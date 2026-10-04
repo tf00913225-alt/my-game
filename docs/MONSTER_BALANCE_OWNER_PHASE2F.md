@@ -4,7 +4,7 @@ Work ID: MONSTER-BALANCE-OWNER-P2F-BOSS-20261004.
 Base dev: 9fff3664d2767739fe8cd5c893f2985f8032d5ef.
 Main: f63d69dbfa66ba75637d1c3cd7fcc7d74782e356; forbidden.
 Branch: feature/monster-balance-owner-phase2f-boss-20261004; target dev.
-Status: IMPLEMENTED, not VERIFIED. PR owns current Head / CI / pending gates.
+Status: 1/1 functional VERIFIED. PR#799 owns metadata-head CI, integration, deployed exact SHA/live QA and cleanup gates.
 Classification: Convergence / Replacement / Removal. No new runtime wrapper.
 
 ## Inspected formal content
@@ -101,11 +101,7 @@ full incoming packet and clamps resulting HP after shield absorption. Existing
 overflow/heal regressions use HP-relative packets and remain mandatory.
 No new damage formula, skill, reward, object count or snapshot architecture.
 
-Required remaining gates: final focused/aggregate + all directly related
-regressions; final neutral/seeded TTK; production Chrome390×844/412×915 Personal
-and all World stages; snapshot/mechanism/reward/repeat/transition; final Runtime
-scan; build/check; latest-head CI; dev merge/deployment/exact SHA and absorbed
-branch cleanup. Requirement remains IMPLEMENTED. No COMPLETE claim.
+Functional gates below are VERIFIED. Required remaining execution gates: metadata-head CI; dev merge/deployment/exact SHA/live QA and absorbed branch cleanup. No COMPLETE claim.
 
 ## Continuation checkpoint — 2026-10-05 (Taipei)
 
@@ -131,3 +127,9 @@ RETIRED/KEEP/MIGRATED, historical evidence retained separately.
 Current aggregate53/53 PASS, focused7/7; latest-head remote full CI, Requirement
 VERIFIED, merge/dev deployment/exact SHA/live QA and branch cleanup remain gates.
 Local Chrome unavailable in this continuation; it is not counted as evidence.
+
+## Functional verification checkpoint
+
+53/53 Phase1–2F aggregate, 7/7 focused, 50/50 formal neutral/seeded TTK, 18/18 natural Chrome scenes at390×844/412×915, snapshot/mechanism/reward regression, final legacy audit and build sync PASS. Exact source d5f88fb03130360add0bbd330930c80c5db6b5c7; Repository CI37220134518 jobs111488621828/111488621822/111488621691/111488621595 SUCCESS; Session CI37220134254 job111488620833 SUCCESS. Boss artifact11309889570 SHA256f949c5f06aa8277bb959e7b111f93599481e6fa1d1cb684126dd8a77c4a26606 independently checked.
+
+Hit/Evasion QA now uses the formal entitlement, toggle and round declaration lifecycle for automatic attacks; original assertions remain. Its latest natural Chrome artifact11310059210 independently matches SHA256f39a315eba8982f47842d574709e62cdb47f45e231d4623610f205dcbaa1b4d4; manual, auto and enemy calls all reached the shared Hit Owner. Earlier failed fixtures are retained as history, not current blockers. Requirement is now1/1 VERIFIED. Final metadata-head CI and dev/deployment/cleanup remain separate gates.

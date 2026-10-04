@@ -709,15 +709,15 @@
     {
       "id": "REQ-MONSTER-BALANCE-OWNER-P2F-BOSS-20261004",
       "title": "Personal/World Boss 戰前數值唯一 MonsterBalance 與七模式 Legacy 退場",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "docs/MONSTER_BALANCE_OWNER_PHASE2F.md",
           "tests/monster-balance-owner-phase2f.test.mjs",
           "scripts/boss-balance-ttk-matrix.mjs"
         ],
-        "verification": "Candidate implementation and synchronous diagnostic only; natural Chrome, aggregate, latest-head CI, deployed SHA and cleanup remain required.",
-        "result": "NOT VERIFIED; do not merge until all required gates pass."
+        "verification": "53/53 Phase1–2F aggregate, 7/7 focused, 50/50 formal neutral/seeded TTK, 18/18 natural Chrome scenes at390×844/412×915, snapshot/mechanism/reward regression, final legacy audit and build sync PASS. Exact source d5f88fb03130360add0bbd330930c80c5db6b5c7; Repository CI37220134518 jobs111488621828/111488621822/111488621691/111488621595 SUCCESS; Session CI37220134254 job111488620833 SUCCESS. Boss artifact11309889570 SHA256f949c5f06aa8277bb959e7b111f93599481e6fa1d1cb684126dd8a77c4a26606 independently checked.",
+        "result": "1/1 functional VERIFIED. Metadata-head CI, integration, deployed exact SHA/live QA and safe branch cleanup are separate release/closeout gates owned by PR#799."
       }
     }
   ]

@@ -1,9 +1,7 @@
 # Monster Balance Owner — Final Convergence Record
 
 Work ID: MONSTER-BALANCE-OWNER-P2F-BOSS-20261004. PR #799, base dev.
-Current status: IMPLEMENTED. Boss production Chrome PASS; latest-head CI,
-integration/deployment and absorbed branch cleanup are not yet closed.
-This document records the implemented authority graph, not a COMPLETE claim.
+Current status: 1/1 functional VERIFIED. Exact-source complete CI and Boss production Chrome PASS. Metadata-head CI, integration/deployment and absorbed branch cleanup remain execution gates owned by PR#799. This document does not claim COMPLETE.
 
 | Formal mode | Level Spec Owner | Allocation Owner | Rank Profile | Mode Profile | Element Profile | Pressure Owner | Legacy stat edge |
 |---|---|---|---|---|---|---|---|
@@ -64,7 +62,8 @@ pressure to formal MonsterBalance entities.
   evidence-token counting.
 - npm run build / build:check: PASS through official build-production.mjs.
 - Production browser390×844/412×915: 18/18 natural scenes PASS; Personal20/30/70, World40 stage1–4 and Personal/World repeat rewards, projection/slots/snapshot/object/reinforcement/shield PASS. Exact source b6f02419; CI37216148173 Boss job111476945757 SUCCESS; artifact11309660021 SHA2564bc8c23163b1e669f16d1c41cb25b624baebad98b0f23cc511259d1c311b1c2c independently checked and representative screenshots reviewed.
-- Latest-head complete CI, deployed exact SHA and safe branch cleanup: pending. Requirement remains IMPLEMENTED.
+- Latest functional-source full CI and independently checked Boss artifact: PASS. 53/53 Phase1–2F aggregate, 7/7 focused, 50/50 formal neutral/seeded TTK, 18/18 natural Chrome scenes at390×844/412×915, snapshot/mechanism/reward regression, final legacy audit and build sync PASS. Exact source d5f88fb03130360add0bbd330930c80c5db6b5c7; Repository CI37220134518 jobs111488621828/111488621822/111488621691/111488621595 SUCCESS; Session CI37220134254 job111488620833 SUCCESS. Boss artifact11309889570 SHA256f949c5f06aa8277bb959e7b111f93599481e6fa1d1cb684126dd8a77c4a26606 independently checked.
+- Metadata-head CI, deployed exact SHA/live QA and safe branch cleanup: pending; PR#799 is durable execution owner. Requirement1/1 VERIFIED.
 
 After Phase2F closes, stop this engineering program. Return to NORMAL
 DEVELOPMENT; any later balance calibration needs a separate approved project.
