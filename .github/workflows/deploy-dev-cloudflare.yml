@@ -15,7 +15,7 @@ jobs:
   deploy:
     name: Deploy dev preview
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       CLOUDFLARE_API_TOKEN_RAW: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID_RAW: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -152,6 +152,19 @@ jobs:
         with:
           name: tower-balance-live-qa-${{ github.sha }}
           path: artifacts/browser-qa/tower-challenge*
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Verify deployed Abyss MonsterBalance runtime
+        id: abyss_balance_live
+        run: ABYSS_BALANCE_BASE_URL="$DEV_BASE_URL" node .github/scripts/run-abyss-balance-browser-qa.mjs
+
+      - name: Upload deployed Abyss balance evidence
+        if: always() && steps.abyss_balance_live.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: abyss-balance-live-qa-${{ github.sha }}
+          path: artifacts/browser-qa/abyss-balance*
           if-no-files-found: error
           retention-days: 90
 

@@ -17,16 +17,6 @@ function storage(seed){
         snapshot:()=>Object.fromEntries(values)
     };
 }
-function baseHp(level,rank){
-    if(Number(level)===20){ return rank==="elite"?1373:rank==="boss"?1931:429; }
-    if(Number(level)===40){ return rank==="elite"?2288:rank==="boss"?3218:715; }
-    throw new Error("unexpected Abyss level "+level);
-}
-function baseDefense(level,rank){
-    if(Number(level)===20){ return rank==="elite"?190:rank==="boss"?213:152; }
-    if(Number(level)===40){ return rank==="elite"?326:rank==="boss"?365:261; }
-    return 1;
-}
 function classList(){
     const values=new Set();
     return {add:name=>values.add(name),remove:name=>values.delete(name),contains:name=>values.has(name)};
@@ -63,11 +53,7 @@ function load(options={}){
             {id:"ticketSetEarth",name:"岩岳裝備券"},{id:"ticketSetFire",name:"赤炎裝備券"},
             {id:"ticketSetWind",name:"青嵐裝備券"},{id:"ticketSetWater",name:"寒泉裝備券"}
         ]}),
-        v132BuildDungeonMonster:(name,level,element,rank)=>({
-            name,level,element,rank,maxHP:baseHp(level,rank),hp:baseHp(level,rank),maxSP:100,sp:100,
-            defense:baseDefense(level,rank),attack:Number(level)===20?140:244,magicAttack:Number(level)===20?140:241,
-            skillIds:[element+"Skill"],skillChance:.35,v132Dungeon:true,activeBuffs:[],statusEffects:[]
-        }),
+        v132BuildDungeonMonster:()=>{throw Error('Retired Abyss numerical caller');},
         v132LaunchDungeonBattle:()=>true,
         v143SkillAnimationManifest:{explosiveFlurry:{sprite:{src:"assets/vfx/fire/explosive-flurry-cast.png?v=165",columns:4,rows:3,frames:12,placement:"group"}}}
     };
@@ -81,6 +67,9 @@ function load(options={}){
         context.FourSymbolsAccountSave.writeForUid(TEST_UID,JSON.parse(oldMain),{source:"test-fixture"});
         localStorage.removeItem("battle_full_version_save_v5");
     }
+    vm.runInContext(fs.readFileSync("js/00-main.js","utf8").split("/* END GENERATED MONSTER BALANCE OWNER */")[0]+"/* END GENERATED MONSTER BALANCE OWNER */",context);
+    context.getMonsterSkillPoolForLevel=(element,level)=>[element+"Skill"];
+    context.getMonsterSkillTierAndChance=()=>({chance:.35});
     vm.runInContext(source,context,{filename:"js/59-abyss-two-tier-runtime.js"});
     return {
         context,localStorage,playerEl,mapEl,
@@ -127,10 +116,10 @@ test("normal boss stages and Lv20 final use seven elite plus one emperor",()=>{
     const assertBossFormation=roster=>{
         assert.equal(roster.length,8);
         assert.equal(roster.filter(monster=>monster.rank==="elite").length,7);
-        assert.equal(roster.filter(monster=>monster.rank==="boss").length,1);
+        assert.equal(roster.filter(monster=>monster.rank==="smallBoss").length,1);
         assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationRow),[0,0,0,0,0]);
         assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationPosition),[0,1,2,3,4]);
-        assert.equal(roster[2].rank,"boss");
+        assert.equal(roster[2].rank,"smallBoss");
         assert.deepEqual(roster.slice(5).map(monster=>monster.v141FormationRow),[1,1,1]);
         assert.deepEqual(roster.slice(5).map(monster=>monster.v141FormationPosition),[1,2,3]);
     };
@@ -142,7 +131,7 @@ test("normal boss stages and Lv20 final use seven elite plus one emperor",()=>{
     }
     const initialFinal=value(context,"v174AbyssBuildRoster(20,4,4)");
     assertBossFormation(initialFinal);
-    assert.deepEqual(initialFinal.filter(monster=>monster.rank==="boss").map(monster=>monster.name),["極帝天尊"]);
+    assert.deepEqual(initialFinal.filter(monster=>monster.rank==="smallBoss").map(monster=>monster.name),["極帝天尊"]);
 });
 
 test("Lv40 final battle restores five Heavenly Emperors plus five elite in formal v155 order",()=>{
@@ -150,35 +139,24 @@ test("Lv40 final battle restores five Heavenly Emperors plus five elite in forma
     const roster=value(context,"v174AbyssBuildRoster(40,4,4)");
     assert.equal(roster.length,10);
     assert.deepEqual(roster.slice(0,5).map(monster=>monster.name),["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"]);
-    assert.equal(roster.slice(0,5).every(monster=>monster.rank==="boss"&&monster.v141FormationRow===0),true);
+    assert.equal(roster.slice(0,5).every(monster=>monster.rank==="smallBoss"&&monster.v141FormationRow===0),true);
     assert.equal(roster.slice(5).every(monster=>monster.rank==="elite"&&monster.v141FormationRow===1),true);
     assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationPosition),[0,1,2,3,4]);
 });
 
-test("both Abyss difficulties reduce current monster HP by 25 percent while preserving the same stage curve",()=>{
+test("Abyss HP/SP/attack/defense now match the unique owner without late durability writes",()=>{
     const {context}=load();
-    const expected20=[[[724,2317],[764,2446],[804,2574],[845,2703]],[2832,5793]];
-    const expected40=[[[1207,3861],[1274,4076],[1341,4290],[1408,4505]],[4719,9654]];
-    [[20,expected20],[40,expected40]].forEach(([level,expected])=>{
-        expected[0].forEach(([regularHp,eliteHp],stage)=>{
-            const roster=value(context,`v174AbyssBuildRoster(${level},0,${stage})`);
-            assert.deepEqual([roster[0].maxHP,roster[5].maxHP],[regularHp,eliteHp]);
-            assert.equal(roster.every(monster=>monster.v174AbyssDurabilityMultiplier===1.875),true);
-        });
-        const boss=value(context,`v174AbyssBuildRoster(${level},0,4)`);
-        assert.deepEqual([
-            boss.find(monster=>monster.rank==="elite").maxHP,
-            boss.find(monster=>monster.rank==="boss").maxHP
-        ],expected[1]);
-    });
-});
-
-test("HP durability change does not modify attack or defense construction",()=>{
-    const {context}=load();
-    const lv20=value(context,"v174AbyssBuildRoster(20,0,0)");
-    const lv40=value(context,"v174AbyssBuildRoster(40,0,0)");
-    assert.deepEqual([lv20[0].attack,lv20[0].defense],[140,152]);
-    assert.deepEqual([lv40[0].attack,lv40[0].defense],[244,261]);
+    [20,40].forEach(level=>{for(let region=0;region<5;region++)for(let stage=0;stage<5;stage++){
+        const roster=value(context,`v174AbyssBuildRoster(${level},${region},${stage})`);
+        for(const m of roster){
+            const p=context.MonsterBalance.preview(m.balanceProjection.identity);
+            assert.equal(m.maxHP,p.final.maxHP);assert.equal(m.maxSP,p.final.maxSP);
+            assert.equal(m.attack,p.final.physicalAttack);assert.equal(m.magicAttack,p.final.magicAttack);
+            assert.equal(m.defense,p.final.defense);assert.equal(m.agility,p.final.speed);
+            assert.equal(m.balanceOwner,"MonsterBalance");
+            assert.equal(Object.hasOwn(m,"v174AbyssDurabilityMultiplier"),false);
+        }
+    }});
 });
 
 test("rapid chest taps acquire one interaction lock and grant exactly one reward",()=>{

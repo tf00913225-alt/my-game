@@ -3,7 +3,7 @@
 /* =====================================================
    Abyss Two-Tier Runtime — fixed Lv20/Lv40 Void Five Emperors
    Formal successor for the legacy five-floor Abyss flow.
-   Reuses v132 dungeon monster construction / battle launcher and the existing
+   Reuses the v132 battle launcher; MonsterBalance owns pre-battle stats and the existing
    combat engine; only Abyss difficulty, progression, rewards and presentation
    are owned here.
 ===================================================== */
@@ -24,20 +24,17 @@
     const PRE_STAGE_ELITE_COUNT=3;
     const STAGES_PER_REGION=5;
     const REGION_COUNT=5;
-    const HP_DURABILITY_MULTIPLIER=1.875;
 
     const ABYSS_DIFFICULTIES=Object.freeze({
         20:Object.freeze({
             id:20,title:"虛空五帝・初境",shortTitle:"初境",unlockLevel:20,
-            monsterLevel:20,skillLevel:1,stageHpMultipliers:Object.freeze([0.90,0.95,1.00,1.05]),
-            bossEliteHpMultiplier:1.10,bossHpMultiplier:1.60,
+            monsterLevel:20,skillLevel:1,
             normalGold:120,emperorGold:500,finalGold:1500,finalExp:600,
             cover:"assets/dungeons/abyss/abyss-cover.webp"
         }),
         40:Object.freeze({
             id:40,title:"虛空五帝・真境",shortTitle:"真境",unlockLevel:40,
-            monsterLevel:40,skillLevel:2,stageHpMultipliers:Object.freeze([0.90,0.95,1.00,1.05]),
-            bossEliteHpMultiplier:1.10,bossHpMultiplier:1.60,
+            monsterLevel:40,skillLevel:2,
             normalGold:220,emperorGold:900,finalGold:3000,finalExp:1200,
             cover:"assets/dungeons/abyss/abyss-cover-v17343.png"
         })
@@ -344,27 +341,30 @@
     }
     function currentRegion(run){ return ABYSS_REGIONS[clamp(Math.floor(numeric(run&&run.regionIndex,0)),0,REGION_COUNT-1)]; }
 
-    function applyHpMultiplier(monster,multiplier){
-        const scale=Math.max(0.01,numeric(multiplier,1))*HP_DURABILITY_MULTIPLIER;
-        monster.maxHP=Math.max(1,Math.round(numeric(monster.maxHP,1)*scale));
-        monster.hp=monster.maxHP;
-        monster.v174AbyssHpMultiplier=scale;
-        monster.v174AbyssDurabilityMultiplier=HP_DURABILITY_MULTIPLIER;
-        delete monster.v141ExtraHP;
-        return monster;
+    // Stable identity mapping; role intent never invents a skill or AI capability.
+    function abyssArchetype(name){
+        if(name==="極帝天尊"){ return "support"; }
+        if(["東帝","東帝天尊","南帝","南帝天尊"].includes(name)){ return "physical"; }
+        if(["天帝","天帝天尊","北帝","北帝天尊"].includes(name)){ return "magic"; }
+        if(name==="天兵天將"){ return "balanced"; }
+        throw new Error("Unknown formal Abyss identity: "+name);
     }
-
-    function makeAbyssMonster(name,config,region,rank,hpMultiplier,boss,loadout){
-        if(typeof window.v132BuildDungeonMonster!=="function"){
-            throw new Error("Abyss requires v132BuildDungeonMonster runtime owner.");
-        }
-        const monster=window.v132BuildDungeonMonster(name,config.monsterLevel,region.element,rank);
-        applyHpMultiplier(monster,hpMultiplier);
+    function makeAbyssMonster(name,config,region,rank,stage,boss,loadout,contextRegion){
+        const element=loadout?loadout.element:region.element;
+        const regionId=contextRegion||region.id;
+        const monster=window.MonsterBalance.build({
+            monsterKey:"abyss."+name+"."+element,name,level:config.monsterLevel,element,
+            archetype:abyssArchetype(name),rank,mode:"abyss",
+            context:"abyss/"+config.id+"/"+regionId+"/stage/"+(stage+1),
+            abyssDifficulty:config.id,abyssRegion:regionId,abyssStage:stage
+        });
+        // Preserve the existing skill-pool/frequency owner without calling a stat builder.
+        monster.skillIds=getMonsterSkillPoolForLevel(element,config.monsterLevel).slice();
+        monster.skillChance=getMonsterSkillTierAndChance(config.monsterLevel).chance;
         monster.v141Abyss=true;
         monster.v174TwoTierAbyss=true;
         monster.v174AbyssDifficulty=config.id;
         monster.v174AbyssRegion=region.id;
-        monster.level=config.monsterLevel;
         monster.v132FixedSkillLoadout=true;
         monster.v141ForceSkillLevel=config.skillLevel;
         monster.v141SkillLevel=config.skillLevel;
@@ -374,7 +374,6 @@
             monster.skillIds=(loadout?loadout.skills:region.bossSkills).slice();
             monster.v141SupportSkillIds=(loadout?loadout.supports:region.bossSupports).slice();
             if(loadout){
-                monster.element=loadout.element;
                 monster.v144CrossElementSkillIds=Array.isArray(loadout.crossElementSkillIds)
                     ?loadout.crossElementSkillIds.slice():[];
             }
@@ -384,7 +383,6 @@
             monster.skillIds=(loadout?loadout.skills:monster.skillIds||[]).slice();
             monster.v141SupportSkillIds=(loadout?loadout.supports:[]).slice();
             if(loadout){
-                monster.element=loadout.element;
                 monster.v144CrossElementSkillIds=Array.isArray(loadout.crossElementSkillIds)
                     ?loadout.crossElementSkillIds.slice():[];
             }
@@ -397,7 +395,7 @@
         FINAL_TRUE_REALM_EMPERORS.forEach((definition,position)=>{
             const emperorRegion=ABYSS_REGIONS[definition.regionIndex];
             const loadout=FINAL_TRUE_REALM_LOADOUTS[definition.name];
-            const boss=makeAbyssMonster(definition.name,config,emperorRegion,"boss",config.bossHpMultiplier,true,loadout);
+            const boss=makeAbyssMonster(definition.name,config,emperorRegion,"smallBoss",PRE_STAGE_COUNT,true,loadout,"extreme");
             boss.v141ForceSkillLevel=5;
             boss.v141SkillLevel=5;
             boss.v144SkillLevel=5;
@@ -407,7 +405,7 @@
             roster.push(boss);
         });
         for(let position=0;position<5;position++){
-            const elite=makeAbyssMonster("天兵天將",config,ABYSS_REGIONS[4],"elite",config.bossEliteHpMultiplier,false,FINAL_TRUE_REALM_ELITE_LOADOUTS[position]);
+            const elite=makeAbyssMonster("天兵天將",config,ABYSS_REGIONS[4],"elite",PRE_STAGE_COUNT,false,FINAL_TRUE_REALM_ELITE_LOADOUTS[position]);
             elite.v141ForceSkillLevel=5;
             elite.v141SkillLevel=5;
             elite.v144SkillLevel=5;
@@ -427,13 +425,12 @@
         const stage=clamp(Math.floor(numeric(encounterIndex,0)),0,STAGES_PER_REGION-1);
         const roster=[];
         if(stage<PRE_STAGE_COUNT){
-            const hpMultiplier=config.stageHpMultipliers[stage];
             for(let index=0;index<PRE_STAGE_REGULAR_COUNT;index++){
-                const monster=makeAbyssMonster("天兵天將",config,region,"regular",hpMultiplier,false);
+                const monster=makeAbyssMonster("天兵天將",config,region,"regular",stage,false);
                 monster.v141FormationRow=1;monster.v141FormationPosition=index;roster.push(monster);
             }
             for(let index=0;index<PRE_STAGE_ELITE_COUNT;index++){
-                const monster=makeAbyssMonster("天兵天將",config,region,"elite",hpMultiplier,false);
+                const monster=makeAbyssMonster("天兵天將",config,region,"elite",stage,false);
                 monster.v141FormationRow=0;monster.v141FormationPosition=index;roster.push(monster);
             }
             return roster;
@@ -443,15 +440,15 @@
         }
         for(let position=0;position<5;position++){
             if(position===2){
-                const boss=makeAbyssMonster(region.emperor,config,region,"boss",config.bossHpMultiplier,true);
+                const boss=makeAbyssMonster(region.emperor,config,region,"smallBoss",stage,true);
                 boss.v141FormationRow=0;boss.v141FormationPosition=2;roster.push(boss);
             }else{
-                const elite=makeAbyssMonster("天兵天將",config,region,"elite",config.bossEliteHpMultiplier,false);
+                const elite=makeAbyssMonster("天兵天將",config,region,"elite",stage,false);
                 elite.v141FormationRow=0;elite.v141FormationPosition=position;roster.push(elite);
             }
         }
         for(let position=1;position<=3;position++){
-            const elite=makeAbyssMonster("天兵天將",config,region,"elite",config.bossEliteHpMultiplier,false);
+            const elite=makeAbyssMonster("天兵天將",config,region,"elite",stage,false);
             elite.v141FormationRow=1;elite.v141FormationPosition=position;roster.push(elite);
         }
         return roster;

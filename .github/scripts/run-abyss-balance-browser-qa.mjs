@@ -1,0 +1,81 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {spawn} from 'node:child_process';
+import {ROOT,findChrome,startServer,waitJson,Cdp} from './runtime-browser-qa-support.mjs';
+const fixture=fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','utf8');
+const expression=`(async()=>{
+ const check=(v,m)=>{if(!v)throw Error(m);};
+ const wait=async(fn,ms=30000)=>{const end=performance.now()+ms;while(!fn()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(fn(),'Runtime wait: '+fn);};
+ await wait(()=>FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
+ await FourSymbolsFeatures.ensure('gameplay-core','abyss-balance-qa');await FourSymbolsFeatures.ensure('abyss','abyss-balance-qa');
+ await wait(()=>FourSymbolsReleaseUpdate?.getState?.().availableReleaseVersion);closeHomeFeature();
+ const evidence=window.abyssBalanceQaEvidence={matrix:[],scenes:[],skills:[],controls:[],portraitGaps:[]};
+ const oldRandom=Math.random;Math.random=()=>.5;autoBattle=false;autoPatrolEnabled=false;
+ const stats=m=>[m.maxHP,m.maxSP,m.attack,m.magicAttack,m.defense,m.agility,m.rank,m.element];
+ const verify=m=>{const p=MonsterBalance.debug(m);check(m.mode==='abyss'&&m.balanceOwner==='MonsterBalance','Abyss owner');check(!Object.hasOwn(m,'v132Dungeon')&&!Object.hasOwn(m,'v141ExtraHP'),'no legacy stat markers');check(JSON.stringify(stats(m).slice(0,6))===JSON.stringify([p.final.maxHP,p.final.maxSP,p.final.physicalAttack,p.final.magicAttack,p.final.defense,p.final.speed]),'projection equality');check(getEnemyPressureMultiplier(m,player)===p.finalDamagePressure,'pressure once');};
+ for(const level of [20,40])for(let region=0;region<5;region++)for(let stage=0;stage<5;stage++){const roster=v174AbyssBuildRoster(level,region,stage);roster.forEach(verify);evidence.matrix.push({level,region,stage,units:roster.map(m=>({name:m.name,rank:m.rank,context:m.context,stats:stats(m),portraitKey:m.portraitKey,portrait:v154ResolveMonsterPortraitRecord(m)}))});}
+ const badgeOwner=showMonsterSkillNameBadge;showMonsterSkillNameBadge=function(name,...args){evidence.skills.push(name);return badgeOwner(name,...args);};
+ const resultClose=()=>document.querySelector('#battleStatisticsResultModal [data-close]')?.click();
+ async function scene(difficulty,region,stage,partyLevel,manual=false){
+  const reference=prepareWildBalanceReferenceParty(partyLevel,partyLevel>=50?3:2);
+  for(const cfg of [autoConfig,autoConfig2,autoConfig3]){cfg.enabled=false;cfg.skill=reference.skill;}autoBattle=false;
+  closeHomeFeature();v174AbyssBackToSelection();showPage('dungeon');switchDungeonTab('abyss');v174AbyssSelectDifficulty(difficulty);
+  // Seed progression only in the isolated read-only QA account. Entry, combat,
+  // results, chest claim and return remain the unmodified production owners.
+  const root=v174AbyssGetRootState();root.selectedDifficulty=difficulty;root.runs[difficulty]={...root.runs[difficulty],active:true,regionIndex:region,encounterIndex:stage,isBoss:stage===4,phase:'ready',battleCompleted:false,chestSpawned:false,chestClaimed:false,portalUnlocked:false,completed:false,completedStages:{},rewardClaims:{},firstClearClaims:{},completedRegions:[false,false,false,false,false],x:50,y:84};
+  localStorage.setItem(FourSymbolsAccountSave.accountKey('abyss-state',FourSymbolsAccountSave.getActiveUid()),JSON.stringify(root));v174AbyssReloadState();v174AbyssSelectDifficulty(difficulty);
+  const entry=document.querySelector('.v174-abyss-encounter');check(entry,'formal entry');entry.click();
+  if(stage===4){await wait(()=>document.getElementById('v169RpgDialogLayer')?.classList.contains('show'));document.querySelectorAll('#v169RpgDialogLayer .v169-rpg-dialog-button')[1].click();}
+  await wait(()=>battleActive&&window.v132ActiveDungeonRun?.mode==='abyss');await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
+  check(!document.getElementById('homeFeatureModal')?.classList.contains('show'),'no blocking shared modal');
+  const initial=monsters.map(stats),ids=currentBattleMonsters.slice(),snapshot=FourSymbolsBattlefieldSlots.getActiveEnemySnapshot(),slots=ids.map(i=>FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,i));
+  check(new Set(slots).size===ids.length,'unique fixed slots');monsters.forEach(verify);renderBattle();monsters.forEach(verify);
+  for(const i of ids){const card=document.getElementById('battleMonster'+i),art=card?.querySelector('.v174-battle-art'),r=card?.getBoundingClientRect();check(r&&r.width>0&&r.height>0&&r.left>=-1&&r.right<=innerWidth+1,'visible target card');check(art&&getComputedStyle(art).backgroundImage!=='none','formal portrait');check(card.querySelector('.monster-hp-inner')&&card.querySelector('.monster-sp-inner'),'HP SP UI');const record=v154ResolveMonsterPortraitRecord(monsters[i]);if(record.temporary)evidence.portraitGaps.push(record);}
+  const shapes={};for(const shape of ['single','all','row','tri']){const targets=FourSymbolsBattlefieldSlots.resolveEnemyTargets(snapshot,ids[0],shape,i=>monsters[i]?.alive);check(targets.length>0&&targets.every(i=>ids.includes(i)),'target geometry '+shape);shapes[shape]=targets;}
+  window.abyssBalanceQaCapture={difficulty,region,stage};await new Promise(r=>setTimeout(r,400));
+  const events=[];const off=FourSymbolsBattleFlow.subscribeBeforeCombatant(e=>{const actor=e.queue[e.index];events.push({round:turn,type:actor?.type,index:actor?.monsterIndex??actor?.characterIndex});monsters.forEach(verify);check(JSON.stringify(ids.map(i=>FourSymbolsBattlefieldSlots.getEnemySlotForMonster(FourSymbolsBattlefieldSlots.getActiveEnemySnapshot(),i)))===JSON.stringify(slots),'no death reflow');});
+  let rounds=1;
+  try{
+   if(!manual){toggleAutoBattle();check(autoBattle,'formal auto input');}
+   while(battleActive){
+    await wait(()=>!battleActive||(battlePhase==='declare'&&battlePresentationLocks.size===0),160000);if(!battleActive)break;rounds=turn;
+    if(!manual){await wait(()=>!battleActive,180000);break;}
+    const beforeTurn=turn;
+    while(battleActive&&battlePhase==='declare'){
+     await wait(()=>!battleActive||battlePhase!=='declare'||(!battleAdvanceScheduled&&battlePresentationLocks.size===0&&declaredCharacterIndexes.has(activeBattleCharacterIndex)));
+     if(!battleActive||battlePhase!=='declare')break;
+     const action=chooseWildBalanceReferenceAction(activeBattleCharacterIndex,reference.skill);toggleSkillQuickBar();const button=document.querySelector('.skill-quick-button[data-skill-id="'+reference.skill+'"]');check(button&&!button.disabled,'legal skill');button.click();check(actionReady&&pendingAction===reference.skill,'skill declaration');document.getElementById('battleMonster'+(action.target??ids.find(i=>monsters[i].alive))).click();
+    }
+    await wait(()=>!battleActive||turn>beforeTurn,160000);
+   }
+  }finally{off();}
+  autoBattle=false;autoConfig.enabled=false;await wait(()=>document.getElementById('battleStatisticsResultModal')?.classList.contains('show'));resultClose();
+  await wait(()=>v174AbyssGetRunState(difficulty).phase==='chest');check(!window.v132ActiveDungeonRun,'no background battle');
+  check(JSON.stringify(initial)===JSON.stringify(monsters.map(stats)),'no late stat writer');
+  const goldBefore=gold;document.querySelector('.v174-abyss-chest').click();await wait(()=>v174AbyssGetRunState(difficulty).chestClaimed,12000);check(gold>goldBefore,'formal reward');
+  document.querySelector('#v132RewardModal button')?.click();document.querySelector('#v141BlackGoldRewardModal button')?.click();
+  v174AbyssBackToSelection();v174AbyssLeaveToGameplay();check(!battleActive&&!window.v132ActiveDungeonRun,'return cleanup');
+  evidence.scenes.push({difficulty,region,stage,partyLevel,manual,initial,slots,shapes,events,rounds:Math.max(...events.map(e=>e.round)),survivors:getExistingPartyIndexes().filter(i=>getPartyCharacterByIndex(i).hp>0).length,rewardGold:gold-goldBefore});
+ }
+ try{
+  for(const region of [0,1,2,3])await scene(20,region,0,30,region===0);
+  await scene(20,3,4,30);await scene(40,4,4,60);await scene(20,0,0,20,true);
+  for(const rank of ['regular','elite','boss']){const cap=rank==='regular'?90:rank==='elite'?75:60;check(calculateStatusEffectChance(999,100,100,0,0,true,rank,0)===cap,'player hard cap');evidence.controls.push({rank,cap});}check(calculateStatusEffectChance(999,100,100,0,0,true,'player',0)===60,'enemy hard cap');
+  return evidence;
+ }finally{Math.random=oldRandom;showMonsterSkillNameBadge=badgeOwner;autoBattle=false;autoConfig.enabled=false;}
+})()`;
+const baseUrl=process.env.ABYSS_BALANCE_BASE_URL;
+if(baseUrl){const manifest=await fetch(new URL('release-manifest.json',baseUrl+'/')).then(r=>r.json());assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA,'Abyss deployed exact SHA');}
+const server=await startServer({baseUrl});const artifact=path.join(ROOT,'artifacts/browser-qa/abyss-balance.json');fs.mkdirSync(path.dirname(artifact),{recursive:true});const results=[];let client,proc,profile;
+function close(){client?.close();client=null;proc?.kill('SIGTERM');proc=null;if(profile){try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{}profile=null;}}
+try{
+ for(const [width,height] of [[390,844],[412,915]]){
+  profile=fs.mkdtempSync(path.join(os.tmpdir(),'abyss-balance-'));const port=9850+Math.floor(Math.random()*100);proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
+  const tabs=await waitJson('http://127.0.0.1:'+port+'/json/list');client=new Cdp(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});await new Promise(r=>setTimeout(r,1000));const active=client.eval(fixture+'\n'+expression);let done=false;active.finally(()=>{done=true;}).catch(()=>{});const captured=new Set();while(!done){await new Promise(r=>setTimeout(r,200));const marker=await client.eval('window.abyssBalanceQaCapture||null').catch(()=>null);if(marker){const key=[marker.difficulty,marker.region,marker.stage].join('-');if(!captured.has(key)){captured.add(key);const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-'+width+'x'+height+'-'+key+'.png'),Buffer.from(shot.data,'base64'));}}}
+  const evidence=await active;assert.equal(evidence.matrix.length,50);assert.equal(evidence.scenes.length,7);assert.equal(evidence.scenes.every(s=>s.survivors>0),true);assert.equal(client.events.some(e=>e.method==='Runtime.consoleAPICalled'&&e.params.type==='error'&&JSON.stringify(e.params.args).includes('戰鬥行動超過安全期限')),false,'no watchdog recovery');results.push({width,height,...evidence});close();
+ }
+ fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',results},null,2)+'\n');console.log('Abyss production QA: 14 natural scenes, 100 rosters / 804 projections, both mobile viewports PASS');
+}catch(error){const partial=await client?.eval('({evidence:window.abyssBalanceQaEvidence,phase:battlePhase,turn,battleActive,run:window.v132ActiveDungeonRun,modals:[...document.querySelectorAll(".show")].map(x=>x.id)})').catch(()=>null);fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-15)},null,2)+'\n');throw error;}
+finally{close();await new Promise(r=>server.server.close(r));}

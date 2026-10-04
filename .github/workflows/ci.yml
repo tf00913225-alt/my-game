@@ -23,7 +23,7 @@ jobs:
     # Keep every gate; 80bbe8d7 hit the prior 20-minute limit after Wild passed.
     # Daily natural battles add 6m33s; run 37133129829 reached the 30m cap
     # after Daily and Tower passed, while the battle QA had printed PASS.
-    timeout-minutes: 40
+    timeout-minutes: 45
 
     steps:
       - name: Check out repository
@@ -267,6 +267,24 @@ jobs:
           path: |
             artifacts/browser-qa/tower-challenge*
             artifacts/browser-qa/wild-balance*
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Verify Abyss MonsterBalance Phase2D
+        id: abyss_balance
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          node tests/monster-balance-owner-phase2d.test.mjs
+          node scripts/abyss-balance-ttk-matrix.mjs artifacts/browser-qa/abyss-balance-ttk.json
+          node .github/scripts/run-abyss-balance-browser-qa.mjs
+
+      - name: Upload Abyss MonsterBalance evidence
+        if: always() && steps.abyss_balance.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: abyss-balance-${{ github.sha }}
+          path: artifacts/browser-qa/abyss-balance*
           if-no-files-found: error
           retention-days: 90
 

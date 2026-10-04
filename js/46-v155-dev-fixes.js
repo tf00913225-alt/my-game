@@ -422,7 +422,7 @@
         if(!monster||(monster.v141SupportSkillIds||[]).indexOf("revive")<0||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
         const defeated=currentAbyssEntriesIncludingDefeated().filter(entry=>
             entry.index!==monsterIndex&&(entry.monster.alive===false||numeric(entry.monster.hp)<=0)
-        ).sort((left,right)=>(right.monster.rank==="boss")-(left.monster.rank==="boss")||left.index-right.index);
+        ).sort((left,right)=>(getMonsterRank(right.monster)==="boss")-(getMonsterRank(left.monster)==="boss")||left.index-right.index);
         const target=defeated[0];
         if(!target||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));

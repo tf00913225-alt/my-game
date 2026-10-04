@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-04",
+  "title": "Monster Balance Owner Phase2D Abyss",
+  "workId": "MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004",
+  "base_branch": "dev",
+  "base_sha": "f47862cc592870e359d31da5da52a5d530c831a8",
+  "work_branch": "feature/monster-balance-owner-phase2d-abyss-20261004",
+  "officialVersion": "173.73",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REQ-MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004",
+      "title": "Abyss 戰前數值唯一 MonsterBalance／canonical smallBoss／退休 V141 V132 V174 重複數值寫入",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "docs/MONSTER_BALANCE_OWNER_PHASE2D.md",
+          "docs/monster-balance-owner-retirement-map.json",
+          "tests/monster-balance-owner-phase2d.test.mjs",
+          "scripts/abyss-balance-ttk-matrix.mjs",
+          ".github/scripts/run-abyss-balance-browser-qa.mjs",
+          "docs/monster-balance-abyss-baseline-20261004.json",
+          "docs/monster-balance-abyss-ttk-evidence-20261004.json"
+        ],
+        "verification": "Focused6/6, 50 encounters/402 projections/14 stable identities; diagnostic150 cases,149 clear+survivor, one explicitly retained unequipped Lv40 final loss; natural Chrome/regression/latest-head CI pending.",
+        "result": "IMPLEMENTED; no VERIFIED until all formal gates pass. Stop before Phase2E; main untouched."
+      }
+    }
+  ]
+}

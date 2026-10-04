@@ -1,3 +1,15 @@
+## 2026-10-04 — Monster Balance Owner Phase2D Abyss / IN PROGRESS / PR #793
+
+Work ID `MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004`; branch `feature/monster-balance-owner-phase2d-abyss-20261004`, target dev.
+Start dev `f47862cc592870e359d31da5da52a5d530c831a8`; main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` forbidden.
+Phase1/2A/2B/2C complete history preserved. This work only Abyss and stops before Phase2E.
+Current spec: Lv20/Lv40, 5 regions ×5 stages; 402 entities /14 stable identities; emperors canonical single-slot smallBoss.
+MonsterBalance now solely projects stats/pressure; V132 Abyss numerical edge, V141 obsolete extra HP builder and V174 durability late mutation removed. Existing skill/AI/formation/portrait/reward/lifecycle owners remain.
+Baseline150 cases38 losses; calibrated150 cases149 clear+survivor; bare Lv40 two-person final loss retained, Lv50/Lv60 final clear. No forced two-round gate.
+Requirement IMPLEMENTED; focused6/6 PASS; regression/natural production Chrome/latest-head CI still pending.
+Closeout requires VERIFIED + latest dev absorption + merge + exact deployment/live Abyss QA + safe branch deletion; do not call COMPLETE yet.
+Full inventory, caller graph, profiles and evidence: `docs/MONSTER_BALANCE_OWNER_PHASE2D.md`.
+
 ## 2026-10-04 — MONSTER-BALANCE-OWNER-P2C-TOWER-20261004（功能1/1 VERIFIED；整合／部署待Gate）
 
 - 開工 dev `13c22561afc518ce33b7da798b32e1c215e3cbde`；main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` 禁止修改。Branch `feature/monster-balance-owner-phase2c-tower-20261004`。Phase1／2A／2B 已核實，未重做；停止點為 Tower，不進 Abyss Phase2D。

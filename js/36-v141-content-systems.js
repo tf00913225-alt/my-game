@@ -807,65 +807,13 @@
     };
     const elementLabel={fire:"火",water:"水",earth:"土",wind:"風",light:"光"};
 
-    function makeAbyssMonster(name,level,element,rank,extraHp,skills,forceLevel){
-        const monster=window.v132BuildDungeonMonster(name,level,element,rank);
-        monster.maxHP+=extraHp;
-        monster.hp=monster.maxHP;
-        monster.v141Abyss=true;
-        monster.v141ExtraHP=extraHp;
-        monster.v141ForceSkillLevel=forceLevel;
-        monster.v141SkillLevel=forceLevel;
-        monster.v144SkillLevel=forceLevel;
-        monster.skillIds=(skills||[]).slice();
-        monster.skillChance=.78;
-        monster.activeBuffs=[];
-        return monster;
-    }
-
+    // Compatibility entry only: the two-tier owner owns roster/progression;
+    // this retired five-floor path has no monster-stat construction authority.
     function buildAbyssRoster(floor){
-        const level=window.v132GetDungeonMonsterLevel?window.v132GetDungeonMonsterLevel():Math.max(1,window.v141GetHighestCharacterLevel());
-        if(floor<5){
-            const data=abyssFloors[floor];
-            const skillLevel=typeof window.v141GetMonsterFixedSkillLevel==="function"
-                ?window.v141GetMonsterFixedSkillLevel(level)
-                :(level<=20?1:level<=40?2:level<=60?3:level<=80?4:5);
-            const boss=makeAbyssMonster(data.boss,level,data.element,"boss",5000,data.skills,skillLevel);
-            const roster=[boss];
-            for(let i=0;i<4;i++){
-                roster.push(makeAbyssMonster("天兵天將",level,data.element,"elite",2500,[data.eliteSkill],skillLevel));
-            }
-            return roster;
+        if(typeof window.v174AbyssBuildRoster!=="function"){
+            throw new Error("Load formal two-tier Abyss before building an encounter.");
         }
-
-        const roster=[];
-        const bossSpecs=[
-            ["東帝天尊","earth",["dustStorm","stoneBreakSky"],["barrier"]],
-            ["天帝天尊","wind",["windHowlLightning","stormRain","stormSpell"],[]],
-            ["極帝天尊","light",[],["yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing"]],
-            ["北帝天尊","water",["iceArrowRain","freeze"],["healSpell"]],
-            ["南帝天尊","fire",["phoenixCry","dragonSlash"],["rage"]]
-        ];
-        bossSpecs.forEach((spec,position)=>{
-            const monster=makeAbyssMonster(spec[0],level,spec[1],"boss",10000,spec[2],5);
-            monster.v141SupportSkillIds=spec[3];
-            if(spec[0]==="極帝天尊"){ monster.v141AbyssAi="support"; monster.skillChance=1; }
-            monster.v141FormationRow=0;
-            monster.v141FormationPosition=position;
-            roster.push(monster);
-        });
-        const elites=[
-            ["water",null,"healSpell"],["earth","stoneBreakSky",null],["fire","phoenixCry",null],
-            ["wind",null,"dodgeSkill"],["water",null,"healSpell"]
-        ];
-        elites.forEach((spec,position)=>{
-            const monster=makeAbyssMonster("天兵天將",level,spec[0],"elite",3500,spec[1]?[spec[1]]:[],5);
-            monster.v141SupportSkillIds=spec[2]?[spec[2]]:[];
-            monster.v141ForceSkillLevel=5;
-            monster.v141FormationRow=1;
-            monster.v141FormationPosition=position;
-            roster.push(monster);
-        });
-        return roster;
+        return window.v174AbyssBuildRoster(40,Math.max(0,Math.min(4,Number(floor)-1)),4);
     }
     window.v141BuildAbyssRoster=buildAbyssRoster;
 

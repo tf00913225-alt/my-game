@@ -585,6 +585,24 @@
         "verification": "Local proof37/37 and preparation/encounter/kernel/proof117/117 PASS, skip0; 128 existing parity cases unchanged. Exact generated policy/code/catalog comparisons PASS. Real Firestore emulator assertions are added to the existing Session Authority owner; remote latest-head CI/emulator, integration, Firebase/DEV deployment and safe cleanup remain mandatory and are tracked by this Work PR.",
         "result": "One UID-private arithmetic observation per preparation; atomic proof/pinned-policy/receipt/marker. Same-intent replay preserves original rules/random/output after expiry or current revision/deployment policy changes. No callable, browser hook, legal action order, terminal verdict, account/economy/HP/reward/ledger mutation or readiness publication. Phase4 remains0/6 VERIFIED."
       }
+    },
+    {
+      "id": "REQ-MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004",
+      "title": "Abyss 戰前數值唯一 MonsterBalance／canonical smallBoss／退休 V141 V132 V174 重複數值寫入",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "docs/MONSTER_BALANCE_OWNER_PHASE2D.md",
+          "docs/monster-balance-owner-retirement-map.json",
+          "tests/monster-balance-owner-phase2d.test.mjs",
+          "scripts/abyss-balance-ttk-matrix.mjs",
+          ".github/scripts/run-abyss-balance-browser-qa.mjs",
+          "docs/monster-balance-abyss-baseline-20261004.json",
+          "docs/monster-balance-abyss-ttk-evidence-20261004.json"
+        ],
+        "verification": "Focused6/6, 50 encounters/402 projections/14 stable identities; diagnostic150 cases,149 clear+survivor, one explicitly retained unequipped Lv40 final loss; natural Chrome/regression/latest-head CI pending.",
+        "result": "IMPLEMENTED; no VERIFIED until all formal gates pass. Stop before Phase2E; main untouched."
+      }
     }
   ]
 }
