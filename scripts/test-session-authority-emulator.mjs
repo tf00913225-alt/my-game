@@ -14,6 +14,7 @@ const {createDailyCheckinGrant}=require("../functions/src/daily-checkin-grant.js
 const {createCanonicalBattleAttempt}=require("../functions/src/canonical-battle-attempt.js");
 const {createCanonicalBattleEncounter}=require("../functions/src/canonical-battle-encounter.js");
 const {resolvePlainPlayerNormalAttack}=require("../functions/src/canonical-battle-normal-attack.js");
+const {resolveForestOpeningRound}=require("../functions/src/canonical-battle-opening-round.js");
 const {createCanonicalBattleAttackProof}=require("../functions/src/canonical-battle-attack-proof.js");
 const {createCanonicalExpAllocation}=require("../functions/src/canonical-exp-allocation.js");
 const {createCanonicalAttributeAllocation}=
@@ -481,6 +482,38 @@ assert.deepEqual((await db.doc(`users/${y}/saves/current`).get()).data(),battleB
 assert.equal((await battleRoot.collection("pendingGrants").get()).size,0);
 assert.equal((await battleRoot.collection("ledgerEntries").get()).size,0);
 console.log("Normal attack rule arithmetic on private Firestore sources: deterministic hit/MISS, session refusal and zero authoritative mutation PASS");
+
+// Opening-round arithmetic uses real original private sources in the existing
+// protected transaction. Explicit server transcript only, no persisted action.
+const readOpeningRoundInputs=(request,tape)=>writerSessions.runProtected(request,async(tx,session)=>{
+    const [snapshot,archive,policy]=await Promise.all([
+        tx.get(battleRoot.collection("playableSnapshots").doc("2")),
+        tx.get(battleRoot.collection("recoveryArchives").doc("2")),tx.get(encounterPolicyRef)]);
+    return resolveForestOpeningRound({uid:session.uid,revision:2,snapshot:snapshot.data(),
+        archive:archive.data(),encounterPolicy:policy.data().policy,
+        encounterKey:encounterArgs.encounterKey,randomTape:tape});
+});
+const openingMissTape=[0.5,0.5,0.95,0.95];
+const openingMiss=await readOpeningRoundInputs(yRequest,openingMissTape);
+assert.deepEqual(await readOpeningRoundInputs(yRequest,openingMissTape),openingMiss);
+assert.equal(openingMiss.actions.length,2);
+assert.equal(openingMiss.actions.every(action=>action.hit===false&&action.damage===0),true);
+const openingHit=await readOpeningRoundInputs(yRequest,[0.5,0.5,0.95,0.5,0.5]);
+assert.equal(openingHit.actions[1].actor,"monster");
+assert.equal(openingHit.actions[1].damage,7);assert.equal(openingHit.actions[1].isCrit,false);
+assert.equal(openingHit.playerHPAfter,openingHit.playerHPBefore-7);
+for(const key of ["combatRulesReady","outcomeVerified","rewardEligible","creditedToCharacter"]){
+    assert.equal(openingHit[key],false);
+}
+await assert.rejects(readOpeningRoundInputs(yRequest,[...openingMissTape,0]),/unused server transcript/);
+await assert.rejects(readOpeningRoundInputs({...yRequest,data:{uid:y,session:sessionB}},openingMissTape),
+    e=>e.message==="SESSION_INVALID");
+assert.deepEqual((await battleRoot.collection("account").doc("current").get()).data(),battleBefore.account);
+assert.deepEqual((await battleRoot.collection("economy").doc("current").get()).data(),battleBefore.economy);
+assert.deepEqual((await db.doc(`users/${y}/saves/current`).get()).data(),battleBefore.envelope);
+assert.equal((await battleRoot.collection("pendingGrants").get()).size,0);
+assert.equal((await battleRoot.collection("ledgerEntries").get()).size,0);
+console.log("Opening round on private Firestore sources: initiative, final tutorial damage, bounded deterministic transcript, session refusal and zero authority mutation PASS");
 
 
 // Protected arithmetic proof lifecycle, real Firestore atomicity and unique
