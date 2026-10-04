@@ -7,6 +7,11 @@
 - 規格：`docs/MONSTER_BALANCE_OWNER_PHASE2C.md`；退場地圖：`docs/monster-balance-owner-retirement-map.json`；batch：`release/requirement-batches/2026-10-04-monster-balance-owner-phase2c-tower.json`。中央 requirements 暫不新增未驗證項，避免污染 final release-ready；exact-head 功能證據通過後才回填 VERIFIED 並重跑 latest-head CI。
 - CI recovery checkpoint：舊 Phase2A regression 原本把 Tower 與 Personal/World/Adventure 一起視為未遷移 baseline；Phase2C 後已收斂為 Tower 驗新 MonsterBalance projection，而 Personal/World/Adventure 仍逐字比對原 Phase2A baseline。未放寬未遷移模式。最新功能 head 需重新跑 exact-head CI。
 
+- 續接 checkpoint：開工重新核對 dev `da66cd015258d8baf2a330cb70c02d6018480ddf`；施工期間 dev 前進至 `36381e61c264c355d29e15008b6415114003e221`（#790 文件／15個空目錄標記），已正常 merge，雙方有效交接保留；正式 `npm run build`／`build:check` 重跑 PASS。
+- Head `1c6f48c1` 的 CI 37164133231：focused、Phase1/2A/2B、4×100、TTK60/60、Tower正式Chrome27/27、Wild與Daily自然Chrome、build、實際戰鬥QA PASS；整個 Required CI 仍 FAIL（Category B/D：立繪首幀獨立fixture未載入MonsterBalance）。fixture改為載入正式生成Owner，保留原立繪／首幀斷言並新增100個owner/projection檢查與Tower零V132呼叫；需新latest-head完整CI。不得用舊run冒稱新Head PASS。
+- 完整診斷與正式瀏覽器功能證據保存於 `docs/monster-balance-tower-ttk-evidence-20261004.json`／`docs/monster-balance-tower-browser-evidence-20261004.json`；artifact 11289322164，SHA256 `701da0310420d8e097ea2be78078ee952b98420d9102374410f4b69ab970f1e7` 已獨立核對，兩張截圖已檢視；這是明列sourceHead的功能歷史證據，最終Head CI／dev部署仍獨立待Gate。
+- 編成完整契約：普通層10 Regular；5倍數2 Elite+8 Regular；10倍數1 smallBoss+2 Elite+7 Regular。smallBoss單格B3，不進Personal／World Boss footprint。技能率1–30F65%、31–60F70%、61–90F75%、91–100F80%。火爆擊／直接傷害+15%；水治療／異常命中+15%，Support／Heal／Freeze AI保留；風閃避+15%、Speed+15%由Owner投影；土HP／Defense+15%由Owner投影。
+
 ## 2026-10-04 — P1-B3-GOVERNANCE-TERMINOLOGY-20261004（文件收斂候選）
 
 - 開工 dev `13c22561afc518ce33b7da798b32e1c215e3cbde`；main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` 禁止修改。分支 `docs/p1-b3-governance-terminology-convergence-20261004`；本工作 PR 是最新 CI／合併／部署／清理的耐久狀態 Owner。

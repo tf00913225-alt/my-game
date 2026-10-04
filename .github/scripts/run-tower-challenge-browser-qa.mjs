@@ -27,12 +27,19 @@ const expression=`(async()=>{
    check(active.every(m=>!Object.hasOwn(m,'v132Dungeon')&&!Object.hasOwn(m,'v132EquipmentDungeon')),'no Tower legacy stat markers');
    check(active.filter(m=>m.rank==='smallBoss').length===(floor%10===0?1:0),'canonical smallBoss count');
    check(active.filter(m=>m.rank==='elite').length===(floor%5===0?2:0),'canonical elite count');
-   for(const m of active){const p=MonsterBalance.debug(m);check(m.maxHP===p.final.maxHP&&m.maxSP===p.final.maxSP&&m.attack===p.final.physicalAttack&&m.magicAttack===p.final.magicAttack&&m.defense===p.final.defense&&m.agility===p.final.speed,'render stats equal owner projection');}
+   for(const m of active){
+     const p=MonsterBalance.debug(m);check(m.maxHP===p.final.maxHP&&m.maxSP===p.final.maxSP&&m.attack===p.final.physicalAttack&&m.magicAttack===p.final.magicAttack&&m.defense===p.final.defense&&m.agility===p.final.speed,'render stats equal owner projection');
+     if(element==='fire')check(m.vTowerCriticalBonusPercent===15&&getMonsterCriticalChance(m)===25&&getTowerDirectDamageMultiplier(m,{damageKind:'direct'})===1.15,'fire critical/direct damage +15');
+     if(element==='water')check(m.vTowerHealingMultiplier===1.15&&getTowerStatusAccuracyBonus(m)===15&&m.v141AbyssAi==='support'&&m.skillIds.includes('freeze'),'water heal/status/support/freeze');
+     if(element==='wind')check(p.profiles.element.speed===1.15&&m.agility===p.derived.speed*1.15&&getMonsterEvasion(m)>=15,'wind owner speed/evasion +15');
+     if(element==='earth')check(p.profiles.element.hp===1.15&&p.profiles.element.defense===1.15,'earth owner HP/defense +15');
+   }
    const slots=FourSymbolsBattlefieldSlots.getActiveEnemySnapshot();
    check(slots&&new Set(Object.values(slots.monsterIndexToSlot)).size===10,'unique battle slots');
    const chance=floor<=30?.65:floor<=60?.7:floor<=90?.75:.8;
    check(currentBattleMonsters.every(i=>monsters[i].skillChance===chance),'common skill chance');
-   const units=currentBattleMonsters.map(i=>({index:i,rank:monsters[i].rank,level:monsters[i].level,owner:monsters[i].balanceOwner,context:monsters[i].context,chance:monsters[i].skillChance,slot:FourSymbolsBattlefieldSlots.getEnemySlotForMonster(slots,i),evasion:getMonsterEvasion(monsters[i]),speed:getMonsterAgility(monsters[i]),hp:monsters[i].maxHP,defense:getMonsterEffectiveDefense(monsters[i])}));
+   const units=currentBattleMonsters.map(i=>({index:i,rank:monsters[i].rank,level:monsters[i].level,owner:monsters[i].balanceOwner,mode:monsters[i].mode,maxSP:monsters[i].maxSP,attack:monsters[i].attack,magicAttack:monsters[i].magicAttack,finalDamagePressure:monsters[i].balanceProjection.finalDamagePressure,context:monsters[i].context,chance:monsters[i].skillChance,slot:FourSymbolsBattlefieldSlots.getEnemySlotForMonster(slots,i),evasion:getMonsterEvasion(monsters[i]),speed:getMonsterAgility(monsters[i]),hp:monsters[i].maxHP,defense:getMonsterEffectiveDefense(monsters[i])}));
+   check(units.filter(u=>u.rank==='smallBoss').every(u=>u.slot==='ENEMY_B3'),'single B3 smallBoss');
    check(units.every(u=>{const r=document.getElementById('battleMonster'+u.index)?.getBoundingClientRect();return r&&r.width>0&&r.height>0&&r.left>=0&&r.right<=innerWidth+1;}),'ten visible targets');
    evidence.matrix.push({element,floor,units});return roster;
  };

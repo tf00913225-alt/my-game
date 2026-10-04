@@ -63,3 +63,9 @@ No Phase 2C requirement may be marked VERIFIED until the exact latest work head 
 ## Stop point
 
 After Phase 2C is integrated and deployed, the next separate migration is Phase 2D Abyss. This work must not migrate Abyss, Adventure, Personal Boss or World Boss.
+
+## Resume evidence checkpoint
+
+Resume dev `da66cd015258d8baf2a330cb70c02d6018480ddf`; subsequent dev `36381e61c264c355d29e15008b6415114003e221` absorbed by normal merge. Both production build and synchronization check rerun. Functional Head `1c6f48c14230f668cc541255af03402186227156`, CI Run37164133231 Job111323468239 passed focused, TTK60/60, Tower Chrome27/27, Wild/Daily Chrome and real battle QA; the full run failed at a portrait fixture that injected only the retired V132 builder. That fixture now loads the formal generated owner, retains all portrait/first-frame assertions, and additionally checks owner identity/projection and zero Tower V132 calls. Requirement remains IMPLEMENTED until renewed complete latest-head CI passes.
+
+Full diagnostic rows, player remaining HP and initial enemy stats/pressure: `docs/monster-balance-tower-ttk-evidence-20261004.json`. Full 27-scene browser evidence: `docs/monster-balance-tower-browser-evidence-20261004.json`. Artifact11289322164 SHA256 `701da0310420d8e097ea2be78078ee952b98420d9102374410f4b69ab970f1e7` independently matched; battle/rules screenshots inspected. Historical functional evidence never substitutes for final exact-head CI or exact dev deployment.
