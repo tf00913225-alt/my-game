@@ -52,10 +52,10 @@ test('Shadow never modifies a frozen formal entity or aliases its nested data',(
 test('rank adds no points; seven modes explicit and isolated',()=>{
  assert.deepEqual(MonsterBalance.modes,['wild','daily','tower','abyss','adventure','personalBoss','worldBoss']);
  for(const mode of MonsterBalance.modes)for(const rank of MonsterBalance.ranks.filter(r=>r==='boss'?mode==='daily':r==='smallBoss'?!['wild','daily'].includes(mode):true)){
-  const row=MonsterBalance.preview({...spec,mode,rank});
-  assert.equal(row.base.abilityPointBudget,245);assert.equal(row.profiles.mode.id,mode);
-  assert.deepEqual(row.allocation,MonsterBalance.preview(spec).allocation);
-  assert.equal(row.profiles.rank.status,['wild','daily','tower'].includes(mode)?'RANK_V1':'PENDING_PRODUCT_CALIBRATION');
+  const input=mode==='abyss'?{...spec,mode,rank,level:40,monsterKey:'abyss.test',abyssDifficulty:40,abyssRegion:'east',abyssStage:0,context:'abyss/40/east/stage/1'}:{...spec,mode,rank};const row=MonsterBalance.preview(input);
+  assert.equal(row.base.abilityPointBudget,mode==='abyss'?195:245);assert.equal(row.profiles.mode.id,mode);
+  assert.deepEqual(row.allocation,MonsterBalance.preview({...input,rank:'regular'}).allocation);
+  assert.equal(row.profiles.rank.status,mode==='abyss'?'ABYSS_RUNTIME_V1':['wild','daily','tower'].includes(mode)?'RANK_V1':'PENDING_PRODUCT_CALIBRATION');
  }
  for(const invalid of [{mode:'boss'},{mode:'legacy-dungeon'},{rank:'boss'},{archetype:'unknown'},{context:''},{element:''}])assert.throws(()=>MonsterBalance.preview({...spec,...invalid}));
 });
@@ -76,7 +76,7 @@ test('existing Tower element profile math only; global defaults all1, other mode
  const wind=MonsterBalance.preview({...spec,element:'wind',mode:'tower'});
  assert.equal(wind.final.speed,wind.derived.speed*1.15);
  assert.deepEqual(wind.profiles.element.metadata,{evasionBonusPercent:15});
- for(const mode of ['daily','abyss','adventure','personalBoss','worldBoss']){
+ for(const mode of ['daily','adventure','personalBoss','worldBoss']){
   const row=MonsterBalance.preview({...spec,mode,element:'earth'});
   if(mode==='daily'){assert.equal(row.final.maxHP,Math.round(row.derived.maxHP*row.profiles.mode.partySizeDurability));assert.equal(row.final.physicalAttack,row.derived.physicalAttack);}
   else assert.deepEqual(row.final,row.derived);

@@ -1090,7 +1090,7 @@ test("Abyss floors one through five keep exact compositions, skill levels and ad
     assert.equal(final.count,10);
     assert.deepEqual(final.names,["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊",
         "天兵天將","天兵天將","天兵天將","天兵天將","天兵天將"]);
-    assert.deepEqual(final.ranks,["boss","boss","boss","boss","boss","elite","elite","elite","elite","elite"]);
+    assert.deepEqual(final.ranks,["smallBoss","smallBoss","smallBoss","smallBoss","smallBoss","elite","elite","elite","elite","elite"]);
     assert.deepEqual(final.elements,["earth","wind","light","water","fire","water","earth","fire","wind","water"]);
     assert.deepEqual(final.forceLevels,[5,5,5,5,5,5,5,5,5,5]);
     assert.deepEqual(final.skills.slice(0,5),[["dustStorm","flyingSandStrike"],["windHowlLightning","stormRain"],["flyingSandStrike","phoenixCry"],

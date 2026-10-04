@@ -69,7 +69,7 @@ test('canonical Elite rerolls rebuild rank once, preserve raw points and attacks
  assert.ok(Math.abs(data.damageElite-data.damageRegular*1.1)<=1);
 });
 
-test('unmigrated common builders and all 50 real Abyss rosters retain starting outputs',()=>{
+test('unmigrated common builders retain outputs; Phase2D real Abyss rosters use projections',()=>{
  const {context:c}=loadLegacyRuntime();
  const baseline=JSON.parse(fs.readFileSync('tests/fixtures/monster-balance-p2a-non-wild-baseline.json','utf8'));
  for(const r of baseline.rows){
@@ -78,7 +78,12 @@ test('unmigrated common builders and all 50 real Abyss rosters retain starting o
  }
  for(const r of baseline.abyss){
   const actual=c.v174AbyssBuildRoster(r.difficulty,r.region,r.stage).map(m=>({name:m.name,level:m.level,rank:m.rank,element:m.element,...project(m)}));
-  assert.deepEqual(plain(actual),r.roster);
+  for(const m of c.v174AbyssBuildRoster(r.difficulty,r.region,r.stage)){
+   const p=MonsterBalance.preview(m.balanceProjection.identity);
+   assert.equal(m.maxHP,p.final.maxHP);assert.equal(m.maxSP,p.final.maxSP);
+   assert.equal(m.attack,p.final.physicalAttack);assert.equal(m.magicAttack,p.final.magicAttack);
+   assert.equal(m.defense,p.final.defense);assert.equal(m.agility,p.final.speed);
+  }
  }
 });
 

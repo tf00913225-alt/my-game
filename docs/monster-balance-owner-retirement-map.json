@@ -1,6 +1,6 @@
 {
-  "workId": "MONSTER-BALANCE-OWNER-P2C-TOWER-20261004",
-  "phase": "2C",
+  "workId": "MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004",
+  "phase": "2D",
   "classification": [
     "Convergence",
     "Replacement",
@@ -23,15 +23,15 @@
       "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "(level-1)*5 + archetype allocation; retain legacy only for unmigrated modes",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Tower caller graph severed in Phase 2C; delete legacy responsibility after Abyss/Adventure/Personal/World Boss migrate",
+      "retirementGate": "Abyss caller edge severed in Phase 2D; shared legacy responsibility remains for Adventure/Personal/World Boss",
       "wildForbidden": true,
       "requiredModes": [
-        "abyss",
         "adventure",
         "personalBoss",
         "worldBoss"
       ],
-      "dailyForbidden": true
+      "dailyForbidden": true,
+      "abyssForbidden": true
     },
     {
       "id": "coreStats",
@@ -42,15 +42,15 @@
       "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "stat generation migrates; skill/identity construction responsibility kept separately",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Tower caller graph severed in Phase 2C; delete legacy responsibility after Abyss/Adventure/Personal/World Boss migrate",
+      "retirementGate": "Abyss caller edge severed in Phase 2D; shared legacy responsibility remains for Adventure/Personal/World Boss",
       "wildForbidden": true,
       "requiredModes": [
-        "abyss",
         "adventure",
         "personalBoss",
         "worldBoss"
       ],
-      "dailyForbidden": true
+      "dailyForbidden": true,
+      "abyssForbidden": true
     },
     {
       "id": "playerLevelBase",
@@ -124,15 +124,15 @@
       "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "keep for unmigrated users only; remove at last dependent migration",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Tower caller graph severed in Phase 2C; delete legacy responsibility after Abyss/Adventure/Personal/World Boss migrate",
+      "retirementGate": "Abyss caller edge severed in Phase 2D; shared legacy responsibility remains for Adventure/Personal/World Boss",
       "dailyForbidden": true,
       "wildForbidden": true,
       "requiredModes": [
-        "abyss",
         "adventure",
         "personalBoss",
         "worldBoss"
-      ]
+      ],
+      "abyssForbidden": true
     },
     {
       "id": "dungeonNormal",
@@ -143,15 +143,15 @@
       "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "same dependency rule; legacy 1.30/1.10 not ratified",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Tower caller graph severed in Phase 2C; delete legacy responsibility after Abyss/Adventure/Personal/World Boss migrate",
+      "retirementGate": "Abyss caller edge severed in Phase 2D; shared legacy responsibility remains for Adventure/Personal/World Boss",
       "dailyForbidden": true,
       "wildForbidden": true,
       "requiredModes": [
-        "abyss",
         "adventure",
         "personalBoss",
         "worldBoss"
-      ]
+      ],
+      "abyssForbidden": true
     },
     {
       "id": "dungeonRank",
@@ -162,15 +162,15 @@
       "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "3.20/4.50 HP,2 SP,1.25/1.40 defense comparison only",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Tower caller graph severed in Phase 2C; delete legacy responsibility after Abyss/Adventure/Personal/World Boss migrate",
+      "retirementGate": "Abyss caller edge severed in Phase 2D; shared legacy responsibility remains for Adventure/Personal/World Boss",
       "dailyForbidden": true,
       "wildForbidden": true,
       "requiredModes": [
-        "abyss",
         "adventure",
         "personalBoss",
         "worldBoss"
-      ]
+      ],
+      "abyssForbidden": true
     },
     {
       "id": "equipmentRank",
@@ -220,23 +220,23 @@
       "id": "legacyAbyss",
       "file": "js/36-v141-content-systems.js",
       "sourceToken": "v141BuildAbyssRoster",
-      "status": "LEGACY OWNER",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 Abyss",
-      "reason": "formal bundle contains old extra HP path; migrate compatibility API callers and legacy save projection first",
+      "status": "COMPATIBILITY API ONLY",
+      "decision": "KEEP",
+      "phase": "Phase 2D Abyss",
+      "reason": "v141BuildAbyssRoster delegates to formal 59 builder; obsolete numerical builder removed",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "No legacy numerical builder; caller delegates to MonsterBalance roster"
     },
     {
       "id": "abyssDurability",
       "file": "js/59-abyss-two-tier-runtime.js",
       "sourceToken": "applyHpMultiplier",
-      "status": "CURRENT OWNER",
-      "decision": "TO MIGRATE",
-      "phase": "Phase 2 Abyss",
-      "reason": "1.875 and exact existing Lv20/40 roster targets preserved in comparison; not rebalanced in Phase1",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2D Abyss",
+      "reason": "Abyss HP stage/rank/mode projection now exclusively MonsterBalance; 1.875 post-write physically removed",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "50 actual encounters / 402 projections and render/launcher no late write"
     },
     {
       "id": "bossMultipliers",
@@ -302,15 +302,15 @@
       "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "mode explicit; v132Dungeon flag cannot imply daily; damage settlement KEEP single owner consumes resolved profile",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Tower caller graph severed in Phase 2C; delete legacy responsibility after Abyss/Adventure/Personal/World Boss migrate",
+      "retirementGate": "Abyss caller edge severed in Phase 2D; shared legacy responsibility remains for Adventure/Personal/World Boss",
       "wildForbidden": true,
       "requiredModes": [
-        "abyss",
         "adventure",
         "personalBoss",
         "worldBoss"
       ],
-      "dailyForbidden": true
+      "dailyForbidden": true,
+      "abyssForbidden": true
     },
     {
       "id": "adventureBuild",
@@ -344,6 +344,16 @@
       "reason": "existing carried/legal skills remain sole AI legality authority; no invented skills",
       "phase1": "KEEP Runtime exactly unchanged",
       "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "legacyAbyssStatWriter",
+      "file": "js/36-v141-content-systems.js",
+      "sourceToken": "function makeAbyssMonster(",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2D Abyss",
+      "reason": "V141 obsolete extra HP roster replaced by compatibility bridge to 59",
+      "retirementGate": "Token absent and bridge never calls shared V132 stat builder"
     }
   ],
   "phase2aGate": "15/15 functional requirements VERIFIED: focused20/20, unchanged non-Wild outputs, 40 diagnostic TTK and both-viewports natural Chrome. Latest Required CI/dev integration/deployed exact SHA remain separate gates owned by PR #780.",
@@ -392,5 +402,38 @@
       "outgoingPressure": 0.25,
       "rawAttackAndPointsUnchanged": true
     }
+  },
+  "phase2dGate": {
+    "workId": "MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004",
+    "status": "VERIFIED",
+    "runtimeOwner": "js/combat/monster-balance-owner.mjs",
+    "migratedMode": "abyss",
+    "retiredWrites": [
+      "Abyss V132 numerical builder edge",
+      "V141 obsolete builder and extraHP",
+      "V174 durability1.875 and HP post-writes",
+      "legacy Abyss additive outgoing pressure"
+    ],
+    "remainingLegacyModes": [
+      "adventure",
+      "personalBoss",
+      "worldBoss"
+    ],
+    "stopAfter": "Phase 2D Abyss",
+    "skillOwnerContinuity": "Original configureBuiltMonster V141/V144 carry/selection hooks preserved before Abyss marker; immutable baseline checks all402 metadata.",
+    "calibration": {
+      "modeHp": 0.45,
+      "modePressure": 0.22,
+      "trueRealmFinalHp": 0.9,
+      "trueRealmFinalPressure": 0.18
+    },
+    "sourceHead": "c723c11d80ccd90ede37307313162271b2640463",
+    "ciRun": 37180059948,
+    "focused": "8/8",
+    "projections": 402,
+    "identities": 14,
+    "ttkCases": 300,
+    "browserScenes": 14,
+    "closeout": "Final metadata-head CI, dev integration/deployment and safe branch cleanup are independent pending gates; PR#793 is live owner."
   }
 }

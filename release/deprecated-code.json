@@ -210,6 +210,20 @@
         "monster.defense=Math.round(numeric(monster.defense,1)*1.15)",
         "monster.maxHP=Math.round(numeric(monster.maxHP,1)*1.15)"
       ]
+    },
+    {
+      "id": "DEP-MONSTER-BALANCE-P2D-ABYSS",
+      "description": "Retired Abyss-only numerical post-writers; shared V132 and Adventure/Boss remain legal.",
+      "enabled": true,
+      "forbidden": [
+        "HP_DURABILITY_MULTIPLIER",
+        "stageHpMultipliers",
+        "bossEliteHpMultiplier",
+        "bossHpMultiplier",
+        "function applyHpMultiplier(",
+        "function makeAbyssMonster(name,level,element,rank,extraHp,skills,forceLevel)",
+        "v141ExtraHP"
+      ]
     }
   ]
 }
