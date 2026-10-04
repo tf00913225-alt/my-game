@@ -22,7 +22,8 @@ export function buildAbyssTtkMatrix(){
       autoBattle=true;for(const i of getExistingPartyIndexes()){const config=getPartyAutoConfig(i);config.enabled=true;config.skill=reference.skill;}
       const initialParty=getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp);
       const initialMonsters=roster.map(m=>({name:m.name,rank:m.rank,level:m.level,element:m.element,hp:m.maxHP,sp:m.maxSP,attack:m.attack,magicAttack:m.magicAttack,defense:m.defense,speed:m.agility,owner:m.balanceOwner||'legacy',pressure:getEnemyPressureMultiplier(m,player),skillFrequency:m.skillChance,skillIds:m.skillIds,supportIds:m.v141SupportSkillIds||[]}));
-      let rounds=0,firstRoundParty=null;const skills=[];const badgeOwner=showMonsterSkillNameBadge;
+      let rounds=0,firstRoundParty=null;const skills=[],controlRolls=[];const badgeOwner=showMonsterSkillNameBadge,statusRollOwner=rollStatusEffectHit;
+      rollStatusEffectHit=function(...args){const hit=statusRollOwner(...args);if(args[5])controlRolls.push({round:turn,targetRank:args[6],chance:calculateStatusEffectChance(...args),hit});return hit;};
       showMonsterSkillNameBadge=function(name,...args){skills.push(name);return badgeOwner(name,...args);};
       try{
         for(let round=1;round<=60;round++){
@@ -39,8 +40,8 @@ export function buildAbyssTtkMatrix(){
           if(round===1)firstRoundParty=getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp);
           if(monsters.every(m=>!m.alive||m.hp<=0)||getExistingPartyIndexes().every(i=>getPartyCharacterByIndex(i).hp<=0))break;
         }
-      }finally{showMonsterSkillNameBadge=badgeOwner;}
-      return {difficulty,partyLevel,region,stage,partySize,reference,rounds,clear:monsters.every(m=>!m.alive||m.hp<=0),survivors:getExistingPartyIndexes().filter(i=>getPartyCharacterByIndex(i).hp>0).length,initialParty,firstRoundParty,finalParty:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),initialMonsters,enemySkillActions:skills,finalMonsters:roster.map(m=>({name:m.name,hp:m.hp,sp:m.sp,statuses:m.statusEffects})),controlUsage:skills.filter(name=>/冰|石|凍|封/.test(name)).length};
+      }finally{showMonsterSkillNameBadge=badgeOwner;rollStatusEffectHit=statusRollOwner;}
+      return {difficulty,partyLevel,region,stage,partySize,reference,rounds,clear:monsters.every(m=>!m.alive||m.hp<=0),survivors:getExistingPartyIndexes().filter(i=>getPartyCharacterByIndex(i).hp>0).length,initialParty,firstRoundParty,finalParty:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),initialMonsters,enemySkillActions:skills,finalMonsters:roster.map(m=>({name:m.name,hp:m.hp,sp:m.sp,statuses:m.statusEffects})),controlUsage:{attempts:controlRolls.length,hits:controlRolls.filter(r=>r.hit).length,rolls:controlRolls}};
     })())`,c));
     rows.push(row);
   }

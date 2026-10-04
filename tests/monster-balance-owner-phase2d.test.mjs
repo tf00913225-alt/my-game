@@ -94,5 +94,5 @@ test('formal challenge TTK matrix preserves the bare Lv40 final challenge and cl
   assert.deepEqual(report.gate.unexpectedLosses,[]);assert.deepEqual(report.gate.instantWipes,[]);
   for(const r of report.failures)assert.deepEqual([r.difficulty,r.partyLevel,r.region,r.stage],[40,40,4,4]);
   assert.ok(report.rows.some(r=>r.rounds>2));
-  for(const row of report.rows){assert.ok(row.rounds<=60);assert.ok(row.reference.skillCost<=row.reference.skillBudget);assert.ok(row.initialMonsters.every(m=>m.owner==='MonsterBalance'));}
+  for(const row of report.rows){assert.ok(row.rounds<=60);assert.ok(row.reference.skillCost<=row.reference.skillBudget);assert.ok(row.initialMonsters.every(m=>m.owner==='MonsterBalance'));for(const roll of row.controlUsage.rolls){const cap=roll.targetRank==='regular'?90:roll.targetRank==='elite'?75:60;assert.ok(roll.chance<=cap,'formal hard-control cap');}}
 });
