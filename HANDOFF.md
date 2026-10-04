@@ -1,3 +1,11 @@
+## 2026-10-04 — P2-SESSION-CI-WAIT-20261004（功能契約 VERIFIED；遠端整合／部署待 Gate）
+
+- Start dev `0de3c3a5c9c5aff789b071f9bd89b4dcdce413d9`; main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` protected. Branch `chore/p2-session-ci-wait-convergence-20261004`, target dev; Work PR is durable current-state owner. NORMAL DEVELOPMENT; no Freeze/RC.
+- Full Session failed/success attempt logs37190573579/37192593665 plus exact CI job timestamps confirm80x10s wait (~15m) exhausted while normal25m32s Repository checks still ran. Latest baseline37200430849 also required attempt2. Formal CI cap40m did not align with consumer wait/deploy20m cap; no stale SHA/wrong owner/cancel in the investigated failures.
+- Existing Session wait inline loop physically replaced by `.github/scripts/wait-session-repository-checks.mjs::waitForRepositoryChecks`: monotonic45m deadline (CI40m + finite5m admission margin),10s polling, bounded external commands, newest exact dev push CI/run/attempt/job, reselect before success, clear state logs. Deploy job60m leaves15m reserve. No new CI/scheduling/deploy owner, temporary patch, bypass or unbounded retries. Downstream secrets/readiness/deploy/current-dev guard and concurrency unchanged.
+-22 direct behavior cases +20 existing session/backend regressions, YAML semantic comparison, npm build/build:check, architecture/release/deprecated and whitespace PASS. Requirement functional1/1 VERIFIED; latest Head PR CI/emulator, dev integration/first-attempt Session formal logs/Firebase, DEV deployed SHA and absorbed branch cleanup remain mandatory, tracked by Work PR. Full evidence/inventory: `docs/P2_SESSION_CI_WAIT_20261004.md`.
+- Runtime/Gameplay/Cloud rules/player data/Production/main/Game+Cache173.73 unchanged. Stop after this P2 batch.
+
 ## 2026-10-04 — MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004（功能1/1 VERIFIED；最終Head／整合／部署待Gate）
 
 - Base dev a0c4cf3ccf6b83278f9940da7f71516d9c98cfa4；main f63d69dbfa66ba75637d1c3cd7fcc7d74782e356 禁止修改。Branch feature/monster-balance-owner-phase2e-adventure-20261004；PR#797 為耐久即時狀態 Owner。

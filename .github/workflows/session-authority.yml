@@ -17,6 +17,8 @@ on:
       - 'scripts/firestore-backup-readiness.mjs'
       - 'tests/firestore-backup-readiness.test.mjs'
       - '.github/workflows/session-authority.yml'
+      - '.github/scripts/wait-session-repository-checks.mjs'
+      - 'tests/session-repository-checks-wait.test.mjs'
   push:
     branches: [dev]
     paths:
@@ -31,6 +33,8 @@ on:
       - 'scripts/firestore-backup-readiness.mjs'
       - 'tests/firestore-backup-readiness.test.mjs'
       - '.github/workflows/session-authority.yml'
+      - '.github/scripts/wait-session-repository-checks.mjs'
+      - 'tests/session-repository-checks-wait.test.mjs'
 
 permissions:
   contents: read
@@ -56,7 +60,7 @@ jobs:
           distribution: temurin
           java-version: '21'
       - run: npm --prefix functions ci --no-audit --no-fund
-      - run: node --test tests/session-client.test.mjs
+      - run: node --test tests/session-client.test.mjs tests/session-repository-checks-wait.test.mjs
       - run: node --test tests/cloud-save-*.test.mjs tests/firebase-trusted-cloud-save-backend.test.mjs
       - name: Verify account boot with session backend unavailable
         run: node .github/scripts/run-boot-architecture-browser-qa.mjs
@@ -75,7 +79,8 @@ jobs:
     needs: emulator
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # 45m bounded CI wait + 15m checkout/auth/readiness/deployment reserve.
+    timeout-minutes: 60
     concurrency:
       group: firebase-native-auth-backend
       cancel-in-progress: false
@@ -85,29 +90,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
-        run: |
-          test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
-          for attempt in $(seq 1 80); do
-            test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
-            # Resolve the exact dev push CI owner, not a newer dev -> main PR
-            # check with the same display name and a longer release test policy.
-            run_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&event=push&branch=dev&per_page=100" --jq "[.workflow_runs[] | select(.path == \".github/workflows/ci.yml\" and .event == \"push\" and .head_branch == \"dev\" and .head_sha == \"$GITHUB_SHA\")][0].id // empty")"
-            conclusion="pending"
-            if [[ -n "$run_id" ]]; then
-              conclusion="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs?per_page=100" --jq '[.jobs[] | select(.name == "Repository checks")][0].conclusion // "pending"')"
-            fi
-            if [[ "$conclusion" == "success" ]]; then
-              test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
-              exit 0
-            fi
-            if [[ "$conclusion" != "pending" ]]; then
-              echo "::error::Repository checks did not succeed ($conclusion)."
-              exit 1
-            fi
-            sleep 10
-          done
-          echo "::error::Timed out waiting for Repository checks."
-          exit 1
+        run: node .github/scripts/wait-session-repository-checks.mjs
       - name: Require existing Firebase deployment secret
         env:
           DEPLOY_CREDENTIAL: ${{ secrets.FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON }}
