@@ -13,7 +13,7 @@ async function runBossBalanceProductionQa(){
     const expression=`(async()=>{
       const check=(v,m)=>{if(!v)throw Error(m);};
       const wait=async(fn,ms=30000)=>{const end=performance.now()+ms;while(!fn()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(fn(),'Boss wait '+fn);};
-      await wait(()=>FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
+      await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
       await FourSymbolsFeatures.ensure('boss-relic','boss-balance-qa');
       await wait(()=>window.GameplaySystem&&window.FourSymbolsBossBattle);closeHomeFeature();
       const evidence=window.bossBalanceQaEvidence={scenes:[],controls:[],skills:[]};

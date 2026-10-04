@@ -71,3 +71,11 @@ test('formal TTK matrix executes all Boss mechanisms, survives and obeys control
   assert.ok(r.rows.some(r=>r.shieldUsage>0));assert.ok(r.rows.some(r=>r.reinforcementUsage===2));assert.ok(r.rows.some(r=>r.mechanismEvents.some(e=>e.objects.length)));
  }
 });
+
+test('288 frozen starting-dev projections preserve every prior-mode numerical profile',()=>{
+ const evidence=JSON.parse(fs.readFileSync('tests/fixtures/monster-balance-p2f-prior-modes.json','utf8'));
+ assert.equal(evidence.sourceHead,'9fff3664d2767739fe8cd5c893f2985f8032d5ef');
+ assert.equal(evidence.rows.length,288);
+ assert.deepEqual([...new Set(evidence.rows.map(r=>r.spec.mode))].sort(),['abyss','adventure','daily','tower','wild']);
+ for(const row of evidence.rows){const p=MonsterBalance.preview(row.spec);assert.deepEqual(p.allocation,row.allocation);assert.deepEqual(p.final,row.final);assert.equal(p.finalDamagePressure,row.pressure);}
+});
