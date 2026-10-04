@@ -5,8 +5,8 @@ Start dev `f47862cc592870e359d31da5da52a5d530c831a8`; main `f63d69dbfa66ba75637d
 Phase1/2A/2B/2C complete history preserved. This work only Abyss and stops before Phase2E.
 Current spec: Lv20/Lv40, 5 regions ×5 stages; 402 entities /14 stable identities; emperors canonical single-slot smallBoss.
 MonsterBalance now solely projects stats/pressure; V132 Abyss numerical edge, V141 obsolete extra HP builder and V174 durability late mutation removed. Existing skill/AI/formation/portrait/reward/lifecycle owners remain.
-Baseline150 cases38 losses; calibrated150 cases149 clear+survivor; bare Lv40 two-person final loss retained, Lv50/Lv60 final clear. No forced two-round gate.
-Requirement IMPLEMENTED; focused6/6 PASS; regression/natural production Chrome/latest-head CI still pending.
+Baseline150 cases38 losses; calibrated300 cases across neutral/seeded policies:298 clear+survivor; bare Lv40 two-person final losses7/10 rounds retained, Lv50/Lv60 final clear. No forced two-round gate.
+Requirement IMPLEMENTED; focused7/7 PASS. Fresh Abyss encounters hand off a cleared snapshot to the unchanged Slot Owner (never clear a live battle). Regression/build gates PASS; natural production Chrome/latest-head CI pending.
 Closeout requires VERIFIED + latest dev absorption + merge + exact deployment/live Abyss QA + safe branch deletion; do not call COMPLETE yet.
 Full inventory, caller graph, profiles and evidence: `docs/MONSTER_BALANCE_OWNER_PHASE2D.md`.
 

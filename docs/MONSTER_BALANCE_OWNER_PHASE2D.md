@@ -81,7 +81,29 @@ these are encounter durations, not fabricated independent per-monster TTK.
 Skill chance/loadouts remain at their existing values. Pre-stage soldiers map balanced;
 south emperors physical, east/heaven/north magic, extreme support. No random archetype.
 First-round and final player HP, resources, enemy stats, skills and status evidence are retained.
-Focused6/6, related48/48, syntax365/365, build:check and deprecated gates PASS locally.
+A second150-case seeded LCG matrix exercises real skill/AI probability draws:149
+clear+survivor, only bare Lv40 final loses in10 rounds. Both policies total300 cases,
+298 clears; aggregated encounter ranges Regular1–8, Elite1–12, smallBoss2–12.
+Seeded cases record the seed and actual hard-control rolls (2 attempts /1 hit);
+neutral cases record10 attempts /0 hits. These are formula-owner observations,
+not deductions from skill names. No first-round wipe under either policy.
+
+Production Chrome found stale8-unit snapshots across new Abyss encounters. The
+Abyss entry now calls the existing Slot Owner clear API before handing a fresh
+roster to the shared launcher, only when no live battle exists. This preserves
+rank placement and prevents reused indexes from aliasing the preceding encounter.
+The Slot Owner, Geometry Adapter, targeting shapes and death behavior are unchanged.
+Visual row0 is the upper/back row (ENEMY_B); row1 is lower/front (ENEMY_F), using
+existing rank-centered slot projection. Metadata order is not a second slot owner.
+The original Abyss browser entry is extended with ABYSS_MONSTER_BALANCE_QA=1.
+QA uses legal four-skill geometry loadouts at Lv40 (61/80 skill points), the formal
+element-box time Owner, deterministic seeded action draws, and a first-round
+final encounter defend queue/control-boundary probe through the real enemy AI.
+No skill IDs, stats, damage math, status math, victory or reward are fabricated.
+Actual portrait image decode,804000 skill-decision boundary draws, control states,
+healing and natural results are recorded. Chrome completion is still pending.
+
+Focused7/7, related48/48, syntax365/365, build:check and deprecated gates PASS locally.
 Production Chrome and final CI remain pending. Combat Rock Wall intentionally changes
 visible shield-inclusive maxHP under the existing Status Owner; QA checks baseMaxHP
 against projection and verifies the separate shield amount. This is combat execution,

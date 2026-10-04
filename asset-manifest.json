@@ -91,7 +91,7 @@
       },
       "feature-abyss": {
         "scripts": [
-          "build/feature-abyss.a52148460c40.js"
+          "build/feature-abyss.84035a3a47b8.js"
         ],
         "styles": [
           "build/feature-abyss.0fd197a8e292.css"
@@ -843,9 +843,9 @@
       "sha256": "ab5bd3ce5582",
       "bytes": 9720
     },
-    "build/feature-abyss.a52148460c40.js": {
-      "sha256": "a52148460c40",
-      "bytes": 50611
+    "build/feature-abyss.84035a3a47b8.js": {
+      "sha256": "84035a3a47b8",
+      "bytes": 51095
     },
     "build/feature-boss-relic.f2d4658b9e0d.js": {
       "sha256": "f2d4658b9e0d",

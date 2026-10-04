@@ -3,16 +3,18 @@ import vm from 'node:vm';
 import {fileURLToPath} from 'node:url';
 import {loadLegacyRuntime} from './monster-balance-shadow-matrix.mjs';
 
-export function buildAbyssTtkMatrix(){
+export function buildAbyssTtkMatrix({randomPolicy='neutral'}={}){
+  if(!['neutral','seeded'].includes(randomPolicy))throw new TypeError('Unknown Abyss diagnostic random policy');
   const {context:c}=loadLegacyRuntime();
   vm.runInContext(fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','utf8'),c);
   vm.runInContext('updateUI=()=>{};saveGame=()=>{};finishPlayerAction=()=>{};',c);
   const rows=[];
   for(const difficulty of [20,40])for(const offset of [0,10,20])for(let region=0;region<5;region++)for(let stage=0;stage<5;stage++){
-    c.__abyssInput={difficulty,partyLevel:difficulty+offset,region,stage};
+    c.__abyssInput={difficulty,partyLevel:difficulty+offset,region,stage,randomPolicy};
     const row=JSON.parse(vm.runInContext(`JSON.stringify((()=>{
-      const {difficulty,partyLevel,region,stage}=__abyssInput;
-      Math.random=()=>.5;
+      const {difficulty,partyLevel,region,stage,randomPolicy}=__abyssInput;
+      const randomSeed=difficulty*100000+region*1000+stage*100+partyLevel;let randomState=randomSeed;
+      Math.random=randomPolicy==='neutral'?()=>.5:()=>{randomState=(Math.imul(randomState,1664525)+1013904223)>>>0;return randomState/4294967296;};
       const partySize=partyLevel>=50?3:2;
       const reference=prepareWildBalanceReferenceParty(partyLevel,partySize);
       const roster=v174AbyssBuildRoster(difficulty,region,stage);
@@ -41,7 +43,7 @@ export function buildAbyssTtkMatrix(){
           if(monsters.every(m=>!m.alive||m.hp<=0)||getExistingPartyIndexes().every(i=>getPartyCharacterByIndex(i).hp<=0))break;
         }
       }finally{showMonsterSkillNameBadge=badgeOwner;rollStatusEffectHit=statusRollOwner;}
-      return {difficulty,partyLevel,region,stage,partySize,reference,rounds,clear:monsters.every(m=>!m.alive||m.hp<=0),survivors:getExistingPartyIndexes().filter(i=>getPartyCharacterByIndex(i).hp>0).length,initialParty,firstRoundParty,finalParty:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),initialMonsters,enemySkillActions:skills,finalMonsters:roster.map(m=>({name:m.name,hp:m.hp,sp:m.sp,statuses:m.statusEffects})),controlUsage:{attempts:controlRolls.length,hits:controlRolls.filter(r=>r.hit).length,rolls:controlRolls}};
+      return {difficulty,partyLevel,region,stage,randomPolicy,randomSeed:randomPolicy==='seeded'?randomSeed:null,partySize,reference,rounds,clear:monsters.every(m=>!m.alive||m.hp<=0),survivors:getExistingPartyIndexes().filter(i=>getPartyCharacterByIndex(i).hp>0).length,initialParty,firstRoundParty,finalParty:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),initialMonsters,enemySkillActions:skills,finalMonsters:roster.map(m=>({name:m.name,hp:m.hp,sp:m.sp,statuses:m.statusEffects})),controlUsage:{attempts:controlRolls.length,hits:controlRolls.filter(r=>r.hit).length,rolls:controlRolls}};
     })())`,c));
     rows.push(row);
   }
@@ -49,10 +51,10 @@ export function buildAbyssTtkMatrix(){
   const unexpectedLosses=failures.filter(r=>!(r.difficulty===40&&r.partyLevel===40&&r.region===4&&r.stage===4));
   const instantWipes=rows.filter(r=>r.firstRoundParty.every(hp=>hp<=0));
   const gate={passed:unexpectedLosses.length===0&&instantWipes.length===0,policy:'All unlock/+10/+20 references clear+survive, except the explicitly retained unequipped two-member Lv40 final challenge loss. Final +10/+20 three-member references must clear; no first-round wipe, no 2-round target.',unexpectedLosses,instantWipes};
-  return {gate,workId:'MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004',method:'Formal Abyss roster, current player stat/skill owners, initiative, enemy AI, damage/status and round-end owners. Neutral 0.5 rolls; two members below Lv50, three from Lv50, no equipment; animation lifecycle requires separate Chrome evidence.',cases:rows.length,failures,rows};
+  return {gate,randomPolicy,workId:'MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004',method:'Formal Abyss roster, current player stat/skill owners, initiative, enemy AI, damage/status and round-end owners. Default neutral0.5 or per-case seeded LCG rolls recorded in randomPolicy/randomSeed; two members below Lv50, three from Lv50, no equipment; animation lifecycle requires separate Chrome evidence.',cases:rows.length,failures,rows};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
-  const report=buildAbyssTtkMatrix();
+  const report=buildAbyssTtkMatrix({randomPolicy:process.argv.includes('--seeded')?'seeded':'neutral'});
   if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify({gate:report.gate.passed,cases:report.cases,failures:report.failures.map(({difficulty,partyLevel,region,stage,rounds,clear,survivors})=>({difficulty,partyLevel,region,stage,rounds,clear,survivors})),ranges:Object.fromEntries([20,40].map(d=>[d,Object.fromEntries([0,10,20].map(offset=>{const rows=report.rows.filter(r=>r.difficulty===d&&r.partyLevel===d+offset);return [d+offset,{min:Math.min(...rows.map(r=>r.rounds)),max:Math.max(...rows.map(r=>r.rounds)),clears:rows.filter(r=>r.clear&&r.survivors>0).length}];}))]))}));
   if(!report.gate.passed&&!process.argv.includes('--baseline'))process.exitCode=1;

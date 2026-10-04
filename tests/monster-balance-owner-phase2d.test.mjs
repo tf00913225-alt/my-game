@@ -80,6 +80,21 @@ test('shared launcher preparation preserves fixed geometry and pre-battle projec
   })())`,c));
   for(const row of rows){assert.equal(row.before,row.after);assert.equal(new Set(row.slots).size,row.slots.length);assert.deepEqual(row.afterDeath,row.original);}
 });
+test('formal Abyss entry hands off a fresh snapshot without clearing a live battle',()=>{
+  const {context:c}=loadLegacyRuntime();
+  const result=JSON.parse(vm.runInContext(`JSON.stringify((()=>{
+    player.level=60;v174AbyssSelectDifficulty(20);
+    const slots=FourSymbolsBattlefieldSlots;
+    const stale=slots.createEnemyFormationSnapshot([0,1,2,3,4,5,6,7],{originalFormationType:8});slots.setActiveEnemySnapshot(stale);
+    let fresh=false,kept=false;
+    v132LaunchDungeonBattle=(roster,done,options)=>{fresh=slots.getActiveEnemySnapshot()===null;return false;};
+    battleActive=false;v174AbyssStartEncounter();
+    slots.setActiveEnemySnapshot(stale);battleActive=true;
+    v132LaunchDungeonBattle=()=>{kept=slots.getActiveEnemySnapshot()===stale;return false;};v174AbyssStartEncounter();
+    return {fresh,kept};
+  })())`,c));
+  assert.deepEqual(result,{fresh:true,kept:true});
+});
 test('retired Abyss writers are physically absent and legacy shared callers remain',()=>{
   const abyss=fs.readFileSync('js/59-abyss-two-tier-runtime.js','utf8');
   assert.doesNotMatch(abyss,/v132BuildDungeonMonster|applyHpMultiplier|HP_DURABILITY_MULTIPLIER|stageHpMultipliers|bossEliteHpMultiplier|bossHpMultiplier|monster\.(maxHP|hp|defense|attack|magicAttack|agility|level|element)\s*=/);
@@ -89,10 +104,11 @@ test('retired Abyss writers are physically absent and legacy shared callers rema
   assert.match(fs.readFileSync('js/27-v132-content-expansion.js','utf8'),/window\.v132BuildDungeonMonster=buildDungeonMonster/);
 });
 test('formal challenge TTK matrix preserves the bare Lv40 final challenge and clears all progression references',()=>{
-  const report=buildAbyssTtkMatrix();assert.equal(report.cases,150);
+  for(const randomPolicy of ['neutral','seeded']){const report=buildAbyssTtkMatrix({randomPolicy});assert.equal(report.cases,150);
   assert.equal(report.gate.passed,true);
   assert.deepEqual(report.gate.unexpectedLosses,[]);assert.deepEqual(report.gate.instantWipes,[]);
   for(const r of report.failures)assert.deepEqual([r.difficulty,r.partyLevel,r.region,r.stage],[40,40,4,4]);
   assert.ok(report.rows.some(r=>r.rounds>2));
   for(const row of report.rows){assert.ok(row.rounds<=60);assert.ok(row.reference.skillCost<=row.reference.skillBudget);assert.ok(row.initialMonsters.every(m=>m.owner==='MonsterBalance'));for(const roll of row.controlUsage.rolls){const cap=roll.targetRank==='regular'?90:roll.targetRank==='elite'?75:60;assert.ok(roll.chance<=cap,'formal hard-control cap');}}
+  }
 });

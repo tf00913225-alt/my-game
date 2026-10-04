@@ -20,9 +20,11 @@
           "scripts/abyss-balance-ttk-matrix.mjs",
           ".github/scripts/run-abyss-balance-browser-qa.mjs",
           "docs/monster-balance-abyss-baseline-20261004.json",
-          "docs/monster-balance-abyss-ttk-evidence-20261004.json"
+          "docs/monster-balance-abyss-ttk-evidence-20261004.json",
+          "docs/monster-balance-abyss-ttk-seeded-evidence-20261004.json",
+          ".github/scripts/run-abyss-live-browser-qa.mjs"
         ],
-        "verification": "Focused6/6, 50 encounters/402 projections/14 stable identities; diagnostic150 cases,149 clear+survivor, one explicitly retained unequipped Lv40 final loss; natural Chrome/regression/latest-head CI pending.",
+        "verification": "Focused7/7,50 encounters/402 projections/14 stable identities. Neutral150 and seeded150 diagnostics:298 clear+survivor,2 explicit bare Lv40 final losses7/10 rounds; both formal challenge gates PASS, no first-round wipe. Existing related regressions/build/deprecated/syntax PASS. Chrome/latest-head CI pending.",
         "result": "IMPLEMENTED; no VERIFIED until all formal gates pass. Stop before Phase2E; main untouched."
       }
     }

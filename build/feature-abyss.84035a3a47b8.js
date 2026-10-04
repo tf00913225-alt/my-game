@@ -617,6 +617,13 @@
         const run=currentRun();if(!run||battleStarting||run.phase!=="ready"||run.battleCompleted||movementState||interactionState){ return false; }
         battleStarting=true;const roster=buildRoster(run.difficulty,run.regionIndex,run.encounterIndex);
         if(typeof window.v132LaunchDungeonBattle!=="function"){ battleStarting=false;throw new Error("Abyss requires v132LaunchDungeonBattle runtime owner."); }
+        // A new Abyss encounter hands a fresh roster to the existing Slot Owner.
+        // Indexes restart at zero; a prior encounter's snapshot must not alias them.
+        // Never clear a live battle, and never rebuild slots during combat/death.
+        const slots=window.FourSymbolsBattlefieldSlots;
+        if(typeof battleActive!=="undefined"&&!battleActive&&slots&&typeof slots.clearActiveEnemySnapshot==="function"){
+            slots.clearActiveEnemySnapshot();
+        }
         const started=window.v132LaunchDungeonBattle(roster,function(outcome){
             battleStarting=false;
             const finish=function(){

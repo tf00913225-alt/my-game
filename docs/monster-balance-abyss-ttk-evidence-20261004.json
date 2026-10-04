@@ -5,8 +5,9 @@
     "unexpectedLosses": [],
     "instantWipes": []
   },
+  "randomPolicy": "neutral",
   "workId": "MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004",
-  "method": "Formal Abyss roster, current player stat/skill owners, initiative, enemy AI, damage/status and round-end owners. Neutral 0.5 rolls; two members below Lv50, three from Lv50, no equipment; animation lifecycle requires separate Chrome evidence.",
+  "method": "Formal Abyss roster, current player stat/skill owners, initiative, enemy AI, damage/status and round-end owners. Default neutral0.5 or per-case seeded LCG rolls recorded in randomPolicy/randomSeed; two members below Lv50, three from Lv50, no equipment; animation lifecycle requires separate Chrome evidence.",
   "cases": 150,
   "failures": [
     {
@@ -14,6 +15,8 @@
       "partyLevel": 40,
       "region": 4,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -507,6 +510,8 @@
       "partyLevel": 20,
       "region": 0,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -808,6 +813,8 @@
       "partyLevel": 20,
       "region": 0,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -1114,6 +1121,8 @@
       "partyLevel": 20,
       "region": 0,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -1425,6 +1434,8 @@
       "partyLevel": 20,
       "region": 0,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -1736,6 +1747,8 @@
       "partyLevel": 20,
       "region": 0,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -2080,6 +2093,8 @@
       "partyLevel": 20,
       "region": 1,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -2381,6 +2396,8 @@
       "partyLevel": 20,
       "region": 1,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -2687,6 +2704,8 @@
       "partyLevel": 20,
       "region": 1,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -2998,6 +3017,8 @@
       "partyLevel": 20,
       "region": 1,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -3309,6 +3330,8 @@
       "partyLevel": 20,
       "region": 1,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -3634,6 +3657,8 @@
       "partyLevel": 20,
       "region": 2,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -3935,6 +3960,8 @@
       "partyLevel": 20,
       "region": 2,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -4236,6 +4263,8 @@
       "partyLevel": 20,
       "region": 2,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -4537,6 +4566,8 @@
       "partyLevel": 20,
       "region": 2,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -4838,6 +4869,8 @@
       "partyLevel": 20,
       "region": 2,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -5153,6 +5186,8 @@
       "partyLevel": 20,
       "region": 3,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -5464,6 +5499,8 @@
       "partyLevel": 20,
       "region": 3,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -5775,6 +5812,8 @@
       "partyLevel": 20,
       "region": 3,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -6086,6 +6125,8 @@
       "partyLevel": 20,
       "region": 3,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -6400,6 +6441,8 @@
       "partyLevel": 20,
       "region": 3,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -6734,6 +6777,8 @@
       "partyLevel": 20,
       "region": 4,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -7011,6 +7056,8 @@
       "partyLevel": 20,
       "region": 4,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -7293,6 +7340,8 @@
       "partyLevel": 20,
       "region": 4,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -7580,6 +7629,8 @@
       "partyLevel": 20,
       "region": 4,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -7867,6 +7918,8 @@
       "partyLevel": 20,
       "region": 4,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 20,
@@ -8167,6 +8220,8 @@
       "partyLevel": 30,
       "region": 0,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -8520,6 +8575,8 @@
       "partyLevel": 30,
       "region": 0,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -8873,6 +8930,8 @@
       "partyLevel": 30,
       "region": 0,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -9226,6 +9285,8 @@
       "partyLevel": 30,
       "region": 0,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -9579,6 +9640,8 @@
       "partyLevel": 30,
       "region": 0,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -9945,6 +10008,8 @@
       "partyLevel": 30,
       "region": 1,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -10298,6 +10363,8 @@
       "partyLevel": 30,
       "region": 1,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -10651,6 +10718,8 @@
       "partyLevel": 30,
       "region": 1,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -11004,6 +11073,8 @@
       "partyLevel": 30,
       "region": 1,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -11357,6 +11428,8 @@
       "partyLevel": 30,
       "region": 1,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -11716,6 +11789,8 @@
       "partyLevel": 30,
       "region": 2,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -12069,6 +12144,8 @@
       "partyLevel": 30,
       "region": 2,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -12422,6 +12499,8 @@
       "partyLevel": 30,
       "region": 2,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -12775,6 +12854,8 @@
       "partyLevel": 30,
       "region": 2,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -13128,6 +13209,8 @@
       "partyLevel": 30,
       "region": 2,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -13487,6 +13570,8 @@
       "partyLevel": 30,
       "region": 3,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -13840,6 +13925,8 @@
       "partyLevel": 30,
       "region": 3,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -14193,6 +14280,8 @@
       "partyLevel": 30,
       "region": 3,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -14546,6 +14635,8 @@
       "partyLevel": 30,
       "region": 3,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -14899,6 +14990,8 @@
       "partyLevel": 30,
       "region": 3,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -15252,6 +15345,8 @@
       "partyLevel": 30,
       "region": 4,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -15581,6 +15676,8 @@
       "partyLevel": 30,
       "region": 4,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -15910,6 +16007,8 @@
       "partyLevel": 30,
       "region": 4,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -16239,6 +16338,8 @@
       "partyLevel": 30,
       "region": 4,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -16568,6 +16669,8 @@
       "partyLevel": 30,
       "region": 4,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 30,
@@ -16904,6 +17007,8 @@
       "partyLevel": 40,
       "region": 0,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -17236,6 +17341,8 @@
       "partyLevel": 40,
       "region": 0,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -17589,6 +17696,8 @@
       "partyLevel": 40,
       "region": 0,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -17942,6 +18051,8 @@
       "partyLevel": 40,
       "region": 0,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -18295,6 +18406,8 @@
       "partyLevel": 40,
       "region": 0,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -18661,6 +18774,8 @@
       "partyLevel": 40,
       "region": 1,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -18993,6 +19108,8 @@
       "partyLevel": 40,
       "region": 1,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -19346,6 +19463,8 @@
       "partyLevel": 40,
       "region": 1,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -19699,6 +19818,8 @@
       "partyLevel": 40,
       "region": 1,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -20052,6 +20173,8 @@
       "partyLevel": 40,
       "region": 1,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -20411,6 +20534,8 @@
       "partyLevel": 40,
       "region": 2,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -20760,6 +20885,8 @@
       "partyLevel": 40,
       "region": 2,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -21109,6 +21236,8 @@
       "partyLevel": 40,
       "region": 2,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -21441,6 +21570,8 @@
       "partyLevel": 40,
       "region": 2,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -21773,6 +21904,8 @@
       "partyLevel": 40,
       "region": 2,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -22132,6 +22265,8 @@
       "partyLevel": 40,
       "region": 3,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -22485,6 +22620,8 @@
       "partyLevel": 40,
       "region": 3,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -22838,6 +22975,8 @@
       "partyLevel": 40,
       "region": 3,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -23191,6 +23330,8 @@
       "partyLevel": 40,
       "region": 3,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -23544,6 +23685,8 @@
       "partyLevel": 40,
       "region": 3,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -23903,6 +24046,8 @@
       "partyLevel": 40,
       "region": 4,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -24211,6 +24356,8 @@
       "partyLevel": 40,
       "region": 4,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -24540,6 +24687,8 @@
       "partyLevel": 40,
       "region": 4,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -24869,6 +25018,8 @@
       "partyLevel": 40,
       "region": 4,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -25198,6 +25349,8 @@
       "partyLevel": 40,
       "region": 4,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -25534,6 +25687,8 @@
       "partyLevel": 40,
       "region": 0,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -25895,6 +26050,8 @@
       "partyLevel": 40,
       "region": 0,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -26256,6 +26413,8 @@
       "partyLevel": 40,
       "region": 0,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -26617,6 +26776,8 @@
       "partyLevel": 40,
       "region": 0,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -26978,6 +27139,8 @@
       "partyLevel": 40,
       "region": 0,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -27358,6 +27521,8 @@
       "partyLevel": 40,
       "region": 1,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -27719,6 +27884,8 @@
       "partyLevel": 40,
       "region": 1,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -28080,6 +28247,8 @@
       "partyLevel": 40,
       "region": 1,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -28441,6 +28610,8 @@
       "partyLevel": 40,
       "region": 1,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -28802,6 +28973,8 @@
       "partyLevel": 40,
       "region": 1,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -29163,6 +29336,8 @@
       "partyLevel": 40,
       "region": 2,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -29521,6 +29696,8 @@
       "partyLevel": 40,
       "region": 2,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -29861,6 +30038,8 @@
       "partyLevel": 40,
       "region": 2,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -30201,6 +30380,8 @@
       "partyLevel": 40,
       "region": 2,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -30562,6 +30743,8 @@
       "partyLevel": 40,
       "region": 2,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -30929,6 +31112,8 @@
       "partyLevel": 40,
       "region": 3,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -31290,6 +31475,8 @@
       "partyLevel": 40,
       "region": 3,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -31651,6 +31838,8 @@
       "partyLevel": 40,
       "region": 3,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -32012,6 +32201,8 @@
       "partyLevel": 40,
       "region": 3,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -32373,6 +32564,8 @@
       "partyLevel": 40,
       "region": 3,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -32741,6 +32934,8 @@
       "partyLevel": 40,
       "region": 4,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -33078,6 +33273,8 @@
       "partyLevel": 40,
       "region": 4,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -33415,6 +33612,8 @@
       "partyLevel": 40,
       "region": 4,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -33752,6 +33951,8 @@
       "partyLevel": 40,
       "region": 4,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -34089,6 +34290,8 @@
       "partyLevel": 40,
       "region": 4,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 2,
       "reference": {
         "level": 40,
@@ -34580,6 +34783,8 @@
       "partyLevel": 50,
       "region": 0,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -34957,6 +35162,8 @@
       "partyLevel": 50,
       "region": 0,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -35334,6 +35541,8 @@
       "partyLevel": 50,
       "region": 0,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -35711,6 +35920,8 @@
       "partyLevel": 50,
       "region": 0,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -36088,6 +36299,8 @@
       "partyLevel": 50,
       "region": 0,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -36478,6 +36691,8 @@
       "partyLevel": 50,
       "region": 1,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -36855,6 +37070,8 @@
       "partyLevel": 50,
       "region": 1,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -37232,6 +37449,8 @@
       "partyLevel": 50,
       "region": 1,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -37609,6 +37828,8 @@
       "partyLevel": 50,
       "region": 1,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -37986,6 +38207,8 @@
       "partyLevel": 50,
       "region": 1,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -38369,6 +38592,8 @@
       "partyLevel": 50,
       "region": 2,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -38746,6 +38971,8 @@
       "partyLevel": 50,
       "region": 2,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -39123,6 +39350,8 @@
       "partyLevel": 50,
       "region": 2,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -39500,6 +39729,8 @@
       "partyLevel": 50,
       "region": 2,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -39877,6 +40108,8 @@
       "partyLevel": 50,
       "region": 2,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -40260,6 +40493,8 @@
       "partyLevel": 50,
       "region": 3,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -40637,6 +40872,8 @@
       "partyLevel": 50,
       "region": 3,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -41014,6 +41251,8 @@
       "partyLevel": 50,
       "region": 3,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -41391,6 +41630,8 @@
       "partyLevel": 50,
       "region": 3,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -41738,6 +41979,8 @@
       "partyLevel": 50,
       "region": 3,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -42122,6 +42365,8 @@
       "partyLevel": 50,
       "region": 4,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -42475,6 +42720,8 @@
       "partyLevel": 50,
       "region": 4,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -42828,6 +43075,8 @@
       "partyLevel": 50,
       "region": 4,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -43181,6 +43430,8 @@
       "partyLevel": 50,
       "region": 4,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -43534,6 +43785,8 @@
       "partyLevel": 50,
       "region": 4,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 50,
@@ -44003,6 +44256,8 @@
       "partyLevel": 60,
       "region": 0,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -44380,6 +44635,8 @@
       "partyLevel": 60,
       "region": 0,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -44757,6 +45014,8 @@
       "partyLevel": 60,
       "region": 0,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -45134,6 +45393,8 @@
       "partyLevel": 60,
       "region": 0,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -45511,6 +45772,8 @@
       "partyLevel": 60,
       "region": 0,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -45901,6 +46164,8 @@
       "partyLevel": 60,
       "region": 1,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -46278,6 +46543,8 @@
       "partyLevel": 60,
       "region": 1,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -46655,6 +46922,8 @@
       "partyLevel": 60,
       "region": 1,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -47032,6 +47301,8 @@
       "partyLevel": 60,
       "region": 1,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -47409,6 +47680,8 @@
       "partyLevel": 60,
       "region": 1,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -47792,6 +48065,8 @@
       "partyLevel": 60,
       "region": 2,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -48148,6 +48423,8 @@
       "partyLevel": 60,
       "region": 2,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -48504,6 +48781,8 @@
       "partyLevel": 60,
       "region": 2,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -48881,6 +49160,8 @@
       "partyLevel": 60,
       "region": 2,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -49258,6 +49539,8 @@
       "partyLevel": 60,
       "region": 2,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -49641,6 +49924,8 @@
       "partyLevel": 60,
       "region": 3,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -50018,6 +50303,8 @@
       "partyLevel": 60,
       "region": 3,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -50395,6 +50682,8 @@
       "partyLevel": 60,
       "region": 3,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -50772,6 +51061,8 @@
       "partyLevel": 60,
       "region": 3,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -51149,6 +51440,8 @@
       "partyLevel": 60,
       "region": 3,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -51532,6 +51825,8 @@
       "partyLevel": 60,
       "region": 4,
       "stage": 0,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -51885,6 +52180,8 @@
       "partyLevel": 60,
       "region": 4,
       "stage": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -52238,6 +52535,8 @@
       "partyLevel": 60,
       "region": 4,
       "stage": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -52591,6 +52890,8 @@
       "partyLevel": 60,
       "region": 4,
       "stage": 3,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
@@ -52944,6 +53245,8 @@
       "partyLevel": 60,
       "region": 4,
       "stage": 4,
+      "randomPolicy": "neutral",
+      "randomSeed": null,
       "partySize": 3,
       "reference": {
         "level": 60,
