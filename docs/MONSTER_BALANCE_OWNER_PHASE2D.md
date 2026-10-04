@@ -10,10 +10,12 @@ Status: IN PROGRESS. Stop before Phase2E. PR is the live closeout owner.
 
 Two fixed difficulties Lv20/Lv40, five regions east/south/heaven/north/extreme,
 five encounters per region. Each difficulty has 25 encounters.
-Pre-stages: five Regular row1 positions0..4, three Elite row0 positions0..2.
-Emperor stages: one single-slot smallBoss row0 position2, seven Elite occupying
-row0 positions0/1/3/4 and row1 positions1/2/3.
-Lv40 extreme final: five smallBoss row0 positions0..4, five Elite row1 positions0..4.
+Roster metadata: pre-stages contain five Regular row1 positions0..4 and three
+Elite row0 positions0..2. Ordinary emperor stages declare one single-slot smallBoss
+row0 position2 and seven Elite (five back / three front metadata). Canonical
+rendered geometry for both eight-unit compositions is three back / five front,
+rank ordered, with the emperor at B3. Lv40 extreme final contains five smallBoss
+back and five Elite front, matching the ten-unit Slot Owner projection.
 Lv20/Lv40 forced skill level1/2; Lv40 final alone forces level5.
 Normal/Elite skill frequency35%; emperors72%, extreme78%, final Elite78%.
 Names, carried skill/support IDs and approved portraits remain unchanged.
@@ -40,7 +42,8 @@ V141/V155 support dispatcher -> core damage/status -> dungeon completion callbac
 9. Skill loadout: existing core pool plus 59 fixed emperor/final loadouts; V144 guard.
 10. Skill frequency: existing core level frequency and 59 emperor/final metadata.
 11. AI: core/V141 special dispatcher and V155 final decision/support execution.
-12. Formation: 59 metadata and FourSymbolsBattlefieldSlots snapshot, no death reflow.
+12. Formation: FourSymbolsBattlefieldSlots snapshot and Geometry Adapter; 59 retains
+    historical metadata. Eight units use three back/five front, no death reflow.
 13. Small Boss identity: explicit emperor slot; no Personal/World footprint.
 14. Durability: MonsterBalance Abyss mode/rank/stage profiles; old1.875 writer retired.
 15. Element stat profile: MonsterBalance neutral profile; no invented elemental buffs.
@@ -120,3 +123,5 @@ deployed Abyss QA and safe absorbed branch cleanup. Main untouched; no Phase2E.
 
 ### Canonical formation audit correction
 The formal Slot Owner defines every eight-unit encounter as three back slots (B2/B3/B4) and five front slots. Rank ordering places the single emperor at B3 with two elites in back and five elites in front. The older 59 metadata describes five back / three front for ordinary emperor stages, but the final geometry adapter uses the canonical snapshot, not this metadata. Phase 2D preserves this actual runtime contract. Chrome QA compares every card against a fresh snapshot from the unchanged Slot Owner and checks the central emperor and no death reflow; metadata is not treated as a second geometry authority.
+
+Chrome Status Owner audit: V155 Rock Wall stores `originalDefense` and applies the existing skill-level defense percentage during combat. QA verifies the stored original against MonsterBalance and the exact live defense against the official skill percentage; base-stat comparisons use that original while the legal buff exists. This does not allow unregistered defense mutations. A zero-quantile random boundary probe at one naturally attempted enemy hard-control roll exercises the unchanged hit formula and status execution; the calculated chance/cap and actual result are recorded. No status is injected.
