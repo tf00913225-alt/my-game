@@ -1,0 +1,1684 @@
+{
+  "passed": true,
+  "commitSha": "866f0699a0cebe7634eafbff2dd19803d90c38b0",
+  "results": [
+    {
+      "width": 390,
+      "height": 844,
+      "scenes": [
+        {
+          "encounterId": "enc_road",
+          "level": 8,
+          "replay": false,
+          "initial": [
+            [
+              225,
+              125,
+              86,
+              63,
+              86,
+              4,
+              "regular",
+              8,
+              "fire"
+            ],
+            [
+              225,
+              125,
+              86,
+              63,
+              86,
+              4,
+              "regular",
+              8,
+              "wind"
+            ],
+            [
+              250,
+              140,
+              94,
+              68.5,
+              94,
+              4,
+              "regular",
+              9,
+              "earth"
+            ]
+          ],
+          "slots": [
+            "ENEMY_F2",
+            "ENEMY_F3",
+            "ENEMY_F4"
+          ],
+          "shapes": {
+            "single": [
+              0
+            ],
+            "row": [
+              0,
+              1,
+              2
+            ],
+            "tri": [
+              0,
+              1
+            ],
+            "all": [
+              0,
+              1,
+              2
+            ]
+          },
+          "beforeParty": [
+            760
+          ],
+          "afterParty": [
+            464
+          ],
+          "rounds": 3,
+          "survivors": 1,
+          "castSkills": [
+            "fireRocket",
+            "fireRocket",
+            "fireRocket"
+          ],
+          "events": [
+            {
+              "turn": 1,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 2
+            },
+            {
+              "turn": 1
+            },
+            {
+              "turn": 2,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 2
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 2
+            },
+            {
+              "turn": 3,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 3,
+              "type": "monster",
+              "index": 2
+            }
+          ],
+          "rewardGold": 150,
+          "rewardExp": 0,
+          "saveProgression": true
+        },
+        {
+          "encounterId": "enc_gate_elite",
+          "level": 10,
+          "replay": false,
+          "initial": [
+            [
+              385,
+              155,
+              102,
+              74,
+              107,
+              4,
+              "elite",
+              10,
+              "earth"
+            ],
+            [
+              275,
+              155,
+              102,
+              74,
+              102,
+              4,
+              "regular",
+              10,
+              "fire"
+            ],
+            [
+              275,
+              155,
+              102,
+              74,
+              102,
+              4,
+              "regular",
+              10,
+              "wind"
+            ]
+          ],
+          "slots": [
+            "ENEMY_F3",
+            "ENEMY_F2",
+            "ENEMY_F4"
+          ],
+          "shapes": {
+            "single": [
+              0
+            ],
+            "row": [
+              1,
+              0,
+              2
+            ],
+            "tri": [
+              1,
+              0,
+              2
+            ],
+            "all": [
+              1,
+              0,
+              2
+            ]
+          },
+          "beforeParty": [
+            920
+          ],
+          "afterParty": [
+            642
+          ],
+          "rounds": 3,
+          "survivors": 1,
+          "castSkills": [],
+          "events": [
+            {
+              "turn": 1,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 2
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 1
+            },
+            {
+              "turn": 2,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 2
+            },
+            {
+              "turn": 3,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 3,
+              "type": "monster",
+              "index": 0
+            }
+          ],
+          "rewardGold": 350,
+          "rewardExp": 0,
+          "saveProgression": true
+        },
+        {
+          "encounterId": "enc_boss",
+          "level": 12,
+          "replay": false,
+          "initial": [
+            [
+              650,
+              170,
+              118,
+              82.25,
+              130,
+              6,
+              "smallBoss",
+              12,
+              "earth"
+            ],
+            [
+              420,
+              155,
+              110,
+              79.5,
+              116,
+              5,
+              "elite",
+              11,
+              "fire"
+            ],
+            [
+              420,
+              155,
+              110,
+              79.5,
+              116,
+              5,
+              "elite",
+              11,
+              "wind"
+            ]
+          ],
+          "slots": [
+            "ENEMY_F3",
+            "ENEMY_F2",
+            "ENEMY_F4"
+          ],
+          "shapes": {
+            "single": [
+              0
+            ],
+            "row": [
+              1,
+              0,
+              2
+            ],
+            "tri": [
+              1,
+              0,
+              2
+            ],
+            "all": [
+              1,
+              0,
+              2
+            ]
+          },
+          "beforeParty": [
+            1080
+          ],
+          "afterParty": [
+            286
+          ],
+          "rounds": 4,
+          "survivors": 1,
+          "castSkills": [],
+          "events": [
+            {
+              "turn": 1,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 2
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 1
+            },
+            {
+              "turn": 2,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 2
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 2
+            },
+            {
+              "turn": 3,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 3,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 3,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 3
+            },
+            {
+              "turn": 4,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 4,
+              "type": "monster",
+              "index": 0
+            }
+          ],
+          "rewardGold": 650,
+          "rewardExp": 300,
+          "saveProgression": true
+        },
+        {
+          "encounterId": "enc_road",
+          "level": 8,
+          "replay": true,
+          "initial": [
+            [
+              225,
+              125,
+              86,
+              63,
+              86,
+              4,
+              "regular",
+              8,
+              "fire"
+            ],
+            [
+              225,
+              125,
+              86,
+              63,
+              86,
+              4,
+              "regular",
+              8,
+              "wind"
+            ],
+            [
+              250,
+              140,
+              94,
+              68.5,
+              94,
+              4,
+              "regular",
+              9,
+              "earth"
+            ]
+          ],
+          "slots": [
+            "ENEMY_F2",
+            "ENEMY_F3",
+            "ENEMY_F4"
+          ],
+          "shapes": {
+            "single": [
+              0
+            ],
+            "row": [
+              0,
+              1,
+              2
+            ],
+            "tri": [
+              0,
+              1
+            ],
+            "all": [
+              0,
+              1,
+              2
+            ]
+          },
+          "beforeParty": [
+            760,
+            760
+          ],
+          "afterParty": [
+            681,
+            760
+          ],
+          "rounds": 2,
+          "survivors": 2,
+          "castSkills": [],
+          "events": [
+            {
+              "turn": 1,
+              "type": "player",
+              "index": 1
+            },
+            {
+              "turn": 1,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 2
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 1
+            },
+            {
+              "turn": 2,
+              "type": "player",
+              "index": 1
+            },
+            {
+              "turn": 2,
+              "type": "player",
+              "index": 0
+            }
+          ],
+          "rewardGold": 0,
+          "rewardExp": 0,
+          "saveProgression": true
+        }
+      ],
+      "skills": [
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 2
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 2
+        },
+        {
+          "name": "土石斬",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "土石斬",
+          "round": 2
+        },
+        {
+          "name": "普通攻擊",
+          "round": 2
+        },
+        {
+          "name": "土石斬",
+          "round": 3
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        }
+      ],
+      "controls": [],
+      "portraitGaps": [
+        {
+          "name": "攔路山賊",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "攔路山賊",
+            "element": "fire",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "山道惡徒",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "山道惡徒",
+            "element": "wind",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "寨外斥候",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "寨外斥候",
+            "element": "earth",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "黑松寨精英",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "黑松寨精英",
+            "element": "earth",
+            "rank": "elite",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "持刀寨眾",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "持刀寨眾",
+            "element": "fire",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "巡寨快手",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "巡寨快手",
+            "element": "wind",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "黑松寨主",
+          "portrait": {
+            "portraitKey": "temporary.boss-reference",
+            "name": "黑松寨主",
+            "element": "earth",
+            "rank": "boss",
+            "sizeClass": "boss",
+            "path": "assets/monsters/boss/boss-placeholder-fire-demon.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "寨主親衛",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "寨主親衛",
+            "element": "fire",
+            "rank": "elite",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "寨主親衛",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "寨主親衛",
+            "element": "wind",
+            "rank": "elite",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "攔路山賊",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "攔路山賊",
+            "element": "fire",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "山道惡徒",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "山道惡徒",
+            "element": "wind",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "寨外斥候",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "寨外斥候",
+            "element": "earth",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        }
+      ],
+      "decodedPortraits": [
+        {
+          "name": "攔路山賊",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "山道惡徒",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "寨外斥候",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "黑松寨精英",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "持刀寨眾",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "巡寨快手",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "黑松寨主",
+          "url": "http://127.0.0.1:40413/assets/monsters/boss/boss-placeholder-fire-demon.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "寨主親衛",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "寨主親衛",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "攔路山賊",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "山道惡徒",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "寨外斥候",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        }
+      ]
+    },
+    {
+      "width": 412,
+      "height": 915,
+      "scenes": [
+        {
+          "encounterId": "enc_road",
+          "level": 8,
+          "replay": false,
+          "initial": [
+            [
+              225,
+              125,
+              86,
+              63,
+              86,
+              4,
+              "regular",
+              8,
+              "fire"
+            ],
+            [
+              225,
+              125,
+              86,
+              63,
+              86,
+              4,
+              "regular",
+              8,
+              "wind"
+            ],
+            [
+              250,
+              140,
+              94,
+              68.5,
+              94,
+              4,
+              "regular",
+              9,
+              "earth"
+            ]
+          ],
+          "slots": [
+            "ENEMY_F2",
+            "ENEMY_F3",
+            "ENEMY_F4"
+          ],
+          "shapes": {
+            "single": [
+              0
+            ],
+            "row": [
+              0,
+              1,
+              2
+            ],
+            "tri": [
+              0,
+              1
+            ],
+            "all": [
+              0,
+              1,
+              2
+            ]
+          },
+          "beforeParty": [
+            760
+          ],
+          "afterParty": [
+            464
+          ],
+          "rounds": 3,
+          "survivors": 1,
+          "castSkills": [
+            "fireRocket",
+            "fireRocket",
+            "fireRocket"
+          ],
+          "events": [
+            {
+              "turn": 1,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 2
+            },
+            {
+              "turn": 1
+            },
+            {
+              "turn": 2,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 2
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 2
+            },
+            {
+              "turn": 3,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 3,
+              "type": "monster",
+              "index": 2
+            }
+          ],
+          "rewardGold": 150,
+          "rewardExp": 0,
+          "saveProgression": true
+        },
+        {
+          "encounterId": "enc_gate_elite",
+          "level": 10,
+          "replay": false,
+          "initial": [
+            [
+              385,
+              155,
+              102,
+              74,
+              107,
+              4,
+              "elite",
+              10,
+              "earth"
+            ],
+            [
+              275,
+              155,
+              102,
+              74,
+              102,
+              4,
+              "regular",
+              10,
+              "fire"
+            ],
+            [
+              275,
+              155,
+              102,
+              74,
+              102,
+              4,
+              "regular",
+              10,
+              "wind"
+            ]
+          ],
+          "slots": [
+            "ENEMY_F3",
+            "ENEMY_F2",
+            "ENEMY_F4"
+          ],
+          "shapes": {
+            "single": [
+              0
+            ],
+            "row": [
+              1,
+              0,
+              2
+            ],
+            "tri": [
+              1,
+              0,
+              2
+            ],
+            "all": [
+              1,
+              0,
+              2
+            ]
+          },
+          "beforeParty": [
+            920
+          ],
+          "afterParty": [
+            642
+          ],
+          "rounds": 3,
+          "survivors": 1,
+          "castSkills": [],
+          "events": [
+            {
+              "turn": 1,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 2
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 1
+            },
+            {
+              "turn": 2,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 2
+            },
+            {
+              "turn": 3,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 3,
+              "type": "monster",
+              "index": 0
+            }
+          ],
+          "rewardGold": 350,
+          "rewardExp": 0,
+          "saveProgression": true
+        },
+        {
+          "encounterId": "enc_boss",
+          "level": 12,
+          "replay": false,
+          "initial": [
+            [
+              650,
+              170,
+              118,
+              82.25,
+              130,
+              6,
+              "smallBoss",
+              12,
+              "earth"
+            ],
+            [
+              420,
+              155,
+              110,
+              79.5,
+              116,
+              5,
+              "elite",
+              11,
+              "fire"
+            ],
+            [
+              420,
+              155,
+              110,
+              79.5,
+              116,
+              5,
+              "elite",
+              11,
+              "wind"
+            ]
+          ],
+          "slots": [
+            "ENEMY_F3",
+            "ENEMY_F2",
+            "ENEMY_F4"
+          ],
+          "shapes": {
+            "single": [
+              0
+            ],
+            "row": [
+              1,
+              0,
+              2
+            ],
+            "tri": [
+              1,
+              0,
+              2
+            ],
+            "all": [
+              1,
+              0,
+              2
+            ]
+          },
+          "beforeParty": [
+            1080
+          ],
+          "afterParty": [
+            286
+          ],
+          "rounds": 4,
+          "survivors": 1,
+          "castSkills": [],
+          "events": [
+            {
+              "turn": 1,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 2
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 1
+            },
+            {
+              "turn": 2,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 2
+            },
+            {
+              "turn": 2,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 2
+            },
+            {
+              "turn": 3,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 3,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 3,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 3
+            },
+            {
+              "turn": 4,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 4,
+              "type": "monster",
+              "index": 0
+            }
+          ],
+          "rewardGold": 650,
+          "rewardExp": 300,
+          "saveProgression": true
+        },
+        {
+          "encounterId": "enc_road",
+          "level": 8,
+          "replay": true,
+          "initial": [
+            [
+              225,
+              125,
+              86,
+              63,
+              86,
+              4,
+              "regular",
+              8,
+              "fire"
+            ],
+            [
+              225,
+              125,
+              86,
+              63,
+              86,
+              4,
+              "regular",
+              8,
+              "wind"
+            ],
+            [
+              250,
+              140,
+              94,
+              68.5,
+              94,
+              4,
+              "regular",
+              9,
+              "earth"
+            ]
+          ],
+          "slots": [
+            "ENEMY_F2",
+            "ENEMY_F3",
+            "ENEMY_F4"
+          ],
+          "shapes": {
+            "single": [
+              0
+            ],
+            "row": [
+              0,
+              1,
+              2
+            ],
+            "tri": [
+              0,
+              1
+            ],
+            "all": [
+              0,
+              1,
+              2
+            ]
+          },
+          "beforeParty": [
+            760,
+            760
+          ],
+          "afterParty": [
+            681,
+            760
+          ],
+          "rounds": 2,
+          "survivors": 2,
+          "castSkills": [],
+          "events": [
+            {
+              "turn": 1,
+              "type": "player",
+              "index": 1
+            },
+            {
+              "turn": 1,
+              "type": "player",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 2
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 0
+            },
+            {
+              "turn": 1,
+              "type": "monster",
+              "index": 1
+            },
+            {
+              "turn": 1
+            },
+            {
+              "turn": 2,
+              "type": "player",
+              "index": 1
+            },
+            {
+              "turn": 2,
+              "type": "player",
+              "index": 0
+            }
+          ],
+          "rewardGold": 0,
+          "rewardExp": 0,
+          "saveProgression": true
+        }
+      ],
+      "skills": [
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 2
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 2
+        },
+        {
+          "name": "土石斬",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "土石斬",
+          "round": 2
+        },
+        {
+          "name": "普通攻擊",
+          "round": 2
+        },
+        {
+          "name": "土石斬",
+          "round": 3
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        }
+      ],
+      "controls": [],
+      "portraitGaps": [
+        {
+          "name": "攔路山賊",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "攔路山賊",
+            "element": "fire",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "山道惡徒",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "山道惡徒",
+            "element": "wind",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "寨外斥候",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "寨外斥候",
+            "element": "earth",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "黑松寨精英",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "黑松寨精英",
+            "element": "earth",
+            "rank": "elite",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "持刀寨眾",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "持刀寨眾",
+            "element": "fire",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "巡寨快手",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "巡寨快手",
+            "element": "wind",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "黑松寨主",
+          "portrait": {
+            "portraitKey": "temporary.boss-reference",
+            "name": "黑松寨主",
+            "element": "earth",
+            "rank": "boss",
+            "sizeClass": "boss",
+            "path": "assets/monsters/boss/boss-placeholder-fire-demon.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "寨主親衛",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "寨主親衛",
+            "element": "fire",
+            "rank": "elite",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "寨主親衛",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "寨主親衛",
+            "element": "wind",
+            "rank": "elite",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "攔路山賊",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "攔路山賊",
+            "element": "fire",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "山道惡徒",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "山道惡徒",
+            "element": "wind",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        },
+        {
+          "name": "寨外斥候",
+          "portrait": {
+            "portraitKey": "temporary.heavenly-soldier",
+            "name": "寨外斥候",
+            "element": "earth",
+            "rank": "regular",
+            "sizeClass": "regular",
+            "path": "assets/dungeons/abyss/soldier.webp",
+            "status": "fallback",
+            "temporary": true
+          }
+        }
+      ],
+      "decodedPortraits": [
+        {
+          "name": "攔路山賊",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "山道惡徒",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "寨外斥候",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "黑松寨精英",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "持刀寨眾",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "巡寨快手",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "黑松寨主",
+          "url": "http://127.0.0.1:40413/assets/monsters/boss/boss-placeholder-fire-demon.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "寨主親衛",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "寨主親衛",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "攔路山賊",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "山道惡徒",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        },
+        {
+          "name": "寨外斥候",
+          "url": "http://127.0.0.1:40413/assets/dungeons/abyss/soldier.webp",
+          "width": 1152,
+          "height": 1536
+        }
+      ]
+    }
+  ],
+  "workId": "MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004",
+  "ciRun": 37196320933,
+  "ciJob": 111418839671,
+  "artifactId": 11301028022,
+  "artifactSha256": "6215ecedeb605dcb59f9241194784d45749f50b0813ea7f32a59bf2cb5d69571",
+  "scope": "Production bundle under PR merge snapshot; isolated disposable QA account; final runtime formulas unchanged. This is not deployed verification."
+}

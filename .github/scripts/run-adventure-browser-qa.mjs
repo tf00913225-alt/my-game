@@ -329,7 +329,7 @@ async function runProductionAdventureBalanceQa(){
           evidence.scenes.push({encounterId:node.encounterId,level,replay,initial,slots,shapes,beforeParty,afterParty:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),rounds:maxTurn,survivors,castSkills,events,rewardGold:gold-beforeGold,rewardExp:sharedExp-beforeExp,saveProgression:true});
         }
         for(const rank of ['regular','elite','boss','smallBoss','player']){const cap=rank==='regular'?90:rank==='elite'?75:60;check(calculateStatusEffectChance(999,100,100,0,0,true,rank==='smallBoss'?getMonsterRank({rank}):rank,0)===cap,'hard cap '+rank);}
-        check(evidence.skills.length>0,'actual Enemy AI skill execution');return evidence;
+        check(evidence.skills.some(skill=>skill.name!=='普通攻擊'),'actual Enemy AI carried skill execution');return evidence;
       }finally{Math.random=oldRandom;showMonsterSkillNameBadge=badge;rollStatusEffectHit=statusRoll;autoBattle=false;autoConfig.enabled=false;}
     })()`;
     const server=await startServer({baseUrl});const file=path.join(process.cwd(),'artifacts/browser-qa/adventure-balance.json');fs.mkdirSync(path.dirname(file),{recursive:true});const results=[];let client,proc,profile;

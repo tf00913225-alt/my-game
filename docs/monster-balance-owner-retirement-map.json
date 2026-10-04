@@ -438,7 +438,7 @@
   },
   "phase2eGate": {
     "workId": "MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004",
-    "status": "IMPLEMENTED",
+    "status": "VERIFIED",
     "runtimeOwner": "js/combat/monster-balance-owner.mjs",
     "migratedMode": "adventure",
     "retiredWrites": [
@@ -456,6 +456,17 @@
     "encounters": 3,
     "archetypes": 9,
     "ttkCases": 36,
-    "closeout": "Production Chrome/latest-head CI/integration/deployment/cleanup pending."
+    "closeout": "1/1 functional VERIFIED. Final metadata-head CI, dev integration/deployment/exact SHA/live Adventure and safe branch cleanup are independent pending gates; PR#797 is durable current owner. Stop before Phase2F.",
+    "sourceHead": "866f0699a0cebe7634eafbff2dd19803d90c38b0",
+    "ciRun": 37196320933,
+    "ciJob": 111418839774,
+    "focused": "6/6",
+    "regression": "46/46 Phase1–2E",
+    "browserScenes": 8,
+    "browserViewports": [
+      "390x844",
+      "412x915"
+    ],
+    "browserArtifact": 11301028022
   }
 }

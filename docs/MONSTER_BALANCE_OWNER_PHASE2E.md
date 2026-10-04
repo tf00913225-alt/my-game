@@ -4,7 +4,7 @@ Work ID: MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004.
 Start dev: a0c4cf3ccf6b83278f9940da7f71516d9c98cfa4.
 Main: f63d69dbfa66ba75637d1c3cd7fcc7d74782e356 (forbidden).
 Branch: feature/monster-balance-owner-phase2e-adventure-20261004; target dev.
-Status: IMPLEMENTED; PR is the durable current CI/integration/deployment/cleanup owner.
+Status: Requirement1/1 VERIFIED; PR#797 is the durable current final-Head CI/integration/deployment/cleanup owner.
 Classification: Convergence / Replacement. Stop before Phase 2F.
 
 ## Current product specification, independently inspected
@@ -23,6 +23,18 @@ monster, no player-level scaling, no chapter scaling or HP/attack multiplier.
 The chapter has planned nodes11–20, which cannot become battles in this work.
 The patrol objective uses Wild's unlocked roster only for a kill/drop target;
 that encounter remains Wild and is not migrated or rebalanced here.
+
+| Monster identity | Name | Level | Element | Rank | Archetype |
+|---|---|---:|---|---|---|
+| adventure.road.bandit | 攔路山賊 | 8 | fire | regular | balanced |
+| adventure.road.thug | 山道惡徒 | 8 | wind | regular | balanced |
+| adventure.road.scout | 寨外斥候 | 9 | earth | regular | balanced |
+| adventure.gate.elite | 黑松寨精英 | 10 | earth | elite | balanced |
+| adventure.gate.blade | 持刀寨眾 | 10 | fire | regular | balanced |
+| adventure.gate.runner | 巡寨快手 | 10 | wind | regular | balanced |
+| adventure.boss.chief | 黑松寨主 | 12 | earth | smallBoss | balanced |
+| adventure.boss.guard-fire | 寨主親衛 | 11 | fire | elite | balanced |
+| adventure.boss.guard-wind | 寨主親衛 | 11 | wind | elite | balanced |
 
 ## Actual caller graph and the 21 responsibilities
 
@@ -89,7 +101,21 @@ Elite encounter1–3, smallBoss encounter2–4. These describe whole-encounter
 duration, not fabricated independent monster TTK. Raw player HP before/after,
 enemy initial stats/resources/pressure, skills and control draws are preserved.
 No unsupported water/high-level/ten-enemy scenario is fabricated.
-Async battle/animation and save continuity still require production Chrome.
+Production Chrome additionally executed eight natural scenes at390×844/412×915:
+solo regular3 / elite3 / smallBoss4 rounds; replay with two members2 rounds.
+Player HP before/after760/464,920/642,1080/286; both replay members survive.
+Enemy carried skill土石斬 executed; ordinary attacks alone cannot satisfy the
+carried-skill browser assertion. No hard-control ability was artificially added.
+Gold150/350/650 and smallBoss EXP300, replay0/0, one-time claim, saved chapter
+ledger, return/re-entry and no background battle all PASS. Battle rewards have
+no item/material component; existing chest/chapter potion rewards are unchanged.
+All nine identities still use existing temporary soldier fallback portraits;
+artwork decoded1152×1536, gaps recorded without asset changes.
+Evidence: docs/monster-balance-adventure-browser-evidence-20261004.json;
+CI37196320933 job111418839671, artifact11301028022 SHA256
+6215ecedeb605dcb59f9241194784d45749f50b0813ea7f32a59bf2cb5d69571.
+Browser build source Head866f0699a0cebe7634eafbff2dd19803d90c38b0.
+This is production-bundle PR QA, not deployed verification.
 
 ## Retirement and compatibility
 
@@ -116,8 +142,15 @@ retirement,48 immutable Boss baselines and36 TTK cases.
 Existing Adventure lifecycle/reward/progression tests remain mandatory.
 Existing Adventure browser entry is extended for real production runtime;
 existing layout viewports retained and production390×844/412×915 added.
-Required: final focused/direct regressions, identity/TTK, production Chrome,
-reward/save/return/re-entry, build sync, deprecated/syntax and latest-head CI.
-Only then Requirement VERIFIED; integration, dev CI/deploy/exact manifest/SHA/
+Local Phase1–2E46/46, focused6/6, existing Adventure lifecycle/reward/progression,
+targeting/formation, AI/status/hard-control and related Cloud regressions PASS.
+Syntax368/368, build/build:check and release/deprecated gate PASS.
+Identity/TTK36 and production Chrome/reward/save/return/re-entry PASS.
+Source Head866f0699a0cebe7634eafbff2dd19803d90c38b0 full latest-head
+CI37196320933 SUCCESS (Repository111418839774, Adventure111418839671,
+Abyss111418840017); Session37196320795 SUCCESS. Requirement1/1 VERIFIED.
+The carried-skill assertion and all required gates will be rerun in the final
+evidence/metadata Head before integration.
+Integration, dev CI/deploy/exact manifest/SHA/
 Game+Cache, deployed Adventure QA and absorbed-branch deletion are separate gates.
 Main untouched. Do not enter Phase2F.
