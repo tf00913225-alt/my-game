@@ -474,10 +474,13 @@
 
     function buildEncounter(encounterId){
         const encounter=CONTENT.encounters[encounterId];
-        if(!encounter||!Array.isArray(encounter.enemies)||typeof makeZoneMonster!=="function"){ return null; }
+        if(!encounter||!Array.isArray(encounter.enemies)||!window.MonsterBalance||typeof window.MonsterBalance.build!=="function"){ return null; }
         return encounter.enemies.map((entry,index)=>{
-            const monster=makeZoneMonster(entry.name,entry.level,entry.element,entry.rank||"regular");
-            monster.rank=entry.rank||monster.rank||"regular";
+            const chapter=chapterDefinition();
+            const monster=window.MonsterBalance.build({monsterKey:entry.monsterKey,name:entry.name,level:entry.level,element:entry.element,archetype:entry.archetype,rank:entry.rank,mode:"adventure",chapterId:chapter.id,encounterId:encounter.id,context:"adventure/"+chapter.id+"/"+encounter.id});
+            monster.skillIds=getMonsterSkillPoolForLevel(entry.element,entry.level);
+            monster.skillChance=getMonsterSkillTierAndChance(entry.level).chance;
+            configureBuiltMonster(monster);
             monster.vAdventure=true;
             monster.vAdventureEncounterId=encounterId;
             monster.vAdventureSlot=index;
@@ -553,6 +556,7 @@
         startBattleResourceMonitor();
         hideOverlay();
 
+        if(window.FourSymbolsBattlefieldSlots){ window.FourSymbolsBattlefieldSlots.clearActiveEnemySnapshot(); }
         const started=window.v132LaunchDungeonBattle(roster,function(outcome){
             const battleInfo=runtime.activeAdventureBattle;
             stopBattleResourceMonitor();

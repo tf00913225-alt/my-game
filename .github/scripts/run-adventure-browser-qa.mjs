@@ -4,6 +4,13 @@ import os from "node:os";
 import path from "node:path";
 import net from "node:net";
 import {spawn,spawnSync} from "node:child_process";
+import {startServer,waitJson,Cdp,findChrome as productionChrome} from './runtime-browser-qa-support.mjs';
+
+// Same Adventure QA entry; production mode extends the historical layout fixtures.
+if(process.env.ADVENTURE_MONSTER_BALANCE_QA==='1'){
+    await runProductionAdventureBalanceQa();
+    process.exit(0);
+}
 
 const ROOT=process.cwd();
 const ARTIFACT_DIR=path.join(ROOT,"artifacts/browser-qa");
@@ -239,3 +246,104 @@ for(const entry of compositionByViewport.slice(1)){
 }
 fs.writeFileSync(path.join(ARTIFACT_DIR,"adventure-node-system-v1.json"),JSON.stringify({generatedAt:new Date().toISOString(),screenshots:VIEWPORTS.map(([w,h])=>`adventure-map-${w}x${h}.png`),evidence},null,2)+"\n");
 console.log("✓ Adventure browser QA passed at exact 360x800, 393x873 and 412x915 viewports with scroll-reachable chapter nodes and stable portrait composition screenshots");
+
+async function runProductionAdventureBalanceQa(){
+    const baseUrl=process.env.ADVENTURE_BALANCE_BASE_URL;
+    if(baseUrl){
+        const manifest=await fetch(new URL('release-manifest.json',baseUrl+'/')).then(r=>r.json());
+        assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA,'deployed Adventure exact SHA');
+    }
+    const reference=fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','utf8');
+    const expression=`(async()=>{
+      const check=(v,m)=>{if(!v)throw Error(m);};
+      const wait=async(fn,ms=30000)=>{const end=performance.now()+ms;while(!fn()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(fn(),'Adventure wait: '+fn);};
+      await wait(()=>FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
+      await FourSymbolsFeatures.ensure('gameplay-core','adventure-balance-qa');
+      await wait(()=>FourSymbolsReleaseUpdate?.getState?.().availableReleaseVersion);closeHomeFeature();
+      document.getElementById('adventureHomeEntry').click();await wait(()=>window.FourSymbolsAdventure&&document.getElementById('adventurePage')?.classList.contains('is-visible'));
+      const api=FourSymbolsAdventure,content=FourSymbolsAdventureContent;
+      const evidence=window.adventureBalanceQaEvidence={scenes:[],skills:[],controls:[],portraitGaps:[],decodedPortraits:[]};
+      const oldRandom=Math.random,badge=showMonsterSkillNameBadge,statusRoll=rollStatusEffectHit;
+      showMonsterSkillNameBadge=function(name,...args){evidence.skills.push({name,round:turn});return badge(name,...args);};
+      rollStatusEffectHit=function(...args){const hit=statusRoll(...args);if(args[5]){const chance=calculateStatusEffectChance(...args),cap=args[6]==='regular'?90:args[6]==='elite'?75:60;check(chance<=cap,'actual hard control cap');evidence.controls.push({chance,rank:args[6],hit});}return hit;};
+      const stats=m=>[m.maxHP,m.maxSP,m.attack,m.magicAttack,m.defense,m.agility,m.rank,m.level,m.element];
+      const verify=m=>{const p=MonsterBalance.debug(m);check(m.balanceOwner==='MonsterBalance'&&m.mode==='adventure','owner');check(!m.v132Dungeon&&!m.v141ExtraHP,'no legacy marker');check(JSON.stringify(stats(m).slice(0,6))===JSON.stringify([p.final.maxHP,p.final.maxSP,p.final.physicalAttack,p.final.magicAttack,p.final.defense,p.final.speed]),'all final stats match projection');check(getEnemyPressureMultiplier(m,player)===p.finalDamagePressure,'pressure once');check(p.base.abilityPointBudget===(m.level-1)*5,'budget');};
+      try{
+        const nodes=content.chapters.chapter_v1.nodes.filter(n=>n.encounterId);
+        check(nodes.length===3,'all formal encounters');
+        for(const [sceneIndex,node] of [...nodes,nodes[0]].entries()){
+          const replay=sceneIndex===3,level=replay?8:node.suggestedLevel;
+          const ref=prepareWildBalanceReferenceParty(level,replay?2:1);v131GrantElementBoxHours(8,32);
+          let seed=9000+sceneIndex;Math.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
+          autoBattle=false;autoPatrolEnabled=false;for(const cfg of [autoConfig,autoConfig2,autoConfig3]){cfg.enabled=false;cfg.skill=ref.skill;cfg.hp=0;cfg.sp=0;}
+          const state=player.adventureProgress.chapters.chapter_v1;state.currentNodeId=node.id;state.branchSelections.fork_1='bold';
+          if(!replay){delete state.completedNodes[node.id];delete state.rewardClaims[node.id];}
+          api.open();api.selectNode(node.id);const activate=document.querySelector('.adventure-node-sheet .adventure-button.primary');check(activate,'formal encounter action');activate.click();
+          await wait(()=>battleActive&&window.v132ActiveDungeonRun?.mode==='adventure');
+          await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
+          check(!document.getElementById('homeFeatureModal')?.classList.contains('show'),'no blocking modal');
+          const roster=monsters.slice(),ids=currentBattleMonsters.slice(),initial=roster.map(stats),beforeParty=getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp);
+          check(roster.length===3,'formal count');roster.forEach(verify);renderBattle();roster.forEach(verify);
+          const snapshot=FourSymbolsBattlefieldSlots.getActiveEnemySnapshot(),slots=ids.map(i=>FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,i));
+          check(new Set(slots).size===3,'fixed unique slots');
+          const shapes={};for(const shape of ['single','row','tri','all']){shapes[shape]=FourSymbolsBattlefieldSlots.resolveEnemyTargets(snapshot,ids[0],shape,i=>monsters[i]?.alive);check(shapes[shape].length>0&&shapes[shape].every(i=>ids.includes(i)),'targeting '+shape);}
+          for(const i of ids){
+            const m=roster[i],spec=content.encounters[node.encounterId].enemies[i];
+            check(m.name===spec.name&&m.element===spec.element&&m.rank===spec.rank&&m.level===spec.level&&m.monsterKey===spec.monsterKey,'content identity');
+            check(m.vAdventureEncounterId===node.encounterId&&m.context==='adventure/chapter_v1/'+node.encounterId,'encounter metadata');
+            const card=document.getElementById('battleMonster'+i),art=card?.querySelector('.v174-battle-art');
+            check(card?.dataset.slot===slots[i]&&art,'actual slot and artwork');
+            check(card.querySelector('.monster-hp-inner')&&card.querySelector('.monster-sp-inner'),'HP/SP UI');
+            const portrait=v154ResolveMonsterPortraitRecord(m);if(portrait.temporary)evidence.portraitGaps.push({name:m.name,portrait});
+            const url=getComputedStyle(art).backgroundImage.split('url(')[1]?.split(')')[0].replaceAll('"','').replaceAll("'",'');check(url,'visible portrait URL');
+            const image=new Image();image.src=url;await image.decode();check(image.naturalWidth>0,'portrait decode');evidence.decodedPortraits.push({name:m.name,url,width:image.naturalWidth,height:image.naturalHeight});
+          }
+          window.adventureBalanceQaCapture=node.encounterId+'-'+sceneIndex;
+          let maxTurn=1;const events=[],castSkills=[];
+          const off=FourSymbolsBattleFlow.subscribeBeforeCombatant(e=>{
+            roster.forEach(verify);maxTurn=Math.max(maxTurn,turn);const actor=e.queue[e.index];events.push({turn,type:actor?.type,index:actor?.monsterIndex??actor?.characterIndex});
+            check(JSON.stringify(ids.map(i=>FourSymbolsBattlefieldSlots.getEnemySlotForMonster(FourSymbolsBattlefieldSlots.getActiveEnemySnapshot(),i)))===JSON.stringify(slots),'no death reorder');
+          });
+          try{
+            if(sceneIndex!==0){toggleAutoBattle();check(autoBattle,'formal auto input');await wait(()=>!battleActive,240000);}
+            else while(battleActive){
+              await wait(()=>!battleActive||(battlePhase==='declare'&&battlePresentationLocks.size===0),120000);if(!battleActive)break;
+              const beforeTurn=turn;
+              while(battleActive&&battlePhase==='declare'){
+                await wait(()=>!battleActive||battlePhase!=='declare'||(!battleAdvanceScheduled&&battlePresentationLocks.size===0&&declaredCharacterIndexes.has(activeBattleCharacterIndex)));
+                if(!battleActive||battlePhase!=='declare')break;
+                const action=chooseWildBalanceReferenceAction(activeBattleCharacterIndex,ref.skill);toggleSkillQuickBar();const button=document.querySelector('.skill-quick-button[data-skill-id="'+ref.skill+'"]');check(button&&!button.disabled,'legal player skill');button.click();check(actionReady&&pendingAction===ref.skill,'skill input');document.getElementById('battleMonster'+(action.target??ids.find(i=>monsters[i].alive))).click();castSkills.push(ref.skill);
+              }
+              await wait(()=>!battleActive||turn>beforeTurn,120000);
+            }
+          }finally{off();}
+          autoBattle=false;autoConfig.enabled=false;check(document.getElementById('battleStatisticsResultModal')?.hidden!==false,'Adventure has no challenge result modal');
+          await wait(()=>!window.v132ActiveDungeonRun&&api.getView().visible);check(!battleActive,'no background battle');roster.forEach(verify);check(JSON.stringify(roster.map(stats))===JSON.stringify(initial),'no late stat writer');
+          const survivors=getExistingPartyIndexes().filter(i=>getPartyCharacterByIndex(i).hp>0).length;check(survivors>0,'natural survivors');
+          const actualState=player.adventureProgress.chapters.chapter_v1;check(actualState.completedNodes[node.id],'completed node');
+          const beforeGold=gold,beforeExp=sharedExp,reward=content.rewards[node.rewardId];
+          if(!replay){check(actualState.rewardClaims[node.id]==='ready','reward ready');check(api.claimNodeReward(node.id),'formal claim');check(gold-beforeGold===(reward.gold||0)&&sharedExp-beforeExp===(reward.sharedExp||0),'reward values unchanged');check(!api.claimNodeReward(node.id),'single claim ledger');}
+          else{check(actualState.rewardClaims[node.id]==='claimed'&&!api.claimNodeReward(node.id),'replay never double grants');}
+          const uid=FourSymbolsAccountSave.getActiveUid(),saved=FourSymbolsAccountSave.readForUid(uid);check(saved.status==='ready'&&saved.save.player.adventureProgress.chapters.chapter_v1.rewardClaims[node.id]==='claimed','persisted progression');
+          api.closeToCity();check(!battleActive&&!window.v132ActiveDungeonRun,'return cleanup');document.getElementById('adventureHomeEntry').click();await wait(()=>api.getView().visible);check(api.getChapterState().rewardClaims[node.id]==='claimed','re-entry progression');
+          evidence.scenes.push({encounterId:node.encounterId,level,replay,initial,slots,shapes,beforeParty,afterParty:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),rounds:maxTurn,survivors,castSkills,events,rewardGold:gold-beforeGold,rewardExp:sharedExp-beforeExp,saveProgression:true});
+        }
+        for(const rank of ['regular','elite','boss','smallBoss','player']){const cap=rank==='regular'?90:rank==='elite'?75:60;check(calculateStatusEffectChance(999,100,100,0,0,true,rank==='smallBoss'?getMonsterRank({rank}):rank,0)===cap,'hard cap '+rank);}
+        check(evidence.skills.some(skill=>skill.name!=='普通攻擊'),'actual Enemy AI carried skill execution');return evidence;
+      }finally{Math.random=oldRandom;showMonsterSkillNameBadge=badge;rollStatusEffectHit=statusRoll;autoBattle=false;autoConfig.enabled=false;}
+    })()`;
+    const server=await startServer({baseUrl});const file=path.join(process.cwd(),'artifacts/browser-qa/adventure-balance.json');fs.mkdirSync(path.dirname(file),{recursive:true});const results=[];let client,proc,profile;
+    const close=()=>{client?.close();client=null;proc?.kill('SIGTERM');proc=null;if(profile){try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{}profile=null;}};
+    try{
+        for(const [width,height] of [[390,844],[412,915]]){
+            profile=fs.mkdtempSync(path.join(os.tmpdir(),'adventure-balance-'));const port=9750+Math.floor(Math.random()*100);
+            proc=spawn(productionChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
+            const tabs=await waitJson('http://127.0.0.1:'+port+'/json/list');client=new Cdp(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});await new Promise(r=>setTimeout(r,1000));
+            const active=client.eval(reference+'\n'+expression);let done=false;active.finally(()=>{done=true;}).catch(()=>{});const captured=new Set();
+            while(!done){await new Promise(r=>setTimeout(r,250));const marker=await client.eval('window.adventureBalanceQaCapture||null').catch(()=>null);if(marker&&!captured.has(marker)){captured.add(marker);const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(file.replace('.json','-'+width+'x'+height+'-'+marker+'.png'),Buffer.from(shot.data,'base64'));}}
+            const evidence=await active;assert.equal(evidence.scenes.length,4);assert.equal(client.events.some(e=>e.method==='Runtime.consoleAPICalled'&&e.params.type==='error'&&JSON.stringify(e.params.args).includes('戰鬥行動超過安全期限')),false,'no watchdog recovery');results.push({width,height,...evidence});close();
+        }
+        fs.writeFileSync(file,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',results},null,2)+'\n');console.log('Adventure production Chrome: eight natural scenes, both mobile viewports, owner/reward/progression PASS');
+    }catch(error){const partial=await client?.eval('({evidence:window.adventureBalanceQaEvidence,phase:battlePhase,turn,battleActive,run:window.v132ActiveDungeonRun,modals:[...document.querySelectorAll(".show")].map(x=>x.id)})').catch(()=>null);fs.writeFileSync(file,JSON.stringify({passed:false,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-12)},null,2)+'\n');throw error;}
+    finally{close();await new Promise(r=>server.server.close(r));}
+}

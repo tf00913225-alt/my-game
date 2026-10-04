@@ -62,27 +62,27 @@
             id:"enc_road",
             label:"山道伏影",
             enemies:[
-                {name:"攔路山賊",level:8,element:"fire",rank:"regular"},
-                {name:"山道惡徒",level:8,element:"wind",rank:"regular"},
-                {name:"寨外斥候",level:9,element:"earth",rank:"regular"}
+                {monsterKey:"adventure.road.bandit",archetype:"balanced",name:"攔路山賊",level:8,element:"fire",rank:"regular"},
+                {monsterKey:"adventure.road.thug",archetype:"balanced",name:"山道惡徒",level:8,element:"wind",rank:"regular"},
+                {monsterKey:"adventure.road.scout",archetype:"balanced",name:"寨外斥候",level:9,element:"earth",rank:"regular"}
             ]
         },
         enc_gate_elite:{
             id:"enc_gate_elite",
             label:"山寨正門",
             enemies:[
-                {name:"黑松寨精英",level:10,element:"earth",rank:"elite"},
-                {name:"持刀寨眾",level:10,element:"fire",rank:"regular"},
-                {name:"巡寨快手",level:10,element:"wind",rank:"regular"}
+                {monsterKey:"adventure.gate.elite",archetype:"balanced",name:"黑松寨精英",level:10,element:"earth",rank:"elite"},
+                {monsterKey:"adventure.gate.blade",archetype:"balanced",name:"持刀寨眾",level:10,element:"fire",rank:"regular"},
+                {monsterKey:"adventure.gate.runner",archetype:"balanced",name:"巡寨快手",level:10,element:"wind",rank:"regular"}
             ]
         },
         enc_boss:{
             id:"enc_boss",
             label:"黑松寨主",
             enemies:[
-                {name:"黑松寨主",level:12,element:"earth",rank:"boss"},
-                {name:"寨主親衛",level:11,element:"fire",rank:"elite"},
-                {name:"寨主親衛",level:11,element:"wind",rank:"elite"}
+                {monsterKey:"adventure.boss.chief",archetype:"balanced",name:"黑松寨主",level:12,element:"earth",rank:"smallBoss"},
+                {monsterKey:"adventure.boss.guard-fire",archetype:"balanced",name:"寨主親衛",level:11,element:"fire",rank:"elite"},
+                {monsterKey:"adventure.boss.guard-wind",archetype:"balanced",name:"寨主親衛",level:11,element:"wind",rank:"elite"}
             ]
         }
     };

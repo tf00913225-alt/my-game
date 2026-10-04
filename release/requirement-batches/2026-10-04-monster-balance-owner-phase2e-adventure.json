@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-04",
+  "title": "Monster Balance Owner Phase2E Adventure",
+  "workId": "MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004",
+  "base_branch": "dev",
+  "base_sha": "a0c4cf3ccf6b83278f9940da7f71516d9c98cfa4",
+  "work_branch": "feature/monster-balance-owner-phase2e-adventure-20261004",
+  "officialVersion": "173.73",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": "REQ-MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004",
+      "title": "Adventure 戰前數值唯一 MonsterBalance、固定遭遇等級／archetype、canonical smallBoss、舊數值 caller 退場",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/MONSTER_BALANCE_OWNER_PHASE2E.md",
+          "tests/monster-balance-owner-phase2e.test.mjs",
+          "scripts/adventure-balance-ttk-matrix.mjs",
+          ".github/scripts/run-adventure-browser-qa.mjs",
+          "docs/monster-balance-adventure-baseline-20261004.json",
+          "docs/monster-balance-adventure-ttk-evidence-20261004.json",
+          "docs/monster-balance-adventure-ttk-seeded-evidence-20261004.json",
+          "docs/monster-balance-adventure-browser-evidence-20261004.json"
+        ],
+        "verification": "Local Phase1–2E46/46, focused6/6,36 formal TTK cases, direct formation/AI/hard-control/reward regressions, syntax368/368, build/build:check and deprecated gate PASS. Production Chrome8 natural scenes390×844/412×915, carried skill, reward/save/re-entry PASS: CI37196320933 job111418839671 artifact11301028022. Source Head866f0699a0cebe7634eafbff2dd19803d90c38b0 full latest-head CI37196320933 and Session37196320795 SUCCESS, with no failed or weakened gates. Final evidence/metadata Head required CI remains separate before merge.",
+        "result": "1/1 functional VERIFIED. Adventure pre-battle stats and pressure have one MonsterBalance owner; content/skill/AI/formation/portrait/reward/save lifecycle owners preserved. Final metadata-head CI, dev integration/deployed exact SHA/live Adventure QA and absorbed-branch cleanup tracked by PR#797. Stop before Phase2F."
+      }
+    }
+  ]
+}

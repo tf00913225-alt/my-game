@@ -591,9 +591,43 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+  adventure_balance:
+    name: Adventure Phase2E production gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Ensure CJK font support
+        run: |
+          if ! fc-list :lang=zh | rg -q .; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
+          fi
+      - name: Verify Adventure focus, TTK and production Chrome
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          mkdir -p artifacts/browser-qa
+          node tests/monster-balance-owner-phase2e.test.mjs
+          node scripts/adventure-balance-ttk-matrix.mjs artifacts/browser-qa/adventure-balance-ttk.json
+          node scripts/adventure-balance-ttk-matrix.mjs artifacts/browser-qa/adventure-balance-ttk-seeded.json --seeded
+          ADVENTURE_MONSTER_BALANCE_QA=1 node .github/scripts/run-adventure-browser-qa.mjs
+      - name: Upload Adventure production evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: adventure-balance-${{ github.sha }}
+          path: artifacts/browser-qa/adventure-balance*
+          if-no-files-found: error
+          retention-days: 90
+
   deploy_dev:
     name: Dev deployment gate
-    needs: [verify, abyss_balance]
+    needs: [verify, abyss_balance, adventure_balance]
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     uses: ./.github/workflows/deploy-dev-cloudflare.yml
     secrets: inherit
