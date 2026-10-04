@@ -405,7 +405,7 @@
   },
   "phase2dGate": {
     "workId": "MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004",
-    "status": "IMPLEMENTED",
+    "status": "VERIFIED",
     "runtimeOwner": "js/combat/monster-balance-owner.mjs",
     "migratedMode": "abyss",
     "retiredWrites": [
@@ -426,6 +426,14 @@
       "modePressure": 0.22,
       "trueRealmFinalHp": 0.9,
       "trueRealmFinalPressure": 0.18
-    }
+    },
+    "sourceHead": "c723c11d80ccd90ede37307313162271b2640463",
+    "ciRun": 37180059948,
+    "focused": "8/8",
+    "projections": 402,
+    "identities": 14,
+    "ttkCases": 300,
+    "browserScenes": 14,
+    "closeout": "Final metadata-head CI, dev integration/deployment and safe branch cleanup are independent pending gates; PR#793 is live owner."
   }
 }

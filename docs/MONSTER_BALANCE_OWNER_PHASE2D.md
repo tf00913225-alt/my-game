@@ -4,7 +4,7 @@ Work ID: MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004.
 Start dev f47862cc592870e359d31da5da52a5d530c831a8.
 Main f63d69dbfa66ba75637d1c3cd7fcc7d74782e356 is forbidden.
 Branch feature/monster-balance-owner-phase2d-abyss-20261004; target dev.
-Status: IN PROGRESS. Stop before Phase2E. PR is the live closeout owner.
+Status: FUNCTIONAL VERIFIED; integration/deployment/cleanup pending. Stop before Phase2E. PR is the live closeout owner.
 
 ## Verified current specification
 
@@ -104,10 +104,10 @@ element-box time Owner, deterministic seeded action draws, and a first-round
 final encounter defend queue/control-boundary probe through the real enemy AI.
 No skill IDs, stats, damage math, status math, victory or reward are fabricated.
 Actual portrait image decode,804000 skill-decision boundary draws, control states,
-healing and natural results are recorded. Chrome completion is still pending.
+healing and natural results are recorded. Corrected source Chrome14/14 PASS.
 
-Focused8/8, related48/48, syntax365/365, build:check and deprecated gates PASS locally.
-Production Chrome and final CI remain pending. Combat Rock Wall intentionally changes
+Focused8/8, related50/50, syntax365/365, build:check and deprecated gates PASS locally.
+Corrected production Chrome and full source CI PASS; final metadata-head CI remains pending. Combat Rock Wall intentionally changes
 visible shield-inclusive maxHP under the existing Status Owner; QA checks baseMaxHP
 against projection and verifies the separate shield amount. This is combat execution,
 not a pre-battle stat writer. Skill capabilities are not added: no carried revive in final,
@@ -116,10 +116,10 @@ approved fallback gap; this numerical migration cannot replace it.
 
 ## Pending gates
 
-Focused identities/projection, calibration/TTK, relevant regression, production
-Chrome390x844/412x915, build synchronization/deprecated/syntax, latest-head CI,
-Requirement VERIFIED, latest dev absorption, PR merge, exact deployed SHA/version,
-deployed Abyss QA and safe absorbed branch cleanup. Main untouched; no Phase2E.
+Functional identities/projection, TTK, regressions, production Chrome, build/
+deprecated/syntax and source-head CI PASS; Requirement1/1 VERIFIED. Remaining:
+final metadata-head CI, latest dev absorption, PR merge, exact deployed SHA/
+version, deployed Abyss QA and safe absorbed branch cleanup. Main untouched; no Phase2E.
 
 ### Canonical formation audit correction
 The formal Slot Owner defines every eight-unit encounter as three back slots (B2/B3/B4) and five front slots. Rank ordering places the single emperor at B3 with two elites in back and five elites in front. The older 59 metadata describes five back / three front for ordinary emperor stages, but the final geometry adapter uses the canonical snapshot, not this metadata. Phase 2D preserves this actual runtime contract. Chrome QA compares every card against a fresh snapshot from the unchanged Slot Owner and checks the central emperor and no death reflow; metadata is not treated as a second geometry authority.
@@ -158,3 +158,36 @@ Abyss Job111365559651 took about16m for its production Chrome. The combined
 has45 minutes with every existing gate retained. Requirement remains
 IMPLEMENTED until the corrected source passes renewed full CI and Chrome.
 No integration or deployment claim; PR#793 remains the live closeout owner.
+
+## Corrected production Chrome evidence
+
+Source c723c11d80ccd90ede37307313162271b2640463; CI37180059948,
+Abyss Job111370640508 SUCCESS. Focused8/8 and both150-case TTK gates PASS.
+Artifact11295260962 SHA256
+`dd476ac3fb2f2b3c2f10129a39c042cf564307b834042f4de0676b7caac6ea23`
+was independently verified. Both downloaded TTK reports exactly match the
+repository JSON. Full Chrome report is preserved in
+`docs/monster-balance-abyss-browser-evidence-20261004.json`.
+
+390×844 and412×915 each pass7 natural scenes,50 rosters/402 projections,
+78 skill events,21 hard-control states,23 positive support heals and58
+decoded portraits. Actual enemy hard-control roll37.95% hits through the
+unchanged status owner and remains below60%. All14 scenes clear with
+survivors; Lv40 final uses one defend round/control exercise and ends in8
+natural rounds, rather than the diagnostic's direct action loop. Legal
+all/single/row/tri input, fixed slots/no death reflow, entry/return/re-entry,
+rewards, no background battle and no unregistered stat mutation PASS.
+390 final and412 single-emperor screenshots were visually reviewed.
+Full Repository Job111370640459 and Session37180059842/Job111370640497 SUCCESS. Requirement1/1 VERIFIED; central requirements34/34. Final metadata-head CI remains independent.
+
+## Functional verification checkpoint
+
+Requirement REQ-MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004 is1/1 VERIFIED
+after all corrected source gates passed. CI37180059948 Repository111370640459
+and Abyss111370640508 SUCCESS; Session37180059842/111370640497 SUCCESS.
+Focused8/8; related50/50; syntax365/365; build synchronization, deprecated
+and all repository-required regression/browser/static/artifact gates PASS.
+No code change accompanies this evidence update. Final metadata Head CI,
+current dev absorption, merge, exact dev CI/deployment/live Abyss QA and safe
+branch deletion remain independent pending gates. PR#793 is the live final
+SHA/closeout owner, avoiding self-referential commit-SHA evidence loops.
