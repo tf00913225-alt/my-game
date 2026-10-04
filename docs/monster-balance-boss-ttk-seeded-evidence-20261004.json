@@ -1,0 +1,7671 @@
+{
+  "workId": "MONSTER-BALANCE-OWNER-P2F-BOSS-20261004",
+  "randomPolicy": "seeded",
+  "cases": 25,
+  "method": "Formal Boss definitions/entry, reference player stats and skills, initiative, enemy skills/AI, damage/status, Round End and Boss mechanism owner (shield/object/charge/heal/summon/phase); isolated synchronous diagnostic, not natural browser proof.",
+  "gate": {
+    "passed": true,
+    "failures": []
+  },
+  "rows": [
+    {
+      "id": "personal-20",
+      "level": 20,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 3150,
+      "SP": 520,
+      "attack": 182,
+      "magicAttack": 120.75,
+      "defense": 228,
+      "speed": 10,
+      "pressure": 0.48,
+      "owner": "MonsterBalance",
+      "skillChance": 0.5599999999999999,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "shield"
+        }
+      ],
+      "summon": null,
+      "type": "personal",
+      "stage": 1,
+      "randomPolicy": "seeded",
+      "randomSeed": 2001,
+      "reference": {
+        "level": 20,
+        "budget": 105,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 40,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1720,
+            "maxSP": 390,
+            "attack": 142,
+            "attackPoints": 8,
+            "defense": 150,
+            "defensePoints": 15,
+            "magicAttack": 209,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 15,
+            "evasion": 0,
+            "vitality": 21,
+            "energy": 10,
+            "intelligence": 36,
+            "agility": 15
+          },
+          {
+            "maxHP": 1720,
+            "maxSP": 390,
+            "attack": 142,
+            "attackPoints": 8,
+            "defense": 150,
+            "defensePoints": 15,
+            "magicAttack": 209,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 15,
+            "evasion": 0,
+            "vitality": 21,
+            "energy": 10,
+            "intelligence": 36,
+            "agility": 15
+          }
+        ]
+      },
+      "rounds": 10,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        1720,
+        1720
+      ],
+      "firstRoundParty": [
+        1648,
+        1720
+      ],
+      "playerHPAfter": [
+        1399,
+        800
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 2,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 3,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 4,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 5,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 6,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 7,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 8,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 9,
+          "name": "霸龍裂天斬"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": {
+            "current": 756,
+            "max": 756
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": {
+            "current": 559,
+            "max": 756
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": {
+            "current": 351,
+            "max": 756
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 9,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 10,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 3,
+      "reinforcementUsage": 0,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "赤焰君",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        }
+      ]
+    },
+    {
+      "id": "personal-30",
+      "level": 30,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 4650,
+      "SP": 760,
+      "attack": 262,
+      "magicAttack": 170.25,
+      "defense": 328,
+      "speed": 14,
+      "pressure": 0.48,
+      "owner": "MonsterBalance",
+      "skillChance": 0.5599999999999999,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "charge"
+        },
+        {
+          "round": 6,
+          "type": "charge"
+        }
+      ],
+      "summon": {
+        "hpBelow": 0.5
+      },
+      "type": "personal",
+      "stage": 1,
+      "randomPolicy": "seeded",
+      "randomSeed": 3001,
+      "reference": {
+        "level": 30,
+        "budget": 155,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 60,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 2520,
+            "maxSP": 565,
+            "attack": 186,
+            "attackPoints": 9,
+            "defense": 212,
+            "defensePoints": 23,
+            "magicAttack": 298.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 23,
+            "evasion": 0,
+            "vitality": 31,
+            "energy": 15,
+            "intelligence": 54,
+            "agility": 23
+          },
+          {
+            "maxHP": 2520,
+            "maxSP": 565,
+            "attack": 186,
+            "attackPoints": 9,
+            "defense": 212,
+            "defensePoints": 23,
+            "magicAttack": 298.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 23,
+            "evasion": 0,
+            "vitality": 31,
+            "energy": 15,
+            "intelligence": 54,
+            "agility": 23
+          }
+        ]
+      },
+      "rounds": 8,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        2520,
+        2520
+      ],
+      "firstRoundParty": [
+        2269,
+        2520
+      ],
+      "playerHPAfter": [
+        113,
+        789
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 2,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 3,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 4,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 4,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 4,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 5,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 5,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 5,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 6,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 7,
+          "name": "霸龍裂天斬"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 2 回合出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 2 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 0,
+      "reinforcementUsage": 2,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "獄火侯",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "赤劫炎衛",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "燼曜戰侍",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        }
+      ]
+    },
+    {
+      "id": "personal-40",
+      "level": 40,
+      "element": "water",
+      "archetype": "balanced",
+      "HP": 6150,
+      "SP": 970,
+      "attack": 342,
+      "magicAttack": 217,
+      "defense": 428,
+      "speed": 20,
+      "pressure": 0.48,
+      "owner": "MonsterBalance",
+      "skillChance": 0.5599999999999999,
+      "phases": 2,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "heal"
+        },
+        {
+          "hpBelow": 0.5,
+          "type": "charge"
+        }
+      ],
+      "summon": null,
+      "type": "personal",
+      "stage": 1,
+      "randomPolicy": "seeded",
+      "randomSeed": 4001,
+      "reference": {
+        "level": 40,
+        "budget": 205,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 80,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 3320,
+            "maxSP": 740,
+            "attack": 242,
+            "attackPoints": 13,
+            "defense": 270,
+            "defensePoints": 30,
+            "magicAttack": 385.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 30,
+            "evasion": 0,
+            "vitality": 41,
+            "energy": 20,
+            "intelligence": 71,
+            "agility": 30
+          },
+          {
+            "maxHP": 3320,
+            "maxSP": 740,
+            "attack": 242,
+            "attackPoints": 13,
+            "defense": 270,
+            "defensePoints": 30,
+            "magicAttack": 385.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 30,
+            "evasion": 0,
+            "vitality": 41,
+            "energy": 20,
+            "intelligence": 71,
+            "agility": 30
+          }
+        ]
+      },
+      "rounds": 8,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        3320,
+        3320
+      ],
+      "firstRoundParty": [
+        3175,
+        3320
+      ],
+      "playerHPAfter": [
+        966,
+        1776
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 2,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 3,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 4,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 5,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 6,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 7,
+          "name": "普通攻擊"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            },
+            {
+              "id": "boss-object-2",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "BOSS 生命低於 50% 時出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-2",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "BOSS 生命低於 50% 時出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 2,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 2,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 0,
+      "reinforcementUsage": 0,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "凍海君",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "血祭圖騰",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "personal-50",
+      "level": 50,
+      "element": "water",
+      "archetype": "balanced",
+      "HP": 7650,
+      "SP": 1210,
+      "attack": 422,
+      "magicAttack": 266.5,
+      "defense": 528,
+      "speed": 24,
+      "pressure": 0.48,
+      "owner": "MonsterBalance",
+      "skillChance": 0.5599999999999999,
+      "phases": 2,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "shield"
+        },
+        {
+          "hpBelow": 0.45,
+          "type": "heal"
+        }
+      ],
+      "summon": {
+        "round": 4
+      },
+      "type": "personal",
+      "stage": 1,
+      "randomPolicy": "seeded",
+      "randomSeed": 5001,
+      "reference": {
+        "level": 50,
+        "budget": 255,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 100,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 4120,
+            "maxSP": 915,
+            "attack": 286,
+            "attackPoints": 14,
+            "defense": 332,
+            "defensePoints": 38,
+            "magicAttack": 474.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 38,
+            "evasion": 0,
+            "vitality": 51,
+            "energy": 25,
+            "intelligence": 89,
+            "agility": 38
+          },
+          {
+            "maxHP": 4120,
+            "maxSP": 915,
+            "attack": 286,
+            "attackPoints": 14,
+            "defense": 332,
+            "defensePoints": 38,
+            "magicAttack": 474.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 38,
+            "evasion": 0,
+            "vitality": 51,
+            "energy": 25,
+            "intelligence": 89,
+            "agility": 38
+          }
+        ]
+      },
+      "rounds": 10,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        4120,
+        4120
+      ],
+      "firstRoundParty": [
+        4120,
+        3896
+      ],
+      "playerHPAfter": [
+        1923,
+        2791
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 2,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 3,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 4,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 4,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 4,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 5,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 5,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 5,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 6,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 6,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 6,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 7,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 7,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 7,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 8,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 9,
+          "name": "洪水猛獸"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": {
+            "current": 1836,
+            "max": 1836
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": {
+            "current": 354,
+            "max": 1836
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-3",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "BOSS 生命低於 45% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-3",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "BOSS 生命低於 45% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 9,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-3",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "BOSS 生命低於 45% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 10,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-3",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "BOSS 生命低於 45% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 2,
+      "reinforcementUsage": 2,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "霜淵侯",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "玄瀾霜衛",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "寒魄冰侍",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "血祭圖騰",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "personal-60",
+      "level": 60,
+      "element": "water",
+      "archetype": "balanced",
+      "HP": 9150,
+      "SP": 1420,
+      "attack": 502,
+      "magicAttack": 313.25,
+      "defense": 628,
+      "speed": 30,
+      "pressure": 0.48,
+      "owner": "MonsterBalance",
+      "skillChance": 0.5599999999999999,
+      "phases": 3,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "shield"
+        },
+        {
+          "round": 5,
+          "type": "charge"
+        },
+        {
+          "hpBelow": 0.35,
+          "type": "charge"
+        }
+      ],
+      "summon": null,
+      "type": "personal",
+      "stage": 1,
+      "randomPolicy": "seeded",
+      "randomSeed": 6001,
+      "reference": {
+        "level": 60,
+        "budget": 305,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 120,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          },
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          },
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          }
+        ]
+      },
+      "rounds": 10,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        4920,
+        4920,
+        4920
+      ],
+      "firstRoundParty": [
+        4920,
+        4663,
+        4920
+      ],
+      "playerHPAfter": [
+        2639,
+        1955,
+        2527
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 2,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 3,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 4,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 5,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 6,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 7,
+          "name": "治療術"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": {
+            "current": 2196,
+            "max": 2196
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": {
+            "current": 385,
+            "max": 2196
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 5 回合出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 5 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-2",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "BOSS 生命低於 35% 時出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-2",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "BOSS 生命低於 35% 時出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 9,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-2",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "BOSS 生命低於 35% 時出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 10,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-2",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "BOSS 生命低於 35% 時出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 2,
+      "reinforcementUsage": 0,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "雪獄尊",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "personal-70",
+      "level": 70,
+      "element": "water",
+      "archetype": "balanced",
+      "HP": 10650,
+      "SP": 1660,
+      "attack": 582,
+      "magicAttack": 362.75,
+      "defense": 728,
+      "speed": 34,
+      "pressure": 0.48,
+      "owner": "MonsterBalance",
+      "skillChance": 0.5599999999999999,
+      "phases": 3,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "heal"
+        },
+        {
+          "round": 5,
+          "type": "amplify"
+        },
+        {
+          "hpBelow": 0.35,
+          "type": "charge"
+        }
+      ],
+      "summon": {
+        "hpBelow": 0.55
+      },
+      "type": "personal",
+      "stage": 1,
+      "randomPolicy": "seeded",
+      "randomSeed": 7001,
+      "reference": {
+        "level": 70,
+        "budget": 355,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 140,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 5720,
+            "maxSP": 1265,
+            "attack": 386,
+            "attackPoints": 19,
+            "defense": 452,
+            "defensePoints": 53,
+            "magicAttack": 651,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 53,
+            "evasion": 0,
+            "vitality": 71,
+            "energy": 35,
+            "intelligence": 124,
+            "agility": 53
+          },
+          {
+            "maxHP": 5720,
+            "maxSP": 1265,
+            "attack": 386,
+            "attackPoints": 19,
+            "defense": 452,
+            "defensePoints": 53,
+            "magicAttack": 651,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 53,
+            "evasion": 0,
+            "vitality": 71,
+            "energy": 35,
+            "intelligence": 124,
+            "agility": 53
+          },
+          {
+            "maxHP": 5720,
+            "maxSP": 1265,
+            "attack": 386,
+            "attackPoints": 19,
+            "defense": 452,
+            "defensePoints": 53,
+            "magicAttack": 651,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 53,
+            "evasion": 0,
+            "vitality": 71,
+            "energy": 35,
+            "intelligence": 124,
+            "agility": 53
+          }
+        ]
+      },
+      "rounds": 9,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        5720,
+        5720,
+        5720
+      ],
+      "firstRoundParty": [
+        5720,
+        5489,
+        5720
+      ],
+      "playerHPAfter": [
+        4686,
+        4408,
+        4825
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 2,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 3,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 4,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 4,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 4,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 5,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 5,
+          "name": "治療術"
+        },
+        {
+          "round": 5,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 6,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 6,
+          "name": "治療術"
+        },
+        {
+          "round": 6,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 7,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 7,
+          "name": "普通攻擊"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            },
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            },
+            {
+              "id": "boss-object-5",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "BOSS 生命低於 35% 時出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            },
+            {
+              "id": "boss-object-5",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "BOSS 生命低於 35% 時出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            },
+            {
+              "id": "boss-object-5",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "BOSS 生命低於 35% 時出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 9,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-5",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "BOSS 生命低於 35% 時出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 0,
+      "reinforcementUsage": 2,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "寒劫尊",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "血祭圖騰",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "玄瀾霜衛",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "寒魄冰侍",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "煞氣戰旗",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "personal-80",
+      "level": 80,
+      "element": "water",
+      "archetype": "balanced",
+      "HP": 12150,
+      "SP": 1870,
+      "attack": 662,
+      "magicAttack": 409.5,
+      "defense": 828,
+      "speed": 40,
+      "pressure": 0.48,
+      "owner": "MonsterBalance",
+      "skillChance": 0.5599999999999999,
+      "phases": 3,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "shield"
+        },
+        {
+          "round": 5,
+          "type": "charge"
+        },
+        {
+          "hpBelow": 0.4,
+          "type": "heal"
+        }
+      ],
+      "summon": null,
+      "type": "personal",
+      "stage": 1,
+      "randomPolicy": "seeded",
+      "randomSeed": 8001,
+      "reference": {
+        "level": 80,
+        "budget": 405,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 160,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          },
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          },
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          }
+        ]
+      },
+      "rounds": 11,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        6520,
+        6520,
+        6520
+      ],
+      "firstRoundParty": [
+        6520,
+        6520,
+        6257
+      ],
+      "playerHPAfter": [
+        3198,
+        2843,
+        3519
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 2,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 3,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 4,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 5,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 6,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 7,
+          "name": "治療術"
+        },
+        {
+          "round": 8,
+          "name": "治療術"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": {
+            "current": 2916,
+            "max": 2916
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": {
+            "current": 176,
+            "max": 2916
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 5 回合出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 5 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-2",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "BOSS 生命低於 40% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-2",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "BOSS 生命低於 40% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 9,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-2",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "BOSS 生命低於 40% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 10,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-2",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "BOSS 生命低於 40% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 11,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-2",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "BOSS 生命低於 40% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 2,
+      "reinforcementUsage": 0,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "凍界皇",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "血祭圖騰",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "personal-90",
+      "level": 90,
+      "element": "water",
+      "archetype": "balanced",
+      "HP": 13650,
+      "SP": 2110,
+      "attack": 742,
+      "magicAttack": 459,
+      "defense": 928,
+      "speed": 44,
+      "pressure": 0.48,
+      "owner": "MonsterBalance",
+      "skillChance": 0.5599999999999999,
+      "phases": 4,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "seal"
+        },
+        {
+          "round": 4,
+          "type": "shield"
+        },
+        {
+          "round": 7,
+          "type": "charge"
+        },
+        {
+          "hpBelow": 0.3,
+          "type": "amplify"
+        }
+      ],
+      "summon": {
+        "round": 4
+      },
+      "type": "personal",
+      "stage": 1,
+      "randomPolicy": "seeded",
+      "randomSeed": 9001,
+      "reference": {
+        "level": 90,
+        "budget": 455,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 180,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 7320,
+            "maxSP": 1615,
+            "attack": 486,
+            "attackPoints": 24,
+            "defense": 572,
+            "defensePoints": 68,
+            "magicAttack": 827.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 68,
+            "evasion": 0,
+            "vitality": 91,
+            "energy": 45,
+            "intelligence": 159,
+            "agility": 68
+          },
+          {
+            "maxHP": 7320,
+            "maxSP": 1615,
+            "attack": 486,
+            "attackPoints": 24,
+            "defense": 572,
+            "defensePoints": 68,
+            "magicAttack": 827.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 68,
+            "evasion": 0,
+            "vitality": 91,
+            "energy": 45,
+            "intelligence": 159,
+            "agility": 68
+          },
+          {
+            "maxHP": 7320,
+            "maxSP": 1615,
+            "attack": 486,
+            "attackPoints": 24,
+            "defense": 572,
+            "defensePoints": 68,
+            "magicAttack": 827.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 68,
+            "evasion": 0,
+            "vitality": 91,
+            "energy": 45,
+            "intelligence": 159,
+            "agility": 68
+          }
+        ]
+      },
+      "rounds": 10,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        7320,
+        7320,
+        7320
+      ],
+      "firstRoundParty": [
+        7320,
+        7320,
+        7320
+      ],
+      "playerHPAfter": [
+        6623,
+        6610,
+        5252
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 2,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 3,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 4,
+          "name": "治療術"
+        },
+        {
+          "round": 4,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 4,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 5,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 5,
+          "name": "治療術"
+        },
+        {
+          "round": 5,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 6,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 6,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 6,
+          "name": "治療術"
+        },
+        {
+          "round": 7,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 7,
+          "name": "治療術"
+        },
+        {
+          "round": 7,
+          "name": "普通攻擊"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "鎖脈法器",
+              "icon": "",
+              "effect": "存活期間，我方治療與 SP 回復降低 40%。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "鎖脈法器",
+              "icon": "",
+              "effect": "存活期間，我方治療與 SP 回復降低 40%。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 3,
+          "shield": {
+            "current": 3276,
+            "max": 3276
+          },
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "鎖脈法器",
+              "icon": "",
+              "effect": "存活期間，我方治療與 SP 回復降低 40%。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 3,
+          "shield": {
+            "current": 985,
+            "max": 3276
+          },
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "鎖脈法器",
+              "icon": "",
+              "effect": "存活期間，我方治療與 SP 回復降低 40%。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 3,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 4,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 7 回合出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            },
+            {
+              "id": "boss-object-5",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "BOSS 生命低於 30% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 4,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 7 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            },
+            {
+              "id": "boss-object-5",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "BOSS 生命低於 30% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 9,
+          "phase": 4,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 7 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            },
+            {
+              "id": "boss-object-5",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "BOSS 生命低於 30% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 10,
+          "phase": 4,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 7 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            },
+            {
+              "id": "boss-object-5",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "BOSS 生命低於 30% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 2,
+      "reinforcementUsage": 2,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "霜天皇",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "鎖脈法器",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "玄瀾霜衛",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "寒魄冰侍",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "煞氣戰旗",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "personal-100",
+      "level": 100,
+      "element": "water",
+      "archetype": "balanced",
+      "HP": 15150,
+      "SP": 2320,
+      "attack": 822,
+      "magicAttack": 505.75,
+      "defense": 1028,
+      "speed": 50,
+      "pressure": 0.48,
+      "owner": "MonsterBalance",
+      "skillChance": 0.5599999999999999,
+      "phases": 4,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "shield"
+        },
+        {
+          "round": 4,
+          "type": "charge"
+        },
+        {
+          "round": 7,
+          "type": "heal"
+        },
+        {
+          "hpBelow": 0.3,
+          "type": "seal"
+        }
+      ],
+      "summon": {
+        "hpBelow": 0.6
+      },
+      "type": "personal",
+      "stage": 1,
+      "randomPolicy": "seeded",
+      "randomSeed": 10001,
+      "reference": {
+        "level": 100,
+        "budget": 505,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 200,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          },
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          },
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          }
+        ]
+      },
+      "rounds": 11,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        8120,
+        8120,
+        8120
+      ],
+      "firstRoundParty": [
+        8120,
+        7740,
+        8120
+      ],
+      "playerHPAfter": [
+        2704,
+        3676,
+        4087
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 2,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 3,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 4,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 5,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 5,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 5,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 6,
+          "name": "治療術"
+        },
+        {
+          "round": 6,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 6,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 7,
+          "name": "治療術"
+        },
+        {
+          "round": 7,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 7,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 8,
+          "name": "治療術"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": {
+            "current": 3636,
+            "max": 3636
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": {
+            "current": 383,
+            "max": 3636
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 4 回合出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 2,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 4 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 3,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 3,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 7 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            },
+            {
+              "id": "boss-object-5",
+              "name": "鎖脈法器",
+              "icon": "",
+              "effect": "存活期間，我方治療與 SP 回復降低 40%。",
+              "trigger": "BOSS 生命低於 30% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 4,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 7 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            },
+            {
+              "id": "boss-object-5",
+              "name": "鎖脈法器",
+              "icon": "",
+              "effect": "存活期間，我方治療與 SP 回復降低 40%。",
+              "trigger": "BOSS 生命低於 30% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 9,
+          "phase": 4,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 7 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            },
+            {
+              "id": "boss-object-5",
+              "name": "鎖脈法器",
+              "icon": "",
+              "effect": "存活期間，我方治療與 SP 回復降低 40%。",
+              "trigger": "BOSS 生命低於 30% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 10,
+          "phase": 4,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 7 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            },
+            {
+              "id": "boss-object-5",
+              "name": "鎖脈法器",
+              "icon": "",
+              "effect": "存活期間，我方治療與 SP 回復降低 40%。",
+              "trigger": "BOSS 生命低於 30% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 11,
+          "phase": 4,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 7 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            },
+            {
+              "id": "boss-object-5",
+              "name": "鎖脈法器",
+              "icon": "",
+              "effect": "存活期間，我方治療與 SP 回復降低 40%。",
+              "trigger": "BOSS 生命低於 30% 時出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 2,
+      "reinforcementUsage": 2,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "寒獄帝",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "玄瀾霜衛",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "寒魄冰侍",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "血祭圖騰",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "鎖脈法器",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "world-40",
+      "level": 40,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 5517,
+      "SP": 970,
+      "attack": 342,
+      "magicAttack": 217,
+      "defense": 428,
+      "speed": 20,
+      "pressure": 0.4968000000000001,
+      "owner": "MonsterBalance",
+      "skillChance": 0.5599999999999999,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 3,
+          "type": "charge"
+        }
+      ],
+      "summon": null,
+      "type": "world",
+      "stage": 1,
+      "randomPolicy": "seeded",
+      "randomSeed": 4001,
+      "reference": {
+        "level": 40,
+        "budget": 205,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 80,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 3320,
+            "maxSP": 740,
+            "attack": 242,
+            "attackPoints": 13,
+            "defense": 270,
+            "defensePoints": 30,
+            "magicAttack": 385.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 30,
+            "evasion": 0,
+            "vitality": 41,
+            "energy": 20,
+            "intelligence": 71,
+            "agility": 30
+          },
+          {
+            "maxHP": 3320,
+            "maxSP": 740,
+            "attack": 242,
+            "attackPoints": 13,
+            "defense": 270,
+            "defensePoints": 30,
+            "magicAttack": 385.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 30,
+            "evasion": 0,
+            "vitality": 41,
+            "energy": 20,
+            "intelligence": 71,
+            "agility": 30
+          }
+        ]
+      },
+      "rounds": 5,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        3320,
+        3320
+      ],
+      "firstRoundParty": [
+        3195,
+        3320
+      ],
+      "playerHPAfter": [
+        1205,
+        1497
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 2,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 3,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 4,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 5,
+          "name": "霸龍裂天斬"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 3 回合出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 3 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 0,
+      "reinforcementUsage": 0,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "熔天君",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "world-40",
+      "level": 40,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 6224,
+      "SP": 970,
+      "attack": 342,
+      "magicAttack": 217,
+      "defense": 428,
+      "speed": 20,
+      "pressure": 0.54,
+      "owner": "MonsterBalance",
+      "skillChance": 0.64,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "shield"
+        }
+      ],
+      "summon": null,
+      "type": "world",
+      "stage": 2,
+      "randomPolicy": "seeded",
+      "randomSeed": 4002,
+      "reference": {
+        "level": 40,
+        "budget": 205,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 80,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 3320,
+            "maxSP": 740,
+            "attack": 242,
+            "attackPoints": 13,
+            "defense": 270,
+            "defensePoints": 30,
+            "magicAttack": 385.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 30,
+            "evasion": 0,
+            "vitality": 41,
+            "energy": 20,
+            "intelligence": 71,
+            "agility": 30
+          },
+          {
+            "maxHP": 3320,
+            "maxSP": 740,
+            "attack": 242,
+            "attackPoints": 13,
+            "defense": 270,
+            "defensePoints": 30,
+            "magicAttack": 385.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 30,
+            "evasion": 0,
+            "vitality": 41,
+            "energy": 20,
+            "intelligence": 71,
+            "agility": 30
+          }
+        ]
+      },
+      "rounds": 8,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        3320,
+        3320
+      ],
+      "firstRoundParty": [
+        3163,
+        3164
+      ],
+      "playerHPAfter": [
+        2723,
+        2053
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 2,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 3,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 4,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 5,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 6,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 7,
+          "name": "火爆亂擊"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": {
+            "current": 1494,
+            "max": 1494
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": {
+            "current": 70,
+            "max": 1494
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 2,
+      "reinforcementUsage": 0,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "熔天君",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        }
+      ]
+    },
+    {
+      "id": "world-40",
+      "level": 40,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 6790,
+      "SP": 970,
+      "attack": 342,
+      "magicAttack": 217,
+      "defense": 428,
+      "speed": 20,
+      "pressure": 0.5724,
+      "owner": "MonsterBalance",
+      "skillChance": 0.72,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "heal"
+        },
+        {
+          "round": 5,
+          "type": "amplify"
+        }
+      ],
+      "summon": {
+        "hpBelow": 0.55
+      },
+      "type": "world",
+      "stage": 3,
+      "randomPolicy": "seeded",
+      "randomSeed": 4003,
+      "reference": {
+        "level": 40,
+        "budget": 205,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 80,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 3320,
+            "maxSP": 740,
+            "attack": 242,
+            "attackPoints": 13,
+            "defense": 270,
+            "defensePoints": 30,
+            "magicAttack": 385.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 30,
+            "evasion": 0,
+            "vitality": 41,
+            "energy": 20,
+            "intelligence": 71,
+            "agility": 30
+          },
+          {
+            "maxHP": 3320,
+            "maxSP": 740,
+            "attack": 242,
+            "attackPoints": 13,
+            "defense": 270,
+            "defensePoints": 30,
+            "magicAttack": 385.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 30,
+            "evasion": 0,
+            "vitality": 41,
+            "energy": 20,
+            "intelligence": 71,
+            "agility": 30
+          }
+        ]
+      },
+      "rounds": 7,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        3320,
+        3320
+      ],
+      "firstRoundParty": [
+        3320,
+        3320
+      ],
+      "playerHPAfter": [
+        1875,
+        2023
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "怒火"
+        },
+        {
+          "round": 2,
+          "name": "怒火"
+        },
+        {
+          "round": 3,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 4,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 4,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 4,
+          "name": "怒火"
+        },
+        {
+          "round": 5,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 5,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 5,
+          "name": "怒火"
+        },
+        {
+          "round": 6,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 6,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 6,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 7,
+          "name": "霸龍裂天斬"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 0,
+      "reinforcementUsage": 2,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "熔天君",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "血祭圖騰",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "赤劫炎衛",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "燼曜戰侍",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "煞氣戰旗",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "world-40",
+      "level": 40,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 7072,
+      "SP": 970,
+      "attack": 342,
+      "magicAttack": 217,
+      "defense": 428,
+      "speed": 20,
+      "pressure": 0.6048000000000001,
+      "owner": "MonsterBalance",
+      "skillChance": 0.8,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "charge"
+        },
+        {
+          "round": 4,
+          "type": "amplify"
+        },
+        {
+          "round": 7,
+          "type": "shield"
+        }
+      ],
+      "summon": {
+        "round": 4
+      },
+      "type": "world",
+      "stage": 4,
+      "randomPolicy": "seeded",
+      "randomSeed": 4004,
+      "reference": {
+        "level": 40,
+        "budget": 205,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 80,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 3320,
+            "maxSP": 740,
+            "attack": 242,
+            "attackPoints": 13,
+            "defense": 270,
+            "defensePoints": 30,
+            "magicAttack": 385.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 30,
+            "evasion": 0,
+            "vitality": 41,
+            "energy": 20,
+            "intelligence": 71,
+            "agility": 30
+          },
+          {
+            "maxHP": 3320,
+            "maxSP": 740,
+            "attack": 242,
+            "attackPoints": 13,
+            "defense": 270,
+            "defensePoints": 30,
+            "magicAttack": 385.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 30,
+            "evasion": 0,
+            "vitality": 41,
+            "energy": 20,
+            "intelligence": 71,
+            "agility": 30
+          }
+        ]
+      },
+      "rounds": 10,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        3320,
+        3320
+      ],
+      "firstRoundParty": [
+        3170,
+        3320
+      ],
+      "playerHPAfter": [
+        1156,
+        207
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 2,
+          "name": "怒火"
+        },
+        {
+          "round": 3,
+          "name": "火箭"
+        },
+        {
+          "round": 4,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 4,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 4,
+          "name": "怒火"
+        },
+        {
+          "round": 5,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 5,
+          "name": "火箭"
+        },
+        {
+          "round": 5,
+          "name": "怒火"
+        },
+        {
+          "round": 6,
+          "name": "火箭"
+        },
+        {
+          "round": 6,
+          "name": "怒火"
+        },
+        {
+          "round": 6,
+          "name": "火箭"
+        },
+        {
+          "round": 7,
+          "name": "怒火"
+        },
+        {
+          "round": 7,
+          "name": "怒火"
+        },
+        {
+          "round": 8,
+          "name": "怒火"
+        },
+        {
+          "round": 9,
+          "name": "怒火"
+        },
+        {
+          "round": 10,
+          "name": "怒火"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 2 回合出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 2 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": {
+            "current": 1697,
+            "max": 1697
+          },
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 1,
+          "shield": {
+            "current": 539,
+            "max": 1697
+          },
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 9,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 10,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 2,
+      "reinforcementUsage": 2,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "熔天君",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "赤劫炎衛",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "燼曜戰侍",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "煞氣戰旗",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "world-60",
+      "level": 60,
+      "element": "water",
+      "archetype": "balanced",
+      "HP": 8208,
+      "SP": 1420,
+      "attack": 502,
+      "magicAttack": 313.25,
+      "defense": 628,
+      "speed": 30,
+      "pressure": 0.4968000000000001,
+      "owner": "MonsterBalance",
+      "skillChance": 0.5599999999999999,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 3,
+          "type": "charge"
+        }
+      ],
+      "summon": null,
+      "type": "world",
+      "stage": 1,
+      "randomPolicy": "seeded",
+      "randomSeed": 6001,
+      "reference": {
+        "level": 60,
+        "budget": 305,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 120,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          },
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          },
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          }
+        ]
+      },
+      "rounds": 6,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        4920,
+        4920,
+        4920
+      ],
+      "firstRoundParty": [
+        4920,
+        4654,
+        4920
+      ],
+      "playerHPAfter": [
+        2854,
+        2128,
+        2403
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 2,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 3,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 4,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 5,
+          "name": "洪水猛獸"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 3 回合出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 3 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 0,
+      "reinforcementUsage": 0,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "冰海皇",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "world-60",
+      "level": 60,
+      "element": "water",
+      "archetype": "balanced",
+      "HP": 9260,
+      "SP": 1420,
+      "attack": 502,
+      "magicAttack": 313.25,
+      "defense": 628,
+      "speed": 30,
+      "pressure": 0.54,
+      "owner": "MonsterBalance",
+      "skillChance": 0.64,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "shield"
+        }
+      ],
+      "summon": null,
+      "type": "world",
+      "stage": 2,
+      "randomPolicy": "seeded",
+      "randomSeed": 6002,
+      "reference": {
+        "level": 60,
+        "budget": 305,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 120,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          },
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          },
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          }
+        ]
+      },
+      "rounds": 7,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        4920,
+        4920,
+        4920
+      ],
+      "firstRoundParty": [
+        4697,
+        4920,
+        4920
+      ],
+      "playerHPAfter": [
+        4412,
+        4920,
+        3500
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 2,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 3,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 4,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 5,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 6,
+          "name": "洪水猛獸"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": {
+            "current": 2222,
+            "max": 2222
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": {
+            "current": 19,
+            "max": 2222
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 2,
+      "reinforcementUsage": 0,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "冰海皇",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        }
+      ]
+    },
+    {
+      "id": "world-60",
+      "level": 60,
+      "element": "water",
+      "archetype": "balanced",
+      "HP": 10102,
+      "SP": 1420,
+      "attack": 502,
+      "magicAttack": 313.25,
+      "defense": 628,
+      "speed": 30,
+      "pressure": 0.5724,
+      "owner": "MonsterBalance",
+      "skillChance": 0.72,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "heal"
+        },
+        {
+          "round": 5,
+          "type": "amplify"
+        }
+      ],
+      "summon": {
+        "hpBelow": 0.55
+      },
+      "type": "world",
+      "stage": 3,
+      "randomPolicy": "seeded",
+      "randomSeed": 6003,
+      "reference": {
+        "level": 60,
+        "budget": 305,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 120,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          },
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          },
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          }
+        ]
+      },
+      "rounds": 8,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        4920,
+        4920,
+        4920
+      ],
+      "firstRoundParty": [
+        4920,
+        4920,
+        4619
+      ],
+      "playerHPAfter": [
+        3686,
+        3963,
+        4619
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 2,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 3,
+          "name": "治療術"
+        },
+        {
+          "round": 4,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 4,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 4,
+          "name": "治療術"
+        },
+        {
+          "round": 5,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 5,
+          "name": "治療術"
+        },
+        {
+          "round": 5,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 6,
+          "name": "治療術"
+        },
+        {
+          "round": 6,
+          "name": "洪水猛獸"
+        },
+        {
+          "round": 6,
+          "name": "洪水猛獸"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            },
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            },
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 0,
+      "reinforcementUsage": 2,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "冰海皇",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "血祭圖騰",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "玄瀾霜衛",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "寒魄冰侍",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "煞氣戰旗",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "world-60",
+      "level": 60,
+      "element": "water",
+      "archetype": "balanced",
+      "HP": 10523,
+      "SP": 1420,
+      "attack": 502,
+      "magicAttack": 313.25,
+      "defense": 628,
+      "speed": 30,
+      "pressure": 0.6048000000000001,
+      "owner": "MonsterBalance",
+      "skillChance": 0.8,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "charge"
+        },
+        {
+          "round": 4,
+          "type": "amplify"
+        },
+        {
+          "round": 7,
+          "type": "shield"
+        }
+      ],
+      "summon": {
+        "round": 4
+      },
+      "type": "world",
+      "stage": 4,
+      "randomPolicy": "seeded",
+      "randomSeed": 6004,
+      "reference": {
+        "level": 60,
+        "budget": 305,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 120,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          },
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          },
+          {
+            "maxHP": 4920,
+            "maxSP": 1090,
+            "attack": 342,
+            "attackPoints": 18,
+            "defense": 390,
+            "defensePoints": 45,
+            "magicAttack": 561.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 45,
+            "evasion": 0,
+            "vitality": 61,
+            "energy": 30,
+            "intelligence": 106,
+            "agility": 45
+          }
+        ]
+      },
+      "rounds": 11,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        4920,
+        4920,
+        4920
+      ],
+      "firstRoundParty": [
+        4492,
+        4920,
+        4920
+      ],
+      "playerHPAfter": [
+        2426,
+        2854,
+        2515
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "冰霜拳"
+        },
+        {
+          "round": 2,
+          "name": "水刀斬"
+        },
+        {
+          "round": 3,
+          "name": "治療術"
+        },
+        {
+          "round": 4,
+          "name": "治療術"
+        },
+        {
+          "round": 4,
+          "name": "治療術"
+        },
+        {
+          "round": 4,
+          "name": "治療術"
+        },
+        {
+          "round": 5,
+          "name": "治療術"
+        },
+        {
+          "round": 5,
+          "name": "治療術"
+        },
+        {
+          "round": 5,
+          "name": "治療術"
+        },
+        {
+          "round": 6,
+          "name": "治療術"
+        },
+        {
+          "round": 6,
+          "name": "治療術"
+        },
+        {
+          "round": 6,
+          "name": "治療術"
+        },
+        {
+          "round": 7,
+          "name": "治療術"
+        },
+        {
+          "round": 7,
+          "name": "治療術"
+        },
+        {
+          "round": 8,
+          "name": "治療術"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 2 回合出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 2 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": {
+            "current": 2526,
+            "max": 2526
+          },
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 1,
+          "shield": {
+            "current": 1462,
+            "max": 2526
+          },
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 9,
+          "phase": 1,
+          "shield": {
+            "current": 398,
+            "max": 2526
+          },
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 10,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 11,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 3,
+      "reinforcementUsage": 2,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "冰海皇",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "玄瀾霜衛",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "寒魄冰侍",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "煞氣戰旗",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "world-80",
+      "level": 80,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 10899,
+      "SP": 1870,
+      "attack": 662,
+      "magicAttack": 409.5,
+      "defense": 828,
+      "speed": 40,
+      "pressure": 0.4968000000000001,
+      "owner": "MonsterBalance",
+      "skillChance": 0.5599999999999999,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 3,
+          "type": "charge"
+        }
+      ],
+      "summon": null,
+      "type": "world",
+      "stage": 1,
+      "randomPolicy": "seeded",
+      "randomSeed": 8001,
+      "reference": {
+        "level": 80,
+        "budget": 405,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 160,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          },
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          },
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          }
+        ]
+      },
+      "rounds": 5,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        6520,
+        6520,
+        6520
+      ],
+      "firstRoundParty": [
+        6520,
+        6520,
+        6294
+      ],
+      "playerHPAfter": [
+        3782,
+        2210,
+        3556
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 2,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 3,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 4,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 5,
+          "name": "普通攻擊"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 3 回合出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 3 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 0,
+      "reinforcementUsage": 0,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "九曜龍皇",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "world-80",
+      "level": 80,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 12296,
+      "SP": 1870,
+      "attack": 662,
+      "magicAttack": 409.5,
+      "defense": 828,
+      "speed": 40,
+      "pressure": 0.54,
+      "owner": "MonsterBalance",
+      "skillChance": 0.64,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "shield"
+        }
+      ],
+      "summon": null,
+      "type": "world",
+      "stage": 2,
+      "randomPolicy": "seeded",
+      "randomSeed": 8002,
+      "reference": {
+        "level": 80,
+        "budget": 405,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 160,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          },
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          },
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          }
+        ]
+      },
+      "rounds": 7,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        6520,
+        6520,
+        6520
+      ],
+      "firstRoundParty": [
+        6255,
+        6245,
+        6520
+      ],
+      "playerHPAfter": [
+        4971,
+        6245,
+        5572
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 2,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 3,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 4,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 5,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 6,
+          "name": "普通攻擊"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": {
+            "current": 2951,
+            "max": 2951
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 1,
+      "reinforcementUsage": 0,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "九曜龍皇",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        }
+      ]
+    },
+    {
+      "id": "world-80",
+      "level": 80,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 13414,
+      "SP": 1870,
+      "attack": 662,
+      "magicAttack": 409.5,
+      "defense": 828,
+      "speed": 40,
+      "pressure": 0.5724,
+      "owner": "MonsterBalance",
+      "skillChance": 0.72,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "heal"
+        },
+        {
+          "round": 5,
+          "type": "amplify"
+        }
+      ],
+      "summon": {
+        "hpBelow": 0.55
+      },
+      "type": "world",
+      "stage": 3,
+      "randomPolicy": "seeded",
+      "randomSeed": 8003,
+      "reference": {
+        "level": 80,
+        "budget": 405,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 160,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          },
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          },
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          }
+        ]
+      },
+      "rounds": 8,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        6520,
+        6520,
+        6520
+      ],
+      "firstRoundParty": [
+        6520,
+        6520,
+        6520
+      ],
+      "playerHPAfter": [
+        4509,
+        5566,
+        4342
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "怒火"
+        },
+        {
+          "round": 2,
+          "name": "火箭"
+        },
+        {
+          "round": 3,
+          "name": "怒火"
+        },
+        {
+          "round": 4,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 4,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 4,
+          "name": "火箭"
+        },
+        {
+          "round": 5,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 5,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 5,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 6,
+          "name": "怒火"
+        },
+        {
+          "round": 6,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 6,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 7,
+          "name": "火爆亂擊"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 0,
+      "reinforcementUsage": 2,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "九曜龍皇",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "血祭圖騰",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "赤劫炎衛",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "燼曜戰侍",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "煞氣戰旗",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "world-80",
+      "level": 80,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 13972,
+      "SP": 1870,
+      "attack": 662,
+      "magicAttack": 409.5,
+      "defense": 828,
+      "speed": 40,
+      "pressure": 0.6048000000000001,
+      "owner": "MonsterBalance",
+      "skillChance": 0.8,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "charge"
+        },
+        {
+          "round": 4,
+          "type": "amplify"
+        },
+        {
+          "round": 7,
+          "type": "shield"
+        }
+      ],
+      "summon": {
+        "round": 4
+      },
+      "type": "world",
+      "stage": 4,
+      "randomPolicy": "seeded",
+      "randomSeed": 8004,
+      "reference": {
+        "level": 80,
+        "budget": 405,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 160,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          },
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          },
+          {
+            "maxHP": 6520,
+            "maxSP": 1440,
+            "attack": 442,
+            "attackPoints": 23,
+            "defense": 510,
+            "defensePoints": 60,
+            "magicAttack": 737.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 60,
+            "evasion": 0,
+            "vitality": 81,
+            "energy": 40,
+            "intelligence": 141,
+            "agility": 60
+          }
+        ]
+      },
+      "rounds": 8,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        6520,
+        6520,
+        6520
+      ],
+      "firstRoundParty": [
+        6520,
+        6520,
+        6520
+      ],
+      "playerHPAfter": [
+        3260,
+        2927,
+        2813
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "怒火"
+        },
+        {
+          "round": 2,
+          "name": "怒火"
+        },
+        {
+          "round": 3,
+          "name": "怒火"
+        },
+        {
+          "round": 4,
+          "name": "火箭"
+        },
+        {
+          "round": 4,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 4,
+          "name": "怒火"
+        },
+        {
+          "round": 5,
+          "name": "怒火"
+        },
+        {
+          "round": 5,
+          "name": "怒火"
+        },
+        {
+          "round": 5,
+          "name": "怒火"
+        },
+        {
+          "round": 6,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 6,
+          "name": "火箭"
+        },
+        {
+          "round": 7,
+          "name": "霸龍裂天斬"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 2 回合出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 2 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 0,
+      "reinforcementUsage": 2,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "九曜龍皇",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "赤劫炎衛",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "燼曜戰侍",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "煞氣戰旗",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "world-100",
+      "level": 100,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 13590,
+      "SP": 2320,
+      "attack": 822,
+      "magicAttack": 505.75,
+      "defense": 1028,
+      "speed": 50,
+      "pressure": 0.4968000000000001,
+      "owner": "MonsterBalance",
+      "skillChance": 0.5599999999999999,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 3,
+          "type": "charge"
+        }
+      ],
+      "summon": null,
+      "type": "world",
+      "stage": 1,
+      "randomPolicy": "seeded",
+      "randomSeed": 10001,
+      "reference": {
+        "level": 100,
+        "budget": 505,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 200,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          },
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          },
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          }
+        ]
+      },
+      "rounds": 5,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        8120,
+        8120,
+        8120
+      ],
+      "firstRoundParty": [
+        8120,
+        7518,
+        8120
+      ],
+      "playerHPAfter": [
+        4710,
+        2923,
+        3515
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 2,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 3,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 4,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 5,
+          "name": "霸龍裂天斬"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 3 回合出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 3 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 0,
+      "reinforcementUsage": 0,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "滅世天魔",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "world-100",
+      "level": 100,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 15332,
+      "SP": 2320,
+      "attack": 822,
+      "magicAttack": 505.75,
+      "defense": 1028,
+      "speed": 50,
+      "pressure": 0.54,
+      "owner": "MonsterBalance",
+      "skillChance": 0.64,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "shield"
+        }
+      ],
+      "summon": null,
+      "type": "world",
+      "stage": 2,
+      "randomPolicy": "seeded",
+      "randomSeed": 10002,
+      "reference": {
+        "level": 100,
+        "budget": 505,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 200,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          },
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          },
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          }
+        ]
+      },
+      "rounds": 8,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        8120,
+        8120,
+        8120
+      ],
+      "firstRoundParty": [
+        8120,
+        8120,
+        7503
+      ],
+      "playerHPAfter": [
+        7812,
+        5921,
+        7186
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 2,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 3,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 4,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 5,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 6,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 7,
+          "name": "普通攻擊"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": {
+            "current": 3680,
+            "max": 3680
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": {
+            "current": 163,
+            "max": 3680
+          },
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 2,
+      "reinforcementUsage": 0,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "滅世天魔",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        }
+      ]
+    },
+    {
+      "id": "world-100",
+      "level": 100,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 16726,
+      "SP": 2320,
+      "attack": 822,
+      "magicAttack": 505.75,
+      "defense": 1028,
+      "speed": 50,
+      "pressure": 0.5724,
+      "owner": "MonsterBalance",
+      "skillChance": 0.72,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "heal"
+        },
+        {
+          "round": 5,
+          "type": "amplify"
+        }
+      ],
+      "summon": {
+        "hpBelow": 0.55
+      },
+      "type": "world",
+      "stage": 3,
+      "randomPolicy": "seeded",
+      "randomSeed": 10003,
+      "reference": {
+        "level": 100,
+        "budget": 505,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 200,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          },
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          },
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          }
+        ]
+      },
+      "rounds": 8,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        8120,
+        8120,
+        8120
+      ],
+      "firstRoundParty": [
+        7474,
+        8120,
+        8120
+      ],
+      "playerHPAfter": [
+        5972,
+        6950,
+        4871
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 2,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 3,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 4,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 4,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 4,
+          "name": "怒火"
+        },
+        {
+          "round": 5,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 5,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 5,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 6,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 6,
+          "name": "怒火"
+        },
+        {
+          "round": 6,
+          "name": "普通攻擊"
+        },
+        {
+          "round": 7,
+          "name": "霸龍裂天斬"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "血祭圖騰",
+              "icon": "",
+              "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+              "trigger": "第 2 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            },
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 8,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 5 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 0,
+      "reinforcementUsage": 2,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "滅世天魔",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "血祭圖騰",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "赤劫炎衛",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "燼曜戰侍",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "煞氣戰旗",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    },
+    {
+      "id": "world-100",
+      "level": 100,
+      "element": "fire",
+      "archetype": "balanced",
+      "HP": 17423,
+      "SP": 2320,
+      "attack": 822,
+      "magicAttack": 505.75,
+      "defense": 1028,
+      "speed": 50,
+      "pressure": 0.6048000000000001,
+      "owner": "MonsterBalance",
+      "skillChance": 0.8,
+      "phases": 1,
+      "mechanism": [
+        {
+          "round": 2,
+          "type": "charge"
+        },
+        {
+          "round": 4,
+          "type": "amplify"
+        },
+        {
+          "round": 7,
+          "type": "shield"
+        }
+      ],
+      "summon": {
+        "round": 4
+      },
+      "type": "world",
+      "stage": 4,
+      "randomPolicy": "seeded",
+      "randomSeed": 10004,
+      "reference": {
+        "level": 100,
+        "budget": 505,
+        "skill": "phoenixCry",
+        "skillLevel": 10,
+        "skillCost": 43,
+        "skillBudget": 200,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          },
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          },
+          {
+            "maxHP": 8120,
+            "maxSP": 1790,
+            "attack": 542,
+            "attackPoints": 28,
+            "defense": 630,
+            "defensePoints": 75,
+            "magicAttack": 914,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 75,
+            "evasion": 0,
+            "vitality": 101,
+            "energy": 50,
+            "intelligence": 176,
+            "agility": 75
+          }
+        ]
+      },
+      "rounds": 7,
+      "clear": true,
+      "survivors": 3,
+      "initialParty": [
+        8120,
+        8120,
+        8120
+      ],
+      "firstRoundParty": [
+        8120,
+        8120,
+        8120
+      ],
+      "playerHPAfter": [
+        3736,
+        3159,
+        3741
+      ],
+      "skills": [
+        {
+          "round": 1,
+          "name": "怒火"
+        },
+        {
+          "round": 2,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 3,
+          "name": "霸龍裂天斬"
+        },
+        {
+          "round": 4,
+          "name": "怒火"
+        },
+        {
+          "round": 4,
+          "name": "怒火"
+        },
+        {
+          "round": 4,
+          "name": "火爆亂擊"
+        },
+        {
+          "round": 5,
+          "name": "火箭"
+        },
+        {
+          "round": 5,
+          "name": "怒火"
+        },
+        {
+          "round": 5,
+          "name": "怒火"
+        },
+        {
+          "round": 6,
+          "name": "怒火"
+        },
+        {
+          "round": 6,
+          "name": "火箭"
+        }
+      ],
+      "controls": [],
+      "mechanismEvents": [
+        {
+          "round": 1,
+          "phase": 1,
+          "shield": null,
+          "objects": [],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 2,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 2 回合出現",
+              "status": "蓄力中",
+              "remaining": "2 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 3,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-1",
+              "name": "滅魂陣",
+              "icon": "",
+              "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+              "trigger": "第 2 回合出現",
+              "status": "蓄力中",
+              "remaining": "1 回合"
+            }
+          ],
+          "reinforcements": 0,
+          "snapshotOwner": true
+        },
+        {
+          "round": 4,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 5,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 6,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        },
+        {
+          "round": 7,
+          "phase": 1,
+          "shield": null,
+          "objects": [
+            {
+              "id": "boss-object-4",
+              "name": "煞氣戰旗",
+              "icon": "",
+              "effect": "存活期間，BOSS 造成傷害提高 25%。",
+              "trigger": "第 4 回合出現",
+              "status": "生效中",
+              "remaining": "破壞前持續"
+            }
+          ],
+          "reinforcements": 2,
+          "snapshotOwner": true
+        }
+      ],
+      "shieldUsage": 0,
+      "reinforcementUsage": 2,
+      "finalBossHP": 0,
+      "finalEnemies": [
+        {
+          "name": "滅世天魔",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss"
+        },
+        {
+          "name": "滅魂陣",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        },
+        {
+          "name": "赤劫炎衛",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "燼曜戰侍",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-reinforcement"
+        },
+        {
+          "name": "煞氣戰旗",
+          "hp": 0,
+          "alive": false,
+          "kind": "boss-object"
+        }
+      ]
+    }
+  ]
+}

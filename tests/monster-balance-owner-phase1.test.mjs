@@ -51,11 +51,11 @@ test('Shadow never modifies a frozen formal entity or aliases its nested data',(
 });
 test('rank adds no points; seven modes explicit and isolated',()=>{
  assert.deepEqual(MonsterBalance.modes,['wild','daily','tower','abyss','adventure','personalBoss','worldBoss']);
- for(const mode of MonsterBalance.modes)for(const rank of MonsterBalance.ranks.filter(r=>r==='boss'?mode==='daily':r==='smallBoss'?!['wild','daily'].includes(mode):true)){
-  const input=mode==='adventure'?{...spec,mode,rank,chapterId:'chapter_v1',encounterId:'enc_boss',context:'adventure/chapter_v1/enc_boss'}:mode==='abyss'?{...spec,mode,rank,level:40,monsterKey:'abyss.test',abyssDifficulty:40,abyssRegion:'east',abyssStage:0,context:'abyss/40/east/stage/1'}:{...spec,mode,rank};const row=MonsterBalance.preview(input);
+ for(const mode of MonsterBalance.modes)for(const rank of MonsterBalance.ranks.filter(r=>['personalBoss','worldBoss'].includes(mode)?['boss','elite'].includes(r):r==='boss'?mode==='daily':r==='smallBoss'?!['wild','daily'].includes(mode):true)){
+  const input=['personalBoss','worldBoss'].includes(mode)?{...spec,mode,rank,monsterKey:'diagnostic.boss',worldStage:1}:mode==='adventure'?{...spec,mode,rank,chapterId:'chapter_v1',encounterId:'enc_boss',context:'adventure/chapter_v1/enc_boss'}:mode==='abyss'?{...spec,mode,rank,level:40,monsterKey:'abyss.test',abyssDifficulty:40,abyssRegion:'east',abyssStage:0,context:'abyss/40/east/stage/1'}:{...spec,mode,rank};const row=MonsterBalance.preview(input);
   assert.equal(row.base.abilityPointBudget,mode==='abyss'?195:245);assert.equal(row.profiles.mode.id,mode);
-  assert.deepEqual(row.allocation,MonsterBalance.preview({...input,rank:'regular'}).allocation);
-  assert.equal(row.profiles.rank.status,mode==='adventure'?'ADVENTURE_RUNTIME_V1':mode==='abyss'?'ABYSS_RUNTIME_V1':['wild','daily','tower'].includes(mode)?'RANK_V1':'PENDING_PRODUCT_CALIBRATION');
+  assert.deepEqual(row.allocation,MonsterBalance.preview({...input,rank:['personalBoss','worldBoss'].includes(mode)?'elite':'regular'}).allocation);
+  assert.equal(row.profiles.rank.status,mode==='adventure'?'ADVENTURE_RUNTIME_V1':mode==='abyss'?'ABYSS_RUNTIME_V1':['personalBoss','worldBoss'].includes(mode)&&rank==='boss'?'BIG_BOSS_RUNTIME_V1':'RANK_V1');
  }
  for(const invalid of [{mode:'boss'},{mode:'legacy-dungeon'},{rank:'boss'},{archetype:'unknown'},{context:''},{element:''}])assert.throws(()=>MonsterBalance.preview({...spec,...invalid}));
 });
@@ -76,7 +76,7 @@ test('existing Tower element profile math only; global defaults all1, other mode
  const wind=MonsterBalance.preview({...spec,element:'wind',mode:'tower'});
  assert.equal(wind.final.speed,wind.derived.speed*1.15);
  assert.deepEqual(wind.profiles.element.metadata,{evasionBonusPercent:15});
- for(const mode of ['daily','personalBoss','worldBoss']){
+ for(const mode of ['daily']){
   const row=MonsterBalance.preview({...spec,mode,element:'earth'});
   if(mode==='daily'){assert.equal(row.final.maxHP,Math.round(row.derived.maxHP*row.profiles.mode.partySizeDurability));assert.equal(row.final.physicalAttack,row.derived.physicalAttack);}
   else assert.deepEqual(row.final,row.derived);
@@ -92,7 +92,7 @@ test('retirement inventory is complete and preserves grandfathered source paths 
  const ids=['coreAllocation','coreStats','wildV131','wildV141','wildRank','dungeonStrength','dungeonNormal','dungeonRank','equipmentRank','beginnerScaling','dailyScaling','legacyAbyss','abyssDurability','bossMultipliers','towerElement','enemyPressure','adventureBuild','v144Wrapper','bossUnusedDefense'];
  for(const id of ids)assert.ok(inventory.items.some(item=>item.id===id),id);
  for(const item of inventory.items){
-  assert.ok(['TO RETIRE','TO MIGRATE','KEEP','RETIRED','COMPATIBILITY FOR NON-WILD ONLY','COMPATIBILITY FOR NON-DAILY ONLY'].includes(item.decision));assert.ok(item.phase&&item.reason&&item.retirementGate);
+  assert.ok(['TO RETIRE','TO MIGRATE','KEEP','MIGRATED','RETIRED','COMPATIBILITY FOR NON-WILD ONLY','COMPATIBILITY FOR NON-DAILY ONLY'].includes(item.decision));assert.ok(item.phase&&item.reason&&item.retirementGate);
   assert.equal(fs.readFileSync(item.file,'utf8').includes(item.sourceToken),item.decision!=='RETIRED',item.id);
  }
 });
@@ -111,12 +111,7 @@ test('540 comparison rows deterministic; old actual builders remain unchanged af
  assert.ok(first.rows.every(r=>Object.values(r.shadowAllocation).reduce((a,b)=>a+b,0)===r.shadowBase.abilityPointBudget));
  assert.ok(first.rows.some(r=>r.spec.mode==='abyss'&&!r.legacyContext.sameLevel));
  const {context}=loadLegacyRuntime();
- const old=()=>context.v132BuildDungeonMonster('unchanged',50,'fire','elite');
- const before=JSON.stringify(old());
- // skill loadout can roll; compare actual six stats and resources only.
- const project=entity=>Object.fromEntries(['maxHP','maxSP','attack','magicAttack','defense','agility','attackPoints','intelligencePoints','vitalityPoints','energyPoints','defensePoints','agilityPoints'].map(key=>[key,entity[key]]));
- const entity=old(),expected=project(entity);
- MonsterBalance.preview({...spec,...entity,rank:'elite',mode:'daily'});
- assert.deepEqual(project(entity),expected);assert.deepEqual(project(old()),expected);
- assert.ok(before.length);
+ assert.equal(context.v132BuildDungeonMonster,undefined);
+ assert.equal(context.makeLegacyModeMonster,undefined);
+ assert.equal(context.generateMonsterAttributePoints,undefined);
 });

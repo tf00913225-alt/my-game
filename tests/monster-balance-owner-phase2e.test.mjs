@@ -53,20 +53,18 @@ test('original carried skills, frequency, identity and portrait continuity survi
     }
   }
 });
-test('Adventure pressure is consumed once and shared Boss legacy baseline is immutable',()=>{
+test('Adventure pressure is consumed once after Boss migration',()=>{
   const c=loadAdventureDiagnostic(),target=vm.runInContext('player',c);
   for(const e of Object.keys(c.FourSymbolsAdventureContent.encounters))for(const m of c.__adventureDiagnosticBuild(e)){
     assert.equal(c.getEnemyPressureMultiplier(m,target),m.balanceProjection.finalDamagePressure);
     m.v132Dungeon=true;m.v141Abyss=true;assert.equal(c.getEnemyPressureMultiplier(m,target),m.balanceProjection.finalDamagePressure);assert.equal(c.getEnemyPressureMultiplier(m,m),1);
   }
-  const old=JSON.parse(fs.readFileSync('tests/fixtures/monster-balance-p2a-extra-non-wild.json','utf8')).rows;
-  const actual=collectNonWildOutputs(loadLegacyRuntime),boss=r=>['personal','world'].includes(r.mode);
-  assert.deepEqual(actual.filter(boss),old.filter(boss));assert.equal(actual.filter(boss).length,48);
+
 });
-test('original adventure numerical edge is physically absent; shared legacy builder remains',()=>{
+test('original adventure numerical edge is physically absent; shared legacy builder is retired',()=>{
   const s=fs.readFileSync('js/adventure/adventure-runtime-v1-20260915.js','utf8');
   assert.doesNotMatch(s,/makeZoneMonster|makeLegacyModeMonster|v132BuildDungeonMonster|monster\.(maxHP|hp|attack|magicAttack|defense|agility|level|rank|element)\s*=/);
-  assert.match(fs.readFileSync('js/00-main.js','utf8'),/function makeLegacyModeMonster/);
+  assert.doesNotMatch(fs.readFileSync('js/00-main.js','utf8'),/function makeLegacyModeMonster/);
 });
 test('all formal Adventure TTK references survive without a forced two-round target',()=>{
   for(const randomPolicy of ['neutral','seeded']){

@@ -3,6 +3,94 @@ import fs from "node:fs";
 import path from "node:path";
 import {spawn,spawnSync} from "node:child_process";
 import {battleSkillTouchFloodQa} from './battle-skill-touch-flood-qa.mjs';
+import os from 'node:os';
+import {startServer,waitJson,Cdp,findChrome} from './runtime-browser-qa-support.mjs';
+
+async function runBossBalanceProductionQa(){
+    const baseUrl=process.env.BOSS_BALANCE_BASE_URL;
+    if(baseUrl){const manifest=await fetch(new URL('release-manifest.json',baseUrl+'/')).then(r=>r.json());assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA);}
+    const reference=fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','utf8');
+    const expression=`(async()=>{
+      const check=(v,m)=>{if(!v)throw Error(m);};
+      const wait=async(fn,ms=30000)=>{const end=performance.now()+ms;while(!fn()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(fn(),'Boss wait '+fn);};
+      await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
+      await FourSymbolsFeatures.ensure('boss-tower','boss-balance-qa');
+      await wait(()=>window.GameplaySystem&&window.FourSymbolsBossBattle);closeHomeFeature();
+      const evidence=window.bossBalanceQaEvidence={scenes:[],controls:[],skills:[]};
+      const stats=m=>[m.maxHP,m.maxSP,m.attack,m.magicAttack,m.defense,m.agility];
+      const verify=m=>{const p=MonsterBalance.debug(m);check(m.balanceOwner==='MonsterBalance'&&['personalBoss','worldBoss'].includes(m.mode),'owner');check(JSON.stringify(stats(m))===JSON.stringify(Object.values(p.final)),'projection');check(!m.v132Dungeon&&!m.v141ExtraHP,'legacy marker');check(p.base.abilityPointBudget===(m.level-1)*5,'budget');check(getEnemyPressureMultiplier(m,player)===p.finalDamagePressure,'pressure');};
+      const plans=[{type:'personal',id:'personal-20'},{type:'personal',id:'personal-30'},{type:'personal',id:'personal-70'},...[1,2,3,4].map(stage=>({type:'world',id:'world-40',stage})),{type:'world',id:'world-40',stage:4,repeat:true},{type:'personal',id:'personal-20',repeat:true}];
+      const oldRandom=Math.random,badge=showMonsterSkillNameBadge,status=rollStatusEffectHit,awardGold=awardMonsterGoldDrop;let killGold=0;
+      awardMonsterGoldDrop=function(...args){const before=gold,result=awardGold(...args);killGold+=gold-before;return result;};
+      showMonsterSkillNameBadge=function(name,...args){evidence.skills.push({name,round:turn});return badge(name,...args);};
+      rollStatusEffectHit=function(...args){const hit=status(...args);if(args[5]){const chance=calculateStatusEffectChance(...args);check(chance<=60,'hard control cap');evidence.controls.push({chance,hit,rank:args[6]});}return hit;};
+      try{
+       for(const [caseIndex,plan] of plans.entries()){killGold=0;evidence.current={...plan};
+        const definition=(plan.type==='world'?GameplaySystem.worldBosses:GameplaySystem.personalBosses).find(d=>d.id===plan.id);
+        const ref=prepareWildBalanceReferenceParty(definition.level,definition.level<60?2:3);v131GrantElementBoxHours(8,32);
+        let seed=definition.level*100+(plan.stage||1);Math.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
+        autoBattle=false;autoPatrolEnabled=false;for(const cfg of [autoConfig,autoConfig2,autoConfig3]){cfg.enabled=false;cfg.skill=ref.skill;cfg.hp=0;cfg.sp=0;}
+        vGameplayOpenBoss();vGameplayOpenBossDetail(plan.type,plan.id);
+        const oreCount=id=>inventoryItems.filter(i=>i?.id===id).reduce((n,i)=>n+(Number(i.count)||0),0);
+        const beforeState=GameplaySystem.getSerializableState(),beforeGold=gold,beforeOre=oreCount(definition.ore);
+        const beforeRelic=definition.relic?JSON.stringify(v174RelicSystem.getOwnedState()[definition.relic]):null;
+        const button=document.querySelector('#bossTabContent .boss-detail .gameplay-primary-action');check(button&&!button.disabled,'formal Boss entry');button.click();
+        await wait(()=>battleActive&&FourSymbolsBossBattle.isActive());await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
+        const boss=monsters[FourSymbolsBossBattle.getBossIndex()],initial=stats(boss),snapshot=FourSymbolsBattlefieldSlots.getActiveEnemySnapshot();verify(boss);
+        check(boss.rank==='boss'&&boss.level===definition.level&&boss.element===definition.element,'identity');
+        check(FourSymbolsBossBattle.getBossFootprintSlots().length===6&&document.querySelector('.v-fixed-boss-footprint'),'six-grid footprint');
+        check(FourSymbolsBossBattle.ownsEnemyFormationSnapshot(snapshot),'snapshot');
+        const art=document.querySelector('.gameplay-boss-card .v174-battle-art');check(art&&getComputedStyle(art).backgroundImage!=='none','portrait');
+        const image=new Image();image.src=getComputedStyle(art).backgroundImage.split('url(')[1]?.split(')')[0].replaceAll(String.fromCharCode(34),'').replaceAll("'",'');await image.decode();check(image.naturalWidth>0,'Boss portrait decode');
+        check(document.querySelector('.gameplay-boss-card .monster-hp-inner')&&document.querySelector('.gameplay-boss-card .monster-sp-inner'),'HP/SP');
+        window.bossBalanceQaCapture=plan.type+'-'+plan.id+'-'+caseIndex;
+        let rounds=1,shields=0,objects=0,reinforcements=0;const off=FourSymbolsBattleFlow.subscribeBeforeCombatant(()=>{
+          rounds=Math.max(rounds,turn);verify(boss);check(FourSymbolsBattlefieldSlots.getActiveEnemySnapshot()===snapshot,'stable snapshot');
+          const shield=FourSymbolsBossBattle.getShieldState();if(shield){shields++;check(shield.max===Math.round(boss.maxHP*.24),'shield ratio once');}
+          for(const i of currentBattleMonsters){const m=monsters[i];if(m.unitKind==='boss-object'){objects++;check(m.canAct===false&&m.noRewards&&!m.balanceOwner,'object Owner');check(['ENEMY_F1','ENEMY_F5'].includes(m.vGameplayBattlefieldSlot)||!m.alive,'object slots');}if(m.vGameplayBossSupport){reinforcements++;verify(m);check(m.rank==='elite'&&['ENEMY_B1','ENEMY_B5'].includes(m.vGameplayBattlefieldSlot),'elite slots');}}
+        });
+        try{toggleAutoBattle();check(autoBattle,'formal auto toggle');await wait(()=>!battleActive,480000);}finally{off();}
+        autoBattle=false;check(JSON.stringify(stats(boss))===JSON.stringify(initial),'no late base stat mutation');
+        const survivors=getExistingPartyIndexes().filter(i=>getPartyCharacterByIndex(i).hp>0).length;check(survivors>0,'natural survivors');
+        const after=GameplaySystem.getSerializableState(),progress=after[plan.type][plan.id];
+        check(progress.firstClear===true||(plan.type==='world'&&plan.stage<4),'clear progression');
+        if(plan.type==='world')check(progress.completedStages===(plan.stage||4),'stage transition');
+        const final=plan.type==='personal'||plan.stage===4,expectedGold=final?(plan.repeat?definition.repeatGold:definition.firstGold):0;
+        Object.assign(evidence.current,{beforeGold,afterGold:gold,killGold,expectedConfiguredGold:expectedGold,progress});
+        check(gold-beforeGold===expectedGold+killGold,'unchanged configured and ordinary kill gold reward');
+        const expectedOre=final&&definition.ore?(plan.repeat?(plan.type==='personal'?1:0):(definition.firstOre||1)):0;check(oreCount(definition.ore)-beforeOre===expectedOre,'unchanged ore reward');
+        const beforeProgress=beforeState[plan.type][plan.id];check(progress.clears===beforeProgress.clears+(final?1:0),'clear count');
+        if(definition.relic){const owned=v174RelicSystem.getOwnedState()[definition.relic];if(final)check(owned.unlocked,'first/repeat relic reward');else check(JSON.stringify(owned)===beforeRelic,'no premature relic reward');}check(!FourSymbolsBossBattle.isActive(),'release Boss context');
+        if(document.getElementById('battleStatisticsResultModal')?.hidden===false)FourSymbolsBattleStatistics.hideResultDetails(true);
+        evidence.scenes.push({...plan,rounds,survivors,shields,objects,reinforcements,initial,finalHP:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),gold:gold-beforeGold,configuredGold:expectedGold,killGold,ore:oreCount(definition.ore)-beforeOre,expectedOre,progress});
+       }
+       return evidence;
+      }finally{Math.random=oldRandom;showMonsterSkillNameBadge=badge;rollStatusEffectHit=status;awardMonsterGoldDrop=awardGold;}
+    })()`;
+    const server=await startServer({baseUrl}),results=[];
+    const file=path.resolve('artifacts/browser-qa/boss-balance-production.json');fs.mkdirSync(path.dirname(file),{recursive:true});
+    let proc,client,profile;
+    const close=()=>{client?.close();proc?.kill('SIGTERM');client=null;proc=null;if(profile)fs.rmSync(profile,{recursive:true,force:true,maxRetries:6,retryDelay:100});};
+    try{
+      for(const [width,height] of [[390,844],[412,915]]){
+        profile=fs.mkdtempSync(path.join(os.tmpdir(),'boss-balance-'));const port=23000+process.pid%10000;
+        proc=spawn(findChrome(),['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
+        const tabs=await waitJson('http://127.0.0.1:'+port+'/json');client=new Cdp(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);
+        await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});await new Promise(r=>setTimeout(r,1000));
+        const active=client.eval(reference+'\n'+expression);let done=false;active.finally(()=>{done=true;}).catch(()=>{});const captured=new Set();
+        while(!done){await new Promise(r=>setTimeout(r,300));const marker=await client.eval('window.bossBalanceQaCapture||null').catch(()=>null);if(marker&&!captured.has(marker)){captured.add(marker);const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(file.replace('.json','-'+width+'x'+height+'-'+marker+'.png'),Buffer.from(shot.data,'base64'));}}
+        const result=await active;assert.equal(result.scenes.length,9);assert.ok(result.scenes.some(s=>s.shields));assert.ok(result.scenes.some(s=>s.objects));assert.ok(result.scenes.some(s=>s.reinforcements));results.push({width,height,...result});close();
+      }
+      fs.writeFileSync(file,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',results},null,2)+'\n');console.log('Boss production Chrome: 18 natural scenes, both viewports, Owner/mechanism/snapshot/reward PASS');
+    }catch(error){console.error('Boss production QA failure:',error);const partial=await client?.eval('({evidence:window.bossBalanceQaEvidence,phase:battlePhase,turn,battleActive,modals:[...document.querySelectorAll(".show")].map(x=>x.id)})').catch(()=>null);fs.writeFileSync(file,JSON.stringify({passed:false,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled'||e.method==='Runtime.exceptionThrown').slice(-15)},null,2)+'\n');throw error;}
+    finally{close();await new Promise(r=>server.server.close(r));}
+}
+
+// Phase2F extends the existing Boss QA entry; default historical coverage remains intact.
+if(process.env.BOSS_MONSTER_BALANCE_QA==='1'){
+    await runBossBalanceProductionQa();
+    process.exit(0);
+}
 
 const baseUrl=String(process.env.DEV_BASE_URL||"https://dev.four-symbols-dev.pages.dev").replace(/\/$/,"");
 const expectedSha=String(process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||"");
@@ -256,7 +344,7 @@ async function launchPresentationQaMode(client,mode,relicId){
         "return true;})()");
     let started=false;
     if(mode==="normal"){
-        started=await client.eval("(()=>{if(typeof startBattle!=='function'||typeof v132BuildDungeonMonster!=='function')return false;window.__battlePresentationQaNormalBackup={monsters:monsters,currentZone:currentZone,mapCooldown:mapCooldown};monsters=[v132BuildDungeonMonster('QA巡怪一',40,'fire','elite'),v132BuildDungeonMonster('QA巡怪二',40,'water','regular'),v132BuildDungeonMonster('QA巡怪三',40,'wind','regular')];currentZone='forest';mapCooldown=false;startBattle(0);return !!battleActive;})()");
+        started=await client.eval("(()=>{if(typeof startBattle!=='function'||typeof MonsterBalance?.build!=='function')return false;window.__battlePresentationQaNormalBackup={monsters:monsters,currentZone:currentZone,mapCooldown:mapCooldown};monsters=['fire','water','wind'].map((element,i)=>configureBuiltMonster(MonsterBalance.build({monsterKey:'qa.'+i,name:'QA巡怪'+i,level:40,element,archetype:'balanced',rank:i===0?'elite':'regular',mode:'wild',context:'wild/qa'})));currentZone='forest';mapCooldown=false;startBattle(0);return !!battleActive;})()");
     }else if(mode==="daily"){
         started=await client.eval("(()=>{if(typeof v132LaunchDungeonBattle!=='function'||typeof v148BuildDailyDungeonWaves!=='function')return false;const built=v148BuildDailyDungeonWaves('exp');const roster=built&&built.waves&&built.waves[0];if(!Array.isArray(roster)||roster.length!==6)return false;const ok=v132LaunchDungeonBattle(roster,()=>{}, {mode:'daily',dailyDungeonType:'exp'})===true;if(ok&&window.v132ActiveDungeonRun){window.v132ActiveDungeonRun.partySize=built.partySize;window.v132ActiveDungeonRun.highestPartyLevel=built.highestPartyLevel;window.v132ActiveDungeonRun.dailyDungeonType='exp';}return ok;})()");
     }else if(mode==="abyss"){

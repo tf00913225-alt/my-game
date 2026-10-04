@@ -1,3 +1,10 @@
+## 2026-10-04 — MONSTER-BALANCE-OWNER-P2F-BOSS-20261004（IMPLEMENTED；驗證待 Gate）
+
+- Base dev9fff3664d2767739fe8cd5c893f2985f8032d5ef；main f63d69dbfa66ba75637d1c3cd7fcc7d74782e356 禁止修改；feature/monster-balance-owner-phase2f-boss-20261004；target dev；Work PR 為耐久即時狀態 Owner。
+- 9 Personal／4 World×4 Stage；balanced固定；body canonical boss、援軍elite；MonsterBalance唯一戰前投影與pressure，worldStage stat集中Owner。Skill／mechanism／object／summon／snapshot／reward仍原Owner。舊dead defense metadata與legacy stat builders／被V148取代的V132 dormant數值入口移除。
+- 初始同步診斷50/50 clear+survive，Personal7–11／World5–11；Shield packet clipping修正後須重產證據。Phase1–2F51/51 PASS、15 Boss機制／snapshot／shield回歸PASS。Local Chrome154 socket() EPERM，不能冒稱Browser PASS；既有battle-layer QA入口擴充自然Boss，existing CI獨立job執行，無第二workflow。
+- Requirement1/1 IMPLEMENTED，禁止VERIFIED／merge直到focused/TTK/aggregate/build/Chrome/latest-head CI通過。完整inventory/caller graph與profiles見docs/MONSTER_BALANCE_OWNER_PHASE2F.md。Next: 遠端checkpoint／Draft PR、runner正式QA與回歸收斂，再dev整合部署與安全清理。Game/Cache173.73不改；NORMAL DEVELOPMENT；不進第二輪calibration。
+
 ## 2026-10-04 — P2-SESSION-CI-WAIT-20261004（功能契約 VERIFIED；遠端整合／部署待 Gate）
 
 - Start dev `0de3c3a5c9c5aff789b071f9bd89b4dcdce413d9`; main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` protected. Branch `chore/p2-session-ci-wait-convergence-20261004`, target dev; Work PR is durable current-state owner. NORMAL DEVELOPMENT; no Freeze/RC.
@@ -4852,3 +4859,18 @@ PR #784 head 98d1d619b14ca08e202ab78565ad3faef9be7309: CI run 37133129829 / job 
 - Next: close out this slice, then establish complete server-selected restricted roster/normal-or-skill declaration policy and a protected pinned multi-round successor lifecycle before full deterministic terminal adjudication and once-only settlement. Do not infer victory/reward eligibility from a first-round HP projection.
 
 - Controlled integration checkpoint: dev advanced via #795 to fe84524b47408224d17c09384dcd46d71306cca0. Preserve its four workflow changes, renamed formation test, historical evidence and all HANDOFF/requirements records. Runtime/player/enemy/generated rules are unchanged by that delta. Previous source head8628efef Session Authority37188900811/job111396722991 SUCCESS (backend243/243, real opening-source transaction PASS); old Repository checks still executing and not substituted for the new integration head. Latest-head CI/emulator, dev merge/deployment and cleanup remain pending.
+
+
+## 2026-10-05 — Phase2F PR#799 continuation
+
+- Resumed existing feature/monster-balance-owner-phase2f-boss-20261004 at b6f02419; fresh dev9fff3664 and mainf63d69db unchanged. No duplicate engineering.
+- Boss production CI37216148173/job111476945757 SUCCESS; artifact11309660021 independently SHA256 checked (4bc8c23163b1e669f16d1c41cb25b624baebad98b0f23cc511259d1c311b1c2c). 18 natural scenes390×844/412×915, actual projection/slots/snapshot/mechanism/rewards and repeats PASS; screenshots reviewed.
+- Correct Hit/Evasion QA's retired ambiguous generic constructor fixture to explicit MonsterBalance.build; assertions preserved. Freeze all13 Boss definitions/four stage gameplay/six objects against starting dev; final retirement statuses normalized. Aggregate53/53, focused7/7 PASS. No new Runtime/balance/reward/UI change.
+- Requirement remains IMPLEMENTED until latest-head complete CI. Dev integration/deployment/exact SHA/live Boss QA and absorbed branch deletion mandatory; PR#799 remains durable closeout owner. No main release or second calibration round.
+
+
+## Monster Balance Owner Phase2F — functional VERIFIED continuation
+
+53/53 Phase1–2F aggregate, 7/7 focused, 50/50 formal neutral/seeded TTK, 18/18 natural Chrome scenes at390×844/412×915, snapshot/mechanism/reward regression, final legacy audit and build sync PASS. Exact source d5f88fb03130360add0bbd330930c80c5db6b5c7; Repository CI37220134518 jobs111488621828/111488621822/111488621691/111488621595 SUCCESS; Session CI37220134254 job111488620833 SUCCESS. Boss artifact11309889570 SHA256f949c5f06aa8277bb959e7b111f93599481e6fa1d1cb684126dd8a77c4a26606 independently checked.
+
+Existing PR#799 retained; no duplicate engineering. Requirement1/1 VERIFIED. Hit/Evasion fixture uses explicit MonsterBalance and actual auto-battle entitlement/toggle/declaration; original assertion coverage retained and natural Chrome PASS. Starting dev9fff3664 and mainf63d69db still current at verification. Earlier Phase2C–2E stale execution map fields reconciled from their merged PR final records, history preserved. Metadata-head CI, merge to dev, deployed exact SHA/live Boss QA and safe absorbed-branch deletion remain independent execution gates. No COMPLETE claim and no further calibration scope.
