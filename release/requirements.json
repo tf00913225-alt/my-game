@@ -690,6 +690,21 @@
         "verification": "Local Phase1–2E46/46, focused6/6,36 formal TTK cases, direct formation/AI/hard-control/reward regressions, syntax368/368, build/build:check and deprecated gate PASS. Production Chrome8 natural scenes390×844/412×915, carried skill, reward/save/re-entry PASS: CI37196320933 job111418839671 artifact11301028022. Source Head866f0699a0cebe7634eafbff2dd19803d90c38b0 full latest-head CI37196320933 and Session37196320795 SUCCESS, with no failed or weakened gates. Final evidence/metadata Head required CI remains separate before merge.",
         "result": "1/1 functional VERIFIED. Adventure pre-battle stats and pressure have one MonsterBalance owner; content/skill/AI/formation/portrait/reward/save lifecycle owners preserved. Final metadata-head CI, dev integration/deployed exact SHA/live Adventure QA and absorbed-branch cleanup tracked by PR#797. Stop before Phase2F."
       }
+    },
+    {
+      "id": "REQ-P2-SESSION-CI-WAIT-20261004",
+      "title": "Session Authority exact-dev Repository checks 等待預算與最新 attempt 收斂",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          ".github/workflows/session-authority.yml",
+          ".github/scripts/wait-session-repository-checks.mjs",
+          "tests/session-repository-checks-wait.test.mjs",
+          "docs/P2_SESSION_CI_WAIT_20261004.md"
+        ],
+        "verification": "22 direct behavior cases PASS; historical25m32s delay and40m CI cap+queue replay; wrong SHA/owner/event/branch, latest rerun, failures/cancel/timeout/missing, stale-dev and elapsed-budget refusal. YAML semantic equivalence, build/build:check, related20/20, architecture/release/deprecated and diff checks PASS.",
+        "result": "Functional contract VERIFIED; latest-head PR CI, merged dev first-attempt Session logs/exact-SHA deployment and safe branch cleanup remain independent mandatory closeout gates in this Work PR. NORMAL DEVELOPMENT; Runtime/Gameplay/Game+Cache173.73/main unchanged."
+      }
     }
   ]
 }
