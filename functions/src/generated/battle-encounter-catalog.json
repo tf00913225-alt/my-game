@@ -6,7 +6,7 @@
   "sourceDigests": {
     "js/combat/level-base-contract.mjs": "4db78e4fbb12dc599cd2c8b739dbbf4d9db4217f543c922c4e257b7ae98152fe",
     "js/combat/monster-archetypes.mjs": "d667081aa6e12ae3d42ba7c172030b45577f1a39bc965cc2c6a7d2e30e89d08a",
-    "js/combat/monster-balance-owner.mjs": "23819ee77d5fd0d6a9ac69ce90673e51a0fa1044b2b19017ed17ae9c79f3ff4d"
+    "js/combat/monster-balance-owner.mjs": "404b6f0b14e6842db48f3a62009f65efea2e060814d1f4f2d6f5036fa1ef02cf"
   },
   "entries": {
     "wild.zone-01.fire-01": {
@@ -63,5 +63,5 @@
   "combatRulesReady": false,
   "outcomeVerified": false,
   "rewardEligible": false,
-  "sha256": "8e6cbdb8b7506ada675ff3aa145cf1b660ad34c3760d22be673ed08e5922b82a"
+  "sha256": "b05cfec2db7ef2089aaf4b5feafca227e1d505542098c4a04a182f29d90ef332"
 }

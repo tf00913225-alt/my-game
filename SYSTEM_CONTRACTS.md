@@ -2,6 +2,10 @@
 
 本文件定義跨模組、跨版本都必須維持的正式系統契約。若歷史註解、測試、交接或舊功能卡規格與本文件衝突，以本文件與最新需求批次為準。
 
+## Boss 術語與契約邊界
+
+術語唯一 Owner：`docs/MONSTER_PORTRAIT_SPEC_V1.md` 第 0 節。世界／個人 Boss 統稱大 Boss，深淵等一般首領稱小 Boss；rank、mode、sizeClass 與 footprint 是獨立契約。下方 Boss 專屬模式的中央六格／援軍／功能物件規則只適用個人／世界大 Boss，不得因一般敵人 `rank="boss"` 套用到塔、每日副本或深淵。既有 World Boss／Personal Boss／Abyss Boss 名稱及內部 identifier 保留。
+
 ## 戰鬥目標契約
 
 - 一般戰鬥維持 `single / tri / row / column / all` 的 Fixed Slot（固定格位）規則。

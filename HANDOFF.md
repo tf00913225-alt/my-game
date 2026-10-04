@@ -7,6 +7,14 @@
 - 規格：`docs/MONSTER_BALANCE_OWNER_PHASE2C.md`；退場地圖：`docs/monster-balance-owner-retirement-map.json`；batch：`release/requirement-batches/2026-10-04-monster-balance-owner-phase2c-tower.json`。中央 requirements 暫不新增未驗證項，避免污染 final release-ready；exact-head 功能證據通過後才回填 VERIFIED 並重跑 latest-head CI。
 - CI recovery checkpoint：舊 Phase2A regression 原本把 Tower 與 Personal/World/Adventure 一起視為未遷移 baseline；Phase2C 後已收斂為 Tower 驗新 MonsterBalance projection，而 Personal/World/Adventure 仍逐字比對原 Phase2A baseline。未放寬未遷移模式。最新功能 head 需重新跑 exact-head CI。
 
+## 2026-10-04 — P1-B3-GOVERNANCE-TERMINOLOGY-20261004（文件收斂候選）
+
+- 開工 dev `13c22561afc518ce33b7da798b32e1c215e3cbde`；main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` 禁止修改。分支 `docs/p1-b3-governance-terminology-convergence-20261004`；本工作 PR 是最新 CI／合併／部署／清理的耐久狀態 Owner。
+- #670 在開工 dev 僅由一般 Bug 快速路徑部分吸收；#542 缺完整永久術語。兩個舊 PR 均有衝突，不直接合併；有效規則由本工作最小文件 PR 取代，通過整合後才關閉。
+- DEV merge 唯一 Owner：AGENTS「DEV PR 自動整合規則」。CLAUDE／自主修復契約／Bug Fast Path 只引用；main 發布、高風險操作、驗證草稿、CI、Release Freeze／P0／P1 Gate 保留。
+- 術語唯一 Owner：docs/MONSTER_PORTRAIT_SPEC_V1.md 第 0 節；SYSTEM_CONTRACTS 區分術語與 footprint／rank／mode。未改 Runtime、UI、素材、Monster Balance 或 Cloud；深淵既有尺寸／五帝素材不重製，識別碼不改名。
+- 分類 Convergence；本批只允許正式文件／交接／Closeout evidence。驗證清單與來源 commit 盤點見 docs/P1_B3_GOVERNANCE_TERMINOLOGY_CLOSEOUT_20261004.md。停止點 P1-B3；#566／#548 及其他工程完全排除，未進 P1-B4。
+
 ## 2026-10-03 — MONSTER-BALANCE-OWNER-P2B-DAILY-20261003（功能1/1 VERIFIED；整合／部署待Gate）
 
 - 開工dev4274454a／main f63d69db；main禁止修改；原Phase1/2A契約與#777/#780最終紀錄已核實。Branch feature/monster-balance-owner-phase2b-daily-20261003；本工作PR為耐久狀態Owner。
@@ -4750,3 +4758,14 @@ PR #784 head 98d1d619b14ca08e202ab78565ad3faef9be7309: CI run 37133129829 / job 
 - Next: required current-head CI/emulator, controlled dev integration, exact deployment verification and recoverable cleanup. The next independent Foundation D slice still needs complete server combat rules/roster and a deterministic outcome resolver before any victory proof or reward entitlement. The browser's win flag remains untrusted.
 
 - Functional evidence: exact41ce22d head real Firestore emulator37140978280/job111255578140 SUCCESS at2026-10-03T17:40:41Z; targeted56/56, cloud/backend171/171 and build:check PASS. This requirement is VERIFIED for stat-definition sealing only. Final metadata head still requires its own CI/emulator before merge; deployment and branch cleanup evidence belongs to PR#786. Phase4 remains0/6 VERIFIED.
+
+
+## 2026-10-04 — CLOUDSAVE-BATTLE-NORMAL-ATTACK-RULES-20261004 (candidate)
+
+- Base dev `13c22561afc518ce33b7da798b32e1c215e3cbde`; branch `feature/cloud-battle-normal-attack-rules-20261004`; target dev; main excluded. PR #786 is merged/deployed/cleaned; preparations and enemy seals are not rebuilt.
+- Additive server arithmetic owner `functions/src/canonical-battle-normal-attack.js::resolvePlainPlayerNormalAttack`. Reuses `inspectRecoveryArchive` and exported existing `canonical-battle-encounter.js::inspectPolicy`; verifies original source UID/revision/digests and enemy policy, then derives stats, hit, critical, damage and HP delta. Generated CommonJS declarations are exact copies of current `js/00-main.js` owners via `scripts/lib/cloud-battle-normal-attack-rules.mjs`; existing production build/check owns synchronization. No hand-written second damage formula, wrapper or temporary patch; browser sources/bundles unchanged.
+- Restricted to one unequipped server-created character, no learned/carried skills, buffs, debuffs, defending, bonus HP/SP or unknown fields, attacking a regular original Forest enemy. Unsupported sources fail closed. RNG transcript is explicit bounded internal server input, consumed exactly once for hit or three times for hit/crit/damage; no ambient RNG and no source mutation. Digest binds source, enemy, rules and exact transcript/output. Future caller must privately read original evidence in its protected transaction and seal RNG/rule version before use: self-consistent caller-supplied hashes alone never prove authority.
+- This is SINGLE PLAYER NORMAL-ATTACK ARITHMETIC ONLY, not accepted action order, a full roster, enemy actions (including tutorial damage), skills/statuses/shields, a terminal battle verdict or rewards. `combatRulesReady/outcomeVerified/rewardEligible/creditedToCharacter` remain false. No new collection, persisted result, callable, hook, grant, claim, ledger, gameplay revision, historical adoption or playable publication. Phase4 remains0/6 VERIFIED.
+- Compatibility inventory: V140 rage split, V149 skill-context critical override, V152 rage normalization and V173.64 fire-cast critical tracking remain client owners; actual wrapper files are loaded by the 128-case parity matrix and hashed in generated policy. They delegate on the admitted plain case. Current player base stats use level×4 physical, level×4 magic, level×3 defense; this differs from the future MonsterBalance level contract. Preserve actual current runtime, do not silently retune or replace with remembered coefficients.
+- Local kernel24/24, cloud/backend195/195, production build:check and whitespace PASS. Existing real emulator suite additionally reads original private Firestore sources under active session, runs deterministic hit/MISS and asserts no authoritative/economy changes. Latest-head CI/emulator, controlled merge, exact Firebase/DEV deployment and recoverable branch cleanup remain PENDING; live status owner is this Work PR. Game/Cache173.73 unchanged.
+- Next independent slice: pinned rules/RNG lifecycle, complete roster/action order and enemy tutorial actions, then carried skills/statuses/shields and deterministic full-result adjudication; only after that connect a one-time trusted reward. Do not publish a victory flag from this arithmetic projection or enable second-device restoration.

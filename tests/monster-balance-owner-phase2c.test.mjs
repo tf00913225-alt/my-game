@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import fs from 'node:fs';
-import {MonsterBalance} from '../js/combat/monster-balance-owner.mjs';
+import {MonsterBalance,TOWER_MODE_PROFILE} from '../js/combat/monster-balance-owner.mjs';
 
 const elements=['fire','water','earth','wind'];
 const baseSpec=(floor,element,rank='regular',slot=0)=>({
@@ -42,13 +42,17 @@ test('Tower ranks change only approved final profiles, never the six-stat budget
     assert.deepEqual(elite.allocation,regular.allocation);
     assert.equal(elite.profiles.rank.hp,1.5);
     assert.equal(elite.profiles.rank.defense,1.1);
-    assert.equal(elite.finalDamagePressure,1.1);
+    assert.equal(elite.profiles.rank.finalDamagePressure,1.1);
+    assert.equal(elite.finalDamagePressure,1.1*TOWER_MODE_PROFILE.damage);
+    assert.equal(elite.final.physicalAttack,elite.derived.physicalAttack);
+    assert.equal(elite.final.magicAttack,elite.derived.magicAttack);
     if(floor%10===0){
       const boss=MonsterBalance.preview(baseSpec(floor,element,'smallBoss'));
       assert.deepEqual(boss.allocation,regular.allocation);
       assert.equal(boss.profiles.rank.hp,3);
       assert.equal(boss.profiles.rank.defense,1.15);
-      assert.equal(boss.finalDamagePressure,1.15);
+      assert.equal(boss.profiles.rank.finalDamagePressure,1.15);
+      assert.equal(boss.finalDamagePressure,1.15*TOWER_MODE_PROFILE.damage);
     }
   }
 });
@@ -62,7 +66,7 @@ test('Tower element stat projection is owned once while gameplay metadata stays 
   assert.equal(wind.final.speed,wind.derived.speed*1.15);
   assert.deepEqual(wind.profiles.element.metadata,{evasionBonusPercent:15});
   const earth=MonsterBalance.preview(baseSpec(50,'earth'));
-  assert.equal(earth.final.maxHP,Math.round(earth.derived.maxHP*1.15));
+  assert.equal(earth.final.maxHP,Math.round(earth.derived.maxHP*TOWER_MODE_PROFILE.hp*1.15));
   assert.equal(earth.final.defense,Math.round(earth.derived.defense*1.15));
 });
 

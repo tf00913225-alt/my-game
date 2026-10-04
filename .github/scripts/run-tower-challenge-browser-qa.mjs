@@ -75,7 +75,12 @@ const expression=`(async()=>{
  evidence.battleScreenshotPending=true;vGameplayRenderTower();evidence.rules=document.getElementById('towerPageContent').textContent;check(evidence.rules.includes('每層固定 10 名敵人')&&evidence.rules.includes('65%')&&evidence.rules.includes('80%'),'visible tower rules');
  return evidence;
 })()`;
-const server=await startServer(),profile=fs.mkdtempSync(path.join(os.tmpdir(),'tower-challenge-')),port=9850+Math.floor(Math.random()*100);
+const deployedBase=process.env.TOWER_QA_BASE_URL;
+if(deployedBase){
+ const manifest=await (await fetch(new URL('release-manifest.json',deployedBase.replace(/\/$/,'')+'/'),{cache:'no-store'})).json();
+ assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA,'deployed Tower exact SHA');
+}
+const server=await startServer({baseUrl:deployedBase}),profile=fs.mkdtempSync(path.join(os.tmpdir(),'tower-challenge-')),port=9850+Math.floor(Math.random()*100);
 const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
 const artifact=path.join(ROOT,'artifacts/browser-qa/tower-challenge.json');fs.mkdirSync(path.dirname(artifact),{recursive:true});let client,evidence;
 try{

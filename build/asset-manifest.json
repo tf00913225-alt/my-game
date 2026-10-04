@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.2733f75c45f7.js"
+          "build/app-shell.1d31510c4046.js"
         ],
         "styles": [
           "build/app-shell.d90705103c7f.css"
@@ -50,7 +50,7 @@
       "gameplay-core": {
         "scripts": [
           "build/gameplay-core-primary.bdd9ea818f5e.js",
-          "build/gameplay-core-secondary.7dbaed549f1e.js"
+          "build/gameplay-core-secondary.faddfa1b3827.js"
         ],
         "styles": [
           "build/gameplay-core.bcca3d2eeff9.css"
@@ -562,9 +562,9 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.2733f75c45f7.js",
-        "sha256": "2733f75c45f7",
-        "bytes": 1029645,
+        "path": "build/app-shell.1d31510c4046.js",
+        "sha256": "1d31510c4046",
+        "bytes": 1029948,
         "priority": "P1",
         "type": "script",
         "decode": false
@@ -802,9 +802,9 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core-secondary.7dbaed549f1e.js",
-        "sha256": "7dbaed549f1e",
-        "bytes": 644199,
+        "path": "build/gameplay-core-secondary.faddfa1b3827.js",
+        "sha256": "faddfa1b3827",
+        "bytes": 644200,
         "priority": "P2",
         "type": "script",
         "decode": false
@@ -818,8 +818,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "a1d606237cd5",
-    "totalBytes": 21606880,
+    "manifestHash": "85195d77ba9c",
+    "totalBytes": 21607184,
     "totalResources": 78
   },
   "assets": {
@@ -827,17 +827,17 @@
       "sha256": "a891c4486126",
       "bytes": 69305
     },
-    "build/app-shell.2733f75c45f7.js": {
-      "sha256": "2733f75c45f7",
-      "bytes": 1029645
+    "build/app-shell.1d31510c4046.js": {
+      "sha256": "1d31510c4046",
+      "bytes": 1029948
     },
     "build/gameplay-core-primary.bdd9ea818f5e.js": {
       "sha256": "bdd9ea818f5e",
       "bytes": 651187
     },
-    "build/gameplay-core-secondary.7dbaed549f1e.js": {
-      "sha256": "7dbaed549f1e",
-      "bytes": 644199
+    "build/gameplay-core-secondary.faddfa1b3827.js": {
+      "sha256": "faddfa1b3827",
+      "bytes": 644200
     },
     "build/feature-patrol.ab5bd3ce5582.js": {
       "sha256": "ab5bd3ce5582",

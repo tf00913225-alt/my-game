@@ -11,7 +11,7 @@ Work ID: MONSTER-BALANCE-OWNER-P2C-TOWER-20261004. Start dev: 13c22561afc518ce33
 - Regular profile: HP 1, defense 1, final pressure 1.
 - Elite profile: HP 1.50, defense 1.10, final pressure 1.10.
 - Tower smallBoss profile: HP 3.00, defense 1.15, final pressure 1.15.
-- Tower mode multiplier is neutral 1 for HP/SP/damage/defense/speed. Global calibration remains 1.
+- Tower mode calibration is HP 0.20 and outgoing damage pressure 0.25; SP/defense/speed remain 1. Raw physical/magic attack and allocation are untouched. Rank ratios remain 1/1.5/3 HP and 1/1.1/1.15 pressure. Global calibration remains 1.
 - Tower entities do not carry `v132Dungeon` or `v132EquipmentDungeon`; core damage settlement consumes `balanceProjection.finalDamagePressure` once.
 
 ## Gameplay owners intentionally preserved
@@ -52,7 +52,7 @@ It verifies four elements × all 100 floors, fixed ten-unit composition, floor=l
 
 Formal diagnostic: `scripts/tower-balance-ttk-matrix.mjs`.
 
-It runs existing player stat/skill owners, initiative, enemy AI, damage and status settlement with neutral 0.5 rolls for Regular/Elite/smallBoss representative floors across all four elements. Two reference members are used below floor 50 and three from floor 50. The first mandatory gate is clear + at least one survivor; round distribution is evidence for final calibration and is not fabricated before CI execution.
+It runs existing player stat/skill owners, initiative, enemy AI, damage and status settlement with neutral 0.5 rolls for Regular/Elite/smallBoss representative floors across all four elements. Tower unlock requires Lv30: reference level is max(30, floor). Two reference members are used below floor 50 and three from floor 50. Formal autoActionForCharacter selects affordable skills or normal attacks; the diagnostic permits at most 60 rounds, without adding a product TTK limit. The first mandatory gate is clear + at least one survivor; local 60-case calibration passes clear + survivor. Regular 1 round, Elite 1–19 rounds, smallBoss 1–11 rounds. Water support/control causes the long cases. These are synchronous diagnostics; Chrome separately verifies animation lifecycle. Original neutral Tower profile failed 51/60 cases with the old diagnostic; correcting unlock/action semantics alone still left 39 failures. Final functional verification remains pending exact-head CI.
 
 Production Chrome owner: `.github/scripts/run-tower-challenge-browser-qa.mjs`.
 

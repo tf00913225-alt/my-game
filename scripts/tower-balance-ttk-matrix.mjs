@@ -13,14 +13,14 @@ const CASES=[
 export function buildTowerTtkMatrix(){
   const {context:c}=loadLegacyRuntime();
   vm.runInContext(fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','utf8'),c);
-  vm.runInContext('updateUI=()=>{};saveGame=()=>{};Math.random=()=>.5;',c);
+  vm.runInContext('updateUI=()=>{};saveGame=()=>{};finishPlayerAction=()=>{};Math.random=()=>.5;',c);
   const rows=[];
   for(const element of ELEMENTS)for(const entry of CASES){
     c.__towerInput={element,...entry};
     const row=JSON.parse(vm.runInContext(`JSON.stringify((()=>{
       const {element,floor,kind}=__towerInput;
       const partySize=floor>=50?3:2;
-      const reference=prepareWildBalanceReferenceParty(floor,partySize);
+      const reference=prepareWildBalanceReferenceParty(Math.max(30,floor),partySize);
       const roster=[];
       if(kind==='smallBoss'){
         roster.push(__shadowTower.boss({id:'tower-diagnostic-'+floor,name:'守關者',level:floor,element},floor));
@@ -34,17 +34,18 @@ export function buildTowerTtkMatrix(){
       monsters=roster;currentZone='dungeon';currentBattleMonsters=roster.map((m,i)=>i);
       window.v132ActiveDungeonRun={mode:'tower'};battleToken++;battleActive=true;battlePhase='resolve';actionReady=true;
       FourSymbolsBattlefieldSlots.clearActiveEnemySnapshot();Math.random=()=>.5;
+      autoBattle=true;for(const i of getExistingPartyIndexes()){const config=getPartyAutoConfig(i);config.enabled=true;config.skill=reference.skill;}
       const initialParty=getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp);
       const initialMonsters=roster.map(m=>({rank:m.rank,level:m.level,hp:m.maxHP,sp:m.maxSP,attack:m.attack,magicAttack:m.magicAttack,defense:m.defense,speed:m.agility,owner:m.balanceOwner,pressure:m.balanceProjection.finalDamagePressure}));
       let rounds=0;
-      for(let round=1;round<=12;round++){
+      for(let round=1;round<=60;round++){
         turn=round;rounds++;
         for(const action of buildInitiativeQueue()){
           if(monsters.every(m=>!m.alive||m.hp<=0)||getExistingPartyIndexes().every(i=>getPartyCharacterByIndex(i).hp<=0))break;
           if(action.type==='monster'){processSingleMonsterAttack(action.monsterIndex,battleToken);continue;}
           const i=action.characterIndex;activeBattleCharacterIndex=i;
           if(getPartyCharacterByIndex(i).hp<=0)continue;
-          queuedPlayerActions[i]=chooseWildBalanceReferenceAction(i,reference.skill);
+          autoActionForCharacter(i,battleToken);
           resolveQueuedPlayerAction(i,battleToken);
         }
         consumeRoundEndDurations();
@@ -63,7 +64,7 @@ export function buildTowerTtkMatrix(){
   const failures=rows.filter(row=>!row.clear||row.survivors===0);
   return {
     workId:'MONSTER-BALANCE-OWNER-P2C-TOWER-20261004',
-    method:'Formal current player stats/skills, initiative, enemy AI, damage and status owners; neutral 0.5 rolls; 2 members below floor50 and 3 members from floor50. Animation lifecycle is verified separately in Chrome.',
+    method:'Formal current player stats/skills, initiative, enemy AI, damage and status owners; neutral 0.5 rolls; Tower unlock Lv30 minimum; 2 members below floor50 and 3 members from floor50. Animation lifecycle is verified separately in Chrome.',
     cases:rows.length,failures,rows
   };
 }
