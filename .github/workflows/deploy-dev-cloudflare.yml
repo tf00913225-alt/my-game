@@ -157,7 +157,7 @@ jobs:
 
       - name: Verify deployed Abyss MonsterBalance runtime
         id: abyss_balance_live
-        run: ABYSS_BALANCE_BASE_URL="$DEV_BASE_URL" node .github/scripts/run-abyss-balance-browser-qa.mjs
+        run: ABYSS_BALANCE_BASE_URL="$DEV_BASE_URL" ABYSS_MONSTER_BALANCE_QA=1 node .github/scripts/run-abyss-live-browser-qa.mjs
 
       - name: Upload deployed Abyss balance evidence
         if: always() && steps.abyss_balance_live.outcome != 'skipped'

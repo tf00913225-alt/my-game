@@ -572,7 +572,7 @@ jobs:
           mkdir -p artifacts/browser-qa
           node tests/monster-balance-owner-phase2d.test.mjs
           node scripts/abyss-balance-ttk-matrix.mjs artifacts/browser-qa/abyss-balance-ttk.json
-          node .github/scripts/run-abyss-balance-browser-qa.mjs
+          ABYSS_MONSTER_BALANCE_QA=1 node .github/scripts/run-abyss-live-browser-qa.mjs
       - name: Upload Abyss evidence
         if: always()
         uses: actions/upload-artifact@v4

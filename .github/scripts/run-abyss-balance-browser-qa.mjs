@@ -19,7 +19,8 @@ const expression=`(async()=>{
  const badgeOwner=showMonsterSkillNameBadge;showMonsterSkillNameBadge=function(name,...args){evidence.skills.push(name);return badgeOwner(name,...args);};
  const resultClose=()=>document.querySelector('#battleStatisticsResultModal [data-close]')?.click();
  async function scene(difficulty,region,stage,partyLevel,manual=false){
-  const reference=prepareWildBalanceReferenceParty(partyLevel,partyLevel>=50?3:2);
+  const reference=prepareWildBalanceReferenceParty(partyLevel,partyLevel>=50?3:2),castSkills=[];
+  if(manual&&partyLevel===30)for(const i of getExistingPartyIndexes()){const key=getPartyCharacterKey(i),loadout=characterSkillLoadouts[key];Object.assign(loadout.skillLevels,{flameSlash:1,fireCritical:1,explosiveFlurry:1});const cost=Object.entries(loadout.skillLevels).reduce((sum,[id,n])=>sum+skillDatabase[id].learnCost+n-1,0);check(cost<=partyLevel*2&&Object.keys(loadout.skillLevels).every(id=>skillDatabase[id].learnLevel<=partyLevel),'legal geometry skill budget');getPartyCharacterByIndex(i).skillPoints=partyLevel*2-cost;loadout.equippedSkills=[reference.skill,'fireRocket','flameTornado','explosiveFlurry'];}
   for(const cfg of [autoConfig,autoConfig2,autoConfig3]){cfg.enabled=false;cfg.skill=reference.skill;}autoBattle=false;
   closeHomeFeature();vGameplayBackToHub();document.querySelector('.gameplay-mode-card.abyss').click();check(document.querySelector('.v174-abyss-selection'),'Gameplay Center Abyss entry');v174AbyssSelectDifficulty(difficulty);
   // Seed progression only in the isolated read-only QA account. Entry, combat,
@@ -32,7 +33,7 @@ const expression=`(async()=>{
   check(!document.getElementById('homeFeatureModal')?.classList.contains('show'),'no blocking shared modal');
   const entities=monsters.slice(),initial=entities.map(stats),ids=currentBattleMonsters.slice(),snapshot=FourSymbolsBattlefieldSlots.getActiveEnemySnapshot(),slots=ids.map(i=>FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,i));
   check(new Set(slots).size===ids.length,'unique fixed slots');check(monsters.every(m=>m.context==='abyss/'+difficulty+'/'+v174AbyssRegions[region].id+'/stage/'+(stage+1)),'actual encounter context');check(monsters.filter(m=>m.rank==='smallBoss').length===(stage<4?0:difficulty===40&&region===4?5:1),'canonical emperor rank');monsters.forEach(verify);renderBattle();monsters.forEach(verify);
-  for(const i of ids){const card=document.getElementById('battleMonster'+i),art=card?.querySelector('.v174-battle-art'),r=card?.getBoundingClientRect();check(r&&r.width>0&&r.height>0&&r.left>=-1&&r.right<=innerWidth+1,'visible target card');check(card.closest('.v131-monster-row')?.classList.contains('v131-monster-row-'+(monsters[i].v141FormationRow+1)),'preserved visual row');check(art&&getComputedStyle(art).backgroundImage!=='none','formal portrait');check(card.querySelector('.monster-hp-inner')&&card.querySelector('.monster-sp-inner'),'HP SP UI');const record=v154ResolveMonsterPortraitRecord(monsters[i]);if(record.temporary)evidence.portraitGaps.push(record);}
+  for(const i of ids){const card=document.getElementById('battleMonster'+i),art=card?.querySelector('.v174-battle-art'),r=card?.getBoundingClientRect();check(r&&r.width>0&&r.height>0&&r.left>=-1&&r.right<=innerWidth+1,'visible target card');check(card.dataset.geometryOwner==='fixed-slot'&&card.dataset.slot===FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,i),'canonical rendered slot');check(card.closest('.v-fixed-enemy-row')?.dataset.slotRow===(monsters[i].v141FormationRow===0?'back':'front'),'preserved visual row');check(art&&getComputedStyle(art).backgroundImage!=='none','formal portrait');check(card.querySelector('.monster-hp-inner')&&card.querySelector('.monster-sp-inner'),'HP SP UI');const record=v154ResolveMonsterPortraitRecord(monsters[i]);if(record.temporary)evidence.portraitGaps.push(record);}
   const shapes={};for(const shape of ['single','all','row','tri']){const targets=FourSymbolsBattlefieldSlots.resolveEnemyTargets(snapshot,ids[0],shape,i=>monsters[i]?.alive);check(targets.length>0&&targets.every(i=>ids.includes(i)),'target geometry '+shape);shapes[shape]=targets;}
   window.abyssBalanceQaCapture={difficulty,region,stage};await new Promise(r=>setTimeout(r,400));
   const events=[];const off=FourSymbolsBattleFlow.subscribeBeforeCombatant(e=>{const actor=e.queue[e.index];events.push({round:turn,type:actor?.type,index:actor?.monsterIndex??actor?.characterIndex});monsters.forEach(verify);check(JSON.stringify(ids.map(i=>FourSymbolsBattlefieldSlots.getEnemySlotForMonster(FourSymbolsBattlefieldSlots.getActiveEnemySnapshot(),i)))===JSON.stringify(slots),'no death reflow');});
@@ -46,7 +47,7 @@ const expression=`(async()=>{
     while(battleActive&&battlePhase==='declare'){
      await wait(()=>!battleActive||battlePhase!=='declare'||(!battleAdvanceScheduled&&battlePresentationLocks.size===0&&declaredCharacterIndexes.has(activeBattleCharacterIndex)));
      if(!battleActive||battlePhase!=='declare')break;
-     const action=chooseWildBalanceReferenceAction(activeBattleCharacterIndex,reference.skill);toggleSkillQuickBar();const button=document.querySelector('.skill-quick-button[data-skill-id="'+reference.skill+'"]');check(button&&!button.disabled,'legal skill');button.click();check(actionReady&&pendingAction===reference.skill,'skill declaration');document.getElementById('battleMonster'+(action.target??ids.find(i=>monsters[i].alive))).click();
+     const skill=partyLevel===30&&castSkills.length<2?['flameTornado','explosiveFlurry'][castSkills.length]:reference.skill;const action=chooseWildBalanceReferenceAction(activeBattleCharacterIndex,skill);toggleSkillQuickBar();const button=document.querySelector('.skill-quick-button[data-skill-id="'+skill+'"]');check(button&&!button.disabled,'legal skill');button.click();check(actionReady&&pendingAction===skill,'skill declaration');document.getElementById('battleMonster'+(action.target??ids.find(i=>monsters[i].alive))).click();castSkills.push(skill);
     }
     await wait(()=>!battleActive||turn>beforeTurn,160000);
    }
@@ -57,12 +58,12 @@ const expression=`(async()=>{
   const goldBefore=gold;document.querySelector('.v174-abyss-chest').click();await wait(()=>v174AbyssGetRunState(difficulty).chestClaimed,12000);check(gold>goldBefore,'formal reward');
   document.querySelector('#v132RewardModal button')?.click();document.querySelector('#v141BlackGoldRewardModal button')?.click();
   v174AbyssBackToSelection();v174AbyssLeaveToGameplay();check(!battleActive&&!window.v132ActiveDungeonRun,'return cleanup');
-  evidence.scenes.push({difficulty,region,stage,partyLevel,manual,initial,slots,shapes,events,rounds:Math.max(...events.map(e=>e.round)),survivors:getExistingPartyIndexes().filter(i=>getPartyCharacterByIndex(i).hp>0).length,rewardGold:gold-goldBefore});
+  evidence.scenes.push({difficulty,region,stage,partyLevel,manual,castSkills,initial,slots,shapes,events,rounds:Math.max(...events.map(e=>e.round)),survivors:getExistingPartyIndexes().filter(i=>getPartyCharacterByIndex(i).hp>0).length,rewardGold:gold-goldBefore});
  }
  try{
   for(const region of [0,1,2,3])await scene(20,region,0,30,region===0);
   await scene(20,3,4,30);await scene(40,4,4,60);await scene(20,0,0,20,true);
-  for(const rank of ['regular','elite','boss']){const cap=rank==='regular'?90:rank==='elite'?75:60;check(calculateStatusEffectChance(999,100,100,0,0,true,rank,0)===cap,'player hard cap');evidence.controls.push({rank,cap});}check(calculateStatusEffectChance(999,100,100,0,0,true,'player',0)===60,'enemy hard cap');
+  check(['flameTornado','explosiveFlurry','phoenixCry','fireRocket'].every(id=>evidence.scenes.some(s=>s.castSkills.includes(id))),'real row/tri/all/single skill input');for(const rank of ['regular','elite','boss']){const cap=rank==='regular'?90:rank==='elite'?75:60;check(calculateStatusEffectChance(999,100,100,0,0,true,rank,0)===cap,'player hard cap');evidence.controls.push({rank,cap});}check(calculateStatusEffectChance(999,100,100,0,0,true,'player',0)===60,'enemy hard cap');
   return evidence;
  }finally{Math.random=oldRandom;showMonsterSkillNameBadge=badgeOwner;autoBattle=false;autoConfig.enabled=false;}
 })()`;
