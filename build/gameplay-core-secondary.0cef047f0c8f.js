@@ -161,7 +161,7 @@
     /* Player-facing skill text is owned by FourSymbolsSkillSpec after the
        gameplay bundle finishes loading. V144 no longer overrides previews. */
 
-    /* ----- Shop: only 10/20/30% potions, with the existing level multiplier. ----- */
+    /* ----- Shop: flat starter and 20/30% potions, with the existing level multiplier. ----- */
     function ensurePotion(id,resource,percent,price){
         if(typeof potionDefinitions==="undefined"||!Array.isArray(potionDefinitions)){ return null; }
         const presentation=SHOP_POTION_PRESENTATION[id];
@@ -174,8 +174,11 @@
             name:presentation?presentation.name:"回復"+percent+"%"+resource.toUpperCase()+"藥水",
             shortName:presentation?presentation.name:resource.toUpperCase()+" "+percent+"%",
             icon:presentation?potionIconMarkup(presentation.iconPath):(potion.icon||""),
-            type:"potion",resource:resource,recoveryPercent:percent,price:price,stats:potion.stats||{}
+            type:"potion",resource:resource,recoveryMode:percent===10?"flat":"percent",
+            recoveryValue:percent===10?66:percent,price:price,stats:potion.stats||{}
         });
+        if(potion.recoveryMode==="flat"){ delete potion.recoveryPercent; }
+        else{ potion.recoveryPercent=percent; }
         if(typeof getPotionInventoryItems==="function"){
             getPotionInventoryItems(id).forEach(item=>{
                 item.name=potion.name;
@@ -183,7 +186,7 @@
                 item.icon=potion.icon;
                 item.type="potion";
                 item.resource=potion.resource;
-                item.recoveryPercent=potion.recoveryPercent;
+                syncPotionRecoveryContract(item,potion);
                 item.price=potion.price;
                 item.stats={};
             });
@@ -222,12 +225,12 @@
                 return '<div class="shop-potion-card '+item.resource+'">'+
                     '<div class="shop-potion-card-head"><span class="shop-potion-type">'+label+'</span><span class="shop-potion-stock">持有 '+getPotionCount(item.id)+'</span></div>'+
                     '<div class="shop-potion-summary"><div class="shop-potion-icon">'+item.icon+'</div><div class="shop-potion-copy">'+
-                    '<div class="shop-potion-name">'+escapeHtml(item.name)+'</div><div class="shop-potion-effect">回復最大'+label+'的 '+item.recoveryPercent+'%</div></div></div>'+
+                    '<div class="shop-potion-name">'+escapeHtml(item.name)+'</div><div class="shop-potion-effect">'+getPotionEffectDescription(item.id)+'</div></div></div>'+
                     '<div class="shop-potion-purchase-row"><label for="shopQuantity-'+item.id+'">數量</label><input id="shopQuantity-'+item.id+'" class="shop-potion-quantity" data-unit-price="'+price+'" type="number" inputmode="numeric" min="1" max="999" step="1" value="1" oninput="v146UpdateShopTotal(\''+item.id+'\')" onblur="v146CommitShopQuantity(\''+item.id+'\')">'+
                     '<span class="v146-shop-total" id="shopTotal-'+item.id+'">'+price+' 金幣</span><button class="home-feature-buy-btn shop-potion-buy" '+(gold<price?'disabled':'')+' onclick="buyShopItem(\''+item.id+'\',document.getElementById(\'shopQuantity-'+item.id+'\').value)">購買</button></div></div>';
             }).join("");
             return '<div class="v141-shop-wallet">目前金幣 <b>'+Math.max(0,Math.floor(numeric(gold))).toLocaleString("zh-TW")+'</b></div>'+
-                '<div class="shop-potion-interface"><div class="shop-potion-note">只販售 HP／SP 10%、20%、30% 回復藥水</div>'+
+                '<div class="shop-potion-interface"><div class="shop-potion-note">販售 HP／SP 回復補品</div>'+
                 '<div class="v133-shop-tier-note">目前商店階級：'+tier.label+'（價格×'+tier.multiplier+'）</div><div class="shop-potion-list">'+cards+'</div></div>';
         };
     }
@@ -4421,10 +4424,7 @@
                         if(config.returnToCityWhenEmpty){ shouldReturnToCity=true; }
                         return;
                     }
-                    const planned=definition.recoveryPercent>=100
-                        ?maxValue-currentValue
-                        :Math.max(1,Math.round(maxValue*definition.recoveryPercent/100));
-                    const recovered=Math.max(0,Math.min(maxValue-currentValue,planned));
+                    const recovered=resolvePotionRecovery(definition,currentValue,maxValue);
                     character[resource]=Math.min(maxValue,currentValue+recovered);
                     consumed++;
                     progressed=true;
@@ -7323,6 +7323,7 @@
             select.addEventListener("change",syncQuickSellModal);
         }
         modal.classList.add("show","v17350-quick-sell-open");
+        window.FourSymbolsBottomNav?.syncContext();
         syncQuickSellModal();
         return true;
     };
@@ -7443,10 +7444,7 @@
             const current=Math.max(0,Number(character[resource])||0);
             if(current>=maxValue){ break; }
             if(typeof consumePotionFromInventory!=="function"||!consumePotionFromInventory(definition.id,1)){ break; }
-            const planned=definition.recoveryPercent>=100
-                ?maxValue-current
-                :Math.max(1,Math.round(maxValue*Number(definition.recoveryPercent||0)/100));
-            const recovered=Math.max(0,Math.min(maxValue-current,planned));
+            const recovered=resolvePotionRecovery(definition,current,maxValue);
             character[resource]=Math.min(maxValue,current+recovered);
             recoveredTotal+=recovered;
             used++;
@@ -11623,6 +11621,7 @@ ensureFunctionalStyles();runRepairs();
             nodes.modal.classList.remove("v131-shop-open");
         }
         nodes.modal.classList.add("show","team-relic-modal");
+        window.FourSymbolsBottomNav?.syncContext();
         const box=nodes.modal.querySelector(".home-feature-modal-box"); if(box){ box.classList.add("wide"); }
         if(nodes.title){ nodes.title.textContent="秘 寶"; }
         const close=nodes.modal.querySelector(".home-feature-close-btn"); if(close){ close.setAttribute("aria-label","返回主城"); close.title="返回主城"; }

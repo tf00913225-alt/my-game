@@ -3,6 +3,9 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
+const potionCoreSource=fs.readFileSync("js/00-main.js","utf8");
+const potionRuleSource=potionCoreSource.slice(potionCoreSource.indexOf("function getPotionRecoveryContract("),potionCoreSource.indexOf("function createPotionInventoryItem("));
+
 
 const source=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
 const css=fs.readFileSync("css/46-v154-dev-fixes.css","utf8");
@@ -47,6 +50,7 @@ function loadRuntime(overrides={}){
     },overrides);
     context.window=context;
     vm.createContext(context);
+    vm.runInContext(potionRuleSource,context);
     vm.runInContext(source,context);
     return context;
 }

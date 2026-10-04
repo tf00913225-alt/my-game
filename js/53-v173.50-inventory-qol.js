@@ -287,6 +287,7 @@
             select.addEventListener("change",syncQuickSellModal);
         }
         modal.classList.add("show","v17350-quick-sell-open");
+        window.FourSymbolsBottomNav?.syncContext();
         syncQuickSellModal();
         return true;
     };
@@ -407,10 +408,7 @@
             const current=Math.max(0,Number(character[resource])||0);
             if(current>=maxValue){ break; }
             if(typeof consumePotionFromInventory!=="function"||!consumePotionFromInventory(definition.id,1)){ break; }
-            const planned=definition.recoveryPercent>=100
-                ?maxValue-current
-                :Math.max(1,Math.round(maxValue*Number(definition.recoveryPercent||0)/100));
-            const recovered=Math.max(0,Math.min(maxValue-current,planned));
+            const recovered=resolvePotionRecovery(definition,current,maxValue);
             character[resource]=Math.min(maxValue,current+recovered);
             recoveredTotal+=recovered;
             used++;

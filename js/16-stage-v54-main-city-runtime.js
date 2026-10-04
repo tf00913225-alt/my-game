@@ -150,6 +150,7 @@
         parts.modal.setAttribute("aria-modal","true");
         parts.modal.setAttribute("aria-labelledby","homeFeatureModalTitle");
         parts.modal.classList.add("show");
+        window.FourSymbolsBottomNav?.syncContext();
         return true;
     }
 
@@ -160,6 +161,7 @@
             window.closeHomeFeature();
         }else{
             parts.modal.classList.remove("show");
+            window.FourSymbolsBottomNav?.syncContext();
         }
         parts.modal.classList.remove(AD_FREE_MODE_CLASS);
         parts.modal.removeAttribute("role");

@@ -1335,23 +1335,25 @@ const achievementDefinitions=[
 const potionDefinitions=[
     {
         id:"hpPotion10",
-        name:"回復10%HP藥水",
-        shortName:"HP 10%",
+        name:"回春散",
+        shortName:"回春散",
         icon:"",
         type:"potion",
         resource:"hp",
-        recoveryPercent:10,
+        recoveryMode:"flat",
+        recoveryValue:66,
         price:20,
         stats:{}
     },
     {
         id:"spPotion10",
-        name:"回復10%SP藥水",
-        shortName:"SP 10%",
+        name:"凝氣散",
+        shortName:"凝氣散",
         icon:"",
         type:"potion",
         resource:"sp",
-        recoveryPercent:10,
+        recoveryMode:"flat",
+        recoveryValue:66,
         price:25,
         stats:{}
     },
@@ -1518,6 +1520,40 @@ function getPotionDefinition(potionId){
     )||null;
 }
 
+/* Canonical recovery rule. Legacy percent-only definitions are read compatibility;
+   flat definitions never interpret recoveryPercent as points. Inventory is not a rule source. */
+function getPotionRecoveryContract(definition){
+    if(!definition){ return {mode:"percent",value:0}; }
+    const mode=definition.recoveryMode;
+    if(mode==="flat"||mode==="percent"||mode==="full"){
+        return {mode,value:Math.max(0,Number(definition.recoveryValue)||0)};
+    }
+    const value=Math.max(0,Number(definition.recoveryPercent)||0);
+    return {mode:value>=100?"full":"percent",value};
+}
+
+function resolvePotionRecovery(definition,currentValue,maxValue){
+    const maximum=Math.max(0,Number(maxValue)||0);
+    const missing=Math.max(0,maximum-Math.max(0,Number(currentValue)||0));
+    const {mode,value}=getPotionRecoveryContract(definition);
+    const planned=mode==="full"?missing:(mode==="flat"?value:Math.round(maximum*value/100));
+    return Math.min(missing,planned);
+}
+
+function syncPotionRecoveryContract(item,definition){
+    const {mode,value}=getPotionRecoveryContract(definition);
+    item.recoveryMode=mode;
+    item.recoveryValue=value;
+    if(mode==="flat"){ delete item.recoveryPercent; }
+    else{ item.recoveryPercent=mode==="full"?100:value; }
+    return item;
+}
+
+function getPotionRecoveryPriority(definition){
+    const {mode,value}=getPotionRecoveryContract(definition);
+    return mode==="flat"?0:(mode==="full"?100:value);
+}
+
 function getPotionEffectDescription(potionId){
     const definition=getPotionDefinition(potionId);
     if(!definition){
@@ -1525,9 +1561,10 @@ function getPotionEffectDescription(potionId){
     }
 
     const resourceLabel=definition.resource==="hp" ? "HP" : "SP";
-    return definition.recoveryPercent>=100
-        ? `回復所有${resourceLabel}`
-        : `回復最大${resourceLabel}的 ${definition.recoveryPercent}%`;
+    const {mode,value}=getPotionRecoveryContract(definition);
+    return mode==="flat"?`恢復 ${value} ${resourceLabel}`
+        :mode==="full"?`回復所有${resourceLabel}`
+        :`回復最大${resourceLabel}的 ${value}%`;
 }
 
 function createPotionInventoryItem(potionId,count=1){
@@ -1543,7 +1580,8 @@ function createPotionInventoryItem(potionId,count=1){
         icon:definition.icon,
         type:"potion",
         resource:definition.resource,
-        recoveryPercent:definition.recoveryPercent,
+        recoveryMode:getPotionRecoveryContract(definition).mode,
+        recoveryValue:getPotionRecoveryContract(definition).value,
         count:Math.min(
             INVENTORY_MAX_STACK_DEFAULT,
             Math.max(1,Math.floor(Number(count)||1))
@@ -1617,7 +1655,7 @@ function addPotionToInventory(potionId,amount=1){
         stack.name=definition.name;
         stack.type="potion";
         stack.resource=definition.resource;
-        stack.recoveryPercent=definition.recoveryPercent;
+        syncPotionRecoveryContract(stack,definition);
         stack.price=Number.isFinite(definition.price) ? definition.price : (Number(stack.price)||0);
         stack.stats={};
         remaining-=add;
@@ -1711,7 +1749,7 @@ function normalizePotionInventoryFromLegacy(saveData){
             item.icon=definition.icon;
             item.type="potion";
             item.resource=definition.resource;
-            item.recoveryPercent=definition.recoveryPercent;
+            syncPotionRecoveryContract(item,definition);
             item.price=Number.isFinite(definition.price) ? definition.price : (Number(item.price)||0);
             item.stats={};
             item.count=Math.max(1,Math.floor(Number(item.count)||1));
@@ -1758,7 +1796,7 @@ function normalizePotionInventoryFromLegacy(saveData){
 function getAutoPotionId(resource){
     const ids=potionDefinitions
         .filter(definition=>definition.resource===resource)
-        .sort((a,b)=>a.recoveryPercent-b.recoveryPercent)
+        .sort((a,b)=>getPotionRecoveryPriority(a)-getPotionRecoveryPriority(b))
         .map(definition=>definition.id);
 
     return ids.find(id=>getPotionCount(id)>0)||null;
@@ -1852,9 +1890,7 @@ function renderBattleItemMenu(){
         list.innerHTML=available.map(definition=>{
             const count=getPotionCount(definition.id);
             const resourceLabel=definition.resource==="hp" ? "HP" : "SP";
-            const effectLabel=definition.recoveryPercent>=100
-                ? `${resourceLabel} 全回復`
-                : `${resourceLabel} +${definition.recoveryPercent}%`;
+            const effectLabel=getPotionEffectDescription(definition.id);
             const iconMarkup=battleItemIconMarkup(definition);
 
             return `
@@ -3918,11 +3954,12 @@ const inventoryItems = [
 
     {
         id:"hpPotion10",
-        name:"回復10%HP藥水",
+        name:"回春散",
         icon:"",
         type:"potion",
         resource:"hp",
-        recoveryPercent:10,
+        recoveryMode:"flat",
+        recoveryValue:66,
         count:3,
         price:20,
         stats:{}
@@ -3930,11 +3967,12 @@ const inventoryItems = [
 
     {
         id:"spPotion10",
-        name:"回復10%SP藥水",
+        name:"凝氣散",
         icon:"",
         type:"potion",
         resource:"sp",
-        recoveryPercent:10,
+        recoveryMode:"flat",
+        recoveryValue:66,
         count:2,
         price:25,
         stats:{}
@@ -8069,8 +8107,8 @@ function inventoryContextSnapshot(context){
 function openInventoryContext(context){
     if(typeof battleActive!=="undefined"&&battleActive){ return false; }
     const normalized=inventoryContextSnapshot(context);
-    showPage("inventory");
     inventoryOpenContext=normalized;
+    showPage("inventory");
     const app=document.getElementById("app");
     if(app){ app.classList.add("inventory-context-open"); app.classList.remove("inventory-overlay-open"); }
     setMapInventoryScrollGate(true);
@@ -8109,6 +8147,12 @@ function closeMapInventoryOverlay(){
         closeInventoryCharacterDetail();
     }
 
+    const sourcePage=context.sourcePage.replace(/Page$/,"");
+    if(context.closeBehavior==="restore-source"&&document.getElementById(sourcePage+"Page")){
+        showPage(sourcePage,{restoreSource:true});
+        return;
+    }
+
     if(context.sourcePage==="map"&&typeof leaveMap==="function"){
         leaveMap();
     }else if(["dungeon","gameplay","gameplayPage","boss","bossPage","tower","towerPage","training","trainingPage"].includes(context.sourcePage)){
@@ -8125,7 +8169,7 @@ function closeMapInventoryOverlay(){
    頁面
 ===================================================== */
 
-function showPage(page){
+function showPage(page,options={}){
 
     if(page==="inventory"&&!inventoryOpenContext){
         inventoryOpenContext=inventoryContextSnapshot({sourcePage:"inventory",closeBehavior:"navigation"});
@@ -8534,7 +8578,7 @@ function showPage(page){
        先點一次分頁按鈕才看得到東西。
     */
 
-    if(page==="dungeon"){
+    if(page==="dungeon"&&!options.restoreSource){
 
         switchDungeonTab(
             "daily"
@@ -8543,7 +8587,7 @@ function showPage(page){
     }
 
 
-    if(page==="boss"){
+    if(page==="boss"&&!options.restoreSource){
 
         switchBossTab(
             "personal"
@@ -18572,10 +18616,7 @@ function applyPostBattleAutoRecovery(){
                 return;
             }
 
-            const planned=definition.recoveryPercent>=100
-                ? maxValue-currentValue
-                : Math.max(1,Math.round(maxValue*definition.recoveryPercent/100));
-            const recovered=Math.max(0,Math.min(maxValue-currentValue,planned));
+            const recovered=resolvePotionRecovery(definition,currentValue,maxValue);
 
             if(resource==="hp"){
                 character.hp=Math.min(maxValue,character.hp+recovered);
@@ -19767,28 +19808,7 @@ function applyPotionEffect(potionId,characterIndex){
         return;
     }
 
-    let plannedRecovery;
-
-    if(definition.recoveryPercent>=100){
-        plannedRecovery=maxValue-currentValue;
-    }else{
-        plannedRecovery=Math.max(
-            1,
-            Math.round(
-                maxValue*
-                definition.recoveryPercent/
-                100
-            )
-        );
-    }
-
-    const recovered=Math.max(
-        0,
-        Math.min(
-            maxValue-currentValue,
-            plannedRecovery
-        )
-    );
+    const recovered=resolvePotionRecovery(definition,currentValue,maxValue);
 
     if(recovered<=0){
         finishPlayerAction();
@@ -25330,6 +25350,7 @@ function openHomeFeature(type){
     modal.classList.add(
         "show"
     );
+    window.FourSymbolsBottomNav?.syncContext();
 
 }
 
@@ -25469,6 +25490,7 @@ function closeHomeFeature(){
         modal.classList.remove(
             "show"
         );
+        window.FourSymbolsBottomNav?.syncContext();
 
 
         /*
@@ -25880,9 +25902,7 @@ function renderShopContent(){
     const cards=shopItems.map(shopItem=>{
         const count=getPotionCount(shopItem.id);
         const resourceLabel=shopItem.resource==="hp" ? "HP" : "SP";
-        const effectText=shopItem.recoveryPercent>=100
-            ? `回復所有${resourceLabel}`
-            : `回復最大${resourceLabel}的 ${shopItem.recoveryPercent}%`;
+        const effectText=getPotionEffectDescription(shopItem.id);
 
         const hasPrice=Number.isFinite(shopItem.price);
         const disabled=!hasPrice || gold<shopItem.price;

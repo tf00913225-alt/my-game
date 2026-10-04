@@ -945,7 +945,7 @@
             const cards=getShoppablePotions().map(shopItem=>{
                 const count=typeof getPotionCount==="function"?getPotionCount(shopItem.id):0;
                 const resourceLabel=shopItem.resource==="hp"?"HP":"SP";
-                const effectText=`回復最大${resourceLabel}的 ${shopItem.recoveryPercent}%`;
+                const effectText=getPotionEffectDescription(shopItem.id);
                 const displayPrice=getShopItemPrice(shopItem);
                 const hasPrice=Number.isFinite(displayPrice);
                 const disabled=!hasPrice||gold<displayPrice;

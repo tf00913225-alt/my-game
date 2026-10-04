@@ -585,6 +585,35 @@
         "verification": "Local proof37/37 and preparation/encounter/kernel/proof117/117 PASS, skip0; 128 existing parity cases unchanged. Exact generated policy/code/catalog comparisons PASS. Real Firestore emulator assertions are added to the existing Session Authority owner; remote latest-head CI/emulator, integration, Firebase/DEV deployment and safe cleanup remain mandatory and are tracked by this Work PR.",
         "result": "One UID-private arithmetic observation per preparation; atomic proof/pinned-policy/receipt/marker. Same-intent replay preserves original rules/random/output after expiry or current revision/deployment policy changes. No callable, browser hook, legal action order, terminal verdict, account/economy/HP/reward/ledger mutation or readiness publication. Phase4 remains0/6 VERIFIED."
       }
+    },
+    {
+      "id": "REQ-FOREGROUND-NAV-20261004",
+      "title": "全域前景功能介面隱藏底部導覽並恢復底層情境",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/04-stage-v11-native-bottom-nav-runtime.js",
+          "js/00-main.js",
+          ".github/scripts/run-foreground-potion-browser-qa.mjs"
+        ],
+        "verification": "Focused rules and production Chrome lifecycle / actual-resource QA",
+        "result": "Focused rules PASS; remote Chrome and integration pending"
+      }
+    },
+    {
+      "id": "REQ-STARTER-POTION-20261004",
+      "title": "回春散與凝氣散固定66回復並收斂所有使用入口",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/00-main.js",
+          "js/40-v144-rules-and-abyss.js",
+          "tests/starter-potion-recovery.test.js",
+          ".github/scripts/run-foreground-potion-browser-qa.mjs"
+        ],
+        "verification": "Focused rules and production Chrome lifecycle / actual-resource QA",
+        "result": "Focused rules PASS; remote Chrome and integration pending"
+      }
     }
   ]
 }

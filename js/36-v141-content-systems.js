@@ -752,7 +752,7 @@
             const modal=document.getElementById("homeFeatureModal");
             const title=document.getElementById("homeFeatureModalTitle");
             if(title){ title.textContent=type==="forge"?"鍛造":"合成"; }
-            if(modal){ modal.dataset.craftingFeature=type; modal.classList.add("show","v141-synthesis-modal"); }
+            if(modal){ modal.dataset.craftingFeature=type; modal.classList.add("show","v141-synthesis-modal"); window.FourSymbolsBottomNav?.syncContext(); }
             ensureEquipmentUids();
             // Route the very first open through the current public renderer.
             // Calling the closure directly bypasses later presentation owners
@@ -1201,7 +1201,8 @@
         showPage=function(page){
             /* Entering battle is part of the same map visit. Every other page
                exit must pause the run at its progress gate. */
-            if(page!=="dungeon"&&page!=="battle"){ abyssMapEntered=false; }
+            if(page!=="dungeon"&&page!=="battle"&&!(page==="inventory"&&
+               typeof inventoryOpenContext!=="undefined"&&inventoryOpenContext?.closeBehavior==="restore-source")){ abyssMapEntered=false; }
             return originalShowPage.apply(this,arguments);
         };
     }

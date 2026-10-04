@@ -471,10 +471,7 @@
                         if(config.returnToCityWhenEmpty){ shouldReturnToCity=true; }
                         return;
                     }
-                    const planned=definition.recoveryPercent>=100
-                        ?maxValue-currentValue
-                        :Math.max(1,Math.round(maxValue*definition.recoveryPercent/100));
-                    const recovered=Math.max(0,Math.min(maxValue-currentValue,planned));
+                    const recovered=resolvePotionRecovery(definition,currentValue,maxValue);
                     character[resource]=Math.min(maxValue,currentValue+recovered);
                     consumed++;
                     progressed=true;

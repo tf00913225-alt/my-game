@@ -88,7 +88,7 @@
                 const candidate=potionDefinitions
                     .filter(definition=>definition&&definition.resource===resource&&definition.manualOnly!==true)
                     .slice()
-                    .sort((a,b)=>(Number(a.recoveryPercent)||0)-(Number(b.recoveryPercent)||0))
+                    .sort((a,b)=>getPotionRecoveryPriority(a)-getPotionRecoveryPriority(b))
                     .find(definition=>Math.max(0,Number(getPotionCount(definition.id))||0)>0);
                 if(candidate){ return candidate.id; }
                 return null;

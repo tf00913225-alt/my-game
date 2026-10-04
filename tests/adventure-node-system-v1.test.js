@@ -2,6 +2,9 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
+const potionCoreSource=fs.readFileSync("js/00-main.js","utf8");
+const potionRuleSource=potionCoreSource.slice(potionCoreSource.indexOf("function getPotionRecoveryContract("),potionCoreSource.indexOf("function createPotionInventoryItem("));
+
 const path=require("node:path");
 
 const ROOT=path.resolve(__dirname,"..");
@@ -197,6 +200,7 @@ function baseRuntime(){
         }
     };
     context.window=context;context.globalThis=context;
+    vm.createContext(context);vm.runInContext(potionRuleSource,context);
     runScript(context,"js/adventure/adventure-items-v1-20260915.js");
     const nine=context.potionDefinitions.find(d=>d.id==="nineTurnRestorationPill");
     const qi=context.potionDefinitions.find(d=>d.id==="taichingQiPill");

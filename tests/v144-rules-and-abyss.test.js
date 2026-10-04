@@ -4,6 +4,9 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
+const potionCoreSource=fs.readFileSync("js/00-main.js","utf8");
+const potionRuleSource=potionCoreSource.slice(potionCoreSource.indexOf("function getPotionDefinition("),potionCoreSource.indexOf("function createPotionInventoryItem("));
+
 
 const index=fs.readFileSync("index.html","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
@@ -61,6 +64,7 @@ function baseContext(overrides={}){
 
 function run(context){
     vm.createContext(context);
+    vm.runInContext(potionRuleSource,context);
     vm.runInContext(source,context);
     return context;
 }
@@ -76,7 +80,7 @@ test("V144 assets remain ordered before later patches under the current cache ve
     assert.deepEqual(order.slice().sort((a,b)=>a-b),order);
 });
 
-test("shop sells only HP/SP 10, 20 and 30 percent potions at balanced base prices",()=>{
+test("shop sells flat starter and 20/30 percent potions at balanced base prices",()=>{
     const context=run(baseContext());
     const snapshot=context.v144RuleDiagnostics();
     assert.deepEqual(JSON.parse(JSON.stringify(snapshot.shopPotionIds)),[
@@ -315,6 +319,7 @@ test("the existing V143 render hook invokes V144 dungeon locking once per battle
     });
     vm.createContext(context);
     vm.runInContext(v143Source,context);
+    vm.runInContext(potionRuleSource,context);
     vm.runInContext(source,context);
     assert.equal(context.renderBattle(),"rendered");
     context.v143AfterBattleRender();

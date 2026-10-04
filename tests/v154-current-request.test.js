@@ -4,6 +4,9 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
+const potionCoreSource=fs.readFileSync("js/00-main.js","utf8");
+const potionRuleSource=potionCoreSource.slice(potionCoreSource.indexOf("function getPotionRecoveryContract("),potionCoreSource.indexOf("function createPotionInventoryItem("));
+
 const {execFileSync}=require("node:child_process");
 
 const source=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
@@ -99,6 +102,7 @@ function loadRuntime(overrides={}){
     context.window=context;
     vm.createContext(context);
     vm.runInContext(fs.readFileSync("js/54-v173.51-battle-qa.js","utf8"),context);
+    vm.runInContext(potionRuleSource,context);
     vm.runInContext(source,context);
     return {context,button,battlePage,body,cards};
 }

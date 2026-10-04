@@ -1,3 +1,11 @@
+## 2026-10-04 — FOREGROUND-NAV-STARTER-POTION-20261004（施工中）
+
+- 開工 dev `f47862cc592870e359d31da5da52a5d530c831a8`；分支 `fix/foreground-nav-starter-potion-20261004`；Target dev；main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` 禁止修改；本工作 PR 為最新狀態 Owner。
+- Convergence / Replacement。Bottom Nav Owner 仍為 `js/04-stage-v11-native-bottom-nav-runtime.js::FourSymbolsBottomNav`；foregroundSuppressionReason 只讀 homeFeatureModal.show、背包語意與 itemModal presentation。正式 show / close lifecycle 同步通知，renderMain/renderContext 也尊重 suppression。無新 timer/observer/rAF/CSS/z-index/DOM/Owner。
+- 盤點發現背包關閉舊路徑將 dungeon 跳玩法總覽、map 離開巡怪，違反本批 restore-source 產品規格。context 在進入前保存；close restore-source 回真正 source，showPage restoreSource 避免重置 dungeon/Boss Tab；Abyss compatibility lifecycle 不因 context inventory 暫離而清除 map visit。原 navigation/leave 行為只作非 restore-source 相容用途。
+- Potion Data Owner 維持 V144 ensurePotion；app-shell starter 定義亦為 flat66。Canonical rule `js/00-main.js::resolvePotionRecovery`，戰鬥/背包單次/批次/戰後/元素匣全部委派。flat/percent/full 明確區分，legacy recoveryPercent 只允許舊百分比/full 定義讀相容，flat metadata 實體移除。ID/數量不變；20/30 與100稀有保持。Auto selection 原 Adventure manualOnly guard 保留，其排序讀 canonical priority；不承擔 recovery 公式。內容/樣式/保存用途原 Wrapper 保留，未新增 Wrapper。
+- 本機固定66、差額封頂、20/30/full與hydration精準測試PASS。Chrome被本機socket EPERM阻擋；以既有CI中的正式Chrome測矩陣、cold/reload、實际HP/SP/庫存，尚未VERIFIED；不冒稱已修好。Game/Cache173.73。Next：remote checkpoint/PR→Chrome→最新Head CI→dev整合/部署SHA/liveQA→安全清理。
+
 ## 2026-10-04 — MONSTER-BALANCE-OWNER-P2C-TOWER-20261004（功能1/1 VERIFIED；整合／部署待Gate）
 
 - 開工 dev `13c22561afc518ce33b7da798b32e1c215e3cbde`；main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` 禁止修改。Branch `feature/monster-balance-owner-phase2c-tower-20261004`。Phase1／2A／2B 已核實，未重做；停止點為 Tower，不進 Abyss Phase2D。

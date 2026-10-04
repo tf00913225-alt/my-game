@@ -305,7 +305,10 @@ jobs:
       - name: Run canonical bottom navigation and fixed home browser QA
         id: bottom_nav_home_browser
         if: success() && github.event_name == 'pull_request'
-        run: node tests/bottom-nav-home-scroll-browser.test.js
+        run: |
+          node tests/bottom-nav-home-scroll-browser.test.js
+          node tests/starter-potion-recovery.test.js
+          node .github/scripts/run-foreground-potion-browser-qa.mjs
 
       - name: Upload bottom navigation and home geometry evidence
         if: always() && steps.bottom_nav_home_browser.outcome != 'skipped'
@@ -314,6 +317,7 @@ jobs:
           name: bottom-nav-home-geometry-${{ github.sha }}
           path: |
             artifacts/browser-qa/bottom-nav-home-scroll-qa.json
+            artifacts/browser-qa/foreground-*
             artifacts/browser-qa/navigation-*.png
           if-no-files-found: error
           retention-days: 90

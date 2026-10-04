@@ -5709,7 +5709,7 @@
             const cards=getShoppablePotions().map(shopItem=>{
                 const count=typeof getPotionCount==="function"?getPotionCount(shopItem.id):0;
                 const resourceLabel=shopItem.resource==="hp"?"HP":"SP";
-                const effectText=`回復最大${resourceLabel}的 ${shopItem.recoveryPercent}%`;
+                const effectText=getPotionEffectDescription(shopItem.id);
                 const displayPrice=getShopItemPrice(shopItem);
                 const hasPrice=Number.isFinite(displayPrice);
                 const disabled=!hasPrice||gold<displayPrice;
@@ -8609,10 +8609,7 @@
             alert(definition.name+"數量不足。");
             return false;
         }
-        const planned=definition.recoveryPercent>=100
-            ?maxValue-currentValue
-            :Math.max(1,Math.round(maxValue*Number(definition.recoveryPercent||0)/100));
-        const recovered=Math.max(0,Math.min(maxValue-currentValue,planned));
+        const recovered=resolvePotionRecovery(definition,currentValue,maxValue);
         character[resource]=Math.min(maxValue,currentValue+recovered);
         if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
         if(typeof renderInventoryItems==="function"){ renderInventoryItems(); }
@@ -10366,7 +10363,7 @@
             const modal=document.getElementById("homeFeatureModal");
             const title=document.getElementById("homeFeatureModalTitle");
             if(title){ title.textContent=type==="forge"?"鍛造":"合成"; }
-            if(modal){ modal.dataset.craftingFeature=type; modal.classList.add("show","v141-synthesis-modal"); }
+            if(modal){ modal.dataset.craftingFeature=type; modal.classList.add("show","v141-synthesis-modal"); window.FourSymbolsBottomNav?.syncContext(); }
             ensureEquipmentUids();
             // Route the very first open through the current public renderer.
             // Calling the closure directly bypasses later presentation owners
@@ -10815,7 +10812,8 @@
         showPage=function(page){
             /* Entering battle is part of the same map visit. Every other page
                exit must pause the run at its progress gate. */
-            if(page!=="dungeon"&&page!=="battle"){ abyssMapEntered=false; }
+            if(page!=="dungeon"&&page!=="battle"&&!(page==="inventory"&&
+               typeof inventoryOpenContext!=="undefined"&&inventoryOpenContext?.closeBehavior==="restore-source")){ abyssMapEntered=false; }
             return originalShowPage.apply(this,arguments);
         };
     }
