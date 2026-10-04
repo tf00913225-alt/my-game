@@ -705,6 +705,23 @@
         "verification": "22 direct behavior cases PASS; historical25m32s delay and40m CI cap+queue replay; wrong SHA/owner/event/branch, latest rerun, failures/cancel/timeout/missing, stale-dev and elapsed-budget refusal. YAML semantic equivalence, build/build:check, related20/20, architecture/release/deprecated and diff checks PASS.",
         "result": "Functional contract VERIFIED; latest-head PR CI, merged dev first-attempt Session logs/exact-SHA deployment and safe branch cleanup remain independent mandatory closeout gates in this Work PR. NORMAL DEVELOPMENT; Runtime/Gameplay/Game+Cache173.73/main unchanged."
       }
+    },
+    {
+      "id": "REQ-P2-PACKAGE-VERSION-OWNERSHIP-20261004",
+      "title": "根 npm metadata 由 release source 單向投影與 Functions 獨立版本／lock 驗證",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "package.json",
+          ".github/scripts/release-gate.mjs",
+          ".github/workflows/ci.yml",
+          "tests/package-version-ownership.test.mjs",
+          "docs/RELEASE_VERIFICATION_RULES.md",
+          "docs/P2_PACKAGE_VERSION_OWNERSHIP_20261004.md"
+        ],
+        "verification": "12/12 executable Gate regressions PASS, including stale root metadata, package-only advance, release advance, malformed JSON, optional npm-generated root lock, both lock metadata locations, independent Functions advance and missing Functions lock. Isolated offline npm install/ci preserve package metadata; build/build:check and release-ready/deprecated gates PASS; generated Runtime has zero tracked diff. Latest-head CI/integration/deployment/cleanup tracked separately by Work PR.",
+        "result": "Historical mirror omission fixed via npm version 173.73.0 --no-git-tag-version --ignore-scripts. Game/Cache173.73 remain release/release.json-owned; root package is verified metadata projection, Functions1.0.0 independent. No root lock introduced; Functions package/lock unchanged. NORMAL DEVELOPMENT; no gameplay/runtime/main change."
+      }
     }
   ]
 }

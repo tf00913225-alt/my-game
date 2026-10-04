@@ -28,6 +28,14 @@
 
 任何 Game/Cache Version 不一致都必須阻止發布。
 
+### 4A. npm metadata 與版本語意
+
+- 根 `package.json.version` 是私有遊戲工具專案的發布 metadata 投影，不是 Runtime／Game／Cache Owner，也不是獨立對外發布的 npm 版本。歷史 Game `N.N` 對應 npm semver `N.N.0`；三段 `N.N.N` 原樣投影。唯一決策來源仍是 `release/release.json.version`，既有 Release Gate 驗證投影，不從 package 反向修改 Game／Cache。
+- 發布者依 release source 計算投影後，使用 `npm version <投影值> --no-git-tag-version --ignore-scripts` 維護 metadata；不單獨升根 package 版本。本批只修 metadata，Game／Cache 保持 173.73。
+- 根工具專案目前無 dependencies、無追蹤的 `package-lock.json`，不為數字同步新增 lock。若未來 npm 正式建立 root lock，Gate 必須同時驗證 lock 頂層及 `packages[""]` 的 name／version；用 npm 更新，不手改 lock，不容許 metadata 漂移。
+- `functions/package.json.version` 是獨立 Functions 私有 npm package metadata，現為 `1.0.0`；不映射 Game／Cache。Functions lock 必須存在且 metadata 與自身 package 一致。Firebase 部署仍由既有 workflow 綁定 exact Git SHA，不能用 Functions package version 推定部署或遊戲版本。
+- build／asset manifest 讀 release source；Production manifest 的版本由 `.github/scripts/release-gate.mjs::writeDeployManifest` 投影，SHA 由既有部署 workflow 綁定。玩家公告、HUD／loader、cache validation 均依各既有 Owner 引用／驗證 release source；不得新增版本檔、workflow env 人工版本、timer 或第二 Owner。
+
 ## 5. Commit SHA 與 Deploy SHA
 
 每次 dev／main 發布必須記錄實際 commit SHA。完成回報至少包含 Branch、Commit SHA、Game Version、Cache Version、Repository checks、Deploy 狀態與 Deployment SHA verified。

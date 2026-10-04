@@ -543,7 +543,9 @@ jobs:
       - name: Enforce release, cache, checklist and deprecated-code gates
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: node .github/scripts/release-gate.mjs ci
+        run: |
+          node tests/package-version-ownership.test.mjs
+          node .github/scripts/release-gate.mjs ci
 
       - name: Verify immutable deployment artifact
         env:

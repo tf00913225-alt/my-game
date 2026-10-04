@@ -30,6 +30,7 @@ function getConfig(){
   const cacheVersion=normalizeVersion(release.cacheVersion);
   if(!/^\d+(?:\.\d+)+$/.test(version)) fail(`Invalid release version: ${release.version}`);
   if(version!==cacheVersion) fail(`Game Version V${version} != Cache Version ${cacheVersion}.`);
+  checkPackageMetadata(version);
   if(requirements.releaseVersion && normalizeVersion(requirements.releaseVersion)!==version){
     fail(`requirements releaseVersion ${requirements.releaseVersion} != V${version}.`);
   }
@@ -37,6 +38,39 @@ function getConfig(){
     fail('release/updateNoticeFile must point to the player release notice source.');
   }
   return {release,requirements,deprecated,version,cacheVersion};
+}
+function checkPackageMetadata(version){
+  // Root package metadata mirrors the release source; it never controls Runtime.
+  // Historical Game N.N maps to npm N.N.0; three-part releases retain N.N.N.
+  const expected=version.split('.').length===2?`${version}.0`:version;
+  if(!/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(expected)){
+    fail(`Release version ${version} cannot project to root package semver.`);
+  }
+  const project=readJson(path.join(ROOT,'package.json'));
+  if(project.version!==expected){
+    fail(`Root package metadata ${project.version} != release-derived ${expected}; release/release.json is the Game/Cache owner.`);
+  }
+  // A root lock is currently absent (the tooling package has no dependencies).
+  // If npm creates one later, validate both npm-owned metadata locations.
+  for(const [directory,pkg] of [['',project],['functions',readJson(path.join(ROOT,'functions','package.json'))]]){
+    const relative=path.join(directory,'package-lock.json');
+    const file=path.join(ROOT,relative);
+    if(!fs.existsSync(file)){
+      if(directory) fail(`Missing required file: ${relative}`);
+      continue;
+    }
+    const lock=readJson(file);
+    if(lock.name!==pkg.name||lock.version!==pkg.version){
+      fail(`${relative} top-level metadata differs from its package.json.`);
+    }
+    if(lock.lockfileVersion>=2){
+      const entry=lock.packages?.[''];
+      if(entry?.name!==pkg.name||entry?.version!==pkg.version){
+        fail(`${relative} packages[""] metadata differs from its package.json.`);
+      }
+    }
+  }
+  // Functions is an independent private npm package, not a Game version mirror.
 }
 function checkReleaseUpdateNotice(root,config){
   const relative=config.release.updateNoticeFile;
