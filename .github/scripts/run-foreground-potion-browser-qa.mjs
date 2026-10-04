@@ -22,19 +22,20 @@ async function run(width,height){
  await c.eval(`(async()=>{for(let i=0;i<600;i++){if(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden)return;await new Promise(r=>setTimeout(r,50));}throw Error('Startup not ready');})()`);
  await c.eval("closeHomeFeature();showPage('home');openHomeFeature('character')");
  const cold=await c.eval(measure);assert.equal(cold.visible,false);assert.equal(cold.hitboxes,0);await c.eval('closeHomeFeature()');assert.equal((await c.eval(measure)).visible,true);
+ await c.eval(`(async()=>{document.querySelector('#homePage .team-relic-home-entry').click();for(let i=0;i<600;i++){if(document.getElementById('homeFeatureModal').classList.contains('team-relic-modal'))return;await new Promise(r=>setTimeout(r,50));}throw Error('Cold relic failed to open');})()`);const coldRelic=await c.eval(measure);assert.equal(coldRelic.visible,false);assert.equal(coldRelic.hitboxes,0);await c.eval('closeHomeFeature()');assert.equal((await c.eval(measure)).visible,true);
  await c.eval(`(async()=>{for(const f of ['gameplay-core','patrol','boss-tower','abyss'])await FourSymbolsFeatures.ensure(f,'foreground-potion-qa');closeHomeFeature();showPage('home');})()`);
  for(let pass=0;pass<2;pass++)for(const [base,action] of bases){
   await c.eval(action);const before=await c.eval(measure);assert.equal(before.visible,true,base+' base visible');
-  const features=base==='home'?['character','inventory','relic','autoBattleSettings','shop','forge','rest','quest','achievement','notice','expPool','system','formation']:['character','inventory','relic','autoBattleSettings'];
+  const features=base==='home'?['character','inventory','relic','autoBattleSettings','shop','forge','synthesis','rest','quest','achievement','announcement','offlineExp','expPool','system','formation']:['character','inventory','relic','autoBattleSettings'];
   for(const feature of features){
-   const open=feature==='inventory'?"openInventoryContext({sourcePage:document.querySelector('#game-content .page.active').id.replace(/Page$/,''),closeBehavior:'restore-source'})":feature==='relic'?"v148OpenContextRelic()":`openHomeFeature('${feature}')`;
+   const open=feature==='inventory'?(base==='home'?"showPage('inventory')":"v148OpenContextInventory()"):feature==='relic'?"v148OpenContextRelic()":`openHomeFeature('${feature}')`;
    await c.eval(open);const immediate=await c.eval(measure);assert.equal(immediate.visible,false,base+'/'+feature+' immediate');assert.equal(immediate.hitboxes,0,'hidden hitbox');
    await c.eval('new Promise(r=>setTimeout(r,180))');const opened=await c.eval(measure);assert.equal(opened.visible,false,base+'/'+feature+' final');
    for(const key of ['shellCount','navCount'])assert.equal(opened[key],1);assert.equal(opened.legacy,0);
    if(pass===0&&['home','daily','abyss'].includes(base)&&['character','relic','autoBattleSettings','shop'].includes(feature)){
     const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(`${out}/foreground-${width}-${base}-${feature}.png`,Buffer.from(shot.data,'base64'));
    }
-   await c.eval(feature==='inventory'?'closeMapInventoryOverlay()':'closeHomeFeature()');const closed=await c.eval(measure);
+   await c.eval(feature==='inventory'?'closeMapInventoryOverlay()':'closeHomeFeature()');const closeImmediate=await c.eval(measure);assert.equal(closeImmediate.visible,true);await c.eval('new Promise(r=>setTimeout(r,180))');const closed=await c.eval(measure);
    assert.equal(closed.visible,true,base+'/'+feature+' restore');assert.equal(closed.context,before.context);assert.equal(closed.signature,before.signature);assert.deepEqual(closed.buttons,before.buttons);assert.equal(closed.active,before.active);
    rows.push({width,height,pass,base,feature,immediate,opened,closed});
   }
@@ -75,7 +76,7 @@ async function run(width,height){
  for(const row of potions.rows){assert.equal(row.actual,row.expected,JSON.stringify(row));assert.equal(row.stock,row.expectedStock??0,JSON.stringify(row));}
  assert.equal(potions.legacy.hp,321);assert.equal(potions.legacy.sp,456);assert.ok(potions.legacy.items.every(x=>x.mode==='flat'&&x.value===66&&x.percent===undefined));assert.equal(potions.shopFlat,true);assert.equal(potions.oldShopNote,false);
  await c.eval("showPage('home');openHomeFeature('character')");await c.send('Page.reload',{ignoreCache:true});await c.eval(`(async()=>{for(let i=0;i<600;i++){if(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden)break;await new Promise(r=>setTimeout(r,50));}closeHomeFeature();showPage('home');})()`);assert.equal((await c.eval(measure)).visible,true);
- results.push({width,height,cold,potions,reload:true});
+ results.push({width,height,cold,coldRelic,potions,reload:true});
  }finally{c?.close();proc.kill('SIGKILL');fs.rmSync(profile,{recursive:true,force:true});}
 }
 try{for(const [w,h] of [[390,844],[412,915]])await run(w,h);const result={passed:true,expected,environment:baseUrl?'deployed-dev':'local-production',rows,results};fs.writeFileSync(`${out}/foreground-potion-qa.json`,JSON.stringify(result,null,2)+'\n');console.log('Foreground/Potion QA PASS',rows.length,'panel transitions',results.map(x=>x.potions.rows.length));}
