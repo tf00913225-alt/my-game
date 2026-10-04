@@ -89,8 +89,9 @@ is added. No temporary patch or later overwrite point remains.
   and retained every existing Gate assertion. No production change was needed.
 - Root npm ci is not applicable without a lock. Both npm install and ci are
   executed in isolated fixtures with an npm-generated lock; the real repository
-  keeps its existing lock absence. Functions dependency installation continues in
-  existing Session Authority CI; no dependency/lock content changes in this batch.
+  keeps its existing lock absence. Functions dependency installation is owned by
+  existing path-filtered Session Authority CI, which is not triggered by this
+  batch. Functions lock metadata is verified here; dependencies/lock are unchanged.
 - `npm run build`, `npm run build:check`, Release Gate `ci` and `release-ready`
   (including Deprecated Gate): PASS; Game/Cache 173.73/173.73. Generated build,
   manifests, index, JS/CSS and Functions source have zero tracked diff.
@@ -101,8 +102,10 @@ is added. No temporary patch or later overwrite point remains.
 ## Deployment and parallel work
 
 No gameplay or Firebase code redeployment is intrinsically required by metadata;
-however the existing push-to-dev CI calls Cloudflare deployment and Session
-Authority. Do not change or bypass those policies. Their actual runs and exact
+however the existing push-to-dev CI always calls Cloudflare deployment. Session
+Authority is filtered to Functions/Firebase/Cloud/session paths; none is changed
+by this batch, so no Session run or Firebase redeployment is required or claimed.
+Do not change or bypass those policies. The actual Cloudflare run and exact
 manifest SHA readback must be reported from the Work PR. No main release.
 The static artifact contains tracked package/checklist/docs metadata, so its
 automatically deployed exact SHA must not be substituted with the old baseline.
