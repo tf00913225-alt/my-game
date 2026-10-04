@@ -20,11 +20,12 @@ async function runBossBalanceProductionQa(){
       const stats=m=>[m.maxHP,m.maxSP,m.attack,m.magicAttack,m.defense,m.agility];
       const verify=m=>{const p=MonsterBalance.debug(m);check(m.balanceOwner==='MonsterBalance'&&['personalBoss','worldBoss'].includes(m.mode),'owner');check(JSON.stringify(stats(m))===JSON.stringify(Object.values(p.final)),'projection');check(!m.v132Dungeon&&!m.v141ExtraHP,'legacy marker');check(p.base.abilityPointBudget===(m.level-1)*5,'budget');check(getEnemyPressureMultiplier(m,player)===p.finalDamagePressure,'pressure');};
       const plans=[{type:'personal',id:'personal-20'},{type:'personal',id:'personal-30'},{type:'personal',id:'personal-70'},...[1,2,3,4].map(stage=>({type:'world',id:'world-40',stage})),{type:'world',id:'world-40',stage:4,repeat:true},{type:'personal',id:'personal-20',repeat:true}];
-      const oldRandom=Math.random,badge=showMonsterSkillNameBadge,status=rollStatusEffectHit;
+      const oldRandom=Math.random,badge=showMonsterSkillNameBadge,status=rollStatusEffectHit,awardGold=awardMonsterGoldDrop;let killGold=0;
+      awardMonsterGoldDrop=function(...args){const before=gold,result=awardGold(...args);killGold+=gold-before;return result;};
       showMonsterSkillNameBadge=function(name,...args){evidence.skills.push({name,round:turn});return badge(name,...args);};
       rollStatusEffectHit=function(...args){const hit=status(...args);if(args[5]){const chance=calculateStatusEffectChance(...args);check(chance<=60,'hard control cap');evidence.controls.push({chance,hit,rank:args[6]});}return hit;};
       try{
-       for(const [caseIndex,plan] of plans.entries()){
+       for(const [caseIndex,plan] of plans.entries()){killGold=0;evidence.current={...plan};
         const definition=(plan.type==='world'?GameplaySystem.worldBosses:GameplaySystem.personalBosses).find(d=>d.id===plan.id);
         const ref=prepareWildBalanceReferenceParty(definition.level,definition.level<60?2:3);v131GrantElementBoxHours(8,32);
         let seed=definition.level*100+(plan.stage||1);Math.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
@@ -55,15 +56,16 @@ async function runBossBalanceProductionQa(){
         check(progress.firstClear===true||(plan.type==='world'&&plan.stage<4),'clear progression');
         if(plan.type==='world')check(progress.completedStages===(plan.stage||4),'stage transition');
         const final=plan.type==='personal'||plan.stage===4,expectedGold=final?(plan.repeat?definition.repeatGold:definition.firstGold):0;
-        check(gold-beforeGold===expectedGold,'unchanged gold reward');
+        Object.assign(evidence.current,{beforeGold,afterGold:gold,killGold,expectedConfiguredGold:expectedGold,progress});
+        check(gold-beforeGold===expectedGold+killGold,'unchanged configured and ordinary kill gold reward');
         const expectedOre=final&&definition.ore?(plan.repeat?(plan.type==='personal'?1:0):(definition.firstOre||1)):0;check(oreCount(definition.ore)-beforeOre===expectedOre,'unchanged ore reward');
         const beforeProgress=beforeState[plan.type][plan.id];check(progress.clears===beforeProgress.clears+(final?1:0),'clear count');
         if(definition.relic){const owned=v174RelicSystem.getOwnedState()[definition.relic];if(final)check(owned.unlocked,'first/repeat relic reward');else check(JSON.stringify(owned)===beforeRelic,'no premature relic reward');}check(!FourSymbolsBossBattle.isActive(),'release Boss context');
         if(document.getElementById('battleStatisticsResultModal')?.hidden===false)FourSymbolsBattleStatistics.hideResultDetails(true);
-        evidence.scenes.push({...plan,rounds,survivors,shields,objects,reinforcements,initial,finalHP:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),gold:gold-beforeGold,progress});
+        evidence.scenes.push({...plan,rounds,survivors,shields,objects,reinforcements,initial,finalHP:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),gold:gold-beforeGold,configuredGold:expectedGold,killGold,ore:oreCount(definition.ore)-beforeOre,expectedOre,progress});
        }
        return evidence;
-      }finally{Math.random=oldRandom;showMonsterSkillNameBadge=badge;rollStatusEffectHit=status;}
+      }finally{Math.random=oldRandom;showMonsterSkillNameBadge=badge;rollStatusEffectHit=status;awardMonsterGoldDrop=awardGold;}
     })()`;
     const server=await startServer({baseUrl}),results=[];
     const file=path.resolve('artifacts/browser-qa/boss-balance-production.json');fs.mkdirSync(path.dirname(file),{recursive:true});
