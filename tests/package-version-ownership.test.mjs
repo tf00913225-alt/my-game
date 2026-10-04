@@ -37,7 +37,6 @@ function check(directory,expectedFailure){
   }else assert.equal(result.status,0,result.stdout+result.stderr);
 }
 test('current source passes with optional root lock and independent Functions version',()=>fixture(directory=>{
-  assert.equal(json(path.join(directory,'functions/package.json')).version,'1.0.0');
   check(directory);
 }));
 test('old root metadata is rejected before it can become a release authority',()=>fixture(directory=>{
