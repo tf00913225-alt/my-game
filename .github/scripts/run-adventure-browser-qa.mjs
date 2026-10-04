@@ -317,7 +317,7 @@ async function runProductionAdventureBalanceQa(){
               await wait(()=>!battleActive||turn>beforeTurn,120000);
             }
           }finally{off();}
-          autoBattle=false;autoConfig.enabled=false;await wait(()=>document.getElementById('battleStatisticsResultModal')?.hidden===false);document.querySelector('#battleStatisticsResultModal [data-close]').click();
+          autoBattle=false;autoConfig.enabled=false;check(document.getElementById('battleStatisticsResultModal')?.hidden!==false,'Adventure has no challenge result modal');
           await wait(()=>!window.v132ActiveDungeonRun&&api.getView().visible);check(!battleActive,'no background battle');roster.forEach(verify);check(JSON.stringify(roster.map(stats))===JSON.stringify(initial),'no late stat writer');
           const survivors=getExistingPartyIndexes().filter(i=>getPartyCharacterByIndex(i).hp>0).length;check(survivors>0,'natural survivors');
           const actualState=player.adventureProgress.chapters.chapter_v1;check(actualState.completedNodes[node.id],'completed node');
