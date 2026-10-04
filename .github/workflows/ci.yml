@@ -23,7 +23,7 @@ jobs:
     # Keep every gate; 80bbe8d7 hit the prior 20-minute limit after Wild passed.
     # Daily natural battles add 6m33s; run 37133129829 reached the 30m cap
     # after Daily and Tower passed, while the battle QA had printed PASS.
-    timeout-minutes: 45
+    timeout-minutes: 40
 
     steps:
       - name: Check out repository
@@ -267,24 +267,6 @@ jobs:
           path: |
             artifacts/browser-qa/tower-challenge*
             artifacts/browser-qa/wild-balance*
-          if-no-files-found: error
-          retention-days: 90
-
-      - name: Verify Abyss MonsterBalance Phase2D
-        id: abyss_balance
-        env:
-          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: |
-          node tests/monster-balance-owner-phase2d.test.mjs
-          node scripts/abyss-balance-ttk-matrix.mjs artifacts/browser-qa/abyss-balance-ttk.json
-          node .github/scripts/run-abyss-balance-browser-qa.mjs
-
-      - name: Upload Abyss MonsterBalance evidence
-        if: always() && steps.abyss_balance.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
-        with:
-          name: abyss-balance-${{ github.sha }}
-          path: artifacts/browser-qa/abyss-balance*
           if-no-files-found: error
           retention-days: 90
 
@@ -568,9 +550,41 @@ jobs:
           CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: node .github/scripts/ci.mjs git-diff
 
+  abyss_balance:
+    name: Abyss Phase2D production gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Ensure CJK font support
+        run: |
+          if ! fc-list :lang=zh | rg -q .; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
+          fi
+      - name: Verify Abyss focus, TTK and production Chrome
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          mkdir -p artifacts/browser-qa
+          node tests/monster-balance-owner-phase2d.test.mjs
+          node scripts/abyss-balance-ttk-matrix.mjs artifacts/browser-qa/abyss-balance-ttk.json
+          node .github/scripts/run-abyss-balance-browser-qa.mjs
+      - name: Upload Abyss evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: abyss-balance-${{ github.sha }}
+          path: artifacts/browser-qa/abyss-balance*
+          if-no-files-found: error
+          retention-days: 90
+
   deploy_dev:
     name: Dev deployment gate
-    needs: verify
+    needs: [verify, abyss_balance]
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     uses: ./.github/workflows/deploy-dev-cloudflare.yml
     secrets: inherit

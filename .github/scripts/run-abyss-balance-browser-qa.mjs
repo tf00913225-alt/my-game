@@ -13,8 +13,8 @@ const expression=`(async()=>{
  await wait(()=>FourSymbolsReleaseUpdate?.getState?.().availableReleaseVersion);closeHomeFeature();
  const evidence=window.abyssBalanceQaEvidence={matrix:[],scenes:[],skills:[],controls:[],portraitGaps:[]};
  const oldRandom=Math.random;Math.random=()=>.5;autoBattle=false;autoPatrolEnabled=false;
- const stats=m=>[m.maxHP,m.maxSP,m.attack,m.magicAttack,m.defense,m.agility,m.rank,m.element];
- const verify=m=>{const p=MonsterBalance.debug(m);check(m.mode==='abyss'&&m.balanceOwner==='MonsterBalance','Abyss owner');check(!Object.hasOwn(m,'v132Dungeon')&&!Object.hasOwn(m,'v141ExtraHP'),'no legacy stat markers');check(JSON.stringify(stats(m).slice(0,6))===JSON.stringify([p.final.maxHP,p.final.maxSP,p.final.physicalAttack,p.final.magicAttack,p.final.defense,p.final.speed]),'projection equality');check(getEnemyPressureMultiplier(m,player)===p.finalDamagePressure,'pressure once');};
+ const stats=m=>[m.v141Shield?.baseMaxHP??m.maxHP,m.maxSP,m.attack,m.magicAttack,m.defense,m.agility,m.rank,m.element];
+ const verify=m=>{const p=MonsterBalance.debug(m);if(m.v141Shield)check(m.v141Shield.v141MonsterShield&&m.v141Shield.baseMaxHP===p.final.maxHP&&m.maxHP===m.v141Shield.baseMaxHP+m.v141Shield.amount,'formal combat shield only');check(m.mode==='abyss'&&m.balanceOwner==='MonsterBalance','Abyss owner');check(!Object.hasOwn(m,'v132Dungeon')&&!Object.hasOwn(m,'v141ExtraHP'),'no legacy stat markers');check(JSON.stringify(stats(m).slice(0,6))===JSON.stringify([p.final.maxHP,p.final.maxSP,p.final.physicalAttack,p.final.magicAttack,p.final.defense,p.final.speed]),'projection equality');check(getEnemyPressureMultiplier(m,player)===p.finalDamagePressure,'pressure once');};
  for(const level of [20,40])for(let region=0;region<5;region++)for(let stage=0;stage<5;stage++){const roster=v174AbyssBuildRoster(level,region,stage);roster.forEach(verify);evidence.matrix.push({level,region,stage,units:roster.map(m=>({name:m.name,rank:m.rank,context:m.context,stats:stats(m),portraitKey:m.portraitKey,portrait:v154ResolveMonsterPortraitRecord(m)}))});}
  const badgeOwner=showMonsterSkillNameBadge;showMonsterSkillNameBadge=function(name,...args){evidence.skills.push(name);return badgeOwner(name,...args);};
  const resultClose=()=>document.querySelector('#battleStatisticsResultModal [data-close]')?.click();
@@ -51,7 +51,7 @@ const expression=`(async()=>{
     await wait(()=>!battleActive||turn>beforeTurn,160000);
    }
   }finally{off();}
-  autoBattle=false;autoConfig.enabled=false;await wait(()=>document.getElementById('battleStatisticsResultModal')?.classList.contains('show'));resultClose();
+  autoBattle=false;autoConfig.enabled=false;await wait(()=>document.getElementById('battleStatisticsResultModal')?.hidden===false);resultClose();
   await wait(()=>v174AbyssGetRunState(difficulty).phase==='chest');check(!window.v132ActiveDungeonRun,'no background battle');
   check(JSON.stringify(initial)===JSON.stringify(monsters.map(stats)),'no late stat writer');
   const goldBefore=gold;document.querySelector('.v174-abyss-chest').click();await wait(()=>v174AbyssGetRunState(difficulty).chestClaimed,12000);check(gold>goldBefore,'formal reward');
