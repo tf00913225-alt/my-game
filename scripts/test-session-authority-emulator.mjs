@@ -14,6 +14,7 @@ const {createDailyCheckinGrant}=require("../functions/src/daily-checkin-grant.js
 const {createCanonicalBattleAttempt}=require("../functions/src/canonical-battle-attempt.js");
 const {createCanonicalBattleEncounter}=require("../functions/src/canonical-battle-encounter.js");
 const {resolvePlainPlayerNormalAttack}=require("../functions/src/canonical-battle-normal-attack.js");
+const {createCanonicalBattleAttackProof}=require("../functions/src/canonical-battle-attack-proof.js");
 const {createCanonicalExpAllocation}=require("../functions/src/canonical-exp-allocation.js");
 const {createCanonicalAttributeAllocation}=
     require("../functions/src/canonical-attribute-allocation.js");
@@ -480,6 +481,85 @@ assert.deepEqual((await db.doc(`users/${y}/saves/current`).get()).data(),battleB
 assert.equal((await battleRoot.collection("pendingGrants").get()).size,0);
 assert.equal((await battleRoot.collection("ledgerEntries").get()).size,0);
 console.log("Normal attack rule arithmetic on private Firestore sources: deterministic hit/MISS, session refusal and zero authoritative mutation PASS");
+
+
+// Protected arithmetic proof lifecycle, real Firestore atomicity and unique
+// preparation consumption. No accepted action order, terminal verdict or reward.
+let attackProofClock=battleStart.issuedAtMs+2,abortAttackProof=false;
+const attackProofOwner=createCanonicalBattleAttackProof({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,now:()=>attackProofClock,randomBytes:size=>Buffer.alloc(size,128),
+    runProtected:(request,fn)=>writerSessions.runProtected(request,async(tx,session)=>{
+        const value=await fn(tx,session);
+        if(abortAttackProof)throw Error("interrupted attack proof transaction");
+        return value;
+    })});
+const attackProofArgs={attemptId:battleStart.attemptId,operationId:"attack-proof-emulator-0001",expectedRevision:2};
+attackProofClock=battleStart.expiresAtMs;
+await assert.rejects(attackProofOwner.seal(yRequest,attackProofArgs),e=>e.code==="failed-precondition");
+attackProofClock=battleStart.issuedAtMs+2;
+abortAttackProof=true;
+await assert.rejects(attackProofOwner.seal(yRequest,attackProofArgs),/interrupted attack proof/);
+abortAttackProof=false;
+for(const name of ["battleAttackProofs","battleAttackAttempts","battleAttackPolicies"]){
+    assert.equal((await battleRoot.collection(name).get()).size,0);
+}
+assert.equal((await battleRoot.collection("operations").doc(attackProofArgs.operationId).get()).exists,false);
+const attackProofContenders=await Promise.allSettled([
+    attackProofOwner.seal(yRequest,attackProofArgs),
+    attackProofOwner.seal(yRequest,{...attackProofArgs,operationId:"attack-proof-emulator-0002"})
+]);
+assert.equal(attackProofContenders.filter(r=>r.status==="fulfilled").length,1);
+assert.equal(attackProofContenders.filter(r=>r.status==="rejected"&&r.reason.code==="already-exists").length,1);
+const attackProofStart=attackProofContenders.find(r=>r.status==="fulfilled").value;
+const winningAttackArgs={...attackProofArgs,operationId:attackProofStart.operationId};
+const attackProofRef=battleRoot.collection("battleAttackProofs").doc(battleStart.attemptId);
+const storedAttackProof=(await attackProofRef.get()).data();
+assert.deepEqual(storedAttackProof.projection,normalAttackRuleResult.ownerUid===y
+    ?await readNormalAttackInputs(yRequest,storedAttackProof.projection.randomTape):null);
+assert.equal(storedAttackProof.projection.randomSamplesConsumed,3);
+assert.equal(attackProofStart.projection,undefined);assert.equal(attackProofStart.randomTape,undefined);
+for(const key of ["combatRulesReady","outcomeVerified","rewardEligible","creditedToCharacter"]){
+    assert.equal(attackProofStart[key],false);
+}
+assert.deepEqual(await attackProofOwner.seal(yRequest,winningAttackArgs),{...attackProofStart,unchanged:true});
+const attackPolicyRef=battleRoot.collection("battleAttackPolicies").doc(attackProofStart.rulesPolicySha256);
+for(const ref of [attackProofRef,attackPolicyRef,
+    battleRoot.collection("operations").doc(winningAttackArgs.operationId),
+    battleRoot.collection("battleAttackAttempts").doc(battleStart.attemptId),
+    battleRoot.collection("battleEncounters").doc(battleStart.attemptId),
+    battleRoot.collection("recoveryArchives").doc("2")]){
+    const saved=(await ref.get()).data();await ref.delete();
+    await assert.rejects(attackProofOwner.seal(yRequest,winningAttackArgs));
+    if([attackProofRef.path,battleRoot.collection("battleAttackAttempts").doc(battleStart.attemptId).path].includes(ref.path)){
+        await assert.rejects(attackProofOwner.seal(yRequest,{...winningAttackArgs,operationId:"attack-proof-emulator-0003"}),
+            e=>e.code==="already-exists");
+    }
+    await ref.set(saved);
+}
+await attackProofRef.update({"projection.damage":storedAttackProof.projection.damage+1});
+await assert.rejects(attackProofOwner.seal(yRequest,winningAttackArgs),e=>e.code==="data-loss");
+await attackProofRef.set(storedAttackProof);
+await assert.rejects(attackProofOwner.seal({...yRequest,data:{...yRequest.data,randomTape:[0,0,0]}},winningAttackArgs),
+    e=>e.code==="invalid-argument");
+await assert.rejects(attackProofOwner.seal({...yRequest,data:{uid:y,session:sessionB}},winningAttackArgs),
+    e=>e.message==="SESSION_INVALID");
+attackProofClock=battleStart.expiresAtMs;
+assert.deepEqual(await attackProofOwner.seal(yRequest,winningAttackArgs),{...attackProofStart,unchanged:true,expired:true});
+for(const ref of [attackProofRef,attackPolicyRef,
+    battleRoot.collection("battleAttackAttempts").doc(battleStart.attemptId)]){
+    const path=ref.path;
+    assert.equal(await rulesRequest(path,yUser.idToken),403);
+    assert.equal(await rulesRequest(path,yUser.idToken,"PATCH"),403);
+}
+for(const name of ["battleAttackProofs","battleAttackAttempts","battleAttackPolicies"]){
+    assert.equal((await battleRoot.collection(name).get()).size,1);
+}
+assert.deepEqual((await battleRoot.collection("account").doc("current").get()).data(),battleBefore.account);
+assert.deepEqual((await battleRoot.collection("economy").doc("current").get()).data(),battleBefore.economy);
+assert.deepEqual((await db.doc(`users/${y}/saves/current`).get()).data(),battleBefore.envelope);
+assert.equal((await battleRoot.collection("pendingGrants").get()).size,0);
+assert.equal((await battleRoot.collection("ledgerEntries").get()).size,0);
+console.log("Attack proof real transaction: pinned rules/entropy/projection, atomic rollback, concurrent one-winner, replay, expiry, private evidence, session and zero authority mutation PASS");
 
 
 assert.deepEqual(initialArchive.get("sourceRecords.claimRecords"),[]);

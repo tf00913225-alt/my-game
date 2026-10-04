@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "cloud-battle-attack-proof-20261004",
+  "releaseVersion": "173.73",
+  "requirements": [
+    {
+      "id": "REQ-CLOUD-BATTLE-ATTACK-PROOF-20261004",
+      "title": "Protected immutable plain-player attack proof pins original sources, rules, server entropy and arithmetic projection without legal-action or reward authority",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "functions/src/canonical-battle-attack-proof.js",
+          "functions/src/canonical-battle-attempt.js",
+          "functions/src/canonical-battle-encounter.js",
+          "functions/src/canonical-battle-normal-attack.js",
+          "tests/cloud-save-battle-attack-proof.test.mjs",
+          "scripts/test-session-authority-emulator.mjs"
+        ],
+        "verification": "Local proof37/37 and preparation/encounter/kernel/proof117/117 PASS, skip0; 128 existing parity cases unchanged. Exact generated policy/code/catalog comparisons PASS. Real Firestore emulator assertions are added to the existing Session Authority owner; remote latest-head CI/emulator, integration, Firebase/DEV deployment and safe cleanup remain mandatory and are tracked by this Work PR.",
+        "result": "One UID-private arithmetic observation per preparation; atomic proof/pinned-policy/receipt/marker. Same-intent replay preserves original rules/random/output after expiry or current revision/deployment policy changes. No callable, browser hook, legal action order, terminal verdict, account/economy/HP/reward/ledger mutation or readiness publication. Phase4 remains0/6 VERIFIED."
+      }
+    }
+  ]
+}

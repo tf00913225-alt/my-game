@@ -30,6 +30,66 @@ function createCanonicalBattleEncounter(dependencies){
     const {db,FieldValue,HttpsError,runProtected,now=Date.now}=dependencies;
     const preparations=createCanonicalBattleAttempt(dependencies);
     const fail=(code,message)=>{throw new HttpsError(code,message);};
+    async function verifySeal(tx,session,args,proof,snaps,requestTime){
+        const {attemptId,operationId,expectedRevision,encounterKey}=args;
+        const uid=session.uid,root=db.collection("serverUsers").doc(uid),{attempt}=proof;
+        const {sealedSnap,receiptSnap,markerSnap,grantSnap,ledgerSnap,otherAttemptSnap}=snaps;
+        const sealed=sealedSnap.exists?sealedSnap.data():null;
+        const receipt=receiptSnap.exists?receiptSnap.data():null;
+        const marker=markerSnap.exists?markerSnap.data():null;
+        if(!sealed||!receipt||!marker||grantSnap.exists||ledgerSnap.exists||otherAttemptSnap.exists||
+           sealed.schemaVersion!==1||sealed.kind!==KIND||sealed.ownerUid!==uid||
+           sealed.operationId!==operationId||sealed.attemptId!==attemptId||
+           sealed.attemptSha256!==attempt.sha256||sealed.encounterKey!==encounterKey||
+           sealed.characterId!==attempt.characterId||sealed.sourceRevision!==expectedRevision||
+           sealed.snapshotSha256!==attempt.snapshotSha256||sealed.creationSessionId!==session.sessionId||
+           !Number.isSafeInteger(sealed.sealedAtMs)||sealed.sealedAtMs<attempt.issuedAtMs||
+           sealed.sealedAtMs>=attempt.expiresAtMs||sealed.expiresAtMs!==attempt.expiresAtMs||
+           sealed.combatRulesReady!==false||sealed.outcomeVerified!==false||
+           sealed.rewardEligible!==false||sealed.creditedToCharacter!==false||
+           !HASH.test(sealed.policySha256||"")||!HASH.test(sealed.definitionSha256||"")||
+           sealed.sha256!==sealDigest(sealed)||
+           receipt.schemaVersion!==1||receipt.kind!==KIND||receipt.ownerUid!==uid||
+           receipt.operationId!==operationId||receipt.attemptId!==attemptId||
+           receipt.sourceRevision!==expectedRevision||receipt.encounterSha256!==sealed.sha256||
+           receipt.creditedToCharacter!==false||
+           marker.schemaVersion!==1||marker.ownerUid!==uid||marker.attemptId!==attemptId||
+           marker.operationId!==operationId||marker.encounterSha256!==sealed.sha256||
+           [sealed,receipt,marker].some(record=>!hasStamp(record))){
+            fail("data-loss","Encounter seal, receipt or preparation marker is inconsistent.");
+        }
+        const policySnap=await tx.get(root.collection("battleEncounterPolicies").doc(sealed.policySha256));
+        let policy;
+        try{policy=inspectPolicy(policySnap.exists?policySnap.data().policy:null);
+            if(policy.sha256!==sealed.policySha256||!hasStamp(policySnap.data())||
+               policySnap.data().ownerUid!==uid||policySnap.data().schemaVersion!==1||
+               !Object.hasOwn(policy.entries,encounterKey)||
+               digest(policy.entries[encounterKey])!==sealed.definitionSha256)throw Error("policy binding");
+        }catch(_){fail("data-loss","Original encounter policy is missing or inconsistent.");}
+        return {...proof,sealed,policy,result:result(sealed,true,requestTime)};
+    }
+    // Shared read-only successor gate: never creates or repairs missing seals.
+    async function readSeal(tx,session,args,requestTime){
+        if(!args||Object.keys(args).sort().join("|")!=="attemptId|expectedRevision"||
+           typeof args.attemptId!=="string"||!ID.test(args.attemptId)){
+            fail("invalid-argument","Only preparation ID and source revision are accepted.");
+        }
+        const proof=await preparations.readPreparation(tx,session,
+            {operationId:args.attemptId,expectedRevision:args.expectedRevision},requestTime);
+        const root=db.collection("serverUsers").doc(session.uid);
+        const sealedSnap=await tx.get(root.collection("battleEncounters").doc(args.attemptId));
+        const stored=sealedSnap.exists?sealedSnap.data():null;
+        if(!stored||typeof stored.operationId!=="string"||!ID.test(stored.operationId)||
+           typeof stored.encounterKey!=="string")fail("data-loss","Original encounter seal is missing or invalid.");
+        const [receiptSnap,markerSnap,grantSnap,ledgerSnap,otherAttemptSnap]=await Promise.all([
+            tx.get(root.collection("operations").doc(stored.operationId)),
+            tx.get(root.collection("battleEncounterAttempts").doc(args.attemptId)),
+            tx.get(root.collection("grantOperations").doc(stored.operationId)),
+            tx.get(root.collection("ledgerEntries").doc(stored.operationId)),
+            tx.get(root.collection("battleAttempts").doc(stored.operationId))]);
+        return verifySeal(tx,session,{...args,operationId:stored.operationId,encounterKey:stored.encounterKey},
+            proof,{sealedSnap,receiptSnap,markerSnap,grantSnap,ledgerSnap,otherAttemptSnap},requestTime);
+    }
     async function seal(request,args){
         if(!args||typeof args!=="object"||Array.isArray(args)||
            Object.keys(args).sort().join("|")!=="attemptId|encounterKey|expectedRevision|operationId"||
@@ -65,39 +125,8 @@ function createCanonicalBattleEncounter(dependencies){
                 fail("already-exists","Preparation already has an encounter seal.");
             }
             if(sealedSnap.exists||receiptSnap.exists){
-                const sealed=sealedSnap.exists?sealedSnap.data():null;
-                const receipt=receiptSnap.exists?receiptSnap.data():null;
-                const marker=markerSnap.exists?markerSnap.data():null;
-                if(!sealed||!receipt||!marker||grantSnap.exists||ledgerSnap.exists||otherAttemptSnap.exists||
-                   sealed.schemaVersion!==1||sealed.kind!==KIND||sealed.ownerUid!==uid||
-                   sealed.operationId!==operationId||sealed.attemptId!==attemptId||
-                   sealed.attemptSha256!==attempt.sha256||sealed.encounterKey!==encounterKey||
-                   sealed.characterId!==attempt.characterId||sealed.sourceRevision!==expectedRevision||
-                   sealed.snapshotSha256!==attempt.snapshotSha256||sealed.creationSessionId!==session.sessionId||
-                   !Number.isSafeInteger(sealed.sealedAtMs)||sealed.sealedAtMs<attempt.issuedAtMs||
-                   sealed.sealedAtMs>=attempt.expiresAtMs||sealed.expiresAtMs!==attempt.expiresAtMs||
-                   sealed.combatRulesReady!==false||sealed.outcomeVerified!==false||
-                   sealed.rewardEligible!==false||sealed.creditedToCharacter!==false||
-                   !HASH.test(sealed.policySha256||"")||!HASH.test(sealed.definitionSha256||"")||
-                   sealed.sha256!==sealDigest(sealed)||
-                   receipt.schemaVersion!==1||receipt.kind!==KIND||receipt.ownerUid!==uid||
-                   receipt.operationId!==operationId||receipt.attemptId!==attemptId||
-                   receipt.sourceRevision!==expectedRevision||receipt.encounterSha256!==sealed.sha256||
-                   receipt.creditedToCharacter!==false||
-                   marker.schemaVersion!==1||marker.ownerUid!==uid||marker.attemptId!==attemptId||
-                   marker.operationId!==operationId||marker.encounterSha256!==sealed.sha256||
-                   [sealed,receipt,marker].some(record=>!hasStamp(record))){
-                    fail("data-loss","Encounter seal, receipt or preparation marker is inconsistent.");
-                }
-                const policySnap=await tx.get(root.collection("battleEncounterPolicies").doc(sealed.policySha256));
-                let policy;
-                try{policy=inspectPolicy(policySnap.exists?policySnap.data().policy:null);
-                    if(policy.sha256!==sealed.policySha256||!hasStamp(policySnap.data())||
-                       policySnap.data().ownerUid!==uid||policySnap.data().schemaVersion!==1||
-                       !Object.hasOwn(policy.entries,encounterKey)||
-                       digest(policy.entries[encounterKey])!==sealed.definitionSha256)throw Error("policy binding");
-                }catch(_){fail("data-loss","Original encounter policy is missing or inconsistent.");}
-                return result(sealed,true,requestTime);
+                return (await verifySeal(tx,session,args,proof,
+                    {sealedSnap,receiptSnap,markerSnap,grantSnap,ledgerSnap,otherAttemptSnap},requestTime)).result;
             }
             if(grantSnap.exists||ledgerSnap.exists||otherAttemptSnap.exists)fail("failed-precondition","Operation ID is already used.");
             if(markerSnap.exists)fail("already-exists","Preparation already has an encounter seal.");
@@ -142,6 +171,6 @@ function createCanonicalBattleEncounter(dependencies){
             definitionSha256:sealed.definitionSha256,expiresAtMs:sealed.expiresAtMs,expired:time>=sealed.expiresAtMs,
             unchanged,combatRulesReady:false,outcomeVerified:false,rewardEligible:false,creditedToCharacter:false};
     }
-    return Object.freeze({seal});
+    return Object.freeze({seal,readSeal});
 }
 module.exports={createCanonicalBattleEncounter,inspectPolicy};

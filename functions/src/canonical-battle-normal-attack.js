@@ -17,7 +17,7 @@ const stateKeys=["id","element","gender","level","exp","expNext","attack","intel
 // sealed policy via protected private reads; self-consistent hashes alone do
 // NOT prove server origin, eligibility, action order or a battle victory.
 // No request/callable, random generator, persistence, win/grant/reward path.
-function resolvePlainPlayerNormalAttack(args){
+function computePlainPlayerNormalAttack(args,sampler=null){
     if(!plain(args)||Object.keys(args).sort().join("|")!==
        "archive|encounterKey|encounterPolicy|randomTape|revision|snapshot|uid"){
         invalid("only private sources, sealed policy and a server random transcript are accepted");
@@ -61,30 +61,40 @@ function resolvePlainPlayerNormalAttack(args){
        !Number.isSafeInteger(enemyStats.maxHP)||enemyStats.maxHP<1||definition.finalDamagePressure!==1){
         invalid("unsupported sealed regular enemy stats");
     }
-    if(!Array.isArray(randomTape)||![1,3].includes(randomTape.length)||
+    if(!Array.isArray(randomTape)||(!sampler&&![1,3].includes(randomTape.length))||
        randomTape.some(value=>typeof value!=="number"||!Number.isFinite(value)||value<0||value>=1)){
         invalid("exact bounded server random transcript required");
     }
     let consumed=0;
+    const transcript=[];
     const random=()=>{
-        if(consumed>=randomTape.length)invalid("random transcript exhausted");
-        return randomTape[consumed++];
+        if(!sampler&&consumed>=randomTape.length)invalid("random transcript exhausted");
+        if(consumed>=3)invalid("random sample budget exceeded");
+        const value=sampler?sampler():randomTape[consumed];
+        if(typeof value!=="number"||!Number.isFinite(value)||value<0||value>=1)invalid("invalid server sample");
+        consumed++;transcript.push(value);return value;
     };
     const player=copy(state),enemy={...copy(enemyStats),level:spec.level,element:spec.element};
     const rules=createPlainPlayerRules(player,random),playerStats=rules.stats;
     if(state.hp>playerStats.maxHP||state.sp>playerStats.maxSP)invalid("invalid starting resources");
     const hit=rules.hit(enemy),critical=hit?rules.critical(enemy):{isCrit:false,multiplier:1};
     const damage=hit?rules.damage(enemy,critical):0;
-    if(consumed!==randomTape.length)invalid("unused random transcript samples");
+    if(!sampler&&consumed!==randomTape.length)invalid("unused random transcript samples");
     if(!integer(damage,1000000000))invalid("damage exceeds the supported numeric budget");
     const result={schemaVersion:1,kind:"plain-player-normal-attack-arithmetic",
         ownerUid:uid,sourceRevision:revision,characterId:character.characterId,
         snapshotSha256:snapshot.sha256,encounterKey,encounterPolicySha256:sealedPolicy.sha256,
         definitionSha256:claimRecordsDigest(definition),rulesSha256:policy.rulesSha256,
-        randomTape:[...randomTape],randomSamplesConsumed:consumed,playerStats:copy(playerStats),
+        randomTape:transcript,randomSamplesConsumed:consumed,playerStats:copy(playerStats),
         hit,isCrit:critical.isCrit,damage,hpBefore:enemy.maxHP,hpAfter:Math.max(0,enemy.maxHP-damage),
         combatRulesReady:false,outcomeVerified:false,rewardEligible:false,creditedToCharacter:false};
     return Object.freeze({...result,sha256:claimRecordsDigest(result)});
 }
 
-module.exports={resolvePlainPlayerNormalAttack};
+function resolvePlainPlayerNormalAttack(args){return computePlainPlayerNormalAttack(args);}
+// Internal server-only entropy adapter; shares admission and arithmetic exactly.
+function samplePlainPlayerNormalAttack(args,sampler){
+    if(!plain(args)||Object.hasOwn(args,"randomTape")||typeof sampler!=="function")invalid("server sampler required");
+    return computePlainPlayerNormalAttack({...args,randomTape:[]},sampler);
+}
+module.exports={resolvePlainPlayerNormalAttack,samplePlainPlayerNormalAttack};

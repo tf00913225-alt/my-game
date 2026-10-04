@@ -44,7 +44,7 @@ function createCanonicalBattleAttempt({db,FieldValue,HttpsError,runProtected,
            records.account.slots[2]!==null||records.characters.length!==1){
             fail("failed-precondition","Only a server-created first character may prepare an attempt.");
         }
-        return records;
+        return {records,snapshot:snapshot.data(),archive:archive.data()};
     }
     async function readContext(tx,session,args){
         const uid=session.uid,{operationId,expectedRevision}=args;
@@ -102,8 +102,8 @@ function createCanonicalBattleAttempt({db,FieldValue,HttpsError,runProtected,
         if(attempt.creationSessionId!==session.sessionId){
             fail("failed-precondition","Battle attempt belongs to an earlier session.");
         }
-        const records=await source(tx,root,uid,attempt.sourceRevision,attempt.snapshotSha256,attempt.characterId);
-        return {attempt,records,result:result(attempt,true,requestTime)};
+        const original=await source(tx,root,uid,attempt.sourceRevision,attempt.snapshotSha256,attempt.characterId);
+        return {attempt,...original,result:result(attempt,true,requestTime)};
     }
     // Internal transaction reader: caller must use the same protected transaction.
     async function readPreparation(tx,session,args,requestTime){
