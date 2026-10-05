@@ -1,12 +1,12 @@
 # 《四象江湖傳》Change Safety & Replacement Migration Contract
 
-## 一般 Bug 預設路徑（2026-10-01 生效）
+## 適用入口
 
-一般 Bug 必須先讀 `docs/BUG_FIX_FAST_PATH.md`，以該文件為調查範圍、證據升級、自主整合與結案的權威來源。預設最小必要調查＋最小安全修正；只查直接相關責任與呼叫鏈。完整 Owner Convergence／Lifecycle 稽核僅在該文件第四節證據成立或使用者明確要求架構工程時適用。下文不得以「較嚴格優先」恢復一般 Bug 全面稽核、tests-only 限制、固定失敗額度、僅草稿 PR 或正式 Runtime 即硬停止。最新 Head 必要 CI、原症狀驗證與資料安全仍必須遵守；一般 Bug 結案不要求發布 main。
+讀取路由由 `AGENTS.md` 唯一控制；一般 Bug 的預設流程／證據升級條件由 `docs/BUG_FIX_FAST_PATH.md` 控制。本文件不得以較嚴格優先恢復一般 Bug 全文件載入或全面 Audit。
 
 # 變更安全與取代遷移契約
 
-> 文件定位：本文件是《四象江湖傳》所有新增、修改、替換、重構、UI／CSS、Gameplay（玩法）、資料、狀態、Lifecycle（生命週期）與 Bug 修復的永久變更安全契約。
+> 文件定位：本文件是《四象江湖傳》Replacement／Convergence／Removal、已證實多 Owner／Patch／Lifecycle 衝突與跨模組責任重整的專項變更安全契約。
 >
 > 生效日期：2026-09-28
 >
@@ -35,7 +35,7 @@
 
 ## 2. 開工前強制分類：Additive 或 Replacement
 
-每次修改前必須先判斷本次變更屬於：
+本契約啟用後先確認本次變更類型；單純 Additive、小型 Bug 或數值修正不因此觸發完整稽核：
 
 1. **Additive（新增）**：新增能力，既有能力仍然有效且需要保留。
 2. **Replacement（取代）**：新設計／新規則／新 UI 取代既有設計或行為。
@@ -71,7 +71,7 @@ UI 看起來只是一個框、圖示或動畫，也不得假設它只負責外�
 
 ## 4. Five-Layer Convergence Gate（五層收斂閘門）
 
-每次會改變既有功能的施工，至少同時檢查以下五層：
+本契約適用的取代／收斂／移除工程，至少同時檢查以下五層：
 
 ### 4.1 Owner（控制來源）
 同一責任只能有一個正式 Owner。不得讓 A、B、C 三套實作同時以不同優先權、載入順序或 Wrapper 互相覆蓋。
@@ -175,10 +175,10 @@ Replacement／Convergence／Removal 只有在以下項目完成後才可宣稱�
 
 ## 9. 與其他規範的關係
 
-- `AGENTS.md`／`CLAUDE.md`：代理入口，必須要求所有修改先遵守本契約。
+- `AGENTS.md`／`CLAUDE.md`：AGENTS 是唯一讀取路由；CLAUDE 只引用入口，本契約不再要求所有修改預設載入。
 - `ARCHITECTURE_RULES.md`：Owner、Patch、Wrapper 與架構細節；與本契約共同適用。
-- `AUTONOMOUS_REPAIR_CONTRACT.md`：修復任務的自主權限邊界；修復施工本身仍必須符合本契約。
-- `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`：所有 Bug／failure／regression 的完成狀態與 Owner Convergence Gate 專項權威；找到根因、CI PASS 或新版可運作均不得自行等同 VERIFIED。
+- `AUTONOMOUS_REPAIR_CONTRACT.md`：僅明確指定 tests-only 受控模式的權限邊界；普通 Bug 依 Fast Path。
+- `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`：證據升級／架構級 Bug 的完成狀態與 Owner Convergence Gate 專項權威；找到根因、CI PASS 或新版可運作均不得自行等同 VERIFIED。
 - `UI_GUIDELINES.md`：UI 尺寸、呈現、互動規格；UI Replacement 同時適用本契約。
 - `docs/RELEASE_VERIFICATION_RULES.md`：Requirement／CI／Release 與 deprecated-code 驗證。
 - `HANDOFF.md`：記錄當前專案狀態與重要遷移結果，不作為本契約的替代來源。

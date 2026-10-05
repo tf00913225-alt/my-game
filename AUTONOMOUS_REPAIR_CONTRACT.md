@@ -1,11 +1,11 @@
 # 《四象江湖傳》受控自主修復契約
 
-## 一般 Bug 預設路徑（2026-10-01 生效）
+## 適用入口
 
-一般 Bug 必須先讀 `docs/BUG_FIX_FAST_PATH.md`，以該文件為調查範圍、證據升級、自主整合與結案的權威來源。預設最小必要調查＋最小安全修正；只查直接相關責任與呼叫鏈。完整 Owner Convergence／Lifecycle 稽核僅在該文件第四節證據成立或使用者明確要求架構工程時適用。下文不得以「較嚴格優先」恢復一般 Bug 全面稽核、tests-only 限制、固定失敗額度、僅草稿 PR 或正式 Runtime 即硬停止。最新 Head 必要 CI、原症狀驗證與資料安全仍必須遵守；一般 Bug 結案不要求發布 main。
+讀取路由由 `AGENTS.md` 唯一控制；一般 Bug 的預設流程／證據升級條件由 `docs/BUG_FIX_FAST_PATH.md` 控制。本文件不得以較嚴格優先恢復一般 Bug 全文件載入或全面 Audit。
 
 
-> 文件定位：本文件是《四象江湖傳》所有「修復型任務」的唯一自主操作契約來源。
+> 文件定位：本文件是《四象江湖傳》明確指定 tests-only／CI Validation-only 受控修復模式的操作契約；一般 Bug 由 Fast Path 控制。
 >
 > 版本：v1.0
 >
@@ -21,59 +21,23 @@
 
 本契約只授權「受控自主修復」，不是一般性的自由修改授權。
 
-所有實際修復施工同時受 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md` 約束；自主修復權限不代表可以用 Wrapper（包裝器）、late patch、`!important`、`display:none` 或過時測試去掩蓋未完成的 Owner／Contract／Lifecycle／Semantic State 遷移。
+本受限模式不自動啟用完整架構稽核；若實際證據或使用者要求觸發架構／取代路由，再讀對應專項 Owner。不得新增第二 Owner 或用測試掩蓋正式錯誤。
 
 ---
 
-## 2. 自動觸發條件
+## 2. 明確受控模式
 
-只要使用者的任務明確屬於下列任一類型，且沒有在當次對話另行指定不同模式，就預設啟用本契約：
+只有使用者明確指定 tests-only 受控自主修復、CI Validation-only 或本契約模式時才啟用。普通 Bug、fix、failure、既有分支續修預設走 `docs/BUG_FIX_FAST_PATH.md`，不因任務名稱自動受本文件的固定失敗額度／Runtime 停止線／僅草稿 PR 限制。
 
-- 修復 Bug（錯誤）
-- `fix`（修復）
-- 處理 failure（失敗）
-- 修正 test failure（測試失敗）
-- 修正 CI failure（持續整合失敗）
-- 修正 fixture（測試夾具）
-- 修正 test harness（測試框架）
-- 修正 stale contract（過期測試契約）
-- 處理既有修復分支上的下一個失敗
+本模式保留第 5～14 節的 tests-only 邊界、failure 額度、可執行驗證與不可合併 CI Validation Draft PR；不擴張當次使用者授權。
 
-若任務是新增功能、重構 production runtime（正式執行程式）、改玩法規格、改正式資料、改 UI（使用者介面）設計或其他非修復型工作，不得因本文件而自動取得自主修改授權。
+## 3. 開工讀取與續接
 
----
+先讀 AGENTS.md，核對即時 PR／Branch／Latest Head 與整合基準，再按其 Routing 讀任務相關規格。HANDOFF 只作交叉確認；不要求 CLAUDE、完整 HANDOFF、非 UI 的 UI Guidelines 或無證據架構契約。
 
-## 3. 開工前的強制讀取順序
+## 4. 分支與基準
 
-開始任何自主修復前，必須先確認 GitHub（程式庫）當下最新 `dev`（開發分支），並閱讀：
-
-1. `AGENTS.md`
-2. `CLAUDE.md`
-3. `HANDOFF.md`
-4. `ARCHITECTURE_RULES.md`
-5. `UI_GUIDELINES.md`（若任務涉及 UI／版面／視覺）
-6. `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`
-7. `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`
-8. `AUTONOMOUS_REPAIR_CONTRACT.md`（本文件）
-
-不得只依賴舊對話摘要、記憶中的 SHA（提交雜湊）或過去的工作分支狀態。
-
----
-
-## 4. 分支與基準規則
-
-自主修復開始時：
-
-- 以 GitHub 當下最新 `dev`（開發分支）為正式整合基準。
-- 必須建立或使用明確指定的獨立 `fix/...` 修復分支。
-- 禁止直接修改 `main`（正式分支）。
-- 禁止直接修改 `dev`（開發分支）。
-- 禁止直接修改任何被指定為 production（正式）或保護中的工作分支。
-- 禁止 `rebase`（重定基底）。
-- 禁止 `force push`（強制推送）。
-- 禁止為了讓測試通過而自行合併 `main`、`dev` 或其他正式分支進修復分支。
-
-若使用者在當次任務已指定精確 base SHA（基準提交雜湊）或工作分支，依該次明確指令執行；不得自行換基準。
+分支、禁止 rebase／force push、防覆蓋、checkpoint 及 DEV 整合由 AGENTS.md 唯一控制；本受控模式不得為取得綠燈自行改基準、合併正式分支或擴張 Runtime／workflow 修改。使用者明確指定 base SHA／分支時依指令執行。
 
 ---
 
@@ -258,51 +222,11 @@ B2／E／E+B2 只是既有分類標籤，**分類名稱本身不得被當成擴�
 
 ---
 
-## 15. 規則優先序
+## 15. 規則責任與完成判定
 
-本文件負責定義「修復任務可以自主做到哪裡」。
+AGENTS.md 控制路由、生命周期、DEV 整合與最小必要測試；普通 Bug 的流程／升級／原症狀驗證由 Fast Path 控制，本契約只控制明確受限修復模式。不用「較嚴格優先」讓舊受限模式覆蓋普通 Bug 授權。
 
-其他專案文件仍各自負責正式規格與架構：
-
-- `ARCHITECTURE_RULES.md`：架構與高風險系統規則
-- `UI_GUIDELINES.md`：UI（使用者介面）規則
-- `HANDOFF.md`：目前專案狀態與交接
-- `AGENTS.md`／`CLAUDE.md`：代理入口與工作守則
-
-若文件間出現衝突：
-
-1. 當次使用者的明確指令優先。
-2. 但不得把模糊語句解讀成擴大自主權限。
-3. 涉及自主修復邊界時，以本契約較嚴格的停止條件為準。
-4. 涉及正式遊戲規格／架構時，以對應正式規範文件為準。
-5. 無法確定時，停止，不猜。
-
----
-
-## 15A. Bug Repair DoD / Owner Convergence 優先 Gate（強制）
-
-任何 Bug／failure／regression 任務，不論本契約允許自主修到哪一步，都必須同時符合 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`。
-
-- 本契約只決定「可以自主做什麼」；不降低 Bug 的完成標準。
-- 找到 contributing cause、修改測試、PR CI PASS 或 branch implementation 都不得直接稱為「已修好」。
-- production runtime 修復若受本契約硬停止條件阻擋，應回報 BLOCKED／DIAGNOSED，不得用 tests-only Patch 迴避。
-- 同一責任若仍有多 Owner、Wrapper、Timer、Observer、CSS override 或其他 late patch，Owner Convergence Gate 不得 PASS。
-- 只有該 Bug 達到專項契約的 VERIFIED 條件，才可以對使用者宣稱 FIXED／RESOLVED／已修好。
-- 使用者不需要決定舊 Owner、Patch、Wrapper、CSS 或 Test 如何退場；代理必須先做工程判斷。若安全施工超出本契約授權，再清楚回報所需授權，不得把技術選擇題丟回使用者。
-
----
-
-## 15A. 修復完成的變更安全 Gate（強制）
-
-即使 failure（失敗）已修好並取得可執行驗證，也必須再確認：
-
-- 修正是回到正式 Owner，而不是新增第二 Owner。
-- 若屬 Replacement／Convergence，舊 Wrapper／Patch／CSS／State／Test 已完成退場或有明確相容性理由。
-- 沒有用 stale test（過時測試）保護舊行為。
-- 沒有用 `display:none`、`animation:none`、`!important` 等遮蔽方式把舊問題藏起來並宣稱完成。
-- Semantic State 與 Lifecycle 已符合新規格。
-
-上述任一未完成，修復不得描述為「已完全收斂」。
+涉及架構級 Bug／Replacement 時依 AGENTS 路由啟用專項 Gate，不在此複製。IMPLEMENTED／INTEGRATED／DEPLOYED 不等於 VERIFIED；證據必須與實際故障匹配。高風險權威／玩家資料安全維持對應子系統契約。
 
 ---
 
@@ -310,12 +234,12 @@ B2／E／E+B2 只是既有分類標籤，**分類名稱本身不得被當成擴�
 
 未來新對話中，使用者只需要說例如：
 
-> 幫我修《四象江湖傳》這個 Bug（錯誤），依目前正式規範執行。
+> 依 tests-only 受控自主修復模式處理目前測試失敗。
 
 代理就應自行：
 
 1. 讀取最新 GitHub（程式庫）狀態。
-2. 讀取本契約與永久規範。
+2. 依 AGENTS Routing 讀本契約與直接相關規格。
 3. 建立／確認安全修復分支。
 4. 在本契約允許範圍內自主修復。
 5. 觸及硬停止條件才停止回報。
