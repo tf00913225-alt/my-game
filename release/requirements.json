@@ -758,7 +758,7 @@
     {
       "id": "REQ-LEVEL-SUPPRESSION-V2-20261005",
       "title": "全遊戲共用連續指數等級傷害倍率取代線性Clamp",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "js/00-main.js",
@@ -767,8 +767,8 @@
           "tests/v170-final-spec-integration.test.js",
           "docs/LEVEL_SUPPRESSION_V2_20261005.md"
         ],
-        "verification": "Formula/adjacent/reciprocal/input, full production bundle damage+skill integration and Hit/Evasion/Status/HardControl/Critical isolation; relevant combat/MonsterBalance/cloud parity, build sync and latest-head CI required.",
-        "result": "IMPLEMENTED; latest-head CI/integration/deployment/cleanup pending in Work PR. Game/Cache173.73 unchanged; main protected."
+        "verification": "Exact integrated source35646dc2abacf4a7c108fa69122c27599139d139 CI run37275575148 SUCCESS: Repository111651740551, Boss111651740674, Abyss111651740753, Adventure111651740789; Session Authority run37275574792 SUCCESS. Formula15/15 (0/±1/±5/±10/±30/±99, adjacency,10000 reciprocal pairs,input/retirement); actual production-bundle integration40/40 (calculateDamage/skill/player normal/enemy normal, Hit/Evasion/Status/HardControl/Critical isolation); six-stat/combat/MonsterBalance aggregate, cloud parity, syntax/deprecated/build sync and exact-candidate real-battle browser gates PASS. Final metadata-head Required CI is tracked independently in Work PR.",
+        "result": "VERIFIED functional/build/exact-source CI. Single continuous Math.pow(1.01,levelDiff) Owner replaces retired linear/clamp constants. No multiplier bounds or other-system coupling; Game/Cache173.73 unchanged. Final metadata-head CI, controlled dev merge, exact deployment and branch cleanup remain separate execution gates in Work PR; main protected."
       }
     }
   ]
