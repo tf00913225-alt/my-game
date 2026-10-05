@@ -270,6 +270,7 @@ jobs:
         env:
           EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
+          node --test tests/level-suppression-v2.test.mjs
           node tests/equipment-combat-percent-migration-v2.test.js
           node tests/six-stat-combat-attribute-convergence-20260930.test.js
           node tests/v170-final-spec-integration.test.js

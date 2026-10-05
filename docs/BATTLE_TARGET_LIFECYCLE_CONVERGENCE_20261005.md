@@ -37,3 +37,11 @@ The formal round queue previously carried enemy index/agility only. Hostile sele
 ## Remaining gates
 
 Exact final PR Head CI; actual Browser evidence review; requirement promotion only after executable functional evidence; latest-dev recheck and normal integration; Merge SHA CI; exact DEV deployment and deployed browser matrix; main unchanged; absorbed-branch deletion with recoverable evidence. PR discussion will own final SHAs and closeout status. Physical S23 Ultra acceptance remains a separate manual gate.
+
+## Continuation checkpoint — 2026-10-05
+
+Resumed existing PR #804 at f22d326dbb58e4caa3027a1bc0d8a22014f358de; no duplicate branch or repair. Latest dev and live manifest are 2c9daaf8563f4c7836a27f7153ec331aa0decf4a; main remains f63d69dbfa66ba75637d1c3cd7fcc7d74782e356. Only open PR is #804.
+
+Final historical CI37274272365: Repository, Adventure and Boss PASS; Abyss focus/neutral+seeded TTK PASS, Chrome debug endpoint refused connection at 127.0.0.1:9933 before browser execution. This is not a gameplay or numerical failure and is not relabeled PASS. Session Authority37274272140 SUCCESS.
+
+Normal two-parent merge absorbs separately integrated #802 and #803. Target source auto-merges with the level formula; preserve both. HANDOFF and requirements union all three work records; production bundles/manifests and restricted policy certificates regenerate through the existing build Owner. No Cloud implementation, formula, projection profile or QA assertion is changed by this continuation. Latest integrated Head CI/emulator, dev merge/deploy/live target QA and cleanup remain mandatory; Phase2 not started.

@@ -30,12 +30,6 @@ const DEFENSE_PER_POINT = 4;
 
 const HP_PER_VITALITY_POINT = 50;
 
-const LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL = 0.01;
-
-const LEVEL_DIFF_FACTOR_MIN_PHYSICAL = 0.85;
-
-const LEVEL_DIFF_FACTOR_MAX_PHYSICAL = 1.15;
-
 const DAMAGE_FORMULA_BASE_CONSTANT = 400;
 
 const DAMAGE_FORMULA_PER_TARGET_LEVEL = 10;
@@ -134,11 +128,13 @@ function getDamageFormulaConstant(targetLevel){
 }
 
 function getDamageLevelMultiplier(casterLevel,targetLevel){
-    const levelDiff=(Number(casterLevel)||1)-(Number(targetLevel)||1);
-    return Math.max(
-        LEVEL_DIFF_FACTOR_MIN_PHYSICAL,
-        Math.min(LEVEL_DIFF_FACTOR_MAX_PHYSICAL,1+levelDiff*LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL)
-    );
+    /* V2: validate Level Contract inputs; never cap/floor the multiplier. */
+    const caster=Number(casterLevel);
+    const target=Number(targetLevel);
+    const resolvedCasterLevel=Number.isSafeInteger(caster)&&caster>=1&&caster<=100?caster:1;
+    const resolvedTargetLevel=Number.isSafeInteger(target)&&target>=1&&target<=100?target:1;
+    const levelDiff=resolvedCasterLevel-resolvedTargetLevel;
+    return Math.pow(1.01,levelDiff);
 }
 
 function getElementalDamageMultiplier(casterElement,targetElement){

@@ -3,8 +3,13 @@
 
 - Base dev276f6a1e9e5d65f563a5a8b51d477f8580430252; branch fix/battle-target-lifecycle-convergence-20261005; target dev; mainf63d69db unchanged. Independent Cloud#802 excluded; MonsterBalance Phase1–2F not rebuilt.
 - Four pre-fix executable failures prove per-cast random retarget on living/lethal fire follow-up. Missing enemy planning identity admits late revived targets. Core now owns frozen token/round/actor/party-identity snapshot; queue passes it, V149 free casts reuse it; dead/invalid primary cancels, late callbacks cannot finish new actions. No new wrapper/temporary patch; no formulas/balance/revive/save change.
--19/19 targeted PASS, related regressions/build/build:check/YAML/whitespace PASS. Local Chrome154 socket EPERM prevents Browser and complete Node-runner verification; actual production Browser runner registered in existing CI and exact-SHA DEV deploy. Requirement IMPLEMENTED pending real functional evidence, not VERIFIED. Existing Cloud generated policy refreshes only V149 dependency digest.
+-19/19 targeted PASS, related regressions/build/build:check/YAML/whitespace PASS. Local Chrome154 socket EPERM prevents Browser and complete Node-runner verification; actual production Browser runner registered in existing CI and exact-SHA DEV deploy. Requirement functional VERIFIED from candidate production Chrome evidence; final Head and deployed verification remain pending. Existing Cloud generated policy refreshes only V149 dependency digest.
 - Full inventory/evidence/gates: docs/BATTLE_TARGET_LIFECYCLE_CONVERGENCE_20261005.md. PR/CI/merge/deployment/deployed QA/absorbed branch cleanup pending; Phase2 must wait for complete closeout. Game/Cache173.73 unchanged; no S23 Ultra claim.
+
+## 2026-10-05 — Level Suppression V2
+
+- Work ID LEVEL-SUPPRESSION-V2-20261005；target dev；main 禁止修改。Final Damage Level Multiplier `1.01 ^ levelDiff`，Single Owner `js/00-main.js::getDamageLevelMultiplier()`，玩家／怪物與普攻／技能共用；No artificial cap/floor. No Hit/Evasion/Status/Crit coupling.
+- 舊線性／0.85～1.15等級Clamp已退休；build同步伺服器生成規則，未新增Owner／Wrapper。Level Base與MonsterBalance所有Profile不變，Tower校正另案。正式契約 `docs/LEVEL_SUPPRESSION_V2_20261005.md`；功能／CI／整合／部署／清理即時狀態由Work PR追蹤。
 
 ## 2026-10-05 — Monster Balance Owner Phase 1–2F COMPLETE
 
@@ -1022,7 +1027,7 @@ Full inventory, caller graph, profiles and evidence: `docs/MONSTER_BALANCE_OWNER
 - `js/00-main.js` 是 `calculateDamage()`、`calculateSkillDamage()` 與 `damageRole` 的單一權威 owner；
   V149、V155、V169 的下游傷害覆寫已移除，既有元素、狀態、爆擊與技能分類仍保留。
 - 玩家與怪物統一採「30＋等級成長＋有效六圍」尺度；五種正式 damageRole、曲線防禦、
-  0.85～1.15 等級差、1.20／1.00／0.85 元素倍率均依 V173.38 規格校準。
+  連續指數等級差（Level Suppression V2取代舊0.85～1.15上／下限）、1.20／1.00／0.85 元素倍率均依 V173.38 規格校準。
 - 元素 EX、套裝、異常增傷、一般技能與未來詞條進入同一普通增傷加算桶，上限 1.50；
   爆擊最終上限 2.25，技能可選 `damageBudgetMultiplier`，未指定時為 1.00。
 - 怪物對玩家才套敵方壓力：普通／精英／BOSS 加成 0%／10%／20%，日常副本另加 5%，
@@ -4903,3 +4908,17 @@ PR #784 head 98d1d619b14ca08e202ab78565ad3faef9be7309: CI run 37133129829 / job 
 53/53 Phase1–2F aggregate, 7/7 focused, 50/50 formal neutral/seeded TTK, 18/18 natural Chrome scenes at390×844/412×915, snapshot/mechanism/reward regression, final legacy audit and build sync PASS. Exact source d5f88fb03130360add0bbd330930c80c5db6b5c7; Repository CI37220134518 jobs111488621828/111488621822/111488621691/111488621595 SUCCESS; Session CI37220134254 job111488620833 SUCCESS. Boss artifact11309889570 SHA256f949c5f06aa8277bb959e7b111f93599481e6fa1d1cb684126dd8a77c4a26606 independently checked.
 
 Existing PR#799 retained; no duplicate engineering. Requirement1/1 VERIFIED. Hit/Evasion fixture uses explicit MonsterBalance and actual auto-battle entitlement/toggle/declaration; original assertion coverage retained and natural Chrome PASS. Starting dev9fff3664 and mainf63d69db still current at verification. Earlier Phase2C–2E stale execution map fields reconciled from their merged PR final records, history preserved. Metadata-head CI, merge to dev, deployed exact SHA/live Boss QA and safe absorbed-branch deletion remain independent execution gates. No COMPLETE claim and no further calibration scope.
+
+
+## 2026-10-05 — CLOUDSAVE-RESTRICTED-BATTLE-INSTANCE-20261005 (candidate)
+
+- Base dev276f6a1e9e5d65f563a5a8b51d477f8580430252; branch feature/cloud-restricted-battle-instance-20261005; PR#802; target dev; mainf63d69db unchanged. #786/#789/#791/#796 not rebuilt. No other Open PR at opening.
+- Additive internal canonical-restricted-battle.js::begin owns protected INITIAL establishment. Reuses original readSeal/readPreparation/runProtected and plain-player admission; no formula/wrapper/temporary patch. PREPARED round0/version0 only. Generated native loadout certificate pins original Lv2/Lv3 naturally normal-only definitions; sole player/enemy, original HP/SP, source/policies/session/expiry. Atomic instance/receipt/consumption/policy bundle; no source writes.
+- Local157/157 targeted battle tests PASS, skip0, with29 new instance tests. Actual emulator now covers concurrent one-winner, transaction rollback, identical replay, corruption/missing evidence, expiry/revision/session refusal, private rules and zero authoritative/economic mutation; remote execution PENDING. Persistence/backup boundaries registered.
+- No round/action submissions, entropy, terminal verdict, rewards, callable/client hook, gameplay HP/revision mutation, legacy adoption or second-device restore. Four readiness/outcome/reward/credit flags false, Phase4 still0/6; entire Protected Restricted Battle Lifecycle NOT COMPLETE.
+- Next: latest-head CI/real emulator; functional requirement verification; controlled dev merge, exact Firebase/DEV deployment validation, recoverable branch cleanup. Next independent engineering: shared repeated-round resolver + protected versioned successor/entropy lifecycle, then complete terminal adjudication and one-time settlement. Durable latest status is PR#802, not this historical paragraph. Game/Cache173.73 unchanged.
+
+
+### Restricted instance functional VERIFIED (PR#802)
+
+Exact source7f0094594cb9aa2797d5efa52a9fdf336a5379b4 Session Authority run37271418896/job111639039155 SUCCESS: backend272/272, skip0; private original instance/policy/resources, real concurrent one-winner and atomic rollback, replay/missing/corrupt proof, revision/expiry/session/private rules/zero-authority PASS. Actual explicit Auth re-login + device takeover/revocation PASS at06:19:06Z, complete HTTP callable suite PASS at06:19:18Z. Local157/157 PASS. The first takeover fixture used the old token and correctly hit SESSION_REAUTH_REQUIRED; only the fixture was corrected to real later Auth login, retaining old-token refusal and production security. Requirement1/1 VERIFIED for protected PREPARED state establishment ONLY. No rounds/RNG/verdict/rewards or overall phase completion. Metadata-head required CI, controlled dev merge, exact Firebase/DEV deployments and recoverable branch deletion remain pending; PR#802 is the durable status owner.
