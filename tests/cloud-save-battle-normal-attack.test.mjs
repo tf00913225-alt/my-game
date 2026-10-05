@@ -23,6 +23,7 @@ function input(element='fire',level=1,randomTape=[0.5,0.5,0.5],mutate=()=>{}){
     encounterPolicy:structuredClone(catalog),encounterKey:'wild.zone-01.fire-01',randomTape};
 }
 
+
 // Independent bracket-aware extraction from the browser source. Load the
 // actual late skill wrappers too: the plain admitted case must still match.
 function extract(name){
@@ -56,7 +57,7 @@ function browser(state,tape,definition){
   context.window=context;
   const declarations=Object.keys(policy.declarationDigests).map(name=>name.startsWith('get')||name.startsWith('calculate')||name.startsWith('isParty')||name==='rollCritical'
     ?extract(name):main.match(new RegExp('^const '+name+'\\s*=\\s*[\\s\\S]*?;','m'))[0]);
-  declarations.push(...['getMainCharacterStats','getRelicFinalEvasionPercent','getCharacterSkillKey','getLearnedElementEX'].map(extract));
+  declarations.push(...['getMainCharacterStats','getRelicFinalEvasionPercent','getCharacterSkillKey','getLearnedElementEX','getWindEXFinalEvasionBonusPercent'].map(extract));
   vm.runInContext(declarations.join('\n'),context);
   for(const file of ['js/33-v140-four-element-balance.js','js/43-v149-skill-ui-rules.js',
     'js/44-v152-dev-fixes.js','js/60-v173.64-skill-progression-rebalance.js']){
