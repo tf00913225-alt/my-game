@@ -45,3 +45,12 @@ Resumed existing PR #804 at f22d326dbb58e4caa3027a1bc0d8a22014f358de; no duplica
 Final historical CI37274272365: Repository, Adventure and Boss PASS; Abyss focus/neutral+seeded TTK PASS, Chrome debug endpoint refused connection at 127.0.0.1:9933 before browser execution. This is not a gameplay or numerical failure and is not relabeled PASS. Session Authority37274272140 SUCCESS.
 
 Normal two-parent merge absorbs separately integrated #802 and #803. Target source auto-merges with the level formula; preserve both. HANDOFF and requirements union all three work records; production bundles/manifests and restricted policy certificates regenerate through the existing build Owner. No Cloud implementation, formula, projection profile or QA assertion is changed by this continuation. Latest integrated Head CI/emulator, dev merge/deploy/live target QA and cleanup remain mandatory; Phase2 not started.
+
+
+### Integrated-head Abyss regression fixture correction
+
+- Head `ff7eeeb5e2eea3d936e0fb4efc326756d99f5433`: Target Lifecycle production browser QA passed 24/24; Abyss run `37296971517` failed its existing actual-hard-control gate. Chrome started successfully and all seven first-viewport natural scenes completed.
+- Evidence contained actual `stun` states but no hard-control rolls. The formal skill contract treats these stun effects as accuracy reduction, not lockdown. The fixed global RNG tape no longer reliably reaches the native emperor petrify selection after target draws move to round planning.
+- The QA boundary now injects the category draw at the existing `FourSymbolsEnemySkillAI.chooseCategory` owner, delegates to its original implementation, derives the skill-selection draw from the current legal/affordable native pool, and retains the existing formal status-roll boundary. No forced skill field, loadout, monster stat, hit formula or gameplay owner changes.
+- Acceptance is stricter: the native category/selection and actual hard-control roll must be recorded, and applied state must be freeze/petrify; soft stun cannot satisfy the gate. The temporary observation object is restored in the existing QA finally cleanup and never shipped as Runtime code.
+- All final-head CI, merge, deployment and deployed browser gates remain pending until actual success evidence is available.
