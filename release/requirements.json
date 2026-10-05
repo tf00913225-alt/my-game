@@ -784,6 +784,20 @@
         "verification": "19/19 focused executable cases PASS, existing related regressions/build PASS; 24/24 final-production Chrome scenarios PASS at 390x844 and 412x915. Evidence: CI run37273828938, artifact11329756508, candidate914f260a718f1f725dd55038f2e523c8ec4a6be9. Screenshots reviewed; mobile emulation, not S23 Ultra physical acceptance.",
         "result": "Target identity/shape/HP/SP/once-only finish VERIFIED against production bundles. Full exact-head CI, dev integration, deployment and deployed Browser QA remain separate Bug DoD gates; no COMPLETE claim."
       }
+    },
+    {
+      "id": "REQ-FIRE-LETHAL-RETARGET-20261005",
+      "title": "Fire free follow-ups legally retarget defeated primary within original round snapshot",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/FIRE_FOLLOWUP_LETHAL_RETARGET_20261005.md",
+          "tests/battle-target-lifecycle-20261005.test.js",
+          ".github/scripts/run-battle-target-lifecycle-browser-qa.mjs"
+        ],
+        "verification": "30/30 executable core+V149 regressions and related35/35 PASS; exact source959feb28292c12e957ee6a556051cd53e3665115 production Chrome48/48 PASS, run37321112490 artifact11350106855. Independently downloaded SHA25631e1523f0811dd948f3802046145ecfa2a0cb4d260a04a73f58d522226805904 matches GitHub;48 rows and390x844/412x915 screenshots reviewed. Dragon[0,2,2]/[0,2,1], one SP cost/finish and revival exclusion PASS.",
+        "result": "Functional VERIFIED in final production Runtime. Exact metadata-head CI, dev integration, exact deployment/live QA and cleanup remain separate gates; NOT COMPLETE."
+      }
     }
   ]
 }

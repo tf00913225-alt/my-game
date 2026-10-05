@@ -15,9 +15,10 @@ jobs:
   deploy:
     name: Deploy dev preview
     runs-on: ubuntu-latest
-    # Prior dev job111348933484 took 18m34s before adding the 16m Abyss QA.
-    # Preserve all gates and allow their measured combined runtime.
-    timeout-minutes: 75
+    # Job111774733928 spent 43m before Boss, then hit the 75m total cap.
+    # Exact-head Boss job111803435446 took 34m; preserve every gate and
+    # allow the measured 77m combined runtime plus 13m bounded reserve.
+    timeout-minutes: 90
     env:
       CLOUDFLARE_API_TOKEN_RAW: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID_RAW: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

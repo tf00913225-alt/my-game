@@ -257,7 +257,7 @@ async function runProductionAdventureBalanceQa(){
     const expression=`(async()=>{
       const check=(v,m)=>{if(!v)throw Error(m);};
       const wait=async(fn,ms=30000)=>{const end=performance.now()+ms;while(!fn()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(fn(),'Adventure wait: '+fn);};
-      await wait(()=>FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
+      await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
       await FourSymbolsFeatures.ensure('gameplay-core','adventure-balance-qa');
       await wait(()=>FourSymbolsReleaseUpdate?.getState?.().availableReleaseVersion);closeHomeFeature();
       document.getElementById('adventureHomeEntry').click();await wait(()=>window.FourSymbolsAdventure&&document.getElementById('adventurePage')?.classList.contains('is-visible'));

@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-05",
+  "title": "Fire Follow-up Lethal Retarget",
+  "workId": "FIRE-FOLLOWUP-LETHAL-RETARGET-20261005",
+  "base_branch": "dev",
+  "base_sha": "a9e3cc0c14c74005f517a594b96c1886665ff469",
+  "work_branch": "fix/fire-followup-lethal-retarget-20261005",
+  "officialVersion": "173.73",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REQ-FIRE-LETHAL-RETARGET-20261005",
+      "title": "Fire free follow-ups legally retarget defeated primary within original round snapshot",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/FIRE_FOLLOWUP_LETHAL_RETARGET_20261005.md",
+          "tests/battle-target-lifecycle-20261005.test.js",
+          ".github/scripts/run-battle-target-lifecycle-browser-qa.mjs"
+        ],
+        "verification": "30/30 executable core+V149 regressions and related35/35 PASS; exact source959feb28292c12e957ee6a556051cd53e3665115 production Chrome48/48 PASS, run37321112490 artifact11350106855. Independently downloaded SHA25631e1523f0811dd948f3802046145ecfa2a0cb4d260a04a73f58d522226805904 matches GitHub;48 rows and390x844/412x915 screenshots reviewed. Dragon[0,2,2]/[0,2,1], one SP cost/finish and revival exclusion PASS.",
+        "result": "Functional VERIFIED in final production Runtime. Exact metadata-head CI, dev integration, exact deployment/live QA and cleanup remain separate gates; NOT COMPLETE."
+      }
+    }
+  ]
+}

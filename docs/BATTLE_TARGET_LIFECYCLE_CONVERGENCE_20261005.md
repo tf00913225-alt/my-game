@@ -1,3 +1,5 @@
+> 2026-10-05 fire lethal-retarget amendment: historical lethal-cancellation assertions below are superseded by docs/FIRE_FOLLOWUP_LETHAL_RETARGET_20261005.md. Snapshot/round/revival identity protections remain authoritative.
+
 # Battle Target Lifecycle Convergence
 
 Work ID: BATTLE-TARGET-LIFECYCLE-CONVERGENCE-20261005

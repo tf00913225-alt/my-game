@@ -54,22 +54,22 @@ test("manual and auto share queue snapshot handoff",()=>{
     assert.match(declaration("processNextCombatant"),/processSingleMonsterAttack\(\s*entry\.monsterIndex,\s*token,\s*entry\.targetSnapshot/);
     assert.doesNotMatch(declaration("processSingleMonsterAttack"),/Math\.random\(\)\*selectablePrimaryTargets/);
 });
-function runtime({hp=[100,100,100],damage=10,shape="single",rank="regular",wrap=true}={}){
+function runtime({hp=[100,100,100],damage=10,shape="single",rank="regular",wrap=true,skillId="fireCritical",maxCasts=1,critical=true}={}){
     const party=hp.map((value,index)=>({id:"ally"+index,hp:value,level:50,element:"water",activeBuffs:[],statusEffects:[]}));
     const timers=[],hits=[],badges=[],logs=[],interceptors=[];let finishes=0,random=0;
     const math=Object.create(Math);math.random=()=>random;
     const noop=()=>{};
     const ctx={console,Math:math,Number,Object,Array,Set,Map,Promise,Date,
         battleActive:true,battleToken:7,turn:1,currentZone:"qa",initiativeQueue:[],initiativeIndex:0,
-        monsters:[{id:"enemy",name:"enemy",hp:1000,alive:true,level:50,element:"fire",rank,sp:100,skillIds:["fireCritical"],skillChance:1}],
-        currentBattleMonsters:[0],skillDatabase:{fireCritical:{id:"fireCritical",name:"烈焰爆擊",element:"fire",spCost:10,maxLevel:10,category:"physical",targetType:shape,followUpOnCriticalOrDefeat:true,followUpMaxCasts:1}},
+        monsters:[{id:"enemy",name:"enemy",hp:1000,alive:true,level:50,element:"fire",rank,sp:100,skillIds:[skillId],skillChance:1}],
+        currentBattleMonsters:[0],skillDatabase:{[skillId]:{id:skillId,name:"烈焰爆擊",element:"fire",spCost:10,maxLevel:10,category:"physical",targetType:shape,followUpOnCriticalOrDefeat:true,followUpMaxCasts:maxCasts}},
         getExistingPartyIndexes:()=>party.map((_,i)=>i),getPartyCharacterByIndex:i=>party[i],getPartyBattleStats:()=>({evasion:0,antiCrit:0,defense:0}),
         canSelectHostileBattlePrimary:(_,i)=>party[i].hp>0&&!party[i].stealth,
         resolveBattlefieldTargets:(_,i,type)=>type==="single"?[i]:party.map((_,j)=>j),
         normalizeBattleTargetType:x=>x,getEffectiveSkillTargetType:s=>s.targetType,
         isMonsterFrozen:()=>false,isMonsterPetrified:()=>false,getStatDownPercentFor:()=>0,
         getMonsterAccuracy:()=>0,getFinalHitReductionPercent:()=>0,getFinalAccuracyBonusPercent:()=>0,
-        getActiveRageCriticalBonuses:()=>({damage:0}),getMonsterCriticalChance:()=>100,rollHitChance:()=>true,
+        getActiveRageCriticalBonuses:()=>({damage:0}),getMonsterCriticalChance:()=>critical?100:0,rollHitChance:()=>true,
         CRIT_CHANCE_MIN_AFTER_ANTI_CRIT:1,CRIT_MULTIPLIER_MAX:3,
         calculateSkillDamage:()=>damage,calculateDamage:()=>damage,hasActiveBuff:()=>false,
         applySkillDebuffEffectsToPlayer:noop,getMonsterEffectiveAbilityPoints:()=>0,
@@ -81,7 +81,7 @@ function runtime({hp=[100,100,100],damage=10,shape="single",rank="regular",wrap=
         FourSymbolsBattleFlow:{interceptActionFinish(fn){interceptors.push(fn);return ()=>interceptors.splice(interceptors.indexOf(fn),1);}}
     };
     ctx.window=ctx;vm.createContext(ctx);
-    for(const name of ["createEnemyActionTargetSnapshot","isEnemyActionTargetSnapshotCurrent","resolveEnemyActionTargets"]){
+    for(const name of ["createEnemyActionTargetSnapshot","isEnemyActionTargetSnapshotCurrent","resolveEnemyActionTargets","retargetEnemyFollowUpSnapshot"]){
         if(main.includes("function "+name+"("))vm.runInContext(declaration(name),ctx);
     }
     vm.runInContext(declaration("processSingleMonsterAttack"),ctx);
@@ -94,8 +94,49 @@ for(const rank of ["regular","boss"]){
         const r=runtime({rank});r.ctx.processSingleMonsterAttack(0,7);r.setRandom(.9);r.flush();
         assert.deepEqual(r.hits,[0,0]);assert.equal(r.finishes,1);assert.equal(r.ctx.monsters[0].sp,90);
     });
-    test(rank+" lethal first hit terminates follow-up without retarget",()=>{
+    test(rank+" lethal first hit retargets snapshot survivor",()=>{
         const r=runtime({rank,hp:[5,100,100]});r.ctx.processSingleMonsterAttack(0,7);r.flush();
-        assert.deepEqual(r.hits,[0]);assert.equal(r.party[1].hp,100);assert.equal(r.finishes,1);
+        assert.deepEqual(r.hits,[0,1]);assert.equal(r.party[1].hp,90);assert.equal(r.finishes,1);
     });
 }
+
+for(const [skillId,maxCasts] of [["flameSlash",1],["fireCritical",1],["explosiveFlurry",1],["dragonSlash",2]]){
+    test(skillId+" lethal chain retains cast limit, SP and once-only finish",()=>{
+        const r=runtime({skillId,maxCasts,hp:[5,5,5],critical:false});r.setRandom(.05);
+        r.ctx.processSingleMonsterAttack(0,7);r.flush();
+        assert.deepEqual(r.hits,maxCasts===2?[0,1,2]:[0,1]);
+        assert.equal(r.badges.length,maxCasts+1);assert.equal(r.ctx.monsters[0].sp,90);
+        assert.equal(r.finishes,1);
+    });
+}
+test("dragon retarget locks surviving B for second follow-up",()=>{
+    const r=runtime({skillId:"dragonSlash",maxCasts:2,hp:[5,100,100]});
+    r.ctx.processSingleMonsterAttack(0,7);r.flush();assert.deepEqual(r.hits,[0,1,1]);assert.equal(r.finishes,1);
+});
+test("A/B/C/D: revived D never enters lethal fallback roster",()=>{
+    const r=runtime({skillId:"dragonSlash",maxCasts:2,hp:[5,5,100,0]});
+    const snapshot=r.plan();r.party[3].hp=100;r.setRandom(.99);
+    r.ctx.processSingleMonsterAttack(0,7,snapshot);r.flush();
+    assert.deepEqual(r.hits,[0,2,2]);assert.equal(r.party[3].hp,100);
+    assert.deepEqual(Array.from(snapshot.targets,e=>e.index),[0,1,2]);
+});
+test("lethal fallback excludes hidden/reused identities and stops when exhausted",()=>{
+    const r=runtime({hp:[5,100,0]});const snapshot=r.plan();r.party[1].stealth=true;r.party[2].hp=100;
+    r.ctx.processSingleMonsterAttack(0,7,snapshot);r.flush();assert.deepEqual(r.hits,[0]);assert.equal(r.finishes,1);
+});
+test("dead caster stops pending free cast and finishes once",()=>{
+    const r=runtime({hp:[5,100,100]});r.ctx.processSingleMonsterAttack(0,7);r.ctx.monsters[0].hp=0;r.ctx.monsters[0].alive=false;
+    r.flush();assert.deepEqual(r.hits,[0]);assert.equal(r.finishes,1);
+});
+test("noncritical nonlethal cast has no follow-up",()=>{
+    const r=runtime({critical:false});const snapshot=r.plan();r.setRandom(.5);r.ctx.processSingleMonsterAttack(0,7,snapshot);r.flush();assert.deepEqual(r.hits,[0]);assert.equal(r.finishes,1);
+});
+test("tri geometry is resolved anew around retargeted primary",()=>{
+    const r=runtime({shape:"tri",hp:[5,100,100]});const centers=[];
+    r.ctx.resolveBattlefieldTargets=(_,i)=>{centers.push(i);return [i];};
+    r.ctx.processSingleMonsterAttack(0,7);r.flush();assert.deepEqual(r.hits,[0,1]);assert.deepEqual([...new Set(centers)],[0,1]);
+});
+test("originally hidden primary candidate stays outside fallback after becoming visible",()=>{
+    const r=runtime({hp:[5,100,100]});r.party[1].stealth=true;const snapshot=r.plan();r.party[1].stealth=false;
+    r.ctx.processSingleMonsterAttack(0,7,snapshot);r.flush();assert.deepEqual(r.hits,[0,2]);assert.equal(r.party[1].hp,100);
+});
