@@ -489,6 +489,13 @@
                 return;
             }
 
+            const targetType=normalizeBattleTargetType(getEffectiveSkillTargetType(options.skill));
+            options.attackArgs[2]=retargetEnemyFollowUpSnapshot(options.attackArgs[2],targetType);
+            if(!resolveEnemyActionTargets(options.attackArgs[2],targetType).targets.length){
+                if(options.realFinish){ options.realFinish(); }
+                return;
+            }
+
             const originalCost=options.skill.spCost;
             const originalIds=monster.skillIds;
             const originalSupports=monster.v141SupportSkillIds;

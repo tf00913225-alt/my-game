@@ -17559,6 +17559,23 @@ function resolveEnemyActionTargets(snapshot,targetType){
     ).filter(Boolean)};
 }
 
+/* Free fire casts may replace a defeated primary, never the round roster.
+   A living but illegal/replaced identity is not a lethal fallback. */
+function retargetEnemyFollowUpSnapshot(snapshot,targetType){
+    const primary=snapshot.primary;
+    if(targetType==="all"||!primary||primary.character.hp>0||
+        getPartyCharacterByIndex(primary.index)!==primary.character){
+        return snapshot;
+    }
+    const survivors=snapshot.targets.filter(entry=>
+        getPartyCharacterByIndex(entry.index)===entry.character&&entry.character.hp>0&&
+        canSelectHostileBattlePrimary("player",entry.index,targetType)
+    );
+    if(!survivors.length){ return snapshot; }
+    const next=survivors[survivors.length===1?0:Math.floor(Math.random()*survivors.length)];
+    return Object.freeze({...snapshot,primary:next});
+}
+
 function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
 
     if(

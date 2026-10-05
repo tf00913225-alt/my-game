@@ -1,3 +1,8 @@
+## 2026-10-05 — FIRE-FOLLOWUP-LETHAL-RETARGET-20261005 / IMPLEMENTED
+
+- Base dev a9e3cc0c14c74005f517a594b96c1886665ff469; fix/fire-followup-lethal-retarget-20261005 → dev; main forbidden. Core snapshot-only lethal retarget + V149 handoff, no wrapper/AI/queue replacement. Original living primary stays locked; killed primary may switch to original legal survivor. Late revived identities remain excluded.
+- 29/29 focused, 35/35 related PASS, build/check PASS. Production Browser/CI/integration/deployment/cleanup pending; no COMPLETE claim. Owner and evidence: docs/FIRE_FOLLOWUP_LETHAL_RETARGET_20261005.md. Wind work waits for Fire integration.
+
 <!-- Phase1 production evidence: 24/24 Chrome scenarios PASS (390x844,412x915), run37273828938/artifact11329756508. Exact final CI/integration/deployed QA still pending; no COMPLETE or physical-device claim. -->
 ## 2026-10-05 — BATTLE-TARGET-LIFECYCLE-CONVERGENCE-20261005 / IMPLEMENTED
 

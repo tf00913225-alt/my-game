@@ -26,8 +26,8 @@
 
 ## 戰鬥目標契約
 
-- 敵方行動目標生命週期由 `js/00-main.js::createEnemyActionTargetSnapshot`／`resolveEnemyActionTargets` 唯一持有。在正式回合佇列建立時封存當時存活的角色身份與合法 primary；結算只能重驗該身份，不得重抽、依第一名存活者替換或納入本回合稍後復活的角色。索引重用不等於原身份。非存檔快照綁定 Battle Token、Round 與 Enemy Identity；取消、換戰鬥、換回合或更換敵人即失效。
-- 敵方免費追擊沿用原 action snapshot。原 primary 死亡／失去合法性時 targeted 追擊終止；範圍由正式 Slot Owner 解析後仍限原存活快照。全體技維持原全體語意但不納入稍後復活者。V149 只擁有追擊次數與演出，不擁有重新選目標的決策權。
+- 敵方行動目標生命週期由 `js/00-main.js::createEnemyActionTargetSnapshot`／`resolveEnemyActionTargets` 唯一持有。在正式回合佇列建立時封存當時存活的角色身份與合法 primary；原始施放只能重驗該身份，不得重抽、依第一名存活者替換或納入本回合稍後復活的角色。索引重用不等於原身份。非存檔快照綁定 Battle Token、Round 與 Enemy Identity；取消、換戰鬥、換回合或更換敵人即失效。
+- 敵方免費追擊沿用原 action snapshot。原 primary 存活且合法時必須沿用；被上一擊擊敗時，由同一 Core Target Owner 的 `retargetEnemyFollowUpSnapshot` 從原 Snapshot 身份中選取目前存活且合法的 primary，並鎖定給後續追擊。存活但失去合法性／身份被替換時不得 fallback；無合法 Survivor 才停止。範圍由正式 Slot Owner 解析後仍限原存活快照。全體技維持原全體語意但不納入稍後復活者。V149 只擁有追擊次數與演出，不擁有重新選目標的決策權。
 
 - 一般戰鬥維持 `single / tri / row / column / all` 的 Fixed Slot（固定格位）規則。
 - `FourSymbolsBattleSkillTargeting` 是技能 Target Shape（目標形狀）與 hostile primary eligibility（敵對主要目標可選性）的唯一協調入口；玩家→敵方、敵方→玩家、手動、自動與支援技能都必須使用同一份正式 Skill Data／effective target type，再交由 `FourSymbolsBattlefieldSlots` 解析幾何。禁止同一 Skill ID 因施放方不同而硬寫第二份目標人數或範圍。

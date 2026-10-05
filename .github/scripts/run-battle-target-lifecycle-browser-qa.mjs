@@ -26,7 +26,7 @@ const expression=`(async()=>{
         characterSkillLoadouts[getPartyCharacterKey(i)].skillLevels={};
     }
     const rows=[];
-    for(const mode of ['manual','auto'])for(const rank of ['regular','boss'])for(const scenario of ['living','lethal','revived']){
+    for(const mode of ['manual','auto'])for(const rank of ['regular','boss'])for(const scenario of ['living','lethal','revived','dragon-surviving','dragon-lethal','revived-lethal']){
         autoBattle=false;autoConfig.enabled=false;autoConfig2.enabled=false;autoConfig3.enabled=false;
         for(const i of getExistingPartyIndexes())getPartyCharacterByIndex(i).hp=getPartyBattleStats(i).maxHP;
         const enemy=MonsterBalance.build({monsterKey:'qa.target.'+rank,name:'QA fire enemy',level:50,element:'fire',archetype:'balanced',rank,
@@ -41,14 +41,17 @@ const expression=`(async()=>{
             closeHomeFeature();
             releasePause=FourSymbolsBattleFlow.acquirePauseLock('target-lifecycle-qa');
             battlePhase='declare';resolutionPhaseStarted=false;
-            if(scenario==='revived')player.hp=0;
-            if(scenario==='lethal')player.hp=1;
+            if(scenario.startsWith('revived'))player.hp=0;
+            if(scenario==='lethal'||scenario.startsWith('dragon'))player.hp=1;
+            if(scenario==='dragon-lethal')player3.hp=1;
+            if(scenario==='revived-lethal')player2.hp=1;
+            if(scenario.startsWith('dragon'))enemy.skillIds=['dragonSlash'];
             queuedPlayerActions={};autoBattle=mode==='auto';
             Math.random=()=>0;
             startResolutionPhase(battleToken);
             const action=initiativeQueue.find(e=>e.type==='monster'&&e.monsterIndex===0);
             if(!action?.targetSnapshot)throw Error('natural queue missing snapshot');
-            if(scenario==='revived')player.hp=getMainCharacterStats().maxHP;
+            if(scenario.startsWith('revived'))player.hp=getMainCharacterStats().maxHP;
             const before=getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp);
             const beforeSp=enemy.sp;
             releaseFinish=FourSymbolsBattleFlow.interceptActionFinish(()=>{finished++;return true;});
@@ -59,7 +62,7 @@ const expression=`(async()=>{
             await wait(()=>finished===1,'follow-up completion: '+JSON.stringify({mode,rank,scenario,badges,hits}));
             await wait(()=>!window.v142SkillAnimationDirector?.getActive?.()||window.v142SkillAnimationDirector.getActive().done,'VFX completion');
             rows.push({mode,rank,scenario,before,beforeSp,after:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),badges,hits,
-                snapshot:action.targetSnapshot.targets.map(t=>t.index),primary:action.targetSnapshot.primary?.index,sp:enemy.sp,cost:skillDatabase.fireCritical.spCost,finished,
+                snapshot:action.targetSnapshot.targets.map(t=>t.index),primary:action.targetSnapshot.primary?.index,sp:enemy.sp,cost:skillDatabase[scenario.startsWith('dragon')?'dragonSlash':'fireCritical'].spCost,finished,
                 visible:document.getElementById('battlePage')?.classList.contains('active')===true&&
                     !document.getElementById('homeFeatureModal')?.classList.contains('show')&&
                     !!document.getElementById('battlePlayerCard1')?.getBoundingClientRect().height});
@@ -87,17 +90,23 @@ try{
         await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
         const rows=await client.eval(expression);
         evidence.push({width,height,rows});
-        assert.equal(rows.length,12);
+        assert.equal(rows.length,24);
         for(const r of rows){
             assert.equal(r.finished,1);assert.equal(r.visible,true);assert.ok(r.hits.some(h=>h.critical===true));
-            const target=r.scenario==='revived'?1:0;
+            const target=r.scenario.startsWith('revived')?1:0;
             assert.equal(r.primary,target);assert.ok(r.badges.length>0);
-            assert.ok(r.badges.every(b=>b.primary===target&&b.targets.length===1&&b.targets[0]===target));
-            assert.ok(r.hits.every(h=>h.index===target));
-            if(r.scenario==='lethal'){assert.equal(r.hits.length,1);assert.equal(r.after[0],0);}
-            else{assert.equal(r.badges.length,2);assert.ok(r.after[target]<r.before[target]);}
-            r.after.forEach((hp,index)=>{if(index!==target)assert.equal(hp,r.before[index]);});
-            if(r.scenario==='revived')assert.deepEqual(r.snapshot,[1,2]);
+            const primaries=r.badges.map(b=>b.primary);
+            const expectedTargets=r.scenario==='lethal'?[0,2]:r.scenario==='dragon-lethal'?[0,2,1]:
+                r.scenario==='dragon-surviving'?[0,2,2]:r.scenario==='revived-lethal'?[1,2]:[target,target];
+            // .9 selects C from B/C; a surviving new primary remains locked.
+            assert.deepEqual(primaries,expectedTargets);
+            assert.deepEqual(r.hits.map(h=>h.index),expectedTargets);
+            assert.ok(r.badges.every(b=>b.targets.length===1&&b.targets[0]===b.primary));
+            const attacked=new Set(expectedTargets);
+            r.after.forEach((hp,index)=>{if(!attacked.has(index))assert.equal(hp,r.before[index]);});
+            if(r.scenario.startsWith('revived')){assert.deepEqual(r.snapshot,[1,2]);assert.equal(r.after[0],r.before[0]);}
+            if(r.scenario==='lethal'||r.scenario.startsWith('dragon'))assert.equal(r.after[0],0);
+            if(r.scenario==='revived-lethal')assert.equal(r.after[1],0);
             assert.ok(r.beforeSp>=r.cost,'formal initial SP is sufficient');
             assert.equal(r.sp,r.beforeSp-r.cost,'original cost once; follow-up free');
         }
@@ -105,7 +114,7 @@ try{
         fs.writeFileSync(path.join(out,'battle-target-'+width+'.png'),Buffer.from(png.data,'base64'));
     }
     fs.writeFileSync(path.join(out,'battle-target-lifecycle.json'),JSON.stringify({passed:true,expected,baseUrl,evidence},null,2)+'\n');
-    console.log('Battle target lifecycle: 24 full-production mobile browser scenarios PASS');
+    console.log('Battle target lifecycle: 48 full-production mobile browser scenarios PASS');
 }catch(error){
     fs.writeFileSync(path.join(out,'battle-target-lifecycle.json'),JSON.stringify({passed:false,expected,baseUrl,evidence,error:String(error.stack||error),events:client?.events.slice(-15)},null,2)+'\n');throw error;
 }finally{
