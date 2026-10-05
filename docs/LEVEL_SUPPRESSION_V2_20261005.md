@@ -71,12 +71,14 @@ future calibration. No UI or release version change.
   added a fresh VM loading ALL current generated production feature bundles in
   dependency order. Fixed attack/defense/element/bonus/crit/pressure, Lv70/71/69/
   100/40 calculateDamage in both directions and actual calculateSkillDamage
-  match the canonical curve. Levels1/100 retain identical hit, evasion, status,
+  match the canonical curve. Actual normalAttack/processSingleMonsterAttack
+  entrypoints also execute each same-level/±1/±30 vector. Levels1/100 retain identical hit, evasion, status,
   hard control and the complete 100-roll critical distribution.
 - Existing six-stat, damage/normal/enemy/skill, Hit/Evasion V2, status/hard-control,
   critical, MonsterBalance aggregate and cloud browser-rule parity remain gates.
 - Existing build Owner: `npm run build` followed by `npm run build:check`;
   superseded hashed files are retired automatically. No hand-edited bundle/hash.
-- Existing CI discovers the new suite; no second workflow. Requirement stays
+- Existing dev Hit/Evasion CI step explicitly executes the new suite; no second
+  workflow. The main-only all-suite step is not used as dev verification. Requirement stays
   IMPLEMENTED until all functional/build and exact latest-head CI gates pass.
   Work PR owns live CI, integration, deployment and branch-cleanup evidence.

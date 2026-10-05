@@ -1685,6 +1685,25 @@ test("Level Suppression V2 after ALL generated production feature bundles",()=>{
         const enemyDamage=levels.map(level=>{player.level=70;target.level=level;return calculateDamage(10000,400,level,70,"light","light",{attacker:target,target:player,ordinaryDamageBonusPercent:20,critMultiplier:1.5});});
         const skill=skillDatabase.stoneSlash;
         const skillDamage=levels.map(level=>{player.level=level;target.level=70;return calculateSkillDamage({skill,skillLevel:1,effectiveAttack:10000,casterLevel:level,casterElement:"light",target,targetDefense:400,attacker:player});});
+        const fixedStats={attack:10000,defense:400,maxHP:1000000,maxSP:1000,evasion:0,accuracy:0,antiCrit:100,criticalChance:0,criticalDamage:0,statusAccuracy:0};
+        getMainCharacterStats=function(){return fixedStats;};
+        getPartyBattleStats=function(){return fixedStats;};
+        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
+        lungePlayerCard=function(){};showSkillNameBadge=function(){};
+        showPlayerHit=function(){};showMonsterHit=function(){};
+        currentZone="grassland";battleActive=true;battleToken=810;turn=1;selectedMonster=0;
+        target.rank="regular";target.attack=10000;target.magicAttack=10000;
+        target.accuracy=0;target.evasion=0;target.antiCrit=100;
+        target.activeBuffs=[];target.skillIds=[];target.skillChance=0;
+        monsters.splice(0,monsters.length,target);currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
+        const playerNormal=levels.map(level=>{
+            player.level=level;player.hp=1000000;target.level=70;target.hp=1000000;target.maxHP=1000000;
+            normalAttack();return 1000000-target.hp;
+        });
+        const enemyNormal=levels.map(level=>{
+            player.level=70;player.hp=1000000;target.level=level;target.hp=1000000;
+            processSingleMonsterAttack(0,battleToken);return 1000000-player.hp;
+        });
         const isolation=[1,100].map(level=>{
             player.level=level;target.level=101-level;
             const hit=calculateHitChancePercent(8,12,5,10,target);
@@ -1698,7 +1717,7 @@ test("Level Suppression V2 after ALL generated production feature bundles",()=>{
             }
             return {hit,evasion,status,hard,critical};
         });
-        return {levels,playerDamage,enemyDamage,skillDamage,skillRaw:getSkillRawAttack(skill,1,10000),isolation};
+        return {levels,playerDamage,enemyDamage,playerNormal,enemyNormal,skillDamage,skillRaw:getSkillRawAttack(skill,1,10000),isolation};
     })()`);
     const defenseFactor=1100/1500;
     for(let index=0;index<report.levels.length;index++){
@@ -1706,6 +1725,9 @@ test("Level Suppression V2 after ALL generated production feature bundles",()=>{
         const expected=Math.round(10000*defenseFactor*1.2*1.5*Math.pow(1.01,level-70));
         assert.equal(report.playerDamage[index],expected,'player damage at '+level);
         assert.equal(report.enemyDamage[index],expected,'enemy damage at '+level);
+        const normalExpected=Math.round(10000*defenseFactor*Math.pow(1.01,level-70));
+        assert.equal(report.playerNormal[index],normalExpected,'actual player normal attack at '+level);
+        assert.equal(report.enemyNormal[index],normalExpected,'actual enemy normal attack at '+level);
         assert.equal(report.skillDamage[index],Math.round(report.skillRaw*defenseFactor*Math.pow(1.01,level-70)),'skill damage at '+level);
     }
     assert.deepEqual(report.isolation[0],report.isolation[1],'Hit/Evasion/Status/Hard Control/Crit do not couple to levels');
