@@ -1,3 +1,8 @@
+## 2026-10-05 — Level Suppression V2
+
+- Work ID LEVEL-SUPPRESSION-V2-20261005；target dev；main 禁止修改。Final Damage Level Multiplier `1.01 ^ levelDiff`，Single Owner `js/00-main.js::getDamageLevelMultiplier()`，玩家／怪物與普攻／技能共用；No artificial cap/floor. No Hit/Evasion/Status/Crit coupling.
+- 舊線性／0.85～1.15等級Clamp已退休；build同步伺服器生成規則，未新增Owner／Wrapper。Level Base與MonsterBalance所有Profile不變，Tower校正另案。正式契約 `docs/LEVEL_SUPPRESSION_V2_20261005.md`；功能／CI／整合／部署／清理即時狀態由Work PR追蹤。
+
 ## 2026-10-05 — Monster Balance Owner Phase 1–2F COMPLETE
 
 - Final documentation Work ID: MONSTER-BALANCE-OWNER-FINAL-CLOSEOUT-20261005; base dev 3b4ffbc2963cc472fa13857e2923cb80506e93e4; branch chore/monster-balance-owner-final-closeout-20261005; target dev.
@@ -1014,7 +1019,7 @@ Full inventory, caller graph, profiles and evidence: `docs/MONSTER_BALANCE_OWNER
 - `js/00-main.js` 是 `calculateDamage()`、`calculateSkillDamage()` 與 `damageRole` 的單一權威 owner；
   V149、V155、V169 的下游傷害覆寫已移除，既有元素、狀態、爆擊與技能分類仍保留。
 - 玩家與怪物統一採「30＋等級成長＋有效六圍」尺度；五種正式 damageRole、曲線防禦、
-  0.85～1.15 等級差、1.20／1.00／0.85 元素倍率均依 V173.38 規格校準。
+  連續指數等級差（Level Suppression V2取代舊0.85～1.15上／下限）、1.20／1.00／0.85 元素倍率均依 V173.38 規格校準。
 - 元素 EX、套裝、異常增傷、一般技能與未來詞條進入同一普通增傷加算桶，上限 1.50；
   爆擊最終上限 2.25，技能可選 `damageBudgetMultiplier`，未指定時為 1.00。
 - 怪物對玩家才套敵方壓力：普通／精英／BOSS 加成 0%／10%／20%，日常副本另加 5%，

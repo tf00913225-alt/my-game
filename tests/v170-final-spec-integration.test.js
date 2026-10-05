@@ -482,7 +482,7 @@ test("final hit, evasion and status chances use one percentage-point model",()=>
     runtime.context.Math.random=()=>0.5;
     assert.deepEqual(
         levelCases.map(difference=>runtime.context.calculateDamage(100,0,50+difference,50,"fire","fire")),
-        [100,105,110,115,115,95,90,85,85]
+        levelCases.map(difference=>Math.round(100*Math.pow(1.01,difference)))
     );
 });
 
@@ -1413,7 +1413,7 @@ test("V173.38 formal damage matrix covers levels, roles, elements, pressure and 
         assert.ok(row.values.aoe_damage<row.values.tri_damage);
         Object.values(row.values).forEach(value=>assert.ok(Number.isFinite(value)&&value>=1));
     });
-    assert.deepEqual(report.level,[1000,1100,850]);
+    assert.deepEqual(report.level,[1000,Math.round(1000*Math.pow(1.01,10)),Math.round(1000*Math.pow(1.01,-20))]);
     assert.deepEqual(report.element,[1000,1200,850]);
     assert.deepEqual(report.pressures,[1,1.1,1.2,1.25,1.35]);
     assert.equal(report.reverse,1);
@@ -1657,6 +1657,80 @@ test("V2 explicit hit fields survive Daily Owner construction and repeated rende
     })()`);
     assert.deepEqual(values.daily,[[10,8,97],[10,8,97],[10,8,97]]);
     assert.deepEqual(values.beginner,[10,8,100]);
+});
+
+test("Level Suppression V2 after ALL generated production feature bundles",()=>{
+    const context=makeContext();
+    context.document.createDocumentFragment=()=>makeUniversalNode();
+    vm.runInContext(fs.readFileSync('js/startup/account-save-repository.js','utf8'),context);
+    vm.runInContext('FourSymbolsAccountSave.activate("v170-test-uid")',context);
+    const manifest=JSON.parse(fs.readFileSync('asset-manifest.json','utf8'));
+    const features=manifest.featureManifest.bundles;
+    const loaded=new Set();
+    function load(name){
+        if(loaded.has(name))return;
+        const bundle=features[name];
+        for(const dependency of bundle.dependencies||[])load(dependency);
+        for(const file of bundle.scripts||[])vm.runInContext(fs.readFileSync(file,'utf8'),context,{filename:file,timeout:5000});
+        loaded.add(name);
+    }
+    for(const name of Object.keys(features))load(name);
+    const report=evaluateJson(context,`(function(){
+        Math.random=function(){return .5;};
+        Object.assign(player,{id:"V2",element:"light",activeBuffs:[],statusEffects:[],hp:1000});
+        player2=null;player3=null;
+        const target={level:70,element:"light",hp:100000,maxHP:100000,defense:400,alive:true,statusEffects:[]};
+        const levels=[70,71,69,100,40];
+        const playerDamage=levels.map(level=>{player.level=level;return calculateDamage(10000,400,level,70,"light","light",{attacker:player,target,ordinaryDamageBonusPercent:20,critMultiplier:1.5});});
+        const enemyDamage=levels.map(level=>{player.level=70;target.level=level;return calculateDamage(10000,400,level,70,"light","light",{attacker:target,target:player,ordinaryDamageBonusPercent:20,critMultiplier:1.5});});
+        const skill=skillDatabase.stoneSlash;
+        const skillDamage=levels.map(level=>{player.level=level;target.level=70;return calculateSkillDamage({skill,skillLevel:1,effectiveAttack:10000,casterLevel:level,casterElement:"light",target,targetDefense:400,attacker:player});});
+        const fixedStats={attack:10000,defense:400,maxHP:1000000,maxSP:1000,evasion:0,accuracy:0,antiCrit:100,criticalChance:0,criticalDamage:0,statusAccuracy:0};
+        getMainCharacterStats=function(){return fixedStats;};
+        getPartyBattleStats=function(){return fixedStats;};
+        updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
+        lungePlayerCard=function(){};showSkillNameBadge=function(){};
+        showPlayerHit=function(){};showMonsterHit=function(){};
+        currentZone="grassland";battleActive=true;battleToken=810;turn=1;selectedMonster=0;
+        target.rank="regular";target.attack=10000;target.magicAttack=10000;
+        target.accuracy=0;target.evasion=0;target.antiCrit=100;
+        target.activeBuffs=[];target.skillIds=[];target.skillChance=0;
+        monsters.splice(0,monsters.length,target);currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
+        const playerNormal=levels.map(level=>{
+            player.level=level;player.hp=1000000;target.level=70;target.hp=1000000;target.maxHP=1000000;
+            normalAttack();return 1000000-target.hp;
+        });
+        const enemyNormal=levels.map(level=>{
+            player.level=70;player.hp=1000000;target.level=level;target.hp=1000000;
+            processSingleMonsterAttack(0,battleToken);return 1000000-player.hp;
+        });
+        const isolation=[1,100].map(level=>{
+            player.level=level;target.level=101-level;
+            const hit=calculateHitChancePercent(8,12,5,10,target);
+            const evasion=getMonsterEvasion(target);
+            const status=calculateStatusEffectChance(40,level,101-level,100,12,false,"regular",3,5);
+            const hard=calculateStatusEffectChance(40,level,101-level,100,12,true,"boss",3,5);
+            const critical=[];
+            for(let roll=0;roll<100;roll++){
+                Math.random=function(){return (roll+.5)/100;};
+                critical.push(rollCritical(player,"physical",5,target));
+            }
+            return {hit,evasion,status,hard,critical};
+        });
+        return {levels,playerDamage,enemyDamage,playerNormal,enemyNormal,skillDamage,skillRaw:getSkillRawAttack(skill,1,10000),isolation};
+    })()`);
+    const defenseFactor=1100/1500;
+    for(let index=0;index<report.levels.length;index++){
+        const level=report.levels[index];
+        const expected=Math.round(10000*defenseFactor*1.2*1.5*Math.pow(1.01,level-70));
+        assert.equal(report.playerDamage[index],expected,'player damage at '+level);
+        assert.equal(report.enemyDamage[index],expected,'enemy damage at '+level);
+        const normalExpected=Math.round(10000*defenseFactor*Math.pow(1.01,level-70));
+        assert.equal(report.playerNormal[index],normalExpected,'actual player normal attack at '+level);
+        assert.equal(report.enemyNormal[index],normalExpected,'actual enemy normal attack at '+level);
+        assert.equal(report.skillDamage[index],Math.round(report.skillRaw*defenseFactor*Math.pow(1.01,level-70)),'skill damage at '+level);
+    }
+    assert.deepEqual(report.isolation[0],report.isolation[1],'Hit/Evasion/Status/Hard Control/Crit do not couple to levels');
 });
 
 console.log("\nV170 final integration suite: "+passed+" tests passed.");
