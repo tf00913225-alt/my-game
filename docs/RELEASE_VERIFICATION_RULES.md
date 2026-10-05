@@ -1,6 +1,8 @@
 # 《四象江湖傳》Release / Requirement Verification 永久規範
 
-本文件是 `AGENTS.md` 與 `CLAUDE.md` 的共通永久發布規範。GPT、Claude、Codex 或任何 AI 開發代理都必須遵守。除非專案負責人日後明確修改，否則不得繞過。
+本文件是 Release／Candidate／Freeze／dev → main／正式版本／Release Readiness／Exact-HEAD production verification 的唯一發布驗證 Owner；在這些任務內完整適用，main 發布仍須使用者正式授權。
+
+AGENTS.md 唯一控制 Agent 讀取路由。一般 dev Bug、Additive 或 docs/governance-only 不預設載入完整發布契約，也不因本文件要求升版、正式部署或玩家實機驗收；既有 CI／Release Gate／deployment checks 正常執行，不取消、不略過。普通工作生命周期依 AGENTS、一般 Bug 結案依 Fast Path；本文件的 NOT COMPLETE／逐項發布驗證門檻適用其發布範圍。
 
 ## 最高優先級規則
 
@@ -158,22 +160,15 @@ Repository checks SUCCESS 只表示既有自動檢查通過；Deploy SUCCESS 只
 
 ## 16A. Repository Closeout 與 main/dev 有效內容收斂
 
-本節為 `dev / main` 固定流程不可省略的最後階段，適用於所有 Work、GPT、Claude、Codex 與其他開發／發布 owner。
+本節為正式 `dev → main` 發布不可省略的收尾；普通 dev 工作只依 AGENTS 的 lifecycle／清理，不自動延伸至 main。
 
 標準完整流程改為：
 
 `最新 dev → 工作分支 → PR 回 dev → CI/Requirement Verification → 合併 dev → 安全清理已完成工作分支／被取代 PR → dev preview／使用者確認 → dev → main PR → main CI → production deploy → production version/SHA verification → 安全清理發布分支 → main/dev 有效內容收斂確認`。
 
-### 16A-1. 合併後分支清理
-- PR 合併後，來源工作分支必須立即進入「是否可刪除」判定。
-- 僅當分支內容已完整吸收、沒有獨立有效 commit／diff、也沒有明確長期保存需求時才刪除。
-- `main`、`dev`、`assets-library` 及專案負責人明確指定保留的 backup／長期分支禁止自動刪除。
-- 不得為降低 branch count 而刪除尚未吸收內容。
+### 16A-1／16A-2. 分支與被取代 PR 清理
 
-### 16A-2. 舊 PR／被取代 PR 收尾
-- 舊 PR 只有在有效內容已完整進入目前權威分支，或由另一個明確 PR／commit 完整取代時，才可關閉。
-- 關閉時應能指出 replacement PR／commit 或已吸收的目標 SHA；仍含獨立有效內容時不得關閉。
-- 已合併、已取代且無獨立內容的 PR 不應繼續被週報列為「待開發／待修復」。
+安全清理與有效內容吸收判定統一引用 AGENTS.md「工作生命週期／DEV PR 自動整合規則」，發布工作同樣遵守；不複製第二套清理授權。發布分支不是永久分支，內容已完整進 main 且無保留理由時必須安全清理。
 
 ### 16A-3. dev → main 發布後收斂
 - 正式發布完成後必須比較 `main` 與 `dev` 的**實際有效內容**。
@@ -191,7 +186,7 @@ Repository checks SUCCESS 只表示既有自動檢查通過；Deploy SUCCESS 只
 - 歷史已完成 branch 數量、已被取代且無獨立內容的舊 PR、純 merge-history 差異，只能列入 Hygiene，不得單獨把總燈號從綠降成黃。
 
 ### 16A-5. 結案回報
-每次完成工作若涉及 GitHub 分支／PR，完成回報除既有欄位外，還必須補：
+本發布流程完成回報除既有欄位外，還必須補：
 - Source branch closeout：DELETED／RETAINED（附原因）
 - Superseded PR closeout：CLOSED／NONE／RETAINED（附原因）
 - Release branch closeout：DELETED／N/A／RETAINED（附原因）
@@ -240,7 +235,7 @@ CI 無法取代所有 UI／手機實機、操作手感、視覺完整性、使�
 
 ## 21. Release Readiness Priority Framework（發布整備優先級框架）
 
-本章是全 Repository 唯一的 **Release Readiness Priority Framework** 正式 Owner。它永久適用所有版本、Release（發布）、Bug（錯誤）、功能開發與 P0／P1／P2 分類；AGENTS.md、CLAUDE.md 只能放入口，不得複製、改寫或建立第二份規則。
+本章是全 Repository 唯一的 **Release Readiness Priority Framework** 正式 Owner。它適用發布整備與 P0／P1／P2 Release Readiness 分類；普通 Bug／功能不因此必讀完整發布規範。AGENTS.md、CLAUDE.md 只能放入口，不得複製、改寫或建立第二份規則。
 
 本框架只界定「發布整備」與「正常開發」的責任邊界。它**不得降低**既有 Bug Repair DoD（錯誤修復完成定義）、Owner Convergence Gate（控制來源收斂閘門）、Change Safety Contract（變更安全契約）、Cloud Save fail-closed（雲端存檔預設拒絕）、main 保護、dev PR（合併請求）流程、Release Verification（發布驗證）或 Repository Closeout（程式庫收尾）規則。
 
