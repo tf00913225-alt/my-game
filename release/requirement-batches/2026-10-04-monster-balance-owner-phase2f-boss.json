@@ -19,7 +19,7 @@
           "scripts/boss-balance-ttk-matrix.mjs"
         ],
         "verification": "53/53 Phase1–2F aggregate, 7/7 focused, 50/50 formal neutral/seeded TTK, 18/18 natural Chrome scenes at390×844/412×915, snapshot/mechanism/reward regression, final legacy audit and build sync PASS. Exact source d5f88fb03130360add0bbd330930c80c5db6b5c7; Repository CI37220134518 jobs111488621828/111488621822/111488621691/111488621595 SUCCESS; Session CI37220134254 job111488620833 SUCCESS. Boss artifact11309889570 SHA256f949c5f06aa8277bb959e7b111f93599481e6fa1d1cb684126dd8a77c4a26606 independently checked.",
-        "result": "1/1 functional VERIFIED. Metadata-head CI, integration, deployed exact SHA/live QA and safe branch cleanup are separate release/closeout gates owned by PR#799."
+        "result": "Phase2F COMPLETE: PR #799 MERGED; final Head 0c66504aa877c3e004cadef983135954f7909a77; merge / verified phase deployment SHA db8530b59d683231535da717d1f641c391adbbcd. CI Run37227464910 / Repository Job111509986097 / deployment Job111516425091 SUCCESS. Exact SHA and live QA retained in PR final closeout. Construction branch DELETED / absent. Original functional verification retained; main untouched."
       }
     }
   ]

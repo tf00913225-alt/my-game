@@ -11,7 +11,7 @@
     "allocationAndIntent": "js/combat/monster-archetypes.mjs",
     "monsterProjection": "js/combat/monster-balance-owner.mjs"
   },
-  "phase1Gate": "shadow architecture PASS only; formal multi-owner convergence intentionally deferred until approved Phase2",
+  "phase1Gate": "COMPLETE per merged/deployed/cleaned PR #777; approved shadow scope complete, subsequent Phase2 migration complete.",
   "grandfatheredWrappers": {},
   "items": [
     {
@@ -343,7 +343,7 @@
       "retirementGate": "Token absent and bridge never calls shared V132 stat builder"
     }
   ],
-  "phase2aGate": "15/15 functional requirements VERIFIED: focused20/20, unchanged non-Wild outputs, 40 diagnostic TTK and both-viewports natural Chrome. Latest Required CI/dev integration/deployed exact SHA remain separate gates owned by PR #780.",
+  "phase2aGate": "COMPLETE per merged/deployed/cleaned PR #780; functional15/15 VERIFIED.",
   "phase2bGate": "COMPLETE per merged/deployed/cleaned PR #784; historical functional record retained in Phase2B documentation.",
   "phase2cGate": {
     "workId": "MONSTER-BALANCE-OWNER-P2C-TOWER-20261004",
@@ -374,7 +374,7 @@
       "artifactSha256": "d3ba1425e94ad12b6d5a73f592ad3c6c0132b34b81a806f8d4fb97695a15c928",
       "requiredCi": "SUCCESS at this functional source head",
       "screenshotsReviewed": true,
-      "scope": "Functional VERIFIED. Final metadata-head CI, integration and exact dev deployment are separate gates owned by PR #788."
+      "scope": "Historical functional-source evidence; integration/deployment/cleanup COMPLETE per PR #788."
     },
     "modeCalibration": {
       "hp": 0.2,
@@ -474,7 +474,7 @@
   "phase2fGate": {
     "status": "VERIFIED",
     "remainingLegacyModes": [],
-    "remaining": "Metadata-head CI, integration, exact deployment/live QA and safe branch cleanup",
+    "remaining": "None",
     "functionalEvidence": {
       "sourceHead": "d5f88fb03130360add0bbd330930c80c5db6b5c7",
       "ciRun": 37220134518,
@@ -492,6 +492,47 @@
       "focused": "7/7",
       "aggregate": "53/53",
       "ttk": "50/50"
-    }
+    },
+    "historicalRemaining": "Metadata-head CI, integration, exact deployment/live QA and safe branch cleanup",
+    "integration": "COMPLETE",
+    "deployment": "COMPLETE",
+    "closeout": "COMPLETE per merged/deployed/cleaned PR #799",
+    "finalHead": "0c66504aa877c3e004cadef983135954f7909a77",
+    "mergeSha": "db8530b59d683231535da717d1f641c391adbbcd",
+    "finalHeadCiRun": 37222770813,
+    "mergedDevCiRun": 37227464910,
+    "repositoryJob": 111509986097,
+    "deploymentJob": 111516425091,
+    "branchCleanup": "DELETED",
+    "deployedShaVerified": true,
+    "liveBossScenes": "18/18 PASS"
+  },
+  "historicalPhase1Gate": "shadow architecture PASS only; formal multi-owner convergence intentionally deferred until approved Phase2",
+  "historicalPhase2aGate": "15/15 functional requirements VERIFIED: focused20/20, unchanged non-Wild outputs, 40 diagnostic TTK and both-viewports natural Chrome. Latest Required CI/dev integration/deployed exact SHA remain separate gates owned by PR #780.",
+  "finalCloseout": {
+    "status": "COMPLETE",
+    "phases": [
+      "1",
+      "2A",
+      "2B",
+      "2C",
+      "2D",
+      "2E",
+      "2F"
+    ],
+    "modes": [
+      "wild",
+      "daily",
+      "tower",
+      "abyss",
+      "adventure",
+      "personalBoss",
+      "worldBoss"
+    ],
+    "statMigration": "COMPLETE",
+    "projectMode": "NORMAL DEVELOPMENT",
+    "verifiedAgainstDev": "3b4ffbc2963cc472fa13857e2923cb80506e93e4",
+    "verifiedAt": "2026-10-05",
+    "scope": "Documentation only; item dispositions RETIRED/MIGRATED/KEEP unchanged; gameplay owners retained; historical fields preserve source-time evidence."
   }
 }

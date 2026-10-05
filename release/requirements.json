@@ -438,7 +438,7 @@
           "docs/monster-balance-shadow-matrix.csv"
         ],
         "verification": "focused shadow regression + related Six-Stat/Tower/Abyss tests + unchanged production artifacts",
-        "result": "focused11/11PASS; directly related Node9/9PASS; build/build:check PASS and generated production artifacts unchanged; syntax356/356PASS; CI integration and exact deployed SHA tracked in Work PR"
+        "result": "Phase1 COMPLETE: PR #777 MERGED; final Head 2736e9b769c3eb25ed544251d55485d1f83e6c9a; merge / verified phase deployment SHA de5e2049eae20294a173f3e7f5b57fa54c5afe9b. CI Run37116666287 / Repository Job111186429103 / deployment Job111186429099 SUCCESS. Exact SHA and live QA retained in PR final closeout. Construction branch DELETED / absent. Original functional verification retained; main untouched."
       }
     },
     {
@@ -469,7 +469,7 @@
           "tests/monster-balance-owner-phase2a.test.mjs"
         ],
         "verification": "15項功能逐項驗證；專項20/20、528projection、56identity、非Wild immutable baseline、40TTK及雙尺寸自然Chrome；build:check PASS",
-        "result": "功能15/15 VERIFIED；一般1–2／精英1–3回合為基準隊伍範圍；Tank defensive AI gap明示。最新Head CI／dev整合／部署SHA／分支清理以PR#780為最終Gate owner，未完成前不宣稱全案完成。"
+        "result": "Phase2A COMPLETE: PR #780 MERGED; final Head cb8e9e9ddbcda3da4ac92e536cc4ffc4db4cb5de; merge / verified phase deployment SHA 4274454a30f25f5807fa589804413efe8ec13290. CI Run37128364356 / Repository Job111218241812 / deployment Job111221104569 SUCCESS. Exact SHA and live QA retained in PR final closeout. Construction branch DELETED / absent. Original functional verification retained; main untouched."
       }
     },
     {
@@ -486,7 +486,7 @@
           "docs/monster-balance-daily-browser-evidence-20261003.json"
         ],
         "verification": "Focused27/27;972 identity/preview/render hook/re-entry projections;54 reference encounters/162 cumulative waves;7 direct suites; real Chrome390/412 production bundles,9 natural encounters/27 waves, manual/auto/rewards/re-entry/beginner; reviewed screenshots.",
-        "result": "Functional1/1 VERIFIED on source1b4cb31 / CI merge9dce10c7, artifact11276934048 SHA256 verified. Latest full Required CI, dev integration, exact deployment/live Daily QA and cleanup remain separate PR#784 gates; main untouched."
+        "result": "Phase2B COMPLETE: PR #784 MERGED; final Head 26f87d81d396a7da976326f4bb8d793244a59059; merge / verified phase deployment SHA 7558011ba38ed533fc25556314007adda6734e33. CI Run37139542320 / Repository Job111250935454 / deployment Job111255496036 SUCCESS. Exact SHA and live QA retained in PR final closeout. Construction branch DELETED / absent. Original functional verification retained; main untouched."
       }
     },
     {
@@ -566,7 +566,7 @@
           ".github/scripts/run-fire-tower-identity-first-frame-browser-qa.mjs"
         ],
         "verification": "Exact functional Head d7108cead55b297a03c3aa6325ce913690ae17e7; CI Run37165953470 Job111328746224 SUCCESS; Session Authority Run37165952955 Job111328745049 SUCCESS. Focused5/5 and actual4x100, TTK60/60 clear+survivor, Tower production Chrome27/27 with six-stat equality/four elements/B3/queue/AOE, three portrait fixtures300 owner checks/zero V132; Phase1/2A/2B and all related required regressions/build/deprecated/syntax PASS. Artifact11289725982 SHA256 independently verified and screenshots reviewed.",
-        "result": "Phase2C functionality1/1 VERIFIED. Regular1 / Elite1–19 / smallBoss1–11 rounds. Unmigrated legacy outputs protected. Final metadata-head CI, dev integration, exact dev deployment and deployed Tower QA remain separate closeout gates in PR #788. main untouched; no Phase2D."
+        "result": "Phase2C COMPLETE: PR #788 MERGED; final Head 17f0c3116b298334bd0eb15ce1c8c13def5dbe01; merge / verified phase deployment SHA f47862cc592870e359d31da5da52a5d530c831a8. CI Run37171471061 / Repository Job111345101774 / deployment Job111348933484 SUCCESS. Exact SHA and live QA retained in PR final closeout. Construction branch DELETED / absent. Original functional verification retained; main untouched."
       }
     },
     {
@@ -604,7 +604,7 @@
           "docs/monster-balance-abyss-browser-evidence-20261004.json"
         ],
         "verification": "Source c723c11d80ccd90ede37307313162271b2640463: CI37180059948 Repository Job111370640459 and Abyss Job111370640508 SUCCESS; Session37180059842/Job111370640497 SUCCESS. Focused8/8,50 encounters/402 projections/14 identities,402 original carried loadouts/frequencies; neutral150+seeded150 challenge gates PASS,298 clear+survivor,2 explicitly retained bare Lv40 final losses7/9 rounds. Chrome14/14,100 rosters/804 projections,390x844+412x915; actual support/control,geometry,portrait,reward/re-entry and no late writer PASS. Related50/50,365 syntax,build sync,deprecated and all repository CI gates PASS. Artifact11295260962 SHA256 dd476ac3fb2f2b3c2f10129a39c042cf564307b834042f4de0676b7caac6ea23 independently verified; both CI TTK reports exactly match repository JSON.",
-        "result": "VERIFIED functional gates; final metadata-head CI, dev integration/deployment and safe branch cleanup remain independent closeout gates. Stop before Phase2E; main untouched."
+        "result": "Phase2D COMPLETE: PR #793 MERGED; final Head e69612b905b14b38d1e9de22cffd852a09d606cb; merge / verified phase deployment SHA dbe58d74f0c13be871512d880cb8dc2e377eab5d. CI Run37183340730 / Repository Job111380139564 / deployment Job111383864960 SUCCESS. Exact SHA and live QA retained in PR final closeout. Construction branch DELETED / absent. Original functional verification retained; main untouched."
       }
     },
     {
@@ -688,7 +688,7 @@
           "docs/monster-balance-adventure-browser-evidence-20261004.json"
         ],
         "verification": "Local Phase1–2E46/46, focused6/6,36 formal TTK cases, direct formation/AI/hard-control/reward regressions, syntax368/368, build/build:check and deprecated gate PASS. Production Chrome8 natural scenes390×844/412×915, carried skill, reward/save/re-entry PASS: CI37196320933 job111418839671 artifact11301028022. Source Head866f0699a0cebe7634eafbff2dd19803d90c38b0 full latest-head CI37196320933 and Session37196320795 SUCCESS, with no failed or weakened gates. Final evidence/metadata Head required CI remains separate before merge.",
-        "result": "1/1 functional VERIFIED. Adventure pre-battle stats and pressure have one MonsterBalance owner; content/skill/AI/formation/portrait/reward/save lifecycle owners preserved. Final metadata-head CI, dev integration/deployed exact SHA/live Adventure QA and absorbed-branch cleanup tracked by PR#797. Stop before Phase2F."
+        "result": "Phase2E COMPLETE: PR #797 MERGED; final Head 1cf43c989079caab57611ec2029d3d2bdb87ccbb; merge / verified phase deployment SHA 0de3c3a5c9c5aff789b071f9bd89b4dcdce413d9. CI Run37200431153 / Repository Job111430819138 / deployment Job111435015679 SUCCESS. Exact SHA and live QA retained in PR final closeout. Construction branch DELETED / absent. Original functional verification retained; main untouched."
       }
     },
     {
@@ -717,7 +717,7 @@
           "scripts/boss-balance-ttk-matrix.mjs"
         ],
         "verification": "53/53 Phase1–2F aggregate, 7/7 focused, 50/50 formal neutral/seeded TTK, 18/18 natural Chrome scenes at390×844/412×915, snapshot/mechanism/reward regression, final legacy audit and build sync PASS. Exact source d5f88fb03130360add0bbd330930c80c5db6b5c7; Repository CI37220134518 jobs111488621828/111488621822/111488621691/111488621595 SUCCESS; Session CI37220134254 job111488620833 SUCCESS. Boss artifact11309889570 SHA256f949c5f06aa8277bb959e7b111f93599481e6fa1d1cb684126dd8a77c4a26606 independently checked.",
-        "result": "1/1 functional VERIFIED. Metadata-head CI, integration, deployed exact SHA/live QA and safe branch cleanup are separate release/closeout gates owned by PR#799."
+        "result": "Phase2F COMPLETE: PR #799 MERGED; final Head 0c66504aa877c3e004cadef983135954f7909a77; merge / verified phase deployment SHA db8530b59d683231535da717d1f641c391adbbcd. CI Run37227464910 / Repository Job111509986097 / deployment Job111516425091 SUCCESS. Exact SHA and live QA retained in PR final closeout. Construction branch DELETED / absent. Original functional verification retained; main untouched."
       }
     },
     {

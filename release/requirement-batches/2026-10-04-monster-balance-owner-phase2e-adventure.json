@@ -24,7 +24,7 @@
           "docs/monster-balance-adventure-browser-evidence-20261004.json"
         ],
         "verification": "Local Phase1–2E46/46, focused6/6,36 formal TTK cases, direct formation/AI/hard-control/reward regressions, syntax368/368, build/build:check and deprecated gate PASS. Production Chrome8 natural scenes390×844/412×915, carried skill, reward/save/re-entry PASS: CI37196320933 job111418839671 artifact11301028022. Source Head866f0699a0cebe7634eafbff2dd19803d90c38b0 full latest-head CI37196320933 and Session37196320795 SUCCESS, with no failed or weakened gates. Final evidence/metadata Head required CI remains separate before merge.",
-        "result": "1/1 functional VERIFIED. Adventure pre-battle stats and pressure have one MonsterBalance owner; content/skill/AI/formation/portrait/reward/save lifecycle owners preserved. Final metadata-head CI, dev integration/deployed exact SHA/live Adventure QA and absorbed-branch cleanup tracked by PR#797. Stop before Phase2F."
+        "result": "Phase2E COMPLETE: PR #797 MERGED; final Head 1cf43c989079caab57611ec2029d3d2bdb87ccbb; merge / verified phase deployment SHA 0de3c3a5c9c5aff789b071f9bd89b4dcdce413d9. CI Run37200431153 / Repository Job111430819138 / deployment Job111435015679 SUCCESS. Exact SHA and live QA retained in PR final closeout. Construction branch DELETED / absent. Original functional verification retained; main untouched."
       }
     }
   ]

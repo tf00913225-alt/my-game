@@ -1,3 +1,16 @@
+## 2026-10-05 — Monster Balance Owner Phase 1–2F COMPLETE
+
+- Final documentation Work ID: MONSTER-BALANCE-OWNER-FINAL-CLOSEOUT-20261005; base dev 3b4ffbc2963cc472fa13857e2923cb80506e93e4; branch chore/monster-balance-owner-final-closeout-20261005; target dev.
+- Monster Balance Owner Phase 1–2F: COMPLETE. Wild / Daily / Tower / Abyss / Adventure / Personal Boss / World Boss all use Single MonsterBalance Stat Owner.
+- Final Phase PR #799: MERGED; Final Head 0c66504aa877c3e004cadef983135954f7909a77; Merge / verified Phase2F deployment db8530b59d683231535da717d1f641c391adbbcd. Requirement1/1 VERIFIED; aggregate53/53, focused7/7, formal TTK50/50, production Chrome18/18 PASS. Personal identities9; World identities4, four stages each.
+- Final Head CI37222770813 / merged-dev CI37227464910 SUCCESS; Repository111509986097 / Boss111509985888 / deployment111516425091 SUCCESS. Phase2F branch deleted / absent; final Head and merge absorbed by opening dev. Latest opening-dev CI37246251480 / Repository111564640645 / deployment111571179388 SUCCESS.
+- Legacy Monster Stat Owner: RETIRED. Boss mechanism / Snapshot / Reward / Skill / AI / Portrait / Formation retain their owners. Retirement-map item dispositions remain RETIRED / MIGRATED / KEEP.
+- Current final state: docs/MONSTER_BALANCE_OWNER_FINAL.md. Phase documents and central/batch requirement evidence reconciled. Historical pending gates below describe source-time checkpoints and do not override final migration closeout.
+- main f63d69dbfa66ba75637d1c3cd7fcc7d74782e356 not modified; Game/Cache173.73/173.73. Project Mode: NORMAL DEVELOPMENT; Release Freeze: NO.
+- 後續怪物數值調整屬於新的 Monster Balance Calibration（平衡校正工程），不得重新開啟 Phase 1～2F migration。本批只收斂文件；文件工作 PR 承擔本批 CI／整合／部署／清理狀態，不把歷史 Phase2F 部署證據冒充本批部署。
+
+## Historical project handoff records
+
 ## 2026-10-04 — P2-PACKAGE-VERSION-OWNERSHIP-20261004（功能1/1 VERIFIED；遠端整合／部署／清理待Gate）
 
 - Start dev `9fff3664d2767739fe8cd5c893f2985f8032d5ef`; main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` protected. Branch `chore/p2-package-version-ownership-20261004`; Work PR owns durable latest state. NORMAL DEVELOPMENT; Freeze NO.

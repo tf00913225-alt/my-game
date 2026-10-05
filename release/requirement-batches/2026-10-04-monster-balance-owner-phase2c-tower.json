@@ -24,7 +24,7 @@
           ".github/scripts/run-fire-tower-identity-first-frame-browser-qa.mjs"
         ],
         "verification": "Exact functional Head d7108cead55b297a03c3aa6325ce913690ae17e7; CI Run37165953470 Job111328746224 SUCCESS; Session Authority Run37165952955 Job111328745049 SUCCESS. Focused5/5 and actual4x100, TTK60/60 clear+survivor, Tower production Chrome27/27 with six-stat equality/four elements/B3/queue/AOE, three portrait fixtures300 owner checks/zero V132; Phase1/2A/2B and all related required regressions/build/deprecated/syntax PASS. Artifact11289725982 SHA256 independently verified and screenshots reviewed.",
-        "result": "Phase2C functionality1/1 VERIFIED. Regular1 / Elite1–19 / smallBoss1–11 rounds. Unmigrated legacy outputs protected. Final metadata-head CI, dev integration, exact dev deployment and deployed Tower QA remain separate closeout gates in PR #788. main untouched; no Phase2D."
+        "result": "Phase2C COMPLETE: PR #788 MERGED; final Head 17f0c3116b298334bd0eb15ce1c8c13def5dbe01; merge / verified phase deployment SHA f47862cc592870e359d31da5da52a5d530c831a8. CI Run37171471061 / Repository Job111345101774 / deployment Job111348933484 SUCCESS. Exact SHA and live QA retained in PR final closeout. Construction branch DELETED / absent. Original functional verification retained; main untouched."
       }
     }
   ],
