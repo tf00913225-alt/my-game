@@ -18,11 +18,11 @@ const expression=`(async()=>{
  window.FourSymbolsEnemySkillAI={...enemySkillAiOwner,chooseCategory(attacks,buffs,draw,...args){
   if(hardControlDecision){
    hardControlDecision=null;
-   const index=attacks.indexOf('flyingSandStrike');check(index>=0,'native emperor hard-control skill is legal and affordable');
+   const index=attacks.findIndex(id=>Array.isArray(skillDatabase[id]?.petrifyChanceByLevel)&&skillDatabase[id].petrifyChanceByLevel.some(chance=>chance>0));check(index>=0,'final native emperor hard-control skill is legal and affordable');
    const category=enemySkillAiOwner.chooseCategory(attacks,buffs,.1,...args);check(category==='attack','native emperor attack category');
    const selectionDraw=(index+.5)/attacks.length;let select=true;
    Math.random=()=>{if(select){select=false;return selectionDraw;}return 0;};
-   evidence.controlDecisionProbe={attacks:attacks.slice(),buffs:buffs.slice(),category,categoryDraw:.1,selectionDraw,round:turn};return category;
+   evidence.controlDecisionProbe={skillId:attacks[index],attacks:attacks.slice(),buffs:buffs.slice(),category,categoryDraw:.1,selectionDraw,round:turn};return category;
   }
   return enemySkillAiOwner.chooseCategory(attacks,buffs,draw,...args);
  }};
