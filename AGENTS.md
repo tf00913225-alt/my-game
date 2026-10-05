@@ -26,7 +26,7 @@
 
 ## Resumable Work Protocol
 
-- 工作身份是穩定的 Work ID＋Branch＋PR，不是對話；建議 `<DOMAIN>-<PURPOSE>-YYYYMMDD`。換 Agent／對話保留身份與既有成果，不重做、不無故建立第二條有效線；取代舊線須留下 replacement 關係。
+- 可寫入施工前建立唯一且穩定的 Work ID；工作身份是 Work ID＋Branch＋PR，不是對話；建議 `<DOMAIN>-<PURPOSE>-YYYYMMDD`。換 Agent／對話保留身份與既有成果，不重做、不無故建立第二條有效線；取代舊線須留下 replacement 關係。
 - GitHub 是耐久狀態，本機／scratch 是暫存。每完成可獨立恢復的最小施工段就 commit 並保存遠端 checkpoint；多步驟／跨對話工作儘早開 PR，未完成可 Draft。續接若有未推本機 commit，先核對並安全保存，不能因遠端未找到就重做。
 - PR 是每條 Work ID 的即時狀態 Owner；PR body／最新狀態至少包含 Work ID、Target、Base dev SHA、Branch、Latest Head、Status、Completed、Pending、Next、CI / Deploy。聊天及舊摘要僅線索，不能凌駕即時 Repository。
 - 續接順序：使用者指定 PR → Work ID → 任務名稱對照有效 Open PR/Branch → 本輪已知 PR/Branch → HANDOFF 交叉確認 → 歷史 archive 最後才查。不以最新 PR 或 HANDOFF 第一筆猜任務；證據唯一就自主續接，僅多個有效候選無法區分時列候選釐清。
