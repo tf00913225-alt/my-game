@@ -736,6 +736,20 @@
         "verification": "12/12 executable Gate regressions PASS, including stale root metadata, package-only advance, release advance, malformed JSON, optional npm-generated root lock, both lock metadata locations, independent Functions advance and missing Functions lock. Isolated offline npm install/ci preserve package metadata; build/build:check and release-ready/deprecated gates PASS; generated Runtime has zero tracked diff. Latest-head CI/integration/deployment/cleanup tracked separately by Work PR.",
         "result": "Historical mirror omission fixed via npm version 173.73.0 --no-git-tag-version --ignore-scripts. Game/Cache173.73 remain release/release.json-owned; root package is verified metadata projection, Functions1.0.0 independent. No root lock introduced; Functions package/lock unchanged. NORMAL DEVELOPMENT; no gameplay/runtime/main change."
       }
+    },
+    {
+      "id": "REQ-BATTLE-TARGET-LIFECYCLE-20261005",
+      "title": "Enemy action target identity stable across fire follow-ups and death/revive round planning",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "docs/BATTLE_TARGET_LIFECYCLE_CONVERGENCE_20261005.md",
+          "tests/battle-target-lifecycle-20261005.test.js",
+          ".github/scripts/run-battle-target-lifecycle-browser-qa.mjs"
+        ],
+        "verification": "19/19 targeted executable cases PASS, related regressions/build PASS; full production Browser evidence pending due local Chrome socket EPERM.",
+        "result": "IMPLEMENTED; no CI/merge/deployment/COMPLETE claim."
+      }
     }
   ]
 }

@@ -3474,6 +3474,9 @@
     function runMonsterFollowUp(options,castNumber){
         scheduleAfterAnimation(()=>{
             const monster=options.monster;
+            if(!isEnemyActionTargetSnapshotCurrent(options.attackArgs[2],options.monsterIndex,options.attackArgs[1])){
+                return;
+            }
             if(!monster||monster.alive===false||numeric(monster.hp)<=0||!livingPartyIndexes().length){
                 if(options.realFinish){ options.realFinish(); }
                 return;
@@ -3568,6 +3571,9 @@
         const previousMonsterAttack=processSingleMonsterAttack;
         processSingleMonsterAttack=function(monsterIndex){
             const attackArgs=Array.prototype.slice.call(arguments);
+            if(!attackArgs[2]){
+                attackArgs[2]=createEnemyActionTargetSnapshot(monsterIndex,attackArgs[1]);
+            }
             const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
             const realFinish=typeof finishPlayerAction==="function"?finishPlayerAction:null;
             const previousBadge=typeof showMonsterSkillNameBadge==="function"?showMonsterSkillNameBadge:null;
@@ -3608,7 +3614,7 @@
             currentReflectAttacker=monsterIndex;
             window.v149CurrentDamageActor=monster;
             let result;
-            try{ result=previousMonsterAttack.apply(this,arguments); }
+            try{ result=previousMonsterAttack.apply(this,attackArgs); }
             finally{
                 currentReflectAttacker=previousAttacker;
                 window.v149CurrentDamageActor=previousDamageActor;

@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-05",
+  "title": "Battle Target Lifecycle Convergence",
+  "workId": "BATTLE-TARGET-LIFECYCLE-CONVERGENCE-20261005",
+  "base_branch": "dev",
+  "base_sha": "276f6a1e9e5d65f563a5a8b51d477f8580430252",
+  "work_branch": "fix/battle-target-lifecycle-convergence-20261005",
+  "officialVersion": "173.73",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REQ-BATTLE-TARGET-LIFECYCLE-20261005",
+      "title": "Enemy action target identity stable across fire follow-ups and death/revive round planning",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "docs/BATTLE_TARGET_LIFECYCLE_CONVERGENCE_20261005.md",
+          "tests/battle-target-lifecycle-20261005.test.js",
+          ".github/scripts/run-battle-target-lifecycle-browser-qa.mjs"
+        ],
+        "verification": "19/19 targeted executable cases PASS, related regressions/build PASS; full production Browser evidence pending due local Chrome socket EPERM.",
+        "result": "IMPLEMENTED; no CI/merge/deployment/COMPLETE claim."
+      }
+    }
+  ]
+}

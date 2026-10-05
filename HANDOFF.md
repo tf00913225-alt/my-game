@@ -1,3 +1,10 @@
+## 2026-10-05 — BATTLE-TARGET-LIFECYCLE-CONVERGENCE-20261005 / IMPLEMENTED
+
+- Base dev276f6a1e9e5d65f563a5a8b51d477f8580430252; branch fix/battle-target-lifecycle-convergence-20261005; target dev; mainf63d69db unchanged. Independent Cloud#802 excluded; MonsterBalance Phase1–2F not rebuilt.
+- Four pre-fix executable failures prove per-cast random retarget on living/lethal fire follow-up. Missing enemy planning identity admits late revived targets. Core now owns frozen token/round/actor/party-identity snapshot; queue passes it, V149 free casts reuse it; dead/invalid primary cancels, late callbacks cannot finish new actions. No new wrapper/temporary patch; no formulas/balance/revive/save change.
+-19/19 targeted PASS, related regressions/build/build:check/YAML/whitespace PASS. Local Chrome154 socket EPERM prevents Browser and complete Node-runner verification; actual production Browser runner registered in existing CI and exact-SHA DEV deploy. Requirement IMPLEMENTED pending real functional evidence, not VERIFIED. Existing Cloud generated policy refreshes only V149 dependency digest.
+- Full inventory/evidence/gates: docs/BATTLE_TARGET_LIFECYCLE_CONVERGENCE_20261005.md. PR/CI/merge/deployment/deployed QA/absorbed branch cleanup pending; Phase2 must wait for complete closeout. Game/Cache173.73 unchanged; no S23 Ultra claim.
+
 ## 2026-10-05 — Monster Balance Owner Phase 1–2F COMPLETE
 
 - Final documentation Work ID: MONSTER-BALANCE-OWNER-FINAL-CLOSEOUT-20261005; base dev 3b4ffbc2963cc472fa13857e2923cb80506e93e4; branch chore/monster-balance-owner-final-closeout-20261005; target dev.
