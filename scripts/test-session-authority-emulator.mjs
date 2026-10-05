@@ -701,9 +701,16 @@ const lifecycleArgs={attemptId:lifecycleAttempt.attemptId,operationId:"restricte
 await lifecycleOwner.begin(lifecycleRequest,lifecycleArgs);
 const lifecycleRef=db.doc(`serverUsers/${lifecycleUid}/restrictedBattles/${lifecycleAttempt.attemptId}`);
 const lifecycleBefore=(await lifecycleRef.get()).data();
-const takeoverSession=await invoke("createGameSession",lifecycleUser.idToken,{uid:lifecycleUid});
+await rejected("createGameSession",lifecycleUser.idToken,{uid:lifecycleUid},"SESSION_REAUTH_REQUIRED");
+while(Math.floor(Date.now()/1000)<=claims(lifecycleUser.idToken).auth_time){
+    await new Promise(resolve=>setTimeout(resolve,100));
+}
+const takeoverUser=await login("accounts:signInWithPassword",{email:"restricted-lifecycle@example.test",password});
+assert.equal(takeoverUser.localId,lifecycleUid);
+const takeoverSession=await invoke("createGameSession",takeoverUser.idToken,{uid:lifecycleUid});
 await assert.rejects(lifecycleOwner.begin(lifecycleRequest,lifecycleArgs),e=>e.message==="SESSION_REVOKED");
-const takeoverRequest={auth:lifecycleRequest.auth,data:{uid:lifecycleUid,session:takeoverSession}};
+const takeoverRequest={auth:{uid:lifecycleUid,token:claims(takeoverUser.idToken)},
+    data:{uid:lifecycleUid,session:takeoverSession}};
 await assert.rejects(lifecycleOwner.begin(takeoverRequest,lifecycleArgs),e=>e.code==="failed-precondition");
 await writerSessions.revoke(takeoverRequest);
 await assert.rejects(lifecycleOwner.begin(takeoverRequest,lifecycleArgs),e=>e.message==="SESSION_REVOKED");
