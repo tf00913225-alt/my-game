@@ -11,6 +11,6 @@ Core `retargetEnemyFollowUpSnapshot` replaces only a defeated primary and shares
 
 #804 planning snapshots, original-action validation, late-revival exclusion, cancel/token/round/actor guards remain. Dragon original +2 free casts; other three original +1. Existing SP/cast-ID/finish interception unchanged.
 
-Tests: 29/29 executable core+complete V149 cases PASS, including A/B/C/D revival, cast caps, SP, finish and geometry. Related Skill/Tower/Abyss/Boss regressions 35/35 PASS. Build/build:check PASS. Local Chrome absent from PATH; recovered installed executable, but CDP startup ECONNREFUSED before Browser execution. Browser PASS not claimed. Existing production runner now asserts 48 scenarios over manual/auto, regular/Boss and lethal/revival/dragon cases; existing CI and exact deployed QA entry points unchanged.
+Tests: 30/30 executable core+complete V149 cases PASS, including A/B/C/D revival, cast caps, SP, finish and geometry. Related Skill/Tower/Abyss/Boss regressions 35/35 PASS. Build/build:check PASS. Local Chrome absent from PATH; recovered installed executable, but CDP startup ECONNREFUSED before Browser execution. Browser PASS not claimed. Existing production runner now asserts 48 scenarios over manual/auto, regular/Boss and lethal/revival/dragon cases; existing CI and exact deployed QA entry points unchanged.
 
 Pending: exact Head CI and production Browser, functional requirement verification, fresh dev check, normal merge, merged CI, exact DEV SHA/live QA and safe absorbed branch cleanup. PR owns durable current status. No main release.

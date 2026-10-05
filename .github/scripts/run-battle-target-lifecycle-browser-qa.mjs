@@ -34,7 +34,7 @@ const expression=`(async()=>{
         Object.assign(enemy,{hp:100000,maxHP:100000,sp:1000,maxSP:1000,skillIds:['fireCritical'],skillChance:1,v141SupportSkillIds:[],v141ForceSkillLevel:1,v132FixedSkillLoadout:true});
         monsters=[enemy];currentZone='forest';mapCooldown=false;
         let releasePause,releaseFinish,finished=0;const badges=[],hits=[];
-        const badge=showMonsterSkillNameBadge,hit=showPlayerHit,random=Math.random;
+        const badge=showMonsterSkillNameBadge,hit=showPlayerHit,random=Math.random,retarget=retargetEnemyFollowUpSnapshot;
         try{
             startBattle(0);
             await wait(()=>battleActive&&turn>=1,'battle begin');clearInterval(timerId);
@@ -57,8 +57,14 @@ const expression=`(async()=>{
             releaseFinish=FourSymbolsBattleFlow.interceptActionFinish(()=>{finished++;return true;});
             showMonsterSkillNameBadge=function(...args){badges.push({name:args[0],primary:args[3],targets:args[4]});return badge.apply(this,args);};
             showPlayerHit=function(...args){hits.push({index:args[2],critical:args[4]});return hit.apply(this,args);};
+            // Draw only at the formal retarget boundary; unrelated hit/crit
+            // rolls remain zero so Dragon's second trigger is deterministic.
+            retargetEnemyFollowUpSnapshot=function(...args){
+                const draw=Math.random;try{Math.random=()=>.9;return retarget.apply(this,args);}
+                finally{Math.random=draw;}
+            };
             processSingleMonsterAttack(0,battleToken,action.targetSnapshot);
-            Math.random=()=>.9;
+            Math.random=()=>0;
             await wait(()=>finished===1,'follow-up completion: '+JSON.stringify({mode,rank,scenario,badges,hits}));
             await wait(()=>!window.v142SkillAnimationDirector?.getActive?.()||window.v142SkillAnimationDirector.getActive().done,'VFX completion');
             rows.push({mode,rank,scenario,before,beforeSp,after:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),badges,hits,
@@ -67,7 +73,7 @@ const expression=`(async()=>{
                     !document.getElementById('homeFeatureModal')?.classList.contains('show')&&
                     !!document.getElementById('battlePlayerCard1')?.getBoundingClientRect().height});
         }finally{
-            showMonsterSkillNameBadge=badge;showPlayerHit=hit;Math.random=random;
+            showMonsterSkillNameBadge=badge;showPlayerHit=hit;Math.random=random;retargetEnemyFollowUpSnapshot=retarget;
             battleActive=false;battleToken++;autoBattle=false;clearInterval(timerId);
             releaseFinish?.();releasePause?.();
             window.v142SkillAnimationDirector?.cancelAll?.();

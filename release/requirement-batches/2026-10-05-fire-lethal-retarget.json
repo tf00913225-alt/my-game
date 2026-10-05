@@ -18,7 +18,7 @@
           "tests/battle-target-lifecycle-20261005.test.js",
           ".github/scripts/run-battle-target-lifecycle-browser-qa.mjs"
         ],
-        "verification": "29/29 executable core/V149 tests and 35/35 related PASS; production Browser and exact CI pending.",
+        "verification": "30/30 executable core/V149 tests and 35/35 related PASS; production Browser and exact CI pending.",
         "result": "IMPLEMENTED; no deployed verification or completion claim."
       }
     }

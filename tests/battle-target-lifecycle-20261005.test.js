@@ -136,3 +136,7 @@ test("tri geometry is resolved anew around retargeted primary",()=>{
     r.ctx.resolveBattlefieldTargets=(_,i)=>{centers.push(i);return [i];};
     r.ctx.processSingleMonsterAttack(0,7);r.flush();assert.deepEqual(r.hits,[0,1]);assert.deepEqual([...new Set(centers)],[0,1]);
 });
+test("originally hidden primary candidate stays outside fallback after becoming visible",()=>{
+    const r=runtime({hp:[5,100,100]});r.party[1].stealth=true;const snapshot=r.plan();r.party[1].stealth=false;
+    r.ctx.processSingleMonsterAttack(0,7,snapshot);r.flush();assert.deepEqual(r.hits,[0,2]);assert.equal(r.party[1].hp,100);
+});
