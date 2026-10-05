@@ -16,6 +16,7 @@ const {createCanonicalBattleEncounter}=require("../functions/src/canonical-battl
 const {resolvePlainPlayerNormalAttack}=require("../functions/src/canonical-battle-normal-attack.js");
 const {resolveForestOpeningRound}=require("../functions/src/canonical-battle-opening-round.js");
 const {createCanonicalBattleAttackProof}=require("../functions/src/canonical-battle-attack-proof.js");
+const {createCanonicalRestrictedBattle}=require("../functions/src/canonical-restricted-battle.js");
 const {createCanonicalExpAllocation}=require("../functions/src/canonical-exp-allocation.js");
 const {createCanonicalAttributeAllocation}=
     require("../functions/src/canonical-attribute-allocation.js");
@@ -593,6 +594,124 @@ assert.deepEqual((await db.doc(`users/${y}/saves/current`).get()).data(),battleB
 assert.equal((await battleRoot.collection("pendingGrants").get()).size,0);
 assert.equal((await battleRoot.collection("ledgerEntries").get()).size,0);
 console.log("Attack proof real transaction: pinned rules/entropy/projection, atomic rollback, concurrent one-winner, replay, expiry, private evidence, session and zero authority mutation PASS");
+
+// Protected restricted instance establishment. No round submission or RNG is
+// implemented in this slice; PREPARED is not combat outcome/reward evidence.
+let instanceClock=battleStart.issuedAtMs+3,abortInstance=false;
+const instanceOwner=createCanonicalRestrictedBattle({db,FieldValue,HttpsError,inspectExistingEnvelope,
+    now:()=>instanceClock,
+    runProtected:(request,fn)=>writerSessions.runProtected(request,async(tx,session)=>{
+        const value=await fn(tx,session);if(abortInstance)throw Error("interrupted instance transaction");
+        return value;
+    })});
+const instanceArgs={attemptId:battleStart.attemptId,operationId:"restricted-instance-emulator-0001",expectedRevision:2};
+instanceClock=battleStart.expiresAtMs;
+await assert.rejects(instanceOwner.begin(yRequest,instanceArgs),e=>e.code==="failed-precondition");
+instanceClock=battleStart.issuedAtMs+3;
+const instanceAccountRef=battleRoot.collection("account").doc("current");
+const instanceEnvelopeRef=db.doc(`users/${y}/saves/current`);
+await instanceAccountRef.update({serverRevision:3});await instanceEnvelopeRef.update({serverRevision:3});
+await assert.rejects(instanceOwner.begin(yRequest,instanceArgs),e=>e.code==="aborted");
+await instanceAccountRef.set(battleBefore.account);await instanceEnvelopeRef.set(battleBefore.envelope);
+abortInstance=true;
+await assert.rejects(instanceOwner.begin(yRequest,instanceArgs),/interrupted instance transaction/);
+abortInstance=false;
+for(const name of ["restrictedBattles","restrictedBattleAttempts","restrictedBattlePolicies"]){
+    assert.equal((await battleRoot.collection(name).get()).size,0);
+}
+assert.equal((await battleRoot.collection("operations").doc(instanceArgs.operationId).get()).exists,false);
+const instanceContenders=await Promise.allSettled([
+    instanceOwner.begin(yRequest,instanceArgs),
+    instanceOwner.begin(yRequest,{...instanceArgs,operationId:"restricted-instance-emulator-0002"})
+]);
+assert.equal(instanceContenders.filter(r=>r.status==="fulfilled").length,1);
+assert.equal(instanceContenders.filter(r=>r.status==="rejected"&&r.reason.code==="already-exists").length,1);
+const instanceStart=instanceContenders.find(r=>r.status==="fulfilled").value;
+const winningInstanceArgs={...instanceArgs,operationId:instanceStart.operationId};
+const instanceRef=battleRoot.collection("restrictedBattles").doc(battleStart.attemptId);
+const instancePolicyRef=battleRoot.collection("restrictedBattlePolicies").doc(instanceStart.policySha256);
+const instanceMarkerRef=battleRoot.collection("restrictedBattleAttempts").doc(battleStart.attemptId);
+const instanceReceiptRef=battleRoot.collection("operations").doc(instanceStart.operationId);
+const storedInstance=(await instanceRef.get()).data();
+const instanceSource=(await battleRoot.collection("recoveryArchives").doc("2").get()).get("sourceRecords.characters")[0];
+const instanceBundle=(await instancePolicyRef.get()).get("bundle");
+assert.equal(storedInstance.initialState.player.hp,instanceSource.state.hp);
+assert.equal(storedInstance.initialState.player.sp,instanceSource.state.sp);
+assert.equal(storedInstance.initialState.enemy.hp,instanceBundle.encounter.entries[encounterArgs.encounterKey].stats.maxHP);
+assert.equal(storedInstance.initialState.enemy.sp,instanceBundle.encounter.entries[encounterArgs.encounterKey].stats.maxSP);
+assert.equal(storedInstance.initialState.status,"PREPARED");
+assert.equal(storedInstance.initialState.round,0);assert.equal(storedInstance.initialState.roundVersion,0);
+assert.equal(instanceBundle.restricted.lifecycle.acceptsRoundSubmission,false);
+assert.equal(instanceStart.initialState,undefined);assert.equal(instanceStart.randomTape,undefined);
+assert.deepEqual(await instanceOwner.begin(yRequest,winningInstanceArgs),{...instanceStart,unchanged:true});
+for(const ref of [instanceRef,instancePolicyRef,instanceMarkerRef,instanceReceiptRef,
+    battleRoot.collection("battleEncounters").doc(battleStart.attemptId),
+    battleRoot.collection("recoveryArchives").doc("2")]){
+    const saved=(await ref.get()).data();await ref.delete();
+    await assert.rejects(instanceOwner.begin(yRequest,winningInstanceArgs));
+    await assert.rejects(instanceOwner.begin(yRequest,{...winningInstanceArgs,operationId:"restricted-instance-emulator-0003"}));
+    await ref.set(saved);
+}
+await instanceRef.update({"initialState.player.hp":storedInstance.initialState.player.hp+1});
+await assert.rejects(instanceOwner.begin(yRequest,winningInstanceArgs),e=>e.code==="data-loss");
+await instanceRef.set(storedInstance);
+await assert.rejects(instanceOwner.begin(yRequest,{...winningInstanceArgs,action:{type:"normal-attack"}}),
+    e=>e.code==="invalid-argument");
+await assert.rejects(instanceOwner.begin({...yRequest,data:{...yRequest.data,randomTape:[0]}},winningInstanceArgs),
+    e=>e.code==="invalid-argument");
+await assert.rejects(instanceOwner.begin({...yRequest,data:{uid:y,session:sessionB}},winningInstanceArgs),
+    e=>e.message==="SESSION_INVALID");
+await assert.rejects(instanceOwner.begin({auth:{uid:x,token:claims(a.idToken)},
+    data:{uid:x,session:sessionA}},winningInstanceArgs),e=>e.message==="SESSION_REVOKED");
+instanceClock=battleStart.expiresAtMs;
+assert.deepEqual(await instanceOwner.begin(yRequest,winningInstanceArgs),{...instanceStart,unchanged:true,expired:true});
+for(const ref of [instanceRef,instancePolicyRef,instanceMarkerRef,instanceReceiptRef]){
+    assert.equal(await rulesRequest(ref.path,yUser.idToken),403);
+    assert.equal(await rulesRequest(ref.path,yUser.idToken,"PATCH"),403);
+}
+for(const name of ["restrictedBattles","restrictedBattleAttempts","restrictedBattlePolicies"]){
+    assert.equal((await battleRoot.collection(name).get()).size,1);
+}
+assert.deepEqual((await instanceAccountRef.get()).data(),battleBefore.account);
+assert.deepEqual((await battleRoot.collection("economy").doc("current").get()).data(),battleBefore.economy);
+assert.deepEqual((await instanceEnvelopeRef.get()).data(),battleBefore.envelope);
+assert.deepEqual((await attackProofRef.get()).data(),storedAttackProof);
+assert.equal((await battleRoot.collection("pendingGrants").get()).size,0);
+assert.equal((await battleRoot.collection("ledgerEntries").get()).size,0);
+console.log("Restricted instance real transaction: original sources/policy/resources, concurrent one-winner, rollback, replay, corruption, expiry, session refusal, private rules and zero authority mutation PASS");
+
+// Isolated account proves actual device/session takeover and revocation; do
+// not invalidate any existing integration fixture used by later assertions.
+const lifecycleUser=await login("accounts:signUp",{email:"restricted-lifecycle@example.test",password});
+const lifecycleUid=lifecycleUser.localId;
+const lifecycleSession=await invoke("createGameSession",lifecycleUser.idToken,{uid:lifecycleUid});
+await invoke("bootstrapCloudSave",lifecycleUser.idToken,{uid:lifecycleUid,session:lifecycleSession});
+const lifecycleRequest={auth:{uid:lifecycleUid,token:claims(lifecycleUser.idToken)},
+    data:{uid:lifecycleUid,session:lifecycleSession}};
+await initialWriter.commitInitialSources(lifecycleRequest,{operationId:"restricted-lifecycle-character-0001",
+    expectedRevision:1,selection:choices});
+const lifecycleDeps={db,FieldValue,HttpsError,inspectExistingEnvelope,runProtected:writerSessions.runProtected};
+const lifecycleAttempt=await createCanonicalBattleAttempt(lifecycleDeps).begin(lifecycleRequest,
+    {operationId:"restricted-lifecycle-attempt-0001",expectedRevision:2});
+await createCanonicalBattleEncounter(lifecycleDeps).seal(lifecycleRequest,
+    {attemptId:lifecycleAttempt.attemptId,operationId:"restricted-lifecycle-encounter-0001",
+        expectedRevision:2,encounterKey:encounterArgs.encounterKey});
+const lifecycleOwner=createCanonicalRestrictedBattle(lifecycleDeps);
+const lifecycleArgs={attemptId:lifecycleAttempt.attemptId,operationId:"restricted-lifecycle-instance-0001",expectedRevision:2};
+await lifecycleOwner.begin(lifecycleRequest,lifecycleArgs);
+const lifecycleRef=db.doc(`serverUsers/${lifecycleUid}/restrictedBattles/${lifecycleAttempt.attemptId}`);
+const lifecycleBefore=(await lifecycleRef.get()).data();
+const takeoverSession=await invoke("createGameSession",lifecycleUser.idToken,{uid:lifecycleUid});
+await assert.rejects(lifecycleOwner.begin(lifecycleRequest,lifecycleArgs),e=>e.message==="SESSION_REVOKED");
+const takeoverRequest={auth:lifecycleRequest.auth,data:{uid:lifecycleUid,session:takeoverSession}};
+await assert.rejects(lifecycleOwner.begin(takeoverRequest,lifecycleArgs),e=>e.code==="failed-precondition");
+await writerSessions.revoke(takeoverRequest);
+await assert.rejects(lifecycleOwner.begin(takeoverRequest,lifecycleArgs),e=>e.message==="SESSION_REVOKED");
+assert.deepEqual((await lifecycleRef.get()).data(),lifecycleBefore);
+assert.equal((await db.collection("serverUsers").doc(lifecycleUid).collection("pendingGrants").get()).size,0);
+assert.equal((await db.collection("serverUsers").doc(lifecycleUid).collection("ledgerEntries").get()).size,0);
+console.log("Restricted instance actual device takeover/revocation: old session blocked, new session cannot inherit, original instance unchanged PASS");
+
 
 
 assert.deepEqual(initialArchive.get("sourceRecords.claimRecords"),[]);

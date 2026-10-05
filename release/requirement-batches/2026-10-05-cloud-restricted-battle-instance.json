@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "cloud-restricted-battle-instance-20261005",
+  "releaseVersion": "173.73",
+  "requirements": [
+    {
+      "id": "REQ-CLOUD-RESTRICTED-BATTLE-INSTANCE-20261005",
+      "title": "受保護森林受限場次建立與原始政策／初始資源固定（僅 PREPARED，不含後續回合）",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "functions/src/canonical-restricted-battle.js",
+          "scripts/lib/cloud-restricted-battle-policy.mjs",
+          "scripts/lib/cloud-battle-opening-round-rules.mjs",
+          "functions/src/generated/restricted-forest-instance-policy.json",
+          "tests/cloud-save-restricted-battle.test.mjs",
+          "scripts/test-session-authority-emulator.mjs",
+          "config/persisted-state-registry.json"
+        ],
+        "verification": "Local157/157 battle preparation/encounter/player/proof/opening/instance tests PASS, skip0; new29 instance cases. Actual Auth/Firestore/Functions emulator concurrency/rollback/private-rules/session/zero-authority assertions added; latest-head remote execution pending.",
+        "result": "Private PREPARED round0/version0 instance pins original preparation, sealed definition, source revision/session/expiry, native naturally normal-only policy and HP/SP. One instance per preparation, atomic four evidence records, immutable idempotent replay. No rounds, RNG, verdict, reward, gameplay mutation, callable, legacy adoption or second-device restore; four readiness/outcome/reward/credit flags false."
+      }
+    }
+  ]
+}

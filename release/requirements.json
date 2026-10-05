@@ -736,6 +736,24 @@
         "verification": "12/12 executable Gate regressions PASS, including stale root metadata, package-only advance, release advance, malformed JSON, optional npm-generated root lock, both lock metadata locations, independent Functions advance and missing Functions lock. Isolated offline npm install/ci preserve package metadata; build/build:check and release-ready/deprecated gates PASS; generated Runtime has zero tracked diff. Latest-head CI/integration/deployment/cleanup tracked separately by Work PR.",
         "result": "Historical mirror omission fixed via npm version 173.73.0 --no-git-tag-version --ignore-scripts. Game/Cache173.73 remain release/release.json-owned; root package is verified metadata projection, Functions1.0.0 independent. No root lock introduced; Functions package/lock unchanged. NORMAL DEVELOPMENT; no gameplay/runtime/main change."
       }
+    },
+    {
+      "id": "REQ-CLOUD-RESTRICTED-BATTLE-INSTANCE-20261005",
+      "title": "受保護森林受限場次建立與原始政策／初始資源固定（僅 PREPARED，不含後續回合）",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "functions/src/canonical-restricted-battle.js",
+          "scripts/lib/cloud-restricted-battle-policy.mjs",
+          "scripts/lib/cloud-battle-opening-round-rules.mjs",
+          "functions/src/generated/restricted-forest-instance-policy.json",
+          "tests/cloud-save-restricted-battle.test.mjs",
+          "scripts/test-session-authority-emulator.mjs",
+          "config/persisted-state-registry.json"
+        ],
+        "verification": "Local157/157 battle preparation/encounter/player/proof/opening/instance tests PASS, skip0; new29 instance cases. Actual Auth/Firestore/Functions emulator concurrency/rollback/private-rules/session/zero-authority assertions added; latest-head remote execution pending.",
+        "result": "Private PREPARED round0/version0 instance pins original preparation, sealed definition, source revision/session/expiry, native naturally normal-only policy and HP/SP. One instance per preparation, atomic four evidence records, immutable idempotent replay. No rounds, RNG, verdict, reward, gameplay mutation, callable, legacy adoption or second-device restore; four readiness/outcome/reward/credit flags false."
+      }
     }
   ]
 }

@@ -11,3 +11,8 @@ The UID main-save key owns three characters, level/EXP/gold, inventory, equipmen
 Tier A: monetary/asset ownership, shop/claim state, protected grants and receipts. Tier B: normal gameplay progression and run settlements; a future server validates reward sources without every battle action crossing the network. Tier C: UI/device settings, session cache and notification/asset cache. A locally stored Tier A label states *required future authority*, not that the present client state has become trusted. Until the full character is recoverable, no more preference-sync expansion should count as Phase 4 progress.
 
 Adding persistence: add the new state with all required metadata; register the backup/restore policy; if it is a UID sidecar, update the backup inventory and account-switch tests; update the writer-site guard after inspecting the new write; add a targeted restore/reward test. The CI guard also rejects direct literal keys, unreviewed dynamic `accountKey` suffixes and activation of historical-only `equipment-shop-purchases`. If the key is temporary, explicitly mark `deviceOnly` and safe default. Never silently map absent reward history to claimable.
+
+
+### Protected restricted Forest instance establishment (2026-10-05)
+
+Three private instance/consumption/policy paths are registered under canonical-restricted-battle.js, authority Tier B, backupRequired true. Corruption/missing evidence blocks progression/replay; no defaults regenerate instances or entitlements. Existing operations path retains the receipt. No TTL/deletion/restore writer is enabled. Full lifecycle/input/policy/backup boundaries are owned by `CLOUD_OPERATION_SETTLEMENT_CONTRACT.md`, same-named section; latest execution status is PR #802.
