@@ -20,9 +20,6 @@
     "MAGIC_ATTACK_PER_POINT": "6b88a4298748b21cd3dc0f39a883c55a7e4ee5f816839fb607462a460854011b",
     "DEFENSE_PER_POINT": "182d89802590a73babf9b69683ec74497dbae46d4eb4ed255ddad23dd3c2ff3f",
     "HP_PER_VITALITY_POINT": "abde025cd22ef901c38b5a734fc191bd33fd95b19fc6c0b1536b99d5c77d1ac4",
-    "LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL": "30a3210b7156144726f2c97b052c0b1efece3e0f0dea92bc311a4f1ec96ee907",
-    "LEVEL_DIFF_FACTOR_MIN_PHYSICAL": "589b92eb6daddac7c98af879e8a2ec427392230bfde148dde69d664279c4e64a",
-    "LEVEL_DIFF_FACTOR_MAX_PHYSICAL": "fb3c5d9eb3fd7956ad858362b0e22bae0b68fa485d3ca2a42a234705c7e57ccc",
     "DAMAGE_FORMULA_BASE_CONSTANT": "83a8da45e422f2200d8547a9546dca2d671f1763ac8920983cf75650ba62cfc1",
     "DAMAGE_FORMULA_PER_TARGET_LEVEL": "9d13646c87a242c6343edad7907209a7d13296b80749cb635c3fe99be8f0cb51",
     "NORMAL_DAMAGE_BONUS_MULTIPLIER_MAX": "9dfe188c25be1bbcc44600183e5325e27b0f64538fba46ea06dd0aa2064f40ba",
@@ -43,7 +40,7 @@
     "getEffectivePlayerAbilityPoints": "03f93809d1dce1d55c9b84fa750fbe67801c1aff65bf3e6ca6c95a4a0a833e53",
     "calculateCharacterBaseStats": "0aa27fc3bcf26348467e3ca98f477754662710a07c8e21764fdc12c4449e236c",
     "getDamageFormulaConstant": "70ed255990728e1018b86464714df88321599ac295a269325e8f448aa1e471c0",
-    "getDamageLevelMultiplier": "494e071c2c57755c844a444ded32069a22d9b7cfcb2f1ef42d445d567d16cc81",
+    "getDamageLevelMultiplier": "6c9802fd80df0f8fdca21c09101efae80de6878c962e8a63dfe94fb8af9e68ef",
     "getElementalDamageMultiplier": "3df36c3b8c659b734f7b1f570ec23e5ac6a9ec6f456d5b785d503b1acf16e221",
     "getDamageContextAttacker": "e3e788dd78069373c3ca8e57423b351da685d8c9e9ab4de8fb100fb009958dc6",
     "getOrdinaryDamageBonusPercent": "6be2f2b8f928acd29a73b691883c71cb439992b6cf26deb7483276d095bb5a9d",
@@ -57,7 +54,7 @@
     "getCriticalStatPoints": "a724e18b459ffd1b795f03adfc173098bee52dbbd3ec45ede1f0b6c1e328bb0f",
     "rollCritical": "d2412f3c3b1cd68a096630d964612d664247ed13c8a946126224f73ef0e7234e"
   },
-  "rulesSha256": "78f02845970b1264f3a145880512bd71dd6215389d2ceeb2c66e526ebf0acb51",
+  "rulesSha256": "65265e7d6297d749c45039e2b55b2b9350d1ca677bb5ad12ee9e01255fe934a8",
   "combatRulesReady": false,
   "outcomeVerified": false,
   "rewardEligible": false

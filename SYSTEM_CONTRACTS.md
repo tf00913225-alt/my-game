@@ -6,6 +6,13 @@
 
 術語唯一 Owner：`docs/MONSTER_PORTRAIT_SPEC_V1.md` 第 0 節。世界／個人 Boss 統稱大 Boss，深淵等一般首領稱小 Boss；rank、mode、sizeClass 與 footprint 是獨立契約。下方 Boss 專屬模式的中央六格／援軍／功能物件規則只適用個人／世界大 Boss，不得因一般敵人 `rank="boss"` 套用到塔、每日副本或深淵。既有 World Boss／Personal Boss／Abyss Boss 名稱及內部 identifier 保留。
 
+## Level Suppression V2（2026-10-05）
+
+- Final Damage Level Multiplier: `1.01 ^ (Attacker Level - Target Level)`，唯一 Owner 為 `js/00-main.js::getDamageLevelMultiplier()`；玩家與怪物、普攻與技能雙向共用 `calculateDamage()` 既有 levelFactor，不疊加第二套公式。
+- 每差1級即時變化，無人工 multiplier cap/floor、Tier 或 Table；Lv1～100整數輸入永遠正值且有限，雙向互逆。無效等級獨立 fallback Lv1。
+- 舊 `1 + diff × 1%`／clamp0.85～1.15與專用常數已退休。不影響 Hit/Evasion/Status/Hard Control/Critical/Speed/Healing/Shield/SP/Cost/AI，不取代自然成長，不修改 MonsterBalance Profile。
+- 正式契約與Regression：`docs/LEVEL_SUPPRESSION_V2_20261005.md`。伺服器規則僅由既有build機械投影同一Owner。
+
 ## Monster Balance Owner 七模式契約
 
 - `js/combat/monster-balance-owner.mjs` 是 `wild / daily / tower / abyss / adventure / personalBoss / worldBoss` 戰前數值的唯一控制來源；內容 Definition 提供固定 Level Spec，Owner 驗證 Level 並轉換配點、HP、SP、物攻、魔攻、防禦、速度與最終傷害 pressure。

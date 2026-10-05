@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "workId": "LEVEL-SUPPRESSION-V2-20261005",
+  "releaseVersion": "173.73",
+  "requirements": [
+    {
+      "id": "REQ-LEVEL-SUPPRESSION-V2-20261005",
+      "title": "全遊戲共用連續指數等級傷害倍率取代線性Clamp",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/00-main.js",
+          "scripts/lib/cloud-battle-normal-attack-rules.mjs",
+          "tests/level-suppression-v2.test.mjs",
+          "tests/v170-final-spec-integration.test.js",
+          "docs/LEVEL_SUPPRESSION_V2_20261005.md"
+        ],
+        "verification": "Formula/adjacent/reciprocal/input, full production bundle damage+skill integration and Hit/Evasion/Status/HardControl/Critical isolation; relevant combat/MonsterBalance/cloud parity, build sync and latest-head CI required.",
+        "result": "IMPLEMENTED; latest-head CI/integration/deployment/cleanup pending in Work PR. Game/Cache173.73 unchanged; main protected."
+      }
+    }
+  ]
+}

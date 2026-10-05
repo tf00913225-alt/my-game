@@ -247,6 +247,16 @@
         "bossBalanceProfile",
         "defenseMultiplier"
       ]
+    },
+    {
+      "id": "DEP-LEVEL-SUPPRESSION-V2",
+      "description": "Retired Level Damage linear/clamp constants only; unrelated 0.85/1.15 remain legal.",
+      "enabled": true,
+      "forbidden": [
+        "LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL",
+        "LEVEL_DIFF_FACTOR_MIN_PHYSICAL",
+        "LEVEL_DIFF_FACTOR_MAX_PHYSICAL"
+      ]
     }
   ]
 }
