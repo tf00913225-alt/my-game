@@ -740,7 +740,7 @@
     {
       "id": "REQ-CLOUD-RESTRICTED-BATTLE-INSTANCE-20261005",
       "title": "受保護森林受限場次建立與原始政策／初始資源固定（僅 PREPARED，不含後續回合）",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "functions/src/canonical-restricted-battle.js",
@@ -751,7 +751,7 @@
           "scripts/test-session-authority-emulator.mjs",
           "config/persisted-state-registry.json"
         ],
-        "verification": "Local157/157 battle preparation/encounter/player/proof/opening/instance tests PASS, skip0; new29 instance cases. Actual Auth/Firestore/Functions emulator concurrency/rollback/private-rules/session/zero-authority assertions added; latest-head remote execution pending.",
+        "verification": "Local157/157 targeted preparation/encounter/player/proof/opening/instance tests PASS, skip0, including29 new instance regressions and existing128 player/96 opening browser-source parity vectors. Exact source7f0094594cb9aa2797d5efa52a9fdf336a5379b4 real Auth/Firestore/Functions Session Authority run37271418896/job111639039155 SUCCESS: backend272/272 PASS, skip0; original source/resource/policy binding, atomic rollback, concurrent one-winner, replay, corruption/missing evidence, expiry/revision/session refusal, private read/write rules and zero authority mutation PASS; actual new-login device takeover and revocation PASS. Final metadata-head CI/integration/exact Firebase+DEV deployment and cleanup are independent pending execution gates.",
         "result": "Private PREPARED round0/version0 instance pins original preparation, sealed definition, source revision/session/expiry, native naturally normal-only policy and HP/SP. One instance per preparation, atomic four evidence records, immutable idempotent replay. No rounds, RNG, verdict, reward, gameplay mutation, callable, legacy adoption or second-device restore; four readiness/outcome/reward/credit flags false."
       }
     }
