@@ -7,7 +7,7 @@
     "js/33-v140-four-element-balance.js": "ec0e90959f8d50862deb808c3cd66554ac426d9bc80de1fe07464e8683162a45",
     "js/43-v149-skill-ui-rules.js": "0400d162e325b77f1444a3c3f8d243b41a66de48830e879fc1a49f256b33bc16",
     "js/44-v152-dev-fixes.js": "86d3285e8967e5c3b57dd60604bb5731f23d81e7022534e535864b0b939e4d1e",
-    "js/60-v173.64-skill-progression-rebalance.js": "3d42854b0775161ec044ac42040c44728c3af9eaeddcf7e38604d9ddf69ea908"
+    "js/60-v173.64-skill-progression-rebalance.js": "ac55d6dfbc3b1325bb7ba7d790330b998d57d521b165058481511336db1f413b"
   },
   "declarationDigests": {
     "BASE_PHYSICAL_ATTACK": "8c512bffb37a77a9df4d5ffe8e5d92d8a6304d41fd610fefb102d03b5b3850dd",
@@ -50,11 +50,11 @@
     "getDamageBudgetMultiplier": "6e2b7ea31c889bddb2de078889f3a49078e7d3a76cd53171b232f43dee3700fe",
     "getTowerDirectDamageMultiplier": "e1be9a97a669cfce3389899ad6c6479322a56f809e548cbacb6fc603c66a64de",
     "calculateDamage": "34484de33b061ba4ae7409ace8555c17d241a577ae1770b4b777823e4e1bd6ad",
-    "calculateHitChancePercent": "c7d45b4c65a986cc6826a6c286fd153b27db29cb5fe9ee00c5d2eb772f00780e",
+    "calculateHitChancePercent": "8691b66a68926e30b35cbc8030a79e686ee26a5f2ead89754df13feebc01b5b6",
     "getCriticalStatPoints": "a724e18b459ffd1b795f03adfc173098bee52dbbd3ec45ede1f0b6c1e328bb0f",
     "rollCritical": "d2412f3c3b1cd68a096630d964612d664247ed13c8a946126224f73ef0e7234e"
   },
-  "rulesSha256": "65265e7d6297d749c45039e2b55b2b9350d1ca677bb5ad12ee9e01255fe934a8",
+  "rulesSha256": "e3e548bd7a80dae9e7eb247406949e38291e545088810663f9d26dc5bc6b9613",
   "combatRulesReady": false,
   "outcomeVerified": false,
   "rewardEligible": false

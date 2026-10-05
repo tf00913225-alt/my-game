@@ -171,6 +171,9 @@ test("final progression data standardizes Lv10 damage skills, EX and support str
         assert.equal(r.skills[id].upgradeCost,1,id+" upgrade cost");
     }
     for(const id of ["fireEX","waterEX","windEX","earthEX"]) assert.deepEqual([r.skills[id].learnLevel,r.skills[id].learnCost,r.skills[id].maxLevel],[50,20,1],id);
+    assert.deepEqual([r.skills.windEX.evasionBonusPercent,r.skills.windEX.accuracyBonusPercent,r.skills.windEX.lowHpEvasionBonusPercent],[15,15,50]);
+    assert.equal(Object.hasOwn(r.skills.windEX,"lowHpFinalHitCapPercent"),false);
+    assert.match(r.context.FourSymbolsSkillSpec.descriptionFor(r.skills.windEX),/25%[\s\S]*額外 \+50%/);
     assert.deepEqual([r.skills.rage.learnLevel,r.skills.rage.learnCost],[18,10]);
     assert.deepEqual([r.skills.fireSoulResonance.learnLevel,r.skills.fireSoulResonance.learnCost,r.skills.fireSoulResonance.maxLevel,r.skills.fireSoulResonance.spCost],[25,14,5,45]);
     assert.deepEqual(Array.from(r.skills.fireSoulResonance.momentumBonusByLevel),[12,15,18,21,25]);
@@ -380,7 +383,7 @@ test("wind and earth support values stay in formal arrays instead of transient s
     assert.equal(r.skills.barrier.barrierBlockCountByLevel,undefined,"Barrier has no charge lifecycle");
     assert.equal(r.skills.earthEX.maxHpMultiplier,1.2,"Earth EX applies Max HP after base sources");
     assert.equal(
-        (main.match(/maxHP:\s*Math\.round\(base\.maxHP\*maxHpPassiveMultiplier\)/g)||[]).length,
+        (main.match(/const maxHP=Math\.round\(base\.maxHP\*maxHpPassiveMultiplier\);/g)||[]).length,
         2,
         "both player stat owners apply Earth EX after base Max HP"
     );

@@ -798,6 +798,51 @@
         "verification": "30/30 executable core+V149 regressions and related35/35 PASS; exact source959feb28292c12e957ee6a556051cd53e3665115 production Chrome48/48 PASS, run37321112490 artifact11350106855. Independently downloaded SHA25631e1523f0811dd948f3802046145ecfa2a0cb4d260a04a73f58d522226805904 matches GitHub;48 rows and390x844/412x915 screenshots reviewed. Dragon[0,2,2]/[0,2,1], one SP cost/finish and revival exclusion PASS.",
         "result": "Functional VERIFIED in final production Runtime. Exact metadata-head CI, dev integration, exact deployment/live QA and cleanup remain separate gates; NOT COMPLETE."
       }
+    },
+    {
+      "id": "REQ-WIND-EX-PROJECTION-20261005",
+      "title": "Native learned Wind EX derives extra50 evasion strictly below final Max HP25%",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/WIND_EX_LOW_HP_EVASION_20261005.md",
+          "tests/v170-final-spec-integration.test.js",
+          "tests/skill-progression-rebalance.test.js",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs"
+        ],
+        "verification": "Formal production integration41/41 PASS: all3 characters,24.99/25.00/25.01%, healing/re-damage, changed Max HP, native/unlearned isolation, FinalAccuracy15 and Hit5–99; focused67/67 PASS.",
+        "result": "Functional numeric contract VERIFIED. Exact-head CI/production Browser, controlled dev merge, Session/deployed SHA/live QA and cleanup are independent pending execution gates; NOT COMPLETE."
+      }
+    },
+    {
+      "id": "REQ-WIND-EX-RETIREMENT-20261005",
+      "title": "Retire low-HP enemy Hit cap and describe additive evasion through existing spec owner",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/WIND_EX_LOW_HP_EVASION_20261005.md",
+          "tests/v170-final-spec-integration.test.js",
+          "tests/skill-progression-rebalance.test.js",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs"
+        ],
+        "verification": "Formal production integration and Hit static retirement assertions PASS; final spec15/15/50 and description extra50, old field/Hit branch absent; deprecated-code gate rejects reintroduction.",
+        "result": "Functional numeric contract VERIFIED. Exact-head CI/production Browser, controlled dev merge, Session/deployed SHA/live QA and cleanup are independent pending execution gates; NOT COMPLETE."
+      }
+    },
+    {
+      "id": "REQ-WIND-EX-STACKING-20261005",
+      "title": "Preserve additive Dodge equipment relic Frostbite and existing skill durations",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/WIND_EX_LOW_HP_EVASION_20261005.md",
+          "tests/v170-final-spec-integration.test.js",
+          "tests/skill-progression-rebalance.test.js",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs"
+        ],
+        "verification": "Formal production integration PASS:65+25+10=100, Frostbite75, expiredDodge50; existing progression Lv1–5 arrays/duration regressions PASS. Existing production Chrome runner separately verifies real relic/combat/UI; remote Browser gate pending.",
+        "result": "Functional numeric contract VERIFIED. Exact-head CI/production Browser, controlled dev merge, Session/deployed SHA/live QA and cleanup are independent pending execution gates; NOT COMPLETE."
+      }
     }
   ]
 }

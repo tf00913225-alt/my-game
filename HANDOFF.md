@@ -1,3 +1,9 @@
+## 2026-10-05 — WIND-EX-LOW-HP-EVASION-20261005 / IMPLEMENTED
+
+- Resumed after Fire PR#805 normal dev merge76f35f0014a6a87ef7d821eb243bfd892f9ed5c1; branch fix/wind-ex-low-hp-evasion-20261005 → dev; main forbidden. Fire exact-head CI37327507546/Session37327507328 and production Chrome48/48 PASS; final combined deployment/cleanup remains pending.
+- Native learned Wind EX keeps Final Evasion+15/Final Accuracy+15; current HP strictly below settled final Max HP25% adds50 percentage points, immediately removed at equality/healing. All3 characters independent; additive Dodge/equipment/relic/Frostbite; uncapped Evasion and Hit5–99 preserved. Old low-HP enemy Hit cap physically retired. Core stat getters share one pure helper, final spec/text retain existing owner; no wrapper/state/timer/save/MonsterBalance/Cloud authority change.
+- Formal production integration41/41 and focused67/67 PASS. Existing production browser/live runner extended; local Chrome socket EPERM is not Browser PASS. Latest-head CI/Browser, dev integration/Session, exact deployed both-feature QA and restorable branch cleanup remain pending. Functional numeric contracts VERIFIED; not COMPLETE. Work PR owns durable current gates; docs/WIND_EX_LOW_HP_EVASION_20261005.md.
+
 ## 2026-10-05 — FIRE-FOLLOWUP-LETHAL-RETARGET-20261005 / IMPLEMENTED
 
 - Base dev a9e3cc0c14c74005f517a594b96c1886665ff469; fix/fire-followup-lethal-retarget-20261005 → dev; main forbidden. Core snapshot-only lethal retarget + V149 handoff, no wrapper/AI/queue replacement. Original living primary stays locked; killed primary may switch to original legal survivor. Late revived identities remain excluded.
