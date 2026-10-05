@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "policyId": "restricted-forest-instance-v1",
+  "scope": "private-initial-state-only",
+  "sourceDigests": {
+    "js/00-main.js": "c07a8838b4e4064f70bc00006ecd51f37ff164554f1f001d47da4f1e2dbb4a84",
+    "js/34-v141-core-systems.js": "55b2a001c684749d4ad7178639efa5fd38080691560edcdfe58b42da88eeab64",
+    "js/40-v144-rules-and-abyss.js": "5cad5ada547347b97475d98919acd8d03b0e1e9a9f30f063b34e48b73469bfc1"
+  },
+  "entries": {
+    "wild.zone-01.fire-01": {
+      "specSha256": "e34337b0df960fb3d4fc64c4fa6288cfb2c897fa7f0e08db3c3660bbaae9d2d1",
+      "attackSkills": [],
+      "supportSkills": [],
+      "skillChance": 0
+    },
+    "wild.zone-01.water-01": {
+      "specSha256": "305f121d66d9465a10b6b7a84376d84a82debe6a19f7a0b393c31a1d098755ff",
+      "attackSkills": [],
+      "supportSkills": [],
+      "skillChance": 0
+    }
+  },
+  "roster": {
+    "players": 1,
+    "enemies": 1,
+    "enemySource": "original-private-encounter-seal",
+    "rankDraw": false
+  },
+  "initialResources": {
+    "player": "original-private-source-hp-sp",
+    "enemy": "sealed-definition-max-hp-sp"
+  },
+  "allowedFutureIntent": {
+    "type": "normal-attack",
+    "actor": "player-0",
+    "target": "enemy-0"
+  },
+  "enemyIntent": {
+    "type": "normal-attack",
+    "target": "player-0",
+    "selection": "sole-living-visible-player"
+  },
+  "unsupported": [
+    "skills",
+    "passives",
+    "buffs",
+    "debuffs",
+    "equipment",
+    "relics",
+    "defend",
+    "items",
+    "follow-up",
+    "shield",
+    "reflect",
+    "lifesteal",
+    "revive",
+    "additional-actors",
+    "post-battle-effects"
+  ],
+  "lifecycle": {
+    "state": "PREPARED",
+    "round": 0,
+    "roundVersion": 0,
+    "acceptsRoundSubmission": false,
+    "randomnessRequired": false
+  },
+  "combatRulesReady": false,
+  "outcomeVerified": false,
+  "rewardEligible": false,
+  "creditedToCharacter": false
+}
