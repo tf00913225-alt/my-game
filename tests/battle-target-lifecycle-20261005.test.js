@@ -102,7 +102,7 @@ for(const rank of ["regular","boss"]){
 
 for(const [skillId,maxCasts] of [["flameSlash",1],["fireCritical",1],["explosiveFlurry",1],["dragonSlash",2]]){
     test(skillId+" lethal chain retains cast limit, SP and once-only finish",()=>{
-        const r=runtime({skillId,maxCasts,hp:[5,5,5],critical:false});
+        const r=runtime({skillId,maxCasts,hp:[5,5,5],critical:false});r.setRandom(.05);
         r.ctx.processSingleMonsterAttack(0,7);r.flush();
         assert.deepEqual(r.hits,maxCasts===2?[0,1,2]:[0,1]);
         assert.equal(r.badges.length,maxCasts+1);assert.equal(r.ctx.monsters[0].sp,90);
