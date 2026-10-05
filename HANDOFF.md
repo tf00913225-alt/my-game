@@ -1,3 +1,11 @@
+## 2026-10-04 — P2-PACKAGE-VERSION-OWNERSHIP-20261004（功能1/1 VERIFIED；遠端整合／部署／清理待Gate）
+
+- Start dev `9fff3664d2767739fe8cd5c893f2985f8032d5ef`; main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` protected. Branch `chore/p2-package-version-ownership-20261004`; Work PR owns durable latest state. NORMAL DEVELOPMENT; Freeze NO.
+- Historical package mirror last changed by0706a241/#380 (173.68.0→173.69.0); releases173.70/#456,173.71/#520,173.72/#535,173.73/#770 omitted root metadata while Gate lacked mirror validation. Root package never controls Runtime/Game/Cache; historical alignment is metadata intent, not independent npm release series.
+- npm maintained root version173.73.0. Existing release-gate::checkPackageMetadata validates one-way release Game→npm semver projection and each existing lock's top/empty-entry metadata. Root dependency-free tool package has no lock; none introduced. Functions package/lock1.0.0 remain independent and unchanged. No new version file/workflow/wrapper/timer/owner.
+-12/12 executable Gate regressions plus isolated offline npm install/ci metadata PASS; build/build:check, release-ready/deprecated PASS; generated Runtime/build diff zero. Formal semantics in RELEASE_VERIFICATION_RULES §4A; inventory/history/retirement/deployment rationale in docs/P2_PACKAGE_VERSION_OWNERSHIP_20261004.md. Existing CI release step runs the focused suite. Latest-head PR CI, merge/dev CI, automatic exact-SHA deployment/readback and safe branch cleanup remain mandatory remote gates, tracked in Work PR.
+- Game/Cache173.73; no Gameplay/Runtime/player data/MonsterBalance/Cloud/UI/main changes. Active Boss#799 excluded. Stop after this batch; no next P2/P3.
+
 ## 2026-10-04 — MONSTER-BALANCE-OWNER-P2F-BOSS-20261004（IMPLEMENTED；驗證待 Gate）
 
 - Base dev9fff3664d2767739fe8cd5c893f2985f8032d5ef；main f63d69dbfa66ba75637d1c3cd7fcc7d74782e356 禁止修改；feature/monster-balance-owner-phase2f-boss-20261004；target dev；Work PR 為耐久即時狀態 Owner。

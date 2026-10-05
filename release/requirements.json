@@ -719,6 +719,23 @@
         "verification": "53/53 Phase1–2F aggregate, 7/7 focused, 50/50 formal neutral/seeded TTK, 18/18 natural Chrome scenes at390×844/412×915, snapshot/mechanism/reward regression, final legacy audit and build sync PASS. Exact source d5f88fb03130360add0bbd330930c80c5db6b5c7; Repository CI37220134518 jobs111488621828/111488621822/111488621691/111488621595 SUCCESS; Session CI37220134254 job111488620833 SUCCESS. Boss artifact11309889570 SHA256f949c5f06aa8277bb959e7b111f93599481e6fa1d1cb684126dd8a77c4a26606 independently checked.",
         "result": "1/1 functional VERIFIED. Metadata-head CI, integration, deployed exact SHA/live QA and safe branch cleanup are separate release/closeout gates owned by PR#799."
       }
+    },
+    {
+      "id": "REQ-P2-PACKAGE-VERSION-OWNERSHIP-20261004",
+      "title": "根 npm metadata 由 release source 單向投影與 Functions 獨立版本／lock 驗證",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "package.json",
+          ".github/scripts/release-gate.mjs",
+          ".github/workflows/ci.yml",
+          "tests/package-version-ownership.test.mjs",
+          "docs/RELEASE_VERIFICATION_RULES.md",
+          "docs/P2_PACKAGE_VERSION_OWNERSHIP_20261004.md"
+        ],
+        "verification": "12/12 executable Gate regressions PASS, including stale root metadata, package-only advance, release advance, malformed JSON, optional npm-generated root lock, both lock metadata locations, independent Functions advance and missing Functions lock. Isolated offline npm install/ci preserve package metadata; build/build:check and release-ready/deprecated gates PASS; generated Runtime has zero tracked diff. Latest-head CI/integration/deployment/cleanup tracked separately by Work PR.",
+        "result": "Historical mirror omission fixed via npm version 173.73.0 --no-git-tag-version --ignore-scripts. Game/Cache173.73 remain release/release.json-owned; root package is verified metadata projection, Functions1.0.0 independent. No root lock introduced; Functions package/lock unchanged. NORMAL DEVELOPMENT; no gameplay/runtime/main change."
+      }
     }
   ]
 }

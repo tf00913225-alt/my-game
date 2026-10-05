@@ -132,7 +132,7 @@
     "PR #780 為獨立有效施工，完全排除本次 P1-A；不回推新開發至 main"
   ],
   "p2": [
-    "package.json 的歷史版本標示與模組警告整理",
+    "根 package 歷史 metadata 已由 P2-PACKAGE-VERSION-OWNERSHIP-20261004 收斂至 release source 投影；Gate 防止再漂移（整合／CI／清理以工作 PR 為準）。模組警告整理見 #795；其餘工具鏈警告另批處理",
     "歷史文件與測試 owner 維護；新的正式必要測試失敗若經確認再分類，已完成清單不重開"
   ],
   "p3": [
