@@ -1,12 +1,12 @@
 # 《四象江湖傳》Bug Repair Definition of Done & Owner Convergence Gate
 
-## 一般 Bug 預設路徑（2026-10-01 生效）
+## 適用入口
 
-一般 Bug 必須先讀 `docs/BUG_FIX_FAST_PATH.md`，以該文件為調查範圍、證據升級、自主整合與結案的權威來源。預設最小必要調查＋最小安全修正；只查直接相關責任與呼叫鏈。完整 Owner Convergence／Lifecycle 稽核僅在該文件第四節證據成立或使用者明確要求架構工程時適用。下文不得以「較嚴格優先」恢復一般 Bug 全面稽核、tests-only 限制、固定失敗額度、僅草稿 PR 或正式 Runtime 即硬停止。最新 Head 必要 CI、原症狀驗證與資料安全仍必須遵守；一般 Bug 結案不要求發布 main。
+讀取路由由 `AGENTS.md` 唯一控制；一般 Bug 的預設流程／證據升級條件由 `docs/BUG_FIX_FAST_PATH.md` 控制。本文件不得以較嚴格優先恢復一般 Bug 全文件載入或全面 Audit。
 
 # Bug 修復完成定義與控制來源收斂閘門
 
-> 文件定位：本文件是《四象江湖傳》所有 Bug／failure／regression（回歸）修復任務的永久完成標準，以及 Owner（控制來源）收斂的唯一專項契約。
+> 文件定位：本文件是《四象江湖傳》複雜／證據升級／架構級 Bug 修復任務的專項完成標準，以及 Owner（控制來源）收斂的唯一專項契約。
 >
 > 生效日期：2026-09-29
 >
@@ -14,7 +14,7 @@
 >
 > 適用代理：GPT、Claude、Codex 與其他 AI／Agent（代理）。
 >
-> 本文件不擴張任何修改或合併權限；操作權限與停止線仍由 AUTONOMOUS_REPAIR_CONTRACT.md、分支規則與當次使用者明確指令決定。
+> 本文件不擴張任何修改或合併權限；操作權限、分支與路由由 AGENTS.md、Fast Path 及當次使用者指令決定；僅明確受控模式另適用 AUTONOMOUS_REPAIR_CONTRACT.md。
 
 ---
 
@@ -320,7 +320,7 @@ Repository 正確但部署／Cache 錯誤，仍然是未完成修復。
 
 ## 10. Regression Test 最低要求
 
-每個 Bug 至少要留下能阻止同一故障機制再次出現的 Regression Test，除非技術上不可自動化；若不可自動化，必須記錄理由與人工 QA 步驟。
+測試風險分類與是否需要新增永久測試統一依 AGENTS.md「最小必要驗證」。本契約啟用的核心／複雜故障須留下故障機制 Regression Test；技術上不可自動化時記錄理由與必要人工 QA。低風險無邏輯修改可 focused verification，不刪既有有效 regression。
 
 Regression Test 必須盡量測「故障機制」，而不只是某個表面值。
 
@@ -352,14 +352,14 @@ Regression Test 必須盡量測「故障機制」，而不只是某個表面值�
 
 ## 12. 與其他永久規範的關係
 
-- docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md：所有變更的總體安全與 Replacement 遷移契約。
-- AUTONOMOUS_REPAIR_CONTRACT.md：修復任務可以自主做到哪裡、何時硬停止；不負責降低本文件的完成標準。
+- docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md：取代／收斂／移除的專項遷移契約。
+- AUTONOMOUS_REPAIR_CONTRACT.md：僅明確受控修復模式的操作邊界；一般 Bug 由 Fast Path 控制。
 - ARCHITECTURE_RULES.md：Owner、Wrapper、Patch、架構邊界。
 - UI_GUIDELINES.md：UI／互動／版面規格。
 - docs/RELEASE_VERIFICATION_RULES.md：CI／部署／Release 驗證。
 - HANDOFF.md：目前專案狀態，不可取代本文件。
 
-若其他文件只要求「測試 PASS」而本文件對該 Bug 還要求最終 Runtime／Deployment 驗證，以較嚴格的完成標準為準。
+在本契約已啟用的範圍內，測試 PASS 不能代替必要最終 Runtime／Deployment 驗證；不得用較嚴格優先擴張一般 Bug 的讀取路由。普通 Bug 依 Fast Path 原症狀驗證及完成狀態。
 
 ---
 

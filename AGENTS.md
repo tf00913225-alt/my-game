@@ -1,281 +1,83 @@
-# 專案代理規則
+# 專案代理入口與 Routing
 
-## 一般 Bug 預設路徑（2026-10-01 生效）
+`tf00913225-alt/my-game` 的唯一 Agent 工程治理入口。先讀本文件，再依任務路由讀相關 Owner；不得把引用清單當成全部必讀。使用者明確指令優先，產品規格由使用者決定，工程判斷由代理依 Repository 證據負責。
 
-一般 Bug 必須先讀 `docs/BUG_FIX_FAST_PATH.md`，以該文件為調查範圍、證據升級、自主整合與結案的權威來源。預設最小必要調查＋最小安全修正；只查直接相關責任與呼叫鏈。完整 Owner Convergence／Lifecycle 稽核僅在該文件第四節證據成立或使用者明確要求架構工程時適用。下文不得以「較嚴格優先」恢復一般 Bug 全面稽核、tests-only 限制、固定失敗額度、僅草稿 PR 或正式 Runtime 即硬停止。最新 Head 必要 CI、原症狀驗證與資料安全仍必須遵守；一般 Bug 結案不要求發布 main。
+## 核心安全底線
 
+- `main` 是正式版、`dev` 是整合分支：禁止直接修改兩者；main 正式發布必須另有使用者正式授權。禁止 rebase、force push、改寫歷史或 blind overwrite。
+- 新工作從即時最新 dev 建獨立 `fix/*`、`feature/*`、`docs/*` 或 `chore/*` 分支，經 PR → dev；建立前查同目的有效 PR／Branch，存在就續接。不同工程不得共用工作分支，一工作一條有效施工線。
+- Scope isolation：只改已授權目標及必要相依。先查正式規格、直接程式與測試、既有 Owner／共用工具，再做最小安全修改；不順手重構、改數值、存檔或 UI。
+- 同一責任只有一個正式 Owner；優先修原來源，禁止無理由疊 Wrapper／Patch。已證實多 Owner、覆蓋或 Lifecycle 衝突時依路由升級，不因猜測擴大 Audit。
+- Cloud／Save／Auth／Payment／Security／Economy／Reward／Migration／不可逆資料操作依相關子系統正式 Gate；Session Authority、reauthentication、Cloud Save Authority、Firestore security、Protected lifecycle、revision、reward once-only、支付驗證與資料保留不得降級或 fail-open。靜態快取更新不得清除玩家資料。
+- `assets-library` 僅素材，不改 HTML/CSS/JS/治理文件，不整分支合入 dev/main；指定素材依圖片 Owner 導入。
+- 專案內部證據優先；必要外部查詢限直接相關官方技術資料。不自行研究其他遊戲實作。
 
-1. 開始任何工作前，先完整閱讀 `HANDOFF.md`。
-2. **任何 UI、CSS、版面、美術圖片、背包、裝備、技能、戰鬥介面等修改前，都必須先閱讀 `UI_GUIDELINES.md`。**
-3. `UI_GUIDELINES.md` 是一般 UI 規範的唯一來源；不要把完整規範複製到其他文件，避免版本分歧。**唯一的專項例外是 `docs/ITEM_RARITY_UI_SPEC.md`：凡涉及裝備、道具、材料、設計圖、符咒、寶箱、掉落、背包格、商店格、合成、冶煉或任何物品階級／稀有度顏色時，該文件為階級與色號的最高權威來源。**
-4. 若本次只要求 UI 修改，不得順手修改戰鬥、存檔、數值、掉落等無關邏輯。
-5. **任何程式、CSS、UI、戰鬥、存檔、技能、掉落、動畫或資產整合修改前，都必須完整閱讀 `HANDOFF.md`、`UI_GUIDELINES.md` 與 `ARCHITECTURE_RULES.md`；若工作涉及物品階級／稀有度，再額外完整閱讀 `docs/ITEM_RARITY_UI_SPEC.md`。**
-6. **修改前必須先在回報中列出：本次功能的 owner 檔案、主要函式、現有 wrapper／後續覆蓋點，以及是否需要暫時補丁。未完成此檢查不得修改。**
-7. **不得自行把 `low / mid / high / perfect` 或「低階／中階／高階／完美」當成新的正式物品階級；正式六階與固定色號一律以 `docs/ITEM_RARITY_UI_SPEC.md` 為準。**
-8. **凡涉及新增、替換、轉檔或正式導入任何點陣圖片資產，必須先完整閱讀 `docs/IMAGE_ASSET_SPEC.md`。該文件是圖片格式、WebP 轉換、無損驗證、透明度、尺寸、Sprite Sheet／VFX 幀資料與正式引用流程的最高權威來源。**
-9. **凡屬修復、fix、failure、test failure、CI failure、fixture、test harness、stale contract 或既有修復分支續修任務，若使用者未在當次任務另行指定不同模式，必須先完整閱讀根目錄 `AUTONOMOUS_REPAIR_CONTRACT.md`，並以該文件作為受控自主修復的唯一正式契約來源；不得依舊對話摘要自行擴張授權。**
-10. **凡涉及怪物／精英／BOSS／日常副本／天兵立繪導入，必須先讀 `MONSTER_PORTRAIT_SPEC.md` 與 `docs/MONSTER_PORTRAIT_SPEC_V1.md`。若素材已經生成並完成正式 WebP 落位，預設使用 `npm run portrait:import -- --keys=<portraitKey,...>` 快速導入；不得為已完成素材重新建立生成 batch、重跑生成或重做母圖搜尋。尚未生成的素材才使用既有 batch 流程。**
-11. **所有新增、修改、替換、重構、UI／CSS、Gameplay、資料、狀態、Lifecycle 與 Bug 修復，施工前都必須完整閱讀 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`。使用者說「改成／換成／不要原本的」時預設為 Replacement（取代），代理必須自行完成舊 Owner／Contract／Lifecycle／Semantic State／Regression Test 的遷移與退場判定，不得只疊加新版，也不得把「舊的要不要刪」這類工程責任丟回給不懂程式的專案負責人。**
-12. **凡屬 Bug、fix、failure、regression、修復後仍重現或任何「已修好」判定，必須完整閱讀 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`。一般 Bug 先依 `docs/BUG_FIX_FAST_PATH.md`，達到證據升級條件才啟用完整 Owner Convergence Gate；DIAGNOSED／IMPLEMENTED／INTEGRATED／DEPLOYED 不得冒稱 VERIFIED。只有原始玩家症狀在最終目標環境依足夠證據不再重現，才可回報「已修好」。若使用者要求的技術做法會形成第二 Owner、Patch／Wrapper 疊加或高風險架構，代理必須主動阻止並改採安全實作；不得把技術退場判斷丟回非技術使用者。**
+## 工作生命週期／DEV PR 自動整合規則
 
-## 最高優先：Change Safety & Replacement Migration Gate（變更安全與取代遷移閘門）
+已授權施工包含：最新 dev → 獨立分支 → 最小修改與必要驗證 → PR → Latest Head Required CI／任務 Gate → 合併 dev → 合併後確認 → 安全清理 → Closeout。不自動延伸為 dev → main 發布。
 
-- `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md` 是所有變更的永久必讀契約，與 `ARCHITECTURE_RULES.md` 共同適用。 Bug／failure／regression 另必須同時遵守 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`；後者是 Bug 完成狀態與 Owner Convergence Gate 的專項權威來源。
-- 每次先分類 Additive（新增）／Replacement（取代）／Convergence（收斂）／Removal（移除）；「改成／換成／不要原本的」預設不是疊加。
-- Replacement 完成條件包含舊 Owner、舊 DOM/CSS/函式/Wrapper、舊 State 語意、舊 Lifecycle 與舊 Test 的遷移／刪除判定。
-- `display:none`、`animation:none`、更後面的 CSS、`!important`、Wrapper 或 late patch 不得作為「已完成取代」的預設證據。
-- 代理必須主動提醒雙 Owner、多份真相、狀態語意混用、Lifecycle 缺口與維護成本；使用者只需決定產品／遊戲結果，不需替代理判斷技術退場細節。
+合併前重新核對 dev、PR Head、完整 diff／scope、可合併狀態與所有必要 checks。dev 前進時檢查新增差異、相關 Owner／衝突及驗證影響；需要吸收時用正常 merge，不 rebase／force push。Head 變動後重新驗證，禁止用舊 CI 替新 Head 背書。CI 不得取消、略過或降低，失敗先修必要阻塞。
 
-## Boss 術語入口
+條件全部通過且無未解除高風險阻塞時，直接正常合併 dev，不再要求 MERGE-DEV 二次授權。明令不得合併的 CI Validation Draft PR 維持不可合併；取消二次確認不取代高風險特定授權，也不授權 main 發布。Release Freeze 中依發布 Owner 限制候選整合；P0 發布阻塞及 P1/P2 不得自行變成正常開發禁令。
 
-Boss 術語的唯一正式 Owner 為 `docs/MONSTER_PORTRAIT_SPEC_V1.md` 第 0 節。需求、PR、文件與回報必須依該節區分大 Boss／小 Boss；術語不授權修改內部 identifier、素材尺寸或戰場格位。
+合併後，確認本工作內容仍存在及相關必要 checks；Runtime／部署特定修改再依風險驗證目標環境。文件-only 不要求 Gameplay Browser QA、Web 部署或玩家實機驗收。工作分支只有在內容已完整吸收、無獨立有效 commit/diff、無活躍 PR 或長期保留理由時才安全刪除，預設不再請示；舊 PR 只有已吸收／明確取代才可關閉。不得刪未吸收內容，永久／指定 backup 分支保留。
 
-## 《四象江湖傳》專案開發、QA 與外部研究固定規則
+清理前檢查可用 Connector/API／已認證 git 等操作；工具未暴露刪除動作不等於沒有權限，若所有可用通道確實均無刪除能力，精確列為待清理及介面限制，不冒稱已結案。正式發布後的 main/dev 有效內容收斂依發布 Owner，不以 commit graph 差異代替實際 diff。
 
-本章為永久固定開發規範。除非專案負責人日後明確要求修改，所有程式開發、Bug 修正、功能新增／調整、程式重構、GitHub 操作、Pull Request、Repository checks、GitHub Actions、瀏覽器測試、QA、自動化測試、技術研究、除錯與程式碼搜尋，都必須遵守以下原則。既有第 1～11 條為本章的具體前置要求，內容重疊時合併理解，不重複建立第二套標準。
+## Resumable Work Protocol
 
-### 一、專案內部資料永遠優先
-- 所有判斷、修改與除錯，先依據目前 Repository 的正式規格、程式碼、資料結構、函式、模組、遊戲規則、共用工具、既有測試、GitHub Actions、Repository checks，以及 `AGENTS.md`、`CLAUDE.md`、`HANDOFF.md`、`ARCHITECTURE_RULES.md`、`UI_GUIDELINES.md`、`AUTONOMOUS_REPAIR_CONTRACT.md`、`docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`、`CHECK_REPORT.txt` 等正式文件。
-- 每次先確認：「本專案是不是已經有現成做法？」若已有，優先沿用，不得因外部案例看起來方便就擅自偏離現有架構。
+- 可寫入施工前建立唯一且穩定的 Work ID；工作身份是 Work ID＋Branch＋PR，不是對話；建議 `<DOMAIN>-<PURPOSE>-YYYYMMDD`。換 Agent／對話保留身份與既有成果，不重做、不無故建立第二條有效線；取代舊線須留下 replacement 關係。
+- GitHub 是耐久狀態，本機／scratch 是暫存。每完成可獨立恢復的最小施工段就 commit 並保存遠端 checkpoint；多步驟／跨對話工作儘早開 PR，未完成可 Draft。續接若有未推本機 commit，先核對並安全保存，不能因遠端未找到就重做。
+- PR 是每條 Work ID 的即時狀態 Owner；PR body／最新狀態至少包含 Work ID、Target、Base dev SHA、Branch、Latest Head、Status、Completed、Pending、Next、CI / Deploy。聊天及舊摘要僅線索，不能凌駕即時 Repository。
+- 續接順序：使用者指定 PR → Work ID → 任務名稱對照有效 Open PR/Branch → 本輪已知 PR/Branch → HANDOFF 交叉確認 → 歷史 archive 最後才查。不以最新 PR 或 HANDOFF 第一筆猜任務；證據唯一就自主續接，僅多個有效候選無法區分時列候選釐清。
+- 每次實際寫入前重新核對工作分支最新 Head；意外前進先讀新增 commit/diff 並安全吸收，禁止盲覆蓋。dev 前進不代表丟棄 checkpoint 或從頭重做。
+- 使用者不用維護 SHA、CI、分支表或長篇交接。暫停時留下 `Work ID / Branch / PR / Latest Head / CI / Next`；結案留下 `Work ID / PR / Final Head / Merge SHA / 最新 dev SHA / 清理狀態`。Repository 仍是權威。
 
-### 二、禁止無關外部遊戲研究
-- 除非使用者明確要求，禁止主動搜尋、檢視或研究其他遊戲、遊戲 Mod、第三方遊戲 Repository、其他 RPG／網頁遊戲／手機遊戲的程式碼、腳本、資料結構、背包、戰鬥或 UI 實作，也不得直接套用其做法。
-- QA 的對象是《四象江湖傳》本身；遇到問題不得優先跳去研究《文明帝國 VI》或其他遊戲／專案。
+## 任務分類與文件 Routing
 
-### 三、允許外部技術查詢的情況與順序
-僅在以下情況使用外部資料：使用者明確要求；第三方技術需要核對官方文件；需查 GitHub／GitHub Actions／Firebase／Cloudflare／瀏覽器 Web API／第三方套件官方資料；或本專案資訊確實不足且不查官方資料就無法安全完成工作。
+先選主要任務，再疊加**實際涉及**的子系統路由；沒有符合條件就不載入。一般 Bug 不因數值／文字改成另一值而自動視為架構 Replacement；「以新 Owner 取代舊 Owner／移除功能」才走取代路由。文件存在不表示須完整讀其歷史。
 
-外部技術來源優先順序固定為：**官方文件 → 官方 Repository → 官方技術說明 → 高可信技術來源 → 其他非官方案例**。即使允許技術查詢，也不等於允許任意研究其他遊戲。
+| 任務／證據 | 必要入口與讀取範圍 |
+|---|---|
+| 普通 Bug／fix／failure／CI failure | `docs/BUG_FIX_FAST_PATH.md`＋直接相關程式、測試、正式規格；不預設讀 HANDOFF、CLAUDE、自主修復、全架構、完整 Gate 或 Release |
+| UI／CSS／DOM／Canvas／viewport／responsive／modal／navigation／touch／interaction／玩家可見畫面 | 完整 `UI_GUIDELINES.md`；只改純後端／資料公式不觸及畫面時不讀 |
+| 物品階級／稀有度 | 額外 `docs/ITEM_RARITY_UI_SPEC.md`；僅補品數值或物品邏輯不觸發稀有度規格 |
+| 點陣圖片新增／替換／轉檔／導入 | `docs/IMAGE_ASSET_SPEC.md` |
+| 怪物立繪 | `MONSTER_PORTRAIT_SPEC.md`＋`docs/MONSTER_PORTRAIT_SPEC_V1.md`；已生成素材走既有快速導入，不重做生成。Boss 術語僅讀後者第 0 節 |
+| Replacement／Convergence／Removal／已證實多 Owner、Wrapper/Patch 疊加、Lifecycle 衝突、跨模組責任重整／明確架構工程 | 完整 `ARCHITECTURE_RULES.md`＋`docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`；單純 Additive、小型 Bug／數值修正不預設觸發 |
+| Bug 達 Fast Path 第四節升級證據／明確架構級 Bug 修復 | 再完整讀 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`；普通 Bug 完成狀態與原症狀驗證依 Fast Path，不啟用完整 Gate |
+| 明確指定 tests-only 受控自主修復模式／CI Validation-only | `AUTONOMOUS_REPAIR_CONTRACT.md`；一般 Bug 不自動啟用此舊受限模式 |
+| Gameplay／Combat／屬性／狀態／技能／怪物數值 | `SYSTEM_CONTRACTS.md` **相關章節**＋該玩法正式 Owner／測試；不讀無關玩法或 Cloud 歷史 |
+| Auth／Session Authority／reauthentication | `DATA_SECURITY_CONTRACTS.md`＋`docs/FIREBASE_AUTH_CLOUD_SAVE.md`；Session 加讀 `docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md` 的「Session Authority owner」「Backend 部署與 protected-test 操作」及直接 Owner／emulator tests，不讀整份進度歷史 |
+| Cloud Save／Firestore／server envelope | `DATA_SECURITY_CONTRACTS.md`＋`docs/FIREBASE_TRUSTED_CLOUD_SAVE_BACKEND.md`＋實際影響的 save／rules Owner／tests |
+| Save migration／schema／recovery／restore | `DATA_SECURITY_CONTRACTS.md`；按範圍讀 `docs/CLOUD_SAVE_PHASE4_CONTRACT.md`、`docs/CLOUD_CANONICAL_SCHEMA_AND_RECOVERY.md`、`docs/CLOUD_CHARACTER_AUTHORITY_MIGRATION_DESIGN.md`；持久化 key/schema 改動加讀 `docs/PERSISTED_STATE_REGISTRY.md` |
+| Protected battle lifecycle／Economy／Reward／once-only transaction | `DATA_SECURITY_CONTRACTS.md`＋`docs/CLOUD_OPERATION_SETTLEMENT_CONTRACT.md` 的相關子系統章節與直接正式 Owner／integration/emulator tests；offline 權威加讀 `docs/OFFLINE_AUTHORITY_POLICY.md` |
+| Payment／Security／不可逆資料操作 | `DATA_SECURITY_CONTRACTS.md`＋直接相關子系統正式契約、驗證／授權 Gate；找不到正式支付／不可逆操作契約不得猜測或放寬 |
+| Boot／startup | `docs/BOOT_ARCHITECTURE.md`；涉及身份／存檔再疊加對應高風險路由 |
+| Release／Candidate／Freeze／dev → main／正式版本／P0/P1/P2 Release Readiness／Exact-HEAD production verification | 完整 `docs/RELEASE_VERIFICATION_RULES.md`；一般 dev Bug 不觸發完整發布契約，既有 CI/deploy gate 仍正常執行 |
+| docs／governance-only | 直接相關文件與交叉引用、文件 checks；不要求 Gameplay QA |
+| 接續既有 PR | 先 PR／Branch／Latest Head／CI／Next，再走上述實際工作路由；HANDOFF 只交叉確認，archive 不自動讀 |
 
-### 四、修改前固定流程
-原則上依序執行：
-1. 確認目前 Git 分支與分支用途。
-2. 確認本次任務範圍。
-3. 閱讀相關專案規格。
-4. 搜尋本專案既有實作。
-5. 找出真正相關的 owner、函式、模組、資料與後續覆蓋點。
-6. 確認是否已有共用函式／共用邏輯／共用元件。
-7. 評估最小必要修改範圍。
-8. 再開始修改。
-9. 執行與修改風險相符的必要測試。
-10. 檢查既有 Repository checks／GitHub Actions。
-11. 只有在風險需要時進行瀏覽器 QA。
-12. 確認是否產生回歸問題。
-13. 最後整理結果、影響與驗證後回報。
+`HANDOFF.md` 僅保留專案級現在狀態、重大架構／migration 結果與跨工程注意事項，**不是每次施工必讀**；普通 Bug 流水帳、舊 SHA/CI/checkpoint 留 PR／既有歷史位置。不同 Owner 不複製完整規範，僅引用；不得用「較嚴格優先」重新啟用已退休的 blanket-read／全面 Audit。
 
-不得一開始就跳去搜尋外部遊戲或其他專案。
+## 最小必要驗證
 
-### 五、最小必要修改與禁止擴張範圍
-- 固定原則：**能小改解決，就不要大改。**
-- 使用者要求處理 A，就只處理 A 與完成 A 所必需的相依問題；不得自行延伸修改 B、C、D，不得順手改遊戲平衡、重做整個 UI、商店、技能、戰鬥或大量無關程式碼。
-- 若發現無關問題，先記錄問題、影響範圍、嚴重度與是否建議另開任務；只有它會阻止本次任務、導致本次修改錯誤、造成資料損壞或嚴重回歸時，才可在必要範圍內一併處理。
+| 風險 | 驗證 |
+|---|---|
+| 低：純文案、静態文字、圖片替換、低風險 CSS 微調、無邏輯文件修正 | focused verification／targeted test／static check＋必要 GitHub CI；圖片仍遵守資產 Gate，畫面實際變化仍驗證相應症狀 |
+| 中：一般邏輯／UI 互動修改 | targeted regression＋相關 build/check＋Required CI＋必要 Browser QA |
+| 高：核心 Combat／Save／Cloud／Auth／Economy／Reward／Migration／Payment／Security | 子系統正式 Gate、完整必要 regression、integration／emulator／Browser QA／部署驗證（按相關性） |
 
-### 六、禁止擅自大規模重構
-- 現有程式只要功能正常、仍可維護、不影響本次任務且沒有明確風險，就不得為了「更漂亮、更現代、個人偏好、重新整理架構」而大規模重構。
-- 只有修復實際 Bug、消除明確重複邏輯、解決既有架構衝突、避免明確嚴重維護問題，或使用者明確要求時，才可重構；即使需要，也必須控制在本次子系統的合理範圍。
+Gameplay 核心／Combat／Save／Cloud／Auth／Economy／Reward／data migration、同根因復發或容易再被修改破壞的故障機制必須保留 regression test。低風險無邏輯修改可依證據 focused verification，不強制每次新建永久 automated test；不得刪除既有有效測試或放寬斷言掩蓋錯誤。
 
-### 七、避免重複造輪子與正式程式碼優先
-- 修改前搜尋本專案是否已有共用函式、UI 元件、資料結構、排序、戰鬥計算、技能／狀態處理、工具函式與測試流程；已有者優先復用。
-- 修 Bug 必須找真正原因，做最小且正確的修復；避免魔法數字、多層 `if` 擋錯、重複 workaround、只修畫面不修資料、只修單一案例卻破壞其他流程。
-- 同時不得因追求完美而過度重構；遵守 `ARCHITECTURE_RULES.md` 的 owner 與 patch 收斂規則。
+驗證與風險成比例：不為小文字跑全 Browser、小 CSS 跑全 Gameplay；CI 已涵蓋的高成本驗證不在本機重複全套，除非除錯／環境差異有具體必要。不得為一次性 QA 新增永久 workflow 或無限擴張測試。CI 必須維持 Latest Head，合併快照 checks 需能綁定當前 PR Head/Base；原症狀驗證不能由 CI 綠燈代替，未取得證據就如實報目前階段。
 
-### 八、QA 的正式定義與檢查範圍
-- QA = Quality Assurance（品質保證／品質驗證），目的在確認《四象江湖傳》修改後仍正常運作，不代表研究、比較或抄用其他遊戲。
-- 依任務需要可檢查：遊戲載入、JavaScript／Console 新錯誤、UI 跑版／重疊、按鈕與觸控、頁面切換、捲動、Canvas、戰鬥、技能、背包、裝備、商店、副本、修改是否生效、手機尺寸／觸控、載入流程與回歸問題。
-- QA 項目必須與本次修改有直接關係。
+## GitHub 遠端操作與開發站
 
-### 九、瀏覽器 QA 與最小必要測試
-- 採「最小必要測試」：UI、CSS、版面、響應式、手機顯示、觸控、捲動、切頁、Canvas、載入、動畫、操作流程或可能造成視覺／互動回歸的修改，優先考慮瀏覽器 QA。
-- 純文字、文件、小型數值、純資料修正或不影響畫面／互動的簡單程式調整，通常不為了形式執行大量瀏覽器 QA。
-- 測試強度必須與風險成比例；禁止無止境建立 QA 流程、重複相同測試、測大量無關功能、小修改跑不必要整套瀏覽器流程、為測試方便改正式架構，或建立一次性且沒有長期價值的複雜永久測試系統。
+已連線 Connector/API 與本機 git/gh 憑證不同；遠端寫入優先已授權 Connector/API（branch/blob/tree/commit/ref/PR/checks/merge），本機 Git 用於檢查、diff、修改與測試。CLI 沒憑證不能誤報 GitHub 未授權，改走可用已授權通道；僅通道明確 authentication/permission 錯誤或缺能力才列阻塞。
 
-### 十、GitHub Actions／CI 固定原則
-- 已有 GitHub Actions、Repository checks、CI、`verify` 或自動測試時，優先使用現有流程。
-- 新增 workflow 前必須確認：沒有同功能流程、不會重複執行或拖慢 CI、不增加不必要維護成本、不破壞 main／dev、具有長期價值且符合現有架構。
-- 只有「現有流程明確不足，而且新增 workflow 對未來長期有價值」時才新增。
-- 一次性的除錯／驗證優先使用現有測試、checks、瀏覽器驗證或不寫入 Repo 的臨時方式，不得因一次 QA 建立永久複雜 workflow。
+DEV 固定 SHA 驗證網址：`https://dev.four-symbols-dev.pages.dev`；不得用 root `https://four-symbols-dev.pages.dev` 或 GitHack/RawCDN 當 dev commit 證據。既有 Repository checks／Release Gate／部署 workflow 維持；Game/Cache 版本唯一來源 `release/release.json`，不得因普通修復自動升正式版。
 
-### 十一、測試不得改變正式遊戲邏輯
-QA、測試與 debug 工具不得為方便而永久改變正式戰鬥數值、玩家資料、掉落率、裝備／技能資料、存檔格式、正式 UI 流程或正式遊戲規則。若需測試專用邏輯，必須清楚隔離，不得讓測試程式成為正式遊戲依賴。
+## Permanent Rule Growth Control
 
-### 十二、專案分支規則
-- `main` = 正式版本。
-- `dev` = 開發版本。
-- `assets-library` = 美術素材專用。
-- `assets-library` 不得修改 HTML、CSS、JavaScript、遊戲邏輯或正式開發規範；不得作為程式功能開發分支，亦不得整個分支直接合併進 `main`／`dev`。若正式程式需要某張素材，只能在符合既有素材導入流程的前提下，將指定素材導入開發分支，不得藉此混入 assets-library 的其他內容。
-
-### 十三、完成任務後的回報
-每次完成修改，回報優先包含：
-1. 修改了什麼。
-2. 修改了哪些檔案。
-3. 為什麼需要修改。
-4. 是否改變既有架構。
-5. 執行了哪些必要測試。
-6. Repository checks／CI 是否通過。
-7. 是否做瀏覽器 QA。
-8. 是否發現其他未處理問題。
-9. 是否仍有已知風險。
-
-避免回報大量與任務無關的思考過程；重點放在結果、影響、驗證。
-
-### 十三之一、GitHub 工作生命週期與 Repository Closeout（永久強制規則）
-本節是所有 Bug 修復、功能開發、文件變更與正式發布的永久結案規範。除非專案負責人於當次任務明確要求例外，工作不得只停在「程式已改／PR 已合併」；必須完成對應的 Repository Closeout（程式庫收尾）。
-
-固定生命週期：
-`最新 dev → 建立工作分支 → 修改／必要測試 → PR 回 dev → Repository checks/CI 通過 → 合併 dev → 清理已完成工作分支與被取代 PR → dev 驗收 → dev → main 正式發布 PR → main CI／production deploy／版本與 SHA 驗證 → 清理發布分支 → 確認 main/dev 有效內容收斂`。
-
-強制規則：
-1. **禁止直接修改 `main` 或 `dev`。** 一般工作必須從當下最新 `dev` 建立 `fix/*`、`feature/*`、`docs/*` 或其他明確用途的工作分支，再以 PR 合回 `dev`。
-
-2. **工作分支合併後必須進入清理判定。** 若來源分支內容已完整進入目標分支、沒有任何獨立有效 commit／diff、也不是需長期保留的正式分支，應刪除該已完成工作分支；不得把已完成臨時分支長期堆積。
-3. **關閉舊 PR 前必須先證明已被吸收或取代。** 只有在舊 PR 的有效內容已完整進入 `dev`／`main`，或已由明確的新 PR／commit 完整取代時，才可關閉；回報中應記錄 replacement PR／commit。若仍有獨立有效內容，禁止為了「乾淨」而直接關閉或刪分支。
-4. **永久分支不得自動刪除。** `main`、`dev`、`assets-library` 與專案負責人明確指定保留的 backup／長期分支不適用自動清理。
-5. **正式發布後必須做 main/dev 收斂檢查。** 判斷重點是「有效內容是否一致」，不得只以 ahead/behind commit 數、merge commit 數或 GitHub 顯示 `diverged` 就直接判定為風險。若兩邊 tree／實際有效 diff 已一致，單純歷史圖不同不得視為未收斂。
-6. 若 `main` 確實存在 `dev` 尚未吸收的有效程式／文件內容，必須透過受控 PR 讓內容回流或重新收斂；**禁止 rebase、force push、直接覆寫 `dev`／`main`** 來消除歷史差異。
-7. **Release branch（發布候選／發布分支）不是永久分支。** 正式發布完成且內容已進入 `main` 後，必須進入同樣的安全清理判定；不得無理由長期留下 release candidate PR／branch。
-8. **Repository Closeout 是完成條件的一部分。** 若本次可安全完成的分支清理、被取代 PR 關閉、發布分支清理或 main/dev 有效內容收斂尚未完成，回報不得把該工作描述成「完全結案」；若因權限、待使用者驗收或尚有獨立內容而不能清理，必須明確列為保留原因。
-9. 每次建立新 PR／新分支前，應先確認是否已有相同目的且仍有效的工作分支／PR，避免重複建立 `runner2`、`runner3`、重複 release candidate 或同目的臨時分支。
-10. 不得為了達成「分支數變少」而犧牲可追溯性或刪除未吸收內容；**安全清理優先於數量清零。**
-11. **已安全合併且無獨立有效內容的臨時工作分支，預設應自動刪除，不需再次向專案負責人詢問。** 代理必須先完成安全判定，再直接執行可用的刪除操作；只有永久分支、明確要求保留的備份／長期分支、仍有未吸收內容或仍被有效 PR 使用時才保留。
-12. **刪除能力與權限判定必須分開。** 在回報「無法刪除分支」前，必須先實際檢查 Repository 權限與當前可用 GitHub 操作。若目前連線顯示 `admin`／`maintain`／`push` 等足以管理 Repository 的權限，禁止把「目前工具介面未暴露 delete branch／delete ref 動作」描述成「沒有權限」。
-13. **不得因第一個介面沒看到刪除按鈕就停止。** 安全條件成立時，代理必須先檢查所有已授權且當前可用的 GitHub 路徑（Connector/API、GitHub action/tool、已認證 git/gh 等）；只要有一條可安全執行，就應直接刪除，不把操作責任轉交給專案負責人。
-14. 若已確認 Repository 權限存在，但本次執行環境確實沒有任何已暴露／已認證的刪除操作，回報必須精確寫成「目前執行介面沒有可用的刪除 Branch／Ref 動作」，不得寫成「沒有權限」。同時仍須把分支列為待清理項目，後續一旦可用刪除操作出現，應在安全判定後直接清理。
-15. 每次 Closeout（結案）都必須主動檢查工作分支清理，不得等專案負責人提醒。若可刪除而未刪，該工作不得宣稱 Repository Hygiene（程式庫清潔）已完全完成。
-
-#### DEV PR 自動整合規則（唯一正式 Owner；取消 MERGE-DEV 二次授權）
-
-- 專案負責人明確要求修復、功能、文件變更或「繼續施工」時，任務授權包含「最新 dev → 工作分支 → PR → 通過既有 Gate → 合併 dev」。不增加原任務範圍。
-- PR 實際 diff 必須完全在已授權範圍內；非僅供驗證且明令不得合併的 Draft PR；PR 可合併；預期 Head SHA 沒有未審查變動；最新 Head 的必要 Repository checks／CI、任務驗收與安全 Gate 均通過；沒有未解除的高風險阻塞。條件全部成立時，代理應直接合併 dev，**不得再要求回覆 `MERGE-DEV PR #xxx`、人工批准合併（manual approval／merge approval）或其他等價二次授權**。
-- 合併前重新核對最新 dev。dev 前進時重新檢查差異、Owner、衝突與相關驗證；不得沿用舊基底驗證覆蓋新內容。Head SHA 改變、CI 失敗、衝突、範圍污染、必要驗收缺失或規格歧義時，先於原授權範圍修復及重驗，無法安全解除才回報阻塞。
-- Release Freeze、P0／P1 判定仍依 `docs/RELEASE_VERIFICATION_RULES.md` 第 21 章；Freeze 中不得把非必要變更合入固定 Candidate。P0 是發布阻塞，P1／P2 不阻止符合安全條件的正常開發。
-- 本規則只取消重複確認；**禁止直接寫入 dev／main、force push、rebase、改寫歷史或略過 CI／驗收**。不授權自動 dev → main；main 正式發布仍須依發布契約取得使用者確認。高風險資料、帳號、存檔、付款與不可逆操作仍遵守各自正式安全 Gate／特定授權；不能用 DEV 自動合併取代它們。
-- `CLAUDE.md`、`AUTONOMOUS_REPAIR_CONTRACT.md` 與一般 Bug 快速路徑只引用本節，不另建整合授權規則。受控契約中「僅供 CI Validation、不得合併」的草稿仍保留原限制；取消二次確認不會將它變成可合併 PR。
-
-週報／健康燈號固定判定：
-- **綠燈**：正式版與 dev 的必要 CI／部署健康，沒有會阻塞下一次發布的有效未吸收內容、實質 main/dev 內容分歧或高優先級阻塞。歷史已合併分支、已被取代且無獨立內容的舊 PR，本身不得把總燈號降成黃燈。
-- **黃燈**：存在會實際影響下一次 dev → main 的問題，例如必要 CI 失敗、有效 PR 衝突、main/dev 有實質有效內容分歧、舊 PR 仍含未吸收獨立內容、發布／部署 gate 未完成。
-- **紅燈**：正式 production 已知故障、核心資料／登入／存檔／付款等高風險功能失效、正式部署失敗或已確認嚴重 Regression（退化）。
-- 「分支很多」「歷史 PR 很多」「commit graph 不完全相同」只能列為 Repository Hygiene（程式庫清潔）資訊；沒有實質未吸收內容時，不得單獨作為黃燈理由。
-
-### 十三之二、Resumable Work Protocol（可續接施工協定；永久強制規則）
-
-本節用來確保長時間施工、工具中斷、對話斷線、App 重啟或多個對話並行時，工程進度仍可由 GitHub（程式庫）可靠復原。**對話不是施工識別單位；Work ID（工作識別碼）＋工作分支＋PR（合併請求）才是。**
-
-#### A. 每一條獨立施工必須有唯一 Work ID
-1. 每個 Bug、功能、資產導入、架構工程或文件工程，在開始可寫入施工前都必須建立一個穩定的 Work ID。建議格式：`<DOMAIN>-<PURPOSE>-YYYYMMDD`；同日同目的若確有第二條獨立工作，再加 `-02`、`-03`。例如：`CLOUDSAVE-P4-20261001`、`BATTLE-REVIVE-20261001`、`WIND-MONSTER-20261001`。
-2. Work ID 一旦建立，在該工作完成前不得因換對話、換代理、換裝置或續修而任意更名。
-3. 同一 Work ID 預設只能有一條有效工作分支與一個有效 PR；發現既有有效分支／PR 時必須續接，不得另開 `runner2`、`recovery2` 或同目的平行分支，除非舊線已明確作廢並留下 replacement（取代）關係。
-4. 不同工作不得共用同一工作分支。雲端存檔、戰鬥、UI、怪物素材等可同時施工，但必須各自擁有獨立 Work ID／Branch（分支）／PR。
-
-#### B. GitHub 是耐久狀態；scratch／本機工作區只視為暫存
-1. 任何已有實質價值的修改，不得長時間只存在 `/workspace/scratch`、未推送本機 commit、臨時檔或單一對話上下文。
-2. 每完成一個可獨立保存、可安全恢復的最小施工段，就應建立 checkpoint（復原點）：Commit（提交）並推送到該 Work ID 的遠端工作分支。不得為了追求一次漂亮的大 commit，而承受斷線即遺失多小時成果的風險。
-3. 預計需要多個步驟、跨多次工具操作、等待 CI／部署、或可能跨對話的工作，應儘早建立 PR；未完成時可使用 Draft PR（草稿合併請求），但 PR 必須清楚標示仍在施工。
-4. 若施工已產生本機 commit，但遠端尚不存在，續接工作的第一優先是確認本機工作區仍在並安全推送；禁止假設 scratch 一定存在，也禁止因找不到遠端 commit 就直接從頭重做。
-5. Remote（遠端）已保存的 Commit／PR 是續接基礎；聊天記憶、舊 SHA、舊文字摘要只能作為線索，不得凌駕 GitHub 即時狀態。
-
-#### C. PR 必須承擔每條 Work ID 的即時施工狀態
-對於尚未完成的工作，PR 說明或最新狀態留言至少要能還原下列資訊：
-- `Work ID`
-- `Target`（通常為 `dev`）
-- `Base dev SHA`（開工基底）
-- `Branch`
-- `Latest Head`
-- `Status`（例如 IN PROGRESS／BLOCKED／READY FOR CI／MERGED）
-- `Completed`（已完成）
-- `Pending`（未完成）
-- `Next`（下一個最小施工點）
-- `CI / Deploy`（已知驗證狀態）
-
-PR 是該工作流的即時狀態 Owner。`HANDOFF.md` 仍是專案級歷史、重要整合結果與跨工作摘要來源，但**不得把整個 Repository 當成只有一個目前工作；也不得只看 HANDOFF 最上方或最近一筆就猜使用者要續接哪一條工作。**
-
-#### D. 多對話並行時的續接解析順序
-使用者要求「繼續／接續／剛剛那個」時，代理必須先依 GitHub 即時資料還原，不得要求使用者重新貼長篇交接。解析順序固定為：
-1. 使用者明確提供的 PR 號碼。
-2. 使用者明確提供的 Work ID。
-3. 使用者明確指出的子系統／任務名稱，對照 Open PR（開啟中的合併請求）、分支名稱與 PR 內容。
-4. 本輪已知的工作分支／PR。
-5. `HANDOFF.md` 與歷史紀錄只作交叉確認。
-
-**禁止單純用最新建立／最近更新的 PR 判斷要續接哪一條工作。** 若只有一個候選明確符合，代理應自行續接；只有在 Repository 證據仍同時指向兩個以上有效候選、無法安全判定時，才向使用者要求選擇，並直接列出候選 PR／Work ID，不得要求使用者重新描述整個工程。
-
-#### E. 併發寫入與防覆蓋
-1. 每次實際寫入前都必須重新核對該工作分支最新 Head；不得把數分鐘前或上一輪對話記住的 Head 當成仍有效。
-2. 若工作分支 Head 在代理不知情下前進，視為可能存在另一個對話／代理的並行施工。必須先讀取新增 commit／diff，確認能安全吸收後再繼續；禁止 blind overwrite（盲目覆寫）、force push（強制推送）或 rebase（重定基底）來搶回分支。
-3. 同一 Work ID 若已有另一條活躍 PR／分支，先做是否同一目的／是否已取代判定；不得無證據建立第二 Owner。
-4. 若最新 `dev` 已前進，依本專案既有整合規則吸收必要變更；不得因此丟棄已保存的 Work ID 成果或從頭重做。
-
-#### F. 使用者不負責維護工程交接
-1. 專案負責人只需說明產品／遊戲需求與提供必要實機驗收；不得要求其手動維護 SHA、分支清單、CI 歷史或長篇交接提示詞。
-2. 使用者只說「接續風怪」「繼續雲端 Phase 4」等簡短語句時，只要 GitHub 證據足以唯一定位，代理就必須自行還原 Work ID、Branch、PR、Latest Head、CI 與下一步。
-3. 若對話中斷，新對話不得以沒有上一個對話完整上下文作為從頭重做的理由；應先查 GitHub 耐久狀態。
-4. 實機操作確實只能由使用者完成時，只要求當下必要的單一步驟或最少步驟，並說明需要回報什麼結果。
-
-#### G. 每次暫停或結案都要留下可續接摘要
-只要工作尚未完全 Closeout（結案），回報至少保留一個短格式狀態：`Work ID / Branch / PR / Latest Head / CI / Next`。
-
-若已合併，至少回報：`Work ID / PR / Merge SHA / 最新 dev SHA / 分支清理狀態`。
-
-這個摘要是方便人閱讀的索引；真正權威仍是 GitHub 即時狀態。任何後續代理都必須重新核對，不得把摘要內 SHA 永久視為最新值。
-
-#### H. 核心原則
-- 【對話可以中斷，工程成果不能只存在對話。】
-- 【對話不是工作身份；Work ID／Branch／PR 才是。】
-- 【多個對話可以並行，但不同工作不得共用分支。】
-- 【同一 Work ID 不得無故產生第二條有效施工線。】
-- 【先保存遠端 checkpoint，再追求長時間連續施工。】
-- 【續接先查 GitHub，不叫使用者重寫交接文件。】
-- 【任何寫入前重新核對 Head，避免並行對話互相覆蓋。】
-
-### 十四、外部搜尋必須與任務直接相關
-若確實需要外部搜尋，內容必須直接服務本次問題，例如 GitHub Actions cache、Firestore Security Rules、Chrome Canvas／Pointer Events 官方文件。除非使用者明確要求競品研究，否則不得搜尋「其他 RPG 怎麼做背包」、「其他遊戲戰鬥架構」、「文明帝國 VI 腳本」等無關案例。
-
-### 十五、固定開發優先順序
-**本專案正式規格 → 本專案現有程式碼 → 本專案現有架構 → 本專案現有共用函式／工具 → 最小必要修改 → 現有自動測試 → Repository checks → 必要瀏覽器 QA → 官方技術資料 → 最後才是外部案例。**
-
-不得反過來。
-
-### 十六、核心永久原則
-- 【先理解自己的專案，再修改自己的專案。】
-- 【QA 是驗證《四象江湖傳》，不是研究其他遊戲。】
-- 【能從本專案解決，就不要搜尋其他遊戲。】
-- 【能使用現有函式，就不要再造一套。】
-- 【能小改解決，就不要大改。】
-- 【能使用現有測試，就不要重建測試系統。】
-- 【一次性的 QA，不代表需要建立永久 workflow。】
-- 【外部資料優先查官方技術來源，不優先查其他遊戲。】
-- 【除非使用者明確要求，不得擅自參考其他遊戲實作。】
-- 【修改範圍必須和使用者要求一致，不得自行擴張。】
-- 【測試強度必須與修改風險相符。】
-- 【所有修改都必須以不破壞既有功能為前提。】
-
-## DEV 發布與測試位置
-- `main` 仍是正式版來源，除非使用者明確要求，不得把開發修改直接推進 `main`。
-- `dev` 只能在 `Repository checks` 成功且 Release Gate 通過後，由 `.github/workflows/deploy-dev-cloudflare.yml` 部署到 Cloudflare Pages。
-- DEV 唯一固定測試／SHA 驗證網址：`https://dev.four-symbols-dev.pages.dev`。此網址為 Cloudflare `dev` 分支固定 alias；不得再以專案 root `https://four-symbols-dev.pages.dev` 作為 dev commit 驗證來源。
-- 不再使用 GitHack / RawCDN 作為 DEV 驗證來源。
-- `assets-library` 與 `assets-library/assets/inbox/` 仍維持 GitHub 素材工作流，不受 Cloudflare Pages 發布方式影響。
-- Game Version、Cache Version、主城 HUD、`index.html` 受管理 cache-busting 與 `V_ASSET_VERSION` 必須一致；部署流程禁止再用 `sed` 或其他方式在 `_deploy` 臨時補版本。
-
-## 最高優先：Release / Requirement Verification Gate
-- **`docs/RELEASE_VERIFICATION_RULES.md` 是本 `AGENTS.md` 的不可分割永久規範，所有 GPT、Claude、Codex 與其他 AI 開發代理都必須完整遵守。**
-- 任何一次包含多項修改的需求，必須先建立／更新 `release/requirements.json`，逐項使用 `TODO / IMPLEMENTED / VERIFIED / BLOCKED`；只有 N/N VERIFIED 才能宣稱完成。
-- **未完成逐項 VERIFIED 前，禁止更新正式版本號並宣稱完成。** 版本號只能表示「已驗證批次準備發布」，不能作為功能完成證據。
-- 程式修改、commit、push、Repository checks SUCCESS、Deploy SUCCESS、版本號更新，任何單一項都不等於完成；缺少 source/commit/push/CI/deploy SHA/Game+Cache/Requirement Verification 任一環節，一律回報 `NOT COMPLETE`。
-- `release/release.json` 是 Game Version／Cache Version 的 release source of truth；`.github/scripts/release-gate.mjs` 與 CI／deploy workflow 為強制執行 owner。
-- **每次 dev → main 正式發布，除非專案負責人明確說「本次不公告」，發布 owner 必須先比對 current `main` 與候選 `dev` 的完整實際 diff，主動整理全部玩家可感知變更到唯一 `release/release-update.json`。不得要求專案負責人另寫跑馬燈、首頁公告或 Release Notes；不得把檔名、函式、Commit SHA、CI 或除錯術語交給玩家。完整規則以 `docs/RELEASE_VERIFICATION_RULES.md` 的「玩家正式版本通知與 dev → main Release Contract」為準。**
-- 正式移除功能必須在 `release/deprecated-code.json` 登記 forbidden tokens；舊 DOM id、class、handler、函式、設定 key 或顯示文字仍存在於正式 HTML/JS/CSS 時，CI 必須失敗。
-- UI、手機 viewport、捲動、裁切、icon、modal、loading、點擊等不能由靜態 CI 完整證明的需求，仍必須做最小必要實際視覺／操作驗收。
-- Cache invalidation、Game Version、Service Worker 更新不得清除玩家 localStorage、IndexedDB、雲端存檔、帳號、背包、等級、裝備或進度；靜態 Cache 與 Save Data 必須完全分離。
-- 完成回報固定包含：`Requirements: N/N VERIFIED`、Branch、Commit SHA、Game Version、Cache Version、Repository checks、Deploy、Deployment SHA verified。任一未完成即顯示 `NOT COMPLETE`。
-
-## GitHub 遠端寫入與憑證固定規則
-- 平台已連線的 GitHub Connector／API 授權，與工作區內 `git`／`gh`／SSH／PAT 的本機憑證是兩套獨立機制；不得把「本機 Git CLI 沒憑證」誤判成「GitHub 未授權」。
-- 當目前代理環境已提供可存取本 Repository 且具備所需寫入權限的 GitHub Connector／API 時，所有遠端寫入必須優先使用該已授權通道完成，包括建立 branch、建立／更新檔案、blob/tree/commit、更新 branch ref、建立或更新 PR、查詢 CI／Repository checks，以及在既有合併規則允許時合併 PR。
-- 工作區內的 Git CLI 預設僅用於本機檢查、diff、修改、測試與必要的本機版本控制；不得把 `git push`、`gh auth login`、PAT 或 SSH 金鑰設定成主要或必要的遠端發布流程。
-- 若本機 `git push` 因缺少憑證失敗，但 GitHub Connector／API 仍可正常寫入，代理必須改走已連線的 GitHub 遠端寫入流程，不得要求使用者重新登入 GitHub，也不得回報成 GitHub 授權失效。
-- 只有 GitHub Connector／API 本身明確回傳 authentication／authorization／permission 錯誤、缺少必要寫入能力，或使用者明確指定必須使用 Git CLI 時，才可把憑證或授權列為阻塞事項。
-- 即使改走 Connector／API，仍必須遵守既有分支政策：禁止直接改寫 `dev`／`main`，必須由最新 `dev` 建立 `fix/`、`feature/`、`docs/` 等工作分支，經 PR、Repository checks／CI 與既有 Release Gate 後再合併。
-- 若修改內容先在本機產生，代理應透過既有 GitHub 檔案／blob／tree／commit／ref 能力發布到工作分支；不得因工作區沒有可持久化 Git 認證而把已完成的修改留在本機或重複要求授權。
-
-13. **凡涉及發布、Release Candidate、P0／P1／P2、Release Freeze、Exact-HEAD Verification 或發布整備判定，必須完整閱讀 `docs/RELEASE_VERIFICATION_RULES.md` 第 21 章「Release Readiness Priority Framework（發布整備優先級框架）」。該章是唯一正式 Owner：P0 是 Release Blocker 而非 Development Blocker；P1／P2 不得阻止正常開發；只有專案負責人明確啟動時才能進入 RELEASE FREEZE。**
+單一 Bug 不預設新增永久規範。新增前先查已有 Owner、能否修改它、是否為反覆系統風險、不新增是否有實際安全／維護問題；優先 replace/consolidate，避免 append。同一責任一規範 Owner，其他文件只引用；發現重複、衝突、過時規則主動收斂。Agent 自行依風險與證據決定 Owner、退場、文件與測試，不要求非技術負責人處理工程治理；使用者主要決定產品／遊戲結果。
