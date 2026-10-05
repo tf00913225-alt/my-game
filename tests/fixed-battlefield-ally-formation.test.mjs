@@ -56,7 +56,23 @@ assert.match(enemySupport,/resolveEnemyTargets\(snapshot,center,\"tri\"/,"enemy 
 assert.doesNotMatch(water,/freeze\s*:/,"retired V169 compatibility layer does not own freeze targeting");
 assert.match(finalSkills,/freeze:\s*\{[^}]*targetType:"column",targetTypeAtMaxLevel:"tri"/,"canonical V173.64 skill owner defines freeze targeting progression");
 assert.match(core,/function resolveBattlefieldTargets\(targetSide,primaryIndex,targetType,options\)[\s\S]*?owner\.resolveAllyTargets\(formation,primaryIndex,normalized,alive\)/,"shared target resolver delegates ally geometry to the canonical Slot owner");
-assert.match(core,/const targetIndexes=primary\s*\?resolveBattlefieldTargets\("player",primary\.index,skillTargetType,\{hostilePrimary:true\}\)/,"monster range attacks pass their effective skill shape through the shared target resolver");
+assert.match(core,/resolveEnemyActionTargets\(actionTargets,skillTargetType\)/,"monster attacks pass their effective skill shape to the action snapshot owner");
+const snapshotResolver=core.match(/^function resolveEnemyActionTargets\([\s\S]*?^\}/m)?.[0];
+assert.ok(snapshotResolver,"formal enemy snapshot resolver exists");
+assert.match(snapshotResolver,/resolveBattlefieldTargets\("player",primary\.index,targetType,\{hostilePrimary:true\}\)/,"snapshot owner delegates range geometry to the shared target resolver");
+// Execute the new boundary with the real Slot owner: keeping a target identity
+// must not change front/back row, tri or column geometry.
+const party=[{hp:100},{hp:100},{hp:100}];
+const snapshotContext={getPartyCharacterByIndex:index=>party[index],canSelectHostileBattlePrimary:()=>true,
+    resolveBattlefieldTargets:(side,index,shape,options)=>{
+        assert.equal(side,"player");assert.equal(options.hostilePrimary,true);
+        return slots.resolveAllyTargets(formation,index,shape,i=>party[i].hp>0);
+    }};
+vm.createContext(snapshotContext);vm.runInContext(snapshotResolver,snapshotContext);
+const snapshot={targets:party.map((character,index)=>({index,character}))};snapshot.primary=snapshot.targets[1];
+for(const [shape,expected] of [["single",[1]],["tri",[1]],["row",[1,2]],["column",[1]],["all",[0,1,2]]]){
+    eq(snapshotContext.resolveEnemyActionTargets(snapshot,shape).targets.map(entry=>entry.index),expected,"enemy snapshot preserves "+shape+" formation geometry");
+}
 assert.doesNotMatch(core,/const attackTargets=isRangeSkill\s*\?\s*livingTargets/,"monster tri and row skills must not expand to all living allies");
 
 // Geometry is element-agnostic: all four elements consume the same shape truth.
