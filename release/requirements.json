@@ -736,6 +736,24 @@
         "verification": "12/12 executable Gate regressions PASS, including stale root metadata, package-only advance, release advance, malformed JSON, optional npm-generated root lock, both lock metadata locations, independent Functions advance and missing Functions lock. Isolated offline npm install/ci preserve package metadata; build/build:check and release-ready/deprecated gates PASS; generated Runtime has zero tracked diff. Latest-head CI/integration/deployment/cleanup tracked separately by Work PR.",
         "result": "Historical mirror omission fixed via npm version 173.73.0 --no-git-tag-version --ignore-scripts. Game/Cache173.73 remain release/release.json-owned; root package is verified metadata projection, Functions1.0.0 independent. No root lock introduced; Functions package/lock unchanged. NORMAL DEVELOPMENT; no gameplay/runtime/main change."
       }
+    },
+    {
+      "id": "REQ-CLOUD-RESTRICTED-BATTLE-INSTANCE-20261005",
+      "title": "受保護森林受限場次建立與原始政策／初始資源固定（僅 PREPARED，不含後續回合）",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "functions/src/canonical-restricted-battle.js",
+          "scripts/lib/cloud-restricted-battle-policy.mjs",
+          "scripts/lib/cloud-battle-opening-round-rules.mjs",
+          "functions/src/generated/restricted-forest-instance-policy.json",
+          "tests/cloud-save-restricted-battle.test.mjs",
+          "scripts/test-session-authority-emulator.mjs",
+          "config/persisted-state-registry.json"
+        ],
+        "verification": "Local157/157 targeted preparation/encounter/player/proof/opening/instance tests PASS, skip0, including29 new instance regressions and existing128 player/96 opening browser-source parity vectors. Exact source7f0094594cb9aa2797d5efa52a9fdf336a5379b4 real Auth/Firestore/Functions Session Authority run37271418896/job111639039155 SUCCESS: backend272/272 PASS, skip0; original source/resource/policy binding, atomic rollback, concurrent one-winner, replay, corruption/missing evidence, expiry/revision/session refusal, private read/write rules and zero authority mutation PASS; actual new-login device takeover and revocation PASS. Final metadata-head CI/integration/exact Firebase+DEV deployment and cleanup are independent pending execution gates.",
+        "result": "Private PREPARED round0/version0 instance pins original preparation, sealed definition, source revision/session/expiry, native naturally normal-only policy and HP/SP. One instance per preparation, atomic four evidence records, immutable idempotent replay. No rounds, RNG, verdict, reward, gameplay mutation, callable, legacy adoption or second-device restore; four readiness/outcome/reward/credit flags false."
+      }
     }
   ]
 }

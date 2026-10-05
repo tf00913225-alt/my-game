@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
+import {syncRestrictedBattlePolicy} from './cloud-restricted-battle-policy.mjs';
 
 export const OPENING_RULES_PATH='functions/src/generated/forest-opening-round-rules.js';
 export const OPENING_POLICY_PATH='functions/src/generated/forest-opening-round-policy.json';
@@ -59,4 +60,5 @@ export function syncForestOpeningRoundRules(root,checkOnly=false){
     if(checkOnly)throw Error('Server opening round rules are stale: '+name);
     fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,expected);
   }
+  syncRestrictedBattlePolicy(root,checkOnly);
 }
