@@ -1,7 +1,7 @@
 # Level Suppression V2 — 2026-10-05
 
-Work ID: `LEVEL-SUPPRESSION-V2-20261005`  
-Requirement: `REQ-LEVEL-SUPPRESSION-V2-20261005`  
+Work ID: `LEVEL-SUPPRESSION-V2-20261005`
+Requirement: `REQ-LEVEL-SUPPRESSION-V2-20261005`
 Target: dev; main excluded. Game/Cache: 173.73.
 
 ## Formal contract
