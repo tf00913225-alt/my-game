@@ -199,6 +199,23 @@ jobs:
             sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
           fi
 
+      - name: Verify battle target lifecycle with final production owners
+        id: battle_target_browser
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          node --test tests/battle-target-lifecycle-20261005.test.js
+          node .github/scripts/run-battle-target-lifecycle-browser-qa.mjs
+
+      - name: Upload battle target lifecycle evidence
+        if: always() && steps.battle_target_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v7
+        with:
+          name: battle-target-lifecycle-${{ github.sha }}
+          path: artifacts/browser-qa/battle-target-*
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Run canonical bottom navigation and fixed home browser QA
         id: bottom_nav_home_browser
         env:

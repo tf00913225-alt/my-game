@@ -1,3 +1,11 @@
+<!-- Phase1 production evidence: 24/24 Chrome scenarios PASS (390x844,412x915), run37273828938/artifact11329756508. Exact final CI/integration/deployed QA still pending; no COMPLETE or physical-device claim. -->
+## 2026-10-05 — BATTLE-TARGET-LIFECYCLE-CONVERGENCE-20261005 / IMPLEMENTED
+
+- Base dev276f6a1e9e5d65f563a5a8b51d477f8580430252; branch fix/battle-target-lifecycle-convergence-20261005; target dev; mainf63d69db unchanged. Independent Cloud#802 excluded; MonsterBalance Phase1–2F not rebuilt.
+- Four pre-fix executable failures prove per-cast random retarget on living/lethal fire follow-up. Missing enemy planning identity admits late revived targets. Core now owns frozen token/round/actor/party-identity snapshot; queue passes it, V149 free casts reuse it; dead/invalid primary cancels, late callbacks cannot finish new actions. No new wrapper/temporary patch; no formulas/balance/revive/save change.
+-19/19 targeted PASS, related regressions/build/build:check/YAML/whitespace PASS. Local Chrome154 socket EPERM prevents Browser and complete Node-runner verification; actual production Browser runner registered in existing CI and exact-SHA DEV deploy. Requirement functional VERIFIED from candidate production Chrome evidence; final Head and deployed verification remain pending. Existing Cloud generated policy refreshes only V149 dependency digest.
+- Full inventory/evidence/gates: docs/BATTLE_TARGET_LIFECYCLE_CONVERGENCE_20261005.md. PR/CI/merge/deployment/deployed QA/absorbed branch cleanup pending; Phase2 must wait for complete closeout. Game/Cache173.73 unchanged; no S23 Ultra claim.
+
 ## 2026-10-05 — Level Suppression V2
 
 - Work ID LEVEL-SUPPRESSION-V2-20261005；target dev；main 禁止修改。Final Damage Level Multiplier `1.01 ^ levelDiff`，Single Owner `js/00-main.js::getDamageLevelMultiplier()`，玩家／怪物與普攻／技能共用；No artificial cap/floor. No Hit/Evasion/Status/Crit coupling.

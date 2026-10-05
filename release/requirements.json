@@ -770,6 +770,20 @@
         "verification": "Exact integrated source35646dc2abacf4a7c108fa69122c27599139d139 CI run37275575148 SUCCESS: Repository111651740551, Boss111651740674, Abyss111651740753, Adventure111651740789; Session Authority run37275574792 SUCCESS. Formula15/15 (0/±1/±5/±10/±30/±99, adjacency,10000 reciprocal pairs,input/retirement); actual production-bundle integration40/40 (calculateDamage/skill/player normal/enemy normal, Hit/Evasion/Status/HardControl/Critical isolation); six-stat/combat/MonsterBalance aggregate, cloud parity, syntax/deprecated/build sync and exact-candidate real-battle browser gates PASS. Final metadata-head Required CI is tracked independently in Work PR.",
         "result": "VERIFIED functional/build/exact-source CI. Single continuous Math.pow(1.01,levelDiff) Owner replaces retired linear/clamp constants. No multiplier bounds or other-system coupling; Game/Cache173.73 unchanged. Final metadata-head CI, controlled dev merge, exact deployment and branch cleanup remain separate execution gates in Work PR; main protected."
       }
+    },
+    {
+      "id": "REQ-BATTLE-TARGET-LIFECYCLE-20261005",
+      "title": "Enemy action target identity stable across fire follow-ups and death/revive round planning",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/BATTLE_TARGET_LIFECYCLE_CONVERGENCE_20261005.md",
+          "tests/battle-target-lifecycle-20261005.test.js",
+          ".github/scripts/run-battle-target-lifecycle-browser-qa.mjs"
+        ],
+        "verification": "19/19 focused executable cases PASS, existing related regressions/build PASS; 24/24 final-production Chrome scenarios PASS at 390x844 and 412x915. Evidence: CI run37273828938, artifact11329756508, candidate914f260a718f1f725dd55038f2e523c8ec4a6be9. Screenshots reviewed; mobile emulation, not S23 Ultra physical acceptance.",
+        "result": "Target identity/shape/HP/SP/once-only finish VERIFIED against production bundles. Full exact-head CI, dev integration, deployment and deployed Browser QA remain separate Bug DoD gates; no COMPLETE claim."
+      }
     }
   ]
 }

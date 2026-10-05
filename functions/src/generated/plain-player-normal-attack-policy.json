@@ -5,7 +5,7 @@
   "sourceOwner": "js/00-main.js",
   "compatibilityDigests": {
     "js/33-v140-four-element-balance.js": "ec0e90959f8d50862deb808c3cd66554ac426d9bc80de1fe07464e8683162a45",
-    "js/43-v149-skill-ui-rules.js": "f0245846a1557d76328d02cb0db7648fa640c18d5eb4545517e21536725fab42",
+    "js/43-v149-skill-ui-rules.js": "01b70a2f7b50c139e88700104bfc94d392eda3399163db3730e5396c7a5973db",
     "js/44-v152-dev-fixes.js": "86d3285e8967e5c3b57dd60604bb5731f23d81e7022534e535864b0b939e4d1e",
     "js/60-v173.64-skill-progression-rebalance.js": "3d42854b0775161ec044ac42040c44728c3af9eaeddcf7e38604d9ddf69ea908"
   },

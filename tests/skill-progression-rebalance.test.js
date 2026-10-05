@@ -220,6 +220,15 @@ test("the formal owner supplies every direct skill base value without V149 data 
     });
 });
 
+test("final earth hard-control data retires flying-sand petrify and keeps ground-charge petrify",()=>{
+    const r=makeRuntime();
+    assert.equal(Object.hasOwn(r.skills.flyingSandStrike,"petrifyChanceByLevel"),false,
+        "retired flying-sand lockdown must not be restored for a browser fixture");
+    assert.deepEqual(Array.from(r.skills.dustStorm.petrifyChanceByLevel),[15,20,25,30,35,40,45,50,55,60]);
+    assert.equal(r.skills.dustStorm.petrifyDuration,2);
+    assert.equal(r.skills.dustStorm.targetType,"single");
+});
+
 test("shared level formula preserves gates while every upgrade costs one point",()=>{
     const r=makeRuntime();
     const required=r.context.v17364GetRequiredCharacterLevelForSkillLevel;

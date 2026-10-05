@@ -13099,6 +13099,12 @@ function startResolutionPhase(token){
     initiativeQueue=
         buildInitiativeQueue();
 
+    initiativeQueue.forEach(entry=>{
+        if(entry.type==="monster"){
+            entry.targetSnapshot=createEnemyActionTargetSnapshot(entry.monsterIndex,token);
+        }
+    });
+
 
     initiativeIndex=0;
 
@@ -13399,7 +13405,8 @@ function processNextCombatant(token){
         try{
             processSingleMonsterAttack(
                 entry.monsterIndex,
-                token
+                token,
+                entry.targetSnapshot
             );
         }catch(error){
             console.error("結算敵方行動時發生未攔截例外：",error);
@@ -17576,7 +17583,48 @@ function finishPlayerAction(){
    不管是角色還是怪物都共用它）往下一位推進。
 */
 
-function processSingleMonsterAttack(monsterIndex,token){
+/* Enemy target identity belongs to the action, not to each free cast.
+   Capture at round planning; direct diagnostic calls capture once at entry.
+   References bind identity even if a party index is reused. No saved state. */
+function createEnemyActionTargetSnapshot(monsterIndex,token){
+    const targets=getExistingPartyIndexes().map(index=>Object.freeze({
+        index:index,character:getPartyCharacterByIndex(index)
+    })).filter(entry=>entry.character&&entry.character.hp>0);
+    const primaryPool=targets.filter(entry=>
+        canSelectHostileBattlePrimary("player",entry.index,"single")
+    );
+    const primary=primaryPool.length
+        ?primaryPool[primaryPool.length===1?0:Math.floor(Math.random()*primaryPool.length)]
+        :null;
+    return Object.freeze({token:token,round:turn,monsterIndex:monsterIndex,
+        monster:monsters[monsterIndex],primary:primary,targets:Object.freeze(targets)});
+}
+
+function isEnemyActionTargetSnapshotCurrent(snapshot,monsterIndex,token){
+    return !!(snapshot&&battleActive&&token===battleToken&&snapshot.token===token&&
+        snapshot.round===turn&&snapshot.monsterIndex===monsterIndex&&
+        snapshot.monster===monsters[monsterIndex]);
+}
+
+function resolveEnemyActionTargets(snapshot,targetType){
+    const living=snapshot.targets.filter(entry=>
+        getPartyCharacterByIndex(entry.index)===entry.character&&entry.character.hp>0
+    );
+    if(targetType==="all"){
+        return {primaryTargetIndex:null,targets:living};
+    }
+    const primary=snapshot.primary;
+    if(!primary||!living.includes(primary)||
+        !canSelectHostileBattlePrimary("player",primary.index,targetType)){
+        return {primaryTargetIndex:null,targets:[]};
+    }
+    const indexes=resolveBattlefieldTargets("player",primary.index,targetType,{hostilePrimary:true});
+    return {primaryTargetIndex:primary.index,targets:indexes.map(index=>
+        living.find(entry=>entry.index===index)
+    ).filter(Boolean)};
+}
+
+function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
 
     if(
         !battleActive ||
@@ -17588,6 +17636,9 @@ function processSingleMonsterAttack(monsterIndex,token){
 
     const monster=
         monsters[monsterIndex];
+
+    const actionTargets=targetSnapshot||createEnemyActionTargetSnapshot(monsterIndex,token);
+    if(!isEnemyActionTargetSnapshotCurrent(actionTargets,monsterIndex,token)){ return; }
 
 
     /*
@@ -17695,9 +17746,7 @@ function processSingleMonsterAttack(monsterIndex,token){
        普通攻擊」是同一種行為。
     */
 
-    const hasVisibleHostilePrimary=getExistingPartyIndexes().some(index=>
-        canSelectHostileBattlePrimary("player",index,"single")
-    );
+    const hasVisibleHostilePrimary=resolveEnemyActionTargets(actionTargets,"single").targets.length>0;
 
     const affordableSkillIds=
 
@@ -17857,44 +17906,11 @@ function processSingleMonsterAttack(monsterIndex,token){
 
     const isRangeSkill=["tri","row","column","all"].includes(skillTargetType);
 
-    const livingTargets=getExistingPartyIndexes()
-        .map(index=>({
-            character:getPartyCharacterByIndex(index),
-            stats:getPartyBattleStats(index),
-            index:index
-        }))
-        .filter(entry=>entry.character && entry.character.hp>0);
-
-    /* Stealth blocks primary selection for every targeted hostile shape.
-       Range skills still include stealthed units when they are collateral. */
-    const selectablePrimaryTargets=livingTargets.filter(entry=>
-        canSelectHostileBattlePrimary("player",entry.index,skillTargetType)
-    );
-
-    if(skillTargetType!=="all"&&selectablePrimaryTargets.length===0){
-        addBattleLog(monster.name+"找不到可被此攻擊選中的目標。");
-        updateUI();
-        finishPlayerAction();
-        return;
-    }
-
-    let attackTargets=[];
-    let primaryTargetIndex=null;
-
-    if(skillTargetType==="all"){
-        attackTargets=livingTargets;
-    }else{
-        const primary=selectablePrimaryTargets[
-            Math.floor(Math.random()*selectablePrimaryTargets.length)
-        ];
-        primaryTargetIndex=primary?primary.index:null;
-        const targetIndexes=primary
-            ?resolveBattlefieldTargets("player",primary.index,skillTargetType,{hostilePrimary:true})
-            :[];
-        attackTargets=targetIndexes.map(index=>
-            livingTargets.find(entry=>entry.index===index)
-        ).filter(Boolean);
-    }
+    const resolvedTargets=resolveEnemyActionTargets(actionTargets,skillTargetType);
+    const primaryTargetIndex=resolvedTargets.primaryTargetIndex;
+    const attackTargets=resolvedTargets.targets.map(entry=>({
+        index:entry.index,character:entry.character,stats:getPartyBattleStats(entry.index)
+    }));
 
     if(attackTargets.length===0){
         addBattleLog(monster.name+"找不到可被此技能選中的目標。");

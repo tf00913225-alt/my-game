@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-05",
+  "title": "Battle Target Lifecycle Convergence",
+  "workId": "BATTLE-TARGET-LIFECYCLE-CONVERGENCE-20261005",
+  "base_branch": "dev",
+  "base_sha": "276f6a1e9e5d65f563a5a8b51d477f8580430252",
+  "work_branch": "fix/battle-target-lifecycle-convergence-20261005",
+  "officialVersion": "173.73",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REQ-BATTLE-TARGET-LIFECYCLE-20261005",
+      "title": "Enemy action target identity stable across fire follow-ups and death/revive round planning",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/BATTLE_TARGET_LIFECYCLE_CONVERGENCE_20261005.md",
+          "tests/battle-target-lifecycle-20261005.test.js",
+          ".github/scripts/run-battle-target-lifecycle-browser-qa.mjs"
+        ],
+        "verification": "19/19 focused executable cases PASS, existing related regressions/build PASS; 24/24 final-production Chrome scenarios PASS at 390x844 and 412x915. Evidence: CI run37273828938, artifact11329756508, candidate914f260a718f1f725dd55038f2e523c8ec4a6be9. Screenshots reviewed; mobile emulation, not S23 Ultra physical acceptance.",
+        "result": "Target identity/shape/HP/SP/once-only finish VERIFIED against production bundles. Full exact-head CI, dev integration, deployment and deployed Browser QA remain separate Bug DoD gates; no COMPLETE claim."
+      }
+    }
+  ]
+}
