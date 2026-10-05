@@ -32,12 +32,12 @@ const expression=`(async()=>{
             mode:rank==='boss'?'personalBoss':'wild',context:'qa/target-lifecycle'});
         Object.assign(enemy,{hp:100000,maxHP:100000,sp:1000,maxSP:1000,skillIds:['fireCritical'],skillChance:1,v141SupportSkillIds:[],v141ForceSkillLevel:1,v132FixedSkillLoadout:true});
         monsters=[enemy];currentZone='forest';mapCooldown=false;
-        const releasePause=FourSymbolsBattleFlow.acquirePauseLock('target-lifecycle-qa');
-        let releaseFinish,finished=0;const badges=[],hits=[];
+        let releasePause,releaseFinish,finished=0;const badges=[],hits=[];
         const badge=showMonsterSkillNameBadge,hit=showPlayerHit,random=Math.random;
         try{
             startBattle(0);
             await wait(()=>battleActive&&turn>=1,'battle begin');clearInterval(timerId);
+            releasePause=FourSymbolsBattleFlow.acquirePauseLock('target-lifecycle-qa');
             battlePhase='declare';resolutionPhaseStarted=false;
             if(scenario==='revived')player.hp=0;
             if(scenario==='lethal')player.hp=1;
@@ -61,7 +61,7 @@ const expression=`(async()=>{
         }finally{
             showMonsterSkillNameBadge=badge;showPlayerHit=hit;Math.random=random;
             battleActive=false;battleToken++;autoBattle=false;clearInterval(timerId);
-            releaseFinish?.();releasePause();
+            releaseFinish?.();releasePause?.();
             window.v142SkillAnimationDirector?.cancelAll?.();
         }
     }
