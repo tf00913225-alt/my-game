@@ -17,6 +17,7 @@ const expression=`(async()=>{
     await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY','startup');
     await FourSymbolsFeatures.ensure('gameplay-core','target-lifecycle-qa');
     await FourSymbolsFeatures.ensure('feature-boss-relic','target-lifecycle-qa');
+    closeHomeFeature();
     player2=buildAdditionalCharacter('QA ally B','water','male');registerAdditionalCharacter(2,player2);
     player3=buildAdditionalCharacter('QA ally C','water','male');registerAdditionalCharacter(3,player3);
     for(const i of getExistingPartyIndexes()){
@@ -37,6 +38,7 @@ const expression=`(async()=>{
         try{
             startBattle(0);
             await wait(()=>battleActive&&turn>=1,'battle begin');clearInterval(timerId);
+            closeHomeFeature();
             releasePause=FourSymbolsBattleFlow.acquirePauseLock('target-lifecycle-qa');
             battlePhase='declare';resolutionPhaseStarted=false;
             if(scenario==='revived')player.hp=0;
@@ -58,7 +60,9 @@ const expression=`(async()=>{
             await wait(()=>!window.v142SkillAnimationDirector?.getActive?.()||window.v142SkillAnimationDirector.getActive().done,'VFX completion');
             rows.push({mode,rank,scenario,before,beforeSp,after:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),badges,hits,
                 snapshot:action.targetSnapshot.targets.map(t=>t.index),primary:action.targetSnapshot.primary?.index,sp:enemy.sp,cost:skillDatabase.fireCritical.spCost,finished,
-                visible:!!document.getElementById('battlePlayerCard1')?.getBoundingClientRect().height});
+                visible:document.getElementById('battlePage')?.classList.contains('active')===true&&
+                    !document.getElementById('homeFeatureModal')?.classList.contains('show')&&
+                    !!document.getElementById('battlePlayerCard1')?.getBoundingClientRect().height});
         }finally{
             showMonsterSkillNameBadge=badge;showPlayerHit=hit;Math.random=random;
             battleActive=false;battleToken++;autoBattle=false;clearInterval(timerId);
@@ -78,9 +82,10 @@ const evidence=[];
 try{
     const page=(await waitJson('http://127.0.0.1:'+port+'/json/list')).find(t=>t.type==='page');
     client=new Cdp(page.webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');
+    await client.send('Page.navigate',{url:server.url});
     for(const [width,height] of [[390,844],[412,915]]){
         await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
-        await client.send('Page.navigate',{url:server.url});const rows=await client.eval(expression);
+        const rows=await client.eval(expression);
         evidence.push({width,height,rows});
         assert.equal(rows.length,12);
         for(const r of rows){
