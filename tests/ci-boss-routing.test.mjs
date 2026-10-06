@@ -66,4 +66,3 @@ test('real shallow PR reproduces no merge base; classifier checkout ancestry rec
     assert.deepEqual(changedPaths(base,head,false,'push').sort(),['base.txt','ui.txt']);
   } finally {process.chdir(previous);fs.rmSync(temp,{recursive:true,force:true});}
 });
-
