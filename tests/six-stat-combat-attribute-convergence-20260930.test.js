@@ -88,4 +88,54 @@ assert.doesNotMatch(index,/精神|creationSpirit|statusSpirit|data-stat="spirit"
 assert.match(index,/id="statusDefense"/);
 assert.match(contracts,/Physical Damage.*Magic Damage/);
 assert.match(contracts,/Physical Skill Elite\/Boss Rank Bonus.*RETIRED/);
-console.log("✓ six-stat runtime owners, migration, unified defense, equipment preservation, and retired rank bonus");
+
+const detailSource=extractFunction(main,"openInventoryCharacterDetail");
+const originalEquipment=context.characterEquipment.fire;
+context.characterEquipment.fire={hand:{rarityKey:"orange",stats:{attack:20,defensePoints:4,intelligence:2,vitality:3,energy:4,agility:5},reforgeStats:{attack:13,defensePoints:2,intelligence:1,vitality:2,energy:3,agility:4},sockets:["gemVitalityI"]}};
+const equipped=context.getMainCharacterStats();
+assert.equal(equipped.attackPoints,133,"allocated, equipment and reforge Attack enter the formal owner once");
+assert.equal(equipped.defensePoints,106);
+assert.equal(equipped.intelligence,103);
+assert.equal(equipped.vitality,106,"socket gem adds Vitality alongside equipment and reforge");
+assert.equal(equipped.energy,107);
+assert.equal(equipped.agility,109);
+const nodes={inventoryCharacterDetailModal:{classList:{add:()=>{}}},inventoryCharacterDetailName:{},inventoryCharacterDetailStats:{}};
+Object.assign(context,{$:id=>nodes[id],inventoryCharacterIndex:0,getBackpackCharacter:()=>context.player,getBackpackCharacterStats:()=>equipped,getInventoryCharacterCriticalStats:()=>({physical:{chance:5,multiplier:1.5},magic:{chance:5,multiplier:1.5}})});
+vm.runInContext(detailSource,context);
+context.openInventoryCharacterDetail();
+const rows=Object.fromEntries([...nodes.inventoryCharacterDetailStats.innerHTML.matchAll(/<span>([^<]+)<\/span>\s*<b>([^<]+)<\/b>/g)].map(match=>[match[1],match[2]]));
+for(const [label,key] of [["HP","maxHP"],["SP","maxSP"],["攻擊","attackPoints"],["防禦","defensePoints"],["智力","intelligence"],["體質","vitality"],["能量","energy"],["敏捷","agility"]]){
+    assert.equal(rows[label],String(equipped[key]),label+" renders the formal owner value");
+}
+assert.notEqual(rows["攻擊"],String(equipped.attack));
+assert.notEqual(rows["防禦"],String(equipped.defense));
+const v141=fs.readFileSync("js/34-v141-core-systems.js","utf8");
+assert.doesNotMatch(v141,/getEquipmentBonus\s*=/,"V141 must not add reforgeStats a second time after the canonical equipment owner");
+const expansion=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
+const setOwner=expansion.slice(expansion.indexOf("    function getEquipmentSetCounts("),expansion.indexOf('    if(typeof getElementDamagePassiveMultiplier==="function")'));
+vm.runInContext(setOwner,context);
+context.characterEquipment.fire.hand.setId="test-set";
+context.characterEquipment.fire.head={setId:"test-set",stats:{}};
+context.characterEquipment.fire.armor={setId:"test-set",stats:{}};
+const withSet=context.getMainCharacterStats();
+for(const key of ["attackPoints","defensePoints","intelligence","vitality","energy","agility"]){
+    assert.equal(withSet[key],equipped[key]+1,"existing three-piece set points remain in the formal owner: "+key);
+}
+assert.equal(withSet.evasion,equipped.evasion+2,"independent set Evasion is preserved");
+context.characterEquipment.fire=originalEquipment;
+assert.match(detailSource,/\["HP",stats\.maxHP\]/,"character detail keeps Max HP");
+assert.match(detailSource,/\["SP",stats\.maxSP\]/,"character detail keeps Max SP");
+assert.match(detailSource,/\["攻擊",stats\.attackPoints\]/,"character detail shows effective Attack Points, not derived Physical Attack");
+assert.match(detailSource,/\["防禦",stats\.defensePoints\]/,"character detail shows effective Defense Points, not derived Final Defense");
+assert.match(detailSource,/\["智力",stats\.intelligence\]/);
+assert.match(detailSource,/\["體質",stats\.vitality\]/);
+assert.match(detailSource,/\["能量",stats\.energy\]/);
+assert.match(detailSource,/\["敏捷",stats\.agility\]/);
+assert.doesNotMatch(detailSource,/\["攻擊",stats\.attack\]/);
+assert.doesNotMatch(detailSource,/\["防禦",stats\.defense\]/);
+assert.match(main,/const ATTACK_PER_LEVEL = 4;/,"physical attack keeps +4 per character level");
+assert.match(main,/const MAGIC_ATTACK_PER_LEVEL = 4;/,"magic attack keeps +4 per character level");
+assert.match(main,/const DEFENSE_PER_LEVEL = 3;/,"defense keeps +3 per character level");
+assert.match(main,/const MAGIC_ATTACK_PER_POINT = 2\.75;/,"each Intelligence point keeps +2.75 Magic Attack");
+
+console.log("✓ six-stat runtime owners, effective-point detail UI, level growth, migration, unified defense, and retired rank bonus");
