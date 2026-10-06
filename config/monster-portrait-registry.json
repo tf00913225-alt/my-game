@@ -70,10 +70,10 @@
     }
   },
   "snapshot": {
-    "portraitTargets": 176,
+    "portraitTargets": 185,
     "existingTargets": 139,
-    "plannedTargets": 37,
-    "uniqueRuntimeNames": 173,
+    "plannedTargets": 46,
+    "uniqueRuntimeNames": 181,
     "assetPoolCounts": {
       "normal": 10,
       "elite": 19,
@@ -1685,6 +1685,89 @@
         "standard",
         "assets/monsters/tower/earth-pool/mon-earth-miniboss-009.webp",
         "existing"
+      ]
+    ],
+    "adventure": [
+      [
+        "adventure.road.bandit",
+        "攔路山賊",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/adventure/road-bandit.webp",
+        "planned"
+      ],
+      [
+        "adventure.road.thug",
+        "山道惡徒",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/adventure/road-thug.webp",
+        "planned"
+      ],
+      [
+        "adventure.road.scout",
+        "寨外斥候",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/adventure/road-scout.webp",
+        "planned"
+      ],
+      [
+        "adventure.gate.elite",
+        "黑松寨精英",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/adventure/gate-elite.webp",
+        "planned"
+      ],
+      [
+        "adventure.gate.blade",
+        "持刀寨眾",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/adventure/gate-blade.webp",
+        "planned"
+      ],
+      [
+        "adventure.gate.runner",
+        "巡寨快手",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/adventure/gate-runner.webp",
+        "planned"
+      ],
+      [
+        "adventure.boss.chief",
+        "黑松寨主",
+        "earth",
+        "smallBoss",
+        "standard",
+        "assets/monsters/adventure/boss-chief.webp",
+        "planned"
+      ],
+      [
+        "adventure.boss.guard-fire",
+        "寨主親衛",
+        "fire",
+        "elite",
+        "standard",
+        "assets/monsters/adventure/boss-guard-fire.webp",
+        "planned"
+      ],
+      [
+        "adventure.boss.guard-wind",
+        "寨主親衛",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/adventure/boss-guard-wind.webp",
+        "planned"
       ]
     ]
   },

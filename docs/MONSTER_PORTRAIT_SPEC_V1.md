@@ -307,7 +307,7 @@ npm run portrait:import -- --keys=<portraitKey,portraitKey,...>
 - `planned` 通過後可升為 `existing`。
 - `retired` 不得默默復活；只有專案負責人明確要求重新啟用時才可使用 `--reactivate-retired`。
 - 日常副本必須保留明確 `portraitKey` runtime 接線；若 owner 契約或 runtime regression test 失敗，工具必須停止，不得只因檔案存在就宣稱導入成功。
-- 此快速流程不改 V154／V159 runtime owner，也不得新增第三套 portrait wrapper。
+- 此快速流程沿用 V154 Resolver／V174 Presentation；V159 已退休，不得新增 portrait wrapper。
 
 尚未生成的素材仍使用既有 batch 流程；兩者用途不同。
 

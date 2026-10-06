@@ -23,6 +23,10 @@ for(const entry of registry.assetPool.entries.filter(e=>e.status==='adopted')){
  assert.equal(context.v154ResolveMonsterPortraitRecord(monster).path,entry.runtimePath);
 }
 const known=rows.find(t=>t.status==='existing'),planned=rows.find(t=>t.status==='planned');
+for(const target of rows.filter(t=>t.group==='adventure'||t.portraitKey.startsWith('adventure.'))){
+ const result=context.v154ResolveMonsterPortraitRecord({monsterKey:target.portraitKey,name:target.name,element:target.element,rank:target.rank});
+ assert.equal(result.requestedPortraitKey,target.portraitKey);assert.equal(result.fallbackReason,'planned');
+}
 assert.equal(context.v154ResolveMonsterPortraitRecord({name:known.name,portraitKey:planned.portraitKey}).path,null,'explicit missing identity cannot fall through to a different name');
 assert.equal(context.v154ResolveMonsterPortraitRecord({name:'任意中文／../未註冊王',element:'fire',rank:'boss'}).path,null);
 for(const [file,meta] of Object.entries(registry.presentation.assets)){

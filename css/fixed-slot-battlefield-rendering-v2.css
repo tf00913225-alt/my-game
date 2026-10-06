@@ -479,7 +479,10 @@
 #game-stage #battlePage .v174-battle-art.v174-generic-portrait::before{
     content:"◇";
     position:absolute;
-    inset:8% 12% 4%;
+    left:12%;
+    width:76%;
+    height:var(--portrait-body-height, 82%);
+    bottom:calc(100% - var(--portrait-baseline, 96%));
     display:grid;
     place-items:center;
     color:var(--ui-gold, #c89a48);

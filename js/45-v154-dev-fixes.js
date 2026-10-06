@@ -120,7 +120,8 @@
                 dedicated:true
             };
         }
-        const explicitKey=String(monster.portraitKey||monster.monsterPortraitKey||(monster.vGameplayBossId&&!monster.vGameplayTowerBoss?"boss."+monster.vGameplayBossId:"")).trim();
+        const canonicalKey=monsterPortraitIdentityByKey.has(monster.monsterKey)?monster.monsterKey:"";
+        const explicitKey=String(monster.portraitKey||monster.monsterPortraitKey||canonicalKey||(monster.vGameplayBossId&&!monster.vGameplayTowerBoss?"boss."+monster.vGameplayBossId:"")).trim();
         if(monsterPortraitRegistryState==="pending"&&explicitKey){ return null; }
         const explicitAssetFailed=!!(explicitKey&&monsterPortraitAssetFailures.has(explicitKey));
         if(explicitKey&&monsterPortraitByKey.has(explicitKey)){

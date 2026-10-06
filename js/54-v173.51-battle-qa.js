@@ -64,6 +64,11 @@ function syncUnitArtwork(card,kind,selectedRecord){
     const rank=monster&&(monster.rank||monster.v141BattleRank)||record?.rank;
     const sizeClass=monster?.vGameplayBoss&&!monster?.vGameplayTowerBoss?"BIG_BOSS":rank==="boss"||rank==="smallBoss"?"SMALL_BOSS":rank==="elite"?"ELITE":"STANDARD";
     if(record)card.dataset.portraitSizeClass=sizeClass;
+    const classContract=record&&window.v154GetPortraitScaleContract?.()?.[sizeClass];
+    if(classContract){
+        art.style.setProperty("--portrait-body-height",String(classContract.bodyHeight*100)+"%");
+        art.style.setProperty("--portrait-baseline",String(classContract.baseline*100)+"%");
+    }
     if(metadata){
         if(!paint){paint=document.createElement("div");paint.className="v174-portrait-paint";art.appendChild(paint);}
         const contract=window.v154GetPortraitScaleContract()[sizeClass];

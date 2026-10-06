@@ -12,6 +12,7 @@ const expression=String.raw`(async()=>{
  await FourSymbolsFeatures.ensure('gameplay-core','portrait-convergence-qa');
  await FourSymbolsFeatures.ensure('feature-boss-relic','portrait-convergence-qa');
  await FourSymbolsFeatures.ensure('abyss','portrait-convergence-qa');
+ await FourSymbolsFeatures.ensure('adventure','portrait-convergence-qa');
  await v154RequestMonsterPortraitRegistry();closeHomeFeature();autoBattle=false;autoPatrolEnabled=false;
  const registry=await fetch('config/monster-portrait-registry.json').then(r=>r.json());
  const targets=Object.values(registry.groups).flat().map(row=>Object.fromEntries(registry.tupleSchema.map((k,i)=>[k,row[i]])));
@@ -20,7 +21,14 @@ const expression=String.raw`(async()=>{
  const measure=(m,i,label)=>{
   const card=document.getElementById('battleMonster'+i),art=card?.querySelector('.v174-battle-art'),paint=art?.querySelector('.v174-portrait-paint');
   const record=v154ResolveMonsterPortraitRecord(m);check(card&&art,'missing final presentation '+label);
-  if(record.generic){check(!paint&&getComputedStyle(art,'::before').content!=='none','generic fallback is visible');check(record.path===null,'fallback must not impersonate a monster');evidence.fallbacks.push({label,name:m.name,key:m.portraitKey,reason:record.fallbackReason});return;}
+  if(record.generic){
+   const pseudo=getComputedStyle(art,'::before'),box=art.getBoundingClientRect(),cls=card.dataset.portraitSizeClass,contract=registry.presentation.classes[cls];
+   const projection=box.height/parseFloat(getComputedStyle(art).height),bodyHeight=parseFloat(pseudo.height)*projection,bottomOffset=parseFloat(pseudo.bottom)*projection;
+   check(!paint&&pseudo.content.includes('◇'),'generic fallback is visible');check(record.path===null,'fallback must not impersonate a monster');
+   check(box.height>0&&Math.abs(bodyHeight/box.height-contract.bodyHeight)<.02,'generic class height '+label);
+   check(Math.abs(bottomOffset/box.height-(1-contract.baseline))<.02,'generic bottom baseline');
+   evidence.fallbacks.push({label,name:m.name,key:record.requestedPortraitKey,sizeClass:cls,reason:record.fallbackReason,slotHeight:box.height,visualBodyHeight:bodyHeight,baseline:box.bottom-bottomOffset,clipped:false});return;
+  }
   check(paint,'missing normalized paint '+record.portraitKey);
   const a=art.getBoundingClientRect(),p=paint.getBoundingClientRect(),meta=registry.presentation.assets[record.path];
   const [l,t,r,b]=meta.alphaBounds,top=p.top+p.height*t/meta.height,bottom=p.top+p.height*b/meta.height,left=p.left+p.width*l/meta.width,right=p.left+p.width*r/meta.width;
@@ -48,12 +56,41 @@ const expression=String.raw`(async()=>{
  for(const type of ['exp','material','gold']){const waves=v148BuildDailyDungeonWaves(type).waves;for(let i=0;i<waves.length;i++){await scene(waves[i],'Daily/'+type+'/'+i);evidence.nativeRosters.push('Daily/'+type+'/'+i);}}
  for(const floor of [1,5,10,100]){await scene(GameplaySystem.buildTowerRoster(floor),'Tower/'+floor);evidence.nativeRosters.push('Tower/'+floor);}
  for(const region of [0,1,2,3,4])for(const stage of [0,4]){await scene(v174AbyssBuildRoster(40,region,stage),'Abyss/'+region+'/'+stage);evidence.nativeRosters.push('Abyss/'+region+'/'+stage);}
+ for(const encounter of Object.values(FourSymbolsAdventureContent.encounters)){
+  const roster=encounter.enemies.map(e=>MonsterBalance.build({...e,mode:'adventure',chapterId:'chapter_v1',encounterId:encounter.id,context:'adventure/chapter_v1/'+encounter.id}));
+  await scene(roster,'Adventure/'+encounter.id);evidence.nativeRosters.push('Adventure/'+encounter.id);
+ }
  for(const cls of ['STANDARD','ELITE','SMALL_BOSS','BIG_BOSS']){
   const rank=cls==='STANDARD'?'regular':cls==='ELITE'?'elite':'smallBoss';
   const all=[...targets,...pool];
   for(let start=0;start<all.length;start+=5){await scene(all.slice(start,start+5).map(t=>({...t,rank,v141BattleRank:rank,vGameplayBoss:cls==='BIG_BOSS',vGameplayTowerBoss:false})),cls+'/'+start);}
  }
  check(evidence.geometry.length>2000,'incomplete full portrait matrix');
+ // Enter both Boss modes through the production entry owner and preserve its
+ // central footprint. The isolated account never settles a reward or Cloud write.
+ player.level=100;
+ for(const mode of ['personal','world']){
+  battleActive=false;window.v132ActiveDungeonRun=null;closeHomeFeature();
+  for(const cfg of [autoConfig,autoConfig2,autoConfig3])cfg.enabled=false;
+  const definition=(mode==='personal'?GameplaySystem.personalBosses:GameplaySystem.worldBosses)[0];
+  if(mode==='world')GameplaySystem.debugReloadState({world:{[definition.id]:{completedStages:3}}});
+  check(vGameplayStartBoss(mode,definition.id),'native Boss entry '+mode);
+  await wait(()=>battleActive&&document.getElementById('battleMonster0'));
+  await v154PreparePortraitsForEncounter(monsters);renderBattle();v154SyncMonsterPortraits();
+  currentBattleMonsters.forEach(i=>measure(monsters[i],i,mode+'/first'));
+  renderBattle();v154SyncMonsterPortraits();currentBattleMonsters.forEach(i=>measure(monsters[i],i,mode+'/redraw'));
+  showPage('home');showPage('battle');renderBattle();v154SyncMonsterPortraits();currentBattleMonsters.forEach(i=>measure(monsters[i],i,mode+'/reentry'));
+  evidence.nativeRosters.push(mode);
+  if(mode==='world'){
+   turn=10;GameplaySystem.debugProcessBossRound();
+   const guards=currentBattleMonsters.filter(i=>monsters[i].unitKind==='boss-reinforcement');
+   check(guards.length===2,'native reinforcement creation');
+   await v154PreparePortraitsForEncounter(guards.map(i=>monsters[i]));renderBattle();v154SyncMonsterPortraits();
+   guards.forEach(i=>measure(monsters[i],i,'Reinforcement/first'));
+   renderBattle();v154SyncMonsterPortraits();guards.forEach(i=>measure(monsters[i],i,'Reinforcement/redraw'));
+   evidence.nativeRosters.push('Reinforcement');
+  }
+ }
  return evidence;
 })()`;
 

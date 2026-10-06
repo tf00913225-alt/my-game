@@ -44,10 +44,22 @@ const bossTower=read("js/gameplay-boss-tower-system.js");
 const abyss=read("js/59-abyss-two-tier-runtime.js");
 const portraitRuntime=read("js/45-v154-dev-fixes.js");
 const portraitTiming=read("js/48-v159-abyss-battle-portraits.js");
+const adventure=read("js/adventure/adventure-content-v1-20260915.js");
 
 const errors=[];
 const warnings=[];
 const discovered=[];
+const adventureIdentities=[];
+const adventureRegex=/\{monsterKey:"([^"]+)",archetype:"[^"]+",name:"([^"]+)",level:\d+,element:"([^"]+)",rank:"([^"]+)"\}/g;
+let adventureMatch;
+while((adventureMatch=adventureRegex.exec(adventure))!==null){
+    const [,portraitKey,name,element,rank]=adventureMatch;
+    discovered.push(name);
+    adventureIdentities.push(portraitKey);
+    const target=targets.find(t=>t.portraitKey===portraitKey);
+    if(!target||target.name!==name||target.element!==element||target.rank!==rank)errors.push('unregistered/mismatched Adventure identity: '+portraitKey);
+}
+if(!adventureIdentities.length)errors.push('Adventure encounter discovery empty');
 const poolTargets=(registry.assetPool?.entries||[]).filter(e=>e.status==='adopted').map(e=>({portraitKey:e.assetId,path:e.runtimePath,sizeClass:'standard',status:'existing'}));
 const invalidPresentation=[];
 for(const target of [...targets,...poolTargets]){

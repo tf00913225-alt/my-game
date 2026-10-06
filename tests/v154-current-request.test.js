@@ -236,7 +236,7 @@ test("equipment cover, ability scrolling and Abyss decluttering stay scoped",()=
     assert.match(source,/presentation\.applyUnit\(card,"monster",record\)/);
     // Legacy image CSS has no Runtime producer; canonical art is verified below.
     assert.doesNotMatch(source,/v162-abyss-battle-portrait-art/);
-    assert.match(fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8"),/\.v174-battle-art\{[^}]*background-size:contain !important/);
+    assert.match(fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8"),/\.v174-battle-art\{[^}]*background-size:var\(--portrait-background-size, contain\) !important/);
 });
 
 console.log("\nV154 current request suite: "+passed+" tests passed.");
