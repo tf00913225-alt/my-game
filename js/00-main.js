@@ -22586,17 +22586,10 @@ function syncEnemyResourceHud(index){
     if(!monster){ return; }
     const hpText=$("battleMonsterHPText"+index);
     const spText=$("battleMonsterSPText"+index);
-    const shield=monster.v141Shield;
-    let hp=projectEnemyResource(monster.hp,monster.maxHP).text;
-    if(shield&&(shield.isBarrier||Number(shield.remaining)>0)){
-        const baseHp=shield.isBarrier?shield.baseHp:Number(monster.hp)-Number(shield.remaining);
-        hp=projectEnemyResource(baseHp,shield.baseMaxHP).text;
-        hp+=shield.isBarrier
-            ?" 結界"+(Number.isFinite(Number(shield.remainingBlocks))?Math.max(0,Math.floor(Number(shield.remainingBlocks))):3)
-            :" +"+projectEnemyResource(shield.remaining,shield.remaining).current;
-    }
-    if(hpText){ hpText.textContent=hp; }
-    if(spText){ spText.textContent=projectEnemyResource(monster.sp,monster.maxSP).text; }
+    const hp=String(projectEnemyResource(monster.hp,monster.maxHP).current);
+    const sp=String(projectEnemyResource(monster.sp,monster.maxSP).current);
+    if(hpText&&hpText.textContent!==hp){ hpText.textContent=hp; }
+    if(spText&&spText.textContent!==sp){ spText.textContent=sp; }
 }
 
 function applyMonsterUiUpdate(index){

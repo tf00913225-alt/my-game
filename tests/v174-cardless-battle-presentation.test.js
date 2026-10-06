@@ -21,8 +21,8 @@ test('HP and SP labels are normalized to current values only without observer ch
     assert.match(source,/function setTextIfChanged\(node,value\)\{if\(node&&node\.textContent!==value\)node\.textContent=value;\}/);
     assert.match(source,/setTextIfChanged\(hp,String\(numericValue\(character\.hp\)\)\)/);
     assert.match(source,/setTextIfChanged\(sp,String\(numericValue\(character\.sp\)\)\)/);
-    assert.match(source,/setTextIfChanged\(hp,String\(numericValue\(monster\.hp\)\)\)/);
-    assert.match(source,/setTextIfChanged\(sp,String\(numericValue\(monster\.sp\)\)\)/);
+    assert.match(source,/if\(Number\.isInteger\(index\)\)syncEnemyResourceHud\(index\)/);
+    assert.doesNotMatch(source,/numericValue\(monster\.(?:hp|sp)\)/);
     const presentationBlock=source.match(/function syncResourceNumbers\(\)\{([\s\S]*?)\n\}/);
     assert.ok(presentationBlock);
     assert.doesNotMatch(presentationBlock[1],/maxHP|maxSP|"\/"|'\/'/);

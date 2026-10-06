@@ -409,14 +409,14 @@ test("Boss HUD renders the white shield inside its formal HP bar",()=>{
     assert.equal(hpInner.style.width,fullHpPercent+"%","full HP and shield use the formal shared proportion");
     assert.equal(overlay.style.left,fullHpPercent+"%");
     assert.equal(overlay.style.width,fullShieldPercent+"%");
-    assert.equal(hpLabel.textContent,boss.hp+" / "+boss.maxHP);
+    assert.equal(hpLabel.textContent,String(Math.floor(boss.hp)));
 
     boss.hp=boss.hp-5000;
     assert.equal(overlay.style.width,5000/(boss.maxHP+5000)*100+"%","half shield remaining shrinks the white segment immediately");
     boss.hp=boss.hp-5000;
     assert.equal(overlay.style.width,"0%","shield zero removes the white segment without a second HUD");
     boss.hp-=0.5;
-    assert.equal(hpLabel.textContent,Math.floor(boss.hp)+" / "+Math.floor(boss.maxHP),"Boss shares the enemy integer presentation without rounding state");
+    assert.equal(hpLabel.textContent,String(Math.floor(boss.hp)),"Boss shares the enemy integer presentation without rounding state");
 });
 
 test("a destroyed healing object stops its persistent effect immediately",()=>{

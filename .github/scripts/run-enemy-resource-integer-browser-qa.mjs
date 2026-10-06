@@ -26,7 +26,7 @@ const expression=`(async()=>{
   const evidence=[];
   const capture=async(label,index=0)=>{
     const m=monsters[index],before=[m.hp,m.maxHP,m.sp,m.maxSP],party=getExistingPartyIndexes().map(i=>{const p=getPartyCharacterByIndex(i);return [p.hp,p.sp];});
-    updateMonsterUI(index);await new Promise(r=>setTimeout(r,120));
+    updateMonsterUI(index);FourSymbolsBattlePresentation.sync();await new Promise(r=>setTimeout(r,120));
     const text=id=>document.getElementById(id+index).textContent;
     const width=id=>parseFloat(document.getElementById(id+index).style.width);
     openBattleStatusDetailModal('monster',index);
@@ -76,8 +76,8 @@ try{
   await client.send('Page.navigate',{url:server.url});
   evidence=await client.eval(reference+'\n'+expression);
   for(const row of evidence){
-    assert.match(row.hp,/^\d+ \/ \d+(?: \+\d+| 結界\d+)?$/,row.label);
-    assert.match(row.sp,/^\d+ \/ \d+$/,row.label);
+    assert.match(row.hp,/^\d+$/,row.label);
+    assert.match(row.sp,/^\d+$/,row.label);
     assert.match(row.hpDetail,/^HP：\d+ \/ \d+$/);assert.match(row.spDetail,/^SP：\d+ \/ \d+$/);
     // JSON serialization maps non-finite fixture numbers to null on both sides.
     assert.deepEqual(row.after,row.before,row.label+' must not mutate resources');
@@ -90,8 +90,8 @@ try{
       assert.ok(Math.abs(row.spWidth-row.before[2]/row.before[3]*100)<.0001,row.label+' SP ratio');
     }
   }
-  assert.equal(evidence[0].before[3],727.5);assert.equal(evidence[0].sp,'727 / 727');
-  assert.equal(evidence.find(r=>r.label==='fractional').hp,'95 / 100');
+  assert.equal(evidence[0].before[3],727.5);assert.equal(evidence[0].sp,'727');
+  assert.equal(evidence.find(r=>r.label==='fractional').hp,'95');
   assert.equal(evidence.find(r=>r.label==='zero').hpWidth,0);
   assert.equal(evidence.find(r=>r.label==='max').hpWidth,100);
   const screenshot=await client.send('Page.captureScreenshot',{format:'png'});
