@@ -8,7 +8,7 @@ import {ROOT,findChrome,startServer,waitJson,Cdp} from './runtime-browser-qa-sup
 const expression=String.raw`(async()=>{
  const check=(v,m)=>{if(!v)throw Error(m);};
  const wait=async(fn)=>{const end=performance.now()+30000;while(!fn()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(fn(),'Runtime readiness timeout');};
- await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY');
+ await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
  await FourSymbolsFeatures.ensure('gameplay-core','portrait-convergence-qa');
  await FourSymbolsFeatures.ensure('feature-boss-relic','portrait-convergence-qa');
  await FourSymbolsFeatures.ensure('abyss','portrait-convergence-qa');
@@ -76,6 +76,7 @@ const expression=String.raw`(async()=>{
   if(mode==='world')GameplaySystem.debugReloadState({world:{[definition.id]:{completedStages:3}}});
   check(vGameplayStartBoss(mode,definition.id),'native Boss entry '+mode);
   await wait(()=>battleActive&&document.getElementById('battleMonster0'));
+  await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
   await v154PreparePortraitsForEncounter(monsters);renderBattle();v154SyncMonsterPortraits();
   currentBattleMonsters.forEach(i=>measure(monsters[i],i,mode+'/first'));
   renderBattle();v154SyncMonsterPortraits();currentBattleMonsters.forEach(i=>measure(monsters[i],i,mode+'/redraw'));
@@ -91,8 +92,13 @@ const expression=String.raw`(async()=>{
    evidence.nativeRosters.push('Reinforcement');
   }
  }
+ check(!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'),'no account overlay over battle');
  return evidence;
 })()`;
+
+const bossStart=expression.indexOf(' // Enter both Boss modes');
+const matrixExpression=expression.slice(0,bossStart)+' return evidence;\n})()';
+const nativeBossExpression=mode=>(expression.slice(0,expression.indexOf(' async function scene'))+expression.slice(bossStart)).replace("['personal','world']",JSON.stringify([mode]));
 
 const deployedBase=process.env.DEV_BASE_URL||'';
 if(deployedBase){
@@ -113,7 +119,17 @@ try{
   await client.send('Storage.clearDataForOrigin',{origin:new URL(server.url).origin,storageTypes:'local_storage'});
   await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
   await client.send('Page.navigate',{url:server.url});
-  const result=await client.eval(expression);evidence.push({width,height,...result});
+  const result=await client.eval(matrixExpression);
+  // A fresh isolated origin per native Boss challenge preserves the production
+  // pending receipt gate rather than bypassing it to enter the next mode.
+  for(const mode of ['personal','world']){
+   await client.send('Storage.clearDataForOrigin',{origin:new URL(server.url).origin,storageTypes:'local_storage'});
+   await client.send('Page.navigate',{url:server.url});
+   const native=await client.eval(nativeBossExpression(mode));
+   for(const key of ['geometry','fallbacks','reentry','nativeRosters'])result[key].push(...native[key]);
+   const nativeShot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-'+width+'-'+mode+'.png'),Buffer.from(nativeShot.data,'base64'));
+  }
+  evidence.push({width,height,...result});
   const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-'+width+'.png'),Buffer.from(shot.data,'base64'));
   console.log('Portrait bounds / baseline / first-frame / redraw / reentry PASS '+width+'x'+height+' measurements='+result.geometry.length);
  }

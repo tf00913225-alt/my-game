@@ -29,6 +29,10 @@ for(const target of rows.filter(t=>t.group==='adventure'||t.portraitKey.startsWi
 }
 assert.equal(context.v154ResolveMonsterPortraitRecord({name:known.name,portraitKey:planned.portraitKey}).path,null,'explicit missing identity cannot fall through to a different name');
 assert.equal(context.v154ResolveMonsterPortraitRecord({name:'任意中文／../未註冊王',element:'fire',rank:'boss'}).path,null);
+for(const target of rows.filter(t=>t.status==='planned'&&rows.filter(other=>other.name===t.name).length===1)){
+ const result=context.v154ResolveMonsterPortraitRecord({name:target.name,element:target.element,rank:target.rank});
+ assert.equal(result.requestedPortraitKey,target.portraitKey);assert.equal(result.fallbackReason,'planned');
+}
 for(const [file,meta] of Object.entries(registry.presentation.assets)){
  assert.equal(crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'),meta.sha256,file+' metadata is stale');
  const [l,t,r,b]=meta.alphaBounds;

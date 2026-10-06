@@ -3984,6 +3984,7 @@
     let monsterPortraitByKey=new Map();
     let monsterPortraitByUniqueName=new Map();
     let monsterPortraitIdentityByKey=new Map();
+    let monsterPortraitIdentityByUniqueName=new Map();
 
     function currentAbyssRoster(){
         if(typeof currentBattleMonsters==="undefined"||typeof monsters==="undefined"){ return []; }
@@ -4008,6 +4009,12 @@
 
     function installMonsterPortraitRegistry(registry){
         monsterPortraitIdentityByKey=new Map(registryTargets(registry).map(target=>[target.portraitKey,target]));
+        monsterPortraitIdentityByUniqueName=new Map();
+        const identityNames=new Set();
+        monsterPortraitIdentityByKey.forEach(target=>{
+            if(identityNames.has(target.name))monsterPortraitIdentityByUniqueName.delete(target.name);
+            else{identityNames.add(target.name);monsterPortraitIdentityByUniqueName.set(target.name,target);}
+        });
         const byKey=new Map();
         const byName=new Map();
         const duplicateNames=new Set();
@@ -4114,10 +4121,10 @@
             status:"existing",
             legacy:true
         }:(()=>{
-            const identity=monsterPortraitIdentityByKey.get(explicitKey);
+            const identity=monsterPortraitIdentityByKey.get(explicitKey)||(!explicitKey&&monsterPortraitIdentityByUniqueName.get(monster.name));
             return {
                 portraitKey:"fallback.generic",
-                requestedPortraitKey:explicitKey||null,
+                requestedPortraitKey:explicitKey||identity&&identity.portraitKey||null,
                 fallbackReason:explicitAssetFailed?"decode-failed":identity?identity.status:"identity-unregistered",
                 name:monster.name||"",
                 element:monster.element||"dynamic",
