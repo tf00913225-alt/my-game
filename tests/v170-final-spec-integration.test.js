@@ -1616,7 +1616,7 @@ test("formal EXP chain couples actual patrol reward to target battles from Lv20"
     console.log("EXP_GROWTH_REPORT="+JSON.stringify(report));
 });
 
-test("V2 final percent sources, naked levels, Calm, Dodge, Wind EX and low-HP cap",()=>{
+test("V2 final percent sources, naked levels, Calm, Dodge and Wind EX low-HP evasion",()=>{
     const runtime=loadFinalRuntime();
     const evidence=evaluateJson(runtime.context,`(()=>{
         player.element="wind";player.level=100;player.activeBuffs=[];player.statusEffects=[];
@@ -1625,17 +1625,60 @@ test("V2 final percent sources, naked levels, Calm, Dodge, Wind EX and low-HP ca
         player.hp=getMainCharacterStats().maxHP;
         const wind={accuracy:getFinalAccuracyBonusPercent(player),evasion:getMainCharacterStats().evasion};
         player.hp=1;
-        const cap=calculateHitChancePercent(1000,0,0,0,player);
+        const lowEvasion=getMainCharacterStats().evasion;
+        const highAccuracyHit=calculateHitChancePercent(1000,lowEvasion,0,0,player);
         characterSkillLoadouts.fire.skillLevels.windEX=0;
         const naked=[1,100].map(level=>{player.level=level;return calculateHitChancePercent(getMainCharacterStats().accuracy,MonsterBalance.build({monsterKey:"test",name:"QA",level,element:"fire",archetype:"balanced",mode:"wild",rank:"regular",context:"wild/test"}).evasion,0,0);});
         const calm=[5,10,15,20,25].map(value=>{player.activeBuffs=[{type:"dinghaishenzhen",turnsLeft:3,accuracyBonusPercent:value}];return [getMainCharacterStats().accuracy,getFinalAccuracyBonusPercent(player),calculateHitChancePercent(0,40,0,getFinalAccuracyBonusPercent(player))];});
         const dodge=[5,10,15,20,25].map(value=>{player.activeBuffs=[{type:"dodgeSkill",turnsLeft:3,percent:value}];return getMainCharacterStats().evasion;});
-        return {wind,cap,naked,calm,dodge};
+        return {wind,lowEvasion,highAccuracyHit,naked,calm,dodge};
     })()`);
-    assert.deepEqual(evidence.wind,{accuracy:15,evasion:15});assert.equal(evidence.cap,50);
+    assert.deepEqual(evidence.wind,{accuracy:15,evasion:15});assert.equal(evidence.lowEvasion,65);assert.equal(evidence.highAccuracyHit,99);
     assert.deepEqual(evidence.naked,[95,95]);
     assert.deepEqual(evidence.calm,[5,10,15,20,25].map(v=>[0,v,55+v]));
     assert.deepEqual(evidence.dodge,[5,10,15,20,25]);
+});
+
+test("Wind EX low-HP bonus uses each character's live maxHP, strict boundary and native identity",()=>{
+    const runtime=loadFinalRuntime();
+    const evidence=evaluateJson(runtime.context,`(()=>{
+        player.element="wind";player2=buildAdditionalCharacter("B","wind","male");player3=buildAdditionalCharacter("C","wind","male");
+        registerAdditionalCharacter(2,player2);registerAdditionalCharacter(3,player3);
+        const rows=getExistingPartyIndexes().map(index=>{
+            const p=getPartyCharacterByIndex(index),key=getCharacterSkillKey(p);
+            p.level=100;p.activeBuffs=[];p.statusEffects=[];p.v141TeamBuffs=[];
+            characterEquipment[key]={};if(index===0)characterEquipment.wind=characterEquipment[key];
+            characterSkillLoadouts[key]={skillLevels:{windEX:1},equippedSkills:[]};
+            const max=getPartyBattleStats(index).maxHP;
+            const values=[1,.2499,.25,.2501,1,.2,.25].map(ratio=>{p.hp=max*ratio;const s=getPartyBattleStats(index);return [s.evasion,getFinalAccuracyBonusPercent(p),calculateHitChancePercent(0,s.evasion,0,0,p)];});
+            p.hp=max*.2;p.activeBuffs=[{type:"dodgeSkill",turnsLeft:3,percent:25}];
+            characterEquipment[key]={armor:{stats:{evasion:10}}};if(index===0)characterEquipment.wind=characterEquipment[key];
+            const stacked=getPartyBattleStats(index).evasion;
+            p.statusEffects=[{type:"frostbite",turnsLeft:2}];const frost=getPartyBattleStats(index).evasion;
+            p.activeBuffs=[{type:"dodgeSkill",turnsLeft:0,percent:25}];const expired=getPartyBattleStats(index).evasion;
+            p.activeBuffs=[];p.statusEffects=[];characterEquipment[key]={};if(index===0)characterEquipment.wind=characterEquipment[key];
+            characterSkillLoadouts[key].skillLevels.windEX=0;const unlearned=getPartyBattleStats(index).evasion;
+            characterSkillLoadouts[key].skillLevels.windEX=1;p.element="fire";const foreign=getPartyBattleStats(index).evasion;
+            p.element="wind";p.hp=max;const healed=getPartyBattleStats(index).evasion;
+            // Equipment-derived maxHP changes the threshold immediately.
+            p.hp=max*.3;characterEquipment[key]={armor:{stats:{maxHP:10000}}};if(index===0)characterEquipment.wind=characterEquipment[key];
+            const changedMax=getPartyBattleStats(index);const resized=[changedMax.maxHP>max,changedMax.evasion];
+            characterEquipment[key]={};if(index===0)characterEquipment.wind=characterEquipment[key];p.hp=max;
+            return {index,values,stacked,frost,expired,unlearned,foreign,healed,resized};
+        });
+        const maxes=getExistingPartyIndexes().map(i=>getPartyBattleStats(i).maxHP);
+        player.hp=maxes[0]*.2;player2.hp=maxes[1]*.25;player3.hp=maxes[2];
+        const isolated=getExistingPartyIndexes().map(i=>getPartyBattleStats(i).evasion);
+        return {rows,isolated,description:FourSymbolsSkillSpec.descriptionFor(skillDatabase.windEX),retired:Object.hasOwn(skillDatabase.windEX,"lowHpFinalHitCapPercent")};
+    })()`);
+    assert.equal(evidence.rows.length,3);
+    for(const r of evidence.rows){
+        assert.deepEqual(r.values,[[15,15,80],[65,15,30],[15,15,80],[15,15,80],[15,15,80],[65,15,30],[15,15,80]],"character "+r.index);
+        assert.deepEqual([r.stacked,r.frost,r.expired,r.unlearned,r.foreign,r.healed],[100,75,50,0,0,15]);
+        assert.deepEqual(r.resized,[true,65]);
+    }
+    assert.deepEqual(evidence.isolated,[65,15,15]);assert.equal(evidence.retired,false);
+    assert.match(evidence.description,/25%[\s\S]*額外 \+50%/);assert.doesNotMatch(evidence.description,/命中率最高/);
 });
 
 test("V2 explicit hit fields survive Daily Owner construction and repeated render",()=>{

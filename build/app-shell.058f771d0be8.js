@@ -2513,6 +2513,16 @@ function getRelicFinalEvasionPercent(character){
         ?Number(window.v174GetRelicFinalEvasionPercent(index))||0:0;
 }
 
+/* Derive the native EX bonus from current HP and the already settled maxHP.
+   Do not call a stats getter here: those getters own this projection. */
+function getWindEXFinalEvasionBonusPercent(character,maxHP){
+    const ex=getLearnedElementEX(character,"wind");
+    if(!ex){ return 0; }
+    const lowHp=Number(maxHP)>0&&Number(character.hp)<Number(maxHP)*0.25;
+    return (Number(ex.evasionBonusPercent)||0)+
+        (lowHp?Number(ex.lowHpEvasionBonusPercent)||0:0);
+}
+
 /* =====================================================
    主角最終能力
 ===================================================== */
@@ -2521,20 +2531,20 @@ function getMainCharacterStats(){
     const bonus=getEquipmentBonus(player.element);
     const base=calculateCharacterBaseStats(player,bonus);
     const characterKey=getCharacterSkillKey(player);
-    const windEXLevel=characterKey?getSkillLevel(characterKey,"windEX"):0;
     const earthEXLevel=characterKey?getSkillLevel(characterKey,"earthEX"):0;
     const evasionBuffPercent=getActiveBuffPercent(player,"dodgeSkill");
     const defenseBuffPercent=getActiveBuffPercent(player,"rockWall");
     const defenseDownPercent=getPlayerDefenseDownPercent(player);
     const maxHpPassiveMultiplier=earthEXLevel>0?Math.max(1,Number(skillDatabase.earthEX.maxHpMultiplier)||1):1;
+    const maxHP=Math.round(base.maxHP*maxHpPassiveMultiplier);
     const rawDefense=base.defense;
     const buffedDefense=rawDefense*(1+(defenseBuffPercent+(earthEXLevel>0?Number(skillDatabase.earthEX.defenseBonusPercent)||0:0))/100);
     return {
         ...base,
-        maxHP:Math.round(base.maxHP*maxHpPassiveMultiplier),
+        maxHP:maxHP,
         defense:Math.max(0,Math.round(buffedDefense*(1-defenseDownPercent/100))),
         accuracy:base.accuracy,
-        evasion:combineEvasionRates([base.evasion,evasionBuffPercent,windEXLevel>0?Number(skillDatabase.windEX.evasionBonusPercent)||0:0,getRelicFinalEvasionPercent(player),-getFrostbiteFinalPercentPointPenalty(player)])
+        evasion:combineEvasionRates([base.evasion,evasionBuffPercent,getWindEXFinalEvasionBonusPercent(player,maxHP),getRelicFinalEvasionPercent(player),-getFrostbiteFinalPercentPointPenalty(player)])
     };
 }
 
@@ -2611,20 +2621,20 @@ function hasActiveBuff(
 function getAdditionalCharacterBattleStats(character,characterKey){
     const bonus=getEquipmentBonus(characterKey);
     const base=calculateCharacterBaseStats(character,bonus);
-        const windEXLevel=characterKey?getSkillLevel(characterKey,"windEX"):0;
     const earthEXLevel=characterKey?getSkillLevel(characterKey,"earthEX"):0;
     const evasionBuffPercent=getActiveBuffPercent(character,"dodgeSkill");
     const defenseBuffPercent=getActiveBuffPercent(character,"rockWall");
     const defenseDownPercent=getPlayerDefenseDownPercent(character);
     const maxHpPassiveMultiplier=earthEXLevel>0?Math.max(1,Number(skillDatabase.earthEX.maxHpMultiplier)||1):1;
+    const maxHP=Math.round(base.maxHP*maxHpPassiveMultiplier);
     const rawDefense=base.defense;
     const buffedDefense=rawDefense*(1+(defenseBuffPercent+(earthEXLevel>0?Number(skillDatabase.earthEX.defenseBonusPercent)||0:0))/100);
     return {
         ...base,
-        maxHP:Math.round(base.maxHP*maxHpPassiveMultiplier),
+        maxHP:maxHP,
         defense:Math.max(0,Math.round(buffedDefense*(1-defenseDownPercent/100))),
         accuracy:base.accuracy,
-        evasion:combineEvasionRates([base.evasion,evasionBuffPercent,windEXLevel>0?Number(skillDatabase.windEX.evasionBonusPercent)||0:0,getRelicFinalEvasionPercent(character),-getFrostbiteFinalPercentPointPenalty(character)])
+        evasion:combineEvasionRates([base.evasion,evasionBuffPercent,getWindEXFinalEvasionBonusPercent(character,maxHP),getRelicFinalEvasionPercent(character),-getFrostbiteFinalPercentPointPenalty(character)])
     };
 }
 
@@ -2972,7 +2982,8 @@ const skillDatabase = {
     windEX:{
         id:"windEX", name:"風元素EX", element:"wind", category:"passive", targetType:"none",
         learnCost:25, maxLevel:1,
-        description:"永久提升風元素角色的閃躲率15%。", evasionBonusPercent:15
+        description:"最終閃躲 +15%、最終命中 +15%；自身 HP 低於最大 HP 的 25% 時，最終閃躲額外 +50%。",
+        evasionBonusPercent:15,accuracyBonusPercent:15,lowHpEvasionBonusPercent:50
     },
 
     /* ===== 土系：物理 ===== */
@@ -13715,12 +13726,7 @@ function calculateHitChancePercent(
         HIT_CHANCE_MIN_PERCENT,
         Math.min(HIT_CHANCE_MAX_PERCENT,chance)
     );
-    const windEx=targetCharacter&&targetCharacter.element==="wind"
-        ?getLearnedElementEX(targetCharacter,"wind"):null;
-    const lowHp=targetCharacter&&Number(targetCharacter.hp)<Number(getPartyBattleStats(getPartyCharacterIndex(targetCharacter))?.maxHP)*0.25;
-    return windEx&&lowHp
-        ?Math.min(normalFinalChance,Number(windEx.lowHpFinalHitCapPercent)||50)
-        :normalFinalChance;
+    return normalFinalChance;
 }
 
 function rollHitChance(

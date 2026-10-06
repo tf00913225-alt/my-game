@@ -134,6 +134,7 @@ jobs:
       - name: Run deployed battle layout and VFX live QA
         run: |
           QA_BASE_URL="$DEV_BASE_URL" node .github/scripts/run-battle-target-lifecycle-browser-qa.mjs
+          QA_BASE_URL="$DEV_BASE_URL" node .github/scripts/run-hit-evasion-v2-browser-qa.mjs
           node .github/scripts/battle-layer-audio-live-qa.mjs
           DAILY_BALANCE_BASE_URL="$DEV_BASE_URL" node .github/scripts/run-daily-balance-browser-qa.mjs
 
@@ -148,6 +149,7 @@ jobs:
             artifacts/browser-qa/battle-layer-element-box-mobile.png
             artifacts/browser-qa/daily-balance*
             artifacts/browser-qa/battle-target-*
+            artifacts/browser-qa/hit-evasion-v2*
           if-no-files-found: error
           retention-days: 90
 

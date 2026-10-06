@@ -9331,7 +9331,7 @@ ensureFunctionalStyles();runRepairs();
         fireSoulResonance:{momentumBonusByLevel:[12,15,18,21,25]},
         fireEX:{damageBonusPercent:10,critChanceBonusPercent:5,critDamageBonusPercent:25,statusTargetDamageBonusPercent:5},
         waterEX:{lifestealMultiplier:1.2,spDrainMultiplier:1.2,healBonusPercent:15,turnStartCleanseChance:35,statusResistBonus:null},
-        windEX:{evasionBonusPercent:15,accuracyBonusPercent:15,lowHpFinalHitCapPercent:50},
+        windEX:{evasionBonusPercent:15,accuracyBonusPercent:15,lowHpEvasionBonusPercent:50},
         earthEX:{defenseBonusPercent:35,maxHpMultiplier:1.2}
     });
 
@@ -9506,7 +9506,8 @@ ensureFunctionalStyles();runRepairs();
         }
         if(skill.id==="windEX"){
             return "最終閃躲 +"+numeric(skill.evasionBonusPercent)+"%，最終命中 +"+
-                numeric(skill.accuracyBonusPercent)+"%；自身 HP 低於 25% 時，敵方對自己的最終命中率最高為 50%。";
+                numeric(skill.accuracyBonusPercent)+"%；自身 HP 低於最大 HP 的 25% 時，最終閃躲額外 +"+
+                numeric(skill.lowHpEvasionBonusPercent)+"%。";
         }
         if(skill.id==="earthEX"){
             return "永久提升防禦力"+numeric(skill.defenseBonusPercent)+"%、最大HP +"+

@@ -4,6 +4,12 @@ import os from "node:os";
 import path from "node:path";
 import {spawn} from "node:child_process";
 import {ROOT,findChrome,startServer,waitJson,Cdp} from "./runtime-browser-qa-support.mjs";
+const baseUrl=process.env.QA_BASE_URL||"";
+const expected=process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||"local";
+if(baseUrl){
+    const manifest=await (await fetch(baseUrl+"/release-manifest.json",{cache:"no-store"})).json();
+    assert.equal(manifest.commitSha,expected,"live V2 QA must use exact deployed SHA");
+}
 // Uses the existing read-only account transport fixture, production index and
 // all real gameplay bundles. No player/cloud data is read or written.
 const expression=`(async()=>{
@@ -19,7 +25,34 @@ const expression=`(async()=>{
     characterSkillLoadouts.fire={skillLevels:{windEX:1},equippedSkills:[]};
     player.hp=getMainCharacterStats().maxHP;
     const wind={accuracy:getFinalAccuracyBonusPercent(player),evasion:getMainCharacterStats().evasion};
-    player.hp=1;const lowCap=calculateHitChancePercent(1000,0,0,0,player);
+    player.hp=1;const lowEvasion=getMainCharacterStats().evasion;
+    const highAccuracyHit=calculateHitChancePercent(1000,lowEvasion,0,0,player);
+    const savedParty=[player2,player3];
+    player2=buildAdditionalCharacter("Wind B","wind","male");player3=buildAdditionalCharacter("Wind C","wind","male");
+    const windBoundary=getExistingPartyIndexes().map(index=>{
+        const p=getPartyCharacterByIndex(index),key=getCharacterSkillKey(p);
+        p.level=100;p.activeBuffs=[];p.statusEffects=[];p.v141TeamBuffs=[];
+        characterEquipment[key]={};if(index===0)characterEquipment.wind=characterEquipment[key];
+        characterSkillLoadouts[key]={skillLevels:{windEX:1},equippedSkills:[]};
+        const max=getPartyBattleStats(index).maxHP;
+        const values=[1,.2499,.25,.2501,1,.2,.25].map(ratio=>{p.hp=max*ratio;const s=getPartyBattleStats(index);return [s.evasion,getFinalAccuracyBonusPercent(p),calculateHitChancePercent(0,s.evasion,0,0,p)];});
+        p.hp=max*.2;p.activeBuffs=[{type:"dodgeSkill",turnsLeft:3,percent:25}];
+        characterEquipment[key]={armor:{stats:{evasion:10}}};if(index===0)characterEquipment.wind=characterEquipment[key];
+        const stacked=getPartyBattleStats(index).evasion;
+        p.statusEffects=[{type:"frostbite",turnsLeft:2}];const frost=getPartyBattleStats(index).evasion;
+        p.activeBuffs=[{type:"dodgeSkill",turnsLeft:0,percent:25}];const expired=getPartyBattleStats(index).evasion;
+        p.activeBuffs=[];p.statusEffects=[];characterEquipment[key]={};if(index===0)characterEquipment.wind=characterEquipment[key];
+        characterSkillLoadouts[key].skillLevels.windEX=0;const unlearned=getPartyBattleStats(index).evasion;
+        characterSkillLoadouts[key].skillLevels.windEX=1;p.element="fire";const foreign=getPartyBattleStats(index).evasion;
+        p.element="wind";p.hp=max;const healed=getPartyBattleStats(index).evasion;
+        p.hp=max*.3;characterEquipment[key]={armor:{stats:{maxHP:10000}}};if(index===0)characterEquipment.wind=characterEquipment[key];
+        const changedMax=getPartyBattleStats(index);const resized=[changedMax.maxHP>max,changedMax.evasion];
+        characterEquipment[key]={};if(index===0)characterEquipment.wind=characterEquipment[key];p.hp=max;
+        return {index,values,stacked,frost,expired,unlearned,foreign,healed,resized};
+    });
+    const windDescription=FourSymbolsSkillSpec.descriptionFor(skillDatabase.windEX);
+    const retired=Object.hasOwn(skillDatabase.windEX,"lowHpFinalHitCapPercent");
+    [player2,player3]=savedParty;
     characterSkillLoadouts.fire.skillLevels.windEX=0;
     // Explicit Owner fixture replaces the retired ambiguous generic constructor.
     const qaMonster=level=>MonsterBalance.build({monsterKey:"qa.hit-evasion",name:"QA",level,element:"fire",archetype:"balanced",rank:"regular",mode:"wild",context:"qa/hit-evasion"});
@@ -60,10 +93,13 @@ const expression=`(async()=>{
     const endBattle=async()=>{loseBattle();const deadline=Date.now()+8000;while(battleActive&&Date.now()<deadline)await new Promise(r=>setTimeout(r,30));if(battleActive)throw new Error("Battle exit did not finish");player.hp=getMainCharacterStats().maxHP;};
     const waitRelic=async()=>{const deadline=Date.now()+5000;while(!v174RelicDebugState()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,20));if(!v174RelicDebugState())throw new Error("Real relic battle did not initialize: "+JSON.stringify({battleActive,battleToken,turn,observers:Array.from(battleRoundStartObservers).map(fn=>String(fn).slice(0,800)),keys:Array.from(battleRoundBoundaryKeys),startSource:String(startBattle).slice(0,500),turnSource:String(startTurn).slice(0,500),logs:Array.from(document.querySelectorAll(".battle-log")).map(n=>n.textContent)}));};
     const relicOwned=v174RelicSystem.getOwnedState(),loadout=v174RelicSystem.getTeamLoadout();
-    const feather=[],relicFrostbite=[];
+    const feather=[],relicFrostbite=[],featherWind=[];
     for(const level of [1,10,20]){
         Object.assign(relicOwned.relic_qinglan_feather,{unlocked:true,level});loadout.relicId="relic_qinglan_feather";
-        await freshMonsters();await waitRelic();feather.push([getMainCharacterStats().evasion,getPartyBattleStats(0).evasion]);player.statusEffects=[{type:"frostbite",turnsLeft:2}];relicFrostbite.push([getMainCharacterStats().evasion,getPartyBattleStats(0).evasion]);player.statusEffects=[];await endBattle();
+        await freshMonsters();await waitRelic();feather.push([getMainCharacterStats().evasion,getPartyBattleStats(0).evasion]);player.statusEffects=[{type:"frostbite",turnsLeft:2}];relicFrostbite.push([getMainCharacterStats().evasion,getPartyBattleStats(0).evasion]);
+        characterSkillLoadouts.fire.skillLevels.windEX=1;player.hp=1;
+        featherWind.push([getMainCharacterStats().evasion,getPartyBattleStats(0).evasion]);
+        characterSkillLoadouts.fire.skillLevels.windEX=0;player.statusEffects=[];await endBattle();
     }
     const bell=[];
     for(const level of [10,20]){
@@ -105,11 +141,15 @@ const expression=`(async()=>{
         if(autoBattle)toggleAutoBattle();combat.autoResolution=calls.splice(0).filter(call=>call.side==="player");
         await endBattle();await freshMonsters();calls.splice(0);
         monsters[0].skillChance=0;monsters[0].skill=null;monsters[0].skills=[];processSingleMonsterAttack(0,battleToken);combat.monster=calls.splice(0);
-    }finally{calculateHitChancePercent=owner;await endBattle();}
-    return {wind,lowCap,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,legacyArmor,tower,frostbite,feather,relicFrostbite,bell,blessing,combat,casts,
+        await endBattle();await freshMonsters();calls.splice(0);characterSkillLoadouts.fire.skillLevels.windEX=1;player.hp=getMainCharacterStats().maxHP*.2;
+        monsters[0].skillChance=0;monsters[0].skillIds=[];processSingleMonsterAttack(0,battleToken);combat.windLowNormal=calls.splice(0).filter(c=>c.side==="monster");
+        await endBattle();await freshMonsters();calls.splice(0);player.hp=getMainCharacterStats().maxHP*.2;
+        monsters[0].sp=1000;monsters[0].skillChance=1;monsters[0].skillIds=["fireCritical"];processSingleMonsterAttack(0,battleToken);combat.windLowSkill=calls.splice(0).filter(c=>c.side==="monster");
+    }finally{calculateHitChancePercent=owner;characterSkillLoadouts.fire.skillLevels.windEX=0;await endBattle();}
+    return {wind,lowEvasion,highAccuracyHit,windBoundary,windDescription,retired,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,legacyArmor,tower,frostbite,feather,relicFrostbite,featherWind,bell,blessing,combat,casts,
         formula:[calculateHitChancePercent(0,0,0,0),calculateHitChancePercent(10,0,0,0),calculateHitChancePercent(10,40,0,0),calculateHitChancePercent(0,40,0,0),calculateHitChancePercent(0,1000,0,0)]};
 })()`;
-const server=await startServer();
+const server=await startServer({baseUrl});
 const profile=fs.mkdtempSync(path.join(os.tmpdir(),"hit-evasion-v2-"));
 const port=9750+Math.floor(Math.random()*200);
 const proc=spawn(findChrome(),["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--remote-debugging-port="+port,"--user-data-dir="+profile,"about:blank"],{stdio:"ignore"});
@@ -123,7 +163,13 @@ try{
     await client.send("Emulation.setDeviceMetricsOverride",{width:393,height:873,deviceScaleFactor:1,mobile:true});
     await client.send("Page.navigate",{url:server.url});
     evidence=await client.eval(expression);
-    assert.deepEqual(evidence.wind,{accuracy:15,evasion:15});assert.equal(evidence.lowCap,50);
+    assert.deepEqual(evidence.wind,{accuracy:15,evasion:15});assert.equal(evidence.lowEvasion,65);assert.equal(evidence.highAccuracyHit,99);
+    assert.equal(evidence.windBoundary.length,3);
+    for(const r of evidence.windBoundary){
+        assert.deepEqual(r.values,[[15,15,80],[65,15,30],[15,15,80],[15,15,80],[15,15,80],[65,15,30],[15,15,80]],"character "+r.index);
+        assert.deepEqual([r.stacked,r.frost,r.expired,r.unlearned,r.foreign,r.healed],[100,75,50,0,0,15]);assert.deepEqual(r.resized,[true,65]);
+    }
+    assert.equal(evidence.retired,false);assert.match(evidence.windDescription,/25%[\s\S]*額外 \+50%/);assert.doesNotMatch(evidence.windDescription,/命中率最高/);
     assert.deepEqual(evidence.levels,[{hit:95,evasion:0},{hit:95,evasion:0}]);
     assert.deepEqual(evidence.calm,[5,10,15,20,25].map(v=>[0,v,55+v]));
     assert.deepEqual(evidence.dodge,[5,10,15,20,25]);
@@ -135,17 +181,24 @@ try{
     assert.deepEqual(evidence.formula,[95,99,65,55,5]);
     assert.ok(evidence.tower.length>0&&evidence.tower.every(v=>v===15));
     assert.equal(evidence.frostbite,15);assert.deepEqual(evidence.feather,[[8,8],[10,10],[12,12]]);assert.deepEqual(evidence.relicFrostbite,[[0,0],[0,0],[0,0]]);
+    assert.deepEqual(evidence.featherWind,[[48,48],[50,50],[52,52]],"low Wind EX + relic - Frostbite applies once");
     assert.deepEqual(evidence.bell,[{accuracy:0,reduction:5,hit:90},{accuracy:0,reduction:8,hit:87}]);
     for(const values of Object.values(evidence.casts))assert.deepEqual(values,[5,10,15,20,25].map(value=>({value,duration:3,accuracy:0})));
     assert.deepEqual(evidence.blessing,{applied:true,evasion:15,duration:2});
     for(const [mode,calls] of Object.entries(evidence.combat)){assert.ok(calls.length>0,mode+" reaches shared Hit Owner");assert.ok(calls.every(call=>call.chance>=5&&call.chance<=99));}
+    for(const mode of ["windLowNormal","windLowSkill"])assert.ok(evidence.combat[mode].every(c=>c.args[1]===65&&c.chance===30),mode+" uses settled low-HP evasion");
+    const windDetail=await client.eval('closeInventoryCharacterDetail();characterEquipment.fire={};characterEquipment.wind=characterEquipment.fire;characterSkillLoadouts.fire.skillLevels.windEX=1;player.hp=getMainCharacterStats().maxHP*.2;inventoryCharacterIndex=0;showPage("home");openInventoryCharacterDetail();document.getElementById("inventoryCharacterDetailStats").textContent;');
+    assert.match(windDetail,/閃避\s*65\.0%/);
+    const windScreenshot=await client.send("Page.captureScreenshot",{format:"png"});
+    fs.writeFileSync(artifact.replace(/\.json$/,"-wind-low-hp.png"),Buffer.from(windScreenshot.data,"base64"));
+    await client.eval('closeInventoryCharacterDetail();characterSkillLoadouts.fire.skillLevels.windEX=0;player.hp=getMainCharacterStats().maxHP;');
     await client.eval('characterEquipment.fire={armor:'+JSON.stringify(evidence.set.armor)+'};characterEquipment.wind=characterEquipment.fire;inventoryCharacterIndex=0;showPage("home");openInventoryCharacterDetail();');
     const screenshot=await client.send("Page.captureScreenshot",{format:"png"});
     fs.writeFileSync(artifact.replace(/\.json$/,".png"),Buffer.from(screenshot.data,"base64"));
     await client.eval('document.getElementById("inventoryCharacterDetailStats").scrollTop=10000');
     const noteScreenshot=await client.send("Page.captureScreenshot",{format:"png"});
     fs.writeFileSync(artifact.replace(/\.json$/,"-formula.png"),Buffer.from(noteScreenshot.data,"base64"));
-    fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||"local",evidence},null,2)+"\n");
+    fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:expected,baseUrl,evidence,windDetail},null,2)+"\n");
     console.log("V2 production mobile Runtime/UI/Save browser QA passed");
 }catch(error){
     fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),evidence},null,2)+"\n");

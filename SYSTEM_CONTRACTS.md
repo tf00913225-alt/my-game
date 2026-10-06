@@ -93,7 +93,7 @@
 - Character Element = Element DNA：`character.element` 唯一負責元素克制、EX 身份與本命元素身份；普通攻擊與所有玩家技能（包括跨修）均以施放角色 DNA 對目標元素結算克制。
 - Skill Element = Skill Identity：`skill.element` 只負責 VFX、Icon、技能／狀態類型與視覺身份，不得改寫角色 DNA 或元素克制。Skill Category 唯一負責 Physical／Magic 與 Attack／Intelligence 公式。
 - Cross Element：需已學至少一招本命技能；跨修免 `requires`、初學成本 ×2、後續升級仍 1 點；每名角色最多裝備 1 招跨元素技能，存檔／自動配裝／戰鬥 Ready Gate 都必須保留欄位順序中的第一招並自動卸下其餘跨修技能。EX 永遠本命限定。
-- Wind EX：Final Evasion +15%、Final Accuracy +15%；自身 HP <25% 時，正式一般命中公式完成後，對該角色套用 `finalHitChance = min(finalHitChance, 50)`。這是 Special Final Cap，不另設普通 Evasion 上限；HP >=25% 立即失效，且不適用 DoT、Reflect、純 Status Formula、Skill HP Cost 或明確不可閃避機制。
+- Wind EX：本命且已學 EX 的角色常駐 Final Evasion +15%、Final Accuracy +15%；自身 currentHP < finalMaxHP ×0.25 時額外 Final Evasion +50 個百分點，與常駐、閃躲術、裝備、秘寶及凍傷依既有來源加總。HP =25% 不啟動，恢復至 HP >=25% 立即失效；每名角色獨立依即時 HP／最大 HP 計算。唯一投影 `js/00-main.js::getWindEXFinalEvasionBonusPercent()` 由既有角色數值 Getter 使用，不讀回 Getter、不建立 Buff／State／Timer。舊敵方命中率50%上限已退休；正常命中公式仍統一 clamp 5%～99%，不新增 Evasion 上限，不改 DoT、Reflect、純 Status Formula、Skill HP Cost 或明確不可閃避機制。
 
 - 玩家四元素「主要效果包含直接傷害」技能的正式傷害曲線唯一 owner 為 `js/00-main.js::getSkillDamageAtLevel()`。Lv1 使用 `baseDamage`；Lv2～4 依 `damagePerLevel` 線性增加；Lv5 = Lv4 × 1.5；Lv6～9 再依固定成長增加；Lv10 = Lv9 × 1.5。突破與最終傷害取整統一使用正式戰鬥 `Math.round` 語意。
 - 玩家直接傷害技能正式上限為 Lv10；純 Buff／Heal／Revive／Control／Support／EX 不得因本規則被誤升 Lv10。既有玩家已學等級必須原值保留，Max Lv 提升不得重置、退點、自動補滿或重複扣點。
@@ -210,7 +210,7 @@
 
 ## Hit / Evasion Percentage-Point V2（2026-10-02）
 
-- Base Hit Chance = 95%；Base Extra Accuracy = 0%；Base Evasion = 0%。Accuracy 10% 直接令 Final Hit Chance +10%；Evasion 10% 直接令 Final Hit Chance -10%。同一 Hit Owner 最後 clamp 5%～99%，Wind EX 低血量特殊上限 50% 保留。等級與等級差不影響 Hit / Evasion；普通／精英／Boss 不因等級派生閃避。風系四象塔明確 +8% 保留。
+- Base Hit Chance = 95%；Base Extra Accuracy = 0%；Base Evasion = 0%。Accuracy 10% 直接令 Final Hit Chance +10%；Evasion 10% 直接令 Final Hit Chance -10%。同一 Hit Owner 最後 clamp 5%～99%；Wind EX 殘血額外 Final Evasion +50%，沿用上述角色來源投影。等級與等級差不影響 Hit / Evasion；普通／精英／Boss 不因等級派生閃避。風系四象塔明確 +8% 保留。
 - 四象鎧甲／袍 Base Evasion +10%，同系列 3 件套額外 Evasion +2%；其他能力不變，不新增普通裝備／重鑄詞條池。
 - 裝備單位遷移唯一 Owner：`functions/src/equipment-combat-percent-migration.js`；App Shell 在主 Runtime 前載入，同一實作供後端 review projection 使用。`equipmentCombatPercentUnitVersion:2` 是每件裝備的單位標記，stats/reforgeStats 一起原子遷移且重複載入不再換算。
 - 開工 dev 所有正式裝備 Accuracy 來源只有四象 armor/robe Base 10 與 V1 Spirit mapping；沒有普通生成／重鑄 Accuracy pool。無版本裝備先分離明確四象 Base 10→Evasion 10，剩餘舊 Equipment Accuracy 按 legacy point unit ×0.15 換算；尚存在 Spirit 時每點直接 +0.3% Accuracy/+0.1% Anti-Crit/+0.05% Status Resistance，再移除 Spirit。新定義／生成装備明確標记版本 2。不得將此遷移用於角色、怪物、技能或 Buff Accuracy。

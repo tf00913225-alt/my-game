@@ -15,11 +15,11 @@
     "buildInitiativeQueue": "ccedc22d75a57cbba999548760cddc9cc6d8cfe84179a963fab6c61d22d3dc53",
     "getMonsterAgility": "bd75fef258f9e1b7e3a0ca22755a5f00bde684c7645bd602bf91c3a26710c179",
     "getMonsterAccuracy": "e8ada45048b2418f59aaaa4dec510ec7ca6207e9b8e8d3fca9a0bf00ae9b4eef",
-    "calculateHitChancePercent": "c7d45b4c65a986cc6826a6c286fd153b27db29cb5fe9ee00c5d2eb772f00780e",
+    "calculateHitChancePercent": "8691b66a68926e30b35cbc8030a79e686ee26a5f2ead89754df13feebc01b5b6",
     "rollHitChance": "7e25079920606c8178531a2717360ae1820aaae116b6866a64a2be0bd58db805",
     "rollBeginnerForestNormalAttackDamage": "d69f138dc4a94512bee6dcce6dcf740fec3021e73ef2c9658ff7020c77f8ca50"
   },
-  "rulesSha256": "17c163b13e9025d479e7a4d65920fa488ffc766b937f1cf1b3b3dad094525459",
+  "rulesSha256": "309a328ebed071785852dbad031477b03aa2bbaa7bfca67a40aea714ac14889f",
   "combatRulesReady": false,
   "outcomeVerified": false,
   "rewardEligible": false
