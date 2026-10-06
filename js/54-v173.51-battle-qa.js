@@ -103,12 +103,7 @@ function syncResourceNumbers(){
     });
     document.querySelectorAll("#battlePage .battle-monster[id^='battleMonster']").forEach(card=>{
         const index=Number(String(card.id).replace("battleMonster",""));
-        let monster=null;
-        try{if(Number.isInteger(index)&&typeof monsters!=="undefined")monster=monsters[index];}catch(_){}
-        if(!monster)return;
-        const hp=card.querySelector(".monster-hp .monster-bar-text"),sp=card.querySelector(".monster-sp .monster-bar-text");
-        setTextIfChanged(hp,String(numericValue(monster.hp)));
-        setTextIfChanged(sp,String(numericValue(monster.sp)));
+        if(Number.isInteger(index))syncEnemyResourceHud(index);
     });
 }
 function syncBattlePresentation(){

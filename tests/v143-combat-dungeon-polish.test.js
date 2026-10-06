@@ -186,6 +186,8 @@ test("earth shield is raster-owned while ally targeting and Barrier rules remain
 });
 
 test("monster Barrier dynamically blocks a direct hit and consumes exactly one charge",()=>{
+    const main=fs.readFileSync("js/00-main.js","utf8");
+    const resourceOwner=main.slice(main.indexOf("function projectEnemyResource("),main.indexOf("function applyMonsterUiUpdate("));
     let visualHits=0;
     const context={
         window:null,console,Math,Date,Event:function(){},
@@ -203,7 +205,9 @@ test("monster Barrier dynamically blocks a direct hit and consumes exactly one c
         }
     };
     context.window=context;
+    context.$=id=>context.document.getElementById(id);
     vm.createContext(context);
+    vm.runInContext(resourceOwner,context);
     vm.runInContext(system,context);
     const monster={name:"東帝",alive:true,maxHP:100,hp:100,activeBuffs:[]};
     context.monsters[0]=monster;

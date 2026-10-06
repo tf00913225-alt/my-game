@@ -879,11 +879,10 @@
         const hpPercent=health/total*100;
         const shieldPercent=current/total*100;
         const hpInner=hpBar.querySelector(":scope > .monster-hp-inner");
-        const label=hpBar.querySelector(":scope > .monster-bar-text");
         if(hpInner){ hpInner.style.width=hpPercent+"%"; }
         shieldOverlay.style.left=hpPercent+"%";
         shieldOverlay.style.width=shieldPercent+"%";
-        if(label){ label.textContent=Math.floor(health)+" / "+Math.floor(maximum); }
+        syncEnemyResourceHud(index);
     }
 
     function objectDefinition(type){

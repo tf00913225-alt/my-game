@@ -22340,9 +22340,9 @@ function openBattleStatusDetailModal(side,index){
 
     const modal=ensureBattleStatusDetailModal();
     const stats=!isMonster&&typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
-    const maxHP=isMonster?Number(entity.maxHP)||Math.max(1,Number(entity.hp)||1):
+    const maxHP=isMonster?entity.maxHP:
         Number(stats&&stats.maxHP)||Number(entity.maxHP)||Math.max(1,Number(entity.hp)||1);
-    const maxSP=isMonster?Number(entity.maxSP)||Math.max(0,Number(entity.sp)||0):
+    const maxSP=isMonster?entity.maxSP:
         Number(stats&&stats.maxSP)||Number(entity.maxSP)||Math.max(0,Number(entity.sp)||0);
     const summary=typeof window.v143GetBattleStatusSummary==="function"
         ?window.v143GetBattleStatusSummary(entity)
@@ -22350,8 +22350,8 @@ function openBattleStatusDetailModal(side,index){
     const fields={
         element:"元素："+battleStatusElementLabel(entity),
         name:"名稱："+String(entity.name||entity.id||"角色"),
-        hp:"HP："+Math.max(0,Number(entity.hp)||0)+" / "+maxHP,
-        sp:"SP："+Math.max(0,Number(entity.sp)||0)+" / "+maxSP
+        hp:"HP："+(isMonster?projectEnemyResource(entity.hp,maxHP).text:Math.max(0,Number(entity.hp)||0)+" / "+maxHP),
+        sp:"SP："+(isMonster?projectEnemyResource(entity.sp,maxSP).text:Math.max(0,Number(entity.sp)||0)+" / "+maxSP)
     };
     Object.keys(fields).forEach(key=>{
         const node=modal.querySelector('[data-field="'+key+'"]');
@@ -22567,6 +22567,32 @@ function runBattleMonsterUiHook(name,index,monster){
     }
 }
 
+/* Enemy presentation only: retain settlement precision and the existing Boss /
+   barrier floor semantics. Ratios always use the unrounded, bounded resources. */
+function projectEnemyResource(value,maximum){
+    const rawMaximum=Number(maximum);
+    const max=Number.isFinite(rawMaximum)?Math.max(0,rawMaximum):0;
+    const rawCurrent=Number(value);
+    const current=Number.isFinite(rawCurrent)?Math.max(0,Math.min(max,rawCurrent)):0;
+    return {
+        current:Math.floor(current),
+        maximum:Math.floor(max),
+        text:Math.floor(current)+" / "+Math.floor(max),
+        percent:max>0?current/max*100:0
+    };
+}
+
+function syncEnemyResourceHud(index){
+    const monster=monsters[index];
+    if(!monster){ return; }
+    const hpText=$("battleMonsterHPText"+index);
+    const spText=$("battleMonsterSPText"+index);
+    const hp=String(projectEnemyResource(monster.hp,monster.maxHP).current);
+    const sp=String(projectEnemyResource(monster.sp,monster.maxSP).current);
+    if(hpText&&hpText.textContent!==hp){ hpText.textContent=hp; }
+    if(spText&&spText.textContent!==sp){ spText.textContent=sp; }
+}
+
 function applyMonsterUiUpdate(index){
 
     const monster=monsters[index];
@@ -22578,24 +22604,16 @@ function applyMonsterUiUpdate(index){
 
     const hpBar=$("battleMonsterBar"+index);
     const spBar=$("battleMonsterSPBar"+index);
-    const hpText=$("battleMonsterHPText"+index);
-    const spText=$("battleMonsterSPText"+index);
 
     if(hpBar){
-        hpBar.style.width=(monster.hp/monster.maxHP*100)+"%";
+        hpBar.style.width=projectEnemyResource(monster.hp,monster.maxHP).percent+"%";
     }
 
     if(spBar){
-        spBar.style.width=(monster.sp/monster.maxSP*100)+"%";
+        spBar.style.width=projectEnemyResource(monster.sp,monster.maxSP).percent+"%";
     }
 
-    if(hpText){
-        hpText.textContent=monster.hp+"/"+monster.maxHP;
-    }
-
-    if(spText){
-        spText.textContent=monster.sp+"/"+monster.maxSP;
-    }
+    syncEnemyResourceHud(index);
 
     runBattleMonsterUiHook("v141AfterMonsterUiUpdate",index,monster);
     runBattleMonsterUiHook("v143SystemAfterMonsterUiUpdate",index,monster);

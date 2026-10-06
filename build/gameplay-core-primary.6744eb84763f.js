@@ -8557,7 +8557,6 @@
         if(!monster){ return; }
         const normalBar=document.getElementById("battleMonsterBar"+index);
         const shieldBar=document.getElementById("battleMonsterShieldBar"+index);
-        const hpText=document.getElementById("battleMonsterHPText"+index);
         const shield=monster.v141Shield;
         const remaining=shield?Math.max(0,Number(shield.remaining)||0):0;
         if(shield&&remaining>0){
@@ -8569,11 +8568,6 @@
             if(shieldBar){
                 shieldBar.style.left=(baseHp/total*100)+"%";
                 shieldBar.style.width=(visibleShield/total*100)+"%";
-            }
-            if(hpText){
-                hpText.textContent=shield.isBarrier
-                    ?Math.floor(baseHp)+"/"+baseMax+"　結界"
-                    :Math.floor(baseHp)+"/"+baseMax+" +"+Math.floor(remaining);
             }
         }else if(shieldBar){
             shieldBar.style.left="0";
@@ -11367,8 +11361,11 @@
     }
     window.v143AfterBattleRender=v143AfterBattleRender;
     function v143SystemAfterMonsterUiUpdate(index){
+        const monster=typeof monsters!=="undefined"?monsters[index]:null;
+        if(isMonsterBarrier(monster)&&!Number.isFinite(Number(monster.v141Shield.remainingBlocks))){
+            monster.v141Shield.remainingBlocks=3;
+        }
         decorateEnemyCard(index);
-        syncMonsterBarrierText(index);
         const card=document.getElementById("battleMonster"+index);
         if(card){ fitEnemyBars(card); }
     }
@@ -11519,7 +11516,7 @@
                 if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",index,"barrier"); }
                 addBattleLog(monster.name+"的結界抵擋直接傷害（剩餘"+shield.remainingBlocks+"次）。");
                 if(shield.remainingBlocks<=0){ removeMonsterBarrier(monster); }
-                syncMonsterBarrierText(index);
+                syncEnemyResourceHud(index);
                 return;
             }
             /* DOT bypasses Barrier without consuming a block. */
@@ -11528,15 +11525,6 @@
             if(shield.baseHp<=0){ removeMonsterBarrier(monster); monster.hp=0; }
             return previousShowMonsterHit.apply(this,arguments);
         };
-    }
-
-    function syncMonsterBarrierText(index){
-        const monster=typeof monsters!=="undefined"?monsters[index]:null;
-        if(!isMonsterBarrier(monster)){ return; }
-        const shield=monster.v141Shield;
-        if(!Number.isFinite(Number(shield.remainingBlocks))){ shield.remainingBlocks=3; }
-        const text=document.getElementById("battleMonsterHPText"+index);
-        if(text){ text.textContent=Math.floor(numeric(shield.baseHp))+"/"+Math.floor(numeric(shield.baseMaxHP))+" 結界"+shield.remainingBlocks; }
     }
 
     if(typeof window.v141TryMonsterSpecialAction==="function"){
