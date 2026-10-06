@@ -1,12 +1,23 @@
-[eval]:1
-process.stdout.write(require('fs').readFileSync('docs/PERSISTED_STATE_REGISTRY.md','utf8').replace(/\r\n/g,'\n')))
-                                                                                                                 ^
-Expected ';', '}' or <eof>
+# Persisted State Registry — owner inventory
 
-SyntaxError: Unexpected token ')'
-    at makeContextifyScript (node:internal/vm:194:14)
-    at compileScript (node:internal/process/execution:388:10)
-    at evalTypeScript (node:internal/process/execution:260:22)
-    at node:internal/main/eval_string:71:3
+The `four_symbols_game_session_v1:<UID>` bearer credential now uses same-origin `localStorage` so a retained Firebase identity can resume after a mobile tab closes. `js/firebase/firebase-session.js` reads the former per-tab `sessionStorage` value as an upgrade fallback, moves it on a successful write, and clears both on logout; server session validation remains mandatory before every protected operation. It is not a gameplay save or reward source.
 
-Node.js v24.19.0
+Machine-readable source: `config/persisted-state-registry.json` (39 entries as of 2026-09-26). Each record declares key/path, writer/restore owner, storage type, UID/character/account/device scope, gameplay/reward/economy/claim coupling, cloud/backup/migration requirements, authority tier/source, schema, deletion, corruption, default and missing-data behavior. The CI guard `scripts/check-persisted-state-registry.mjs` checks account-key literals, the legacy sidecar map, all current runtime storage writer sites and new IndexedDB usage; additions fail until reviewed. It cannot prove dynamically generated keys or that historical claim data is true; code review still audits indirect persistence helpers and new runtime roots.
+
+The UID main-save key owns three characters, level/EXP/gold, inventory, equipment references, relics, skills and embedded quest/Boss/tower/abyss/claim state. Current claim-bearing sidecars include daily dungeon, progress, milestones, task tracker, legacy/new abyss and equipment shop daily limits. `patrol-character-index` is used by the runtime but was absent from the former `LEGACY_SIDECARS` backup list; it is now included in the backup inventory as a device preference. `equipment-shop-purchases` is a **historical-only reserved key** in `LEGACY_SIDECARS`; repository search found no current runtime writer or reader for its UID key, so `js/51-v169-rpg-ui.js` must not be presented as its active owner. The original legacy key and any translated UID copy remain preserved, while missing or corrupt claim history stays blocked pending explicit reconciliation; it cannot imply an unclaimed reward. `announcement-read`, bulk-sell quality and release notification markers are device-only preferences, although registered for preservation decisions. Existing `LEGACY_SIDECARS` is a legacy key translation map; it is not a complete persistence inventory.
+
+`IndexedDB` is mentioned in broader project plans but no `indexedDB.open`/`createObjectStore` runtime writer was found in the audited `js/` tree. The Firebase SDK's internal Auth persistence is owned by Firebase; it is not an application gameplay store. Firestore paths in the registry describe existing server envelope, candidate and grant reservation/receipt; the canonical schema and disaster backup paths in `CLOUD_CANONICAL_SCHEMA_AND_RECOVERY.md` are designs, not deployed stores.
+
+Tier A: monetary/asset ownership, shop/claim state, protected grants and receipts. Tier B: normal gameplay progression and run settlements; a future server validates reward sources without every battle action crossing the network. Tier C: UI/device settings, session cache and notification/asset cache. A locally stored Tier A label states *required future authority*, not that the present client state has become trusted. Until the full character is recoverable, no more preference-sync expansion should count as Phase 4 progress.
+
+Adding persistence: add the new state with all required metadata; register the backup/restore policy; if it is a UID sidecar, update the backup inventory and account-switch tests; update the writer-site guard after inspecting the new write; add a targeted restore/reward test. The CI guard also rejects direct literal keys, unreviewed dynamic `accountKey` suffixes and activation of historical-only `equipment-shop-purchases`. If the key is temporary, explicitly mark `deviceOnly` and safe default. Never silently map absent reward history to claimable.
+
+
+### Protected restricted Forest instance establishment (2026-10-05)
+
+Three private instance/consumption/policy paths are registered under canonical-restricted-battle.js, authority Tier B, backupRequired true. Corruption/missing evidence blocks progression/replay; no defaults regenerate instances or entitlements. Existing operations path retains the receipt. No TTL/deletion/restore writer is enabled. Full lifecycle/input/policy/backup boundaries are owned by `CLOUD_OPERATION_SETTLEMENT_CONTRACT.md`, same-named section; latest execution status is PR #802.
+
+
+### Protected restricted round history (2026-10-06)
+
+The private restrictedBattleRounds/{attemptId}_{roundVersion} path and existing restrictedBattleAttempts roundHead are registered under canonical-restricted-battle.js with Tier B authority and required backup retention. Full input/lifecycle/replay/backup boundaries are owned by CLOUD_OPERATION_SETTLEMENT_CONTRACT.md, section Protected restricted normal-round writer. No delete/restore writer or client access is enabled.
