@@ -1140,6 +1140,6 @@ jobs:
   deploy_dev:
     name: Dev deployment gate
     needs: verify
-    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    if: ${{ !cancelled() && needs.verify.result == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/dev' }}
     uses: ./.github/workflows/deploy-dev-cloudflare.yml
     secrets: inherit
