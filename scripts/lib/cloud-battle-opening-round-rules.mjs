@@ -11,7 +11,7 @@ export function buildForestOpeningRoundRules(root){
   const declarations={};
   const constants=['HIT_CHANCE_BASE','HIT_CHANCE_MIN_PERCENT','HIT_CHANCE_MAX_PERCENT'];
   const functions=['buildInitiativeQueue','getMonsterAgility','getMonsterAccuracy',
-    'calculateHitChancePercent','rollHitChance'];
+    'calculateHitChancePercent','rollHitChance','emitCombatEvent'];
   for(const name of [...constants,...functions]){
     const pattern=constants.includes(name)?'^const '+name+'\\s*=\\s*[\\s\\S]*?;'
       :'^function '+name+'\\([\\s\\S]*?^\\}';
@@ -43,7 +43,7 @@ export function buildForestOpeningRoundRules(root){
   // Exact browser owners, with zero-modifier bindings valid only after the
   // existing plain-player admission gate. Two combatants only: the browser
   // random sort comparator is intentionally not generalized to larger rosters.
-  const code=`// GENERATED from js/00-main.js by production build. DO NOT EDIT.\n"use strict";\nfunction createForestOpeningRoundRules(player,stats,enemy,random){\n    const Math=Object.create(globalThis.Math);\n    Math.random=random;\n    const getExistingPartyIndexes=()=>[0];\n    const getPartyCharacterByIndex=index=>index===0?player:null;\n    const getPartyBattleStats=()=>stats;\n    const getPartyCharacterIndex=entity=>entity===player?0:-1;\n    const getLearnedElementEX=()=>null;\n    const getMonsterDebuffValue=()=>0;\n    const getStatDownPercentFor=()=>0;\n    const currentBattleMonsters=[0];\n    const monsters=[enemy];\n${Object.values(declarations).join('\n\n')}\n    return Object.freeze({\n        initiative:()=>buildInitiativeQueue(),\n        enemyHit:()=>rollHitChance(getMonsterAccuracy(enemy),stats.evasion,0,0,player),\n        enemyDamage:()=>rollBeginnerForestNormalAttackDamage()\n    });\n}\nmodule.exports={createForestOpeningRoundRules};\n`;
+  const code=`// GENERATED from js/00-main.js by production build. DO NOT EDIT.\n"use strict";\nfunction createForestOpeningRoundRules(player,stats,enemy,random){\n    const Math=Object.create(globalThis.Math);\n    Math.random=random;\n    const getExistingPartyIndexes=()=>[0];\n    const getPartyCharacterByIndex=index=>index===0?player:null;\n    const getPartyBattleStats=()=>stats;\n    const getPartyCharacterIndex=entity=>entity===player?0:-1;\n    const getLearnedElementEX=()=>null;\n    const getMonsterDebuffValue=()=>0;\n    const getStatDownPercentFor=()=>0;\n    const currentBattleMonsters=[0];\n    const monsters=[enemy];\n    const combatEventObservers=new Map();\n${Object.values(declarations).join('\n\n')}\n    return Object.freeze({\n        initiative:()=>buildInitiativeQueue(),\n        enemyHit:()=>rollHitChance(getMonsterAccuracy(enemy),stats.evasion,0,0,player),\n        enemyDamage:()=>rollBeginnerForestNormalAttackDamage()\n    });\n}\nmodule.exports={createForestOpeningRoundRules};\n`;
   const policy={schemaVersion:1,policyId:'forest-opening-round-v1',
     scope:'two-combatant-declared-normal-attacks-first-round-arithmetic-only',sourceOwner:'js/00-main.js',tutorialDamageOwner:tuningPath,
     compatibilityDigests:Object.fromEntries(['js/40-v144-rules-and-abyss.js',tuningPath].map(file=>

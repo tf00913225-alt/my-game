@@ -50,12 +50,12 @@ function oracle(args,tape){
   const stats=playerAttack({...sources,randomTape:[0.999999999999]}).playerStats;
   let cursor=0;
   const randomMath=Object.assign(Object.create(Math),{random:()=>tape[cursor++]});
-  const context=vm.createContext({Math:randomMath,player:character,currentBattleMonsters:[0],monsters:[enemy],
+  const context=vm.createContext({Math:randomMath,combatEventObservers:new Map(),player:character,currentBattleMonsters:[0],monsters:[enemy],
     getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:()=>character,
     getPartyBattleStats:()=>stats,getPartyCharacterIndex:e=>e===character?0:-1,
     getLearnedElementEX:()=>null,getMonsterDebuffValue:()=>0,getStatDownPercentFor:()=>0});
   const functions=['buildInitiativeQueue','getMonsterAgility','getMonsterAccuracy',
-    'calculateHitChancePercent','rollHitChance','rollBeginnerForestNormalAttackDamage'];
+    'calculateHitChancePercent','rollHitChance','emitCombatEvent','rollBeginnerForestNormalAttackDamage'];
   const constants=['BEGINNER_FOREST_NORMAL_DAMAGE_MIN','BEGINNER_FOREST_NORMAL_DAMAGE_MAX',
     'HIT_CHANCE_BASE','HIT_CHANCE_MIN_PERCENT','HIT_CHANCE_MAX_PERCENT'];
   vm.runInContext([...constants.map(n=>main.match(new RegExp('^const '+n+'\\s*=\\s*[\\s\\S]*?;','m'))[0]),

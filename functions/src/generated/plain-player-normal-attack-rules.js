@@ -152,6 +152,18 @@ function getDamageContextAttacker(options){
     return window.v149CurrentDamageActor||null;
 }
 
+function getBattleDamageSource(options){
+    const context=options||{};
+    const cast=window.FourSymbolsSkillDamageContext;
+    if(context.sourceType){ return context.sourceType; }
+    if(context.damageKind&&context.damageKind!=="direct"){ return context.damageKind; }
+    if(cast&&(!context.attacker||context.attacker===cast.attacker)){
+        return cast.freeCast?"followUp":"activeSkill";
+    }
+    if(context.skill&&context.skill.v149FreeFollowUp){ return "followUp"; }
+    return context.skill?"activeSkill":"normalAttack";
+}
+
 function getOrdinaryDamageBonusPercent(options){
     const resolved=options&&typeof options==="object"?options:{};
     const attacker=getDamageContextAttacker(resolved);
@@ -246,6 +258,19 @@ function getTowerDirectDamageMultiplier(attacker,damageOptions){
     return attacker&&attacker.vGameplayTower===true&&attacker.canAct!==false&&
         attacker.vGameplayBossObject!==true&&kind==="direct"&&directSkill
         ?Math.max(1,Number(attacker.vTowerDirectDamageMultiplier)||1):1;
+}
+
+function getRelicDirectDamageMultiplier(attacker,target,options){
+    const context=options||{};
+    if(String(context.damageKind||"direct")!=="direct"||
+        ["relic","dot","reflect","environment","self","hpCost"].includes(context.sourceType)||
+        (attacker&&attacker.vGameplayBossObject===true)){ return 1; }
+    const owner=window.v174RelicDamageModifiers;
+    if(!owner){ return 1; }
+    const outgoing=typeof owner.outgoingReduction==="function"?Number(owner.outgoingReduction(attacker))||0:0;
+    void target;
+    const skillFinal=typeof owner.skillFinalBonus==="function"?Number(owner.skillFinalBonus(attacker,getBattleDamageSource(context)))||0:0;
+    return (1-Math.max(0,Math.min(100,outgoing))/100)*(1+Math.max(0,skillFinal)/100);
 }
 
 function calculateDamage(
