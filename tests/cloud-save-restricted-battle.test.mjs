@@ -12,7 +12,7 @@ const {assembleCanonicalSnapshot,claimRecordsDigest:digest}=require('../function
 const {createRecoveryArchive}=require('../functions/src/canonical-recovery-archive');
 const uid='restricted-instance-user',attemptId='restricted-preparation-0001',operationId='restricted-instance-0001';
 const sessionId='s'.repeat(32);
-function fixture({mutate=()=>{},retry=false,entropy=.999999,enemy='wild.zone-01.fire-01'}={}){
+function fixture({mutate=()=>{},retry=false,sentinel=false,entropy=.999999,enemy='wild.zone-01.fire-01'}={}){
   const records=makeInitialCharacterSources(uid,2,'restricted-initial-source-0001',{
     displayName:'場次英雄',element:'fire',gender:'male',
     attributes:{attack:10,intelligence:0,vitality:0,energy:0,defensePoints:0,agility:0}});
@@ -24,7 +24,7 @@ function fixture({mutate=()=>{},retry=false,entropy=.999999,enemy='wild.zone-01.
   const collection=p=>({doc:id=>({path:`${p}/${id}`,collection:n=>collection(`${p}/${id}/${n}`)})});
   let clock=1000,writes=0,entropyCalls=0,clockReads=0,expireOnRead=0,abort=false,active=sessionId;
   class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
-  const deps={db:{collection},FieldValue:{serverTimestamp:()=>({toMillis:()=>123})},HttpsError,now:()=>{clockReads++;if(expireOnRead===clockReads)clock=601000;return clock;},randomBytes:n=>{entropyCalls++;const b=Buffer.alloc(n);
+  const deps={db:{collection},FieldValue:{serverTimestamp:()=>sentinel?{serverTransform:true}:{toMillis:()=>123}},HttpsError,now:()=>{clockReads++;if(expireOnRead===clockReads)clock=601000;return clock;},randomBytes:n=>{entropyCalls++;const b=Buffer.alloc(n);
       for(let i=0;i<n;i+=6)b.writeUIntBE(Math.floor(entropy*281474976710656),i,6);return b;},
     inspectExistingEnvelope:v=>({kind:'current',data:v,serverRevision:v.serverRevision}),
     runProtected:async(request,fn)=>{
@@ -37,7 +37,7 @@ function fixture({mutate=()=>{},retry=false,entropy=.999999,enemy='wild.zone-01.
         const result=await fn(tx,{uid,sessionId:active});return {pending,result};};
       if(retry)await call();
       const {pending,result}=await call();if(abort)throw Error('interrupted instance transaction');
-      for(const [p,v] of pending)data.set(p,v);writes+=pending.length;return result;
+      for(const [p,v] of pending)data.set(p,v.createdAt?.serverTransform?{...v,createdAt:{toMillis:()=>123}}:v);writes+=pending.length;return result;
     }};
   const owner=createCanonicalRestrictedBattle(deps),request={data:{uid,session:{}}};
   const args={attemptId,operationId,expectedRevision:2};
@@ -260,4 +260,11 @@ test('bounded full-chain exhaustion never issues a terminal verdict or permits o
   await assert.rejects(h.owner.advance(h.request,roundArgs(h,128,'restricted-bound-overflow-0001')),e=>e.code==='invalid-argument');
   assert.equal(h.writes,before);
   const replay=await h.owner.advance(h.request,roundArgs(h,0,'restricted-bound-round-0000'));assert.equal(replay.unchanged,true);
+});
+
+test('server timestamp transforms are validated only after commit; missing committed stamps block replay',async()=>{
+  const h=await prepared({sentinel:true}),first=await advance(h);
+  assert.deepEqual(await advance(h),{...first,unchanged:true});
+  const r=h.data.get(h.root+'/restrictedBattleRounds/'+attemptId+'_1');r.createdAt={serverTransform:true};
+  await assert.rejects(advance(h),e=>e.code==='data-loss');assert.equal(h.writes,14);
 });

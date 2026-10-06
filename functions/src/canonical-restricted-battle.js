@@ -209,7 +209,7 @@ function createCanonicalRestrictedBattle(dependencies){
   const roundDigest=v=>digest(Object.fromEntries(roundFields.map(k=>[k,v[k]])));
   const initialRoundState=b=>({round:0,roundVersion:0,playerHP:b.initialState.player.hp,
     playerSP:b.initialState.player.sp,enemyHP:b.initialState.enemy.hp,enemySP:b.initialState.enemy.sp});
-  function inspectRound(r,receipt,b,bundle,priorState,priorHash,version,priorTime){
+  function inspectRound(r,receipt,b,bundle,priorState,priorHash,version,priorTime,committed=true){
     try{
       const p=r?.projection,{sha256,...body}=p||{};
       if(!r||!receipt||r.schemaVersion!==1||r.kind!==roundKind||r.ownerUid!==b.ownerUid||
@@ -221,7 +221,7 @@ function createCanonicalRestrictedBattle(dependencies){
         Object.keys(r.writerPolicy).sort().join('|')!==[...Object.keys(roundPolicyDeclaration),'arithmeticSha256','writerSha256'].sort().join('|')||
         digest(Object.fromEntries(Object.keys(roundPolicyDeclaration).map(k=>[k,r.writerPolicy[k]])))!==digest(roundPolicyDeclaration)||
         r.priorRoundSha256!==priorHash||
-        !noAuthority(r)||r.sha256!==roundDigest(r)||!stamped(r)||!stamped(receipt)||
+        !noAuthority(r)||r.sha256!==roundDigest(r)||(committed&&(!stamped(r)||!stamped(receipt)))||
         digest(Object.fromEntries(Object.keys(roundReceipt(r)).map(k=>[k,receipt[k]])))!==digest(roundReceipt(r))||
         !p||p.schemaVersion!==1||p.kind!=='restricted-forest-round-arithmetic'||!noAuthority(p)||
         sha256!==digest(body)||p.ownerUid!==b.ownerUid||p.sourceRevision!==b.sourceRevision||
@@ -360,7 +360,7 @@ function createCanonicalRestrictedBattle(dependencies){
       }
       const createdAt=FieldValue.serverTimestamp(),receipt=roundReceipt(r);
       inspectRound({...r,createdAt},{...receipt,createdAt},b,bundle,chain.state,chain.hash,
-        expectedRoundVersion+1,chain.time);
+        expectedRoundVersion+1,chain.time,false);
       tx.create(chain.roundRef(expectedRoundVersion+1),{...r,createdAt});
       tx.create(receiptRef,{...receipt,createdAt});
       tx.update(root.collection('restrictedBattleAttempts').doc(attemptId),
