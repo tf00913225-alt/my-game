@@ -20,6 +20,8 @@ Open PR 清單只反映觀測時點。沒有 Open PR 不代表整個子系統已
 
 ## 近期重要架構／migration 結果
 
+- HERO-CORE-PHASE1-20261007 建立 `js/hero-core.js` 唯一英雄 Domain 與既有 UID main-save extension；完整契約／下一階段邊界見 `docs/HERO_SYSTEM_V1.md`。Hero 尚未進入 Battle Runtime，後續 UI／Reward／Equipment／Combat 不得重新計算等級、技能、星級成本或配點。CI／整合即時結果查同 Work ID PR。
+
 - Monster Balance Owner Phase 1–2F 已收斂七模式：Wild、Daily、Tower、Abyss、Adventure、Personal Boss、World Boss。後續平衡校正是新工程，不重開 migration；`docs/MONSTER_BALANCE_OWNER_FINAL.md` 為總結果索引，`SYSTEM_CONTRACTS.md` 的七模式章節為跨模式契約；退場圖 `docs/monster-balance-owner-retirement-map.json`。
 - Level Suppression V2 已採 `1.01 ^ levelDiff`、無人工 cap/floor，唯一 `js/00-main.js::getDamageLevelMultiplier()`；正式規格 `docs/LEVEL_SUPPRESSION_V2_20261005.md` 及 `SYSTEM_CONTRACTS.md` 相關章節。與 Hit／Evasion／Status 分離。
 - Battle target identity 已由 Core snapshot 收斂；PR #804 及後續 Fire #805 已合併。擊殺後追擊只能轉移至原合法存活快照，稍後復活者不加入；規格 `docs/FIRE_FOLLOWUP_LETHAL_RETARGET_20261005.md` 及 `SYSTEM_CONTRACTS.md` 戰鬥目標章節。合併不代表部署／清理已完成，查 PR 最新證據。

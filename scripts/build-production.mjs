@@ -36,6 +36,7 @@ const bootScripts=[
 ];
 const appScripts=[
     "functions/src/equipment-combat-percent-migration.js",
+    "js/hero-core.js",
     "js/00-main.js",
     "js/01-stage-v8-touch-lock.js",
     "js/02-stage-v9-native-coordinate-api.js",
