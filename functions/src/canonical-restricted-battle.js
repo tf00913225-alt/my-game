@@ -46,7 +46,7 @@ function inspectBundle(bundle,sha256,encounterPolicy,encounterKey){
 }
 
 // Internal protected restricted lifecycle. No callable, character writer,
-// verdict or settlement. #791 observations are never consumed here.
+// reward verdict or settlement. #791 observations are never consumed here.
 function createCanonicalRestrictedBattle(dependencies){
   const {db,FieldValue,HttpsError,runProtected,now=Date.now,randomBytes=cryptoRandomBytes}=dependencies;
   const encounters=createCanonicalBattleEncounter(dependencies);
@@ -292,7 +292,14 @@ function createCanonicalRestrictedBattle(dependencies){
       rounds.push(r);state=r.projection.nextState;hash=r.sha256;time=r.committedAtMs;
     }
     if(head&&hash!==head.roundSha256)fail('data-loss','Round head digest is inconsistent.');
-    return {state,hash,time,rounds,roundRef};
+    const terminalSnap=await tx.get(root.collection('restrictedBattleTerminals').doc(b.battleId));
+    const terminal=terminalSnap.exists?terminalSnap.data():null;
+    if(terminal||Object.hasOwn(m,'terminalHead')){
+      const receipt=terminal&&ID.test(terminal.operationId||'')?
+        await tx.get(root.collection('operations').doc(terminal.operationId)):null;
+      inspectTerminal(terminal,receipt?.exists?receipt.data():null,b,{state,hash,time,rounds},m.terminalHead);
+    }
+    return {state,hash,time,rounds,roundRef,terminal};
   }
   async function advance(request,args){
     if(!args||typeof args!=='object'||Array.isArray(args)||
@@ -334,6 +341,7 @@ function createCanonicalRestrictedBattle(dependencies){
         return roundResult(replay,true,time);
       }
       if(receiptSnap.exists)fail('data-loss','Operation receipt lacks matching committed round evidence.');
+      if(chain.terminal)fail('failed-precondition','Restricted terminal evidence already closes this instance.');
       if(expectedRoundVersion!==chain.state.roundVersion)fail('aborted','BATTLE_ROUND_VERSION_CONFLICT');
       if(time<chain.time||time>=b.expiresAtMs)fail('failed-precondition','Battle is outside its original time window.');
       if(!chain.state.playerHP||!chain.state.enemyHP)fail('failed-precondition','Terminal resources cannot advance.');
@@ -374,11 +382,111 @@ function createCanonicalRestrictedBattle(dependencies){
       expiresAtMs:r.expiresAtMs,expired:time>=r.expiresAtMs,unchanged,...flags};
   }
 
+  const terminalKind='restricted-battle-terminal';
+  const terminalDeclaration={schemaVersion:1,policyId:'restricted-terminal-resource-v1',
+    scope:'private-committed-resource-closure',maxRounds:128,...flags};
+  const terminalPolicy={...terminalDeclaration,writerSha256:codeHash(__filename)};
+  const terminalFields=['schemaVersion','kind','ownerUid','operationId','battleId','battleSha256',
+    'sourceRevision','creationSessionId','expiresAtMs','sealedAtMs','policySha256','terminalPolicy',
+    'roundVersion','roundSha256','stateSha256','resourceStatus',...Object.keys(flags)];
+  const terminalDigest=t=>digest(Object.fromEntries(terminalFields.map(k=>[k,t[k]])));
+  // Only committed resource closure. No winner, post-battle effects or grant.
+  const resourceStatus=s=>s.playerHP===0&&s.enemyHP>0?'player-dead':
+    s.enemyHP===0&&s.playerHP>0?'enemy-dead':null;
+  function terminalReceipt(t){
+    return {schemaVersion:1,kind:terminalKind,ownerUid:t.ownerUid,operationId:t.operationId,
+      battleId:t.battleId,sourceRevision:t.sourceRevision,roundVersion:t.roundVersion,
+      terminalSha256:t.sha256,creditedToCharacter:false};
+  }
+  function inspectTerminal(t,receipt,b,chain,head,committed=true){
+    try{
+      const p=t?.terminalPolicy;
+      if(!t||!receipt||!head||t.schemaVersion!==1||t.kind!==terminalKind||t.ownerUid!==b.ownerUid||
+        !ID.test(t.operationId||'')||t.battleId!==b.battleId||t.battleSha256!==b.sha256||
+        t.sourceRevision!==b.sourceRevision||t.creationSessionId!==b.creationSessionId||
+        t.expiresAtMs!==b.expiresAtMs||t.policySha256!==b.policySha256||!noAuthority(t)||
+        !Number.isSafeInteger(t.sealedAtMs)||t.sealedAtMs<chain.time||t.sealedAtMs>=b.expiresAtMs||
+        !chain.rounds.length||t.roundVersion!==chain.state.roundVersion||t.roundSha256!==chain.hash||
+        t.stateSha256!==digest(chain.state)||!resourceStatus(chain.state)||
+        t.resourceStatus!==resourceStatus(chain.state)||t.sha256!==terminalDigest(t)||
+        !p||!HASH.test(p.writerSha256||'')||
+        Object.keys(p).sort().join('|')!==[...Object.keys(terminalDeclaration),'writerSha256'].sort().join('|')||
+        digest(Object.fromEntries(Object.keys(terminalDeclaration).map(k=>[k,p[k]])))!==digest(terminalDeclaration)||
+        digest(head)!==digest({operationId:t.operationId,terminalSha256:t.sha256})||
+        digest(Object.fromEntries(Object.keys(terminalReceipt(t)).map(k=>[k,receipt[k]])))!==digest(terminalReceipt(t))||
+        (committed&&(!stamped(t)||!stamped(receipt))))throw Error('binding');
+    }catch(_){fail('data-loss','Original terminal, receipt or closure marker is inconsistent.');}
+    return t;
+  }
+  async function sealTerminal(request,args){
+    if(!args||typeof args!=='object'||Array.isArray(args)||
+      Object.keys(args).sort().join('|')!=='attemptId|expectedRevision|expectedRoundVersion|operationId'||
+      typeof args.operationId!=='string'||typeof args.attemptId!=='string'||
+      !ID.test(args.operationId)||!ID.test(args.attemptId)||args.operationId===args.attemptId||
+      !Number.isSafeInteger(args.expectedRevision)||args.expectedRevision<1||
+      !Number.isSafeInteger(args.expectedRoundVersion)||args.expectedRoundVersion<1||args.expectedRoundVersion>128||
+      Object.keys(request?.data||{}).some(k=>!['uid','session'].includes(k))){
+      fail('invalid-argument','Only original IDs and expected source/committed round versions are accepted.');
+    }
+    return runProtected(request,async(tx,session)=>{
+      const time=now();
+      if(!Number.isSafeInteger(time)||time<1)fail('internal','Server clock is unavailable.');
+      const {attemptId,operationId,expectedRevision,expectedRoundVersion}=args;
+      const root=db.collection('serverUsers').doc(session.uid);
+      const verified=await readInstance(tx,session,{attemptId,expectedRevision},time);
+      const {battle:b,bundle}=verified,chain=await readRounds(tx,root,verified);
+      const receiptRef=root.collection('operations').doc(operationId);
+      const [receipt,grant,ledger,attempt,account,envelope]=await Promise.all([
+        tx.get(receiptRef),tx.get(root.collection('grantOperations').doc(operationId)),
+        tx.get(root.collection('ledgerEntries').doc(operationId)),tx.get(root.collection('battleAttempts').doc(operationId)),
+        tx.get(root.collection('account').doc('current')),
+        tx.get(db.collection('users').doc(session.uid).collection('saves').doc('current'))]);
+      if(grant.exists||ledger.exists||attempt.exists)fail('failed-precondition','Operation ID is already used.');
+      if(chain.terminal){
+        if(chain.terminal.operationId!==operationId)fail('already-exists','This instance already has terminal evidence.');
+        if(chain.terminal.roundVersion!==expectedRoundVersion)fail('failed-precondition','Operation intent differs.');
+        return terminalResult(chain.terminal,true,time);
+      }
+      if(receipt.exists)fail('data-loss','Operation receipt lacks matching terminal evidence.');
+      if(chain.state.roundVersion!==expectedRoundVersion)fail('aborted','BATTLE_ROUND_VERSION_CONFLICT');
+      if(!resourceStatus(chain.state))fail('failed-precondition','Committed resources are not a supported terminal state.');
+      if(time<chain.time||time>=b.expiresAtMs)fail('failed-precondition','Battle is outside its original time window.');
+      if(account.data()?.serverRevision!==expectedRevision||envelope.data()?.serverRevision!==expectedRevision||
+        account.data()?.snapshotSha256!==b.snapshotSha256)fail('aborted','CLOUD_REVISION_CONFLICT');
+      if(digest(bundle)!==digest({restricted:restrictedPolicy,opening:openingPolicy,player:playerPolicy,encounter:catalog})){
+        fail('failed-precondition','New closure requires the original deployment bundle.');
+      }
+      // Inspect stored v1 round proof; never rerun or reinterpret its formula.
+      const t={schemaVersion:1,kind:terminalKind,ownerUid:session.uid,operationId,battleId:attemptId,
+        battleSha256:b.sha256,sourceRevision:expectedRevision,creationSessionId:session.sessionId,
+        expiresAtMs:b.expiresAtMs,sealedAtMs:time,policySha256:b.policySha256,terminalPolicy:copy(terminalPolicy),
+        roundVersion:expectedRoundVersion,roundSha256:chain.hash,stateSha256:digest(chain.state),
+        resourceStatus:resourceStatus(chain.state),...flags};
+      t.sha256=terminalDigest(t);
+      const head={operationId,terminalSha256:t.sha256},storedReceipt=terminalReceipt(t);
+      inspectTerminal(t,storedReceipt,b,chain,head,false);
+      const commitTime=now();
+      if(!Number.isSafeInteger(commitTime)||commitTime<time||commitTime>=b.expiresAtMs){
+        fail('failed-precondition','Battle expired before terminal commit.');
+      }
+      const createdAt=FieldValue.serverTimestamp();
+      tx.create(root.collection('restrictedBattleTerminals').doc(attemptId),{...t,createdAt});
+      tx.create(receiptRef,{...storedReceipt,createdAt});
+      tx.update(root.collection('restrictedBattleAttempts').doc(attemptId),{terminalHead:head});
+      return terminalResult(t,false,time);
+    });
+  }
+  function terminalResult(t,unchanged,time){
+    return {operationId:t.operationId,battleId:t.battleId,sourceRevision:t.sourceRevision,
+      roundVersion:t.roundVersion,terminalSha256:t.sha256,resourceStatus:t.resourceStatus,
+      expiresAtMs:t.expiresAtMs,expired:time>=t.expiresAtMs,unchanged,...flags};
+  }
+
   function result(b,unchanged,time){
     return {operationId:b.operationId,battleId:b.battleId,sourceRevision:b.sourceRevision,
       battleSha256:b.sha256,policySha256:b.policySha256,status:'PREPARED',round:0,roundVersion:0,
       expiresAtMs:b.expiresAtMs,expired:time>=b.expiresAtMs,unchanged,...flags};
   }
-  return Object.freeze({begin,advance});
+  return Object.freeze({begin,advance,sealTerminal});
 }
 module.exports={createCanonicalRestrictedBattle};
