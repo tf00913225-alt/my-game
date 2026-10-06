@@ -12,7 +12,9 @@ export function selectHealth(response, sha, repository) {
   return {status, runId:Number(status.target_url.slice(prefix.length))};
 }
 export function requireHealthyRun(run, sha) {
-  const devPush=run.path==='.github/workflows/ci.yml' && run.event==='push' && run.head_branch==='dev' && run.head_sha===sha;
+  // Targeted dev push no longer publishes this context. Legacy exact full-push
+  // evidence remains valid; manual CI is always full and records the context.
+  const devPush=run.path==='.github/workflows/ci.yml' && ['push','workflow_dispatch'].includes(run.event) && run.head_branch==='dev' && run.head_sha===sha;
   const nightly=run.path==='.github/workflows/full-regression-nightly.yml' && ['schedule','workflow_dispatch'].includes(run.event);
   if ((!devPush && !nightly) || run.status!=='completed' || run.conclusion!=='success') throw Error('Full regression owner run is not complete/successful');
   return true;

@@ -1,6 +1,52 @@
 import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
+import {parse} from 'acorn';
+
+// Compare complete top-level declarations, never diff hunk line numbers. Any
+// change outside explicitly owned existing functions is unknown shared runtime.
+const SHARED_FUNCTIONS = {
+  renderShopContent: ['ui','inventory'],
+  openInventoryCharacterDetail: ['ui','inventory'],
+  renderBattle: ['battle'],
+  updateMonsterBars: ['battle'],
+  openBattleStatusDetailModal: ['battle'],
+  projectEnemyResource: ['battle'],
+  syncEnemyResourceHud: ['battle']
+};
+export function classifySharedSource(before, after) {
+  try {
+    const inspect = source => {
+      const ast=parse(source,{ecmaVersion:'latest',sourceType:'script'});
+      const functions={}, pieces=[];let cursor=0;
+      for(const node of ast.body) {
+        if(node.type!=='FunctionDeclaration' || !SHARED_FUNCTIONS[node.id?.name]) continue;
+        if(functions[node.id.name]) throw Error('Duplicate owner');
+        const effects=[];
+        const canonical=value=>JSON.stringify(value,(key,item)=>['start','end','raw'].includes(key)?undefined:item);
+        const visit=value=>{
+          if(!value || typeof value!=='object') return;
+          if(value.type==='CallExpression' || value.type==='NewExpression') {
+            const callee=source.slice(value.callee.start,value.callee.end).replace(/\s/g,'');
+            if(!/^Math\.(?:floor|ceil|round|trunc)$/.test(callee)) effects.push(canonical(value.callee));
+          }
+          if(['AssignmentExpression','UpdateExpression','AwaitExpression','YieldExpression'].includes(value.type)) effects.push(canonical(value.left || value.argument));
+          for(const child of Object.values(value)) if(Array.isArray(child)) child.forEach(visit);else visit(child);
+        };
+        visit(node.body);
+        functions[node.id.name]={text:source.slice(node.start,node.end),effects:JSON.stringify(effects)};
+        pieces.push(source.slice(cursor,node.start),`FUNCTION:${node.id.name}`);cursor=node.end;
+      }
+      pieces.push(source.slice(cursor));return {functions,rest:pieces.join('')};
+    };
+    const a=inspect(before),b=inspect(after);
+    if(a.rest!==b.rest || JSON.stringify(Object.keys(a.functions))!==JSON.stringify(Object.keys(b.functions))) return null;
+    if(Object.keys(a.functions).some(k=>a.functions[k].effects!==b.functions[k].effects)) return null;
+    const changed=Object.keys(a.functions).filter(k=>a.functions[k].text!==b.functions[k].text);
+    return changed.length ? [...new Set(changed.flatMap(k=>SHARED_FUNCTIONS[k]))] : null;
+  } catch {return null;}
+}
+const GENERATED=/^(?:build\/|asset-manifest\.json$|functions\/src\/generated\/restricted-forest-instance-policy\.json$)/;
 
 // Single policy owner. Rollback conditional PR gates by setting this false.
 export const PR_GATES_ENABLED = true;
@@ -38,7 +84,8 @@ const OWNERS = [
 ];
 
 export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'dev',
-  enabled = PR_GATES_ENABLED, addedPaths = [], error = '', fullRegression = false} = {}) {
+  enabled = PR_GATES_ENABLED, addedPaths = [], error = '', fullRegression = false,
+  responsibilities = null, generatedVerified = false} = {}) {
   const flags = Object.fromEntries(CHANGE_FLAGS.map(k => [`${k}_changed`, false]));
   const reasons = [];
   const mark = (...keys) => keys.forEach(k => {flags[`${k}_changed`] = true;});
@@ -48,12 +95,19 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
     if (typeof p !== 'string' || !p || p.startsWith('/') || p.includes('..') || p.includes('\\')) {
       strict('Invalid changed path', 'unknown_runtime'); continue;
     }
-    if (/^(?:\.github\/|ci\/|package(?:-lock)?\.json$|scripts\/.*(?:build|deployment|release)|release\/|build\/|asset-manifest\.json$|feature-manifest\.json$|config\/(?:boot|feature|first-play)-manifest\.json$)/.test(p)) {
+    if (GENERATED.test(p)) {
+      if(!generatedVerified || !paths.some(x=>/^(?:js\/|css\/|assets\/)/.test(x))) strict(`Unexplained generated output: ${p}`, 'unknown_runtime');
+      continue;
+    }
+    if(p==='js/00-main.js' && Array.isArray(responsibilities) && responsibilities.length && responsibilities.every(k=>['ui','inventory','battle','boss','monster_balance'].includes(k))) {mark(...responsibilities);continue;}
+    if (/^(?:\.github\/scripts\/(?:ci-(?:change-classifier|aggregate)|full-regression-health)\.mjs|tests\/(?:ci-(?:boss-routing|change-classifier|aggregate|concurrency).*|full-regression-health.test)\.mjs|\.github\/workflows\/(?:ci|deploy-dev-cloudflare)\.yml|package\.json|package-lock\.json)$/.test(p)) {mark('workflow');continue;}
+    if (/^(?:\.github\/|ci\/|package(?:-lock)?\.json$|scripts\/.*(?:build|deployment|release)|release\/|feature-manifest\.json$|config\/(?:boot|feature|first-play)-manifest\.json$)/.test(p)) {
       strict(`CI/build/release owner: ${p}`, 'workflow', 'release'); continue;
     }
     if (/^js\/combat\/monster-(?:balance-owner|archetypes)\.mjs$/.test(p)) {
-      strict(`Shared MonsterBalance: ${p}`, 'monster_balance', 'battle'); continue;
+      mark('monster_balance','battle'); continue;
     }
+    if(p==='js/gameplay-boss-tower-system.js' || p==='tests/gameplay-boss-tower-system.test.js') {mark('boss','tower','battle');continue;}
     if (/^(?:js\/(?:00-main|gameplay-boss-tower-system|.*(?:skill|battle|relic).*)\.js|functions\/.*battle.*|tests\/fixtures\/|tests\/.*(?:battle|monster-balance|skill-progression|level-suppression|hit-evasion).*)$/.test(p)) {
       strict(`Shared battle/test owner: ${p}`, 'battle'); continue;
     }
@@ -68,8 +122,8 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
   }
   const strictMode = reasons.length > 0;
   const nightly = fullRegression && eventName !== 'pull_request';
-  const mainRequired = baseRef === 'main' || eventName !== 'pull_request';
-  const full = eventName !== 'pull_request' || mainRequired || strictMode;
+  const mainRequired = baseRef === 'main' || nightly || (eventName==='push' && strictMode) || !['pull_request','push'].includes(eventName);
+  const full = mainRequired || strictMode;
   const f = key => flags[`${key}_changed`];
   const predicted = {
     core_checks: true,
@@ -91,24 +145,42 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
   return {policyVersion: 1, eventName, baseRef, strictMode, shadow, fullRegression: nightly, flags, reasons, predicted, gates};
 }
 
-function changedPaths(base, head, added = false) {
+export function changedPaths(base, head, added = false, eventName = 'pull_request') {
   for (const sha of [base, head]) {
     if (!/^[a-f0-9]{40}$/.test(sha) || /^0+$/.test(sha)) throw Error('Missing exact comparison SHA');
     try {execFileSync('git', ['cat-file', '-e', `${sha}^{commit}`], {stdio: 'ignore'});}
-    catch {execFileSync('git', ['fetch', '--no-tags', '--depth=1', 'origin', sha], {stdio: 'pipe', timeout: 60_000});}
+    catch {execFileSync('git', ['fetch', '--no-tags', 'origin', sha], {stdio: 'pipe', timeout: 60_000});}
   }
-  return execFileSync('git', ['diff', '--name-only', '--no-renames', ...(added ? ['--diff-filter=A'] : []), '-z', `${base}...${head}`],
+  // Only the classifier checkout has complete ancestry. Genuine unrelated
+  // histories still throw and retain strict fallback. Push compares exact trees.
+  if(eventName==='pull_request') execFileSync('git',['merge-base',base,head],{stdio:'pipe'});
+  return execFileSync('git', ['diff', '--name-only', '--no-renames', ...(added ? ['--diff-filter=A'] : []), '-z', `${base}${eventName==='pull_request'?'...':'..'}${head}`],
     {encoding: 'utf8', timeout: 30_000}).split('\0').filter(Boolean);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  let paths = [], addedPaths = [], error = '';
+  let paths = [], addedPaths = [], error = '', responsibilities=null, generatedVerified=false;
   try {
-    paths = changedPaths(process.env.CI_BASE_SHA, process.env.CI_HEAD_SHA);
-    addedPaths = changedPaths(process.env.CI_BASE_SHA, process.env.CI_HEAD_SHA, true);
+    paths = changedPaths(process.env.CI_BASE_SHA, process.env.CI_HEAD_SHA, false, process.env.CI_EVENT_NAME);
+    addedPaths = changedPaths(process.env.CI_BASE_SHA, process.env.CI_HEAD_SHA, true, process.env.CI_EVENT_NAME);
+    const comparisonBase=process.env.CI_EVENT_NAME==='pull_request' ? execFileSync('git',['merge-base',process.env.CI_BASE_SHA,process.env.CI_HEAD_SHA],{encoding:'utf8'}).trim() : process.env.CI_BASE_SHA;
+    if(paths.includes('js/00-main.js')) responsibilities=classifySharedSource(
+      execFileSync('git',['show',`${comparisonBase}:js/00-main.js`],{encoding:'utf8',maxBuffer:8*1024*1024}),
+      execFileSync('git',['show',`${process.env.CI_HEAD_SHA}:js/00-main.js`],{encoding:'utf8',maxBuffer:8*1024*1024}));
+    if(paths.some(p=>GENERATED.test(p))) {
+      // Build --check certifies manifests, every shipped bundle and generated
+      // policy against actual formal source, without executing changed outputs.
+      execFileSync(process.execPath,['scripts/build-production.mjs','--check'],{stdio:'pipe',timeout:120_000,maxBuffer:8*1024*1024});
+      const manifest=JSON.parse(fs.readFileSync('asset-manifest.json','utf8'));
+      const previous=JSON.parse(execFileSync('git',['show',`${comparisonBase}:asset-manifest.json`],{encoding:'utf8',maxBuffer:8*1024*1024}));
+      for(const p of paths.filter(p=>p.startsWith('build/') && p!=='build/asset-manifest.json')) {
+        if(!Object.hasOwn(manifest.assets,p) && !(Object.hasOwn(previous.assets,p) && !fs.existsSync(p))) throw Error(`Unregistered generated output: ${p}`);
+      }
+      generatedVerified=true;
+    }
   } catch (e) {error = `Comparison unavailable; strict fallback: ${e.message}`;}
-  const plan = classifyChanges(paths, {eventName: process.env.CI_EVENT_NAME, baseRef: process.env.CI_BASE_REF, addedPaths, error, fullRegression: process.env.CI_FULL_REGRESSION === 'true'});
-  const outputs = {plan_json: JSON.stringify(plan), strict: plan.strictMode, cloud_gate: plan.gates.session_authority, full_node: plan.shadow || plan.strictMode || plan.eventName !== 'pull_request' || plan.baseRef === 'main' || plan.flags.cloud_changed || plan.flags.persistence_changed,
+  const plan = classifyChanges(paths, {eventName: process.env.CI_EVENT_NAME, baseRef: process.env.CI_BASE_REF, addedPaths, error, responsibilities, generatedVerified, fullRegression: process.env.CI_FULL_REGRESSION === 'true'});
+  const outputs = {plan_json: JSON.stringify(plan), strict: plan.strictMode, cloud_gate: plan.gates.session_authority, full_node: plan.shadow || plan.strictMode || plan.fullRegression || !['pull_request','push'].includes(plan.eventName) || plan.baseRef === 'main' || plan.flags.monster_balance_changed || plan.flags.workflow_changed || plan.flags.cloud_changed || plan.flags.persistence_changed,
     ...plan.flags, ...plan.gates};
   if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(outputs).map(([k,v]) => `${k}=${v}\n`).join(''));

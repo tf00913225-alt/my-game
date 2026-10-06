@@ -19,6 +19,10 @@ on:
       - dev
       - main
 
+concurrency:
+  group: ci-${{ (inputs.candidate_sha || inputs.full_regression) && format('full-{0}-{1}', inputs.candidate_sha || github.sha, github.run_id) || (github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number)) || (github.event_name == 'push' && github.ref == 'refs/heads/dev' && 'push-dev') || format('isolated-{0}', github.run_id) }}
+  cancel-in-progress: ${{ !inputs.candidate_sha && !inputs.full_regression && ((github.event_name == 'pull_request' && github.base_ref == 'dev') || (github.event_name == 'push' && github.ref == 'refs/heads/dev')) }}
+
 permissions:
   contents: read
 
@@ -64,18 +68,25 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.candidate_sha || github.sha }}
-          fetch-depth: 2
+          ref: ${{ inputs.candidate_sha || github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
       - name: Confirm exact regression source snapshot
         env:
-          EXPECTED_SOURCE_SHA: ${{ inputs.candidate_sha || github.sha }}
+          EXPECTED_SOURCE_SHA: ${{ inputs.candidate_sha || github.event.pull_request.head.sha || github.sha }}
         run: test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
+      - name: Reject superseded dev integration before testing
+        if: github.event_name == 'push' && github.ref == 'refs/heads/dev' && !inputs.candidate_sha && !inputs.full_regression
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}
+        run: test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$EXPECTED_SOURCE_SHA"
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
           package-manager-cache: false
+      - name: Install pinned CI parser
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Verify classifier fixtures before emitting policy
-        run: node --test tests/ci-change-classifier.test.mjs
+        run: node --test tests/ci-change-classifier.test.mjs tests/ci-boss-routing.test.mjs tests/ci-concurrency.test.mjs
       - name: Compute fail-closed PR/full plan
         id: classify
         env:
@@ -108,6 +119,8 @@ jobs:
           node-version: "24"
           package-manager-cache: false
 
+      - name: Install pinned CI parser
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Prepare Git comparison base
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -147,7 +160,7 @@ jobs:
           node --check .github/scripts/run-water-wild-portrait-browser-qa.mjs
 
       - name: Verify CI aggregate failure propagation
-        run: node --test tests/ci-change-classifier.test.mjs tests/ci-aggregate.test.mjs tests/session-repository-checks-wait.test.mjs tests/full-regression-health.test.mjs
+        run: node --test tests/ci-change-classifier.test.mjs tests/ci-boss-routing.test.mjs tests/ci-concurrency.test.mjs tests/ci-aggregate.test.mjs tests/session-repository-checks-wait.test.mjs tests/full-regression-health.test.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
@@ -1067,7 +1080,7 @@ jobs:
 
   health_start:
     name: Mark full regression pending
-    if: inputs.full_regression || (github.event_name == 'push' && github.ref == 'refs/heads/dev')
+    if: inputs.full_regression || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -1088,7 +1101,7 @@ jobs:
   health_record:
     name: Full Regression Health
     needs: [classify, verify, health_start]
-    if: always() && (inputs.full_regression || (github.event_name == 'push' && github.ref == 'refs/heads/dev'))
+    if: always() && (inputs.full_regression || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -1146,12 +1159,18 @@ jobs:
         env:
           CI_NEEDS_JSON: ${{ toJSON(needs) }}
           CI_PLAN_JSON: ${{ needs.classify.outputs.plan_json }}
-          CI_MAIN_REQUIRED: ${{ github.event_name != 'pull_request' || github.base_ref == 'main' }}
+          CI_MAIN_REQUIRED: ${{ needs.classify.outputs.main_browser }}
         run: node .github/scripts/ci-aggregate.mjs
 
   deploy_dev:
     name: Dev deployment gate
-    needs: verify
+    needs: [verify, classify]
     if: ${{ !cancelled() && needs.verify.result == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/dev' }}
     uses: ./.github/workflows/deploy-dev-cloudflare.yml
+    with:
+      boss_required: ${{ needs.classify.outputs.boss_balance == 'true' }}
+      tower_required: ${{ needs.classify.outputs.tower_wild_browser == 'true' }}
+      abyss_required: ${{ needs.classify.outputs.abyss_balance == 'true' }}
+      adventure_required: ${{ needs.classify.outputs.adventure_balance == 'true' || needs.classify.outputs.adventure_ui_browser == 'true' }}
+      battle_daily_required: ${{ needs.classify.outputs.battle_browser == 'true' || needs.classify.outputs.daily_browser == 'true' }}
     secrets: inherit
