@@ -296,6 +296,7 @@ try{
     fs.writeFileSync(provenancePath,JSON.stringify(provenance,null,2)+"\n");
     fs.writeFileSync(registryPath,JSON.stringify(registry,null,2)+"\n");
 
+    runCheck(process.execPath,["scripts/measure-monster-portraits.mjs","--write"],"Portrait visual bounds");
     runCheck(process.execPath,["tests/monster-portrait-runtime.test.js"],"Monster portrait runtime contract");
     runCheck(process.execPath,["scripts/audit-monster-portraits.mjs"],"Monster portrait audit");
     runCheck(process.execPath,["tests/permanent-image-asset-pipeline.test.mjs"],"Permanent image asset gate");

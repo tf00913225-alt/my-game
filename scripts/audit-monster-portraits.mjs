@@ -3,7 +3,8 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import {execFileSync} from "node:child_process";
+import crypto from 'node:crypto';
+import {portraitImageMetadata} from './lib/portrait-image-metadata.mjs';
 
 const args=new Set(process.argv.slice(2));
 const strict=args.has("--strict");
@@ -43,10 +44,34 @@ const bossTower=read("js/gameplay-boss-tower-system.js");
 const abyss=read("js/59-abyss-two-tier-runtime.js");
 const portraitRuntime=read("js/45-v154-dev-fixes.js");
 const portraitTiming=read("js/48-v159-abyss-battle-portraits.js");
+const adventure=read("js/adventure/adventure-content-v1-20260915.js");
 
 const errors=[];
 const warnings=[];
 const discovered=[];
+const adventureIdentities=[];
+const adventureRegex=/\{monsterKey:"([^"]+)",archetype:"[^"]+",name:"([^"]+)",level:\d+,element:"([^"]+)",rank:"([^"]+)"\}/g;
+let adventureMatch;
+while((adventureMatch=adventureRegex.exec(adventure))!==null){
+    const [,portraitKey,name,element,rank]=adventureMatch;
+    discovered.push(name);
+    adventureIdentities.push(portraitKey);
+    const target=targets.find(t=>t.portraitKey===portraitKey);
+    if(!target||target.name!==name||target.element!==element||target.rank!==rank)errors.push('unregistered/mismatched Adventure identity: '+portraitKey);
+}
+if(!adventureIdentities.length)errors.push('Adventure encounter discovery empty');
+const poolTargets=(registry.assetPool?.entries||[]).filter(e=>e.status==='adopted').map(e=>({portraitKey:e.assetId,path:e.runtimePath,sizeClass:'standard',status:'existing'}));
+const invalidPresentation=[];
+for(const target of [...targets,...poolTargets]){
+    if(!registry.dimensions[target.sizeClass])errors.push('unknown portrait sizeClass: '+target.portraitKey);
+    if(target.status!=='existing')continue;
+    const meta=registry.presentation?.assets?.[target.path];
+    const absolute=path.join(root,target.path);
+    if(!meta||!Array.isArray(meta.alphaBounds)||meta.alphaBounds.length!==4){invalidPresentation.push(target.portraitKey);continue;}
+    const [l,t,r,b]=meta.alphaBounds;
+    if(!(l>=0&&t>=0&&r>l&&b>t&&r<=meta.width&&b<=meta.height)||!fs.existsSync(absolute)||crypto.createHash('sha256').update(fs.readFileSync(absolute)).digest('hex')!==meta.sha256)invalidPresentation.push(target.portraitKey);
+}
+if(invalidPresentation.length)errors.push('invalid/stale presentation metadata: '+invalidPresentation.join(', '));
 
 const zoneVariables=[
     "forestMonsters","desertMonsters","iceMountainMonsters","zone4Monsters","zone5Monsters",
@@ -166,8 +191,9 @@ generatedExisting.forEach(target=>{
         return;
     }
     try{
-        const meta=execFileSync("identify",["-format","%m|%wx%h|%[channels]|%[opaque]",absolute],{encoding:"utf8"}).trim();
-        const [format,geometry,channels,opaque]=meta.split("|");
+        const meta=portraitImageMetadata(absolute);
+        const {format,opaque}=meta;
+        const geometry=meta.width+'x'+meta.height,channels=meta.alpha?'rgba':'rgb';
         if(extension===".webp"&&String(format).toUpperCase()!=="WEBP"){
             invalidGeneratedAssets.push({portraitKey:target.portraitKey,path:target.path,reason:`decoder format ${format} != WEBP`});
         }
@@ -236,6 +262,16 @@ Object.entries(snapshot).forEach(([key,value])=>{
 });
 
 const report={
+    TOTAL_TARGETS:targets.length,
+    EXISTING:existingTargets.length,
+    PLANNED:plannedTargets.length,
+    MISSING:missingExisting.length+missingPlanned.length,
+    BROKEN:missingExisting.length+invalidGeneratedAssets.length,
+    FALLBACK_ONLY:missingPlanned.length,
+    UNREGISTERED:unregistered.length,
+    DUPLICATE_IDENTITY:uniq(duplicateKeys).length,
+    LEGACY_IDENTITY:registry.policy.legacyUniversalSoldierFiles.length,
+    invalidPresentation,
     ok:errors.length===0,
     strict,
     baselineDevHead:registry.baselineDevHead,

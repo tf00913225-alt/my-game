@@ -3975,23 +3975,6 @@
 
     const MONSTER_PORTRAIT_REGISTRY_URL="config/monster-portrait-registry.json";
     const HEAVENLY_SOLDIER_ELEMENTS=new Set(["fire","water","wind","earth"]);
-    const TEMPORARY_MONSTER_PORTRAIT="assets/dungeons/abyss/soldier.webp";
-    const TEMPORARY_BOSS_PORTRAIT="assets/monsters/boss/boss-placeholder-fire-demon.webp";
-    const EARLY_ABYSS_PORTRAITS={
-        東帝:"assets/dungeons/abyss/east-emperor.webp",
-        天帝:"assets/dungeons/abyss/heaven-emperor.webp",
-        北帝:"assets/dungeons/abyss/north-emperor.webp",
-        南帝:"assets/dungeons/abyss/south-emperor.webp",
-        天兵天將:"assets/dungeons/abyss/soldier.webp"
-    };
-    const FINAL_ABYSS_PORTRAITS={
-        東帝天尊:"assets/dungeons/abyss/floor5-east-emperor.webp",
-        天帝天尊:"assets/dungeons/abyss/floor5-heaven-emperor.webp",
-        北帝天尊:"assets/dungeons/abyss/floor5-north-emperor.webp",
-        南帝天尊:"assets/dungeons/abyss/floor5-south-emperor.webp",
-        極帝天尊:"assets/dungeons/abyss/floor5-extreme-emperor.webp",
-        天兵天將:"assets/dungeons/abyss/floor5-soldier.webp"
-    };
     let monsterPortraitRegistry=null;
     let monsterPortraitRegistryPromise=null;
     let monsterPortraitRegistryState="pending";
@@ -4000,6 +3983,8 @@
     const dailyPortraitPreparation=new Map();
     let monsterPortraitByKey=new Map();
     let monsterPortraitByUniqueName=new Map();
+    let monsterPortraitIdentityByKey=new Map();
+    let monsterPortraitIdentityByUniqueName=new Map();
 
     function currentAbyssRoster(){
         if(typeof currentBattleMonsters==="undefined"||typeof monsters==="undefined"){ return []; }
@@ -4009,10 +3994,7 @@
     }
 
     function isFinalAbyssRoster(roster){
-        return roster.some(entry=>Object.prototype.hasOwnProperty.call(
-            FINAL_ABYSS_PORTRAITS,
-            entry.monster.name
-        )&&entry.monster.name!=="天兵天將");
+        return roster.some(entry=>entry.monster.v174TrueRealmFinal||String(monsterPortraitByUniqueName.get(entry.monster.name)?.portraitKey||"").startsWith("abyss.final."));
     }
 
     function registryTargets(registry){
@@ -4026,6 +4008,13 @@
     }
 
     function installMonsterPortraitRegistry(registry){
+        monsterPortraitIdentityByKey=new Map(registryTargets(registry).map(target=>[target.portraitKey,target]));
+        monsterPortraitIdentityByUniqueName=new Map();
+        const identityNames=new Set();
+        monsterPortraitIdentityByKey.forEach(target=>{
+            if(identityNames.has(target.name))monsterPortraitIdentityByUniqueName.delete(target.name);
+            else{identityNames.add(target.name);monsterPortraitIdentityByUniqueName.set(target.name,target);}
+        });
         const byKey=new Map();
         const byName=new Map();
         const duplicateNames=new Set();
@@ -4081,11 +4070,12 @@
     }
     window.v154RequestMonsterPortraitRegistry=requestMonsterPortraitRegistry;
     window.v154GetMonsterPortraitRegistryState=()=>monsterPortraitRegistryState;
+    window.v154GetPortraitPresentation=path=>monsterPortraitRegistry&&monsterPortraitRegistry.presentation&&monsterPortraitRegistry.presentation.assets[path]||null;
+    window.v154GetPortraitScaleContract=()=>monsterPortraitRegistry&&monsterPortraitRegistry.presentation&&monsterPortraitRegistry.presentation.classes||null;
 
     function legacyAbyssPortrait(monster,finalFloor){
-        if(!monster||!monster.v141Abyss){ return null; }
-        const portraits=finalFloor?FINAL_ABYSS_PORTRAITS:EARLY_ABYSS_PORTRAITS;
-        return portraits[monster.name]||null;
+        if(!monster||!monster.v141Abyss||monster.name!=="天兵天將"){ return null; }
+        return monsterPortraitRegistry?.policy?.legacyUniversalSoldierFiles?.[finalFloor?1:0]||null;
     }
 
     function resolveMonsterPortraitRecord(monster,options){
@@ -4103,22 +4093,23 @@
                 dedicated:true
             };
         }
-        const explicitKey=String(monster.portraitKey||monster.monsterPortraitKey||"").trim();
+        const canonicalKey=monsterPortraitIdentityByKey.has(monster.monsterKey)?monster.monsterKey:"";
+        const explicitKey=String(monster.portraitKey||monster.monsterPortraitKey||canonicalKey||(monster.vGameplayBossId&&!monster.vGameplayTowerBoss?"boss."+monster.vGameplayBossId:"")).trim();
         if(monsterPortraitRegistryState==="pending"&&explicitKey){ return null; }
         const explicitAssetFailed=!!(explicitKey&&monsterPortraitAssetFailures.has(explicitKey));
         if(explicitKey&&monsterPortraitByKey.has(explicitKey)){
             if(!explicitAssetFailed){ return monsterPortraitByKey.get(explicitKey); }
         }
-        if(monster.name==="天兵天將"){
+        if(monster.name==="天兵天將"&&!explicitKey){
             const element=String(monster.portraitElement||monster.element||"").toLowerCase();
             if(HEAVENLY_SOLDIER_ELEMENTS.has(element)){
                 const soldier=monsterPortraitByKey.get("soldier."+element);
                 if(soldier){ return soldier; }
             }
         }
-        const byName=explicitAssetFailed?null:monsterPortraitByUniqueName.get(monster.name);
+        const byName=explicitKey?null:monsterPortraitByUniqueName.get(monster.name);
         if(byName){ return byName; }
-        const legacy=legacyAbyssPortrait(monster,!!(options&&options.finalAbyss));
+        const legacy=!explicitKey?legacyAbyssPortrait(monster,!!(options&&options.finalAbyss)):null;
         if(monsterPortraitRegistryState==="pending"){ return null; }
         return legacy?{
             portraitKey:"legacy.abyss."+String(monster.name||"unknown"),
@@ -4130,20 +4121,30 @@
             status:"existing",
             legacy:true
         }:(()=>{
-            const temporaryBoss=monster.rank==="boss"||monster.rank==="smallBoss"||monster.unitKind==="boss"||monster.vGameplayBoss===true||monster.vGameplayTowerBoss===true||monster.v141BattleRank==="boss";
+            const identity=monsterPortraitIdentityByKey.get(explicitKey)||(!explicitKey&&monsterPortraitIdentityByUniqueName.get(monster.name));
             return {
-                portraitKey:temporaryBoss?"temporary.boss-reference":"temporary.heavenly-soldier",
+                portraitKey:"fallback.generic",
+                requestedPortraitKey:explicitKey||identity&&identity.portraitKey||null,
+                fallbackReason:explicitAssetFailed?"decode-failed":identity?identity.status:"identity-unregistered",
                 name:monster.name||"",
                 element:monster.element||"dynamic",
-                rank:temporaryBoss?"boss":(monster.rank||"regular"),
-                sizeClass:temporaryBoss?"boss":"regular",
-                path:temporaryBoss?TEMPORARY_BOSS_PORTRAIT:TEMPORARY_MONSTER_PORTRAIT,
+                rank:monster.rank||"regular",
+                sizeClass:identity&&identity.sizeClass||"standard",
+                path:null,
                 status:"fallback",
-                temporary:true
+                generic:true
             };
         })();
     }
     window.v154ResolveMonsterPortraitRecord=resolveMonsterPortraitRecord;
+    window.v154BindMonsterPortraitIdentity=function(monster){
+        const record=monster&&monsterPortraitByKey.get(monster.portraitKey);
+        if(record&&record.group==="assetPool"){
+            monster.name=record.name;
+            monster.displayName=record.name;
+        }
+        return monster;
+    };
 
     function prepareDailyDungeonPortraits(type){
         const key=String(type||"").trim();
@@ -4200,6 +4201,7 @@
             }
             const entries=list.map(monster=>{
                 const record=resolveMonsterPortraitRecord(monster);
+                if(record&&record.generic){ return Promise.resolve({state:"ready",monster:monster,record:record}); }
                 if(!record||!record.path){
                     return Promise.resolve({state:"failed",monster:monster,error:new Error("portrait record missing")});
                 }
@@ -4207,7 +4209,8 @@
                     ?window.FourSymbolsFeatures.ensureAssets([record.path])
                     :Promise.reject(new Error("feature asset decoder unavailable"));
                 return assets.then(()=>{
-                    const name=record.displayName||record.name||monster.name||"";
+                    // Only an explicit adopted asset establishes a Tower identity.
+                    const name=record.group==="assetPool"?record.name:null;
                     if(name){ monster.name=name;monster.displayName=name; }
                     monster.portraitPath=record.path;
                     return {state:"ready",monster:monster,record:record};
@@ -4218,7 +4221,7 @@
                 return {
                     state:failed.length?"failed":"ready",
                     records:results.filter(entry=>entry.state==="ready").map(entry=>entry.record),
-                    paths:results.filter(entry=>entry.state==="ready").map(entry=>entry.record.path),
+                    paths:results.filter(entry=>entry.state==="ready"&&entry.record.path).map(entry=>entry.record.path),
                     failures:failed.map(entry=>entry.monster&&entry.monster.portraitKey||"unknown")
                 };
             });
@@ -4240,7 +4243,7 @@
     function syncCardlessPresentation(card,record){
         if(!card){ return; }
         const presentation=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
-        if(record){
+        if(record&&record.path){
             const cssValue='url("'+record.path+'")';
             card.dataset.v154PortraitRecordPath=record.path;
             card.style.setProperty("--v152-abyss-portrait",cssValue);
@@ -4250,7 +4253,7 @@
         }
         /* V154 selects the record. V174 is the only presentation owner. */
         if(presentation&&typeof presentation.applyUnit==="function"){
-            try{ presentation.applyUnit(card,"monster"); }catch(_){ }
+            presentation.applyUnit(card,"monster",record);
         }
     }
 
@@ -4287,9 +4290,9 @@
             card.classList.toggle("v152-abyss-portrait",abyssPortrait);
             card.classList.toggle("v154-abyss-portrait",abyssPortrait);
             card.classList.toggle("v154-monster-portrait",!!portrait);
-            if(portrait){
+            if(record){
                 card.dataset.monsterPortraitKey=record.portraitKey;
-                card.dataset.monsterPortraitPath=portrait;
+                card.dataset.monsterPortraitPath=portrait||"";
                 if(abyssPortrait){ card.dataset.abyssPortrait=finalFloor?"floor5":"floor1-4"; }
                 else{ delete card.dataset.abyssPortrait; }
             }else{
@@ -6167,87 +6170,12 @@
     }
     window.v169ArrangeShopColumns=arrangeShopColumns;
 
-    const SHOP_REFRESH_STORAGE_KEY=window.FourSymbolsAccountSave.accountKey("equipment-shop-daily");
-    const SHOP_FREE_REFRESHES=5;
-    const SHOP_MAX_REFRESHES=10;
     let shopPage="potion";
-    const SHOP_EQUIPMENT_PREVIEW=[
-        {name:"青鋒長劍",slot:"武器",glyph:"劍"},{name:"厚背砍刀",slot:"武器",glyph:"刀"},
-        {name:"沉木法杖",slot:"武器",glyph:"杖"},{name:"竹骨法扇",slot:"武器",glyph:"扇"},
-        {name:"烏金戰甲",slot:"衣服",glyph:"甲"},{name:"素紋法袍",slot:"衣服",glyph:"袍"},
-        {name:"鐵紋護腕",slot:"護腕",glyph:"腕"},{name:"雲紗護腕",slot:"護腕",glyph:"袖"},
-        {name:"玄鐵戰靴",slot:"鞋子",glyph:"靴"},{name:"行雲法履",slot:"鞋子",glyph:"履"},
-        {name:"束髮戰冠",slot:"頭部",glyph:"冠"},{name:"青布法帽",slot:"頭部",glyph:"帽"},
-        {name:"精鐵短劍",slot:"武器",glyph:"鋒"},{name:"斬馬闊刀",slot:"武器",glyph:"斬"},
-        {name:"檀木短杖",slot:"武器",glyph:"木"},{name:"素竹羽扇",slot:"武器",glyph:"羽"},
-        {name:"護心皮甲",slot:"衣服",glyph:"護"},{name:"清風道袍",slot:"衣服",glyph:"道"}
-    ];
-
-    function shopEscape(value){
-        return String(value==null?"":value)
-            .replace(/&/g,"&amp;")
-            .replace(/</g,"&lt;")
-            .replace(/>/g,"&gt;")
-            .replace(/"/g,"&quot;")
-            .replace(/'/g,"&#039;");
-    }
-
-    function shopDateKey(){
-        const now=new Date();
-        return now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
-    }
-
-    function loadEquipmentShopRefreshState(){
-        const today=shopDateKey();
-        let state={date:today,refreshCount:0};
-        try{
-            const stored=JSON.parse(localStorage.getItem(SHOP_REFRESH_STORAGE_KEY)||"{}");
-            if(stored&&stored.date===today){
-                state.refreshCount=Math.max(0,Math.min(SHOP_MAX_REFRESHES,Math.floor(Number(stored.refreshCount)||0)));
-            }
-        }catch(_){ }
-        return state;
-    }
-
-    function saveEquipmentShopRefreshState(state){
-        try{ localStorage.setItem(SHOP_REFRESH_STORAGE_KEY,JSON.stringify(state)); }catch(_){ }
-    }
-
-    function equipmentShopOffers(refreshCount){
-        const count=Math.max(0,Math.floor(Number(refreshCount)||0));
-        const start=count*5%SHOP_EQUIPMENT_PREVIEW.length;
-        return Array.from({length:6},(_,offset)=>
-            SHOP_EQUIPMENT_PREVIEW[(start+offset)%SHOP_EQUIPMENT_PREVIEW.length]
-        );
-    }
 
     function renderShopTabs(){
         return '<div class="v17345-shop-tabs" role="tablist" aria-label="商店分類">'+
             '<button type="button" class="'+(shopPage==="potion"?'active':'')+'" onclick="v169SwitchShopPage(\'potion\')">補品</button>'+
             '<button type="button" class="'+(shopPage==="equipment"?'active':'')+'" onclick="v169SwitchShopPage(\'equipment\')">裝備</button></div>';
-    }
-
-    function renderEquipmentShop(){
-        const state=loadEquipmentShopRefreshState();
-        const offers=equipmentShopOffers(state.refreshCount);
-        const freeRemaining=Math.max(0,SHOP_FREE_REFRESHES-state.refreshCount);
-        const paidPending=state.refreshCount>=SHOP_FREE_REFRESHES&&state.refreshCount<SHOP_MAX_REFRESHES;
-        const goldText=typeof gold!=="undefined"?Math.max(0,Math.floor(Number(gold)||0)).toLocaleString("zh-TW"):"0";
-        const refreshLabel=freeRemaining>0
-            ?"免費刷新（剩"+freeRemaining+"次）"
-            :state.refreshCount>=SHOP_MAX_REFRESHES?"今日刷新已達上限":"金幣刷新・價格待設定";
-        return '<div class="v17345-equipment-shop">'+
-            '<div class="v17345-equipment-wallet"><span>目前金幣</span><b>'+goldText+'</b></div>'+
-            '<div class="v17345-equipment-grid">'+offers.map(item=>
-                '<article class="v17345-equipment-card"><div class="v17345-equipment-icon" aria-hidden="true">'+shopEscape(item.glyph)+'</div>'+
-                '<b>'+shopEscape(item.name)+'</b><span>'+shopEscape(item.slot)+'・普通裝備</span>'+
-                '<button type="button" disabled>售價待設定</button></article>'
-            ).join("")+'</div>'+
-            '<div class="v17345-equipment-refresh"><div><b>今日刷新 '+state.refreshCount+' / '+SHOP_MAX_REFRESHES+'</b>'+
-            '<span>前5次免費；第6～10次使用金幣，價格待下一步確認。</span></div>'+
-            '<button type="button" '+(freeRemaining>0?'onclick="v17345RefreshEquipmentShop()"':'disabled')+'>'+refreshLabel+'</button></div>'+
-            (paidPending?'<p class="v17345-equipment-pending">金幣刷新版面已保留，等確認刷新價格後再開放第6～10次。</p>':'')+
-            '</div>';
     }
 
     function rerenderShop(){
@@ -6260,19 +6188,11 @@
         rerenderShop();
     };
 
-    window.v17345RefreshEquipmentShop=function(){
-        const state=loadEquipmentShopRefreshState();
-        if(state.refreshCount>=SHOP_FREE_REFRESHES){ return; }
-        state.refreshCount++;
-        saveEquipmentShopRefreshState(state);
-        rerenderShop();
-    };
-
     if(typeof renderShopContent==="function"){
         const previousRenderShopContent=renderShopContent;
         renderShopContent=function(){
             const content=shopPage==="equipment"
-                ?renderEquipmentShop()
+                ?(window.FourSymbolsEquipmentShop?window.FourSymbolsEquipmentShop.render():'<div class="v17345-equipment-shop" aria-busy="true"></div>')
                 :arrangeShopColumns(previousRenderShopContent.apply(this,arguments));
             return '<div class="v17345-shop-shell">'+renderShopTabs()+content+'</div>';
         };
@@ -6438,7 +6358,7 @@
         return RARITIES[RARITIES.length-1];
     }
     function artMarkup(path,rarityKey){
-        return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarityKey+'"><img src="'+path+'" alt="" draggable="false" onerror="this.hidden=true"></span>';
+        return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarityKey+'"><img src="'+path+'" alt="" draggable="false" onerror="this.parentElement.dataset.assetState=\'broken\';this.parentElement.setAttribute(\'role\',\'img\');this.parentElement.setAttribute(\'aria-label\',\'裝備圖片無法載入\');this.parentElement.textContent=\'◇\'"></span>';
     }
     const LEGACY_STARTER_EQUIPMENT_ART={
         ironSword:{path:"assets/equipment/warrior/weapon-01.png",classType:"warrior"},
@@ -6885,11 +6805,26 @@
 
     function shopState(){
         const today=(()=>{const now=new Date();return now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");})();
-        try{ const stored=JSON.parse(localStorage.getItem(SHOP_STORAGE_KEY)||"{}"); return stored&&stored.date===today?{date:today,refreshCount:Math.max(0,Math.min(10,Math.floor(Number(stored.refreshCount)||0)))}:{date:today,refreshCount:0}; }catch(_){ return {date:today,refreshCount:0}; }
+        const fresh={date:today,refreshCount:0,soldOfferIds:[]};
+        try{
+            const raw=localStorage.getItem(SHOP_STORAGE_KEY);
+            if(raw===null){ return fresh; }
+            const stored=JSON.parse(raw);
+            if(!stored||typeof stored.date!=="string"||!Number.isInteger(stored.refreshCount)||stored.refreshCount<0||stored.refreshCount>10){ return null; }
+            if(stored.date!==today){ return fresh; }
+            // Existing date/refresh-only records migrate in place. Inventory
+            // names and generated instance UIDs are never purchase receipts.
+            const sold=stored.soldOfferIds===undefined?[]:stored.soldOfferIds;
+            if(!Array.isArray(sold)||sold.some(id=>typeof id!=="string"||!id.startsWith(today+":")||!/^\d{4}-\d{2}-\d{2}:\d+:\d$/.test(id))){ return null; }
+            return {date:today,refreshCount:stored.refreshCount,soldOfferIds:[...new Set(sold)]};
+        }catch(_){ return null; }
     }
-    function currentShopOffers(){
-        const state=shopState();
-        return Array.from({length:6},(_,index)=>generateEquipment(seededRandom(state.date+":"+state.refreshCount+":"+index)));
+    function currentShopOffers(state=shopState()){
+        if(!state){ return []; }
+        return Array.from({length:6},(_,index)=>{
+            const offerId=state.date+":"+state.refreshCount+":"+index;
+            return {...generateEquipment(seededRandom(offerId)),offerId};
+        });
     }
     function statLine(item){
         const [key,value]=Object.entries(item.stats||{})[0]||["",0];
@@ -6903,42 +6838,67 @@
         const html='<div class="v132-reward-modal-inner v17346-shop-preview-modal item-presentation-frame" data-presentation-mode="shop-preview" data-rarity="'+escapeHtml(item.rarityKey)+'"><h3>'+escapeHtml(item.name)+'</h3><div class="item-presentation-scroll" data-scroll-owner="y"><div class="v17346-shop-preview-art">'+item.icon+'</div><div class="v17346-shop-preview-info"><span>'+escapeHtml(SLOT_META[item.type].label)+'</span><strong>'+escapeHtml(statLine(item))+'</strong></div><div class="v17346-shop-preview-price">'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</div>'+(item.reforgeSlots?'<div class="v17346-shop-preview-reforge">[可冶煉]</div>':'')+'</div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
         window.v132ShowRewardModal(html);
     };
-    function replaceEquipmentShop(){
-        const root=document.querySelector("#homeFeatureModalBody .v17345-equipment-shop");
-        if(!root){ return; }
+    function renderEquipmentShop(){
         const state=shopState();
-        const offers=currentShopOffers();
+        if(!state){ return '<div class="v17345-equipment-shop"><p role="alert">裝備商店資料無法讀取，購買與刷新已暫停。</p></div>'; }
+        const offers=currentShopOffers(state);
         const freeRemaining=Math.max(0,5-state.refreshCount);
         const currentGold=typeof gold!=="undefined"?Math.max(0,Math.floor(Number(gold)||0)):0;
         const goldText=currentGold.toLocaleString("zh-TW");
-        root.innerHTML='<div class="v17345-equipment-wallet"><span>目前金幣</span><b>'+goldText+'</b></div><div class="v17345-equipment-grid">'+offers.map((item,index)=>{
+        return '<div class="v17345-equipment-shop"><div class="v17345-equipment-wallet"><span>目前金幣</span><b>'+goldText+'</b></div><div class="v17345-equipment-grid">'+offers.map((item,index)=>{
             const rarity=RARITY_BY_KEY[item.rarityKey];
-            const canBuy=currentGold>=rarity.shopPrice;
-            return '<article class="v17345-equipment-card v17346-shop-card '+(canBuy?'is-affordable':'is-unaffordable')+'" data-rarity="'+escapeHtml(item.rarityKey)+'" role="button" tabindex="0" aria-label="預覽 '+escapeHtml(item.name)+'" onclick="v17346PreviewEquipmentShopOffer('+index+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();v17346PreviewEquipmentShopOffer('+index+')}"><div class="v17345-equipment-icon v17346-gear-art">'+item.icon+'</div><b class="v17346-shop-name">'+escapeHtml(item.name)+'</b><span class="v17346-shop-slot">'+escapeHtml(SLOT_META[item.type].label)+'</span><span class="v17346-stat">'+escapeHtml(statLine(item))+'</span>'+(item.reforgeSlots?'<span class="v17346-reforge-mini">[可冶煉]</span>':'')+'<button class="v17346-shop-buy" type="button" '+(canBuy?'onclick="event.stopPropagation();v17346BuyEquipmentShopOffer('+index+')"':'disabled aria-disabled="true"')+'>'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</button></article>';
-        }).join("")+'</div><div class="v17345-equipment-refresh"><div><b>今日刷新 '+state.refreshCount+' / 10</b><span>前5次免費；第6～10次尚未開放。</span></div><button type="button" '+(freeRemaining>0?'onclick="v17345RefreshEquipmentShop()"':'disabled')+'>'+(freeRemaining>0?'免費刷新（剩'+freeRemaining+'次）':'免費刷新已用完')+'</button></div>';
+            const sold=state.soldOfferIds.includes(item.offerId);
+            const canBuy=!sold&&currentGold>=rarity.shopPrice&&typeof window.v132CanAddItemToInventory==="function"&&window.v132CanAddItemToInventory(item,1);
+            return '<article class="v17345-equipment-card v17346-shop-card '+(sold?'purchased':canBuy?'is-affordable':'is-unaffordable')+'" data-offer-id="'+escapeHtml(item.offerId)+'" data-rarity="'+escapeHtml(item.rarityKey)+'" role="button" tabindex="0" aria-label="預覽 '+escapeHtml(item.name)+'" onclick="v17346PreviewEquipmentShopOffer('+index+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();v17346PreviewEquipmentShopOffer('+index+')}"><div class="v17345-equipment-icon v17346-gear-art">'+item.icon+'</div><b class="v17346-shop-name">'+escapeHtml(item.name)+'</b><span class="v17346-shop-slot">'+escapeHtml(SLOT_META[item.type].label)+'</span><span class="v17346-stat">'+escapeHtml(statLine(item))+'</span>'+(item.reforgeSlots?'<span class="v17346-reforge-mini">[可冶煉]</span>':'')+'<button class="v17346-shop-buy" type="button" '+(canBuy?'onclick="event.stopPropagation();v17346BuyEquipmentShopOffer('+index+',\''+escapeHtml(item.offerId)+'\')"':'disabled aria-disabled="true"')+'>'+(sold?'已購買':rarity.shopPrice.toLocaleString("zh-TW")+' 金幣')+'</button></article>';
+        }).join("")+'</div><div class="v17345-equipment-refresh"><div><b>今日刷新 '+state.refreshCount+' / 10</b><span>前5次免費；第6～10次尚未開放。</span></div><button type="button" '+(freeRemaining>0?'onclick="v17345RefreshEquipmentShop()"':'disabled')+'>'+(freeRemaining>0?'免費刷新（剩'+freeRemaining+'次）':'免費刷新已用完')+'</button></div></div>';
     }
-    window.v17346BuyEquipmentShopOffer=function(index){
-        const item=currentShopOffers()[Math.max(0,Math.min(5,Math.floor(Number(index)||0)))];
-        if(!item){ return; }
+    function replaceEquipmentShop(){
+        const body=document.getElementById("homeFeatureModalBody");
+        if(body&&body.querySelector(".v17345-equipment-shop")&&typeof renderShopContent==="function"){ body.innerHTML=renderShopContent(); }
+    }
+    let shopPurchaseInProgress=false;
+    window.v17346BuyEquipmentShopOffer=function(index,expectedOfferId){
+        if(shopPurchaseInProgress||!Number.isInteger(Number(index))||Number(index)<0||Number(index)>5){ return false; }
+        const state=shopState();
+        const item=currentShopOffers(state)[Number(index)];
+        if(!item||(expectedOfferId&&expectedOfferId!==item.offerId)||state.soldOfferIds.includes(item.offerId)){ return false; }
         const cost=Math.max(0,Number(item.shopPrice)||0);
-        if(typeof gold==="undefined"||Number(gold)<cost){ void (window.rpgAlert?window.rpgAlert("金幣不足。",{title:"無法購買"}):Promise.resolve()); return; }
-        if(window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(item,1)){ alert("背包空間不足。"); return; }
-        gold-=cost;
-        if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){ inventoryItems.push({...item}); }
+        if(typeof gold==="undefined"||!Number.isFinite(Number(gold))||Number(gold)<cost){ void (window.rpgAlert?window.rpgAlert("金幣不足。",{title:"無法購買"}):Promise.resolve()); return false; }
+        if(typeof window.v132CanAddItemToInventory!=="function"||!window.v132CanAddItemToInventory(item,1)){ alert("背包空間不足。"); return false; }
+        if(typeof window.v132RunInventoryTransaction!=="function"||typeof window.v132AddItemToInventory!=="function"||typeof saveGame!=="function"){ return false; }
+        const beforeGold=gold;
+        const {offerId,...instance}=item;
+        const nextState={...state,soldOfferIds:[...state.soldOfferIds,offerId]};
+        shopPurchaseInProgress=true;
+        let committed=false;
+        try{
+            committed=window.v132RunInventoryTransaction(()=>{
+                gold-=cost;
+                if(!window.v132AddItemToInventory(instance,1)){ return false; }
+                return saveGame({source:"equipment-shop-purchase",equipmentShopState:nextState})===true;
+            });
+            if(!committed){ gold=beforeGold; }
+        }finally{ shopPurchaseInProgress=false; }
+        if(!committed){
+            if(window.rpgAlert){ void window.rpgAlert("購買未完成，金幣與裝備已還原。",{title:"無法購買"}); }
+            return false;
+        }
         if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
         if(typeof renderInventoryItems==="function"){ renderInventoryItems(); }
-        if(typeof saveGame==="function"){ saveGame(); }
         replaceEquipmentShop();
         if(window.rpgAlert){ void window.rpgAlert("已購買「"+item.name+"」。",{title:"購買成功",tone:"success"}); }
+        return true;
     };
-    if(typeof window.v169SwitchShopPage==="function"){
-        const previousSwitch=window.v169SwitchShopPage;
-        window.v169SwitchShopPage=function(page){ const result=previousSwitch.apply(this,arguments); if(page==="equipment"){ replaceEquipmentShop(); } return result; };
-    }
-    if(typeof window.v17345RefreshEquipmentShop==="function"){
-        const previousRefresh=window.v17345RefreshEquipmentShop;
-        window.v17345RefreshEquipmentShop=function(){ const result=previousRefresh.apply(this,arguments); replaceEquipmentShop(); return result; };
-    }
+    window.FourSymbolsEquipmentShop=Object.freeze({render:renderEquipmentShop});
+    window.v17345RefreshEquipmentShop=function(){
+        if(shopPurchaseInProgress){ return false; }
+        const state=shopState();
+        if(!state||state.refreshCount>=5){ return false; }
+        try{ localStorage.setItem(SHOP_STORAGE_KEY,JSON.stringify({...state,refreshCount:state.refreshCount+1})); }
+        catch(_){ if(window.rpgAlert){ void window.rpgAlert("商店刷新未完成，請稍後再試。",{title:"無法刷新"}); } return false; }
+        replaceEquipmentShop();
+        return true;
+    };
 
     function showEquipmentReward(){
         if(typeof window.v132ShowRewardModal!=="function"){ return; }
@@ -7688,13 +7648,51 @@ function battleArtworkSource(card,kind){
     if(source&&source!=="none"&&!/^linear-gradient/i.test(source))card.dataset.v174BattleArtwork=source;
     return card.dataset.v174BattleArtwork||"";
 }
-function syncUnitArtwork(card,kind){
+function syncUnitArtwork(card,kind,selectedRecord){
     if(!card)return;
     card.classList.add("v174-cardless-unit");
     let art=card.querySelector(":scope > .v174-battle-art");
     if(!art){art=document.createElement("div");art.className="v174-battle-art";card.insertBefore(art,card.firstChild);}
-    const source=battleArtworkSource(card,kind);
-    if(source)art.style.backgroundImage=source;
+    let record=null,monster=null;
+    if(kind==="monster"){
+        try{monster=monsters[Number(String(card.id).replace("battleMonster",""))];}catch(_){}
+        if(selectedRecord!==undefined)record=selectedRecord;
+        else if(typeof window.v154ResolveMonsterPortraitRecord==="function")record=window.v154ResolveMonsterPortraitRecord(monster);
+    }
+    const source=kind==="monster"?(record&&record.path?'url("'+record.path+'")':""):battleArtworkSource(card,kind);
+    art.style.backgroundImage=source||"none";
+    let paint=art.querySelector(":scope > .v174-portrait-paint");
+    const metadata=record&&record.path&&window.v154GetPortraitPresentation?.(record.path);
+    art.classList.toggle("v174-normalized-portrait",!!metadata);
+    art.classList.toggle("v174-generic-portrait",!!(record&&record.generic));
+    const rank=monster&&(monster.rank||monster.v141BattleRank)||record?.rank;
+    const sizeClass=monster?.vGameplayBoss&&!monster?.vGameplayTowerBoss?"BIG_BOSS":rank==="boss"||rank==="smallBoss"?"SMALL_BOSS":rank==="elite"?"ELITE":"STANDARD";
+    if(record)card.dataset.portraitSizeClass=sizeClass;
+    const classContract=record&&window.v154GetPortraitScaleContract?.()?.[sizeClass];
+    if(classContract){
+        art.style.setProperty("--portrait-body-height",String(classContract.bodyHeight*100)+"%");
+        art.style.setProperty("--portrait-baseline",String(classContract.baseline*100)+"%");
+    }
+    if(metadata){
+        if(!paint){paint=document.createElement("div");paint.className="v174-portrait-paint";art.appendChild(paint);}
+        const contract=window.v154GetPortraitScaleContract()[sizeClass];
+        const [left,top,right,bottom]=metadata.alphaBounds;
+        const aspect=metadata.width/metadata.height,bw=(right-left)/metadata.width,bh=(bottom-top)/metadata.height;
+        const width='min('+1/bw*100+'cqw, '+contract.bodyHeight*aspect/bh*100+'cqh)';
+        paint.style.setProperty("--portrait-width",width);
+        paint.style.setProperty("--portrait-aspect",String(aspect));
+        paint.style.setProperty("--portrait-center",String((left+right)/2/metadata.width));
+        paint.style.setProperty("--portrait-bottom",String(bottom/metadata.height));
+        paint.style.setProperty("--portrait-baseline",String(contract.baseline*100)+"%");
+        card.dataset.portraitSizeClass=sizeClass;
+    }else{
+        if(paint)paint.remove();
+        if(!record)delete card.dataset.portraitSizeClass;
+    }
+    if(record){
+        card.dataset.monsterPortraitKey=record.portraitKey;
+        card.dataset.portraitFallback=record.fallbackReason||"none";
+    }
     card.style.setProperty("background-image","none","important");
 }
 function syncResourceNumbers(){
@@ -8672,7 +8670,9 @@ ensureFunctionalStyles();runRepairs();
         const spProjection=projectionFor(spNodes[0],resourceState&&resourceState.spRatio,0);
         const hpRect=hpProjection&&hpProjection.rect;
         const spRect=spProjection&&spProjection.rect;
-        const artworkProjection=art&&portraitRect?{rect:portraitRect,backgroundImage:String(art.style&&art.style.backgroundImage||window.getComputedStyle(art).backgroundImage||""),backgroundSize:String(art.style&&art.style.backgroundSize||window.getComputedStyle(art).backgroundSize||"contain"),backgroundPosition:String(art.style&&art.style.backgroundPosition||window.getComputedStyle(art).backgroundPosition||"center"),backgroundRepeat:String(art.style&&art.style.backgroundRepeat||window.getComputedStyle(art).backgroundRepeat||"no-repeat")} : null;
+        const paint=art&&art.querySelector(".v174-portrait-paint")||art;
+        const paintRect=paint&&paint!==art?paint.getBoundingClientRect():portraitRect;
+        const artworkProjection=paint&&paintRect?{rect:paintRect,backgroundImage:String(paint.style&&paint.style.backgroundImage||window.getComputedStyle(paint).backgroundImage||""),backgroundSize:String(paint.style&&paint.style.backgroundSize||window.getComputedStyle(paint).backgroundSize||"contain"),backgroundPosition:String(paint.style&&paint.style.backgroundPosition||window.getComputedStyle(paint).backgroundPosition||"center"),backgroundRepeat:String(paint.style&&paint.style.backgroundRepeat||window.getComputedStyle(paint).backgroundRepeat||"no-repeat")} : null;
         const hudRects=hudNodes
             .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
             .filter(rect=>rect&&rect.width>0&&rect.height>0);

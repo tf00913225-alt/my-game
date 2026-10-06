@@ -333,7 +333,7 @@
     },
     {
       "key": "four_symbols_account:<UID>:equipment-shop-daily",
-      "ownerModule": "js/51-v169-rpg-ui.js",
+      "ownerModule": "js/equipment-progression.js",
       "storageType": "localStorage",
       "scope": "uid",
       "deviceOnly": false,
@@ -346,8 +346,8 @@
       "migrationRequired": true,
       "authorityTier": "A",
       "authoritativeSource": "future server validated state",
-      "schemaVersion": "legacy/unversioned",
-      "restoreOwner": "js/51-v169-rpg-ui.js",
+      "schemaVersion": "date/refreshCount/soldOfferIds-v1",
+      "restoreOwner": "js/equipment-progression.js",
       "deletionPolicy": "retain until owner-approved cleanup",
       "corruptionBehavior": "block recovery/claim if gameplay critical",
       "defaultBehavior": "safe default",
@@ -895,7 +895,7 @@
       "backupRequired": true,
       "migrationRequired": false,
       "authorityTier": "B",
-      "authoritativeSource": "private protected server initial state; no combat outcome or reward authority",
+      "authoritativeSource": "private protected original consumption marker plus committed round head; no outcome or reward authority",
       "schemaVersion": "1",
       "restoreOwner": "functions/src/canonical-restricted-battle.js",
       "deletionPolicy": "retain original evidence; never reopen an expired/consumed preparation",
@@ -924,6 +924,28 @@
       "corruptionBehavior": "fail closed; no regeneration",
       "defaultBehavior": "no instance or entitlement",
       "missingDataBehavior": "block replay and future progression; no repair or reward"
+    },
+    {
+      "key": "serverUsers/{uid}/restrictedBattleRounds/{attemptId}_{roundVersion}",
+      "ownerModule": "functions/src/canonical-restricted-battle.js",
+      "storageType": "Firestore",
+      "scope": "uid/session/preparation/round",
+      "deviceOnly": false,
+      "gameplayCritical": true,
+      "rewardCoupled": false,
+      "economyCoupled": false,
+      "claimCoupled": false,
+      "cloudRequired": true,
+      "backupRequired": true,
+      "migrationRequired": false,
+      "authorityTier": "B",
+      "authoritativeSource": "immutable original-policy-bound server round and entropy evidence; no terminal or reward authority",
+      "schemaVersion": "1",
+      "restoreOwner": "functions/src/canonical-restricted-battle.js",
+      "deletionPolicy": "retain original evidence; never reopen an expired/consumed preparation",
+      "corruptionBehavior": "fail closed; no regeneration",
+      "defaultBehavior": "no round; never infer victory",
+      "missingDataBehavior": "block replay and new execution; never reroll or regenerate"
     }
   ]
 }

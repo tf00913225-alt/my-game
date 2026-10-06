@@ -37,7 +37,7 @@ npm run portrait:import -- --group=daily --dry-run
 - `planned` 素材通過後直接升為 `existing`。
 - `retired` 預設拒絕；只有已明確授權重新啟用的 target 才可加 `--reactivate-retired`。
 - 日常副本必須仍由 runtime 寫入明確 `portraitKey`。
-- 匯入前必須跑既有 `tests/monster-portrait-runtime.test.js`，確認 V154 owner／V159 同步契約沒有漂移。
+- 匯入前必須跑既有 `tests/monster-portrait-runtime.test.js`，確認 V154 Resolver／V174 Presentation 契約沒有漂移；V159 已退休。
 - 更新 registry snapshot 時，`retired` 不得被誤算成 `planned`。
 
 這條快速流程只處理「素材已生成、已核准、已落正式路徑」的導入；**不得重新生成、裁切、改圖或自行從中文檔名猜對應關係**。
@@ -80,4 +80,4 @@ node scripts/audit-monster-portrait-batch.mjs --strict --batch=release/monster-p
 - 深淵東／南／天／北領域前置關分別用土／火／風／水天兵。
 - 真境最終戰五名天兵視覺順序固定：水｜土｜火｜風｜水。
 - 極帝領域前置四關目前是 light；未經使用者明確決定，不得自行新增「光天兵」。
-- 不得新增第三套 battle portrait wrapper；既有深淵 owner 是 V154，同步時序補丁是 V159，後續導入要收斂而非再疊 patch。
+- 不得新增 battle portrait wrapper；選圖 owner 是 V154，尺寸與基準 owner 是 V174，正式契約見 `docs/MONSTER_PORTRAIT_SPEC_V1.md` 第 8 節。
