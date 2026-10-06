@@ -90,6 +90,26 @@ assert.match(contracts,/Physical Damage.*Magic Damage/);
 assert.match(contracts,/Physical Skill Elite\/Boss Rank Bonus.*RETIRED/);
 
 const detailSource=extractFunction(main,"openInventoryCharacterDetail");
+const originalEquipment=context.characterEquipment.fire;
+context.characterEquipment.fire={hand:{rarityKey:"orange",stats:{attack:20,defensePoints:4,intelligence:2,vitality:3,energy:4,agility:5},reforgeStats:{attack:13,defensePoints:2,intelligence:1,vitality:2,energy:3,agility:4},sockets:["gemVitalityI"]}};
+const equipped=context.getMainCharacterStats();
+assert.equal(equipped.attackPoints,133,"allocated, equipment and reforge Attack enter the formal owner once");
+assert.equal(equipped.defensePoints,106);
+assert.equal(equipped.intelligence,103);
+assert.equal(equipped.vitality,106,"socket gem adds Vitality alongside equipment and reforge");
+assert.equal(equipped.energy,107);
+assert.equal(equipped.agility,109);
+const nodes={inventoryCharacterDetailModal:{classList:{add:()=>{}}},inventoryCharacterDetailName:{},inventoryCharacterDetailStats:{}};
+Object.assign(context,{$:id=>nodes[id],inventoryCharacterIndex:0,getBackpackCharacter:()=>context.player,getBackpackCharacterStats:()=>equipped,getInventoryCharacterCriticalStats:()=>({physical:{chance:5,multiplier:1.5},magic:{chance:5,multiplier:1.5}})});
+vm.runInContext(detailSource,context);
+context.openInventoryCharacterDetail();
+const rows=Object.fromEntries([...nodes.inventoryCharacterDetailStats.innerHTML.matchAll(/<span>([^<]+)<\/span>\s*<b>([^<]+)<\/b>/g)].map(match=>[match[1],match[2]]));
+for(const [label,key] of [["HP","maxHP"],["SP","maxSP"],["攻擊","attackPoints"],["防禦","defensePoints"],["智力","intelligence"],["體質","vitality"],["能量","energy"],["敏捷","agility"]]){
+    assert.equal(rows[label],String(equipped[key]),label+" renders the formal owner value");
+}
+assert.notEqual(rows["攻擊"],String(equipped.attack));
+assert.notEqual(rows["防禦"],String(equipped.defense));
+context.characterEquipment.fire=originalEquipment;
 assert.match(detailSource,/\["HP",stats\.maxHP\]/,"character detail keeps Max HP");
 assert.match(detailSource,/\["SP",stats\.maxSP\]/,"character detail keeps Max SP");
 assert.match(detailSource,/\["攻擊",stats\.attackPoints\]/,"character detail shows effective Attack Points, not derived Physical Attack");
