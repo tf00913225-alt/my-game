@@ -15,16 +15,10 @@ permissions:
   contents: read
 
 jobs:
-  verify:
-    name: Repository checks
+  core_checks:
+    name: core_checks
     runs-on: ubuntu-latest
-    # Main-target releases run all 262 suites and the complete browser gates.
-    # Natural Wild battles add real animation time to the existing dev gates.
-    # Keep every gate; 80bbe8d7 hit the prior 20-minute limit after Wild passed.
-    # Daily natural battles add 6m33s; run 37133129829 reached the 30m cap
-    # after Daily and Tower passed, while the battle QA had printed PASS.
     timeout-minutes: 40
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -74,6 +68,9 @@ jobs:
           node --check .github/scripts/run-daily-dungeon-webp-browser-qa.mjs
           node --check .github/scripts/run-fire-portrait-browser-qa.mjs
           node --check .github/scripts/run-water-wild-portrait-browser-qa.mjs
+
+      - name: Verify CI aggregate failure propagation
+        run: node --test tests/ci-aggregate.test.mjs tests/session-repository-checks-wait.test.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
@@ -192,6 +189,72 @@ jobs:
         id: build_sync
         run: npm run build:check
 
+      - name: Capture build synchronization evidence
+        if: failure() && steps.build_sync.outcome == 'failure'
+        run: |
+          npm run build
+          mkdir -p artifacts/build-sync
+          cp index.html artifacts/build-sync/index.html
+          cp asset-manifest.json artifacts/build-sync/asset-manifest.json
+          cp config/feature-manifest.json artifacts/build-sync/feature-manifest.json
+          cp -R build artifacts/build-sync/build
+          git diff -- index.html asset-manifest.json config/feature-manifest.json build > artifacts/build-sync/build-sync.diff || true
+          find build -type f -print | sort > artifacts/build-sync/build-files.txt
+
+      - name: Upload build synchronization evidence
+        if: failure() && steps.build_sync.outcome == 'failure'
+        uses: actions/upload-artifact@v7
+        with:
+          name: production-build-sync-${{ github.sha }}
+          path: artifacts/build-sync
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Check static local resources
+        run: node .github/scripts/ci.mjs resources
+
+      - name: Check duplicate HTML IDs
+        run: node .github/scripts/ci.mjs html-ids
+
+      - name: Check release entries and loader integrity
+        run: node .github/scripts/ci.mjs loader
+
+      - name: Enforce release, cache, checklist and deprecated-code gates
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          node tests/package-version-ownership.test.mjs
+          node .github/scripts/release-gate.mjs ci
+
+      - name: Verify immutable deployment artifact
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.sha }}
+          EXPECTED_BRANCH: ${{ github.base_ref || github.ref_name }}
+        run: node .github/scripts/prepare-static-deployment.mjs
+
+      - name: Check Git whitespace and conflict markers
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node .github/scripts/ci.mjs git-diff
+
+
+  battle_browser:
+    name: battle_browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
       - name: Ensure CJK font support for player-text browser QA
         run: |
           if ! fc-list :lang=zh | rg -q .; then
@@ -213,55 +276,6 @@ jobs:
         with:
           name: battle-target-lifecycle-${{ github.sha }}
           path: artifacts/browser-qa/battle-target-*
-          if-no-files-found: error
-          retention-days: 90
-
-      - name: Run canonical bottom navigation and fixed home browser QA
-        id: bottom_nav_home_browser
-        env:
-          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        if: success() && github.event_name == 'pull_request'
-        run: |
-          node tests/bottom-nav-home-scroll-browser.test.js
-          node tests/starter-potion-recovery.test.js
-          node .github/scripts/run-foreground-potion-browser-qa.mjs
-
-      - name: Upload bottom navigation and home geometry evidence
-        if: always() && steps.bottom_nav_home_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v7
-        with:
-          name: bottom-nav-home-geometry-${{ github.sha }}
-          path: |
-            artifacts/browser-qa/bottom-nav-home-scroll-qa.json
-            artifacts/browser-qa/foreground-*
-            artifacts/browser-qa/navigation-*.png
-          if-no-files-found: error
-          retention-days: 90
-
-      - name: Run Daily Dungeon WebP decode and lifecycle browser QA
-        id: daily_dungeon_webp_browser
-        env:
-          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
-        run: |
-          python3 -m http.server 4175 --bind 127.0.0.1 > /tmp/four-symbols-daily-dungeon-qa-server.log 2>&1 &
-          SERVER_PID=$!
-          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
-          DEV_BASE_URL=http://127.0.0.1:4175 node .github/scripts/run-daily-dungeon-webp-browser-qa.mjs
-          node .github/scripts/run-daily-balance-browser-qa.mjs
-
-      - name: Upload Daily Dungeon WebP browser evidence
-        if: always() && steps.daily_dungeon_webp_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v7
-        with:
-          name: daily-dungeon-webp-browser-qa-${{ github.sha }}
-          path: |
-            artifacts/browser-qa/daily-dungeon-webp-browser-qa.json
-            artifacts/browser-qa/daily-dungeon-portrait-runtime-qa.json
-            artifacts/browser-qa/daily-dungeon-exp-*.png
-            artifacts/browser-qa/daily-dungeon-material-*.png
-            artifacts/browser-qa/daily-dungeon-gold-*.png
-            artifacts/browser-qa/daily-balance*
           if-no-files-found: error
           retention-days: 90
 
@@ -287,27 +301,90 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
-      - name: Verify Four Symbols Tower challenge convergence
-        id: tower_challenge
-        env:
-          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: |
-          node tests/monster-balance-owner-phase2c.test.mjs
-          node scripts/tower-balance-ttk-matrix.mjs artifacts/browser-qa/tower-challenge-balance-ttk.json
-          node tests/tower-challenge-formula.test.js
-          node tests/tower-element-formation-small-boss-20260924.test.js
-          node tests/gameplay-boss-tower-system.test.js
-          node .github/scripts/run-tower-challenge-browser-qa.mjs
-          node .github/scripts/run-wild-balance-browser-qa.mjs
+      - name: Run Fixed Slot battlefield 9x16 mobile browser QA
+        id: fixed_slot_browser
+        if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+        run: node .github/scripts/run-fixed-slot-battlefield-browser-qa.mjs
 
-      - name: Upload Tower challenge browser evidence
-        if: always() && steps.tower_challenge.outcome != 'skipped'
+      - name: Upload Fixed Slot battlefield browser evidence
+        if: always() && steps.fixed_slot_browser.outcome != 'skipped'
         uses: actions/upload-artifact@v7
         with:
-          name: tower-challenge-${{ github.sha }}
+          name: fixed-slot-battlefield-browser-qa-${{ github.sha }}
           path: |
-            artifacts/browser-qa/tower-challenge*
-            artifacts/browser-qa/wild-balance*
+            artifacts/browser-qa/fixed-slot-battlefield-rendering-v2.json
+            artifacts/browser-qa/boss-battle-convergence-412x915.png
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Run exact-candidate real battle mobile browser QA
+        id: battle_live_browser
+        if: success() && github.event_name == 'pull_request'
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/four-symbols-battle-qa-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          DEV_BASE_URL=http://127.0.0.1:4173 node .github/scripts/battle-layer-audio-live-qa.mjs
+
+      - name: Upload exact-candidate real battle browser evidence
+        if: always() && steps.battle_live_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v7
+        with:
+          name: battle-layout-vfx-live-qa-${{ github.sha }}
+          path: |
+            artifacts/browser-qa/battle-layer-audio-live-qa.json
+            artifacts/browser-qa/battle-layout-wind-flame-mobile.png
+            artifacts/browser-qa/battle-layer-element-box-mobile.png
+            artifacts/browser-qa/battle-result-modal-mobile.png
+            artifacts/browser-qa/boss-target-entity-live-412x915.png
+          if-no-files-found: error
+          retention-days: 90
+
+
+  ui_browser:
+    name: ui_browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Ensure CJK font support for player-text browser QA
+        run: |
+          if ! fc-list :lang=zh | rg -q .; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
+          fi
+
+      - name: Run canonical bottom navigation and fixed home browser QA
+        id: bottom_nav_home_browser
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        if: success() && github.event_name == 'pull_request'
+        run: |
+          node tests/bottom-nav-home-scroll-browser.test.js
+          node tests/starter-potion-recovery.test.js
+          node .github/scripts/run-foreground-potion-browser-qa.mjs
+
+      - name: Upload bottom navigation and home geometry evidence
+        if: always() && steps.bottom_nav_home_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v7
+        with:
+          name: bottom-nav-home-geometry-${{ github.sha }}
+          path: |
+            artifacts/browser-qa/bottom-nav-home-scroll-qa.json
+            artifacts/browser-qa/foreground-*
+            artifacts/browser-qa/navigation-*.png
           if-no-files-found: error
           retention-days: 90
 
@@ -361,67 +438,164 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
-      - name: Capture build synchronization evidence
-        if: failure() && steps.build_sync.outcome == 'failure'
-        run: |
-          npm run build
-          mkdir -p artifacts/build-sync
-          cp index.html artifacts/build-sync/index.html
-          cp asset-manifest.json artifacts/build-sync/asset-manifest.json
-          cp config/feature-manifest.json artifacts/build-sync/feature-manifest.json
-          cp -R build artifacts/build-sync/build
-          git diff -- index.html asset-manifest.json config/feature-manifest.json build > artifacts/build-sync/build-sync.diff || true
-          find build -type f -print | sort > artifacts/build-sync/build-files.txt
-
-      - name: Upload build synchronization evidence
-        if: failure() && steps.build_sync.outcome == 'failure'
-        uses: actions/upload-artifact@v7
-        with:
-          name: production-build-sync-${{ github.sha }}
-          path: artifacts/build-sync
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Run Fixed Slot battlefield 9x16 mobile browser QA
-        id: fixed_slot_browser
+      - name: Run skill progression mobile browser QA
+        id: skill_inventory_browser
         if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
-        run: node .github/scripts/run-fixed-slot-battlefield-browser-qa.mjs
+        run: node .github/scripts/run-skill-progression-browser-qa.mjs
 
-      - name: Upload Fixed Slot battlefield browser evidence
-        if: always() && steps.fixed_slot_browser.outcome != 'skipped'
+      - name: Upload Skill / Inventory browser evidence
+        if: always() && steps.skill_inventory_browser.outcome != 'skipped'
         uses: actions/upload-artifact@v7
         with:
-          name: fixed-slot-battlefield-browser-qa-${{ github.sha }}
+          name: skill-inventory-semantic-browser-qa-${{ github.sha }}
           path: |
-            artifacts/browser-qa/fixed-slot-battlefield-rendering-v2.json
-            artifacts/browser-qa/boss-battle-convergence-412x915.png
+            artifacts/browser-qa/skill-inventory-semantic-browser-qa.json
+            artifacts/browser-qa/skill-360x800.png
+            artifacts/browser-qa/skill-393x873.png
+            artifacts/browser-qa/skill-412x915.png
+            artifacts/browser-qa/inventory-home-393x873.png
+            artifacts/browser-qa/inventory-map-393x873.png
+            artifacts/browser-qa/inventory-dungeon-393x873.png
+            artifacts/browser-qa/battle-picker-393x873.png
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Run Backpack visual composition browser QA
+        id: backpack_visual_browser
+        if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+        run: node tests/backpack-visual-composition-browser.test.js
+
+      - name: Upload Backpack visual composition evidence
+        if: always() && steps.backpack_visual_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v7
+        with:
+          name: backpack-visual-composition-${{ github.sha }}
+          path: artifacts/browser-qa/backpack-*.png
           if-no-files-found: error
           retention-days: 90
 
-      - name: Run exact-candidate real battle mobile browser QA
-        id: battle_live_browser
-        if: success() && github.event_name == 'pull_request'
-        env:
-          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+
+  daily_browser:
+    name: daily_browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Ensure CJK font support for player-text browser QA
         run: |
-          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/four-symbols-battle-qa-server.log 2>&1 &
+          if ! fc-list :lang=zh | rg -q .; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
+          fi
+
+      - name: Run Daily Dungeon WebP decode and lifecycle browser QA
+        id: daily_dungeon_webp_browser
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+        run: |
+          python3 -m http.server 4175 --bind 127.0.0.1 > /tmp/four-symbols-daily-dungeon-qa-server.log 2>&1 &
           SERVER_PID=$!
           trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
-          DEV_BASE_URL=http://127.0.0.1:4173 node .github/scripts/battle-layer-audio-live-qa.mjs
+          DEV_BASE_URL=http://127.0.0.1:4175 node .github/scripts/run-daily-dungeon-webp-browser-qa.mjs
+          node .github/scripts/run-daily-balance-browser-qa.mjs
 
-      - name: Upload exact-candidate real battle browser evidence
-        if: always() && steps.battle_live_browser.outcome != 'skipped'
+      - name: Upload Daily Dungeon WebP browser evidence
+        if: always() && steps.daily_dungeon_webp_browser.outcome != 'skipped'
         uses: actions/upload-artifact@v7
         with:
-          name: battle-layout-vfx-live-qa-${{ github.sha }}
+          name: daily-dungeon-webp-browser-qa-${{ github.sha }}
           path: |
-            artifacts/browser-qa/battle-layer-audio-live-qa.json
-            artifacts/browser-qa/battle-layout-wind-flame-mobile.png
-            artifacts/browser-qa/battle-layer-element-box-mobile.png
-            artifacts/browser-qa/battle-result-modal-mobile.png
-            artifacts/browser-qa/boss-target-entity-live-412x915.png
+            artifacts/browser-qa/daily-dungeon-webp-browser-qa.json
+            artifacts/browser-qa/daily-dungeon-portrait-runtime-qa.json
+            artifacts/browser-qa/daily-dungeon-exp-*.png
+            artifacts/browser-qa/daily-dungeon-material-*.png
+            artifacts/browser-qa/daily-dungeon-gold-*.png
+            artifacts/browser-qa/daily-balance*
           if-no-files-found: error
           retention-days: 90
+
+
+  tower_wild_browser:
+    name: tower_wild_browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Ensure CJK font support for player-text browser QA
+        run: |
+          if ! fc-list :lang=zh | rg -q .; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
+          fi
+
+      - name: Verify Four Symbols Tower challenge convergence
+        id: tower_challenge
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          node tests/monster-balance-owner-phase2c.test.mjs
+          node scripts/tower-balance-ttk-matrix.mjs artifacts/browser-qa/tower-challenge-balance-ttk.json
+          node tests/tower-challenge-formula.test.js
+          node tests/tower-element-formation-small-boss-20260924.test.js
+          node tests/gameplay-boss-tower-system.test.js
+          node .github/scripts/run-tower-challenge-browser-qa.mjs
+          node .github/scripts/run-wild-balance-browser-qa.mjs
+
+      - name: Upload Tower challenge browser evidence
+        if: always() && steps.tower_challenge.outcome != 'skipped'
+        uses: actions/upload-artifact@v7
+        with:
+          name: tower-challenge-${{ github.sha }}
+          path: |
+            artifacts/browser-qa/tower-challenge*
+            artifacts/browser-qa/wild-balance*
+          if-no-files-found: error
+          retention-days: 90
+
+
+  portrait_browser:
+    name: portrait_browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Ensure CJK font support for player-text browser QA
+        run: |
+          if ! fc-list :lang=zh | rg -q .; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
+          fi
 
       - name: Run Fire Tower identity and first-frame mobile browser QA
         id: fire_tower_identity_browser
@@ -482,6 +656,30 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+
+  adventure_ui_browser:
+    name: adventure_ui_browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Ensure CJK font support for player-text browser QA
+        run: |
+          if ! fc-list :lang=zh | rg -q .; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
+          fi
+
       - name: Run Adventure V1 mobile browser QA
         id: adventure_browser
         if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
@@ -496,6 +694,31 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+
+  main_browser:
+    name: main_browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Ensure CJK font support for player-text browser QA
+        run: |
+          if ! fc-list :lang=zh | rg -q .; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
+          fi
+
       - name: Run account-first cold/warm mobile browser QA
         if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
         run: node .github/scripts/run-boot-architecture-browser-qa.mjs
@@ -509,73 +732,11 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
-      - name: Run skill progression mobile browser QA
-        id: skill_inventory_browser
-        if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
-        run: node .github/scripts/run-skill-progression-browser-qa.mjs
-
-      - name: Upload Skill / Inventory browser evidence
-        if: always() && steps.skill_inventory_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v7
-        with:
-          name: skill-inventory-semantic-browser-qa-${{ github.sha }}
-          path: |
-            artifacts/browser-qa/skill-inventory-semantic-browser-qa.json
-            artifacts/browser-qa/skill-360x800.png
-            artifacts/browser-qa/skill-393x873.png
-            artifacts/browser-qa/skill-412x915.png
-            artifacts/browser-qa/inventory-home-393x873.png
-            artifacts/browser-qa/inventory-map-393x873.png
-            artifacts/browser-qa/inventory-dungeon-393x873.png
-            artifacts/browser-qa/battle-picker-393x873.png
-          if-no-files-found: warn
-          retention-days: 90
-
-      - name: Run Backpack visual composition browser QA
-        id: backpack_visual_browser
-        if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
-        run: node tests/backpack-visual-composition-browser.test.js
-
-      - name: Upload Backpack visual composition evidence
-        if: always() && steps.backpack_visual_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v7
-        with:
-          name: backpack-visual-composition-${{ github.sha }}
-          path: artifacts/browser-qa/backpack-*.png
-          if-no-files-found: error
-          retention-days: 90
-
       - name: Run relic progression mobile browser QA
         if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
         run: node .github/scripts/run-relic-progression-browser-qa.mjs
 
-      - name: Check static local resources
-        run: node .github/scripts/ci.mjs resources
 
-      - name: Check duplicate HTML IDs
-        run: node .github/scripts/ci.mjs html-ids
-
-      - name: Check release entries and loader integrity
-        run: node .github/scripts/ci.mjs loader
-
-      - name: Enforce release, cache, checklist and deprecated-code gates
-        env:
-          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: |
-          node tests/package-version-ownership.test.mjs
-          node .github/scripts/release-gate.mjs ci
-
-      - name: Verify immutable deployment artifact
-        env:
-          EXPECTED_COMMIT_SHA: ${{ github.sha }}
-          EXPECTED_BRANCH: ${{ github.base_ref || github.ref_name }}
-        run: node .github/scripts/prepare-static-deployment.mjs
-
-      - name: Check Git whitespace and conflict markers
-        env:
-          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-          CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: node .github/scripts/ci.mjs git-diff
 
   abyss_balance:
     name: Abyss Phase2D production gates
@@ -680,9 +841,33 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+  verify:
+    name: Repository checks
+    if: always()
+    needs: [core_checks, battle_browser, ui_browser, daily_browser, tower_wild_browser, portrait_browser, adventure_ui_browser, main_browser, abyss_balance, adventure_balance, boss_balance]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Require every necessary child gate
+        env:
+          CI_NEEDS_JSON: ${{ toJSON(needs) }}
+          CI_MAIN_REQUIRED: ${{ github.ref == 'refs/heads/main' || github.base_ref == 'main' }}
+        run: node .github/scripts/ci-aggregate.mjs
+
   deploy_dev:
     name: Dev deployment gate
-    needs: [verify, abyss_balance, adventure_balance, boss_balance]
+    needs: verify
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     uses: ./.github/workflows/deploy-dev-cloudflare.yml
     secrets: inherit
