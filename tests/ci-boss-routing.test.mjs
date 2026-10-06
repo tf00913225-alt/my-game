@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
+import {parse} from 'acorn';
 import {classifyChanges, classifySharedSource, changedPaths} from '../.github/scripts/ci-change-classifier.mjs';
 const plan=(paths,options={})=>classifyChanges(paths,{enabled:true,...options});
 test('nine routing acceptance cases',()=>{
@@ -35,7 +36,12 @@ test('real main source character rows and enemy numeric presentation stay target
   const character=source.replace('["攻擊",stats.attackPoints]','["攻擊",stats.attack]');
   assert.notEqual(character,source);
   assert.deepEqual(classifySharedSource(character,source),['ui','inventory']);
-  const enemy=source.replace('hpText.textContent=monster.hp+"/"+monster.maxHP;','hpText.textContent=Math.floor(monster.hp)+"/"+Math.floor(monster.maxHP);');
+  // Use the formal declaration boundary rather than pinning old HP writer text:
+  // concurrent #810 legitimately delegates that writer to its projection owner.
+  const owner=parse(source,{ecmaVersion:'latest'}).body.find(n=>n.type==='FunctionDeclaration' && n.id.name==='applyMonsterUiUpdate');
+  assert.ok(owner);
+  const offset=owner.body.start+1;
+  const enemy=source.slice(0,offset)+'\nconst numericPresentationFixture=Math.floor(1.5);\n'+source.slice(offset);
   assert.notEqual(enemy,source);
   assert.deepEqual(classifySharedSource(source,enemy),['battle']);
   assert.equal(plan(['js/00-main.js','build/asset-manifest.json'],{responsibilities:classifySharedSource(source,enemy),generatedVerified:true}).gates.boss_balance,false);
@@ -60,3 +66,4 @@ test('real shallow PR reproduces no merge base; classifier checkout ancestry rec
     assert.deepEqual(changedPaths(base,head,false,'push').sort(),['base.txt','ui.txt']);
   } finally {process.chdir(previous);fs.rmSync(temp,{recursive:true,force:true});}
 });
+
