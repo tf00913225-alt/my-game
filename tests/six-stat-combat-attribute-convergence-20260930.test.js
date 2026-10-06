@@ -88,4 +88,21 @@ assert.doesNotMatch(index,/精神|creationSpirit|statusSpirit|data-stat="spirit"
 assert.match(index,/id="statusDefense"/);
 assert.match(contracts,/Physical Damage.*Magic Damage/);
 assert.match(contracts,/Physical Skill Elite\/Boss Rank Bonus.*RETIRED/);
-console.log("✓ six-stat runtime owners, migration, unified defense, equipment preservation, and retired rank bonus");
+
+const detailSource=extractFunction(main,"openInventoryCharacterDetail");
+assert.match(detailSource,/\["HP",stats\.maxHP\]/,"character detail keeps Max HP");
+assert.match(detailSource,/\["SP",stats\.maxSP\]/,"character detail keeps Max SP");
+assert.match(detailSource,/\["攻擊",stats\.attackPoints\]/,"character detail shows effective Attack Points, not derived Physical Attack");
+assert.match(detailSource,/\["防禦",stats\.defensePoints\]/,"character detail shows effective Defense Points, not derived Final Defense");
+assert.match(detailSource,/\["智力",stats\.intelligence\]/);
+assert.match(detailSource,/\["體質",stats\.vitality\]/);
+assert.match(detailSource,/\["能量",stats\.energy\]/);
+assert.match(detailSource,/\["敏捷",stats\.agility\]/);
+assert.doesNotMatch(detailSource,/\["攻擊",stats\.attack\]/);
+assert.doesNotMatch(detailSource,/\["防禦",stats\.defense\]/);
+assert.match(main,/const ATTACK_PER_LEVEL = 4;/,"physical attack keeps +4 per character level");
+assert.match(main,/const MAGIC_ATTACK_PER_LEVEL = 4;/,"magic attack keeps +4 per character level");
+assert.match(main,/const DEFENSE_PER_LEVEL = 3;/,"defense keeps +3 per character level");
+assert.match(main,/const MAGIC_ATTACK_PER_POINT = 2\.75;/,"each Intelligence point keeps +2.75 Magic Attack");
+
+console.log("✓ six-stat runtime owners, effective-point detail UI, level growth, migration, unified defense, and retired rank bonus");
