@@ -143,3 +143,20 @@ health before Repository checks succeeds. Existing main/production gates remain.
 Protection endpoints remain UNVERIFIED. Main promotion/production is not
 performed. Nightly activation remains a platform/authorization limitation;
 code integration alone must not be called complete schedule activation.
+
+## Exact dev deployment parallelization
+
+Publication remains one immutable artifact deployment. Six independent deployed
+QA groups (Responsive/Forge, Battle/Hit/Daily, Tower, Abyss, Adventure, Boss)
+check the same github.sha source and dev HEAD, and validate deployed manifest
+before and after QA. No QA command/evidence upload is removed. Credentials
+remain only in the publication job. The original `Deploy dev preview` check
+now aggregates publisher plus all six groups: failure, cancellation or skip
+fails the final barrier. Production deployment workflow is unchanged.
+
+Local acceptance: 137 targeted contract tests PASS, workflow YAML/semantic
+validation and actionlint PASS, git diff --check PASS. Remote final-head
+acceptance and full dev deployment remain pending until actual run completion.
+Rollback dependent changes in reverse order: deployed parallelization, then
+Nightly/health; PR classifier enforcement can separately return to Shadow by
+setting PR_GATES_ENABLED=false. Never remove existing main/dev protection.

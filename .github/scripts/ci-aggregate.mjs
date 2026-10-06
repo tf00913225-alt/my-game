@@ -7,6 +7,13 @@ export const CHILD_GATES = Object.freeze([
   'tower_wild_browser', 'portrait_browser', 'adventure_ui_browser',
   'main_browser', 'abyss_balance', 'adventure_balance', 'boss_balance', 'session_authority', 'promotion_health'
 ]);
+export const DEPLOYMENT_GATES=Object.freeze(['publish_dev','responsive_live','battle_daily_live','tower_live','abyss_live','adventure_live','boss_live']);
+export function requireDeploymentGates(needs) {
+  if(!needs || typeof needs!=='object' || Array.isArray(needs)) throw Error('Invalid deployment aggregate input');
+  if(Object.keys(needs).some(k=>!DEPLOYMENT_GATES.includes(k))) throw Error('Unknown deployment dependency');
+  for(const key of DEPLOYMENT_GATES) if(needs[key]?.result!=='success') throw Error(`Required deployed QA ${key} did not pass: ${needs[key]?.result ?? 'missing'}`);
+  return true;
+}
 
 export function requireChildGates(needs, {mainRequired = true, plan} = {}) {
   if (!needs || typeof needs !== 'object' || Array.isArray(needs)) throw Error('Invalid aggregate input');
@@ -36,6 +43,10 @@ export function requireChildGates(needs, {mainRequired = true, plan} = {}) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
+    if(process.argv.includes('--dev-deployment')) {
+      requireDeploymentGates(JSON.parse(process.env.CI_NEEDS_JSON));
+      console.log('Exact-SHA deployed QA: every required group passed.');
+    } else {
     if (!['true', 'false'].includes(process.env.CI_MAIN_REQUIRED)) throw Error('Missing main gate policy');
     const plan = JSON.parse(process.env.CI_PLAN_JSON);
     if (!plan) throw Error('Missing classifier plan');
@@ -43,6 +54,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       mainRequired: process.env.CI_MAIN_REQUIRED === 'true', plan
     });
     console.log('Repository checks: every required child passed; only explicit classifier/main-only skips accepted.');
+    }
   } catch (error) {
     console.error(`::error::${error.message}`);
     process.exitCode = 1;

@@ -1,10 +1,29 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {CHILD_GATES, requireChildGates} from '../.github/scripts/ci-aggregate.mjs';
+import {CHILD_GATES, requireChildGates, DEPLOYMENT_GATES, requireDeploymentGates} from '../.github/scripts/ci-aggregate.mjs';
 import {classifyChanges} from '../.github/scripts/ci-change-classifier.mjs';
 
 const passed = () => Object.fromEntries(CHILD_GATES.map(key => [key, {result: 'success'}]));
+test('deployed aggregate accepts all pass and rejects every failure, skip or cancellation',()=>{
+  const passed=()=>Object.fromEntries(DEPLOYMENT_GATES.map(k=>[k,{result:'success'}]));
+  assert.equal(requireDeploymentGates(passed()),true);
+  for(const key of DEPLOYMENT_GATES) for(const result of ['failure','skipped','cancelled',undefined]) {
+    const needs=passed();needs[key]={result};assert.throws(()=>requireDeploymentGates(needs),/did not pass/);
+  }
+});
+test('every parallel deployed QA binds its pre/post manifest checks to the same exact SHA',()=>{
+  const text=fs.readFileSync(new URL('../.github/workflows/deploy-dev-cloudflare.yml',import.meta.url),'utf8');
+  for(const key of DEPLOYMENT_GATES.filter(k=>k!=='publish_dev')) {
+    const job=text.split('\n  '+key+':')[1].split(/\n  [a-z_]+:/)[0];
+    assert.match(job,/needs: publish_dev/);assert.match(job,/EXPECTED_COMMIT_SHA: \$\{\{ github.sha \}\}/);
+    assert.equal((job.match(/node \.github\/scripts\/release-gate\.mjs verify-deployed/g)||[]).length,2);
+    assert.match(job,/ref: \$\{\{ github.sha \}\}/);
+  }
+  const aggregate=text.split('\n  deploy:')[1];
+  assert.match(aggregate,/name: Deploy dev preview\n    if: always\(\)/);
+  assert.deepEqual(aggregate.match(/needs: \[([^\]]+)\]/)[1].split(',').map(v=>v.trim()),[...DEPLOYMENT_GATES]);
+});
 test('all children pass => aggregate passes', () => assert.equal(requireChildGates(passed()), true));
 for (const key of CHILD_GATES) {
   for (const result of ['failure', 'cancelled', 'skipped', 'neutral', 'queued', undefined]) {
