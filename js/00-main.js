@@ -29968,8 +29968,8 @@ function openInventoryCharacterDetail(){
     const rows=[
         ["HP",stats.maxHP],
         ["SP",stats.maxSP],
-        ["攻擊",stats.attack],
-        ["防禦",stats.defense],
+        ["攻擊",stats.attackPoints],
+        ["防禦",stats.defensePoints],
         ["智力",stats.intelligence],
         ["體質",stats.vitality],
         ["能量",stats.energy],
