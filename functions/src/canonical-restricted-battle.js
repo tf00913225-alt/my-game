@@ -1,6 +1,7 @@
 "use strict";
 
-const {randomBytes:cryptoRandomBytes}=require('node:crypto');
+const {randomBytes:cryptoRandomBytes,createHash}=require('node:crypto');
+const fs=require('node:fs');
 const {sampleForestRepeatedRound}=require('./canonical-battle-opening-round');
 const {createCanonicalBattleEncounter,inspectPolicy}=require('./canonical-battle-encounter');
 const {resolvePlainPlayerNormalAttack}=require('./canonical-battle-normal-attack');
@@ -194,8 +195,13 @@ function createCanonicalRestrictedBattle(dependencies){
       {battleSnap,markerSnap,receiptSnap,grantSnap,ledgerSnap,otherAttemptSnap});
   }
 
-  const roundPolicy={schemaVersion:1,policyId:'restricted-normal-round-writer-v1',maxRounds:128,
+  const roundPolicyDeclaration={schemaVersion:1,policyId:'restricted-normal-round-writer-v1',maxRounds:128,
     action:'normal-attack',playerSlot:'player-0',targetSlot:'enemy-0',entropyBytes:42,...flags};
+  // Normalize line endings so review and Linux deployment share code identity.
+  const codeHash=path=>createHash('sha256').update(fs.readFileSync(path,'utf8').replace(/\r\n/g,'\n')).digest('hex');
+  const roundPolicy={...roundPolicyDeclaration,
+    arithmeticSha256:codeHash(require.resolve('./canonical-battle-opening-round')),
+    writerSha256:codeHash(__filename)};
   const roundKind='restricted-battle-round';
   const roundFields=['schemaVersion','kind','ownerUid','operationId','battleId','battleSha256',
     'sourceRevision','creationSessionId','expiresAtMs','committedAtMs','policySha256','writerPolicy',
@@ -211,7 +217,10 @@ function createCanonicalRestrictedBattle(dependencies){
         r.sourceRevision!==b.sourceRevision||r.creationSessionId!==b.creationSessionId||
         r.expiresAtMs!==b.expiresAtMs||!Number.isSafeInteger(r.committedAtMs)||
         r.committedAtMs<priorTime||r.committedAtMs>=b.expiresAtMs||r.policySha256!==b.policySha256||
-        digest(r.writerPolicy)!==digest(roundPolicy)||r.priorRoundSha256!==priorHash||
+        !r.writerPolicy||!HASH.test(r.writerPolicy.arithmeticSha256||'')||!HASH.test(r.writerPolicy.writerSha256||'')||
+        Object.keys(r.writerPolicy).sort().join('|')!==[...Object.keys(roundPolicyDeclaration),'arithmeticSha256','writerSha256'].sort().join('|')||
+        digest(Object.fromEntries(Object.keys(roundPolicyDeclaration).map(k=>[k,r.writerPolicy[k]])))!==digest(roundPolicyDeclaration)||
+        r.priorRoundSha256!==priorHash||
         !noAuthority(r)||r.sha256!==roundDigest(r)||!stamped(r)||!stamped(receipt)||
         digest(Object.fromEntries(Object.keys(roundReceipt(r)).map(k=>[k,receipt[k]])))!==digest(roundReceipt(r))||
         !p||p.schemaVersion!==1||p.kind!=='restricted-forest-round-arithmetic'||!noAuthority(p)||
@@ -277,6 +286,9 @@ function createCanonicalRestrictedBattle(dependencies){
       if(typeof r.operationId!=='string'||!ID.test(r.operationId))fail('data-loss','Round operation is invalid.');
       const receiptSnap=await tx.get(root.collection('operations').doc(r.operationId));
       inspectRound(r,receiptSnap.exists?receiptSnap.data():null,b,bundle,state,hash,i+1,time);
+      if(rounds.length&&digest(r.writerPolicy)!==digest(rounds[0].writerPolicy)){
+        fail('data-loss','Committed rounds use incompatible execution policies.');
+      }
       rounds.push(r);state=r.projection.nextState;hash=r.sha256;time=r.committedAtMs;
     }
     if(head&&hash!==head.roundSha256)fail('data-loss','Round head digest is inconsistent.');
@@ -290,6 +302,7 @@ function createCanonicalRestrictedBattle(dependencies){
       !Number.isSafeInteger(args.expectedRevision)||args.expectedRevision<1||
       !Number.isSafeInteger(args.expectedRoundVersion)||args.expectedRoundVersion<0||
       args.expectedRoundVersion>=roundPolicy.maxRounds||
+      !args.action||typeof args.action!=='object'||Array.isArray(args.action)||
       digest(args.action)!==digest({type:'normal-attack',actor:'player-0',target:'enemy-0'})||
       Object.keys(request?.data||{}).some(k=>!['uid','session'].includes(k))){
       fail('invalid-argument','Only original IDs, expected versions and the restricted normal attack declaration are accepted.');
@@ -326,7 +339,8 @@ function createCanonicalRestrictedBattle(dependencies){
       if(!chain.state.playerHP||!chain.state.enemyHP)fail('failed-precondition','Terminal resources cannot advance.');
       if(accountSnap.data()?.serverRevision!==expectedRevision||envelopeSnap.data()?.serverRevision!==expectedRevision||
         accountSnap.data()?.snapshotSha256!==b.snapshotSha256)fail('aborted','CLOUD_REVISION_CONFLICT');
-      if(digest(bundle)!==digest({restricted:restrictedPolicy,opening:openingPolicy,player:playerPolicy,encounter:catalog})){
+      if((chain.rounds.length&&digest(chain.rounds[0].writerPolicy)!==digest(roundPolicy))||
+        digest(bundle)!==digest({restricted:restrictedPolicy,opening:openingPolicy,player:playerPolicy,encounter:catalog})){
         fail('failed-precondition','New execution requires the original deployment policy.');
       }
       let cursor=0,projection;

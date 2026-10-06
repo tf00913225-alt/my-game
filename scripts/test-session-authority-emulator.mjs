@@ -716,6 +716,13 @@ const repeatedSame=await Promise.all([roundOwner.advance(yRequest,winningRoundAr
 for(const replay of repeatedSame)assert.deepEqual(replay,{...firstRound,unchanged:true});
 await assert.rejects(roundOwner.advance(yRequest,{...winningRoundArgs,expectedRoundVersion:1}),e=>e.code==='failed-precondition');
 const secondArgs={...roundArgs,operationId:'restricted-round-emulator-0003',expectedRoundVersion:1};
+let deadlineReads=0;
+const expiredDuringCommit=createCanonicalRestrictedBattle({...roundDeps,
+  now:()=>++deadlineReads<3?instanceClock:battleStart.expiresAtMs});
+const beforeDeadlineMarker=(await instanceMarkerRef.get()).data();
+await assert.rejects(expiredDuringCommit.advance(yRequest,secondArgs),e=>e.code==='failed-precondition');
+assert.deepEqual((await instanceMarkerRef.get()).data(),beforeDeadlineMarker);
+assert.equal((await battleRoot.collection('operations').doc(secondArgs.operationId).get()).exists,false);
 await roundOwner.advance(yRequest,secondArgs);
 const round2Ref=battleRoot.collection('restrictedBattleRounds').doc(battleStart.attemptId+'_2');
 const round2=(await round2Ref.get()).data();
@@ -735,6 +742,16 @@ await assert.rejects(roundOwner.advance(yRequest,winningRoundArgs),e=>e.code==='
 await instanceMarkerRef.set(committedMarker);
 await round1Ref.update({'projection.nextState.playerHP':round1.projection.nextState.playerHP+1});
 await assert.rejects(roundOwner.advance(yRequest,winningRoundArgs),e=>e.code==='data-loss');await round1Ref.set(round1);
+const roundFs=require('node:fs'),originalRead=roundFs.readFileSync;
+roundFs.readFileSync=(path,...rest)=>{
+  const content=originalRead(path,...rest);
+  return String(path).endsWith('canonical-battle-opening-round.js')?content+'\n// changed deployment':content;
+};
+let changedExecutableOwner;
+try{changedExecutableOwner=createCanonicalRestrictedBattle(roundDeps);}finally{roundFs.readFileSync=originalRead;}
+assert.deepEqual(await changedExecutableOwner.advance(yRequest,winningRoundArgs),{...firstRound,unchanged:true});
+await assert.rejects(changedExecutableOwner.advance(yRequest,{...roundArgs,operationId:'restricted-round-emulator-0004',expectedRoundVersion:2}),
+  e=>e.code==='failed-precondition');
 const roundCurrent=require('../functions/src/generated/forest-opening-round-policy.json');
 const originalRuleHash=roundCurrent.rulesSha256;roundCurrent.rulesSha256='0'.repeat(64);
 try{

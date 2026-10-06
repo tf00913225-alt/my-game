@@ -22,9 +22,9 @@ function fixture({mutate=()=>{},retry=false,entropy=.999999,enemy='wild.zone-01.
     [`${root}/playableSnapshots/2`,snapshot],[`${root}/recoveryArchives/2`,createRecoveryArchive(uid,2,records,snapshot)],
     [`users/${uid}/saves/current`,{serverRevision:2,authoritativeStateReady:false}]]);
   const collection=p=>({doc:id=>({path:`${p}/${id}`,collection:n=>collection(`${p}/${id}/${n}`)})});
-  let clock=1000,writes=0,entropyCalls=0,abort=false,active=sessionId;
+  let clock=1000,writes=0,entropyCalls=0,clockReads=0,expireOnRead=0,abort=false,active=sessionId;
   class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
-  const deps={db:{collection},FieldValue:{serverTimestamp:()=>({toMillis:()=>123})},HttpsError,now:()=>clock,randomBytes:n=>{entropyCalls++;const b=Buffer.alloc(n);
+  const deps={db:{collection},FieldValue:{serverTimestamp:()=>({toMillis:()=>123})},HttpsError,now:()=>{clockReads++;if(expireOnRead===clockReads)clock=601000;return clock;},randomBytes:n=>{entropyCalls++;const b=Buffer.alloc(n);
       for(let i=0;i<n;i+=6)b.writeUIntBE(Math.floor(entropy*281474976710656),i,6);return b;},
     inspectExistingEnvelope:v=>({kind:'current',data:v,serverRevision:v.serverRevision}),
     runProtected:async(request,fn)=>{
@@ -41,8 +41,8 @@ function fixture({mutate=()=>{},retry=false,entropy=.999999,enemy='wild.zone-01.
     }};
   const owner=createCanonicalRestrictedBattle(deps),request={data:{uid,session:{}}};
   const args={attemptId,operationId,expectedRevision:2};
-  return {data,root,records,snapshot,args,request,owner,get writes(){return writes;},get entropyCalls(){return entropyCalls;},
-    set clock(v){clock=v;},set abort(v){abort=v;},set session(v){active=v;},
+  return {data,root,records,snapshot,args,request,owner,newOwner:()=>createCanonicalRestrictedBattle(deps),get writes(){return writes;},get entropyCalls(){return entropyCalls;},
+    set clock(v){clock=v;},set expireOnRead(v){expireOnRead=v;clockReads=0;},set abort(v){abort=v;},set session(v){active=v;},
     seed:async()=>{await createCanonicalBattleAttempt(deps).begin(request,{operationId:attemptId,expectedRevision:2});
       clock=1001;await createCanonicalBattleEncounter(deps).seal(request,{attemptId,
         operationId:'restricted-encounter-0001',expectedRevision:2,encounterKey:enemy});clock=1002;},
@@ -227,4 +227,37 @@ test('new rounds require original expiry/revision/session but historical replay 
   h.clock=1003;
   await assert.rejects(h.owner.advance(h.request,roundArgs(h,1,'restricted-round-operation-0002')),e=>e.code==='aborted');
   h.session='x'.repeat(32);await assert.rejects(advance(h));assert.equal(h.writes,14);
+});
+
+test('changed executable policy refuses a new round but historical replay never runs the new arithmetic',async()=>{
+  const h=await prepared(),first=await advance(h);
+  const nativeRead=fs.readFileSync;
+  fs.readFileSync=(path,...rest)=>{
+    const content=nativeRead(path,...rest);
+    return String(path).endsWith('canonical-battle-opening-round.js')?content+'\n// changed deployment':content;
+  };
+  let changed;
+  try{
+    // Recreate the production factory with the fixture's original dependencies.
+    changed=h.newOwner();
+  }finally{fs.readFileSync=nativeRead;}
+  assert.deepEqual(await changed.advance(h.request,roundArgs(h)),{...first,unchanged:true});
+  await assert.rejects(changed.advance(h.request,roundArgs(h,1,'restricted-round-operation-0002')),
+    e=>e.code==='failed-precondition');assert.equal(h.writes,14);
+});
+
+test('expiry crossed during the transaction rejects all buffered writes',async()=>{
+  const h=await prepared(),before=[...h.data];h.expireOnRead=3;
+  await assert.rejects(advance(h),e=>e.code==='failed-precondition');assert.deepEqual([...h.data],before);
+});
+test('bounded full-chain exhaustion never issues a terminal verdict or permits overflow',async()=>{
+  const h=await prepared();
+  for(let version=0;version<128;version++){
+    const result=await h.owner.advance(h.request,roundArgs(h,version,'restricted-bound-round-'+String(version).padStart(4,'0')));
+    assert.equal(result.roundVersion,version+1);assert.equal(result.outcomeVerified,false);
+  }
+  const before=h.writes;
+  await assert.rejects(h.owner.advance(h.request,roundArgs(h,128,'restricted-bound-overflow-0001')),e=>e.code==='invalid-argument');
+  assert.equal(h.writes,before);
+  const replay=await h.owner.advance(h.request,roundArgs(h,0,'restricted-bound-round-0000'));assert.equal(replay.unchanged,true);
 });
