@@ -17,7 +17,14 @@ const integerText=text=>assert.match(text,/^\d+$/);
 const lateSource=fs.readFileSync('js/54-v173.51-battle-qa.js','utf8');
 run(lateSource.slice(lateSource.indexOf('function syncResourceNumbers(){'),lateSource.indexOf('function syncBattlePresentation(){')));
 c.document.querySelectorAll=selector=>selector==="#battlePage .battle-monster[id^='battleMonster']"?[{id:'battleMonster0'}]:[];
-const render=()=>run('applyMonsterUiUpdate(0);syncResourceNumbers()');
+const render=()=>{
+  run('applyMonsterUiUpdate(0)');
+  const hp=node('battleMonsterHPText').textContent,sp=node('battleMonsterSPText').textContent;
+  integerText(hp);integerText(sp);
+  run('syncResourceNumbers()');
+  assert.equal(node('battleMonsterHPText').textContent,hp);
+  assert.equal(node('battleMonsterSPText').textContent,sp);
+};
 const set=source=>run('monsters=['+source+'];currentBattleMonsters=[0]');
 
 test('full production hooks project fractional resources without mutating combat state',()=>{

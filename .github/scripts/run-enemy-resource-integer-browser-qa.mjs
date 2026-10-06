@@ -26,7 +26,9 @@ const expression=`(async()=>{
   const evidence=[];
   const capture=async(label,index=0)=>{
     const m=monsters[index],before=[m.hp,m.maxHP,m.sp,m.maxSP],party=getExistingPartyIndexes().map(i=>{const p=getPartyCharacterByIndex(i);return [p.hp,p.sp];});
-    updateMonsterUI(index);FourSymbolsBattlePresentation.sync();await new Promise(r=>setTimeout(r,120));
+    updateMonsterUI(index);
+    const mutationHp=document.getElementById('battleMonsterHPText'+index).textContent,mutationSp=document.getElementById('battleMonsterSPText'+index).textContent;
+    FourSymbolsBattlePresentation.sync();await new Promise(r=>setTimeout(r,120));
     const text=id=>document.getElementById(id+index).textContent;
     const width=id=>parseFloat(document.getElementById(id+index).style.width);
     openBattleStatusDetailModal('monster',index);
@@ -35,7 +37,7 @@ const expression=`(async()=>{
     closeBattleStatusDetailModal();
     const after=[m.hp,m.maxHP,m.sp,m.maxSP],partyAfter=getExistingPartyIndexes().map(i=>{const p=getPartyCharacterByIndex(i);return [p.hp,p.sp];});
     const card=document.getElementById('battleMonster'+index),rect=card.getBoundingClientRect();
-    const result={label,before,after,party,partyAfter,hp:text('battleMonsterHPText'),sp:text('battleMonsterSPText'),hpWidth:width('battleMonsterBar'),spWidth:width('battleMonsterSPBar'),hpDetail,spDetail,visible:rect.width>0&&rect.height>0&&getComputedStyle(card).display!=='none'};
+    const result={label,before,after,party,partyAfter,mutationHp,mutationSp,hp:text('battleMonsterHPText'),sp:text('battleMonsterSPText'),hpWidth:width('battleMonsterBar'),spWidth:width('battleMonsterSPBar'),hpDetail,spDetail,visible:rect.width>0&&rect.height>0&&getComputedStyle(card).display!=='none'};
     evidence.push(result);return result;
   };
   await capture('formal-abyss-elite');
@@ -78,6 +80,8 @@ try{
   for(const row of evidence){
     assert.match(row.hp,/^\d+$/,row.label);
     assert.match(row.sp,/^\d+$/,row.label);
+    assert.equal(row.mutationHp,row.hp,row.label+' mutation and late HP owner agree');
+    assert.equal(row.mutationSp,row.sp,row.label+' mutation and late SP owner agree');
     assert.match(row.hpDetail,/^HP：\d+ \/ \d+$/);assert.match(row.spDetail,/^SP：\d+ \/ \d+$/);
     // JSON serialization maps non-finite fixture numbers to null on both sides.
     assert.deepEqual(row.after,row.before,row.label+' must not mutate resources');
