@@ -7032,6 +7032,7 @@ function saveGame(options={}){
         try{
             repository.writeForUid(activeUid,saveData,{
                 source:String(persistenceOptions.source||"gameplay"),
+                ...(persistenceOptions.equipmentShopState?{equipmentShopState:persistenceOptions.equipmentShopState}:{}),
                 ...(typeof persistenceOptions.localDirty==="boolean"?{localDirty:persistenceOptions.localDirty}:{})
             });
         }finally{

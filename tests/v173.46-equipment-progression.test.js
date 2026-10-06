@@ -35,7 +35,7 @@ assert.match(source,/shoulder:\{label:"護腕",warrior:\["vitality","attack"\],m
 assert.match(source,/head:\{label:"頭盔",warrior:\["vitality","attack","agility"\],mage:\["vitality","intelligence","agility"\]\}/);
 assert.match(source,/weapon:\{label:"武器",warrior:\["attack"\],mage:\["intelligence"\]\}/);
 
-assert.match(source,/currentShopOffers\(\)[\s\S]*?generateEquipment\(seededRandom/);
+assert.match(source,/currentShopOffers\(state=shopState\(\)\)[\s\S]*?generateEquipment\(seededRandom/);
 assert.match(source,/window\.v17346BuyEquipmentShopOffer/);
 assert.match(source,/window\.v148BuildDailyDungeonWaves\("gold"\)/);
 assert.match(source,/window\.v17346BeginEquipmentDungeon=beginEquipmentDungeon/);

@@ -107,7 +107,7 @@
         return RARITIES[RARITIES.length-1];
     }
     function artMarkup(path,rarityKey){
-        return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarityKey+'"><img src="'+path+'" alt="" draggable="false" onerror="this.hidden=true"></span>';
+        return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarityKey+'"><img src="'+path+'" alt="" draggable="false" onerror="this.parentElement.dataset.assetState=\'broken\';this.parentElement.setAttribute(\'role\',\'img\');this.parentElement.setAttribute(\'aria-label\',\'裝備圖片無法載入\');this.parentElement.textContent=\'◇\'"></span>';
     }
     const LEGACY_STARTER_EQUIPMENT_ART={
         ironSword:{path:"assets/equipment/warrior/weapon-01.png",classType:"warrior"},
@@ -554,11 +554,26 @@
 
     function shopState(){
         const today=(()=>{const now=new Date();return now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");})();
-        try{ const stored=JSON.parse(localStorage.getItem(SHOP_STORAGE_KEY)||"{}"); return stored&&stored.date===today?{date:today,refreshCount:Math.max(0,Math.min(10,Math.floor(Number(stored.refreshCount)||0)))}:{date:today,refreshCount:0}; }catch(_){ return {date:today,refreshCount:0}; }
+        const fresh={date:today,refreshCount:0,soldOfferIds:[]};
+        try{
+            const raw=localStorage.getItem(SHOP_STORAGE_KEY);
+            if(raw===null){ return fresh; }
+            const stored=JSON.parse(raw);
+            if(!stored||typeof stored.date!=="string"||!Number.isInteger(stored.refreshCount)||stored.refreshCount<0||stored.refreshCount>10){ return null; }
+            if(stored.date!==today){ return fresh; }
+            // Existing date/refresh-only records migrate in place. Inventory
+            // names and generated instance UIDs are never purchase receipts.
+            const sold=stored.soldOfferIds===undefined?[]:stored.soldOfferIds;
+            if(!Array.isArray(sold)||sold.some(id=>typeof id!=="string"||!id.startsWith(today+":")||!/^\d{4}-\d{2}-\d{2}:\d+:\d$/.test(id))){ return null; }
+            return {date:today,refreshCount:stored.refreshCount,soldOfferIds:[...new Set(sold)]};
+        }catch(_){ return null; }
     }
-    function currentShopOffers(){
-        const state=shopState();
-        return Array.from({length:6},(_,index)=>generateEquipment(seededRandom(state.date+":"+state.refreshCount+":"+index)));
+    function currentShopOffers(state=shopState()){
+        if(!state){ return []; }
+        return Array.from({length:6},(_,index)=>{
+            const offerId=state.date+":"+state.refreshCount+":"+index;
+            return {...generateEquipment(seededRandom(offerId)),offerId};
+        });
     }
     function statLine(item){
         const [key,value]=Object.entries(item.stats||{})[0]||["",0];
@@ -572,42 +587,67 @@
         const html='<div class="v132-reward-modal-inner v17346-shop-preview-modal item-presentation-frame" data-presentation-mode="shop-preview" data-rarity="'+escapeHtml(item.rarityKey)+'"><h3>'+escapeHtml(item.name)+'</h3><div class="item-presentation-scroll" data-scroll-owner="y"><div class="v17346-shop-preview-art">'+item.icon+'</div><div class="v17346-shop-preview-info"><span>'+escapeHtml(SLOT_META[item.type].label)+'</span><strong>'+escapeHtml(statLine(item))+'</strong></div><div class="v17346-shop-preview-price">'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</div>'+(item.reforgeSlots?'<div class="v17346-shop-preview-reforge">[可冶煉]</div>':'')+'</div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
         window.v132ShowRewardModal(html);
     };
-    function replaceEquipmentShop(){
-        const root=document.querySelector("#homeFeatureModalBody .v17345-equipment-shop");
-        if(!root){ return; }
+    function renderEquipmentShop(){
         const state=shopState();
-        const offers=currentShopOffers();
+        if(!state){ return '<div class="v17345-equipment-shop"><p role="alert">裝備商店資料無法讀取，購買與刷新已暫停。</p></div>'; }
+        const offers=currentShopOffers(state);
         const freeRemaining=Math.max(0,5-state.refreshCount);
         const currentGold=typeof gold!=="undefined"?Math.max(0,Math.floor(Number(gold)||0)):0;
         const goldText=currentGold.toLocaleString("zh-TW");
-        root.innerHTML='<div class="v17345-equipment-wallet"><span>目前金幣</span><b>'+goldText+'</b></div><div class="v17345-equipment-grid">'+offers.map((item,index)=>{
+        return '<div class="v17345-equipment-shop"><div class="v17345-equipment-wallet"><span>目前金幣</span><b>'+goldText+'</b></div><div class="v17345-equipment-grid">'+offers.map((item,index)=>{
             const rarity=RARITY_BY_KEY[item.rarityKey];
-            const canBuy=currentGold>=rarity.shopPrice;
-            return '<article class="v17345-equipment-card v17346-shop-card '+(canBuy?'is-affordable':'is-unaffordable')+'" data-rarity="'+escapeHtml(item.rarityKey)+'" role="button" tabindex="0" aria-label="預覽 '+escapeHtml(item.name)+'" onclick="v17346PreviewEquipmentShopOffer('+index+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();v17346PreviewEquipmentShopOffer('+index+')}"><div class="v17345-equipment-icon v17346-gear-art">'+item.icon+'</div><b class="v17346-shop-name">'+escapeHtml(item.name)+'</b><span class="v17346-shop-slot">'+escapeHtml(SLOT_META[item.type].label)+'</span><span class="v17346-stat">'+escapeHtml(statLine(item))+'</span>'+(item.reforgeSlots?'<span class="v17346-reforge-mini">[可冶煉]</span>':'')+'<button class="v17346-shop-buy" type="button" '+(canBuy?'onclick="event.stopPropagation();v17346BuyEquipmentShopOffer('+index+')"':'disabled aria-disabled="true"')+'>'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</button></article>';
-        }).join("")+'</div><div class="v17345-equipment-refresh"><div><b>今日刷新 '+state.refreshCount+' / 10</b><span>前5次免費；第6～10次尚未開放。</span></div><button type="button" '+(freeRemaining>0?'onclick="v17345RefreshEquipmentShop()"':'disabled')+'>'+(freeRemaining>0?'免費刷新（剩'+freeRemaining+'次）':'免費刷新已用完')+'</button></div>';
+            const sold=state.soldOfferIds.includes(item.offerId);
+            const canBuy=!sold&&currentGold>=rarity.shopPrice&&typeof window.v132CanAddItemToInventory==="function"&&window.v132CanAddItemToInventory(item,1);
+            return '<article class="v17345-equipment-card v17346-shop-card '+(sold?'purchased':canBuy?'is-affordable':'is-unaffordable')+'" data-offer-id="'+escapeHtml(item.offerId)+'" data-rarity="'+escapeHtml(item.rarityKey)+'" role="button" tabindex="0" aria-label="預覽 '+escapeHtml(item.name)+'" onclick="v17346PreviewEquipmentShopOffer('+index+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();v17346PreviewEquipmentShopOffer('+index+')}"><div class="v17345-equipment-icon v17346-gear-art">'+item.icon+'</div><b class="v17346-shop-name">'+escapeHtml(item.name)+'</b><span class="v17346-shop-slot">'+escapeHtml(SLOT_META[item.type].label)+'</span><span class="v17346-stat">'+escapeHtml(statLine(item))+'</span>'+(item.reforgeSlots?'<span class="v17346-reforge-mini">[可冶煉]</span>':'')+'<button class="v17346-shop-buy" type="button" '+(canBuy?'onclick="event.stopPropagation();v17346BuyEquipmentShopOffer('+index+',\''+escapeHtml(item.offerId)+'\')"':'disabled aria-disabled="true"')+'>'+(sold?'已購買':rarity.shopPrice.toLocaleString("zh-TW")+' 金幣')+'</button></article>';
+        }).join("")+'</div><div class="v17345-equipment-refresh"><div><b>今日刷新 '+state.refreshCount+' / 10</b><span>前5次免費；第6～10次尚未開放。</span></div><button type="button" '+(freeRemaining>0?'onclick="v17345RefreshEquipmentShop()"':'disabled')+'>'+(freeRemaining>0?'免費刷新（剩'+freeRemaining+'次）':'免費刷新已用完')+'</button></div></div>';
     }
-    window.v17346BuyEquipmentShopOffer=function(index){
-        const item=currentShopOffers()[Math.max(0,Math.min(5,Math.floor(Number(index)||0)))];
-        if(!item){ return; }
+    function replaceEquipmentShop(){
+        const body=document.getElementById("homeFeatureModalBody");
+        if(body&&body.querySelector(".v17345-equipment-shop")&&typeof renderShopContent==="function"){ body.innerHTML=renderShopContent(); }
+    }
+    let shopPurchaseInProgress=false;
+    window.v17346BuyEquipmentShopOffer=function(index,expectedOfferId){
+        if(shopPurchaseInProgress||!Number.isInteger(Number(index))||Number(index)<0||Number(index)>5){ return false; }
+        const state=shopState();
+        const item=currentShopOffers(state)[Number(index)];
+        if(!item||(expectedOfferId&&expectedOfferId!==item.offerId)||state.soldOfferIds.includes(item.offerId)){ return false; }
         const cost=Math.max(0,Number(item.shopPrice)||0);
-        if(typeof gold==="undefined"||Number(gold)<cost){ void (window.rpgAlert?window.rpgAlert("金幣不足。",{title:"無法購買"}):Promise.resolve()); return; }
-        if(window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(item,1)){ alert("背包空間不足。"); return; }
-        gold-=cost;
-        if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){ inventoryItems.push({...item}); }
+        if(typeof gold==="undefined"||!Number.isFinite(Number(gold))||Number(gold)<cost){ void (window.rpgAlert?window.rpgAlert("金幣不足。",{title:"無法購買"}):Promise.resolve()); return false; }
+        if(typeof window.v132CanAddItemToInventory!=="function"||!window.v132CanAddItemToInventory(item,1)){ alert("背包空間不足。"); return false; }
+        if(typeof window.v132RunInventoryTransaction!=="function"||typeof window.v132AddItemToInventory!=="function"||typeof saveGame!=="function"){ return false; }
+        const beforeGold=gold;
+        const {offerId,...instance}=item;
+        const nextState={...state,soldOfferIds:[...state.soldOfferIds,offerId]};
+        shopPurchaseInProgress=true;
+        let committed=false;
+        try{
+            committed=window.v132RunInventoryTransaction(()=>{
+                gold-=cost;
+                if(!window.v132AddItemToInventory(instance,1)){ return false; }
+                return saveGame({source:"equipment-shop-purchase",equipmentShopState:nextState})===true;
+            });
+            if(!committed){ gold=beforeGold; }
+        }finally{ shopPurchaseInProgress=false; }
+        if(!committed){
+            if(window.rpgAlert){ void window.rpgAlert("購買未完成，金幣與裝備已還原。",{title:"無法購買"}); }
+            return false;
+        }
         if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
         if(typeof renderInventoryItems==="function"){ renderInventoryItems(); }
-        if(typeof saveGame==="function"){ saveGame(); }
         replaceEquipmentShop();
         if(window.rpgAlert){ void window.rpgAlert("已購買「"+item.name+"」。",{title:"購買成功",tone:"success"}); }
+        return true;
     };
-    if(typeof window.v169SwitchShopPage==="function"){
-        const previousSwitch=window.v169SwitchShopPage;
-        window.v169SwitchShopPage=function(page){ const result=previousSwitch.apply(this,arguments); if(page==="equipment"){ replaceEquipmentShop(); } return result; };
-    }
-    if(typeof window.v17345RefreshEquipmentShop==="function"){
-        const previousRefresh=window.v17345RefreshEquipmentShop;
-        window.v17345RefreshEquipmentShop=function(){ const result=previousRefresh.apply(this,arguments); replaceEquipmentShop(); return result; };
-    }
+    window.FourSymbolsEquipmentShop=Object.freeze({render:renderEquipmentShop});
+    window.v17345RefreshEquipmentShop=function(){
+        if(shopPurchaseInProgress){ return false; }
+        const state=shopState();
+        if(!state||state.refreshCount>=5){ return false; }
+        try{ localStorage.setItem(SHOP_STORAGE_KEY,JSON.stringify({...state,refreshCount:state.refreshCount+1})); }
+        catch(_){ if(window.rpgAlert){ void window.rpgAlert("商店刷新未完成，請稍後再試。",{title:"無法刷新"}); } return false; }
+        replaceEquipmentShop();
+        return true;
+    };
 
     function showEquipmentReward(){
         if(typeof window.v132ShowRewardModal!=="function"){ return; }

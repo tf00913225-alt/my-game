@@ -12,6 +12,8 @@ Tier A: monetary/asset ownership, shop/claim state, protected grants and receipt
 
 Adding persistence: add the new state with all required metadata; register the backup/restore policy; if it is a UID sidecar, update the backup inventory and account-switch tests; update the writer-site guard after inspecting the new write; add a targeted restore/reward test. The CI guard also rejects direct literal keys, unreviewed dynamic `accountKey` suffixes and activation of historical-only `equipment-shop-purchases`. If the key is temporary, explicitly mark `deviceOnly` and safe default. Never silently map absent reward history to claimable.
 
+`equipment-shop-daily` remains the existing UID sidecar and backup entry. Its sole data/render/refresh owner is now `js/equipment-progression.js`; V169 owns only the shell/tabs and delegates equipment content. The local provisional shop extends date/refreshCount records with `soldOfferIds` (`date:refreshCount:slotIndex`, six slots). Legacy date/refresh-only records migrate in place; corrupt current records block purchase/refresh. Day rollover creates a fresh batch; refresh retains that day's receipts but changes identity. Purchases reuse V132 inventory transaction/addition and pass the next shop state into the existing account save rollback boundary, committing gold/inventory/main metadata/sidecar together on successful synchronous save. Storage exceptions restore prior bytes and runtime inventory/gold; success UI appears only after commit. No Cloud economy/authority or historical reserved key is activated. This is localStorage exception rollback, not a cross-device or crash-proof database transaction.
+
 
 ### Protected restricted Forest instance establishment (2026-10-05)
 

@@ -8,6 +8,7 @@ const elementBox=read("js/45-v154-dev-fixes.js");
 const elementCss=read("css/46-v154-dev-fixes.css");
 const content=read("js/36-v141-content-systems.js");
 const shop=read("js/51-v169-rpg-ui.js");
+const equipmentShop=read("js/equipment-progression.js");
 const shopCss=read("css/49-v169-rpg-ui.css");
 const touch=read("js/01-stage-v8-touch-lock.js");
 
@@ -38,13 +39,13 @@ assert.ok(content.includes('const synthesisState={\n        tab:"talisman"'));
 assert.ok(content.includes('["talisman","符咒合成"],["fragment","碎片合成"]'));
 
 // 5. Shop exposes potion/equipment pages and six equipment cards with 5 free / 10 max refreshes.
-assert.ok(shop.includes("const SHOP_FREE_REFRESHES=5;"));
-assert.ok(shop.includes("const SHOP_MAX_REFRESHES=10;"));
-assert.ok(shop.includes("Array.from({length:6}"));
+assert.ok(equipmentShop.includes("state.refreshCount>=5"));
+assert.ok(equipmentShop.includes("stored.refreshCount>10"));
+assert.ok(equipmentShop.includes("Array.from({length:6}"));
 assert.ok(shop.includes("v169SwitchShopPage"));
 assert.ok(shop.includes(">補品</button>"));
 assert.ok(shop.includes(">裝備</button>"));
-assert.ok(shop.includes("金幣刷新・價格待設定"));
+assert.ok(equipmentShop.includes("第6～10次尚未開放"));
 assert.match(shopCss,/\.v17345-equipment-grid\{[\s\S]*?grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 
 // 6. Wave handoff remains inside battle so out-of-battle auto recovery cannot fire.
