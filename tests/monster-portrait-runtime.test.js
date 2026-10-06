@@ -93,6 +93,7 @@ function loadRuntime(monsterRows){
 }
 
 const registry={
+    policy:{legacyUniversalSoldierFiles:['assets/dungeons/abyss/soldier.webp','assets/dungeons/abyss/floor5-soldier.webp']},
     tupleSchema:["portraitKey","name","element","rank","sizeClass","path","status"],
     groups:{
         wild:[
@@ -120,9 +121,9 @@ const registry={
     runtime.context.v154InstallMonsterPortraitRegistry(registry);
     runtime.context.v154SyncMonsterPortraits();
     assert.equal(runtime.context.resolveMonsterPortrait(runtime.context.monsters[0]),"assets/monsters/wild/zone-01/fire-01.png");
-    assert.equal(runtime.context.resolveMonsterPortrait(runtime.context.monsters[1]),"assets/dungeons/abyss/soldier.webp");
+    assert.equal(runtime.context.resolveMonsterPortrait(runtime.context.monsters[1]),null);
     assert.equal(runtime.cards[0].dataset.monsterPortraitKey,"wild.zone-01.fire-01");
-    assert.equal(runtime.cards[1].dataset.monsterPortraitKey,"temporary.heavenly-soldier");
+    assert.equal(runtime.cards[1].dataset.monsterPortraitKey,"fallback.generic");
     assert.equal(runtime.cards[0].querySelector(".v174-battle-art").style.getPropertyValue("background-image"),
         'url("assets/monsters/wild/zone-01/fire-01.png")');
 }
@@ -161,16 +162,15 @@ const registry={
 }
 
 assert.match(source,/MONSTER_PORTRAIT_REGISTRY_URL="config\/monster-portrait-registry\.json"/);
-assert.match(source,/TEMPORARY_MONSTER_PORTRAIT="assets\/dungeons\/abyss\/soldier\.webp"/);
-assert.match(source,/TEMPORARY_BOSS_PORTRAIT="assets\/monsters\/boss\/boss-placeholder-fire-demon\.webp"/);
+assert.doesNotMatch(source,/TEMPORARY_MONSTER_PORTRAIT|TEMPORARY_BOSS_PORTRAIT/);
 assert.match(source,/target\.status!=="existing"/);
-assert.match(source,/presentation\.applyUnit\(card,"monster"\)/,
+assert.match(source,/presentation\.applyUnit\(card,"monster",record\)/,
     "portrait sync must invoke the canonical cardless presentation owner");
 assert.match(dailySource,/monster\.portraitKey=dailyMonsterPortraitKey\(type,rank\)/,
     "daily dungeon monsters must carry an explicit portrait key");
 assert.doesNotMatch(source,/background-size:contain!important/,
     "portrait selection runtime must not inject a second geometry owner");
-assert.match(battlefieldCss,/\.v174-battle-art\{[\s\S]*background-size:contain !important/,
+assert.match(battlefieldCss,/\.v174-battle-art\{[\s\S]*background-size:var\(--portrait-background-size, contain\) !important/,
     "the canonical Fixed Slot stylesheet owns no-crop portrait geometry");
 assert.equal((source.match(/renderBattle=function/g)||[]).length,0);
 assert.match(source,/window\.v154AfterBattleRender=v154AfterBattleRender/);

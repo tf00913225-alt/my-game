@@ -3133,5 +3133,1811 @@
       "status": "reserved",
       "reason": "SOURCE_PNG_DECODE_FAILED"
     }
+  },
+  "presentation": {
+    "version": 1,
+    "boundsMethod": "nonzero-alpha-inclusive",
+    "classes": {
+      "STANDARD": {
+        "bodyHeight": 0.82,
+        "baseline": 0.96
+      },
+      "ELITE": {
+        "bodyHeight": 0.85,
+        "baseline": 0.96
+      },
+      "SMALL_BOSS": {
+        "bodyHeight": 0.88,
+        "baseline": 0.96
+      },
+      "BIG_BOSS": {
+        "bodyHeight": 0.9,
+        "baseline": 0.96
+      }
+    },
+    "assets": {
+      "assets/monsters/wild/zone-01/fire-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          17,
+          1006,
+          1536
+        ],
+        "sha256": "03c2b705b8fc4e6cd16837d2d962df8004334d05056eea4af18da7c7b4e99fae"
+      },
+      "assets/monsters/wild/zone-01/water-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          9,
+          1024,
+          1536
+        ],
+        "sha256": "4a472ee18c0aacd9a1932b32b8837d0c63296a47bd27c67bb46d5c844bc3efbe"
+      },
+      "assets/monsters/wild/zone-01/wind-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "31e16f3dc1dae46cefc665d8f1f2ad99b0dcf209ae522594dc095828190c1cdc"
+      },
+      "assets/monsters/wild/zone-01/earth-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          14,
+          0,
+          1012,
+          1536
+        ],
+        "sha256": "3f437204e0ceb58cf868d542e14bd91e3212a8be1454c045a086658dd0f20758"
+      },
+      "assets/monsters/wild/zone-02/fire-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          19,
+          19,
+          1023,
+          1536
+        ],
+        "sha256": "0fc02fdca70b66b9e667993e520d9548637b012d6cad36de2bbc01fa83e7d7c6"
+      },
+      "assets/monsters/wild/zone-02/water-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          7,
+          1002,
+          1536
+        ],
+        "sha256": "33f43c33d4552e215f7d43665ad1f5b254d86e30945128f544fd5c0a6f4a501a"
+      },
+      "assets/monsters/wild/zone-02/wind-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "cfaaa4a24fd818a950d820165542dfd47e5e8f64ca2de02a106d070025fc466a"
+      },
+      "assets/monsters/wild/zone-02/earth-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          1,
+          1012,
+          1536
+        ],
+        "sha256": "6ac2c95b79c462ceece99e26766fa75310c8782e25a000a5ea0d70e929a74d43"
+      },
+      "assets/monsters/wild/zone-03/fire-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          9,
+          1024,
+          1536
+        ],
+        "sha256": "c6564d7ab380c42c66f2148fcf1de0db3b9e6d32bebaf7e7127a7d6122f02b59"
+      },
+      "assets/monsters/wild/zone-03/water-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          13,
+          1024,
+          1536
+        ],
+        "sha256": "9e92ba321f4cd304a4d9f7d21aad4e26f8ac2763323828f91a8c354b50fc87c9"
+      },
+      "assets/monsters/wild/zone-03/fire-02.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          85,
+          1024,
+          1450
+        ],
+        "sha256": "106cd639661978ac0281935cc2c8898e296c2b9cd8cd5b5d20c2483786f87a28"
+      },
+      "assets/monsters/wild/zone-03/wind-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "a732e43075c90e3a2c62cb81f430009045ff72e3d737852eb57b1df2a3bca6b3"
+      },
+      "assets/monsters/wild/zone-03/earth-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          18,
+          1024,
+          1536
+        ],
+        "sha256": "2f34ad587fe2e2c9fe8849d2357f6941463ac542cf3b1a7e42e8689a373f42e8"
+      },
+      "assets/monsters/wild/zone-04/fire-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          11,
+          1024,
+          1536
+        ],
+        "sha256": "c56b8d4c4b3a7d27dc16ae7be3034aca891e7f2f12b20555c53101f2303d7254"
+      },
+      "assets/monsters/wild/zone-04/water-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          33,
+          0,
+          1014,
+          1536
+        ],
+        "sha256": "479a399ed2cb3ed86db00208312fc269131332d35358d4abf14337ca12ee5bb4"
+      },
+      "assets/monsters/wild/zone-04/fire-02.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          9,
+          94,
+          1024,
+          1450
+        ],
+        "sha256": "72acb233c67e37c2201666dcf7bcd64c1d391214c6152dd87428f4c9cc89373c"
+      },
+      "assets/monsters/wild/zone-04/wind-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "bf2852329e8011c486645c4f73226c29b943ed4fb2f8e1ef172297b36fb26155"
+      },
+      "assets/monsters/wild/zone-04/earth-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          998,
+          1536
+        ],
+        "sha256": "61455788c92651349e2f30a1f5daf5aed4d6853fcdc4e903bdc0d64175ba67ff"
+      },
+      "assets/monsters/wild/zone-05/fire-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "11e92edb7e5d09e54be724d568b4be8c2d4e33572015657279f0f174a3826d21"
+      },
+      "assets/monsters/wild/zone-05/water-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          17,
+          25,
+          1013,
+          1536
+        ],
+        "sha256": "d7d185ed40565c35e269e1c3fea4a9551d05068ea59d3b30622d1ecf3a9d941d"
+      },
+      "assets/monsters/wild/zone-05/fire-02.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          13,
+          348,
+          1013,
+          1184
+        ],
+        "sha256": "7d4fd2faa58dd4c9cc28e7a6ac4b87fda11af112cf101131e56644b5eee70ab7"
+      },
+      "assets/monsters/wild/zone-05/wind-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "238c9220c16235c3f468283d4313855234ac69c25aa8d840fc6782024a1be8cf"
+      },
+      "assets/monsters/wild/zone-05/earth-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          14,
+          1020,
+          1536
+        ],
+        "sha256": "ab7c26a7667f22f4766646dcdd4282896aa7c2ca4f9cc155dcab8a3308dd88b5"
+      },
+      "assets/monsters/wild/zone-06/fire-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          229,
+          1016,
+          1316
+        ],
+        "sha256": "f1394526a738f852440e4b6d727ebb4a437c412128502b31a84bb32f42f7462d"
+      },
+      "assets/monsters/wild/zone-06/water-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "5723357932e3fd49120de48be89dec689834278af2537a94d06d7aaa4d272f94"
+      },
+      "assets/monsters/wild/zone-06/fire-02.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          225,
+          1024,
+          1311
+        ],
+        "sha256": "a05572d37d7c908ca7e520f2187c62faf913dcaf2e9bdbe0fadae99f6ba2eb51"
+      },
+      "assets/monsters/wild/zone-06/wind-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "26b51a11793130a7e96b97c152422b40dfa441d2b92c2cb16c0a46fc2dd87913"
+      },
+      "assets/monsters/wild/zone-06/earth-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          19,
+          1024,
+          1536
+        ],
+        "sha256": "7609c2d4c3eacd46870b69efd962e07216647ae80463ab94766493f7a933b5a2"
+      },
+      "assets/monsters/wild/zone-07/fire-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          7,
+          1013,
+          1536
+        ],
+        "sha256": "f1389799fa455df476a2340e9f74b6bd4b8596e2f116fafd19389aa42feef2e9"
+      },
+      "assets/monsters/wild/zone-07/water-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          15,
+          1006,
+          1536
+        ],
+        "sha256": "aafd12f2ee34778c4b0310cf8e700a0ffb480af628651a546bb865e939cd61b0"
+      },
+      "assets/monsters/wild/zone-07/fire-02.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          229,
+          1017,
+          1306
+        ],
+        "sha256": "74451027fb10b61f874fa805cacd81342e3c6122fa049ddf7e332a719bd739ee"
+      },
+      "assets/monsters/wild/zone-07/wind-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "5107b49c03f2ff28b135eb7d6ce67a5538aad2a25c00cd667a4ec1dc3f58ee3a"
+      },
+      "assets/monsters/wild/zone-07/earth-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          39,
+          1024,
+          1536
+        ],
+        "sha256": "124aa08dc3e734640d13150da28cac053ccf3471566851dbf3d61d2910f7cfbb"
+      },
+      "assets/monsters/wild/zone-08/fire-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          265,
+          1021,
+          1271
+        ],
+        "sha256": "b9c31e8eb62e9662bcdafb9f20218e74bcfef17db4d19349cebd09fd23e0c0af"
+      },
+      "assets/monsters/wild/zone-08/water-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          9,
+          1024,
+          1536
+        ],
+        "sha256": "0800d1c316cd15f78d356158e0755f64e458a8be699d79d8566f9d1513690011"
+      },
+      "assets/monsters/wild/zone-08/fire-02.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          236,
+          1024,
+          1300
+        ],
+        "sha256": "da7cce7cd15077a7ff7bfd425ab0f0515eca1c0c53ce81392b96f6418cdf8d5e"
+      },
+      "assets/monsters/wild/zone-08/wind-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "fa39c346cb99f7a8e62e583f0800939246d6e958001707eab1370171dd9f412f"
+      },
+      "assets/monsters/wild/zone-08/earth-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          8,
+          1010,
+          1536
+        ],
+        "sha256": "5dd882515eb14c330a00fe936a41f311bc245b47568164041766251086e35ede"
+      },
+      "assets/monsters/wild/zone-09/fire-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          213,
+          1014,
+          1323
+        ],
+        "sha256": "55d111e29ad79e8b1f03ed05ea62db4985d28511b01e7dce41080a8a4ae807cf"
+      },
+      "assets/monsters/wild/zone-09/water-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          3,
+          1024,
+          1536
+        ],
+        "sha256": "626531849b7eeca082949f9ce772bd1bb2b9e4aa36d3b0d80fb63aca0652ee99"
+      },
+      "assets/monsters/wild/zone-09/fire-02.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          229,
+          1019,
+          1307
+        ],
+        "sha256": "eaa9372da1c1e00fc63afcfb3c120e4962951ddc95b18f300a7040b72a92d029"
+      },
+      "assets/monsters/wild/zone-09/wind-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          9,
+          1024,
+          1536
+        ],
+        "sha256": "8f1392eff6ad37e81d32b3ea91cad374c7108b80977e65d0b92c32f96888709c"
+      },
+      "assets/monsters/wild/zone-09/earth-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          24,
+          15,
+          1023,
+          1536
+        ],
+        "sha256": "5c23498c58d38c00f6495d809a91960a061ce8ad8f7f60ec269b5c7d8746f02e"
+      },
+      "assets/monsters/wild/zone-10/fire-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          214,
+          1007,
+          1321
+        ],
+        "sha256": "23098f4613564ceaa5c6568a7eeed94b62dde95aa0c6160902e28235b907cada"
+      },
+      "assets/monsters/wild/zone-10/water-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          2,
+          1024,
+          1536
+        ],
+        "sha256": "3878cf5ad8fde947cc9cbb30ced162c2dc008ea1e510fe3d11dc3df453430fb1"
+      },
+      "assets/monsters/wild/zone-10/fire-02.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          226,
+          1024,
+          1314
+        ],
+        "sha256": "e366a282436f14eef1545c0a770772227dae54933de61875e7905f0751fac0c8"
+      },
+      "assets/monsters/wild/zone-10/wind-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "bf1d1cb8c7a937fbd5ae53639349920a2dc1ca06a4e74243ea053c295da097de"
+      },
+      "assets/monsters/wild/zone-10/earth-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          9,
+          1014,
+          1536
+        ],
+        "sha256": "d0d1dbe8d6f5367ab4262bbbea73174362610751a82879308f92e87b85aca4f0"
+      },
+      "assets/monsters/daily/exp/regular.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          32,
+          0,
+          1002,
+          1536
+        ],
+        "sha256": "3e9b084f634b5bded84fa169508b691f25f33b10d92bf5c533d454b2164fa889"
+      },
+      "assets/monsters/daily/exp/elite.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          13,
+          1024,
+          1523
+        ],
+        "sha256": "68fe4dd2bc14cf04f39b44d83341c1e6ccfca0036d33cf8069f775b7c6ece250"
+      },
+      "assets/monsters/daily/exp/boss.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "792f15e1ed9a086e873ecabad901ed35e289456047a0248fdfadffa61aa76f2d"
+      },
+      "assets/monsters/daily/material/regular.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          23,
+          0,
+          1024,
+          1524
+        ],
+        "sha256": "d0a9ee975a495646725b266ab1e397577bb4712231d350c64cf17493bdc8531b"
+      },
+      "assets/monsters/daily/material/elite.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          27,
+          0,
+          1010,
+          1516
+        ],
+        "sha256": "023c1deca7ef12578d63527015968c236d1e2e0f9edb5c6edb3716adec72d4be"
+      },
+      "assets/monsters/daily/material/boss.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "0b045dc4a17df0235f081d6bbbe1959934364ea9efef0e25acb728236d7a51a8"
+      },
+      "assets/monsters/daily/gold/regular.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          9,
+          1024,
+          1514
+        ],
+        "sha256": "9885bdda6b993973f875062e6e44feeb2b95f09907d7f9443a26f473951545e4"
+      },
+      "assets/monsters/daily/gold/elite.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "fa21ba459ee893b4c2439f976147d084a76dd7aae57eafc065049e520668bb36"
+      },
+      "assets/monsters/daily/gold/boss.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "4c33ff9e1dbd5a237c9dcfec592141f62ad18df4e0127f2b9b7ebfff5a305de1"
+      },
+      "assets/dungeons/abyss/east-emperor.webp": {
+        "width": 1152,
+        "height": 1536,
+        "alphaBounds": [
+          3,
+          1,
+          1149,
+          1533
+        ],
+        "sha256": "301b4e3cde8192fc4e47c404394e4c3f706adde2d9457fe6c23fcf8fbad00b65"
+      },
+      "assets/dungeons/abyss/south-emperor.webp": {
+        "width": 1152,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1152,
+          1536
+        ],
+        "sha256": "8a1c0da5181913c33f7f31ee8e2aa833bde5749c9479b46ddc40b93eb63511a0"
+      },
+      "assets/dungeons/abyss/heaven-emperor.webp": {
+        "width": 1152,
+        "height": 1536,
+        "alphaBounds": [
+          5,
+          4,
+          1152,
+          1533
+        ],
+        "sha256": "2ea16dd203432abbdd726f44d702364c3e119fa16d152595ae5d79db28f252fb"
+      },
+      "assets/dungeons/abyss/north-emperor.webp": {
+        "width": 1152,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1152,
+          1536
+        ],
+        "sha256": "b1483b1c2d0d53ba77ab045722041211b950e99904e7b3d35b319ead480ab348"
+      },
+      "assets/dungeons/abyss/floor5-east-emperor.webp": {
+        "width": 1152,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          2,
+          1152,
+          1530
+        ],
+        "sha256": "d465db5d25f70492db5ec0172097155929a657dc431dc231b982f77308649fa5"
+      },
+      "assets/dungeons/abyss/floor5-heaven-emperor.webp": {
+        "width": 1152,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1152,
+          1536
+        ],
+        "sha256": "5b2910a2c6f82d7c6057557474a222b3228c838d91470088cc87fff7b1dfdb17"
+      },
+      "assets/dungeons/abyss/floor5-extreme-emperor.webp": {
+        "width": 1152,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1152,
+          1528
+        ],
+        "sha256": "6db2895bdcac5f61dbf78a72e919750bb8d18484539fe49f684486c2268dd84d"
+      },
+      "assets/dungeons/abyss/floor5-north-emperor.webp": {
+        "width": 1152,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1152,
+          1536
+        ],
+        "sha256": "07e78a9b6de299068f5c4fca6503f9f6e21b2e7d4c114261e195dc64409927bd"
+      },
+      "assets/dungeons/abyss/floor5-south-emperor.webp": {
+        "width": 1152,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1152,
+          1536
+        ],
+        "sha256": "050eb72b3202d4103826e92fb33b0c4f4f0d36d6fa53208332866aebfacd5d00"
+      },
+      "assets/monsters/soldiers/heavenly-soldier-fire.png": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          17,
+          17,
+          1011,
+          1536
+        ],
+        "sha256": "273bc89e6715c076a0d3b7d33768e9b0f5502745ac55ded456d57c5baded3f7f"
+      },
+      "assets/monsters/soldiers/heavenly-soldier-water.png": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1520
+        ],
+        "sha256": "9a09c89187ba7290f178856d8109dd3e5753539579169443c9b5307f14ef3d31"
+      },
+      "assets/monsters/soldiers/heavenly-soldier-wind.png": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1012,
+          1536
+        ],
+        "sha256": "0022bebd2acfd18197d4061489aedd224dd849973db0f1f784ea46d5569967f4"
+      },
+      "assets/monsters/soldiers/heavenly-soldier-earth.png": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          34,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "ddc130dd0a7b98bc7979f7c773f245921afba74de08a85a554b9a38448826c47"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-001.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "72fa74879f8020e0aeac19625937f2800edbe74a284e0008f7e257bd6d2b6172"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-002.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "56a810fb66ebeb54ca14908e201357b26ff464e856d5d39057f1482f5fe06544"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-003.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1011,
+          1536
+        ],
+        "sha256": "3efbce2ba65e3dfd739661dbfd1aff9ad3f7d0dc89a93918a2368381ddc6dd4a"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-004.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1012,
+          1536
+        ],
+        "sha256": "e9df8692521468424a96d2a6c9169fbecbfb4e02aafe9d4662998ccd12d93e83"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-005.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "8a609e945b11453a2448ff0a4d982dd6146a89733c341a4839a4893616bdfbc7"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-006.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "7d3ab8264a01994902ab1c417d103bf140200e8aff14da1b953bceb1623e5bd5"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-007.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "fe53c99d31a9880bed013a5e2e7521233f5fc9c4174d92e0352f1504be2a6450"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-008.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "77e4ca31b113adf105f765a0f50e5efb8ee7223d817a9d1f60a6e9db1e8abbff"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-009.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "8e17b40d92b368ec875ce1bfd1e19adf6f451a52d4161f13a0a4e5f239c6a30b"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-010.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "ad5a40fa37543640e62c2b436f9cdf4057db3b6adf89417c543a7ebd242723ac"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-011.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          11,
+          1024,
+          1536
+        ],
+        "sha256": "14df282a4ab650cc36c40c66aa261c36945f9a250ea9a4ff854f11d1ec842cb6"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-012.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "a3fbb34c05745c230266f909db7caca4f52ecd25826bbb0a6adde44b510176ee"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-013.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          7,
+          1008,
+          1536
+        ],
+        "sha256": "08de508517c51df44606978baec8e3e88bf65cf4e63edc005b00aa06e7e2a542"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-014.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "cb57718c4f339da479f40828d3139805aa83bded91ba3b5843e8e1c5b5ff5c86"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-015.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "383438363a79970226649722324086c826685496adac5e0749850eaa339be999"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-016.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "5a05c657f404125ba2635c606adbf5cf83c6fda80591cb1630e8f16d270c0c5f"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-017.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "204f421581708ff6597200ed4f732dabdbc4a40626b31953a09c1f089a2220b3"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-018.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          14,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "33c37c4351ba50fc2209c33aaf29889fd691a8473469ed11bcd963dc4cbf22a7"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-019.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          21,
+          1024,
+          1536
+        ],
+        "sha256": "c1293895c12539cec0749472c9f7382ee155ac7c8c90b9336fb9aa37c5c3ea9b"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-normal-020.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "07be0e673832d8133aa9330972fcc0a6fae03256dcf6ceea7b2ec07503baaa65"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-elite-001.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          13,
+          1024,
+          1536
+        ],
+        "sha256": "1f4c9459c5f99081c6bb20b03971aaa091a745fefa8989ccb1e01ec8f106d851"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-elite-002.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "a18e7da24f86a5282a54c071b97006c466db66f1cc904b56fbd6f8c96ff6c8e6"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-elite-003.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "054e64ef4d15161656fdd6422631c8e8daa5612ca4cc7813bc8ce082ee37a3aa"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-elite-004.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1016,
+          1536
+        ],
+        "sha256": "19ec3b2aafef4bca3001c23a679e82129e8c4ce88658b27851cdc478d727a3c6"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-elite-005.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "60f701947d7abf7d067604c82c3156479559b2a1f9f957a17e5a7f7306396ec4"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-elite-006.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          16,
+          1024,
+          1536
+        ],
+        "sha256": "258f8fb52c34300b9633424f46f428602c4d93da7ad8947d4fb19abe7f8255ee"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-elite-007.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          9,
+          1012,
+          1536
+        ],
+        "sha256": "63851b8ff0f3c5fa0402fbb452ef08104cc956f1b8a71ee224b748332c632acb"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-elite-008.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1020,
+          1536
+        ],
+        "sha256": "11cec0a8356b0f29aadc609184def0f1b64aca6cee5e28d6a1ab496967a66346"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-elite-009.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "040fce4e93c5b2ea89409054b1654549e41cb58603768568eb133f21820e5fe3"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-elite-010.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "8834875d85ca337add963c7a6ece2a3370af7859814b16c9dccae9130bf5eab1"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-miniboss-001.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          13,
+          1024,
+          1518
+        ],
+        "sha256": "49ef8605c0c5396ce7cbe059855326b66d4c39a5c53c19402262c7282bf22cd3"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-miniboss-002.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1023,
+          1536
+        ],
+        "sha256": "25a611642830f2c2bdc58bbf8a78935798664dd1f34a9e725f9e74a9d9e6fce1"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-miniboss-003.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1014,
+          1536
+        ],
+        "sha256": "cc3d5a7a88836353eea52f35fb0fb5494c98ceb915f8934e6b4e48b151d32cd6"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-miniboss-004.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "4d7670ef3db2d6275409ced2014d74b15c582645975639bd559c679aa88401f0"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-miniboss-005.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "7928e8be2e95d1fcc350fad0678c39a1a3851f09346cfdc802d7f6526a0cb858"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-miniboss-006.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "8a266aacc87211b2f5e77c54b3f4efa5a512fe7d5345124e450fa6accdc14bf1"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-miniboss-007.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          1,
+          1024,
+          1536
+        ],
+        "sha256": "f1c0c9c80ff4aaf96c6948a3513c81770afd3313d6fc67910a7b9652859cddb1"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-miniboss-008.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "bb43908266c8833ebcac88882ed9427ab9c730683d0802b5687d5819d088ac15"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-miniboss-009.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "c7e4a4142d1da89c7bbcbe1e6a5793bdc7b56177f226deb0d604d6cc275b65c7"
+      },
+      "assets/monsters/tower/wind-pool/mon-wind-miniboss-010.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "0e6efbbda8b7207f8a0dc82794b73cfce28f3bf30a509de36509859f6f05ed75"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-normal-001.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          57,
+          1024,
+          1536
+        ],
+        "sha256": "502bc56d3cd8c47dd62e5a1dc63093f97f8294904ab5ec0b0a72fdb66b49010e"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-normal-002.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          23,
+          1014,
+          1536
+        ],
+        "sha256": "36727f31d9202de8587f458bd9541aac3e4fd873f9dbb372920068101bf9bcd1"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-normal-003.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          23,
+          17,
+          1008,
+          1520
+        ],
+        "sha256": "ec75b4b5fc8b4bf1492f9a27463329ab8f9dbf4404fce776ce7478fe254856d4"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-normal-004.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          27,
+          19,
+          1004,
+          1536
+        ],
+        "sha256": "d6b53c39f4af2591f5f21ea4f5dccb4fdf03cfef1be98626bec32ca93322e117"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-normal-005.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          14,
+          1024,
+          1536
+        ],
+        "sha256": "1734381e2a4cfcea1c38c531c383351454b191fc1d8ee713ee3134d5085fca28"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-normal-006.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          14,
+          0,
+          1010,
+          1512
+        ],
+        "sha256": "c12258d71951c9f4c93bc7d9437d37be4d5e15a27b1255154685f4047560c367"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-normal-007.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          12,
+          970,
+          1536
+        ],
+        "sha256": "800ca96593ef481e7c1ce0bdd9fc0c59f09eb2b1fcdb66f89b0d552f2e9c2303"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-normal-008.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          7,
+          1008,
+          1536
+        ],
+        "sha256": "d875820d4dafbda59660bdef7c2ec9fae42cb76c352f97d9375bd884dc65319c"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-normal-009.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          15,
+          0,
+          1011,
+          1536
+        ],
+        "sha256": "be1240e4f8d5ef83b20ffbc32d846e9299b6b66510cfd6793516aef5484dc9c3"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-normal-010.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          17,
+          1008,
+          1518
+        ],
+        "sha256": "3683819187f5909c1b617893b6fe8317c19713dfbcc2014a1c65f1706a617e98"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-elite-001.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "8f0bbadf77ede8dfbc303616ce8e4ca8daa6d18eb81fe2c1949e99c92569fb75"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-elite-002.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "3cc6773493f5ee7cc87f1a6abdaac2cf752f7e65774793457a776e6125a1f6b8"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-elite-003.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "cd6e16188220b2fe427b6a4c3e2aaabaf07df139770b429936749fde9b535b91"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-elite-004.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1013,
+          1536
+        ],
+        "sha256": "7c7f193cff1db373cf844b490ec9798af99403d14faf01408a1708082d9a130a"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-elite-005.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          49,
+          1010,
+          1536
+        ],
+        "sha256": "0ca84db1ecbe99f93b9c3b48412837d5764db07f72cf2c9e8cf3cfc5c0d2f80a"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-elite-006.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          9,
+          1010,
+          1536
+        ],
+        "sha256": "b97bfffc181bf3490e812df4ed3e4960afe2cf3e862e5ec125c98d39393daeee"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-elite-007.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1000,
+          1536
+        ],
+        "sha256": "b2c938f47e6ea103bc713cb934a434abcef643ed4487dacb693a92b601c31641"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-elite-008.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "0e22f22a1fe5f53095d5d97dd9fd93ae814b8adc1b5289a435cf048f1773572d"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-elite-009.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          1,
+          1024,
+          1536
+        ],
+        "sha256": "910cfc20af935d4e341b8428e02b712696501303fd578f53d072c7f1460656eb"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-elite-010.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          1,
+          1024,
+          1536
+        ],
+        "sha256": "008c43650d454caa43f3b3daabf71203c48b9d77b47b9b17600e96cf28a8168f"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-miniboss-001.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "8ecd1a428e04995ef61c9550ff4a32608cb4f69603715aefce9ba6196517953a"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-miniboss-002.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "12b2cf4be200be4676f69fcf4680020d8171ce89b6747837d3ba49ed8367a43d"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-miniboss-003.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          19,
+          1012,
+          1518
+        ],
+        "sha256": "a91e2cfca30aff505756157331d78d3afc5c5fb47188c1176d3e99e4966921fe"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-miniboss-004.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "f38fa81fece8ef7c316f431583ee2b28055192d284a98a306519ed6f621e094e"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-miniboss-005.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "764cf1a423e921f7016ce3a0ed81cbd81136fca2cb34c4017a5343b2a0a734f5"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-miniboss-006.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "3811b1eebad273250b121287b28382e48d2f58a15cc8cb3c7e4c583b7a1357da"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-miniboss-007.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "5085ea56d934cfe085ff75ecf8e4c04993f8f2ff5723342c3e70647ad1a4ce08"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-miniboss-008.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "fe995c0a561db0e643cc700ca1d6c184e9d4db6088eaf91256217cc4513a6166"
+      },
+      "assets/monsters/tower/earth-pool/mon-earth-miniboss-009.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "02ce60d15a6e9168f04013d7bbdedcacc8392e605c41ca9d36c514a1f01aa470"
+      },
+      "assets/monsters/wild/fire-pool/mon-fire-normal-001.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          9,
+          1008,
+          1536
+        ],
+        "sha256": "c70df7a35e90aeb92a865b57753b0ad0c7d501ff1b7caf27b377bb0c329ce664"
+      },
+      "assets/monsters/wild/fire-pool/mon-fire-normal-002.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "4836f1fc7737c69085d626379949f5ef9998d6355e7d4adb3db78590b0fd5fd3"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-elite-001.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          19,
+          976,
+          1536
+        ],
+        "sha256": "83b9f720754c5193e1c0d540105c4b782dec94c3e6808a8977285b6038bd762c"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-elite-002.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "896cf3da2972fb057ddcaddf4ff00662aa765ee631eb22bdd880f0e0d83a0c00"
+      },
+      "assets/monsters/wild/fire-pool/mon-fire-normal-004.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          57,
+          17,
+          1009,
+          1512
+        ],
+        "sha256": "48dd8ba574ec53a9278a05501d0d48fb24208732bd396afa10fb400174a9f224"
+      },
+      "assets/monsters/wild/fire-pool/mon-fire-normal-006.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1010,
+          1536
+        ],
+        "sha256": "dc80fa062924cbc08e7fccd0a89f3b1d01a1c58a4f82802c4503a9b9cc9f8af7"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-elite-004.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          41,
+          19,
+          978,
+          1522
+        ],
+        "sha256": "08441c5d7ac2fc9c09382ff04aac87d80f81ba0e0c102218b6819bb59bdc1469"
+      },
+      "assets/monsters/wild/fire-pool/mon-fire-normal-008.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1010,
+          1536
+        ],
+        "sha256": "5930f3781ead4564ce8193fbe23ff9ad2ceb542778978e6bb516e4d3d17bda43"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-elite-008.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          25,
+          26,
+          1024,
+          1536
+        ],
+        "sha256": "6ea6a910c023b72592cef2dde3f890911cf4d33ec7f58ebd2aa669ed05655a76"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-elite-009.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1023,
+          1536
+        ],
+        "sha256": "22ece523e821b5026127e83f2386207c7bb27ecd0061238abe3f8f3a688c38e0"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-miniboss-001.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          17,
+          1018,
+          1536
+        ],
+        "sha256": "f9cfd3530dac563e9b78e8472f10b50f9dd6cfcd1fcccf7e878d5be34d1034b2"
+      },
+      "assets/monsters/wild/fire-pool/mon-fire-normal-010.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          25,
+          4,
+          1010,
+          1536
+        ],
+        "sha256": "e1acdf74c3d4cdacaaa3d58f6bc69291c4156e50d667d3b8652743fdab18962f"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-miniboss-002.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "6043b633b86a36469547ac882d3a9cf2060d6591666d51c3591c10ff981fb2c8"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-miniboss-003.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "15d280fa0b90822c732c95c0b9ddc807ecf64e559377f18ee7b1ee6c6ce5b6cf"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-miniboss-004.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "f8df8fe570a6b65d434a906fa7119eaa1c657b033dd28e03d06e559fcf6cf54f"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-miniboss-005.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "35fc86b6a96a3bbe3d419ea9af7623bc7306b92f7a78892b440a4d53fced7cc2"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-miniboss-006.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "a7f328b26e51008f158bf0911015a94203c2c0c50c2eb09b4799c97129d92887"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-miniboss-007.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          28,
+          1024,
+          1515
+        ],
+        "sha256": "0a8f77b9e32f7c1ffa224e82796a27616ec64e459852063ee7475c71a6a71533"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-miniboss-008.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          14,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "d59ec63a7546fd9781b42aaecbac0487c33c5a75252f546b246d0c0631ddc306"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-miniboss-009.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1521
+        ],
+        "sha256": "cc7b293b0cb80fcb837d55d0267dfb118c849ef0df00bc9ba60e674bada2e25a"
+      },
+      "assets/monsters/tower/fire-pool/mon-fire-miniboss-011.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "4b028b3ba7a1f8e16762577432f56fed91082952c707751f6c716836d7b869fe"
+      },
+      "assets/dungeons/abyss/soldier.webp": {
+        "width": 1152,
+        "height": 1536,
+        "alphaBounds": [
+          7,
+          0,
+          1152,
+          1536
+        ],
+        "sha256": "b55a63bc199574b174f5534fe62c3d6678707e7a37bfd34892fa45b574d855e1"
+      },
+      "assets/dungeons/abyss/floor5-soldier.webp": {
+        "width": 1152,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          4,
+          1152,
+          1532
+        ],
+        "sha256": "3f49f788302c77cc034123d8c22a13d16e2d85935d18cd37000e533b3daa10f3"
+      }
+    }
   }
 }

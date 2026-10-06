@@ -44,13 +44,46 @@ function battleArtworkSource(card,kind){
     if(source&&source!=="none"&&!/^linear-gradient/i.test(source))card.dataset.v174BattleArtwork=source;
     return card.dataset.v174BattleArtwork||"";
 }
-function syncUnitArtwork(card,kind){
+function syncUnitArtwork(card,kind,selectedRecord){
     if(!card)return;
     card.classList.add("v174-cardless-unit");
     let art=card.querySelector(":scope > .v174-battle-art");
     if(!art){art=document.createElement("div");art.className="v174-battle-art";card.insertBefore(art,card.firstChild);}
-    const source=battleArtworkSource(card,kind);
-    if(source)art.style.backgroundImage=source;
+    let record=null,monster=null;
+    if(kind==="monster"){
+        try{monster=monsters[Number(String(card.id).replace("battleMonster",""))];}catch(_){}
+        if(selectedRecord!==undefined)record=selectedRecord;
+        else if(typeof window.v154ResolveMonsterPortraitRecord==="function")record=window.v154ResolveMonsterPortraitRecord(monster);
+    }
+    const source=kind==="monster"?(record&&record.path?'url("'+record.path+'")':""):battleArtworkSource(card,kind);
+    art.style.backgroundImage=source||"none";
+    let paint=art.querySelector(":scope > .v174-portrait-paint");
+    const metadata=record&&record.path&&window.v154GetPortraitPresentation?.(record.path);
+    art.classList.toggle("v174-normalized-portrait",!!metadata);
+    art.classList.toggle("v174-generic-portrait",!!(record&&record.generic));
+    const rank=monster&&(monster.rank||monster.v141BattleRank)||record?.rank;
+    const sizeClass=monster?.vGameplayBoss&&!monster?.vGameplayTowerBoss?"BIG_BOSS":rank==="boss"||rank==="smallBoss"?"SMALL_BOSS":rank==="elite"?"ELITE":"STANDARD";
+    if(record)card.dataset.portraitSizeClass=sizeClass;
+    if(metadata){
+        if(!paint){paint=document.createElement("div");paint.className="v174-portrait-paint";art.appendChild(paint);}
+        const contract=window.v154GetPortraitScaleContract()[sizeClass];
+        const [left,top,right,bottom]=metadata.alphaBounds;
+        const aspect=metadata.width/metadata.height,bw=(right-left)/metadata.width,bh=(bottom-top)/metadata.height;
+        const width='min('+1/bw*100+'cqw, '+contract.bodyHeight*aspect/bh*100+'cqh)';
+        paint.style.setProperty("--portrait-width",width);
+        paint.style.setProperty("--portrait-aspect",String(aspect));
+        paint.style.setProperty("--portrait-center",String((left+right)/2/metadata.width));
+        paint.style.setProperty("--portrait-bottom",String(bottom/metadata.height));
+        paint.style.setProperty("--portrait-baseline",String(contract.baseline*100)+"%");
+        card.dataset.portraitSizeClass=sizeClass;
+    }else{
+        if(paint)paint.remove();
+        if(!record)delete card.dataset.portraitSizeClass;
+    }
+    if(record){
+        card.dataset.monsterPortraitKey=record.portraitKey;
+        card.dataset.portraitFallback=record.fallbackReason||"none";
+    }
     card.style.setProperty("background-image","none","important");
 }
 function syncResourceNumbers(){
