@@ -5,7 +5,7 @@ import vm from 'node:vm';
 import {createRequire} from 'node:module';
 import {buildForestOpeningRoundRules,OPENING_RULES_PATH,OPENING_POLICY_PATH} from '../scripts/lib/cloud-battle-opening-round-rules.mjs';
 const require=createRequire(import.meta.url);
-const {resolveForestOpeningRound:resolve}=require('../functions/src/canonical-battle-opening-round');
+const {resolveForestOpeningRound:resolve,resolveForestRepeatedRound:repeat}=require('../functions/src/canonical-battle-opening-round');
 const {resolvePlainPlayerNormalAttack:playerAttack}=require('../functions/src/canonical-battle-normal-attack');
 const {makeInitialCharacterSources}=require('../functions/src/initial-character-sources');
 const {assembleCanonicalSnapshot,claimRecordsDigest:digest}=require('../functions/src/canonical-snapshot');
@@ -43,9 +43,11 @@ function extract(name){
 }
 function oracle(args,tape){
   const character=structuredClone(args.archive.sourceRecords.characters[0].state);
+  if(args.currentState)character.hp=args.currentState.playerHP;
   const definition=args.encounterPolicy.entries[args.encounterKey];
   const enemy={...definition.stats,level:definition.spec.level,element:definition.spec.element,alive:true,canAct:true};
-  const stats=playerAttack({...args,randomTape:[0.999999999999]}).playerStats;
+  const {currentState,...sources}=args;
+  const stats=playerAttack({...sources,randomTape:[0.999999999999]}).playerStats;
   let cursor=0;
   const randomMath=Object.assign(Object.create(Math),{random:()=>tape[cursor++]});
   const context=vm.createContext({Math:randomMath,player:character,currentBattleMonsters:[0],monsters:[enemy],
@@ -63,7 +65,7 @@ function oracle(args,tape){
     vm.runInContext(fs.readFileSync(file,'utf8'),context,{filename:file});
   }
   const queue=JSON.parse(JSON.stringify(context.buildInitiativeQueue()));
-  let playerHP=character.hp,enemyHP=enemy.maxHP;const actions=[];
+  let playerHP=character.hp,enemyHP=currentState?currentState.enemyHP:enemy.maxHP;const actions=[];
   for(const {type} of queue){
     if(playerHP===0||enemyHP===0){actions.push({actor:type,skipped:true,reason:'combatant-dead'});continue;}
     const start=cursor,hpBefore=type==='player'?enemyHP:playerHP;
@@ -71,7 +73,7 @@ function oracle(args,tape){
     if(type==='player'){
       hit=tape[cursor++]<0.95;
       const samples=hit?tape.slice(cursor-1,cursor+2):[tape[cursor-1]];
-      const result=playerAttack({...args,randomTape:samples});
+      const result=playerAttack({...sources,randomTape:samples});
       cursor+=hit?2:0;({hit,isCrit,damage}=result);enemyHP=Math.max(0,enemyHP-damage);
     }else{
       hit=context.rollHitChance(context.getMonsterAccuracy(enemy),stats.evasion,0,0,character);
@@ -177,4 +179,69 @@ test('opening projection has no callable, persistence, ambient entropy or reward
   const source=fs.readFileSync('functions/src/canonical-battle-opening-round.js','utf8');
   assert.doesNotMatch(source,/onCall\(|tx\.(create|set|update)|Math\.random\(|randomBytes\(/);
   assert.doesNotMatch(fs.readFileSync('functions/index.js','utf8'),/resolveForestOpeningRound/);
+});
+
+function initialRoundState(args){
+  const state=args.archive.sourceRecords.characters[0].state;
+  const enemy=args.encounterPolicy.entries[args.encounterKey].stats;
+  return {round:0,roundVersion:0,playerHP:state.hp,playerSP:state.sp,enemyHP:enemy.maxHP,enemySP:enemy.maxSP};
+}
+test('shared repeated-round owner matches final browser arithmetic across carried HP and repeated initiative',()=>{
+  let cases=0;
+  for(const element of ['fire','water','wind','earth'])for(const key of Object.keys(catalog.entries)){
+    for(const agility of [0,20]){
+      const sources=input({element,key,agility});let state=initialRoundState(sources);
+      // Misses retain enemy HP; enemy hits carry decreasing player HP. Each
+      // round rerolls initiative, then the last round permits lethal damage.
+      for(let round=0;round<4;round++){
+        const tape=round<3?[0,0.9,0.999999,0.5,0.5,0.5,0.5]:Array(7).fill(0.5);
+        // Player first: MISS then enemy hit. Enemy first: hit then player MISS.
+        if(round<3&&agility===0){tape[2]=0.5;tape[3]=0.5;tape[4]=0.999999;}
+        const args={...sources,currentState:state},expected=oracle(args,tape);
+        const request=vector(args,tape),before=structuredClone(request),actual=repeat(request);
+        assert.deepEqual(actual.initiative,expected.queue);assert.deepEqual(actual.actions,expected.actions);
+        assert.equal(actual.playerHPBefore,state.playerHP);assert.equal(actual.enemyHPBefore,state.enemyHP);
+        assert.deepEqual(actual.nextState,{...state,round:round+1,roundVersion:round+1,
+          playerHP:expected.playerHP,enemyHP:expected.enemyHP});
+        assert.equal(actual.priorStateSha256,digest(state));assert.equal(actual.nextStateSha256,digest(actual.nextState));
+        const {sha256,...body}=actual;assert.equal(sha256,digest(body));
+        assert.deepEqual(request,before);assert.deepEqual(repeat(request),actual);
+        for(const flag of ['combatRulesReady','outcomeVerified','rewardEligible','creditedToCharacter'])assert.equal(actual[flag],false);
+        state=actual.nextState;cases++;
+        if(!state.playerHP||!state.enemyHP){assert.throws(()=>repeat({...sources,currentState:state,randomTape:[0,0,0.95,0.95]}));break;}
+      }
+    }
+  }
+  assert.equal(cases,64);
+});
+test('first shared round preserves original opening fields and digest after removing successor metadata',()=>{
+  for(const agility of [0,20]){
+    const sources=input({agility}),request=vector(sources),opening=resolve(request);
+    const repeated=repeat({...request,currentState:initialRoundState(sources)});
+    const {priorState,priorStateSha256,nextState,nextStateSha256,restrictedPolicySha256,sha256,...body}=repeated;
+    body.kind='forest-opening-round-arithmetic';
+    assert.deepEqual({...body,sha256:digest(body)},opening);
+  }
+});
+test('later lethal retaliation skips the dead player without spending its entropy',()=>{
+  const sources=input(),currentState={...initialRoundState(sources),round:7,roundVersion:7,playerHP:1,enemyHP:1};
+  const actual=repeat({...sources,currentState,randomTape:[0,0.9,0.5,0.5]});
+  assert.equal(actual.nextState.playerHP,0);assert.equal(actual.nextState.enemyHP,1);
+  assert.deepEqual(actual.actions[1],{actor:'player',skipped:true,reason:'combatant-dead'});
+  assert.equal(actual.randomSamplesConsumed,4);
+});
+test('prior state cannot resurrect, heal, change SP, overflow versions or admit unknown fields',()=>{
+  const sources=input(),state=initialRoundState(sources),base={...sources,currentState:state,randomTape:[0.5,0.5,0.95,0.95]};
+  for(const change of [{round:-1},{round:1.5,roundVersion:1.5},{round:Number.MAX_SAFE_INTEGER,roundVersion:Number.MAX_SAFE_INTEGER},
+    {roundVersion:1},{playerHP:0},{enemyHP:0},{playerHP:state.playerHP+1},{enemyHP:state.enemyHP+1},
+    {playerHP:state.playerHP-1},{enemyHP:state.enemyHP-1},{playerSP:state.playerSP-1},{enemySP:state.enemySP+1},
+    {won:true},{status:'VICTORY'}])assert.throws(()=>repeat({...base,currentState:{...state,...change}}));
+  for(const currentState of [null,[],{},false])assert.throws(()=>repeat({...base,currentState}));
+  for(const randomTape of [[0,0], [0.5,0.5,0.95], [0.5,0.5,0.95,0.95,0], [NaN,0,0.95,0.95]]){
+    assert.throws(()=>repeat({...base,randomTape}));
+  }
+  assert.throws(()=>repeat({...base,action:{type:'skill'}}));
+  const unbound=structuredClone(base);unbound.encounterPolicy.entries[unbound.encounterKey].spec.level++;
+  const {sha256,...body}=unbound.encounterPolicy;unbound.encounterPolicy.sha256=digest(body);
+  assert.throws(()=>repeat(unbound),/certified/);
 });
