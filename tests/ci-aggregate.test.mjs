@@ -95,3 +95,8 @@ test('isolated Tower runner prepares the directory required by its existing TTK 
   const write = tower.indexOf('node scripts/tower-balance-ttk-matrix.mjs artifacts/browser-qa/');
   assert.ok(prepare >= 0 && write > prepare, 'TTK output cannot depend on a previous browser job');
 });
+
+test('full Node suites obey classifier full-node policy independently of main-only browsers',()=>{
+  const workflow=fs.readFileSync('.github/workflows/ci.yml','utf8');
+  assert.match(workflow,/name: Run all Node unit and integration suites\n\s+if: needs\.classify\.outputs\.full_node == 'true'/);
+});
