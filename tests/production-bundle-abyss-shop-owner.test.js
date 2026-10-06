@@ -13,15 +13,14 @@ const gameplayJs=readBundleScripts("gameplay-core");
 const gameplayCss=readBundleStyles("gameplay-core");
 const appCss=readBundleStyles("app-shell");
 
-for(const portrait of [
-    "floor5-east-emperor.webp",
-    "floor5-heaven-emperor.webp",
-    "floor5-extreme-emperor.webp",
-    "floor5-north-emperor.webp",
-    "floor5-south-emperor.webp"
-]){
-    assert.match(gameplayJs,new RegExp(portrait.replace(/[.*+?^${}()|[\\]\\]/g,"\\$&")),`production bundle is missing ${portrait}`);
-}
+const registry=JSON.parse(fs.readFileSync('config/monster-portrait-registry.json','utf8'));
+const finalPortraits=registry.groups['abyss-boss'].filter(row=>row[0].startsWith('abyss.final.'));
+assert.equal(finalPortraits.length,5);
+assert.equal(new Set(finalPortraits.map(row=>row[5])).size,5);
+finalPortraits.forEach(row=>{assert.equal(row[6],'existing');assert.ok(fs.existsSync(row[5]),row[0]);});
+assert.match(gameplayJs,/config\/monster-portrait-registry\.json/,'production resolver must load the canonical Registry');
+assert.match(gameplayJs,/v154ResolveMonsterPortraitRecord/);
+assert.doesNotMatch(gameplayJs,/EARLY_ABYSS_PORTRAITS|FINAL_ABYSS_PORTRAITS/,'retired duplicate path maps cannot return');
 for(const skill of [
     "dustStorm","flyingSandStrike","rockWall","windHowlLightning","stormRain",
     "stealthSkill","phoenixCry","yuanZuBlessing","iceArrowRain","iceSpin",
