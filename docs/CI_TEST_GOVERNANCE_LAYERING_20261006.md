@@ -3,8 +3,46 @@
 Work ID: `CI-TEST-GOVERNANCE-LAYERING-20261006`
 Target: dev; main writes forbidden.
 Branch: `feature/ci-test-governance-layering-20261006`.
-Status: Phase 1 remote VERIFIED; Phase 2 PR enforcement implemented after shadow;
-Phase 3 full regression/health implemented, final remote validation pending.
+Status: Original layering integrated. Current routing/stale-run repair is owned by
+Work ID CI-BOSS-ROUTING-20261006, branch chore/ci-boss-routing-20261006.
+Latest Head, Required CI, integration and cleanup evidence belong to its PR.
+
+## Current routing owner (supersedes historical phase restrictions below)
+
+The classifier remains the single routing owner. PR comparisons require a real
+merge base and exact PR head; only its checkout receives full ancestry. dev push
+compares exact before/after trees. Missing SHA, unrelated histories, invalid/new
+unowned runtime and unexplained generated outputs retain strict fallback.
+
+Known existing presentation declarations in js/00-main.js are compared by Acorn
+AST boundaries. Unchanged surrounding source, declaration identity and call/write
+effects are required; new declarations, new effects and unknown shared changes
+are strict. Shop/character presentation routes to UI; battle presentation routes
+to battle. Boss/Tower source routes to Boss/Tower/battle. MonsterBalance routes to
+all affected balance modes, Daily and battle, with full Node regressions.
+
+Generated bundles/manifests and restricted-policy digest may follow their source
+only after production build --check, registered-output validation and a real
+source change. Generated-only changes stay strict. CI routing/aggregate/workflow
+owners run core and full Node contract suites; other CI/build/release owners stay
+strict. No gameplay source, QA scene, viewport, assertion or timeout is removed.
+
+Ordinary dev integration now uses affected gates. main/release, manual full CI,
+Nightly and unknown changes retain full validation. Targeted dev runs never
+publish Full Regression Health. Nightly/manual full evidence is still required
+for promotion; main publication remains separately authorized. Nightly schedule
+activation still requires its separately authorized arrival on the default branch.
+
+CI concurrency isolates PR number, dev integration and full candidate/run ID.
+Only ordinary dev-target PR/dev push runs cancel older runs in the same group.
+The parent cancellation includes its reusable dev deployment; latest-dev guard
+rejects an already superseded integration before testing. Nightly/main/release
+and separate workflows are isolated. Exact deployed SHA checks remain before
+and after every affected QA group. Publisher and responsive live smoke remain
+mandatory; each other deployed group accepts only an explicit affected-mode
+skip, never failure/cancellation/missing evidence. Manual deployment defaults full.
+
+## Historical implementation evidence
 
 ## Phase 0 evidence
 

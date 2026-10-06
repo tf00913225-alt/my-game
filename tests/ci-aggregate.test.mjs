@@ -12,6 +12,17 @@ test('deployed aggregate accepts all pass and rejects every failure, skip or can
     const needs=passed();needs[key]={result};assert.throws(()=>requireDeploymentGates(needs),/did not pass/);
   }
 });
+test('explicit affected-mode deployment skips are legal; failure/cancellation/missing evidence never are',()=>{
+  const mapping={boss_live:'bossRequired',tower_live:'towerRequired',abyss_live:'abyssRequired',adventure_live:'adventureRequired',battle_daily_live:'battleDailyRequired'};
+  for(const [job,option] of Object.entries(mapping)) {
+    const needs=Object.fromEntries(DEPLOYMENT_GATES.map(k=>[k,{result:'success'}]));
+    needs[job].result='skipped';
+    assert.equal(requireDeploymentGates(needs,{[option]:false}),true);
+    assert.throws(()=>requireDeploymentGates(needs),/did not pass/);
+    for(const result of ['failure','cancelled',undefined]) {needs[job].result=result;assert.throws(()=>requireDeploymentGates(needs,{[option]:false}),/did not pass/);}
+    assert.throws(()=>requireDeploymentGates(needs,{[option]:'false'}),/Invalid deployment policy/);
+  }
+});
 test('every parallel deployed QA binds its pre/post manifest checks to the same exact SHA',()=>{
   const text=fs.readFileSync(new URL('../.github/workflows/deploy-dev-cloudflare.yml',import.meta.url),'utf8');
   for(const key of DEPLOYMENT_GATES.filter(k=>k!=='publish_dev')) {
@@ -50,7 +61,7 @@ test('legal docs classifier skips pass, failure/cancellation never does', () => 
 });
 test('missing classifier / forged strict or dev-push skips fail closed', () => {
   for(const eventName of ['push','pull_request']) {
-    const plan=classifyChanges(['.github/workflows/ci.yml'],{enabled:true,eventName});
+    const plan=classifyChanges(['js/unknown.js'],{enabled:true,eventName});
     plan.gates.boss_balance=false;
     assert.throws(()=>requireChildGates(passed(),{mainRequired:false,plan}),/cannot skip/);
   }
@@ -59,7 +70,7 @@ test('missing classifier / forged strict or dev-push skips fail closed', () => {
 });
 test('full dev/nightly require Session and boot, while promotion-only is skipped', () => {
   for(const eventName of ['push','schedule']) {
-    const plan=classifyChanges(['docs/readme.md'],{eventName,baseRef:'dev',fullRegression:eventName==='schedule'});
+    const plan=classifyChanges(['docs/readme.md'],{eventName,baseRef:'dev',fullRegression:true});
     const needs=passed();needs.promotion_health.result='skipped';
     assert.equal(requireChildGates(needs,{mainRequired:true,plan}),true);
     needs.session_authority.result='skipped';
@@ -85,7 +96,7 @@ test('public barrier waits for every required child; deployment only follows bar
   const dependencies = barrier.match(/needs: \[([^\]]+)\]/)[1].split(',').map(v => v.trim());
   assert.deepEqual(dependencies, [...CHILD_GATES]);
   assert.match(barrier, /run: node \.github\/scripts\/ci-aggregate\.mjs/);
-  assert.match(text.split('\n  deploy_dev:')[1], /needs: verify/);
+  assert.match(text.split('\n  deploy_dev:')[1], /needs: \[verify, classify\]/);
 });
 
 test('dev deployment survives legitimate ancestor skips but rejects failed validation and cancellation', () => {

@@ -8,10 +8,12 @@ export const CHILD_GATES = Object.freeze([
   'main_browser', 'abyss_balance', 'adventure_balance', 'boss_balance', 'session_authority', 'promotion_health'
 ]);
 export const DEPLOYMENT_GATES=Object.freeze(['publish_dev','responsive_live','battle_daily_live','tower_live','abyss_live','adventure_live','boss_live']);
-export function requireDeploymentGates(needs) {
+export function requireDeploymentGates(needs, {bossRequired = true, towerRequired = true, abyssRequired = true, adventureRequired = true, battleDailyRequired = true} = {}) {
   if(!needs || typeof needs!=='object' || Array.isArray(needs)) throw Error('Invalid deployment aggregate input');
   if(Object.keys(needs).some(k=>!DEPLOYMENT_GATES.includes(k))) throw Error('Unknown deployment dependency');
-  for(const key of DEPLOYMENT_GATES) if(needs[key]?.result!=='success') throw Error(`Required deployed QA ${key} did not pass: ${needs[key]?.result ?? 'missing'}`);
+  const required={publish_dev:true,responsive_live:true,boss_live:bossRequired,tower_live:towerRequired,abyss_live:abyssRequired,adventure_live:adventureRequired,battle_daily_live:battleDailyRequired};
+  if(Object.values(required).some(v=>typeof v!=='boolean')) throw Error('Invalid deployment policy');
+  for(const key of DEPLOYMENT_GATES) if(!(required[key]===false && needs[key]?.result==='skipped') && needs[key]?.result!=='success') throw Error(`Required deployed QA ${key} did not pass: ${needs[key]?.result ?? 'missing'}`);
   return true;
 }
 
@@ -24,7 +26,7 @@ export function requireChildGates(needs, {mainRequired = true, plan} = {}) {
         !plan.gates || plan.gates.core_checks !== true) throw Error('Invalid classifier policy');
     for (const key of CHILD_GATES.filter(k => k !== 'classify')) {
       if (typeof plan.gates[key] !== 'boolean') throw Error(`Missing classifier gate ${key}`);
-      if (!['main_browser', 'promotion_health'].includes(key) && (plan.strictMode || plan.shadow || plan.eventName !== 'pull_request' || mainRequired) &&
+      if (!['main_browser', 'promotion_health'].includes(key) && (plan.strictMode || plan.shadow || plan.fullRegression || !['pull_request','push'].includes(plan.eventName) || mainRequired) &&
           plan.gates[key] !== true) throw Error(`Full/strict policy cannot skip ${key}`);
     }
     if (plan.gates.promotion_health !== (plan.baseRef === 'main' && !plan.fullRegression)) throw Error('Promotion health policy mismatch');
@@ -44,7 +46,12 @@ export function requireChildGates(needs, {mainRequired = true, plan} = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
     if(process.argv.includes('--dev-deployment')) {
-      requireDeploymentGates(JSON.parse(process.env.CI_NEEDS_JSON));
+      const policy={};
+      for(const [key,env] of Object.entries({bossRequired:'CI_BOSS_REQUIRED',towerRequired:'CI_TOWER_REQUIRED',abyssRequired:'CI_ABYSS_REQUIRED',adventureRequired:'CI_ADVENTURE_REQUIRED',battleDailyRequired:'CI_BATTLE_DAILY_REQUIRED'})) {
+        if(!['true','false'].includes(process.env[env])) throw Error(`Missing deployment policy: ${env}`);
+        policy[key]=process.env[env]==='true';
+      }
+      requireDeploymentGates(JSON.parse(process.env.CI_NEEDS_JSON),policy);
       console.log('Exact-SHA deployed QA: every required group passed.');
     } else {
     if (!['true', 'false'].includes(process.env.CI_MAIN_REQUIRED)) throw Error('Missing main gate policy');
