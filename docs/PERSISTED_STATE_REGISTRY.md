@@ -23,3 +23,5 @@ Three private instance/consumption/policy paths are registered under canonical-r
 ### Protected restricted round history (2026-10-06)
 
 The private restrictedBattleRounds/{attemptId}_{roundVersion} path and existing restrictedBattleAttempts roundHead are registered under canonical-restricted-battle.js with Tier B authority and required backup retention. Full input/lifecycle/replay/backup boundaries are owned by CLOUD_OPERATION_SETTLEMENT_CONTRACT.md, section Protected restricted normal-round writer. No delete/restore writer or client access is enabled.
+
+The same Owner registers immutable `restrictedBattleTerminals/{attemptId}` and the existing consumption marker's `terminalHead` as retained Tier B evidence. Missing/corrupt terminal, marker or receipt blocks replay/progression and never implies a reusable preparation or reward right. Full closure/replay/backup boundaries are owned by `CLOUD_OPERATION_SETTLEMENT_CONTRACT.md`, section Protected restricted terminal resource closure; no deletion or restore writer is enabled.
