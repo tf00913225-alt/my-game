@@ -1,6 +1,7 @@
 "use strict";
 
 const {createHash}=require("node:crypto");
+const {normalizeAccountState:normalizeHeroAccount}=require("./hero-core.js");
 
 const CLOUD_SAVE_SCHEMA_VERSION=1;
 const MAX_CANDIDATE_BYTES=700*1024;
@@ -11,6 +12,7 @@ const MAX_STRING_LENGTH=65536;
 
 const ALLOWED_SAVE_KEYS=new Set([
     "version",
+    "heroAccount",
     "player",
     "player2",
     "player3",
@@ -167,6 +169,13 @@ function validateLegacySaveCandidate(candidate){
     validateNonNegativeNumber(candidate.lastSaveTimestamp,"save.lastSaveTimestamp",{integer:true,max:9_999_999_999_999});
 
     validateJsonValue(candidate,"save",0);
+
+    // Shape validation only: preserve exact untrusted source bytes/snapshot.
+    // This does not confer Hero ownership, progression or playable authority.
+    if(Object.hasOwn(candidate,"heroAccount")){
+        try{ normalizeHeroAccount(candidate.heroAccount); }
+        catch(_){ fail("invalid-argument","save.heroAccount is invalid or unsupported."); }
+    }
 
     let serialized;
     try{
