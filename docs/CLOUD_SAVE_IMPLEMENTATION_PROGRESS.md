@@ -348,6 +348,8 @@ Wire callable 名稱是 `protectedTest`（本文 protected-test 的正式 Fireba
 
 ## G. Next Safe Step（每次結束必更新）
 
+Current Foundation D continuation (2026-10-07): PR #817 completed private restricted terminal resource closure; its durable closeout confirms merge/deployment/cleanup. Work ID `CLOUDSAVE-TERMINAL-SOURCE-READER-20261007` adds the original Owner's protected historical terminal source reader as the prerequisite for a separately gated outcome successor. Exact transaction and authority boundaries are owned by `CLOUD_OPERATION_SETTLEMENT_CONTRACT.md`, section Protected terminal successor source reader. Execution/CI/merge status belongs to this Work ID's PR. Next: verify that reader with existing regression/emulator gates and integrate dev; then establish full supported outcome policy before any outcome authority or once-only reward settlement. Phase4 remains 0/6; legacy admission and second-device character recovery remain closed. The historical Phase 1 publication steps below do not authorize this work to publish main; routing follows current `AGENTS.md`.
+
 **Phase 1 功能驗收 COMPLETE / 5/5 VERIFIED；Phase 2 為 COMPLETE / 6/6 VERIFIED；Phase 3 為 COMPLETE / 6/6 VERIFIED。**
 
 1. 先讀本文件、`AGENTS.md`、`ARCHITECTURE_RULES.md`、`SYSTEM_CONTRACTS.md`、`docs/BOOT_ARCHITECTURE.md`、本次 Requirement Batch。
