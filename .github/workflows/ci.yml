@@ -15,6 +15,44 @@ permissions:
   contents: read
 
 jobs:
+  classify:
+    name: CI change classifier
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      plan_json: ${{ steps.classify.outputs.plan_json }}
+      strict: ${{ steps.classify.outputs.strict }}
+      cloud_gate: ${{ steps.classify.outputs.cloud_gate }}
+      core_checks: ${{ steps.classify.outputs.core_checks }}
+      battle_browser: ${{ steps.classify.outputs.battle_browser }}
+      ui_browser: ${{ steps.classify.outputs.ui_browser }}
+      daily_browser: ${{ steps.classify.outputs.daily_browser }}
+      tower_wild_browser: ${{ steps.classify.outputs.tower_wild_browser }}
+      portrait_browser: ${{ steps.classify.outputs.portrait_browser }}
+      adventure_ui_browser: ${{ steps.classify.outputs.adventure_ui_browser }}
+      abyss_balance: ${{ steps.classify.outputs.abyss_balance }}
+      adventure_balance: ${{ steps.classify.outputs.adventure_balance }}
+      boss_balance: ${{ steps.classify.outputs.boss_balance }}
+      main_browser: ${{ steps.classify.outputs.main_browser }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Verify classifier fixtures before emitting policy
+        run: node --test tests/ci-change-classifier.test.mjs
+      - name: Compute fail-closed shadow plan
+        id: classify
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          CI_EVENT_NAME: ${{ github.event_name }}
+          CI_BASE_REF: ${{ github.base_ref || github.ref_name }}
+        run: node .github/scripts/ci-change-classifier.mjs
+
   core_checks:
     name: core_checks
     runs-on: ubuntu-latest
@@ -70,7 +108,7 @@ jobs:
           node --check .github/scripts/run-water-wild-portrait-browser-qa.mjs
 
       - name: Verify CI aggregate failure propagation
-        run: node --test tests/ci-aggregate.test.mjs tests/session-repository-checks-wait.test.mjs
+        run: node --test tests/ci-change-classifier.test.mjs tests/ci-aggregate.test.mjs tests/session-repository-checks-wait.test.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
@@ -865,7 +903,7 @@ jobs:
   verify:
     name: Repository checks
     if: always()
-    needs: [core_checks, battle_browser, ui_browser, daily_browser, tower_wild_browser, portrait_browser, adventure_ui_browser, main_browser, abyss_balance, adventure_balance, boss_balance]
+    needs: [classify, core_checks, battle_browser, ui_browser, daily_browser, tower_wild_browser, portrait_browser, adventure_ui_browser, main_browser, abyss_balance, adventure_balance, boss_balance]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

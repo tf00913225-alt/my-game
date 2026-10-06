@@ -3,7 +3,7 @@
 Work ID: `CI-TEST-GOVERNANCE-LAYERING-20261006`
 Target: dev; main writes forbidden.
 Branch: `feature/ci-test-governance-layering-20261006`.
-Status: Phase 1 implementation; remote validation pending.
+Status: Phase 1 remote VERIFIED; Phase 2 classifier SHADOW, no PR skipping enabled.
 
 ## Phase 0 evidence
 
@@ -82,3 +82,25 @@ never remove existing dev/main gates to work around failure.
 
 Final status/evidence, exact Head, timings and deployment belong to the Work PR.
 Until those gates pass this work is **NOT COMPLETE**.
+
+## Phase 1 remote acceptance / Phase 2 shadow checkpoint
+
+Exact Head `ab146b3701d5c3a2b151825881449b15dfd09062`: CI run
+`37408209921` SUCCESS, Repository checks SUCCESS, Session Authority
+`37408209717` emulator SUCCESS. All original test/evidence steps retained.
+Real failure propagation: earlier run `37407980798` Tower failure resulted in
+Repository checks FAILURE after all required children settled.
+Execution: core 1m42s, UI 8m35s, Daily 8m57s, Tower/Wild 13m28s, Battle 10m18s,
+Portrait 1m05s, Adventure balance 4m19s, Abyss 18m19s, Boss 34m14s.
+Final barrier takes the Boss critical path, not merely the split serial group.
+
+Classifier owner: `.github/scripts/ci-change-classifier.mjs`. Unit fixtures cover
+Battle, UI, Cloud, Portrait, Docs, MonsterBalance, Release, Workflow, unknown
+runtime, unavailable comparison, new files, shadow and full dev/main behavior.
+Shadow emits predicted/effective gates in every PR summary; original full gates
+remain. Classifier itself is also a required aggregate child.
+Generated build/manifest diffs are strict as required; many UI PRs containing
+such generated changes can therefore still run the full matrix.
+Automatic schedule activation is blocked until a separately authorized main
+release: main is this repository's default branch, and GitHub only schedules
+workflows present there. This task must not modify main or default-branch settings.

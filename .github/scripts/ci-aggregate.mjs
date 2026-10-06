@@ -3,7 +3,7 @@ import {pathToFileURL} from 'node:url';
 // The public check name remains Repository checks. No upstream failure, queued
 // job or cancellation can become a green required check.
 export const CHILD_GATES = Object.freeze([
-  'core_checks', 'battle_browser', 'ui_browser', 'daily_browser',
+  'classify', 'core_checks', 'battle_browser', 'ui_browser', 'daily_browser',
   'tower_wild_browser', 'portrait_browser', 'adventure_ui_browser',
   'main_browser', 'abyss_balance', 'adventure_balance', 'boss_balance'
 ]);
