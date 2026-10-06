@@ -810,7 +810,7 @@
                 const percent=activeMonsterEarthShieldPercent(target);
                 if(type==="hp"&&actualLoss>0&&percent>0&&numeric(context.actor.hp)>0){
                     const reflected=Math.max(1,Math.floor(actualLoss*percent/100));
-                    context.actor.hp=Math.max(0,numeric(context.actor.hp)-reflected);
+                    settleBattleHpDamage(context.actor,reflected,{attacker:target,sourceType:"reflect",damageKind:"reflect"});
                     if(typeof showPlayerHit==="function"){
                         showPlayerHit(reflected,"hp",context.actorIndex,false);
                     }

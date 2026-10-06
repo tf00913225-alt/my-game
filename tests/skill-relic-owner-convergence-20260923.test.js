@@ -189,53 +189,27 @@ test("Team Relic runtime is guaranteed by gameplay-core, not a Boss-only side ef
   );
 });
 
-test("10 runtime-ready relics retain real Trigger/Effect/Scalar data and 10 unopened relics stay metadata-only",()=>{
-  const readyIds=[
-    "relic_qiankun_flask","relic_sun_orb","relic_xuanwu_seal","relic_soul_bell","relic_tiangang_banner",
-    "relic_nine_dragon_fire","relic_cold_spring_jade","relic_qinglan_feather","relic_rock_mountain_seal","relic_returning_wheel"
-  ];
-  const pendingIds=[
-    "relic_origin_talisman","relic_broken_army_scroll","relic_red_sky_war_mark","relic_ice_mirror_heart","relic_wind_chasing_talisman",
-    "relic_mountain_river_cauldron","relic_burning_star_mark","relic_spirit_spring_bottle","relic_demon_suppressing_seal","relic_all_returning_array"
-  ];
-  const block=id=>{
-    const marker='id:"'+id+'"';
-    const start=relic.indexOf(marker);
-    assert.ok(start>=0,id+" missing");
-    const next=relic.indexOf('\n        {',start+marker.length);
-    return relic.slice(start,next>=0?next:relic.length);
-  };
-  readyIds.forEach(id=>{
-    const source=block(id);
-    assert.match(source,/runtimeReady:true/,id+" runtimeReady");
-    assert.match(source,/scalars:\{/,id+" scalars");
-    assert.match(source,/triggers:\[/,id+" triggers");
-    assert.match(source,/effect\(/,id+" effects");
-    assert.match(source,/limitText:/,id+" limit");
-    assert.match(source,/nextText:\{/,id+" nextText");
-  });
-  pendingIds.forEach(id=>{
-    const source=block(id);
-    assert.match(source,/runtimeReady:false/,id+" pending flag");
-    assert.doesNotMatch(source,/triggers:\[|effect\(|scalars:\{|nextText:\{/,id+" must remain metadata-only");
-  });
+test("20 final relics retain formal Trigger/Effect/Scalar data and player text",()=>{
+  const createRuntime=require('./helpers/relic-runtime-fixture.cjs');
+  const c=createRuntime().context;
+  const catalog=c.v174RelicSystem.catalog;
+  assert.equal(Object.keys(catalog).length,20);
+  for(const def of Object.values(catalog)){
+    assert.equal(def.runtimeReady,true,def.id);assert.ok(Object.keys(def.scalars).length,def.id);
+    assert.ok(def.triggers.length&&def.triggers.every(trigger=>trigger.effects.length),def.id);
+    assert.ok(def.limitText&&def.triggerText&&Object.keys(def.nextText).length,def.id);
+    assert.doesNotMatch(c.v174RelicSystem.getCurrentEffectText(def.id,20),/尚未開放|待確認|NaN|undefined/);
+  }
   assert.match(relic,/function dispatchRelicEvent\(event,payload\)/);
   assert.match(relic,/function resolveEffects\(triggerDef,def,payload\)/);
-  assert.match(relic,/function equipRelic\(id\)[\s\S]*?def\.runtimeReady!==true/);
-  assert.match(relic,/function upgradeRelic\(id\)[\s\S]*?!def\.runtimeReady/);
-  assert.match(relic,/function normalizeLoadout\(raw\)[\s\S]*?def&&def\.runtimeReady===true\?id:null/);
-  assert.match(relicProgression,/function upgradeRelic\(relicId\)[\s\S]*?def\.runtimeReady!==true/);
-  assert.match(relicProgression,/def\.runtimeReady!==true[\s\S]*?目前不可合成、裝備或強化/);
-  assert.match(relic,/效果尚未覺醒/);
-  assert.match(relic,/能力尚未開放/);
-  assert.doesNotMatch(relic,/下一級提升效果數值/);
 });
 
 test("implemented relic descriptions expose real special cases without fake zero bonuses",()=>{
   assert.match(relicSummary,/寒泉玉珮","任一我方角色HP由35%以上降至35%以下時/);
   assert.match(relic,/HP由35%以上降至35%以下時觸發，每場最多2次，冷卻3回合/);
   assert.match(relic,/relic_nine_dragon_fire[\s\S]*?level>=20\?"，對燃燒目標額外\+15%"/);
-  assert.match(relic,/relic_rock_mountain_seal[\s\S]*?Lv20護盾後準備一次18%秘寶威力反震/);
+  assert.match(relic,/岩甲/);
+  assert.doesNotMatch(relic,/prepare_reflect|reflectReady|ally_hits_8|battle_start_defense/);
   assert.match(relic,/const bonus=Math\.round\(valueFor\(def,"burnBonus",level\)\*100\)/);
   assert.match(relic,/bonus>0\?"；燃燒目標額外\+"/);
 });

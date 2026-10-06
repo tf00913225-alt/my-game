@@ -49,3 +49,33 @@ test('feedback no longer performs HP refund as a second reduction owner',()=>{
   const feedback=source.slice(source.indexOf('    if(typeof showPlayerHit==='),source.indexOf('    if(typeof tickStatusEffects==='));
   assert.doesNotMatch(feedback,/damageReductionPercent|const refund|character\.hp\+refund/);
 });
+
+test('fully loaded character and party getters project final relic evasion exactly once',()=>{
+  c.v174GetRelicFinalEvasionPercent=()=>0;
+  const base=c.getMainCharacterStats().evasion;
+  c.v174GetRelicFinalEvasionPercent=()=>8;
+  assert.equal(c.getMainCharacterStats().evasion,base+8);
+  assert.equal(c.getPartyBattleStats(0).evasion,base+8);
+  c.v174GetRelicFinalEvasionPercent=()=>0;
+});
+
+test('ordinary relic bonus shares the existing 50% cap, skill final bonus is applied once',()=>{
+  const enemy={level:30,element:'fire',rank:'regular'};
+  c.v174RelicDamageModifiers={ordinaryBonus:()=>10,skillFinalBonus:(_actor,source)=>source==='activeSkill'?20:0};
+  assert.equal(c.getOrdinaryDamageBonusPercent({attacker:target,ordinaryDamageBonusPercent:100}),50);
+  assert.equal(c.getRelicDirectDamageMultiplier(target,enemy,{attacker:target,sourceType:'activeSkill'}),1.2);
+  for(const sourceType of ['normalAttack','counter','followUp','dot','relic','reflect','item','hpCost','environment']){
+    assert.equal(c.getRelicDirectDamageMultiplier(target,enemy,{attacker:target,sourceType}),1,sourceType);
+  }
+});
+
+test('final relic crit chance keeps the canonical 95% cap',()=>{
+  run('player.activeBuffs=[]; Math.random=()=>.95;');
+  const originalStats=c.getPartyBattleStats;
+  c.getPartyBattleStats=index=>({...originalStats(index),statusAccuracy:100});
+  c.v174RelicDamageModifiers={critBonus:()=>8};
+  assert.equal(c.rollCritical(target).isCrit,false);
+  run('Math.random=()=>.94999;');assert.equal(c.rollCritical(target).isCrit,true);
+  run('player.activeBuffs=[];Math.random=()=>.5;');
+  c.getPartyBattleStats=originalStats;
+});

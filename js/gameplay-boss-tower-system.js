@@ -1029,7 +1029,7 @@
             damage=absorbPlayerShields(character,damage,index);
             if(damage>0){
                 const beforeHp=Math.max(0,numeric(character.hp,0));
-                character.hp=Math.max(0,character.hp-damage);
+                settleBattleHpDamage(character,damage,{attacker:boss,sourceType:"environment",damageKind:"environment"});
                 const actual=Math.max(0,beforeHp-numeric(character.hp,0));
                 if(typeof battleStatisticsRecordDamageTakenByIndex==="function"){
                     battleStatisticsRecordDamageTakenByIndex(index,actual);

@@ -2,7 +2,7 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const createRuntime=require('./helpers/relic-runtime-fixture.cjs');
 function setup(id,level=1){
-    const r=createRuntime({pending:true}),c=r.context;
+    const r=createRuntime({}),c=r.context;
     c.v174RelicDevUnlock(id);c.v174RelicSystem.getOwnedState()[id].level=level;
     assert.equal(c.v174EquipRelic(id),true);c.startBattle();
     r.emit=(type,event)=>c.FourSymbolsCombatEvents.emit(type,event);
@@ -110,4 +110,57 @@ test('nine dragon complete actions cross-round, misses count and hard-control sk
     assert.equal(c.v174RelicDebugState().enemyActionCount,6);r.round(2);assert.equal(c.v174RelicDebugState().enemyActionCount,6);
     r.monsters[0].frozen=true;let action=startAction(r,0);r.emit('action_finished',{action});assert.equal(c.v174RelicDebugState().enemyActionCount,6);
     r.monsters[0].frozen=false;action=startAction(r,1);r.emit('action_finished',{action});assert.equal(c.v174RelicDebugState().enemyActionCount,0);assert.equal(c.v174RelicDebugState().totalTriggers,1);
+});
+
+test('fixed battlefield and party slots break equal-ratio and cleanse ties',()=>{
+    let r=setup('relic_broken_army_scroll'),c=r.context;
+    c.FourSymbolsBattlefieldSlots={enemySlots:['front','rear'],getActiveEnemySnapshot:()=>({}),getEnemySlotForMonster:(s,i)=>i===2?'front':'rear'};
+    r.monsters[0].hp=2000;r.monsters[1].hp=1000;r.monsters[2].hp=1000;
+    const power=c.v174RelicSystem.getRelicPower('relic_broken_army_scroll');
+    c.settleBattleHpDamage(r.monsters[3],2000,{attacker:r.party[0],sourceType:'normalAttack'});
+    assert.equal(r.monsters[1].hp,1000);assert.equal(r.monsters[2].hp,1000-Math.floor(power*.9));
+    r=setup('relic_origin_talisman');c=r.context;
+    c.FourSymbolsBattlefieldSlots={allySlots:['front','rear'],getAllySlotForCharacter:i=>i===1?'front':'rear'};
+    r.party.forEach(p=>{p.hp=500;p.statusEffects=[{type:'poison',turnsLeft:3}];});c.turn=4;r.end();
+    assert.equal(r.party[1].statusEffects.length,0);assert.equal(r.party[0].statusEffects.length,1);
+});
+test('nine dragon can trigger twice in the same round after fourteen complete actions',()=>{
+    const r=setup('relic_nine_dragon_fire'),c=r.context;
+    for(let i=0;i<14;i++){const action=startAction(r,i);r.emit('action_finished',{action});}
+    assert.equal(c.v174RelicDebugState().totalTriggers,2);assert.equal(c.v174RelicDebugState().enemyActionCount,0);
+});
+for(const [level,anchor] of [[1,0],[10,1],[20,2]]){
+    test('Lv'+level+' broken army exact scalar and one activation per round',()=>{
+        const r=setup('relic_broken_army_scroll',level),c=r.context;
+        r.monsters[1].hp=1500;r.monsters[2].hp=1600;
+        const power=c.v174RelicSystem.getRelicPower('relic_broken_army_scroll');
+        c.settleBattleHpDamage(r.monsters[3],2000,{attacker:r.party[0],sourceType:'activeSkill'});
+        assert.equal(r.monsters[1].hp,1500-Math.floor(power*[.9,1.15,1.4][anchor]));
+        c.settleBattleHpDamage(r.monsters[2],2000,{attacker:r.party[0],sourceType:'normalAttack'});assert.equal(c.v174RelicDebugState().totalTriggers,1);
+    });
+    test('Lv'+level+' adaptive array each mode anchors and round-end expiry',()=>{
+        for(const hp of [400,600,900]){
+            const r=setup('relic_all_returning_array',level),c=r.context;r.party.forEach(p=>{p.hp=hp;p.statusEffects=[{type:'poison',turnsLeft:5}];});r.round(4);
+            if(hp===400){assert.equal(r.party[0].hp,hp+[120,150,180][anchor]);assert.equal(c.v174RelicDamageModifiers.incomingReduction(r.party[0]),[8,10,12][anchor]);assert.equal(r.party[0].statusEffects.length,level===20?0:1);}
+            if(hp===600){const stats=c.v174ProjectRelicBattleStats(0,{attack:100,defense:100,statusResistance:0});assert.ok(Math.abs(stats.attack-(100+[10,12,15][anchor]))<1e-9);assert.ok(Math.abs(stats.defense-stats.attack)<1e-9);assert.equal(stats.statusResistance,level===20?10:0);}
+            if(hp===900){assert.equal(c.v174RelicDamageModifiers.skillFinalBonus(r.party[0],'activeSkill'),[10,15,20][anchor]);}
+            r.party[0].hp=100;r.end();assert.ok(c.v174RelicDebugState().playerMods[0].length);r.end();assert.equal(c.v174RelicDebugState().playerMods[0].length,0);
+        }
+    });
+    test('Lv'+level+' wind rounding minimum, actual-spend maximum and independent actors',()=>{
+        const r=setup('relic_wind_chasing_talisman',level);r.round(3);
+        r.party.forEach(p=>p.sp=0);
+        r.emit('skill_completed',{actor:r.party[0],actualSpent:1,sourceType:'activeSkill'});assert.equal(r.party[0].sp,1);
+        r.emit('skill_completed',{actor:r.party[1],actualSpent:0,sourceType:'activeSkill'});assert.equal(r.party[1].sp,0);
+        r.emit('skill_completed',{actor:r.party[2],actualSpent:19,sourceType:'activeSkill'});assert.equal(r.party[2].sp,Math.floor(19*[.15,.2,.25][anchor]));
+        r.end();assert.ok(!r.party[1].activeBuffs.some(b=>b.sourceId==='wind_cycle_window'));
+    });
+}
+test('mountain two activations per battle, round reset and actual overkill clamp',()=>{
+    const r=setup('relic_mountain_river_cauldron'),c=r.context;
+    for(let round=1;round<=3;round++){
+        r.party.forEach(p=>p.hp=1000);if(round>1)r.round(round);
+        c.settleBattleHpDamage(r.party[0],900,{attacker:r.monsters[0]});assert.equal(c.v174RelicDebugState().totalTriggers,Math.min(round,2));
+    }
+    r.round(4);r.party[0].hp=20;c.settleBattleHpDamage(r.party[0],99999,{attacker:r.monsters[0]});assert.equal(c.v174RelicDebugState().roundHpLoss,20);
 });

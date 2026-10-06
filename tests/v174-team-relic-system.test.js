@@ -7,6 +7,8 @@ const summarySource=fs.readFileSync("js/relic-summary-catalog.js","utf8");
 const source=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
 const shieldSource=mainSource.slice(mainSource.indexOf("function getPlayerShieldRemaining("),mainSource.indexOf("function showShieldAbsorb("));
+const combatSource=mainSource.slice(mainSource.indexOf("const combatEventObservers="),mainSource.indexOf("const battleBeforeCombatantObservers="));
+const policySource=mainSource.slice(mainSource.indexOf("const GENERAL_NEGATIVE_STATUS_TYPES="),mainSource.indexOf("\n});",mainSource.indexOf("const GENERAL_NEGATIVE_STATUS_TYPES="))+4);
 const repositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
 const loader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
 const css=fs.readFileSync("css/55-team-relic-system.css","utf8");
@@ -99,6 +101,7 @@ function createRuntime(options={}){
         attack:100,magicAttack:100,accuracy:100,statusEffects:[],activeBuffs:[]
     }));
     let enemyDamage=10;
+    let enemyActionSerial=0;
     const roundStartObservers=new Set();
     const roundEndObservers=new Set();
     const battleFlowTrace=[];
@@ -124,7 +127,10 @@ function createRuntime(options={}){
             isPresentationActive(){return presentationLockCount>0;}
         },
         getExistingPartyIndexes:()=>[0,1,2],getPartyCharacterByIndex:i=>party[i]||null,
-        getPartyBattleStats:()=>({maxHP:1000,maxSP:200,attack:100,magicAttack:100,defense:100,evasion:0,resistance:0}),
+        getPartyBattleStats:index=>{
+            const stats={maxHP:1000,maxSP:200,attack:100,magicAttack:100,defense:100,evasion:0,resistance:0,statusResistance:0};
+            return context.v174ProjectRelicBattleStats?context.v174ProjectRelicBattleStats(index,stats):stats;
+        },
         getMainCharacterStats:()=>({maxHP:1000,maxSP:200,attack:100,magicAttack:100,defense:100,evasion:0,resistance:0}),
         getPlayer2BattleStats:()=>({maxHP:1000,maxSP:200,attack:100,magicAttack:100,defense:100,evasion:0,resistance:0}),
         getPlayer3BattleStats:()=>({maxHP:1000,maxSP:200,attack:100,magicAttack:100,defense:100,evasion:0,resistance:0}),
@@ -146,7 +152,7 @@ function createRuntime(options={}){
             this.initiativeIndex=0;
             this.processNextCombatant(this.battleToken);
         },
-        startBattle(){this.battleActive=true;this.battleToken++;this.turn=1;this.startTurn(this.battleToken);},
+        startBattle(){party.forEach(character=>character.activeBuffs=character.activeBuffs.filter(buff=>buff.sourceType!=="relic"));this.battleActive=true;this.battleToken++;this.turn=1;this.startTurn(this.battleToken);},
         processNextCombatant(){
             battleFlowTrace.push("processNextCombatant:"+this.turn+":"+this.initiativeIndex);
             if(this.initiativeIndex<this.initiativeQueue.length){this.initiativeIndex++;return;}
@@ -155,9 +161,19 @@ function createRuntime(options={}){
             this.turn++;
             this.startTurn(this.battleToken);
         },
-        processSingleMonsterAttack(){const c=party[0];c.hp=Math.max(0,c.hp-enemyDamage);this.showPlayerHit(enemyDamage,"hp",0,false);},
+        processSingleMonsterAttack(index=1){
+            const entity=monsters[index],action={token:this.battleToken,index:enemyActionSerial++,entity,entry:{type:"monster"}};
+            this.battleDurationAction=action;this.FourSymbolsCombatEvents.emit("action_started",{action});
+            if(!entity.frozen&&!entity.petrified){
+                const incoming=this.applyPlayerDirectIncomingModifiers(party[0],enemyDamage,{attacker:entity});
+                const damage=this.absorbPlayerShields(party[0],incoming,0);
+                this.settleBattleHpDamage(party[0],damage,{attacker:entity,sourceType:"normalAttack"});
+                this.showPlayerHit(damage,"hp",0,false);
+            }
+            this.FourSymbolsCombatEvents.emit("action_finished",{action});this.battleDurationAction=null;
+        },
         tickStatusEffects(){},
-        winBattle(){this.battleActive=false;},loseBattle(){this.battleActive=false;}
+        winBattle(){this.FourSymbolsCombatEvents.emit("battle_end",{});this.battleActive=false;},loseBattle(){this.FourSymbolsCombatEvents.emit("battle_end",{});this.battleActive=false;}
     };
     context.window=context;
     vm.createContext(context);
@@ -172,6 +188,8 @@ function createRuntime(options={}){
         return true;
     };
     context.showShieldAbsorb=()=>{};
+    context.getDamageContextAttacker=()=>null;context.isPartyDamageTarget=entity=>party.includes(entity);context.battleDurationAction=null;
+    vm.runInContext(combatSource,context);vm.runInContext(policySource,context);
     vm.runInContext(shieldSource,context);
     vm.runInContext(source,context);
     return {
@@ -185,8 +203,8 @@ function createRuntime(options={}){
 const runtime=createRuntime();
 const {context,store,accountSaveKey,party,monsters,battleLogs}=runtime;
 assert.equal(Object.keys(context.v174RelicSystem.catalog).length,20,"catalog has 20 relics");
-assert.equal(Object.values(context.v174RelicSystem.catalog).filter(r=>r.runtimeReady).length,10,"first 10 relics are real runtime-ready relics");
-assert.equal(Object.values(context.v174RelicSystem.catalog).filter(r=>!r.runtimeReady).length,10,"relics 11-20 remain locked placeholders");
+assert.equal(Object.values(context.v174RelicSystem.catalog).filter(r=>r.runtimeReady).length,20,"all 20 relics have formal runtime");
+assert.equal(Object.values(context.v174RelicSystem.catalog).filter(r=>!r.runtimeReady).length,0,"no catalog entry is an unopened placeholder");
 
 const catalog=context.v174RelicSystem.catalog;
 assert.equal(catalog.relic_qiankun_flask.triggers[0].maxTriggersPerBattle,null,"Qiankun Flask has no hidden per-battle trigger cap");
@@ -203,9 +221,11 @@ Object.values(catalog).filter(def=>def.runtimeReady).forEach(def=>{
 assert.deepEqual(explicitBattleLimits.sort(),[
     "relic_cold_spring_jade:hp_below_35:max2",
     "relic_qinglan_feather:battle_start:once",
+    "relic_red_sky_war_mark:opening_burst:once",
+    "relic_demon_suppressing_seal:opening_insurance:once",
+    "relic_mountain_river_cauldron:round_loss_30:max2",
     "relic_returning_wheel:before_lethal:once",
-    "relic_rock_mountain_seal:ally_hits_8:max2",
-    "relic_rock_mountain_seal:battle_start_defense:once",
+    "relic_rock_mountain_seal:opening_armor:once",
     "relic_xuanwu_seal:opening_shield:once"
 ].sort(),"only relics with intentional design limits may have per-battle caps");
 
@@ -291,7 +311,7 @@ for(const [level,reduction] of [[10,6],[20,8]]){
     assert.equal(monsters[1].accuracy,0,"Soul Bell never multiplies independent Accuracy");
     assert.equal(context.v174GetRelicFinalHitReductionPercent(monsters[1]),reduction);
     const efficiency=context.v174GetRelicFinalHitReductionPercent(monsters[0])/reduction;
-    assert.ok(efficiency>0&&efficiency<=1,"existing Boss efficiency applies to percentage points");
+    assert.ok(Math.abs(efficiency-0.8)<1e-12,"Soul Bell owns 80% Boss efficiency without changing global efficiency");
     context.loseBattle();
     assert.equal(context.v174GetRelicFinalHitReductionPercent(monsters[1]),0,"battle teardown releases reduction");
 }
@@ -303,20 +323,19 @@ for(const [level,evasion] of [[1,8],[10,10],[20,12]]){
 }
 
 
-context.v174EquipRelic("relic_rock_mountain_seal");party[0].hp=1000;context.startBattle();
-assert.ok(context.getPartyBattleStats(0).defense>100,"Rock Mountain Seal opening defense uses the real shared stat owner");context.loseBattle();
-
 context.v174EquipRelic("relic_rock_mountain_seal");
-party.forEach(c=>{c.hp=1000;c.activeBuffs=[];});runtime.setEnemyDamage(10);context.startBattle();
-for(let i=0;i<8;i++)context.processSingleMonsterAttack(1,context.battleToken);
-const rockState=context.v174RelicDebugState();
-assert.equal(rockState.triggerCounts["relic_rock_mountain_seal:battle_start_defense"],1,"Rock Mountain opening trigger owns an independent count");
-assert.equal(rockState.triggerCounts["relic_rock_mountain_seal:ally_hits_8"],1,"Rock Mountain hit trigger owns an independent count");
-assert.ok(party.every(c=>c.activeBuffs.some(b=>b.type==="shield")),"Rock Mountain hit trigger applies its real team shield");
-context.loseBattle();
+party.forEach(c=>{c.hp=1000;c.activeBuffs=[];});runtime.setEnemyDamage(100);context.startBattle();
+assert.equal(context.getPartyBattleStats(0).defense,100,"Rock opening does not replace defense stats");
+assert.equal(party[0].activeBuffs.find(b=>b.type==="relicArmor").charges,2);
+context.processSingleMonsterAttack(1,context.battleToken);
+assert.equal(party[0].hp,908,"first direct action consumes one armor and reduces 8%");
+context.processSingleMonsterAttack(1,context.battleToken);
+assert.equal(party[0].hp,816,"second direct action consumes last armor");
+assert.ok(!party[0].activeBuffs.some(b=>b.type==="relicArmor"));context.loseBattle();
 
-context.v174EquipRelic("relic_qiankun_flask");context.startBattle();monsters[0].alive=true;context.killMonster(0);
-assert.equal(context.v174RelicDebugState().lastEvent.event,"enemy_defeated","character-source kill reaches enemy_defeated event boundary");context.loseBattle();
+context.v174EquipRelic("relic_qiankun_flask");context.startBattle();monsters[0].alive=true;monsters[0].hp=100;
+context.settleBattleHpDamage(monsters[0],100,{attacker:party[0],sourceType:"normalAttack"});
+assert.equal(context.v174RelicDebugState().lastEvent.event,"enemy_defeated","actual character-source HP settlement reaches defeat event");context.loseBattle();
 
 const beforeLevel=context.v174RelicSystem.getOwnedState().relic_qiankun_flask.level;
 assert.equal(context.v174UpgradeRelic("relic_qiankun_flask"),true);
@@ -340,15 +359,17 @@ assert.equal(cancelled.getPresentationLockCount(),1,"cinematic owns one core pre
 cancelled.context.loseBattle();
 assert.equal(cancelled.getPresentationLockCount(),0,"presentation cancellation releases the core HUD/input lock without reverting gameplay");
 
+const devCompleted=createRuntime({dev:true});
+assert.equal(devCompleted.context.v174EquipRelic("relic_origin_talisman"),true,"completed relic uses the same formal loadout in DEV");
+const devSaved=JSON.parse(devCompleted.store.get(devCompleted.accountSaveKey));
+assert.equal(devSaved.teamLoadout.relicId,"relic_origin_talisman");
+devCompleted.party.forEach(c=>c.hp=400);devCompleted.context.startBattle();devCompleted.context.turn=4;devCompleted.advanceRound();
+assert.equal(devCompleted.party[0].hp,460,"DEV completed relic settles real gameplay rather than preview logs");devCompleted.context.loseBattle();
 const devPreview=createRuntime({dev:true,livePresentation:true});
-assert.equal(devPreview.context.v174EquipRelic("relic_origin_talisman"),false,"runtimeReady:false relics cannot enter the formal loadout even in DEV");
-const devSaved=JSON.parse(devPreview.store.get(devPreview.accountSaveKey));
-assert.equal(devSaved.teamLoadout&&devSaved.teamLoadout.relicId||null,null,"DEV must not persist an unfinished relic into canonical teamLoadout");
 devPreview.context.startBattle();
-assert.equal(devPreview.context.v174RelicPresentationState().pending,0,"unopened relic abilities never auto-play on battle entry");
-assert.equal(devPreview.context.v174RelicDebugState().totalTriggers,0,"unopened relic abilities never create formal trigger state");
-assert.equal(devPreview.context.v174RelicDevPreviewPresentation("relic_origin_talisman"),true,"manual internal DEV presentation remains available without equipping");
-assert.equal(devPreview.context.v174RelicPresentationState().pending,1,"manual DEV preview is the only presentation queue entry");
-devPreview.context.loseBattle();
+assert.equal(devPreview.context.v174RelicPresentationState().pending,0,"manual preview never equips or auto-triggers a relic");
+assert.equal(devPreview.context.v174RelicDevPreviewPresentation("relic_origin_talisman"),true);
+assert.equal(devPreview.context.v174RelicPresentationState().pending,1);
+assert.equal(devPreview.context.v174RelicDebugState().totalTriggers,0,"manual preview does not create gameplay effects");devPreview.context.loseBattle();
 
 console.log("✓ V174 team relic system integration tests passed.");

@@ -3897,12 +3897,15 @@ const battleActionFinishObservers=new Set();
 /* Synchronous settlement notifications. Combat owners publish committed facts;
    relics subscribe without wrapping attacks, skills, status RNG or feedback. */
 const combatEventObservers=new Map();
+const combatDamageFacts=new WeakMap();
 function emitCombatEvent(type,event){
     (combatEventObservers.get(type)||[]).forEach(observer=>observer(event));
     return event;
 }
 window.FourSymbolsCombatEvents=Object.freeze({
     emit:emitCombatEvent,
+    lastDamageFor:entity=>combatDamageFacts.get(entity)||null,
+    healthFor:getCombatantHealthSnapshot,
     subscribe(type,observer){
         if(!combatEventObservers.has(type)){ combatEventObservers.set(type,new Set()); }
         combatEventObservers.get(type).add(observer);
@@ -3933,12 +3936,23 @@ function getFormalDamageContext(options){
 function settleBattleHpDamage(target,damage,options){
     if(!target||!(Number(damage)>0)){ return 0; }
     const context=getFormalDamageContext(options);
-    const previousHp=Math.max(0,Number(target.hp)||0);
-    target.hp=Math.max(0,previousHp-Number(damage));
-    const actualHpLoss=Math.max(0,previousHp-Math.max(0,Number(target.hp)||0));
-    const event=Object.assign({target,previousHp,hpAfterDamage:Math.max(0,Number(target.hp)||0),actualHpLoss},context);
+    const previousHp=getCombatantHealthSnapshot(target).hp;
+    const requestedHp=(Number(target.hp)||0)-Number(damage);
+    const hpOwner=Object.getOwnPropertyDescriptor(target,"hp");
+    target.hp=hpOwner&&typeof hpOwner.set==="function"?requestedHp:Math.max(0,requestedHp);
+    const after=getCombatantHealthSnapshot(target);
+    const actualHpLoss=Math.max(0,previousHp-after.hp);
+    const event=Object.assign({target,previousHp,hpAfterDamage:after.hp,maxHP:after.maxHP,actualHpLoss},context);
+    combatDamageFacts.set(target,event);
     emitCombatEvent("hp_damage",event);
     return actualHpLoss;
+}
+function getCombatantHealthSnapshot(entity){
+    if(entity&&entity.v141Shield&&!entity.v141Shield.isBarrier&&typeof window.v141SyncMonsterShield==="function"){
+        const remaining=window.v141SyncMonsterShield(entity),shield=entity.v141Shield;
+        return {hp:Math.max(0,(Number(entity.hp)||0)-remaining),maxHP:Math.max(1,Number(shield&&shield.baseMaxHP)||Number(entity.maxHP)||1)};
+    }
+    return {hp:Math.max(0,Number(entity&&entity.hp)||0),maxHP:Math.max(1,Number(entity&&entity.maxHP)||1)};
 }
 function applyPlayerDirectIncomingModifiers(target,damage,options){
     const context=getFormalDamageContext(options);
@@ -3947,7 +3961,7 @@ function applyPlayerDirectIncomingModifiers(target,damage,options){
         !context.attacker||isPartyDamageTarget(context.attacker)||context.attacker.vGameplayBossObject){ return damage; }
     const owner=window.v174RelicDamageModifiers;
     const reduction=owner&&typeof owner.incomingReduction==="function"?Number(owner.incomingReduction(target))||0:0;
-    const event=Object.assign({target,damage:Math.max(0,Math.floor(damage*(1-Math.max(0,Math.min(80,reduction))/100)))},context);
+    const event=Object.assign({target,damage:Math.max(0,Math.floor(damage*(1-Math.max(0,Math.min(100,reduction))/100)))},context);
     emitCombatEvent("incoming_direct",event);
     return Math.max(0,event.damage);
 }
@@ -18279,12 +18293,7 @@ function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
 
 
                 const hpBeforeReflect=Math.max(0,Number(monster.hp)||0);
-                monster.hp=
-                    Math.max(
-                        0,
-                        monster.hp-
-                        reflectDamage
-                    );
+                settleBattleHpDamage(monster,reflectDamage,{attacker:targetCharacter,sourceType:"reflect",damageKind:"reflect"});
                 battleStatisticsRecordDamageDealtByIndex(
                     targetIndex,
                     Math.max(0,hpBeforeReflect-monster.hp)
