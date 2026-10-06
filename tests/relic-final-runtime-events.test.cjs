@@ -165,3 +165,14 @@ test('mountain two activations per battle, round reset and actual overkill clamp
     }
     r.round(4);r.party[0].hp=20;c.settleBattleHpDamage(r.party[0],99999,{attacker:r.monsters[0]});assert.equal(c.v174RelicDebugState().roundHpLoss,20);
 });
+
+test('mountain counts post-Shield actual enemy HP loss and snapshots only living allies',()=>{
+    const r=setup('relic_mountain_river_cauldron',20),c=r.context,p=r.party[0],enemy=r.monsters[0];
+    c.FourSymbolsPlayerShield.apply(p,1000,{sourceType:'skill',sourceId:'other',durationRounds:3});
+    const settle=amount=>c.settleBattleHpDamage(p,c.FourSymbolsPlayerShield.absorb(p,amount,0),{attacker:enemy});
+    settle(899);assert.equal(p.hp,1000);assert.equal(c.v174RelicDebugState().roundHpLoss,0);
+    settle(201);assert.equal(p.hp,900);assert.equal(c.v174RelicDebugState().roundHpLoss,100);assert.equal(c.v174RelicDebugState().totalTriggers,0);
+    c.settleBattleHpDamage(p,100,{attacker:enemy,sourceType:'environment',damageKind:'environment'});assert.equal(c.v174RelicDebugState().roundHpLoss,100);
+    c.settleBattleHpDamage(p,100,{attacker:p,sourceType:'hpCost',damageKind:'hpCost'});assert.equal(c.v174RelicDebugState().roundHpLoss,100);
+    r.party[2].hp=0;r.round(2);assert.equal(c.v174RelicDebugState().roundMaxHp,2000);assert.equal(c.v174RelicDebugState().roundHpLoss,0);
+});
