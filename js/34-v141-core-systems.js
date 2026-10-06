@@ -770,24 +770,4 @@
         };
     }
 
-    /* Refined affixes are separate from original item stats but contribute in combat. */
-    if(typeof getEquipmentBonus==="function"){
-        const originalGetEquipmentBonus=getEquipmentBonus;
-        getEquipmentBonus=function(characterId){
-            const bonus=originalGetEquipmentBonus.apply(this,arguments);
-            const equipment=characterEquipment&&characterEquipment[characterId];
-            if(!equipment){ return bonus; }
-            Object.values(equipment).forEach(item=>{
-                const stats=item&&item.reforgeStats;
-                if(!stats){ return; }
-                Object.keys(stats).forEach(stat=>{
-                    if(Object.prototype.hasOwnProperty.call(bonus,stat)){
-                        bonus[stat]+=Number(stats[stat])||0;
-                    }
-                });
-            });
-            return bonus;
-        };
-    }
-
 })();
