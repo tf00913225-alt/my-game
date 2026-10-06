@@ -60,6 +60,14 @@ unchanged.
 - YAML parse/semantic checks: PASS; every original step is still present;
   step references remain in the same child job; needs reference valid jobs.
 - Whitespace: PASS. Remote Latest Head CI and actual timing remain pending.
+- First remote execution exposed an implicit serial dependency: Tower TTK
+  writer expected `artifacts/browser-qa` to exist from an earlier browser step.
+  Job `112089964859` failed ENOENT; isolated browser jobs now explicitly create
+  their evidence directory. No assertion or test was removed. Regression added.
+- Latest dev `8224dab26348dee1e3c506d1fcdcf91001869a6e` was absorbed by normal
+  merge, preserving #806 Wind EX and its newly deployed Hit/Evasion QA.
+- Actual baseline run `37346751274`: verify 29m11s; Boss 34m27s; Abyss 18m54s;
+  Adventure 4m15s; dev deployment 78m53s. Final barrier must still wait for Boss.
 - Phase 2 may start only after Phase 1 remote validation. Classifier shadow
   mode must precede conditional PR gates; dev push must remain full.
 - Phase 3 scheduled full regression/health must preserve current main CI and

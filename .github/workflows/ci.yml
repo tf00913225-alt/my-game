@@ -255,6 +255,9 @@ jobs:
           node-version: "24"
           package-manager-cache: false
 
+      - name: Prepare isolated browser evidence directory
+        run: mkdir -p artifacts/browser-qa
+
       - name: Ensure CJK font support for player-text browser QA
         run: |
           if ! fc-list :lang=zh | rg -q .; then
@@ -358,6 +361,9 @@ jobs:
         with:
           node-version: "24"
           package-manager-cache: false
+
+      - name: Prepare isolated browser evidence directory
+        run: mkdir -p artifacts/browser-qa
 
       - name: Ensure CJK font support for player-text browser QA
         run: |
@@ -491,6 +497,9 @@ jobs:
           node-version: "24"
           package-manager-cache: false
 
+      - name: Prepare isolated browser evidence directory
+        run: mkdir -p artifacts/browser-qa
+
       - name: Ensure CJK font support for player-text browser QA
         run: |
           if ! fc-list :lang=zh | rg -q .; then
@@ -542,6 +551,9 @@ jobs:
           node-version: "24"
           package-manager-cache: false
 
+      - name: Prepare isolated browser evidence directory
+        run: mkdir -p artifacts/browser-qa
+
       - name: Ensure CJK font support for player-text browser QA
         run: |
           if ! fc-list :lang=zh | rg -q .; then
@@ -589,6 +601,9 @@ jobs:
         with:
           node-version: "24"
           package-manager-cache: false
+
+      - name: Prepare isolated browser evidence directory
+        run: mkdir -p artifacts/browser-qa
 
       - name: Ensure CJK font support for player-text browser QA
         run: |
@@ -673,6 +688,9 @@ jobs:
           node-version: "24"
           package-manager-cache: false
 
+      - name: Prepare isolated browser evidence directory
+        run: mkdir -p artifacts/browser-qa
+
       - name: Ensure CJK font support for player-text browser QA
         run: |
           if ! fc-list :lang=zh | rg -q .; then
@@ -711,6 +729,9 @@ jobs:
         with:
           node-version: "24"
           package-manager-cache: false
+
+      - name: Prepare isolated browser evidence directory
+        run: mkdir -p artifacts/browser-qa
 
       - name: Ensure CJK font support for player-text browser QA
         run: |

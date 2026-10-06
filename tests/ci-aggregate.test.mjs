@@ -33,3 +33,11 @@ test('public barrier waits for every required child; deployment only follows bar
   assert.match(barrier, /run: node \.github\/scripts\/ci-aggregate\.mjs/);
   assert.match(text.split('\n  deploy_dev:')[1], /needs: verify/);
 });
+
+test('isolated Tower runner prepares the directory required by its existing TTK writer', () => {
+  const text = fs.readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
+  const tower = text.split('\n  tower_wild_browser:')[1].split('\n  portrait_browser:')[0];
+  const prepare = tower.indexOf('run: mkdir -p artifacts/browser-qa');
+  const write = tower.indexOf('node scripts/tower-balance-ttk-matrix.mjs artifacts/browser-qa/');
+  assert.ok(prepare >= 0 && write > prepare, 'TTK output cannot depend on a previous browser job');
+});
