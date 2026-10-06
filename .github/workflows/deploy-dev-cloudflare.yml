@@ -185,7 +185,7 @@ jobs:
           test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$EXPECTED_COMMIT_SHA"
 
   battle_daily_live:
-    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || inputs.battle_daily_required) }}
+    if: ${{ !cancelled() && needs.publish_dev.result == 'success' && (github.event_name == 'workflow_dispatch' || inputs.battle_daily_required) }}
     name: battle_daily_live
     needs: publish_dev
     runs-on: ubuntu-latest
@@ -245,7 +245,7 @@ jobs:
           test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$EXPECTED_COMMIT_SHA"
 
   tower_live:
-    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || inputs.tower_required) }}
+    if: ${{ !cancelled() && needs.publish_dev.result == 'success' && (github.event_name == 'workflow_dispatch' || inputs.tower_required) }}
     name: tower_live
     needs: publish_dev
     runs-on: ubuntu-latest
@@ -296,7 +296,7 @@ jobs:
           test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$EXPECTED_COMMIT_SHA"
 
   abyss_live:
-    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || inputs.abyss_required) }}
+    if: ${{ !cancelled() && needs.publish_dev.result == 'success' && (github.event_name == 'workflow_dispatch' || inputs.abyss_required) }}
     name: abyss_live
     needs: publish_dev
     runs-on: ubuntu-latest
@@ -347,7 +347,7 @@ jobs:
           test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$EXPECTED_COMMIT_SHA"
 
   adventure_live:
-    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || inputs.adventure_required) }}
+    if: ${{ !cancelled() && needs.publish_dev.result == 'success' && (github.event_name == 'workflow_dispatch' || inputs.adventure_required) }}
     name: adventure_live
     needs: publish_dev
     runs-on: ubuntu-latest
@@ -398,7 +398,7 @@ jobs:
           test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$EXPECTED_COMMIT_SHA"
 
   boss_live:
-    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || inputs.boss_required) }}
+    if: ${{ !cancelled() && needs.publish_dev.result == 'success' && (github.event_name == 'workflow_dispatch' || inputs.boss_required) }}
     name: boss_live
     needs: publish_dev
     runs-on: ubuntu-latest

@@ -49,3 +49,16 @@ test('classifier alone receives complete ancestry and exact PR head',()=>{
   assert.match(job,/fetch-depth: 0/);
   assert.match(job,/ref: \$\{\{ inputs.candidate_sha \|\| github.event.pull_request.head.sha \|\| github.sha \}\}/);
 });
+test('affected live QA never starts after failed publication; manual dispatch remains full',()=>{
+  const workflow=fs.readFileSync(new URL('../.github/workflows/deploy-dev-cloudflare.yml',import.meta.url),'utf8');
+  for(const [job,input] of [['boss_live','boss_required'],['tower_live','tower_required'],['abyss_live','abyss_required'],['adventure_live','adventure_required'],['battle_daily_live','battle_daily_required']]) {
+    const block=workflow.split('\n  '+job+':')[1].split(/\n  [a-z_]+:/)[0];
+    const expression=block.match(/if: \$\{\{ (.+) \}\}/)[1];
+    const eligible=new Function('cancelled','needs','github','inputs',`return ${expression}`);
+    const github={event_name:'push'},inputs={[input]:true};
+    assert.equal(eligible(()=>false,{publish_dev:{result:'success'}},github,inputs),true);
+    assert.equal(eligible(()=>false,{publish_dev:{result:'success'}},github,{[input]:false}),false);
+    assert.equal(eligible(()=>false,{publish_dev:{result:'success'}},{event_name:'workflow_dispatch'},{[input]:false}),true);
+    for(const result of ['failure','cancelled','skipped',undefined]) assert.equal(eligible(()=>false,{publish_dev:{result}},github,inputs),false);
+  }
+});
