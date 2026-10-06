@@ -9,6 +9,7 @@
 - 秘寶不占角色技能欄、不占角色行動、不消耗角色回合、不消耗角色 SP，也不視為角色施放技能。
 - 秘寶是獨立戰場事件，用於戰術補助、戰場節奏修正、少打多補償與元素 Build 聯動，不得取代角色技能、裝備、元素與養成本體。
 - 敵方數量越多時，至少部分秘寶應透過敵方有效行動、我方有效受擊等事件自然提高價值；禁止用隱藏攻防倍率直接替少人隊伍放水。
+- 每件秘寶核心能力都須有泛用價值。元素與特定一般負面狀態只能提供額外收益，不能成為核心能力啟動門票；禁止沒有火／水角色、燃燒或冰封就完全無效。
 
 ## 唯一資料真相
 
@@ -37,6 +38,8 @@
 - 秘寶造成燃燒、凍傷、冰封、護盾或其他既有狀態時，必須沿用正式狀態 owner 與「同名狀態不可疊加、覆蓋或刷新」規則。
 - 秘寶傷害使用獨立 `relicPower`，不得直接借某名角色技能傷害；預設不能暴擊、追擊、吸血或觸發角色技能被動。
 - 平衡常數集中在 `RELIC_BALANCE_CONFIG`；BOSS 傷害／Debuff 效率等修正不得散落在各秘寶函式。
+- `calculateDamage()` 是秘寶直接傷害 modifier 的正式消費 Owner。Incoming Reduction 在護盾吸收前結算；禁止在 showPlayerHit 顯示層事後回補 HP。鎮魂使用 per-effect Boss Efficiency 80%，不改全域 bossDebuffEfficiency。
+- 玩家護盾沿用 activeBuffs，由 `FourSymbolsPlayerShield` 統一建立、按 sourceType/sourceId 刷新與吸收。玄武週期刷新只替換自己來源的完整值；其他合法來源護盾保留。玄武盾破守勢 Lv1～9 無、Lv10～19 6%、Lv20 10%，到下一回合結束移除。
 - 戰鬥開始時鎖定本場裝備秘寶；戰鬥進行中禁止 hot swap。
 - `js/60-team-relic-system.js` 是 `gameplay-core` 固定末端 Runtime。一般巡怪、一般戰鬥、每日副本、裝備副本、Boss、Tower、深淵、Adventure 等入口只要能取得正式戰鬥核心，就必定已 execute 同一份 Team Relic Trigger Engine；不得依賴玩家曾開過秘寶頁、背景 prefetch、戰鬥開始後才補載或 `setTimeout`／`MutationObserver` 補救。
 - `runtimeReady:false` 的秘寶不得進入 `teamLoadout.relicId` 正式有效值；舊存檔 hydrate、裝備 action、合成／強化 UI 都必須 fail closed。玩家只顯示「效果尚未覺醒／能力尚未開放」等遊戲語言，不得顯示假的下一級或工程 metadata。

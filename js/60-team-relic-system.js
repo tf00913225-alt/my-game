@@ -147,23 +147,24 @@
         },
         {
             id:"relic_xuanwu_seal",category:"defense",tags:["defense","shield"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_xuanwu_seal.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
-            description:"每第3回合開始為全隊建立不疊加的護盾。",
-            scalars:{shieldPercent:[[1,6],[10,8],[20,10]],damageReduction:[[1,0],[19,0],[20,8]]},
-            triggers:[trigger("third_start","every_n_rounds",{phase:"round_start",roundInterval:3},[
-                effect("shield_all",{percentKey:"shieldPercent",durationRounds:2}),effect("buff_all",{minLevel:20,damageReductionKey:"damageReduction",durationRounds:1})
-            ])],
-            limitText:"同一秘寶護盾不可相加；只保留較高護盾值。",
-            nextText:{10:"護盾提高至最大HP 8%",20:"護盾10%，並獲得1回合8%減傷"}
+            description:"開場立即建立玄武護盾，第3、6、9回合開始刷新完整護盾；Lv10起盾破獲得玄武守勢。",
+            scalars:{shieldPercent:[[1,6],[10,9],[20,12]],damageReduction:[[1,0],[9,0],[10,6],[19,6],[20,10]]},
+            triggers:[
+                trigger("opening_shield","battle_start",{oncePerBattle:true},[effect("shield_all",{percentKey:"shieldPercent"})]),
+                trigger("third_start","every_n_rounds",{phase:"round_start",roundInterval:3},[effect("shield_all",{percentKey:"shieldPercent"})])
+            ],
+            limitText:"開場一次；每第3回合刷新同來源完整盾，不疊加、不移除其他來源盾；盾破守勢到下一回合結束。",
+            nextText:{10:"護盾9%，盾破獲得6%直接減傷",20:"護盾12%，盾破獲得10%直接減傷"}
         },
         {
             id:"relic_soul_bell",category:"control",tags:["control","soft-control"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_soul_bell.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
-            description:"每第4回合開始，以降攻與降命中壓制敵方全體。",
-            scalars:{attackDown:[[1,10],[10,12],[20,15]],accuracyDown:[[1,0],[9,0],[10,5],[20,8]]},
-            triggers:[trigger("fourth_start","every_n_rounds",{phase:"round_start",roundInterval:4},[
-                effect("debuff_all_enemies",{attackDownKey:"attackDown",accuracyDownKey:"accuracyDown",durationRounds:1})
+            description:"每第3回合開始施加鎮魂，降低敵方直接最終傷害與最終命中，持續2回合。",
+            scalars:{damageDown:[[1,8],[10,10],[20,12]],accuracyDown:[[1,4],[10,6],[20,8]]},
+            triggers:[trigger("third_start","every_n_rounds",{phase:"round_start",roundInterval:3},[
+                effect("debuff_all_enemies",{damageDownKey:"damageDown",accuracyDownKey:"accuracyDown",durationRounds:2,bossEfficiency:.8})
             ])],
-            limitText:"BOSS套用較低效率；不造成全體硬控。",
-            nextText:{10:"降攻12%並追加最終命中-5%",20:"降攻15%、最終命中-8%"}
+            limitText:"鎮魂不疊加；刷新期限並保留較高值。BOSS僅保留80%效果，不影響DOT與環境傷害，不造成硬控。",
+            nextText:{10:"直接傷害-10%、最終命中-6%，持續2回合",20:"直接傷害-12%、最終命中-8%，持續2回合"}
         },
         {
             id:"relic_tiangang_banner",category:"defense",tags:["attack","defense","anti_swarm"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_tiangang_banner.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
@@ -914,17 +915,26 @@
     }
     function applyShield(index,percent,duration,sourceId){
         const character=characterAt(index),stats=statsAt(index); if(!character||!stats||numeric(character.hp)<=0||percent<=0){ return 0; }
-        character.activeBuffs=Array.isArray(character.activeBuffs)?character.activeBuffs:[];
         const amount=Math.max(1,Math.floor(numeric(stats.maxHP)*percent/100*RELIC_BALANCE_CONFIG.shieldModifier));
-        const existing=character.activeBuffs.find(buff=>buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0);
-        if(existing){
-            if(numeric(existing.remaining)>=amount){ return numeric(existing.remaining); }
-            existing.remaining=amount; existing.amount=Math.max(numeric(existing.amount),amount); existing.turnsLeft=Math.max(1,Math.floor(numeric(duration)||1)); existing.v174RelicSource=sourceId;
-            return amount;
-        }
-        character.activeBuffs.push({type:"shield",statusName:"岩盾",remaining:amount,amount:amount,turnsLeft:Math.max(1,Math.floor(numeric(duration)||1)),v174RelicSource:sourceId,sourceType:SOURCE_RELIC});
+        const owner=window.FourSymbolsPlayerShield;
+        if(!owner){ return 0; }
+        owner.apply(character,amount,{durationRounds:duration,sourceType:SOURCE_RELIC,sourceId:sourceId,
+            statusName:sourceId==="relic_xuanwu_seal"?"玄武護盾":"岩盾"});
         return amount;
     }
+    window.v174RelicShieldBroken=function(character,shield){
+        if(!relicBattleState||shield.sourceType!==SOURCE_RELIC||shield.sourceId!=="relic_xuanwu_seal"){ return; }
+        const index=partyIndexes().find(index=>characterAt(index)===character);
+        const level=relicLevel(shield.sourceId);
+        if(index===undefined||level<10){ return; }
+        const percent=valueFor(relicCatalog[shield.sourceId],"damageReduction",level);
+        const list=relicBattleState.playerMods[String(index)]||[];
+        const existing=list.find(mod=>mod.sourceId==="xuanwu_stance");
+        if(existing){ existing.damageReductionPercent=Math.max(numeric(existing.damageReductionPercent),percent);existing.expiresRound=currentRound()+1; }
+        else{ addPlayerMod(index,{sourceId:"xuanwu_stance",damageReductionPercent:percent},2); }
+        const feedback=window.FourSymbolsBattleFloatingFeedback;
+        if(feedback){ feedback.emit({side:"player",index:index,kind:"status",text:"玄武守勢"}); }
+    };
     function damageEnemy(index,amount,element){
         const monster=typeof monsters!=="undefined"?monsters[index]:null; if(!monster||!monster.alive||amount<=0){ return 0; }
         if(window.GameplaySystem&&typeof window.GameplaySystem.canDirectlyAffectMonster==="function"&&!window.GameplaySystem.canDirectlyAffectMonster(monster,index)){
@@ -942,17 +952,21 @@
             sum+(entry.monster===monster&&numeric(entry.expiresRound)>=currentRound()
                 ?numeric(entry.finalHitReductionPercent):0),0);
     };
-    function applyEnemyDebuff(monster,attackDown,accuracyDown,duration){
+    function applyEnemyDebuff(monster,attackDown,accuracyDown,duration,options){
         if(!monster||!monster.alive||!relicBattleState){ return; }
         if(window.GameplaySystem&&typeof window.GameplaySystem.canDirectlyAffectMonster==="function"&&!window.GameplaySystem.canDirectlyAffectMonster(monster)){
             return;
         }
-        const efficiency=isBoss(monster)?RELIC_BALANCE_CONFIG.bossDebuffEfficiency:1;
+        const config=options||{};
+        const efficiency=isBoss(monster)?(config.bossEfficiency===undefined?RELIC_BALANCE_CONFIG.bossDebuffEfficiency:config.bossEfficiency):1;
         const attack=Math.max(0,attackDown*efficiency),accuracy=Math.max(0,accuracyDown*efficiency);
-        const restore={monster:monster,expiresRound:currentRound()+Math.max(1,Math.floor(duration||1))-1};
+        const existing=config.sourceId?relicBattleState.monsterRestores.find(entry=>entry.monster===monster&&entry.sourceId===config.sourceId):null;
+        const restore=existing||{monster:monster,sourceId:config.sourceId,sourceType:SOURCE_RELIC};
+        restore.expiresRound=currentRound()+Math.max(1,Math.floor(duration||1))-1;
         if(attack>0){ restore.attack=monster.attack; restore.magicAttack=monster.magicAttack; monster.attack=numeric(monster.attack)*(1-attack/100); monster.magicAttack=numeric(monster.magicAttack)*(1-attack/100); }
-        if(accuracy>0){ restore.finalHitReductionPercent=accuracy; }
-        relicBattleState.monsterRestores.push(restore);
+        if(accuracy>0){ restore.finalHitReductionPercent=Math.max(numeric(restore.finalHitReductionPercent),accuracy); }
+        if(config.damageDown>0){ restore.finalDamageReductionPercent=Math.max(numeric(restore.finalDamageReductionPercent),config.damageDown*efficiency); }
+        if(!existing){ relicBattleState.monsterRestores.push(restore); }
     }
     function applyPlayerBuffAll(effectDef,def,level){
         const duration=effectDef.durationKey?valueFor(def,effectDef.durationKey,level):Math.max(1,numeric(effectDef.durationRounds)||1);
@@ -995,7 +1009,10 @@
                 applyPlayerBuffAll(eff,def,level);
             }else if(eff.type==="debuff_all_enemies"){
                 const a=eff.attackDownKey?valueFor(def,eff.attackDownKey,level):0,acc=eff.accuracyDownKey?valueFor(def,eff.accuracyDownKey,level):0;
-                (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).forEach(index=>applyEnemyDebuff(monsters[index],a,acc,eff.durationRounds));
+                (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).forEach(index=>applyEnemyDebuff(monsters[index],a,acc,eff.durationRounds,{
+                    sourceId:def.id,bossEfficiency:eff.bossEfficiency,
+                    damageDown:eff.damageDownKey?valueFor(def,eff.damageDownKey,level):0
+                }));
             }else if(eff.type==="cleanse_single"){
                 if(payload&&Number.isInteger(payload.targetIndex)){ for(let i=0;i<Math.max(1,numeric(eff.count)||1);i++){ if(!cleanseOne(payload.targetIndex)){ break; } } }
             }else if(eff.type==="apply_status_all_enemies"&&eff.statusId==="burn"){
@@ -1097,6 +1114,17 @@
         window.FourSymbolsBattleFlow.subscribeRoundEnd(()=>{
             if(relicBattleState&&typeof battleActive!=="undefined"&&battleActive){
                 dispatchRelicEvent("round_end",{sourceType:"system"});
+                /* Boundary observers run before the formal duration consumer.
+                   Expire projected modifiers here so the next UI cannot see them. */
+                Object.keys(relicBattleState.playerMods).forEach(key=>{
+                    relicBattleState.playerMods[key]=relicBattleState.playerMods[key].filter(mod=>numeric(mod.expiresRound)>currentRound());
+                });
+                relicBattleState.monsterRestores=relicBattleState.monsterRestores.filter(entry=>{
+                    if(numeric(entry.expiresRound)>currentRound()){ return true; }
+                    if(entry.attack!==undefined){ entry.monster.attack=entry.attack; }
+                    if(entry.magicAttack!==undefined){ entry.monster.magicAttack=entry.magicAttack; }
+                    return false;
+                });
             }
         });
     }
@@ -1276,8 +1304,8 @@
             const bonus=Math.round(valueFor(def,"burnBonus",level)*100);
             return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(bonus>0?"；燃燒目標額外+"+bonus+"%":"")+"。";
         }
-        if(def.id==="relic_xuanwu_seal"){ return "全隊獲得最大HP "+valueFor(def,"shieldPercent",level).toFixed(1).replace(/\.0$/,"")+"%護盾，持續2回合"+(level>=20?"，並獲得8%減傷1回合":"")+"。"; }
-        if(def.id==="relic_soul_bell"){ return "敵方全體攻擊-"+Math.round(valueFor(def,"attackDown",level))+"%"+(level>=10?"、最終命中-"+Math.round(valueFor(def,"accuracyDown",level))+"%":"")+"，持續1回合。"; }
+        if(def.id==="relic_xuanwu_seal"){ return "開場與每第3回合刷新全隊"+valueFor(def,"shieldPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP玄武護盾"+(level>=10?"；盾破獲得"+valueFor(def,"damageReduction",level)+"%直接減傷至下一回合結束":"")+"。"; }
+        if(def.id==="relic_soul_bell"){ return "鎮魂：敵方直接最終傷害-"+valueFor(def,"damageDown",level).toFixed(1).replace(/\.0$/,"")+"%、最終命中-"+valueFor(def,"accuracyDown",level).toFixed(1).replace(/\.0$/,"")+"%，持續2回合；BOSS保留80%效果。"; }
         if(def.id==="relic_tiangang_banner"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(level>=10?"並降攻"+Math.round(valueFor(def,"attackDown",level))+"%":"")+"。"; }
         if(def.id==="relic_nine_dragon_fire"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×火屬性秘寶傷害"+(level>=10?"，燃燒機率"+Math.round(valueFor(def,"burnChance",level)*100)+"%":"")+(level>=20?"，對燃燒目標額外+15%":"")+"。"; }
         if(def.id==="relic_cold_spring_jade"){ return "急救目標 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"並淨化1個一般負面":"")+(level>=20?"、恢復4%最大SP":"")+"；HP由35%以上降至35%以下時觸發，每場最多2次，冷卻3回合。"; }

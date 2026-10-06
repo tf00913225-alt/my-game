@@ -18161,54 +18161,7 @@ function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
                     }
                 }
 
-                const shieldBuff=
-
-                    (targetCharacter.activeBuffs||[])
-                    .find(
-                        b=>
-
-                            b.type==="shield"&&
-                            b.turnsLeft>0 &&
-                            b.remaining>0
-
-                    );
-
-
-                if(damage>0 && shieldBuff){
-
-                    const absorbed=
-
-                        Math.min(
-                            damage,
-                            shieldBuff.remaining
-                        );
-
-
-                    shieldBuff.remaining-=
-                        absorbed;
-
-                    damage-=
-                        absorbed;
-
-
-                    if(absorbed>0){
-
-                        addBattleLog(
-                            "護盾吸收了"+
-                            absorbed+
-                            "點傷害（剩餘"+
-                            shieldBuff.remaining+
-                            "點）。"
-                        );
-
-                        showShieldAbsorb(
-                            targetIndex,
-                            absorbed
-                        );
-
-                    }
-
-                }
+                damage=absorbPlayerShields(targetCharacter,damage,targetIndex);
 
             }
 
@@ -24134,6 +24087,40 @@ function showPlayerHit(amount,type,characterIndex,isPositive,isCrit){
    shield-popup），跟一般HP掉血的紅字明確區分開來，
    代表「這是護盾扛下來的量，不是真的扣血」。
 */
+/* Player shields share one source-aware storage, refresh and absorption owner. */
+function getPlayerShieldRemaining(character){
+    return (character&&character.activeBuffs||[]).reduce((sum,buff)=>sum+
+        (buff&&buff.type==="shield"&&Number(buff.turnsLeft)>0?Math.max(0,Number(buff.remaining)||0):0),0);
+}
+function applyPlayerShield(character,amount,options){
+    if(!character||Number(character.hp)<=0||!(Number(amount)>0)){ return null; }
+    const config=options||{};
+    character.activeBuffs=Array.isArray(character.activeBuffs)?character.activeBuffs:[];
+    const existing=character.activeBuffs.find(buff=>buff&&buff.type==="shield"&&
+        buff.sourceType===config.sourceType&&buff.sourceId===config.sourceId);
+    const shield=existing||{type:"shield"};
+    Object.assign(shield,{remaining:Math.floor(amount),amount:Math.floor(amount),
+        turnsLeft:config.durationRounds||Number.MAX_SAFE_INTEGER,
+        sourceType:config.sourceType,sourceId:config.sourceId,
+        statusName:config.statusName||"岩盾"});
+    if(!existing){ character.activeBuffs.push(shield); }
+    return shield;
+}
+function absorbPlayerShields(character,damage,targetIndex){
+    let remaining=Math.max(0,Number(damage)||0);
+    (character&&character.activeBuffs||[]).slice().forEach(shield=>{
+        if(remaining<=0||!shield||shield.type!=="shield"||Number(shield.turnsLeft)<=0||Number(shield.remaining)<=0){ return; }
+        const absorbed=Math.min(remaining,Number(shield.remaining));
+        shield.remaining-=absorbed;remaining-=absorbed;
+        showShieldAbsorb(targetIndex,absorbed);
+        if(shield.remaining<=0&&typeof window.v174RelicShieldBroken==="function"){
+            window.v174RelicShieldBroken(character,shield);
+        }
+    });
+    return remaining;
+}
+window.FourSymbolsPlayerShield=Object.freeze({apply:applyPlayerShield,absorb:absorbPlayerShields,remaining:getPlayerShieldRemaining});
+
 function showShieldAbsorb(characterIndex,absorbed){
 
     if(!absorbed || absorbed<=0){

@@ -6,8 +6,8 @@
     const entries=[
         ["relic_qiankun_flask","乾坤玉壺","奇數回合結束時"],
         ["relic_sun_orb","烈陽神珠","偶數回合開始時"],
-        ["relic_xuanwu_seal","玄武靈印","每第3回合開始時"],
-        ["relic_soul_bell","鎮魂古鐘","每第4回合開始時"],
+        ["relic_xuanwu_seal","玄武靈印","開場與每第3回合開始時"],
+        ["relic_soul_bell","鎮魂古鐘","每第3回合開始時"],
         ["relic_tiangang_banner","天罡戰旗","我方累積受到6次敵方有效攻擊後"],
         ["relic_nine_dragon_fire","九龍神火罩","敵方累積完成7次有效行動後"],
         ["relic_cold_spring_jade","寒泉玉珮","任一我方角色HP由35%以上降至35%以下時"],

@@ -5,6 +5,8 @@ const assert=require("node:assert/strict");
 
 const summarySource=fs.readFileSync("js/relic-summary-catalog.js","utf8");
 const source=fs.readFileSync("js/60-team-relic-system.js","utf8");
+const mainSource=fs.readFileSync("js/00-main.js","utf8");
+const shieldSource=mainSource.slice(mainSource.indexOf("function getPlayerShieldRemaining("),mainSource.indexOf("function showShieldAbsorb("));
 const repositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
 const loader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
 const css=fs.readFileSync("css/55-team-relic-system.css","utf8");
@@ -169,6 +171,8 @@ function createRuntime(options={}){
         context.FourSymbolsAccountSave.writeForUid(accountUid,data,{source:"test-core"});
         return true;
     };
+    context.showShieldAbsorb=()=>{};
+    vm.runInContext(shieldSource,context);
     vm.runInContext(source,context);
     return {
         context,store,accountSaveKey,party,monsters,battleLogs,battleFlowTrace,
@@ -201,7 +205,8 @@ assert.deepEqual(explicitBattleLimits.sort(),[
     "relic_qinglan_feather:battle_start:once",
     "relic_returning_wheel:before_lethal:once",
     "relic_rock_mountain_seal:ally_hits_8:max2",
-    "relic_rock_mountain_seal:battle_start_defense:once"
+    "relic_rock_mountain_seal:battle_start_defense:once",
+    "relic_xuanwu_seal:opening_shield:once"
 ].sort(),"only relics with intentional design limits may have per-battle caps");
 
 assert.equal(context.v174EquipRelic("relic_qiankun_flask"),true);
@@ -276,12 +281,13 @@ assert.equal(context.v174RelicDebugState().allyHitCount,0);context.loseBattle();
 context.v174EquipRelic("relic_qinglan_feather");party[0].hp=1000;context.startBattle();
 const boosted=context.getPartyBattleStats(0);assert.ok(context.v174GetRelicFinalEvasionPercent(0)===8&&boosted.resistance>=8,"Qinglan Feather feeds the shared party stat owner");context.loseBattle();
 
-context.v174EquipRelic("relic_soul_bell");monsters.forEach(m=>{m.alive=true;m.attack=100;m.magicAttack=100;m.accuracy=100;});context.startBattle();context.turn=4;context.startTurn(context.battleToken);
-assert.ok(monsters[1].attack<100,"Soul Bell applies actual live monster attack reduction");context.loseBattle();
-for(const [level,reduction] of [[10,5],[20,8]]){
+context.v174EquipRelic("relic_soul_bell");monsters.forEach(m=>{m.alive=true;m.attack=100;m.magicAttack=100;m.accuracy=100;});context.startBattle();context.turn=3;context.startTurn(context.battleToken);
+assert.equal(monsters[1].attack,100,"Soul Bell preserves monster base attack");
+assert.equal(context.v174RelicDamageModifiers.outgoingReduction(monsters[1]),8);context.loseBattle();
+for(const [level,reduction] of [[10,6],[20,8]]){
     context.v174RelicSystem.getOwnedState().relic_soul_bell.level=level;
     monsters.forEach(m=>{m.alive=true;m.hp=2000;m.attack=100;m.accuracy=0;});
-    context.startBattle();context.turn=4;context.startTurn(context.battleToken);
+    context.startBattle();context.turn=3;context.startTurn(context.battleToken);
     assert.equal(monsters[1].accuracy,0,"Soul Bell never multiplies independent Accuracy");
     assert.equal(context.v174GetRelicFinalHitReductionPercent(monsters[1]),reduction);
     const efficiency=context.v174GetRelicFinalHitReductionPercent(monsters[0])/reduction;

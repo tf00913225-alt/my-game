@@ -278,10 +278,7 @@
        沒有護盾時分母就是 maxHP，行為跟原本完全一樣，不影響一般情況。
     */
     function getShieldRemaining(character){
-        const buff=(character&&character.activeBuffs||[]).find(
-            b=>b.type==="shield" && b.turnsLeft>0 && b.remaining>0
-        );
-        return buff ? Math.max(0,buff.remaining) : 0;
+        return getPlayerShieldRemaining(character);
     }
 
     if(typeof updateSingleCharacterBars==="function"){
