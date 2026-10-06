@@ -27,6 +27,7 @@ test('nightly, candidate, main and release retain isolated groups and are not ca
     [context({event_name:'workflow_dispatch',ref:'refs/heads/release/test'}),{}]
   ]) {
     assert.equal(Boolean(evaluate(cancel,github,inputs)),false);
+    assert.notEqual(evaluate(group,github,inputs),evaluate(group,context()),'main/release/full cannot share ordinary dev-target PR group');
     assert.notEqual(evaluate(group,github,inputs),evaluate(group,context({event_name:'push',ref:'refs/heads/dev'})));
   }
   const nightly=fs.readFileSync(new URL('../.github/workflows/full-regression-nightly.yml',import.meta.url),'utf8');
