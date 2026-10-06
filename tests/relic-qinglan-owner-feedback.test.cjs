@@ -1,5 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const createRuntime=require('./helpers/relic-runtime-fixture.cjs');
+const createRuntime=require('../scripts/test-helpers/relic-runtime-fixture.cjs');
 const main=fs.readFileSync('js/00-main.js','utf8');
 const existing=fs.readFileSync('tests/hit-evasion-final-percent-status-formula-20260923.test.js','utf8');
 const extract=new Function('assert','main',existing.slice(existing.indexOf('function sourceFunction('),existing.indexOf('function formulaRuntime('))+';return {sourceFunction,constLine,constObject};')(assert,main);

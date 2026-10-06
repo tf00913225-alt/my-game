@@ -1,6 +1,6 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
-const createRuntime=require('./helpers/relic-runtime-fixture.cjs');
+const createRuntime=require('../scripts/test-helpers/relic-runtime-fixture.cjs');
 
 for(const [level,shieldPercent,stance] of [[1,6,0],[10,9,6],[20,12,10]]){
   test('Xuanwu Lv'+level+' opening, source refresh, shield break and next-round expiry',()=>{

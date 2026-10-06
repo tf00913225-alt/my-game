@@ -1,6 +1,6 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
-const createRuntime=require('./helpers/relic-runtime-fixture.cjs');
+const createRuntime=require('../scripts/test-helpers/relic-runtime-fixture.cjs');
 
 for(const [level,damage,hit] of [[1,8,4],[10,10,6],[20,12,8]]){
   test('Soul Bell Lv'+level+' uses per-effect final modifiers and round-end expiry',()=>{

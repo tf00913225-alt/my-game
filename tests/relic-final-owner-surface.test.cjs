@@ -1,5 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const createRuntime=require('./helpers/relic-runtime-fixture.cjs');
+const createRuntime=require('../scripts/test-helpers/relic-runtime-fixture.cjs');
 const main=fs.readFileSync('js/00-main.js','utf8'),vfx=fs.readFileSync('js/39-v143-skill-animation.js','utf8'),skills=fs.readFileSync('js/43-v149-skill-ui-rules.js','utf8');
 const old=fs.readFileSync('tests/hit-evasion-final-percent-status-formula-20260923.test.js','utf8');
 const extract=new Function('assert','main',old.slice(old.indexOf('function sourceFunction('),old.indexOf('function formulaRuntime('))+';return sourceFunction;')(assert,main);

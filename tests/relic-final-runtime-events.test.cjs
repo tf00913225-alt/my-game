@@ -1,6 +1,6 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
-const createRuntime=require('./helpers/relic-runtime-fixture.cjs');
+const createRuntime=require('../scripts/test-helpers/relic-runtime-fixture.cjs');
 function setup(id,level=1){
     const r=createRuntime({}),c=r.context;
     c.v174RelicDevUnlock(id);c.v174RelicSystem.getOwnedState()[id].level=level;

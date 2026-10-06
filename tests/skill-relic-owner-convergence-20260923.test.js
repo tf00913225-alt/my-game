@@ -190,7 +190,7 @@ test("Team Relic runtime is guaranteed by gameplay-core, not a Boss-only side ef
 });
 
 test("20 final relics retain formal Trigger/Effect/Scalar data and player text",()=>{
-  const createRuntime=require('./helpers/relic-runtime-fixture.cjs');
+  const createRuntime=require('../scripts/test-helpers/relic-runtime-fixture.cjs');
   const c=createRuntime().context;
   const catalog=c.v174RelicSystem.catalog;
   assert.equal(Object.keys(catalog).length,20);

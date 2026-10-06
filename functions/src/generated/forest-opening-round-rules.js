@@ -167,13 +167,18 @@ function rollHitChance(
     directChanceBonusPercent,
     targetCharacter
 ){
-    return Math.random()*100<calculateHitChancePercent(
+    const roll=Math.random()*100;
+    const chance=calculateHitChancePercent(
         casterAccuracy,
         targetEvasion,
         directChanceReductionPercent,
         directChanceBonusPercent,
         targetCharacter
     );
+    const hit=roll<chance;
+    emitCombatEvent("hit_roll",{target:targetCharacter,roll,chance,hit,casterAccuracy,targetEvasion,
+        directChanceReductionPercent,directChanceBonusPercent});
+    return hit;
 }
 
         const rollBeginnerForestNormalAttackDamage=function(){

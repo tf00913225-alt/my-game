@@ -109,6 +109,9 @@
 - 只允許 Team Relic Runtime 本身進入 `gameplay-core`；Boss／Tower／秘寶養成仍維持 `feature-boss-relic` lazy load，且兩者都不得塞進 Critical Boot。禁止為 Team Relic 再建立額外 feature gate、戰鬥開始後 Promise 補載或 polling。
 - `runtimeReady:false` 秘寶不是可用功能：不得正式裝備、強化、觸發或顯示虛構下一級數值；舊存檔 loadout 若指向未實裝秘寶必須 fail closed 為未裝備。禁止逐件補 `if` 建立第二套 Trigger Engine。
 
+- 20件正式秘寶效果與錨點由 `docs/TEAM_RELIC_SYSTEM_RULES.md` 管理。事件由唯一 `FourSymbolsCombatEvents` 發布 committed HP／Action／Skill／Status facts；秘寶訂閱，不包裝攻擊、技能、命中RNG、狀態RNG或死亡函式。Incoming直接減傷在Barrier排除後、Shield吸收前；鎮魂Direct Final Damage、萬象Active Skill Final Damage、赤霄ordinary additive與Crit均由正式Owner消費。
+- Evasion只投影一次；Status Insurance只在正式成功寫入後淨化，不重roll。所有回合效果在正式Round End到期；Shield沿用單一來源感知Owner。
+
 ## Battle Statistics（戰鬥統計）與戰況介面契約
 
 - `FourSymbolsBattleStatistics` 是每場戰鬥統計的唯一 owner（控制來源）；每場開始建立一次、戰鬥中累積、結束時凍結同一份 snapshot（快照），戰後結算禁止重新推算第二份數字。

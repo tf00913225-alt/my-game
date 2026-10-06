@@ -5,9 +5,9 @@
   "sourceOwner": "js/00-main.js",
   "compatibilityDigests": {
     "js/33-v140-four-element-balance.js": "ec0e90959f8d50862deb808c3cd66554ac426d9bc80de1fe07464e8683162a45",
-    "js/43-v149-skill-ui-rules.js": "0400d162e325b77f1444a3c3f8d243b41a66de48830e879fc1a49f256b33bc16",
+    "js/43-v149-skill-ui-rules.js": "dc765992753af59a8f1d85f6e1252f492cec949fcbc15699e6dd34d61b73a22b",
     "js/44-v152-dev-fixes.js": "86d3285e8967e5c3b57dd60604bb5731f23d81e7022534e535864b0b939e4d1e",
-    "js/60-v173.64-skill-progression-rebalance.js": "ac55d6dfbc3b1325bb7ba7d790330b998d57d521b165058481511336db1f413b"
+    "js/60-v173.64-skill-progression-rebalance.js": "a337844bb92c6950df5ad52d66886e1243b670bb62ca2d4594e02b24782ce587"
   },
   "declarationDigests": {
     "BASE_PHYSICAL_ATTACK": "8c512bffb37a77a9df4d5ffe8e5d92d8a6304d41fd610fefb102d03b5b3850dd",
@@ -43,18 +43,18 @@
     "getDamageLevelMultiplier": "6c9802fd80df0f8fdca21c09101efae80de6878c962e8a63dfe94fb8af9e68ef",
     "getElementalDamageMultiplier": "3df36c3b8c659b734f7b1f570ec23e5ac6a9ec6f456d5b785d503b1acf16e221",
     "getDamageContextAttacker": "e3e788dd78069373c3ca8e57423b351da685d8c9e9ab4de8fb100fb009958dc6",
-    "getOrdinaryDamageBonusPercent": "6be2f2b8f928acd29a73b691883c71cb439992b6cf26deb7483276d095bb5a9d",
+    "getOrdinaryDamageBonusPercent": "8e38e7e7c73c320d48be13aa44b3a684c038b35ebd696bde56ee9030d793c905",
     "getOrdinaryDamageMultiplier": "6e8161c69076be254b07622655730acddbd0cb314b7ce077b2236fe38e974c34",
     "isPartyDamageTarget": "544b1a6fb5cec0c118e20c9fe18b3e8f4965406a93eb80c0c7ac53223bb98fcc",
     "getEnemyPressureMultiplier": "0728e490b226507a4735274af9257f155214aa2554f3a20905696ae6c2e16b48",
     "getDamageBudgetMultiplier": "6e2b7ea31c889bddb2de078889f3a49078e7d3a76cd53171b232f43dee3700fe",
     "getTowerDirectDamageMultiplier": "e1be9a97a669cfce3389899ad6c6479322a56f809e548cbacb6fc603c66a64de",
-    "calculateDamage": "34484de33b061ba4ae7409ace8555c17d241a577ae1770b4b777823e4e1bd6ad",
+    "calculateDamage": "a9726a781f48ac810318a87854a70625d03017896afde14b41b86ae565f9bfa2",
     "calculateHitChancePercent": "8691b66a68926e30b35cbc8030a79e686ee26a5f2ead89754df13feebc01b5b6",
     "getCriticalStatPoints": "a724e18b459ffd1b795f03adfc173098bee52dbbd3ec45ede1f0b6c1e328bb0f",
-    "rollCritical": "d2412f3c3b1cd68a096630d964612d664247ed13c8a946126224f73ef0e7234e"
+    "rollCritical": "e46af562d803324a60e8e1b068db35d68dc6f38fc772dd6c64c7255c1c3c0e46"
   },
-  "rulesSha256": "e3e548bd7a80dae9e7eb247406949e38291e545088810663f9d26dc5bc6b9613",
+  "rulesSha256": "aebfcd6af4010854eda3c147d1c781fd243add9fd2850d301805970317fac6b2",
   "combatRulesReady": false,
   "outcomeVerified": false,
   "rewardEligible": false
