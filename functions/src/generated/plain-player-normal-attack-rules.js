@@ -301,12 +301,7 @@ function calculateHitChancePercent(
         HIT_CHANCE_MIN_PERCENT,
         Math.min(HIT_CHANCE_MAX_PERCENT,chance)
     );
-    const windEx=targetCharacter&&targetCharacter.element==="wind"
-        ?getLearnedElementEX(targetCharacter,"wind"):null;
-    const lowHp=targetCharacter&&Number(targetCharacter.hp)<Number(getPartyBattleStats(getPartyCharacterIndex(targetCharacter))?.maxHP)*0.25;
-    return windEx&&lowHp
-        ?Math.min(normalFinalChance,Number(windEx.lowHpFinalHitCapPercent)||50)
-        :normalFinalChance;
+    return normalFinalChance;
 }
 
 function getCriticalStatPoints(character){

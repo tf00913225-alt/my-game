@@ -249,6 +249,12 @@
       ]
     },
     {
+      "id": "DEP-WIND-EX-LOW-HP-HIT-CAP",
+      "description": "Wind EX low-HP final-hit cap is replaced by additive final Evasion; old field and player-visible cap text must not return.",
+      "enabled": true,
+      "forbidden": ["lowHpFinalHitCapPercent", "最終命中率最高為 50"]
+    },
+    {
       "id": "DEP-LEVEL-SUPPRESSION-V2",
       "description": "Retired Level Damage linear/clamp constants only; unrelated 0.85/1.15 remain legal.",
       "enabled": true,
