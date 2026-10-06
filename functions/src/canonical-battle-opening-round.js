@@ -4,15 +4,16 @@ const {resolvePlainPlayerNormalAttack,samplePlainPlayerNormalAttack}=require('./
 const {createForestOpeningRoundRules}=require('./generated/forest-opening-round-rules');
 const openingPolicy=require('./generated/forest-opening-round-policy.json');
 const playerPolicy=require('./generated/plain-player-normal-attack-policy.json');
+const restrictedPolicy=require('./generated/restricted-forest-instance-policy.json');
 const {claimRecordsDigest:digest}=require('./canonical-snapshot');
 const copy=value=>JSON.parse(JSON.stringify(value));
 const invalid=message=>{throw Error('Opening round input invalid: '+message);};
 
 // Pure internal projection, NOT a persisted/legal encounter or terminal
 // verdict. Both actors' normal attacks are explicitly restricted assumptions;
-// no enemy skill selection, multi-enemy draw or repeated-round lifecycle.
+// no enemy skill selection, multi-enemy draw or protected lifecycle.
 // A protected successor must pin the complete policy and server transcript.
-function resolveForestOpeningRound(args){
+function resolveForestRoundArithmetic(args,currentState=null){
     if(!args||typeof args!=='object'||Array.isArray(args)||
        Object.keys(args).sort().join('|')!=='archive|encounterKey|encounterPolicy|randomTape|revision|snapshot|uid'){
         invalid('only private original sources and an explicit server transcript are supported');
@@ -29,6 +30,24 @@ function resolveForestOpeningRound(args){
     const definition=copy(args.encounterPolicy.entries[args.encounterKey]);
     const enemy={...definition.stats,level:definition.spec.level,element:definition.spec.element,
         alive:true,canAct:true};
+    if(currentState){
+        const entry=restrictedPolicy.entries[args.encounterKey];
+        if(!entry||entry.specSha256!==digest(definition.spec)||entry.skillChance!==0||
+           entry.attackSkills.length||entry.supportSkills.length){
+            invalid('enemy must be certified naturally normal-attack-only');
+        }
+        if(typeof currentState!=='object'||Array.isArray(currentState)||
+           Object.keys(currentState).sort().join('|')!=='enemyHP|enemySP|playerHP|playerSP|round|roundVersion'||
+           !Number.isSafeInteger(currentState.round)||currentState.round<0||
+           currentState.round>=Number.MAX_SAFE_INTEGER||currentState.roundVersion!==currentState.round||
+           !Number.isSafeInteger(currentState.playerHP)||currentState.playerHP<1||currentState.playerHP>player.hp||
+           !Number.isSafeInteger(currentState.enemyHP)||currentState.enemyHP<1||currentState.enemyHP>enemy.maxHP||
+           currentState.playerSP!==player.sp||currentState.enemySP!==enemy.maxSP||
+           (currentState.round===0&&(currentState.playerHP!==player.hp||currentState.enemyHP!==enemy.maxHP))){
+            invalid('live bounded prior round state required; healing, SP changes and terminal replay unsupported');
+        }
+        player.hp=currentState.playerHP;
+    }
     let cursor=0;
     const random=()=>{
         if(cursor>=randomTape.length)invalid('server transcript exhausted');
@@ -40,7 +59,8 @@ function resolveForestOpeningRound(args){
        queue.some(a=>!['player','monster'].includes(a.type))){
         invalid('unsupported two-combatant initiative contract');
     }
-    let playerHP=player.hp,enemyHP=enemy.maxHP;
+    let playerHP=player.hp,enemyHP=currentState?currentState.enemyHP:enemy.maxHP;
+    const enemyHPBefore=enemyHP;
     const actions=[];
     for(const actor of queue){
         const type=actor.type;
@@ -66,9 +86,30 @@ function resolveForestOpeningRound(args){
         encounterKey:args.encounterKey,encounterPolicySha256:admitted.encounterPolicySha256,
         definitionSha256:admitted.definitionSha256,openingRulesPolicySha256:digest(openingPolicy),
         playerRulesPolicySha256:digest(playerPolicy),initiative:queue,actions,
-        playerHPBefore:player.hp,playerHPAfter:playerHP,enemyHPBefore:enemy.maxHP,enemyHPAfter:enemyHP,
+        playerHPBefore:player.hp,playerHPAfter:playerHP,enemyHPBefore,enemyHPAfter:enemyHP,
         randomTape:copy(randomTape),randomSamplesConsumed:cursor,
         combatRulesReady:false,outcomeVerified:false,rewardEligible:false,creditedToCharacter:false};
+    if(currentState){
+        body.kind='restricted-forest-round-arithmetic';
+        body.restrictedPolicySha256=digest(restrictedPolicy);
+        body.priorState=copy(currentState);
+        body.priorStateSha256=digest(currentState);
+        body.nextState={round:currentState.round+1,roundVersion:currentState.roundVersion+1,
+            playerHP,enemyHP,playerSP:player.sp,enemySP:enemy.maxSP};
+        body.nextStateSha256=digest(body.nextState);
+    }
     return Object.freeze({...body,sha256:digest(body)});
 }
-module.exports={resolveForestOpeningRound};
+// Retain the original opening projection contract and digest. Both entry
+// points execute this same loop; there is no second initiative/damage owner.
+function resolveForestOpeningRound(args){return resolveForestRoundArithmetic(args);}
+// Pure internal successor prerequisite. currentState is a protected caller's
+// committed state, never browser authority. Hashes alone prove no provenance.
+// Death stops further projections; no terminal verdict or reward is issued.
+function resolveForestRepeatedRound(args){
+    if(!args||typeof args!=='object'||Array.isArray(args)||
+       !Object.hasOwn(args,'currentState')||!args.currentState){invalid('prior state required');}
+    const {currentState,...sources}=args;
+    return resolveForestRoundArithmetic(sources,currentState);
+}
+module.exports={resolveForestOpeningRound,resolveForestRepeatedRound};
