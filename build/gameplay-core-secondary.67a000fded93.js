@@ -6358,7 +6358,7 @@
         return RARITIES[RARITIES.length-1];
     }
     function artMarkup(path,rarityKey){
-        return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarityKey+'"><img src="'+path+'" alt="" draggable="false" onerror="this.hidden=true"></span>';
+        return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarityKey+'"><img src="'+path+'" alt="" draggable="false" onerror="this.parentElement.dataset.assetState=\'broken\';this.parentElement.setAttribute(\'role\',\'img\');this.parentElement.setAttribute(\'aria-label\',\'裝備圖片無法載入\');this.parentElement.textContent=\'◇\'"></span>';
     }
     const LEGACY_STARTER_EQUIPMENT_ART={
         ironSword:{path:"assets/equipment/warrior/weapon-01.png",classType:"warrior"},

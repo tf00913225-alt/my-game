@@ -46,6 +46,8 @@ try{
   // The established read-only Cloud fixture may project its account snapshot;
   // funds for the new batch are local QA setup, never a deployed account write.
   await c.eval('gold=100000;document.querySelector(".v17345-equipment-refresh button").click();true');const refresh=await capture(width,'F-refresh');assert.ok(refresh.cards.every(v=>!v.disabled&&v.button!=='已購買'));assert.ok(refresh.cards.every(v=>v.id!==bought.cards.find(b=>b.id===v.id)?.id));
+  assert.deepEqual(await c.eval(`(()=>{const img=document.querySelector('.v17346-gear-art img');img.dispatchEvent(new Event('error'));const art=document.querySelector('.v17346-gear-art .v169-item-art');return {state:art.dataset.assetState,label:art.getAttribute('aria-label'),fallback:art.textContent};})()`),{state:'broken',label:'裝備圖片無法載入',fallback:'◇'});
+  await c.eval(`v169SwitchShopPage('potion');v169SwitchShopPage('equipment');true`);sameOffers(refresh,await c.eval(snapshot));
   console.log('Shop offer/render/reentry/reload/refresh production QA PASS '+width+'x'+height);
  }
  fs.writeFileSync(path.join(dir,'evidence.json'),JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||'local',evidence},null,2));

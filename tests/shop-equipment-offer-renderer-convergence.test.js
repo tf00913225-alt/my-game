@@ -29,6 +29,7 @@ test('canonical renderer owns six deterministic art cards, stable batch IDs and 
  assert.doesNotMatch(gear,/previousSwitch|previousRefresh/);
  const f=fixture(),a=f.read();assert.equal((a.match(/<img /g)||[]).length,6);assert.equal((a.match(/v169-item-art/g)||[]).length,6);assert.equal(a,f.read());
  assert.match(a,/data-offer-id="2026-10-06:0:0"/);
+ const errorCode=a.match(/onerror="([^"]+)"/)[1];const art={dataset:{},setAttribute(k,v){this[k]=v;},textContent:''};new Function(errorCode).call({parentElement:art});assert.equal(art.dataset.assetState,'broken');assert.equal(art.textContent,'◇');assert.equal(art['aria-label'],'裝備圖片無法載入');
 });
 test('purchase once, rapid repeat and synchronous reentry, gold/inventory/save receipt agree',()=>{
  const f=fixture(),before=f.read(),cost=Number(before.match(/>([\d,]+) 金幣<\/button>/)[1].replaceAll(',',''));
