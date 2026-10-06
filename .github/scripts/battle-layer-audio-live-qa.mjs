@@ -80,7 +80,7 @@ async function runBossBalanceProductionQa(){
     try{
       for(const [width,height] of [[390,844],[412,915]]){
         profile=fs.mkdtempSync(path.join(os.tmpdir(),'boss-balance-'));const port=23000+process.pid%10000;
-        proc=spawn(findChrome(),['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
+        proc=spawn(findChrome(),['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:['ignore','ignore','inherit']});
         const tabs=await waitJson('http://127.0.0.1:'+port+'/json');client=new Cdp(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);
         await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});await new Promise(r=>setTimeout(r,1000));
         const active=client.eval(reference+'\n'+expression);let done=false;active.finally(()=>{done=true;}).catch(()=>{});const captured=new Set();
@@ -394,17 +394,17 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     // DEV preview is deliberately unavailable on the production host.
     await waitFor(client,`window.v174RelicDebugState?.()?.relicId===${id}`,relicId+" initialized battle owner",7000);
     await client.eval("(()=>{currentBattleMonsters.forEach(index=>{monsters[index].hp=Math.max(100000,monsters[index].hp);monsters[index].maxHP=Math.max(100000,monsters[index].maxHP||0);});return true;})()");
-    await client.eval("(()=>{window.__relicQaFinishRelease=FourSymbolsBattleFlow.interceptActionFinish(()=>true);return true;})()");
+    await client.eval("(()=>{window.__relicQaFinishRelease=FourSymbolsBattleFlow.interceptActionFinish(()=>!!battleDurationAction?.completed);return true;})()");
     const before=await client.eval("window.v174RelicDebugState().totalTriggers");
     if(relicId==="relic_cold_spring_jade"){
-        await client.eval("(()=>{const max=getPartyBattleStats(0).maxHP;player.hp=Math.max(1,Math.floor(max*.1));showPlayerHit(Math.ceil(max*.4),'hp',0,false);return true;})()");
+        await client.eval("(()=>{const max=getPartyBattleStats(0).maxHP;player.hp=Math.floor(max*.4);settleBattleHpDamage(player,Math.ceil(max*.1),{attacker:monsters[currentBattleMonsters[0]],sourceType:'normalAttack',damageKind:'direct'});return true;})()");
     }else if(relicId==="relic_qiankun_flask"){
         await client.eval("(()=>{turn=1;notifyBattleRoundBoundary('round_end',battleToken);return true;})()");
     }else if(relicId==="relic_sun_orb"){
         await client.eval("(()=>{turn=2;notifyBattleRoundBoundary('round_start',battleToken);return true;})()");
     }else if(relicId==="relic_nine_dragon_fire"){
         for(let action=0;action<7;action++){
-            await client.eval("(()=>{getExistingPartyIndexes().forEach(i=>{getPartyCharacterByIndex(i).hp=9999999;});const index=currentBattleMonsters.find(i=>monsters[i]?.alive&&monsters[i].hp>0);processSingleMonsterAttack(index,battleToken);clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;return true;})()");
+            await client.eval("(()=>{getExistingPartyIndexes().forEach(i=>{getPartyCharacterByIndex(i).hp=9999999;});const index=currentBattleMonsters.find(i=>monsters[i]?.alive&&monsters[i].hp>0);initiativeIndex="+action+";initiativeQueue[initiativeIndex]={type:'monster',monsterIndex:index};notifyBeforeCombatant(battleToken);processSingleMonsterAttack(index,battleToken);clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;return true;})()");
             if(action<6){
                 await waitFor(client,"(()=>{clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;return !window.v142GetRemainingAnimationMs?.();})()", "relic counter action animation",10000);
                 assert.equal(await client.eval("window.v174RelicDebugState().enemyActionCount"),action+1,"exactly one effective enemy action must be counted");

@@ -60,7 +60,7 @@ function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedP
         relic_qinglan_feather:{id:"relic_qinglan_feather",name:"青嵐羽符",rarity:"blue",runtimeReady:true,maxLevel:20},
         relic_rock_mountain_seal:{id:"relic_rock_mountain_seal",name:"岩岳鎮印",rarity:"purple",runtimeReady:true,maxLevel:20},
         relic_returning_wheel:{id:"relic_returning_wheel",name:"回天寶輪",rarity:"pink",runtimeReady:true,maxLevel:20},
-        relic_all_returning_array:{id:"relic_all_returning_array",name:"萬象歸元盤",rarity:"four-symbol",runtimeReady:false,maxLevel:20}
+        relic_all_returning_array:{id:"relic_all_returning_array",name:"萬象歸元盤",rarity:"four-symbol",runtimeReady:true,maxLevel:20}
     };
     const owned=Object.fromEntries(Object.keys(catalog).map(id=>[id,{unlocked:catalog[id].runtimeReady,level:1,exp:0,seen:false}]));
     const loadout={relicId:"relic_qiankun_flask",subRelicId:null};
@@ -329,7 +329,7 @@ function add(context,id,count){
     assert.equal(b.context.RelicProgressionSystem.getProgressionState().pending,null);
 }
 
-/* The current catalog has no usable white relic. Four-symbol fragments have a long-term high-end source, but the unfinished relic cannot be crafted/equipped yet. */
+/* The current catalog has no usable white relic. Four-symbol fragments retain the rare high-end source and formal material requirements. */
 {
     const {context}=makeContext();
     const estimate=context.RelicProgressionSystem.estimateBossTarget("personal","personal-40","relic_qiankun_flask",1);
@@ -337,7 +337,7 @@ function add(context,id,count){
     assert.ok(estimate.minutesTo100>estimate.minutesTo50);
     const four=context.RelicProgressionSystem.getBossPoolProbabilities("world-100").find(entry=>entry.relicId==="relic_all_returning_array");
     assert.ok(four&&four.chance>0&&four.chance<.02,"four-symbol fragment path should be rare but non-zero");
-    assert.equal(context.RelicProgressionSystem.getCraftStatus("relic_all_returning_array").canCraft,false,"unfinished four-symbol relic must not become equip-ready through the drop system");
+    assert.equal(context.RelicProgressionSystem.getCraftStatus("relic_all_returning_array").canCraft,false,"completed four-symbol relic still requires actual specific fragments");
 }
 
 console.log("✓ Relic progression/drop system targeted tests passed.");

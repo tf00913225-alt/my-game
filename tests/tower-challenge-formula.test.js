@@ -7,7 +7,7 @@ const c={window:null,Math:Object.create(Math),Number,String,Array,Object,CRIT_CH
  isMonsterFrozen:m=>!!m.frozen,isMonsterPetrified:()=>false,skillDatabase:{attack:{category:'magic',spCost:10},heal:{category:'heal',spCost:10}},getPersistentStateConflict:()=>null,getMonsterTimedStatusResistanceBonus:()=>0};
 c.window=c;vm.createContext(c);
 vm.runInContext(core.match(/const LOCKDOWN_HIT_BOUNDS = \{[\s\S]*?\n\};/)[0],c);
-for(const n of ['getTowerDirectDamageMultiplier','getTowerStatusAccuracyBonus','getMonsterCriticalChance','calculateDamage','chooseEnemySkillCategory','calculateStatusEffectChance','rollNamedPersistentStatusEffect'])vm.runInContext(fn(core,n),c);
+for(const n of ['getTowerDirectDamageMultiplier','getTowerStatusAccuracyBonus','getMonsterCriticalChance','getRelicDirectDamageMultiplier','calculateDamage','chooseEnemySkillCategory','calculateStatusEffectChance','rollNamedPersistentStatusEffect'])vm.runInContext(fn(core,n),c);
 const ai=core.slice(core.indexOf('window.FourSymbolsEnemySkillAI=Object.freeze({'),core.indexOf('\n});',core.indexOf('window.FourSymbolsEnemySkillAI=Object.freeze({'))+4);vm.runInContext(ai,c);
 vm.runInContext(fn(base,'healMonsterPreservingShield'),c);
 c.Math.random=()=>.5;

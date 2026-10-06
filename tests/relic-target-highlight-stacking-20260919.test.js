@@ -63,7 +63,7 @@ assert.match(
 );
 assert.match(
   relic,
-  /types\.some\(type=>\["heal_all_allies","restore_sp_all","shield_all","buff_all","prepare_reflect"\]\.includes\(type\)\)[\s\S]*?targetSide:"player",targetType:"allyAll"/,
+  /types\.some\(type=>\["heal_all_allies","restore_sp_all","shield_all","buff_all"\]\.includes\(type\)\)[\s\S]*?targetSide:"player",targetType:"allyAll"/,
   "ally-wide effects must resolve every living ally through the shared highlight path"
 );
 assert.match(

@@ -1028,15 +1028,10 @@
             if(!character||!stats||character.hp<=0){ return; }
             let damage=Math.max(1,Math.round(stats.maxHP*.42));
             if(character.isDefending){ damage=Math.max(1,Math.floor(damage*.5)); }
-            const shield=(character.activeBuffs||[]).find(buff=>buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0);
-            if(shield){
-                const absorbed=Math.min(damage,numeric(shield.remaining));
-                shield.remaining-=absorbed;
-                damage-=absorbed;
-            }
+            damage=absorbPlayerShields(character,damage,index);
             if(damage>0){
                 const beforeHp=Math.max(0,numeric(character.hp,0));
-                character.hp=Math.max(0,character.hp-damage);
+                settleBattleHpDamage(character,damage,{attacker:boss,sourceType:"environment",damageKind:"environment"});
                 const actual=Math.max(0,beforeHp-numeric(character.hp,0));
                 if(typeof battleStatisticsRecordDamageTakenByIndex==="function"){
                     battleStatisticsRecordDamageTakenByIndex(index,actual);

@@ -302,11 +302,11 @@
         }
         const entity=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
         const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
-        const shield=entity&&Array.isArray(entity.activeBuffs)?entity.activeBuffs.find(effect=>effect&&effect.type==="shield"&&Number(effect.turnsLeft)>0&&Number(effect.remaining)>0):null;
+        const shield=typeof getPlayerShieldRemaining==="function"?getPlayerShieldRemaining(entity):0;
         return entity&&stats?{
             hpRatio:clampedRatio(entity.hp,stats.maxHP),
             spRatio:clampedRatio(entity.sp,stats.maxSP),
-            shieldRatio:shield?clampedRatio(shield.remaining,stats.maxHP):0
+            shieldRatio:clampedRatio(shield,stats.maxHP)
         }:null;
     }
     function projectionFor(node,ratio,shieldRatio){

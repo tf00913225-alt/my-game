@@ -16,10 +16,11 @@
     "getMonsterAgility": "bd75fef258f9e1b7e3a0ca22755a5f00bde684c7645bd602bf91c3a26710c179",
     "getMonsterAccuracy": "e8ada45048b2418f59aaaa4dec510ec7ca6207e9b8e8d3fca9a0bf00ae9b4eef",
     "calculateHitChancePercent": "8691b66a68926e30b35cbc8030a79e686ee26a5f2ead89754df13feebc01b5b6",
-    "rollHitChance": "7e25079920606c8178531a2717360ae1820aaae116b6866a64a2be0bd58db805",
+    "rollHitChance": "8debbbfd9179892c635638f33cf65d7ab36aba7e2bff7ab13baa2981eb41bbcb",
+    "emitCombatEvent": "970970e5079483bd3fe4c59e8ba9c2d69ff83f620bc2c9b654dd5aef38b2641a",
     "rollBeginnerForestNormalAttackDamage": "d69f138dc4a94512bee6dcce6dcf740fec3021e73ef2c9658ff7020c77f8ca50"
   },
-  "rulesSha256": "309a328ebed071785852dbad031477b03aa2bbaa7bfca67a40aea714ac14889f",
+  "rulesSha256": "d0772054865c274d3426e488697b9b3a2f00d6e3a2671bebbdfe0d278c1cf8f4",
   "combatRulesReady": false,
   "outcomeVerified": false,
   "rewardEligible": false

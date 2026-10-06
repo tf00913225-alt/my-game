@@ -113,6 +113,9 @@
 - 只允許 Team Relic Runtime 本身進入 `gameplay-core`；Boss／Tower／秘寶養成仍維持 `feature-boss-relic` lazy load，且兩者都不得塞進 Critical Boot。禁止為 Team Relic 再建立額外 feature gate、戰鬥開始後 Promise 補載或 polling。
 - `runtimeReady:false` 秘寶不是可用功能：不得正式裝備、強化、觸發或顯示虛構下一級數值；舊存檔 loadout 若指向未實裝秘寶必須 fail closed 為未裝備。禁止逐件補 `if` 建立第二套 Trigger Engine。
 
+- 20件正式秘寶效果與錨點由 `docs/TEAM_RELIC_SYSTEM_RULES.md` 管理。事件由唯一 `FourSymbolsCombatEvents` 發布 committed HP／Action／Skill／Status facts；秘寶訂閱，不包裝攻擊、技能、命中RNG、狀態RNG或死亡函式。Incoming直接減傷在Barrier排除後、Shield吸收前；鎮魂Direct Final Damage、萬象Active Skill Final Damage、赤霄ordinary additive與Crit均由正式Owner消費。
+- Evasion只投影一次；Status Insurance只在正式成功寫入後淨化，不重roll。所有回合效果在正式Round End到期；Shield沿用單一來源感知Owner。
+
 ## Battle Statistics（戰鬥統計）與戰況介面契約
 
 - `FourSymbolsBattleStatistics` 是每場戰鬥統計的唯一 owner（控制來源）；每場開始建立一次、戰鬥中累積、結束時凍結同一份 snapshot（快照），戰後結算禁止重新推算第二份數字。
@@ -219,7 +222,7 @@
 - 裝備單位遷移唯一 Owner：`functions/src/equipment-combat-percent-migration.js`；App Shell 在主 Runtime 前載入，同一實作供後端 review projection 使用。`equipmentCombatPercentUnitVersion:2` 是每件裝備的單位標記，stats/reforgeStats 一起原子遷移且重複載入不再換算。
 - 開工 dev 所有正式裝備 Accuracy 來源只有四象 armor/robe Base 10 與 V1 Spirit mapping；沒有普通生成／重鑄 Accuracy pool。無版本裝備先分離明確四象 Base 10→Evasion 10，剩餘舊 Equipment Accuracy 按 legacy point unit ×0.15 換算；尚存在 Spirit 時每點直接 +0.3% Accuracy/+0.1% Anti-Crit/+0.05% Status Resistance，再移除 Spirit。新定義／生成装備明確標记版本 2。不得將此遷移用於角色、怪物、技能或 Buff Accuracy。
 - 本機／雲端 snapshot 經既有 hydrate/normalize 入口投影；候選與原始 Archive 的 raw bytes、hash、UID、revision 與信任狀態不改寫。後端 review ownedItem 只對副本遷移，不授予權威、不修改原始證據。
-- 鎮魂古鐘命中 -5/-8% 是 Relic Final Hit Reduction Source，依 bossDebuffEfficiency 計算後與暈眩相加，既有期限與清理 owner 保留，禁止乘算 monster.accuracy。
+- 鎮魂古鐘 Lv1/10/20 的最終命中 -4/-6/-8% 由 Relic Final Hit Reduction Source 與暈眩相加；第3/6/9回合開始、持續2回合，本效果的 Boss 效率固定80%，不改其他秘寶的全域效率，也不修改 monster.accuracy。直接最終傷害 -8/-10/-12% 由唯一 calculateDamage 消費，不改 monster.attack/magicAttack，不影響 DOT/Reflect/Environment/Relic/Boss Object。
 
 - Relic Evasion 只由 `v174GetRelicFinalEvasionPercent(index)` 提供來源值，`getMainCharacterStats`／`getAdditionalCharacterBattleStats` 的既有 Evasion 加總一次結算並一起處理 Frostbite。Relic stats decorator 不得再次改寫 Evasion；隊伍 getter 委派角色 getter 後不得雙加。
 

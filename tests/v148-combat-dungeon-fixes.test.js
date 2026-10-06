@@ -42,7 +42,7 @@ function element(extra={}){
 
 function baseContext(overrides={}){
     const context=Object.assign({
-        window:null,console,Math,Date,Number,Object,Array,Set,Map,Promise,
+        window:null,console,Math,Date,Number,Object,Array,Set,Map,Promise,combatEventObservers:new Map(),
         setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},requestAnimationFrame:callback=>callback(),
         skillDatabase:{
             rage:{id:"rage",name:"怒火",element:"fire",category:"buff",targetType:"allyAll",duration:2,spCost:50,
@@ -62,6 +62,10 @@ function baseContext(overrides={}){
     },overrides);
     context.window=context;
     vm.createContext(context);
+    for(const name of ["emitCombatEvent","spendActiveSkillSP"]){
+        const start=coreSource.indexOf("function "+name+"(");assert.ok(start>=0,name);
+        vm.runInContext(coreSource.slice(start,coreSource.indexOf("\n}",start)+2),context);
+    }
     vm.runInContext(slotOwnerSource,context);
     vm.runInContext(source,context);
     return context;

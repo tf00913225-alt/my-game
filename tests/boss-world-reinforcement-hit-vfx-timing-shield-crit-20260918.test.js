@@ -63,6 +63,7 @@ const critContext={
     getLearnedElementEX:()=>null,
     battleStatisticsRecordCriticalByActor:()=>{}
 };
+critContext.window=critContext;
 vm.createContext(critContext);
 vm.runInContext(core.slice(rollStart,rollEnd)+"this.rollCritical=rollCritical;",critContext);
 const protectedBoss={vBossShield:{current:500}};

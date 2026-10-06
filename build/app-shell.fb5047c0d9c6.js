@@ -2622,6 +2622,11 @@ function getRelicFinalEvasionPercent(character){
         ?Number(window.v174GetRelicFinalEvasionPercent(index))||0:0;
 }
 
+function projectRelicBattleStats(character,stats){
+    return typeof window.v174ProjectRelicBattleStats==="function"
+        ?window.v174ProjectRelicBattleStats(getPartyCharacterIndex(character),stats):stats;
+}
+
 /* Derive the native EX bonus from current HP and the already settled maxHP.
    Do not call a stats getter here: those getters own this projection. */
 function getWindEXFinalEvasionBonusPercent(character,maxHP){
@@ -2648,13 +2653,13 @@ function getMainCharacterStats(){
     const maxHP=Math.round(base.maxHP*maxHpPassiveMultiplier);
     const rawDefense=base.defense;
     const buffedDefense=rawDefense*(1+(defenseBuffPercent+(earthEXLevel>0?Number(skillDatabase.earthEX.defenseBonusPercent)||0:0))/100);
-    return {
+    return projectRelicBattleStats(player,{
         ...base,
         maxHP:maxHP,
         defense:Math.max(0,Math.round(buffedDefense*(1-defenseDownPercent/100))),
         accuracy:base.accuracy,
         evasion:combineEvasionRates([base.evasion,evasionBuffPercent,getWindEXFinalEvasionBonusPercent(player,maxHP),getRelicFinalEvasionPercent(player),-getFrostbiteFinalPercentPointPenalty(player)])
-    };
+    });
 }
 
 /*
@@ -2738,13 +2743,13 @@ function getAdditionalCharacterBattleStats(character,characterKey){
     const maxHP=Math.round(base.maxHP*maxHpPassiveMultiplier);
     const rawDefense=base.defense;
     const buffedDefense=rawDefense*(1+(defenseBuffPercent+(earthEXLevel>0?Number(skillDatabase.earthEX.defenseBonusPercent)||0:0))/100);
-    return {
+    return projectRelicBattleStats(character,{
         ...base,
         maxHP:maxHP,
         defense:Math.max(0,Math.round(buffedDefense*(1-defenseDownPercent/100))),
         accuracy:base.accuracy,
         evasion:combineEvasionRates([base.evasion,evasionBuffPercent,getWindEXFinalEvasionBonusPercent(character,maxHP),getRelicFinalEvasionPercent(character),-getFrostbiteFinalPercentPointPenalty(character)])
-    };
+    });
 }
 
 function getPlayer2BattleStats(){
@@ -4063,6 +4068,86 @@ const MANUAL_RESOLUTION_START_MS=250;
 const POST_ACTION_DELAY_MS=1150;
 const BATTLE_DECLARE_ADVANCE_MS=MANUAL_RESOLUTION_START_MS;
 const battleActionFinishObservers=new Set();
+/* Synchronous settlement notifications. Combat owners publish committed facts;
+   relics subscribe without wrapping attacks, skills, status RNG or feedback. */
+const combatEventObservers=new Map();
+const combatDamageFacts=new WeakMap();
+function emitCombatEvent(type,event){
+    (combatEventObservers.get(type)||[]).forEach(observer=>observer(event));
+    return event;
+}
+window.FourSymbolsCombatEvents=Object.freeze({
+    emit:emitCombatEvent,
+    lastDamageFor:entity=>combatDamageFacts.get(entity)||null,
+    healthFor:getCombatantHealthSnapshot,
+    subscribe(type,observer){
+        if(!combatEventObservers.has(type)){ combatEventObservers.set(type,new Set()); }
+        combatEventObservers.get(type).add(observer);
+        return ()=>combatEventObservers.get(type).delete(observer);
+    }
+});
+
+function getBattleDamageSource(options){
+    const context=options||{};
+    const cast=window.FourSymbolsSkillDamageContext;
+    if(context.sourceType){ return context.sourceType; }
+    if(context.damageKind&&context.damageKind!=="direct"){ return context.damageKind; }
+    if(cast&&(!context.attacker||context.attacker===cast.attacker)){
+        return cast.freeCast?"followUp":"activeSkill";
+    }
+    if(context.skill&&context.skill.v149FreeFollowUp){ return "followUp"; }
+    return context.skill?"activeSkill":"normalAttack";
+}
+function getFormalDamageContext(options){
+    const resolved=Object.assign({},options||{});
+    if(!resolved.attacker){ resolved.attacker=getDamageContextAttacker(resolved)||(battleDurationAction&&battleDurationAction.entity); }
+    resolved.sourceType=getBattleDamageSource(resolved);
+    resolved.damageKind=resolved.damageKind||"direct";
+    const action=battleDurationAction;
+    if(action){ resolved.actionId=String(action.token)+":"+String(turn)+":"+String(action.index); }
+    return resolved;
+}
+function settleBattleHpDamage(target,damage,options){
+    if(!target||!(Number(damage)>0)){ return 0; }
+    const context=getFormalDamageContext(options);
+    const previousHp=getCombatantHealthSnapshot(target).hp;
+    const requestedHp=(Number(target.hp)||0)-Number(damage);
+    const hpOwner=Object.getOwnPropertyDescriptor(target,"hp");
+    target.hp=hpOwner&&typeof hpOwner.set==="function"?requestedHp:Math.max(0,requestedHp);
+    const after=getCombatantHealthSnapshot(target);
+    const actualHpLoss=Math.max(0,previousHp-after.hp);
+    const event=Object.assign({target,previousHp,hpAfterDamage:after.hp,maxHP:after.maxHP,actualHpLoss},context);
+    combatDamageFacts.set(target,event);
+    emitCombatEvent("hp_damage",event);
+    return actualHpLoss;
+}
+function getCombatantHealthSnapshot(entity){
+    if(entity&&entity.v141Shield&&!entity.v141Shield.isBarrier&&typeof window.v141SyncMonsterShield==="function"){
+        const remaining=window.v141SyncMonsterShield(entity),shield=entity.v141Shield;
+        return {hp:Math.max(0,(Number(entity.hp)||0)-remaining),maxHP:Math.max(1,Number(shield&&shield.baseMaxHP)||Number(entity.maxHP)||1)};
+    }
+    return {hp:Math.max(0,Number(entity&&entity.hp)||0),maxHP:Math.max(1,Number(entity&&entity.maxHP)||1)};
+}
+function applyPlayerDirectIncomingModifiers(target,damage,options){
+    const context=getFormalDamageContext(options);
+    if(!(damage>0)||context.damageKind!=="direct"||
+        ["relic","dot","reflect","environment","self","hpCost"].includes(context.sourceType)||
+        !context.attacker||isPartyDamageTarget(context.attacker)||context.attacker.vGameplayBossObject){ return damage; }
+    const owner=window.v174RelicDamageModifiers;
+    const reduction=owner&&typeof owner.incomingReduction==="function"?Number(owner.incomingReduction(target))||0:0;
+    const event=Object.assign({target,damage:Math.max(0,Math.floor(damage*(1-Math.max(0,Math.min(100,reduction))/100)))},context);
+    emitCombatEvent("incoming_direct",event);
+    return Math.max(0,event.damage);
+}
+function spendActiveSkillSP(character,amount){
+    const requested=Math.max(0,Number(amount)||0);
+    const spent=Math.min(Math.max(0,Number(character.sp)||0),requested);
+    character.sp=Math.max(0,Number(character.sp)||0)-spent;
+    const context=window.FourSymbolsSkillDamageContext;
+    if(context&&context.attacker===character&&!context.freeCast){ context.actualSpent=(Number(context.actualSpent)||0)+spent; }
+    emitCombatEvent("skill_spent",{actor:character,actualSpent:spent,sourceType:context&&context.freeCast?"followUp":"activeSkill"});
+    return spent;
+}
 const battleBeforeCombatantObservers=new Set();
 const battleRoundStartObservers=new Set();
 const battleRoundEndObservers=new Set();
@@ -4506,6 +4591,10 @@ function battleStatisticsRecordDamageDealtByActor(character,value){
 }
 
 function notifyBattleActionFinished(){
+    if(battleDurationAction&&!battleDurationAction.completed){
+        battleDurationAction.completed=true;
+        emitCombatEvent("action_finished",{action:battleDurationAction});
+    }
     battleActionFinishObservers.forEach(observer=>{
         try{ observer(); }
         catch(error){ console.error("戰鬥行動完成觀察器失敗：",error); }
@@ -4524,6 +4613,7 @@ function interceptBattleActionFinish(){
 function notifyBeforeCombatant(token){
     const event={token:token,turn:turn,index:initiativeIndex,queue:initiativeQueue};
     beginBattleDurationAction(event);
+    if(battleDurationAction){ emitCombatEvent("action_started",{action:battleDurationAction}); }
     battleBeforeCombatantObservers.forEach(observer=>{
         try{ observer(event); }
         catch(error){ console.error("戰鬥佇列觀察器失敗：",error); }
@@ -12730,6 +12820,10 @@ function getOrdinaryDamageBonusPercent(options){
     const target=resolved.target||null;
     const skill=resolved.skill||null;
     let total=0;
+    const relic=window.v174RelicDamageModifiers;
+    if(relic&&typeof relic.ordinaryBonus==="function"){
+        total+=Number(relic.ordinaryBonus(attacker,getBattleDamageSource(resolved)))||0;
+    }
 
     if(attacker&&typeof getElementDamagePassiveMultiplier==="function"){
         total+=(Math.max(0,Number(getElementDamagePassiveMultiplier(attacker))||1)-1)*100;
@@ -12806,6 +12900,21 @@ function getDamageBudgetMultiplier(skillOrOptions){
     return 1;
 }
 
+/* Relic modifiers project into this sole direct-damage formula. Explicit
+   non-direct sources never consume incoming protection or outgoing suppression. */
+function getRelicDirectDamageMultiplier(attacker,target,options){
+    const context=options||{};
+    if(String(context.damageKind||"direct")!=="direct"||
+        ["relic","dot","reflect","environment","self","hpCost"].includes(context.sourceType)||
+        (attacker&&attacker.vGameplayBossObject===true)){ return 1; }
+    const owner=window.v174RelicDamageModifiers;
+    if(!owner){ return 1; }
+    const outgoing=typeof owner.outgoingReduction==="function"?Number(owner.outgoingReduction(attacker))||0:0;
+    void target;
+    const skillFinal=typeof owner.skillFinalBonus==="function"?Number(owner.skillFinalBonus(attacker,getBattleDamageSource(context)))||0:0;
+    return (1-Math.max(0,Math.min(100,outgoing))/100)*(1+Math.max(0,skillFinal)/100);
+}
+
 window.v173GetOrdinaryDamageBonusPercent=getOrdinaryDamageBonusPercent;
 window.v173GetOrdinaryDamageMultiplier=getOrdinaryDamageMultiplier;
 window.v173GetEnemyPressureMultiplier=getEnemyPressureMultiplier;
@@ -12861,11 +12970,12 @@ function calculateDamage(
         ?Math.max(0,Number(bossOwner.getOutgoingDamageMultiplier(attacker))||0):1;
     const towerFactor=getTowerDirectDamageMultiplier(attacker,options);
     const budgetFactor=getDamageBudgetMultiplier(options);
+    const relicFactor=getRelicDirectDamageMultiplier(attacker,options.target||null,options);
     const randomFactor=0.95+Math.random()*0.10;
 
     const result=
         safeAttack*levelFactor*elementFactor*defenseFactor*
-        ordinaryFactor*criticalFactor*pressureFactor*bossDamageFactor*towerFactor*budgetFactor*randomFactor;
+        ordinaryFactor*criticalFactor*pressureFactor*bossDamageFactor*towerFactor*budgetFactor*relicFactor*randomFactor;
 
     if(!Number.isFinite(result)){ return 1; }
     return Math.max(1,Math.round(result));
@@ -13850,13 +13960,18 @@ function rollHitChance(
     directChanceBonusPercent,
     targetCharacter
 ){
-    return Math.random()*100<calculateHitChancePercent(
+    const roll=Math.random()*100;
+    const chance=calculateHitChancePercent(
         casterAccuracy,
         targetEvasion,
         directChanceReductionPercent,
         directChanceBonusPercent,
         targetCharacter
     );
+    const hit=roll<chance;
+    emitCombatEvent("hit_roll",{target:targetCharacter,roll,chance,hit,casterAccuracy,targetEvasion,
+        directChanceReductionPercent,directChanceBonusPercent});
+    return hit;
 }
 
 window.v173GetHitChancePercent=calculateHitChancePercent;
@@ -14135,7 +14250,8 @@ function rollStatusEffectHit(
     isLockdown,
     targetRank,
     targetBonusResistancePercent,
-    finalStatusBonusPercent
+    finalStatusBonusPercent,
+    targetEntity
 ){
 
     const chance=calculateStatusEffectChance(
@@ -14150,7 +14266,9 @@ function rollStatusEffectHit(
         finalStatusBonusPercent
     );
 
-    return Math.random()*100<chance;
+    const roll=Math.random()*100;
+    emitCombatEvent("status_roll",{target:targetEntity,roll,chance,arguments:[baseChancePercent,casterLevel,targetLevel,offensiveAttribute,targetStatusResistance,isLockdown,targetRank,targetBonusResistancePercent,finalStatusBonusPercent]});
+    return roll<chance;
 
 }
 
@@ -14616,7 +14734,7 @@ function rollNamedPersistentStatusEffect(
         duplicate:false,
         hit:guaranteedHit===true||(
             typeof rollStatusEffectHit==="function"&&
-            rollStatusEffectHit.apply(null,finalRollArguments)
+            rollStatusEffectHit.apply(null,Array.from({length:9},(_,index)=>finalRollArguments[index]).concat([entity]))
         )
     };
 }
@@ -14625,6 +14743,22 @@ window.v173PersistentStateNames=PERSISTENT_STATE_NAMES;
 window.v173GetPersistentStateName=getPersistentStateName;
 window.v173HasNamedPersistentState=hasNamedPersistentState;
 window.v173GetPersistentStateConflict=getPersistentStateConflict;
+
+/* General negative states are classified by the status owner, never by a
+   relic's arbitrary metadata scan. Mechanisms and protected states stay out. */
+const GENERAL_NEGATIVE_STATUS_TYPES=new Set([
+    "burn","poison","frostbite","freeze","petrify","stun","agilityDown",
+    "statDown","attackDown","defenseDown","accuracyDown","damageDown","relicSuppression"
+]);
+window.FourSymbolsStatusPolicy=Object.freeze({
+    isGeneralNegative(state){
+        return !!(state&&GENERAL_NEGATIVE_STATUS_TYPES.has(state.type)&&Number(state.turnsLeft)>0&&
+            !state.bossMechanism&&!state.mechanism&&!state.internal);
+    },
+    isCleanseable(state){
+        return this.isGeneralNegative(state)&&state.dispellable!==false&&state.uncleansable!==true;
+    }
+});
 window.v173CanApplyNamedPersistentState=canApplyNamedPersistentState;
 window.v173MarkPersistentStateName=markPersistentStateName;
 window.v173RollNamedPersistentStatusEffect=rollNamedPersistentStatusEffect;
@@ -14656,14 +14790,15 @@ function applyBurnEffect(monster,duration,percent){
         percent:percent
     },"burn");
     const burnSource=typeof window.v155GetCurrentDamageActor==="function"
-        ?window.v155GetCurrentDamageActor()
-        :null;
+        ?window.v155GetCurrentDamageActor()||(battleDurationAction&&battleDurationAction.entity)
+        :(battleDurationAction&&battleDurationAction.entity);
     if(burnSource){
         Object.defineProperty(burnState,"sourceActor",{
             value:burnSource,writable:true,configurable:true,enumerable:false
         });
     }
     monster.statusEffects.push(burnState);
+    emitCombatEvent("status_written",{target:monster,state:burnState});
 
     return true;
 
@@ -14699,6 +14834,7 @@ function applyFreezeEffect(monster,duration){
 
     const freezeState={type:"freeze",turnsLeft:duration};
     monster.statusEffects.push(markPersistentStateName(freezeState,"freeze"));
+    emitCombatEvent("status_written",{target:monster,state:freezeState});
 
     return true;
 
@@ -14773,6 +14909,7 @@ function applyMonsterDebuff(
         extraFields||{}
     );
     monster.statusEffects.push(markPersistentStateName(state,type));
+    emitCombatEvent("status_written",{target:monster,state:state});
 
     return true;
 
@@ -15696,7 +15833,7 @@ function tickStatusEffects(){
                             directShield.baseHp=Math.max(0,baseHp-burnDamage);
                             monster.hp=directShield.baseHp+remaining;
                         }else{
-                            monster.hp=Math.max(0,monster.hp-burnDamage);
+                            settleBattleHpDamage(monster,burnDamage,{attacker:effect.sourceActor,sourceType:"dot",damageKind:"dot"});
                         }
 
 
@@ -15842,12 +15979,7 @@ function tickStatusEffects(){
 
                         if(burnDamage>0){
                             const hpBeforeBurn=Math.max(0,Number(character.hp)||0);
-                            character.hp=
-                                Math.max(
-                                    0,
-                                    character.hp-
-                                    burnDamage
-                                );
+                            settleBattleHpDamage(character,burnDamage,{attacker:effect.sourceActor,sourceType:"dot",damageKind:"dot"});
                             battleStatisticsRecordDamageTakenByIndex(
                                 charIndex,
                                 Math.max(0,hpBeforeBurn-character.hp)
@@ -15937,7 +16069,11 @@ function rollCritical(character,category="physical",targetAntiCritPercent=0,targ
     if(ex){ chance+=Number(ex.critChanceBonusPercent)||0; multiplier+=(Number(ex.critDamageBonusPercent)||0)/100; }
     const rage=(character&&character.activeBuffs||[]).find(b=>b&&b.type==="rage");
     if(rage){ chance+=Number(rage.bonusPercent)||0; multiplier+=(Number(rage.bonusPercent)||0)/100; }
-    chance=Math.max(5,chance-Math.max(0,Number(targetAntiCritPercent)||0));
+    const relic=window.v174RelicDamageModifiers;
+    if(relic&&typeof relic.critBonus==="function"){
+        chance+=Number(relic.critBonus(character,getBattleDamageSource({attacker:character})))||0;
+    }
+    chance=Math.max(5,Math.min(CRIT_CHANCE_MAX,chance-Math.max(0,Number(targetAntiCritPercent)||0)));
     const isCrit=Math.random()*100<chance;
     if(isCrit){ battleStatisticsRecordCriticalByActor(character); }
     return {isCrit:isCrit,multiplier:isCrit?Math.min(CRIT_MULTIPLIER_MAX,multiplier):1};
@@ -16079,8 +16215,7 @@ function castDamageSkill(skillId){
     }
 
 
-    player.sp -=
-        skill.spCost;
+    spendActiveSkillSP(player,skill.spCost);
 
 
     lungePlayerCard();
@@ -16271,11 +16406,7 @@ function castDamageSkill(skillId){
 
         const hpBeforeDirectDamage=monster.hp;
 
-        monster.hp =
-            Math.max(
-                0,
-                monster.hp-damage
-            );
+        settleBattleHpDamage(monster,damage,{attacker:getDamageContextAttacker({})});
 
 
         showMonsterHit(
@@ -16709,7 +16840,7 @@ function castBuffSkill(skillId,targetIndex){
         return;
     }
 
-    player.sp-=skill.spCost;
+    spendActiveSkillSP(player,skill.spCost);
     lungePlayerCard();
     showSkillNameBadge(skill.name,skill.element);
     setTimeout(()=>{ showPlayerSpPopup(skill.spCost); },500);
@@ -16836,7 +16967,7 @@ function castHealSkill(skillId,targetIndex){
         return;
     }
 
-    player.sp-=skill.spCost;
+    spendActiveSkillSP(player,skill.spCost);
     lungePlayerCard();
     showSkillNameBadge(skill.name,skill.element);
     setTimeout(()=>{ showPlayerSpPopup(skill.spCost); },500);
@@ -17017,7 +17148,7 @@ function castReviveSkill(skillId,targetIndex){
     const targetCharacter=targetSlot.character;
     const targetIndexResolved=targetSlot.characterIndex;
 
-    player.sp-=skill.spCost;
+    spendActiveSkillSP(player,skill.spCost);
     lungePlayerCard();
     showSkillNameBadge(skill.name,skill.element);
     setTimeout(()=>{ showPlayerSpPopup(skill.spCost); },500);
@@ -17345,11 +17476,7 @@ function normalAttack(){
         );
 
 
-    monster.hp =
-        Math.max(
-            0,
-            monster.hp-damage
-        );
+    settleBattleHpDamage(monster,damage,{attacker:getDamageContextAttacker({})});
 
 
     showMonsterHit(
@@ -17483,11 +17610,7 @@ function windArrowAttack(){
         );
 
 
-    monster.hp =
-        Math.max(
-            0,
-            monster.hp-damage
-        );
+    settleBattleHpDamage(monster,damage,{attacker:getDamageContextAttacker({})});
 
 
     showMonsterHit(index,damage,"hp");
@@ -17521,6 +17644,12 @@ function windArrowAttack(){
 function finishPlayerAction(){
 
     battleStatisticsFinishAction();
+    if(interceptBattleActionFinish()){
+        return;
+    }
+    /* A captured skill follow-up is still the same Action. Publish its one
+       completion only after that owner releases, then honor relic effects
+       newly queued by the completion event before advancing the queue. */
     notifyBattleActionFinished();
     if(interceptBattleActionFinish()){
         return;
@@ -18310,6 +18439,7 @@ function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
             }
             else{
 
+                damage=applyPlayerDirectIncomingModifiers(targetCharacter,damage,{attacker:monster,skill:castSkillData});
                 const earthShieldBuff=(targetCharacter.activeBuffs||[]).find(buff=>
                     buff&&buff.type==="earthShield"&&Number(buff.turnsLeft)>0&&Number(buff.remainingBlocks)>0
                 );
@@ -18323,66 +18453,14 @@ function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
                     }
                 }
 
-                const shieldBuff=
-
-                    (targetCharacter.activeBuffs||[])
-                    .find(
-                        b=>
-
-                            b.type==="shield"&&
-                            b.turnsLeft>0 &&
-                            b.remaining>0
-
-                    );
-
-
-                if(damage>0 && shieldBuff){
-
-                    const absorbed=
-
-                        Math.min(
-                            damage,
-                            shieldBuff.remaining
-                        );
-
-
-                    shieldBuff.remaining-=
-                        absorbed;
-
-                    damage-=
-                        absorbed;
-
-
-                    if(absorbed>0){
-
-                        addBattleLog(
-                            "護盾吸收了"+
-                            absorbed+
-                            "點傷害（剩餘"+
-                            shieldBuff.remaining+
-                            "點）。"
-                        );
-
-                        showShieldAbsorb(
-                            targetIndex,
-                            absorbed
-                        );
-
-                    }
-
-                }
+                damage=absorbPlayerShields(targetCharacter,damage,targetIndex);
 
             }
 
 
             const hpBeforeDirectDamage=Math.max(0,Number(targetCharacter.hp)||0);
 
-            targetCharacter.hp=
-                Math.max(
-                    0,
-                    targetCharacter.hp-
-                    damage
-                );
+            settleBattleHpDamage(targetCharacter,damage,{attacker:monster,skill:castSkillData});
 
             const actualHpDamage=Math.max(0,hpBeforeDirectDamage-targetCharacter.hp);
 
@@ -18399,12 +18477,7 @@ function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
 
 
                 const hpBeforeReflect=Math.max(0,Number(monster.hp)||0);
-                monster.hp=
-                    Math.max(
-                        0,
-                        monster.hp-
-                        reflectDamage
-                    );
+                settleBattleHpDamage(monster,reflectDamage,{attacker:targetCharacter,sourceType:"reflect",damageKind:"reflect"});
                 battleStatisticsRecordDamageDealtByIndex(
                     targetIndex,
                     Math.max(0,hpBeforeReflect-monster.hp)
@@ -18689,6 +18762,7 @@ function applyPostBattleAutoRecovery(){
 
 
 function winBattle(){
+    emitCombatEvent("battle_end",{});
 
     if(!battleActive){
         return;
@@ -18956,6 +19030,7 @@ function checkAutoReturnToCity(){
 
 
 function loseBattle(){
+    emitCombatEvent("battle_end",{});
 
     if(!battleActive){
         return;
@@ -19190,6 +19265,7 @@ function resolveEscapeAttempt(characterIndex){
     addBattleLog("成功逃脫！");
     Promise.resolve(motion).then(()=>{
         const finishEscapeRoute=()=>{
+            emitCombatEvent("battle_end",{result:"escape"});
             if(window.v132ActiveDungeonRun&&typeof window.v132AbortDungeonBattle==="function"){
                 window.v132AbortDungeonBattle("escape");
             }else{
@@ -21179,7 +21255,7 @@ function secondaryCharacterNormalAttack(characterIndex,index){
             critMultiplier:critResult.multiplier
         }
     );
-    monster.hp=Math.max(0,monster.hp-damage);
+    settleBattleHpDamage(monster,damage,{attacker:getDamageContextAttacker({})});
 
     showMonsterHit(index,damage,"hp",critResult.isCrit);
     addBattleLog(
@@ -21236,7 +21312,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         return;
     }
 
-    character.sp-=spCost;
+    spendActiveSkillSP(character,spCost);
     lungePlayerCard(characterIndex);
     showSkillNameBadge(
         skill.name,skill.element,characterIndex,
@@ -21320,7 +21396,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
             critMultiplier:critResult.multiplier
         });
         const hpBeforeDirectDamage=monster.hp;
-        monster.hp=Math.max(0,monster.hp-damage);
+        settleBattleHpDamage(monster,damage,{attacker:getDamageContextAttacker({})});
 
         showMonsterHit(index,damage,"hp",critResult.isCrit);
         const actualDamageDealt=Math.max(0,hpBeforeDirectDamage-monster.hp);
@@ -21563,11 +21639,7 @@ function player2NormalAttack(index){
         );
 
 
-    monster.hp=
-        Math.max(
-            0,
-            monster.hp-damage
-        );
+    settleBattleHpDamage(monster,damage,{attacker:getDamageContextAttacker({})});
 
 
     showMonsterHit(
@@ -21709,7 +21781,7 @@ function castPlayer2Skill(skillId,centerIndex){
         return;
     }
 
-    player2.sp-=spCost;
+    spendActiveSkillSP(player2,spCost);
 
 
     lungePlayerCard(1);
@@ -21907,11 +21979,7 @@ function castPlayer2Skill(skillId,centerIndex){
 
         const hpBeforeDirectDamage=monster.hp;
 
-        monster.hp=
-            Math.max(
-                0,
-                monster.hp-damage
-            );
+        settleBattleHpDamage(monster,damage,{attacker:getDamageContextAttacker({})});
 
 
         showMonsterHit(
@@ -24296,6 +24364,44 @@ function showPlayerHit(amount,type,characterIndex,isPositive,isCrit){
    shield-popup），跟一般HP掉血的紅字明確區分開來，
    代表「這是護盾扛下來的量，不是真的扣血」。
 */
+/* Player shields share one source-aware storage, refresh and absorption owner. */
+function getPlayerShieldRemaining(character){
+    return (character&&character.activeBuffs||[]).reduce((sum,buff)=>sum+
+        (buff&&buff.type==="shield"&&Number(buff.turnsLeft)>0?Math.max(0,Number(buff.remaining)||0):0),0);
+}
+function applyPlayerShield(character,amount,options){
+    if(!character||Number(character.hp)<=0||!(Number(amount)>0)){ return null; }
+    const config=options||{};
+    character.activeBuffs=Array.isArray(character.activeBuffs)?character.activeBuffs:[];
+    const existing=character.activeBuffs.find(buff=>buff&&buff.type==="shield"&&
+        buff.sourceType===config.sourceType&&buff.sourceId===config.sourceId);
+    const shield=existing||{type:"shield"};
+    Object.assign(shield,{remaining:Math.floor(amount),amount:Math.floor(amount),
+        turnsLeft:config.durationRounds||Number.MAX_SAFE_INTEGER,
+        sourceType:config.sourceType,sourceId:config.sourceId,
+        statusName:config.statusName||"岩盾"});
+    if(!existing){ character.activeBuffs.push(shield); }
+    return shield;
+}
+function absorbPlayerShields(character,damage,targetIndex){
+    let remaining=Math.max(0,Number(damage)||0);
+    (character&&character.activeBuffs||[]).slice().forEach(shield=>{
+        if(remaining<=0||!shield||shield.type!=="shield"||Number(shield.turnsLeft)<=0||Number(shield.remaining)<=0){ return; }
+        const absorbed=Math.min(remaining,Number(shield.remaining));
+        shield.remaining-=absorbed;remaining-=absorbed;
+        showShieldAbsorb(targetIndex,absorbed);
+        if(shield.remaining<=0){
+            shield.turnsLeft=0;
+            character.activeBuffs=character.activeBuffs.filter(buff=>buff!==shield);
+            if(typeof window.v174RelicShieldBroken==="function"){
+                window.v174RelicShieldBroken(character,shield);
+            }
+        }
+    });
+    return remaining;
+}
+window.FourSymbolsPlayerShield=Object.freeze({apply:applyPlayerShield,absorb:absorbPlayerShields,remaining:getPlayerShieldRemaining});
+
 function showShieldAbsorb(characterIndex,absorbed){
 
     if(!absorbed || absorbed<=0){
@@ -34251,21 +34357,21 @@ try{
     const entries=[
         ["relic_qiankun_flask","乾坤玉壺","奇數回合結束時"],
         ["relic_sun_orb","烈陽神珠","偶數回合開始時"],
-        ["relic_xuanwu_seal","玄武靈印","每第3回合開始時"],
-        ["relic_soul_bell","鎮魂古鐘","每第4回合開始時"],
+        ["relic_xuanwu_seal","玄武靈印","開場與每第3回合開始時"],
+        ["relic_soul_bell","鎮魂古鐘","每第3回合開始時"],
         ["relic_tiangang_banner","天罡戰旗","我方累積受到6次敵方有效攻擊後"],
         ["relic_nine_dragon_fire","九龍神火罩","敵方累積完成7次有效行動後"],
         ["relic_cold_spring_jade","寒泉玉珮","任一我方角色HP由35%以上降至35%以下時"],
         ["relic_qinglan_feather","青嵐羽符","戰鬥開始時"],
-        ["relic_rock_mountain_seal","岩岳鎮印","開場；另於我方累積受8次有效攻擊時"],
+        ["relic_rock_mountain_seal","岩岳鎮印","開場每名存活隊友獲得2層岩甲"],
         ["relic_returning_wheel","回天寶輪","本場第一次有我方角色將受到致命傷害時"],
         ["relic_origin_talisman","太初聖符","每第4回合結束"],
-        ["relic_broken_army_scroll","破軍殘卷","角色攻擊／技能擊敗敵人後"],
+        ["relic_broken_army_scroll","破軍殘卷","角色普通攻擊／正式主動技能擊敗敵人後"],
         ["relic_red_sky_war_mark","赤霄戰紋","戰鬥開始時"],
         ["relic_ice_mirror_heart","玄冰鏡心","每第3回合結束"],
         ["relic_wind_chasing_talisman","追風行符","每第3回合開始"],
-        ["relic_mountain_river_cauldron","山河寶鼎","我方累積受7次有效攻擊後"],
-        ["relic_burning_star_mark","焚星殘印","偶數回合結束"],
+        ["relic_mountain_river_cauldron","山河寶鼎","本回合敵方造成實際HP損失達回合開場隊伍最大HP總和30%時"],
+        ["relic_burning_star_mark","焚星殘印","敵人HP由50%以上降至50%以下或相等且仍存活時"],
         ["relic_spirit_spring_bottle","靈泉法瓶","每第3回合結束"],
         ["relic_demon_suppressing_seal","伏魔金印","戰鬥開始；首次成功受到一般負面狀態"],
         ["relic_all_returning_array","萬象歸元盤","每第4回合開始"]

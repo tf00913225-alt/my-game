@@ -46,13 +46,17 @@ function bareDocument(){
 
 function load(overrides={}){
     const context=Object.assign({
-        window:null,console,Math,Date,Number,Object,Array,Set,Map,Promise,
+        window:null,console,Math,Date,Number,Object,Array,Set,Map,Promise,battleDurationAction:null,combatEventObservers:new Map(),combatDamageFacts:new WeakMap(),
         skillDatabase:skills(),document:bareDocument(),
         setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},
         currentBattleMonsters:[],monsters:[],battleToken:1,turn:1
     },overrides);
     context.window=context;
     vm.createContext(context);
+    for(const name of ["emitCombatEvent","getBattleDamageSource","getDamageContextAttacker","getFormalDamageContext","getCombatantHealthSnapshot","settleBattleHpDamage"]){
+        const start=coreSource.indexOf("function "+name+"(");assert.ok(start>=0,name);
+        vm.runInContext(coreSource.slice(start,coreSource.indexOf("\n}",start)+2),context);
+    }
     vm.runInContext(source,context);
     return context;
 }

@@ -60,10 +60,10 @@ function runtime({hp=[100,100,100],damage=10,shape="single",rank="regular",wrap=
     const math=Object.create(Math);math.random=()=>random;
     const noop=()=>{};
     const ctx={console,Math:math,Number,Object,Array,Set,Map,Promise,Date,
-        battleActive:true,battleToken:7,turn:1,currentZone:"qa",initiativeQueue:[],initiativeIndex:0,
+        battleActive:true,battleToken:7,turn:1,battleDurationAction:null,combatEventObservers:new Map(),combatDamageFacts:new WeakMap(),currentZone:"qa",initiativeQueue:[],initiativeIndex:0,
         monsters:[{id:"enemy",name:"enemy",hp:1000,alive:true,level:50,element:"fire",rank,sp:100,skillIds:[skillId],skillChance:1}],
         currentBattleMonsters:[0],skillDatabase:{[skillId]:{id:skillId,name:"烈焰爆擊",element:"fire",spCost:10,maxLevel:10,category:"physical",targetType:shape,followUpOnCriticalOrDefeat:true,followUpMaxCasts:maxCasts}},
-        getExistingPartyIndexes:()=>party.map((_,i)=>i),getPartyCharacterByIndex:i=>party[i],getPartyBattleStats:()=>({evasion:0,antiCrit:0,defense:0}),
+        getPartyCharacterIndex:e=>party.indexOf(e),getExistingPartyIndexes:()=>party.map((_,i)=>i),getPartyCharacterByIndex:i=>party[i],getPartyBattleStats:()=>({evasion:0,antiCrit:0,defense:0}),
         canSelectHostileBattlePrimary:(_,i)=>party[i].hp>0&&!party[i].stealth,
         resolveBattlefieldTargets:(_,i,type)=>type==="single"?[i]:party.map((_,j)=>j),
         normalizeBattleTargetType:x=>x,getEffectiveSkillTargetType:s=>s.targetType,
@@ -72,7 +72,7 @@ function runtime({hp=[100,100,100],damage=10,shape="single",rank="regular",wrap=
         getActiveRageCriticalBonuses:()=>({damage:0}),getMonsterCriticalChance:()=>critical?100:0,rollHitChance:()=>true,
         CRIT_CHANCE_MIN_AFTER_ANTI_CRIT:1,CRIT_MULTIPLIER_MAX:3,
         calculateSkillDamage:()=>damage,calculateDamage:()=>damage,hasActiveBuff:()=>false,
-        applySkillDebuffEffectsToPlayer:noop,getMonsterEffectiveAbilityPoints:()=>0,
+        showMissEffect:noop,showShieldAbsorb:noop,applySkillDebuffEffectsToPlayer:noop,getMonsterEffectiveAbilityPoints:()=>0,
         showPlayerHit:(amount,resource,index)=>hits.push(index),showMonsterSkillNameBadge:(...args)=>badges.push(args),
         addBattleLog:message=>logs.push(message),updateUI:noop,lungeMonsterCard:noop,
         document:{getElementById:()=>null,querySelectorAll:()=>[],readyState:"complete"},
@@ -81,7 +81,7 @@ function runtime({hp=[100,100,100],damage=10,shape="single",rank="regular",wrap=
         FourSymbolsBattleFlow:{interceptActionFinish(fn){interceptors.push(fn);return ()=>interceptors.splice(interceptors.indexOf(fn),1);}}
     };
     ctx.window=ctx;vm.createContext(ctx);
-    for(const name of ["createEnemyActionTargetSnapshot","isEnemyActionTargetSnapshotCurrent","resolveEnemyActionTargets","retargetEnemyFollowUpSnapshot"]){
+    for(const name of ["emitCombatEvent","getBattleDamageSource","getDamageContextAttacker","getFormalDamageContext","getCombatantHealthSnapshot","settleBattleHpDamage","isPartyDamageTarget","applyPlayerDirectIncomingModifiers","absorbPlayerShields","createEnemyActionTargetSnapshot","isEnemyActionTargetSnapshotCurrent","resolveEnemyActionTargets","retargetEnemyFollowUpSnapshot"]){
         if(main.includes("function "+name+"("))vm.runInContext(declaration(name),ctx);
     }
     vm.runInContext(declaration("processSingleMonsterAttack"),ctx);
@@ -139,4 +139,18 @@ test("tri geometry is resolved anew around retargeted primary",()=>{
 test("originally hidden primary candidate stays outside fallback after becoming visible",()=>{
     const r=runtime({hp:[5,100,100]});r.party[1].stealth=true;const snapshot=r.plan();r.party[1].stealth=false;
     r.ctx.processSingleMonsterAttack(0,7,snapshot);r.flush();assert.deepEqual(r.hits,[0,2]);assert.equal(r.party[1].hp,100);
+});
+
+test("canonical incoming modifier excludes MISS and full Barrier before source-aware Shield absorption",()=>{
+    for(const outcome of ["miss","barrier","shield","hit"]){
+        const r=runtime({wrap:false,critical:false,damage:10});let incoming=0;
+        r.ctx.combatEventObservers.set("incoming_direct",new Set([()=>incoming++]));
+        if(outcome==="miss")r.ctx.rollHitChance=()=>false;
+        if(outcome==="barrier")r.ctx.hasActiveBuff=()=>true;
+        if(outcome==="shield")r.party[0].activeBuffs.push({type:"shield",sourceType:"skill",sourceId:"other",turnsLeft:2,remaining:30});
+        r.ctx.processSingleMonsterAttack(0,7);r.flush();
+        assert.equal(incoming,["miss","barrier"].includes(outcome)?0:1,outcome);
+        assert.equal(r.party[0].hp,outcome==="hit"?90:100,outcome);
+        if(outcome==="shield")assert.equal(r.party[0].activeBuffs[0].remaining,20);
+    }
 });

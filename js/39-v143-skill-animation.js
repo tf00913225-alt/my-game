@@ -854,6 +854,21 @@
     }
 
     function normalizedStatusEntry(entry,kind){
+        if(entry&&entry.sourceType==="relic"){
+            const parts=[];
+            const labels={attackPercent:"攻擊",defensePercent:"防禦",evasionPercent:"最終閃避",resistancePercent:"最終異常抗性",ordinaryDamagePercent:"普通攻擊／主動技能直接傷害",critPercent:"最終爆擊",skillFinalPercent:"主動技能直接最終傷害"};
+            Object.keys(labels).forEach(key=>{if(Number(entry[key])){parts.push(labels[key]+" +"+entry[key]+"%");}});
+            if(Number(entry.damageReductionPercent)){parts.push("受到直接傷害 -"+entry.damageReductionPercent+"%");}
+            if(entry.type==="relicArmor"){parts.push("剩餘 "+entry.charges+" 層，每敵方直接行動最多耗1層");}
+            if(entry.type==="relicInsurance"){parts.push("下一個成功寫入的可淨化負面立即解除");}
+            if(entry.sourceId==="wind_cycle_window"){parts.push("本回合首次完成主動技能返還實際SP消耗");}
+            if(entry.type==="relicSuppression"){parts.push("直接最終傷害 -"+entry.finalDamageReductionPercent+"%、最終命中 -"+entry.finalHitReductionPercent+"%");}
+            if(entry.type==="shield"){parts.push("剩餘護盾 "+Math.ceil(Math.max(0,Number(entry.remaining)||0)));}
+            const turns=Math.max(0,Number(entry.turnsLeft)||0),persistent=turns>9999;
+            return Object.freeze({type:entry.type,name:entry.statusName||"秘寶",iconSrc:entry.iconSrc||RAW_STATUS_VISUALS.shield.iconSrc,
+                effect:parts.join("、")||"秘寶效果生效中",turnsLeft:persistent?null:Math.ceil(turns),
+                remainingText:entry.untilNextAction?"至下一次行動開始":persistent?"觸發／耗盡後消失":Math.ceil(turns)+" 回合",kind});
+        }
         const type=statusVisualTypeForEntry(entry);
         if(!type){ return null; }
         const spec=RAW_STATUS_VISUALS[type];

@@ -12,6 +12,7 @@ function createForestOpeningRoundRules(player,stats,enemy,random){
     const getStatDownPercentFor=()=>0;
     const currentBattleMonsters=[0];
     const monsters=[enemy];
+    const combatEventObservers=new Map();
 const HIT_CHANCE_BASE = 95;
 
 const HIT_CHANCE_MIN_PERCENT = 5;
@@ -167,13 +168,23 @@ function rollHitChance(
     directChanceBonusPercent,
     targetCharacter
 ){
-    return Math.random()*100<calculateHitChancePercent(
+    const roll=Math.random()*100;
+    const chance=calculateHitChancePercent(
         casterAccuracy,
         targetEvasion,
         directChanceReductionPercent,
         directChanceBonusPercent,
         targetCharacter
     );
+    const hit=roll<chance;
+    emitCombatEvent("hit_roll",{target:targetCharacter,roll,chance,hit,casterAccuracy,targetEvasion,
+        directChanceReductionPercent,directChanceBonusPercent});
+    return hit;
+}
+
+function emitCombatEvent(type,event){
+    (combatEventObservers.get(type)||[]).forEach(observer=>observer(event));
+    return event;
 }
 
         const rollBeginnerForestNormalAttackDamage=function(){

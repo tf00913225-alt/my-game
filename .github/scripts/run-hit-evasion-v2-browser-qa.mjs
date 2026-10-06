@@ -102,9 +102,9 @@ const expression=`(async()=>{
         characterSkillLoadouts.fire.skillLevels.windEX=0;player.statusEffects=[];await endBattle();
     }
     const bell=[];
-    for(const level of [10,20]){
+    for(const level of [1,10,20]){
         Object.assign(relicOwned.relic_soul_bell,{unlocked:true,level});loadout.relicId="relic_soul_bell";
-        await freshMonsters();await waitRelic();turn=4;v174RelicDebugDispatch("round_start",{sourceType:"system"});
+        await freshMonsters();await waitRelic();turn=3;notifyBattleRoundBoundary("round_start",battleToken);
         bell.push({accuracy:monsters[0].accuracy,reduction:getFinalHitReductionPercent(monsters[0]),hit:calculateHitChancePercent(monsters[0].accuracy,0,getFinalHitReductionPercent(monsters[0]),0)});
         await endBattle();
     }
@@ -182,7 +182,7 @@ try{
     assert.ok(evidence.tower.length>0&&evidence.tower.every(v=>v===15));
     assert.equal(evidence.frostbite,15);assert.deepEqual(evidence.feather,[[8,8],[10,10],[12,12]]);assert.deepEqual(evidence.relicFrostbite,[[0,0],[0,0],[0,0]]);
     assert.deepEqual(evidence.featherWind,[[48,48],[50,50],[52,52]],"low Wind EX + relic - Frostbite applies once");
-    assert.deepEqual(evidence.bell,[{accuracy:0,reduction:5,hit:90},{accuracy:0,reduction:8,hit:87}]);
+    assert.deepEqual(evidence.bell,[{accuracy:0,reduction:4,hit:91},{accuracy:0,reduction:6,hit:89},{accuracy:0,reduction:8,hit:87}]);
     for(const values of Object.values(evidence.casts))assert.deepEqual(values,[5,10,15,20,25].map(value=>({value,duration:3,accuracy:0})));
     assert.deepEqual(evidence.blessing,{applied:true,evasion:15,duration:2});
     for(const [mode,calls] of Object.entries(evidence.combat)){assert.ok(calls.length>0,mode+" reaches shared Hit Owner");assert.ok(calls.every(call=>call.chance>=5&&call.chance<=99));}

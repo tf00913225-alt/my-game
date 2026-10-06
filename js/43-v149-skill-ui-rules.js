@@ -238,9 +238,11 @@
     }
 
     function snapshotHasDefeat(snapshot){
-        return (snapshot||[]).some(entry=>
-            entry.wasAlive&&(!entry.monster||entry.monster.alive===false||numeric(entry.monster.hp)<=0)
-        );
+        return (snapshot||[]).some(entry=>{
+            if(!entry.wasAlive||!entry.monster||(entry.monster.alive!==false&&numeric(entry.monster.hp)>0)){return false;}
+            const facts=window.FourSymbolsCombatEvents&&window.FourSymbolsCombatEvents.lastDamageFor(entry.monster);
+            return !facts||facts.sourceType==="activeSkill";
+        });
     }
 
     function invokeTrackedPlayerSkill(options,freeCast){

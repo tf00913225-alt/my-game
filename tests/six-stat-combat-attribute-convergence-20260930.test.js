@@ -36,7 +36,7 @@ const context=vm.createContext({
     getDamageLevelMultiplier:()=>1,getDamageContextAttacker:()=>null,getElementalDamageMultiplier:()=>1,DAMAGE_FORMULA_BASE_CONSTANT:400,DAMAGE_FORMULA_PER_TARGET_LEVEL:10,
     getOrdinaryDamageMultiplier:()=>1,getEnemyPressureMultiplier:()=>1,getDamageBudgetMultiplier:()=>1
 });
-const names=["getBaseStats","getEquipmentBonus","getEffectivePlayerAbilityPoints","calculateCharacterBaseStats","getMainCharacterStats","getWindEXFinalEvasionBonusPercent","getRelicFinalEvasionPercent","getPartyCharacterIndex","migrateLegacySixStats","migrateLegacyEquipmentStats","getMonsterEvasion","getMonsterAccuracy","getMonsterEffectiveDefense","calculateHealingAmount","getDamageFormulaConstant","getTowerDirectDamageMultiplier","calculateDamage"];
+const names=["projectRelicBattleStats","getRelicDirectDamageMultiplier","getBaseStats","getEquipmentBonus","getEffectivePlayerAbilityPoints","calculateCharacterBaseStats","getMainCharacterStats","getWindEXFinalEvasionBonusPercent","getRelicFinalEvasionPercent","getPartyCharacterIndex","migrateLegacySixStats","migrateLegacyEquipmentStats","getMonsterEvasion","getMonsterAccuracy","getMonsterEffectiveDefense","calculateHealingAmount","getDamageFormulaConstant","getTowerDirectDamageMultiplier","calculateDamage"];
 const gemOwner=main.slice(main.indexOf("const EQUIPMENT_SOCKET_CAPACITY="),main.indexOf("window.FourSymbolsEquipmentGems="));
 vm.runInContext(gemOwner+"\n"+names.map(name=>extractFunction(main,name)).join("\n"),context);
 const base=context.getBaseStats();

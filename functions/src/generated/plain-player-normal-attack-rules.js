@@ -152,12 +152,28 @@ function getDamageContextAttacker(options){
     return window.v149CurrentDamageActor||null;
 }
 
+function getBattleDamageSource(options){
+    const context=options||{};
+    const cast=window.FourSymbolsSkillDamageContext;
+    if(context.sourceType){ return context.sourceType; }
+    if(context.damageKind&&context.damageKind!=="direct"){ return context.damageKind; }
+    if(cast&&(!context.attacker||context.attacker===cast.attacker)){
+        return cast.freeCast?"followUp":"activeSkill";
+    }
+    if(context.skill&&context.skill.v149FreeFollowUp){ return "followUp"; }
+    return context.skill?"activeSkill":"normalAttack";
+}
+
 function getOrdinaryDamageBonusPercent(options){
     const resolved=options&&typeof options==="object"?options:{};
     const attacker=getDamageContextAttacker(resolved);
     const target=resolved.target||null;
     const skill=resolved.skill||null;
     let total=0;
+    const relic=window.v174RelicDamageModifiers;
+    if(relic&&typeof relic.ordinaryBonus==="function"){
+        total+=Number(relic.ordinaryBonus(attacker,getBattleDamageSource(resolved)))||0;
+    }
 
     if(attacker&&typeof getElementDamagePassiveMultiplier==="function"){
         total+=(Math.max(0,Number(getElementDamagePassiveMultiplier(attacker))||1)-1)*100;
@@ -244,6 +260,19 @@ function getTowerDirectDamageMultiplier(attacker,damageOptions){
         ?Math.max(1,Number(attacker.vTowerDirectDamageMultiplier)||1):1;
 }
 
+function getRelicDirectDamageMultiplier(attacker,target,options){
+    const context=options||{};
+    if(String(context.damageKind||"direct")!=="direct"||
+        ["relic","dot","reflect","environment","self","hpCost"].includes(context.sourceType)||
+        (attacker&&attacker.vGameplayBossObject===true)){ return 1; }
+    const owner=window.v174RelicDamageModifiers;
+    if(!owner){ return 1; }
+    const outgoing=typeof owner.outgoingReduction==="function"?Number(owner.outgoingReduction(attacker))||0:0;
+    void target;
+    const skillFinal=typeof owner.skillFinalBonus==="function"?Number(owner.skillFinalBonus(attacker,getBattleDamageSource(context)))||0:0;
+    return (1-Math.max(0,Math.min(100,outgoing))/100)*(1+Math.max(0,skillFinal)/100);
+}
+
 function calculateDamage(
     attack,
     defense,
@@ -273,11 +302,12 @@ function calculateDamage(
         ?Math.max(0,Number(bossOwner.getOutgoingDamageMultiplier(attacker))||0):1;
     const towerFactor=getTowerDirectDamageMultiplier(attacker,options);
     const budgetFactor=getDamageBudgetMultiplier(options);
+    const relicFactor=getRelicDirectDamageMultiplier(attacker,options.target||null,options);
     const randomFactor=0.95+Math.random()*0.10;
 
     const result=
         safeAttack*levelFactor*elementFactor*defenseFactor*
-        ordinaryFactor*criticalFactor*pressureFactor*bossDamageFactor*towerFactor*budgetFactor*randomFactor;
+        ordinaryFactor*criticalFactor*pressureFactor*bossDamageFactor*towerFactor*budgetFactor*relicFactor*randomFactor;
 
     if(!Number.isFinite(result)){ return 1; }
     return Math.max(1,Math.round(result));
@@ -319,7 +349,11 @@ function rollCritical(character,category="physical",targetAntiCritPercent=0,targ
     if(ex){ chance+=Number(ex.critChanceBonusPercent)||0; multiplier+=(Number(ex.critDamageBonusPercent)||0)/100; }
     const rage=(character&&character.activeBuffs||[]).find(b=>b&&b.type==="rage");
     if(rage){ chance+=Number(rage.bonusPercent)||0; multiplier+=(Number(rage.bonusPercent)||0)/100; }
-    chance=Math.max(5,chance-Math.max(0,Number(targetAntiCritPercent)||0));
+    const relic=window.v174RelicDamageModifiers;
+    if(relic&&typeof relic.critBonus==="function"){
+        chance+=Number(relic.critBonus(character,getBattleDamageSource({attacker:character})))||0;
+    }
+    chance=Math.max(5,Math.min(CRIT_CHANCE_MAX,chance-Math.max(0,Number(targetAntiCritPercent)||0)));
     const isCrit=Math.random()*100<chance;
     if(isCrit){ battleStatisticsRecordCriticalByActor(character); }
     return {isCrit:isCrit,multiplier:isCrit?Math.min(CRIT_MULTIPLIER_MAX,multiplier):1};

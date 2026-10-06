@@ -358,7 +358,7 @@
             return stop(skill.name+"的目標無法接受效果。");
         }
 
-        character.sp-=cost;
+        spendActiveSkillSP(character,cost);
         lungePlayerCard(characterIndex);
         showSkillNameBadge(skill.name,skill.element,characterIndex);
         setTimeout(()=>showPlayerSpPopup(cost,characterIndex),500);

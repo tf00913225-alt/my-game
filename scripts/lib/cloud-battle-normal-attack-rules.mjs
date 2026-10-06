@@ -8,9 +8,9 @@ const hash=value=>createHash('sha256').update(value).digest('hex');
 const functions=[
   'getEffectivePlayerAbilityPoints','calculateCharacterBaseStats',
   'getDamageFormulaConstant','getDamageLevelMultiplier','getElementalDamageMultiplier',
-  'getDamageContextAttacker','getOrdinaryDamageBonusPercent','getOrdinaryDamageMultiplier',
+  'getDamageContextAttacker','getBattleDamageSource','getOrdinaryDamageBonusPercent','getOrdinaryDamageMultiplier',
   'isPartyDamageTarget','getEnemyPressureMultiplier','getDamageBudgetMultiplier',
-  'getTowerDirectDamageMultiplier','calculateDamage','calculateHitChancePercent',
+  'getTowerDirectDamageMultiplier','getRelicDirectDamageMultiplier','calculateDamage','calculateHitChancePercent',
   'getCriticalStatPoints','rollCritical'
 ];
 const constants=[
