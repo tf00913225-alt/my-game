@@ -109,6 +109,19 @@ for(const [label,key] of [["HP","maxHP"],["SP","maxSP"],["攻擊","attackPoints"
 }
 assert.notEqual(rows["攻擊"],String(equipped.attack));
 assert.notEqual(rows["防禦"],String(equipped.defense));
+const v141=fs.readFileSync("js/34-v141-core-systems.js","utf8");
+assert.doesNotMatch(v141,/getEquipmentBonus\s*=/,"V141 must not add reforgeStats a second time after the canonical equipment owner");
+const expansion=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
+const setOwner=expansion.slice(expansion.indexOf("    function getEquipmentSetCounts("),expansion.indexOf('    if(typeof getElementDamagePassiveMultiplier==="function")'));
+vm.runInContext(setOwner,context);
+context.characterEquipment.fire.hand.setId="test-set";
+context.characterEquipment.fire.head={setId:"test-set",stats:{}};
+context.characterEquipment.fire.armor={setId:"test-set",stats:{}};
+const withSet=context.getMainCharacterStats();
+for(const key of ["attackPoints","defensePoints","intelligence","vitality","energy","agility"]){
+    assert.equal(withSet[key],equipped[key]+1,"existing three-piece set points remain in the formal owner: "+key);
+}
+assert.equal(withSet.evasion,equipped.evasion+2,"independent set Evasion is preserved");
 context.characterEquipment.fire=originalEquipment;
 assert.match(detailSource,/\["HP",stats\.maxHP\]/,"character detail keeps Max HP");
 assert.match(detailSource,/\["SP",stats\.maxSP\]/,"character detail keeps Max SP");
