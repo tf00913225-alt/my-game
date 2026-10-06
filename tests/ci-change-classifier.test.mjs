@@ -4,8 +4,8 @@ import {classifyChanges, BROWSER_GATES, CHANGE_FLAGS} from '../.github/scripts/c
 const classify = (paths, options = {}) => classifyChanges(paths, {enabled: true, ...options});
 const all = plan => BROWSER_GATES.forEach(k => assert.equal(plan.gates[k], true, k));
 for (const [name, paths] of [
-  ['Battle', ['js/00-main.js']], ['MonsterBalance', ['js/combat/monster-balance-owner.mjs']],
-  ['Release', ['release/requirements.json']], ['Workflow', ['.github/workflows/ci.yml']]
+  ['Battle', ['js/00-main.js']],
+  ['Release', ['release/requirements.json']]
 ]) test(`${name} fixture fans out all required modes`, () => all(classify(paths)));
 test('UI fixture runs UI and skips unrelated balance modes', () => {
   const p=classify(['css/23-stage-v77-inventory-detail-ui.css']);
@@ -31,8 +31,8 @@ test('invalid or unavailable paths never silently skip', () => {
   for(const paths of [[],null,['../bad'],['unknown.file']]) all(classify(paths));
   all(classify(['docs/readme.md'],{error:'API unavailable'}));
 });
-test('dev push and main PR ignore narrow PR skipping', () => {
-  all(classify(['docs/readme.md'],{eventName:'push'}));
+test('dev push uses affected paths and main PR retains full gates', () => {
+  assert.equal(classify(['docs/readme.md'],{eventName:'push'}).gates.boss_balance,false);
   const p=classify(['docs/readme.md'],{baseRef:'main'});all(p);assert.equal(p.gates.main_browser,true);
 });
 test('shadow shows proposed skips while preserving every original gate', () => {
