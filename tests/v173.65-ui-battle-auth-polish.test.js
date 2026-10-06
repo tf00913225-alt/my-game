@@ -11,7 +11,7 @@ assert.doesNotMatch(boss,/boss-mechanism-card|boss-mechanism-slot/);
 const battle=read("js/54-v173.51-battle-qa.js");
 const fixedBattle=read("css/fixed-slot-battlefield-rendering-v2.css");
 assert.doesNotMatch(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?position:absolute!important/);
-assert.match(fixedBattle,/v-fixed-ally-slot > \.battle-player > \.v174-battle-art\{[\s\S]*?background-size:contain !important/);
+assert.match(fixedBattle,/v-fixed-ally-slot > \.battle-player > \.v174-battle-art\{[\s\S]*?background-size:var\(--portrait-background-size, contain\) !important/);
 assert.match(fixedBattle,/v-fixed-enemy-slot \.monster-hp,[\s\S]*?bottom:26px !important/);
 assert.match(fixedBattle,/v-fixed-enemy-slot \.monster-sp,[\s\S]*?bottom:15px !important/);
 

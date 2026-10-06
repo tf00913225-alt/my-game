@@ -294,9 +294,16 @@ async function runProductionAdventureBalanceQa(){
             const card=document.getElementById('battleMonster'+i),art=card?.querySelector('.v174-battle-art');
             check(card?.dataset.slot===slots[i]&&art,'actual slot and artwork');
             check(card.querySelector('.monster-hp-inner')&&card.querySelector('.monster-sp-inner'),'HP/SP UI');
-            const portrait=v154ResolveMonsterPortraitRecord(m);if(portrait.temporary)evidence.portraitGaps.push({name:m.name,portrait});
-            const url=getComputedStyle(art).backgroundImage.split('url(')[1]?.split(')')[0].replaceAll('"','').replaceAll("'",'');check(url,'visible portrait URL');
-            const image=new Image();image.src=url;await image.decode();check(image.naturalWidth>0,'portrait decode');evidence.decodedPortraits.push({name:m.name,url,width:image.naturalWidth,height:image.naturalHeight});
+            const portrait=v154ResolveMonsterPortraitRecord(m);
+            if(portrait.generic){
+              evidence.portraitGaps.push({name:m.name,portrait});
+              check(portrait.requestedPortraitKey===m.monsterKey&&portrait.fallbackReason==='planned','registered planned identity');
+              check(art.classList.contains('v174-generic-portrait')&&getComputedStyle(art).backgroundImage==='none','visible neutral fallback without wrong monster image');
+              check(getComputedStyle(art,'::before').content.includes('◇'),'generic fallback rendered');
+            }else{
+              const url=getComputedStyle(art).backgroundImage.split('url(')[1]?.split(')')[0].replaceAll('"','').replaceAll("'",'');check(url,'visible portrait URL');
+              const image=new Image();image.src=url;await image.decode();check(image.naturalWidth>0,'portrait decode');evidence.decodedPortraits.push({name:m.name,url,width:image.naturalWidth,height:image.naturalHeight});
+            }
           }
           window.adventureBalanceQaCapture=node.encounterId+'-'+sceneIndex;
           let maxTurn=1;const events=[],castSkills=[];
