@@ -24227,8 +24227,12 @@ function absorbPlayerShields(character,damage,targetIndex){
         const absorbed=Math.min(remaining,Number(shield.remaining));
         shield.remaining-=absorbed;remaining-=absorbed;
         showShieldAbsorb(targetIndex,absorbed);
-        if(shield.remaining<=0&&typeof window.v174RelicShieldBroken==="function"){
-            window.v174RelicShieldBroken(character,shield);
+        if(shield.remaining<=0){
+            shield.turnsLeft=0;
+            character.activeBuffs=character.activeBuffs.filter(buff=>buff!==shield);
+            if(typeof window.v174RelicShieldBroken==="function"){
+                window.v174RelicShieldBroken(character,shield);
+            }
         }
     });
     return remaining;
