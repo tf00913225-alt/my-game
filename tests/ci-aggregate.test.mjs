@@ -88,6 +88,25 @@ test('public barrier waits for every required child; deployment only follows bar
   assert.match(text.split('\n  deploy_dev:')[1], /needs: verify/);
 });
 
+test('dev deployment survives legitimate ancestor skips but rejects failed validation and cancellation', () => {
+  const workflow=fs.readFileSync(new URL('../.github/workflows/ci.yml',import.meta.url),'utf8');
+  const deployment=workflow.split('\n  deploy_dev:')[1];
+  const expression=deployment.match(/if: \$\{\{ (.+) \}\}/)[1];
+  assert.match(expression,/!cancelled\(\)/,'explicit status function overrides implicit success() ancestor skip propagation');
+  const eligible=new Function('cancelled','needs','github',`return ${expression};`);
+  const github={event_name:'push',ref:'refs/heads/dev'};
+  const needs={verify:{result:'success'},promotion_health:{result:'skipped'}};
+  assert.equal(eligible(()=>false,needs,github),true);
+  for(const result of ['failure','cancelled','skipped','neutral','queued',undefined]) {
+    assert.equal(eligible(()=>false,{...needs,verify:{result}},github),false,result);
+  }
+  assert.equal(eligible(()=>true,needs,github),false);
+  for(const event_name of ['pull_request','workflow_dispatch','schedule']) {
+    assert.equal(eligible(()=>false,needs,{...github,event_name}),false,event_name);
+  }
+  assert.equal(eligible(()=>false,needs,{...github,ref:'refs/heads/main'}),false);
+});
+
 test('isolated Tower runner prepares the directory required by its existing TTK writer', () => {
   const text = fs.readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
   const tower = text.split('\n  tower_wild_browser:')[1].split('\n  portrait_browser:')[0];

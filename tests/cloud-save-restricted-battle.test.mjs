@@ -12,7 +12,7 @@ const {assembleCanonicalSnapshot,claimRecordsDigest:digest}=require('../function
 const {createRecoveryArchive}=require('../functions/src/canonical-recovery-archive');
 const uid='restricted-instance-user',attemptId='restricted-preparation-0001',operationId='restricted-instance-0001';
 const sessionId='s'.repeat(32);
-function fixture({mutate=()=>{},retry=false,enemy='wild.zone-01.fire-01'}={}){
+function fixture({mutate=()=>{},retry=false,sentinel=false,entropy=.999999,enemy='wild.zone-01.fire-01'}={}){
   const records=makeInitialCharacterSources(uid,2,'restricted-initial-source-0001',{
     displayName:'場次英雄',element:'fire',gender:'male',
     attributes:{attack:10,intelligence:0,vitality:0,energy:0,defensePoints:0,agility:0}});
@@ -22,25 +22,27 @@ function fixture({mutate=()=>{},retry=false,enemy='wild.zone-01.fire-01'}={}){
     [`${root}/playableSnapshots/2`,snapshot],[`${root}/recoveryArchives/2`,createRecoveryArchive(uid,2,records,snapshot)],
     [`users/${uid}/saves/current`,{serverRevision:2,authoritativeStateReady:false}]]);
   const collection=p=>({doc:id=>({path:`${p}/${id}`,collection:n=>collection(`${p}/${id}/${n}`)})});
-  let clock=1000,writes=0,abort=false,active=sessionId;
+  let clock=1000,writes=0,entropyCalls=0,clockReads=0,expireOnRead=0,abort=false,active=sessionId;
   class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
-  const deps={db:{collection},FieldValue:{serverTimestamp:()=>({toMillis:()=>123})},HttpsError,now:()=>clock,
+  const deps={db:{collection},FieldValue:{serverTimestamp:()=>sentinel?{serverTransform:true}:{toMillis:()=>123}},HttpsError,now:()=>{clockReads++;if(expireOnRead===clockReads)clock=601000;return clock;},randomBytes:n=>{entropyCalls++;const b=Buffer.alloc(n);
+      for(let i=0;i<n;i+=6)b.writeUIntBE(Math.floor(entropy*281474976710656),i,6);return b;},
     inspectExistingEnvelope:v=>({kind:'current',data:v,serverRevision:v.serverRevision}),
     runProtected:async(request,fn)=>{
       if(request.data.uid!==uid)throw new HttpsError('permission-denied','wrong UID');
       const call=async()=>{const pending=[];
         const tx={get:async ref=>({exists:data.has(ref.path),data:()=>data.get(ref.path)}),
           create:(ref,v)=>{assert.equal(data.has(ref.path),false);const {createdAt,...body}=v;
-            pending.push([ref.path,{...structuredClone(body),createdAt}]);}};
+            pending.push([ref.path,{...structuredClone(body),createdAt}]);},
+          update:(ref,v)=>{assert.equal(data.has(ref.path),true);pending.push([ref.path,{...data.get(ref.path),...structuredClone(v)}]);}};
         const result=await fn(tx,{uid,sessionId:active});return {pending,result};};
       if(retry)await call();
       const {pending,result}=await call();if(abort)throw Error('interrupted instance transaction');
-      for(const [p,v] of pending)data.set(p,v);writes+=pending.length;return result;
+      for(const [p,v] of pending)data.set(p,v.createdAt?.serverTransform?{...v,createdAt:{toMillis:()=>123}}:v);writes+=pending.length;return result;
     }};
   const owner=createCanonicalRestrictedBattle(deps),request={data:{uid,session:{}}};
   const args={attemptId,operationId,expectedRevision:2};
-  return {data,root,records,snapshot,args,request,owner,get writes(){return writes;},
-    set clock(v){clock=v;},set abort(v){abort=v;},set session(v){active=v;},
+  return {data,root,records,snapshot,args,request,owner,newOwner:()=>createCanonicalRestrictedBattle(deps),get writes(){return writes;},get entropyCalls(){return entropyCalls;},
+    set clock(v){clock=v;},set expireOnRead(v){expireOnRead=v;clockReads=0;},set abort(v){abort=v;},set session(v){active=v;},
     seed:async()=>{await createCanonicalBattleAttempt(deps).begin(request,{operationId:attemptId,expectedRevision:2});
       clock=1001;await createCanonicalBattleEncounter(deps).seal(request,{attemptId,
         operationId:'restricted-encounter-0001',expectedRevision:2,encounterKey:enemy});clock=1002;},
@@ -71,7 +73,7 @@ for(const enemy of ['wild.zone-01.fire-01','wild.zone-01.water-01']){
     assert.equal(result.initialState,undefined);assert.equal(result.randomTape,undefined);
     for(const [p,v] of before)assert.deepEqual(h.data.get(p),v);
     assert.deepEqual(await h.begin(),{...result,unchanged:true});assert.equal(h.writes,11);
-    assert.equal(h.owner.advance,undefined);assert.equal(h.owner.complete,undefined);
+    assert.equal(typeof h.owner.advance,'function');assert.equal(h.owner.complete,undefined);
   });
 }
 test('transaction retries and interrupted commits cannot produce partial instance evidence',async()=>{
@@ -152,6 +154,117 @@ test('wrong UID, original missing source and operation ID collisions fail before
 });
 test('no callable, gameplay integration, entropy or reward path is exposed',()=>{
   const source=fs.readFileSync('functions/src/canonical-restricted-battle.js','utf8');
-  assert.doesNotMatch(source,/onCall\(|tx\.(set|update)|randomBytes\(|Math\.random\(|battleAttackProofs/);
+  assert.doesNotMatch(source,/onCall\(|tx\.set|Math\.random\(|battleAttackProofs/);
   assert.doesNotMatch(fs.readFileSync('functions/index.js','utf8'),/createCanonicalRestrictedBattle/);
+});
+
+const roundArgs=(h,version=0,id='restricted-round-operation-0001')=>({attemptId,operationId:id,
+  expectedRevision:2,expectedRoundVersion:version,action:{type:'normal-attack',actor:'player-0',target:'enemy-0'}});
+const advance=(h,extra={},req=h.request)=>h.owner.advance(req,{...roundArgs(h),...extra});
+async function prepared(options){const h=fixture(options);await h.seed();await h.begin();return h;}
+test('protected rounds pin entropy once across retries, chain committed state, replay and preserve original sources',async()=>{
+  const h=await prepared({retry:true}),before=[...h.data],a=roundArgs(h);
+  const first=await advance(h);assert.equal(h.entropyCalls,1);assert.equal(first.roundVersion,1);
+  assert.equal(first.randomTape,undefined);assert.equal(first.projection,undefined);
+  const round=h.data.get(h.root+'/restrictedBattleRounds/'+attemptId+'_1');
+  assert.equal(round.projection.randomTape.length,4);assert.equal(round.priorRoundSha256,h.battle().sha256);
+  assert.equal(h.writes,14);assert.deepEqual(await advance(h),{...first,unchanged:true});assert.equal(h.writes,14);
+  const second=await h.owner.advance(h.request,roundArgs(h,1,'restricted-round-operation-0002'));
+  assert.equal(second.roundVersion,2);assert.equal(h.writes,17);
+  const r2=h.data.get(h.root+'/restrictedBattleRounds/'+attemptId+'_2');
+  assert.equal(r2.priorRoundSha256,round.sha256);assert.deepEqual(r2.projection.priorState,round.projection.nextState);
+  assert.deepEqual(await advance(h),{...first,unchanged:true});
+  for(const [path,value] of before)if(!path.includes('/restrictedBattleAttempts/'))assert.deepEqual(h.data.get(path),value);
+  for(const flag of ['combatRulesReady','outcomeVerified','rewardEligible','creditedToCharacter'])assert.equal(second[flag],false);
+});
+test('interrupted round commits leave all evidence unchanged and retry commits exactly once',async()=>{
+  const h=await prepared({retry:true}),before=[...h.data];h.abort=true;
+  await assert.rejects(advance(h),/interrupted/);assert.deepEqual([...h.data],before);
+  h.abort=false;await advance(h);assert.equal(h.writes,14);
+});
+test('version conflicts, ID intent collisions, terminal resources and unsupported declarations never write',async()=>{
+  const h=await prepared();await advance(h);const before=[...h.data];
+  await assert.rejects(advance(h,{operationId:'restricted-round-other-0001'}),e=>e.code==='aborted');
+  await assert.rejects(advance(h,{expectedRoundVersion:1}),e=>e.code==='failed-precondition');
+  for(const action of [{type:'skill',actor:'player-0',target:'enemy-0'}, {type:'normal-attack',actor:'player-1',target:'enemy-0'},
+    {type:'normal-attack',actor:'player-0',target:'enemy-0',damage:1}]){
+    await assert.rejects(advance(h,{action}),e=>e.code==='invalid-argument');
+  }
+  for(const key of ['hp','damage','randomTape','seed','won','reward','source']){
+    await assert.rejects(advance(h,{[key]:true}),e=>e.code==='invalid-argument');
+    await assert.rejects(advance(h,{}, {data:{...h.request.data,[key]:true}}),e=>e.code==='invalid-argument');
+  }
+  assert.deepEqual([...h.data],before);
+  const lethal=await prepared({entropy:.5});const r=await advance(lethal);
+  const state=lethal.data.get(lethal.root+'/restrictedBattleRounds/'+attemptId+'_1').projection.nextState;
+  assert.equal(state.enemyHP,0);assert.equal(r.outcomeVerified,false);
+  await assert.rejects(lethal.owner.advance(lethal.request,roundArgs(lethal,1,'restricted-round-operation-0002')),
+    e=>e.code==='failed-precondition');
+});
+test('missing round/receipt/head/original evidence fails closed for replay and new execution',async()=>{
+  for(const path of ['restrictedBattleRounds/'+attemptId+'_1','operations/restricted-round-operation-0001',
+    'restrictedBattleAttempts/'+attemptId,'restrictedBattles/'+attemptId]){
+    const h=await prepared();await advance(h);h.data.delete(h.root+'/'+path);const before=[...h.data];
+    await assert.rejects(advance(h));await assert.rejects(h.owner.advance(h.request,roundArgs(h,1,'restricted-round-operation-0002')));
+    assert.deepEqual([...h.data],before);
+  }
+  const h=await prepared();await advance(h);delete h.data.get(h.root+'/restrictedBattleAttempts/'+attemptId).roundHead;
+  await assert.rejects(advance(h),e=>e.code==='data-loss');
+});
+test('corrupt committed chain/entropy/output/policy/version refuses every replay',async()=>{
+  for(const mutate of [r=>r.priorRoundSha256='0'.repeat(64),r=>r.projection.nextState.playerHP++,
+    r=>r.projection.randomTape[0]=1,r=>r.writerPolicy.maxRounds++,r=>r.projection.nextState.roundVersion++,
+    r=>r.outcomeVerified=true,r=>r.projection.actions[0].hpAfter++]){
+    const h=await prepared();await advance(h);mutate(h.data.get(h.root+'/restrictedBattleRounds/'+attemptId+'_1'));
+    await assert.rejects(advance(h),e=>e.code==='data-loss');assert.equal(h.writes,14);
+  }
+});
+test('new rounds require original expiry/revision/session but historical replay survives expiry and later revision',async()=>{
+  const h=await prepared();const first=await advance(h);h.clock=601000;
+  h.data.get(h.root+'/account/current').serverRevision=3;h.data.get('users/'+uid+'/saves/current').serverRevision=3;
+  assert.deepEqual(await advance(h),{...first,unchanged:true,expired:true});
+  await assert.rejects(h.owner.advance(h.request,roundArgs(h,1,'restricted-round-operation-0002')),e=>e.code==='failed-precondition');
+  h.clock=1003;
+  await assert.rejects(h.owner.advance(h.request,roundArgs(h,1,'restricted-round-operation-0002')),e=>e.code==='aborted');
+  h.session='x'.repeat(32);await assert.rejects(advance(h));assert.equal(h.writes,14);
+});
+
+test('changed executable policy refuses a new round but historical replay never runs the new arithmetic',async()=>{
+  const h=await prepared(),first=await advance(h);
+  const nativeRead=fs.readFileSync;
+  fs.readFileSync=(path,...rest)=>{
+    const content=nativeRead(path,...rest);
+    return String(path).endsWith('canonical-battle-opening-round.js')?content+'\n// changed deployment':content;
+  };
+  let changed;
+  try{
+    // Recreate the production factory with the fixture's original dependencies.
+    changed=h.newOwner();
+  }finally{fs.readFileSync=nativeRead;}
+  assert.deepEqual(await changed.advance(h.request,roundArgs(h)),{...first,unchanged:true});
+  await assert.rejects(changed.advance(h.request,roundArgs(h,1,'restricted-round-operation-0002')),
+    e=>e.code==='failed-precondition');assert.equal(h.writes,14);
+});
+
+test('expiry crossed during the transaction rejects all buffered writes',async()=>{
+  const h=await prepared(),before=[...h.data];h.expireOnRead=3;
+  await assert.rejects(advance(h),e=>e.code==='failed-precondition');assert.deepEqual([...h.data],before);
+});
+test('bounded full-chain exhaustion never issues a terminal verdict or permits overflow',async()=>{
+  const h=await prepared();
+  for(let version=0;version<128;version++){
+    const result=await h.owner.advance(h.request,roundArgs(h,version,'restricted-bound-round-'+String(version).padStart(4,'0')));
+    assert.equal(result.roundVersion,version+1);assert.equal(result.outcomeVerified,false);
+  }
+  const before=h.writes;
+  await assert.rejects(h.owner.advance(h.request,roundArgs(h,128,'restricted-bound-overflow-0001')),e=>e.code==='invalid-argument');
+  assert.equal(h.writes,before);
+  const replay=await h.owner.advance(h.request,roundArgs(h,0,'restricted-bound-round-0000'));assert.equal(replay.unchanged,true);
+});
+
+test('server timestamp transforms are validated only after commit; missing committed stamps block replay',async()=>{
+  const h=await prepared({sentinel:true}),first=await advance(h);
+  assert.deepEqual(await advance(h),{...first,unchanged:true});
+  const r=h.data.get(h.root+'/restrictedBattleRounds/'+attemptId+'_1');r.createdAt={serverTransform:true};
+  await assert.rejects(advance(h),e=>e.code==='data-loss');assert.equal(h.writes,14);
 });
