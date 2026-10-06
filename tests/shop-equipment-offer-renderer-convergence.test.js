@@ -6,7 +6,7 @@ const repoSource=fs.readFileSync('js/startup/account-save-repository.js','utf8')
 const content=fs.readFileSync('js/27-v132-content-expansion.js','utf8');
 const inventoryEnd='    window.v132RunInventoryTransaction=runInventoryTransaction;';
 const inventoryOwner=content.slice(content.indexOf('    function getItemInventoryCapacity('),content.indexOf(inventoryEnd)+inventoryEnd.length);
-function fixture(seed=new Map()){
+function fixture(seed=new Map(),uid='shop-A'){
  let failKey=null,day='2026-10-06',success=0,reenter=null;
  const store={getItem:k=>seed.get(k)??null,setItem(k,v){if(k===failKey)throw Error('quota');seed.set(k,String(v));},removeItem:k=>seed.delete(k)};
  const body={innerHTML:'',querySelector:()=>true};
@@ -16,7 +16,7 @@ function fixture(seed=new Map()){
   isEquipmentInventoryType:t=>['head','shoulder','armor','shoes','weapon'].includes(t),cloneInventoryStackItem:(d,n)=>({...d,count:n}),INVENTORY_MAX_STACK_DEFAULT:999,
   renderShopContent(){return c.FourSymbolsEquipmentShop.render();}
  });c.window=c;
- vm.runInContext(repoSource,c);const repo=c.FourSymbolsAccountSave;repo.activate('shop-A');
+ vm.runInContext(repoSource,c);const repo=c.FourSymbolsAccountSave;repo.activate(uid);
  c.saveGame=options=>{if(reenter){const fn=reenter;reenter=null;fn();}try{repo.writeForUid(repo.getActiveUid(),{gold:c.gold,inventoryItems:c.inventoryItems},options);return true;}catch(_){return false;}};
  c.rpgAlert=(_message,o)=>{if(o.tone==='success')success++;return Promise.resolve();};
  vm.runInContext(inventoryOwner,c);vm.runInContext(gear,c);
@@ -54,5 +54,5 @@ test('main, metadata or shop storage failure roll back all prior bytes, runtime 
 });
 test('corrupt shop state blocks purchase and refresh, UID B does not inherit A receipts',()=>{
  const f=fixture();f.seed.set(f.key,'{bad');assert.equal(f.buy(0),false);assert.equal(f.c.v17345RefreshEquipmentShop(),false);assert.match(f.read(),/購買與刷新已暫停/);
- const a=fixture();a.buy(0);const b=fixture(new Map([...a.seed].filter(([k])=>!k.includes('shop-A'))));assert.doesNotMatch(b.read(),/已購買/);
+ const a=fixture();a.buy(0);const b=fixture(a.seed,'shop-B');assert.doesNotMatch(b.read(),/已購買/);assert.equal(b.buy(0),true);assert.equal(b.key,'four_symbols_account:shop-B:equipment-shop-daily');assert.match(fixture(a.seed).read(),/已購買/);
 });
