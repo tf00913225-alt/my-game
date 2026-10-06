@@ -13,13 +13,13 @@ const invalid=message=>{throw Error('Opening round input invalid: '+message);};
 // verdict. Both actors' normal attacks are explicitly restricted assumptions;
 // no enemy skill selection, multi-enemy draw or protected lifecycle.
 // A protected successor must pin the complete policy and server transcript.
-function resolveForestRoundArithmetic(args,currentState=null){
+function resolveForestRoundArithmetic(args,currentState=null,sampler=null){
     if(!args||typeof args!=='object'||Array.isArray(args)||
        Object.keys(args).sort().join('|')!=='archive|encounterKey|encounterPolicy|randomTape|revision|snapshot|uid'){
         invalid('only private original sources and an explicit server transcript are supported');
     }
     const {randomTape,...sources}=args;
-    if(!Array.isArray(randomTape)||randomTape.length<3||randomTape.length>7||
+    if(!Array.isArray(randomTape)||(!sampler&&randomTape.length<3)||randomTape.length>7||
        randomTape.some(v=>typeof v!=='number'||!Number.isFinite(v)||v<0||v>=1)){
         invalid('bounded exact server transcript required');
     }
@@ -50,6 +50,11 @@ function resolveForestRoundArithmetic(args,currentState=null){
     }
     let cursor=0;
     const random=()=>{
+        if(sampler){
+            const value=sampler();
+            if(cursor>=7||typeof value!=='number'||!Number.isFinite(value)||value<0||value>=1)invalid('server sampler invalid');
+            randomTape.push(value);
+        }
         if(cursor>=randomTape.length)invalid('server transcript exhausted');
         return randomTape[cursor++];
     };
@@ -112,4 +117,11 @@ function resolveForestRepeatedRound(args){
     const {currentState,...sources}=args;
     return resolveForestRoundArithmetic(sources,currentState);
 }
-module.exports={resolveForestOpeningRound,resolveForestRepeatedRound};
+// Captures only samples consumed by the shared loop, including dead skips.
+function sampleForestRepeatedRound(args,random){
+    if(typeof random!=='function'||!args?.currentState)invalid('server sampler and prior state required');
+    const {currentState,...sources}=args;
+    if(Object.hasOwn(sources,'randomTape'))invalid('sampler does not accept a transcript');
+    return resolveForestRoundArithmetic({...sources,randomTape:[]},currentState,random);
+}
+module.exports={resolveForestOpeningRound,resolveForestRepeatedRound,sampleForestRepeatedRound};
