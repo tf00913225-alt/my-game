@@ -440,7 +440,6 @@
         if(!monster){ return; }
         const normalBar=document.getElementById("battleMonsterBar"+index);
         const shieldBar=document.getElementById("battleMonsterShieldBar"+index);
-        const hpText=document.getElementById("battleMonsterHPText"+index);
         const shield=monster.v141Shield;
         const remaining=shield?Math.max(0,Number(shield.remaining)||0):0;
         if(shield&&remaining>0){
@@ -452,11 +451,6 @@
             if(shieldBar){
                 shieldBar.style.left=(baseHp/total*100)+"%";
                 shieldBar.style.width=(visibleShield/total*100)+"%";
-            }
-            if(hpText){
-                hpText.textContent=shield.isBarrier
-                    ?Math.floor(baseHp)+"/"+baseMax+"　結界"
-                    :Math.floor(baseHp)+"/"+baseMax+" +"+Math.floor(remaining);
             }
         }else if(shieldBar){
             shieldBar.style.left="0";

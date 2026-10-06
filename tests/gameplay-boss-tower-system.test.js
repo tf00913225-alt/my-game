@@ -9,6 +9,7 @@ const appSource=fs.readFileSync("js/00-main.js","utf8");
 const balanceStart=appSource.indexOf("/* BEGIN GENERATED MONSTER BALANCE OWNER */");
 const balanceEnd=appSource.indexOf("/* END GENERATED MONSTER BALANCE OWNER */")+"/* END GENERATED MONSTER BALANCE OWNER */".length;
 const balanceSource=appSource.slice(balanceStart,balanceEnd);
+const resourcePresentationSource=appSource.slice(appSource.indexOf("function projectEnemyResource("),appSource.indexOf("function applyMonsterUiUpdate("));
 const accountSource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
 const battlefieldSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const v131Source=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
@@ -121,6 +122,8 @@ function load(options={}){
     context.FourSymbolsAccountSave.activate(TEST_UID);
     vm.runInContext(battlefieldSource,context,{filename:"js/battlefield-slot-owner.js"});
     vm.runInContext(balanceSource,context,{filename:"monster-balance-runtime.js"});
+    context.$=id=>context.document.getElementById(id);
+    vm.runInContext(resourcePresentationSource,context,{filename:"enemy-resource-presentation.js"});
     vm.runInContext(source,context,{filename:"js/gameplay-boss-tower-system.js"});
     vm.runInContext(v131FormationSource,context,{filename:"js/25-v131-fix-batch.js#formation"});
     return {context,localStorage};
@@ -395,7 +398,7 @@ test("Boss HUD renders the white shield inside its formal HP bar",()=>{
         querySelector(selector){ return selector.includes(".monster-hp")?hpBar:null; },
         querySelectorAll(){ return []; }
     };
-    context.document.getElementById=id=>id==="battleMonster0"?card:null;
+    context.document.getElementById=id=>id==="battleMonster0"?card:id==="battleMonsterHPText0"?hpLabel:null;
     context.document.createElement=()=>({className:"",style:{}});
 
     context.FourSymbolsBossBattle.applyShield(10000);
@@ -412,6 +415,8 @@ test("Boss HUD renders the white shield inside its formal HP bar",()=>{
     assert.equal(overlay.style.width,5000/(boss.maxHP+5000)*100+"%","half shield remaining shrinks the white segment immediately");
     boss.hp=boss.hp-5000;
     assert.equal(overlay.style.width,"0%","shield zero removes the white segment without a second HUD");
+    boss.hp-=0.5;
+    assert.equal(hpLabel.textContent,Math.floor(boss.hp)+" / "+Math.floor(boss.maxHP),"Boss shares the enemy integer presentation without rounding state");
 });
 
 test("a destroyed healing object stops its persistent effect immediately",()=>{
