@@ -16,3 +16,8 @@ Adding persistence: add the new state with all required metadata; register the b
 ### Protected restricted Forest instance establishment (2026-10-05)
 
 Three private instance/consumption/policy paths are registered under canonical-restricted-battle.js, authority Tier B, backupRequired true. Corruption/missing evidence blocks progression/replay; no defaults regenerate instances or entitlements. Existing operations path retains the receipt. No TTL/deletion/restore writer is enabled. Full lifecycle/input/policy/backup boundaries are owned by `CLOUD_OPERATION_SETTLEMENT_CONTRACT.md`, same-named section; latest execution status is PR #802.
+
+
+### Protected restricted round history (2026-10-06)
+
+The private restrictedBattleRounds/{attemptId}_{roundVersion} path and existing restrictedBattleAttempts roundHead are registered under canonical-restricted-battle.js with Tier B authority and required backup retention. Full input/lifecycle/replay/backup boundaries are owned by CLOUD_OPERATION_SETTLEMENT_CONTRACT.md, section Protected restricted normal-round writer. No delete/restore writer or client access is enabled.
