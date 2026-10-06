@@ -19,3 +19,23 @@ test('formal Action completion waits for captured follow-ups and then holds newl
     presentation=false;c.finishPlayerAction();assert.equal(completions,1);assert.equal(c.battleDurationAction,null);assert.equal(c.initiativeIndex,1);assert.equal(timers.length,1);
     c.finishPlayerAction();assert.equal(completions,1);assert.equal(c.initiativeIndex,1);assert.equal(timers.length,1);
 });
+test('successful escape publishes Battle End for normal and dungeon routes; failed escape preserves state',async()=>{
+    for(const dungeon of [false,true])for(const succeeds of [false,true]){
+        let state={enemyActions:6},ends=0,finishes=0,aborts=0;
+        const c={window:null,Math:Object.assign(Object.create(Math),{random:()=>succeeds?0:1}),Promise,
+            timerId:null,monsters:[{alive:true,level:1}],currentBattleMonsters:[0],player:{level:1},
+            battleActive:true,autoBattle:true,actionReady:true,pendingAction:{},battleAdvanceTimeoutId:null,
+            battleAdvanceScheduled:false,battleToken:1,
+            clearInterval(){},getPartyCharacterByIndex:()=>null,addBattleLog(){},
+            finishPlayerAction(){finishes++;},clearBattleRoundPrompt(){},clearBattleActionWatchdog(){},
+            finishBattleStatisticsSession(){},closeMenus(){},showPage(){},setMapCooldown(){},
+            startMonsterMovement(){},ensureAutoPatrolInterval(){},
+            emitCombatEvent(type,payload){assert.equal(type,'battle_end');assert.equal(payload.result,'escape');state=null;ends++;},
+            v132ActiveDungeonRun:dungeon?{}:null,v132AbortDungeonBattle(){aborts++;c.battleActive=false;}};
+        c.window=c;vm.createContext(c);vm.runInContext(declaration('resolveEscapeAttempt'),c);
+        c.resolveEscapeAttempt(0);await new Promise(resolve=>setImmediate(resolve));
+        assert.equal(ends,succeeds?1:0);assert.equal(state===null,succeeds);
+        assert.equal(finishes,succeeds?0:1);assert.equal(aborts,dungeon&&succeeds?1:0);
+        assert.equal(c.battleActive,!succeeds);
+    }
+});

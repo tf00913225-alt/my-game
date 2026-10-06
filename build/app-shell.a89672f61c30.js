@@ -19152,6 +19152,7 @@ function resolveEscapeAttempt(characterIndex){
     addBattleLog("成功逃脫！");
     Promise.resolve(motion).then(()=>{
         const finishEscapeRoute=()=>{
+            emitCombatEvent("battle_end",{result:"escape"});
             if(window.v132ActiveDungeonRun&&typeof window.v132AbortDungeonBattle==="function"){
                 window.v132AbortDungeonBattle("escape");
             }else{
