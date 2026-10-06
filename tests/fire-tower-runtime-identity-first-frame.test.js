@@ -3,6 +3,7 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
+const {MonsterBalance}=require("../js/combat/monster-balance-owner.mjs");
 
 const towerSource=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const portraitSource=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
@@ -10,11 +11,16 @@ const registry=JSON.parse(fs.readFileSync("config/monster-portrait-registry.json
 const fireEntries=registry.assetPool.entries.filter(entry=>entry.element==="fire");
 const fireById=new Map(fireEntries.map(entry=>[entry.assetId,entry]));
 const WEEK_KEY="2026-09-28";
+const FIXED_NOW=Date.UTC(2026,8,28);
+class FixtureDate extends Date {
+    constructor(...args){ super(...(args.length?args:[FIXED_NOW])); }
+    static now(){ return FIXED_NOW; }
+}
 
 function loadTower({gate}={}){
     const calls=[];
     const context={
-        window:null,console,Math,Number,Object,Array,Set,Map,Promise,Date,
+        window:null,console,Math,Number,Object,Array,Set,Map,Promise,Date:FixtureDate,MonsterBalance,
         FourSymbolsAccountSave:{
             getActiveUid:()=>"test-user",
             saveKey:uid=>"save:"+uid,

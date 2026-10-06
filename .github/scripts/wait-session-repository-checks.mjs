@@ -2,9 +2,9 @@ import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {performance} from 'node:perf_hooks';
 
-// CI verify has a 40-minute execution cap. Allow five additional minutes for
-// runner admission/API visibility; deploy retains 15 minutes after this wait.
-export const WAIT_BUDGET_MS = 45 * 60 * 1000;
+// Repository checks now waits for the slowest required child (Boss: 60m).
+// Allow five additional minutes for runner admission/API visibility.
+export const WAIT_BUDGET_MS = 65 * 60 * 1000;
 export const POLL_INTERVAL_MS = 10 * 1000;
 const TARGET = 'Repository checks';
 const OWNER = '.github/workflows/ci.yml';

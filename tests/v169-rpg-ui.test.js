@@ -233,7 +233,7 @@ test("successful potion purchases enqueue an RPG receipt only after inventory ch
 test("dungeon backpack reuses the shared context-aware inventory lifecycle",()=>{
     assert.match(mainSource,/function openInventoryContext\(context\)/);
     const entry=mainSource.slice(mainSource.indexOf("function openInventoryContext("),mainSource.indexOf("function setMapInventoryScrollGate("));
-    assert.match(entry,/showPage\("inventory"\);\s*inventoryOpenContext=normalized;/);
+    assert.match(entry,/inventoryOpenContext=normalized;\s*showPage\("inventory"\);/);
     assert.match(mainSource,/function openMapInventoryOverlay\(context\)\{\s*return openInventoryContext\(context\);/);
     assert.doesNotMatch(uiSource,/mapPage\.classList\.add\("active"\)|previousOpenMapInventoryOverlay|v169-dungeon-inventory-overlay/);
     assert.doesNotMatch(css,/v169-dungeon-inventory-overlay|maximizeDungeonBackpack/);

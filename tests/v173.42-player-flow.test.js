@@ -58,15 +58,18 @@ assert.match(v131,/V17342_GLOBAL_GOLD_REWARD_MULTIPLIER=5/);
 assert.match(v131,/getBeginnerForestMonsterExpUnit/);
 assert.match(v131,/beginnerMonsterUnits/);
 
-/* V173.43 daily-dungeon strength is dynamic, not the old 0.5 × 0.5 path. */
-assert.match(tuning,/const partyMultiplier=partySize===1\?\.40:partySize===2\?\.72:1;/);
-assert.match(tuning,/const levelMultiplier=highestLevel<=15\?\.80:highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05;/);
-assert.match(tuning,/function getDailyDungeonScaleContext\(\)/);
-assert.match(tuning,/function normalizeDailyDungeonMonster\(monster\)/);
-assert.match(tuning,/factor:partyMultiplier\*levelMultiplier\*DAILY_DUNGEON_DIFFICULTY_MULTIPLIER/);
-assert.match(tuning,/DAILY_DUNGEON_DIFFICULTY_MULTIPLIER=\.5/);
-assert.match(tuning,/monster\.v141Abyss===true/);
-assert.doesNotMatch(tuning,/v17342DailyDungeonStatsHalvedAgain/);
+// MonsterBalance owns Daily durability; retired V173 scaling must not return.
+const {MonsterBalance,DAILY_PARTY_DURABILITY}=require("../js/combat/monster-balance-owner.mjs");
+assert.deepEqual(DAILY_PARTY_DURABILITY,{1:.04,2:.08,3:.12});
+const dailySpec={context:'ci/formal-daily',monsterKey:'daily.exp.regular',name:'修行弟子',element:'fire',rank:'regular',archetype:'balanced',level:50,mode:'daily',dailyType:'exp',wave:1,slot:0,highestPartyLevel:50,skillFrequency:.35};
+const dailyParty=[1,2,3].map(partySize=>MonsterBalance.build({...dailySpec,partySize}));
+assert.deepEqual(dailyParty.map(m=>m.balanceProjection.profiles.mode.partySizeDurability),[.04,.08,.12]);
+for(const m of dailyParty){
+  assert.equal(m.balanceOwner,'MonsterBalance');
+  for(const key of ['attack','magicAttack','defense','maxSP','agility'])assert.equal(m[key],dailyParty[0][key]);
+  assert.equal(m.v173DailyDungeonScaleFactor,undefined);
+}
+assert.doesNotMatch(tuning,/partyMultiplier|levelMultiplier|DAILY_DUNGEON_DIFFICULTY_MULTIPLIER|normalizeDailyDungeonMonster/);
 assert.match(tuning,/rollBeginnerForestNormalAttackDamage=function\(\)\{[\s\S]*return 5\+Math\.floor\(Math\.random\(\)\*4\)/);
 
 /* Second / third character starts at Lv1; catch-up is EXP-only and ends at Lv20. */

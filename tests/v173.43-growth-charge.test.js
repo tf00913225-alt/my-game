@@ -168,13 +168,20 @@ test("growth targets stay bright and dots share the notification presentation ow
     assert.match(nativeNavCss,/#bottomNav > \.nav-button > \.v141-notice-dot\{[^}]*width:22px;[^}]*height:22px/);
 });
 test("three-character home HUD grows with readable text but remains three columns",()=>{assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);assert.match(homeRosterCss,/grid-template-columns:40px minmax\(0,1fr\)/);assert.match(homeRosterCss,/min-height:84px/);assert.match(homeRosterCss,/width:40px;height:40px/);assert.match(homeRosterCss,/\.v146-home-character-main > div:first-child\{[\s\S]*font-size:15px/);assert.match(homeRosterCss,/\.v146-home-resource strong\{[\s\S]*font-size:13px/);});
-test("ordinary daily dungeons use V173.43 dynamic party/level scaling and Abyss stays excluded",()=>{
-    assert.match(dungeon,/const partyMultiplier=partySize===1\?\.40:partySize===2\?\.72:1/);
-    assert.match(dungeon,/const levelMultiplier=highestLevel<=15\?\.80:highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05/);
-    assert.match(dungeon,/factor:partyMultiplier\*levelMultiplier/);
-    assert.match(dungeon,/function normalizeDailyDungeonMonster\(monster\)/);
+test("ordinary Daily durability is owned once by MonsterBalance; Abyss remains excluded",()=>{
+// MonsterBalance owns Daily durability; retired V173 scaling must not return.
+const {MonsterBalance,DAILY_PARTY_DURABILITY}=require("../js/combat/monster-balance-owner.mjs");
+assert.deepEqual(DAILY_PARTY_DURABILITY,{1:.04,2:.08,3:.12});
+const dailySpec={context:'ci/formal-daily',monsterKey:'daily.exp.regular',name:'修行弟子',element:'fire',rank:'regular',archetype:'balanced',level:50,mode:'daily',dailyType:'exp',wave:1,slot:0,highestPartyLevel:50,skillFrequency:.35};
+const dailyParty=[1,2,3].map(partySize=>MonsterBalance.build({...dailySpec,partySize}));
+assert.deepEqual(dailyParty.map(m=>m.balanceProjection.profiles.mode.partySizeDurability),[.04,.08,.12]);
+for(const m of dailyParty){
+  assert.equal(m.balanceOwner,'MonsterBalance');
+  for(const key of ['attack','magicAttack','defense','maxSP','agility'])assert.equal(m[key],dailyParty[0][key]);
+  assert.equal(m.v173DailyDungeonScaleFactor,undefined);
+}
+assert.doesNotMatch(dungeon,/partyMultiplier|levelMultiplier|DAILY_DUNGEON_DIFFICULTY_MULTIPLIER|normalizeDailyDungeonMonster/);
     assert.match(dungeon,/monster\.v141Abyss===true/);
-    assert.doesNotMatch(dungeon,/v17342DailyDungeonStatsHalvedAgain/);
 });
 
 console.log("\n"+passed+" V173.43 formal growth/charge checks passed.");
