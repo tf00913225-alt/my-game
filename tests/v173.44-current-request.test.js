@@ -20,15 +20,22 @@ const index=fs.readFileSync("index.html","utf8");
 assert.match(battle,/REFERENCE_TARGET_ORDER_6=\[4,1,3,6,2,5\]/);
 assert.match(battle,/REFERENCE_TARGET_ORDER_10=\[7,2,6,1,5,10,4,9,3,8\]/);
 assert.match(battle,/monster\.v148TargetOrder=REFERENCE_TARGET_ORDER_6\[slot\]/);
-assert.match(tuning,/partySize===1\?\.40:partySize===2\?\.72:1/);
-assert.match(tuning,/highestLevel<=15\?\.80:highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05/);
-assert.match(tuning,/DAILY_DUNGEON_DIFFICULTY_MULTIPLIER=\.5/);
-assert.match(tuning,/factor:partyMultiplier\*levelMultiplier\*DAILY_DUNGEON_DIFFICULTY_MULTIPLIER/);
-assert.match(tuning,/FORMAL_DAILY_DUNGEON_TYPES=new Set\(\["exp","material","gold"\]\)/);
-assert.match(tuning,/v173DailySoloProtected=context\.partySize===1&&context\.highestLevel<=20/);
-assert.match(tuning,/Number\(monster\.v141DungeonStage\)===1\?0:Math\.min\(\.45,baseSkillChance\*\.60\)/);
+// MonsterBalance owns Daily durability; retired V173 scaling must not return.
+const {MonsterBalance,DAILY_PARTY_DURABILITY}=require("../js/combat/monster-balance-owner.mjs");
+assert.deepEqual(DAILY_PARTY_DURABILITY,{1:.04,2:.08,3:.12});
+const dailySpec={context:'ci/formal-daily',monsterKey:'daily.exp.regular',name:'修行弟子',element:'fire',rank:'regular',archetype:'balanced',level:50,mode:'daily',dailyType:'exp',wave:1,slot:0,highestPartyLevel:50,skillFrequency:.35};
+const dailyParty=[1,2,3].map(partySize=>MonsterBalance.build({...dailySpec,partySize}));
+assert.deepEqual(dailyParty.map(m=>m.balanceProjection.profiles.mode.partySizeDurability),[.04,.08,.12]);
+for(const m of dailyParty){
+  assert.equal(m.balanceOwner,'MonsterBalance');
+  for(const key of ['attack','magicAttack','defense','maxSP','agility'])assert.equal(m[key],dailyParty[0][key]);
+  assert.equal(m.v173DailyDungeonScaleFactor,undefined);
+}
+assert.doesNotMatch(tuning,/partyMultiplier|levelMultiplier|DAILY_DUNGEON_DIFFICULTY_MULTIPLIER|normalizeDailyDungeonMonster/);
 assert.match(tuning,/v173DailyBossUsedSkillLastAction===true/);
-assert.doesNotMatch(tuning,/v17342DailyDungeonStatsHalvedAgain/);
+assert.match(tuning,/Number\(monster\.v141DungeonStage\)===1/);
+assert.equal(MonsterBalance.build({...dailySpec,partySize:1,highestPartyLevel:20}).v173DailySoloProtected,true);
+assert.equal(dailyParty[0].v173DailySoloProtected,false);
 assert.match(battle,/if\(soloProtected\)[\s\S]*slot===4\?"elite":null[\s\S]*slot===4\)\{ return "boss"; \}[\s\S]*slot===3\?"elite":null/);
 assert.match(battle,/material:\{title:"材料副本",requirement:"任一角色達到10級"/);
 assert.match(battle,/gold:\{title:"金幣副本",requirement:"任一角色達到10級"/);
