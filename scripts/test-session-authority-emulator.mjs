@@ -21,7 +21,7 @@ const {createCanonicalExpAllocation}=require("../functions/src/canonical-exp-all
 const {createCanonicalAttributeAllocation}=
     require("../functions/src/canonical-attribute-allocation.js");
 const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
-const {assembleCanonicalSnapshot}=require("../functions/src/canonical-snapshot.js");
+const {assembleCanonicalSnapshot,claimRecordsDigest}=require("../functions/src/canonical-snapshot.js");
 const {inspectRecoveryArchive,createRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
 const {createCanonicalCurrentRecovery}=
     require("../functions/src/canonical-current-recovery.js");
@@ -780,6 +780,92 @@ assert.equal((await battleRoot.collection('pendingGrants').get()).size,0);
 assert.equal((await battleRoot.collection('ledgerEntries').get()).size,0);
 console.log('Protected round actual emulator: rollback, concurrent version winner, identical lost-response replay, chain integrity, corruption, expiry, policy drift, revision, private rules and zero authority PASS');
 
+// Close only committed terminal resources; no browser verdict or reward.
+instanceClock=storedInstance.preparedAtMs+3;
+const terminalRoundOwner=createCanonicalRestrictedBattle({...roundDeps,randomBytes:n=>{
+  const bytes=Buffer.alloc(n);for(let i=0;i<n;i+=6)bytes.writeUIntBE(Math.floor(.1*281474976710656),i,6);return bytes;
+}});
+await assert.rejects(terminalRoundOwner.sealTerminal(yRequest,{attemptId:battleStart.attemptId,
+  operationId:'restricted-terminal-emulator-0001',expectedRevision:2,expectedRoundVersion:2}),e=>e.code==='failed-precondition');
+let terminalVersion=2,terminalRound;
+do{
+  await terminalRoundOwner.advance(yRequest,{...roundArgs,expectedRoundVersion:terminalVersion,
+    operationId:'restricted-terminal-round-'+String(++terminalVersion).padStart(4,'0')});
+  terminalRound=(await battleRoot.collection('restrictedBattleRounds').doc(battleStart.attemptId+'_'+terminalVersion).get()).data();
+}while(terminalRound.projection.nextState.playerHP&&terminalRound.projection.nextState.enemyHP&&terminalVersion<128);
+assert.ok(!terminalRound.projection.nextState.playerHP||!terminalRound.projection.nextState.enemyHP);
+const terminalArgs={attemptId:battleStart.attemptId,operationId:'restricted-terminal-emulator-0001',
+  expectedRevision:2,expectedRoundVersion:terminalVersion};
+const terminalRef=battleRoot.collection('restrictedBattleTerminals').doc(battleStart.attemptId);
+const terminalMarkerBefore=(await instanceMarkerRef.get()).data();
+const terminalRollback=createCanonicalRestrictedBattle({...roundDeps,
+  runProtected:(req,fn)=>writerSessions.runProtected(req,async(tx,s)=>{await fn(tx,s);throw Error('terminal rollback injection');})});
+await assert.rejects(terminalRollback.sealTerminal(yRequest,terminalArgs),/terminal rollback injection/);
+assert.equal((await terminalRef.get()).exists,false);
+assert.equal((await battleRoot.collection('operations').doc(terminalArgs.operationId).get()).exists,false);
+assert.deepEqual((await instanceMarkerRef.get()).data(),terminalMarkerBefore);
+let terminalClockReads=0;
+const terminalDeadline=createCanonicalRestrictedBattle({...roundDeps,now:()=>++terminalClockReads===1?instanceClock:battleStart.expiresAtMs});
+await assert.rejects(terminalDeadline.sealTerminal(yRequest,terminalArgs),e=>e.code==='failed-precondition');
+assert.equal((await terminalRef.get()).exists,false);
+assert.deepEqual((await instanceMarkerRef.get()).data(),terminalMarkerBefore);
+await instanceAccountRef.update({serverRevision:3});await instanceEnvelopeRef.update({serverRevision:3});
+await assert.rejects(terminalRoundOwner.sealTerminal(yRequest,terminalArgs),e=>e.code==='aborted');
+await instanceAccountRef.set(roundBefore.account);await instanceEnvelopeRef.set(roundBefore.envelope);
+roundCurrent.rulesSha256='0'.repeat(64);
+try{await assert.rejects(terminalRoundOwner.sealTerminal(yRequest,terminalArgs),e=>e.code==='failed-precondition');}
+finally{roundCurrent.rulesSha256=originalRuleHash;}
+instanceClock=battleStart.expiresAtMs;
+await assert.rejects(terminalRoundOwner.sealTerminal(yRequest,terminalArgs),e=>e.code==='failed-precondition');
+instanceClock=storedInstance.preparedAtMs+3;
+const concurrentTerminal=await Promise.allSettled([
+  terminalRoundOwner.sealTerminal(yRequest,terminalArgs),
+  terminalRoundOwner.sealTerminal(yRequest,{...terminalArgs,operationId:'restricted-terminal-emulator-0002'})]);
+assert.equal(concurrentTerminal.filter(r=>r.status==='fulfilled').length,1);
+assert.equal(concurrentTerminal.filter(r=>r.status==='rejected').length,1);
+const terminalFirst=concurrentTerminal.find(r=>r.status==='fulfilled').value;
+const winningTerminalArgs={...terminalArgs,operationId:terminalFirst.operationId};
+const terminal=(await terminalRef.get()).data();
+assert.equal(terminal.roundSha256,terminalRound.sha256);
+assert.equal(terminal.stateSha256,claimRecordsDigest(terminalRound.projection.nextState));
+assert.equal((await battleRoot.collection('restrictedBattleTerminals').get()).size,1);
+const identicalTerminal=await Promise.all([
+  terminalRoundOwner.sealTerminal(yRequest,winningTerminalArgs),terminalRoundOwner.sealTerminal(yRequest,winningTerminalArgs)]);
+for(const r of identicalTerminal)assert.deepEqual(r,{...terminalFirst,unchanged:true});
+assert.deepEqual(await roundOwner.advance(yRequest,winningRoundArgs),{...firstRound,unchanged:true});
+await assert.rejects(terminalRoundOwner.advance(yRequest,{...roundArgs,expectedRoundVersion:terminalVersion,
+  operationId:'restricted-terminal-after-0001'}),e=>e.code==='failed-precondition');
+for(const ref of [terminalRef,battleRoot.collection('operations').doc(terminalFirst.operationId),instanceMarkerRef,
+  round1Ref,instanceRef,instancePolicyRef,battleRoot.collection('playableSnapshots').doc('2'),
+  battleRoot.collection('recoveryArchives').doc('2')]){
+  const saved=(await ref.get()).data();await ref.delete();
+  await assert.rejects(terminalRoundOwner.sealTerminal(yRequest,winningTerminalArgs));
+  await assert.rejects(terminalRoundOwner.sealTerminal(yRequest,{...terminalArgs,operationId:'restricted-terminal-emulator-0003'}));
+  await ref.set(saved);
+}
+const terminalMarker=(await instanceMarkerRef.get()).data();
+await instanceMarkerRef.set(terminalMarkerBefore);
+await assert.rejects(terminalRoundOwner.sealTerminal(yRequest,winningTerminalArgs),e=>e.code==='data-loss');
+await instanceMarkerRef.set(terminalMarker);
+await terminalRef.update({resourceStatus:'unsupported'});
+await assert.rejects(terminalRoundOwner.sealTerminal(yRequest,winningTerminalArgs),e=>e.code==='data-loss');
+await terminalRef.set(terminal);
+await instanceAccountRef.update({serverRevision:3});await instanceEnvelopeRef.update({serverRevision:3});
+instanceClock=battleStart.expiresAtMs;roundCurrent.rulesSha256='0'.repeat(64);
+try{assert.deepEqual(await changedExecutableOwner.sealTerminal(yRequest,winningTerminalArgs),
+  {...terminalFirst,unchanged:true,expired:true});}finally{roundCurrent.rulesSha256=originalRuleHash;}
+await instanceAccountRef.set(roundBefore.account);await instanceEnvelopeRef.set(roundBefore.envelope);
+assert.equal(await rulesRequest(terminalRef.path,yUser.idToken),403);
+assert.equal(await rulesRequest(terminalRef.path,yUser.idToken,'PATCH'),403);
+assert.deepEqual((await instanceRef.get()).data(),roundBefore.instance);
+assert.deepEqual((await instanceAccountRef.get()).data(),roundBefore.account);
+assert.deepEqual((await instanceEnvelopeRef.get()).data(),roundBefore.envelope);
+assert.deepEqual((await battleRoot.collection('economy').doc('current').get()).data(),battleBefore.economy);
+assert.equal((await battleRoot.collection('pendingGrants').get()).size,0);
+assert.equal((await battleRoot.collection('ledgerEntries').get()).size,0);
+for(const key of ['combatRulesReady','outcomeVerified','rewardEligible','creditedToCharacter'])assert.equal(terminalFirst[key],false);
+console.log('Protected terminal actual emulator: rollback, precommit deadline, concurrent one-winner, identical replay, original chain/receipt/marker integrity, revision/expiry/policy refusal, private rules and zero authority PASS');
+
 // Isolated account proves actual device/session takeover and revocation; do
 // not invalidate any existing integration fixture used by later assertions.
 const lifecycleUser=await login("accounts:signUp",{email:"restricted-lifecycle@example.test",password});
@@ -804,6 +890,18 @@ const lifecycleBefore=(await lifecycleRef.get()).data();
 const lifecycleRoundArgs={attemptId:lifecycleAttempt.attemptId,operationId:'restricted-lifecycle-round-0001',
   expectedRevision:2,expectedRoundVersion:0,action:{type:'normal-attack',actor:'player-0',target:'enemy-0'}};
 await lifecycleOwner.advance(lifecycleRequest,lifecycleRoundArgs);
+const lifecycleTerminalOwner=createCanonicalRestrictedBattle({...lifecycleDeps,randomBytes:n=>{
+  const bytes=Buffer.alloc(n);for(let i=0;i<n;i+=6)bytes.writeUIntBE(Math.floor(.1*281474976710656),i,6);return bytes;
+}});
+let lifecycleVersion=1,lifecycleState=(await db.doc(`serverUsers/${lifecycleUid}/restrictedBattleRounds/${lifecycleAttempt.attemptId}_1`).get()).data().projection.nextState;
+while(lifecycleState.playerHP&&lifecycleState.enemyHP&&lifecycleVersion<128){
+  await lifecycleTerminalOwner.advance(lifecycleRequest,{...lifecycleRoundArgs,expectedRoundVersion:lifecycleVersion,
+    operationId:'restricted-lifecycle-next-'+String(++lifecycleVersion).padStart(4,'0')});
+  lifecycleState=(await db.doc(`serverUsers/${lifecycleUid}/restrictedBattleRounds/${lifecycleAttempt.attemptId}_${lifecycleVersion}`).get()).data().projection.nextState;
+}
+const lifecycleTerminalArgs={attemptId:lifecycleAttempt.attemptId,operationId:'restricted-lifecycle-terminal-0001',
+  expectedRevision:2,expectedRoundVersion:lifecycleVersion};
+await lifecycleTerminalOwner.sealTerminal(lifecycleRequest,lifecycleTerminalArgs);
 await rejected("createGameSession",lifecycleUser.idToken,{uid:lifecycleUid},"SESSION_REAUTH_REQUIRED");
 while(Math.floor(Date.now()/1000)<=claims(lifecycleUser.idToken).auth_time){
     await new Promise(resolve=>setTimeout(resolve,100));
@@ -813,13 +911,16 @@ assert.equal(takeoverUser.localId,lifecycleUid);
 const takeoverSession=await invoke("createGameSession",takeoverUser.idToken,{uid:lifecycleUid});
 await assert.rejects(lifecycleOwner.begin(lifecycleRequest,lifecycleArgs),e=>e.message==="SESSION_REVOKED");
 await assert.rejects(lifecycleOwner.advance(lifecycleRequest,lifecycleRoundArgs),e=>e.message==='SESSION_REVOKED');
+await assert.rejects(lifecycleTerminalOwner.sealTerminal(lifecycleRequest,lifecycleTerminalArgs),e=>e.message==='SESSION_REVOKED');
 const takeoverRequest={auth:{uid:lifecycleUid,token:claims(takeoverUser.idToken)},
     data:{uid:lifecycleUid,session:takeoverSession}};
 await assert.rejects(lifecycleOwner.begin(takeoverRequest,lifecycleArgs),e=>e.code==="failed-precondition");
 await assert.rejects(lifecycleOwner.advance(takeoverRequest,lifecycleRoundArgs),e=>e.code==='failed-precondition');
+await assert.rejects(lifecycleTerminalOwner.sealTerminal(takeoverRequest,lifecycleTerminalArgs),e=>e.code==='failed-precondition');
 await writerSessions.revoke(takeoverRequest);
 await assert.rejects(lifecycleOwner.begin(takeoverRequest,lifecycleArgs),e=>e.message==="SESSION_REVOKED");
 await assert.rejects(lifecycleOwner.advance(takeoverRequest,lifecycleRoundArgs),e=>e.message==='SESSION_REVOKED');
+await assert.rejects(lifecycleTerminalOwner.sealTerminal(takeoverRequest,lifecycleTerminalArgs),e=>e.message==='SESSION_REVOKED');
 assert.deepEqual((await lifecycleRef.get()).data(),lifecycleBefore);
 assert.equal((await db.collection("serverUsers").doc(lifecycleUid).collection("pendingGrants").get()).size,0);
 assert.equal((await db.collection("serverUsers").doc(lifecycleUid).collection("ledgerEntries").get()).size,0);

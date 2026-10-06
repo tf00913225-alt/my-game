@@ -25,7 +25,7 @@ function fixture({mutate=()=>{},retry=false,sentinel=false,entropy=.999999,enemy
   let clock=1000,writes=0,entropyCalls=0,clockReads=0,expireOnRead=0,abort=false,active=sessionId;
   class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
   const deps={db:{collection},FieldValue:{serverTimestamp:()=>sentinel?{serverTransform:true}:{toMillis:()=>123}},HttpsError,now:()=>{clockReads++;if(expireOnRead===clockReads)clock=601000;return clock;},randomBytes:n=>{entropyCalls++;const b=Buffer.alloc(n);
-      for(let i=0;i<n;i+=6)b.writeUIntBE(Math.floor(entropy*281474976710656),i,6);return b;},
+      for(let i=0;i<n;i+=6)b.writeUIntBE(Math.floor((Array.isArray(entropy)?entropy[i/6]:entropy)*281474976710656),i,6);return b;},
     inspectExistingEnvelope:v=>({kind:'current',data:v,serverRevision:v.serverRevision}),
     runProtected:async(request,fn)=>{
       if(request.data.uid!==uid)throw new HttpsError('permission-denied','wrong UID');
@@ -162,6 +162,102 @@ const roundArgs=(h,version=0,id='restricted-round-operation-0001')=>({attemptId,
   expectedRevision:2,expectedRoundVersion:version,action:{type:'normal-attack',actor:'player-0',target:'enemy-0'}});
 const advance=(h,extra={},req=h.request)=>h.owner.advance(req,{...roundArgs(h),...extra});
 async function prepared(options){const h=fixture(options);await h.seed();await h.begin();return h;}
+
+const terminalArgs=(version,id='restricted-terminal-operation-0001')=>({attemptId,operationId:id,
+  expectedRevision:2,expectedRoundVersion:version});
+async function terminalFixture(options={}){
+  const h=await prepared({entropy:.1,...options});
+  let version=0;
+  do{
+    await h.owner.advance(h.request,roundArgs(h,version,'restricted-terminal-round-'+String(++version).padStart(4,'0')));
+    const state=h.data.get(h.root+'/restrictedBattleRounds/'+attemptId+'_'+version).projection.nextState;
+    if(!state.playerHP||!state.enemyHP)return {h,version,state};
+  }while(version<128);
+  throw Error('fixture failed to reach terminal resources');
+}
+for(const lowHP of [false,true])test(`terminal resource closure seals once (${lowHP?'player':'enemy'} dead) without authority`,async()=>{
+  const {h,version,state}=await terminalFixture({retry:true,sentinel:true,
+    entropy:lowHP?[.1,.1,.99,.1,.1,.1,.1]:.1,mutate:r=>{if(lowHP)r.characters[0].state.hp=1;}});
+  const before=[...h.data],writes=h.writes,entropy=h.entropyCalls,args=terminalArgs(version);
+  const result=await h.owner.sealTerminal(h.request,args);
+  assert.equal(result.resourceStatus,lowHP?'player-dead':'enemy-dead');
+  assert.equal(state[lowHP?'playerHP':'enemyHP'],0);assert.equal(h.writes,writes+3);
+  assert.equal(h.entropyCalls,entropy);assert.equal(result.projection,undefined);
+  assert.deepEqual(await h.owner.sealTerminal(h.request,args),{...result,unchanged:true});
+  assert.equal(h.writes,writes+3);
+  for(const [p,v] of before)if(!p.includes('/restrictedBattleAttempts/'))assert.deepEqual(h.data.get(p),v);
+  for(const flag of ['combatRulesReady','outcomeVerified','rewardEligible','creditedToCharacter'])assert.equal(result[flag],false);
+  await assert.rejects(h.owner.sealTerminal(h.request,terminalArgs(version,'restricted-terminal-operation-0002')),e=>e.code==='already-exists');
+  await assert.rejects(h.owner.sealTerminal(h.request,{...args,expectedRoundVersion:version+1}),e=>e.code==='failed-precondition');
+  await assert.rejects(h.owner.advance(h.request,roundArgs(h,version,'restricted-terminal-after-0001')));
+  assert.equal(h.writes,writes+3);
+});
+test('terminal refuses live resources, uncommitted versions and client verdicts before writes',async()=>{
+  const h=await prepared();await advance(h);const writes=h.writes;
+  await assert.rejects(h.owner.sealTerminal(h.request,terminalArgs(1)),e=>e.code==='failed-precondition');
+  await assert.rejects(h.owner.sealTerminal(h.request,terminalArgs(2)),e=>e.code==='aborted');
+  for(const patch of [{expectedRoundVersion:0},{expectedRoundVersion:129},{expectedRevision:0},
+    {operationId:attemptId},{winner:'player'},{resourceStatus:'enemy-dead'},{hp:0},{reward:true}]){
+    await assert.rejects(h.owner.sealTerminal(h.request,{...terminalArgs(1),...patch}),e=>e.code==='invalid-argument');
+  }
+  await assert.rejects(h.owner.sealTerminal({data:{...h.request.data,won:true}},terminalArgs(1)),e=>e.code==='invalid-argument');
+  assert.equal(h.writes,writes);
+});
+test('terminal rollback and precommit expiry leave no partial closure',async()=>{
+  const {h,version}=await terminalFixture({retry:true}),before=[...h.data],args=terminalArgs(version);
+  h.abort=true;await assert.rejects(h.owner.sealTerminal(h.request,args),/interrupted/);
+  assert.deepEqual([...h.data],before);h.abort=false;
+  h.expireOnRead=2;await assert.rejects(h.owner.sealTerminal(h.request,args),e=>e.code==='failed-precondition');
+  assert.deepEqual([...h.data],before);h.expireOnRead=0;h.clock=1003;
+  await h.owner.sealTerminal(h.request,args);
+});
+test('terminal replay preserves historical proof after revision, expiry and deployment drift; Session still binds',async()=>{
+  const {h,version}=await terminalFixture(),args=terminalArgs(version);
+  h.data.get(h.root+'/account/current').serverRevision=3;
+  h.data.get(`users/${uid}/saves/current`).serverRevision=3;
+  await assert.rejects(h.owner.sealTerminal(h.request,args),e=>e.code==='aborted');
+  h.data.get(h.root+'/account/current').serverRevision=2;
+  h.data.get(`users/${uid}/saves/current`).serverRevision=2;
+  const result=await h.owner.sealTerminal(h.request,args),writes=h.writes;
+  h.clock=601000;h.data.get(h.root+'/account/current').serverRevision=3;
+  h.data.get(`users/${uid}/saves/current`).serverRevision=3;
+  const policy=require('../functions/src/generated/forest-opening-round-policy.json'),old=policy.rulesSha256;
+  policy.rulesSha256='0'.repeat(64);
+  try{assert.deepEqual(await h.newOwner().sealTerminal(h.request,args),{...result,unchanged:true,expired:true});}
+  finally{policy.rulesSha256=old;}
+  h.session='x'.repeat(32);await assert.rejects(h.owner.sealTerminal(h.request,args));
+  assert.equal(h.writes,writes);
+});
+test('missing terminal, receipt, marker or any original chain evidence never regenerates closure',async()=>{
+  const {h,version}=await terminalFixture(),args=terminalArgs(version);await h.owner.sealTerminal(h.request,args);
+  const writes=h.writes;
+  for(const path of [h.root+'/restrictedBattleTerminals/'+attemptId,h.root+'/operations/'+args.operationId,
+    h.root+'/restrictedBattles/'+attemptId,h.root+'/restrictedBattleRounds/'+attemptId+'_1',
+    h.root+'/restrictedBattlePolicies/'+h.battle().policySha256,h.root+'/recoveryArchives/2']){
+    const saved=h.data.get(path);h.data.delete(path);
+    await assert.rejects(h.owner.sealTerminal(h.request,args));
+    await assert.rejects(h.owner.sealTerminal(h.request,terminalArgs(version,'restricted-terminal-operation-0002')));
+    await assert.rejects(advance(h));h.data.set(path,saved);
+  }
+  const marker=h.data.get(h.root+'/restrictedBattleAttempts/'+attemptId),head=marker.terminalHead;
+  delete marker.terminalHead;await assert.rejects(h.owner.sealTerminal(h.request,args),e=>e.code==='data-loss');
+  marker.terminalHead=head;
+  assert.equal(h.writes,writes);
+});
+test('terminal tampering of original policy, version, resources, digests, flags and receipts blocks replay',async()=>{
+  const {h,version}=await terminalFixture(),args=terminalArgs(version);await h.owner.sealTerminal(h.request,args);
+  const path=h.root+'/restrictedBattleTerminals/'+attemptId,t=h.data.get(path),writes=h.writes;
+  for(const [key,value] of Object.entries({resourceStatus:'player-dead',roundVersion:version+1,
+    roundSha256:'0'.repeat(64),stateSha256:'0'.repeat(64),creationSessionId:'x'.repeat(32),
+    sourceRevision:3,sealedAtMs:601000,combatRulesReady:true,outcomeVerified:true,rewardEligible:true,
+    creditedToCharacter:true,terminalPolicy:{...t.terminalPolicy,policyId:'unknown'}})){
+    h.data.set(path,{...t,[key]:value});
+    await assert.rejects(h.owner.sealTerminal(h.request,args),e=>e.code==='data-loss');
+  }
+  h.data.set(path,t);
+  h.data.get(h.root+'/operations/'+args.operationId).terminalSha256='0'.repeat(64);
+  await assert.rejects(h.owner.sealTerminal(h.request,args),e=>e.code==='data-loss');assert.equal(h.writes,writes);
+});
 test('protected rounds pin entropy once across retries, chain committed state, replay and preserve original sources',async()=>{
   const h=await prepared({retry:true}),before=[...h.data],a=roundArgs(h);
   const first=await advance(h);assert.equal(h.entropyCalls,1);assert.equal(first.roundVersion,1);
