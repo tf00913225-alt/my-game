@@ -104,3 +104,15 @@ such generated changes can therefore still run the full matrix.
 Automatic schedule activation is blocked until a separately authorized main
 release: main is this repository's default branch, and GitHub only schedules
 workflows present there. This task must not modify main or default-branch settings.
+
+## Phase 2 enforced checkpoint
+
+Remote Shadow classifier job `112100800243` on Head `668ec9ff42c5e3e1e27456b4b728e5c323d2ef29`
+passed all fixtures and emitted SHADOW with every original gate retained; CI
+run `37411524319` remains supplementary full execution. Eight representative
+fixtures plus fail-closed cases passed before enabling conditional PR gates.
+Enforcement is restricted to PRs into dev. main-target PRs and all non-PR
+contexts force full gates. Aggregate validates the classifier child and schema;
+failure/cancellation never count as legal skips. Pure docs can skip balance and
+browser jobs; unknown source, generated manifest/build, CI/framework/shared
+owners remain strict. Runtime files under docs are not document-only changes.

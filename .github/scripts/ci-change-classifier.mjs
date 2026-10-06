@@ -3,7 +3,7 @@ import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 
 // Single policy owner. Rollback conditional PR gates by setting this false.
-export const PR_GATES_ENABLED = false;
+export const PR_GATES_ENABLED = true;
 export const CHANGE_FLAGS = Object.freeze([
   'core', 'battle', 'monster_balance', 'tower', 'daily', 'abyss', 'adventure',
   'boss', 'ui', 'inventory', 'skill', 'portrait', 'cloud', 'persistence',
@@ -57,7 +57,8 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
     if (/^(?:js\/(?:00-main|gameplay-boss-tower-system|.*(?:skill|battle|relic).*)\.js|functions\/.*battle.*|tests\/fixtures\/|tests\/.*(?:battle|monster-balance|skill-progression|level-suppression|hit-evasion).*)$/.test(p)) {
       strict(`Shared battle/test owner: ${p}`, 'battle'); continue;
     }
-    if (p.startsWith('docs/') || (/\.md$/i.test(p) && !p.startsWith('release/'))) continue;
+    if ((p.startsWith('docs/') && !/\.(?:js|mjs|cjs|css|html|json|ya?ml)$/i.test(p)) ||
+        (/\.md$/i.test(p) && !p.startsWith('release/'))) continue;
     if (addedPaths.includes(p) && /\.(?:js|mjs|cjs)$/.test(p)) {
       strict(`New runtime/test source: ${p}`, 'unknown_runtime'); continue;
     }

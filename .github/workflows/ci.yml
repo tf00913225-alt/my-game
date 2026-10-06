@@ -44,7 +44,7 @@ jobs:
           package-manager-cache: false
       - name: Verify classifier fixtures before emitting policy
         run: node --test tests/ci-change-classifier.test.mjs
-      - name: Compute fail-closed shadow plan
+      - name: Compute fail-closed PR/full plan
         id: classify
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -54,6 +54,7 @@ jobs:
         run: node .github/scripts/ci-change-classifier.mjs
 
   core_checks:
+    needs: classify
     name: core_checks
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -212,7 +213,7 @@ jobs:
           node tests/battle-input-hitbox-browser-20260919.test.js
 
       - name: Ensure existing asset-test dependency
-        if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
+        if: needs.classify.outputs.main_browser == 'true'
         run: |
           if ! command -v identify >/dev/null 2>&1; then
             sudo apt-get update
@@ -278,6 +279,8 @@ jobs:
 
 
   battle_browser:
+    needs: classify
+    if: needs.classify.outputs.battle_browser == 'true'
     name: battle_browser
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -385,6 +388,8 @@ jobs:
 
 
   ui_browser:
+    needs: classify
+    if: needs.classify.outputs.ui_browser == 'true'
     name: ui_browser
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -520,6 +525,8 @@ jobs:
 
 
   daily_browser:
+    needs: classify
+    if: needs.classify.outputs.daily_browser == 'true'
     name: daily_browser
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -574,6 +581,8 @@ jobs:
 
 
   tower_wild_browser:
+    needs: classify
+    if: needs.classify.outputs.tower_wild_browser == 'true'
     name: tower_wild_browser
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -625,6 +634,8 @@ jobs:
 
 
   portrait_browser:
+    needs: classify
+    if: needs.classify.outputs.portrait_browser == 'true'
     name: portrait_browser
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -711,6 +722,8 @@ jobs:
 
 
   adventure_ui_browser:
+    needs: classify
+    if: needs.classify.outputs.adventure_ui_browser == 'true'
     name: adventure_ui_browser
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -752,6 +765,7 @@ jobs:
 
 
   main_browser:
+    needs: classify
     name: main_browser
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -798,6 +812,8 @@ jobs:
 
 
   abyss_balance:
+    needs: classify
+    if: needs.classify.outputs.abyss_balance == 'true'
     name: Abyss Phase2D production gates
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -832,6 +848,8 @@ jobs:
           retention-days: 90
 
   adventure_balance:
+    needs: classify
+    if: needs.classify.outputs.adventure_balance == 'true'
     name: Adventure Phase2E production gates
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -866,6 +884,8 @@ jobs:
           retention-days: 90
 
   boss_balance:
+    needs: classify
+    if: needs.classify.outputs.boss_balance == 'true'
     name: Boss Phase2F production gates
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -921,6 +941,7 @@ jobs:
       - name: Require every necessary child gate
         env:
           CI_NEEDS_JSON: ${{ toJSON(needs) }}
+          CI_PLAN_JSON: ${{ needs.classify.outputs.plan_json }}
           CI_MAIN_REQUIRED: ${{ github.ref == 'refs/heads/main' || github.base_ref == 'main' }}
         run: node .github/scripts/ci-aggregate.mjs
 

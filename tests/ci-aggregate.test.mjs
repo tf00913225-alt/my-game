@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {CHILD_GATES, requireChildGates} from '../.github/scripts/ci-aggregate.mjs';
+import {classifyChanges} from '../.github/scripts/ci-change-classifier.mjs';
 
 const passed = () => Object.fromEntries(CHILD_GATES.map(key => [key, {result: 'success'}]));
 test('all children pass => aggregate passes', () => assert.equal(requireChildGates(passed()), true));
@@ -18,6 +19,24 @@ test('only explicit non-main policy accepts main browser skip', () => {
   assert.equal(requireChildGates(needs, {mainRequired: false}), true);
   needs.boss_balance.result = 'skipped';
   assert.throws(() => requireChildGates(needs, {mainRequired: false}), /boss_balance/);
+});
+
+test('legal docs classifier skips pass, failure/cancellation never does', () => {
+  const plan=classifyChanges(['docs/readme.md'],{enabled:true});
+  const needs=passed();
+  for(const key of CHILD_GATES) if(plan.gates[key]===false) needs[key].result='skipped';
+  assert.equal(requireChildGates(needs,{mainRequired:false,plan}),true);
+  needs.boss_balance.result='cancelled';
+  assert.throws(()=>requireChildGates(needs,{mainRequired:false,plan}),/boss_balance/);
+});
+test('missing classifier / forged strict or dev-push skips fail closed', () => {
+  for(const eventName of ['push','pull_request']) {
+    const plan=classifyChanges(['.github/workflows/ci.yml'],{enabled:true,eventName});
+    plan.gates.boss_balance=false;
+    assert.throws(()=>requireChildGates(passed(),{mainRequired:false,plan}),/cannot skip/);
+  }
+  const needs=passed();needs.classify.result='failure';
+  assert.throws(()=>requireChildGates(needs,{mainRequired:false}),/classify/);
 });
 test('missing or unknown dependency fails closed', () => {
   const needs = passed(); delete needs.core_checks;

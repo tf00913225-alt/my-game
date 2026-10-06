@@ -22,7 +22,7 @@ test('Docs fixture retains core and skips expensive browsers', () => {
   assert.equal(p.gates.core_checks,true);BROWSER_GATES.forEach(k=>assert.equal(p.gates[k],false,k));
 });
 test('unknown runtime / unowned CSS / framework / build / loader fail closed', () => {
-  for(const path of ['js/new-runtime.js','css/new-style.css','tests/unknown.test.js','scripts/build-production.mjs','config/feature-manifest.json','asset-manifest.json']) {
+  for(const path of ['js/new-runtime.js','docs/live.js','css/new-style.css','tests/unknown.test.js','scripts/build-production.mjs','config/feature-manifest.json','asset-manifest.json']) {
     const p=classify([path]);assert.equal(p.strictMode,true,path);all(p);
   }
 });
