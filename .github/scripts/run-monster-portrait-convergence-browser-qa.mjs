@@ -46,10 +46,10 @@ const expression=String.raw`(async()=>{
   roster.forEach(m=>{m.alive=true;m.hp=m.hp||100;m.maxHP=m.maxHP||100;m.sp=m.sp||0;m.maxSP=m.maxSP||1;m.level=m.level||70;v154BindMonsterPortraitIdentity(m);});
   const prepared=await v154PreparePortraitsForEncounter(roster);check(prepared.state==='ready','portrait preparation '+label);
   FourSymbolsBattlefieldSlots.setActiveEnemySnapshot(FourSymbolsBattlefieldSlots.createEnemyFormationSnapshot(currentBattleMonsters,{originalFormationType:roster.length}));
-  showPage('battle');renderBattle();v154SyncMonsterPortraits();
+  showPage('battle');renderBattle();
   roster.forEach((m,i)=>measure(m,i,label+'/first'));
-  renderBattle();v154SyncMonsterPortraits();roster.forEach((m,i)=>measure(m,i,label+'/redraw'));
-  showPage('home');showPage('battle');renderBattle();v154SyncMonsterPortraits();roster.forEach((m,i)=>measure(m,i,label+'/reentry'));
+  renderBattle();roster.forEach((m,i)=>measure(m,i,label+'/redraw'));
+  showPage('home');showPage('battle');renderBattle();roster.forEach((m,i)=>measure(m,i,label+'/reentry'));
   evidence.reentry.push(label);
  }
  const wild=targets.filter(t=>t.portraitKey.startsWith('wild.')).slice(0,5).map(t=>({...t}));await scene(wild,'Wild');
@@ -77,18 +77,18 @@ const expression=String.raw`(async()=>{
   check(vGameplayStartBoss(mode,definition.id),'native Boss entry '+mode);
   await wait(()=>battleActive&&document.getElementById('battleMonster0'));
   await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
-  await v154PreparePortraitsForEncounter(monsters);renderBattle();v154SyncMonsterPortraits();
   currentBattleMonsters.forEach(i=>measure(monsters[i],i,mode+'/first'));
-  renderBattle();v154SyncMonsterPortraits();currentBattleMonsters.forEach(i=>measure(monsters[i],i,mode+'/redraw'));
-  showPage('home');showPage('battle');renderBattle();v154SyncMonsterPortraits();currentBattleMonsters.forEach(i=>measure(monsters[i],i,mode+'/reentry'));
+  renderBattle();currentBattleMonsters.forEach(i=>measure(monsters[i],i,mode+'/redraw'));
+  showPage('home');showPage('battle');renderBattle();currentBattleMonsters.forEach(i=>measure(monsters[i],i,mode+'/reentry'));
   evidence.nativeRosters.push(mode);
   if(mode==='world'){
    turn=10;GameplaySystem.debugProcessBossRound();
    const guards=currentBattleMonsters.filter(i=>monsters[i].unitKind==='boss-reinforcement');
    check(guards.length===2,'native reinforcement creation');
-   await v154PreparePortraitsForEncounter(guards.map(i=>monsters[i]));renderBattle();v154SyncMonsterPortraits();
    guards.forEach(i=>measure(monsters[i],i,'Reinforcement/first'));
-   renderBattle();v154SyncMonsterPortraits();guards.forEach(i=>measure(monsters[i],i,'Reinforcement/redraw'));
+   renderBattle();guards.forEach(i=>measure(monsters[i],i,'Reinforcement/redraw'));
+   showPage('home');showPage('battle');renderBattle();guards.forEach(i=>measure(monsters[i],i,'Reinforcement/reentry'));
+   evidence.reentry.push('Reinforcement');
    evidence.nativeRosters.push('Reinforcement');
   }
  }
