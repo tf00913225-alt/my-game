@@ -12628,6 +12628,21 @@ function getDamageBudgetMultiplier(skillOrOptions){
     return 1;
 }
 
+/* Relic modifiers project into this sole direct-damage formula. Explicit
+   non-direct sources never consume incoming protection or outgoing suppression. */
+function getRelicDirectDamageMultiplier(attacker,target,options){
+    const context=options||{};
+    if(String(context.damageKind||"direct")!=="direct"||
+        ["relic","dot","reflect","environment","self","hpCost"].includes(context.sourceType)||
+        (attacker&&attacker.vGameplayBossObject===true)){ return 1; }
+    const owner=window.v174RelicDamageModifiers;
+    if(!owner){ return 1; }
+    const outgoing=typeof owner.outgoingReduction==="function"?Number(owner.outgoingReduction(attacker))||0:0;
+    const incoming=typeof owner.incomingReduction==="function"?Number(owner.incomingReduction(target))||0:0;
+    return (1-Math.max(0,Math.min(100,outgoing))/100)*
+        (1-Math.max(0,Math.min(80,incoming))/100);
+}
+
 window.v173GetOrdinaryDamageBonusPercent=getOrdinaryDamageBonusPercent;
 window.v173GetOrdinaryDamageMultiplier=getOrdinaryDamageMultiplier;
 window.v173GetEnemyPressureMultiplier=getEnemyPressureMultiplier;
@@ -12683,11 +12698,12 @@ function calculateDamage(
         ?Math.max(0,Number(bossOwner.getOutgoingDamageMultiplier(attacker))||0):1;
     const towerFactor=getTowerDirectDamageMultiplier(attacker,options);
     const budgetFactor=getDamageBudgetMultiplier(options);
+    const relicFactor=getRelicDirectDamageMultiplier(attacker,options.target||null,options);
     const randomFactor=0.95+Math.random()*0.10;
 
     const result=
         safeAttack*levelFactor*elementFactor*defenseFactor*
-        ordinaryFactor*criticalFactor*pressureFactor*bossDamageFactor*towerFactor*budgetFactor*randomFactor;
+        ordinaryFactor*criticalFactor*pressureFactor*bossDamageFactor*towerFactor*budgetFactor*relicFactor*randomFactor;
 
     if(!Number.isFinite(result)){ return 1; }
     return Math.max(1,Math.round(result));
@@ -19421,445 +19437,7 @@ function closeMenus(){
    的自動分派邏輯統一在外面呼叫一次。
 
    如果這裡的防禦也在內部呼叫finishPlayerAction()，
-   外面那個「呼叫完player2AutoAction()
-   之後再呼叫一次finishPlayerAction()」的邏輯
-   會變成呼叫兩次，導致行動順序被跳號、
-   角色索引錯亂。
-
-   所以拆成兩層：
-   setDefendingState()只負責「設定防禦狀態+記錄」，
-   不管進不進度；
-   applyDefendEffect()是給「會自己負責結束行動」
-   的呼叫者用（手動防禦、player1自動防禦），
-   內部才呼叫finishPlayerAction()。
-   player2AutoAction()的防禦分支則直接呼叫
-   setDefendingState()，讓外層統一呼叫
-   finishPlayerAction()，維持跟其他player2
-   自動行動路徑一致的呼叫方式。
-*/
-
-function setDefendingState(characterIndex){
-    const activeCharacter=
-        getPartyCharacterByIndex(characterIndex);
-
-
-    if(!activeCharacter){
-        return;
-    }
-
-
-    activeCharacter.isDefending=
-        true;
-
-
-    /*
-       ★ 修正（依照使用者要求）：
-       這裡原本會額外印一行「擺出防禦姿態，
-       本回合受到的傷害減半」，
-       使用者覺得沒必要——防禦有沒有生效，
-       應該直接反映在「被攻擊時的那一行」，
-       標註「（防禦狀態傷害減半）」就夠了，
-       不需要另外多一行事先宣告的訊息。
-       這裡拿掉這行log，效果本身
-       （isDefending=true）還是照常套用。
-    */
-
-    updateUI();
-
-}
-
-
-function applyDefendEffect(characterIndex){
-
-    setDefendingState(
-        characterIndex
-    );
-
-
-    finishPlayerAction();
-
-}
-
-
-function useDefend(){
-    const autoOn=
-        activeBattleCharacterIndex===0
-        ? autoBattle
-        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
-
-    const activeCharacter=
-        getPartyCharacterByIndex(activeBattleCharacterIndex);
-
-
-    if(
-        !battleActive ||
-        autoOn ||
-        actionReady ||
-        !activeCharacter ||
-        activeCharacter.hp<=0
-    ){
-        return;
-    }
-
-
-    /*
-       ★ 修正（真的抓到兩個bug）：
-
-       1. 這裡原本只「檢查」actionReady，
-          從來沒有「設定」actionReady=true，
-          等於這道防呆形同虛設——
-          手指按快一點，第二次點擊會在
-          finishPlayerAction()真正把狀態鎖住之前
-          就先闖關成功，導致同一個角色的行動
-          被宣告兩次、進度被推進兩次，
-          後面的角色/怪物的執行順序就整個錯亂，
-          這正是「怪物攻擊兩次」背後的真正原因。
-
-       2. 角色已經死亡（HP<=0）還是能按防禦，
-          這裡也一併補上防呆。
-
-       這裡在真正生效之前立刻鎖住actionReady，
-       第二次點擊會直接被上面那道guard擋下來。
-    */
-
-    actionReady=true;
-
-
-    /*
-       ★ 修正（重要，依照使用者明確指正）：
-       防禦之前是「按了就立刻生效」，       跳過宣告/結算流程。
-       現在改成跟其他行動一樣先宣告、
-       等結算階段照敏捷順序才真正生效——
-       雖然防禦本身「保護的是接下來受到的傷害」，       不太受順序影響，但玩家明確要求
-       「所有行動都要遵循同一套宣告/結算機制」，
-       不要有防禦這種特例，這裡就照做。
-    */
-
-    queuedPlayerActions[
-        activeBattleCharacterIndex
-    ]={
-
-        action:"defend",
-
-        target:null
-
-    };
-
-
-    updateUI();
-
-    finishPlayerAction();
-
-}
-
-
-function usePotion(potionId){
-
-    /*
-       V91：戰鬥宣告直接記住「哪一瓶」藥水，
-       不再只記 hp/sp 類型。真正扣背包數量與
-       百分比恢復仍留在敏捷排序後的結算階段。
-    */
-
-    const definition=getPotionDefinition(potionId);
-
-    if(!definition){
-        return;
-    }
-
-    const autoOn=
-        activeBattleCharacterIndex===0
-        ? autoBattle
-        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
-
-    if(
-        !battleActive ||
-        autoOn ||
-        actionReady
-    ){
-        return;
-    }
-
-    const activeCharacter=
-        getPartyCharacterByIndex(activeBattleCharacterIndex);
-
-    if(
-        !activeCharacter ||
-        activeCharacter.hp<=0
-    ){
-        return;
-    }
-
-    if(getPotionCount(potionId)<=0){
-        addBattleLog(
-            definition.name+
-            "目前沒有庫存。"
-        );
-        renderBattlePotionMenu();
-        return;
-    }
-
-    const stats=
-        getPartyBattleStats(activeBattleCharacterIndex);
-
-    if(
-        definition.resource==="hp" &&
-        activeCharacter.hp>=stats.maxHP
-    ){
-        addBattleLog("HP已經是滿的。");
-        return;
-    }
-
-    if(
-        definition.resource==="sp" &&
-        activeCharacter.sp>=stats.maxSP
-    ){
-        addBattleLog("SP已經是滿的。");
-        return;
-    }
-
-    actionReady=true;
-
-    queuedPlayerActions[
-        activeBattleCharacterIndex
-    ]={
-        action:"potion",
-        potionId:potionId,
-        target:null
-    };
-
-    closeMenus();
-    updateUI();
-    finishPlayerAction();
-}
-
-
-function applyPotionEffect(potionId,characterIndex){
-
-    const definition=getPotionDefinition(potionId);
-
-    if(!definition){
-        addBattleLog("找不到這個藥水資料。");
-        finishPlayerAction();
-        return;
-    }
-
-    const activeCharacter=
-        getPartyCharacterByIndex(characterIndex);
-
-    if(!activeCharacter){
-        finishPlayerAction();
-        return;
-    }
-
-    const stats=
-        getPartyBattleStats(characterIndex);
-
-    const maxValue=
-        definition.resource==="hp"
-        ? stats.maxHP
-        : stats.maxSP;
-
-    const currentValue=
-        definition.resource==="hp"
-        ? activeCharacter.hp
-        : activeCharacter.sp;
-
-    if(currentValue>=maxValue){
-        addBattleLog(
-            (definition.resource==="hp" ? "HP" : "SP")+
-            "已經是滿的。"
-        );
-        finishPlayerAction();
-        return;
-    }
-
-    if(getPotionCount(potionId)<=0){
-        addBattleLog(
-            definition.name+
-            "目前沒有庫存。"
-        );
-        finishPlayerAction();
-        return;
-    }
-
-    const recovered=resolvePotionRecovery(definition,currentValue,maxValue);
-
-    if(recovered<=0){
-        finishPlayerAction();
-        return;
-    }
-
-    if(!consumePotionFromInventory(potionId,1)){
-        addBattleLog(
-            definition.name+
-            "扣除失敗。"
-        );
-        finishPlayerAction();
-        return;
-    }
-
-    if(definition.resource==="hp"){
-        activeCharacter.hp=Math.min(
-            stats.maxHP,
-            activeCharacter.hp+recovered
-        );
-
-        showPlayerHit(
-            recovered,
-            "heal",
-            characterIndex,
-            true
-        );
-    }else{
-        activeCharacter.sp=Math.min(
-            stats.maxSP,
-            activeCharacter.sp+recovered
-        );
-
-        showPlayerHit(
-            recovered,
-            "sp",
-            characterIndex,
-            true
-        );
-    }
-
-    addBattleLog(
-        (activeCharacter.id||"你")+
-        "使用"+
-        definition.name+
-        "，恢復"+
-        recovered+
-        " "+
-        definition.resource.toUpperCase()+
-        "。"
-    );
-
-    updateUI();
-    saveGame();
-    finishPlayerAction();
-}
-
-
-/* =====================================================
-   自動戰鬥
-===================================================== */
-
-function toggleAutoBattle(){
-
-    /*
-       ★ 修正（依照使用者要求，讓巡邏頁面的
-       自動戰鬥按鈕也能用）：
-       原本這裡開頭就是「不在戰鬥中就直接
-       return」，導致在地圖／巡邏頁面按這顆
-       按鈕完全沒有任何反應——但玩家會想在
-       戰鬥之外，先把「下一場戰鬥要不要自動」
-       這個偏好設定好，不需要真的人在戰鬥裡
-       才能調整。
-
-       拿掉這個開頭的擋板之後，下面的邏輯
-       （改autoBattle、同步autoConfig.enabled／
-       autoConfig2.enabled、更新按鈕文字、
-       寫一行戰鬥紀錄）在不在戰鬥中執行都是
-       安全的——autoConfig.enabled本來就是
-       「下一場戰鬥要沿用的設定」，startBattle()
-       開新戰鬥時會自己讀這個值，所以在戰鬥外
-       調整，效果就是「先設定好，下一場自動生效」，
-       跟原本設計的用途完全一致。
-       最下面那段「宣告階段安全接手」的邏輯
-       本身有battlePhase／battleActive雙重檢查，
-       不在戰鬥中執行也不會有任何副作用。
-    */
-
-    autoBattle =
-        !autoBattle;
-
-
-    /*
-       ★ 新增（依照使用者要求）：
-       切換自動戰鬥的當下，立刻重新判斷
-       回合資訊列／戰鬥指令按鈕要不要顯示——
-       打開自動戰鬥時應該馬上藏起來（不用
-       等到下一次declare/resolve切換才生效），
-       關掉恢復手動時，如果現在剛好是宣告
-       階段、輪到玩家自己選，也要立刻顯示
-       出來，不能讓玩家對著藏起來的按鈕
-       不知道要點哪裡。
-    */
-
-    updateActionHudVisibility();
-
-
-    /*
-       ★ 修正：
-       原本這裡只改了本場戰鬥用的 autoBattle，
-       沒有同步回 autoConfig.enabled，
-       導致下一場戰鬥開始時
-       startBattle() 會用主城設定的
-       autoConfig.enabled 重新覆蓋，
-       如果玩家沒有另外去主城勾選，
-       第二場就會變回手動，看起來像「自動戰鬥失效」。
-       這裡同步更新設定，並且順便同步
-       主城那個checkbox的畫面，
-       這樣切換一次之後之後每一場都會沿用。
-    */
-
-    autoConfig.enabled =
-        autoBattle;
-
-
-    /*
-       ★ 修正（真的抓到一個bug）：
-       這裡原本完全沒有動到autoConfig2.enabled，
-       等於這顆共用的「啟動/停止」按鈕
-       永遠只控制第一角色，
-       第二角色的自動戰鬥開關從頭到尾沒被碰過，
-       一直維持在預設的關閉狀態——
-       這正是「只有青墨東皇會自動，青水不會」
-       的真正原因。
-
-       現在只有一顆共用按鈕，沒有另外的
-       per-character開關可以分別按，
-       合理的行為應該是「一鍵讓整隊都自動/都手動」，
-       所以這裡讓第二角色（如果存在）
-       跟著第一角色的狀態一起切換。
-    */
-
-    if(player2){
-
-        autoConfig2.enabled=
-            autoBattle;
-
-    }
-
-    if(player3){
-
-        autoConfig3.enabled=
-            autoBattle;
-
-    }
-
-
-    const homeCheckbox =
-        $("autoEnabled");
-
-
-    if(homeCheckbox){
-
-        homeCheckbox.checked =
-            autoBattle;
-
-    }
-
-
-    const player2Checkbox=
-        $("autoEnabledPlayer2");
-
-
-    if(player2Checkbox){
-
-        player2Checkbox.checked=
+   ed=
             autoBattle;
 
     }
@@ -19875,214 +19453,7 @@ function toggleAutoBattle(){
     }
     else if(
         battleActive &&
-        battlePhase==="declare"
-    ){
-        /* V95：從自動切回手動時，不重新啟動回合、
-           不改 activeBattleCharacterIndex；直接用當下真正
-           正在等待操作的角色顯示粗黃框與技能列。 */
-        clearBattleTargetSelectionMode();
-        updateActiveCharacterHighlight();
-        populateSkillQuickBar();
-    }
-
-
-    updateAutoButton();
-
-
-    addBattleLog(
-
-        autoBattle
-        ?
-        "自動戰鬥開始（下一場也會沿用此設定）。"
-        :
-        "⏹ 已停止自動戰鬥。"
-
-    );
-
-
-    /*
-       ★ 修正（真的抓到了，這次的除錯訊息
-       直接把兇手抓出來了）：
-
-       這裡原本「重新啟動自動戰鬥時，
-       400ms後強制呼叫一次autoAction()」，
-       是很早之前為了解決「自動戰鬥卡住」
-       留下的權宜之計——但autoAction()
-       是「第一角色宣告階段」專用的函式，
-       這裡完全沒有檢查當下：
-       - 現在是宣告階段還是結算階段
-         （battlePhase）
-       - 現在真的輪到第一角色宣告嗎
-         （activeBattleCharacterIndex）
-       - 自然的流程本身是不是根本沒卡住，
-         只是玩家自己手癢按了停止/啟動
-
-       只要玩家在宣告階段但輪到「清水戰」
-       宣告時按了停止又啟動，400ms後這段
-       會不管三七二十一直接呼叫autoAction()
-       （幫第一角色宣告一次、並呼叫一次
-       finishPlayerAction()），等於在
-       activeBattleCharacterIndex還沒真正
-       輪到第一角色的情況下，硬是把它往前
-       多推了一步——這正是「宣告階段莫名其妙
-       多出一次finishPlayerAction()、
-       清水戰的宣告被跳過、queued變空」
-       的真正原因。如果剛好發生在結算階段，
-       一樣會讓initiativeIndex被多推一步，
-       跳過該輪到的下一位。
-
-       現在已經把「手動/自動模式下，SP不足、
-       尚未學習等分支漏呼叫finishPlayerAction()」
-       這些真正會讓流程卡死的漏洞都補上了，
-       正常情況下自然的宣告/結算鏈不會再
-       無聲卡住，這個「外部硬踢一次」的
-       權宜之計已經不需要、而且是主動的
-       危害來源，直接拿掉。
-
-       切換自動戰鬥現在只單純改
-       autoBattle/autoConfig這些狀態旗標，
-       下一次beginCharacterTurn()自然執行到
-       的時候，會自己讀到新的autoOn值、
-       正確判斷要不要自動出手。
-
-       ★ 但（依照使用者實測回報，補回一個
-       合理但要做對的行為）：
-       如果切換的當下，剛好卡在「宣告階段，
-       正在等某個角色手動輸入」（那個角色的
-       20秒計時器正在跑），玩家把自動打開，
-       直覺會期待「這個正在等我的角色，
-       現在馬上自動幫我選」——不能什麼都不做，
-       不然要嘛只能等20秒逾時、要嘛得先做完
-       這輪手動選擇，自動開關看起來像沒反應。
-
-       這裡跟拿掉的舊版最大差別：
-       1. 只接手「當下正在等待、且剛被切成
-          自動」的那一位，不會不分青紅皂白
-          永遠呼叫player1的autoAction()。
-       2. 執行前用closure記住當下的
-          battleToken、battlePhase、
-          activeBattleCharacterIndex，
-          setTimeout真正執行的那一刻，
-          三個條件都要重新核對一次沒有變過
-          （token沒換新戰鬥、還是宣告階段、
-          還是同一個角色在等）——如果玩家
-          在這400ms內自己手動選完了，
-          或流程本來就自然繼續往下走了，
-          這裡的核對會失敗，直接什麼都不做，
-          不會發生「已經有人選過了，這裡
-          又硬插一次」的重複推進。
-    */
-
-    if(
-        autoBattle &&
-        battlePhase==="declare"
-    ){
-
-        const expectedToken=
-            battleToken;
-
-        const expectedCharacterIndex=
-            activeBattleCharacterIndex;
-
-        setTimeout(()=>{
-
-            if(
-                !battleActive ||
-                battleToken!==
-                expectedToken ||
-                battlePhase!==
-                "declare"||
-                activeBattleCharacterIndex!==
-                expectedCharacterIndex
-            ){
-                return;
-            }
-
-
-            try{
-
-                autoActionForCharacter(
-                    expectedCharacterIndex,
-                    expectedToken
-                );
-
-            }
-            catch(error){
-
-                console.error(
-                    "切換自動戰鬥時接手宣告發生例外：",
-                    error
-                );
-
-            }
-
-        },400);
-
-    }
-
-}
-
-
-function updateAutoButton(){
-
-    /*
-       ★ 修正（依照使用者指定版面）：
-       啟動之後按鈕文字改成「停止」、
-       加上active的紅色樣式；
-       左邊的標籤文字也要跟著換成「自動戰鬥中」。
-    */
-
-    const button=
-        $("autoBattleButton");
-
-
-    if(button){
-
-        button.textContent=
-
-            autoBattle
-            ?
-            "⏹ 停止"
-            :
-            "▶ 啟動";
-
-
-        button.classList.toggle(
-            "active",
-            autoBattle
-        );
-
-    }
-
-
-    const label=
-        $("autoBattleLabel");
-
-
-    if(label){
-
-        label.textContent=
-
-            autoBattle
-            ?
-            "自動戰鬥中"
-            :
-            "自動戰鬥";
-
-    }
-
-
-    /*
-       ★ 新增（依照使用者要求，巡邏頁面的
-       自動戰鬥面板）：
-       跟上面同一套邏輯，同步更新巡邏頁面
-       那份自動戰鬥按鈕/標籤，確保兩邊
-       顯示的狀態永遠一致，不會出現戰鬥
-       頁面顯示「停止」、巡邏頁面卻還顯示
-       「啟動」這種不同步的情況。
-    */
-
-    const mapButton=
+        n=
         $("mapAutoBattleButton");
 
 
@@ -20144,39 +19515,7 @@ function updateAutoButton(){
         $("quickAutoBattleToggle");
 
 
-    if(quickBattleBtn){
-
-        quickBattleBtn.setAttribute(
-            "aria-label",
-
-            autoBattle
-            ?
-            "自動戰鬥（開啟中）"
-            :
-            "自動戰鬥（關閉）"
-        );
-
-
-        quickBattleBtn.classList.toggle(
-            "active",
-            autoBattle
-        );
-
-    }
-
-}
-
-
-/*
-   ★ 新增：自動戰鬥詳細設定面板（展開版）。
-
-   openAutoBattleSettings()：展開面板，
-   預設先顯示玩家1的設定。
-
-   switchAutoSettingsCharacter()：切換角色時，
-   重新填入「自動行動」下拉選單
-   （普通攻擊/防禦/該角色裝備的技能），
-   並載入該角色目前的HP%/SP%/自動回城設定。
+  HP%/SP%/自動回城設定。
 
    confirmAutoBattleSettings()：把表單上的值
    寫回對應角色的autoConfig/autoConfig2，存檔，收起面板。
@@ -20218,16 +19557,7 @@ function openAutoBattleSettings(){
        整個display:none，就算把面板自己的
        display改掉，也會被沒有display的
        祖先蓋住看不見——這正是「設定按鈕
-       沒反應」的真正原因。
-
-       這裡在「不在戰鬥中」的情況下，把面板
-       這個DOM節點暫時搬到document.body底下
-       （逃出battlePage那層display:none），
-       並套用上面新增的floating-modal樣式
-       （改成position:fixed、自己定位）。
-       搬走之前先記住原本的位置
-       （autoSettingsOriginalParent／
-       autoSettingsOriginalNextSibling），
+       sOriginalNextSibling），
        closeAutoBattleSettings()裡會依照
        這兩個值把它搬回battlePage原本的
        位置，不會讓它從此消失在battlePage裡。
@@ -20417,38 +19747,7 @@ function openAutoBattleSettings(){
             panel.style.height=
 
                 (bottomEdge-topEdge)+
-                "px";
-
-            panel.style.zIndex=
-                "99999";
-
-        }
-
-    }
-    else{
-
-        /*
-           ★ 不在戰鬥中：清掉可能殘留的行內
-           定位樣式（例如上一次在戰鬥頁面裡
-           打開時設過的top/height），
-           讓floating-modal這個class能夠
-           正常生效，不被殘留的行內樣式卡住。
-        */
-
-        panel.style.position=
-            "";
-
-        panel.style.top=
-            "";
-
-        panel.style.left=
-            "";
-
-        panel.style.right=
-            "";
-
-        panel.style.height=
-            "";
+                "px"";
 
         panel.style.zIndex=
             "";
@@ -20584,30 +19883,7 @@ function saveAutoSettingsFormToCharacter(characterIndex){
     if(actionSelect){
 
         targetConfig.skill=
-            actionSelect.value;
-
-    }
-
-
-    if(hpSelect){
-
-        targetConfig.hp=
-            Number(hpSelect.value);
-
-    }
-
-
-    if(spSelect){
-
-        targetConfig.sp=
-            Number(spSelect.value);
-
-    }
-
-
-    if(returnCityCheckbox){
-
-        targetConfig.returnToCityWhenEmpty=
+            actionSelect.valtConfig.returnToCityWhenEmpty=
 
             returnCityCheckbox.checked;
 
@@ -20750,39 +20026,7 @@ function switchAutoSettingsCharacter(skipSave){
                 }
             );
 
-        }
-
-
-        actionSelect.innerHTML=
-            optionsHTML;
-
-
-        const stillValid=
-
-            Array.from(
-                actionSelect.options
-            )
-            .some(
-                opt=>
-                    opt.value===
-                    targetConfig.skill
-            );
-
-
-        actionSelect.value=
-
-            stillValid
-            ?
-            targetConfig.skill
-            :
-            "normal";
-
-    }
-
-
-    if(hpSelect){
-
-        hpSelect.value=
+.value=
             targetConfig.hp;
 
     }
@@ -21344,25 +20588,7 @@ function player2NormalAttack(index){
            呼叫updateUI()、finishPlayerAction()——
            普通攻擊是使用頻率最高的動作，
            這代表水墨幾乎每次普通攻擊都會讓
-           戰鬥卡住不動，這應該就是「戰鬥到一半
-           卡住」最主要、最常發生的原因，
-           不是背景執行的問題。
-
-           補上這兩行，沒命中的時候也要正確結束
-           這個角色的行動、往下一位推進。
-        */
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const critResult=
-        rollCritical(
+           戰鬥     rollCritical(
             player2,
             "physical",
             getMonsterEffectiveAntiCrit(monster),
@@ -21400,22 +20626,7 @@ function player2NormalAttack(index){
     );
 
 
-    addBattleLog(
-
-        ""+
-        player2.id+
-        "普通攻擊"+
-        monster.name+
-        (
-            critResult.isCrit
-            ?
-            "（爆擊！）"
-            :
-            ""
-        )+
-        "，造成"+
-        damage+
-        "傷害。"
+ "傷害。"
 
     );
 
@@ -21857,18 +21068,7 @@ function castPlayer2Skill(skillId,centerIndex){
             skill,
             level,
             monster,
-            index,
-            player2.level,
-            skill.category==="physical"?stats2.attackPoints:stats2.intelligence
-        );
-
-
-        if(skill.lifestealPercentByLevel){
-
-            totalLifesteal+=
-                actualDamageDealt;
-
-        }
+            
 
 
         if(monster.hp<=0){
@@ -21910,22 +21110,7 @@ function castPlayer2Skill(skillId,centerIndex){
                 stats2.maxSP,
                 player2.sp+
                 lifestealAmount
-            );
-
-
-        showPlayerHit(
-            lifestealAmount,
-            "heal",
-            1,
-            true
-        );
-
-
-        addBattleLog(
-            ""+
-            player2.id+
-            "吸收傷害回復了"+
-            lifestealAmount+
+      
             "點HP與SP。"
         );
 
@@ -21940,17 +21125,7 @@ function castPlayer2Skill(skillId,centerIndex){
     */
 
     if(skill.selfShieldByLevel&&canApplyNamedPersistentState(
-        player2,"shield","player",1,skill.name
-    )){
-
-        const shieldAmount=
-            skill.selfShieldByLevel[
-                level-1
-            ];
-
-
-        player2.activeBuffs=(player2.activeBuffs||[]).filter(buff=>
-            !buff||buff.type!=="shield"||Number(buff.turnsLeft)>0&&Number(buff.remaining)>0
+        player2"shield"||Number(buff.turnsLeft)>0&&Number(buff.remaining)>0
         );
 
 
@@ -22010,38 +21185,7 @@ function castPlayer2Skill(skillId,centerIndex){
                     remaining:
                         shieldAmount
 
-                },"shield"));
-
-            }
-        );
-
-
-        addBattleLog(
-            "我方全體獲得"+
-            shieldAmount+
-            "點護盾，持續"+
-            (skill.shieldDuration||2)+
-            "回合。"
-        );
-
-    }
-
-
-    updateUI();
-
-    finishPlayerAction();
-
-}
-
-
-/* =====================================================
-   V92 — 怪物金幣掉落
-   基礎值跟怪物等級成長；精英/BOSS提高倍率，並保留少量隨機浮動。
-===================================================== */
-
-function getMonsterGoldDrop(monster){
-    if(!monster){
-        return 0;
+                },"shield"));urn 0;
     }
 
     const level=Math.max(1,Math.floor(Number(monster.level)||1));
@@ -22083,23 +21227,7 @@ function awardMonsterGoldDrop(monster){
 }
 
 
-/* =====================================================
-   怪物死亡
-===================================================== */
-
-function killMonster(index){
-
-    const monster =
-        monsters[index];
-
-
-    if(
-        !monster ||
-        !monster.alive
-    ){
-        return;
-    }
-
+/* ======================================
 
     monster.alive=false;
 
@@ -22129,22 +21257,7 @@ function killMonster(index){
            兩者順序對調就不會互相影響了。
         */
 
-        card.classList.add(
-            "dying"
-        );
-
-
-        setTimeout(()=>{
-
-            card.classList.remove(
-                "dying"
-            );
-
-            card.classList.add(
-                "dead"
-            );
-
-        },1850);
+        c
 
     }
 
@@ -22185,326 +21298,7 @@ function killMonster(index){
        每個分支各自重複判斷一次。
     */
 
-    const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
-    if(bossOwner&&typeof bossOwner.onEnemyDeath==="function"){
-        bossOwner.onEnemyDeath(index,monster);
-    }
-
-    if(!monster.noRewards){
-        recordMonsterKillForBestiary(monster);
-        awardMonsterGoldDrop(monster);
-        /* 怪物掉落與擊殺進度一起即時存檔，避免中途戰敗/切背景遺失。 */
-        saveGame();
-    }
-
-
-    updateMonsterUI(index);
-
-}
-
-
-/* =====================================================
-   戰鬥畫面
-===================================================== */
-
-const BATTLE_RENDER_HOOK_ORDER=Object.freeze({
-    before:Object.freeze([
-        "v141PrepareBattleRender"
-    ]),
-    after:Object.freeze([
-        "v131AfterBattleRender",
-        "v141AfterBattleRender",
-        "v143AfterBattleRender",
-        "v154AfterBattleRender",
-        "v17351AfterBattleRender",
-        "vFixedSlotAfterBattleRender"
-    ])
-});
-
-function runBattleRenderHooks(phase,context,args){
-    const root=typeof window!=="undefined"
-        ? window
-        : (typeof globalThis!=="undefined" ? globalThis : null);
-    const hookNames=BATTLE_RENDER_HOOK_ORDER[phase]||[];
-    hookNames.forEach(name=>{
-        const hook=root&&root[name];
-        if(typeof hook==="function"){
-            hook.apply(context,args);
-        }
-    });
-}
-
-if(typeof window!=="undefined"){
-    window.FourSymbolsBattleRenderHookOrder=BATTLE_RENDER_HOOK_ORDER;
-}
-
-function isBattleStatusInspectionBlocked(){
-    if(!battleActive){ return true; }
-    const actionRegion=$("battleActionRegion");
-    if(actionRegion&&actionRegion.classList.contains("target-selecting")){
-        return true;
-    }
-    return !!document.querySelector(
-        "#battlePage .battle-monster.targetable,#battlePage .battle-player.ally-targetable"
-    );
-}
-
-function battleStatusElementLabel(entity){
-    const key=String(entity&&entity.element||"");
-    if(typeof elementDatabase!=="undefined"&&elementDatabase&&elementDatabase[key]){
-        return elementDatabase[key].name||elementDatabase[key].label||
-            ({fire:"火",water:"水",wind:"風",earth:"土",light:"元光"}[key]||key||"無");
-    }
-    return ({fire:"火",water:"水",wind:"風",earth:"土",light:"元光"}[key]||key||"無");
-}
-
-function ensureBattleStatusDetailModal(){
-    let modal=document.getElementById("battleStatusDetailModal");
-    if(modal){ return modal; }
-    modal=document.createElement("div");
-    modal.id="battleStatusDetailModal";
-    modal.className="battle-status-detail-modal";
-    modal.hidden=true;
-    modal.setAttribute("aria-hidden","true");
-    modal.innerHTML=
-        '<div class="battle-status-detail-panel" role="dialog" aria-modal="true" aria-labelledby="battleStatusDetailTitle">'+
-            '<button type="button" class="battle-status-detail-close" aria-label="關閉">×</button>'+
-            '<h3 id="battleStatusDetailTitle">戰鬥狀態</h3>'+
-            '<div class="battle-status-detail-core">'+
-                '<span data-field="element"></span>'+
-                '<span data-field="name"></span>'+
-                '<span data-field="hp"></span>'+
-                '<span data-field="sp"></span>'+
-            '</div>'+
-            '<section><h4>增益狀態：</h4><div data-list="buffs" class="battle-status-detail-list"></div></section>'+
-            '<section><h4>負面狀態：</h4><div data-list="debuffs" class="battle-status-detail-list"></div></section>'+
-        '</div>';
-    const host=$("battlePage")||document.body;
-    host.appendChild(modal);
-    const close=modal.querySelector(".battle-status-detail-close");
-    if(close){ close.addEventListener("click",closeBattleStatusDetailModal); }
-    modal.addEventListener("click",event=>{
-        if(event.target===modal){ closeBattleStatusDetailModal(); }
-    });
-    return modal;
-}
-
-function closeBattleStatusDetailModal(){
-    const modal=document.getElementById("battleStatusDetailModal");
-    if(!modal){ return; }
-    modal.hidden=true;
-    modal.setAttribute("aria-hidden","true");
-    syncBattleUiPriorityLayer();
-}
-
-function renderBattleStatusDetailList(host,items){
-    if(!host){ return; }
-    host.innerHTML="";
-    if(!Array.isArray(items)||items.length===0){
-        const empty=document.createElement("div");
-        empty.className="battle-status-detail-empty";
-        empty.textContent="無";
-        host.appendChild(empty);
-        return;
-    }
-    items.forEach(item=>{
-        const row=document.createElement("div");
-        row.className="battle-status-detail-row";
-        const icon=document.createElement("span");
-        icon.className="battle-status-detail-icon";
-        if(item&&item.iconSrc){
-            icon.style.backgroundImage='url("'+String(item.iconSrc).replace(/"/g,"%22")+'")';
-        }
-        icon.setAttribute("aria-hidden","true");
-        const text=document.createElement("span");
-        text.className="battle-status-detail-text";
-        const name=document.createElement("b");
-        name.textContent=(item&&item.name||"狀態")+"：";
-        const effect=document.createElement("span");
-        effect.textContent=(item&&item.effect||"效果生效中")+"　剩餘 "+(item&&item.remainingText||"0 回合");
-        text.appendChild(name);
-        text.appendChild(effect);
-        row.appendChild(icon);
-        row.appendChild(text);
-        host.appendChild(row);
-    });
-}
-
-function openBattleStatusDetailModal(side,index){
-    if(isBattleStatusInspectionBlocked()){ return false; }
-    const isMonster=side==="monster";
-    const entity=isMonster
-        ?(typeof monsters!=="undefined"&&monsters[index])
-        :(typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null);
-    if(!entity){ return false; }
-
-    const modal=ensureBattleStatusDetailModal();
-    const stats=!isMonster&&typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
-    const maxHP=isMonster?entity.maxHP:
-        Number(stats&&stats.maxHP)||Number(entity.maxHP)||Math.max(1,Number(entity.hp)||1);
-    const maxSP=isMonster?entity.maxSP:
-        Number(stats&&stats.maxSP)||Number(entity.maxSP)||Math.max(0,Number(entity.sp)||0);
-    const summary=typeof window.v143GetBattleStatusSummary==="function"
-        ?window.v143GetBattleStatusSummary(entity)
-        :{buffs:[],debuffs:[]};
-    const fields={
-        element:"元素："+battleStatusElementLabel(entity),
-        name:"名稱："+String(entity.name||entity.id||"角色"),
-        hp:"HP："+(isMonster?projectEnemyResource(entity.hp,maxHP).text:Math.max(0,Number(entity.hp)||0)+" / "+maxHP),
-        sp:"SP："+(isMonster?projectEnemyResource(entity.sp,maxSP).text:Math.max(0,Number(entity.sp)||0)+" / "+maxSP)
-    };
-    Object.keys(fields).forEach(key=>{
-        const node=modal.querySelector('[data-field="'+key+'"]');
-        if(node){ node.textContent=fields[key]; }
-    });
-    renderBattleStatusDetailList(modal.querySelector('[data-list="buffs"]'),summary.buffs);
-    renderBattleStatusDetailList(modal.querySelector('[data-list="debuffs"]'),summary.debuffs);
-    modal.hidden=false;
-    modal.setAttribute("aria-hidden","false");
-    syncBattleUiPriorityLayer();
-    return true;
-}
-
-if(typeof window!=="undefined"){
-    window.openBattleStatusDetailModal=openBattleStatusDetailModal;
-    window.closeBattleStatusDetailModal=closeBattleStatusDetailModal;
-}
-
-function renderBattle(){
-
-    runBattleRenderHooks("before",this,arguments);
-
-    const area =
-        $("battleMonsterArea");
-
-
-    area.innerHTML="";
-
-
-    currentBattleMonsters
-    .forEach(
-        index=>{
-
-            const monster =
-                monsters[index];
-
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-
-            card.id =
-                "battleMonster"+index;
-
-
-            card.className =
-                "battle-monster";
-
-
-            card.onclick=()=>{
-                if(card.classList.contains("targetable")){
-                    selectBattleTarget(index);
-                    return;
-                }
-                openBattleStatusDetailModal("monster",index);
-            };
-
-
-            const icon =
-                monster.name==="史萊姆"
-                ?
-                ""
-                :
-                monster.name==="沙漠豺狼"
-                ?
-                ""
-                :
-                monster.name==="沙蠍"
-                ?
-                ""
-                :
-                "";
-
-
-            card.innerHTML =
-
-            `            <div class="battle-monster-icon">
-                ${icon}
-            </div>
-
-            <div
-                id="battleMonsterStatus${index}"
-                class="monster-status-badges"
-            ></div>
-
-            <div class="monster-hp">
-
-                <div
-                    id="battleMonsterBar${index}"
-                    class="monster-hp-inner"
-                ></div>
-
-                <div
-                    id="battleMonsterHPText${index}"
-                    class="monster-bar-text"
-                ></div>
-
-            </div>
-
-            <div class="monster-sp">
-
-                <div
-                    id="battleMonsterSPBar${index}"
-                    class="monster-sp-inner"
-                ></div>
-
-                <div
-                    id="battleMonsterSPText${index}"
-                    class="monster-bar-text"
-                ></div>
-
-            </div>
-
-            <div class="battle-monster-name">
-                ${monster.name}
-            </div>
-
-            <div class="battle-monster-level">
-                Lv.${monster.level}
-            </div>
-            `;
-
-
-            area.appendChild(
-                card
-            );
-
-            const presentation=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
-            if(presentation&&typeof presentation.applyUnit==="function"){
-                presentation.applyUnit(card,"monster");
-            }
-
-        }
-    );
-
-
-    currentBattleMonsters
-    .forEach(
-        index=>{
-            updateMonsterUI(index);
-        }
-    );
-
-
-    renderPlayers();
-    const bossPresentationOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
-    if(bossPresentationOwner&&typeof bossPresentationOwner.syncHud==="function"){
-        bossPresentationOwner.syncHud();
-    }
-
-    runBattleRenderHooks("after",this,arguments);
+    const er",this,arguments);
     if(typeof syncBattleUiPriorityLayer==="function"){
         syncBattleUiPriorityLayer();
     }
@@ -22515,107 +21309,14 @@ function renderBattle(){
        之前這套「JS直接量測、強制撐滿」的做法
        其實是已經驗證過準確的（曾經量到過
        正確的差距數字），拿掉是判斷錯誤——
-       CSS的flex-grow在使用者的實際測試環境下
-       一直不夠可靠，與其繼續信任CSS去猜，
-       不如信任這個已經證實準確的量測方式，
-       用實際量到的數字直接強制設定高度，
-       確保戰鬥紀錄一定會貼滿到該到的地方。
-    */
-
-    /* V96：戰鬥資訊高度由 Flex 決定，不再排程二次 JS 量測。 */
-
-}
-
-
-/*
-   ★ 重新加回來：量測.battle-info目前的下緣，
-   跟畫面實際可視範圍下緣之間還差多少，
-   直接把差距加回.battle-info的高度上，
-   強制貼滿，不再單純依賴CSS flex-grow
-   是否有確實生效。
-*/
-
-function fillBattleInfoGap(){
-    /* V96 compatibility stub：舊函式名稱保留，避免其他舊程式參照時報錯。
-       實際高度完全交給 CSS Flex，不再讀 visualViewport、不再寫 inline height。 */
-}
-
-
-/*
-   ★ 修正（拿掉整套JS強制補高的機制）：
-   這一整套「量測、補高、監聽視窗變化、
-   定時重新檢查」的做法，是之前為了解決
-   戰鬥紀錄下方空白反覆嘗試的其中一種手法，
-   但這幾輪在使用者實際測試環境下一直沒有
-   穩定生效，反而增加了程式碼複雜度、
-   也讓每次updateUI()都要多做一次量測運算。
-
-   現在改用更根本的做法：讓.turn-target-row
-   （回合資訊區塊）本身就是「有多少剩餘空間
-   就自動長多大」的區塊，不再需要另外用JS
-   去量測、去補，這整段程式碼已經不需要了。
-*/
-
-function runBattleMonsterUiHook(name,index,monster){
-    if(typeof window==="undefined"){ return; }
-    const hook=window[name];
-    if(typeof hook!=="function"){ return; }
-    try{
-        hook(index,monster);
-    }catch(error){
-        console.error("Battle monster UI hook failed:",name,error);
-    }
-}
-
-/* Enemy presentation only: retain settlement precision and the existing Boss /
-   barrier floor semantics. Ratios always use the unrounded, bounded resources. */
-function projectEnemyResource(value,maximum){
-    const rawMaximum=Number(maximum);
-    const max=Number.isFinite(rawMaximum)?Math.max(0,rawMaximum):0;
-    const rawCurrent=Number(value);
-    const current=Number.isFinite(rawCurrent)?Math.max(0,Math.min(max,rawCurrent)):0;
-    return {
-        current:Math.floor(current),
-        maximum:Math.floor(max),
-        text:Math.floor(current)+" / "+Math.floor(max),
-        percent:max>0?current/max*100:0
-    };
-}
-
-function syncEnemyResourceHud(index){
-    const monster=monsters[index];
-    if(!monster){ return; }
-    const hpText=$("battleMonsterHPText"+index);
-    const spText=$("battleMonsterSPText"+index);
-    const hp=String(projectEnemyResource(monster.hp,monster.maxHP).current);
-    const sp=String(projectEnemyResource(monster.sp,monster.maxSP).current);
+       CojectEnemyResource(monster.sp,monster.maxSP).current);
     if(hpText&&hpText.textContent!==hp){ hpText.textContent=hp; }
     if(spText&&spText.textContent!==sp){ spText.textContent=sp; }
 }
 
 function applyMonsterUiUpdate(index){
 
-    const monster=monsters[index];
-    if(!monster){
-        return;
-    }
-
-    runBattleMonsterUiHook("v141BeforeMonsterUiUpdate",index,monster);
-
-    const hpBar=$("battleMonsterBar"+index);
-    const spBar=$("battleMonsterSPBar"+index);
-
-    if(hpBar){
-        hpBar.style.width=projectEnemyResource(monster.hp,monster.maxHP).percent+"%";
-    }
-
-    if(spBar){
-        spBar.style.width=projectEnemyResource(monster.sp,monster.maxSP).percent+"%";
-    }
-
-    syncEnemyResourceHud(index);
-
-    runBattleMonsterUiHook("v141AfterMonsterUiUpdate",index,monster);
+    const monster=moiHook("v141AfterMonsterUiUpdate",index,monster);
     runBattleMonsterUiHook("v143SystemAfterMonsterUiUpdate",index,monster);
     runBattleMonsterUiHook("v149AfterMonsterUiUpdate",index,monster);
     runBattleMonsterUiHook("v143StatusAfterMonsterUiUpdate",index,monster);
@@ -23253,49 +21954,7 @@ function playIceSpinProjectile(
 /*
    ★ 修正（依照使用者要求，怪物用火箭
    攻擊玩家時也要有同樣的飛行特效）：
-   原本這裡只接受「怪物索引陣列」，
-   寫死組出"battleMonster"+index去找
-   目標元素，只能用在「玩家射怪物」這個
-   方向。改成直接接受「目標DOM id的陣列」，
-   打玩家（"battlePlayerCard"+index）
-   跟打怪物（"battleMonster"+index）
-   兩種方向都能共用同一套動畫邏輯，不用
-   寫兩份幾乎一樣的程式碼。
-*/
-
-function playFireRocketAnimation(
-    sourceCardId,
-    targetElementIds
-){
-
-    const sourceEl=
-        $(sourceCardId);
-
-
-    if(!sourceEl){
-        return;
-    }
-
-
-    const sourceRect=
-        sourceEl.getBoundingClientRect();
-
-    const sourcePoint =
-        gamePointFromClient(
-            sourceRect.left+
-            sourceRect.width/2,
-            sourceRect.top+
-            sourceRect.height/2
-        );
-
-    const startX =
-        sourcePoint.x;
-
-    const startY =
-        sourcePoint.y;
-
-
-    targetElementIds.forEach(
+ntIds.forEach(
         (targetElementId,i)=>{
 
             setTimeout(()=>{
@@ -23550,14 +22209,7 @@ function createBattleTargetContract(side,skillName,elementType,actorIndex,target
     const skill=skillName==="普通攻擊"
         ?{id:"normal",targetType:"single",category:"physical"}
         :findBattleSkillByPresentation(skillName,elementType);
-    const targetType=String(targetTypeOverride||skill&&skill.targetType||"single");
-    const sameSide=/ally/i.test(targetType)||/heal|revive|buff/.test(String(skill&&skill.category||""));
-    const targetSide=targetSideOverride==="player"||targetSideOverride==="monster"
-        ?targetSideOverride
-        :(sameSide?side:(side==="player"?"monster":"player"));
-    const explicitIds=Array.isArray(targetIds)?targetIds.slice():[];
-    let primary=targetId!==undefined&&targetId!==null?targetId:null;
-    let ids=explicitIds;
+    cds=explicitIds;
 
     if(targetType==="self"){
         primary=actorIndex;
@@ -23592,14 +22244,7 @@ function createBattleTargetContract(side,skillName,elementType,actorIndex,target
         }else if(primary!==null&&primary!==undefined){
             ids=[primary];
         }else if(sameSide){
-            ids=activeBattleTargetIds(targetSide,false);
-            primary=ids.length?ids[0]:null;
-        }
-    }
-
-    ids=Array.from(new Set(ids.filter(Number.isInteger)));
-    if(targetType==="all"||targetType==="allyAll"){ primary=null; }
-    else if(primary===null&&ids.length){ primary=ids[0]; }
+            ids=activeBattleTargetIds(targetSids[0]; }
 
     return Object.freeze({
         version:"battle-target-contract-v1",
@@ -23712,43 +22357,11 @@ function showSkillNameBadge(skillName,elementType,characterIndex,targetId,target
 const badgePoint={x:rect.left+rect.width/2,y:rect.top};
 
     badge.style.left=badgePoint.x+"px";
-    badge.style.top=badgePoint.y+"px";
-    document.body.appendChild(badge);
-
-
-    setTimeout(()=>{
-
-        if(
-            badge &&
-            badge.parentNode
-        ){
-
-            badge.parentNode.removeChild(
-                badge
-            );
-
-        }
-
-    },badgeDuration);
+    badge.style.top=badgePoint.y+"px";Duration);
 
     if(typeof window!=="undefined" && typeof window.v142PlaySkillAnimationFromBadge==="function"){
         window.v142PlaySkillAnimationFromBadge("player",skillName,elementType,
-            characterIndex||0,targetContract.targetId,targetContract.targetIds,targetContract
-        );
-    }
-
-}
-
-
-/*
-   ★ 新增（依照使用者要求，怪物施放技能時
-   也要跳技能名稱）：
-   跟showSkillNameBadge()幾乎一模一樣，
-   唯一差別是目標元素從
-   battlePlayerCard+characterIndex
-   換成battleMonster+monsterIndex——
-   怪物攻擊時同樣可能觸發卡片前傾動畫
-   （lungeMonsterCard()），所以這裡
+            characterIndex||0,targetContract.targetId,targetConsterCard()），所以這裡
    一樣不當卡片的子元素、掛在
    document.body底下、用position:fixed
    疊在怪物卡片正上方，原因跟
@@ -23761,15 +22374,7 @@ function showMonsterSkillNameBadge(
     monsterIndex,
     targetId,
     targetIds,
-    targetSide,
-    targetTypeOverride
-){
-
-    const targetContract=createBattleTargetContract(
-        "monster",skillName,elementType,Number.isInteger(monsterIndex)?monsterIndex:0,targetId,targetIds,targetSide,targetTypeOverride
-    );
-
-    const element=
+    targ=
         $("battleMonster"+
             monsterIndex
         );
@@ -23800,15 +22405,7 @@ function showMonsterSkillNameBadge(
     const badgeDuration=
         getSkillNameBadgeDuration(
             skillName,
-            elementType
-        );
-
-    badge.style.setProperty(
-        "--skill-name-display-duration",
-        badgeDuration+"ms"
-    );
-    badge.dataset.skillElement=String(elementType||"normal");
-const badgePoint={x:rect.left+rect.width/2,y:rect.top};
+   .top};
 
     badge.style.left=badgePoint.x+"px";
     badge.style.top=badgePoint.y+"px";
@@ -23831,37 +22428,7 @@ const badgePoint={x:rect.left+rect.width/2,y:rect.top};
     },badgeDuration);
 
     if(typeof window!=="undefined" && typeof window.v142PlaySkillAnimationFromBadge==="function"){
-        window.v142PlaySkillAnimationFromBadge("monster",skillName,elementType,
-            monsterIndex||0,targetContract.targetId,targetContract.targetIds,targetContract
-        );
-    }
-
-}
-
-
-/*
-   ★ 修正（依照使用者要求，拿掉施放技能時
-   跳出SP消耗數字的動畫）：
-   之前每次施放技能，都會另外跳出一個
-   「-XXSP」的浮動文字，提醒扣了多少SP。
-   使用者覺得這個提示不需要，直接拿掉。
-   保留這個函式本身（讓所有呼叫的地方
-   還是能正常運作、不會噴錯），
-   但函式內容清空，不再做任何顯示。
-*/
-
-function showPlayerSpPopup(amount,characterIndex){
-
-    return;
-
-}
-
-
-function lungePlayerCard(characterIndex){
-
-    const element =
-        $("battlePlayerCard"+
-            (characterIndex||0)
+        window.v142PlaySkillAnimationFromBadge("monst         (characterIndex||0)
         );
 
 
@@ -23900,27 +22467,7 @@ function lungeMonsterCard(index){
         $("battleMonster"+index);
 
 
-    if(!element){
-        return;
-    }
-
-
-    element.classList.remove(
-        "attacker-lunge-down"
-    );
-
-
-    void element.offsetWidth;
-
-
-    element.classList.add(
-        "attacker-lunge-down"
-    );
-
-
-    setTimeout(()=>{
-
-        element.classList.remove(
+    if(!element){st.remove(
             "attacker-lunge-down"
         );
 
@@ -24153,30 +22700,7 @@ function showMonsterHit(index,amount,type,isCrit){
     if(settlement){
         if(settlement.shieldAbsorbed>0){
             showDamagePopup(element,"-"+settlement.shieldAbsorbed,"shield",false);
-        }
-        if(settlement.hpDamage>0){
-            showDamagePopup(element,"-"+settlement.hpDamage+"HP","hp",isCrit);
-        }
-        return;
-    }
-
-    const prefix=type==="heal"?"+":"-";
-    showDamagePopup(
-        element,
-        prefix+amount+(type==="sp"?"SP":"HP"),
-        type,
-        isCrit
-    );
-}
-
-
-/* =====================================================
-   怪物重生
-===================================================== */
-
-function respawnMonsters(){
-
-    if(battleActive){
+       
         return;
     }
 
@@ -24194,22 +22718,7 @@ function respawnMonsters(){
     monsters
     .slice(
         0,
-        MAX_TRAINING_MONSTERS
-    )
-    .forEach(
-        (monster,index)=>{
-
-            if(
-                !monster ||
-                monster.alive
-            ){
-                return;
-            }
-
-
-            monster.alive=true;
-
-            monster.hp =
+           monster.hp =
                 monster.maxHP;
 
             monster.sp =
@@ -24236,17 +22745,7 @@ function respawnMonsters(){
 
 /*
    ★ 修正（依照使用者要求，這次真的統一掉了）：
-   這裡之前已經被改成「進入地圖就自動每4秒
-   觸發一次戰鬥」，但使用者這次明確要求：
-   進入地圖後必須先按「自動巡怪」按鈕，
-   才會開始每4秒自動戰鬥——這正是後來
-   在toggleAutoPatrol()/runAutoPatrolCheck()
-   （地圖頁面自動戰鬥面板旁邊那顆新按鈕）
-   做的事，兩套邏輯做的是同一件事，卻各自
-   獨立運作、互不知道對方存在，才會出現
-   「自動巡怪都還沒按，就自己打起來」
-   這種行為——因為真正在背景運作的其實是
-   這裡這套「進地圖就自動開始」的舊邏輯，
+   這裡之前已經被改成「進入地圖就的舊邏輯，
    跟使用者按的那顆按鈕完全無關。
 
    函式名稱、呼叫的地方（enterZone()、
@@ -24276,21 +22775,7 @@ function stopMonsterMovement(){
        有任何作用，純粹是為了讓舊的呼叫點
        （leaveMap()、startBattle()…）
        不用一個一個改掉、不會噴錯。
-    */
 
-}
-
-
-/* =====================================================
-   升級
-===================================================== */
-
-function checkLevelUp(targetCharacter){
-
-    /*
-       ★ 修正：
-       原本這整個函式寫死只認player，
-       第二角色沒辦法透過這裡升級。
        改成可以傳入要升級的角色物件，
        不傳的話預設還是player
        （保留舊的呼叫方式相容）。
@@ -24348,34 +22833,7 @@ function checkLevelUp(targetCharacter){
         /*
            ★ 規格要求：
            升級固定 +30 最大HP、+10 最大SP，
-           跟體質/能量配點加成分開累加。
-        */
-
-        character.bonusHP += 30;
-
-        character.bonusSP += 10;
-
-
-        levels++;
-
-    }
-
-
-    if(levels>0){
-
-        /*
-           ★ 修正：           這裡跟之前戰鬥勝利補血是同一種問題——
-           升級當下直接把HP/SP強制補滿，
-           跟你設定的「HP低於X%/SP低於X%」
-           自動補藥水門檻完全無關，
-           難怪你會覺得「明明還沒到門檻，           它自己就補了」。
-
-           拿掉強制補滿，只重新計算一次
-           current hp/sp的上限夾住（避免超過新的maxHP/maxSP），
-           不會平白無故變成全滿。
-
-           player2沒有getMainCharacterStats()可以用
-           （那個函式寫死算player的），
+           跟體質/能量（那個函式寫死算player的），
            改用跟getInventoryCharacterStats()
            player2分支同一套公式現算一次。
         */
@@ -24425,23 +22883,7 @@ function checkLevelUp(targetCharacter){
             maxSP=
                 50+
                 character.energy*15+
-                character.bonusSP+
-                bonus2.maxSP+
-                bonus2.energy*15;
-
-        }
-
-
-        character.hp =
-            Math.min(
-                character.hp,
-                maxHP
-            );
-
-
-        character.sp =
-            Math.min(
-                character.sp,
+                character.bonusSP+            character.sp,
                 maxSP
             );
 
@@ -24485,23 +22927,7 @@ function checkLevelUp(targetCharacter){
             (player.id||"你")
             :
             character.id,
-            character.level
-        );
-
-    }
-
-
-    /*
-       ★ 修正（依照使用者回報，「按升級的
-       時候，上面頭像框的等級沒有跟著
-       增加」）：
-       不管有沒有真的升級（levels>0），
-       都呼叫一次，順便同步好目前的等級
-       數字，成本很低（找不到元素就直接
-       return），沒有副作用。
-    */
-
-    refreshCharacterAvatarLevels();
+terAvatarLevels();
 
 
     saveGame();
@@ -24522,20 +22948,7 @@ function closeLevelModal(){
 
 /* =====================================================
    ★ 經驗池分配
-=====================================================
-
-   規格五、六：
-   EXP先進入共用經驗池，
-   不會戰鬥一結束就自動升級。
-   玩家回到主城後，自行按「分配經驗值」
-   把經驗池的EXP分給角色，
-   才會真正觸發升級判定。
-
-   目前遊戲裡唯一擁有完整等級/屬性系統的
-   角色是主角（player，也就是創角時選的元素）。
-   水戰士／風弓手目前只有裝備欄，
-   尚未有獨立等級系統
-   （規格二有註明「多角色同時戰鬥」是未來功能），
+==========戰鬥」是未來功能），
    所以分配按鈕先只開放給主角，
    其餘角色顯示「尚未開放」。
 
@@ -24574,26 +22987,7 @@ function showExpToast(amount){
     expToastTimer =
         setTimeout(()=>{
 
-            toast.classList.remove(
-                "show"
-            );
-
-        },2600);
-
-}
-
-
-let levelUpToastTimer=null;
-
-
-/*
-   ★ 新增（依照使用者要求，「升級的時候
-   可以跳出一個訊息框，顯示XXX升到XX級」）：
-   跟showExpToast()同一套寫法，非阻斷、
-   自動消失，不需要玩家按確定。
-*/
-
-function showLevelUpToast(characterName,level){
+    howLevelUpToast(characterName,level){
 
     const toast=
         $("levelUpToast");
@@ -24692,32 +23086,7 @@ let homeFeatureBorrowedNextSibling=
     null;
 
 /*
-   ★ 新增（依照使用者要求，角色視窗隱藏
-   借進來頁面裡多餘的箭頭切換區塊）：
-   記住這次借頁面進來時，順手隱藏了哪一個
-   「◀角色名▶」的區塊，restoreBorrowedElement()
-   歸位時要負責把它的顯示狀態恢復回來，
-   不然切走之後，那個頁面單獨被使用時
-   （例如之後可能還有其他借用場景）會
-   一直維持隱藏、找不回來。
-*/
-
-let homeFeatureHiddenSwitchCard=
-    null;
-
-
-/*
-   ★ 新增（依照使用者要求，主城立繪隨機
-   切換）：兩張圖base64內嵌，每次進入主城
-   頁面時（showPage()裡呼叫，見下面
-   showHomePortrait()的呼叫點）隨機挑一張
-   顯示，不是戰鬥用的角色卡片圖，是額外
-   準備的立繪。
-*/
-
-/* =====================================================
-   V89 — 任務介面專用手勢模式
-   任務使用 #questTabBody 作為唯一內層 scroll owner。
+   ★ 新增（依照使。
    遊戲最外層原本 touch-action:none，因此只在任務視窗
    開啟期間放行 pan-y；不新增 touch/pointer listener。
 ===================================================== */
@@ -24726,17 +23095,7 @@ function setQuestTouchMode(active){
     [
         document.documentElement,
         document.body,
-        document.getElementById("game-viewport"),
-        document.getElementById("game-stage")
-    ].forEach(function(element){
-
-        if(!element){
-            return;
-        }
-
-        element.classList.toggle(
-            "quest-scroll-active",
-            !!active
+                  !!active
         );
 
     });
@@ -24782,16 +23141,7 @@ function openHomeFeature(type){
            把homeRestCard借進來，從來沒有
            清空過bodyEl本身的innerHTML。
            如果「上一次」開的是用innerHTML=
-           整段蓋掉的類型（例如「角色」——
-           裡面有頭像切換列、分頁按鈕、
-           characterTabContent），那些殘留
-           HTML會一直留在bodyEl裡，這次借來
-           的內容只是「加」在後面，不是
-           「取代」，玩家會看到上一次的舊
-           畫面卡在最上面、新內容被推到
-           下面看不到（要滾動很多才看得到，
-           甚至看起來像整個空白，因為角色
-           頁那個characterTabContent本身
+           整段蓋掉的類型（例如「角色」characterTabContent本身
            因為「分頁高度要一致」的需求，
            保留了一個固定的min-height，
            空著的時候看起來就是一大塊
@@ -24847,21 +23197,7 @@ function openHomeFeature(type){
 
 
         /*
-           ★ 新增：角色頁面內容比較多
-           （借進來的整頁內容），套用加寬
-           樣式，closeHomeFeature()關閉時
-           會自動拿掉，不影響其他一般大小
-           的視窗。
-        */
-
-        const box=
-
-            modal.querySelector(
-                ".home-feature-modal-box"
-            );
-
-
-        if(box){
+           ★ 新增：角色頁面內容比較多ox){
 
             box.classList.add(
                 "wide"
@@ -24889,18 +23225,7 @@ function openHomeFeature(type){
         bodyEl.innerHTML=
             renderCharacterShowcaseContent();
 
-
-        /*
-           ★ 修正：預設一打開就選第一角色、
-           顯示能力值分頁——改呼叫
-           selectCharacterForTabs(0)而不是
-           直接switchCharacterTab("status")，
-           這樣三個頁面的角色狀態從一開始
-           就是同步的，不用等玩家自己點一次
-           頭像才對齊。
-        */
-
-        selectCharacterForTabs(
+ctCharacterForTabs(
             0
         );
 
@@ -24913,15 +23238,7 @@ function openHomeFeature(type){
         }
 
     }
-    else if(type==="formation"){
-        titleEl.textContent="佈陣";
-        bodyEl.innerHTML=
-            typeof window.vFixedRenderAllyFormationContent==="function"
-            ? window.vFixedRenderAllyFormationContent()
-            : "";
-    }
-    else if(type==="offlineExp"){
-
+    else if(type==="formation")
         titleEl.textContent=
             "離線經驗";
 
@@ -24935,20 +23252,7 @@ function openHomeFeature(type){
             "任務";
 
         /*
-           V89：任務不再沿用商店的一般 row/button 版型。
-           只在任務開啟期間套用專用 modal 結構與手勢模式。
-        */
-        modal.classList.add(
-            "quest-mode"
-        );
-
-        setQuestTouchMode(
-            true
-        );
-
-        ensureDailyQuestsCurrent();
-
-        dailyQuestState.progress.checkin=
+           V89：任務不再沿用商店的一般 rowe.progress.checkin=
             1;
 
         bodyEl.innerHTML=
@@ -24962,52 +23266,7 @@ function openHomeFeature(type){
         titleEl.textContent=
             "成就";
 
-        bodyEl.innerHTML=
-            renderAchievementContent();
-
-    }
-    else if(type==="announcement"){
-
-        titleEl.textContent=
-            "公告";
-
-        bodyEl.innerHTML=
-            renderAnnouncementContent();
-
-    }
-    else if(type==="system"){
-
-        titleEl.textContent=
-            "系統";
-
-        bodyEl.innerHTML=
-            renderSystemContent();
-
-    }
-    else if(type==="autoBattleSettings"){
-
-        /*
-           ★ 新增（依照使用者要求，「自動
-           戰鬥放進下面導覽列，按下去跳出
-           設定視窗」）：
-           原本#autoBattleSettingsPanel
-           那套是自己土法煉鋼算position:
-           fixed座標、另外搬到document.body
-           底下顯示，牽涉battlePage的
-           display:none、行內樣式覆蓋等
-           好幾層問題，查證後就是這一整套
-           自訂定位邏輯本身容易在「不在
-           戰鬥中」的情境出錯，才會有
-           「按下去沒反應」的狀況。
-
-           這裡不修那套舊邏輯，而是直接
-           改用整個遊戲共用、已經驗證過
-           很多次都正常運作的
-           openHomeFeature()彈窗系統——
-           借用同一個#autoBattleSettingsPanel
-           （欄位/下拉選單完全不用重做），
-           但用borrowElementIntoModal()
-           塞進這個彈窗的body，跟「休息」
+        bodyEl.          塞進這個彈窗的body，跟「休息」
            「經驗池分配」用的是同一招，
            不再需要自己算座標、自己管
            z-index。
@@ -25035,33 +23294,7 @@ function openHomeFeature(type){
            一個因為「分頁要等高」而保留
            固定高度的空characterTabContent）
            會一直卡在bodyEl裡，這次借來的
-           設定面板只是「加」在它後面，
-           不是「取代」它。玩家看到的就是
-           使用者截圖那樣：上面還是角色頁的
-           分頁按鈕，下面一大塊空白（那個
-           空的characterTabContent），
-           設定面板本身其實還在，只是被
-           推到更下面，畫面上完全看不到。
-
-           跟「主城休息」「經驗池分配」
-           同一個bug、同一個修法：先清空
-           bodyEl，保證每次開視窗都是乾淨
-           起點。
-        */
-
-        bodyEl.innerHTML=
-            "";
-
-
-        const panel=
-            $("autoBattleSettingsPanel");
-
-
-        if(panel){
-
-            /*
-               ★ 修正（依照使用者回報，「這些
-               按鈕都沒反應」＋「設定頁面靠上面
+           設定面板只是「加」＋「設定頁面靠上面
                很醜」）：
                真正的原因找到了——上面這段只
                清掉「行內」定位樣式，但
@@ -25069,14 +23302,7 @@ function openHomeFeature(type){
                元素本身的CSS class
                （.auto-settings-expanded）
                寫死了position:absolute；
-               top:0；left:0；right:0；
-               height:360px；z-index:98
-               （原本是設計給battlePage裡
-               「蓋在角色卡牌上面」那種用法）。
-               行內樣式清成""之後，瀏覽器會
-               fallback回這個class本身的設定，
-               等於面板還是position:absolute，
-               而且因為.home-feature-modal-box
+                 而且因為.home-feature-modal-box
                沒有設position，最近的「已定位
                祖先」變成.home-feature-modal
                本身（position:fixed;inset:0），
@@ -25143,14 +23369,7 @@ function openHomeFeature(type){
         /*
            ★ 修正（依照使用者最新要求，「為什麼有時候
            自動戰鬥設定頁面很置中，有時候很靠下面，都把
-           它固定置中；把整個頁面放大讓文字都能塞進去，
-           不要讓他捲動」）：
-           這裡原本依照更早一輪的要求加了dock-bottom樣式
-           （戰鬥中讓視窗貼齊畫面下緣的戰鬥資訊框），這正是
-           「有時候置中、有時候靠下面」的原因——戰鬥中貼底、
-           不在戰鬥中置中，兩種狀態交替出現。使用者現在
-           明確要求「都固定置中」，改成完全不再加dock-bottom
-           這個class，不管在不在戰鬥中都維持
+       個class，不管在不在戰鬥中都維持
            .home-feature-modal預設的置中顯示。
 
            同時把視窗本身（.home-feature-modal-box）的
@@ -25170,39 +23389,7 @@ function openHomeFeature(type){
             settingsBox.style.setProperty(
                 "max-height",
                 "96dvh",
-                "important"
-            );
-
-        }
-
-
-        const characterSelect=
-            $("autoSettingsCharacterSelect");
-
-
-        if(characterSelect){
-
-            const option0=
-                $("autoSettingsCharOption0");
-
-
-            if(option0){
-
-                option0.textContent=
-
-                    player.id||
-                    "角色1";
-
-            }
-
-
-            const option1=
-                $("autoSettingsCharOption1");
-
-
-            if(option1){
-
-                option1.textContent=
+                 option1.textContent=
 
                     player2
                     ?
@@ -25362,17 +23549,7 @@ function closeHomeFeature(){
     if(
         releaseUpdate&&
         typeof releaseUpdate.shouldPreventSharedModalClose==="function"&&
-        releaseUpdate.shouldPreventSharedModalClose()
-    ){
-        if(typeof releaseUpdate.announceForcedLock==="function"){
-            releaseUpdate.announceForcedLock();
-        }
-        return false;
-    }
-
-    if(
-        releaseUpdate&&
-        typeof releaseUpdate.onSharedModalClosed==="function"
+        releaseUpdate.shouldPreventSharedMolosed==="function"
     ){
         releaseUpdate.onSharedModalClosed();
     }
@@ -25402,36 +23579,7 @@ function closeHomeFeature(){
 
         if(box){
 
-            box.classList.remove(
-                "wide"
-            );
-
-        }
-
-
-        /*
-           ★ 新增：跟上面加wide是同一組，
-           關閉視窗時外層遮罩的no-padding
-           也要一併拿掉。
-        */
-
-        modal.classList.remove(
-            "no-padding"
-        );
-
-
-        /*
-           ★ 新增：跟no-padding同一組收尾——
-           自動戰鬥設定視窗用的dock-bottom
-           （貼底顯示）也要一併拿掉，不會
-           讓下次開商店/任務這種一般置中
-           視窗被誤套用貼底樣式。
-        */
-
-        modal.classList.remove(
-            "dock-bottom"
-        );
-
+            bo
         /* V89：任務專用版型與祖層 pan-y 只在任務開啟時存在。 */
         modal.classList.remove(
             "quest-mode"
@@ -25447,25 +23595,7 @@ function closeHomeFeature(){
     /*
        ★ 新增：跟wide/no-padding是同一組
        收尾動作，關閉視窗時把？按鈕重置回
-       隱藏，避免下次開商店/任務這種一般
-       視窗時殘留顯示。
-    */
-
-    const helpBtn=
-        $("statusHelpButton");
-
-
-    if(helpBtn){
-
-        helpBtn.style.display=
-            "none";
-
-    }
-
-
-    /*
-       ★ 修正（依照使用者回報，「自動戰鬥的框...套用並
-       期待按鈕再戰鬥中根本沒有反應」旁邊那張截圖，
+       隱截圖，
        「全屬性技能預覽」按鈕出現在自動戰鬥設定視窗上）：
        跟上面statusHelpButton同一個bug、漏了同一個地方
        沒重置——skillPreviewHeaderButton只有在
@@ -25593,43 +23723,7 @@ function selectCharacterForTabs(targetIndex){
                 avatarEl.style.opacity=selected ? "1" : ".5";
                 avatarEl.classList.toggle("is-current-character",selected);
                 const choice=avatarEl.closest(".character-showcase-choice");
-                if(choice){ choice.classList.toggle("is-current-character",selected); }
-            }
-
-        }
-    );
-
-}
-
-
-function switchCharacterTab(tabName){
-
-    restoreBorrowedElement();
-
-
-    /*
-       ★ 新增（依照使用者要求，「返回框框
-       旁邊多一個？按鈕」，只在能力值分頁
-       顯示）：
-       每次切分頁都重新判斷一次，切到
-       "status"才顯示，切到其他分頁
-       （經驗池分配/技能/背包）自動隱藏，
-       不用在每個分頁各自處理。
-    */
-
-    const helpBtn=
-        $("statusHelpButton");
-
-
-    if(helpBtn){
-
-        helpBtn.style.display=
-
-            tabName==="status"
-            ?
-            "inline-block"
-            :
-            "none";
+                if(choice){ choice.classList.toggle("is-current-character",selected); }     "none";
 
     }
 
@@ -25646,40 +23740,7 @@ function switchCharacterTab(tabName){
     const skillPreviewBtn=
         $("skillPreviewHeaderButton");
 
-
-    if(skillPreviewBtn){
-
-        skillPreviewBtn.style.display=
-
-            tabName==="skill"
-            ?
-            "inline-block"
-            :
-            "none";
-
-    }
-
-
-    const container=
-        $("characterTabContent");
-
-
-    if(!container){
-        return;
-    }
-
-
-    const pageIdMap={
-        status:"statusPage",
-        inventory:"inventoryPage",
-        skill:"skillPage",
-        expPool:"homeExpPoolCard"
-    };
-
-
-    const pageEl=
-        $(
-            pageIdMap[tabName]
+ageIdMap[tabName]
         );
 
 
@@ -25708,19 +23769,7 @@ function switchCharacterTab(tabName){
        這個情境隱藏，頁面本身如果之後被
        單獨借用在別的地方，不受影響
        （因為是在借進來、確定要顯示的這個
-       時間點才隱藏，不是寫死在頁面本身
-       的CSS上）。
-    */
-
-    const switchCardIdMap={
-        status:"statusCharacterSwitchCard",
-        inventory:"inventoryCharacterSwitchCard",
-        skill:"skillCharacterSwitchCard"
-    };
-
-
-    const switchCard=
-        $(
+     $(
             switchCardIdMap[tabName]
         );
 
@@ -25739,37 +23788,7 @@ function switchCharacterTab(tabName){
 
     /*
        ★ 順便讓目前選中的分頁按鈕有
-       視覺上的區別（例如底色反白），
-       玩家才看得出來目前正在看哪個分頁。
-    */
-
-    ["ExpPool","Status","Skill"].forEach(
-        name=>{
-
-            const btn=
-                $("characterTabBtn"+name);
-
-
-            if(btn){
-
-                btn.style.opacity=
-
-                    name.toLowerCase()===
-                    tabName.toLowerCase()
-                    ?
-                    "1"
-                    :
-                    ".55";
-
-            }
-
-        }
-    );
-
-}
-
-
-function updateGoldDisplay(){
+   ){
 
     const value=Math.max(0,Math.floor(Number(gold)||0));
 
@@ -25793,12 +23812,7 @@ function updateGoldDisplay(){
 function renderShopContent(){
 
     const cards=shopItems.map(shopItem=>{
-        const count=getPotionCount(shopItem.id);
-        const resourceLabel=shopItem.resource==="hp" ? "HP" : "SP";
-        const effectText=getPotionEffectDescription(shopItem.id);
-
-        const hasPrice=Number.isFinite(shopItem.price);
-        const disabled=!hasPrice || gold<shopItem.price;
+        ced=!hasPrice || gold<shopItem.price;
         const buttonText=!hasPrice
             ? "價格待定"
             : `${shopItem.price} 金幣`;
@@ -25814,13 +23828,7 @@ function renderShopContent(){
                 <div class="shop-potion-purchase-row">
                     <label for="shopQuantity-${shopItem.id}">數量</label>
                     <input
-                        id="shopQuantity-${shopItem.id}"
-                        class="shop-potion-quantity"
-                        type="number"
-                        inputmode="numeric"
-                        min="1"
-                        max="9999"
-                        step="1"
+                        id=      step="1"
                         value="1"
                     >
                     <button
@@ -26095,36 +24103,7 @@ function renderCharacterShowcaseContent(){
            下限硬是比max-height:60dvh還
            高，CSS規則裡min-height優先權
            比max-height高，等於這個容器
-           永遠至少480px高，跟外層
-           .home-feature-modal-box自己
-           的高度上限（80dvh／.wide時
-           96dvh）擠在一起，容易兩層都
-           超出、變成「外層容器+內層
-           容器」兩個都要捲動的巢狀捲動，
-           手機上很容易卡住、感覺完全
-           捲不動。
-
-           改成min(480px,50dvh)——內容
-           較多的分頁（能力值）還是盡量
-           抓滿480px這個理想值，但螢幕
-           真的矮的時候會自動讓步，
-           不會硬撐出兩層都要捲動的
-           衝突，同時因為每次算出來的
-           還是同一個固定值（不會因為
-           切分頁而改變），原本「切分頁
-           大小不跳動」的需求還是有保留。
-        */
-
-        '<div id="characterTabContent"'+
-        'style="flex:1 1 auto;height:auto;min-height:0;max-height:none;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y;box-sizing:border-box;"></div>';
-
-
-    return html;
-
-}
-
-
-/* =====================================================
+           永遠至少4====================================================
    ★ 每日任務
 ===================================================== */
 
@@ -26503,17 +24482,7 @@ function renderQuestListGeneric(
                 ]||0;
 
             const claimed=
-                !!state.claimed[
-                    quest.id
-                ];
-
-            const done=
-                progress>=quest.goal;
-
-            const safeProgress=
-                Math.min(
-                    progress,
-                    quest.goal
+              oal
                 );
 
             const percent=
@@ -26536,31 +24505,7 @@ function renderQuestListGeneric(
                 :
                 done
                 ?
-                "可領取"
-                :
-                "進行中";
-
-            const statusClass=
-                claimed
-                ?
-                "claimed"
-                :
-                done
-                ?
-                "ready"
-                :
-                "progress";
-
-            const buttonText=
-                claimed
-                ?
-                "已領取"
-                :
-                done
-                ?
-                "領取"
-                :
-                "未達成";
+         "未達成";
 
             html+=
                 '<section class="quest-card '+statusClass+'">'+
@@ -26590,40 +24535,13 @@ function renderQuestListGeneric(
                     '<div class="quest-card-foot">'+
                         '<div class="quest-reward">'+
                             '<span class="quest-reward-label">獎勵</span>'+
-                            '<span>'+formatQuestReward(quest.reward)+'</span>'+
-                        '</div>'+
-
-                        '<button class="quest-claim-btn"'+
-                            (
-                                !done || claimed
-                                ?
-                                " disabled"
+                            '<span>'+formatQuestReward(quest.reward)+'</span>'+d"
                                 :
                                 ""
                             )+
                             ' onclick="'+claimFnName+'(\''+quest.id+'\')">'+
                             buttonText+
-                        '</button>'+
-                    '</div>'+
-
-                '</section>';
-
-        }
-    );
-
-
-    html+=
-        "</div>";
-
-    return html;
-
-}
-
-
-function renderDailyQuestListContent(){
-
-    return renderQuestListGeneric(
-        dailyQuestDefinitions,
+                        '</butfinitions,
         dailyQuestState,
         "claimDailyQuest"
     );
@@ -26698,13 +24616,7 @@ function renderQuestTabContent(activeTab){
                 '<button id="questTabBtnDaily" class="quest-tab'+
                     (!isCommission ? " active" : "")+'"'+
                     ' role="tab" aria-selected="'+(!isCommission ? "true" : "false")+'"'+
-                    ' onclick="switchQuestTab(\'daily\')">'+
-                    "每日任務"+
-                '</button>'+
-
-                '<button id="questTabBtnCommission" class="quest-tab'+
-                    (isCommission ? " active" : "")+'"'+
-                    ' role="tab" aria-selected="'+(isCommission ? "true" : "false")+'"'+
+                    ' onclab" aria-selected="'+(isCommission ? "true" : "false")+'"'+
                     ' onclick="switchQuestTab(\'commission\')">'+
                     "委託任務"+
                 '</button>'+
@@ -26726,14 +24638,7 @@ function renderQuestTabContent(activeTab){
                     ?
                     renderCommissionQuestListContent()
                     :
-                    renderDailyQuestListContent()
-                )+
-            '</div>'+
-
-            '<div id="questCompletionPanel" class="quest-completion-panel">'+
-                renderQuestCompletionPanelContent(
-                    isCommission
-                    ? commissionQuestDefinitions
+                         ? commissionQuestDefinitions
                     : dailyQuestDefinitions,
                     isCommission
                     ? commissionQuestState
@@ -27192,561 +25097,7 @@ function renderAchievementContent(){
                 achievement.id+
                 '\')">'+
 
-                (
-                    claimed
-                    ?
-                    "已領取"
-                    :
-                    done
-                    ?
-                    "領取"
-                    :
-                    "未達成"
-                )+
-
-                "</button>"+
-
-                "</div>";
-
-        }
-    );
-
-
-    return html;
-
-}
-
-
-function claimAchievement(achievementId){
-
-    const achievement=
-
-        achievementDefinitions.find(
-            a=>a.id===achievementId
-        );
-
-
-    if(!achievement){
-        return;
-    }
-
-
-    if(
-        !achievement.check() ||
-        achievementState[achievementId]
-    ){
-        return;
-    }
-
-
-    achievementState[achievementId]=
-        true;
-
-
-    if(achievement.reward.gold){
-
-        gold=
-            gold+
-            achievement.reward.gold;
-
-    }
-
-    updateGoldDisplay();
-
-    saveGame();
-
-
-    const bodyEl=
-        $("homeFeatureModalBody");
-
-
-    if(bodyEl){
-
-        bodyEl.innerHTML=
-            renderAchievementContent();
-
-    }
-
-}
-
-
-/* =====================================================
-   ★ 公告
-===================================================== */
-
-function renderAnnouncementContent(){
-
-    const releaseUpdate=
-        window.FourSymbolsReleaseUpdate;
-
-    if(
-        releaseUpdate&&
-        typeof releaseUpdate.renderAnnouncementContent==="function"
-    ){
-        const releaseContent=
-            releaseUpdate.renderAnnouncementContent();
-
-        if(releaseContent){
-            return releaseContent;
-        }
-    }
-
-    return (
-
-        '<div style="font-size:13px;line-height:1.8;">'+
-
-        "主城全新改版！<br>"+
-        "新增商店、圖鑑、每日任務、成就系統，"+
-        "歡迎慢慢逛逛。<br><br>"+
-
-        "開發中功能：<br>"+
-        "更多裝備、更多地區、更多技能，"+
-        "陸續更新中。"+
-
-        "</div>"
-
-    );
-
-}
-
-
-function renderSystemContent(){
-
-    return (
-        '<div class="system-panel">'+
-            '<div class="system-panel-row">'+
-                '<div><strong>遊戲存檔</strong><small>目前遊戲會自動存檔，也可以立即手動保存。</small></div>'+
-                '<button class="home-feature-buy-btn" onclick="saveGame();alert(\'已完成手動存檔。\')">立即存檔</button>'+
-            '</div>'+
-            '<div class="system-panel-row">'+
-                '<div><strong>帳號管理</strong><small>查看目前 Firebase UID、登出或切換帳號。</small></div>'+
-                '<button class="home-feature-buy-btn" onclick="window.FourSymbolsStartupPolicy&&window.FourSymbolsStartupPolicy.openAccountManager()">切換帳號／綁定帳號</button>'+
-            '</div>'+
-            '<div class="system-panel-row">'+
-                '<div><strong>客服信箱</strong><small>查看《四象江湖傳》客服聯絡方式。</small></div>'+
-                '<button id="systemSupportEmailButton" class="home-feature-buy-btn" onclick="window.FourSymbolsSupport.show()">查看信箱</button>'+
-            '</div>'+
-            '<div class="system-panel-row danger">'+
-                '<div><strong>刪除角色</strong><small>刪除全部角色與遊戲進度，返回初始創角頁面。</small></div>'+
-                '<button class="home-feature-buy-btn" onclick="resetGame()">刪除角色</button>'+
-            '</div>'+
-        '</div>'
-    );
-
-}
-
-
-function restAtHome(){
-
-    if(battleActive){
-
-        alert(
-            "戰鬥中無法休息。"
-        );
-
-        return;
-
-    }
-
-
-    const needsRest=getExistingPartyIndexes().some(index=>{
-        const character=getPartyCharacterByIndex(index);
-        const stats=getPartyBattleStats(index);
-        return character.hp<stats.maxHP || character.sp<stats.maxSP;
-    });
-
-    if(!needsRest){
-
-        alert(
-            "HP、SP 已經是滿的了。"
-        );
-
-        return;
-
-    }
-
-
-    getExistingPartyIndexes().forEach(index=>{
-        const character=getPartyCharacterByIndex(index);
-        const stats=getPartyBattleStats(index);
-        character.hp=stats.maxHP;
-        character.sp=stats.maxSP;
-    });
-
-
-    updateUI();
-
-    saveGame();
-
-
-    alert(
-        "休息完畢，HP／SP 已經全部補滿。"
-    );
-
-}
-
-
-/* =====================================================
-   V92 — 主城開發測試快捷鍵
-===================================================== */
-
-function grantTestGoldMillion(){
-    gold=
-        Math.max(0,Math.floor(Number(gold)||0))+
-        TEST_GOLD_GRANT;
-
-    updateGoldDisplay();
-    updateUI();
-    saveGame();
-
-    alert(
-        "金幣 +1,000,000，目前共有 "+
-        gold.toLocaleString("zh-TW")+
-        " 金幣。"
-    );
-}
-
-function grantTestExpTenMillion(){
-    sharedExp=
-        Math.max(0,Math.floor(Number(sharedExp)||0))+
-        TEST_EXP_POOL_GRANT;
-
-    updateUI();
-    saveGame();
-
-    alert(
-        "經驗池 +1,000,000,000，目前共有 "+
-        sharedExp.toLocaleString("zh-TW")+
-        " EXP。"
-    );
-}
-
-function updateHomeTestTools(){
-    const goldButton=$("testGoldMillionButton");
-    const expButton=$("testExpTenMillionButton");
-
-    if(goldButton){
-        goldButton.innerHTML="金幣 <b>+100萬</b>";
-    }
-
-    if(expButton){
-        expButton.innerHTML="經驗池 <b>+10億</b>";
-    }
-}
-
-
-/*
-   ★ 測試用：技能點 +999。
-
-   純粹方便你測試技能效果（尤其是燃燒這種
-   需要一路升級才看得出差異的技能），
-   之後正式版上線前記得把這張卡片
-   跟這個函式一起拿掉。
-*/
-
-function grantTestSkillPoints(){
-
-    /*
-       ★ 修正：
-       原本這裡寫死只加給player（第一角色），
-       第二角色永遠測試不到「給點數」這個按鈕，
-       容易讓人誤以為第二角色的技能點是從別的地方
-       （甚至bug）冒出來的。
-       改成player2存在的話兩邊都各加999，
-       測試哪個角色都方便。
-    */
-
-    player.skillPoints+=999;
-
-
-    let message=
-
-        "技能點 +999，「"+
-        (player.id||"第一角色")+
-        "」目前共有"+
-        player.skillPoints+
-        "點。";
-
-
-    if(player2){
-
-        player2.skillPoints+=999;
-
-
-        message+=
-
-            "\n「"+
-            player2.id+
-            "」目前共有"+
-            player2.skillPoints+
-            "點。";
-
-    }
-
-    if(player3){
-
-        player3.skillPoints+=999;
-
-        message+=
-            "\n「"+
-            player3.id+
-            "」目前共有"+
-            player3.skillPoints+
-            "點。";
-
-    }
-
-
-    updateUI();
-
-    renderSkillLoadout();
-
-    saveGame();
-
-
-    alert(
-        message
-    );
-
-}
-
-
-/*
-   ★ 新增（測試用）：經驗池 +100000。
-
-   純粹方便測試升級、技能開放門檻這類
-   需要練功練很久才看得到效果的東西，
-   直接把經驗存進共用經驗池，
-   之後要不要分給角色還是照原本的方式
-   自己去分配。之後正式版上線前記得
-   把這個按鈕跟這個函式一起拿掉。
-*/
-
-function grantTestExp(){
-
-    sharedExp+=100000;
-
-    updateUI();
-
-    saveGame();
-
-
-    alert(
-        "經驗池 +100000，目前共有"+
-        sharedExp+
-        "點經驗值。"
-    );
-
-}
-
-
-function distributeExpToPlayer(){
-
-    distributeExpToCharacter(
-        player
-    );
-
-}
-
-
-/*
-   ★ 新增：分配經驗值給第二角色。
-   跟distributeExpToPlayer()是同一套邏輯，
-   直接呼叫共用函式，只是換一個角色物件。
-*/
-
-function distributeExpToPlayer2(){
-
-    if(!player2){
-        return;
-    }
-
-
-    distributeExpToCharacter(
-        player2
-    );
-
-}
-
-
-function distributeExpToPlayer3(){
-
-    if(!player3){
-        return;
-    }
-
-    distributeExpToCharacter(
-        player3
-    );
-
-}
-
-
-/*
-   把distributeExpToPlayer()原本的邏輯
-   抽成通用函式，player/player2共用同一套，
-   不用維護兩份幾乎一樣的程式碼。
-*/
-
-function distributeExpToCharacter(character){
-
-    if(battleActive){
-
-        alert(
-            "戰鬥中無法分配經驗值。"
-        );
-
-        return;
-
-    }
-
-
-    if(sharedExp<=0){
-        return;
-    }
-
-
-    /*
-       ★ 修正：
-       原本是把經驗池「全部」一次塞給角色，
-       可能一次連續升好幾級，
-       而且會把經驗池清空，
-       導致玩家沒辦法把剩下的經驗
-       留給其他角色。
-
-       改成：每按一次，只轉移「剛好升上下一級」
-       所需要的經驗值，一次只升一級。
-       如果經驗池不夠升一級，
-       就不轉移、提示還差多少，
-       避免經驗值卡在一個不上不下的狀態。
-
-       ★ 新增防呆：
-       如果角色的exp不知道為什麼已經超過expNext
-       （理論上不該發生，但存檔可能因為某些操作
-       留下不一致的資料），needed會變成負數或0，
-       這樣「sharedExp<needed」這個判斷永遠是false，
-       等於白白從經驗池那裡「偷」到exp，
-       還可能讓checkLevelUp()一次跑很多輪，
-       灌出離譜的技能點/屬性點數字。
-       這裡先把needed夾在最小1，
-       徹底避免這個漏洞。
-    */
-
-    const needed =
-        Math.max(
-            1,
-            character.expNext-
-            character.exp
-        );
-
-
-    if(sharedExp<needed){
-
-        alert(
-            "經驗池不足以升級，還差"+
-            (needed-sharedExp)+
-            "EXP。"
-        );
-
-        return;
-
-    }
-
-
-    character.exp +=
-        needed;
-
-    sharedExp -=
-        needed;
-
-
-    checkLevelUp(
-        character
-    );
-
-    updateUI();
-
-    saveGame();
-
-}
-
-
-function renderExpDistributeList(){
-
-    const container =
-        $("expDistributeList");
-
-
-    if(!container){
-        return;
-    }
-
-
-    container.innerHTML="";
-
-
-    const element =
-        elementDatabase[
-            player.element
-        ]||
-        elementDatabase.fire;
-
-
-    const needed =
-        Math.max(
-            0,
-            player.expNext-
-            player.exp
-        );
-
-
-    const mainRow =
-        document.createElement(
-            "div"
-        );
-
-
-    mainRow.innerHTML =
-
-        `
-        <button
-            id="distributeMainButton"
-            class="exp-distribute-button"
-        >
-            <span class="exp-character-icon">${element.icon}</span>
-            <span class="exp-character-copy">
-                <strong>${player.id||element.character}</strong>
-                <small>Lv.${player.level} → Lv.${player.level+1}</small>
-            </span>
-            <span class="exp-character-cost">
-                <b>${needed.toLocaleString("zh-TW")}</b>
-                <small>EXP</small>
-            </span>
-        </button>
-        `;
-
-
-    container.appendChild(
-        mainRow
-    );
-
-
-    /*
-       ★ 一次只升一級：
-       經驗池不夠升下一級時直接鎖住按鈕，
-       不會讓玩家誤按後把經驗池清空
-       卻升不了級。
-    */
-
-    $("distributeMainButton")
-        .disabled =
-        sharedExp<needed ||
-        battleActive;
-
-
-    $("distributeMainButton")
-        .onclick =
-        distributeExpToPlayer;
+   ExpToPlayer;
 
 
     /*
@@ -27763,350 +25114,7 @@ function renderExpDistributeList(){
             );
 
 
-        const needed2=
-            Math.max(
-                0,
-                player2.expNext-
-                player2.exp
-            );
-
-
-        player2Row.innerHTML=
-
-            `
-            <button
-                id="distributePlayer2Button"
-                class="exp-distribute-button"
-            >
-                <span class="exp-character-icon">◆</span>
-                <span class="exp-character-copy">
-                    <strong>${player2.id}</strong>
-                    <small>Lv.${player2.level} → Lv.${player2.level+1}</small>
-                </span>
-                <span class="exp-character-cost">
-                    <b>${needed2.toLocaleString("zh-TW")}</b>
-                    <small>EXP</small>
-                </span>
-            </button>
-            `;
-
-
-        container.appendChild(
-            player2Row
-        );
-
-
-        $("distributePlayer2Button")
-            .disabled=
-
-            sharedExp<needed2 ||
-            battleActive;
-
-
-        $("distributePlayer2Button")
-            .onclick=
-            distributeExpToPlayer2;
-
-    }
-
-
-    if(player3){
-
-        const player3Row=
-            document.createElement(
-                "div"
-            );
-
-        const needed3=
-            Math.max(
-                0,
-                player3.expNext-
-                player3.exp
-            );
-
-        player3Row.innerHTML=
-            `
-            <button
-                id="distributePlayer3Button"
-                class="exp-distribute-button"
-            >
-                <span class="exp-character-icon">◆</span>
-                <span class="exp-character-copy">
-                    <strong>${player3.id}</strong>
-                    <small>Lv.${player3.level} → Lv.${player3.level+1}</small>
-                </span>
-                <span class="exp-character-cost">
-                    <b>${needed3.toLocaleString("zh-TW")}</b>
-                    <small>EXP</small>
-                </span>
-            </button>
-            `;
-
-        container.appendChild(
-            player3Row
-        );
-
-        $("distributePlayer3Button").disabled=
-            sharedExp<needed3 ||
-            battleActive;
-
-        $("distributePlayer3Button").onclick=
-            distributeExpToPlayer3;
-
-    }
-
-
-    /*
-       ★ 修正：
-       水戰士／風弓手這兩個鎖定佔位按鈕
-       依照玩家要求整個拿掉，不再顯示，
-       這兩個目前本來就沒有真正的角色資料
-       （除非玩家創建第二角色時剛好選了同樣元素，
-       但那個情況下實際掛的是player2，
-       不是這裡的水/風佔位符），
-       留著只是多餘的視覺雜訊。
-    */
-
-}
-
-
-/* =====================================================
-   狀態加點
-===================================================== */
-
-/*
-   ★ 狀態頁切換角色（新增）。
-   切換的時候要把pendingStats清空，
-   不然「還沒確認的加點」會誤帶到另一個角色身上。
-*/
-
-function changeStatusCharacter(direction){
-
-    const indexes=getExistingPartyIndexes();
-
-    if(indexes.length<2){
-        return;
-    }
-
-    const currentPosition=Math.max(
-        0,
-        indexes.indexOf(statusCharacterIndex)
-    );
-
-    statusCharacterIndex=indexes[
-        (currentPosition+direction+indexes.length)%indexes.length
-    ];
-
-
-    Object.keys(
-        pendingStats
-    )
-    .forEach(stat=>{
-
-        pendingStats[stat]=0;
-
-    });
-
-
-    updateStatusPreview();
-
-}
-
-
-/*
-   ★ 新增（依照使用者要求，「加點要新增
-   長按快速加點比較簡單，還是雙箭頭按一下
-   +10比較簡單，妳直接選一個」——選了
-   長按方案）：
-
-   共用的「長按持續觸發」小工具。按下
-   （touchstart/mousedown）先等500毫秒
-   （避免手滑輕點也被當成長按），接著
-   每120毫秒自動呼叫一次傳進來的函式，
-   直到放開/手指移出/滑走為止
-   （touchend/touchcancel/mouseup/
-   mouseleave全部都要清掉計時器，
-   任何一種放開手指的方式都不能漏接，
-   不然計時器會卡住一直加下去）。
-
-   6組+/-按鈕（攻擊/智力/體質/能量/
-   防禦/敏捷）全部呼叫這個函式，不用
-   每顆按鈕各寫一份長按邏輯。
-*/
-
-function attachLongPress(el,fn){
-
-    if(!el){
-        return;
-    }
-
-
-    let holdTimeout=null;
-
-    let repeatInterval=null;
-
-
-    function stop(){
-
-        if(holdTimeout){
-            clearTimeout(holdTimeout);
-            holdTimeout=null;
-        }
-
-
-        if(repeatInterval){
-            clearInterval(repeatInterval);
-            repeatInterval=null;
-        }
-
-    }
-
-
-    function start(e){
-
-        e.preventDefault();
-
-        fn();
-
-
-        stop();
-
-
-        holdTimeout=
-            setTimeout(
-                ()=>{
-
-                    repeatInterval=
-                        setInterval(
-                            fn,
-                            55
-                        );
-
-                },
-                250
-            );
-
-    }
-
-
-    el.addEventListener(
-        "touchstart",
-        start,
-        {passive:false}
-    );
-
-    el.addEventListener(
-        "mousedown",
-        start
-    );
-
-
-    [
-        "touchend",
-        "touchcancel",
-        "mouseup",
-        "mouseleave"
-    ].forEach(evtName=>{
-
-        el.addEventListener(
-            evtName,
-            stop
-        );
-
-    });
-
-}
-
-
-function addPoint(stat){
-
-    if(
-        !Object.prototype.hasOwnProperty.call(
-            pendingStats,
-            stat
-        )
-    ){
-        return;
-    }
-
-
-    const targetCharacter=
-        getStatusCharacterObject();
-
-
-    const used =
-        Object.values(
-            pendingStats
-        )
-        .reduce(
-            (sum,value)=>
-                sum+value,
-            0
-        );
-
-
-    if(
-        used>=
-        targetCharacter.attributePoints
-    ){
-        return;
-    }
-
-
-    pendingStats[stat]++;
-
-
-    updateStatusPreview();
-
-}
-
-
-/*
-   ★ 新增（依照使用者指正）：
-   之前這裡只有addPoint()，完全沒有對應的
-   減號函式，導致狀態頁面分配升級點數的地方
-   只能加、不能扣，跟創角頁面（本來就有
-   加減兩顆按鈕）不一致。
-   補上removePoint()，只能扣掉「這次還沒
-   確認、暫存中」的點數，不會動到角色
-   已經生效的屬性值，邏輯上跟創角頁面的
-   creationAdd(stat,-1)是同一種做法。
-*/
-
-function removePoint(stat){
-
-    if(
-        !Object.prototype.hasOwnProperty.call(
-            pendingStats,
-            stat
-        )
-    ){
-        return;
-    }
-
-
-    if(
-        pendingStats[stat]<=0
-    ){
-        return;
-    }
-
-
-    pendingStats[stat]--;
-
-
-    updateStatusPreview();
-
-}
-
-
-function updateStatusPreview(){
-
-    /*
-       ★ 修正：
-       原本這整個函式都寫死認player，
-       第二角色沒辦法用狀態頁加點。
-       改成先抓「目前選中的角色」
+        const成先抓「目前選中的角色」
        （player或player2），
        下面所有計算都對這個角色做，
        不用整個函式重寫兩份。
@@ -28154,17 +25162,7 @@ function updateStatusPreview(){
        裡的算法完全一致（1體質=+50HP，
        1能量=+15SP），只是這裡改成吃
        targetCharacter（可能是player或
-       player2），不能直接呼叫
-       getBaseStats()（那個函式寫死抓
-       player），自己重算一次。
-
-       目前HP/SP（targetCharacter.hp／.sp）
-       不會因為預覽加點而改變，只有「上限」
-       會跟著pendingStats.vitality／.energy
-       即時預覽變化——這樣血條寬度
-       （現在HP÷預覽後上限）就會自然
-       隨著上限變大而縮短，不用另外寫
-       「縮短動畫」的特殊邏輯。
+            「縮短動畫」的特殊邏輯。
     */
 
     const previewMaxHP=
@@ -28181,95 +25179,7 @@ function updateStatusPreview(){
         (targetCharacter.bonusSP||0);
 
 
-    const currentHP=
-
-        Math.min(
-            targetCharacter.hp||0,
-            previewMaxHP
-        );
-
-
-    const currentSP=
-
-        Math.min(
-            targetCharacter.sp||0,
-            previewMaxSP
-        );
-
-
-    $("statusPreviewHpText")
-        .textContent=
-
-        currentHP+
-        "／"+
-        previewMaxHP;
-
-
-    $("statusPreviewSpText")
-        .textContent=
-
-        currentSP+
-        "／"+
-        previewMaxSP;
-
-
-    $("statusPreviewHpFill")
-        .style.width=
-
-        (
-            previewMaxHP>0
-            ?
-            (currentHP/previewMaxHP*100)
-            :
-            0
-        )+
-        "%";
-
-
-    $("statusPreviewSpFill")
-        .style.width=
-
-        (
-            previewMaxSP>0
-            ?
-            (currentSP/previewMaxSP*100)
-            :
-            0
-        )+
-        "%";
-
-
-    /*
-       ★ 新增：
-       狀態頁面現在會顯示
-       「玩家點數 + 裝備加成 = 總合」，
-       而不是只顯示玩家自己加點的數字。
-       裝備加成抓對應角色的裝備欄
-       （player→player.element、
-       player2→固定"player2"這個key），
-       跟主城、背包頁看到的邏輯一致。
-    */
-
-    const equipmentBonus =        getEquipmentBonus(
-            getPartyCharacterKey(
-                getPartyCharacterIndex(targetCharacter)
-            )
-        );
-
-
-    function formatStatLine(
-        baseValue,
-        bonusValue
-    ){
-
-        /*
-           ★ 修正：
-           之前裝備加成是0的時候只顯示單一數字，
-           玩家沒裝備東西時完全看不出
-           「有在算裝備加成」這件事，
-           以為沒生效。
-           改成一律顯示「基礎+裝備=總合」，
-           就算裝備加成是0也一樣顯示，
+       就算裝備加成是0也一樣顯示，
            例如 9+0=9。
         */
 

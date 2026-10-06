@@ -783,6 +783,18 @@
         },{attackPercent:0,defensePercent:0,evasionPercent:0,resistancePercent:0,damageReductionPercent:0});
     }
     window.v174GetRelicFinalEvasionPercent=index=>playerModTotals(index).evasionPercent;
+    window.v174RelicDamageModifiers=Object.freeze({
+        incomingReduction(entity){
+            const index=partyIndexes().find(index=>characterAt(index)===entity);
+            return index===undefined?0:playerModTotals(index).damageReductionPercent;
+        },
+        outgoingReduction(entity){
+            if(!relicBattleState){ return 0; }
+            return relicBattleState.monsterRestores.reduce((sum,entry)=>sum+
+                (entry.monster===entity&&numeric(entry.expiresRound)>=currentRound()
+                    ?numeric(entry.finalDamageReductionPercent):0),0);
+        }
+    });
 
     function decorateStats(index,stats){
         if(!stats||!relicBattleState){ return stats; }
@@ -1179,11 +1191,6 @@
             ){
                 const character=characterAt(index),stats=statsAt(index);
                 if(character&&stats){
-                    const reduction=Math.max(0,Math.min(80,playerModTotals(index).damageReductionPercent));
-                    if(reduction>0){
-                        const refund=Math.min(displayAmount,Math.floor(displayAmount*reduction/100));
-                        character.hp=Math.min(numeric(stats.maxHP),numeric(character.hp)+refund); displayAmount=Math.max(0,displayAmount-refund);
-                    }
                     relicBattleState.damageEventSerial++;
                     const eventId=relicBattleState.damageEventSerial;
                     const previousHp=Math.min(numeric(stats.maxHP),numeric(character.hp)+displayAmount);
