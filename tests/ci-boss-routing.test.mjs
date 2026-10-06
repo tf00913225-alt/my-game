@@ -31,6 +31,10 @@ test('dev integration uses affected paths, dispatch retains full safety',()=>{
   assert.equal(plan(['css/23-stage-v77-inventory-detail-ui.css'],{eventName:'push'}).gates.boss_balance,false);
   assert.equal(plan(['docs/readme.md'],{eventName:'workflow_dispatch'}).gates.boss_balance,true);
 });
+test('high-risk Cloud/persistence dev integrations retain full regression and Session',()=>{
+  const p=plan(['functions/src/session-authority.js'],{eventName:'push'});
+  for(const key of ['boss_balance','main_browser','session_authority']) assert.equal(p.gates[key],true,key);
+});
 test('real main source character rows and enemy numeric presentation stay targeted; external effects stay strict',()=>{
   const source=fs.readFileSync(new URL('../js/00-main.js',import.meta.url),'utf8');
   const character=source.replace('["攻擊",stats.attackPoints]','["攻擊",stats.attack]');

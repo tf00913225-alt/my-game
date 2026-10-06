@@ -122,7 +122,8 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
   }
   const strictMode = reasons.length > 0;
   const nightly = fullRegression && eventName !== 'pull_request';
-  const mainRequired = baseRef === 'main' || nightly || (eventName==='push' && strictMode) || !['pull_request','push'].includes(eventName);
+  const highRiskIntegration = eventName==='push' && (flags.cloud_changed || flags.persistence_changed);
+  const mainRequired = baseRef === 'main' || nightly || highRiskIntegration || (eventName==='push' && strictMode) || !['pull_request','push'].includes(eventName);
   const full = mainRequired || strictMode;
   const f = key => flags[`${key}_changed`];
   const predicted = {
