@@ -22,7 +22,7 @@ const {auditLegacyRewardClaims}=require("./legacy-reward-claim-audit.js");
 const {buildCanonicalCharacterReviewPlan}=require("./canonical-character-review-plan.js");
 const {LEGACY_BACKUP_SIDECARS}=require("./cloud-save-policy.js");
 const RETAINED_MAIN_FIELDS=["version","bestiaryData","lastSaveTimestamp",
-    "selectedCreationElement","autoConfig","autoConfig2","autoConfig3"];
+    "selectedCreationElement","autoConfig","autoConfig2","autoConfig3","heroAccount"];
 
 // An internal, read-only translation of the exact legacy sources. References
 // here are source paths, never server-owned item or character identifiers.

@@ -139,6 +139,18 @@ test("read-only draft keeps empty slots and equipped objects separate from the b
     assert.deepEqual(draft.retainedMainFields.bestiaryData,{status:"present",value:{wolf:3}});
     assert.deepEqual(draft.retainedMainFields.autoConfig,{status:"present",value:{threshold:20}});
     assert.deepEqual(draft.retainedMainFields.autoConfig2,{status:"missing"});
+    assert.deepEqual(draft.retainedMainFields.heroAccount,{status:"missing"});
+    const heroAccount=require("../functions/src/hero-core.js").normalizeAccountState();
+    Object.assign(heroAccount.heroes.divineDogHongbao,{unlocked:true,stars:3,allocationSeed:42,specificFragments:18});
+    const heroDraft=prepareLegacyCharacterDraft({...save,heroAccount},sidecars);
+    assert.deepEqual(heroDraft.retainedMainFields.heroAccount,{status:"present",value:heroAccount});
+    assert.equal(heroDraft.claimHistoryBlocked,true);
+    let nextHeroReviewId=0;
+    const heroPlan=require("../functions/src/canonical-character-review-plan.js")
+        .buildCanonicalCharacterReviewPlan("hero-review-uid",heroDraft,()=>`hero-review-${++nextHeroReviewId}`);
+    assert.deepEqual(heroPlan.retainedMainFields.heroAccount.value,heroAccount);
+    assert.equal(heroPlan.authoritativeStateReady,false);
+    assert.equal(heroPlan.readyForAcceptance,false);
     const mappedMainKeys=new Set(["player","player2","player3","gold","sharedExp",
         "inventoryItems","characterEquipment","characterSkillLoadouts","allyFormation",
         "playerRelics","teamLoadout","dailyQuestState","commissionQuestState",
