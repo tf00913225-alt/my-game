@@ -17531,6 +17531,12 @@ function windArrowAttack(){
 function finishPlayerAction(){
 
     battleStatisticsFinishAction();
+    if(interceptBattleActionFinish()){
+        return;
+    }
+    /* A captured skill follow-up is still the same Action. Publish its one
+       completion only after that owner releases, then honor relic effects
+       newly queued by the completion event before advancing the queue. */
     notifyBattleActionFinished();
     if(interceptBattleActionFinish()){
         return;
