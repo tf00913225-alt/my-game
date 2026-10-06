@@ -826,6 +826,15 @@ assert.equal(concurrentTerminal.filter(r=>r.status==='rejected').length,1);
 const terminalFirst=concurrentTerminal.find(r=>r.status==='fulfilled').value;
 const winningTerminalArgs={...terminalArgs,operationId:terminalFirst.operationId};
 const terminal=(await terminalRef.get()).data();
+const terminalSourceArgs={attemptId:battleStart.attemptId,expectedRevision:2,terminalSha256:terminal.sha256};
+const readTerminalSource=(request=yRequest,args=terminalSourceArgs)=>writerSessions.runProtected(request,
+  (tx,session)=>terminalRoundOwner.readTerminal(tx,session,args,instanceClock));
+const sourceProof=await readTerminalSource();
+assert.deepEqual(sourceProof.result,{...terminalFirst,unchanged:true});
+assert.equal(sourceProof.original.snapshot.sha256,storedInstance.snapshotSha256);
+assert.equal(sourceProof.chain.rounds.length,terminalVersion);
+await assert.rejects(readTerminalSource(yRequest,{...terminalSourceArgs,terminalSha256:'0'.repeat(64)}),
+  e=>e.code==='failed-precondition');
 assert.equal(terminal.roundSha256,terminalRound.sha256);
 assert.equal(terminal.stateSha256,claimRecordsDigest(terminalRound.projection.nextState));
 assert.equal((await battleRoot.collection('restrictedBattleTerminals').get()).size,1);
@@ -839,6 +848,7 @@ for(const ref of [terminalRef,battleRoot.collection('operations').doc(terminalFi
   round1Ref,instanceRef,instancePolicyRef,battleRoot.collection('playableSnapshots').doc('2'),
   battleRoot.collection('recoveryArchives').doc('2')]){
   const saved=(await ref.get()).data();await ref.delete();
+  await assert.rejects(readTerminalSource());
   await assert.rejects(terminalRoundOwner.sealTerminal(yRequest,winningTerminalArgs));
   await assert.rejects(terminalRoundOwner.sealTerminal(yRequest,{...terminalArgs,operationId:'restricted-terminal-emulator-0003'}));
   await ref.set(saved);
@@ -848,10 +858,12 @@ await instanceMarkerRef.set(terminalMarkerBefore);
 await assert.rejects(terminalRoundOwner.sealTerminal(yRequest,winningTerminalArgs),e=>e.code==='data-loss');
 await instanceMarkerRef.set(terminalMarker);
 await terminalRef.update({resourceStatus:'unsupported'});
+await assert.rejects(readTerminalSource(),e=>e.code==='data-loss');
 await assert.rejects(terminalRoundOwner.sealTerminal(yRequest,winningTerminalArgs),e=>e.code==='data-loss');
 await terminalRef.set(terminal);
 await instanceAccountRef.update({serverRevision:3});await instanceEnvelopeRef.update({serverRevision:3});
 instanceClock=battleStart.expiresAtMs;roundCurrent.rulesSha256='0'.repeat(64);
+assert.deepEqual((await readTerminalSource()).result,{...terminalFirst,unchanged:true,expired:true});
 try{assert.deepEqual(await changedExecutableOwner.sealTerminal(yRequest,winningTerminalArgs),
   {...terminalFirst,unchanged:true,expired:true});}finally{roundCurrent.rulesSha256=originalRuleHash;}
 await instanceAccountRef.set(roundBefore.account);await instanceEnvelopeRef.set(roundBefore.envelope);
@@ -902,6 +914,11 @@ while(lifecycleState.playerHP&&lifecycleState.enemyHP&&lifecycleVersion<128){
 const lifecycleTerminalArgs={attemptId:lifecycleAttempt.attemptId,operationId:'restricted-lifecycle-terminal-0001',
   expectedRevision:2,expectedRoundVersion:lifecycleVersion};
 await lifecycleTerminalOwner.sealTerminal(lifecycleRequest,lifecycleTerminalArgs);
+const lifecycleTerminal=(await db.doc(`serverUsers/${lifecycleUid}/restrictedBattleTerminals/${lifecycleAttempt.attemptId}`).get()).data();
+const lifecycleReadArgs={attemptId:lifecycleAttempt.attemptId,expectedRevision:2,terminalSha256:lifecycleTerminal.sha256};
+const readLifecycleTerminal=request=>writerSessions.runProtected(request,
+  (tx,session)=>lifecycleTerminalOwner.readTerminal(tx,session,lifecycleReadArgs,Date.now()));
+await readLifecycleTerminal(lifecycleRequest);
 await rejected("createGameSession",lifecycleUser.idToken,{uid:lifecycleUid},"SESSION_REAUTH_REQUIRED");
 while(Math.floor(Date.now()/1000)<=claims(lifecycleUser.idToken).auth_time){
     await new Promise(resolve=>setTimeout(resolve,100));
@@ -912,15 +929,18 @@ const takeoverSession=await invoke("createGameSession",takeoverUser.idToken,{uid
 await assert.rejects(lifecycleOwner.begin(lifecycleRequest,lifecycleArgs),e=>e.message==="SESSION_REVOKED");
 await assert.rejects(lifecycleOwner.advance(lifecycleRequest,lifecycleRoundArgs),e=>e.message==='SESSION_REVOKED');
 await assert.rejects(lifecycleTerminalOwner.sealTerminal(lifecycleRequest,lifecycleTerminalArgs),e=>e.message==='SESSION_REVOKED');
+await assert.rejects(readLifecycleTerminal(lifecycleRequest),e=>e.message==='SESSION_REVOKED');
 const takeoverRequest={auth:{uid:lifecycleUid,token:claims(takeoverUser.idToken)},
     data:{uid:lifecycleUid,session:takeoverSession}};
 await assert.rejects(lifecycleOwner.begin(takeoverRequest,lifecycleArgs),e=>e.code==="failed-precondition");
 await assert.rejects(lifecycleOwner.advance(takeoverRequest,lifecycleRoundArgs),e=>e.code==='failed-precondition');
 await assert.rejects(lifecycleTerminalOwner.sealTerminal(takeoverRequest,lifecycleTerminalArgs),e=>e.code==='failed-precondition');
+await assert.rejects(readLifecycleTerminal(takeoverRequest),e=>e.code==='failed-precondition');
 await writerSessions.revoke(takeoverRequest);
 await assert.rejects(lifecycleOwner.begin(takeoverRequest,lifecycleArgs),e=>e.message==="SESSION_REVOKED");
 await assert.rejects(lifecycleOwner.advance(takeoverRequest,lifecycleRoundArgs),e=>e.message==='SESSION_REVOKED');
 await assert.rejects(lifecycleTerminalOwner.sealTerminal(takeoverRequest,lifecycleTerminalArgs),e=>e.message==='SESSION_REVOKED');
+await assert.rejects(readLifecycleTerminal(takeoverRequest),e=>e.message==='SESSION_REVOKED');
 assert.deepEqual((await lifecycleRef.get()).data(),lifecycleBefore);
 assert.equal((await db.collection("serverUsers").doc(lifecycleUid).collection("pendingGrants").get()).size,0);
 assert.equal((await db.collection("serverUsers").doc(lifecycleUid).collection("ledgerEntries").get()).size,0);
