@@ -193,6 +193,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 /* END GENERATED MONSTER BALANCE OWNER */
 
 
+
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
    - 遊戲邏輯舞台固定 1080 × 1920
@@ -733,6 +734,16 @@ let player2 = null;
 
 /* 第三角色資料槽：目前先保留為 null，不自行發明解鎖/創角條件。背包 UI 已完整支援第三角色資料。 */
 let player3 = null;
+
+// UID lifecycle reloads the app; loadGame replaces this entire account projection.
+let heroAccountState=window.FourSymbolsHeroCore.normalizeAccountState();
+window.FourSymbolsHeroSystem=Object.freeze({
+    getDomain:()=>window.FourSymbolsHeroCore.createDomain(heroAccountState,
+        ()=>[player,player2,player3],calculateCharacterBaseStats,id=>skillDatabase[id]),
+    // Future trusted callers must atomically persist/consume through their Owner.
+    // No rewards or inventory consumption are wired in Phase 1.
+    replaceAccountState:next=>{ heroAccountState=window.FourSymbolsHeroCore.normalizeAccountState(next); }
+});
 
 
 /*
@@ -6773,6 +6784,7 @@ function saveGame(options={}){
         const saveData = {
 
             version:6,
+            heroAccount:window.FourSymbolsHeroCore.normalizeAccountState(heroAccountState),
 
             player:player,
 
@@ -7094,6 +7106,9 @@ function loadGame(){
            先把玩家資料載入。
         */
 
+        // Validate the optional extension before mutating any existing character.
+        const hydratedHeroAccount=window.FourSymbolsHeroCore.normalizeAccountState(data.heroAccount);
+        heroAccountState=hydratedHeroAccount;
         Object.assign(
             player,
             data.player

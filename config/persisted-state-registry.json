@@ -3,6 +3,7 @@
   "states": [
     {
       "key": "four_symbols_save:<UID>",
+      "extensions": {"heroAccount": {"schemaVersion": 1, "ownerModule": "functions/src/hero-core.js", "restoreOwner": "js/00-main.js::loadGame", "contract": "docs/HERO_SYSTEM_V1.md", "missingDataBehavior": "locked zero-fragment zero-star projection; no storage write", "corruptionBehavior": "block hydration; preserve original save", "authorityTier": "B", "authoritativeSource": "UID local only; future trusted server mapping required"}},
       "ownerModule": "js/startup/account-save-repository.js",
       "storageType": "localStorage",
       "scope": "uid+characters",
