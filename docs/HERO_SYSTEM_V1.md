@@ -4,7 +4,7 @@ Work ID: HERO-CORE-PHASE1-20261007. Target: dev. Base dev: c1475726961a352811b19
 
 ## Formal domain and APIs
 
-`js/hero-core.js::FourSymbolsHeroCore` is the sole Hero Domain Owner. Immutable registry, progression costs, allocation version 1, schema validation and pure mutations live here. `FourSymbolsHeroSystem` in `js/00-main.js` adapts current account/player/skill Owners: `getDomain()` returns an immutable account snapshot with live player-level projection; obtain a fresh domain after applying a returned mutation. `replaceAccountState(next)` validates and replaces in-memory state only; callers must coordinate persistence and any consumption through their formal transaction Owner. No reward source or inventory consumption is enabled.
+`functions/src/hero-core.js::FourSymbolsHeroCore` is the sole Hero Domain Owner. Immutable registry, progression costs, allocation version 1, schema validation and pure mutations live here. `FourSymbolsHeroSystem` in `js/00-main.js` adapts current account/player/skill Owners: `getDomain()` returns an immutable account snapshot with live player-level projection; obtain a fresh domain after applying a returned mutation. `replaceAccountState(next)` validates and replaces in-memory state only; callers must coordinate persistence and any consumption through their formal transaction Owner. No reward source or inventory consumption is enabled.
 
 Domain APIs: getHeroDefinition, listHeroDefinitions, getHeroAccountState, isHeroUnlocked, getHeroLevel, getHeroSkillLevel, getHeroStarCost, getHeroTotalAllocatablePoints, getHeroAllocatedStats, getHeroBaseStats, getHeroSkillProjection, canUnlockHero, canStarUpHero, canReroll, unlockHero, unlockHeroDirect, starUpHero, rerollHeroAllocation, addSpecificFragments, serialize. Mutations return a new account without changing input. Direct unlock is a future trusted acquisition interface, not a chapter/login grant.
 
@@ -25,6 +25,8 @@ Physical weights: Attack 30, Intelligence 10, Agility/Defense/Vitality/Energy ea
 Existing UID main-save version 6 adds `heroAccount: {schemaVersion:1, heroes:{[heroId]:{heroId,unlocked,specificFragments,stars,allocationSeed,allocationVersion:1}}}`. No sidecar/key is created. `saveGame` serializes canonical fields; `loadGame` validates before mutating characters. Missing extension projects both heroes locked, zero fragments/stars, seed 1. Validation never writes storage or other fields. Existing invalid/unsupported Hero data fails closed; it is not reset to a blank account. Serialization strips derived/transient fields. Existing UID switching reload Owner and backups preserve the same main-save document. This local extension grants no server authority; future Cloud snapshot/admission must explicitly map and validate Hero ownership and costs before publication.
 
 No level, EXP, skill level, final stats, HP, rage or temporary passive stacks are persisted.
+
+`functions/src/hero-core.js` is the same source loaded before main in the browser bundle and required by the existing Cloud candidate policy. `cloud-save-policy.js` accepts the optional extension and delegates structural validation to this Owner; exact untrusted snapshot/raw bytes remain untouched. Read-only legacy screening retains the extension (including a missing marker) in retainedMainFields and the review plan. No Hero entitlement is validated or awarded, no playable canonical writer is enabled, and all historical claim/acceptance gates remain blocked. Raw backups/candidates are evidence, not canonical Hero ownership.
 
 ## Future battle contract — not implemented
 

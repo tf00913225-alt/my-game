@@ -91,4 +91,5 @@
         });
     }
     global.FourSymbolsHeroCore=Object.freeze({getHeroDefinition:definition,listHeroDefinitions:()=>Object.values(registry),weights,contract,normalizeAccountState,allocate,createDomain});
+    if(typeof module!=="undefined"&&module.exports){ module.exports=global.FourSymbolsHeroCore; }
 })(typeof window!=="undefined"?window:globalThis);

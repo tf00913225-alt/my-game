@@ -62,7 +62,7 @@
 });
 
 
-/* bundled source: js/hero-core.js */
+/* bundled source: functions/src/hero-core.js */
 /* Hero System V1 Phase 1. Pure domain: no storage, rewards, UI or battle hooks. */
 (function installHeroCore(global){
     "use strict";
@@ -156,6 +156,7 @@
         });
     }
     global.FourSymbolsHeroCore=Object.freeze({getHeroDefinition:definition,listHeroDefinitions:()=>Object.values(registry),weights,contract,normalizeAccountState,allocate,createDomain});
+    if(typeof module!=="undefined"&&module.exports){ module.exports=global.FourSymbolsHeroCore; }
 })(typeof window!=="undefined"?window:globalThis);
 
 

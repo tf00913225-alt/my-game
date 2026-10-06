@@ -1,6 +1,6 @@
 # Persisted State Registry — owner inventory
 
-Hero Phase 1 extends the existing UID main-save with `heroAccount` schema v1, owned by `js/hero-core.js` and serialized/hydrated by `js/00-main.js`; no new key/sidecar. Canonical fields and missing/corrupt/version policies: `HERO_SYSTEM_V1.md`. Main-save backup/UID isolation policies apply; Hero state remains local, not trusted Cloud ownership. Future authoritative snapshots require explicit Hero mapping/validation.
+Hero Phase 1 extends the existing UID main-save with `heroAccount` schema v1, owned by `functions/src/hero-core.js` and serialized/hydrated by `js/00-main.js`; no new key/sidecar. Canonical fields and missing/corrupt/version policies: `HERO_SYSTEM_V1.md`. Main-save backup/UID isolation policies apply; Hero state remains local, not trusted Cloud ownership. Future authoritative snapshots require explicit Hero mapping/validation.
 
 The `four_symbols_game_session_v1:<UID>` bearer credential now uses same-origin `localStorage` so a retained Firebase identity can resume after a mobile tab closes. `js/firebase/firebase-session.js` reads the former per-tab `sessionStorage` value as an upgrade fallback, moves it on a successful write, and clears both on logout; server session validation remains mandatory before every protected operation. It is not a gameplay save or reward source.
 

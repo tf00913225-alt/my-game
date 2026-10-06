@@ -4,7 +4,7 @@
 
 ## Hero System V1 Phase 1
 
-唯一 Hero Domain Owner 為 `js/hero-core.js`，玩家與 main-save adapter 在 `js/00-main.js::FourSymbolsHeroSystem`。Registry／最低已建立玩家等級投影／無 EXP／衍生 Skill Level／0–5 星／碎片成本／seed weighted allocation／洗髓／永久 schema 與未施工 battle contract 由 `docs/HERO_SYSTEM_V1.md` 定義。Hero account 進既有 UID main-save，不新增 sidecar；Rage 與 passive stacks 僅 battle transient，不持久化。Phase 1 英雄尚未進入正式 Battle Runtime；Equipment／Reward／UI／Combat 留待後續 Phase。
+唯一 Hero Domain Owner 為 `functions/src/hero-core.js`，玩家與 main-save adapter 在 `js/00-main.js::FourSymbolsHeroSystem`。Registry／最低已建立玩家等級投影／無 EXP／衍生 Skill Level／0–5 星／碎片成本／seed weighted allocation／洗髓／永久 schema 與未施工 battle contract 由 `docs/HERO_SYSTEM_V1.md` 定義。Hero account 進既有 UID main-save，不新增 sidecar；Rage 與 passive stacks 僅 battle transient，不持久化。Phase 1 英雄尚未進入正式 Battle Runtime；Equipment／Reward／UI／Combat 留待後續 Phase。
 
 ## Boss 術語與契約邊界
 
