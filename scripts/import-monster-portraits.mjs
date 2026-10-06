@@ -222,6 +222,7 @@ if(dryRun){
         existingTargets++;
     }
 }else{
+    const originalRegistryText=fs.readFileSync(registryPath,'utf8');
     registry.snapshot={
         portraitTargets:targets.length,
         existingTargets,
@@ -229,6 +230,11 @@ if(dryRun){
         uniqueRuntimeNames:new Set(targets.map(target=>String(target.row[nameIndex]||"")).filter(Boolean)).size
     };
     fs.writeFileSync(registryPath,JSON.stringify(registry)+"\n");
+    const measured=spawnSync(process.execPath,['scripts/measure-monster-portraits.mjs','--write'],{cwd:root,encoding:'utf8'});
+    if(measured.status!==0){
+        fs.writeFileSync(registryPath,originalRegistryText);
+        fail('presentation metadata transaction rolled back: '+String(measured.stderr||measured.error||''));
+    }
 }
 
 const report={

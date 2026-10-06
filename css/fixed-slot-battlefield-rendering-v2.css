@@ -442,7 +442,7 @@
     height:auto !important;
     display:block !important;
     z-index:1 !important;
-    background-size:contain !important;
+    background-size:var(--portrait-background-size, contain) !important;
     background-position:center bottom !important;
     background-repeat:no-repeat !important;
     background-color:transparent !important;
@@ -455,6 +455,40 @@
     animation:none !important;
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
     pointer-events:none !important;
+}
+/* Offline alpha bounds are consumed by V174. The full canvas is painted once,
+   preserving aspect and every nontransparent pixel; no runtime pixel scan. */
+#game-stage #battlePage .v174-battle-art.v174-normalized-portrait,
+#game-stage #battlePage .v174-battle-art.v174-generic-portrait{
+    container-type:size;
+    --portrait-background-size:0 0;
+}
+#game-stage #battlePage .v174-battle-art > .v174-portrait-paint{
+    position:absolute;
+    width:var(--portrait-width);
+    aspect-ratio:var(--portrait-aspect);
+    height:auto;
+    left:calc(50% - var(--portrait-width) * var(--portrait-center));
+    top:calc(var(--portrait-baseline) - var(--portrait-width) / var(--portrait-aspect) * var(--portrait-bottom));
+    background-image:inherit;
+    background-size:contain;
+    background-position:center;
+    background-repeat:no-repeat;
+    pointer-events:none;
+}
+#game-stage #battlePage .v174-battle-art.v174-generic-portrait::before{
+    content:"◇";
+    position:absolute;
+    left:12%;
+    width:76%;
+    height:var(--portrait-body-height, 82%);
+    bottom:calc(100% - var(--portrait-baseline, 96%));
+    display:grid;
+    place-items:center;
+    color:var(--ui-gold, #c89a48);
+    font-size:72cqh;
+    border:1px dashed currentColor;
+    border-radius:50%;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art::after{
     content:"";

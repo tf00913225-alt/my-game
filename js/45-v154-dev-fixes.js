@@ -9,23 +9,6 @@
 
     const MONSTER_PORTRAIT_REGISTRY_URL="config/monster-portrait-registry.json";
     const HEAVENLY_SOLDIER_ELEMENTS=new Set(["fire","water","wind","earth"]);
-    const TEMPORARY_MONSTER_PORTRAIT="assets/dungeons/abyss/soldier.webp";
-    const TEMPORARY_BOSS_PORTRAIT="assets/monsters/boss/boss-placeholder-fire-demon.webp";
-    const EARLY_ABYSS_PORTRAITS={
-        東帝:"assets/dungeons/abyss/east-emperor.webp",
-        天帝:"assets/dungeons/abyss/heaven-emperor.webp",
-        北帝:"assets/dungeons/abyss/north-emperor.webp",
-        南帝:"assets/dungeons/abyss/south-emperor.webp",
-        天兵天將:"assets/dungeons/abyss/soldier.webp"
-    };
-    const FINAL_ABYSS_PORTRAITS={
-        東帝天尊:"assets/dungeons/abyss/floor5-east-emperor.webp",
-        天帝天尊:"assets/dungeons/abyss/floor5-heaven-emperor.webp",
-        北帝天尊:"assets/dungeons/abyss/floor5-north-emperor.webp",
-        南帝天尊:"assets/dungeons/abyss/floor5-south-emperor.webp",
-        極帝天尊:"assets/dungeons/abyss/floor5-extreme-emperor.webp",
-        天兵天將:"assets/dungeons/abyss/floor5-soldier.webp"
-    };
     let monsterPortraitRegistry=null;
     let monsterPortraitRegistryPromise=null;
     let monsterPortraitRegistryState="pending";
@@ -34,6 +17,8 @@
     const dailyPortraitPreparation=new Map();
     let monsterPortraitByKey=new Map();
     let monsterPortraitByUniqueName=new Map();
+    let monsterPortraitIdentityByKey=new Map();
+    let monsterPortraitIdentityByUniqueName=new Map();
 
     function currentAbyssRoster(){
         if(typeof currentBattleMonsters==="undefined"||typeof monsters==="undefined"){ return []; }
@@ -43,10 +28,7 @@
     }
 
     function isFinalAbyssRoster(roster){
-        return roster.some(entry=>Object.prototype.hasOwnProperty.call(
-            FINAL_ABYSS_PORTRAITS,
-            entry.monster.name
-        )&&entry.monster.name!=="天兵天將");
+        return roster.some(entry=>entry.monster.v174TrueRealmFinal||String(monsterPortraitByUniqueName.get(entry.monster.name)?.portraitKey||"").startsWith("abyss.final."));
     }
 
     function registryTargets(registry){
@@ -60,6 +42,13 @@
     }
 
     function installMonsterPortraitRegistry(registry){
+        monsterPortraitIdentityByKey=new Map(registryTargets(registry).map(target=>[target.portraitKey,target]));
+        monsterPortraitIdentityByUniqueName=new Map();
+        const identityNames=new Set();
+        monsterPortraitIdentityByKey.forEach(target=>{
+            if(identityNames.has(target.name))monsterPortraitIdentityByUniqueName.delete(target.name);
+            else{identityNames.add(target.name);monsterPortraitIdentityByUniqueName.set(target.name,target);}
+        });
         const byKey=new Map();
         const byName=new Map();
         const duplicateNames=new Set();
@@ -115,11 +104,12 @@
     }
     window.v154RequestMonsterPortraitRegistry=requestMonsterPortraitRegistry;
     window.v154GetMonsterPortraitRegistryState=()=>monsterPortraitRegistryState;
+    window.v154GetPortraitPresentation=path=>monsterPortraitRegistry&&monsterPortraitRegistry.presentation&&monsterPortraitRegistry.presentation.assets[path]||null;
+    window.v154GetPortraitScaleContract=()=>monsterPortraitRegistry&&monsterPortraitRegistry.presentation&&monsterPortraitRegistry.presentation.classes||null;
 
     function legacyAbyssPortrait(monster,finalFloor){
-        if(!monster||!monster.v141Abyss){ return null; }
-        const portraits=finalFloor?FINAL_ABYSS_PORTRAITS:EARLY_ABYSS_PORTRAITS;
-        return portraits[monster.name]||null;
+        if(!monster||!monster.v141Abyss||monster.name!=="天兵天將"){ return null; }
+        return monsterPortraitRegistry?.policy?.legacyUniversalSoldierFiles?.[finalFloor?1:0]||null;
     }
 
     function resolveMonsterPortraitRecord(monster,options){
@@ -137,22 +127,23 @@
                 dedicated:true
             };
         }
-        const explicitKey=String(monster.portraitKey||monster.monsterPortraitKey||"").trim();
+        const canonicalKey=monsterPortraitIdentityByKey.has(monster.monsterKey)?monster.monsterKey:"";
+        const explicitKey=String(monster.portraitKey||monster.monsterPortraitKey||canonicalKey||(monster.vGameplayBossId&&!monster.vGameplayTowerBoss?"boss."+monster.vGameplayBossId:"")).trim();
         if(monsterPortraitRegistryState==="pending"&&explicitKey){ return null; }
         const explicitAssetFailed=!!(explicitKey&&monsterPortraitAssetFailures.has(explicitKey));
         if(explicitKey&&monsterPortraitByKey.has(explicitKey)){
             if(!explicitAssetFailed){ return monsterPortraitByKey.get(explicitKey); }
         }
-        if(monster.name==="天兵天將"){
+        if(monster.name==="天兵天將"&&!explicitKey){
             const element=String(monster.portraitElement||monster.element||"").toLowerCase();
             if(HEAVENLY_SOLDIER_ELEMENTS.has(element)){
                 const soldier=monsterPortraitByKey.get("soldier."+element);
                 if(soldier){ return soldier; }
             }
         }
-        const byName=explicitAssetFailed?null:monsterPortraitByUniqueName.get(monster.name);
+        const byName=explicitKey?null:monsterPortraitByUniqueName.get(monster.name);
         if(byName){ return byName; }
-        const legacy=legacyAbyssPortrait(monster,!!(options&&options.finalAbyss));
+        const legacy=!explicitKey?legacyAbyssPortrait(monster,!!(options&&options.finalAbyss)):null;
         if(monsterPortraitRegistryState==="pending"){ return null; }
         return legacy?{
             portraitKey:"legacy.abyss."+String(monster.name||"unknown"),
@@ -164,20 +155,30 @@
             status:"existing",
             legacy:true
         }:(()=>{
-            const temporaryBoss=monster.rank==="boss"||monster.rank==="smallBoss"||monster.unitKind==="boss"||monster.vGameplayBoss===true||monster.vGameplayTowerBoss===true||monster.v141BattleRank==="boss";
+            const identity=monsterPortraitIdentityByKey.get(explicitKey)||(!explicitKey&&monsterPortraitIdentityByUniqueName.get(monster.name));
             return {
-                portraitKey:temporaryBoss?"temporary.boss-reference":"temporary.heavenly-soldier",
+                portraitKey:"fallback.generic",
+                requestedPortraitKey:explicitKey||identity&&identity.portraitKey||null,
+                fallbackReason:explicitAssetFailed?"decode-failed":identity?identity.status:"identity-unregistered",
                 name:monster.name||"",
                 element:monster.element||"dynamic",
-                rank:temporaryBoss?"boss":(monster.rank||"regular"),
-                sizeClass:temporaryBoss?"boss":"regular",
-                path:temporaryBoss?TEMPORARY_BOSS_PORTRAIT:TEMPORARY_MONSTER_PORTRAIT,
+                rank:monster.rank||"regular",
+                sizeClass:identity&&identity.sizeClass||"standard",
+                path:null,
                 status:"fallback",
-                temporary:true
+                generic:true
             };
         })();
     }
     window.v154ResolveMonsterPortraitRecord=resolveMonsterPortraitRecord;
+    window.v154BindMonsterPortraitIdentity=function(monster){
+        const record=monster&&monsterPortraitByKey.get(monster.portraitKey);
+        if(record&&record.group==="assetPool"){
+            monster.name=record.name;
+            monster.displayName=record.name;
+        }
+        return monster;
+    };
 
     function prepareDailyDungeonPortraits(type){
         const key=String(type||"").trim();
@@ -234,6 +235,7 @@
             }
             const entries=list.map(monster=>{
                 const record=resolveMonsterPortraitRecord(monster);
+                if(record&&record.generic){ return Promise.resolve({state:"ready",monster:monster,record:record}); }
                 if(!record||!record.path){
                     return Promise.resolve({state:"failed",monster:monster,error:new Error("portrait record missing")});
                 }
@@ -241,7 +243,8 @@
                     ?window.FourSymbolsFeatures.ensureAssets([record.path])
                     :Promise.reject(new Error("feature asset decoder unavailable"));
                 return assets.then(()=>{
-                    const name=record.displayName||record.name||monster.name||"";
+                    // Only an explicit adopted asset establishes a Tower identity.
+                    const name=record.group==="assetPool"?record.name:null;
                     if(name){ monster.name=name;monster.displayName=name; }
                     monster.portraitPath=record.path;
                     return {state:"ready",monster:monster,record:record};
@@ -252,7 +255,7 @@
                 return {
                     state:failed.length?"failed":"ready",
                     records:results.filter(entry=>entry.state==="ready").map(entry=>entry.record),
-                    paths:results.filter(entry=>entry.state==="ready").map(entry=>entry.record.path),
+                    paths:results.filter(entry=>entry.state==="ready"&&entry.record.path).map(entry=>entry.record.path),
                     failures:failed.map(entry=>entry.monster&&entry.monster.portraitKey||"unknown")
                 };
             });
@@ -274,7 +277,7 @@
     function syncCardlessPresentation(card,record){
         if(!card){ return; }
         const presentation=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
-        if(record){
+        if(record&&record.path){
             const cssValue='url("'+record.path+'")';
             card.dataset.v154PortraitRecordPath=record.path;
             card.style.setProperty("--v152-abyss-portrait",cssValue);
@@ -284,7 +287,7 @@
         }
         /* V154 selects the record. V174 is the only presentation owner. */
         if(presentation&&typeof presentation.applyUnit==="function"){
-            try{ presentation.applyUnit(card,"monster"); }catch(_){ }
+            presentation.applyUnit(card,"monster",record);
         }
     }
 
@@ -321,9 +324,9 @@
             card.classList.toggle("v152-abyss-portrait",abyssPortrait);
             card.classList.toggle("v154-abyss-portrait",abyssPortrait);
             card.classList.toggle("v154-monster-portrait",!!portrait);
-            if(portrait){
+            if(record){
                 card.dataset.monsterPortraitKey=record.portraitKey;
-                card.dataset.monsterPortraitPath=portrait;
+                card.dataset.monsterPortraitPath=portrait||"";
                 if(abyssPortrait){ card.dataset.abyssPortrait=finalFloor?"floor5":"floor1-4"; }
                 else{ delete card.dataset.abyssPortrait; }
             }else{

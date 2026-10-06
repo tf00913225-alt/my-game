@@ -71,6 +71,8 @@ The generator uses Registry `sizeClass` dimensions. It must never assume every m
 
 ## Completion gate
 
+Import／Master finalization also runs `scripts/measure-monster-portraits.mjs --write` to update the same Registry presentation metadata. The visual contract and sole presentation owner are defined in `docs/MONSTER_PORTRAIT_SPEC_V1.md` section 8; Alpha analysis occurs only offline. Metadata does not alter immutable Master or Runtime bytes. CI re-decodes with `--check`, validates hashes and runs full mobile bounds/baseline/redraw/reentry QA.
+
 `node tests/permanent-image-asset-pipeline.test.mjs` is the mandatory CI gate.
 
 The gate is **count-independent**. It validates every entry currently marked `runtimeReady=true`; it must not encode historical batch sizes such as “18 Wild Fire portraits”.
