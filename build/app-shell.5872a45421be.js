@@ -258,6 +258,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 /* END GENERATED MONSTER BALANCE OWNER */
 
 
+
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
    - 遊戲邏輯舞台固定 1080 × 1920
@@ -7032,6 +7033,7 @@ function saveGame(options={}){
         try{
             repository.writeForUid(activeUid,saveData,{
                 source:String(persistenceOptions.source||"gameplay"),
+                ...(persistenceOptions.equipmentShopState?{equipmentShopState:persistenceOptions.equipmentShopState}:{}),
                 ...(typeof persistenceOptions.localDirty==="boolean"?{localDirty:persistenceOptions.localDirty}:{})
             });
         }finally{

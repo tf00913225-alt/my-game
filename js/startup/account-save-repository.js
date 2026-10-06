@@ -129,6 +129,11 @@
         const metaKey=metadataKey(uid);
         const previousRaw=storage().getItem(key);
         const previousMeta=storage().getItem(metaKey);
+        // The existing local equipment shop commits its batch receipt with
+        // gold/inventory through this same rollback boundary. No Cloud authority.
+        const shopKey=options.equipmentShopState?accountKey("equipment-shop-daily"):null;
+        const previousShop=shopKey?storage().getItem(shopKey):null;
+        const shopRaw=shopKey?JSON.stringify(options.equipmentShopState):null;
         let previousMetadata=null;
         if(previousMeta){
             try{ previousMetadata=JSON.parse(previousMeta); }
@@ -167,10 +172,12 @@
         try{
             storage().setItem(key,raw);
             storage().setItem(metaKey,metadata);
+            if(shopKey){ storage().setItem(shopKey,shopRaw); }
         }catch(error){
             try{
                 if(previousRaw===null){ storage().removeItem(key); }else{ storage().setItem(key,previousRaw); }
                 if(previousMeta===null){ storage().removeItem(metaKey); }else{ storage().setItem(metaKey,previousMeta); }
+                if(shopKey){ if(previousShop===null){ storage().removeItem(shopKey); }else{ storage().setItem(shopKey,previousShop); } }
             }catch(_){ }
             throw coded("account-save-write-failed","Account save could not be committed atomically.",error);
         }

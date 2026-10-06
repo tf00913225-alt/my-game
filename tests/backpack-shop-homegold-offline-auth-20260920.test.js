@@ -26,7 +26,7 @@ assert.match(adventure,/road_chest:\{gold:420,potions:\[\{id:"hpPotion30",count:
 assert.match(adventure,/id:"hpPotion30",name:"大還丹"/);
 assert.match(adventure,/id:"spPotion30",name:"歸元丹"/);
 
-assert.match(shopUi,/v17345-equipment-wallet"><span>目前金幣<\/span><b>'\+goldText\+'/);
+assert.match(shopUi,/FourSymbolsEquipmentShop\.render\(\)/,"shell delegates the equipment wallet to its canonical renderer");
 assert.match(equipment,/v17345-equipment-wallet"><span>目前金幣<\/span><b>'\+goldText\+'/);
 assert.match(shopCss,/\.v17345-equipment-wallet\{[\s\S]{0,260}display:flex !important/);
 assert.doesNotMatch(shopCss,/\.v17345-equipment-wallet\{\s*display:none !important/);
