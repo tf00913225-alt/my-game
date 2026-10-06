@@ -160,3 +160,21 @@ acceptance and full dev deployment remain pending until actual run completion.
 Rollback dependent changes in reverse order: deployed parallelization, then
 Nightly/health; PR classifier enforcement can separately return to Shadow by
 setting PR_GATES_ENABLED=false. Never remove existing main/dev protection.
+
+## Full-suite restoration discovered by strict PR execution
+
+Exact Head d109f12d enabled full Node suites for Strict/Cloud/Persistence PRs.
+The 284-suite runner exposed older assertions that referenced retired V173
+Daily stat multipliers, the former ten-enemy Daily roster, legacy Abyss HP
+post-writes, and pre-fix inventory navigation order. Ten existing test files
+are aligned with the formal MonsterBalance/three-wave Daily/two-tier Abyss/
+V174 presentation owners. No suite or test case is removed; factories and
+projection/identity/confirmation/resume behavior are exercised instead of
+matching retired assignments. The Fire Tower fixture also pins its week and
+loads the real MonsterBalance module. No gameplay/build/release asset changes.
+
+Local suite diagnosis: 280/284 suites pass after targeted repairs; four actual
+Chrome suites require the GitHub runner's Chrome (not counted as local passes).
+Governance contracts: 138/138 PASS. Remote full acceptance remains required.
+The d109f12d Boss job failed before gameplay at Chrome CDP ECONNREFUSED; evidence
+is retained, and a later exact-head execution must pass the unchanged QA.

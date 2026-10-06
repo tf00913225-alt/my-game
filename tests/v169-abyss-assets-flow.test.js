@@ -43,7 +43,13 @@ test("a persisted Abyss run pauses at a progress gate without resetting its floo
     assert.match(abyss,/繼續挑戰/);
     assert.match(abyss,/if\(!abyssState\.active\)\{ abyssState=Object\.assign/);
     assert.match(abyss,/if\(tabName!=="abyss"\)\{ abyssMapEntered=false; \}/);
-    assert.match(abyss,/if\(page!=="dungeon"&&page!=="battle"\)\{ abyssMapEntered=false; \}/);
+    const gate=abyss.match(/if\(page!=="dungeon"&&page!=="battle"&&[^{}]+\{ abyssMapEntered=false; \}/)?.[0];
+    assert.ok(gate,'formal page-exit gate missing');
+    const vm=require('node:vm');
+    for(const [page,closeBehavior,expected] of [['dungeon',null,true],['battle',null,true],['inventory','restore-source',true],['inventory',null,false],['home',null,false]]){
+      const context={page,inventoryOpenContext:{closeBehavior},abyssMapEntered:true};
+      vm.runInNewContext(gate,context);assert.equal(context.abyssMapEntered,expected,page+' resume contract');
+    }
     assert.match(abyss,/raw\.phase==="portal"&&Number\(raw\.rewardVersion\|\|0\)<1/);
     assert.match(css,/\.v141-abyss-intro\.v169-abyss-resume/);
     assert.doesNotMatch(css,/v169-abyss-resume[^{}]*\{[^}]*(?:display|padding|background|justify-content)\s*:/);

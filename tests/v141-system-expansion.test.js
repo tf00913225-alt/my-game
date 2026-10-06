@@ -168,21 +168,20 @@ test("offline EXP uses highest-character level bands without changing its time c
 });
 
 test("daily dungeon creation owns formations and elements without render-time rewriting",()=>{
-    assert.match(v132Source,/for\(let i=0;i<10;i\+\+\)/);
-    assert.match(v132Source,/stage===3 \? "elite" : "regular"/);
-    assert.match(v132Source,/bossCount:1/);
-    assert.match(v132Source,/eliteCount:4/);
-    assert.match(v132Source,/total:5/);
+    const {context}=require('../scripts/monster-balance-shadow-matrix.mjs').loadLegacyRuntime();
+    vm.runInContext(fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','utf8'),context);
+    context.prepareWildBalanceReferenceParty(50,3);
+    for(const type of ['exp','material','gold']){
+        const waves=context.v148BuildDailyDungeonWaves(type).waves;
+        assert.equal(waves.length,3);
+        for(const [wave,roster] of waves.entries()){
+            assert.equal(roster.length,6);
+            assert.deepEqual(Array.from(roster,m=>m.rank),[['regular','regular','regular','regular','regular','regular'],['regular','regular','regular','regular','elite','elite'],['regular','regular','regular','elite','boss','elite']][wave]);
+            roster.forEach(m=>{assert.equal(m.balanceOwner,'MonsterBalance');assert.equal(m.mode,'daily');assert.ok(['fire','water','earth','wind'].includes(m.element));});
+        }
+    }
     assert.match(v132Source,/const DUNGEON_DAILY_LIMIT_ENABLED=false/);
-    // The dungeon creation owner selects elements; render hooks only validate skills.
     const rules=fs.readFileSync("js/40-v144-rules-and-abyss.js","utf8");
-    const context=vm.createContext({Math:Object.create(Math)});
-    vm.runInContext(v132Source.match(/const DUNGEON_ELEMENTS=\[[^;]+;/)[0]+extractFunction(v132Source,"randomElement"),context);
-    [0,.25,.5,.75,.999].forEach((roll,index)=>{
-        context.Math.random=()=>roll;
-        assert.equal(context.randomElement(),["fire","water","earth","wind","wind"][index]);
-    });
-    assert.match(extractFunction(v132Source,"startExpDungeonBattle"),/randomElement\(\)/);
     assert.doesNotMatch(uiSource,/monster\.element=elements\[index%elements\.length\]/);
     assert.match(rules,/window\.v144ConfigureDungeonBattleSkillsAfterRender=configureDungeonBattleSkillsAfterRender/);
 });
@@ -293,21 +292,28 @@ test("synthesis implements exact material costs, replacement-only reforge and pe
     assert.match(contentSource,/Math\.min\(100,count\)/);
 });
 
-test("Abyss has exact five-floor rosters, fixed center support BOSS and click-only final chest",()=>{
-    ["東帝","南帝","天帝","北帝","極帝天尊","東帝天尊","南帝天尊","北帝天尊","天帝天尊"].forEach(name=>assert.ok(contentSource.includes(name)));
-    ["flyingSandStrike","dustStorm","stoneSlash","explosiveFlurry","dragonSlash","fireRocket","windHowlLightning","stormFlurry","windCrossSlash","floodBeast","frostPunch","waterKnife"].forEach(id=>assert.ok(contentSource.includes(id)));
-    assert.match(contentSource,/function openAbyssBossDialogue\(\)/);
-    assert.match(contentSource,/const overlay=document\.createElement\("button"\)/);
-    assert.match(contentSource,/window\.v141ChallengeAbyssBoss=function\(\)\{\s*return openAbyssBossDialogue\(\);\s*\}/);
-    assert.match(contentSource,/if\(spec\[0\]==="極帝天尊"\)/);
-    assert.match(contentSource,/v141FormationPosition=position/);
-    assert.match(contentSource,/monster\.maxHP\+=extraHp/);
-    assert.match(contentSource,/floor<5[\s\S]*?"boss",5000/);
-    assert.match(contentSource,/"boss",10000/);
-    assert.match(contentSource,/"elite",3500/);
-    assert.match(contentSource,/abyssState\.phase="chest"/);
-    assert.match(contentSource,/window\.v141OpenAbyssChest=function/);
-    assert.match(contentSource,/source\.currentSrc\|\|source\.src/);
+test("formal two-tier Abyss keeps five regions, center bosses and click-only final chest",()=>{
+    const owner=fs.readFileSync('js/59-abyss-two-tier-runtime.js','utf8');
+    const {context}=require('../scripts/monster-balance-shadow-matrix.mjs').loadLegacyRuntime();
+    const {MonsterBalance}=require('../js/combat/monster-balance-owner.mjs');
+    for(const level of [20,40])for(let region=0;region<5;region++)for(let stage=0;stage<5;stage++){
+        const roster=context.v174AbyssBuildRoster(level,region,stage);
+        assert.equal(roster.length,level===40&&region===4&&stage===4?10:8);
+        for(const m of roster){
+            assert.equal(m.balanceOwner,'MonsterBalance');assert.equal(m.mode,'abyss');assert.equal(m.level,level);
+            const projection=MonsterBalance.preview(m.balanceProjection.identity);
+            assert.equal(m.maxHP,projection.final.maxHP);assert.equal(m.maxSP,projection.final.maxSP);
+        }
+        if(stage===4&&!(level===40&&region===4)){assert.equal(roster[2].rank,'smallBoss');assert.equal(roster[2].v141FormationPosition,2);}
+    }
+    const final=context.v174AbyssBuildRoster(40,4,4);
+    assert.deepEqual(Array.from(final.slice(0,5),m=>m.name),['東帝天尊','天帝天尊','極帝天尊','北帝天尊','南帝天尊']);
+    assert.equal(final.slice(0,5).every(m=>m.rank==='smallBoss'),true);
+    assert.equal(final.slice(5).every(m=>m.rank==='elite'),true);
+    assert.match(owner,/run\.phase="chest"/);
+    assert.match(owner,/window\.v141OpenAbyssChest=claimChest/);
+    assert.match(owner,/source\.currentSrc\|\|source\.src/);
+    assert.doesNotMatch(owner,/monster\.maxHP\+=extraHp/);
 });
 
 test("procedural audio is skill-driven and covers the combat sound building blocks",()=>{
