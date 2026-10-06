@@ -71,6 +71,30 @@ assert.deepEqual(hydrate.heroAccountState,core.normalizeAccountState());assert.e
 const reload=vm.createContext({window:{FourSymbolsHeroCore:core},data:{...legacy,heroAccount:state},heroAccountState:null});
 vm.runInContext(main.slice(hydrateStart,hydrateEnd),reload);
 assert.deepEqual(reload.heroAccountState,state);
+// Actual saveGame -> UID repository -> actual loadGame extension boundary.
+const stored=new Map();
+const saveContext=vm.createContext({console,window:{FourSymbolsHeroCore:core,localStorage:{getItem:key=>stored.get(key)||null,setItem:(key,value)=>stored.set(key,String(value)),removeItem:key=>stored.delete(key)}},
+    deleteAllCharactersInProgress:false,player:legacy.player,player2:null,player3:null,heroAccountState:state,
+    SAVE_KEY:"four_symbols_save:hero-uid",normalizeInventoryStacks:()=>{},sharedExp:7,gold:legacy.gold,
+    dailyQuestState:{},commissionQuestState:{},bestiaryData:{},achievementState:{},selectedCreationElement:"fire",
+    characterEquipment:{},characterSkillLoadouts:legacy.characterSkillLoadouts,autoConfig:{},autoConfig2:{},autoConfig3:{},inventoryItems:legacy.inventoryItems});
+vm.runInContext(fs.readFileSync("js/startup/account-save-repository.js","utf8"),saveContext);
+saveContext.window.FourSymbolsAccountSave.activate("hero-uid");
+vm.runInContext(main.slice(main.indexOf("function saveGame("),main.indexOf("function normalizeHydratedRetiredSkillReferences(")),saveContext);
+assert.equal(saveContext.saveGame(),true);
+const saved=saveContext.window.FourSymbolsAccountSave.readActive().save;
+assert.deepEqual(core.normalizeAccountState(saved.heroAccount),state);
+assert.equal(saved.gold,123);assert.equal(saved.player.id,"legacy");assert.equal(saved.inventoryItems[0].id,"gear");
+assert.deepEqual(Array.from(stored.keys()).sort(),["four_symbols_active_uid","four_symbols_save:hero-uid","four_symbols_save_meta:hero-uid"]);
+const loadPrefix=main.slice(main.indexOf("function loadGame(){"),hydrateEnd)+"return heroAccountState; }catch(error){return false;} }";
+vm.runInContext(loadPrefix,saveContext);
+saveContext.heroAccountState=null;
+assert.deepEqual(saveContext.loadGame(),state);
+saveContext.window.FourSymbolsAccountSave.activate("other-uid");
+assert.equal(saveContext.loadGame(),false);
+saveContext.window.FourSymbolsAccountSave.activate("hero-uid");
+assert.equal(saveContext.loadGame({...saved,heroAccount:{schemaVersion:99,heroes:{}}}),false);
+assert.deepEqual(saveContext.heroAccountState,state,"invalid extension must leave current account unchanged");
 assert.match(main,/heroAccount:window\.FourSymbolsHeroCore\.normalizeAccountState\(heroAccountState\)/);
 assert.ok(hydrateStart<main.indexOf("            data.player",hydrateStart));
 assert.match(fs.readFileSync("scripts/build-production.mjs","utf8"),/"js\/hero-core.js",\s*"js\/00-main.js"/);
