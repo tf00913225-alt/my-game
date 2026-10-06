@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import {spawnSync} from "node:child_process";
+import createRuntime from "../../scripts/test-helpers/relic-runtime-fixture.cjs";
 
 function findChrome(){
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
@@ -44,19 +45,7 @@ var inventoryItems=[
 ];
 var gold=0,battleActive=false;
 var player={id:"QA",relicProgression:{version:1,initialized:true,ownershipMigration:"preserved-existing",legacyTowerChoiceHandled:true,majorMilestoneClaims:{},pending:null}};
-const catalog={
- relic_qiankun_flask:{id:"relic_qiankun_flask",name:"乾坤玉壺",rarity:"blue",runtimeReady:true,maxLevel:20},
- relic_sun_orb:{id:"relic_sun_orb",name:"烈陽神珠",rarity:"purple",runtimeReady:true,maxLevel:20},
- relic_xuanwu_seal:{id:"relic_xuanwu_seal",name:"玄武靈印",rarity:"blue",runtimeReady:true,maxLevel:20},
- relic_soul_bell:{id:"relic_soul_bell",name:"鎮魂古鐘",rarity:"purple",runtimeReady:true,maxLevel:20},
- relic_tiangang_banner:{id:"relic_tiangang_banner",name:"天罡戰旗",rarity:"orange",runtimeReady:true,maxLevel:20},
- relic_nine_dragon_fire:{id:"relic_nine_dragon_fire",name:"九龍神火罩",rarity:"purple",runtimeReady:true,maxLevel:20},
- relic_cold_spring_jade:{id:"relic_cold_spring_jade",name:"寒泉玉珮",rarity:"purple",runtimeReady:true,maxLevel:20},
- relic_qinglan_feather:{id:"relic_qinglan_feather",name:"青嵐羽符",rarity:"blue",runtimeReady:true,maxLevel:20},
- relic_rock_mountain_seal:{id:"relic_rock_mountain_seal",name:"岩岳鎮印",rarity:"purple",runtimeReady:true,maxLevel:20},
- relic_returning_wheel:{id:"relic_returning_wheel",name:"回天寶輪",rarity:"pink",runtimeReady:true,maxLevel:20},
- relic_all_returning_array:{id:"relic_all_returning_array",name:"萬象歸元盤",rarity:"four-symbol",runtimeReady:false,maxLevel:20}
-};
+const catalog=${JSON.stringify(createRuntime({}).context.v174RelicSystem.catalog)};
 const owned={};Object.values(catalog).forEach(function(def){owned[def.id]={unlocked:false,level:1,seen:true};});
 const loadout={relicId:null,subRelicId:null};
 window.v174RelicSystem={catalog:catalog,getOwnedState:function(){return owned;},getTeamLoadout:function(){return loadout;}};
