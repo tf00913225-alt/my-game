@@ -394,7 +394,7 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     // DEV preview is deliberately unavailable on the production host.
     await waitFor(client,`window.v174RelicDebugState?.()?.relicId===${id}`,relicId+" initialized battle owner",7000);
     await client.eval("(()=>{currentBattleMonsters.forEach(index=>{monsters[index].hp=Math.max(100000,monsters[index].hp);monsters[index].maxHP=Math.max(100000,monsters[index].maxHP||0);});return true;})()");
-    await client.eval("(()=>{window.__relicQaFinishRelease=FourSymbolsBattleFlow.interceptActionFinish(()=>true);return true;})()");
+    await client.eval("(()=>{window.__relicQaFinishRelease=FourSymbolsBattleFlow.interceptActionFinish(()=>!!battleDurationAction?.completed);return true;})()");
     const before=await client.eval("window.v174RelicDebugState().totalTriggers");
     if(relicId==="relic_cold_spring_jade"){
         await client.eval("(()=>{const max=getPartyBattleStats(0).maxHP;player.hp=Math.floor(max*.4);settleBattleHpDamage(player,Math.ceil(max*.1),{attacker:monsters[currentBattleMonsters[0]],sourceType:'normalAttack',damageKind:'direct'});return true;})()");
