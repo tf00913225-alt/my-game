@@ -231,7 +231,8 @@ test("equipment cover, ability scrolling and Abyss decluttering stay scoped",()=
     assert.doesNotMatch(characterRuntime,/bodyRect\.bottom-rootRect\.top-10/);
     assert.match(css,/v141-abyss-intro:not\(\.complete\)::before\{[\s\S]*?aspect-ratio:9\/16/);
     assert.match(css,/v141-abyss-shell > header\{[\s\S]*?position:absolute !important/);
-    assert.match(css,/v154-abyss-portrait[\s\S]*?var\(--v152-abyss-portrait\)/);
+    assert.doesNotMatch(css,/v154-abyss-portrait[^{}]*\{[^}]*background-image/);
+    assert.match(source,/presentation\.applyUnit\(card,"monster"\)/);
     // Legacy image CSS has no Runtime producer; canonical art is verified below.
     assert.doesNotMatch(source,/v162-abyss-battle-portrait-art/);
     assert.match(fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8"),/\.v174-battle-art\{[^}]*background-size:contain !important/);

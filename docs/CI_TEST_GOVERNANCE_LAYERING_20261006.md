@@ -1,0 +1,180 @@
+# CI test governance layering
+
+Work ID: `CI-TEST-GOVERNANCE-LAYERING-20261006`
+Target: dev; main writes forbidden.
+Branch: `feature/ci-test-governance-layering-20261006`.
+Status: Phase 1 remote VERIFIED; Phase 2 PR enforcement implemented after shadow;
+Phase 3 full regression/health implemented, final remote validation pending.
+
+## Phase 0 evidence
+
+- Read latest GitHub dev: `5ffa4d1e979279b8ee57bfde356e637b8f3471f6`.
+- Read main: `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356`.
+- Open PR search: #806 Wind EX; no existing CI layering PR.
+- Branch protection full endpoints: **UNVERIFIED**, HTTP 403 Resource not
+  accessible by integration. Branch metadata reports main's Repository checks
+  context, but is not treated as a complete protection/ruleset audit.
+- `.github/workflows/ci.yml`: Repository checks serialized target lifecycle,
+  bottom navigation/potion, Daily, Hit/Evasion, Tower/Wild, responsive/forge,
+  touch/navigation, update notification, fixed slots, battle live, portraits,
+  Adventure, skill/backpack. Boot/relic browser and all Node suites were main-only.
+- Independent CI jobs: Abyss Phase2D, Adventure Phase2E, Boss Phase2F.
+- `session-authority.yml`: independent emulator, then dev-only Firebase deploy;
+  `wait-session-repository-checks.mjs` explicitly waits for the exact dev push
+  `.github/workflows/ci.yml` job named `Repository checks`. It rejects stale
+  dev, failed runs, old attempts and wrong SHA. This external name is preserved.
+- Dev deployment previously needs verify/Abyss/Adventure/Boss; reusable
+  `deploy-dev-cloudflare.yml` checks current dev, packages immutable artifact,
+  deploys exact SHA, verifies release manifest, and runs deployed responsive,
+  forge/potion, battle/target, Daily, Tower, Abyss, Adventure and Boss QA.
+- Production deploy is workflow_run CI success on main push only; exact verified
+  checkout, stale-main checks, release-ready/build, immutable artifact, manifest
+  verification and production runtime QA remain untouched.
+- Existing dev baseline CI run: `37346751274`, SUCCESS. Historical runtime
+  estimates in the task are hypotheses until actual run/job logs are compared.
+
+## Phase 1 owner and topology
+
+CI orchestration remains `.github/workflows/ci.yml`; result policy is
+`.github/scripts/ci-aggregate.mjs`. Original test/evidence steps are moved, not
+deleted. Independent browser runners isolate server ports and artifacts.
+
+`core_checks`, `battle_browser`, `ui_browser`, `daily_browser`,
+`tower_wild_browser`, `portrait_browser`, `adventure_ui_browser`,
+`main_browser`, `abyss_balance`, `adventure_balance`, `boss_balance`
+→ `verify` (**Repository checks**) → dev deployment.
+
+The barrier uses always() and rejects missing, failure, cancellation, queued,
+neutral or unexpected skipped children. Only main_browser's existing non-main
+skip is allowed in Phase 1. Session does not wait on core_checks: it waits on
+this final barrier. Its finite wait becomes 65m to cover the existing 60m Boss
+cap plus runner/API reserve; Firebase job retains 15m after that wait.
+
+All prior test commands, conditions, evidence uploads and main-only gates are
+preserved. No PR changed-path skipping is enabled yet. No dev/production
+deployment contract is replaced. Gameplay, save state and release versions are
+unchanged.
+
+## Validation and phase transitions
+
+- Local aggregate and Session contract tests: 92/92 PASS.
+- YAML parse/semantic checks: PASS; every original step is still present;
+  step references remain in the same child job; needs reference valid jobs.
+- Whitespace: PASS. Remote Latest Head CI and actual timing remain pending.
+- First remote execution exposed an implicit serial dependency: Tower TTK
+  writer expected `artifacts/browser-qa` to exist from an earlier browser step.
+  Job `112089964859` failed ENOENT; isolated browser jobs now explicitly create
+  their evidence directory. No assertion or test was removed. Regression added.
+- Latest dev `8224dab26348dee1e3c506d1fcdcf91001869a6e` was absorbed by normal
+  merge, preserving #806 Wind EX and its newly deployed Hit/Evasion QA.
+- Actual baseline run `37346751274`: verify 29m11s; Boss 34m27s; Abyss 18m54s;
+  Adventure 4m15s; dev deployment 78m53s. Final barrier must still wait for Boss.
+- Phase 2 may start only after Phase 1 remote validation. Classifier shadow
+  mode must precede conditional PR gates; dev push must remain full.
+- Phase 3 scheduled full regression/health must preserve current main CI and
+  deployment; main promotion is not authorized by this engineering task.
+
+## Rollback
+
+Phase 1: revert the Phase 1 commit to restore original serial verify and wait
+budget together. Phase 2: disable PR skip, retaining full CI and classifier
+shadow evidence. Phase 3: if unstable, remove its new health blocking role;
+never remove existing dev/main gates to work around failure.
+
+Final status/evidence, exact Head, timings and deployment belong to the Work PR.
+Until those gates pass this work is **NOT COMPLETE**.
+
+## Phase 1 remote acceptance / Phase 2 shadow checkpoint
+
+Exact Head `ab146b3701d5c3a2b151825881449b15dfd09062`: CI run
+`37408209921` SUCCESS, Repository checks SUCCESS, Session Authority
+`37408209717` emulator SUCCESS. All original test/evidence steps retained.
+Real failure propagation: earlier run `37407980798` Tower failure resulted in
+Repository checks FAILURE after all required children settled.
+Execution: core 1m42s, UI 8m35s, Daily 8m57s, Tower/Wild 13m28s, Battle 10m18s,
+Portrait 1m05s, Adventure balance 4m19s, Abyss 18m19s, Boss 34m14s.
+Final barrier takes the Boss critical path, not merely the split serial group.
+
+Classifier owner: `.github/scripts/ci-change-classifier.mjs`. Unit fixtures cover
+Battle, UI, Cloud, Portrait, Docs, MonsterBalance, Release, Workflow, unknown
+runtime, unavailable comparison, new files, shadow and full dev/main behavior.
+Shadow emits predicted/effective gates in every PR summary; original full gates
+remain. Classifier itself is also a required aggregate child.
+Generated build/manifest diffs are strict as required; many UI PRs containing
+such generated changes can therefore still run the full matrix.
+Automatic schedule activation is blocked until a separately authorized main
+release: main is this repository's default branch, and GitHub only schedules
+workflows present there. This task must not modify main or default-branch settings.
+
+## Phase 2 enforced checkpoint
+
+Remote Shadow classifier job `112100800243` on Head `668ec9ff42c5e3e1e27456b4b728e5c323d2ef29`
+passed all fixtures and emitted SHADOW with every original gate retained; CI
+run `37411524319` remains supplementary full execution. Eight representative
+fixtures plus fail-closed cases passed before enabling conditional PR gates.
+Enforcement is restricted to PRs into dev. main-target PRs and all non-PR
+contexts force full gates. Aggregate validates the classifier child and schema;
+failure/cancellation never count as legal skips. Pure docs can skip balance and
+browser jobs; unknown source, generated manifest/build, CI/framework/shared
+owners remain strict. Runtime files under docs are not document-only changes.
+
+## Phase 3 full regression / health
+
+dev push runs all Node suites and every browser job, including boot/relic,
+plus the existing Session Authority emulator in validation-only mode. Called
+emulators have per-run concurrency groups, avoiding a cycle with standalone
+Firebase deployment waiting for Repository checks. Original Session job name,
+security tests, credentials and bounded wait remain; reuse cannot deploy.
+
+Nightly `23 20 * * *` targets Taiwan 04:23, pins current dev once, and reuses
+full CI. Every checkout uses the pinned SHA and an independent source-SHA
+assertion. All Node, Battle/Hit, Daily, Tower/Wild, Abyss, Adventure, Boss,
+UI/Forge/navigation, skill/backpack/portrait, boot/relic, Cloud/Session and
+build/release/artifact gates execute. It never deploys. Scheduling is NOT ACTIVE
+until this workflow reaches main through a separately authorized release.
+
+`Full Regression Health` status and a 90-day report record exact candidate SHA,
+owner run and results. Missing/pending/failure/error cannot promote. Later full
+success on the same candidate resolves failure; no fallback to older success.
+The owner run must complete SUCCESS, including dev deployment if present.
+main-target CI compares the actual candidate tree to current dev and checks
+health before Repository checks succeeds. Existing main/production gates remain.
+
+Protection endpoints remain UNVERIFIED. Main promotion/production is not
+performed. Nightly activation remains a platform/authorization limitation;
+code integration alone must not be called complete schedule activation.
+
+## Exact dev deployment parallelization
+
+Publication remains one immutable artifact deployment. Six independent deployed
+QA groups (Responsive/Forge, Battle/Hit/Daily, Tower, Abyss, Adventure, Boss)
+check the same github.sha source and dev HEAD, and validate deployed manifest
+before and after QA. No QA command/evidence upload is removed. Credentials
+remain only in the publication job. The original `Deploy dev preview` check
+now aggregates publisher plus all six groups: failure, cancellation or skip
+fails the final barrier. Production deployment workflow is unchanged.
+
+Local acceptance: 137 targeted contract tests PASS, workflow YAML/semantic
+validation and actionlint PASS, git diff --check PASS. Remote final-head
+acceptance and full dev deployment remain pending until actual run completion.
+Rollback dependent changes in reverse order: deployed parallelization, then
+Nightly/health; PR classifier enforcement can separately return to Shadow by
+setting PR_GATES_ENABLED=false. Never remove existing main/dev protection.
+
+## Full-suite restoration discovered by strict PR execution
+
+Exact Head d109f12d enabled full Node suites for Strict/Cloud/Persistence PRs.
+The 284-suite runner exposed older assertions that referenced retired V173
+Daily stat multipliers, the former ten-enemy Daily roster, legacy Abyss HP
+post-writes, and pre-fix inventory navigation order. Ten existing test files
+are aligned with the formal MonsterBalance/three-wave Daily/two-tier Abyss/
+V174 presentation owners. No suite or test case is removed; factories and
+projection/identity/confirmation/resume behavior are exercised instead of
+matching retired assignments. The Fire Tower fixture also pins its week and
+loads the real MonsterBalance module. No gameplay/build/release asset changes.
+
+Local suite diagnosis: 280/284 suites pass after targeted repairs; four actual
+Chrome suites require the GitHub runner's Chrome (not counted as local passes).
+Governance contracts: 138/138 PASS. Remote full acceptance remains required.
+The d109f12d Boss job failed before gameplay at Chrome CDP ECONNREFUSED; evidence
+is retained, and a later exact-head execution must pass the unchanged QA.

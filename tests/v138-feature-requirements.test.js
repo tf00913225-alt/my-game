@@ -133,24 +133,27 @@ test("equipment dungeon always keeps one BOSS and four elites",()=>{
     );
 });
 
-test("all three dungeon entry paths require confirmation",()=>{
-    const calls=v132Source.match(/confirmDungeonEntry\(/g)||[];
-    assert.equal(calls.length,4,"一個函式定義加三個副本呼叫");
-    assert.match(v132Source,/confirmDungeonEntry\(\s*"經驗副本"/);
-    assert.match(v132Source,/confirmDungeonEntry\(\s*"材料副本"/);
-    assert.match(v132Source,/confirmDungeonEntry\(\s*"裝備副本"/);
+test("all three formal daily entry paths require confirmation before construction",()=>{
+    const owner=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
+    const calls=[];
+    const context=vm.createContext({dailyPartyContext:()=>({soloProtected:false}),window:{rpgConfirm:(text,options)=>{calls.push({text,options});return Promise.resolve(true);}}});
+    vm.runInContext(extractFunction(owner,"confirmFormalDailyDungeon"),context);
+    for(const title of ['經驗副本','材料副本','金幣副本'])context.confirmFormalDailyDungeon({title});
+    assert.equal(calls.length,3);
+    calls.forEach((call,i)=>{assert.ok(call.text.includes(['經驗副本','材料副本','金幣副本'][i]));assert.equal(call.options.confirmText,'進入副本');});
+    assert.match(extractFunction(owner,"beginFormalDailyDungeon"),/if\(!await confirmFormalDailyDungeon\(meta\)\)\{ return; \}\s*const built=buildDailyDungeonWaves\(type\)/);
 });
 
-test("dungeon elite and BOSS HP/SP receive the requested additional boosts",()=>{
-    assert.match(
-        v132Source,
-        /DUNGEON_ELITE_MULTIPLIERS=\{maxHP:3\.20,maxSP:2\.00/
-    );
-    assert.match(
-        v132Source,
-        /DUNGEON_BOSS_MULTIPLIERS=\{maxHP:4\.50,maxSP:2\.00/
-    );
-    assert.match(v132Source,/monster\.sp=monster\.maxSP/);
+test("daily elite and BOSS durability follows the formal balance owner without SP rewrites",()=>{
+    const {MonsterBalance}=require('../js/combat/monster-balance-owner.mjs');
+    const spec={context:'ci/formal-daily',monsterKey:'daily.exp.regular',name:'修行弟子',element:'fire',rank:'regular',archetype:'balanced',level:50,mode:'daily',partySize:3,dailyType:'exp',wave:1,slot:0,highestPartyLevel:50,skillFrequency:.35};
+    const regular=MonsterBalance.build(spec);
+    for(const [rank,hp,defense] of [['elite',1.5,1.1],['boss',2,1.15]]){
+        const m=MonsterBalance.build({...spec,rank});
+        assert.equal(m.maxHP,regular.maxHP*hp);assert.equal(m.defense,regular.defense*defense);
+        assert.equal(m.maxSP,regular.maxSP);assert.equal(m.sp,m.maxSP);
+        assert.equal(m.attack,regular.attack);assert.equal(m.balanceOwner,'MonsterBalance');
+    }
 });
 
 test("chests and tickets expose open/preview only and preview exact probabilities",()=>{

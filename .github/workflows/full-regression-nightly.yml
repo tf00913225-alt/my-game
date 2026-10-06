@@ -1,0 +1,43 @@
+name: Nightly Full Regression
+
+# GitHub schedule activation requires this workflow on the default branch.
+# This engineering task installs it on dev; main publication is separate.
+on:
+  schedule:
+    - cron: '23 20 * * *' # Taiwan 04:23, away from the hourly peak.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  statuses: write
+
+concurrency:
+  group: full-regression-nightly-dev
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    name: Pin current dev candidate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      sha: ${{ steps.dev.outputs.sha }}
+    steps:
+      - uses: actions/github-script@v7
+        id: dev
+        with:
+          script: |
+            const {data}=await github.rest.git.getRef({...context.repo,ref:'heads/dev'});
+            const sha=data.object.sha;
+            if(!/^[a-f0-9]{40}$/.test(sha)) throw Error('Cannot pin dev HEAD');
+            core.setOutput('sha',sha);
+            await core.summary.addHeading('Exact Nightly dev candidate').addRaw(sha).write();
+  full:
+    name: Full dev snapshot regression
+    needs: resolve
+    uses: ./.github/workflows/ci.yml
+    with:
+      candidate_sha: ${{ needs.resolve.outputs.sha }}
+      full_regression: true
+    secrets: inherit
