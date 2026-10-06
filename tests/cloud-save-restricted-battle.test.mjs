@@ -47,7 +47,8 @@ function fixture({mutate=()=>{},retry=false,sentinel=false,entropy=.999999,enemy
       clock=1001;await createCanonicalBattleEncounter(deps).seal(request,{attemptId,
         operationId:'restricted-encounter-0001',expectedRevision:2,encounterKey:enemy});clock=1002;},
     begin:(extra={},req=request)=>owner.begin(req,{...args,...extra}),
-    battle:()=>data.get(`${root}/restrictedBattles/${attemptId}`)};
+    battle:()=>data.get(`${root}/restrictedBattles/${attemptId}`),
+    readTerminal:(args,req=request)=>deps.runProtected(req,(tx,session)=>owner.readTerminal(tx,session,args,clock))};
 }
 test('restricted policy executes actual native skill owners and binds generated output',()=>{
   const built=buildRestrictedBattlePolicy(process.cwd());
@@ -175,6 +176,50 @@ async function terminalFixture(options={}){
   }while(version<128);
   throw Error('fixture failed to reach terminal resources');
 }
+test('private terminal reader binds complete original evidence without writes or entropy',async()=>{
+  const {h,version,state}=await terminalFixture({retry:true});
+  const sealed=await h.owner.sealTerminal(h.request,terminalArgs(version));
+  const args={attemptId,expectedRevision:2,terminalSha256:sealed.terminalSha256};
+  const before=[...h.data],writes=h.writes,entropy=h.entropyCalls;
+  const proof=await h.readTerminal(args);
+  assert.deepEqual(proof.result,{...sealed,unchanged:true});
+  assert.deepEqual(proof.chain.state,state);assert.equal(proof.chain.rounds.length,version);
+  assert.equal(proof.original.snapshot.sha256,h.snapshot.sha256);
+  h.clock=601000;h.data.get(h.root+'/account/current').serverRevision=3;
+  h.data.get(`users/${uid}/saves/current`).serverRevision=3;
+  const policy=require('../functions/src/generated/forest-opening-round-policy.json'),saved=policy.rulesSha256;
+  policy.rulesSha256='0'.repeat(64);
+  try{assert.deepEqual((await h.readTerminal(args)).result,{...sealed,unchanged:true,expired:true});}
+  finally{policy.rulesSha256=saved;}
+  h.data.get(h.root+'/account/current').serverRevision=2;
+  h.data.get(`users/${uid}/saves/current`).serverRevision=2;
+  assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);assert.equal(h.entropyCalls,entropy);
+  h.session='x'.repeat(32);await assert.rejects(h.readTerminal(args));
+  await assert.rejects(h.readTerminal(args,{data:{uid:'another-user'}}));
+});
+test('private terminal reader rejects absent closure, substitution and corrupt predecessor proof',async()=>{
+  const {h,version}=await terminalFixture();
+  const args={attemptId,expectedRevision:2,terminalSha256:'0'.repeat(64)};
+  await assert.rejects(h.readTerminal(args),e=>e.code==='failed-precondition');
+  const sealed=await h.owner.sealTerminal(h.request,terminalArgs(version));
+  await assert.rejects(h.readTerminal(args),e=>e.code==='failed-precondition');
+  args.terminalSha256=sealed.terminalSha256;
+  const writes=h.writes;
+  for(const patch of [{expectedRevision:0},{expectedRevision:3},{winner:'player'},
+    {terminalSha256:'bad'},{attemptId:'bad'},{reward:true}])await assert.rejects(h.readTerminal({...args,...patch}));
+  for(const path of [h.root+'/restrictedBattleTerminals/'+attemptId,
+    h.root+'/operations/'+sealed.operationId,h.root+'/restrictedBattleAttempts/'+attemptId,
+    h.root+'/restrictedBattleRounds/'+attemptId+'_1',h.root+'/restrictedBattles/'+attemptId,
+    h.root+'/restrictedBattlePolicies/'+h.battle().policySha256,
+    h.root+'/playableSnapshots/2',h.root+'/recoveryArchives/2']){
+    const saved=h.data.get(path);h.data.delete(path);
+    await assert.rejects(h.readTerminal(args));h.data.set(path,saved);
+  }
+  const terminal=h.data.get(h.root+'/restrictedBattleTerminals/'+attemptId);
+  terminal.outcomeVerified=true;
+  await assert.rejects(h.readTerminal(args),e=>e.code==='data-loss');terminal.outcomeVerified=false;
+  assert.equal(h.writes,writes);
+});
 for(const lowHP of [false,true])test(`terminal resource closure seals once (${lowHP?'player':'enemy'} dead) without authority`,async()=>{
   const {h,version,state}=await terminalFixture({retry:true,sentinel:true,
     entropy:lowHP?[.1,.1,.99,.1,.1,.1,.1]:.1,mutate:r=>{if(lowHP)r.characters[0].state.hp=1;}});

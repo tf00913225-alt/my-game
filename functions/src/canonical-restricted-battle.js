@@ -487,6 +487,26 @@ function createCanonicalRestrictedBattle(dependencies){
       battleSha256:b.sha256,policySha256:b.policySha256,status:'PREPARED',round:0,roundVersion:0,
       expiresAtMs:b.expiresAtMs,expired:time>=b.expiresAtMs,unchanged,...flags};
   }
-  return Object.freeze({begin,advance,sealTerminal});
+  // Private successor source reader. Caller must supply its existing
+  // runProtected transaction/session; historical evidence is not eligibility.
+  async function readTerminal(tx,session,args,time){
+    if(!args||typeof args!=='object'||Array.isArray(args)||
+      Object.keys(args).sort().join('|')!=='attemptId|expectedRevision|terminalSha256'||
+      typeof args.attemptId!=='string'||!ID.test(args.attemptId)||
+      !Number.isSafeInteger(args.expectedRevision)||args.expectedRevision<1||
+      typeof args.terminalSha256!=='string'||!HASH.test(args.terminalSha256)){
+      fail('invalid-argument','Only original preparation, source revision and terminal digest are accepted.');
+    }
+    if(!Number.isSafeInteger(time)||time<1)fail('internal','Server clock is unavailable.');
+    const verified=await readInstance(tx,session,
+      {attemptId:args.attemptId,expectedRevision:args.expectedRevision},time);
+    const chain=await readRounds(tx,db.collection('serverUsers').doc(session.uid),verified);
+    if(!chain.terminal)fail('failed-precondition','Original terminal closure is required.');
+    if(chain.terminal.sha256!==args.terminalSha256){
+      fail('failed-precondition','Original terminal digest differs.');
+    }
+    return {...verified,chain,result:terminalResult(chain.terminal,true,time)};
+  }
+  return Object.freeze({begin,advance,sealTerminal,readTerminal});
 }
 module.exports={createCanonicalRestrictedBattle};
