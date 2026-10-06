@@ -44,3 +44,8 @@ test('all required change flags exist as booleans', () => {
   const p=classify(['docs/readme.md']);
   CHANGE_FLAGS.forEach(k=>assert.equal(typeof p.flags[`${k}_changed`],'boolean',k));
 });
+test('nightly enables main-only boot/relic plus Session, and never runs promotion/deploy', () => {
+  const p=classify(['docs/readme.md'],{eventName:'schedule',baseRef:'dev',fullRegression:true});
+  all(p);assert.equal(p.gates.main_browser,true);assert.equal(p.gates.session_authority,true);
+  assert.equal(p.gates.promotion_health,false);
+});

@@ -38,7 +38,7 @@ const OWNERS = [
 ];
 
 export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'dev',
-  enabled = PR_GATES_ENABLED, addedPaths = [], error = ''} = {}) {
+  enabled = PR_GATES_ENABLED, addedPaths = [], error = '', fullRegression = false} = {}) {
   const flags = Object.fromEntries(CHANGE_FLAGS.map(k => [`${k}_changed`, false]));
   const reasons = [];
   const mark = (...keys) => keys.forEach(k => {flags[`${k}_changed`] = true;});
@@ -67,7 +67,8 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
     else strict(`Unclassified owner: ${p}`, 'unknown_runtime');
   }
   const strictMode = reasons.length > 0;
-  const mainRequired = baseRef === 'main';
+  const nightly = fullRegression && eventName !== 'pull_request';
+  const mainRequired = baseRef === 'main' || eventName !== 'pull_request';
   const full = eventName !== 'pull_request' || mainRequired || strictMode;
   const f = key => flags[`${key}_changed`];
   const predicted = {
@@ -82,11 +83,12 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
     adventure_balance: full || f('adventure') || f('monster_balance'),
     boss_balance: full || f('boss') || f('monster_balance'),
     main_browser: mainRequired,
+    promotion_health: baseRef === 'main' && !nightly,
     session_authority: full || f('cloud') || f('persistence')
   };
   const shadow = eventName === 'pull_request' && !mainRequired && !enabled;
-  const gates = shadow ? Object.fromEntries(Object.keys(predicted).map(k => [k, k === 'main_browser' ? false : true])) : predicted;
-  return {policyVersion: 1, eventName, baseRef, strictMode, shadow, flags, reasons, predicted, gates};
+  const gates = shadow ? Object.fromEntries(Object.keys(predicted).map(k => [k, ['main_browser','promotion_health'].includes(k) ? false : true])) : predicted;
+  return {policyVersion: 1, eventName, baseRef, strictMode, shadow, fullRegression: nightly, flags, reasons, predicted, gates};
 }
 
 function changedPaths(base, head, added = false) {
@@ -105,8 +107,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     paths = changedPaths(process.env.CI_BASE_SHA, process.env.CI_HEAD_SHA);
     addedPaths = changedPaths(process.env.CI_BASE_SHA, process.env.CI_HEAD_SHA, true);
   } catch (e) {error = `Comparison unavailable; strict fallback: ${e.message}`;}
-  const plan = classifyChanges(paths, {eventName: process.env.CI_EVENT_NAME, baseRef: process.env.CI_BASE_REF, addedPaths, error});
-  const outputs = {plan_json: JSON.stringify(plan), strict: plan.strictMode, cloud_gate: plan.gates.session_authority,
+  const plan = classifyChanges(paths, {eventName: process.env.CI_EVENT_NAME, baseRef: process.env.CI_BASE_REF, addedPaths, error, fullRegression: process.env.CI_FULL_REGRESSION === 'true'});
+  const outputs = {plan_json: JSON.stringify(plan), strict: plan.strictMode, cloud_gate: plan.gates.session_authority, full_node: plan.shadow || plan.strictMode || plan.eventName !== 'pull_request' || plan.baseRef === 'main' || plan.flags.cloud_changed || plan.flags.persistence_changed,
     ...plan.flags, ...plan.gates};
   if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(outputs).map(([k,v]) => `${k}=${v}\n`).join(''));

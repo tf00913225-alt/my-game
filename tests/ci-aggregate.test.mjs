@@ -38,6 +38,22 @@ test('missing classifier / forged strict or dev-push skips fail closed', () => {
   const needs=passed();needs.classify.result='failure';
   assert.throws(()=>requireChildGates(needs,{mainRequired:false}),/classify/);
 });
+test('full dev/nightly require Session and boot, while promotion-only is skipped', () => {
+  for(const eventName of ['push','schedule']) {
+    const plan=classifyChanges(['docs/readme.md'],{eventName,baseRef:'dev',fullRegression:eventName==='schedule'});
+    const needs=passed();needs.promotion_health.result='skipped';
+    assert.equal(requireChildGates(needs,{mainRequired:true,plan}),true);
+    needs.session_authority.result='skipped';
+    assert.throws(()=>requireChildGates(needs,{mainRequired:true,plan}),/session_authority/);
+  }
+});
+test('reused Session cannot deploy or deadlock with the standalone Firebase waiter', () => {
+  const ci=fs.readFileSync(new URL('../.github/workflows/ci.yml',import.meta.url),'utf8');
+  const session=fs.readFileSync(new URL('../.github/workflows/session-authority.yml',import.meta.url),'utf8');
+  assert.match(ci,/uses: \.\/\.github\/workflows\/session-authority\.yml[\s\S]*?emulator_only: true/);
+  assert.match(session,/if: \$\{\{ !inputs\.emulator_only &&/);
+  assert.match(session,/inputs\.emulator_only && format\('session-emulator-\{0\}', github\.run_id\)/);
+});
 test('missing or unknown dependency fails closed', () => {
   const needs = passed(); delete needs.core_checks;
   assert.throws(() => requireChildGates(needs), /core_checks/);

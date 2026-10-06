@@ -5,7 +5,7 @@ import {pathToFileURL} from 'node:url';
 export const CHILD_GATES = Object.freeze([
   'classify', 'core_checks', 'battle_browser', 'ui_browser', 'daily_browser',
   'tower_wild_browser', 'portrait_browser', 'adventure_ui_browser',
-  'main_browser', 'abyss_balance', 'adventure_balance', 'boss_balance'
+  'main_browser', 'abyss_balance', 'adventure_balance', 'boss_balance', 'session_authority', 'promotion_health'
 ]);
 
 export function requireChildGates(needs, {mainRequired = true, plan} = {}) {
@@ -17,14 +17,15 @@ export function requireChildGates(needs, {mainRequired = true, plan} = {}) {
         !plan.gates || plan.gates.core_checks !== true) throw Error('Invalid classifier policy');
     for (const key of CHILD_GATES.filter(k => k !== 'classify')) {
       if (typeof plan.gates[key] !== 'boolean') throw Error(`Missing classifier gate ${key}`);
-      if (key !== 'main_browser' && (plan.strictMode || plan.shadow || plan.eventName !== 'pull_request' || mainRequired) &&
+      if (!['main_browser', 'promotion_health'].includes(key) && (plan.strictMode || plan.shadow || plan.eventName !== 'pull_request' || mainRequired) &&
           plan.gates[key] !== true) throw Error(`Full/strict policy cannot skip ${key}`);
     }
+    if (plan.gates.promotion_health !== (plan.baseRef === 'main' && !plan.fullRegression)) throw Error('Promotion health policy mismatch');
     if (plan.gates.main_browser !== mainRequired) throw Error('Main browser policy mismatch');
   }
   for (const key of CHILD_GATES) {
     const result = needs[key]?.result;
-    const permittedSkip = (key === 'main_browser' && !mainRequired) ||
+    const permittedSkip = (['main_browser','promotion_health'].includes(key) && !mainRequired) ||
       (plan && key !== 'classify' && key !== 'core_checks' && plan.gates[key] === false);
     if (result !== 'success' && !(permittedSkip && result === 'skipped')) {
       throw Error(`Required CI child ${key} did not pass: ${result ?? 'missing'}`);

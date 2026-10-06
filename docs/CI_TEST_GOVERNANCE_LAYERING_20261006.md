@@ -3,7 +3,8 @@
 Work ID: `CI-TEST-GOVERNANCE-LAYERING-20261006`
 Target: dev; main writes forbidden.
 Branch: `feature/ci-test-governance-layering-20261006`.
-Status: Phase 1 remote VERIFIED; Phase 2 classifier SHADOW, no PR skipping enabled.
+Status: Phase 1 remote VERIFIED; Phase 2 PR enforcement implemented after shadow;
+Phase 3 full regression/health implemented, final remote validation pending.
 
 ## Phase 0 evidence
 
@@ -116,3 +117,29 @@ contexts force full gates. Aggregate validates the classifier child and schema;
 failure/cancellation never count as legal skips. Pure docs can skip balance and
 browser jobs; unknown source, generated manifest/build, CI/framework/shared
 owners remain strict. Runtime files under docs are not document-only changes.
+
+## Phase 3 full regression / health
+
+dev push runs all Node suites and every browser job, including boot/relic,
+plus the existing Session Authority emulator in validation-only mode. Called
+emulators have per-run concurrency groups, avoiding a cycle with standalone
+Firebase deployment waiting for Repository checks. Original Session job name,
+security tests, credentials and bounded wait remain; reuse cannot deploy.
+
+Nightly `23 20 * * *` targets Taiwan 04:23, pins current dev once, and reuses
+full CI. Every checkout uses the pinned SHA and an independent source-SHA
+assertion. All Node, Battle/Hit, Daily, Tower/Wild, Abyss, Adventure, Boss,
+UI/Forge/navigation, skill/backpack/portrait, boot/relic, Cloud/Session and
+build/release/artifact gates execute. It never deploys. Scheduling is NOT ACTIVE
+until this workflow reaches main through a separately authorized release.
+
+`Full Regression Health` status and a 90-day report record exact candidate SHA,
+owner run and results. Missing/pending/failure/error cannot promote. Later full
+success on the same candidate resolves failure; no fallback to older success.
+The owner run must complete SUCCESS, including dev deployment if present.
+main-target CI compares the actual candidate tree to current dev and checks
+health before Repository checks succeeds. Existing main/production gates remain.
+
+Protection endpoints remain UNVERIFIED. Main promotion/production is not
+performed. Nightly activation remains a platform/authorization limitation;
+code integration alone must not be called complete schedule activation.
