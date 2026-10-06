@@ -60,10 +60,10 @@ function runtime({hp=[100,100,100],damage=10,shape="single",rank="regular",wrap=
     const math=Object.create(Math);math.random=()=>random;
     const noop=()=>{};
     const ctx={console,Math:math,Number,Object,Array,Set,Map,Promise,Date,
-        battleActive:true,battleToken:7,turn:1,currentZone:"qa",initiativeQueue:[],initiativeIndex:0,
+        battleActive:true,battleToken:7,turn:1,battleDurationAction:null,combatEventObservers:new Map(),combatDamageFacts:new WeakMap(),currentZone:"qa",initiativeQueue:[],initiativeIndex:0,
         monsters:[{id:"enemy",name:"enemy",hp:1000,alive:true,level:50,element:"fire",rank,sp:100,skillIds:[skillId],skillChance:1}],
         currentBattleMonsters:[0],skillDatabase:{[skillId]:{id:skillId,name:"烈焰爆擊",element:"fire",spCost:10,maxLevel:10,category:"physical",targetType:shape,followUpOnCriticalOrDefeat:true,followUpMaxCasts:maxCasts}},
-        getExistingPartyIndexes:()=>party.map((_,i)=>i),getPartyCharacterByIndex:i=>party[i],getPartyBattleStats:()=>({evasion:0,antiCrit:0,defense:0}),
+        getPartyCharacterIndex:e=>party.indexOf(e),getExistingPartyIndexes:()=>party.map((_,i)=>i),getPartyCharacterByIndex:i=>party[i],getPartyBattleStats:()=>({evasion:0,antiCrit:0,defense:0}),
         canSelectHostileBattlePrimary:(_,i)=>party[i].hp>0&&!party[i].stealth,
         resolveBattlefieldTargets:(_,i,type)=>type==="single"?[i]:party.map((_,j)=>j),
         normalizeBattleTargetType:x=>x,getEffectiveSkillTargetType:s=>s.targetType,
@@ -81,7 +81,7 @@ function runtime({hp=[100,100,100],damage=10,shape="single",rank="regular",wrap=
         FourSymbolsBattleFlow:{interceptActionFinish(fn){interceptors.push(fn);return ()=>interceptors.splice(interceptors.indexOf(fn),1);}}
     };
     ctx.window=ctx;vm.createContext(ctx);
-    for(const name of ["createEnemyActionTargetSnapshot","isEnemyActionTargetSnapshotCurrent","resolveEnemyActionTargets","retargetEnemyFollowUpSnapshot"]){
+    for(const name of ["emitCombatEvent","getBattleDamageSource","getDamageContextAttacker","getFormalDamageContext","getCombatantHealthSnapshot","settleBattleHpDamage","isPartyDamageTarget","applyPlayerDirectIncomingModifiers","absorbPlayerShields","createEnemyActionTargetSnapshot","isEnemyActionTargetSnapshotCurrent","resolveEnemyActionTargets","retargetEnemyFollowUpSnapshot"]){
         if(main.includes("function "+name+"("))vm.runInContext(declaration(name),ctx);
     }
     vm.runInContext(declaration("processSingleMonsterAttack"),ctx);

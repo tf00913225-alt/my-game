@@ -98,6 +98,7 @@ test('adaptive array exact average boundaries and formal skill-only final damage
     for(const [hp,form] of [[400,'生'],[401,'和'],[750,'和'],[751,'勢']]){
         const r=setup('relic_all_returning_array',20),c=r.context;r.party.forEach(p=>p.hp=hp);r.party[2].hp=0;r.round(4);
         const mod=c.v174RelicDebugState().playerMods[0][0];assert.ok(mod.statusName.endsWith(form));
+        assert.ok(r.battleLogs.some(line=>line.includes("本次："+mod.statusName)),"battle log records the selected mode");
         if(form==='勢'){assert.equal(c.v174RelicDamageModifiers.skillFinalBonus(r.party[0],'activeSkill'),20);for(const source of ['normalAttack','counter','followUp','dot','relic']){assert.equal(c.v174RelicDamageModifiers.skillFinalBonus(r.party[0],source),0);}}
         if(form==='和'){assert.equal(c.v174ProjectRelicBattleStats(0,{attack:100,magicAttack:100,defense:100,statusResistance:0}).attack.toFixed(6),"115.000000");}
         if(form==='生'){assert.equal(r.party[0].hp,580);assert.equal(c.v174RelicDamageModifiers.incomingReduction(r.party[0]),12);}

@@ -70,7 +70,7 @@ function makeRuntime(options={}){
     const beforeCombatantObservers=[];
     const actionFinishedObservers=[];
     const context={
-        console,Math,Number,Object,Array,String,Set,Map,Date,JSON,
+        console,Math,Number,Object,Array,String,Set,Map,Date,JSON,combatEventObservers:new Map(),
         skillDatabase,characterSkillLoadouts,currentSkillCharacter:options.key||"fire",activeBattleCharacterIndex:0,turn:1,
         player:owners.fire,player2:owners.player2,player3:null,
         getSkillCharacterObject:key=>owners[key],
@@ -108,6 +108,11 @@ function makeRuntime(options={}){
     };
     context.window=context;
     vm.createContext(context);
+    for(const name of ["emitCombatEvent","spendActiveSkillSP"]){
+        const start=main.indexOf("function "+name+"(");
+        assert.ok(start>=0,name);
+        vm.runInContext(main.slice(start,main.indexOf("\n}",start)+2),context);
+    }
     vm.runInContext(source,context,{filename:"js/60-v173.64-skill-progression-rebalance.js"});
     const rawCastDamageSkill=context.castDamageSkill;
     context.castDamageSkill=function(skillId){
@@ -481,6 +486,11 @@ test("one target owner handles both directions and Stealth only blocks hostile p
     };
     context.window=context;
     vm.createContext(context);
+    for(const name of ["emitCombatEvent","spendActiveSkillSP"]){
+        const start=main.indexOf("function "+name+"(");
+        assert.ok(start>=0,name);
+        vm.runInContext(main.slice(start,main.indexOf("\n}",start)+2),context);
+    }
     vm.runInContext(slice,context,{filename:"battle-target-owner-slice.js"});
 
     const owner=context.FourSymbolsBattleSkillTargeting;
@@ -521,6 +531,11 @@ test("core duration lifecycle defers timed-effect consumption to round end",()=>
     };
     context.window=context;
     vm.createContext(context);
+    for(const name of ["emitCombatEvent","spendActiveSkillSP"]){
+        const start=main.indexOf("function "+name+"(");
+        assert.ok(start>=0,name);
+        vm.runInContext(main.slice(start,main.indexOf("\n}",start)+2),context);
+    }
     vm.runInContext(slice,context,{filename:"duration-owner-slice.js"});
 
     const lifecycle=context.FourSymbolsDurationLifecycle;

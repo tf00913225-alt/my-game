@@ -11383,9 +11383,10 @@ ensureFunctionalStyles();runRepairs();
     }
 
     function performRelicPresentation(def,triggerDef,payload,preResolvedVisuals){
-        queueRelicPresentation(def,()=>{
+        const presentationDef=payload&&payload.formName?Object.assign({},def,{name:payload.formName}):def;
+        queueRelicPresentation(presentationDef,()=>{
             flushRelicVisuals(preResolvedVisuals);
-            battleLog(def.name+"｜"+currentEffectText(def,relicLevel(def.id)));
+            battleLog(def.name+"｜"+currentEffectText(def,relicLevel(def.id))+(payload&&payload.formName?"｜本次："+payload.formName:""));
             if(typeof updateUI==="function"){ try{updateUI();}catch(_){ } }
         },{
             triggerDef:triggerDef,
