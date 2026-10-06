@@ -233,20 +233,26 @@ assets/dungeons/abyss/floor5-soldier.webp
 - 不擅自把極帝前置關改成任一單一四象元素。
 - audit 應把這件事列為「已知未決規則」，不是假裝已完成。
 
-## 8. 現有 runtime owner 與未來收斂規則
+## 8. Runtime 與 Portrait Visual Scale Contract
 
-目前深淵立繪同步 owner：
+選圖唯一 Owner 是 `js/45-v154-dev-fixes.js`。所有玩法共用明確 portraitKey → Registry identity → 已登記唯一名稱相容映射；明確 key 缺圖時不得改用另一個名稱或元素。四象天兵只在正式天兵身份且無其他明確 key 時按元素解析。极帝 light 天兵保留 Registry policy 指定的 legacy 圖，不能作一般怪 fallback。未完成素材維持 planned，通用 fallback 是無圖片的中性幾何標記，不冒用天兵、其他元素怪或 Boss。DEV／Test 可由 record.fallbackReason 與 DOM data-portrait-fallback 觀察。
 
-- `js/45-v154-dev-fixes.js`
-  - `syncAbyssPortraits()`
-  - `window.v154SyncAbyssPortraits`
-  - 目前仍含 `EARLY_ABYSS_PORTRAITS` / `FINAL_ABYSS_PORTRAITS`
-- `js/48-v159-abyss-battle-portraits.js`
-  - 是後續載入時序補丁，重新呼叫 V154 同步入口。
+V159 已退休；舊 EARLY_ABYSS_PORTRAITS／FINAL_ABYSS_PORTRAITS 與 temporary 天兵／火魔替代圖已退場，不再建立 wrapper、Timer 或 Observer。
 
-**禁止再建立第三套 `renderBattle()`／`updateUI()` portrait wrapper。**
+呈現唯一 Owner 是 `js/54-v173.51-battle-qa.js` 的 V174；Slot／HUD 幾何仍由原 Fixed Slot Owner 控制。Registry `presentation` 是唯一離線尺寸資料來源，與資產 canvas sizeClass 分離：
 
-四象天兵與全怪物立繪實際導入時，應把 resolver 收斂成單一正式 owner，然後讓 V154/V159 的舊映射／補丁退場或只保留相容橋接；不得讓「舊 abyss map + 新全域 map + 新 wrapper」三套邏輯長期並存。
+| 視覺 class | 非透明主體目標高度／paint slot | 底部基準／paint slot |
+|---|---|---|
+| STANDARD | 82% | 96% |
+| ELITE | 85% | 96% |
+| SMALL_BOSS | 88% | 96% |
+| BIG_BOSS | 90% | 96% |
+
+個人／世界 Boss 使用其正式中央 footprint；深淵、塔與日常首領仍依原玩法 Slot。資產 standard／boss canvas 不因此改名或重製。
+
+`scripts/measure-monster-portraits.mjs --write` 在 Import／Audit 階段計算完整 nonzero Alpha Bounding Box（含武器、角、翅膀、尾巴及透明特效），寫入像素範圍、canvas dimensions 與 SHA-256。此範圍是完整可見輪廓，不宣稱可以自動區分核心身體與武器。Runtime 不讀像素；以等比例 contain 投影完整畫布，將 Alpha bottom 對齊 baseline。寬型輪廓以完整不裁切優先，按可用寬度縮小，QA 記錄 widthLimited；不得以 crop 或每張 CSS magic number 強制同高。Bounds 不改 Master、Runtime 圖像或 Provenance bytes。
+
+正式 CSS Owner 為 `css/fixed-slot-battlefield-rendering-v2.css`。`--portrait-width` 由 class、Bounds 與容器單位投影，不使用 transform:scale。更換資產後必須更新 metadata；`--check` 重新解碼核對，Registry Audit 與 regression 拒絕 stale hash、缺檔、非法 Bounds、planned 冒充 existing。首次準備、重繪、重入均由原 lifecycle 同步。
 
 ## 9. 自動生成最小輸入
 
@@ -301,7 +307,7 @@ npm run portrait:import -- --keys=<portraitKey,portraitKey,...>
 - `planned` 通過後可升為 `existing`。
 - `retired` 不得默默復活；只有專案負責人明確要求重新啟用時才可使用 `--reactivate-retired`。
 - 日常副本必須保留明確 `portraitKey` runtime 接線；若 owner 契約或 runtime regression test 失敗，工具必須停止，不得只因檔案存在就宣稱導入成功。
-- 此快速流程不改 V154／V159 runtime owner，也不得新增第三套 portrait wrapper。
+- 此快速流程沿用 V154 Resolver／V174 Presentation；V159 已退休，不得新增 portrait wrapper。
 
 尚未生成的素材仍使用既有 batch 流程；兩者用途不同。
 

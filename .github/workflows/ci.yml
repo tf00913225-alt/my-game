@@ -159,6 +159,8 @@ jobs:
             sudo apt-get install --yes --no-install-recommends imagemagick
           fi
           node tests/permanent-image-asset-pipeline.test.mjs
+          node scripts/measure-monster-portraits.mjs --check
+          node tests/monster-portrait-convergence.test.mjs
 
       - name: Reject unregistered persistent state
         run: node scripts/check-persisted-state-registry.mjs --self-test
@@ -755,6 +757,16 @@ jobs:
           SERVER_PID=$!
           trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
           DEV_BASE_URL=http://127.0.0.1:4176 node .github/scripts/run-fire-portrait-browser-qa.mjs
+
+      - name: Verify full portrait bounds baseline and reentry on both mobile viewports
+        run: node .github/scripts/run-monster-portrait-convergence-browser-qa.mjs
+
+      - name: Upload portrait convergence evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: monster-portrait-convergence-${{ inputs.candidate_sha || github.sha }}
+          path: artifacts/browser-qa/monster-portrait-convergence*
 
       - name: Upload Fire portrait browser evidence
         if: always() && steps.fire_portrait_browser.outcome != 'skipped'

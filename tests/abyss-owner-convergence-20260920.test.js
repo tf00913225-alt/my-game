@@ -50,11 +50,12 @@ const resolverOrder=[
     "const explicitKey=",
     "const byName=",
     "const legacy=",
-    "const temporaryBoss="
+    'portraitKey:"fallback.generic"'
 ].map(fragment=>resolverSource.indexOf(fragment));
 assert.ok(resolverOrder.every(index=>index>=0));
 assert.deepEqual(resolverOrder.slice().sort((a,b)=>a-b),resolverOrder,"portrait fallback must remain last");
-assert.match(v154,/temporaryBoss\?TEMPORARY_BOSS_PORTRAIT:TEMPORARY_MONSTER_PORTRAIT/);
+assert.doesNotMatch(v154,/TEMPORARY_BOSS_PORTRAIT|TEMPORARY_MONSTER_PORTRAIT/);
+assert.match(v154,/path:null,[\s\S]*status:"fallback",[\s\S]*generic:true/);
 
 const finalRows=registry.groups["abyss-boss"].filter(row=>row[1].endsWith("天尊")&&row[6]==="existing");
 assert.equal(finalRows.length,5);

@@ -104,6 +104,7 @@ function loadRuntime(overrides={}){
     vm.runInContext(fs.readFileSync("js/54-v173.51-battle-qa.js","utf8"),context);
     vm.runInContext(potionRuleSource,context);
     vm.runInContext(source,context);
+    context.v154InstallMonsterPortraitRegistry(JSON.parse(fs.readFileSync('config/monster-portrait-registry.json','utf8')));
     return {context,button,battlePage,body,cards};
 }
 
@@ -206,8 +207,8 @@ test("formal Abyss portraits precede the temporary Boss fallback",()=>{
 
     const fallback=loadRuntime({monsters:[{name:"未註冊頭目",rank:"boss"}]});
     const fallbackRecord=fallback.context.v154ResolveMonsterPortraitRecord(fallback.context.monsters[0]);
-    assert.equal(fallbackRecord.portraitKey,"temporary.boss-reference");
-    assert.equal(fallbackRecord.path,"assets/monsters/boss/boss-placeholder-fire-demon.webp");
+    assert.equal(fallbackRecord.portraitKey,"fallback.generic");
+    assert.equal(fallbackRecord.path,null);
 });
 test("all six supplied floor 5 portraits are optimized at the source dimensions",()=>{
     ["east-emperor","heaven-emperor","north-emperor","south-emperor","extreme-emperor","soldier"].forEach(name=>{
@@ -232,10 +233,10 @@ test("equipment cover, ability scrolling and Abyss decluttering stay scoped",()=
     assert.match(css,/v141-abyss-intro:not\(\.complete\)::before\{[\s\S]*?aspect-ratio:9\/16/);
     assert.match(css,/v141-abyss-shell > header\{[\s\S]*?position:absolute !important/);
     assert.doesNotMatch(css,/v154-abyss-portrait[^{}]*\{[^}]*background-image/);
-    assert.match(source,/presentation\.applyUnit\(card,"monster"\)/);
+    assert.match(source,/presentation\.applyUnit\(card,"monster",record\)/);
     // Legacy image CSS has no Runtime producer; canonical art is verified below.
     assert.doesNotMatch(source,/v162-abyss-battle-portrait-art/);
-    assert.match(fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8"),/\.v174-battle-art\{[^}]*background-size:contain !important/);
+    assert.match(fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8"),/\.v174-battle-art\{[^}]*background-size:var\(--portrait-background-size, contain\) !important/);
 });
 
 console.log("\nV154 current request suite: "+passed+" tests passed.");

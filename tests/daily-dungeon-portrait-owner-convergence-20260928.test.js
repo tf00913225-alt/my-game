@@ -13,7 +13,7 @@ const v174=fs.readFileSync("js/54-v173.51-battle-qa.js","utf8");
 
 assert.doesNotMatch(v154,/v162-abyss-battle-portrait-art|syncMonsterPortraitArt/,
     "V154 must not create or maintain a legacy img portrait pipeline");
-assert.match(v154,/presentation\.applyUnit\(card,"monster"\)/,
+assert.match(v154,/presentation\.applyUnit\(card,"monster",record\)/,
     "V154 must hand the selected record to the only presentation owner");
 assert.match(v154,/monsterPortraitRegistryPromise=null/,
     "registry failure must be retryable");
@@ -31,7 +31,7 @@ assert.doesNotMatch(css,/v162-abyss-battle-portrait-art/,
     "CSS must not hide a retired legacy image");
 assert.doesNotMatch(legacyCss,/v162-abyss-battle-portrait-art|var\(--v152-abyss-portrait\)/,
     "CSS46 must not restore either retired artwork surface");
-assert.match(v174,/function syncUnitArtwork\(card,kind\)/,
+assert.match(v174,/function syncUnitArtwork\(card,kind,selectedRecord\)/,
     "V174 must own artwork DOM creation and presentation");
 
 console.log("Daily Dungeon portrait owner convergence contracts: PASS.");
