@@ -22339,9 +22339,9 @@ function openBattleStatusDetailModal(side,index){
 
     const modal=ensureBattleStatusDetailModal();
     const stats=!isMonster&&typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
-    const maxHP=isMonster?Number(entity.maxHP)||Math.max(1,Number(entity.hp)||1):
+    const maxHP=isMonster?entity.maxHP:
         Number(stats&&stats.maxHP)||Number(entity.maxHP)||Math.max(1,Number(entity.hp)||1);
-    const maxSP=isMonster?Number(entity.maxSP)||Math.max(0,Number(entity.sp)||0):
+    const maxSP=isMonster?entity.maxSP:
         Number(stats&&stats.maxSP)||Number(entity.maxSP)||Math.max(0,Number(entity.sp)||0);
     const summary=typeof window.v143GetBattleStatusSummary==="function"
         ?window.v143GetBattleStatusSummary(entity)

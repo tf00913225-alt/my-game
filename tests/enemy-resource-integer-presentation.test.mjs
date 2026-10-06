@@ -68,6 +68,10 @@ test('enemy details share projection while player details and player resource st
   run('openBattleStatusDetailModal("monster",0)');
   assert.equal(fields.get('hp').textContent,'HP：66 / 100');
   assert.equal(fields.get('sp').textContent,'SP：37 / 100');
+  run('monsters[0].maxHP=0;monsters[0].maxSP=0');
+  run('openBattleStatusDetailModal("monster",0)');
+  assert.equal(fields.get('hp').textContent,'HP：0 / 0');
+  assert.equal(fields.get('sp').textContent,'SP：0 / 0');
   run('player.hp=95.5;player.sp=37.25');
   const before=plain(run('({hp:player.hp,sp:player.sp})'));
   run('openBattleStatusDetailModal("player",0)');
