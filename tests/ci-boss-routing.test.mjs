@@ -30,6 +30,17 @@ test('dev integration uses affected paths, dispatch retains full safety',()=>{
   assert.equal(plan(['css/23-stage-v77-inventory-detail-ui.css'],{eventName:'push'}).gates.boss_balance,false);
   assert.equal(plan(['docs/readme.md'],{eventName:'workflow_dispatch'}).gates.boss_balance,true);
 });
+test('real main source character rows and enemy numeric presentation stay targeted; external effects stay strict',()=>{
+  const source=fs.readFileSync(new URL('../js/00-main.js',import.meta.url),'utf8');
+  const character=source.replace('["攻擊",stats.attackPoints]','["攻擊",stats.attack]');
+  assert.notEqual(character,source);
+  assert.deepEqual(classifySharedSource(character,source),['ui','inventory']);
+  const enemy=source.replace('hpText.textContent=monster.hp+"/"+monster.maxHP;','hpText.textContent=Math.floor(monster.hp)+"/"+Math.floor(monster.maxHP);');
+  assert.notEqual(enemy,source);
+  assert.deepEqual(classifySharedSource(source,enemy),['battle']);
+  assert.equal(plan(['js/00-main.js','build/asset-manifest.json'],{responsibilities:classifySharedSource(source,enemy),generatedVerified:true}).gates.boss_balance,false);
+  assert.equal(classifySharedSource(source,enemy+'\nwindow.externalOwner=1;'),null);
+});
 test('real shallow PR reproduces no merge base; classifier checkout ancestry recovers exact paths',()=>{
   const previous=process.cwd(),temp=fs.mkdtempSync(path.join(os.tmpdir(),'ci-routing-'));
   const git=(cwd,...args)=>execFileSync('git',args,{cwd,encoding:'utf8',stdio:'pipe'}).trim();

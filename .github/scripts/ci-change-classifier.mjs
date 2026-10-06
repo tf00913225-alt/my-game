@@ -9,7 +9,7 @@ const SHARED_FUNCTIONS = {
   renderShopContent: ['ui','inventory'],
   openInventoryCharacterDetail: ['ui','inventory'],
   renderBattle: ['battle'],
-  updateMonsterBars: ['battle'],
+  applyMonsterUiUpdate: ['battle'],
   openBattleStatusDetailModal: ['battle'],
   projectEnemyResource: ['battle'],
   syncEnemyResourceHud: ['battle']
@@ -96,7 +96,7 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
       strict('Invalid changed path', 'unknown_runtime'); continue;
     }
     if (GENERATED.test(p)) {
-      if(!generatedVerified || !paths.some(x=>/^(?:js\/|css\/|assets\/)/.test(x))) strict(`Unexplained generated output: ${p}`, 'unknown_runtime');
+      if(!generatedVerified || !paths.some(x=>/^(?:js\/|css\/|assets\/|config\/)/.test(x))) strict(`Unexplained generated output: ${p}`, 'unknown_runtime');
       continue;
     }
     if(p==='js/00-main.js' && Array.isArray(responsibilities) && responsibilities.length && responsibilities.every(k=>['ui','inventory','battle','boss','monster_balance'].includes(k))) {mark(...responsibilities);continue;}
