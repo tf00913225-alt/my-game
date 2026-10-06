@@ -200,7 +200,7 @@
         {
             id:"relic_qinglan_feather",category:"buff",tags:["wind","evasion","element"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_qinglan_feather.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
             description:"戰鬥開始時提高全隊閃避與異常抗性。",
-            scalars:{evasionBonus:[[1,8],[10,10],[20,12]],resistanceBonus:[[1,8],[10,10],[20,12]],duration:[[1,2],[19,2],[20,3]]},
+            scalars:{evasionBonus:[[1,8],[10,10],[20,12]],resistanceBonus:[[1,8],[10,10],[20,12]],duration:[[1,3],[20,3]]},
             triggers:[trigger("battle_start","battle_start",{oncePerBattle:true},[
                 effect("buff_all",{evasionKey:"evasionBonus",resistanceKey:"resistanceBonus",durationKey:"duration"})
             ])],
@@ -208,17 +208,12 @@
             nextText:{10:"閃避與異常抗性各+10%",20:"各+12%，持續3回合"}
         },
         {
-            id:"relic_rock_mountain_seal",category:"defense",tags:["earth","pressure","element"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_rock_mountain_seal.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
-            description:"開場提高全隊防禦，受圍攻時再產生隊伍護盾。",
-            scalars:{defenseBonus:[[1,10],[10,12],[20,15]],shieldPercent:[[1,5],[10,6],[20,8]],reflectMultiplier:[[1,0],[19,0],[20,.18]]},
-            triggers:[
-                trigger("battle_start_defense","battle_start",{oncePerBattle:true},[effect("buff_all",{defenseKey:"defenseBonus",durationRounds:3})]),
-                trigger("ally_hits_8","ally_hit_count",{threshold:8,resetOnTrigger:true,maxTriggersPerBattle:2},[
-                    effect("shield_all",{percentKey:"shieldPercent",durationRounds:2}),effect("prepare_reflect",{minLevel:20,multiplierKey:"reflectMultiplier",durationRounds:1})
-                ])
-            ],
-            limitText:"受擊護盾每場最多2次；Lv20反震只作用於下一名實際攻擊者。",
-            nextText:{10:"開場防禦+12%，受擊護盾6%",20:"防禦+15%、護盾8%，追加一次反震"}
+            id:"relic_rock_mountain_seal",category:"defense",tags:["earth","pressure"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_rock_mountain_seal.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            description:"開場每人獲得2層岩甲；敵方有效直接傷害每行動最多消耗1層，該行動減傷。",
+            scalars:{damageReduction:[[1,8],[10,10],[20,12]],shieldPercent:[[1,0],[19,0],[20,6]]},
+            triggers:[trigger("opening_armor","battle_start",{oncePerBattle:true},[effect("rock_armor",{})])],
+            limitText:"每角色2層；MISS、完全Barrier格擋、DOT及其他非敵方直接傷害不消耗。Lv20最後一層耗盡給6%最大HP護盾。",
+            nextText:{10:"岩甲減傷10%",20:"岩甲減傷12%，最後一層消耗後獲得6%HP護盾"}
         },
         {
             id:"relic_returning_wheel",category:"special",tags:["recovery","survival"],rarity:"pink",maxLevel:20,iconPath:"assets/relics/icons/relic_returning_wheel.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
@@ -231,16 +226,16 @@
             limitText:"整支隊伍每場只觸發一次，不是每個角色各一次。",
             nextText:{10:"保命後回復18%最大HP",20:"回復22%、護盾10%並解除1個一般負面"}
         },
-        {id:"relic_origin_talisman",category:"buff",tags:["recovery","cleanse","special"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_origin_talisman.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第4回合結束淨化負面最多的隊友，並恢復全隊HP。",limitText:"第一版資料已建立，尚未開放取得。"},
-        {id:"relic_broken_army_scroll",category:"attack",tags:["execute"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_broken_army_scroll.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"角色擊敗敵人後，追擊目前HP最低的存活敵人。",limitText:"每回合最多一次；秘寶與DOT擊殺不觸發。"},
-        {id:"relic_red_sky_war_mark",category:"buff",tags:["attack","burst"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_red_sky_war_mark.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"戰鬥開始時短暫提高全隊攻擊，後期追加暴擊率。",limitText:"只觸發一次，不長時間常駐。"},
-        {id:"relic_ice_mirror_heart",category:"element",tags:["water","frostbite","freeze","control"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_ice_mirror_heart.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合結束，對凍傷或冰封中的敵人追加水屬性秘寶傷害。",limitText:"不附加冰封，不刷新凍傷。"},
-        {id:"relic_wind_chasing_talisman",category:"buff",tags:["wind","tempo"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_wind_chasing_talisman.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合開始提高隊伍節奏與閃避。",limitText:"第一版資料保留；待確認正式速度 owner 後再開放。"},
-        {id:"relic_mountain_river_cauldron",category:"defense",tags:["recovery","anti_swarm"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_mountain_river_cauldron.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"我方累積受7次有效攻擊後，恢復全隊並短暫提高防禦。",limitText:"每回合最多一次。"},
-        {id:"relic_burning_star_mark",category:"element",tags:["fire","burn","attack"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_burning_star_mark.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"偶數回合結束時對燃燒中的敵人追加火屬性秘寶傷害。",limitText:"不消耗或刷新燃燒。"},
-        {id:"relic_spirit_spring_bottle",category:"recovery",tags:["sp","long-battle"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_spirit_spring_bottle.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合結束恢復全隊SP，高等級追加少量HP。",limitText:"死亡角色不受影響。"},
-        {id:"relic_demon_suppressing_seal",category:"defense",tags:["buff","cleanse"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_demon_suppressing_seal.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"開場提高異常抗性，並在首次中負面時自動淨化。",limitText:"自動淨化每場一次。"},
-        {id:"relic_all_returning_array",category:"special",tags:["adaptive"],rarity:"four-symbol",maxLevel:20,iconPath:"assets/relics/icons/relic_all_returning_array.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第4回合開始依全隊平均HP決定回血或攻防增益。",limitText:"一次只發動回血或攻防其中一種。"}
+        {"id":"relic_origin_talisman","category":"buff","tags":["buff"],"rarity":"purple","maxLevel":20,"iconPath":"assets/relics/icons/relic_origin_talisman.webp","runtimeReady":false,"defaultUnlocked":false,"unlockSource":null,"description":"每第4回合結束淨化負面最多的存活隊友，並恢復全隊HP。","scalars":{"healHpPercent":[[1,6],[10,8],[20,10]]},"triggers":[{"id":"every_4_end","type":"every_n_rounds","roundInterval":4,"phase":"round_end","maxTriggersPerRound":1,"effects":[{"type":"cleanse_most_debuffed","sourceType":"relic"},{"type":"heal_all_allies","sourceType":"relic","percentKey":"healHpPercent"}]}],"limitText":"同數量優先HP比例較低，再依隊伍順序；無負面仍回血；只淨化可解除的一般負面。","nextText":{"10":"淨化最多2個，全隊回復8%HP","20":"選定隊友淨化全部一般負面，全隊回復10%HP"}},
+        {"id":"relic_broken_army_scroll","category":"attack","tags":["attack"],"rarity":"purple","maxLevel":20,"iconPath":"assets/relics/icons/relic_broken_army_scroll.webp","runtimeReady":false,"defaultUnlocked":false,"unlockSource":null,"description":"普通攻擊或正式主動技能擊殺後，追擊存活敵人中HP比例最低者。","scalars":{"damageMultiplier":[[1,0.9],[10,1.15],[20,1.4]]},"triggers":[{"id":"kill_chain","type":"enemy_defeated","maxTriggersPerRound":1,"effects":[{"type":"damage_lowest_enemy","sourceType":"relic"}]}],"limitText":"每回合最多1次；比例相同依戰場順序。秘寶、DOT、反擊、追擊、反射、環境擊殺不觸發；無敵人不演出。","nextText":{"10":"追擊1.15×秘寶威力","20":"追擊1.40×秘寶威力"}},
+        {"id":"relic_red_sky_war_mark","category":"buff","tags":["buff"],"rarity":"orange","maxLevel":20,"iconPath":"assets/relics/icons/relic_red_sky_war_mark.webp","runtimeReady":false,"defaultUnlocked":false,"unlockSource":null,"description":"開場獲得赤霄，強化普通攻擊與主動技能的直接傷害及爆擊。","scalars":{"ordinaryDamageBonus":[[1,6],[10,8],[20,10]],"critBonus":[[1,4],[10,6],[20,8]],"duration":[[1,2],[19,2],[20,3]]},"triggers":[{"id":"opening_burst","type":"battle_start","oncePerBattle":true,"effects":[{"type":"buff_all","sourceType":"relic","ordinaryDamageKey":"ordinaryDamageBonus","critKey":"critBonus","durationKey":"duration","statusName":"赤霄"}]}],"limitText":"每場開場一次。傷害併入普通加算桶（上限50%），爆擊上限95%；DOT、反擊、追擊、秘寶不受益。","nextText":{"10":"直接傷害+8%、爆擊+6%，2回合","20":"直接傷害+10%、爆擊+8%，3回合"}},
+        {"id":"relic_ice_mirror_heart","category":"element","tags":["element"],"rarity":"purple","maxLevel":20,"iconPath":"assets/relics/icons/relic_ice_mirror_heart.webp","runtimeReady":false,"defaultUnlocked":false,"unlockSource":null,"description":"每第3回合結束固定攻擊全體敵人，有一般負面者追加傷害。","scalars":{"damageMultiplier":[[1,0.85],[10,1],[20,1.15]],"debuffBonus":[[1,0.15],[10,0.2],[20,0.25]]},"triggers":[{"id":"every_3_end","type":"every_n_rounds","roundInterval":3,"phase":"round_end","maxTriggersPerRound":1,"effects":[{"type":"damage_all_enemies","sourceType":"relic","multiplierKey":"damageMultiplier","bonusAgainstGeneralDebuff":true,"bonusKey":"debuffBonus","element":"water"}]}],"limitText":"無負面仍造成傷害；只認正式一般負面，不把Boss機制或工程標記當負面；不附加冰封或刷新凍傷。","nextText":{"10":"傷害1.00×，一般負面目標+20%","20":"傷害1.15×，一般負面目標+25%"}},
+        {"id":"relic_wind_chasing_talisman","category":"buff","tags":["buff"],"rarity":"blue","maxLevel":20,"iconPath":"assets/relics/icons/relic_wind_chasing_talisman.webp","runtimeReady":false,"defaultUnlocked":false,"unlockSource":null,"description":"每第3回合開始獲得乘風，首次完成正式主動技能返還本次實際消耗SP並提高閃避。","scalars":{"refundPercent":[[1,15],[10,20],[20,25]],"evasionBonus":[[1,8],[10,10],[20,12]]},"triggers":[{"id":"every_3_start","type":"every_n_rounds","roundInterval":3,"phase":"round_start","maxTriggersPerRound":1,"effects":[{"type":"skill_cycle","sourceType":"relic"}]}],"limitText":"乘風只持續當回合，每角色一次；返還取floor，至少1且不超過實耗，零消耗不返還；閃避到該角色下一次行動開始，不改速度或順序。","nextText":{"10":"SP返還20%，最終閃避+10%","20":"SP返還25%，最終閃避+12%"}},
+        {"id":"relic_mountain_river_cauldron","category":"defense","tags":["defense"],"rarity":"orange","maxLevel":20,"iconPath":"assets/relics/icons/relic_mountain_river_cauldron.webp","runtimeReady":false,"defaultUnlocked":false,"unlockSource":null,"description":"本回合敵方造成的實際HP損失達開場存活隊伍最大HP總和30%時，立即穩場。","scalars":{"healHpPercent":[[1,8],[10,10],[20,12]],"damageReduction":[[1,10],[10,12],[20,15]]},"triggers":[{"id":"round_loss_30","type":"ally_hp_loss","threshold":0.3,"maxTriggersPerRound":1,"maxTriggersPerBattle":2,"effects":[{"type":"emergency_stabilize","sourceType":"relic"}]}],"limitText":"每回合最多1次，每場最多2次；計數每回合歸零。敵方DOT計入，護盾、結界、自損、HP消耗、環境與秘寶不計。鎮勢到下一回合結束。","nextText":{"10":"回復10%HP，直接減傷12%","20":"回復12%HP，直接減傷15%；觸發前HP≤30%者獲8%護盾"}},
+        {"id":"relic_burning_star_mark","category":"element","tags":["element"],"rarity":"purple","maxLevel":20,"iconPath":"assets/relics/icons/relic_burning_star_mark.webp","runtimeReady":false,"defaultUnlocked":false,"unlockSource":null,"description":"每回合首名敵人HP由50%以上降至50%以下或相等且仍存活時，秘寶追擊。","scalars":{"damageMultiplier":[[1,0.9],[10,1.1],[20,1.3]]},"triggers":[{"id":"hp_cross_50","type":"enemy_hp_crossing","hpThreshold":0.5,"maxTriggersPerRound":1,"effects":[{"type":"damage_crossing_enemy","sourceType":"relic"}]}],"limitText":"每回合最多1次；直接擊殺不觸發，不要求燃燒。Lv20觸發判定時目標HP≤25%，本次傷害額外+30%。","nextText":{"10":"追擊1.10×秘寶威力","20":"追擊1.30×；HP≤25%時額外+30%"}},
+        {"id":"relic_spirit_spring_bottle","category":"recovery","tags":["recovery"],"rarity":"blue","maxLevel":20,"iconPath":"assets/relics/icons/relic_spirit_spring_bottle.webp","runtimeReady":false,"defaultUnlocked":false,"unlockSource":null,"description":"每第3回合結束回復所有存活隊友SP，高等級追加HP回復。","scalars":{"spPercent":[[1,8],[10,10],[20,12]],"healHpPercent":[[1,0],[9,0],[10,3],[20,5]]},"triggers":[{"id":"every_3_end","type":"every_n_rounds","roundInterval":3,"phase":"round_end","maxTriggersPerRound":1,"effects":[{"type":"restore_sp_all","sourceType":"relic","percentKey":"spPercent"},{"type":"heal_all_allies","sourceType":"relic","percentKey":"healHpPercent","minLevel":10}]}],"limitText":"死亡角色不受益；HP與SP不得超過上限。","nextText":{"10":"回復10%最大SP及3%最大HP","20":"回復12%最大SP及5%最大HP"}},
+        {"id":"relic_demon_suppressing_seal","category":"defense","tags":["defense"],"rarity":"orange","maxLevel":20,"iconPath":"assets/relics/icons/relic_demon_suppressing_seal.webp","runtimeReady":false,"defaultUnlocked":false,"unlockSource":null,"description":"開場全隊獲得3回合伏魔抗性，每名角色另有1枚自動淨化伏魔印。","scalars":{"resistanceBonus":[[1,6],[10,10],[20,15]]},"triggers":[{"id":"opening_insurance","type":"battle_start","oncePerBattle":true,"effects":[{"type":"buff_all","sourceType":"relic","resistanceKey":"resistanceBonus","durationRounds":3,"statusName":"伏魔"},{"type":"status_insurance","sourceType":"relic"}]}],"limitText":"每角色每場各1印；正式成功寫入可淨化負面後才消耗並解除該狀態，不可淨化與Boss機制不消耗印；衍生效果只顯示伏魔・破邪。","nextText":{"10":"異常抗性+10%，3回合；每角色1印","20":"異常抗性+15%，3回合；每角色1印"}},
+        {"id":"relic_all_returning_array","category":"special","tags":["special"],"rarity":"four-symbol","maxLevel":20,"iconPath":"assets/relics/icons/relic_all_returning_array.webp","runtimeReady":false,"defaultUnlocked":false,"unlockSource":null,"description":"每第4回合開始依存活隊友HP比例算術平均，固定選擇歸生、調和或破勢。","scalars":{"healHpPercent":[[1,12],[10,15],[20,18]],"damageReduction":[[1,8],[10,10],[20,12]],"balancedBonus":[[1,10],[10,12],[20,15]],"skillFinalBonus":[[1,10],[10,15],[20,20]]},"triggers":[{"id":"every_4_start","type":"every_n_rounds","roundInterval":4,"phase":"round_start","maxTriggersPerRound":1,"effects":[{"type":"adaptive_battle_state","sourceType":"relic"}]}],"limitText":"每次只判定1次，持續2回合。平均≤40%歸生；>40%且≤75%調和；>75%破勢。死亡角色不納入；破勢僅正式主動技能直接最終傷害。","nextText":{"10":"歸生15%回血/10%減傷；調和12%攻防；破勢15%","20":"歸生18%回血/12%減傷及每人淨化1個；調和15%攻防/10%抗性；破勢20%"}}
     ];
 
     RELIC_CATALOG_LIST.forEach(def=>{
@@ -747,7 +742,7 @@
             relicId:id||null,battleToken:currentBattleToken(),round:currentRound(),enemyActionCount:0,allyHitCount:0,
             totalTriggers:0,triggerCounts:{},roundTriggerCounts:{},lastTriggerRound:{},onceUsed:{},
             lastHpDamageEvent:{},damageEventSerial:0,playerMods:{},monsterRestores:[],reflectReady:{},
-            currentEnemyIndex:null,lastEvent:null,boundaryEvents:{}
+            currentEnemyIndex:null,lastEvent:null,boundaryEvents:{},actions:{},rockArmor:{},insurance:{},skillCycle:{},roundHpLoss:0,roundMaxHp:0
         };
     }
     function activeBattleRelic(){ return relicBattleState&&relicBattleState.relicId?relicCatalog[relicBattleState.relicId]:null; }
@@ -774,17 +769,29 @@
         if(!relicBattleState){ return; }
         const key=String(index),expires=currentRound()+Math.max(1,Math.floor(numeric(duration)||1))-1;
         relicBattleState.playerMods[key]=relicBattleState.playerMods[key]||[];
-        relicBattleState.playerMods[key].push(Object.assign({expiresRound:expires,sourceType:SOURCE_RELIC},mod||{}));
+        const entry=Object.assign({expiresRound:expires,sourceType:SOURCE_RELIC,type:"relicBuff",turnsLeft:Math.max(1,duration||1)},mod||{});
+        const existing=relicBattleState.playerMods[key].find(item=>item.sourceId&&item.sourceId===entry.sourceId);
+        if(existing){
+            Object.keys(entry).forEach(field=>{existing[field]=typeof entry[field]==="number"?Math.max(numeric(existing[field]),entry[field]):entry[field];});
+            return existing;
+        }
+        relicBattleState.playerMods[key].push(entry);
+        const character=characterAt(index);
+        if(character){ character.activeBuffs=character.activeBuffs||[];character.activeBuffs.push(entry); }
+        return entry;
     }
     function playerModTotals(index){
         const list=relicBattleState&&relicBattleState.playerMods[String(index)]||[];
         return list.reduce((out,mod)=>{
-            ["attackPercent","defensePercent","evasionPercent","resistancePercent","damageReductionPercent"].forEach(key=>{out[key]+=numeric(mod[key]);});
+            ["attackPercent","defensePercent","evasionPercent","resistancePercent","damageReductionPercent","ordinaryDamagePercent","critPercent","skillFinalPercent"].forEach(key=>{out[key]+=numeric(mod[key]);});
             return out;
-        },{attackPercent:0,defensePercent:0,evasionPercent:0,resistancePercent:0,damageReductionPercent:0});
+        },{attackPercent:0,defensePercent:0,evasionPercent:0,resistancePercent:0,damageReductionPercent:0,ordinaryDamagePercent:0,critPercent:0,skillFinalPercent:0});
     }
     window.v174GetRelicFinalEvasionPercent=index=>playerModTotals(index).evasionPercent;
     window.v174RelicDamageModifiers=Object.freeze({
+        ordinaryBonus(entity,source){ return ["normalAttack","activeSkill"].includes(source)?modsFor(entity).ordinaryDamagePercent:0; },
+        critBonus(entity,source){ return ["normalAttack","activeSkill"].includes(source)?modsFor(entity).critPercent:0; },
+        skillFinalBonus(entity,source){ return source==="activeSkill"?modsFor(entity).skillFinalPercent:0; },
         incomingReduction(entity){
             const index=partyIndexes().find(index=>characterAt(index)===entity);
             return index===undefined?0:playerModTotals(index).damageReductionPercent;
@@ -806,14 +813,24 @@
         return copy;
     }
 
-    if(typeof getPartyBattleStats==="function"){
-        const previous=getPartyBattleStats;
-        getPartyBattleStats=function(index){ return decorateStats(index,previous.apply(this,arguments)); };
+    window.v174ProjectRelicBattleStats=decorateStats;
+
+    function modsFor(entity){
+        const index=partyIndexes().find(index=>characterAt(index)===entity);
+        return playerModTotals(index);
     }
-    [["getMainCharacterStats",0],["getPlayer2BattleStats",1],["getPlayer3BattleStats",2]].forEach(([name,index])=>{
-        const previous=window[name];
-        if(typeof previous==="function"){ window[name]=function(){ return decorateStats(index,previous.apply(this,arguments)); }; }
-    });
+    function effName(effectDef,def){ return effectDef.statusName||({relic_qinglan_feather:"青嵐",relic_red_war_mark:"赤霄",relic_demon_gold_seal:"伏魔"})[def.id]||def.name; }
+    function isGeneralNegative(state){ return !!(window.FourSymbolsStatusPolicy&&window.FourSymbolsStatusPolicy.isGeneralNegative(state)); }
+    function isCleanseable(state){ return !!(window.FourSymbolsStatusPolicy&&window.FourSymbolsStatusPolicy.isCleanseable(state)); }
+    function livingPartyIndexes(){ return partyIndexes().filter(index=>numeric(characterAt(index).hp)>0); }
+    function livingEnemyIndexes(){ return (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).filter(index=>{
+        const enemy=monsters[index];return enemy&&enemy.alive&&numeric(enemy.hp)>0&&(!window.GameplaySystem||!window.GameplaySystem.canDirectlyAffectMonster||window.GameplaySystem.canDirectlyAffectMonster(enemy,index));
+    }); }
+    function shortFeedback(index,text){ const owner=window.FourSymbolsBattleFloatingFeedback;if(owner){owner.emit({side:"player",index,kind:"status",text});} }
+    function removeMod(index,mod){
+        relicBattleState.playerMods[String(index)]=(relicBattleState.playerMods[String(index)]||[]).filter(item=>item!==mod);
+        const character=characterAt(index);if(character&&character.activeBuffs){character.activeBuffs=character.activeBuffs.filter(item=>item!==mod);}
+    }
 
     function canTrigger(triggerDef,key){
         if(!relicBattleState||!triggerDef){ return false; }
@@ -862,7 +879,9 @@
             return !!(character&&stats&&numeric(character.hp)>0&&numeric(character.hp)/Math.max(1,numeric(stats.maxHP))<threshold);
         }
         if(triggerDef.type==="ally_debuffed"){ return event==="ally_debuffed"; }
-        if(triggerDef.type==="enemy_defeated"){ return event==="enemy_defeated"&&payload&&payload.sourceType!==SOURCE_RELIC; }
+        if(triggerDef.type==="enemy_defeated"){ return event==="enemy_defeated"&&payload&&["normalAttack","activeSkill"].includes(payload.sourceType)&&livingEnemyIndexes().length>0; }
+        if(triggerDef.type==="enemy_hp_crossing"){ return event==="enemy_hp_crossing"; }
+        if(triggerDef.type==="ally_hp_loss"){ return event==="ally_hp_loss"&&relicBattleState.roundHpLoss>=relicBattleState.roundMaxHp*numeric(triggerDef.threshold)&&relicBattleState.roundMaxHp>0; }
         if(triggerDef.type==="ally_down"){ return event==="ally_down"; }
         if(triggerDef.type==="before_lethal_damage"){ return event==="before_lethal_damage"; }
         if(triggerDef.type==="once_per_battle"){ return event===(triggerDef.phase||"once_per_battle"); }
@@ -910,7 +929,7 @@
     }
     function cleanseOne(index){
         const character=characterAt(index); if(!character||!Array.isArray(character.statusEffects)){ return false; }
-        const i=character.statusEffects.findIndex(state=>state&&state.dispellable!==false&&state.uncleansable!==true&&numeric(state.turnsLeft)>0);
+        const i=character.statusEffects.findIndex(isCleanseable);
         if(i<0){ return false; } character.statusEffects.splice(i,1); return true;
     }
     function applyShield(index,percent,duration,sourceId){
@@ -941,7 +960,7 @@
             return 0;
         }
         const final=Math.max(1,Math.floor(amount*(isBoss(monster)?RELIC_BALANCE_CONFIG.bossDamageModifier:1)));
-        monster.hp=Math.max(0,numeric(monster.hp)-final);
+        settleBattleHpDamage(monster,final,{sourceType:SOURCE_RELIC,damageKind:"relic"});
         emitRelicMonsterHit(index,final,"hp",false);
         if(monster.hp<=0&&typeof killMonster==="function"){ withSource(SOURCE_RELIC,()=>killMonster(index)); }
         return final;
@@ -966,17 +985,27 @@
         if(attack>0){ restore.attack=monster.attack; restore.magicAttack=monster.magicAttack; monster.attack=numeric(monster.attack)*(1-attack/100); monster.magicAttack=numeric(monster.magicAttack)*(1-attack/100); }
         if(accuracy>0){ restore.finalHitReductionPercent=Math.max(numeric(restore.finalHitReductionPercent),accuracy); }
         if(config.damageDown>0){ restore.finalDamageReductionPercent=Math.max(numeric(restore.finalDamageReductionPercent),config.damageDown*efficiency); }
+        if(config.damageDown>0){
+            monster.statusEffects=monster.statusEffects||[];
+            let state=monster.statusEffects.find(state=>state.sourceId===config.sourceId&&state.type==="relicSuppression");
+            if(!state){state={type:"relicSuppression",statusName:"鎮魂",sourceType:SOURCE_RELIC,sourceId:config.sourceId,dispellable:true};monster.statusEffects.push(state);}
+            state.turnsLeft=Math.max(1,Math.floor(duration||1));
+            state.finalDamageReductionPercent=restore.finalDamageReductionPercent;
+            state.finalHitReductionPercent=restore.finalHitReductionPercent;
+        }
         if(!existing){ relicBattleState.monsterRestores.push(restore); }
     }
     function applyPlayerBuffAll(effectDef,def,level){
         const duration=effectDef.durationKey?valueFor(def,effectDef.durationKey,level):Math.max(1,numeric(effectDef.durationRounds)||1);
         partyIndexes().forEach(index=>{
-            const mod={};
+            const mod={sourceId:def.id,statusName:effName(effectDef,def)};
             if(effectDef.attackKey){ mod.attackPercent=valueFor(def,effectDef.attackKey,level); }
             if(effectDef.defenseKey){ mod.defensePercent=valueFor(def,effectDef.defenseKey,level); }
             if(effectDef.evasionKey){ mod.evasionPercent=valueFor(def,effectDef.evasionKey,level); }
             if(effectDef.resistanceKey){ mod.resistancePercent=valueFor(def,effectDef.resistanceKey,level); }
             if(effectDef.damageReductionKey){ mod.damageReductionPercent=valueFor(def,effectDef.damageReductionKey,level); }
+            if(effectDef.ordinaryDamageKey){ mod.ordinaryDamagePercent=valueFor(def,effectDef.ordinaryDamageKey,level); }
+            if(effectDef.critKey){ mod.critPercent=valueFor(def,effectDef.critKey,level); }
             addPlayerMod(index,mod,duration);
         });
     }
@@ -986,11 +1015,45 @@
         let prevented=false;
         (triggerDef.effects||[]).forEach(eff=>{
             if(level<Math.max(1,numeric(eff.minLevel)||1)){ return; }
-            if(eff.type==="damage_all_enemies"){
+            if(eff.type==="rock_armor"){
+                livingPartyIndexes().forEach(index=>{relicBattleState.rockArmor[index]={charges:2,actions:{}};});
+            }else if(eff.type==="status_insurance"){
+                livingPartyIndexes().forEach(index=>{relicBattleState.insurance[index]=true;});
+            }else if(eff.type==="skill_cycle"){
+                livingPartyIndexes().forEach(index=>{relicBattleState.skillCycle[index]={round:currentRound(),used:false};});
+            }else if(eff.type==="cleanse_most_debuffed"){
+                const candidates=livingPartyIndexes().map(index=>({index,count:(characterAt(index).statusEffects||[]).filter(isCleanseable).length,hp:numeric(characterAt(index).hp)/Math.max(1,statsAt(index).maxHP)}));
+                candidates.sort((a,b)=>b.count-a.count||a.hp-b.hp||a.index-b.index);
+                if(candidates.length){for(let count=0;count<(level>=20?candidates[0].count:level>=10?2:1);count++){if(!cleanseOne(candidates[0].index)){break;}}}
+            }else if(eff.type==="damage_lowest_enemy"||eff.type==="damage_crossing_enemy"){
+                const enemies=livingEnemyIndexes();enemies.sort((a,b)=>monsters[a].hp/Math.max(1,monsters[a].maxHP)-monsters[b].hp/Math.max(1,monsters[b].maxHP)||a-b);
+                const index=eff.type==="damage_crossing_enemy"?payload.monsterIndex:enemies[0];
+                if(index!==undefined&&monsters[index]&&monsters[index].alive){
+                    const bonus=eff.type==="damage_crossing_enemy"&&level>=20&&monsters[index].hp/Math.max(1,monsters[index].maxHP)<=.25?1.3:1;
+                    damageEnemy(index,power*valueFor(def,"damageMultiplier",level)*bonus);
+                    payload.monsterIndex=index;
+                }
+            }else if(eff.type==="emergency_stabilize"){
+                const low=livingPartyIndexes().filter(index=>characterAt(index).hp/Math.max(1,statsAt(index).maxHP)<=.3);
+                livingPartyIndexes().forEach(index=>{healAlly(index,valueFor(def,"healHpPercent",level));addPlayerMod(index,{sourceId:def.id,statusName:"山河鎮勢",damageReductionPercent:valueFor(def,"damageReduction",level)},2);});
+                if(level>=20){low.forEach(index=>applyShield(index,8,undefined,def.id));}
+            }else if(eff.type==="adaptive_battle_state"){
+                const indexes=livingPartyIndexes();if(!indexes.length){return;}
+                const average=indexes.reduce((sum,index)=>sum+characterAt(index).hp/Math.max(1,statsAt(index).maxHP),0)/indexes.length;
+                const form=average<=.4?"萬象・歸生":average<=.75?"萬象・調和":"萬象・破勢";
+                payload.formName=form;
+                indexes.forEach(index=>{
+                    const mod={sourceId:def.id,statusName:form};
+                    if(average<=.4){healAlly(index,valueFor(def,"healHpPercent",level));mod.damageReductionPercent=valueFor(def,"damageReduction",level);if(level>=20){cleanseOne(index);}}
+                    else if(average<=.75){mod.attackPercent=valueFor(def,"balancedBonus",level);mod.defensePercent=mod.attackPercent;if(level>=20){mod.resistancePercent=10;}}
+                    else{mod.skillFinalPercent=valueFor(def,"skillFinalBonus",level);}
+                    addPlayerMod(index,mod,2);shortFeedback(index,form);
+                });
+            }else if(eff.type==="damage_all_enemies"){
                 const mult=valueFor(def,eff.multiplierKey,level),bonus=valueFor(def,eff.bonusKey,level);
                 (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).slice().forEach(index=>{
                     const monster=monsters[index]; if(!monster||!monster.alive){ return; }
-                    const statusBonus=eff.bonusAgainstStatus&&hasStatus(monster,eff.bonusAgainstStatus)?bonus:0;
+                    const statusBonus=(eff.bonusAgainstStatus&&hasStatus(monster,eff.bonusAgainstStatus))||(eff.bonusAgainstGeneralDebuff&&(monster.statusEffects||[]).some(isGeneralNegative))?bonus:0;
                     damageEnemy(index,power*mult*(1+statusBonus)*RELIC_BALANCE_CONFIG.groupDamageModifier,eff.element);
                 });
             }else if(eff.type==="heal_all_allies"){
@@ -1082,6 +1145,99 @@
         }
     }
 
+    const combatEvents=window.FourSymbolsCombatEvents;
+    if(combatEvents){
+        combatEvents.subscribe("battle_end",()=>{relicBattleState=null;pendingBattleInit=false;resetRelicPresentationQueue();});
+        combatEvents.subscribe("action_started",event=>{
+            if(!relicBattleState||!event.action){return;}
+            const action=event.action,key=String(action.token)+":"+currentRound()+":"+action.index;
+            if(relicBattleState.actions[key]){return;}
+            const entity=action.entity;
+            relicBattleState.actions[key]={entity,enemy:action.entry.type==="monster",hit:false,finished:false,
+                skipped:!!((typeof isMonsterFrozen==="function"&&isMonsterFrozen(entity))||(typeof isMonsterPetrified==="function"&&isMonsterPetrified(entity))||hasStatus(entity,"stun")),spent:0};
+            const index=partyIndexes().find(index=>characterAt(index)===entity);
+            if(index!==undefined){(relicBattleState.playerMods[index]||[]).slice().forEach(mod=>{if(mod.untilNextAction){removeMod(index,mod);}});}
+        });
+        combatEvents.subscribe("skill_spent",event=>{
+            if(!relicBattleState||event.sourceType!=="activeSkill"){return;}
+            const actions=Object.values(relicBattleState.actions).filter(action=>action.entity===event.actor&&!action.finished);
+            if(actions.length){const action=actions[actions.length-1];action.spent+=event.actualSpent;action.activeSkill=true;}
+        });
+        function completeSkill(event){
+            if(!relicBattleState||event.sourceType!=="activeSkill"){return;}
+            const index=partyIndexes().find(index=>characterAt(index)===event.actor),cycle=relicBattleState.skillCycle[index];
+            if(!cycle||cycle.used||cycle.round!==currentRound()){return;}
+            cycle.used=true;const def=activeBattleRelic(),level=relicLevel(def.id),spent=Math.max(0,numeric(event.actualSpent));
+            if(spent>0){const refund=Math.min(spent,Math.max(1,Math.floor(spent*valueFor(def,"refundPercent",level)/100))),actor=event.actor;
+                const actual=Math.min(refund,Math.max(0,statsAt(index).maxSP-numeric(actor.sp)));actor.sp+=actual;showRelicSpFloat(index,actual);}
+            addPlayerMod(index,{sourceId:"wind_cycle_evasion",statusName:"乘風",evasionPercent:valueFor(def,"evasionBonus",level),untilNextAction:true},Number.MAX_SAFE_INTEGER);
+        }
+        combatEvents.subscribe("skill_completed",completeSkill);
+        combatEvents.subscribe("action_finished",event=>{
+            if(!relicBattleState||!event.action){return;}
+            const action=event.action,key=String(action.token)+":"+currentRound()+":"+action.index,state=relicBattleState.actions[key];
+            if(!state||state.finished){return;}state.finished=true;
+            if(state.enemy&&!state.skipped){relicBattleState.enemyActionCount++;dispatchRelicEvent("after_enemy_action",{sourceType:"enemy"});
+                if(state.hit){relicBattleState.allyHitCount++;dispatchRelicEvent("after_ally_hit",{sourceType:"enemy"});}}
+            if(!state.enemy&&state.activeSkill&&!state.skipped){completeSkill({actor:state.entity,actualSpent:state.spent,sourceType:"activeSkill"});}
+        });
+        combatEvents.subscribe("incoming_direct",event=>{
+            if(!relicBattleState){return;}
+            const index=partyIndexes().find(index=>characterAt(index)===event.target),armor=relicBattleState.rockArmor[index];
+            const action=relicBattleState.actions[event.actionId];if(action){action.hit=true;}
+            if(!armor||!(event.damage>0)){return;}
+            const id=event.actionId;
+            if(!id){return;}
+            if(armor.actions[id]===undefined&&armor.charges>0){
+                armor.charges--;armor.actions[id]=valueFor(activeBattleRelic(),"damageReduction",relicLevel(relicBattleState.relicId));
+                shortFeedback(index,"岩甲・"+armor.charges);
+                if(armor.charges===0&&relicLevel(relicBattleState.relicId)>=20){applyShield(index,6,undefined,relicBattleState.relicId);}
+            }
+            event.damage=Math.floor(event.damage*(1-numeric(armor.actions[id])/100));
+        });
+        combatEvents.subscribe("hp_damage",event=>{
+            if(!relicBattleState){return;}
+            const index=partyIndexes().find(index=>characterAt(index)===event.target);
+            relicBattleState.damageEventSerial++;
+            if(index!==undefined){
+                const payload={sourceType:event.sourceType,targetIndex:index,damageEventId:relicBattleState.damageEventSerial,previousHpPercent:event.previousHp/Math.max(1,statsAt(index).maxHP)};
+                if(event.hpAfterDamage<=0){dispatchRelicEvent("before_lethal_damage",payload);}
+                if(event.target.hp>0){dispatchRelicEvent("ally_hp_below",payload);}
+                const enemy=event.attacker&&!partyIndexes().some(slot=>characterAt(slot)===event.attacker);
+                if(enemy&&["normalAttack","activeSkill","dot"].includes(event.sourceType)&&!event.attacker.vGameplayBossObject){
+                    relicBattleState.roundHpLoss+=event.actualHpLoss;dispatchRelicEvent("ally_hp_loss",payload);
+                }
+            }else{
+                const monsterIndex=(typeof monsters!=="undefined"?monsters:[]).indexOf(event.target);
+                if(monsterIndex<0){return;}
+                if(event.hpAfterDamage<=0){dispatchRelicEvent("enemy_defeated",{sourceType:event.sourceType,monsterIndex});}
+                else if(event.previousHp/Math.max(1,event.target.maxHP)>.5&&event.hpAfterDamage/Math.max(1,event.target.maxHP)<=.5){
+                    dispatchRelicEvent("enemy_hp_crossing",{sourceType:event.sourceType,monsterIndex});
+                }
+            }
+        });
+        combatEvents.subscribe("status_written",event=>{
+            if(!relicBattleState||!isCleanseable(event.state)){return;}
+            const index=partyIndexes().find(index=>characterAt(index)===event.target);
+            if(index===undefined||!relicBattleState.insurance[index]){return;}
+            event.target.statusEffects=event.target.statusEffects.filter(state=>state!==event.state);
+            relicBattleState.insurance[index]=false;shortFeedback(index,"伏魔・破邪");
+        });
+        combatEvents.subscribe("hit_roll",event=>{
+            if(!relicBattleState||event.hit){return;}
+            const index=partyIndexes().find(index=>characterAt(index)===event.target),qinglan=(relicBattleState.playerMods[index]||[]).find(mod=>mod.sourceId==="relic_qinglan_feather");
+            if(!qinglan){return;}
+            const baseline=calculateHitChancePercent(event.casterAccuracy,event.targetEvasion-qinglan.evasionPercent,event.directChanceReductionPercent,event.directChanceBonusPercent,event.target);
+            if(event.roll<baseline){shortFeedback(index,"青嵐・迴避");}
+        });
+        combatEvents.subscribe("status_roll",event=>{
+            if(!relicBattleState||event.roll<event.chance){return;}
+            const index=partyIndexes().find(index=>characterAt(index)===event.target),qinglan=(relicBattleState.playerMods[index]||[]).find(mod=>mod.sourceId==="relic_qinglan_feather");
+            if(!qinglan){return;}const args=event.arguments.slice();args[4]=numeric(args[4])-qinglan.resistancePercent;
+            if(event.roll<calculateStatusEffectChance.apply(null,args)){shortFeedback(index,"青嵐・抵抗");}
+        });
+    }
+
     if(typeof startBattle==="function"){
         const previous=startBattle;
         startBattle=function(){
@@ -1098,6 +1254,8 @@
             if(pendingBattleInit||!relicBattleState||relicBattleState.battleToken!==currentBattleToken()){ initializeBattleRelic(); }
             cleanupPlayerMods();
             resetRoundCounters();
+            relicBattleState.roundHpLoss=0;
+            relicBattleState.roundMaxHp=livingPartyIndexes().reduce((sum,index)=>sum+numeric(statsAt(index).maxHP),0);
             dispatchRelicEvent("round_start",{sourceType:"system"});
         });
     }
@@ -1117,7 +1275,7 @@
                 /* Boundary observers run before the formal duration consumer.
                    Expire projected modifiers here so the next UI cannot see them. */
                 Object.keys(relicBattleState.playerMods).forEach(key=>{
-                    relicBattleState.playerMods[key]=relicBattleState.playerMods[key].filter(mod=>numeric(mod.expiresRound)>currentRound());
+                    relicBattleState.playerMods[key].slice().forEach(mod=>{if(numeric(mod.expiresRound)<=currentRound()){removeMod(Number(key),mod);}});
                 });
                 relicBattleState.monsterRestores=relicBattleState.monsterRestores.filter(entry=>{
                     if(numeric(entry.expiresRound)>currentRound()){ return true; }
@@ -1127,158 +1285,6 @@
                 });
             }
         });
-    }
-
-    function shouldHoldMonsterActionFinishForRelic(hardControlled){
-        const def=activeBattleRelic();
-        if(!def||!def.runtimeReady||!relicBattleState){ return false; }
-        if(Object.keys(relicBattleState.reflectReady||{}).length){ return true; }
-        return def.triggers.some((triggerDef,index)=>{
-            const key=def.id+":"+(triggerDef.id||index);
-            if(!canTrigger(triggerDef,key)){ return false; }
-            if(triggerDef.type==="enemy_action_count"){
-                return !hardControlled&&numeric(relicBattleState.enemyActionCount)+1>=numeric(triggerDef.threshold);
-            }
-            if(triggerDef.type==="ally_hit_count"){
-                return numeric(relicBattleState.allyHitCount)+1>=numeric(triggerDef.threshold);
-            }
-            return false;
-        });
-    }
-
-    if(typeof processSingleMonsterAttack==="function"){
-        const previous=processSingleMonsterAttack;
-        processSingleMonsterAttack=function(monsterIndex){
-            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            const hardControlled=!!(monster&&((typeof isMonsterFrozen==="function"&&isMonsterFrozen(monster))||(typeof isMonsterPetrified==="function"&&isMonsterPetrified(monster))));
-            const finishProbe=shouldHoldMonsterActionFinishForRelic(hardControlled);
-            if(finishProbe){ relicPresentationHandoffsPending++; }
-            try{
-                const before=partyIndexes().map(index=>{
-                    const character=characterAt(index);
-                    const shield=(character&&Array.isArray(character.activeBuffs)?character.activeBuffs:[]).find(buff=>
-                        buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0
-                    );
-                    return {index:index,hp:numeric(character&&character.hp),shield:numeric(shield&&shield.remaining)};
-                });
-                if(relicBattleState){ relicBattleState.currentEnemyIndex=monsterIndex; }
-                const result=withSource("enemy",()=>previous.apply(this,arguments));
-                const hitTargets=[];
-                before.forEach(entry=>{
-                    const character=characterAt(entry.index);
-                    const shield=(character&&Array.isArray(character.activeBuffs)?character.activeBuffs:[]).find(buff=>
-                        buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0
-                    );
-                    const shieldAfter=numeric(shield&&shield.remaining);
-                    if(character&&(numeric(character.hp)<entry.hp||shieldAfter<entry.shield)){ hitTargets.push(entry.index); }
-                });
-                if(relicBattleState){
-                    relicBattleState.currentEnemyIndex=null;
-                    if(!hardControlled){ relicBattleState.enemyActionCount++; dispatchRelicEvent("after_enemy_action",{sourceType:"enemy",monsterIndex:monsterIndex}); }
-                    if(hitTargets.length){ relicBattleState.allyHitCount++; dispatchRelicEvent("after_ally_hit",{sourceType:"enemy",monsterIndex:monsterIndex,targetIndexes:hitTargets}); }
-                    const reflectedIndex=hitTargets.find(index=>relicBattleState.reflectReady[String(index)]);
-                    if(reflectedIndex!==undefined&&monster&&monster.alive){
-                        const reflect=relicBattleState.reflectReady[String(reflectedIndex)]; delete relicBattleState.reflectReady[String(reflectedIndex)];
-                        const def=activeBattleRelic();
-                        if(def){
-                            const visuals=[];
-                            const previousCollector=relicVisualCollector;
-                            relicVisualCollector=visuals;
-                            let damage=0;
-                            try{
-                                damage=Math.max(1,Math.floor(getRelicPower(def.id)*numeric(reflect.multiplier)));
-                                damageEnemy(monsterIndex,damage,"earth");
-                            }finally{
-                                relicVisualCollector=previousCollector;
-                            }
-                            queueRelicPresentation(def,()=>{
-                                flushRelicVisuals(visuals);
-                                battleLog(def.name+"反震"+damage+"點秘寶傷害。");
-                                if(typeof updateUI==="function"){ try{updateUI();}catch(_){ } }
-                            },{
-                                payload:{monsterIndex:monsterIndex},
-                                override:{targetSide:"monster",targetType:"single",targetId:monsterIndex,targetIds:[monsterIndex],category:"attack"}
-                            });
-                        }
-                    }
-                }
-                return result;
-            }finally{
-                if(finishProbe){ releaseRelicPresentationHandoff(false); }
-            }
-        };
-    }
-
-    if(typeof showPlayerHit==="function"){
-        const previous=showPlayerHit;
-        showPlayerHit=function(amount,type,index,isPositive){
-            let displayAmount=numeric(amount);
-            if(
-                relicBattleState&&type==="hp"&&!isPositive&&displayAmount>0&&Number.isInteger(index)&&
-                (!sourceContext||sourceContext.sourceType!==SOURCE_RELIC)
-            ){
-                const character=characterAt(index),stats=statsAt(index);
-                if(character&&stats){
-                    relicBattleState.damageEventSerial++;
-                    const eventId=relicBattleState.damageEventSerial;
-                    const previousHp=Math.min(numeric(stats.maxHP),numeric(character.hp)+displayAmount);
-                    const previousHpPercent=previousHp/Math.max(1,numeric(stats.maxHP));
-                    if(numeric(character.hp)<=0){
-                        dispatchRelicEvent("before_lethal_damage",{sourceType:sourceContext&&sourceContext.sourceType||"unknown",targetIndex:index,damageEventId:eventId,damage:displayAmount});
-                    }
-                    if(numeric(character.hp)>0){
-                        dispatchRelicEvent("ally_hp_below",{sourceType:sourceContext&&sourceContext.sourceType||"unknown",targetIndex:index,damageEventId:eventId,damage:displayAmount,previousHpPercent:previousHpPercent});
-                    }else{
-                        dispatchRelicEvent("ally_down",{sourceType:sourceContext&&sourceContext.sourceType||"unknown",targetIndex:index,damageEventId:eventId});
-                    }
-                }
-            }
-            const args=Array.from(arguments); args[0]=displayAmount; return previous.apply(this,args);
-        };
-    }
-
-    if(typeof tickStatusEffects==="function"){
-        const previous=tickStatusEffects;
-        tickStatusEffects=function(){ return withSource("status",()=>previous.apply(this,arguments)); };
-    }
-
-    function wrapAllyDebuffApplication(name){
-        const previous=window[name];
-        if(typeof previous!=="function"){ return; }
-        window[name]=function(entity){
-            const targetIndex=partyIndexes().find(index=>characterAt(index)===entity);
-            const before=targetIndex===undefined?0:(Array.isArray(entity&&entity.statusEffects)?entity.statusEffects.length:0);
-            const result=previous.apply(this,arguments);
-            if(targetIndex!==undefined&&relicBattleState&&(!sourceContext||sourceContext.sourceType!==SOURCE_RELIC)){
-                const after=Array.isArray(entity&&entity.statusEffects)?entity.statusEffects.length:0;
-                if(result!==false&&after>before){
-                    dispatchRelicEvent("ally_debuffed",{sourceType:sourceContext&&sourceContext.sourceType||"enemy",targetIndex:targetIndex});
-                }
-            }
-            return result;
-        };
-    }
-    ["applyBurnEffect","applyFreezeEffect","applyMonsterDebuff","applyPetrifyEffect","applyStunEffect"].forEach(wrapAllyDebuffApplication);
-
-    if(typeof killMonster==="function"){
-        const previous=killMonster;
-        killMonster=function(index){
-            const monster=typeof monsters!=="undefined"?monsters[index]:null;
-            const source=sourceContext&&sourceContext.sourceType||"character";
-            const wasAlive=!!(monster&&monster.alive!==false);
-            const result=previous.apply(this,arguments);
-            if(relicBattleState&&wasAlive&&monster&&monster.alive===false){ dispatchRelicEvent("enemy_defeated",{sourceType:source,monsterIndex:index}); }
-            return result;
-        };
-    }
-
-    if(typeof winBattle==="function"){
-        const previous=winBattle;
-        winBattle=function(){ const result=previous.apply(this,arguments); relicBattleState=null; pendingBattleInit=false; resetRelicPresentationQueue(); return result; };
-    }
-    if(typeof loseBattle==="function"){
-        const previous=loseBattle;
-        loseBattle=function(){ const result=previous.apply(this,arguments); relicBattleState=null; pendingBattleInit=false; resetRelicPresentationQueue(); return result; };
     }
 
     function rarityClass(def){ return "rarity-"+(def&&def.rarity||"white"); }
@@ -1310,7 +1316,7 @@
         if(def.id==="relic_nine_dragon_fire"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×火屬性秘寶傷害"+(level>=10?"，燃燒機率"+Math.round(valueFor(def,"burnChance",level)*100)+"%":"")+(level>=20?"，對燃燒目標額外+15%":"")+"。"; }
         if(def.id==="relic_cold_spring_jade"){ return "急救目標 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"並淨化1個一般負面":"")+(level>=20?"、恢復4%最大SP":"")+"；HP由35%以上降至35%以下時觸發，每場最多2次，冷卻3回合。"; }
         if(def.id==="relic_qinglan_feather"){ return "全隊最終閃躲+"+Math.round(valueFor(def,"evasionBonus",level))+"%、最終異常抗性+"+Math.round(valueFor(def,"resistanceBonus",level))+"%，持續"+Math.round(valueFor(def,"duration",level))+"回合。"; }
-        if(def.id==="relic_rock_mountain_seal"){ return "開場防禦+"+Math.round(valueFor(def,"defenseBonus",level))+"%持續3回合；受擊計數觸發時獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%最大HP護盾"+(level>=20?"；Lv20護盾後準備一次18%秘寶威力反震，作用於下一名實際攻擊者":"")+"。"; }
+        if(def.id==="relic_rock_mountain_seal"){return "開場每人2層岩甲，每個敵方有效直接傷害行動減傷"+valueFor(def,"damageReduction",level)+"%；每行動最多耗1層"+(level>=20?"，末層消耗獲得6%HP護盾":"")+"。";}
         if(def.id==="relic_returning_wheel"){ return "阻止本場第一次死亡，保留1HP後恢復"+Math.round(valueFor(def,"healHpPercent",level))+"%最大HP並獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%護盾。"; }
         return def.description;
     }

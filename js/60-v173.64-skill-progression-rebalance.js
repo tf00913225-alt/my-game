@@ -1005,7 +1005,7 @@
             if(!canAddNamedBuff(actor,"fireSoulResonance",actorIndex,"炎魂共鳴")){
                 return notify("炎魂共鳴仍在持續中，無法重複施放或刷新。");
             }
-            actor.sp=numeric(actor.sp)-cost;
+            spendActiveSkillSP(actor,cost);
             const resolvedLevel=clampLevel(level,5);
             const resonance=addNamedBuff(actor,"fireSoulResonance",actorIndex,"炎魂共鳴",3,{
                 skillLevel:resolvedLevel,extensionCount:0,lastExtendedRound:null
@@ -1030,7 +1030,7 @@
             const resolvedLevel=clampLevel(level,5);
             const hpCost=Math.max(1,Math.round(maxHp*(BLOOD_BURN_HP_COST_BY_LEVEL[resolvedLevel-1]/100)));
             if(numeric(actor.hp)<=hpCost){ return notify("目前HP不足以承受焚血訣的生命消耗。"); }
-            actor.sp=numeric(actor.sp)-cost;
+            spendActiveSkillSP(actor,cost);
             actor.hp=numeric(actor.hp)-hpCost;
             addNamedBuff(actor,"bloodBurn",actorIndex,"焚血",3,{
                 skillLevel:resolvedLevel,hpCost,remainingFireActions:4
@@ -1082,7 +1082,8 @@
             critical:false,burnAdded:false,finished:false
         };
         fireCastContext=context;
-        window.FourSymbolsSkillDamageContext={attacker:actor,skill,directSkillBonusPercent:bonus};
+        const damageContext={attacker:actor,skill,directSkillBonusPercent:bonus,freeCast,actualSpent:0};
+        window.FourSymbolsSkillDamageContext=damageContext;
         let result;
         try{ result=invoke(); }
         finally{
@@ -1090,6 +1091,10 @@
             window.FourSymbolsSkillDamageContext=null;
         }
         const succeeded=freeCast||context.finished||numeric(actor.sp)<beforeSp;
+        if(succeeded&&!freeCast&&window.FourSymbolsCombatEvents){
+            window.FourSymbolsCombatEvents.emit("skill_completed",{actor,actorIndex,skill,
+                actualSpent:damageContext.actualSpent,sourceType:"activeSkill"});
+        }
         if(succeeded&&!freeCast){
             if(blood){
                 blood.remainingFireActions=Math.max(0,numeric(blood.remainingFireActions,4)-1);

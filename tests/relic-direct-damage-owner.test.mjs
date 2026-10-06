@@ -17,7 +17,8 @@ test('the final loaded canonical damage owner consumes incoming relic reduction 
     c.v174RelicDamageModifiers={incomingReduction:()=>0,outgoingReduction:()=>0};
     const baseline=damage(enemy);
     c.v174RelicDamageModifiers={incomingReduction:()=>10,outgoingReduction:()=>0};
-    assert.equal(damage(enemy),Math.round(baseline*.9),mode);
+    assert.equal(c.applyPlayerDirectIncomingModifiers(target,baseline,{attacker:enemy}),Math.floor(baseline*.9),mode);
+    assert.equal(damage(enemy),baseline,'incoming reduction is settled once before absorption');
   }
 });
 

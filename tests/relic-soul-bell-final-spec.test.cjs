@@ -19,7 +19,8 @@ for(const [level,damage,hit] of [[1,8,4],[10,10,6],[20,12,8]]){
     assert.equal(c.v174GetRelicFinalHitReductionPercent(boss),hit*.8);
     assert.equal(enemy.attack,100);assert.equal(enemy.magicAttack,100);
     assert.equal(enemy.accuracy,100);
-    assert.equal(enemy.statusEffects.length,0,'no hard control');
+    assert.equal(enemy.statusEffects.filter(state=>['freeze','petrify','stun'].includes(state.type)).length,0,'no hard control');
+    assert.equal(enemy.statusEffects[0].type,'relicSuppression','formal soft negative status');
     r.advanceRound();
     assert.equal(c.turn,4);
     assert.equal(c.v174RelicDamageModifiers.outgoingReduction(enemy),damage);

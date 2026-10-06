@@ -234,7 +234,7 @@
     }
 
     function animateSupportCast(state,characterIndex,skill,targetId,targetIds,targetSide,targetTypeOverride){
-        state.character.sp=Math.max(0,numeric(state.character.sp)-state.cost);
+        spendActiveSkillSP(state.character,state.cost);
         if(typeof lungePlayerCard==="function"){ lungePlayerCard(characterIndex); }
         if(typeof showSkillNameBadge==="function"){
             showSkillNameBadge(skill.name,skill.element,characterIndex,targetId,targetIds,targetSide,targetTypeOverride);
