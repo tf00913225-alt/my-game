@@ -432,7 +432,7 @@
         const previousBuildInitiativeQueue=buildInitiativeQueue;
         buildInitiativeQueue=function(){
             return previousBuildInitiativeQueue.apply(this,arguments).filter(entry=>
-                entry.type!=="player"||!hardControlName(getPartyCharacterByIndex(entry.characterIndex))
+                (entry.type!=="player"&&entry.type!=="heroNpc")||!hardControlName(getPartyCharacterByIndex(entry.characterIndex))
             );
         };
     }

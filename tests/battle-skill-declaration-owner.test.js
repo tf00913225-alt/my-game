@@ -8,7 +8,7 @@ const logs=[],notices=[];
 const ctx={battleActive:true,battlePhase:'declare',activeBattleCharacterIndex:0,autoBattle:false,actionReady:false,pendingAction:null,queuedPlayerActions:{},
     skillDatabase:{attack:{name:'攻擊',category:'magic',spCost:10,targetType:'single'},heal:{name:'治療',category:'heal',spCost:10,targetType:'ally'},buff:{name:'增益',category:'buff',spCost:10,targetType:'ally'},revive:{name:'復活術',category:'revive',spCost:10,targetType:'deadAlly'},passive:{name:'被動',category:'passive'}},
     characterSkillLoadouts:Object.fromEntries([0,1,2].map(i=>[i,{skillLevels:{attack:1,heal:1,buff:1,revive:1},equippedSkills:['attack','heal','buff','revive']}])),
-    getPartyCharacterByIndex:i=>party[i],getBattleCharacterByIndex:i=>party[i],getPartyCharacterKey:i=>i,getPartyAutoConfig:()=>({enabled:false}),
+    getExistingPartyIndexes:()=>party.map((_,i)=>i),getPartyCharacterByIndex:i=>party[i],getBattleCharacterByIndex:i=>party[i],getPartyCharacterKey:i=>i,getPartyAutoConfig:()=>({enabled:false}),
     addBattleLog(message){logs.push(message);},showBattleActionNotice(message){notices.push(message);},closeMenus(){},clearBattleTargetSelectionMode(){},setBattleTargetSelectionMode(){},setBattleAllyTargetSelectionMode(){},
     updateUI(){},finishPlayerAction(){finished++;ctx.actionReady=false;ctx.pendingAction=null;},populateSkillQuickBar(){},syncTurnTimerWithBattlePickers(){},
     isValidAllyTargetForSkill:(skill,character)=>skill.targetType==='deadAlly'?character.hp<=0:character.hp>0,currentBattleMonsters:[0],normalizeBattleTargetType:type=>type,getBattleActionTargetType:type=>ctx.skillDatabase[type]?.targetType||"single",getBattleActionDisplayName:()=>"attack",

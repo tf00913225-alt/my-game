@@ -28,7 +28,7 @@ function buildInitiativeQueue(){
         if(!character || character.hp<=0){ return; }
 
         list.push({
-            type:"player",
+            type:character.combatantKind==="heroNpc"?"heroNpc":"player",
             characterIndex:characterIndex,
             agility:getPartyBattleStats(characterIndex).agility
         });
