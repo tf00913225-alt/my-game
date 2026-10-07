@@ -459,6 +459,9 @@ try{
     await clear();await navigate("legacy-empty");await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='MIGRATION_REQUIRED'","legacy migration confirmation");
     const migration=await client.eval(`(()=>({creation:getComputedStyle(document.getElementById("creationPage")).display,legacy:localStorage.getItem("battle_full_version_save_v5"),account:localStorage.getItem("four_symbols_save:uid-legacy"),confirmDisabled:document.getElementById("firebaseMigrationConfirmButton").disabled}))()`);
     assert.equal(migration.creation,"none");assert.ok(migration.legacy);assert.equal(migration.account,null);assert.equal(migration.confirmDisabled,false);evidence.checks.legacyMigration=migration;
+    assert.equal(await client.eval(`document.getElementById('firebaseDirectEnterButton').disabled`),true);
+    await client.eval(`document.getElementById('firebaseDirectEnterButton').click()`);
+    assert.equal(await client.eval(`FourSymbolsStartupPolicy.getState()`),"MIGRATION_REQUIRED");
     await client.eval(`document.getElementById("firebaseMigrationCancelButton").click()`);await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'","safe migration cancel",15000);assert.ok(await client.eval(`localStorage.getItem("battle_full_version_save_v5")`),"Cancelling migration removed legacy data");
     await clear();await navigate("legacy-cloud");await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='MIGRATION_REQUIRED'","legacy/cloud conflict");
     const conflict=await client.eval(`(()=>({creation:getComputedStyle(document.getElementById("creationPage")).display,legacy:localStorage.getItem("battle_full_version_save_v5"),account:localStorage.getItem("four_symbols_save:uid-legacy-cloud"),confirmDisabled:document.getElementById("firebaseMigrationConfirmButton").disabled}))()`);
@@ -473,18 +476,22 @@ try{
     assert.ok(resumeFrames.every(frame=>frame.presentation==="resume"&&!frame.accountVisible&&!frame.diagnosticVisible&&(frame.state==="READY"||frame.state==="OFFLINE_READY")),"Account management flashed during automatic boot");
     await client.eval(`window.dispatchEvent(new CustomEvent('four-symbols:game-session-state',{detail:{code:'SESSION_REAUTH_REQUIRED'}}))`);
     assert.equal(await client.eval(`document.getElementById('firebaseAuthStatus').hidden`),true);
+    let directPoint;
     for(const width of [390,420]){
       await client.send("Emulation.setDeviceMetricsOverride",{width,height:844,deviceScaleFactor:3,mobile:true,screenWidth:width,screenHeight:844});
       const buttons=await client.eval(`(()=>{const ids=['firebaseSwitchAccountButton','firebaseDirectEnterButton'];return ids.map(id=>{const n=document.getElementById(id),r=n.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,disabled:n.disabled,hit:document.elementFromPoint(r.left+r.width/2,r.top+r.height/2)===n};});})()`);
       assert.ok(buttons.every(b=>b.left>=0&&b.right<=width&&b.height>=40&&!b.disabled&&b.hit));
       assert.ok(buttons[1].width>buttons[0].width);
+      directPoint={x:buttons[1].left+buttons[1].width/2,y:buttons[1].top+buttons[1].height/2};
     }
-    await client.eval(`document.getElementById('firebaseDirectEnterButton').click()`);
-    assert.equal(await client.eval(`document.getElementById('firebaseAuthOverlay').classList.contains('show')`),false);
-    await sleep(5200);
+    await client.send("Input.dispatchTouchEvent",{type:"touchStart",touchPoints:[directPoint]});
+    await client.send("Input.dispatchTouchEvent",{type:"touchEnd",touchPoints:[]});
+    await sleep(100);
     assert.equal(await client.eval(`document.getElementById('firebaseAuthOverlay').classList.contains('show')`),false);
     await client.eval(`FourSymbolsFirebaseLifecycle.openAuth()`);
     assert.equal(await client.eval(`document.getElementById('firebaseAuthOverlay').dataset.presentation`),"account");
+    await sleep(5200);
+    assert.equal(await client.eval(`document.getElementById('firebaseAuthOverlay').classList.contains('show')`),true,"Stale Resume timer closed manual account management");
     assert.match(await client.eval(`document.getElementById('firebaseAuthStatus').textContent`),/重新驗證/);
     assert.doesNotMatch(await client.eval(`document.getElementById('firebaseAuthStatus').textContent`),/SESSION_REAUTH_REQUIRED/);
     await client.eval(`FourSymbolsFirebaseLifecycle.closeAuth()`);
@@ -569,6 +576,16 @@ try{
     evidence.checks.mainCity412x915=await client.eval(`(()=>{const images=[...document.querySelectorAll("#homePage img,#bottomNav img,#mainBottomNav img")].filter(image=>image.currentSrc&&image.getClientRects().length>0&&getComputedStyle(image).visibility!=="hidden"&&getComputedStyle(image).display!=="none");return {viewport:[innerWidth,innerHeight],overflow:document.documentElement.scrollWidth>innerWidth,loaderHidden:document.getElementById("startupLoader").hidden,imagesDecoded:images.length>0&&images.every(image=>image.complete&&image.naturalWidth>0),visualReady:performance.getEntriesByName("four-symbols:main-city-visual-ready").length>0};})()`);
     assert.deepEqual(evidence.checks.mainCity412x915.viewport,[412,915]);assert.equal(evidence.checks.mainCity412x915.overflow,false);assert.equal(evidence.checks.mainCity412x915.loaderHidden,true);assert.equal(evidence.checks.mainCity412x915.imagesDecoded,true);assert.equal(evidence.checks.mainCity412x915.visualReady,true);
 
+    await clear();await navigate("existing-a");
+    await waitFor(client,"document.getElementById('firebaseAuthOverlay')?.dataset.presentation==='resume'&&document.getElementById('firebaseAuthOverlay')?.classList.contains('show')","automatic Resume countdown",20000);
+    const countdown=[];
+    for(let i=0;i<28;i++){
+        countdown.push(await client.eval(`Number(document.getElementById('firebaseAuthResumeCountdown').textContent)`));
+        await sleep(200);
+    }
+    assert.ok(countdown.includes(5)&&countdown.includes(4)&&countdown.includes(3)&&countdown.includes(2)&&countdown.includes(1)&&countdown.includes(0));
+    assert.equal(await client.eval(`document.getElementById('firebaseAuthOverlay').classList.contains('show')`),false);
+    evidence.checks.resumeCountdown=countdown;
     evidence.status="PASS";evidence.finishedAt=new Date().toISOString();fs.writeFileSync(evidenceFile,JSON.stringify(evidence,null,2)+"\n");
     console.log(`✓ Boot / First Play mobile browser QA passed (pack ${manifest.firstPlay.totalResources} resources / ${manifest.firstPlay.totalBytes} bytes; returning auth ${evidence.performance.coldAuth.readyMs}ms; warm city ${evidence.performance.warmExisting.readyMs}ms)`);
 }catch(error){

@@ -141,6 +141,8 @@ function markup(){
 }
 function setBusy(value){
     busy=value===true;
+    const direct=byId("firebaseDirectEnterButton");
+    if(direct){ direct.disabled=busy||!gameplayIsReadyBehindAuth(); }
     ["firebaseGoogleButton","firebaseGoogleReauthButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton","firebaseCloudPreferencesTestButton","firebaseCloudPreferencesRestoreButton","firebaseMigrationCandidateButton","firebaseMigrationCandidateCancelButton","firebaseCandidateScreeningButton","firebaseMigrationBackupExportButton","firebaseMigrationArchiveRecoveryButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
 }
 function renderResumeCountdown(){
