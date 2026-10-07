@@ -1,4 +1,4 @@
-PARTIAL / 玩家價值驗收未完成 |PARTIAL / 玩家價值驗收未完成 |PARTIAL / 玩家價值驗收未完成 |PARTIAL / 玩家價值驗收未完成 |PARTIAL / 玩家價值驗收未完成 |# 《四象江湖傳》Cloud Account / Cloud Save 整體進度
+# 《四象江湖傳》Cloud Account / Cloud Save 整體進度
 
 本文件記錄產品里程碑與已驗收能力；個別工程即時 Head／CI／部署／結案由其 Work PR 擁有。Cloud 產品定位、Authority Ceiling 與開工 Gate 唯一 Owner 是 `DATA_SECURITY_CONTRACTS.md`。下列日期條目保留當時施工證據；其中 candidate／pending／Next 不構成現在的施工指令，後續結果以對應 PR 交叉核對。
 
