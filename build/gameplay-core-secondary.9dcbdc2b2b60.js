@@ -1193,17 +1193,9 @@
     window.v146SyncCharacterAttentionDots=syncCharacterAttentionDots;
     window.v146GetCharacterGrowthAttention=getCharacterGrowthAttention;
 
-    /* ----- Synthesis blueprints and crafted results are ordinary equipment, never elemental sets. ----- */
+    /* ----- Preserve legacy ordinary crafted equipment; blueprint metadata belongs to V132 materials. ----- */
     const SYNTHESIS_SET_PREFIX=/^(赤炎|寒泉|岩岳|青嵐)/;
     const SYNTHESIS_SET_COLORS=/#(?:e24b32|4bb9e8|c59a54|55cda3)/gi;
-
-    function normalizeOrdinaryBlueprintItem(item){
-        if(!item||!item.blueprintSlot){ return item; }
-        item.name=String(item.name||"裝備設計圖").replace(SYNTHESIS_SET_PREFIX,"");
-        delete item.setId;
-        item.v146OrdinaryBlueprint=true;
-        return item;
-    }
 
     function normalizeOrdinaryCraftedItem(item){
         if(!item||!item.v141Crafted){ return item; }
@@ -1219,48 +1211,9 @@
     }
 
     function normalizeOrdinarySynthesisData(){
-        const content=typeof window.v132GetContentDefinitions==="function"
-            ?window.v132GetContentDefinitions():null;
-        const definitions=content&&Array.isArray(content.blueprints)?content.blueprints:[];
-        definitions.forEach(normalizeOrdinaryBlueprintItem);
         if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){
-            inventoryItems.forEach(item=>{
-                normalizeOrdinaryBlueprintItem(item);
-                normalizeOrdinaryCraftedItem(item);
-            });
+            inventoryItems.forEach(normalizeOrdinaryCraftedItem);
         }
-    }
-
-    /* ----- Synthesis step 2 is retired; equipment output is always ordinary. ----- */
-    function polishSynthesis(){
-        const root=document.querySelector(".v141-synthesis");
-        if(!root){ return; }
-        root.classList.add("v146-synthesis-ordinary");
-        root.querySelectorAll(".v141-blueprint-series").forEach(node=>node.remove());
-        root.querySelectorAll("label").forEach(label=>{
-            if(/^\s*2[　\s]/.test(label.textContent||"")){ label.remove(); }
-        });
-        root.querySelectorAll(".v143-item-picker button").forEach(button=>{
-            const span=button.querySelector("span");
-            const original=button.getAttribute("aria-label")||span&&span.textContent||"設計圖";
-            const cleaned=original.replace(SYNTHESIS_SET_PREFIX,"");
-            button.setAttribute("aria-label",cleaned);
-            button.title=cleaned;
-            if(span){ span.remove(); }
-        });
-        const preview=root.querySelector(".v141-craft-preview div:last-child");
-        if(preview){
-            preview.innerHTML="<b>隨機普通裝備</b><span>合成只會產生一般普通裝備；四大套裝僅由戰鬥掉落或獎勵取得。</span>";
-        }
-    }
-
-    if(typeof window.v141RenderSynthesis==="function"){
-        const previousRenderSynthesis=window.v141RenderSynthesis;
-        window.v141RenderSynthesis=function(){
-            const result=previousRenderSynthesis.apply(this,arguments);
-            polishSynthesis();
-            return result;
-        };
     }
 
     /* ----- Shared lifecycle. ----- */
@@ -1291,7 +1244,6 @@
         mutationQueued=false;
         syncShopTotals();
         syncDungeonShell();
-        polishSynthesis();
         syncCharacterAttentionDots();
     }
     if(typeof MutationObserver!=="undefined"){
@@ -1313,7 +1265,7 @@
     normalizeOrdinarySynthesisData();
     syncSetDefinitions();
     const boot=()=>{
-        renderHomeRoster(); syncDungeonShell(); syncShopTotals(); polishSynthesis(); syncCharacterAttentionDots();
+        renderHomeRoster(); syncDungeonShell(); syncShopTotals(); syncCharacterAttentionDots();
     };
     if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",boot,{once:true}); }
     else{ boot(); }
@@ -7779,24 +7731,16 @@ window.v17351PreviewQuestMilestones=previewChests;previewChests();window.__v1735
 /* bundled source: js/58-v173.63-functional-fixes.js */
 /* =====================================================
    V173.63 — requested functional fixes (runtime authority)
-   - maximum character, synthesis and dungeon-backpack canvases
+   - maximum character canvas
    - canonical item art + formal rarity frames
    - premium text-only daily dungeon reward previews
-   - material promotion synthesis through Four-Symbol tier
 ===================================================== */
 (function installV17363FunctionalFixes(){
 "use strict";
 if(typeof window==="undefined"||typeof document==="undefined"||window.__v17363FunctionalFixesInstalled){return;}
 window.__v17363FunctionalFixesInstalled=true;
 
-const TIER_ORDER=["white","blue","purple","orange","pink","four-symbol"];
-const TIER_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
 const TIER_ALIAS={low:"white",mid:"blue",high:"purple",perfect:"orange"};
-const BLUEPRINT_SLOTS=["head","shoulder","armor","shoes","hand"];
-const SLOT_LABEL={head:"頭部",shoulder:"護腕",armor:"衣服",shoes:"腳",hand:"武器"};
-const MATERIAL_STATE={oreTier:"white"};
-let materialTabActive=false;
-let repairQueued=false;
 
 function normalizeTier(value){
     const key=String(value||"").toLowerCase();
@@ -7817,20 +7761,7 @@ function defs(){
         equipmentSetItems:Array.isArray(content.equipmentSetItems)?content.equipmentSetItems:[]
     };
 }
-function ownedCount(id){
-    if(typeof inventoryItems==="undefined"||!Array.isArray(inventoryItems)){return 0;}
-    return inventoryItems.reduce((sum,item)=>sum+(item&&item.id===id?Math.max(1,Math.floor(Number(item.count)||1)):0),0);
-}
 function setImp(node,key,value){if(node&&node.style){node.style.setProperty(key,value,"important");}}
-function refreshInventory(){
-    if(typeof window.v17361SyncItemArt==="function"){try{window.v17361SyncItemArt();}catch(_){}}
-    if(typeof rebuildInventorySlots==="function"){try{rebuildInventorySlots();}catch(_){}}
-    if(typeof renderInventoryItems==="function"){try{renderInventoryItems();}catch(_){}}
-    else if(typeof renderInventory==="function"){try{renderInventory();}catch(_){}}
-    if(typeof updateGoldDisplay==="function"){try{updateGoldDisplay();}catch(_){}}
-    if(typeof saveGame==="function"){try{saveGame();}catch(_){}}
-}
-
 /* ---------- 2 / 6 / 7. Use the maximum game canvas. ---------- */
 function maximizeCharacterPanel(){
     const modal=document.getElementById("homeFeatureModal");
@@ -7858,32 +7789,6 @@ function maximizeCharacterPanel(){
     setImp(root,"overflow-y","auto");
     setImp(root,"touch-action","pan-y");
 }
-function maximizeSynthesisPanel(){
-    const modal=document.getElementById("homeFeatureModal");
-    if(!modal||!modal.classList.contains("v141-synthesis-modal")){return;}
-    const box=modal.querySelector(".home-feature-modal-box");
-    const body=document.getElementById("homeFeatureModalBody");
-    // Crafting outer spacing is owned by CSS49 for every render path.
-    setImp(box,"width","calc(100% - 8px)");
-    setImp(box,"max-width","none");
-    setImp(box,"height","calc(100% - 8px)");
-    setImp(box,"max-height","calc(100% - 8px)");
-    setImp(box,"min-height","0");
-    setImp(box,"display","flex");
-    setImp(box,"flex-direction","column");
-    setImp(box,"overflow","hidden");
-    setImp(body,"flex","1 1 auto");
-    setImp(body,"min-height","0");
-    setImp(body,"overflow","hidden");
-    setImp(body,"touch-action","pan-y");
-    const synthesisBody=body&&body.querySelector(".v141-synthesis-body");
-    setImp(synthesisBody,"flex","1 1 auto");
-    setImp(synthesisBody,"min-height","0");
-    setImp(synthesisBody,"overflow-x","hidden");
-    setImp(synthesisBody,"overflow-y","auto");
-    setImp(synthesisBody,"overscroll-behavior-y","contain");
-    setImp(synthesisBody,"touch-action","pan-y");
-}
 /* ---------- 3 / 7. Canonical item icons and explicit rarity frames. ---------- */
 function canonicalDefinition(id){
     const content=defs();
@@ -7905,48 +7810,6 @@ function syncCanonicalItemArt(){
         }
     });
 }
-function equipmentArt(item){
-    if(!item){return "";}
-    if(item.assetPath){
-        const rarity=esc(normalizeTier(item.rarityKey||item.quality||item.tierKey||"white"));
-        return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarity+'"><img src="'+esc(item.assetPath)+'" alt="" draggable="false" onerror="this.hidden=true"></span>';
-    }
-    return String(item.icon||"");
-}
-function findOwned(value){
-    const key=String(value||"");
-    const bag=typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)?inventoryItems:[];
-    let found=bag.find(item=>item&&(String(item.id||"")===key||String(item.v141Uid||"")===key));
-    if(found){return found;}
-    if(typeof characterEquipment!=="undefined"&&characterEquipment){
-        for(const slots of Object.values(characterEquipment||{})){
-            found=Object.values(slots||{}).find(item=>item&&(String(item.id||"")===key||String(item.v141Uid||"")===key));
-            if(found){return found;}
-        }
-    }
-    return null;
-}
-function pickerArt(value){
-    const owned=findOwned(value);
-    const definition=canonicalDefinition(owned&&owned.id||value);
-    if(definition&&definition.icon){return String(definition.icon);}
-    return equipmentArt(owned);
-}
-function repairPicker(picker){
-    const label=picker&&picker.closest("label");
-    const select=label&&label.querySelector("select");
-    if(!select){return;}
-    const options=Array.from(select.options||[]);
-    Array.from(picker.querySelectorAll("button")).forEach((button,index)=>{
-        const option=options[index];if(!option){return;}
-        const host=button.querySelector("i");
-        const art=pickerArt(option.value);
-        if(host&&art&&host.innerHTML!==art){host.innerHTML=art;}
-        button.classList.toggle("selected",String(option.value)===String(select.value));
-    });
-}
-function repairSynthesisIcons(){document.querySelectorAll(".v143-item-picker").forEach(repairPicker);}
-
 /* ---------- 5. Actual text-only premium reward previews (no pseudo-image preview). ---------- */
 function previewMarkup(title,eyebrow,groups,note){
     return '<div class="v132-reward-modal-inner v17361-reward-preview v17363-text-reward-preview">'+
@@ -7992,7 +7855,6 @@ function ensureFunctionalStyles(){
 #game-stage .v169-material-art.v169-rarity-orange:not(.inventory-backpack-rarity-neutral),#game-stage .v169-material-art.v169-rarity-perfect:not(.inventory-backpack-rarity-neutral){color:#FF9F38!important;border-color:#FF9F38!important;box-shadow:0 0 9px rgba(255,159,56,.9),inset 0 0 8px rgba(255,159,56,.35)!important;}
 #game-stage .v169-material-art.v169-rarity-pink:not(.inventory-backpack-rarity-neutral){color:#FF4FA7!important;border-color:#FF4FA7!important;box-shadow:0 0 10px rgba(255,79,167,.92),inset 0 0 8px rgba(255,79,167,.36)!important;}
 #game-stage .v169-material-art.v169-rarity-four-symbol:not(.inventory-backpack-rarity-neutral){color:#fff!important;border-color:transparent!important;background:linear-gradient(#090b0f,#090b0f) padding-box,conic-gradient(#42A5FF,#47D6A3,#C89B45,#FF5A36,#42A5FF) border-box!important;box-shadow:0 0 9px rgba(255,90,54,.32),0 0 13px rgba(66,165,255,.32)!important;}
-#game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{width:calc(100% - 8px)!important;max-width:none!important;height:calc(100% - 8px)!important;max-height:calc(100% - 8px)!important;}
 #game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="equipment"] .v141-dungeon-cover-art{background-image:linear-gradient(180deg,transparent 58%,rgba(7,5,3,.38)),url("assets/dungeons/covers/equipment-v17363.png"),url("assets/dungeons/covers/equipment-v17343.png")!important;background-size:cover!important;background-position:center!important;}
 #game-stage .v17363-text-reward-preview{width:min(392px,calc(100% - 18px))!important;max-width:392px!important;padding:18px!important;border:1px solid rgba(213,164,82,.82)!important;border-radius:15px!important;background:radial-gradient(circle at 50% 0,rgba(232,177,77,.16),transparent 36%),linear-gradient(160deg,#22170e,#090807 76%)!important;box-shadow:0 22px 52px rgba(0,0,0,.78),inset 0 0 0 1px rgba(255,231,171,.07)!important;}
 #game-stage .v17363-preview-heading{text-align:left;padding-bottom:11px;margin-bottom:11px;border-bottom:1px solid rgba(196,149,75,.4);}
@@ -8004,137 +7866,9 @@ function ensureFunctionalStyles(){
 #game-stage .v17363-preview-group em{position:absolute;right:12px;top:11px;color:#e5b966;font:900 11px/1.4 Cinzel,"Noto Sans TC",sans-serif;font-style:normal;}
 #game-stage .v17363-preview-group p{margin:6px 0 0;color:#cdbfa7;font-size:12px;line-height:1.72;}
 #game-stage .v17363-preview-note{margin:10px 1px 0;padding:8px 10px;border-left:2px solid #b98b45;color:#9f927d;background:rgba(184,134,62,.06);font-size:11px;line-height:1.6;text-align:left;}
-#game-stage .v17363-material-synthesis{display:grid;gap:8px;padding-bottom:8px;}
-#game-stage .v17363-material-card{position:relative;padding:10px;border:1px solid rgba(154,112,58,.7);border-radius:11px;background:linear-gradient(180deg,#20170f,#0e0b08);overflow:visible;}
-#game-stage .v17363-material-card h4{margin:0 0 3px;color:#f0ce85;font:900 16px/1.35 "Noto Serif TC",serif;}
-#game-stage .v17363-material-card>p{margin:0 0 7px;color:#9f927f;font-size:10px;line-height:1.45;}
-#game-stage .v17363-material-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;position:relative;z-index:12;}
-#game-stage .v17363-material-controls.single{grid-template-columns:1fr;}
-#game-stage .v17363-material-controls:not(.single)>.v17363-material-field:last-child:nth-child(odd){grid-column:1/-1;}
-#game-stage .v17363-material-field{display:grid;gap:4px;min-width:0;color:#bbaa8c;font-size:10px;}
-#game-stage .v17363-material-field-label{color:#bbaa8c;font-size:10px;line-height:1.3;}
-#game-stage .v17363-game-select{position:relative;min-width:0;z-index:1;}
-#game-stage .v17363-game-select.open{z-index:80;}
-#game-stage .v17363-game-select-trigger{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:6px;width:100%;min-height:36px;padding:5px 8px;border:1px solid #805e31;border-radius:7px;color:#ead9b5;background:linear-gradient(180deg,#21170e,#0b0907);font-size:11px;font-weight:800;text-align:left;box-shadow:inset 0 0 0 1px rgba(255,222,151,.03);}
-#game-stage .v17363-game-select-trigger>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-stage .v17363-game-select-trigger>b{color:#d7ab59;font-size:12px;}
-#game-stage .v17363-game-select.open .v17363-game-select-trigger{border-color:#d6a448;box-shadow:0 0 9px rgba(211,157,65,.2),inset 0 0 0 1px rgba(255,225,158,.14);}
-#game-stage .v17363-game-select-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);display:none;max-height:205px;padding:5px;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;border:1px solid #a0783a;border-radius:8px;background:linear-gradient(170deg,#281b0f,#090705);box-shadow:0 12px 30px rgba(0,0,0,.82),inset 0 0 0 1px rgba(255,222,151,.05);}
-#game-stage .v17363-game-select.open .v17363-game-select-menu{display:grid;gap:3px;}
-#game-stage .v17363-game-select-option{display:grid;grid-template-columns:auto minmax(0,1fr) 16px;align-items:center;gap:7px;width:100%;min-height:34px;padding:6px 8px;border:1px solid transparent;border-radius:6px;color:#d7c6a4;background:transparent;font-size:11px;font-weight:800;text-align:left;}
-#game-stage .v17363-game-select-option.selected{border-color:#9d7336;background:linear-gradient(90deg,rgba(180,126,39,.2),rgba(72,46,16,.15));color:#ffe09a;}
-#game-stage .v17363-game-select-option>b{color:#efbd55;text-align:center;}
-#game-stage .v17363-menu-rarity-dot{display:block;width:10px;height:10px;border:1px solid rgba(255,255,255,.35);border-radius:50%;background:#9d7136;box-shadow:0 0 5px rgba(255,255,255,.08);}
-#game-stage .v17363-menu-rarity-dot.white{background:#d8d8d8;}#game-stage .v17363-menu-rarity-dot.blue{background:#42a5ff;}#game-stage .v17363-menu-rarity-dot.purple{background:#b05cff;}#game-stage .v17363-menu-rarity-dot.orange{background:#ff9f38;}#game-stage .v17363-menu-rarity-dot.pink{background:#ff4fa7;}#game-stage .v17363-menu-rarity-dot.neutral{background:#b68a48;}
-#game-stage .v17363-material-flow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;margin:7px 0;padding:7px;border:1px solid rgba(116,87,49,.55);border-radius:9px;background:#090806;}
-#game-stage .v17363-material-flow section{display:grid;gap:2px;justify-items:center;min-width:0;text-align:center;color:#cab996;font-size:10px;}
-#game-stage .v17363-material-flow section>.v169-item-art,#game-stage .v17363-material-flow section>svg{width:70px!important;height:70px!important;max-width:70px!important;max-height:70px!important;margin:0 auto!important;}
-#game-stage .v17363-material-flow section>.v169-item-art img{width:100%!important;height:100%!important;object-fit:contain!important;}
-#game-stage .v17363-material-flow section b{max-width:100%;color:#f1d698;font-size:12px;line-height:1.25;overflow-wrap:anywhere;}
-#game-stage .v17363-material-flow section span{font-size:10px;line-height:1.25;}
-#game-stage .v17363-material-flow>i{color:#d3a34f;font-size:18px;font-style:normal;}
-#game-stage .v17363-material-card .v17363-craft-button{width:100%;min-height:39px;border:1px solid #b88740;border-radius:8px;color:#1c1207;background:linear-gradient(180deg,#efd17f,#bd7d2c);font-weight:900;}
-#game-stage .v17363-material-card .v17363-craft-button:disabled{filter:grayscale(.7);opacity:.45;}
+
 `;
     document.head.appendChild(style);
-}
-
-/* ---------- 9. Material synthesis helpers. ---------- */
-function oreByTier(tier){return defs().ores.find(item=>normalizeTier(item&&item.tierKey)===tier)||null;}
-function canAdd(definition,amount){return !window.v132CanAddItemToInventory||window.v132CanAddItemToInventory(definition,amount);}
-function add(definition,amount){return !!(definition&&window.v132AddItemToInventory&&window.v132AddItemToInventory(definition,amount));}
-
-/* ---------- 10. Material promotion: 50 same-tier -> 10 next-tier. ---------- */
-function nextTier(tier){const index=TIER_ORDER.indexOf(normalizeTier(tier));return index>=0&&index<TIER_ORDER.length-1?TIER_ORDER[index+1]:null;}
-function tierChoices(){
-    return TIER_ORDER.slice(0,-1).map(tier=>({value:tier,label:TIER_LABEL[tier]+" → "+TIER_LABEL[nextTier(tier)],tier}));
-}
-function materialGameSelect(key,label,choices,selected){
-    const normalized=(choices||[]).map(choice=>Array.isArray(choice)?{value:String(choice[0]),label:String(choice[1])}:{value:String(choice.value),label:String(choice.label),tier:choice.tier});
-    const current=normalized.find(choice=>choice.value===String(selected))||normalized[0]||{value:"",label:"未設定"};
-    const dot=current.tier?'<i class="v17363-menu-rarity-dot '+esc(current.tier)+'"></i>':'';
-    return '<div class="v17363-material-field"><span class="v17363-material-field-label">'+esc(label)+'</span><div class="v17363-game-select" data-material-key="'+esc(key)+'">'+
-        '<button class="v17363-game-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="v17363ToggleMaterialMenu(this)">'+dot+'<span>'+esc(current.label)+'</span><b aria-hidden="true">▾</b></button>'+
-        '<div class="v17363-game-select-menu" role="listbox">'+normalized.map(choice=>'<button class="v17363-game-select-option'+(choice.value===current.value?' selected':'')+'" type="button" role="option" aria-selected="'+(choice.value===current.value?'true':'false')+'" data-material-key="'+esc(key)+'" data-material-value="'+esc(choice.value)+'" onclick="v17363ChooseMaterialOption(this.dataset.materialKey,this.dataset.materialValue)">'+(choice.tier?'<i class="v17363-menu-rarity-dot '+esc(choice.tier)+'"></i>':'<i class="v17363-menu-rarity-dot neutral"></i>')+'<span>'+esc(choice.label)+'</span><b aria-hidden="true">'+(choice.value===current.value?'✓':'')+'</b></button>').join("")+'</div></div></div>';
-}
-function renderMaterialSynthesis(){
-    const body=document.querySelector("#homeFeatureModalBody .v141-synthesis-body");
-    if(!body){return;}
-    const oreSource=oreByTier(MATERIAL_STATE.oreTier),oreTarget=oreByTier(nextTier(MATERIAL_STATE.oreTier));
-    body.innerHTML='<div class="v17363-material-synthesis">'+
-        '<section class="v17363-material-card"><h4>礦石升階</h4><p>同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。</p><div class="v17363-material-controls single">'+materialGameSelect("oreTier","升階路線",tierChoices(),MATERIAL_STATE.oreTier)+'</div>'+materialFlow(oreSource,oreTarget)+
-        '<button class="v17363-craft-button" type="button" '+(!oreSource||ownedCount(oreSource.id)<50?'disabled':'')+' onclick="v17363CraftMaterial(&quot;ore&quot;)">合成下一階礦石 ×10</button></section>'+
-        '</div>';
-    repairSynthesisIcons();
-}
-function materialFlow(source,target){
-    const sourceCount=source?ownedCount(source.id):0;
-    return '<div class="v17363-material-flow"><section>'+(source&&source.icon||'')+'<b>'+esc(source&&source.name||"來源未建立")+'</b><span>'+sourceCount+' / 50</span></section><i>→</i><section>'+(target&&target.icon||'')+'<b>'+esc(target&&target.name||"已達最高階")+'</b><span>×10</span></section></div>';
-}
-window.v17363ToggleMaterialMenu=function(trigger){
-    const root=trigger&&trigger.closest&&trigger.closest(".v17363-game-select");if(!root){return;}
-    const opening=!root.classList.contains("open");
-    document.querySelectorAll(".v17363-game-select.open").forEach(item=>{item.classList.remove("open");const button=item.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
-    root.classList.toggle("open",opening);trigger.setAttribute("aria-expanded",opening?"true":"false");
-};
-window.v17363ChooseMaterialOption=function(key,value){
-    if(!Object.prototype.hasOwnProperty.call(MATERIAL_STATE,key)){return;}
-    MATERIAL_STATE[key]=String(value||"");renderMaterialSynthesis();
-};
-window.v17363SetMaterialOption=window.v17363ChooseMaterialOption;
-const functionalModalRoot=document.getElementById("homeFeatureModal");
-if(functionalModalRoot){functionalModalRoot.addEventListener("click",event=>{
-    functionalModalRoot.querySelectorAll(".v17363-game-select.open").forEach(root=>{if(root.contains(event.target)){return;}root.classList.remove("open");const button=root.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
-});}
-window.v17363CraftMaterial=function(kind){
-    if(kind!=="ore"){ return false; }
-    const tier=MATERIAL_STATE.oreTier;
-    const targetTier=nextTier(tier);
-    const source=oreByTier(tier);
-    const target=oreByTier(targetTier);
-    if(!source||!target||!targetTier){alert("此道具已達最高可合成階級。");return false;}
-    if(ownedCount(source.id)<50){alert("素材不足，需要「"+source.name+"」×50。");return false;}
-    if(!canAdd(target,10)){alert("背包空間不足，無法放入合成結果。");return false;}
-    const transaction=window.v132RunInventoryTransaction||function(operation){return !!operation();};
-    const success=transaction(()=>window.v132ConsumeStackItem&&window.v132ConsumeStackItem(source.id,50)&&add(target,10));
-    if(!success){alert("材料合成失敗，素材已自動還原。");return false;}
-    refreshInventory();
-    renderMaterialSynthesis();
-    if(typeof window.rpgAlert==="function"){void window.rpgAlert("消耗「"+source.name+"」×50\n獲得「"+target.name+"」×10",{title:"材料合成成功",confirmText:"知道了",tone:"success"});}
-    return true;
-};
-function ensureMaterialTab(){
-    if(document.getElementById("homeFeatureModal")?.dataset.craftingFeature==="forge"){ return; }
-    const tabs=document.querySelector("#homeFeatureModalBody .v141-synthesis-tabs");
-    if(!tabs){return;}
-    let button=tabs.querySelector('[data-v17363-material-tab="1"]');
-    if(!button){
-        button=document.createElement("button");button.type="button";button.dataset.v17363MaterialTab="1";button.textContent="材料合成";button.onclick=window.v17363OpenMaterialSynthesis;tabs.appendChild(button);
-    }
-    Array.from(tabs.querySelectorAll("button")).forEach(item=>item.classList.toggle("active",materialTabActive&&item===button||!materialTabActive&&item!==button&&item.classList.contains("active")));
-    if(materialTabActive){Array.from(tabs.querySelectorAll("button")).forEach(item=>item.classList.toggle("active",item===button));}
-}
-const originalRenderSynthesis=typeof window.v141RenderSynthesis==="function"?window.v141RenderSynthesis:null;
-const originalSwitchSynthesis=typeof window.v141SwitchSynthesisTab==="function"?window.v141SwitchSynthesisTab:null;
-window.v17363OpenMaterialSynthesis=function(){
-    materialTabActive=true;
-    if(originalRenderSynthesis){originalRenderSynthesis();}
-    ensureMaterialTab();renderMaterialSynthesis();maximizeSynthesisPanel();
-};
-if(originalRenderSynthesis){
-    window.v141RenderSynthesis=function(){
-        // Presentation data must be hydrated before V143 builds the first icon picker.
-        if(typeof window.v17346SyncFourElementSets==="function"){try{window.v17346SyncFourElementSets();}catch(_){}}
-        syncCanonicalItemArt();
-        const result=originalRenderSynthesis.apply(this,arguments);
-        ensureMaterialTab();if(materialTabActive){renderMaterialSynthesis();}
-        repairSynthesisIcons();maximizeSynthesisPanel();scheduleRepairs();return result;
-    };
-}
-if(originalSwitchSynthesis){
-    window.v141SwitchSynthesisTab=function(){
-        materialTabActive=false;const result=originalSwitchSynthesis.apply(this,arguments);ensureMaterialTab();scheduleRepairs();return result;
-    };
 }
 
 /* ---------- 4. Force current return artwork on patrol/dungeon navigation. ---------- */
@@ -8145,15 +7879,8 @@ function syncReturnIcons(){
 }
 
 function runRepairs(){
-    repairQueued=false;ensureFunctionalStyles();syncCanonicalItemArt();maximizeCharacterPanel();maximizeSynthesisPanel();repairSynthesisIcons();ensureMaterialTab();syncReturnIcons();
+    ensureFunctionalStyles();syncCanonicalItemArt();maximizeCharacterPanel();syncReturnIcons();
 }
-function scheduleRepairs(){
-    if(repairQueued){return;}repairQueued=true;
-    if(typeof requestAnimationFrame==="function"){requestAnimationFrame(runRepairs);}else{setTimeout(runRepairs,0);}
-}
-
-/* Production repairs are lifecycle-driven. Inventory/open/render owners call this
-   explicit hook; synthesis already calls scheduleRepairs from its own render lifecycle. */
 window.v17363SyncFunctionalFixes=runRepairs;
 ensureFunctionalStyles();runRepairs();
 })();

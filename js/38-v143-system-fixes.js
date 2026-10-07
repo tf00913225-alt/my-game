@@ -473,62 +473,6 @@
         window.v132ShowRewardModal('<div class="v132-reward-modal-inner"><h3>合成成功</h3><div class="v141-result-item">'+item.icon+'<b>'+escapeHtml(item.name)+'</b>'+stats+'</div><p>此為系統隨機生成的普通裝備，不屬於四大套裝。</p><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">確定</button></div></div>');
     }
 
-    function allEquipment(){
-        const result=[];
-        (inventoryItems||[]).forEach(item=>{ if(item&&item.v141Uid){ result.push(item); } });
-        Object.values(typeof characterEquipment!=="undefined"&&characterEquipment||{}).forEach(slots=>
-            Object.values(slots||{}).forEach(item=>{ if(item&&item.v141Uid){ result.push(item); } })
-        );
-        return result;
-    }
-    function iconForPickerValue(value){
-        const content=definitions();
-        const item=(inventoryItems||[]).find(candidate=>candidate&&(candidate.id===value||candidate.v141Uid===value))||
-            allEquipment().find(candidate=>candidate.v141Uid===value)||
-            (content.talismans||[]).find(candidate=>candidate.id===value);
-        if(item&&item.assetPath){
-            const rarity=escapeHtml(normalizeTierKey(item.rarityKey||item.quality||item.tierKey||"white"));
-            return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarity+'"><img src="'+escapeHtml(item.assetPath)+'" alt="" draggable="false" decoding="async"></span>';
-        }
-        return item&&item.icon?item.icon:svgIcon("物","#caa461");
-    }
-
-    function decorateSynthesis(){
-        const root=document.querySelector(".v141-synthesis");
-        if(!root){ return; }
-        root.classList.add("v143-synthesis");
-        root.querySelectorAll("label").forEach(label=>{
-            const select=label.querySelector("select");
-            if(!select||label.querySelector(".v143-item-picker")){ return; }
-            if(/系列/.test(label.textContent)&&!/選擇裝備/.test(label.textContent)){ label.hidden=true; return; }
-            const picker=document.createElement("div");
-            picker.className="v143-item-picker";
-            Array.from(select.options).forEach(option=>{
-                const button=document.createElement("button");
-                button.type="button";
-                button.className=option.value===select.value?"selected":"";
-                button.setAttribute("aria-label",option.textContent);
-                button.innerHTML='<i>'+iconForPickerValue(option.value)+'</i><span>'+escapeHtml(option.textContent)+'</span>';
-                button.onclick=()=>{
-                    select.value=option.value;
-                    select.dispatchEvent(new Event("change",{bubbles:true}));
-                };
-                picker.appendChild(button);
-            });
-            select.hidden=true;
-            select.insertAdjacentElement("afterend",picker);
-        });
-
-    }
-
-    if(typeof window.v141RenderSynthesis==="function"){
-        const previousRenderSynthesis=window.v141RenderSynthesis;
-        window.v141RenderSynthesis=function(){
-            const result=previousRenderSynthesis.apply(this,arguments);
-            decorateSynthesis();
-            return result;
-        };
-    }
 
     /* Shared lifecycle keeps the patched DOM healthy after page switches. */
     if(typeof showPage==="function"){
@@ -544,7 +488,6 @@
         fixDungeonNavigation();
         decorateEnemyCards();
         syncEarthShieldEffects();
-        decorateSynthesis();
     }
     if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",boot,{once:true}); }
     else{ setTimeout(boot,0); }

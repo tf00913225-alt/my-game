@@ -9654,7 +9654,7 @@
 
     function renderSynthesisTabs(){
         const tabs=[
-            ["talisman","符咒合成"],["fragment","碎片合成"]
+            ["talisman","符咒合成"],["fragment","碎片合成"],["material","材料合成"]
         ];
         return '<div class="v141-synthesis-tabs">'+tabs.map(([id,label])=>
             '<button type="button" class="'+(synthesisState.tab===id?'active':'')+'" onclick="v141SwitchSynthesisTab(\''+id+'\')">'+label+'</button>'
@@ -9723,6 +9723,31 @@
         const nextTier=TALISMAN_TIER_ORDER[TALISMAN_TIER_ORDER.indexOf(sourceTier)+1];
         return definitions().talismans.find(item=>item.talismanEffect===source.talismanEffect&&normalizeTierKey(item.tierKey)===nextTier)||null;
     }
+    function allEquipment(){
+        const result=[];
+        (inventoryItems||[]).forEach(item=>{ if(item&&item.v141Uid){ result.push(item); } });
+        Object.values(typeof characterEquipment!=="undefined"&&characterEquipment||{}).forEach(slots=>
+            Object.values(slots||{}).forEach(item=>{ if(item&&item.v141Uid){ result.push(item); } })
+        );
+        return result;
+    }
+    function iconForPickerValue(value){
+        const content=definitions();
+        const canonical=[content.talismans,content.ores,content.blueprints,content.tickets,content.equipmentSetItems].filter(Array.isArray).flat().find(item=>item&&item.id===value);
+        const item=canonical||(inventoryItems||[]).find(candidate=>candidate&&(candidate.id===value||candidate.v141Uid===value))||allEquipment().find(candidate=>candidate.v141Uid===value);
+        if(item&&item.assetPath){
+            const rarity=escapeHtml(normalizeTierKey(item.rarityKey||item.quality||item.tierKey||"white"));
+            return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarity+'"><img src="'+escapeHtml(item.assetPath)+'" alt="" draggable="false" decoding="async"></span>';
+        }
+        return item&&item.icon?item.icon:svgIcon("物","#caa461");
+    }
+
+    function renderItemPicker(label,entries,selected,handler){
+        return '<div class="v141-picker-field"><span>'+escapeHtml(label)+'</span><div class="v143-item-picker" role="group" aria-label="'+escapeHtml(label)+'">'+entries.map(entry=>
+            '<button type="button" class="'+(entry.value===selected?'selected':'')+'" aria-pressed="'+(entry.value===selected)+'" aria-label="'+escapeHtml(entry.label)+'" title="'+escapeHtml(entry.label)+'" data-picker-value="'+escapeHtml(entry.value)+'" onclick="'+handler+'(this.dataset.pickerValue)"><i>'+iconForPickerValue(entry.value)+'</i></button>'
+        ).join('')+'</div></div>';
+    }
+
     function renderTalismanTab(){
         const list=availableTalismans();
         if(!list.length){ return '<div class="v141-synthesis-empty">沒有可升階的白／藍／紫階符咒。</div>'; }
@@ -9735,9 +9760,7 @@
         const qty=synthesisState.talismanQty;
         const can=max>=qty&&target;
         return '<div class="v141-synthesis-card v141-talisman-craft">'+
-            '<label>選擇符咒<select onchange="v141SelectTalisman(this.value)">'+list.map(item=>
-                '<option value="'+item.id+'" '+(item.id===source.id?'selected':'')+'>'+escapeHtml(item.name)+'（'+countItem(item.id)+'）</option>'
-            ).join("")+'</select></label>'+
+            renderItemPicker('選擇符咒',list.map(item=>({value:item.id,label:item.name+'（'+countItem(item.id)+'）'})),source.id,'v141SelectTalisman')+
             '<div class="v141-upgrade-flow"><section class="v141-talisman-source" aria-label="合成材料">'+source.icon+'<b>'+escapeHtml(source.name)+' ×'+(qty*3)+'</b></section><i aria-hidden="true">→</i><section class="v141-talisman-target" aria-label="合成目標">'+target.icon+'<b>'+escapeHtml(target.name)+' ×'+qty+'</b></section></div>'+
             '<div class="v141-quantity"><button onclick="v141AdjustTalismanQty(-1)">－</button><strong>'+qty+'</strong><button onclick="v141AdjustTalismanQty(1)">＋</button><button onclick="v141AdjustTalismanQty(\'max\')">MAX</button></div>'+
             '<div class="v141-material-lines"><span>持有 '+owned+'</span><span>消耗 '+(qty*3)+'</span><span>金幣 '+(TALISMAN_GOLD[normalizeTierKey(source.tierKey)]*qty).toLocaleString('zh-TW')+'</span></div>'+
@@ -9758,11 +9781,86 @@
         }).join('')+'</div>';
     }
 
+    const MATERIAL_STATE={oreTier:"white"};
+    const MATERIAL_TIER_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
+    function materialOwnedCount(id){
+        return inventoryItems.reduce((sum,item)=>sum+(item&&item.id===id?Math.max(1,Math.floor(Number(item.count)||1)):0),0);
+    }
+    function refreshMaterialInventory(){
+        if(typeof window.v17361SyncItemArt==="function"){try{window.v17361SyncItemArt();}catch(_){}}
+        if(typeof rebuildInventorySlots==="function"){try{rebuildInventorySlots();}catch(_){}}
+        if(typeof renderInventoryItems==="function"){try{renderInventoryItems();}catch(_){}}
+        else if(typeof renderInventory==="function"){try{renderInventory();}catch(_){}}
+        if(typeof updateGoldDisplay==="function"){try{updateGoldDisplay();}catch(_){}}
+        if(typeof saveGame==="function"){try{saveGame();}catch(_){}}
+    }
+
+    /* ---------- 9. Material synthesis helpers. ---------- */
+    function oreByTier(tier){return definitions().ores.find(item=>normalizeTierKey(item&&item.tierKey)===tier)||null;}
+    function canAdd(definition,amount){return !window.v132CanAddItemToInventory||window.v132CanAddItemToInventory(definition,amount);}
+
+    /* ---------- 10. Material promotion: 50 same-tier -> 10 next-tier. ---------- */
+    function nextTier(tier){const index=TIER_ORDER.indexOf(normalizeTierKey(tier));return index>=0&&index<TIER_ORDER.length-1?TIER_ORDER[index+1]:null;}
+    function tierChoices(){
+        return TIER_ORDER.slice(0,-1).map(tier=>({value:tier,label:MATERIAL_TIER_LABEL[tier]+" → "+MATERIAL_TIER_LABEL[nextTier(tier)],tier}));
+    }
+    function materialGameSelect(key,label,choices,selected){
+        const normalized=(choices||[]).map(choice=>Array.isArray(choice)?{value:String(choice[0]),label:String(choice[1])}:{value:String(choice.value),label:String(choice.label),tier:choice.tier});
+        const current=normalized.find(choice=>choice.value===String(selected))||normalized[0]||{value:"",label:"未設定"};
+        const dot=current.tier?'<i class="v17363-menu-rarity-dot '+escapeHtml(current.tier)+'"></i>':'';
+        return '<div class="v17363-material-field"><span class="v17363-material-field-label">'+escapeHtml(label)+'</span><div class="v17363-game-select" data-material-key="'+escapeHtml(key)+'">'+
+            '<button class="v17363-game-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="v17363ToggleMaterialMenu(this)">'+dot+'<span>'+escapeHtml(current.label)+'</span><b aria-hidden="true">▾</b></button>'+
+            '<div class="v17363-game-select-menu" role="listbox">'+normalized.map(choice=>'<button class="v17363-game-select-option'+(choice.value===current.value?' selected':'')+'" type="button" role="option" aria-selected="'+(choice.value===current.value?'true':'false')+'" data-material-key="'+escapeHtml(key)+'" data-material-value="'+escapeHtml(choice.value)+'" onclick="v17363ChooseMaterialOption(this.dataset.materialKey,this.dataset.materialValue)">'+(choice.tier?'<i class="v17363-menu-rarity-dot '+escapeHtml(choice.tier)+'"></i>':'<i class="v17363-menu-rarity-dot neutral"></i>')+'<span>'+escapeHtml(choice.label)+'</span><b aria-hidden="true">'+(choice.value===current.value?'✓':'')+'</b></button>').join("")+'</div></div></div>';
+    }
+    function renderMaterialSynthesis(){
+        const oreSource=oreByTier(MATERIAL_STATE.oreTier),oreTarget=oreByTier(nextTier(MATERIAL_STATE.oreTier));
+        return '<div class="v17363-material-synthesis">'+
+            '<section class="v17363-material-card"><h4>礦石升階</h4><p>同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。</p><div class="v17363-material-controls single">'+materialGameSelect("oreTier","升階路線",tierChoices(),MATERIAL_STATE.oreTier)+'</div>'+materialFlow(oreSource,oreTarget)+
+            '<button class="v17363-craft-button" type="button" '+(!oreSource||materialOwnedCount(oreSource.id)<50?'disabled':'')+' onclick="v17363CraftMaterial(&quot;ore&quot;)">合成下一階礦石 ×10</button></section></div>';
+    }
+    function materialFlow(source,target){
+        const sourceCount=source?materialOwnedCount(source.id):0;
+        return '<div class="v17363-material-flow"><section>'+(source&&source.icon||'')+'<b>'+escapeHtml(source&&source.name||"來源未建立")+'</b><span>'+sourceCount+' / 50</span></section><i>→</i><section>'+(target&&target.icon||'')+'<b>'+escapeHtml(target&&target.name||"已達最高階")+'</b><span>×10</span></section></div>';
+    }
+    window.v17363ToggleMaterialMenu=function(trigger){
+        const root=trigger&&trigger.closest&&trigger.closest(".v17363-game-select");if(!root){return;}
+        const opening=!root.classList.contains("open");
+        document.querySelectorAll(".v17363-game-select.open").forEach(item=>{item.classList.remove("open");const button=item.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
+        root.classList.toggle("open",opening);trigger.setAttribute("aria-expanded",opening?"true":"false");
+    };
+    window.v17363ChooseMaterialOption=function(key,value){
+        if(!Object.prototype.hasOwnProperty.call(MATERIAL_STATE,key)){return;}
+        MATERIAL_STATE[key]=String(value||"");renderSynthesis();
+    };
+    window.v17363SetMaterialOption=window.v17363ChooseMaterialOption;
+    const functionalModalRoot=document.getElementById("homeFeatureModal");
+    if(functionalModalRoot){functionalModalRoot.addEventListener("click",event=>{
+        functionalModalRoot.querySelectorAll(".v17363-game-select.open").forEach(root=>{if(root.contains(event.target)){return;}root.classList.remove("open");const button=root.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
+    });}
+    window.v17363CraftMaterial=function(kind){
+        if(kind!=="ore"){return false;}
+        const tier=MATERIAL_STATE.oreTier;
+        const targetTier=nextTier(tier);
+        const source=oreByTier(tier);
+        const target=oreByTier(targetTier);
+        if(!source||!target||!targetTier){alert("此道具已達最高可合成階級。");return false;}
+        if(materialOwnedCount(source.id)<50){alert("素材不足，需要「"+source.name+"」×50。");return false;}
+        if(!canAdd(target,10)){alert("背包空間不足，無法放入合成結果。");return false;}
+        const transaction=window.v132RunInventoryTransaction||function(operation){return !!operation();};
+        const success=transaction(()=>window.v132ConsumeStackItem&&window.v132ConsumeStackItem(source.id,50)&&addItem(target,10));
+        if(!success){alert("材料合成失敗，素材已自動還原。");return false;}
+        refreshMaterialInventory();
+        renderSynthesis();
+        if(typeof window.rpgAlert==="function"){void window.rpgAlert("消耗「"+source.name+"」×50\n獲得「"+target.name+"」×10",{title:"材料合成成功",confirmText:"知道了",tone:"success"});}
+        return true;
+    };
+
     function renderSynthesis(){
         const body=document.getElementById("homeFeatureModalBody");
         if(!body){ return; }
+        if(typeof window.v17346SyncFourElementSets==="function"){ window.v17346SyncFourElementSets(); }
         const forge=activeFeature==="forge";
-        const renderers=forge?{reforge:renderReforgeTab,socket:renderSocketTab}:{talisman:renderTalismanTab,fragment:renderFragmentTab};
+        const renderers=forge?{reforge:renderReforgeTab,socket:renderSocketTab}:{talisman:renderTalismanTab,fragment:renderFragmentTab,material:renderMaterialSynthesis};
         const tab=forge?synthesisState.forgeTab:synthesisState.tab;
         const content=renderers[tab]();
         const tabs=forge?'<div class="v141-synthesis-tabs v141-forge-tabs"><button type="button" class="'+(tab==="reforge"?'active':'')+'" onclick="v141SwitchForgeTab(\'reforge\')">冶煉</button><button type="button" class="'+(tab==="socket"?'active':'')+'" onclick="v141SwitchForgeTab(\'socket\')">鑲嵌</button></div>':renderSynthesisTabs();
@@ -9803,7 +9901,7 @@
         return true;
     };
     window.v141SwitchSynthesisTab=function(tab){
-        synthesisState.tab=["talisman","fragment"].includes(tab)?tab:"talisman";
+        synthesisState.tab=["talisman","fragment","material"].includes(tab)?tab:"talisman";
         synthesisState.pendingReforge=null;
         renderSynthesis();
     };
@@ -9976,12 +10074,7 @@
             if(title){ title.textContent=type==="forge"?"鍛造":"合成"; }
             if(modal){ modal.dataset.craftingFeature=type; modal.classList.add("show","v141-synthesis-modal"); window.FourSymbolsBottomNav?.syncContext(); }
             ensureEquipmentUids();
-            // Route the very first open through the current public renderer.
-            // Calling the closure directly bypasses later presentation owners
-            // and is why equipment/talisman art only appears after a click.
-            if(type==="forge"){ renderSynthesis(); }
-            else if(typeof window.v141RenderSynthesis==="function"){ window.v141RenderSynthesis(); }
-            else{ renderSynthesis(); }
+            renderSynthesis();
         };
     }
     if(typeof closeHomeFeature==="function"){
@@ -11534,62 +11627,6 @@
         window.v132ShowRewardModal('<div class="v132-reward-modal-inner"><h3>合成成功</h3><div class="v141-result-item">'+item.icon+'<b>'+escapeHtml(item.name)+'</b>'+stats+'</div><p>此為系統隨機生成的普通裝備，不屬於四大套裝。</p><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">確定</button></div></div>');
     }
 
-    function allEquipment(){
-        const result=[];
-        (inventoryItems||[]).forEach(item=>{ if(item&&item.v141Uid){ result.push(item); } });
-        Object.values(typeof characterEquipment!=="undefined"&&characterEquipment||{}).forEach(slots=>
-            Object.values(slots||{}).forEach(item=>{ if(item&&item.v141Uid){ result.push(item); } })
-        );
-        return result;
-    }
-    function iconForPickerValue(value){
-        const content=definitions();
-        const item=(inventoryItems||[]).find(candidate=>candidate&&(candidate.id===value||candidate.v141Uid===value))||
-            allEquipment().find(candidate=>candidate.v141Uid===value)||
-            (content.talismans||[]).find(candidate=>candidate.id===value);
-        if(item&&item.assetPath){
-            const rarity=escapeHtml(normalizeTierKey(item.rarityKey||item.quality||item.tierKey||"white"));
-            return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarity+'"><img src="'+escapeHtml(item.assetPath)+'" alt="" draggable="false" decoding="async"></span>';
-        }
-        return item&&item.icon?item.icon:svgIcon("物","#caa461");
-    }
-
-    function decorateSynthesis(){
-        const root=document.querySelector(".v141-synthesis");
-        if(!root){ return; }
-        root.classList.add("v143-synthesis");
-        root.querySelectorAll("label").forEach(label=>{
-            const select=label.querySelector("select");
-            if(!select||label.querySelector(".v143-item-picker")){ return; }
-            if(/系列/.test(label.textContent)&&!/選擇裝備/.test(label.textContent)){ label.hidden=true; return; }
-            const picker=document.createElement("div");
-            picker.className="v143-item-picker";
-            Array.from(select.options).forEach(option=>{
-                const button=document.createElement("button");
-                button.type="button";
-                button.className=option.value===select.value?"selected":"";
-                button.setAttribute("aria-label",option.textContent);
-                button.innerHTML='<i>'+iconForPickerValue(option.value)+'</i><span>'+escapeHtml(option.textContent)+'</span>';
-                button.onclick=()=>{
-                    select.value=option.value;
-                    select.dispatchEvent(new Event("change",{bubbles:true}));
-                };
-                picker.appendChild(button);
-            });
-            select.hidden=true;
-            select.insertAdjacentElement("afterend",picker);
-        });
-
-    }
-
-    if(typeof window.v141RenderSynthesis==="function"){
-        const previousRenderSynthesis=window.v141RenderSynthesis;
-        window.v141RenderSynthesis=function(){
-            const result=previousRenderSynthesis.apply(this,arguments);
-            decorateSynthesis();
-            return result;
-        };
-    }
 
     /* Shared lifecycle keeps the patched DOM healthy after page switches. */
     if(typeof showPage==="function"){
@@ -11605,7 +11642,6 @@
         fixDungeonNavigation();
         decorateEnemyCards();
         syncEarthShieldEffects();
-        decorateSynthesis();
     }
     if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",boot,{once:true}); }
     else{ setTimeout(boot,0); }

@@ -164,12 +164,13 @@ test("V143 delegates dungeon destinations to the final owner",()=>{
     assert.match(fs.readFileSync("css/06-stage-v11-native-bottom-nav.css","utf8"),/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
 });
 
-test("synthesis keeps icon-first material pickers while blueprint crafting is retired",()=>{
-    assert.match(system,/className="v143-item-picker"/);
-    assert.match(system,/iconForPickerValue/);
+test("synthesis keeps canonical icon-first material pickers while blueprint crafting is retired",()=>{
+    const synthesis=fs.readFileSync("js/36-v141-content-systems.js","utf8");
+    assert.match(synthesis,/class="v143-item-picker"/);
+    assert.match(synthesis,/iconForPickerValue/);
     assert.doesNotMatch(system,/window\.v141CraftEquipment=/);
     assert.doesNotMatch(system,/ConsumeStackItem\(blueprint/);
-    assert.match(css,/\.v143-item-picker i,[\s\S]*width:48px;height:48px/);
+    assert.match(fs.readFileSync("css/38-v141-system-expansion.css","utf8"),/\.v143-item-picker i,[\s\S]*width:48px;height:48px/);
 });
 
 test("earth shield is raster-owned while ally targeting and Barrier rules remain intact",()=>{
