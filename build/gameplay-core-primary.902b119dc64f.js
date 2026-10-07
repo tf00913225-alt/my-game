@@ -484,11 +484,12 @@
         return allyFormationState;
     }
 
-    function getSerializableAllyFormation(){
+    function getSerializableAllyFormation(characterIndexes){
         if(!allyFormationState){ return null; }
         return {
             version:1,
-            characterIndexToSlot:Object.assign({},allyFormationState.characterIndexToSlot)
+            characterIndexToSlot:Object.fromEntries(Object.entries(allyFormationState.characterIndexToSlot)
+                .filter(([index])=>!Array.isArray(characterIndexes)||characterIndexes.includes(Number(index))))
         };
     }
 
@@ -3977,6 +3978,7 @@
         monsters=monsterList;
         currentZone="dungeon";
 
+        initializeHeroBattleCombatants();
         battleActive=true;
         battleToken++;
         battleRoundBoundaryKeys=new Set();
