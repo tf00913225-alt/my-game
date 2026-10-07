@@ -106,7 +106,7 @@ assert.match(homePolish,/skill-loadout-slot/);
 assert.match(homePolish,/已學習但尚未裝備/);
 assert.doesNotMatch(homePolish,/normalizeOrdinaryBlueprintItem|v146OrdinaryBlueprint/);
 assert.match(homePolish,/delete item\.setId/);
-assert.match(fs.readFileSync("js/36-v141-content-systems.js","utf8"),/隨機普通裝備/);
+assert.doesNotMatch(abyss,/v141CraftEquipment|v141GetSelectedCraftBlueprint|設計圖升階/);
 
 /* Red dots use the shared coordinate-aware contract and taps never flash blue. */
 assert.match(homeCss,/#game-stage \*/);
