@@ -269,6 +269,7 @@ module.exports={
     CLOUD_SAVE_SCHEMA_VERSION,
     CloudSavePolicyError,
     MAX_CANDIDATE_BYTES,
+    validateJsonValue,
     normalizeClientVersion,
     validateLegacySaveCandidate,
     validateMigrationBackup
