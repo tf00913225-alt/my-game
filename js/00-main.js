@@ -21137,7 +21137,7 @@ function autoActionForCharacter(characterIndex,token){
     const aliveInBattle=currentBattleMonsters.filter(index=>isBattleTargetAlive("monster",index));
     if(aliveInBattle.length===0){ checkBattleEnd(); return; }
 
-    const heroProjection=getHeroBattleSkillProjection(character);
+    const heroProjection=character.combatantKind==="heroNpc"?getHeroBattleSkillProjection(character):null;
     let action=heroProjection?(character.rage>=4?heroProjection.skillId:"normal"):(config.skill||"normal");
     let skill=action!=="normal"?skillDatabase[action]:null;
     const skillKey=getPartyCharacterKey(characterIndex);

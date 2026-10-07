@@ -209,6 +209,7 @@ test("enemy Myriad Earth Shield reflects only actual HP loss",()=>{
         activeBuffs:[{type:"earthShield",statusName:"萬象土盾",turnsLeft:3,percent:50}],statusEffects:[]};
     const context=load({
         player,monsters:[target],currentBattleMonsters:[0],
+        getPartyCharacterIndex:actor=>actor===player?0:-1,
         showMonsterHit(){},showPlayerHit(){},addBattleLog(){},
         normalAttack(){ target.hp=Math.max(0,target.hp-100); this.showMonsterHit(0,100,"hp"); }
     });
