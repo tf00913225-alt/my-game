@@ -22,7 +22,7 @@
   if(id==="materialChest")add({sourceType:"dungeon",sourceId:"material",mode:"材料副本",location:"主城 → 副本 → 每日副本 → 材料副本",quantityRange:[1,3],repeatable:true,chance:1,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；總回合少於15給3箱、15～29給2箱、30以上給1箱；每日1次；可選廣告雙倍"});
   if(id==="equipmentChest")add({sourceType:"dungeon",sourceId:"equipment",mode:"裝備副本",location:"主城 → 副本 → 每日副本 → 裝備副本",quantity:2,chance:1,repeatable:true,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；每日1次；可選廣告雙倍×4"});
   const series=data.series.find(row=>'fragment'+row.setId.charAt(0).toUpperCase()+row.setId.slice(1)===id);
-  if(series)add({sourceType:"dismantle",sourceId:series.setId,mode:"裝備分解",location:"背包 → "+series.label+"系列裝備 → 分解",quantity:data.seriesDismantleQuantity,chance:1,repeatable:true,notes:"消耗1件對應系列裝備；裝備抽獎券來源可由同系列裝備詳情追溯"});
+  if(series)add({sourceType:"dismantle",sourceId:series.setId,materialItemId:series.setId,mode:"裝備分解",location:"背包 → "+series.label+"系列裝備 → 分解",quantity:data.seriesDismantleQuantity,chance:1,repeatable:true,notes:"消耗1件對應系列裝備；裝備抽獎券來源可由同系列裝備詳情追溯"});
   if(data.equipmentDungeonFragments.setIds.some(setId=>'fragment'+setId.charAt(0).toUpperCase()+setId.slice(1)===id))add({sourceType:"dungeon",sourceId:"equipment",mode:"裝備副本",location:"主城 → 副本 → 每日副本 → 裝備副本",quantity:data.equipmentDungeonFragments.count,chance:1/data.equipmentDungeonFragments.setIds.length,repeatable:true,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；四系列隨機一種；暫定分布；廣告雙倍數量"});
   if(/^ticketSet(Fire|Water|Earth|Wind)$/.test(id)){
    for(const difficulty of Object.values(data.abyssDifficulties)){
@@ -77,7 +77,7 @@
    if(rarity)add({sourceType:"chest",sourceId:"equipmentChest",chestId:"equipmentChest",chestName:"裝備寶箱",mode:"裝備寶箱",quantity:1,chance:null,notes:"每箱3件隨機裝備；每件"+rarity.label+"機率"+rarity.chance+"%；職業、部位、屬性與數值隨機；此成品無固定命中率",repeatable:true});
    add({sourceType:"shop",sourceId:"equipment-shop",mode:"商店",location:"主城 → 商店 → 裝備",quantity:1,chance:null,repeatable:true,notes:"每日隨機商品；此成品無固定出現機率"});
   }
-  if(/^set(Fire|Water|Earth|Wind)_/.test(id))add({sourceType:"chest",sourceId:"ticketSet"+id.slice(3).split('_')[0],chestId:"ticketSet"+id.slice(3).split('_')[0],chestName:"對應系列裝備抽獎券",mode:"系列裝備抽獎券",quantity:1,chance:.1,repeatable:true});
+  if(/^set(Fire|Water|Earth|Wind)(?:_|$)/.test(id))add({sourceType:"chest",sourceId:"ticketSet"+id.slice(3).split('_')[0],chestId:"ticketSet"+id.slice(3).split('_')[0],chestName:"對應系列裝備抽獎券",mode:"系列裝備抽獎券",quantity:1,chance:id.includes('_')?.1:1,repeatable:true});
   return rows;
  }
  function formatSource(row){

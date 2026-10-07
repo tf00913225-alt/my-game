@@ -82,6 +82,7 @@ test('elite roll, Boss stages, synthesis and indirect source numbers agree with 
  assert.deepEqual(Array.from(stages[0].quantityRange),Array.from(data.difficulties.hard.essence));
  assert.ok(owner.getSources('oreLow').some(row=>row.bossId==='personal-20'&&row.quantity===1&&row.repeatable));
  assert.equal(owner.trace('freezeTalismanPerfect')[0].parents[0].source.mode,'符咒合成');
+ const dismantle=owner.trace('fragmentSetFire').find(row=>row.source.sourceType==='dismantle');assert.equal(dismantle.parents[0].source.chestId,'ticketSetFire');assert.ok(dismantle.parents[0].parents.some(row=>row.source.sourceType==='abyss'));
  const gear={id:'gear-qa',name:'普通裝備',type:'armor',rarityKey:'orange',v17346GeneratedEquipment:true};
  assert.equal(owner.getSources(gear).length,2);assert.equal(owner.trace(gear)[0].parents[0].source.sourceId,'equipment');
 });
