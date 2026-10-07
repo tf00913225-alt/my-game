@@ -84,7 +84,7 @@ test('elite roll, Boss stages, synthesis and indirect source numbers agree with 
  assert.equal(owner.trace('freezeTalismanPerfect')[0].parents[0].source.mode,'符咒合成');
  const dismantle=owner.trace('fragmentSetFire').find(row=>row.source.sourceType==='dismantle');assert.equal(dismantle.parents[0].source.chestId,'ticketSetFire');assert.ok(dismantle.parents[0].parents.some(row=>row.source.sourceType==='abyss'));
  const gear={id:'gear-qa',name:'普通裝備',type:'armor',rarityKey:'orange',v17346GeneratedEquipment:true};
- assert.equal(owner.getSources(gear).length,2);assert.equal(owner.trace(gear)[0].parents[0].source.sourceId,'equipment');
+ assert.equal(owner.getSources(gear).length,2);assert.ok(owner.getSources(gear).find(row=>row.sourceId==='equipment-shop').notes.includes(data.equipmentShop.find(row=>row.key==='orange').chance+'%'));assert.equal(owner.trace(gear)[0].parents[0].source.sourceId,'equipment');
 });
 
 test('revival manual declaration targets exact zero HP through the canonical ally validator',()=>{

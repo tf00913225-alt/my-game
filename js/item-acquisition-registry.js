@@ -75,7 +75,8 @@
   if(item.v17346GeneratedEquipment){
    const rarity=data.equipmentChest.find(row=>row.key===(item.rarityKey||item.quality));
    if(rarity)add({sourceType:"chest",sourceId:"equipmentChest",chestId:"equipmentChest",chestName:"裝備寶箱",mode:"裝備寶箱",quantity:1,chance:null,notes:"每箱3件隨機裝備；每件"+rarity.label+"機率"+rarity.chance+"%；職業、部位、屬性與數值隨機；此成品無固定命中率",repeatable:true});
-   add({sourceType:"shop",sourceId:"equipment-shop",mode:"商店",location:"主城 → 商店 → 裝備",quantity:1,chance:null,repeatable:true,notes:"每日隨機商品；此成品無固定出現機率"});
+   const shopRarity=data.equipmentShop.find(row=>row.key===(item.rarityKey||item.quality));
+   add({sourceType:"shop",sourceId:"equipment-shop",mode:"商店",location:"主城 → 商店 → 裝備",quantity:1,chance:null,repeatable:true,notes:"每日隨機商品；"+(shopRarity?"每件"+shopRarity.label+"機率"+shopRarity.chance+"%；":"")+"職業、部位、屬性與數值隨機；此成品無固定出現機率"});
   }
   if(/^set(Fire|Water|Earth|Wind)(?:_|$)/.test(id))add({sourceType:"chest",sourceId:"ticketSet"+id.slice(3).split('_')[0],chestId:"ticketSet"+id.slice(3).split('_')[0],chestName:"對應系列裝備抽獎券",mode:"系列裝備抽獎券",quantity:1,chance:id.includes('_')?.1:1,repeatable:true});
   return rows;

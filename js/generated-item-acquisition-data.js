@@ -37,6 +37,28 @@ window.FourSymbolsItemAcquisitionData={
     "count": 10,
     "provisional": true
   },
+  "equipmentShop": [
+    {
+      "key": "white",
+      "label": "白階",
+      "chance": 70
+    },
+    {
+      "key": "blue",
+      "label": "藍階",
+      "chance": 15
+    },
+    {
+      "key": "purple",
+      "label": "紫階",
+      "chance": 10
+    },
+    {
+      "key": "orange",
+      "label": "橙階",
+      "chance": 5
+    }
+  ],
   "equipmentChest": [
     {
       "key": "white",
@@ -51,12 +73,12 @@ window.FourSymbolsItemAcquisitionData={
     {
       "key": "purple",
       "label": "紫階",
-      "chance": 10
+      "chance": 15
     },
     {
       "key": "orange",
       "label": "橙階",
-      "chance": 10
+      "chance": 5
     }
   ],
   "materialChest": [

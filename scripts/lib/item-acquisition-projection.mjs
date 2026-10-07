@@ -21,6 +21,7 @@ export function buildItemAcquisitionProjection(root){
  return {
   series:data('js/36-v141-content-systems.js','SERIES'),seriesDismantleQuantity:data('js/36-v141-content-systems.js','SERIES_DISMANTLE_FRAGMENT_COUNT'),
   equipmentDungeonFragments:data('js/equipment-progression.js','EQUIPMENT_DUNGEON_FRAGMENT_REWARD'),
+  equipmentShop:data('js/equipment-progression.js','EQUIPMENT_SHOP_DROP_TABLE'),
   equipmentChest:data('js/equipment-progression.js','EQUIPMENT_CHEST_DROP_TABLE'),
   materialChest:data('js/27-v132-content-expansion.js','MATERIAL_CHEST_DROP_TABLE'),
   eliteDrops:data('js/34-v141-core-systems.js','ELITE_DROP_TABLE'),
