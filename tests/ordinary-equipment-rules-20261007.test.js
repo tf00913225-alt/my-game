@@ -21,6 +21,9 @@ test('independent shop and chest tables total 100 and deterministic boundaries e
   const items=c.v17346RollEquipmentChestItems(()=>roll);
   assert.equal(items.length,3);assert.ok(items.every(x=>x.rarityKey===key));
  }
+ const samples=[0,...Array(6).fill(0),.4,...Array(6).fill(0),.95,...Array(5).fill(0)];
+ assert.deepEqual(plain(c.v17346RollEquipmentChestItems(()=>samples.shift())).map(x=>x.rarityKey),['white','blue','orange']);
+ assert.equal(samples.length,0,'each piece consumes its own rarity roll');
 });
 test('ordinary rolls use new inclusive ranges, one stat, and explicit rarity art pools',()=>{
  const c=fixture();
