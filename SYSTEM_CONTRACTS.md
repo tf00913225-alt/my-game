@@ -244,3 +244,5 @@
 - Wind：最終 Evasion +15 個百分點（不另設上限）；Agility／Speed ×1.15，只影響速度，不增加 Evasion 或 Accuracy。
 - Earth：Defense ×1.15、Max HP ×1.15、建立時 hp=maxHP，Profile 同場冪等，不在 render/reload/round 疊加。
 - Profile 僅套 Tower metadata；其他玩法的敵人数量、技能頻率與戰鬥數值保持既有規則。入口顯示當週元素特性、樓層施放率與每層固定 10 名敵人。
+
+本批已核准暫定獎勵：四象塔每週每10層首次通關體質寶石×1，沿用既有每週樓層領取記錄；裝備副本每次通關等機率抽取赤炎／寒泉／岩岳／青嵐碎片一種×10（各25%），與寶箱一起領取及廣告雙倍。數量與分布集中於各玩法正式 Reward Owner。

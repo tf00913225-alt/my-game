@@ -67,6 +67,7 @@
         name:series.label+"碎片",type:"material",setId:series.setId,tierKey:"fragment",
         icon:svgIcon("碎",series.color),price:0,stats:{}
     }));
+    window.v141GetSeriesFragmentDefinition=setId=>getFragmentDefinition(setId);
     function getFragmentDefinition(setId){ return fragmentDefinitions.find(item=>item.setId===setId)||null; }
 
     function countItem(itemId){

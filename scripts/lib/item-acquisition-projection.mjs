@@ -19,6 +19,7 @@ export function buildItemAcquisitionProjection(root){
  const towerOwner=read(relic).match(/    function towerEssenceForFloor\(floor\)\{[\s\S]*?\n    \}/)[0];
  const towerEssence=vm.runInNewContext('('+towerOwner.trim()+')',{RELIC_TOWER_REWARD_CONFIG:tower,integer:value=>Math.max(0,Math.floor(Number(value)||0))});
  return {
+  equipmentDungeonFragments:data('js/equipment-progression.js','EQUIPMENT_DUNGEON_FRAGMENT_REWARD'),
   equipmentChest:data('js/equipment-progression.js','EQUIPMENT_CHEST_DROP_TABLE'),
   materialChest:data('js/27-v132-content-expansion.js','MATERIAL_CHEST_DROP_TABLE'),
   eliteDrops:data('js/34-v141-core-systems.js','ELITE_DROP_TABLE'),

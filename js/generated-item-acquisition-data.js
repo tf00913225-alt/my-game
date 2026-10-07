@@ -1,5 +1,15 @@
 // GENERATED projection of canonical Reward Owners. DO NOT EDIT.
 window.FourSymbolsItemAcquisitionData={
+  "equipmentDungeonFragments": {
+    "setIds": [
+      "setFire",
+      "setWater",
+      "setEarth",
+      "setWind"
+    ],
+    "count": 10,
+    "provisional": true
+  },
   "equipmentChest": [
     {
       "key": "white",
@@ -1070,6 +1080,12 @@ window.FourSymbolsItemAcquisitionData={
     },
     "breakthrough": {
       "everyTen": 1
+    },
+    "gem": {
+      "itemId": "gemVitalityI",
+      "every": 10,
+      "count": 1,
+      "provisional": true
     },
     "majorMilestones": {
       "25": {

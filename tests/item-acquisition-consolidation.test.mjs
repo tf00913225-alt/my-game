@@ -109,3 +109,29 @@ test('final battle UI clears defeated state after either shared revival; old tim
  assert.match(declaration('updateUI'),/updateBattlePlayerBars\(\);\s*syncBattleDefeatedCards\(\);/);
  assert.doesNotMatch(read('js/41-v146-system-polish.js'),/syncDefeatedCards/);
 });
+
+test('approved provisional rewards project exact floors and fragment quantities',()=>{
+ const api=registry();
+ const gems=api.getSources('gemVitalityI');
+ assert.deepEqual(Array.from(gems,r=>r.floor),[10,20,30,40,50,60,70,80,90,100]);
+ for(const row of gems){assert.equal(row.quantity,1);assert.equal(row.chance,1);assert.match(row.notes,/每週.*暫定/);}
+ for(const element of ['Fire','Water','Earth','Wind']){
+  const row=api.getSources('fragmentSet'+element).find(r=>r.sourceId==='equipment');
+  assert.equal(row.quantity,10);assert.equal(row.chance,.25);assert.match(row.notes,/雙倍/);
+ }
+});
+test('equipment reward commits chest and fixed fragment together, retries safely and grants once',()=>{
+ const source=read('js/equipment-progression.js');
+ const claim=source.slice(source.indexOf('    window.v17346ClaimEquipmentDungeon=function'),source.indexOf('    async function beginEquipmentDungeon'));
+ const receipt={fragment:{id:'fragmentSetFire',name:'赤炎碎片'},count:10};
+ let items=[],saveOK=false,capacityOK=true,ad;
+ const ctx={window:{},equipmentDungeonReward:receipt,equipmentDungeonClaiming:false,EQUIPMENT_CHEST_DEFINITION:{id:'equipmentChest'},saveGame:()=>saveOK,alert(){},syncEquipmentChestPresentation(){}};
+ ctx.window.v132AddItemToInventory=(def,count)=>{if(!capacityOK&&def.id==='fragmentSetFire')return false;items.push({id:def.id,count});return true;};
+ ctx.window.v132RunInventoryTransaction=fn=>{const before=items.slice();try{if(fn())return true;}catch{}items=before;return false;};
+ ctx.showRewardedAd=success=>{ad=success;};vm.createContext(ctx);vm.runInContext(claim,ctx);
+ assert.equal(ctx.window.v17346ClaimEquipmentDungeon(false),false);assert.equal(items.length,0);assert.equal(ctx.equipmentDungeonReward,receipt);
+ saveOK=true;capacityOK=false;assert.equal(ctx.window.v17346ClaimEquipmentDungeon(false),false);assert.equal(items.length,0);
+ capacityOK=true;assert.equal(ctx.window.v17346ClaimEquipmentDungeon(true),true);assert.equal(ctx.window.v17346ClaimEquipmentDungeon(false),false);
+ ad();ad();assert.deepEqual(items,[{id:'equipmentChest',count:4},{id:'fragmentSetFire',count:20}]);
+ assert.equal(ctx.window.v17346ClaimEquipmentDungeon(false),false);assert.equal(ctx.equipmentDungeonReward,null);
+});

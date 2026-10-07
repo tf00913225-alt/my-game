@@ -33,7 +33,7 @@ assert.ok(renderStart>=0&&renderEnd>renderStart,"material synthesis render owner
 const materialRender=repairs.slice(renderStart,renderEnd);
 assert.doesNotMatch(materialRender,/<select\b/i);
 assert.match(materialRender,/materialGameSelect\("oreTier"/);
-assert.match(materialRender,/materialGameSelect\("blueprintSet"/);
+assert.doesNotMatch(materialRender,/blueprintSet|設計圖/);
 assert.match(repairs,/\.v17363-game-select-menu/);
 assert.match(repairs,/section>\.v169-item-art[\s\S]*?width:70px/);
 assert.match(touch,/data-scroll-owner="x\|y\|both"/);

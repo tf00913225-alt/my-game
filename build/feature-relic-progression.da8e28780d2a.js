@@ -91,6 +91,7 @@
             tenFloor:function(floor){ return floor>=80?10:(floor>=40?9:8); }
         }),
         breakthrough:Object.freeze({everyTen:1}),
+        gem:Object.freeze({itemId:"gemVitalityI",every:10,count:1,provisional:true}),
         majorMilestones:Object.freeze({
             25:Object.freeze({boxId:"relicChoiceBoxBlue"}),
             50:Object.freeze({boxId:"relicChoiceBoxPurple"}),
@@ -203,6 +204,8 @@
             relicChoiceBox:true,maxRarity:box.maxRarity,fragmentAmount:box.fragmentAmount
         });
     });
+    const towerGem=window.FourSymbolsEquipmentGems&&window.FourSymbolsEquipmentGems.definitions[RELIC_TOWER_REWARD_CONFIG.gem.itemId];
+    if(towerGem){ itemDefinitions[towerGem.id]=towerGem; }
     Object.freeze(itemDefinitions);
 
     function inventoryList(){
@@ -509,6 +512,9 @@
             rewards.push({itemId:MATERIAL_CONFIG.breakthroughItemId,count:RELIC_TOWER_REWARD_CONFIG.breakthrough.everyTen});
         }else if(floor%5===0){
             rewards.push({itemId:MATERIAL_CONFIG.universalItemId,count:RELIC_TOWER_REWARD_CONFIG.universal.fiveFloor(floor)});
+        }
+        if(floor%RELIC_TOWER_REWARD_CONFIG.gem.every===0){
+            rewards.push({itemId:RELIC_TOWER_REWARD_CONFIG.gem.itemId,count:RELIC_TOWER_REWARD_CONFIG.gem.count});
         }
         const milestone=RELIC_TOWER_REWARD_CONFIG.majorMilestones[floor];
         if(milestone&&options.firstEver===true&&itemDefinitions[milestone.boxId]){

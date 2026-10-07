@@ -33580,6 +33580,16 @@ try{
 /* bundled source: js/generated-item-acquisition-data.js */
 // GENERATED projection of canonical Reward Owners. DO NOT EDIT.
 window.FourSymbolsItemAcquisitionData={
+  "equipmentDungeonFragments": {
+    "setIds": [
+      "setFire",
+      "setWater",
+      "setEarth",
+      "setWind"
+    ],
+    "count": 10,
+    "provisional": true
+  },
   "equipmentChest": [
     {
       "key": "white",
@@ -34651,6 +34661,12 @@ window.FourSymbolsItemAcquisitionData={
     "breakthrough": {
       "everyTen": 1
     },
+    "gem": {
+      "itemId": "gemVitalityI",
+      "every": 10,
+      "count": 1,
+      "provisional": true
+    },
     "majorMilestones": {
       "25": {
         "boxId": "relicChoiceBoxBlue"
@@ -34973,6 +34989,7 @@ window.FourSymbolsItemAcquisitionData={
   if(talisman){const tierIndex=["Low","Mid","High","Perfect"].indexOf(talisman[2]);add({sourceType:"synthesis",sourceId:"talisman-promotion",materialItemId:talisman[1]+"Talisman"+["Low","Mid","High"][tierIndex-1],mode:"符咒合成",location:"主城 → 合成 → 符咒合成",quantity:1,chance:1,repeatable:true,notes:"3張同款前一階符咒＋"+data.talismanGold[tiers[tierIndex-1]]+"金幣"});}
   if(id==="materialChest")add({sourceType:"dungeon",sourceId:"material",mode:"材料副本",location:"主城 → 副本 → 每日副本 → 材料副本",quantityRange:[1,3],repeatable:true,chance:1,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；總回合少於15給3箱、15～29給2箱、30以上給1箱；每日1次；可選廣告雙倍"});
   if(id==="equipmentChest")add({sourceType:"dungeon",sourceId:"equipment",mode:"裝備副本",location:"主城 → 副本 → 每日副本 → 裝備副本",quantity:2,chance:1,repeatable:true,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；每日1次；可選廣告雙倍×4"});
+  if(data.equipmentDungeonFragments.setIds.some(setId=>'fragment'+setId.charAt(0).toUpperCase()+setId.slice(1)===id))add({sourceType:"dungeon",sourceId:"equipment",mode:"裝備副本",location:"主城 → 副本 → 每日副本 → 裝備副本",quantity:data.equipmentDungeonFragments.count,chance:1/data.equipmentDungeonFragments.setIds.length,repeatable:true,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；四系列隨機一種；暫定分布；廣告雙倍數量"});
   if(/^ticketSet(Fire|Water|Earth|Wind)$/.test(id)){
    for(const difficulty of Object.values(data.abyssDifficulties)){
     const region=data.abyssRegions.find(region=>region.ticketId===id);
@@ -35014,7 +35031,8 @@ window.FourSymbolsItemAcquisitionData={
    if(id===data.materials.essenceItemId){quantity=data.tower.essenceByFloor[floor-1];}
    if(id===data.materials.universalItemId&&floor%5===0)quantity=floor%10===0?data.tower.universal.ten[floor-1]:data.tower.universal.five[floor-1];
    if(id===data.materials.breakthroughItemId&&floor%10===0)quantity=data.tower.breakthrough.everyTen;
-   if(quantity)add({sourceType:"tower",sourceId:"tower-"+floor,mode:"四象塔",floor,quantity,chance:1,repeatable:true,notes:"每週各層首次通關"});
+   if(id===data.tower.gem.itemId&&floor%data.tower.gem.every===0)quantity=data.tower.gem.count;
+   if(quantity)add({sourceType:"tower",sourceId:"tower-"+floor,mode:"四象塔",floor,quantity,chance:1,repeatable:true,notes:"每週各層首次通關"+(id===data.tower.gem.itemId?"；寶石數量暫定":"")});
   }
   for(const [rewardId,reward] of Object.entries(data.adventureRewards))for(const potion of reward.potions||[])if(potion.id===id)add({sourceType:"adventure",sourceId:rewardId,mode:"主線冒險",chapter:1,location:rewardId==="road_chest"?"第一章 → 舊驛箱":rewardId==="chapter_v1_clear"?"第一章主線通關":rewardId,quantity:potion.count,chance:1,firstClearOnly:true,repeatable:false});
   const merchant=data.adventureMerchants.find(row=>row.id===id);
