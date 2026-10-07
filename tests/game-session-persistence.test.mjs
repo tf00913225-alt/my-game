@@ -86,3 +86,43 @@ test("browser QA account stubs export the runtime reauthentication entry",()=>{
         assert.match(source,/export async function reauthenticateWithGoogle\(\)/,path);
     }
 });
+
+test("Resume direct entry requires ready same-UID gameplay and retires its interval",()=>{
+    const source=fs.readFileSync(new URL("../js/firebase/firebase-auth-ui.js",import.meta.url),"utf8");
+    const intervals=new Map();let nextInterval=0,click;
+    const overlay={classList:{add(){},remove(){}},setAttribute(){}};
+    const context={resumeActive:false,resumeGraceUsed:false,resumeInterval:0,resumeDeadline:0,
+        RESUME_GRACE_MS:5000,OVERLAY_ID:"firebaseAuthOverlay",busy:false,state:{user:{uid:"uid-a"}},
+        Date:{now:()=>1000},render:()=>{},renderResumeCountdown:()=>{},
+        setFirebaseAuthUiState:()=>{},byId:id=>id==="firebaseDirectEnterButton"?{addEventListener:(_,listener)=>{click=listener;}}:overlay,
+        window:{getComputedStyle:()=>({display:"block"}),
+            FourSymbolsStartupPolicy:{getState:()=>"SAVE_LOADING",getUid:()=>"uid-a"},
+            FourSymbolsAccountSave:{getActiveUid:()=>"uid-a"},
+            setInterval:callback=>{intervals.set(++nextInterval,callback);return nextInterval;},
+            clearInterval:id=>intervals.delete(id)}};
+    vm.createContext(context);
+    vm.runInContext(source.slice(source.indexOf("function clearResumeTimer()"),source.indexOf("function bind()")),context);
+    vm.runInContext(source.slice(source.indexOf('    byId("firebaseDirectEnterButton").addEventListener'),source.indexOf('    byId("firebaseGoogleButton").addEventListener')),context);
+    for(const mode of ["SAVE_LOADING","AUTH_REQUIRED","MIGRATION_REQUIRED","ERROR"]){
+        context.window.FourSymbolsStartupPolicy.getState=()=>mode;
+        assert.equal(context.startResumeGrace(),false,mode);
+        click();assert.equal(context.resumeActive,false);assert.equal(intervals.size,0);
+    }
+    for(const mode of ["READY","OFFLINE_READY"]){
+        context.window.FourSymbolsStartupPolicy.getState=()=>mode;
+        context.window.FourSymbolsStartupPolicy.getUid=()=>"uid-b";
+        assert.equal(context.startResumeGrace(),false,"unresolved identity mismatch");
+        context.window.FourSymbolsStartupPolicy.getUid=()=>"uid-a";
+        context.window.FourSymbolsAccountSave.getActiveUid=()=>"uid-b";
+        assert.equal(context.startResumeGrace(),false,"save-owner mismatch");
+        context.window.FourSymbolsAccountSave.getActiveUid=()=>"uid-a";
+        context.window.getComputedStyle=()=>({display:"none"});
+        assert.equal(context.startResumeGrace(),false,"gameplay not visible");
+        context.window.getComputedStyle=()=>({display:"block"});
+        assert.equal(context.startResumeGrace(),true);
+        assert.equal(intervals.size,1);
+        context.busy=true;click();assert.equal(context.resumeActive,true);
+        context.busy=false;click();
+        assert.equal(context.resumeActive,false);assert.equal(context.resumeInterval,0);assert.equal(intervals.size,0);
+    }
+});
