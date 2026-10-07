@@ -8627,7 +8627,7 @@ body.creation-fixed-active{
     background:#0b0a08;
     font-size:18px;
 }
-.firebase-auth-resume-panel .firebase-auth-button{width:100%;}
+.firebase-auth-resume-panel .firebase-auth-button{width:100%;font-size:15px;}
 .firebase-auth-resume-actions{display:grid;grid-template-columns:2fr 3fr;gap:8px;margin-top:8px;}
 .firebase-auth-overlay[data-presentation="resume"] .firebase-auth-topbar,
 .firebase-auth-overlay[data-presentation="resume"] .firebase-auth-title,

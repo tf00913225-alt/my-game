@@ -479,8 +479,8 @@ try{
     let directPoint;
     for(const width of [390,420]){
       await client.send("Emulation.setDeviceMetricsOverride",{width,height:844,deviceScaleFactor:3,mobile:true,screenWidth:width,screenHeight:844});
-      const buttons=await client.eval(`(()=>{const ids=['firebaseSwitchAccountButton','firebaseDirectEnterButton'];return ids.map(id=>{const n=document.getElementById(id),r=n.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,disabled:n.disabled,hit:document.elementFromPoint(r.left+r.width/2,r.top+r.height/2)===n};});})()`);
-      assert.ok(buttons.every(b=>b.left>=0&&b.right<=width&&b.height>=40&&!b.disabled&&b.hit));
+      const buttons=await client.eval(`(()=>{const ids=['firebaseSwitchAccountButton','firebaseDirectEnterButton'];return ids.map(id=>{const n=document.getElementById(id),r=n.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,fontSize:parseFloat(getComputedStyle(n).fontSize),disabled:n.disabled,hit:document.elementFromPoint(r.left+r.width/2,r.top+r.height/2)===n};});})()`);
+      assert.ok(buttons.every(b=>b.left>=0&&b.right<=width&&b.height>=40&&b.fontSize>=15&&!b.disabled&&b.hit));
       assert.ok(buttons[1].width>buttons[0].width);
       directPoint={x:buttons[1].left+buttons[1].width/2,y:buttons[1].top+buttons[1].height/2};
     }
