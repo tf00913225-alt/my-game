@@ -182,3 +182,48 @@ assert.doesNotMatch(timingSource,/requestAnimationFrame|setTimeout|MutationObser
     "V159 must be retired and contain no delayed or launch synchronization");
 
 console.log("Monster portrait runtime tests passed.");
+const realSharedRegistry=JSON.parse(fs.readFileSync('config/monster-portrait-registry.json','utf8'));
+const sharedEntries=realSharedRegistry.assetPool.entries.filter(e=>e.assetClass==='shared-npc');
+{
+    const runtime=loadRuntime([]);
+    runtime.context.v154InstallMonsterPortraitRegistry(realSharedRegistry);
+    for(const entry of sharedEntries){
+        for(const monster of [{portraitKey:entry.assetId,name:'天兵天將',element:'fire'}, {name:entry.displayName,element:'fire'}, {name:'未指定人物',element:'water'}]){
+            assert.equal(runtime.context.v154ResolveMonsterPortraitRecord(monster).path,null,entry.assetId+' reserved/name/element cannot resolve shared art');
+        }
+    }
+    const adopted=structuredClone(realSharedRegistry);
+    const e=adopted.assetPool.entries.find(e=>e.assetClass==='shared-npc');
+    e.status='adopted';e.runtimePath='assets/characters/npcs/test-shared.webp';
+    runtime.context.v154InstallMonsterPortraitRegistry(adopted);
+    for(const name of ['主線路人','活動守衛','委託敵人']){
+        const monster={name,element:'water',rank:'elite',portraitKey:e.assetId};
+        assert.equal(runtime.context.v154ResolveMonsterPortraitRecord(monster).path,e.runtimePath);
+        runtime.context.v154BindMonsterPortraitIdentity(monster);
+        assert.equal(monster.name,name,'shared art cannot rename Content');
+        assert.equal(monster.element,'water');assert.equal(monster.rank,'elite');
+    }
+    assert.equal(runtime.context.v154ResolveMonsterPortraitRecord({name:e.displayName}).path,null,'adopted shared art has no name fallback');
+    assert.equal(runtime.context.v154ResolveMonsterPortraitRecord({name:e.displayName,portraitKey:'NPC_SHARED_999'}).path,null,'unknown explicit shared ID cannot fall through');
+    e.runtimePath=null;runtime.context.v154InstallMonsterPortraitRegistry(adopted);
+    assert.equal(runtime.context.v154ResolveMonsterPortraitRecord({portraitKey:e.assetId}).path,null,'adopted without derivative cannot resolve');
+}
+console.log('Shared portrait reserved / explicit-only / Content identity isolation passed.');
+
+(async()=>{
+    const adopted=structuredClone(realSharedRegistry);
+    const entry=adopted.assetPool.entries.find(e=>e.assetClass==='shared-npc');
+    entry.status='adopted';entry.runtimePath='assets/characters/npcs/test-shared.webp';
+    const runtime=loadRuntime([]);
+    runtime.context.fetch=async()=>({ok:true,json:async()=>adopted});
+    runtime.context.FourSymbolsFeatures={ensureAssets:async()=>{}};
+    const actors=[{name:'主線人物',portraitKey:entry.assetId},{name:'活動人物',portraitKey:entry.assetId}];
+    const ready=await runtime.context.v154PreparePortraitsForEncounter(actors);
+    assert.equal(ready.state,'ready');
+    assert.deepEqual(actors.map(actor=>actor.name),['主線人物','活動人物'],'encounter preparation preserves each Content identity');
+    runtime.context.FourSymbolsFeatures.ensureAssets=async()=>{throw new Error('decode failed');};
+    const failed=await runtime.context.v154PreparePortraitsForEncounter(actors);
+    assert.equal(failed.state,'failed','decoder failure is explicit, not random shared art');
+    assert.equal(failed.paths.length,0);
+    console.log('Shared portrait encounter preparation / decode failure passed.');
+})().catch(error=>{console.error(error);process.exitCode=1;});

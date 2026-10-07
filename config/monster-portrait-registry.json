@@ -2917,6 +2917,1506 @@
         "status": "reserved",
         "usedIn": "Earth Tower / reserved pending valid Master replacement",
         "notes": "Source PNG is truncated and fails decode; never promoted to runtimeReady."
+      },
+      {
+        "assetId": "NPC_SHARED_001",
+        "displayName": "綠袍持杖老者01",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000000882078777ea48060529f6.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "4a1a4c548537c23b428588456406428abaa401b391803f64589f621e742636b1",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_002",
+        "displayName": "黑紅袍持扇男子02",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000003c82118faa2ab8e90785c0.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "e7f80d50d5d350661cd205f00bbbc83a3d91f3d971036a6eec41af0ab2bb1767",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_003",
+        "displayName": "青巾長刀武者03",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000055c8207a0c764b0a4c2caa2.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "9921c7b28e9bae3811dde63b331837e352617c14151a61c8bc8a4610a3f01c57",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_004",
+        "displayName": "紫衣鏈刃女子04",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000008a48211b644a51cad773537.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "fbc6d5940459ed485f3fa0782dad389bc045ec0368cf829efc807c9b7b6558d8",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_005",
+        "displayName": "淡紫衣持扇女子05",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000167882118494d73f1def23da.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "758bd107b2fdb2e6689003d7ef8e60f8c0d1f02fbd81aede30b2eb3926c02c4f",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_006",
+        "displayName": "藍袍持杖老者06",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000001ae482118c2176218b31dfed.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "378e4251671e61ad15fb3ef59e215af014a316e27de95f66d5ea2ad9fc370c6a",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_007",
+        "displayName": "粉衣持傘女子07",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000027ac8207827fa8053bd13e83.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "1fe156d6648862371edea00996444c0df1a56572507a063650eb5f342ca8b1ff",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_008",
+        "displayName": "赤膊拳套武者08",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000029b882118b93716aed6c08d6.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "a737b203fb4f82b067f26f872dbaad09df98ce75a18688701309d747e8f00846",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_009",
+        "displayName": "黑紅袍符劍男子09",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000002b8c8211aea440c3f2615cc0.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "5f8d34b921c04d22ced94e179ce51459d785bf9320eb0acc029624ef1ae0497c",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_010",
+        "displayName": "黃袍持杖僧人10",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000002c948211b263829c9bf5ae27.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "1ff08dffc700389c0de26c8f6bf5c911896cdf777809b6d9c4a8e30d57df0c7e",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_011",
+        "displayName": "紅黑衣雙刀女子11",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000002dd08211aeed78c6f886dce2.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "a4398925a4e88c8a8a17fda4d17ecf69e1216f080b8f6639b4c831c4d2990a29",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_012",
+        "displayName": "藍衣持刀壯漢12",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000351c8211ba694fa4f45e36d9.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "9c3f829356c5a2f9fd2a86a3afce10bfbdf29ab7e853edcfcfb93f04ccf80f15",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_013",
+        "displayName": "褐衣持錘武者13",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000372c8207bdc6ad2cff0aeb54.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "847abb854a25bc449821cb94f3f9b1bd0eb7c86aad230f7399716e3b377f6ac4",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_014",
+        "displayName": "橙衣繩鏢女子14",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000037948211bed95d1a0f227463.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "b0ba201b089a713a67ab79fc58f87cc5aed867c198bc9d4f40f18784137ea9b4",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_015",
+        "displayName": "綠衣鏈刃女子15",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000039dc8211966f5f8f0a658e07.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "33a62fca0ec2903ab233369a11b6d4530b01c9f230e510c417b878f2d4749bb5",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_016",
+        "displayName": "黑袍持傘男子16",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000045808211b3327ca80b6d86f1.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "548eb38ecc7303814a802a40207f42721159a4ce5afa7aa0896855f5487fc5a3",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_017",
+        "displayName": "赤膊長錘武者17",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000490482119f5bb90110ef451c.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "ee929e218a3a7f8d56e3fdb871d5b3b27a508600e01d6ae13ff6dfb7cd3fd4d3",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_018",
+        "displayName": "藍白衣持卷男子18",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000004b8882118ce495c9de337ac0.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "db7c41a8389dcb036d2727a8b17db9b94eafc3b8240a99b16e5a634c699c15e9",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_019",
+        "displayName": "褐衣雙爪武者19",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000004ef882119fb2379f40c5d273.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "8a84fc75cdaa08ae64a9cc9fd72c56cd68aedec59340532f913e945281b204e3",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_020",
+        "displayName": "紫衣飛刃女子20",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000050fc8211a644f7c88b3c57dd.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "5b709c462653064a24e94fbe4971ffd4a074483d53ef3ed787216f3d5caaa015",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_021",
+        "displayName": "青巾持刀男子21",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000511c82119526b036c7b677d9.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "9c199bacf75418b579b663a6e0fb19ea84b8e68df8f43e76499d718ea3cae5cf",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_022",
+        "displayName": "青衣持槍男子22",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000054a88211914d2aff7fc5d12c.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "39d54b5aab828bd215858f9ce5ba01b916e455507d804887806372f658f70b3b",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_023",
+        "displayName": "黑紅衣飛刃女子23",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000005a3c8206b150bcc636a50cf2.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "9cb53b1c7759c17d9e673744c82311961b3cca2f6edece5ef9d0adb94451cc99",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_024",
+        "displayName": "斗笠持劍男子24",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000678082119c7b6d159e2f1a2f.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "7697bb351c5cd6318f49ce8323f65aaf98ca16b1f42a15623e1aad93d41a64f7",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_025",
+        "displayName": "紅白衣持琴女子25",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000006ef48211a9d9522a1d136a77.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "71c24baa4e1350d0657482e7792189f178d3e20452fa2653dddf926994c299dc",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_026",
+        "displayName": "綠白衣花枝女子26",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000070208207b1fd39dd4070a8a4.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "10c24b1632ad761edd67654c0e2b6561ed73baa691dc6849c58a3c2bd1bfcf30",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_027",
+        "displayName": "粉綠衣飄帶女子27",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000070ac8211aae804d989be719c.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "c2931caebf03c264fb2c88aaf89d6cb3554618a77f4f59632f174b83db5e1000",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_028",
+        "displayName": "墨綠袍持扇男子28",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000007380820786193ea4969a4e4a.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "c58b52e06bec8a79bead24c0a89212a5cb97448594b186695e488d2f1077567b",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_029",
+        "displayName": "黑甲盾刀武者29",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000075a482118255e3cc4004c1f7.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "0cc801cc393da168189aebd3e863b874ddc74a7ba308949555c6e477db945bd3",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_030",
+        "displayName": "黃袍持杖老僧30",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000076f48211ba41df8d6ea004fe.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "70e176970b7ee2edf324951c7c7731803da585cfb91cd7e138b4052bdeec2b3f",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_031",
+        "displayName": "白綠衣長笛女子31",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000079e4821186144457ddb4ce18.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "06c4b9f98221ca6bc08466ae1efbe0594a74ccb8d45bc31abaff32f46eefa848",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_032",
+        "displayName": "青橙衣弓手32",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000007c288211b88a0caa71ed0b56.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "84c6a93cd063712b26920e22662b31bc83906ca74cf29910c0bfe7df6c6eea2d",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_033",
+        "displayName": "斗笠持棍老者33",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000007e848207af9fe4e4cfc5f289.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "c25bad3f99969109ffe05e5ef687aeb5a6d8ef28f22fa53f0ebb7e1dd98cc87b",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_034",
+        "displayName": "褐衣持杖老者34",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000085a082119a30ce0fe1451f5b.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "87e8adab1569448970f5ec216a5ef13d13394fd4bacad1447d7b00dc779ca78e",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_035",
+        "displayName": "綠衣盾槍武者35",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000008b5c8211af80c03a21fe4ba7.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "8c067eccd8d4daa0be8c7f271220927e763cca7c4525e24611537ef08fe10f10",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_036",
+        "displayName": "紅披風持戟武者36",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000008b78821195c335b5f5d825d9.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "6c36f4f0ec0e30b20e300c8f8fc12f19176b490bb4fca9109d7fdeb0432dcafb",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_037",
+        "displayName": "藍巾持刀男子37",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000008d7082118be52ffa0850c59b.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "659cb7155cf9f74c4f8d8d5a11fe3d85dd943b96d6ed3c16fabd5ecb4647ff63",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_038",
+        "displayName": "淡藍衣環刃女子38",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_000000008f408208913e055793bb72d9.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "43856e3b686b31f30df6c48d8874e933afc52ea99265fed77b4420a00d40c0a0",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_039",
+        "displayName": "紅白衣持槍女子39",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000a8d08207bdb3fd1d2e40b7df.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "4b978a8abe14ce9dd19f40b477fa4065c8471f00a5fa09e5630917a3f3ce1df4",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_040",
+        "displayName": "赤膊巨斧武者40",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000aaf4821187d562c24e6b356e.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "bb57ca7d3ebfbed629dc367e7194b4542d4a9997b493b44ee2db72107a06724d",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_041",
+        "displayName": "紅衣繩鏢女子41",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000bebc8211a3e75b7049c8bffd.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "7c1f4d7fd7aae463f25112c8ed557327de9e620c104b3b35e11394efb1130613",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_042",
+        "displayName": "紫黑衣蒙面男子42",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000d0a48207a0660a186960e2e1.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "9dc17b6613ad96a8d3f2bd9286c04bcf4e33d1974ef827637b3028dc2061710d",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_043",
+        "displayName": "灰褐衣持杖老者43",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000d7b8821198e8d34ee227aa12.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "5d874406f5fb57cb6898a6f0988d871218cd27b25dcb30eb2ee7174447b54e62",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_044",
+        "displayName": "綠袍葫蘆老者44",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000d9e48207b7064effd61a2c15.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "ef0fae0f2bfb59b918538ad446da77a3fe0abbaef79abb79a9370968f8c7d4e7",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_045",
+        "displayName": "黑甲紅披風弩手45",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000eb4c82119849987e350d4e27.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "526911d49aa950e316f1a8fe6f5c0bd466629b6de6d6c3b81cf292be10a74224",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_046",
+        "displayName": "藍白衣持琴男子46",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000ecec8207bb413a859dfc27c1.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "bffe9ff7e4a0b9bcda343d53e76a7a3ae515be0ba65ad394ef226a4147bc7d5f",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_047",
+        "displayName": "白藍衣雙劍女子47",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000efe48211b26d4bd3c9f7a162.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "28ef3750e1533babf369551cd27229b1ec47deb65c89f855cab2be92b271cd19",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_048",
+        "displayName": "綠衣花枝女子48",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000f5b88211966ba1a76bc17291.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "bda16082692dd7ab89319e92db1b53056aa34fbc9b7e4494010529c07dec160b",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_049",
+        "displayName": "褐袍葫蘆老者49",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000fad48211916b8b39a1773273.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "af982ec53bf66ec5fd20e011de66de8ea6c7ff44ed5a25a2488e22f881ecab96",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+      },
+      {
+        "assetId": "NPC_SHARED_050",
+        "displayName": "紅白衣弓手50",
+        "sourceBranch": "assets-library",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000fdbc8211bf607bc476dcdcc1.png",
+        "sourceCommit": "562bb43a1dbe24b395536d098ae70131ff38626e",
+        "sourceSha256": "1465ff72fa70bb87220885b1ec23af5cef8d69878e24c34bc6cafb8075088884",
+        "assetClass": "shared-npc",
+        "sizeClass": "standard",
+        "status": "reserved",
+        "reusePolicy": "reusable",
+        "exclusive": false,
+        "allowedContexts": [
+          "battle-npc",
+          "story-npc",
+          "event-npc",
+          "commission-npc",
+          "special-event-npc",
+          "humanoid-enemy"
+        ],
+        "sourceImage": {
+          "width": 1086,
+          "height": 1448,
+          "format": "png",
+          "alpha": true,
+          "transparentPixels": true,
+          "decodeVerified": true
+        },
+        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
       }
     ]
   },

@@ -4,6 +4,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import {auditSharedPortraits} from './lib/shared-portrait-audit.mjs';
 import {portraitImageMetadata} from './lib/portrait-image-metadata.mjs';
 
 const args=new Set(process.argv.slice(2));
@@ -47,6 +49,21 @@ const portraitTiming=read("js/48-v159-abyss-battle-portraits.js");
 const adventure=read("js/adventure/adventure-content-v1-20260915.js");
 
 const errors=[];
+const baseArg=process.argv.find(arg=>arg.startsWith('--base='));
+const base=baseArg?.slice(7)||process.env.CI_BASE_SHA;
+const previous=base&& !/^0+$/.test(base)?JSON.parse(execFileSync('git',['show',base+':config/monster-portrait-registry.json'],{encoding:'utf8',maxBuffer:16*1024*1024})):null;
+errors.push(...auditSharedPortraits(registry,previous));
+const masterArg=process.argv.find(arg=>arg.startsWith('--master-root='));
+if(masterArg){
+    for(const entry of registry.assetPool.entries.filter(e=>e.assetClass==='shared-npc')){
+        try{
+            const file=path.join(masterArg.slice(14),entry.sourcePath);
+            const hash=crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+            const image=portraitImageMetadata(file);
+            if(hash!==entry.sourceSha256||image.width!==entry.sourceImage.width||image.height!==entry.sourceImage.height||image.format.toUpperCase()!=='PNG'||!image.alpha||image.opaque)throw new Error('Master bytes/geometry/alpha mismatch');
+        }catch(error){errors.push(entry.assetId+': '+error.message);}
+    }
+}
 const warnings=[];
 const discovered=[];
 const adventureIdentities=[];
