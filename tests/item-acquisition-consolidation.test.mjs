@@ -81,3 +81,31 @@ test('elite roll, Boss stages, synthesis and indirect source numbers agree with 
  const gear={id:'gear-qa',name:'普通裝備',type:'armor',rarityKey:'orange',v17346GeneratedEquipment:true};
  assert.equal(owner.getSources(gear).length,2);assert.equal(owner.trace(gear)[0].parents[0].source.sourceId,'equipment');
 });
+
+test('revival manual declaration targets exact zero HP through the canonical ally validator',()=>{
+ const party=[{hp:50,sp:12},{hp:0,sp:17},{hp:-1,sp:20}],def={id:'revivalPill',name:'還魂丹',resource:'revive',targetType:'deadAlly',manualOnly:true};
+ const ctx={battleActive:true,battlePhase:'declare',activeBattleCharacterIndex:0,autoBattle:false,actionReady:false,pendingAction:null,getPotionDefinition:()=>def,getPartyCharacterByIndex:i=>party[i],getBattleCharacterByIndex:i=>party[i],getExistingPartyIndexes:()=>[0,1,2],getPotionCount:()=>2,addBattleLog:()=>{},closeMenus:()=>{},getPartyAutoConfig:()=>({enabled:false}),setBattleAllyTargetSelectionMode:()=>{ctx.selected=true;}};
+ vm.runInNewContext(declaration('isValidAllyTargetForSkill')+'\n'+declaration('usePotion'),ctx);
+ assert.equal(ctx.isValidAllyTargetForSkill(def,party[0],0),false);assert.equal(ctx.isValidAllyTargetForSkill(def,party[1],1),true);assert.equal(ctx.isValidAllyTargetForSkill(def,party[2],2),false);
+ ctx.autoBattle=true;ctx.usePotion('revivalPill');assert.equal(ctx.selected,undefined);
+ ctx.autoBattle=false;party[1].hp=10;ctx.usePotion('revivalPill');assert.equal(ctx.selected,undefined);assert.equal(ctx.actionReady,false);
+ party[1].hp=0;ctx.usePotion('revivalPill');assert.equal(ctx.selected,true);assert.equal(ctx.pendingAction,'revivalPill');assert.equal(ctx.actionReady,true);
+ assert.doesNotMatch(read('js/42-v148-combat-dungeon-fixes.js'),/isValidAllyTargetForSkill=function/);
+});
+
+test('final potion Owner preserves revival target and canonical declaration selection',()=>{
+ const source=read('js/38-v143-system-fixes.js'),party=[{hp:50,sp:12},{hp:0,sp:17},{hp:-1,sp:20}],def={id:'revivalPill',name:'還魂丹',resource:'revive',targetType:'deadAlly',manualOnly:true};
+ const ctx={usePotion:()=>{},battleActive:true,battlePhase:'declare',activeBattleCharacterIndex:0,autoBattle:false,actionReady:false,pendingAction:null,POTION_TARGET_ACTION:'potion-target',window:{},getPotionDefinition:()=>def,getPartyCharacterByIndex:i=>party[i],getExistingPartyIndexes:()=>[0,1,2],getPartyBattleStats:()=>({maxHP:100,maxSP:50}),getPotionCount:()=>2,queuedPotionReservations:()=>0,addBattleLog:()=>{},closeMenus:()=>{},setBattleAllyTargetSelectionMode:()=>{ctx.selected=true;}};
+ vm.runInNewContext(declaration('isValidAllyTargetForSkill')+'\n'+source.match(/    function validPotionTarget[\s\S]*?\n    \}/)[0]+'\n'+source.slice(source.indexOf('    if(typeof usePotion==='),source.indexOf('    if(typeof selectBattleAllyTarget===')),ctx);
+ assert.equal(ctx.validPotionTarget('revivalPill',0),false);assert.equal(ctx.validPotionTarget('revivalPill',1),true);assert.equal(ctx.validPotionTarget('revivalPill',2),false);
+ ctx.usePotion('revivalPill');assert.equal(ctx.selected,true);assert.equal(ctx.window.v143PendingPotionTarget.potionId,'revivalPill');
+ let resolved;ctx.applyPotionEffect=(...args)=>{resolved=args;};ctx.queuedPlayerActions={0:{targetAlly:1}};
+ vm.runInNewContext(source.slice(source.indexOf('    if(typeof applyPotionEffect==='),source.indexOf('    /* Escape routing')),ctx);ctx.applyPotionEffect('revivalPill',0,1);assert.deepEqual(resolved,['revivalPill',0,1]);
+});
+
+test('final battle UI clears defeated state after either shared revival; old timed owner is retired',()=>{
+ const party=[{hp:50},{hp:0}],classes=[new Set(),new Set()],ctx={currentBattleMonsters:[],monsters:[],getExistingPartyIndexes:()=>[0,1],getPartyCharacterByIndex:i=>party[i],$:id=>({classList:{toggle:(key,on)=>{const set=classes[Number(id.slice(-1))];on?set.add(key):set.delete(key);}}})};
+ vm.runInNewContext(declaration('syncBattleDefeatedCards'),ctx);ctx.syncBattleDefeatedCards();assert.ok(classes[1].has('v146-defeated'));party[1].hp=35;ctx.syncBattleDefeatedCards();assert.equal(classes[1].has('v146-defeated'),false);
+ assert.match(declaration('updateUI'),/updateBattlePlayerBars\(\);\s*syncBattleDefeatedCards\(\);/);
+ assert.doesNotMatch(read('js/41-v146-system-polish.js'),/syncDefeatedCards/);
+});

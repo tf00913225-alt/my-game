@@ -164,12 +164,11 @@ test("V143 delegates dungeon destinations to the final owner",()=>{
     assert.match(fs.readFileSync("css/06-stage-v11-native-bottom-nav.css","utf8"),/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
 });
 
-test("synthesis is icon-first and creates ordinary random gear without a set ID",()=>{
+test("synthesis keeps icon-first material pickers while blueprint crafting is retired",()=>{
     assert.match(system,/className="v143-item-picker"/);
     assert.match(system,/iconForPickerValue/);
-    assert.match(system,/v143NormalCraft:true/);
-    assert.match(system,/delete item\.setId/);
-    assert.match(system,/系統隨機生成的普通裝備，不屬於四大套裝/);
+    assert.doesNotMatch(system,/window\.v141CraftEquipment=/);
+    assert.doesNotMatch(system,/ConsumeStackItem\(blueprint/);
     assert.match(css,/\.v143-item-picker i,[\s\S]*width:48px;height:48px/);
 });
 

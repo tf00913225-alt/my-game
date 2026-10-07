@@ -19711,7 +19711,7 @@ function usePotion(potionId){
 
     if(definition.resource==="revive"){
         if(battlePhase!=="declare"){ return; }
-        const dead=[0,1,2].some(index=>isValidAllyTargetForSkill(definition,getBattleCharacterByIndex(index),index));
+        const dead=getExistingPartyIndexes().some(index=>isValidAllyTargetForSkill(definition,getBattleCharacterByIndex(index),index));
         if(!dead){ addBattleLog("目前沒有需要復活的死亡友方。"); return; }
         closeMenus();actionReady=true;pendingAction=potionId;
         setBattleAllyTargetSelectionMode(potionId);return;
@@ -32777,6 +32777,18 @@ function updateMapPageHeader(){
    ★ 更新UI
 ===================================================== */
 
+// Final battle HP rendering owns defeated-card state for death and both revive sources.
+function syncBattleDefeatedCards(){
+    currentBattleMonsters.forEach(index=>{
+        const monster=monsters[index],card=$("battleMonster"+index);
+        if(card){ card.classList.toggle("v146-defeated",!monster||monster.alive===false||Number(monster.hp)<=0); }
+    });
+    getExistingPartyIndexes().forEach(index=>{
+        const character=getPartyCharacterByIndex(index),card=$("battlePlayerCard"+index);
+        if(card){ card.classList.toggle("v146-defeated",!character||Number(character.hp)<=0); }
+    });
+}
+
 function updateUI(){
 
     bumpBattleRuntimeMetric("updateUI");
@@ -32802,6 +32814,7 @@ function updateUI(){
         });
 
         updateBattlePlayerBars();
+        syncBattleDefeatedCards();
 
         const bossPresentationOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
         if(bossPresentationOwner&&typeof bossPresentationOwner.syncHud==="function"){

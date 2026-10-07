@@ -777,28 +777,6 @@
         };
     }
 
-    function syncDefeatedCards(){
-        if(
-            typeof monsters!=="undefined"&&
-            Array.isArray(monsters)&&
-            typeof currentBattleMonsters!=="undefined"&&
-            Array.isArray(currentBattleMonsters)
-        ){
-            currentBattleMonsters.forEach(index=>{
-                const monster=monsters[index];
-                const card=document.getElementById("battleMonster"+index);
-                if(card){ card.classList.toggle("v146-defeated",!monster||monster.alive===false||numeric(monster.hp)<=0); }
-            });
-        }
-        if(typeof getPartyCharacterByIndex==="function"){
-            [0,1,2].forEach(index=>{
-                const character=getPartyCharacterByIndex(index);
-                const card=document.getElementById("battlePlayerCard"+index);
-                if(card){ card.classList.toggle("v146-defeated",!character||numeric(character.hp)<=0); }
-            });
-        }
-    }
-
     /* ----- Abyss is a real walk-up map: bounded steps, movement lock, proximity. ----- */
     let abyssMoveUnlockTimer=0;
 
@@ -1292,7 +1270,6 @@
             const result=previousShowPage.apply(this,arguments);
             if(page==="home"){ renderHomeRoster(); }
             if(page==="dungeon"){ setTimeout(syncDungeonShell,0); }
-            setTimeout(syncDefeatedCards,0);
             setTimeout(syncCharacterAttentionDots,0);
             return result;
         };
@@ -1336,7 +1313,7 @@
     normalizeOrdinarySynthesisData();
     syncSetDefinitions();
     const boot=()=>{
-        renderHomeRoster(); syncDungeonShell(); syncShopTotals(); polishSynthesis(); syncDefeatedCards(); syncCharacterAttentionDots();
+        renderHomeRoster(); syncDungeonShell(); syncShopTotals(); polishSynthesis(); syncCharacterAttentionDots();
     };
     if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",boot,{once:true}); }
     else{ boot(); }
@@ -1477,15 +1454,6 @@
     window.v148GetAutoTargetPriority=autoTargetPriority;
 
     /* A defeated card remains inert except while Revive is explicitly aiming. */
-    if(typeof isValidAllyTargetForSkill==="function"){
-        const previousIsValidAllyTarget=isValidAllyTargetForSkill;
-        isValidAllyTargetForSkill=function(skill,character,index){
-            if(!skill||!character){ return false; }
-            if(skill.targetType==="deadAlly"){ return numeric(character.hp)<=0; }
-            return previousIsValidAllyTarget.apply(this,arguments);
-        };
-    }
-
     function markReviveTargets(actionType){
         if(typeof document==="undefined"){ return; }
         document.querySelectorAll(".battle-player.v148-revive-target").forEach(card=>
@@ -1496,7 +1464,7 @@
         partyIndexes().forEach(index=>{
             const character=getPartyCharacterByIndex(index);
             const card=document.getElementById("battlePlayerCard"+index);
-            if(card&&character&&numeric(character.hp)<=0){
+            if(card&&character&&(typeof isValidAllyTargetForSkill==="function"?isValidAllyTargetForSkill(skill,character,index):numeric(character.hp)<=0)){
                 card.classList.add("ally-targetable","v148-revive-target");
             }
         });
@@ -1802,7 +1770,7 @@
         if(!battleActive||!caster||numeric(caster.hp)<=0||!target||numeric(target.hp)!==0||getPotionCount(definition.id)<1){
             return finishSupport("沒有合法死亡目標，還魂丹未消耗。");
         }
-        const skill={...skillDatabase.revive,name:definition.name};
+        const skill=skillDatabase.revive;
         return resolvePartyRevive(characterIndex,{targetAlly:targetIndex},skill,{
             character:caster,key:getPartyCharacterKey(characterIndex),level:1,cost:0,consumable:definition
         });
@@ -1831,7 +1799,7 @@
             numeric(targetStats.maxHP),
             Math.floor(numeric(targetStats.maxHP)*percent/100*multiplier)
         ));
-        const reviveMessage=(target.id||"隊友")+"被"+skill.name+"復活，恢復"+restoredHP+" HP。";
+        const reviveMessage=(target.id||"隊友")+"被"+(state.consumable?state.consumable.name:skill.name)+"復活，恢復"+restoredHP+" HP。";
         const token=typeof battleToken!=="undefined"?battleToken:null;
         let settled=false;
         const reviveAtImpact=()=>{
@@ -6694,7 +6662,7 @@
         const item=currentShopOffers()[safeIndex];
         if(!item||typeof window.v132ShowRewardModal!=="function"){ return; }
         const rarity=RARITY_BY_KEY[item.rarityKey]||RARITIES[0];
-        const html='<div class="v132-reward-modal-inner v17346-shop-preview-modal item-presentation-frame" data-presentation-mode="shop-preview" data-rarity="'+escapeHtml(item.rarityKey)+'"><h3>'+escapeHtml(item.name)+'</h3><div class="item-presentation-scroll" data-scroll-owner="y"><div class="v17346-shop-preview-art">'+item.icon+'</div><div class="v17346-shop-preview-info"><span>'+escapeHtml(SLOT_META[item.type].label)+'</span><strong>'+escapeHtml(statLine(item))+'</strong></div><div class="v17346-shop-preview-price">'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</div>'+(item.reforgeSlots?'<div class="v17346-shop-preview-reforge">[可冶煉]</div>':'')+'</div><div class="v132-reward-actions"><button type="button" onclick="v17346ShowShopOfferAcquisition('+safeIndex+')">獲取途徑</button><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
+        const html='<div class="v132-reward-modal-inner v17346-shop-preview-modal item-presentation-frame" data-presentation-mode="shop-preview" data-rarity="'+escapeHtml(item.rarityKey)+'"><h3>'+escapeHtml(item.name)+'</h3><div class="item-presentation-scroll" data-scroll-owner="y"><div class="v17346-shop-preview-art">'+item.icon+'</div><div class="v17346-shop-preview-info"><span>'+escapeHtml(SLOT_META[item.type].label)+'</span><strong>'+escapeHtml(statLine(item))+'</strong></div><div class="v17346-shop-preview-price">'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</div>'+(item.reforgeSlots?'<div class="v17346-shop-preview-reforge">[可冶煉]</div>':'')+'</div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button><button type="button" onclick="v17346ShowShopOfferAcquisition('+safeIndex+')">獲取途徑</button></div></div>';
         window.v132ShowRewardModal(html);
     };
     function renderEquipmentShop(){

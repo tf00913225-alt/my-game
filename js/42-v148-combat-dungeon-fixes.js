@@ -124,15 +124,6 @@
     window.v148GetAutoTargetPriority=autoTargetPriority;
 
     /* A defeated card remains inert except while Revive is explicitly aiming. */
-    if(typeof isValidAllyTargetForSkill==="function"){
-        const previousIsValidAllyTarget=isValidAllyTargetForSkill;
-        isValidAllyTargetForSkill=function(skill,character,index){
-            if(!skill||!character){ return false; }
-            if(skill.targetType==="deadAlly"){ return numeric(character.hp)<=0; }
-            return previousIsValidAllyTarget.apply(this,arguments);
-        };
-    }
-
     function markReviveTargets(actionType){
         if(typeof document==="undefined"){ return; }
         document.querySelectorAll(".battle-player.v148-revive-target").forEach(card=>
@@ -143,7 +134,7 @@
         partyIndexes().forEach(index=>{
             const character=getPartyCharacterByIndex(index);
             const card=document.getElementById("battlePlayerCard"+index);
-            if(card&&character&&numeric(character.hp)<=0){
+            if(card&&character&&(typeof isValidAllyTargetForSkill==="function"?isValidAllyTargetForSkill(skill,character,index):numeric(character.hp)<=0)){
                 card.classList.add("ally-targetable","v148-revive-target");
             }
         });
@@ -449,7 +440,7 @@
         if(!battleActive||!caster||numeric(caster.hp)<=0||!target||numeric(target.hp)!==0||getPotionCount(definition.id)<1){
             return finishSupport("沒有合法死亡目標，還魂丹未消耗。");
         }
-        const skill={...skillDatabase.revive,name:definition.name};
+        const skill=skillDatabase.revive;
         return resolvePartyRevive(characterIndex,{targetAlly:targetIndex},skill,{
             character:caster,key:getPartyCharacterKey(characterIndex),level:1,cost:0,consumable:definition
         });
@@ -478,7 +469,7 @@
             numeric(targetStats.maxHP),
             Math.floor(numeric(targetStats.maxHP)*percent/100*multiplier)
         ));
-        const reviveMessage=(target.id||"隊友")+"被"+skill.name+"復活，恢復"+restoredHP+" HP。";
+        const reviveMessage=(target.id||"隊友")+"被"+(state.consumable?state.consumable.name:skill.name)+"復活，恢復"+restoredHP+" HP。";
         const token=typeof battleToken!=="undefined"?battleToken:null;
         let settled=false;
         const reviveAtImpact=()=>{

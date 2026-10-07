@@ -6,6 +6,14 @@
 
 唯一 Hero Domain Owner 為 `functions/src/hero-core.js`，玩家與 main-save adapter 在 `js/00-main.js::FourSymbolsHeroSystem`。Registry／最低已建立玩家等級投影／無 EXP／衍生 Skill Level／0–5 星／碎片成本／seed weighted allocation／洗髓／永久 schema 與未施工 battle contract 由 `docs/HERO_SYSTEM_V1.md` 定義。Hero account 進既有 UID main-save，不新增 sidecar；Rage 與 passive stacks 僅 battle transient，不持久化。Phase 1 英雄尚未進入正式 Battle Runtime；Equipment／Reward／UI／Combat 留待後續 Phase。
 
+## 道具取得與補品收斂（2026-10-07）
+
+- 取得來源呈現由 `js/item-acquisition-registry.js` 唯一負責，資料由既有 Reward Owners 投影；查詢不發獎、不扣道具、不寫存檔。沒有正式來源時顯示「目前版本尚無正式取得途徑」。
+- 裝備設計圖已取消取得、升階與鍛造需求；穩定 ID 定義僅保留舊存檔相容，禁止新發獎。
+- 正式一般補品為回春散 HP+66、凝氣散 SP+66、HP/SP30%、HP/SP50%。一般 HP/SP100% 停止新取得；歷史20%／100%堆疊維持相容讀取。九轉回元丹／太清聚氣丹維持稀有100%定位。
+- 還魂丹僅手動戰鬥宣告，指定 HP=0 的死亡友方，固定恢復HP35、SP不變、消耗行動；有效命中且保存成功時消耗1顆。自動補品／自動戰鬥不得使用。補品宣告沿用 V143 Owner，復活結算沿用 V148 共用 resolver；死亡樣式由核心 `updateUI → syncBattleDefeatedCards` 投影當前 HP，舊切頁延遲同步退休。
+- 材料寶箱只抽取白／藍／紫／橙階礦石、基礎／30%／50% HP/SP補品與還魂丹，暫定分布集中在 `MATERIAL_CHEST_DROP_TABLE`，預覽與來源表同讀；正式掉率尚未核定。
+
 ## Boss 術語與契約邊界
 
 術語唯一 Owner：`docs/MONSTER_PORTRAIT_SPEC_V1.md` 第 0 節。世界／個人 Boss 統稱大 Boss，深淵等一般首領稱小 Boss；rank、mode、sizeClass 與 footprint 是獨立契約。下方 Boss 專屬模式的中央六格／援軍／功能物件規則只適用個人／世界大 Boss，不得因一般敵人 `rank="boss"` 套用到塔、每日副本或深淵。既有 World Boss／Personal Boss／Abyss Boss 名稱及內部 identifier 保留。

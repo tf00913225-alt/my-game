@@ -30,7 +30,7 @@
    }
    add({sourceType:"synthesis",sourceId:id.replace('ticket','fragment'),mode:"合成",location:"主城 → 合成 → 碎片合成",quantity:1,chance:1,repeatable:true,notes:"100枚對應系列碎片＋500金幣"});
   }
-  for(const [floor,reward] of Object.entries(data.tower.majorMilestones)){if(id===reward.boxId)add({sourceType:"tower",sourceId:"tower-"+floor,mode:"四象塔",floor:Number(floor),quantity:1,chance:1,firstClearOnly:true,repeatable:false,location:"主城 → 玩法 → 四象塔"});}
+  for(const [floor,reward] of Object.entries(data.tower.majorMilestones)){if(id===reward.boxId)add({sourceType:"tower",sourceId:"tower-"+floor,mode:"四象塔",unlockRequirement:"任一角色Lv."+data.towerUnlockLevel,floor:Number(floor),quantity:1,chance:1,firstClearOnly:true,repeatable:false,location:"主城 → 玩法 → 四象塔"});}
   const relic=data.relics.find(r=>fragment(r.id)===id||r.id===id);
   if(relic){
    if(id===relic.id){add({sourceType:"synthesis",sourceId:fragment(id),mode:"秘寶合成",location:"主城 → 秘寶 → "+relic.name,quantity:1,chance:1,repeatable:false,notes:"100專屬碎片；最多以100通用碎片替代50專屬碎片"});}
@@ -42,7 +42,7 @@
    const world=boss.id.startsWith("world"),mode=world?"世界Boss":"個人Boss";
    for(const stage of (world?[1,2,3,4]:[1])){
    const cfg=data.difficulties[world?(stage===4?"special":stage===3?"hell":"hard"):boss.level>=100?"special":boss.level>=80?"hell":boss.level>=50?"hard":"normal"];
-   const base={sourceType:"boss",sourceId:boss.id,mode,bossId:boss.id,bossName:boss.name,bossLevel:boss.level,stage:world?stage:null,location:"主城 → 玩法 → "+mode,unlockRequirement:"隊伍達到Lv."+boss.level,repeatable:true,notes:world?"第"+stage+"階段通關後":"通關後"};
+   const base={sourceType:"boss",sourceId:boss.id,mode,bossId:boss.id,bossName:boss.name,bossLevel:boss.level,stage:world?stage:null,location:"主城 → 玩法 → "+mode,unlockRequirement:"至少一名角色達到Lv."+boss.level,repeatable:true,notes:world?"第"+stage+"階段通關後":"通關後"};
    if(relic&&id!==relic.id&&(data.bossPools[boss.id]||[]).includes(relic.id)){
     const pool=data.bossPools[boss.id].map(rid=>data.relics.find(r=>r.id===rid)),total=pool.reduce((n,r)=>n+data.rarityWeights[r.rarity],0);
     add({...base,quantityRange:cfg.fragment,chance:data.rarityWeights[relic.rarity]/total*data.rarityChances[relic.rarity]});

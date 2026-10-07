@@ -178,6 +178,33 @@ async function run(chrome,url,live){
    await c.eval(`showPage('inventory')`);await settle();const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`backpack-${v.join('x')}.png`),Buffer.from(shot.data,'base64'));
    console.log('PASS responsive production runtime '+v.join('x')+' modes + resize + entrances + late styles');
   }
+  const revive=await c.eval(`(async()=>{
+   const wait=async(predicate,label)=>{const end=Date.now()+15000;while(!predicate()&&Date.now()<end)await new Promise(r=>setTimeout(r,30));if(!predicate())throw Error(label);};
+   closeItemModal();closeHomeFeature();
+   player2=buildAdditionalCharacter('Revival QA ally','water','male');registerAdditionalCharacter(2,player2);
+   autoBattle=false;autoConfig.enabled=false;autoConfig2.enabled=false;autoConfig3.enabled=false;
+   player.hp=getPartyBattleStats(0).maxHP;
+   const enemy=MonsterBalance.build({monsterKey:'qa.revival',name:'Revival QA enemy',level:10,element:'fire',archetype:'balanced',rank:'regular',mode:'wild',context:'qa/revival'});
+   Object.assign(enemy,{hp:100000,maxHP:100000,skillIds:[],v132FixedSkillLoadout:true});monsters=[enemy];currentZone='forest';mapCooldown=false;
+   const originalSave=saveGame;let releasePause,releaseFinish;
+   try{
+    startBattle(0);await wait(()=>battleActive&&turn>=1,'revival battle start');clearInterval(timerId);
+    releasePause=FourSymbolsBattleFlow.acquirePauseLock('revival-item-qa');
+    player2.hp=0;player2.sp=17;updateUI();await new Promise(requestAnimationFrame);battlePhase='declare';activeBattleCharacterIndex=0;actionReady=false;pendingAction=null;queuedPlayerActions={};
+    saveGame=()=>true;addPotionToInventory('revivalPill',2);const count=getPotionCount('revivalPill');
+    usePotion('revivalPill');const card=document.getElementById('battlePlayerCard1');
+    const marked=card.classList.contains('ally-targetable')&&card.classList.contains('v148-revive-target');
+    selectBattleAllyTarget(0);const rejected=!queuedPlayerActions[0]&&getPotionCount('revivalPill')===count;
+    let finishes=0;releaseFinish=FourSymbolsBattleFlow.interceptActionFinish(()=>{finishes++;return true;});
+    selectBattleAllyTarget(1);const queued=queuedPlayerActions[0];
+    applyPotionEffect(queued.potionId,0,queued.targetAlly);
+    await wait(()=>player2.hp===35,'shared revival impact');await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame);
+    const revived={hp:player2.hp,sp:player2.sp,count:getPotionCount('revivalPill'),marked,rejected,finished:finishes,defeated:document.getElementById('battlePlayerCard1').classList.contains('v146-defeated'),living:getLivingParty().includes(1),initiative:buildInitiativeQueue().some(row=>row.type==='player'&&row.characterIndex===1),auto:getAutoPotionId('revive')};
+    await wait(()=>!window.v142SkillAnimationDirector?.getActive?.()||window.v142SkillAnimationDirector.getActive().done,'revival animation complete');return {...revived,beforeCount:count};
+   }finally{saveGame=originalSave;battleActive=false;battleToken++;clearInterval(timerId);releaseFinish?.();releasePause?.();window.v142SkillAnimationDirector?.cancelAll?.();}
+  })()`);
+  assert.equal(revive.hp,35);assert.equal(revive.sp,17);assert.equal(revive.count,revive.beforeCount-1);assert.ok(revive.marked&&revive.rejected&&revive.living&&revive.initiative,JSON.stringify(revive));assert.equal(revive.defeated,false);assert.equal(revive.auto,null);
+  evidence.push({revival:revive});console.log('PASS manual revival: dead target / one item / HP35 / unchanged SP / living UI / initiative');
   return evidence;
  }catch(error){if(c){try{const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from(shot.data,'base64'));}catch{}}error.evidence=evidence;if(browserError){error.message+="\nBrowser: "+browserError;error.stack+="\nBrowser: "+browserError;}throw error;}finally{c?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true});}catch{}}
 }
@@ -192,5 +219,5 @@ try{
  }else {local=await startServer();url=local.url;}
  const evidence=await run(findChrome(),url,live);
  fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:live?'deployed-site':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||null,evidence},null,2)+'\n');
- console.log('Responsive Item real runtime QA PASS: '+evidence.length+'/6 viewports');
+ console.log('Responsive Item real runtime QA PASS: 6/6 viewports + manual revival');
 }catch(error){fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:false,error:String(error.stack||error),evidence:error.evidence||[]},null,2)+'\n');throw error;}finally{local?.server.close();}

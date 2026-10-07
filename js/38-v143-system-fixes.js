@@ -331,7 +331,9 @@
         const definition=typeof getPotionDefinition==="function"?getPotionDefinition(potionId):null;
         const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
         const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
-        if(!definition||!character||!stats||character.hp<=0){ return false; }
+        if(!definition||!character||!stats){ return false; }
+        if(definition.resource==="revive"){ return isValidAllyTargetForSkill(definition,character,index); }
+        if(character.hp<=0){ return false; }
         return definition.resource==="hp"?character.hp<stats.maxHP:character.sp<stats.maxSP;
     }
 
@@ -353,6 +355,7 @@
             const autoOn=activeBattleCharacterIndex===0?autoBattle:getPartyAutoConfig(activeBattleCharacterIndex).enabled;
             const caster=getPartyCharacterByIndex(activeBattleCharacterIndex);
             if(!definition||!battleActive||autoOn||actionReady||!caster||caster.hp<=0){ return; }
+            if(definition.resource==="revive"&&battlePhase!=="declare"){ return; }
             const available=getPotionCount(potionId)-queuedPotionReservations(potionId);
             if(available<=0){ addBattleLog(definition.name+"已被其他角色預定或沒有庫存。"); return; }
             const valid=(typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes():[0,1,2])
@@ -362,6 +365,7 @@
             pendingAction=POTION_TARGET_ACTION;
             window.v143PendingPotionTarget={potionId:potionId,casterIndex:activeBattleCharacterIndex};
             closeMenus();
+            if(definition.resource==="revive"){ setBattleAllyTargetSelectionMode(potionId);return; }
             const region=document.getElementById("battleActionRegion");
             if(region){ region.classList.add("target-selecting"); }
             const prompt=document.getElementById("battleTargetPromptAction");
@@ -408,13 +412,14 @@
 
     if(typeof applyPotionEffect==="function"){
         const previousApplyPotion=applyPotionEffect;
-        applyPotionEffect=function(potionId,characterIndex){
+        applyPotionEffect=function(potionId,characterIndex,targetAlly){
             const queued=typeof queuedPlayerActions!=="undefined"&&queuedPlayerActions[characterIndex];
-            const target=queued&&Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+            const target=Number.isInteger(targetAlly)?targetAlly:queued&&Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
             window.v143LastPotionEffectTarget={index:target,at:Date.now()};
             const caster=getPartyCharacterByIndex(characterIndex);
             const receiver=getPartyCharacterByIndex(target);
             const definition=getPotionDefinition(potionId);
+            if(definition?.resource==="revive"){ return previousApplyPotion.call(this,potionId,characterIndex,target); }
             const previousLog=typeof addBattleLog==="function"?addBattleLog:null;
             if(previousLog&&caster&&receiver&&characterIndex!==target){
                 addBattleLog=function(message){

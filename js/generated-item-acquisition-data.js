@@ -162,6 +162,7 @@ window.FourSymbolsItemAcquisitionData={
     "spPotion50": 100,
     "spPotion30": 90
   },
+  "towerUnlockLevel": 30,
   "personalBosses": [
     {
       "id": "personal-20",

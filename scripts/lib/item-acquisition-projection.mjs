@@ -25,6 +25,7 @@ export function buildItemAcquisitionProjection(root){
   wildDrops:data('js/27-v132-content-expansion.js','NORMAL_DROP_TABLE'),
   talismanGold:data('js/36-v141-content-systems.js','TALISMAN_GOLD'),
   shopPotions:data('js/40-v144-rules-and-abyss.js','SHOP_POTION_PRICES'),
+  towerUnlockLevel:data(boss,'TOWER_UNLOCK_LEVEL'),
   personalBosses:data(boss,'PERSONAL_BOSSES'),worldBosses:data(boss,'WORLD_BOSSES'),
   relics,bossPools:data(relic,'RELIC_BOSS_DROP_TABLE'),
   rarityWeights:data(relic,'RARITY_WEIGHTS'),rarityChances:data(relic,'RARITY_FRAGMENT_DROP_CHANCE'),
