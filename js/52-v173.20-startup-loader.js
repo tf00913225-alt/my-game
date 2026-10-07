@@ -96,7 +96,8 @@
         return new Promise(resolve=>global.setTimeout(()=>{ root.hidden=true; root.setAttribute("aria-hidden","true"); resolve(); },360));
     }
     function accountUi(mode,message,error=false,migration=null){
-        firebase.setUiState({mode,user:activeUser,message,error,migration}); firebase.openAuth();
+        firebase.setUiState({mode,user:activeUser,message,error,migration});
+        if(mode===STATES.SAVE_LOADING){ firebase.closeAuth(); }else{ firebase.openAuth(); }
     }
     function safeCloudEmpty(result,uid){
         if(result&&result.exists===false&&result.uid===uid){ return true; }
@@ -179,7 +180,7 @@
         await global.FourSymbolsHomeRelicSummary.prepareFirstScreenVisuals();
         if(token!==transitionToken){ return; }
         transition(offline?STATES.OFFLINE_READY:STATES.READY,{uid:resolvedUid});
-        firebase.setUiState({mode:state,user:activeUser,error:false,migration:null});
+        firebase.setUiState({mode:state,migration:null});
         firebase.closeAuth(); status("載入完成","主城已可操作");
         mark("four-symbols:critical-ready");
         await hideLoader();
@@ -217,9 +218,7 @@
         activeUser=user; resolvedUid=user.uid; saveResolved=false; cloudResult=null; lastError=null;
         startAppShell();
         transition(STATES.SAVE_LOADING,{uid:user.uid}); showLoader();
-        status("讀取帳號角色","正在解析 UID 雲端與本機存檔");
-        firebase.setUiState({mode:"SAVE_LOADING",user:activeUser,message:"正在讀取此 UID 的角色資料…",error:false,migration:null});
-        firebase.closeAuth();
+        status("讀取帳號角色","正在解析 UID 雲端與本機存檔"); accountUi("SAVE_LOADING","正在讀取此 UID 的角色資料…");
         const repo=global.FourSymbolsAccountSave;
         repo.activate(user.uid);
         if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.activate(user.uid); }
