@@ -357,6 +357,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 
 
 
+
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
    - 遊戲邏輯舞台固定 1080 × 1920
@@ -2768,6 +2769,10 @@ function getPartyBattleStats(index){
     if(index===0){ return getMainCharacterStats(); }
     if(index===1){ return getPlayer2BattleStats(); }
     if(index===2){ return getPlayer3BattleStats(); }
+    const combatant=getPartyCharacterByIndex(index);
+    if(combatant&&combatant.combatantKind==="heroNpc"){
+        return getAdditionalCharacterBattleStats(combatant,null);
+    }
     return null;
 }
 
@@ -4186,7 +4191,7 @@ function battleDurationNumber(value){
 }
 function battleDurationEntityForEntry(entry){
     if(!entry){ return null; }
-    if(entry.type==="player"){ return getPartyCharacterByIndex(entry.characterIndex); }
+    if((entry.type==="player"||entry.type==="heroNpc")){ return getPartyCharacterByIndex(entry.characterIndex); }
     if(entry.type==="monster"&&Array.isArray(monsters)){ return monsters[entry.monsterIndex]||null; }
     return null;
 }
@@ -4473,11 +4478,11 @@ function buildBattleStatisticsCombatant(characterIndex){
     const kind=getBattleStatisticsCombatantKind(character);
     const identity=String(character.id||("角色"+(characterIndex+1)));
     return {
-        id:kind+":"+characterIndex+":"+identity,
+        id:character.combatantId||kind+":"+characterIndex+":"+identity,
         kind:kind,
         side:"ally",
         battleIndex:characterIndex,
-        name:identity,
+        name:character.name||identity,
         portrait:typeof getCharacterBattleArtworkPath==="function"
             ?getCharacterBattleArtworkPath(character)
             :""
@@ -4511,7 +4516,7 @@ function battleStatisticsBeginAction(entry){
     const owner=getBattleStatisticsOwner();
     if(!owner||!entry){ activeBattleStatisticsAction=null;return; }
 
-    const sourceId=entry.type==="player"&&typeof owner.getCombatantIdByBattleIndex==="function"
+    const sourceId=(entry.type==="player"||entry.type==="heroNpc")&&typeof owner.getCombatantIdByBattleIndex==="function"
         ?owner.getCombatantIdByBattleIndex(entry.characterIndex)
         :null;
     const partyHp={};
@@ -5027,10 +5032,56 @@ function $(id){
    V130 — 三角色共用索引／戰鬥資料
 ===================================================== */
 
+// Battle-only roster. Player/save/loadout Owners continue to use getCharacters().
+// Numeric battle indexes 3..5 are slots, never player4/player5/player6 identities.
+let heroBattleCombatants=[];
+let heroBattleSelection=null;
+const HERO_BASIC_ATTACK_CONFIG=Object.freeze({enabled:true,skill:"normal",hp:0,sp:0});
+
+function initializeHeroBattleCombatants(){
+    const domain=window.FourSymbolsHeroSystem.getDomain();
+    const ids=heroBattleSelection===null
+        ?domain.listHeroDefinitions().filter(def=>domain.isHeroUnlocked(def.heroId)).map(def=>def.heroId)
+        :heroBattleSelection;
+    if(ids.length>3||new Set(ids).size!==ids.length){ throw new Error("invalid Hero battle roster"); }
+    const next=ids.map(heroId=>{
+        const definition=domain.getHeroDefinition(heroId);
+        if(!domain.isHeroUnlocked(heroId)){ throw new Error("locked Hero cannot enter battle"); }
+        const stats=domain.getHeroBaseStats(heroId);
+        return {id:heroId,name:definition.name,heroId,combatantId:"heroNpc:"+heroId,
+            combatantKind:"heroNpc",element:definition.element,level:domain.getHeroLevel(heroId),
+            ...domain.getHeroAllocatedStats(heroId),hp:stats.maxHP,sp:stats.maxSP,
+            activeBuffs:[],statusEffects:[],isDefending:false};
+    });
+    heroBattleCombatants=next;
+    return next;
+}
+
+window.FourSymbolsHeroBattle=Object.freeze({
+    maxHeroes:3,maxPlayerCharacters:3,
+    // Selection is session-only. Acquisition, UI and permanent loadout are later phases.
+    setRoster(heroIds){
+        if(battleActive){ throw new Error("cannot replace combatant identity during battle"); }
+        if(!Array.isArray(heroIds)||heroIds.length>3||new Set(heroIds).size!==heroIds.length){
+            throw new Error("invalid Hero battle roster");
+        }
+        const domain=window.FourSymbolsHeroSystem.getDomain();
+        heroIds.forEach(id=>{domain.getHeroDefinition(id);if(!domain.isHeroUnlocked(id)){throw new Error("locked Hero");}});
+        heroBattleSelection=heroIds.slice();
+    },
+    useUnlockedRoster(){
+        if(battleActive){ throw new Error("cannot replace combatant identity during battle"); }
+        heroBattleSelection=null;
+    }
+});
+
 function getPartyCharacterByIndex(index){
     if(index===0){ return player; }
     if(index===1){ return player2; }
     if(index===2){ return player3; }
+    if(Number.isInteger(index)&&index>=3&&index<6&&typeof heroBattleCombatants!=="undefined"){
+        return heroBattleCombatants[index-3]||null;
+    }
     return null;
 }
 
@@ -5044,6 +5095,7 @@ function getPartyCharacterKey(index){
 
 
 function getPartyAutoConfig(index){
+    if(index>=3&&index<6){ return {...HERO_BASIC_ATTACK_CONFIG}; }
     if(index===1){ return autoConfig2; }
     if(index===2){ return autoConfig3; }
     return autoConfig;
@@ -5054,12 +5106,17 @@ function getPartyCharacterIndex(character){
     if(character===player){ return 0; }
     if(character===player2){ return 1; }
     if(character===player3){ return 2; }
+    if(character&&typeof heroBattleCombatants!=="undefined"){
+        const index=heroBattleCombatants.indexOf(character);
+        if(index>=0){ return index+3; }
+    }
     return -1;
 }
 
 
 function getExistingPartyIndexes(){
-    return [0,1,2,3,4,5].filter(index=>!!getPartyCharacterByIndex(index));
+    const indexes=typeof battleActive!=="undefined"&&battleActive?[0,1,2,3,4,5]:[0,1,2];
+    return indexes.filter(index=>!!getPartyCharacterByIndex(index));
 }
 
 
@@ -5090,6 +5147,7 @@ function getCharacterArtworkPath(character){
 */
 function getCharacterBattleArtworkPath(character){
     if(!character){ return ""; }
+    if(character.combatantKind==="heroNpc"){ return ""; }
 
     const gender=character.gender==="male" ? "male" : "female";
     const element=elementDatabase[character.element]
@@ -5102,7 +5160,7 @@ function getCharacterBattleArtworkPath(character){
 
 function getCharacterDisplayNameByIndex(index){
     const character=getPartyCharacterByIndex(index);
-    return character ? (character.id||("角色"+(index+1))) : ("角色"+(index+1));
+    return character ? (character.name||character.id||("角色"+(index+1))) : ("角色"+(index+1));
 }
 
 
@@ -7138,7 +7196,7 @@ function saveGame(options={}){
                     window.FourSymbolsBattlefieldSlots &&
                     typeof window.FourSymbolsBattlefieldSlots.getSerializableAllyFormation==="function"
                 )
-                ? window.FourSymbolsBattlefieldSlots.getSerializableAllyFormation()
+                ? window.FourSymbolsBattlefieldSlots.getSerializableAllyFormation([0,1,2])
                 : (
                     existingRelicSaveData &&
                     existingRelicSaveData.allyFormation
@@ -10929,6 +10987,7 @@ function startBattle(triggerIndex){
     }
 
 
+    initializeHeroBattleCombatants();
     battleActive=true;
 
     /*
@@ -11515,7 +11574,7 @@ function beginCharacterTurn(token){
        就不再等新的輸入，直接進入結算階段。
     */
 
-    while(activeBattleCharacterIndex<3){
+    while(activeBattleCharacterIndex<6){
         const candidate=getPartyCharacterByIndex(activeBattleCharacterIndex);
         if(candidate && candidate.hp>0){
             break;
@@ -11523,7 +11582,7 @@ function beginCharacterTurn(token){
         activeBattleCharacterIndex++;
     }
 
-    if(activeBattleCharacterIndex>=3){
+    if(activeBattleCharacterIndex>=6){
 
         startResolutionPhase(
             token
@@ -11575,6 +11634,12 @@ function beginCharacterTurn(token){
 
     }
 
+
+    if(currentActingCharacter&&currentActingCharacter.combatantKind==="heroNpc"){
+        clearActiveCharacterHighlight();
+        autoActionForCharacter(activeBattleCharacterIndex,token);
+        return;
+    }
 
     timer=20;
 
@@ -12121,7 +12186,7 @@ function setBattleAllyTargetSelectionMode(actionType){
         if(card){ card.classList.remove("targetable","target"); }
     });
 
-    [0,1,2].forEach(index=>{
+    getExistingPartyIndexes().forEach(index=>{
         const character=getBattleCharacterByIndex(index);
         const card=$("battlePlayerCard"+index);
         if(card){
@@ -12213,7 +12278,7 @@ function returnFromBattleTargetSelection(){
 
 function clearActiveCharacterHighlight(){
 
-    [0,1,2].forEach(i=>{
+    getExistingPartyIndexes().forEach(i=>{
         const card=$("battlePlayerCard"+i);
         if(card){
             card.classList.remove(
@@ -12228,7 +12293,7 @@ function updateActiveCharacterHighlight(){
 
     for(
         let i=0;
-        i<3;
+        i<6;
         i++
     ){
 
@@ -12458,7 +12523,7 @@ function prepareAction(type){
             /* 單體我方技能先選角色；全體技能維持直接宣告。 */
             if(skill.targetType==="ally" || skill.targetType==="allyTri" || skill.targetType==="deadAlly"){
 
-                const hasValidTarget=[0,1,2].some(index=>
+                const hasValidTarget=getExistingPartyIndexes().some(index=>
                     isValidAllyTargetForSkill(
                         skill,
                         getBattleCharacterByIndex(index),
@@ -13134,7 +13199,7 @@ function buildInitiativeQueue(){
         if(!character || character.hp<=0){ return; }
 
         list.push({
-            type:"player",
+            type:character.combatantKind==="heroNpc"?"heroNpc":"player",
             characterIndex:characterIndex,
             agility:getPartyBattleStats(characterIndex).agility
         });
@@ -13544,7 +13609,7 @@ function processNextCombatant(token){
         ];
 
 
-    if(entry.type==="player"){
+    if((entry.type==="player"||entry.type==="heroNpc")){
 
         /*
            這個角色有可能在這個大回合
@@ -13696,6 +13761,11 @@ function resolveQueuedPlayerAction(characterIndex,token){
 
     }
 
+
+    const combatant=getPartyCharacterByIndex(characterIndex);
+    if(combatant&&combatant.combatantKind==="heroNpc"&&queued.action!=="normal"){
+        finishPlayerAction();return;
+    }
 
     const isAdditionalCharacter=
         characterIndex>0;
@@ -16707,7 +16777,7 @@ function castDamageSkill(skillId){
             ];
 
 
-        getCharacters().forEach(
+        getExistingPartyIndexes().map(getPartyCharacterByIndex).forEach(
             character=>{
 
                 if(
@@ -16809,7 +16879,7 @@ function castDamageSkill(skillId){
 */
 
 function getActivePlayerCharacters(){
-    return getCharacters().filter(
+    return getExistingPartyIndexes().map(getPartyCharacterByIndex).filter(
         character=>character && character.hp>0
     );
 }
@@ -16854,7 +16924,7 @@ function castBuffSkill(skillId,targetIndex){
 
     function pushBuff(extraFields){
         const targets=skill.targetType==="allyAll"
-            ? getActivePlayerCharacters().slice(0,3)
+            ? getActivePlayerCharacters()
             : [chosenTarget||player];
 
         targets.forEach(character=>{
@@ -17286,12 +17356,12 @@ function tickPlayerBuffs(){
 
     /*
        ★ 修正（角色陣列重構第一階段）：
-       改用getCharacters()，之後加第三角色，
+       改用getExistingPartyIndexes().map(getPartyCharacterByIndex)，之後加第三角色，
        這裡完全不用再改一行，自動就會一起
        處理到。
     */
 
-    getCharacters().forEach(
+    getExistingPartyIndexes().map(getPartyCharacterByIndex).forEach(
         character=>{
 
             tickBuffsForCharacter(
@@ -18724,6 +18794,7 @@ function applyPostBattleAutoRecovery(){
 
     getExistingPartyIndexes().forEach(characterIndex=>{
 
+        if(characterIndex>=3){ return; }
         const character=getPartyCharacterByIndex(characterIndex);
         const config=getPartyAutoConfig(characterIndex);
         const stats=getPartyBattleStats(characterIndex);
@@ -22909,7 +22980,7 @@ function renderPlayers(){
         return {
             character:character,
             characterIndex:characterIndex,
-            id:character.id||("角色"+(characterIndex+1)),
+            id:character.name||character.id||("角色"+(characterIndex+1)),
             icon:elementDatabase[character.element]
                 ? elementDatabase[character.element].icon
                 : "",

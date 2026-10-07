@@ -1893,6 +1893,7 @@
         monsters=monsterList;
         currentZone="dungeon";
 
+        initializeHeroBattleCombatants();
         battleActive=true;
         battleToken++;
         battleRoundBoundaryKeys=new Set();

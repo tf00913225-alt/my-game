@@ -209,6 +209,8 @@ jobs:
           node tests/boss-snapshot-owner-lifecycle-convergence-20261001.test.js
           node tests/fixed-slot-battlefield-rendering-v2.test.js
           node tests/fixed-battlefield-ally-formation.test.mjs
+          node tests/hero-core-phase1.test.js
+          node tests/hero-battle-phase2a.test.js
 
       - name: Run battle layout, timing and range-VFX regressions
         run: |
