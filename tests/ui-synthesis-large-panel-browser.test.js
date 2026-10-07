@@ -6,6 +6,8 @@ const path=require("node:path");
 const cp=require("node:child_process");
 
 function findChrome(){
+    const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    if(configured&&fs.existsSync(configured)){ return configured; }
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }

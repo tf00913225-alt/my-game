@@ -700,38 +700,6 @@
         };
     }
 
-    /* ----- Synthesis step 2 is retired; equipment output is always ordinary. ----- */
-    function polishSynthesis(){
-        const root=document.querySelector(".v141-synthesis");
-        if(!root){ return; }
-        root.classList.add("v146-synthesis-ordinary");
-        root.querySelectorAll(".v141-blueprint-series").forEach(node=>node.remove());
-        root.querySelectorAll("label").forEach(label=>{
-            if(/^\s*2[　\s]/.test(label.textContent||"")){ label.remove(); }
-        });
-        root.querySelectorAll(".v143-item-picker button").forEach(button=>{
-            const span=button.querySelector("span");
-            const original=button.getAttribute("aria-label")||span&&span.textContent||"設計圖";
-            const cleaned=original.replace(SYNTHESIS_SET_PREFIX,"");
-            button.setAttribute("aria-label",cleaned);
-            button.title=cleaned;
-            if(span){ span.remove(); }
-        });
-        const preview=root.querySelector(".v141-craft-preview div:last-child");
-        if(preview){
-            preview.innerHTML="<b>隨機普通裝備</b><span>合成只會產生一般普通裝備；四大套裝僅由戰鬥掉落或獎勵取得。</span>";
-        }
-    }
-
-    if(typeof window.v141RenderSynthesis==="function"){
-        const previousRenderSynthesis=window.v141RenderSynthesis;
-        window.v141RenderSynthesis=function(){
-            const result=previousRenderSynthesis.apply(this,arguments);
-            polishSynthesis();
-            return result;
-        };
-    }
-
     /* ----- Shared lifecycle. ----- */
     if(typeof showPage==="function"){
         const previousShowPage=showPage;
@@ -761,7 +729,6 @@
         mutationQueued=false;
         syncShopTotals();
         syncDungeonShell();
-        polishSynthesis();
         syncCharacterAttentionDots();
     }
     if(typeof MutationObserver!=="undefined"){
@@ -783,7 +750,7 @@
     normalizeOrdinarySynthesisData();
     syncSetDefinitions();
     const boot=()=>{
-        renderHomeRoster(); syncDungeonShell(); syncShopTotals(); polishSynthesis(); syncDefeatedCards(); syncCharacterAttentionDots();
+        renderHomeRoster(); syncDungeonShell(); syncShopTotals(); syncDefeatedCards(); syncCharacterAttentionDots();
     };
     if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",boot,{once:true}); }
     else{ boot(); }
