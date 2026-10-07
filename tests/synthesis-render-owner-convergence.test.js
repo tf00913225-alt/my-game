@@ -72,7 +72,8 @@ test("all five material promotions retain 50 to 10, IDs, options and rollback",(
     }
 });
 test("fragment quantity and transaction remain 100 fragments plus 500 gold per ticket",()=>{
-    const h=harness();h.put("fragmentSetFire",400);h.c.openHomeFeature("synthesis");h.c.v141SwitchSynthesisTab("fragment");h.c.v141AdjustFragmentQty("setFire",1);
+    const h=harness();h.put("fragmentSetFire",400);h.c.openHomeFeature("synthesis");h.c.v141SwitchSynthesisTab("fragment");h.c.v141AdjustFragmentQty("setFire","max");
+    assert.match(h.body.innerHTML,/<strong>4<\/strong>/);h.c.v141AdjustFragmentQty("setFire",-1);assert.match(h.body.innerHTML,/<strong>3<\/strong>/);h.c.v141AdjustFragmentQty("setFire",-1);
     h.c.v141CraftFragmentTicket("setFire");assert.equal(h.count("fragmentSetFire"),200);assert.equal(h.count("ticketFire"),2);assert.equal(h.c.gold,99000);
     const snapshot=JSON.stringify(h.c.inventoryItems);h.c.failAdd=true;h.c.v141CraftFragmentTicket("setFire");assert.equal(JSON.stringify(h.c.inventoryItems),snapshot);assert.equal(h.c.gold,99000);
 });

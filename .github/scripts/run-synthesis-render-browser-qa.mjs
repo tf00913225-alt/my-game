@@ -70,7 +70,15 @@ try{
   const rollback=await c.eval(`(()=>{const holdings=()=>inventoryItems.map(n=>({id:n.id,count:n.count})).sort((a,b)=>a.id.localeCompare(b.id)),before=JSON.stringify(holdings()),g=gold,add=v132AddItemToInventory;v132AddItemToInventory=()=>false;try{v141CraftTalismans();return {inventory:JSON.stringify(holdings())===before,gold:gold===g,pickers:document.querySelectorAll('.v143-item-picker').length};}finally{v132AddItemToInventory=add;}})()`);assert.deepEqual(rollback,{inventory:true,gold:true,pickers:1});
   await c.eval(`document.querySelector('#v169RpgDialogLayer.show .v169-rpg-dialog-actions button:last-child')?.click();true`);
   await c.eval(`v141SwitchSynthesisTab('fragment');true`);const fragmentLayout=await layout(width);
-  const fragment=await c.eval(`(()=>{const count=id=>inventoryItems.filter(n=>n.id===id).reduce((s,n)=>s+n.count,0),ticket=v132GetContentDefinitions().tickets.find(n=>n.setId==='setFire');v141AdjustFragmentQty('setFire',-100);v141AdjustFragmentQty('setFire',1);const before={fragment:count('fragmentSetFire'),ticket:count(ticket.id),gold};v141CraftFragmentTicket('setFire');return {before,after:{fragment:count('fragmentSetFire'),ticket:count(ticket.id),gold}};})()`);
+  await tap('.v141-fragment-row:first-child .v141-fragment-controls div button:last-child');
+  assert.equal(await c.eval(`document.querySelector('.v141-fragment-row:first-child strong').textContent`),'4');
+  await tap('.v141-fragment-row:first-child .v141-fragment-controls div button:first-child');
+  assert.equal(await c.eval(`document.querySelector('.v141-fragment-row:first-child strong').textContent`),'3');
+  await tap('.v141-fragment-row:first-child .v141-fragment-controls div button:nth-of-type(2)');
+  assert.equal(await c.eval(`document.querySelector('.v141-fragment-row:first-child strong').textContent`),'4');
+  await tap('.v141-fragment-row:first-child .v141-fragment-controls div button:first-child');
+  await tap('.v141-fragment-row:first-child .v141-fragment-controls div button:first-child');
+  const fragment=await c.eval(`(()=>{const count=id=>inventoryItems.filter(n=>n.id===id).reduce((s,n)=>s+n.count,0),ticket=v132GetContentDefinitions().tickets.find(n=>n.setId==='setFire');const before={fragment:count('fragmentSetFire'),ticket:count(ticket.id),gold};v141CraftFragmentTicket('setFire');return {before,after:{fragment:count('fragmentSetFire'),ticket:count(ticket.id),gold}};})()`);
   assert.equal(fragment.after.fragment,fragment.before.fragment-200);assert.equal(fragment.after.ticket,fragment.before.ticket+2);assert.equal(fragment.after.gold,fragment.before.gold-1000);
   await new Promise(r=>setTimeout(r,600));await c.eval(`v132CloseRewardModal();v141SwitchSynthesisTab('material');true`);
   const materialImages=await decode(),materialLayout=await layout(width);
