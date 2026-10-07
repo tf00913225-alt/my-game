@@ -48,6 +48,8 @@ The caller must provide the existing same-UID/revision canonical sources and an 
 
 Both `readyForPublication` and `authoritativeStateReady` remain false. Structural field coverage is not source authority or gameplay-semantic acceptance. Existing first-character sources lack this complete source and therefore cannot pass this reader; no migration candidate is adopted, callable/pointer is added, archive rewritten or player load enabled. Complete trusted writers, domain-specific sidecar validation, catalogue/skill parity, recovery retention and fresh-device rehearsal remain required before publication.
 
+`verifyCanonicalPlayableProjectionAgainstSources` checks the stored digest, byte length, UID/revision and false readiness flags, then independently rebuilds from the same sources. A self-consistent edited projection still fails if it differs from source records. It verifies internal evidence only and grants no publication or restore authority.
+
 ## Frozen internal battle evidence
 
 The product/authority ceiling and FREEZE decision are owned by `../DATA_SECURITY_CONTRACTS.md`. Preserve existing private battle sources, policies, receipts, rounds, terminal records and tests; these sections grant no successor construction or deletion. Ordinary bounded reward settlement does not require this server battle runtime.

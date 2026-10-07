@@ -3,7 +3,8 @@ import {createRequire} from "node:module";
 import {readFileSync} from "node:fs";
 import test from "node:test";
 const require=createRequire(import.meta.url);
-const {assembleCanonicalSnapshot,assembleCanonicalPlayableProjection,claimRecordsDigest}=require("../functions/src/canonical-snapshot.js");
+const {assembleCanonicalSnapshot,assembleCanonicalPlayableProjection,
+    verifyCanonicalPlayableProjectionAgainstSources,claimRecordsDigest}=require("../functions/src/canonical-snapshot.js");
 const {LEGACY_BACKUP_SIDECARS,ALLOWED_SAVE_KEYS}=require("../functions/src/cloud-save-policy.js");
 const {normalizeAccountState}=require("../functions/src/hero-core.js");
 
@@ -103,4 +104,34 @@ test("projection rejects oversized and non-JSON payloads before serialization ca
     const r=sources();r.playableState.bestiaryData.bad=undefined;assert.throws(()=>assemble(r));
     const large=sources();large.playableState.bestiaryData=Object.fromEntries(
         Array.from({length:20},(_,i)=>[i,"x".repeat(60000)]));assert.throws(()=>assemble(large));
+    const expanded=sources();
+    for(const entry of Object.values(expanded.progress.sidecars)){
+        entry.raw=JSON.stringify({data:"x".repeat(43000)});
+    }
+    expanded.playableState.bestiaryData={a:"x".repeat(60000),b:"x".repeat(60000),c:"x".repeat(60000)};
+    assert.ok(assembleCanonicalSnapshot("uid-a",7,expanded).byteLength<750*1024);
+    assert.throws(()=>assemble(expanded),/playable projection exceeds internal size budget/);
+});
+test("stored projection must match sources and cannot publish through tampered flags",()=>{
+    const r=sources(),bundle=assemble(r);
+    assert.deepEqual(verifyCanonicalPlayableProjectionAgainstSources(bundle,"uid-a",7,r),bundle.projection);
+    for(const change of [b=>b.projection.gameSave.gold++,b=>b.projection.sidecars.progress.raw="{}",
+        b=>b.projection.authoritativeStateReady=true,b=>b.readyForPublication=true,
+        b=>b.byteLength++,b=>b.projection.ownerUid="other",b=>b.projection.sourceServerRevision++]){
+        const b=structuredClone(bundle);change(b);
+        assert.throws(()=>verifyCanonicalPlayableProjectionAgainstSources(b,"uid-a",7,r));
+    }
+    r.playableState.bestiaryData.slime++;
+    assert.throws(()=>verifyCanonicalPlayableProjectionAgainstSources(bundle,"uid-a",7,r));
+});
+test("existing initial-character sources stay unpublished and cannot substitute missing playable domains",()=>{
+    const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
+    const r=makeInitialCharacterSources("uid-a",7,"create-a",{displayName:"new hero",element:"water",gender:"female",
+        attributes:{attack:1,intelligence:2,vitality:3,energy:4,defensePoints:0,agility:0}});
+    assert.equal(assembleCanonicalSnapshot("uid-a",7,r).readyForPublication,false);
+    assert.throws(()=>assemble(r));
+    r.playableState={...sources().playableState,provenance:"server-created"};
+    assert.throws(()=>assemble(r),/sidecar missing/);
+    const bad=sources();bad.progress.sidecars["element-box-state"].raw='{"constructor":{}}';
+    assert.throws(()=>assemble(bad));
 });

@@ -299,6 +299,7 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
         let parsed;
         try{parsed=JSON.parse(entry.raw);}catch(_){fail(`playable sidecar JSON: ${key}`);}
         if(!object(parsed)){fail(`playable sidecar structure: ${key}`);}
+        validateJsonValue(parsed,`sidecar ${key}`,0);
     }
     const gameSave={version:6,heroAccount:hero,player:players[0],player2:players[1],
         player3:players[2],gold:source.snapshot.economy.gold,
@@ -322,5 +323,21 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
         readyForPublication:false});
 }
 
+function verifyCanonicalPlayableProjectionAgainstSources(bundle,uid,revision,records){
+    if(!object(bundle)||!object(bundle.projection)||bundle.readyForPublication!==false||
+       bundle.projection.authoritativeStateReady!==false||
+       bundle.projection.ownerUid!==uid||bundle.projection.sourceServerRevision!==revision||
+       snapshotDigest(bundle.projection)!==bundle.sha256||
+       Buffer.byteLength(JSON.stringify(bundle.projection),"utf8")!==bundle.byteLength){
+        fail("playable projection digest, size, readiness or owner");
+    }
+    const rebuilt=assembleCanonicalPlayableProjection(uid,revision,records);
+    if(rebuilt.sha256!==bundle.sha256||rebuilt.byteLength!==bundle.byteLength){
+        fail("playable projection differs from canonical sources");
+    }
+    return bundle.projection;
+}
+
 module.exports={assembleCanonicalSnapshot,assembleCanonicalPlayableProjection,inspectCanonicalSnapshot,
-    verifyCanonicalSnapshotAgainstSources,claimRecordsDigest,MAX_SNAPSHOT_BYTES};
+    verifyCanonicalSnapshotAgainstSources,verifyCanonicalPlayableProjectionAgainstSources,
+    claimRecordsDigest,MAX_SNAPSHOT_BYTES};
