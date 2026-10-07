@@ -291,19 +291,10 @@ function renderMaterialSynthesis(){
     const body=document.querySelector("#homeFeatureModalBody .v141-synthesis-body");
     if(!body){return;}
     const oreSource=oreByTier(MATERIAL_STATE.oreTier),oreTarget=oreByTier(nextTier(MATERIAL_STATE.oreTier));
-    const bpSource=blueprintDef(MATERIAL_STATE.blueprintTier,MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
-    const bpTarget=blueprintDef(nextTier(MATERIAL_STATE.blueprintTier),MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
-    const sets=setOptions();
-    const setChoices=sets.map(([value,label])=>({value,label}));
-    const slotChoices=BLUEPRINT_SLOTS.map(slot=>({value:slot,label:SLOT_LABEL[slot]}));
     body.innerHTML='<div class="v17363-material-synthesis">'+
         '<section class="v17363-material-card"><h4>礦石升階</h4><p>同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。</p><div class="v17363-material-controls single">'+materialGameSelect("oreTier","升階路線",tierChoices(),MATERIAL_STATE.oreTier)+'</div>'+materialFlow(oreSource,oreTarget)+
         '<button class="v17363-craft-button" type="button" '+(!oreSource||ownedCount(oreSource.id)<50?'disabled':'')+' onclick="v17363CraftMaterial(&quot;ore&quot;)">合成下一階礦石 ×10</button></section>'+
-        '<section class="v17363-material-card"><h4>設計圖升階</h4><p>同系列、同部位、同階設計圖 50 張，可合成下一階同款設計圖 10 張。</p><div class="v17363-material-controls">'+
-        materialGameSelect("blueprintSet","系列",setChoices,MATERIAL_STATE.blueprintSet)+
-        materialGameSelect("blueprintSlot","部位",slotChoices,MATERIAL_STATE.blueprintSlot)+
-        materialGameSelect("blueprintTier","升階路線",tierChoices(),MATERIAL_STATE.blueprintTier)+'</div>'+materialFlow(bpSource,bpTarget)+
-        '<button class="v17363-craft-button" type="button" '+(!bpSource||ownedCount(bpSource.id)<50?'disabled':'')+' onclick="v17363CraftMaterial(&quot;blueprint&quot;)">合成下一階設計圖 ×10</button></section></div>';
+        '</div>';
     repairSynthesisIcons();
 }
 function materialFlow(source,target){
@@ -326,6 +317,7 @@ if(functionalModalRoot){functionalModalRoot.addEventListener("click",event=>{
     functionalModalRoot.querySelectorAll(".v17363-game-select.open").forEach(root=>{if(root.contains(event.target)){return;}root.classList.remove("open");const button=root.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
 });}
 window.v17363CraftMaterial=function(kind){
+    if(kind!=="ore"){ return false; }
     const isOre=kind==="ore";
     const tier=isOre?MATERIAL_STATE.oreTier:MATERIAL_STATE.blueprintTier;
     const targetTier=nextTier(tier);

@@ -10,16 +10,16 @@
 
     const VERSION="144";
     const SHOP_POTION_PRICES={
-        hpPotion10:20,hpPotion20:45,hpPotion30:75,
-        spPotion10:25,spPotion20:55,spPotion30:90
+        hpPotion10:20,hpPotion50:80,hpPotion30:75,
+        spPotion10:25,spPotion50:100,spPotion30:90
     };
     const SHOP_POTION_IDS=Object.keys(SHOP_POTION_PRICES);
     const SHOP_POTION_PRESENTATION=Object.freeze({
         hpPotion10:Object.freeze({name:"回春散",iconPath:"assets/items/potions/hp-potion-10-huichun.webp"}),
-        hpPotion20:Object.freeze({name:"養命丹",iconPath:"assets/items/potions/hp-potion-20-yangming.webp"}),
+        hpPotion50:Object.freeze({name:"HP 50%補品",iconPath:"assets/items/potions/hp-potion-20-yangming.webp"}),
         hpPotion30:Object.freeze({name:"大還丹",iconPath:"assets/items/potions/hp-potion-30-dahuan.webp"}),
         spPotion10:Object.freeze({name:"凝氣散",iconPath:"assets/items/potions/sp-potion-10-ningqi.webp"}),
-        spPotion20:Object.freeze({name:"聚氣丹",iconPath:"assets/items/potions/sp-potion-20-juqi.webp"}),
+        spPotion50:Object.freeze({name:"SP 50%補品",iconPath:"assets/items/potions/sp-potion-20-juqi.webp"}),
         spPotion30:Object.freeze({name:"歸元丹",iconPath:"assets/items/potions/sp-potion-30-guiyuan.webp"})
     });
     const SHOP_PRICE_TIERS=[
@@ -193,10 +193,10 @@
     }
 
     ensurePotion("hpPotion10","hp",10,SHOP_POTION_PRICES.hpPotion10);
-    ensurePotion("hpPotion20","hp",20,SHOP_POTION_PRICES.hpPotion20);
+    ensurePotion("hpPotion50","hp",50,SHOP_POTION_PRICES.hpPotion50);
     ensurePotion("hpPotion30","hp",30,SHOP_POTION_PRICES.hpPotion30);
     ensurePotion("spPotion10","sp",10,SHOP_POTION_PRICES.spPotion10);
-    ensurePotion("spPotion20","sp",20,SHOP_POTION_PRICES.spPotion20);
+    ensurePotion("spPotion50","sp",50,SHOP_POTION_PRICES.spPotion50);
     ensurePotion("spPotion30","sp",30,SHOP_POTION_PRICES.spPotion30);
 
     function shopTier(){

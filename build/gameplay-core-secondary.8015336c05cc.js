@@ -12,16 +12,16 @@
 
     const VERSION="144";
     const SHOP_POTION_PRICES={
-        hpPotion10:20,hpPotion20:45,hpPotion30:75,
-        spPotion10:25,spPotion20:55,spPotion30:90
+        hpPotion10:20,hpPotion50:80,hpPotion30:75,
+        spPotion10:25,spPotion50:100,spPotion30:90
     };
     const SHOP_POTION_IDS=Object.keys(SHOP_POTION_PRICES);
     const SHOP_POTION_PRESENTATION=Object.freeze({
         hpPotion10:Object.freeze({name:"回春散",iconPath:"assets/items/potions/hp-potion-10-huichun.webp"}),
-        hpPotion20:Object.freeze({name:"養命丹",iconPath:"assets/items/potions/hp-potion-20-yangming.webp"}),
+        hpPotion50:Object.freeze({name:"HP 50%補品",iconPath:"assets/items/potions/hp-potion-20-yangming.webp"}),
         hpPotion30:Object.freeze({name:"大還丹",iconPath:"assets/items/potions/hp-potion-30-dahuan.webp"}),
         spPotion10:Object.freeze({name:"凝氣散",iconPath:"assets/items/potions/sp-potion-10-ningqi.webp"}),
-        spPotion20:Object.freeze({name:"聚氣丹",iconPath:"assets/items/potions/sp-potion-20-juqi.webp"}),
+        spPotion50:Object.freeze({name:"SP 50%補品",iconPath:"assets/items/potions/sp-potion-20-juqi.webp"}),
         spPotion30:Object.freeze({name:"歸元丹",iconPath:"assets/items/potions/sp-potion-30-guiyuan.webp"})
     });
     const SHOP_PRICE_TIERS=[
@@ -195,10 +195,10 @@
     }
 
     ensurePotion("hpPotion10","hp",10,SHOP_POTION_PRICES.hpPotion10);
-    ensurePotion("hpPotion20","hp",20,SHOP_POTION_PRICES.hpPotion20);
+    ensurePotion("hpPotion50","hp",50,SHOP_POTION_PRICES.hpPotion50);
     ensurePotion("hpPotion30","hp",30,SHOP_POTION_PRICES.hpPotion30);
     ensurePotion("spPotion10","sp",10,SHOP_POTION_PRICES.spPotion10);
-    ensurePotion("spPotion20","sp",20,SHOP_POTION_PRICES.spPotion20);
+    ensurePotion("spPotion50","sp",50,SHOP_POTION_PRICES.spPotion50);
     ensurePotion("spPotion30","sp",30,SHOP_POTION_PRICES.spPotion30);
 
     function shopTier(){
@@ -1516,7 +1516,7 @@
         document.querySelectorAll(".battle-player.v148-revive-target").forEach(card=>
             card.classList.remove("v148-revive-target")
         );
-        const skill=typeof skillDatabase!=="undefined"?skillDatabase[actionType]:null;
+        const skill=typeof getBattleAllyActionDefinition==="function"?getBattleAllyActionDefinition(actionType):(typeof skillDatabase!=="undefined"?skillDatabase[actionType]:null);
         if(!skill||skill.targetType!=="deadAlly"){ return; }
         partyIndexes().forEach(index=>{
             const character=getPartyCharacterByIndex(index);
@@ -1815,6 +1815,27 @@
         );
     }
 
+    // Shared revive mutation/reactivation boundary for skill and consumable sources.
+    function reactivateRevivedPartyUnit(index,target,hp){
+        if(!target||numeric(target.hp)!==0||getPartyCharacterByIndex(index)!==target){ return false; }
+        target.hp=hp;
+        if(typeof updateUI==="function"){ updateUI(); }
+        return true;
+    }
+    window.v148ResolveRevivalPill=function(characterIndex,targetIndex,definition){
+        const caster=getPartyCharacterByIndex(characterIndex),target=getPartyCharacterByIndex(targetIndex);
+        if(!battleActive||!caster||numeric(caster.hp)<=0||!target||numeric(target.hp)!==0||getPotionCount(definition.id)<1){
+            return finishSupport("沒有合法死亡目標，還魂丹未消耗。");
+        }
+        // Synchronous settlement: consume and reactivate in the existing action queue.
+        if(!consumePotionFromInventory(definition.id,1)){ return finishSupport("還魂丹數量不足。"); }
+        reactivateRevivedPartyUnit(targetIndex,target,definition.fixedReviveHP);
+        if(typeof showPlayerHit==="function"){ showPlayerHit(definition.fixedReviveHP,"heal",targetIndex,true); }
+        if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("player",targetIndex,"revive"); }
+        if(typeof saveGame==="function"){ saveGame(); }
+        return finishSupport((target.id||"隊友")+"被還魂丹復活，HP 35；SP不恢復。");
+    };
+
     function resolvePartyRevive(characterIndex,queued,skill,state){
         let targetIndex=Number.isInteger(queued.targetAlly)?queued.targetAlly:null;
         if(targetIndex===null){
@@ -1841,7 +1862,7 @@
         const reviveMessage=(target.id||"隊友")+"被"+skill.name+"復活，恢復"+restoredHP+" HP。";
         const reviveAtImpact=()=>{
             if(numeric(target.hp)>0){ return; }
-            target.hp=restoredHP;
+            reactivateRevivedPartyUnit(targetIndex,target,restoredHP);
             if(typeof addBattleLog==="function"){ addBattleLog(reviveMessage); }
             if(typeof updateUI==="function"){ updateUI(); }
             if(typeof showPlayerHit==="function"){ showPlayerHit(restoredHP,"heal",targetIndex,true); }
@@ -7195,6 +7216,7 @@
         if(total<=1){ return null; }
         if(typeof getPotionDefinition==="function"){
             const definition=getPotionDefinition(item.id);
+            if(definition?.battleOnly){ return null; }
             if(definition){ return {kind:"potion",label:"批量使用",total,definition}; }
         }
         if(item.type==="chest"&&SUPPORTED_BATCH_CHEST_IDS.has(String(item.id||""))){
@@ -8060,19 +8082,10 @@ function renderMaterialSynthesis(){
     const body=document.querySelector("#homeFeatureModalBody .v141-synthesis-body");
     if(!body){return;}
     const oreSource=oreByTier(MATERIAL_STATE.oreTier),oreTarget=oreByTier(nextTier(MATERIAL_STATE.oreTier));
-    const bpSource=blueprintDef(MATERIAL_STATE.blueprintTier,MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
-    const bpTarget=blueprintDef(nextTier(MATERIAL_STATE.blueprintTier),MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
-    const sets=setOptions();
-    const setChoices=sets.map(([value,label])=>({value,label}));
-    const slotChoices=BLUEPRINT_SLOTS.map(slot=>({value:slot,label:SLOT_LABEL[slot]}));
     body.innerHTML='<div class="v17363-material-synthesis">'+
         '<section class="v17363-material-card"><h4>礦石升階</h4><p>同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。</p><div class="v17363-material-controls single">'+materialGameSelect("oreTier","升階路線",tierChoices(),MATERIAL_STATE.oreTier)+'</div>'+materialFlow(oreSource,oreTarget)+
         '<button class="v17363-craft-button" type="button" '+(!oreSource||ownedCount(oreSource.id)<50?'disabled':'')+' onclick="v17363CraftMaterial(&quot;ore&quot;)">合成下一階礦石 ×10</button></section>'+
-        '<section class="v17363-material-card"><h4>設計圖升階</h4><p>同系列、同部位、同階設計圖 50 張，可合成下一階同款設計圖 10 張。</p><div class="v17363-material-controls">'+
-        materialGameSelect("blueprintSet","系列",setChoices,MATERIAL_STATE.blueprintSet)+
-        materialGameSelect("blueprintSlot","部位",slotChoices,MATERIAL_STATE.blueprintSlot)+
-        materialGameSelect("blueprintTier","升階路線",tierChoices(),MATERIAL_STATE.blueprintTier)+'</div>'+materialFlow(bpSource,bpTarget)+
-        '<button class="v17363-craft-button" type="button" '+(!bpSource||ownedCount(bpSource.id)<50?'disabled':'')+' onclick="v17363CraftMaterial(&quot;blueprint&quot;)">合成下一階設計圖 ×10</button></section></div>';
+        '</div>';
     repairSynthesisIcons();
 }
 function materialFlow(source,target){
@@ -8095,6 +8108,7 @@ if(functionalModalRoot){functionalModalRoot.addEventListener("click",event=>{
     functionalModalRoot.querySelectorAll(".v17363-game-select.open").forEach(root=>{if(root.contains(event.target)){return;}root.classList.remove("open");const button=root.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
 });}
 window.v17363CraftMaterial=function(kind){
+    if(kind!=="ore"){ return false; }
     const isOre=kind==="ore";
     const tier=isOre?MATERIAL_STATE.oreTier:MATERIAL_STATE.blueprintTier;
     const targetTier=nextTier(tier);

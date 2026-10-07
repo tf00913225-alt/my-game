@@ -2481,6 +2481,7 @@
         {id:"setWind",label:"青嵐"}
     ];
 
+    // Retired: definitions resolve old saves only; never a gameplay resource.
     const blueprintDefinitions=[];
     BLUEPRINT_SLOTS.forEach(slot=>{
         RESOURCE_TIERS.forEach(tier=>{
@@ -2491,6 +2492,7 @@
                     icon:blueprintIcon(slot.key,tier.key),
                     type:"material",
                     blueprintSlot:slot.key,
+                    retired:true,compatibilityOnly:true,
                     tierKey:tier.key,
                     legacyTierKey:tier.legacyKey,
                     available:tier.available!==false,
@@ -2552,7 +2554,7 @@
     function syncStaticContentPresentation(item,definition){
         if(!item || !definition || item.id!==definition.id){ return item; }
         [
-            "name","icon","type","price","setId","tierKey","legacyTierKey","available","planned","blueprintSlot",
+            "name","icon","type","price","setId","tierKey","legacyTierKey","available","planned","blueprintSlot","retired","compatibilityOnly",
             "talismanEffect","talismanDuration","tierChance","sharedSkillId","talismanSkillLevel"
         ].forEach(key=>{
             if(Object.prototype.hasOwnProperty.call(definition,key)){
@@ -2665,7 +2667,7 @@
         return {
             talismans:talismanDefinitions.slice(),
             ores:oreDefinitions.slice(),
-            blueprints:blueprintDefinitions.slice(),
+            blueprints:[],
             tickets:ticketDefinitions.slice(),
             equipmentSets:EQUIPMENT_SETS.slice(),
             equipmentSetItems:equipmentSetItemDefinitions.slice()
@@ -2703,7 +2705,7 @@
     window.v132CanAddItemToInventory=canAddItemToInventory;
 
     function addItemToInventory(definition,amount){
-        if(!definition){ return false; }
+        if(!definition||definition.retired||definition.compatibilityOnly||definition.blueprintSlot||/^blueprint/.test(definition.id)||/^(hp|sp)Potion100$/.test(definition.id)){ return false; }
         const quantity=Math.max(1,Math.floor(Number(amount)||1));
         const maxStack=isEquipmentInventoryType(definition.type)
             ? 1
@@ -2847,12 +2849,10 @@
           獨立判定）
     ===================================================== */
 
-    const NORMAL_DROP_POOL=[
-        ()=>getTalismanDefinition("freezeTalismanLow"),
-        ()=>getTalismanDefinition("stealthTalismanLow"),
-        ()=>getTalismanDefinition("barrierTalismanLow"),
-        ()=>getOreDefinition("oreLow")
-    ];
+    const NORMAL_DROP_TABLE=Object.freeze([
+        {itemId:"freezeTalismanLow",chance:.05,quantity:1},{itemId:"stealthTalismanLow",chance:.05,quantity:1},
+        {itemId:"barrierTalismanLow",chance:.05,quantity:1},{itemId:"oreLow",chance:.05,quantity:1}
+    ].map(Object.freeze));
 
     function awardMonsterMaterialDrop(monster){
         /*
@@ -2863,9 +2863,9 @@
         if(window.v132ActiveDungeonRun){ return; }
 
         const gained=[];
-        NORMAL_DROP_POOL.forEach(getDef=>{
-            if(Math.random()*100>=5){ return; }
-            const definition=getDef();
+        NORMAL_DROP_TABLE.forEach(row=>{
+            if(Math.random()>=row.chance){ return; }
+            const definition=getTalismanDefinition(row.itemId)||getOreDefinition(row.itemId);
             if(!definition){ return; }
             if(addItemToInventory(definition,1)){
                 gained.push(definition.name);
@@ -3535,30 +3535,11 @@
         let html;
 
         if(item.type==="chest"){
-            const oreRows=CHEST_TIER_WEIGHTS.map(tier=>{
-                const oreDef=getOreDefinitionByTier(tier.key);
-                const amount=tier.key==="orange" ? 5 : 10;
-                return oreDef ? previewRow(oreDef.icon,oreDef.name,amount,tier.weight) : "";
+            const rows=MATERIAL_CHEST_DROP_TABLE.map(entry=>{
+                const def=materialChestRewardDefinition(entry.itemId);
+                return def?previewRow(def.icon,def.name,entry.amount,entry.weight):"";
             }).join("");
-            const blueprintRows=CHEST_TIER_WEIGHTS.map(tier=>{
-                const pool=getBlueprintDefinitionsByTier(tier.key);
-                const eachChance=pool.length ? tier.weight/pool.length : 0;
-                const amount=tier.key==="orange" ? 5 : 10;
-                return pool.map(definition=>
-                    previewRow(definition.icon,definition.name,amount,eachChance)
-                ).join("");
-            }).join("");
-            html=
-                '<div class="v132-reward-modal-inner">'+
-                '<h3>'+escapeHtml(item.name)+' 開啟預覽</h3>'+
-                '<p>每次開啟會各獲得1組礦石與1種裝備設計圖；兩類獎勵分開抽取。</p>'+
-                '<div class="v132-preview-section-title">可能獲得的礦石</div>'+
-                '<div class="v132-preview-list">'+oreRows+'</div>'+
-                '<div class="v132-preview-section-title">可能獲得的裝備設計圖</div>'+
-                '<div class="v132-preview-list v132-preview-list-scroll">'+blueprintRows+'</div>'+
-                '<div class="v132-reward-actions">'+
-                '<button type="button" onclick="v132CloseRewardModal()">關閉</button>'+
-                '</div></div>';
+            html='<div class="v132-reward-modal-inner"><h3>材料寶箱 開啟預覽</h3><p>鍛造材料＋實戰消耗品。每箱抽取一項；以下為暫定分布，取得機率尚未定案。</p><div class="v132-preview-list v132-preview-list-scroll">'+rows+'</div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">關閉</button></div></div>';
         }
         else if(item.type==="ticket"){
             const ticketDef=getTicketDefinition(item.id);
@@ -4266,12 +4247,17 @@
        放進背包，真正的開箱（骰礦石/設計圖階級）延後到玩家
        在背包裡點開這個物品、按下「開啟」的那一刻才進行。
     */
-    const CHEST_TIER_WEIGHTS=[
-        {key:"white",label:"白階",weight:40},
-        {key:"blue",label:"藍階",weight:30},
-        {key:"purple",label:"紫階",weight:20},
-        {key:"orange",label:"橙階",weight:10}
-    ];
+    // Sole provisional material chest drop table: preview, runtime and acquisition share it.
+    const MATERIAL_CHEST_DROP_TABLE=Object.freeze([
+        {itemId:"oreLow",weight:20,amount:10},{itemId:"oreMid",weight:15,amount:10},
+        {itemId:"oreHigh",weight:10,amount:10},{itemId:"orePerfect",weight:5,amount:5},
+        {itemId:"hpPotion10",weight:12,amount:1},{itemId:"spPotion10",weight:12,amount:1},
+        {itemId:"hpPotion30",weight:8,amount:1},{itemId:"spPotion30",weight:8,amount:1},
+        {itemId:"hpPotion50",weight:4,amount:1},{itemId:"spPotion50",weight:4,amount:1},
+        {itemId:"revivalPill",weight:2,amount:1}
+    ].map(entry=>Object.freeze({...entry,provisional:true})));
+    function materialChestRewardDefinition(id){ return getOreDefinition(id)||(typeof getPotionDefinition==="function"?getPotionDefinition(id):null); }
+    window.v132MaterialChestDropTable=MATERIAL_CHEST_DROP_TABLE;
 
     const materialChestDefinition={
         id:"materialChest",
@@ -4306,32 +4292,12 @@
     window.v132HydrateOwnedContentPresentation=hydrateOwnedContentPresentation;
     hydrateOwnedContentPresentation();
 
-    function pickWeightedTier(){
-        const roll=Math.random()*100;
-        let acc=0;
-        for(const tier of CHEST_TIER_WEIGHTS){
-            acc+=tier.weight;
-            if(roll<acc){ return tier.key; }
-        }
-        return CHEST_TIER_WEIGHTS[CHEST_TIER_WEIGHTS.length-1].key;
-    }
-
-    /* 骰「開1個材料寶箱」會拿到的內容，純計算、不碰背包。 */
     function rollMaterialChestRewards(){
-        const oreTier=pickWeightedTier();
-        const oreDef=getOreDefinitionByTier(oreTier);
-        const oreAmount=oreTier==="orange" ? 5 : 10;
-
-        const blueprintTier=pickWeightedTier();
-        const blueprintPool=getBlueprintDefinitionsByTier(blueprintTier);
-        const blueprintDef=blueprintPool[Math.floor(Math.random()*blueprintPool.length)];
-        const blueprintAmount=blueprintTier==="orange" ? 5 : 10;
-
-        return [
-            {def:oreDef,amount:oreAmount},
-            {def:blueprintDef,amount:blueprintAmount}
-        ];
+        let roll=Math.random()*MATERIAL_CHEST_DROP_TABLE.reduce((sum,row)=>sum+row.weight,0);
+        const entry=MATERIAL_CHEST_DROP_TABLE.find(row=>(roll-=row.weight)<0)||MATERIAL_CHEST_DROP_TABLE[MATERIAL_CHEST_DROP_TABLE.length-1];
+        return [{def:materialChestRewardDefinition(entry.itemId),amount:entry.amount}];
     }
+    window.v132RollMaterialChestRewards=rollMaterialChestRewards;
 
     /*
        從背包實際開啟1個材料寶箱：先確認庫存夠、扣掉1個寶箱，
@@ -4410,77 +4376,7 @@
 
     /* Equipment encounter retired. Formal Gold entry is owned by V148. */
 
-    function showEquipmentDungeonRewardModal(){
-        const html=
-            '<div class="v132-reward-modal-inner">'+
-            '<h3>裝備副本挑戰成功！</h3>'+
-            '<p>獲得高極裝備寶箱 ×1，請選擇1張抽獎券：</p>'+
-            '<div class="v132-ticket-choices">'+
-            ticketDefinitions.map(def=>
-                '<button type="button" class="v132-ticket-choice" onclick="v132ClaimEquipmentDungeonReward(\''+def.id+'\',false)">'+
-                '<span class="v132-ticket-icon">'+def.icon+'</span>'+
-                '<span class="v132-ticket-name">'+def.name+'</span>'+
-                '</button>'
-            ).join("")+
-            '</div>'+
-            '<div class="v132-reward-actions">'+
-            '<span class="v132-reward-note">選好之後可再選擇是否看廣告雙倍領取（雙倍＝同款抽獎券×2）</span>'+
-            '<button type="button" class="v132-reward-back" onclick="v132LeaveEquipmentReward()">返回</button>'+
-            '</div></div>';
-        v132ShowRewardModal(html);
-    }
-
-    window.v132LeaveEquipmentReward=function(){
-        v132CloseRewardModal();
-        showPage("dungeon");
-        switchDungeonTab("daily");
-    };
-
-    window.v132ClaimEquipmentDungeonReward=async function(ticketId,doubled){
-        function grant(amount){
-            const definition=getTicketDefinition(ticketId);
-            if(!definition){ return; }
-            if(!addItemToInventory(definition,amount)){
-                rebuildInventorySlots();
-                alert("背包空間不足，抽獎券尚未領取；請先整理背包後再試。");
-                return;
-            }
-            rebuildInventorySlots();
-            markDungeonUsed("equipment");
-            saveGame();
-            v132CloseRewardModal();
-            alert("獲得"+definition.name+"×"+amount+"！");
-            showPage("dungeon");
-            switchDungeonTab("daily");
-        }
-
-        if(doubled){
-            grant(2);
-            return;
-        }
-
-        if(!doubled){
-            const askDouble=
-                typeof window.rpgConfirm==="function" &&
-                await window.rpgConfirm(
-                    "要看廣告雙倍領取這張抽獎券嗎？",
-                    {
-                        title:"裝備副本獎勵",
-                        confirmText:"觀看廣告雙倍",
-                        cancelText:"直接領取"
-                    }
-                );
-            if(askDouble){
-                showRewardedAd(function(){ grant(2); },function(){
-                    alert("廣告未完成，改為直接領取。");
-                    grant(1);
-                });
-                return;
-            }
-        }
-        grant(1);
-    };
-
+    // Legacy equipment-ticket reward grant retired; equipment-progression owns this dungeon.
 
     /* =====================================================
        19. 通用獎勵彈窗（簡單覆蓋層，跟遊戲既有深色系一致）
@@ -9759,51 +9655,6 @@
         ).join("")+'</div>';
     }
 
-    function heldBlueprints(){
-        const byId=new Map();
-        inventoryItems.forEach(item=>{
-            if(!item||!item.blueprintSlot){ return; }
-            const tier=normalizeTierKey(item.tierKey);
-            if(!TIER_META[tier]||TIER_META[tier].available===false){ return; }
-            item.tierKey=tier;
-            if(!byId.has(item.id)){ byId.set(item.id,item); }
-        });
-        return [...byId.values()];
-    }
-
-    function renderCraftTab(){
-        const blueprints=heldBlueprints();
-        if(!blueprints.length){
-            return '<div class="v141-synthesis-empty">背包內沒有裝備設計圖紙。<small>材料寶箱可取得圖紙與礦石。</small></div>';
-        }
-        if(!blueprints.some(item=>item.id===synthesisState.blueprintId)){ synthesisState.blueprintId=blueprints[0].id; }
-        const blueprint=blueprints.find(item=>item.id===synthesisState.blueprintId);
-        const tier=normalizeTierKey(blueprint.tierKey);
-        const meta=TIER_META[tier];
-        const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
-        const blueprintSeries=SERIES.find(item=>item.setId===blueprint.setId)||null;
-        const series=blueprintSeries||SERIES.find(item=>item.setId===synthesisState.seriesId)||SERIES[0];
-        const ore=definitions().ores.find(item=>normalizeTierKey(item.tierKey)===tier);
-        const blueprintCount=countItem(blueprint.id);
-        const oreCount=ore?countItem(ore.id):0;
-        const canCraft=blueprintCount>=50&&oreCount>=50&&gold>=meta.craftGold&&inventoryItems.length<120;
-        return '<div class="v141-synthesis-card">'+
-            '<label>1　選擇設計圖紙<select onchange="v141SelectCraftBlueprint(this.value)">'+blueprints.map(item=>
-                '<option value="'+escapeHtml(item.id)+'" '+(item.id===blueprint.id?'selected':'')+'>'+escapeHtml(item.name)+'（'+countItem(item.id)+'）</option>'
-            ).join("")+'</select></label>'+
-            (blueprintSeries
-                ?'<div class="v141-blueprint-series"><span>2　裝備系列</span><b>'+series.label+'（由圖紙決定）</b></div>'
-                :'<label>2　舊圖紙系列<select onchange="v141SelectCraftSeries(this.value)">'+SERIES.map(item=>
-                    '<option value="'+item.setId+'" '+(item.setId===series.setId?'selected':'')+'>'+item.label+'</option>'
-                ).join("")+'</select><small>僅舊存檔既有圖紙沒有系列欄位；新取得圖紙會自動指定系列。</small></label>')+
-            '<section class="v141-craft-preview"><div class="v141-craft-icon">'+svgIcon(slot.glyph,series.color)+'</div><div><b>'+series.label+meta.label+slot.label+'</b><span>'+rangeText(tier,false)+'</span></div></section>'+
-            '<div class="v141-material-lines"><span>圖紙 <b class="'+(blueprintCount>=50?'ok':'lack')+'">'+blueprintCount+' / 50</b></span>'+
-            '<span>'+escapeHtml(ore&&ore.name||meta.label+'礦石')+' <b class="'+(oreCount>=50?'ok':'lack')+'">'+oreCount+' / 50</b></span>'+
-            '<span>金幣 <b class="'+(gold>=meta.craftGold?'ok':'lack')+'">'+meta.craftGold.toLocaleString('zh-TW')+'</b></span></div>'+
-            '<button type="button" class="v141-synthesis-primary" '+(canCraft?'':'disabled')+' onclick="v141CraftEquipment()">開始合成</button>'+
-            '<button type="button" class="v141-affix-info" onclick="v141ShowAffixInfo()">ⓘ 詞條機率</button></div>';
-    }
-
     function renderReforgeTab(){
         const entries=allRefinableEquipment();
         if(!entries.length){ return '<div class="v141-synthesis-empty">沒有可冶煉的裝備。<small>只有具備至少 1 個冶煉槽、且未鎖定的裝備會出現在這裡。</small></div>'; }
@@ -9950,7 +9801,6 @@
         synthesisState.pendingReforge=null;
         renderSynthesis();
     };
-    window.v141SelectCraftBlueprint=function(id){ synthesisState.blueprintId=id; renderSynthesis(); };
     window.v141SelectCraftSeries=function(id){ synthesisState.seriesId=id; renderSynthesis(); };
     window.v141SelectReforgeItem=function(uid){
         synthesisState.reforgeUid=uid;
@@ -10006,31 +9856,6 @@
             return '<div><b>'+meta.label+'材料</b>　'+reforgeRangeText(tier,2)+'　／　'+cost+'</div>';
         }).join('');
         window.v132ShowRewardModal('<div class="v132-reward-modal-inner v141-affix-modal"><h3>冶煉規則</h3><p>裝備品質不限制材料階級。選用哪一階材料，本次重洗就使用哪一階的數值範圍。</p>'+lines+'<p>桃紅階、四象階已預留正式階級，但目前不開放數值與取得來源。</p><p>每次會重洗所有未鎖定的冶煉槽；已鎖定詞條保持原數值。冶煉次數不限。</p><p>消耗：未鎖定消耗 50 礦石；鎖 1 條 100 礦石；鎖 2 條 150 礦石。最多鎖 2 條，且至少保留 1 個槽位重洗。</p><p>單槽最高值固定10%；具副詞條範圍的材料，雙詞條同時最高固定5%。</p><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">返回</button></div></div>');
-    };
-
-    window.v141CraftEquipment=function(){
-        const blueprint=heldBlueprints().find(item=>item.id===synthesisState.blueprintId);
-        if(!blueprint){ return; }
-        const series=SERIES.find(item=>item.setId===(blueprint.setId||synthesisState.seriesId))||SERIES[0];
-        const tier=normalizeTierKey(blueprint.tierKey);
-        const meta=TIER_META[tier];
-        const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
-        const ore=definitions().ores.find(item=>normalizeTierKey(item.tierKey)===tier);
-        if(!ore||countItem(blueprint.id)<50||countItem(ore.id)<50||gold<meta.craftGold){ alert("素材或金幣不足。"); return; }
-        const stats=rollAffixes(tier,false);
-        const item={
-            id:makeUid("crafted"),v141Uid:makeUid("gear"),name:series.label+meta.label+slot.label,
-            icon:svgIcon(slot.glyph,series.color),type:slot.type,setId:series.setId,tierKey:tier,
-            levelRequirement:1,price:0,count:1,stats:stats,reforgeStats:null,v141Crafted:true
-        };
-        if(window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(item,1)){ alert("背包空間不足。"); return; }
-        const success=runInventoryTransaction(()=>{
-            return window.v132ConsumeStackItem(blueprint.id,50)&&window.v132ConsumeStackItem(ore.id,50)&&addItem(item,1);
-        });
-        if(!success){ alert("合成失敗，素材已自動還原。"); return; }
-        gold-=meta.craftGold;
-        rebuildInventorySlots(); updateGoldDisplay(); saveGame(); renderSynthesis();
-        showSynthesisResult("合成成功",'<div class="v141-result-item">'+item.icon+'<b>'+escapeHtml(item.name)+'</b>'+statsHtml(stats)+'</div>');
     };
 
     window.v141StartReforge=function(){
@@ -11698,38 +11523,6 @@
         const stats=Object.keys(item.stats||{}).map(key=>'<span>'+labels[key]+' <b>+'+item.stats[key]+'</b></span>').join("");
         window.v132ShowRewardModal('<div class="v132-reward-modal-inner"><h3>合成成功</h3><div class="v141-result-item">'+item.icon+'<b>'+escapeHtml(item.name)+'</b>'+stats+'</div><p>此為系統隨機生成的普通裝備，不屬於四大套裝。</p><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">確定</button></div></div>');
     }
-
-    window.v141CraftEquipment=function(){
-        const select=document.querySelector(".v141-synthesis-body select");
-        const blueprint=select&&(inventoryItems||[]).find(item=>item&&item.id===select.value&&item.blueprintSlot);
-        if(!blueprint){ return; }
-        const tier=normalizeTierKey(blueprint.tierKey);
-        const meta=TIER_META[normalizeTierKey(tier)];
-        const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
-        const ore=definitions().ores.find(item=>item.tierKey===tier);
-        if(!meta||meta.available===false||!ore||countItem(blueprint.id)<50||countItem(ore.id)<50||numeric(gold)<meta.craftGold){ alert("素材或金幣不足。"); return; }
-        const item={
-            id:"normal_crafted_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8),
-            v141Uid:"gear_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8),
-            name:NORMAL_GEAR_PREFIXES[Math.floor(Math.random()*NORMAL_GEAR_PREFIXES.length)]+meta.label+slot.label,
-            icon:svgIcon(slot.glyph,meta.color),type:slot.type,tierKey:tier,levelRequirement:1,
-            price:0,count:1,stats:rollNormalAffixes(tier),reforgeStats:null,
-            v141Crafted:true,v143NormalCraft:true
-        };
-        delete item.setId;
-        if(window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(item,1)){ alert("背包空間不足。"); return; }
-        const transaction=window.v132RunInventoryTransaction||function(operation){ return !!operation(); };
-        const success=transaction(()=>
-            window.v132ConsumeStackItem(blueprint.id,50)&&
-            window.v132ConsumeStackItem(ore.id,50)&&
-            window.v132AddItemToInventory(item,1)
-        );
-        if(!success){ alert("合成失敗，素材已自動還原。"); return; }
-        gold-=meta.craftGold;
-        rebuildInventorySlots(); updateGoldDisplay(); saveGame();
-        window.v141RenderSynthesis();
-        synthesisResult(item);
-    };
 
     function allEquipment(){
         const result=[];

@@ -1,0 +1,64 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import {buildItemAcquisitionProjection} from '../scripts/lib/item-acquisition-projection.mjs';
+const read=file=>fs.readFileSync(file,'utf8');
+const main=read('js/00-main.js');
+function declaration(name){const match=main.match(new RegExp('^function '+name+'\\([\\s\\S]*?^\\}','m'));assert.ok(match,name);return match[0];}
+function registry(){const ctx={window:{FourSymbolsItemAcquisitionData:buildItemAcquisitionProjection(process.cwd())}};vm.runInNewContext(read('js/item-acquisition-registry.js'),ctx);return ctx.window.FourSymbolsItemAcquisition;}
+test('material chest allowed pool and projection have a sole canonical owner',()=>{
+ const data=buildItemAcquisitionProjection(process.cwd());
+ const allowed=['oreLow','oreMid','oreHigh','orePerfect','hpPotion10','spPotion10','hpPotion30','spPotion30','hpPotion50','spPotion50','revivalPill'];
+ assert.deepEqual(Array.from(data.materialChest,row=>row.itemId).sort(),allowed.sort());
+ assert.equal(data.materialChest.reduce((n,row)=>n+row.weight,0),100);
+ const source=read('js/27-v132-content-expansion.js');
+ assert.match(source,/blueprints:\[\]/);
+ assert.match(source,/compatibilityOnly:true/);
+ assert.doesNotMatch(source,/getBlueprintDefinitionsByTier\(blueprintTier\)/);
+ assert.doesNotMatch(read('js/38-v143-system-fixes.js'),/ConsumeStackItem\(blueprint/);
+});
+test('50 percent is usable; retired 100 percent saves remain readable',()=>{
+ const array=main.match(/const potionDefinitions=([\s\S]*?\n\]);/)[1];
+ const ctx={};vm.runInNewContext('var potionDefinitions='+array+';'+['getPotionDefinition','getPotionRecoveryContract','resolvePotionRecovery'].map(declaration).join('\n'),ctx);
+ for(const id of ['hpPotion50','spPotion50'])assert.equal(ctx.resolvePotionRecovery(ctx.getPotionDefinition(id),10,200),100);
+ for(const id of ['hpPotion100','spPotion100'])assert.equal(ctx.resolvePotionRecovery(ctx.getPotionDefinition(id),10,200),190);
+ assert.doesNotMatch(main.match(/const RETIRED_BACKPACK_POTION_IDS=[\s\S]*?\);/)[0],/Potion50/);
+ assert.doesNotMatch(read('js/adventure/adventure-content-v1-20260915.js'),/id:"(?:hp|sp)Potion100"/);
+});
+test('rare full restoration uses the shared recovery formula',()=>{
+ const ctx={window:{},potionDefinitions:[],inventoryItems:[],getAutoPotionId:()=>null};vm.runInNewContext(['getPotionRecoveryContract','resolvePotionRecovery'].map(declaration).join('\n'),ctx);
+ vm.runInNewContext(read('js/adventure/adventure-items-v1-20260915.js'),ctx);
+ for(const def of Object.values(ctx.window.FourSymbolsAdventureItems.definitions))assert.equal(ctx.resolvePotionRecovery(def,35,300),265);
+});
+test('every source query is read-only, shows exact milestones and recursively traces chests',()=>{
+ const owner=registry();
+ for(const [id,floor] of [['relicChoiceBoxBlue',25],['relicChoiceBoxPurple',50],['relicChoiceBoxOrange',75],['relicChoiceBoxPink',100]]){
+  const source=owner.getSources(id)[0];assert.equal(source.floor,floor);assert.match(owner.formatSource(source),new RegExp('首次第'+floor+'層'));assert.equal(source.quantity,1);
+ }
+ const tree=owner.trace('revivalPill');assert.equal(tree[0].source.chestId,'materialChest');assert.equal(tree[0].parents[0].source.sourceId,'material');
+ assert.ok(owner.getSources('oreLow').length>1);
+ for(const id of ['heroMarrowPill','heroFragment_divineDogHongbao','unknown-future-gem'])assert.equal(owner.getSources(id).length,0);
+ assert.equal(owner.empty,'目前版本尚無正式取得途徑');
+ assert.match(read('index.html'),/id="itemAcquisitionButton"/);
+ assert.doesNotMatch(read('js/item-acquisition-registry.js'),/addItemToInventory|consumePotion|saveGame\(|grant\(/);
+});
+test('revival pill and skill share reactivation; success consumes exactly once and preserves SP',()=>{
+ const source=read('js/42-v148-combat-dungeon-fixes.js');
+ const shared=source.match(/    function reactivateRevivedPartyUnit[\s\S]*?\n    \}/)[0];
+ const pill=source.match(/    window\.v148ResolveRevivalPill=function[\s\S]*?\n    \};/)[0];
+ const party=[{hp:100,sp:45},{hp:0,sp:17}],ctx={window:{},party,battleActive:true,numeric:v=>Number(v)||0,getPartyCharacterByIndex:i=>party[i],getPotionCount:()=>ctx.count,consumePotionFromInventory:()=>{ctx.count--;return true;},finishSupport:()=>{ctx.finishes++;},count:2,finishes:0};
+ vm.runInNewContext(shared+'\n'+pill,ctx);
+ const def={id:'revivalPill',fixedReviveHP:35};
+ ctx.window.v148ResolveRevivalPill(0,1,def);assert.equal(party[1].hp,35);assert.equal(party[1].sp,17);assert.equal(ctx.count,1);assert.equal(ctx.finishes,1);
+ ctx.window.v148ResolveRevivalPill(0,1,def);assert.equal(ctx.count,1);
+ party[1].hp=0;ctx.battleActive=false;ctx.window.v148ResolveRevivalPill(0,1,def);assert.equal(ctx.count,1);assert.equal(party[1].hp,0);
+ assert.match(source,/reactivateRevivedPartyUnit\(targetIndex,target,restoredHP\)/);
+ assert.match(main,/resource:"revive",manualOnly:true/);
+ assert.match(declaration('usePotion'),/autoOn/);assert.match(declaration('usePotion'),/setBattleAllyTargetSelectionMode\(potionId\)/);
+});
+test('relic source compatibility API delegates to acquisition registry',()=>{
+ const body=read('js/relic-progression-drop-system.js').match(/    function relicSources[\s\S]*?\n    \}/)[0];
+ assert.match(body,/FourSymbolsItemAcquisition/);assert.doesNotMatch(body,/RELIC_BOSS_DROP_TABLE|majorMilestones/);
+ const owner=registry(),sources=owner.getSources('relicFragment_xuanwu_seal');assert.ok(sources.some(s=>s.bossName==='雪獄尊'));assert.ok(sources.some(s=>s.chestId==='relicChoiceBoxBlue'));
+});

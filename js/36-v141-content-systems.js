@@ -367,51 +367,6 @@
         ).join("")+'</div>';
     }
 
-    function heldBlueprints(){
-        const byId=new Map();
-        inventoryItems.forEach(item=>{
-            if(!item||!item.blueprintSlot){ return; }
-            const tier=normalizeTierKey(item.tierKey);
-            if(!TIER_META[tier]||TIER_META[tier].available===false){ return; }
-            item.tierKey=tier;
-            if(!byId.has(item.id)){ byId.set(item.id,item); }
-        });
-        return [...byId.values()];
-    }
-
-    function renderCraftTab(){
-        const blueprints=heldBlueprints();
-        if(!blueprints.length){
-            return '<div class="v141-synthesis-empty">背包內沒有裝備設計圖紙。<small>材料寶箱可取得圖紙與礦石。</small></div>';
-        }
-        if(!blueprints.some(item=>item.id===synthesisState.blueprintId)){ synthesisState.blueprintId=blueprints[0].id; }
-        const blueprint=blueprints.find(item=>item.id===synthesisState.blueprintId);
-        const tier=normalizeTierKey(blueprint.tierKey);
-        const meta=TIER_META[tier];
-        const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
-        const blueprintSeries=SERIES.find(item=>item.setId===blueprint.setId)||null;
-        const series=blueprintSeries||SERIES.find(item=>item.setId===synthesisState.seriesId)||SERIES[0];
-        const ore=definitions().ores.find(item=>normalizeTierKey(item.tierKey)===tier);
-        const blueprintCount=countItem(blueprint.id);
-        const oreCount=ore?countItem(ore.id):0;
-        const canCraft=blueprintCount>=50&&oreCount>=50&&gold>=meta.craftGold&&inventoryItems.length<120;
-        return '<div class="v141-synthesis-card">'+
-            '<label>1　選擇設計圖紙<select onchange="v141SelectCraftBlueprint(this.value)">'+blueprints.map(item=>
-                '<option value="'+escapeHtml(item.id)+'" '+(item.id===blueprint.id?'selected':'')+'>'+escapeHtml(item.name)+'（'+countItem(item.id)+'）</option>'
-            ).join("")+'</select></label>'+
-            (blueprintSeries
-                ?'<div class="v141-blueprint-series"><span>2　裝備系列</span><b>'+series.label+'（由圖紙決定）</b></div>'
-                :'<label>2　舊圖紙系列<select onchange="v141SelectCraftSeries(this.value)">'+SERIES.map(item=>
-                    '<option value="'+item.setId+'" '+(item.setId===series.setId?'selected':'')+'>'+item.label+'</option>'
-                ).join("")+'</select><small>僅舊存檔既有圖紙沒有系列欄位；新取得圖紙會自動指定系列。</small></label>')+
-            '<section class="v141-craft-preview"><div class="v141-craft-icon">'+svgIcon(slot.glyph,series.color)+'</div><div><b>'+series.label+meta.label+slot.label+'</b><span>'+rangeText(tier,false)+'</span></div></section>'+
-            '<div class="v141-material-lines"><span>圖紙 <b class="'+(blueprintCount>=50?'ok':'lack')+'">'+blueprintCount+' / 50</b></span>'+
-            '<span>'+escapeHtml(ore&&ore.name||meta.label+'礦石')+' <b class="'+(oreCount>=50?'ok':'lack')+'">'+oreCount+' / 50</b></span>'+
-            '<span>金幣 <b class="'+(gold>=meta.craftGold?'ok':'lack')+'">'+meta.craftGold.toLocaleString('zh-TW')+'</b></span></div>'+
-            '<button type="button" class="v141-synthesis-primary" '+(canCraft?'':'disabled')+' onclick="v141CraftEquipment()">開始合成</button>'+
-            '<button type="button" class="v141-affix-info" onclick="v141ShowAffixInfo()">ⓘ 詞條機率</button></div>';
-    }
-
     function renderReforgeTab(){
         const entries=allRefinableEquipment();
         if(!entries.length){ return '<div class="v141-synthesis-empty">沒有可冶煉的裝備。<small>只有具備至少 1 個冶煉槽、且未鎖定的裝備會出現在這裡。</small></div>'; }
@@ -558,7 +513,6 @@
         synthesisState.pendingReforge=null;
         renderSynthesis();
     };
-    window.v141SelectCraftBlueprint=function(id){ synthesisState.blueprintId=id; renderSynthesis(); };
     window.v141SelectCraftSeries=function(id){ synthesisState.seriesId=id; renderSynthesis(); };
     window.v141SelectReforgeItem=function(uid){
         synthesisState.reforgeUid=uid;
@@ -614,31 +568,6 @@
             return '<div><b>'+meta.label+'材料</b>　'+reforgeRangeText(tier,2)+'　／　'+cost+'</div>';
         }).join('');
         window.v132ShowRewardModal('<div class="v132-reward-modal-inner v141-affix-modal"><h3>冶煉規則</h3><p>裝備品質不限制材料階級。選用哪一階材料，本次重洗就使用哪一階的數值範圍。</p>'+lines+'<p>桃紅階、四象階已預留正式階級，但目前不開放數值與取得來源。</p><p>每次會重洗所有未鎖定的冶煉槽；已鎖定詞條保持原數值。冶煉次數不限。</p><p>消耗：未鎖定消耗 50 礦石；鎖 1 條 100 礦石；鎖 2 條 150 礦石。最多鎖 2 條，且至少保留 1 個槽位重洗。</p><p>單槽最高值固定10%；具副詞條範圍的材料，雙詞條同時最高固定5%。</p><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">返回</button></div></div>');
-    };
-
-    window.v141CraftEquipment=function(){
-        const blueprint=heldBlueprints().find(item=>item.id===synthesisState.blueprintId);
-        if(!blueprint){ return; }
-        const series=SERIES.find(item=>item.setId===(blueprint.setId||synthesisState.seriesId))||SERIES[0];
-        const tier=normalizeTierKey(blueprint.tierKey);
-        const meta=TIER_META[tier];
-        const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
-        const ore=definitions().ores.find(item=>normalizeTierKey(item.tierKey)===tier);
-        if(!ore||countItem(blueprint.id)<50||countItem(ore.id)<50||gold<meta.craftGold){ alert("素材或金幣不足。"); return; }
-        const stats=rollAffixes(tier,false);
-        const item={
-            id:makeUid("crafted"),v141Uid:makeUid("gear"),name:series.label+meta.label+slot.label,
-            icon:svgIcon(slot.glyph,series.color),type:slot.type,setId:series.setId,tierKey:tier,
-            levelRequirement:1,price:0,count:1,stats:stats,reforgeStats:null,v141Crafted:true
-        };
-        if(window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(item,1)){ alert("背包空間不足。"); return; }
-        const success=runInventoryTransaction(()=>{
-            return window.v132ConsumeStackItem(blueprint.id,50)&&window.v132ConsumeStackItem(ore.id,50)&&addItem(item,1);
-        });
-        if(!success){ alert("合成失敗，素材已自動還原。"); return; }
-        gold-=meta.craftGold;
-        rebuildInventorySlots(); updateGoldDisplay(); saveGame(); renderSynthesis();
-        showSynthesisResult("合成成功",'<div class="v141-result-item">'+item.icon+'<b>'+escapeHtml(item.name)+'</b>'+statsHtml(stats)+'</div>');
     };
 
     window.v141StartReforge=function(){

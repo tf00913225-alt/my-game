@@ -138,7 +138,7 @@
         document.querySelectorAll(".battle-player.v148-revive-target").forEach(card=>
             card.classList.remove("v148-revive-target")
         );
-        const skill=typeof skillDatabase!=="undefined"?skillDatabase[actionType]:null;
+        const skill=typeof getBattleAllyActionDefinition==="function"?getBattleAllyActionDefinition(actionType):(typeof skillDatabase!=="undefined"?skillDatabase[actionType]:null);
         if(!skill||skill.targetType!=="deadAlly"){ return; }
         partyIndexes().forEach(index=>{
             const character=getPartyCharacterByIndex(index);
@@ -437,6 +437,27 @@
         );
     }
 
+    // Shared revive mutation/reactivation boundary for skill and consumable sources.
+    function reactivateRevivedPartyUnit(index,target,hp){
+        if(!target||numeric(target.hp)!==0||getPartyCharacterByIndex(index)!==target){ return false; }
+        target.hp=hp;
+        if(typeof updateUI==="function"){ updateUI(); }
+        return true;
+    }
+    window.v148ResolveRevivalPill=function(characterIndex,targetIndex,definition){
+        const caster=getPartyCharacterByIndex(characterIndex),target=getPartyCharacterByIndex(targetIndex);
+        if(!battleActive||!caster||numeric(caster.hp)<=0||!target||numeric(target.hp)!==0||getPotionCount(definition.id)<1){
+            return finishSupport("沒有合法死亡目標，還魂丹未消耗。");
+        }
+        // Synchronous settlement: consume and reactivate in the existing action queue.
+        if(!consumePotionFromInventory(definition.id,1)){ return finishSupport("還魂丹數量不足。"); }
+        reactivateRevivedPartyUnit(targetIndex,target,definition.fixedReviveHP);
+        if(typeof showPlayerHit==="function"){ showPlayerHit(definition.fixedReviveHP,"heal",targetIndex,true); }
+        if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("player",targetIndex,"revive"); }
+        if(typeof saveGame==="function"){ saveGame(); }
+        return finishSupport((target.id||"隊友")+"被還魂丹復活，HP 35；SP不恢復。");
+    };
+
     function resolvePartyRevive(characterIndex,queued,skill,state){
         let targetIndex=Number.isInteger(queued.targetAlly)?queued.targetAlly:null;
         if(targetIndex===null){
@@ -463,7 +484,7 @@
         const reviveMessage=(target.id||"隊友")+"被"+skill.name+"復活，恢復"+restoredHP+" HP。";
         const reviveAtImpact=()=>{
             if(numeric(target.hp)>0){ return; }
-            target.hp=restoredHP;
+            reactivateRevivedPartyUnit(targetIndex,target,restoredHP);
             if(typeof addBattleLog==="function"){ addBattleLog(reviveMessage); }
             if(typeof updateUI==="function"){ updateUI(); }
             if(typeof showPlayerHit==="function"){ showPlayerHit(restoredHP,"heal",targetIndex,true); }

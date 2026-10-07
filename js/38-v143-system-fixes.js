@@ -468,38 +468,6 @@
         window.v132ShowRewardModal('<div class="v132-reward-modal-inner"><h3>合成成功</h3><div class="v141-result-item">'+item.icon+'<b>'+escapeHtml(item.name)+'</b>'+stats+'</div><p>此為系統隨機生成的普通裝備，不屬於四大套裝。</p><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">確定</button></div></div>');
     }
 
-    window.v141CraftEquipment=function(){
-        const select=document.querySelector(".v141-synthesis-body select");
-        const blueprint=select&&(inventoryItems||[]).find(item=>item&&item.id===select.value&&item.blueprintSlot);
-        if(!blueprint){ return; }
-        const tier=normalizeTierKey(blueprint.tierKey);
-        const meta=TIER_META[normalizeTierKey(tier)];
-        const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
-        const ore=definitions().ores.find(item=>item.tierKey===tier);
-        if(!meta||meta.available===false||!ore||countItem(blueprint.id)<50||countItem(ore.id)<50||numeric(gold)<meta.craftGold){ alert("素材或金幣不足。"); return; }
-        const item={
-            id:"normal_crafted_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8),
-            v141Uid:"gear_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8),
-            name:NORMAL_GEAR_PREFIXES[Math.floor(Math.random()*NORMAL_GEAR_PREFIXES.length)]+meta.label+slot.label,
-            icon:svgIcon(slot.glyph,meta.color),type:slot.type,tierKey:tier,levelRequirement:1,
-            price:0,count:1,stats:rollNormalAffixes(tier),reforgeStats:null,
-            v141Crafted:true,v143NormalCraft:true
-        };
-        delete item.setId;
-        if(window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(item,1)){ alert("背包空間不足。"); return; }
-        const transaction=window.v132RunInventoryTransaction||function(operation){ return !!operation(); };
-        const success=transaction(()=>
-            window.v132ConsumeStackItem(blueprint.id,50)&&
-            window.v132ConsumeStackItem(ore.id,50)&&
-            window.v132AddItemToInventory(item,1)
-        );
-        if(!success){ alert("合成失敗，素材已自動還原。"); return; }
-        gold-=meta.craftGold;
-        rebuildInventorySlots(); updateGoldDisplay(); saveGame();
-        window.v141RenderSynthesis();
-        synthesisResult(item);
-    };
-
     function allEquipment(){
         const result=[];
         (inventoryItems||[]).forEach(item=>{ if(item&&item.v141Uid){ result.push(item); } });

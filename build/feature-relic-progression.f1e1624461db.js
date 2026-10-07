@@ -879,21 +879,8 @@
     }
 
     function relicSources(relicId){
-        const def=catalog[relicId];
-        if(!def){ return []; }
-        const sources=[];
-        Object.entries(RELIC_BOSS_DROP_TABLE).forEach(([bossId,pool])=>{
-            if(!pool.includes(relicId)){ return; }
-            const definition=[...(gameplayRuntime.personalBosses||[]),...(gameplayRuntime.worldBosses||[])].find(item=>item&&item.id===bossId);
-            if(definition){ sources.push(definition.name+"（BOSS）"); }
-        });
-        Object.entries(RELIC_TOWER_REWARD_CONFIG.majorMilestones).forEach(([floor,reward])=>{
-            const box=MATERIAL_CONFIG.choiceBoxes[reward.boxId];
-            if(box&&rarityIndex(def.rarity)<=rarityIndex(box.maxRarity)){
-                sources.push("四象塔 "+floor+" 層首達自選箱");
-            }
-        });
-        return sources;
+        const owner=window.FourSymbolsItemAcquisition;
+        return owner?owner.getSources(fragmentIdFor(relicId)).map(owner.formatSource):[];
     }
 
     function eligibleChoiceRelics(boxId){
@@ -1068,9 +1055,9 @@
         const owned=relicRuntime.getOwnedState()[relicId];
         const status=craftStatus(relicId),cost=upgradeCost(relicId);
         let panel=detail.querySelector(".relic-progression-detail-panel");
-        const sourceText=relicSources(relicId).length?relicSources(relicId).join("、"):"目前尚無正式取得來源";
+        const sourceText=relicSources(relicId).length?relicSources(relicId).join("、"):"目前版本尚無正式取得途徑";
         const replacementText=owned.unlocked?"已持有；多餘專屬碎片會保留。":status.specific>=100?"已達 100 專屬碎片，可直接合成。":status.specific>=50?"缺少 "+status.missing+"；需要秘寶通用碎片 ×"+status.universalCost+"。":"至少要先取得 50 個專屬碎片，才能使用通用碎片補足。";
-        const panelHtml='<div class="relic-progression-detail-panel"><div><span>專屬碎片</span><b>'+status.specific+' / 100</b></div><div><span>秘寶通用碎片</span><b>'+status.universal+'</b></div><p>'+esc(replacementText)+'</p><small>取得來源：'+esc(sourceText)+'</small><em>每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。</em></div>';
+        const panelHtml='<div class="relic-progression-detail-panel"><div><span>專屬碎片</span><b>'+status.specific+' / 100</b></div><div><span>秘寶通用碎片</span><b>'+status.universal+'</b></div><p>'+esc(replacementText)+'</p><small>取得來源：'+esc(sourceText)+'</small><button type="button" data-relic-source="'+esc(relicId)+'" onclick="vRelicProgressionShowAcquisition(this.dataset.relicSource)">獲取途徑</button><em>每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。</em></div>';
         if(panel){ panel.outerHTML=panelHtml; }
         else{
             const hero=detail.querySelector(".team-relic-detail-hero");
@@ -1168,6 +1155,7 @@
     /* The previous Team Relic owner exposed a gold-only public upgrade action.
        Keep its battle/runtime owner intact, but replace the public progression
        entry so there is only one reachable upgrade economy: essence + stones. */
+    window.vRelicProgressionShowAcquisition=id=>window.FourSymbolsItemAcquisition?.show({id:fragmentIdFor(id),name:(catalog[id]?.name||id)+"碎片"});
     window.v174UpgradeRelic=upgradeRelic;
     window.vRelicProgressionCraft=craftRelic;
     window.vRelicProgressionUpgrade=upgradeRelic;

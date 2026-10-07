@@ -1463,16 +1463,17 @@ const potionDefinitions=[
     }
 ];
 
-const shopItems=potionDefinitions;
+potionDefinitions.push({id:"revivalPill",name:"還魂丹",shortName:"還魂丹",icon:"✦",type:"potion",resource:"revive",manualOnly:true,battleOnly:true,targetType:"deadAlly",fixedReviveHP:35,price:0,stats:{}});
+const shopItems=potionDefinitions.filter(item=>!item.manualOnly&&!/Potion100$/.test(item.id));
 
 /*
-   50% HP/SP potions are retired from the backpack surface.
+   General 100% HP/SP potions are retired from new acquisition.
    Keep the legacy definitions readable so old saves can still be parsed
    without mutating player data; new content must not award these IDs.
 */
 const RETIRED_BACKPACK_POTION_IDS=new Set([
-    "hpPotion50",
-    "spPotion50"
+    "hpPotion100",
+    "spPotion100"
 ]);
 
 /* =====================================================
@@ -1620,6 +1621,7 @@ function getPotionEffectDescription(potionId){
         return "未知效果";
     }
 
+    if(definition.resource==="revive"){ return "僅戰鬥中手動復活死亡友方，HP 固定35；不恢復SP"; }
     const resourceLabel=definition.resource==="hp" ? "HP" : "SP";
     const {mode,value}=getPotionRecoveryContract(definition);
     return mode==="flat"?`恢復 ${value} ${resourceLabel}`
@@ -1681,7 +1683,7 @@ function addPotionToInventory(potionId,amount=1){
     const definition=getPotionDefinition(potionId);
     const quantity=Math.max(1,Math.floor(Number(amount)||1));
 
-    if(!definition){
+    if(!definition||RETIRED_BACKPACK_POTION_IDS.has(potionId)){
         return false;
     }
 
@@ -1855,7 +1857,7 @@ function normalizePotionInventoryFromLegacy(saveData){
 
 function getAutoPotionId(resource){
     const ids=potionDefinitions
-        .filter(definition=>definition.resource===resource)
+        .filter(definition=>definition.resource===resource&&!definition.manualOnly)
         .sort((a,b)=>getPotionRecoveryPriority(a)-getPotionRecoveryPriority(b))
         .map(definition=>definition.id);
 
@@ -11936,14 +11938,17 @@ function isValidAllyTargetForSkill(skill,character,index){
     if(!skill || !character){ return false; }
 
     if(skill.targetType==="deadAlly"){
-        return character.hp<=0;
+        return skill.resource==="revive"?Number(character.hp)===0:character.hp<=0;
     }
 
     return character.hp>0;
 }
 
+function getBattleAllyActionDefinition(actionType){
+    return actionType==="revivalPill"?getPotionDefinition(actionType):skillDatabase[actionType];
+}
 function setBattleAllyTargetSelectionMode(actionType){
-    const skill=skillDatabase[actionType];
+    const skill=getBattleAllyActionDefinition(actionType);
     const region=$("battleActionRegion");
     const promptAction=$("battleTargetPromptAction");
 
@@ -11983,7 +11988,7 @@ function selectBattleAllyTarget(index){
         return;
     }
 
-    const skill=skillDatabase[pendingAction];
+    const skill=getBattleAllyActionDefinition(pendingAction);
     const character=getBattleCharacterByIndex(index);
 
     if(
@@ -12001,7 +12006,8 @@ function selectBattleAllyTarget(index){
     clearBattleTargetSelectionMode();
 
     queuedPlayerActions[activeBattleCharacterIndex]={
-        action:action,
+        action:action==="revivalPill"?"potion":action,
+        potionId:action==="revivalPill"?action:undefined,
         target:null,
         targetAlly:index
     };
@@ -13580,7 +13586,8 @@ function resolveQueuedPlayerAction(characterIndex,token){
 
         applyPotionEffect(
             queued.potionId,
-            characterIndex
+            characterIndex,
+            queued.targetAlly
         );
 
         return;
@@ -19697,6 +19704,13 @@ function usePotion(potionId){
         return;
     }
 
+    if(definition.resource==="revive"){
+        if(battlePhase!=="declare"){ return; }
+        const dead=[0,1,2].some(index=>isValidAllyTargetForSkill(definition,getBattleCharacterByIndex(index),index));
+        if(!dead){ addBattleLog("目前沒有需要復活的死亡友方。"); return; }
+        closeMenus();actionReady=true;pendingAction=potionId;
+        setBattleAllyTargetSelectionMode(potionId);return;
+    }
     const stats=
         getPartyBattleStats(activeBattleCharacterIndex);
 
@@ -19732,7 +19746,7 @@ function usePotion(potionId){
 }
 
 
-function applyPotionEffect(potionId,characterIndex){
+function applyPotionEffect(potionId,characterIndex,targetAlly){
 
     const definition=getPotionDefinition(potionId);
 
@@ -19750,6 +19764,10 @@ function applyPotionEffect(potionId,characterIndex){
         return;
     }
 
+    if(definition.resource==="revive"){
+        if(!battleActive||!Number.isInteger(targetAlly)||!window.v148ResolveRevivalPill){ finishPlayerAction();return; }
+        window.v148ResolveRevivalPill(characterIndex,targetAlly,definition);return;
+    }
     const stats=
         getPartyBattleStats(characterIndex);
 
@@ -30465,6 +30483,7 @@ function openItemModal(
     }
 
 
+    window.FourSymbolsCurrentItemDetail=item;
     selectedInventorySlot =
         slotIndex;
 
@@ -30553,6 +30572,7 @@ function openEquippedItem(
     item,
     slot
 ){
+    window.FourSymbolsCurrentItemDetail=item;
 
     selectedInventorySlot =
         null;
@@ -30605,6 +30625,7 @@ function openEquippedItem(
 
 
 function closeItemModal(){
+    window.FourSymbolsCurrentItemDetail=null;
 
     selectedInventorySlot =
         null;

@@ -5,7 +5,7 @@
   "sourceOwner": "js/00-main.js",
   "tutorialDamageOwner": "js/47-v158-combat-tuning.js",
   "compatibilityDigests": {
-    "js/40-v144-rules-and-abyss.js": "5cad5ada547347b97475d98919acd8d03b0e1e9a9f30f063b34e48b73469bfc1",
+    "js/40-v144-rules-and-abyss.js": "69ee3ee8bbe636c9a21b6e4671edf002c2a1fc58c818a03fe17fe179e7d76d3f",
     "js/47-v158-combat-tuning.js": "4ebc87b7d7227a5ba3363e0eb4dbd4e40b9da6106c6873ecf831ba6a121079ec"
   },
   "declarationDigests": {

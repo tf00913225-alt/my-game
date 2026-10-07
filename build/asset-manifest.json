@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.815d04dfeb66.js"
+          "build/app-shell.0b7c6f44a273.js"
         ],
         "styles": [
           "build/app-shell.d90705103c7f.css"
@@ -49,8 +49,8 @@
       },
       "gameplay-core": {
         "scripts": [
-          "build/gameplay-core-primary.f2a161f16f46.js",
-          "build/gameplay-core-secondary.6339cb84be2e.js"
+          "build/gameplay-core-primary.c9f0148b189a.js",
+          "build/gameplay-core-secondary.8015336c05cc.js"
         ],
         "styles": [
           "build/gameplay-core.4be7fcb9d1da.css"
@@ -103,7 +103,7 @@
       "feature-boss-relic": {
         "scripts": [
           "build/feature-boss-relic.1c705c499f29.js",
-          "build/feature-relic-progression.87f6a83606ad.js"
+          "build/feature-relic-progression.f1e1624461db.js"
         ],
         "styles": [
           "build/feature-boss-relic.790db1f9bab2.css",
@@ -131,7 +131,7 @@
       },
       "feature-adventure": {
         "scripts": [
-          "build/feature-adventure-content.02c35f37d5c3.js",
+          "build/feature-adventure-content.6cc9644cc366.js",
           "build/feature-adventure-runtime.762231c99803.js",
           "build/feature-adventure-ui.0c92aaea1139.js"
         ],
@@ -562,9 +562,9 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.815d04dfeb66.js",
-        "sha256": "815d04dfeb66",
-        "bytes": 1054363,
+        "path": "build/app-shell.0b7c6f44a273.js",
+        "sha256": "0b7c6f44a273",
+        "bytes": 1088777,
         "priority": "P1",
         "type": "script",
         "decode": false
@@ -794,17 +794,17 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core-primary.f2a161f16f46.js",
-        "sha256": "f2a161f16f46",
-        "bytes": 641941,
+        "path": "build/gameplay-core-primary.c9f0148b189a.js",
+        "sha256": "c9f0148b189a",
+        "bytes": 631710,
         "priority": "P2",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/gameplay-core-secondary.6339cb84be2e.js",
-        "sha256": "6339cb84be2e",
-        "bytes": 656545,
+        "path": "build/gameplay-core-secondary.8015336c05cc.js",
+        "sha256": "8015336c05cc",
+        "bytes": 657032,
         "priority": "P2",
         "type": "script",
         "decode": false
@@ -818,8 +818,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "86270e45f27e",
-    "totalBytes": 21636526,
+    "manifestHash": "d3020c66127a",
+    "totalBytes": 21661196,
     "totalResources": 78
   },
   "assets": {
@@ -827,17 +827,17 @@
       "sha256": "b0702d4afce7",
       "bytes": 69833
     },
-    "build/app-shell.815d04dfeb66.js": {
-      "sha256": "815d04dfeb66",
-      "bytes": 1054363
+    "build/app-shell.0b7c6f44a273.js": {
+      "sha256": "0b7c6f44a273",
+      "bytes": 1088777
     },
-    "build/gameplay-core-primary.f2a161f16f46.js": {
-      "sha256": "f2a161f16f46",
-      "bytes": 641941
+    "build/gameplay-core-primary.c9f0148b189a.js": {
+      "sha256": "c9f0148b189a",
+      "bytes": 631710
     },
-    "build/gameplay-core-secondary.6339cb84be2e.js": {
-      "sha256": "6339cb84be2e",
-      "bytes": 656545
+    "build/gameplay-core-secondary.8015336c05cc.js": {
+      "sha256": "8015336c05cc",
+      "bytes": 657032
     },
     "build/feature-patrol.ab5bd3ce5582.js": {
       "sha256": "ab5bd3ce5582",
@@ -851,9 +851,9 @@
       "sha256": "1c705c499f29",
       "bytes": 90307
     },
-    "build/feature-relic-progression.87f6a83606ad.js": {
-      "sha256": "87f6a83606ad",
-      "bytes": 70008
+    "build/feature-relic-progression.f1e1624461db.js": {
+      "sha256": "f1e1624461db",
+      "bytes": 69657
     },
     "build/feature-adventure-entry.43c6c9446f8e.js": {
       "sha256": "43c6c9446f8e",
@@ -863,9 +863,9 @@
       "sha256": "cf197e72837f",
       "bytes": 6423
     },
-    "build/feature-adventure-content.02c35f37d5c3.js": {
-      "sha256": "02c35f37d5c3",
-      "bytes": 11577
+    "build/feature-adventure-content.6cc9644cc366.js": {
+      "sha256": "6cc9644cc366",
+      "bytes": 11468
     },
     "build/feature-adventure-runtime.762231c99803.js": {
       "sha256": "762231c99803",
