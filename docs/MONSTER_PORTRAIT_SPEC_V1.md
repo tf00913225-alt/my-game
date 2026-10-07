@@ -254,6 +254,19 @@ V159 已退休；舊 EARLY_ABYSS_PORTRAITS／FINAL_ABYSS_PORTRAITS 與 temporary
 
 正式 CSS Owner 為 `css/fixed-slot-battlefield-rendering-v2.css`。`--portrait-width` 由 class、Bounds 與容器單位投影，不使用 transform:scale。更換資產後必須更新 metadata；`--check` 重新解碼核對，Registry Audit 與 regression 拒絕 stale hash、缺檔、非法 Bounds、planned 冒充 existing。首次準備、重繪、重入均由原 lifecycle 同步。
 
+## 8.1 Reusable Shared NPC Portrait Assets
+
+共用人物素材唯一建檔 Owner 仍是 `config/monster-portrait-registry.json` 的 `assetPool.entries`；本節是其唯一正式治理規則來源，不另建 NPC Registry。
+
+- `NPC_SHARED_XXX` 是永久素材身分，與 Content 的 NPC／敵人名稱、元素、階級、數值、門派、劇情、技能、掉落及 AI 分離；這些 Gameplay 欄位不得寫入 shared-npc entry。`displayName` 僅描述外觀。
+- ID 建立後不得重新編號、重新分配或回收；退休保留 row。新增只在歷史最大序號後追加。相同 SHA-256 母檔不得配置第二個永久素材 ID；重複來源只能追溯至原 ID。
+- `assetClass="shared-npc"` 預設 `reusePolicy="reusable"`、`exclusive=false`。只有使用者明確授權專屬角色時才能設 `exclusive=true`／`reusePolicy="exclusive"`，並在 notes 記錄授權。allowedContexts 是許可場合，不是現有角色綁定。
+- 未使用維持既有 `reserved`；不得產生 runtimePath、加入 groups、Encounter、Rotation 或 Runtime manifest。sourceBranch／sourcePath／sourceCommit／sourceSha256 與 sourceImage 保留母檔 bytes、實際尺寸、解碼及透明驗證。sizeClass 是未來 derivative 畫布規格，不表示母檔已縮放；inbox Master 不刪除、不覆寫、不裁切。
+- 正式採用須另由 Content Owner 明確指定既有等價 `portraitKey: "NPC_SHARED_003"`；多個 Content 可引用同一 ID，不複製圖片，角色名稱及屬性由各 Content 自己擁有。usedIn／references 若存在只供查詢，不是角色身分 Owner。
+- 採用時依 `docs/IMAGE_ASSET_SPEC.md` 與既有 Selective Import Gate 建立唯一透明無損 WebP derivative，再記錄 runtimePath／presentation 並升 `adopted`。本次建檔不決定正式 Runtime 路徑；既有 importer 的 assets/monsters 範圍不得為保留素材繞過。
+- V154 僅接受 adopted＋runtimePath 且明確 portraitKey 的共用圖；不建立 displayName 映射、不按名稱／檔名／性別／武器／元素猜圖、不覆寫 Content 名稱。不存在、reserved、未建立 derivative 或 decode 失敗時沿用中性 fallback，不任選共用圖。
+- Audit 檢查唯一 ID／來源／SHA、不可回收的歷史 ID、純素材欄位與 reserved 隔離；Runtime regression 同時保護既有 Monster 與共用素材的 explicit binding。
+
 ## 9. 自動生成最小輸入
 
 生成器對每個 target 至少取得：
