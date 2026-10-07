@@ -20,7 +20,8 @@ test('cardless battle presentation keeps slot geometry and HUD owners untouched'
 test('HP and SP labels are normalized to current values only without observer churn',()=>{
     assert.match(source,/function setTextIfChanged\(node,value\)\{if\(node&&node\.textContent!==value\)node\.textContent=value;\}/);
     assert.match(source,/setTextIfChanged\(hp,String\(numericValue\(character\.hp\)\)\)/);
-    assert.match(source,/setTextIfChanged\(sp,String\(numericValue\(character\.sp\)\)\)/);
+    assert.match(source,/const resource=getBattleSecondaryResource\(character\)/);
+    assert.match(source,/setTextIfChanged\(sp,resource\.kind==="rage"\?"怒氣 "\+numericValue\(resource\.current\)\+"\/12":String\(numericValue\(resource\.current\)\)\)/);
     assert.match(source,/if\(Number\.isInteger\(index\)\)syncEnemyResourceHud\(index\)/);
     assert.doesNotMatch(source,/numericValue\(monster\.(?:hp|sp)\)/);
     const presentationBlock=source.match(/function syncResourceNumbers\(\)\{([\s\S]*?)\n\}/);
@@ -28,6 +29,23 @@ test('HP and SP labels are normalized to current values only without observer ch
     assert.doesNotMatch(presentationBlock[1],/maxHP|maxSP|"\/"|'\/'/);
     assert.equal((source.match(/new MutationObserver/g)||[]).length,0);
     assert.match(source,/window\.v17351AfterBattleRender=syncBattlePresentation/);
+});
+
+test('final resource presentation preserves player SP and displays Hero Rage without repeated writes',()=>{
+    const main=fs.readFileSync(path.join(__dirname,'..','js','00-main.js'),'utf8');
+    const projection=main.match(/function getBattleSecondaryResource\(character,stats\)\{[\s\S]*?\n\}/)[0];
+    const numeric=source.match(/function numericValue\([^\n]+/)[0];
+    const setter=source.match(/function setTextIfChanged\([^\n]+/)[0];
+    const sync=source.match(/function syncResourceNumbers\(\)\{[\s\S]*?\n\}/)[0];
+    const characters=[{hp:87,sp:35},{combatantKind:'heroNpc',hp:56,sp:99,rage:7}];
+    let writes=0;
+    const labels=characters.map(()=>['',''].map(()=>({value:'',get textContent(){return this.value;},set textContent(value){this.value=value;writes++;}})));
+    const cards=characters.map((_,index)=>({id:'battlePlayerCard'+index,querySelector:selector=>labels[index][selector==='.hp-bar-text'?0:1]}));
+    const context=vm.createContext({document:{querySelectorAll:selector=>selector.includes('battle-player')?cards:[]},getPartyCharacterByIndex:index=>characters[index]});
+    vm.runInContext([projection,numeric,setter,sync].join('\n'),context);
+    vm.runInContext('syncResourceNumbers();syncResourceNumbers();',context);
+    assert.deepEqual(labels.map(pair=>pair.map(node=>node.textContent)),[['87','35'],['56','怒氣 7/12']]);
+    assert.equal(writes,4,'unchanged labels must not trigger observer churn');
 });
 
 test('portrait motion keeps lunge while enemy hit feedback has no shake lifecycle',()=>{
