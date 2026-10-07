@@ -3876,9 +3876,11 @@
         const assetPoolEntries=registry.assetPool&&Array.isArray(registry.assetPool.entries)?registry.assetPool.entries:[];
         assetPoolEntries.forEach(entry=>{
             if(entry.status!=="adopted"||!entry.assetId||!entry.runtimePath){ return; }
-            const tier=String(entry.tier||"normal");
-            const record={group:"assetPool",portraitKey:entry.assetId,name:entry.displayName||entry.assetId,element:entry.element||"fire",rank:tier==="elite"?"elite":(tier==="miniboss"?"boss":"regular"),sizeClass:"standard",path:entry.runtimePath,status:"existing",assetId:entry.assetId,tier:tier};
+            const shared=entry.assetClass==="shared-npc";
+            const tier=shared?null:String(entry.tier||"normal");
+            const record={group:"assetPool",portraitKey:entry.assetId,name:entry.displayName||entry.assetId,assetClass:entry.assetClass,element:shared?"dynamic":(entry.element||"fire"),rank:shared?"dynamic":tier==="elite"?"elite":(tier==="miniboss"?"boss":"regular"),sizeClass:entry.sizeClass||"standard",path:entry.runtimePath,status:"existing",assetId:entry.assetId,tier:tier};
             byKey.set(entry.assetId,record);
+            if(shared){ return; } // Shared art resolves only through an explicit portraitKey.
             if(byName.has(entry.displayName)){ duplicateNames.add(entry.displayName); }
             else{ byName.set(entry.displayName,record); }
         });
@@ -3988,7 +3990,7 @@
     window.v154ResolveMonsterPortraitRecord=resolveMonsterPortraitRecord;
     window.v154BindMonsterPortraitIdentity=function(monster){
         const record=monster&&monsterPortraitByKey.get(monster.portraitKey);
-        if(record&&record.group==="assetPool"){
+        if(record&&record.group==="assetPool"&&record.assetClass!=="shared-npc"){
             monster.name=record.name;
             monster.displayName=record.name;
         }
@@ -4059,7 +4061,7 @@
                     :Promise.reject(new Error("feature asset decoder unavailable"));
                 return assets.then(()=>{
                     // Only an explicit adopted asset establishes a Tower identity.
-                    const name=record.group==="assetPool"?record.name:null;
+                    const name=record.group==="assetPool"&&record.assetClass!=="shared-npc"?record.name:null;
                     if(name){ monster.name=name;monster.displayName=name; }
                     monster.portraitPath=record.path;
                     return {state:"ready",monster:monster,record:record};
