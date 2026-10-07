@@ -7518,7 +7518,8 @@ function syncResourceNumbers(){
         if(!character)return;
         const hp=card.querySelector(".hp-bar-text"),sp=card.querySelector(".sp-bar-text");
         setTextIfChanged(hp,String(numericValue(character.hp)));
-        setTextIfChanged(sp,String(numericValue(character.sp)));
+        const resource=getBattleSecondaryResource(character);
+        setTextIfChanged(sp,resource.kind==="rage"?"怒氣 "+numericValue(resource.current)+"/12":String(numericValue(resource.current)));
     });
     document.querySelectorAll("#battlePage .battle-monster[id^='battleMonster']").forEach(card=>{
         const index=Number(String(card.id).replace("battleMonster",""));
@@ -8200,7 +8201,7 @@ ensureFunctionalStyles();runRepairs();
         const shield=typeof getPlayerShieldRemaining==="function"?getPlayerShieldRemaining(entity):0;
         return entity&&stats?{
             hpRatio:clampedRatio(entity.hp,stats.maxHP),
-            spRatio:clampedRatio(entity.sp,stats.maxSP),
+            spRatio:clampedRatio(getBattleSecondaryResource(entity,stats).current,getBattleSecondaryResource(entity,stats).max),
             shieldRatio:clampedRatio(shield,stats.maxHP)
         }:null;
     }

@@ -5124,6 +5124,10 @@ function getHeroBattleSkillProjection(character){
     return character&&character.combatantKind==="heroNpc"
         ?window.FourSymbolsHeroSystem.getDomain().getHeroSkillProjection(character.heroId):null;
 }
+function getBattleSecondaryResource(character,stats){
+    const isRage=character&&character.combatantKind==="heroNpc";
+    return {kind:isRage?"rage":"sp",current:Number(isRage?character.rage:character.sp)||0,max:isRage?12:Number(stats&&stats.maxSP)||0};
+}
 function addHeroBattleRage(character){
     character.rage=Math.min(12,Math.max(0,Number(character.rage)||0)+1);
 }
@@ -23369,8 +23373,8 @@ function updateSingleCharacterBars(
                 0,
                 Math.min(
                     100,
-                    (character.combatantKind==="heroNpc"?character.rage:character.sp)/
-                    (character.combatantKind==="heroNpc"?12:stats.maxSP)*
+                    getBattleSecondaryResource(character,stats).current/
+                    getBattleSecondaryResource(character,stats).max*
                     100
                 )
             )+

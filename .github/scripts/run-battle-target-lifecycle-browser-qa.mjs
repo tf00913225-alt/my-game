@@ -196,6 +196,8 @@ try{
         const heroes=await client.eval(heroExpression);
         assert.deepEqual(heroes.map(r=>r.count),[0,1,2,3]);
         evidence.push({width,height,heroes});
+        const heroPng=await client.send('Page.captureScreenshot',{format:'png'});
+        fs.writeFileSync(path.join(out,'hero-phase2b-'+width+'.png'),Buffer.from(heroPng.data,'base64'));
         const rows=await client.eval(expression);
         evidence.push({width,height,rows});
         assert.equal(rows.length,24);
