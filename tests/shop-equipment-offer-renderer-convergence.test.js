@@ -23,11 +23,11 @@ function fixture(seed=new Map(),uid='shop-A'){
  const key=repo.accountKey('equipment-shop-daily');
  return {c,repo,seed,key,body,read:()=>c.FourSymbolsEquipmentShop.render(),buy:(i,id)=>c.v17346BuyEquipmentShopOffer(i,id),fail:k=>failKey=k,day:d=>day=d,reenter:fn=>reenter=fn,success:()=>success};
 }
-test('canonical renderer owns six deterministic art cards, stable batch IDs and no glyph fallback',()=>{
+test('canonical renderer owns six deterministic cards, stable batch IDs and explicit missing-art placeholders',()=>{
  assert.doesNotMatch(ui,/SHOP_EQUIPMENT_PREVIEW|function renderEquipmentShop|equipmentShopOffers|equipment-shop-daily/);
  assert.match(ui,/FourSymbolsEquipmentShop\.render\(\)/);
  assert.doesNotMatch(gear,/previousSwitch|previousRefresh/);
- const f=fixture(),a=f.read();assert.equal((a.match(/<img /g)||[]).length,6);assert.equal((a.match(/v169-item-art/g)||[]).length,6);assert.equal(a,f.read());
+ const f=fixture(),a=f.read();assert.equal((a.match(/<img /g)||[]).length+(a.match(/data-asset-state="missing"/g)||[]).length,6);assert.equal((a.match(/v169-item-art/g)||[]).length,6);assert.equal(a,f.read());
  assert.match(a,/data-offer-id="2026-10-06:0:0"/);
  const errorCode=a.match(/onerror="([^"]+)"/)[1];const art={dataset:{},setAttribute(k,v){this[k]=v;},textContent:''};new Function(errorCode).call({parentElement:art});assert.equal(art.dataset.assetState,'broken');assert.equal(art.textContent,'◇');assert.equal(art['aria-label'],'裝備圖片無法載入');
 });
