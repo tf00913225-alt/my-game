@@ -44,9 +44,9 @@ test("talisman resolution is two stage and max-skill aware",()=>{
 test("pink and four-symbol are planned but not silently injected into current drops",()=>{
   assert.match(equipment,/key:"pink",label:"桃紅階",chance:0,available:false,planned:true/);
   assert.match(equipment,/key:"four-symbol",label:"四象階",chance:0,available:false,planned:true/);
-  const chest=content.match(/const CHEST_TIER_WEIGHTS=\[([\s\S]*?)\];/)[1];
-  assert.ok(chest.includes('key:"white"')&&chest.includes('key:"orange"'));
-  assert.ok(!chest.includes('key:"pink"')&&!chest.includes('key:"four-symbol"'));
+  const chest=content.match(/const MATERIAL_CHEST_DROP_TABLE=Object.freeze\(\[([\s\S]*?)\]\.map[\s\S]*?\);/)[1];
+  assert.ok(chest.includes('itemId:"oreLow"')&&chest.includes('itemId:"orePerfect"'));
+  assert.ok(!chest.includes('itemId:"orePink"')&&!chest.includes('itemId:"oreFourSymbol"'));
   assert.match(synthesis,/尚未開放・數值待定/);
 });
 

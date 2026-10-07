@@ -5049,7 +5049,7 @@
     white-space:pre-line;
 }
 #game-stage .v17361-reward-preview .v17361-reward-visual.single:has(.material)::before{
-    content:"材料寶箱  ×1～3\A━━━━━━━━━━━━\A通關回合越少，獲得的寶箱越多。\A寶箱可取得礦石、裝備設計圖等養成材料。";
+    content:"材料寶箱  ×1～3\A━━━━━━━━━━━━\A通關回合越少，獲得的寶箱越多。\A寶箱可取得礦石、基礎／30%／50%補品與還魂丹。";
 }
 #game-stage .v17361-reward-preview .v17361-reward-visual.single:has(.cover)::before{
     content:"金幣獎勵\A━━━━━━━━━━━━\A依目前副本等級結算金幣數量。\A通關後可直接領取，或觀看廣告取得雙倍獎勵。";

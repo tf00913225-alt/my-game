@@ -6,6 +6,14 @@
 
 唯一 Hero Domain Owner 為 `functions/src/hero-core.js`，玩家與 main-save adapter 在 `js/00-main.js::FourSymbolsHeroSystem`。Registry／最低已建立玩家等級投影／無 EXP／衍生 Skill Level／0–5 星／碎片成本／seed weighted allocation／洗髓／永久 schema 由 `docs/HERO_SYSTEM_V1.md` 定義。Hero account 進既有 UID main-save，不新增 sidecar；Rage 與 passive stacks 不持久化。Phase 2A 的 `js/00-main.js::FourSymbolsHeroBattle` 只接入上場／普攻／受擊／死亡／合法復活／行動序與同一 Statistics Owner；3 玩家＋最多 3 Hero 共用既有 Slot／Target／Hit／Damage／Status／Flow。Hero 使用 `heroNpc` 身份與 battle-only state，不能取得玩家 Skill Key 或保存 HP／狀態／臨時站位。Phase 2B 的 Rage／Hero Skill／Passive／立繪由同一 battle adapter 與 Combat Events 接入；怒氣只存在正式 battle actor，技能讀 Core level 並走既有結算 Owner。Equipment／Reward／Hero page UI 留待後續 Phase；接續界線與驗證由 Hero 契約與 Work PR 管理。
 
+## 道具取得與補品收斂（2026-10-07）
+
+- 取得來源呈現由 `js/item-acquisition-registry.js` 唯一負責，資料由既有 Reward Owners 投影；查詢不發獎、不扣道具、不寫存檔。沒有正式來源時顯示「目前版本尚無正式取得途徑」。
+- 裝備設計圖已取消取得、升階與鍛造需求；穩定 ID 定義僅保留舊存檔相容，禁止新發獎。
+- 正式一般補品為回春散 HP+66、凝氣散 SP+66、HP/SP30%、HP/SP50%。一般 HP/SP100% 停止新取得；歷史20%／100%堆疊維持相容讀取。九轉回元丹／太清聚氣丹維持稀有100%定位。
+- 還魂丹僅手動戰鬥宣告，指定 HP=0 的死亡友方，固定恢復HP35、SP不變、消耗行動；有效命中且保存成功時消耗1顆。自動補品／自動戰鬥不得使用。補品宣告沿用 V143 Owner，復活結算沿用 V148 共用 resolver；死亡樣式由核心 `updateUI → syncBattleDefeatedCards` 投影當前 HP，舊切頁延遲同步退休。
+- 材料寶箱只抽取白／藍／紫／橙階礦石、基礎／30%／50% HP/SP補品與還魂丹，暫定分布集中在 `MATERIAL_CHEST_DROP_TABLE`，預覽與來源表同讀；正式掉率尚未核定。
+
 ## Boss 術語與契約邊界
 
 術語唯一 Owner：`docs/MONSTER_PORTRAIT_SPEC_V1.md` 第 0 節。世界／個人 Boss 統稱大 Boss，深淵等一般首領稱小 Boss；rank、mode、sizeClass 與 footprint 是獨立契約。下方 Boss 專屬模式的中央六格／援軍／功能物件規則只適用個人／世界大 Boss，不得因一般敵人 `rank="boss"` 套用到塔、每日副本或深淵。既有 World Boss／Personal Boss／Abyss Boss 名稱及內部 identifier 保留。
@@ -218,7 +226,7 @@
 ## Hit / Evasion Percentage-Point V2（2026-10-02）
 
 - Base Hit Chance = 95%；Base Extra Accuracy = 0%；Base Evasion = 0%。Accuracy 10% 直接令 Final Hit Chance +10%；Evasion 10% 直接令 Final Hit Chance -10%。同一 Hit Owner 最後 clamp 5%～99%；Wind EX 殘血額外 Final Evasion +50%，沿用上述角色來源投影。等級與等級差不影響 Hit / Evasion；普通／精英／Boss 不因等級派生閃避。風系四象塔明確 +8% 保留。
-- 四象裝備正式數值 Owner：`js/27-v132-content-expansion.js::EQUIPMENT_SET_PIECES`／`normalizeEquipmentSetItem()`；四元素各攻／法五件，Lv20 且本元素限定。刀／扇攻擊／智力 +30；鎧甲／袍防禦能力值 +25、敏捷 +5；靴／履攻擊／智力 +20、防禦能力值 +10；盔／冠攻擊／智力 +25、體質 +5；護腕／法環攻擊／智力 +25。攻／法各自計件，三件六圍各 +5，五件僅對應元素直接技能傷害 +5%（含技能追擊，不含普攻、其他元素或間接傷害）。舊基礎負體質／閃避／抗暴／異常抗性退場；既有物品基礎資料在既有同步／hydrate 路徑更新，重鑄／鑲嵌保留。後載模組只委派同一 Owner，不再加減補正。
+- 元素系列裝備正式數值 Owner：`js/27-v132-content-expansion.js::EQUIPMENT_SET_PIECES`／`normalizeEquipmentSetItem()`；四元素各攻／法五件，Lv20 且本元素限定。刀／扇攻擊／智力 +30；鎧甲／袍防禦能力值 +25、敏捷 +5；靴／履攻擊／智力 +20、防禦能力值 +10；盔／冠攻擊／智力 +25、體質 +5；護腕／法環攻擊／智力 +25。攻／法各自計件，三件六圍各 +5，五件僅對應元素直接技能傷害 +5%（含技能追擊，不含普攻、其他元素或間接傷害）。舊基礎負體質／閃避／抗暴／異常抗性退場；既有物品基礎資料在既有同步／hydrate 路徑更新，重鑄／鑲嵌保留。後載模組只委派同一 Owner，不再加減補正。
 - 裝備單位遷移唯一 Owner：`functions/src/equipment-combat-percent-migration.js`；App Shell 在主 Runtime 前載入，同一實作供後端 review projection 使用。`equipmentCombatPercentUnitVersion:2` 是每件裝備的單位標記，stats/reforgeStats 一起原子遷移且重複載入不再換算。
 - 開工 dev 所有正式裝備 Accuracy 來源只有四象 armor/robe Base 10 與 V1 Spirit mapping；沒有普通生成／重鑄 Accuracy pool。無版本裝備先分離明確四象 Base 10→Evasion 10，剩餘舊 Equipment Accuracy 按 legacy point unit ×0.15 換算；尚存在 Spirit 時每點直接 +0.3% Accuracy/+0.1% Anti-Crit/+0.05% Status Resistance，再移除 Spirit。新定義／生成装備明確標记版本 2。不得將此遷移用於角色、怪物、技能或 Buff Accuracy。
 - 本機／雲端 snapshot 經既有 hydrate/normalize 入口投影；候選與原始 Archive 的 raw bytes、hash、UID、revision 與信任狀態不改寫。後端 review ownedItem 只對副本遷移，不授予權威、不修改原始證據。
@@ -236,3 +244,5 @@
 - Wind：最終 Evasion +15 個百分點（不另設上限）；Agility／Speed ×1.15，只影響速度，不增加 Evasion 或 Accuracy。
 - Earth：Defense ×1.15、Max HP ×1.15、建立時 hp=maxHP，Profile 同場冪等，不在 render/reload/round 疊加。
 - Profile 僅套 Tower metadata；其他玩法的敵人数量、技能頻率與戰鬥數值保持既有規則。入口顯示當週元素特性、樓層施放率與每層固定 10 名敵人。
+
+本批已核准暫定獎勵：四象塔每週每10層首次通關體質寶石×1，沿用既有每週樓層領取記錄；裝備副本每次通關等機率抽取赤炎／寒泉／岩岳／青嵐碎片一種×10（各25%），與寶箱一起領取及廣告雙倍。數量與分布集中於各玩法正式 Reward Owner。

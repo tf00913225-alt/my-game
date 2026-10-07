@@ -124,26 +124,17 @@
     window.v148GetAutoTargetPriority=autoTargetPriority;
 
     /* A defeated card remains inert except while Revive is explicitly aiming. */
-    if(typeof isValidAllyTargetForSkill==="function"){
-        const previousIsValidAllyTarget=isValidAllyTargetForSkill;
-        isValidAllyTargetForSkill=function(skill,character,index){
-            if(!skill||!character){ return false; }
-            if(skill.targetType==="deadAlly"){ return numeric(character.hp)<=0; }
-            return previousIsValidAllyTarget.apply(this,arguments);
-        };
-    }
-
     function markReviveTargets(actionType){
         if(typeof document==="undefined"){ return; }
         document.querySelectorAll(".battle-player.v148-revive-target").forEach(card=>
             card.classList.remove("v148-revive-target")
         );
-        const skill=typeof skillDatabase!=="undefined"?skillDatabase[actionType]:null;
+        const skill=typeof getBattleAllyActionDefinition==="function"?getBattleAllyActionDefinition(actionType):(typeof skillDatabase!=="undefined"?skillDatabase[actionType]:null);
         if(!skill||skill.targetType!=="deadAlly"){ return; }
         partyIndexes().forEach(index=>{
             const character=getPartyCharacterByIndex(index);
             const card=document.getElementById("battlePlayerCard"+index);
-            if(card&&character&&numeric(character.hp)<=0){
+            if(card&&character&&(typeof isValidAllyTargetForSkill==="function"?isValidAllyTargetForSkill(skill,character,index):numeric(character.hp)<=0)){
                 card.classList.add("ally-targetable","v148-revive-target");
             }
         });
@@ -234,12 +225,12 @@
     }
 
     function animateSupportCast(state,characterIndex,skill,targetId,targetIds,targetSide,targetTypeOverride){
-        spendActiveSkillSP(state.character,state.cost);
+        if(!state.consumable){ spendActiveSkillSP(state.character,state.cost); }
         if(typeof lungePlayerCard==="function"){ lungePlayerCard(characterIndex); }
         if(typeof showSkillNameBadge==="function"){
             showSkillNameBadge(skill.name,skill.element,characterIndex,targetId,targetIds,targetSide,targetTypeOverride);
         }
-        if(typeof showPlayerSpPopup==="function"){
+        if(!state.consumable&&typeof showPlayerSpPopup==="function"){
             setTimeout(()=>showPlayerSpPopup(state.cost,characterIndex),500);
         }
     }
@@ -437,6 +428,24 @@
         );
     }
 
+    // Shared revive mutation/reactivation boundary for skill and consumable sources.
+    function reactivateRevivedPartyUnit(index,target,hp){
+        if(!target||numeric(target.hp)!==0||getPartyCharacterByIndex(index)!==target){ return false; }
+        target.hp=hp;
+        if(typeof updateUI==="function"){ updateUI(); }
+        return true;
+    }
+    window.v148ResolveRevivalPill=function(characterIndex,targetIndex,definition){
+        const caster=getPartyCharacterByIndex(characterIndex),target=getPartyCharacterByIndex(targetIndex);
+        if(!battleActive||!caster||numeric(caster.hp)<=0||!target||numeric(target.hp)!==0||getPotionCount(definition.id)<1){
+            return finishSupport("沒有合法死亡目標，還魂丹未消耗。");
+        }
+        const skill=skillDatabase.revive;
+        return resolvePartyRevive(characterIndex,{targetAlly:targetIndex},skill,{
+            character:caster,key:getPartyCharacterKey(characterIndex),level:1,cost:0,consumable:definition
+        });
+    };
+
     function resolvePartyRevive(characterIndex,queued,skill,state){
         let targetIndex=Number.isInteger(queued.targetAlly)?queued.targetAlly:null;
         if(targetIndex===null){
@@ -456,14 +465,29 @@
         const multiplier=exSkill&&exLevel>0&&numeric(exSkill.healBonusPercent)>0
             ?1+numeric(exSkill.healBonusPercent)/100:1;
         const percent=levelValue(skill.reviveHealPercentByLevel,state.level,20);
-        const restoredHP=Math.max(1,Math.min(
+        const restoredHP=state.consumable?state.consumable.fixedReviveHP:Math.max(1,Math.min(
             numeric(targetStats.maxHP),
             Math.floor(numeric(targetStats.maxHP)*percent/100*multiplier)
         ));
-        const reviveMessage=(target.id||"隊友")+"被"+skill.name+"復活，恢復"+restoredHP+" HP。";
+        const reviveMessage=(target.id||"隊友")+"被"+(state.consumable?state.consumable.name:skill.name)+"復活，恢復"+restoredHP+" HP。";
+        const token=typeof battleToken!=="undefined"?battleToken:null;
+        let settled=false;
         const reviveAtImpact=()=>{
-            if(numeric(target.hp)>0){ return; }
-            target.hp=restoredHP;
+            if(settled){ return; }
+            settled=true;
+            if((typeof battleActive!=="undefined"&&!battleActive)||(token!==null&&battleToken!==token)||getPartyCharacterByIndex(targetIndex)!==target||numeric(target.hp)!==0){ return; }
+            if(state.consumable&&!consumePotionFromInventory(state.consumable.id,1)){ return; }
+            if(!reactivateRevivedPartyUnit(targetIndex,target,restoredHP)){ return; }
+            if(state.consumable&&typeof saveGame==="function"){
+                let saved=false;
+                try{ saved=saveGame()===true; }catch(error){ console.error("還魂丹存檔失敗",error); }
+                if(!saved){
+                    target.hp=0;addPotionToInventory(state.consumable.id,1);
+                    if(typeof updateUI==="function"){ updateUI(); }
+                    if(typeof addBattleLog==="function"){ addBattleLog("還魂丹復活未能保存，道具未消耗。"); }
+                    return;
+                }
+            }
             if(typeof addBattleLog==="function"){ addBattleLog(reviveMessage); }
             if(typeof updateUI==="function"){ updateUI(); }
             if(typeof showPlayerHit==="function"){ showPlayerHit(restoredHP,"heal",targetIndex,true); }

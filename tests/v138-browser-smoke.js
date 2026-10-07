@@ -133,16 +133,16 @@ async function seedParty(page){
                 .filter(button=>getComputedStyle(button).display!=="none")
                 .map(button=>button.textContent.trim())
         );
-        assert.deepEqual(chestButtons,["開啟","預覽"]);
+        assert.deepEqual(chestButtons,["開啟","預覽","獲取途徑"]);
         await page.click("#v132ItemPreviewButton");
         const chestPreview=await page.evaluate(()=>({
             rows:document.querySelectorAll("#v132RewardModal .v132-preview-row").length,
             text:document.getElementById("v132RewardModal").textContent.replace(/\s+/g," ")
         }));
-        assert.equal(chestPreview.rows,24);
-        assert.match(chestPreview.text,/低階礦石 ×10 40%/);
-        assert.match(chestPreview.text,/低階頭部設計圖 ×10 8%/);
-        assert.match(chestPreview.text,/極品衣服設計圖 ×5 2%/);
+        assert.equal(chestPreview.rows,11);
+        assert.match(chestPreview.text,/白階礦石 ×10 20%/);
+        assert.match(chestPreview.text,/HP 50%補品 ×1 4%/);
+        assert.match(chestPreview.text,/還魂丹 ×1 2%/);
         await page.evaluate(()=>v132CloseRewardModal());
 
         await page.evaluate(()=>{

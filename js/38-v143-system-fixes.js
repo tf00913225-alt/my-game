@@ -331,7 +331,9 @@
         const definition=typeof getPotionDefinition==="function"?getPotionDefinition(potionId):null;
         const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
         const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
-        if(!definition||!character||!stats||character.hp<=0){ return false; }
+        if(!definition||!character||!stats){ return false; }
+        if(definition.resource==="revive"){ return isValidAllyTargetForSkill(definition,character,index); }
+        if(character.hp<=0){ return false; }
         return definition.resource==="hp"?character.hp<stats.maxHP:character.sp<stats.maxSP;
     }
 
@@ -353,6 +355,7 @@
             const autoOn=activeBattleCharacterIndex===0?autoBattle:getPartyAutoConfig(activeBattleCharacterIndex).enabled;
             const caster=getPartyCharacterByIndex(activeBattleCharacterIndex);
             if(!definition||!battleActive||autoOn||actionReady||!caster||caster.hp<=0){ return; }
+            if(definition.resource==="revive"&&battlePhase!=="declare"){ return; }
             const available=getPotionCount(potionId)-queuedPotionReservations(potionId);
             if(available<=0){ addBattleLog(definition.name+"已被其他角色預定或沒有庫存。"); return; }
             const valid=(typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes():[0,1,2])
@@ -362,6 +365,7 @@
             pendingAction=POTION_TARGET_ACTION;
             window.v143PendingPotionTarget={potionId:potionId,casterIndex:activeBattleCharacterIndex};
             closeMenus();
+            if(definition.resource==="revive"){ setBattleAllyTargetSelectionMode(potionId);return; }
             const region=document.getElementById("battleActionRegion");
             if(region){ region.classList.add("target-selecting"); }
             const prompt=document.getElementById("battleTargetPromptAction");
@@ -408,13 +412,14 @@
 
     if(typeof applyPotionEffect==="function"){
         const previousApplyPotion=applyPotionEffect;
-        applyPotionEffect=function(potionId,characterIndex){
+        applyPotionEffect=function(potionId,characterIndex,targetAlly){
             const queued=typeof queuedPlayerActions!=="undefined"&&queuedPlayerActions[characterIndex];
-            const target=queued&&Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+            const target=Number.isInteger(targetAlly)?targetAlly:queued&&Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
             window.v143LastPotionEffectTarget={index:target,at:Date.now()};
             const caster=getPartyCharacterByIndex(characterIndex);
             const receiver=getPartyCharacterByIndex(target);
             const definition=getPotionDefinition(potionId);
+            if(definition?.resource==="revive"){ return previousApplyPotion.call(this,potionId,characterIndex,target); }
             const previousLog=typeof addBattleLog==="function"?addBattleLog:null;
             if(previousLog&&caster&&receiver&&characterIndex!==target){
                 addBattleLog=function(message){
@@ -468,36 +473,6 @@
         window.v132ShowRewardModal('<div class="v132-reward-modal-inner"><h3>合成成功</h3><div class="v141-result-item">'+item.icon+'<b>'+escapeHtml(item.name)+'</b>'+stats+'</div><p>此為系統隨機生成的普通裝備，不屬於四大套裝。</p><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">確定</button></div></div>');
     }
 
-    window.v141CraftEquipment=function(){
-        const blueprint=window.v141GetSelectedCraftBlueprint&&window.v141GetSelectedCraftBlueprint();
-        if(!blueprint){ return; }
-        const tier=normalizeTierKey(blueprint.tierKey);
-        const meta=TIER_META[normalizeTierKey(tier)];
-        const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
-        const ore=definitions().ores.find(item=>item.tierKey===tier);
-        if(!meta||meta.available===false||!ore||countItem(blueprint.id)<50||countItem(ore.id)<50||numeric(gold)<meta.craftGold){ alert("素材或金幣不足。"); return; }
-        const item={
-            id:"normal_crafted_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8),
-            v141Uid:"gear_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8),
-            name:NORMAL_GEAR_PREFIXES[Math.floor(Math.random()*NORMAL_GEAR_PREFIXES.length)]+meta.label+slot.label,
-            icon:svgIcon(slot.glyph,meta.color),type:slot.type,tierKey:tier,levelRequirement:1,
-            price:0,count:1,stats:rollNormalAffixes(tier),reforgeStats:null,
-            v141Crafted:true,v143NormalCraft:true
-        };
-        delete item.setId;
-        if(window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(item,1)){ alert("背包空間不足。"); return; }
-        const transaction=window.v132RunInventoryTransaction||function(operation){ return !!operation(); };
-        const success=transaction(()=>
-            window.v132ConsumeStackItem(blueprint.id,50)&&
-            window.v132ConsumeStackItem(ore.id,50)&&
-            window.v132AddItemToInventory(item,1)
-        );
-        if(!success){ alert("合成失敗，素材已自動還原。"); return; }
-        gold-=meta.craftGold;
-        rebuildInventorySlots(); updateGoldDisplay(); saveGame();
-        window.v141RenderSynthesis();
-        synthesisResult(item);
-    };
 
     /* Shared lifecycle keeps the patched DOM healthy after page switches. */
     if(typeof showPage==="function"){

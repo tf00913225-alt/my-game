@@ -19,7 +19,7 @@ const privacy=read("privacy.html");
 const authUi=read("js/firebase/firebase-auth-ui.js");
 const auth=read("js/firebase/firebase-auth.js");
 
-assert.match(main,/RETIRED_BACKPACK_POTION_IDS=new Set\(\[[\s\S]*"hpPotion50"[\s\S]*"spPotion50"/);
+assert.match(main,/RETIRED_BACKPACK_POTION_IDS=new Set\(\[[\s\S]*"hpPotion100"[\s\S]*"spPotion100"/);
 assert.match(main,/RETIRED_BACKPACK_POTION_IDS\.has\(String\(item\.id\|\|""\)\)/);
 assert.doesNotMatch(adventure,/id:"(?:hp|sp)Potion50"/);
 assert.match(adventure,/road_chest:\{gold:420,potions:\[\{id:"hpPotion30",count:1\}\]\}/);

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import crypto from "node:crypto";
+import {syncItemAcquisitionProjection} from "./lib/item-acquisition-projection.mjs";
 import {syncMonsterBalanceRuntime} from "./lib/monster-balance-runtime-source.mjs";
 import {syncBattleEncounterCatalog} from "./lib/cloud-battle-encounter-catalog.mjs";
 import {syncPlainPlayerNormalAttackRules} from "./lib/cloud-battle-normal-attack-rules.mjs";
@@ -11,6 +12,7 @@ import {fileURLToPath} from "node:url";
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const BUILD=path.join(ROOT,"build");
 const checkOnly=process.argv.includes("--check");
+syncItemAcquisitionProjection(ROOT,checkOnly);
 syncMonsterBalanceRuntime(ROOT,checkOnly);
 await syncBattleEncounterCatalog(ROOT,checkOnly);
 syncPlainPlayerNormalAttackRules(ROOT,checkOnly);
@@ -38,6 +40,8 @@ const appScripts=[
     "functions/src/equipment-combat-percent-migration.js",
     "functions/src/hero-core.js",
     "js/00-main.js",
+    "js/generated-item-acquisition-data.js",
+    "js/item-acquisition-registry.js",
     "js/01-stage-v8-touch-lock.js",
     "js/02-stage-v9-native-coordinate-api.js",
     "js/03-stage-v10-battle-log-scroll-runtime.js",

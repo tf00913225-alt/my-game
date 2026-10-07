@@ -30,7 +30,7 @@ function harness(){
         v132GetContentDefinitions:()=>defs,v132CanAddItemToInventory:()=>true,
         rebuildInventorySlots(){},updateGoldDisplay(){},saveGame(){},updateUI(){},alert(){},
         setTimeout(){timers++;return 1;},v132ShowRewardModal(){},
-        v132ConsumeStackItem(id,n){const item=c.inventoryItems.find(item=>item.id===id);if(!item||item.count<n)return false;item.count-=n;return true;},
+        v132ConsumeStackItem(id,n){const item=c.inventoryItems.find(item=>item.id===id);if(!item||item.count<n)return false;item.count-=n;if(item.count===0)c.inventoryItems.splice(c.inventoryItems.indexOf(item),1);return true;},
         v132AddItemToInventory(def,n){if(c.failAdd)return false;const item=c.inventoryItems.find(item=>item.id===def.id);if(item)item.count+=n;else c.inventoryItems.push({...def,count:n});return true;},
         v132RunInventoryTransaction(fn){const snapshot=JSON.stringify(c.inventoryItems);const success=fn();if(!success)c.inventoryItems=JSON.parse(snapshot);return success;}
     };
@@ -59,9 +59,9 @@ test("talisman costs and failure rollback survive canonical rendering",()=>{
         assert.match(h.body.innerHTML,/class="v143-item-picker"/);
     }
 });
-test("all five material promotions retain 50 to 10, IDs, options and rollback",()=>{
+test("all five ore promotions retain 50 to 10, IDs, options and rollback",()=>{
     for(const [index,tier] of tiers.slice(0,-1).entries()){
-        for(const kind of ["ore","blueprint"]){
+        for(const kind of ["ore"]){
             const h=harness();h.put(kind+"-"+tier,50);h.c.openHomeFeature("synthesis");h.c.v141SwitchSynthesisTab("material");h.c.v17363ChooseMaterialOption(kind==="ore"?"oreTier":"blueprintTier",tier);
             assert.match(h.body.innerHTML,/role="listbox"/);assert.doesNotMatch(h.body.innerHTML,/<select/);
             const before=h.c.gold,snapshot=JSON.stringify(h.c.inventoryItems);h.c.failAdd=true;
@@ -82,12 +82,12 @@ test("legacy ordinary gear compatibility cannot strip canonical material bluepri
     const canonicalBefore=JSON.stringify(h.defs.blueprints),ownedBefore=JSON.stringify(h.c.inventoryItems);
     h.c.inventoryItems.push({id:"old-gear",name:"赤炎普通裝備",v141Crafted:true,setId:"setFire",requiredElement:"fire",stats:{attack:3},icon:"old-art"});
     const polish=fs.readFileSync("js/41-v146-system-polish.js","utf8");
-    const block=polish.slice(polish.indexOf("    const SYNTHESIS_SET_PREFIX="),polish.indexOf('    if(typeof window.v141CraftEquipment==="function")'));
+    const block=polish.slice(polish.indexOf("    const SYNTHESIS_SET_PREFIX="),polish.indexOf('    /* ----- Shared lifecycle.'));
     vm.runInContext(block+"\nnormalizeOrdinarySynthesisData();",h.c);
     assert.equal(JSON.stringify(h.defs.blueprints),canonicalBefore);
     assert.equal(JSON.stringify(h.c.inventoryItems.slice(0,1)),ownedBefore);
     assert.equal(h.c.inventoryItems[1].setId,undefined);assert.equal(h.c.inventoryItems[1].requiredElement,undefined);
     assert.equal(h.c.inventoryItems[1].stats.attack,3);
     h.c.openHomeFeature("synthesis");h.c.v141SwitchSynthesisTab("material");
-    assert.match(h.body.innerHTML,/data-material-value="setFire"/);assert.equal(h.c.v17363CraftMaterial("blueprint"),true);assert.equal(h.count("blueprint-blue"),10);
+    assert.doesNotMatch(h.body.innerHTML,/blueprintSet|設計圖/);assert.equal(h.c.v17363CraftMaterial("blueprint"),false);assert.equal(h.count("blueprint-white"),50);assert.equal(h.count("blueprint-blue"),0);assert.equal(JSON.stringify(h.defs.blueprints),canonicalBefore);
 });
