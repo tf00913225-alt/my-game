@@ -126,6 +126,8 @@ test('Phase 2B action completion counts MISS, deduplicates incoming hits, preser
   ctx.recordHeroEnemyActionReceipt({target:h,sourceType});ctx.finishHeroBattleAction({action:ctx.battleDurationAction});
  }
  assert.equal(h.rage,2);h.rage=12;ctx.addHeroBattleRage(h);assert.equal(h.rage,12);
+ assert.deepEqual(plain(ctx.getBattleSecondaryResource(h,{maxSP:999})),{kind:'rage',current:12,max:12});
+ assert.deepEqual(plain(ctx.getBattleSecondaryResource(ctx.player,{maxSP:100})),{kind:'sp',current:100,max:100});
  ctx.initializeHeroBattleCombatants();assert.equal(ctx.getPartyCharacterByIndex(3).rage,0);assert.equal(ctx.getPartyCharacterByIndex(3).phoenixBurnStacks,0);
  assert.equal(JSON.stringify(account),original);
 });

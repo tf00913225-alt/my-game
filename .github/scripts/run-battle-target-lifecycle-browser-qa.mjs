@@ -163,6 +163,7 @@ const heroExpression=`(async()=>{
                 begin('monster',0);Math.random=()=>.99999;processSingleMonsterAttack(0,battleToken,snapshot);await new Promise(r=>setTimeout(r,2300));check(dog.rage===1,'enemy MISS Rage');
                 dog.activeBuffs=[markPersistentStateName({type:'shield',remaining:100000,turnsLeft:2},'shield')];const shieldHp=dog.hp;
                 begin('monster',0);Math.random=()=>0;processSingleMonsterAttack(0,battleToken,snapshot);await new Promise(r=>setTimeout(r,2300));check(dog.hp===shieldHp&&dog.rage===2,'fully absorbed hit Rage');
+                check(Math.abs(FourSymbolsBattlefieldRenderGeometry.getUnitGeometry('player',3).spProjection.ratio-2/12)<.00001,'Rage HUD geometry uses same resource projection');
                 dog.hp=0;const retained=dog.rage;activeBattleCharacterIndex=0;player.sp=1000;castReviveSkill('revive',3);await new Promise(r=>setTimeout(r,2300));check(dog.hp>0&&dog.rage===retained,'death revival retains Rage');
                 player.hp=1;king.rage=0;begin('heroNpc',4);Math.random=()=>.99999;secondaryCharacterNormalAttack(4,0);await new Promise(r=>setTimeout(r,700));
                 check(hasNamedPersistentState(player,'stealthSkill')&&king.rage===1,'Vajra lowest HP Stealth on MISS');
