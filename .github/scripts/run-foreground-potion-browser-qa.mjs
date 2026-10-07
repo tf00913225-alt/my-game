@@ -66,9 +66,9 @@ async function run(width,height){
   const rows=[];
   try{
    for(const route of ['battle','inventory-single','inventory-batch','post-battle','element-box']){
-    for(const [id,resource,start,expected] of [['hpPotion10','hp',4000,4066],['hpPotion10','hp',4500,4520],['spPotion10','sp',1000,1066],['spPotion10','sp',1170,1190],['hpPotion20','hp',3000,3904],['hpPotion30','hp',3000,4356],['spPotion20','sp',500,738],['spPotion30','sp',500,857],['nineTurnRestorationPill','hp',4000,4520],['taichingQiPill','sp',1000,1190]]){
+    for(const [id,resource,start,expected] of [['hpPotion10','hp',4000,4066],['hpPotion10','hp',4500,4520],['spPotion10','sp',1000,1066],['spPotion10','sp',1170,1190],['hpPotion20','hp',3000,3904],['hpPotion30','hp',3000,4356],['spPotion20','sp',500,738],['spPotion30','sp',500,857],['hpPotion50','hp',2000,4260],['spPotion50','sp',500,1095],['nineTurnRestorationPill','hp',4000,4520],['taichingQiPill','sp',1000,1190]]){
      if((route==='post-battle'||route==='element-box')&&getPotionDefinition(id).manualOnly)continue;
-     inventoryItems.splice(0,inventoryItems.length);addPotionToInventory(id,route==='inventory-batch'?2:1);player.hp=4520;player.sp=1190;player[resource]=start;
+     inventoryItems.splice(0,inventoryItems.length);if(getPotionDefinition(id).compatibilityOnly){inventoryItems.push({...getPotionDefinition(id),count:route==='inventory-batch'?2:1});normalizePotionInventoryFromLegacy({});}else addPotionToInventory(id,route==='inventory-batch'?2:1);player.hp=4520;player.sp=1190;player[resource]=start;
      rebuildInventorySlots();inventoryCharacterIndex=0;
      if(route==='battle')applyPotionEffect(id,0);
      else if(route==='inventory-single')v17342UseInventoryPotion(inventorySlots.findIndex(item=>item?.id===id));

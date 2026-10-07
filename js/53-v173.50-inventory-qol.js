@@ -339,6 +339,7 @@
         if(total<=1){ return null; }
         if(typeof getPotionDefinition==="function"){
             const definition=getPotionDefinition(item.id);
+            if(definition?.battleOnly){ return null; }
             if(definition){ return {kind:"potion",label:"批量使用",total,definition}; }
         }
         if(item.type==="chest"&&SUPPORTED_BATCH_CHEST_IDS.has(String(item.id||""))){

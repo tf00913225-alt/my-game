@@ -91,6 +91,7 @@
             tenFloor:function(floor){ return floor>=80?10:(floor>=40?9:8); }
         }),
         breakthrough:Object.freeze({everyTen:1}),
+        gem:Object.freeze({itemId:"gemVitalityI",every:10,count:1,provisional:true}),
         majorMilestones:Object.freeze({
             25:Object.freeze({boxId:"relicChoiceBoxBlue"}),
             50:Object.freeze({boxId:"relicChoiceBoxPurple"}),
@@ -203,6 +204,8 @@
             relicChoiceBox:true,maxRarity:box.maxRarity,fragmentAmount:box.fragmentAmount
         });
     });
+    const towerGem=window.FourSymbolsEquipmentGems&&window.FourSymbolsEquipmentGems.definitions[RELIC_TOWER_REWARD_CONFIG.gem.itemId];
+    if(towerGem){ itemDefinitions[towerGem.id]=towerGem; }
     Object.freeze(itemDefinitions);
 
     function inventoryList(){
@@ -509,6 +512,9 @@
             rewards.push({itemId:MATERIAL_CONFIG.breakthroughItemId,count:RELIC_TOWER_REWARD_CONFIG.breakthrough.everyTen});
         }else if(floor%5===0){
             rewards.push({itemId:MATERIAL_CONFIG.universalItemId,count:RELIC_TOWER_REWARD_CONFIG.universal.fiveFloor(floor)});
+        }
+        if(floor%RELIC_TOWER_REWARD_CONFIG.gem.every===0){
+            rewards.push({itemId:RELIC_TOWER_REWARD_CONFIG.gem.itemId,count:RELIC_TOWER_REWARD_CONFIG.gem.count});
         }
         const milestone=RELIC_TOWER_REWARD_CONFIG.majorMilestones[floor];
         if(milestone&&options.firstEver===true&&itemDefinitions[milestone.boxId]){
@@ -879,21 +885,8 @@
     }
 
     function relicSources(relicId){
-        const def=catalog[relicId];
-        if(!def){ return []; }
-        const sources=[];
-        Object.entries(RELIC_BOSS_DROP_TABLE).forEach(([bossId,pool])=>{
-            if(!pool.includes(relicId)){ return; }
-            const definition=[...(gameplayRuntime.personalBosses||[]),...(gameplayRuntime.worldBosses||[])].find(item=>item&&item.id===bossId);
-            if(definition){ sources.push(definition.name+"（BOSS）"); }
-        });
-        Object.entries(RELIC_TOWER_REWARD_CONFIG.majorMilestones).forEach(([floor,reward])=>{
-            const box=MATERIAL_CONFIG.choiceBoxes[reward.boxId];
-            if(box&&rarityIndex(def.rarity)<=rarityIndex(box.maxRarity)){
-                sources.push("四象塔 "+floor+" 層首達自選箱");
-            }
-        });
-        return sources;
+        const owner=window.FourSymbolsItemAcquisition;
+        return owner?owner.getSources(relicId).concat(owner.getSources(fragmentIdFor(relicId))).map(owner.formatSource):[];
     }
 
     function eligibleChoiceRelics(boxId){
@@ -980,17 +973,17 @@
     const originalOpenRelicPage=typeof window.v174OpenRelicPage==="function"?window.v174OpenRelicPage:null;
     const originalOpenRelicDetail=typeof window.v174OpenRelicDetail==="function"?window.v174OpenRelicDetail:null;
     if(originalOpenRelicPage){
-        window.v174OpenRelicPage=function(){ ensureFirstCharacterLevel20Relics();currentRelicDetailId=null;const result=originalOpenRelicPage.apply(this,arguments);decorateRelicSurface();return result; };
+        window.v174OpenRelicPage=function(){ ensureFirstCharacterLevel20Relics();currentRelicDetailId=null;return originalOpenRelicPage.apply(this,arguments); };
     }
     if(originalOpenRelicDetail){
-        window.v174OpenRelicDetail=function(id){ ensureFirstCharacterLevel20Relics();currentRelicDetailId=id;const result=originalOpenRelicDetail.apply(this,arguments);decorateRelicSurface();return result; };
+        window.v174OpenRelicDetail=function(id){ ensureFirstCharacterLevel20Relics();currentRelicDetailId=id;return originalOpenRelicDetail.apply(this,arguments); };
     }
     if(typeof window.openHomeFeature==="function"){
         const original=window.openHomeFeature;
         window.openHomeFeature=function(type){
             if(type==="relic"){ ensureFirstCharacterLevel20Relics(); }
             const result=original.apply(this,arguments);
-            if(type==="relic"){ currentRelicDetailId=null;decorateRelicSurface(); }
+            if(type==="relic"){ currentRelicDetailId=null; }
             return result;
         };
     }
@@ -1002,15 +995,6 @@
         const original=window.vGameplayCloseBossDetail;
         window.vGameplayCloseBossDetail=function(){ currentBossDetail=null;return original.apply(this,arguments); };
     }
-    ["v174SetRelicFilter","v174EquipRelic","v174UnequipRelic"].forEach(name=>{
-        const original=window[name];
-        if(typeof original!=="function"){ return; }
-        window[name]=function(){
-            const result=original.apply(this,arguments);
-            decorateRelicSurface();
-            return result;
-        };
-    });
     if(typeof window.vGameplaySwitchBossTab==="function"){
         const original=window.vGameplaySwitchBossTab;
         window.vGameplaySwitchBossTab=function(){ currentBossDetail=null;return original.apply(this,arguments); };
@@ -1068,9 +1052,9 @@
         const owned=relicRuntime.getOwnedState()[relicId];
         const status=craftStatus(relicId),cost=upgradeCost(relicId);
         let panel=detail.querySelector(".relic-progression-detail-panel");
-        const sourceText=relicSources(relicId).length?relicSources(relicId).join("、"):"目前尚無正式取得來源";
+        const sourceText=relicSources(relicId).length?"點選獲取途徑查看完整條件與來源追溯":"目前版本尚無正式取得途徑";
         const replacementText=owned.unlocked?"已持有；多餘專屬碎片會保留。":status.specific>=100?"已達 100 專屬碎片，可直接合成。":status.specific>=50?"缺少 "+status.missing+"；需要秘寶通用碎片 ×"+status.universalCost+"。":"至少要先取得 50 個專屬碎片，才能使用通用碎片補足。";
-        const panelHtml='<div class="relic-progression-detail-panel"><div><span>專屬碎片</span><b>'+status.specific+' / 100</b></div><div><span>秘寶通用碎片</span><b>'+status.universal+'</b></div><p>'+esc(replacementText)+'</p><small>取得來源：'+esc(sourceText)+'</small><em>每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。</em></div>';
+        const panelHtml='<div class="relic-progression-detail-panel"><div><span>專屬碎片</span><b>'+status.specific+' / 100</b></div><div><span>秘寶通用碎片</span><b>'+status.universal+'</b></div><p>'+esc(replacementText)+'</p><small>取得來源：'+esc(sourceText)+'</small><button type="button" data-relic-source="'+esc(relicId)+'" onclick="vRelicProgressionShowAcquisition(this.dataset.relicSource)">獲取途徑</button><em>每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。</em></div>';
         if(panel){ panel.outerHTML=panelHtml; }
         else{
             const hero=detail.querySelector(".team-relic-detail-hero");
@@ -1146,7 +1130,7 @@
         reconcilePending();
         const home=document.querySelector("#towerPageContent .tower-home");if(!home){return;}
         let guide=home.querySelector(".tower-relic-reward-guide");
-        const html='<section class="tower-relic-reward-guide"><h3>秘寶養成獎勵</h3><p>普通層：秘寶精華・每 5 層：通用碎片・每 10 層：通用碎片＋突破石＋較多精華。</p><small>首次達到 25 / 50 / 75 / 100 層，分別獲得藍 / 紫 / 橙 / 桃紅階以下「秘寶碎片自選箱」。四象階不進低塔自選箱。</small></section>';
+        const html='<section class="tower-relic-reward-guide"><h3>寶石與秘寶養成獎勵</h3><p>每週每 '+RELIC_TOWER_REWARD_CONFIG.gem.every+' 層首次通關：體質寶石 ×'+RELIC_TOWER_REWARD_CONFIG.gem.count+'（暫定）。</p><p>普通層：秘寶精華・每 5 層：通用碎片・每 10 層：通用碎片＋突破石＋較多精華。</p><small>首次達到 25 / 50 / 75 / 100 層，分別獲得藍 / 紫 / 橙 / 桃紅階以下「秘寶碎片自選箱」。四象階不進低塔自選箱。</small></section>';
         if(guide){ guide.outerHTML=html; }
         else{
             const summary=home.querySelector(".tower-summary-grid");
@@ -1168,6 +1152,7 @@
     /* The previous Team Relic owner exposed a gold-only public upgrade action.
        Keep its battle/runtime owner intact, but replace the public progression
        entry so there is only one reachable upgrade economy: essence + stones. */
+    window.vRelicProgressionShowAcquisition=id=>window.FourSymbolsItemAcquisition?.show({id:id,name:catalog[id]?.name||id});
     window.v174UpgradeRelic=upgradeRelic;
     window.vRelicProgressionCraft=craftRelic;
     window.vRelicProgressionUpgrade=upgradeRelic;
@@ -1191,6 +1176,7 @@
         getUpgradeCost:upgradeCost,
         upgradeRelic:upgradeRelic,
         getRelicSources:relicSources,
+        decorateRelicSurface:decorateRelicSurface,
         getBossPreview:bossPreview,
         getBossPoolProbabilities:poolProbabilities,
         rollBossReward:rollBossReward,

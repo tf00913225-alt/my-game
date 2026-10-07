@@ -199,28 +199,6 @@
         };
     }
 
-    function syncDefeatedCards(){
-        if(
-            typeof monsters!=="undefined"&&
-            Array.isArray(monsters)&&
-            typeof currentBattleMonsters!=="undefined"&&
-            Array.isArray(currentBattleMonsters)
-        ){
-            currentBattleMonsters.forEach(index=>{
-                const monster=monsters[index];
-                const card=document.getElementById("battleMonster"+index);
-                if(card){ card.classList.toggle("v146-defeated",!monster||monster.alive===false||numeric(monster.hp)<=0); }
-            });
-        }
-        if(typeof getPartyCharacterByIndex==="function"){
-            [0,1,2].forEach(index=>{
-                const character=getPartyCharacterByIndex(index);
-                const card=document.getElementById("battlePlayerCard"+index);
-                if(card){ card.classList.toggle("v146-defeated",!character||numeric(character.hp)<=0); }
-            });
-        }
-    }
-
     /* ----- Abyss is a real walk-up map: bounded steps, movement lock, proximity. ----- */
     let abyssMoveUnlockTimer=0;
 
@@ -660,31 +638,6 @@
         }
     }
 
-    if(typeof window.v141CraftEquipment==="function"){
-        const previousCraftEquipment=window.v141CraftEquipment;
-        window.v141CraftEquipment=function(){
-            const before=new Set(
-                (typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)?inventoryItems:[])
-                    .map(item=>item&&item.v141Uid).filter(Boolean)
-            );
-            const result=previousCraftEquipment.apply(this,arguments);
-            let normalized=false;
-            if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){
-                inventoryItems.forEach(item=>{
-                    if(!item||!item.v141Crafted||before.has(item.v141Uid)){ return; }
-                    normalizeOrdinaryCraftedItem(item);
-                    normalized=true;
-                });
-            }
-            if(normalized){
-                if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
-                if(typeof renderInventoryItems==="function"){ renderInventoryItems(); }
-                if(typeof saveGame==="function"){ saveGame(); }
-            }
-            return result;
-        };
-    }
-
     /* ----- Shared lifecycle. ----- */
     if(typeof showPage==="function"){
         const previousShowPage=showPage;
@@ -692,7 +645,6 @@
             const result=previousShowPage.apply(this,arguments);
             if(page==="home"){ renderHomeRoster(); }
             if(page==="dungeon"){ setTimeout(syncDungeonShell,0); }
-            setTimeout(syncDefeatedCards,0);
             setTimeout(syncCharacterAttentionDots,0);
             return result;
         };
@@ -735,7 +687,7 @@
     normalizeOrdinarySynthesisData();
     syncSetDefinitions();
     const boot=()=>{
-        renderHomeRoster(); syncDungeonShell(); syncShopTotals(); syncDefeatedCards(); syncCharacterAttentionDots();
+        renderHomeRoster(); syncDungeonShell(); syncShopTotals(); syncCharacterAttentionDots();
     };
     if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",boot,{once:true}); }
     else{ boot(); }

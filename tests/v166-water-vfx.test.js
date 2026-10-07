@@ -720,7 +720,7 @@ test("legacy Ice Spin projectile is suppressed while its official sheet is activ
 test("revive activation and its HP popup wait for the frame-eight hit",()=>{
     assert.match(animation,/v143RunAtTargetHit/);
     assert.match(support,/resolvePartyRevive[\s\S]*?v143RunAtTargetHit/);
-    assert.match(support,/const reviveAtImpact=\(\)=>\{[\s\S]*?target\.hp=restoredHP[\s\S]*?showPlayerHit\(restoredHP/);
+    assert.match(support,/const reviveAtImpact=\(\)=>\{[\s\S]*?reactivateRevivedPartyUnit\(targetIndex,target,restoredHP\)[\s\S]*?showPlayerHit\(restoredHP/);
     assert.match(support,/v143RunAtTargetHit\("player",targetIndex,reviveAtImpact,true\)/);
     assert.doesNotMatch(
         support,

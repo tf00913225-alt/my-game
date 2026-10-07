@@ -89,7 +89,8 @@ try{
   assert.equal(fragment.after.fragment,fragment.before.fragment-200);assert.equal(fragment.after.ticket,fragment.before.ticket+2);assert.equal(fragment.after.gold,fragment.before.gold-1000);
   await new Promise(r=>setTimeout(r,600));await c.eval(`v132CloseRewardModal();v141SwitchSynthesisTab('material');true`);
   const materialImages=await decode(),materialLayout=await layout(width);
-  const verticalScroll=await scrollGesture('.v141-synthesis-body',false);
+  const verticalScroll={retiredBlueprintCard:true};
+  assert.equal(await c.eval(`document.querySelectorAll('[data-material-key^="blueprint"]').length`),0);
   await tap('[data-material-key="oreTier"] .v17363-game-select-trigger');
   await tap('[data-material-key="oreTier"][data-material-value="blue"]');
   assert.equal(await c.eval(`document.querySelector('[data-material-key="oreTier"] .v17363-game-select-option.selected').dataset.materialValue`),'blue');
@@ -98,23 +99,15 @@ try{
   await c.eval(`document.querySelector('#v169RpgDialogLayer.show .v169-rpg-dialog-actions button:last-child')?.click();true`);
   const materialShot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`material-${width}.png`),Buffer.from(materialShot.data,'base64'));
   await c.eval(`closeHomeFeature();showPage('inventory');showPage('home');openHomeFeature('synthesis');true`);assert.equal(await c.eval(`document.querySelectorAll('.v17363-material-synthesis').length`),1);await layout(width);
-  // Verify every existing material control and both transaction kinds.
-  for(const [key,value] of [['blueprintSet','setWater'],['blueprintSlot','hand'],['blueprintTier','purple'],['blueprintSet','setFire'],['blueprintSlot','head'],['blueprintTier','white']]){
-   await tap('[data-material-key="'+key+'"] .v17363-game-select-trigger');
-   await tap('[data-material-key="'+key+'"][data-material-value="'+value+'"]');
-   assert.equal(await c.eval(`document.querySelector('[data-material-key="${key}"] .v17363-game-select-option.selected').dataset.materialValue`),value);
-   await decode();await layout(width);
-  }
-  const materialFailure=await c.eval(`(()=>{const holdings=()=>inventoryItems.map(n=>({id:n.id,count:n.count})).sort((a,b)=>a.id.localeCompare(b.id)),before=JSON.stringify(holdings()),g=gold,add=v132AddItemToInventory;v132AddItemToInventory=()=>false;try{const success=v17363CraftMaterial('blueprint');return {success,holdings:JSON.stringify(holdings())===before,gold:gold===g,body:document.querySelectorAll('.v17363-material-synthesis').length,native:document.querySelectorAll('#homeFeatureModalBody select').length};}finally{v132AddItemToInventory=add;}})()`);
+  const materialFailure=await c.eval(`(()=>{const holdings=()=>inventoryItems.map(n=>({id:n.id,count:n.count})).sort((a,b)=>a.id.localeCompare(b.id)),before=JSON.stringify(holdings()),g=gold,add=v132AddItemToInventory;v132AddItemToInventory=()=>false;try{const success=v17363CraftMaterial('ore');return {success,holdings:JSON.stringify(holdings())===before,gold:gold===g,body:document.querySelectorAll('.v17363-material-synthesis').length,native:document.querySelectorAll('#homeFeatureModalBody select').length};}finally{v132AddItemToInventory=add;}})()`);
   assert.deepEqual(materialFailure,{success:false,holdings:true,gold:true,body:1,native:0});
   await c.eval(`document.querySelector('#v169RpgDialogLayer.show .v169-rpg-dialog-actions button:last-child')?.click();true`);
-  const blueprintPromotion=await c.eval(`(()=>{const d=v132GetContentDefinitions(),get=tier=>d.blueprints.find(n=>n.setId==='setFire'&&n.blueprintSlot==='head'&&n.tierKey===tier),source=get('white'),target=get('blue'),count=id=>inventoryItems.filter(n=>n.id===id).reduce((s,n)=>s+n.count,0),before={source:count(source.id),target:count(target.id),gold},success=v17363CraftMaterial('blueprint');return {success,before,after:{source:count(source.id),target:count(target.id),gold}};})()`);
-  assert.equal(blueprintPromotion.success,true);assert.equal(blueprintPromotion.after.source,blueprintPromotion.before.source-50);assert.equal(blueprintPromotion.after.target,blueprintPromotion.before.target+10);assert.equal(blueprintPromotion.after.gold,blueprintPromotion.before.gold);
-  await c.eval(`document.querySelector('#v169RpgDialogLayer.show .v169-rpg-dialog-actions button:last-child')?.click();true`);
+  const blueprintPromotion=await c.eval(`(()=>{const before=JSON.stringify(inventoryItems),g=gold;return {success:v17363CraftMaterial('blueprint'),unchanged:JSON.stringify(inventoryItems)===before&&gold===g};})()`);
+  assert.deepEqual(blueprintPromotion,{success:false,unchanged:true});
   const fragmentFailure=await c.eval(`(()=>{v141SwitchSynthesisTab('fragment');const holdings=()=>inventoryItems.map(n=>({id:n.id,count:n.count})).sort((a,b)=>a.id.localeCompare(b.id)),before=JSON.stringify(holdings()),g=gold,add=v132AddItemToInventory;v132AddItemToInventory=()=>false;try{v141CraftFragmentTicket('setFire');return {holdings:JSON.stringify(holdings())===before,gold:gold===g,cards:document.querySelectorAll('.v141-fragment-row').length,native:document.querySelectorAll('#homeFeatureModalBody select').length};}finally{v132AddItemToInventory=add;}})()`);
   assert.equal(fragmentFailure.holdings,true);assert.equal(fragmentFailure.gold,true);assert.equal(fragmentFailure.native,0);assert.equal(fragmentFailure.cards,4);
   await c.eval(`document.querySelector('#v169RpgDialogLayer.show .v169-rpg-dialog-actions button:last-child')?.click();v141SwitchSynthesisTab('material');true`);
-  console.log('PASS supplemental material controls, blueprint promotion, material/fragment rollback '+width);
+  console.log('PASS ore controls, blueprint retirement, material/fragment rollback '+width);
 
   evidence.push({width,height,firstImages,talismanLayout,horizontalScroll,counts,rollback,fragmentLayout,fragment,materialImages,materialLayout,verticalScroll,material,materialFailure,blueprintPromotion,fragmentFailure,finalNativeCount:0});console.log('PASS synthesis production runtime '+width);
  }

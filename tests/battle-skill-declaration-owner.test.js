@@ -13,7 +13,7 @@ const ctx={battleActive:true,battlePhase:'declare',activeBattleCharacterIndex:0,
     updateUI(){},finishPlayerAction(){finished++;ctx.actionReady=false;ctx.pendingAction=null;},populateSkillQuickBar(){},syncTurnTimerWithBattlePickers(){},
     isValidAllyTargetForSkill:(skill,character)=>skill.targetType==='deadAlly'?character.hp<=0:character.hp>0,currentBattleMonsters:[0],normalizeBattleTargetType:type=>type,getBattleActionTargetType:type=>ctx.skillDatabase[type]?.targetType||"single",getBattleActionDisplayName:()=>"attack",
     $:()=>({textContent:'',classList:{add(){}}}),document:{querySelectorAll:()=>[]},monsters:[{alive:true,hp:100,name:'敵人'}]};
-vm.createContext(ctx);
+vm.createContext(ctx);vm.runInContext(extract("getBattleAllyActionDefinition","setBattleAllyTargetSelectionMode"),ctx);
 vm.runInContext(extract('getBattleTargetEntity','resolveBattlefieldTargets'),ctx);
 vm.runInContext(extract('prepareAction','selectBattleTarget')+extract('selectBattleTarget','executeAction'),ctx);
 // Avoid loading unrelated combat functions; these selection helpers are source slices.
