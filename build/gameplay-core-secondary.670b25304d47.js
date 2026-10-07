@@ -6781,7 +6781,7 @@
         const built=window.v148BuildDailyDungeonWaves("gold");
         const waves=built&&built.waves||[];
         if(waves.length!==3){ return; }
-        const accepted=window.rpgConfirm?await window.rpgConfirm("裝備副本共3輪，每輪6名敵人。\n勝利後獲得2個裝備寶箱，寶箱會放入背包；每箱開啟後隨機獲得3件裝備。\n是否開始挑戰？",{title:"裝備副本",confirmText:"開始挑戰"}):true;
+        const accepted=window.rpgConfirm?await window.rpgConfirm("裝備副本共3輪，每輪6名敵人。\n勝利後獲得2個裝備寶箱，以及隨機一種元素系列碎片 ×'+EQUIPMENT_DUNGEON_FRAGMENT_REWARD.count+'（暫定），獎勵會放入背包；每箱開啟後隨機獲得3件裝備。\n是否開始挑戰？",{title:"裝備副本",confirmText:"開始挑戰"}):true;
         if(!accepted){ return; }
         if(typeof window.v154PrepareDailyDungeonPortraits==="function"){
             const prepared=await window.v154PrepareDailyDungeonPortraits("gold");

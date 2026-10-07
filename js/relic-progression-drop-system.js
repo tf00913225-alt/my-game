@@ -1139,7 +1139,7 @@
         reconcilePending();
         const home=document.querySelector("#towerPageContent .tower-home");if(!home){return;}
         let guide=home.querySelector(".tower-relic-reward-guide");
-        const html='<section class="tower-relic-reward-guide"><h3>秘寶養成獎勵</h3><p>普通層：秘寶精華・每 5 層：通用碎片・每 10 層：通用碎片＋突破石＋較多精華。</p><small>首次達到 25 / 50 / 75 / 100 層，分別獲得藍 / 紫 / 橙 / 桃紅階以下「秘寶碎片自選箱」。四象階不進低塔自選箱。</small></section>';
+        const html='<section class="tower-relic-reward-guide"><h3>寶石與秘寶養成獎勵</h3><p>每週每 '+RELIC_TOWER_REWARD_CONFIG.gem.every+' 層首次通關：體質寶石 ×'+RELIC_TOWER_REWARD_CONFIG.gem.count+'（暫定）。</p><p>普通層：秘寶精華・每 5 層：通用碎片・每 10 層：通用碎片＋突破石＋較多精華。</p><small>首次達到 25 / 50 / 75 / 100 層，分別獲得藍 / 紫 / 橙 / 桃紅階以下「秘寶碎片自選箱」。四象階不進低塔自選箱。</small></section>';
         if(guide){ guide.outerHTML=html; }
         else{
             const summary=home.querySelector(".tower-summary-grid");

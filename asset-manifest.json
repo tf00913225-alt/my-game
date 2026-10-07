@@ -50,7 +50,7 @@
       "gameplay-core": {
         "scripts": [
           "build/gameplay-core-primary.458bd2c4149e.js",
-          "build/gameplay-core-secondary.d739f5085384.js"
+          "build/gameplay-core-secondary.670b25304d47.js"
         ],
         "styles": [
           "build/gameplay-core.ae8f6d6ec710.css"
@@ -103,7 +103,7 @@
       "feature-boss-relic": {
         "scripts": [
           "build/feature-boss-relic.1c705c499f29.js",
-          "build/feature-relic-progression.da8e28780d2a.js"
+          "build/feature-relic-progression.25579b52e59d.js"
         ],
         "styles": [
           "build/feature-boss-relic.790db1f9bab2.css",
@@ -802,9 +802,9 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core-secondary.d739f5085384.js",
-        "sha256": "d739f5085384",
-        "bytes": 656208,
+        "path": "build/gameplay-core-secondary.670b25304d47.js",
+        "sha256": "670b25304d47",
+        "bytes": 656305,
         "priority": "P2",
         "type": "script",
         "decode": false
@@ -818,8 +818,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "6d18a2342664",
-    "totalBytes": 21666260,
+    "manifestHash": "1ccfe7b0bbf5",
+    "totalBytes": 21666357,
     "totalResources": 78
   },
   "assets": {
@@ -835,9 +835,9 @@
       "sha256": "458bd2c4149e",
       "bytes": 631294
     },
-    "build/gameplay-core-secondary.d739f5085384.js": {
-      "sha256": "d739f5085384",
-      "bytes": 656208
+    "build/gameplay-core-secondary.670b25304d47.js": {
+      "sha256": "670b25304d47",
+      "bytes": 656305
     },
     "build/feature-patrol.ab5bd3ce5582.js": {
       "sha256": "ab5bd3ce5582",
@@ -851,9 +851,9 @@
       "sha256": "1c705c499f29",
       "bytes": 90307
     },
-    "build/feature-relic-progression.da8e28780d2a.js": {
-      "sha256": "da8e28780d2a",
-      "bytes": 70121
+    "build/feature-relic-progression.25579b52e59d.js": {
+      "sha256": "25579b52e59d",
+      "bytes": 70274
     },
     "build/feature-adventure-entry.43c6c9446f8e.js": {
       "sha256": "43c6c9446f8e",
