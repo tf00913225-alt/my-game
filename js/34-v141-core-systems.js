@@ -602,17 +602,17 @@
        Elite single-roll drops + quest progress    /* =====================================================
        Elite single-roll drops + quest progress
     ===================================================== */
+    const ELITE_DROP_TABLE=Object.freeze([
+        {itemId:"ticketSetFire",chance:.01,quantity:1},{itemId:"ticketSetWater",chance:.01,quantity:1},
+        {itemId:"ticketSetEarth",chance:.01,quantity:1},{itemId:"ticketSetWind",chance:.01,quantity:1},
+        {itemId:"freezeTalismanMid",chance:.05,quantity:1},{itemId:"stealthTalismanMid",chance:.05,quantity:1},
+        {itemId:"barrierTalismanMid",chance:.05,quantity:1}
+    ].map(Object.freeze));
     function addEliteSpecialDrop(monster){
         if(typeof window.v132AddItemToInventory!=="function"){ return null; }
-        const roll=Math.random()*100;
-        let definition=null;
-        if(roll<1){ definition=window.v132GetTicketDefinition&&window.v132GetTicketDefinition("ticketSetFire"); }
-        else if(roll<2){ definition=window.v132GetTicketDefinition&&window.v132GetTicketDefinition("ticketSetWater"); }
-        else if(roll<3){ definition=window.v132GetTicketDefinition&&window.v132GetTicketDefinition("ticketSetEarth"); }
-        else if(roll<4){ definition=window.v132GetTicketDefinition&&window.v132GetTicketDefinition("ticketSetWind"); }
-        else if(roll<9){ definition=window.v132GetTalismanDefinition&&window.v132GetTalismanDefinition("freezeTalismanMid"); }
-        else if(roll<14){ definition=window.v132GetTalismanDefinition&&window.v132GetTalismanDefinition("stealthTalismanMid"); }
-        else if(roll<19){ definition=window.v132GetTalismanDefinition&&window.v132GetTalismanDefinition("barrierTalismanMid"); }
+        let roll=Math.random();
+        const row=ELITE_DROP_TABLE.find(entry=>(roll-=entry.chance)<0);
+        const definition=row&&((window.v132GetTicketDefinition&&window.v132GetTicketDefinition(row.itemId))||(window.v132GetTalismanDefinition&&window.v132GetTalismanDefinition(row.itemId)));
         if(!definition){ return null; }
         if(!window.v132AddItemToInventory(definition,1)){
             addBattleLog(monster.name+"出現特殊掉落，但背包已滿，未能放入。");

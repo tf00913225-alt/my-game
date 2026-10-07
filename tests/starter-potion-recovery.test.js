@@ -2,10 +2,10 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const main=fs.readFileSync('js/00-main.js','utf8');
 const rules=main.slice(main.indexOf('function getPotionDefinition('),main.indexOf('function createPotionInventoryItem('));
-const declarations=main.slice(main.indexOf('const potionDefinitions=['),main.indexOf('const shopItems=potionDefinitions;'));
+const declarations=main.slice(main.indexOf('const potionDefinitions=['),main.indexOf('const shopItems=potionDefinitions'));
 function fixture(){const c={window:null,console,document:{getElementById(){return null;}},skillDatabase:{},setTimeout(){},inventoryItems:[]};c.window=c;vm.createContext(c);vm.runInContext(declarations+rules,c);vm.runInContext(fs.readFileSync('js/40-v144-rules-and-abyss.js','utf8'),c);return c;}
 test('flat starter and percent tiers recover real capped amounts',()=>{
- const c=fixture();for(const [id,current,max,expected] of [['hpPotion10',4000,4520,66],['hpPotion10',4500,4520,20],['spPotion10',1000,1190,66],['spPotion10',1170,1190,20],['hpPotion20',3000,4520,904],['hpPotion30',3000,4520,1356],['spPotion20',500,1190,238],['spPotion30',500,1190,357],['hpPotion100',4000,4520,520],['spPotion100',1000,1190,190]])assert.equal(c.resolvePotionRecovery(c.getPotionDefinition(id),current,max),expected,id);
+ const c=fixture();for(const [id,current,max,expected] of [['hpPotion10',4000,4520,66],['hpPotion10',4500,4520,20],['spPotion10',1000,1190,66],['spPotion10',1170,1190,20],['hpPotion20',3000,4520,904],['hpPotion30',3000,4520,1356],['spPotion20',500,1190,238],['spPotion30',500,1190,357],['hpPotion50',1000,4520,2260],['spPotion50',100,1190,595],['hpPotion100',4000,4520,520],['spPotion100',1000,1190,190]])assert.equal(c.resolvePotionRecovery(c.getPotionDefinition(id),current,max),expected,id);
  for(const id of ['hpPotion10','spPotion10']){const d=c.getPotionDefinition(id);assert.equal(d.recoveryMode,'flat');assert.equal(d.recoveryValue,66);assert.equal(d.recoveryPercent,undefined);}
  assert.equal(c.getPotionEffectDescription('hpPotion10'),'恢復 66 HP');assert.equal(c.getPotionEffectDescription('spPotion10'),'恢復 66 SP');
 });

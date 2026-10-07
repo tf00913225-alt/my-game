@@ -69,6 +69,9 @@
     };
     const SHOP_STORAGE_KEY=window.FourSymbolsAccountSave.accountKey("equipment-shop-daily");
     let activeReforgeSnapshot=null;
+    const EQUIPMENT_DUNGEON_FRAGMENT_REWARD=Object.freeze({setIds:Object.freeze(["setFire","setWater","setEarth","setWind"]),count:10,provisional:true});
+    let equipmentDungeonReward=null;
+    let equipmentDungeonClaiming=false;
     let equipmentDungeonRunning=false;
     let equipmentDungeonWaveIndex=-1;
 
@@ -568,12 +571,16 @@
         const [key,value]=Object.entries(item.stats||{})[0]||["",0];
         return (STAT_LABEL[key]||key)+(Number(value)>=0?" +":" ")+value+(["accuracy","evasion"].includes(key)?"%":"");
     }
+    window.v17346ShowShopOfferAcquisition=function(index){
+        const item=currentShopOffers()[Math.max(0,Math.min(5,Math.floor(Number(index)||0)))];
+        return item&&window.FourSymbolsItemAcquisition?.show(item);
+    };
     window.v17346PreviewEquipmentShopOffer=function(index){
         const safeIndex=Math.max(0,Math.min(5,Math.floor(Number(index)||0)));
         const item=currentShopOffers()[safeIndex];
         if(!item||typeof window.v132ShowRewardModal!=="function"){ return; }
         const rarity=RARITY_BY_KEY[item.rarityKey]||RARITIES[0];
-        const html='<div class="v132-reward-modal-inner v17346-shop-preview-modal item-presentation-frame" data-presentation-mode="shop-preview" data-rarity="'+escapeHtml(item.rarityKey)+'"><h3>'+escapeHtml(item.name)+'</h3><div class="item-presentation-scroll" data-scroll-owner="y"><div class="v17346-shop-preview-art">'+item.icon+'</div><div class="v17346-shop-preview-info"><span>'+escapeHtml(SLOT_META[item.type].label)+'</span><strong>'+escapeHtml(statLine(item))+'</strong></div><div class="v17346-shop-preview-price">'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</div>'+(item.reforgeSlots?'<div class="v17346-shop-preview-reforge">[可冶煉]</div>':'')+'</div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
+        const html='<div class="v132-reward-modal-inner v17346-shop-preview-modal item-presentation-frame" data-presentation-mode="shop-preview" data-rarity="'+escapeHtml(item.rarityKey)+'"><h3>'+escapeHtml(item.name)+'</h3><div class="item-presentation-scroll" data-scroll-owner="y"><div class="v17346-shop-preview-art">'+item.icon+'</div><div class="v17346-shop-preview-info"><span>'+escapeHtml(SLOT_META[item.type].label)+'</span><strong>'+escapeHtml(statLine(item))+'</strong></div><div class="v17346-shop-preview-price">'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</div>'+(item.reforgeSlots?'<div class="v17346-shop-preview-reforge">[可冶煉]</div>':'')+'</div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button><button type="button" onclick="v17346ShowShopOfferAcquisition('+safeIndex+')">獲取途徑</button></div></div>';
         window.v132ShowRewardModal(html);
     };
     function renderEquipmentShop(){
@@ -640,48 +647,56 @@
 
     function showEquipmentReward(){
         if(typeof window.v132ShowRewardModal!=="function"){ return; }
-        const html='<div class="v132-reward-modal-inner"><h3>裝備副本挑戰成功！</h3><p>獲得裝備寶箱 ×2；每個寶箱開啟後隨機獲得3件裝備。</p><p>'+escapeHtml(equipmentChestOddsText("・"))+'</p><div class="v132-reward-actions"><button type="button" onclick="v17346ClaimEquipmentDungeon(false)">直接領取</button><button type="button" onclick="v17346ClaimEquipmentDungeon(true)">看廣告雙倍領取</button></div></div>';
+        if(!equipmentDungeonReward){
+            const config=EQUIPMENT_DUNGEON_FRAGMENT_REWARD;
+            const setId=config.setIds[Math.min(config.setIds.length-1,Math.floor(Math.random()*config.setIds.length))];
+            const fragment=typeof window.v141GetSeriesFragmentDefinition==="function"?window.v141GetSeriesFragmentDefinition(setId):null;
+            if(!fragment){ return; }
+            equipmentDungeonReward={fragment:fragment,count:config.count};
+        }
+        const html='<div class="v132-reward-modal-inner"><h3>裝備副本挑戰成功！</h3><p>獲得裝備寶箱 ×2；每個寶箱開啟後隨機獲得3件裝備。</p><p>'+escapeHtml(equipmentDungeonReward.fragment.name)+' ×'+equipmentDungeonReward.count+'（暫定；廣告雙倍亦適用）</p><p>'+escapeHtml(equipmentChestOddsText("・"))+'</p><div class="v132-reward-actions"><button type="button" onclick="v17346ClaimEquipmentDungeon(false)">直接領取</button><button type="button" onclick="v17346ClaimEquipmentDungeon(true)">看廣告雙倍領取</button></div></div>';
         window.v132ShowRewardModal(html);
     }
     window.v17346ClaimEquipmentDungeon=function(doubled){
+        if(!equipmentDungeonReward||equipmentDungeonClaiming){ return false; }
+        const receipt=equipmentDungeonReward;
+        equipmentDungeonClaiming=true;
         const grant=multiplier=>{
-            const chestCount=2*Math.max(1,Math.floor(Number(multiplier)||1));
-            if(typeof window.v132AddItemToInventory!=="function"){
-                alert("裝備寶箱系統尚未就緒，請重新整理後再試。");
-                return;
-            }
-            if(window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(EQUIPMENT_CHEST_DEFINITION,chestCount)){
-                alert("背包空間不足，裝備寶箱尚未領取；請先整理背包後再試。");
-                return;
-            }
-            if(!window.v132AddItemToInventory(EQUIPMENT_CHEST_DEFINITION,chestCount)){
-                alert("裝備寶箱寫入失敗，請先整理背包後再試。");
-                return;
-            }
+            if(equipmentDungeonReward!==receipt){ return false; }
+            const chestCount=2*multiplier,fragmentCount=receipt.count*multiplier;
+            const committed=typeof window.v132RunInventoryTransaction==="function"&&
+                typeof window.v132AddItemToInventory==="function"&&typeof saveGame==="function"&&
+                window.v132RunInventoryTransaction(()=>
+                    window.v132AddItemToInventory(EQUIPMENT_CHEST_DEFINITION,chestCount)&&
+                    window.v132AddItemToInventory(receipt.fragment,fragmentCount)&&saveGame()===true);
+            equipmentDungeonClaiming=false;
+            if(!committed){ alert("獎勵尚未領取，請確認背包空間與存檔後再試。"); return false; }
+            equipmentDungeonReward=null;
             syncEquipmentChestPresentation();
             if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
             if(typeof renderInventoryItems==="function"){ renderInventoryItems(); }
-            if(typeof saveGame==="function"){ saveGame(); }
             if(typeof window.v132CloseRewardModal==="function"){ window.v132CloseRewardModal(); }
             if(typeof window.rpgAlert==="function"){
-                void window.rpgAlert("獲得裝備寶箱×"+chestCount+"，請到背包自行開啟。",{title:"裝備副本獎勵",confirmText:"知道了",tone:"success"});
+                void window.rpgAlert("獲得裝備寶箱×"+chestCount+"、"+receipt.fragment.name+"×"+fragmentCount+"。",{title:"裝備副本獎勵",confirmText:"知道了",tone:"success"});
             }
             if(typeof showPage==="function"){ showPage("dungeon"); }
             if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); }
+            return true;
         };
         if(doubled&&typeof showRewardedAd==="function"){
-            showRewardedAd(()=>grant(2),()=>alert("廣告未完成，未獲得雙倍獎勵。"));
-        }else{
-            grant(1);
+            showRewardedAd(()=>grant(2),()=>{ if(equipmentDungeonReward===receipt){ equipmentDungeonClaiming=false; alert("廣告未完成，未獲得雙倍獎勵。"); } });
+            return true;
         }
+        return grant(1);
     };
 
     async function beginEquipmentDungeon(){
+        if(equipmentDungeonReward){ showEquipmentReward(); return; }
         if(equipmentDungeonRunning||typeof window.v148BuildDailyDungeonWaves!=="function"||typeof window.v132LaunchDungeonBattle!=="function"){ return; }
         const built=window.v148BuildDailyDungeonWaves("gold");
         const waves=built&&built.waves||[];
         if(waves.length!==3){ return; }
-        const accepted=window.rpgConfirm?await window.rpgConfirm("裝備副本共3輪，每輪6名敵人。\n勝利後獲得2個裝備寶箱，寶箱會放入背包；每箱開啟後隨機獲得3件裝備。\n是否開始挑戰？",{title:"裝備副本",confirmText:"開始挑戰"}):true;
+        const accepted=window.rpgConfirm?await window.rpgConfirm("裝備副本共3輪，每輪6名敵人。\n勝利後獲得2個裝備寶箱，以及隨機一種元素系列碎片 ×"+EQUIPMENT_DUNGEON_FRAGMENT_REWARD.count+"（暫定），獎勵會放入背包；每箱開啟後隨機獲得3件裝備。\n是否開始挑戰？",{title:"裝備副本",confirmText:"開始挑戰"}):true;
         if(!accepted){ return; }
         if(typeof window.v154PrepareDailyDungeonPortraits==="function"){
             const prepared=await window.v154PrepareDailyDungeonPortraits("gold");
@@ -714,6 +729,7 @@
             '<div class="v17363-preview-heading"><small>DAILY DUNGEON</small><h3>裝備副本獎勵預覽</h3></div>'+
             '<div class="v17363-preview-groups">'+
                 '<section class="v17363-preview-group"><b>裝備寶箱</b><em>×2</em><p>勝利後取得 2 個裝備寶箱；每個寶箱固定隨機取得 3 件裝備。</p></section>'+
+                '<section class="v17363-preview-group"><b>元素系列碎片</b><em>隨機一種 ×'+EQUIPMENT_DUNGEON_FRAGMENT_REWARD.count+'</em><p>赤炎／寒泉／岩岳／青嵐等機率；暫定，每種'+(100/EQUIPMENT_DUNGEON_FRAGMENT_REWARD.setIds.length)+'%；廣告雙倍亦適用。</p></section>'+
                 '<section class="v17363-preview-group"><b>裝備品階機率</b><p>'+escapeHtml(odds)+'</p></section>'+
             '</div>'+
             '<div class="v17363-preview-note">機率直接取自正式裝備寶箱掉落表，不載入大型裝備預覽圖。</div>'+

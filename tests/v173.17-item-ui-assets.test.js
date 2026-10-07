@@ -115,8 +115,9 @@ assert.match(touchSource,/data-scroll-owner="x\|y\|both"/);
 });
 
 test("equipment reward has a visible return action and resilient image fallback",()=>{
-    assert.match(itemSource,/class="v132-reward-back" onclick="v132LeaveEquipmentReward\(\)"/);
-    assert.match(itemSource,/window\.v132LeaveEquipmentReward=function\(\)/);
+    assert.doesNotMatch(itemSource,/window\.v132LeaveEquipmentReward=/,"retired ticket dungeon reward Owner must be absent");
+    const rewardOwner=read("js/equipment-progression.js");
+    assert.match(rewardOwner,/v132CloseRewardModal\(\)[\s\S]*?showPage\("dungeon"\)/,"canonical chest reward returns to the dungeon");
     assert.match(itemSource,/assets\/items\/tickets\/"\+elementKey\+"-icon\.png/);
     assert.match(itemSource,/onerror="this\.hidden=true"/);
     assert.match(assetCss,/\.v169-item-art > img\[hidden\]\{display:none !important;\}/);

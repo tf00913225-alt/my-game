@@ -80,6 +80,7 @@ function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedP
         console,JSON,Date,Math,Number,Object,Array,Map,Set,Promise,
         setTimeout,clearTimeout,setInterval,clearInterval,
         window:null,localStorage,gold:1000,
+        FourSymbolsEquipmentGems:{definitions:{gemVitalityI:{id:"gemVitalityI",name:"體質寶石",type:"gem",icon:"◆",stats:{vitality:1}}}},
         player:saveDoc.player,
         inventoryItems:saveDoc.inventoryItems,
         saveGame(){
@@ -341,3 +342,18 @@ function add(context,id,count){
 }
 
 console.log("✓ Relic progression/drop system targeted tests passed.");
+
+/* Gem shares the existing persisted weekly receipt, including repeat/next-week behavior. */
+{
+ const {context,gameplayState}=makeContext({withStarters:true});
+ assert.equal(context.vGameplaySelectTowerBand(10),true);
+ assert.ok(context.RelicProgressionSystem.getProgressionState().pending.rewards.some(r=>r.itemId==='gemVitalityI'&&r.count===1));
+ gameplayState.tower.claimedFloors['10']=true;gameplayState.tower.completedFloor=10;gameplayState.tower.historicalHighest=10;
+ context.__setActiveBattle(null);assert.equal(context.RelicProgressionSystem.reconcilePending(),'delivered');
+ assert.equal(context.RelicProgressionSystem.getItemCount('gemVitalityI'),1);
+ context.vGameplaySelectTowerBand(10);assert.equal(context.RelicProgressionSystem.getProgressionState().pending,null);
+ gameplayState.tower.weekKey='2026-09-14';gameplayState.tower.claimedFloors={};
+ context.vGameplaySelectTowerBand(10);gameplayState.tower.claimedFloors['10']=true;context.__setActiveBattle(null);
+ assert.equal(context.RelicProgressionSystem.reconcilePending(),'delivered');assert.equal(context.RelicProgressionSystem.getItemCount('gemVitalityI'),2);
+ assert.ok(!context.RelicProgressionSystem.getTowerRewardPlan(25,{firstEver:false}).rewards.some(r=>r.itemId==='gemVitalityI'));
+}

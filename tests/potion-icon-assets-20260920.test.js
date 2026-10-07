@@ -40,10 +40,10 @@ const css=fs.readFileSync(path.join(root,"css/49-v169-rpg-ui.css"),"utf8");
 
 const expected=[
     ["hpPotion10","回春散",files[0]],
-    ["hpPotion20","養命丹",files[1]],
+    ["hpPotion50","HP 50%補品",files[1]],
     ["hpPotion30","大還丹",files[2]],
     ["spPotion10","凝氣散",files[3]],
-    ["spPotion20","聚氣丹",files[4]],
+    ["spPotion50","SP 50%補品",files[4]],
     ["spPotion30","歸元丹",files[5]]
 ];
 for(const [id,name,relative] of expected){
@@ -51,6 +51,8 @@ for(const [id,name,relative] of expected){
     assert.ok(source.includes('name:"'+name+'"'),name+" must be the formal visible name");
     assert.ok(source.includes('iconPath:"'+relative+'"'),relative+" must be the formal runtime asset");
 }
+const main=fs.readFileSync(path.join(root,"js/00-main.js"),"utf8");
+for(const id of ["hpPotion20","spPotion20"])assert.ok(main.includes('id:"'+id+'"'),id+" legacy save definition remains readable");
 assert.match(source,/shop-potion-summary/);
 assert.match(source,/shop-potion-icon/);
 assert.match(source,/v169-item-art v169-potion-art/);

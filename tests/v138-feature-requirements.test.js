@@ -160,7 +160,8 @@ test("chests and tickets expose open/preview only and preview exact probabilitie
     assert.match(v132Source,/sellButton\.style\.display=isChestOrTicket \? "none" : ""/);
     assert.match(v132Source,/useButton\.textContent="開啟"/);
     assert.match(v132Source,/previewButton\.textContent="預覽"/);
-    assert.match(v132Source,/tier\.weight\/pool\.length/);
+    assert.match(v132Source,/MATERIAL_CHEST_DROP_TABLE\.map/);
+    assert.doesNotMatch(v132Source,/tier\.weight\/pool\.length/);
     assert.match(v132Source,/100\/pieces\.length/);
     assert.match(v132Source,/addItemToInventory\(materialChestDefinition,finalCount\)/);
     assert.match(v132Source,/請到背包自行開啟/);

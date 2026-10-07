@@ -125,6 +125,18 @@ async function run(chrome,url,live){
     if(mode==='potion')assert.ok(await c.eval(`Number(document.getElementById('v17350BatchQuantity').max)>=100000`),'large owned count not exercised');
     const textSizes=await c.eval(`Array.from(document.querySelectorAll('#itemModalName,#itemModalStats div,#itemModalStats b,.v17351-compare-stat span,.v17351-compare-stat b,.v17351-compare-pane>strong,#v17350BatchAction label,#v17350BatchAction input,#v17350BatchAction span,#v17350BatchAction button,#itemModal .item-modal-buttons button')).filter(n=>n.getBoundingClientRect().width>0).map(n=>({text:(n.textContent||n.value||'').slice(0,40),size:parseFloat(getComputedStyle(n).fontSize)*n.getBoundingClientRect().width/n.offsetWidth}))`);for(const t of textSizes)assert.ok(t.size>=12.9,'unreadable text '+JSON.stringify(t));
     const controlHits=await actionable();await screenshot(mode+'-'+v.join('x'));
+    await check('#itemAcquisitionButton',v,true);
+    const beforeAcquisition=await c.eval('JSON.stringify({items:inventoryItems,gold,party:getExistingPartyIndexes().map(getPartyCharacterByIndex)})');
+    await click('#itemAcquisitionButton',v);
+    const acquisition=await check('#v132RewardModal .v132-reward-modal-inner',v);
+    const sourceText=await c.eval("document.getElementById('v132RewardModal').textContent");
+    if(mode==='chest')assert.ok(sourceText.includes('材料副本'),'chest true origin missing');
+    if(mode==='potion')assert.ok(sourceText.includes('材料寶箱')&&sourceText.includes('商店')&&sourceText.includes('材料副本'),'multiple sources / ancestry missing');
+    if(mode==='material')assert.ok(sourceText.includes('目前版本尚無正式取得途徑'),'missing source state not shown');
+    assert.equal(await c.eval('JSON.stringify({items:inventoryItems,gold,party:getExistingPartyIndexes().map(getPartyCharacterByIndex)})'),beforeAcquisition,'read-only acquisition changed player state');
+    await scroll('#v132RewardModal .v132-preview-list-scroll');await screenshot('acquisition-'+mode+'-'+v.join('x'));
+    await c.eval('v132CloseRewardModal()');await settle();
+
     const contentScroll=await scroll(contents);modes.push({mode,frame,actions,back,names,art,batch,contentScroll,textSizes,controlHits});
     // Resize while open; the state and fixed controls must survive.
     await resize([v[0],v[1]-80]);await check('#itemModal .item-modal-buttons',[v[0],v[1]-80]);await actionable();assert.equal((await measure('#itemModal')).mode,expected);await resize(v);
@@ -166,6 +178,46 @@ async function run(chrome,url,live){
    await c.eval(`showPage('inventory')`);await settle();const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`backpack-${v.join('x')}.png`),Buffer.from(shot.data,'base64'));
    console.log('PASS responsive production runtime '+v.join('x')+' modes + resize + entrances + late styles');
   }
+  const revive=await c.eval(`(async()=>{
+   const wait=async(predicate,label)=>{const end=Date.now()+15000;while(!predicate()&&Date.now()<end)await new Promise(r=>setTimeout(r,30));if(!predicate())throw Error(label);};
+   closeItemModal();closeHomeFeature();
+   player2=buildAdditionalCharacter('Revival QA ally','water','male');registerAdditionalCharacter(2,player2);
+   autoBattle=false;autoConfig.enabled=false;autoConfig2.enabled=false;autoConfig3.enabled=false;
+   player.hp=getPartyBattleStats(0).maxHP;
+   const enemy=MonsterBalance.build({monsterKey:'qa.revival',name:'Revival QA enemy',level:10,element:'fire',archetype:'balanced',rank:'regular',mode:'wild',context:'qa/revival'});
+   Object.assign(enemy,{hp:100000,maxHP:100000,skillIds:[],v132FixedSkillLoadout:true});monsters=[enemy];currentZone='forest';mapCooldown=false;
+   const originalSave=saveGame;let releasePause,releaseFinish;
+   try{
+    startBattle(0);await wait(()=>battleActive&&turn>=1,'revival battle start');clearInterval(timerId);
+    releasePause=FourSymbolsBattleFlow.acquirePauseLock('revival-item-qa');
+    player2.hp=0;player2.sp=17;updateUI();await new Promise(requestAnimationFrame);battlePhase='declare';activeBattleCharacterIndex=0;actionReady=false;pendingAction=null;queuedPlayerActions={};
+    saveGame=()=>true;addPotionToInventory('revivalPill',2);const count=getPotionCount('revivalPill');
+    usePotion('revivalPill');const card=document.getElementById('battlePlayerCard1');
+    const marked=card.classList.contains('ally-targetable')&&card.classList.contains('v148-revive-target');
+    selectBattleAllyTarget(0);const rejected=!queuedPlayerActions[0]&&getPotionCount('revivalPill')===count;
+    let finishes=0;releaseFinish=FourSymbolsBattleFlow.interceptActionFinish(()=>{finishes++;return true;});
+    selectBattleAllyTarget(1);const queued=queuedPlayerActions[0];
+    applyPotionEffect(queued.potionId,0,queued.targetAlly);
+    await wait(()=>player2.hp===35,'shared revival impact');await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame);
+    const revived={hp:player2.hp,sp:player2.sp,count:getPotionCount('revivalPill'),marked,rejected,finished:finishes,defeated:document.getElementById('battlePlayerCard1').classList.contains('v146-defeated'),living:getLivingParty().includes(1),initiative:buildInitiativeQueue().some(row=>row.type==='player'&&row.characterIndex===1),auto:getAutoPotionId('revive')};
+    await wait(()=>!window.v142SkillAnimationDirector?.getActive?.()||window.v142SkillAnimationDirector.getActive().done,'revival animation complete');return {...revived,beforeCount:count};
+   }finally{saveGame=originalSave;battleActive=false;battleToken++;clearInterval(timerId);releaseFinish?.();releasePause?.();window.v142SkillAnimationDirector?.cancelAll?.();}
+  })()`);
+  assert.equal(revive.hp,35);assert.equal(revive.sp,17);assert.equal(revive.count,revive.beforeCount-1);assert.ok(revive.marked&&revive.rejected&&revive.living&&revive.initiative,JSON.stringify(revive));assert.equal(revive.defeated,false);assert.equal(revive.auto,null);
+  evidence.push({revival:revive});console.log('PASS manual revival: dead target / one item / HP35 / unchanged SP / living UI / initiative');
+  await resize([360,640]);
+  await c.eval("(async()=>{await FourSymbolsFeatures.ensure('feature-boss-relic','acquisition-qa');showPage('home');v174OpenRelicDetail('relic_xuanwu_seal');})()");
+  await c.eval("(async()=>{const until=Date.now()+20000;while(!document.querySelector('[data-relic-source=\"relic_xuanwu_seal\"]')&&Date.now()<until)await new Promise(r=>setTimeout(r,30));if(!document.querySelector('[data-relic-source=\"relic_xuanwu_seal\"]'))throw Error('formal relic renderer did not decorate acquisition');})()");await settle();
+  const beforeRelicSource=await c.eval('JSON.stringify({items:inventoryItems,gold,player})');
+  await c.eval("document.querySelector('[data-relic-source=\"relic_xuanwu_seal\"]').scrollIntoView({block:'center'})");await settle();
+  const relicControl=await check('[data-relic-source="relic_xuanwu_seal"]',[360,640],true);assert.ok(relicControl.projectedFont>=13&&relicControl.rect.height>=44);
+  await click('[data-relic-source="relic_xuanwu_seal"]',[360,640]);
+  await check('#v132RewardModal .v132-reward-modal-inner',[360,640]);
+  const relicSourceText=await c.eval("document.getElementById('v132RewardModal').textContent");
+  assert.ok(relicSourceText.includes('第一位角色達Lv.20')&&relicSourceText.includes('雪獄尊')&&relicSourceText.includes('第25層'),'complete relic direct/fragment/chest ancestry missing');
+  assert.equal(await c.eval('JSON.stringify({items:inventoryItems,gold,player})'),beforeRelicSource,'relic acquisition UI changed owned state');
+  await screenshot('acquisition-relic-360x640');await c.eval('v132CloseRewardModal()');
+  evidence.push({relicAcquisition:true});console.log('PASS relic acquisition: Lv20 direct unlock / fragment Boss / Tower ancestry / read-only');
   return evidence;
  }catch(error){if(c){try{const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from(shot.data,'base64'));}catch{}}error.evidence=evidence;if(browserError){error.message+="\nBrowser: "+browserError;error.stack+="\nBrowser: "+browserError;}throw error;}finally{c?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true});}catch{}}
 }
@@ -180,5 +232,5 @@ try{
  }else {local=await startServer();url=local.url;}
  const evidence=await run(findChrome(),url,live);
  fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:live?'deployed-site':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||null,evidence},null,2)+'\n');
- console.log('Responsive Item real runtime QA PASS: '+evidence.length+'/6 viewports');
+ console.log('Responsive Item real runtime QA PASS: 6/6 viewports + manual revival');
 }catch(error){fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:false,error:String(error.stack||error),evidence:error.evidence||[]},null,2)+'\n');throw error;}finally{local?.server.close();}
