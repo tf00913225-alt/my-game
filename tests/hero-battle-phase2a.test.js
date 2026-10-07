@@ -74,6 +74,20 @@ test('Hero uses domain projection and shared Buff projection; no player EX/loado
  assert.throws(()=>ctx.FourSymbolsHeroBattle.setRoster([]),/during battle/);
  ctx.battleActive=false;assert.throws(()=>ctx.FourSymbolsHeroBattle.setRoster(['unknown']));assert.throws(()=>ctx.FourSymbolsHeroBattle.setRoster([h.heroId,h.heroId]));
 });
+test('Natural Hero declaration queues one basic action per identity and clears prior manual highlight',()=>{
+ const {ctx}=runtime(3);let cleared=0,resolved=0;
+ Object.assign(ctx,{battlePresentationLocks:new Set(),declaredCharacterIndexes:new Set(),autoBattle:false,
+  closeMenus:()=>{},clearBattleTargetSelectionMode:()=>{},clearActiveCharacterHighlight:()=>cleared++,
+  startResolutionPhase:()=>resolved++,isBattleTargetAlive:(kind,index)=>kind==='monster'&&ctx.monsters[index]?.hp>0,
+  canSelectHostileBattlePrimary:(kind,index)=>kind==='monster'&&ctx.monsters[index]?.hp>0});
+ for(const name of ['autoActionForCharacter','beginCharacterTurn'])vm.runInContext(decl(name),ctx);
+ for(const index of [3,4,5]){
+  ctx.activeBattleCharacterIndex=index;ctx.beginCharacterTurn(7);ctx.beginCharacterTurn(7);
+  assert.deepEqual(plain(ctx.queuedPlayerActions[index]),{action:'normal',target:0});
+ }
+ assert.equal(ctx.finishes,3);assert.equal(cleared,3);assert.deepEqual(Array.from(ctx.declaredCharacterIndexes),[3,4,5]);
+ ctx.activeBattleCharacterIndex=6;ctx.beginCharacterTurn(7);assert.equal(resolved,1);
+});
 test('Hero basic attack shares hit, critical and damage settlement; MISS finishes once',()=>{
  const {ctx}=runtime(1);const h=ctx.getPartyCharacterByIndex(3);
  ctx.secondaryCharacterNormalAttack(3,0);assert.equal(ctx.monsters[0].hp,980);assert.equal(ctx.finishes,1);assert.equal(ctx.damageArgs[6].attacker,h);

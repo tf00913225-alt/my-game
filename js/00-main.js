@@ -11473,6 +11473,7 @@ function beginCharacterTurn(token){
 
 
     if(currentActingCharacter&&currentActingCharacter.combatantKind==="heroNpc"){
+        clearActiveCharacterHighlight();
         autoActionForCharacter(activeBattleCharacterIndex,token);
         return;
     }
