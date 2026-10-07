@@ -1393,6 +1393,9 @@ const achievementDefinitions=[
 ===================================================== */
 
 const potionDefinitions=[
+    // Compatibility only: V144 saves may contain former 20% shop stacks.
+    {id:"hpPotion20",name:"養命丹",shortName:"養命丹",icon:"",type:"potion",resource:"hp",recoveryPercent:20,price:45,compatibilityOnly:true,stats:{}},
+    {id:"spPotion20",name:"聚氣丹",shortName:"聚氣丹",icon:"",type:"potion",resource:"sp",recoveryPercent:20,price:55,compatibilityOnly:true,stats:{}},
     {
         id:"hpPotion10",
         name:"回春散",
@@ -1464,7 +1467,7 @@ const potionDefinitions=[
 ];
 
 potionDefinitions.push({id:"revivalPill",name:"還魂丹",shortName:"還魂丹",icon:"✦",type:"potion",resource:"revive",manualOnly:true,battleOnly:true,targetType:"deadAlly",fixedReviveHP:35,price:0,stats:{}});
-const shopItems=potionDefinitions.filter(item=>!item.manualOnly&&!/Potion100$/.test(item.id));
+const shopItems=potionDefinitions.filter(item=>!item.manualOnly&&!item.compatibilityOnly&&!/Potion100$/.test(item.id));
 
 /*
    General 100% HP/SP potions are retired from new acquisition.
@@ -1683,7 +1686,7 @@ function addPotionToInventory(potionId,amount=1){
     const definition=getPotionDefinition(potionId);
     const quantity=Math.max(1,Math.floor(Number(amount)||1));
 
-    if(!definition||RETIRED_BACKPACK_POTION_IDS.has(potionId)){
+    if(!definition||definition.compatibilityOnly||RETIRED_BACKPACK_POTION_IDS.has(potionId)){
         return false;
     }
 
@@ -11861,6 +11864,8 @@ function toggleSkillQuickBar(){
 
 
 function getBattleActionDisplayName(actionType){
+
+    if(actionType==="revivalPill"){ return getPotionDefinition(actionType)?.name||"還魂丹"; }
 
     if(actionType==="normal"){
         return "普通攻擊";
@@ -30520,6 +30525,8 @@ function openItemModal(
         </div>
         `;
 
+
+    if(item.blueprintSlot||/^blueprint/.test(item.id)){ $("itemModalStats").insertAdjacentHTML("afterbegin","<div>裝備設計圖已取消；僅保留舊存檔相容資料。</div>"); }
 
     const equipButton =
         $("itemEquipButton");

@@ -19,8 +19,11 @@ export function buildItemAcquisitionProjection(root){
  const towerOwner=read(relic).match(/    function towerEssenceForFloor\(floor\)\{[\s\S]*?\n    \}/)[0];
  const towerEssence=vm.runInNewContext('('+towerOwner.trim()+')',{RELIC_TOWER_REWARD_CONFIG:tower,integer:value=>Math.max(0,Math.floor(Number(value)||0))});
  return {
+  equipmentChest:data('js/equipment-progression.js','EQUIPMENT_CHEST_DROP_TABLE'),
   materialChest:data('js/27-v132-content-expansion.js','MATERIAL_CHEST_DROP_TABLE'),
+  eliteDrops:data('js/34-v141-core-systems.js','ELITE_DROP_TABLE'),
   wildDrops:data('js/27-v132-content-expansion.js','NORMAL_DROP_TABLE'),
+  talismanGold:data('js/36-v141-content-systems.js','TALISMAN_GOLD'),
   shopPotions:data('js/40-v144-rules-and-abyss.js','SHOP_POTION_PRICES'),
   personalBosses:data(boss,'PERSONAL_BOSSES'),worldBosses:data(boss,'WORLD_BOSSES'),
   relics,bossPools:data(relic,'RELIC_BOSS_DROP_TABLE'),

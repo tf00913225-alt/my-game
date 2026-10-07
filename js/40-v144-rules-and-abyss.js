@@ -159,7 +159,7 @@
     /* Player-facing skill text is owned by FourSymbolsSkillSpec after the
        gameplay bundle finishes loading. V144 no longer overrides previews. */
 
-    /* ----- Shop: flat starter and 20/30% potions, with the existing level multiplier. ----- */
+    /* ----- Shop: flat starter and 30/50% potions, with the existing level multiplier. ----- */
     function ensurePotion(id,resource,percent,price){
         if(typeof potionDefinitions==="undefined"||!Array.isArray(potionDefinitions)){ return null; }
         const presentation=SHOP_POTION_PRESENTATION[id];

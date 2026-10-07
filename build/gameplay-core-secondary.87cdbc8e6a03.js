@@ -161,7 +161,7 @@
     /* Player-facing skill text is owned by FourSymbolsSkillSpec after the
        gameplay bundle finishes loading. V144 no longer overrides previews. */
 
-    /* ----- Shop: flat starter and 20/30% potions, with the existing level multiplier. ----- */
+    /* ----- Shop: flat starter and 30/50% potions, with the existing level multiplier. ----- */
     function ensurePotion(id,resource,percent,price){
         if(typeof potionDefinitions==="undefined"||!Array.isArray(potionDefinitions)){ return null; }
         const presentation=SHOP_POTION_PRESENTATION[id];
@@ -1253,31 +1253,6 @@
         }
     }
 
-    if(typeof window.v141CraftEquipment==="function"){
-        const previousCraftEquipment=window.v141CraftEquipment;
-        window.v141CraftEquipment=function(){
-            const before=new Set(
-                (typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)?inventoryItems:[])
-                    .map(item=>item&&item.v141Uid).filter(Boolean)
-            );
-            const result=previousCraftEquipment.apply(this,arguments);
-            let normalized=false;
-            if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){
-                inventoryItems.forEach(item=>{
-                    if(!item||!item.v141Crafted||before.has(item.v141Uid)){ return; }
-                    normalizeOrdinaryCraftedItem(item);
-                    normalized=true;
-                });
-            }
-            if(normalized){
-                if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
-                if(typeof renderInventoryItems==="function"){ renderInventoryItems(); }
-                if(typeof saveGame==="function"){ saveGame(); }
-            }
-            return result;
-        };
-    }
-
     /* ----- Synthesis step 2 is retired; equipment output is always ordinary. ----- */
     function polishSynthesis(){
         const root=document.querySelector(".v141-synthesis");
@@ -1612,12 +1587,12 @@
     }
 
     function animateSupportCast(state,characterIndex,skill,targetId,targetIds,targetSide,targetTypeOverride){
-        spendActiveSkillSP(state.character,state.cost);
+        if(!state.consumable){ spendActiveSkillSP(state.character,state.cost); }
         if(typeof lungePlayerCard==="function"){ lungePlayerCard(characterIndex); }
         if(typeof showSkillNameBadge==="function"){
             showSkillNameBadge(skill.name,skill.element,characterIndex,targetId,targetIds,targetSide,targetTypeOverride);
         }
-        if(typeof showPlayerSpPopup==="function"){
+        if(!state.consumable&&typeof showPlayerSpPopup==="function"){
             setTimeout(()=>showPlayerSpPopup(state.cost,characterIndex),500);
         }
     }
@@ -1827,13 +1802,10 @@
         if(!battleActive||!caster||numeric(caster.hp)<=0||!target||numeric(target.hp)!==0||getPotionCount(definition.id)<1){
             return finishSupport("沒有合法死亡目標，還魂丹未消耗。");
         }
-        // Synchronous settlement: consume and reactivate in the existing action queue.
-        if(!consumePotionFromInventory(definition.id,1)){ return finishSupport("還魂丹數量不足。"); }
-        reactivateRevivedPartyUnit(targetIndex,target,definition.fixedReviveHP);
-        if(typeof showPlayerHit==="function"){ showPlayerHit(definition.fixedReviveHP,"heal",targetIndex,true); }
-        if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("player",targetIndex,"revive"); }
-        if(typeof saveGame==="function"){ saveGame(); }
-        return finishSupport((target.id||"隊友")+"被還魂丹復活，HP 35；SP不恢復。");
+        const skill={...skillDatabase.revive,name:definition.name};
+        return resolvePartyRevive(characterIndex,{targetAlly:targetIndex},skill,{
+            character:caster,key:getPartyCharacterKey(characterIndex),level:1,cost:0,consumable:definition
+        });
     };
 
     function resolvePartyRevive(characterIndex,queued,skill,state){
@@ -1855,14 +1827,29 @@
         const multiplier=exSkill&&exLevel>0&&numeric(exSkill.healBonusPercent)>0
             ?1+numeric(exSkill.healBonusPercent)/100:1;
         const percent=levelValue(skill.reviveHealPercentByLevel,state.level,20);
-        const restoredHP=Math.max(1,Math.min(
+        const restoredHP=state.consumable?state.consumable.fixedReviveHP:Math.max(1,Math.min(
             numeric(targetStats.maxHP),
             Math.floor(numeric(targetStats.maxHP)*percent/100*multiplier)
         ));
         const reviveMessage=(target.id||"隊友")+"被"+skill.name+"復活，恢復"+restoredHP+" HP。";
+        const token=typeof battleToken!=="undefined"?battleToken:null;
+        let settled=false;
         const reviveAtImpact=()=>{
-            if(numeric(target.hp)>0){ return; }
-            reactivateRevivedPartyUnit(targetIndex,target,restoredHP);
+            if(settled){ return; }
+            settled=true;
+            if((typeof battleActive!=="undefined"&&!battleActive)||(token!==null&&battleToken!==token)||getPartyCharacterByIndex(targetIndex)!==target||numeric(target.hp)!==0){ return; }
+            if(state.consumable&&!consumePotionFromInventory(state.consumable.id,1)){ return; }
+            if(!reactivateRevivedPartyUnit(targetIndex,target,restoredHP)){ return; }
+            if(state.consumable&&typeof saveGame==="function"){
+                let saved=false;
+                try{ saved=saveGame()===true; }catch(error){ console.error("還魂丹存檔失敗",error); }
+                if(!saved){
+                    target.hp=0;addPotionToInventory(state.consumable.id,1);
+                    if(typeof updateUI==="function"){ updateUI(); }
+                    if(typeof addBattleLog==="function"){ addBattleLog("還魂丹復活未能保存，道具未消耗。"); }
+                    return;
+                }
+            }
             if(typeof addBattleLog==="function"){ addBattleLog(reviveMessage); }
             if(typeof updateUI==="function"){ updateUI(); }
             if(typeof showPlayerHit==="function"){ showPlayerHit(restoredHP,"heal",targetIndex,true); }
@@ -6698,12 +6685,16 @@
         const [key,value]=Object.entries(item.stats||{})[0]||["",0];
         return (STAT_LABEL[key]||key)+(Number(value)>=0?" +":" ")+value+(["accuracy","evasion"].includes(key)?"%":"");
     }
+    window.v17346ShowShopOfferAcquisition=function(index){
+        const item=currentShopOffers()[Math.max(0,Math.min(5,Math.floor(Number(index)||0)))];
+        return item&&window.FourSymbolsItemAcquisition?.show(item);
+    };
     window.v17346PreviewEquipmentShopOffer=function(index){
         const safeIndex=Math.max(0,Math.min(5,Math.floor(Number(index)||0)));
         const item=currentShopOffers()[safeIndex];
         if(!item||typeof window.v132ShowRewardModal!=="function"){ return; }
         const rarity=RARITY_BY_KEY[item.rarityKey]||RARITIES[0];
-        const html='<div class="v132-reward-modal-inner v17346-shop-preview-modal item-presentation-frame" data-presentation-mode="shop-preview" data-rarity="'+escapeHtml(item.rarityKey)+'"><h3>'+escapeHtml(item.name)+'</h3><div class="item-presentation-scroll" data-scroll-owner="y"><div class="v17346-shop-preview-art">'+item.icon+'</div><div class="v17346-shop-preview-info"><span>'+escapeHtml(SLOT_META[item.type].label)+'</span><strong>'+escapeHtml(statLine(item))+'</strong></div><div class="v17346-shop-preview-price">'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</div>'+(item.reforgeSlots?'<div class="v17346-shop-preview-reforge">[可冶煉]</div>':'')+'</div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
+        const html='<div class="v132-reward-modal-inner v17346-shop-preview-modal item-presentation-frame" data-presentation-mode="shop-preview" data-rarity="'+escapeHtml(item.rarityKey)+'"><h3>'+escapeHtml(item.name)+'</h3><div class="item-presentation-scroll" data-scroll-owner="y"><div class="v17346-shop-preview-art">'+item.icon+'</div><div class="v17346-shop-preview-info"><span>'+escapeHtml(SLOT_META[item.type].label)+'</span><strong>'+escapeHtml(statLine(item))+'</strong></div><div class="v17346-shop-preview-price">'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</div>'+(item.reforgeSlots?'<div class="v17346-shop-preview-reforge">[可冶煉]</div>':'')+'</div><div class="v132-reward-actions"><button type="button" onclick="v17346ShowShopOfferAcquisition('+safeIndex+')">獲取途徑</button><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
         window.v132ShowRewardModal(html);
     };
     function renderEquipmentShop(){
@@ -7806,7 +7797,7 @@ const TIER_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",p
 const TIER_ALIAS={low:"white",mid:"blue",high:"purple",perfect:"orange"};
 const BLUEPRINT_SLOTS=["head","shoulder","armor","shoes","hand"];
 const SLOT_LABEL={head:"頭部",shoulder:"護腕",armor:"衣服",shoes:"腳",hand:"武器"};
-const MATERIAL_STATE={oreTier:"white",blueprintTier:"white",blueprintSet:"setFire",blueprintSlot:"head"};
+const MATERIAL_STATE={oreTier:"white"};
 let materialTabActive=false;
 let repairQueued=false;
 
@@ -7979,8 +7970,8 @@ window.v148ShowDailyDungeonPreview=function(type){
             {title:"結算方式",text:"完成副本後直接結算；若該結算提供廣告加倍，可自行選擇是否加倍領取。"}
         ],note:"重點養成資源一眼看懂，不再用獎勵圖片佔據版面。"},
         material:{title:"材料副本獎勵預覽",groups:[
-            {title:"材料寶箱",badge:"×1～3",text:"通關回合越少，取得寶箱數越高；寶箱內含礦石、裝備設計圖等養成材料。"},
-            {title:"用途",text:"礦石可用於冶煉；設計圖紙保留在背包，可用於既有材料升階合成。"}
+            {title:"材料寶箱",badge:"×1～3",text:"通關回合越少，取得寶箱數越高；寶箱內含白／藍／紫／橙階礦石、基礎／30%／50%補品及還魂丹；分布暫定。"},
+            {title:"用途",text:"礦石可用於冶煉與礦石升階；補品與還魂丹供戰鬥使用。裝備設計圖已取消。"}
         ],note:"寶箱數量依副本結算規則決定。"},
         gold:{title:"金幣副本獎勵預覽",groups:[
             {title:"金幣獎勵",badge:"GOLD",text:"依目前副本難度與結算規則獲得金幣，通關後直接入帳。"},
@@ -8053,20 +8044,11 @@ function ensureFunctionalStyles(){
 
 /* ---------- 9. Material synthesis helpers. ---------- */
 function oreByTier(tier){return defs().ores.find(item=>normalizeTier(item&&item.tierKey)===tier)||null;}
-function blueprintsBy(tier,setId,slot){
-    return defs().blueprints.filter(item=>item&&normalizeTier(item.tierKey)===tier&&(!setId||item.setId===setId)&&(!slot||item.blueprintSlot===slot));
-}
 function canAdd(definition,amount){return !window.v132CanAddItemToInventory||window.v132CanAddItemToInventory(definition,amount);}
 function add(definition,amount){return !!(definition&&window.v132AddItemToInventory&&window.v132AddItemToInventory(definition,amount));}
 
 /* ---------- 10. Material promotion: 50 same-tier -> 10 next-tier. ---------- */
 function nextTier(tier){const index=TIER_ORDER.indexOf(normalizeTier(tier));return index>=0&&index<TIER_ORDER.length-1?TIER_ORDER[index+1]:null;}
-function blueprintDef(tier,setId,slot){return blueprintsBy(normalizeTier(tier),setId,slot)[0]||null;}
-function setOptions(){
-    const map=new Map();
-    defs().blueprints.forEach(item=>{if(item&&item.setId&&!map.has(item.setId)){const prefix=String(item.name||"").replace(/(白階|藍階|紫階|橙階|桃紅階|四象階).*$/,'');map.set(item.setId,prefix||item.setId);}});
-    return [...map.entries()];
-}
 function tierChoices(){
     return TIER_ORDER.slice(0,-1).map(tier=>({value:tier,label:TIER_LABEL[tier]+" → "+TIER_LABEL[nextTier(tier)],tier}));
 }
@@ -8109,11 +8091,10 @@ if(functionalModalRoot){functionalModalRoot.addEventListener("click",event=>{
 });}
 window.v17363CraftMaterial=function(kind){
     if(kind!=="ore"){ return false; }
-    const isOre=kind==="ore";
-    const tier=isOre?MATERIAL_STATE.oreTier:MATERIAL_STATE.blueprintTier;
+    const tier=MATERIAL_STATE.oreTier;
     const targetTier=nextTier(tier);
-    const source=isOre?oreByTier(tier):blueprintDef(tier,MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
-    const target=isOre?oreByTier(targetTier):blueprintDef(targetTier,MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
+    const source=oreByTier(tier);
+    const target=oreByTier(targetTier);
     if(!source||!target||!targetTier){alert("此道具已達最高可合成階級。");return false;}
     if(ownedCount(source.id)<50){alert("素材不足，需要「"+source.name+"」×50。");return false;}
     if(!canAdd(target,10)){alert("背包空間不足，無法放入合成結果。");return false;}

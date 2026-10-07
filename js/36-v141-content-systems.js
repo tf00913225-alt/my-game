@@ -11,10 +11,10 @@
     const TIER_ORDER=["white","blue","purple","orange","pink","four-symbol"];
     const TALISMAN_TIER_ORDER=["white","blue","purple","orange"];
     const TIER_META={
-        white:{label:"白階",available:true,craftGold:500,reforgeGold:1000,main:[1,5],reforgeMain:[1,3]},
-        blue:{label:"藍階",available:true,craftGold:1500,reforgeGold:3000,main:[3,8],reforgeMain:[2,5]},
-        purple:{label:"紫階",available:true,craftGold:4000,reforgeGold:8000,main:[5,11],sub:[1,3],reforgeMain:[4,7],reforgeSub:[1,2]},
-        orange:{label:"橙階",available:true,craftGold:10000,reforgeGold:20000,main:[7,14],sub:[2,5],reforgeMain:[6,10],reforgeSub:[2,4]},
+        white:{label:"白階",available:true,reforgeGold:1000,main:[1,5],reforgeMain:[1,3]},
+        blue:{label:"藍階",available:true,reforgeGold:3000,main:[3,8],reforgeMain:[2,5]},
+        purple:{label:"紫階",available:true,reforgeGold:8000,main:[5,11],sub:[1,3],reforgeMain:[4,7],reforgeSub:[1,2]},
+        orange:{label:"橙階",available:true,reforgeGold:20000,main:[7,14],sub:[2,5],reforgeMain:[6,10],reforgeSub:[2,4]},
         pink:{label:"桃紅階",available:false,planned:true},
         "four-symbol":{label:"四象階",available:false,planned:true}
     };
@@ -40,7 +40,7 @@
     const SUB_STATS=["vitality","energy","defensePoints","agility","statusResistance"];
     const TALISMAN_GOLD={white:300,blue:1000,purple:3000};
     const synthesisState={
-        tab:"talisman",forgeTab:"reforge",socketUid:null,gemId:null,blueprintId:null,seriesId:"setFire",reforgeUid:null,
+        tab:"talisman",forgeTab:"reforge",socketUid:null,gemId:null,reforgeUid:null,
         reforgeMaterialTier:"white",lockedReforgeKeys:[],
         talismanId:null,talismanQty:1,fragmentQty:{setFire:1,setWater:1,setEarth:1,setWind:1},
         pendingReforge:null
@@ -513,7 +513,6 @@
         synthesisState.pendingReforge=null;
         renderSynthesis();
     };
-    window.v141SelectCraftSeries=function(id){ synthesisState.seriesId=id; renderSynthesis(); };
     window.v141SelectReforgeItem=function(uid){
         synthesisState.reforgeUid=uid;
         synthesisState.pendingReforge=null;

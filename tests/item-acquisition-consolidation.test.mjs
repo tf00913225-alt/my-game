@@ -47,12 +47,17 @@ test('revival pill and skill share reactivation; success consumes exactly once a
  const source=read('js/42-v148-combat-dungeon-fixes.js');
  const shared=source.match(/    function reactivateRevivedPartyUnit[\s\S]*?\n    \}/)[0];
  const pill=source.match(/    window\.v148ResolveRevivalPill=function[\s\S]*?\n    \};/)[0];
- const party=[{hp:100,sp:45},{hp:0,sp:17}],ctx={window:{},party,battleActive:true,numeric:v=>Number(v)||0,getPartyCharacterByIndex:i=>party[i],getPotionCount:()=>ctx.count,consumePotionFromInventory:()=>{ctx.count--;return true;},finishSupport:()=>{ctx.finishes++;},count:2,finishes:0};
- vm.runInNewContext(shared+'\n'+pill,ctx);
+ const resolver=source.match(/    function resolvePartyRevive[\s\S]*?\n    \}/)[0];
+ const party=[{hp:100,sp:45},{hp:0,sp:17}],impacts=[],ctx={window:{v143RunAtTargetHit:(side,index,callback)=>impacts.push(callback)},party,battleActive:true,battleToken:1,numeric:v=>Number(v)||0,getPartyCharacterByIndex:i=>party[i],getPartyCharacterKey:()=>"fire",getPartyBattleStats:()=>({maxHP:300}),getSkillLevel:()=>0,levelValue:()=>20,skillDatabase:{revive:{id:'revive',element:'water',targetType:'deadAlly'}},animateSupportCast:()=>{},getPotionCount:()=>ctx.count,consumePotionFromInventory:()=>{ctx.count--;return true;},finishSupport:()=>{ctx.finishes++;},saveGame:()=>true,count:2,finishes:0};
+ vm.runInNewContext(shared+'\n'+resolver+'\n'+pill,ctx);
  const def={id:'revivalPill',fixedReviveHP:35};
- ctx.window.v148ResolveRevivalPill(0,1,def);assert.equal(party[1].hp,35);assert.equal(party[1].sp,17);assert.equal(ctx.count,1);assert.equal(ctx.finishes,1);
+ ctx.window.v148ResolveRevivalPill(0,1,def);assert.equal(party[1].hp,0);assert.equal(ctx.count,2);const impact=impacts.shift();impact();impact();assert.equal(party[1].hp,35);assert.equal(party[1].sp,17);assert.equal(ctx.count,1);assert.equal(ctx.finishes,1);
  ctx.window.v148ResolveRevivalPill(0,1,def);assert.equal(ctx.count,1);
  party[1].hp=0;ctx.battleActive=false;ctx.window.v148ResolveRevivalPill(0,1,def);assert.equal(ctx.count,1);assert.equal(party[1].hp,0);
+ party[1].hp=0;ctx.battleActive=true;ctx.saveGame=()=>false;ctx.addPotionToInventory=()=>{ctx.count++;return true;};
+ ctx.window.v148ResolveRevivalPill(0,1,def);impacts.shift()();assert.equal(ctx.count,1);assert.equal(party[1].hp,0);assert.equal(party[1].sp,17);
+ ctx.saveGame=()=>true;ctx.window.v148ResolveRevivalPill(0,1,def);ctx.battleToken++;impacts.shift()();assert.equal(ctx.count,1);assert.equal(party[1].hp,0);
+ ctx.window.v148ResolveRevivalPill(0,1,def);party[1]={hp:0,sp:33};impacts.shift()();assert.equal(ctx.count,1);assert.equal(party[1].hp,0);
  assert.match(source,/reactivateRevivedPartyUnit\(targetIndex,target,restoredHP\)/);
  assert.match(main,/resource:"revive",manualOnly:true/);
  assert.match(declaration('usePotion'),/autoOn/);assert.match(declaration('usePotion'),/setBattleAllyTargetSelectionMode\(potionId\)/);
@@ -61,4 +66,18 @@ test('relic source compatibility API delegates to acquisition registry',()=>{
  const body=read('js/relic-progression-drop-system.js').match(/    function relicSources[\s\S]*?\n    \}/)[0];
  assert.match(body,/FourSymbolsItemAcquisition/);assert.doesNotMatch(body,/RELIC_BOSS_DROP_TABLE|majorMilestones/);
  const owner=registry(),sources=owner.getSources('relicFragment_xuanwu_seal');assert.ok(sources.some(s=>s.bossName==='雪獄尊'));assert.ok(sources.some(s=>s.chestId==='relicChoiceBoxBlue'));
+});
+
+test('elite roll, Boss stages, synthesis and indirect source numbers agree with reward owners',()=>{
+ const data=buildItemAcquisitionProjection(process.cwd()),owner=registry();
+ assert.equal(Number(data.eliteDrops.reduce((n,row)=>n+row.chance,0).toFixed(2)),.19);
+ assert.equal(owner.getSources('ticketSetFire').filter(row=>row.sourceType==='abyss').length,4);
+ assert.equal(owner.getSources('ticketSetUnknown').length,0);
+ const stages=owner.getSources(data.materials.essenceItemId).filter(row=>row.bossId==='world-40');
+ assert.deepEqual(Array.from(stages,row=>row.stage),[1,2,3,4]);
+ assert.deepEqual(Array.from(stages[0].quantityRange),Array.from(data.difficulties.hard.essence));
+ assert.ok(owner.getSources('oreLow').some(row=>row.bossId==='personal-20'&&row.quantity===1&&row.repeatable));
+ assert.equal(owner.trace('freezeTalismanPerfect')[0].parents[0].source.mode,'符咒合成');
+ const gear={id:'gear-qa',name:'普通裝備',type:'armor',rarityKey:'orange',v17346GeneratedEquipment:true};
+ assert.equal(owner.getSources(gear).length,2);assert.equal(owner.trace(gear)[0].parents[0].source.sourceId,'equipment');
 });

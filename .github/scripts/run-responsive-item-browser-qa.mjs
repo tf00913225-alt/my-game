@@ -125,6 +125,18 @@ async function run(chrome,url,live){
     if(mode==='potion')assert.ok(await c.eval(`Number(document.getElementById('v17350BatchQuantity').max)>=100000`),'large owned count not exercised');
     const textSizes=await c.eval(`Array.from(document.querySelectorAll('#itemModalName,#itemModalStats div,#itemModalStats b,.v17351-compare-stat span,.v17351-compare-stat b,.v17351-compare-pane>strong,#v17350BatchAction label,#v17350BatchAction input,#v17350BatchAction span,#v17350BatchAction button,#itemModal .item-modal-buttons button')).filter(n=>n.getBoundingClientRect().width>0).map(n=>({text:(n.textContent||n.value||'').slice(0,40),size:parseFloat(getComputedStyle(n).fontSize)*n.getBoundingClientRect().width/n.offsetWidth}))`);for(const t of textSizes)assert.ok(t.size>=12.9,'unreadable text '+JSON.stringify(t));
     const controlHits=await actionable();await screenshot(mode+'-'+v.join('x'));
+    await check('#itemAcquisitionButton',v,true);
+    const beforeAcquisition=await c.eval('JSON.stringify({items:inventoryItems,gold,party:getExistingPartyIndexes().map(getPartyCharacterByIndex)})');
+    await click('#itemAcquisitionButton',v);
+    const acquisition=await check('#v132RewardModal .v132-reward-modal-inner',v);
+    const sourceText=await c.eval("document.getElementById('v132RewardModal').textContent");
+    if(mode==='chest')assert.ok(sourceText.includes('材料副本'),'chest true origin missing');
+    if(mode==='potion')assert.ok(sourceText.includes('材料寶箱')&&sourceText.includes('商店')&&sourceText.includes('材料副本'),'multiple sources / ancestry missing');
+    if(mode==='material')assert.ok(sourceText.includes('目前版本尚無正式取得途徑'),'missing source state not shown');
+    assert.equal(await c.eval('JSON.stringify({items:inventoryItems,gold,party:getExistingPartyIndexes().map(getPartyCharacterByIndex)})'),beforeAcquisition,'read-only acquisition changed player state');
+    await scroll('#v132RewardModal .v132-preview-list-scroll');await screenshot('acquisition-'+mode+'-'+v.join('x'));
+    await c.eval('v132CloseRewardModal()');await settle();
+
     const contentScroll=await scroll(contents);modes.push({mode,frame,actions,back,names,art,batch,contentScroll,textSizes,controlHits});
     // Resize while open; the state and fixed controls must survive.
     await resize([v[0],v[1]-80]);await check('#itemModal .item-modal-buttons',[v[0],v[1]-80]);await actionable();assert.equal((await measure('#itemModal')).mode,expected);await resize(v);

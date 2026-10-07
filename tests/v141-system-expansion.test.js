@@ -126,7 +126,9 @@ test("wild ranks are explicit, independent 10% rolls and never random BOSS",()=>
 test("elite special loot uses one 19% cumulative table and isolates the normal low-tier pool",()=>{
     const dropBody=extractFunction(coreSource,"addEliteSpecialDrop");
     assert.equal((dropBody.match(/Math\.random\(\)/g)||[]).length,1);
-    ["roll<1","roll<2","roll<3","roll<4","roll<9","roll<14","roll<19"].forEach(token=>assert.ok(dropBody.includes(token)));
+    assert.match(dropBody,/ELITE_DROP_TABLE.find/);
+    assert.match(coreSource,/itemId:"ticketSetFire",chance:\.01,quantity:1/);
+    assert.match(coreSource,/itemId:"barrierTalismanMid",chance:\.05,quantity:1/);
     assert.match(coreSource,/v141EliteDropIsolation:true/);
     assert.match(v132Source,/if\(window\.v132ActiveDungeonRun\)\{ return; \}/);
     assert.match(v131Source,/rank==="elite"\)\{ return 1\.5; \}/);
@@ -263,20 +265,20 @@ test("compact UI and daily cover scaffolding meet the mobile layout requirements
     assert.doesNotMatch(finalNavSource,/bottom-nav map-page-nav v141-dungeon-nav/);
 });
 
-test("new blueprints encode part, tier and series while legacy saves remain selectable",()=>{
+test("retired blueprints retain stable save identities but have no gameplay crafting owner",()=>{
     assert.match(v132Source,/const BLUEPRINT_SERIES=\[/);
     assert.match(v132Source,/BLUEPRINT_SERIES\.forEach\(series/);
     assert.match(v132Source,/setId:series\.id/);
     assert.equal(5*6*4,120);
-    assert.match(contentSource,/blueprint\.setId\|\|synthesisState\.seriesId/);
-    assert.match(contentSource,/由圖紙決定/);
-    assert.match(contentSource,/僅舊存檔既有圖紙沒有系列欄位/);
+    assert.match(v132Source,/compatibilityOnly:true/);
+    assert.match(v132Source,/blueprints:\[\]/);
+    assert.doesNotMatch(contentSource,/v141CraftEquipment|ConsumeStackItem\(blueprint/);
 });
 
 test("synthesis implements exact material costs, replacement-only reforge and peak rolls",()=>{
-    ["craftGold:500","craftGold:1500","craftGold:4000","craftGold:10000","reforgeGold:1000","reforgeGold:3000","reforgeGold:8000","reforgeGold:20000"].forEach(token=>assert.ok(contentSource.includes(token)));
-    assert.match(contentSource,/ConsumeStackItem\(blueprint\.id,50\)/);
-    assert.match(contentSource,/ConsumeStackItem\(ore\.id,50\)/);
+    ["reforgeGold:1000","reforgeGold:3000","reforgeGold:8000","reforgeGold:20000"].forEach(token=>assert.ok(contentSource.includes(token)));
+    assert.doesNotMatch(contentSource,/ConsumeStackItem\(blueprint\.id/);
+
     assert.match(contentSource,/return locks===0\?50:\(locks===1\?100:150\)/);
     assert.doesNotMatch(contentSource,/consumeMatching\(candidate=>candidate&&candidate\.blueprintSlot/);
     assert.match(contentSource,/ConsumeStackItem\(info\.ore\.id,cost\)/);

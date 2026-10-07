@@ -15,7 +15,7 @@ const TIER_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",p
 const TIER_ALIAS={low:"white",mid:"blue",high:"purple",perfect:"orange"};
 const BLUEPRINT_SLOTS=["head","shoulder","armor","shoes","hand"];
 const SLOT_LABEL={head:"頭部",shoulder:"護腕",armor:"衣服",shoes:"腳",hand:"武器"};
-const MATERIAL_STATE={oreTier:"white",blueprintTier:"white",blueprintSet:"setFire",blueprintSlot:"head"};
+const MATERIAL_STATE={oreTier:"white"};
 let materialTabActive=false;
 let repairQueued=false;
 
@@ -188,8 +188,8 @@ window.v148ShowDailyDungeonPreview=function(type){
             {title:"結算方式",text:"完成副本後直接結算；若該結算提供廣告加倍，可自行選擇是否加倍領取。"}
         ],note:"重點養成資源一眼看懂，不再用獎勵圖片佔據版面。"},
         material:{title:"材料副本獎勵預覽",groups:[
-            {title:"材料寶箱",badge:"×1～3",text:"通關回合越少，取得寶箱數越高；寶箱內含礦石、裝備設計圖等養成材料。"},
-            {title:"用途",text:"礦石可用於冶煉；設計圖紙保留在背包，可用於既有材料升階合成。"}
+            {title:"材料寶箱",badge:"×1～3",text:"通關回合越少，取得寶箱數越高；寶箱內含白／藍／紫／橙階礦石、基礎／30%／50%補品及還魂丹；分布暫定。"},
+            {title:"用途",text:"礦石可用於冶煉與礦石升階；補品與還魂丹供戰鬥使用。裝備設計圖已取消。"}
         ],note:"寶箱數量依副本結算規則決定。"},
         gold:{title:"金幣副本獎勵預覽",groups:[
             {title:"金幣獎勵",badge:"GOLD",text:"依目前副本難度與結算規則獲得金幣，通關後直接入帳。"},
@@ -262,20 +262,11 @@ function ensureFunctionalStyles(){
 
 /* ---------- 9. Material synthesis helpers. ---------- */
 function oreByTier(tier){return defs().ores.find(item=>normalizeTier(item&&item.tierKey)===tier)||null;}
-function blueprintsBy(tier,setId,slot){
-    return defs().blueprints.filter(item=>item&&normalizeTier(item.tierKey)===tier&&(!setId||item.setId===setId)&&(!slot||item.blueprintSlot===slot));
-}
 function canAdd(definition,amount){return !window.v132CanAddItemToInventory||window.v132CanAddItemToInventory(definition,amount);}
 function add(definition,amount){return !!(definition&&window.v132AddItemToInventory&&window.v132AddItemToInventory(definition,amount));}
 
 /* ---------- 10. Material promotion: 50 same-tier -> 10 next-tier. ---------- */
 function nextTier(tier){const index=TIER_ORDER.indexOf(normalizeTier(tier));return index>=0&&index<TIER_ORDER.length-1?TIER_ORDER[index+1]:null;}
-function blueprintDef(tier,setId,slot){return blueprintsBy(normalizeTier(tier),setId,slot)[0]||null;}
-function setOptions(){
-    const map=new Map();
-    defs().blueprints.forEach(item=>{if(item&&item.setId&&!map.has(item.setId)){const prefix=String(item.name||"").replace(/(白階|藍階|紫階|橙階|桃紅階|四象階).*$/,'');map.set(item.setId,prefix||item.setId);}});
-    return [...map.entries()];
-}
 function tierChoices(){
     return TIER_ORDER.slice(0,-1).map(tier=>({value:tier,label:TIER_LABEL[tier]+" → "+TIER_LABEL[nextTier(tier)],tier}));
 }
@@ -318,11 +309,10 @@ if(functionalModalRoot){functionalModalRoot.addEventListener("click",event=>{
 });}
 window.v17363CraftMaterial=function(kind){
     if(kind!=="ore"){ return false; }
-    const isOre=kind==="ore";
-    const tier=isOre?MATERIAL_STATE.oreTier:MATERIAL_STATE.blueprintTier;
+    const tier=MATERIAL_STATE.oreTier;
     const targetTier=nextTier(tier);
-    const source=isOre?oreByTier(tier):blueprintDef(tier,MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
-    const target=isOre?oreByTier(targetTier):blueprintDef(targetTier,MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
+    const source=oreByTier(tier);
+    const target=oreByTier(targetTier);
     if(!source||!target||!targetTier){alert("此道具已達最高可合成階級。");return false;}
     if(ownedCount(source.id)<50){alert("素材不足，需要「"+source.name+"」×50。");return false;}
     if(!canAdd(target,10)){alert("背包空間不足，無法放入合成結果。");return false;}

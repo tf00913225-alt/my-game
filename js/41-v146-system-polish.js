@@ -675,31 +675,6 @@
         }
     }
 
-    if(typeof window.v141CraftEquipment==="function"){
-        const previousCraftEquipment=window.v141CraftEquipment;
-        window.v141CraftEquipment=function(){
-            const before=new Set(
-                (typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)?inventoryItems:[])
-                    .map(item=>item&&item.v141Uid).filter(Boolean)
-            );
-            const result=previousCraftEquipment.apply(this,arguments);
-            let normalized=false;
-            if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){
-                inventoryItems.forEach(item=>{
-                    if(!item||!item.v141Crafted||before.has(item.v141Uid)){ return; }
-                    normalizeOrdinaryCraftedItem(item);
-                    normalized=true;
-                });
-            }
-            if(normalized){
-                if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
-                if(typeof renderInventoryItems==="function"){ renderInventoryItems(); }
-                if(typeof saveGame==="function"){ saveGame(); }
-            }
-            return result;
-        };
-    }
-
     /* ----- Synthesis step 2 is retired; equipment output is always ordinary. ----- */
     function polishSynthesis(){
         const root=document.querySelector(".v141-synthesis");

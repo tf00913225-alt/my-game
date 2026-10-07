@@ -553,12 +553,16 @@
         const [key,value]=Object.entries(item.stats||{})[0]||["",0];
         return (STAT_LABEL[key]||key)+(Number(value)>=0?" +":" ")+value+(["accuracy","evasion"].includes(key)?"%":"");
     }
+    window.v17346ShowShopOfferAcquisition=function(index){
+        const item=currentShopOffers()[Math.max(0,Math.min(5,Math.floor(Number(index)||0)))];
+        return item&&window.FourSymbolsItemAcquisition?.show(item);
+    };
     window.v17346PreviewEquipmentShopOffer=function(index){
         const safeIndex=Math.max(0,Math.min(5,Math.floor(Number(index)||0)));
         const item=currentShopOffers()[safeIndex];
         if(!item||typeof window.v132ShowRewardModal!=="function"){ return; }
         const rarity=RARITY_BY_KEY[item.rarityKey]||RARITIES[0];
-        const html='<div class="v132-reward-modal-inner v17346-shop-preview-modal item-presentation-frame" data-presentation-mode="shop-preview" data-rarity="'+escapeHtml(item.rarityKey)+'"><h3>'+escapeHtml(item.name)+'</h3><div class="item-presentation-scroll" data-scroll-owner="y"><div class="v17346-shop-preview-art">'+item.icon+'</div><div class="v17346-shop-preview-info"><span>'+escapeHtml(SLOT_META[item.type].label)+'</span><strong>'+escapeHtml(statLine(item))+'</strong></div><div class="v17346-shop-preview-price">'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</div>'+(item.reforgeSlots?'<div class="v17346-shop-preview-reforge">[可冶煉]</div>':'')+'</div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
+        const html='<div class="v132-reward-modal-inner v17346-shop-preview-modal item-presentation-frame" data-presentation-mode="shop-preview" data-rarity="'+escapeHtml(item.rarityKey)+'"><h3>'+escapeHtml(item.name)+'</h3><div class="item-presentation-scroll" data-scroll-owner="y"><div class="v17346-shop-preview-art">'+item.icon+'</div><div class="v17346-shop-preview-info"><span>'+escapeHtml(SLOT_META[item.type].label)+'</span><strong>'+escapeHtml(statLine(item))+'</strong></div><div class="v17346-shop-preview-price">'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</div>'+(item.reforgeSlots?'<div class="v17346-shop-preview-reforge">[可冶煉]</div>':'')+'</div><div class="v132-reward-actions"><button type="button" onclick="v17346ShowShopOfferAcquisition('+safeIndex+')">獲取途徑</button><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
         window.v132ShowRewardModal(html);
     };
     function renderEquipmentShop(){

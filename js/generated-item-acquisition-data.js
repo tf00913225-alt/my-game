@@ -1,5 +1,27 @@
 // GENERATED projection of canonical Reward Owners. DO NOT EDIT.
 window.FourSymbolsItemAcquisitionData={
+  "equipmentChest": [
+    {
+      "key": "white",
+      "label": "白階",
+      "chance": 40
+    },
+    {
+      "key": "blue",
+      "label": "藍階",
+      "chance": 40
+    },
+    {
+      "key": "purple",
+      "label": "紫階",
+      "chance": 10
+    },
+    {
+      "key": "orange",
+      "label": "橙階",
+      "chance": 10
+    }
+  ],
   "materialChest": [
     {
       "itemId": "oreLow",
@@ -68,6 +90,43 @@ window.FourSymbolsItemAcquisitionData={
       "provisional": true
     }
   ],
+  "eliteDrops": [
+    {
+      "itemId": "ticketSetFire",
+      "chance": 0.01,
+      "quantity": 1
+    },
+    {
+      "itemId": "ticketSetWater",
+      "chance": 0.01,
+      "quantity": 1
+    },
+    {
+      "itemId": "ticketSetEarth",
+      "chance": 0.01,
+      "quantity": 1
+    },
+    {
+      "itemId": "ticketSetWind",
+      "chance": 0.01,
+      "quantity": 1
+    },
+    {
+      "itemId": "freezeTalismanMid",
+      "chance": 0.05,
+      "quantity": 1
+    },
+    {
+      "itemId": "stealthTalismanMid",
+      "chance": 0.05,
+      "quantity": 1
+    },
+    {
+      "itemId": "barrierTalismanMid",
+      "chance": 0.05,
+      "quantity": 1
+    }
+  ],
   "wildDrops": [
     {
       "itemId": "freezeTalismanLow",
@@ -90,6 +149,11 @@ window.FourSymbolsItemAcquisitionData={
       "quantity": 1
     }
   ],
+  "talismanGold": {
+    "white": 300,
+    "blue": 1000,
+    "purple": 3000
+  },
   "shopPotions": {
     "hpPotion10": 20,
     "hpPotion50": 80,

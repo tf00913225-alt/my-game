@@ -621,7 +621,7 @@
     window.v132CanAddItemToInventory=canAddItemToInventory;
 
     function addItemToInventory(definition,amount){
-        if(!definition||definition.retired||definition.compatibilityOnly||definition.blueprintSlot||/^blueprint/.test(definition.id)||/^(hp|sp)Potion100$/.test(definition.id)){ return false; }
+        if(!definition||definition.retired||definition.compatibilityOnly||definition.blueprintSlot||/^blueprint/.test(definition.id)||/^(hp|sp)Potion(?:20|100)$/.test(definition.id)){ return false; }
         const quantity=Math.max(1,Math.floor(Number(amount)||1));
         const maxStack=isEquipmentInventoryType(definition.type)
             ? 1
@@ -2160,7 +2160,7 @@
        原本「材料副本挑戰成功」按「直接領取」就會馬上把寶箱
        全部拆開、材料直接進背包，玩家完全沒有機會自己選時機
        開。改成：領取只把「材料寶箱」這個新物品（可堆疊）
-       放進背包，真正的開箱（骰礦石/設計圖階級）延後到玩家
+       放進背包，真正的開箱（依正式材料寶箱池抽取）延後到玩家
        在背包裡點開這個物品、按下「開啟」的那一刻才進行。
     */
     // Sole provisional material chest drop table: preview, runtime and acquisition share it.

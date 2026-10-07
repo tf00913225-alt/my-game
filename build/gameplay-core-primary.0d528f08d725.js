@@ -2705,7 +2705,7 @@
     window.v132CanAddItemToInventory=canAddItemToInventory;
 
     function addItemToInventory(definition,amount){
-        if(!definition||definition.retired||definition.compatibilityOnly||definition.blueprintSlot||/^blueprint/.test(definition.id)||/^(hp|sp)Potion100$/.test(definition.id)){ return false; }
+        if(!definition||definition.retired||definition.compatibilityOnly||definition.blueprintSlot||/^blueprint/.test(definition.id)||/^(hp|sp)Potion(?:20|100)$/.test(definition.id)){ return false; }
         const quantity=Math.max(1,Math.floor(Number(amount)||1));
         const maxStack=isEquipmentInventoryType(definition.type)
             ? 1
@@ -4244,7 +4244,7 @@
        原本「材料副本挑戰成功」按「直接領取」就會馬上把寶箱
        全部拆開、材料直接進背包，玩家完全沒有機會自己選時機
        開。改成：領取只把「材料寶箱」這個新物品（可堆疊）
-       放進背包，真正的開箱（骰礦石/設計圖階級）延後到玩家
+       放進背包，真正的開箱（依正式材料寶箱池抽取）延後到玩家
        在背包裡點開這個物品、按下「開啟」的那一刻才進行。
     */
     // Sole provisional material chest drop table: preview, runtime and acquisition share it.
@@ -7845,17 +7845,17 @@
        Elite single-roll drops + quest progress    /* =====================================================
        Elite single-roll drops + quest progress
     ===================================================== */
+    const ELITE_DROP_TABLE=Object.freeze([
+        {itemId:"ticketSetFire",chance:.01,quantity:1},{itemId:"ticketSetWater",chance:.01,quantity:1},
+        {itemId:"ticketSetEarth",chance:.01,quantity:1},{itemId:"ticketSetWind",chance:.01,quantity:1},
+        {itemId:"freezeTalismanMid",chance:.05,quantity:1},{itemId:"stealthTalismanMid",chance:.05,quantity:1},
+        {itemId:"barrierTalismanMid",chance:.05,quantity:1}
+    ].map(Object.freeze));
     function addEliteSpecialDrop(monster){
         if(typeof window.v132AddItemToInventory!=="function"){ return null; }
-        const roll=Math.random()*100;
-        let definition=null;
-        if(roll<1){ definition=window.v132GetTicketDefinition&&window.v132GetTicketDefinition("ticketSetFire"); }
-        else if(roll<2){ definition=window.v132GetTicketDefinition&&window.v132GetTicketDefinition("ticketSetWater"); }
-        else if(roll<3){ definition=window.v132GetTicketDefinition&&window.v132GetTicketDefinition("ticketSetEarth"); }
-        else if(roll<4){ definition=window.v132GetTicketDefinition&&window.v132GetTicketDefinition("ticketSetWind"); }
-        else if(roll<9){ definition=window.v132GetTalismanDefinition&&window.v132GetTalismanDefinition("freezeTalismanMid"); }
-        else if(roll<14){ definition=window.v132GetTalismanDefinition&&window.v132GetTalismanDefinition("stealthTalismanMid"); }
-        else if(roll<19){ definition=window.v132GetTalismanDefinition&&window.v132GetTalismanDefinition("barrierTalismanMid"); }
+        let roll=Math.random();
+        const row=ELITE_DROP_TABLE.find(entry=>(roll-=entry.chance)<0);
+        const definition=row&&((window.v132GetTicketDefinition&&window.v132GetTicketDefinition(row.itemId))||(window.v132GetTalismanDefinition&&window.v132GetTalismanDefinition(row.itemId)));
         if(!definition){ return null; }
         if(!window.v132AddItemToInventory(definition,1)){
             addBattleLog(monster.name+"出現特殊掉落，但背包已滿，未能放入。");
@@ -9299,10 +9299,10 @@
     const TIER_ORDER=["white","blue","purple","orange","pink","four-symbol"];
     const TALISMAN_TIER_ORDER=["white","blue","purple","orange"];
     const TIER_META={
-        white:{label:"白階",available:true,craftGold:500,reforgeGold:1000,main:[1,5],reforgeMain:[1,3]},
-        blue:{label:"藍階",available:true,craftGold:1500,reforgeGold:3000,main:[3,8],reforgeMain:[2,5]},
-        purple:{label:"紫階",available:true,craftGold:4000,reforgeGold:8000,main:[5,11],sub:[1,3],reforgeMain:[4,7],reforgeSub:[1,2]},
-        orange:{label:"橙階",available:true,craftGold:10000,reforgeGold:20000,main:[7,14],sub:[2,5],reforgeMain:[6,10],reforgeSub:[2,4]},
+        white:{label:"白階",available:true,reforgeGold:1000,main:[1,5],reforgeMain:[1,3]},
+        blue:{label:"藍階",available:true,reforgeGold:3000,main:[3,8],reforgeMain:[2,5]},
+        purple:{label:"紫階",available:true,reforgeGold:8000,main:[5,11],sub:[1,3],reforgeMain:[4,7],reforgeSub:[1,2]},
+        orange:{label:"橙階",available:true,reforgeGold:20000,main:[7,14],sub:[2,5],reforgeMain:[6,10],reforgeSub:[2,4]},
         pink:{label:"桃紅階",available:false,planned:true},
         "four-symbol":{label:"四象階",available:false,planned:true}
     };
@@ -9328,7 +9328,7 @@
     const SUB_STATS=["vitality","energy","defensePoints","agility","statusResistance"];
     const TALISMAN_GOLD={white:300,blue:1000,purple:3000};
     const synthesisState={
-        tab:"talisman",forgeTab:"reforge",socketUid:null,gemId:null,blueprintId:null,seriesId:"setFire",reforgeUid:null,
+        tab:"talisman",forgeTab:"reforge",socketUid:null,gemId:null,reforgeUid:null,
         reforgeMaterialTier:"white",lockedReforgeKeys:[],
         talismanId:null,talismanQty:1,fragmentQty:{setFire:1,setWater:1,setEarth:1,setWind:1},
         pendingReforge:null
@@ -9801,7 +9801,6 @@
         synthesisState.pendingReforge=null;
         renderSynthesis();
     };
-    window.v141SelectCraftSeries=function(id){ synthesisState.seriesId=id; renderSynthesis(); };
     window.v141SelectReforgeItem=function(uid){
         synthesisState.reforgeUid=uid;
         synthesisState.pendingReforge=null;
@@ -11569,15 +11568,7 @@
             select.hidden=true;
             select.insertAdjacentElement("afterend",picker);
         });
-        const series=root.querySelector(".v141-blueprint-series");
-        if(series){ series.innerHTML="<span>2　合成結果</span><b>系統隨機普通裝備</b>"; }
-        const preview=root.querySelector(".v141-craft-preview");
-        if(preview){
-            const icon=preview.querySelector(".v141-craft-icon");
-            const text=preview.querySelector("div:last-child");
-            if(icon){ icon.innerHTML=svgIcon("鍛","#d1ad69"); }
-            if(text){ text.innerHTML="<b>隨機普通裝備</b><span>依圖紙部位與階級生成；不會產出赤炎、寒泉、岩岳、青嵐套裝。</span>"; }
-        }
+
     }
 
     if(typeof window.v141RenderSynthesis==="function"){

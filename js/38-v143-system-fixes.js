@@ -513,15 +513,7 @@
             select.hidden=true;
             select.insertAdjacentElement("afterend",picker);
         });
-        const series=root.querySelector(".v141-blueprint-series");
-        if(series){ series.innerHTML="<span>2　合成結果</span><b>系統隨機普通裝備</b>"; }
-        const preview=root.querySelector(".v141-craft-preview");
-        if(preview){
-            const icon=preview.querySelector(".v141-craft-icon");
-            const text=preview.querySelector("div:last-child");
-            if(icon){ icon.innerHTML=svgIcon("鍛","#d1ad69"); }
-            if(text){ text.innerHTML="<b>隨機普通裝備</b><span>依圖紙部位與階級生成；不會產出赤炎、寒泉、岩岳、青嵐套裝。</span>"; }
-        }
+
     }
 
     if(typeof window.v141RenderSynthesis==="function"){
