@@ -11,29 +11,35 @@
     window.__equipmentProgressionInstalled=true;
 
     const RARITIES=[
-        {key:"white",label:"白階",chance:40,min:1,max:3,reforgeSlots:0,shopPrice:500,color:"#D8D8D8",available:true},
-        {key:"blue",label:"藍階",chance:40,min:4,max:6,reforgeSlots:0,shopPrice:1500,color:"#42A5FF",available:true},
-        {key:"purple",label:"紫階",chance:15,min:7,max:9,reforgeSlots:1,shopPrice:4000,color:"#B05CFF",available:true},
-        {key:"orange",label:"橙階",chance:5,min:10,max:12,reforgeSlots:1,shopPrice:10000,color:"#FF9F38",available:true},
+        {key:"white",label:"白階",chance:40,min:5,max:10,reforgeSlots:0,shopPrice:500,color:"#D8D8D8",available:true},
+        {key:"blue",label:"藍階",chance:40,min:11,max:16,reforgeSlots:0,shopPrice:1500,color:"#42A5FF",available:true},
+        {key:"purple",label:"紫階",chance:15,min:17,max:22,reforgeSlots:1,shopPrice:4000,color:"#B05CFF",available:true},
+        {key:"orange",label:"橙階",chance:5,min:23,max:28,reforgeSlots:1,shopPrice:10000,color:"#FF9F38",available:true},
         {key:"pink",label:"桃紅階",chance:0,available:false,planned:true,color:"#FF4FA7"},
         {key:"four-symbol",label:"四象階",chance:0,available:false,planned:true,fourSymbol:true,color:null}
     ];
     const RARITY_BY_KEY=Object.fromEntries(RARITIES.map(item=>[item.key,item]));
+    const EQUIPMENT_SHOP_DROP_TABLE=[
+        {key:"white",label:"白階",chance:70},
+        {key:"blue",label:"藍階",chance:15},
+        {key:"purple",label:"紫階",chance:10},
+        {key:"orange",label:"橙階",chance:5}
+    ];
     const EQUIPMENT_CHEST_DROP_TABLE=[
         {key:"white",label:"白階",chance:40},
         {key:"blue",label:"藍階",chance:40},
-        {key:"purple",label:"紫階",chance:10},
-        {key:"orange",label:"橙階",chance:10}
+        {key:"purple",label:"紫階",chance:15},
+        {key:"orange",label:"橙階",chance:5}
     ];
     const STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",defensePoints:"防禦",agility:"敏捷",accuracy:"命中",evasion:"閃避",crit:"爆擊",criticalChance:"爆擊",antiCrit:"抗暴",statusAccuracy:"異常命中",statusResistance:"異常抗性"};
     const SLOT_META={
-        shoulder:{label:"護腕",warrior:["vitality","attack"],mage:["vitality","intelligence"]},
-        head:{label:"頭盔",warrior:["vitality","attack","agility"],mage:["vitality","intelligence","agility"]},
+        shoulder:{label:"護腕",warrior:["vitality","attack","defensePoints"],mage:["vitality","intelligence","defensePoints"]},
+        head:{label:"頭盔",warrior:["vitality","attack","agility","defensePoints"],mage:["vitality","intelligence","agility","defensePoints"]},
         shoes:{label:"鞋子",warrior:["vitality","agility","attack"],mage:["vitality","agility","intelligence"]},
-        armor:{label:"衣服",warrior:["vitality","agility","attack"],mage:["vitality","agility","intelligence"]},
+        armor:{label:"衣服",warrior:["vitality","agility","attack","defensePoints"],mage:["vitality","agility","intelligence","defensePoints"]},
         weapon:{label:"武器",warrior:["attack"],mage:["intelligence"]}
     };
-    const ASSETS={
+    const WHITE_BLUE_ASSETS={
         warrior:{
             shoulder:["assets/equipment/warrior/bracer-01.png","assets/equipment/warrior/bracer-02.png"],
             head:["assets/equipment/warrior/head-01.png","assets/equipment/warrior/head-02.png"],
@@ -49,6 +55,8 @@
             weapon:["assets/equipment/mage/weapon-01.png","assets/equipment/mage/weapon-02.png","assets/equipment/mage/weapon-03.png","assets/equipment/mage/weapon-04.png"]
         }
     };
+    // Explicit rarity ownership. Empty high-tier pools never borrow legacy art.
+    const ASSET_POOLS={white:WHITE_BLUE_ASSETS,blue:WHITE_BLUE_ASSETS,purple:{},orange:{}};
     const NAME_PREFIX={
         white:["素鐵","粗革","舊紋","樸木","灰鋼","素麻"],
         blue:["青鋼","凝霜","玄紋","碧影","寒星","靈木"],
@@ -87,13 +95,14 @@
         let state=hashSeed(seed)||1;
         return function(){ state=(state+0x6D2B79F5)|0; let t=state; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; };
     }
-    function rarityFromRandom(random=Math.random){
+    function rarityFromRandom(random=Math.random,table=RARITIES){
         const roll=random()*100;
         let cursor=0;
-        for(const rarity of RARITIES){ cursor+=rarity.chance; if(roll<cursor){ return rarity; } }
-        return RARITIES[RARITIES.length-1];
+        for(const rarity of table){ cursor+=rarity.chance; if(roll<cursor){ return RARITY_BY_KEY[rarity.key]; } }
+        throw new Error("裝備階級抽取超出範圍");
     }
     function artMarkup(path,rarityKey){
+        if(!path){ return '<span class="v169-item-art v169-equipment-art" data-asset-state="missing" role="img" aria-label="裝備素材尚未就緒" title="裝備素材尚未就緒">◇</span>'; }
         return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarityKey+'"><img src="'+path+'" alt="" draggable="false" onerror="this.parentElement.dataset.assetState=\'broken\';this.parentElement.setAttribute(\'role\',\'img\');this.parentElement.setAttribute(\'aria-label\',\'裝備圖片無法載入\');this.parentElement.textContent=\'◇\'"></span>';
     }
     const LEGACY_STARTER_EQUIPMENT_ART={
@@ -104,7 +113,7 @@
         leatherShoes:{path:"assets/equipment/warrior/shoes-01.png"},
         powerRing:{ring:true}
     };
-    /* V173.62: starter whites obey the same 1–3 single-stat band as ordinary white drops/shop gear. */
+    /* Starter equipment retains its fixed legacy values independently of ordinary drops. */
     const STARTER_WHITE_STATS={
         ironSword:{attack:3},
         woodStaff:{intelligence:3},
@@ -162,8 +171,9 @@
     window.v17357RepairLegacyStarterEquipmentIcons=repairLegacyStarterEquipmentIcons;
     window.v17362StarterWhiteStats=Object.fromEntries(Object.entries(STARTER_WHITE_STATS).map(([id,stats])=>[id,{...stats}]));
     function makeUid(prefix){ return prefix+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8); }
-    function assetVariant(classType,slot,random){
-        const list=ASSETS[classType]&&ASSETS[classType][slot]||[];
+    function assetVariant(classType,slot,random,rarityKey){
+        const pool=ASSET_POOLS[rarityKey];
+        const list=pool&&pool[classType]&&pool[classType][slot]||[];
         return list.length?list[Math.floor(random()*list.length)%list.length]:"";
     }
     function mageWeaponSuffix(asset){
@@ -187,14 +197,15 @@
     }
     function generateEquipment(random=Math.random,forced={}){
         const forcedRarity=forced.rarity?RARITY_BY_KEY[forced.rarity]:null;
-        const rarity=forcedRarity&&forcedRarity.available!==false?forcedRarity:rarityFromRandom(random);
+        if(forced.rarity&&(!forcedRarity||forcedRarity.available===false)){ throw new Error("特殊裝備不使用一般生成規則"); }
+        const rarity=forcedRarity||rarityFromRandom(random);
         const classType=forced.classType||(random()<.5?"warrior":"mage");
         const slots=Object.keys(SLOT_META);
         const slot=forced.slot||slots[Math.floor(random()*slots.length)%slots.length];
         const statPool=SLOT_META[slot][classType];
         const stat=forced.stat||statPool[Math.floor(random()*statPool.length)%statPool.length];
         const value=forced.value==null?randomInt(rarity.min,rarity.max,random):Number(forced.value);
-        const asset=assetVariant(classType,slot,random);
+        const asset=assetVariant(classType,slot,random,rarity.key);
         const name=generatedName(rarity,classType,slot,random,asset);
         return {
             equipmentCombatPercentUnitVersion:2,
@@ -207,6 +218,8 @@
     }
     window.v17346GenerateEquipment=generateEquipment;
     window.v17346EquipmentRarityTable=RARITIES.map(item=>({...item}));
+    window.v17346EquipmentShopDropTable=EQUIPMENT_SHOP_DROP_TABLE.map(item=>({...item}));
+    window.v17346RollEquipmentShopRarity=random=>rarityFromRandom(random,EQUIPMENT_SHOP_DROP_TABLE).key;
 
     function equipmentChestIcon(){
         if(typeof window.v17361GeneralDungeonChestIcon==="function"){
@@ -546,7 +559,9 @@
         if(!state){ return []; }
         return Array.from({length:6},(_,index)=>{
             const offerId=state.date+":"+state.refreshCount+":"+index;
-            return {...generateEquipment(seededRandom(offerId)),offerId};
+            const random=seededRandom(offerId);
+            const rarity=rarityFromRandom(random,EQUIPMENT_SHOP_DROP_TABLE);
+            return {...generateEquipment(random,{rarity:rarity.key}),offerId};
         });
     }
     function statLine(item){
