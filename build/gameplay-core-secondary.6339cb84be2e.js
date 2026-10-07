@@ -664,37 +664,9 @@
     }
 
     /* ----- Element sets: exact piece stats, role variant and restrictions. ----- */
-    const SET_ELEMENTS={setFire:"fire",setWater:"water",setEarth:"earth",setWind:"wind"};
-    const SET_LABELS={setFire:"赤炎",setWater:"寒泉",setEarth:"岩岳",setWind:"青嵐"};
-    const PIECE_RULES={
-        blade:{role:"attack",roleLabel:"攻",name:"刀",stats:{attack:10,vitality:-2}},
-        fan:{role:"magic",roleLabel:"法",name:"扇",stats:{intelligence:10,vitality:-2}},
-        heavyArmor:{role:"attack",roleLabel:"攻",name:"鎧甲",stats:{attack:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
-        robe:{role:"magic",roleLabel:"法",name:"袍",stats:{intelligence:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
-        boots:{role:"attack",roleLabel:"攻",name:"靴",stats:{attack:2,agility:10}},
-        shoes:{role:"magic",roleLabel:"法",name:"履",stats:{intelligence:2,agility:10}},
-        helm:{role:"attack",roleLabel:"攻",name:"盔",stats:{attack:12}},
-        crown:{role:"magic",roleLabel:"法",name:"冠",stats:{intelligence:12}},
-        wristguard:{role:"attack",roleLabel:"攻",name:"護腕",stats:{attack:12}},
-        focus:{role:"magic",roleLabel:"法",name:"法環",stats:{intelligence:12}}
-    };
-
-    function pieceKey(item){
-        const id=String(item&&item.id||"");
-        return Object.keys(PIECE_RULES).find(key=>id.endsWith("_"+key))||null;
-    }
-
     function applySetRule(item){
-        if(!item||!SET_ELEMENTS[item.setId]){ return item; }
-        const key=pieceKey(item);
-        const rule=key&&PIECE_RULES[key];
-        if(!rule){ return item; }
-        item.name=SET_LABELS[item.setId]+rule.name+"["+rule.roleLabel+"]";
-        item.stats=Object.assign({},rule.stats);
-        item.levelRequirement=20;
-        item.requiredElement=SET_ELEMENTS[item.setId];
-        item.setVariant=rule.role;
-        return item;
+        return typeof window.v132NormalizeEquipmentSetItem==="function"
+            ?window.v132NormalizeEquipmentSetItem(item):item;
     }
 
     function allOwnedItems(){
@@ -721,107 +693,6 @@
             if(definition){ item.icon=definition.icon; }
             applySetRule(item);
         });
-    }
-
-    function variantCountsForEquipment(equipmentKey,setId){
-        const counts={attack:0,magic:0};
-        const equipment=typeof characterEquipment!=="undefined"&&characterEquipment
-            ?characterEquipment[equipmentKey]:null;
-        Object.values(equipment||{}).forEach(item=>{
-            if(item&&item.setId===setId&&counts[item.setVariant]!==undefined){ counts[item.setVariant]++; }
-        });
-        return counts;
-    }
-
-    if(typeof getEquipmentBonus==="function"){
-        const previousEquipmentBonus=getEquipmentBonus;
-        getEquipmentBonus=function(characterId){
-            const bonus=previousEquipmentBonus.apply(this,arguments);
-            Object.keys(SET_ELEMENTS).forEach(setId=>{
-                const counts=variantCountsForEquipment(characterId,setId);
-                const total=counts.attack+counts.magic;
-                if(total>=3&&counts.attack<3&&counts.magic<3){
-                    ["attack","vitality","energy","intelligence","agility"].forEach(stat=>{
-                        bonus[stat]=(numeric(bonus[stat])-1);
-                    });
-                }
-            });
-            return bonus;
-        };
-    }
-
-    if(typeof getElementDamagePassiveMultiplier==="function"){
-        const previousElementMultiplier=getElementDamagePassiveMultiplier;
-        getElementDamagePassiveMultiplier=function(character){
-            let multiplier=previousElementMultiplier.apply(this,arguments);
-            const characterKey=typeof getCharacterSkillKey==="function"?getCharacterSkillKey(character):null;
-            const equipmentKey=characterKey||null;
-            const setId=Object.keys(SET_ELEMENTS).find(id=>SET_ELEMENTS[id]===character?.element);
-            if(equipmentKey&&setId){
-                const counts=variantCountsForEquipment(equipmentKey,setId);
-                const total=counts.attack+counts.magic;
-                if(total>=5&&counts.attack<5&&counts.magic<5){ multiplier-=.02; }
-            }
-            return multiplier;
-        };
-    }
-
-    if(typeof equipSelectedItem==="function"){
-        const previousEquipSelectedItem=equipSelectedItem;
-        equipSelectedItem=function(){
-            const item=typeof inventorySlots!=="undefined"&&selectedInventorySlot!==null
-                ?inventorySlots[selectedInventorySlot]:null;
-            const character=typeof getBackpackCharacter==="function"
-                ?getBackpackCharacter(inventoryCharacterIndex):null;
-            if(item&&item.requiredElement&&character&&character.element!==item.requiredElement){
-                const elementName=typeof elementDatabase!=="undefined"&&elementDatabase[item.requiredElement]
-                    ?elementDatabase[item.requiredElement].name:item.requiredElement;
-                alert(item.name+"僅限"+elementName+"元素角色穿戴。");
-                return;
-            }
-            return previousEquipSelectedItem.apply(this,arguments);
-        };
-    }
-
-    function syncSetModal(item){
-        if(!item||!item.setId||!item.setVariant){ return; }
-        const equipmentKey=typeof getBackpackEquipmentKey==="function"
-            ?getBackpackEquipmentKey(inventoryCharacterIndex):null;
-        const counts=variantCountsForEquipment(equipmentKey,item.setId);
-        const count=counts[item.setVariant]||0;
-        const role=item.setVariant==="attack"?"攻":"法";
-        const title=document.querySelector("#itemModalStats .v132-set-title");
-        const bonuses=document.querySelectorAll("#itemModalStats .v132-set-bonus");
-        if(title){ title.textContent="["+SET_LABELS[item.setId]+"•"+role+"] "+count+"/5"; }
-        if(bonuses[0]){
-            bonuses[0].classList.toggle("active",count>=3);
-            bonuses[0].classList.toggle("inactive",count<3);
-            bonuses[0].textContent="裝備三件　全能力+1　閃避+2%　["+(count>=3?"已啟動":"未啟動")+"]";
-        }
-        if(bonuses[1]){
-            bonuses[1].classList.toggle("active",count>=5);
-            bonuses[1].classList.toggle("inactive",count<5);
-            const elementName=typeof elementDatabase!=="undefined"&&elementDatabase[item.requiredElement]
-                ?elementDatabase[item.requiredElement].name:"";
-            bonuses[1].textContent="裝備五件　"+elementName+"元素技能傷害+2%　["+(count>=5?"已啟動":"未啟動")+"]";
-        }
-    }
-
-    if(typeof openItemModal==="function"){
-        const previousOpenItemModal=openItemModal;
-        openItemModal=function(slotIndex){
-            const result=previousOpenItemModal.apply(this,arguments);
-            syncSetModal(typeof inventorySlots!=="undefined"?inventorySlots[slotIndex]:null);
-            return result;
-        };
-    }
-    if(typeof openEquippedItem==="function"){
-        const previousOpenEquippedItem=openEquippedItem;
-        openEquippedItem=function(item){
-            const result=previousOpenEquippedItem.apply(this,arguments);
-            syncSetModal(item);
-            return result;
-        };
     }
 
     /* ----- Enabling auto outside combat immediately performs configured recovery. ----- */
@@ -6312,19 +6183,6 @@
         warrior:{shoulder:"戰腕",head:"戰盔",armor:"戰甲",shoes:"戰靴",weapon:"戰刃"},
         mage:{shoulder:"法環",head:"法冠",armor:"法袍",shoes:"法履",weapon:"法杖"}
     };
-    const SET_RULES={
-        blade:{stats:{attack:15,vitality:-2}},
-        fan:{stats:{intelligence:15,vitality:-2}},
-        heavyArmor:{stats:{attack:7,evasion:10,antiCrit:0.5,statusResistance:0.25}},
-        robe:{stats:{intelligence:7,evasion:10,antiCrit:0.5,statusResistance:0.25}},
-        boots:{stats:{attack:2,agility:13}},
-        shoes:{stats:{intelligence:2,agility:13}},
-        helm:{stats:{attack:15}},
-        crown:{stats:{intelligence:15}},
-        wristguard:{stats:{attack:15}},
-        focus:{stats:{intelligence:15}}
-    };
-    const SET_IDS=new Set(["setFire","setWater","setEarth","setWind"]);
     const SHOP_STORAGE_KEY=window.FourSymbolsAccountSave.accountKey("equipment-shop-daily");
     let activeReforgeSnapshot=null;
     let equipmentDungeonRunning=false;
@@ -6563,28 +6421,15 @@
     window.v17346OpenEquipmentChest=openEquipmentChest;
     window.v17346ShowEquipmentChestPreview=showEquipmentChestPreview;
 
-    function setPieceKey(item){
-        const id=String(item&&item.id||"");
-        return Object.keys(SET_RULES).find(key=>id.endsWith("_"+key))||null;
-    }
     function addOrangeClass(icon){
         if(typeof icon!=="string"||icon.includes("v17346-rarity-orange")){ return icon; }
         return icon.replace(/class="([^"]*v169-item-art[^"]*)"/,(_m,classes)=>'class="'+classes+' v17346-rarity-orange"');
     }
     function applySetRule(item){
-        if(!item||!SET_IDS.has(item.setId)){ return item; }
-        const key=setPieceKey(item);
-        if(!key){ return item; }
+        const defs=typeof window.v132GetContentDefinitions==="function"?window.v132GetContentDefinitions():null;
+        if(!(defs?.equipmentSetItems||[]).some(def=>def.id===item?.id&&def.setId===item?.setId)){ return item; }
         migrateLegacyEquipmentStats(item);
-        const migratedStats=item.stats;
-        item.stats={...migratedStats,...SET_RULES[key].stats};
-        // These independent extras may already contain the V1/V2 Spirit
-        // migration. Reapplying set base rules must never discard them.
-        ["antiCrit","statusResistance"].forEach(field=>{
-            if(migratedStats[field]!==undefined){
-                item.stats[field]=Math.max(Number(migratedStats[field])||0,Number(item.stats[field])||0);
-            }
-        });
+        window.v132NormalizeEquipmentSetItem(item);
         item.quality="orange";
         item.rarityKey="orange";
         const legacyAffixCount=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;

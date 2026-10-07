@@ -14,16 +14,8 @@ assert.match(source,/\{key:"blue",label:"藍階",chance:40,min:4,max:6,reforgeSl
 assert.match(source,/\{key:"purple",label:"紫階",chance:15,min:7,max:9,reforgeSlots:1/);
 assert.match(source,/\{key:"orange",label:"橙階",chance:5,min:10,max:12,reforgeSlots:1/);
 
-assert.match(source,/blade:\{stats:\{attack:15,vitality:-2\}\}/);
-assert.match(source,/fan:\{stats:\{intelligence:15,vitality:-2\}\}/);
-assert.match(source,/heavyArmor:\{stats:\{attack:7,evasion:10,antiCrit:0\.5,statusResistance:0\.25\}\}/);
-assert.match(source,/robe:\{stats:\{intelligence:7,evasion:10,antiCrit:0\.5,statusResistance:0\.25\}\}/);
-assert.match(source,/boots:\{stats:\{attack:2,agility:13\}\}/);
-assert.match(source,/shoes:\{stats:\{intelligence:2,agility:13\}\}/);
-assert.match(source,/helm:\{stats:\{attack:15\}\}/);
-assert.match(source,/crown:\{stats:\{intelligence:15\}\}/);
-assert.match(source,/wristguard:\{stats:\{attack:15\}\}/);
-assert.match(source,/focus:\{stats:\{intelligence:15\}\}/);
+assert.match(source,/window\.v132NormalizeEquipmentSetItem\(item\)/);
+assert.doesNotMatch(source,/const SET_RULES=/,"late progression must not own another set stat table");
 assert.match(source,/item\.quality="orange"/);
 assert.match(source,/v17346-rarity-orange/);
 

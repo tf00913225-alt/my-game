@@ -112,16 +112,18 @@ assert.notEqual(rows["防禦"],String(equipped.defense));
 const v141=fs.readFileSync("js/34-v141-core-systems.js","utf8");
 assert.doesNotMatch(v141,/getEquipmentBonus\s*=/,"V141 must not add reforgeStats a second time after the canonical equipment owner");
 const expansion=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
-const setOwner=expansion.slice(expansion.indexOf("    function getEquipmentSetCounts("),expansion.indexOf('    if(typeof getElementDamagePassiveMultiplier==="function")'));
+vm.runInContext(expansion.slice(expansion.indexOf("    const EQUIPMENT_SET_PIECES="),expansion.indexOf("    const equipmentSetItemDefinitions=")),context);
+const setOwner=expansion.slice(expansion.indexOf("    function getEquipmentSetCounts("),expansion.indexOf('    // Only direct skills'));
 vm.runInContext(setOwner,context);
-context.characterEquipment.fire.hand.setId="test-set";
-context.characterEquipment.fire.head={setId:"test-set",stats:{}};
-context.characterEquipment.fire.armor={setId:"test-set",stats:{}};
+context.characterEquipment.fire.hand.setId="setFire";
+context.characterEquipment.fire.hand.id="setFire_blade";
+context.characterEquipment.fire.head={id:"setFire_helm",setId:"setFire",stats:{}};
+context.characterEquipment.fire.armor={id:"setFire_heavyArmor",setId:"setFire",stats:{}};
 const withSet=context.getMainCharacterStats();
 for(const key of ["attackPoints","defensePoints","intelligence","vitality","energy","agility"]){
-    assert.equal(withSet[key],equipped[key]+1,"existing three-piece set points remain in the formal owner: "+key);
+    assert.equal(withSet[key],equipped[key]+5,"three-piece set points remain in the formal owner: "+key);
 }
-assert.equal(withSet.evasion,equipped.evasion+2,"independent set Evasion is preserved");
+assert.equal(withSet.evasion,equipped.evasion,"retired set Evasion is absent");
 context.characterEquipment.fire=originalEquipment;
 assert.match(detailSource,/\["HP",stats\.maxHP\]/,"character detail keeps Max HP");
 assert.match(detailSource,/\["SP",stats\.maxSP\]/,"character detail keeps Max SP");

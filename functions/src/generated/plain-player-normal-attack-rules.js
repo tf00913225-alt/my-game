@@ -175,6 +175,11 @@ function getOrdinaryDamageBonusPercent(options){
         total+=Number(relic.ordinaryBonus(attacker,getBattleDamageSource(resolved)))||0;
     }
 
+    if(skill&&(resolved.damageKind||"direct")==="direct"&&["activeSkill","followUp"].includes(getBattleDamageSource(resolved))&&
+        typeof window.v132GetEquipmentSetSkillDamageBonusPercent==="function"){
+        total+=window.v132GetEquipmentSetSkillDamageBonusPercent(attacker,skill);
+    }
+
     if(attacker&&typeof getElementDamagePassiveMultiplier==="function"){
         total+=(Math.max(0,Number(getElementDamagePassiveMultiplier(attacker))||1)-1)*100;
     }

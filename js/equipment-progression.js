@@ -59,19 +59,6 @@
         warrior:{shoulder:"戰腕",head:"戰盔",armor:"戰甲",shoes:"戰靴",weapon:"戰刃"},
         mage:{shoulder:"法環",head:"法冠",armor:"法袍",shoes:"法履",weapon:"法杖"}
     };
-    const SET_RULES={
-        blade:{stats:{attack:15,vitality:-2}},
-        fan:{stats:{intelligence:15,vitality:-2}},
-        heavyArmor:{stats:{attack:7,evasion:10,antiCrit:0.5,statusResistance:0.25}},
-        robe:{stats:{intelligence:7,evasion:10,antiCrit:0.5,statusResistance:0.25}},
-        boots:{stats:{attack:2,agility:13}},
-        shoes:{stats:{intelligence:2,agility:13}},
-        helm:{stats:{attack:15}},
-        crown:{stats:{intelligence:15}},
-        wristguard:{stats:{attack:15}},
-        focus:{stats:{intelligence:15}}
-    };
-    const SET_IDS=new Set(["setFire","setWater","setEarth","setWind"]);
     const SHOP_STORAGE_KEY=window.FourSymbolsAccountSave.accountKey("equipment-shop-daily");
     let activeReforgeSnapshot=null;
     let equipmentDungeonRunning=false;
@@ -310,28 +297,15 @@
     window.v17346OpenEquipmentChest=openEquipmentChest;
     window.v17346ShowEquipmentChestPreview=showEquipmentChestPreview;
 
-    function setPieceKey(item){
-        const id=String(item&&item.id||"");
-        return Object.keys(SET_RULES).find(key=>id.endsWith("_"+key))||null;
-    }
     function addOrangeClass(icon){
         if(typeof icon!=="string"||icon.includes("v17346-rarity-orange")){ return icon; }
         return icon.replace(/class="([^"]*v169-item-art[^"]*)"/,(_m,classes)=>'class="'+classes+' v17346-rarity-orange"');
     }
     function applySetRule(item){
-        if(!item||!SET_IDS.has(item.setId)){ return item; }
-        const key=setPieceKey(item);
-        if(!key){ return item; }
+        const defs=typeof window.v132GetContentDefinitions==="function"?window.v132GetContentDefinitions():null;
+        if(!(defs?.equipmentSetItems||[]).some(def=>def.id===item?.id&&def.setId===item?.setId)){ return item; }
         migrateLegacyEquipmentStats(item);
-        const migratedStats=item.stats;
-        item.stats={...migratedStats,...SET_RULES[key].stats};
-        // These independent extras may already contain the V1/V2 Spirit
-        // migration. Reapplying set base rules must never discard them.
-        ["antiCrit","statusResistance"].forEach(field=>{
-            if(migratedStats[field]!==undefined){
-                item.stats[field]=Math.max(Number(migratedStats[field])||0,Number(item.stats[field])||0);
-            }
-        });
+        window.v132NormalizeEquipmentSetItem(item);
         item.quality="orange";
         item.rarityKey="orange";
         const legacyAffixCount=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;

@@ -2157,12 +2157,13 @@
        影響（item.setId不存在時直接跳過）。
     */
     function appendEquipmentSetInfo(item){
-        if(!item || !item.setId){ return; }
+        if(!item || !equipmentSetItemDefinitions.some(def=>def.id===item.id&&def.setId===item.setId)){ return; }
+        normalizeEquipmentSetItem(item);
         const equipmentKey=getBackpackEquipmentKey(inventoryCharacterIndex);
         if(!equipmentKey){ return; }
         const counts=getEquipmentSetCounts(equipmentKey);
-        const count=counts[item.setId]||0;
-        const label=getSetLabel(item.setId);
+        const count=counts[item.setId+"_"+item.setVariant]||0;
+        const label=getSetLabel(item.setId)+"•"+(item.setVariant==="attack"?"攻":"法");
         const elementKey=getSetElement(item.setId);
         const elementName=(elementKey && elementDatabase[elementKey]) ? elementDatabase[elementKey].name : "";
         const threeActive=count>=3;
@@ -2171,10 +2172,10 @@
             '<div class="v132-set-info">'+
             '<div class="v132-set-title">['+escapeHtml(label)+']'+count+'/5</div>'+
             '<div class="v132-set-bonus'+(threeActive ? " active" : " inactive")+'">'+
-            '裝備三件　全能力+1　閃避+2%　'+(threeActive ? "[已啟動]" : "[未啟動]")+
+            '裝備三件　全能力+5　'+(threeActive ? "[已啟動]" : "[未啟動]")+
             '</div>'+
             '<div class="v132-set-bonus'+(fiveActive ? " active" : " inactive")+'">'+
-            '裝備五件　'+escapeHtml(elementName)+'元素技能傷害+2%　'+(fiveActive ? "[已啟動]" : "[未啟動]")+
+            '裝備五件　'+escapeHtml(elementName)+'元素技能傷害+5%　'+(fiveActive ? "[已啟動]" : "[未啟動]")+
             '</div>'+
             '</div>';
         const statsEl=document.getElementById("itemModalStats");
@@ -2585,16 +2586,16 @@
     */
 
     const EQUIPMENT_SET_PIECES=[
-        {key:"blade",slot:"weapon",name:"刀",stats:{attack:10,vitality:-2}},
-        {key:"fan",slot:"weapon",name:"扇",stats:{intelligence:10,vitality:-2}},
-        {key:"heavyArmor",slot:"armor",name:"鎧甲",stats:{attack:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
-        {key:"robe",slot:"armor",name:"袍",stats:{intelligence:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
-        {key:"boots",slot:"shoes",name:"靴",stats:{agility:10}},
-        {key:"shoes",slot:"shoes",name:"履",stats:{agility:10}},
-        {key:"helm",slot:"head",name:"盔",stats:{attack:12}},
-        {key:"crown",slot:"head",name:"冠",stats:{intelligence:12}},
-        {key:"wristguard",slot:"shoulder",name:"護腕",stats:{attack:12}},
-        {key:"focus",slot:"shoulder",name:"法環",stats:{intelligence:12}}
+        {key:"blade",slot:"weapon",name:"刀",role:"attack",stats:{attack:30}},
+        {key:"fan",slot:"weapon",name:"扇",role:"magic",stats:{intelligence:30}},
+        {key:"heavyArmor",slot:"armor",name:"鎧甲",role:"attack",stats:{defensePoints:25,agility:5}},
+        {key:"robe",slot:"armor",name:"袍",role:"magic",stats:{defensePoints:25,agility:5}},
+        {key:"boots",slot:"shoes",name:"靴",role:"attack",stats:{attack:20,defensePoints:10}},
+        {key:"shoes",slot:"shoes",name:"履",role:"magic",stats:{intelligence:20,defensePoints:10}},
+        {key:"helm",slot:"head",name:"盔",role:"attack",stats:{attack:25,vitality:5}},
+        {key:"crown",slot:"head",name:"冠",role:"magic",stats:{intelligence:25,vitality:5}},
+        {key:"wristguard",slot:"shoulder",name:"護腕",role:"attack",stats:{attack:25}},
+        {key:"focus",slot:"shoulder",name:"法環",role:"magic",stats:{intelligence:25}}
     ];
 
     const EQUIPMENT_SETS=[
@@ -2604,10 +2605,23 @@
         {id:"setWind",label:"青嵐",element:"wind"}
     ];
 
+    function normalizeEquipmentSetItem(item){
+        const set=EQUIPMENT_SETS.find(set=>set.id===item?.setId);
+        const piece=set&&EQUIPMENT_SET_PIECES.find(piece=>item.id===set.id+"_"+piece.key);
+        if(!piece){ return item; }
+        item.name=set.label+piece.name+"["+(piece.role==="attack"?"攻":"法")+"]";
+        item.stats={...piece.stats};
+        item.levelRequirement=20;
+        item.requiredElement=set.element;
+        item.setVariant=piece.role;
+        return item;
+    }
+    window.v132NormalizeEquipmentSetItem=normalizeEquipmentSetItem;
+
     const equipmentSetItemDefinitions=[];
     EQUIPMENT_SETS.forEach(set=>{
         EQUIPMENT_SET_PIECES.forEach(piece=>{
-            equipmentSetItemDefinitions.push({
+            equipmentSetItemDefinitions.push(normalizeEquipmentSetItem({
                 id:set.id+"_"+piece.key,
                 name:set.label+piece.name,
                 icon:equipmentSetIcon(set.id,piece.key),
@@ -2618,7 +2632,7 @@
                 price:0,
                 equipmentCombatPercentUnitVersion:2,
                 stats:Object.assign({},piece.stats)
-            });
+            }));
         });
     });
 
@@ -3374,17 +3388,19 @@
 
 
     /* =====================================================
-       10. 裝備套裝加成（3件：六圍全部+1／5件：對應元素
-           技能傷害+2%），接進既有兩個唯一結算入口
+       10. 裝備套裝加成（攻／法分開計件；3件：六圍全部+5／5件：對應元素
+           技能傷害+5%），接進既有兩個唯一結算入口
     ===================================================== */
 
     function getEquipmentSetCounts(characterId){
-        const equipment=characterEquipment[characterId];
         const counts={};
-        if(!equipment){ return counts; }
-        Object.values(equipment).forEach(item=>{
-            if(item && item.setId){
-                counts[item.setId]=(counts[item.setId]||0)+1;
+        const equipment=characterEquipment[characterId];
+        Object.values(equipment||{}).forEach(item=>{
+            const set=EQUIPMENT_SETS.find(set=>set.id===item?.setId);
+            const piece=set&&EQUIPMENT_SET_PIECES.find(piece=>item.id===set.id+"_"+piece.key);
+            if(piece){
+                const key=set.id+"_"+piece.role;
+                counts[key]=(counts[key]||0)+1;
             }
         });
         return counts;
@@ -3396,43 +3412,27 @@
         getEquipmentBonus=function(characterId){
             const bonus=originalGetEquipmentBonus.apply(this,arguments);
             const counts=getEquipmentSetCounts(characterId);
-
-            Object.keys(counts).forEach(setId=>{
-                if(counts[setId]>=3){
+            Object.values(counts).forEach(count=>{
+                if(count>=3){
                     ["attack","vitality","energy","intelligence","defensePoints","agility"].forEach(stat=>{
-                        bonus[stat]=(bonus[stat]||0)+1;
+                        bonus[stat]=(bonus[stat]||0)+5;
                     });
-                    bonus.evasion=(bonus.evasion||0)+2;
-                    bonus.antiCrit=(bonus.antiCrit||0)+0.1;
-                    bonus.statusResistance=(bonus.statusResistance||0)+0.05;
                 }
             });
-
             return bonus;
         };
     }
 
-    if(typeof getElementDamagePassiveMultiplier==="function"){
-        const originalGetElementDamagePassiveMultiplier=getElementDamagePassiveMultiplier;
-        getElementDamagePassiveMultiplier=function(character){
-            let multiplier=originalGetElementDamagePassiveMultiplier.apply(this,arguments);
-
-            if(!character || !character.element){ return multiplier; }
-
-            const key=typeof getCharacterSkillKey==="function" ? getCharacterSkillKey(character) : null;
-            const equipmentKey=key==="fire" ? "fire" : key;
-            if(!equipmentKey){ return multiplier; }
-
-            const counts=getEquipmentSetCounts(equipmentKey);
-            Object.keys(counts).forEach(setId=>{
-                if(counts[setId]>=5 && getSetElement(setId)===character.element){
-                    multiplier+=0.02;
-                }
-            });
-
-            return multiplier;
-        };
-    }
+    // Only direct skills of the set's element consume this source. Normal
+    // attacks and unrelated elements must never inherit the five-piece bonus.
+    window.v132GetEquipmentSetSkillDamageBonusPercent=function(character,skill){
+        const key=typeof getCharacterSkillKey==="function"?getCharacterSkillKey(character):null;
+        if(!key||!skill||!character){ return 0; }
+        const set=EQUIPMENT_SETS.find(set=>set.element===character.element&&set.element===skill.element);
+        if(!set){ return 0; }
+        const counts=getEquipmentSetCounts(key);
+        return counts[set.id+"_attack"]>=5||counts[set.id+"_magic"]>=5?5:0;
+    };
 
 
     /* =====================================================
@@ -3445,6 +3445,15 @@
             const item=inventorySlots[selectedInventorySlot];
             const character=getBackpackCharacter(inventoryCharacterIndex);
 
+            if(document.getElementById("itemEquipButton")?.dataset.slot){
+                return originalEquipSelectedItem.apply(this,arguments);
+            }
+            normalizeEquipmentSetItem(item);
+            if(item&&item.requiredElement&&character&&character.element!==item.requiredElement){
+                const elementName=elementDatabase[item.requiredElement]?.name||item.requiredElement;
+                alert(item.name+"僅限"+elementName+"元素角色穿戴。");
+                return;
+            }
             if(
                 item &&
                 item.levelRequirement &&

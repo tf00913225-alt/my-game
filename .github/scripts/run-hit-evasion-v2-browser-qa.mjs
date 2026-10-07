@@ -63,11 +63,11 @@ const expression=`(async()=>{
     const armor={id:"setWind_heavyArmor",setId:"setWind",type:"armor",stats:{accuracy:10,attack:7,antiCrit:0.5,statusResistance:0.25}};
     migrateLegacyEquipmentStats(armor);
     characterEquipment.fire={armor};characterEquipment.wind=characterEquipment.fire;
-    const one=getEquipmentBonus("fire").evasion;
-    characterEquipment.fire.head={setId:"setWind",stats:{}};
-    characterEquipment.fire.hand={setId:"setWind",stats:{}};
-    const three=getEquipmentBonus("fire").evasion;
-    delete characterEquipment.fire.head;const two=getEquipmentBonus("fire").evasion;
+    const one=getEquipmentBonus("fire").evasion;const oneDefense=getEquipmentBonus("fire").defensePoints;
+    characterEquipment.fire.head=structuredClone(v132GetContentDefinitions().equipmentSetItems.find(item=>item.id==="setWind_helm"));
+    characterEquipment.fire.hand=structuredClone(v132GetContentDefinitions().equipmentSetItems.find(item=>item.id==="setWind_blade"));
+    const three=getEquipmentBonus("fire").evasion;const threeDefense=getEquipmentBonus("fire").defensePoints;
+    delete characterEquipment.fire.head;const two=getEquipmentBonus("fire").evasion;const twoDefense=getEquipmentBonus("fire").defensePoints;
     player.hp=getMainCharacterStats().maxHP;
     showPage("home");openInventoryCharacterDetail();
     const detail=document.getElementById("inventoryCharacterDetailStats").textContent;
@@ -75,6 +75,19 @@ const expression=`(async()=>{
     const legacyArmor={id:"setWind_heavyArmor",setId:"setWind",type:"armor",stats:{accuracy:10,spirit:10,antiCrit:0.5,statusResistance:0.25}};
     inventoryItems.push(legacyArmor);v17346SyncFourElementSets();v17346SyncFourElementSets();
     inventoryItems.splice(inventoryItems.indexOf(legacyArmor),1);
+    const currentSetPieces=v132GetContentDefinitions().equipmentSetItems.map(item=>({id:item.id,stats:item.stats,level:item.levelRequirement,element:item.requiredElement,variant:item.setVariant}));
+    const currentSetBonuses=[];const setEquipment=characterEquipment.fire;const setElement=player.element;
+    for(const setId of ["setFire","setWater","setEarth","setWind"]){
+        for(const variant of ["attack","magic"]){
+            const pieces=v132GetContentDefinitions().equipmentSetItems.filter(item=>item.setId===setId&&item.setVariant===variant);
+            player.element=pieces[0].requiredElement;
+            characterEquipment.fire=Object.fromEntries(pieces.map(item=>[getInventoryEquipmentSlot(item.type),structuredClone(item)]));
+            characterEquipment[player.element]=characterEquipment.fire;
+            const skill={element:player.element,category:"physical"};
+            currentSetBonuses.push({setId,variant,points:getEquipmentBonus("fire"),skill:v173GetOrdinaryDamageBonusPercent({attacker:player,skill}),normal:v173GetOrdinaryDamageBonusPercent({attacker:player}),other:v173GetOrdinaryDamageBonusPercent({attacker:player,skill:{element:player.element==="fire"?"water":"fire"}})});
+        }
+    }
+    player.element=setElement;characterEquipment.fire=setEquipment;characterEquipment.wind=setEquipment;
     const migrated=FourSymbolsEquipmentCombatMigration.projectItem({stats:{accuracy:20,antiCrit:1,statusResistance:0.5}});
     const repeated=FourSymbolsEquipmentCombatMigration.projectItem(migrated);
     // Explicit tower affinity survives the retired level-derived default.
@@ -146,7 +159,7 @@ const expression=`(async()=>{
         await endBattle();await freshMonsters();calls.splice(0);player.hp=getMainCharacterStats().maxHP*.2;
         monsters[0].sp=1000;monsters[0].skillChance=1;monsters[0].skillIds=["fireCritical"];processSingleMonsterAttack(0,battleToken);combat.windLowSkill=calls.splice(0).filter(c=>c.side==="monster");
     }finally{calculateHitChancePercent=owner;characterSkillLoadouts.fire.skillLevels.windEX=0;await endBattle();}
-    return {wind,lowEvasion,highAccuracyHit,windBoundary,windDescription,retired,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,legacyArmor,tower,frostbite,feather,relicFrostbite,featherWind,bell,blessing,combat,casts,
+    return {wind,lowEvasion,highAccuracyHit,windBoundary,windDescription,retired,levels,calm,dodge,set:{one,three,two,armor,defense:[oneDefense,threeDefense,twoDefense]},currentSetPieces,currentSetBonuses,detail,migrated,repeated,legacyArmor,tower,frostbite,feather,relicFrostbite,featherWind,bell,blessing,combat,casts,
         formula:[calculateHitChancePercent(0,0,0,0),calculateHitChancePercent(10,0,0,0),calculateHitChancePercent(10,40,0,0),calculateHitChancePercent(0,40,0,0),calculateHitChancePercent(0,1000,0,0)]};
 })()`;
 const server=await startServer({baseUrl});
@@ -173,10 +186,20 @@ try{
     assert.deepEqual(evidence.levels,[{hit:95,evasion:0},{hit:95,evasion:0}]);
     assert.deepEqual(evidence.calm,[5,10,15,20,25].map(v=>[0,v,55+v]));
     assert.deepEqual(evidence.dodge,[5,10,15,20,25]);
-    assert.deepEqual([evidence.set.one,evidence.set.three,evidence.set.two],[10,12,10]);
-    assert.match(evidence.detail,/命中\s*0%/);assert.match(evidence.detail,/閃避\s*10\.0%/);
+    assert.deepEqual([evidence.set.one,evidence.set.three,evidence.set.two],[0,0,0]);
+    assert.match(evidence.detail,/命中\s*0%/);assert.match(evidence.detail,/閃避\s*0\.0%/);
     assert.match(evidence.detail,/5%～99%/);
-    assert.equal(evidence.legacyArmor.stats.accuracy,3);assert.equal(evidence.legacyArmor.stats.evasion,10);assert.equal(evidence.legacyArmor.stats.antiCrit,1.5);assert.equal(evidence.legacyArmor.stats.statusResistance,0.75);
+    assert.deepEqual(evidence.legacyArmor.stats,{defensePoints:25,agility:5});
+    assert.deepEqual(evidence.set.defense,[25,30,25],"same-role three pieces add5 Defense Points, two pieces remove the bonus");
+    const setStats={blade:{attack:30},fan:{intelligence:30},heavyArmor:{defensePoints:25,agility:5},robe:{defensePoints:25,agility:5},boots:{attack:20,defensePoints:10},shoes:{intelligence:20,defensePoints:10},helm:{attack:25,vitality:5},crown:{intelligence:25,vitality:5},wristguard:{attack:25},focus:{intelligence:25}};
+    assert.equal(evidence.currentSetPieces.length,40);
+    for(const piece of evidence.currentSetPieces){assert.deepEqual(piece.stats,setStats[piece.id.split("_")[1]]);assert.equal(piece.level,20);}
+    assert.equal(evidence.currentSetBonuses.length,8);
+    for(const row of evidence.currentSetBonuses){
+        assert.equal(row.points.defensePoints,40);assert.equal(row.points.agility,10);assert.equal(row.points.vitality,10);assert.equal(row.points.energy,5);
+        assert.equal(row.points[row.variant==="attack"?"attack":"intelligence"],105);assert.equal(row.points[row.variant==="attack"?"intelligence":"attack"],5);
+        assert.equal(row.points.evasion,0);assert.equal(row.skill,5);assert.equal(row.normal,0);assert.equal(row.other,0);
+    }
     assert.equal(evidence.migrated.stats.accuracy,3);assert.deepEqual(evidence.repeated,evidence.migrated);
     assert.deepEqual(evidence.formula,[95,99,65,55,5]);
     assert.ok(evidence.tower.length>0&&evidence.tower.every(v=>v===15));

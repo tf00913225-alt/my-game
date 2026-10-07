@@ -46,6 +46,8 @@ function baseContext(overrides={}){
     context.window=context;
     context.__listeners=listeners;
     vm.createContext(context);
+    const sets=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
+    vm.runInContext(sets.slice(sets.indexOf("    const EQUIPMENT_SET_PIECES="),sets.indexOf("    const equipmentSetItemDefinitions=")),context);
     vm.runInContext(source,context);
     return context;
 }
@@ -148,10 +150,10 @@ test("all forty set pieces receive exact stats, role names and element locks",()
         v132GetContentDefinitions:()=>({equipmentSetItems:definitions})
     });
     assert.equal(definitions.length,40);
-    assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setFire_blade").stats)),{attack:10,vitality:-2});
-    assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setWater_boots").stats)),{attack:2,agility:10});
-    assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setEarth_shoes").stats)),{intelligence:2,agility:10});
-    assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setWind_heavyArmor").stats)),{attack:5,evasion:10,antiCrit:0.5,statusResistance:0.25});
+    assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setFire_blade").stats)),{attack:30});
+    assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setWater_boots").stats)),{attack:20,defensePoints:10});
+    assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setEarth_shoes").stats)),{intelligence:20,defensePoints:10});
+    assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setWind_heavyArmor").stats)),{defensePoints:25,agility:5});
     assert.equal(definitions.find(item=>item.id==="setWater_crown").name,"寒泉冠[法]");
     assert.equal(definitions.find(item=>item.id==="setEarth_wristguard").requiredElement,"earth");
     assert.ok(definitions.every(item=>item.levelRequirement===20));
