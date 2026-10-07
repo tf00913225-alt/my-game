@@ -42,6 +42,7 @@ function runtime(count=2){
  // Capacity fixture only: no production registry/save changes or duplicate real Hero identity.
  const third='fixture-third-hero';
  const d=count===3?{...domain,listHeroDefinitions:()=>[...domain.listHeroDefinitions(),{heroId:third,name:'Fixture'}],getHeroDefinition:id=>id===third?{heroId:third,name:'Fixture',element:'earth'}:domain.getHeroDefinition(id),isHeroUnlocked:id=>id===third||domain.isHeroUnlocked(id),getHeroBaseStats:id=>domain.getHeroBaseStats(id===third?ids[0]:id),getHeroLevel:id=>domain.getHeroLevel(id===third?ids[0]:id),getHeroAllocatedStats:id=>domain.getHeroAllocatedStats(id===third?ids[0]:id)}:domain;
+ if(count===3){d.getHeroSkillProjection=id=>domain.getHeroSkillProjection(id===third?ids[0]:id);}
  ctx.FourSymbolsHeroSystem={getDomain:()=>d};
  vm.runInContext(main.slice(main.indexOf('// Battle-only roster.'),main.indexOf('function getCharacterArtworkPath(')),ctx);
  ctx.FourSymbolsHeroBattle.setRoster([...ids,third].slice(0,count));
@@ -108,4 +109,51 @@ test('Hero damage taken/dealt and healing use same statistics HP deltas',()=>{
  ctx.battleStatisticsBeginAction({type:'monster',monsterIndex:0});h.hp-=10;ctx.battleStatisticsFinishAction();
  const row=ctx.FourSymbolsBattleStatistics.getSnapshot().combatants.find(c=>c.kind==='heroNpc');assert.equal(row.damageDealt,20);assert.equal(row.damageTaken,10);
  const old=h;ctx.initializeHeroBattleCombatants();assert.notEqual(ctx.getPartyCharacterByIndex(3),old);assert.equal(ctx.getPartyCharacterByIndex(3).activeBuffs.length,0);
+});
+
+test('Phase 2B action completion counts MISS, deduplicates incoming hits, preserves death state and resets new battle',()=>{
+ const {ctx,account,original}=runtime(2),h=ctx.getPartyCharacterByIndex(3);
+ const basic={entity:h,entry:{type:'heroNpc'},basicAttackPerformed:true};
+ ctx.finishHeroBattleAction({action:basic});ctx.finishHeroBattleAction({action:basic});
+ assert.equal(h.rage,1);assert.equal(h.phoenixBurnStacks,1);
+ ctx.battleDurationAction={entity:ctx.monsters[0],entry:{type:'monster'}};
+ for(let i=0;i<5;i++)ctx.recordHeroEnemyActionReceipt({target:h,hit:false});
+ ctx.recordHeroEnemyActionReceipt({target:h,damageKind:'reflect',sourceType:'reflect'});
+ h.hp=0;ctx.finishHeroBattleAction({action:ctx.battleDurationAction});
+ assert.equal(h.rage,2);assert.equal(h.phoenixBurnStacks,1);
+ for(const sourceType of ['dot','reflect','self','environment','hpCost','relic']){
+  ctx.battleDurationAction={entity:ctx.monsters[0],entry:{type:'monster'}};
+  ctx.recordHeroEnemyActionReceipt({target:h,sourceType});ctx.finishHeroBattleAction({action:ctx.battleDurationAction});
+ }
+ assert.equal(h.rage,2);h.rage=12;ctx.addHeroBattleRage(h);assert.equal(h.rage,12);
+ ctx.initializeHeroBattleCombatants();assert.equal(ctx.getPartyCharacterByIndex(3).rage,0);assert.equal(ctx.getPartyCharacterByIndex(3).phoenixBurnStacks,0);
+ assert.equal(JSON.stringify(account),original);
+});
+
+test('Phase 2B Vajra passive chooses absolute HP and canonical slot tie; uses named one-round Stealth',()=>{
+ const {ctx}=runtime(2),actor=ctx.getPartyCharacterByIndex(4);
+ Object.assign(ctx,{canApplyNamedPersistentState:(t)=>!t.activeBuffs?.some(b=>b.type==='stealthSkill'),markPersistentStateName:s=>s,emitCombatEvent:()=>{}});
+ for(const i of ctx.getExistingPartyIndexes())ctx.getPartyCharacterByIndex(i).hp=50;
+ ctx.getPartyCharacterByIndex(3).hp=1;
+ ctx.finishHeroBattleAction({action:{entity:actor,basicAttackPerformed:true}});
+ assert.deepEqual(plain(ctx.getPartyCharacterByIndex(3).activeBuffs),[{type:'stealthSkill',turnsLeft:1}]);
+ ctx.getPartyCharacterByIndex(3).hp=50;
+ ctx.finishHeroBattleAction({action:{entity:actor,basicAttackPerformed:true}});
+ const slots=ctx.FourSymbolsBattlefieldSlots,first=slots.getCharacterAtAllySlot(slots.allySlots[0]);
+ assert.equal(ctx.getPartyCharacterByIndex(first).activeBuffs[0].type,'stealthSkill');
+ assert.equal(actor.rage,2);
+});
+
+test('Phase 2B Hero cast uses Core level, Rage only and local burn bonus; invalid targets retain resources',()=>{
+ const {ctx}=runtime(1),h=ctx.getPartyCharacterByIndex(3);h.rage=4;h.phoenixBurnStacks=2;
+ const skill={id:'phoenixCry',name:'火鳳天鳴',element:'fire',category:'magic',targetType:'all',spCost:999,baseDamage:1,burnChance:35,burnDuration:2,burnPercentByLevel:Array(10).fill(5)};
+ ctx.skillDatabase.phoenixCry=skill;
+ Object.assign(ctx,{getEffectiveSkillTargetType:s=>s.targetType,getSkillTargets:()=>[],getMonsterEffectiveStatusResistance:()=>0,
+ calculateSkillDamage:args=>{ctx.skillArgs=args;return 20;},rollNamedPersistentStatusEffect:(_,type,args)=>{ctx.statusArgs=args;return {hit:true};},applyBurnEffect:()=>{},applySkillDebuffEffects:()=>{}});
+ vm.runInContext(decl('castSecondaryCharacterSkill'),ctx);
+ const sp=h.sp;ctx.castSecondaryCharacterSkill(3,'phoenixCry',null);
+ assert.equal(h.rage,4);assert.equal(h.phoenixBurnStacks,2);
+ ctx.getSkillTargets=()=>[0];ctx.castSecondaryCharacterSkill(3,'phoenixCry',null);
+ assert.equal(h.rage,0);assert.equal(h.sp,sp);assert.equal(h.phoenixBurnStacks,0);
+ assert.equal(ctx.skillArgs.skillLevel,5);assert.equal(ctx.statusArgs[0],65);assert.equal(skill.burnChance,35);
 });

@@ -104,7 +104,8 @@ const heroExpression=`(async()=>{
             isHeroUnlocked:id=>id===third||domain.isHeroUnlocked(id),
             getHeroLevel:id=>domain.getHeroLevel(id===third?ids[0]:id),
             getHeroBaseStats:id=>domain.getHeroBaseStats(id===third?ids[0]:id),
-            getHeroAllocatedStats:id=>domain.getHeroAllocatedStats(id===third?ids[0]:id)})};
+            getHeroAllocatedStats:id=>domain.getHeroAllocatedStats(id===third?ids[0]:id),
+            getHeroSkillProjection:id=>domain.getHeroSkillProjection(id===third?ids[0]:id)})};
         FourSymbolsHeroBattle.setRoster([...ids,third].slice(0,count));
         const enemy=MonsterBalance.build({monsterKey:'qa.hero',name:'QA Enemy',level:50,element:'water',archetype:'balanced',rank:'regular',mode:'wild',context:'qa/hero'});
         Object.assign(enemy,{hp:100000,maxHP:100000,sp:1000,maxSP:1000,skillIds:[],skillChance:0,v141SupportSkillIds:[],v132FixedSkillLoadout:true});
@@ -127,6 +128,7 @@ const heroExpression=`(async()=>{
                 battleStatisticsBeginAction({type:'heroNpc',characterIndex:index});Math.random=()=>0;
                 secondaryCharacterNormalAttack(index,0);await new Promise(r=>setTimeout(r,650));battleStatisticsFinishAction();check(enemy.hp<100000,'hero basic damage');
                 const hitHp=enemy.hp;Math.random=()=>.99999;secondaryCharacterNormalAttack(index,0);await new Promise(r=>setTimeout(r,650));check(enemy.hp===hitHp,'hero basic MISS');
+                h.activeBuffs=[]; // Foundation targeting excludes the separately verified Phase 2B Stealth passive.
                 Math.random=()=>.99999;const target=createEnemyActionTargetSnapshot(0,battleToken);Math.random=()=>0;
                 battleStatisticsBeginAction({type:'monster',monsterIndex:0});processSingleMonsterAttack(0,battleToken,target);await new Promise(r=>setTimeout(r,2200));battleStatisticsFinishAction();check(h.hp<hp,'hero incoming damage');
                 const damaged=h.hp;Math.random=()=>.99999;processSingleMonsterAttack(0,battleToken,target);await new Promise(r=>setTimeout(r,2200));check(h.hp===damaged,'hero incoming MISS');
@@ -140,6 +142,35 @@ const heroExpression=`(async()=>{
                 check(buildInitiativeQueue().some(e=>e.type==='heroNpc'&&e.characterIndex===index),'revive initiative');check(createEnemyActionTargetSnapshot(0,battleToken).targets.some(e=>e.character===h),'revive target');check(!resolveEnemyActionTargets(oldSnapshot,'all').targets.some(e=>e.character===h),'old snapshot stays closed');
                 const stats=FourSymbolsBattleStatistics.getSnapshot().combatants.find(c=>c.id===statId);check(stats.damageDealt>0&&stats.damageTaken>0&&stats.criticalHits>0,'hero statistics settlement');
                 h.activeBuffs.push({type:'dodgeSkill',percent:25,turnsLeft:1});check(getPartyBattleStats(index).evasion>=25,'shared Buff projection');h.statusEffects.push({type:'freeze',turnsLeft:1});check(!buildInitiativeQueue().some(e=>e.characterIndex===index),'hard control');
+            }
+            if(count===2){
+                finish();finish=FourSymbolsBattleFlow.interceptActionFinish(()=>{notifyBattleActionFinished();finished++;return true;});
+                const dog=getPartyCharacterByIndex(3),king=getPartyCharacterByIndex(4);
+                for(const i of getExistingPartyIndexes()){const p=getPartyCharacterByIndex(i);p.hp=getPartyBattleStats(i).maxHP;p.activeBuffs=[];p.statusEffects=[];}
+                dog.rage=0;dog.phoenixBurnStacks=0;dog.sp=0;
+                const begin=(type,index)=>{const entry=type==='monster'?{type,monsterIndex:index}:{type,characterIndex:index};beginBattleDurationAction({token:battleToken,index:0,queue:[entry]});battleStatisticsBeginAction(entry);activeBattleCharacterIndex=index;};
+                Math.random=()=>.99999;
+                for(let n=0;n<4;n++){begin('heroNpc',3);secondaryCharacterNormalAttack(3,0);await new Promise(r=>setTimeout(r,700));}
+                check(dog.rage===4&&dog.phoenixBurnStacks===4,'MISS basic Rage and Hongbao stacks');
+                begin('heroNpc',3);queuedPlayerActions[3]={action:'normal',target:0};Math.random=()=>0;resolveQueuedPlayerAction(3,battleToken);
+                await new Promise(r=>setTimeout(r,2300));check(dog.rage===0&&dog.phoenixBurnStacks===0&&dog.sp===0,'forced Core skill uses four Rage only');
+                check(enemy.statusEffects.some(s=>s.type==='burn'),'Hero Phoenix shared Burn');
+                for(const [sourceType,damageKind] of [['dot','dot'],['reflect','reflect'],['self','self'],['environment','environment']]){
+                    begin('monster',0);settleBattleHpDamage(dog,1,{attacker:enemy,sourceType,damageKind});notifyBattleActionFinished();
+                }
+                check(dog.rage===0,'excluded damage never grants Rage');
+                dog.activeBuffs=[];Math.random=()=>.7;const snapshot=createEnemyActionTargetSnapshot(0,battleToken);check(snapshot.primary.index===3,'Phase 2B enemy primary');
+                begin('monster',0);Math.random=()=>.99999;processSingleMonsterAttack(0,battleToken,snapshot);await new Promise(r=>setTimeout(r,2300));check(dog.rage===1,'enemy MISS Rage');
+                dog.activeBuffs=[markPersistentStateName({type:'shield',remaining:100000,turnsLeft:2},'shield')];const shieldHp=dog.hp;
+                begin('monster',0);Math.random=()=>0;processSingleMonsterAttack(0,battleToken,snapshot);await new Promise(r=>setTimeout(r,2300));check(dog.hp===shieldHp&&dog.rage===2,'fully absorbed hit Rage');
+                dog.hp=0;const retained=dog.rage;activeBattleCharacterIndex=0;player.sp=1000;castReviveSkill('revive',3);await new Promise(r=>setTimeout(r,2300));check(dog.hp>0&&dog.rage===retained,'death revival retains Rage');
+                player.hp=1;king.rage=0;begin('heroNpc',4);Math.random=()=>.99999;secondaryCharacterNormalAttack(4,0);await new Promise(r=>setTimeout(r,700));
+                check(hasNamedPersistentState(player,'stealthSkill')&&king.rage===1,'Vajra lowest HP Stealth on MISS');
+                check(!canSelectHostileBattlePrimary('player',0,'single'),'Stealth targeting');consumeRoundEndDurations();check(!hasNamedPersistentState(player,'stealthSkill'),'Stealth one Round End');
+                king.rage=4;king.sp=0;enemy.hp=100000;begin('heroNpc',4);queuedPlayerActions[4]={action:'normal',target:0};Math.random=()=>0;resolveQueuedPlayerAction(4,battleToken);
+                await new Promise(r=>setTimeout(r,2300));check(king.rage===0&&king.sp===0&&enemy.hp<100000,'Hero Wind skill shared damage');
+                for(const index of [3,4]){const path=getCharacterBattleArtworkPath(getPartyCharacterByIndex(index));const image=new Image();image.src=path;await image.decode();check(image.naturalWidth===1086&&image.naturalHeight===1448,'lossless portrait canvas');check(document.getElementById('battlePlayerCard'+index).textContent.includes('怒氣'),'live Rage HUD');}
+                initializeHeroBattleCombatants();check(getPartyCharacterByIndex(3).rage===0&&getPartyCharacterByIndex(3).phoenixBurnStacks===0,'fresh battle transient reset');
             }
             check(JSON.stringify(system.getDomain().serialize())===accountBytes,'battle state cannot mutate Hero Save');
             saveGame();const saved=JSON.parse(localStorage.getItem('four_symbols_save:skill-runtime-browser-qa'));check(JSON.stringify(saved.heroAccount)===accountBytes,'real save Hero isolation');check(Object.keys(saved.allyFormation.characterIndexToSlot).every(k=>Number(k)<3),'save excludes transient Hero slots');
