@@ -1,6 +1,6 @@
-# 《四象江湖傳》Cloud Account / Cloud Save 整體進度
+PARTIAL / 玩家價值驗收未完成 |PARTIAL / 玩家價值驗收未完成 |PARTIAL / 玩家價值驗收未完成 |PARTIAL / 玩家價值驗收未完成 |PARTIAL / 玩家價值驗收未完成 |# 《四象江湖傳》Cloud Account / Cloud Save 整體進度
 
-本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
+本文件記錄產品里程碑與已驗收能力；個別工程即時 Head／CI／部署／結案由其 Work PR 擁有。Cloud 產品定位、Authority Ceiling 與開工 Gate 唯一 Owner 是 `DATA_SECURITY_CONTRACTS.md`。下列日期條目保留當時施工證據；其中 candidate／pending／Next 不構成現在的施工指令，後續結果以對應 PR 交叉核對。
 
 ## 2026-09-27 — atomic daily check-in candidate; Phase 4 0/6 VERIFIED
 
@@ -60,20 +60,9 @@
 - Candidate source at base was `battle_full_version_save_v5` while the immutable copy came from `four_symbols_save:<UID>`. Candidate submission is being changed to an explicit sealed backup ID and raw bundle with SHA-256 consistency checks. Previously submitted unbundled history remains untrusted and blocked; this does not accept a character. The backup inventory also adds the previously omitted `patrol-character-index` preference.
 - Old Phase 1–3 acceptance evidence remains historical. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**. The grant reservation candidate is a partial prerequisite, not an awarded balance and not Phase 5–7 completion. A passing CI or Firebase deploy cannot certify full character restore.
 
-### Dependency order (preserving original Phase 4–10 history above)
+### Current dependency order
 
-1. Foundation A: persisted-state registry, sealed backup manifest and source unification.
-2. Foundation B: canonical server character schema and materialized playable snapshot design.
-3. Foundation C: operation ID, idempotency, receipt, ledger, expected revision and transaction implemented **together with the first balance/EXP/item mutation**. Old Phase 6/7 cannot wait until after old Phase 5 award writes.
-4. Foundation D: server-issued run/attempt and reward settlement sources.
-5. Foundation E: durable server backup, recovery points and audited restore (old Phase 8 moves ahead of migration acceptance).
-6. Foundation F: one-time local-history acceptance with explicit owner confirmation and claim blocking.
-7. Foundation G: complete schema and claims gate `authoritativeStateReady:true` only after restore rehearsal.
-8. Foundation H: fresh-device full-character recovery acceptance (old Phase 4 success gate).
-9. Foundation I: payment/refund entitlements (old Phase 9).
-10. Foundation J: destructive/disaster/multi-device tests throughout and final release gate (old Phase 10).
-
-`docs/OFFLINE_AUTHORITY_POLICY.md` and `docs/CLOUD_CANONICAL_SCHEMA_AND_RECOVERY.md` specify the provisional offline paths and restoration gates. The owner-provided Google Cloud Console Disaster Recovery screenshot on 2026-09-26 (Asia/Taipei) shows PITR disabled, scheduled backups disabled and no displayed backups for `(default)`; no disaster restore has been rehearsed. Firestore region remains unverified. App Check enforcement, Google guest linking and WIF are unimplemented; an anonymous→Google UID-switch guard is implemented but link/merge remains unavailable.
+依 G 節的完整 Cloud Save 玩家價值順序施工；舊 Foundation D 的 Server Battle successor 指引已停止適用。保留既有來源、receipt／ledger／revision 與失敗關閉 Gate，不以 Phase 編號強制延後必要安全相依。
 
 ## 2026-09-25 — Historical reward-claim proof gate (candidate)
 
@@ -120,14 +109,14 @@
 | 2 | Cloud Save Skeleton（雲端存檔骨架） | COMPLETE / 6/6 VERIFIED |
 | 3 | UID Local Isolation / Login Loading（本機隔離／登入載入） | COMPLETE / 6/6 VERIFIED |
 | 4 | General Progress Migration（一般進度遷移） | IN PROGRESS / 0/6 VERIFIED |
-| 5 | High-value Data Backend Authority（高價值資料後端權威） | NOT STARTED |
-| 6 | Operation ID / Idempotency / Atomic Transaction | NOT STARTED |
-| 7 | Audit / Economy Ledger（稽核／經濟帳本） | NOT STARTED |
-| 8 | Snapshot / Backup / Recovery（快照／備份／復原） | NOT STARTED |
+| 5 | High-value Data Backend Authority（高價值資料後端權威） | PARTIAL / 玩家價值驗收未完成 |
+| 6 | Operation ID / Idempotency / Atomic Transaction | PARTIAL / 玩家價值驗收未完成 |
+| 7 | Audit / Economy Ledger（稽核／經濟帳本） | PARTIAL / 玩家價值驗收未完成 |
+| 8 | Snapshot / Backup / Recovery（快照／備份／復原） | PARTIAL / 玩家價值驗收未完成 |
 | 9 | Payment / Refund Entitlement（付款／退款權益） | NOT STARTED |
-| 10 | Destructive / Multi-device / Recovery Testing（破壞性／多裝置／復原測試） | NOT STARTED |
+| 10 | Destructive / Multi-device / Recovery Testing（破壞性／多裝置／復原測試） | PARTIAL / 玩家價值驗收未完成 |
 
-既有 UID local repository、唯讀 cloud reader、migration candidate 等是前置實作，**不代表 Phase 2–10 已驗收完成**。Phase 1 使用交易不代表 Phase 6 全部完成。
+Phase 1–3 保留既有驗收結果。Phase 4 維持 **0/6 VERIFIED**；Phase 5–8／10 已有有限實作與測試，但不等於完整資產權威、復原或多裝置驗收。Phase 9 payment/refund entitlement 未實作。
 
 ## 2026-09-24 character-authority audit (next engineering gate)
 
@@ -149,7 +138,7 @@
 - 程式 PR [#335](https://github.com/tf00913225-alt/my-game/pull/335) 已在兩組 CI 全綠後合併 `dev`。實作 commits：`3d2434fd1323ea175333868cd8d51871a6f4a69a`、`d413304550f015dc164152d1e0229dd68dcdd95b`；merge commit：`b105f5329d95874820202b6ade78254712200d5e`。未修改 `main`。
 - **目前驗收狀態：COMPLETE / 5/5 VERIFIED。** Rules IAM 403 已解除；真實 Firebase 七支 Functions／Rules 部署及同 UID 雙手機 takeover 驗收已有下列證據。Phase 1 完成不等於完整雲端存檔已完成。文件 PR、最後 dev CI／部署、main PR 與正式部署屬本次發布鏈，須各自核對最新 SHA，不能以功能驗收代替發布驗證。
 
-### 2026-09-19 正式驗收結案證據（目前狀態）
+### 2026-09-19 正式驗收結案證據（歷史狀態）
 
 - **發布檢查修復回流：** main PR #342 的 run `35441331170` 抓到 `tests/critical-feature-budget.test.js` 過期的 5 個 Firebase 模組預期；Phase 1 已正式納入兩個 session 模組，實際為 7。於最新 `dev@10a2decd213cc061e8820fbfd5b01e4ad4d386f4` 開 fix 分支，精準測試先重現再修正通過；大小／hash／feature 邊界斷言保留，不改正式程式。後續修復 PR、最終 dev／main SHA 和各工作流程結果統一記錄於 [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341)，不把前一 dev 的成功紀錄當成修復後證據。
 - **已部署驗收基準 SHA：** `342ef104fa2897f5ae5c3249e0c75c9efca3e762`，為本次收尾開始時 GitHub 最新 dev，非沿用未核對的舊 SHA。
@@ -276,10 +265,10 @@
 
 ## D. Remaining Work（尚未完成）
 
-1. Phase 1 功能驗收已完成；本次結案文件仍須 PR → Repository checks SUCCESS → merge dev，然後核對最新 dev 的 CI、DEV deployment、Session Authority emulator 與 Firebase deploy，逐一記錄實際 SHA。
-2. 使用者已授權 dev → main 發布；只有上述最新 dev 驗證成功，且 main←dev 比較無獨立修復、素材分支混入或機密，才可建立及合併受保護發布 PR。正式部署、登入及無 DEV 測試區亦須獨立驗證。完成結果寫入[結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 永久發布記錄，不預填成功。
-3. Artifact Registry 清理政策本身仍有非阻塞警告，保留維運追蹤；不以 Deploy complete 推定政策設定成功。
-4. Phase 3 已完成；Phase 4 偏好設定試驗已部署但整批仍 0/6 VERIFIED，手機取回確認操作已通過，跨裝置 QA 未完成；Phase 5–10 仍 NOT STARTED。真正的換機角色恢復需要後端對等級、EXP、金幣、背包、裝備與領獎狀態建立可信權威與遷移策略；不能整包採納本機 gameplay payload 或把偏好測試當作正式角色存檔。
+- 完整 canonical 欄位與 ongoing backend write path：目前僅 server-created 首角色與有限 check-in／potion／EXP 等操作，尚無完整多角色、Hero、技能／資產／全部進度權威。
+- 完整 playable projection、正式 reader／publication、one-time legacy acceptance、遊戲級可選 restore point／完整災難還原、第二手機及 takeover 後完整角色恢復、離線重新連線衝突驗收仍未完成。
+- 資料庫備份不能代替遊戲級 claim／receipt／支付權益保留與 restore rehearsal。現有 restricted recovery 僅為未發布 server-created 首角色的 current revision 新修訂恢復，不能宣稱完整存檔回復。
+- 歷史 Phase 1 main 發布授權與流程是已往工程紀錄，不授權本次或後續 dev → main。版本以 `release/release.json` 為準。
 
 ## E. Architecture Decisions（永久決策）
 
@@ -290,7 +279,7 @@
 | Single Active Session | 每 UID 只有一個 activeSession；Firebase identity 之外，所有 protected operations 必須驗證 current session；trusted backend 為最終權威 |
 | Cloud Authoritative | 正式進度以雲端為準；local 僅 cache／temporary／offline candidate；禁止以較新 local timestamp 整份覆蓋 cloud |
 | UID Isolation | 本機／雲端資料均明確綁定 UID；A 登出／B 登入不得继承 A 正式資料；UID 必須由驗證身分取得 |
-| Trusted Backend | 金幣、EXP、等級、物品、裝備、秘寶、獎勵、合成、商店、付款／退款等最終由後端驗證／計算，browser 只提意圖 |
+| Trusted Backend | 正式持久化資產與獎勵由後端驗證意圖、來源及 bounded delta；普通戰鬥仍 Client-simulated，依 DATA_SECURITY_CONTRACTS.md |
 | Revision | 正式資料採用 server-owned monotonic revision 做並行控制；本次 session revision 與 save serverRevision 是不同領域，不互相代替 |
 | schemaVersion | 每個持久化 schema 都有明確版本，需具相容／遷移策略；不可把 legacy save version 當 cloud schema |
 | serverTimestamp | 正式提交／建立／撤銷時間由 server 決定；local 時間不授權、不決定正式先後 |
@@ -303,7 +292,7 @@
 
 - **高：** 現有 browser 可改本機金幣／EXP／物品等；舊 A 仍可操作本機遊戲，但無權經新的 protected backend 寫正式雲端。未遷移的 gameplay 不能宣稱已防作弊。
 - **高：** 部分 sidecar key／in-memory singleton 固定於首次 UID，現有 startup 切換帳號未統一 reload/reset 全部 owner；核心 save guard 可降低風險，Phase 3 仍須獨立稽核與實測。
-- **高：** `DATA_SECURITY_CONTRACTS.md` 仍不存在；本次七支 Functions／Rules／部署身分已有實際證據，但不等於所有 Firebase 設定或 providers 皆已稽核。repository CORS 不是授權；不可用它取代 session check。
+- **歷史缺口已補齊：** `DATA_SECURITY_CONTRACTS.md` 已存在並擁有 Cloud 產品邊界；本次七支 Functions／Rules／部署身分已有實際證據，但不等於所有 Firebase 設定或 providers 皆已稽核。repository CORS 不是授權；不可用它取代 session check。
 - **已解除的歷史阻塞：** Firebase Rules IAM 403 與本次七支函式部署阻塞已解除，證據見上方。每次後續部署仍須核對實際 SHA 與結果，不能只凭 GitHub merge 宣稱後端已更新。
 - **低／維運追蹤：** Artifact Registry 清理政策仍有設定警告；部署已 SUCCESS，政策本身未 VERIFIED，後續需另行查驗，不於本次擴充 IAM 權限。
 - **高：** 未實作 App Check／全面 rate limit／經濟後端；session bearer 在同 origin JS 可讀，XSS／被複製 credential 不屬硬體防複製機制。新增裝置不能只靠 local deviceId 判斷。
@@ -346,21 +335,28 @@ await FourSymbolsFirebase.protectedTest() // {result:"SUCCESS",uid,sessionId,rev
 
 Wire callable 名稱是 `protectedTest`（本文 protected-test 的正式 Firebase 名稱），不修改 game save，也不建立角色。payload UID 必須等於驗證身分；session 欄位包含 uid、sessionId、credential、schemaVersion。成功事件／狀態不是將來受保護寫入的通行證，每次仍需 transaction 驗證。
 
-## G. Next Safe Step（每次結束必更新）
+## G. Next Safe Step
 
-Current Foundation D continuation (2026-10-07): PR #817 completed private restricted terminal resource closure; its durable closeout confirms merge/deployment/cleanup. Work ID `CLOUDSAVE-TERMINAL-SOURCE-READER-20261007` adds the original Owner's protected historical terminal source reader as the prerequisite for a separately gated outcome successor. Exact transaction and authority boundaries are owned by `CLOUD_OPERATION_SETTLEMENT_CONTRACT.md`, section Protected terminal successor source reader. Execution/CI/merge status belongs to this Work ID's PR. Next: verify that reader with existing regression/emulator gates and integrate dev; then establish full supported outcome policy before any outcome authority or once-only reward settlement. Phase4 remains 0/6; legacy admission and second-device character recovery remain closed. The historical Phase 1 publication steps below do not authorize this work to publish main; routing follows current `AGENTS.md`.
+2026-10-07 盤點基準：`dev@7e0a4e630c8134241d9daaa1b5733424cf213714`。Phase 4 **IN PROGRESS / 0/6 VERIFIED**；`authoritativeStateReady:false`。完整換機恢復未完成。
 
-**Phase 1 功能驗收 COMPLETE / 5/5 VERIFIED；Phase 2 為 COMPLETE / 6/6 VERIFIED；Phase 3 為 COMPLETE / 6/6 VERIFIED。**
+已存在：Session／UID 隔離／envelope；canonical assembler 與 server-created 首角色 callable/client creation path；有限 unpublished check-in／potion／shared EXP operation receipts／ledger；完整原始 migration candidate bundle 與 read-only screening；snapshot/archive 及 restricted current-revision operator recovery。這些不是 legacy admission 或 full playable Cloud Save；Hero 尚未有 canonical authority mapping。
 
-1. 先讀本文件、`AGENTS.md`、`ARCHITECTURE_RULES.md`、`SYSTEM_CONTRACTS.md`、`docs/BOOT_ARCHITECTURE.md`、本次 Requirement Batch。
-2. 看 `functions/src/session-authority.js`、`functions/index.js`、`js/firebase/session-client.js`、`firebase-session.js`、兩個 Firebase client owners 與 `firestore.rules`。
-3. [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 先以 CI 全綠合併 dev，再核對該最新 SHA 的 Repository checks、DEV 與 Firebase 部署；把最終 dev SHA／run／job 記錄於結案 PR。
-4. 比較 main←dev，完成受保護 PR 與正式部署驗證；把 main SHA、production deployment 及登入／DEV 測試區隔離結果記入永久發布記錄。任一發布環節未完成，整次任務仍回報 NOT COMPLETE。
-5. Phase 2 已以真實 Google 帳號在手機 Chrome 完成 Version 2／Revision 1／重複 bootstrap 不增 Revision／無 gameplay payload 驗證。ChatGPT 內建瀏覽器曾使 Google OAuth 不完整，不作為後端失敗證據；後續登入驗收必須使用完整瀏覽器或正式 App Auth surface。
-6. Phase 3 已完成自動與真實手機隔離驗收。Phase 4 下一步手機 Chrome 同一 Google UID 的「取回」已顯示成功，彈窗改為「取消／套用雲端設定」並待新標籤上線確認；另一台裝置上不得為了測試局部偏好而建立／覆蓋角色。接著設計並實作可信角色／資產後端與舊存檔遷移，先確定首次採納與衝突策略，再做跨手機角色恢復測試；不得把本機存檔直接升格為雲端權威或整包覆蓋 Phase 2 Envelope。
-7. 不修改戰鬥／VFX／UI、經濟／背包／秘寶、支付或 gameplay save owner，禁止 local overwrite 與無關 refactor。禁止直接修改 main／dev。
+資料庫證據：同 SHA Session Authority [run 37589236566](https://github.com/tf00913225-alt/my-game/actions/runs/37589236566)／deploy job `112688096649` SUCCESS；Firestore `(default)` region `asia-east1`，PITR enabled，matching READY backups 7，latest observed snapshot `2026-10-07T06:24:56.156362Z`（臺北14:24:56），expiry `2026-10-14T06:24:56.156362Z`。Schedule query 與完整 restore rehearsal **UNVERIFIED**；不得由備份存在推定遊戲還原通過。Functions region `us-central1`。
 
-官方技術依據：[Callable 身分驗證](https://firebase.google.com/docs/functions/callable)、[Firebase auth_time／撤銷檢查](https://firebase.google.com/docs/auth/admin/manage-sessions)、[Firestore 原子交易與重跑](https://firebase.google.com/docs/firestore/manage-data/transactions)。
+PR #817 terminal closure、PR #820 terminal reader 已完成，不能重做或再當 pending。Server Battle 工程依中央契約 **FREEZE**，保留其證據／tests／保護，不延伸 full server outcome／round／skills／Hero／Boss／reward authority。
+
+下一條獨立施工線先做完整 canonical source coverage 與 snapshot 缺口盤點，從即時 dev／有效 PR 依 AGENTS 續接；治理文件合併不等於授權直接開啟所有 Runtime 步驟。後續最多八步：
+
+1. 完整 canonical 資料與 gameplay-critical registry mapping（多角色、技能、Hero、formation、資產、進度、claims），定義來源與缺失 blocker。
+2. 完整 bounded playable snapshot 與必要 backend ongoing write paths；revision／receipt／ledger／claim 原子一致，維持 unready。
+3. 獨立 durable backup／遊戲 recovery point 與 audited restore rehearsal，保留後續操作／唯一 claims／entitlements。
+4. 原裝置 immutable backup＋screening＋明確 owner-confirmed one-time migration acceptance transaction，不因結構有效信任歷史獎勵。
+5. 完整性及復原 Gate 通過後才實作 publication／reader 與 `authoritativeStateReady:true`。
+6. 空白第二手機同 UID 完整恢復，逐欄位 parity 與未建立 slots=null 驗收。
+7. takeover 後新裝置完整恢復與正式寫入、舊 session 拒絕；offline reconnect／stale conflict／lost-response／corruption recovery 驗證。
+8. 依 Offline Policy 做 Attempt/Ticket＋bounded once-only settlement；高價值／支付依自己的正式 Gate，不擴張 Server Battle Engine。
+
+讀取路由由 `AGENTS.md` 控制；個別 PR 保存 Latest Head／CI／Next。歷史 Phase 1 發布鏈不作現在 Next。
 
 ## 2026-10-02 — CLOUDSAVE-CHECKIN-SOURCE-SNAPSHOT-20261002 (candidate)
 
