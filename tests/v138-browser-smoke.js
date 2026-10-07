@@ -178,11 +178,12 @@ async function seedParty(page){
 
         const setDisplay=await page.evaluate(()=>{
             const makePiece=(name,slot)=>({
-                id:"test"+slot,
+                id:"setEarth_"+({head:"helm",hand:"blade",armor:"heavyArmor"}[slot]),
                 name,
                 icon:"◇",
                 type:slot==="hand" ? "weapon" : slot,
                 setId:"setEarth",
+                setVariant:"attack",
                 stats:{}
             });
             characterEquipment.fire.head=makePiece("岩岳盔","head");
@@ -195,9 +196,9 @@ async function seedParty(page){
                 inactive:document.querySelector(".v132-set-bonus.inactive")?.textContent||""
             };
         });
-        assert.equal(setDisplay.title,"[岩岳]3/5");
-        assert.match(setDisplay.active,/全能力\+1.*已啟動/);
-        assert.match(setDisplay.inactive,/土元素技能傷害\+2%.*未啟動/);
+        assert.equal(setDisplay.title,"[岩岳•攻]3/5");
+        assert.match(setDisplay.active,/全能力\+5.*已啟動/);
+        assert.match(setDisplay.inactive,/土元素技能傷害\+5%.*未啟動/);
 
         const confirmation=await page.evaluate(async()=>{
             closeItemModal();

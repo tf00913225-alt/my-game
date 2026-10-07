@@ -218,7 +218,7 @@
 ## Hit / Evasion Percentage-Point V2（2026-10-02）
 
 - Base Hit Chance = 95%；Base Extra Accuracy = 0%；Base Evasion = 0%。Accuracy 10% 直接令 Final Hit Chance +10%；Evasion 10% 直接令 Final Hit Chance -10%。同一 Hit Owner 最後 clamp 5%～99%；Wind EX 殘血額外 Final Evasion +50%，沿用上述角色來源投影。等級與等級差不影響 Hit / Evasion；普通／精英／Boss 不因等級派生閃避。風系四象塔明確 +8% 保留。
-- 四象鎧甲／袍 Base Evasion +10%，同系列 3 件套額外 Evasion +2%；其他能力不變，不新增普通裝備／重鑄詞條池。
+- 四象裝備正式數值 Owner：`js/27-v132-content-expansion.js::EQUIPMENT_SET_PIECES`／`normalizeEquipmentSetItem()`；四元素各攻／法五件，Lv20 且本元素限定。刀／扇攻擊／智力 +30；鎧甲／袍防禦能力值 +25、敏捷 +5；靴／履攻擊／智力 +20、防禦能力值 +10；盔／冠攻擊／智力 +25、體質 +5；護腕／法環攻擊／智力 +25。攻／法各自計件，三件六圍各 +5，五件僅對應元素直接技能傷害 +5%（含技能追擊，不含普攻、其他元素或間接傷害）。舊基礎負體質／閃避／抗暴／異常抗性退場；既有物品基礎資料在既有同步／hydrate 路徑更新，重鑄／鑲嵌保留。後載模組只委派同一 Owner，不再加減補正。
 - 裝備單位遷移唯一 Owner：`functions/src/equipment-combat-percent-migration.js`；App Shell 在主 Runtime 前載入，同一實作供後端 review projection 使用。`equipmentCombatPercentUnitVersion:2` 是每件裝備的單位標記，stats/reforgeStats 一起原子遷移且重複載入不再換算。
 - 開工 dev 所有正式裝備 Accuracy 來源只有四象 armor/robe Base 10 與 V1 Spirit mapping；沒有普通生成／重鑄 Accuracy pool。無版本裝備先分離明確四象 Base 10→Evasion 10，剩餘舊 Equipment Accuracy 按 legacy point unit ×0.15 換算；尚存在 Spirit 時每點直接 +0.3% Accuracy/+0.1% Anti-Crit/+0.05% Status Resistance，再移除 Spirit。新定義／生成装備明確標记版本 2。不得將此遷移用於角色、怪物、技能或 Buff Accuracy。
 - 本機／雲端 snapshot 經既有 hydrate/normalize 入口投影；候選與原始 Archive 的 raw bytes、hash、UID、revision 與信任狀態不改寫。後端 review ownedItem 只對副本遷移，不授予權威、不修改原始證據。

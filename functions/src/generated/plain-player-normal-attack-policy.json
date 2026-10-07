@@ -44,7 +44,7 @@
     "getElementalDamageMultiplier": "3df36c3b8c659b734f7b1f570ec23e5ac6a9ec6f456d5b785d503b1acf16e221",
     "getDamageContextAttacker": "e3e788dd78069373c3ca8e57423b351da685d8c9e9ab4de8fb100fb009958dc6",
     "getBattleDamageSource": "4531126b9f0a87182e1bf0b1833ecbc6b8aa5bba8b22d9b3433380d3632de62e",
-    "getOrdinaryDamageBonusPercent": "8e38e7e7c73c320d48be13aa44b3a684c038b35ebd696bde56ee9030d793c905",
+    "getOrdinaryDamageBonusPercent": "011fee64721bb150f35ebad3a3430e34c3d681c20592485b7a9d38453e61364b",
     "getOrdinaryDamageMultiplier": "6e8161c69076be254b07622655730acddbd0cb314b7ce077b2236fe38e974c34",
     "isPartyDamageTarget": "544b1a6fb5cec0c118e20c9fe18b3e8f4965406a93eb80c0c7ac53223bb98fcc",
     "getEnemyPressureMultiplier": "0728e490b226507a4735274af9257f155214aa2554f3a20905696ae6c2e16b48",
@@ -56,7 +56,7 @@
     "getCriticalStatPoints": "a724e18b459ffd1b795f03adfc173098bee52dbbd3ec45ede1f0b6c1e328bb0f",
     "rollCritical": "e46af562d803324a60e8e1b068db35d68dc6f38fc772dd6c64c7255c1c3c0e46"
   },
-  "rulesSha256": "980862b7a3c92ec5b4f71dc122a13299637f79f1f011bbda4328293797b95c41",
+  "rulesSha256": "3e99a005a1626a2cbd2de0915aaea08412bc86dc2392e8e7d1c500bfef8a9d83",
   "combatRulesReady": false,
   "outcomeVerified": false,
   "rewardEligible": false

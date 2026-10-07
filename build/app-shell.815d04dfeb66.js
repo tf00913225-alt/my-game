@@ -2399,7 +2399,9 @@ const characterEquipment = {
 
 function migrateLegacyEquipmentStats(item){
     if(!item||typeof item!=="object"){ return item; }
-    return window.FourSymbolsEquipmentCombatMigration.migrateItem(item);
+    window.FourSymbolsEquipmentCombatMigration.migrateItem(item);
+    return typeof window.v132NormalizeEquipmentSetItem==="function"
+        ?window.v132NormalizeEquipmentSetItem(item):item;
 }
 
 function normalizeEquipmentSlots(equipment){
@@ -12823,6 +12825,11 @@ function getOrdinaryDamageBonusPercent(options){
     const relic=window.v174RelicDamageModifiers;
     if(relic&&typeof relic.ordinaryBonus==="function"){
         total+=Number(relic.ordinaryBonus(attacker,getBattleDamageSource(resolved)))||0;
+    }
+
+    if(skill&&(resolved.damageKind||"direct")==="direct"&&["activeSkill","followUp"].includes(getBattleDamageSource(resolved))&&
+        typeof window.v132GetEquipmentSetSkillDamageBonusPercent==="function"){
+        total+=window.v132GetEquipmentSetSkillDamageBonusPercent(attacker,skill);
     }
 
     if(attacker&&typeof getElementDamagePassiveMultiplier==="function"){

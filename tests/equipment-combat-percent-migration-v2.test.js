@@ -39,16 +39,19 @@ const statFunction=inventorySource.split("\n").find(line=>line.startsWith("funct
 const ui=vm.runInNewContext('const num=v=>Number.isFinite(Number(v))?Number(v):0;'+statFunction+';statText');
 assert.equal(ui({stats:{accuracy:1.5,evasion:10},reforgeStats:{accuracy:0.3,evasion:2}}),"命中 +1.8%　閃避 +12%","numeric reforge aggregation precedes the display suffix");
 const setSource=fs.readFileSync("js/equipment-progression.js","utf8");
-const setConstants=setSource.slice(setSource.indexOf("    const SET_RULES="),setSource.indexOf("    const SHOP_STORAGE_KEY="));
-const setOwner=setSource.slice(setSource.indexOf("    function setPieceKey("),setSource.indexOf("    /*\n       First-character equipment"));
-const applySet=vm.runInNewContext(setConstants+setOwner+";applySetRule",{migrateLegacyEquipmentStats:migrateItem});
+const expansion=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
+const setConstants=expansion.slice(expansion.indexOf("    const EQUIPMENT_SET_PIECES="),expansion.indexOf("    const equipmentSetItemDefinitions="));
+const setOwner=setSource.slice(setSource.indexOf("    function addOrangeClass("),setSource.indexOf("    /*\n       First-character equipment"));
+const ctx={window:{},migrateLegacyEquipmentStats:migrateItem};
+vm.runInNewContext(setConstants,ctx);
+ctx.window.v132GetContentDefinitions=()=>({equipmentSetItems:[...['setFire','setWater','setEarth','setWind'].flatMap(setId=>['heavyArmor','robe'].map(key=>({id:setId+'_'+key,setId})))]});
+const applySet=vm.runInNewContext(setOwner+";applySetRule",ctx);
 for(const setId of ["setFire","setWater","setEarth","setWind"]){
     for(const suffix of ["heavyArmor","robe"]){
         for(const stats of [{accuracy:10,spirit:10,antiCrit:0.5,statusResistance:0.25},{accuracy:30,antiCrit:1.5,statusResistance:0.75}]){
             const item={id:setId+"_"+suffix,setId,stats};applySet(item);applySet(item);
-            assert.equal(item.stats.evasion,10);assert.equal(item.stats.accuracy,3);
-            assert.equal(item.stats.antiCrit,1.5,"set normalization preserves migrated Spirit anti-crit");
-            assert.equal(item.stats.statusResistance,0.75,"set normalization preserves migrated Spirit resistance");
+            assert.deepEqual(JSON.parse(JSON.stringify(item.stats)),{defensePoints:25,agility:5},"new base replaces retired extras exactly");
+
         }
     }
 }

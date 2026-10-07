@@ -128,6 +128,7 @@ test("既有存檔與已穿戴套裝會同步取得新版圖示",()=>{
     };
     context.window=context;
     vm.createContext(context);
+    vm.runInContext(content.slice(content.indexOf("    const EQUIPMENT_SET_PIECES="),content.indexOf("    const equipmentSetItemDefinitions=")),context);
     vm.runInContext(polish,context,{filename:"js/41-v146-system-polish.js"});
     assert.equal(inventoryItems[0].icon,"NEW_ATTACK_ICON");
     assert.equal(equipped.icon,"NEW_ATTACK_ICON");
