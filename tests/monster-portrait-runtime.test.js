@@ -209,3 +209,21 @@ const sharedEntries=realSharedRegistry.assetPool.entries.filter(e=>e.assetClass=
     assert.equal(runtime.context.v154ResolveMonsterPortraitRecord({portraitKey:e.assetId}).path,null,'adopted without derivative cannot resolve');
 }
 console.log('Shared portrait reserved / explicit-only / Content identity isolation passed.');
+
+(async()=>{
+    const adopted=structuredClone(realSharedRegistry);
+    const entry=adopted.assetPool.entries.find(e=>e.assetClass==='shared-npc');
+    entry.status='adopted';entry.runtimePath='assets/characters/npcs/test-shared.webp';
+    const runtime=loadRuntime([]);
+    runtime.context.fetch=async()=>({ok:true,json:async()=>adopted});
+    runtime.context.FourSymbolsFeatures={ensureAssets:async()=>{}};
+    const actors=[{name:'主線人物',portraitKey:entry.assetId},{name:'活動人物',portraitKey:entry.assetId}];
+    const ready=await runtime.context.v154PreparePortraitsForEncounter(actors);
+    assert.equal(ready.state,'ready');
+    assert.deepEqual(actors.map(actor=>actor.name),['主線人物','活動人物'],'encounter preparation preserves each Content identity');
+    runtime.context.FourSymbolsFeatures.ensureAssets=async()=>{throw new Error('decode failed');};
+    const failed=await runtime.context.v154PreparePortraitsForEncounter(actors);
+    assert.equal(failed.state,'failed','decoder failure is explicit, not random shared art');
+    assert.equal(failed.paths.length,0);
+    console.log('Shared portrait encounter preparation / decode failure passed.');
+})().catch(error=>{console.error(error);process.exitCode=1;});
