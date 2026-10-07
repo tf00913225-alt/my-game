@@ -150,7 +150,7 @@ test("manual active character highlight is unique and cleared for per-character 
   assert.match(beginBlock,/const autoOn=[\s\S]*?getPartyAutoConfig\(activeBattleCharacterIndex\)\.enabled/);
   assert.match(beginBlock,/clearActiveCharacterHighlight\(\);[\s\S]*?if\(!autoOn\)\{[\s\S]*?updateActiveCharacterHighlight\(\)/);
 
-  const cards=Array.from({length:3},()=>{
+  const cards=Array.from({length:6},()=>{
     const classes=new Set();
     return {classList:{remove:name=>classes.delete(name),toggle:(name,on)=>on?classes.add(name):classes.delete(name),contains:name=>classes.has(name)}};
   });
@@ -159,12 +159,13 @@ test("manual active character highlight is unique and cleared for per-character 
   const clearBody=main.match(/function clearActiveCharacterHighlight\(\)\{[\s\S]*?\n\}/)?.[0];
   const updateBody=main.match(/function updateActiveCharacterHighlight\(\)\{[\s\S]*?\n\}/)?.[0];
   assert.ok(clearBody&&updateBody,"canonical highlight functions must remain extractable");
-  const clear=new Function("$",`${clearBody};return clearActiveCharacterHighlight;`)($);
+  const clear=new Function("$","getExistingPartyIndexes",`${clearBody};return clearActiveCharacterHighlight;`)($,()=>cards.map((_,index)=>index));
   const update=new Function("$","getIndex",`${updateBody.replaceAll("activeBattleCharacterIndex","getIndex()")};return updateActiveCharacterHighlight;`)($,()=>activeBattleCharacterIndex);
   const active=()=>cards.map((card,index)=>card.classList.contains("active-turn")?index:null).filter(index=>index!==null);
 
   clear();update();assert.deepEqual(active(),[0]);
   activeBattleCharacterIndex=1;clear();update();assert.deepEqual(active(),[1]);
   activeBattleCharacterIndex=2;clear();update();assert.deepEqual(active(),[2]);
+  for(const index of [3,4,5]){activeBattleCharacterIndex=index;clear();update();assert.deepEqual(active(),[index]);}
   clear();assert.deepEqual(active(),[],"auto-controlled character must not retain a manual-control flash");
 });
