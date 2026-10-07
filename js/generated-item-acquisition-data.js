@@ -567,6 +567,13 @@ window.FourSymbolsItemAcquisitionData={
       "firstOre": 8
     }
   ],
+  "firstCharacterRelicUnlock": {
+    "level": 20,
+    "relicIds": [
+      "relic_qiankun_flask",
+      "relic_xuanwu_seal"
+    ]
+  },
   "relics": [
     {
       "id": "relic_qiankun_flask",

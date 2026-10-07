@@ -34,9 +34,10 @@
    add({sourceType:"synthesis",sourceId:id.replace('ticket','fragment'),materialItemId:id.replace('ticket','fragment'),mode:"合成",location:"主城 → 合成 → 碎片合成",quantity:1,chance:1,repeatable:true,notes:"100枚對應系列碎片＋500金幣"});
   }
   for(const [floor,reward] of Object.entries(data.tower.majorMilestones)){if(id===reward.boxId)add({sourceType:"tower",sourceId:"tower-"+floor,mode:"四象塔",unlockRequirement:"任一角色Lv."+data.towerUnlockLevel,floor:Number(floor),quantity:1,chance:1,firstClearOnly:true,repeatable:false,location:"主城 → 玩法 → 四象塔"});}
+  if(data.firstCharacterRelicUnlock.relicIds.includes(id))add({sourceType:"milestone",sourceId:"first-character-level-"+data.firstCharacterRelicUnlock.level,mode:"角色里程碑",location:"第一位角色達Lv."+data.firstCharacterRelicUnlock.level,quantity:1,chance:1,firstClearOnly:true,repeatable:false,unlockRequirement:"第一位角色Lv."+data.firstCharacterRelicUnlock.level,notes:"自動解鎖完整秘寶，不發放專屬碎片"});
   const relic=data.relics.find(r=>fragment(r.id)===id||r.id===id);
   if(relic){
-   if(id===relic.id){add({sourceType:"synthesis",sourceId:fragment(id),mode:"秘寶合成",location:"主城 → 秘寶 → "+relic.name,quantity:1,chance:1,repeatable:false,notes:"100專屬碎片；最多以100通用碎片替代50專屬碎片"});}
+   if(id===relic.id){add({sourceType:"synthesis",sourceId:fragment(id),materialItemId:fragment(id),mode:"秘寶合成",location:"主城 → 秘寶 → "+relic.name,quantity:1,chance:1,repeatable:false,notes:"100專屬碎片；最多以100通用碎片替代50專屬碎片"});}
    else{
     for(const [boxId,box] of Object.entries(data.materials.choiceBoxes)){if(tiers.indexOf(relic.rarity)<=tiers.indexOf(box.maxRarity))add({sourceType:"chest",sourceId:boxId,chestId:boxId,chestName:box.name,mode:"秘寶碎片自選箱",quantity:box.fragmentAmount,chance:1,repeatable:false,notes:"開箱手動指定此秘寶"});}
    }

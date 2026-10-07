@@ -886,7 +886,7 @@
 
     function relicSources(relicId){
         const owner=window.FourSymbolsItemAcquisition;
-        return owner?owner.getSources(fragmentIdFor(relicId)).map(owner.formatSource):[];
+        return owner?owner.getSources(relicId).concat(owner.getSources(fragmentIdFor(relicId))).map(owner.formatSource):[];
     }
 
     function eligibleChoiceRelics(boxId){
@@ -973,17 +973,17 @@
     const originalOpenRelicPage=typeof window.v174OpenRelicPage==="function"?window.v174OpenRelicPage:null;
     const originalOpenRelicDetail=typeof window.v174OpenRelicDetail==="function"?window.v174OpenRelicDetail:null;
     if(originalOpenRelicPage){
-        window.v174OpenRelicPage=function(){ ensureFirstCharacterLevel20Relics();currentRelicDetailId=null;const result=originalOpenRelicPage.apply(this,arguments);decorateRelicSurface();return result; };
+        window.v174OpenRelicPage=function(){ ensureFirstCharacterLevel20Relics();currentRelicDetailId=null;return originalOpenRelicPage.apply(this,arguments); };
     }
     if(originalOpenRelicDetail){
-        window.v174OpenRelicDetail=function(id){ ensureFirstCharacterLevel20Relics();currentRelicDetailId=id;const result=originalOpenRelicDetail.apply(this,arguments);decorateRelicSurface();return result; };
+        window.v174OpenRelicDetail=function(id){ ensureFirstCharacterLevel20Relics();currentRelicDetailId=id;return originalOpenRelicDetail.apply(this,arguments); };
     }
     if(typeof window.openHomeFeature==="function"){
         const original=window.openHomeFeature;
         window.openHomeFeature=function(type){
             if(type==="relic"){ ensureFirstCharacterLevel20Relics(); }
             const result=original.apply(this,arguments);
-            if(type==="relic"){ currentRelicDetailId=null;decorateRelicSurface(); }
+            if(type==="relic"){ currentRelicDetailId=null; }
             return result;
         };
     }
@@ -995,15 +995,6 @@
         const original=window.vGameplayCloseBossDetail;
         window.vGameplayCloseBossDetail=function(){ currentBossDetail=null;return original.apply(this,arguments); };
     }
-    ["v174SetRelicFilter","v174EquipRelic","v174UnequipRelic"].forEach(name=>{
-        const original=window[name];
-        if(typeof original!=="function"){ return; }
-        window[name]=function(){
-            const result=original.apply(this,arguments);
-            decorateRelicSurface();
-            return result;
-        };
-    });
     if(typeof window.vGameplaySwitchBossTab==="function"){
         const original=window.vGameplaySwitchBossTab;
         window.vGameplaySwitchBossTab=function(){ currentBossDetail=null;return original.apply(this,arguments); };
@@ -1061,7 +1052,7 @@
         const owned=relicRuntime.getOwnedState()[relicId];
         const status=craftStatus(relicId),cost=upgradeCost(relicId);
         let panel=detail.querySelector(".relic-progression-detail-panel");
-        const sourceText=relicSources(relicId).length?relicSources(relicId).join("、"):"目前版本尚無正式取得途徑";
+        const sourceText=relicSources(relicId).length?"點選獲取途徑查看完整條件與來源追溯":"目前版本尚無正式取得途徑";
         const replacementText=owned.unlocked?"已持有；多餘專屬碎片會保留。":status.specific>=100?"已達 100 專屬碎片，可直接合成。":status.specific>=50?"缺少 "+status.missing+"；需要秘寶通用碎片 ×"+status.universalCost+"。":"至少要先取得 50 個專屬碎片，才能使用通用碎片補足。";
         const panelHtml='<div class="relic-progression-detail-panel"><div><span>專屬碎片</span><b>'+status.specific+' / 100</b></div><div><span>秘寶通用碎片</span><b>'+status.universal+'</b></div><p>'+esc(replacementText)+'</p><small>取得來源：'+esc(sourceText)+'</small><button type="button" data-relic-source="'+esc(relicId)+'" onclick="vRelicProgressionShowAcquisition(this.dataset.relicSource)">獲取途徑</button><em>每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。</em></div>';
         if(panel){ panel.outerHTML=panelHtml; }
@@ -1161,7 +1152,7 @@
     /* The previous Team Relic owner exposed a gold-only public upgrade action.
        Keep its battle/runtime owner intact, but replace the public progression
        entry so there is only one reachable upgrade economy: essence + stones. */
-    window.vRelicProgressionShowAcquisition=id=>window.FourSymbolsItemAcquisition?.show({id:fragmentIdFor(id),name:(catalog[id]?.name||id)+"碎片"});
+    window.vRelicProgressionShowAcquisition=id=>window.FourSymbolsItemAcquisition?.show({id:id,name:catalog[id]?.name||id});
     window.v174UpgradeRelic=upgradeRelic;
     window.vRelicProgressionCraft=craftRelic;
     window.vRelicProgressionUpgrade=upgradeRelic;
@@ -1185,6 +1176,7 @@
         getUpgradeCost:upgradeCost,
         upgradeRelic:upgradeRelic,
         getRelicSources:relicSources,
+        decorateRelicSurface:decorateRelicSurface,
         getBossPreview:bossPreview,
         getBossPoolProbabilities:poolProbabilities,
         rollBossReward:rollBossReward,

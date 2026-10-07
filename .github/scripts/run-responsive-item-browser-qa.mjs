@@ -205,6 +205,19 @@ async function run(chrome,url,live){
   })()`);
   assert.equal(revive.hp,35);assert.equal(revive.sp,17);assert.equal(revive.count,revive.beforeCount-1);assert.ok(revive.marked&&revive.rejected&&revive.living&&revive.initiative,JSON.stringify(revive));assert.equal(revive.defeated,false);assert.equal(revive.auto,null);
   evidence.push({revival:revive});console.log('PASS manual revival: dead target / one item / HP35 / unchanged SP / living UI / initiative');
+  await resize([360,640]);
+  await c.eval("(async()=>{await FourSymbolsFeatures.ensure('feature-boss-relic','acquisition-qa');showPage('home');v174OpenRelicDetail('relic_xuanwu_seal');})()");
+  await c.eval("(async()=>{const until=Date.now()+20000;while(!document.querySelector('[data-relic-source=\"relic_xuanwu_seal\"]')&&Date.now()<until)await new Promise(r=>setTimeout(r,30));if(!document.querySelector('[data-relic-source=\"relic_xuanwu_seal\"]'))throw Error('formal relic renderer did not decorate acquisition');})()");await settle();
+  const beforeRelicSource=await c.eval('JSON.stringify({items:inventoryItems,gold,player})');
+  await c.eval("document.querySelector('[data-relic-source=\"relic_xuanwu_seal\"]').scrollIntoView({block:'center'})");await settle();
+  const relicControl=await check('[data-relic-source="relic_xuanwu_seal"]',[360,640],true);assert.ok(relicControl.projectedFont>=13&&relicControl.rect.height>=44);
+  await click('[data-relic-source="relic_xuanwu_seal"]',[360,640]);
+  await check('#v132RewardModal .v132-reward-modal-inner',[360,640]);
+  const relicSourceText=await c.eval("document.getElementById('v132RewardModal').textContent");
+  assert.ok(relicSourceText.includes('第一位角色達Lv.20')&&relicSourceText.includes('雪獄尊')&&relicSourceText.includes('第25層'),'complete relic direct/fragment/chest ancestry missing');
+  assert.equal(await c.eval('JSON.stringify({items:inventoryItems,gold,player})'),beforeRelicSource,'relic acquisition UI changed owned state');
+  await screenshot('acquisition-relic-360x640');await c.eval('v132CloseRewardModal()');
+  evidence.push({relicAcquisition:true});console.log('PASS relic acquisition: Lv20 direct unlock / fragment Boss / Tower ancestry / read-only');
   return evidence;
  }catch(error){if(c){try{const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from(shot.data,'base64'));}catch{}}error.evidence=evidence;if(browserError){error.message+="\nBrowser: "+browserError;error.stack+="\nBrowser: "+browserError;}throw error;}finally{c?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true});}catch{}}
 }

@@ -66,6 +66,10 @@ test('relic source compatibility API delegates to acquisition registry',()=>{
  const body=read('js/relic-progression-drop-system.js').match(/    function relicSources[\s\S]*?\n    \}/)[0];
  assert.match(body,/FourSymbolsItemAcquisition/);assert.doesNotMatch(body,/RELIC_BOSS_DROP_TABLE|majorMilestones/);
  const owner=registry(),sources=owner.getSources('relicFragment_xuanwu_seal');assert.ok(sources.some(s=>s.bossName==='雪獄尊'));assert.ok(sources.some(s=>s.chestId==='relicChoiceBoxBlue'));
+ const direct=owner.getSources('relic_xuanwu_seal').find(r=>r.sourceType==='milestone');assert.equal(direct.quantity,1);assert.equal(direct.chance,1);assert.match(direct.location,/第一位角色達Lv.20/);
+ assert.ok(!sources.some(r=>r.sourceType==='milestone'),'direct unlock must not pretend to grant fragments');
+ assert.ok(!owner.getSources('relic_burning_jade').some(r=>r.sourceType==='milestone'));
+ assert.ok(owner.trace('relic_xuanwu_seal').find(r=>r.source.sourceType==='synthesis').parents.some(p=>p.source.bossId));
 });
 
 test('elite roll, Boss stages, synthesis and indirect source numbers agree with reward owners',()=>{

@@ -29,6 +29,7 @@ export function buildItemAcquisitionProjection(root){
   shopPotions:data('js/40-v144-rules-and-abyss.js','SHOP_POTION_PRICES'),
   towerUnlockLevel:data(boss,'TOWER_UNLOCK_LEVEL'),
   personalBosses:data(boss,'PERSONAL_BOSSES'),worldBosses:data(boss,'WORLD_BOSSES'),
+  firstCharacterRelicUnlock:{level:data(relic,'FIRST_CHARACTER_RELIC_UNLOCK_LEVEL'),relicIds:data(relic,'FIRST_CHARACTER_BLUE_RELICS')},
   relics,bossPools:data(relic,'RELIC_BOSS_DROP_TABLE'),
   rarityWeights:data(relic,'RARITY_WEIGHTS'),rarityChances:data(relic,'RARITY_FRAGMENT_DROP_CHANCE'),
   difficulties:data(relic,'BOSS_DIFFICULTY_CONFIG'),materials:data(relic,'MATERIAL_CONFIG'),
