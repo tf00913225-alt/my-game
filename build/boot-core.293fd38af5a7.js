@@ -1,4 +1,4 @@
-window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.73","firebaseBootstrap":"build/firebase/firebase-bootstrap.b481588b9bb5.js"});
+window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.73","firebaseBootstrap":"build/firebase/firebase-bootstrap.4a2ab457ec24.js"});
 (function installFourSymbolsSupportContact(global){
 "use strict";
 if(!global||global.FourSymbolsSupport){ return; }
@@ -1286,7 +1286,9 @@ throw new Error("Main City First Screen Visual Ready owner is unavailable.");
 }
 status("準備主城畫面","正在完成首屏圖片、字型與版面繪製");
 await global.FourSymbolsHomeRelicSummary.prepareFirstScreenVisuals();
+if(token!==transitionToken){ return; }
 transition(offline?STATES.OFFLINE_READY:STATES.READY,{uid:resolvedUid});
+firebase.setUiState({mode:state,user:activeUser,error:false,migration:null});
 firebase.closeAuth(); status("載入完成","主城已可操作");
 mark("four-symbols:critical-ready");
 await hideLoader();
@@ -1324,7 +1326,9 @@ const token=++transitionToken;
 activeUser=user; resolvedUid=user.uid; saveResolved=false; cloudResult=null; lastError=null;
 startAppShell();
 transition(STATES.SAVE_LOADING,{uid:user.uid}); showLoader();
-status("讀取帳號角色","正在解析 UID 雲端與本機存檔"); accountUi("SAVE_LOADING","正在讀取此 UID 的角色資料…");
+status("讀取帳號角色","正在解析 UID 雲端與本機存檔");
+firebase.setUiState({mode:"SAVE_LOADING",user:activeUser,message:"正在讀取此 UID 的角色資料…",error:false,migration:null});
+firebase.closeAuth();
 const repo=global.FourSymbolsAccountSave;
 repo.activate(user.uid);
 if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.activate(user.uid); }

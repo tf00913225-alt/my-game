@@ -4,16 +4,16 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.b0702d4afce7.js"
+      "build/boot-core.293fd38af5a7.js"
     ],
     "styles": [
-      "build/boot-core.eea71835cf27.css"
+      "build/boot-core.7fa19ec70835.css"
     ],
     "images": [
       "assets/ui/startup-logo.4631c0bc3f2b.jpg",
       "assets/ui/startup-main-city.d43e67af1c1c.jpg"
     ],
-    "firebaseBootstrap": "build/firebase/firebase-bootstrap.b481588b9bb5.js"
+    "firebaseBootstrap": "build/firebase/firebase-bootstrap.4a2ab457ec24.js"
   },
   "featureManifest": {
     "schemaVersion": 1,
@@ -210,25 +210,25 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.b0702d4afce7.js",
-        "sha256": "b0702d4afce7",
-        "bytes": 69833,
+        "path": "build/boot-core.293fd38af5a7.js",
+        "sha256": "293fd38af5a7",
+        "bytes": 70040,
         "priority": "P0",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/boot-core.eea71835cf27.css",
-        "sha256": "eea71835cf27",
-        "bytes": 211910,
+        "path": "build/boot-core.7fa19ec70835.css",
+        "sha256": "7fa19ec70835",
+        "bytes": 212245,
         "priority": "P0",
         "type": "style",
         "decode": false
       },
       {
-        "path": "build/firebase/firebase-auth-ui.e3f05a08ec87.js",
-        "sha256": "e3f05a08ec87",
-        "bytes": 47749,
+        "path": "build/firebase/firebase-auth-ui.a3104a9e0c69.js",
+        "sha256": "a3104a9e0c69",
+        "bytes": 49001,
         "priority": "P0",
         "type": "script",
         "decode": false
@@ -242,9 +242,9 @@
         "decode": false
       },
       {
-        "path": "build/firebase/firebase-bootstrap.b481588b9bb5.js",
-        "sha256": "b481588b9bb5",
-        "bytes": 5439,
+        "path": "build/firebase/firebase-bootstrap.4a2ab457ec24.js",
+        "sha256": "4a2ab457ec24",
+        "bytes": 5438,
         "priority": "P0",
         "type": "script",
         "decode": false
@@ -818,14 +818,14 @@
         "decode": false
       }
     ],
-    "manifestHash": "86270e45f27e",
-    "totalBytes": 21636526,
+    "manifestHash": "a46356ddb898",
+    "totalBytes": 21638319,
     "totalResources": 78
   },
   "assets": {
-    "build/boot-core.b0702d4afce7.js": {
-      "sha256": "b0702d4afce7",
-      "bytes": 69833
+    "build/boot-core.293fd38af5a7.js": {
+      "sha256": "293fd38af5a7",
+      "bytes": 70040
     },
     "build/app-shell.815d04dfeb66.js": {
       "sha256": "815d04dfeb66",
@@ -875,9 +875,9 @@
       "sha256": "0c92aaea1139",
       "bytes": 27664
     },
-    "build/boot-core.eea71835cf27.css": {
-      "sha256": "eea71835cf27",
-      "bytes": 211910
+    "build/boot-core.7fa19ec70835.css": {
+      "sha256": "7fa19ec70835",
+      "bytes": 212245
     },
     "build/app-shell.d90705103c7f.css": {
       "sha256": "d90705103c7f",
@@ -931,13 +931,13 @@
       "sha256": "2d3a8e570074",
       "bytes": 8038
     },
-    "build/firebase/firebase-auth-ui.e3f05a08ec87.js": {
-      "sha256": "e3f05a08ec87",
-      "bytes": 47749
+    "build/firebase/firebase-auth-ui.a3104a9e0c69.js": {
+      "sha256": "a3104a9e0c69",
+      "bytes": 49001
     },
-    "build/firebase/firebase-bootstrap.b481588b9bb5.js": {
-      "sha256": "b481588b9bb5",
-      "bytes": 5439
+    "build/firebase/firebase-bootstrap.4a2ab457ec24.js": {
+      "sha256": "4a2ab457ec24",
+      "bytes": 5438
     },
     "assets/ui/startup-logo.4631c0bc3f2b.jpg": {
       "sha256": "4631c0bc3f2b",

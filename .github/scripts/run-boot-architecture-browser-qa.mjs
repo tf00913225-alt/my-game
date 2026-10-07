@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
+import os from "node:os";
 import {spawn,spawnSync} from "node:child_process";
 
 const ROOT=process.cwd();
@@ -25,6 +26,8 @@ const qaReadyFirstPlayRecord={
 const qaStaleFirstPlayRecord={...qaReadyFirstPlayRecord,manifestHash:"qa-stale-manifest",assets:{...qaReadyFirstPlayRecord.assets,"assets/ui/nav-home.png":"qa-stale-asset"}};
 
 function chromeBinary(){
+    const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    if(configured&&fs.existsSync(configured)){ return configured; }
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -286,7 +289,7 @@ const server=await createQaServer();
 const address=server.address();
 const origin=`http://127.0.0.1:${address.port}`;
 const debugPort=9400+(process.pid%400);
-const profile=path.join("/tmp","four-symbols-boot-qa-"+process.pid);
+const profile=path.join(os.tmpdir(),"four-symbols-boot-qa-"+process.pid);
 const chrome=spawn(chromeBinary(),["--headless=new","--no-sandbox","--disable-dev-shm-usage","--hide-scrollbars",`--remote-debugging-port=${debugPort}`,`--user-data-dir=${profile}`,"--window-size=390,844","about:blank"],{stdio:["ignore","pipe","pipe"]});
 let chromeStderr="";chrome.stderr.on("data",chunk=>{chromeStderr+=String(chunk);});
 let client=null;
@@ -299,6 +302,20 @@ try{
     await client.send("Page.enable");await client.send("Runtime.enable");await client.send("Network.enable");await client.send("Log.enable");
     await client.send("Emulation.setDeviceMetricsOverride",{width:390,height:844,deviceScaleFactor:3,mobile:true,screenWidth:390,screenHeight:844});
     await client.send("Emulation.setTouchEmulationEnabled",{enabled:true,maxTouchPoints:5});
+    await client.send("Page.addScriptToEvaluateOnNewDocument",{source:`
+      window.__qaAccountFrames=[];
+      function accountFrame(){
+        const overlay=document.getElementById('firebaseAuthOverlay');
+        const panel=document.getElementById('firebaseSignedInPanel');
+        if(overlay?.classList.contains('show')){
+          window.__qaAccountFrames.push({state:window.FourSymbolsStartupPolicy?.getState(),
+            presentation:overlay.dataset.presentation,accountVisible:panel?.classList.contains('show'),
+            diagnosticVisible:document.getElementById('firebaseSessionTestPanel')?.hidden===false});
+        }
+        requestAnimationFrame(accountFrame);
+      }
+      requestAnimationFrame(accountFrame);
+    `});
     const clear=()=>client.send("Storage.clearDataForOrigin",{origin,storageTypes:"all"});
     const navigate=async scenario=>{await client.send("Page.navigate",{url:`${origin}/?scenario=${encodeURIComponent(scenario)}&run=${Date.now()}`});await waitFor(client,"document.readyState==='complete'","document load");};
 
@@ -451,6 +468,27 @@ try{
     const accountA=await client.eval(`(()=>({uid:FourSymbolsStartupPolicy.getUid(),playerId:player.id,gold:gold,sharedExp:sharedExp,item:inventoryItems[0]?.id,equipment:characterEquipment.fire.hand?.id,creation:getComputedStyle(document.getElementById("creationPage")).display,game:getComputedStyle(document.getElementById("gameInterface")).display,gameplayBeforeCity:performance.getEntriesByType("resource").filter(entry=>/gameplay-core|feature-/.test(entry.name)&&entry.startTime<performance.getEntriesByName("four-symbols:main-city-interactive")[0].startTime).map(entry=>new URL(entry.name).pathname)}))()`);
     assert.equal(accountA.uid,"uid-A");assert.equal(accountA.playerId,"角色-A");assert.equal(accountA.gold,1111);assert.equal(accountA.sharedExp,111);assert.equal(accountA.item,"qa-token-A");assert.equal(accountA.equipment,"qa-blade-A");assert.equal(accountA.creation,"none");assert.notEqual(accountA.game,"none");assert.ok(accountA.gameplayBeforeCity.some(path=>/gameplay-core/.test(path)),"First Play gameplay core was not warmed before city");assert.equal(accountA.gameplayBeforeCity.some(path=>/feature-(?:abyss|skill|boss-relic)/.test(path)),false,"Deep optional feature loaded before city");
     evidence.checks.existingUser=accountA;evidence.performance.coldExisting=await metrics(client,"four-symbols:main-city-interactive");
+    const resumeFrames=await client.eval(`window.__qaAccountFrames`);
+    assert.ok(resumeFrames.length>0,"Returning account never showed Resume");
+    assert.ok(resumeFrames.every(frame=>frame.presentation==="resume"&&!frame.accountVisible&&!frame.diagnosticVisible&&(frame.state==="READY"||frame.state==="OFFLINE_READY")),"Account management flashed during automatic boot");
+    await client.eval(`window.dispatchEvent(new CustomEvent('four-symbols:game-session-state',{detail:{code:'SESSION_REAUTH_REQUIRED'}}))`);
+    assert.equal(await client.eval(`document.getElementById('firebaseAuthStatus').hidden`),true);
+    for(const width of [390,420]){
+      await client.send("Emulation.setDeviceMetricsOverride",{width,height:844,deviceScaleFactor:3,mobile:true,screenWidth:width,screenHeight:844});
+      const buttons=await client.eval(`(()=>{const ids=['firebaseSwitchAccountButton','firebaseDirectEnterButton'];return ids.map(id=>{const n=document.getElementById(id),r=n.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,disabled:n.disabled,hit:document.elementFromPoint(r.left+r.width/2,r.top+r.height/2)===n};});})()`);
+      assert.ok(buttons.every(b=>b.left>=0&&b.right<=width&&b.height>=40&&!b.disabled&&b.hit));
+      assert.ok(buttons[1].width>buttons[0].width);
+    }
+    await client.eval(`document.getElementById('firebaseDirectEnterButton').click()`);
+    assert.equal(await client.eval(`document.getElementById('firebaseAuthOverlay').classList.contains('show')`),false);
+    await sleep(5200);
+    assert.equal(await client.eval(`document.getElementById('firebaseAuthOverlay').classList.contains('show')`),false);
+    await client.eval(`FourSymbolsFirebaseLifecycle.openAuth()`);
+    assert.equal(await client.eval(`document.getElementById('firebaseAuthOverlay').dataset.presentation`),"account");
+    assert.match(await client.eval(`document.getElementById('firebaseAuthStatus').textContent`),/重新驗證/);
+    assert.doesNotMatch(await client.eval(`document.getElementById('firebaseAuthStatus').textContent`),/SESSION_REAUTH_REQUIRED/);
+    await client.eval(`FourSymbolsFirebaseLifecycle.closeAuth()`);
+    evidence.checks.autoResume={frames:resumeFrames.length,noAccountFlash:true,directEnter:true,timerClean:true,viewports:[390,420],sessionErrorPresentation:true};
     const cityVisual=await client.eval(`(()=>{const mark=name=>performance.getEntriesByName(name).at(-1)?.startTime||0;const images=[...document.querySelectorAll("#homePage img,#bottomNav img,#mainBottomNav img")].filter(image=>image.currentSrc&&image.getClientRects().length>0&&getComputedStyle(image).visibility!=="hidden"&&getComputedStyle(image).display!=="none");const home=document.getElementById("homePage");const backgrounds=[home,...home.querySelectorAll(".home-bg-fixed-layer,.home-card-icon")].map(node=>getComputedStyle(node).backgroundImage).filter(value=>value&&value!=="none"&&/url\\(/.test(value));return {dataReady:mark("four-symbols:main-city-data-ready"),visualReady:mark("four-symbols:main-city-visual-ready"),interactive:mark("four-symbols:main-city-interactive"),loaderHidden:document.getElementById("startupLoader").hidden,rosterReady:document.getElementById("v146HomeRoster")?.dataset.ready||null,imagesDecoded:images.length>0&&images.every(image=>image.complete&&image.naturalWidth>0),backgroundsReady:backgrounds.length>0&&backgrounds.every(value=>value&&value!=="none")};})()`);
     assert.ok(cityVisual.dataReady>0&&cityVisual.visualReady>=cityVisual.dataReady);assert.ok(cityVisual.interactive>=cityVisual.visualReady);assert.equal(cityVisual.loaderHidden,true);assert.equal(cityVisual.rosterReady,"true");assert.equal(cityVisual.imagesDecoded,true);assert.equal(cityVisual.backgroundsReady,true);evidence.checks.mainCityVisualReady=cityVisual;
     await client.eval(`document.querySelector(".team-relic-home-entry")?.click()`);

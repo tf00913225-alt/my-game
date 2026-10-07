@@ -8,7 +8,7 @@ import {
     bootstrapTrustedCloudSave,createInitialCanonicalCharacter,CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,saveLocalAutoBattlePreferences,createLocalMigrationBackup,
     submitLegacyMigrationCandidate,screenLegacyMigrationCandidate
 } from "./firebase-cloud-save.2d3a8e570074.js";
-import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.e3f05a08ec87.js";
+import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.a3104a9e0c69.js";
 import {synchronizeGameSession,revokeGameSession,protectedTest,getGameSessionState} from "./firebase-session.877a7842d6bd.js";
 
 const AUTH_EVENT="four-symbols:firebase-auth-state";
@@ -32,7 +32,7 @@ function synchronizeSession(user){
 installFirebaseSessionHooks({signedIn:synchronizeSession,beforeSignOut:revokeGameSession});
 window.addEventListener("four-symbols:game-session-state",event=>{
     const code=event.detail?.code;
-    const message=code?`${code}：雲端操作已停用。請重新登入原帳號；訪客請先聯絡客服保留原 UID。`:null;
+    const message=code?"雲端操作暫時無法使用。請重新驗證原帳號；訪客請先聯絡客服保留原 UID。":null;
     setFirebaseAuthUiState({sessionError:message});
 });
 function identityPromise(){

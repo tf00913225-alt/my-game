@@ -329,7 +329,7 @@
 .firebase-auth-resume-panel[hidden]{display:none;}
 .firebase-auth-resume-panel small{
     color:#a89b86;
-    font-size:12px;
+    font-size:13px;
     font-weight:700;
 }
 .firebase-auth-resume-panel strong{
@@ -355,6 +355,10 @@
     font-size:18px;
 }
 .firebase-auth-resume-panel .firebase-auth-button{width:100%;}
+.firebase-auth-resume-actions{display:grid;grid-template-columns:2fr 3fr;gap:8px;margin-top:8px;}
+.firebase-auth-overlay[data-presentation="resume"] .firebase-auth-topbar,
+.firebase-auth-overlay[data-presentation="resume"] .firebase-auth-title,
+.firebase-auth-overlay[data-presentation="resume"] .firebase-auth-subtitle{display:none;}
 
 /* Shared support dialog: login and the in-game system page call the same owner. */
 .support-contact-overlay{
