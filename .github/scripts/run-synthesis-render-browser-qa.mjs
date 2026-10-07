@@ -83,7 +83,25 @@ try{
   await c.eval(`document.querySelector('#v169RpgDialogLayer.show .v169-rpg-dialog-actions button:last-child')?.click();true`);
   const materialShot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`material-${width}.png`),Buffer.from(materialShot.data,'base64'));
   await c.eval(`closeHomeFeature();showPage('inventory');showPage('home');openHomeFeature('synthesis');true`);assert.equal(await c.eval(`document.querySelectorAll('.v17363-material-synthesis').length`),1);await layout(width);
-  evidence.push({width,height,firstImages,talismanLayout,horizontalScroll,counts,rollback,fragmentLayout,fragment,materialImages,materialLayout,verticalScroll,material,finalNativeCount:0});console.log('PASS synthesis production runtime '+width);
+  // Verify every existing material control and both transaction kinds.
+  for(const [key,value] of [['blueprintSet','setWater'],['blueprintSlot','hand'],['blueprintTier','purple'],['blueprintSet','setFire'],['blueprintSlot','head'],['blueprintTier','white']]){
+   await tap('[data-material-key="'+key+'"] .v17363-game-select-trigger');
+   await tap('[data-material-key="'+key+'"][data-material-value="'+value+'"]');
+   assert.equal(await c.eval(`document.querySelector('[data-material-key="${key}"] .v17363-game-select-option.selected').dataset.materialValue`),value);
+   await decode();await layout(width);
+  }
+  const materialFailure=await c.eval(`(()=>{const holdings=()=>inventoryItems.map(n=>({id:n.id,count:n.count})).sort((a,b)=>a.id.localeCompare(b.id)),before=JSON.stringify(holdings()),g=gold,add=v132AddItemToInventory;v132AddItemToInventory=()=>false;try{const success=v17363CraftMaterial('blueprint');return {success,holdings:JSON.stringify(holdings())===before,gold:gold===g,body:document.querySelectorAll('.v17363-material-synthesis').length,native:document.querySelectorAll('#homeFeatureModalBody select').length};}finally{v132AddItemToInventory=add;}})()`);
+  assert.deepEqual(materialFailure,{success:false,holdings:true,gold:true,body:1,native:0});
+  await c.eval(`document.querySelector('#v169RpgDialogLayer.show .v169-rpg-dialog-actions button:last-child')?.click();true`);
+  const blueprintPromotion=await c.eval(`(()=>{const d=v132GetContentDefinitions(),get=tier=>d.blueprints.find(n=>n.setId==='setFire'&&n.blueprintSlot==='head'&&n.tierKey===tier),source=get('white'),target=get('blue'),count=id=>inventoryItems.filter(n=>n.id===id).reduce((s,n)=>s+n.count,0),before={source:count(source.id),target:count(target.id),gold},success=v17363CraftMaterial('blueprint');return {success,before,after:{source:count(source.id),target:count(target.id),gold}};})()`);
+  assert.equal(blueprintPromotion.success,true);assert.equal(blueprintPromotion.after.source,blueprintPromotion.before.source-50);assert.equal(blueprintPromotion.after.target,blueprintPromotion.before.target+10);assert.equal(blueprintPromotion.after.gold,blueprintPromotion.before.gold);
+  await c.eval(`document.querySelector('#v169RpgDialogLayer.show .v169-rpg-dialog-actions button:last-child')?.click();true`);
+  const fragmentFailure=await c.eval(`(()=>{v141SwitchSynthesisTab('fragment');const holdings=()=>inventoryItems.map(n=>({id:n.id,count:n.count})).sort((a,b)=>a.id.localeCompare(b.id)),before=JSON.stringify(holdings()),g=gold,add=v132AddItemToInventory;v132AddItemToInventory=()=>false;try{v141CraftFragmentTicket('setFire');return {holdings:JSON.stringify(holdings())===before,gold:gold===g,cards:document.querySelectorAll('.v141-fragment-row').length,native:document.querySelectorAll('#homeFeatureModalBody select').length};}finally{v132AddItemToInventory=add;}})()`);
+  assert.equal(fragmentFailure.holdings,true);assert.equal(fragmentFailure.gold,true);assert.equal(fragmentFailure.native,0);assert.equal(fragmentFailure.cards,4);
+  await c.eval(`document.querySelector('#v169RpgDialogLayer.show .v169-rpg-dialog-actions button:last-child')?.click();v141SwitchSynthesisTab('material');true`);
+  console.log('PASS supplemental material controls, blueprint promotion, material/fragment rollback '+width);
+
+  evidence.push({width,height,firstImages,talismanLayout,horizontalScroll,counts,rollback,fragmentLayout,fragment,materialImages,materialLayout,verticalScroll,material,materialFailure,blueprintPromotion,fragmentFailure,finalNativeCount:0});console.log('PASS synthesis production runtime '+width);
  }
  fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:baseUrl?'exact-deployed':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||null,evidence},null,2)+'\n');
 }catch(error){if(c)try{const s=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from(s.data,'base64'));}catch{}const errors=c?.events.filter(e=>e.method==='Runtime.exceptionThrown'||e.method==='Runtime.consoleAPICalled'&&e.params.type==='error');console.error(JSON.stringify(errors));fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:false,error:String(error.stack||error),errors,evidence},null,2)+'\n');throw error;}

@@ -388,9 +388,6 @@
         const blueprint=blueprints.find(item=>item.id===synthesisState.blueprintId);
         const tier=normalizeTierKey(blueprint.tierKey);
         const meta=TIER_META[tier];
-        const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
-        const blueprintSeries=SERIES.find(item=>item.setId===blueprint.setId)||null;
-        const series=blueprintSeries||SERIES.find(item=>item.setId===synthesisState.seriesId)||SERIES[0];
         const ore=definitions().ores.find(item=>normalizeTierKey(item.tierKey)===tier);
         const blueprintCount=countItem(blueprint.id);
         const oreCount=ore?countItem(ore.id):0;

@@ -76,3 +76,17 @@ test("fragment quantity and transaction remain 100 fragments plus 500 gold per t
     h.c.v141CraftFragmentTicket("setFire");assert.equal(h.count("fragmentSetFire"),200);assert.equal(h.count("ticketFire"),2);assert.equal(h.c.gold,99000);
     const snapshot=JSON.stringify(h.c.inventoryItems);h.c.failAdd=true;h.c.v141CraftFragmentTicket("setFire");assert.equal(JSON.stringify(h.c.inventoryItems),snapshot);assert.equal(h.c.gold,99000);
 });
+test("legacy ordinary gear compatibility cannot strip canonical material blueprint identity",()=>{
+    const h=harness();h.put("blueprint-white",50);
+    const canonicalBefore=JSON.stringify(h.defs.blueprints),ownedBefore=JSON.stringify(h.c.inventoryItems);
+    h.c.inventoryItems.push({id:"old-gear",name:"赤炎普通裝備",v141Crafted:true,setId:"setFire",requiredElement:"fire",stats:{attack:3},icon:"old-art"});
+    const polish=fs.readFileSync("js/41-v146-system-polish.js","utf8");
+    const block=polish.slice(polish.indexOf("    const SYNTHESIS_SET_PREFIX="),polish.indexOf('    if(typeof window.v141CraftEquipment==="function")'));
+    vm.runInContext(block+"\nnormalizeOrdinarySynthesisData();",h.c);
+    assert.equal(JSON.stringify(h.defs.blueprints),canonicalBefore);
+    assert.equal(JSON.stringify(h.c.inventoryItems.slice(0,1)),ownedBefore);
+    assert.equal(h.c.inventoryItems[1].setId,undefined);assert.equal(h.c.inventoryItems[1].requiredElement,undefined);
+    assert.equal(h.c.inventoryItems[1].stats.attack,3);
+    h.c.openHomeFeature("synthesis");h.c.v141SwitchSynthesisTab("material");
+    assert.match(h.body.innerHTML,/data-material-value="setFire"/);assert.equal(h.c.v17363CraftMaterial("blueprint"),true);assert.equal(h.count("blueprint-blue"),10);
+});

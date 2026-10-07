@@ -637,17 +637,9 @@
     window.v146SyncCharacterAttentionDots=syncCharacterAttentionDots;
     window.v146GetCharacterGrowthAttention=getCharacterGrowthAttention;
 
-    /* ----- Synthesis blueprints and crafted results are ordinary equipment, never elemental sets. ----- */
+    /* ----- Preserve legacy ordinary crafted equipment; blueprint metadata belongs to V132 materials. ----- */
     const SYNTHESIS_SET_PREFIX=/^(赤炎|寒泉|岩岳|青嵐)/;
     const SYNTHESIS_SET_COLORS=/#(?:e24b32|4bb9e8|c59a54|55cda3)/gi;
-
-    function normalizeOrdinaryBlueprintItem(item){
-        if(!item||!item.blueprintSlot){ return item; }
-        item.name=String(item.name||"裝備設計圖").replace(SYNTHESIS_SET_PREFIX,"");
-        delete item.setId;
-        item.v146OrdinaryBlueprint=true;
-        return item;
-    }
 
     function normalizeOrdinaryCraftedItem(item){
         if(!item||!item.v141Crafted){ return item; }
@@ -663,15 +655,8 @@
     }
 
     function normalizeOrdinarySynthesisData(){
-        const content=typeof window.v132GetContentDefinitions==="function"
-            ?window.v132GetContentDefinitions():null;
-        const definitions=content&&Array.isArray(content.blueprints)?content.blueprints:[];
-        definitions.forEach(normalizeOrdinaryBlueprintItem);
         if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){
-            inventoryItems.forEach(item=>{
-                normalizeOrdinaryBlueprintItem(item);
-                normalizeOrdinaryCraftedItem(item);
-            });
+            inventoryItems.forEach(normalizeOrdinaryCraftedItem);
         }
     }
 
