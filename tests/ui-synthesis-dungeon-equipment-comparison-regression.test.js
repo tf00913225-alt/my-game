@@ -7,7 +7,7 @@ const touch=read("js/01-stage-v8-touch-lock.js");
 const rewardCss=read("css/33-v132-content-expansion.css");
 const inventory=read("js/55-v173.51-inventory-qa.js");
 const compareCss=read("css/53-v173.51-qa.css");
-const picker=read("js/38-v143-system-fixes.js");
+const picker=read("js/36-v141-content-systems.js");
 const repairs=read("js/58-v173.63-functional-fixes.js");
 const guide=read("UI_GUIDELINES.md");
 
@@ -27,19 +27,26 @@ assert.match(compareCss,/\.v17351-compare-back/);
 assert.match(touch,/data-scroll-owner="x\|y\|both"/);
 
 assert.match(picker,/function iconForPickerValue\(value\)[\s\S]*?item&&item\.assetPath[\s\S]*?v169-equipment-art/);
-const renderStart=repairs.indexOf("function renderMaterialSynthesis()");
-const renderEnd=repairs.indexOf("function materialFlow",renderStart);
+const renderStart=picker.indexOf("function renderMaterialSynthesis()");
+const renderEnd=picker.indexOf("function materialFlow",renderStart);
 assert.ok(renderStart>=0&&renderEnd>renderStart,"material synthesis render owner must exist");
-const materialRender=repairs.slice(renderStart,renderEnd);
+const materialRender=picker.slice(renderStart,renderEnd);
 assert.doesNotMatch(materialRender,/<select\b/i);
 assert.match(materialRender,/materialGameSelect\("oreTier"/);
 assert.match(materialRender,/materialGameSelect\("blueprintSet"/);
-assert.match(repairs,/\.v17363-game-select-menu/);
-assert.match(repairs,/section>\.v169-item-art[\s\S]*?width:70px/);
+assert.match(reforgeCss,/\.v17363-game-select-menu/);
+assert.match(reforgeCss,/section>\.v169-item-art[\s\S]*?width:70px/);
 assert.match(touch,/data-scroll-owner="x\|y\|both"/);
 assert.match(guide,/禁止直接顯示瀏覽器原生 `<select>` \/ `<option>`/);
 const synthesisOwner=read("js/36-v141-content-systems.js");
-assert.match(synthesisOwner,/ensureEquipmentUids\(\);[\s\S]*?window\.v141RenderSynthesis\(\)/);
-assert.match(repairs,/window\.v141RenderSynthesis=function\(\)\{[\s\S]*?v17346SyncFourElementSets[\s\S]*?syncCanonicalItemArt\(\)[\s\S]*?originalRenderSynthesis\.apply[\s\S]*?repairSynthesisIcons\(\)/);
+assert.match(synthesisOwner,/ensureEquipmentUids\(\);\s*renderSynthesis\(\)/);
+assert.match(synthesisOwner,/function renderSynthesis\(\)[\s\S]*?v17346SyncFourElementSets[\s\S]*?material:renderMaterialSynthesis/);
+assert.doesNotMatch(synthesisOwner,/<select\b|<option\b/i);
+assert.doesNotMatch(materialRender,/innerHTML|appendChild|requestAnimationFrame|setTimeout/);
+for(const file of ["js/38-v143-system-fixes.js","js/41-v146-system-polish.js","js/58-v173.63-functional-fixes.js"]){
+    assert.doesNotMatch(read(file),/v141RenderSynthesis\s*=|decorateSynthesis|polishSynthesis|repairSynthesisIcons|ensureMaterialTab|renderMaterialSynthesis|maximizeSynthesisPanel/);
+}
+const assignments=fs.readdirSync("js").filter(name=>name.endsWith(".js")).flatMap(name=>read("js/"+name).match(/window\.v141RenderSynthesis\s*=/g)||[]);
+assert.equal(assignments.length,1,"one public synthesis render owner");
 
 console.log("✓ synthesis, dungeon preview and equipment comparison UI regression batch");

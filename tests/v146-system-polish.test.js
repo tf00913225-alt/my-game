@@ -216,7 +216,8 @@ test("inventory, home, synthesis, nav and slow exit all use the latest mobile co
        this V146 snapshot must not enforce its superseded three-row layout. */
     assert.ok(inventoryCss.includes(".inventory-equipment-slot"));
     assert.match(eagerSource,/v146-home-roster/);
-    assert.match(source,/root\.querySelectorAll\("\.v141-blueprint-series"\).*remove/);
+    assert.doesNotMatch(source,/polishSynthesis|v141RenderSynthesis\s*=/);
+    assert.doesNotMatch(fs.readFileSync("js/36-v141-content-systems.js","utf8"),/class="v141-blueprint-series"/);
     assert.match(source,/v148SyncContextNavigation/);
     assert.doesNotMatch(source,/function dungeonNavMarkup\(/);
     assert.ok(finalNavSource.includes('buttons.push(["返回","assets/ui/map-return.png",returnAction]);'));

@@ -637,17 +637,9 @@
     window.v146SyncCharacterAttentionDots=syncCharacterAttentionDots;
     window.v146GetCharacterGrowthAttention=getCharacterGrowthAttention;
 
-    /* ----- Synthesis blueprints and crafted results are ordinary equipment, never elemental sets. ----- */
+    /* ----- Preserve legacy ordinary crafted equipment; blueprint metadata belongs to V132 materials. ----- */
     const SYNTHESIS_SET_PREFIX=/^(赤炎|寒泉|岩岳|青嵐)/;
     const SYNTHESIS_SET_COLORS=/#(?:e24b32|4bb9e8|c59a54|55cda3)/gi;
-
-    function normalizeOrdinaryBlueprintItem(item){
-        if(!item||!item.blueprintSlot){ return item; }
-        item.name=String(item.name||"裝備設計圖").replace(SYNTHESIS_SET_PREFIX,"");
-        delete item.setId;
-        item.v146OrdinaryBlueprint=true;
-        return item;
-    }
 
     function normalizeOrdinaryCraftedItem(item){
         if(!item||!item.v141Crafted){ return item; }
@@ -663,15 +655,8 @@
     }
 
     function normalizeOrdinarySynthesisData(){
-        const content=typeof window.v132GetContentDefinitions==="function"
-            ?window.v132GetContentDefinitions():null;
-        const definitions=content&&Array.isArray(content.blueprints)?content.blueprints:[];
-        definitions.forEach(normalizeOrdinaryBlueprintItem);
         if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){
-            inventoryItems.forEach(item=>{
-                normalizeOrdinaryBlueprintItem(item);
-                normalizeOrdinaryCraftedItem(item);
-            });
+            inventoryItems.forEach(normalizeOrdinaryCraftedItem);
         }
     }
 
@@ -696,38 +681,6 @@
                 if(typeof renderInventoryItems==="function"){ renderInventoryItems(); }
                 if(typeof saveGame==="function"){ saveGame(); }
             }
-            return result;
-        };
-    }
-
-    /* ----- Synthesis step 2 is retired; equipment output is always ordinary. ----- */
-    function polishSynthesis(){
-        const root=document.querySelector(".v141-synthesis");
-        if(!root){ return; }
-        root.classList.add("v146-synthesis-ordinary");
-        root.querySelectorAll(".v141-blueprint-series").forEach(node=>node.remove());
-        root.querySelectorAll("label").forEach(label=>{
-            if(/^\s*2[　\s]/.test(label.textContent||"")){ label.remove(); }
-        });
-        root.querySelectorAll(".v143-item-picker button").forEach(button=>{
-            const span=button.querySelector("span");
-            const original=button.getAttribute("aria-label")||span&&span.textContent||"設計圖";
-            const cleaned=original.replace(SYNTHESIS_SET_PREFIX,"");
-            button.setAttribute("aria-label",cleaned);
-            button.title=cleaned;
-            if(span){ span.remove(); }
-        });
-        const preview=root.querySelector(".v141-craft-preview div:last-child");
-        if(preview){
-            preview.innerHTML="<b>隨機普通裝備</b><span>合成只會產生一般普通裝備；四大套裝僅由戰鬥掉落或獎勵取得。</span>";
-        }
-    }
-
-    if(typeof window.v141RenderSynthesis==="function"){
-        const previousRenderSynthesis=window.v141RenderSynthesis;
-        window.v141RenderSynthesis=function(){
-            const result=previousRenderSynthesis.apply(this,arguments);
-            polishSynthesis();
             return result;
         };
     }
@@ -761,7 +714,6 @@
         mutationQueued=false;
         syncShopTotals();
         syncDungeonShell();
-        polishSynthesis();
         syncCharacterAttentionDots();
     }
     if(typeof MutationObserver!=="undefined"){
@@ -783,7 +735,7 @@
     normalizeOrdinarySynthesisData();
     syncSetDefinitions();
     const boot=()=>{
-        renderHomeRoster(); syncDungeonShell(); syncShopTotals(); polishSynthesis(); syncDefeatedCards(); syncCharacterAttentionDots();
+        renderHomeRoster(); syncDungeonShell(); syncShopTotals(); syncDefeatedCards(); syncCharacterAttentionDots();
     };
     if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",boot,{once:true}); }
     else{ boot(); }

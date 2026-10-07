@@ -367,56 +367,6 @@
 .v143-abyss-dialogue span{color:#c5b99f;font-size:14px !important;animation:v143DialogueHint 1s ease-in-out infinite alternate;}
 @keyframes v143DialogueHint{to{opacity:.52;transform:translateY(3px)}}
 
-/* 6. Icon-first synthesis controls. */
-#game-stage .v143-synthesis .v141-synthesis-body{overflow:auto !important;overscroll-behavior:contain;}
-#game-stage .v143-synthesis .v141-synthesis-card{height:auto !important;min-height:100%;}
-#game-stage .v143-synthesis .v141-synthesis-card label{display:block !important;margin-bottom:7px !important;}
-#game-stage .v143-synthesis .v141-synthesis-card select[hidden]{display:none !important;}
-#game-stage .v143-item-picker{
-    display:grid;
-    grid-auto-flow:column;
-    grid-auto-columns:74px;
-    gap:6px;
-    margin-top:6px;
-    padding:3px 1px 7px;
-    overflow-x:auto;
-    scroll-snap-type:x proximity;
-}
-#game-stage .v143-item-picker button{
-    display:flex;
-    min-width:0;
-    min-height:82px;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    gap:3px;
-    padding:5px 3px;
-    border:1px solid #6c5434;
-    border-radius:8px;
-    color:#cbbd9f;
-    background:linear-gradient(160deg,#211a12,#0d0b08);
-    scroll-snap-align:start;
-}
-#game-stage .v143-item-picker button.selected{border-color:#f0bd59;color:#fff0c5;box-shadow:0 0 10px rgba(232,169,60,.5),inset 0 0 9px rgba(232,169,60,.15);}
-#game-stage .v143-item-picker i,
-#game-stage .v143-item-picker i > svg{display:block;width:48px;height:48px;flex:0 0 48px;}
-#game-stage .v143-item-picker i > .v169-item-art,
-#game-stage .v143-item-picker i > .v169-item-art > img,
-#game-stage .v143-item-picker i > .v169-item-art > svg{
-    display:block;
-    width:100%;
-    height:100%;
-}
-#game-stage .v143-item-picker i > .v169-item-art{
-    box-sizing:border-box;
-}
-#game-stage .v143-item-picker i > .v169-item-art > img{
-    object-fit:contain;
-}
-#game-stage .v143-item-picker button > span:not(.v169-item-art){display:-webkit-box;overflow:hidden;font-size:10px;line-height:12px;text-align:center;-webkit-box-orient:vertical;-webkit-line-clamp:2;}
-#game-stage .v143-synthesis .v141-blueprint-series b{color:#f2d28c;}
-#game-stage .v143-synthesis .v141-craft-preview span{white-space:normal;line-height:1.35;}
-
 @media (max-height:720px){
     #game-stage #dungeonPage{padding-bottom:82px !important;}
     #game-stage .v143-abyss-dialogue b{font-size:19px !important;}
