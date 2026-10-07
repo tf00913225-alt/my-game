@@ -94,6 +94,7 @@ function innerHtml(){
 var battleActive=true;
 var activeBattleCharacterIndex=1;
 function $(id){return document.getElementById(id)}
+function getExistingPartyIndexes(){return [0,1,2];}
 ${highlightSource}
 updateActiveCharacterHighlight();
 var monsters=Array.from({length:10},function(_,index){return {hp:1380-index*5,sp:630-index*3,maxHP:2000,maxSP:800};});
