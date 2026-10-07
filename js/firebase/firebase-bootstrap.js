@@ -32,7 +32,7 @@ function synchronizeSession(user){
 installFirebaseSessionHooks({signedIn:synchronizeSession,beforeSignOut:revokeGameSession});
 window.addEventListener("four-symbols:game-session-state",event=>{
     const code=event.detail?.code;
-    const message=code?`${code}：雲端操作已停用。請重新登入原帳號；訪客請先聯絡客服保留原 UID。`:null;
+    const message=code?"雲端操作暫時無法使用。請重新驗證原帳號；訪客請先聯絡客服保留原 UID。":null;
     setFirebaseAuthUiState({sessionError:message});
 });
 function identityPromise(){
