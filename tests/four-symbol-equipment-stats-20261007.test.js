@@ -72,6 +72,15 @@ assert.equal(damage({skill:{element:"water"}}),1000);
 assert.equal(damage({skill:{element:"fire"},sourceType:"activeSkill",damageKind:"dot"}),1000);
 assert.equal(damage({skill:{element:"fire"},sourceType:"followUp"}),1050);
 for(const sourceType of ["normalAttack","dot","reflect","environment","relic"]){assert.equal(damage({skill:{element:"fire"},sourceType}),1000);}
+ctx.escapeHtml=value=>String(value);
+let modalHtml="";
+ctx.document.getElementById=()=>({insertAdjacentHTML:(_position,html)=>{modalHtml=html;}});
+ctx.getBackpackEquipmentKey=()=>"fire";
+vm.runInContext(between(expansion,"    function getSetLabel(","    window.v132GetOreDefinition="),ctx);
+vm.runInContext(between(expansion,"    function appendEquipmentSetInfo(","    if(typeof openItemModal==="),ctx);
+ctx.appendEquipmentSetInfo(definitions.find(item=>item.id==="setFire_blade"));
+assert.match(modalHtml,/\[赤炎•攻\]5\/5/);assert.match(modalHtml,/全能力\+5/);assert.match(modalHtml,/火元素技能傷害\+5%/);
+modalHtml="";ctx.appendEquipmentSetInfo({id:"ticketSetFire",setId:"setFire"});assert.equal(modalHtml,"","tickets are not equipment set pieces");
 assert.doesNotMatch(polish,/const PIECE_RULES=|variantCountsForEquipment|getEquipmentBonus\s*=|getElementDamagePassiveMultiplier\s*=/,"late correction owners retired");
 assert.doesNotMatch(progression,/const SET_RULES=/);
 assert.match(expansion,/裝備三件　全能力\+5/);assert.match(expansion,/元素技能傷害\+5%/);

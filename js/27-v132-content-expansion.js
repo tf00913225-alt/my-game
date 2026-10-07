@@ -73,7 +73,8 @@
        影響（item.setId不存在時直接跳過）。
     */
     function appendEquipmentSetInfo(item){
-        if(!item || !item.setId){ return; }
+        if(!item || !equipmentSetItemDefinitions.some(def=>def.id===item.id&&def.setId===item.setId)){ return; }
+        normalizeEquipmentSetItem(item);
         const equipmentKey=getBackpackEquipmentKey(inventoryCharacterIndex);
         if(!equipmentKey){ return; }
         const counts=getEquipmentSetCounts(equipmentKey);
