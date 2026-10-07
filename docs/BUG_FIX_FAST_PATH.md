@@ -16,9 +16,9 @@
 2. 確認是否已有同目的有效 PR／工作分支，避免重複施工。續接時保留有效成果，先核對與最新 dev 的差異，不重建同目的 PR。
 3. 新工作從最新 dev 建立 fix/ 工作分支。
 4. 優先調查直接相關的 Runtime（執行層）、DOM（文件物件模型）、CSS（樣式）、Event Handler（事件處理）、State（狀態）、Data Flow（資料流）與直接呼叫鏈。
-5. 找到可被證據支持的直接根因後，立即進入最小修正。
-6. 只修改解決該 Bug 必要的檔案與邏輯；優先直接修正既有正式來源。
-7. 執行與該 Bug 直接相關的最小必要測試。
+5. 找到有證據支持的直接根因後，代理主動檢查合理範圍內的同類路徑：同功能入口／Tab、同 Render／State／Lifecycle 的直接 caller、同交易的切頁／重開、同 Owner 的相鄰路徑；不延伸至無同根因證據的模組。
+6. 同類結果分為「已確認同根因／可疑待證／無關」：已確認者納入本次最小安全修正，優先修既有正式來源；可疑者不因模式相似就修改，必要時記於本次 PR；無關者排除。第四節證據成立時依既有規則升級。
+7. 依 `AGENTS.md` 風險分類，執行涵蓋原 Bug 與已確認同根因路徑的最小必要測試；工程範圍與驗證由代理依證據判斷，不要求使用者自行找其他故障路徑。
 8. 建立 PR，等待必要 CI。
 9. DEV PR 自動整合統一依 `AGENTS.md`「DEV PR 自動整合規則」：最新 Head 必要 CI／驗收與安全 Gate 通過後自行合併 dev，不需再次要求人工 MERGE-DEV 授權。本路徑不另建合併批准規則。
 
@@ -33,7 +33,7 @@
 - Save／Cloud／Runtime（存檔／雲端／執行層）全鏈路審計。
 - 與 Bug 無直接證據關聯的技術債清理。
 
-只有直接調查發現明確證據後，才可以擴大範圍。
+搜尋／掃描與修改／測試範圍分開：低成本 pattern 搜尋可稍向外檢查 Wrapper／previous/original render、late patch／repair hook、Observer／Timer／requestAnimationFrame、duplicate DOM、native control fallback 或第二資料來源。可疑命中不等於必須修改；只有同根因證據才擴大施工，搜尋較廣不觸發全站回歸，測試仍與實際修改風險成比例。
 
 ## 四、升級為架構級施工的條件
 
@@ -78,7 +78,7 @@
 本文件是一般 Bug 的預設施工流程、調查範圍、升級條件、自主整合與結案權威來源。與其他文件衝突時，當次使用者明確指令優先；一般 Bug 的上述事項以本文件為準。
 
 - AUTONOMOUS_REPAIR_CONTRACT.md 的 tests-only（純測試）預設限制、正式 Runtime 即硬停止、固定失敗額度與僅草稿 PR 限制，不適用本路徑內已授權的一般 Bug。
-- Owner Convergence Gate 與完整 Lifecycle 審計僅在第四節證據成立、或使用者明確要求架構工程時啟用；不得以「較嚴格規範優先」恢復所有 Bug 全面稽核。
+- Owner Convergence Gate 與完整 Lifecycle 審計僅在第四節證據成立、或使用者明確要求架構工程（含「全部／完全收斂」「唯一 Owner」）時啟用；完成判定依 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md` 與 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`，不得只因新 Owner 存在就宣稱全部收斂，也不得恢復所有 Bug 全面稽核。
 - Change Safety（變更安全）檢查限本次實際修改責任與直接相依；本路徑不允許新增第二 Owner 或以遮蔽代替必要的舊實作退場。
 - 原有症狀驗證、資料安全、正式玩法規格與最新 Head 必要 CI 不降低。
 - 已明確授權的大型架構工程保留成果與專項要求；本規範不構成重做或丟棄現有工作的理由。
