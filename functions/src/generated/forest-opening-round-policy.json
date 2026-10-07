@@ -5,14 +5,14 @@
   "sourceOwner": "js/00-main.js",
   "tutorialDamageOwner": "js/47-v158-combat-tuning.js",
   "compatibilityDigests": {
-    "js/40-v144-rules-and-abyss.js": "5cad5ada547347b97475d98919acd8d03b0e1e9a9f30f063b34e48b73469bfc1",
+    "js/40-v144-rules-and-abyss.js": "4109964b833950ac859a76189895398d48fb8abff37388f4f6e401329f6c40d3",
     "js/47-v158-combat-tuning.js": "4ebc87b7d7227a5ba3363e0eb4dbd4e40b9da6106c6873ecf831ba6a121079ec"
   },
   "declarationDigests": {
     "HIT_CHANCE_BASE": "340ec586949a9330d6988e79748107a11098b6923a8f43b89d5bf2707b274a31",
     "HIT_CHANCE_MIN_PERCENT": "07c323b35b73375428d01b1e4d00a6db108bd1365775f6490525713475faae5f",
     "HIT_CHANCE_MAX_PERCENT": "732c40bc69f9b84e77c777483641d838b68c1cf62215e667f175220b65597ad1",
-    "buildInitiativeQueue": "ccedc22d75a57cbba999548760cddc9cc6d8cfe84179a963fab6c61d22d3dc53",
+    "buildInitiativeQueue": "56fb1241bd42df0a66b662170ae2d50f023801771bb0b28cac4233d1f7ba6c9b",
     "getMonsterAgility": "bd75fef258f9e1b7e3a0ca22755a5f00bde684c7645bd602bf91c3a26710c179",
     "getMonsterAccuracy": "e8ada45048b2418f59aaaa4dec510ec7ca6207e9b8e8d3fca9a0bf00ae9b4eef",
     "calculateHitChancePercent": "8691b66a68926e30b35cbc8030a79e686ee26a5f2ead89754df13feebc01b5b6",
@@ -20,7 +20,7 @@
     "emitCombatEvent": "970970e5079483bd3fe4c59e8ba9c2d69ff83f620bc2c9b654dd5aef38b2641a",
     "rollBeginnerForestNormalAttackDamage": "d69f138dc4a94512bee6dcce6dcf740fec3021e73ef2c9658ff7020c77f8ca50"
   },
-  "rulesSha256": "d0772054865c274d3426e488697b9b3a2f00d6e3a2671bebbdfe0d278c1cf8f4",
+  "rulesSha256": "73281d6dc21692638813c14139a593616919386de2d0c7b91f50e2a54182ab88",
   "combatRulesReady": false,
   "outcomeVerified": false,
   "rewardEligible": false

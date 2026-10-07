@@ -434,7 +434,7 @@
         const previousBuildInitiativeQueue=buildInitiativeQueue;
         buildInitiativeQueue=function(){
             return previousBuildInitiativeQueue.apply(this,arguments).filter(entry=>
-                entry.type!=="player"||!hardControlName(getPartyCharacterByIndex(entry.characterIndex))
+                (entry.type!=="player"&&entry.type!=="heroNpc")||!hardControlName(getPartyCharacterByIndex(entry.characterIndex))
             );
         };
     }
@@ -10406,7 +10406,7 @@ ensureFunctionalStyles();runRepairs();
     function esc(value){ return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;"); }
     function currentRound(){ return Math.max(1,Math.floor(typeof turn!=="undefined"?numeric(turn):1)); }
     function currentBattleToken(){ return typeof battleToken!=="undefined"?battleToken:null; }
-    function partyIndexes(){ return typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes().slice(0,3):[0,1,2].filter(i=>typeof getPartyCharacterByIndex==="function"&&getPartyCharacterByIndex(i)); }
+    function partyIndexes(){ return typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes().slice(0,6):[0,1,2].filter(i=>typeof getPartyCharacterByIndex==="function"&&getPartyCharacterByIndex(i)); }
     function characterAt(index){ return typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null; }
     function statsAt(index){ return typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null; }
     function relicLevel(id){ return Math.max(1,Math.min(MAX_LEVEL,Math.floor(numeric(playerRelics[id]&&playerRelics[id].level)||1))); }
