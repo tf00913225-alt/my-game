@@ -1,5 +1,32 @@
 // GENERATED projection of canonical Reward Owners. DO NOT EDIT.
 window.FourSymbolsItemAcquisitionData={
+  "series": [
+    {
+      "setId": "setFire",
+      "label": "赤炎",
+      "element": "fire",
+      "color": "#e24b32"
+    },
+    {
+      "setId": "setWater",
+      "label": "寒泉",
+      "element": "water",
+      "color": "#4bb9e8"
+    },
+    {
+      "setId": "setEarth",
+      "label": "岩岳",
+      "element": "earth",
+      "color": "#c59a54"
+    },
+    {
+      "setId": "setWind",
+      "label": "青嵐",
+      "element": "wind",
+      "color": "#55cda3"
+    }
+  ],
+  "seriesDismantleQuantity": 10,
   "equipmentDungeonFragments": {
     "setIds": [
       "setFire",

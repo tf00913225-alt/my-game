@@ -33580,6 +33580,33 @@ try{
 /* bundled source: js/generated-item-acquisition-data.js */
 // GENERATED projection of canonical Reward Owners. DO NOT EDIT.
 window.FourSymbolsItemAcquisitionData={
+  "series": [
+    {
+      "setId": "setFire",
+      "label": "赤炎",
+      "element": "fire",
+      "color": "#e24b32"
+    },
+    {
+      "setId": "setWater",
+      "label": "寒泉",
+      "element": "water",
+      "color": "#4bb9e8"
+    },
+    {
+      "setId": "setEarth",
+      "label": "岩岳",
+      "element": "earth",
+      "color": "#c59a54"
+    },
+    {
+      "setId": "setWind",
+      "label": "青嵐",
+      "element": "wind",
+      "color": "#55cda3"
+    }
+  ],
+  "seriesDismantleQuantity": 10,
   "equipmentDungeonFragments": {
     "setIds": [
       "setFire",
@@ -34989,6 +35016,8 @@ window.FourSymbolsItemAcquisitionData={
   if(talisman){const tierIndex=["Low","Mid","High","Perfect"].indexOf(talisman[2]);add({sourceType:"synthesis",sourceId:"talisman-promotion",materialItemId:talisman[1]+"Talisman"+["Low","Mid","High"][tierIndex-1],mode:"符咒合成",location:"主城 → 合成 → 符咒合成",quantity:1,chance:1,repeatable:true,notes:"3張同款前一階符咒＋"+data.talismanGold[tiers[tierIndex-1]]+"金幣"});}
   if(id==="materialChest")add({sourceType:"dungeon",sourceId:"material",mode:"材料副本",location:"主城 → 副本 → 每日副本 → 材料副本",quantityRange:[1,3],repeatable:true,chance:1,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；總回合少於15給3箱、15～29給2箱、30以上給1箱；每日1次；可選廣告雙倍"});
   if(id==="equipmentChest")add({sourceType:"dungeon",sourceId:"equipment",mode:"裝備副本",location:"主城 → 副本 → 每日副本 → 裝備副本",quantity:2,chance:1,repeatable:true,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；每日1次；可選廣告雙倍×4"});
+  const series=data.series.find(row=>'fragment'+row.setId.charAt(0).toUpperCase()+row.setId.slice(1)===id);
+  if(series)add({sourceType:"dismantle",sourceId:series.setId,mode:"裝備分解",location:"背包 → "+series.label+"系列裝備 → 分解",quantity:data.seriesDismantleQuantity,chance:1,repeatable:true,notes:"消耗1件對應系列裝備；裝備抽獎券來源可由同系列裝備詳情追溯"});
   if(data.equipmentDungeonFragments.setIds.some(setId=>'fragment'+setId.charAt(0).toUpperCase()+setId.slice(1)===id))add({sourceType:"dungeon",sourceId:"equipment",mode:"裝備副本",location:"主城 → 副本 → 每日副本 → 裝備副本",quantity:data.equipmentDungeonFragments.count,chance:1/data.equipmentDungeonFragments.setIds.length,repeatable:true,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；四系列隨機一種；暫定分布；廣告雙倍數量"});
   if(/^ticketSet(Fire|Water|Earth|Wind)$/.test(id)){
    for(const difficulty of Object.values(data.abyssDifficulties)){
@@ -34997,7 +35026,7 @@ window.FourSymbolsItemAcquisitionData={
     if(region)add({...base,sourceId:"abyss-"+difficulty.id+"-"+region.id,location:difficulty.title+" → "+region.name+" → 帝王寶箱",chance:1});
     add({...base,sourceId:"abyss-"+difficulty.id+"-extreme",location:difficulty.title+" → 第五區極帝領域 → 帝王寶箱",chance:.25});
    }
-   add({sourceType:"synthesis",sourceId:id.replace('ticket','fragment'),mode:"合成",location:"主城 → 合成 → 碎片合成",quantity:1,chance:1,repeatable:true,notes:"100枚對應系列碎片＋500金幣"});
+   add({sourceType:"synthesis",sourceId:id.replace('ticket','fragment'),materialItemId:id.replace('ticket','fragment'),mode:"合成",location:"主城 → 合成 → 碎片合成",quantity:1,chance:1,repeatable:true,notes:"100枚對應系列碎片＋500金幣"});
   }
   for(const [floor,reward] of Object.entries(data.tower.majorMilestones)){if(id===reward.boxId)add({sourceType:"tower",sourceId:"tower-"+floor,mode:"四象塔",unlockRequirement:"任一角色Lv."+data.towerUnlockLevel,floor:Number(floor),quantity:1,chance:1,firstClearOnly:true,repeatable:false,location:"主城 → 玩法 → 四象塔"});}
   const relic=data.relics.find(r=>fragment(r.id)===id||r.id===id);

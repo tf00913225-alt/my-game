@@ -29,6 +29,7 @@
         hand:{label:"武器",type:"weapon",glyph:"刃"},
         armor:{label:"衣服",type:"armor",glyph:"甲"}
     };
+    const SERIES_DISMANTLE_FRAGMENT_COUNT=10;
     const SERIES=[
         {setId:"setFire",label:"赤炎",element:"fire",color:"#e24b32"},
         {setId:"setWater",label:"寒泉",element:"water",color:"#4bb9e8"},
@@ -649,7 +650,7 @@
         if(
             typeof window.rpgConfirm!=="function" ||
             !await window.rpgConfirm(
-                "確定分解「"+item.name+"」？\n將固定獲得"+fragment.name+"×10，裝備無法復原。",
+                "確定分解「"+item.name+"」？\n將固定獲得"+fragment.name+"×"+SERIES_DISMANTLE_FRAGMENT_COUNT+"，裝備無法復原。",
                 {
                     title:"分解裝備",
                     confirmText:"確定分解",
@@ -665,11 +666,11 @@
         if(realIndex<0){ return; }
         const success=runInventoryTransaction(()=>{
             inventoryItems.splice(realIndex,1);
-            return addItem(fragment,10);
+            return addItem(fragment,SERIES_DISMANTLE_FRAGMENT_COUNT);
         });
         if(!success){ alert("背包空間不足，分解已取消。"); return; }
         closeItemModal(); rebuildInventorySlots(); saveGame(); renderInventory();
-        alert("分解完成，獲得"+fragment.name+"×10。");
+        alert("分解完成，獲得"+fragment.name+"×"+SERIES_DISMANTLE_FRAGMENT_COUNT+"。");
     };
 
     if(typeof openHomeFeature==="function"){

@@ -118,6 +118,8 @@ test('approved provisional rewards project exact floors and fragment quantities'
  for(const element of ['Fire','Water','Earth','Wind']){
   const row=api.getSources('fragmentSet'+element).find(r=>r.sourceId==='equipment');
   assert.equal(row.quantity,10);assert.equal(row.chance,.25);assert.match(row.notes,/雙倍/);
+  const dismantle=api.getSources('fragmentSet'+element).find(r=>r.sourceType==='dismantle');assert.equal(dismantle.quantity,10);assert.equal(dismantle.chance,1);
+  assert.ok(api.trace('ticketSet'+element).some(node=>node.source.sourceType==='synthesis'&&node.parents.some(parent=>parent.source.sourceId==='equipment')));
  }
 });
 test('equipment reward commits chest and fixed fragment together, retries safely and grants once',()=>{
