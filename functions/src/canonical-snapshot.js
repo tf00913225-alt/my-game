@@ -230,5 +230,114 @@ function verifyCanonicalSnapshotAgainstSources(bundle,uid,revision,records){
     return bundle.snapshot;
 }
 
-module.exports={assembleCanonicalSnapshot,inspectCanonicalSnapshot,
-    verifyCanonicalSnapshotAgainstSources,claimRecordsDigest,MAX_SNAPSHOT_BYTES};
+// A separate, unpublished projection keeps existing archive/receipt v1 hashes
+// stable. The caller must supply reviewed server sources; this is not a writer
+// or a client-candidate adoption path.
+function assembleCanonicalPlayableProjection(uid,revision,records){
+    const {validateJsonValue,validateLegacySaveCandidate}=require("./cloud-save-policy.js");
+    validateJsonValue(records,"canonical sources",0);
+    const source=assembleCanonicalSnapshot(uid,revision,records);
+    const extra=records.playableState;
+    const keys=["schemaVersion","ownerUid","serverRevision","provenance",
+        "heroAccount","bestiaryData","autoConfig","autoConfig2","autoConfig3",
+        "selectedCreationElement","lastSaveTimestamp"];
+    if(!object(extra)||Object.keys(extra).length!==keys.length||
+       keys.some(key=>!Object.hasOwn(extra,key))||extra.schemaVersion!==1||
+       extra.ownerUid!==uid||extra.serverRevision!==revision||
+       extra.provenance!==records.account.provenance||
+       !object(extra.heroAccount)||!object(extra.bestiaryData)||
+       !ELEMENTS.has(extra.selectedCreationElement)||
+       !Number.isSafeInteger(extra.lastSaveTimestamp)||extra.lastSaveTimestamp<1){
+        fail("complete playable source owner, revision or fields");
+    }
+    const hero=require("./hero-core.js").normalizeAccountState(extra.heroAccount);
+    if(snapshotDigest(hero)!==snapshotDigest(extra.heroAccount)){
+        fail("Hero source would require defaults or discard fields");
+    }
+    const configKeys=["autoConfig","autoConfig2","autoConfig3"];
+    const preferences=require("./cloud-preferences.js").normalizePreferences({
+        characterIds:records.account.slots.map((id,index)=>id===null?null:`slot-${index}`),
+        ...Object.fromEntries(configKeys.map(key=>[key,extra[key]]))});
+    const slotKeys=["fire","player2","player3"];
+    const characterEquipment={},characterSkillLoadouts={};
+    const players=[null,null,null];
+    for(const character of source.snapshot.characters){
+        const state=character.state;
+        const integers=["attack","intelligence","vitality","energy","defensePoints",
+            "agility","expNext","skillPoints","attributePoints","bonusHP","bonusSP"];
+        if(integers.some(key=>!Number.isSafeInteger(state[key])||state[key]<0)||
+           state.expNext<1||!["male","female"].includes(state.gender)||
+           ["hp","sp"].some(key=>!Number.isFinite(state[key])||state[key]<0)||
+           !Array.isArray(state.activeBuffs)||!Array.isArray(state.statusEffects)||
+           typeof state.isDefending!=="boolean"){
+            fail("complete character state");
+        }
+        players[character.slotIndex]=copy(state);
+        const key=slotKeys[character.slotIndex];
+        characterEquipment[key]=Object.fromEntries([...EQUIPMENT_SLOTS].map(slot=>[slot,null]));
+        characterSkillLoadouts[key]=copy(character.skillLoadout);
+    }
+    const items=new Map(source.snapshot.inventory.map(item=>[item.ownedItemId,item]));
+    const itemState=item=>({...copy(item.state),v141Uid:item.ownedItemId});
+    for(const ref of source.snapshot.equipment){
+        const index=source.snapshot.slots.indexOf(ref.characterId);
+        characterEquipment[slotKeys[index]][ref.slot]=itemState(items.get(ref.ownedItemId));
+    }
+    const playerRelics={};
+    for(const relic of source.snapshot.relics){
+        if(typeof relic.seen!=="boolean"){ fail("complete relic state"); }
+        playerRelics[relic.relicId]={unlocked:relic.unlocked,level:relic.level,
+            exp:relic.exp,seen:relic.seen};
+    }
+    // Device-only preferences may be missing; every gameplay source must be
+    // explicit. An empty/default object cannot be synthesized by this reader.
+    const deviceOnly=new Set(["announcement-read","bulk-sell-quality","patrol-character-index"]);
+    const sidecars=copy(source.snapshot.progress.sidecars);
+    for(const [key,entry] of Object.entries(sidecars)){
+        if(deviceOnly.has(key)){continue;}
+        if(entry.status!=="present"){ fail(`playable sidecar missing: ${key}`); }
+        let parsed;
+        try{parsed=JSON.parse(entry.raw);}catch(_){fail(`playable sidecar JSON: ${key}`);}
+        if(!object(parsed)){fail(`playable sidecar structure: ${key}`);}
+        validateJsonValue(parsed,`sidecar ${key}`,0);
+    }
+    const gameSave={version:6,heroAccount:hero,player:players[0],player2:players[1],
+        player3:players[2],gold:source.snapshot.economy.gold,
+        sharedExp:source.snapshot.economy.sharedExp,bestiaryData:copy(extra.bestiaryData),
+        lastSaveTimestamp:extra.lastSaveTimestamp,selectedCreationElement:extra.selectedCreationElement,
+        characterEquipment,characterSkillLoadouts,allyFormation:copy(source.snapshot.formation),
+        playerRelics,teamLoadout:{relicId:source.snapshot.relicLoadout.relicId,
+            subRelicId:source.snapshot.relicLoadout.subRelicId},
+        inventoryItems:source.snapshot.inventory.filter(item=>item.location==="bag").map(itemState),
+        ...Object.fromEntries(PROGRESS_FIELDS.map(key=>[key,copy(source.snapshot.progress[key])])),
+        ...Object.fromEntries(configKeys.map(key=>[key,copy(preferences[key])]))};
+    // Reuse the current save-format bounds, without adopting a candidate or
+    // treating structural validity as authority.
+    validateLegacySaveCandidate(gameSave);
+    const projection={projectionVersion:1,ownerUid:uid,sourceServerRevision:revision,
+        sourceSnapshotSha256:source.sha256,gameSave,sidecars,
+        claimCheckpoint:copy(source.snapshot.claimCheckpoint),authoritativeStateReady:false};
+    const byteLength=Buffer.byteLength(JSON.stringify(projection),"utf8");
+    if(byteLength>MAX_SNAPSHOT_BYTES){ fail("playable projection exceeds internal size budget"); }
+    return Object.freeze({projection,sha256:snapshotDigest(projection),byteLength,
+        readyForPublication:false});
+}
+
+function verifyCanonicalPlayableProjectionAgainstSources(bundle,uid,revision,records){
+    if(!object(bundle)||!object(bundle.projection)||bundle.readyForPublication!==false||
+       bundle.projection.authoritativeStateReady!==false||
+       bundle.projection.ownerUid!==uid||bundle.projection.sourceServerRevision!==revision||
+       snapshotDigest(bundle.projection)!==bundle.sha256||
+       Buffer.byteLength(JSON.stringify(bundle.projection),"utf8")!==bundle.byteLength){
+        fail("playable projection digest, size, readiness or owner");
+    }
+    const rebuilt=assembleCanonicalPlayableProjection(uid,revision,records);
+    if(rebuilt.sha256!==bundle.sha256||rebuilt.byteLength!==bundle.byteLength){
+        fail("playable projection differs from canonical sources");
+    }
+    return bundle.projection;
+}
+
+module.exports={assembleCanonicalSnapshot,assembleCanonicalPlayableProjection,inspectCanonicalSnapshot,
+    verifyCanonicalSnapshotAgainstSources,verifyCanonicalPlayableProjectionAgainstSources,
+    claimRecordsDigest,MAX_SNAPSHOT_BYTES};
