@@ -16,3 +16,9 @@ node_modules/
 firebase-debug.*.log
 .firebase/
 gha-creds-*.json
+
+# Local package cache, worktrees, QA output, and static deployment staging.
+/.pnpm-store/
+/.worktrees/
+/artifacts/
+/_deploy/
