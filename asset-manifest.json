@@ -49,8 +49,8 @@
       },
       "gameplay-core": {
         "scripts": [
-          "build/gameplay-core-primary.c9fb7ae06e4e.js",
-          "build/gameplay-core-secondary.dd157853ecf6.js"
+          "build/gameplay-core-primary.09f2abe434fc.js",
+          "build/gameplay-core-secondary.409311c007b8.js"
         ],
         "styles": [
           "build/gameplay-core.336fac9e345f.css"
@@ -794,17 +794,17 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core-primary.c9fb7ae06e4e.js",
-        "sha256": "c9fb7ae06e4e",
-        "bytes": 648743,
+        "path": "build/gameplay-core-primary.09f2abe434fc.js",
+        "sha256": "09f2abe434fc",
+        "bytes": 648814,
         "priority": "P2",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/gameplay-core-secondary.dd157853ecf6.js",
-        "sha256": "dd157853ecf6",
-        "bytes": 634173,
+        "path": "build/gameplay-core-secondary.409311c007b8.js",
+        "sha256": "409311c007b8",
+        "bytes": 635409,
         "priority": "P2",
         "type": "script",
         "decode": false
@@ -818,8 +818,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "4dcecbb434bf",
-    "totalBytes": 21629277,
+    "manifestHash": "5e11bb0c44c5",
+    "totalBytes": 21630584,
     "totalResources": 78
   },
   "assets": {
@@ -831,13 +831,13 @@
       "sha256": "bca4e677b18d",
       "bytes": 1058151
     },
-    "build/gameplay-core-primary.c9fb7ae06e4e.js": {
-      "sha256": "c9fb7ae06e4e",
-      "bytes": 648743
+    "build/gameplay-core-primary.09f2abe434fc.js": {
+      "sha256": "09f2abe434fc",
+      "bytes": 648814
     },
-    "build/gameplay-core-secondary.dd157853ecf6.js": {
-      "sha256": "dd157853ecf6",
-      "bytes": 634173
+    "build/gameplay-core-secondary.409311c007b8.js": {
+      "sha256": "409311c007b8",
+      "bytes": 635409
     },
     "build/feature-patrol.ab5bd3ce5582.js": {
       "sha256": "ab5bd3ce5582",

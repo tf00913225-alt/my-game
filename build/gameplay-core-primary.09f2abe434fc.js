@@ -9405,10 +9405,10 @@
     const TIER_ORDER=["white","blue","purple","orange","pink","four-symbol"];
     const TALISMAN_TIER_ORDER=["white","blue","purple","orange"];
     const TIER_META={
-        white:{label:"白階",available:true,craftGold:500,reforgeGold:1000,main:[1,5],reforgeMain:[1,3]},
-        blue:{label:"藍階",available:true,craftGold:1500,reforgeGold:3000,main:[3,8],reforgeMain:[2,5]},
-        purple:{label:"紫階",available:true,craftGold:4000,reforgeGold:8000,main:[5,11],sub:[1,3],reforgeMain:[4,7],reforgeSub:[1,2]},
-        orange:{label:"橙階",available:true,craftGold:10000,reforgeGold:20000,main:[7,14],sub:[2,5],reforgeMain:[6,10],reforgeSub:[2,4]},
+        white:{label:"白階",available:true,craftGold:500,reforgeGold:1000,main:[1,5],reforgeMain:[5,10]},
+        blue:{label:"藍階",available:true,craftGold:1500,reforgeGold:3000,main:[3,8],reforgeMain:[11,16]},
+        purple:{label:"紫階",available:true,craftGold:4000,reforgeGold:8000,main:[5,11],sub:[1,3],reforgeMain:[17,22],reforgeSub:[11,16]},
+        orange:{label:"橙階",available:true,craftGold:10000,reforgeGold:20000,main:[7,14],sub:[2,5],reforgeMain:[23,28],reforgeSub:[11,16]},
         pink:{label:"桃紅階",available:false,planned:true},
         "four-symbol":{label:"四象階",available:false,planned:true}
     };
@@ -9668,16 +9668,17 @@
     window.v141RollCraftAffixes=rollAffixes;
 
     function reforgeRangeForSlot(tierKey,slotIndex){
-        const meta=TIER_META[normalizeTierKey(tierKey)]||TIER_META.white;
-        if(meta.available===false||!Array.isArray(meta.reforgeMain)){ return null; }
+        const meta=TIER_META[normalizeTierKey(tierKey)];
+        if(!meta||meta.available===false||!Array.isArray(meta.reforgeMain)){ return null; }
         if(slotIndex<=0){ return meta.reforgeMain; }
-        return meta.reforgeSub||meta.reforgeMain;
+        return meta.reforgeSub||null;
     }
     function reforgeRangeText(tierKey,slotCount){
         const meta=TIER_META[normalizeTierKey(tierKey)]||TIER_META.white;
         if(meta.available===false||!Array.isArray(meta.reforgeMain)){ return "尚未開放・數值待定"; }
         const main=meta.reforgeMain;
-        const sub=meta.reforgeSub||meta.reforgeMain;
+        const sub=meta.reforgeSub;
+        if(!sub){ return "主槽 "+main[0]+"～"+main[1]+"・無副屬性"; }
         return slotCount<=1
             ?"詞條 "+main[0]+"～"+main[1]
             :"主槽 "+main[0]+"～"+main[1]+"・其餘槽 "+sub[0]+"～"+sub[1];
@@ -9689,20 +9690,21 @@
         const used=new Set();
         const locks=(lockedKeys||[]).filter(key=>Object.prototype.hasOwnProperty.call(current,key)).slice(0,Math.min(2,Math.max(0,slots-1)));
         locks.forEach(key=>{ result[key]=current[key]; used.add(key); });
-        const meta=TIER_META[normalizeTierKey(tierKey)]||TIER_META.white;
-        if(meta.available===false){ throw new Error("此階級冶煉尚未開放"); }
+        const meta=TIER_META[normalizeTierKey(tierKey)];
+        if(!meta||meta.available===false){ throw new Error("此階級冶煉尚未開放"); }
         const unlockedCount=Math.max(0,slots-locks.length);
         const forceDualPeak=locks.length===0&&slots>=2&&!!meta.reforgeSub&&Math.random()<.05;
         let generated=0;
         while(Object.keys(result).length<slots){
             const needMain=!Array.from(used).some(key=>MAIN_STATS.includes(key));
             const slotIndex=needMain?0:Math.max(1,Object.keys(result).length);
+            const range=reforgeRangeForSlot(tierKey,slotIndex);
+            if(!range){ break; }
             let pool=needMain?MAIN_STATS:SUB_STATS;
             let available=pool.filter(key=>!used.has(key));
             if(!available.length){ available=MAIN_STATS.concat(SUB_STATS).filter(key=>!used.has(key)); }
             if(!available.length){ break; }
             const key=available[Math.floor(Math.random()*available.length)%available.length];
-            const range=reforgeRangeForSlot(tierKey,slotIndex);
             let value;
             if(forceDualPeak&&generated<2){ value=range[1]; }
             else if(!meta.reforgeSub||slots===1){ value=rollSinglePeak(range); }
