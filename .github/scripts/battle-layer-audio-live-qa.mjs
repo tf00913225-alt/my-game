@@ -411,6 +411,11 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
             }
         }
     }else{ throw new Error("No production relic fixture trigger: "+relicId); }
+    // The seventh enemy action completes asynchronously like the first six.
+    // Observe the production completion event before checking its exact count.
+    // This bounded wait does not dispatch another action or synthesize a trigger.
+    await waitFor(client,`window.v174RelicDebugState().totalTriggers!==${Number(before)}`,
+        mode+" "+relicId+" production event completion",10000);
     const after=await client.eval("window.v174RelicDebugState().totalTriggers");
     assert.equal(after,before+1,"Relic production event must trigger exactly once: "+relicId);
     await waitFor(
