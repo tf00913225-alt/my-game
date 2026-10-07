@@ -99,6 +99,7 @@ test("leaving READY clears a pending candidate confirmation",()=>{
     const start=source.indexOf("export function setFirebaseAuthUiState(next={}){");
     assert.ok(start>=0);
     const context={
+        resumeActive:false,
         candidateConfirmation:{uid:"uid-a",backupKey:"sealed-a",revision:2},
         state:{user:{uid:"uid-a"},mode:"READY",migrationCandidate:"已封存"},
         render:()=>{}

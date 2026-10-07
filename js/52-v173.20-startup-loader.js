@@ -96,7 +96,8 @@
         return new Promise(resolve=>global.setTimeout(()=>{ root.hidden=true; root.setAttribute("aria-hidden","true"); resolve(); },360));
     }
     function accountUi(mode,message,error=false,migration=null){
-        firebase.setUiState({mode,user:activeUser,message,error,migration}); firebase.openAuth();
+        firebase.setUiState({mode,user:activeUser,message,error,migration});
+        if(mode===STATES.SAVE_LOADING){ firebase.closeAuth(); }else{ firebase.openAuth(); }
     }
     function safeCloudEmpty(result,uid){
         if(result&&result.exists===false&&result.uid===uid){ return true; }
@@ -177,7 +178,9 @@
         }
         status("準備主城畫面","正在完成首屏圖片、字型與版面繪製");
         await global.FourSymbolsHomeRelicSummary.prepareFirstScreenVisuals();
+        if(token!==transitionToken){ return; }
         transition(offline?STATES.OFFLINE_READY:STATES.READY,{uid:resolvedUid});
+        firebase.setUiState({mode:state,migration:null});
         firebase.closeAuth(); status("載入完成","主城已可操作");
         mark("four-symbols:critical-ready");
         await hideLoader();
