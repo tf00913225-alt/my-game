@@ -305,7 +305,7 @@
         const shield=typeof getPlayerShieldRemaining==="function"?getPlayerShieldRemaining(entity):0;
         return entity&&stats?{
             hpRatio:clampedRatio(entity.hp,stats.maxHP),
-            spRatio:clampedRatio(entity.sp,stats.maxSP),
+            spRatio:clampedRatio(getBattleSecondaryResource(entity,stats).current,getBattleSecondaryResource(entity,stats).max),
             shieldRatio:clampedRatio(shield,stats.maxHP)
         }:null;
     }

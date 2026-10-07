@@ -1,4 +1,4 @@
-# Hero System V1 — Phase 1 and Phase 2A
+# Hero System V1 — Phase 1, Phase 2A and Phase 2B
 
 Work ID: HERO-CORE-PHASE1-20261007. Target: dev. Base dev: c1475726961a352811b195d65f7f54e905a80c5c.
 
@@ -44,14 +44,18 @@ Hero artwork is not defined in this phase; battle slots use the existing textual
 
 Regression: `tests/hero-battle-phase2a.test.js` and the existing production `run-battle-target-lifecycle-browser-qa.mjs` cover 0–3 Hero capacity, six distinct slots/initiative/identities, normal attack and incoming MISS/damage, death/revive, statistics, real save isolation and prior three-player target lifecycle. PR owns live CI/deploy/merge status.
 
-## Future Rage and passive contract — not implemented
+## Phase 2B — Rage, skills, passives and portraits
 
-Hero NPC kind stays `heroNpc`. Phase 2A party capacity is 3 players + at most 3 heroes in the existing six-slot Owner; Hero uses the same Battle Runtime and Statistics Owner. The following Rage/passive behavior remains unimplemented metadata.
+Hero NPC kind stays `heroNpc`. Party capacity remains 3 players + at most 3 heroes in the existing six-slot Owner. `js/00-main.js` extends the existing battle adapter and Combat Events; no parallel combat system or permanent schema is added. Work PR owns validation and completion status.
 
-Rage is battle transient 0–12; each new battle starts 0. Completed hero basic attack +1 regardless of MISS. Receiving one enemy basic/skill Action +1 once, including MISS/multihit/full shield absorption. Burn/DoT/reflect/self/environment damage give none. At rage >=4 the next own Action must use hero skill, cost 4. Death preserves rage, revival resumes it; a new battle resets it. No runtime/HUD exists in Phase 1.
+Rage is battle transient 0–12; each new battle starts 0. Completed hero basic attack +1 regardless of MISS. Receiving one enemy basic/skill Action +1 once, including MISS/multihit/full shield absorption. Burn/DoT/reflect/self/environment damage give none. At rage >=4 the next own Action must use hero skill, cost 4 instead of player SP. Declaration and resolution recheck current Rage. No legal skill targets means no cost or stack reset. Death preserves Rage, revival resumes it; a new battle resets it. Hero resource HUD projects Rage using the existing secondary resource bar; player SP remains unchanged.
 
-紅包 passive: each completed basic attack adds 15 percentage points to the next phoenixCry burn chance, stackable and preserved on death/revival; reset only on successful cast. Future hero-specific modifier must not edit global phoenixCry. 天王 passive: completed basic attack applies stealth 1 round to living ally with lowest absolute current HP, including self/players/heroes; ties use canonical Battlefield Slot order. No passive runtime exists.
+紅包 passive: each completed basic attack adds 15 percentage points to the next phoenixCry burn chance, stackable and preserved on death/revival; reset only on successful cast. The cast-local modifier does not edit global phoenixCry. 天王 passive: completed basic attack applies Stealth 1 round to living ally with lowest absolute current HP, including self/players/heroes; ties use canonical Battlefield Slot order. Shared named-state admission prevents refreshing an existing Stealth; the existing Round-End Owner expires it.
 
-Equipment must later share the player equipment/inventory Owner with exclusive physical item ownership (no simultaneous copies). Hero UI, equipment, rewards/login/story/activity fragments, skill AI/rage/passives and portraits/VFX remain subsequent phases.
+Hero skills use Core-projected skill level and final skillDatabase through `castSecondaryCharacterSkill`, the existing Targeting/Hit/Critical/Damage/Status/VFX/Statistics Owners. No player skill key, player EX or skill-point requirement is assigned. Completed-action facts are consumed once; enemy recipients are deduplicated on the formal action object. Rage and burn stacks live only on fresh battle actors.
+
+Battle artwork maps stable Hero IDs to `assets/heroes/divine-dog-hongbao.webp` and `assets/heroes/vajra-heavenly-king.webp`. Sources are the two PNGs under `assets/inbox/英雄or怪物立繪/英雄/` at assets-library `7a6d7feb73a940a1a2599de261787f051c5841cc`. Lossless WebP preserves the original 1086×1448 RGBA canvas byte-for-byte without cropping/resizing. Existing combatant presentation uses contain.
+
+Equipment must later share the player equipment/inventory Owner with exclusive physical item ownership (no simultaneous copies). Hero page, equipment, acquisition rewards/login/story/activity fragments and additional skill AI remain subsequent phases.
 
 Regression: `tests/hero-core-phase1.test.js`; existing account ownership, legacy hydration and player six-stat tests remain applicable. PR is the live CI/merge/closeout Owner.

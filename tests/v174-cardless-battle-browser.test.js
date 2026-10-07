@@ -26,6 +26,7 @@ const runtimeSource=fs.readFileSync(path.join(process.cwd(),"js","54-v173.51-bat
     .replace(/<\/script/gi,"<\\/script");
 
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
+const secondaryResourceSource=mainSource.match(/function getBattleSecondaryResource\(character,stats\)\{[\s\S]*?\n\}/)[0];
 const resourceStart=mainSource.indexOf("function projectEnemyResource(");
 const resourceEnd=mainSource.indexOf("function applyMonsterUiUpdate(",resourceStart);
 assert.ok(resourceStart>=0&&resourceEnd>resourceStart,"formal enemy resource presentation owner missing");
@@ -99,6 +100,7 @@ ${highlightSource}
 updateActiveCharacterHighlight();
 var monsters=Array.from({length:10},function(_,index){return {hp:1380-index*5,sp:630-index*3,maxHP:2000,maxSP:800};});
 ${resourceSource}
+${secondaryResourceSource}
 var qaParty=[{hp:835,sp:412},{hp:798,sp:468},{hp:752,sp:506}];
 function getPartyCharacterByIndex(index){return qaParty[index]||null;}
 function qaRect(selector){var r=document.querySelector(selector).getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height,right:r.right,bottom:r.bottom};}

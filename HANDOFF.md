@@ -20,7 +20,7 @@ Open PR 清單只反映觀測時點。沒有 Open PR 不代表整個子系統已
 
 ## 近期重要架構／migration 結果
 
-- HERO-CORE-PHASE1-20261007 建立 `functions/src/hero-core.js` 唯一英雄 Domain 與既有 UID main-save extension；HERO-BATTLE-PHASE2A-20261007 接入既有 Battle Owner 的 `heroNpc` 身份、6-unit 容量、普攻／受擊／死亡／合法復活／Initiative／Statistics，不重設 Core 或永久 schema。完整契約／下一階段邊界見 `docs/HERO_SYSTEM_V1.md`；Rage／Hero Skill／Passive／UI／Reward／Equipment 未施工。CI／整合即時結果查對應 Work ID PR。
+- HERO-CORE-PHASE1-20261007 建立 `functions/src/hero-core.js` 唯一英雄 Domain 與既有 UID main-save extension；HERO-BATTLE-PHASE2A-20261007 接入既有 Battle Owner 的 `heroNpc` 身份、6-unit 容量、普攻／受擊／死亡／合法復活／Initiative／Statistics，不重設 Core 或永久 schema。HERO-BATTLE-PHASE2B-20261008（PR #833）接續同一 Owner 的戰鬥暫存怒氣、技能、兩項被動與指定立繪；完整契約／後續邊界見 `docs/HERO_SYSTEM_V1.md`。英雄頁／Reward／Equipment 未施工；CI／整合／驗收即時結果查 Work PR。
 
 - Monster Balance Owner Phase 1–2F 已收斂七模式：Wild、Daily、Tower、Abyss、Adventure、Personal Boss、World Boss。後續平衡校正是新工程，不重開 migration；`docs/MONSTER_BALANCE_OWNER_FINAL.md` 為總結果索引，`SYSTEM_CONTRACTS.md` 的七模式章節為跨模式契約；退場圖 `docs/monster-balance-owner-retirement-map.json`。
 - Level Suppression V2 已採 `1.01 ^ levelDiff`、無人工 cap/floor，唯一 `js/00-main.js::getDamageLevelMultiplier()`；正式規格 `docs/LEVEL_SUPPRESSION_V2_20261005.md` 及 `SYSTEM_CONTRACTS.md` 相關章節。與 Hit／Evasion／Status 分離。

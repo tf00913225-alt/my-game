@@ -5146,9 +5146,8 @@
     function withDamageActor(actor,callback){
         const previousActor=damageActorContext;
         const previousReflectContext=monsterReflectContext;
-        const actorIndex=actor&&typeof player!=="undefined"&&actor===player?0:
-            actor&&typeof player2!=="undefined"&&actor===player2?1:
-            actor&&typeof player3!=="undefined"&&actor===player3?2:null;
+        const partyIndex=typeof getPartyCharacterIndex==="function"?getPartyCharacterIndex(actor):-1;
+        const actorIndex=partyIndex>=0?partyIndex:null;
         if(!monsterReflectContext&&actorIndex!==null&&typeof currentBattleMonsters!=="undefined"&&typeof monsters!=="undefined"){
             monsterReflectContext={
                 actor:actor,actorIndex:actorIndex,
@@ -7512,7 +7511,8 @@ function syncResourceNumbers(){
         if(!character)return;
         const hp=card.querySelector(".hp-bar-text"),sp=card.querySelector(".sp-bar-text");
         setTextIfChanged(hp,String(numericValue(character.hp)));
-        setTextIfChanged(sp,String(numericValue(character.sp)));
+        const resource=getBattleSecondaryResource(character);
+        setTextIfChanged(sp,resource.kind==="rage"?"怒氣 "+numericValue(resource.current)+"/12":String(numericValue(resource.current)));
     });
     document.querySelectorAll("#battlePage .battle-monster[id^='battleMonster']").forEach(card=>{
         const index=Number(String(card.id).replace("battleMonster",""));
@@ -8194,7 +8194,7 @@ ensureFunctionalStyles();runRepairs();
         const shield=typeof getPlayerShieldRemaining==="function"?getPlayerShieldRemaining(entity):0;
         return entity&&stats?{
             hpRatio:clampedRatio(entity.hp,stats.maxHP),
-            spRatio:clampedRatio(entity.sp,stats.maxSP),
+            spRatio:clampedRatio(getBattleSecondaryResource(entity,stats).current,getBattleSecondaryResource(entity,stats).max),
             shieldRatio:clampedRatio(shield,stats.maxHP)
         }:null;
     }

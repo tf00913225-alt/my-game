@@ -5056,7 +5056,7 @@ function initializeHeroBattleCombatants(){
         return {id:heroId,name:definition.name,heroId,combatantId:"heroNpc:"+heroId,
             combatantKind:"heroNpc",element:definition.element,level:domain.getHeroLevel(heroId),
             ...domain.getHeroAllocatedStats(heroId),hp:stats.maxHP,sp:stats.maxSP,
-            activeBuffs:[],statusEffects:[],isDefending:false};
+            activeBuffs:[],statusEffects:[],isDefending:false,rage:0,phoenixBurnStacks:0};
     });
     heroBattleCombatants=next;
     return next;
@@ -5125,6 +5125,58 @@ function getExistingPartyIndexes(){
 }
 
 
+function getHeroBattleSkillProjection(character){
+    return character&&character.combatantKind==="heroNpc"
+        ?window.FourSymbolsHeroSystem.getDomain().getHeroSkillProjection(character.heroId):null;
+}
+function getBattleSecondaryResource(character,stats){
+    const isRage=character&&character.combatantKind==="heroNpc";
+    return {kind:isRage?"rage":"sp",current:Number(isRage?character.rage:character.sp)||0,max:isRage?12:Number(stats&&stats.maxSP)||0};
+}
+function addHeroBattleRage(character){
+    character.rage=Math.min(12,Math.max(0,Number(character.rage)||0)+1);
+}
+function finishHeroBattleAction(event){
+    const action=event&&event.action;
+    if(!action||action.heroEffectsCommitted){ return; }
+    action.heroEffectsCommitted=true;
+    (action.heroRecipients||[]).forEach(addHeroBattleRage);
+    const actor=action.entity;
+    if(!actor||actor.combatantKind!=="heroNpc"||!action.basicAttackPerformed){
+        if(action.heroRecipients&&action.heroRecipients.size){ updateUI(); }
+        return;
+    }
+    addHeroBattleRage(actor);
+    if(actor.heroId==="divineDogHongbao"){
+        actor.phoenixBurnStacks=(Number(actor.phoenixBurnStacks)||0)+1;
+    }else if(actor.heroId==="vajraHeavenlyKing"){
+        const slots=window.FourSymbolsBattlefieldSlots;
+        slots.ensureAllyFormation(getExistingPartyIndexes());
+        const living=slots.allySlots.map(slot=>slots.getCharacterAtAllySlot(slot))
+            .filter(index=>Number.isInteger(index)&&getPartyCharacterByIndex(index).hp>0);
+        const index=living.reduce((best,index)=>best===null||getPartyCharacterByIndex(index).hp<getPartyCharacterByIndex(best).hp?index:best,null);
+        const target=index===null?null:getPartyCharacterByIndex(index);
+        if(target&&canApplyNamedPersistentState(target,"stealthSkill","player",index,"金剛天王")){
+            const state=markPersistentStateName({type:"stealthSkill",turnsLeft:1},"stealthSkill");
+            (target.activeBuffs||(target.activeBuffs=[])).push(state);
+            emitCombatEvent("status_written",{target,state});
+        }
+    }
+    updateUI();
+}
+function recordHeroEnemyActionReceipt(event){
+    const action=typeof battleDurationAction!=="undefined"?battleDurationAction:null;
+    const target=event&&event.target;
+    if(!action||action.completed||action.entry.type!=="monster"||!target||target.combatantKind!=="heroNpc"){ return; }
+    if(event.attacker&&event.attacker!==action.entity){ return; }
+    if(event.damageKind&&event.damageKind!=="direct"||["dot","reflect","self","environment","hpCost","relic"].includes(event.sourceType)){ return; }
+    (action.heroRecipients||(action.heroRecipients=new Set())).add(target);
+}
+if(window.FourSymbolsCombatEvents){
+    ["enemy_action_target","hit_roll","status_roll","incoming_direct","hp_damage"].forEach(type=>window.FourSymbolsCombatEvents.subscribe(type,recordHeroEnemyActionReceipt));
+    window.FourSymbolsCombatEvents.subscribe("action_finished",finishHeroBattleAction);
+}
+
 function getCharacterArtworkPath(character){
     if(!character){ return ""; }
 
@@ -5152,7 +5204,9 @@ function getCharacterArtworkPath(character){
 */
 function getCharacterBattleArtworkPath(character){
     if(!character){ return ""; }
-    if(character.combatantKind==="heroNpc"){ return ""; }
+    if(character.combatantKind==="heroNpc"){
+        return ({divineDogHongbao:"assets/heroes/divine-dog-hongbao.webp",vajraHeavenlyKing:"assets/heroes/vajra-heavenly-king.webp"})[character.heroId]||"";
+    }
 
     const gender=character.gender==="male" ? "male" : "female";
     const element=elementDatabase[character.element]
@@ -13774,8 +13828,9 @@ function resolveQueuedPlayerAction(characterIndex,token){
 
 
     const combatant=getPartyCharacterByIndex(characterIndex);
-    if(combatant&&combatant.combatantKind==="heroNpc"&&queued.action!=="normal"){
-        finishPlayerAction();return;
+    if(combatant&&combatant.combatantKind==="heroNpc"){
+        const projection=getHeroBattleSkillProjection(combatant);
+        queued.action=combatant.rage>=4?projection.skillId:"normal";
     }
 
     const isAdditionalCharacter=
@@ -18359,6 +18414,8 @@ function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
             const targetIndex=
                 targetEntry.index;
 
+            emitCombatEvent("enemy_action_target",{target:targetCharacter,attacker:monster});
+
 
             if(isPureControlSkill){
                 const freezeChance=getSkillFreezeChanceAtLevel(castSkillData,effectiveSkillLevel);
@@ -21243,10 +21300,11 @@ function autoActionForCharacter(characterIndex,token){
     const aliveInBattle=currentBattleMonsters.filter(index=>isBattleTargetAlive("monster",index));
     if(aliveInBattle.length===0){ checkBattleEnd(); return; }
 
-    let action=config.skill||"normal";
+    const heroProjection=character.combatantKind==="heroNpc"?getHeroBattleSkillProjection(character):null;
+    let action=heroProjection?(character.rage>=4?heroProjection.skillId:"normal"):(config.skill||"normal");
     let skill=action!=="normal"?skillDatabase[action]:null;
     const skillKey=getPartyCharacterKey(characterIndex);
-    if(action!=="normal"&&(
+    if(!heroProjection&&action!=="normal"&&(
         !skill||
         getSkillLevel(skillKey,action)<=0||
         character.sp<(skill.spCost!==undefined?skill.spCost:(skill.cost||0))||
@@ -21256,7 +21314,7 @@ function autoActionForCharacter(characterIndex,token){
         skill=null;
     }
 
-    const skillLevel=skill?getSkillLevel(skillKey,action):0;
+    const skillLevel=skill?(heroProjection?heroProjection.level:getSkillLevel(skillKey,action)):0;
     const targetType=skill
         ?normalizeBattleTargetType(getEffectiveSkillTargetType(skill,skillLevel))
         :"single";
@@ -21317,6 +21375,10 @@ function secondaryCharacterNormalAttack(characterIndex,index){
 
     selectedMonster=index;
     const monster=monsters[index];
+
+    if(typeof battleDurationAction!=="undefined"&&battleDurationAction&&battleDurationAction.entity===character){
+        battleDurationAction.basicAttackPerformed=true;
+    }
 
     lungePlayerCard(characterIndex);
     showSkillNameBadge("普通攻擊","normal",characterIndex,index,[index]);
@@ -21384,8 +21446,13 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         return;
     }
 
-    const level=getSkillLevel(characterKey,skillId);
-    const spCost=skill.spCost!==undefined ? skill.spCost : (skill.cost||0);
+    const heroProjection=getHeroBattleSkillProjection(character);
+    const level=heroProjection?heroProjection.level:getSkillLevel(characterKey,skillId);
+    const spCost=heroProjection?0:(skill.spCost!==undefined ? skill.spCost : (skill.cost||0));
+
+    if(heroProjection&&(heroProjection.skillId!==skillId||character.rage<4)){
+        finishPlayerAction();return;
+    }
 
     if(level<=0 || character.sp<spCost){
         addBattleLog(
@@ -21413,13 +21480,17 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         return;
     }
 
-    spendActiveSkillSP(character,spCost);
+    const heroBurnBonus=heroProjection&&skillId==="phoenixCry"?(Number(character.phoenixBurnStacks)||0)*15:0;
+    if(heroProjection){
+        character.rage-=4;
+        if(skillId==="phoenixCry"){ character.phoenixBurnStacks=0; }
+    }else{ spendActiveSkillSP(character,spCost); }
     lungePlayerCard(characterIndex);
     showSkillNameBadge(
         skill.name,skill.element,characterIndex,
         effectiveTargetType==="all"?null:centerIndex,targets,undefined,effectiveTargetType
     );
-    setTimeout(()=>showPlayerSpPopup(spCost,characterIndex),500);
+    if(!heroProjection){ setTimeout(()=>showPlayerSpPopup(spCost,characterIndex),500); }
 
     const statBonus=skill.category==="magic" ? stats.magicAttack : stats.attack;
 
@@ -21512,7 +21583,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
                 monster,
                 "burn",
                 [
-                    skill.burnChance,character.level,monster.level,
+                    skill.burnChance+heroBurnBonus,character.level,monster.level,
                     stats.intelligence,getMonsterEffectiveStatusResistance(monster)
                 ],
                 "monster",
@@ -23325,8 +23396,8 @@ function updateSingleCharacterBars(
                 0,
                 Math.min(
                     100,
-                    character.sp/
-                    stats.maxSP*
+                    getBattleSecondaryResource(character,stats).current/
+                    getBattleSecondaryResource(character,stats).max*
                     100
                 )
             )+
@@ -23359,10 +23430,9 @@ function updateSingleCharacterBars(
 
     if(spText){
 
-        spText.textContent =
-            character.sp+
-            "/"+
-            stats.maxSP;
+        spText.textContent = character.combatantKind==="heroNpc"
+            ?"怒氣 "+character.rage+"/12"
+            :character.sp+"/"+stats.maxSP;
 
     }
 

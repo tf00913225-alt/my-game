@@ -760,9 +760,8 @@
     function withDamageActor(actor,callback){
         const previousActor=damageActorContext;
         const previousReflectContext=monsterReflectContext;
-        const actorIndex=actor&&typeof player!=="undefined"&&actor===player?0:
-            actor&&typeof player2!=="undefined"&&actor===player2?1:
-            actor&&typeof player3!=="undefined"&&actor===player3?2:null;
+        const partyIndex=typeof getPartyCharacterIndex==="function"?getPartyCharacterIndex(actor):-1;
+        const actorIndex=partyIndex>=0?partyIndex:null;
         if(!monsterReflectContext&&actorIndex!==null&&typeof currentBattleMonsters!=="undefined"&&typeof monsters!=="undefined"){
             monsterReflectContext={
                 actor:actor,actorIndex:actorIndex,
