@@ -283,16 +283,16 @@
       },
       {
         "path": "privacy-consent.html",
-        "sha256": "f673d091317c",
-        "bytes": 9578,
+        "sha256": "6e020241563c",
+        "bytes": 9515,
         "priority": "P0",
         "type": "html",
         "decode": false
       },
       {
         "path": "privacy.html",
-        "sha256": "a02e296f551b",
-        "bytes": 8420,
+        "sha256": "bbf42a364b43",
+        "bytes": 8212,
         "priority": "P0",
         "type": "html",
         "decode": false
@@ -818,8 +818,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "6ed892ba7247",
-    "totalBytes": 21635655,
+    "manifestHash": "99e411993a77",
+    "totalBytes": 21635384,
     "totalResources": 78
   },
   "assets": {
