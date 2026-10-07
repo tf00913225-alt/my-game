@@ -12,7 +12,7 @@
     "HIT_CHANCE_BASE": "340ec586949a9330d6988e79748107a11098b6923a8f43b89d5bf2707b274a31",
     "HIT_CHANCE_MIN_PERCENT": "07c323b35b73375428d01b1e4d00a6db108bd1365775f6490525713475faae5f",
     "HIT_CHANCE_MAX_PERCENT": "732c40bc69f9b84e77c777483641d838b68c1cf62215e667f175220b65597ad1",
-    "buildInitiativeQueue": "4bdf46aac71bd819f0f171108d036ab3fcfaabda9d4cd44a3d42730220d0d9c7",
+    "buildInitiativeQueue": "56fb1241bd42df0a66b662170ae2d50f023801771bb0b28cac4233d1f7ba6c9b",
     "getMonsterAgility": "bd75fef258f9e1b7e3a0ca22755a5f00bde684c7645bd602bf91c3a26710c179",
     "getMonsterAccuracy": "e8ada45048b2418f59aaaa4dec510ec7ca6207e9b8e8d3fca9a0bf00ae9b4eef",
     "calculateHitChancePercent": "8691b66a68926e30b35cbc8030a79e686ee26a5f2ead89754df13feebc01b5b6",
@@ -20,7 +20,7 @@
     "emitCombatEvent": "970970e5079483bd3fe4c59e8ba9c2d69ff83f620bc2c9b654dd5aef38b2641a",
     "rollBeginnerForestNormalAttackDamage": "d69f138dc4a94512bee6dcce6dcf740fec3021e73ef2c9658ff7020c77f8ca50"
   },
-  "rulesSha256": "4b16add39e761db32d472e7a3e43df7e9e503593f204d806bb094ae6e4a890d8",
+  "rulesSha256": "73281d6dc21692638813c14139a593616919386de2d0c7b91f50e2a54182ab88",
   "combatRulesReady": false,
   "outcomeVerified": false,
   "rewardEligible": false
