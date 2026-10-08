@@ -180,8 +180,8 @@ async function verifySurface(client,width,height,surface,markup){
   if(surface==="character"){
     surfaceMarkup+=`<section id="skillPage"><button class="skill-action-card qa-major qa-skill-action">技能升級測試</button></section>`;
   }
-  const runtime='<script src="js/00-main.js"></script>'+(wide?'<script src="js/19-stage-v78-character-inventory-runtime.js"></script>':'');
-  const page=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050403}#game-viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}#game-stage{position:relative;width:1080px;height:1920px;flex:0 0 1080px;transform-origin:center center;overflow:hidden}#game-content{position:absolute;left:0;top:0;width:420px;height:746.6667px;transform:scale(2.5714285714);transform-origin:top left}#homeFeatureModal{display:flex!important;position:absolute!important;inset:0!important;width:420px!important;height:746.6667px!important}.qa-test-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}</style></head><body><div id="game-viewport"><div id="game-stage"><div id="app"><div id="game-content"><div id="homeFeatureModal" class="${classes}"><div class="home-feature-modal-box ${wide?"wide":""}"><div class="home-feature-modal-title"><span class="qa-test-title">功能型 UI・${surface}</span><button class="home-feature-close-btn qa-major">返回</button></div><div id="homeFeatureModalBody">${surfaceMarkup}</div></div></div></div></div></div></div>${runtime}<script>document.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{button.dataset.qaClicked='1';}));</script></body></html>`;
+  const runtime=wide?'<script src="js/19-stage-v78-character-inventory-runtime.js"></script>':'';
+  const page=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050403}#game-viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}#game-stage{position:relative;width:1080px;height:1920px;flex:0 0 1080px;transform-origin:center center;overflow:hidden}#game-content{position:absolute;left:0;top:0;width:420px;height:746.6667px;transform:scale(2.5714285714);transform-origin:top left}#homeFeatureModal{display:flex!important}.qa-test-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}</style></head><body><div id="game-ui"><div id="homeFeatureModal" class="${classes}"><div class="home-feature-modal-box ${wide?"wide":""}"><div class="home-feature-modal-title"><span class="qa-test-title">功能型 UI・${surface}</span><button class="home-feature-close-btn qa-major">返回</button></div><div id="homeFeatureModalBody">${surfaceMarkup}</div></div></div></div>${runtime}<script>document.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{button.dataset.qaClicked='1';}));</script></body></html>`;
   fs.writeFileSync(fixture,page,"utf8");
   try{
     await configureViewport(client,width,height);
@@ -211,11 +211,11 @@ async function verifySurface(client,width,height,surface,markup){
       // owner reserves 4 logical pixels per edge without inline geometry.
       assert.equal(data.inline.width,"","retired layout writer must not claim frame width");
       assert.equal(data.inline.height,"","retired layout writer must not claim frame height");
-      assert.equal(data.computed.width,"412px","formal CSS wide panel side inset missing");
+      assert.ok(Math.abs(parseFloat(data.computed.width)-Math.min(width-32,960))<=1,"browser Large Panel side inset/maximum missing");
       // css/00 native ancestry keeps its 96% height ceiling; content
       // flexing can make this frame shorter than the requested 8px inset.
-      assert.equal(data.computed.maxHeight,"96%","native wide panel height ceiling missing");
-      assert.ok(parseFloat(data.computed.height)>=620&&parseFloat(data.computed.height)<=746.6667*0.96,"character panel violates Large Panel height or native ceiling");
+      assert.equal(data.computed.maxHeight,"calc(100% - 24px)","browser Large Panel height ceiling missing");
+      assert.ok(Math.abs(parseFloat(data.computed.height)-Math.min(760,height-32))<=1,"character panel violates browser Large Panel height");
       interactions.exp=await hitClick(client,".v131-exp-preview-btn");
       interactions.status=await hitClick(client,".status-btn");
       interactions.confirm=await hitClick(client,"#confirmStatusButton");

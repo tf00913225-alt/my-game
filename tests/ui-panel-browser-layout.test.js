@@ -38,11 +38,10 @@ const html=`<!doctype html>
 <link rel="stylesheet" href="css/53-v173.51-qa.css">
 <style>
 html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;}
-#game-stage{position:relative!important;width:1080px!important;height:1920px!important;overflow:hidden!important;}
-#app,#game-content{position:relative!important;width:420px!important;height:746.6667px!important;transform:none!important;}
+#game-ui{position:relative!important;inset:auto!important;display:block!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;padding:0!important;}
 #homeFeatureModal{display:flex!important;position:absolute!important;inset:0!important;width:420px!important;height:746.6667px!important;}
 </style></head><body>
-<div id="game-stage"><div id="app"><div id="game-content">
+<div id="game-ui">
 <div id="homeFeatureModal" class="home-feature-modal show v131-shop-open">
   <div class="home-feature-modal-box">
     <div class="home-feature-modal-title">
@@ -57,7 +56,7 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;}
     </div>
   </div>
 </div>
-</div></div></div>
+</div>
 <pre id="result"></pre>
 <script>
 (function(){
@@ -166,7 +165,7 @@ try{
 
 
     snapshots.filter(shot=>shot.page==='equipment').forEach(shot=>{
-        assert.equal(shot.cardRects.length,6,"equipment shop must show six cards on one screen");
+        assert.equal(shot.cardRects.length,6,"equipment shop must retain all six cards in its list");
         assert.equal(shot.equipmentArtRects.length,6,"each equipment card needs one bounded art frame");
         assert.equal(shot.equipmentItemArtRects.length,6,"each equipment art frame needs one item art");
         assert.equal(shot.equipmentImageRects.length,6,"each equipment item art needs one image");
@@ -231,7 +230,7 @@ try{
     });
 
 
-    console.log("Headless Chrome: shop stayed fixed, non-scrollable and aligned with six potion icons across 5 tab switches");
+    console.log("Headless Chrome: shop frame stayed fixed with aligned cards and bounded list scrolling across 5 tab switches");
 }finally{
     try{ fs.unlinkSync(fixture); }catch(_){ }
 }

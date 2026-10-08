@@ -358,6 +358,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 
 
 
+
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
    - 遊戲邏輯舞台固定 1080 × 1920
@@ -389,6 +390,30 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 
         app.appendChild(content);
     }
+})();
+
+/* Browser layout boundary. Move the existing general-page nodes once; their
+   data, handlers and navigation lifecycle remain owned by the same runtime.
+   The remaining game-content and native overlay retain the Phase 1 projection. */
+(function setupBrowserGameUi(){
+    const ui=document.createElement("div");
+    ui.id="game-ui";
+    ui.hidden=true;
+    ui.dataset.presentationDomain="browser";
+    document.body.appendChild(ui);
+    for(const id of ["homePage","inventoryPage","homeFeatureModal","itemModal",
+                     "inventoryCharacterDetailModal","skillDetailModal","statusHelpModal"]){
+        const node=document.getElementById(id);
+        if(node) ui.appendChild(node);
+    }
+    const gameInterface=document.getElementById("gameInterface");
+    function syncVisibility(){
+        ui.hidden=!gameInterface||gameInterface.style.display==="none";
+    }
+    if(gameInterface){
+        new MutationObserver(syncVisibility).observe(gameInterface,{attributes:true,attributeFilter:["style"]});
+    }
+    syncVisibility();
 })();
 
 /* Legacy V3 navigation positioning retired; FourSymbolsBottomNav owns the shell. */
@@ -35194,7 +35219,7 @@ window.FourSymbolsItemAcquisitionData={
     const CLICK_LIFETIME_MS=1000;
     const completedPointers=new Map();
     let legacyClickGesture=null;
-    function isGameSurfaceTarget(target){ return !!(target&&target.closest&&target.closest("#game-stage")); }
+    function isGameSurfaceTarget(target){ return !!(target&&target.closest&&target.closest("#game-stage, #game-ui")); }
     function isEditableGameControl(target){ return !!(target&&target.closest&&target.closest('input, textarea, [contenteditable="true"]')); }
     function scrollAxes(node){
         const style=window.getComputedStyle(node);
@@ -35266,7 +35291,9 @@ window.FourSymbolsItemAcquisitionData={
     document.addEventListener("pointercancel",cancelPointer,{capture:true,passive:true});
     function handleSuppressedGestureClick(event){ if(consumeSuppression(event)){ event.preventDefault(); event.stopImmediatePropagation(); } }
     const stage=document.getElementById("game-stage");
-    if(stage){ stage.addEventListener("click",handleSuppressedGestureClick,true); stage.addEventListener("pointerleave",function(event){ if(event.target===stage){ cancelPointer(event); } },true); }
+    for(const surface of [stage,document.getElementById("game-ui")]){
+        if(surface){ surface.addEventListener("click",handleSuppressedGestureClick,true); surface.addEventListener("pointerleave",function(event){ if(event.target===surface){ cancelPointer(event); } },true); }
+    }
     function resetGestures(){ activePointers.clear(); completedPointers.clear(); legacyClickGesture=null; }
     window.addEventListener("blur",resetGestures);
     window.addEventListener("pagehide",resetGestures);
@@ -35442,6 +35469,9 @@ window.FourSymbolsItemAcquisitionData={
         const nav=document.getElementById("bottomNav");
         const overlay=document.getElementById("game-overlay-layer");
         if(!nav||!overlay){ return null; }
+        const ui=document.getElementById("game-ui");
+        const generalActive=!!ui?.querySelector(":scope > .page.active");
+        const destination=generalActive?ui:overlay;
         if(!mainButtons){
             mainButtons=Array.from(nav.children);
             mainButtons.forEach(button=>{
@@ -35458,8 +35488,10 @@ window.FourSymbolsItemAcquisitionData={
             shell=document.createElement("div");
             shell.className="native-bottom-nav-layer";
             shell.appendChild(nav);
-            overlay.appendChild(shell);
+            destination.appendChild(shell);
         }
+        if(shell.parentElement!==destination){ destination.appendChild(shell); }
+        shell.dataset.presentationDomain=generalActive?"browser":"native";
         return nav;
     }
     function renderMain(page){
@@ -35553,7 +35585,7 @@ window.FourSymbolsItemAcquisitionData={
                 hide();
                 return "hidden-battle";
             }
-            const mainPage=document.querySelector("#game-content .page.active");
+            const mainPage=document.querySelector("#game-ui > .page.active, #game-content .page.active");
             renderMain(mainPage?.id.replace(/Page$/,"")||"home");
             return "main";
         }

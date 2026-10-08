@@ -14,7 +14,7 @@ const main=read("js/00-main.js");
 
 assert.match(inventory,/const INVENTORY_PAGE_SIZE=24/);
 assert.match(inventory,/for\(let index=0;index<INVENTORY_PAGE_SIZE;index\+\+\)/);
-assert.match(core,/grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/);
+assert.match(core,/grid-template-columns:repeat\(auto-fill,minmax\(48px,1fr\)\)/);
 assert.match(core,/aspect-ratio:1/);
 assert.match(core,/\.inventory-grid-scroll\{[\s\S]*?overflow-y:auto/);
 assert.match(core,/\.inventory-classic-shell\{[\s\S]*?border:1px solid/);

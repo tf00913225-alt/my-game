@@ -17,15 +17,15 @@ assert.match(shared,/--ui-large-panel-safe-space:24px/);
 // The inline V78 writer is retired; CSS owns the character frame and scroll.
 assert.match(character,/function applyCharacterInventoryLayout\(\)\{ return false; \}/);
 assert.doesNotMatch(character,/setProperty|MutationObserver|requestAnimationFrame|setTimeout/);
-assert.match(shared,/#homeFeatureModal \.home-feature-modal-box\.wide\{[^}]*width:calc\(100% - 8px\) !important;[^}]*max-width:none !important;[^}]*height:calc\(100% - 8px\) !important;[^}]*max-height:calc\(100% - 8px\) !important;/);
+assert.doesNotMatch(shared,/#homeFeatureModal \.home-feature-modal-box\.wide\{[^}]*max-width:none !important/);
 assert.match(shared,/#characterTabContent\{[^}]*flex:1 1 auto !important;[^}]*height:auto !important;[^}]*scrollbar-gutter:stable !important;/);
 assert.match(shared,/\.home-feature-modal-box\.wide #characterTabContent\{[^}]*overflow-x:hidden !important;[^}]*overflow-y:auto !important;/);
 
 assert.match(shared,/\.home-feature-modal-box\.wide\{[\s\S]*?max-width:var\(--ui-large-panel-max-width\) !important[\s\S]*?height:min\(var\(--ui-large-panel-height\),calc\(100% - var\(--ui-large-panel-safe-space\)\)\) !important/);
 assert.match(shared,/\.home-feature-modal-box\.wide #homeFeatureModalBody\{[\s\S]*?flex:1 1 auto !important/);
 assert.match(shared,/#characterTabContent\{[\s\S]*?flex:1 1 auto !important[\s\S]*?scrollbar-gutter:stable !important/);
-assert.match(shared,/V173\.62 — character and dungeon backpack use the maximum mobile canvas/);
-assert.match(shared,/#homeFeatureModal \.home-feature-modal-box\.wide\{[\s\S]*?width:calc\(100% - 8px\) !important;[\s\S]*?max-width:none !important;[\s\S]*?height:calc\(100% - 8px\) !important/);
+assert.match(shared,/#game-ui\{[^}]*--ui-large-panel-max-width:960px;[^}]*--ui-large-panel-height:760px;/);
+assert.doesNotMatch(shared,/#homeFeatureModal \.home-feature-modal-box\.wide\{[^}]*max-width:none !important/);
 
 assert.match(quest,/#homeFeatureModal\.quest-mode\{[\s\S]*?padding:12px !important/);
 assert.match(quest,/\.quest-mode \.home-feature-modal-box\{[\s\S]*?max-width:var\(--ui-large-panel-max-width,396px\) !important/);

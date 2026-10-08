@@ -45,10 +45,10 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
 <style>
 html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000;}
-#game-stage{position:relative!important;left:auto!important;top:auto!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;transform:none!important;}
+#game-ui{position:relative!important;left:auto!important;top:auto!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;transform:none!important;}
 #homeFeatureModal{display:flex!important;position:absolute!important;inset:0!important;width:420px!important;height:746.6667px!important;align-items:center!important;justify-content:center!important;padding:0!important;}
 .home-feature-modal-title{height:52px!important;}
-</style></head><body><div id="game-stage"><div id="homeFeatureModal" class="home-feature-modal">
+</style></head><body><div id="game-ui"><div id="homeFeatureModal" class="home-feature-modal">
 <div class="home-feature-modal-box"><div class="home-feature-modal-title"><span>系統</span><button>返回</button></div><div id="homeFeatureModalBody"><div id="systemPanel" class="system-panel"></div></div></div>
 </div></div><pre id="result"></pre><script>
 (function(){

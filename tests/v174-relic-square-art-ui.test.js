@@ -22,7 +22,7 @@ assert.match(source,/function renderRelicList\(\)[\s\S]*?team-relic-current-art[
 assert.match(source,/function detailMarkup\(def\)[\s\S]*?team-relic-detail-art[^\n]*relicIconMarkup\(def,true\)/,
     "detail hero must render through relicIconMarkup");
 
-assert.match(css,/\.team-relic-current-art,\s*\n#game-stage \.team-relic-card-art,\s*\n#game-stage \.team-relic-detail-art\{aspect-ratio:1\/1;/,
+assert.match(css,/\.team-relic-current-art,\s*\n:is\(#game-stage,#game-ui\) \.team-relic-card-art,\s*\n:is\(#game-stage,#game-ui\) \.team-relic-detail-art\{aspect-ratio:1\/1;/,
     "current/list/detail art containers must share the same 1:1 contract");
 assert.match(css,/\.team-relic-current-art img,[\s\S]*?\.team-relic-detail-art img\{[^}]*object-fit:contain/,
     "all relic art images must use contain instead of stretching/cropping");
@@ -89,7 +89,7 @@ function verify(data,width){
     assert.ok(data.current.art.right<=data.current.copy.left+tolerance,`${width}px current art overlaps copy`);
     assert.ok(data.current.actions.right<=stage.right-tolerance,`${width}px current actions escape stage`);
 
-    assert.equal(data.grid.columns.trim().split(/\s+/).length,2,`${width}px grid is not two columns`);
+    assert.equal(data.grid.columns.trim().split(/\s+/).length,1,`${width}px narrow grid must retain one readable column`);
     assert.equal(data.grid.cards.length,8);
     assert.ok(Math.abs(data.grid.cards[0].height-data.grid.cards[1].height)<=tolerance,`${width}px card row heights differ`);
     for(let i=0;i<data.grid.cards.length;i++){

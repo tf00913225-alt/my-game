@@ -82,12 +82,14 @@ function createFixture(){
   <div id="game-overlay-layer" aria-hidden="true"></div>
   <div id="app"><div id="game-content">
     <button id="qaBattleAction" type="button">戰鬥技能</button>
+  </div></div>
+</div></div>
+<div id="game-ui">
     <div id="homeFeatureModal" class="home-feature-modal"><div class="home-feature-modal-box">
       <div class="home-feature-modal-title"><span id="homeFeatureModalTitle">標題</span><div><button class="home-feature-close-btn" type="button" onclick="closeHomeFeature()">返回</button></div></div>
       <div id="homeFeatureModalBody"></div>
     </div></div>
-  </div></div>
-</div></div>
+</div>
 <script>${inlineScript(prelude)}</script>
 <script>${inlineScript(read("js/release-update-notification.js"))}</script>
 <script>document.dispatchEvent(new Event("four-symbols:startup-ready"));</script>

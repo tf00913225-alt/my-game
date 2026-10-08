@@ -195,6 +195,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 
 
 
+
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
    - 遊戲邏輯舞台固定 1080 × 1920
@@ -226,6 +227,30 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 
         app.appendChild(content);
     }
+})();
+
+/* Browser layout boundary. Move the existing general-page nodes once; their
+   data, handlers and navigation lifecycle remain owned by the same runtime.
+   The remaining game-content and native overlay retain the Phase 1 projection. */
+(function setupBrowserGameUi(){
+    const ui=document.createElement("div");
+    ui.id="game-ui";
+    ui.hidden=true;
+    ui.dataset.presentationDomain="browser";
+    document.body.appendChild(ui);
+    for(const id of ["homePage","inventoryPage","homeFeatureModal","itemModal",
+                     "inventoryCharacterDetailModal","skillDetailModal","statusHelpModal"]){
+        const node=document.getElementById(id);
+        if(node) ui.appendChild(node);
+    }
+    const gameInterface=document.getElementById("gameInterface");
+    function syncVisibility(){
+        ui.hidden=!gameInterface||gameInterface.style.display==="none";
+    }
+    if(gameInterface){
+        new MutationObserver(syncVisibility).observe(gameInterface,{attributes:true,attributeFilter:["style"]});
+    }
+    syncVisibility();
 })();
 
 /* Legacy V3 navigation positioning retired; FourSymbolsBottomNav owns the shell. */

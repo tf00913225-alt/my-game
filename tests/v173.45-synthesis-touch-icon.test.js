@@ -35,18 +35,18 @@ const body={
     scrollHeight:500,clientHeight:500,scrollWidth:300,clientWidth:300,
     computedStyle:{overflowX:"hidden",overflowY:"auto"},
     matches:selector=>selector.includes("#homeFeatureModalBody"),
-    closest:selector=>selector==="#game-stage"?stage:null
+    closest:selector=>["#game-stage","#game-stage, #game-ui"].includes(selector)?stage:null
 };
 const picker={
     nodeType:1,parentElement:body,
     scrollHeight:90,clientHeight:90,scrollWidth:520,clientWidth:300,
     computedStyle:{overflowX:"auto",overflowY:"hidden"},
     matches:selector=>selector.includes(".v143-item-picker"),
-    closest:selector=>selector==="#game-stage"?stage:null
+    closest:selector=>["#game-stage","#game-stage, #game-ui"].includes(selector)?stage:null
 };
 const card={
     nodeType:1,parentElement:picker,matches:()=>false,
-    closest:selector=>selector==="#game-stage"?stage:null
+    closest:selector=>["#game-stage","#game-stage, #game-ui"].includes(selector)?stage:null
 };
 
 let prevented=false;
@@ -62,11 +62,11 @@ const synthesisBody={
     scrollHeight:920,clientHeight:500,scrollWidth:300,clientWidth:300,
     computedStyle:{overflowX:"hidden",overflowY:"auto"},
     matches:selector=>selector.includes(".v141-synthesis-body"),
-    closest:selector=>selector==="#game-stage"?stage:null
+    closest:selector=>["#game-stage","#game-stage, #game-ui"].includes(selector)?stage:null
 };
 const synthesisChild={
     nodeType:1,parentElement:synthesisBody,matches:()=>false,
-    closest:selector=>selector==="#game-stage"?stage:null
+    closest:selector=>["#game-stage","#game-stage, #game-ui"].includes(selector)?stage:null
 };
 prevented=false;
 listeners.get("touchmove")({target:synthesisChild,preventDefault(){ prevented=true; }});

@@ -42,7 +42,7 @@ const html=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <link id="v174-critical-ui-regression-style" rel="stylesheet" href="css/56-v174-critical-ui-regressions.css">
 <style>
 html,body{margin:0;width:390px;height:844px;background:#050505;overflow:hidden}
-#game-stage{position:relative;width:390px;height:844px;transform:none!important;overflow:hidden}
+#game-ui{position:relative;width:390px;height:844px;transform:none!important;overflow:hidden}
 #homeFeatureModal{display:flex!important;position:absolute!important;inset:0!important}
 #homeFeatureModal .home-feature-modal-box.wide{display:flex;flex-direction:column;width:382px;height:836px}
 #homeFeatureModalBody{height:760px;min-height:0}
@@ -50,7 +50,7 @@ html,body{margin:0;width:390px;height:844px;background:#050505;overflow:hidden}
 #skillLoadout,#skillElementTabs{display:none}
 #goldTest{position:absolute;left:4px;top:70px;z-index:20;background:rgb(238,196,92);color:rgb(35,23,5);text-shadow:0 2px 2px #000}
 #creationPage{display:none!important}
-</style></head><body><div id="game-stage">
+</style></head><body><div id="game-ui">
 <div id="homeFeatureModal" class="home-feature-modal show team-relic-modal team-relic-mode"><section class="home-feature-modal-box wide"><button id="goldTest">黃底黑字</button><div id="homeFeatureModalBody"><div id="characterTabContent"><div id="skillPage"><div id="skillLoadout"></div><div id="skillElementTabs"></div><div id="allSkillsList"></div></div></div></div></section></div>
 </div><pre id="result"></pre>
 <script>window.requestAnimationFrame=function(cb){return setTimeout(cb,0)};</script>

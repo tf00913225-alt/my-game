@@ -14,6 +14,9 @@
         const nav=document.getElementById("bottomNav");
         const overlay=document.getElementById("game-overlay-layer");
         if(!nav||!overlay){ return null; }
+        const ui=document.getElementById("game-ui");
+        const generalActive=!!ui?.querySelector(":scope > .page.active");
+        const destination=generalActive?ui:overlay;
         if(!mainButtons){
             mainButtons=Array.from(nav.children);
             mainButtons.forEach(button=>{
@@ -30,8 +33,10 @@
             shell=document.createElement("div");
             shell.className="native-bottom-nav-layer";
             shell.appendChild(nav);
-            overlay.appendChild(shell);
+            destination.appendChild(shell);
         }
+        if(shell.parentElement!==destination){ destination.appendChild(shell); }
+        shell.dataset.presentationDomain=generalActive?"browser":"native";
         return nav;
     }
     function renderMain(page){
@@ -125,7 +130,7 @@
                 hide();
                 return "hidden-battle";
             }
-            const mainPage=document.querySelector("#game-content .page.active");
+            const mainPage=document.querySelector("#game-ui > .page.active, #game-content .page.active");
             renderMain(mainPage?.id.replace(/Page$/,"")||"home");
             return "main";
         }

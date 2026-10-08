@@ -33,14 +33,16 @@ function fixture(width,height){
 <link rel="stylesheet" href="css/55-team-relic-system.css">
 <!-- Historical high-specificity wide-modal owner intentionally loads last. -->
 <link rel="stylesheet" href="css/22-stage-v78-character-inventory-core.css">
+<link rel="stylesheet" href="css/56-v174-critical-ui-regressions.css">
 <style>
 html,body{margin:0;width:${width}px;height:${height}px;overflow:hidden;background:#050505;}
-#game-stage{position:relative!important;width:${width}px!important;height:${height}px!important;transform:none!important;overflow:hidden!important;}
+#game-ui{position:relative!important;width:${width}px!important;height:${height}px!important;transform:none!important;overflow:hidden!important;}
+#game-stage{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;transform:none!important;}
 #homeFeatureModal{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:absolute!important;inset:0!important;}
 .team-relic-home-tools{position:absolute;left:8px;right:8px;bottom:8px;display:flex;justify-content:space-between;}
 .team-relic-home-tools .home-card{position:relative;width:82px;height:68px;}
 .qa-player-row{position:absolute;left:8px;right:8px;bottom:92px;height:116px;}
-</style></head><body><div id="game-stage">
+</style></head><body><div id="game-ui">
   <div class="team-relic-home-tools"><button class="home-card home-card-utility team-relic-home-entry">秘寶</button><button class="home-card home-card-utility team-element-box-home-entry">元素匣</button></div>
   <div id="homeFeatureModal" class="home-feature-modal show no-padding team-relic-modal">
     <section class="home-feature-modal-box wide">
@@ -52,14 +54,15 @@ html,body{margin:0;width:${width}px;height:${height}px;overflow:hidden;backgroun
       </main></div>
     </section>
   </div>
-  <div id="teamRelicBattleBanner" class="team-relic-battle-banner show"><span class="team-relic-battle-icon">寶</span><b>秘寶・青嵐羽符</b></div>
+  <div id="game-stage" style="position:absolute;inset:0;transform:none"><div id="teamRelicBattleBanner" class="team-relic-battle-banner show"><span class="team-relic-battle-icon">寶</span><b>秘寶・青嵐羽符</b></div>
   <div class="qa-player-row"></div>
+</div>
 </div><pre id="result"></pre><script>
 (function(){
   var q=function(selector){return document.querySelector(selector);};
   var rect=function(element){var r=element.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
   var overlap=function(a,b){return a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;};
-  var stage=q("#game-stage"),box=q(".team-relic-modal .home-feature-modal-box"),body=q("#homeFeatureModalBody"),tabs=q(".team-relic-tabs"),grid=q(".team-relic-grid");
+  var stage=q("#game-ui"),box=q(".team-relic-modal .home-feature-modal-box"),body=q("#homeFeatureModalBody"),tabs=q(".team-relic-tabs"),grid=q(".team-relic-grid");
   var tools=q(".team-relic-home-tools"),entryNodes=Array.from(tools.querySelectorAll("button"));
   var entries=entryNodes.map(rect);
   var cards=Array.from(document.querySelectorAll(".team-relic-card")).map(rect);
@@ -95,8 +98,8 @@ function verify(data,width,height){
     assert.ok(data.box.top>=data.stage.top-tolerance&&data.box.bottom<=data.stage.bottom+tolerance,`${width}px relic modal escapes vertically`);
     /* The modal owns 4px outer padding and an additional 8px safe inset, so
        a 16px total delta on each axis is the intended full-screen frame. */
-    assert.ok(data.box.width>=width-20&&data.box.height>=height-20,
-        `${width}px relic modal is not full-screen (${data.box.width}x${data.box.height})`);
+    assert.ok(data.box.width>=width-20&&Math.abs(data.box.height-Math.min(760,height-16))<=1,
+        `${width}px relic modal violates the browser Large Panel ceiling (${data.box.width}x${data.box.height})`);
     assert.match(data.body.overflowY,/auto|scroll/,`${width}px legacy wide-modal CSS retook scroll ownership`);
     assert.equal(data.body.overflowX,"hidden");assert.equal(data.body.touchAction,"pan-y");
     assert.ok(data.body.scrollHeight>data.body.clientHeight&&data.body.after>data.body.before,`${width}px relic body cannot actually scroll`);
@@ -106,8 +109,8 @@ function verify(data,width,height){
     assert.equal(data.tabs.overflowX,"auto");assert.equal(data.tabs.touchAction,"pan-x pan-y");
     assert.ok(data.tabs.scrollWidth>data.tabs.clientWidth&&data.tabs.after>data.tabs.before,`${width}px category rail cannot actually scroll`);
     assert.equal(data.grid.cards.length,20);
-    assert.equal(data.grid.columns.trim().split(/\s+/).length,2,`${width}px relic grid is not two columns`);
-    assert.ok(Math.abs(data.grid.cards[0].top-data.grid.cards[1].top)<=tolerance&&data.grid.cards[2].top>data.grid.cards[0].top,`${width}px relic cards do not form two-column rows`);
+    assert.equal(data.grid.columns.trim().split(/\s+/).length,1,`${width}px narrow relic grid must keep a readable single column`);
+    assert.ok(data.grid.cards[1].top>=data.grid.cards[0].bottom-tolerance&&data.grid.cards[2].top>=data.grid.cards[1].bottom-tolerance,`${width}px relic cards do not form ordered single-column rows`);
     for(const card of data.grid.cards){assert.ok(card.left>=data.box.left-tolerance&&card.right<=data.box.right+tolerance,`${width}px relic card escapes modal`);}
     assert.equal(data.entries.length,2);assert.ok(data.entries[0].right<data.entries[1].left,`${width}px relic and element-box entries overlap`);
     assert.equal(data.hitTesting.container,"none",`${width}px transparent utility container blocks existing home buttons`);

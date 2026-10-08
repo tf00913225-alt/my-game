@@ -16,7 +16,7 @@ assert.doesNotMatch(main,/map-inventory-overlay-open/);
 assert.doesNotMatch(shared,/map-inventory-overlay-open/);
 assert.doesNotMatch(legacyMain,/map-inventory-overlay-open\{/);
 // The V177 backpack frame belongs to css/22 in every entry context.
-assert.match(visual,/#game-stage #inventoryPage \.inventory-classic-shell\{[^}]*width:93\.4%;[^}]*height:100%;[^}]*overflow:hidden/);
+assert.match(visual,/#game-ui #inventoryPage \.inventory-classic-shell\{[^}]*width:100%;[^}]*height:100%;[^}]*overflow:hidden/);
 assert.doesNotMatch(shared,/\.inventory-classic-shell\{/);
 assert.match(core,/\.inventory-grid-scroll\{[\s\S]*?overflow-y:auto;[^}]*overflow-x:hidden;[^}]*touch-action:pan-y;[^}]*scrollbar-gutter:stable;/);
 assert.match(main,/sourcePage===\"map\"&&typeof leaveMap===\"function\"/);
