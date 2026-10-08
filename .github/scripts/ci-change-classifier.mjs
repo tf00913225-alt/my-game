@@ -45,11 +45,12 @@ export function classifySharedSource(before, after, sourcePath='js/00-main.js') 
           if(['ReturnStatement','BreakStatement','ContinueStatement','TryStatement'].includes(value.type))effects.push(canonical({type:value.type,label:value.label,handler:!!value.handler,finalizer:!!value.finalizer}));
           if(value.type==='ThrowStatement'){effects.push(canonical(value));effectCount++;}
           if(['WithStatement','DebuggerStatement'].includes(value.type)){effects.push(canonical(value));effectCount++;}
+          if(['ForInStatement','ForOfStatement','SpreadElement'].includes(value.type)){effects.push(canonical(value));effectCount++;}
           if(value.type==='CallExpression' || value.type==='NewExpression') {
             const callee=source.slice(value.callee.start,value.callee.end).replace(/\s/g,'');
             if(!/^Math\.(?:floor|ceil|round|trunc)$/.test(callee)){effects.push(canonical(value));effectCount++;}
           }
-          if(['AssignmentExpression','UpdateExpression','AwaitExpression','YieldExpression'].includes(value.type)){effects.push(canonical(value));effectCount++;}
+          if(['AssignmentExpression','UpdateExpression','AwaitExpression','YieldExpression'].includes(value.type)||(value.type==='UnaryExpression'&&value.operator==='delete')){effects.push(canonical(value));effectCount++;}
           for(const child of Object.values(value)) if(Array.isArray(child)) child.forEach(visit);else visit(child);
         };
         visit(node.body);
@@ -57,7 +58,8 @@ export function classifySharedSource(before, after, sourcePath='js/00-main.js') 
         // too. An unused pure diagnostic local cannot change an existing effect.
         const presentationRows=b=>node.id.name==='openInventoryCharacterDetail' && b.id.name==='rows' && references.get('rows')===2 && b.init?.type==='ArrayExpression' && b.init.elements.every(row=>row?.type==='ArrayExpression' && row.elements.length===2 && row.elements[0]?.type==='Literal' && typeof row.elements[0].value==='string');
         const usedBindings=bindings.filter(b=>(b.id.type!=='Identifier'||(references.get(b.id.name)||0)>1) && !presentationRows(b));
-        functions[node.id.name]={text:source.slice(node.start,node.end),effects:effectCount?canonical({effects,bindings:usedBindings,params:node.params,async:node.async,generator:node.generator}):canonical({params:node.params,async:node.async,generator:node.generator})};
+        const signature={params:node.params,async:node.async,generator:node.generator,directives:node.body.body.filter(n=>n.directive).map(n=>n.directive)};
+        functions[node.id.name]={text:source.slice(node.start,node.end),effects:effectCount?canonical({effects,bindings:usedBindings,...signature}):canonical(signature)};
         pieces.push(source.slice(cursor,node.start),`FUNCTION:${node.id.name}`);cursor=node.end;
       }
       pieces.push(source.slice(cursor));return {functions,rest:pieces.join('')};

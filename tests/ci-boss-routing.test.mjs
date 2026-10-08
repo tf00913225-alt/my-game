@@ -39,6 +39,10 @@ test('shared reforge presentation is targeted; formulas, writes and callers fail
   assert.equal(classifySharedSource('function renderShopContent(){return "UI";}','async function renderShopContent(){return "UI";}'),null);
   assert.equal(classifySharedSource('function renderBattle(){settleDamage(10);}','function renderBattle(){with({settleDamage(){}}){settleDamage(10);}}'),null);
   assert.equal(classifySharedSource('function renderShopContent(){return "UI";}','function renderShopContent(){debugger;return "UI";}'),null);
+  assert.equal(classifySharedSource('function renderShopContent(){return "UI";}','function renderShopContent(){delete player.equipment;return "UI";}'),null);
+  assert.equal(classifySharedSource('function renderShopContent(){return "UI";}','function renderShopContent(){const x=[...bossEffects];return "UI";}'),null);
+  assert.equal(classifySharedSource('function renderShopContent(){return "UI";}','function renderShopContent(){for(const x of bossEffects){}return "UI";}'),null);
+  assert.equal(classifySharedSource('function renderBattle(){settleDamage(10);}','function renderBattle(){"use strict";settleDamage(10);}'),null);
   assert.equal(classifySharedSource('function renderBattle(){settleDamage(10);}','function renderBattle(){if(battleActive)return;settleDamage(10);}'),null);
   for(const name of ['canActuallyReforge','reforgeSlotCount'])assert.equal(classifySharedSource('function '+name+'(){return false;}','function '+name+'(){return true;}',sourcePath),null,'transaction guard is not presentation: '+name);
 });

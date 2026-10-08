@@ -50,7 +50,7 @@ CI policy edits exercise Fast and retained Full themselves. Generated outputs
 still require exact build verification; shared call arguments and complete
 writes must remain identical, not just the callee/write destination.
 Even otherwise pure declarations retain parameter/async/generator signatures;
-dynamic scope and debugger edits stay strict.
+directives, dynamic scope, debugger, delete and implicit iterator edits stay strict.
 Effectful presentation functions also retain control-flow/guard/early-return
 order, used local bindings and default parameters; changing a call input via
 an alias cannot masquerade as unchanged effects. canActuallyReforge/reforgeSlotCount are consumed by transactions and
