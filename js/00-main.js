@@ -11375,9 +11375,8 @@ function startTurn(token){
     updateActionHudVisibility();
 
 
-    /* Auto Battle owns a short, tracked presentation lock before the first
-       declaration/action of the newly established round. Manual battle keeps
-       the existing timing unchanged. */
+    /* The tracked round notice observes the new round without holding
+       declaration or resolution. Manual input keeps its existing timing. */
     showAutoBattleRoundPrompt(token);
     beginCharacterTurn(token);
 
@@ -22839,7 +22838,10 @@ function projectEnemyResource(value,maximum){
     };
 }
 
-function syncEnemyResourceHud(index){
+function syncEnemyResourceHud(index,atImpact){
+    if(atImpact!==true&&typeof window.v143ScheduleMonsterUiUpdate==="function"){
+        return window.v143ScheduleMonsterUiUpdate(index,()=>syncEnemyResourceHud(index,true),"labels");
+    }
     const monster=monsters[index];
     if(!monster){ return; }
     const hpText=$("battleMonsterHPText"+index);
@@ -24367,7 +24369,7 @@ function showPlayerHit(amount,type,characterIndex,isPositive,isCrit){
                 :
                 "HP"
             ),
-            type,
+            isPositive&&type==="hp"?"heal":type,
             isCrit
         );
 

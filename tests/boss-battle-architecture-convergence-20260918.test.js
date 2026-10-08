@@ -65,7 +65,7 @@ assert.match(fixedCss,/\.battle-monster\.v174-cardless-unit\{[\s\S]*?border:0 !i
 assert.doesNotMatch(fixedCss,/\.damage-popup\.hp-popup\{[\s\S]*?display:none/);
 assert.doesNotMatch(presentation,/v174-hit-shake|shakeArtForPopup/);
 
-assert.match(fixedCss,/\.v-fixed-enemy-slot \.monster-hp,[\s\S]*?\.v-fixed-ally-slot \.hp-bar\{bottom:26px !important/);
+assert.match(fixedCss,/\.v-fixed-enemy-slot \.monster-hp,[\s\S]*?\.v-fixed-ally-slot \.hp-bar\{bottom:calc\(var\(--battle-name-row-height\) \+ var\(--battle-resource-bar-height\)\) !important/);
 assert.match(fixedCss,/--battle-resource-bar-height:11px/);
 assert.match(fixedCss,/--battle-enemy-region-track:42fr[\s\S]*?--battle-center-region-track:16fr[\s\S]*?--battle-ally-region-track:42fr/);
 assert.match(fixedCss,/\.battle-center-region\{[\s\S]*?border:0/);

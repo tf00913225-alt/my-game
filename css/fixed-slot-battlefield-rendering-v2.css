@@ -508,6 +508,7 @@
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .battle-player-id{
     position:absolute !important;
+    top:auto !important;
     left:2px !important;
     right:2px !important;
     width:auto !important;
