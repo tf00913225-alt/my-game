@@ -22839,7 +22839,7 @@ function projectEnemyResource(value,maximum){
 }
 
 function syncEnemyResourceHud(index,atImpact){
-    if(atImpact!==true&&typeof window.v143ScheduleMonsterUiUpdate==="function"){
+    if(atImpact!==true&&typeof window!=="undefined"&&typeof window.v143ScheduleMonsterUiUpdate==="function"){
         return window.v143ScheduleMonsterUiUpdate(index,()=>syncEnemyResourceHud(index,true),"labels");
     }
     const monster=monsters[index];
@@ -32939,7 +32939,7 @@ function syncBattleDefeatedCards(){
             const monster=monsters[index],card=$("battleMonster"+index);
             if(card){ card.classList.toggle("v146-defeated",!monster||monster.alive===false||Number(monster.hp)<=0); }
         };
-        if(typeof window.v143ScheduleMonsterUiUpdate==="function"){ window.v143ScheduleMonsterUiUpdate(index,apply,"defeated"); }
+        if(typeof window!=="undefined"&&typeof window.v143ScheduleMonsterUiUpdate==="function"){ window.v143ScheduleMonsterUiUpdate(index,apply,"defeated"); }
         else{ apply(); }
     });
     getExistingPartyIndexes().forEach(index=>{
@@ -32947,7 +32947,7 @@ function syncBattleDefeatedCards(){
             const character=getPartyCharacterByIndex(index),card=$("battlePlayerCard"+index);
             if(card){ card.classList.toggle("v146-defeated",!character||Number(character.hp)<=0); }
         };
-        if(typeof window.v143SchedulePlayerStatusUiUpdate==="function"){ window.v143SchedulePlayerStatusUiUpdate(index,apply,"defeated"); }
+        if(typeof window!=="undefined"&&typeof window.v143SchedulePlayerStatusUiUpdate==="function"){ window.v143SchedulePlayerStatusUiUpdate(index,apply,"defeated"); }
         else{ apply(); }
     });
 }
