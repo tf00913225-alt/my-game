@@ -44,6 +44,8 @@ equipment and selection regressions in core_checks. The affected step runs
 them sequentially only when full_node is false; full_node already includes
 the same tests. No new test system or relaxed assertions are introduced.
 Unmapped mechanisms cannot use Fast merely because a filename sounds visual.
+The existing floating-feedback and skill-name presentation CSS owners route
+to UI/battle Fast; their Runtime timing/lifecycle JS remains strict.
 CI policy edits exercise Fast and retained Full themselves. Generated outputs
 still require exact build verification; shared call arguments and complete
 writes must remain identical, not just the callee/write destination.

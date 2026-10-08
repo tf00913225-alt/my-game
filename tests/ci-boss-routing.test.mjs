@@ -11,6 +11,7 @@ test('three Boss levels, PR/dev consistency and release strictness',()=>{
   for(const eventName of ['pull_request','push']){
     assert.equal(plan(['css/23-stage-v77-inventory-detail-ui.css'],{eventName}).bossMode,'none');
     assert.equal(plan(['assets/vfx/impact.webp'],{eventName}).bossMode,'fast');
+    for(const path of ['css/battle-floating-feedback-owner.css','css/battle-skill-name-presentation-owner.css'])assert.equal(plan([path],{eventName}).bossMode,'fast');
     for(const path of ['js/gameplay-boss-tower-system.js','js/combat/monster-balance-owner.mjs','js/unknown.js','functions/src/session-authority.js','config/persisted-state-registry.json']){
       const result=plan([path],{eventName});assert.equal(result.bossMode,'full');assert.equal(result.gates.boss_balance,true);
     }

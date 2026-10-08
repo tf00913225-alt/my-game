@@ -97,6 +97,7 @@ const OWNERS = [
   [/^js\/(?:04-stage-v11-native-bottom-nav-runtime|19-stage-v78-character-inventory-runtime|53-v173\.50-inventory-qol|55-v173\.51-inventory-qa|56-v173\.51-shop-qa|release-update-notification)\.js$/, ['ui', 'inventory']],
   [/^css\/(?:06-stage-v11-native-bottom-nav|08-stage-v14-character-scroll-fix|09-stage-v15-native-character-shell|22-stage-v78-character-inventory-core|23-stage-v77-inventory-detail-ui|24-stage-v85-inventory-inner-grid-scroll-root|52-v173\.50-inventory-qol|release-update-notification|ad-free-service-info-modal)\.css$/, ['ui', 'inventory']],
   [/^css\/44-v149-skill-ui-rules\.css$/, ['ui', 'skill']],
+  [/^css\/battle-(?:floating-feedback|skill-name-presentation)-owner\.css$/, ['ui', 'battle']],
   [/^css\/adventure-(?:entry-v1|v1)-20260915\.css$/, ['adventure', 'ui']],
   [/^tests\/(?:cloud-save-|session-|firebase-|account-save-|auth-before-)/, ['cloud', 'persistence']],
   [/^tests\/(?:backpack-|responsive-window-|bottom-nav-|starter-potion-|forge-sockets-|reforge-eligibility-|ui-synthesis-|v173\.(?:46-equipment-progression|51-qa|57-starter-icons-reforge-filter|58-reforge-redesign)|ui-critical-)/, ['ui', 'inventory']],
