@@ -37,7 +37,8 @@ pass Full plus natural/deployed snapshot acceptance itself.
 Boss mode is emitted by the same classifier for PR and dev push and passed
 unchanged to deployed QA: `none` for reliably isolated inventory/shop/docs;
 `fast` for known battle presentation/animation; `full` for Boss rules, balance,
-unknown/shared effects, core/lifecycle/settlement, release and manual/nightly.
+unknown/shared effects, core/lifecycle/settlement, Cloud/persistence, release and manual/nightly.
+Cloud/persistence uses Boss Full on both PR and dev, including its required flag.
 Unmapped mechanisms cannot use Fast merely because a filename sounds visual.
 CI policy edits exercise Fast and retained Full themselves. Generated outputs
 still require exact build verification; shared call arguments and complete

@@ -154,9 +154,10 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
   };
   const shadow = eventName === 'pull_request' && !mainRequired && !enabled;
   const gates = shadow ? Object.fromEntries(Object.keys(predicted).map(k => [k, ['main_browser','promotion_health'].includes(k) ? false : true])) : predicted;
-  const bossMode=shadow || full || f('boss') || f('monster_balance') || f('workflow') ? 'full' : gates.boss_balance ? 'fast' : 'none';
+  const bossFull=full || f('boss') || f('monster_balance') || f('workflow') || f('cloud') || f('persistence');
+  const bossMode=shadow || bossFull ? 'full' : gates.boss_balance ? 'fast' : 'none';
   // Gate policy edits must exercise the retained Full capability themselves.
-  if(f('workflow')){predicted.boss_balance=true;gates.boss_balance=true;}
+  if(bossFull){predicted.boss_balance=true;gates.boss_balance=true;}
   return {policyVersion: 1, eventName, baseRef, strictMode, shadow, fullRegression: nightly, flags, reasons, predicted, gates, bossMode};
 }
 

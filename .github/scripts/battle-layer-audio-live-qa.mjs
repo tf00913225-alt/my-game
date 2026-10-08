@@ -78,7 +78,11 @@ async function runBossBalanceProductionQa(){
         if(plan.uiOnly){
           check(art.getBoundingClientRect().width>0&&art.getBoundingClientRect().height>0,'visible artwork');
           openBattleStatusDetailModal('monster',FourSymbolsBossBattle.getBossIndex());
-          check(document.getElementById('battleStatusDetailModal')?.hidden===false,'status detail interaction');closeBattleStatusDetailModal();
+          check(document.getElementById('battleStatusDetailModal')?.hidden===false,'status detail interaction');
+          window.bossBalanceQaCapture=plan.type+'-'+plan.id+'-'+caseIndex+'-status';
+          await new Promise(r=>setTimeout(r,650));closeBattleStatusDetailModal();
+          window.bossBalanceQaCapture=plan.type+'-'+plan.id+'-'+caseIndex+'-hud';
+          await new Promise(r=>setTimeout(r,650));
           evidence.scenes.push({...plan,kind:'viewport-interaction',rounds:0,settlementVerified:false,cleanup:await cleanup()});continue;
         }
         let controlledEvidence=null;
