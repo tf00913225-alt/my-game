@@ -28,6 +28,12 @@ test('shared reforge presentation is targeted; formulas, writes and callers fail
   for(const after of [before.replace('return 1','return 2'),before.replace('return "選擇裝備"','monsters[0].hp=1;return "選擇裝備"'),before+'window.patch=1;'])assert.equal(classifySharedSource(before,after,sourcePath),null);
   assert.equal(classifySharedSource('function renderBattle(){settleDamage(10);}','function renderBattle(){settleDamage(1);}'),null);
   assert.equal(classifySharedSource('function renderBattle(){monsters[0].hp=10;}','function renderBattle(){monsters[0].hp=1;}'),null);
+  assert.equal(classifySharedSource('function renderBattle(){if(battleActive)settleDamage(10);}','function renderBattle(){if(!battleActive)settleDamage(10);}'),null);
+  assert.equal(classifySharedSource('function renderBattle(){const damage=10;settleDamage(damage);}','function renderBattle(){const damage=1;settleDamage(damage);}'),null);
+  assert.equal(classifySharedSource('function renderBattle(){settleDamage(10);}','function renderBattle(){const settleDamage=()=>{};settleDamage(10);}'),null);
+  assert.equal(classifySharedSource('function renderBattle(damage=10){settleDamage(damage);}','function renderBattle(damage=1){settleDamage(damage);}'),null);
+  assert.equal(classifySharedSource('function renderBattle(){settleDamage(10);}','function renderBattle(){if(battleActive)return;settleDamage(10);}'),null);
+  for(const name of ['canActuallyReforge','reforgeSlotCount'])assert.equal(classifySharedSource('function '+name+'(){return false;}','function '+name+'(){return true;}',sourcePath),null,'transaction guard is not presentation: '+name);
 });
 test('Fast mode is passed unchanged from classifier to PR and deployed QA',()=>{
   const ci=fs.readFileSync(new URL('../.github/workflows/ci.yml',import.meta.url),'utf8');

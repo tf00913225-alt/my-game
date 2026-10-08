@@ -16,7 +16,7 @@ const SHARED_FUNCTIONS = {
 };
 const SHARED_MODULES = {
   'js/00-main.js': SHARED_FUNCTIONS,
-  'js/36-v141-content-systems.js': Object.fromEntries(['reforgeSlotCount','canActuallyReforge','renderReforgeTab','renderSynthesisTabs','renderMaterialSynthesis','renderSynthesis'].map(k=>[k,['ui','inventory']])),
+  'js/36-v141-content-systems.js': Object.fromEntries(['renderReforgeTab','renderSynthesisTabs','renderMaterialSynthesis','renderSynthesis'].map(k=>[k,['ui','inventory']])),
   'js/equipment-progression.js': Object.fromEntries(['remainingReforgeSlots','appendReforgeMarkers','renderEquipmentShop','equipmentChestOddsText'].map(k=>[k,['ui','inventory']]))
 };
 export function classifySharedSource(before, after, sourcePath='js/00-main.js') {
@@ -32,19 +32,30 @@ export function classifySharedSource(before, after, sourcePath='js/00-main.js') 
       };collect(ast);nodes.sort((a,b)=>a.start-b.start);
       for(const node of nodes) {
         if(functions[node.id.name]) throw Error('Duplicate owner');
-        const effects=[];
+        const effects=[],bindings=[],references=new Map();let effectCount=0;
         const canonical=value=>JSON.stringify(value,(key,item)=>['start','end','raw'].includes(key)?undefined:item);
         const visit=value=>{
           if(!value || typeof value!=='object') return;
+          if(value.type==='Identifier')references.set(value.name,(references.get(value.name)||0)+1);
+          if(value.type==='VariableDeclarator')bindings.push(value);
+          if(['IfStatement','ConditionalExpression','WhileStatement','DoWhileStatement','ForStatement','SwitchStatement','SwitchCase'].includes(value.type))effects.push(canonical({type:value.type,test:value.test,init:value.init,update:value.update,discriminant:value.discriminant}));
+          if(['ForInStatement','ForOfStatement','LogicalExpression'].includes(value.type))effects.push(canonical({type:value.type,operator:value.operator,left:value.left,right:value.type==='LogicalExpression'?undefined:value.right,await:value.await}));
+          if(value.type==='CatchClause')effects.push(canonical({type:value.type,param:value.param}));
+          if(['ReturnStatement','BreakStatement','ContinueStatement','TryStatement'].includes(value.type))effects.push(canonical({type:value.type,label:value.label,handler:!!value.handler,finalizer:!!value.finalizer}));
+          if(value.type==='ThrowStatement'){effects.push(canonical(value));effectCount++;}
           if(value.type==='CallExpression' || value.type==='NewExpression') {
             const callee=source.slice(value.callee.start,value.callee.end).replace(/\s/g,'');
-            if(!/^Math\.(?:floor|ceil|round|trunc)$/.test(callee)) effects.push(canonical(value));
+            if(!/^Math\.(?:floor|ceil|round|trunc)$/.test(callee)){effects.push(canonical(value));effectCount++;}
           }
-          if(['AssignmentExpression','UpdateExpression','AwaitExpression','YieldExpression'].includes(value.type)) effects.push(canonical(value));
+          if(['AssignmentExpression','UpdateExpression','AwaitExpression','YieldExpression'].includes(value.type)){effects.push(canonical(value));effectCount++;}
           for(const child of Object.values(value)) if(Array.isArray(child)) child.forEach(visit);else visit(child);
         };
         visit(node.body);
-        functions[node.id.name]={text:source.slice(node.start,node.end),effects:JSON.stringify(effects)};
+        // Inputs reached through local aliases/default parameters must stay fixed,
+        // too. An unused pure diagnostic local cannot change an existing effect.
+        const presentationRows=b=>node.id.name==='openInventoryCharacterDetail' && b.id.name==='rows' && references.get('rows')===2 && b.init?.type==='ArrayExpression' && b.init.elements.every(row=>row?.type==='ArrayExpression' && row.elements.length===2 && row.elements[0]?.type==='Literal' && typeof row.elements[0].value==='string');
+        const usedBindings=bindings.filter(b=>(b.id.type!=='Identifier'||(references.get(b.id.name)||0)>1) && !presentationRows(b));
+        functions[node.id.name]={text:source.slice(node.start,node.end),effects:effectCount?canonical({effects,bindings:usedBindings,params:node.params,async:node.async,generator:node.generator}):'[]'};
         pieces.push(source.slice(cursor,node.start),`FUNCTION:${node.id.name}`);cursor=node.end;
       }
       pieces.push(source.slice(cursor));return {functions,rest:pieces.join('')};
