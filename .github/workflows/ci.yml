@@ -260,6 +260,13 @@ jobs:
           node tests/gameplay-ui-regressions-20260908.test.js
           node tests/forge-sockets-gems.test.js
 
+      - name: Run affected inventory and reforge regressions
+        if: needs.classify.outputs.inventory_changed == 'true' && needs.classify.outputs.full_node != 'true'
+        run: |
+          for file in tests/reforge-eligibility-runtime-browser.test.js tests/ui-synthesis-dungeon-equipment-comparison-regression.test.js tests/ui-synthesis-large-panel-browser.test.js tests/v173.46-equipment-progression.test.js tests/v173.51-qa.test.js tests/v173.57-starter-icons-reforge-filter.test.js tests/v173.58-reforge-redesign.test.js; do
+            node "$file"
+          done
+
       - name: Run relic lifecycle and battle input regressions
         run: |
           node tests/relic-trigger-lifecycle-battle-input-ui-20260919.test.js

@@ -35,6 +35,8 @@ test('Fast mode is passed unchanged from classifier to PR and deployed QA',()=>{
   assert.match(ci,/BOSS_GATE_MODE: \$\{\{ needs.classify.outputs.boss_mode \}\}/);
   assert.match(ci,/boss_mode: \$\{\{ needs.classify.outputs.boss_mode \}\}/);
   assert.match(deploy,/BOSS_GATE_MODE: \$\{\{ github.event_name == 'workflow_dispatch' && 'full' \|\| inputs.boss_mode \}\}/);
+  assert.match(ci,/Run affected inventory and reforge regressions\s+if: needs\.classify\.outputs\.inventory_changed == 'true' && needs\.classify\.outputs\.full_node != 'true'/);
+  for(const path of ['reforge-eligibility-runtime-browser.test.js','ui-synthesis-dungeon-equipment-comparison-regression.test.js','ui-synthesis-large-panel-browser.test.js','v173.46-equipment-progression.test.js','v173.51-qa.test.js','v173.57-starter-icons-reforge-filter.test.js','v173.58-reforge-redesign.test.js'])assert.ok(ci.includes('tests/'+path),path);
 });
 test('nine routing acceptance cases',()=>{
   for(const name of ['renderShopContent','openInventoryCharacterDetail']) {

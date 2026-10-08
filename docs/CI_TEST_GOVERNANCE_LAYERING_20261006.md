@@ -39,6 +39,10 @@ unchanged to deployed QA: `none` for reliably isolated inventory/shop/docs;
 `fast` for known battle presentation/animation; `full` for Boss rules, balance,
 unknown/shared effects, core/lifecycle/settlement, Cloud/persistence, release and manual/nightly.
 Cloud/persistence uses Boss Full on both PR and dev, including its required flag.
+Inventory/reforge routes still execute the existing eligibility, synthesis,
+equipment and selection regressions in core_checks. The affected step runs
+them sequentially only when full_node is false; full_node already includes
+the same tests. No new test system or relaxed assertions are introduced.
 Unmapped mechanisms cannot use Fast merely because a filename sounds visual.
 CI policy edits exercise Fast and retained Full themselves. Generated outputs
 still require exact build verification; shared call arguments and complete
