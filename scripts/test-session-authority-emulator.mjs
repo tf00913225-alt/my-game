@@ -1427,7 +1427,8 @@ const ownedRequest={auth:{uid:ownedUid,token:claims(ownedUser.idToken)},
     data:{uid:ownedUid,session:ownedSession}};
 await initialWriter.commitInitialSources(ownedRequest,{
     operationId:ownedOperation,expectedRevision:1,selection:choices});
-const ownedRecords=makeInitialCharacterSources(ownedUid,2,ownedOperation,choices,{recordedAt:Date.now()});
+const ownedRecords=(await db.doc(`serverUsers/${ownedUid}/recoveryArchives/2`).get())
+    .get("sourceRecords");
 const ownedBase={schemaVersion:1,ownerUid:ownedUid,serverRevision:2,
     provenance:"server-created"};
 const ownedItemId="server-owned-starter-blade-0001";
