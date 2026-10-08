@@ -30,7 +30,7 @@ function sources(count=1){
             gameplayProgress:{},abyssProgress:{},sidecars:Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>
                 [key,{status:"present",raw:JSON.stringify({marker:key})}]))},
         claimRecords,claimCheckpoint:{...base,claimCount:1,claimDigest:claimRecordsDigest(claimRecords),historicalClaimsBlocked:true},
-        playableState:{...base,heroAccount:normalizeAccountState(null),bestiaryData:{slime:9},
+        playableState:{...base,heroAccount:normalizeAccountState(null),bestiaryData:{slime:{seen:true,kills:9}},
             autoConfig:{...auto},autoConfig2:{...auto},autoConfig3:{...auto},
             selectedCreationElement:"water",lastSaveTimestamp:1700000000000}};
 }
@@ -45,7 +45,7 @@ test("complete projection covers current save fields, slots, owned equipment and
             assert.deepEqual(restored.gameSave[["player","player2","player3"][index]],records.characters[index]?.state??null);
         }
         assert.deepEqual(restored.gameSave.heroAccount,records.playableState.heroAccount);
-        assert.deepEqual(restored.gameSave.bestiaryData,{slime:9});
+        assert.deepEqual(restored.gameSave.bestiaryData,{slime:{seen:true,kills:9}});
         assert.deepEqual(restored.sidecars,records.progress.sidecars);
         assert.deepEqual(restored.claimCheckpoint,records.claimCheckpoint);
         assert.equal(restored.gameSave.characterEquipment.fire.hand.v141Uid,"equip-a");
@@ -57,14 +57,14 @@ test("complete projection covers current save fields, slots, owned equipment and
         assert.equal(bundle.readyForPublication,false);
         assert.equal(bundle.byteLength,Buffer.byteLength(JSON.stringify(restored)));
         assert.deepEqual(records,before);
-        records.playableState.bestiaryData.slime=99;
-        assert.equal(restored.gameSave.bestiaryData.slime,9);
+        records.playableState.bestiaryData.slime.kills=99;
+        assert.equal(restored.gameSave.bestiaryData.slime.kills,9);
     }
 });
 test("new digest binds previously omitted fields while v1 receipt hash stays stable",()=>{
     const records=sources(),old=assembleCanonicalSnapshot("uid-a",7,records).sha256,initial=assemble(records).sha256;
     for(const change of [r=>r.playableState.heroAccount.heroes.divineDogHongbao.specificFragments++,
-        r=>r.playableState.bestiaryData.slime++,r=>r.playableState.autoConfig.hp++,
+        r=>r.playableState.bestiaryData.slime.kills++,r=>r.playableState.autoConfig.hp++,
         r=>r.playableState.lastSaveTimestamp++]){
         const changed=structuredClone(records);change(changed);
         assert.equal(assembleCanonicalSnapshot("uid-a",7,changed).sha256,old);
@@ -108,7 +108,8 @@ test("projection rejects oversized and non-JSON payloads before serialization ca
     for(const entry of Object.values(expanded.progress.sidecars)){
         entry.raw=JSON.stringify({data:"x".repeat(43000)});
     }
-    expanded.playableState.bestiaryData={a:"x".repeat(60000),b:"x".repeat(60000),c:"x".repeat(60000)};
+    expanded.playableState.bestiaryData=Object.fromEntries(Array.from({length:1700},(_,index)=>
+        [`monster-${index}-${"x".repeat(110)}`,{seen:true,kills:1}]));
     assert.ok(assembleCanonicalSnapshot("uid-a",7,expanded).byteLength<750*1024);
     assert.throws(()=>assemble(expanded),/playable projection exceeds internal size budget/);
 });
@@ -121,8 +122,41 @@ test("stored projection must match sources and cannot publish through tampered f
         const b=structuredClone(bundle);change(b);
         assert.throws(()=>verifyCanonicalPlayableProjectionAgainstSources(b,"uid-a",7,r));
     }
-    r.playableState.bestiaryData.slime++;
+    r.playableState.bestiaryData.slime.kills++;
     assert.throws(()=>verifyCanonicalPlayableProjectionAgainstSources(bundle,"uid-a",7,r));
+});
+
+test("bestiary observations reject lossy, negative, fractional and contradictory kill history",()=>{
+    for(const row of [9,{}, {seen:true,kills:-1},{seen:true,kills:1.5},
+        {seen:false,kills:1},{seen:1,kills:0},{seen:true,kills:Number.MAX_SAFE_INTEGER+1},
+        {seen:true,kills:0,rewardClaimed:false}]){
+        const r=sources();r.playableState.bestiaryData.slime=row;
+        assert.throws(()=>assemble(r),/bestiary/);
+    }
+    const r=sources();r.playableState.bestiaryData={"":{seen:true,kills:0}};
+    assert.throws(()=>assemble(r),/bestiary/);
+    r.playableState.bestiaryData={slime:{seen:false,kills:0}};
+    assert.deepEqual(assemble(r).projection.gameSave.bestiaryData,r.playableState.bestiaryData);
+});
+
+test("durable playable fields use the progress revision and reject duplicate source owners",()=>{
+    const r=sources();
+    const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=r.playableState;
+    r.progress.playableState=fields;delete r.playableState;
+    const original=assemble(r);
+    assert.deepEqual(original.projection.gameSave.heroAccount,fields.heroAccount);
+    const changed=structuredClone(r);changed.progress.playableState.bestiaryData.slime.kills++;
+    assert.notEqual(assemble(changed).sha256,original.sha256);
+    assert.notEqual(assembleCanonicalSnapshot("uid-a",7,changed).sha256,
+        assembleCanonicalSnapshot("uid-a",7,r).sha256);
+    r.playableState={schemaVersion,ownerUid,serverRevision,provenance,...fields};
+    assert.throws(()=>assemble(r),/duplicate source/);
+    delete r.playableState;
+    r.progress.playableState.ownerUid="other";
+    assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,r),/durable playable fields/);
+    delete r.progress.playableState.ownerUid;
+    r.progress.playableState.bestiaryData.slime.kills=-1;
+    assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,r),/bestiary/);
 });
 test("existing initial-character sources stay unpublished and cannot substitute missing playable domains",()=>{
     const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
