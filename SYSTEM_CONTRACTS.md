@@ -66,7 +66,7 @@
 - 正式 Battle Info Drawer（戰鬥資訊抽屜）外殼永遠透明；收合／展開都保留左側回合文字，只有右側「戰鬥資訊／返回」小 Tab 與展開後的紀錄正文可有黑底。巡怪 `#mapBattleInfo` 是獨立固定黑色紀錄框，不得再共享正式 Drawer 外觀 owner。
 - Battle Info Tab 固定錨定於戰鬥畫面右下；不可拖曳、不可自由定位。展開／收合只允許改變 Drawer（抽屜）狀態，不得改變 Tab 錨點。
 - 巡怪頁底部導覽與副本／Gameplay 共用 `js/04-stage-v11-native-bottom-nav-runtime.js::FourSymbolsBottomNav.syncContext()` 的 app-shell context navigation owner；順序固定為「角色／背包／秘寶／元素匣／返回」，冷進野怪區不得等待或預載 gameplay-core 才取得正確情境。`js/42-v148-combat-dungeon-fixes.js::syncContextNavigation()` 只保留深淵頂部返回控制與相容轉呼叫，不得重新持有底部情境選擇。巡怪頁不得再建立右上角第二顆返回鈕或自行硬寫另一套底部按鈕 markup。
-- 通知紅點共用 `css/38-v141-system-expansion.css::.v141-notice-dot` 的 Legacy 呈現契約；1080×1920 原生底部導覽只可由 `css/06-stage-v11-native-bottom-nav.css` 做明確尺寸換算。禁止後載 CSS 將同一個 Legacy CSS 尺寸直接套到兩種座標層；跨呈現域的位置轉換依 `UI_GUIDELINES.md` 第十三節的唯一 Display Owner，紅點不得攔截點擊或在呼吸動畫最小幀失去可辨識性。
+- 通知紅點共用 `css/38-v141-system-expansion.css::.v141-notice-dot` 的呈現契約；browser／1080×1920 native 底部導覽只可由 `css/06-stage-v11-native-bottom-nav.css` 做各域明確尺寸設定。同一導航殼的域選擇由 `FourSymbolsBottomNav` 控制，跨呈現域的位置轉換依 `UI_GUIDELINES.md` 第十三節的唯一 Display Owner，紅點不得攔截點擊或在呼吸動畫最小幀失去可辨識性。
 - 手動戰鬥在技能／物品／目標選擇期間，回合／倒數列必須保持 100% 可見並位於選擇 UI 上層；不得以降低 opacity（透明度）或被其他 UI 覆蓋的方式讓位。
 - 巡怪人物初始畫面不得顯示 legacy `patrol-character.png` 再切換；`js/26-v131-patrol-appearance.js` 必須先解析玩家選定角色／性別／元素素材，待 decode/load 成功後直接顯示正式 WebP。
 
@@ -195,7 +195,7 @@
 - Floating feedback remains the sole transient-text owner. Critical format is `💥 N`; status capsules are black with white text and retain `statusType` only as semantic metadata.
 - A live V143 impact is scheduled as one target-plus-`impactId` batch. Its requests register before the batch flushes and sort Shield → Damage/Critical/MISS/Resist → Status. Synthetic feedback without an `impactId` stays on the normal queue; clear cancels every pending batch.
 - Persistent state Gate returns a reason. `sameNameDuplicate` is a silent reject before hit rolling or mutation; `exclusiveConflict` (Freeze/Petrify) emits formal status MISS; resistance remains distinct.
-- 普通攻擊名稱顯示 700ms，動畫仍為 520ms，名稱不取得流程鎖；其他技能名稱維持 duration × 2/3。唯一 Core Queue resolve delay 為 visualRemaining + 650ms；技能秒數與 Hit Frame 不變。
+- 普通攻擊名稱顯示 700ms，動畫仍為 520ms，名稱不取得流程鎖；其他技能名稱維持 duration × 2/3。唯一 Core Queue resolve delay 為 visualRemaining + 650ms；技能秒數與 Hit Frame 不變。普通 Impact 的視覺時鐘於同步 settlement／DOM task 完成後由 V143 啟動，Hit task 先投影正式資源／狀態，再揭示 Impact 與同批浮字／recoil／SFX。初始化待完成時 V142 remaining 保留 authored duration；cold hit 的既有 140ms recoil 不得被到期清理截斷，dispose／supersede 仍立即取消。
 - 戰場怪物 identity 僅名稱，等級讀正式 entity.level 於 Battle Status Detail 顯示；玩家 ID／SP／HP HUD 共用名稱列與資源條 tokens 連續相接，不改 Slot／artwork geometry。
 - Skill-name presentation derives color from `skill.element` through `data-skill-element`; character element must not participate. It is a document-level fixed viewport surface and shares the ordinary floating-feedback visual font size.
 

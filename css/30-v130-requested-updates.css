@@ -1,7 +1,7 @@
 /* V130 — Requested character, skill, shop and battle refinements. */
 
 /* Character skill tab: this is the single native scroll owner. */
-#game-stage #homeFeatureModal #characterTabContent{
+#game-ui #homeFeatureModal #characterTabContent{
     overflow-y:auto !important;
     overflow-x:hidden !important;
     min-height:0 !important;
@@ -10,7 +10,7 @@
     overscroll-behavior-y:contain !important;
 }
 
-#game-stage #homeFeatureModal #characterTabContent > #skillPage{
+#game-ui #homeFeatureModal #characterTabContent > #skillPage{
     display:block !important;
     position:static !important;
     height:max-content !important;
@@ -21,7 +21,7 @@
     touch-action:pan-y !important;
 }
 
-#game-stage #homeFeatureModal #allSkillsList{
+#game-ui #homeFeatureModal #allSkillsList{
     overflow:visible !important;
     padding-bottom:80px !important;
 }

@@ -4,6 +4,7 @@ const source=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const start=source.indexOf("    window.v143ResolveBattleFeedbackTiming=function");
 const end=source.indexOf('    if(typeof applySkillDebuffEffectsToPlayer',start);
 const resolver=source.slice(start,end);
+const hitQueue=source.slice(source.indexOf('    function queueTargetHit('),source.indexOf('    function requestImpactTimeline('));
 function fixture(config={id:"normal"}){
     const sounds=[],motions=[],timers=[];
     const artwork={animate(frames,options){motions.push({frames,options});return {cancel(){}};}};
@@ -11,7 +12,7 @@ function fixture(config={id:"normal"}){
     const context={window:{v141Audio:{play:kind=>sounds.push(kind),combatFeedbackVolumeScale:2}},
         state:{current,metrics:{delayedNumbers:0}},Date:{now:()=>100},
         delayFor:()=>config.wait??297,setTimer:fn=>timers.push(fn),cardFor:()=>({querySelector:sel=>{assert.equal(sel,".v174-battle-art");return artwork;}})};
-    vm.createContext(context);vm.runInContext(resolver,context);
+    vm.createContext(context);vm.runInContext(hitQueue+resolver,context);
     return {context,sounds,motions,timers};
 }
 for(const kind of ["damage","criticalDamage","miss","heal","sp","shield","status"]){
@@ -30,11 +31,11 @@ const expired=fixture({id:'normal',wait:0});expired.context.window.v143ResolveBa
 const scheduleStart=source.indexOf('    function scheduleStatusOwnedUiUpdate(');
 const scheduleEnd=source.indexOf('    if(typeof document!=="undefined")',scheduleStart);
 const calls=[],timers=[];const c={state:{pendingUpdates:new Map()},existingTargetDelay:()=>300,setTimer:fn=>timers.push(fn),window:{},syncStatusVisualsForUnit(){}};
-vm.createContext(c);vm.runInContext(source.slice(scheduleStart,scheduleEnd),c);
+vm.createContext(c);vm.runInContext(hitQueue+source.slice(scheduleStart,scheduleEnd),c);
 for(const projection of ["status","resources","labels","defeated"]){c.window.v143SchedulePlayerStatusUiUpdate(0,()=>calls.push(projection),projection);}
 assert.deepEqual(calls,[]);assert.equal(timers.length,4);timers.forEach(fn=>fn());assert.deepEqual(calls,["status","resources","labels","defeated"]);assert.equal(c.state.pendingUpdates.size,0);
 const queued=[];const cold={state:{pendingUpdates:new Map(),current:{done:false,targetSide:'monster',emitted:new Set([0]),hitReached:false}},existingTargetDelay:()=>0,setTimer:fn=>queued.push(fn),window:{},syncStatusVisualsForUnit(){}};
-let projected=false;vm.createContext(cold);vm.runInContext(source.slice(scheduleStart,scheduleEnd),cold);cold.window.v143ScheduleMonsterUiUpdate(0,()=>{projected=true;},'boss-shield');assert.equal(projected,false);assert.equal(queued.length,1);cold.state.current.hitReached=true;queued[0]();assert.equal(projected,true);
+let projected=false;vm.createContext(cold);vm.runInContext(hitQueue+source.slice(scheduleStart,scheduleEnd),cold);cold.window.v143ScheduleMonsterUiUpdate(0,()=>{projected=true;},'boss-shield');assert.equal(projected,false);assert.equal(queued.length,1);cold.state.current.hitReached=true;queued[0]();assert.equal(projected,true);
 console.log("Battle feel: target-hit audio/artwork-only recoil, critical, non-damage exclusion and independent committed projections PASS");
 const cleanupStart=source.indexOf('    function cleanupCurrent(');
 const cleanupEnd=source.indexOf('    let sequence=',cleanupStart);
@@ -49,13 +50,16 @@ assert.equal(cancelled,1);assert.equal(art.v143ImpactRecoil,null);assert.equal(c
 // first exposed frame is the impact frame, never a transparent travel frame.
 const spriteClasses=new Set();
 const spriteNode={style:{setProperty(key,value){this[key]=value;}},dataset:{},setAttribute(){},classList:{contains:key=>spriteClasses.has(key),add:key=>spriteClasses.add(key)}};
-const spriteCurrent={duration:520,startedAt:100,firstVisibleFrameAt:0,targetSide:'monster',model:{sprite:{src:'normal.webp',columns:4,rows:3,frames:12,hitFrame:6,impactOnly:true}},spriteNodes:new Map(),confirmedTargets:new Set([0])};
+const rasterMicrotasks=[];
+const spriteCurrent={duration:520,startedAt:100,firstVisibleFrameAt:0,targetSide:'monster',targetIndexes:[0],model:{sprite:{src:'normal.webp',columns:4,rows:3,frames:12,hitFrame:6,impactOnly:true}},spriteNodes:new Map(),confirmedTargets:new Set([0])};
 const raster={state:{current:spriteCurrent,stage:{}},Date:{now:()=>100},placementFor:()=> 'single',appendSpriteNode:()=>spriteNode,
+    queueMicrotask:fn=>rasterMicrotasks.push(fn),setTimer(){},targetHitTime:()=>397,
     beginVisualTimeline(current){assert.ok(spriteClasses.has('v143-vfx-sprite-active'));assert.equal(spriteNode.style.animationPlayState,'paused');current.firstVisibleFrameAt=100;current.visualStartedAt=100;},placeSprite(_current,node){node.style.left='10px';node.style.top='20px';},requestSpriteAspect(){},cardFor:()=>({classList:{remove(){}}}),syncStatusVisualsForUnit(){}};
 vm.createContext(raster);
 vm.runInContext(source.slice(source.indexOf('    function addSprite('),source.indexOf('    function targetHitTime(')),raster);
 vm.runInContext(source.slice(source.indexOf('    function settleTargetVisual('),source.indexOf('    function registerTarget(')),raster);
 raster.addSprite(spriteCurrent,0,{});assert.equal(spriteNode.style.visibility,'hidden');assert.equal(spriteNode.style.animationPlayState,'paused');assert.equal(spriteNode.style['--v143-sprite-delay'],'-260ms');
+assert.equal(spriteCurrent.firstVisibleFrameAt,0);assert.equal(rasterMicrotasks.length,1);rasterMicrotasks[0]();
 raster.settleTargetVisual(spriteCurrent,0);assert.equal(spriteNode.style.visibility,'visible');assert.equal(spriteNode.style.animationPlayState,'running');assert.equal(spriteCurrent.visualStartedAt,100);assert.equal(spriteCurrent.duration,520);
 const audio=fs.readFileSync('js/34-v141-core-systems.js','utf8');
 const noiseSource=audio.slice(audio.indexOf('        function noise('),audio.indexOf('        function play(',audio.indexOf('        function noise(')));

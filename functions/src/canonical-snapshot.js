@@ -36,6 +36,44 @@ function digest(value){ return createHash("sha256").update(JSON.stringify(value)
 function snapshotDigest(value){ return digest(stable(value)); }
 function claimRecordsDigest(records){ return digest(stable(records)); }
 
+// Validate retained evidence, never sanitize it or accrue elapsed-time value.
+// Bounds come from the existing element-box, growth and rested storage owners.
+function inspectTimeSidecar(key,raw){
+    const fields={
+        "element-box-state":["remainingMs"],
+        "exp-pool-growth-state":["initialized","unlocked","lastAt","noticeShown",
+            "lastCapped","newcomerRewards"],
+        "rested-exp-state":["battles","progressMs","lastSeenAt","blockedByElementBox"]
+    }[key];
+    if(!fields){return;}
+    let state;
+    try{state=JSON.parse(raw);}catch(_){fail(`time sidecar JSON: ${key}`);}
+    if(!object(state)||Object.keys(state).sort().join("|")!==[...fields].sort().join("|")){
+        fail(`time sidecar fields: ${key}`);
+    }
+    require("./cloud-save-policy").validateJsonValue(state,`time sidecar ${key}`,0);
+    const integer=(value,max=Number.MAX_SAFE_INTEGER)=>
+        Number.isSafeInteger(value)&&value>=0&&value<=max;
+    if(key==="element-box-state"){
+        if(!integer(state.remainingMs,32*60*60*1000)){fail("element-box remaining time");}
+    }else if(key==="rested-exp-state"){
+        if(!integer(state.battles,300)||!integer(state.progressMs,120000-1)||
+           !integer(state.lastSeenAt)||state.lastSeenAt<1||
+           typeof state.blockedByElementBox!=="boolean"||
+           state.battles===300&&state.progressMs!==0){fail("rested time evidence");}
+    }else{
+        if(["initialized","unlocked","noticeShown","lastCapped"].some(field=>
+            typeof state[field]!=="boolean")||!integer(state.lastAt)||
+           !object(state.newcomerRewards)||Object.entries(state.newcomerRewards).some(
+               ([id,claimed])=>!ID.test(id)||claimed!==true)||
+           (state.initialized?state.lastAt<1:
+               state.lastAt!==0||state.unlocked||state.noticeShown||state.lastCapped)||
+           !state.unlocked&&(state.noticeShown||state.lastCapped)){
+            fail("growth time or recorded reward evidence");
+        }
+    }
+}
+
 // Durable sources inherit ownership/revision from progress/current. The older
 // explicit in-memory input remains available, but two sources cannot coexist.
 function inspectPlayableState(records){
@@ -212,6 +250,11 @@ function assembleCanonicalSnapshot(uid,revision,records){
            CLAIM_SIDECARS.has(key)&&provenance!=="server-created"&&entry.status!=="present"){
             fail("claim-bearing sidecar missing or invalid");
         }
+        // Preserve historical v1 archive compatibility. Durable playable
+        // sources are newer; complete projection always validates below.
+        if(records.progress.playableState!==undefined&&entry.status==="present"){
+            inspectTimeSidecar(key,entry.raw);
+        }
         if(CLAIM_SIDECARS.has(key)&&entry.status==="present"){
             let parsed;
             try{ parsed=JSON.parse(entry.raw); }catch(_){ fail("claim-bearing sidecar JSON"); }
@@ -327,6 +370,7 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
         try{parsed=JSON.parse(entry.raw);}catch(_){fail(`playable sidecar JSON: ${key}`);}
         if(!object(parsed)){fail(`playable sidecar structure: ${key}`);}
         validateJsonValue(parsed,`sidecar ${key}`,0);
+        inspectTimeSidecar(key,entry.raw);
     }
     const gameSave={version:6,heroAccount:hero,player:players[0],player2:players[1],
         player3:players[2],gold:source.snapshot.economy.gold,

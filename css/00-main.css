@@ -49,13 +49,13 @@
    Scroll containers keep their existing overflow/touch behavior; only the
    browser-drawn scrollbar track/thumb is hidden across the game UI.
 */
-#game-stage,
-#game-stage *{
+:is(#game-stage, #game-ui),
+:is(#game-stage, #game-ui) *{
     scrollbar-width:none !important;
 }
 
-#game-stage::-webkit-scrollbar,
-#game-stage *::-webkit-scrollbar{
+:is(#game-stage, #game-ui)::-webkit-scrollbar,
+:is(#game-stage, #game-ui) *::-webkit-scrollbar{
     width:0 !important;
     height:0 !important;
     display:none !important;
@@ -419,10 +419,8 @@ button:disabled{
    變成要滑動才看得到，實際上沒有真的把空間要回來。
 */
 
-#app.no-header .header,
-#app:has(#homePage.active) #gameHeaderBar{
-    display:none;
-}
+#app.no-header .header{display:none;}
+
 
 /*
    ★ 修正：
@@ -514,14 +512,11 @@ button:disabled{
     padding:10px 12px 78px;
 }
 
-#app.no-header .content,
-#app:has(#homePage.active) .content{
+#app.no-header .content{
     top:0;
 }
 
-#app:has(#homePage.active) .content{
-    padding-bottom:84px;
-}
+
 
 /*
    ★ 新增（依照使用者要求，「黑框上下
@@ -597,20 +592,12 @@ button:disabled{
 
 #homePage{
     position:relative;
-
-    /*
-       V89 ROOT FIX — 主城位於固定 420×746.67 的 #app/.content 裡，
-       不能再用 100vh（真實瀏覽器 viewport）當高度基準。
-       否則手機 viewport 高度會大於虛擬舞台，直接把 .content 撐出
-       scrollHeight。改為跟父層可視區同高，主城本身不再產生捲動。
-    */
-    height:100%;
-    min-height:0;
-    box-sizing:border-box;
-    overflow:hidden;
-
-    margin:-14px;
-    padding:14px;
+    width:min(100%,var(--ui-page-max-width));
+    height:100%;min-height:0;
+    margin:0 auto;padding:12px;
+    box-sizing:border-box;overflow-y:auto;overflow-x:hidden;
+    overscroll-behavior-y:contain;touch-action:pan-y;
+    scrollbar-gutter:stable;
 }
 
 .home-bg-fixed-layer{
@@ -845,8 +832,8 @@ button:disabled{
     border-radius:7px;
     background:linear-gradient(180deg,rgba(30,21,12,.94),rgba(8,7,5,.92));
     color:#ceb887;
-    font-size:8px;
-    line-height:10px;
+    font-size:13px;
+    line-height:18px;
     box-shadow:inset 0 0 0 1px rgba(255,224,151,.05),0 2px 5px rgba(0,0,0,.3);
     white-space:nowrap;
 }
@@ -854,7 +841,7 @@ button:disabled{
 .home-hud-resources b{
     display:inline-block;
     color:#ffe093;
-    font-size:10px;
+    font-size:13px;
     font-variant-numeric:tabular-nums;
     white-space:nowrap;
 }
@@ -903,13 +890,13 @@ button:disabled{
     display:flex;
     flex:0 0 auto;
     flex-direction:column;
-    gap:1px;
-    padding:1px 7px 0;
+    gap:12px;
+    padding:12px 7px;
 }
 
 .home-primary-actions{
     display:grid;
-    grid-template-columns:repeat(2,minmax(0,46%));
+    grid-template-columns:repeat(2,minmax(0,1fr));
     justify-content:space-between;
     align-self:center;
     width:100%;
@@ -918,25 +905,12 @@ button:disabled{
 
 .home-secondary-actions{
     display:grid;
-    grid-template-columns:repeat(2,80px);
-    grid-template-rows:repeat(4,70px);
+    grid-template-columns:repeat(auto-fit,minmax(80px,1fr));
+    grid-auto-rows:84px;
     justify-content:space-between;
-    gap:5px 0;
-    min-height:295px;
+    gap:8px;
+    min-height:0;
     padding:0;
-}
-
-.home-utility-actions{
-    position:absolute;
-    right:0;
-    bottom:0;
-    left:0;
-    z-index:4;
-    display:grid;
-    grid-template-columns:repeat(2,92px);
-    justify-content:space-between;
-    gap:0;
-    padding:0 74px;
 }
 
 .home-card{
@@ -1025,11 +999,11 @@ button:disabled{
 
 .home-card-secondary{
     display:grid;
-    grid-template-rows:49px 19px;
+    grid-template-rows:60px 22px;
     align-content:stretch;
     justify-items:stretch;
-    width:80px;
-    height:70px;
+    width:100%;
+    height:84px;
     overflow:hidden;
     border:1px solid rgba(205,154,65,.82);
     border-radius:11px;
@@ -1048,7 +1022,7 @@ button:disabled{
 
 .home-card-secondary .home-card-icon{
     width:100%;
-    height:49px;
+    height:60px;
     border:0;
     border-bottom:1px solid rgba(198,151,65,.62);
     border-radius:10px 10px 0 0;
@@ -1073,39 +1047,6 @@ button:disabled{
     background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));
     font-size:13px;
     line-height:18px;
-}
-
-.home-card-utility{
-    display:grid;
-    grid-template-columns:1fr;
-    grid-template-rows:52px 24px;
-    align-items:stretch;
-    justify-items:stretch;
-    height:78px;
-    overflow:hidden;
-    border:1px solid rgba(186,137,57,.76);
-    border-radius:9px;
-    background:linear-gradient(180deg,rgba(38,26,15,.96),rgba(9,8,6,.96));
-    box-shadow:0 3px 8px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,224,151,.05);
-}
-
-.home-card-utility .home-card-icon{
-    width:100%;
-    height:52px;
-    margin:0;
-    border-radius:8px 8px 0 0;
-    border-right:0;
-    border-bottom:1px solid rgba(174,127,55,.55);
-}
-
-.home-card-utility .home-card-label{
-    align-self:stretch;
-    padding:0 4px;
-    background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));
-    font-size:15.5px;
-    line-height:23px;
-    text-align:center;
-    letter-spacing:.02em;
 }
 
 .home-gold-display{
@@ -6246,7 +6187,7 @@ button:active{
 }
 
 /* Full-screen modal layers remain constrained to the stage. */
-#game-stage .home-feature-modal,
+:is(#game-stage,#game-ui) .home-feature-modal,
 #game-stage .map-feature-modal,
 #game-stage .modal-overlay,
 #game-stage .popup-overlay{
@@ -6521,9 +6462,31 @@ button:active{
 
 /* V173.61 — shared return icon center fill / patrol power saving / quest batch action */
 #game-stage img[src*="map-return.png"]{background:#050505;border-radius:50%;}
-#game-stage .quest-batch-actions{display:flex;justify-content:flex-end;padding:8px 10px 4px;}
-#game-stage .quest-claim-all-btn{
+:is(#game-stage,#game-ui) .quest-batch-actions{display:flex;justify-content:flex-end;padding:8px 10px 4px;}
+:is(#game-stage,#game-ui) .quest-claim-all-btn{
     min-width:108px;min-height:36px;padding:7px 12px;border:1px solid #b98a42;border-radius:8px;
     background:linear-gradient(180deg,#4c3316,#211308);color:#ffe0a0;font-size:12px;font-weight:900;
 }
-#game-stage .quest-claim-all-btn:disabled{opacity:.42;filter:grayscale(.35);}
+:is(#game-stage,#game-ui) .quest-claim-all-btn:disabled{opacity:.42;filter:grayscale(.35);}
+
+/* Browser shell geometry. No transform or resize writer participates here. */
+#game-ui{
+    --ui-page-max-width:1120px;
+    position:fixed;inset:0;z-index:1000;
+    display:grid;grid-template-rows:minmax(0,1fr) auto;
+    padding:var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+    box-sizing:border-box;pointer-events:none;overflow:hidden;
+    touch-action:pan-x pan-y;
+}
+#game-ui[hidden]{display:none;}
+#game-ui > .page{grid-row:1;min-height:0;pointer-events:auto;}
+#game-ui > .page:not(.active){display:none;}
+#game-ui > .home-feature-modal,#game-ui > .item-modal{
+    position:fixed;inset:0;width:auto;height:auto;
+    box-sizing:border-box;pointer-events:auto;
+    padding:max(12px,var(--safe-top)) max(12px,var(--safe-right)) max(12px,var(--safe-bottom)) max(12px,var(--safe-left));
+    touch-action:pan-x pan-y;
+}
+#game-ui img,#game-ui svg,#game-ui canvas{
+    -webkit-touch-callout:none;user-select:none;-webkit-user-drag:none;
+}

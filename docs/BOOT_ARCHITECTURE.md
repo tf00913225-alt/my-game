@@ -29,6 +29,8 @@
 
 Display tokens 位於 Critical Boot 的 `css/00-main.css`，app-shell 的 scaler／座標 Owner 直接消費同一來源。Boot／Auth 不依賴 app scaler；一般 UI 與戰鬥局部舞台的遷移邊界由 `UI_GUIDELINES.md` 第十三節控制。不得因 responsive 工程新增 Critical feature、重跑 Startup 或搬動 Auth／Save destination 決策。
 
+一般 UI 的 `#game-ui` 由既有 app-shell Owner 一次搬移既有 DOM；顯示狀態跟隨 `#gameInterface` 的既有呈現生命週期。Boot、Auth 與角色／存檔 destination 仍由上表 Owner 決定；browser boundary 不得自行判斷 READY 或 UID。
+
 ## Startup State Machine
 
 ```mermaid

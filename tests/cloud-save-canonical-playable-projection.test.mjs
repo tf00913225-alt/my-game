@@ -7,6 +7,7 @@ const {assembleCanonicalSnapshot,assembleCanonicalPlayableProjection,
     verifyCanonicalPlayableProjectionAgainstSources,claimRecordsDigest}=require("../functions/src/canonical-snapshot.js");
 const {LEGACY_BACKUP_SIDECARS,ALLOWED_SAVE_KEYS}=require("../functions/src/cloud-save-policy.js");
 const {normalizeAccountState}=require("../functions/src/hero-core.js");
+const {makeInitialSidecars}=require("../functions/src/initial-character-sources.js");
 
 function sources(count=1){
     const base={schemaVersion:1,ownerUid:"uid-a",serverRevision:7,provenance:"grandfathered-unverified-history"};
@@ -28,7 +29,9 @@ function sources(count=1){
         relicLoadout:{...base,relicId:"relic-a",subRelicId:null},
         progress:{...base,dailyQuestState:{claimed:true},commissionQuestState:{},achievementState:{},
             gameplayProgress:{},abyssProgress:{},sidecars:Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>
-                [key,{status:"present",raw:JSON.stringify({marker:key})}]))},
+                [key,makeInitialSidecars(1700000000000)[key].status==="present"?
+                    makeInitialSidecars(1700000000000)[key]:
+                    {status:"present",raw:JSON.stringify({marker:key})}]))},
         claimRecords,claimCheckpoint:{...base,claimCount:1,claimDigest:claimRecordsDigest(claimRecords),historicalClaimsBlocked:true},
         playableState:{...base,heroAccount:normalizeAccountState(null),bestiaryData:{slime:{seen:true,kills:9}},
             autoConfig:{...auto},autoConfig2:{...auto},autoConfig3:{...auto},
@@ -105,13 +108,66 @@ test("projection rejects oversized and non-JSON payloads before serialization ca
     const large=sources();large.playableState.bestiaryData=Object.fromEntries(
         Array.from({length:20},(_,i)=>[i,"x".repeat(60000)]));assert.throws(()=>assemble(large));
     const expanded=sources();
-    for(const entry of Object.values(expanded.progress.sidecars)){
-        entry.raw=JSON.stringify({data:"x".repeat(43000)});
+    for(const [key,entry] of Object.entries(expanded.progress.sidecars)){
+        if(makeInitialSidecars(1)[key].status!=="present"){
+            entry.raw=JSON.stringify({data:"x".repeat(55000)});
+        }
     }
     expanded.playableState.bestiaryData=Object.fromEntries(Array.from({length:1700},(_,index)=>
         [`monster-${index}-${"x".repeat(110)}`,{seen:true,kills:1}]));
     assert.ok(assembleCanonicalSnapshot("uid-a",7,expanded).byteLength<750*1024);
     assert.throws(()=>assemble(expanded),/playable projection exceeds internal size budget/);
+});
+
+test("time sidecars reject lossy values and contradictory recorded state without accrual",()=>{
+    const mutations={
+        "element-box-state":[s=>s.remainingMs=-1,s=>s.remainingMs=0.5,
+            s=>s.remainingMs=32*60*60*1000+1,s=>s.remainingMs="0",s=>s.extra=true],
+        "rested-exp-state":[s=>s.battles=301,s=>s.battles=-1,s=>s.progressMs=120000,
+            s=>s.progressMs=0.5,s=>s.lastSeenAt=0,s=>s.blockedByElementBox=1,
+            s=>{s.battles=300;s.progressMs=1;}],
+        "exp-pool-growth-state":[s=>s.lastAt=-1,s=>s.lastAt=0.5,s=>s.lastAt=0,
+            s=>s.unlocked=1,s=>s.newcomerRewards={quest:false},
+            s=>s.newcomerRewards={"":true},s=>s.newcomerRewards=[],
+            s=>s.noticeShown=true,s=>s.lastCapped=true,s=>s.initialized=false]
+    };
+    for(const [key,changes] of Object.entries(mutations)){
+        for(const change of changes){
+            const r=sources(),state=JSON.parse(r.progress.sidecars[key].raw);
+            change(state);r.progress.sidecars[key].raw=JSON.stringify(state);
+            assert.throws(()=>assemble(r),undefined,key);
+            const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=r.playableState;
+            r.progress.playableState=fields;delete r.playableState;
+            assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,r),undefined,key);
+        }
+        const r=sources();r.progress.sidecars[key].raw="{}";
+        assert.throws(()=>assemble(r),/time sidecar fields/);
+        r.progress.sidecars[key].raw="{";
+        assert.throws(()=>assemble(r),new RegExp(`playable sidecar JSON: ${key}`));
+    }
+    const r=sources();
+    r.progress.sidecars["element-box-state"].raw='{"remainingMs":115200000}';
+    r.progress.sidecars["rested-exp-state"].raw=JSON.stringify({battles:300,progressMs:0,
+        lastSeenAt:1700000000000,blockedByElementBox:true});
+    r.progress.sidecars["exp-pool-growth-state"].raw=JSON.stringify({initialized:true,
+        unlocked:true,lastAt:1700000000000,noticeShown:true,lastCapped:true,newcomerRewards:{quest:true}});
+    const before=structuredClone(r),projection=assemble(r).projection;
+    assert.deepEqual(projection.sidecars,r.progress.sidecars);
+    assert.deepEqual(r,before);
+    assert.equal(projection.gameSave.sharedExp,7);
+    assert.equal(projection.authoritativeStateReady,false);
+});
+
+test("historical v1 time bytes stay unchanged but cannot become complete playable evidence",()=>{
+    const r=sources();
+    for(const key of ["element-box-state","exp-pool-growth-state","rested-exp-state"]){
+        r.progress.sidecars[key]={status:"present",raw:"{}"};
+    }
+    const before=structuredClone(r),bundle=assembleCanonicalSnapshot("uid-a",7,r);
+    assert.deepEqual(bundle.snapshot.progress.sidecars,r.progress.sidecars);
+    assert.equal(assembleCanonicalSnapshot("uid-a",7,r).sha256,bundle.sha256);
+    assert.throws(()=>assemble(r),/time sidecar fields/);
+    assert.deepEqual(r,before);
 });
 test("stored projection must match sources and cannot publish through tampered flags",()=>{
     const r=sources(),bundle=assemble(r);

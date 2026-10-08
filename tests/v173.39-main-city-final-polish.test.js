@@ -3,22 +3,23 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const read=p=>fs.readFileSync(p,"utf8");
 const base=read("css/00-main.css"),index=read("index.html"),roster=read("css/19-stage-v54-main-city-moderate-native-scale.css"),runtime=read("js/16-stage-v54-main-city-runtime.js");
+const utility=read("css/56-v174-critical-ui-regressions.css");
 let passed=0;function test(n,f){f();passed++;console.log("✓ "+n);}
 test("HUD uses the requested logical typography without growing its shell",()=>{
  assert.match(base,/\.home-city-hud\{[\s\S]*?min-height:48px;/);
  assert.match(base,/\.home-hud-identity\{[\s\S]*?align-items:center;[\s\S]*?align-self:stretch;/);
  assert.match(base,/\.home-hud-kicker\{[\s\S]*?gap:8px;[\s\S]*?font-size:15px;[\s\S]*?line-height:1\.15;/);
- assert.match(roster,/#game-stage #homePage \.home-version-badge\{font-size:13px;line-height:17px;\}/);
+ assert.match(roster,/#game-ui #homePage \.home-version-badge\{font-size:13px;line-height:17px;\}/);
  assert.match(base,/\.home-hud-resources\{[\s\S]*?grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
  assert.doesNotMatch(index,/homeHudCharacterList|homeHudCharacterName|homeHudCharacterLevel/);
 });
-test("utility buttons use image-over-text cards and preserve the centre passage",()=>{
- assert.match(base,/\.home-utility-actions\{[\s\S]*?bottom:0;[\s\S]*?grid-template-columns:repeat\(2,92px\);[\s\S]*?padding:0 74px;/);
- assert.match(base,/\.home-card-utility\{[\s\S]*?grid-template-columns:1fr;[\s\S]*?grid-template-rows:52px 24px;[\s\S]*?height:78px;/);
- assert.match(base,/\.home-card-utility \.home-card-icon\{[\s\S]*?width:100%;[\s\S]*?height:52px;[\s\S]*?border-bottom:1px solid/);
- assert.match(base,/\.home-card-utility \.home-card-label\{[\s\S]*?font-size:15\.5px;[\s\S]*?line-height:23px;/);
- assert.match(base,/#app\.no-header \.header,\s*#app:has\(#homePage\.active\) #gameHeaderBar\{[\s\S]*?display:none;/);
- assert.equal(396-(74*2)-(92*2),64);
+test("utilities retain their image-over-text skin in normal browser flow",()=>{
+ assert.match(utility,/#game-ui \.team-relic-home-tools\{[^}]*position:relative;[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\);[^}]*width:100%;/);
+ assert.match(utility,/\.home-card-utility\{[^}]*grid-template-rows:58px 24px;[^}]*height:84px;/);
+ assert.match(utility,/\.home-card-icon\{[^}]*height:58px;[^}]*border-bottom:1px solid/);
+ assert.match(utility,/\.home-card-label\{[^}]*font-size:13px;[^}]*line-height:18px;/);
+ assert.doesNotMatch(base,/\.home-utility-actions\{|^\.home-card-utility\{/m,'persistent utility owner must not compete with legacy defaults');
+ assert.match(base,/#app\.no-header \.header\{[^}]*display:none;/);
 });
 test("roster keeps three cells while growing enough for the permanent typography floor",()=>{
  assert.match(roster,/\.v146-home-roster\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*?margin:5px 10px 0;/);
@@ -33,10 +34,10 @@ test("roster keeps three cells while growing enough for the permanent typography
  assert.match(runtime,/function renderHomeRoster\(\)[\s\S]*?ensureHomeRosterShell\(\)/);
  assert.match(runtime,/team-relic-loadout-slot/);
 });
-test("fixed home card heights and non-scroll geometry remain explicit",()=>{
+test("home cards retain readable heights and adapt to browser width",()=>{
  assert.match(base,/\.home-card-primary\{[\s\S]*?height:78px;/);
- assert.match(base,/\.home-card-secondary\{[\s\S]*?width:80px;[\s\S]*?height:70px;/);
- assert.match(base,/\.home-secondary-actions\{[\s\S]*?grid-template-columns:repeat\(2,80px\);[\s\S]*?grid-template-rows:repeat\(4,70px\);/);
- assert.match(base,/#homePage\{[\s\S]*?height:100%;[\s\S]*?overflow:hidden;/);
+ assert.match(base,/\.home-card-secondary\{[\s\S]*?width:100%;[\s\S]*?height:84px;/);
+ assert.match(base,/\.home-secondary-actions\{[\s\S]*?grid-template-columns:repeat\(auto-fit,minmax\(80px,1fr\)\);[\s\S]*?grid-auto-rows:84px;/);
+ assert.match(base,/#homePage\{[\s\S]*?height:100%;[\s\S]*?overflow-y:auto;/);
 });
 console.log("\n"+passed+" V173.39 main-city pixel-tune tests passed.");

@@ -47,8 +47,8 @@ for(const [options,primary,danger] of [[{},false,false],[{danger:true},true,true
 assert.equal(created.filter(node=>node.id==="v169RpgDialogLayer").length,1,"all tones reuse one dialog layer");
 
 assert.doesNotMatch(relicCss,/map-return\.png/);
-assert.match(relicCss,/\.team-relic-home-tools\{[\s\S]*?width:192px;[\s\S]*?gap:32px;/);
-assert.match(relicCss,/#statusHelpButton,\s*\n#game-stage #homeFeatureModal\.team-relic-modal #skillPreviewHeaderButton\{display:none!important;\}/,
+assert.match(fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8"),/\.team-relic-home-tools\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\);[^}]*width:100%;[^}]*gap:12px;/);
+assert.match(relicCss,/#statusHelpButton,\s*\n#game-ui #homeFeatureModal\.team-relic-modal #skillPreviewHeaderButton\{display:none!important;\}/,
     "relic modal must never expose the character status-help or all-skill-preview header controls");
 assert.match(relicCss,/\.team-relic-modal:not\(\.team-relic-detail-mode\) \.home-feature-close-btn:not\(#statusHelpButton\):not\(#skillPreviewHeaderButton\)\{display:inline-flex!important;\}/,
     "only the real modal return button may be forced visible in relic list mode");
@@ -58,9 +58,9 @@ assert.match(relicRuntime,/classList\.add\("team-relic-detail-mode"\)/,
     "detail runtime must explicitly enter relic detail mode before rendering the detail view");
 assert.match(relicRuntime,/classList\.remove\("team-relic-detail-mode"\)/,
     "returning to the list must explicitly leave relic detail mode");
-assert.match(relicCss,/#game-stage #homeFeatureModal\.team-relic-modal \.team-relic-detail-back\{[^}]*font-size:0!important/,
+assert.match(relicCss,/#game-ui #homeFeatureModal\.team-relic-modal \.team-relic-detail-back\{[^}]*font-size:0!important/,
     "the original detail button text must be suppressed with enough specificity to beat shared button CSS");
-assert.match(relicCss,/#game-stage #homeFeatureModal\.team-relic-modal \.team-relic-detail-back::after\{content:"返回秘寶列表";[^}]*font-size:15px/,
+assert.match(relicCss,/#game-ui #homeFeatureModal\.team-relic-modal \.team-relic-detail-back::after\{content:"返回秘寶列表";[^}]*font-size:15px/,
     "the detail return label must have exactly one visible 15px action source");
 
 assert.match(abyss,/for\(let position=0;position<5;position\+\+\)[\s\S]*?for\(let position=1;position<=3;position\+\+\)/,

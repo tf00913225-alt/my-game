@@ -1,5 +1,5 @@
 /* Paid-service disclosure inside the existing shared homeFeatureModal. */
-#game-stage #homeFeatureModal.ad-free-service-info-mode{
+#game-ui #homeFeatureModal.ad-free-service-info-mode{
     z-index:12000;
     box-sizing:border-box;
     padding:14px;
@@ -10,7 +10,7 @@
         rgba(2,2,2,.84);
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-box{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-box{
     display:flex;
     width:calc(100% - var(--ui-medium-modal-safe-space,28px));
     max-width:var(--ui-medium-modal-max-width,360px);
@@ -29,7 +29,7 @@
         inset 0 0 28px rgba(186,128,43,.08);
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title{
     flex:0 0 auto;
     min-height:52px;
     box-sizing:border-box;
@@ -39,7 +39,7 @@
         linear-gradient(180deg,rgba(53,37,20,.96),rgba(18,13,9,.96));
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title > span{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title > span{
     color:#f0cf83;
     font-family:"Noto Serif TC",serif;
     font-size:20px;
@@ -49,11 +49,11 @@
     text-shadow:0 1px 2px #000,0 0 10px rgba(229,173,66,.18);
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title > div{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title > div{
     display:none;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode #homeFeatureModalBody{
+#game-ui #homeFeatureModal.ad-free-service-info-mode #homeFeatureModalBody{
     flex:1 1 auto;
     min-height:0;
     box-sizing:border-box;
@@ -66,7 +66,7 @@
     scrollbar-gutter:stable;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-panel{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-panel{
     display:flex;
     width:100%;
     min-width:0;
@@ -78,7 +78,7 @@
     line-height:1.65;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-hero{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-hero{
     display:flex;
     box-sizing:border-box;
     flex-direction:column;
@@ -94,7 +94,7 @@
     text-align:center;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-subtitle{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-subtitle{
     color:#ead7ad;
     font-family:"Noto Serif TC",serif;
     font-size:17px;
@@ -102,7 +102,7 @@
     letter-spacing:.5px;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-price{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-price{
     color:#f2c769;
     font-family:"Cinzel","Noto Serif TC",serif;
     font-size:28px;
@@ -112,14 +112,14 @@
     text-shadow:0 0 12px rgba(233,176,62,.16);
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-badge{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-badge{
     color:#ae9a77;
     font-size:13px;
     font-weight:700;
     letter-spacing:.3px;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy{
     box-sizing:border-box;
     padding:11px 12px;
     border:1px solid rgba(137,104,57,.44);
@@ -127,15 +127,15 @@
     background:rgba(8,7,6,.62);
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy p{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy p{
     margin:0 0 8px;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy p:last-child{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy p:last-child{
     margin-bottom:0;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support{
     display:flex;
     box-sizing:border-box;
     flex-direction:column;
@@ -146,7 +146,7 @@
     background:rgba(15,11,8,.72);
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row{
     display:flex;
     min-width:0;
     align-items:flex-start;
@@ -155,30 +155,30 @@
     overflow-wrap:anywhere;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row > span{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row > span{
     flex:0 0 auto;
     color:#a99572;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row > b{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row > b{
     min-width:0;
     color:#ead4a4;
     font-weight:800;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row > b[data-todo="true"]{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-support-row > b[data-todo="true"]{
     color:#9c907c;
     font-weight:700;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions{
     display:grid;
     grid-template-columns:1fr;
     gap:7px;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button,
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button,
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button{
     min-height:44px;
     box-sizing:border-box;
     padding:8px 10px;
@@ -193,35 +193,35 @@
     letter-spacing:.2px;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button:disabled,
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button:disabled{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button:disabled,
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button:disabled{
     border-color:#51483c;
     background:#171512;
     color:#777065;
     cursor:not-allowed;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button:focus-visible,
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button:focus-visible{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button:focus-visible,
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button:focus-visible{
     outline:2px solid #f0d289;
     outline-offset:2px;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-todo-note{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-todo-note{
     margin:0;
     color:#8f8574;
     font-size:12px;
     line-height:1.55;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions{
     display:grid;
     grid-template-columns:1fr;
     gap:8px;
     padding-top:2px;
 }
 
-#game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions .ad-free-service-acknowledge{
+#game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions .ad-free-service-acknowledge{
     border-color:#c09243;
     background:linear-gradient(180deg,#e8c66e,#b9792c);
     color:#261707;
@@ -230,15 +230,15 @@
 }
 
 @media (max-width:360px){
-    #game-stage #homeFeatureModal.ad-free-service-info-mode{
+    #game-ui #homeFeatureModal.ad-free-service-info-mode{
         padding:10px;
     }
 
-    #game-stage #homeFeatureModal.ad-free-service-info-mode #homeFeatureModalBody{
+    #game-ui #homeFeatureModal.ad-free-service-info-mode #homeFeatureModalBody{
         padding:11px;
     }
 
-    #game-stage #homeFeatureModal.ad-free-service-info-mode .ad-free-service-panel{
+    #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-panel{
         gap:10px;
         font-size:14px;
     }

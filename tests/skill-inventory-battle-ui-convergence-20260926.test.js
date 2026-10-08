@@ -38,7 +38,7 @@ assert.match(mainCss,/grid-template-columns:repeat\(4,minmax\(0,1fr\)/);
 assert.doesNotMatch(mainCss,/\.skill-element-tab\.learn\{/);
 assert.doesNotMatch(mainCss,/skill-section-divider|skill-section-learned|skill-section-unlearned/);
 assert.doesNotMatch(inventoryCss,/inventory-overlay-open/);
-assert.match(inventoryCss,/app\.on-inventory-page \.content\{[^}]*overflow:hidden/);
+assert.doesNotMatch(inventoryCss,/app\.on-inventory-page \.content\{/);
 assert.match(read("css/22-stage-v78-character-inventory-core.css"),/#inventoryPage\{[^}]*height:100%[^}]*overflow:hidden/);
 assert.doesNotMatch(inventoryCss,/inventory-classic-shell|inventory-right-panel/);
 assert.match(inventoryCss,/\.inventory-grid-scroll\{[^}]*overflow-y:auto[^}]*overflow-x:hidden/);

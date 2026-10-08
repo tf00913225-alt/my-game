@@ -6,6 +6,7 @@ const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 const read=path=>fs.readFileSync(path,"utf8");
 const index=read("index.html");
+const utilityCss=fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8");
 const baseCss=read("css/00-main.css");
 const v54Css=read("css/19-stage-v54-main-city-moderate-native-scale.css");
 const v54Runtime=read("js/16-stage-v54-main-city-runtime.js");
@@ -39,20 +40,20 @@ test("the HUD keeps only city identity, resources and DEV tools",()=>{
 test("character and shop are the only two primary entrances",()=>{
     assert.equal(count(actions,/class="home-card home-card-primary"/g),2);
     assert.match(actions,/home-primary-actions[\s\S]*openHomeFeature\('character'\)[\s\S]*openHomeFeature\('shop'\)/);
-    assert.match(baseCss,/\.home-primary-actions\{[\s\S]*grid-template-columns:repeat\(2,minmax\(0,46%\)\);[\s\S]*width:100%/);
+    assert.match(baseCss,/\.home-primary-actions\{[\s\S]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\);[\s\S]*width:100%/);
     assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:78px;[\s\S]*border:1px solid rgba\(222,170,70,.9\)/);
     assert.match(baseCss,/\.home-card-primary::after\{[\s\S]*linear-gradient/);
     assert.match(baseCss,/\.home-card-primary \.home-card-label\{[\s\S]*height:19px;[\s\S]*border-top:1px solid[\s\S]*background:linear-gradient/);
     assert.ok((28-19)/28>=.30&&(28-19)/28<=.40);
 });
 
-test("eight secondary entrances form two substantial vertical button rails",()=>{
+test("eight secondary entrances reflow with readable browser dimensions",()=>{
     assert.equal(count(actions,/class="home-card home-card-secondary"/g),8);
     ["rest","synthesis","quest","forge","achievement","announcement","offlineExp","system"].forEach(type=>assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)")));
-    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*grid-template-columns:repeat\(2,80px\);[\s\S]*grid-template-rows:repeat\(4,70px\);[\s\S]*min-height:295px/);
+    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*grid-template-columns:repeat\(auto-fit,minmax\(80px,1fr\)\);[\s\S]*grid-auto-rows:84px;/);
     assert.doesNotMatch(baseCss,/margin-inline-(?:start|end):(34|68)px/);
-    assert.match(baseCss,/\.home-card-secondary\{[\s\S]*width:80px;[\s\S]*height:70px;[\s\S]*border:1px solid[\s\S]*background:linear-gradient[\s\S]*box-shadow:/);
-    assert.match(baseCss,/\.home-card-secondary \.home-card-icon\{[\s\S]*width:100%;[\s\S]*height:49px/);
+    assert.match(baseCss,/\.home-card-secondary\{[\s\S]*width:100%;[\s\S]*height:84px;[\s\S]*border:1px solid[\s\S]*background:linear-gradient[\s\S]*box-shadow:/);
+    assert.match(baseCss,/\.home-card-secondary \.home-card-icon\{[\s\S]*width:100%;[\s\S]*height:60px/);
     assert.match(baseCss,/\.home-card-secondary \.home-card-label\{[\s\S]*background:linear-gradient/);
     assert.ok((90-80)/90>=.10&&(90-80)/90<=.15);
     assert.ok((95-82)/95>=.10&&(95-82)/95<=.15);
@@ -122,13 +123,13 @@ test("gold and EXP share one compact formatter without ellipsis",()=>{
     assert.doesNotMatch(baseCss,/\.home-hud-resources b\{[\s\S]{0,180}text-overflow:ellipsis/);
 });
 
-test("the fixed 9:16 home has no vertical scroll owner and reserves one navigation height",()=>{
-    assert.match(baseCss,/#homePage\{[\s\S]*?height:100%;[\s\S]*?overflow:hidden;/);
-    assert.match(baseCss,/#app:has\(#homePage\.active\) \.content\{[\s\S]*?padding-bottom:84px;/);
+test("the browser home retains a bounded content scroller and one navigation row",()=>{
+    assert.match(baseCss,/#homePage\{[^}]*height:100%;[^}]*overflow-y:auto;/);
+    assert.match(baseCss,/#game-ui\{[^}]*grid-template-rows:minmax\(0,1fr\) auto;/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*?margin:5px 10px 0;/);
     assert.match(baseCss,/\.home-card-grid\{[\s\S]*display:flex;[\s\S]*flex:0 0 auto/);
     assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:78px/);
-    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*min-height:295px/);
+    assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-auto-rows:84px;/);
     assert.doesNotMatch(baseCss,/\.home-card-grid\{[\s\S]{0,220}grid-template-columns:repeat\(4,1fr\)/);
 });
 
@@ -138,7 +139,7 @@ test("the three-character roster fits above the shared navigation",()=>{
     const actionHeight=1+90+1+256;
     const rosterHeight=45.5+5+23+4+84+7+2;
     assert.ok(hudHeight+actionHeight+rosterHeight<=safeHeight);
-    assert.match(baseCss,/\.home-utility-actions\{[\s\S]*position:absolute/);
+    assert.match(utilityCss,/#game-ui \.team-relic-home-tools\{[^}]*position:relative;/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
     assert.match(rosterCss,/\.v146-home-character\{[\s\S]*min-height:84px/);
     assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:40px;[\s\S]*height:40px/);

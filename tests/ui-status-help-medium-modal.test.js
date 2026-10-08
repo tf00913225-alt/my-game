@@ -34,17 +34,17 @@ const box={
     nodeType:1,parentElement:documentElement,scrollHeight:540,clientHeight:540,
     computedStyle:{overflowY:"hidden",overflowX:"hidden"},
     matches:selector=>selector.includes(".item-modal-box"),
-    closest:selector=>selector==="#game-stage"?stage:null
+    closest:selector=>selector==="#game-ui"?stage:null
 };
 const body={
     nodeType:1,parentElement:box,scrollHeight:960,clientHeight:410,
     computedStyle:{overflowY:"auto",overflowX:"hidden"},
     matches:selector=>selector.includes("#statusHelpModal .item-stat-list"),
-    closest:selector=>selector==="#game-stage"?stage:null
+    closest:selector=>selector==="#game-ui"?stage:null
 };
 const row={
     nodeType:1,parentElement:body,matches:()=>false,
-    closest:selector=>selector==="#game-stage"?stage:null
+    closest:selector=>selector==="#game-ui"?stage:null
 };
 assert.equal(window.FourSymbolsGestureArbiter.findScrollOwner(row)?.node,body,"status help copy must resolve to its own scroll owner");
 
@@ -70,9 +70,9 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
 <style>
 html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000;}
-#game-stage{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;transform:none!important;}
+#game-ui{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;transform:none!important;}
 #statusHelpModal{display:flex!important;position:absolute!important;inset:0!important;width:420px!important;height:746.6667px!important;align-items:center!important;justify-content:center!important;}
-</style></head><body><div id="game-stage"><div id="statusHelpModal" class="item-modal"><div class="item-modal-box" style="max-height:88%;overflow-y:auto;">
+</style></head><body><div id="game-ui"><div id="statusHelpModal" class="item-modal"><div class="item-modal-box" style="max-height:88%;overflow-y:auto;">
 <div class="item-modal-name">能力值說明</div><div class="item-stat-list"></div><button class="close-item-button">返回</button>
 </div></div></div><pre id="result"></pre><script>
 (function(){

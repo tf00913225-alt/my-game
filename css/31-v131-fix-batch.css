@@ -157,7 +157,7 @@
     text-shadow:0 0 6px rgba(255,95,162,.7),0 1px 3px #000 !important;
 }
 
-#game-stage #homeFeatureModal .home-feature-modal-box.wide{
+#game-ui #homeFeatureModal .home-feature-modal-box.wide{
     height:auto !important;
     max-height:96% !important;
     overflow:hidden !important;
@@ -165,13 +165,13 @@
     flex-direction:column !important;
 }
 
-#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
+#game-ui #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
     flex:0 1 auto !important;
     min-height:0 !important;
     overflow:hidden !important;
 }
 
-#game-stage #homeFeatureModal #characterTabContent{
+#game-ui #homeFeatureModal #characterTabContent{
     flex:0 1 auto !important;
     height:auto !important;
     min-height:0 !important;
@@ -184,7 +184,7 @@
     padding-bottom:0 !important;
 }
 
-#game-stage #homeFeatureModal #characterTabContent > #skillPage{
+#game-ui #homeFeatureModal #characterTabContent > #skillPage{
     display:block !important;
     position:static !important;
     height:auto !important;
@@ -195,16 +195,16 @@
     touch-action:pan-y !important;
 }
 
-#game-stage #homeFeatureModal #characterTabContent > #skillPage .content,
-#game-stage #homeFeatureModal #allSkillsList,
-#game-stage #homeFeatureModal .skill-loadout-list{
+#game-ui #homeFeatureModal #characterTabContent > #skillPage .content,
+#game-ui #homeFeatureModal #allSkillsList,
+#game-ui #homeFeatureModal .skill-loadout-list{
     height:auto !important;
     max-height:none !important;
     overflow:visible !important;
 }
 
 /* V138：剩餘技能點改成高對比資訊條，未點詳細也能看到學習成本。 */
-#game-stage #skillPage .v138-skill-point-summary{
+:is(#game-stage,#game-ui) #skillPage .v138-skill-point-summary{
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
@@ -217,7 +217,7 @@
     box-shadow:0 0 12px rgba(232,169,60,.28) !important;
 }
 
-#game-stage #skillPage #skillPoints{
+:is(#game-stage,#game-ui) #skillPage #skillPoints{
     display:inline-flex !important;
     min-width:52px !important;
     min-height:34px !important;
@@ -291,11 +291,11 @@
     will-change:transform !important;
 }
 
-#game-stage #inventoryPortraitFrame{
+#game-ui #inventoryPortraitFrame{
     overflow:hidden;
 }
 
-#game-stage #inventoryPortraitFrame .v131-inventory-portrait{
+#game-ui #inventoryPortraitFrame .v131-inventory-portrait{
     position:absolute;
     inset:0;
     width:100%;
@@ -421,11 +421,11 @@
     pointer-events:none;
 }
 
-#game-stage #autoBattleSettingsPanel.v131-element-box-panel .auto-cancel-btn{
+:is(#game-stage,#game-ui) #autoBattleSettingsPanel.v131-element-box-panel .auto-cancel-btn{
     display:none !important;
 }
 
-#game-stage #autoBattleSettingsPanel.v131-element-box-panel .auto-save-btn{
+:is(#game-stage,#game-ui) #autoBattleSettingsPanel.v131-element-box-panel .auto-save-btn{
     width:100% !important;
 }
 
@@ -471,16 +471,16 @@
 .v131-element-box-stats .remaining strong{ color:#ffdf69; }
 
 #game-stage #characterTabContent,
-#game-stage #homeExpPoolCard,
-#game-stage #statusPage,
-#game-stage #skillPage{
+:is(#game-stage,#game-ui) #homeExpPoolCard,
+:is(#game-stage,#game-ui) #statusPage,
+:is(#game-stage,#game-ui) #skillPage{
     font-size:15px;
 }
 
 #game-stage #characterTabContent p,
 #game-stage #characterTabContent small,
 #game-stage #characterTabContent .description,
-#game-stage #homeExpPoolCard .exp-pool-caption{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-caption{
     font-size:14px !important;
     line-height:1.55 !important;
 }
@@ -497,16 +497,16 @@
    純粹只調字級，不會撐爆原本的框。
 */
 
-#game-stage #statusPage .status-row{
+:is(#game-stage,#game-ui) #statusPage .status-row{
     font-size:15px !important;
 }
 
-#game-stage #allSkillsList .skill-row-desc{
+:is(#game-stage,#game-ui) #allSkillsList .skill-row-desc{
     font-size:15px !important;
     line-height:1.5 !important;
 }
 
-#game-stage #allSkillsList .skill-row-text b{
+:is(#game-stage,#game-ui) #allSkillsList .skill-row-text b{
     font-size:17px !important;
 }
 
@@ -563,14 +563,14 @@
     line-height:1.7 !important;
 }
 
-#game-stage #homeFeatureModal.v131-shop-open .home-feature-modal-box,
-#game-stage #homeFeatureModal.v131-shop-open #homeFeatureModalBody,
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-interface{
+#game-ui #homeFeatureModal.v131-shop-open .home-feature-modal-box,
+#game-ui #homeFeatureModal.v131-shop-open #homeFeatureModalBody,
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-interface{
     background:#050505 !important;
     background-image:none !important;
 }
 
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-card{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-card{
     background:linear-gradient(160deg,#17130e,#080706) !important;
 }
 

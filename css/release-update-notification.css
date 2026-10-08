@@ -85,11 +85,11 @@
     color:#f6d18c;
 }
 
-#game-stage #homeFeatureModal.release-update-modal{
+#game-ui #homeFeatureModal.release-update-modal{
     padding:14px;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .home-feature-modal-box{
+#game-ui #homeFeatureModal.release-update-modal .home-feature-modal-box{
     width:min(94%,390px);
     max-width:390px;
     max-height:88dvh;
@@ -100,13 +100,13 @@
     box-sizing:border-box;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .home-feature-modal-title{
+#game-ui #homeFeatureModal.release-update-modal .home-feature-modal-title{
     flex:0 0 auto;
     margin-bottom:0;
     padding-bottom:10px;
 }
 
-#game-stage #homeFeatureModal.release-update-modal #homeFeatureModalBody{
+#game-ui #homeFeatureModal.release-update-modal #homeFeatureModalBody{
     flex:1 1 auto;
     min-height:0;
     overflow-x:hidden;
@@ -118,19 +118,19 @@
     touch-action:pan-y;
 }
 
-#game-stage #homeFeatureModal.release-update-modal.release-update-forced .home-feature-close-btn{
+#game-ui #homeFeatureModal.release-update-modal.release-update-forced .home-feature-close-btn{
     display:none;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .release-update-detail,
-#game-stage #homeFeatureModal.release-update-modal .release-update-announcement{
+#game-ui #homeFeatureModal.release-update-modal .release-update-detail,
+#game-ui #homeFeatureModal.release-update-modal .release-update-announcement{
     color:#f1e7d4;
     font-size:16px;
     line-height:1.65;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .release-update-version,
-#game-stage #homeFeatureModal.release-update-modal .release-update-announcement-version{
+#game-ui #homeFeatureModal.release-update-modal .release-update-version,
+#game-ui #homeFeatureModal.release-update-modal .release-update-announcement-version{
     margin:0 0 8px;
     color:#f4ca72;
     font-size:18px;
@@ -138,34 +138,34 @@
     letter-spacing:.04em;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .release-update-intro,
-#game-stage #homeFeatureModal.release-update-modal .release-update-announcement-status{
+#game-ui #homeFeatureModal.release-update-modal .release-update-intro,
+#game-ui #homeFeatureModal.release-update-modal .release-update-announcement-status{
     margin:0 0 12px;
     color:#d8c6a4;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .release-update-detail h3{
+#game-ui #homeFeatureModal.release-update-modal .release-update-detail h3{
     margin:0 0 7px;
     color:#f1cf86;
     font-size:17px;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .release-update-notes{
+#game-ui #homeFeatureModal.release-update-modal .release-update-notes{
     margin:0;
     padding-left:1.35em;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .release-update-notes li{
+#game-ui #homeFeatureModal.release-update-modal .release-update-notes li{
     margin:0 0 8px;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .release-update-published{
+#game-ui #homeFeatureModal.release-update-modal .release-update-published{
     margin:14px 0 0;
     color:#ae9c7e;
     font-size:14px;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .release-update-suppress-today{
+#game-ui #homeFeatureModal.release-update-modal .release-update-suppress-today{
     display:flex;
     align-items:center;
     justify-content:flex-end;
@@ -179,7 +179,7 @@
     user-select:none;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .release-update-suppress-today-input{
+#game-ui #homeFeatureModal.release-update-modal .release-update-suppress-today-input{
     width:18px;
     height:18px;
     margin:0;
@@ -188,19 +188,19 @@
     cursor:pointer;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .release-update-actions{
+#game-ui #homeFeatureModal.release-update-modal .release-update-actions{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:10px;
     margin-top:18px;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .release-update-actions:has(:only-child){
+#game-ui #homeFeatureModal.release-update-modal .release-update-actions:has(:only-child){
     grid-template-columns:minmax(0,1fr);
 }
 
-#game-stage #homeFeatureModal.release-update-modal .release-update-actions button,
-#game-stage #homeFeatureModal .release-update-announcement .release-update-primary{
+#game-ui #homeFeatureModal.release-update-modal .release-update-actions button,
+#game-ui #homeFeatureModal .release-update-announcement .release-update-primary{
     min-height:52px;
     padding:8px 12px;
     font-size:16px;
@@ -208,15 +208,15 @@
     letter-spacing:.04em;
 }
 
-#game-stage #homeFeatureModal.release-update-modal .release-update-primary,
-#game-stage #homeFeatureModal .release-update-announcement .release-update-primary{
+#game-ui #homeFeatureModal.release-update-modal .release-update-primary,
+#game-ui #homeFeatureModal .release-update-announcement .release-update-primary{
     color:#2b1907;
     border-color:#e2b961;
     background:linear-gradient(180deg,#f5d98a,#c48632);
     text-shadow:none;
 }
 
-#game-stage #homeFeatureModal .release-update-announcement{
+#game-ui #homeFeatureModal .release-update-announcement{
     max-width:34em;
     margin:0 auto;
     padding:4px 3px 16px;
@@ -226,11 +226,11 @@
     overflow-wrap:anywhere;
 }
 
-#game-stage #homeFeatureModal .release-update-announcement p{
+#game-ui #homeFeatureModal .release-update-announcement p{
     margin:0 0 10px;
 }
 
-#game-stage #homeFeatureModal .release-update-announcement .release-update-primary{
+#game-ui #homeFeatureModal .release-update-announcement .release-update-primary{
     width:100%;
     margin-top:4px;
 }

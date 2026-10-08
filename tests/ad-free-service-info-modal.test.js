@@ -76,7 +76,7 @@ test("the paid-service info is manual-only and owns no automatic home lifecycle"
 
 test("the scoped RPG modal style supports internal mobile scrolling without new important overrides",()=>{
     assert.equal(css.includes("!important"),false);
-    assert.match(css,/#game-stage #homeFeatureModal\.ad-free-service-info-mode/);
+    assert.match(css,/#game-ui #homeFeatureModal\.ad-free-service-info-mode/);
     assert.match(css,/max-width:var\(--ui-medium-modal-max-width,360px\)/);
     assert.match(css,/max-height:calc\(100% - var\(--ui-medium-modal-safe-space,28px\)\)/);
     assert.match(css,/#homeFeatureModalBody\{[\s\S]*overflow-y:auto;[\s\S]*overscroll-behavior-y:contain;[\s\S]*touch-action:pan-y;/);
