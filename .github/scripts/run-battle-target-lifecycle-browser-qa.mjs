@@ -92,6 +92,17 @@ const heroExpression=`(async()=>{
     for(const p of getCharacters()){p.level=50;p.hp=100000;p.bonusHP=100000;p.activeBuffs=[];p.statusEffects=[];}
     const system=FourSymbolsHeroSystem;const ids=FourSymbolsHeroCore.listHeroDefinitions().map(d=>d.heroId);
     const beforeAccount=system.getDomain().serialize();let account=beforeAccount;
+    if(location.hostname==='dev.four-symbols-dev.pages.dev'){
+        const locked=FourSymbolsHeroCore.normalizeAccountState();system.replaceAccountState(locked);
+        FourSymbolsHeroBattle.useUnlockedRoster();
+        const preview=initializeHeroBattleCombatants();
+        check(JSON.stringify(preview.map(h=>h.heroId))===JSON.stringify(ids),'DEV default two Hero preview');
+        check(preview.every(h=>h.combatantKind==='heroNpc'),'DEV preview formal identity');
+        check(JSON.stringify(system.getDomain().serialize())===JSON.stringify(locked),'DEV preview canonical isolation');
+        saveGame();const previewSave=JSON.parse(localStorage.getItem('four_symbols_save:skill-runtime-browser-qa'));
+        check(JSON.stringify(previewSave.heroAccount)===JSON.stringify(locked),'DEV preview real save stays locked');
+        system.replaceAccountState(beforeAccount);
+    }
     for(const id of ids){if(!FourSymbolsHeroCore.createDomain(account,getCharacters,calculateCharacterBaseStats,id=>skillDatabase[id]).isHeroUnlocked(id))account=FourSymbolsHeroCore.createDomain(account,getCharacters,calculateCharacterBaseStats,id=>skillDatabase[id]).unlockHeroDirect(id,123);}
     system.replaceAccountState(account);const accountBytes=JSON.stringify(account);
     const originalFormation=FourSymbolsBattlefieldSlots.getSerializableAllyFormation();
