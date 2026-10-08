@@ -44,72 +44,6 @@
 }
 
 
-/* bundled source: css/02-stage-v3-layout-fix.css */
-/* =====================================================
-   V3 FIX — ALL LEGACY UI MUST STAY INSIDE THE 420×746.6667
-   DESIGN SURFACE, WHICH IS THEN SCALED TO 1080×1920.
-   This specifically fixes bottom navigation escaping/clipping
-   outside the scaled game surface.
-===================================================== */
-#game-stage > #app > #game-content{
-    position:absolute !important;
-    left:0 !important;
-    top:0 !important;
-    width:420px !important;
-    height:746.6666667px !important;
-    margin:0 !important;
-    padding:0 !important;
-    transform:scale(2.571428571428571) !important;
-    transform-origin:top left !important;
-    overflow:hidden !important;
-}
-
-/* Full-screen overlays must use the virtual design surface,
-   not the real browser viewport. */
-#game-stage > #app > #game-content .map-bg-fixed-layer,
-#game-stage > #app > #game-content .training-bg-fixed-layer{
-    position:absolute !important;
-    left:0 !important;
-    top:0 !important;
-    right:auto !important;
-    bottom:auto !important;
-    width:420px !important;
-    height:746.6666667px !important;
-}
-
-#game-stage > #app > #game-content .home-feature-modal,
-#game-stage > #app > #game-content .item-modal,
-#game-stage > #app > #game-content .modal,
-#game-stage > #app > #game-content .popup-overlay{
-    position:absolute !important;
-    left:0 !important;
-    top:0 !important;
-    right:auto !important;
-    bottom:auto !important;
-    width:420px !important;
-    height:746.6666667px !important;
-}
-
-#game-stage > #app > #game-content #mapBattleOverlay{
-    position:absolute !important;
-    left:0 !important;
-    right:0 !important;
-    bottom:70px !important;
-    width:420px !important;
-    box-sizing:border-box !important;
-}
-
-/* Any direct full-width bottom-fixed element created by existing
-   game code is constrained to the legacy surface. */
-#game-stage > #app > #game-content > div[style*="position:fixed"][style*="bottom:0"]{
-    position:absolute !important;
-    left:0 !important;
-    right:auto !important;
-    bottom:0 !important;
-    width:420px !important;
-}
-
-
 /* bundled source: css/03-stage-v4-viewport-lock.css */
 /* =====================================================
    V5 — REAL VIEWPORT LOCK + LAYOUT-VIEWPORT CENTERING
@@ -136,8 +70,10 @@ html, body{
     min-width:0 !important;
     min-height:0 !important;
     margin:0 !important;
-    padding:0 !important;
-    overflow:hidden !important;
+    padding:var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left) !important;
+    /* This is a clipping surface, not a scroller. overflow:hidden permits
+       scrollIntoView to move the whole transformed stage inside this box. */
+    overflow:clip !important;
     overscroll-behavior:none !important;
     background:#0c0b0a !important;
     contain:strict !important;
@@ -149,9 +85,7 @@ html, body{
 
 #game-stage{
     position:relative !important;
-    flex:0 0 1080px !important;
-    width:1080px !important;
-    height:1920px !important;
+    flex:0 0 var(--game-native-width);
     left:auto !important;
     top:auto !important;
     margin:0 !important;
@@ -161,12 +95,6 @@ html, body{
     z-index:0 !important;
     contain:layout paint size !important;
     will-change:transform;
-}
-
-#game-stage > #app{
-    position:absolute !important;
-    left:0 !important;
-    top:0 !important;
 }
 
 /* No descendant may create a document-level horizontal overflow. */
@@ -181,13 +109,6 @@ html, body{
     overflow:hidden !important;
 }
 
-/* V5 viewport surface: the game itself occupies the browser layout viewport. */
-html, body, #game-viewport{
-    width:100%;
-    height:100%;
-    min-width:0;
-    min-height:0;
-}
 #game-viewport{
     /* Normal one-finger panning belongs to the browser. Pinch remains
        blocked by the viewport declaration and the global gesture owner. */
@@ -1179,15 +1100,7 @@ html, body, #game-viewport{
    Both ratios are intentionally identical.
 ============================================================ */
 
-:root{
-    --game-native-width:1080px;
-    --game-native-height:1920px;
-
-    --game-legacy-width:420px;
-    --game-legacy-height:746.6666667px;
-
-    --legacy-to-native:2.5714285714285714;
-}
+/* Display tokens are owned by css/00-main.css. */
 
 /* Native design surface. */
 #game-stage > #game-overlay-layer .native-design-surface{

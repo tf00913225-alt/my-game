@@ -230,205 +230,96 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 
 /* Legacy V3 navigation positioning retired; FourSymbolsBottomNav owns the shell. */
 
-const GAME_WIDTH = 1080;
-const GAME_HEIGHT = 1920;
+/* Display dimensions and the legacy projection are owned by css/00-main.css.
+   General UI uses browser CSS pixels; only stage-bound presentation uses
+   native/legacy coordinates. The legacy surface remains until its pages migrate. */
+const displayTokens = getComputedStyle(document.documentElement);
+const GAME_WIDTH = Number(displayTokens.getPropertyValue("--stage-design-width"));
+const GAME_HEIGHT = Number(displayTokens.getPropertyValue("--stage-design-height"));
+const LEGACY_WIDTH = Number(displayTokens.getPropertyValue("--legacy-design-width"));
+const LEGACY_HEIGHT = GAME_HEIGHT * LEGACY_WIDTH / GAME_WIDTH;
+if(![GAME_WIDTH, GAME_HEIGHT, LEGACY_WIDTH].every(value => Number.isFinite(value) && value > 0)){
+    throw new Error("Display design tokens are unavailable");
+}
 
-const LEGACY_WIDTH = 420;
-const LEGACY_HEIGHT = 746.6666667;
+function getDisplaySurfaceGeometry(surface){
+    if(surface === "browser") return {left:0, top:0, scaleX:1, scaleY:1};
+    if(surface !== "native" && surface !== "legacy"){
+        throw new TypeError("Unknown display surface: " + surface);
+    }
+    const element = document.getElementById(surface === "native" ? "game-stage" : "game-content");
+    if(!element) return null;
+    const rect = element.getBoundingClientRect();
+    if(!(rect.width > 0 && rect.height > 0)) return null;
+    const width = surface === "native" ? GAME_WIDTH : LEGACY_WIDTH;
+    const height = surface === "native" ? GAME_HEIGHT : LEGACY_HEIGHT;
+    return {left:rect.left, top:rect.top, scaleX:rect.width/width, scaleY:rect.height/height};
+}
 
-/*
- * V9 MIGRATION RULE:
- * 1080×1920 is the official coordinate standard for all NEW systems.
- * LEGACY_WIDTH/HEIGHT exist only for existing content compatibility.
- */
+function clientPointFromSurface(surface, x, y){
+    const geometry = getDisplaySurfaceGeometry(surface);
+    if(!geometry) return {x, y}; // Existing native API's unavailable-surface compatibility.
+    return {x:geometry.left + x*geometry.scaleX, y:geometry.top + y*geometry.scaleY};
+}
 
-let gameStageScale = 1;
-let gameStageLeft = 0;
-let gameStageTop = 0;
+function surfacePointFromClient(surface, clientX, clientY){
+    const geometry = getDisplaySurfaceGeometry(surface);
+    if(!geometry) return {x:clientX, y:clientY};
+    return {x:(clientX-geometry.left)/geometry.scaleX, y:(clientY-geometry.top)/geometry.scaleY};
+}
+
+function gamePointFromClient(clientX, clientY){
+    return surfacePointFromClient("native", clientX, clientY);
+}
+
+function clientPointFromGame(x, y){
+    return clientPointFromSurface("native", x, y);
+}
+
+function getGamePointFromEvent(event){
+    const point = event?.touches?.[0] || event?.changedTouches?.[0] || event;
+    return gamePointFromClient(point?.clientX ?? 0, point?.clientY ?? 0);
+}
 
 function updateGameStageScale(){
-
     const stage = document.getElementById("game-stage");
     const viewport = document.getElementById("game-viewport");
-    if(!stage || !viewport){
-        return;
-    }
-
-    /*
-       V5: use the layout viewport / actual game-viewport size,
-       NOT visualViewport.width/height.
-
-       visualViewport can become smaller when the browser is zoomed
-       or when a file is opened inside a scaled preview surface.
-       Using it here caused the game to shrink to the left side instead
-       of centering in the real available viewport.
-    */
+    if(!stage || !viewport) return;
+    // Use the layout viewport. visualViewport is a resize trigger, not a second scaler.
     const vw = viewport.clientWidth || window.innerWidth || GAME_WIDTH;
     const vh = viewport.clientHeight || window.innerHeight || GAME_HEIGHT;
-
     const rootStyle = getComputedStyle(document.documentElement);
-
     const safeTop = parseFloat(rootStyle.getPropertyValue("--safe-top")) || 0;
     const safeRight = parseFloat(rootStyle.getPropertyValue("--safe-right")) || 0;
     const safeBottom = parseFloat(rootStyle.getPropertyValue("--safe-bottom")) || 0;
     const safeLeft = parseFloat(rootStyle.getPropertyValue("--safe-left")) || 0;
-
-    const availableWidth = Math.max(1, vw - safeLeft - safeRight);
-    const availableHeight = Math.max(1, vh - safeTop - safeBottom);
-
-    gameStageScale = Math.min(
-        availableWidth / GAME_WIDTH,
-        availableHeight / GAME_HEIGHT
-    );
-
-    /*
-       Center the 1080×1920 stage inside the actual viewport.
-       The stage is still clipped by #game-viewport, so it cannot
-       create page scrolling.
-    */
-    const displayedWidth = GAME_WIDTH * gameStageScale;
-    const displayedHeight = GAME_HEIGHT * gameStageScale;
-
-    // The viewport itself is a flex centering surface. Keep the stage at its
-    // native 1080x1920 layout size and only scale it visually around center.
-    // This avoids transformed-layout overflow and guarantees symmetric bars.
-    gameStageLeft = safeLeft + Math.max(0, (availableWidth - displayedWidth) / 2);
-    gameStageTop = safeTop + Math.max(0, (availableHeight - displayedHeight) / 2);
-
-    stage.style.left = "auto";
-    stage.style.top = "auto";
-    stage.style.transformOrigin = "center center";
-    stage.style.transform = "scale(" + gameStageScale + ")";
-
-    /* Keep the existing 420×746.6667 legacy design surface intact.
-       It is scaled once inside the 1080×1920 virtual stage. */
-    const content = document.getElementById("game-content");
-    if(content){
-        content.style.transform = "scale(" + (GAME_WIDTH / LEGACY_WIDTH) + ")";
-        content.style.transformOrigin = "top left";
-    }
-
-    /* Expose useful diagnostics for testing. */
+    const scale = Math.min(Math.max(1,vw-safeLeft-safeRight)/GAME_WIDTH,
+                           Math.max(1,vh-safeTop-safeBottom)/GAME_HEIGHT);
+    // CSS owns centering, clipping and the legacy transform. JS writes only stage scale.
+    stage.style.transform = "scale(" + scale + ")";
+    const rect = stage.getBoundingClientRect();
     window.GAME_VIEWPORT_WIDTH = vw;
     window.GAME_VIEWPORT_HEIGHT = vh;
-    window.GAME_STAGE_SCALE = gameStageScale;
-    window.GAME_STAGE_LEFT = gameStageLeft;
-    window.GAME_STAGE_TOP = gameStageTop;
-}
-
-function gamePointFromClient(clientX,clientY){
-
-    return {
-        x:
-            (clientX-gameStageLeft)/
-            gameStageScale,
-
-        y:
-            (clientY-gameStageTop)/
-            gameStageScale
-    };
-
-}
-
-function clientPointFromGame(x,y){
-
-    return {
-        x:
-            gameStageLeft+
-            x*gameStageScale,
-
-        y:
-            gameStageTop+
-            y*gameStageScale
-    };
-
-}
-
-
-/* Convert any Pointer/Touch/Mouse event into 1080×1920
-   virtual game coordinates. */
-function getGamePointFromEvent(event){
-    let clientX = 0;
-    let clientY = 0;
-
-    if(event && event.touches && event.touches.length){
-        clientX = event.touches[0].clientX;
-        clientY = event.touches[0].clientY;
-    }else if(event && event.changedTouches && event.changedTouches.length){
-        clientX = event.changedTouches[0].clientX;
-        clientY = event.changedTouches[0].clientY;
-    }else if(event){
-        clientX = event.clientX ?? 0;
-        clientY = event.clientY ?? 0;
-    }
-
-    return gamePointFromClient(clientX, clientY);
+    window.GAME_STAGE_SCALE = scale;
+    window.GAME_STAGE_LEFT = rect.left;
+    window.GAME_STAGE_TOP = rect.top;
 }
 
 function applyGameStageTransform(){
     updateGameStageScale();
 }
 
-window.addEventListener(
-    "resize",
-    updateGameStageScale,
-    {passive:true}
-);
-
-window.addEventListener(
-    "orientationchange",
-    updateGameStageScale,
-    {passive:true}
-);
-
-if(window.visualViewport){
-
-    /* visualViewport is only a resize trigger. Its dimensions are NOT
-       used for the game scale because browser zoom can shrink it. */
-    window.visualViewport.addEventListener(
-        "resize",
-        updateGameStageScale,
-        {passive:true}
-    );
-
-}
-
+window.addEventListener("resize", updateGameStageScale, {passive:true});
+window.addEventListener("orientationchange", updateGameStageScale, {passive:true});
+window.visualViewport?.addEventListener("resize", updateGameStageScale, {passive:true});
 updateGameStageScale();
 
-/* V6: the viewport owns all clipping and centering. Never let a descendant
-   contribute document-level scroll dimensions. */
-(function enforceViewportSurface(){
-    const viewport = document.getElementById("game-viewport");
-    if(!viewport) return;
-    viewport.style.display = "flex";
-    viewport.style.alignItems = "center";
-    viewport.style.justifyContent = "center";
-    viewport.style.overflow = "hidden";
-})();
-
-/* V5 runtime guard: prevent legacy scrolling and keep stage centered in the layout viewport. */
-(function installViewportLock(){
-    const lock = () => {
-        document.documentElement.style.overflow = "hidden";
-        document.body.style.overflow = "hidden";
-        document.documentElement.style.overscrollBehavior = "none";
-        document.body.style.overscrollBehavior = "none";
-        updateGameStageScale();
-    };
-
-    window.addEventListener("resize", lock, {passive:true});
-    window.addEventListener("orientationchange", lock, {passive:true});
-    if(window.visualViewport){
-        window.visualViewport.addEventListener("resize", lock, {passive:true});
-    }
-    lock();
-})();
-
-/*
-   ★ COMPLETE virtual-stage validation helpers
-   These expose one consistent 1080×1920 coordinate system
-   for future Hotspots, Canvas/VFX and pointer interactions.
-*/
+window.FourSymbolsDisplay = Object.freeze({
+    dimensions:Object.freeze({nativeWidth:GAME_WIDTH, nativeHeight:GAME_HEIGHT,
+                              legacyWidth:LEGACY_WIDTH, legacyHeight:LEGACY_HEIGHT}),
+    clientToSurface:surfacePointFromClient,
+    surfaceToClient:clientPointFromSurface
+});
 window.GAME_VIRTUAL_WIDTH = GAME_WIDTH;
 window.GAME_VIRTUAL_HEIGHT = GAME_HEIGHT;
 window.gameToScreenPoint = clientPointFromGame;

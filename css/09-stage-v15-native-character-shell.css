@@ -800,15 +800,7 @@
    Both ratios are intentionally identical.
 ============================================================ */
 
-:root{
-    --game-native-width:1080px;
-    --game-native-height:1920px;
-
-    --game-legacy-width:420px;
-    --game-legacy-height:746.6666667px;
-
-    --legacy-to-native:2.5714285714285714;
-}
+/* Display tokens are owned by css/00-main.css. */
 
 /* Native design surface. */
 #game-stage > #game-overlay-layer .native-design-surface{
