@@ -4091,8 +4091,9 @@ let battleAdvanceTimeoutId=null;
 let battleAdvanceScheduled=false;
 /* Queue timing has one owner: this module. V142/V143 report visual time only. */
 const MANUAL_RESOLUTION_START_MS=250;
-const POST_ACTION_DELAY_MS=1150;
-const BATTLE_DECLARE_ADVANCE_MS=MANUAL_RESOLUTION_START_MS;
+const AUTO_DECLARE_HANDOFF_MS=100;
+const AUTO_DECISION_DELAY_MS=50;
+const POST_ACTION_DELAY_MS=650;
 const battleActionFinishObservers=new Set();
 /* Synchronous settlement notifications. Combat owners publish committed facts;
    relics subscribe without wrapping attacks, skills, status RNG or feedback. */
@@ -4185,7 +4186,6 @@ let battleResolutionResumeToken=null;
 let battleAutoActionResume=null;
 let battleRoundPromptTimeoutId=null;
 let battleActionNoticeTimeoutId=null;
-let battleRoundPromptRelease=null;
 let activeBattleStatisticsAction=null;
 /*
  * Persistent Effect Duration Lifecycle
@@ -4400,11 +4400,6 @@ function clearBattleRoundPrompt(){
         ?document.getElementById("battleRoundPrompt")
         :null;
     if(prompt){ prompt.hidden=true; }
-    if(battleRoundPromptRelease){
-        const release=battleRoundPromptRelease;
-        battleRoundPromptRelease=null;
-        release();
-    }
 }
 
 function clearBattleActionNotice(){
@@ -4464,17 +4459,10 @@ function showAutoBattleRoundPrompt(token){
     prompt.textContent="第 "+Math.max(1,Math.floor(Number(turn)||1))+" 回合";
     prompt.hidden=false;
 
-    const flow=window.FourSymbolsBattleFlow;
-    battleRoundPromptRelease=flow&&typeof flow.acquirePresentationLock==="function"
-        ?flow.acquirePresentationLock("auto-round-prompt")
-        :null;
-
+    /* Observer presentation: declaration proceeds while this notice is visible. */
     battleRoundPromptTimeoutId=setTimeout(()=>{
         battleRoundPromptTimeoutId=null;
         if(prompt){ prompt.hidden=true; }
-        const release=battleRoundPromptRelease;
-        battleRoundPromptRelease=null;
-        if(release){ release(); }
     },500);
     return true;
 }
@@ -4658,10 +4646,10 @@ function notifyBattleRoundBoundary(type,token){
     if(type==="round_end"){ consumeRoundEndDurations(); }
     return true;
 }
-function getBattleAdvanceDelay(phase){
+function getBattleAdvanceDelay(phase,automaticDeclaration){
     if(phase==="declare"){
         /* A previous VFX must never delay the last declared action. */
-        return MANUAL_RESOLUTION_START_MS;
+        return automaticDeclaration===true?AUTO_DECLARE_HANDOFF_MS:MANUAL_RESOLUTION_START_MS;
     }
     const visualRemaining=typeof window!=="undefined"&&typeof window.v142GetRemainingAnimationMs==="function"
         ?Number(window.v142GetRemainingAnimationMs())||0:0;
@@ -11819,7 +11807,7 @@ function beginCharacterTurn(token){
            原本1000ms才會真正出手，這是專門
            留給「玩家自己選」用的思考時間，
            全自動角色不需要這個等待，
-           調快到150ms（保留極短的延遲只是
+           使用正式 AUTO_DECISION_DELAY_MS（保留極短的延遲只是
            避免瞬間觸發造成的潛在時序問題，
            不是刻意留給玩家看的等待時間）。
         */
@@ -11888,7 +11876,7 @@ function beginCharacterTurn(token){
 
             }
 
-        },150);
+        },AUTO_DECISION_DELAY_MS);
 
     }
 
@@ -17871,6 +17859,8 @@ function finishPlayerAction(){
 
     if(battlePhase==="declare"){
 
+        const automaticDeclaration=activeBattleCharacterIndex===0
+            ?autoBattle:getPartyAutoConfig(activeBattleCharacterIndex).enabled;
         activeBattleCharacterIndex++;
 
 
@@ -17900,7 +17890,7 @@ function finishPlayerAction(){
                 token
             );
 
-        },getBattleAdvanceDelay("declare"));
+        },getBattleAdvanceDelay("declare",automaticDeclaration));
 
         return;
 
@@ -17911,12 +17901,8 @@ function finishPlayerAction(){
 
 
     /*
-       ★ 修正（依照使用者要求，加快節奏）：
-       原本1050ms，使用者反應「每個人行動完、
-       換下一位」的間隔感覺偏久，尤其一整輪
-       打完要接下一輪的時候特別明顯——
-       這裡調快到700ms，動畫還是看得清楚，
-       但整體節奏會俐落不少。
+       The sole queue owner waits for the unchanged visual lifetime,
+       then retains the formal 650ms post-action beat.
     */
 
     const nextDelay=getBattleAdvanceDelay("resolve");
@@ -22705,6 +22691,7 @@ function ensureBattleStatusDetailModal(){
             '<div class="battle-status-detail-core">'+
                 '<span data-field="element"></span>'+
                 '<span data-field="name"></span>'+
+                '<span data-field="level"></span>'+
                 '<span data-field="hp"></span>'+
                 '<span data-field="sp"></span>'+
             '</div>'+
@@ -22782,6 +22769,7 @@ function openBattleStatusDetailModal(side,index){
     const fields={
         element:"元素："+battleStatusElementLabel(entity),
         name:"名稱："+String(entity.name||entity.id||"角色"),
+        level:"等級：Lv."+String(entity.level),
         hp:"HP："+(isMonster?projectEnemyResource(entity.hp,maxHP).text:Math.max(0,Number(entity.hp)||0)+" / "+maxHP),
         sp:"SP："+(isMonster?projectEnemyResource(entity.sp,maxSP).text:Math.max(0,Number(entity.sp)||0)+" / "+maxSP)
     };
@@ -23288,8 +23276,17 @@ function updateBattlePlayerBars(){
 function updateSingleCharacterBars(
     index,
     character,
-    stats
+    stats,
+    atImpact
 ){
+    const scheduler=typeof window!=="undefined"?window.v143SchedulePlayerStatusUiUpdate:null;
+    if(atImpact!==true&&typeof scheduler==="function"){
+        return scheduler(index,()=>{
+            if(getPartyCharacterByIndex(index)===character){
+                updateSingleCharacterBars(index,character,getPartyBattleStats(index),true);
+            }
+        },"resources");
+    }
 
     const card=
         $("battlePlayerCard"+index);
@@ -24434,9 +24431,10 @@ function showMissEffect(isPlayerTarget,index,text){
     }
 
 
-    showDodgeAnimation(
-        element
-    );
+    const dodge=()=>showDodgeAnimation(element);
+    if(typeof window.v143RunAtTargetHit==="function"){
+        window.v143RunAtTargetHit(isPlayerTarget?"player":"monster",index||0,dodge,true);
+    }else{ dodge(); }
 
 
     showDamagePopup(
@@ -33098,12 +33096,20 @@ function updateMapPageHeader(){
 // Final battle HP rendering owns defeated-card state for death and both revive sources.
 function syncBattleDefeatedCards(){
     currentBattleMonsters.forEach(index=>{
-        const monster=monsters[index],card=$("battleMonster"+index);
-        if(card){ card.classList.toggle("v146-defeated",!monster||monster.alive===false||Number(monster.hp)<=0); }
+        const apply=()=>{
+            const monster=monsters[index],card=$("battleMonster"+index);
+            if(card){ card.classList.toggle("v146-defeated",!monster||monster.alive===false||Number(monster.hp)<=0); }
+        };
+        if(typeof window.v143ScheduleMonsterUiUpdate==="function"){ window.v143ScheduleMonsterUiUpdate(index,apply,"defeated"); }
+        else{ apply(); }
     });
     getExistingPartyIndexes().forEach(index=>{
-        const character=getPartyCharacterByIndex(index),card=$("battlePlayerCard"+index);
-        if(card){ card.classList.toggle("v146-defeated",!character||Number(character.hp)<=0); }
+        const apply=()=>{
+            const character=getPartyCharacterByIndex(index),card=$("battlePlayerCard"+index);
+            if(card){ card.classList.toggle("v146-defeated",!character||Number(character.hp)<=0); }
+        };
+        if(typeof window.v143SchedulePlayerStatusUiUpdate==="function"){ window.v143SchedulePlayerStatusUiUpdate(index,apply,"defeated"); }
+        else{ apply(); }
     });
 }
 

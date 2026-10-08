@@ -389,8 +389,8 @@
 
         function playSkill(skill,name){
             const label=String(name||skill&&skill.name||"");
-            if(label==="普通攻擊"){ play("swing",SKILL_VOLUME_SCALE); setTimeout(()=>play("hit",SKILL_VOLUME_SCALE),55); return; }
-            if(!skill){ play("hit",SKILL_VOLUME_SCALE); return; }
+            if(label==="普通攻擊"){ play("swing",SKILL_VOLUME_SCALE); return; }
+            if(!skill){ return; }
             if(skill.category==="heal"){ play("heal",SKILL_VOLUME_SCALE); return; }
             if(skill.category==="revive"){ play("revive",SKILL_VOLUME_SCALE); return; }
             if(skill.category==="buff"){
@@ -401,8 +401,6 @@
             setTimeout(()=>{
                 const elementKind={fire:"fire",water:"water",wind:"wind",earth:"earth",light:"buff"}[skill.element];
                 if(elementKind){ play(elementKind,SKILL_VOLUME_SCALE); }
-                if(/爆|炸|鳳|龍/.test(label)){ setTimeout(()=>play("explosion",SKILL_VOLUME_SCALE),45); }
-                else{ play(/重|裂|猛|破/.test(label)?"heavy":"hit",SKILL_VOLUME_SCALE); }
             },65);
         }
 
@@ -444,37 +442,8 @@
         };
     }
 
-    if(typeof showMissEffect==="function"){
-        const originalShowMissEffect=showMissEffect;
-        showMissEffect=function(){
-            audioEngine.play("dodge",COMBAT_FEEDBACK_VOLUME_SCALE);
-            return originalShowMissEffect.apply(this,arguments);
-        };
-    }
-
-    if(typeof showShieldAbsorb==="function"){
-        const originalShowShieldAbsorb=showShieldAbsorb;
-        showShieldAbsorb=function(){
-            audioEngine.play("block",COMBAT_FEEDBACK_VOLUME_SCALE);
-            return originalShowShieldAbsorb.apply(this,arguments);
-        };
-    }
-
-    if(typeof showMonsterHit==="function"){
-        const originalShowMonsterHit=showMonsterHit;
-        showMonsterHit=function(index,amount,type,isCrit){
-            if(type==="hp"&&Number(amount)>0){ audioEngine.play(isCrit?"crit":"damage",COMBAT_FEEDBACK_VOLUME_SCALE); }
-            return originalShowMonsterHit.apply(this,arguments);
-        };
-    }
-
-    if(typeof showPlayerHit==="function"){
-        const originalShowPlayerHit=showPlayerHit;
-        showPlayerHit=function(amount,type,index,isPositive,isCrit){
-            if(type==="hp"&&Number(amount)>0){ audioEngine.play(isCrit?"crit":"damage",COMBAT_FEEDBACK_VOLUME_SCALE); }
-            return originalShowPlayerHit.apply(this,arguments);
-        };
-    }
+    /* Impact damage/critical/block/dodge audio is projected by V143 at the
+       target hit frame; cast wrappers above own only cast/travel sounds. */
 
     function applyMonsterSkillShield(monsterIndex,skillId,level){
         const skill=skillDatabase[skillId];

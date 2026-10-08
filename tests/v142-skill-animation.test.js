@@ -191,7 +191,7 @@ function createContext(options={}){
         assert.equal(context.v142GetSkillAnimationConfig("explosiveFlurry").duration,1450);
         assert.equal(context.v142GetSkillAnimationConfig("phoenixCry").duration,3200);
         assert.equal(context.skillDatabase.phoenixCry.resolveDuration,3200);
-        assert.equal(context.v142GetSkillNameDisplayDuration("普通攻擊","normal"),347);
+        assert.equal(context.v142GetSkillNameDisplayDuration("普通攻擊","normal"),700);
         assert.equal(context.v142GetSkillNameDisplayDuration("火焰斬","fire"),507);
         assert.equal(context.v142GetSkillNameDisplayDuration("火鳳天鳴","fire"),2133);
     });

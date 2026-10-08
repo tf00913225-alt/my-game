@@ -58,7 +58,7 @@
 - Fixed Slot 只擁有站位、幾何、點擊、HUD（資訊介面）與 VFX 錨點；不得重新成為可見卡框。
 - `FourSymbolsBattlefieldSlots` 是格位與範圍幾何唯一 owner（控制來源）；`battlefield-render-geometry-adapter.js` 只投影 DOM（文件物件模型）；`FourSymbolsBattlePresentation` 只裝飾立繪與瞬時回饋。
 - 動態生成單位必須在插入 DOM 當下套用正式 presentation（呈現），不得依賴輪詢修正。
-- 受擊回饋只使用傷害數字、立繪震動、技能 VFX 與爆擊效果；`.red-hit` 根卡框狀態已退役。Heal（治療）不得使用傷害語意。
+- Direct Damage Impact Presentation 由 V143 Hit Frame 同步投影 artwork-only Impact Recoil（僅 `.v174-battle-art`，140ms）、Floating Feedback、Impact SFX 與已結算 HP／Shield。`.red-hit`、root card shake、`v174-hit-shake` 永久 RETIRED；Heal／SP／Shield Gain／Status-only／DOT 不使用直接傷害 recoil，MISS 使用既有 dodge。Gameplay settlement 維持同步。
 - 玩家與普通敵方共用資源條高度與 HUD 錨點；Boss 可使用自己的大型 HP／Shield HUD。
 - Target Reticle（目標準星）由 Fixed Slot V2 唯一投影；敵方、我方、Boss、援軍與可破壞 Boss object 共用同一金色準星。歷史 `::after` 準星不得與正式 `::before` 準星並存。
 - Status Icon（狀態圖示）HUD 必須位於 HP／SP 資源條之上，正式 24px Icon 不得被塞入低於自身高度的容器或被資源條 z-index 蓋住。
@@ -132,7 +132,7 @@
 - 傷害／治療只能從戰鬥結算前後的實際 HP 差額或正式 settlement（結算）事件累積；不得讀浮字、VFX、紅字顏色或戰鬥紀錄反推。
 - Shield（護盾）、減傷、Barrier（結界）、無敵／吸收後未真正扣 HP 的部分不得算承受傷害；Overheal（過量治療）未另有正式規則前不得算入有效治療。
 - 左側「戰鬥數據」Drawer（抽屜）與右側 Boss 功能卡 Drawer 都是 non-blocking observer UI（非阻塞觀察介面）：打開時不得取得 `FourSymbolsBattleFlow` pause／presentation lock，Auto／Manual Battle（自動／手動戰鬥）都必須照常推進。玩家主動打開戰鬥數據、Boss 功能卡、戰鬥資訊或戰鬥狀態視窗時，該互動資訊層必須暫時位於技能 VFX 與傷害／治療浮字之上，禁止被瞬時演出遮住；關閉後恢復一般戰場繪製順序。左側「戰鬥數據」入口固定貼齊戰場左邊並允許玩家上下拖移。
-- Auto Battle（自動戰鬥）回合提示是正式 round lifecycle 的 0.5 秒 tracked lock；新回合成立後先顯示「第 X 回合」，提示結束後才允許第一個宣告／行動。手動戰鬥維持既有節奏。
+- Auto Battle（自動戰鬥）回合提示是正式 round lifecycle 的 500ms observer presentation，不取得 Presentation Lock，可與 Auto declaration 同時進行。Auto decision 50ms／declare handoff 100ms；Manual declaration 保留 250ms。
 - 個人 Boss、世界 Boss、深淵可在 battle finish 後顯示 `FourSymbolsBattleStatistics` 的 frozen snapshot，直到玩家主動關閉；一般巡怪與每日副本不得因此增加長駐結算 Modal。
 
 ## Boss 功能卡資訊契約
@@ -195,6 +195,8 @@
 - Floating feedback remains the sole transient-text owner. Critical format is `💥 N`; status capsules are black with white text and retain `statusType` only as semantic metadata.
 - A live V143 impact is scheduled as one target-plus-`impactId` batch. Its requests register before the batch flushes and sort Shield → Damage/Critical/MISS/Resist → Status. Synthetic feedback without an `impactId` stays on the normal queue; clear cancels every pending batch.
 - Persistent state Gate returns a reason. `sameNameDuplicate` is a silent reject before hit rolling or mutation; `exclusiveConflict` (Freeze/Petrify) emits formal status MISS; resistance remains distinct.
+- 普通攻擊名稱顯示 700ms，動畫仍為 520ms，名稱不取得流程鎖；其他技能名稱維持 duration × 2/3。唯一 Core Queue resolve delay 為 visualRemaining + 650ms；技能秒數與 Hit Frame 不變。
+- 戰場怪物 identity 僅名稱，等級讀正式 entity.level 於 Battle Status Detail 顯示；玩家 ID／SP／HP HUD 共用名稱列與資源條 tokens 連續相接，不改 Slot／artwork geometry。
 - Skill-name presentation derives color from `skill.element` through `data-skill-element`; character element must not participate. It is a document-level fixed viewport surface and shares the ordinary floating-feedback visual font size.
 
 ## Battle Reading Layer Contract (2026-10-01)

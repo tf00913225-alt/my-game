@@ -65,7 +65,7 @@ assert.equal(snapshot.combatants.find(item=>item.id==="player:0").damageDealt,32
 
 assert.match(battle,/showAutoBattleRoundPrompt\(token\)/);
 assert.match(battle,/battleRoundPromptTimeoutId=setTimeout\([\s\S]*?\},500\)/);
-assert.match(battle,/acquirePresentationLock\("auto-round-prompt"\)/);
+assert.doesNotMatch(battle,/acquirePresentationLock\("auto-round-prompt"\)/);
 assert.doesNotMatch(statsSource,/acquireDrawerPause|acquirePauseLock|battle-insight-drawer[\s\S]*acquirePresentationLock/,"battle insight drawers must never pause combat");
 assert.match(battle,/battleResolutionResumeToken/);
 assert.match(battle,/battleAutoActionResume/);

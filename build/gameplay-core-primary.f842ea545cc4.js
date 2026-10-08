@@ -7634,8 +7634,8 @@
 
         function playSkill(skill,name){
             const label=String(name||skill&&skill.name||"");
-            if(label==="普通攻擊"){ play("swing",SKILL_VOLUME_SCALE); setTimeout(()=>play("hit",SKILL_VOLUME_SCALE),55); return; }
-            if(!skill){ play("hit",SKILL_VOLUME_SCALE); return; }
+            if(label==="普通攻擊"){ play("swing",SKILL_VOLUME_SCALE); return; }
+            if(!skill){ return; }
             if(skill.category==="heal"){ play("heal",SKILL_VOLUME_SCALE); return; }
             if(skill.category==="revive"){ play("revive",SKILL_VOLUME_SCALE); return; }
             if(skill.category==="buff"){
@@ -7646,8 +7646,6 @@
             setTimeout(()=>{
                 const elementKind={fire:"fire",water:"water",wind:"wind",earth:"earth",light:"buff"}[skill.element];
                 if(elementKind){ play(elementKind,SKILL_VOLUME_SCALE); }
-                if(/爆|炸|鳳|龍/.test(label)){ setTimeout(()=>play("explosion",SKILL_VOLUME_SCALE),45); }
-                else{ play(/重|裂|猛|破/.test(label)?"heavy":"hit",SKILL_VOLUME_SCALE); }
             },65);
         }
 
@@ -7689,37 +7687,8 @@
         };
     }
 
-    if(typeof showMissEffect==="function"){
-        const originalShowMissEffect=showMissEffect;
-        showMissEffect=function(){
-            audioEngine.play("dodge",COMBAT_FEEDBACK_VOLUME_SCALE);
-            return originalShowMissEffect.apply(this,arguments);
-        };
-    }
-
-    if(typeof showShieldAbsorb==="function"){
-        const originalShowShieldAbsorb=showShieldAbsorb;
-        showShieldAbsorb=function(){
-            audioEngine.play("block",COMBAT_FEEDBACK_VOLUME_SCALE);
-            return originalShowShieldAbsorb.apply(this,arguments);
-        };
-    }
-
-    if(typeof showMonsterHit==="function"){
-        const originalShowMonsterHit=showMonsterHit;
-        showMonsterHit=function(index,amount,type,isCrit){
-            if(type==="hp"&&Number(amount)>0){ audioEngine.play(isCrit?"crit":"damage",COMBAT_FEEDBACK_VOLUME_SCALE); }
-            return originalShowMonsterHit.apply(this,arguments);
-        };
-    }
-
-    if(typeof showPlayerHit==="function"){
-        const originalShowPlayerHit=showPlayerHit;
-        showPlayerHit=function(amount,type,index,isPositive,isCrit){
-            if(type==="hp"&&Number(amount)>0){ audioEngine.play(isCrit?"crit":"damage",COMBAT_FEEDBACK_VOLUME_SCALE); }
-            return originalShowPlayerHit.apply(this,arguments);
-        };
-    }
+    /* Impact damage/critical/block/dodge audio is projected by V143 at the
+       target hit frame; cast wrappers above own only cast/travel sounds. */
 
     function applyMonsterSkillShield(monsterIndex,skillId,level){
         const skill=skillDatabase[skillId];
@@ -11080,6 +11049,7 @@
     };
     window.v142GetSkillNameDisplayDuration=function(name,element){
         const config=animationConfig(null,name,element);
+        if(config.id==="normal"){ return 700; }
         return Math.max(1,Math.round(config.duration*2/3));
     };
     window.v142GetAnimationDiagnostics=function(){ return director.getMetrics(); };
@@ -11251,7 +11221,7 @@
         const name=card.querySelector(".battle-monster-name");
         const level=card.querySelector(".battle-monster-level");
         if(!name){ return; }
-        const identity=monster.name+" Lv"+monster.level;
+        const identity=String(monster.name||"");
         if(name.textContent.trim()!==identity){ name.textContent=identity; }
         name.classList.add("v143-monster-identity");
         if(level){ level.hidden=true; level.setAttribute("aria-hidden","true"); }
@@ -11724,7 +11694,7 @@
     }
 
     const RAW_MANIFEST={
-        normal:{hit:.57,noVisual:true},
+        normal:{hit:.57,sprite:castSheet("assets/vfx/normal/normal-impact.webp","single",{hitFrame:6,scale:.85,maxSize:100,impactOnly:true})},
 
         flameSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-slash-cast.png","single",{scale:1.85,maxSize:220})},
         fireCritical:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260})},
@@ -12866,7 +12836,7 @@
            Outcome confirmation still marks the node and controls hit feedback, but
            MISS/status/custom Boss paths must not make the cast animation disappear. */
         if(node.style.left&&node.style.top){
-            node.style.visibility="visible";
+            node.style.visibility=sprite.impactOnly?"hidden":"visible";
             node.dataset.emittedVisual="true";
         }
         if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }
@@ -12878,7 +12848,10 @@
         const placement=placementFor(current.config,current.model.sprite);
         const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
         const node=current.spriteNodes.get(key);
-        if(node){ node.dataset.confirmedHit="true"; node.style.visibility="visible"; }
+        if(node){
+            node.dataset.confirmedHit="true";
+            if(!current.model.sprite.impactOnly||current.hitReached){ node.style.visibility="visible"; }
+        }
     }
 
     function targetHitTime(current,index){
@@ -12908,6 +12881,10 @@
         const card=cardFor(current.targetSide,index);
         if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }
         current.hitReached=true;
+        if(current.model.sprite&&current.model.sprite.impactOnly&&current.confirmedTargets.has(index)){
+            const node=current.spriteNodes.get(String(index));
+            if(node){ node.style.visibility="visible"; }
+        }
         syncStatusVisualsForUnit(current.targetSide,index);
     }
 
@@ -13005,7 +12982,7 @@
         stage.style.visibility="visible";
         stage.dataset.sequence=String(current.sequence);
         stage.dataset.skill=String(config.id||"unknown");
-        stage.dataset.element=String(config.element||"normal");
+        stage.dataset.element=config.id==="normal"?"normal":String(config.element||"normal");
         stage.dataset.renderer="raster-only";
         stage.dataset.geometryOwner="fixed-slot";
         if(model.missingAsset||model.missingDedicatedAsset){ stage.dataset.missingVisual="true"; }
@@ -13079,10 +13056,10 @@
         return originalDispose();
     };
 
-    function delayFor(targetSide,index,allowDefeated){
+    function delayFor(targetSide,index,allowDefeated,confirmHit){
         const current=registerTarget(targetSide,index,allowDefeated);
         if(!current){ return 0; }
-        confirmTargetVisual(current,index);
+        if(current.config.id!=="normal"||confirmHit===true){ confirmTargetVisual(current,index); }
         return Math.max(0,targetHitTime(current,index)-Date.now());
     }
 
@@ -13101,15 +13078,40 @@
 
     /* V143 owns hit timing only. Battle Floating Feedback owns popup DOM,
        geometry, collision lanes, typography and cleanup. */
-    window.v143ResolveBattleFeedbackTiming=function(targetSide,index,kind){
+    window.v143ResolveBattleFeedbackTiming=function(targetSide,index,kind,isCritical){
         const side=targetSide==="monster"?"monster":"player";
         const unitIndex=Number(index)||0;
-        const wait=delayFor(side,unitIndex,true);
+        const damage=kind==="damage"||kind==="criticalDamage";
+        const wait=delayFor(side,unitIndex,true,damage||kind==="shield");
         const current=state.current;
-        const critical=String(kind||"")==="damage"&&!!(
+        const critical=isCritical===true||damage&&!!(
             current&&!current.done&&current.config&&current.config.id==="fireCritical"&&
             current.targetSide===side
         );
+        const direct=current&&!current.done&&(current.config.id==="normal"||
+            current.config.category==="physical"||current.config.category==="magic");
+        const present=function(){
+            const audio=window.v141Audio;
+            if(audio&&typeof audio.play==="function"){
+                const sound=damage?(critical?"crit":"damage"):kind==="shield"?"block":kind==="miss"?"dodge":null;
+                if(sound){ audio.play(sound,audio.combatFeedbackVolumeScale); }
+            }
+            if(!damage||!direct){ return; }
+            const card=cardFor(side,unitIndex);
+            const artwork=card&&card.querySelector(".v174-battle-art");
+            if(!artwork||typeof artwork.animate!=="function"){ return; }
+            if(typeof window.matchMedia==="function"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){ return; }
+            if(artwork.v143ImpactRecoil){ artwork.v143ImpactRecoil.cancel(); }
+            const distance=(critical?5:4)*(side==="monster"?-1:1);
+            artwork.v143ImpactRecoil=artwork.animate([
+                {translate:"0px 0px",scale:1},
+                {translate:"0px "+distance+"px",scale:critical?.975:.98,offset:.3},
+                {translate:"0px "+(-distance*.3)+"px",scale:1,offset:.7},
+                {translate:"0px 0px",scale:1}
+            ],{duration:140,easing:"ease-out"});
+            artwork.v143ImpactRecoil.onfinish=()=>{ artwork.v143ImpactRecoil=null; };
+        };
+        if(wait>8){ setTimer(present,wait); }else{ present(); }
         if(wait>8){ state.metrics.delayedNumbers++; }
         return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical});
     };
@@ -13189,14 +13191,14 @@
         return callback();
     }
 
-    window.v143ScheduleMonsterUiUpdate=function(index,callback){
-        return scheduleStatusOwnedUiUpdate("monster",Number(index),"monster",callback);
+    window.v143ScheduleMonsterUiUpdate=function(index,callback,projection){
+        return scheduleStatusOwnedUiUpdate("monster",Number(index),"monster-"+(projection||"resources"),callback);
     };
     window.v143StatusAfterMonsterUiUpdate=function(index){
         syncStatusVisualsForUnit("monster",Number(index));
     };
-    window.v143SchedulePlayerStatusUiUpdate=function(index,callback){
-        return scheduleStatusOwnedUiUpdate("player",Number(index),"player-status",callback);
+    window.v143SchedulePlayerStatusUiUpdate=function(index,callback,projection){
+        return scheduleStatusOwnedUiUpdate("player",Number(index),"player-"+(projection||"status"),callback);
     };
     window.v143StatusAfterPlayerUiUpdate=function(index){
         syncStatusVisualsForUnit("player",Number(index));
