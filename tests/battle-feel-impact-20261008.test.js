@@ -45,3 +45,11 @@ const cleanupContext={state:{current:active,stage:null,metrics:{completed:0}},ca
 vm.createContext(cleanupContext);vm.runInContext(source.slice(cleanupStart,cleanupEnd),cleanupContext);
 cleanupContext.cleanupCurrent(active,'dispose');
 assert.equal(cancelled,1);assert.equal(art.v143ImpactRecoil,null);assert.equal(cleanupContext.state.current,null);
+const audio=fs.readFileSync('js/34-v141-core-systems.js','utf8');
+const noiseSource=audio.slice(audio.indexOf('        function noise('),audio.indexOf('        function play(',audio.indexOf('        function noise(')));
+for(const sampleRate of [44100,48000]){
+    let combatDraws=0;const samples=[];const node={connect(){},start(){},stop(){},gain:{},frequency:{},Q:{}};
+    const a={Math:Object.create(Math),ensure:()=>({sampleRate,currentTime:0,createBuffer:(_channels,length)=>({getChannelData:()=>{const data=new Float32Array(length);samples.push(data);return data;}}),createBufferSource:()=>({...node}),createBiquadFilter:()=>({...node}),createGain:()=>({...node})}),master:{},playbackGainScale:1};a.Math.random=()=>.25;
+    vm.createContext(a);vm.runInContext(audio.match(/        const noiseRandom=Math.random;/)[0]+noiseSource,a);a.Math.random=()=>{combatDraws++;return .5;};a.noise(.14,{});
+    assert.equal(combatDraws,0);assert.equal(samples[0].length,Math.floor(sampleRate*.14));assert.equal(samples[0][0],-.5);
+}

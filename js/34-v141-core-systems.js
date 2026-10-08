@@ -294,6 +294,9 @@
     const audioEngine=(function(){
         let context=null;
         let master=null;
+        /* Sample generation keeps its own source; audio scheduling/sample rate
+           must not consume a subsequently installed deterministic combat RNG. */
+        const noiseRandom=Math.random;
         const SKILL_VOLUME_SCALE=2;
         const COMBAT_FEEDBACK_VOLUME_SCALE=2;
         let playbackGainScale=1;
@@ -338,7 +341,7 @@
             const data=buffer.getChannelData(0);
             for(let i=0;i<length;i++){
                 const envelope=1-i/length;
-                data[i]=(Math.random()*2-1)*envelope;
+                data[i]=(noiseRandom()*2-1)*envelope;
             }
             const source=ctx.createBufferSource();
             const filter=ctx.createBiquadFilter();
