@@ -1,0 +1,7809 @@
+{
+  "workId": "EQUIPMENT-CATALOG-20261008",
+  "baseDev": "27a7e0371f1538328fc509e5154fd86408cdc911",
+  "assetsLibrary": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+  "images": [
+    {
+      "classType": "warrior",
+      "index": 1,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000002888211a89dc8f09d1ddd21.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "4c622efdd39cbce74d9ffe6909b18caed6297d775402ffa225e69e126058267f",
+      "assetPath": "assets/equipment/warrior/catalog-001.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "銀龍"
+    },
+    {
+      "classType": "warrior",
+      "index": 2,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000003088207957d869cee94fb2c.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0be787a6a0ce9c8fb844285b1ecfadf60f9eddefd32300248e0e81f5c5316f82",
+      "assetPath": "assets/equipment/warrior/catalog-002.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "赤焰"
+    },
+    {
+      "classType": "warrior",
+      "index": 3,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000005cc8207b47aa64012c1e4d4.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "8cafbc4fe0a8c99fc71b0172eae7cb15cf6a04e6a82455f7806140e75c6b6104",
+      "assetPath": "assets/equipment/warrior/catalog-003.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "赤羽"
+    },
+    {
+      "classType": "warrior",
+      "index": 4,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000006c882118f932515efcec49e.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0729df7b3ce3d0f7aabcc4d5010d43cb06e8a7b0fa112e6fc2e13b6d86a9534a",
+      "assetPath": "assets/equipment/warrior/catalog-004.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "金龍"
+    },
+    {
+      "classType": "warrior",
+      "index": 5,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000000d0482089ed80b0cc6d32ddb.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "8b011625320ff47500ef171c7559ab3d718e7f0f57f73cc6486ad3efcf0dd3db",
+      "assetPath": "assets/equipment/warrior/catalog-005.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "玄紅"
+    },
+    {
+      "classType": "warrior",
+      "index": 6,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000110c8207ab3ee21fa5fc19e6.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "bf6f56f42f1bc47f34d12d203310c1b9b76d20df82d8efca900f5340eb0687d5",
+      "assetPath": "assets/equipment/warrior/catalog-006.webp",
+      "type": "weapon",
+      "weaponKind": "槍",
+      "theme": "紫晶"
+    },
+    {
+      "classType": "warrior",
+      "index": 7,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000014888211b737c564a7d56751.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "52e0d0a4c9a5130e94ee7eae9af74e11edb1bc6699a27adaaca01173b7ab33d5",
+      "assetPath": "assets/equipment/warrior/catalog-007.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "墨龍"
+    },
+    {
+      "classType": "warrior",
+      "index": 8,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000018108211ab4002ecc1380771.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e7e3e454a960407ff3d731fc5c82b608160115b5726ab867da892b397ff0f5de",
+      "assetPath": "assets/equipment/warrior/catalog-008.webp",
+      "type": "weapon",
+      "weaponKind": "槍",
+      "theme": "冰晶"
+    },
+    {
+      "classType": "warrior",
+      "index": 9,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000018ec8211ae3da4926d98fd8a.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "8a384cc99564e05884dccb61ba69e4b33ed7ff5bcd31db3dc891270693730c51",
+      "assetPath": "assets/equipment/warrior/catalog-009.webp",
+      "type": "weapon",
+      "weaponKind": "槍",
+      "theme": "碧玉"
+    },
+    {
+      "classType": "warrior",
+      "index": 10,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000001d3c82119321e7eb309167b2.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "acc865a0a02eba88f98c6ef81e41e053e37d12d6e48bf1a649b64e2e2f0bd5fe",
+      "assetPath": "assets/equipment/warrior/catalog-010.webp",
+      "type": "weapon",
+      "weaponKind": "槍",
+      "theme": "白羽"
+    },
+    {
+      "classType": "warrior",
+      "index": 11,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000202c821190be3ee018936f41.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "da71fcbc2101742e2de02ce6238a58d210a2ab3d666ab39bbb9678fc27524c1a",
+      "assetPath": "assets/equipment/warrior/catalog-011.webp",
+      "type": "weapon",
+      "weaponKind": "刀",
+      "theme": "霜雪"
+    },
+    {
+      "classType": "warrior",
+      "index": 12,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000022588211aff1af37101577ba.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "11d4e4fb346c081fac3d3c7df76d816ba7020f7d16250b9e2294fdd9f08652d5",
+      "assetPath": "assets/equipment/warrior/catalog-012.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "血影"
+    },
+    {
+      "classType": "warrior",
+      "index": 13,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000022e882079e64b46b27e6f58a.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "00db92ed77b6abe9ab3eb305608f8abbaba70a91e2d9fa12f85798a70624f040",
+      "assetPath": "assets/equipment/warrior/catalog-013.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "翠龍"
+    },
+    {
+      "classType": "warrior",
+      "index": 14,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000023588207ae562a2c77cc0aa7.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a408bb3ccd0e881d5ed2d014d925dfb6e54ad767df7d353da5a8430009c2a3b3",
+      "assetPath": "assets/equipment/warrior/catalog-014.webp",
+      "type": "weapon",
+      "weaponKind": "刀",
+      "theme": "赤龍"
+    },
+    {
+      "classType": "warrior",
+      "index": 15,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000024ac821193aaaece57c841d2.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "2d642e4ed96121aafb864ce8262906fea9e5f20aac6255f4ab0630671a136c56",
+      "assetPath": "assets/equipment/warrior/catalog-015.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "黑翼"
+    },
+    {
+      "classType": "warrior",
+      "index": 16,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000270c820784602b292f03bdf5.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b9d0274a23993f6a5c4cfe20f298ee669ea8760105ff09e00c8758213bbc2cbd",
+      "assetPath": "assets/equipment/warrior/catalog-016.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "玄金"
+    },
+    {
+      "classType": "warrior",
+      "index": 17,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000002e4c8211b1cbdf18eb5aa2f7.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "8ad3143caf421422918281a3617c416c2b5fd7086b112ce2402ba191322ea39b",
+      "assetPath": "assets/equipment/warrior/catalog-017.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "赤鱗"
+    },
+    {
+      "classType": "warrior",
+      "index": 18,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000030c08211bdeb58dea18534f7.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "172f9378828c29bd03478fcec7050fc4b7295a61511db4f069f14a055a93210d",
+      "assetPath": "assets/equipment/warrior/catalog-018.webp",
+      "type": "weapon",
+      "weaponKind": "槍",
+      "theme": "赤金"
+    },
+    {
+      "classType": "warrior",
+      "index": 19,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000317c821192b40c044b460c2b.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "5c15da3317b38f5d1fb9326f9fd19d57634cd751afab9efe773915d46106f6c3",
+      "assetPath": "assets/equipment/warrior/catalog-019.webp",
+      "type": "weapon",
+      "weaponKind": "刀",
+      "theme": "翠龍"
+    },
+    {
+      "classType": "warrior",
+      "index": 20,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000034148207b5bce80502134a42.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b2fda54ac0ee4ff096608e51909045eedbf2790198753ac8912239d4111b6a36",
+      "assetPath": "assets/equipment/warrior/catalog-020.webp",
+      "type": "weapon",
+      "weaponKind": "刀",
+      "theme": "滄浪"
+    },
+    {
+      "classType": "warrior",
+      "index": 21,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000036bc8211a48e258ed5564ea1.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "886b58c028e1f351488d6353f0aa75a83208230559d05ef2c684f0ad1f80417a",
+      "assetPath": "assets/equipment/warrior/catalog-021.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "玄金"
+    },
+    {
+      "classType": "warrior",
+      "index": 22,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000036f48211940fefb202d48106.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "359d3cd046d5236510edbbeee44b056641ffcc4b14fc305e341297271cbacfb9",
+      "assetPath": "assets/equipment/warrior/catalog-022.webp",
+      "type": "weapon",
+      "weaponKind": "刀",
+      "theme": "雷霆"
+    },
+    {
+      "classType": "warrior",
+      "index": 23,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000003dac8211a0b310ad23a5ef83.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0dca517c504f347907bcbf82c749105d53c6878713666ffd5fa1b4a88e3421dc",
+      "assetPath": "assets/equipment/warrior/catalog-023.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "金羽"
+    },
+    {
+      "classType": "warrior",
+      "index": 24,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000003fbc82088d6b7078e015be44.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b5997e77f99e7c97f5fbc5620cf971f6b2ae6269ed994ae28948597e673e172c",
+      "assetPath": "assets/equipment/warrior/catalog-024.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "滄龍"
+    },
+    {
+      "classType": "warrior",
+      "index": 25,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000040348211b073cac8835079de.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "eb212ce59c2419774b859c27ee32a66e7d61315da583a0d219059d7c5e830ca7",
+      "assetPath": "assets/equipment/warrior/catalog-025.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "白羽"
+    },
+    {
+      "classType": "warrior",
+      "index": 26,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000420482078e8dc03d46cd8f22.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1fd0bc96827fde7eced73768504c21bdf50b10dabd41c26c000c5049ab2dccb1",
+      "assetPath": "assets/equipment/warrior/catalog-026.webp",
+      "type": "weapon",
+      "weaponKind": "槍",
+      "theme": "玄鐵"
+    },
+    {
+      "classType": "warrior",
+      "index": 27,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000056f4821190e8a3d5dcbf1f74.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1722d5102174f4841ac06e18289b0e8d7f9c2e7e8cdc8c265001dd3c98d243a9",
+      "assetPath": "assets/equipment/warrior/catalog-027.webp",
+      "type": "weapon",
+      "weaponKind": "刀",
+      "theme": "翡翠"
+    },
+    {
+      "classType": "warrior",
+      "index": 28,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000005a34820796aa814ee5ddd66f.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "732339e75b51bfb4c7ac205770f3457464541c27e7971e9954d623c4599d1143",
+      "assetPath": "assets/equipment/warrior/catalog-028.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "寒霜"
+    },
+    {
+      "classType": "warrior",
+      "index": 29,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000005fe48208b0eb456744cf3335.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e20e4ee280163a0b74d6e45cef13ef20833478ff5d49a040ef7277860248bd86",
+      "assetPath": "assets/equipment/warrior/catalog-029.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "紫金"
+    },
+    {
+      "classType": "warrior",
+      "index": 30,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000617882078aea2c426ee3c4c8.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6824a4cdaf0fb708751d1838ee0849dcbd464b7091d919f880e4054c062a16cc",
+      "assetPath": "assets/equipment/warrior/catalog-030.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "金獅"
+    },
+    {
+      "classType": "warrior",
+      "index": 31,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000006eb08211afee0328ef195777.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d766d5e33d58628d800510e94f03df0bb01d8d4bd078fa833d36ebde178cfec8",
+      "assetPath": "assets/equipment/warrior/catalog-031.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "魔角"
+    },
+    {
+      "classType": "warrior",
+      "index": 32,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000006f908207804cfb25240947d3.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "453c9203f4e89b0bd6c6f746c27fbdda202dbcffb863eeaa357727ad606a6a6a",
+      "assetPath": "assets/equipment/warrior/catalog-032.webp",
+      "type": "weapon",
+      "weaponKind": "槍",
+      "theme": "墨影"
+    },
+    {
+      "classType": "warrior",
+      "index": 33,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000070d482078bc5144fcc4b0e41.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c2ca4ff4449cd3a4c24c8532e48ac3d14cf2d4477258491541431ab9fe637148",
+      "assetPath": "assets/equipment/warrior/catalog-033.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "血羽"
+    },
+    {
+      "classType": "warrior",
+      "index": 34,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000076bc82119f65051b90f26bf4.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "5c28ae3c463485d73b01ab89cb17487f29f3bf15b4eeb53506d31e8790822e59",
+      "assetPath": "assets/equipment/warrior/catalog-034.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "赤金"
+    },
+    {
+      "classType": "warrior",
+      "index": 35,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000076d88211ad30cd4d2ffc4cb0.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c36fde8528046229d3b2f64b092cd8fa132af6f063ad38ec1cf719c733805e7d",
+      "assetPath": "assets/equipment/warrior/catalog-035.webp",
+      "type": "weapon",
+      "weaponKind": "刀",
+      "theme": "青金"
+    },
+    {
+      "classType": "warrior",
+      "index": 36,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_0000000077c882118d6728b18cc145f5.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6bd7eb726efd737754d1a45a475a921d54710aeb0425b4770b1adc7cb1642508",
+      "assetPath": "assets/equipment/warrior/catalog-036.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "紫晶"
+    },
+    {
+      "classType": "warrior",
+      "index": 37,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000795082119a0df62554a702d7.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "97cf96542f47102cb043f879938fced1dfdcd6c173b39418762d6df5231040c1",
+      "assetPath": "assets/equipment/warrior/catalog-037.webp",
+      "type": "weapon",
+      "weaponKind": "槍",
+      "theme": "烈焰"
+    },
+    {
+      "classType": "warrior",
+      "index": 38,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000007eec8211909bebebad77733c.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "40b9cfee8aeb7045b95e2952f67fb6e8d915be6f0f2ea217eeb11165d9b87b5b",
+      "assetPath": "assets/equipment/warrior/catalog-038.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "冰龍"
+    },
+    {
+      "classType": "warrior",
+      "index": 39,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000008d8482079051cea9f65ff314.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3ff0c921008644df6410dc82621ca78274fbc43bf387dfd195f78daa4ca0d046",
+      "assetPath": "assets/equipment/warrior/catalog-039.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "翠鱗"
+    },
+    {
+      "classType": "warrior",
+      "index": 40,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000008fdc821181dcf93b40cb3c68.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "9bb8acee2b0e7377a4940da55b83095810532cd700c0c126fb81f3d880ff51bb",
+      "assetPath": "assets/equipment/warrior/catalog-040.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "古銀"
+    },
+    {
+      "classType": "warrior",
+      "index": 41,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000009300820783b47e97f5342607.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "920b1611e41991653d000432278e3bfbdb4f0e5a4ae826eaf91ce45ff130e06c",
+      "assetPath": "assets/equipment/warrior/catalog-041.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "炎龍"
+    },
+    {
+      "classType": "warrior",
+      "index": 42,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000009cd082119593763f290484e7.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "fdbd2c614eef7cdf5eb21865704b95ca01c63eb4f14e612508c96729dc2b1ec0",
+      "assetPath": "assets/equipment/warrior/catalog-042.webp",
+      "type": "weapon",
+      "weaponKind": "槍",
+      "theme": "寒泉"
+    },
+    {
+      "classType": "warrior",
+      "index": 43,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_000000009ee88211bcf1766419236dbb.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "9bbdd7a594bc6025277796c19f359b999020e9cbd0b4d4f866b23b1bdfaf48ab",
+      "assetPath": "assets/equipment/warrior/catalog-043.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "日曜"
+    },
+    {
+      "classType": "warrior",
+      "index": 44,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000a360821189dc0978586bd247.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "8b3bd1b0e297b7eb3c2a28c590fce76c60a82370662bc8a84ba232de8843971e",
+      "assetPath": "assets/equipment/warrior/catalog-044.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "霜鋼"
+    },
+    {
+      "classType": "warrior",
+      "index": 45,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000c0d08211b740ce5cc0a0a3ef.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f2ff046cba0d476742ea09e155aebdfc450aa7721e34ac4762adfb2e37207e2f",
+      "assetPath": "assets/equipment/warrior/catalog-045.webp",
+      "type": "weapon",
+      "weaponKind": "刀",
+      "theme": "烏鐵"
+    },
+    {
+      "classType": "warrior",
+      "index": 46,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000c0f08211bb2b28e8c1d0bf3a.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "32f09f0acbd4aa1dda7ece1b2eb5cc0d7e8d0dc4c537f1648a2f0fb23165688e",
+      "assetPath": "assets/equipment/warrior/catalog-046.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "白凰"
+    },
+    {
+      "classType": "warrior",
+      "index": 47,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000c13c8208b83621651c544f63.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0fe474cf1e94b06066261d5900386700649781fb6b2ae3adfc2e3ed102198229",
+      "assetPath": "assets/equipment/warrior/catalog-047.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "鎖龍"
+    },
+    {
+      "classType": "warrior",
+      "index": 48,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000d1dc8211b77ae8ccadce2bf7.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1cdf84cadcb6689366d7f671e1a2b07c5fc7a7b3f8b74dfabf0ad2a4a880824d",
+      "assetPath": "assets/equipment/warrior/catalog-048.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "碧紋"
+    },
+    {
+      "classType": "warrior",
+      "index": 49,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000d80c82119ec9d7b7879825c3.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c3d1a1fe28288b82ccaf61ac5dcda4d136da774851ad2a1668c5dde0ebae8559",
+      "assetPath": "assets/equipment/warrior/catalog-049.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "龍爪"
+    },
+    {
+      "classType": "warrior",
+      "index": 50,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000dd10821185640fc651fbe670.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "af4d3ab0f446cb5d161074b98be14d52746e6a3fe5d01a1a517424e682147a74",
+      "assetPath": "assets/equipment/warrior/catalog-050.webp",
+      "type": "weapon",
+      "weaponKind": "刀",
+      "theme": "炎牙"
+    },
+    {
+      "classType": "warrior",
+      "index": 51,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000de548207b70b7fc6c8927b2f.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b042beb40111de7d6f889072c9d9e4138477b6e6a8967427609f7b41259db2bc",
+      "assetPath": "assets/equipment/warrior/catalog-051.webp",
+      "type": "weapon",
+      "weaponKind": "槍",
+      "theme": "銅羽"
+    },
+    {
+      "classType": "warrior",
+      "index": 52,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000e1588207abcb9bbe1493468e.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "df444b196bdbb132873cfb6e85b5d972a982ec7300bf823318dd35f88edd5f64",
+      "assetPath": "assets/equipment/warrior/catalog-052.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "冰晶"
+    },
+    {
+      "classType": "warrior",
+      "index": 53,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000e4408211a1260e3b8da99ec2.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "647fe8860d26717591136ce6354ef8c98e27c4245cb36fa248c092583f8b394c",
+      "assetPath": "assets/equipment/warrior/catalog-053.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "鳳羽"
+    },
+    {
+      "classType": "warrior",
+      "index": 54,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000e6ac8207b0b90f2d2103fe9f.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "cb63846af5cafe6db318a3fe627d0dcf9e05c9b81851e462e8bc4a30500f2036",
+      "assetPath": "assets/equipment/warrior/catalog-054.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "虎嘯"
+    },
+    {
+      "classType": "warrior",
+      "index": 55,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000ebc88211bfff22651cecb73c.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "7fecbfb2e2f75391038db1d936d1bbc7f27bc7e3a622de5b98abc27d1725ceed",
+      "assetPath": "assets/equipment/warrior/catalog-055.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "赤角"
+    },
+    {
+      "classType": "warrior",
+      "index": 56,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000f0208211b3229b768774d3cc.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "fc630885cbb7fc4d364542fb571e95bb51050ba8832badd0b2e279e29ea1dfa1",
+      "assetPath": "assets/equipment/warrior/catalog-056.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "赤凰"
+    },
+    {
+      "classType": "warrior",
+      "index": 57,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000f2348211aca0e298cca44083.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e44f01a3051be2723f959dcb4e50225efac8cc217529a04131f0cbb7916c00e0",
+      "assetPath": "assets/equipment/warrior/catalog-057.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "黑鋼"
+    },
+    {
+      "classType": "warrior",
+      "index": 58,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000f5288211a239761f26da9569.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "26623fa662d3984222496b4d1c37fd276d128fdecbbbbe626d0f0d079dd35499",
+      "assetPath": "assets/equipment/warrior/catalog-058.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "棕革"
+    },
+    {
+      "classType": "warrior",
+      "index": 59,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000f87c8211b0493ab78cd385ee.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d9a36733312b37571f98baa36a8043376d7e788ad999875330a4a1118e96c72d",
+      "assetPath": "assets/equipment/warrior/catalog-059.webp",
+      "type": "weapon",
+      "weaponKind": "刀",
+      "theme": "白金"
+    },
+    {
+      "classType": "warrior",
+      "index": 60,
+      "source": "assets/inbox/戰士裝備/戰士紫、橙階裝備/file_00000000ffbc82118741436fcc04fc2b.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f74ee5c2a3e81965e96a6e8234cb5d24480e19bdbe83fc671c109f635fb70223",
+      "assetPath": "assets/equipment/warrior/catalog-060.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "墨金"
+    },
+    {
+      "classType": "mage",
+      "index": 1,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_0000000003388206bc15a5d632fac04b.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e8876336ca0c98ae34c334a8bb833cb2263b26139332e122d5d43cfd7db7a2c4",
+      "assetPath": "assets/equipment/mage/catalog-001.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "滄玉"
+    },
+    {
+      "classType": "mage",
+      "index": 2,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000000378820997b016866c363483.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "28418ca54da681e78e9fe21f90d98061dc3eb4eb822110384808a723a3467215",
+      "assetPath": "assets/equipment/mage/catalog-002.webp",
+      "type": "weapon",
+      "weaponKind": "杖",
+      "theme": "紫月"
+    },
+    {
+      "classType": "mage",
+      "index": 3,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000208482118ed229833c98c48a.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1e7ab408a43d39677d71795439b35f17823275f8b48b7dbe0e7cbd24a3702ccb",
+      "assetPath": "assets/equipment/mage/catalog-003.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "星藍"
+    },
+    {
+      "classType": "mage",
+      "index": 4,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000002bb082078bdf1aa8fb4e601e.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "2a82808a6e14682864e9b3faf0665048fc5fa9de3cdb2dc80353f37aa0cb7378",
+      "assetPath": "assets/equipment/mage/catalog-004.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "星紋"
+    },
+    {
+      "classType": "mage",
+      "index": 5,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000002c4c8211805d8f70c4ec5109.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "dacd5655786ae934a4ded46b6e091d446172ea5db4e5f3010d3471cc85bf1ae0",
+      "assetPath": "assets/equipment/mage/catalog-005.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "寒羽"
+    },
+    {
+      "classType": "mage",
+      "index": 6,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_0000000033a08211af6c7c34e0a3d77c.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "08cc5794073ab58d6ca6edc3e855dca64caadafa5dee2685e3cb3a496819d9b0",
+      "assetPath": "assets/equipment/mage/catalog-006.webp",
+      "type": "weapon",
+      "weaponKind": "杖",
+      "theme": "桃晶"
+    },
+    {
+      "classType": "mage",
+      "index": 7,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000354082089e6b1b7019fc6acd.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "19d0d64661e8da6fee625c9be7c6204253745d3d3a573608597f73d2498a6847",
+      "assetPath": "assets/equipment/mage/catalog-007.webp",
+      "type": "weapon",
+      "weaponKind": "扇",
+      "theme": "墨月"
+    },
+    {
+      "classType": "mage",
+      "index": 8,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_0000000045ac8211b40257e53694f59a.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6201e1baf84bc5147494fbeedee6de8b4be06010ad587670705e675e6dd31d44",
+      "assetPath": "assets/equipment/mage/catalog-008.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "雪霜"
+    },
+    {
+      "classType": "mage",
+      "index": 9,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_0000000049548211bc43c242471fdd2a.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "fa31d65b17dfd1d1718feea2dbe453886ea969d4be3953f445f416e4b4b46af0",
+      "assetPath": "assets/equipment/mage/catalog-009.webp",
+      "type": "weapon",
+      "weaponKind": "扇",
+      "theme": "翠羽"
+    },
+    {
+      "classType": "mage",
+      "index": 10,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000004b3c8211b75a37788d50ec58.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ec02c0aca23c4e2d0339438647f7ec45a3a131de486d9c027cf92032d77516aa",
+      "assetPath": "assets/equipment/mage/catalog-010.webp",
+      "type": "weapon",
+      "weaponKind": "扇",
+      "theme": "墨金"
+    },
+    {
+      "classType": "mage",
+      "index": 11,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_0000000051348211a69f333cbd1f704e.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "75fa217b6d338ac93841798c58c5a492743ab287ca28ef2220a5b8ceb98a8632",
+      "assetPath": "assets/equipment/mage/catalog-011.webp",
+      "type": "weapon",
+      "weaponKind": "扇",
+      "theme": "青山"
+    },
+    {
+      "classType": "mage",
+      "index": 12,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_0000000054ec82078dc021fc828f964c.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d713549069523a3517885333075e230c4614d8e71d2b662de2b67e0ac19d1f15",
+      "assetPath": "assets/equipment/mage/catalog-012.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "翠雲"
+    },
+    {
+      "classType": "mage",
+      "index": 13,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000005a908211b6c99d64ea10894f.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "844e5ada03ad16130febdddfb329e1a7c89b18108de8759360f019b8ac881f58",
+      "assetPath": "assets/equipment/mage/catalog-013.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "冰翼"
+    },
+    {
+      "classType": "mage",
+      "index": 14,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000005b0c821185d1716f1bc3cd80.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0c7e520e396c27cc9180fea5031d28346d70d4c2e883bcda07fb8257c8366369",
+      "assetPath": "assets/equipment/mage/catalog-014.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "霜紋"
+    },
+    {
+      "classType": "mage",
+      "index": 15,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000005cf082098a0f8c25a8413d04.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3b76692212d5814169d5e6e7e09a55ac466d8d383726a0994a31600c17a277b4",
+      "assetPath": "assets/equipment/mage/catalog-015.webp",
+      "type": "weapon",
+      "weaponKind": "扇",
+      "theme": "冰花"
+    },
+    {
+      "classType": "mage",
+      "index": 16,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000005ed88207aeab19dfb5da20e5.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "5d3eab7737cfe37c8c23edd207300963d9555b0cd597d27438ee5927d5a552a5",
+      "assetPath": "assets/equipment/mage/catalog-016.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "冰蓮"
+    },
+    {
+      "classType": "mage",
+      "index": 17,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000006000821193e95004382af89e.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a237f8aa565e22dabf89c482a231423a6a907623e88eb24c16883ad0d740c104",
+      "assetPath": "assets/equipment/mage/catalog-017.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "流藍"
+    },
+    {
+      "classType": "mage",
+      "index": 18,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000698c82118e55488aefeed5c1.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6cf423034fec38203aa5ddec96858798546632ca0acc57adfb8b4d2e004c85fb",
+      "assetPath": "assets/equipment/mage/catalog-018.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "紫晶"
+    },
+    {
+      "classType": "mage",
+      "index": 19,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000006ab08211ae188d25fac53d51.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3de8acf9c57bfcfbdab45f9d3352794ae115c78410c7c151b8d1279223eb879b",
+      "assetPath": "assets/equipment/mage/catalog-019.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "翡翠"
+    },
+    {
+      "classType": "mage",
+      "index": 20,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_0000000075988211bed3fab7397612d6.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1a5ac89de6165a3c94ac3e3720ea9f54501cdfe62c732e68f922f71855014d53",
+      "assetPath": "assets/equipment/mage/catalog-020.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "星辰"
+    },
+    {
+      "classType": "mage",
+      "index": 21,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000007ac48211a6c9166da27a038e.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "24c0d12554094602424c519c0bc23dd70871a387aa009772eb8f54a11afe1e19",
+      "assetPath": "assets/equipment/mage/catalog-021.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "紫月"
+    },
+    {
+      "classType": "mage",
+      "index": 22,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000007b288207b5b61307ed984a78.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "90b67a54fc2d53b7e69c82abe8230b098636de87b87984fd1139bc10fc88db2c",
+      "assetPath": "assets/equipment/mage/catalog-022.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "玄金"
+    },
+    {
+      "classType": "mage",
+      "index": 23,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000007c888211ba5e34b8ee9dcfaf.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "09f174d4e8dd151876a7f429befd5a80807849c9bf470f7ad1417ba5aaf97fa6",
+      "assetPath": "assets/equipment/mage/catalog-023.webp",
+      "type": "weapon",
+      "weaponKind": "杖",
+      "theme": "炎晶"
+    },
+    {
+      "classType": "mage",
+      "index": 24,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000007d80821180ea00c71207303a.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "fb3b5e8fef2396c2b49f3c05e1fe43a99ad2bb21fe9fb220b01e70b35da2fc2d",
+      "assetPath": "assets/equipment/mage/catalog-024.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "寒星"
+    },
+    {
+      "classType": "mage",
+      "index": 25,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000007dc48207b59c1c429fd82fb0.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b3f68b0840511ba532d1167e5120e6285f8c286e448b19c4f4c77990a22bd735",
+      "assetPath": "assets/equipment/mage/catalog-025.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "冰雲"
+    },
+    {
+      "classType": "mage",
+      "index": 26,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000007fe882118fe46c8c95710664.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6b3d813c148e50b45c6b68ce19eb28b4f21b7eb18c0df33d386f51f340eda43f",
+      "assetPath": "assets/equipment/mage/catalog-026.webp",
+      "type": "weapon",
+      "weaponKind": "扇",
+      "theme": "血影"
+    },
+    {
+      "classType": "mage",
+      "index": 27,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_0000000080648207bb859e306db23a9d.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "594e847cb28efac22f949593f7d0023421f62a94fc9274a915cd53054e0a36fa",
+      "assetPath": "assets/equipment/mage/catalog-027.webp",
+      "type": "weapon",
+      "weaponKind": "杖",
+      "theme": "翠環"
+    },
+    {
+      "classType": "mage",
+      "index": 28,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_0000000084e88211a6c94e493be2dc67.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1efd4a90a27e63a687c321a7cd0c4a819c4aa0204b4b96d39b3a25e730414fa2",
+      "assetPath": "assets/equipment/mage/catalog-028.webp",
+      "type": "weapon",
+      "weaponKind": "杖",
+      "theme": "翠羽"
+    },
+    {
+      "classType": "mage",
+      "index": 29,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000008d7c8207a763ec955f886ea2.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "9f01d28577b59128dff6d66d9dbad5c689751bd3215a624ccd12cdc8feb543c7",
+      "assetPath": "assets/equipment/mage/catalog-029.webp",
+      "type": "weapon",
+      "weaponKind": "杖",
+      "theme": "冰蓮"
+    },
+    {
+      "classType": "mage",
+      "index": 30,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000008d80821181c0b89cfa374b02.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "fae93ab836a8807b038a9510c788fd11fbc15269945743f71510fa4391699b0f",
+      "assetPath": "assets/equipment/mage/catalog-030.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "藍金"
+    },
+    {
+      "classType": "mage",
+      "index": 31,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000008f5c82118e5db2e8afea22ba.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "aeac534016cd9f9ab1a54080e2eea4bc31650ce8d04700ca0d0ff92baa0cf954",
+      "assetPath": "assets/equipment/mage/catalog-031.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "日曜"
+    },
+    {
+      "classType": "mage",
+      "index": 32,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000966c8211b4cd0be15771c979.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ab9776671720ecc2891c3d4133b095b1ace2fb3c2f6b617a96e633464f1b343a",
+      "assetPath": "assets/equipment/mage/catalog-032.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "紫星"
+    },
+    {
+      "classType": "mage",
+      "index": 33,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_0000000097808209b1d9d3097cdf67b2.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3960bfc8107f055c01bc648fe978524995353309619b017c43df25541e551be8",
+      "assetPath": "assets/equipment/mage/catalog-033.webp",
+      "type": "weapon",
+      "weaponKind": "杖",
+      "theme": "墨金"
+    },
+    {
+      "classType": "mage",
+      "index": 34,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_0000000097f88211b96bc311e281158b.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "707d37de75d3610bda32b31453726e9dc4c86bd5157b2e3d69c16c448a20cd80",
+      "assetPath": "assets/equipment/mage/catalog-034.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "白金"
+    },
+    {
+      "classType": "mage",
+      "index": 35,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000009b78821185b718895ff4dad2.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "7c8e62dd3ce1a6d260699a1cfd31c518950cf706bf3b0aa4a9dc34fc467070c5",
+      "assetPath": "assets/equipment/mage/catalog-035.webp",
+      "type": "weapon",
+      "weaponKind": "扇",
+      "theme": "墨竹"
+    },
+    {
+      "classType": "mage",
+      "index": 36,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000009ca08211bb1b6265b7396043.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "9c3ad37990f2c79fadbf651cf8cc6f61565838c73ff7d84ad0c56fcc71a496f5",
+      "assetPath": "assets/equipment/mage/catalog-036.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "紫晶"
+    },
+    {
+      "classType": "mage",
+      "index": 37,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000009d9c8211816d55fd9d8d5363.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "65d1ca5f64b559960446cc02e1898402963643d19d305acbe6b03484e55ca2f7",
+      "assetPath": "assets/equipment/mage/catalog-037.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "墨紫"
+    },
+    {
+      "classType": "mage",
+      "index": 38,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_000000009e1c82119e4a6b7aeec464e8.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "14f48e7a8a66543ccc1bb44b163beadc584c451d21447dda307063d44c231740",
+      "assetPath": "assets/equipment/mage/catalog-038.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "金星"
+    },
+    {
+      "classType": "mage",
+      "index": 39,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000bca082078daf21e296cad7fe.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "4590ea33cc0e1f3700cdbeb4b3da1f88f51319dad6d9727422351ce24443be24",
+      "assetPath": "assets/equipment/mage/catalog-039.webp",
+      "type": "weapon",
+      "weaponKind": "扇",
+      "theme": "烈焰"
+    },
+    {
+      "classType": "mage",
+      "index": 40,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000bd108211b7e6df81b8fe075b.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "29184d3196125a36a83c2ed44776d56e2815855cb33a2ac7b99b7f32b5001e6d",
+      "assetPath": "assets/equipment/mage/catalog-040.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "滄玉"
+    },
+    {
+      "classType": "mage",
+      "index": 41,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000bd448207a12b997bf7cc4d2d.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "81b56a4ef60e77a67a6bc7d8ba28ebaf8d87806ee5d51dbcf65fe9233eec6826",
+      "assetPath": "assets/equipment/mage/catalog-041.webp",
+      "type": "weapon",
+      "weaponKind": "杖",
+      "theme": "紫晶"
+    },
+    {
+      "classType": "mage",
+      "index": 42,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000bf8c8211a89d2a847fff1325.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "46b9e0e184238e604d058345d091b654adc5b7fea5b58b263d8f64e9cb36a7c9",
+      "assetPath": "assets/equipment/mage/catalog-042.webp",
+      "type": "shoes",
+      "weaponKind": null,
+      "theme": "白星"
+    },
+    {
+      "classType": "mage",
+      "index": 43,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000c07082119a63c524a5cfb9a1.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c5573ef27f9a319ed7d73c632dd5106d06163a71a50f55ee7c5e315a6cc4f599",
+      "assetPath": "assets/equipment/mage/catalog-043.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "炎羽"
+    },
+    {
+      "classType": "mage",
+      "index": 44,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000c6588207a47c368963334bb9.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b74b02e60339b02a1da42645c5dbe7bf2f128dcfc6034516d40b1b10e62db8a4",
+      "assetPath": "assets/equipment/mage/catalog-044.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "赤金"
+    },
+    {
+      "classType": "mage",
+      "index": 45,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000cb648211b4a8702c81600b7f.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "74c2b05d9b54c255a7f36baed41d4dffe6683f9d9d6c58569d785cb618c95530",
+      "assetPath": "assets/equipment/mage/catalog-045.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "藍月"
+    },
+    {
+      "classType": "mage",
+      "index": 46,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000cd208207bbb926d565ea2f59.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "25e6e1e9d1ac739325eea2c9e253537d580c5090da73c8338b52e8a341a2ae39",
+      "assetPath": "assets/equipment/mage/catalog-046.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "血月"
+    },
+    {
+      "classType": "mage",
+      "index": 47,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000cfac82119effa448def68bcb.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "5f18c7a7474578cc95f7ec39059333cc542229b3c14f6f0613d210d01c317274",
+      "assetPath": "assets/equipment/mage/catalog-047.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "金星"
+    },
+    {
+      "classType": "mage",
+      "index": 48,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000db4082078ea5876dbb07189f.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "93dc34f70fb2af316d7f6672b603c021a33ee1177fdd354cd607c99d2f6e9053",
+      "assetPath": "assets/equipment/mage/catalog-048.webp",
+      "type": "weapon",
+      "weaponKind": "杖",
+      "theme": "青風"
+    },
+    {
+      "classType": "mage",
+      "index": 49,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000dde082118c18c0cc55731b5c.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f676edf88869280a090242eb961b9f57dec4637be81b8366b20f99f310ddb489",
+      "assetPath": "assets/equipment/mage/catalog-049.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "古玉"
+    },
+    {
+      "classType": "mage",
+      "index": 50,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000e2dc8211bb15bcd4c670890e.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "39b65fb2c919687b7b0cf5483c25b7f640c908666f9ebdeaae0e79d972434a19",
+      "assetPath": "assets/equipment/mage/catalog-050.webp",
+      "type": "weapon",
+      "weaponKind": "杖",
+      "theme": "金輪"
+    },
+    {
+      "classType": "mage",
+      "index": 51,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000ec0882119ed087c81183f0cf.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "00bca8ff13e13cea8928f782e8e5ef60a560c4b90a60429f09c6cb8b25b88ee0",
+      "assetPath": "assets/equipment/mage/catalog-051.webp",
+      "type": "armor",
+      "weaponKind": null,
+      "theme": "流藍"
+    },
+    {
+      "classType": "mage",
+      "index": 52,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000ed38821195702baa2af374e9.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "65db49d421529b442a5d4b0f77b4dd03a089042247e994d9571c404703e9d305",
+      "assetPath": "assets/equipment/mage/catalog-052.webp",
+      "type": "weapon",
+      "weaponKind": "扇",
+      "theme": "桃花"
+    },
+    {
+      "classType": "mage",
+      "index": 53,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000efe48211a63aad2e9575c9c5.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a58a453903d48f2ada4ef814eef221a28b2a5827e20ecdf2a21bbc1ff48bdae8",
+      "assetPath": "assets/equipment/mage/catalog-053.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "墨玉"
+    },
+    {
+      "classType": "mage",
+      "index": 54,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000f160820996022d6ac868b710.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "05aa46ec41719755c59b7efafc91b293297a65f2b9d3544c0ec78a18a0a01aa3",
+      "assetPath": "assets/equipment/mage/catalog-054.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "幽月"
+    },
+    {
+      "classType": "mage",
+      "index": 55,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000f1f88206b102a32c6225c3b6.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d9e8779d319f7c03611d8075caa39a2dc33fc33a77654ef0591ec065796bdb38",
+      "assetPath": "assets/equipment/mage/catalog-055.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "翠竹"
+    },
+    {
+      "classType": "mage",
+      "index": 56,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000f2d4820798efd3eb02bdbdc2.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ce0f3081a390ee0e4f7019b347e7ab46d14d4202409e5e2617a7055d8e869ec0",
+      "assetPath": "assets/equipment/mage/catalog-056.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "炎羽"
+    },
+    {
+      "classType": "mage",
+      "index": 57,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000f51082119b70a825c86b90d9.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c06e6aa115eb854f660a3ebcffa6d6f6117929340641901699e5528e847d8b27",
+      "assetPath": "assets/equipment/mage/catalog-057.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "月銀"
+    },
+    {
+      "classType": "mage",
+      "index": 58,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000f5408211bb34358cb38d9efa.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a7ed5e78bfa09eebe7a96e6d6f3cc59af8283f2805b405068a9ffc03e3ae8153",
+      "assetPath": "assets/equipment/mage/catalog-058.webp",
+      "type": "head",
+      "weaponKind": null,
+      "theme": "赤金"
+    },
+    {
+      "classType": "mage",
+      "index": 59,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000f6e082079087bb25d0d5a864.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6ecb4ce77fd7823a80c1f03db2632ecc9161eeb4d1433a63b478f48baea72353",
+      "assetPath": "assets/equipment/mage/catalog-059.webp",
+      "type": "shoulder",
+      "weaponKind": null,
+      "theme": "白金"
+    },
+    {
+      "classType": "mage",
+      "index": 60,
+      "source": "assets/inbox/法師裝備/法師紫、橙階裝備/file_00000000f78c821197742841c548c6e1.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e31004f04e497a9664d56c440d82cfdb9713cf995265d36aecb48bac92162097",
+      "assetPath": "assets/equipment/mage/catalog-060.webp",
+      "type": "weapon",
+      "weaponKind": "扇",
+      "theme": "赤凰"
+    },
+    {
+      "classType": "warrior",
+      "index": 1,
+      "legacy": true,
+      "source": "assets/equipment/warrior/armor-01.png",
+      "assetPath": "assets/equipment/warrior/armor-01.png",
+      "type": "armor",
+      "theme": "棕革",
+      "weaponKind": null,
+      "size": [
+        245,
+        248
+      ],
+      "sha256": "a9221a79d4ec91f895f46dfa2510896f916db8dd863b077e9f6d47792e00406b"
+    },
+    {
+      "classType": "warrior",
+      "index": 2,
+      "legacy": true,
+      "source": "assets/equipment/warrior/armor-02.png",
+      "assetPath": "assets/equipment/warrior/armor-02.png",
+      "type": "armor",
+      "theme": "青鋼",
+      "weaponKind": null,
+      "size": [
+        246,
+        249
+      ],
+      "sha256": "3e5107292f1bdacdc64bb4e004ba88988d36154c1c1e89fc7180059710da2a26"
+    },
+    {
+      "classType": "warrior",
+      "index": 3,
+      "legacy": true,
+      "source": "assets/equipment/warrior/bracer-01.png",
+      "assetPath": "assets/equipment/warrior/bracer-01.png",
+      "type": "shoulder",
+      "theme": "皮紋",
+      "weaponKind": null,
+      "size": [
+        236,
+        271
+      ],
+      "sha256": "d040d160e6b8b577b1d7a309d048bb65586d2e0db986902c276490a938181c47"
+    },
+    {
+      "classType": "warrior",
+      "index": 4,
+      "legacy": true,
+      "source": "assets/equipment/warrior/bracer-02.png",
+      "assetPath": "assets/equipment/warrior/bracer-02.png",
+      "type": "shoulder",
+      "theme": "烏鋼",
+      "weaponKind": null,
+      "size": [
+        238,
+        280
+      ],
+      "sha256": "dcfb6f4814d5b4505cdb3252e3283b1da1423eabad8db3b4af93ee387ba680bf"
+    },
+    {
+      "classType": "warrior",
+      "index": 5,
+      "legacy": true,
+      "source": "assets/equipment/warrior/head-01.png",
+      "assetPath": "assets/equipment/warrior/head-01.png",
+      "type": "head",
+      "theme": "素鐵",
+      "weaponKind": null,
+      "size": [
+        198,
+        241
+      ],
+      "sha256": "79072df848266d6054350df8f71aab0407c6092fa750798d9eb37405bc575c2f"
+    },
+    {
+      "classType": "warrior",
+      "index": 6,
+      "legacy": true,
+      "source": "assets/equipment/warrior/head-02.png",
+      "assetPath": "assets/equipment/warrior/head-02.png",
+      "type": "head",
+      "theme": "墨鋼",
+      "weaponKind": null,
+      "size": [
+        186,
+        258
+      ],
+      "sha256": "e4bb066db7036a0d68777aa17b8531ce8204fa7fbe68b0c60a09aca7225dc1f5"
+    },
+    {
+      "classType": "warrior",
+      "index": 7,
+      "legacy": true,
+      "source": "assets/equipment/warrior/shoes-01.png",
+      "assetPath": "assets/equipment/warrior/shoes-01.png",
+      "type": "shoes",
+      "theme": "粗革",
+      "weaponKind": null,
+      "size": [
+        223,
+        255
+      ],
+      "sha256": "dd02993ce44571f2f5941cfd2d718d268d2b72d1bf09285f2bb41a2ac926cafa"
+    },
+    {
+      "classType": "warrior",
+      "index": 8,
+      "legacy": true,
+      "source": "assets/equipment/warrior/shoes-02.png",
+      "assetPath": "assets/equipment/warrior/shoes-02.png",
+      "type": "shoes",
+      "theme": "鐵獅",
+      "weaponKind": null,
+      "size": [
+        217,
+        262
+      ],
+      "sha256": "ff1c26170bd8d6e9cecfcd667c0d097973c9f867f48ee4669b30d0304bcd0f68"
+    },
+    {
+      "classType": "warrior",
+      "index": 9,
+      "legacy": true,
+      "source": "assets/equipment/warrior/weapon-01.png",
+      "assetPath": "assets/equipment/warrior/weapon-01.png",
+      "type": "weapon",
+      "theme": "鈍鐵",
+      "weaponKind": "刀",
+      "size": [
+        256,
+        258
+      ],
+      "sha256": "569bbee841fe4ec904b2fa32e63f067fdee2da30b7476d7342143364bd2a94a9"
+    },
+    {
+      "classType": "warrior",
+      "index": 10,
+      "legacy": true,
+      "source": "assets/equipment/warrior/weapon-02.png",
+      "assetPath": "assets/equipment/warrior/weapon-02.png",
+      "type": "weapon",
+      "theme": "銅紋",
+      "weaponKind": "刀",
+      "size": [
+        260,
+        261
+      ],
+      "sha256": "12bdac54e0446933f7a913b8acc99e696542cbd98fe634c1795107c41bab3137"
+    },
+    {
+      "classType": "warrior",
+      "index": 11,
+      "legacy": true,
+      "source": "assets/equipment/warrior/weapon-03.png",
+      "assetPath": "assets/equipment/warrior/weapon-03.png",
+      "type": "weapon",
+      "theme": "金穗",
+      "weaponKind": "劍",
+      "size": [
+        278,
+        285
+      ],
+      "sha256": "8d279c326a3cbe279807f4cb317d51e1899e58ad388a8f62bc57ec29f367c67c"
+    },
+    {
+      "classType": "warrior",
+      "index": 12,
+      "legacy": true,
+      "source": "assets/equipment/warrior/weapon-04.png",
+      "assetPath": "assets/equipment/warrior/weapon-04.png",
+      "type": "weapon",
+      "theme": "藍穗",
+      "weaponKind": "劍",
+      "size": [
+        270,
+        285
+      ],
+      "sha256": "8c7f36022ccdf71a4994ce1b454fb3a025a2194b6589ab126ae2cd4d4e80ef02"
+    },
+    {
+      "classType": "mage",
+      "index": 1,
+      "legacy": true,
+      "source": "assets/equipment/mage/armor-01.png",
+      "assetPath": "assets/equipment/mage/armor-01.png",
+      "type": "armor",
+      "theme": "雲藍",
+      "weaponKind": null,
+      "size": [
+        267,
+        291
+      ],
+      "sha256": "d5b08766966dfdbc1591f18fd9bce51728689a2277c43a9aae15467f687cc03f"
+    },
+    {
+      "classType": "mage",
+      "index": 2,
+      "legacy": true,
+      "source": "assets/equipment/mage/armor-02.png",
+      "assetPath": "assets/equipment/mage/armor-02.png",
+      "type": "armor",
+      "theme": "墨紅",
+      "weaponKind": null,
+      "size": [
+        261,
+        292
+      ],
+      "sha256": "ca922512777583e8f5a6130dbf1e0400f71e44110037474b062f02d11ae96a0a"
+    },
+    {
+      "classType": "mage",
+      "index": 3,
+      "legacy": true,
+      "source": "assets/equipment/mage/bracer-01.png",
+      "assetPath": "assets/equipment/mage/bracer-01.png",
+      "type": "shoulder",
+      "theme": "銀浪",
+      "weaponKind": null,
+      "size": [
+        252,
+        272
+      ],
+      "sha256": "7f60a96a5ae1480a2b5707e1b58a318a66aef7aa62ad41b53b01ef0ab1ac7065"
+    },
+    {
+      "classType": "mage",
+      "index": 4,
+      "legacy": true,
+      "source": "assets/equipment/mage/bracer-02.png",
+      "assetPath": "assets/equipment/mage/bracer-02.png",
+      "type": "shoulder",
+      "theme": "玄卦",
+      "weaponKind": null,
+      "size": [
+        251,
+        283
+      ],
+      "sha256": "4e3bea5c3a50ecfb074ec5f3f800958a8c46e93dd1c3b222cc8b31c906446744"
+    },
+    {
+      "classType": "mage",
+      "index": 5,
+      "legacy": true,
+      "source": "assets/equipment/mage/head-01.png",
+      "assetPath": "assets/equipment/mage/head-01.png",
+      "type": "head",
+      "theme": "藍月",
+      "weaponKind": null,
+      "size": [
+        280,
+        263
+      ],
+      "sha256": "74e357cac91098695a77a8142b0b83dcc3614381e9579ac0d3750126eef7dbc4"
+    },
+    {
+      "classType": "mage",
+      "index": 6,
+      "legacy": true,
+      "source": "assets/equipment/mage/head-02.png",
+      "assetPath": "assets/equipment/mage/head-02.png",
+      "type": "head",
+      "theme": "赤結",
+      "weaponKind": null,
+      "size": [
+        289,
+        287
+      ],
+      "sha256": "c4190b3cf29e44d7004eac88e092edc9109c22370d06a437bfe1a578beb6366c"
+    },
+    {
+      "classType": "mage",
+      "index": 7,
+      "legacy": true,
+      "source": "assets/equipment/mage/shoes-01.png",
+      "assetPath": "assets/equipment/mage/shoes-01.png",
+      "type": "shoes",
+      "theme": "冰紋",
+      "weaponKind": null,
+      "size": [
+        276,
+        264
+      ],
+      "sha256": "d781606a20210d48ae2e4beb2d00c6a50cab26027cbfa15a26757fa3f441f376"
+    },
+    {
+      "classType": "mage",
+      "index": 8,
+      "legacy": true,
+      "source": "assets/equipment/mage/shoes-02.png",
+      "assetPath": "assets/equipment/mage/shoes-02.png",
+      "type": "shoes",
+      "theme": "紫玉",
+      "weaponKind": null,
+      "size": [
+        256,
+        284
+      ],
+      "sha256": "04902b237e032b5de0064a0a8c47aa18b0a1fd5751d6e7008feed9a2a070e01c"
+    },
+    {
+      "classType": "mage",
+      "index": 9,
+      "legacy": true,
+      "source": "assets/equipment/mage/weapon-01.png",
+      "assetPath": "assets/equipment/mage/weapon-01.png",
+      "type": "weapon",
+      "theme": "金環",
+      "weaponKind": "杖",
+      "size": [
+        257,
+        270
+      ],
+      "sha256": "de7da9b1f204a70fabb069382a79e1a3d659b020a71a40a5dfe1a5a2f1dbe3dd"
+    },
+    {
+      "classType": "mage",
+      "index": 10,
+      "legacy": true,
+      "source": "assets/equipment/mage/weapon-02.png",
+      "assetPath": "assets/equipment/mage/weapon-02.png",
+      "type": "weapon",
+      "theme": "冰環",
+      "weaponKind": "杖",
+      "size": [
+        251,
+        277
+      ],
+      "sha256": "de16c1cf46d9f7c548536d352f0f1c8a64df1e29652a6facfcada0ce44b9501a"
+    },
+    {
+      "classType": "mage",
+      "index": 11,
+      "legacy": true,
+      "source": "assets/equipment/mage/weapon-03.png",
+      "assetPath": "assets/equipment/mage/weapon-03.png",
+      "type": "weapon",
+      "theme": "青竹",
+      "weaponKind": "扇",
+      "size": [
+        293,
+        295
+      ],
+      "sha256": "a6effb5c050001ba3ab73888747d905bcc0d235fb23f030daeffa3def5033c6c"
+    },
+    {
+      "classType": "mage",
+      "index": 12,
+      "legacy": true,
+      "source": "assets/equipment/mage/weapon-04.png",
+      "assetPath": "assets/equipment/mage/weapon-04.png",
+      "type": "weapon",
+      "theme": "滄浪",
+      "weaponKind": "扇",
+      "size": [
+        297,
+        300
+      ],
+      "sha256": "1f0b66f840d1201a9118c0cac64ca693d1a5fb2910950e99a0e2ac0f0a5f040a"
+    }
+  ],
+  "equipment": [
+    {
+      "name": "紫霞銀龍戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-001.webp",
+      "stats": {
+        "vitality": 17
+      }
+    },
+    {
+      "name": "幽月銀龍戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-001.webp",
+      "stats": {
+        "agility": 20
+      }
+    },
+    {
+      "name": "日曜銀龍戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-001.webp",
+      "stats": {
+        "vitality": 23
+      }
+    },
+    {
+      "name": "天衡銀龍戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-001.webp",
+      "stats": {
+        "agility": 26
+      }
+    },
+    {
+      "name": "紫霞赤焰戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-002.webp",
+      "stats": {
+        "vitality": 18
+      }
+    },
+    {
+      "name": "幽月赤焰戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-002.webp",
+      "stats": {
+        "agility": 21
+      }
+    },
+    {
+      "name": "日曜赤焰戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-002.webp",
+      "stats": {
+        "vitality": 24
+      }
+    },
+    {
+      "name": "天衡赤焰戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-002.webp",
+      "stats": {
+        "agility": 27
+      }
+    },
+    {
+      "name": "紫霞赤羽戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-003.webp",
+      "stats": {
+        "vitality": 19
+      }
+    },
+    {
+      "name": "幽月赤羽戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-003.webp",
+      "stats": {
+        "attack": 22
+      }
+    },
+    {
+      "name": "日曜赤羽戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-003.webp",
+      "stats": {
+        "vitality": 25
+      }
+    },
+    {
+      "name": "天衡赤羽戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-003.webp",
+      "stats": {
+        "attack": 28
+      }
+    },
+    {
+      "name": "紫霞金龍戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-004.webp",
+      "stats": {
+        "attack": 20
+      }
+    },
+    {
+      "name": "幽月金龍戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-004.webp",
+      "stats": {
+        "defensePoints": 17
+      }
+    },
+    {
+      "name": "日曜金龍戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-004.webp",
+      "stats": {
+        "attack": 26
+      }
+    },
+    {
+      "name": "天衡金龍戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-004.webp",
+      "stats": {
+        "defensePoints": 23
+      }
+    },
+    {
+      "name": "紫霞玄紅戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-005.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "幽月玄紅戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-005.webp",
+      "stats": {
+        "vitality": 18
+      }
+    },
+    {
+      "name": "日曜玄紅戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-005.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "天衡玄紅戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-005.webp",
+      "stats": {
+        "vitality": 24
+      }
+    },
+    {
+      "name": "紫霞紫晶長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-006.webp",
+      "stats": {
+        "attack": 22
+      }
+    },
+    {
+      "name": "幽月紫晶長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-006.webp",
+      "stats": {
+        "attack": 19
+      }
+    },
+    {
+      "name": "日曜紫晶長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-006.webp",
+      "stats": {
+        "attack": 28
+      }
+    },
+    {
+      "name": "天衡紫晶長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-006.webp",
+      "stats": {
+        "attack": 25
+      }
+    },
+    {
+      "name": "紫霞墨龍戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-007.webp",
+      "stats": {
+        "agility": 17
+      }
+    },
+    {
+      "name": "幽月墨龍戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-007.webp",
+      "stats": {
+        "defensePoints": 20
+      }
+    },
+    {
+      "name": "日曜墨龍戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-007.webp",
+      "stats": {
+        "agility": 23
+      }
+    },
+    {
+      "name": "天衡墨龍戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-007.webp",
+      "stats": {
+        "defensePoints": 26
+      }
+    },
+    {
+      "name": "紫霞冰晶長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-008.webp",
+      "stats": {
+        "attack": 18
+      }
+    },
+    {
+      "name": "幽月冰晶長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-008.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "日曜冰晶長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-008.webp",
+      "stats": {
+        "attack": 24
+      }
+    },
+    {
+      "name": "天衡冰晶長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-008.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "紫霞碧玉長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-009.webp",
+      "stats": {
+        "attack": 19
+      }
+    },
+    {
+      "name": "幽月碧玉長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-009.webp",
+      "stats": {
+        "attack": 22
+      }
+    },
+    {
+      "name": "日曜碧玉長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-009.webp",
+      "stats": {
+        "attack": 25
+      }
+    },
+    {
+      "name": "天衡碧玉長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-009.webp",
+      "stats": {
+        "attack": 28
+      }
+    },
+    {
+      "name": "紫霞白羽長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-010.webp",
+      "stats": {
+        "attack": 20
+      }
+    },
+    {
+      "name": "幽月白羽長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-010.webp",
+      "stats": {
+        "attack": 17
+      }
+    },
+    {
+      "name": "日曜白羽長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-010.webp",
+      "stats": {
+        "attack": 26
+      }
+    },
+    {
+      "name": "天衡白羽長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-010.webp",
+      "stats": {
+        "attack": 23
+      }
+    },
+    {
+      "name": "紫霞霜雪戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-011.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "幽月霜雪戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-011.webp",
+      "stats": {
+        "attack": 18
+      }
+    },
+    {
+      "name": "日曜霜雪戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-011.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "天衡霜雪戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-011.webp",
+      "stats": {
+        "attack": 24
+      }
+    },
+    {
+      "name": "紫霞血影戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-012.webp",
+      "stats": {
+        "vitality": 22
+      }
+    },
+    {
+      "name": "幽月血影戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-012.webp",
+      "stats": {
+        "agility": 19
+      }
+    },
+    {
+      "name": "日曜血影戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-012.webp",
+      "stats": {
+        "vitality": 28
+      }
+    },
+    {
+      "name": "天衡血影戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-012.webp",
+      "stats": {
+        "agility": 25
+      }
+    },
+    {
+      "name": "紫霞翠龍護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-013.webp",
+      "stats": {
+        "vitality": 17
+      }
+    },
+    {
+      "name": "幽月翠龍護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-013.webp",
+      "stats": {
+        "attack": 20
+      }
+    },
+    {
+      "name": "日曜翠龍護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-013.webp",
+      "stats": {
+        "vitality": 23
+      }
+    },
+    {
+      "name": "天衡翠龍護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-013.webp",
+      "stats": {
+        "attack": 26
+      }
+    },
+    {
+      "name": "紫霞赤龍戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-014.webp",
+      "stats": {
+        "attack": 18
+      }
+    },
+    {
+      "name": "幽月赤龍戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-014.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "日曜赤龍戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-014.webp",
+      "stats": {
+        "attack": 24
+      }
+    },
+    {
+      "name": "天衡赤龍戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-014.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "紫霞黑翼護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-015.webp",
+      "stats": {
+        "defensePoints": 19
+      }
+    },
+    {
+      "name": "幽月黑翼護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-015.webp",
+      "stats": {
+        "vitality": 22
+      }
+    },
+    {
+      "name": "日曜黑翼護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-015.webp",
+      "stats": {
+        "defensePoints": 25
+      }
+    },
+    {
+      "name": "天衡黑翼護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-015.webp",
+      "stats": {
+        "vitality": 28
+      }
+    },
+    {
+      "name": "紫霞玄金戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-016.webp",
+      "stats": {
+        "vitality": 20
+      }
+    },
+    {
+      "name": "幽月玄金戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-016.webp",
+      "stats": {
+        "attack": 17
+      }
+    },
+    {
+      "name": "日曜玄金戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-016.webp",
+      "stats": {
+        "vitality": 26
+      }
+    },
+    {
+      "name": "天衡玄金戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-016.webp",
+      "stats": {
+        "attack": 23
+      }
+    },
+    {
+      "name": "紫霞赤鱗戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-017.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "幽月赤鱗戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-017.webp",
+      "stats": {
+        "defensePoints": 18
+      }
+    },
+    {
+      "name": "日曜赤鱗戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-017.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "天衡赤鱗戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-017.webp",
+      "stats": {
+        "defensePoints": 24
+      }
+    },
+    {
+      "name": "紫霞赤金長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-018.webp",
+      "stats": {
+        "attack": 22
+      }
+    },
+    {
+      "name": "幽月赤金長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-018.webp",
+      "stats": {
+        "attack": 19
+      }
+    },
+    {
+      "name": "日曜赤金長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-018.webp",
+      "stats": {
+        "attack": 28
+      }
+    },
+    {
+      "name": "天衡赤金長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-018.webp",
+      "stats": {
+        "attack": 25
+      }
+    },
+    {
+      "name": "紫霞翠龍戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-019.webp",
+      "stats": {
+        "attack": 17
+      }
+    },
+    {
+      "name": "幽月翠龍戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-019.webp",
+      "stats": {
+        "attack": 20
+      }
+    },
+    {
+      "name": "日曜翠龍戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-019.webp",
+      "stats": {
+        "attack": 23
+      }
+    },
+    {
+      "name": "天衡翠龍戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-019.webp",
+      "stats": {
+        "attack": 26
+      }
+    },
+    {
+      "name": "紫霞滄浪戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-020.webp",
+      "stats": {
+        "attack": 18
+      }
+    },
+    {
+      "name": "幽月滄浪戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-020.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "日曜滄浪戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-020.webp",
+      "stats": {
+        "attack": 24
+      }
+    },
+    {
+      "name": "天衡滄浪戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-020.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "紫霞玄金戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-021.webp",
+      "stats": {
+        "agility": 19
+      }
+    },
+    {
+      "name": "幽月玄金戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-021.webp",
+      "stats": {
+        "attack": 22
+      }
+    },
+    {
+      "name": "日曜玄金戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-021.webp",
+      "stats": {
+        "agility": 25
+      }
+    },
+    {
+      "name": "天衡玄金戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-021.webp",
+      "stats": {
+        "attack": 28
+      }
+    },
+    {
+      "name": "紫霞雷霆戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-022.webp",
+      "stats": {
+        "attack": 20
+      }
+    },
+    {
+      "name": "幽月雷霆戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-022.webp",
+      "stats": {
+        "attack": 17
+      }
+    },
+    {
+      "name": "日曜雷霆戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-022.webp",
+      "stats": {
+        "attack": 26
+      }
+    },
+    {
+      "name": "天衡雷霆戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-022.webp",
+      "stats": {
+        "attack": 23
+      }
+    },
+    {
+      "name": "紫霞金羽戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-023.webp",
+      "stats": {
+        "agility": 21
+      }
+    },
+    {
+      "name": "幽月金羽戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-023.webp",
+      "stats": {
+        "defensePoints": 18
+      }
+    },
+    {
+      "name": "日曜金羽戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-023.webp",
+      "stats": {
+        "agility": 27
+      }
+    },
+    {
+      "name": "天衡金羽戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-023.webp",
+      "stats": {
+        "defensePoints": 24
+      }
+    },
+    {
+      "name": "紫霞滄龍護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-024.webp",
+      "stats": {
+        "attack": 22
+      }
+    },
+    {
+      "name": "幽月滄龍護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-024.webp",
+      "stats": {
+        "defensePoints": 19
+      }
+    },
+    {
+      "name": "日曜滄龍護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-024.webp",
+      "stats": {
+        "attack": 28
+      }
+    },
+    {
+      "name": "天衡滄龍護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-024.webp",
+      "stats": {
+        "defensePoints": 25
+      }
+    },
+    {
+      "name": "紫霞白羽戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-025.webp",
+      "stats": {
+        "vitality": 17
+      }
+    },
+    {
+      "name": "幽月白羽戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-025.webp",
+      "stats": {
+        "attack": 20
+      }
+    },
+    {
+      "name": "日曜白羽戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-025.webp",
+      "stats": {
+        "vitality": 23
+      }
+    },
+    {
+      "name": "天衡白羽戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-025.webp",
+      "stats": {
+        "attack": 26
+      }
+    },
+    {
+      "name": "紫霞玄鐵長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-026.webp",
+      "stats": {
+        "attack": 18
+      }
+    },
+    {
+      "name": "幽月玄鐵長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-026.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "日曜玄鐵長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-026.webp",
+      "stats": {
+        "attack": 24
+      }
+    },
+    {
+      "name": "天衡玄鐵長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-026.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "紫霞翡翠戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-027.webp",
+      "stats": {
+        "attack": 19
+      }
+    },
+    {
+      "name": "幽月翡翠戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-027.webp",
+      "stats": {
+        "attack": 22
+      }
+    },
+    {
+      "name": "日曜翡翠戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-027.webp",
+      "stats": {
+        "attack": 25
+      }
+    },
+    {
+      "name": "天衡翡翠戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-027.webp",
+      "stats": {
+        "attack": 28
+      }
+    },
+    {
+      "name": "紫霞寒霜戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-028.webp",
+      "stats": {
+        "agility": 20
+      }
+    },
+    {
+      "name": "幽月寒霜戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-028.webp",
+      "stats": {
+        "defensePoints": 17
+      }
+    },
+    {
+      "name": "日曜寒霜戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-028.webp",
+      "stats": {
+        "agility": 26
+      }
+    },
+    {
+      "name": "天衡寒霜戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-028.webp",
+      "stats": {
+        "defensePoints": 23
+      }
+    },
+    {
+      "name": "紫霞紫金戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-029.webp",
+      "stats": {
+        "vitality": 21
+      }
+    },
+    {
+      "name": "幽月紫金戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-029.webp",
+      "stats": {
+        "agility": 18
+      }
+    },
+    {
+      "name": "日曜紫金戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-029.webp",
+      "stats": {
+        "vitality": 27
+      }
+    },
+    {
+      "name": "天衡紫金戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-029.webp",
+      "stats": {
+        "agility": 24
+      }
+    },
+    {
+      "name": "紫霞金獅護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-030.webp",
+      "stats": {
+        "vitality": 22
+      }
+    },
+    {
+      "name": "幽月金獅護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-030.webp",
+      "stats": {
+        "attack": 19
+      }
+    },
+    {
+      "name": "日曜金獅護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-030.webp",
+      "stats": {
+        "vitality": 28
+      }
+    },
+    {
+      "name": "天衡金獅護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-030.webp",
+      "stats": {
+        "attack": 25
+      }
+    },
+    {
+      "name": "紫霞魔角戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-031.webp",
+      "stats": {
+        "vitality": 17
+      }
+    },
+    {
+      "name": "幽月魔角戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-031.webp",
+      "stats": {
+        "attack": 20
+      }
+    },
+    {
+      "name": "日曜魔角戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-031.webp",
+      "stats": {
+        "vitality": 23
+      }
+    },
+    {
+      "name": "天衡魔角戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-031.webp",
+      "stats": {
+        "attack": 26
+      }
+    },
+    {
+      "name": "紫霞墨影長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-032.webp",
+      "stats": {
+        "attack": 18
+      }
+    },
+    {
+      "name": "幽月墨影長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-032.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "日曜墨影長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-032.webp",
+      "stats": {
+        "attack": 24
+      }
+    },
+    {
+      "name": "天衡墨影長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-032.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "紫霞血羽戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-033.webp",
+      "stats": {
+        "agility": 19
+      }
+    },
+    {
+      "name": "幽月血羽戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-033.webp",
+      "stats": {
+        "defensePoints": 22
+      }
+    },
+    {
+      "name": "日曜血羽戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-033.webp",
+      "stats": {
+        "agility": 25
+      }
+    },
+    {
+      "name": "天衡血羽戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-033.webp",
+      "stats": {
+        "defensePoints": 28
+      }
+    },
+    {
+      "name": "紫霞赤金戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-034.webp",
+      "stats": {
+        "vitality": 20
+      }
+    },
+    {
+      "name": "幽月赤金戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-034.webp",
+      "stats": {
+        "agility": 17
+      }
+    },
+    {
+      "name": "日曜赤金戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-034.webp",
+      "stats": {
+        "vitality": 26
+      }
+    },
+    {
+      "name": "天衡赤金戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-034.webp",
+      "stats": {
+        "agility": 23
+      }
+    },
+    {
+      "name": "紫霞青金戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-035.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "幽月青金戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-035.webp",
+      "stats": {
+        "attack": 18
+      }
+    },
+    {
+      "name": "日曜青金戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-035.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "天衡青金戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-035.webp",
+      "stats": {
+        "attack": 24
+      }
+    },
+    {
+      "name": "紫霞紫晶護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-036.webp",
+      "stats": {
+        "defensePoints": 22
+      }
+    },
+    {
+      "name": "幽月紫晶護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-036.webp",
+      "stats": {
+        "vitality": 19
+      }
+    },
+    {
+      "name": "日曜紫晶護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-036.webp",
+      "stats": {
+        "defensePoints": 28
+      }
+    },
+    {
+      "name": "天衡紫晶護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-036.webp",
+      "stats": {
+        "vitality": 25
+      }
+    },
+    {
+      "name": "紫霞烈焰長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-037.webp",
+      "stats": {
+        "attack": 17
+      }
+    },
+    {
+      "name": "幽月烈焰長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-037.webp",
+      "stats": {
+        "attack": 20
+      }
+    },
+    {
+      "name": "日曜烈焰長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-037.webp",
+      "stats": {
+        "attack": 23
+      }
+    },
+    {
+      "name": "天衡烈焰長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-037.webp",
+      "stats": {
+        "attack": 26
+      }
+    },
+    {
+      "name": "紫霞冰龍戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-038.webp",
+      "stats": {
+        "attack": 18
+      }
+    },
+    {
+      "name": "幽月冰龍戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-038.webp",
+      "stats": {
+        "defensePoints": 21
+      }
+    },
+    {
+      "name": "日曜冰龍戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-038.webp",
+      "stats": {
+        "attack": 24
+      }
+    },
+    {
+      "name": "天衡冰龍戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-038.webp",
+      "stats": {
+        "defensePoints": 27
+      }
+    },
+    {
+      "name": "紫霞翠鱗戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-039.webp",
+      "stats": {
+        "vitality": 19
+      }
+    },
+    {
+      "name": "幽月翠鱗戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-039.webp",
+      "stats": {
+        "agility": 22
+      }
+    },
+    {
+      "name": "日曜翠鱗戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-039.webp",
+      "stats": {
+        "vitality": 25
+      }
+    },
+    {
+      "name": "天衡翠鱗戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-039.webp",
+      "stats": {
+        "agility": 28
+      }
+    },
+    {
+      "name": "紫霞古銀戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-040.webp",
+      "stats": {
+        "attack": 20
+      }
+    },
+    {
+      "name": "幽月古銀戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-040.webp",
+      "stats": {
+        "vitality": 17
+      }
+    },
+    {
+      "name": "日曜古銀戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-040.webp",
+      "stats": {
+        "attack": 26
+      }
+    },
+    {
+      "name": "天衡古銀戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-040.webp",
+      "stats": {
+        "vitality": 23
+      }
+    },
+    {
+      "name": "紫霞炎龍護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-041.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "幽月炎龍護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-041.webp",
+      "stats": {
+        "defensePoints": 18
+      }
+    },
+    {
+      "name": "日曜炎龍護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-041.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "天衡炎龍護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-041.webp",
+      "stats": {
+        "defensePoints": 24
+      }
+    },
+    {
+      "name": "紫霞寒泉長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-042.webp",
+      "stats": {
+        "attack": 22
+      }
+    },
+    {
+      "name": "幽月寒泉長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-042.webp",
+      "stats": {
+        "attack": 19
+      }
+    },
+    {
+      "name": "日曜寒泉長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-042.webp",
+      "stats": {
+        "attack": 28
+      }
+    },
+    {
+      "name": "天衡寒泉長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-042.webp",
+      "stats": {
+        "attack": 25
+      }
+    },
+    {
+      "name": "紫霞日曜戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-043.webp",
+      "stats": {
+        "attack": 17
+      }
+    },
+    {
+      "name": "幽月日曜戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-043.webp",
+      "stats": {
+        "defensePoints": 20
+      }
+    },
+    {
+      "name": "日曜日曜戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-043.webp",
+      "stats": {
+        "attack": 23
+      }
+    },
+    {
+      "name": "天衡日曜戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-043.webp",
+      "stats": {
+        "defensePoints": 26
+      }
+    },
+    {
+      "name": "紫霞霜鋼戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-044.webp",
+      "stats": {
+        "agility": 18
+      }
+    },
+    {
+      "name": "幽月霜鋼戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-044.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "日曜霜鋼戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-044.webp",
+      "stats": {
+        "agility": 24
+      }
+    },
+    {
+      "name": "天衡霜鋼戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-044.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "紫霞烏鐵戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-045.webp",
+      "stats": {
+        "attack": 19
+      }
+    },
+    {
+      "name": "幽月烏鐵戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-045.webp",
+      "stats": {
+        "attack": 22
+      }
+    },
+    {
+      "name": "日曜烏鐵戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-045.webp",
+      "stats": {
+        "attack": 25
+      }
+    },
+    {
+      "name": "天衡烏鐵戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-045.webp",
+      "stats": {
+        "attack": 28
+      }
+    },
+    {
+      "name": "紫霞白凰戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-046.webp",
+      "stats": {
+        "vitality": 20
+      }
+    },
+    {
+      "name": "幽月白凰戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-046.webp",
+      "stats": {
+        "agility": 17
+      }
+    },
+    {
+      "name": "日曜白凰戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-046.webp",
+      "stats": {
+        "vitality": 26
+      }
+    },
+    {
+      "name": "天衡白凰戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-046.webp",
+      "stats": {
+        "agility": 23
+      }
+    },
+    {
+      "name": "紫霞鎖龍護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-047.webp",
+      "stats": {
+        "vitality": 21
+      }
+    },
+    {
+      "name": "幽月鎖龍護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-047.webp",
+      "stats": {
+        "attack": 18
+      }
+    },
+    {
+      "name": "日曜鎖龍護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-047.webp",
+      "stats": {
+        "vitality": 27
+      }
+    },
+    {
+      "name": "天衡鎖龍護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-047.webp",
+      "stats": {
+        "attack": 24
+      }
+    },
+    {
+      "name": "紫霞碧紋戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-048.webp",
+      "stats": {
+        "vitality": 22
+      }
+    },
+    {
+      "name": "幽月碧紋戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-048.webp",
+      "stats": {
+        "agility": 19
+      }
+    },
+    {
+      "name": "日曜碧紋戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-048.webp",
+      "stats": {
+        "vitality": 28
+      }
+    },
+    {
+      "name": "天衡碧紋戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-048.webp",
+      "stats": {
+        "agility": 25
+      }
+    },
+    {
+      "name": "紫霞龍爪戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-049.webp",
+      "stats": {
+        "attack": 17
+      }
+    },
+    {
+      "name": "幽月龍爪戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-049.webp",
+      "stats": {
+        "vitality": 20
+      }
+    },
+    {
+      "name": "日曜龍爪戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-049.webp",
+      "stats": {
+        "attack": 23
+      }
+    },
+    {
+      "name": "天衡龍爪戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-049.webp",
+      "stats": {
+        "vitality": 26
+      }
+    },
+    {
+      "name": "紫霞炎牙戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-050.webp",
+      "stats": {
+        "attack": 18
+      }
+    },
+    {
+      "name": "幽月炎牙戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-050.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "日曜炎牙戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-050.webp",
+      "stats": {
+        "attack": 24
+      }
+    },
+    {
+      "name": "天衡炎牙戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-050.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "紫霞銅羽長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-051.webp",
+      "stats": {
+        "attack": 19
+      }
+    },
+    {
+      "name": "幽月銅羽長槍",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-051.webp",
+      "stats": {
+        "attack": 22
+      }
+    },
+    {
+      "name": "日曜銅羽長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-051.webp",
+      "stats": {
+        "attack": 25
+      }
+    },
+    {
+      "name": "天衡銅羽長槍",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-051.webp",
+      "stats": {
+        "attack": 28
+      }
+    },
+    {
+      "name": "紫霞冰晶護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-052.webp",
+      "stats": {
+        "defensePoints": 20
+      }
+    },
+    {
+      "name": "幽月冰晶護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-052.webp",
+      "stats": {
+        "vitality": 17
+      }
+    },
+    {
+      "name": "日曜冰晶護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-052.webp",
+      "stats": {
+        "defensePoints": 26
+      }
+    },
+    {
+      "name": "天衡冰晶護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-052.webp",
+      "stats": {
+        "vitality": 23
+      }
+    },
+    {
+      "name": "紫霞鳳羽戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-053.webp",
+      "stats": {
+        "vitality": 21
+      }
+    },
+    {
+      "name": "幽月鳳羽戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-053.webp",
+      "stats": {
+        "attack": 18
+      }
+    },
+    {
+      "name": "日曜鳳羽戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-053.webp",
+      "stats": {
+        "vitality": 27
+      }
+    },
+    {
+      "name": "天衡鳳羽戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-053.webp",
+      "stats": {
+        "attack": 24
+      }
+    },
+    {
+      "name": "紫霞虎嘯戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-054.webp",
+      "stats": {
+        "agility": 22
+      }
+    },
+    {
+      "name": "幽月虎嘯戰盔",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-054.webp",
+      "stats": {
+        "defensePoints": 19
+      }
+    },
+    {
+      "name": "日曜虎嘯戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-054.webp",
+      "stats": {
+        "agility": 28
+      }
+    },
+    {
+      "name": "天衡虎嘯戰盔",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/catalog-054.webp",
+      "stats": {
+        "defensePoints": 25
+      }
+    },
+    {
+      "name": "紫霞赤角護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-055.webp",
+      "stats": {
+        "attack": 17
+      }
+    },
+    {
+      "name": "幽月赤角護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-055.webp",
+      "stats": {
+        "defensePoints": 20
+      }
+    },
+    {
+      "name": "日曜赤角護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-055.webp",
+      "stats": {
+        "attack": 23
+      }
+    },
+    {
+      "name": "天衡赤角護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-055.webp",
+      "stats": {
+        "defensePoints": 26
+      }
+    },
+    {
+      "name": "紫霞赤凰護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-056.webp",
+      "stats": {
+        "vitality": 18
+      }
+    },
+    {
+      "name": "幽月赤凰護腕",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-056.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "日曜赤凰護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-056.webp",
+      "stats": {
+        "vitality": 24
+      }
+    },
+    {
+      "name": "天衡赤凰護腕",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/catalog-056.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "紫霞黑鋼戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-057.webp",
+      "stats": {
+        "agility": 19
+      }
+    },
+    {
+      "name": "幽月黑鋼戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-057.webp",
+      "stats": {
+        "attack": 22
+      }
+    },
+    {
+      "name": "日曜黑鋼戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-057.webp",
+      "stats": {
+        "agility": 25
+      }
+    },
+    {
+      "name": "天衡黑鋼戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-057.webp",
+      "stats": {
+        "attack": 28
+      }
+    },
+    {
+      "name": "紫霞棕革戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-058.webp",
+      "stats": {
+        "vitality": 20
+      }
+    },
+    {
+      "name": "幽月棕革戰靴",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-058.webp",
+      "stats": {
+        "agility": 17
+      }
+    },
+    {
+      "name": "日曜棕革戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-058.webp",
+      "stats": {
+        "vitality": 26
+      }
+    },
+    {
+      "name": "天衡棕革戰靴",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/catalog-058.webp",
+      "stats": {
+        "agility": 23
+      }
+    },
+    {
+      "name": "紫霞白金戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-059.webp",
+      "stats": {
+        "attack": 21
+      }
+    },
+    {
+      "name": "幽月白金戰刀",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-059.webp",
+      "stats": {
+        "attack": 18
+      }
+    },
+    {
+      "name": "日曜白金戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-059.webp",
+      "stats": {
+        "attack": 27
+      }
+    },
+    {
+      "name": "天衡白金戰刀",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/catalog-059.webp",
+      "stats": {
+        "attack": 24
+      }
+    },
+    {
+      "name": "紫霞墨金戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-060.webp",
+      "stats": {
+        "attack": 22
+      }
+    },
+    {
+      "name": "幽月墨金戰甲",
+      "rarityKey": "purple",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-060.webp",
+      "stats": {
+        "defensePoints": 19
+      }
+    },
+    {
+      "name": "日曜墨金戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-060.webp",
+      "stats": {
+        "attack": 28
+      }
+    },
+    {
+      "name": "天衡墨金戰甲",
+      "rarityKey": "orange",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/catalog-060.webp",
+      "stats": {
+        "defensePoints": 25
+      }
+    },
+    {
+      "name": "紫霞滄玉法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-001.webp",
+      "stats": {
+        "vitality": 17
+      }
+    },
+    {
+      "name": "幽月滄玉法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-001.webp",
+      "stats": {
+        "intelligence": 20
+      }
+    },
+    {
+      "name": "日曜滄玉法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-001.webp",
+      "stats": {
+        "vitality": 23
+      }
+    },
+    {
+      "name": "天衡滄玉法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-001.webp",
+      "stats": {
+        "intelligence": 26
+      }
+    },
+    {
+      "name": "紫霞紫月法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-002.webp",
+      "stats": {
+        "intelligence": 18
+      }
+    },
+    {
+      "name": "幽月紫月法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-002.webp",
+      "stats": {
+        "intelligence": 21
+      }
+    },
+    {
+      "name": "日曜紫月法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-002.webp",
+      "stats": {
+        "intelligence": 24
+      }
+    },
+    {
+      "name": "天衡紫月法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-002.webp",
+      "stats": {
+        "intelligence": 27
+      }
+    },
+    {
+      "name": "紫霞星藍法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-003.webp",
+      "stats": {
+        "vitality": 19
+      }
+    },
+    {
+      "name": "幽月星藍法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-003.webp",
+      "stats": {
+        "agility": 22
+      }
+    },
+    {
+      "name": "日曜星藍法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-003.webp",
+      "stats": {
+        "vitality": 25
+      }
+    },
+    {
+      "name": "天衡星藍法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-003.webp",
+      "stats": {
+        "agility": 28
+      }
+    },
+    {
+      "name": "紫霞星紋法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-004.webp",
+      "stats": {
+        "vitality": 20
+      }
+    },
+    {
+      "name": "幽月星紋法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-004.webp",
+      "stats": {
+        "agility": 17
+      }
+    },
+    {
+      "name": "日曜星紋法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-004.webp",
+      "stats": {
+        "vitality": 26
+      }
+    },
+    {
+      "name": "天衡星紋法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-004.webp",
+      "stats": {
+        "agility": 23
+      }
+    },
+    {
+      "name": "紫霞寒羽法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-005.webp",
+      "stats": {
+        "intelligence": 21
+      }
+    },
+    {
+      "name": "幽月寒羽法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-005.webp",
+      "stats": {
+        "vitality": 18
+      }
+    },
+    {
+      "name": "日曜寒羽法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-005.webp",
+      "stats": {
+        "intelligence": 27
+      }
+    },
+    {
+      "name": "天衡寒羽法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-005.webp",
+      "stats": {
+        "vitality": 24
+      }
+    },
+    {
+      "name": "紫霞桃晶法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-006.webp",
+      "stats": {
+        "intelligence": 22
+      }
+    },
+    {
+      "name": "幽月桃晶法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-006.webp",
+      "stats": {
+        "intelligence": 19
+      }
+    },
+    {
+      "name": "日曜桃晶法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-006.webp",
+      "stats": {
+        "intelligence": 28
+      }
+    },
+    {
+      "name": "天衡桃晶法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-006.webp",
+      "stats": {
+        "intelligence": 25
+      }
+    },
+    {
+      "name": "紫霞墨月法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-007.webp",
+      "stats": {
+        "intelligence": 17
+      }
+    },
+    {
+      "name": "幽月墨月法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-007.webp",
+      "stats": {
+        "intelligence": 20
+      }
+    },
+    {
+      "name": "日曜墨月法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-007.webp",
+      "stats": {
+        "intelligence": 23
+      }
+    },
+    {
+      "name": "天衡墨月法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-007.webp",
+      "stats": {
+        "intelligence": 26
+      }
+    },
+    {
+      "name": "紫霞雪霜法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-008.webp",
+      "stats": {
+        "vitality": 18
+      }
+    },
+    {
+      "name": "幽月雪霜法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-008.webp",
+      "stats": {
+        "intelligence": 21
+      }
+    },
+    {
+      "name": "日曜雪霜法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-008.webp",
+      "stats": {
+        "vitality": 24
+      }
+    },
+    {
+      "name": "天衡雪霜法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-008.webp",
+      "stats": {
+        "intelligence": 27
+      }
+    },
+    {
+      "name": "紫霞翠羽法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-009.webp",
+      "stats": {
+        "intelligence": 19
+      }
+    },
+    {
+      "name": "幽月翠羽法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-009.webp",
+      "stats": {
+        "intelligence": 22
+      }
+    },
+    {
+      "name": "日曜翠羽法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-009.webp",
+      "stats": {
+        "intelligence": 25
+      }
+    },
+    {
+      "name": "天衡翠羽法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-009.webp",
+      "stats": {
+        "intelligence": 28
+      }
+    },
+    {
+      "name": "紫霞墨金法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-010.webp",
+      "stats": {
+        "intelligence": 20
+      }
+    },
+    {
+      "name": "幽月墨金法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-010.webp",
+      "stats": {
+        "intelligence": 17
+      }
+    },
+    {
+      "name": "日曜墨金法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-010.webp",
+      "stats": {
+        "intelligence": 26
+      }
+    },
+    {
+      "name": "天衡墨金法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-010.webp",
+      "stats": {
+        "intelligence": 23
+      }
+    },
+    {
+      "name": "紫霞青山法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-011.webp",
+      "stats": {
+        "intelligence": 21
+      }
+    },
+    {
+      "name": "幽月青山法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-011.webp",
+      "stats": {
+        "intelligence": 18
+      }
+    },
+    {
+      "name": "日曜青山法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-011.webp",
+      "stats": {
+        "intelligence": 27
+      }
+    },
+    {
+      "name": "天衡青山法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-011.webp",
+      "stats": {
+        "intelligence": 24
+      }
+    },
+    {
+      "name": "紫霞翠雲法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-012.webp",
+      "stats": {
+        "intelligence": 22
+      }
+    },
+    {
+      "name": "幽月翠雲法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-012.webp",
+      "stats": {
+        "defensePoints": 19
+      }
+    },
+    {
+      "name": "日曜翠雲法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-012.webp",
+      "stats": {
+        "intelligence": 28
+      }
+    },
+    {
+      "name": "天衡翠雲法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-012.webp",
+      "stats": {
+        "defensePoints": 25
+      }
+    },
+    {
+      "name": "紫霞冰翼法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-013.webp",
+      "stats": {
+        "defensePoints": 17
+      }
+    },
+    {
+      "name": "幽月冰翼法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-013.webp",
+      "stats": {
+        "vitality": 20
+      }
+    },
+    {
+      "name": "日曜冰翼法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-013.webp",
+      "stats": {
+        "defensePoints": 23
+      }
+    },
+    {
+      "name": "天衡冰翼法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-013.webp",
+      "stats": {
+        "vitality": 26
+      }
+    },
+    {
+      "name": "紫霞霜紋法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-014.webp",
+      "stats": {
+        "agility": 18
+      }
+    },
+    {
+      "name": "幽月霜紋法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-014.webp",
+      "stats": {
+        "intelligence": 21
+      }
+    },
+    {
+      "name": "日曜霜紋法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-014.webp",
+      "stats": {
+        "agility": 24
+      }
+    },
+    {
+      "name": "天衡霜紋法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-014.webp",
+      "stats": {
+        "intelligence": 27
+      }
+    },
+    {
+      "name": "紫霞冰花法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-015.webp",
+      "stats": {
+        "intelligence": 19
+      }
+    },
+    {
+      "name": "幽月冰花法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-015.webp",
+      "stats": {
+        "intelligence": 22
+      }
+    },
+    {
+      "name": "日曜冰花法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-015.webp",
+      "stats": {
+        "intelligence": 25
+      }
+    },
+    {
+      "name": "天衡冰花法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-015.webp",
+      "stats": {
+        "intelligence": 28
+      }
+    },
+    {
+      "name": "紫霞冰蓮法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-016.webp",
+      "stats": {
+        "agility": 20
+      }
+    },
+    {
+      "name": "幽月冰蓮法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-016.webp",
+      "stats": {
+        "defensePoints": 17
+      }
+    },
+    {
+      "name": "日曜冰蓮法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-016.webp",
+      "stats": {
+        "agility": 26
+      }
+    },
+    {
+      "name": "天衡冰蓮法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-016.webp",
+      "stats": {
+        "defensePoints": 23
+      }
+    },
+    {
+      "name": "紫霞流藍法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-017.webp",
+      "stats": {
+        "vitality": 21
+      }
+    },
+    {
+      "name": "幽月流藍法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-017.webp",
+      "stats": {
+        "agility": 18
+      }
+    },
+    {
+      "name": "日曜流藍法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-017.webp",
+      "stats": {
+        "vitality": 27
+      }
+    },
+    {
+      "name": "天衡流藍法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-017.webp",
+      "stats": {
+        "agility": 24
+      }
+    },
+    {
+      "name": "紫霞紫晶法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-018.webp",
+      "stats": {
+        "intelligence": 22
+      }
+    },
+    {
+      "name": "幽月紫晶法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-018.webp",
+      "stats": {
+        "defensePoints": 19
+      }
+    },
+    {
+      "name": "日曜紫晶法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-018.webp",
+      "stats": {
+        "intelligence": 28
+      }
+    },
+    {
+      "name": "天衡紫晶法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-018.webp",
+      "stats": {
+        "defensePoints": 25
+      }
+    },
+    {
+      "name": "紫霞翡翠法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-019.webp",
+      "stats": {
+        "vitality": 17
+      }
+    },
+    {
+      "name": "幽月翡翠法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-019.webp",
+      "stats": {
+        "intelligence": 20
+      }
+    },
+    {
+      "name": "日曜翡翠法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-019.webp",
+      "stats": {
+        "vitality": 23
+      }
+    },
+    {
+      "name": "天衡翡翠法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-019.webp",
+      "stats": {
+        "intelligence": 26
+      }
+    },
+    {
+      "name": "紫霞星辰法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-020.webp",
+      "stats": {
+        "intelligence": 18
+      }
+    },
+    {
+      "name": "幽月星辰法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-020.webp",
+      "stats": {
+        "vitality": 21
+      }
+    },
+    {
+      "name": "日曜星辰法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-020.webp",
+      "stats": {
+        "intelligence": 24
+      }
+    },
+    {
+      "name": "天衡星辰法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-020.webp",
+      "stats": {
+        "vitality": 27
+      }
+    },
+    {
+      "name": "紫霞紫月法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-021.webp",
+      "stats": {
+        "vitality": 19
+      }
+    },
+    {
+      "name": "幽月紫月法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-021.webp",
+      "stats": {
+        "intelligence": 22
+      }
+    },
+    {
+      "name": "日曜紫月法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-021.webp",
+      "stats": {
+        "vitality": 25
+      }
+    },
+    {
+      "name": "天衡紫月法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-021.webp",
+      "stats": {
+        "intelligence": 28
+      }
+    },
+    {
+      "name": "紫霞玄金法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-022.webp",
+      "stats": {
+        "vitality": 20
+      }
+    },
+    {
+      "name": "幽月玄金法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-022.webp",
+      "stats": {
+        "agility": 17
+      }
+    },
+    {
+      "name": "日曜玄金法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-022.webp",
+      "stats": {
+        "vitality": 26
+      }
+    },
+    {
+      "name": "天衡玄金法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-022.webp",
+      "stats": {
+        "agility": 23
+      }
+    },
+    {
+      "name": "紫霞炎晶法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-023.webp",
+      "stats": {
+        "intelligence": 21
+      }
+    },
+    {
+      "name": "幽月炎晶法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-023.webp",
+      "stats": {
+        "intelligence": 18
+      }
+    },
+    {
+      "name": "日曜炎晶法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-023.webp",
+      "stats": {
+        "intelligence": 27
+      }
+    },
+    {
+      "name": "天衡炎晶法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-023.webp",
+      "stats": {
+        "intelligence": 24
+      }
+    },
+    {
+      "name": "紫霞寒星法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-024.webp",
+      "stats": {
+        "agility": 22
+      }
+    },
+    {
+      "name": "幽月寒星法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-024.webp",
+      "stats": {
+        "intelligence": 19
+      }
+    },
+    {
+      "name": "日曜寒星法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-024.webp",
+      "stats": {
+        "agility": 28
+      }
+    },
+    {
+      "name": "天衡寒星法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-024.webp",
+      "stats": {
+        "intelligence": 25
+      }
+    },
+    {
+      "name": "紫霞冰雲法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-025.webp",
+      "stats": {
+        "intelligence": 17
+      }
+    },
+    {
+      "name": "幽月冰雲法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-025.webp",
+      "stats": {
+        "defensePoints": 20
+      }
+    },
+    {
+      "name": "日曜冰雲法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-025.webp",
+      "stats": {
+        "intelligence": 23
+      }
+    },
+    {
+      "name": "天衡冰雲法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-025.webp",
+      "stats": {
+        "defensePoints": 26
+      }
+    },
+    {
+      "name": "紫霞血影法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-026.webp",
+      "stats": {
+        "intelligence": 18
+      }
+    },
+    {
+      "name": "幽月血影法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-026.webp",
+      "stats": {
+        "intelligence": 21
+      }
+    },
+    {
+      "name": "日曜血影法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-026.webp",
+      "stats": {
+        "intelligence": 24
+      }
+    },
+    {
+      "name": "天衡血影法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-026.webp",
+      "stats": {
+        "intelligence": 27
+      }
+    },
+    {
+      "name": "紫霞翠環法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-027.webp",
+      "stats": {
+        "intelligence": 19
+      }
+    },
+    {
+      "name": "幽月翠環法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-027.webp",
+      "stats": {
+        "intelligence": 22
+      }
+    },
+    {
+      "name": "日曜翠環法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-027.webp",
+      "stats": {
+        "intelligence": 25
+      }
+    },
+    {
+      "name": "天衡翠環法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-027.webp",
+      "stats": {
+        "intelligence": 28
+      }
+    },
+    {
+      "name": "紫霞翠羽法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-028.webp",
+      "stats": {
+        "intelligence": 20
+      }
+    },
+    {
+      "name": "幽月翠羽法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-028.webp",
+      "stats": {
+        "intelligence": 17
+      }
+    },
+    {
+      "name": "日曜翠羽法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-028.webp",
+      "stats": {
+        "intelligence": 26
+      }
+    },
+    {
+      "name": "天衡翠羽法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-028.webp",
+      "stats": {
+        "intelligence": 23
+      }
+    },
+    {
+      "name": "紫霞冰蓮法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-029.webp",
+      "stats": {
+        "intelligence": 21
+      }
+    },
+    {
+      "name": "幽月冰蓮法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-029.webp",
+      "stats": {
+        "intelligence": 18
+      }
+    },
+    {
+      "name": "日曜冰蓮法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-029.webp",
+      "stats": {
+        "intelligence": 27
+      }
+    },
+    {
+      "name": "天衡冰蓮法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-029.webp",
+      "stats": {
+        "intelligence": 24
+      }
+    },
+    {
+      "name": "紫霞藍金法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-030.webp",
+      "stats": {
+        "defensePoints": 22
+      }
+    },
+    {
+      "name": "幽月藍金法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-030.webp",
+      "stats": {
+        "vitality": 19
+      }
+    },
+    {
+      "name": "日曜藍金法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-030.webp",
+      "stats": {
+        "defensePoints": 28
+      }
+    },
+    {
+      "name": "天衡藍金法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-030.webp",
+      "stats": {
+        "vitality": 25
+      }
+    },
+    {
+      "name": "紫霞日曜法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-031.webp",
+      "stats": {
+        "vitality": 17
+      }
+    },
+    {
+      "name": "幽月日曜法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-031.webp",
+      "stats": {
+        "agility": 20
+      }
+    },
+    {
+      "name": "日曜日曜法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-031.webp",
+      "stats": {
+        "vitality": 23
+      }
+    },
+    {
+      "name": "天衡日曜法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-031.webp",
+      "stats": {
+        "agility": 26
+      }
+    },
+    {
+      "name": "紫霞紫星法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-032.webp",
+      "stats": {
+        "vitality": 18
+      }
+    },
+    {
+      "name": "幽月紫星法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-032.webp",
+      "stats": {
+        "agility": 21
+      }
+    },
+    {
+      "name": "日曜紫星法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-032.webp",
+      "stats": {
+        "vitality": 24
+      }
+    },
+    {
+      "name": "天衡紫星法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-032.webp",
+      "stats": {
+        "agility": 27
+      }
+    },
+    {
+      "name": "紫霞墨金法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-033.webp",
+      "stats": {
+        "intelligence": 19
+      }
+    },
+    {
+      "name": "幽月墨金法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-033.webp",
+      "stats": {
+        "intelligence": 22
+      }
+    },
+    {
+      "name": "日曜墨金法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-033.webp",
+      "stats": {
+        "intelligence": 25
+      }
+    },
+    {
+      "name": "天衡墨金法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-033.webp",
+      "stats": {
+        "intelligence": 28
+      }
+    },
+    {
+      "name": "紫霞白金法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-034.webp",
+      "stats": {
+        "intelligence": 20
+      }
+    },
+    {
+      "name": "幽月白金法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-034.webp",
+      "stats": {
+        "vitality": 17
+      }
+    },
+    {
+      "name": "日曜白金法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-034.webp",
+      "stats": {
+        "intelligence": 26
+      }
+    },
+    {
+      "name": "天衡白金法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-034.webp",
+      "stats": {
+        "vitality": 23
+      }
+    },
+    {
+      "name": "紫霞墨竹法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-035.webp",
+      "stats": {
+        "intelligence": 21
+      }
+    },
+    {
+      "name": "幽月墨竹法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-035.webp",
+      "stats": {
+        "intelligence": 18
+      }
+    },
+    {
+      "name": "日曜墨竹法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-035.webp",
+      "stats": {
+        "intelligence": 27
+      }
+    },
+    {
+      "name": "天衡墨竹法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-035.webp",
+      "stats": {
+        "intelligence": 24
+      }
+    },
+    {
+      "name": "紫霞紫晶法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-036.webp",
+      "stats": {
+        "intelligence": 22
+      }
+    },
+    {
+      "name": "幽月紫晶法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-036.webp",
+      "stats": {
+        "defensePoints": 19
+      }
+    },
+    {
+      "name": "日曜紫晶法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-036.webp",
+      "stats": {
+        "intelligence": 28
+      }
+    },
+    {
+      "name": "天衡紫晶法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-036.webp",
+      "stats": {
+        "defensePoints": 25
+      }
+    },
+    {
+      "name": "紫霞墨紫法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-037.webp",
+      "stats": {
+        "intelligence": 17
+      }
+    },
+    {
+      "name": "幽月墨紫法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-037.webp",
+      "stats": {
+        "defensePoints": 20
+      }
+    },
+    {
+      "name": "日曜墨紫法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-037.webp",
+      "stats": {
+        "intelligence": 23
+      }
+    },
+    {
+      "name": "天衡墨紫法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-037.webp",
+      "stats": {
+        "defensePoints": 26
+      }
+    },
+    {
+      "name": "紫霞金星法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-038.webp",
+      "stats": {
+        "agility": 18
+      }
+    },
+    {
+      "name": "幽月金星法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-038.webp",
+      "stats": {
+        "intelligence": 21
+      }
+    },
+    {
+      "name": "日曜金星法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-038.webp",
+      "stats": {
+        "agility": 24
+      }
+    },
+    {
+      "name": "天衡金星法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-038.webp",
+      "stats": {
+        "intelligence": 27
+      }
+    },
+    {
+      "name": "紫霞烈焰法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-039.webp",
+      "stats": {
+        "intelligence": 19
+      }
+    },
+    {
+      "name": "幽月烈焰法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-039.webp",
+      "stats": {
+        "intelligence": 22
+      }
+    },
+    {
+      "name": "日曜烈焰法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-039.webp",
+      "stats": {
+        "intelligence": 25
+      }
+    },
+    {
+      "name": "天衡烈焰法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-039.webp",
+      "stats": {
+        "intelligence": 28
+      }
+    },
+    {
+      "name": "紫霞滄玉法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-040.webp",
+      "stats": {
+        "vitality": 20
+      }
+    },
+    {
+      "name": "幽月滄玉法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-040.webp",
+      "stats": {
+        "agility": 17
+      }
+    },
+    {
+      "name": "日曜滄玉法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-040.webp",
+      "stats": {
+        "vitality": 26
+      }
+    },
+    {
+      "name": "天衡滄玉法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-040.webp",
+      "stats": {
+        "agility": 23
+      }
+    },
+    {
+      "name": "紫霞紫晶法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-041.webp",
+      "stats": {
+        "intelligence": 21
+      }
+    },
+    {
+      "name": "幽月紫晶法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-041.webp",
+      "stats": {
+        "intelligence": 18
+      }
+    },
+    {
+      "name": "日曜紫晶法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-041.webp",
+      "stats": {
+        "intelligence": 27
+      }
+    },
+    {
+      "name": "天衡紫晶法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-041.webp",
+      "stats": {
+        "intelligence": 24
+      }
+    },
+    {
+      "name": "紫霞白星法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-042.webp",
+      "stats": {
+        "vitality": 22
+      }
+    },
+    {
+      "name": "幽月白星法履",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-042.webp",
+      "stats": {
+        "agility": 19
+      }
+    },
+    {
+      "name": "日曜白星法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-042.webp",
+      "stats": {
+        "vitality": 28
+      }
+    },
+    {
+      "name": "天衡白星法履",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/catalog-042.webp",
+      "stats": {
+        "agility": 25
+      }
+    },
+    {
+      "name": "紫霞炎羽法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-043.webp",
+      "stats": {
+        "vitality": 17
+      }
+    },
+    {
+      "name": "幽月炎羽法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-043.webp",
+      "stats": {
+        "intelligence": 20
+      }
+    },
+    {
+      "name": "日曜炎羽法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-043.webp",
+      "stats": {
+        "vitality": 23
+      }
+    },
+    {
+      "name": "天衡炎羽法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-043.webp",
+      "stats": {
+        "intelligence": 26
+      }
+    },
+    {
+      "name": "紫霞赤金法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-044.webp",
+      "stats": {
+        "intelligence": 18
+      }
+    },
+    {
+      "name": "幽月赤金法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-044.webp",
+      "stats": {
+        "defensePoints": 21
+      }
+    },
+    {
+      "name": "日曜赤金法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-044.webp",
+      "stats": {
+        "intelligence": 24
+      }
+    },
+    {
+      "name": "天衡赤金法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-044.webp",
+      "stats": {
+        "defensePoints": 27
+      }
+    },
+    {
+      "name": "紫霞藍月法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-045.webp",
+      "stats": {
+        "agility": 19
+      }
+    },
+    {
+      "name": "幽月藍月法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-045.webp",
+      "stats": {
+        "defensePoints": 22
+      }
+    },
+    {
+      "name": "日曜藍月法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-045.webp",
+      "stats": {
+        "agility": 25
+      }
+    },
+    {
+      "name": "天衡藍月法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-045.webp",
+      "stats": {
+        "defensePoints": 28
+      }
+    },
+    {
+      "name": "紫霞血月法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-046.webp",
+      "stats": {
+        "vitality": 20
+      }
+    },
+    {
+      "name": "幽月血月法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-046.webp",
+      "stats": {
+        "agility": 17
+      }
+    },
+    {
+      "name": "日曜血月法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-046.webp",
+      "stats": {
+        "vitality": 26
+      }
+    },
+    {
+      "name": "天衡血月法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-046.webp",
+      "stats": {
+        "agility": 23
+      }
+    },
+    {
+      "name": "紫霞金星法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-047.webp",
+      "stats": {
+        "vitality": 21
+      }
+    },
+    {
+      "name": "幽月金星法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-047.webp",
+      "stats": {
+        "intelligence": 18
+      }
+    },
+    {
+      "name": "日曜金星法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-047.webp",
+      "stats": {
+        "vitality": 27
+      }
+    },
+    {
+      "name": "天衡金星法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-047.webp",
+      "stats": {
+        "intelligence": 24
+      }
+    },
+    {
+      "name": "紫霞青風法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-048.webp",
+      "stats": {
+        "intelligence": 22
+      }
+    },
+    {
+      "name": "幽月青風法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-048.webp",
+      "stats": {
+        "intelligence": 19
+      }
+    },
+    {
+      "name": "日曜青風法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-048.webp",
+      "stats": {
+        "intelligence": 28
+      }
+    },
+    {
+      "name": "天衡青風法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-048.webp",
+      "stats": {
+        "intelligence": 25
+      }
+    },
+    {
+      "name": "紫霞古玉法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-049.webp",
+      "stats": {
+        "defensePoints": 17
+      }
+    },
+    {
+      "name": "幽月古玉法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-049.webp",
+      "stats": {
+        "vitality": 20
+      }
+    },
+    {
+      "name": "日曜古玉法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-049.webp",
+      "stats": {
+        "defensePoints": 23
+      }
+    },
+    {
+      "name": "天衡古玉法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-049.webp",
+      "stats": {
+        "vitality": 26
+      }
+    },
+    {
+      "name": "紫霞金輪法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-050.webp",
+      "stats": {
+        "intelligence": 18
+      }
+    },
+    {
+      "name": "幽月金輪法杖",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-050.webp",
+      "stats": {
+        "intelligence": 21
+      }
+    },
+    {
+      "name": "日曜金輪法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-050.webp",
+      "stats": {
+        "intelligence": 24
+      }
+    },
+    {
+      "name": "天衡金輪法杖",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-050.webp",
+      "stats": {
+        "intelligence": 27
+      }
+    },
+    {
+      "name": "紫霞流藍法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-051.webp",
+      "stats": {
+        "intelligence": 19
+      }
+    },
+    {
+      "name": "幽月流藍法袍",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-051.webp",
+      "stats": {
+        "defensePoints": 22
+      }
+    },
+    {
+      "name": "日曜流藍法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-051.webp",
+      "stats": {
+        "intelligence": 25
+      }
+    },
+    {
+      "name": "天衡流藍法袍",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/catalog-051.webp",
+      "stats": {
+        "defensePoints": 28
+      }
+    },
+    {
+      "name": "紫霞桃花法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-052.webp",
+      "stats": {
+        "intelligence": 20
+      }
+    },
+    {
+      "name": "幽月桃花法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-052.webp",
+      "stats": {
+        "intelligence": 17
+      }
+    },
+    {
+      "name": "日曜桃花法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-052.webp",
+      "stats": {
+        "intelligence": 26
+      }
+    },
+    {
+      "name": "天衡桃花法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-052.webp",
+      "stats": {
+        "intelligence": 23
+      }
+    },
+    {
+      "name": "紫霞墨玉法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-053.webp",
+      "stats": {
+        "agility": 21
+      }
+    },
+    {
+      "name": "幽月墨玉法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-053.webp",
+      "stats": {
+        "defensePoints": 18
+      }
+    },
+    {
+      "name": "日曜墨玉法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-053.webp",
+      "stats": {
+        "agility": 27
+      }
+    },
+    {
+      "name": "天衡墨玉法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-053.webp",
+      "stats": {
+        "defensePoints": 24
+      }
+    },
+    {
+      "name": "紫霞幽月法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-054.webp",
+      "stats": {
+        "vitality": 22
+      }
+    },
+    {
+      "name": "幽月幽月法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-054.webp",
+      "stats": {
+        "intelligence": 19
+      }
+    },
+    {
+      "name": "日曜幽月法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-054.webp",
+      "stats": {
+        "vitality": 28
+      }
+    },
+    {
+      "name": "天衡幽月法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-054.webp",
+      "stats": {
+        "intelligence": 25
+      }
+    },
+    {
+      "name": "紫霞翠竹法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-055.webp",
+      "stats": {
+        "agility": 17
+      }
+    },
+    {
+      "name": "幽月翠竹法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-055.webp",
+      "stats": {
+        "defensePoints": 20
+      }
+    },
+    {
+      "name": "日曜翠竹法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-055.webp",
+      "stats": {
+        "agility": 23
+      }
+    },
+    {
+      "name": "天衡翠竹法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-055.webp",
+      "stats": {
+        "defensePoints": 26
+      }
+    },
+    {
+      "name": "紫霞炎羽法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-056.webp",
+      "stats": {
+        "vitality": 18
+      }
+    },
+    {
+      "name": "幽月炎羽法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-056.webp",
+      "stats": {
+        "intelligence": 21
+      }
+    },
+    {
+      "name": "日曜炎羽法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-056.webp",
+      "stats": {
+        "vitality": 24
+      }
+    },
+    {
+      "name": "天衡炎羽法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-056.webp",
+      "stats": {
+        "intelligence": 27
+      }
+    },
+    {
+      "name": "紫霞月銀法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-057.webp",
+      "stats": {
+        "intelligence": 19
+      }
+    },
+    {
+      "name": "幽月月銀法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-057.webp",
+      "stats": {
+        "defensePoints": 22
+      }
+    },
+    {
+      "name": "日曜月銀法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-057.webp",
+      "stats": {
+        "intelligence": 25
+      }
+    },
+    {
+      "name": "天衡月銀法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-057.webp",
+      "stats": {
+        "defensePoints": 28
+      }
+    },
+    {
+      "name": "紫霞赤金法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-058.webp",
+      "stats": {
+        "agility": 20
+      }
+    },
+    {
+      "name": "幽月赤金法冠",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-058.webp",
+      "stats": {
+        "defensePoints": 17
+      }
+    },
+    {
+      "name": "日曜赤金法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-058.webp",
+      "stats": {
+        "agility": 26
+      }
+    },
+    {
+      "name": "天衡赤金法冠",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/catalog-058.webp",
+      "stats": {
+        "defensePoints": 23
+      }
+    },
+    {
+      "name": "紫霞白金法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-059.webp",
+      "stats": {
+        "vitality": 21
+      }
+    },
+    {
+      "name": "幽月白金法腕",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-059.webp",
+      "stats": {
+        "intelligence": 18
+      }
+    },
+    {
+      "name": "日曜白金法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-059.webp",
+      "stats": {
+        "vitality": 27
+      }
+    },
+    {
+      "name": "天衡白金法腕",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/catalog-059.webp",
+      "stats": {
+        "intelligence": 24
+      }
+    },
+    {
+      "name": "紫霞赤凰法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-060.webp",
+      "stats": {
+        "intelligence": 22
+      }
+    },
+    {
+      "name": "幽月赤凰法扇",
+      "rarityKey": "purple",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-060.webp",
+      "stats": {
+        "intelligence": 19
+      }
+    },
+    {
+      "name": "日曜赤凰法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-060.webp",
+      "stats": {
+        "intelligence": 28
+      }
+    },
+    {
+      "name": "天衡赤凰法扇",
+      "rarityKey": "orange",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/catalog-060.webp",
+      "stats": {
+        "intelligence": 25
+      }
+    },
+    {
+      "name": "素棕革戰甲",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/armor-01.png",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "樸棕革戰甲",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/armor-01.png",
+      "stats": {
+        "agility": 8
+      }
+    },
+    {
+      "name": "青紋棕革戰甲",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/armor-01.png",
+      "stats": {
+        "vitality": 11
+      }
+    },
+    {
+      "name": "靈紋棕革戰甲",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/armor-01.png",
+      "stats": {
+        "agility": 14
+      }
+    },
+    {
+      "name": "素青鋼戰甲",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/armor-02.png",
+      "stats": {
+        "attack": 6
+      }
+    },
+    {
+      "name": "樸青鋼戰甲",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/armor-02.png",
+      "stats": {
+        "defensePoints": 9
+      }
+    },
+    {
+      "name": "青紋青鋼戰甲",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/armor-02.png",
+      "stats": {
+        "attack": 12
+      }
+    },
+    {
+      "name": "靈紋青鋼戰甲",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/armor-02.png",
+      "stats": {
+        "defensePoints": 15
+      }
+    },
+    {
+      "name": "素皮紋護腕",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/bracer-01.png",
+      "stats": {
+        "vitality": 7
+      }
+    },
+    {
+      "name": "樸皮紋護腕",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/bracer-01.png",
+      "stats": {
+        "attack": 10
+      }
+    },
+    {
+      "name": "青紋皮紋護腕",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/bracer-01.png",
+      "stats": {
+        "vitality": 13
+      }
+    },
+    {
+      "name": "靈紋皮紋護腕",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/bracer-01.png",
+      "stats": {
+        "attack": 16
+      }
+    },
+    {
+      "name": "素烏鋼護腕",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/bracer-02.png",
+      "stats": {
+        "defensePoints": 8
+      }
+    },
+    {
+      "name": "樸烏鋼護腕",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/bracer-02.png",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "青紋烏鋼護腕",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/bracer-02.png",
+      "stats": {
+        "defensePoints": 14
+      }
+    },
+    {
+      "name": "靈紋烏鋼護腕",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/bracer-02.png",
+      "stats": {
+        "vitality": 11
+      }
+    },
+    {
+      "name": "素素鐵戰盔",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/head-01.png",
+      "stats": {
+        "vitality": 9
+      }
+    },
+    {
+      "name": "樸素鐵戰盔",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/head-01.png",
+      "stats": {
+        "attack": 6
+      }
+    },
+    {
+      "name": "青紋素鐵戰盔",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/head-01.png",
+      "stats": {
+        "vitality": 15
+      }
+    },
+    {
+      "name": "靈紋素鐵戰盔",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/head-01.png",
+      "stats": {
+        "attack": 12
+      }
+    },
+    {
+      "name": "素墨鋼戰盔",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/head-02.png",
+      "stats": {
+        "agility": 10
+      }
+    },
+    {
+      "name": "樸墨鋼戰盔",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/head-02.png",
+      "stats": {
+        "defensePoints": 7
+      }
+    },
+    {
+      "name": "青紋墨鋼戰盔",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/head-02.png",
+      "stats": {
+        "agility": 16
+      }
+    },
+    {
+      "name": "靈紋墨鋼戰盔",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/head-02.png",
+      "stats": {
+        "defensePoints": 13
+      }
+    },
+    {
+      "name": "素粗革戰靴",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/shoes-01.png",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "樸粗革戰靴",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/shoes-01.png",
+      "stats": {
+        "agility": 8
+      }
+    },
+    {
+      "name": "青紋粗革戰靴",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/shoes-01.png",
+      "stats": {
+        "vitality": 11
+      }
+    },
+    {
+      "name": "靈紋粗革戰靴",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/shoes-01.png",
+      "stats": {
+        "agility": 14
+      }
+    },
+    {
+      "name": "素鐵獅戰靴",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/shoes-02.png",
+      "stats": {
+        "attack": 6
+      }
+    },
+    {
+      "name": "樸鐵獅戰靴",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/shoes-02.png",
+      "stats": {
+        "vitality": 9
+      }
+    },
+    {
+      "name": "青紋鐵獅戰靴",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/shoes-02.png",
+      "stats": {
+        "attack": 12
+      }
+    },
+    {
+      "name": "靈紋鐵獅戰靴",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/shoes-02.png",
+      "stats": {
+        "vitality": 15
+      }
+    },
+    {
+      "name": "素鈍鐵戰刀",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-01.png",
+      "stats": {
+        "attack": 7
+      }
+    },
+    {
+      "name": "樸鈍鐵戰刀",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-01.png",
+      "stats": {
+        "attack": 10
+      }
+    },
+    {
+      "name": "青紋鈍鐵戰刀",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-01.png",
+      "stats": {
+        "attack": 13
+      }
+    },
+    {
+      "name": "靈紋鈍鐵戰刀",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-01.png",
+      "stats": {
+        "attack": 16
+      }
+    },
+    {
+      "name": "素銅紋戰刀",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-02.png",
+      "stats": {
+        "attack": 8
+      }
+    },
+    {
+      "name": "樸銅紋戰刀",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-02.png",
+      "stats": {
+        "attack": 5
+      }
+    },
+    {
+      "name": "青紋銅紋戰刀",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-02.png",
+      "stats": {
+        "attack": 14
+      }
+    },
+    {
+      "name": "靈紋銅紋戰刀",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-02.png",
+      "stats": {
+        "attack": 11
+      }
+    },
+    {
+      "name": "素金穗長劍",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-03.png",
+      "stats": {
+        "attack": 9
+      }
+    },
+    {
+      "name": "樸金穗長劍",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-03.png",
+      "stats": {
+        "attack": 6
+      }
+    },
+    {
+      "name": "青紋金穗長劍",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-03.png",
+      "stats": {
+        "attack": 15
+      }
+    },
+    {
+      "name": "靈紋金穗長劍",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-03.png",
+      "stats": {
+        "attack": 12
+      }
+    },
+    {
+      "name": "素藍穗長劍",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-04.png",
+      "stats": {
+        "attack": 10
+      }
+    },
+    {
+      "name": "樸藍穗長劍",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-04.png",
+      "stats": {
+        "attack": 7
+      }
+    },
+    {
+      "name": "青紋藍穗長劍",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-04.png",
+      "stats": {
+        "attack": 16
+      }
+    },
+    {
+      "name": "靈紋藍穗長劍",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/weapon-04.png",
+      "stats": {
+        "attack": 13
+      }
+    },
+    {
+      "name": "素雲藍法袍",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/armor-01.png",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "樸雲藍法袍",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/armor-01.png",
+      "stats": {
+        "agility": 8
+      }
+    },
+    {
+      "name": "青紋雲藍法袍",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/armor-01.png",
+      "stats": {
+        "vitality": 11
+      }
+    },
+    {
+      "name": "靈紋雲藍法袍",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/armor-01.png",
+      "stats": {
+        "agility": 14
+      }
+    },
+    {
+      "name": "素墨紅法袍",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/armor-02.png",
+      "stats": {
+        "intelligence": 6
+      }
+    },
+    {
+      "name": "樸墨紅法袍",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/armor-02.png",
+      "stats": {
+        "defensePoints": 9
+      }
+    },
+    {
+      "name": "青紋墨紅法袍",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/armor-02.png",
+      "stats": {
+        "intelligence": 12
+      }
+    },
+    {
+      "name": "靈紋墨紅法袍",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/armor-02.png",
+      "stats": {
+        "defensePoints": 15
+      }
+    },
+    {
+      "name": "素銀浪法腕",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/bracer-01.png",
+      "stats": {
+        "vitality": 7
+      }
+    },
+    {
+      "name": "樸銀浪法腕",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/bracer-01.png",
+      "stats": {
+        "intelligence": 10
+      }
+    },
+    {
+      "name": "青紋銀浪法腕",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/bracer-01.png",
+      "stats": {
+        "vitality": 13
+      }
+    },
+    {
+      "name": "靈紋銀浪法腕",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/bracer-01.png",
+      "stats": {
+        "intelligence": 16
+      }
+    },
+    {
+      "name": "素玄卦法腕",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/bracer-02.png",
+      "stats": {
+        "defensePoints": 8
+      }
+    },
+    {
+      "name": "樸玄卦法腕",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/bracer-02.png",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "青紋玄卦法腕",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/bracer-02.png",
+      "stats": {
+        "defensePoints": 14
+      }
+    },
+    {
+      "name": "靈紋玄卦法腕",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/bracer-02.png",
+      "stats": {
+        "vitality": 11
+      }
+    },
+    {
+      "name": "素藍月法冠",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/head-01.png",
+      "stats": {
+        "vitality": 9
+      }
+    },
+    {
+      "name": "樸藍月法冠",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/head-01.png",
+      "stats": {
+        "intelligence": 6
+      }
+    },
+    {
+      "name": "青紋藍月法冠",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/head-01.png",
+      "stats": {
+        "vitality": 15
+      }
+    },
+    {
+      "name": "靈紋藍月法冠",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/head-01.png",
+      "stats": {
+        "intelligence": 12
+      }
+    },
+    {
+      "name": "素赤結法冠",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/head-02.png",
+      "stats": {
+        "agility": 10
+      }
+    },
+    {
+      "name": "樸赤結法冠",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/head-02.png",
+      "stats": {
+        "defensePoints": 7
+      }
+    },
+    {
+      "name": "青紋赤結法冠",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/head-02.png",
+      "stats": {
+        "agility": 16
+      }
+    },
+    {
+      "name": "靈紋赤結法冠",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/head-02.png",
+      "stats": {
+        "defensePoints": 13
+      }
+    },
+    {
+      "name": "素冰紋法履",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/shoes-01.png",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "樸冰紋法履",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/shoes-01.png",
+      "stats": {
+        "agility": 8
+      }
+    },
+    {
+      "name": "青紋冰紋法履",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/shoes-01.png",
+      "stats": {
+        "vitality": 11
+      }
+    },
+    {
+      "name": "靈紋冰紋法履",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/shoes-01.png",
+      "stats": {
+        "agility": 14
+      }
+    },
+    {
+      "name": "素紫玉法履",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/shoes-02.png",
+      "stats": {
+        "intelligence": 6
+      }
+    },
+    {
+      "name": "樸紫玉法履",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/shoes-02.png",
+      "stats": {
+        "vitality": 9
+      }
+    },
+    {
+      "name": "青紋紫玉法履",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/shoes-02.png",
+      "stats": {
+        "intelligence": 12
+      }
+    },
+    {
+      "name": "靈紋紫玉法履",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/shoes-02.png",
+      "stats": {
+        "vitality": 15
+      }
+    },
+    {
+      "name": "素金環法杖",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-01.png",
+      "stats": {
+        "intelligence": 7
+      }
+    },
+    {
+      "name": "樸金環法杖",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-01.png",
+      "stats": {
+        "intelligence": 10
+      }
+    },
+    {
+      "name": "青紋金環法杖",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-01.png",
+      "stats": {
+        "intelligence": 13
+      }
+    },
+    {
+      "name": "靈紋金環法杖",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-01.png",
+      "stats": {
+        "intelligence": 16
+      }
+    },
+    {
+      "name": "素冰環法杖",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-02.png",
+      "stats": {
+        "intelligence": 8
+      }
+    },
+    {
+      "name": "樸冰環法杖",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-02.png",
+      "stats": {
+        "intelligence": 5
+      }
+    },
+    {
+      "name": "青紋冰環法杖",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-02.png",
+      "stats": {
+        "intelligence": 14
+      }
+    },
+    {
+      "name": "靈紋冰環法杖",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-02.png",
+      "stats": {
+        "intelligence": 11
+      }
+    },
+    {
+      "name": "素青竹法扇",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-03.png",
+      "stats": {
+        "intelligence": 9
+      }
+    },
+    {
+      "name": "樸青竹法扇",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-03.png",
+      "stats": {
+        "intelligence": 6
+      }
+    },
+    {
+      "name": "青紋青竹法扇",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-03.png",
+      "stats": {
+        "intelligence": 15
+      }
+    },
+    {
+      "name": "靈紋青竹法扇",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-03.png",
+      "stats": {
+        "intelligence": 12
+      }
+    },
+    {
+      "name": "素滄浪法扇",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-04.png",
+      "stats": {
+        "intelligence": 10
+      }
+    },
+    {
+      "name": "樸滄浪法扇",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-04.png",
+      "stats": {
+        "intelligence": 7
+      }
+    },
+    {
+      "name": "青紋滄浪法扇",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-04.png",
+      "stats": {
+        "intelligence": 16
+      }
+    },
+    {
+      "name": "靈紋滄浪法扇",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/weapon-04.png",
+      "stats": {
+        "intelligence": 13
+      }
+    }
+  ]
+}
