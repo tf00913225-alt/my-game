@@ -10,7 +10,7 @@ const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 // Internal transaction owner; its guarded callable accepts choices only.
 // Source records and progression are never accepted from the browser.
 function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
-    inspectExistingEnvelope,nextRevision}){
+    inspectExistingEnvelope,nextRevision,now=Date.now}){
     const fail=(code,message)=>{ throw new HttpsError(code,message); };
 
     async function commitInitialSources(request,{operationId,expectedRevision,selection},
@@ -19,6 +19,8 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
            !Number.isSafeInteger(expectedRevision)||expectedRevision<1){
             fail("invalid-argument","An internal source operation needs an ID and revision.");
         }
+        // Pin the server observation outside Firestore transaction retries.
+        const recordedAt=now();
         return runProtected(request,async(transaction,session)=>{
             const uid=session.uid;
             let choices;
@@ -105,7 +107,7 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
                 fail("aborted","CLOUD_REVISION_CONFLICT");
             }
             const revision=nextRevision(envelope);
-            const records=makeInitialCharacterSources(uid,revision,operationId,selection);
+            const records=makeInitialCharacterSources(uid,revision,operationId,selection,{recordedAt});
             if(records?.account?.provenance!=="server-created"||
                records.claimRecords?.length!==0||records.characters?.length!==1||
                records.account.slots?.[1]!==null||records.account.slots?.[2]!==null||

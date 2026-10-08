@@ -2,6 +2,28 @@
   "schemaVersion": 1,
   "states": [
     {
+      "key": "serverUsers/{uid}/progress/current",
+      "ownerModule": "functions/src/canonical-source-writer.js",
+      "storageType": "Firestore",
+      "scope": "uid/account",
+      "deviceOnly": false,
+      "gameplayCritical": true,
+      "rewardCoupled": true,
+      "economyCoupled": false,
+      "claimCoupled": true,
+      "cloudRequired": true,
+      "backupRequired": true,
+      "migrationRequired": true,
+      "authorityTier": "A",
+      "authoritativeSource": "existing protected canonical source transactions; new creation only for playableState initialization",
+      "schemaVersion": "1; optional playableState extension",
+      "restoreOwner": "functions/src/canonical-current-recovery.js",
+      "deletionPolicy": "retain with original revision snapshots, archives and immutable receipts; no new cleanup enabled",
+      "corruptionBehavior": "block canonical writes and complete projection when present playableState is invalid",
+      "defaultBehavior": "server-generated initial state for a newly created account only; never default during reads or recovery",
+      "missingDataBehavior": "preserve historical sources; block complete projection until reviewed"
+    },
+    {
       "key": "four_symbols_save:<UID>",
       "extensions": {"heroAccount": {"schemaVersion": 1, "ownerModule": "functions/src/hero-core.js", "restoreOwner": "js/00-main.js::loadGame", "contract": "docs/HERO_SYSTEM_V1.md", "missingDataBehavior": "locked zero-fragment zero-star projection; no storage write", "corruptionBehavior": "block hydration; preserve original save", "authorityTier": "B", "authoritativeSource": "UID local only; future trusted server mapping required"}},
       "ownerModule": "js/startup/account-save-repository.js",

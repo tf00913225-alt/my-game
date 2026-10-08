@@ -20,7 +20,6 @@ const {createCanonicalRestrictedBattle}=require("../functions/src/canonical-rest
 const {createCanonicalExpAllocation}=require("../functions/src/canonical-exp-allocation.js");
 const {createCanonicalAttributeAllocation}=
     require("../functions/src/canonical-attribute-allocation.js");
-const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
 const {assembleCanonicalSnapshot,claimRecordsDigest}=require("../functions/src/canonical-snapshot.js");
 const {inspectRecoveryArchive,createRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
 const {createCanonicalCurrentRecovery}=
@@ -949,6 +948,16 @@ console.log("Restricted instance actual device takeover/revocation: old session 
 
 
 assert.deepEqual(initialArchive.get("sourceRecords.claimRecords"),[]);
+const initialPlayableFields=initialArchive.get("sourceRecords.progress.playableState");
+assert.ok(Number.isSafeInteger(initialPlayableFields.lastSaveTimestamp));
+assert.equal(initialPlayableFields.selectedCreationElement,choices.element);
+assert.deepEqual(initialPlayableFields.bestiaryData,{});
+assert.ok(Object.values(initialPlayableFields.heroAccount.heroes).every(row=>
+    row.unlocked===false&&row.specificFragments===0&&row.stars===0));
+assert.deepEqual((await db.doc(`serverUsers/${y}/progress/current`).get())
+    .get("playableState"),initialPlayableFields);
+assert.deepEqual((await db.doc(`serverUsers/${y}/playableSnapshots/2`).get())
+    .get("snapshot.progress.playableState"),initialPlayableFields);
 assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/2`).get())
     .get("readyForPublication"),false);
 assert.equal((await db.doc(`serverUsers/${y}/characters/character-${initialOperation}`).get())
@@ -1188,6 +1197,8 @@ await creditSourceArchiveRef.set(creditSourceArchive);
 const credited=await goldWriter.creditReservedGrant(yRequest,creditArgs);
 assert.equal(credited.creditRevision,4);
 const creditedArchive=await checkRecoveryArchive(y,4);
+assert.deepEqual(creditedArchive.get("sourceRecords.progress.playableState"),initialPlayableFields);
+assert.equal(creditedArchive.get("sourceRecords.progress.serverRevision"),4);
 assert.equal(creditedArchive.get("sourceRecords.claimRecords")[0].claimKey,
     grantIdForCharacter);
 const changedArchive=structuredClone(creditedArchive.data());
@@ -1315,6 +1326,8 @@ await rejected("allocateCanonicalSharedExp",yUser.idToken,
 const allocated=await invoke("allocateCanonicalSharedExp",yUser.idToken,callableAllocation);
 assert.equal(allocated.allocatedRevision,9);
 const leveledArchive=await checkRecoveryArchive(y,9);
+assert.deepEqual(leveledArchive.get("sourceRecords.progress.playableState"),initialPlayableFields);
+assert.equal(leveledArchive.get("sourceRecords.progress.serverRevision"),9);
 assert.equal(leveledArchive.get("sourceRecords.claimRecords").length,3);
 assert.equal(allocated.cost,300);
 assert.equal(allocated.levelAfter,2);
@@ -1360,7 +1373,8 @@ const capRequest={auth:{uid:capUid,token:claims(capUser.idToken)},
     data:{uid:capUid,session:capSession}};
 await initialWriter.commitInitialSources(capRequest,{
     operationId:capOperation,expectedRevision:1,selection:choices});
-const capRecords=makeInitialCharacterSources(capUid,2,capOperation,choices);
+const capRecords=(await db.doc(`serverUsers/${capUid}/recoveryArchives/2`).get())
+    .get("sourceRecords");
 capRecords.characters[0].state.level=100;
 capRecords.characters[0].state.exp=0;
 capRecords.characters[0].state.expNext=120;
@@ -1413,7 +1427,8 @@ const ownedRequest={auth:{uid:ownedUid,token:claims(ownedUser.idToken)},
     data:{uid:ownedUid,session:ownedSession}};
 await initialWriter.commitInitialSources(ownedRequest,{
     operationId:ownedOperation,expectedRevision:1,selection:choices});
-const ownedRecords=makeInitialCharacterSources(ownedUid,2,ownedOperation,choices);
+const ownedRecords=(await db.doc(`serverUsers/${ownedUid}/recoveryArchives/2`).get())
+    .get("sourceRecords");
 const ownedBase={schemaVersion:1,ownerUid:ownedUid,serverRevision:2,
     provenance:"server-created"};
 const ownedItemId="server-owned-starter-blade-0001";
@@ -1612,7 +1627,12 @@ assert.equal((await ownedRoot.collection("claimRecords").doc(ownedGrant).get())
 assert.equal((await ownedRoot.collection("recoveryAudits").doc(recoveryOperation).get())
     .get("sourceRevision"),6);
 assert.equal((await approvalRef.get()).get("status"),"used");
-await checkRecoveryArchive(ownedUid,7);
+const recoveredOwnedArchive=await checkRecoveryArchive(ownedUid,7);
+assert.deepEqual(recoveredOwnedArchive.get("sourceRecords.progress.playableState"),
+    ownedRecords.progress.playableState);
+assert.equal(recoveredOwnedArchive.get("sourceRecords.progress.serverRevision"),7);
+assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
+    .get("playableState"),ownedRecords.progress.playableState);
 assert.equal((await recovery.restoreCurrent(ownedRequest,recoveryArgs)).unchanged,true);
 assert.equal((await invoke("restoreCanonicalCurrent",ownedUser.idToken,recoveryPayload))
     .unchanged,true);
