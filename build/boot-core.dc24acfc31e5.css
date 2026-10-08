@@ -16,6 +16,15 @@
 */
 
 :root{
+    /* Sole design-size owner. Browser UI does not inherit stage coordinates. */
+    --stage-design-width:1080;
+    --stage-design-height:1920;
+    --legacy-design-width:420;
+    --game-native-width:calc(var(--stage-design-width) * 1px);
+    --game-native-height:calc(var(--stage-design-height) * 1px);
+    --game-legacy-width:calc(var(--legacy-design-width) * 1px);
+    --game-legacy-height:calc(var(--game-native-height) * var(--legacy-design-width) / var(--stage-design-width));
+    --legacy-to-native:calc(var(--stage-design-width) / var(--legacy-design-width));
 
     --theme-box-bg:
         linear-gradient(160deg,#241c12,#15100a);
@@ -128,11 +137,9 @@ h1,h2,h3,
 ===================================================== */
 
 #game-stage{
-    position:fixed;
-    left:50%;
-    top:50%;
-    width:1080px;
-    height:1920px;
+    position:relative;
+    width:var(--game-native-width);
+    height:var(--game-native-height);
     overflow:hidden;
     background:#0c0b0a;
     transform-origin:center center;
@@ -186,25 +193,6 @@ body.v174-battle-reading-open #game-stage .team-relic-battle-banner{
     -webkit-touch-callout:none;
 }
 
-#game-stage > #app{
-    /*
-       舊版遊戲 UI 目前以約 420px 寬的窄版版型設計。
-       先保留既有 UI 尺寸，讓整個 legacy layout 成為
-       stage 內的一張完整設計稿，再由 stage 統一縮放。
-    */
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:420px;
-    height:746.6666667px;
-    max-width:none;
-    transform:translate(-50%,-50%);
-    transform-origin:center center;
-}
-
-/* 舊 #app 的 fixed/100dvh 規則由本次覆寫，
-   其餘頁面、戰鬥、技能、巡怪等功能不改。 */
-
 #game-stage #creationPage,
 #game-stage .page,
 #game-stage .content{
@@ -231,90 +219,7 @@ button:disabled{
     cursor:not-allowed;
 }
 
-/*
-   ★ 修正（改用「固定畫布＋整體縮放」的正確做法）：
-   之前是讓畫面裡每一塊區域各自「有彈性地」
-   試著縮小去塞進螢幕，這種做法很難完全預測，
-   不同手機、不同內容狀態，結果都可能不一樣，
-   才會一直卡在「這裡調好、那裡又跑版」的循環。
-
-   正確做法：把整個遊戲畫面當成一張「固定尺寸
-   的設計稿」（下面設定400×860這個參考尺寸），
-   不管實際螢幕多大多小，永遠用同一張設計稿，
-   只是整體等比例縮放去貼合實際螢幕——
-   裡面每個東西的相對位置、大小關係永遠不會跑掉，
-   不需要再猜測任何東西該不該縮小。
-
-   #viewportOuter是鋪滿整個真實瀏覽器視窗的
-   外層容器（黑色背景），#app維持固定的
-   400×860尺寸「畫布」，靠JS算出縮放比例，
-   讓這張畫布整體縮放後剛好完整塞進
-   #viewportOuter，四周多出來的空間
-   （例如手機螢幕比例跟參考尺寸不完全一樣）
-   就自然變成黑色留白，不會裁切、也不會捲動。
-*/
-
-/*
-   ★ 修正（真的簡化到底，不要再疊層）：
-   之前用#viewportOuter（固定滿版）包住
-   #app（用百分比對應父層），這兩層之間
-   還是有一次「百分比計算」在發生，
-   不管用flex置中還是絕對定位置中，
-   都還是多了一層「#app的高度要不要正確等於
-   #viewportOuter的高度」這個計算——
-   這幾輪的問題可能就出在這裡：
-   不管怎麼調整置中方式，只要還有這一層
-   百分比轉換，就有出錯的機會。
-
-   這次直接把兩層合併成一層：
-   #app自己就是position:fixed、
-   直接對應真實視窗（100dvh），
-   不再需要另外一個外層容器幫忙轉換高度，
-   中間完全不會有任何百分比計算的機會，
-   高度是多少就是多少，最直接、最不會出錯。
-   寬度上限、水平置中，用最基本、
-   最多網站都在用、最不會出錯的
-   left:50%+transform位移做法。
-*/
-
-#app{
-    position:fixed;
-
-    top:0;
-    left:50%;
-
-    transform:translateX(-50%);
-
-    width:100%;
-    max-width:420px;
-
-    height:100dvh;
-
-    margin:0;
-    background:#0c0b0a;
-    overflow:hidden;
-
-    padding-top:env(safe-area-inset-top);
-    padding-bottom:env(safe-area-inset-bottom);
-    padding-left:env(safe-area-inset-left);
-    padding-right:env(safe-area-inset-right);
-}
-/* 1080×1920 stage compatibility override */
-#game-stage > #app{
-    position:absolute;
-    top:50%;
-    left:50%;
-    width:420px;
-    max-width:none;
-    height:746.6666667px;
-    margin:0;
-    transform:translate(-50%,-50%);
-    overflow:hidden;
-    padding-top:0;
-    padding-bottom:0;
-    padding-left:0;
-    padding-right:0;
-}
+#app{background:#0c0b0a;}
 
 /* =====================================================
    創建角色
@@ -6294,27 +6199,12 @@ button:active{
    mechanics remain intact while the whole game scales
    as one unit.
 ===================================================== */
-html, body{
-    width:100%;
-    height:100%;
-    margin:0;
-    overflow:hidden;
-}
-
-#game-stage{
-    width:1080px !important;
-    height:1920px !important;
-    overflow:hidden !important;
-    transform-origin:center center !important;
-    background:#0c0b0a;
-}
-
 #game-stage > #app{
     position:absolute !important;
     left:0 !important;
     top:0 !important;
-    width:1080px !important;
-    height:1920px !important;
+    width:var(--game-native-width) !important;
+    height:var(--game-native-height) !important;
     max-width:none !important;
     min-width:0 !important;
     min-height:0 !important;
@@ -6332,8 +6222,8 @@ html, body{
     position:absolute !important;
     left:0 !important;
     top:0 !important;
-    width:1080px !important;
-    height:1920px !important;
+    width:var(--game-native-width) !important;
+    height:var(--game-native-height) !important;
     overflow:visible !important;
     pointer-events:none !important;
     z-index:2147483000 !important;
@@ -6343,22 +6233,16 @@ html, body{
     position:absolute !important;
     left:0 !important;
     top:0 !important;
-    width:420px !important;
-    height:746.6666667px !important;
+    width:var(--game-legacy-width) !important;
+    height:var(--game-legacy-height) !important;
     max-width:none !important;
     min-width:0 !important;
     min-height:0 !important;
     margin:0 !important;
     padding:0 !important;
-    transform:scale(2.571428571428571) !important;
+    transform:scale(var(--legacy-to-native)) !important;
     transform-origin:top left !important;
     overflow:hidden !important;
-}
-
-/* Any direct fixed/viewport sizing on the legacy app itself
-   must not escape the fixed game-stage. */
-#game-stage > #app{
-    position:absolute !important;
 }
 
 /* Full-screen modal layers remain constrained to the stage. */
@@ -6383,9 +6267,12 @@ html, body{
 #game-stage > #app > #game-content .map-bg-fixed-layer,
 #game-stage > #app > #game-content .training-bg-fixed-layer{
     position:absolute !important;
-    inset:0 !important;
-    width:420px !important;
-    height:746.6666667px !important;
+    left:0 !important;
+    top:0 !important;
+    right:auto !important;
+    bottom:auto !important;
+    width:var(--game-legacy-width) !important;
+    height:var(--game-legacy-height) !important;
 }
 
 #game-stage > #app > #game-content .map-quick-toggle-row{
@@ -6407,14 +6294,17 @@ html, body{
 #game-stage > #app > #game-content .modal,
 #game-stage > #app > #game-content .popup-overlay{
     position:absolute !important;
-    inset:0 !important;
-    width:420px !important;
-    height:746.6666667px !important;
+    left:0 !important;
+    top:0 !important;
+    right:auto !important;
+    bottom:auto !important;
+    width:var(--game-legacy-width) !important;
+    height:var(--game-legacy-height) !important;
 }
 
 #game-stage > #app > #game-content .home-feature-modal-box.wide{
-    width:1080px !important;
-    max-width:1080px !important;
+    width:var(--game-native-width) !important;
+    max-width:var(--game-native-width) !important;
     max-height:96% !important;
 }
 
@@ -6435,15 +6325,15 @@ html, body{
     left:0 !important;
     right:0 !important;
     bottom:70px !important;
-    width:420px !important;
+    width:var(--game-legacy-width) !important;
 }
 
 #game-stage > #app > #game-content > div[style*="position:fixed"][style*="bottom:0"]{
     position:absolute !important;
     left:0 !important;
-    right:0 !important;
+    right:auto !important;
     bottom:0 !important;
-    width:420px !important;
+    width:var(--game-legacy-width) !important;
 }
 
 #game-stage > #app > #game-content .ice-spin-projectile,
@@ -6459,24 +6349,17 @@ html, body{
    IMPORTANT:
    - Existing #game-content remains the LEGACY 420×746.6667 layer.
    - Do NOT migrate existing gameplay UI in bulk in this version.
-   - All NEW UI / VFX / Hotspot / Canvas overlays should use the
-     native 1080×1920 coordinate space.
+   - Stage-bound UI / VFX / Hotspots use native coordinates.
+     General UI uses browser CSS pixels and migrates page-by-page.
    - #game-overlay-layer is the native coordinate layer.
 
    This is an incremental migration:
-   old content stays stable, new content uses the final standard.
+   old content stays stable until its original owner migrates it.
 ============================================================ */
 
-:root{
-    --game-native-width: 1080px;
-    --game-native-height: 1920px;
-    --game-legacy-width: 420px;
-    --game-legacy-height: 746.6666667px;
-}
-
 #game-stage > #game-overlay-layer{
-    width:1080px !important;
-    height:1920px !important;
+    width:var(--game-native-width) !important;
+    height:var(--game-native-height) !important;
     left:0 !important;
     top:0 !important;
     transform:none !important;
@@ -6490,8 +6373,8 @@ html, body{
     position:absolute;
     left:0;
     top:0;
-    width:1080px;
-    height:1920px;
+    width:var(--game-native-width);
+    height:var(--game-native-height);
     box-sizing:border-box;
     transform:none;
     transform-origin:top left;

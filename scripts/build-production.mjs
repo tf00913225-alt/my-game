@@ -129,7 +129,7 @@ const gameplayScriptParts=[
 
 const criticalStyles=["css/00-main.css","css/29-v125-character-creation-native.css","css/51-v173.20-startup-loader.css","css/firebase-auth.css"];
 const appStyles=[
-    "css/01-stage-v8-map-page-fix.css","css/02-stage-v3-layout-fix.css","css/03-stage-v4-viewport-lock.css",
+    "css/01-stage-v8-map-page-fix.css","css/03-stage-v4-viewport-lock.css",
     "css/04-v119-ally-target-style.css","css/06-stage-v11-native-bottom-nav.css",
     "css/08-stage-v14-character-scroll-fix.css","css/09-stage-v15-native-character-shell.css",
     "css/19-stage-v54-main-city-moderate-native-scale.css","css/20-stage-v60-training-only-safety.css",

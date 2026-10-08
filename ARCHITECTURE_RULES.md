@@ -28,6 +28,8 @@
 
 8. 不順手全面重構；只在本次修改的同一子系統內做小範圍收斂。
 
+9. Display 尺寸、stage scale、browser／native／legacy 座標分工與 compatibility 退場由 `UI_GUIDELINES.md` 第十三節唯一規定；不得另建 responsive scaler 或後置 viewport lock。
+
 ## 0A. 架構級 Bug
 
 僅在 Fast Path 證據升級條件成立或明確架構級 Bug 修復時，完整適用 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`；責任盤點、完整 Lifecycle、重複根因稽核與完成狀態由該專項 Owner 控制，不在此複製。

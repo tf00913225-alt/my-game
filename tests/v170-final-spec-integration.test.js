@@ -197,6 +197,11 @@ function makeUniversalNode(){
 
 function makeContext(){
     const noop=()=>{};
+    // The headless DOM must expose the same design-size source as production.
+    const displayTokens=Object.fromEntries(Array.from(
+        fs.readFileSync("css/00-main.css","utf8").matchAll(/--(stage-design-width|stage-design-height|legacy-design-width):([\d.]+);/g),
+        match=>["--"+match[1],match[2]]
+    ));
     const dummy=makeUniversalNode();
     const storage=()=>{
         const values=new Map();
@@ -221,7 +226,7 @@ function makeContext(){
         setTimeout:()=>1,clearTimeout:noop,setInterval:()=>1,clearInterval:noop,
         requestAnimationFrame:()=>1,cancelAnimationFrame:noop,queueMicrotask:noop,
         addEventListener:noop,removeEventListener:noop,dispatchEvent:()=>true,
-        scrollTo:noop,getComputedStyle:()=>({getPropertyValue:()=>"",display:"none",position:"static"}),
+        scrollTo:noop,getComputedStyle:()=>({getPropertyValue:key=>displayTokens[key]||"",display:"none",position:"static"}),
         MutationObserver:EmptyObserver,ResizeObserver:EmptyObserver,
         HTMLElement:function(){},Node:function(){},Event:EmptyEvent,CustomEvent:EmptyEvent,
         Image:function(){ return dummy; },Audio:function(){ return dummy; },

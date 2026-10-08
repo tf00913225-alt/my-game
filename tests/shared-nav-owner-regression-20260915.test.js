@@ -8,7 +8,7 @@ const read=path=>fs.readFileSync(path,"utf8");
 const early=read("js/35-v141-ui-battle.js");
 const polish=read("js/41-v146-system-polish.js");
 const nav=read("js/42-v148-combat-dungeon-fixes.js");
-const layout=read("css/02-stage-v3-layout-fix.css");
+const layout=read("css/00-main.css");
 const navCss=read("css/38-v141-system-expansion.css");
 const devCss=read("css/45-v152-dev-fixes.css");
 
@@ -87,5 +87,5 @@ test("gameplay panel keeps only the top ornament owner",()=>{
     const css=read("css/00-main.css");
     assert.match(css,/\.home-bg-fixed-layer\{\s*position:absolute;\s*inset:0;/);
     assert.doesNotMatch(css,/#game-stage > #app > #game-content \.home-bg-fixed-layer/);
-    assert.doesNotMatch(read("css/02-stage-v3-layout-fix.css"),/#game-stage > #app > #game-content \.home-bg-fixed-layer/);
+    assert.doesNotMatch(read("css/00-main.css"),/#game-stage > #app > #game-content \.home-bg-fixed-layer/);
  });
