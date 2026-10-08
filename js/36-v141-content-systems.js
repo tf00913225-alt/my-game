@@ -636,6 +636,9 @@
         if(synthesisState.pendingReforge){ return; }
         const item=findEquipmentByUid(uid);
         if(!canActuallyReforge(item)){
+            synthesisState.reforgeUid=typeof uid==="string"?uid:"";
+            synthesisState.lockedReforgeKeys=[];
+            renderSynthesis();
             alert(item?canActuallyReforge(item,true):"裝備已失效或 UID 重複，請重新選擇裝備。");
             return false;
         }
