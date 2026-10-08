@@ -949,6 +949,20 @@ console.log("Restricted instance actual device takeover/revocation: old session 
 
 assert.deepEqual(initialArchive.get("sourceRecords.claimRecords"),[]);
 const initialPlayableFields=initialArchive.get("sourceRecords.progress.playableState");
+const initialTimeSidecars=initialArchive.get("sourceRecords.progress.sidecars");
+for(const [key,state] of Object.entries({
+    "element-box-state":{remainingMs:0},
+    "exp-pool-growth-state":{initialized:true,unlocked:false,
+        lastAt:initialPlayableFields.lastSaveTimestamp,noticeShown:false,lastCapped:false,newcomerRewards:{}},
+    "rested-exp-state":{battles:0,progressMs:0,
+        lastSeenAt:initialPlayableFields.lastSaveTimestamp,blockedByElementBox:false}
+})){
+    assert.deepEqual(initialTimeSidecars[key],{status:"present",raw:JSON.stringify(state)});
+}
+assert.deepEqual((await db.doc(`serverUsers/${y}/progress/current`).get())
+    .get("sidecars"),initialTimeSidecars);
+assert.deepEqual((await db.doc(`serverUsers/${y}/playableSnapshots/2`).get())
+    .get("snapshot.progress.sidecars"),initialTimeSidecars);
 assert.ok(Number.isSafeInteger(initialPlayableFields.lastSaveTimestamp));
 assert.equal(initialPlayableFields.selectedCreationElement,choices.element);
 assert.deepEqual(initialPlayableFields.bestiaryData,{});
@@ -1198,6 +1212,7 @@ const credited=await goldWriter.creditReservedGrant(yRequest,creditArgs);
 assert.equal(credited.creditRevision,4);
 const creditedArchive=await checkRecoveryArchive(y,4);
 assert.deepEqual(creditedArchive.get("sourceRecords.progress.playableState"),initialPlayableFields);
+assert.deepEqual(creditedArchive.get("sourceRecords.progress.sidecars"),initialTimeSidecars);
 assert.equal(creditedArchive.get("sourceRecords.progress.serverRevision"),4);
 assert.equal(creditedArchive.get("sourceRecords.claimRecords")[0].claimKey,
     grantIdForCharacter);
@@ -1327,6 +1342,7 @@ const allocated=await invoke("allocateCanonicalSharedExp",yUser.idToken,callable
 assert.equal(allocated.allocatedRevision,9);
 const leveledArchive=await checkRecoveryArchive(y,9);
 assert.deepEqual(leveledArchive.get("sourceRecords.progress.playableState"),initialPlayableFields);
+assert.deepEqual(leveledArchive.get("sourceRecords.progress.sidecars"),initialTimeSidecars);
 assert.equal(leveledArchive.get("sourceRecords.progress.serverRevision"),9);
 assert.equal(leveledArchive.get("sourceRecords.claimRecords").length,3);
 assert.equal(allocated.cost,300);
@@ -1630,9 +1646,12 @@ assert.equal((await approvalRef.get()).get("status"),"used");
 const recoveredOwnedArchive=await checkRecoveryArchive(ownedUid,7);
 assert.deepEqual(recoveredOwnedArchive.get("sourceRecords.progress.playableState"),
     ownedRecords.progress.playableState);
+assert.deepEqual(recoveredOwnedArchive.get("sourceRecords.progress.sidecars"),ownedRecords.progress.sidecars);
 assert.equal(recoveredOwnedArchive.get("sourceRecords.progress.serverRevision"),7);
 assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
     .get("playableState"),ownedRecords.progress.playableState);
+assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
+    .get("sidecars"),ownedRecords.progress.sidecars);
 assert.equal((await recovery.restoreCurrent(ownedRequest,recoveryArgs)).unchanged,true);
 assert.equal((await invoke("restoreCanonicalCurrent",ownedUser.idToken,recoveryPayload))
     .unchanged,true);
