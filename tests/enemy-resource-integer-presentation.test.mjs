@@ -110,7 +110,7 @@ test('enemy details share projection while player details and player resource st
 
 test('Boss and legacy hooks cannot author an independent resource number format',()=>{
   const boss=fs.readFileSync('js/gameplay-boss-tower-system.js','utf8');
-  const sync=boss.slice(boss.indexOf('    function syncBossShieldHud(){'),boss.indexOf('    function objectDefinition('));
+  const sync=boss.slice(boss.indexOf('    function syncBossShieldHud(atImpact){'),boss.indexOf('    function objectDefinition('));
   assert.match(sync,/syncEnemyResourceHud\(index\)/);assert.doesNotMatch(sync,/textContent\s*=/);
   for(const file of ['js/35-v141-ui-battle.js','js/38-v143-system-fixes.js']){
     assert.doesNotMatch(fs.readFileSync(file,'utf8'),/hpText\.textContent\s*=|text\.textContent=Math\.floor\(numeric\(shield\.baseHp\)\)/);

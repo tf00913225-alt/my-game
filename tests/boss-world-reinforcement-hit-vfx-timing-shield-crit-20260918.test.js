@@ -14,8 +14,8 @@ const bossCss=read("css/gameplay-boss-tower.css");
 const vfx=read("js/39-v143-skill-animation.js");
 
 assert.match(core,/const MANUAL_RESOLUTION_START_MS=250;/);
-assert.match(core,/const POST_ACTION_DELAY_MS=1150;/);
-assert.match(core,/if\(phase==="declare"\)[\s\S]*?return MANUAL_RESOLUTION_START_MS;/);
+assert.match(core,/const POST_ACTION_DELAY_MS=650;/);
+assert.match(core,/if\(phase==="declare"\)[\s\S]*?return automaticDeclaration===true\?AUTO_DECLARE_HANDOFF_MS:MANUAL_RESOLUTION_START_MS;/);
 assert.match(core,/return Math\.max\(0,visualRemaining\)\+POST_ACTION_DELAY_MS;/);
 assert.doesNotMatch(core,/__battleAdvanceDelayOverrideMs/);
 assert.doesNotMatch(read("js/46-v155-dev-fixes.js"),/__battleAdvanceDelayOverrideMs/);

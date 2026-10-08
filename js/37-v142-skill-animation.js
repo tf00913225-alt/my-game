@@ -275,6 +275,7 @@
     };
     window.v142GetSkillNameDisplayDuration=function(name,element){
         const config=animationConfig(null,name,element);
+        if(config.id==="normal"){ return 700; }
         return Math.max(1,Math.round(config.duration*2/3));
     };
     window.v142GetAnimationDiagnostics=function(){ return director.getMetrics(); };

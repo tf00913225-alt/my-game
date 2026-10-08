@@ -26,8 +26,13 @@ Generated bundles/manifests and restricted-policy digest may follow their source
 only after production build --check, registered-output validation and a real
 source change. Generated-only changes stay strict. CI routing/aggregate/workflow
 owners run core and full Node contract suites; other CI/build/release owners stay
-strict. Full Boss retains all nine scenarios at both phone sizes. No gameplay
-source, Full scenario, required assertion or failure propagation is removed.
+strict. Full Boss retains all nine scenarios at both phone sizes. No Full
+scenario, required assertion or failure propagation is removed. The new
+observer failure propagation exposed an existing dead-Boss/live-support
+formation bug: the Boss Owner now retains context authority until completion
+or abort, including after the body dies. This necessary blocker repair changes
+no stats, AI, damage, rewards, progression, save or account authority, and must
+pass Full plus natural/deployed snapshot acceptance itself.
 
 Boss mode is emitted by the same classifier for PR and dev push and passed
 unchanged to deployed QA: `none` for reliably isolated inventory/shop/docs;
