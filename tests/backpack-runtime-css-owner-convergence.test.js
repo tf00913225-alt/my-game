@@ -17,7 +17,7 @@ const browser=read("tests/backpack-visual-composition-browser.test.js");
 // Permanent gate: source ownership checks are paired with full production-stack browser QA.
 assert.match(css22,/--inventory-equipment-slot-size/);
 assert.match(css22,/--inventory-equipment-cell-height/);
-assert.match(css22,/#game-stage #inventoryPage #inventoryCharacterDetailButton\{[^}]*width:28px[^}]*height:28px/);
+assert.match(css22,/#game-ui #inventoryPage #inventoryCharacterDetailButton\{[^}]*width:28px[^}]*height:28px/);
 assert.doesNotMatch(css23,/inventory-character-detail-button/);
 assert.doesNotMatch(css31,/inventoryCharacterDetailButton/);
 assert.doesNotMatch(css24,/102-SLOT|102-slot|exactly 102|no pagination|flex:1 1 auto !important/);

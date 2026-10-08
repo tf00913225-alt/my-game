@@ -12,6 +12,7 @@ const policySource=mainSource.slice(mainSource.indexOf("const GENERAL_NEGATIVE_S
 const repositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
 const loader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
 const css=fs.readFileSync("css/55-team-relic-system.css","utf8");
+const utilityCss=fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8");
 const feedbackSource=fs.readFileSync("js/battle-floating-feedback-owner.js","utf8");
 const feedbackCss=fs.readFileSync("css/battle-floating-feedback-owner.css","utf8");
 const build=fs.readFileSync("scripts/build-production.mjs","utf8");
@@ -39,13 +40,13 @@ assert.doesNotMatch(source,/localStorage\.setItem\([^\n]*relic/i,"relics must no
 ].forEach(type=>assert.ok(source.includes('triggerDef.type==="'+type+'"'),"trigger schema supports "+type));
 assert.match(css,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 assert.match(css,/team-relic-tabs[\s\S]*overflow-x:auto/);
-assert.match(css,/#game-stage #homeFeatureModal\.team-relic-modal \.home-feature-modal-box\.wide #homeFeatureModalBody\{[^}]*overflow-y:auto!important/,
+assert.match(css,/#game-ui #homeFeatureModal\.team-relic-modal \.home-feature-modal-box\.wide #homeFeatureModalBody\{[^}]*overflow-y:auto!important/,
     "larger relic typography must remain vertically scrollable");
 assert.match(css,/\.team-relic-detail section p\{[^}]*font-size:15px[^}]*line-height:21px/,
     "relic detail copy must use normal 15px mobile body typography");
 assert.doesNotMatch(css,/map-return\.png/,
     "relic modal must use text return controls instead of the round image return icon");
-assert.match(css,/#game-stage #homeFeatureModal\.team-relic-modal \.home-feature-close-btn\{[^}]*min-width:68px!important;[^}]*font-size:15px!important;[^}]*background:linear-gradient\(180deg,#2c2419,#0f0c09\)!important;[^}]*color:#f4ead4!important/,
+assert.match(css,/#game-ui #homeFeatureModal\.team-relic-modal \.home-feature-close-btn\{[^}]*min-width:68px!important;[^}]*font-size:15px!important;[^}]*background:linear-gradient\(180deg,#2c2419,#0f0c09\)!important;[^}]*color:#f4ead4!important/,
     "relic list return control must be a readable 15px dark-gradient text button");
 assert.match(css,/team-relic-modal\.team-relic-detail-mode \.home-feature-close-btn\{display:none!important;\}/,
     "detail mode must remove the redundant modal return control");
@@ -58,19 +59,17 @@ for(const hex of ["#FF9F38","#FF4FA7","#FF5A36","#42A5FF","#47D6A3","#C89B45"]){
 }
 assert.match(css,/rarity-four-symbol[\s\S]*conic-gradient/);
 assert.match(css,/@keyframes teamRelicFourSymbolRarityBreath/);
-assert.match(css,/#game-stage \.team-relic-home-tools\{[\s\S]*?left:50%;[\s\S]*?bottom:0;[\s\S]*?grid-template-columns:repeat\(2,80px\);[\s\S]*?width:192px;[\s\S]*?gap:32px;[\s\S]*?transform:translateX\(-50%\);[\s\S]*?pointer-events:none/,
-    "relic must lean toward Offline EXP and Element Box toward System while preserving the two 80px entrances");
-const utilityRule=(css.match(/#game-stage \.team-relic-home-tools \.home-card-utility\{([^}]*)\}/)||[])[1]||"";
-assert.match(utilityRule,/width:80px/);
+assert.doesNotMatch(css,/#game-(?:stage|ui) \.team-relic-home-tools\{/,'lazy relic CSS must not duplicate persistent utility geometry');
+assert.match(utilityCss,/#game-ui \.team-relic-home-tools\{[^}]*position:relative;[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\);[^}]*width:100%;[^}]*pointer-events:none/,'persistent utilities must reflow inside the browser city');
+const utilityRule=(utilityCss.match(/#game-ui \.team-relic-home-tools \.home-card-utility\{([^}]*)\}/)||[])[1]||"";
+assert.match(utilityRule,/width:100%/);
 assert.match(utilityRule,/height:84px/);
 assert.match(utilityRule,/border:1px solid rgba\(205,154,65,\.82\)/);
 assert.match(utilityRule,/background:linear-gradient\(155deg,rgba\(35,25,15,\.96\),rgba\(8,7,5,\.96\)\)/);
-assert.match(utilityRule,/box-shadow:0 4px 10px rgba\(0,0,0,\.52\)/,
-    "relic and element-box entrances must retain their black-gold skin while accommodating readable labels");
-assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-icon\{[^}]*width:100%;[^}]*height:58px/);
-assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-label\{[^}]*font-size:13px;[^}]*line-height:18px;[^}]*font-weight:900/);
-assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-utility\{[\s\S]*?pointer-events:auto/,
-    "relic and element-box buttons must retain their own hitboxes");
+assert.match(utilityRule,/box-shadow:0 4px 10px rgba\(0,0,0,\.52\)/,'persistent utility skin must remain intact');
+assert.match(utilityCss,/#game-ui \.team-relic-home-tools \.home-card-icon\{[^}]*width:100%;[^}]*height:58px/);
+assert.match(utilityCss,/#game-ui \.team-relic-home-tools \.home-card-label\{[^}]*font-size:13px;[^}]*line-height:18px;[^}]*font-weight:900/);
+assert.match(utilityRule,/pointer-events:auto/,'utilities retain their hitboxes');
 assert.match(css,/\.team-relic-battle-banner\{[^}]*top:48%/,
     "relic name banner must be centered in the battlefield");
 assert.doesNotMatch(css,/\.team-relic-sp-float\{|\.damage-popup\.sp-popup\{[^}]*top:/,

@@ -1,7 +1,7 @@
 /* V177 Backpack Visual Composition & Style Owner.
    This is the canonical visual owner for the existing #inventoryPage.
    The existing #inventoryGridScroll remains the only item-grid scroll owner. */
-#game-stage #inventoryPage{
+#game-ui #inventoryPage{
     --bag-bg:#090807;--bag-panel:#15120f;--bag-frame:#6f5934;--bag-frame-hi:#a98a50;
     --bag-gold:#c89b45;--bag-gold-muted:#8a6730;--bag-text:#eee4cf;--bag-muted:#aaa08d;
     --bag-slot-empty:#3b3328;--bag-slot-border:var(--bag-slot-empty);--bag-selected:#e5c06b;
@@ -10,92 +10,101 @@
 }
 
 /* Thick frame body and title plate: restrained metal, cut corners, double depth. */
-#game-stage #inventoryPage{height:100%;min-height:0;overflow:hidden;box-sizing:border-box}
-#game-stage #inventoryPage .inventory-classic-shell{position:relative;width:93.4%;height:100%;max-height:100%;min-width:0;min-height:0;margin:0 auto;padding:12px 0;container-type:inline-size;display:flex;flex-direction:column;gap:10px;overflow:hidden;box-sizing:border-box;background:linear-gradient(135deg,rgba(200,155,69,.07),transparent 28%,transparent 72%,rgba(88,58,27,.055)),linear-gradient(180deg,#1b1712 0%,var(--bag-panel) 34%,var(--bag-bg));border:1px solid var(--bag-frame);clip-path:polygon(0 12px,12px 0,calc(100% - 12px) 0,100% 12px,100% calc(100% - 12px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 12px));box-shadow:inset 0 0 0 1px rgba(229,192,107,.06),inset 0 18px 28px rgba(0,0,0,.28),0 12px 25px rgba(0,0,0,.45)}
-#game-stage #inventoryPage .inventory-classic-shell:before{content:"";position:absolute;inset:5px;pointer-events:none;opacity:.5;border:1px solid rgba(200,155,69,.2);clip-path:inherit}
-#game-stage #inventoryPage .inventory-header{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:start;flex:0 0 auto;min-height:43px;margin:0 10px}
-#game-stage #inventoryPage .inventory-title-plate{grid-column:2;display:grid;grid-template-columns:auto;justify-items:center;align-items:center;gap:3px;min-width:154px;padding:7px 12px 8px;background:linear-gradient(180deg,#302719,#17130e 70%,#100e0a);border:1px solid var(--bag-frame-hi);clip-path:polygon(0 7px,7px 0,calc(100% - 7px) 0,100% 7px,100% calc(100% - 7px),calc(100% - 7px) 100%,7px 100%,0 calc(100% - 7px));box-shadow:inset 0 1px 0 rgba(246,222,157,.14),0 5px 12px rgba(0,0,0,.38)}
-#game-stage #inventoryPage .inventory-title-plate h2{margin:0;color:var(--bag-text);font-size:22px;line-height:1;letter-spacing:.12em}
-#game-stage #inventoryPage .inventory-title-plate-kicker{color:#b7b19e;font-size:12px;line-height:1;letter-spacing:.1em}
-#game-stage #inventoryPage .inventory-header .map-inventory-overlay-close{grid-column:3;justify-self:end;width:auto;min-width:48px;min-height:32px;margin:5px 0 0;padding:5px 8px;border:1px solid var(--bag-frame);color:#d7c9aa;background:linear-gradient(180deg,#211b12,#100e0a);clip-path:polygon(0 4px,4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%);font-size:18px;line-height:1.2;box-shadow:inset 0 1px 0 rgba(229,192,107,.08)}
-#game-stage #inventoryPage .inventory-header .map-inventory-overlay-close:active{transform:scale(.97)}
+#game-ui #inventoryPage{width:min(100%,var(--ui-page-max-width));height:100%;min-height:0;overflow:hidden;box-sizing:border-box;margin:0 auto;padding:8px;}
+#game-ui #inventoryPage .inventory-classic-shell{position:relative;width:100%;height:100%;max-height:100%;min-width:0;min-height:0;margin:0 auto;padding:12px 0;container-type:inline-size;display:flex;flex-direction:column;gap:10px;overflow:hidden;box-sizing:border-box;background:linear-gradient(135deg,rgba(200,155,69,.07),transparent 28%,transparent 72%,rgba(88,58,27,.055)),linear-gradient(180deg,#1b1712 0%,var(--bag-panel) 34%,var(--bag-bg));border:1px solid var(--bag-frame);clip-path:polygon(0 12px,12px 0,calc(100% - 12px) 0,100% 12px,100% calc(100% - 12px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 12px));box-shadow:inset 0 0 0 1px rgba(229,192,107,.06),inset 0 18px 28px rgba(0,0,0,.28),0 12px 25px rgba(0,0,0,.45)}
+#game-ui #inventoryPage .inventory-classic-shell:before{content:"";position:absolute;inset:5px;pointer-events:none;opacity:.5;border:1px solid rgba(200,155,69,.2);clip-path:inherit}
+#game-ui #inventoryPage .inventory-header{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:start;flex:0 0 auto;min-height:43px;margin:0 10px}
+#game-ui #inventoryPage .inventory-title-plate{grid-column:2;display:grid;grid-template-columns:auto;justify-items:center;align-items:center;gap:3px;min-width:154px;padding:7px 12px 8px;background:linear-gradient(180deg,#302719,#17130e 70%,#100e0a);border:1px solid var(--bag-frame-hi);clip-path:polygon(0 7px,7px 0,calc(100% - 7px) 0,100% 7px,100% calc(100% - 7px),calc(100% - 7px) 100%,7px 100%,0 calc(100% - 7px));box-shadow:inset 0 1px 0 rgba(246,222,157,.14),0 5px 12px rgba(0,0,0,.38)}
+#game-ui #inventoryPage .inventory-title-plate h2{margin:0;color:var(--bag-text);font-size:22px;line-height:1;letter-spacing:.12em}
+#game-ui #inventoryPage .inventory-title-plate-kicker{color:#b7b19e;font-size:13px;line-height:1;letter-spacing:.1em}
+#game-ui #inventoryPage .inventory-header .map-inventory-overlay-close{grid-column:3;justify-self:end;width:auto;min-width:48px;min-height:32px;margin:5px 0 0;padding:5px 8px;border:1px solid var(--bag-frame);color:#d7c9aa;background:linear-gradient(180deg,#211b12,#100e0a);clip-path:polygon(0 4px,4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%);font-size:18px;line-height:1.2;box-shadow:inset 0 1px 0 rgba(229,192,107,.08)}
+#game-ui #inventoryPage .inventory-header .map-inventory-overlay-close:active{transform:scale(.97)}
 
 /* Character showcase: portrait in the middle, equipment components around it. */
-#game-stage #inventoryPage .inventory-character-switch{width:100%;min-height:42px;flex:0 0 auto;display:flex;justify-content:center;align-items:center;gap:12px;margin:0}
-#game-stage #inventoryPage .inventory-character-arrow{width:30px;height:30px;min-width:30px;padding:0;border:1px solid var(--bag-frame);border-radius:0;color:#d8c28d;background:#17120c;font-size:18px;line-height:1;box-shadow:inset 0 -4px 8px rgba(0,0,0,.4)}
-#game-stage #inventoryPage .inventory-character-arrow:active{transform:scale(.97)}
-#game-stage #inventoryPage .inventory-character-name{min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;color:#e1d1a9;font-size:21px;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#game-stage #inventoryPage .inventory-character-name small{margin:0;color:var(--bag-muted);font-size:18px}
-#game-stage #inventoryPage .inventory-character-panel{flex:0 0 auto;min-height:0}
-#game-stage #inventoryPage .inventory-character-stage{--inventory-equipment-slot-size:clamp(42px,14cqw,64px);--inventory-equipment-label-height:24px;--inventory-equipment-grid-gap:clamp(4px,1.5cqw,10px);--inventory-equipment-row-gap:4px;--inventory-equipment-cell-height:calc(var(--inventory-equipment-slot-size) + var(--inventory-equipment-label-height) + var(--inventory-equipment-row-gap));position:relative;width:100%;height:calc(3 * var(--inventory-equipment-cell-height) + 2 * var(--inventory-equipment-grid-gap));min-height:0;margin:0;padding:0 10px;display:grid;grid-template-columns:minmax(52px,1fr) minmax(112px,2.2fr) minmax(52px,1fr);align-items:stretch;gap:var(--inventory-equipment-grid-gap);box-sizing:border-box}
-#game-stage #inventoryPage .inventory-character-stage:before{content:"";position:absolute;inset:4% 17%;pointer-events:none;background:radial-gradient(ellipse at center,rgba(109,137,117,.18),transparent 58%),radial-gradient(ellipse at center,rgba(180,144,76,.1),transparent 72%);border:1px solid rgba(150,137,96,.18);border-radius:50%;opacity:.7}
-#game-stage #inventoryPage .inventory-portrait-frame{position:relative;grid-column:2;grid-row:1;align-self:stretch;width:100%;height:100%;min-height:0;margin:0;display:grid;place-items:center;overflow:hidden;border:0;background:transparent;box-shadow:none}
-#game-stage #inventoryPage .inventory-portrait-frame:before,#game-stage #inventoryPage .inventory-portrait-frame:after{content:"";position:absolute;pointer-events:none;border:1px solid rgba(166,146,93,.28);border-radius:50%}
-#game-stage #inventoryPage .inventory-portrait-frame:before{inset:8% 12%}
-#game-stage #inventoryPage .inventory-portrait-frame:after{inset:16% 20%;border-color:rgba(93,135,111,.16)}
-#game-stage #inventoryPage .inventory-portrait-frame .v131-inventory-portrait{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
-#game-stage #inventoryPage .inventory-portrait-placeholder{position:relative;z-index:1;color:var(--bag-muted);font-size:15px}
-#game-stage #inventoryPage #inventoryCharacterDetailButton{position:absolute;z-index:3;right:3%;top:4%;width:28px;height:28px;min-width:28px;min-height:28px;padding:0;border:1px solid #69715d;border-radius:0;color:#e0c782;background:#131a18;font-size:13px;line-height:1}
-#game-stage #inventoryPage #inventoryCharacterDetailButton:active{transform:scale(.96)}
-#game-stage #inventoryPage .inventory-equipment-grid{position:absolute;inset:0 10px;z-index:2;display:grid;grid-template-columns:minmax(52px,1fr) minmax(112px,2.2fr) minmax(52px,1fr);grid-template-rows:repeat(3,var(--inventory-equipment-cell-height));align-content:start;gap:var(--inventory-equipment-grid-gap);pointer-events:none}
-#game-stage #inventoryPage .inventory-equipment-cell{width:100%;min-width:0;height:var(--inventory-equipment-cell-height);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:var(--inventory-equipment-row-gap);pointer-events:auto}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(1){grid-column:1;grid-row:1}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(2){grid-column:3;grid-row:1}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(3){grid-column:1;grid-row:2}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(4){grid-column:3;grid-row:2}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(5){grid-column:1;grid-row:3}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(6){grid-column:3;grid-row:3}
-#game-stage #inventoryPage .inventory-equipment-slot-label{order:2;width:100%;height:var(--inventory-equipment-label-height);min-width:0;color:#a9a695;font-size:18px;line-height:var(--inventory-equipment-label-height);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
-#game-stage #inventoryPage .inventory-equipment-slot{order:1;width:var(--inventory-equipment-slot-size);height:var(--inventory-equipment-slot-size);flex:0 0 var(--inventory-equipment-slot-size);padding:4px;border:1px solid var(--bag-frame);border-radius:0;background:linear-gradient(145deg,#231b12,#0e0c09 70%);box-shadow:inset 0 1px 0 rgba(226,218,185,.07),inset 0 -7px 12px rgba(0,0,0,.4);box-sizing:border-box}
-#game-stage #inventoryPage .inventory-equipment-icon{font-size:clamp(18px,3.5vw,30px);line-height:1}
+#game-ui #inventoryPage .inventory-character-switch{width:100%;min-height:42px;flex:0 0 auto;display:flex;justify-content:center;align-items:center;gap:12px;margin:0}
+#game-ui #inventoryPage .inventory-character-arrow{width:30px;height:30px;min-width:30px;padding:0;border:1px solid var(--bag-frame);border-radius:0;color:#d8c28d;background:#17120c;font-size:18px;line-height:1;box-shadow:inset 0 -4px 8px rgba(0,0,0,.4)}
+#game-ui #inventoryPage .inventory-character-arrow:active{transform:scale(.97)}
+#game-ui #inventoryPage .inventory-character-name{min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;color:#e1d1a9;font-size:21px;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#game-ui #inventoryPage .inventory-character-name small{margin:0;color:var(--bag-muted);font-size:18px}
+#game-ui #inventoryPage .inventory-character-panel{flex:0 0 auto;min-height:0}
+#game-ui #inventoryPage .inventory-character-stage{--inventory-equipment-slot-size:clamp(42px,14cqw,64px);--inventory-equipment-label-height:24px;--inventory-equipment-grid-gap:clamp(4px,1.5cqw,10px);--inventory-equipment-row-gap:4px;--inventory-equipment-cell-height:calc(var(--inventory-equipment-slot-size) + var(--inventory-equipment-label-height) + var(--inventory-equipment-row-gap));position:relative;width:100%;height:calc(3 * var(--inventory-equipment-cell-height) + 2 * var(--inventory-equipment-grid-gap));min-height:0;margin:0;padding:0 10px;display:grid;grid-template-columns:minmax(52px,1fr) minmax(112px,2.2fr) minmax(52px,1fr);align-items:stretch;gap:var(--inventory-equipment-grid-gap);box-sizing:border-box}
+#game-ui #inventoryPage .inventory-character-stage:before{content:"";position:absolute;inset:4% 17%;pointer-events:none;background:radial-gradient(ellipse at center,rgba(109,137,117,.18),transparent 58%),radial-gradient(ellipse at center,rgba(180,144,76,.1),transparent 72%);border:1px solid rgba(150,137,96,.18);border-radius:50%;opacity:.7}
+#game-ui #inventoryPage .inventory-portrait-frame{position:relative;grid-column:2;grid-row:1;align-self:stretch;width:100%;height:100%;min-height:0;margin:0;display:grid;place-items:center;overflow:hidden;border:0;background:transparent;box-shadow:none}
+#game-ui #inventoryPage .inventory-portrait-frame:before,#game-ui #inventoryPage .inventory-portrait-frame:after{content:"";position:absolute;pointer-events:none;border:1px solid rgba(166,146,93,.28);border-radius:50%}
+#game-ui #inventoryPage .inventory-portrait-frame:before{inset:8% 12%}
+#game-ui #inventoryPage .inventory-portrait-frame:after{inset:16% 20%;border-color:rgba(93,135,111,.16)}
+#game-ui #inventoryPage .inventory-portrait-frame .v131-inventory-portrait{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
+#game-ui #inventoryPage .inventory-portrait-placeholder{position:relative;z-index:1;color:var(--bag-muted);font-size:15px}
+#game-ui #inventoryPage #inventoryCharacterDetailButton{position:absolute;z-index:3;right:3%;top:4%;width:28px;height:28px;min-width:28px;min-height:28px;padding:0;border:1px solid #69715d;border-radius:0;color:#e0c782;background:#131a18;font-size:13px;line-height:1}
+#game-ui #inventoryPage #inventoryCharacterDetailButton:active{transform:scale(.96)}
+#game-ui #inventoryPage .inventory-equipment-grid{position:absolute;inset:0 10px;z-index:2;display:grid;grid-template-columns:minmax(52px,1fr) minmax(112px,2.2fr) minmax(52px,1fr);grid-template-rows:repeat(3,var(--inventory-equipment-cell-height));align-content:start;gap:var(--inventory-equipment-grid-gap);pointer-events:none}
+#game-ui #inventoryPage .inventory-equipment-cell{width:100%;min-width:0;height:var(--inventory-equipment-cell-height);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:var(--inventory-equipment-row-gap);pointer-events:auto}
+#game-ui #inventoryPage .inventory-equipment-cell:nth-child(1){grid-column:1;grid-row:1}#game-ui #inventoryPage .inventory-equipment-cell:nth-child(2){grid-column:3;grid-row:1}#game-ui #inventoryPage .inventory-equipment-cell:nth-child(3){grid-column:1;grid-row:2}#game-ui #inventoryPage .inventory-equipment-cell:nth-child(4){grid-column:3;grid-row:2}#game-ui #inventoryPage .inventory-equipment-cell:nth-child(5){grid-column:1;grid-row:3}#game-ui #inventoryPage .inventory-equipment-cell:nth-child(6){grid-column:3;grid-row:3}
+#game-ui #inventoryPage .inventory-equipment-slot-label{order:2;width:100%;height:var(--inventory-equipment-label-height);min-width:0;color:#a9a695;font-size:18px;line-height:var(--inventory-equipment-label-height);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+#game-ui #inventoryPage .inventory-equipment-slot{order:1;width:var(--inventory-equipment-slot-size);height:var(--inventory-equipment-slot-size);flex:0 0 var(--inventory-equipment-slot-size);padding:4px;border:1px solid var(--bag-frame);border-radius:0;background:linear-gradient(145deg,#231b12,#0e0c09 70%);box-shadow:inset 0 1px 0 rgba(226,218,185,.07),inset 0 -7px 12px rgba(0,0,0,.4);box-sizing:border-box}
+#game-ui #inventoryPage .inventory-equipment-icon{font-size:clamp(18px,3.5vw,30px);line-height:1}
 
 /* Resource, category rail, item slots and the existing single grid scroller. */
-#game-stage #inventoryPage .inventory-right-panel{position:relative;width:100%;min-width:0;min-height:0;flex:1 1 auto;margin:0;padding:8px 10px 0;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;background:transparent}
-#game-stage #inventoryPage .inventory-wallet-bar{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-height:26px;margin:0 5px 3px;padding:2px 4px;border:0;background:transparent;box-shadow:none}
-#game-stage #inventoryPage .inventory-wallet-label{color:var(--bag-muted);font-size:18px;line-height:1}
-#game-stage #inventoryPage .inventory-wallet-value{color:#d6bd79;font-size:18px;line-height:1;font-variant-numeric:tabular-nums}
-#game-stage #inventoryPage .inventory-category-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0 0 7px;padding:0 3px;border-bottom:1px solid var(--bag-frame)}
-#game-stage #inventoryPage .inventory-category-tab{position:relative;min-width:0;min-height:36px;padding:9px 4px 7px;border:0;border-radius:0;color:var(--bag-muted);background:transparent;font-size:18px;font-weight:700;line-height:1;text-align:center;cursor:pointer;user-select:none;transition:color 160ms ease,background 160ms ease}
-#game-stage #inventoryPage .inventory-category-tab:after{content:"";position:absolute;left:18%;right:18%;bottom:-1px;height:2px;background:transparent}
-#game-stage #inventoryPage .inventory-category-tab.active{color:#f0d58f;background:linear-gradient(180deg,rgba(170,140,74,.1),transparent)}
-#game-stage #inventoryPage .inventory-category-tab.active:after{background:var(--bag-gold);box-shadow:0 0 7px rgba(198,164,93,.25)}
-#game-stage #inventoryPage .inventory-category-tab:focus-visible{outline:1px solid var(--bag-gold);outline-offset:-2px}
-#game-stage #inventoryPage .inventory-grid-scroll{display:block;width:100%;min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden;padding:0 1px 8px;scrollbar-gutter:stable;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
-#game-stage #inventoryPage .inventory-grid-classic{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;width:100%;margin:0;align-content:start}
-#game-stage #inventoryPage .inventory-item-classic{position:relative;width:100%;aspect-ratio:1;min-width:0;min-height:0;padding:3px;border:1px solid var(--slot-rarity,var(--bag-slot-border));border-radius:0;background:linear-gradient(145deg,#211a12,#0e0b08 70%);box-shadow:inset 0 1px 0 rgba(226,218,185,.06),inset 0 -8px 13px rgba(0,0,0,.42),0 2px 4px rgba(0,0,0,.22);box-sizing:border-box;transition:filter 160ms ease,transform 100ms ease,box-shadow 160ms ease}
-#game-stage #inventoryPage .inventory-item-classic .inventory-icon{position:relative;z-index:1;display:grid;place-items:center;width:100%;height:100%;font-size:clamp(17px,3vw,28px)}
-#game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon>.v169-item-art{display:grid;place-items:center;width:100%;height:100%;max-width:100%;max-height:100%;overflow:hidden;box-sizing:border-box}
-#game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon>.v169-item-art>img{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center}
-#game-stage #inventoryPage .inventory-item-classic .inventory-count{position:absolute;z-index:2;right:3px;bottom:2px;min-width:14px;color:#f0eadc;font-size:18px;line-height:22px;text-align:right;text-shadow:0 1px 2px #000}
-#game-stage #inventoryPage .inventory-item-classic .inventory-slot-number{display:none}
-#game-stage #inventoryPage .inventory-item-classic.rarity-white{--slot-rarity:var(--rarity-white)}#game-stage #inventoryPage .inventory-item-classic.rarity-blue{--slot-rarity:var(--rarity-blue)}#game-stage #inventoryPage .inventory-item-classic.rarity-purple{--slot-rarity:var(--rarity-purple)}#game-stage #inventoryPage .inventory-item-classic.rarity-orange{--slot-rarity:var(--rarity-orange)}#game-stage #inventoryPage .inventory-item-classic.rarity-red{--slot-rarity:var(--rarity-red)}#game-stage #inventoryPage .inventory-item-classic.rarity-myriad{--slot-rarity:transparent;background:linear-gradient(145deg,#211a12,#0e0b08 70%) padding-box,var(--rarity-myriad) border-box}
-#game-stage #inventoryPage .inventory-item-classic.is-selected{filter:brightness(1.1);box-shadow:inset 0 0 0 1px rgba(232,210,151,.35),inset 0 -8px 13px rgba(0,0,0,.35),0 0 11px color-mix(in srgb,var(--slot-rarity,var(--bag-selected)) 30%,transparent);animation:inventorySlotShine 2.1s ease-in-out infinite}
-#game-stage #inventoryPage .inventory-item-classic:active{transform:scale(.975)}
+#game-ui #inventoryPage .inventory-right-panel{position:relative;width:100%;min-width:0;min-height:0;flex:1 1 auto;margin:0;padding:8px 10px 0;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;background:transparent}
+#game-ui #inventoryPage .inventory-wallet-bar{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-height:26px;margin:0 5px 3px;padding:2px 4px;border:0;background:transparent;box-shadow:none}
+#game-ui #inventoryPage .inventory-wallet-label{color:var(--bag-muted);font-size:18px;line-height:1}
+#game-ui #inventoryPage .inventory-wallet-value{color:#d6bd79;font-size:18px;line-height:1;font-variant-numeric:tabular-nums}
+#game-ui #inventoryPage .inventory-category-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0 0 7px;padding:0 3px;border-bottom:1px solid var(--bag-frame)}
+#game-ui #inventoryPage .inventory-category-tab{position:relative;min-width:0;min-height:36px;padding:9px 4px 7px;border:0;border-radius:0;color:var(--bag-muted);background:transparent;font-size:18px;font-weight:700;line-height:1;text-align:center;cursor:pointer;user-select:none;transition:color 160ms ease,background 160ms ease}
+#game-ui #inventoryPage .inventory-category-tab:after{content:"";position:absolute;left:18%;right:18%;bottom:-1px;height:2px;background:transparent}
+#game-ui #inventoryPage .inventory-category-tab.active{color:#f0d58f;background:linear-gradient(180deg,rgba(170,140,74,.1),transparent)}
+#game-ui #inventoryPage .inventory-category-tab.active:after{background:var(--bag-gold);box-shadow:0 0 7px rgba(198,164,93,.25)}
+#game-ui #inventoryPage .inventory-category-tab:focus-visible{outline:1px solid var(--bag-gold);outline-offset:-2px}
+#game-ui #inventoryPage .inventory-grid-scroll{display:block;width:100%;min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden;padding:0 1px 8px;scrollbar-gutter:stable;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+#game-ui #inventoryPage .inventory-grid-classic{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px;width:100%;margin:0;align-content:start}
+#game-ui #inventoryPage .inventory-item-classic{position:relative;width:100%;aspect-ratio:1;min-width:0;min-height:0;padding:3px;border:1px solid var(--slot-rarity,var(--bag-slot-border));border-radius:0;background:linear-gradient(145deg,#211a12,#0e0b08 70%);box-shadow:inset 0 1px 0 rgba(226,218,185,.06),inset 0 -8px 13px rgba(0,0,0,.42),0 2px 4px rgba(0,0,0,.22);box-sizing:border-box;transition:filter 160ms ease,transform 100ms ease,box-shadow 160ms ease}
+#game-ui #inventoryPage .inventory-item-classic .inventory-icon{position:relative;z-index:1;display:grid;place-items:center;width:100%;height:100%;font-size:clamp(17px,3vw,28px)}
+#game-ui #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon>.v169-item-art{display:grid;place-items:center;width:100%;height:100%;max-width:100%;max-height:100%;overflow:hidden;box-sizing:border-box}
+#game-ui #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon>.v169-item-art>img{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center}
+#game-ui #inventoryPage .inventory-item-classic .inventory-count{position:absolute;z-index:2;right:3px;bottom:2px;min-width:14px;color:#f0eadc;font-size:18px;line-height:22px;text-align:right;text-shadow:0 1px 2px #000}
+#game-ui #inventoryPage .inventory-item-classic .inventory-slot-number{display:none}
+#game-ui #inventoryPage .inventory-item-classic.rarity-white{--slot-rarity:var(--rarity-white)}#game-ui #inventoryPage .inventory-item-classic.rarity-blue{--slot-rarity:var(--rarity-blue)}#game-ui #inventoryPage .inventory-item-classic.rarity-purple{--slot-rarity:var(--rarity-purple)}#game-ui #inventoryPage .inventory-item-classic.rarity-orange{--slot-rarity:var(--rarity-orange)}#game-ui #inventoryPage .inventory-item-classic.rarity-red{--slot-rarity:var(--rarity-red)}#game-ui #inventoryPage .inventory-item-classic.rarity-myriad{--slot-rarity:transparent;background:linear-gradient(145deg,#211a12,#0e0b08 70%) padding-box,var(--rarity-myriad) border-box}
+#game-ui #inventoryPage .inventory-item-classic.is-selected{filter:brightness(1.1);box-shadow:inset 0 0 0 1px rgba(232,210,151,.35),inset 0 -8px 13px rgba(0,0,0,.35),0 0 11px color-mix(in srgb,var(--slot-rarity,var(--bag-selected)) 30%,transparent);animation:inventorySlotShine 2.1s ease-in-out infinite}
+#game-ui #inventoryPage .inventory-item-classic:active{transform:scale(.975)}
 @keyframes inventorySlotShine{0%,100%{filter:brightness(1.07)}50%{filter:brightness(1.14)}}
 
 /* Bottom Action owner: grid geometry, pagination, refresh and quick-sell share one rail. */
-#game-stage #inventoryPage .inventory-bottom-actions{flex:0 0 auto;display:grid;grid-template-columns:minmax(82px,auto) minmax(0,1fr) minmax(82px,auto);align-items:center;gap:8px;width:100%;min-height:44px;margin:2px 0 0;padding:4px 0 0;border-top:1px solid color-mix(in srgb,var(--bag-frame) 55%,transparent);box-sizing:border-box}
-#game-stage #inventoryPage .inventory-bottom-action{min-width:0;min-height:36px;padding:6px 8px;border:1px solid var(--bag-frame);border-radius:0;color:#d7c9aa;background:linear-gradient(180deg,#241c13,#100d09);font-size:18px;font-weight:800;line-height:1.2;white-space:normal;cursor:pointer;clip-path:polygon(0 4px,4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%)}
-#game-stage #inventoryPage .inventory-bottom-action:active{transform:scale(.97)}
-#game-stage #inventoryPage .inventory-quick-sell-action{border-color:var(--bag-gold-muted);color:#efd18b;background:linear-gradient(180deg,#2a2114,#151008)}
-#game-stage #inventoryPage .inventory-bottom-action[hidden]{visibility:hidden}
-#game-stage #inventoryPage .inventory-pagination-slot{min-width:0;display:flex;justify-content:center;align-items:center}
-#game-stage #inventoryPage .v141-inventory-pager{display:grid;grid-template-columns:32px minmax(48px,auto) 32px;align-items:center;justify-content:center;gap:6px;margin:0;padding:0;border:0;background:transparent;box-shadow:none}
-#game-stage #inventoryPage .v141-inventory-pager button{width:32px;min-width:32px;height:32px;min-height:32px;padding:0;border:1px solid var(--bag-frame);border-radius:0;color:#d7c9aa;background:#120e0a;font-size:18px;line-height:1}
-#game-stage #inventoryPage .v141-inventory-pager button:active{transform:scale(.96)}
-#game-stage #inventoryPage .v141-inventory-pager span{min-width:48px;color:#bab5a7;font-size:18px;text-align:center}
+#game-ui #inventoryPage .inventory-bottom-actions{flex:0 0 auto;display:grid;grid-template-columns:minmax(82px,auto) minmax(0,1fr) minmax(82px,auto);align-items:center;gap:8px;width:100%;min-height:44px;margin:2px 0 0;padding:4px 0 0;border-top:1px solid color-mix(in srgb,var(--bag-frame) 55%,transparent);box-sizing:border-box}
+#game-ui #inventoryPage .inventory-bottom-action{min-width:0;min-height:36px;padding:6px 8px;border:1px solid var(--bag-frame);border-radius:0;color:#d7c9aa;background:linear-gradient(180deg,#241c13,#100d09);font-size:18px;font-weight:800;line-height:1.2;white-space:normal;cursor:pointer;clip-path:polygon(0 4px,4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%)}
+#game-ui #inventoryPage .inventory-bottom-action:active{transform:scale(.97)}
+#game-ui #inventoryPage .inventory-quick-sell-action{border-color:var(--bag-gold-muted);color:#efd18b;background:linear-gradient(180deg,#2a2114,#151008)}
+#game-ui #inventoryPage .inventory-bottom-action[hidden]{visibility:hidden}
+#game-ui #inventoryPage .inventory-pagination-slot{min-width:0;display:flex;justify-content:center;align-items:center}
+#game-ui #inventoryPage .v141-inventory-pager{display:grid;grid-template-columns:32px minmax(48px,auto) 32px;align-items:center;justify-content:center;gap:6px;margin:0;padding:0;border:0;background:transparent;box-shadow:none}
+#game-ui #inventoryPage .v141-inventory-pager button{width:32px;min-width:32px;height:32px;min-height:32px;padding:0;border:1px solid var(--bag-frame);border-radius:0;color:#d7c9aa;background:#120e0a;font-size:18px;line-height:1}
+#game-ui #inventoryPage .v141-inventory-pager button:active{transform:scale(.96)}
+#game-ui #inventoryPage .v141-inventory-pager span{min-width:48px;color:#bab5a7;font-size:18px;text-align:center}
 
 /* Quick Sell uses the existing shared Home Feature modal owner. */
-#game-stage #homeFeatureModal.v17350-quick-sell-open .home-feature-modal-box{width:min(92%,390px);max-height:88%;min-height:0}
-#game-stage #homeFeatureModal.v17350-quick-sell-open #homeFeatureModalBody{overflow:auto;padding:0 2px 2px}
-#game-stage #homeFeatureModal .v17350-quick-sell-modal{display:grid;gap:14px;padding:4px 2px;color:#d8d0bd}
-#game-stage #homeFeatureModal .v17350-quick-sell-lede{margin:0;color:#aaa494;font-size:15px;line-height:1.55}
-#game-stage #homeFeatureModal .v17350-quick-sell-field{display:grid;gap:7px;color:#e6d19c;font-size:15px;font-weight:800}
-#game-stage #homeFeatureModal .v17350-quick-sell-field select{width:100%;min-height:42px;padding:7px 9px;border:1px solid #59645a;border-radius:0;color:#eee1c4;background:#111817;font-size:15px}
-#game-stage #homeFeatureModal .v17350-quick-sell-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-#game-stage #homeFeatureModal .v17350-quick-sell-summary>div{display:grid;gap:5px;padding:10px;border:1px solid #3e4a45;background:#151c1a;clip-path:polygon(0 5px,5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%)}
-#game-stage #homeFeatureModal .v17350-quick-sell-summary span{color:#a9a292;font-size:14px}
-#game-stage #homeFeatureModal .v17350-quick-sell-summary b{color:#f0d58f;font-size:18px}
-#game-stage #homeFeatureModal .v17350-quick-sell-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-#game-stage #homeFeatureModal .v17350-quick-sell-actions button{min-height:44px;border:1px solid #58645b;border-radius:0;color:#d5cbb7;background:#161c1b;font-size:15px;font-weight:800}
-#game-stage #homeFeatureModal .v17350-quick-sell-actions button:last-child{border-color:#9a773f;color:#2b1d08;background:linear-gradient(180deg,#e2c071,#a87831)}
-#game-stage #homeFeatureModal .v17350-quick-sell-actions button:disabled{opacity:.45}
+#game-ui #homeFeatureModal.v17350-quick-sell-open .home-feature-modal-box{width:min(92%,390px);max-height:88%;min-height:0}
+#game-ui #homeFeatureModal.v17350-quick-sell-open #homeFeatureModalBody{overflow:auto;padding:0 2px 2px}
+#game-ui #homeFeatureModal .v17350-quick-sell-modal{display:grid;gap:14px;padding:4px 2px;color:#d8d0bd}
+#game-ui #homeFeatureModal .v17350-quick-sell-lede{margin:0;color:#aaa494;font-size:15px;line-height:1.55}
+#game-ui #homeFeatureModal .v17350-quick-sell-field{display:grid;gap:7px;color:#e6d19c;font-size:15px;font-weight:800}
+#game-ui #homeFeatureModal .v17350-quick-sell-field select{width:100%;min-height:42px;padding:7px 9px;border:1px solid #59645a;border-radius:0;color:#eee1c4;background:#111817;font-size:15px}
+#game-ui #homeFeatureModal .v17350-quick-sell-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#game-ui #homeFeatureModal .v17350-quick-sell-summary>div{display:grid;gap:5px;padding:10px;border:1px solid #3e4a45;background:#151c1a;clip-path:polygon(0 5px,5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%)}
+#game-ui #homeFeatureModal .v17350-quick-sell-summary span{color:#a9a292;font-size:14px}
+#game-ui #homeFeatureModal .v17350-quick-sell-summary b{color:#f0d58f;font-size:18px}
+#game-ui #homeFeatureModal .v17350-quick-sell-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#game-ui #homeFeatureModal .v17350-quick-sell-actions button{min-height:44px;border:1px solid #58645b;border-radius:0;color:#d5cbb7;background:#161c1b;font-size:15px;font-weight:800}
+#game-ui #homeFeatureModal .v17350-quick-sell-actions button:last-child{border-color:#9a773f;color:#2b1d08;background:linear-gradient(180deg,#e2c071,#a87831)}
+#game-ui #homeFeatureModal .v17350-quick-sell-actions button:disabled{opacity:.45}
 
-@media (max-width:430px){#game-stage #inventoryPage .inventory-title-plate{min-width:154px;gap:7px;padding-inline:9px}#game-stage #inventoryPage .inventory-title-plate h2{font-size:20px}#game-stage #inventoryPage .inventory-character-stage{padding-inline:7px}#game-stage #inventoryPage .inventory-equipment-grid{inset-inline:7px}}
-@media (max-width:380px){#game-stage #inventoryPage .inventory-classic-shell{width:96%}#game-stage #inventoryPage .inventory-character-stage{grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-stage #inventoryPage .inventory-equipment-grid{grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-stage #inventoryPage .inventory-grid-classic{gap:4px}#game-stage #inventoryPage .inventory-bottom-actions{gap:4px}#game-stage #inventoryPage .inventory-bottom-action{padding-inline:5px}}
-@media (prefers-reduced-motion:reduce){#game-stage #inventoryPage .inventory-item-classic.is-selected{animation:none}}
+@media (max-width:430px){#game-ui #inventoryPage .inventory-title-plate{min-width:154px;gap:7px;padding-inline:9px}#game-ui #inventoryPage .inventory-title-plate h2{font-size:20px}#game-ui #inventoryPage .inventory-character-stage{padding-inline:7px}#game-ui #inventoryPage .inventory-equipment-grid{inset-inline:7px}}
+@media (max-width:380px){#game-ui #inventoryPage .inventory-classic-shell{width:96%}#game-ui #inventoryPage .inventory-character-stage{grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-ui #inventoryPage .inventory-equipment-grid{grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-ui #inventoryPage .inventory-grid-classic{gap:4px}#game-ui #inventoryPage .inventory-bottom-actions{gap:4px}#game-ui #inventoryPage .inventory-bottom-action{padding-inline:5px}}
+@media (prefers-reduced-motion:reduce){#game-ui #inventoryPage .inventory-item-classic.is-selected{animation:none}}
+
+/* Same bag DOM, equipment layout and item scroll owner at every width. */
+@media (min-width:800px){
+    #game-ui #inventoryPage .inventory-classic-shell{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);padding:16px;gap:16px;}
+    #game-ui #inventoryPage .inventory-header{grid-column:1/-1;}
+    #game-ui #inventoryPage .inventory-character-panel{align-self:start;}
+    #game-ui #inventoryPage .inventory-right-panel{height:100%;padding-top:0;}
+    #game-ui #inventoryPage .inventory-grid-classic{grid-template-columns:repeat(auto-fill,minmax(60px,1fr));}
+}

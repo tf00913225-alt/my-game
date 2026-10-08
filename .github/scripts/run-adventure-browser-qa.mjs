@@ -344,8 +344,11 @@ async function runProductionAdventureBalanceQa(){
     try{
         for(const [width,height] of [[390,844],[412,915]]){
             profile=fs.mkdtempSync(path.join(os.tmpdir(),'adventure-balance-'));const port=9750+Math.floor(Math.random()*100);
-            proc=spawn(productionChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
-            const tabs=await waitJson('http://127.0.0.1:'+port+'/json/list');client=new Cdp(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});await new Promise(r=>setTimeout(r,1000));
+            const chrome=productionChrome();let launchError='';
+            proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:['ignore','ignore','pipe']});
+            proc.stderr.on('data',chunk=>{launchError=(launchError+chunk).slice(-4000);});
+            proc.on('error',error=>{launchError=String(error);});
+            const tabs=await waitJson('http://127.0.0.1:'+port+'/json/list').catch(error=>{throw new Error('Adventure Chrome startup failed: '+chrome+' exit='+proc.exitCode+' '+launchError,{cause:error});});client=new Cdp(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});await new Promise(r=>setTimeout(r,1000));
             const active=client.eval(reference+'\n'+expression);let done=false;active.finally(()=>{done=true;}).catch(()=>{});const captured=new Set();
             while(!done){await new Promise(r=>setTimeout(r,250));const marker=await client.eval('window.adventureBalanceQaCapture||null').catch(()=>null);if(marker&&!captured.has(marker)){captured.add(marker);const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(file.replace('.json','-'+width+'x'+height+'-'+marker+'.png'),Buffer.from(shot.data,'base64'));}}
             const evidence=await active;assert.equal(evidence.scenes.length,4);assert.equal(client.events.some(e=>e.method==='Runtime.consoleAPICalled'&&e.params.type==='error'&&JSON.stringify(e.params.args).includes('戰鬥行動超過安全期限')),false,'no watchdog recovery');results.push({width,height,...evidence});close();

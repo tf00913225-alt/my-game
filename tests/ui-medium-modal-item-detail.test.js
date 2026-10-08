@@ -46,10 +46,10 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
 <style>
 html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000;}
-#game-stage{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;transform:none!important;}
+#game-ui{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;transform:none!important;}
 #itemModal{display:flex!important;position:absolute!important;inset:0!important;width:420px!important;height:746.6667px!important;align-items:center!important;justify-content:center!important;}
 #itemModalIcon{height:150px;}.item-modal-buttons{min-height:46px;}
-</style></head><body><div id="game-stage"><div id="itemModal" class="item-modal item-modal-mode-compact" data-presentation-mode="compact">
+</style></head><body><div id="game-ui"><div id="itemModal" class="item-modal item-modal-mode-compact" data-presentation-mode="compact">
 <div class="item-modal-box"><div id="itemModalIcon" class="item-modal-icon">◆</div><div id="itemModalName" class="item-modal-name">回復10%SP藥水</div><div id="itemModalStats" class="item-stat-list"></div><div class="item-modal-buttons"><button id="v17342InventoryPotionUse">使用</button><button id="itemEquipButton">不可裝備</button><button>售出</button></div><button class="close-item-button">返回</button></div>
 </div></div><pre id="result"></pre><script>
 (function(){

@@ -96,7 +96,7 @@ test("backpack is 120 slots rendered as five cyclic pages of 24 without drag or 
     assert.match(uiSource,/inventoryPageIndex=\(inventoryPageIndex\+Number\(direction\)\+INVENTORY_PAGE_COUNT\)%INVENTORY_PAGE_COUNT/);
     assert.match(uiSource,/box\.draggable=false/);
     assert.doesNotMatch(uiSource,/inventory-slot-number/);
-    assert.match(inventoryCss,/\.inventory-grid-classic\{[^}]*grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/);
+    assert.match(inventoryCss,/\.inventory-grid-classic\{[^}]*grid-template-columns:repeat\(auto-fill,minmax\(48px,1fr\)\)/);
     assert.match(inventoryCss,/\.inventory-grid-scroll\{[^}]*overflow-y:auto/);
     assert.match(cssSource,/\.inventory-slot-number\{\s*display:none/);
 });

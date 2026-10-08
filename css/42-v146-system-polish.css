@@ -4,7 +4,7 @@
 
 /* Mobile browsers must never paint their native blue tap flash over game UI. */
 #game-stage,
-#game-stage *{
+:is(#game-stage, #game-ui) *{
     -webkit-tap-highlight-color:rgba(0,0,0,0) !important;
 }
 
@@ -36,7 +36,7 @@
 #battlePage .v146-defeated{pointer-events:none !important;}
 
 
-#game-stage .shop-potion-purchase-row{display:grid !important;grid-template-columns:auto 52px minmax(70px,1fr) 64px !important;gap:5px !important;align-items:center !important;}
+:is(#game-stage,#game-ui) .shop-potion-purchase-row{display:grid !important;grid-template-columns:auto 52px minmax(70px,1fr) 64px !important;gap:5px !important;align-items:center !important;}
 #game-stage .v146-shop-total{min-width:0;color:#f3cf79;font-size:13px;line-height:17px;font-weight:900;text-align:right;white-space:nowrap;}
 
 
@@ -60,7 +60,7 @@
 .v143-abyss-dialogue{padding:34px 25px !important;}.v143-abyss-dialogue b{font-size:23px !important;line-height:1.7 !important;}.v143-abyss-dialogue span{font-size:15px !important;}
 
 /* Lv20+ EXP pool charge / catch-up: minimal additions to the existing pool. */
-#game-stage #homeExpPoolCard .v173-exp-charge-status{
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status{
     position:relative;
     display:grid;
     gap:4px;
@@ -72,12 +72,12 @@
     color:#ead9b4;
     overflow:visible;
 }
-#game-stage #homeExpPoolCard .v173-exp-charge-status > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-#game-stage #homeExpPoolCard .v173-exp-charge-status b{color:#f1c96e;font-size:16px;line-height:21px;}
-#game-stage #homeExpPoolCard .v173-exp-charge-status span{color:#d8bd82;font-size:14px;line-height:19px;font-weight:800;}
-#game-stage #homeExpPoolCard .v173-exp-charge-status small{color:#b8a88c;font-size:14px;line-height:1.45;}
-#game-stage #homeExpPoolCard .v173-exp-charge-floats{position:absolute;right:12px;top:24px;pointer-events:none;overflow:visible;}
-#game-stage #homeExpPoolCard .v173-exp-charge-float{
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status b{color:#f1c96e;font-size:16px;line-height:21px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status span{color:#d8bd82;font-size:14px;line-height:19px;font-weight:800;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status small{color:#b8a88c;font-size:14px;line-height:1.45;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-floats{position:absolute;right:12px;top:24px;pointer-events:none;overflow:visible;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-float{
     position:absolute;right:0;top:0;white-space:nowrap;color:#ffe27e;font-size:14px;font-weight:900;text-shadow:0 1px 3px #000;
     animation:v173ExpChargeFloat 1.45s ease-out both;
 }
@@ -135,31 +135,31 @@
     font-size:13px !important;
     line-height:17px !important;
 }
-#game-stage #homeExpPoolCard .exp-pool-kicker{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-kicker{
     font-size:13px !important;
     line-height:17px !important;
 }
-#game-stage #homeExpPoolCard .exp-pool-unit{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-unit{
     font-size:14px !important;
     line-height:18px !important;
 }
-#game-stage #homeExpPoolCard .exp-pool-section-head small{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-section-head small{
     font-size:14px !important;
     line-height:18px !important;
 }
-#game-stage #homeExpPoolCard .exp-character-copy strong{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-copy strong{
     font-size:15px !important;
     line-height:19px !important;
 }
-#game-stage #homeExpPoolCard .exp-character-copy small{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-copy small{
     font-size:14px !important;
     line-height:18px !important;
 }
-#game-stage #homeExpPoolCard .exp-character-cost b{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-cost b{
     font-size:15px !important;
     line-height:19px !important;
 }
-#game-stage #homeExpPoolCard .exp-character-cost small{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-cost small{
     font-size:13px !important;
     line-height:17px !important;
 }
@@ -187,22 +187,22 @@
 }
 
 /* Other formal non-battle mobile owners discovered by the full typography scan. */
-#game-stage #skillPage .skill-loadout-slot{min-height:60px!important;font-size:15px!important;line-height:1.25!important;}
-#game-stage #skillPage .skill-loadout-slot-name{font-size:15px!important;line-height:18px!important;}
-#game-stage #statusPage .status-points-line{font-size:14px!important;line-height:1.45!important;}
-#game-stage #statusPage .status-formula-hint,#game-stage #statusPage .status-preview-bar-label{font-size:14px!important;line-height:1.4!important;}
+:is(#game-stage,#game-ui) #skillPage .skill-loadout-slot{min-height:60px!important;font-size:15px!important;line-height:1.25!important;}
+:is(#game-stage,#game-ui) #skillPage .skill-loadout-slot-name{font-size:15px!important;line-height:18px!important;}
+:is(#game-stage,#game-ui) #statusPage .status-points-line{font-size:14px!important;line-height:1.45!important;}
+:is(#game-stage,#game-ui) #statusPage .status-formula-hint,:is(#game-stage,#game-ui) #statusPage .status-preview-bar-label{font-size:14px!important;line-height:1.4!important;}
 #game-stage #mapPage .map-player-name{max-width:62px!important;font-size:13px!important;line-height:17px!important;}
 #game-stage #mapPage .map-player-level{font-size:13px!important;line-height:17px!important;}
 #game-stage #mapPage .map-follower{width:64px!important;padding:3px!important;}
 #game-stage #mapPage .map-follower-id{max-width:60px!important;font-size:13px!important;line-height:17px!important;}
 #game-stage #mapPage .map-follower-level{font-size:13px!important;line-height:17px!important;}
-#game-stage #homeFeatureModal [onclick*="selectCharacterForTabs"]>div[style*="font-size:11px"],#game-stage #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:11px"]{font-size:15px!important;line-height:19px!important;}
-#game-stage #homeFeatureModal [id^="characterAvatarLevel"],#game-stage #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:10px"]{font-size:14px!important;line-height:18px!important;}
-#game-stage #homeFeatureModal .character-showcase-choice{position:relative;padding:5px 3px 4px;border:2px solid transparent;border-radius:12px;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
-#game-stage #homeFeatureModal .character-showcase-choice.is-current-character{border-color:#ffe08a;background:linear-gradient(180deg,rgba(158,104,24,.35),rgba(18,12,7,.16));box-shadow:0 0 0 2px rgba(255,186,58,.22),0 0 15px rgba(255,166,32,.48);}
-#game-stage #homeFeatureModal .character-showcase-avatar.is-current-character{border-color:#fff0ab!important;box-shadow:0 0 0 3px rgba(255,176,42,.55),0 0 16px rgba(255,130,28,.9)!important;}
-#game-stage #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody>div:first-child{font-size:15px!important;line-height:1.7!important;}
-#game-stage #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody div[style*="font-size:11px"]{font-size:14px!important;line-height:1.55!important;}
+#game-ui #homeFeatureModal [onclick*="selectCharacterForTabs"]>div[style*="font-size:11px"],#game-ui #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:11px"]{font-size:15px!important;line-height:19px!important;}
+#game-ui #homeFeatureModal [id^="characterAvatarLevel"],#game-ui #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:10px"]{font-size:14px!important;line-height:18px!important;}
+#game-ui #homeFeatureModal .character-showcase-choice{position:relative;padding:5px 3px 4px;border:2px solid transparent;border-radius:12px;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
+#game-ui #homeFeatureModal .character-showcase-choice.is-current-character{border-color:#ffe08a;background:linear-gradient(180deg,rgba(158,104,24,.35),rgba(18,12,7,.16));box-shadow:0 0 0 2px rgba(255,186,58,.22),0 0 15px rgba(255,166,32,.48);}
+#game-ui #homeFeatureModal .character-showcase-avatar.is-current-character{border-color:#fff0ab!important;box-shadow:0 0 0 3px rgba(255,176,42,.55),0 0 16px rgba(255,130,28,.9)!important;}
+#game-ui #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody>div:first-child{font-size:15px!important;line-height:1.7!important;}
+#game-ui #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody div[style*="font-size:11px"]{font-size:14px!important;line-height:1.55!important;}
 #game-stage .v132-dungeon-list>div[style*="font-size:11px"]{font-size:14px!important;line-height:1.5!important;}
 #game-stage .v17361-reward-icon>em{font-size:13px!important;line-height:17px!important;}
 /* Native all-skill preview is scaled from 1080 design space; 34px is the real 13px floor at a 420px phone. */
@@ -226,7 +226,7 @@
     #game-stage #dungeonPage.v146-abyss-active{padding-bottom:78px !important;}
 }
 @media (max-width:380px){
-    #game-stage .shop-potion-purchase-row{grid-template-columns:auto 48px minmax(62px,1fr) 58px !important;gap:3px !important;}
+    :is(#game-stage,#game-ui) .shop-potion-purchase-row{grid-template-columns:auto 48px minmax(62px,1fr) 58px !important;gap:3px !important;}
     #game-stage .v146-shop-total{font-size:13px;}
 }
 @media (prefers-reduced-motion:reduce){

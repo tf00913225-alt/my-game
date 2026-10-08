@@ -246,6 +246,8 @@ Media Query 可以使用，但不能變成針對各手機型號的補丁集合�
 - `css/00-main.css` 的 design tokens 唯一決定 native／legacy 尺寸及 legacy 投影；`css/03-stage-v4-viewport-lock.css` 負責目前 viewport 裁切、安全區與置中；`js/00-main.js` 只計算一次 stage fit scale，並以 `FourSymbolsDisplay` 提供 `browser`／`native`／`legacy` 與 client coordinates 的轉換。`js/02-stage-v9-native-coordinate-api.js` 保留同一函式的舊名稱與 native element helpers，不再擁有第二套轉換公式。
 - 一般 UI 的 `%`、`vw`／`vh`、breakpoint 與 scroll 必須對應其 browser layout domain；stage-bound 元件使用 native／legacy local dimensions，不讀真實 viewport 再做第二次縮放。跨域定位必須使用上述同一 Owner，不能拿 diagnostics 的 scale／offset 自行複製公式。
 - 未遷移頁暫留 `#game-content` 的單一 legacy compatibility boundary；native overlay 跳過 legacy 倍率，body-level auth／reward-modal family 維持 browser CSS pixels。每個頁面只能走一條投影鏈，不得新增 wrapper／scaler 來拉寬桌面。退休 legacy 前須證明正式載入來源沒有剩餘 consumer，並通過座標、導航、捲動與 modal 回歸。
+- 一般 UI 的 browser boundary 為 `js/00-main.js` 建立的 body-level `#game-ui`：一次搬移既有主城、背包與共用功能／物品／角色詳細視窗的 DOM，保留 ID、事件及原生命周期；其可見性跟隨既有 `#gameInterface`，不判斷帳號或 Startup destination。地圖、創角與戰鬥維持原舞台。版面由原頁 CSS Owner 維護，不再保留已遷移頁的 stage-only selector；角色／技能借入共用視窗時使用同一 browser domain。
+- `FourSymbolsBottomNav` 保留同一殼與按鈕：主城／背包使用 browser boundary，其他情境回到 native overlay。`css/06` 唯一控制兩域幾何與通知點；手勢仍由 `js/01` 對兩個正式 surface 處理，單指捲動、滑動後防誤觸及素材長按規則相同。一般頁正常 Page Zoom 不做反向倍率補償。
 - 一般 UI 移出舞台後應保留正常 Browser Page Zoom 的文字／排版效果。現有 stage 的 fit-scale 相容行為與行動 pinch lock 保留至相關呈現遷移，不得添加反向 zoom 補丁。
 
 ## 十四、安全區
@@ -391,7 +393,7 @@ UI 與遊戲邏輯盡量分離。UI 任務若發現邏輯問題，應記錄並�
 
 - 背包 Large Panel 的 DOM／進出生命週期由 `index.html` 與 `js/00-main.js` 負責；版面與美術由 `css/22-stage-v78-character-inventory-core.css` 負責；`css/24-stage-v85-inventory-inner-grid-scroll-root.css` 只負責既有 `#inventoryGridScroll` 單一垂直捲動契約。主城、野怪、副本與活動入口必須重用同一個 `#inventoryPage`，不得再建立第二個背包視窗或搬移 owner。
 - 物品 Medium Modal 的外框、自適應上限、圖框與固定操作列由 `css/49-v169-rpg-ui.css` 單獨決定；`js/00-main.js` 以 `data-presentation-mode` 與 `item-modal-mode-*` 明確切換 `equipment`、`compact`、`comparison`，建立、切換、關閉及再次開啟都必須同步清理狀態。內容 runtime 可以增減內容與按鈕，不得再注入或覆蓋外框尺寸。
-- 尚未遷移的物品詳情使用 legacy 420×746.6667 內容面的 CSS 單位；它由既有 1080×1920 舞台投影，不得另讀瀏覽器寬高來二次縮放。一般頁後續遷移與座標域退場依本文件第十三節，不能將 legacy 限制延伸至新 browser-domain UI。商店商品內容由 `js/equipment-progression.js` 負責，掛載生命週期由 `js/27-v132-content-expansion.js` 的 `v132RewardModal` family 負責，暫屬 `document.body` 相容掛載，因此只能使用 browser CSS pixels（瀏覽器 CSS 像素）；待整個 v132 reward-modal family（獎勵視窗家族）共同遷移後才可移除相容層，禁止只搬其中一個視窗。
+- 物品詳情已隨既有 `#itemModal` 遷移到 browser CSS pixels，尺寸由 `css/49` 的同一外框與 tier tokens 決定；不得恢復 legacy 投影或 runtime 尺寸 writer。商店商品內容由 `js/equipment-progression.js` 負責，掛載生命週期由 `js/27-v132-content-expansion.js` 的 `v132RewardModal` family 負責，仍屬 `document.body` 相容掛載，因此只能使用 browser CSS pixels（瀏覽器 CSS 像素）；待整個 v132 reward-modal family（獎勵視窗家族）共同遷移後才可移除相容層，禁止只搬其中一個視窗。
 - 背景導覽的語意投影、DOM／殼生命週期由 `js/04-stage-v11-native-bottom-nav-runtime.js::FourSymbolsBottomNav.syncContext()` 控制，使冷進頁面不依賴延遲玩法模組；`js/42-v148-combat-dungeon-fixes.js::syncContextNavigation()` 只保留深淵頂部返回控制與呼叫正式投影的相容橋。背包覆蓋狀態、`app.on-inventory-page` 或 `itemModal.dataset.presentationMode` 啟用時，同步隱藏背景導覽殼；物品模式切換／清理由 `js/00-main.js::setItemModalPresentationMode()` 同步呼叫相容入口，關閉後恢復原情境。導覽幾何仍唯一屬於 `css/06-stage-v11-native-bottom-nav.css`，禁止另增 z-index、尺寸、座標或延遲同步 owner。
 - 每個物品視窗只能有一個標記 `data-scroll-owner="y"` 的內容捲動區；標題與必要操作列保持在外框內且不參與捲動。方形圖框使用 `aspect-ratio:1`，圖片使用 `object-fit:contain`；不得以圖片自身 `scale`、固定 `flex-basis` 或縮小可讀文字來換取塞入固定高度。
 - 裝備比較由兩欄在可讀寬度不足時改為上下排列；批量使用／開啟只擁有內容與操作行為，不得成為外框尺寸 owner。新增物品模式時必須先擴充上述語意狀態與同一外框契約，不得依 disabled、按鈕文字、`:has()` 或偶然 DOM 結構推測模式。
@@ -433,9 +435,9 @@ UI 與遊戲邏輯盡量分離。UI 任務若發現邏輯問題，應記錄並�
 
 ## 瀏覽器原生手勢與圖片長按保護（永久規則）
 
-- 《四象江湖傳》正式遊戲區 `#game-stage` **禁止瀏覽器層級的 pinch zoom／雙指縮放**。`index.html` 的 viewport 鎖定只是第一層；`js/01-stage-v8-touch-lock.js` 必須在可捲動容器內也優先攔截兩指以上手勢，不能因 scroll whitelist 而放行瀏覽器縮放。
+- 《四象江湖傳》正式遊戲區 `#game-stage` 與 `#game-ui` **禁止瀏覽器層級的 pinch zoom／雙指縮放**。`index.html` 的 viewport 鎖定只是第一層；`js/01-stage-v8-touch-lock.js` 必須在可捲動容器內也優先攔截兩指以上手勢，不能因 scroll whitelist 而放行瀏覽器縮放。
 - 單指垂直／水平捲動仍依既有 scroll whitelist 正常運作；禁止用全域 `touch-action:none` 粗暴鎖死，避免破壞背包、角色、合成、商店、任務與其他正式捲動區。
-- `#game-stage` 內的圖片、SVG、Canvas 與其他視覺素材不得出現瀏覽器原生「另存圖片／在新分頁開啟／搜尋圖片／分享圖片」長按選單，也不得被原生拖曳或選取。全域事件 owner 固定為 `js/01-stage-v8-touch-lock.js`；CSS 基礎保護固定由 `css/00-main.css` 提供。
+- `#game-stage` 與 `#game-ui` 內的圖片、SVG、Canvas 與其他視覺素材不得出現瀏覽器原生「另存圖片／在新分頁開啟／搜尋圖片／分享圖片」長按選單，也不得被原生拖曳或選取。全域事件 owner 固定為 `js/01-stage-v8-touch-lock.js`；CSS 基礎保護固定由 `css/00-main.css` 提供。
 - 禁止為單一頁面新增第二套 contextmenu／pinch-zoom workaround。新增任何角色、背包、裝備、技能、商店、副本、地圖、彈窗或未來 UI，都必須自動繼承上述全域規則。
 - 文字輸入欄位（`input`／`textarea`／明確 `contenteditable=true`）可保留必要的文字編輯行為；不得為了禁止圖片長按而破壞創角輸入或其他正式文字輸入。
 - 手機 UI QA 必須實測：單指捲動仍可用、雙指不能縮放、長按圖片沒有任何瀏覽器原生反應、正常點擊／拖曳遊戲控制仍可用。

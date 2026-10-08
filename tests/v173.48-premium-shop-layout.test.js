@@ -11,11 +11,11 @@ const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 
 assert.match(css,/V173\.48 — PREMIUM ONE-SCREEN SHOP/);
 assert.match(css,/#homeFeatureModal\.v131-shop-open #homeFeatureModalBody\{[\s\S]*?overflow:hidden !important;[\s\S]*?touch-action:none !important;/);
-assert.match(css,/\.v17345-equipment-grid\{[\s\S]*?grid-template-rows:repeat\(3,minmax\(0,1fr\)\) !important;[\s\S]*?overflow:hidden !important;/);
+assert.match(css,/\.v17345-equipment-grid\{[\s\S]*?grid-template-columns:repeat\(auto-fit,minmax\(min\(100%,260px\),1fr\)\) !important;[\s\S]*?grid-auto-rows:minmax\(150px,1fr\) !important;[\s\S]*?overflow-y:auto !important;/);
 assert.match(css,/\.v17346-shop-card \.v17346-shop-buy\{[\s\S]*?grid-column:1 \/ -1 !important;[\s\S]*?grid-row:5 !important;/);
 assert.match(css,/\.v17346-shop-card \.v17346-reforge-mini\{[\s\S]*?grid-row:4 !important;/);
 assert.match(css,/\.v17345-equipment-refresh\{[\s\S]*?grid-template-columns:minmax\(0,1fr\) 128px !important;[\s\S]*?height:58px !important;/);
-assert.match(css,/\.shop-potion-list\{[\s\S]*?grid-template-rows:repeat\(3,minmax\(0,1fr\)\) !important;[\s\S]*?overflow:hidden !important;/);
+assert.match(css,/\.shop-potion-list\{[\s\S]*?grid-template-columns:repeat\(auto-fit,minmax\(min\(100%,260px\),1fr\)\) !important;[\s\S]*?grid-auto-rows:minmax\(150px,1fr\) !important;[\s\S]*?overflow-y:auto !important;/);
 assert.match(css,/\.shop-potion-card\{[\s\S]*?display:grid !important;[\s\S]*?grid-template-rows:18px 38px 36px !important;[\s\S]*?row-gap:3px !important;/);
 assert.match(css,/\.shop-potion-summary\{[\s\S]*?grid-template-columns:38px minmax\(0,1fr\) !important;[\s\S]*?height:38px !important;/);
 assert.match(css,/\.shop-potion-name\{[\s\S]*?min-height:0 !important;[\s\S]*?height:18px !important;[\s\S]*?margin:0 !important;/);

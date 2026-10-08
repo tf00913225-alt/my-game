@@ -37,7 +37,7 @@ return `<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="${cssHref}">
 <style>
 html,body{margin:0;width:420px;height:746px;overflow:hidden;background:#080706;}
-#game-stage{position:relative!important;width:420px!important;height:746px!important;overflow:hidden!important;}
+#game-ui{position:relative!important;width:420px!important;height:746px!important;overflow:hidden!important;}
 #largeSample,#backpackSample,#mediumSample{position:absolute!important;box-sizing:border-box!important;padding:10px!important;overflow:hidden!important;}
 #largeSample{left:10px!important;top:10px!important;width:195px!important;height:214px!important;}
 #backpackSample{left:215px!important;top:10px!important;width:195px!important;height:214px!important;}
@@ -50,7 +50,7 @@ html,body{margin:0;width:420px;height:746px;overflow:hidden;background:#080706;}
 #mediumStats{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;}
 #largeSample button,#backpackSample button,#mediumSample button,#rewardSample button,#smallSample button{height:34px!important;box-sizing:border-box!important;}
 </style></head><body>
-<div id="game-stage">
+<div id="game-ui">
   <section id="largeSample" class="home-feature-modal-box">
     <div id="largeTitle" class="home-feature-modal-title"><span>角色</span><button class="home-feature-close-btn">返回</button></div>
     <div class="sample-tabs"><button id="tabIdle" class="character-tab">能力</button><button id="tabActive" class="character-tab active">技能</button></div>

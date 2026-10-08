@@ -27,5 +27,5 @@ assert.match(base,/\.status-confirm\{[\s\S]*?min-height:44px/);
 assert.match(base,/\.skill-action-card\{[\s\S]*?min-height:44px/);
 assert.match(exp,/\.v131-exp-preview-btn\{[\s\S]*?min-height:44px/);
 assert.match(exp,/\.v131-exp-actions button\{[\s\S]*?min-height:44px/);
-assert.match(expShell,/#game-stage #homeExpPoolCard \.exp-pool-hero\{[\s\S]*?rgba\(200,154,72,.30\)/);
+assert.match(expShell,/:is\(#game-stage,#game-ui\) #homeExpPoolCard \.exp-pool-hero\{[\s\S]*?rgba\(200,154,72,.30\)/);
 console.log("✓ premium functional UI batch 2 preserves EXP, leveling, six-stat allocation and skill owners");

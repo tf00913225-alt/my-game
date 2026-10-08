@@ -19,5 +19,5 @@ assert.match(cityCss,/team-relic-loadout-slot/);
 assert.doesNotMatch(relic,/createElement\("div"\)[\s\S]{0,160}team-relic-loadout-slot/);
 assert.doesNotMatch(relicCss,/team-relic-loadout-slot/);
 assert.match(css,/Main-city persistent utility shell/);
-assert.match(css,/\.team-relic-home-tools\{[\s\S]*grid-template-columns:repeat\(2,80px\)/);
+assert.match(css,/\.team-relic-home-tools\{[\s\S]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 console.log("V173.65 dev-deploy home utility regression checks passed.");

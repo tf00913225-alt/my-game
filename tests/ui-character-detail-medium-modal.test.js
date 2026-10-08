@@ -39,13 +39,13 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
 <style>
 html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000;}
-#game-stage{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;transform:none!important;}
+#game-ui{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;transform:none!important;}
 #inventoryCharacterDetailModal{display:flex!important;position:absolute!important;inset:0!important;width:420px!important;height:746.6667px!important;align-items:center!important;justify-content:center!important;}
 #inventoryCharacterDetailModal .inventory-character-detail-box{padding:15px!important;}
 #inventoryCharacterDetailModal h2{flex:0 0 auto;margin:0;height:36px;}
 #inventoryCharacterDetailModal .close-item-button{height:46px;min-height:46px;}
 .inventory-character-detail-row{min-height:44px;box-sizing:border-box;}
-</style></head><body><div id="game-stage"><div id="inventoryCharacterDetailModal" class="item-modal inventory-character-detail-modal">
+</style></head><body><div id="game-ui"><div id="inventoryCharacterDetailModal" class="item-modal inventory-character-detail-modal">
 <div class="inventory-character-detail-box"><h2>測試 Lv.12</h2><div id="inventoryCharacterDetailStats" class="inventory-character-detail-grid"></div><button class="close-item-button">關閉</button></div>
 </div></div><pre id="result"></pre><script>
 (function(){

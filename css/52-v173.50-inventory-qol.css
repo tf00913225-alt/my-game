@@ -12,7 +12,7 @@
 }
 
 /* Batch use/open: a compact row above the existing item-detail actions. */
-#game-stage #itemModal .v17350-batch-action{
+#game-ui #itemModal .v17350-batch-action{
     display:flex;
     flex-wrap:wrap;
     align-items:center;
@@ -27,12 +27,12 @@
     background:linear-gradient(180deg,rgba(42,28,15,.92),rgba(15,11,7,.96));
     color:#ddcda9;
 }
-#game-stage #itemModal .v17350-batch-action label{
+#game-ui #itemModal .v17350-batch-action label{
     font-size:18px;
     font-weight:800;
     white-space:nowrap;
 }
-#game-stage #itemModal .v17350-batch-action input{
+#game-ui #itemModal .v17350-batch-action input{
     width:auto;
     min-width:88px;
     flex:1 1 88px;
@@ -49,12 +49,12 @@
     font-weight:900;
     text-align:center;
 }
-#game-stage #itemModal .v17350-batch-action .v17350-batch-max{
+#game-ui #itemModal .v17350-batch-action .v17350-batch-max{
     color:#9e8c70;
     font-size:18px;
     white-space:nowrap;
 }
-#game-stage #itemModal .v17350-batch-action button{
+#game-ui #itemModal .v17350-batch-action button{
     width:auto;
     flex:1 0 100px;
     height:auto;

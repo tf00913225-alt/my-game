@@ -8,9 +8,9 @@ const cp=require("node:child_process");
 const detailCss=fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8");
 const touchSource=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 
-assert.match(detailCss,/#game-stage #skillDetailModal \.item-modal-box\{[\s\S]*?max-width:var\(--ui-medium-modal-max-width,360px\) !important;[\s\S]*?height:min\(var\(--ui-medium-modal-height,540px\),calc\(100% - var\(--ui-medium-modal-safe-space,28px\)\)\) !important;/);
-assert.match(detailCss,/#game-stage #skillDetailModal #skillDetailStats\{[\s\S]*?flex:1 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?scrollbar-gutter:stable !important;/);
-assert.match(detailCss,/#game-stage #skillDetailModal \.close-item-button\{[\s\S]*?margin-top:0 !important;/);
+assert.match(detailCss,/#game-ui #skillDetailModal \.item-modal-box\{[\s\S]*?max-width:var\(--ui-medium-modal-max-width,360px\) !important;[\s\S]*?height:min\(var\(--ui-medium-modal-height,540px\),calc\(100% - var\(--ui-medium-modal-safe-space,28px\)\)\) !important;/);
+assert.match(detailCss,/#game-ui #skillDetailModal #skillDetailStats\{[\s\S]*?flex:1 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?scrollbar-gutter:stable !important;/);
+assert.match(detailCss,/#game-ui #skillDetailModal \.close-item-button\{[\s\S]*?margin-top:0 !important;/);
 assert.match(touchSource,/data-scroll-owner="x\|y\|both"/);
 
 function findChrome(){
@@ -35,10 +35,10 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
 <style>
 html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000;}
-#game-stage{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;transform:none!important;}
+#game-ui{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;transform:none!important;}
 #skillDetailModal{display:flex!important;position:absolute!important;inset:0!important;width:420px!important;height:746.6667px!important;align-items:center!important;justify-content:center!important;}
 #skillDetailIcon{height:90px;}.close-item-button{height:46px;}
-</style></head><body><div id="game-stage"><div id="skillDetailModal" class="item-modal">
+</style></head><body><div id="game-ui"><div id="skillDetailModal" class="item-modal">
 <div class="item-modal-box"><div id="skillDetailIcon" class="item-modal-icon">技</div><div id="skillDetailName" class="item-modal-name">測試技能</div><div id="skillDetailStats" class="item-stat-list"></div><button class="close-item-button">返回</button></div>
 </div></div><pre id="result"></pre><script>
 (function(){
