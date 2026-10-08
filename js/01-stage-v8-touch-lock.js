@@ -82,7 +82,9 @@
     document.addEventListener("pointercancel",cancelPointer,{capture:true,passive:true});
     function handleSuppressedGestureClick(event){ if(consumeSuppression(event)){ event.preventDefault(); event.stopImmediatePropagation(); } }
     const stage=document.getElementById("game-stage");
-    if(stage){ document.addEventListener("click",function(event){ if(isGameSurfaceTarget(event.target)){ handleSuppressedGestureClick(event); } },true); stage.addEventListener("pointerleave",function(event){ if(event.target===stage){ cancelPointer(event); } },true); }
+    for(const surface of [stage,document.getElementById("game-ui")]){
+        if(surface){ surface.addEventListener("click",handleSuppressedGestureClick,true); surface.addEventListener("pointerleave",function(event){ if(event.target===surface){ cancelPointer(event); } },true); }
+    }
     function resetGestures(){ activePointers.clear(); completedPointers.clear(); legacyClickGesture=null; }
     window.addEventListener("blur",resetGestures);
     window.addEventListener("pagehide",resetGestures);

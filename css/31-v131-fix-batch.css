@@ -204,7 +204,7 @@
 }
 
 /* V138：剩餘技能點改成高對比資訊條，未點詳細也能看到學習成本。 */
-#game-stage #skillPage .v138-skill-point-summary{
+:is(#game-stage,#game-ui) #skillPage .v138-skill-point-summary{
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
@@ -217,7 +217,7 @@
     box-shadow:0 0 12px rgba(232,169,60,.28) !important;
 }
 
-#game-stage #skillPage #skillPoints{
+:is(#game-stage,#game-ui) #skillPage #skillPoints{
     display:inline-flex !important;
     min-width:52px !important;
     min-height:34px !important;
@@ -471,16 +471,16 @@
 .v131-element-box-stats .remaining strong{ color:#ffdf69; }
 
 #game-stage #characterTabContent,
-#game-stage #homeExpPoolCard,
-#game-stage #statusPage,
-#game-stage #skillPage{
+:is(#game-stage,#game-ui) #homeExpPoolCard,
+:is(#game-stage,#game-ui) #statusPage,
+:is(#game-stage,#game-ui) #skillPage{
     font-size:15px;
 }
 
 #game-stage #characterTabContent p,
 #game-stage #characterTabContent small,
 #game-stage #characterTabContent .description,
-#game-stage #homeExpPoolCard .exp-pool-caption{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-caption{
     font-size:14px !important;
     line-height:1.55 !important;
 }
@@ -497,16 +497,16 @@
    純粹只調字級，不會撐爆原本的框。
 */
 
-#game-stage #statusPage .status-row{
+:is(#game-stage,#game-ui) #statusPage .status-row{
     font-size:15px !important;
 }
 
-#game-stage #allSkillsList .skill-row-desc{
+:is(#game-stage,#game-ui) #allSkillsList .skill-row-desc{
     font-size:15px !important;
     line-height:1.5 !important;
 }
 
-#game-stage #allSkillsList .skill-row-text b{
+:is(#game-stage,#game-ui) #allSkillsList .skill-row-text b{
     font-size:17px !important;
 }
 

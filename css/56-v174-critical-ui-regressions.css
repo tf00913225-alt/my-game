@@ -166,7 +166,7 @@
 /* Main-city roster: preserve the three equal slots, but return enough horizontal
    room to the HP/SP labels and reduce the two bars instead of letting them bleed. */
 #game-ui #homePage #v146HomeRoster .v146-home-character{
-    grid-template-columns:32px minmax(0,1fr) !important;
+    grid-template-columns:minmax(0,1fr) !important;
     gap:3px !important;
     min-height:70px !important;
     padding:3px 2px !important;

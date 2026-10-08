@@ -60,7 +60,7 @@
 .v143-abyss-dialogue{padding:34px 25px !important;}.v143-abyss-dialogue b{font-size:23px !important;line-height:1.7 !important;}.v143-abyss-dialogue span{font-size:15px !important;}
 
 /* Lv20+ EXP pool charge / catch-up: minimal additions to the existing pool. */
-#game-stage #homeExpPoolCard .v173-exp-charge-status{
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status{
     position:relative;
     display:grid;
     gap:4px;
@@ -72,12 +72,12 @@
     color:#ead9b4;
     overflow:visible;
 }
-#game-stage #homeExpPoolCard .v173-exp-charge-status > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-#game-stage #homeExpPoolCard .v173-exp-charge-status b{color:#f1c96e;font-size:16px;line-height:21px;}
-#game-stage #homeExpPoolCard .v173-exp-charge-status span{color:#d8bd82;font-size:14px;line-height:19px;font-weight:800;}
-#game-stage #homeExpPoolCard .v173-exp-charge-status small{color:#b8a88c;font-size:14px;line-height:1.45;}
-#game-stage #homeExpPoolCard .v173-exp-charge-floats{position:absolute;right:12px;top:24px;pointer-events:none;overflow:visible;}
-#game-stage #homeExpPoolCard .v173-exp-charge-float{
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status b{color:#f1c96e;font-size:16px;line-height:21px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status span{color:#d8bd82;font-size:14px;line-height:19px;font-weight:800;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status small{color:#b8a88c;font-size:14px;line-height:1.45;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-floats{position:absolute;right:12px;top:24px;pointer-events:none;overflow:visible;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-float{
     position:absolute;right:0;top:0;white-space:nowrap;color:#ffe27e;font-size:14px;font-weight:900;text-shadow:0 1px 3px #000;
     animation:v173ExpChargeFloat 1.45s ease-out both;
 }
@@ -135,31 +135,31 @@
     font-size:13px !important;
     line-height:17px !important;
 }
-#game-stage #homeExpPoolCard .exp-pool-kicker{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-kicker{
     font-size:13px !important;
     line-height:17px !important;
 }
-#game-stage #homeExpPoolCard .exp-pool-unit{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-unit{
     font-size:14px !important;
     line-height:18px !important;
 }
-#game-stage #homeExpPoolCard .exp-pool-section-head small{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-section-head small{
     font-size:14px !important;
     line-height:18px !important;
 }
-#game-stage #homeExpPoolCard .exp-character-copy strong{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-copy strong{
     font-size:15px !important;
     line-height:19px !important;
 }
-#game-stage #homeExpPoolCard .exp-character-copy small{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-copy small{
     font-size:14px !important;
     line-height:18px !important;
 }
-#game-stage #homeExpPoolCard .exp-character-cost b{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-cost b{
     font-size:15px !important;
     line-height:19px !important;
 }
-#game-stage #homeExpPoolCard .exp-character-cost small{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-cost small{
     font-size:13px !important;
     line-height:17px !important;
 }
@@ -187,10 +187,10 @@
 }
 
 /* Other formal non-battle mobile owners discovered by the full typography scan. */
-#game-stage #skillPage .skill-loadout-slot{min-height:60px!important;font-size:15px!important;line-height:1.25!important;}
-#game-stage #skillPage .skill-loadout-slot-name{font-size:15px!important;line-height:18px!important;}
-#game-stage #statusPage .status-points-line{font-size:14px!important;line-height:1.45!important;}
-#game-stage #statusPage .status-formula-hint,#game-stage #statusPage .status-preview-bar-label{font-size:14px!important;line-height:1.4!important;}
+:is(#game-stage,#game-ui) #skillPage .skill-loadout-slot{min-height:60px!important;font-size:15px!important;line-height:1.25!important;}
+:is(#game-stage,#game-ui) #skillPage .skill-loadout-slot-name{font-size:15px!important;line-height:18px!important;}
+:is(#game-stage,#game-ui) #statusPage .status-points-line{font-size:14px!important;line-height:1.45!important;}
+:is(#game-stage,#game-ui) #statusPage .status-formula-hint,:is(#game-stage,#game-ui) #statusPage .status-preview-bar-label{font-size:14px!important;line-height:1.4!important;}
 #game-stage #mapPage .map-player-name{max-width:62px!important;font-size:13px!important;line-height:17px!important;}
 #game-stage #mapPage .map-player-level{font-size:13px!important;line-height:17px!important;}
 #game-stage #mapPage .map-follower{width:64px!important;padding:3px!important;}

@@ -1834,7 +1834,7 @@
 }
 
 /* V138：剩餘技能點改成高對比資訊條，未點詳細也能看到學習成本。 */
-#game-stage #skillPage .v138-skill-point-summary{
+:is(#game-stage,#game-ui) #skillPage .v138-skill-point-summary{
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
@@ -1847,7 +1847,7 @@
     box-shadow:0 0 12px rgba(232,169,60,.28) !important;
 }
 
-#game-stage #skillPage #skillPoints{
+:is(#game-stage,#game-ui) #skillPage #skillPoints{
     display:inline-flex !important;
     min-width:52px !important;
     min-height:34px !important;
@@ -2101,16 +2101,16 @@
 .v131-element-box-stats .remaining strong{ color:#ffdf69; }
 
 #game-stage #characterTabContent,
-#game-stage #homeExpPoolCard,
-#game-stage #statusPage,
-#game-stage #skillPage{
+:is(#game-stage,#game-ui) #homeExpPoolCard,
+:is(#game-stage,#game-ui) #statusPage,
+:is(#game-stage,#game-ui) #skillPage{
     font-size:15px;
 }
 
 #game-stage #characterTabContent p,
 #game-stage #characterTabContent small,
 #game-stage #characterTabContent .description,
-#game-stage #homeExpPoolCard .exp-pool-caption{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-caption{
     font-size:14px !important;
     line-height:1.55 !important;
 }
@@ -2127,16 +2127,16 @@
    純粹只調字級，不會撐爆原本的框。
 */
 
-#game-stage #statusPage .status-row{
+:is(#game-stage,#game-ui) #statusPage .status-row{
     font-size:15px !important;
 }
 
-#game-stage #allSkillsList .skill-row-desc{
+:is(#game-stage,#game-ui) #allSkillsList .skill-row-desc{
     font-size:15px !important;
     line-height:1.5 !important;
 }
 
-#game-stage #allSkillsList .skill-row-text b{
+:is(#game-stage,#game-ui) #allSkillsList .skill-row-text b{
     font-size:17px !important;
 }
 
@@ -3627,7 +3627,7 @@
 #game-stage .quest-milestone.claimed .quest-milestone-slot{opacity:.55;}
 
 /* ----- Compact experience pool: clear hierarchy without oversized buttons ----- */
-#game-stage #homeExpPoolCard .exp-pool-hero{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-hero{
     position:relative;
     padding:12px 13px 11px;
     border:1px solid rgba(200,154,72,.30);
@@ -3635,25 +3635,25 @@
     background:linear-gradient(155deg,rgba(35,26,16,.90),rgba(10,8,6,.93));
     box-shadow:inset 0 1px 0 rgba(255,238,196,.035);
 }
-#game-stage #homeExpPoolCard .exp-pool-kicker{font-size:9px;}
-#game-stage #homeExpPoolCard .exp-pool-title{font-size:18px;}
-#game-stage #homeExpPoolCard .exp-pool-value{font-size:30px;}
-#game-stage #homeExpPoolCard .exp-pool-caption{margin-top:7px;font-size:13px !important;line-height:1.45;}
-#game-stage #homeExpPoolCard .exp-pool-section-head{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-kicker{font-size:9px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-title{font-size:18px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-value{font-size:30px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-caption{margin-top:7px;font-size:13px !important;line-height:1.45;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-section-head{
     margin:10px 3px 6px;
     padding-bottom:6px;
     border-bottom:1px solid rgba(200,154,72,.16);
 }
-#game-stage #homeExpPoolCard .exp-pool-section-head span{font-size:14px;}
-#game-stage #homeExpPoolCard .exp-pool-section-head small{font-size:11px;}
-#game-stage #homeExpPoolCard .exp-pool-character-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
-#game-stage #homeExpPoolCard .exp-distribute-button{min-height:52px;padding:6px 7px;grid-template-columns:29px minmax(0,1fr);gap:6px;}
-#game-stage #homeExpPoolCard .exp-character-icon{width:29px;height:29px;font-size:15px;}
-#game-stage #homeExpPoolCard .exp-character-copy strong{font-size:13px;}
-#game-stage #homeExpPoolCard .exp-character-copy small{font-size:10px;}
-#game-stage #homeExpPoolCard .exp-character-cost{grid-column:1/-1;display:flex;flex-direction:row;justify-content:flex-end;gap:4px;margin-top:-4px;}
-#game-stage #homeExpPoolCard .exp-character-cost b{font-size:11px;}
-#game-stage #homeExpPoolCard .exp-character-cost small{font-size:8px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-section-head span{font-size:14px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-section-head small{font-size:11px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-character-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-distribute-button{min-height:52px;padding:6px 7px;grid-template-columns:29px minmax(0,1fr);gap:6px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-icon{width:29px;height:29px;font-size:15px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-copy strong{font-size:13px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-copy small{font-size:10px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-cost{grid-column:1/-1;display:flex;flex-direction:row;justify-content:flex-end;gap:4px;margin-top:-4px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-cost b{font-size:11px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-cost small{font-size:8px;}
 
 /* ----- Compact offline EXP and element box ----- */
 #game-stage .v141-offline-panel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
@@ -4695,7 +4695,7 @@
 .v143-abyss-dialogue{padding:34px 25px !important;}.v143-abyss-dialogue b{font-size:23px !important;line-height:1.7 !important;}.v143-abyss-dialogue span{font-size:15px !important;}
 
 /* Lv20+ EXP pool charge / catch-up: minimal additions to the existing pool. */
-#game-stage #homeExpPoolCard .v173-exp-charge-status{
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status{
     position:relative;
     display:grid;
     gap:4px;
@@ -4707,12 +4707,12 @@
     color:#ead9b4;
     overflow:visible;
 }
-#game-stage #homeExpPoolCard .v173-exp-charge-status > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-#game-stage #homeExpPoolCard .v173-exp-charge-status b{color:#f1c96e;font-size:16px;line-height:21px;}
-#game-stage #homeExpPoolCard .v173-exp-charge-status span{color:#d8bd82;font-size:14px;line-height:19px;font-weight:800;}
-#game-stage #homeExpPoolCard .v173-exp-charge-status small{color:#b8a88c;font-size:14px;line-height:1.45;}
-#game-stage #homeExpPoolCard .v173-exp-charge-floats{position:absolute;right:12px;top:24px;pointer-events:none;overflow:visible;}
-#game-stage #homeExpPoolCard .v173-exp-charge-float{
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status b{color:#f1c96e;font-size:16px;line-height:21px;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status span{color:#d8bd82;font-size:14px;line-height:19px;font-weight:800;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status small{color:#b8a88c;font-size:14px;line-height:1.45;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-floats{position:absolute;right:12px;top:24px;pointer-events:none;overflow:visible;}
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-float{
     position:absolute;right:0;top:0;white-space:nowrap;color:#ffe27e;font-size:14px;font-weight:900;text-shadow:0 1px 3px #000;
     animation:v173ExpChargeFloat 1.45s ease-out both;
 }
@@ -4770,31 +4770,31 @@
     font-size:13px !important;
     line-height:17px !important;
 }
-#game-stage #homeExpPoolCard .exp-pool-kicker{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-kicker{
     font-size:13px !important;
     line-height:17px !important;
 }
-#game-stage #homeExpPoolCard .exp-pool-unit{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-unit{
     font-size:14px !important;
     line-height:18px !important;
 }
-#game-stage #homeExpPoolCard .exp-pool-section-head small{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-section-head small{
     font-size:14px !important;
     line-height:18px !important;
 }
-#game-stage #homeExpPoolCard .exp-character-copy strong{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-copy strong{
     font-size:15px !important;
     line-height:19px !important;
 }
-#game-stage #homeExpPoolCard .exp-character-copy small{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-copy small{
     font-size:14px !important;
     line-height:18px !important;
 }
-#game-stage #homeExpPoolCard .exp-character-cost b{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-cost b{
     font-size:15px !important;
     line-height:19px !important;
 }
-#game-stage #homeExpPoolCard .exp-character-cost small{
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-cost small{
     font-size:13px !important;
     line-height:17px !important;
 }
@@ -4822,10 +4822,10 @@
 }
 
 /* Other formal non-battle mobile owners discovered by the full typography scan. */
-#game-stage #skillPage .skill-loadout-slot{min-height:60px!important;font-size:15px!important;line-height:1.25!important;}
-#game-stage #skillPage .skill-loadout-slot-name{font-size:15px!important;line-height:18px!important;}
-#game-stage #statusPage .status-points-line{font-size:14px!important;line-height:1.45!important;}
-#game-stage #statusPage .status-formula-hint,#game-stage #statusPage .status-preview-bar-label{font-size:14px!important;line-height:1.4!important;}
+:is(#game-stage,#game-ui) #skillPage .skill-loadout-slot{min-height:60px!important;font-size:15px!important;line-height:1.25!important;}
+:is(#game-stage,#game-ui) #skillPage .skill-loadout-slot-name{font-size:15px!important;line-height:18px!important;}
+:is(#game-stage,#game-ui) #statusPage .status-points-line{font-size:14px!important;line-height:1.45!important;}
+:is(#game-stage,#game-ui) #statusPage .status-formula-hint,:is(#game-stage,#game-ui) #statusPage .status-preview-bar-label{font-size:14px!important;line-height:1.4!important;}
 #game-stage #mapPage .map-player-name{max-width:62px!important;font-size:13px!important;line-height:17px!important;}
 #game-stage #mapPage .map-player-level{font-size:13px!important;line-height:17px!important;}
 #game-stage #mapPage .map-follower{width:64px!important;padding:3px!important;}
@@ -5992,8 +5992,8 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
    never change the owning frame dimensions.
 */
 :root{
-    --ui-large-panel-max-width:960px;
-    --ui-large-panel-height:760px;
+    --ui-large-panel-max-width:396px;
+    --ui-large-panel-height:620px;
     --ui-large-panel-safe-space:24px;
     --ui-large-panel-tab-height:42px;
     --ui-large-panel-content-gap:10px;
@@ -6003,6 +6003,11 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     --ui-medium-modal-content-gap:10px;
     --ui-item-art-min:92px;
     --ui-item-art-max:156px;
+}
+
+#game-ui{
+    --ui-large-panel-max-width:960px;
+    --ui-large-panel-height:760px;
 }
 
 /*
@@ -6204,8 +6209,8 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     letter-spacing:.015em;
     overflow-wrap:anywhere;
 }
-#game-stage .home-feature-modal-box::before,
-#game-stage .home-feature-modal-box::after{
+:is(#game-stage,#game-ui) .home-feature-modal-box::before,
+:is(#game-stage,#game-ui) .home-feature-modal-box::after{
     pointer-events:none;
 }
 
@@ -6874,14 +6879,17 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 }
 #game-ui #homeFeatureModal.v131-shop-open .v17345-equipment-grid{
     display:grid !important;
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)) !important;
+    grid-auto-rows:minmax(150px,1fr) !important;
     align-content:stretch !important;
     gap:7px !important;
     width:100% !important;
     height:100% !important;
     min-height:0 !important;
-    overflow:hidden !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    touch-action:pan-y !important;
+    scrollbar-gutter:stable;
 }
 #game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card{
     display:grid !important;
@@ -7065,13 +7073,16 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 }
 #game-ui #homeFeatureModal.v131-shop-open .shop-potion-list{
     display:grid !important;
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)) !important;
+    grid-auto-rows:minmax(150px,1fr) !important;
     gap:6px !important;
     width:100% !important;
     height:100% !important;
     min-height:0 !important;
-    overflow:hidden !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    touch-action:pan-y !important;
+    scrollbar-gutter:stable;
 }
 #game-ui #homeFeatureModal.v131-shop-open .shop-potion-card{
     display:grid !important;
@@ -7260,16 +7271,16 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
    Keep Android Chrome from changing the character scroll position when the
    EXP preview list is replaced, and do not let a tiny finger drift on an
    action button become a vertical pan. */
-#game-stage #homeExpPoolCard,
-#game-stage #homeExpPoolCard .exp-pool-hero,
-#game-stage #homeExpPoolCard .v173-exp-charge-status,
-#game-stage #homeExpPoolCard #expDistributeList,
-#game-stage #homeExpPoolCard #expDistributeList *{
+:is(#game-stage,#game-ui) #homeExpPoolCard,
+:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-hero,
+:is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status,
+:is(#game-stage,#game-ui) #homeExpPoolCard #expDistributeList,
+:is(#game-stage,#game-ui) #homeExpPoolCard #expDistributeList *{
     overflow-anchor:none !important;
 }
-#game-stage #homeExpPoolCard .v131-exp-preview-btn,
-#game-stage #homeExpPoolCard .v131-exp-confirm,
-#game-stage #homeExpPoolCard .v131-exp-back{
+:is(#game-stage,#game-ui) #homeExpPoolCard .v131-exp-preview-btn,
+:is(#game-stage,#game-ui) #homeExpPoolCard .v131-exp-confirm,
+:is(#game-stage,#game-ui) #homeExpPoolCard .v131-exp-back{
     touch-action:none !important;
     -webkit-user-select:none !important;
     user-select:none !important;
@@ -7278,16 +7289,11 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     scroll-behavior:auto !important;
 }
 
-/* V173.62 — character and dungeon backpack use the maximum mobile canvas. */
+/* Character uses the shared browser Large Panel and one content scroller. */
 #game-ui #homeFeatureModal:has(.home-feature-modal-box.wide){
-    padding:4px !important;
+    padding:max(4px,var(--safe-top)) max(4px,var(--safe-right)) max(4px,var(--safe-bottom)) max(4px,var(--safe-left)) !important;
 }
-#game-ui #homeFeatureModal .home-feature-modal-box.wide{
-    width:calc(100% - 8px) !important;
-    max-width:none !important;
-    height:calc(100% - 8px) !important;
-    max-height:calc(100% - 8px) !important;
-}
+
 #game-ui #homeFeatureModal .home-feature-modal-box.wide #characterTabContent{
     overflow-x:hidden !important;
     overflow-y:auto !important;
@@ -7295,7 +7301,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     overscroll-behavior-y:contain !important;
     touch-action:pan-y !important;
 }
-#game-stage .home-feature-modal-box .home-feature-close-btn{
+:is(#game-stage,#game-ui) .home-feature-modal-box .home-feature-close-btn{
     min-height:38px;
 }
 
@@ -7303,7 +7309,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
    Shared Black-Gold Window Skin — visual-only owner
    Geometry, stacking, overflow and interaction remain owned by existing rules.
 ===================================================== */
-#game-stage{
+:root{
     --rpg-window-iron:#0D0C09;
     --rpg-window-iron-soft:#171510;
     --rpg-window-panel:#201D17;
@@ -7315,8 +7321,8 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     --rpg-window-muted:#B9AD98;
 }
 
-#game-stage .home-feature-modal-box,
-#game-stage .item-modal-box,
+:is(#game-stage,#game-ui) .home-feature-modal-box,
+:is(#game-stage,#game-ui) .item-modal-box,
 #game-stage .creation-skill-detail-box,
 #game-stage .modal-box,
 .v169-rpg-dialog,
@@ -7340,9 +7346,9 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
         inset 0 0 30px rgba(0,0,0,.42);
 }
 
-#game-stage .home-feature-modal-title,
-#game-stage .item-modal-name,
-#game-stage .inventory-classic-title,
+:is(#game-stage,#game-ui) .home-feature-modal-title,
+:is(#game-stage,#game-ui) .item-modal-name,
+:is(#game-stage,#game-ui) .inventory-classic-title,
 #game-stage .creation-skill-detail-header,
 #game-stage .v132-reward-modal-title,
 .v169-rpg-dialog h2,
@@ -7359,18 +7365,18 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     text-shadow:0 1px 2px #000,0 0 6px rgba(198,154,69,.16);
 }
 
-#game-stage #homeFeatureModalBody,
-#game-stage .item-stat-list,
-#game-stage #itemModalStats,
-#game-stage #skillDetailStats,
-#game-stage .inventory-stats-panel,
-#game-stage .inventory-character-detail-row,
-#game-stage .system-panel,
-#game-stage .quest-card,
-#game-stage .v141-synthesis-card,
-#game-stage .v141-synthesis-empty,
-#game-stage .v17351-achievement-card,
-#game-stage .v17351-compare-pane,
+:is(#game-stage,#game-ui) #homeFeatureModalBody,
+:is(#game-stage,#game-ui) .item-stat-list,
+:is(#game-stage,#game-ui) #itemModalStats,
+:is(#game-stage,#game-ui) #skillDetailStats,
+:is(#game-stage,#game-ui) .inventory-stats-panel,
+:is(#game-stage,#game-ui) .inventory-character-detail-row,
+:is(#game-stage,#game-ui) .system-panel,
+:is(#game-stage,#game-ui) .quest-card,
+:is(#game-stage,#game-ui) .v141-synthesis-card,
+:is(#game-stage,#game-ui) .v141-synthesis-empty,
+:is(#game-stage,#game-ui) .v17351-achievement-card,
+:is(#game-stage,#game-ui) .v17351-compare-pane,
 .v132-reward-modal-inner .v17363-text-reward-preview{
     border-color:rgba(115,88,45,.76);
     color:var(--rpg-window-text,#EEE7D8);
@@ -7382,8 +7388,8 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
         inset 0 5px 16px rgba(0,0,0,.28);
 }
 
-#game-stage .home-feature-modal-box button,
-#game-stage .item-modal-box button,
+:is(#game-stage,#game-ui) .home-feature-modal-box button,
+:is(#game-stage,#game-ui) .item-modal-box button,
 #game-stage .creation-skill-detail-box button,
 #game-stage .modal-box button,
 .v132-reward-modal-inner button,
@@ -7401,8 +7407,8 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     text-shadow:0 1px 2px rgba(0,0,0,.92);
 }
 
-#game-stage .home-feature-modal-box button:hover,
-#game-stage .item-modal-box button:hover,
+:is(#game-stage,#game-ui) .home-feature-modal-box button:hover,
+:is(#game-stage,#game-ui) .item-modal-box button:hover,
 #game-stage .creation-skill-detail-box button:hover,
 #game-stage .modal-box button:hover,
 .v132-reward-modal-inner button:hover,
@@ -7419,8 +7425,8 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
         0 3px 7px rgba(0,0,0,.36);
 }
 
-#game-stage .home-feature-modal-box button:active,
-#game-stage .item-modal-box button:active,
+:is(#game-stage,#game-ui) .home-feature-modal-box button:active,
+:is(#game-stage,#game-ui) .item-modal-box button:active,
 #game-stage .creation-skill-detail-box button:active,
 #game-stage .modal-box button:active,
 .v132-reward-modal-inner button:active,
@@ -7433,12 +7439,12 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
         inset 0 0 0 1px rgba(240,211,138,.12);
 }
 
-#game-stage .home-feature-modal-box button.active,
-#game-stage .home-feature-modal-box button.selected,
-#game-stage .home-feature-modal-box button[aria-selected="true"],
-#game-stage .home-feature-modal-box button[aria-pressed="true"],
-#game-stage .item-modal-box button.active,
-#game-stage .item-modal-box button.selected,
+:is(#game-stage,#game-ui) .home-feature-modal-box button.active,
+:is(#game-stage,#game-ui) .home-feature-modal-box button.selected,
+:is(#game-stage,#game-ui) .home-feature-modal-box button[aria-selected="true"],
+:is(#game-stage,#game-ui) .home-feature-modal-box button[aria-pressed="true"],
+:is(#game-stage,#game-ui) .item-modal-box button.active,
+:is(#game-stage,#game-ui) .item-modal-box button.selected,
 #game-stage .creation-skill-detail-box button.active,
 #game-stage .creation-skill-detail-box button.selected{
     border-color:var(--rpg-window-gold-hi,#F0D38A);
@@ -7454,8 +7460,8 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     text-shadow:0 1px 2px #000,0 0 5px rgba(240,211,138,.12);
 }
 
-#game-stage .home-feature-modal-box button:disabled,
-#game-stage .item-modal-box button:disabled,
+:is(#game-stage,#game-ui) .home-feature-modal-box button:disabled,
+:is(#game-stage,#game-ui) .item-modal-box button:disabled,
 #game-stage .creation-skill-detail-box button:disabled,
 #game-stage .modal-box button:disabled,
 .v132-reward-modal-inner button:disabled,
@@ -7466,20 +7472,20 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
 }
 
-#game-stage .home-feature-modal-box .quest-tab,
-#game-stage .home-feature-modal-box .character-tab,
-#game-stage .home-feature-modal-box .v141-synthesis-tabs button,
-#game-stage .home-feature-modal-box .v17345-shop-tabs button,
+:is(#game-stage,#game-ui) .home-feature-modal-box .quest-tab,
+:is(#game-stage,#game-ui) .home-feature-modal-box .character-tab,
+:is(#game-stage,#game-ui) .home-feature-modal-box .v141-synthesis-tabs button,
+:is(#game-stage,#game-ui) .home-feature-modal-box .v17345-shop-tabs button{
     border-color:var(--rpg-window-gold-dark,#73582D);
     color:var(--rpg-window-muted,#B9AD98);
     background:linear-gradient(180deg,#242019,#12110E);
     box-shadow:inset 0 1px 0 rgba(240,211,138,.08),inset 0 -2px 0 rgba(0,0,0,.42);
 }
 
-#game-stage .home-feature-modal-box .quest-tab.active,
-#game-stage .home-feature-modal-box .character-tab.active,
-#game-stage .home-feature-modal-box .v141-synthesis-tabs button.active,
-#game-stage .home-feature-modal-box .v17345-shop-tabs button.active,
+:is(#game-stage,#game-ui) .home-feature-modal-box .quest-tab.active,
+:is(#game-stage,#game-ui) .home-feature-modal-box .character-tab.active,
+:is(#game-stage,#game-ui) .home-feature-modal-box .v141-synthesis-tabs button.active,
+:is(#game-stage,#game-ui) .home-feature-modal-box .v17345-shop-tabs button.active{
     border-color:var(--rpg-window-gold-hi,#F0D38A);
     color:#FFF0BE;
     background:
@@ -7491,8 +7497,8 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
         0 0 0 1px rgba(198,154,69,.22);
 }
 
-#game-stage .home-feature-modal-box .home-feature-close-btn,
-#game-stage .item-modal-box .close-item-button,
+:is(#game-stage,#game-ui) .home-feature-modal-box .home-feature-close-btn,
+:is(#game-stage,#game-ui) .item-modal-box .close-item-button,
 #game-stage .creation-skill-detail-box .creation-skill-detail-close,
 #game-stage .creation-skill-detail-box .creation-skill-detail-x{
     border-color:#9B773B;
@@ -8466,7 +8472,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-ui #homeFeatureModal.team-relic-modal .team-relic-loading-error{color:#ffb5a6;}
 :is(#game-stage,#game-ui) .team-relic-notice-dot{position:absolute;right:-2px;top:-2px;z-index:5;}
 /* Main-city relic summary styling lives in the app-shell first-screen owner. */
-#game-ui #homeFeatureModal.team-relic-modal{padding:4px!important;}
+#game-ui #homeFeatureModal.team-relic-modal{padding:max(4px,var(--safe-top)) max(4px,var(--safe-right)) max(4px,var(--safe-bottom)) max(4px,var(--safe-left)) !important;}
 #game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide{position:relative!important;width:calc(100% - 8px)!important;max-width:var(--ui-large-panel-max-width)!important;height:min(var(--ui-large-panel-height),calc(100% - 8px))!important;max-height:calc(100% - 8px)!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;border:2px solid rgba(174,126,51,.86);background:linear-gradient(180deg,#17120d,#070706 78%);}
 #game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-title{flex:0 0 auto;min-height:44px;border-bottom:1px solid rgba(206,154,61,.45);background:linear-gradient(180deg,rgba(45,31,15,.96),rgba(15,12,8,.96));}
 #game-ui #homeFeatureModal.team-relic-modal #homeFeatureModalTitle{font-family:"Noto Serif TC",serif;letter-spacing:.2em;color:#f0d28d;font-size:20px;}

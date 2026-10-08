@@ -3,7 +3,7 @@
 #game-ui #homeFeatureModal.team-relic-modal .team-relic-loading-error{color:#ffb5a6;}
 :is(#game-stage,#game-ui) .team-relic-notice-dot{position:absolute;right:-2px;top:-2px;z-index:5;}
 /* Main-city relic summary styling lives in the app-shell first-screen owner. */
-#game-ui #homeFeatureModal.team-relic-modal{padding:4px!important;}
+#game-ui #homeFeatureModal.team-relic-modal{padding:max(4px,var(--safe-top)) max(4px,var(--safe-right)) max(4px,var(--safe-bottom)) max(4px,var(--safe-left)) !important;}
 #game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide{position:relative!important;width:calc(100% - 8px)!important;max-width:var(--ui-large-panel-max-width)!important;height:min(var(--ui-large-panel-height),calc(100% - 8px))!important;max-height:calc(100% - 8px)!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;border:2px solid rgba(174,126,51,.86);background:linear-gradient(180deg,#17120d,#070706 78%);}
 #game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-title{flex:0 0 auto;min-height:44px;border-bottom:1px solid rgba(206,154,61,.45);background:linear-gradient(180deg,rgba(45,31,15,.96),rgba(15,12,8,.96));}
 #game-ui #homeFeatureModal.team-relic-modal #homeFeatureModalTitle{font-family:"Noto Serif TC",serif;letter-spacing:.2em;color:#f0d28d;font-size:20px;}

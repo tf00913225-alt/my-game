@@ -257,6 +257,34 @@ async function run(chrome,url,live){
   await screenshot('acquisition-relic-360x640');await c.eval('v132CloseRewardModal()');
   evidence.push({relicAcquisition:true});console.log('PASS relic acquisition: Lv20 direct unlock / fragment Boss / Tower ancestry / read-only');
   await checkDisplay('late-features-reentry');
+  // Phase 2 regressions use the final production owners, including lazy CSS.
+  // A viewport fit is insufficient: general pages must have no transformed
+  // ancestor, retain real CSS pixels, and actually reflow on wide displays.
+  for(const v of DISPLAY_VIEWPORTS){
+   await resize(v);await c.eval("closeItemModal();closeHomeFeature();showPage('home')");await settle();
+   const home=await check('#homePage',v),nav=await check('#game-ui #bottomNav',v);
+   const domain=await c.eval(`(()=>{const n=document.getElementById('homePage');const ancestors=[];for(let p=n;p;p=p.parentElement)ancestors.push(getComputedStyle(p).transform);return {parent:n.parentElement.id,ancestors,navParent:document.getElementById('bottomNav').parentElement.parentElement.id,resources:[...n.querySelectorAll('.home-hud-resources b,.v146-home-resource strong')].map(n=>parseFloat(getComputedStyle(n).fontSize))};})()`);
+   assert.equal(domain.parent,'game-ui');assert.equal(domain.navParent,'game-ui');
+   assert.ok(domain.ancestors.every(t=>t==='none'),'browser UI inherited a transform');
+   assert.ok(domain.resources.every(size=>size>=13),'browser home text below reading minimum');
+   assert.ok(home.rect.bottom<=nav.rect.top+1,'navigation overlaps browser page');
+   if(v[0]>=800)assert.ok(home.rect.width>700,'desktop remained a narrow stage projection');
+   await c.eval("showPage('inventory')");await settle();
+   const bag=await check('#inventoryPage',v),frame=await measure('.inventory-classic-shell');
+   if(v[0]>=800)assert.ok(frame.columns.split(' ').length===2,'desktop bag did not use two columns');
+   await check('.inventory-bottom-actions',v);await check('.map-inventory-overlay-close',v,true);
+   await c.eval("closeMapInventoryOverlay();showPage('training')");await settle();
+   assert.equal(await c.eval("bottomNav.parentElement.parentElement.id"),'game-overlay-layer','native return lost navigation domain');
+   await c.eval("openHomeFeature('character')");await settle();
+   const character=await check('#homeFeatureModal .home-feature-modal-box',v);
+   assert.ok(character.rect.width<=961,'character ignored shared Large Panel limit');
+   await c.eval("closeHomeFeature();showPage('home')");
+   evidence.push({generalUi:true,viewport:v,home,nav,bag,character,domain});
+  }
+  console.log('PASS general browser UI: eight widths, desktop reflow, reading size, shared panel and native return');
+  const visibility=await c.eval(`(async()=>{const source=document.getElementById('gameInterface'),ui=document.getElementById('game-ui'),previous=source.style.display;source.style.display='none';await new Promise(requestAnimationFrame);const hidden=ui.hidden;source.style.display=previous;await new Promise(requestAnimationFrame);return {hidden,restored:!ui.hidden,roots:document.querySelectorAll('#game-ui').length};})()`);
+  assert.deepEqual(visibility,{hidden:true,restored:true,roots:1},'browser boundary lost original interface visibility/reentry lifecycle');
+  evidence.push({generalVisibility:visibility});
   return evidence;
  }catch(error){if(c){try{const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from(shot.data,'base64'));}catch{}}error.evidence=evidence;if(browserError){error.message+="\nBrowser: "+browserError;error.stack+="\nBrowser: "+browserError;}throw error;}finally{c?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true});}catch{}}
 }
