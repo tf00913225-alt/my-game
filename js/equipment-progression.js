@@ -68,7 +68,6 @@
         mage:{shoulder:"法環",head:"法冠",armor:"法袍",shoes:"法履",weapon:"法杖"}
     };
     const SHOP_STORAGE_KEY=window.FourSymbolsAccountSave.accountKey("equipment-shop-daily");
-    let activeReforgeSnapshot=null;
     const EQUIPMENT_DUNGEON_FRAGMENT_REWARD=Object.freeze({setIds:Object.freeze(["setFire","setWater","setEarth","setWind"]),count:10,provisional:true});
     let equipmentDungeonReward=null;
     let equipmentDungeonClaiming=false;
@@ -397,10 +396,7 @@
     }
 
     function remainingReforgeSlots(item){
-        if(!item){ return 0; }
-        const explicit=Math.max(0,Math.floor(Number(item.reforgeSlots)||0));
-        const existing=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;
-        return Math.max(explicit,existing);
+        return window.FourSymbolsReforge?window.FourSymbolsReforge.slotCount(item):0;
     }
     window.v17346RemainingReforgeSlots=remainingReforgeSlots;
 
@@ -409,10 +405,13 @@
         if(!stats){ return; }
         stats.querySelectorAll(".v17346-reforge-slot").forEach(node=>node.remove());
         const count=remainingReforgeSlots(item);
+        const owner=window.FourSymbolsReforge;
+        const reason=owner?owner.reason(item):"冶煉功能尚未就緒。";
         for(let index=0;index<count;index++){
-            stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot">[可冶煉]</div>');
+            stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot">'+(reason?escapeHtml(reason)+'（冶煉槽 '+(index+1)+' / '+count+'）':'[可冶煉]')+'</div>');
         }
     }
+    window.v17346AppendReforgeMarkers=appendReforgeMarkers;
     function configureEquipmentChestModal(item){
         if(!item||item.id!==EQUIPMENT_CHEST_DEFINITION.id){ return; }
         const modal=document.getElementById("itemModal");
@@ -470,38 +469,6 @@
         const previousCloseItemModal=closeItemModal;
         closeItemModal=function(){
             return previousCloseItemModal.apply(this,arguments);
-        };
-    }
-
-    function allEquipment(){
-        const result=[];
-        if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){ result.push(...inventoryItems); }
-        if(typeof characterEquipment!=="undefined"&&characterEquipment){ Object.values(characterEquipment).forEach(slots=>result.push(...Object.values(slots||{}))); }
-        return result.filter(Boolean);
-    }
-    function selectedReforgeItem(){
-        const select=document.querySelector('select[onchange*="v141SelectReforgeItem"]');
-        const uid=select&&select.value;
-        return uid?allEquipment().find(item=>item&&item.v141Uid===uid)||null:null;
-    }
-    if(typeof window.v141StartReforge==="function"){
-        const previousStartReforge=window.v141StartReforge;
-        window.v141StartReforge=function(){
-            const item=selectedReforgeItem();
-            if(!item||remainingReforgeSlots(item)<=0){
-                if(typeof window.rpgAlert==="function"){ void window.rpgAlert("這件裝備沒有冶煉槽。",{title:"無法冶煉"}); }
-                else{ alert("這件裝備沒有冶煉槽。"); }
-                return false;
-            }
-            return previousStartReforge.apply(this,arguments);
-        };
-    }
-    if(typeof window.v141ResolveReforge==="function"){
-        const previousResolveReforge=window.v141ResolveReforge;
-        window.v141ResolveReforge=function(){
-            // V173.58: replacement semantics live in js/36. No additive merge and
-            // no reforgeUsed attempt consumption here.
-            return previousResolveReforge.apply(this,arguments);
         };
     }
 
