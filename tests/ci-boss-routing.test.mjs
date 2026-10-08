@@ -40,6 +40,12 @@ test('shared reforge presentation is targeted; formulas, writes and callers fail
   assert.equal(classifySharedSource('function renderBattle(){settleDamage(10);}','function renderBattle(){with({settleDamage(){}}){settleDamage(10);}}'),null);
   assert.equal(classifySharedSource('function renderShopContent(){return "UI";}','function renderShopContent(){debugger;return "UI";}'),null);
   assert.equal(classifySharedSource('function renderShopContent(){return "UI";}','function renderShopContent(){delete player.equipment;return "UI";}'),null);
+  assert.equal(classifySharedSource('function renderShopContent(){return "UI";}','function renderShopContent(){settleDamage`10`;return "UI";}'),null);
+  assert.equal(classifySharedSource('function renderShopContent(){return "UI";}','function renderShopContent(){import("./boss-runtime.js");return "UI";}'),null);
+  assert.equal(classifySharedSource('function renderBattle(){settleDamage`\\u0031`;}','function renderBattle(){settleDamage`1`;}'),null);
+  assert.equal(classifySharedSource('function renderShopContent(){return "UI";}','function renderShopContent(){Math.floor({valueOf:settleDamage});return "UI";}'),null);
+  assert.equal(classifySharedSource('function renderShopContent(){return Math.floor(1);}','function renderShopContent(){const Math={floor:settleDamage};return Math.floor(1);}'),null);
+  assert.deepEqual(classifySharedSource('function renderShopContent(){const label="UI";return label;}','function renderShopContent(){const label="介面";return label;}'),['ui','inventory']);
   assert.equal(classifySharedSource('function renderShopContent(){return "UI";}','function renderShopContent(){const x=[...bossEffects];return "UI";}'),null);
   assert.equal(classifySharedSource('function renderShopContent(){return "UI";}','function renderShopContent(){for(const x of bossEffects){}return "UI";}'),null);
   assert.equal(classifySharedSource('function renderBattle(){settleDamage(10);}','function renderBattle(){"use strict";settleDamage(10);}'),null);

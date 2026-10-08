@@ -51,6 +51,9 @@ still require exact build verification; shared call arguments and complete
 writes must remain identical, not just the callee/write destination.
 Even otherwise pure declarations retain parameter/async/generator signatures;
 directives, dynamic scope, debugger, delete and implicit iterator edits stay strict.
+Dynamic imports and tagged calls are effects; tagged-template raw arguments remain intact.
+Only unshadowed Math rounding of numeric literals is treated as a pure diagnostic;
+opaque used bindings and control flow remain fixed even in otherwise pure declarations.
 Effectful presentation functions also retain control-flow/guard/early-return
 order, used local bindings and default parameters; changing a call input via
 an alias cannot masquerade as unchanged effects. canActuallyReforge/reforgeSlotCount are consumed by transactions and

@@ -32,8 +32,8 @@ export function classifySharedSource(before, after, sourcePath='js/00-main.js') 
       };collect(ast);nodes.sort((a,b)=>a.start-b.start);
       for(const node of nodes) {
         if(functions[node.id.name]) throw Error('Duplicate owner');
-        const effects=[],bindings=[],references=new Map();let effectCount=0;
-        const canonical=value=>JSON.stringify(value,(key,item)=>['start','end','raw'].includes(key)?undefined:item);
+        const effects=[],bindings=[],mathCalls=[],catchParams=[],references=new Map();let effectCount=0;
+        const canonical=value=>JSON.stringify(value,function(key,item){return ['start','end'].includes(key)||(key==='raw'&&this.type==='Literal')?undefined:item;});
         const visit=value=>{
           if(!value || typeof value!=='object') return;
           if(value.type==='Identifier')references.set(value.name,(references.get(value.name)||0)+1);
@@ -41,25 +41,28 @@ export function classifySharedSource(before, after, sourcePath='js/00-main.js') 
           if(['FunctionDeclaration','ClassDeclaration'].includes(value.type))bindings.push({id:value.id,init:value});
           if(['IfStatement','ConditionalExpression','WhileStatement','DoWhileStatement','ForStatement','SwitchStatement','SwitchCase'].includes(value.type))effects.push(canonical({type:value.type,test:value.test,init:value.init,update:value.update,discriminant:value.discriminant}));
           if(['ForInStatement','ForOfStatement','LogicalExpression'].includes(value.type))effects.push(canonical({type:value.type,operator:value.operator,left:value.left,right:value.type==='LogicalExpression'?undefined:value.right,await:value.await}));
-          if(value.type==='CatchClause')effects.push(canonical({type:value.type,param:value.param}));
+          if(value.type==='CatchClause'){catchParams.push(value.param);effects.push(canonical({type:value.type,param:value.param}));}
           if(['ReturnStatement','BreakStatement','ContinueStatement','TryStatement'].includes(value.type))effects.push(canonical({type:value.type,label:value.label,handler:!!value.handler,finalizer:!!value.finalizer}));
           if(value.type==='ThrowStatement'){effects.push(canonical(value));effectCount++;}
           if(['WithStatement','DebuggerStatement'].includes(value.type)){effects.push(canonical(value));effectCount++;}
           if(['ForInStatement','ForOfStatement','SpreadElement'].includes(value.type)){effects.push(canonical(value));effectCount++;}
+          if(['TaggedTemplateExpression','ImportExpression'].includes(value.type)){effects.push(canonical(value));effectCount++;}
           if(value.type==='CallExpression' || value.type==='NewExpression') {
             const callee=source.slice(value.callee.start,value.callee.end).replace(/\s/g,'');
-            if(!/^Math\.(?:floor|ceil|round|trunc)$/.test(callee)){effects.push(canonical(value));effectCount++;}
+            if(/^Math\.(?:floor|ceil|round|trunc)$/.test(callee)&&value.arguments.every(n=>n.type==='Literal'&&typeof n.value==='number'))mathCalls.push(value);
+            else{effects.push(canonical(value));effectCount++;}
           }
           if(['AssignmentExpression','UpdateExpression','AwaitExpression','YieldExpression'].includes(value.type)||(value.type==='UnaryExpression'&&value.operator==='delete')){effects.push(canonical(value));effectCount++;}
           for(const child of Object.values(value)) if(Array.isArray(child)) child.forEach(visit);else visit(child);
         };
         visit(node.body);
+        if(JSON.stringify([...node.params,...catchParams,...bindings.map(b=>b.id)]).includes('"name":"Math"'))for(const call of mathCalls){effects.push(canonical(call));effectCount++;}
         // Inputs reached through local aliases/default parameters must stay fixed,
         // too. An unused pure diagnostic local cannot change an existing effect.
         const presentationRows=b=>node.id.name==='openInventoryCharacterDetail' && b.id.name==='rows' && references.get('rows')===2 && b.init?.type==='ArrayExpression' && b.init.elements.every(row=>row?.type==='ArrayExpression' && row.elements.length===2 && row.elements[0]?.type==='Literal' && typeof row.elements[0].value==='string');
-        const usedBindings=bindings.filter(b=>(b.id.type!=='Identifier'||(references.get(b.id.name)||0)>1) && !presentationRows(b));
+        const usedBindings=bindings.filter(b=>(b.id.type!=='Identifier'||(references.get(b.id.name)||0)>1) && !presentationRows(b) && !(effectCount===0&&b.id.name!=='Math'&&b.init?.type==='Literal'&&(b.init.value===null||['string','number','boolean'].includes(typeof b.init.value))));
         const signature={params:node.params,async:node.async,generator:node.generator,directives:node.body.body.filter(n=>n.directive).map(n=>n.directive)};
-        functions[node.id.name]={text:source.slice(node.start,node.end),effects:effectCount?canonical({effects,bindings:usedBindings,...signature}):canonical(signature)};
+        functions[node.id.name]={text:source.slice(node.start,node.end),effects:canonical({effects,bindings:usedBindings,...signature})};
         pieces.push(source.slice(cursor,node.start),`FUNCTION:${node.id.name}`);cursor=node.end;
       }
       pieces.push(source.slice(cursor));return {functions,rest:pieces.join('')};
