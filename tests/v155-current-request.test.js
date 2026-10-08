@@ -265,7 +265,7 @@ test("hard-controlled player and monster leave timing to the core queue owner",(
     context.processSingleMonsterAttack(0,1);
     assert.deepEqual(observed,[undefined,undefined]);
     assert.equal(Object.prototype.hasOwnProperty.call(context,"__battleAdvanceDelayOverrideMs"),false);
-    assert.match(coreSource,/function getBattleAdvanceDelay\(phase\)/);
+    assert.match(coreSource,/function getBattleAdvanceDelay\(phase,automaticDeclaration\)/);
     assert.doesNotMatch(source,/withHardControlDelay|__battleAdvanceDelayOverrideMs/);
     assert.doesNotMatch(v131Source,/finishPlayerAction\s*=(?!=)/);
     assert.doesNotMatch(v142Source,/finishPlayerAction\s*=(?!=)/);

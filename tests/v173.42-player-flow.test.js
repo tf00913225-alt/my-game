@@ -116,7 +116,7 @@ assert.match(fs.readFileSync("css/38-v141-system-expansion.css","utf8"),/animati
 assert.match(fs.readFileSync("css/06-stage-v11-native-bottom-nav.css","utf8"),/#bottomNav > \.nav-button > \.v141-notice-dot\{[\s\S]*?width:22px;/);
 
 /* Manual actions use one core delay owner extended only by visual remaining time. */
-assert.match(core,/function getBattleAdvanceDelay\(phase\)/);
+assert.match(core,/function getBattleAdvanceDelay\(phase,automaticDeclaration\)/);
 assert.match(core,/v142GetRemainingAnimationMs/);
 assert.doesNotMatch(v131,/finishPlayerAction\s*=|processNextCombatant\s*=/);
 
