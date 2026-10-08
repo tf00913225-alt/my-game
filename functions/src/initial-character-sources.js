@@ -9,6 +9,25 @@ const ELEMENTS=new Set(["fire","water","wind","earth"]);
 const digest=value=>createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const plain=value=>value!==null&&typeof value==="object"&&!Array.isArray(value);
 
+// Initial evidence only. No elapsed-time accrual, reward or historical default.
+function makeInitialSidecars(recordedAt){
+    const sidecars=Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>[
+        key,{status:"not-applicable",raw:null}]));
+    if(recordedAt!==undefined){
+        const initial={
+            "element-box-state":{remainingMs:0},
+            "exp-pool-growth-state":{initialized:true,unlocked:false,lastAt:recordedAt,
+                noticeShown:false,lastCapped:false,newcomerRewards:{}},
+            "rested-exp-state":{battles:0,progressMs:0,lastSeenAt:recordedAt,
+                blockedByElementBox:false}
+        };
+        for(const [key,state] of Object.entries(initial)){
+            sidecars[key]={status:"present",raw:JSON.stringify(state)};
+        }
+    }
+    return sidecars;
+}
+
 // Only the player's choices cross this boundary. All progression is generated
 // here by the server. The callable accepts choices only, never progression.
 function makeInitialCharacterSources(uid,revision,operationId,selection,{recordedAt}={}){
@@ -55,11 +74,10 @@ function makeInitialCharacterSources(uid,revision,operationId,selection,{recorde
                 ...Object.fromEntries(["autoConfig","autoConfig2","autoConfig3"].map(key=>
                     [key,{enabled:false,skill:"normal",hp:50,sp:25,returnToCityWhenEmpty:false}])),
                 selectedCreationElement:selection.element,lastSaveTimestamp:recordedAt}}),
-            sidecars:Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>[
-                key,{status:"not-applicable",raw:null}]))},
+            sidecars:makeInitialSidecars(recordedAt)},
         claimRecords:[],claimCheckpoint:{...base,claimCount:0,
             claimDigest:digest([]),historicalClaimsBlocked:false}
     };
 }
 
-module.exports={makeInitialCharacterSources};
+module.exports={makeInitialCharacterSources,makeInitialSidecars};

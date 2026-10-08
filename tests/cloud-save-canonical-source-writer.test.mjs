@@ -86,18 +86,41 @@ test("new creation persists server-generated playable fields in the existing rev
     assert.deepEqual(h.data.get(`${root}/playableSnapshots/5`).snapshot.progress.playableState,fields);
     const archive=h.data.get(`${root}/recoveryArchives/5`);
     assert.deepEqual(archive.sourceRecords.progress.playableState,fields);
+    const initial={
+        "element-box-state":{remainingMs:0},
+        "exp-pool-growth-state":{initialized:true,unlocked:false,lastAt:1700000000000,
+            noticeShown:false,lastCapped:false,newcomerRewards:{}},
+        "rested-exp-state":{battles:0,progressMs:0,lastSeenAt:1700000000000,
+            blockedByElementBox:false}
+    };
+    for(const [key,state] of Object.entries(initial)){
+        assert.deepEqual(progress.sidecars[key],{status:"present",raw:JSON.stringify(state)});
+    }
+    for(const [key,entry] of Object.entries(progress.sidecars)){
+        if(!Object.hasOwn(initial,key)){assert.deepEqual(entry,{status:"not-applicable",raw:null});}
+    }
+    assert.deepEqual(archive.sourceRecords.progress.sidecars,progress.sidecars);
+    assert.deepEqual(h.data.get(`${root}/playableSnapshots/5`).snapshot.progress.sidecars,progress.sidecars);
     assert.equal(archive.readyForRestore,false);
     const count=h.committed;
     h.setClock(1800000000000);
     assert.equal((await h.writer.commitInitialSources({},args)).unchanged,true);
     assert.equal(h.committed,count);
     assert.equal(h.data.get(`${root}/progress/current`).playableState.lastSaveTimestamp,1700000000000);
+    assert.deepEqual(h.data.get(`${root}/progress/current`).sidecars,progress.sidecars);
+    assert.equal(h.data.get(`${root}/economy/current`).sharedExp,0);
     const {assembleCanonicalPlayableProjection}=require("../functions/src/canonical-snapshot.js");
     assert.throws(()=>assembleCanonicalPlayableProjection(uid,5,archive.sourceRecords),/sidecar missing/);
     const imported=harness();
     await assert.rejects(imported.writer.commitInitialSources({}, {...args,
         selection:{...selection,heroAccount:fields.heroAccount}}),/Invalid initial/);
     assert.equal(imported.committed,0);
+    for(const key of ["sidecars","remainingMs","lastSeenAt","newcomerRewards"]){
+        const h=harness();
+        await assert.rejects(h.writer.commitInitialSources({}, {...args,
+            selection:{...selection,[key]:1}}),/Invalid initial/);
+        assert.equal(h.committed,0);
+    }
 });
 
 test("static newcomer EXP curve follows current game anchors",()=>{
