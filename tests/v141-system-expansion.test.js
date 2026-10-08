@@ -322,8 +322,10 @@ test("procedural audio is skill-driven and covers the combat sound building bloc
     ["swing","hit","damage","heavy","crit","block","dodge","magic","charge","explosion","fire","ice","water","wind","earth","buff","debuff","shield","heal","revive","boss","monster","death"].forEach(kind=>assert.ok(coreSource.includes('case "'+kind+'"')));
     assert.match(coreSource,/playSkill\(skill,name\)/);
     assert.match(coreSource,/skill\.category==="physical"\?"swing":"magic"/);
-    assert.match(coreSource,/originalShowShieldAbsorb/);
-    assert.match(coreSource,/originalShowMissEffect/);
+    assert.doesNotMatch(coreSource,/originalShowShieldAbsorb|originalShowMissEffect/);
+    const impactOwner=fs.readFileSync('js/39-v143-skill-animation.js','utf8');
+    assert.match(impactOwner,/kind==="shield"\?"block":kind==="miss"\?"dodge"/);
+    assert.match(impactOwner,/setTimer\(present,wait\)/);
     assert.doesNotMatch(coreSource,/setFire|setWater|setEarth|setWind/);
 });
 
