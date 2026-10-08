@@ -21,25 +21,33 @@ test('independent shop and chest tables total 100 and deterministic boundaries e
   const items=c.v17346RollEquipmentChestItems(()=>roll);
   assert.equal(items.length,3);assert.ok(items.every(x=>x.rarityKey===key));
  }
- const samples=[0,...Array(6).fill(0),.4,...Array(6).fill(0),.95,...Array(5).fill(0)];
+ const samples=[0,...Array(3).fill(0),.4,...Array(3).fill(0),.95,...Array(3).fill(0)];
  assert.deepEqual(plain(c.v17346RollEquipmentChestItems(()=>samples.shift())).map(x=>x.rarityKey),['white','blue','orange']);
  assert.equal(samples.length,0,'each piece consumes its own rarity roll');
 });
-test('ordinary rolls use new inclusive ranges, one stat, and explicit rarity art pools',()=>{
- const c=fixture();
- for(const [rarity,[min,max]] of Object.entries(ranges))for(const classType of ['warrior','mage'])for(const slot of ['weapon','shoulder','head','armor','shoes'])for(const [random,value] of [[0,min],[.99999,max]]){
-  const item=c.v17346GenerateEquipment(()=>random,{rarity,classType,slot});
-  assert.equal(Object.keys(item.stats).length,1);assert.equal(Object.values(item.stats)[0],value);
-  if(['white','blue'].includes(rarity)){assert.match(item.assetPath,/assets\/equipment\/(warrior|mage)\//);assert.match(item.icon,/<img /);}
-  else {assert.equal(item.assetPath,'');assert.doesNotMatch(item.icon,/<img |v17346-rarity-/);assert.match(item.icon,/data-asset-state="missing"/);assert.match(item.icon,/裝備素材尚未就緒/);}
+test('fixed catalog owns every ordinary name, legal stat, rarity and image',()=>{
+ const c=fixture(),catalog=plain(c.v17346GetEquipmentCatalog());
+ assert.equal(catalog.length,576);assert.equal(new Set(catalog.map(x=>x.name)).size,576);
+ const manifest=JSON.parse(fs.readFileSync('docs/equipment-catalog-20261008.json','utf8'));
+ assert.deepEqual(catalog,manifest.equipment);assert.equal(manifest.images.length,144);
+ for(const image of manifest.images){
+  const entries=catalog.filter(x=>x.assetPath===image.assetPath);assert.equal(entries.length,4);
+  assert.deepEqual(entries.map(x=>x.rarityKey),image.legacy?['white','white','blue','blue']:['purple','purple','orange','orange']);
+  assert.ok(fs.existsSync(image.assetPath),image.assetPath);
+  if(!image.legacy)assert.match(image.assetPath,/\.webp$/);
+ }
+ for(const entry of catalog){
+  const pool=catalog.filter(x=>x.rarityKey===entry.rarityKey&&x.classType===entry.classType&&x.type===entry.type);
+  const roll=(pool.findIndex(x=>x.name===entry.name)+.1)/pool.length;
+  const item=c.v17346GenerateEquipment(()=>roll,{rarity:entry.rarityKey,classType:entry.classType,slot:entry.type});
+  assert.equal(item.name,entry.name);assert.deepEqual(plain(item.stats),entry.stats);assert.equal(item.assetPath,entry.assetPath);assert.match(item.icon,/<img /);
+  assert.equal(Object.keys(item.stats).length,1);const [min,max]=ranges[entry.rarityKey];assert.ok(Object.values(item.stats)[0]>=min&&Object.values(item.stats)[0]<=max);
+  const power=entry.classType==='warrior'?'attack':'intelligence';
+  const allowed={weapon:[power],shoulder:['vitality',power,'defensePoints'],head:['vitality',power,'agility','defensePoints'],armor:['vitality','agility',power,'defensePoints'],shoes:['vitality','agility',power]};
+  assert.ok(allowed[entry.type].includes(Object.keys(item.stats)[0]));
+  item.stats.attack=999;assert.deepEqual(plain(c.v17346GetEquipmentCatalog()).find(x=>x.name===entry.name).stats,entry.stats);
  }
  for(const rarity of ['pink','four-symbol','unknown'])assert.throws(()=>c.v17346GenerateEquipment(()=>0,{rarity}),/特殊裝備/);
-});
-test('both classes can roll defense only on bracers helmets and clothes',()=>{
- const c=fixture();
- for(const classType of ['warrior','mage'])for(const [slot,pool] of Object.entries({weapon:[classType==='warrior'?'attack':'intelligence'],shoulder:['vitality',classType==='warrior'?'attack':'intelligence','defensePoints'],head:['vitality',classType==='warrior'?'attack':'intelligence','agility','defensePoints'],armor:['vitality','agility',classType==='warrior'?'attack':'intelligence','defensePoints'],shoes:['vitality','agility',classType==='warrior'?'attack':'intelligence']})){
-  for(let i=0;i<pool.length;i++)assert.deepEqual(Object.keys(c.v17346GenerateEquipment(()=>(i+.1)/pool.length,{rarity:'white',classType,slot}).stats),[pool[i]]);
- }
 });
 test('inventory, equipped UIDs, old stats and reforge stats survive repeated load/sync; starter stays fixed',()=>{
  const items=[{id:'old-gear',v141Uid:'old-uid',type:'armor',rarityKey:'orange',v17346GeneratedEquipment:true,stats:{attack:12},reforgeStats:{vitality:4},assetPath:'old.png',icon:'old'}];
