@@ -1,7 +1,7 @@
 "use strict";
 
 const {assembleCanonicalSnapshot,inspectCanonicalSnapshot}=require("./canonical-snapshot");
-const {makeInitialCharacterSources}=require("./initial-character-sources");
+const {makeInitialCharacterSources,makeInitialSidecars}=require("./initial-character-sources");
 const {createRecoveryArchive}=require("./canonical-recovery-archive");
 const {createHash}=require("node:crypto");
 
@@ -116,8 +116,8 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
                records.economy?.gold!==0||records.economy?.sharedExp!==0||
                records.inventory?.length!==0||records.equipment?.length!==0||
                records.relics?.length!==0||
-               Object.values(records.progress?.sidecars||{}).some(entry=>
-                   entry.status!=="not-applicable"||entry.raw!==null)){
+               JSON.stringify(records.progress?.sidecars)!==
+                   JSON.stringify(makeInitialSidecars(recordedAt))){
                 fail("failed-precondition","Initial source cannot import historical claims.");
             }
             let bundle;
