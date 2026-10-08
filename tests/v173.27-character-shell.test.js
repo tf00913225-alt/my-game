@@ -41,39 +41,39 @@ test("the retired V78 export cannot write character or backpack geometry",()=>{
     assert.equal(typeof context.window.v78ApplyCharacterInventoryLayout,"function");
     assert.equal(context.window.v78ApplyCharacterInventoryLayout(),false);
     assert.doesNotMatch(runtime,/setProperty|MutationObserver|setTimeout|requestAnimationFrame/);
-    const frame=rule(sharedCss,"#game-stage #homeFeatureModal .home-feature-modal-box.wide");
-    for(const property of ["width","height","max-height"]){
-        assert.match(frame,new RegExp("(?:^|[;\\s])"+property+":calc\\(100% - 8px\\) !important;"));
-    }
-    assert.match(frame,/max-width:none !important;/);
-    assert.match(rule(sharedCss,"#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody"),/flex:1 1 auto !important;/);
-    const content=rule(sharedCss,"#game-stage #homeFeatureModal #characterTabContent");
+    const frame=rule(sharedCss,"#game-ui #homeFeatureModal .home-feature-modal-box.wide");
+    assert.match(frame,/width:calc\(100% - var\(--ui-large-panel-safe-space\)\) !important;/);
+    assert.match(frame,/max-width:var\(--ui-large-panel-max-width\) !important;/);
+    assert.match(frame,/height:min\(var\(--ui-large-panel-height\),calc\(100% - var\(--ui-large-panel-safe-space\)\)\) !important;/);
+    assert.match(frame,/max-height:calc\(100% - var\(--ui-large-panel-safe-space\)\) !important;/);
+    assert.match(rule(sharedCss,"#game-ui #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody"),/flex:1 1 auto !important;/);
+    const content=rule(sharedCss,"#game-ui #homeFeatureModal #characterTabContent");
     assert.match(content,/flex:1 1 auto !important;/);
     assert.match(content,/height:auto !important;/);
     assert.match(content,/scrollbar-gutter:stable !important;/);
 });
 
-test("the late shared design-system CSS retains the matching fullscreen character override",()=>{
+test("the browser character uses the shared capped Large Panel owner",()=>{
     assert.match(sharedCss,/--ui-large-panel-max-width:396px/);
     assert.match(sharedCss,/--ui-large-panel-height:620px/);
-    assert.match(sharedCss,/V173\.62 — character and dungeon backpack use the maximum mobile canvas/);
-    assert.match(sharedCss,/#homeFeatureModal \.home-feature-modal-box\.wide\{[\s\S]*?width:calc\(100% - 8px\) !important;[\s\S]*?max-width:none !important;[\s\S]*?height:calc\(100% - 8px\) !important/);
+    assert.match(sharedCss,/#game-ui\{[^}]*--ui-large-panel-max-width:960px;[^}]*--ui-large-panel-height:760px;/);
+    assert.doesNotMatch(sharedCss,/#game-ui #homeFeatureModal \.home-feature-modal-box\.wide\{[^}]*max-width:none !important;/);
     assert.match(sharedCss,/\.home-feature-modal-box\.wide #homeFeatureModalBody\{[\s\S]{0,220}flex:1 1 auto !important/);
     assert.match(sharedCss,/#characterTabContent\{[\s\S]{0,220}flex:1 1 auto !important/);
 });
 
 test("backpack geometry no longer competes with the character modal",()=>{
-    assert.match(coreCss,/#game-stage #inventoryPage \.inventory-classic-shell\{[^}]*width:93\.4%;[^}]*height:100%;/);
+    assert.match(coreCss,/#game-ui #inventoryPage \.inventory-classic-shell\{[^}]*width:100%;[^}]*height:100%;/);
     assert.doesNotMatch(coreCss,/#characterTabContent|\.home-feature-modal-box\.wide/);
     assert.doesNotMatch(runtime,/transform\s*:\s*scale\s*\(|dataset\.characterTab|fixedCharacterTab/);
 });
 
 test("long character tabs retain their CSS scroll owner and backpack has its own",()=>{
-    const content=rule(sharedCss,"#game-stage #homeFeatureModal .home-feature-modal-box.wide #characterTabContent");
+    const content=rule(sharedCss,"#game-ui #homeFeatureModal .home-feature-modal-box.wide #characterTabContent");
     assert.match(content,/overflow-y:auto !important;/);
     assert.match(content,/overflow-x:hidden !important;/);
     assert.match(content,/touch-action:pan-y !important;/);
-    assert.match(rule(coreCss,"#game-stage #inventoryPage .inventory-grid-scroll"),/overflow-y:auto;[^}]*scrollbar-gutter:stable;/);
+    assert.match(rule(coreCss,"#game-ui #inventoryPage .inventory-grid-scroll"),/overflow-y:auto;[^}]*scrollbar-gutter:stable;/);
     assert.doesNotMatch(finalCss,/\.inventory-grid-scroll\{/);
 });
 

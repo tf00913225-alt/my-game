@@ -36,7 +36,7 @@ assert.match(inventory,/armor:\["armor","robe"\]/);
 assert.match(inventory,/shoes:\["shoes","boots"\]/);
 assert.match(inventory,/selectedInventorySlot!==null/);
 assert.match(inventory,/openEquippedItem=function\(\)[\s\S]*?clearEquipmentComparison\(\)/);
-assert.match(frameCss,/item-modal-mode-comparison \.item-modal-box\{[^}]*max-width:396px !important/);
+assert.match(frameCss,/item-modal-mode-comparison \.item-modal-box\{[^}]*max-width:min\(760px,calc\(100% - 20px\)\) !important/);
 assert.match(compareCss,/\.v17351-compare-grid\{[^}]*overflow-y:auto!important/);
 assert.match(compareCss,/\.v17351-compare-stats\{[^}]*max-height:none!important[^}]*overflow:visible!important/);
 

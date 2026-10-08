@@ -19,15 +19,15 @@ assert.match(inventoryQol,/QUALITY_ORDER=\["white","blue","purple","orange","pin
 assert.match(scrollOwner,/function applyCharacterInventoryLayout\(\)\{ return false; \}/);
 assert.doesNotMatch(scrollOwner,/setProperty|MutationObserver|setTimeout|requestAnimationFrame/);
 assert.match(characterCss,/\.home-feature-modal-box\.wide #characterTabContent\{[^}]*overflow-y:auto !important;/);
-assert.match(scrollCss,/\.content\{[^}]*overflow:hidden;/);
+assert.doesNotMatch(scrollCss,/app\.on-inventory-page \.content\{/);
 assert.match(scrollCss,/\.inventory-grid-scroll\{[^}]*overflow-y:auto;[^}]*touch-action:pan-y;/);
 assert.match(relicJs,/function prepareRelicModal\(\)/);
-assert.match(inventoryCss,/inventory-grid-classic\{[\s\S]*?repeat\(6,minmax\(0,1fr\)\)/);
+assert.match(inventoryCss,/inventory-grid-classic\{[\s\S]*?repeat\(auto-fill,minmax\(48px,1fr\)\)/);
 assert.match(inventoryCss,/inventory-item-classic\{[\s\S]*?border:1px solid var\(--slot-rarity,var\(--bag-slot-border\)\);[^}]*box-sizing:border-box/);
 assert.match(detailCss,/inventory-stat-primary\{[\s\S]*?border-bottom:1px solid rgba\(200,154,72,.12\)/);
 assert.match(detailCss,/inventory-character-detail-row\{[\s\S]*?min-height:44px/);
 assert.match(systemCss,/\.item-modal:not\(#itemModal\) \.item-modal-box\{[\s\S]*?border:1px solid rgba\(200,154,72,.72\)/);
-assert.match(relicCss,/team-relic-current-actions button,#game-stage \.team-relic-select-first\{[\s\S]*?min-height:44px/);
+assert.match(relicCss,/team-relic-current-actions button,:is\(#game-stage,#game-ui\) \.team-relic-select-first\{[\s\S]*?min-height:44px/);
 assert.match(relicCss,/team-relic-tabs button\{[\s\S]*?min-height:44px/);
 assert.match(relicCss,/\.rarity-white\{border-color:#d8d8d8!important;/);
 assert.match(relicCss,/\.rarity-blue\{border-color:#42a5ff!important;/);

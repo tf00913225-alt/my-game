@@ -30,21 +30,21 @@ const box={
     nodeType:1,parentElement:documentElement,scrollHeight:620,clientHeight:620,
     computedStyle:{overflowY:"hidden"},
     matches:selector=>selector.includes(".home-feature-modal-box"),
-    closest:selector=>selector==="#game-stage"?stage:null
+    closest:selector=>["#game-stage","#game-stage, #game-ui"].includes(selector)?stage:null
 };
 const body={
     nodeType:1,parentElement:box,scrollHeight:1200,clientHeight:520,
     computedStyle:{overflowY:"auto"},
     matches:selector=>selector.includes("#homeFeatureModalBody"),
-    closest:selector=>selector==="#game-stage"?stage:null
+    closest:selector=>["#game-stage","#game-stage, #game-ui"].includes(selector)?stage:null
 };
 const card={
     nodeType:1,parentElement:body,matches:()=>false,
-    closest:selector=>selector==="#game-stage"?stage:null
+    closest:selector=>["#game-stage","#game-stage, #game-ui"].includes(selector)?stage:null
 };
 const background={
     nodeType:1,parentElement:documentElement,matches:()=>false,
-    closest:selector=>selector==="#game-stage"?stage:null
+    closest:selector=>["#game-stage","#game-stage, #game-ui"].includes(selector)?stage:null
 };
 
 function dispatch(type,target,pointerType){

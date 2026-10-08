@@ -182,11 +182,11 @@ body > .team-relic-battle-presentation .team-relic-battle-cutin-copy strong{
     display:block;max-width:100%;color:#ffe5ad;font:900 clamp(28px,8vw,36px)/1.2 "Noto Serif TC",serif;
     letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-:is(#game-stage,#game-ui) .team-relic-battle-banner{position:absolute;z-index:18115;left:50%;top:48%;transform:translate(-50%,-50%) scale(.94);display:flex;align-items:center;justify-content:center;gap:9px;min-width:210px;max-width:380px;padding:10px 16px;border:1px solid rgba(229,183,87,.9);border-radius:20px;background:linear-gradient(90deg,rgba(9,8,7,.97),rgba(65,43,17,.97),rgba(9,8,7,.97));color:#f7dda0;box-shadow:0 7px 22px rgba(0,0,0,.65),0 0 18px rgba(211,158,58,.2);opacity:0;pointer-events:none;transition:opacity .13s ease,transform .18s ease;}
-:is(#game-stage,#game-ui) .team-relic-battle-banner.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
-:is(#game-stage,#game-ui) .team-relic-battle-banner b{font:900 17px/22px "Noto Serif TC",serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-:is(#game-stage,#game-ui) .team-relic-battle-icon{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border:1px solid #c59643;border-radius:9px;background:#21150a;overflow:hidden;}
-:is(#game-stage,#game-ui) .team-relic-battle-icon img{display:block;width:100%;height:100%;object-fit:contain;}
+#game-stage .team-relic-battle-banner{position:absolute;z-index:18115;left:50%;top:48%;transform:translate(-50%,-50%) scale(.94);display:flex;align-items:center;justify-content:center;gap:9px;min-width:210px;max-width:380px;padding:10px 16px;border:1px solid rgba(229,183,87,.9);border-radius:20px;background:linear-gradient(90deg,rgba(9,8,7,.97),rgba(65,43,17,.97),rgba(9,8,7,.97));color:#f7dda0;box-shadow:0 7px 22px rgba(0,0,0,.65),0 0 18px rgba(211,158,58,.2);opacity:0;pointer-events:none;transition:opacity .13s ease,transform .18s ease;}
+#game-stage .team-relic-battle-banner.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+#game-stage .team-relic-battle-banner b{font:900 17px/22px "Noto Serif TC",serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#game-stage .team-relic-battle-icon{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border:1px solid #c59643;border-radius:9px;background:#21150a;overflow:hidden;}
+#game-stage .team-relic-battle-icon img{display:block;width:100%;height:100%;object-fit:contain;}
 
 @media(max-width:390px){:is(#game-stage,#game-ui) .team-relic-current-card{grid-template-columns:68px minmax(0,1fr);padding:8px;}:is(#game-stage,#game-ui) .team-relic-current-art{width:68px;}:is(#game-stage,#game-ui) .team-relic-card{grid-template-columns:62px minmax(0,1fr);min-height:178px;padding:7px;gap:3px 7px;}:is(#game-stage,#game-ui) .team-relic-card-art{width:62px;}:is(#game-stage,#game-ui) .team-relic-detail-hero{grid-template-columns:minmax(92px,34%) minmax(0,1fr);gap:2px 9px;padding:12px 10px;}}
 

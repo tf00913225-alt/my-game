@@ -5,7 +5,7 @@ const vm=require("node:vm");
 let now=100;
 const listeners=new Map(),win=new Map();
 const stage={addEventListener:(name,fn)=>listeners.set("stage:"+name,fn)};
-const target={nodeType:1,isConnected:true,closest(selector){return selector==="#game-stage"?stage:selector.includes("button")?this:null;},getAttribute(){return null;},contains(n){return n===this;}};
+const target={nodeType:1,isConnected:true,closest(selector){return ["#game-stage","#game-stage, #game-ui"].includes(selector)?stage:selector.includes("button")?this:null;},getAttribute(){return null;},contains(n){return n===this;}};
 const document={documentElement:{},hidden:false,getElementById:()=>stage,addEventListener:(name,fn)=>listeners.set(name,fn)};
 const window={addEventListener:(name,fn)=>win.set(name,fn),getComputedStyle:()=>({overflowX:"visible",overflowY:"visible"})};
 vm.runInNewContext(fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8"),{window,document,Date:{now:()=>now},Math,Number,Map});

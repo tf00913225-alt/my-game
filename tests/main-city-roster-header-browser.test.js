@@ -25,10 +25,10 @@ const html=width=>`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/31-v131-fix-batch.css">
 <style>
 html,body{margin:0;width:${width}px;height:900px;overflow:hidden;background:#050505}
-#game-stage{width:${width}px!important;height:900px!important;transform:none!important;overflow:hidden!important}
+#game-ui{width:${width}px!important;height:900px!important;transform:none!important;overflow:hidden!important}
 #homePage{display:block!important;width:${width}px!important;height:900px!important}
 #v146HomeRoster{margin:8px 10px!important;width:auto!important}
-</style></head><body><div id="game-stage"><div id="homePage">
+</style></head><body><div id="game-ui"><div id="homePage">
 <section id="v146HomeRoster" class="v146-home-roster"><header>
 <b>冒險隊伍</b><span class="v146-home-roster-count">隊伍 3 / 6</span>
 <span class="v146-home-roster-gold">金幣 <strong>9,999,999</strong></span>

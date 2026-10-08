@@ -419,7 +419,7 @@ button:disabled{
    變成要滑動才看得到，實際上沒有真的把空間要回來。
 */
 
-#app.no-header .header,
+#app.no-header .header{display:none;}
 
 
 /*
@@ -913,19 +913,6 @@ button:disabled{
     padding:0;
 }
 
-.home-utility-actions{
-    position:absolute;
-    right:0;
-    bottom:0;
-    left:0;
-    z-index:4;
-    display:grid;
-    grid-template-columns:repeat(2,92px);
-    justify-content:space-between;
-    gap:0;
-    padding:0 74px;
-}
-
 .home-card{
     position:relative;
     min-width:0;
@@ -1060,39 +1047,6 @@ button:disabled{
     background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));
     font-size:13px;
     line-height:18px;
-}
-
-.home-card-utility{
-    display:grid;
-    grid-template-columns:1fr;
-    grid-template-rows:52px 24px;
-    align-items:stretch;
-    justify-items:stretch;
-    height:78px;
-    overflow:hidden;
-    border:1px solid rgba(186,137,57,.76);
-    border-radius:9px;
-    background:linear-gradient(180deg,rgba(38,26,15,.96),rgba(9,8,6,.96));
-    box-shadow:0 3px 8px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,224,151,.05);
-}
-
-.home-card-utility .home-card-icon{
-    width:100%;
-    height:52px;
-    margin:0;
-    border-radius:8px 8px 0 0;
-    border-right:0;
-    border-bottom:1px solid rgba(174,127,55,.55);
-}
-
-.home-card-utility .home-card-label{
-    align-self:stretch;
-    padding:0 4px;
-    background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));
-    font-size:15.5px;
-    line-height:23px;
-    text-align:center;
-    letter-spacing:.02em;
 }
 
 .home-gold-display{
@@ -6233,7 +6187,7 @@ button:active{
 }
 
 /* Full-screen modal layers remain constrained to the stage. */
-#game-stage .home-feature-modal,
+:is(#game-stage,#game-ui) .home-feature-modal,
 #game-stage .map-feature-modal,
 #game-stage .modal-overlay,
 #game-stage .popup-overlay{
@@ -6508,12 +6462,12 @@ button:active{
 
 /* V173.61 — shared return icon center fill / patrol power saving / quest batch action */
 #game-stage img[src*="map-return.png"]{background:#050505;border-radius:50%;}
-#game-stage .quest-batch-actions{display:flex;justify-content:flex-end;padding:8px 10px 4px;}
-#game-stage .quest-claim-all-btn{
+:is(#game-stage,#game-ui) .quest-batch-actions{display:flex;justify-content:flex-end;padding:8px 10px 4px;}
+:is(#game-stage,#game-ui) .quest-claim-all-btn{
     min-width:108px;min-height:36px;padding:7px 12px;border:1px solid #b98a42;border-radius:8px;
     background:linear-gradient(180deg,#4c3316,#211308);color:#ffe0a0;font-size:12px;font-weight:900;
 }
-#game-stage .quest-claim-all-btn:disabled{opacity:.42;filter:grayscale(.35);}
+:is(#game-stage,#game-ui) .quest-claim-all-btn:disabled{opacity:.42;filter:grayscale(.35);}
 
 /* Browser shell geometry. No transform or resize writer participates here. */
 #game-ui{

@@ -4,7 +4,7 @@
 
 /* Mobile browsers must never paint their native blue tap flash over game UI. */
 #game-stage,
-#game-stage *{
+:is(#game-stage, #game-ui) *{
     -webkit-tap-highlight-color:rgba(0,0,0,0) !important;
 }
 
@@ -36,7 +36,7 @@
 #battlePage .v146-defeated{pointer-events:none !important;}
 
 
-#game-stage .shop-potion-purchase-row{display:grid !important;grid-template-columns:auto 52px minmax(70px,1fr) 64px !important;gap:5px !important;align-items:center !important;}
+:is(#game-stage,#game-ui) .shop-potion-purchase-row{display:grid !important;grid-template-columns:auto 52px minmax(70px,1fr) 64px !important;gap:5px !important;align-items:center !important;}
 #game-stage .v146-shop-total{min-width:0;color:#f3cf79;font-size:13px;line-height:17px;font-weight:900;text-align:right;white-space:nowrap;}
 
 
@@ -226,7 +226,7 @@
     #game-stage #dungeonPage.v146-abyss-active{padding-bottom:78px !important;}
 }
 @media (max-width:380px){
-    #game-stage .shop-potion-purchase-row{grid-template-columns:auto 48px minmax(62px,1fr) 58px !important;gap:3px !important;}
+    :is(#game-stage,#game-ui) .shop-potion-purchase-row{grid-template-columns:auto 48px minmax(62px,1fr) 58px !important;gap:3px !important;}
     #game-stage .v146-shop-total{font-size:13px;}
 }
 @media (prefers-reduced-motion:reduce){

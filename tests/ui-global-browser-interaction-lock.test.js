@@ -49,7 +49,7 @@ const target={
   parentElement:scroller,
   matches:()=>false,
   closest(selector){
-    if(selector==="#game-stage") return gameRoot;
+    if(["#game-stage","#game-stage, #game-ui"].includes(selector)) return gameRoot;
     if(selector.includes("input")||selector.includes("textarea")||selector.includes("contenteditable")) return null;
     return null;
   }
@@ -59,7 +59,7 @@ const editable={
   parentElement:null,
   matches:()=>false,
   closest(selector){
-    if(selector==="#game-stage") return gameRoot;
+    if(["#game-stage","#game-stage, #game-ui"].includes(selector)) return gameRoot;
     if(selector.includes("input")) return editable;
     return null;
   }

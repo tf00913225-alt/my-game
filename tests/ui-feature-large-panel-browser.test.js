@@ -28,11 +28,11 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
 <style>
 html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;}
-#game-stage{position:relative!important;width:1080px!important;height:1920px!important;overflow:hidden!important;}
+#game-ui{position:relative!important;width:1080px!important;height:1920px!important;overflow:hidden!important;}
 #app,#game-content{position:relative!important;width:420px!important;height:746.6667px!important;transform:none!important;}
 #homeFeatureModal{display:flex!important;position:absolute!important;inset:0!important;width:420px!important;height:746.6667px!important;}
 </style></head><body>
-<div id="game-stage"><div id="app"><div id="game-content">
+<div id="game-ui"><div id="app"><div id="game-content">
 <div id="homeFeatureModal" class="home-feature-modal show">
 <div class="home-feature-modal-box"><div class="home-feature-modal-title"><span>測試</span><button class="home-feature-close-btn">返回</button></div><div id="homeFeatureModalBody"></div></div>
 </div></div></div></div><pre id="result"></pre>

@@ -33,9 +33,9 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/53-v173.51-qa.css">
 <style>
 html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000;}
-#game-stage{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;}
+#game-ui{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;}
 #homeFeatureModal{display:flex!important;position:absolute!important;inset:0!important;width:420px!important;height:746.6667px!important;}
-</style></head><body><div id="game-stage">
+</style></head><body><div id="game-ui">
 <div id="homeFeatureModal" class="home-feature-modal show v141-synthesis-modal">
 <div class="home-feature-modal-box"><div class="home-feature-modal-title"><span>合成</span><button class="home-feature-close-btn">返回</button></div>
 <div id="homeFeatureModalBody"><div class="v141-synthesis v143-synthesis">

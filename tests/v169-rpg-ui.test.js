@@ -239,9 +239,9 @@ test("dungeon backpack reuses the shared context-aware inventory lifecycle",()=>
     assert.doesNotMatch(css,/v169-dungeon-inventory-overlay|maximizeDungeonBackpack/);
 });
 
-test("character panel fills the mobile canvas while preserving internal scroll",()=>{
-    assert.match(css,/#homeFeatureModal:has\(\.home-feature-modal-box\.wide\)\{[\s\S]*padding:4px !important/);
-    assert.match(css,/\.home-feature-modal-box\.wide\{[\s\S]*width:calc\(100% - 8px\) !important;[\s\S]*max-width:none !important;[\s\S]*height:calc\(100% - 8px\) !important/);
+test("character panel uses safe capped browser geometry while preserving internal scroll",()=>{
+    assert.match(css,/#homeFeatureModal:has\(\.home-feature-modal-box\.wide\)\{[\s\S]*padding:max\(4px,var\(--safe-top\)\)/);
+    assert.match(css,/\.home-feature-modal-box\.wide\{[\s\S]*width:calc\(100% - var\(--ui-large-panel-safe-space\)\) !important;[\s\S]*max-width:var\(--ui-large-panel-max-width\) !important;[\s\S]*height:min\(var\(--ui-large-panel-height\),calc\(100% - var\(--ui-large-panel-safe-space\)\)\) !important/);
     assert.match(css,/\.home-feature-modal-box\.wide #characterTabContent\{[\s\S]*overflow-y:auto !important/);
 });
 

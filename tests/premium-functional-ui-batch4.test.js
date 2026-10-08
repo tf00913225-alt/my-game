@@ -10,7 +10,7 @@ const synthesis=read("js/36-v141-content-systems.js");
 const fixes=read("js/58-v173.63-functional-fixes.js");
 const ui=read("js/51-v169-rpg-ui.js");
 const qa=read("css/53-v173.51-qa.css");
-const materialRule=(synth.match(/#game-stage \.v141-material-lines span\{[^{}]*\}/)||[""])[0];
+const materialRule=(synth.match(/:is\(#game-stage,#game-ui\) \.v141-material-lines span\{[^{}]*\}/)||[""])[0];
 assert.match(shop,/#homeFeatureModal\.v131-shop-open \.v17345-shop-tabs button\{[^{}]*min-height:44px !important;[^{}]*height:44px !important/);
 assert.match(shop,/\.shop-potion-purchase-row \.shop-potion-buy\{[^{}]*min-height:36px !important;[^{}]*#f1ce7a/);
 assert.match(shop,/\.v17346-shop-card \.v17346-shop-buy\{[^{}]*min-height:42px !important;[^{}]*#f1ce7a/);

@@ -129,10 +129,11 @@ async function swipe(client,x,y){
 }
 async function runViewport(chrome,url,width,height){
  const profile=fs.mkdtempSync(path.join(os.tmpdir(),'nav-runtime-qa-')),port=9600+Math.floor(Math.random()*300);
- const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-timer-throttling','--disable-renderer-backgrounding','--disable-backgrounding-occluded-windows','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
+ const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-timer-throttling','--disable-renderer-backgrounding','--disable-backgrounding-occluded-windows','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:['ignore','ignore','pipe']});
+ let launchError='';proc.stderr.on('data',chunk=>{launchError=(launchError+chunk).slice(-4000);});proc.on('error',error=>{launchError=String(error);});
  let client;const evidence={viewport:{width,height},rows:[]};
  try{
-  const page=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(x=>x.type==='page');client=new Cdp(page.webSocketDebuggerUrl);
+  const page=(await waitJson(`http://127.0.0.1:${port}/json/list`).catch(error=>{throw new Error('Navigation Chrome startup failed: '+chrome+' exit='+proc.exitCode+' '+launchError,{cause:error});})).find(x=>x.type==='page');client=new Cdp(page.webSocketDebuggerUrl);
   await client.send('Page.enable');await client.send('Runtime.enable');
   await client.send('Emulation.setFocusEmulationEnabled',{enabled:true});
   await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});

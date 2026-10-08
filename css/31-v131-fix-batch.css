@@ -291,11 +291,11 @@
     will-change:transform !important;
 }
 
-#game-stage #inventoryPortraitFrame{
+#game-ui #inventoryPortraitFrame{
     overflow:hidden;
 }
 
-#game-stage #inventoryPortraitFrame .v131-inventory-portrait{
+#game-ui #inventoryPortraitFrame .v131-inventory-portrait{
     position:absolute;
     inset:0;
     width:100%;
@@ -421,11 +421,11 @@
     pointer-events:none;
 }
 
-#game-stage #autoBattleSettingsPanel.v131-element-box-panel .auto-cancel-btn{
+:is(#game-stage,#game-ui) #autoBattleSettingsPanel.v131-element-box-panel .auto-cancel-btn{
     display:none !important;
 }
 
-#game-stage #autoBattleSettingsPanel.v131-element-box-panel .auto-save-btn{
+:is(#game-stage,#game-ui) #autoBattleSettingsPanel.v131-element-box-panel .auto-save-btn{
     width:100% !important;
 }
 

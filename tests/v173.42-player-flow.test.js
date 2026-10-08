@@ -50,7 +50,7 @@ assert.match(v141,/hasExpLevelUp/);
 assert.match(index,/home-utility-actions team-relic-home-tools/);
 assert.match(index,/team-relic-home-entry[^>]*data-feature="relic"/);
 assert.match(index,/team-element-box-home-entry[^>]*data-feature="gameplay-core"/);
-assert.match(baseCss,/grid-template-rows:repeat\(4,70px\)/);
+assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-template-columns:repeat\(auto-fit,minmax\(80px,1fr\)\);[^}]*grid-auto-rows:84px;/);
 assert.match(v131,/V17342_GLOBAL_EXP_REWARD_MULTIPLIER=3/);
 assert.match(v131,/function getFormalMonsterBaseExp/);
 assert.doesNotMatch(v131,/V131_EXP_MULTIPLIER/);
@@ -109,7 +109,7 @@ assert.match(homePolish,/delete item\.setId/);
 assert.doesNotMatch(abyss,/v141CraftEquipment|v141GetSelectedCraftBlueprint|設計圖升階/);
 
 /* Red dots use the shared coordinate-aware contract and taps never flash blue. */
-assert.match(homeCss,/#game-stage \*/);
+assert.match(homeCss,/:is\(#game-stage, #game-ui\) \*/);
 assert.match(homeCss,/-webkit-tap-highlight-color:rgba\(0,0,0,0\) !important/);
 assert.doesNotMatch(homeCss,/\.v141-notice-dot,[\s\S]*width:7px !important/);
 assert.match(fs.readFileSync("css/38-v141-system-expansion.css","utf8"),/animation:v141NoticePulse 1\.25s ease-in-out infinite/);
