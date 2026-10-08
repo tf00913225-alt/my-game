@@ -6673,7 +6673,6 @@
     ];
     window.v17346GetEquipmentCatalog=()=>EQUIPMENT_CATALOG.map(entry=>({...entry,stats:{...entry.stats}}));
     const SHOP_STORAGE_KEY=window.FourSymbolsAccountSave.accountKey("equipment-shop-daily");
-    let activeReforgeSnapshot=null;
     const EQUIPMENT_DUNGEON_FRAGMENT_REWARD=Object.freeze({setIds:Object.freeze(["setFire","setWater","setEarth","setWind"]),count:10,provisional:true});
     let equipmentDungeonReward=null;
     let equipmentDungeonClaiming=false;
@@ -6987,10 +6986,7 @@
     }
 
     function remainingReforgeSlots(item){
-        if(!item){ return 0; }
-        const explicit=Math.max(0,Math.floor(Number(item.reforgeSlots)||0));
-        const existing=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;
-        return Math.max(explicit,existing);
+        return window.FourSymbolsReforge?window.FourSymbolsReforge.slotCount(item):0;
     }
     window.v17346RemainingReforgeSlots=remainingReforgeSlots;
 
@@ -6999,10 +6995,13 @@
         if(!stats){ return; }
         stats.querySelectorAll(".v17346-reforge-slot").forEach(node=>node.remove());
         const count=remainingReforgeSlots(item);
+        const owner=window.FourSymbolsReforge;
+        const reason=owner?owner.reason(item):"冶煉功能尚未就緒。";
         for(let index=0;index<count;index++){
-            stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot">[可冶煉]</div>');
+            stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot">'+(reason?escapeHtml(reason)+'（冶煉槽 '+(index+1)+' / '+count+'）':'[可冶煉]')+'</div>');
         }
     }
+    window.v17346AppendReforgeMarkers=appendReforgeMarkers;
     function configureEquipmentChestModal(item){
         if(!item||item.id!==EQUIPMENT_CHEST_DEFINITION.id){ return; }
         const modal=document.getElementById("itemModal");
@@ -7060,38 +7059,6 @@
         const previousCloseItemModal=closeItemModal;
         closeItemModal=function(){
             return previousCloseItemModal.apply(this,arguments);
-        };
-    }
-
-    function allEquipment(){
-        const result=[];
-        if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){ result.push(...inventoryItems); }
-        if(typeof characterEquipment!=="undefined"&&characterEquipment){ Object.values(characterEquipment).forEach(slots=>result.push(...Object.values(slots||{}))); }
-        return result.filter(Boolean);
-    }
-    function selectedReforgeItem(){
-        const select=document.querySelector('select[onchange*="v141SelectReforgeItem"]');
-        const uid=select&&select.value;
-        return uid?allEquipment().find(item=>item&&item.v141Uid===uid)||null:null;
-    }
-    if(typeof window.v141StartReforge==="function"){
-        const previousStartReforge=window.v141StartReforge;
-        window.v141StartReforge=function(){
-            const item=selectedReforgeItem();
-            if(!item||remainingReforgeSlots(item)<=0){
-                if(typeof window.rpgAlert==="function"){ void window.rpgAlert("這件裝備沒有冶煉槽。",{title:"無法冶煉"}); }
-                else{ alert("這件裝備沒有冶煉槽。"); }
-                return false;
-            }
-            return previousStartReforge.apply(this,arguments);
-        };
-    }
-    if(typeof window.v141ResolveReforge==="function"){
-        const previousResolveReforge=window.v141ResolveReforge;
-        window.v141ResolveReforge=function(){
-            // V173.58: replacement semantics live in js/36. No additive merge and
-            // no reforgeUsed attempt consumption here.
-            return previousResolveReforge.apply(this,arguments);
         };
     }
 
@@ -8224,7 +8191,7 @@ box.innerHTML='<header class="v17351-compare-header"><div><small>EQUIPMENT COMPA
 '<article class="v17351-compare-pane selected"><em>背包装備</em><div class="v17351-compare-art">'+selectedArt+'</div><strong>'+esc(selectedName)+'</strong><div class="v17351-compare-stats selected-stats">'+selectedStats+'</div></article>'+
 '<article class="v17351-compare-pane current"><em>目前裝備</em>'+(worn?'<div class="v17351-compare-art">'+itemArt(worn)+'</div><strong>'+esc(worn.name||"目前裝備")+'</strong><div class="v17351-compare-stats">'+compareStats(worn)+'</div>':'<div class="v17351-compare-art empty">—</div><strong>此部位尚未裝備</strong><div class="v17351-compare-stats">'+compareStats(null)+'</div>')+'</article></div>';
 buttons.parentNode.insertBefore(box,buttons);if(typeof window.setItemModalPresentationMode==="function")window.setItemModalPresentationMode("comparison");
-const b=document.createElement("button");b.id="v17351EquipmentLockButton";b.type="button";b.className="item-modal-button v17351-lock-button"+(locked(item)?" locked":"");b.textContent=locked(item)?"🔒 已鎖定・點擊解除":"🔓 鎖定裝備";b.onclick=()=>{item.v17351Locked=!locked(item);if(typeof saveGame==="function")saveGame();syncDetail(item,slotIndex);syncSellUi();};buttons.appendChild(b);
+const b=document.createElement("button");b.id="v17351EquipmentLockButton";b.type="button";b.className="item-modal-button v17351-lock-button"+(locked(item)?" locked":"");b.textContent=locked(item)?"🔒 已鎖定・點擊解除":"🔓 鎖定裝備";b.onclick=()=>{item.v17351Locked=!locked(item);if(typeof saveGame==="function")saveGame();if(typeof window.v17346AppendReforgeMarkers==="function")window.v17346AppendReforgeMarkers(item);syncDetail(item,slotIndex);if(document.getElementById("homeFeatureModal")?.dataset.craftingFeature==="forge"&&typeof window.v141RenderSynthesis==="function")window.v141RenderSynthesis();syncSellUi();};buttons.appendChild(b);
 }
 if(typeof window.openItemModal==="function"){const old=window.openItemModal;window.openItemModal=function(idx){const r=old.apply(this,arguments);const hasSelected=typeof selectedInventorySlot!=="undefined"&&selectedInventorySlot!==null&&Number.isInteger(Number(selectedInventorySlot)),selected=hasSelected?Number(selectedInventorySlot):Number(idx),i=typeof inventorySlots!=="undefined"?inventorySlots[selected]:null;syncDetail(i,selected);return r}}
 /* Equipped slots are already the reference side; comparing them against themselves is meaningless.
@@ -8232,8 +8199,6 @@ if(typeof window.openItemModal==="function"){const old=window.openItemModal;wind
 if(typeof window.openEquippedItem==="function"){const old=window.openEquippedItem;window.openEquippedItem=function(){const r=old.apply(this,arguments);clearEquipmentComparison();if(typeof window.setItemModalPresentationMode==="function")window.setItemModalPresentationMode("equipment");return r}}
 if(typeof window.closeItemModal==="function"){const old=window.closeItemModal;window.closeItemModal=function(){clearEquipmentComparison();return old.apply(this,arguments)}}
 if(typeof window.sellSelectedItem==="function"){const old=window.sellSelectedItem;window.sellSelectedItem=async function(){const i=typeof selectedInventorySlot!=="undefined"&&selectedInventorySlot!==null&&typeof inventorySlots!=="undefined"?inventorySlots[selectedInventorySlot]:null;if(locked(i)){await alertRpg("這件裝備已鎖定，請先解除鎖定後才能出售。",{title:"裝備已鎖定",confirmText:"知道了",danger:true});return false}return old.apply(this,arguments)}}
-function selectedForge(){const s=["#v141ReforgeItemSelect","#reforgeItemSelect",'select[onchange*="v141SelectReforgeItem"]'].map(x=>document.querySelector(x)).find(Boolean);if(!s||typeof inventoryItems==="undefined")return null;const v=String(s.value||""),nidx=Number(v);if(Number.isInteger(nidx)&&nidx>=0&&inventoryItems[nidx])return inventoryItems[nidx];return inventoryItems.find(i=>i&&[i.v141Uid,i.uid,i.id].some(x=>x!=null&&String(x)===v))||null;}
-if(typeof window.v141StartReforge==="function"){const old=window.v141StartReforge;window.v141StartReforge=function(){const i=selectedForge();if(locked(i)){void alertRpg("這件裝備已鎖定，無法進行冶煉。\n請先在背包解除鎖定。",{title:"裝備已鎖定",confirmText:"知道了",danger:true});return false}return old.apply(this,arguments)}}
 function writeQuickSellQuality(value){const quality=QUICK_SELL_QUALITY_KEYS.includes(value)?value:"white";try{localStorage.setItem(QUICK_SELL_QUALITY_KEY,quality)}catch(_){}return quality;}
 function syncSellUi(){if(typeof window.v17350SyncQuickSellModal==="function")window.v17350SyncQuickSellModal();}
 window.v17351ToggleQualityMenu=()=>{};

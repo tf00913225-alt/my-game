@@ -68,5 +68,5 @@ assetPaths.forEach(file=>assert.equal(fs.existsSync(file),true,file));
 console.log("V173.46 equipment progression specification checks passed");
 
 // V173.62: reforgeSlots are affix-slot capacity; attempts are unlimited.
-assert.match(source,/return Math\.max\(explicit,existing\)/);
+assert.match(source,/window\.FourSymbolsReforge\.slotCount\(item\)/);
 assert.doesNotMatch(source,/item\.reforgeUsed=Math\.min/);
