@@ -1180,7 +1180,7 @@
         let node=current.spriteNodes.get(key);
         if(!node){
             const initialSprite=!current.firstVisibleFrameAt;
-            if(initialSprite){ beginVisualTimeline(current); }
+            if(initialSprite&&!sprite.impactOnly){ beginVisualTimeline(current); }
             node=appendSpriteNode(current);
             node.dataset.columns=String(sprite.columns);
             node.dataset.rows=String(sprite.rows);
@@ -1188,7 +1188,8 @@
             node.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
             node.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
             node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
-            /* The first normal cast always begins at Frame 1. A later sprite
+            /* An ordinary cast starts at Frame 1; impact-only clips hold their
+               registered impact frame while hidden. A later sprite
                for a separately delayed target may catch up to the visual
                timeline, but it must never rewrite the initial cast. */
             node.dataset.emission=initialSprite?"initial":"late";
@@ -1196,6 +1197,12 @@
                 ?"0ms"
                 :-Math.min(current.duration,Math.max(0,Date.now()-(current.visualStartedAt||current.startedAt)))+"ms"
             );
+            if(sprite.impactOnly){
+                /* Hold the impact frame while hidden. DOM setup latency must not
+                   leave transparent travel frames after the formal hit task. */
+                node.style.setProperty("--v143-sprite-delay",-(current.duration*sprite.hitFrame/sprite.frames)+"ms");
+                node.style.animationPlayState="paused";
+            }
             if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
             current.spriteNodes.set(key,node);
         }
@@ -1210,6 +1217,9 @@
             node.dataset.emittedVisual="true";
         }
         if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }
+        /* Start the new impact-only lifetime after positioning, so slow DOM
+           setup cannot expire the hit/recoil before its first painted frame. */
+        if(sprite.impactOnly&&!current.firstVisibleFrameAt){ beginVisualTimeline(current); }
     }
 
     function confirmTargetVisual(current,index){
@@ -1220,7 +1230,10 @@
         const node=current.spriteNodes.get(key);
         if(node){
             node.dataset.confirmedHit="true";
-            if(!current.model.sprite.impactOnly||current.hitReached){ node.style.visibility="visible"; }
+            if(!current.model.sprite.impactOnly||current.hitReached){
+                node.style.visibility="visible";
+                if(current.model.sprite.impactOnly){ node.style.animationPlayState="running"; }
+            }
         }
     }
 
@@ -1253,7 +1266,7 @@
         current.hitReached=true;
         if(current.model.sprite&&current.model.sprite.impactOnly&&current.confirmedTargets.has(index)){
             const node=current.spriteNodes.get(String(index));
-            if(node){ node.style.visibility="visible"; }
+            if(node){ node.style.visibility="visible"; node.style.animationPlayState="running"; }
         }
         syncStatusVisualsForUnit(current.targetSide,index);
     }

@@ -45,6 +45,18 @@ const cleanupContext={state:{current:active,stage:null,metrics:{completed:0}},ca
 vm.createContext(cleanupContext);vm.runInContext(source.slice(cleanupStart,cleanupEnd),cleanupContext);
 cleanupContext.cleanupCurrent(active,'dispose');
 assert.equal(cancelled,1);assert.equal(art.v143ImpactRecoil,null);assert.equal(cleanupContext.state.current,null);
+// Execute the real raster emitter and hit task: even after slow DOM setup the
+// first exposed frame is the impact frame, never a transparent travel frame.
+const spriteClasses=new Set();
+const spriteNode={style:{setProperty(key,value){this[key]=value;}},dataset:{},setAttribute(){},classList:{contains:key=>spriteClasses.has(key),add:key=>spriteClasses.add(key)}};
+const spriteCurrent={duration:520,startedAt:100,firstVisibleFrameAt:0,targetSide:'monster',model:{sprite:{src:'normal.webp',columns:4,rows:3,frames:12,hitFrame:6,impactOnly:true}},spriteNodes:new Map(),confirmedTargets:new Set([0])};
+const raster={state:{current:spriteCurrent,stage:{}},Date:{now:()=>100},placementFor:()=> 'single',appendSpriteNode:()=>spriteNode,
+    beginVisualTimeline(current){assert.ok(spriteClasses.has('v143-vfx-sprite-active'));assert.equal(spriteNode.style.animationPlayState,'paused');current.firstVisibleFrameAt=100;current.visualStartedAt=100;},placeSprite(_current,node){node.style.left='10px';node.style.top='20px';},requestSpriteAspect(){},cardFor:()=>({classList:{remove(){}}}),syncStatusVisualsForUnit(){}};
+vm.createContext(raster);
+vm.runInContext(source.slice(source.indexOf('    function addSprite('),source.indexOf('    function targetHitTime(')),raster);
+vm.runInContext(source.slice(source.indexOf('    function settleTargetVisual('),source.indexOf('    function registerTarget(')),raster);
+raster.addSprite(spriteCurrent,0,{});assert.equal(spriteNode.style.visibility,'hidden');assert.equal(spriteNode.style.animationPlayState,'paused');assert.equal(spriteNode.style['--v143-sprite-delay'],'-260ms');
+raster.settleTargetVisual(spriteCurrent,0);assert.equal(spriteNode.style.visibility,'visible');assert.equal(spriteNode.style.animationPlayState,'running');assert.equal(spriteCurrent.visualStartedAt,100);assert.equal(spriteCurrent.duration,520);
 const audio=fs.readFileSync('js/34-v141-core-systems.js','utf8');
 const noiseSource=audio.slice(audio.indexOf('        function noise('),audio.indexOf('        function play(',audio.indexOf('        function noise(')));
 for(const sampleRate of [44100,48000]){
