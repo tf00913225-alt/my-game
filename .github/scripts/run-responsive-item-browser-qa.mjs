@@ -97,12 +97,14 @@ async function run(chrome,url,live){
     const center=screenToGame(r.left+r.width/2,r.top+r.height/2);
     const s=getComputedStyle(document.documentElement),safe=Object.fromEntries(['top','right','bottom','left'].map(k=>[k,parseFloat(s.getPropertyValue('--safe-'+k))||0]));
     return {count,maxError,center,stage:r.toJSON(),content:cr.toJSON(),inlineLegacyTransform:content.style.transform,
+     viewportScroll:{left:document.getElementById('game-viewport').scrollLeft,top:document.getElementById('game-viewport').scrollTop},
      viewport:{width:innerWidth,height:innerHeight},safe,diagnostics:{left:GAME_STAGE_LEFT,top:GAME_STAGE_TOP,scale:GAME_STAGE_SCALE},
      document:{width:document.documentElement.clientWidth,height:document.documentElement.clientHeight,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight}};
    })()`);
    assert.ok(row.maxError<1e-6,label+' coordinate roundtrip '+row.maxError);
    assert.ok(Math.abs(row.center.x-1080/2)<1e-6&&Math.abs(row.center.y-1920/2)<1e-6,label+' native center');
    assert.equal(row.inlineLegacyTransform,'',label+' competing runtime legacy scale');
+   assert.deepEqual(row.viewportScroll,{left:0,top:0},label+' viewport must not become a programmatic scroller');
    assert.ok(Math.abs(row.stage.left-row.diagnostics.left)<0.1&&Math.abs(row.stage.top-row.diagnostics.top)<0.1,label+' stale diagnostics');
    assert.ok(Math.abs(row.stage.left+row.stage.width/2-(row.safe.left+(row.viewport.width-row.safe.left-row.safe.right)/2))<1,label+' asymmetric safe-area horizontal centering');
    assert.ok(Math.abs(row.stage.top+row.stage.height/2-(row.safe.top+(row.viewport.height-row.safe.top-row.safe.bottom)/2))<1,label+' asymmetric safe-area vertical centering');

@@ -54,6 +54,7 @@ test("one resize subscription per target and CSS alone owns the legacy transform
     assert.doesNotMatch(read("scripts/build-production.mjs"),/02-stage-v3-layout-fix/);
     assert.doesNotMatch(read("js/02-stage-v9-native-coordinate-api.js"),/getBoundingClientRect|gameStageScale/);
     assert.doesNotMatch(read("css/09-stage-v15-native-character-shell.css"),/--game-(?:native|legacy)-(?:width|height):/);
+    assert.match(read("css/03-stage-v4-viewport-lock.css"),/#game-viewport\{[^}]*overflow:clip !important;/);
 });
 test("missing design tokens fail explicitly instead of silently inventing another dimension owner",()=>{
     assert.throws(()=>fixture({tokens:false}),/Display design tokens are unavailable/);

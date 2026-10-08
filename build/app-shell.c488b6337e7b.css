@@ -71,7 +71,9 @@ html, body{
     min-height:0 !important;
     margin:0 !important;
     padding:var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left) !important;
-    overflow:hidden !important;
+    /* This is a clipping surface, not a scroller. overflow:hidden permits
+       scrollIntoView to move the whole transformed stage inside this box. */
+    overflow:clip !important;
     overscroll-behavior:none !important;
     background:#0c0b0a !important;
     contain:strict !important;
