@@ -902,8 +902,22 @@ let player3 = null;
 // UID lifecycle reloads the app; loadGame replaces this entire account projection.
 let heroAccountState=window.FourSymbolsHeroCore.normalizeAccountState();
 window.FourSymbolsHeroSystem=Object.freeze({
-    getDomain:()=>window.FourSymbolsHeroCore.createDomain(heroAccountState,
-        ()=>[player,player2,player3],calculateCharacterBaseStats,id=>skillDatabase[id]),
+    getDomain:({forBattle=false}={})=>{
+        const core=window.FourSymbolsHeroCore;
+        const domain=account=>core.createDomain(account,
+            ()=>[player,player2,player3],calculateCharacterBaseStats,id=>skillDatabase[id]);
+        let account=heroAccountState;
+        // DEV battle preview only: never mutate canonical account or claim rewards.
+        if(forBattle&&window.location?.hostname==="dev.four-symbols-dev.pages.dev"){
+            for(const heroId of ["divineDogHongbao","vajraHeavenlyKing"]){
+                const current=domain(account);
+                if(!current.isHeroUnlocked(heroId)){
+                    account=current.unlockHeroDirect(heroId,20261008);
+                }
+            }
+        }
+        return domain(account);
+    },
     // Future trusted callers must atomically persist/consume through their Owner.
     // No rewards or inventory consumption are wired in Phase 1.
     replaceAccountState:next=>{ heroAccountState=window.FourSymbolsHeroCore.normalizeAccountState(next); }
@@ -5044,7 +5058,7 @@ let heroBattleSelection=null;
 const HERO_BASIC_ATTACK_CONFIG=Object.freeze({enabled:true,skill:"normal",hp:0,sp:0});
 
 function initializeHeroBattleCombatants(){
-    const domain=window.FourSymbolsHeroSystem.getDomain();
+    const domain=window.FourSymbolsHeroSystem.getDomain({forBattle:true});
     const ids=heroBattleSelection===null
         ?domain.listHeroDefinitions().filter(def=>domain.isHeroUnlocked(def.heroId)).map(def=>def.heroId)
         :heroBattleSelection;
@@ -5070,7 +5084,7 @@ window.FourSymbolsHeroBattle=Object.freeze({
         if(!Array.isArray(heroIds)||heroIds.length>3||new Set(heroIds).size!==heroIds.length){
             throw new Error("invalid Hero battle roster");
         }
-        const domain=window.FourSymbolsHeroSystem.getDomain();
+        const domain=window.FourSymbolsHeroSystem.getDomain({forBattle:true});
         heroIds.forEach(id=>{domain.getHeroDefinition(id);if(!domain.isHeroUnlocked(id)){throw new Error("locked Hero");}});
         heroBattleSelection=heroIds.slice();
     },
@@ -5127,7 +5141,7 @@ function getExistingPartyIndexes(){
 
 function getHeroBattleSkillProjection(character){
     return character&&character.combatantKind==="heroNpc"
-        ?window.FourSymbolsHeroSystem.getDomain().getHeroSkillProjection(character.heroId):null;
+        ?window.FourSymbolsHeroSystem.getDomain({forBattle:true}).getHeroSkillProjection(character.heroId):null;
 }
 function getBattleSecondaryResource(character,stats){
     const isRage=character&&character.combatantKind==="heroNpc";
