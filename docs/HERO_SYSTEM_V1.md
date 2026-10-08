@@ -58,4 +58,6 @@ Battle artwork maps stable Hero IDs to `assets/heroes/divine-dog-hongbao.webp` a
 
 Equipment must later share the player equipment/inventory Owner with exclusive physical item ownership (no simultaneous copies). Hero page, equipment, acquisition rewards/login/story/activity fragments and additional skill AI remain subsequent phases.
 
+DEV battle preview: only the exact `dev.four-symbols-dev.pages.dev` hostname automatically supplies the two current heroes to the battle-domain projection. `FourSymbolsHeroSystem.getDomain({forBattle:true})` creates a disposable Core account copy for locked heroes, with a stable test seed; existing owned heroes retain all progression. The ordinary domain, canonical `heroAccountState`, save/load and reward claims remain unchanged. No preview entitlement exists on production, root/preview Pages URLs or localhost. The default unlocked roster therefore includes both heroes on DEV; explicit session roster selection still works. This is testing access, not chapter/login acquisition or a permanent grant.
+
 Regression: `tests/hero-core-phase1.test.js`; existing account ownership, legacy hydration and player six-stat tests remain applicable. PR is the live CI/merge/closeout Owner.
