@@ -18,7 +18,7 @@ async function runBossBalanceProductionQa(){
       await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
       await FourSymbolsFeatures.ensure('boss-tower','boss-balance-qa');
       await wait(()=>window.GameplaySystem&&window.FourSymbolsBossBattle);closeHomeFeature();
-      const evidence=window.bossBalanceQaEvidence={scenes:[],controls:[],skills:[]};
+      const evidence=window.bossBalanceQaEvidence={scenes:[],controls:[],skills:[],statusRolls:[],statusWrites:[]};
       const stats=m=>[m.maxHP,m.maxSP,m.attack,m.magicAttack,m.defense,m.agility];
       const verify=m=>{const p=MonsterBalance.debug(m);check(m.balanceOwner==='MonsterBalance'&&['personalBoss','worldBoss'].includes(m.mode),'owner');check(JSON.stringify(stats(m))===JSON.stringify(Object.values(p.final)),'projection');check(!m.v132Dungeon&&!m.v141ExtraHP,'legacy marker');check(p.base.abilityPointBudget===(m.level-1)*5,'budget');check(getEnemyPressureMultiplier(m,player)===p.finalDamagePressure,'pressure');};
       const fast=${JSON.stringify(mode==='fast')},viewportWidth=window.innerWidth;
@@ -27,7 +27,8 @@ async function runBossBalanceProductionQa(){
       const oldRandom=Math.random,initiative=buildInitiativeQueue,badge=showMonsterSkillNameBadge,status=rollStatusEffectHit,awardGold=awardMonsterGoldDrop;let killGold=0;
       awardMonsterGoldDrop=function(...args){const before=gold,result=awardGold(...args);killGold+=gold-before;return result;};
       showMonsterSkillNameBadge=function(name,...args){evidence.skills.push({name,round:turn});return badge(name,...args);};
-      rollStatusEffectHit=function(...args){const hit=status(...args);if(args[5]){const chance=calculateStatusEffectChance(...args);check(chance<=60,'hard control cap');evidence.controls.push({chance,hit,rank:args[6]});}return hit;};
+      rollStatusEffectHit=function(...args){const hit=status(...args),chance=calculateStatusEffectChance(...args);evidence.statusRolls.push({chance,hit,round:turn});if(args[5]){check(chance<=60,'hard control cap');evidence.controls.push({chance,hit,rank:args[6]});}return hit;};
+      const offStatus=FourSymbolsCombatEvents.subscribe('status_written',({target,state})=>evidence.statusWrites.push({target:target?.id||target?.name,type:state.type,turnsLeft:state.turnsLeft,round:turn}));
       try{
        for(const [caseIndex,plan] of plans.entries()){killGold=0;evidence.current={...plan};
         const definition=(plan.type==='world'?GameplaySystem.worldBosses:GameplaySystem.personalBosses).find(d=>d.id===plan.id);
@@ -76,19 +77,40 @@ async function runBossBalanceProductionQa(){
           check(FourSymbolsBossBattle.resolveEnemyDamageTargets(FourSymbolsBossBattle.getBossIndex(),'all').length===alive.length,'all living targets');
         };targetRules();
         if(plan.uiOnly){
-          check(art.getBoundingClientRect().width>0&&art.getBoundingClientRect().height>0,'visible artwork');
+          let viewportMechanisms=null;
+          if(plan.id!=='personal-20'){
+            if(plan.type==='personal')boss.hp=Math.floor(boss.maxHP*.34);else turn=7;
+            FourSymbolsBossBattle.processRound();renderBattle();targetRules();
+            const supports=currentBattleMonsters.filter(i=>monsters[i].vGameplayBossSupport),objects=currentBattleMonsters.filter(i=>monsters[i].unitKind==='boss-object');
+            check(supports.length===2&&supports.every(i=>document.getElementById('battleMonster'+i)?.parentElement?.dataset.slot===monsters[i].vGameplayBattlefieldSlot),'second viewport support DOM slots');
+            check(objects.length>0&&objects.every(i=>['ENEMY_F1','ENEMY_F5'].includes(document.getElementById('battleMonster'+i)?.parentElement?.dataset.slot)),'second viewport object DOM slots');
+            if(plan.type==='world')check(FourSymbolsBossBattle.getShieldState(),'second viewport shield');
+            check(FourSymbolsBattlefieldSlots.getActiveEnemySnapshot()===snapshot,'second viewport stable snapshot');
+            viewportMechanisms={method:'controlled-viewport-state',supports:supports.map(i=>monsters[i].vGameplayBattlefieldSlot),objects:objects.map(i=>monsters[i].objectType),shield:FourSymbolsBossBattle.getShieldState()};
+          }
+          const viewportArt=document.querySelector('.gameplay-boss-card .v174-battle-art');
+          check(viewportArt?.getBoundingClientRect().width>0&&viewportArt.getBoundingClientRect().height>0,'visible artwork');
           openBattleStatusDetailModal('monster',FourSymbolsBossBattle.getBossIndex());
           check(document.getElementById('battleStatusDetailModal')?.hidden===false,'status detail interaction');
           window.bossBalanceQaCapture=plan.type+'-'+plan.id+'-'+caseIndex+'-status';
           await new Promise(r=>setTimeout(r,650));closeBattleStatusDetailModal();
           window.bossBalanceQaCapture=plan.type+'-'+plan.id+'-'+caseIndex+'-hud';
           await new Promise(r=>setTimeout(r,650));
-          evidence.scenes.push({...plan,kind:'viewport-interaction',rounds:0,settlementVerified:false,cleanup:await cleanup()});continue;
+          const released=await cleanup();check(gold===beforeGold&&JSON.stringify(GameplaySystem.getSerializableState())===JSON.stringify(beforeState),'no UI probe settlement');
+          evidence.scenes.push({...plan,kind:'viewport-interaction',rounds:0,viewportMechanisms,settlementVerified:false,cleanup:released});continue;
         }
-        let controlledEvidence=null;
+        let controlledEvidence=null;const statusRollStart=evidence.statusRolls.length,statusWriteStart=evidence.statusWrites.length;
         if(plan.controlled){
           // Isolated test state; never claim this is a natural combat/settlement.
-          if(plan.controlled==='hp-threshold')boss.hp=Math.floor(boss.maxHP*.34);else turn=7;
+          if(plan.controlled==='hp-threshold'){
+            boss.hp=Math.floor(boss.maxHP*.34);
+            const skill=skillDatabase.windSpell;check(skill&&(!skill.requires||skill.requires.length===0)&&Number(skill.learnLevel||1)<=definition.level&&skill.learnCost<=definition.level*2,'legal status probe skill');
+            for(const index of getExistingPartyIndexes()){
+              const key=getPartyCharacterKey(index);characterSkillLoadouts[key]={skillLevels:{windSpell:1},equippedSkills:['windSpell']};
+              getPartyCharacterByIndex(index).element='wind';
+              [autoConfig,autoConfig2,autoConfig3][index].skill='windSpell';
+            }
+          }else turn=7;
           FourSymbolsBossBattle.processRound();targetRules();
           const supports=currentBattleMonsters.map(i=>monsters[i]).filter(m=>m.vGameplayBossSupport);
           check(supports.length===2&&supports.every(m=>['ENEMY_B1','ENEMY_B5'].includes(m.vGameplayBattlefieldSlot)),'controlled summon and fixed slots');
@@ -110,6 +132,10 @@ async function runBossBalanceProductionQa(){
         const offRound=FourSymbolsBattleFlow.subscribeRoundEnd(()=>{completedRounds++;if(plan.maxRounds&&completedRounds>=plan.maxRounds&&battleActive){try{stopped=true;check(v132AbortDungeonBattle('qa-stop'),'round limit abort');}catch(error){observerError=error;}}});
         try{toggleAutoBattle();check(autoBattle,'formal auto toggle');await wait(()=>!battleActive||observerError,480000);if(observerError)throw observerError;}finally{off();offRound();if(battleActive)v132AbortDungeonBattle('qa-stop');}
         check(actions>0,'formal action queue executed');
+        if(plan.controlled==='hp-threshold'){
+          controlledEvidence.statusRolls=evidence.statusRolls.slice(statusRollStart);controlledEvidence.statusWrites=evidence.statusWrites.slice(statusWriteStart);
+          check(controlledEvidence.statusRolls.length>0&&controlledEvidence.statusWrites.some(s=>s.type==='agilityDown'),'real status chance and committed debuff');
+        }
         if(plan.maxRounds)check(completedRounds<=plan.maxRounds,'real round upper bound');
         autoBattle=false;check(JSON.stringify(stats(boss))===JSON.stringify(initial),'no late base stat mutation');
         if(stopped||plan.controlled){
@@ -132,7 +158,7 @@ async function runBossBalanceProductionQa(){
         evidence.scenes.push({...plan,kind:'natural-victory',rounds,completedRounds,actions,survivors,shields,objects,reinforcements,initial,finalHP:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),gold:gold-beforeGold,configuredGold:expectedGold,killGold,ore:oreCount(definition.ore)-beforeOre,expectedOre,progress,settlementVerified:true,...(fast?{cleanup:await cleanup()}: {})});
        }
        return evidence;
-      }finally{Math.random=oldRandom;buildInitiativeQueue=initiative;showMonsterSkillNameBadge=badge;rollStatusEffectHit=status;awardMonsterGoldDrop=awardGold;}
+      }finally{offStatus();Math.random=oldRandom;buildInitiativeQueue=initiative;showMonsterSkillNameBadge=badge;rollStatusEffectHit=status;awardMonsterGoldDrop=awardGold;}
     })()`;
     const server=await startServer({baseUrl}),results=[];
     const file=path.resolve('artifacts/browser-qa/boss-balance-production'+(mode==='fast'?'-fast':'')+'.json');fs.mkdirSync(path.dirname(file),{recursive:true});

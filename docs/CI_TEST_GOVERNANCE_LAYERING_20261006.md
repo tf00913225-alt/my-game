@@ -48,9 +48,16 @@ Fast uses real Runtime natural personal-20 victory/first rewards/progression,
 personal-70 and world-40 stage 4 up to ten completed rounds (early natural
 victory retains settlement checks). Separate controlled personal-70 HP .34
 and world-stage round-7 probes run real actions after formal mechanism owners
-trigger summons/charge/phases/shield. They never claim natural victory.
+trigger summons/charge/phases/shield. The HP probe equips a legal level-1
+windSpell loadout and requires actual status RNG plus a committed agilityDown
+event from formal actions; it never injects a successful status result.
+They never claim natural victory.
 390x844 runs combat; 412x915 verifies all three formal entries, visible HUD,
 target rules and status-detail interaction without replaying complete battles.
+Explicit controlled viewport state triggers HP/round mechanisms to verify
+support/object DOM slots and shield at 412x915 too; these are zero-action UI
+probes, never natural combat or settlement. Status/HUD capture holds retain
+both important screens before formal abort.
 Bounded probes release observers and use the existing dungeon abort, dispose
 VFX, then assert inactive Boss/dungeon/battle/auto state, cleared timers/locks
 and no late turn or reward. Both neutral and seeded all-Boss TTK remain.
