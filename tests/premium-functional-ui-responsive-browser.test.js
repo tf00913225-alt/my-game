@@ -20,7 +20,7 @@ const chrome=findChrome();
 assert.ok(chrome,"Chrome is required for premium functional responsive QA");
 
 const styles=[
-  "css/00-main.css","css/02-stage-v3-layout-fix.css","css/03-stage-v4-viewport-lock.css","css/22-stage-v78-character-inventory-core.css","css/23-stage-v77-inventory-detail-ui.css","css/24-stage-v85-inventory-inner-grid-scroll-root.css",
+  "css/00-main.css", "css/03-stage-v4-viewport-lock.css","css/22-stage-v78-character-inventory-core.css","css/23-stage-v77-inventory-detail-ui.css","css/24-stage-v85-inventory-inner-grid-scroll-root.css",
   "css/25-stage-v90-quest-interface-core.css","css/31-v131-fix-batch.css","css/37-v139-rested-experience.css",
   "css/38-v141-system-expansion.css","css/42-v146-system-polish.css","css/49-v169-rpg-ui.css",
   "css/53-v173.51-qa.css","css/55-team-relic-system.css"

@@ -9,7 +9,7 @@ const require=createRequire(import.meta.url);
 export function loadLegacyRuntime(){
   const source=fs.readFileSync('tests/v170-final-spec-integration.test.js','utf8');
   const fixture=source.slice(source.indexOf('function makeUniversalNode()'),source.indexOf('function loadFinalRuntime()'));
-  const context=new Function('vm',fixture+';return makeContext();')(vm);
+  const context=new Function('vm','fs',fixture+';return makeContext();')(vm,fs);
   context.document.createDocumentFragment=()=>context.document.createElement('fragment');
   vm.runInContext(fs.readFileSync('js/startup/account-save-repository.js','utf8'),context);
   vm.runInContext('FourSymbolsAccountSave.activate("monster-shadow-isolated-fixture")',context);
