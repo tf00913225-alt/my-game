@@ -33,7 +33,8 @@ test("V143 assets stay ordered before later patches under the current cache vers
 });
 
 test("enemy identity starts at 16px, never drops below 12px and bars use 12px bold text",()=>{
-    assert.match(system,/monster\.name\+" Lv"\+monster\.level/);
+    assert.match(system,/const identity=String\(monster\.name\|\|""\)/);
+    assert.doesNotMatch(system,/monster\.name\+" Lv"\+monster\.level/);
     assert.match(system,/let size=16/);
     assert.match(system,/while\(size>12/);
     assert.match(css,/\.battle-monster-name\.v143-monster-identity[\s\S]*font-size:16px !important/);

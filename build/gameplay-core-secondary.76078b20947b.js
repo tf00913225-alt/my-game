@@ -8013,10 +8013,17 @@ function syncResourceNumbers(){
         let character=null;
         try{if(Number.isInteger(index)&&typeof getPartyCharacterByIndex==="function")character=getPartyCharacterByIndex(index);}catch(_){}
         if(!character)return;
-        const hp=card.querySelector(".hp-bar-text"),sp=card.querySelector(".sp-bar-text");
-        setTextIfChanged(hp,String(numericValue(character.hp)));
-        const resource=getBattleSecondaryResource(character);
-        setTextIfChanged(sp,resource.kind==="rage"?"怒氣 "+numericValue(resource.current)+"/12":String(numericValue(resource.current)));
+        const apply=()=>{
+            const current=getPartyCharacterByIndex(index);
+            if(current!==character){ return; }
+            const hp=card.querySelector(".hp-bar-text"),sp=card.querySelector(".sp-bar-text");
+            setTextIfChanged(hp,String(numericValue(character.hp)));
+            const resource=getBattleSecondaryResource(character);
+            setTextIfChanged(sp,resource.kind==="rage"?"怒氣 "+numericValue(resource.current)+"/12":String(numericValue(resource.current)));
+        };
+        if(typeof window!=="undefined"&&typeof window.v143SchedulePlayerStatusUiUpdate==="function"){
+            window.v143SchedulePlayerStatusUiUpdate(index,apply,"labels");
+        }else{ apply(); }
     });
     document.querySelectorAll("#battlePage .battle-monster[id^='battleMonster']").forEach(card=>{
         const index=Number(String(card.id).replace("battleMonster",""));
@@ -8898,7 +8905,7 @@ ensureFunctionalStyles();runRepairs();
         const resolver=window.v143ResolveBattleFeedbackTiming;
         if(typeof resolver!=="function"){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
         try{
-            const timing=resolver(options.side==="monster"?"monster":"player",Number(options.index)||0,semanticKind(options.kind))||{};
+            const timing=resolver(options.side==="monster"?"monster":"player",Number(options.index)||0,semanticKind(options.kind),options.critical===true)||{};
             return {delayMs:Math.max(0,numeric(timing.delayMs,0)),critical:timing.critical===true,impactId:timing.impactId||null,impactAt:Number.isFinite(Number(timing.impactAt))?Number(timing.impactAt):0,sequence:numeric(timing.sequence,0)};
         }catch(_){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
     }

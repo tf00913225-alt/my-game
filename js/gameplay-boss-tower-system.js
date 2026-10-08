@@ -855,9 +855,12 @@
         if(boss){ boss.vLastDamageSettlement=null; }
         return settlement||null;
     }
-    function syncBossShieldHud(){
+    function syncBossShieldHud(atImpact){
         if(typeof document==="undefined"){ return; }
         const index=bossIndex();
+        if(atImpact!==true&&typeof window.v143ScheduleMonsterUiUpdate==="function"){
+            return window.v143ScheduleMonsterUiUpdate(index,()=>syncBossShieldHud(true),"boss-shield");
+        }
         const card=Number.isInteger(index)?document.getElementById("battleMonster"+index):null;
         if(!card){ return; }
         const hpBar=card.querySelector(":scope > .monster-hp");

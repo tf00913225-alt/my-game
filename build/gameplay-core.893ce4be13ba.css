@@ -8205,6 +8205,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .battle-player-id{
     position:absolute !important;
+    top:auto !important;
     left:2px !important;
     right:2px !important;
     width:auto !important;
@@ -8240,6 +8241,9 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     line-height:var(--battle-name-row-height) !important;
     font-size:12px !important;
     z-index:20 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-sp,
@@ -8260,9 +8264,9 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     box-sizing:border-box !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-hp,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar{bottom:26px !important;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar{bottom:calc(var(--battle-name-row-height) + var(--battle-resource-bar-height)) !important;}
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-sp,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .sp-bar{bottom:15px !important;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .sp-bar{bottom:var(--battle-name-row-height) !important;}
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .monster-bar-text,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .hp-bar-text,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .sp-bar-text{

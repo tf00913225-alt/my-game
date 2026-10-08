@@ -97,7 +97,7 @@
         const name=card.querySelector(".battle-monster-name");
         const level=card.querySelector(".battle-monster-level");
         if(!name){ return; }
-        const identity=monster.name+" Lv"+monster.level;
+        const identity=String(monster.name||"");
         if(name.textContent.trim()!==identity){ name.textContent=identity; }
         name.classList.add("v143-monster-identity");
         if(level){ level.hidden=true; level.setAttribute("aria-hidden","true"); }

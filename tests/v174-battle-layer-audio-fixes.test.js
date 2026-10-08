@@ -69,12 +69,12 @@ test("Skill SFX and general combat feedback are both exactly doubled",()=>{
     assert.match(audio,/\(Number\(opts\.volume\)\|\|0\.14\)\*playbackGainScale/);
     assert.match(audio,/play\("heal",SKILL_VOLUME_SCALE\)/);
     assert.match(audio,/play\(elementKind,SKILL_VOLUME_SCALE\)/);
-    assert.match(audio,/play\("explosion",SKILL_VOLUME_SCALE\)/);
+    assert.doesNotMatch(audio,/play\("explosion",SKILL_VOLUME_SCALE\)/, "cast audio must not anticipate an impact");
     assert.match(audio,/combatFeedbackVolumeScale:COMBAT_FEEDBACK_VOLUME_SCALE/);
     assert.match(audio,/audioEngine\.play\("death",COMBAT_FEEDBACK_VOLUME_SCALE\)/);
-    assert.match(audio,/audioEngine\.play\("dodge",COMBAT_FEEDBACK_VOLUME_SCALE\)/);
-    assert.match(audio,/audioEngine\.play\("block",COMBAT_FEEDBACK_VOLUME_SCALE\)/);
-    assert.match(audio,/audioEngine\.play\(isCrit\?"crit":"damage",COMBAT_FEEDBACK_VOLUME_SCALE\)/);
+    assert.match(fs.readFileSync("js/39-v143-skill-animation.js","utf8"),/dodge/);
+    assert.match(fs.readFileSync("js/39-v143-skill-animation.js","utf8"),/block/);
+    assert.match(fs.readFileSync("js/39-v143-skill-animation.js","utf8"),/critical\?"crit":"damage"/);
     assert.match(audio,/audioEngine\.play\("boss",COMBAT_FEEDBACK_VOLUME_SCALE\)/);
 });
 

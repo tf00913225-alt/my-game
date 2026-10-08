@@ -64,7 +64,7 @@
     }
 
     const RAW_MANIFEST={
-        normal:{hit:.57,noVisual:true},
+        normal:{hit:.57,sprite:castSheet("assets/vfx/normal/normal-impact.webp","single",{hitFrame:6,scale:.85,maxSize:100,impactOnly:true})},
 
         flameSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-slash-cast.png","single",{scale:1.85,maxSize:220})},
         fireCritical:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260})},
@@ -1180,7 +1180,7 @@
         let node=current.spriteNodes.get(key);
         if(!node){
             const initialSprite=!current.firstVisibleFrameAt;
-            if(initialSprite){ beginVisualTimeline(current); }
+            if(initialSprite&&!sprite.impactOnly){ beginVisualTimeline(current); }
             node=appendSpriteNode(current);
             node.dataset.columns=String(sprite.columns);
             node.dataset.rows=String(sprite.rows);
@@ -1188,7 +1188,8 @@
             node.style.backgroundImage='url("'+String(sprite.src).replace(/"/g,"%22")+'")';
             node.style.backgroundSize=(sprite.columns*100)+"% "+(sprite.rows*100)+"%";
             node.style.setProperty("--v143-sprite-duration",current.duration+"ms");
-            /* The first normal cast always begins at Frame 1. A later sprite
+            /* An ordinary cast starts at Frame 1; impact-only clips hold their
+               registered impact frame while hidden. A later sprite
                for a separately delayed target may catch up to the visual
                timeline, but it must never rewrite the initial cast. */
             node.dataset.emission=initialSprite?"initial":"late";
@@ -1196,6 +1197,12 @@
                 ?"0ms"
                 :-Math.min(current.duration,Math.max(0,Date.now()-(current.visualStartedAt||current.startedAt)))+"ms"
             );
+            if(sprite.impactOnly){
+                /* Hold the impact frame while hidden. DOM setup latency must not
+                   leave transparent travel frames after the formal hit task. */
+                node.style.setProperty("--v143-sprite-delay",-(current.duration*sprite.hitFrame/sprite.frames)+"ms");
+                node.style.animationPlayState="paused";
+            }
             if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
             current.spriteNodes.set(key,node);
         }
@@ -1206,10 +1213,13 @@
            Outcome confirmation still marks the node and controls hit feedback, but
            MISS/status/custom Boss paths must not make the cast animation disappear. */
         if(node.style.left&&node.style.top){
-            node.style.visibility="visible";
+            node.style.visibility=sprite.impactOnly?"hidden":"visible";
             node.dataset.emittedVisual="true";
         }
         if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }
+        /* Start the new impact-only lifetime after positioning, so slow DOM
+           setup cannot expire the hit/recoil before its first painted frame. */
+        if(sprite.impactOnly&&!current.firstVisibleFrameAt){ beginVisualTimeline(current); }
     }
 
     function confirmTargetVisual(current,index){
@@ -1218,7 +1228,13 @@
         const placement=placementFor(current.config,current.model.sprite);
         const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
         const node=current.spriteNodes.get(key);
-        if(node){ node.dataset.confirmedHit="true"; node.style.visibility="visible"; }
+        if(node){
+            node.dataset.confirmedHit="true";
+            if(!current.model.sprite.impactOnly||current.hitReached){
+                node.style.visibility="visible";
+                if(current.model.sprite.impactOnly){ node.style.animationPlayState="running"; }
+            }
+        }
     }
 
     function targetHitTime(current,index){
@@ -1248,6 +1264,10 @@
         const card=cardFor(current.targetSide,index);
         if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }
         current.hitReached=true;
+        if(current.model.sprite&&current.model.sprite.impactOnly&&current.confirmedTargets.has(index)){
+            const node=current.spriteNodes.get(String(index));
+            if(node){ node.style.visibility="visible"; node.style.animationPlayState="running"; }
+        }
         syncStatusVisualsForUnit(current.targetSide,index);
     }
 
@@ -1281,6 +1301,11 @@
         current.targetIndexes.forEach(index=>{
             const card=cardFor(current.targetSide,index);
             if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }
+            const artwork=card&&card.querySelector(".v174-battle-art");
+            if(artwork&&artwork.v143ImpactRecoil){
+                artwork.v143ImpactRecoil.cancel();
+                artwork.v143ImpactRecoil=null;
+            }
         });
         if(state.stage&&state.stage.dataset.sequence===String(current.sequence)&&typeof state.stage.remove==="function"){
             state.stage.remove();
@@ -1345,7 +1370,7 @@
         stage.style.visibility="visible";
         stage.dataset.sequence=String(current.sequence);
         stage.dataset.skill=String(config.id||"unknown");
-        stage.dataset.element=String(config.element||"normal");
+        stage.dataset.element=config.id==="normal"?"normal":String(config.element||"normal");
         stage.dataset.renderer="raster-only";
         stage.dataset.geometryOwner="fixed-slot";
         if(model.missingAsset||model.missingDedicatedAsset){ stage.dataset.missingVisual="true"; }
@@ -1419,10 +1444,10 @@
         return originalDispose();
     };
 
-    function delayFor(targetSide,index,allowDefeated){
+    function delayFor(targetSide,index,allowDefeated,confirmHit){
         const current=registerTarget(targetSide,index,allowDefeated);
         if(!current){ return 0; }
-        confirmTargetVisual(current,index);
+        if(current.config.id!=="normal"||confirmHit===true){ confirmTargetVisual(current,index); }
         return Math.max(0,targetHitTime(current,index)-Date.now());
     }
 
@@ -1441,15 +1466,40 @@
 
     /* V143 owns hit timing only. Battle Floating Feedback owns popup DOM,
        geometry, collision lanes, typography and cleanup. */
-    window.v143ResolveBattleFeedbackTiming=function(targetSide,index,kind){
+    window.v143ResolveBattleFeedbackTiming=function(targetSide,index,kind,isCritical){
         const side=targetSide==="monster"?"monster":"player";
         const unitIndex=Number(index)||0;
-        const wait=delayFor(side,unitIndex,true);
+        const damage=kind==="damage"||kind==="criticalDamage";
+        const wait=delayFor(side,unitIndex,true,damage||kind==="shield");
         const current=state.current;
-        const critical=String(kind||"")==="damage"&&!!(
+        const critical=isCritical===true||damage&&!!(
             current&&!current.done&&current.config&&current.config.id==="fireCritical"&&
             current.targetSide===side
         );
+        const direct=current&&!current.done&&(current.config.id==="normal"||
+            current.config.category==="physical"||current.config.category==="magic");
+        const present=function(){
+            const audio=window.v141Audio;
+            if(audio&&typeof audio.play==="function"){
+                const sound=damage?(critical?"crit":"damage"):kind==="shield"?"block":kind==="miss"?"dodge":null;
+                if(sound){ audio.play(sound,audio.combatFeedbackVolumeScale); }
+            }
+            if(!damage||!direct){ return; }
+            const card=cardFor(side,unitIndex);
+            const artwork=card&&card.querySelector(".v174-battle-art");
+            if(!artwork||typeof artwork.animate!=="function"){ return; }
+            if(typeof window.matchMedia==="function"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){ return; }
+            if(artwork.v143ImpactRecoil){ artwork.v143ImpactRecoil.cancel(); }
+            const distance=(critical?5:4)*(side==="monster"?-1:1);
+            artwork.v143ImpactRecoil=artwork.animate([
+                {translate:"0px 0px",scale:1},
+                {translate:"0px "+distance+"px",scale:critical?.975:.98,offset:.3},
+                {translate:"0px "+(-distance*.3)+"px",scale:1,offset:.7},
+                {translate:"0px 0px",scale:1}
+            ],{duration:140,easing:"ease-out"});
+            artwork.v143ImpactRecoil.onfinish=()=>{ artwork.v143ImpactRecoil=null; };
+        };
+        if(wait>8||current&&!current.done&&!current.hitReached){ setTimer(present,wait); }else{ present(); }
         if(wait>8){ state.metrics.delayedNumbers++; }
         return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical});
     };
@@ -1515,7 +1565,10 @@
     function scheduleStatusOwnedUiUpdate(side,index,keyPrefix,callback){
         if(typeof callback!=="function"){ return; }
         const wait=existingTargetDelay(side,index);
-        if(wait>8){
+        const current=state.current;
+        const awaitingImpact=current&&!current.done&&current.targetSide===side&&
+            current.emitted.has(index)&&!current.hitReached;
+        if(wait>8||awaitingImpact){
             const key=keyPrefix+":"+index;
             if(!state.pendingUpdates.has(key)){
                 state.pendingUpdates.set(key,true);
@@ -1529,14 +1582,14 @@
         return callback();
     }
 
-    window.v143ScheduleMonsterUiUpdate=function(index,callback){
-        return scheduleStatusOwnedUiUpdate("monster",Number(index),"monster",callback);
+    window.v143ScheduleMonsterUiUpdate=function(index,callback,projection){
+        return scheduleStatusOwnedUiUpdate("monster",Number(index),"monster-"+(projection||"resources"),callback);
     };
     window.v143StatusAfterMonsterUiUpdate=function(index){
         syncStatusVisualsForUnit("monster",Number(index));
     };
-    window.v143SchedulePlayerStatusUiUpdate=function(index,callback){
-        return scheduleStatusOwnedUiUpdate("player",Number(index),"player-status",callback);
+    window.v143SchedulePlayerStatusUiUpdate=function(index,callback,projection){
+        return scheduleStatusOwnedUiUpdate("player",Number(index),"player-"+(projection||"status"),callback);
     };
     window.v143StatusAfterPlayerUiUpdate=function(index){
         syncStatusVisualsForUnit("player",Number(index));

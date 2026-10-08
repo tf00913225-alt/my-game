@@ -213,7 +213,7 @@ assert.match(mainSource,/showDamagePopup\(\s*element,\s*text\|\|"MISS",\s*"miss"
 assert.match(mainSource,/return feedback\.emit\(\{[\s\S]*?kind:type==="heal"[\s\S]*?type==="miss"[\s\S]*?"miss"/,"canonical feedback maps MISS to the miss semantic kind");
 assert.match(feedbackOwner,/if\(value==="miss"\)\{ return "miss"; \}/,"feedback owner preserves MISS semantics");
 assert.match(feedbackOwner,/const resolver=window\.v143ResolveBattleFeedbackTiming/,"canonical feedback owner delegates impact timing to V143");
-assert.match(feedbackOwner,/resolver\(options\.side==="monster"\?"monster":"player",Number\(options\.index\)\|\|0,semanticKind\(options\.kind\)\)/,"MISS target and kind reach the V143 timing API");
+assert.match(feedbackOwner,/resolver\(options\.side==="monster"\?"monster":"player",Number\(options\.index\)\|\|0,semanticKind\(options\.kind\),options\.critical===true\)/,"MISS target and kind plus critical state reach the V143 timing API");
 assert.doesNotMatch(source,/function missDelayFor\(/,"MISS must not bypass target registration");
 assert.doesNotMatch(source,/v174FireRocketTravel/,"single-skill Fire Rocket override must stay retired");
 console.log("✓ Boss VFX reliability regression suite passed");

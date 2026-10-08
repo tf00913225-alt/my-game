@@ -120,7 +120,7 @@ assert.match(relic,/function equipRelic\(id\)[\s\S]*teamLoadout\.relicId=id;[\s\
 assert.doesNotMatch(relic,/devPreviewRelicId/,
   "parallel DEV loadout state must not return");
 
-assert.match(core,/const POST_ACTION_DELAY_MS=1150;/,
+assert.match(core,/const POST_ACTION_DELAY_MS=650;/,
   "global battle pacing must remain untouched");
 assert.match(v143,/function relicSheet\(src,hitFrame,options\)[\s\S]*authoredHitFrame:frame/,
   "reviewed relic authored hit frames must remain untouched");

@@ -64,7 +64,7 @@ function test(name,fn){
 }
 
 test("core battle flow owns pacing and skips non-acting entities",()=>{
-    assert.match(coreSource,/function getBattleAdvanceDelay\(phase\)/);
+    assert.match(coreSource,/function getBattleAdvanceDelay\(phase,automaticDeclaration\)/);
     assert.match(coreSource,/v142GetRemainingAnimationMs/);
     assert.match(coreSource,/monsters\[i\]\.canAct!==false/);
     assert.match(coreSource,/actingMonster\.canAct===false/);
