@@ -57,11 +57,13 @@ async function runBossBalanceProductionQa(){
         window.bossBalanceQaCapture=plan.type+'-'+plan.id+'-'+caseIndex;
         const cleanup=async()=>{
           if(battleActive)check(v132AbortDungeonBattle('qa-stop'),'formal QA abort');
+          clearBattleActionWatchdog();
           if(window.v142SkillAnimationDirector)window.v142SkillAnimationDirector.dispose();
+          window.FourSymbolsBattleFloatingFeedback?.clear?.();
           const stoppedTurn=turn,stoppedGold=gold;
           await new Promise(r=>setTimeout(r,1500));
           check(!battleActive&&!autoBattle&&!FourSymbolsBossBattle.isActive()&&!window.v132ActiveDungeonRun,'released battle context');
-          check(timerId===null&&!battleAdvanceTimeoutId&&!battleAdvanceScheduled&&!FourSymbolsBattleFlow.isPresentationActive(),'released timers/presentation locks');
+          check(timerId===null&&!battleAdvanceTimeoutId&&!battleAdvanceScheduled&&!battleActionWatchdogTimeoutId&&!battleRoundPromptTimeoutId&&!FourSymbolsBattleFlow.isPresentationActive(),'released timers/presentation locks');
           check(turn===stoppedTurn&&gold===stoppedGold,'no late turn or settlement');
           return {battleActive,autoBattle,bossActive:FourSymbolsBossBattle.isActive(),timersReleased:true,stable:true};
         };
@@ -92,7 +94,9 @@ async function runBossBalanceProductionQa(){
         }
         let rounds=1,completedRounds=0,actions=0,stopped=false,observerError=null,shields=0,objects=0,reinforcements=0;const off=FourSymbolsBattleFlow.subscribeBeforeCombatant(()=>{try{
           actions++;
-          rounds=Math.max(rounds,turn);verify(boss);check(FourSymbolsBattlefieldSlots.getActiveEnemySnapshot()===snapshot,'stable snapshot');
+          rounds=Math.max(rounds,turn);verify(boss);
+          if(FourSymbolsBattlefieldSlots.getActiveEnemySnapshot()!==snapshot)evidence.snapshotMismatch={turn,battleActive,bossActive:FourSymbolsBossBattle.isActive(),bossAlive:boss.alive,bossHP:boss.hp,initial:snapshot,current:FourSymbolsBattlefieldSlots.getActiveEnemySnapshot(),context:GameplaySystem.getActiveBattleState(),diagnostics:FourSymbolsBossBattle.getLifecycleDiagnostics()};
+          check(FourSymbolsBattlefieldSlots.getActiveEnemySnapshot()===snapshot,'stable snapshot');
           const shield=FourSymbolsBossBattle.getShieldState();if(shield){shields++;check(shield.max===Math.round(boss.maxHP*.24),'shield ratio once');}
           for(const i of currentBattleMonsters){const m=monsters[i];if(m.unitKind==='boss-object'){objects++;check(m.canAct===false&&m.noRewards&&!m.balanceOwner,'object Owner');check(['ENEMY_F1','ENEMY_F5'].includes(m.vGameplayBattlefieldSlot)||!m.alive,'object slots');}if(m.vGameplayBossSupport){reinforcements++;verify(m);check(m.rank==='elite'&&['ENEMY_B1','ENEMY_B5'].includes(m.vGameplayBattlefieldSlot),'elite slots');}}
         }catch(error){observerError=error;}});

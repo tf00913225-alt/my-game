@@ -40,6 +40,25 @@ test('World stage stats and pressure are owner-only; reinforcements retain Elite
  for(const worldStage of [0,5,1.5,null])assert.throws(()=>MonsterBalance.build({...previous.balanceProjection.identity,worldStage}));
  assert.throws(()=>MonsterBalance.build({...previous.balanceProjection.identity,rank:'smallBoss'}));
 });
+test('Boss death retains formation authority until completion releases surviving support',()=>{
+ const c=loadBossDiagnostic();
+ vm.runInContext(`prepareWildBalanceReferenceParty(70,3);battleActive=false;
+   const launch=v132LaunchDungeonBattle;v132LaunchDungeonBattle=(roster,callback,...args)=>{globalThis.completeBossProbe=callback;return launch(roster,callback,...args);};
+   vGameplayStartBoss('personal','personal-70');monsters[0].hp=Math.floor(monsters[0].maxHP*.34);FourSymbolsBossBattle.processRound();`,c);
+ const owner=c.FourSymbolsBattlefieldSlots,boss=c.FourSymbolsBossBattle,snapshot=owner.getActiveEnemySnapshot();
+ const guards=vm.runInContext('currentBattleMonsters.filter(i=>monsters[i].vGameplayBossSupport)',c);
+ assert.equal(guards.length,2);
+ vm.runInContext('monsters[0].alive=false;monsters[0].hp=0;',c);
+ assert.equal(boss.isActive(),true,'Boss-mode lifecycle still owns surviving entities');
+ assert.equal(boss.getEnemyFormationSnapshot(),snapshot);
+ assert.equal(boss.ownsEnemyFormationSnapshot(snapshot),true);
+ assert.deepEqual(plain(guards.map(i=>owner.getEnemySlotForMonster(snapshot,i))),['ENEMY_B1','ENEMY_B5']);
+ assert.ok(guards.every(i=>boss.canEnemyAct(i)));
+ const before=plain(c.GameplaySystem.getSerializableState());
+ vm.runInContext("completeBossProbe({result:'qa-stop'});",c);
+ assert.equal(boss.isActive(),false);assert.equal(boss.ownsEnemyFormationSnapshot(snapshot),false);
+ assert.deepEqual(plain(c.GameplaySystem.getSerializableState()),before,'abort cannot award progression');
+});
 test('formal shield/object/summon lifecycle retains one snapshot and original slots',()=>{
  const c=loadBossDiagnostic();vm.runInContext('prepareWildBalanceReferenceParty(100,3);battleActive=false;vGameplayStartBoss("personal","personal-100");',c);
  const boss=vm.runInContext('monsters[0]',c),owner=c.FourSymbolsBattlefieldSlots,snapshot=owner.getActiveEnemySnapshot();verify(boss);
