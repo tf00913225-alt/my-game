@@ -31,6 +31,8 @@ test('shared reforge presentation is targeted; formulas, writes and callers fail
   assert.equal(classifySharedSource('function renderBattle(){if(battleActive)settleDamage(10);}','function renderBattle(){if(!battleActive)settleDamage(10);}'),null);
   assert.equal(classifySharedSource('function renderBattle(){const damage=10;settleDamage(damage);}','function renderBattle(){const damage=1;settleDamage(damage);}'),null);
   assert.equal(classifySharedSource('function renderBattle(){settleDamage(10);}','function renderBattle(){const settleDamage=()=>{};settleDamage(10);}'),null);
+  assert.equal(classifySharedSource('function renderBattle(){settleDamage(10);}','function renderBattle(){function settleDamage(){} settleDamage(10);}'),null);
+  assert.equal(classifySharedSource('function renderBattle(){new BattleRuntime();}','function renderBattle(){class BattleRuntime{} new BattleRuntime();}'),null);
   assert.equal(classifySharedSource('function renderBattle(damage=10){settleDamage(damage);}','function renderBattle(damage=1){settleDamage(damage);}'),null);
   assert.equal(classifySharedSource('function renderBattle(){settleDamage(10);}','function renderBattle(){if(battleActive)return;settleDamage(10);}'),null);
   for(const name of ['canActuallyReforge','reforgeSlotCount'])assert.equal(classifySharedSource('function '+name+'(){return false;}','function '+name+'(){return true;}',sourcePath),null,'transaction guard is not presentation: '+name);

@@ -38,6 +38,7 @@ export function classifySharedSource(before, after, sourcePath='js/00-main.js') 
           if(!value || typeof value!=='object') return;
           if(value.type==='Identifier')references.set(value.name,(references.get(value.name)||0)+1);
           if(value.type==='VariableDeclarator')bindings.push(value);
+          if(['FunctionDeclaration','ClassDeclaration'].includes(value.type))bindings.push({id:value.id,init:value});
           if(['IfStatement','ConditionalExpression','WhileStatement','DoWhileStatement','ForStatement','SwitchStatement','SwitchCase'].includes(value.type))effects.push(canonical({type:value.type,test:value.test,init:value.init,update:value.update,discriminant:value.discriminant}));
           if(['ForInStatement','ForOfStatement','LogicalExpression'].includes(value.type))effects.push(canonical({type:value.type,operator:value.operator,left:value.left,right:value.type==='LogicalExpression'?undefined:value.right,await:value.await}));
           if(value.type==='CatchClause')effects.push(canonical({type:value.type,param:value.param}));
