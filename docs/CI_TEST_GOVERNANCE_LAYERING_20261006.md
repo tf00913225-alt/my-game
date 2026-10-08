@@ -3,8 +3,8 @@
 Work ID: `CI-TEST-GOVERNANCE-LAYERING-20261006`
 Target: dev; main writes forbidden.
 Branch: `feature/ci-test-governance-layering-20261006`.
-Status: Original layering integrated. Current routing/stale-run repair is owned by
-Work ID CI-BOSS-ROUTING-20261006, branch chore/ci-boss-routing-20261006.
+Status: Original layering integrated. Current Boss tier optimization is owned by
+Work ID CI-BOSS-TIERED-GATES-20261008, branch feature/ci-boss-tiered-gates-20261008.
 Latest Head, Required CI, integration and cleanup evidence belong to its PR.
 
 ## Current routing owner (supersedes historical phase restrictions below)
@@ -14,18 +14,72 @@ merge base and exact PR head; only its checkout receives full ancestry. dev push
 compares exact before/after trees. Missing SHA, unrelated histories, invalid/new
 unowned runtime and unexplained generated outputs retain strict fallback.
 
-Known existing presentation declarations in js/00-main.js are compared by Acorn
+Known existing presentation declarations in js/00-main.js and explicitly mapped
+reforge/shop declarations in the shared content/equipment modules are compared by Acorn
 AST boundaries. Unchanged surrounding source, declaration identity and call/write
 effects are required; new declarations, new effects and unknown shared changes
 are strict. Shop/character presentation routes to UI; battle presentation routes
-to battle. Boss/Tower source routes to Boss/Tower/battle. MonsterBalance routes to
+to battle and Boss Fast. Boss/Tower source routes to Boss/Tower/battle Full. MonsterBalance routes to
 all affected balance modes, Daily and battle, with full Node regressions.
 
 Generated bundles/manifests and restricted-policy digest may follow their source
 only after production build --check, registered-output validation and a real
 source change. Generated-only changes stay strict. CI routing/aggregate/workflow
 owners run core and full Node contract suites; other CI/build/release owners stay
-strict. No gameplay source, QA scene, viewport, assertion or timeout is removed.
+strict. Full Boss retains all nine scenarios at both phone sizes. No Full
+scenario, required assertion or failure propagation is removed. The new
+observer failure propagation exposed an existing dead-Boss/live-support
+formation bug: the Boss Owner now retains context authority until completion
+or abort, including after the body dies. This necessary blocker repair changes
+no stats, AI, damage, rewards, progression, save or account authority, and must
+pass Full plus natural/deployed snapshot acceptance itself.
+
+Boss mode is emitted by the same classifier for PR and dev push and passed
+unchanged to deployed QA: `none` for reliably isolated inventory/shop/docs;
+`fast` for known battle presentation/animation; `full` for Boss rules, balance,
+unknown/shared effects, core/lifecycle/settlement, Cloud/persistence, release and manual/nightly.
+Cloud/persistence uses Boss Full on both PR and dev, including its required flag.
+Inventory/reforge routes still execute the existing eligibility, synthesis,
+equipment and selection regressions in core_checks. The affected step runs
+them sequentially only when full_node is false; full_node already includes
+the same tests. No new test system or relaxed assertions are introduced.
+Unmapped mechanisms cannot use Fast merely because a filename sounds visual.
+The existing floating-feedback and skill-name presentation CSS owners route
+to UI/battle Fast; their Runtime timing/lifecycle JS remains strict.
+CI policy edits exercise Fast and retained Full themselves. Generated outputs
+still require exact build verification; shared call arguments and complete
+writes must remain identical, not just the callee/write destination.
+Even otherwise pure declarations retain parameter/async/generator signatures;
+directives, dynamic scope, debugger, delete and implicit iterator edits stay strict.
+Dynamic imports and tagged calls are effects; tagged-template raw arguments remain intact.
+Only unshadowed Math rounding of numeric literals is treated as a pure diagnostic;
+opaque used bindings and control flow remain fixed even in otherwise pure declarations.
+Effectful presentation functions also retain control-flow/guard/early-return
+order, used local bindings and default parameters; changing a call input via
+an alias cannot masquerade as unchanged effects. canActuallyReforge/reforgeSlotCount are consumed by transactions and
+are deliberately excluded from presentation routing; their changes stay Full.
+
+Fast uses real Runtime natural personal-20 victory/first rewards/progression,
+personal-70 and world-40 stage 4 up to ten completed rounds (early natural
+victory retains settlement checks). Separate controlled personal-70 HP .34
+and world-stage round-7 probes run real actions after formal mechanism owners
+trigger summons/charge/phases/shield. The HP probe equips a legal level-1
+windSpell loadout and requires actual status RNG plus a committed agilityDown
+event from formal actions; it never injects a successful status result.
+They never claim natural victory.
+390x844 runs combat; 412x915 verifies all three formal entries, visible HUD,
+target rules and status-detail interaction without replaying complete battles.
+Explicit controlled viewport state triggers HP/round mechanisms to verify
+support/object DOM slots and shield at 412x915 too; these are zero-action UI
+probes, never natural combat or settlement. Status/HUD capture holds retain
+both important screens before formal abort.
+Bounded probes release observers and use the existing dungeon abort, dispose
+VFX, then assert inactive Boss/dungeon/battle/auto state, cleared timers/locks
+and no late turn or reward. Both neutral and seeded all-Boss TTK remain.
+Artifacts distinguish Fast/Full, natural/controlled/UI scenes, total rounds,
+verified settlements, elapsed time and skipped coverage/reason. Actual CI
+timings and latest Head acceptance belong to the Work PR; no fixed savings
+percentage is promised. Historical timing records below remain unchanged.
 
 Ordinary dev integration now uses affected gates. main/release, manual full CI,
 Nightly and unknown changes retain full validation. Targeted dev runs never

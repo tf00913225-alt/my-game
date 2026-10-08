@@ -3,6 +3,9 @@ name: Deploy dev to Cloudflare Pages
 on:
   workflow_call:
     inputs:
+      boss_mode:
+        type: string
+        default: full
       boss_required:
         type: boolean
         default: true
@@ -404,6 +407,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
+      BOSS_GATE_MODE: ${{ github.event_name == 'workflow_dispatch' && 'full' || inputs.boss_mode }}
       DEV_BASE_URL: https://dev.four-symbols-dev.pages.dev
       EXPECTED_BRANCH: dev
       EXPECTED_COMMIT_SHA: ${{ github.sha }}

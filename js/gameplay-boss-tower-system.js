@@ -1401,7 +1401,9 @@
 
     window.FourSymbolsBossBattle=Object.freeze({
         version:"boss-target-entity-v1",
-        isActive:function(){ return !!activeBoss(); },
+        // Formation authority lasts until completion/abort releases the context,
+        // including remaining reinforcements after the Boss body dies.
+        isActive:function(){ return isLargeBossContext(); },
         getEnemyFormationSnapshot:bossBattlefieldSnapshot,
         ownsEnemyFormationSnapshot:function(snapshot){
             return !!(activeBattleContext&&snapshot&&snapshot.bossBattleSnapshot===true&&
