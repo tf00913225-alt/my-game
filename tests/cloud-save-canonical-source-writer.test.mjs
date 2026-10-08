@@ -16,6 +16,7 @@ const selection={displayName:"英雄",element:"fire",gender:"female",
 
 function harness(candidate="none"){
     let sessionId="creation-session-one";
+    let clock=1700000000000;
     const data=new Map([[save,{schemaVersion:2,ownerUid:uid,
         authoritativeStateReady:false,authoritativeStateVersion:0,
         migrationCandidateStatus:candidate,
@@ -47,8 +48,9 @@ function harness(candidate="none"){
     const writer=createCanonicalSourceWriter({db,FieldValue:{serverTimestamp:()=>stamp},
         HttpsError,runProtected:(_request,operation)=>operation(transaction,{uid,sessionId}),
         inspectExistingEnvelope:record=>({kind:"current",serverRevision:record.serverRevision,
-            data:record}),nextRevision:envelope=>envelope.serverRevision+1});
+            data:record}),nextRevision:envelope=>envelope.serverRevision+1,now:()=>clock});
     return {writer,data,setSessionId:value=>{sessionId=value;},
+        setClock:value=>{clock=value;},
         get committed(){return committed;}};
 }
 
@@ -64,6 +66,38 @@ test("public first creation replay requires the original session and current rev
     h.data.get(save).serverRevision=6;
     await assert.rejects(h.writer.commitInitialSources({},args,{requireCurrentReplay:true}),
         /advanced character/);
+});
+
+test("new creation persists server-generated playable fields in the existing revision and recovery archive",async()=>{
+    const h=harness(),args={operationId,expectedRevision:4,selection};
+    await h.writer.commitInitialSources({},args);
+    const progress=h.data.get(`${root}/progress/current`);
+    const fields=progress.playableState;
+    assert.equal(progress.serverRevision,5);
+    assert.equal(fields.lastSaveTimestamp,1700000000000);
+    assert.equal(fields.selectedCreationElement,selection.element);
+    assert.deepEqual(fields.bestiaryData,{});
+    assert.ok(Object.values(fields.heroAccount.heroes).every(row=>
+        row.unlocked===false&&row.stars===0&&row.specificFragments===0));
+    for(const key of ["autoConfig","autoConfig2","autoConfig3"]){
+        assert.deepEqual(fields[key],{enabled:false,skill:"normal",hp:50,sp:25,returnToCityWhenEmpty:false});
+    }
+    assert.notEqual(fields.autoConfig,fields.autoConfig2);
+    assert.deepEqual(h.data.get(`${root}/playableSnapshots/5`).snapshot.progress.playableState,fields);
+    const archive=h.data.get(`${root}/recoveryArchives/5`);
+    assert.deepEqual(archive.sourceRecords.progress.playableState,fields);
+    assert.equal(archive.readyForRestore,false);
+    const count=h.committed;
+    h.setClock(1800000000000);
+    assert.equal((await h.writer.commitInitialSources({},args)).unchanged,true);
+    assert.equal(h.committed,count);
+    assert.equal(h.data.get(`${root}/progress/current`).playableState.lastSaveTimestamp,1700000000000);
+    const {assembleCanonicalPlayableProjection}=require("../functions/src/canonical-snapshot.js");
+    assert.throws(()=>assembleCanonicalPlayableProjection(uid,5,archive.sourceRecords),/sidecar missing/);
+    const imported=harness();
+    await assert.rejects(imported.writer.commitInitialSources({}, {...args,
+        selection:{...selection,heroAccount:fields.heroAccount}}),/Invalid initial/);
+    assert.equal(imported.committed,0);
 });
 
 test("static newcomer EXP curve follows current game anchors",()=>{
