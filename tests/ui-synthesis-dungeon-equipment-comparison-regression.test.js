@@ -46,7 +46,7 @@ assert.doesNotMatch(materialRender,/innerHTML|appendChild|requestAnimationFrame|
 for(const file of ["js/38-v143-system-fixes.js","js/41-v146-system-polish.js","js/58-v173.63-functional-fixes.js"]){
     assert.doesNotMatch(read(file),/v141RenderSynthesis\s*=|decorateSynthesis|polishSynthesis|repairSynthesisIcons|ensureMaterialTab|renderMaterialSynthesis|maximizeSynthesisPanel/);
 }
-const assignments=fs.readdirSync("js").filter(name=>name.endsWith(".js")).flatMap(name=>read("js/"+name).match(/window\.v141RenderSynthesis\s*=/g)||[]);
+const assignments=fs.readdirSync("js").filter(name=>name.endsWith(".js")).flatMap(name=>read("js/"+name).match(/window\.v141RenderSynthesis\s*=(?!=|>)/g)||[]);
 assert.equal(assignments.length,1,"one public synthesis render owner");
 
 console.log("✓ synthesis, dungeon preview and equipment comparison UI regression batch");

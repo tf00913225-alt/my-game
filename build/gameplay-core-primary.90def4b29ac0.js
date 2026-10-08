@@ -9407,16 +9407,26 @@
 
     function reforgeSlotCount(item){
         if(!item){ return 0; }
-        const explicit=Math.max(0,Math.floor(Number(item.reforgeSlots)||0));
+        const value=Number(item.reforgeSlots)||0;
+        const explicit=Number.isFinite(value)?Math.max(0,Math.floor(value)):0;
         const existing=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;
         const slots=Math.max(explicit,existing);
-        if(slots>explicit){ item.reforgeSlots=slots; }
-        if(item.reforgeUsed){ item.reforgeUsed=0; }
         return slots;
     }
-    function canActuallyReforge(item){
-        return !!(item&&item.v17351Locked!==true&&reforgeSlotCount(item)>0);
+    function canActuallyReforge(item,explain=false){
+        let reason="";
+        if(!item||!isEquipmentInventoryType(item.type)){ reason="這不是合法裝備。"; }
+        else if(typeof item.v141Uid!=="string"||!item.v141Uid.trim()){ reason="裝備 UID 無效，無法冶煉。"; }
+        else if(findEquipmentByUid(item.v141Uid)!==item){ reason="裝備已失效或 UID 重複，無法冶煉。"; }
+        else if((item.reforgeSlots!=null&&(!Number.isSafeInteger(Number(item.reforgeSlots))||Number(item.reforgeSlots)<0))||
+            (item.reforgeStats!=null&&(typeof item.reforgeStats!=="object"||Array.isArray(item.reforgeStats)||
+                Object.entries(item.reforgeStats).some(([key,value])=>!Object.prototype.hasOwnProperty.call(STAT_LABEL,key)||typeof value!=="number"||!Number.isFinite(value))))){ reason="冶煉資料異常，無法冶煉。"; }
+        else if(reforgeSlotCount(item)<=0){ reason="這件裝備沒有冶煉槽。"; }
+        else if(item.v17351Locked===true){ reason="裝備已鎖定，無法冶煉"; }
+        return explain?reason:!reason;
     }
+    window.FourSymbolsReforge={canReforge:canActuallyReforge,slotCount:reforgeSlotCount,
+        reason:item=>canActuallyReforge(item,true)};
     function reforgeMaterialInfo(tierKey){
         const normalized=normalizeTierKey(tierKey);
         const tier=TIER_META[normalized]?normalized:"white";
@@ -9444,14 +9454,15 @@
         });
         Object.keys(characterEquipment||{}).forEach(characterKey=>{
             Object.values(characterEquipment[characterKey]||{}).forEach(item=>{
-                if(item&&canActuallyReforge(item)){ results.push({item,source:"已裝備"}); }
+                if(item&&isEquipmentInventoryType(item.type)&&canActuallyReforge(item)){ results.push({item,source:"已裝備"}); }
             });
         });
         return results;
     }
     function findEquipmentByUid(uid){
-        const entry=allRefinableEquipment().find(candidate=>candidate.item.v141Uid===uid);
-        return entry?entry.item:null;
+        if(typeof uid!=="string"||!uid.trim()){ return null; }
+        const matches=allEquipment().filter(item=>item.v141Uid===uid);
+        return matches.length===1?matches[0]:null;
     }
 
     function socketEquipment(){
@@ -9663,12 +9674,18 @@
 
     function renderReforgeTab(){
         const entries=allRefinableEquipment();
-        if(!entries.length){ return '<div class="v141-synthesis-empty">沒有可冶煉的裝備。<small>只有具備至少 1 個冶煉槽、且未鎖定的裝備會出現在這裡。</small></div>'; }
-        if(!entries.some(entry=>entry.item.v141Uid===synthesisState.reforgeUid)){
+        if(synthesisState.reforgeUid===null&&entries.length){
             synthesisState.reforgeUid=entries[0].item.v141Uid;
             synthesisState.lockedReforgeKeys=[];
         }
         const item=findEquipmentByUid(synthesisState.reforgeUid);
+        if(!canActuallyReforge(item)){
+            const reason=item?canActuallyReforge(item,true):synthesisState.reforgeUid?"裝備已失效或 UID 重複，請重新選擇裝備。":"沒有可冶煉的裝備。";
+            return '<div class="v141-synthesis-empty">'+escapeHtml(reason)+
+                '<small>只有具備至少 1 個冶煉槽、且未鎖定的裝備會出現在這裡。</small>'+
+                renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］'})),synthesisState.reforgeUid,'v141SelectReforgeItem')+
+                (synthesisState.pendingReforge?'<button type="button" onclick="v141ResolveReforge(false)">保留原效果</button>':'')+'</div>';
+        }
         const slotCount=reforgeSlotCount(item);
         const locks=normalizeReforgeLocks(item);
         const lockSet=new Set(locks);
@@ -9906,8 +9923,16 @@
         renderSynthesis();
     };
     window.v141SelectReforgeItem=function(uid){
+        if(synthesisState.pendingReforge){ return; }
+        const item=findEquipmentByUid(uid);
+        if(!canActuallyReforge(item)){
+            synthesisState.reforgeUid=typeof uid==="string"?uid:"";
+            synthesisState.lockedReforgeKeys=[];
+            renderSynthesis();
+            alert(item?canActuallyReforge(item,true):"裝備已失效或 UID 重複，請重新選擇裝備。");
+            return false;
+        }
         synthesisState.reforgeUid=uid;
-        synthesisState.pendingReforge=null;
         synthesisState.lockedReforgeKeys=[];
         renderSynthesis();
     };
@@ -9963,48 +9988,78 @@
 
     window.v141StartReforge=function(){
         const item=findEquipmentByUid(synthesisState.reforgeUid);
-        if(!item||synthesisState.pendingReforge){ return; }
+        if(synthesisState.pendingReforge){ return false; }
+        if(!canActuallyReforge(item)){
+            alert(item?canActuallyReforge(item,true):"裝備已失效或 UID 重複，請重新選擇裝備。");
+            return false;
+        }
+        if(typeof window.v132RunInventoryTransaction!=="function"||typeof window.v132ConsumeStackItem!=="function"||typeof saveGame!=="function"){
+            alert("冶煉交易或存檔系統尚未準備完成，無法安全扣除材料。");
+            return false;
+        }
         const slotCount=reforgeSlotCount(item);
         if(slotCount<=0){ alert("這件裝備沒有冶煉槽。"); return; }
         const locks=normalizeReforgeLocks(item).slice();
         if(locks.length>=slotCount){ alert("至少要保留 1 個未鎖定槽位才能重新冶煉。"); return; }
         const tier=normalizeTierKey(synthesisState.reforgeMaterialTier);
         const info=reforgeMaterialInfo(tier);
-        if(!info.meta||info.meta.available===false){ alert("此材料階級尚未開放。"); return; }
+        if(!TIER_META[tier]||!info.meta||info.meta.available===false){ alert("此材料階級尚未開放。"); return false; }
         const cost=reforgeMaterialCost(locks.length);
-        if(!info.ore||info.oreCount<cost||gold<info.meta.reforgeGold){
+        if(!info.ore||!Number.isFinite(info.oreCount)||info.oreCount<cost||!Number.isFinite(gold)||gold<info.meta.reforgeGold){
             alert(info.meta.label+"冶煉材料或金幣不足。");
             return;
         }
-        const success=runInventoryTransaction(()=>
-            window.v132ConsumeStackItem(info.ore.id,cost)
-        );
-        if(!success){ alert("冶煉素材扣除失敗，已自動還原。"); return; }
-        gold-=info.meta.reforgeGold;
-        synthesisState.pendingReforge={
+        const pending={
             uid:item.v141Uid,
+            item,
             stats:rollReforgeAffixes(item,tier,locks),
             materialTier:tier,
             lockedKeys:locks.slice(),
             materialCost:cost
         };
-        rebuildInventorySlots(); updateGoldDisplay(); saveGame(); renderSynthesis();
+        const previousGold=gold;
+        const success=runInventoryTransaction(()=>{
+            if(!window.v132ConsumeStackItem(info.ore.id,cost)){ return false; }
+            gold-=info.meta.reforgeGold;
+            return saveGame()!==false;
+        });
+        if(!success){
+            gold=previousGold;
+            rebuildInventorySlots(); updateGoldDisplay(); renderSynthesis();
+            alert("冶煉交易或存檔失敗，金幣與素材已還原。"); return false;
+        }
+        synthesisState.pendingReforge=pending;
+        rebuildInventorySlots(); updateGoldDisplay(); renderSynthesis();
+        return true;
     };
 
     window.v141ResolveReforge=function(applyNew){
         const pending=synthesisState.pendingReforge;
         if(!pending){ return; }
         const item=findEquipmentByUid(pending.uid);
+        if(applyNew&&(!canActuallyReforge(item)||item!==pending.item)){
+            alert(item?canActuallyReforge(item,true)||"裝備已變更，無法套用冶煉效果。":"裝備已失效或 UID 重複，無法套用冶煉效果。");
+            return false;
+        }
+        const oldStats=item&&item.reforgeStats,oldUsed=item&&item.reforgeUsed;
         if(applyNew&&item){
             // Replace the unlocked result as one full roll; locked keys were already
             // copied into pending.stats by rollReforgeAffixes(). No additive stacking.
             item.reforgeStats=Object.assign({},pending.stats);
             item.reforgeUsed=0;
         }
+        if(saveGame()===false){
+            if(applyNew&&item){
+                if(oldStats===undefined){ delete item.reforgeStats; }else{ item.reforgeStats=oldStats; }
+                if(oldUsed===undefined){ delete item.reforgeUsed; }else{ item.reforgeUsed=oldUsed; }
+            }
+            alert("冶煉結果存檔失敗，請重試。"); return false;
+        }
         synthesisState.pendingReforge=null;
         if(item){ normalizeReforgeLocks(item); }
-        saveGame(); updateUI(); renderSynthesis();
+        updateUI(); renderSynthesis();
         showSynthesisResult(applyNew?"已套用新冶煉效果":"已保留原冶煉效果",applyNew&&item?'<div class="v141-result-item"><b>'+escapeHtml(item.name)+'</b>'+statsHtml(item.reforgeStats)+'</div>':'<p>本次材料與金幣已消耗，原有效果維持不變。</p>');
+        return true;
     };
 
     window.v141CraftTalismans=function(){

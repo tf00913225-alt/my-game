@@ -24,11 +24,11 @@ assert.match(eq,/item\.quality="white"/);
 assert.match(eq,/item\.reforgeSlots=0/);
 assert.match(eq,/repairLegacyStarterEquipmentIcons\(\);\n\s*syncEquipmentChestPresentation\(\);\n\s*syncMainCharacterEquipmentStorage\(\)/);
 
-assert.match(synthesis,/function canActuallyReforge\(item\)/);
-assert.match(synthesis,/item\.v17351Locked!==true/);
-assert.match(synthesis,/reforgeSlotCount\(item\)>0/);
+assert.match(synthesis,/function canActuallyReforge\(item,explain=false\)/);
+assert.match(synthesis,/item\.v17351Locked===true/);
+assert.match(synthesis,/reforgeSlotCount\(item\)<=0/);
 assert.match(synthesis,/isEquipmentInventoryType\(item\.type\)&&canActuallyReforge\(item\)/);
-assert.match(synthesis,/if\(item&&canActuallyReforge\(item\)\)\{ results\.push\(\{item,source:"已裝備"\}\); \}/);
+assert.match(synthesis,/if\(item&&isEquipmentInventoryType\(item\.type\)&&canActuallyReforge\(item\)\)\{ results\.push\(\{item,source:"已裝備"\}\); \}/);
 
 assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
 assert.ok(index.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
