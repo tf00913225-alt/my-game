@@ -496,7 +496,8 @@ test("frame eight delays hit numbers together and Fire Critical keeps its critic
     assert.equal(feedback.critical,true);
     runtime.context.setTimeout(()=>runtime.context.showMonsterHit(1,55,"hp",feedback.critical),feedback.delayMs);
     assert.equal(runtime.monsterHits.length,0);
-    assert.equal(runtime.scheduled.length,before+1);
+    assert.equal(runtime.scheduled.length,before+2,"impact audio/recoil and floating number share the target-hit timer");
+    assert.ok(Math.abs(runtime.scheduled[before].delay-feedback.delayMs)<10);
     const numberTimer=runtime.scheduled[runtime.scheduled.length-1];
     assert.ok(numberTimer.delay>=590&&numberTimer.delay<=620);
     numberTimer.callback();

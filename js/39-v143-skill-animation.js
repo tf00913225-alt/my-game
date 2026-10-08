@@ -1486,7 +1486,7 @@
             ],{duration:140,easing:"ease-out"});
             artwork.v143ImpactRecoil.onfinish=()=>{ artwork.v143ImpactRecoil=null; };
         };
-        if(wait>8){ setTimer(present,wait); }else{ present(); }
+        if(wait>8||current&&!current.done&&!current.hitReached){ setTimer(present,wait); }else{ present(); }
         if(wait>8){ state.metrics.delayedNumbers++; }
         return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical});
     };
@@ -1552,7 +1552,10 @@
     function scheduleStatusOwnedUiUpdate(side,index,keyPrefix,callback){
         if(typeof callback!=="function"){ return; }
         const wait=existingTargetDelay(side,index);
-        if(wait>8){
+        const current=state.current;
+        const awaitingImpact=current&&!current.done&&current.targetSide===side&&
+            current.emitted.has(index)&&!current.hitReached;
+        if(wait>8||awaitingImpact){
             const key=keyPrefix+":"+index;
             if(!state.pendingUpdates.has(key)){
                 state.pendingUpdates.set(key,true);
