@@ -8906,7 +8906,7 @@ ensureFunctionalStyles();runRepairs();
         if(typeof resolver!=="function"){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
         try{
             const timing=resolver(options.side==="monster"?"monster":"player",Number(options.index)||0,semanticKind(options.kind),options.critical===true)||{};
-            return {delayMs:Math.max(0,numeric(timing.delayMs,0)),critical:timing.critical===true,impactId:timing.impactId||null,impactAt:Number.isFinite(Number(timing.impactAt))?Number(timing.impactAt):0,sequence:numeric(timing.sequence,0)};
+            return {delayMs:Math.max(0,numeric(timing.delayMs,0)),critical:timing.critical===true,impactId:timing.impactId||null,impactAt:Number.isFinite(Number(timing.impactAt))?Number(timing.impactAt):0,sequence:numeric(timing.sequence,0),scheduleImpact:typeof timing.scheduleImpact==="function"?timing.scheduleImpact:null};
         }catch(_){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
     }
     function impactBatchKey(request){ return unitKey(request.side,request.index)+"|"+String(request.impactId); }
@@ -8934,16 +8934,26 @@ ensureFunctionalStyles();runRepairs();
     function registerImpactRequest(request,timing){
         const key=impactBatchKey(request);
         let batch=pendingImpactBatches.get(key);
+        let created=false;
         if(!batch){
             const dueAt=Number(request.impactAt)||Date.now()+Math.max(0,numeric(timing.delayMs,0));
             batch={key:key,side:request.side,index:request.index,impactId:request.impactId,dueAt:dueAt,requests:[],timer:null};
             pendingImpactBatches.set(key,batch);
-            /* A batch owns exactly one timer. Even a zero-delay impact defers to a
-               task boundary so all synchronous and microtask status producers can register. */
-            batch.timer=setTimeout(()=>flushImpactBatch(key),Math.max(0,dueAt-Date.now()));
+            created=true;
         }
         request.impactBatchKey=key;
         batch.requests.push(request);
+        /* Register before a hit Owner can synchronously flush a late request. */
+        if(created){
+            if(timing.scheduleImpact){ timing.scheduleImpact(()=>{
+                if(pendingImpactBatches.get(key)===batch){
+                    batch.dueAt=Date.now();
+                    batch.requests.forEach(item=>{ item.impactAt=batch.dueAt; });
+                    batch.timer=setTimeout(()=>flushImpactBatch(key),0);
+                }
+            }); }
+            else{ batch.timer=setTimeout(()=>flushImpactBatch(key),Math.max(0,batch.dueAt-Date.now())); }
+        }
     }
     function makeHandle(request){
         let resolvePromise;

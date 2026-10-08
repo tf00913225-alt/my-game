@@ -951,7 +951,9 @@
         }
         const wait=existingTargetDelay(side,index);
         const invoke=()=>syncStatusVisualsForUnit(side,index,false);
-        if(wait>8){ setTimer(invoke,wait); } else{ invoke(); }
+        if(!queueTargetHit(current,index,invoke,"projection",side)){
+            if(wait>8){ setTimer(invoke,wait); } else{ invoke(); }
+        }
     }
 
     if(typeof applyBurnEffect==="function"){
@@ -1219,7 +1221,36 @@
         if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }
         /* Start the new impact-only lifetime after positioning, so slow DOM
            setup cannot expire the hit/recoil before its first painted frame. */
-        if(sprite.impactOnly&&!current.firstVisibleFrameAt){ beginVisualTimeline(current); }
+        if(sprite.impactOnly&&!current.firstVisibleFrameAt){ requestImpactTimeline(current); }
+    }
+
+    function queueTargetHit(current,index,callback,phase,side){
+        if(!current||!current.model||!current.model.sprite||!current.model.sprite.impactOnly){ return false; }
+        if(side&&current.targetSide!==side){ return false; }
+        if(current.done){ return true; }
+        if(current.hitReached){ callback(); return true; }
+        if(!current.hitCallbacks){ current.hitCallbacks=new Map(); }
+        const callbacks=current.hitCallbacks.get(index)||[];
+        callbacks.push({callback:callback,phase:phase||"feedback"});
+        current.hitCallbacks.set(index,callbacks);
+        return true;
+    }
+
+    function requestImpactTimeline(current){
+        if(current.timelineRequested){ return; }
+        current.timelineRequested=true;
+        if(current.gate){ current.gate.visualTimelinePending=true; }
+        /* Finish the synchronous settlement/DOM task before arming the same
+           authored clock. An expired pre-render safety timer cannot win over hit. */
+        const start=function(){
+            if(state.current!==current||current.done){ return; }
+            beginVisualTimeline(current);
+            current.targetIndexes.forEach(index=>setTimer(
+                ()=>settleTargetVisual(current,index),Math.max(0,targetHitTime(current,index)-Date.now())
+            ));
+        };
+        if(typeof queueMicrotask==="function"){ queueMicrotask(start); }
+        else{ Promise.resolve().then(start); }
     }
 
     function confirmTargetVisual(current,index){
@@ -1249,6 +1280,7 @@
         if(!current||current.firstVisibleFrameAt){ return false; }
         current.firstVisibleFrameAt=Date.now();
         current.visualStartedAt=current.firstVisibleFrameAt;
+        if(current.gate){ current.gate.visualTimelinePending=false; }
         if(current.gate&&typeof current.gate.restartVisualTimeline==="function"){
             current.gate.restartVisualTimeline(current.duration);
         }
@@ -1264,11 +1296,16 @@
         const card=cardFor(current.targetSide,index);
         if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }
         current.hitReached=true;
+        const callbacks=current.hitCallbacks&&current.hitCallbacks.get(index)||[];
+        if(current.hitCallbacks){ current.hitCallbacks.delete(index); }
+        callbacks.filter(entry=>entry.phase==="projection").forEach(entry=>entry.callback());
+        syncStatusVisualsForUnit(current.targetSide,index);
         if(current.model.sprite&&current.model.sprite.impactOnly&&current.confirmedTargets.has(index)){
             const node=current.spriteNodes.get(String(index));
             if(node){ node.style.visibility="visible"; node.style.animationPlayState="running"; }
         }
-        syncStatusVisualsForUnit(current.targetSide,index);
+        callbacks.filter(entry=>entry.phase!=="projection").forEach(entry=>entry.callback());
+        current.presentationReadyAt=Date.now();
     }
 
     function emitSprite(current,index,allowDefeated){
@@ -1281,7 +1318,9 @@
         if(current.targetIndexes.indexOf(index)<0){ current.targetIndexes.push(index); }
         if(targetCard&&targetCard.classList){ targetCard.classList.add("v143-effects-pending"); }
         if(current.model.sprite){ addSprite(current,index,target); }
-        setTimer(()=>settleTargetVisual(current,index),Math.max(0,targetHitTime(current,index)-Date.now()));
+        if(!current.model.sprite||!current.model.sprite.impactOnly||current.firstVisibleFrameAt){
+            setTimer(()=>settleTargetVisual(current,index),Math.max(0,targetHitTime(current,index)-Date.now()));
+        }
     }
 
     function registerTarget(targetSide,index,allowDefeated){
@@ -1296,6 +1335,15 @@
 
     function cleanupCurrent(current,reason){
         if(!current||current.done){ return; }
+        if(current.model&&current.model.sprite&&current.model.sprite.impactOnly&&current.presentationReadyAt&&
+           reason!=="dispose"&&reason!=="superseded"&&reason!=="v143-render-error"){
+            const remaining=140-(Date.now()-current.presentationReadyAt);
+            if(remaining>0){
+                if(current.cleanupTimer){ clearTimeout(current.cleanupTimer); }
+                current.cleanupTimer=setTimer(()=>cleanupCurrent(current,reason),remaining);
+                return;
+            }
+        }
         current.done=true;
         current.spriteNodes.forEach(node=>{ if(node.v143MotionAnimation){ node.v143MotionAnimation.cancel(); } });
         current.targetIndexes.forEach(index=>{
@@ -1460,6 +1508,7 @@
     window.v143RunAtTargetHit=function(targetSide,index,callback,allowDefeated){
         if(typeof callback!=="function"){ return 0; }
         const wait=delayFor(targetSide,index,allowDefeated===true);
+        if(queueTargetHit(state.current,index,callback,"feedback",targetSide)){ return wait; }
         if(wait>8){ setTimer(callback,wait); }else{ callback(); }
         return wait;
     };
@@ -1480,15 +1529,15 @@
             current.config.category==="physical"||current.config.category==="magic");
         const present=function(){
             const audio=window.v141Audio;
-            if(audio&&typeof audio.play==="function"){
+            const playSound=function(){
                 const sound=damage?(critical?"crit":"damage"):kind==="shield"?"block":kind==="miss"?"dodge":null;
-                if(sound){ audio.play(sound,audio.combatFeedbackVolumeScale); }
-            }
-            if(!damage||!direct){ return; }
+                if(sound&&audio&&typeof audio.play==="function"){ audio.play(sound,audio.combatFeedbackVolumeScale); }
+            };
+            if(!damage||!direct){ playSound(); return; }
             const card=cardFor(side,unitIndex);
             const artwork=card&&card.querySelector(".v174-battle-art");
-            if(!artwork||typeof artwork.animate!=="function"){ return; }
-            if(typeof window.matchMedia==="function"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){ return; }
+            if(!artwork||typeof artwork.animate!=="function"){ playSound(); return; }
+            if(typeof window.matchMedia==="function"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){ playSound(); return; }
             if(artwork.v143ImpactRecoil){ artwork.v143ImpactRecoil.cancel(); }
             const distance=(critical?5:4)*(side==="monster"?-1:1);
             artwork.v143ImpactRecoil=artwork.animate([
@@ -1498,10 +1547,15 @@
                 {translate:"0px 0px",scale:1}
             ],{duration:140,easing:"ease-out"});
             artwork.v143ImpactRecoil.onfinish=()=>{ artwork.v143ImpactRecoil=null; };
+            playSound();
         };
-        if(wait>8||current&&!current.done&&!current.hitReached){ setTimer(present,wait); }else{ present(); }
+        if(!queueTargetHit(current,unitIndex,present,"feedback",side)){
+            if(wait>8||current&&!current.done&&!current.hitReached){ setTimer(present,wait); }else{ present(); }
+        }
         if(wait>8){ state.metrics.delayedNumbers++; }
-        return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical});
+        const scheduleImpact=current&&current.model&&current.model.sprite&&current.model.sprite.impactOnly
+            ?callback=>queueTargetHit(current,unitIndex,callback,"feedback",side):null;
+        return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical,scheduleImpact:scheduleImpact});
     };
 
     if(typeof applySkillDebuffEffectsToPlayer==="function"){
@@ -1529,7 +1583,9 @@
                 syncStatusVisualEffects();
             }
         };
-        if(wait>8){ setTimer(invoke,wait); }else{ invoke(); }
+        if(!queueTargetHit(state.current,Number(index),invoke,"projection",side)){
+            if(wait>8){ setTimer(invoke,wait); }else{ invoke(); }
+        }
     }
 
     if(typeof window.v141PlayCardEffect==="function"){
@@ -1572,10 +1628,11 @@
             const key=keyPrefix+":"+index;
             if(!state.pendingUpdates.has(key)){
                 state.pendingUpdates.set(key,true);
-                setTimer(()=>{
+                const project=()=>{
                     state.pendingUpdates.delete(key);
                     callback();
-                },wait);
+                };
+                if(!queueTargetHit(current,index,project,"projection",side)){ setTimer(project,wait); }
             }
             return;
         }

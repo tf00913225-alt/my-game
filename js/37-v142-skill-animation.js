@@ -325,6 +325,7 @@
     window.v142GetActiveAnimationGate=currentGate;
     window.v142GetRemainingAnimationMs=function(){
         const gate=currentGate();
+        if(gate&&!gate.done&&gate.visualTimelinePending){ return Number(gate.config.duration)||0; }
         return gate&&!gate.done?Math.max(0,gate.deadline-Date.now()):0;
     };
 
