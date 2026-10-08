@@ -64,6 +64,7 @@ jobs:
       abyss_balance: ${{ steps.classify.outputs.abyss_balance }}
       adventure_balance: ${{ steps.classify.outputs.adventure_balance }}
       boss_balance: ${{ steps.classify.outputs.boss_balance }}
+      boss_mode: ${{ steps.classify.outputs.boss_mode }}
       main_browser: ${{ steps.classify.outputs.main_browser }}
     steps:
       - uses: actions/checkout@v7
@@ -1023,8 +1024,14 @@ jobs:
             sudo apt-get update
             sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
           fi
+      - name: Verify Fast implementation when CI policy changes
+        if: needs.classify.outputs.workflow_changed == 'true'
+        env:
+          EXPECTED_COMMIT_SHA: ${{ inputs.candidate_sha || github.event.pull_request.head.sha || github.sha }}
+        run: BOSS_GATE_MODE=fast BOSS_MONSTER_BALANCE_QA=1 node .github/scripts/battle-layer-audio-live-qa.mjs
       - name: Verify Boss focus, aggregate, TTK and existing production QA
         env:
+          BOSS_GATE_MODE: ${{ needs.classify.outputs.boss_mode }}
           EXPECTED_COMMIT_SHA: ${{ inputs.candidate_sha || github.event.pull_request.head.sha || github.sha }}
         run: |
           mkdir -p artifacts/browser-qa
@@ -1172,6 +1179,7 @@ jobs:
     uses: ./.github/workflows/deploy-dev-cloudflare.yml
     with:
       boss_required: ${{ needs.classify.outputs.boss_balance == 'true' }}
+      boss_mode: ${{ needs.classify.outputs.boss_mode }}
       tower_required: ${{ needs.classify.outputs.tower_wild_browser == 'true' }}
       abyss_required: ${{ needs.classify.outputs.abyss_balance == 'true' }}
       adventure_required: ${{ needs.classify.outputs.adventure_balance == 'true' || needs.classify.outputs.adventure_ui_browser == 'true' }}

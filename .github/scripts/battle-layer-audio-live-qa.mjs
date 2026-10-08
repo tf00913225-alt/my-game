@@ -7,6 +7,8 @@ import os from 'node:os';
 import {startServer,waitJson,Cdp,findChrome} from './runtime-browser-qa-support.mjs';
 
 async function runBossBalanceProductionQa(){
+    const mode=process.env.BOSS_GATE_MODE||'full',startedAt=Date.now();
+    assert.ok(['fast','full'].includes(mode),'Unknown Boss mode must fail closed');
     const baseUrl=process.env.BOSS_BALANCE_BASE_URL;
     if(baseUrl){const manifest=await fetch(new URL('release-manifest.json',baseUrl+'/')).then(r=>r.json());assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA);}
     const reference=fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','utf8');
@@ -19,7 +21,9 @@ async function runBossBalanceProductionQa(){
       const evidence=window.bossBalanceQaEvidence={scenes:[],controls:[],skills:[]};
       const stats=m=>[m.maxHP,m.maxSP,m.attack,m.magicAttack,m.defense,m.agility];
       const verify=m=>{const p=MonsterBalance.debug(m);check(m.balanceOwner==='MonsterBalance'&&['personalBoss','worldBoss'].includes(m.mode),'owner');check(JSON.stringify(stats(m))===JSON.stringify(Object.values(p.final)),'projection');check(!m.v132Dungeon&&!m.v141ExtraHP,'legacy marker');check(p.base.abilityPointBudget===(m.level-1)*5,'budget');check(getEnemyPressureMultiplier(m,player)===p.finalDamagePressure,'pressure');};
-      const plans=[{type:'personal',id:'personal-20'},{type:'personal',id:'personal-30'},{type:'personal',id:'personal-70'},...[1,2,3,4].map(stage=>({type:'world',id:'world-40',stage})),{type:'world',id:'world-40',stage:4,repeat:true},{type:'personal',id:'personal-20',repeat:true}];
+      const fast=${JSON.stringify(mode==='fast')},viewportWidth=window.innerWidth;
+      const representative=[{type:'personal',id:'personal-20'},{type:'personal',id:'personal-70',maxRounds:10},{type:'world',id:'world-40',stage:4,maxRounds:10}];
+      const plans=fast?(viewportWidth===390?representative.concat([{type:'personal',id:'personal-70',controlled:'hp-threshold',maxRounds:1},{type:'world',id:'world-40',stage:4,controlled:'round-mechanisms',maxRounds:1}]):representative.map(p=>({...p,uiOnly:true}))):[{type:'personal',id:'personal-20'},{type:'personal',id:'personal-30'},{type:'personal',id:'personal-70'},...[1,2,3,4].map(stage=>({type:'world',id:'world-40',stage})),{type:'world',id:'world-40',stage:4,repeat:true},{type:'personal',id:'personal-20',repeat:true}];
       const oldRandom=Math.random,badge=showMonsterSkillNameBadge,status=rollStatusEffectHit,awardGold=awardMonsterGoldDrop;let killGold=0;
       awardMonsterGoldDrop=function(...args){const before=gold,result=awardGold(...args);killGold+=gold-before;return result;};
       showMonsterSkillNameBadge=function(name,...args){evidence.skills.push({name,round:turn});return badge(name,...args);};
@@ -27,6 +31,7 @@ async function runBossBalanceProductionQa(){
       try{
        for(const [caseIndex,plan] of plans.entries()){killGold=0;evidence.current={...plan};
         const definition=(plan.type==='world'?GameplaySystem.worldBosses:GameplaySystem.personalBosses).find(d=>d.id===plan.id);
+        if(fast&&plan.type==='world'){const state=GameplaySystem.getSerializableState();state.world[plan.id].completedStages=3;GameplaySystem.debugReloadState(state);}
         const ref=prepareWildBalanceReferenceParty(definition.level,definition.level<60?2:3);v131GrantElementBoxHours(8,32);
         let seed=definition.level*100+(plan.stage||1);Math.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
         autoBattle=false;autoPatrolEnabled=false;for(const cfg of [autoConfig,autoConfig2,autoConfig3]){cfg.enabled=false;cfg.skill=ref.skill;cfg.hp=0;cfg.sp=0;}
@@ -50,13 +55,58 @@ async function runBossBalanceProductionQa(){
         }
         check(document.querySelector('.gameplay-boss-card .monster-hp-inner')&&document.querySelector('.gameplay-boss-card .monster-sp-inner'),'HP/SP');
         window.bossBalanceQaCapture=plan.type+'-'+plan.id+'-'+caseIndex;
-        let rounds=1,shields=0,objects=0,reinforcements=0;const off=FourSymbolsBattleFlow.subscribeBeforeCombatant(()=>{
+        const cleanup=async()=>{
+          if(battleActive)check(v132AbortDungeonBattle('qa-stop'),'formal QA abort');
+          if(window.v142SkillAnimationDirector)window.v142SkillAnimationDirector.dispose();
+          const stoppedTurn=turn,stoppedGold=gold;
+          await new Promise(r=>setTimeout(r,1500));
+          check(!battleActive&&!autoBattle&&!FourSymbolsBossBattle.isActive()&&!window.v132ActiveDungeonRun,'released battle context');
+          check(timerId===null&&!battleAdvanceTimeoutId&&!battleAdvanceScheduled&&!FourSymbolsBattleFlow.isPresentationActive(),'released timers/presentation locks');
+          check(turn===stoppedTurn&&gold===stoppedGold,'no late turn or settlement');
+          return {battleActive,autoBattle,bossActive:FourSymbolsBossBattle.isActive(),timersReleased:true,stable:true};
+        };
+        const targetRules=()=>{
+          const alive=currentBattleMonsters.filter(i=>monsters[i]?.alive);
+          check(JSON.stringify(FourSymbolsBossBattle.resolveEnemyDamageTargets(FourSymbolsBossBattle.getBossIndex(),'tri'))===JSON.stringify([FourSymbolsBossBattle.getBossIndex()]),'single Boss target');
+          check(FourSymbolsBossBattle.resolveEnemyDamageTargets(FourSymbolsBossBattle.getBossIndex(),'all').length===alive.length,'all living targets');
+        };targetRules();
+        if(plan.uiOnly){
+          check(art.getBoundingClientRect().width>0&&art.getBoundingClientRect().height>0,'visible artwork');
+          openBattleStatusDetailModal('monster',FourSymbolsBossBattle.getBossIndex());
+          check(document.getElementById('battleStatusDetailModal')?.hidden===false,'status detail interaction');closeBattleStatusDetailModal();
+          evidence.scenes.push({...plan,kind:'viewport-interaction',rounds:0,settlementVerified:false,cleanup:await cleanup()});continue;
+        }
+        let controlledEvidence=null;
+        if(plan.controlled){
+          // Isolated test state; never claim this is a natural combat/settlement.
+          if(plan.controlled==='hp-threshold')boss.hp=Math.floor(boss.maxHP*.34);else turn=7;
+          FourSymbolsBossBattle.processRound();targetRules();
+          const supports=currentBattleMonsters.map(i=>monsters[i]).filter(m=>m.vGameplayBossSupport);
+          check(supports.length===2&&supports.every(m=>['ENEMY_B1','ENEMY_B5'].includes(m.vGameplayBattlefieldSlot)),'controlled summon and fixed slots');
+          const objects=currentBattleMonsters.map(i=>monsters[i]).filter(m=>m.unitKind==='boss-object').map(m=>({type:m.objectType,slot:m.vGameplayBattlefieldSlot,canAct:m.canAct}));
+          if(plan.controlled==='hp-threshold'){
+            check(objects.some(o=>o.objectType==='charge'||o.type==='charge'),'controlled low HP charge');
+            check(GameplaySystem.getActiveBattleState().combatPhase>=2,'controlled HP phase skills');
+          }else check(FourSymbolsBossBattle.getShieldState(),'controlled shield');
+          controlledEvidence={method:plan.controlled,hpRatio:boss.hp/boss.maxHP,turn,objects,supports:supports.map(m=>({slot:m.vGameplayBattlefieldSlot,skills:m.skillIds})),state:GameplaySystem.getActiveBattleState()};
+        }
+        let rounds=1,completedRounds=0,actions=0,stopped=false,observerError=null,shields=0,objects=0,reinforcements=0;const off=FourSymbolsBattleFlow.subscribeBeforeCombatant(()=>{try{
+          actions++;
           rounds=Math.max(rounds,turn);verify(boss);check(FourSymbolsBattlefieldSlots.getActiveEnemySnapshot()===snapshot,'stable snapshot');
           const shield=FourSymbolsBossBattle.getShieldState();if(shield){shields++;check(shield.max===Math.round(boss.maxHP*.24),'shield ratio once');}
           for(const i of currentBattleMonsters){const m=monsters[i];if(m.unitKind==='boss-object'){objects++;check(m.canAct===false&&m.noRewards&&!m.balanceOwner,'object Owner');check(['ENEMY_F1','ENEMY_F5'].includes(m.vGameplayBattlefieldSlot)||!m.alive,'object slots');}if(m.vGameplayBossSupport){reinforcements++;verify(m);check(m.rank==='elite'&&['ENEMY_B1','ENEMY_B5'].includes(m.vGameplayBattlefieldSlot),'elite slots');}}
-        });
-        try{toggleAutoBattle();check(autoBattle,'formal auto toggle');await wait(()=>!battleActive,480000);}finally{off();}
+        }catch(error){observerError=error;}});
+        const offRound=FourSymbolsBattleFlow.subscribeRoundEnd(()=>{completedRounds++;if(plan.maxRounds&&completedRounds>=plan.maxRounds&&battleActive){try{stopped=true;check(v132AbortDungeonBattle('qa-stop'),'round limit abort');}catch(error){observerError=error;}}});
+        try{toggleAutoBattle();check(autoBattle,'formal auto toggle');await wait(()=>!battleActive||observerError,480000);if(observerError)throw observerError;}finally{off();offRound();if(battleActive)v132AbortDungeonBattle('qa-stop');}
+        check(actions>0,'formal action queue executed');
+        if(plan.maxRounds)check(completedRounds<=plan.maxRounds,'real round upper bound');
         autoBattle=false;check(JSON.stringify(stats(boss))===JSON.stringify(initial),'no late base stat mutation');
+        if(stopped||plan.controlled){
+          check(stopped,'controlled probe must stop without natural settlement');
+          check(JSON.stringify(GameplaySystem.getSerializableState())===JSON.stringify(beforeState),'no aborted progression');
+          check(gold-beforeGold===killGold,'no configured reward on abort');
+          evidence.scenes.push({...plan,kind:plan.controlled?'controlled-mechanism':'bounded-natural',rounds:completedRounds,actions,shields,objects,reinforcements,controlledEvidence,settlementVerified:false,cleanup:await cleanup()});continue;
+        }
         const survivors=getExistingPartyIndexes().filter(i=>getPartyCharacterByIndex(i).hp>0).length;check(survivors>0,'natural survivors');
         const after=GameplaySystem.getSerializableState(),progress=after[plan.type][plan.id];
         check(progress.firstClear===true||(plan.type==='world'&&plan.stage<4),'clear progression');
@@ -68,15 +118,15 @@ async function runBossBalanceProductionQa(){
         const beforeProgress=beforeState[plan.type][plan.id];check(progress.clears===beforeProgress.clears+(final?1:0),'clear count');
         if(definition.relic){const owned=v174RelicSystem.getOwnedState()[definition.relic];if(final)check(owned.unlocked,'first/repeat relic reward');else check(JSON.stringify(owned)===beforeRelic,'no premature relic reward');}check(!FourSymbolsBossBattle.isActive(),'release Boss context');
         if(document.getElementById('battleStatisticsResultModal')?.hidden===false)FourSymbolsBattleStatistics.hideResultDetails(true);
-        evidence.scenes.push({...plan,rounds,survivors,shields,objects,reinforcements,initial,finalHP:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),gold:gold-beforeGold,configuredGold:expectedGold,killGold,ore:oreCount(definition.ore)-beforeOre,expectedOre,progress});
+        evidence.scenes.push({...plan,kind:'natural-victory',rounds,completedRounds,actions,survivors,shields,objects,reinforcements,initial,finalHP:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),gold:gold-beforeGold,configuredGold:expectedGold,killGold,ore:oreCount(definition.ore)-beforeOre,expectedOre,progress,settlementVerified:true,...(fast?{cleanup:await cleanup()}: {})});
        }
        return evidence;
       }finally{Math.random=oldRandom;showMonsterSkillNameBadge=badge;rollStatusEffectHit=status;awardMonsterGoldDrop=awardGold;}
     })()`;
     const server=await startServer({baseUrl}),results=[];
-    const file=path.resolve('artifacts/browser-qa/boss-balance-production.json');fs.mkdirSync(path.dirname(file),{recursive:true});
+    const file=path.resolve('artifacts/browser-qa/boss-balance-production'+(mode==='fast'?'-fast':'')+'.json');fs.mkdirSync(path.dirname(file),{recursive:true});
     let proc,client,profile;
-    const close=()=>{client?.close();proc?.kill('SIGTERM');client=null;proc=null;if(profile)fs.rmSync(profile,{recursive:true,force:true,maxRetries:6,retryDelay:100});};
+    const close=async()=>{client?.close();if(proc&&proc.exitCode===null){const exited=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await exited;}client=null;proc=null;if(profile){fs.rmSync(profile,{recursive:true,force:true,maxRetries:20,retryDelay:100});profile=null;}};
     try{
       for(const [width,height] of [[390,844],[412,915]]){
         profile=fs.mkdtempSync(path.join(os.tmpdir(),'boss-balance-'));const port=23000+process.pid%10000;
@@ -85,11 +135,15 @@ async function runBossBalanceProductionQa(){
         await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});await new Promise(r=>setTimeout(r,1000));
         const active=client.eval(reference+'\n'+expression);let done=false;active.finally(()=>{done=true;}).catch(()=>{});const captured=new Set();
         while(!done){await new Promise(r=>setTimeout(r,300));const marker=await client.eval('window.bossBalanceQaCapture||null').catch(()=>null);if(marker&&!captured.has(marker)){captured.add(marker);const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(file.replace('.json','-'+width+'x'+height+'-'+marker+'.png'),Buffer.from(shot.data,'base64'));}}
-        const result=await active;assert.equal(result.scenes.length,9);assert.ok(result.scenes.some(s=>s.shields));assert.ok(result.scenes.some(s=>s.objects));assert.ok(result.scenes.some(s=>s.reinforcements));results.push({width,height,...result});close();
+        const result=await active;assert.equal(result.scenes.length,mode==='full'?9:width===390?5:3);
+        if(mode==='full'||width===390){assert.ok(result.scenes.some(s=>s.shields));assert.ok(result.scenes.some(s=>s.objects));assert.ok(result.scenes.some(s=>s.reinforcements));assert.ok(result.scenes.some(s=>s.id==='personal-20'&&s.settlementVerified));}
+        results.push({width,height,...result});await close();
       }
-      fs.writeFileSync(file,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',results},null,2)+'\n');console.log('Boss production Chrome: 18 natural scenes, both viewports, Owner/mechanism/snapshot/reward PASS');
-    }catch(error){console.error('Boss production QA failure:',error);const partial=await client?.eval('({evidence:window.bossBalanceQaEvidence,phase:battlePhase,turn,battleActive,modals:[...document.querySelectorAll(".show")].map(x=>x.id)})').catch(()=>null);fs.writeFileSync(file,JSON.stringify({passed:false,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled'||e.method==='Runtime.exceptionThrown').slice(-15)},null,2)+'\n');throw error;}
-    finally{close();await new Promise(r=>server.server.close(r));}
+      const scenes=results.flatMap(r=>r.scenes),summary={mode,elapsedMs:Date.now()-startedAt,scenes:scenes.length,naturalBattles:scenes.filter(s=>['natural-victory','bounded-natural'].includes(s.kind)).length,controlledBattles:scenes.filter(s=>s.controlled).length,viewportInteractions:scenes.filter(s=>s.uiOnly).length,totalRounds:scenes.reduce((n,s)=>n+s.rounds,0),settlementsVerified:scenes.filter(s=>s.settlementVerified).length,skipped:mode==='fast'?'Remaining Full scenarios and duplicate natural playback at 412x915; presentation-only risk. Full remains required for core/unknown/release changes.':'none'};
+      fs.writeFileSync(file,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',summary,results},null,2)+'\n');console.log('Boss production Chrome PASS '+JSON.stringify(summary));
+      if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'\nBoss QA: '+JSON.stringify(summary)+'\n');
+    }catch(error){console.error('Boss production QA failure:',error);const partial=await client?.eval('({url:location.href,startup:window.FourSymbolsStartupPolicy?.getState?.(),body:document.body?.innerText?.slice(0,1500),evidence:window.bossBalanceQaEvidence,phase:typeof battlePhase==="undefined"?null:battlePhase,turn:typeof turn==="undefined"?null:turn,battleActive:typeof battleActive==="undefined"?null:battleActive,modals:[...document.querySelectorAll(".show")].map(x=>x.id)})').catch(()=>null);fs.writeFileSync(file,JSON.stringify({passed:false,mode,elapsedMs:Date.now()-startedAt,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled'||e.method==='Runtime.exceptionThrown').slice(-15)},null,2)+'\n');throw error;}
+    finally{await close();await new Promise(r=>server.server.close(r));}
 }
 
 // Phase2F extends the existing Boss QA entry; default historical coverage remains intact.

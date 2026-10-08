@@ -3,8 +3,8 @@
 Work ID: `CI-TEST-GOVERNANCE-LAYERING-20261006`
 Target: dev; main writes forbidden.
 Branch: `feature/ci-test-governance-layering-20261006`.
-Status: Original layering integrated. Current routing/stale-run repair is owned by
-Work ID CI-BOSS-ROUTING-20261006, branch chore/ci-boss-routing-20261006.
+Status: Original layering integrated. Current Boss tier optimization is owned by
+Work ID CI-BOSS-TIERED-GATES-20261008, branch feature/ci-boss-tiered-gates-20261008.
 Latest Head, Required CI, integration and cleanup evidence belong to its PR.
 
 ## Current routing owner (supersedes historical phase restrictions below)
@@ -14,18 +14,44 @@ merge base and exact PR head; only its checkout receives full ancestry. dev push
 compares exact before/after trees. Missing SHA, unrelated histories, invalid/new
 unowned runtime and unexplained generated outputs retain strict fallback.
 
-Known existing presentation declarations in js/00-main.js are compared by Acorn
+Known existing presentation declarations in js/00-main.js and explicitly mapped
+reforge/shop declarations in the shared content/equipment modules are compared by Acorn
 AST boundaries. Unchanged surrounding source, declaration identity and call/write
 effects are required; new declarations, new effects and unknown shared changes
 are strict. Shop/character presentation routes to UI; battle presentation routes
-to battle. Boss/Tower source routes to Boss/Tower/battle. MonsterBalance routes to
+to battle and Boss Fast. Boss/Tower source routes to Boss/Tower/battle Full. MonsterBalance routes to
 all affected balance modes, Daily and battle, with full Node regressions.
 
 Generated bundles/manifests and restricted-policy digest may follow their source
 only after production build --check, registered-output validation and a real
 source change. Generated-only changes stay strict. CI routing/aggregate/workflow
 owners run core and full Node contract suites; other CI/build/release owners stay
-strict. No gameplay source, QA scene, viewport, assertion or timeout is removed.
+strict. Full Boss retains all nine scenarios at both phone sizes. No gameplay
+source, Full scenario, required assertion or failure propagation is removed.
+
+Boss mode is emitted by the same classifier for PR and dev push and passed
+unchanged to deployed QA: `none` for reliably isolated inventory/shop/docs;
+`fast` for known battle presentation/animation; `full` for Boss rules, balance,
+unknown/shared effects, core/lifecycle/settlement, release and manual/nightly.
+Unmapped mechanisms cannot use Fast merely because a filename sounds visual.
+CI policy edits exercise Fast and retained Full themselves. Generated outputs
+still require exact build verification; shared call arguments and complete
+writes must remain identical, not just the callee/write destination.
+
+Fast uses real Runtime natural personal-20 victory/first rewards/progression,
+personal-70 and world-40 stage 4 up to ten completed rounds (early natural
+victory retains settlement checks). Separate controlled personal-70 HP .34
+and world-stage round-7 probes run real actions after formal mechanism owners
+trigger summons/charge/phases/shield. They never claim natural victory.
+390x844 runs combat; 412x915 verifies all three formal entries, visible HUD,
+target rules and status-detail interaction without replaying complete battles.
+Bounded probes release observers and use the existing dungeon abort, dispose
+VFX, then assert inactive Boss/dungeon/battle/auto state, cleared timers/locks
+and no late turn or reward. Both neutral and seeded all-Boss TTK remain.
+Artifacts distinguish Fast/Full, natural/controlled/UI scenes, total rounds,
+verified settlements, elapsed time and skipped coverage/reason. Actual CI
+timings and latest Head acceptance belong to the Work PR; no fixed savings
+percentage is promised. Historical timing records below remain unchanged.
 
 Ordinary dev integration now uses affected gates. main/release, manual full CI,
 Nightly and unknown changes retain full validation. Targeted dev runs never

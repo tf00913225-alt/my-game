@@ -7,6 +7,33 @@ import {execFileSync} from 'node:child_process';
 import {parse} from 'acorn';
 import {classifyChanges, classifySharedSource, changedPaths} from '../.github/scripts/ci-change-classifier.mjs';
 const plan=(paths,options={})=>classifyChanges(paths,{enabled:true,...options});
+test('three Boss levels, PR/dev consistency and release strictness',()=>{
+  for(const eventName of ['pull_request','push']){
+    assert.equal(plan(['css/23-stage-v77-inventory-detail-ui.css'],{eventName}).bossMode,'none');
+    assert.equal(plan(['assets/vfx/impact.webp'],{eventName}).bossMode,'fast');
+    for(const path of ['js/gameplay-boss-tower-system.js','js/combat/monster-balance-owner.mjs','js/unknown.js'])assert.equal(plan([path],{eventName}).bossMode,'full');
+  }
+  for(const options of [{baseRef:'main'},{eventName:'workflow_dispatch'},{eventName:'schedule',fullRegression:true}])assert.equal(plan(['docs/readme.md'],options).bossMode,'full');
+  assert.equal(plan(['.github/workflows/ci.yml']).bossMode,'full');
+});
+test('shared reforge presentation is targeted; formulas, writes and callers fail closed',()=>{
+  const sourcePath='js/36-v141-content-systems.js';
+  const before='(()=>{function renderReforgeTab(){return "選擇裝備";}function reward(){return 1;}})();';
+  const after=before.replace('選擇裝備','重新選擇装備');
+  const responsibilitiesByPath={[sourcePath]:classifySharedSource(before,after,sourcePath)};
+  assert.deepEqual(responsibilitiesByPath[sourcePath],['ui','inventory']);
+  assert.equal(plan([sourcePath],{responsibilitiesByPath}).bossMode,'none');
+  for(const after of [before.replace('return 1','return 2'),before.replace('return "選擇裝備"','monsters[0].hp=1;return "選擇裝備"'),before+'window.patch=1;'])assert.equal(classifySharedSource(before,after,sourcePath),null);
+  assert.equal(classifySharedSource('function renderBattle(){settleDamage(10);}','function renderBattle(){settleDamage(1);}'),null);
+  assert.equal(classifySharedSource('function renderBattle(){monsters[0].hp=10;}','function renderBattle(){monsters[0].hp=1;}'),null);
+});
+test('Fast mode is passed unchanged from classifier to PR and deployed QA',()=>{
+  const ci=fs.readFileSync(new URL('../.github/workflows/ci.yml',import.meta.url),'utf8');
+  const deploy=fs.readFileSync(new URL('../.github/workflows/deploy-dev-cloudflare.yml',import.meta.url),'utf8');
+  assert.match(ci,/BOSS_GATE_MODE: \$\{\{ needs.classify.outputs.boss_mode \}\}/);
+  assert.match(ci,/boss_mode: \$\{\{ needs.classify.outputs.boss_mode \}\}/);
+  assert.match(deploy,/BOSS_GATE_MODE: \$\{\{ github.event_name == 'workflow_dispatch' && 'full' \|\| inputs.boss_mode \}\}/);
+});
 test('nine routing acceptance cases',()=>{
   for(const name of ['renderShopContent','openInventoryCharacterDetail']) {
     const responsibilities=classifySharedSource(`function ${name}(){return 1;}`,`function ${name}(){return 2;}`);
@@ -14,7 +41,7 @@ test('nine routing acceptance cases',()=>{
   }
   const responsibilities=classifySharedSource('function renderBattle(){return 1;}','function renderBattle(){return 2;}');
   const p=plan(['js/00-main.js','build/example.js'],{responsibilities,generatedVerified:true});
-  assert.equal(p.gates.battle_browser,true);assert.equal(p.gates.boss_balance,false);
+  assert.equal(p.gates.battle_browser,true);assert.equal(p.gates.boss_balance,true);assert.equal(p.bossMode,'fast');
   assert.equal(plan(['js/gameplay-boss-tower-system.js']).gates.boss_balance,true);
   const balance=plan(['js/combat/monster-balance-owner.mjs']);
   for(const k of ['boss_balance','tower_wild_browser','abyss_balance','adventure_balance']) assert.equal(balance.gates[k],true,k);
@@ -48,7 +75,7 @@ test('real main source character rows and enemy numeric presentation stay target
   const enemy=source.slice(0,offset)+'\nconst numericPresentationFixture=Math.floor(1.5);\n'+source.slice(offset);
   assert.notEqual(enemy,source);
   assert.deepEqual(classifySharedSource(source,enemy),['battle']);
-  assert.equal(plan(['js/00-main.js','build/asset-manifest.json'],{responsibilities:classifySharedSource(source,enemy),generatedVerified:true}).gates.boss_balance,false);
+  assert.equal(plan(['js/00-main.js','build/asset-manifest.json'],{responsibilities:classifySharedSource(source,enemy),generatedVerified:true}).bossMode,'fast');
   assert.equal(classifySharedSource(source,enemy+'\nwindow.externalOwner=1;'),null);
 });
 test('real shallow PR reproduces no merge base; classifier checkout ancestry recovers exact paths',()=>{
