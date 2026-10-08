@@ -83,7 +83,7 @@
 }
 
 @media (min-width:800px){
-    #game-ui #homePage.active{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);grid-template-rows:auto minmax(0,1fr);gap:16px;align-content:start;}
+    #game-ui #homePage.active{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);grid-template-rows:auto auto auto;gap:16px;align-content:start;}
     #game-ui #homePage .home-city-hud{grid-column:1/-1;}
     #game-ui #homePage .home-card-grid{grid-column:1;align-self:start;}
     #game-ui #homePage .v146-home-roster{grid-column:2;align-self:start;margin:12px 0;}

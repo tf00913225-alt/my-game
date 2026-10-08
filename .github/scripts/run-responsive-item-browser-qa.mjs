@@ -269,6 +269,10 @@ async function run(chrome,url,live){
    assert.ok(domain.resources.every(size=>size>=13),'browser home text below reading minimum');
    assert.ok(home.rect.bottom<=nav.rect.top+1,'navigation overlaps browser page');
    if(v[0]>=800)assert.ok(home.rect.width>700,'desktop remained a narrow stage projection');
+   await c.eval("adventureHomeEntry.scrollIntoView({block:'nearest'})");await settle();
+   await check('#adventureHomeEntry',v,true);
+   const entrance=await c.eval(`(()=>{const entry=adventureHomeEntry,r=entry.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);const axis=adventureHomeAxis.getBoundingClientRect(),cards=document.querySelector('.home-card-grid').getBoundingClientRect(),roster=document.getElementById('v146HomeRoster').getBoundingClientRect();return {hit:entry===hit||entry.contains(hit),afterContent:axis.top>=Math.max(cards.bottom,roster.bottom)-1};})()`);
+   assert.ok(entrance.hit&&entrance.afterContent,'adventure entrance overlaps or covers home controls');
    await c.eval("showPage('inventory')");await settle();
    const bag=await check('#inventoryPage',v),frame=await measure('.inventory-classic-shell');
    if(v[0]>=800)assert.ok(frame.columns.split(' ').length===2,'desktop bag did not use two columns');
@@ -278,8 +282,19 @@ async function run(chrome,url,live){
    await c.eval("openHomeFeature('character')");await settle();
    const character=await check('#homeFeatureModal .home-feature-modal-box',v);
    assert.ok(character.rect.width<=961,'character ignored shared Large Panel limit');
+   await c.eval("closeHomeFeature();openHomeFeature('shop')");await settle();
+   const shopGrid=await check('.shop-potion-list',v);
+   if(v[0]>=1100)assert.ok(shopGrid.columns.split(' ').length>=3,'desktop shop grid remained mobile columns');
+   await c.eval("closeHomeFeature();openHomeFeature('relic')");
+   await c.eval("(async()=>{const end=Date.now()+20000;while(!document.querySelector('.team-relic-grid')&&Date.now()<end)await new Promise(r=>setTimeout(r,30));if(!document.querySelector('.team-relic-grid'))throw Error('relic list missing');})()");await settle();
+   const relicGrid=await measure('.team-relic-grid');
+   assert.ok(relicGrid.overflow<=1,'relic list gained horizontal overflow');
+   await check('#homeFeatureModalBody',v);
+   await c.eval("document.querySelector('.team-relic-grid > :last-child').scrollIntoView({block:'end'})");await settle();
+   await check('.team-relic-grid > :last-child',v);
+   if(v[0]>=1100)assert.ok(relicGrid.columns.split(' ').length>=3,'desktop relic grid remained mobile columns');
    await c.eval("closeHomeFeature();showPage('home')");
-   evidence.push({generalUi:true,viewport:v,home,nav,bag,character,domain});
+   evidence.push({generalUi:true,viewport:v,home,nav,bag,character,domain,entrance,shopGrid,relicGrid});
   }
   console.log('PASS general browser UI: eight widths, desktop reflow, reading size, shared panel and native return');
   const visibility=await c.eval(`(async()=>{const source=document.getElementById('gameInterface'),ui=document.getElementById('game-ui'),previous=source.style.display;source.style.display='none';await new Promise(requestAnimationFrame);const hidden=ui.hidden;source.style.display=previous;await new Promise(requestAnimationFrame);return {hidden,restored:!ui.hidden,roots:document.querySelectorAll('#game-ui').length};})()`);

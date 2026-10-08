@@ -23,7 +23,7 @@
           "build/app-shell.062e555282f9.js"
         ],
         "styles": [
-          "build/app-shell.9f4900101d3f.css"
+          "build/app-shell.036233ef330a.css"
         ],
         "dependencies": [
           "feature-adventure-entry"
@@ -34,7 +34,7 @@
           "build/feature-adventure-entry.43c6c9446f8e.js"
         ],
         "styles": [
-          "build/feature-adventure-entry.3b79bc2d8b41.css"
+          "build/feature-adventure-entry.31b04db78b0d.css"
         ],
         "dependencies": []
       },
@@ -562,19 +562,19 @@
         "decode": true
       },
       {
+        "path": "build/app-shell.036233ef330a.css",
+        "sha256": "036233ef330a",
+        "bytes": 102127,
+        "priority": "P1",
+        "type": "style",
+        "decode": false
+      },
+      {
         "path": "build/app-shell.062e555282f9.js",
         "sha256": "062e555282f9",
         "bytes": 1105892,
         "priority": "P1",
         "type": "script",
-        "decode": false
-      },
-      {
-        "path": "build/app-shell.9f4900101d3f.css",
-        "sha256": "9f4900101d3f",
-        "bytes": 102131,
-        "priority": "P1",
-        "type": "style",
         "decode": false
       },
       {
@@ -818,8 +818,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "c1edbcc1bf91",
-    "totalBytes": 21768245,
+    "manifestHash": "bd6abc657974",
+    "totalBytes": 21768241,
     "totalResources": 78
   },
   "assets": {
@@ -879,9 +879,9 @@
       "sha256": "d4fa510c2943",
       "bytes": 210060
     },
-    "build/app-shell.9f4900101d3f.css": {
-      "sha256": "9f4900101d3f",
-      "bytes": 102131
+    "build/app-shell.036233ef330a.css": {
+      "sha256": "036233ef330a",
+      "bytes": 102127
     },
     "build/gameplay-core.5b844b4041f6.css": {
       "sha256": "5b844b4041f6",
@@ -903,9 +903,9 @@
       "sha256": "10f48bf40a17",
       "bytes": 5665
     },
-    "build/feature-adventure-entry.3b79bc2d8b41.css": {
-      "sha256": "3b79bc2d8b41",
-      "bytes": 3236
+    "build/feature-adventure-entry.31b04db78b0d.css": {
+      "sha256": "31b04db78b0d",
+      "bytes": 3212
     },
     "build/feature-adventure.7a3a29e4a2d0.css": {
       "sha256": "7a3a29e4a2d0",
