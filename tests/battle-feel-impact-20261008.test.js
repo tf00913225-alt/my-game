@@ -33,3 +33,12 @@ vm.createContext(c);vm.runInContext(source.slice(scheduleStart,scheduleEnd),c);
 for(const projection of ["status","resources","labels","defeated"]){c.window.v143SchedulePlayerStatusUiUpdate(0,()=>calls.push(projection),projection);}
 assert.deepEqual(calls,[]);assert.equal(timers.length,4);timers.forEach(fn=>fn());assert.deepEqual(calls,["status","resources","labels","defeated"]);assert.equal(c.state.pendingUpdates.size,0);
 console.log("Battle feel: target-hit audio/artwork-only recoil, critical, non-damage exclusion and independent committed projections PASS");
+const cleanupStart=source.indexOf('    function cleanupCurrent(');
+const cleanupEnd=source.indexOf('    let sequence=',cleanupStart);
+let cancelled=0;
+const art={v143ImpactRecoil:{cancel(){cancelled++;}}};
+const active={done:false,spriteNodes:[],targetIndexes:[0],targetSide:'monster'};
+const cleanupContext={state:{current:active,stage:null,metrics:{completed:0}},cardFor:()=>({classList:{remove(){}},querySelector:()=>art}),syncStatusVisualEffects(){}};
+vm.createContext(cleanupContext);vm.runInContext(source.slice(cleanupStart,cleanupEnd),cleanupContext);
+cleanupContext.cleanupCurrent(active,'dispose');
+assert.equal(cancelled,1);assert.equal(art.v143ImpactRecoil,null);assert.equal(cleanupContext.state.current,null);

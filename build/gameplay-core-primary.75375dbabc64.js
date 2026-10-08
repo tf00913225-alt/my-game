@@ -12918,6 +12918,11 @@
         current.targetIndexes.forEach(index=>{
             const card=cardFor(current.targetSide,index);
             if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }
+            const artwork=card&&card.querySelector(".v174-battle-art");
+            if(artwork&&artwork.v143ImpactRecoil){
+                artwork.v143ImpactRecoil.cancel();
+                artwork.v143ImpactRecoil=null;
+            }
         });
         if(state.stage&&state.stage.dataset.sequence===String(current.sequence)&&typeof state.stage.remove==="function"){
             state.stage.remove();
