@@ -6,9 +6,9 @@
    Shared sizing authority for migrated panel tiers. Content quantity must
    never change the owning frame dimensions.
 */
-#game-stage{
-    --ui-large-panel-max-width:396px;
-    --ui-large-panel-height:620px;
+:root{
+    --ui-large-panel-max-width:960px;
+    --ui-large-panel-height:760px;
     --ui-large-panel-safe-space:24px;
     --ui-large-panel-tab-height:42px;
     --ui-large-panel-content-gap:10px;
@@ -209,7 +209,7 @@
 }
 
 /* Premium functional UI: announcement is a reading surface, not a dashboard card. */
-#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > div[style*="line-height:1.8"]):not(:has(#homeFeatureModalBody > button)) #homeFeatureModalBody > div[style*="line-height:1.8"]{
+#game-ui #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > div[style*="line-height:1.8"]):not(:has(#homeFeatureModalBody > button)) #homeFeatureModalBody > div[style*="line-height:1.8"]{
     max-width:34em;
     margin:0 auto;
     padding:4px 3px 16px;
@@ -231,7 +231,7 @@
 }
 
 /* ----- Item Presentation: canonical frame for every item-detail mode. ----- */
-#game-stage #itemModal .item-modal-box{
+#game-ui #itemModal .item-modal-box{
     width:calc(100% - var(--ui-medium-modal-safe-space)) !important;
     max-width:var(--ui-medium-modal-max-width) !important;
     height:auto !important;
@@ -245,12 +245,12 @@
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
-#game-stage #itemModal #itemModalIcon,
-#game-stage #itemModal #itemModalName,
-#game-stage #itemModal .item-modal-buttons{
+#game-ui #itemModal #itemModalIcon,
+#game-ui #itemModal #itemModalName,
+#game-ui #itemModal .item-modal-buttons{
     flex:0 0 auto !important;
 }
-#game-stage #itemModal #itemModalStats{
+#game-ui #itemModal #itemModalStats{
     flex:1 1 auto !important;
     min-height:0 !important;
     max-height:none !important;
@@ -261,27 +261,27 @@
     touch-action:pan-y !important;
     scrollbar-gutter:stable !important;
 }
-#game-stage #itemModal .item-modal-buttons{
+#game-ui #itemModal .item-modal-buttons{
     margin-top:0 !important;
     grid-template-columns:repeat(3,minmax(0,1fr));
 }
 /* Text is authored in the documented legacy-content unit. 18px remains
    readable after projection in normal/short phone space; text never shrinks
    to force content into the frame. */
-#game-stage #itemModal #itemModalName{
+#game-ui #itemModal #itemModalName{
     margin:5px 0 9px;
     font-size:20px;
     line-height:1.35;
     overflow-wrap:anywhere;
 }
-#game-stage #itemModal #itemModalStats,
-#game-stage #itemModal #itemModalStats *{
+#game-ui #itemModal #itemModalStats,
+#game-ui #itemModal #itemModalStats *{
     font-size:18px;
     line-height:1.55;
     overflow-wrap:anywhere;
 }
-#game-stage #itemModal .item-modal-buttons button,
-#game-stage #itemModal .close-item-button{
+#game-ui #itemModal .item-modal-buttons button,
+#game-ui #itemModal .close-item-button{
     box-sizing:border-box;
     min-width:0;
     min-height:44px;
@@ -292,11 +292,11 @@
     white-space:normal;
     overflow-wrap:anywhere;
 }
-#game-stage #itemModal .close-item-button{
+#game-ui #itemModal .close-item-button{
     flex:0 0 auto;
 }
 
-#game-stage #itemModal #itemModalIcon{
+#game-ui #itemModal #itemModalIcon{
     display:grid !important;
     place-items:center !important;
     width:clamp(var(--ui-item-art-min),40%,var(--ui-item-art-max)) !important;
@@ -308,12 +308,12 @@
     align-self:center !important;
     overflow:hidden !important;
 }
-#game-stage #itemModal #itemModalIcon > .v169-item-art,
-#game-stage #itemModal #itemModalIcon > .v169-equipment-art,
-#game-stage #itemModal #itemModalIcon > .v169-material-art,
-#game-stage #itemModal #itemModalIcon > .v169-talisman-art,
-#game-stage #itemModal #itemModalIcon > .v169-ticket-art,
-#game-stage #itemModal #itemModalIcon > .v169-blueprint-art{
+#game-ui #itemModal #itemModalIcon > .v169-item-art,
+#game-ui #itemModal #itemModalIcon > .v169-equipment-art,
+#game-ui #itemModal #itemModalIcon > .v169-material-art,
+#game-ui #itemModal #itemModalIcon > .v169-talisman-art,
+#game-ui #itemModal #itemModalIcon > .v169-ticket-art,
+#game-ui #itemModal #itemModalIcon > .v169-blueprint-art{
     display:grid !important;
     place-items:center !important;
     width:100% !important;
@@ -324,8 +324,8 @@
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
-#game-stage #itemModal #itemModalIcon img,
-#game-stage #itemModal #itemModalIcon svg{
+#game-ui #itemModal #itemModalIcon img,
+#game-ui #itemModal #itemModalIcon svg{
     display:block !important;
     width:100% !important;
     height:100% !important;
@@ -335,38 +335,38 @@
     object-position:center !important;
 }
 
-#game-stage #itemModal.item-modal-mode-compact .item-modal-box{
+#game-ui #itemModal.item-modal-mode-compact .item-modal-box{
     max-height:calc(100% - var(--ui-medium-modal-safe-space)) !important;
     justify-content:flex-start !important;
 }
-#game-stage #itemModal.item-modal-mode-compact #itemModalIcon{
+#game-ui #itemModal.item-modal-mode-compact #itemModalIcon{
     --ui-item-art-max:132px;
 }
-#game-stage #itemModal.item-modal-mode-compact #itemModalStats{
+#game-ui #itemModal.item-modal-mode-compact #itemModalStats{
     flex:0 1 auto !important;
     max-height:180px !important;
 }
 
-#game-stage #itemModal.item-modal-mode-comparison .item-modal-box{
-    max-width:396px !important;
+#game-ui #itemModal.item-modal-mode-comparison .item-modal-box{
+    max-width:min(760px,calc(100% - 20px)) !important;
     max-height:calc(100% - 20px) !important;
     padding:11px !important;
     gap:7px !important;
 }
-#game-stage #itemModal.item-modal-mode-comparison .item-modal-box > #itemModalIcon,
-#game-stage #itemModal.item-modal-mode-comparison .item-modal-box > #itemModalName,
-#game-stage #itemModal.item-modal-mode-comparison .item-modal-box > #itemModalStats,
-#game-stage #itemModal.item-modal-mode-comparison .item-modal-box > .close-item-button{
+#game-ui #itemModal.item-modal-mode-comparison .item-modal-box > #itemModalIcon,
+#game-ui #itemModal.item-modal-mode-comparison .item-modal-box > #itemModalName,
+#game-ui #itemModal.item-modal-mode-comparison .item-modal-box > #itemModalStats,
+#game-ui #itemModal.item-modal-mode-comparison .item-modal-box > .close-item-button{
     display:none !important;
 }
-#game-stage #itemModal.item-modal-mode-comparison .item-modal-buttons{
+#game-ui #itemModal.item-modal-mode-comparison .item-modal-buttons{
     display:grid !important;
     grid-template-columns:repeat(3,minmax(0,1fr)) !important;
     width:100% !important;
     min-height:48px !important;
     gap:6px !important;
 }
-#game-stage #itemModal.item-modal-mode-comparison .item-modal-buttons button{
+#game-ui #itemModal.item-modal-mode-comparison .item-modal-buttons button{
     min-width:0 !important;
     min-height:48px !important;
     height:auto !important;
@@ -488,7 +488,7 @@
     will-change:auto !important;
 }
 /* ----- Character: same Large Panel frame as shop; only tab content changes. ----- */
-#game-stage #homeFeatureModal .home-feature-modal-box.wide{
+#game-ui #homeFeatureModal .home-feature-modal-box.wide{
     width:calc(100% - var(--ui-large-panel-safe-space)) !important;
     max-width:var(--ui-large-panel-max-width) !important;
     height:min(var(--ui-large-panel-height),calc(100% - var(--ui-large-panel-safe-space))) !important;
@@ -499,7 +499,7 @@
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
-#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
+#game-ui #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
     display:flex !important;
     flex:1 1 auto !important;
     flex-direction:column !important;
@@ -507,18 +507,18 @@
     min-height:0 !important;
     overflow:hidden !important;
 }
-#game-stage #homeFeatureModal #characterTabContent{
+#game-ui #homeFeatureModal #characterTabContent{
     flex:1 1 auto !important;
     height:auto !important;
     min-height:0 !important;
     max-height:none !important;
     scrollbar-gutter:stable !important;
 }
-#game-stage #homeFeatureModal #characterTabContent > #skillPage{
+#game-ui #homeFeatureModal #characterTabContent > #skillPage{
     padding:0 0 12px !important;
 }
 
-#game-stage #homeFeatureModal #allSkillsList{
+#game-ui #homeFeatureModal #allSkillsList{
     padding-bottom:12px !important;
 }
 
@@ -527,10 +527,10 @@
    runtime wrapper classes. Exclude the character .wide shell so its internal
    tab scroll owner remains authoritative when the EXP pool is borrowed into it.
 */
-#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeExpPoolCard) .home-feature-modal-box,
-#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > .home-feature-row) .home-feature-modal-box,
-#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > button[onclick^="claimOfflineExp"]) .home-feature-modal-box,
-#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > div[style*="line-height:1.8"]):not(:has(#homeFeatureModalBody > button)) .home-feature-modal-box{
+#game-ui #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeExpPoolCard) .home-feature-modal-box,
+#game-ui #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > .home-feature-row) .home-feature-modal-box,
+#game-ui #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > button[onclick^="claimOfflineExp"]) .home-feature-modal-box,
+#game-ui #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > div[style*="line-height:1.8"]):not(:has(#homeFeatureModalBody > button)) .home-feature-modal-box{
     width:calc(100% - var(--ui-large-panel-safe-space)) !important;
     max-width:var(--ui-large-panel-max-width) !important;
     height:min(var(--ui-large-panel-height),calc(100% - var(--ui-large-panel-safe-space))) !important;
@@ -541,16 +541,16 @@
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
-#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeExpPoolCard) .home-feature-modal-title,
-#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > .home-feature-row) .home-feature-modal-title,
-#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > button[onclick^="claimOfflineExp"]) .home-feature-modal-title,
-#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > div[style*="line-height:1.8"]):not(:has(#homeFeatureModalBody > button)) .home-feature-modal-title{
+#game-ui #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeExpPoolCard) .home-feature-modal-title,
+#game-ui #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > .home-feature-row) .home-feature-modal-title,
+#game-ui #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > button[onclick^="claimOfflineExp"]) .home-feature-modal-title,
+#game-ui #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > div[style*="line-height:1.8"]):not(:has(#homeFeatureModalBody > button)) .home-feature-modal-title{
     flex:0 0 auto !important;
 }
-#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeExpPoolCard) #homeFeatureModalBody,
-#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > .home-feature-row) #homeFeatureModalBody,
-#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > button[onclick^="claimOfflineExp"]) #homeFeatureModalBody,
-#game-stage #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > div[style*="line-height:1.8"]):not(:has(#homeFeatureModalBody > button)) #homeFeatureModalBody{
+#game-ui #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeExpPoolCard) #homeFeatureModalBody,
+#game-ui #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > .home-feature-row) #homeFeatureModalBody,
+#game-ui #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > button[onclick^="claimOfflineExp"]) #homeFeatureModalBody,
+#game-ui #homeFeatureModal:not(:has(.home-feature-modal-box.wide)):has(#homeFeatureModalBody > div[style*="line-height:1.8"]):not(:has(#homeFeatureModalBody > button)) #homeFeatureModalBody{
     flex:1 1 auto !important;
     min-height:0 !important;
     overflow-x:hidden !important;
@@ -562,11 +562,11 @@
 }
 
 /* ----- Synthesis: maximum mobile panel; wallet/tabs stay fixed, body scrolls. ----- */
-#game-stage #homeFeatureModal.v141-synthesis-modal{
+#game-ui #homeFeatureModal.v141-synthesis-modal{
     /* 216 native-stage units expressed on the existing 420/1080 content plane. */
     padding:4px 4px 84px !important;
 }
-#game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{
+#game-ui #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{
     width:calc(100% - 8px) !important;
     max-width:none !important;
     height:calc(100% - 8px) !important;
@@ -577,16 +577,16 @@
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
-#game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-title{
+#game-ui #homeFeatureModal.v141-synthesis-modal .home-feature-modal-title{
     flex:0 0 auto !important;
 }
-#game-stage #homeFeatureModal.v141-synthesis-modal #homeFeatureModalBody{
+#game-ui #homeFeatureModal.v141-synthesis-modal #homeFeatureModalBody{
     display:flex !important;
     flex:1 1 auto !important;
     min-height:0 !important;
     overflow:hidden !important;
 }
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis{
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis{
     display:flex !important;
     flex:1 1 auto !important;
     width:100% !important;
@@ -596,18 +596,18 @@
     gap:var(--ui-large-panel-content-gap) !important;
     overflow:hidden !important;
 }
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-wallet,
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-tabs{
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-wallet,
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-tabs{
     flex:0 0 auto !important;
 }
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-tabs{
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-tabs{
     grid-template-columns:repeat(3,minmax(0,1fr)) !important;
     gap:8px !important;
 }
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-tabs button{
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-tabs button{
     min-height:44px !important;
 }
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-body{
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-body{
     flex:1 1 auto !important;
     min-height:0 !important;
     overflow-x:hidden !important;
@@ -617,29 +617,29 @@
     touch-action:pan-y !important;
     scrollbar-gutter:stable !important;
 }
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-card,
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-empty{
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-card,
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-empty{
     height:auto !important;
     min-height:100% !important;
     box-sizing:border-box !important;
 }
 
 /* ----- Shop: one fixed Large Panel frame; tabs only replace body content. ----- */
-#game-stage #homeFeatureModal.v131-shop-open .home-feature-modal-box{
+#game-ui #homeFeatureModal.v131-shop-open .home-feature-modal-box{
     max-width:var(--ui-large-panel-max-width) !important;
     height:min(var(--ui-large-panel-height),calc(100% - var(--ui-large-panel-safe-space))) !important;
     display:flex;
     flex-direction:column;
 }
-#game-stage #homeFeatureModal.v131-shop-open .home-feature-modal-title{
+#game-ui #homeFeatureModal.v131-shop-open .home-feature-modal-title{
     flex:0 0 auto;
 }
-#game-stage #homeFeatureModal.v131-shop-open #homeFeatureModalBody{
+#game-ui #homeFeatureModal.v131-shop-open #homeFeatureModalBody{
     flex:1 1 auto;
     min-height:0;
     scrollbar-gutter:stable;
 }
-#game-stage #homeFeatureModal .v17345-shop-shell{
+#game-ui #homeFeatureModal .v17345-shop-shell{
     display:flex;
     height:100%;
     min-height:100%;
@@ -647,7 +647,7 @@
     flex-direction:column;
     gap:var(--ui-large-panel-content-gap);
 }
-#game-stage #homeFeatureModal .v17345-shop-tabs{
+#game-ui #homeFeatureModal .v17345-shop-tabs{
     display:grid;
     flex:0 0 auto;
     grid-template-columns:repeat(2,minmax(0,1fr));
@@ -658,7 +658,7 @@
     padding:2px 0 6px;
     background:linear-gradient(180deg,rgba(13,9,6,.98),rgba(13,9,6,.88));
 }
-#game-stage #homeFeatureModal .v17345-shop-tabs button{
+#game-ui #homeFeatureModal .v17345-shop-tabs button{
     min-height:var(--ui-large-panel-tab-height);
     border:1px solid #765b34;
     border-radius:8px;
@@ -667,23 +667,23 @@
     font-size:15px;
     font-weight:900;
 }
-#game-stage #homeFeatureModal .v17345-shop-tabs button.active{
+#game-ui #homeFeatureModal .v17345-shop-tabs button.active{
     border-color:#d0a353;
     color:#2a1807;
     background:linear-gradient(180deg,#f2d58d,#bf8336);
     box-shadow:0 0 0 1px rgba(255,223,146,.16),0 4px 12px rgba(0,0,0,.42);
 }
-#game-stage #homeFeatureModal .shop-potion-interface,
-#game-stage #homeFeatureModal .v17345-equipment-shop{
+#game-ui #homeFeatureModal .shop-potion-interface,
+#game-ui #homeFeatureModal .v17345-equipment-shop{
     flex:1 0 auto;
     min-height:0;
 }
-#game-stage #homeFeatureModal .v17345-equipment-shop{
+#game-ui #homeFeatureModal .v17345-equipment-shop{
     display:flex;
     flex-direction:column;
     gap:10px;
 }
-#game-stage #homeFeatureModal .v17345-equipment-wallet{
+#game-ui #homeFeatureModal .v17345-equipment-wallet{
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -695,15 +695,15 @@
     background:rgba(20,15,10,.72);
     font-size:13px;
 }
-#game-stage #homeFeatureModal .v17345-equipment-wallet b{
+#game-ui #homeFeatureModal .v17345-equipment-wallet b{
     color:#efc66d;
 }
-#game-stage #homeFeatureModal .v17345-equipment-grid{
+#game-ui #homeFeatureModal .v17345-equipment-grid{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:9px;
 }
-#game-stage #homeFeatureModal .v17345-equipment-card{
+#game-ui #homeFeatureModal .v17345-equipment-card{
     display:grid;
     grid-template-columns:58px minmax(0,1fr);
     grid-template-rows:auto auto auto;
@@ -716,7 +716,7 @@
     background:linear-gradient(145deg,rgba(39,28,17,.94),rgba(13,10,7,.98));
     box-shadow:inset 0 0 14px rgba(230,178,75,.035);
 }
-#game-stage #homeFeatureModal .v17345-equipment-icon{
+#game-ui #homeFeatureModal .v17345-equipment-icon{
     grid-row:1 / 4;
     display:flex;
     width:56px;
@@ -732,7 +732,7 @@
     font-weight:900;
     text-shadow:0 0 8px rgba(229,177,72,.24);
 }
-#game-stage #homeFeatureModal .v17345-equipment-card > b{
+#game-ui #homeFeatureModal .v17345-equipment-card > b{
     min-width:0;
     overflow:hidden;
     color:#ead8b4;
@@ -741,12 +741,12 @@
     text-overflow:ellipsis;
     white-space:nowrap;
 }
-#game-stage #homeFeatureModal .v17345-equipment-card > span{
+#game-ui #homeFeatureModal .v17345-equipment-card > span{
     color:#a99b83;
     font-size:11px;
     line-height:1.3;
 }
-#game-stage #homeFeatureModal .v17345-equipment-card > button{
+#game-ui #homeFeatureModal .v17345-equipment-card > button{
     min-height:30px;
     margin-top:5px;
     border:1px solid rgba(121,94,56,.5);
@@ -755,7 +755,7 @@
     background:#17120d;
     font-size:11px;
 }
-#game-stage #homeFeatureModal .v17345-equipment-refresh{
+#game-ui #homeFeatureModal .v17345-equipment-refresh{
     display:flex;
     flex:0 0 auto;
     align-items:center;
@@ -767,24 +767,24 @@
     border-radius:10px;
     background:rgba(18,13,9,.9);
 }
-#game-stage #homeFeatureModal .v17345-equipment-refresh > div{
+#game-ui #homeFeatureModal .v17345-equipment-refresh > div{
     display:flex;
     min-width:0;
     flex:1 1 auto;
     flex-direction:column;
     gap:3px;
 }
-#game-stage #homeFeatureModal .v17345-equipment-refresh b{
+#game-ui #homeFeatureModal .v17345-equipment-refresh b{
     color:#f0c96f;
     font-size:13px;
 }
-#game-stage #homeFeatureModal .v17345-equipment-refresh span,
-#game-stage #homeFeatureModal .v17345-equipment-pending{
+#game-ui #homeFeatureModal .v17345-equipment-refresh span,
+#game-ui #homeFeatureModal .v17345-equipment-pending{
     color:#a99a80;
     font-size:11px;
     line-height:1.4;
 }
-#game-stage #homeFeatureModal .v17345-equipment-refresh > button{
+#game-ui #homeFeatureModal .v17345-equipment-refresh > button{
     flex:0 0 auto;
     min-width:118px;
     min-height:40px;
@@ -796,32 +796,32 @@
     font-size:12px;
     font-weight:900;
 }
-#game-stage #homeFeatureModal .v17345-equipment-refresh > button:disabled{
+#game-ui #homeFeatureModal .v17345-equipment-refresh > button:disabled{
     border-color:#67563f;
     color:#81735e;
     background:#211a13;
 }
-#game-stage #homeFeatureModal .v17345-equipment-pending{
+#game-ui #homeFeatureModal .v17345-equipment-pending{
     margin:0;
     padding:0 4px 4px;
 }
 
 @media (max-width:430px){
-    #game-stage #homeFeatureModal .v17345-equipment-card{
+    #game-ui #homeFeatureModal .v17345-equipment-card{
         grid-template-columns:50px minmax(0,1fr);
         column-gap:7px;
         padding:7px;
     }
-    #game-stage #homeFeatureModal .v17345-equipment-icon{
+    #game-ui #homeFeatureModal .v17345-equipment-icon{
         width:48px;
         height:48px;
         font-size:22px;
     }
-    #game-stage #homeFeatureModal .v17345-equipment-refresh{
+    #game-ui #homeFeatureModal .v17345-equipment-refresh{
         align-items:stretch;
         flex-direction:column;
     }
-    #game-stage #homeFeatureModal .v17345-equipment-refresh > button{
+    #game-ui #homeFeatureModal .v17345-equipment-refresh > button{
         width:100%;
     }
 }
@@ -837,19 +837,19 @@
    - Potion and equipment tabs share the same one-screen geometry.
    - Equipment cards use explicit grid rows so rarity/reforge differences cannot
      move names, stats or purchase buttons into different cells. */
-#game-stage #homeFeatureModal.v131-shop-open #homeFeatureModalBody{
+#game-ui #homeFeatureModal.v131-shop-open #homeFeatureModalBody{
     overflow:hidden !important;
     overscroll-behavior:none !important;
     touch-action:none !important;
     scrollbar-gutter:auto !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17345-shop-shell{
+#game-ui #homeFeatureModal.v131-shop-open .v17345-shop-shell{
     height:100% !important;
     min-height:0 !important;
     gap:8px !important;
     overflow:hidden !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17345-shop-tabs{
+#game-ui #homeFeatureModal.v131-shop-open .v17345-shop-tabs{
     position:static !important;
     top:auto !important;
     flex:0 0 42px !important;
@@ -858,13 +858,13 @@
     padding:0 !important;
     background:transparent !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17345-shop-tabs button{
+#game-ui #homeFeatureModal.v131-shop-open .v17345-shop-tabs button{
     min-height:44px !important;
     height:44px !important;
     font-size:15px !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-interface,
-#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-shop{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-interface,
+#game-ui #homeFeatureModal.v131-shop-open .v17345-equipment-shop{
     flex:1 1 auto !important;
     height:auto !important;
     min-height:0 !important;
@@ -874,7 +874,7 @@
 
 /* Equipment page keeps a compact current-gold row so purchases never
    require leaving the tab to confirm the account balance. */
-#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-wallet{
+#game-ui #homeFeatureModal.v131-shop-open .v17345-equipment-wallet{
     display:flex !important;
     flex:0 0 32px !important;
     min-height:32px !important;
@@ -882,12 +882,12 @@
     box-sizing:border-box !important;
     font-size:13px !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-shop{
+#game-ui #homeFeatureModal.v131-shop-open .v17345-equipment-shop{
     display:grid !important;
     grid-template-rows:32px minmax(0,1fr) 58px !important;
     gap:7px !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-grid{
+#game-ui #homeFeatureModal.v131-shop-open .v17345-equipment-grid{
     display:grid !important;
     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
     grid-template-rows:repeat(3,minmax(0,1fr)) !important;
@@ -898,7 +898,7 @@
     min-height:0 !important;
     overflow:hidden !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card{
+#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card{
     display:grid !important;
     grid-template-columns:54px minmax(0,1fr) !important;
     grid-template-rows:18px 15px 18px 12px 30px !important;
@@ -918,7 +918,7 @@
     background:linear-gradient(155deg,rgba(28,21,13,.72),rgba(8,7,5,.90)) !important;
     box-shadow:inset 0 1px 0 rgba(255,238,196,.025),0 3px 8px rgba(0,0,0,.24) !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art{
+#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art{
     display:flex !important;
     position:relative !important;
     grid-column:1 !important;
@@ -935,7 +935,7 @@
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art > .v169-item-art{
+#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art > .v169-item-art{
     display:block !important;
     width:100% !important;
     height:100% !important;
@@ -946,8 +946,8 @@
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art > .v169-item-art > img,
-#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art > .v169-item-art > svg{
+#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art > .v169-item-art > img,
+#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art > .v169-item-art > svg{
     display:block !important;
     width:100% !important;
     height:100% !important;
@@ -956,7 +956,7 @@
     object-fit:contain !important;
     object-position:center !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-name{
+#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-name{
     grid-column:2 !important;
     grid-row:1 !important;
     min-width:0 !important;
@@ -968,7 +968,7 @@
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-slot{
+#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-slot{
     grid-column:2 !important;
     grid-row:2 !important;
     min-width:0 !important;
@@ -979,7 +979,7 @@
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-stat{
+#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-stat{
     grid-column:2 !important;
     grid-row:3 !important;
     min-width:0 !important;
@@ -990,7 +990,7 @@
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-reforge-mini{
+#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-reforge-mini{
     grid-column:2 !important;
     grid-row:4 !important;
     min-width:0 !important;
@@ -1002,7 +1002,7 @@
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-buy{
+#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-buy{
     grid-column:1 / -1 !important;
     grid-row:5 !important;
     width:100% !important;
@@ -1018,7 +1018,7 @@
     background:linear-gradient(180deg,#f1ce7a,#bd7d2d) !important;
     font-weight:900 !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh{
+#game-ui #homeFeatureModal.v131-shop-open .v17345-equipment-refresh{
     display:grid !important;
     grid-template-columns:minmax(0,1fr) 128px !important;
     align-items:center !important;
@@ -1032,24 +1032,24 @@
     border-radius:9px !important;
     box-sizing:border-box !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh > div{
+#game-ui #homeFeatureModal.v131-shop-open .v17345-equipment-refresh > div{
     display:flex !important;
     min-width:0 !important;
     flex-direction:column !important;
     gap:1px !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh b{
+#game-ui #homeFeatureModal.v131-shop-open .v17345-equipment-refresh b{
     font-size:12px !important;
     line-height:15px !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh span{
+#game-ui #homeFeatureModal.v131-shop-open .v17345-equipment-refresh span{
     overflow:hidden !important;
     font-size:10px !important;
     line-height:13px !important;
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-refresh > button{
+#game-ui #homeFeatureModal.v131-shop-open .v17345-equipment-refresh > button{
     width:128px !important;
     min-width:128px !important;
     height:38px !important;
@@ -1061,14 +1061,14 @@
 /* Potion tab: six cards share one fixed-height mobile viewport.
    The card owns a strict 18 / 38 / 36px height budget so legacy min-heights
    cannot collapse the middle row and make copy / quantity / price overlap. */
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-interface{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-interface{
     display:grid !important;
     grid-template-rows:auto auto minmax(0,1fr) !important;
     gap:4px !important;
     min-height:0 !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-note,
-#game-stage #homeFeatureModal.v131-shop-open .v133-shop-tier-note{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-note,
+#game-ui #homeFeatureModal.v131-shop-open .v133-shop-tier-note{
     min-height:0 !important;
     margin:0 !important;
     padding:0 2px !important;
@@ -1078,7 +1078,7 @@
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-list{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-list{
     display:grid !important;
     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
     grid-template-rows:repeat(3,minmax(0,1fr)) !important;
@@ -1088,7 +1088,7 @@
     min-height:0 !important;
     overflow:hidden !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-card{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-card{
     display:grid !important;
     grid-template-rows:18px 38px 36px !important;
     row-gap:3px !important;
@@ -1105,7 +1105,7 @@
     background:linear-gradient(155deg,rgba(30,22,14,.78),rgba(8,7,5,.92)) !important;
     box-shadow:inset 0 1px 0 rgba(255,238,196,.03),0 3px 8px rgba(0,0,0,.24) !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-card-head{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-card-head{
     display:flex !important;
     align-items:center !important;
     justify-content:space-between !important;
@@ -1117,7 +1117,7 @@
     margin:0 !important;
     overflow:hidden !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-summary{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-summary{
     display:grid !important;
     grid-template-columns:38px minmax(0,1fr) !important;
     gap:6px !important;
@@ -1129,7 +1129,7 @@
     margin:0 !important;
     overflow:hidden !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-icon{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-icon{
     display:grid !important;
     place-items:center !important;
     width:38px !important;
@@ -1138,19 +1138,19 @@
     min-height:38px !important;
     overflow:hidden !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-icon > .v169-item-art{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-icon > .v169-item-art{
     width:100% !important;
     height:100% !important;
     min-width:0 !important;
     min-height:0 !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-icon > .v169-item-art > img{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-icon > .v169-item-art > img{
     width:100% !important;
     height:100% !important;
     object-fit:contain !important;
     object-position:center !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-copy{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-copy{
     display:grid !important;
     grid-template-rows:18px 18px !important;
     gap:0 !important;
@@ -1160,7 +1160,7 @@
     height:36px !important;
     overflow:hidden !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-type{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-type{
     min-width:0 !important;
     overflow:hidden !important;
     font-size:15px !important;
@@ -1168,7 +1168,7 @@
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-stock{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-stock{
     min-width:0 !important;
     min-height:0 !important;
     margin:0 !important;
@@ -1178,18 +1178,7 @@
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-name{
-    min-width:0 !important;
-    min-height:0 !important;
-    height:18px !important;
-    margin:0 !important;
-    overflow:hidden !important;
-    font-size:15px !important;
-    line-height:18px !important;
-    text-overflow:ellipsis !important;
-    white-space:nowrap !important;
-}
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-effect{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-name{
     min-width:0 !important;
     min-height:0 !important;
     height:18px !important;
@@ -1200,7 +1189,18 @@
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-effect{
+    min-width:0 !important;
+    min-height:0 !important;
+    height:18px !important;
+    margin:0 !important;
+    overflow:hidden !important;
+    font-size:15px !important;
+    line-height:18px !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+}
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
     display:grid !important;
     grid-template-columns:24px minmax(56px,1fr) 54px !important;
     grid-template-rows:36px !important;
@@ -1213,10 +1213,10 @@
     margin:0 !important;
     overflow:hidden !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row label{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-purchase-row label{
     display:none !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-quantity{
     grid-column:1 !important;
     grid-row:1 !important;
     width:24px !important;
@@ -1237,12 +1237,12 @@
     line-height:32px !important;
     text-align:center !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity::-webkit-outer-spin-button,
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity::-webkit-inner-spin-button{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-quantity::-webkit-outer-spin-button,
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-quantity::-webkit-inner-spin-button{
     -webkit-appearance:none !important;
     margin:0 !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v146-shop-total{
+#game-ui #homeFeatureModal.v131-shop-open .v146-shop-total{
     grid-column:2 !important;
     grid-row:1 !important;
     min-width:0 !important;
@@ -1254,7 +1254,7 @@
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row .shop-potion-buy{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-purchase-row .shop-potion-buy{
     grid-column:3 !important;
     grid-row:1 !important;
     width:54px !important;
@@ -1289,21 +1289,21 @@
     -webkit-user-select:none !important;
     user-select:none !important;
 }
-#game-stage #homeFeatureModal #characterTabContent:has(#homeExpPoolCard){
+#game-ui #homeFeatureModal #characterTabContent:has(#homeExpPoolCard){
     scroll-behavior:auto !important;
 }
 
 /* V173.62 — character and dungeon backpack use the maximum mobile canvas. */
-#game-stage #homeFeatureModal:has(.home-feature-modal-box.wide){
+#game-ui #homeFeatureModal:has(.home-feature-modal-box.wide){
     padding:4px !important;
 }
-#game-stage #homeFeatureModal .home-feature-modal-box.wide{
+#game-ui #homeFeatureModal .home-feature-modal-box.wide{
     width:calc(100% - 8px) !important;
     max-width:none !important;
     height:calc(100% - 8px) !important;
     max-height:calc(100% - 8px) !important;
 }
-#game-stage #homeFeatureModal .home-feature-modal-box.wide #characterTabContent{
+#game-ui #homeFeatureModal .home-feature-modal-box.wide #characterTabContent{
     overflow-x:hidden !important;
     overflow-y:auto !important;
     -webkit-overflow-scrolling:touch !important;

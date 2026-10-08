@@ -420,9 +420,7 @@ button:disabled{
 */
 
 #app.no-header .header,
-#app:has(#homePage.active) #gameHeaderBar{
-    display:none;
-}
+
 
 /*
    ★ 修正：
@@ -514,14 +512,11 @@ button:disabled{
     padding:10px 12px 78px;
 }
 
-#app.no-header .content,
-#app:has(#homePage.active) .content{
+#app.no-header .content{
     top:0;
 }
 
-#app:has(#homePage.active) .content{
-    padding-bottom:84px;
-}
+
 
 /*
    ★ 新增（依照使用者要求，「黑框上下
@@ -597,20 +592,12 @@ button:disabled{
 
 #homePage{
     position:relative;
-
-    /*
-       V89 ROOT FIX — 主城位於固定 420×746.67 的 #app/.content 裡，
-       不能再用 100vh（真實瀏覽器 viewport）當高度基準。
-       否則手機 viewport 高度會大於虛擬舞台，直接把 .content 撐出
-       scrollHeight。改為跟父層可視區同高，主城本身不再產生捲動。
-    */
-    height:100%;
-    min-height:0;
-    box-sizing:border-box;
-    overflow:hidden;
-
-    margin:-14px;
-    padding:14px;
+    width:min(100%,var(--ui-page-max-width));
+    height:100%;min-height:0;
+    margin:0 auto;padding:12px;
+    box-sizing:border-box;overflow-y:auto;overflow-x:hidden;
+    overscroll-behavior-y:contain;touch-action:pan-y;
+    scrollbar-gutter:stable;
 }
 
 .home-bg-fixed-layer{
@@ -845,8 +832,8 @@ button:disabled{
     border-radius:7px;
     background:linear-gradient(180deg,rgba(30,21,12,.94),rgba(8,7,5,.92));
     color:#ceb887;
-    font-size:8px;
-    line-height:10px;
+    font-size:13px;
+    line-height:18px;
     box-shadow:inset 0 0 0 1px rgba(255,224,151,.05),0 2px 5px rgba(0,0,0,.3);
     white-space:nowrap;
 }
@@ -903,13 +890,13 @@ button:disabled{
     display:flex;
     flex:0 0 auto;
     flex-direction:column;
-    gap:1px;
-    padding:1px 7px 0;
+    gap:12px;
+    padding:12px 7px;
 }
 
 .home-primary-actions{
     display:grid;
-    grid-template-columns:repeat(2,minmax(0,46%));
+    grid-template-columns:repeat(2,minmax(0,1fr));
     justify-content:space-between;
     align-self:center;
     width:100%;
@@ -918,11 +905,11 @@ button:disabled{
 
 .home-secondary-actions{
     display:grid;
-    grid-template-columns:repeat(2,80px);
-    grid-template-rows:repeat(4,70px);
+    grid-template-columns:repeat(auto-fit,minmax(80px,1fr));
+    grid-auto-rows:84px;
     justify-content:space-between;
-    gap:5px 0;
-    min-height:295px;
+    gap:8px;
+    min-height:0;
     padding:0;
 }
 
@@ -1025,11 +1012,11 @@ button:disabled{
 
 .home-card-secondary{
     display:grid;
-    grid-template-rows:49px 19px;
+    grid-template-rows:60px 22px;
     align-content:stretch;
     justify-items:stretch;
-    width:80px;
-    height:70px;
+    width:100%;
+    height:84px;
     overflow:hidden;
     border:1px solid rgba(205,154,65,.82);
     border-radius:11px;
@@ -1048,7 +1035,7 @@ button:disabled{
 
 .home-card-secondary .home-card-icon{
     width:100%;
-    height:49px;
+    height:60px;
     border:0;
     border-bottom:1px solid rgba(198,151,65,.62);
     border-radius:10px 10px 0 0;
@@ -6527,3 +6514,25 @@ button:active{
     background:linear-gradient(180deg,#4c3316,#211308);color:#ffe0a0;font-size:12px;font-weight:900;
 }
 #game-stage .quest-claim-all-btn:disabled{opacity:.42;filter:grayscale(.35);}
+
+/* Browser shell geometry. No transform or resize writer participates here. */
+#game-ui{
+    --ui-page-max-width:1120px;
+    position:fixed;inset:0;z-index:1000;
+    display:grid;grid-template-rows:minmax(0,1fr) auto;
+    padding:var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+    box-sizing:border-box;pointer-events:none;overflow:hidden;
+    touch-action:pan-x pan-y;
+}
+#game-ui[hidden]{display:none;}
+#game-ui > .page{grid-row:1;min-height:0;pointer-events:auto;}
+#game-ui > .page:not(.active){display:none;}
+#game-ui > .home-feature-modal,#game-ui > .item-modal{
+    position:fixed;inset:0;width:auto;height:auto;
+    box-sizing:border-box;pointer-events:auto;
+    padding:max(12px,var(--safe-top)) max(12px,var(--safe-right)) max(12px,var(--safe-bottom)) max(12px,var(--safe-left));
+    touch-action:pan-x pan-y;
+}
+#game-ui img,#game-ui svg,#game-ui canvas{
+    -webkit-touch-callout:none;user-select:none;-webkit-user-drag:none;
+}

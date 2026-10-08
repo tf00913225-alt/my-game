@@ -162,4 +162,4 @@
     #game-stage .relic-progression-detail-panel em{ grid-column:1; }
 }
 
-#game-stage #homeFeatureModal.team-relic-modal .relic-progression-detail-panel [data-relic-source]{font-size:16px;min-height:52px;}
+#game-ui #homeFeatureModal.team-relic-modal .relic-progression-detail-panel [data-relic-source]{font-size:16px;min-height:52px;}

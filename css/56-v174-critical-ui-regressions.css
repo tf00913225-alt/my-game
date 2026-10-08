@@ -165,26 +165,25 @@
 
 /* Main-city roster: preserve the three equal slots, but return enough horizontal
    room to the HP/SP labels and reduce the two bars instead of letting them bleed. */
-#game-stage #homePage #v146HomeRoster .v146-home-character{
+#game-ui #homePage #v146HomeRoster .v146-home-character{
     grid-template-columns:32px minmax(0,1fr) !important;
     gap:3px !important;
     min-height:70px !important;
     padding:3px 2px !important;
 }
-#game-stage #homePage #v146HomeRoster .v146-home-avatar{
+#game-ui #homePage #v146HomeRoster .v146-home-avatar{
     width:32px !important;
     height:32px !important;
 }
-#game-stage #homePage #v146HomeRoster .v146-home-character-main{
+#game-ui #homePage #v146HomeRoster .v146-home-character-main{
     gap:2px !important;
 }
-#game-stage #homePage #v146HomeRoster .v146-home-resource{
-    height:14px !important;
+#game-ui #homePage #v146HomeRoster .v146-home-resource{
+    height:19px !important;
 }
-#game-stage #homePage #v146HomeRoster .v146-home-resource strong{
-    font-size:11px !important;
-    line-height:12px !important;
-    letter-spacing:-.45px !important;
+#game-ui #homePage #v146HomeRoster .v146-home-resource strong{
+    font-size:13px !important;
+    line-height:17px !important;
 }
 
 /* Character creation now fits the fixed canvas without a nested scroll layer.
@@ -206,7 +205,7 @@
 
 /* 2026-09-11 reported mobile regressions.
    Equipment comparison must never inherit an inventory-slot crop/zoom rule. */
-#game-stage #itemModal .v17351-compare-art > .v169-item-art{
+#game-ui #itemModal .v17351-compare-art > .v169-item-art{
     width:100% !important;
     height:100% !important;
     max-width:100% !important;
@@ -219,7 +218,7 @@
     background-position:center !important;
     background-size:contain !important;
 }
-#game-stage #itemModal .v17351-compare-art > .v169-item-art > img{
+#game-ui #itemModal .v17351-compare-art > .v169-item-art > img{
     position:static !important;
     inset:auto !important;
     display:block !important;
@@ -235,23 +234,23 @@
 /* Battle artwork sizing is owned by js/54-v173.51-battle-qa.js. */
 
 /* Main-city persistent utility shell: boot-visible before relic gameplay executes. */
-#game-stage .team-relic-home-tools{
-    position:absolute;left:50%;right:auto;bottom:0;z-index:5;display:grid;
-    grid-template-columns:repeat(2,80px);width:192px;gap:32px;padding:0;
-    box-sizing:border-box;transform:translateX(-50%);pointer-events:none;align-items:end;
+#game-ui .team-relic-home-tools{
+    position:relative;inset:auto;z-index:5;display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:12px;padding:0;
+    box-sizing:border-box;pointer-events:none;align-items:end;
 }
-#game-stage .team-relic-home-tools .home-card-utility{
+#game-ui .team-relic-home-tools .home-card-utility{
     display:grid;grid-template-columns:1fr;grid-template-rows:58px 24px;align-content:stretch;
-    justify-items:stretch;width:80px;height:84px;pointer-events:auto;position:relative;overflow:hidden;
+    justify-items:stretch;width:100%;height:84px;pointer-events:auto;position:relative;overflow:hidden;
     border:1px solid rgba(205,154,65,.82);border-radius:11px;
     background:linear-gradient(155deg,rgba(35,25,15,.96),rgba(8,7,5,.96));
     box-shadow:0 4px 10px rgba(0,0,0,.52),inset 0 0 0 1px rgba(255,224,151,.06);
 }
-#game-stage .team-relic-home-tools .home-card-utility:active{transform:translateY(1px) scale(.97);filter:brightness(1.12);}
-#game-stage .team-relic-home-tools .home-card-icon{display:flex;align-items:center;justify-content:center;width:100%;height:58px;overflow:hidden;border:0;border-bottom:1px solid rgba(174,127,55,.55);border-radius:0;background-position:center;background-size:cover;background-repeat:no-repeat;}
-#game-stage .team-relic-home-tools .home-card-label{align-self:stretch;padding:2px 3px 1px;background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));font-size:13px;line-height:18px;font-weight:900;}
-#game-stage .team-relic-home-tools .home-card-icon img{width:100%;height:100%;object-fit:cover;display:block;}
-#game-stage .team-relic-home-entry .home-card-icon{background-image:url("../assets/ui/home-relic-v174.eed14e806044.webp");}
-#game-stage .team-relic-home-entry .team-relic-home-glyph{font-size:0;color:transparent;text-shadow:none;}
-#game-stage .team-element-box-home-entry .home-card-icon{background-image:url("../assets/ui/home-element-box-v174.webp");}
-#game-stage .team-element-box-home-entry .home-card-icon img{display:none;}
+#game-ui .team-relic-home-tools .home-card-utility:active{transform:translateY(1px) scale(.97);filter:brightness(1.12);}
+#game-ui .team-relic-home-tools .home-card-icon{display:flex;align-items:center;justify-content:center;width:100%;height:58px;overflow:hidden;border:0;border-bottom:1px solid rgba(174,127,55,.55);border-radius:0;background-position:center;background-size:cover;background-repeat:no-repeat;}
+#game-ui .team-relic-home-tools .home-card-label{align-self:stretch;padding:2px 3px 1px;background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));font-size:13px;line-height:18px;font-weight:900;}
+#game-ui .team-relic-home-tools .home-card-icon img{width:100%;height:100%;object-fit:cover;display:block;}
+#game-ui .team-relic-home-entry .home-card-icon{background-image:url("../assets/ui/home-relic-v174.eed14e806044.webp");}
+#game-ui .team-relic-home-entry .team-relic-home-glyph{font-size:0;color:transparent;text-shadow:none;}
+#game-ui .team-element-box-home-entry .home-card-icon{background-image:url("../assets/ui/home-element-box-v174.webp");}
+#game-ui .team-element-box-home-entry .home-card-icon img{display:none;}

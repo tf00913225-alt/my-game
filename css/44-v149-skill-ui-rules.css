@@ -4,14 +4,14 @@
 ===================================================== */
 
 /* The shop modal stays centred inside the 420px game canvas. */
-#game-stage #homeFeatureModal.v131-shop-open{
+#game-ui #homeFeatureModal.v131-shop-open{
     align-items:center !important;
     justify-content:center !important;
     box-sizing:border-box !important;
     padding:12px !important;
     overflow:hidden !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .home-feature-modal-box{
+#game-ui #homeFeatureModal.v131-shop-open .home-feature-modal-box{
     width:100% !important;
     max-width:396px !important;
     max-height:calc(100% - 24px) !important;
@@ -20,34 +20,34 @@
     overflow:hidden !important;
     transform:none !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open #homeFeatureModalBody,
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-interface,
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-list,
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-card{
+#game-ui #homeFeatureModal.v131-shop-open #homeFeatureModalBody,
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-interface,
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-list,
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-card{
     width:100% !important;
     min-width:0 !important;
     max-width:100% !important;
     box-sizing:border-box !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open #homeFeatureModalBody{
+#game-ui #homeFeatureModal.v131-shop-open #homeFeatureModalBody{
     overflow-x:hidden !important;
     overflow-y:auto !important;
     overscroll-behavior:contain !important;
     touch-action:pan-y !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
     display:grid !important;
     grid-template-columns:auto 46px minmax(0,1fr) !important;
     gap:4px !important;
     align-items:center !important;
     min-width:0 !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row .shop-potion-buy{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-purchase-row .shop-potion-buy{
     grid-column:1 / -1 !important;
     width:100% !important;
     min-width:0 !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open .v146-shop-total{
+#game-ui #homeFeatureModal.v131-shop-open .v146-shop-total{
     min-width:0 !important;
     overflow:hidden !important;
     text-overflow:ellipsis !important;
@@ -109,7 +109,7 @@
 }
 
 @media (max-width:380px){
-    #game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
+    #game-ui #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
         grid-template-columns:auto 42px minmax(0,1fr) !important;
     }
 }

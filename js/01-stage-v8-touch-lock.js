@@ -10,7 +10,7 @@
     const CLICK_LIFETIME_MS=1000;
     const completedPointers=new Map();
     let legacyClickGesture=null;
-    function isGameSurfaceTarget(target){ return !!(target&&target.closest&&target.closest("#game-stage")); }
+    function isGameSurfaceTarget(target){ return !!(target&&target.closest&&target.closest("#game-stage, #game-ui")); }
     function isEditableGameControl(target){ return !!(target&&target.closest&&target.closest('input, textarea, [contenteditable="true"]')); }
     function scrollAxes(node){
         const style=window.getComputedStyle(node);
@@ -82,7 +82,7 @@
     document.addEventListener("pointercancel",cancelPointer,{capture:true,passive:true});
     function handleSuppressedGestureClick(event){ if(consumeSuppression(event)){ event.preventDefault(); event.stopImmediatePropagation(); } }
     const stage=document.getElementById("game-stage");
-    if(stage){ stage.addEventListener("click",handleSuppressedGestureClick,true); stage.addEventListener("pointerleave",function(event){ if(event.target===stage){ cancelPointer(event); } },true); }
+    if(stage){ document.addEventListener("click",function(event){ if(isGameSurfaceTarget(event.target)){ handleSuppressedGestureClick(event); } },true); stage.addEventListener("pointerleave",function(event){ if(event.target===stage){ cancelPointer(event); } },true); }
     function resetGestures(){ activePointers.clear(); completedPointers.clear(); legacyClickGesture=null; }
     window.addEventListener("blur",resetGestures);
     window.addEventListener("pagehide",resetGestures);

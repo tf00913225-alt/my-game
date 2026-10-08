@@ -2,13 +2,7 @@
    Presentation and geometry belong to css/22. This file owns only the
    existing #inventoryGridScroll interaction contract; retired fixed-capacity
    and non-paginated layout assumptions are intentionally not present. */
-#game-stage #app.on-inventory-page .content{
-    min-height:0;
-    overflow:hidden;
-    touch-action:pan-y;
-}
-
-#game-stage #app.on-inventory-page #inventoryPage .inventory-grid-scroll{
+#game-ui #inventoryPage .inventory-grid-scroll{
     min-height:0;
     overflow-y:auto;
     overflow-x:hidden;
@@ -18,7 +12,7 @@
     scrollbar-gutter:stable;
 }
 
-#game-stage #app.on-inventory-page #inventoryPage .inventory-grid-classic{
+#game-ui #inventoryPage .inventory-grid-classic{
     width:100%;
     margin:0;
     align-content:start;

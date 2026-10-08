@@ -113,7 +113,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 }
 
 /* Keep the ability panel inside its real viewport and make it the scroll owner. */
-#game-stage #homeFeatureModal #characterTabContent{
+#game-ui #homeFeatureModal #characterTabContent{
     box-sizing:border-box !important;
     overflow-x:hidden !important;
     overflow-y:auto !important;

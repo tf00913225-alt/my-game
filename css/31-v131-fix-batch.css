@@ -157,7 +157,7 @@
     text-shadow:0 0 6px rgba(255,95,162,.7),0 1px 3px #000 !important;
 }
 
-#game-stage #homeFeatureModal .home-feature-modal-box.wide{
+#game-ui #homeFeatureModal .home-feature-modal-box.wide{
     height:auto !important;
     max-height:96% !important;
     overflow:hidden !important;
@@ -165,13 +165,13 @@
     flex-direction:column !important;
 }
 
-#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
+#game-ui #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
     flex:0 1 auto !important;
     min-height:0 !important;
     overflow:hidden !important;
 }
 
-#game-stage #homeFeatureModal #characterTabContent{
+#game-ui #homeFeatureModal #characterTabContent{
     flex:0 1 auto !important;
     height:auto !important;
     min-height:0 !important;
@@ -184,7 +184,7 @@
     padding-bottom:0 !important;
 }
 
-#game-stage #homeFeatureModal #characterTabContent > #skillPage{
+#game-ui #homeFeatureModal #characterTabContent > #skillPage{
     display:block !important;
     position:static !important;
     height:auto !important;
@@ -195,9 +195,9 @@
     touch-action:pan-y !important;
 }
 
-#game-stage #homeFeatureModal #characterTabContent > #skillPage .content,
-#game-stage #homeFeatureModal #allSkillsList,
-#game-stage #homeFeatureModal .skill-loadout-list{
+#game-ui #homeFeatureModal #characterTabContent > #skillPage .content,
+#game-ui #homeFeatureModal #allSkillsList,
+#game-ui #homeFeatureModal .skill-loadout-list{
     height:auto !important;
     max-height:none !important;
     overflow:visible !important;
@@ -563,14 +563,14 @@
     line-height:1.7 !important;
 }
 
-#game-stage #homeFeatureModal.v131-shop-open .home-feature-modal-box,
-#game-stage #homeFeatureModal.v131-shop-open #homeFeatureModalBody,
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-interface{
+#game-ui #homeFeatureModal.v131-shop-open .home-feature-modal-box,
+#game-ui #homeFeatureModal.v131-shop-open #homeFeatureModalBody,
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-interface{
     background:#050505 !important;
     background-image:none !important;
 }
 
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-card{
+#game-ui #homeFeatureModal.v131-shop-open .shop-potion-card{
     background:linear-gradient(160deg,#17130e,#080706) !important;
 }
 

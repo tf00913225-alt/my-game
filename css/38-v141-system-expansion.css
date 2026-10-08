@@ -53,14 +53,14 @@
 #game-stage .system-panel-row small{font-size:13px;line-height:1.55;}
 
 /* ----- Backpack: exactly 18 visible slots, seven cyclic pages ----- */
-#game-stage #inventoryPage .inventory-item-classic{
+#game-ui #inventoryPage .inventory-item-classic{
     cursor:pointer;
     user-select:none;
     -webkit-user-drag:none;
     touch-action:manipulation;
 }
 
-#game-stage #inventoryPage .inventory-item-classic .inventory-icon{
+#game-ui #inventoryPage .inventory-item-classic .inventory-icon{
     display:grid;
     place-items:center;
     width:100%;
@@ -72,7 +72,7 @@
 }
 
 /* Inventory owns every backpack item-art box, regardless of filter or lazy feature CSS. */
-#game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon{
+#game-ui #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon{
     display:grid;
     width:100%;
     height:100%;
@@ -82,7 +82,7 @@
     overflow:hidden;
     box-sizing:border-box;
 }
-#game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon > .v169-item-art{
+#game-ui #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon > .v169-item-art{
     position:relative;
     isolation:isolate;
     display:grid;
@@ -98,7 +98,7 @@
     overflow:hidden;
     box-sizing:border-box;
 }
-#game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon > .v169-item-art > img{
+#game-ui #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon > .v169-item-art > img{
     position:relative;
     inset:auto;
     display:block;
@@ -113,7 +113,7 @@
 
 /* Inventory is the owner of equipment-card geometry. It must not depend on
    the lazy Abyss stylesheet before equipment artwork can fit its slot. */
-#game-stage #inventoryPage .v169-item-art.v169-equipment-art{
+#game-ui #inventoryPage .v169-item-art.v169-equipment-art{
     position:relative;
     isolation:isolate;
     display:grid;
@@ -129,7 +129,7 @@
     border-radius:8px;
     box-sizing:border-box;
 }
-#game-stage #inventoryPage .v169-item-art.v169-equipment-art > img{
+#game-ui #inventoryPage .v169-item-art.v169-equipment-art > img{
     position:relative;
     inset:auto;
     z-index:1;
@@ -150,7 +150,7 @@
 /* Context contract: Backpack Slot owns rarity presentation. The shared
    v169 art remains an image container here, while other contexts keep their
    own rarity treatment. */
-#game-stage #inventoryPage .inventory-backpack-rarity-neutral{
+#game-ui #inventoryPage .inventory-backpack-rarity-neutral{
     border:0;
     border-radius:0;
     box-shadow:none;
@@ -158,28 +158,28 @@
     animation:none;
 }
 
-#game-stage #inventoryPage .inventory-item-classic .inventory-slot-number{
+#game-ui #inventoryPage .inventory-item-classic .inventory-slot-number{
     display:none !important;
 }
 
-#game-stage #inventoryPage .inventory-empty-dot{
+#game-ui #inventoryPage .inventory-empty-dot{
     color:rgba(191,157,99,.3);
     font-size:18px;
     line-height:1;
 }
 
-#game-stage #inventoryPage .inventory-character-arrow{
+#game-ui #inventoryPage .inventory-character-arrow{
     width:42px !important;
     height:38px !important;
     min-height:38px !important;
     font-size:27px !important;
 }
 
-#game-stage #inventoryPage .inventory-character-name span{
+#game-ui #inventoryPage .inventory-character-name span{
     font-size:16px !important;
 }
 
-#game-stage #inventoryPage .inventory-character-level{
+#game-ui #inventoryPage .inventory-character-level{
     font-size:13px !important;
 }
 
@@ -561,16 +561,16 @@
 }
 
 /* ----- Quest typography and milestone chests ----- */
-#game-stage #homeFeatureModal.quest-mode .home-feature-modal-box{
+#game-ui #homeFeatureModal.quest-mode .home-feature-modal-box{
     width:min(98%,480px) !important;
     max-width:480px !important;
 }
-#game-stage #homeFeatureModal.quest-mode .home-feature-modal-title{font-size:23px !important;}
-#game-stage #homeFeatureModal.quest-mode .quest-tab{font-size:16px !important;}
-#game-stage #homeFeatureModal.quest-mode .quest-card-name{font-size:16px !important;}
-#game-stage #homeFeatureModal.quest-mode .quest-card-desc{font-size:13px !important;line-height:1.48 !important;}
-#game-stage #homeFeatureModal.quest-mode .quest-progress-line{font-size:12px !important;}
-#game-stage #homeFeatureModal.quest-mode .quest-progress-line strong{font-size:13px !important;}
+#game-ui #homeFeatureModal.quest-mode .home-feature-modal-title{font-size:23px !important;}
+#game-ui #homeFeatureModal.quest-mode .quest-tab{font-size:16px !important;}
+#game-ui #homeFeatureModal.quest-mode .quest-card-name{font-size:16px !important;}
+#game-ui #homeFeatureModal.quest-mode .quest-card-desc{font-size:13px !important;line-height:1.48 !important;}
+#game-ui #homeFeatureModal.quest-mode .quest-progress-line{font-size:12px !important;}
+#game-ui #homeFeatureModal.quest-mode .quest-progress-line strong{font-size:13px !important;}
 
 #game-stage .quest-completion-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;color:#dec89d;font-size:13px;}
 #game-stage .quest-completion-track{height:7px;overflow:hidden;border-radius:99px;background:#1b1510;box-shadow:inset 0 0 0 1px #5c462b;}
@@ -636,14 +636,14 @@
 #game-stage .v141-compact-element-box #v131ElementBoxStats small{grid-column:1/-1;color:#94866f;font-size:11px;text-align:center;}
 
 /* ----- Compact shop with purchase confirmation handled in JS ----- */
-#game-stage #homeFeatureModal.v131-shop-open .home-feature-modal-box{
+#game-ui #homeFeatureModal.v131-shop-open .home-feature-modal-box{
     width:min(96%,520px) !important;
     max-width:520px !important;
     height:auto !important;
     max-height:94dvh !important;
     overflow:hidden !important;
 }
-#game-stage #homeFeatureModal.v131-shop-open #homeFeatureModalBody{overflow:hidden !important;}
+#game-ui #homeFeatureModal.v131-shop-open #homeFeatureModalBody{overflow:hidden !important;}
 #game-stage .v141-shop-wallet{margin-bottom:6px;padding:7px 10px;border:1px solid #80602f;border-radius:7px;color:#d7c39c;background:#120e09;text-align:right;font-size:13px;}
 #game-stage .v141-shop-wallet b{color:#ffe093;font-size:16px;}
 #game-stage .shop-potion-note{margin-bottom:5px;font-size:12px;}
@@ -774,14 +774,14 @@
 #game-stage .v17363-material-flow section span{font-size:13px!important;line-height:1.35!important}
 #game-stage .v17363-material-card .v17363-craft-button{min-height:44px!important;font-size:15px!important}
 
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-wallet span{font-size:14px!important;line-height:19px!important}
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-wallet b{font-size:16px!important;line-height:21px!important}
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-tabs button{min-height:44px!important;font-size:15px!important;line-height:1.25!important}
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-card label,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-card label small{font-size:14px!important;line-height:1.4!important}
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-craft-preview span,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-material-lines span,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-affix-info,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-reforge-current small,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-reforge-current div,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-compare small,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-compare span{font-size:14px!important;line-height:1.45!important}
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-material-lines b,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-upgrade-flow b,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-reforge-current>b{font-size:16px!important;line-height:1.35!important}
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-primary,#game-stage #homeFeatureModal.v141-synthesis-modal .v141-synthesis-card button{min-height:44px!important;font-size:15px!important}
-#game-stage #homeFeatureModal.v141-synthesis-modal .v143-item-picker button > span:not(.v169-item-art){font-size:14px!important;line-height:18px!important;-webkit-line-clamp:2!important}
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-wallet span{font-size:14px!important;line-height:19px!important}
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-wallet b{font-size:16px!important;line-height:21px!important}
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-tabs button{min-height:44px!important;font-size:15px!important;line-height:1.25!important}
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-card label,#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-card label small{font-size:14px!important;line-height:1.4!important}
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-craft-preview span,#game-ui #homeFeatureModal.v141-synthesis-modal .v141-material-lines span,#game-ui #homeFeatureModal.v141-synthesis-modal .v141-affix-info,#game-ui #homeFeatureModal.v141-synthesis-modal .v141-reforge-current small,#game-ui #homeFeatureModal.v141-synthesis-modal .v141-reforge-current div,#game-ui #homeFeatureModal.v141-synthesis-modal .v141-compare small,#game-ui #homeFeatureModal.v141-synthesis-modal .v141-compare span{font-size:14px!important;line-height:1.45!important}
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-material-lines b,#game-ui #homeFeatureModal.v141-synthesis-modal .v141-upgrade-flow b,#game-ui #homeFeatureModal.v141-synthesis-modal .v141-reforge-current>b{font-size:16px!important;line-height:1.35!important}
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-primary,#game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-card button{min-height:44px!important;font-size:15px!important}
+#game-ui #homeFeatureModal.v141-synthesis-modal .v143-item-picker button > span:not(.v169-item-art){font-size:14px!important;line-height:18px!important;-webkit-line-clamp:2!important}
 
 #game-stage .v143-item-picker{
     display:grid;
@@ -938,14 +938,14 @@
 /* Talisman synthesis is owned by gameplay-core, not the Abyss feature CSS.
    Both previews are intentional: left is the 3x material stack and right is
    the crafted next tier. Keep each 2:3 artwork contained inside its slot. */
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-upgrade-flow .v169-talisman-art{
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-upgrade-flow .v169-talisman-art{
     width:92px;
     height:138px;
     max-width:100%;
     flex:0 0 auto;
     overflow:hidden;
 }
-#game-stage #homeFeatureModal.v141-synthesis-modal .v141-upgrade-flow .v169-talisman-art > img{
+#game-ui #homeFeatureModal.v141-synthesis-modal .v141-upgrade-flow .v169-talisman-art > img{
     display:block;
     width:100%;
     height:100%;
