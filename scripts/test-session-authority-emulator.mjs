@@ -20,7 +20,6 @@ const {createCanonicalRestrictedBattle}=require("../functions/src/canonical-rest
 const {createCanonicalExpAllocation}=require("../functions/src/canonical-exp-allocation.js");
 const {createCanonicalAttributeAllocation}=
     require("../functions/src/canonical-attribute-allocation.js");
-const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
 const {assembleCanonicalSnapshot,claimRecordsDigest}=require("../functions/src/canonical-snapshot.js");
 const {inspectRecoveryArchive,createRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
 const {createCanonicalCurrentRecovery}=
@@ -1374,7 +1373,8 @@ const capRequest={auth:{uid:capUid,token:claims(capUser.idToken)},
     data:{uid:capUid,session:capSession}};
 await initialWriter.commitInitialSources(capRequest,{
     operationId:capOperation,expectedRevision:1,selection:choices});
-const capRecords=makeInitialCharacterSources(capUid,2,capOperation,choices);
+const capRecords=(await db.doc(`serverUsers/${capUid}/recoveryArchives/2`).get())
+    .get("sourceRecords");
 capRecords.characters[0].state.level=100;
 capRecords.characters[0].state.exp=0;
 capRecords.characters[0].state.expNext=120;
