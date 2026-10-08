@@ -31,9 +31,7 @@ function inlineStyle(source){ return source.replace(/<\/style/gi,"<\\/style"); }
 
 function createFixture(){
     const styles=[
-        "css/00-main.css",
-        "css/02-stage-v3-layout-fix.css",
-        "css/03-stage-v4-viewport-lock.css",
+        "css/00-main.css", "css/03-stage-v4-viewport-lock.css",
         "css/release-update-notification.css"
     ].map(read).map(inlineStyle).join("\n");
     const longContent=Array.from({length:10},(_,index)=>

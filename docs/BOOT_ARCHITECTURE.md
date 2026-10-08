@@ -9,6 +9,7 @@
 | 狀態與合法轉移 | `js/startup/startup-contract.js` |
 | 啟動流程與畫面 destination | `js/52-v173.20-startup-loader.js` |
 | Critical / Feature runtime 載入 | `js/startup/feature-loader.js`、`asset-manifest.json` |
+| App display scale 與跨呈現域座標 | `js/00-main.js::FourSymbolsDisplay`；尺寸／投影與 viewport CSS 分工依 `UI_GUIDELINES.md` 第十三節 |
 | Feature source 邊界 | `config/feature-manifest.json`、`scripts/build-production.mjs` |
 | UID 本機存檔與 migration | `js/startup/account-save-repository.js` |
 | Gameplay save serialization | `js/00-main.js` 的 `FourSymbolsGameSave`／`saveGame()`／`loadGame()` |
@@ -25,6 +26,8 @@
 | 巡怪圖片 | `js/26-v131-patrol-appearance.js` 與 `assets/characters/patrol/*.webp` |
 
 不得新增另一個 startup owner、全域 runtime gate、帳號 bypass loader 或 `*-fix-loading.js` 類後置 patch。
+
+Display tokens 位於 Critical Boot 的 `css/00-main.css`，app-shell 的 scaler／座標 Owner 直接消費同一來源。Boot／Auth 不依賴 app scaler；一般 UI 與戰鬥局部舞台的遷移邊界由 `UI_GUIDELINES.md` 第十三節控制。不得因 responsive 工程新增 Critical feature、重跑 Startup 或搬動 Auth／Save destination 決策。
 
 ## Startup State Machine
 
