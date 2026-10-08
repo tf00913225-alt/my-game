@@ -9,6 +9,7 @@ import {ROOT,ASSET_MANIFEST,findChrome,startServer,waitJson,Cdp,qaPrelude,QA_AUT
 // external account transport is the existing isolated, read-only QA seam.
 const OUT=path.join(ROOT,'artifacts/browser-qa/responsive-item');
 const VIEWPORTS=[[360,800],[360,640],[393,873],[393,660],[412,915],[412,680]];
+const DISPLAY_VIEWPORTS=[[390,844],[412,915],[768,1024],[834,1194],[1366,768],[1536,864],[1920,1080],[2560,1440]];
 const settle=()=>new Promise(resolve=>setTimeout(resolve,150));
 const PREPARE=String.raw`(async()=>{
  const until=Date.now()+45000;
@@ -77,6 +78,41 @@ async function run(chrome,url,live){
    await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',clickCount:1});await settle();
   };
   const screenshot=async name=>{const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,name+'.png'),Buffer.from(shot.data,'base64'));};
+  const checkDisplay=async label=>{
+   const row=await c.eval(`(()=>{
+    const api=window.FourSymbolsDisplay;if(!api)throw Error('display owner missing');
+    const stage=document.getElementById('game-stage'),content=document.getElementById('game-content'),r=stage.getBoundingClientRect(),cr=content.getBoundingClientRect();
+    const aliases=screenToGame===screenToGamePoint&&gameToScreen===gameToScreenPoint&&eventToGame===eventToGamePoint;
+    if(!aliases)throw Error('coordinate aliases have diverged');
+    let count=0,maxError=0;
+    for(const surface of ['browser','native','legacy']){
+     const width=surface==='legacy'?api.dimensions.legacyWidth:api.dimensions.nativeWidth;
+     const height=surface==='legacy'?api.dimensions.legacyHeight:api.dimensions.nativeHeight;
+     for(const [x,y] of [[0,0],[width,0],[0,height],[width,height],[width/2,height/2]]){
+      const p=api.surfaceToClient(surface,x,y),q=api.clientToSurface(surface,p.x,p.y);
+      maxError=Math.max(maxError,Math.abs(q.x-x),Math.abs(q.y-y));count++;
+      if(surface==='browser'&&(p.x!==x||p.y!==y))throw Error('browser domain scaled');
+     }
+    }
+    const center=screenToGame(r.left+r.width/2,r.top+r.height/2);
+    const s=getComputedStyle(document.documentElement),safe=Object.fromEntries(['top','right','bottom','left'].map(k=>[k,parseFloat(s.getPropertyValue('--safe-'+k))||0]));
+    return {count,maxError,center,stage:r.toJSON(),content:cr.toJSON(),inlineLegacyTransform:content.style.transform,
+     viewport:{width:innerWidth,height:innerHeight},safe,diagnostics:{left:GAME_STAGE_LEFT,top:GAME_STAGE_TOP,scale:GAME_STAGE_SCALE},
+     document:{width:document.documentElement.clientWidth,height:document.documentElement.clientHeight,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight}};
+   })()`);
+   assert.ok(row.maxError<1e-6,label+' coordinate roundtrip '+row.maxError);
+   assert.ok(Math.abs(row.center.x-1080/2)<1e-6&&Math.abs(row.center.y-1920/2)<1e-6,label+' native center');
+   assert.equal(row.inlineLegacyTransform,'',label+' competing runtime legacy scale');
+   assert.ok(Math.abs(row.stage.left-row.diagnostics.left)<0.1&&Math.abs(row.stage.top-row.diagnostics.top)<0.1,label+' stale diagnostics');
+   assert.ok(Math.abs(row.stage.left+row.stage.width/2-(row.safe.left+(row.viewport.width-row.safe.left-row.safe.right)/2))<1,label+' asymmetric safe-area horizontal centering');
+   assert.ok(Math.abs(row.stage.top+row.stage.height/2-(row.safe.top+(row.viewport.height-row.safe.top-row.safe.bottom)/2))<1,label+' asymmetric safe-area vertical centering');
+   assert.ok(row.document.scrollWidth<=row.document.width+1&&row.document.scrollHeight<=row.document.height+1,label+' document overflow');
+   evidence.push({display:label,...row});return row;
+  };
+  for(const v of DISPLAY_VIEWPORTS){await resize(v);await checkDisplay(v.join('x'));}
+  await c.eval(`for(const el of [document.documentElement,document.body])for(const [side,value]of Object.entries({top:20,right:41,bottom:31,left:17}))el.style.setProperty('--safe-'+side,value+'px');window.dispatchEvent(new Event('resize'));`);
+  await settle();await checkDisplay('asymmetric-safe-area');
+  await c.eval(`for(const el of [document.documentElement,document.body])for(const side of ['top','right','bottom','left'])el.style.removeProperty('--safe-'+side);window.dispatchEvent(new Event('resize'));`);
   const scroll=async(selector)=>{
    const before=await measure(selector);assert.ok(before.overflow<=1,selector+' content overflows horizontally');assert.ok(before.clientHeight>24,selector+' has no usable content');
    if(before.scrollHeight>before.clientHeight+1){
@@ -218,6 +254,7 @@ async function run(chrome,url,live){
   assert.equal(await c.eval('JSON.stringify({items:inventoryItems,gold,player})'),beforeRelicSource,'relic acquisition UI changed owned state');
   await screenshot('acquisition-relic-360x640');await c.eval('v132CloseRewardModal()');
   evidence.push({relicAcquisition:true});console.log('PASS relic acquisition: Lv20 direct unlock / fragment Boss / Tower ancestry / read-only');
+  await checkDisplay('late-features-reentry');
   return evidence;
  }catch(error){if(c){try{const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from(shot.data,'base64'));}catch{}}error.evidence=evidence;if(browserError){error.message+="\nBrowser: "+browserError;error.stack+="\nBrowser: "+browserError;}throw error;}finally{c?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true});}catch{}}
 }
