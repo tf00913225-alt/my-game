@@ -1,5 +1,9 @@
 /* Diagnostic only. Never imported by production bundles. Uses formal stat and skill owners. */
 function prepareWildBalanceReferenceParty(level,partySize=3){
+    // Preserve the canonical player-only balance baseline on the DEV preview host.
+    if(typeof window!=='undefined'&&window.location?.hostname==='dev.four-symbols-dev.pages.dev'&&!battleActive){
+        window.FourSymbolsHeroBattle?.setRoster([]);
+    }
     const budget=START_ATTRIBUTE_POINTS+(level-1)*5;
     const intelligence=Math.floor(budget*.35),vitality=Math.floor(budget*.2),energy=Math.floor(budget*.1),defensePoints=Math.floor(budget*.15),agility=Math.floor(budget*.15);
     const make=id=>({...player,id,level,element:'fire',attack:budget-intelligence-vitality-energy-defensePoints-agility,intelligence,vitality,energy,defensePoints,agility,
