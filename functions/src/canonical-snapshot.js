@@ -36,6 +36,51 @@ function digest(value){ return createHash("sha256").update(JSON.stringify(value)
 function snapshotDigest(value){ return digest(stable(value)); }
 function claimRecordsDigest(records){ return digest(stable(records)); }
 
+// Durable sources inherit ownership/revision from progress/current. The older
+// explicit in-memory input remains available, but two sources cannot coexist.
+function inspectPlayableState(records){
+    const fields=["heroAccount","bestiaryData","autoConfig","autoConfig2","autoConfig3",
+        "selectedCreationElement","lastSaveTimestamp"];
+    const stored=records.progress?.playableState;
+    let extra=records.playableState;
+    if(stored!==undefined){
+        if(extra!==undefined||!object(stored)||Object.keys(stored).length!==fields.length||
+           fields.some(key=>!Object.hasOwn(stored,key))){
+            fail("durable playable fields or duplicate source");
+        }
+        extra={schemaVersion:records.progress.schemaVersion,ownerUid:records.progress.ownerUid,
+            serverRevision:records.progress.serverRevision,provenance:records.progress.provenance,
+            ...stored};
+    }
+    const keys=["schemaVersion","ownerUid","serverRevision","provenance",...fields];
+    if(!object(extra)||Object.keys(extra).length!==keys.length||
+       keys.some(key=>!Object.hasOwn(extra,key))||extra.schemaVersion!==1||
+       extra.ownerUid!==records.account.ownerUid||extra.serverRevision!==records.account.serverRevision||
+       extra.provenance!==records.account.provenance||
+       !object(extra.heroAccount)||!object(extra.bestiaryData)||
+       !ELEMENTS.has(extra.selectedCreationElement)||
+       !Number.isSafeInteger(extra.lastSaveTimestamp)||extra.lastSaveTimestamp<1){
+        fail("complete playable source owner, revision or fields");
+    }
+    require("./cloud-save-policy").validateJsonValue(extra,"playable source",0);
+    const hero=require("./hero-core").normalizeAccountState(extra.heroAccount);
+    if(snapshotDigest(hero)!==snapshotDigest(extra.heroAccount)){
+        fail("Hero source would require defaults or discard fields");
+    }
+    for(const [name,row] of Object.entries(extra.bestiaryData)){
+        if(!name.trim()||name.length>128||!object(row)||
+           Object.keys(row).sort().join("|")!=="kills|seen"||typeof row.seen!=="boolean"||
+           !Number.isSafeInteger(row.kills)||row.kills<0||(!row.seen&&row.kills>0)){
+            fail("bestiary observation or kill count");
+        }
+    }
+    const configKeys=["autoConfig","autoConfig2","autoConfig3"];
+    const preferences=require("./cloud-preferences").normalizePreferences({
+        characterIds:records.account.slots.map((id,index)=>id===null?null:`slot-${index}`),
+        ...Object.fromEntries(configKeys.map(key=>[key,extra[key]]))});
+    return {extra,hero,preferences};
+}
+
 // The future protected writer supplies server-owned records at one revision.
 // This pure reader never reads a client candidate, changes Firestore, or
 // publishes a playable pointer. A recovery/claim gate must precede publication.
@@ -194,6 +239,7 @@ function assembleCanonicalSnapshot(uid,revision,records){
        !records.claimRecords.some(claim=>claim.status==="blocked")){
         fail("historical claims need a blocking record");
     }
+    if(records.progress.playableState!==undefined){inspectPlayableState(records);}
     const payload={schemaVersion:SCHEMA_VERSION,ownerUid:uid,
         sourceServerRevision:revision,provenance,slots:copy(slots),
         characters:copy(characters),economy:copy(records.economy),
@@ -237,27 +283,8 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
     const {validateJsonValue,validateLegacySaveCandidate}=require("./cloud-save-policy.js");
     validateJsonValue(records,"canonical sources",0);
     const source=assembleCanonicalSnapshot(uid,revision,records);
-    const extra=records.playableState;
-    const keys=["schemaVersion","ownerUid","serverRevision","provenance",
-        "heroAccount","bestiaryData","autoConfig","autoConfig2","autoConfig3",
-        "selectedCreationElement","lastSaveTimestamp"];
-    if(!object(extra)||Object.keys(extra).length!==keys.length||
-       keys.some(key=>!Object.hasOwn(extra,key))||extra.schemaVersion!==1||
-       extra.ownerUid!==uid||extra.serverRevision!==revision||
-       extra.provenance!==records.account.provenance||
-       !object(extra.heroAccount)||!object(extra.bestiaryData)||
-       !ELEMENTS.has(extra.selectedCreationElement)||
-       !Number.isSafeInteger(extra.lastSaveTimestamp)||extra.lastSaveTimestamp<1){
-        fail("complete playable source owner, revision or fields");
-    }
-    const hero=require("./hero-core.js").normalizeAccountState(extra.heroAccount);
-    if(snapshotDigest(hero)!==snapshotDigest(extra.heroAccount)){
-        fail("Hero source would require defaults or discard fields");
-    }
+    const {extra,hero,preferences}=inspectPlayableState(records);
     const configKeys=["autoConfig","autoConfig2","autoConfig3"];
-    const preferences=require("./cloud-preferences.js").normalizePreferences({
-        characterIds:records.account.slots.map((id,index)=>id===null?null:`slot-${index}`),
-        ...Object.fromEntries(configKeys.map(key=>[key,extra[key]]))});
     const slotKeys=["fire","player2","player3"];
     const characterEquipment={},characterSkillLoadouts={};
     const players=[null,null,null];

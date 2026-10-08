@@ -11,7 +11,7 @@ const plain=value=>value!==null&&typeof value==="object"&&!Array.isArray(value);
 
 // Only the player's choices cross this boundary. All progression is generated
 // here by the server. The callable accepts choices only, never progression.
-function makeInitialCharacterSources(uid,revision,operationId,selection){
+function makeInitialCharacterSources(uid,revision,operationId,selection,{recordedAt}={}){
     if(!plain(selection)||Object.keys(selection).sort().join("|")!==
         "attributes|displayName|element|gender"||
        typeof selection.displayName!=="string"||
@@ -31,6 +31,9 @@ function makeInitialCharacterSources(uid,revision,operationId,selection){
     const base={schemaVersion:1,ownerUid:uid,serverRevision:revision,
         provenance:"server-created"};
     const attributes=selection.attributes;
+    if(recordedAt!==undefined&&(!Number.isSafeInteger(recordedAt)||recordedAt<1)){
+        throw new Error("Invalid server creation timestamp.");
+    }
     const state={id:selection.displayName,element:selection.element,
         gender:selection.gender,level:1,exp:0,expNext:newcomerExpNext(1),
         ...Object.fromEntries(STAT_KEYS.map(key=>[key,attributes[key]])),
@@ -46,6 +49,12 @@ function makeInitialCharacterSources(uid,revision,operationId,selection){
         relicLoadout:{...base,relicId:null,subRelicId:null},
         progress:{...base,dailyQuestState:{},commissionQuestState:{},
             achievementState:{},gameplayProgress:{},abyssProgress:{},
+            ...(recordedAt===undefined?{}:{playableState:{
+                heroAccount:require("./hero-core").normalizeAccountState(null),
+                bestiaryData:{},
+                ...Object.fromEntries(["autoConfig","autoConfig2","autoConfig3"].map(key=>
+                    [key,{enabled:false,skill:"normal",hp:50,sp:25,returnToCityWhenEmpty:false}])),
+                selectedCreationElement:selection.element,lastSaveTimestamp:recordedAt}}),
             sidecars:Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>[
                 key,{status:"not-applicable",raw:null}]))},
         claimRecords:[],claimCheckpoint:{...base,claimCount:0,
