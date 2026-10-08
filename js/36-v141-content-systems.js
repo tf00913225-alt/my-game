@@ -703,6 +703,10 @@
             alert(item?canActuallyReforge(item,true):"裝備已失效或 UID 重複，請重新選擇裝備。");
             return false;
         }
+        if(typeof window.v132RunInventoryTransaction!=="function"||typeof window.v132ConsumeStackItem!=="function"||typeof saveGame!=="function"){
+            alert("冶煉交易或存檔系統尚未準備完成，無法安全扣除材料。");
+            return false;
+        }
         const slotCount=reforgeSlotCount(item);
         if(slotCount<=0){ alert("這件裝備沒有冶煉槽。"); return; }
         const locks=normalizeReforgeLocks(item).slice();
