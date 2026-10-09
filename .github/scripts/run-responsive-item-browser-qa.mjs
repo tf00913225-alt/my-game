@@ -127,6 +127,7 @@ async function run(chrome,url,live){
    }
    return {needed:false};
   };
+  if(!process.env.RESPONSIVE_GENERAL_UI_ONLY){
   for(const v of VIEWPORTS){
    await resize(v);await c.eval(`closeItemModal();showPage('home');showPage('inventory')`);await settle();
    const backpack=[];
@@ -257,12 +258,20 @@ async function run(chrome,url,live){
   await screenshot('acquisition-relic-360x640');await c.eval('v132CloseRewardModal()');
   evidence.push({relicAcquisition:true});console.log('PASS relic acquisition: Lv20 direct unlock / fragment Boss / Tower ancestry / read-only');
   await checkDisplay('late-features-reentry');
+  }
+  await c.eval("(async()=>{await FourSymbolsFeatures.ensure('skill','responsive-general-ui-qa');await FourSymbolsFeatures.ensure('relic','responsive-general-ui-qa')})()");
   // Phase 2 regressions use the final production owners, including lazy CSS.
   // A viewport fit is insufficient: general pages must have no transformed
   // ancestor, retain real CSS pixels, and actually reflow on wide displays.
   for(const v of DISPLAY_VIEWPORTS){
    await resize(v);await c.eval("closeItemModal();closeHomeFeature();showPage('home')");await settle();
    const home=await check('#homePage',v),nav=await check('#game-ui #bottomNav',v);
+   const visual=await c.eval(`(()=>{const home=homePage,s=getComputedStyle(home.querySelector('.home-bg-fixed-layer'));return {background:s.backgroundImage,scroll:home.scrollHeight-home.clientHeight,badge:home.querySelector('.home-version-badge').matches('#game-ui #homePage .home-version-badge')};})()`);
+   assert.match(visual.background,/assets\/ui\/home-background-v17344\.png/);
+   assert.doesNotMatch(visual.background,/home-background\.jpg/);
+   assert.ok(visual.badge,'version badge lost browser owner');
+   if(v[0]===390||v[0]===412){assert.ok(visual.scroll<=1,'unexpected mobile home page scroll '+visual.scroll);await screenshot('migration-home-'+v.join('x'));}
+
    const domain=await c.eval(`(()=>{const n=document.getElementById('homePage');const ancestors=[];for(let p=n;p;p=p.parentElement)ancestors.push(getComputedStyle(p).transform);return {parent:n.parentElement.id,ancestors,navParent:document.getElementById('bottomNav').parentElement.parentElement.id,resources:[...n.querySelectorAll('.home-hud-resources b,.v146-home-resource strong')].map(n=>parseFloat(getComputedStyle(n).fontSize))};})()`);
    assert.equal(domain.parent,'game-ui');assert.equal(domain.navParent,'game-ui');
    assert.ok(domain.ancestors.every(t=>t==='none'),'browser UI inherited a transform');
@@ -282,6 +291,24 @@ async function run(chrome,url,live){
    await c.eval("openHomeFeature('character')");await settle();
    const character=await check('#homeFeatureModal .home-feature-modal-box',v);
    assert.ok(character.rect.width<=961,'character ignored shared Large Panel limit');
+   const tabs=[];
+   for(const tab of ['expPool','status','skill']){
+    await c.eval(`switchCharacterTab(${JSON.stringify(tab)})`);await settle();
+    const geometry=await c.eval(`(()=>{const content=characterTabContent,bar=document.querySelector('.character-tab-row'),s=getComputedStyle(content),b=bar.getBoundingClientRect(),r=content.getBoundingClientRect();return {tabBottom:b.bottom,contentTop:r.top,overflowY:s.overflowY,overflowX:s.overflowX,touch:s.touchAction,outerScroll:homeFeatureModalBody.scrollHeight-homeFeatureModalBody.clientHeight};})()`);
+    assert.ok(geometry.tabBottom<=geometry.contentTop,'character tab overlaps '+tab);
+    assert.equal(geometry.overflowY,'auto');assert.equal(geometry.overflowX,'hidden');assert.equal(geometry.touch,'pan-y');assert.ok(geometry.outerScroll<=1,'nested character scroll');tabs.push({tab,...geometry});
+   }
+   await c.eval('characterTabContent.scrollTop=0');await settle();
+   const first=await c.eval(`(()=>{const n=document.querySelector('#allSkillsList > :first-child'),r=n.getBoundingClientRect(),c=characterTabContent.getBoundingClientRect();return {top:r.top,bottom:r.bottom,visibleTop:c.top,visibleBottom:c.bottom};})()`);
+   assert.ok(first.top>=first.visibleTop-1,'first skill covered by tab');
+   await c.eval(`document.querySelector('#allSkillsList > :last-child').scrollIntoView({block:'end'})`);await settle();
+   await check('#allSkillsList > :last-child',v);
+   await c.eval('characterTabContent.scrollTop=0');await settle();
+   if(v[0]===390||v[0]===412)await screenshot('migration-skill-'+v.join('x'));
+   await c.eval("closeHomeFeature();openHomeFeature('character');switchCharacterTab('skill');selectCharacterForTabs(0)");await settle();
+   const reopen=await c.eval(`document.querySelector('.character-tab-row').getBoundingClientRect().bottom<=characterTabContent.getBoundingClientRect().top`);assert.ok(reopen,'reopened character overlap');
+   evidence.push({visual,characterTabs:tabs,first,reopen,viewport:v});
+
    await c.eval("closeHomeFeature();openHomeFeature('shop')");await settle();
    const shopGrid=await check('.shop-potion-list',v);
    if(v[0]>=1100)assert.ok(shopGrid.columns.split(' ').length>=3,'desktop shop grid remained mobile columns');
@@ -295,6 +322,29 @@ async function run(chrome,url,live){
    if(v[0]>=1100)assert.ok(relicGrid.columns.split(' ').length>=3,'desktop relic grid remained mobile columns');
    await c.eval("closeHomeFeature();showPage('home')");
    evidence.push({generalUi:true,viewport:v,home,nav,bag,character,domain,entrance,shopGrid,relicGrid});
+  }
+  for(const v of [[390,844],[412,915],[1366,768],[1920,1080]]){
+   await resize(v);
+   for(const feature of ['forge','synthesis','autoBattleSettings','quest','announcement','system','rest']){
+    await c.eval(`closeHomeFeature();openHomeFeature(${JSON.stringify(feature)})`);await settle();
+    await check('#homeFeatureModal .home-feature-modal-box',v);
+    assert.equal(await c.eval("homeFeatureModal.parentElement.id"),'game-ui');
+    if(feature==='autoBattleSettings'){
+     const stacking=await c.eval("({ui:Number(getComputedStyle(document.getElementById('game-ui')).zIndex),stage:Number(getComputedStyle(document.getElementById('game-stage')).zIndex)})");
+     assert.ok(stacking.ui>stacking.stage,'element box raised obsolete stage ancestor');
+    }
+   }
+   await c.eval("closeHomeFeature();showPage('inventory');openInventoryCharacterDetail()");await settle();await check('#inventoryCharacterDetailModal .item-modal-box',v);
+   await c.eval("closeInventoryCharacterDetail();closeMapInventoryOverlay();openHomeFeature('character');switchCharacterTab('skill');showSkillDetail('fireRocket')");await settle();await check('#skillDetailModal .item-modal-box',v);
+   await c.eval("closeSkillDetail();switchCharacterTab('status');showStatusHelp()");await settle();await check('#statusHelpModal .item-modal-box',v);
+   await c.eval("closeStatusHelp();closeHomeFeature();showPage('home')");
+   const loaded=new Promise(resolve=>{const listener=event=>{const message=JSON.parse(String(event.data));if(message.method==='Page.loadEventFired'){c.ws.removeEventListener('message',listener);resolve();}};c.ws.addEventListener('message',listener);});
+   await c.send('Page.reload',{ignoreCache:true});await loaded;await c.eval(PREPARE);await c.eval(INSTALL_MEASURE);await settle();
+   const reloaded=await c.eval("({background:getComputedStyle(document.querySelector('.home-bg-fixed-layer')).backgroundImage,roots:document.querySelectorAll('#game-ui').length})");
+   assert.match(reloaded.background,/home-background-v17344\.png/);assert.equal(reloaded.roots,1);
+   await c.eval("openHomeFeature('character');switchCharacterTab('skill')");await settle();
+   assert.ok(await c.eval("document.querySelector('.character-tab-row').getBoundingClientRect().bottom<=characterTabContent.getBoundingClientRect().top"),'reload character overlap');
+   await c.eval('closeHomeFeature()');evidence.push({familyAndReload:true,viewport:v,reloaded});
   }
   console.log('PASS general browser UI: eight widths, desktop reflow, reading size, shared panel and native return');
   const visibility=await c.eval(`(async()=>{const source=document.getElementById('gameInterface'),ui=document.getElementById('game-ui'),previous=source.style.display;source.style.display='none';await new Promise(requestAnimationFrame);const hidden=ui.hidden;source.style.display=previous;await new Promise(requestAnimationFrame);return {hidden,restored:!ui.hidden,roots:document.querySelectorAll('#game-ui').length};})()`);
@@ -314,5 +364,5 @@ try{
  }else {local=await startServer();url=local.url;}
  const evidence=await run(findChrome(),url,live);
  fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:live?'deployed-site':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||null,evidence},null,2)+'\n');
- console.log('Responsive Item real runtime QA PASS: 6/6 viewports + manual revival');
+ console.log(process.env.RESPONSIVE_GENERAL_UI_ONLY?'General UI migration QA PASS: visual owner, tabs, family and reload':'Responsive Item real runtime QA PASS: 6/6 viewports + manual revival + general UI migration');
 }catch(error){fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:false,error:String(error.stack||error),evidence:error.evidence||[]},null,2)+'\n');throw error;}finally{local?.server.close();}

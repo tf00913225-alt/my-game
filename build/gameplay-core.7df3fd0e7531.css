@@ -1957,7 +1957,7 @@
     to{ transform:scale(1.18); opacity:1; }
 }
 
-#game-stage #expDistributeList{
+:is(#game-stage,#game-ui) #expDistributeList{
     display:flex;
     flex-direction:column;
     gap:7px;
@@ -2100,16 +2100,16 @@
 
 .v131-element-box-stats .remaining strong{ color:#ffdf69; }
 
-#game-stage #characterTabContent,
+#game-ui #characterTabContent,
 :is(#game-stage,#game-ui) #homeExpPoolCard,
 :is(#game-stage,#game-ui) #statusPage,
 :is(#game-stage,#game-ui) #skillPage{
     font-size:15px;
 }
 
-#game-stage #characterTabContent p,
-#game-stage #characterTabContent small,
-#game-stage #characterTabContent .description,
+#game-ui #characterTabContent p,
+#game-ui #characterTabContent small,
+#game-ui #characterTabContent .description,
 :is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-caption{
     font-size:14px !important;
     line-height:1.55 !important;
@@ -2188,7 +2188,7 @@
     padding:14px 8px !important;
 }
 
-#game-stage .stat-explanation{
+:is(#game-stage,#game-ui) .stat-explanation{
     font-size:14px !important;
     line-height:1.7 !important;
 }
@@ -4660,7 +4660,7 @@
 /* Status floating text is owned by css/battle-floating-feedback-owner.css. */
 /* Growth reminders use the shared notification-dot presentation contract in
    css/38.  This file only keeps the attention target fully composited. */
-#game-stage .v146-growth-attention-target{
+:is(#game-stage,#game-ui) .v146-growth-attention-target{
     opacity:1 !important;
     filter:none !important;
 }
@@ -4672,7 +4672,7 @@
 
 
 :is(#game-stage,#game-ui) .shop-potion-purchase-row{display:grid !important;grid-template-columns:auto 52px minmax(70px,1fr) 64px !important;gap:5px !important;align-items:center !important;}
-#game-stage .v146-shop-total{min-width:0;color:#f3cf79;font-size:13px;line-height:17px;font-weight:900;text-align:right;white-space:nowrap;}
+#game-ui .v146-shop-total{min-width:0;color:#f3cf79;font-size:13px;line-height:17px;font-weight:900;text-align:right;white-space:nowrap;}
 
 
 #game-stage #dungeonPage.v146-abyss-active{padding:0 0 82px !important;background:#090806;}
@@ -4717,7 +4717,7 @@
     animation:v173ExpChargeFloat 1.45s ease-out both;
 }
 @keyframes v173ExpChargeFloat{0%{opacity:0;transform:translateY(5px)}15%{opacity:1}100%{opacity:0;transform:translateY(-18px)}}
-#game-stage #expDistributeList .v173-exp-row-meta{
+:is(#game-stage,#game-ui) #expDistributeList .v173-exp-row-meta{
     grid-column:1/-1;
     display:flex;
     align-items:center;
@@ -4727,7 +4727,7 @@
     font-size:14px;
     line-height:1.4;
 }
-#game-stage #expDistributeList .v173-exp-row-meta b{
+:is(#game-stage,#game-ui) #expDistributeList .v173-exp-row-meta b{
     margin-left:auto;
     padding:2px 6px;
     border:1px solid rgba(200,153,69,.58);
@@ -4758,7 +4758,7 @@
     font-size:15px !important;
     line-height:1.5 !important;
 }
-#game-stage #homeRestCard > div{
+:is(#game-stage,#game-ui) #homeRestCard > div{
     font-size:15px !important;
     line-height:1.55 !important;
 }
@@ -4862,7 +4862,7 @@
 }
 @media (max-width:380px){
     :is(#game-stage,#game-ui) .shop-potion-purchase-row{grid-template-columns:auto 48px minmax(62px,1fr) 58px !important;gap:3px !important;}
-    #game-stage .v146-shop-total{font-size:13px;}
+    #game-ui .v146-shop-total{font-size:13px;}
 }
 @media (prefers-reduced-motion:reduce){
     .v146-area-impact,#game-stage .v141-abyss-map.v146-too-far,.v173-exp-charge-float{animation-duration:.01ms !important;animation-iteration-count:1 !important;}
@@ -5383,7 +5383,7 @@
 }
 
 /* Keep Element Box settings above every document-level battle effect. */
-body.v162-element-box-settings-open #game-stage{
+body.v162-element-box-settings-open #game-ui{
     z-index:2147483644 !important;
 }
 body.v162-element-box-settings-open #homeFeatureModal,
@@ -5463,11 +5463,6 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage .v17342-element-box-use-notice.show{
     opacity:1;
     transform:translateY(0);
-}
-
-/* Current main-city production background. */
-#game-stage .home-bg-fixed-layer{
-    background-image:url("../assets/ui/home-background-v17344.png") !important;
 }
 
 /* The older equipment-specific shorthand kept background-size:auto 84%.
@@ -6497,6 +6492,13 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     min-height:0 !important;
     overflow:hidden !important;
 }
+/* Header and tabs remain in normal flow; only tab content may shrink/scroll. */
+#game-ui #homeFeatureModal .character-showcase-row{
+    display:flex;flex:0 0 auto;gap:10px;justify-content:center;margin-bottom:8px;
+}
+#game-ui #homeFeatureModal .character-tab-row{
+    display:flex;flex:0 0 auto;gap:6px;margin-bottom:6px;
+}
 #game-ui #homeFeatureModal #characterTabContent{
     flex:1 1 auto !important;
     height:auto !important;
@@ -7348,7 +7350,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 
 :is(#game-stage,#game-ui) .home-feature-modal-title,
 :is(#game-stage,#game-ui) .item-modal-name,
-:is(#game-stage,#game-ui) .inventory-classic-title,
+#game-ui .inventory-classic-title,
 #game-stage .creation-skill-detail-header,
 #game-stage .v132-reward-modal-title,
 .v169-rpg-dialog h2,
@@ -7367,10 +7369,10 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 
 #game-ui #homeFeatureModalBody,
 :is(#game-stage,#game-ui) .item-stat-list,
-:is(#game-stage,#game-ui) #itemModalStats,
-:is(#game-stage,#game-ui) #skillDetailStats,
-:is(#game-stage,#game-ui) .inventory-stats-panel,
-:is(#game-stage,#game-ui) .inventory-character-detail-row,
+#game-ui #itemModalStats,
+#game-ui #skillDetailStats,
+#game-ui .inventory-stats-panel,
+#game-ui .inventory-character-detail-row,
 :is(#game-stage,#game-ui) .system-panel,
 :is(#game-stage,#game-ui) .quest-card,
 :is(#game-stage,#game-ui) .v141-synthesis-card,

@@ -327,7 +327,7 @@
     to{ transform:scale(1.18); opacity:1; }
 }
 
-#game-stage #expDistributeList{
+:is(#game-stage,#game-ui) #expDistributeList{
     display:flex;
     flex-direction:column;
     gap:7px;
@@ -470,16 +470,16 @@
 
 .v131-element-box-stats .remaining strong{ color:#ffdf69; }
 
-#game-stage #characterTabContent,
+#game-ui #characterTabContent,
 :is(#game-stage,#game-ui) #homeExpPoolCard,
 :is(#game-stage,#game-ui) #statusPage,
 :is(#game-stage,#game-ui) #skillPage{
     font-size:15px;
 }
 
-#game-stage #characterTabContent p,
-#game-stage #characterTabContent small,
-#game-stage #characterTabContent .description,
+#game-ui #characterTabContent p,
+#game-ui #characterTabContent small,
+#game-ui #characterTabContent .description,
 :is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-caption{
     font-size:14px !important;
     line-height:1.55 !important;
@@ -558,7 +558,7 @@
     padding:14px 8px !important;
 }
 
-#game-stage .stat-explanation{
+:is(#game-stage,#game-ui) .stat-explanation{
     font-size:14px !important;
     line-height:1.7 !important;
 }

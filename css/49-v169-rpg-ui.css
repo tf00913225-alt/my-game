@@ -512,6 +512,13 @@
     min-height:0 !important;
     overflow:hidden !important;
 }
+/* Header and tabs remain in normal flow; only tab content may shrink/scroll. */
+#game-ui #homeFeatureModal .character-showcase-row{
+    display:flex;flex:0 0 auto;gap:10px;justify-content:center;margin-bottom:8px;
+}
+#game-ui #homeFeatureModal .character-tab-row{
+    display:flex;flex:0 0 auto;gap:6px;margin-bottom:6px;
+}
 #game-ui #homeFeatureModal #characterTabContent{
     flex:1 1 auto !important;
     height:auto !important;
@@ -1363,7 +1370,7 @@
 
 :is(#game-stage,#game-ui) .home-feature-modal-title,
 :is(#game-stage,#game-ui) .item-modal-name,
-:is(#game-stage,#game-ui) .inventory-classic-title,
+#game-ui .inventory-classic-title,
 #game-stage .creation-skill-detail-header,
 #game-stage .v132-reward-modal-title,
 .v169-rpg-dialog h2,
@@ -1382,10 +1389,10 @@
 
 #game-ui #homeFeatureModalBody,
 :is(#game-stage,#game-ui) .item-stat-list,
-:is(#game-stage,#game-ui) #itemModalStats,
-:is(#game-stage,#game-ui) #skillDetailStats,
-:is(#game-stage,#game-ui) .inventory-stats-panel,
-:is(#game-stage,#game-ui) .inventory-character-detail-row,
+#game-ui #itemModalStats,
+#game-ui #skillDetailStats,
+#game-ui .inventory-stats-panel,
+#game-ui .inventory-character-detail-row,
 :is(#game-stage,#game-ui) .system-panel,
 :is(#game-stage,#game-ui) .quest-card,
 :is(#game-stage,#game-ui) .v141-synthesis-card,
