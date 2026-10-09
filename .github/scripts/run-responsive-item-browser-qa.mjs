@@ -56,6 +56,8 @@ async function run(chrome,url,live){
    c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,body=stubs.get('/'+new URL(p.request.url).pathname.slice(new URL('.',url).pathname.length));c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:{requestId:p.requestId}).catch(error=>console.error(error));}});
    await c.send('Fetch.enable',{patterns:[...stubs.keys()].map(p=>({urlPattern:'*'+p+'*',resourceType:'Script'}))});
   }
+  // Same isolated-account reload reset used by foreground-potion QA. Never touches a player UID.
+  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:"for(const key of Object.keys(localStorage)){if(key.startsWith('four_symbols_save:skill-runtime-browser-qa')||key.startsWith('four_symbols_save_meta:skill-runtime-browser-qa'))localStorage.removeItem(key);}"});
   await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')});
   const resize=async v=>{await c.send('Emulation.setDeviceMetricsOverride',{width:v[0],height:v[1],deviceScaleFactor:1,mobile:true,screenWidth:v[0],screenHeight:v[1]});await settle();};
   await resize(VIEWPORTS[0]);await c.send('Page.navigate',{url});
