@@ -298,11 +298,13 @@ async function run(chrome,url,live){
     await c.eval(`switchCharacterTab(${JSON.stringify(tab)})`);await settle();
     const geometry=await c.eval(`(()=>{const content=characterTabContent,bar=document.querySelector('.character-tab-row'),s=getComputedStyle(content),b=bar.getBoundingClientRect(),r=content.getBoundingClientRect();return {tabBottom:b.bottom,contentTop:r.top,overflowY:s.overflowY,overflowX:s.overflowX,touch:s.touchAction,outerScroll:homeFeatureModalBody.scrollHeight-homeFeatureModalBody.clientHeight};})()`);
     assert.ok(geometry.tabBottom<=geometry.contentTop,'character tab overlaps '+tab);
+    if(tabs.length)assert.ok(Math.abs(geometry.tabBottom-tabs[0].tabBottom)<1,'contextual header changed tab geometry '+tab);
     assert.equal(geometry.overflowY,'auto');assert.equal(geometry.overflowX,'hidden');assert.equal(geometry.touch,'pan-y');assert.ok(geometry.outerScroll<=1,'nested character scroll');tabs.push({tab,...geometry});
    }
    await c.eval('characterTabContent.scrollTop=0');await settle();
    const first=await c.eval(`(()=>{const n=document.querySelector('#allSkillsList > :first-child'),r=n.getBoundingClientRect(),c=characterTabContent.getBoundingClientRect();return {top:r.top,bottom:r.bottom,visibleTop:c.top,visibleBottom:c.bottom};})()`);
    assert.ok(first.top>=first.visibleTop-1,'first skill covered by tab');
+   assert.ok(first.bottom<=first.visibleBottom+1,'first skill card clipped');
    await c.eval(`document.querySelector('#allSkillsList > :last-child').scrollIntoView({block:'end'})`);await settle();
    await check('#allSkillsList > :last-child',v);
    await c.eval('characterTabContent.scrollTop=0');await settle();

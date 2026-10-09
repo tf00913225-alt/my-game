@@ -6492,6 +6492,11 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     min-height:0 !important;
     overflow:hidden !important;
 }
+/* Reserve the two existing 38px action rows plus their 6px gap, including
+   tabs where the contextual preview action is hidden. */
+#game-ui #homeFeatureModal .home-feature-modal-box.wide .home-feature-modal-title > div{
+    min-height:calc(38px + 6px + 38px);
+}
 /* Header and tabs remain in normal flow; only tab content may shrink/scroll. */
 #game-ui #homeFeatureModal .character-showcase-row{
     display:flex;flex:0 0 auto;gap:10px;justify-content:center;margin-bottom:8px;
