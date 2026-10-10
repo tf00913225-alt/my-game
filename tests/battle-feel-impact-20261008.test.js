@@ -21,7 +21,7 @@ for(const kind of ["damage","criticalDamage","miss","heal","sp","shield","status
     f.timers.forEach(fn=>fn());
     const damage=kind==="damage"||kind==="criticalDamage";
     assert.equal(f.motions.length,damage?1:0);
-    if(damage){assert.equal(f.motions[0].options.duration,140);assert.equal(f.motions[0].frames[1].translate,kind==="criticalDamage"?"0px -5px":"0px -4px");}
+    if(damage){assert.equal(f.motions[0].options.duration,140);assert.equal(f.motions[0].frames[1].translate,kind==="criticalDamage"?"0px -5px":"0px -4px");assert.equal(f.motions[0].frames[0].filter,"brightness(0) invert(1)");assert.equal(f.motions[0].frames[2].offset,80/140);assert.equal(f.motions[0].frames[2].filter,"none");}
     const sound={damage:"damage",criticalDamage:"crit",miss:"dodge",shield:"block"}[kind];
     assert.deepEqual(f.sounds,sound?[sound]:[]);
 }

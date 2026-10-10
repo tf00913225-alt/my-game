@@ -478,3 +478,6 @@
 #game-stage #battlePage .battle-monster.v143-unit-stealthed > .v174-battle-art{
     opacity:.35 !important;
 }
+:root{--battle-hp-loss-color:#e9b86b;}
+#battlePage .monster-hp-inner,#battlePage .hp-bar-inner{transition:none;}
+.v143-hp-damage-trail{position:absolute;top:0;height:100%;background:var(--battle-hp-loss-color);pointer-events:none;}
