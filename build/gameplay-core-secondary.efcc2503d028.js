@@ -7157,7 +7157,7 @@
 .v169-equipment-art:is(.v17346-rarity-purple,.v169-rarity-purple){--equipment-rarity-fill:rgba(176,92,255,.25)}
 .v169-equipment-art:is(.v17346-rarity-orange,.v169-rarity-orange){--equipment-rarity-fill:rgba(255,159,56,.25)}
 .v169-equipment-art:is(.v17346-rarity-pink,.v169-rarity-pink){--equipment-rarity-fill:rgba(255,79,167,.25)}
-.v169-equipment-art:is(.v17346-rarity-four-symbol,.v169-rarity-four-symbol){--equipment-rarity-fill:conic-gradient(from 0deg,rgba(66,165,255,.25) 0 25%,rgba(71,214,163,.25) 25% 50%,rgba(200,155,69,.25) 50% 75%,rgba(255,90,54,.25) 75% 100%)}
+.v169-equipment-art:is(.v17346-rarity-four-symbol,.v169-rarity-four-symbol){--equipment-rarity-fill:conic-gradient(from 0deg,rgba(66,165,255,.25) 0%,rgba(71,214,163,.25) 25%,rgba(200,155,69,.25) 50%,rgba(255,90,54,.25) 75%,rgba(66,165,255,.25) 100%)}
 .v169-equipment-art{background:var(--equipment-rarity-fill,#090807)}
 .v17346-rarity-white:not(.inventory-backpack-rarity-neutral){border:2px solid #D8D8D8!important;box-shadow:0 0 7px rgba(216,216,216,.55)!important}
 .v17346-rarity-blue:not(.inventory-backpack-rarity-neutral){border:2px solid #42A5FF!important;box-shadow:0 0 9px rgba(66,165,255,.7)!important}
