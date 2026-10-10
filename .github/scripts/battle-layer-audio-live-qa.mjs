@@ -1353,12 +1353,12 @@ try{
         if(typeof openHomeFeature==='function'){openHomeFeature('autoBattleSettings');opened='openHomeFeature';}
         else if(typeof openAutoBattleSettings==='function'){openAutoBattleSettings();opened='openAutoBattleSettings';}
         const stage=document.getElementById('v143-skill-stage');
-        const gameStage=document.getElementById('game-stage');
+        const gameUi=document.getElementById('game-ui');
         const modal=document.getElementById('homeFeatureModal');
         const panel=document.getElementById('autoBattleSettingsPanel');
         const modalBody=document.getElementById('homeFeatureModalBody');
         const stageStyle=stage?getComputedStyle(stage):null;
-        const gameStageStyle=gameStage?getComputedStyle(gameStage):null;
+        const gameUiStyle=gameUi?getComputedStyle(gameUi):null;
         const modalStyle=modal?getComputedStyle(modal):null;
         const panelStyle=panel?getComputedStyle(panel):null;
         return {
@@ -1373,7 +1373,8 @@ try{
                 stageVisibility:stageStyle?.visibility||null,
                 stageOpacity:stageStyle?.opacity||null,
                 stageZ:Number(stageStyle?.zIndex||0),
-                gameStageZ:Number(gameStageStyle?.zIndex||0),
+                gameUiZ:Number(gameUiStyle?.zIndex||0),
+                modalParent:modal?.parentElement?.id||null,
                 modalShow:!!modal?.classList.contains('show'),
                 modalConnected:!!modal?.isConnected,
                 panelConnected:!!panel?.isConnected,
@@ -1402,7 +1403,8 @@ try{
     assert.equal(elementBoxLayers.stageSkill,"explosiveFlurry","Element Box overlap must inspect the intended V143 skill stage");
     assert.equal(elementBoxLayers.stageVisibility,"hidden","Skill presentation must be hidden while Element Box settings owns focus");
     assert.equal(Number(elementBoxLayers.stageOpacity),0,"Skill presentation opacity must be zero while Element Box settings owns focus");
-    assert.ok(elementBoxLayers.gameStageZ>elementBoxLayers.stageZ,"Game/Element Box stacking context must be above the document-level V143 skill stage");
+    assert.equal(elementBoxLayers.modalParent,"game-ui","Element Box must use the migrated browser UI boundary");
+    assert.ok(elementBoxLayers.gameUiZ>elementBoxLayers.stageZ,"Game/Element Box stacking context must be above the document-level V143 skill stage");
     assert.equal(elementBoxLayers.modalShow,true,"The shared Element Box modal must be in its real open state");
     assert.equal(elementBoxLayers.modalConnected,true,"The shared Element Box modal must remain connected to the document");
     assert.equal(elementBoxLayers.panelConnected,true,"The real Element Box settings panel must remain connected to the document");
