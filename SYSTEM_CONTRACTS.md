@@ -58,7 +58,7 @@
 - Fixed Slot 只擁有站位、幾何、點擊、HUD（資訊介面）與 VFX 錨點；不得重新成為可見卡框。
 - `FourSymbolsBattlefieldSlots` 是格位與範圍幾何唯一 owner（控制來源）；`battlefield-render-geometry-adapter.js` 只投影 DOM（文件物件模型）；`FourSymbolsBattlePresentation` 只裝飾立繪與瞬時回饋。
 - 動態生成單位必須在插入 DOM 當下套用正式 presentation（呈現），不得依賴輪詢修正。
-- Direct Damage Impact Presentation 由 V143 Hit Frame 同步投影 artwork-only Impact Recoil（僅 `.v174-battle-art`，140ms，前80ms短反白）、Floating Feedback、Impact SFX 與已結算 HP／Shield。HP紅條立即投影正式值；V143依正式HP減少量與最終HUD分母畫260ms暖色傷害殘留段，Boss護盾改變分母不視為失血，回血／重建身份／dispose清理舊殘留。`.red-hit`、root card shake、`v174-hit-shake` 永久 RETIRED；Heal／SP／Shield Gain／Status-only／DOT 不使用直接傷害recoil／反白，MISS 使用既有 dodge。Gameplay settlement 維持同步。
+- Direct Damage Impact Presentation 由 V143 Hit Frame 同步投影 artwork-only Impact Recoil（僅 `.v174-battle-art`，140ms），同一V143 Owner於命中時獨立反白兩次（每次80ms，中間40ms恢復原色，總長200ms，不延長Gameplay gate）、Floating Feedback、Impact SFX 與已結算 HP／Shield。HP紅條立即投影正式值；V143依正式HP減少量與最終HUD分母畫260ms暖色傷害殘留段，Boss護盾改變分母不視為失血，回血／重建身份／dispose清理舊殘留。`.red-hit`、root card shake、`v174-hit-shake` 永久 RETIRED；Heal／SP／Shield Gain／Status-only／DOT 不使用直接傷害recoil／反白，MISS 使用既有 dodge。Gameplay settlement 維持同步。
 - 玩家與普通敵方共用資源條高度與 HUD 錨點；Boss 可使用自己的大型 HP／Shield HUD。
 - Target Reticle（目標準星）由 Fixed Slot V2 唯一投影；敵方、我方、Boss、援軍與可破壞 Boss object 共用同一金色準星。歷史 `::after` 準星不得與正式 `::before` 準星並存。
 - Status Icon（狀態圖示）HUD 必須位於 HP／SP 資源條之上，正式 24px Icon 不得被塞入低於自身高度的容器或被資源條 z-index 蓋住。
