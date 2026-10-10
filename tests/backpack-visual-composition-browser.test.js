@@ -29,7 +29,7 @@ const equipmentProgressionSource=fs.readFileSync(path.join(root,"js/equipment-pr
 const functionalFixesSource=fs.readFileSync(path.join(root,"js/58-v173.63-functional-fixes.js"),"utf8");
 const injectedRarityMatch=equipmentProgressionSource.match(/\.v17346-rarity-white[\s\S]*?@keyframes v17360FourSymbolRarityBreath\{[\s\S]*?\}/);
 assert.ok(injectedRarityMatch,"fixture must source v17346 rarity CSS from equipment-progression.js");
-const injectedMaterialMatch=functionalFixesSource.match(/#game-stage \.v169-material-art:not\(\.inventory-backpack-rarity-neutral\)[\s\S]*?(?=#game-stage \.v17363-text-reward-preview)/);
+const injectedMaterialMatch=functionalFixesSource.match(/:is\(#game-stage,#game-ui\) \.v169-material-art:not\(\.inventory-backpack-rarity-neutral\)[\s\S]*?(?=#game-stage \.v17363-text-reward-preview)/);
 assert.ok(injectedMaterialMatch,"fixture must source material rarity CSS from js/58 runtime injection");
 const styles=stylePaths.map(file=>`<link rel="stylesheet" href="${file}">`).join("")+`<style id="equipment-progression-style">${injectedRarityMatch[0]}</style><style id="functional-material-style">${injectedMaterialMatch[0]}</style>`;
 const equipmentArt='<span class="v169-item-art v169-equipment-art v169-rarity-orange v17346-rarity-orange inventory-backpack-rarity-neutral"><img alt="裝備" src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'64\' height=\'64\'%3E%3Crect width=\'64\' height=\'64\' fill=\'%23c88f30\'/%3E%3C/svg%3E"></span>';
