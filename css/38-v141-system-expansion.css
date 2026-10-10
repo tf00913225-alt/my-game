@@ -154,7 +154,7 @@
     border:0;
     border-radius:0;
     box-shadow:none;
-    background:transparent;
+    background:var(--equipment-rarity-fill,transparent)!important;
     animation:none;
 }
 

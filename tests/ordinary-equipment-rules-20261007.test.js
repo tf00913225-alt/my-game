@@ -27,14 +27,18 @@ test('independent shop and chest tables total 100 and deterministic boundaries e
 });
 test('fixed catalog owns every ordinary name, legal stat, rarity and image',()=>{
  const c=fixture(),catalog=plain(c.v17346GetEquipmentCatalog());
- assert.equal(catalog.length,576);assert.equal(new Set(catalog.map(x=>x.name)).size,576);
+ assert.equal(catalog.length,661);assert.equal(new Set(catalog.map(x=>x.name)).size,661);
  const manifest=JSON.parse(fs.readFileSync('docs/equipment-catalog-20261008.json','utf8'));
- assert.deepEqual(catalog,manifest.equipment);assert.equal(manifest.images.length,144);
+ assert.deepEqual(catalog,manifest.equipment);assert.equal(manifest.images.length,301);
+ assert.deepEqual(Object.fromEntries(Object.keys(ranges).map(key=>[key,catalog.filter(x=>x.rarityKey===key).length])),{white:91,blue:90,purple:240,orange:240});
+ assert.equal(manifest.images.filter(x=>x.legacy&&x.classType==='warrior').length,90);
+ assert.equal(manifest.images.filter(x=>x.legacy&&x.classType==='mage').length,91);
+ assert.equal(new Set(manifest.images.filter(x=>x.legacy).map(x=>x.rgbaSha256)).size,181);
  for(const image of manifest.images){
-  const entries=catalog.filter(x=>x.assetPath===image.assetPath);assert.equal(entries.length,4);
-  assert.deepEqual(entries.map(x=>x.rarityKey),image.legacy?['white','white','blue','blue']:['purple','purple','orange','orange']);
+  const entries=catalog.filter(x=>x.assetPath===image.assetPath);assert.equal(entries.length,image.legacy?1:4);
+  assert.deepEqual(entries.map(x=>x.rarityKey),image.legacy?[image.rarityKey]:['purple','purple','orange','orange']);
   assert.ok(fs.existsSync(image.assetPath),image.assetPath);
-  if(!image.legacy)assert.match(image.assetPath,/\.webp$/);
+  assert.match(image.assetPath,/\.webp$/);
  }
  for(const entry of catalog){
   const pool=catalog.filter(x=>x.rarityKey===entry.rarityKey&&x.classType===entry.classType&&x.type===entry.type);

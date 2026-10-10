@@ -1,6 +1,6 @@
 {
-  "workId": "EQUIPMENT-CATALOG-20261008",
-  "baseDev": "27a7e0371f1538328fc509e5154fd86408cdc911",
+  "workId": "EQUIPMENT-OLD-ICON-TINT-20261010",
+  "baseDev": "10636f606300c2a1e39e47f3deb16d0c812272ea",
   "assetsLibrary": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
   "images": [
     {
@@ -1686,365 +1686,4349 @@
     {
       "classType": "warrior",
       "index": 1,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto1.png",
+      "assetPath": "assets/equipment/warrior/legacy-001.webp",
+      "slot": "head",
+      "theme": "鉚鐵戰盔",
       "legacy": true,
-      "source": "assets/equipment/warrior/armor-01.png",
-      "assetPath": "assets/equipment/warrior/armor-01.png",
-      "type": "armor",
-      "theme": "棕革",
-      "weaponKind": null,
-      "size": [
-        245,
-        248
-      ],
-      "sha256": "a9221a79d4ec91f895f46dfa2510896f916db8dd863b077e9f6d47792e00406b"
+      "rarityKey": "white",
+      "width": 198,
+      "height": 241,
+      "rgbaSha256": "79072df848266d6054350df8f71aab0407c6092fa750798d9eb37405bc575c2f",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     },
     {
       "classType": "warrior",
       "index": 2,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto10.png",
+      "assetPath": "assets/equipment/warrior/legacy-002.webp",
+      "slot": "head",
+      "theme": "牛角戰盔",
       "legacy": true,
-      "source": "assets/equipment/warrior/armor-02.png",
-      "assetPath": "assets/equipment/warrior/armor-02.png",
-      "type": "armor",
-      "theme": "青鋼",
-      "weaponKind": null,
-      "size": [
-        246,
-        249
-      ],
-      "sha256": "3e5107292f1bdacdc64bb4e004ba88988d36154c1c1e89fc7180059710da2a26"
+      "rarityKey": "white",
+      "width": 254,
+      "height": 248,
+      "rgbaSha256": "a5c547214ee161a69532fb5d39ea776588b0abcced794d6fc3417727a2776edc",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     },
     {
       "classType": "warrior",
       "index": 3,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto11.png",
+      "assetPath": "assets/equipment/warrior/legacy-003.webp",
+      "slot": "head",
+      "theme": "銀羽藍晶戰盔",
       "legacy": true,
-      "source": "assets/equipment/warrior/bracer-01.png",
-      "assetPath": "assets/equipment/warrior/bracer-01.png",
-      "type": "shoulder",
-      "theme": "皮紋",
-      "weaponKind": null,
-      "size": [
-        236,
-        271
-      ],
-      "sha256": "d040d160e6b8b577b1d7a309d048bb65586d2e0db986902c276490a938181c47"
+      "rarityKey": "blue",
+      "width": 250,
+      "height": 287,
+      "rgbaSha256": "2ac6bb50f8fa304e67811cc9d581387ec3e536bbbc5a876b3422e85646bbe49a",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
     },
     {
       "classType": "warrior",
       "index": 4,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto12.png",
+      "assetPath": "assets/equipment/warrior/legacy-004.webp",
+      "slot": "head",
+      "theme": "玄棘戰盔",
       "legacy": true,
-      "source": "assets/equipment/warrior/bracer-02.png",
-      "assetPath": "assets/equipment/warrior/bracer-02.png",
-      "type": "shoulder",
-      "theme": "烏鋼",
-      "weaponKind": null,
-      "size": [
-        238,
-        280
-      ],
-      "sha256": "dcfb6f4814d5b4505cdb3252e3283b1da1423eabad8db3b4af93ee387ba680bf"
+      "rarityKey": "white",
+      "width": 207,
+      "height": 271,
+      "rgbaSha256": "d90be121483845f81a2b80e10b84498398981a4fd67fa3c15cd2cb1d5d13501a",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     },
     {
       "classType": "warrior",
       "index": 5,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto13.png",
+      "assetPath": "assets/equipment/warrior/legacy-005.webp",
+      "slot": "head",
+      "theme": "斗笠戰盔",
       "legacy": true,
-      "source": "assets/equipment/warrior/head-01.png",
-      "assetPath": "assets/equipment/warrior/head-01.png",
-      "type": "head",
-      "theme": "素鐵",
-      "weaponKind": null,
-      "size": [
-        198,
-        241
-      ],
-      "sha256": "79072df848266d6054350df8f71aab0407c6092fa750798d9eb37405bc575c2f"
+      "rarityKey": "white",
+      "width": 283,
+      "height": 270,
+      "rgbaSha256": "75749662ead4571d9ebffe581e8c22516399688339311c44dd112e80828c28a2",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     },
     {
       "classType": "warrior",
       "index": 6,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto14.png",
+      "assetPath": "assets/equipment/warrior/legacy-006.webp",
+      "slot": "head",
+      "theme": "龍首銀盔",
       "legacy": true,
-      "source": "assets/equipment/warrior/head-02.png",
-      "assetPath": "assets/equipment/warrior/head-02.png",
-      "type": "head",
-      "theme": "墨鋼",
-      "weaponKind": null,
-      "size": [
-        186,
-        258
-      ],
-      "sha256": "e4bb066db7036a0d68777aa17b8531ce8204fa7fbe68b0c60a09aca7225dc1f5"
+      "rarityKey": "blue",
+      "width": 223,
+      "height": 271,
+      "rgbaSha256": "d7135c274db94f7d436c713a8f4fd936a8d6be65fc17374c8b71fc24794e6196",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
     },
     {
       "classType": "warrior",
       "index": 7,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto15.png",
+      "assetPath": "assets/equipment/warrior/legacy-007.webp",
+      "slot": "head",
+      "theme": "金羽戰盔",
       "legacy": true,
-      "source": "assets/equipment/warrior/shoes-01.png",
-      "assetPath": "assets/equipment/warrior/shoes-01.png",
-      "type": "shoes",
-      "theme": "粗革",
-      "weaponKind": null,
-      "size": [
-        223,
-        255
-      ],
-      "sha256": "dd02993ce44571f2f5941cfd2d718d268d2b72d1bf09285f2bb41a2ac926cafa"
+      "rarityKey": "blue",
+      "width": 205,
+      "height": 291,
+      "rgbaSha256": "412e77b1d1217c1d345c70991865b8562715e8231d7a48e3d1d8c359859b8184",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
     },
     {
       "classType": "warrior",
       "index": 8,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto16.png",
+      "assetPath": "assets/equipment/warrior/legacy-008.webp",
+      "slot": "head",
+      "theme": "銅鉚皮盔",
       "legacy": true,
-      "source": "assets/equipment/warrior/shoes-02.png",
-      "assetPath": "assets/equipment/warrior/shoes-02.png",
-      "type": "shoes",
-      "theme": "鐵獅",
-      "weaponKind": null,
-      "size": [
-        217,
-        262
-      ],
-      "sha256": "ff1c26170bd8d6e9cecfcd667c0d097973c9f867f48ee4669b30d0304bcd0f68"
+      "rarityKey": "white",
+      "width": 225,
+      "height": 258,
+      "rgbaSha256": "e2d36fabe68f793490686ffe7f67e61c047bfa59e8e916c3675a1f5ec2fc96cc",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     },
     {
       "classType": "warrior",
       "index": 9,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto2.png",
+      "assetPath": "assets/equipment/warrior/legacy-009.webp",
+      "slot": "head",
+      "theme": "玄鋼戰盔",
       "legacy": true,
-      "source": "assets/equipment/warrior/weapon-01.png",
-      "assetPath": "assets/equipment/warrior/weapon-01.png",
-      "type": "weapon",
-      "theme": "鈍鐵",
-      "weaponKind": "刀",
-      "size": [
-        256,
-        258
-      ],
-      "sha256": "569bbee841fe4ec904b2fa32e63f067fdee2da30b7476d7342143364bd2a94a9"
+      "rarityKey": "white",
+      "width": 186,
+      "height": 258,
+      "rgbaSha256": "e4bb066db7036a0d68777aa17b8531ce8204fa7fbe68b0c60a09aca7225dc1f5",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     },
     {
       "classType": "warrior",
       "index": 10,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto3.png",
+      "assetPath": "assets/equipment/warrior/legacy-010.webp",
+      "slot": "head",
+      "theme": "赤纓銅盔",
       "legacy": true,
-      "source": "assets/equipment/warrior/weapon-02.png",
-      "assetPath": "assets/equipment/warrior/weapon-02.png",
-      "type": "weapon",
-      "theme": "銅紋",
-      "weaponKind": "刀",
-      "size": [
-        260,
-        261
-      ],
-      "sha256": "12bdac54e0446933f7a913b8acc99e696542cbd98fe634c1795107c41bab3137"
+      "rarityKey": "blue",
+      "width": 233,
+      "height": 277,
+      "rgbaSha256": "cb20b8b3848d81f7632f1a2d10bd929641619676f452fb7e68aac330b83d8f45",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
     },
     {
       "classType": "warrior",
       "index": 11,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto4.png",
+      "assetPath": "assets/equipment/warrior/legacy-011.webp",
+      "slot": "head",
+      "theme": "白毛皮盔",
       "legacy": true,
-      "source": "assets/equipment/warrior/weapon-03.png",
-      "assetPath": "assets/equipment/warrior/weapon-03.png",
-      "type": "weapon",
-      "theme": "金穗",
-      "weaponKind": "劍",
-      "size": [
-        278,
-        285
-      ],
-      "sha256": "8d279c326a3cbe279807f4cb317d51e1899e58ad388a8f62bc57ec29f367c67c"
+      "rarityKey": "white",
+      "width": 218,
+      "height": 271,
+      "rgbaSha256": "379cad82f60aabbb2cedb1095993826fff18b5ad399bad8065361befcb02bb18",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     },
     {
       "classType": "warrior",
       "index": 12,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto5.png",
+      "assetPath": "assets/equipment/warrior/legacy-012.webp",
+      "slot": "head",
+      "theme": "白金飛翼盔",
       "legacy": true,
-      "source": "assets/equipment/warrior/weapon-04.png",
-      "assetPath": "assets/equipment/warrior/weapon-04.png",
-      "type": "weapon",
-      "theme": "藍穗",
-      "weaponKind": "劍",
-      "size": [
-        270,
-        285
-      ],
-      "sha256": "8c7f36022ccdf71a4994ce1b454fb3a025a2194b6589ab126ae2cd4d4e80ef02"
+      "rarityKey": "blue",
+      "width": 212,
+      "height": 266,
+      "rgbaSha256": "e66d600cecc43397d27d06d3b2aabb05f43917f65a9b657b4336c88106ffd40f",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 13,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto6.png",
+      "assetPath": "assets/equipment/warrior/legacy-013.webp",
+      "slot": "head",
+      "theme": "弦月札盔",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 243,
+      "height": 262,
+      "rgbaSha256": "577882c0425dac4d64207b421f033ff0e224f5458754b6ba4c5bdd21013fd41a",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 14,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto7.png",
+      "assetPath": "assets/equipment/warrior/legacy-014.webp",
+      "slot": "head",
+      "theme": "龍角戰盔",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 226,
+      "height": 272,
+      "rgbaSha256": "3a5e496fd6bfb3b52312edc1f766a8d8c25b4e485bbfeaeede8716f1435f4b23",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 15,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto8.png",
+      "assetPath": "assets/equipment/warrior/legacy-015.webp",
+      "slot": "head",
+      "theme": "赤巾鐵盔",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 235,
+      "height": 256,
+      "rgbaSha256": "40e52eea322d1e5040786b3029d9d3dcaf0342ef94580340ac828c58c03d9d2c",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 16,
+      "sourcePath": "assets/inbox/戰士裝備/戰士帽子-戰盔/1000067049_auto9.png",
+      "assetPath": "assets/equipment/warrior/legacy-016.webp",
+      "slot": "head",
+      "theme": "赤羽金盔",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 203,
+      "height": 293,
+      "rgbaSha256": "6fd4f2263f00a44a41fb2633c333967ff97ecff9d0389c9b1e65dbfc1dcc4735",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 17,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto1.png",
+      "assetPath": "assets/equipment/warrior/legacy-017.webp",
+      "slot": "weapon",
+      "theme": "殘鐵戰刀",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 256,
+      "height": 258,
+      "rgbaSha256": "569bbee841fe4ec904b2fa32e63f067fdee2da30b7476d7342143364bd2a94a9",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 18,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto10.png",
+      "assetPath": "assets/equipment/warrior/legacy-018.webp",
+      "slot": "weapon",
+      "theme": "竹紋戰刀",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 251,
+      "height": 263,
+      "rgbaSha256": "27af183a4463826ea17edf8e1911f17eb337b9af8e470fc77a8344995e2a8826",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 19,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto11.png",
+      "assetPath": "assets/equipment/warrior/legacy-019.webp",
+      "slot": "weapon",
+      "theme": "玄雷戰刀",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 256,
+      "height": 257,
+      "rgbaSha256": "a8f18a79a6bc2ce22d237028e13e196d338a9a7a0ae3e97bc39d9c9869fa7874",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 20,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto12.png",
+      "assetPath": "assets/equipment/warrior/legacy-020.webp",
+      "slot": "weapon",
+      "theme": "赤紋戰刀",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 257,
+      "height": 260,
+      "rgbaSha256": "cd7f0790ac9b62218e5cf5a67a303e4531e0c4ae190add1215dae41a4ae0b561",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 21,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto13.png",
+      "assetPath": "assets/equipment/warrior/legacy-021.webp",
+      "slot": "weapon",
+      "theme": "古銅戰刀",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 247,
+      "height": 270,
+      "rgbaSha256": "a520ab4d7f10a36d31b0c2003a930eb9db7c7728d3db3ba38cedf22c34b17062",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 22,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto14.png",
+      "assetPath": "assets/equipment/warrior/legacy-022.webp",
+      "slot": "weapon",
+      "theme": "獸牙戰刀",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 263,
+      "height": 272,
+      "rgbaSha256": "714127db856da758cd3dcf3e7b0b6d2d04723f66469093a3253c19c913161673",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 23,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto15.png",
+      "assetPath": "assets/equipment/warrior/legacy-023.webp",
+      "slot": "weapon",
+      "theme": "青玉戰刀",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 261,
+      "height": 272,
+      "rgbaSha256": "3f5d5d40112852b0fcb415c1ad73da1e3c0b655ba3c61da66cc0d3f8dbdf3843",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 24,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto16.png",
+      "assetPath": "assets/equipment/warrior/legacy-024.webp",
+      "slot": "weapon",
+      "theme": "熔紋戰刀",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 265,
+      "height": 267,
+      "rgbaSha256": "cde872d500091d53f13e3a53073fbfefa14995d751493a4991fc1b6f6e289e85",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 25,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto2.png",
+      "assetPath": "assets/equipment/warrior/legacy-025.webp",
+      "slot": "weapon",
+      "theme": "金紋戰刀",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 260,
+      "height": 261,
+      "rgbaSha256": "12bdac54e0446933f7a913b8acc99e696542cbd98fe634c1795107c41bab3137",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 26,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto3.png",
+      "assetPath": "assets/equipment/warrior/legacy-026.webp",
+      "slot": "weapon",
+      "theme": "銀雲戰刀",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 272,
+      "height": 256,
+      "rgbaSha256": "4f4c4ea7b9d74c9a6b202a9cc5a16dc6005a5c16642f7698bd133d0d1e698455",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 27,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto4.png",
+      "assetPath": "assets/equipment/warrior/legacy-027.webp",
+      "slot": "weapon",
+      "theme": "赤龍戰刀",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 258,
+      "height": 253,
+      "rgbaSha256": "08d5904ab6256bbd318bfffaf1d99160d98e82c0c2c851b58738f78ccfd68e02",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 28,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto5.png",
+      "assetPath": "assets/equipment/warrior/legacy-028.webp",
+      "slot": "weapon",
+      "theme": "碧刃戰刀",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 254,
+      "height": 261,
+      "rgbaSha256": "d172a84e4d33e73440f14962060dcce87556b0cd466199c276cf8ab39db4bc18",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 29,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto6.png",
+      "assetPath": "assets/equipment/warrior/legacy-029.webp",
+      "slot": "weapon",
+      "theme": "素鋼戰刀",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 254,
+      "height": 262,
+      "rgbaSha256": "afa0c16cdff01c88523a4df0eefcef1c6cb3593ad1f8505ca2959717ebb83eaa",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 30,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto7.png",
+      "assetPath": "assets/equipment/warrior/legacy-030.webp",
+      "slot": "weapon",
+      "theme": "玄鐵戰刀",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 260,
+      "height": 269,
+      "rgbaSha256": "8caa35759ddf2160198e8a350660a5b38a3e90b221f335d7290c1d20633a2b09",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 31,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto8.png",
+      "assetPath": "assets/equipment/warrior/legacy-031.webp",
+      "slot": "weapon",
+      "theme": "金龍戰刀",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 255,
+      "height": 258,
+      "rgbaSha256": "a086c3056b23417d4df47d133c25ba2104e1e29dcdb1aa8fcc0c52dbdfbe12e2",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 32,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-砍刀/1000067051_auto9.png",
+      "assetPath": "assets/equipment/warrior/legacy-032.webp",
+      "slot": "weapon",
+      "theme": "棘刃戰刀",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 255,
+      "height": 264,
+      "rgbaSha256": "6ba82a58e08e2d1f00cca1271796d77376c6af01eecb909bf096d0943249c960",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 33,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto1.png",
+      "assetPath": "assets/equipment/warrior/legacy-033.webp",
+      "slot": "weapon",
+      "theme": "銀晶長劍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 278,
+      "height": 285,
+      "rgbaSha256": "8d279c326a3cbe279807f4cb317d51e1899e58ad388a8f62bc57ec29f367c67c",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 34,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto10.png",
+      "assetPath": "assets/equipment/warrior/legacy-034.webp",
+      "slot": "weapon",
+      "theme": "白梅長劍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 273,
+      "height": 290,
+      "rgbaSha256": "28be494cf5bbcf5a4ea6e02b4f426351729c13577d583a9986892b46eea49b30",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 35,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto11.png",
+      "assetPath": "assets/equipment/warrior/legacy-035.webp",
+      "slot": "weapon",
+      "theme": "玄金長劍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 280,
+      "height": 289,
+      "rgbaSha256": "ad44c8c224aa4db6b43bd9d49a7ec66ce09c821c5855dc3fb0a07ce97db38222",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 36,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto12.png",
+      "assetPath": "assets/equipment/warrior/legacy-036.webp",
+      "slot": "weapon",
+      "theme": "蒼晶長劍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 273,
+      "height": 285,
+      "rgbaSha256": "92fcfea88170bb1145add6bddcb1a6adddd1992a9df5b4e2f9a5fea23a915a39",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 37,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto13.png",
+      "assetPath": "assets/equipment/warrior/legacy-037.webp",
+      "slot": "weapon",
+      "theme": "斑鋼長劍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 281,
+      "height": 295,
+      "rgbaSha256": "953b2dedf7be519d021ac005cde1f7f89746fd8c2be59a3322380044af4479b5",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 38,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto14.png",
+      "assetPath": "assets/equipment/warrior/legacy-038.webp",
+      "slot": "weapon",
+      "theme": "赤晶長劍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 278,
+      "height": 293,
+      "rgbaSha256": "ba37538e6ce537b22c7ae394b26cf6a1fa2fa0bee803de4b35046d47babb51a4",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 39,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto15.png",
+      "assetPath": "assets/equipment/warrior/legacy-039.webp",
+      "slot": "weapon",
+      "theme": "青影長劍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 275,
+      "height": 293,
+      "rgbaSha256": "8a21160382f2472748276b01885605e3a38ae0aa6b2e22ed11f85af017fa71e9",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 40,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto16.png",
+      "assetPath": "assets/equipment/warrior/legacy-040.webp",
+      "slot": "weapon",
+      "theme": "櫻華長劍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 272,
+      "height": 291,
+      "rgbaSha256": "60b339a098637cc767d7a5cd8d3d68ebc2bf471a5edfa1c2089a27876e606951",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 41,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto2.png",
+      "assetPath": "assets/equipment/warrior/legacy-041.webp",
+      "slot": "weapon",
+      "theme": "銀龍長劍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 270,
+      "height": 285,
+      "rgbaSha256": "8c7f36022ccdf71a4994ce1b454fb3a025a2194b6589ab126ae2cd4d4e80ef02",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 42,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto3.png",
+      "assetPath": "assets/equipment/warrior/legacy-042.webp",
+      "slot": "weapon",
+      "theme": "赤翼長劍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 270,
+      "height": 285,
+      "rgbaSha256": "2245f324d99debf0ee9b472944a7772aa5d96d2adc4f0f2a5fb8422889ac2615",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 43,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto4.png",
+      "assetPath": "assets/equipment/warrior/legacy-043.webp",
+      "slot": "weapon",
+      "theme": "碧晶長劍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 270,
+      "height": 287,
+      "rgbaSha256": "403c72b3c20cb36424a0ac8578343d8225d01a45b7b4827d9b28627f430de0ca",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 44,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto5.png",
+      "assetPath": "assets/equipment/warrior/legacy-044.webp",
+      "slot": "weapon",
+      "theme": "金耀長劍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 279,
+      "height": 290,
+      "rgbaSha256": "031fba831d5ebc0bd592ef7f55f179dd98543184e729790a62b395be2105837d",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 45,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto6.png",
+      "assetPath": "assets/equipment/warrior/legacy-045.webp",
+      "slot": "weapon",
+      "theme": "陰陽長劍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 276,
+      "height": 292,
+      "rgbaSha256": "247bcf638e8994e5ccba91820ef2ced37f1174c90603d38f1e535b03ed8acd45",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 46,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto7.png",
+      "assetPath": "assets/equipment/warrior/legacy-046.webp",
+      "slot": "weapon",
+      "theme": "冰翼長劍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 271,
+      "height": 291,
+      "rgbaSha256": "56df03828795815a6c566af696798d81b74c65afd3694ba472e2ff7313fc3558",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 47,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto8.png",
+      "assetPath": "assets/equipment/warrior/legacy-047.webp",
+      "slot": "weapon",
+      "theme": "炎羽長劍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 278,
+      "height": 297,
+      "rgbaSha256": "c3385f5b6f3dbfd4bc15eee8fb1e6ac631554112b1a8bbc9a59e215e55202884",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 48,
+      "sourcePath": "assets/inbox/戰士裝備/戰士武器-長劍/1000067052_auto9.png",
+      "assetPath": "assets/equipment/warrior/legacy-048.webp",
+      "slot": "weapon",
+      "theme": "紫影長劍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 280,
+      "height": 291,
+      "rgbaSha256": "60244258dc1031c99862995a19b8e6477ee8607bffe724ca1e0aceb197f2199e",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 49,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto1.png",
+      "assetPath": "assets/equipment/warrior/legacy-049.webp",
+      "slot": "armor",
+      "theme": "麻衣皮甲",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 245,
+      "height": 248,
+      "rgbaSha256": "a9221a79d4ec91f895f46dfa2510896f916db8dd863b077e9f6d47792e00406b",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 50,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto10.png",
+      "assetPath": "assets/equipment/warrior/legacy-050.webp",
+      "slot": "armor",
+      "theme": "銀龍戰甲",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 255,
+      "height": 268,
+      "rgbaSha256": "5d94e1272f8955162714f38ef7218dae798ebcc1a55815c5051755e3b6c2d5a8",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 51,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto11.png",
+      "assetPath": "assets/equipment/warrior/legacy-051.webp",
+      "slot": "armor",
+      "theme": "獸毛戰甲",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 256,
+      "height": 273,
+      "rgbaSha256": "0cd5d81017534101690c0c2691d8d8931db4f77f48801e877a27e8a750031051",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 52,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto12.png",
+      "assetPath": "assets/equipment/warrior/legacy-052.webp",
+      "slot": "armor",
+      "theme": "紫紋戰甲",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 251,
+      "height": 267,
+      "rgbaSha256": "699279c775b30757a3592f67241d07fffd400fc8c514a9d23917ed3a22de62e2",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 53,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto13.png",
+      "assetPath": "assets/equipment/warrior/legacy-053.webp",
+      "slot": "armor",
+      "theme": "赤巾皮甲",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 252,
+      "height": 262,
+      "rgbaSha256": "e41ed75576b777043e10c6434cb3a22253807a9754952a1df024dd664c45d04d",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 54,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto14.png",
+      "assetPath": "assets/equipment/warrior/legacy-054.webp",
+      "slot": "armor",
+      "theme": "獅首戰甲",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 261,
+      "height": 268,
+      "rgbaSha256": "ff1f8d891744ef8b9ba17230e4d08f345871655be6f9d981180d19fbc915495b",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 55,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto15.png",
+      "assetPath": "assets/equipment/warrior/legacy-055.webp",
+      "slot": "armor",
+      "theme": "銀雲戰甲",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 247,
+      "height": 266,
+      "rgbaSha256": "bdc661ada2e97c83e4c8b40c704c1cf9cf1c91450fcadb6b35b9565a1df3f7f3",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 56,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto16.png",
+      "assetPath": "assets/equipment/warrior/legacy-056.webp",
+      "slot": "armor",
+      "theme": "赤鱗皮甲",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 255,
+      "height": 266,
+      "rgbaSha256": "7e3b7ae627e883d314de5b42d11e11918aad521e9d44fcf79340d691f9e87ad2",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 57,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto2.png",
+      "assetPath": "assets/equipment/warrior/legacy-057.webp",
+      "slot": "armor",
+      "theme": "藍巾札甲",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 246,
+      "height": 249,
+      "rgbaSha256": "3e5107292f1bdacdc64bb4e004ba88988d36154c1c1e89fc7180059710da2a26",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 58,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto3.png",
+      "assetPath": "assets/equipment/warrior/legacy-058.webp",
+      "slot": "armor",
+      "theme": "金獅戰甲",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 257,
+      "height": 251,
+      "rgbaSha256": "6f57959bc78d4e9ab630470962ce59611bebdc174c610c8e18235dc860e9a49e",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 59,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto4.png",
+      "assetPath": "assets/equipment/warrior/legacy-059.webp",
+      "slot": "armor",
+      "theme": "青巾皮甲",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 245,
+      "height": 254,
+      "rgbaSha256": "5fa2ce47f13b252f4db3083b02eaedf1cba09ab88f222279a02cf8ddf5a0f420",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 60,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto5.png",
+      "assetPath": "assets/equipment/warrior/legacy-060.webp",
+      "slot": "armor",
+      "theme": "銀月戰甲",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 250,
+      "height": 262,
+      "rgbaSha256": "de648823ef340903b47ca017e5dff142e49923f5e991f6c91aa15f6a24cba18c",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 61,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto6.png",
+      "assetPath": "assets/equipment/warrior/legacy-061.webp",
+      "slot": "armor",
+      "theme": "白毛鱗甲",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 250,
+      "height": 270,
+      "rgbaSha256": "3f94f9ce6c8ad6df6bebdee239426b1dc8f4756d92372cd2d9b63dfb1e7013a7",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 62,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto7.png",
+      "assetPath": "assets/equipment/warrior/legacy-062.webp",
+      "slot": "armor",
+      "theme": "玄狼戰甲",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 262,
+      "height": 267,
+      "rgbaSha256": "3fbd37d564ceeac855cdd26daba86fe283baa62aea078dea2f1045477bd954ec",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 63,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto8.png",
+      "assetPath": "assets/equipment/warrior/legacy-063.webp",
+      "slot": "armor",
+      "theme": "白金戰袍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 251,
+      "height": 269,
+      "rgbaSha256": "abb38e9227dbc6e27789e271689b14e0ca3bc90e0065637716646ee02dc914b6",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 64,
+      "sourcePath": "assets/inbox/戰士裝備/戰士衣服-鎧甲/1000067048_auto9.png",
+      "assetPath": "assets/equipment/warrior/legacy-064.webp",
+      "slot": "armor",
+      "theme": "青鱗戰甲",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 250,
+      "height": 271,
+      "rgbaSha256": "b832484b1343a343d6c77fd595ad3b09fc6ad74526020b6aea91166183b0b98d",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 65,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto1.png",
+      "assetPath": "assets/equipment/warrior/legacy-065.webp",
+      "slot": "shoulder",
+      "theme": "鐵紋護腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 236,
+      "height": 271,
+      "rgbaSha256": "d040d160e6b8b577b1d7a309d048bb65586d2e0db986902c276490a938181c47",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 66,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto10.png",
+      "assetPath": "assets/equipment/warrior/legacy-066.webp",
+      "slot": "shoulder",
+      "theme": "束帶護腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 240,
+      "height": 275,
+      "rgbaSha256": "11c70f5d6c2a9b59c2b75e620518ab7d41f5c93791de6eaa3d1319d62377d87f",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 67,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto11.png",
+      "assetPath": "assets/equipment/warrior/legacy-067.webp",
+      "slot": "shoulder",
+      "theme": "獸骨護腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 248,
+      "height": 284,
+      "rgbaSha256": "a803e0b96ba7062e6b5d4150969f042180acbb7f6a758e1d4a983d5f3360182e",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 68,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto12.png",
+      "assetPath": "assets/equipment/warrior/legacy-068.webp",
+      "slot": "shoulder",
+      "theme": "紫雲護腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 230,
+      "height": 273,
+      "rgbaSha256": "7b196e7c762cb1209f3d3f25bb95ba0bf6b3abe543ffdfe6b8d37fe6362bce3f",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 69,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto13.png",
+      "assetPath": "assets/equipment/warrior/legacy-069.webp",
+      "slot": "shoulder",
+      "theme": "赤繩護腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 233,
+      "height": 277,
+      "rgbaSha256": "c595cadf8816e69f1d2c96bfba1ad60de4502305b7588ea385973bef50a139bb",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 70,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto14.png",
+      "assetPath": "assets/equipment/warrior/legacy-070.webp",
+      "slot": "shoulder",
+      "theme": "青羽護腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 235,
+      "height": 284,
+      "rgbaSha256": "ad47ef34409a43934d4e4048cf5f5c7387b9569075735da6c9040bbd86baef76",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 71,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto15.png",
+      "assetPath": "assets/equipment/warrior/legacy-071.webp",
+      "slot": "shoulder",
+      "theme": "赤紋護腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 239,
+      "height": 266,
+      "rgbaSha256": "d6040ea5b6348a5606dcdf61432c7b6fc0cf50e439e6869b6cd628045a8f3a80",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 72,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto16.png",
+      "assetPath": "assets/equipment/warrior/legacy-072.webp",
+      "slot": "shoulder",
+      "theme": "獅首護腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 237,
+      "height": 279,
+      "rgbaSha256": "f1bdcd8967c4a4f75731ab4de23c647c2323a8b16bcae0ac815a980c3db79759",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 73,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto2.png",
+      "assetPath": "assets/equipment/warrior/legacy-073.webp",
+      "slot": "shoulder",
+      "theme": "玄銀護腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 238,
+      "height": 280,
+      "rgbaSha256": "dcfb6f4814d5b4505cdb3252e3283b1da1423eabad8db3b4af93ee387ba680bf",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 74,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto3.png",
+      "assetPath": "assets/equipment/warrior/legacy-074.webp",
+      "slot": "shoulder",
+      "theme": "金獅護腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 247,
+      "height": 281,
+      "rgbaSha256": "b07fa05c7c6809d328f5c4b2d57a4f315d74fbbf606c75703a8070346cf135fd",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 75,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto4.png",
+      "assetPath": "assets/equipment/warrior/legacy-075.webp",
+      "slot": "shoulder",
+      "theme": "白毛護腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 241,
+      "height": 280,
+      "rgbaSha256": "5fe4756faa508d0f4caeff23172f2ef0a5befc52f88c70194da6eee9a70c5205",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 76,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto5.png",
+      "assetPath": "assets/equipment/warrior/legacy-076.webp",
+      "slot": "shoulder",
+      "theme": "金龍護腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 228,
+      "height": 279,
+      "rgbaSha256": "a7bd1d8f20f1238ff48bab087327630acd6d37d24bbe4cbf199ae805f405071f",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 77,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto6.png",
+      "assetPath": "assets/equipment/warrior/legacy-077.webp",
+      "slot": "shoulder",
+      "theme": "青紋護腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 243,
+      "height": 269,
+      "rgbaSha256": "cb2f526bf5bb1e752b3260aaeaa3024294126cc9ddb7bf2871a7d8dac87051a7",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 78,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto7.png",
+      "assetPath": "assets/equipment/warrior/legacy-078.webp",
+      "slot": "shoulder",
+      "theme": "蒼月護腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 248,
+      "height": 284,
+      "rgbaSha256": "7e8aef5cee7e53c0049c1ff3a33babe4e7485ee892dd8b3b5569ad497604e162",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 79,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto8.png",
+      "assetPath": "assets/equipment/warrior/legacy-079.webp",
+      "slot": "shoulder",
+      "theme": "赤痕護腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 244,
+      "height": 281,
+      "rgbaSha256": "6b8da7314ec082a002ad3b6d3b32bbb55b774d4adc989fdfa47cc2170f03e13b",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 80,
+      "sourcePath": "assets/inbox/戰士裝備/戰士護腕-護腕/1000067050_auto9.png",
+      "assetPath": "assets/equipment/warrior/legacy-080.webp",
+      "slot": "shoulder",
+      "theme": "金陽護腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 232,
+      "height": 284,
+      "rgbaSha256": "5311c44452de44b57f5a602d64177cb7963ea283d377837b18bf73d5b430b01d",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 81,
+      "sourcePath": "assets/inbox/戰士裝備/戰士鞋子-戰靴/1000067047_auto1.png",
+      "assetPath": "assets/equipment/warrior/legacy-081.webp",
+      "slot": "shoes",
+      "theme": "束帶戰靴",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 223,
+      "height": 255,
+      "rgbaSha256": "dd02993ce44571f2f5941cfd2d718d268d2b72d1bf09285f2bb41a2ac926cafa",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 82,
+      "sourcePath": "assets/inbox/戰士裝備/戰士鞋子-戰靴/1000067047_auto10.png",
+      "assetPath": "assets/equipment/warrior/legacy-082.webp",
+      "slot": "shoes",
+      "theme": "銀雲戰靴",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 212,
+      "height": 264,
+      "rgbaSha256": "f9661a16374b6dde3b9ba03b1d45b6df6d7bca6cf545f03f643536de18d5d067",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 83,
+      "sourcePath": "assets/inbox/戰士裝備/戰士鞋子-戰靴/1000067047_auto11.png",
+      "assetPath": "assets/equipment/warrior/legacy-083.webp",
+      "slot": "shoes",
+      "theme": "赤狼戰靴",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 222,
+      "height": 268,
+      "rgbaSha256": "b47f45a22266b16e1e1f6ee5e7a0850b1dec156d1bfe6ee349e293fb6a0ac676",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 84,
+      "sourcePath": "assets/inbox/戰士裝備/戰士鞋子-戰靴/1000067047_auto12.png",
+      "assetPath": "assets/equipment/warrior/legacy-084.webp",
+      "slot": "shoes",
+      "theme": "紫翼戰靴",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 249,
+      "height": 267,
+      "rgbaSha256": "e803078ae568345507512cbb88c6eb1371a0e6d8c0b4f6dfea9d9b5e784955af",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 85,
+      "sourcePath": "assets/inbox/戰士裝備/戰士鞋子-戰靴/1000067047_auto16.png",
+      "assetPath": "assets/equipment/warrior/legacy-085.webp",
+      "slot": "shoes",
+      "theme": "玄紋戰靴",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 256,
+      "height": 282,
+      "rgbaSha256": "9bacfefee4b33de6b269fe66d00923a9076a83afde0c1568e085b9fab2cc00b3",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 86,
+      "sourcePath": "assets/inbox/戰士裝備/戰士鞋子-戰靴/1000067047_auto3.png",
+      "assetPath": "assets/equipment/warrior/legacy-086.webp",
+      "slot": "shoes",
+      "theme": "白毛戰靴",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 233,
+      "height": 268,
+      "rgbaSha256": "56f6528f094e72562036793c0b70454ba8d61687a03c973b29e40b0a3b85887f",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 87,
+      "sourcePath": "assets/inbox/戰士裝備/戰士鞋子-戰靴/1000067047_auto5.png",
+      "assetPath": "assets/equipment/warrior/legacy-087.webp",
+      "slot": "shoes",
+      "theme": "青葉戰靴",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 226,
+      "height": 257,
+      "rgbaSha256": "d4fcb1c78f1075f5ce9d95bbb2687193b9203a6e6d37b262886f3288de3313ad",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 88,
+      "sourcePath": "assets/inbox/戰士裝備/戰士鞋子-戰靴/1000067047_auto6.png",
+      "assetPath": "assets/equipment/warrior/legacy-088.webp",
+      "slot": "shoes",
+      "theme": "銀甲戰靴",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 219,
+      "height": 255,
+      "rgbaSha256": "6f84878f78e067d87cce82d6c9b2108db334583d2982958204effbd7ff494d11",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 89,
+      "sourcePath": "assets/inbox/戰士裝備/戰士鞋子-戰靴/1000067047_auto7.png",
+      "assetPath": "assets/equipment/warrior/legacy-089.webp",
+      "slot": "shoes",
+      "theme": "白巾戰靴",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 221,
+      "height": 259,
+      "rgbaSha256": "7d90d458fa24bf1256936f1ec5999aaadd665ee5fe44272f3ae6f6beb7d14132",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "warrior",
+      "index": 90,
+      "sourcePath": "assets/inbox/戰士裝備/戰士鞋子-戰靴/1000067047_auto9.png",
+      "assetPath": "assets/equipment/warrior/legacy-090.webp",
+      "slot": "shoes",
+      "theme": "鉚帶戰靴",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 215,
+      "height": 267,
+      "rgbaSha256": "59fd4d00f3013eb11d1e5849a4446617263d6073e4f30c6f2c8a47f274c0486e",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     },
     {
       "classType": "mage",
       "index": 1,
+      "sourcePath": "assets/inbox/法師裝備/法師帽子-法冠/1000066948_auto17.png",
+      "assetPath": "assets/equipment/mage/legacy-001.webp",
+      "slot": "head",
+      "theme": "星月法帽",
       "legacy": true,
-      "source": "assets/equipment/mage/armor-01.png",
-      "assetPath": "assets/equipment/mage/armor-01.png",
-      "type": "armor",
-      "theme": "雲藍",
-      "weaponKind": null,
-      "size": [
-        267,
-        291
-      ],
-      "sha256": "d5b08766966dfdbc1591f18fd9bce51728689a2277c43a9aae15467f687cc03f"
+      "rarityKey": "blue",
+      "width": 280,
+      "height": 263,
+      "rgbaSha256": "74e357cac91098695a77a8142b0b83dcc3614381e9579ac0d3750126eef7dbc4",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
     },
     {
       "classType": "mage",
       "index": 2,
+      "sourcePath": "assets/inbox/法師裝備/法師帽子-法冠/1000066948_auto18.png",
+      "assetPath": "assets/equipment/mage/legacy-002.webp",
+      "slot": "head",
+      "theme": "陰陽赤繩法帽",
       "legacy": true,
-      "source": "assets/equipment/mage/armor-02.png",
-      "assetPath": "assets/equipment/mage/armor-02.png",
-      "type": "armor",
-      "theme": "墨紅",
-      "weaponKind": null,
-      "size": [
-        261,
-        292
-      ],
-      "sha256": "ca922512777583e8f5a6130dbf1e0400f71e44110037474b062f02d11ae96a0a"
+      "rarityKey": "white",
+      "width": 289,
+      "height": 287,
+      "rgbaSha256": "c4190b3cf29e44d7004eac88e092edc9109c22370d06a437bfe1a578beb6366c",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     },
     {
       "classType": "mage",
       "index": 3,
+      "sourcePath": "assets/inbox/法師裝備/法師帽子-法冠/1000066948_auto19.png",
+      "assetPath": "assets/equipment/mage/legacy-003.webp",
+      "slot": "head",
+      "theme": "銀晶法帽",
       "legacy": true,
-      "source": "assets/equipment/mage/bracer-01.png",
-      "assetPath": "assets/equipment/mage/bracer-01.png",
-      "type": "shoulder",
-      "theme": "銀浪",
-      "weaponKind": null,
-      "size": [
-        252,
-        272
-      ],
-      "sha256": "7f60a96a5ae1480a2b5707e1b58a318a66aef7aa62ad41b53b01ef0ab1ac7065"
+      "rarityKey": "blue",
+      "width": 283,
+      "height": 290,
+      "rgbaSha256": "2eb7c4ee3fba0ac78094c350dbdebd76abdcae81556219a453f515cb9f904763",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
     },
     {
       "classType": "mage",
       "index": 4,
+      "sourcePath": "assets/inbox/法師裝備/法師帽子-法冠/1000066948_auto20.png",
+      "assetPath": "assets/equipment/mage/legacy-004.webp",
+      "slot": "head",
+      "theme": "青葉花冠",
       "legacy": true,
-      "source": "assets/equipment/mage/bracer-02.png",
-      "assetPath": "assets/equipment/mage/bracer-02.png",
-      "type": "shoulder",
-      "theme": "玄卦",
-      "weaponKind": null,
-      "size": [
-        251,
-        283
-      ],
-      "sha256": "4e3bea5c3a50ecfb074ec5f3f800958a8c46e93dd1c3b222cc8b31c906446744"
+      "rarityKey": "white",
+      "width": 287,
+      "height": 282,
+      "rgbaSha256": "0cad46555c77ff0618877ce4648fe69e88d9abe63d47cca2514939c5af5b6b9e",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     },
     {
       "classType": "mage",
       "index": 5,
+      "sourcePath": "assets/inbox/法師裝備/法師帽子-法冠/1000066948_auto21.png",
+      "assetPath": "assets/equipment/mage/legacy-005.webp",
+      "slot": "head",
+      "theme": "紫晶法帽",
       "legacy": true,
-      "source": "assets/equipment/mage/head-01.png",
-      "assetPath": "assets/equipment/mage/head-01.png",
-      "type": "head",
-      "theme": "藍月",
-      "weaponKind": null,
-      "size": [
-        280,
-        263
-      ],
-      "sha256": "74e357cac91098695a77a8142b0b83dcc3614381e9579ac0d3750126eef7dbc4"
+      "rarityKey": "blue",
+      "width": 292,
+      "height": 285,
+      "rgbaSha256": "7e9e4198e2c56317af6dcc296388518edf7cf42de2eded5d6827007e1cd1f044",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
     },
     {
       "classType": "mage",
       "index": 6,
+      "sourcePath": "assets/inbox/法師裝備/法師帽子-法冠/1000066948_auto22.png",
+      "assetPath": "assets/equipment/mage/legacy-006.webp",
+      "slot": "head",
+      "theme": "竹符法帽",
       "legacy": true,
-      "source": "assets/equipment/mage/head-02.png",
-      "assetPath": "assets/equipment/mage/head-02.png",
-      "type": "head",
-      "theme": "赤結",
-      "weaponKind": null,
-      "size": [
-        289,
-        287
-      ],
-      "sha256": "c4190b3cf29e44d7004eac88e092edc9109c22370d06a437bfe1a578beb6366c"
+      "rarityKey": "white",
+      "width": 300,
+      "height": 260,
+      "rgbaSha256": "9b6338e3c9bdb630a3472feb43aff22791e1de806c5f5aa03f5e43863aa3ef54",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     },
     {
       "classType": "mage",
       "index": 7,
+      "sourcePath": "assets/inbox/法師裝備/法師帽子-法冠/1000066948_auto23.png",
+      "assetPath": "assets/equipment/mage/legacy-007.webp",
+      "slot": "head",
+      "theme": "赤晶法帽",
       "legacy": true,
-      "source": "assets/equipment/mage/shoes-01.png",
-      "assetPath": "assets/equipment/mage/shoes-01.png",
-      "type": "shoes",
-      "theme": "冰紋",
-      "weaponKind": null,
-      "size": [
-        276,
-        264
-      ],
-      "sha256": "d781606a20210d48ae2e4beb2d00c6a50cab26027cbfa15a26757fa3f441f376"
+      "rarityKey": "blue",
+      "width": 293,
+      "height": 297,
+      "rgbaSha256": "46b47eb05ae4a058da32ed6cb4b4a59ba4925026b7859ca777abc060f6b764a7",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
     },
     {
       "classType": "mage",
       "index": 8,
+      "sourcePath": "assets/inbox/法師裝備/法師帽子-法冠/1000066948_auto25.png",
+      "assetPath": "assets/equipment/mage/legacy-008.webp",
+      "slot": "head",
+      "theme": "冰蓮法帽",
       "legacy": true,
-      "source": "assets/equipment/mage/shoes-02.png",
-      "assetPath": "assets/equipment/mage/shoes-02.png",
-      "type": "shoes",
-      "theme": "紫玉",
-      "weaponKind": null,
-      "size": [
-        256,
-        284
-      ],
-      "sha256": "04902b237e032b5de0064a0a8c47aa18b0a1fd5751d6e7008feed9a2a070e01c"
+      "rarityKey": "blue",
+      "width": 289,
+      "height": 293,
+      "rgbaSha256": "9c7d450d0c6f48222f32ed6739cf36f2423f3894ee1106e9fef0bf8a8dd2b6f9",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
     },
     {
       "classType": "mage",
       "index": 9,
+      "sourcePath": "assets/inbox/法師裝備/法師帽子-法冠/1000066948_auto26.png",
+      "assetPath": "assets/equipment/mage/legacy-009.webp",
+      "slot": "head",
+      "theme": "破影法帽",
       "legacy": true,
-      "source": "assets/equipment/mage/weapon-01.png",
-      "assetPath": "assets/equipment/mage/weapon-01.png",
-      "type": "weapon",
-      "theme": "金環",
-      "weaponKind": "杖",
-      "size": [
-        257,
-        270
-      ],
-      "sha256": "de7da9b1f204a70fabb069382a79e1a3d659b020a71a40a5dfe1a5a2f1dbe3dd"
+      "rarityKey": "white",
+      "width": 297,
+      "height": 290,
+      "rgbaSha256": "7a76ff7785a5c1c601ff09223801b5f714507f1bc8a1e0b0ffe35f6d890fafaf",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     },
     {
       "classType": "mage",
       "index": 10,
+      "sourcePath": "assets/inbox/法師裝備/法師帽子-法冠/1000066948_auto27.png",
+      "assetPath": "assets/equipment/mage/legacy-010.webp",
+      "slot": "head",
+      "theme": "寒潮法帽",
       "legacy": true,
-      "source": "assets/equipment/mage/weapon-02.png",
-      "assetPath": "assets/equipment/mage/weapon-02.png",
-      "type": "weapon",
-      "theme": "冰環",
-      "weaponKind": "杖",
-      "size": [
-        251,
-        277
-      ],
-      "sha256": "de16c1cf46d9f7c548536d352f0f1c8a64df1e29652a6facfcada0ce44b9501a"
+      "rarityKey": "blue",
+      "width": 297,
+      "height": 290,
+      "rgbaSha256": "4f3419b6cf14dabe9944990456fc110d76a828669f52887b60ebb01d9b304632",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
     },
     {
       "classType": "mage",
       "index": 11,
+      "sourcePath": "assets/inbox/法師裝備/法師帽子-法冠/1000066948_auto29.png",
+      "assetPath": "assets/equipment/mage/legacy-011.webp",
+      "slot": "head",
+      "theme": "青晶法帽",
       "legacy": true,
-      "source": "assets/equipment/mage/weapon-03.png",
-      "assetPath": "assets/equipment/mage/weapon-03.png",
-      "type": "weapon",
-      "theme": "青竹",
-      "weaponKind": "扇",
-      "size": [
-        293,
-        295
-      ],
-      "sha256": "a6effb5c050001ba3ab73888747d905bcc0d235fb23f030daeffa3def5033c6c"
+      "rarityKey": "white",
+      "width": 283,
+      "height": 290,
+      "rgbaSha256": "cbe98b8386d36e7955437da2afc346a51511f33c0137f17c38e6b4ff9e3404ee",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     },
     {
       "classType": "mage",
       "index": 12,
+      "sourcePath": "assets/inbox/法師裝備/法師帽子-法冠/1000066948_auto32.png",
+      "assetPath": "assets/equipment/mage/legacy-012.webp",
+      "slot": "head",
+      "theme": "陰陽素帽",
       "legacy": true,
-      "source": "assets/equipment/mage/weapon-04.png",
-      "assetPath": "assets/equipment/mage/weapon-04.png",
-      "type": "weapon",
-      "theme": "滄浪",
-      "weaponKind": "扇",
-      "size": [
-        297,
-        300
-      ],
-      "sha256": "1f0b66f840d1201a9118c0cac64ca693d1a5fb2910950e99a0e2ac0f0a5f040a"
+      "rarityKey": "white",
+      "width": 285,
+      "height": 290,
+      "rgbaSha256": "1dc6d193630c2a04718cbffa5c2b68010d9c23faea514dd2a6bdb539ebc1fbed",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 13,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto1.png",
+      "assetPath": "assets/equipment/mage/legacy-013.webp",
+      "slot": "weapon",
+      "theme": "竹影法扇",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 293,
+      "height": 295,
+      "rgbaSha256": "a6effb5c050001ba3ab73888747d905bcc0d235fb23f030daeffa3def5033c6c",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 14,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto10.png",
+      "assetPath": "assets/equipment/mage/legacy-014.webp",
+      "slot": "weapon",
+      "theme": "紫蝶法扇",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 307,
+      "height": 295,
+      "rgbaSha256": "599dd45849f57fdc70e517524f5e3be8933c4f23765a8f74fa3efcc22751673b",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 15,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto11.png",
+      "assetPath": "assets/equipment/mage/legacy-015.webp",
+      "slot": "weapon",
+      "theme": "雲鶴法扇",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 297,
+      "height": 297,
+      "rgbaSha256": "376304de37c3fd9de1218a8452aae09a96852b3da975ddca6217850e4184ff73",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 16,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto12.png",
+      "assetPath": "assets/equipment/mage/legacy-016.webp",
+      "slot": "weapon",
+      "theme": "赤蓮法扇",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 290,
+      "height": 295,
+      "rgbaSha256": "2e53d574e3ae7808771c3e33a145c5c2d425b1ef3e7a89bb3c3f181ccbe15380",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 17,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto13.png",
+      "assetPath": "assets/equipment/mage/legacy-017.webp",
+      "slot": "weapon",
+      "theme": "銀杏法扇",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 295,
+      "height": 285,
+      "rgbaSha256": "2b2b36946e1c6fb89addce8079e82cc1b7fbece6ff84107fbe00e1d7332ff9a0",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 18,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto14.png",
+      "assetPath": "assets/equipment/mage/legacy-018.webp",
+      "slot": "weapon",
+      "theme": "雪華法扇",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 295,
+      "height": 286,
+      "rgbaSha256": "4e9eaa2a8cc5aaf778b850269eefcaaf70e4d1b451e3608f9f37867989ebb213",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 19,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto15.png",
+      "assetPath": "assets/equipment/mage/legacy-019.webp",
+      "slot": "weapon",
+      "theme": "紫藤法扇",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 300,
+      "height": 288,
+      "rgbaSha256": "96c6d184d9d676a5d07ee58751af5fbda0fe20d795a30488b5d339315da14c2a",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 20,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto16.png",
+      "assetPath": "assets/equipment/mage/legacy-020.webp",
+      "slot": "weapon",
+      "theme": "青嵐法扇",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 291,
+      "height": 288,
+      "rgbaSha256": "0d122704e6b5c039f016d8b8c55295dcaa85921b293eac1b5ad0c372bf2071fe",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 21,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto2.png",
+      "assetPath": "assets/equipment/mage/legacy-021.webp",
+      "slot": "weapon",
+      "theme": "海潮法扇",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 297,
+      "height": 300,
+      "rgbaSha256": "1f0b66f840d1201a9118c0cac64ca693d1a5fb2910950e99a0e2ac0f0a5f040a",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 22,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto3.png",
+      "assetPath": "assets/equipment/mage/legacy-022.webp",
+      "slot": "weapon",
+      "theme": "金雲法扇",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 299,
+      "height": 293,
+      "rgbaSha256": "5f9ed968d1cc3c2a9c9bf1f585452e7cbd09b3a2278e1ca5727cdffb1b3abeb9",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 23,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto4.png",
+      "assetPath": "assets/equipment/mage/legacy-023.webp",
+      "slot": "weapon",
+      "theme": "紫花法扇",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 292,
+      "height": 293,
+      "rgbaSha256": "4a8c5e3a936b1ca4c2ca8fb397910ff169ac92764eb31b7d9167223ba904dee2",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 24,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto5.png",
+      "assetPath": "assets/equipment/mage/legacy-024.webp",
+      "slot": "weapon",
+      "theme": "烈焰法扇",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 302,
+      "height": 300,
+      "rgbaSha256": "c6a8528b8413538f775491897547e4ae9e8bcdf63a7d81ec3249f7ffdb248a0f",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 25,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto6.png",
+      "assetPath": "assets/equipment/mage/legacy-025.webp",
+      "slot": "weapon",
+      "theme": "青梅法扇",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 299,
+      "height": 307,
+      "rgbaSha256": "03e95e8dbca614901623fc4381c85536f15b0d8ab6d118bfd3ab93638abdd39f",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 26,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto7.png",
+      "assetPath": "assets/equipment/mage/legacy-026.webp",
+      "slot": "weapon",
+      "theme": "星月法扇",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 301,
+      "height": 303,
+      "rgbaSha256": "327033933cd0ea2026704b948414dd0b9debc93f9f749dea88026c085ac4813d",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 27,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto8.png",
+      "assetPath": "assets/equipment/mage/legacy-027.webp",
+      "slot": "weapon",
+      "theme": "櫻華法扇",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 288,
+      "height": 304,
+      "rgbaSha256": "33416e4e8ce7d03b66d5e5cabd72711452e29df37dab0199e2a80670c9f879a1",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 28,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-扇子/1000066946_auto9.png",
+      "assetPath": "assets/equipment/mage/legacy-028.webp",
+      "slot": "weapon",
+      "theme": "墨龍法扇",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 301,
+      "height": 297,
+      "rgbaSha256": "dedece8f8cd3bc4620e3d2a646e6e97896c154eeca96ff10ee2eae62adf744f1",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 29,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto1.png",
+      "assetPath": "assets/equipment/mage/legacy-029.webp",
+      "slot": "weapon",
+      "theme": "蒼珠法杖",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 257,
+      "height": 270,
+      "rgbaSha256": "de7da9b1f204a70fabb069382a79e1a3d659b020a71a40a5dfe1a5a2f1dbe3dd",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 30,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto10.png",
+      "assetPath": "assets/equipment/mage/legacy-030.webp",
+      "slot": "weapon",
+      "theme": "赤焰法杖",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 268,
+      "height": 293,
+      "rgbaSha256": "3b199cebceb40ae425b53335518dde3f07dace0aec06096591d042623a5700d6",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 31,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto11.png",
+      "assetPath": "assets/equipment/mage/legacy-031.webp",
+      "slot": "weapon",
+      "theme": "冰晶法杖",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 269,
+      "height": 297,
+      "rgbaSha256": "ecb79bc27cfa30fcc9501f1b59d405a2ea15157674fd36d02d15080e1bbf0287",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 32,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto12.png",
+      "assetPath": "assets/equipment/mage/legacy-032.webp",
+      "slot": "weapon",
+      "theme": "紫電法杖",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 261,
+      "height": 292,
+      "rgbaSha256": "737c67be081ef0e146466559cf91ab255c98b239b8579a573188ef8cd96d71f4",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 33,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto13.png",
+      "assetPath": "assets/equipment/mage/legacy-033.webp",
+      "slot": "weapon",
+      "theme": "青竹葫蘆杖",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 256,
+      "height": 275,
+      "rgbaSha256": "7226cf87fe8041c2dbed26116e2b367d9dd2a6c29876186969e68817b54970bd",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 34,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto14.png",
+      "assetPath": "assets/equipment/mage/legacy-034.webp",
+      "slot": "weapon",
+      "theme": "陰陽法杖",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 255,
+      "height": 290,
+      "rgbaSha256": "15e36f37f698d57c758e6cfb486ac3d4792bcbbc8e861cb5e500878630f33367",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 35,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto15.png",
+      "assetPath": "assets/equipment/mage/legacy-035.webp",
+      "slot": "weapon",
+      "theme": "青羽法杖",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 247,
+      "height": 300,
+      "rgbaSha256": "c7c4eaec1d4a1e543e26c1abfa8990e1dc4e1362608e1210c6e0fa7ed5e66905",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 36,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto16.png",
+      "assetPath": "assets/equipment/mage/legacy-036.webp",
+      "slot": "weapon",
+      "theme": "櫻珠法杖",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 260,
+      "height": 289,
+      "rgbaSha256": "8672b0f12275ed55250d22fa5b2a5ec53788fc32b76a3e52639602a1530e5735",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 37,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto2.png",
+      "assetPath": "assets/equipment/mage/legacy-037.webp",
+      "slot": "weapon",
+      "theme": "霜翼法杖",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 251,
+      "height": 277,
+      "rgbaSha256": "de16c1cf46d9f7c548536d352f0f1c8a64df1e29652a6facfcada0ce44b9501a",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 38,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto3.png",
+      "assetPath": "assets/equipment/mage/legacy-038.webp",
+      "slot": "weapon",
+      "theme": "炎耀法杖",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 261,
+      "height": 281,
+      "rgbaSha256": "ebb660c700081fd880f4e15b768412a5900b338905eae71432f14af00bf5691e",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 39,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto4.png",
+      "assetPath": "assets/equipment/mage/legacy-039.webp",
+      "slot": "weapon",
+      "theme": "玉蓮法杖",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 244,
+      "height": 266,
+      "rgbaSha256": "92660189ea306c7f1d9f4582d0aa40875674cba8b3e70789dc7080f660f21b46",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 40,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto5.png",
+      "assetPath": "assets/equipment/mage/legacy-040.webp",
+      "slot": "weapon",
+      "theme": "幽骸法杖",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 266,
+      "height": 297,
+      "rgbaSha256": "82235549bee2b2e10b8da9235918b3ed110f40ca3fd50990df4fc3b5e0da41ee",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 41,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto6.png",
+      "assetPath": "assets/equipment/mage/legacy-041.webp",
+      "slot": "weapon",
+      "theme": "白羽法杖",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 255,
+      "height": 296,
+      "rgbaSha256": "3cd7438202db88779e3369ae2f2b0c2461d7ef91fb24a21aa234a381bac7c3e6",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 42,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto7.png",
+      "assetPath": "assets/equipment/mage/legacy-042.webp",
+      "slot": "weapon",
+      "theme": "寒濤法杖",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 267,
+      "height": 288,
+      "rgbaSha256": "c3af8189995f74eae127a1bd0b87769a89ee76449aacbf64261f0af6bacba36c",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 43,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto8.png",
+      "assetPath": "assets/equipment/mage/legacy-043.webp",
+      "slot": "weapon",
+      "theme": "青藤法杖",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 253,
+      "height": 281,
+      "rgbaSha256": "efbdb39ef5c955d93b4fe4bc318fa2b67261c290607960cf5a9ede83ea9e9ab7",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 44,
+      "sourcePath": "assets/inbox/法師裝備/法師武器-法杖/1000066947_auto9.png",
+      "assetPath": "assets/equipment/mage/legacy-044.webp",
+      "slot": "weapon",
+      "theme": "星環法杖",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 263,
+      "height": 291,
+      "rgbaSha256": "8a409c5f2bf18a1b849d286abe86e43c91e1909f16a0e5cbcee0c6d30f00249e",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 45,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto1.png",
+      "assetPath": "assets/equipment/mage/legacy-045.webp",
+      "slot": "armor",
+      "theme": "銀雲法袍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 267,
+      "height": 291,
+      "rgbaSha256": "d5b08766966dfdbc1591f18fd9bce51728689a2277c43a9aae15467f687cc03f",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 46,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto10.png",
+      "assetPath": "assets/equipment/mage/legacy-046.webp",
+      "slot": "armor",
+      "theme": "青羽法袍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 271,
+      "height": 290,
+      "rgbaSha256": "1d62c759fc03f27ab77ea9d20124cbedeb87f9ff6f98995ae14dece44f88dabc",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 47,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto11.png",
+      "assetPath": "assets/equipment/mage/legacy-047.webp",
+      "slot": "armor",
+      "theme": "赤紋法袍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 277,
+      "height": 296,
+      "rgbaSha256": "13fd09b212c0cb9909864b08845ae59d6d5a22985ee7458638aa4c8d213e409d",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 48,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto12.png",
+      "assetPath": "assets/equipment/mage/legacy-048.webp",
+      "slot": "armor",
+      "theme": "蒼晶法袍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 273,
+      "height": 294,
+      "rgbaSha256": "26d204202ed8279de7a3b734c8d2933a666f3a66947280386ebbb5637c2bc96c",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 49,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto13.png",
+      "assetPath": "assets/equipment/mage/legacy-049.webp",
+      "slot": "armor",
+      "theme": "金蓮法袍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 277,
+      "height": 301,
+      "rgbaSha256": "53443241f9d751464124ab00f22316512031dcefd64e5f3a76454f78714a7e89",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 50,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto14.png",
+      "assetPath": "assets/equipment/mage/legacy-050.webp",
+      "slot": "armor",
+      "theme": "紫雲法袍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 278,
+      "height": 296,
+      "rgbaSha256": "359266ea44ccc62cb4ab2240e71625884d36537b6a1c3e83de6286061e22d910",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 51,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto15.png",
+      "assetPath": "assets/equipment/mage/legacy-051.webp",
+      "slot": "armor",
+      "theme": "陰陽法袍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 264,
+      "height": 295,
+      "rgbaSha256": "e941853856fbcbb5fe6e741d7f6c12ea91558d2433a0246c18dbdc9b68b033a3",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 52,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto16.png",
+      "assetPath": "assets/equipment/mage/legacy-052.webp",
+      "slot": "armor",
+      "theme": "櫻華法袍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 276,
+      "height": 300,
+      "rgbaSha256": "b1f9d66c21fed5b969b8a1f126b2f07db73b3598b8e818be1746579acda4999f",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 53,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto2.png",
+      "assetPath": "assets/equipment/mage/legacy-053.webp",
+      "slot": "armor",
+      "theme": "墨焰法袍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 261,
+      "height": 292,
+      "rgbaSha256": "ca922512777583e8f5a6130dbf1e0400f71e44110037474b062f02d11ae96a0a",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 54,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto3.png",
+      "assetPath": "assets/equipment/mage/legacy-054.webp",
+      "slot": "armor",
+      "theme": "竹影法袍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 262,
+      "height": 292,
+      "rgbaSha256": "665cb511a2f43834dce5c18f4cfc75ab208e3e61353d2eb86a4a7d26e6471c73",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 55,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto4.png",
+      "assetPath": "assets/equipment/mage/legacy-055.webp",
+      "slot": "armor",
+      "theme": "星月法袍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 266,
+      "height": 293,
+      "rgbaSha256": "57dfb3bade33ea5196a0007fcf95a837d757431ecec8f95446548c80aad9a02d",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 56,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto5.png",
+      "assetPath": "assets/equipment/mage/legacy-056.webp",
+      "slot": "armor",
+      "theme": "金雲法袍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 269,
+      "height": 294,
+      "rgbaSha256": "e4714155ffe542851bf09d194f7d76cd4233c1fd8355f3a0313753b2105b4cc1",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 57,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto6.png",
+      "assetPath": "assets/equipment/mage/legacy-057.webp",
+      "slot": "armor",
+      "theme": "麻繩法袍",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 257,
+      "height": 298,
+      "rgbaSha256": "5b9a25d55368c621a65b8cb5b8236825cf631c2b9f9d14548554943ea401c5c1",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 58,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto7.png",
+      "assetPath": "assets/equipment/mage/legacy-058.webp",
+      "slot": "armor",
+      "theme": "雪羽法袍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 269,
+      "height": 298,
+      "rgbaSha256": "3d9fbc5a38f8e36bf0b61a5a3052c0a6a3fdb92094823505e15f7bfba86a0757",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 59,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto8.png",
+      "assetPath": "assets/equipment/mage/legacy-059.webp",
+      "slot": "armor",
+      "theme": "赤金法袍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 267,
+      "height": 299,
+      "rgbaSha256": "3cc7964d3e502d3de1e09eee10335aea7964b7fb0afd5ee0e3f88236f0b73c54",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 60,
+      "sourcePath": "assets/inbox/法師裝備/法師衣服-法袍/1000066670_auto9.png",
+      "assetPath": "assets/equipment/mage/legacy-060.webp",
+      "slot": "armor",
+      "theme": "紫藤法袍",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 271,
+      "height": 296,
+      "rgbaSha256": "688f43f7dd1ea8c7aa97664c9654e274bd14dcfab6596e9eb00e668ebf2d386f",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 61,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto1.png",
+      "assetPath": "assets/equipment/mage/legacy-061.webp",
+      "slot": "shoulder",
+      "theme": "銀雲法腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 252,
+      "height": 272,
+      "rgbaSha256": "7f60a96a5ae1480a2b5707e1b58a318a66aef7aa62ad41b53b01ef0ab1ac7065",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 62,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto10.png",
+      "assetPath": "assets/equipment/mage/legacy-062.webp",
+      "slot": "shoulder",
+      "theme": "蒼珠法腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 255,
+      "height": 255,
+      "rgbaSha256": "c955f6ff8d85af0400dd139fa358435571040b8e7b8cda0ae13d2a4d3144744a",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 63,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto11.png",
+      "assetPath": "assets/equipment/mage/legacy-063.webp",
+      "slot": "shoulder",
+      "theme": "青符法腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 255,
+      "height": 262,
+      "rgbaSha256": "a680127eb881a910415c17b991a8804dac6c43e3a0b2efe896dcd1de2a859730",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 64,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto12.png",
+      "assetPath": "assets/equipment/mage/legacy-064.webp",
+      "slot": "shoulder",
+      "theme": "白羽法腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 255,
+      "height": 271,
+      "rgbaSha256": "034de936c46e8152b1cca2276a73a4331832e78d4035d90b7551e9f43e1f5d23",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 65,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto13.png",
+      "assetPath": "assets/equipment/mage/legacy-065.webp",
+      "slot": "shoulder",
+      "theme": "金晶法腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 258,
+      "height": 283,
+      "rgbaSha256": "0a9faff6ca43ddc6afe4af75764be062df6b756eff61da9a84332cb2338b4fc7",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 66,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto14.png",
+      "assetPath": "assets/equipment/mage/legacy-066.webp",
+      "slot": "shoulder",
+      "theme": "紫符法腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 257,
+      "height": 270,
+      "rgbaSha256": "b9731df29ef357104600bba14875e0c46c8986e12f1c37d27d0c3ce3c2acbadb",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 67,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto15.png",
+      "assetPath": "assets/equipment/mage/legacy-067.webp",
+      "slot": "shoulder",
+      "theme": "潮波法腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 262,
+      "height": 266,
+      "rgbaSha256": "f1ce09111a9a34ab8a0d99d2f624c6e9693fe903418e7e7335b23ed9a9f91b17",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 68,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto16.png",
+      "assetPath": "assets/equipment/mage/legacy-068.webp",
+      "slot": "shoulder",
+      "theme": "赤棘法腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 248,
+      "height": 280,
+      "rgbaSha256": "10e54da193fb85d87370d20a0d01adcf4bc8f99a24074a72cbbd06174c44eb37",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 69,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto2.png",
+      "assetPath": "assets/equipment/mage/legacy-069.webp",
+      "slot": "shoulder",
+      "theme": "陰陽法腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 251,
+      "height": 283,
+      "rgbaSha256": "4e3bea5c3a50ecfb074ec5f3f800958a8c46e93dd1c3b222cc8b31c906446744",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 70,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto3.png",
+      "assetPath": "assets/equipment/mage/legacy-070.webp",
+      "slot": "shoulder",
+      "theme": "玉蓮法腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 246,
+      "height": 272,
+      "rgbaSha256": "5fd6e8616c6c8d06b84c827b318e5abef02112695664918f30d7f197990ab119",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 71,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto4.png",
+      "assetPath": "assets/equipment/mage/legacy-071.webp",
+      "slot": "shoulder",
+      "theme": "紫晶法腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 257,
+      "height": 294,
+      "rgbaSha256": "4c82b306e88a7edeec07a0e0d44244c7ff55a84b6e0c51f03a7fea5a0009175f",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 72,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto5.png",
+      "assetPath": "assets/equipment/mage/legacy-072.webp",
+      "slot": "shoulder",
+      "theme": "青葉法腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 253,
+      "height": 287,
+      "rgbaSha256": "1be063fb75b83187a8063ae079c1b476c523e89cee06e14177d18f80b94e591d",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 73,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto6.png",
+      "assetPath": "assets/equipment/mage/legacy-073.webp",
+      "slot": "shoulder",
+      "theme": "霜雪法腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 247,
+      "height": 262,
+      "rgbaSha256": "54c26eefc2d9aac5d73be5ef5d81594edb106c7b9b311f0f061f557e318fa02b",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 74,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto7.png",
+      "assetPath": "assets/equipment/mage/legacy-074.webp",
+      "slot": "shoulder",
+      "theme": "烈焰法腕",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 255,
+      "height": 289,
+      "rgbaSha256": "f2a289c5b046bbea5ef9afbd9ee3d3c9b5969a7a13e7b67d13319d30223076e7",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 75,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto8.png",
+      "assetPath": "assets/equipment/mage/legacy-075.webp",
+      "slot": "shoulder",
+      "theme": "星月法腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 246,
+      "height": 278,
+      "rgbaSha256": "c901e30c123c963066b133646b8516b83fddd0a433bc9577ca1d30ef64dd9894",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 76,
+      "sourcePath": "assets/inbox/法師裝備/法師護腕-法腕/1000066949_auto9.png",
+      "assetPath": "assets/equipment/mage/legacy-076.webp",
+      "slot": "shoulder",
+      "theme": "獸牙法腕",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 254,
+      "height": 253,
+      "rgbaSha256": "6cefdd2fc60c08db605f43f1d9368f34bd0c48bc801d3fa548e426f4dac0140c",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 77,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto1.png",
+      "assetPath": "assets/equipment/mage/legacy-077.webp",
+      "slot": "shoes",
+      "theme": "銀雲法履",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 276,
+      "height": 264,
+      "rgbaSha256": "d781606a20210d48ae2e4beb2d00c6a50cab26027cbfa15a26757fa3f441f376",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 78,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto10.png",
+      "assetPath": "assets/equipment/mage/legacy-078.webp",
+      "slot": "shoes",
+      "theme": "竹葉法履",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 273,
+      "height": 285,
+      "rgbaSha256": "2bd966a1c5a4626a59acf53da8631c1243a382135cbecaaf83e86ebdcdce5b4e",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 79,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto11.png",
+      "assetPath": "assets/equipment/mage/legacy-079.webp",
+      "slot": "shoes",
+      "theme": "赤晶法履",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 279,
+      "height": 284,
+      "rgbaSha256": "aab7de4ece1abbd1808959e280b1f2f310df0d817b6a6972b5cc176a4b6ea4fc",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 80,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto12.png",
+      "assetPath": "assets/equipment/mage/legacy-080.webp",
+      "slot": "shoes",
+      "theme": "流雲法履",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 268,
+      "height": 272,
+      "rgbaSha256": "51f3051a6c5f4fe7403e9295c5713d8eeef12e6924672f68f256bf23ad1f9b1f",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 81,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto13.png",
+      "assetPath": "assets/equipment/mage/legacy-081.webp",
+      "slot": "shoes",
+      "theme": "星海法履",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 276,
+      "height": 296,
+      "rgbaSha256": "94f813398d5034dcc74850a5dc77b36121702918469e36f0311f8b71502711dc",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 82,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto15.png",
+      "assetPath": "assets/equipment/mage/legacy-082.webp",
+      "slot": "shoes",
+      "theme": "葫蘆法履",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 292,
+      "height": 292,
+      "rgbaSha256": "41cacf5c64869649cb425d780db23b4a26abf1fc0e199cbc3ad1d3bd9eb6bc00",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 83,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto16.png",
+      "assetPath": "assets/equipment/mage/legacy-083.webp",
+      "slot": "shoes",
+      "theme": "寒晶法履",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 257,
+      "height": 285,
+      "rgbaSha256": "42edbf6eb524c72ded35b6fec86aa54a173c454ec2d6ba24d633fdf1ecb09c12",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 84,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto2.png",
+      "assetPath": "assets/equipment/mage/legacy-084.webp",
+      "slot": "shoes",
+      "theme": "紫珠法履",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 256,
+      "height": 284,
+      "rgbaSha256": "04902b237e032b5de0064a0a8c47aa18b0a1fd5751d6e7008feed9a2a070e01c",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 85,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto3.png",
+      "assetPath": "assets/equipment/mage/legacy-085.webp",
+      "slot": "shoes",
+      "theme": "青珠法履",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 279,
+      "height": 289,
+      "rgbaSha256": "88d26219347dd088e2fe5b4518e019154ea09f39bd5148e86d50d0719916b002",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 86,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto4.png",
+      "assetPath": "assets/equipment/mage/legacy-086.webp",
+      "slot": "shoes",
+      "theme": "烈焰法履",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 246,
+      "height": 282,
+      "rgbaSha256": "bbc528d488a33b60709d9f1f28404e70fee7333522b10803fb9699c7a292384a",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 87,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto5.png",
+      "assetPath": "assets/equipment/mage/legacy-087.webp",
+      "slot": "shoes",
+      "theme": "霜雪法履",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 302,
+      "height": 276,
+      "rgbaSha256": "3afc270db4359a819eebd5a9e8cbbed65d34fa4fe9cd57630ac416ab0cbfc8d2",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 88,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto6.png",
+      "assetPath": "assets/equipment/mage/legacy-088.webp",
+      "slot": "shoes",
+      "theme": "陰陽法履",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 272,
+      "height": 289,
+      "rgbaSha256": "7cccf9b8664aeb9b60595f1efde638b2df253001afacd4717cb4964a5ed8cd76",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
+    },
+    {
+      "classType": "mage",
+      "index": 89,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto7.png",
+      "assetPath": "assets/equipment/mage/legacy-089.webp",
+      "slot": "shoes",
+      "theme": "青浪法履",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 294,
+      "height": 288,
+      "rgbaSha256": "de3b6698b14f6f07ef1dd34cc97b59352253b2f63400d0c224be03c3a333b344",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 90,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto8.png",
+      "assetPath": "assets/equipment/mage/legacy-090.webp",
+      "slot": "shoes",
+      "theme": "星月法履",
+      "legacy": true,
+      "rarityKey": "blue",
+      "width": 253,
+      "height": 284,
+      "rgbaSha256": "b88bb2986a26620a70cffb6883d9e8cc18e53ca1588fd25d251b464c0ff13a29",
+      "classificationReason": "較精緻的鑲晶、光效或華麗裝飾"
+    },
+    {
+      "classType": "mage",
+      "index": 91,
+      "sourcePath": "assets/inbox/法師裝備/法師鞋子-法履/1000066671_auto9.png",
+      "assetPath": "assets/equipment/mage/legacy-091.webp",
+      "slot": "shoes",
+      "theme": "白金法履",
+      "legacy": true,
+      "rarityKey": "white",
+      "width": 276,
+      "height": 292,
+      "rgbaSha256": "ea8cd66fde26faae2eb94db54d4886ba2c1d1b6c3c24b8af17bf1e6470af800b",
+      "classificationReason": "較樸素的皮革、素鋼或實體紋飾"
     }
   ],
   "equipment": [
+    {
+      "name": "素鉚鐵戰盔",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-001.webp",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "素牛角戰盔",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-002.webp",
+      "stats": {
+        "attack": 6
+      }
+    },
+    {
+      "name": "青紋銀羽藍晶戰盔",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-003.webp",
+      "stats": {
+        "agility": 13
+      }
+    },
+    {
+      "name": "素玄棘戰盔",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-004.webp",
+      "stats": {
+        "defensePoints": 8
+      }
+    },
+    {
+      "name": "素斗笠戰盔",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-005.webp",
+      "stats": {
+        "vitality": 9
+      }
+    },
+    {
+      "name": "青紋龍首銀盔",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-006.webp",
+      "stats": {
+        "attack": 16
+      }
+    },
+    {
+      "name": "青紋金羽戰盔",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-007.webp",
+      "stats": {
+        "agility": 11
+      }
+    },
+    {
+      "name": "素銅鉚皮盔",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-008.webp",
+      "stats": {
+        "defensePoints": 6
+      }
+    },
+    {
+      "name": "素玄鋼戰盔",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-009.webp",
+      "stats": {
+        "vitality": 7
+      }
+    },
+    {
+      "name": "青紋赤纓銅盔",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-010.webp",
+      "stats": {
+        "attack": 14
+      }
+    },
+    {
+      "name": "素白毛皮盔",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-011.webp",
+      "stats": {
+        "agility": 9
+      }
+    },
+    {
+      "name": "青紋白金飛翼盔",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-012.webp",
+      "stats": {
+        "defensePoints": 16
+      }
+    },
+    {
+      "name": "青紋弦月札盔",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-013.webp",
+      "stats": {
+        "vitality": 11
+      }
+    },
+    {
+      "name": "青紋龍角戰盔",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-014.webp",
+      "stats": {
+        "attack": 12
+      }
+    },
+    {
+      "name": "素赤巾鐵盔",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-015.webp",
+      "stats": {
+        "agility": 7
+      }
+    },
+    {
+      "name": "青紋赤羽金盔",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "head",
+      "assetPath": "assets/equipment/warrior/legacy-016.webp",
+      "stats": {
+        "defensePoints": 14
+      }
+    },
+    {
+      "name": "素殘鐵戰刀",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-017.webp",
+      "stats": {
+        "attack": 9
+      }
+    },
+    {
+      "name": "素竹紋戰刀",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-018.webp",
+      "stats": {
+        "attack": 10
+      }
+    },
+    {
+      "name": "青紋玄雷戰刀",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-019.webp",
+      "stats": {
+        "attack": 11
+      }
+    },
+    {
+      "name": "素赤紋戰刀",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-020.webp",
+      "stats": {
+        "attack": 6
+      }
+    },
+    {
+      "name": "素古銅戰刀",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-021.webp",
+      "stats": {
+        "attack": 7
+      }
+    },
+    {
+      "name": "素獸牙戰刀",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-022.webp",
+      "stats": {
+        "attack": 8
+      }
+    },
+    {
+      "name": "青紋青玉戰刀",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-023.webp",
+      "stats": {
+        "attack": 15
+      }
+    },
+    {
+      "name": "青紋熔紋戰刀",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-024.webp",
+      "stats": {
+        "attack": 16
+      }
+    },
+    {
+      "name": "素金紋戰刀",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-025.webp",
+      "stats": {
+        "attack": 5
+      }
+    },
+    {
+      "name": "青紋銀雲戰刀",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-026.webp",
+      "stats": {
+        "attack": 12
+      }
+    },
+    {
+      "name": "青紋赤龍戰刀",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-027.webp",
+      "stats": {
+        "attack": 13
+      }
+    },
+    {
+      "name": "青紋碧刃戰刀",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-028.webp",
+      "stats": {
+        "attack": 14
+      }
+    },
+    {
+      "name": "素素鋼戰刀",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-029.webp",
+      "stats": {
+        "attack": 9
+      }
+    },
+    {
+      "name": "素玄鐵戰刀",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-030.webp",
+      "stats": {
+        "attack": 10
+      }
+    },
+    {
+      "name": "青紋金龍戰刀",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-031.webp",
+      "stats": {
+        "attack": 11
+      }
+    },
+    {
+      "name": "青紋棘刃戰刀",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-032.webp",
+      "stats": {
+        "attack": 12
+      }
+    },
+    {
+      "name": "素銀晶長劍",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-033.webp",
+      "stats": {
+        "attack": 7
+      }
+    },
+    {
+      "name": "素白梅長劍",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-034.webp",
+      "stats": {
+        "attack": 8
+      }
+    },
+    {
+      "name": "素玄金長劍",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-035.webp",
+      "stats": {
+        "attack": 9
+      }
+    },
+    {
+      "name": "青紋蒼晶長劍",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-036.webp",
+      "stats": {
+        "attack": 16
+      }
+    },
+    {
+      "name": "素斑鋼長劍",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-037.webp",
+      "stats": {
+        "attack": 5
+      }
+    },
+    {
+      "name": "青紋赤晶長劍",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-038.webp",
+      "stats": {
+        "attack": 12
+      }
+    },
+    {
+      "name": "青紋青影長劍",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-039.webp",
+      "stats": {
+        "attack": 13
+      }
+    },
+    {
+      "name": "素櫻華長劍",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-040.webp",
+      "stats": {
+        "attack": 8
+      }
+    },
+    {
+      "name": "青紋銀龍長劍",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-041.webp",
+      "stats": {
+        "attack": 15
+      }
+    },
+    {
+      "name": "青紋赤翼長劍",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-042.webp",
+      "stats": {
+        "attack": 16
+      }
+    },
+    {
+      "name": "素碧晶長劍",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-043.webp",
+      "stats": {
+        "attack": 5
+      }
+    },
+    {
+      "name": "素金耀長劍",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-044.webp",
+      "stats": {
+        "attack": 6
+      }
+    },
+    {
+      "name": "素陰陽長劍",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-045.webp",
+      "stats": {
+        "attack": 7
+      }
+    },
+    {
+      "name": "青紋冰翼長劍",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-046.webp",
+      "stats": {
+        "attack": 14
+      }
+    },
+    {
+      "name": "青紋炎羽長劍",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-047.webp",
+      "stats": {
+        "attack": 15
+      }
+    },
+    {
+      "name": "青紋紫影長劍",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "weapon",
+      "assetPath": "assets/equipment/warrior/legacy-048.webp",
+      "stats": {
+        "attack": 16
+      }
+    },
+    {
+      "name": "素麻衣皮甲",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-049.webp",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "青紋銀龍戰甲",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-050.webp",
+      "stats": {
+        "agility": 12
+      }
+    },
+    {
+      "name": "素獸毛戰甲",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-051.webp",
+      "stats": {
+        "attack": 7
+      }
+    },
+    {
+      "name": "青紋紫紋戰甲",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-052.webp",
+      "stats": {
+        "defensePoints": 14
+      }
+    },
+    {
+      "name": "素赤巾皮甲",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-053.webp",
+      "stats": {
+        "vitality": 9
+      }
+    },
+    {
+      "name": "青紋獅首戰甲",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-054.webp",
+      "stats": {
+        "agility": 16
+      }
+    },
+    {
+      "name": "素銀雲戰甲",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-055.webp",
+      "stats": {
+        "attack": 5
+      }
+    },
+    {
+      "name": "素赤鱗皮甲",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-056.webp",
+      "stats": {
+        "defensePoints": 6
+      }
+    },
+    {
+      "name": "素藍巾札甲",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-057.webp",
+      "stats": {
+        "vitality": 7
+      }
+    },
+    {
+      "name": "青紋金獅戰甲",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-058.webp",
+      "stats": {
+        "agility": 14
+      }
+    },
+    {
+      "name": "素青巾皮甲",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-059.webp",
+      "stats": {
+        "attack": 9
+      }
+    },
+    {
+      "name": "青紋銀月戰甲",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-060.webp",
+      "stats": {
+        "defensePoints": 16
+      }
+    },
+    {
+      "name": "素白毛鱗甲",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-061.webp",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "青紋玄狼戰甲",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-062.webp",
+      "stats": {
+        "agility": 12
+      }
+    },
+    {
+      "name": "青紋白金戰袍",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-063.webp",
+      "stats": {
+        "attack": 13
+      }
+    },
+    {
+      "name": "青紋青鱗戰甲",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "armor",
+      "assetPath": "assets/equipment/warrior/legacy-064.webp",
+      "stats": {
+        "defensePoints": 14
+      }
+    },
+    {
+      "name": "素鐵紋護腕",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-065.webp",
+      "stats": {
+        "attack": 9
+      }
+    },
+    {
+      "name": "素束帶護腕",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-066.webp",
+      "stats": {
+        "defensePoints": 10
+      }
+    },
+    {
+      "name": "素獸骨護腕",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-067.webp",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "青紋紫雲護腕",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-068.webp",
+      "stats": {
+        "attack": 12
+      }
+    },
+    {
+      "name": "素赤繩護腕",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-069.webp",
+      "stats": {
+        "defensePoints": 7
+      }
+    },
+    {
+      "name": "青紋青羽護腕",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-070.webp",
+      "stats": {
+        "vitality": 14
+      }
+    },
+    {
+      "name": "素赤紋護腕",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-071.webp",
+      "stats": {
+        "attack": 9
+      }
+    },
+    {
+      "name": "青紋獅首護腕",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-072.webp",
+      "stats": {
+        "defensePoints": 16
+      }
+    },
+    {
+      "name": "素玄銀護腕",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-073.webp",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "青紋金獅護腕",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-074.webp",
+      "stats": {
+        "attack": 12
+      }
+    },
+    {
+      "name": "素白毛護腕",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-075.webp",
+      "stats": {
+        "defensePoints": 7
+      }
+    },
+    {
+      "name": "青紋金龍護腕",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-076.webp",
+      "stats": {
+        "vitality": 14
+      }
+    },
+    {
+      "name": "素青紋護腕",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-077.webp",
+      "stats": {
+        "attack": 9
+      }
+    },
+    {
+      "name": "青紋蒼月護腕",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-078.webp",
+      "stats": {
+        "defensePoints": 16
+      }
+    },
+    {
+      "name": "青紋赤痕護腕",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-079.webp",
+      "stats": {
+        "vitality": 11
+      }
+    },
+    {
+      "name": "青紋金陽護腕",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/warrior/legacy-080.webp",
+      "stats": {
+        "attack": 12
+      }
+    },
+    {
+      "name": "素束帶戰靴",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/legacy-081.webp",
+      "stats": {
+        "attack": 7
+      }
+    },
+    {
+      "name": "青紋銀雲戰靴",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/legacy-082.webp",
+      "stats": {
+        "vitality": 14
+      }
+    },
+    {
+      "name": "青紋赤狼戰靴",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/legacy-083.webp",
+      "stats": {
+        "agility": 15
+      }
+    },
+    {
+      "name": "青紋紫翼戰靴",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/legacy-084.webp",
+      "stats": {
+        "attack": 16
+      }
+    },
+    {
+      "name": "青紋玄紋戰靴",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/legacy-085.webp",
+      "stats": {
+        "vitality": 11
+      }
+    },
+    {
+      "name": "素白毛戰靴",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/legacy-086.webp",
+      "stats": {
+        "agility": 6
+      }
+    },
+    {
+      "name": "素青葉戰靴",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/legacy-087.webp",
+      "stats": {
+        "attack": 7
+      }
+    },
+    {
+      "name": "青紋銀甲戰靴",
+      "rarityKey": "blue",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/legacy-088.webp",
+      "stats": {
+        "vitality": 14
+      }
+    },
+    {
+      "name": "素白巾戰靴",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/legacy-089.webp",
+      "stats": {
+        "agility": 9
+      }
+    },
+    {
+      "name": "素鉚帶戰靴",
+      "rarityKey": "white",
+      "classType": "warrior",
+      "type": "shoes",
+      "assetPath": "assets/equipment/warrior/legacy-090.webp",
+      "stats": {
+        "attack": 10
+      }
+    },
+    {
+      "name": "青紋星月法帽",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/legacy-001.webp",
+      "stats": {
+        "vitality": 11
+      }
+    },
+    {
+      "name": "素陰陽赤繩法帽",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/legacy-002.webp",
+      "stats": {
+        "intelligence": 6
+      }
+    },
+    {
+      "name": "青紋銀晶法帽",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/legacy-003.webp",
+      "stats": {
+        "agility": 13
+      }
+    },
+    {
+      "name": "素青葉花冠",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/legacy-004.webp",
+      "stats": {
+        "defensePoints": 8
+      }
+    },
+    {
+      "name": "青紋紫晶法帽",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/legacy-005.webp",
+      "stats": {
+        "vitality": 15
+      }
+    },
+    {
+      "name": "素竹符法帽",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/legacy-006.webp",
+      "stats": {
+        "intelligence": 10
+      }
+    },
+    {
+      "name": "青紋赤晶法帽",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/legacy-007.webp",
+      "stats": {
+        "agility": 11
+      }
+    },
+    {
+      "name": "青紋冰蓮法帽",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/legacy-008.webp",
+      "stats": {
+        "defensePoints": 12
+      }
+    },
+    {
+      "name": "素破影法帽",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/legacy-009.webp",
+      "stats": {
+        "vitality": 7
+      }
+    },
+    {
+      "name": "青紋寒潮法帽",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/legacy-010.webp",
+      "stats": {
+        "intelligence": 14
+      }
+    },
+    {
+      "name": "素青晶法帽",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/legacy-011.webp",
+      "stats": {
+        "agility": 9
+      }
+    },
+    {
+      "name": "素陰陽素帽",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "head",
+      "assetPath": "assets/equipment/mage/legacy-012.webp",
+      "stats": {
+        "defensePoints": 10
+      }
+    },
+    {
+      "name": "素竹影法扇",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-013.webp",
+      "stats": {
+        "intelligence": 5
+      }
+    },
+    {
+      "name": "青紋紫蝶法扇",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-014.webp",
+      "stats": {
+        "intelligence": 12
+      }
+    },
+    {
+      "name": "素雲鶴法扇",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-015.webp",
+      "stats": {
+        "intelligence": 7
+      }
+    },
+    {
+      "name": "青紋赤蓮法扇",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-016.webp",
+      "stats": {
+        "intelligence": 14
+      }
+    },
+    {
+      "name": "素銀杏法扇",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-017.webp",
+      "stats": {
+        "intelligence": 9
+      }
+    },
+    {
+      "name": "青紋雪華法扇",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-018.webp",
+      "stats": {
+        "intelligence": 16
+      }
+    },
+    {
+      "name": "素紫藤法扇",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-019.webp",
+      "stats": {
+        "intelligence": 5
+      }
+    },
+    {
+      "name": "青紋青嵐法扇",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-020.webp",
+      "stats": {
+        "intelligence": 12
+      }
+    },
+    {
+      "name": "青紋海潮法扇",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-021.webp",
+      "stats": {
+        "intelligence": 13
+      }
+    },
+    {
+      "name": "素金雲法扇",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-022.webp",
+      "stats": {
+        "intelligence": 8
+      }
+    },
+    {
+      "name": "青紋紫花法扇",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-023.webp",
+      "stats": {
+        "intelligence": 15
+      }
+    },
+    {
+      "name": "青紋烈焰法扇",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-024.webp",
+      "stats": {
+        "intelligence": 16
+      }
+    },
+    {
+      "name": "素青梅法扇",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-025.webp",
+      "stats": {
+        "intelligence": 5
+      }
+    },
+    {
+      "name": "青紋星月法扇",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-026.webp",
+      "stats": {
+        "intelligence": 12
+      }
+    },
+    {
+      "name": "素櫻華法扇",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-027.webp",
+      "stats": {
+        "intelligence": 7
+      }
+    },
+    {
+      "name": "素墨龍法扇",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-028.webp",
+      "stats": {
+        "intelligence": 8
+      }
+    },
+    {
+      "name": "素蒼珠法杖",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-029.webp",
+      "stats": {
+        "intelligence": 9
+      }
+    },
+    {
+      "name": "青紋赤焰法杖",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-030.webp",
+      "stats": {
+        "intelligence": 16
+      }
+    },
+    {
+      "name": "青紋冰晶法杖",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-031.webp",
+      "stats": {
+        "intelligence": 11
+      }
+    },
+    {
+      "name": "青紋紫電法杖",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-032.webp",
+      "stats": {
+        "intelligence": 12
+      }
+    },
+    {
+      "name": "素青竹葫蘆杖",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-033.webp",
+      "stats": {
+        "intelligence": 7
+      }
+    },
+    {
+      "name": "素陰陽法杖",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-034.webp",
+      "stats": {
+        "intelligence": 8
+      }
+    },
+    {
+      "name": "素青羽法杖",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-035.webp",
+      "stats": {
+        "intelligence": 9
+      }
+    },
+    {
+      "name": "素櫻珠法杖",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-036.webp",
+      "stats": {
+        "intelligence": 10
+      }
+    },
+    {
+      "name": "青紋霜翼法杖",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-037.webp",
+      "stats": {
+        "intelligence": 11
+      }
+    },
+    {
+      "name": "青紋炎耀法杖",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-038.webp",
+      "stats": {
+        "intelligence": 12
+      }
+    },
+    {
+      "name": "素玉蓮法杖",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-039.webp",
+      "stats": {
+        "intelligence": 7
+      }
+    },
+    {
+      "name": "青紋幽骸法杖",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-040.webp",
+      "stats": {
+        "intelligence": 14
+      }
+    },
+    {
+      "name": "素白羽法杖",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-041.webp",
+      "stats": {
+        "intelligence": 9
+      }
+    },
+    {
+      "name": "青紋寒濤法杖",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-042.webp",
+      "stats": {
+        "intelligence": 16
+      }
+    },
+    {
+      "name": "素青藤法杖",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-043.webp",
+      "stats": {
+        "intelligence": 5
+      }
+    },
+    {
+      "name": "青紋星環法杖",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "weapon",
+      "assetPath": "assets/equipment/mage/legacy-044.webp",
+      "stats": {
+        "intelligence": 12
+      }
+    },
+    {
+      "name": "素銀雲法袍",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-045.webp",
+      "stats": {
+        "vitality": 7
+      }
+    },
+    {
+      "name": "素青羽法袍",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-046.webp",
+      "stats": {
+        "agility": 8
+      }
+    },
+    {
+      "name": "素赤紋法袍",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-047.webp",
+      "stats": {
+        "intelligence": 9
+      }
+    },
+    {
+      "name": "青紋蒼晶法袍",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-048.webp",
+      "stats": {
+        "defensePoints": 16
+      }
+    },
+    {
+      "name": "青紋金蓮法袍",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-049.webp",
+      "stats": {
+        "vitality": 11
+      }
+    },
+    {
+      "name": "青紋紫雲法袍",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-050.webp",
+      "stats": {
+        "agility": 12
+      }
+    },
+    {
+      "name": "素陰陽法袍",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-051.webp",
+      "stats": {
+        "intelligence": 7
+      }
+    },
+    {
+      "name": "素櫻華法袍",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-052.webp",
+      "stats": {
+        "defensePoints": 8
+      }
+    },
+    {
+      "name": "素墨焰法袍",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-053.webp",
+      "stats": {
+        "vitality": 9
+      }
+    },
+    {
+      "name": "素竹影法袍",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-054.webp",
+      "stats": {
+        "agility": 10
+      }
+    },
+    {
+      "name": "青紋星月法袍",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-055.webp",
+      "stats": {
+        "intelligence": 11
+      }
+    },
+    {
+      "name": "青紋金雲法袍",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-056.webp",
+      "stats": {
+        "defensePoints": 12
+      }
+    },
+    {
+      "name": "素麻繩法袍",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-057.webp",
+      "stats": {
+        "vitality": 7
+      }
+    },
+    {
+      "name": "青紋雪羽法袍",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-058.webp",
+      "stats": {
+        "agility": 14
+      }
+    },
+    {
+      "name": "青紋赤金法袍",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-059.webp",
+      "stats": {
+        "intelligence": 15
+      }
+    },
+    {
+      "name": "青紋紫藤法袍",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "armor",
+      "assetPath": "assets/equipment/mage/legacy-060.webp",
+      "stats": {
+        "defensePoints": 16
+      }
+    },
+    {
+      "name": "素銀雲法腕",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-061.webp",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "青紋蒼珠法腕",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-062.webp",
+      "stats": {
+        "intelligence": 12
+      }
+    },
+    {
+      "name": "素青符法腕",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-063.webp",
+      "stats": {
+        "defensePoints": 7
+      }
+    },
+    {
+      "name": "素白羽法腕",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-064.webp",
+      "stats": {
+        "vitality": 8
+      }
+    },
+    {
+      "name": "青紋金晶法腕",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-065.webp",
+      "stats": {
+        "intelligence": 15
+      }
+    },
+    {
+      "name": "素紫符法腕",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-066.webp",
+      "stats": {
+        "defensePoints": 10
+      }
+    },
+    {
+      "name": "青紋潮波法腕",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-067.webp",
+      "stats": {
+        "vitality": 11
+      }
+    },
+    {
+      "name": "青紋赤棘法腕",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-068.webp",
+      "stats": {
+        "intelligence": 12
+      }
+    },
+    {
+      "name": "素陰陽法腕",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-069.webp",
+      "stats": {
+        "defensePoints": 7
+      }
+    },
+    {
+      "name": "青紋玉蓮法腕",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-070.webp",
+      "stats": {
+        "vitality": 14
+      }
+    },
+    {
+      "name": "青紋紫晶法腕",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-071.webp",
+      "stats": {
+        "intelligence": 15
+      }
+    },
+    {
+      "name": "素青葉法腕",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-072.webp",
+      "stats": {
+        "defensePoints": 10
+      }
+    },
+    {
+      "name": "青紋霜雪法腕",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-073.webp",
+      "stats": {
+        "vitality": 11
+      }
+    },
+    {
+      "name": "青紋烈焰法腕",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-074.webp",
+      "stats": {
+        "intelligence": 12
+      }
+    },
+    {
+      "name": "素星月法腕",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-075.webp",
+      "stats": {
+        "defensePoints": 7
+      }
+    },
+    {
+      "name": "素獸牙法腕",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoulder",
+      "assetPath": "assets/equipment/mage/legacy-076.webp",
+      "stats": {
+        "vitality": 8
+      }
+    },
+    {
+      "name": "素銀雲法履",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-077.webp",
+      "stats": {
+        "agility": 9
+      }
+    },
+    {
+      "name": "素竹葉法履",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-078.webp",
+      "stats": {
+        "intelligence": 10
+      }
+    },
+    {
+      "name": "素赤晶法履",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-079.webp",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "青紋流雲法履",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-080.webp",
+      "stats": {
+        "agility": 12
+      }
+    },
+    {
+      "name": "青紋星海法履",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-081.webp",
+      "stats": {
+        "intelligence": 13
+      }
+    },
+    {
+      "name": "素葫蘆法履",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-082.webp",
+      "stats": {
+        "vitality": 8
+      }
+    },
+    {
+      "name": "青紋寒晶法履",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-083.webp",
+      "stats": {
+        "agility": 15
+      }
+    },
+    {
+      "name": "素紫珠法履",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-084.webp",
+      "stats": {
+        "intelligence": 10
+      }
+    },
+    {
+      "name": "素青珠法履",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-085.webp",
+      "stats": {
+        "vitality": 5
+      }
+    },
+    {
+      "name": "青紋烈焰法履",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-086.webp",
+      "stats": {
+        "agility": 12
+      }
+    },
+    {
+      "name": "青紋霜雪法履",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-087.webp",
+      "stats": {
+        "intelligence": 13
+      }
+    },
+    {
+      "name": "素陰陽法履",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-088.webp",
+      "stats": {
+        "vitality": 8
+      }
+    },
+    {
+      "name": "青紋青浪法履",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-089.webp",
+      "stats": {
+        "agility": 15
+      }
+    },
+    {
+      "name": "青紋星月法履",
+      "rarityKey": "blue",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-090.webp",
+      "stats": {
+        "intelligence": 16
+      }
+    },
+    {
+      "name": "素白金法履",
+      "rarityKey": "white",
+      "classType": "mage",
+      "type": "shoes",
+      "assetPath": "assets/equipment/mage/legacy-091.webp",
+      "stats": {
+        "vitality": 5
+      }
+    },
     {
       "name": "紫霞銀龍戰甲",
       "rarityKey": "purple",
@@ -6844,966 +10828,32 @@
       "stats": {
         "intelligence": 25
       }
-    },
-    {
-      "name": "素棕革戰甲",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "armor",
-      "assetPath": "assets/equipment/warrior/armor-01.png",
-      "stats": {
-        "vitality": 5
-      }
-    },
-    {
-      "name": "樸棕革戰甲",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "armor",
-      "assetPath": "assets/equipment/warrior/armor-01.png",
-      "stats": {
-        "agility": 8
-      }
-    },
-    {
-      "name": "青紋棕革戰甲",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "armor",
-      "assetPath": "assets/equipment/warrior/armor-01.png",
-      "stats": {
-        "vitality": 11
-      }
-    },
-    {
-      "name": "靈紋棕革戰甲",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "armor",
-      "assetPath": "assets/equipment/warrior/armor-01.png",
-      "stats": {
-        "agility": 14
-      }
-    },
-    {
-      "name": "素青鋼戰甲",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "armor",
-      "assetPath": "assets/equipment/warrior/armor-02.png",
-      "stats": {
-        "attack": 6
-      }
-    },
-    {
-      "name": "樸青鋼戰甲",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "armor",
-      "assetPath": "assets/equipment/warrior/armor-02.png",
-      "stats": {
-        "defensePoints": 9
-      }
-    },
-    {
-      "name": "青紋青鋼戰甲",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "armor",
-      "assetPath": "assets/equipment/warrior/armor-02.png",
-      "stats": {
-        "attack": 12
-      }
-    },
-    {
-      "name": "靈紋青鋼戰甲",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "armor",
-      "assetPath": "assets/equipment/warrior/armor-02.png",
-      "stats": {
-        "defensePoints": 15
-      }
-    },
-    {
-      "name": "素皮紋護腕",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/warrior/bracer-01.png",
-      "stats": {
-        "vitality": 7
-      }
-    },
-    {
-      "name": "樸皮紋護腕",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/warrior/bracer-01.png",
-      "stats": {
-        "attack": 10
-      }
-    },
-    {
-      "name": "青紋皮紋護腕",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/warrior/bracer-01.png",
-      "stats": {
-        "vitality": 13
-      }
-    },
-    {
-      "name": "靈紋皮紋護腕",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/warrior/bracer-01.png",
-      "stats": {
-        "attack": 16
-      }
-    },
-    {
-      "name": "素烏鋼護腕",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/warrior/bracer-02.png",
-      "stats": {
-        "defensePoints": 8
-      }
-    },
-    {
-      "name": "樸烏鋼護腕",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/warrior/bracer-02.png",
-      "stats": {
-        "vitality": 5
-      }
-    },
-    {
-      "name": "青紋烏鋼護腕",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/warrior/bracer-02.png",
-      "stats": {
-        "defensePoints": 14
-      }
-    },
-    {
-      "name": "靈紋烏鋼護腕",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/warrior/bracer-02.png",
-      "stats": {
-        "vitality": 11
-      }
-    },
-    {
-      "name": "素素鐵戰盔",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "head",
-      "assetPath": "assets/equipment/warrior/head-01.png",
-      "stats": {
-        "vitality": 9
-      }
-    },
-    {
-      "name": "樸素鐵戰盔",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "head",
-      "assetPath": "assets/equipment/warrior/head-01.png",
-      "stats": {
-        "attack": 6
-      }
-    },
-    {
-      "name": "青紋素鐵戰盔",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "head",
-      "assetPath": "assets/equipment/warrior/head-01.png",
-      "stats": {
-        "vitality": 15
-      }
-    },
-    {
-      "name": "靈紋素鐵戰盔",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "head",
-      "assetPath": "assets/equipment/warrior/head-01.png",
-      "stats": {
-        "attack": 12
-      }
-    },
-    {
-      "name": "素墨鋼戰盔",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "head",
-      "assetPath": "assets/equipment/warrior/head-02.png",
-      "stats": {
-        "agility": 10
-      }
-    },
-    {
-      "name": "樸墨鋼戰盔",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "head",
-      "assetPath": "assets/equipment/warrior/head-02.png",
-      "stats": {
-        "defensePoints": 7
-      }
-    },
-    {
-      "name": "青紋墨鋼戰盔",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "head",
-      "assetPath": "assets/equipment/warrior/head-02.png",
-      "stats": {
-        "agility": 16
-      }
-    },
-    {
-      "name": "靈紋墨鋼戰盔",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "head",
-      "assetPath": "assets/equipment/warrior/head-02.png",
-      "stats": {
-        "defensePoints": 13
-      }
-    },
-    {
-      "name": "素粗革戰靴",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "shoes",
-      "assetPath": "assets/equipment/warrior/shoes-01.png",
-      "stats": {
-        "vitality": 5
-      }
-    },
-    {
-      "name": "樸粗革戰靴",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "shoes",
-      "assetPath": "assets/equipment/warrior/shoes-01.png",
-      "stats": {
-        "agility": 8
-      }
-    },
-    {
-      "name": "青紋粗革戰靴",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "shoes",
-      "assetPath": "assets/equipment/warrior/shoes-01.png",
-      "stats": {
-        "vitality": 11
-      }
-    },
-    {
-      "name": "靈紋粗革戰靴",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "shoes",
-      "assetPath": "assets/equipment/warrior/shoes-01.png",
-      "stats": {
-        "agility": 14
-      }
-    },
-    {
-      "name": "素鐵獅戰靴",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "shoes",
-      "assetPath": "assets/equipment/warrior/shoes-02.png",
-      "stats": {
-        "attack": 6
-      }
-    },
-    {
-      "name": "樸鐵獅戰靴",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "shoes",
-      "assetPath": "assets/equipment/warrior/shoes-02.png",
-      "stats": {
-        "vitality": 9
-      }
-    },
-    {
-      "name": "青紋鐵獅戰靴",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "shoes",
-      "assetPath": "assets/equipment/warrior/shoes-02.png",
-      "stats": {
-        "attack": 12
-      }
-    },
-    {
-      "name": "靈紋鐵獅戰靴",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "shoes",
-      "assetPath": "assets/equipment/warrior/shoes-02.png",
-      "stats": {
-        "vitality": 15
-      }
-    },
-    {
-      "name": "素鈍鐵戰刀",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-01.png",
-      "stats": {
-        "attack": 7
-      }
-    },
-    {
-      "name": "樸鈍鐵戰刀",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-01.png",
-      "stats": {
-        "attack": 10
-      }
-    },
-    {
-      "name": "青紋鈍鐵戰刀",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-01.png",
-      "stats": {
-        "attack": 13
-      }
-    },
-    {
-      "name": "靈紋鈍鐵戰刀",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-01.png",
-      "stats": {
-        "attack": 16
-      }
-    },
-    {
-      "name": "素銅紋戰刀",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-02.png",
-      "stats": {
-        "attack": 8
-      }
-    },
-    {
-      "name": "樸銅紋戰刀",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-02.png",
-      "stats": {
-        "attack": 5
-      }
-    },
-    {
-      "name": "青紋銅紋戰刀",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-02.png",
-      "stats": {
-        "attack": 14
-      }
-    },
-    {
-      "name": "靈紋銅紋戰刀",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-02.png",
-      "stats": {
-        "attack": 11
-      }
-    },
-    {
-      "name": "素金穗長劍",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-03.png",
-      "stats": {
-        "attack": 9
-      }
-    },
-    {
-      "name": "樸金穗長劍",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-03.png",
-      "stats": {
-        "attack": 6
-      }
-    },
-    {
-      "name": "青紋金穗長劍",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-03.png",
-      "stats": {
-        "attack": 15
-      }
-    },
-    {
-      "name": "靈紋金穗長劍",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-03.png",
-      "stats": {
-        "attack": 12
-      }
-    },
-    {
-      "name": "素藍穗長劍",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-04.png",
-      "stats": {
-        "attack": 10
-      }
-    },
-    {
-      "name": "樸藍穗長劍",
-      "rarityKey": "white",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-04.png",
-      "stats": {
-        "attack": 7
-      }
-    },
-    {
-      "name": "青紋藍穗長劍",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-04.png",
-      "stats": {
-        "attack": 16
-      }
-    },
-    {
-      "name": "靈紋藍穗長劍",
-      "rarityKey": "blue",
-      "classType": "warrior",
-      "type": "weapon",
-      "assetPath": "assets/equipment/warrior/weapon-04.png",
-      "stats": {
-        "attack": 13
-      }
-    },
-    {
-      "name": "素雲藍法袍",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "armor",
-      "assetPath": "assets/equipment/mage/armor-01.png",
-      "stats": {
-        "vitality": 5
-      }
-    },
-    {
-      "name": "樸雲藍法袍",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "armor",
-      "assetPath": "assets/equipment/mage/armor-01.png",
-      "stats": {
-        "agility": 8
-      }
-    },
-    {
-      "name": "青紋雲藍法袍",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "armor",
-      "assetPath": "assets/equipment/mage/armor-01.png",
-      "stats": {
-        "vitality": 11
-      }
-    },
-    {
-      "name": "靈紋雲藍法袍",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "armor",
-      "assetPath": "assets/equipment/mage/armor-01.png",
-      "stats": {
-        "agility": 14
-      }
-    },
-    {
-      "name": "素墨紅法袍",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "armor",
-      "assetPath": "assets/equipment/mage/armor-02.png",
-      "stats": {
-        "intelligence": 6
-      }
-    },
-    {
-      "name": "樸墨紅法袍",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "armor",
-      "assetPath": "assets/equipment/mage/armor-02.png",
-      "stats": {
-        "defensePoints": 9
-      }
-    },
-    {
-      "name": "青紋墨紅法袍",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "armor",
-      "assetPath": "assets/equipment/mage/armor-02.png",
-      "stats": {
-        "intelligence": 12
-      }
-    },
-    {
-      "name": "靈紋墨紅法袍",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "armor",
-      "assetPath": "assets/equipment/mage/armor-02.png",
-      "stats": {
-        "defensePoints": 15
-      }
-    },
-    {
-      "name": "素銀浪法腕",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/mage/bracer-01.png",
-      "stats": {
-        "vitality": 7
-      }
-    },
-    {
-      "name": "樸銀浪法腕",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/mage/bracer-01.png",
-      "stats": {
-        "intelligence": 10
-      }
-    },
-    {
-      "name": "青紋銀浪法腕",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/mage/bracer-01.png",
-      "stats": {
-        "vitality": 13
-      }
-    },
-    {
-      "name": "靈紋銀浪法腕",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/mage/bracer-01.png",
-      "stats": {
-        "intelligence": 16
-      }
-    },
-    {
-      "name": "素玄卦法腕",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/mage/bracer-02.png",
-      "stats": {
-        "defensePoints": 8
-      }
-    },
-    {
-      "name": "樸玄卦法腕",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/mage/bracer-02.png",
-      "stats": {
-        "vitality": 5
-      }
-    },
-    {
-      "name": "青紋玄卦法腕",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/mage/bracer-02.png",
-      "stats": {
-        "defensePoints": 14
-      }
-    },
-    {
-      "name": "靈紋玄卦法腕",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "shoulder",
-      "assetPath": "assets/equipment/mage/bracer-02.png",
-      "stats": {
-        "vitality": 11
-      }
-    },
-    {
-      "name": "素藍月法冠",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "head",
-      "assetPath": "assets/equipment/mage/head-01.png",
-      "stats": {
-        "vitality": 9
-      }
-    },
-    {
-      "name": "樸藍月法冠",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "head",
-      "assetPath": "assets/equipment/mage/head-01.png",
-      "stats": {
-        "intelligence": 6
-      }
-    },
-    {
-      "name": "青紋藍月法冠",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "head",
-      "assetPath": "assets/equipment/mage/head-01.png",
-      "stats": {
-        "vitality": 15
-      }
-    },
-    {
-      "name": "靈紋藍月法冠",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "head",
-      "assetPath": "assets/equipment/mage/head-01.png",
-      "stats": {
-        "intelligence": 12
-      }
-    },
-    {
-      "name": "素赤結法冠",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "head",
-      "assetPath": "assets/equipment/mage/head-02.png",
-      "stats": {
-        "agility": 10
-      }
-    },
-    {
-      "name": "樸赤結法冠",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "head",
-      "assetPath": "assets/equipment/mage/head-02.png",
-      "stats": {
-        "defensePoints": 7
-      }
-    },
-    {
-      "name": "青紋赤結法冠",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "head",
-      "assetPath": "assets/equipment/mage/head-02.png",
-      "stats": {
-        "agility": 16
-      }
-    },
-    {
-      "name": "靈紋赤結法冠",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "head",
-      "assetPath": "assets/equipment/mage/head-02.png",
-      "stats": {
-        "defensePoints": 13
-      }
-    },
-    {
-      "name": "素冰紋法履",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "shoes",
-      "assetPath": "assets/equipment/mage/shoes-01.png",
-      "stats": {
-        "vitality": 5
-      }
-    },
-    {
-      "name": "樸冰紋法履",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "shoes",
-      "assetPath": "assets/equipment/mage/shoes-01.png",
-      "stats": {
-        "agility": 8
-      }
-    },
-    {
-      "name": "青紋冰紋法履",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "shoes",
-      "assetPath": "assets/equipment/mage/shoes-01.png",
-      "stats": {
-        "vitality": 11
-      }
-    },
-    {
-      "name": "靈紋冰紋法履",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "shoes",
-      "assetPath": "assets/equipment/mage/shoes-01.png",
-      "stats": {
-        "agility": 14
-      }
-    },
-    {
-      "name": "素紫玉法履",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "shoes",
-      "assetPath": "assets/equipment/mage/shoes-02.png",
-      "stats": {
-        "intelligence": 6
-      }
-    },
-    {
-      "name": "樸紫玉法履",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "shoes",
-      "assetPath": "assets/equipment/mage/shoes-02.png",
-      "stats": {
-        "vitality": 9
-      }
-    },
-    {
-      "name": "青紋紫玉法履",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "shoes",
-      "assetPath": "assets/equipment/mage/shoes-02.png",
-      "stats": {
-        "intelligence": 12
-      }
-    },
-    {
-      "name": "靈紋紫玉法履",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "shoes",
-      "assetPath": "assets/equipment/mage/shoes-02.png",
-      "stats": {
-        "vitality": 15
-      }
-    },
-    {
-      "name": "素金環法杖",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-01.png",
-      "stats": {
-        "intelligence": 7
-      }
-    },
-    {
-      "name": "樸金環法杖",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-01.png",
-      "stats": {
-        "intelligence": 10
-      }
-    },
-    {
-      "name": "青紋金環法杖",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-01.png",
-      "stats": {
-        "intelligence": 13
-      }
-    },
-    {
-      "name": "靈紋金環法杖",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-01.png",
-      "stats": {
-        "intelligence": 16
-      }
-    },
-    {
-      "name": "素冰環法杖",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-02.png",
-      "stats": {
-        "intelligence": 8
-      }
-    },
-    {
-      "name": "樸冰環法杖",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-02.png",
-      "stats": {
-        "intelligence": 5
-      }
-    },
-    {
-      "name": "青紋冰環法杖",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-02.png",
-      "stats": {
-        "intelligence": 14
-      }
-    },
-    {
-      "name": "靈紋冰環法杖",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-02.png",
-      "stats": {
-        "intelligence": 11
-      }
-    },
-    {
-      "name": "素青竹法扇",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-03.png",
-      "stats": {
-        "intelligence": 9
-      }
-    },
-    {
-      "name": "樸青竹法扇",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-03.png",
-      "stats": {
-        "intelligence": 6
-      }
-    },
-    {
-      "name": "青紋青竹法扇",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-03.png",
-      "stats": {
-        "intelligence": 15
-      }
-    },
-    {
-      "name": "靈紋青竹法扇",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-03.png",
-      "stats": {
-        "intelligence": 12
-      }
-    },
-    {
-      "name": "素滄浪法扇",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-04.png",
-      "stats": {
-        "intelligence": 10
-      }
-    },
-    {
-      "name": "樸滄浪法扇",
-      "rarityKey": "white",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-04.png",
-      "stats": {
-        "intelligence": 7
-      }
-    },
-    {
-      "name": "青紋滄浪法扇",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-04.png",
-      "stats": {
-        "intelligence": 16
-      }
-    },
-    {
-      "name": "靈紋滄浪法扇",
-      "rarityKey": "blue",
-      "classType": "mage",
-      "type": "weapon",
-      "assetPath": "assets/equipment/mage/weapon-04.png",
-      "stats": {
-        "intelligence": 13
-      }
     }
+  ],
+  "legacyRuntimePathsPreserved": [
+    "assets/equipment/warrior/armor-01.png",
+    "assets/equipment/warrior/armor-02.png",
+    "assets/equipment/warrior/bracer-01.png",
+    "assets/equipment/warrior/bracer-02.png",
+    "assets/equipment/warrior/head-01.png",
+    "assets/equipment/warrior/head-02.png",
+    "assets/equipment/warrior/shoes-01.png",
+    "assets/equipment/warrior/shoes-02.png",
+    "assets/equipment/warrior/weapon-01.png",
+    "assets/equipment/warrior/weapon-02.png",
+    "assets/equipment/warrior/weapon-03.png",
+    "assets/equipment/warrior/weapon-04.png",
+    "assets/equipment/mage/armor-01.png",
+    "assets/equipment/mage/armor-02.png",
+    "assets/equipment/mage/bracer-01.png",
+    "assets/equipment/mage/bracer-02.png",
+    "assets/equipment/mage/head-01.png",
+    "assets/equipment/mage/head-02.png",
+    "assets/equipment/mage/shoes-01.png",
+    "assets/equipment/mage/shoes-02.png",
+    "assets/equipment/mage/weapon-01.png",
+    "assets/equipment/mage/weapon-02.png",
+    "assets/equipment/mage/weapon-03.png",
+    "assets/equipment/mage/weapon-04.png"
   ]
 }
