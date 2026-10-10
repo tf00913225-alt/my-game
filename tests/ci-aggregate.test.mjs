@@ -130,3 +130,48 @@ test('full Node suites obey classifier full-node policy independently of main-on
   const workflow=fs.readFileSync('.github/workflows/ci.yml','utf8');
   assert.match(workflow,/name: Run all Node unit and integration suites\n\s+if: needs\.classify\.outputs\.full_node == 'true'/);
 });
+
+test('core targeted suites and full runner cover the same files exactly once',()=>{
+  const workflow=fs.readFileSync(new URL('../.github/workflows/ci.yml',import.meta.url),'utf8');
+  const core=workflow.split('\n  core_checks:')[1].split('\n  battle_browser:')[0];
+  const steps=core.split(/\n      - name: /).slice(1);
+  const names=[
+    'Run Release Update Notification targeted regression','Run Adventure V1 targeted regression',
+    'Run Cloud Save Phase 3 UID isolation regressions','Run Fixed Slot battlefield rendering regression',
+    'Run battle layout, timing and range-VFX regressions','Run skill and relic owner convergence regressions',
+    'Run Gameplay context navigation regression','Run Gameplay UI regression',
+    'Run relic lifecycle and battle input regressions'
+  ];
+  const targeted=names.map(name=>{
+    const step=steps.find(s=>s.startsWith(name+'\n'));
+    assert.ok(step,name);
+    assert.match(step,/\n        if: needs\.classify\.outputs\.full_node != 'true'\n/);
+    assert.doesNotMatch(step,/\n        (?:env|working-directory|continue-on-error):/);
+    const files=[...step.matchAll(/node (tests\/[^\s]+\.test\.(?:js|cjs|mjs))/g)].map(m=>m[1]);
+    assert.ok(files.length,name);
+    return files;
+  }).flat();
+  const inventory=steps.find(s=>s.startsWith('Run affected inventory and reforge regressions\n'));
+  assert.match(inventory,/inventory_changed == 'true' && needs\.classify\.outputs\.full_node != 'true'/);
+  const inventoryFiles=[...inventory.matchAll(/tests\/[^\s;]+\.test\.(?:js|cjs|mjs)/g)].map(m=>m[0]);
+  assert.equal(inventoryFiles.length,6);
+  assert.equal(targeted.filter(p=>p==='tests/v173.51-qa.test.js').length,1);
+  const root=new URL('../tests/',import.meta.url);
+  const discovered=fs.readdirSync(root,{recursive:true}).filter(p=>/\.test\.(?:js|cjs|mjs)$/.test(p)).map(p=>'tests/'+p.replaceAll('\\','/'));
+  for(const inventoryChanged of [false,true]) {
+    const selected=[...targeted,...(inventoryChanged?inventoryFiles:[])];
+    assert.equal(new Set(selected).size,selected.length,'targeted mode must not repeat a suite');
+    for(const file of selected)assert.equal(discovered.filter(p=>p===file).length,1,file+' must be discovered once by Full');
+  }
+  const runner=fs.readFileSync(new URL('../.github/scripts/ci.mjs',import.meta.url),'utf8');
+  assert.match(runner,/const suites=allTestJs\.filter\(file=>\/\\\.test\\\.\(\?:js\|cjs\|mjs\)\$\//);
+  assert.match(runner,/for\(const file of suites\)[\s\S]*?commandResult\(process\.execPath,\[name\]\)/);
+  assert.match(runner,/if\(result\.status!==0\)[\s\S]*?fail\(`/);
+  assert.match(runner,/process\.exitCode=1/);
+  // These gates have prerequisite/timing value and remain before Full.
+  for(const name of ['Verify CI aggregate failure propagation','Enforce permanent image asset pipeline gate']) {
+    const step=steps.find(s=>s.startsWith(name+'\n'));
+    assert.ok(step);assert.doesNotMatch(step,/full_node/);
+    assert.ok(core.indexOf(name)<core.indexOf('Run all Node unit and integration suites'));
+  }
+});
