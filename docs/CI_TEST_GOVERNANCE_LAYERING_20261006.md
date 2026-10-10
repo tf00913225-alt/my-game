@@ -40,9 +40,15 @@ unchanged to deployed QA: `none` for reliably isolated inventory/shop/docs;
 unknown/shared effects, core/lifecycle/settlement, Cloud/persistence, release and manual/nightly.
 Cloud/persistence uses Boss Full on both PR and dev, including its required flag.
 Inventory/reforge routes still execute the existing eligibility, synthesis,
-equipment and selection regressions in core_checks. The affected step runs
-them sequentially only when full_node is false; full_node already includes
-the same tests. No new test system or relaxed assertions are introduced.
+equipment and selection regressions in core_checks. Its six affected suites
+and the nine core targeted groups run sequentially only when full_node is
+false; the existing Full runner discovers those same files once in the same
+job, Node version and source snapshot. v173.51-qa belongs to the core layout
+group, so the inventory loop does not repeat it. CI routing self-tests and
+the permanent image pipeline remain early prerequisite gates; separate job,
+PR/dev snapshot, browser and deployed checks retain their own validation.
+No test file, test assertion, classifier safety boundary or failure propagation
+is removed, and no new test runner is introduced.
 Unmapped mechanisms cannot use Fast merely because a filename sounds visual.
 The existing floating-feedback and skill-name presentation CSS owners route
 to UI/battle Fast; their Runtime timing/lifecycle JS remains strict.

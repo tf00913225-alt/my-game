@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import vm from 'node:vm';
+import {createRequire} from 'node:module';
 import {CHILD_GATES, requireChildGates, DEPLOYMENT_GATES, requireDeploymentGates} from '../.github/scripts/ci-aggregate.mjs';
 import {classifyChanges} from '../.github/scripts/ci-change-classifier.mjs';
 
@@ -129,4 +131,84 @@ test('isolated Tower runner prepares the directory required by its existing TTK 
 test('full Node suites obey classifier full-node policy independently of main-only browsers',()=>{
   const workflow=fs.readFileSync('.github/workflows/ci.yml','utf8');
   assert.match(workflow,/name: Run all Node unit and integration suites\n\s+if: needs\.classify\.outputs\.full_node == 'true'/);
+});
+
+test('core targeted suites and full runner cover the same files exactly once',()=>{
+  const workflow=fs.readFileSync(new URL('../.github/workflows/ci.yml',import.meta.url),'utf8');
+  const core=workflow.split('\n  core_checks:')[1].split('\n  battle_browser:')[0];
+  const steps=core.split(/\n      - name: /).slice(1);
+  const names=[
+    'Run Release Update Notification targeted regression','Run Adventure V1 targeted regression',
+    'Run Cloud Save Phase 3 UID isolation regressions','Run Fixed Slot battlefield rendering regression',
+    'Run battle layout, timing and range-VFX regressions','Run skill and relic owner convergence regressions',
+    'Run Gameplay context navigation regression','Run Gameplay UI regression',
+    'Run relic lifecycle and battle input regressions'
+  ];
+  const targeted=names.map(name=>{
+    const step=steps.find(s=>s.startsWith(name+'\n'));
+    assert.ok(step,name);
+    assert.match(step,/\n        if: needs\.classify\.outputs\.full_node != 'true'\n/);
+    assert.doesNotMatch(step,/\n        (?:env|working-directory|continue-on-error):/);
+    const files=[...step.matchAll(/node (tests\/[^\s]+\.test\.(?:js|cjs|mjs))/g)].map(m=>m[1]);
+    assert.ok(files.length,name);
+    return files;
+  }).flat();
+  const inventory=steps.find(s=>s.startsWith('Run affected inventory and reforge regressions\n'));
+  assert.match(inventory,/inventory_changed == 'true' && needs\.classify\.outputs\.full_node != 'true'/);
+  const inventoryFiles=[...inventory.matchAll(/tests\/[^\s;]+\.test\.(?:js|cjs|mjs)/g)].map(m=>m[0]);
+  assert.equal(inventoryFiles.length,6);
+  assert.equal(targeted.filter(p=>p==='tests/v173.51-qa.test.js').length,1);
+  const root=new URL('../tests/',import.meta.url);
+  const discovered=fs.readdirSync(root,{recursive:true}).filter(p=>/\.test\.(?:js|cjs|mjs)$/.test(p)).map(p=>'tests/'+p.replaceAll('\\','/'));
+  for(const inventoryChanged of [false,true]) {
+    const selected=[...targeted,...(inventoryChanged?inventoryFiles:[])];
+    assert.equal(new Set(selected).size,selected.length,'targeted mode must not repeat a suite');
+    for(const file of selected)assert.equal(discovered.filter(p=>p===file).length,1,file+' must be discovered once by Full');
+  }
+  const runner=fs.readFileSync(new URL('../.github/scripts/ci.mjs',import.meta.url),'utf8');
+  assert.match(runner,/const suites=allTestJs\.filter\(file=>\/\\\.test\\\.\(\?:js\|cjs\|mjs\)\$\//);
+  assert.match(runner,/for\(const file of suites\)[\s\S]*?commandResult\(process\.execPath,\[name\]\)/);
+  assert.match(runner,/if\(result\.status!==0\)[\s\S]*?fail\(`/);
+  assert.match(runner,/process\.exitCode=1/);
+  // These gates have prerequisite/timing value and remain before Full.
+  for(const name of ['Verify CI aggregate failure propagation','Enforce permanent image asset pipeline gate']) {
+    const step=steps.find(s=>s.startsWith(name+'\n'));
+    assert.ok(step);assert.doesNotMatch(step,/full_node/);
+    assert.ok(core.indexOf(name)<core.indexOf('Run all Node unit and integration suites'));
+  }
+});
+
+test('backpack Chrome transport rejects stalled commands and cleans up without weakening visual assertions',async()=>{
+  const source=fs.readFileSync(new URL('./backpack-visual-composition-browser.test.js',import.meta.url),'utf8').replaceAll('\r\n','\n');
+  const require=createRequire(import.meta.url);
+  let socket,killed=0,removed=0,launchFailure=false;
+  class FakeSocket extends EventTarget {
+    constructor(){super();socket=this;queueMicrotask(()=>this.dispatchEvent(new Event('open')));}
+    send(text){this.request=JSON.parse(text);}
+    close(){this.dispatchEvent(new Event('close'));}
+    reply(value){const event=new Event('message');event.data=JSON.stringify({id:this.request.id,result:value});this.dispatchEvent(event);}
+  }
+  const connect=vm.runInNewContext(source.split('\nconst chrome=findChrome();')[0]+'\nconnectChrome;',{
+    require:name=>name==='node:fs'?{mkdtempSync:()=>'/unused-fixture-profile',rmSync:()=>removed++}:
+      name==='node:child_process'?{spawn:()=>({kill:()=>killed++,
+        stderr:{on:(event,read)=>{if(launchFailure)read('fixture Chrome launch diagnostic');}},
+        once:(event,read)=>{if(launchFailure&&event==='exit')queueMicrotask(()=>read(1,null));}})}:
+      name==='node:net'?{createServer:()=>({once(){},listen(port,host,ready){ready();},address:()=>({port:12345}),close(done){done();}})}:require(name),
+    __dirname:new URL('.',import.meta.url).pathname,
+    WebSocket:FakeSocket,AbortSignal,
+    fetch:async()=>({json:async()=>launchFailure?[]:[{type:'page',webSocketDebuggerUrl:'ws://fixture.invalid'}]}),
+    setTimeout:(fn,ms)=>setTimeout(fn,ms===30000?10:ms),clearTimeout
+  });
+  const browser=await connect('fixture-chrome');
+  try{
+    const success=browser.send('Runtime.evaluate');socket.reply({value:'retained'});
+    assert.equal((await success).value,'retained');
+    await assert.rejects(browser.send('Page.captureScreenshot'),/CDP timed out after 30 seconds: Page.captureScreenshot/);
+    const closed=browser.send('Page.navigate');socket.close();
+    await assert.rejects(closed,/closed before response/);
+  }finally{browser.close();}
+  assert.equal(killed,1);assert.equal(removed,1);
+  launchFailure=true;
+  await assert.rejects(connect('fixture-chrome'),/Chrome launch failed:.*"code":1[\s\S]*fixture Chrome launch diagnostic/);
+  assert.equal(killed,2);assert.equal(removed,2);
 });

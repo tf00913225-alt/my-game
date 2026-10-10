@@ -193,12 +193,15 @@ jobs:
           retention-days: 90
 
       - name: Run Release Update Notification targeted regression
+        if: needs.classify.outputs.full_node != 'true'
         run: node tests/release-update-notification-system.test.js
 
       - name: Run Adventure V1 targeted regression
+        if: needs.classify.outputs.full_node != 'true'
         run: node tests/adventure-node-system-v1.test.js
 
       - name: Run Cloud Save Phase 3 UID isolation regressions
+        if: needs.classify.outputs.full_node != 'true'
         run: |
           node tests/cloud-save-phase3-uid-local-isolation.test.js
           node tests/account-save-ownership.test.js
@@ -206,6 +209,7 @@ jobs:
           node tests/firebase-auth-foundation.test.mjs
 
       - name: Run Fixed Slot battlefield rendering regression
+        if: needs.classify.outputs.full_node != 'true'
         run: |
           node tests/boss-snapshot-owner-lifecycle-convergence-20261001.test.js
           node tests/fixed-slot-battlefield-rendering-v2.test.js
@@ -214,6 +218,7 @@ jobs:
           node tests/hero-battle-phase2a.test.js
 
       - name: Run battle layout, timing and range-VFX regressions
+        if: needs.classify.outputs.full_node != 'true'
         run: |
           node tests/monster-balance-owner-phase1.test.mjs
           node tests/monster-balance-owner-phase2a.test.mjs
@@ -248,14 +253,17 @@ jobs:
           node tests/battle-presentation-owner-convergence-20260926.test.js
 
       - name: Run skill and relic owner convergence regressions
+        if: needs.classify.outputs.full_node != 'true'
         run: |
           node tests/skill-progression-rebalance.test.js
           node tests/skill-relic-owner-convergence-20260923.test.js
 
       - name: Run Gameplay context navigation regression
+        if: needs.classify.outputs.full_node != 'true'
         run: node tests/gameplay-context-nav-actions-20260915.test.js
 
       - name: Run Gameplay UI regression
+        if: needs.classify.outputs.full_node != 'true'
         run: |
           node tests/gameplay-ui-regressions-20260908.test.js
           node tests/forge-sockets-gems.test.js
@@ -263,11 +271,12 @@ jobs:
       - name: Run affected inventory and reforge regressions
         if: needs.classify.outputs.inventory_changed == 'true' && needs.classify.outputs.full_node != 'true'
         run: |
-          for file in tests/reforge-eligibility-runtime-browser.test.js tests/ui-synthesis-dungeon-equipment-comparison-regression.test.js tests/ui-synthesis-large-panel-browser.test.js tests/v173.46-equipment-progression.test.js tests/v173.51-qa.test.js tests/v173.57-starter-icons-reforge-filter.test.js tests/v173.58-reforge-redesign.test.js; do
+          for file in tests/reforge-eligibility-runtime-browser.test.js tests/ui-synthesis-dungeon-equipment-comparison-regression.test.js tests/ui-synthesis-large-panel-browser.test.js tests/v173.46-equipment-progression.test.js tests/v173.57-starter-icons-reforge-filter.test.js tests/v173.58-reforge-redesign.test.js; do
             node "$file"
           done
 
       - name: Run relic lifecycle and battle input regressions
+        if: needs.classify.outputs.full_node != 'true'
         run: |
           node tests/relic-trigger-lifecycle-battle-input-ui-20260919.test.js
           node tests/v174-team-relic-system.test.js
