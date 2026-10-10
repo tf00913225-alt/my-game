@@ -96,6 +96,34 @@ and after every affected QA group. Publisher and responsive live smoke remain
 mandatory; each other deployed group accepts only an explicit affected-mode
 skip, never failure/cancellation/missing evidence. Manual deployment defaults full.
 
+## 2026-10-10 並行協作驗收檢查
+
+Work ID: `GOV-PARALLEL-CODEX-ACCEPTANCE-20261010`。檢查基準 dev:
+`ff2d20dfd8c809cdf481e5125672076d10a9c70a`。
+協作責任與結案條件由 [AGENTS.md](../AGENTS.md#多-codex-並行施工與統一驗收規範) 唯一管理；
+CLAUDE.md 已直接引用 AGENTS，不另複製規範。本段保存檢查證據，不新增測試政策。
+
+| 檢查 | 現有證據與判定 |
+|---|---|
+| dev 更新自動整合 | `ci.yml` 的 push dev/main 與 PR dev/main 已存在；classify → 受影響 gates → `verify`（Repository checks），dev push 成功再呼叫 `deploy-dev-cloudflare.yml`。普通 dev 不是每次 Full；unknown／strict／安全相關依現有 classifier 保守路由。 |
+| 同測試多次觸發 | PR 與 dev push 是不同合併快照，CI 與 deployed QA 是不同環境，不可直接去重。Cloud 相關 paths 會觸發獨立 `session-authority.yml`，CI 的 cloud_gate 也呼叫其 emulator，存在同 SHA 重複 emulator 風險；獨立 workflow 還負責受保護 Firebase 部署與精確 Repository checks 等待。此安全鏈不在本次刪除或改寫，若後續去重須走 Auth／Cloud Gate。 |
+| concurrency | 普通 dev-target PR 按 PR number 分組，dev push 共用 push-dev 組，兩者 cancel-in-progress；Cloudflare 固定 dev 組也取消舊 run。main／候選 Full／Nightly 隔離且不取消執行中；Session／Firebase 維持 cancel-in-progress false。不同 PR 不互相取消。 |
+| 狀態可辨識 | Actions run API 提供 status／conclusion／head_sha／event／attempt；job 與 log 可追第一個失敗。aggregate 拒絕 failure／cancelled／missing／未授權 skip。API 的 cancelled 本身沒有證明是 concurrency，須和同組較新 run、SHA、時間／日誌交叉核對。 |
+| 避免新流程 | 現有 classifier、aggregate、固定 deployed SHA 前後驗證與 artifacts 足以支援統一驗收。本次僅修改協作 Owner 與本證據文件；不新增 workflow／監控／手動 dispatch，不改測試、玩法或部署設定。 |
+| 其他 workflows | Production 僅接受 main push 的成功 CI workflow_run 並固定 SHA；Firebase Native Auth 為既有明確確認的手動流程；Android PoC 僅特定 feature branches／手動；V173.38 inspect 僅指定 patch paths。均不是一般 dev 共用 CI 的第二條全套驗收線，保持原樣。 |
+
+實際 Actions 快照（讀取時狀態，後續以即時 run 為準）：
+
+- [dev CI 38051973599](https://github.com/tf00913225-alt/my-game/actions/runs/38051973599)：基準 dev SHA，push，in_progress，conclusion null。
+- [前一 dev CI 38049221628](https://github.com/tf00913225-alt/my-game/actions/runs/38049221628)：`32469fa9a93051125fde8c831de65eb6ed2bf9ae`，completed/cancelled。已有較新 dev run 且配置允許取代；未讀取消原因日誌，不宣稱已證明由 concurrency 取消。
+- [Session 38044163659](https://github.com/tf00913225-alt/my-game/actions/runs/38044163659)：completed/failure，與 CI cancelled 分開呈現；[後續 Session 38046730869](https://github.com/tf00913225-alt/my-game/actions/runs/38046730869) 是不同 SHA 的 success，不能拿來背書先前 SHA 或推論根因已修復。
+
+限制：branch metadata 在檢查時回傳 dev/main 的 protected=false；完整 protection endpoints
+皆回傳 403 Resource not accessible by integration，因此不能宣稱已完整核實遠端保護／rulesets。
+本工作保留治理中的 dev/main 禁止直改與 PR 合併規則，不變更遠端設定。
+Nightly 排程仍依 default branch 是否具有 workflow 決定是否生效，不能僅憑 dev 檔案宣稱已啟用。
+安全 emulator 去重與保護完整稽核列為未解決風險；不因本工程節省額度而繞過它們。
+
 ## Historical implementation evidence
 
 ## Phase 0 evidence

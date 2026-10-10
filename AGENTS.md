@@ -16,13 +16,33 @@
 
 已授權施工包含：最新 dev → 獨立分支 → 最小修改與必要驗證 → PR → Latest Head Required CI／任務 Gate → 合併 dev → 合併後確認 → 安全清理 → Closeout。不自動延伸為 dev → main 發布。
 
-合併前重新核對 dev、PR Head、完整 diff／scope、可合併狀態與所有必要 checks。dev 前進時檢查新增差異、相關 Owner／衝突及驗證影響；需要吸收時用正常 merge，不 rebase／force push。Head 變動後重新驗證，禁止用舊 CI 替新 Head 背書。CI 不得取消、略過或降低，失敗先修必要阻塞。
+合併前重新核對 dev、PR Head、完整 diff／scope、可合併狀態與所有必要 checks。dev 前進時檢查新增差異、相關 Owner／衝突及驗證影響；需要吸收時用正常 merge，不 rebase／force push。Head 變動後重新驗證，禁止用舊 CI 替新 Head 背書。不得手動取消、略過或降低必要 CI；既有 workflow concurrency 對同組過時版本的取代取消依下節處理，失敗先修必要阻塞。
 
 條件全部通過且無未解除高風險阻塞時，直接正常合併 dev，不再要求 MERGE-DEV 二次授權。明令不得合併的 CI Validation Draft PR 維持不可合併；取消二次確認不取代高風險特定授權，也不授權 main 發布。Release Freeze 中依發布 Owner 限制候選整合；P0 發布阻塞及 P1/P2 不得自行變成正常開發禁令。
 
-合併後，確認本工作內容仍存在及相關必要 checks；Runtime／部署特定修改再依風險驗證目標環境。文件-only 不要求 Gameplay Browser QA、Web 部署或玩家實機驗收。工作分支只有在內容已完整吸收、無獨立有效 commit/diff、無活躍 PR 或長期保留理由時才安全刪除，預設不再請示；舊 PR 只有已吸收／明確取代才可關閉。不得刪未吸收內容，永久／指定 backup 分支保留。
+合併後，確認本工作內容仍存在及本工作相關必要 checks；共用整合／部署證據與被新版本取代的處理依下節，不要求追蹤其他工程直到 dev 停止前進。Runtime／部署特定修改再依風險驗證目標環境。文件-only 不要求 Gameplay Browser QA、Web 部署或玩家實機驗收。工作分支只有在內容已完整吸收、無獨立有效 commit/diff、無活躍 PR 或長期保留理由時才安全刪除，預設不再請示；舊 PR 只有已吸收／明確取代才可關閉。不得刪未吸收內容，永久／指定 backup 分支保留。
 
 清理前檢查可用 Connector/API／已認證 git 等操作；工具未暴露刪除動作不等於沒有權限，若所有可用通道確實均無刪除能力，精確列為待清理及介面限制，不冒稱已結案。正式發布後的 main/dev 有效內容收斂依發布 Owner，不以 commit graph 差異代替實際 diff。
+
+## 多 Codex 並行施工與統一驗收規範
+
+本節是並行協作唯一規範 Owner；CLAUDE 與其他工程文件引用本節，不建立另一套驗收規則。適用於一般 dev 工程，不取代子系統安全 Gate、Latest Head PR 合併規則或正式發布授權。
+
+| 責任 | Owner 與範圍 |
+|---|---|
+| 個別施工 | 各施工 Codex 只負責自己 Work ID／Branch／PR 的修改、最小必要測試、原症狀驗證、最新 Head 必要 checks、合併確認與安全清理。PR 記錄受影響 Owner、驗證證據及尚待處理事項；不得修改其他工程範圍來消除不相關紅燈。 |
+| dev 共用驗收 | 既有 GitHub Actions 自動負責 dev 的受影響範圍整合 CI、Repository checks 與固定 SHA 部署驗收；classifier、aggregate 與部署 workflow 是執行 Owner。各 Codex 引用同一 run／job／artifact，不自行再啟動共同全套測試或部署。 |
+| 共同失敗分流 | 先發現者先記錄失敗 run／attempt／SHA／job、第一個實際失敗步驟、影響範圍與相關 PR，再依證據交由對應施工負責人處理。歸屬不明時回報相關子系統／CI Owner 與使用者，列為待歸屬，不猜測跨範圍修復。Actions 負責執行，不代替人工根因歸屬。 |
+
+- **dev 前進**：合併前仍檢查新增差異、衝突、相關 Owner 與驗證影響。其他 PR 更新 dev 本身不是重跑本機全套、重新部署、workflow_dispatch 或重建施工線的理由。只有本工作 Head 改變、相關依賴／衝突改變、必要 check 失效或具體原症狀／環境差異需要時，才補相應驗證；不得用舊 Head 的綠燈背書新 Head。
+- **共用證據**：PR CI 與 dev push 驗證不同快照，部署驗收驗證實際環境，必要的分層檢查不得當成可刪除的重複。證據至少帶 workflow、run URL／ID、attempt、event、Head／Base 或 dev SHA、必要 job 結果；部署證據另帶目標網址與實際 deployed SHA。已由同一有效快照 Actions 完成的高成本驗證，不在本機或其他 Codex 再做一次。
+- **狀態判讀**：queued／in_progress／waiting／pending 是待完成；completed + success 且必要 jobs／證據齊全才是通過。failure／timed_out／action_required 是需診斷的阻塞。cancelled 不等於測試失敗，也不等於通過；只有核對同 concurrency group 的較新 run、SHA 與時間／日誌後，才標示「被新版本取代」。無法確認取消原因就記錄「取消原因未確認」；missing／非政策允許的 skipped／neutral 均不可充當成功。
+- **取代處理**：只允許既有 workflow 的同組過時版本自動取消，不手動取消必要 CI 來省額度。PR 被取代須等本 PR 最新 Head 必要 checks；dev 被取代則由 Actions 驗證新 dev。若本工作仍須最終部署／安全驗收，只核對含本工作內容的新快照及相關證據，不能把舊取消結果當成通過；只需文件整合的工程可記錄 dev 共用驗收「由新 run 接管」，部署 N/A，完成自己的結案。
+- **停止條件**：本工作已合併、內容已確認保留、必要任務 Gate／原症狀驗證完成、無待處理問題且清理已完成或明確列出工具限制時，回報完成並結束。不得因其他 PR 繼續推進 dev 而持續輪詢 CI／部署或重新驗收。必須等待的本工作 Gate 使用有界等待與退避，只讀必要狀態及失敗日誌；不持續重讀整份規範、所有歷史 log 或無關 PR。
+- **共同失敗修復**：先區分測試／程式失敗、基礎設施故障、過時 SHA 拒絕與取代取消。修復留在對應 Work ID 的有效施工線；已結案工程若需再修，按新工作規則建立獨立線並關聯原 PR。確認暫時性故障且 SHA 仍有效時，優先重跑失敗 job；不得多人同時重跑同一 run。已知必要阻塞仍須解決，不以「其他 Owner」跳過合併 Gate。
+- **安全與發布**：不得為節省 Token／Actions 額度取消或降級安全、存檔、帳號、付款、資料遷移與正式部署檢查。dev/main 保護、必要 PR checks、正常 merge、Release Freeze 與 main 正式授權全部保留。本節不授權修改 branch protection、觸發正式發布或跨工程改碼。
+
+現有 Actions 拓樸、重複觸發檢查與限制證據見 [CI 治理文件](docs/CI_TEST_GOVERNANCE_LAYERING_20261006.md) 的「2026-10-10 並行協作驗收檢查」；該段僅保存證據，協作責任依本節。
 
 ## Resumable Work Protocol
 
