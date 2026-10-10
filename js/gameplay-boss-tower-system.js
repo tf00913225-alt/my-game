@@ -885,6 +885,9 @@
         if(hpInner){ hpInner.style.width=hpPercent+"%"; }
         shieldOverlay.style.left=hpPercent+"%";
         shieldOverlay.style.width=shieldPercent+"%";
+        if(hpInner&&typeof window.v143PresentHpLoss==="function"){
+            window.v143PresentHpLoss(hpInner,boss,maximum);
+        }
         syncEnemyResourceHud(index);
     }
 
