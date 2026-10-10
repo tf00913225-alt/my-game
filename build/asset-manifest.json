@@ -50,10 +50,10 @@
       "gameplay-core": {
         "scripts": [
           "build/gameplay-core-primary.859da0cdd818.js",
-          "build/gameplay-core-secondary.4aeb0ab0cce4.js"
+          "build/gameplay-core-secondary.efcc2503d028.js"
         ],
         "styles": [
-          "build/gameplay-core.3c9a2d008d7d.css"
+          "build/gameplay-core.de3b9fc7918b.css"
         ],
         "dependencies": [
           "app-shell",
@@ -94,7 +94,7 @@
           "build/feature-abyss.745a55548522.js"
         ],
         "styles": [
-          "build/feature-abyss.0fd197a8e292.css"
+          "build/feature-abyss.e7d16b632859.css"
         ],
         "dependencies": [
           "gameplay-core"
@@ -802,24 +802,24 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core-secondary.4aeb0ab0cce4.js",
-        "sha256": "4aeb0ab0cce4",
-        "bytes": 734844,
+        "path": "build/gameplay-core-secondary.efcc2503d028.js",
+        "sha256": "efcc2503d028",
+        "bytes": 750608,
         "priority": "P2",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/gameplay-core.3c9a2d008d7d.css",
-        "sha256": "3c9a2d008d7d",
-        "bytes": 374546,
+        "path": "build/gameplay-core.de3b9fc7918b.css",
+        "sha256": "de3b9fc7918b",
+        "bytes": 374585,
         "priority": "P2",
         "type": "style",
         "decode": false
       }
     ],
-    "manifestHash": "393997c03130",
-    "totalBytes": 21776349,
+    "manifestHash": "71c3feab0a58",
+    "totalBytes": 21792152,
     "totalResources": 78
   },
   "assets": {
@@ -835,9 +835,9 @@
       "sha256": "859da0cdd818",
       "bytes": 649160
     },
-    "build/gameplay-core-secondary.4aeb0ab0cce4.js": {
-      "sha256": "4aeb0ab0cce4",
-      "bytes": 734844
+    "build/gameplay-core-secondary.efcc2503d028.js": {
+      "sha256": "efcc2503d028",
+      "bytes": 750608
     },
     "build/feature-patrol.ab5bd3ce5582.js": {
       "sha256": "ab5bd3ce5582",
@@ -883,17 +883,17 @@
       "sha256": "036233ef330a",
       "bytes": 102127
     },
-    "build/gameplay-core.3c9a2d008d7d.css": {
-      "sha256": "3c9a2d008d7d",
-      "bytes": 374546
+    "build/gameplay-core.de3b9fc7918b.css": {
+      "sha256": "de3b9fc7918b",
+      "bytes": 374585
     },
     "build/feature-patrol.1cef20d37f82.css": {
       "sha256": "1cef20d37f82",
       "bytes": 2471
     },
-    "build/feature-abyss.0fd197a8e292.css": {
-      "sha256": "0fd197a8e292",
-      "bytes": 25618
+    "build/feature-abyss.e7d16b632859.css": {
+      "sha256": "e7d16b632859",
+      "bytes": 25700
     },
     "build/feature-boss-relic.790db1f9bab2.css": {
       "sha256": "790db1f9bab2",
