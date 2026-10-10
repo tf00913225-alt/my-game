@@ -118,7 +118,7 @@ CLAUDE.md 已直接引用 AGENTS，不另複製規範。本段保存檢查證據
 - [前一 dev CI 38049221628](https://github.com/tf00913225-alt/my-game/actions/runs/38049221628)：`32469fa9a93051125fde8c831de65eb6ed2bf9ae`，completed/cancelled。已有較新 dev run 且配置允許取代；未讀取消原因日誌，不宣稱已證明由 concurrency 取消。
 - [Session 38044163659](https://github.com/tf00913225-alt/my-game/actions/runs/38044163659)：completed/failure，與 CI cancelled 分開呈現；[後續 Session 38046730869](https://github.com/tf00913225-alt/my-game/actions/runs/38046730869) 是不同 SHA 的 success，不能拿來背書先前 SHA 或推論根因已修復。
 
-限制：branch metadata 在檢查時回傳 dev/main 的 protected=false；完整 protection endpoints
+限制：branch metadata 在檢查時回傳 dev protected=false、main protected=true；完整 protection endpoints
 皆回傳 403 Resource not accessible by integration，因此不能宣稱已完整核實遠端保護／rulesets。
 本工作保留治理中的 dev/main 禁止直改與 PR 合併規則，不變更遠端設定。
 Nightly 排程仍依 default branch 是否具有 workflow 決定是否生效，不能僅憑 dev 檔案宣稱已啟用。
