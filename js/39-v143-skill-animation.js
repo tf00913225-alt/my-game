@@ -247,7 +247,7 @@
     const originalPlay=director.play.bind(director);
     const originalDispose=director.dispose.bind(director);
     const state={
-        version:VERSION,current:null,stage:null,timers:new Set(),pendingUpdates:new Map(),
+        version:VERSION,current:null,stage:null,timers:new Set(),pendingUpdates:new Map(),hpSamples:new WeakMap(),hpTrails:new Map(),
         metrics:{started:0,completed:0,missingVisuals:0,legacyNodesPurged:0,delayedNumbers:0,delayedDeaths:0}
     };
     window.v143SkillAnimationState=state;
@@ -262,7 +262,42 @@
         state.timers.forEach(id=>clearTimeout(id));
         state.timers.clear();
         state.pendingUpdates.clear();
+        state.hpTrails.forEach(entry=>{ entry.animation.cancel(); entry.node.remove(); });
+        state.hpTrails.clear();
+        state.hpSamples=new WeakMap();
     }
+
+    /* Read the final HUD projection, never delay or write gameplay HP. Boss
+       shields change the bar denominator; only actual HP loss creates a trail. */
+    window.v143PresentHpLoss=function(bar,entity,maxHP){
+        if(!bar||!entity){ return; }
+        const hp=Math.max(0,Number(entity.hp)||0);
+        const percent=Math.max(0,Math.min(100,parseFloat(bar.style.width)||0));
+        const previous=state.hpSamples.get(bar);
+        state.hpSamples.set(bar,{entity,hp,percent});
+        const clear=function(){
+            const entry=state.hpTrails.get(bar);
+            if(entry){ entry.animation.cancel(); entry.node.remove(); state.hpTrails.delete(bar); }
+        };
+        if(!previous||previous.entity!==entity||hp>previous.hp||hp===previous.hp&&percent!==previous.percent){ clear(); return; }
+        if(hp>=previous.hp){ return; }
+        clear();
+        if(!bar.parentElement||typeof bar.animate!=="function"||
+           typeof window.matchMedia==="function"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){ return; }
+        const denominator=hp>0&&percent>0?hp/percent*100:Math.max(1,Number(maxHP)||1);
+        const loss=Math.min(100-percent,(previous.hp-hp)/denominator*100);
+        if(loss<=0){ return; }
+        const node=document.createElement("span");
+        node.className="v143-hp-damage-trail";
+        node.setAttribute("aria-hidden","true");
+        node.style.left=percent+"%";
+        node.style.width=loss+"%";
+        bar.parentElement.appendChild(node);
+        const animation=node.animate([{opacity:1},{opacity:1,offset:.2},{opacity:0}],{duration:260,easing:"ease-out"});
+        const entry={node,animation};
+        state.hpTrails.set(bar,entry);
+        animation.onfinish=()=>{ node.remove(); if(state.hpTrails.get(bar)===entry){ state.hpTrails.delete(bar); } };
+    };
 
     function purgeLegacyCardVfx(){
         if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
@@ -1541,8 +1576,9 @@
             if(artwork.v143ImpactRecoil){ artwork.v143ImpactRecoil.cancel(); }
             const distance=(critical?5:4)*(side==="monster"?-1:1);
             artwork.v143ImpactRecoil=artwork.animate([
-                {translate:"0px 0px",scale:1},
-                {translate:"0px "+distance+"px",scale:critical?.975:.98,offset:.3},
+                {translate:"0px 0px",scale:1,filter:"brightness(0) invert(1)"},
+                {translate:"0px "+distance+"px",scale:critical?.975:.98,filter:"brightness(0) invert(1)",offset:.3},
+                {filter:typeof getComputedStyle==="function"?getComputedStyle(artwork).filter:"none",offset:80/140},
                 {translate:"0px "+(-distance*.3)+"px",scale:1,offset:.7},
                 {translate:"0px 0px",scale:1}
             ],{duration:140,easing:"ease-out"});

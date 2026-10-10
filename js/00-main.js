@@ -196,6 +196,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 
 
 
+
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
    - 遊戲邏輯舞台固定 1080 × 1920
@@ -22794,6 +22795,10 @@ function applyMonsterUiUpdate(index){
     runBattleMonsterUiHook("v143SystemAfterMonsterUiUpdate",index,monster);
     runBattleMonsterUiHook("v149AfterMonsterUiUpdate",index,monster);
     runBattleMonsterUiHook("v143StatusAfterMonsterUiUpdate",index,monster);
+    const card=$("battleMonster"+index);
+    if(hpBar&&card&&!card.classList.contains("gameplay-boss-card")&&typeof window.v143PresentHpLoss==="function"){
+        window.v143PresentHpLoss(hpBar,monster,monster.maxHP);
+    }
 }
 
 function updateMonsterUI(index){
@@ -23101,6 +23106,10 @@ function updateSingleCharacterBars(
         hpBar.style.width =
             hpPercent+
             "%";
+
+        if(typeof window.v143PresentHpLoss==="function"){
+            window.v143PresentHpLoss(hpBar,character,stats.maxHP);
+        }
 
     }
 
