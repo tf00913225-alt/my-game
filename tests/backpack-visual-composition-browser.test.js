@@ -10,14 +10,22 @@ const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function freePort(){return new Promise((resolve,reject)=>{const server=net.createServer();server.once("error",reject);server.listen(0,"127.0.0.1",()=>{const port=server.address().port;server.close(()=>resolve(port));});});}
 async function connectChrome(chrome){
     const port=await freePort(),profile=fs.mkdtempSync(path.join(require("node:os").tmpdir(),"backpack-runtime-"));
-    const child=cp.spawn(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--remote-debugging-address=127.0.0.1",`--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,"about:blank"],{stdio:"ignore"});
+    const child=cp.spawn(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--remote-debugging-address=127.0.0.1",`--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,"about:blank"],{stdio:["ignore","ignore","pipe"]});
+    let stderr="",launchError,exit;
+    child.stderr?.on("data",chunk=>{stderr=(stderr+String(chunk)).slice(-4000);});
+    child.once("error",error=>{launchError=error;});
+    child.once("exit",(code,signal)=>{exit={code,signal};});
     let socket,id=0;const pending=new Map();
     const rejectPending=error=>{for(const request of pending.values()){clearTimeout(request.timer);request.reject(error);}pending.clear();};
     const close=()=>{rejectPending(new Error("Backpack Chrome connection closed"));socket?.close();child.kill("SIGKILL");fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:50});};
     try{
-        let target;const deadline=Date.now()+5000;
-        while(!target&&Date.now()<deadline){try{target=(await (await fetch(`http://127.0.0.1:${port}/json/list`,{signal:AbortSignal.timeout(1000)})).json()).find(row=>row.type==="page"&&row.webSocketDebuggerUrl);}catch(_){}if(!target)await sleep(50);}
-        assert.ok(target,"Chrome DevTools target unavailable within 5 seconds");
+        // Match the existing shared browser readiness budget, not 100 polls.
+        let target;const deadline=Date.now()+15000;
+        while(!target&&Date.now()<deadline){
+            if(launchError||exit)throw new Error(`Backpack Chrome launch failed: ${launchError?.message||JSON.stringify(exit)}\n${stderr}`);
+            try{target=(await (await fetch(`http://127.0.0.1:${port}/json/list`,{signal:AbortSignal.timeout(1000)})).json()).find(row=>row.type==="page"&&row.webSocketDebuggerUrl);}catch(_){}if(!target)await sleep(50);
+        }
+        assert.ok(target,`Chrome DevTools target unavailable within 15 seconds\n${stderr}`);
         socket=new WebSocket(target.webSocketDebuggerUrl);
         await new Promise((resolve,reject)=>{
             const timer=setTimeout(()=>reject(new Error("Backpack Chrome socket open timed out")),5000);

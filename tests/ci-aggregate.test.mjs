@@ -181,7 +181,7 @@ test('core targeted suites and full runner cover the same files exactly once',()
 test('backpack Chrome transport rejects stalled commands and cleans up without weakening visual assertions',async()=>{
   const source=fs.readFileSync(new URL('./backpack-visual-composition-browser.test.js',import.meta.url),'utf8').replaceAll('\r\n','\n');
   const require=createRequire(import.meta.url);
-  let socket,killed=0,removed=0;
+  let socket,killed=0,removed=0,launchFailure=false;
   class FakeSocket extends EventTarget {
     constructor(){super();socket=this;queueMicrotask(()=>this.dispatchEvent(new Event('open')));}
     send(text){this.request=JSON.parse(text);}
@@ -190,11 +190,13 @@ test('backpack Chrome transport rejects stalled commands and cleans up without w
   }
   const connect=vm.runInNewContext(source.split('\nconst chrome=findChrome();')[0]+'\nconnectChrome;',{
     require:name=>name==='node:fs'?{mkdtempSync:()=>'/unused-fixture-profile',rmSync:()=>removed++}:
-      name==='node:child_process'?{spawn:()=>({kill:()=>killed++})}:
+      name==='node:child_process'?{spawn:()=>({kill:()=>killed++,
+        stderr:{on:(event,read)=>{if(launchFailure)read('fixture Chrome launch diagnostic');}},
+        once:(event,read)=>{if(launchFailure&&event==='exit')queueMicrotask(()=>read(1,null));}})}:
       name==='node:net'?{createServer:()=>({once(){},listen(port,host,ready){ready();},address:()=>({port:12345}),close(done){done();}})}:require(name),
     __dirname:new URL('.',import.meta.url).pathname,
     WebSocket:FakeSocket,AbortSignal,
-    fetch:async()=>({json:async()=>[{type:'page',webSocketDebuggerUrl:'ws://fixture.invalid'}]}),
+    fetch:async()=>({json:async()=>launchFailure?[]:[{type:'page',webSocketDebuggerUrl:'ws://fixture.invalid'}]}),
     setTimeout:(fn,ms)=>setTimeout(fn,ms===30000?10:ms),clearTimeout
   });
   const browser=await connect('fixture-chrome');
@@ -206,4 +208,7 @@ test('backpack Chrome transport rejects stalled commands and cleans up without w
     await assert.rejects(closed,/closed before response/);
   }finally{browser.close();}
   assert.equal(killed,1);assert.equal(removed,1);
+  launchFailure=true;
+  await assert.rejects(connect('fixture-chrome'),/Chrome launch failed:.*"code":1[\s\S]*fixture Chrome launch diagnostic/);
+  assert.equal(killed,2);assert.equal(removed,2);
 });
