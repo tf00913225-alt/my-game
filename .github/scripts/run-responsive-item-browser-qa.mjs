@@ -194,7 +194,7 @@ async function run(chrome,url,live){
    await c.eval(`showPage('home');openHomeFeature('shop');v17346PreviewEquipmentShopOffer(0)`);await settle();
    const shop=await check('.v17346-shop-preview-modal',v),shopArt=await check('.v17346-shop-preview-art',v),shopBack=await check('.v17346-shop-preview-modal .v132-reward-actions button',v,true);
    assert.ok(Math.abs(shopArt.rect.width-shopArt.rect.height)<1,'shop art distorted');
-   const shopImages=await c.eval(`Array.from(document.querySelectorAll('.v17346-shop-preview-art img')).map(n=>({fit:getComputedStyle(n).objectFit,loaded:n.complete&&n.naturalWidth>0}))`);assert.ok(shopImages.length);for(const img of shopImages){assert.equal(img.fit,'contain');assert.ok(img.loaded);}
+   const shopImages=await c.eval(`(async()=>{const images=Array.from(document.querySelectorAll('.v17346-shop-preview-art img'));let timeout;try{await Promise.race([Promise.all(images.map(n=>n.decode())),new Promise((_,reject)=>{timeout=setTimeout(()=>reject(new Error('shop artwork decode timed out')),15000);})]);return images.map(n=>({src:n.getAttribute('src'),fit:getComputedStyle(n).objectFit,loaded:n.complete&&n.naturalWidth>0}));}finally{clearTimeout(timeout);}})()`);assert.ok(shopImages.length);for(const img of shopImages){assert.equal(img.fit,'contain');assert.ok(img.loaded,'shop artwork not loaded: '+img.src);}
    await resize([v[0],v[1]-80]);await check('.v17346-shop-preview-modal .v132-reward-actions button',[v[0],v[1]-80]);await screenshot('shop-short-'+v.join('x'));await resize(v);await screenshot('shop-'+v.join('x'));
    await click('.v17346-shop-preview-modal .v132-reward-actions button',v);await c.eval(`closeHomeFeature()`);
    // Load later feature styles before re-entering the same inventory owner.
