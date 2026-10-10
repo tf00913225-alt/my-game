@@ -11936,7 +11936,7 @@
     const originalPlay=director.play.bind(director);
     const originalDispose=director.dispose.bind(director);
     const state={
-        version:VERSION,current:null,stage:null,timers:new Set(),pendingUpdates:new Map(),hpSamples:new WeakMap(),hpTrails:new Map(),
+        version:VERSION,current:null,stage:null,timers:new Set(),pendingUpdates:new Map(),hpSamples:new WeakMap(),hpTrails:new Map(),impactFlashes:new Map(),
         metrics:{started:0,completed:0,missingVisuals:0,legacyNodesPurged:0,delayedNumbers:0,delayedDeaths:0}
     };
     window.v143SkillAnimationState=state;
@@ -11954,6 +11954,8 @@
         state.hpTrails.forEach(entry=>{ entry.animation.cancel(); entry.node.remove(); });
         state.hpTrails.clear();
         state.hpSamples=new WeakMap();
+        state.impactFlashes.forEach(animation=>animation.cancel());
+        state.impactFlashes.clear();
     }
 
     /* Read the final HUD projection, never delay or write gameplay HP. Boss
@@ -13074,6 +13076,10 @@
             const card=cardFor(current.targetSide,index);
             if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }
             const artwork=card&&card.querySelector(".v174-battle-art");
+            if(artwork&&(reason==="dispose"||reason==="superseded"||reason==="v143-render-error")){
+                const flash=state.impactFlashes.get(artwork);
+                if(flash){ flash.cancel(); state.impactFlashes.delete(artwork); }
+            }
             if(artwork&&artwork.v143ImpactRecoil){
                 artwork.v143ImpactRecoil.cancel();
                 artwork.v143ImpactRecoil=null;
@@ -13264,14 +13270,27 @@
             if(typeof window.matchMedia==="function"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){ playSound(); return; }
             if(artwork.v143ImpactRecoil){ artwork.v143ImpactRecoil.cancel(); }
             const distance=(critical?5:4)*(side==="monster"?-1:1);
+            const previousFlash=state.impactFlashes.get(artwork);
+            if(previousFlash){ previousFlash.cancel(); }
+            const baseFilter=typeof getComputedStyle==="function"?getComputedStyle(artwork).filter:"none";
+            // Two80ms pulses separated by40ms of the original artwork. This
+            // presentation finishes independently of the140ms recoil/gate.
+            const flash=artwork.animate([
+                {filter:"brightness(0) invert(1)",offset:0,easing:"steps(1, end)"},
+                {filter:baseFilter,offset:.4,easing:"steps(1, end)"},
+                {filter:"brightness(0) invert(1)",offset:.6,easing:"steps(1, end)"},
+                {filter:baseFilter,offset:1}
+            ],{duration:200,easing:"linear"});
+            state.impactFlashes.set(artwork,flash);
+            flash.onfinish=()=>{ if(state.impactFlashes.get(artwork)===flash){ state.impactFlashes.delete(artwork); } };
             artwork.v143ImpactRecoil=artwork.animate([
-                {translate:"0px 0px",scale:1,filter:"brightness(0) invert(1)"},
-                {translate:"0px "+distance+"px",scale:critical?.975:.98,filter:"brightness(0) invert(1)",offset:.3},
-                {filter:typeof getComputedStyle==="function"?getComputedStyle(artwork).filter:"none",offset:80/140},
+                {translate:"0px 0px",scale:1},
+                {translate:"0px "+distance+"px",scale:critical?.975:.98,offset:.3},
                 {translate:"0px "+(-distance*.3)+"px",scale:1,offset:.7},
                 {translate:"0px 0px",scale:1}
             ],{duration:140,easing:"ease-out"});
-            artwork.v143ImpactRecoil.onfinish=()=>{ artwork.v143ImpactRecoil=null; };
+            const recoil=artwork.v143ImpactRecoil;
+            recoil.onfinish=()=>{ if(artwork.v143ImpactRecoil===recoil){ artwork.v143ImpactRecoil=null; } };
             playSound();
         };
         if(!queueTargetHit(current,unitIndex,present,"feedback",side)){

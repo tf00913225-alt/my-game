@@ -3,7 +3,7 @@ const assert=require("node:assert/strict"),fs=require("node:fs"),vm=require("nod
 const source=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const nodes=[];
 function node(){const n={style:{},setAttribute(){},removed:false,remove(){this.removed=true;},animate(frames,options){const a={frames,options,cancelled:false,cancel(){this.cancelled=true;}};this.animation=a;return a;}};nodes.push(n);return n;}
-const state={hpSamples:new WeakMap(),hpTrails:new Map(),timers:new Set(),pendingUpdates:new Map()};
+const state={hpSamples:new WeakMap(),hpTrails:new Map(),impactFlashes:new Map(),timers:new Set(),pendingUpdates:new Map()};
 const context={state,window:{},document:{createElement:node},clearTimeout(){}};
 vm.createContext(context);
 vm.runInContext(source.slice(source.indexOf("    function clearTimers("),source.indexOf("    function purgeLegacyCardVfx(")),context);
@@ -25,12 +25,13 @@ actor.hp=750;bar.style.width="50%";present(bar,actor,1000);
 trail=state.hpTrails.get(bar);assert.equal(trail.node.style.left,"50%");assert.equal(trail.node.style.width,"10%","150 HP loss over final shield-inclusive1500 denominator");
 trail.animation.onfinish();assert.equal(state.hpTrails.size,0);assert.ok(trail.node.removed);
 actor.hp=0;bar.style.width="0%";present(bar,actor,1000);assert.equal(state.hpTrails.get(bar).node.style.width,"75%","death uses maxHP denominator after shield is depleted");
-context.clearTimers();assert.equal(state.hpTrails.size,0,"dispose removes every active trail");
+let flashCancelled=false;state.impactFlashes.set({}, {cancel(){flashCancelled=true;}});
+context.clearTimers();assert.ok(flashCancelled);assert.equal(state.impactFlashes.size,0);assert.equal(state.hpTrails.size,0,"dispose removes every active trail");
 present(bar,{hp:100},1000);assert.equal(state.hpTrails.size,0,"new entity identity never inherits previous damage");
 const impact=fs.readFileSync("tests/battle-feel-impact-20261008.test.js","utf8");
 assert.ok(impact.includes('kind==="criticalDamage"'),"existing runtime test covers critical/direct/MISS/heal/status paths");
-const frames=source.slice(source.indexOf("artwork.v143ImpactRecoil=artwork.animate(["),source.indexOf("artwork.v143ImpactRecoil.onfinish"));
+const frames=source.slice(source.indexOf("const flash=artwork.animate(["),source.indexOf("            playSound();",source.indexOf("const flash=artwork.animate([")));
 assert.match(frames,/filter:"brightness\(0\) invert\(1\)"/);
-assert.match(frames,/offset:80\/140/);assert.match(frames,/duration:140/);
+assert.match(frames,/offset:\.4/);assert.match(frames,/offset:\.6/);assert.match(frames,/duration:200/);assert.match(frames,/duration:140/);
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");assert.match(css,/pointer-events:none/);assert.match(css,/\.hp-bar-inner\{transition:none;\}/);
-console.log("Hit flash80ms within existing recoil; HP loss260ms, repeat/heal/shield/death/identity/dispose PASS");
+console.log("Two hit flashes80ms,40ms gap independent of existing recoil; HP loss260ms, repeat/heal/shield/death/identity/dispose PASS");
