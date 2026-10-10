@@ -137,7 +137,7 @@ test("element box settings temporarily rise above document-level skill effects",
     assert.equal(runtime.body.classList.contains("v162-element-box-settings-open"),true);
     runtime.context.closeAutoBattleSettings();
     assert.equal(runtime.body.classList.contains("v162-element-box-settings-open"),false);
-    assert.match(css,/v162-element-box-settings-open #game-stage\{[\s\S]*?z-index:2147483644 !important/);
+    assert.match(css,/v162-element-box-settings-open #game-ui\{[\s\S]*?z-index:2147483644 !important/);
     assert.match(css,/v162-element-box-settings-open #homeFeatureModal,[\s\S]*?z-index:2147483645 !important/);
 });
 

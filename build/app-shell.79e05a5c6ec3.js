@@ -26316,8 +26316,7 @@ function renderCharacterShowcaseContent(){
 
     let html=
 
-        '<div style="display:flex;gap:10px;'+
-        'justify-content:center;margin-bottom:8px;">';
+        '<div class="character-showcase-row">';
 
 
     slots.forEach(
@@ -26456,7 +26455,7 @@ function renderCharacterShowcaseContent(){
 
     html+=
 
-        '<div style="display:flex;gap:6px;margin-bottom:6px;">'+
+        '<div class="character-tab-row">'+
 
         '<button id="characterTabBtnExpPool" class="home-feature-buy-btn"'+
         'style="flex:1;padding:10px 6px;font-size:18px;min-height:52px;"'+
