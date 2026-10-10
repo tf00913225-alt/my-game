@@ -71,7 +71,7 @@ assert.match(water,/FROSTBITE_REMAINING_RATE=\.70/);
 assert.match(skillOwner,/floodBeast:\{baseDamage:105,damagePerLevel:21,spCost:35,targetType:"single",requires:\["waterBall"\]/);
 assert.match(main,/function learnSkill\(skillId\)[\s\S]*?getSkillLearnEligibilityForUi\([\s\S]*?owner,[\s\S]*?skill,[\s\S]*?character\.skillLevels[\s\S]*?if\(!eligibility\.allowed\)[\s\S]*?availablePoints<learnCost[\s\S]*?owner\.skillPoints=availablePoints-learnCost/);
 assert.match(skillOwner,/function applyFinalProgressionData\(\)/);
-assert.match(abyssCss,/home-background-v17344\.png/);
+assert.match(fs.readFileSync("css/00-main.css","utf8"),/\.home-bg-fixed-layer\{[^}]*background-image:url\(\.\.\/assets\/ui\/home-background-v17344\.png\)/);
 assert.equal(fs.existsSync("assets/ui/home-background-v17344.png"),true,"assets/ui/home-background-v17344.png");
 assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
 assert.ok(index.includes('aria-label="目前版本 V'+releaseMeta.version+'"'));
