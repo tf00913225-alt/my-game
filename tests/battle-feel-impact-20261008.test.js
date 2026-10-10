@@ -7,10 +7,10 @@ const resolver=source.slice(start,end);
 const hitQueue=source.slice(source.indexOf('    function queueTargetHit('),source.indexOf('    function requestImpactTimeline('));
 function fixture(config={id:"normal"}){
     const sounds=[],motions=[],timers=[];
-    const artwork={animate(frames,options){motions.push({frames,options});return {cancel(){}};}};
+    const artwork={animate(frames,options){motions.push({frames,options});const motion={frames,options,cancelled:false,cancel(){this.cancelled=true;}};motions[motions.length-1]=motion;return motion;}};
     const current={done:false,sequence:1,targetSide:"monster",config};
     const context={window:{v141Audio:{play:kind=>sounds.push(kind),combatFeedbackVolumeScale:2}},
-        state:{current,metrics:{delayedNumbers:0}},Date:{now:()=>100},
+        state:{current,impactFlashes:new Map(),metrics:{delayedNumbers:0}},Date:{now:()=>100},
         delayFor:()=>config.wait??297,setTimer:fn=>timers.push(fn),cardFor:()=>({querySelector:sel=>{assert.equal(sel,".v174-battle-art");return artwork;}})};
     vm.createContext(context);vm.runInContext(hitQueue+resolver,context);
     return {context,sounds,motions,timers};
@@ -20,14 +20,24 @@ for(const kind of ["damage","criticalDamage","miss","heal","sp","shield","status
     assert.equal(timing.delayMs,297);assert.equal(f.sounds.length,0);assert.equal(f.motions.length,0);
     f.timers.forEach(fn=>fn());
     const damage=kind==="damage"||kind==="criticalDamage";
-    assert.equal(f.motions.length,damage?1:0);
-    if(damage){assert.equal(f.motions[0].options.duration,140);assert.equal(f.motions[0].frames[1].translate,kind==="criticalDamage"?"0px -5px":"0px -4px");assert.equal(f.motions[0].frames[0].filter,"brightness(0) invert(1)");assert.equal(f.motions[0].frames[2].offset,80/140);assert.equal(f.motions[0].frames[2].filter,"none");}
+    assert.equal(f.motions.length,damage?2:0);
+    if(damage){assert.equal(f.motions[1].options.duration,140);assert.equal(f.motions[1].frames[1].translate,kind==="criticalDamage"?"0px -5px":"0px -4px");assert.equal(f.motions[0].frames[0].filter,"brightness(0) invert(1)");assert.equal(f.motions[0].options.duration,200);assert.equal(f.motions[0].frames[1].filter,"none");assert.deepEqual(Array.from(f.motions[0].frames,f=>f.offset),[0,.4,.6,1]);assert.equal(f.motions[0].frames[2].filter,"brightness(0) invert(1)");}
     const sound={damage:"damage",criticalDamage:"crit",miss:"dodge",shield:"block"}[kind];
     assert.deepEqual(f.sounds,sound?[sound]:[]);
 }
 const indirect=fixture({id:"healSpell",category:"heal"});indirect.context.window.v143ResolveBattleFeedbackTiming("monster",0,"damage");indirect.timers.forEach(fn=>fn());assert.equal(indirect.motions.length,0);
 const noCast=fixture();noCast.context.state.current=null;noCast.context.window.v143ResolveBattleFeedbackTiming("monster",0,"damage");noCast.timers.forEach(fn=>fn());assert.equal(noCast.motions.length,0);
-const expired=fixture({id:'normal',wait:0});expired.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');assert.equal(expired.sounds.length,0);assert.equal(expired.motions.length,0);expired.timers.forEach(fn=>fn());assert.equal(expired.motions.length,1);
+const expired=fixture({id:'normal',wait:0});expired.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');assert.equal(expired.sounds.length,0);assert.equal(expired.motions.length,0);expired.timers.forEach(fn=>fn());assert.equal(expired.motions.length,2);
+const repeat=fixture({id:'normal',wait:0});
+const presentHit=()=>{repeat.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');repeat.timers.splice(0).forEach(fn=>fn());};
+presentHit();const oldFlash=repeat.motions[0],oldRecoil=repeat.motions[1];presentHit();
+assert.ok(oldFlash.cancelled&&oldRecoil.cancelled);
+oldFlash.onfinish();oldRecoil.onfinish();
+assert.equal([...repeat.context.state.impactFlashes.values()][0],repeat.motions[2]);
+repeat.motions[2].onfinish();assert.equal(repeat.context.state.impactFlashes.size,0);
+const reduced=fixture();reduced.context.window.matchMedia=()=>({matches:true});
+reduced.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');reduced.timers.forEach(fn=>fn());
+assert.equal(reduced.motions.length,0);assert.deepEqual(reduced.sounds,['damage']);
 const scheduleStart=source.indexOf('    function scheduleStatusOwnedUiUpdate(');
 const scheduleEnd=source.indexOf('    if(typeof document!=="undefined")',scheduleStart);
 const calls=[],timers=[];const c={state:{pendingUpdates:new Map()},existingTargetDelay:()=>300,setTimer:fn=>timers.push(fn),window:{},syncStatusVisualsForUnit(){}};
@@ -42,10 +52,11 @@ const cleanupEnd=source.indexOf('    let sequence=',cleanupStart);
 let cancelled=0;
 const art={v143ImpactRecoil:{cancel(){cancelled++;}}};
 const active={done:false,spriteNodes:[],targetIndexes:[0],targetSide:'monster'};
-const cleanupContext={state:{current:active,stage:null,metrics:{completed:0}},cardFor:()=>({classList:{remove(){}},querySelector:()=>art}),syncStatusVisualEffects(){}};
+const cleanupContext={state:{impactFlashes:new Map(),current:active,stage:null,metrics:{completed:0}},cardFor:()=>({classList:{remove(){}},querySelector:()=>art}),syncStatusVisualEffects(){}};
 vm.createContext(cleanupContext);vm.runInContext(source.slice(cleanupStart,cleanupEnd),cleanupContext);
+cleanupContext.state.impactFlashes.set(art,{cancel(){cancelled++;}});
 cleanupContext.cleanupCurrent(active,'dispose');
-assert.equal(cancelled,1);assert.equal(art.v143ImpactRecoil,null);assert.equal(cleanupContext.state.current,null);
+assert.equal(cancelled,2);assert.equal(cleanupContext.state.impactFlashes.size,0);assert.equal(art.v143ImpactRecoil,null);assert.equal(cleanupContext.state.current,null);
 // Execute the real raster emitter and hit task: even after slow DOM setup the
 // first exposed frame is the impact frame, never a transparent travel frame.
 const spriteClasses=new Set();
