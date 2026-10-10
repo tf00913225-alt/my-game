@@ -12,7 +12,7 @@
 }
 
 /* Keep Element Box settings above every document-level battle effect. */
-body.v162-element-box-settings-open #game-stage{
+body.v162-element-box-settings-open #game-ui{
     z-index:2147483644 !important;
 }
 body.v162-element-box-settings-open #homeFeatureModal,
@@ -92,11 +92,6 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage .v17342-element-box-use-notice.show{
     opacity:1;
     transform:translateY(0);
-}
-
-/* Current main-city production background. */
-#game-stage .home-bg-fixed-layer{
-    background-image:url("../assets/ui/home-background-v17344.png") !important;
 }
 
 /* The older equipment-specific shorthand kept background-size:auto 84%.

@@ -183,7 +183,7 @@ assert.match(questCss,/quest-milestone\.reached:not\(\.claimed\) \.quest-milesto
 assert.match(questCss,/quest-milestone:not\(\.reached\)[\s\S]*opacity:\.5 !important/);
 assert.match(questCss,/quest-milestone\.claimed[\s\S]*opacity:\.5 !important/);
 
-assert.match(abyssCss,/home-background-v17344\.png/);
+assert.match(baseCss,/\.home-bg-fixed-layer\{[^}]*background-image:url\(\.\.\/assets\/ui\/home-background-v17344\.png\)/);
 assert.match(abyssCss,/gold-v17344\.png/);
 assert.match(abyssCss,/abyss-cover-v17343\.png/);
 [

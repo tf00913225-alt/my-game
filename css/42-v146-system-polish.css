@@ -25,7 +25,7 @@
 /* Status floating text is owned by css/battle-floating-feedback-owner.css. */
 /* Growth reminders use the shared notification-dot presentation contract in
    css/38.  This file only keeps the attention target fully composited. */
-#game-stage .v146-growth-attention-target{
+:is(#game-stage,#game-ui) .v146-growth-attention-target{
     opacity:1 !important;
     filter:none !important;
 }
@@ -37,7 +37,7 @@
 
 
 :is(#game-stage,#game-ui) .shop-potion-purchase-row{display:grid !important;grid-template-columns:auto 52px minmax(70px,1fr) 64px !important;gap:5px !important;align-items:center !important;}
-#game-stage .v146-shop-total{min-width:0;color:#f3cf79;font-size:13px;line-height:17px;font-weight:900;text-align:right;white-space:nowrap;}
+#game-ui .v146-shop-total{min-width:0;color:#f3cf79;font-size:13px;line-height:17px;font-weight:900;text-align:right;white-space:nowrap;}
 
 
 #game-stage #dungeonPage.v146-abyss-active{padding:0 0 82px !important;background:#090806;}
@@ -82,7 +82,7 @@
     animation:v173ExpChargeFloat 1.45s ease-out both;
 }
 @keyframes v173ExpChargeFloat{0%{opacity:0;transform:translateY(5px)}15%{opacity:1}100%{opacity:0;transform:translateY(-18px)}}
-#game-stage #expDistributeList .v173-exp-row-meta{
+:is(#game-stage,#game-ui) #expDistributeList .v173-exp-row-meta{
     grid-column:1/-1;
     display:flex;
     align-items:center;
@@ -92,7 +92,7 @@
     font-size:14px;
     line-height:1.4;
 }
-#game-stage #expDistributeList .v173-exp-row-meta b{
+:is(#game-stage,#game-ui) #expDistributeList .v173-exp-row-meta b{
     margin-left:auto;
     padding:2px 6px;
     border:1px solid rgba(200,153,69,.58);
@@ -123,7 +123,7 @@
     font-size:15px !important;
     line-height:1.5 !important;
 }
-#game-stage #homeRestCard > div{
+:is(#game-stage,#game-ui) #homeRestCard > div{
     font-size:15px !important;
     line-height:1.55 !important;
 }
@@ -227,7 +227,7 @@
 }
 @media (max-width:380px){
     :is(#game-stage,#game-ui) .shop-potion-purchase-row{grid-template-columns:auto 48px minmax(62px,1fr) 58px !important;gap:3px !important;}
-    #game-stage .v146-shop-total{font-size:13px;}
+    #game-ui .v146-shop-total{font-size:13px;}
 }
 @media (prefers-reduced-motion:reduce){
     .v146-area-impact,#game-stage .v141-abyss-map.v146-too-far,.v173-exp-charge-float{animation-duration:.01ms !important;animation-iteration-count:1 !important;}

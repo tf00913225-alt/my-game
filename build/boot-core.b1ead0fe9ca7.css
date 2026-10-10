@@ -605,7 +605,7 @@ button:disabled{
     inset:0;
     z-index:0;
 
-    background-image:url(../assets/ui/home-background.jpg);
+    background-image:url(../assets/ui/home-background-v17344.png);
     background-size:cover;
     background-position:center center;
     background-repeat:no-repeat;
@@ -890,8 +890,8 @@ button:disabled{
     display:flex;
     flex:0 0 auto;
     flex-direction:column;
-    gap:12px;
-    padding:12px 7px;
+    gap:4px;
+    padding:4px 7px;
 }
 
 .home-primary-actions{
