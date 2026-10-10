@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import vm from 'node:vm';
+import {createRequire} from 'node:module';
 import {CHILD_GATES, requireChildGates, DEPLOYMENT_GATES, requireDeploymentGates} from '../.github/scripts/ci-aggregate.mjs';
 import {classifyChanges} from '../.github/scripts/ci-change-classifier.mjs';
 
@@ -174,4 +176,34 @@ test('core targeted suites and full runner cover the same files exactly once',()
     assert.ok(step);assert.doesNotMatch(step,/full_node/);
     assert.ok(core.indexOf(name)<core.indexOf('Run all Node unit and integration suites'));
   }
+});
+
+test('backpack Chrome transport rejects stalled commands and cleans up without weakening visual assertions',async()=>{
+  const source=fs.readFileSync(new URL('./backpack-visual-composition-browser.test.js',import.meta.url),'utf8').replaceAll('\r\n','\n');
+  const require=createRequire(import.meta.url);
+  let socket,killed=0,removed=0;
+  class FakeSocket extends EventTarget {
+    constructor(){super();socket=this;queueMicrotask(()=>this.dispatchEvent(new Event('open')));}
+    send(text){this.request=JSON.parse(text);}
+    close(){this.dispatchEvent(new Event('close'));}
+    reply(value){const event=new Event('message');event.data=JSON.stringify({id:this.request.id,result:value});this.dispatchEvent(event);}
+  }
+  const connect=vm.runInNewContext(source.split('\nconst chrome=findChrome();')[0]+'\nconnectChrome;',{
+    require:name=>name==='node:fs'?{mkdtempSync:()=>'/unused-fixture-profile',rmSync:()=>removed++}:
+      name==='node:child_process'?{spawn:()=>({kill:()=>killed++})}:
+      name==='node:net'?{createServer:()=>({once(){},listen(port,host,ready){ready();},address:()=>({port:12345}),close(done){done();}})}:require(name),
+    __dirname:new URL('.',import.meta.url).pathname,
+    WebSocket:FakeSocket,AbortSignal,
+    fetch:async()=>({json:async()=>[{type:'page',webSocketDebuggerUrl:'ws://fixture.invalid'}]}),
+    setTimeout:(fn,ms)=>setTimeout(fn,ms===30000?10:ms),clearTimeout
+  });
+  const browser=await connect('fixture-chrome');
+  try{
+    const success=browser.send('Runtime.evaluate');socket.reply({value:'retained'});
+    assert.equal((await success).value,'retained');
+    await assert.rejects(browser.send('Page.captureScreenshot'),/CDP timed out after 30 seconds: Page.captureScreenshot/);
+    const closed=browser.send('Page.navigate');socket.close();
+    await assert.rejects(closed,/closed before response/);
+  }finally{browser.close();}
+  assert.equal(killed,1);assert.equal(removed,1);
 });

@@ -11,12 +11,30 @@ async function freePort(){return new Promise((resolve,reject)=>{const server=net
 async function connectChrome(chrome){
     const port=await freePort(),profile=fs.mkdtempSync(path.join(require("node:os").tmpdir(),"backpack-runtime-"));
     const child=cp.spawn(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--remote-debugging-address=127.0.0.1",`--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,"about:blank"],{stdio:"ignore"});
-    let target;for(let i=0;i<100&&!target;i++){try{target=(await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()).find(row=>row.type==="page"&&row.webSocketDebuggerUrl);}catch(_){}if(!target)await sleep(50);}
-    assert.ok(target,"Chrome DevTools target unavailable");
-    const socket=new WebSocket(target.webSocketDebuggerUrl);await new Promise((resolve,reject)=>{socket.addEventListener("open",resolve,{once:true});socket.addEventListener("error",reject,{once:true});});
-    let id=0;const pending=new Map();socket.addEventListener("message",event=>{const message=JSON.parse(String(event.data));if(message.id&&pending.has(message.id)){const promise=pending.get(message.id);pending.delete(message.id);message.error?promise.reject(new Error(message.error.message)):promise.resolve(message.result);}});
-    const send=(method,params={})=>new Promise((resolve,reject)=>{const next=++id;pending.set(next,{resolve,reject});socket.send(JSON.stringify({id:next,method,params}));});
-    return {send,close:()=>{socket.close();child.kill("SIGKILL");fs.rmSync(profile,{recursive:true,force:true});}};
+    let socket,id=0;const pending=new Map();
+    const rejectPending=error=>{for(const request of pending.values()){clearTimeout(request.timer);request.reject(error);}pending.clear();};
+    const close=()=>{rejectPending(new Error("Backpack Chrome connection closed"));socket?.close();child.kill("SIGKILL");fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:50});};
+    try{
+        let target;const deadline=Date.now()+5000;
+        while(!target&&Date.now()<deadline){try{target=(await (await fetch(`http://127.0.0.1:${port}/json/list`,{signal:AbortSignal.timeout(1000)})).json()).find(row=>row.type==="page"&&row.webSocketDebuggerUrl);}catch(_){}if(!target)await sleep(50);}
+        assert.ok(target,"Chrome DevTools target unavailable within 5 seconds");
+        socket=new WebSocket(target.webSocketDebuggerUrl);
+        await new Promise((resolve,reject)=>{
+            const timer=setTimeout(()=>reject(new Error("Backpack Chrome socket open timed out")),5000);
+            socket.addEventListener("open",()=>{clearTimeout(timer);resolve();},{once:true});
+            socket.addEventListener("error",()=>{clearTimeout(timer);reject(new Error("Backpack Chrome socket failed to open"));},{once:true});
+        });
+        socket.addEventListener("message",event=>{const message=JSON.parse(String(event.data));if(message.id&&pending.has(message.id)){const request=pending.get(message.id);pending.delete(message.id);clearTimeout(request.timer);message.error?request.reject(new Error(message.error.message)):request.resolve(message.result);}});
+        socket.addEventListener("close",()=>rejectPending(new Error("Backpack Chrome socket closed before response")));
+        socket.addEventListener("error",()=>rejectPending(new Error("Backpack Chrome socket error")));
+        const send=(method,params={})=>new Promise((resolve,reject)=>{
+            const next=++id;
+            const timer=setTimeout(()=>{pending.delete(next);reject(new Error(`Backpack Chrome CDP timed out after 30 seconds: ${method}`));},30000);
+            pending.set(next,{resolve,reject,timer});
+            try{socket.send(JSON.stringify({id:next,method,params}));}catch(error){clearTimeout(timer);pending.delete(next);reject(error);}
+        });
+        return {send,close};
+    }catch(error){close();throw error;}
 }
 
 const chrome=findChrome();
