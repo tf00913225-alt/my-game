@@ -326,6 +326,7 @@
             }
         }};
         state.impactFlashes.set(artwork,entry);
+        if(state.impactFlashes.size===1){ window.FourSymbolsBattlePresentation?.syncHud?.(); }
         animation.onfinish=entry.cancel;
         return entry;
     }

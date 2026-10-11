@@ -169,9 +169,9 @@ try{
    if(kind==='dot'){settleBattleHpDamage(monsters[index],1,{sourceType:'dot',damageKind:'dot'});showMonsterHit(index,1,'hp');}
    else{v143ResolveBattleFeedbackTiming('monster',index,kind,false);}
    await new Promise(resolve=>v143RunAtTargetHit('monster',index,resolve,true));
-   return {kind,count:v143SkillAnimationState.impactFlashes.size};
+   return {kind,count:v143SkillAnimationState.impactFlashes.size,hudPlane:!!document.querySelector('.v174-battle-hud-layer')};
   },kind);
-  assert.equal(result.count,0);evidence.exclusions.push(result);
+  assert.equal(result.count,0);assert.equal(result.hudPlane,false,kind+' keeps its existing HUD mount');evidence.exclusions.push(result);
  }
  const life=async(reason)=>{
   const info=await cast('iceArrowRain');
