@@ -5,8 +5,32 @@ import os from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {parse} from 'acorn';
-import {classifyChanges, classifySharedSource, changedPaths} from '../.github/scripts/ci-change-classifier.mjs';
+import {classifyChanges, classifySharedSource, changedPaths, applyAuthorizedLethalBossException} from '../.github/scripts/ci-change-classifier.mjs';
 const plan=(paths,options={})=>classifyChanges(paths,{enabled:true,...options});
+test('authorized lethal repair skips only Boss on its exact unintegrated dev snapshot',()=>{
+  const paths=['js/39-v143-skill-animation.js','.github/scripts/ci-change-classifier.mjs'];
+  const baseSha='a'.repeat(40),headSha='b'.repeat(40),now=new Date('2026-10-11T00:00:00Z');
+  const runGit=args=>{if(args[0]==='merge-base'&&args[3]===baseSha)throw Object.assign(new Error('not ancestor'),{status:1});return '';};
+  for(const eventName of ['pull_request','push']){
+    const before=plan(paths,{eventName});
+    const after=applyAuthorizedLethalBossException(before,{paths,baseSha,headSha,now,runGit});
+    assert.equal(after.bossMode,'none');assert.equal(after.gates.boss_balance,false);
+    for(const key of Object.keys(before.gates).filter(k=>k!=='boss_balance'))assert.equal(after.gates[key],before.gates[key]);
+    assert.equal(after.strictMode,before.strictMode);
+  }
+  for(const options of [{baseRef:'main'},{eventName:'workflow_dispatch'},{eventName:'schedule',fullRegression:true}]){
+    const before=plan(paths,options);
+    assert.equal(applyAuthorizedLethalBossException(before,{paths,baseSha,headSha,now,runGit}),before);
+  }
+  const before=plan(paths);
+  for(const extra of [
+    {now:new Date('2026-10-18T00:00:00Z')}, {headSha:'invalid'},
+    {paths:[...paths,'js/gameplay-boss-tower-system.js']},
+    {runGit:()=>''}, // checkpoint already in base
+    {runGit:args=>args[0]==='diff'?'js/39-v143-skill-animation.js':runGit(args)},
+    {runGit:()=>{throw Object.assign(new Error('missing checkpoint'),{status:128});}}
+  ])assert.equal(applyAuthorizedLethalBossException(before,{paths,baseSha,headSha,now,runGit,...extra}),before);
+});
 test('three Boss levels, PR/dev consistency and release strictness',()=>{
   for(const eventName of ['pull_request','push']){
     assert.equal(plan(['css/23-stage-v77-inventory-detail-ui.css'],{eventName}).bossMode,'none');

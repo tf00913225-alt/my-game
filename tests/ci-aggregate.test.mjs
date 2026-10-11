@@ -4,9 +4,26 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import {createRequire} from 'node:module';
 import {CHILD_GATES, requireChildGates, DEPLOYMENT_GATES, requireDeploymentGates} from '../.github/scripts/ci-aggregate.mjs';
-import {classifyChanges} from '../.github/scripts/ci-change-classifier.mjs';
+import {classifyChanges, applyAuthorizedLethalBossException} from '../.github/scripts/ci-change-classifier.mjs';
 
 const passed = () => Object.fromEntries(CHILD_GATES.map(key => [key, {result: 'success'}]));
+test('one-work Boss exemption permits only skipped Boss, never missing or failed gates',()=>{
+  const paths=['js/39-v143-skill-animation.js'],baseSha='a'.repeat(40),headSha='b'.repeat(40);
+  const plan=applyAuthorizedLethalBossException(classifyChanges(paths),{paths,baseSha,headSha,
+    runGit:args=>{if(args[0]==='merge-base'&&args[3]===baseSha)throw Object.assign(new Error('not ancestor'),{status:1});return '';}});
+  // After the finite exception expires the normal fail-closed policy is tested.
+  if(!plan.bossException){assert.equal(plan.gates.boss_balance,true);return;}
+  const needs=passed();needs.boss_balance.result='skipped';needs.main_browser.result='skipped';
+  assert.equal(requireChildGates(needs,{mainRequired:false,plan}),true);
+  for(const result of ['failure','cancelled','neutral',undefined]){
+    needs.boss_balance={result};assert.throws(()=>requireChildGates(needs,{mainRequired:false,plan}),/boss_balance/);
+  }
+  needs.boss_balance.result='skipped';
+  for(const key of CHILD_GATES.filter(k=>!['boss_balance','main_browser','promotion_health'].includes(k))){
+    const broken=structuredClone(needs);broken[key].result='skipped';
+    assert.throws(()=>requireChildGates(broken,{mainRequired:false,plan}),new RegExp(key));
+  }
+});
 test('deployed aggregate accepts all pass and rejects every failure, skip or cancellation',()=>{
   const passed=()=>Object.fromEntries(DEPLOYMENT_GATES.map(k=>[k,{result:'success'}]));
   assert.equal(requireDeploymentGates(passed()),true);
