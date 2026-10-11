@@ -2174,12 +2174,14 @@ const characterEquipment = {
 function migrateLegacyEquipmentStats(item){
     if(!item||typeof item!=="object"){ return item; }
     window.FourSymbolsEquipmentCombatMigration.migrateItem(item);
-    if(isEquipmentInventoryType(item.type)){
-        try{ window.FourSymbolsEquipmentReforge.migrateItem(item); }
-        catch(error){ console.error("保留無法安全遷移的冶煉裝備",item.id,error); }
-    }
     return typeof window.v132NormalizeEquipmentSetItem==="function"
         ?window.v132NormalizeEquipmentSetItem(item):item;
+}
+
+function hydrateEquipmentReforge(item){
+    if(!item||!isEquipmentInventoryType(item.type)){ return; }
+    try{ window.FourSymbolsEquipmentReforge.migrateItem(item); }
+    catch(error){ console.error("保留無法安全遷移的冶煉裝備",item.id,error); }
 }
 
 function normalizeEquipmentSlots(equipment){
@@ -2193,7 +2195,7 @@ function normalizeEquipmentSlots(equipment){
     delete equipment.weapon;
     delete equipment.helmet;
     delete equipment.accessory;
-    Object.values(equipment).forEach(migrateLegacyEquipmentStats);
+    Object.values(equipment).forEach(item=>{ migrateLegacyEquipmentStats(item); hydrateEquipmentReforge(item); });
 }
 
 
@@ -7841,6 +7843,7 @@ function loadGame(){
                     item.id
                 ){
                     migrateLegacyEquipmentStats(item);
+                    hydrateEquipmentReforge(item);
                     inventoryItems.push(
                         item
                     );

@@ -91,7 +91,6 @@
     function affixes(item){
         if(!item){ return []; }
         if(item.reforgeVersion!==undefined&&item.reforgeVersion!==VERSION){ throw Error("未知冶煉資料版本，請保留原資料"); }
-        if(item.reforgeSlots!=null&&(!Number.isSafeInteger(item.reforgeSlots)||item.reforgeSlots<0)){ throw Error("冶煉槽資料異常，請保留原資料"); }
         if(item.reforgeAffixes!==undefined){
             if(!Array.isArray(item.reforgeAffixes)||!item.reforgeAffixes.every(a=>a===null||validAffix(a))){ throw Error("冶煉詞條資料異常，請保留原資料"); }
             return item.reforgeAffixes.map(a=>a===null?null:{...a});
@@ -105,6 +104,7 @@
     }
     function slotCount(item){
         if(!item){ return 0; }
+        if(item.reforgeSlots!=null&&(!Number.isSafeInteger(item.reforgeSlots)||item.reforgeSlots<0)){ throw Error("冶煉槽資料異常，請保留原資料"); }
         return Math.max(SLOTS[rarity(item)],item.reforgeSlots||0,affixes(item).length);
     }
     function slots(item){
@@ -2422,12 +2422,14 @@ const characterEquipment = {
 function migrateLegacyEquipmentStats(item){
     if(!item||typeof item!=="object"){ return item; }
     window.FourSymbolsEquipmentCombatMigration.migrateItem(item);
-    if(isEquipmentInventoryType(item.type)){
-        try{ window.FourSymbolsEquipmentReforge.migrateItem(item); }
-        catch(error){ console.error("保留無法安全遷移的冶煉裝備",item.id,error); }
-    }
     return typeof window.v132NormalizeEquipmentSetItem==="function"
         ?window.v132NormalizeEquipmentSetItem(item):item;
+}
+
+function hydrateEquipmentReforge(item){
+    if(!item||!isEquipmentInventoryType(item.type)){ return; }
+    try{ window.FourSymbolsEquipmentReforge.migrateItem(item); }
+    catch(error){ console.error("保留無法安全遷移的冶煉裝備",item.id,error); }
 }
 
 function normalizeEquipmentSlots(equipment){
@@ -2441,7 +2443,7 @@ function normalizeEquipmentSlots(equipment){
     delete equipment.weapon;
     delete equipment.helmet;
     delete equipment.accessory;
-    Object.values(equipment).forEach(migrateLegacyEquipmentStats);
+    Object.values(equipment).forEach(item=>{ migrateLegacyEquipmentStats(item); hydrateEquipmentReforge(item); });
 }
 
 
@@ -8089,6 +8091,7 @@ function loadGame(){
                     item.id
                 ){
                     migrateLegacyEquipmentStats(item);
+                    hydrateEquipmentReforge(item);
                     inventoryItems.push(
                         item
                     );

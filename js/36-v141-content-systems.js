@@ -12,13 +12,14 @@
     const TIER_ORDER=["white","blue","purple","orange","pink","four-symbol"];
     const TALISMAN_TIER_ORDER=["white","blue","purple","orange"];
     const TIER_META={
-        white:{label:"白階",available:true,reforgeGold:1000,main:[1,5],reforgeMain:[5,10]},
-        blue:{label:"藍階",available:true,reforgeGold:3000,main:[3,8],reforgeMain:[11,16]},
-        purple:{label:"紫階",available:true,reforgeGold:8000,main:[5,11],sub:[1,3],reforgeMain:[17,22],reforgeSub:[11,16]},
-        orange:{label:"橙階",available:true,reforgeGold:20000,main:[7,14],sub:[2,5],reforgeMain:[23,28],reforgeSub:[11,16]},
-        pink:{label:"桃紅階",available:false,planned:true,reforgeGold:30000,reforgeMain:[29,34]},
-        "four-symbol":{label:"四象階",available:false,planned:true,reforgeGold:50000,reforgeMain:[35,40]}
+        white:{label:"白階",available:true,main:[1,5]},
+        blue:{label:"藍階",available:true,main:[3,8]},
+        purple:{label:"紫階",available:true,main:[5,11],sub:[1,3]},
+        orange:{label:"橙階",available:true,main:[7,14],sub:[2,5]},
+        pink:{label:"桃紅階",available:false,planned:true},
+        "four-symbol":{label:"四象階",available:false,planned:true}
     };
+    TIER_ORDER.forEach(key=>{ TIER_META[key].reforgeGold=reforgeModel.TIERS[key].gold; });
     function normalizeTierKey(value){
         const key=String(value||"").toLowerCase();
         return TIER_ALIASES[key]||key;
@@ -257,8 +258,9 @@
         const tier=normalizeTierKey(tierKey);
         const meta=TIER_META[tier];
         if(!meta||meta.available===false||!Array.isArray(meta.main)){ throw new Error("此階級尚未開放數值設定："+tier); }
-        const mainRange=isReforge?meta.reforgeMain:meta.main;
-        const subRange=isReforge?meta.reforgeSub:meta.sub;
+        if(isReforge){ throw new Error("冶煉必須使用逐槽 Owner"); }
+        const mainRange=meta.main;
+        const subRange=meta.sub;
         const stats={};
         const main=MAIN_STATS[Math.floor(Math.random()*MAIN_STATS.length)];
         if(!subRange){ stats[main]=rollSinglePeak(mainRange); return stats; }
@@ -296,14 +298,6 @@
         if(!entries.length){ return '<span class="muted">尚無冶煉詞條</span>'; }
         return entries.map(([key,value])=>'<span>'+escapeHtml(STAT_LABEL[key]||key)+' <b>+'+value+(["accuracy","evasion"].includes(key)?"%":"")+'</b></span>').join("");
     }
-    function rangeText(tierKey,isReforge){
-        const meta=TIER_META[normalizeTierKey(tierKey)];
-        if(!meta||meta.available===false){ return "尚未開放・數值待定"; }
-        const main=isReforge?meta.reforgeMain:meta.main;
-        const sub=isReforge?meta.reforgeSub:meta.sub;
-        return '主詞條 '+main[0]+'～'+main[1]+(sub?'・副詞條 '+sub[0]+'～'+sub[1]:'');
-    }
-
     function showSynthesisResult(title,body){
         const modal=document.getElementById("homeFeatureModal");
         if(modal){

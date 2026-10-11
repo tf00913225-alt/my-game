@@ -78,3 +78,11 @@ assert.equal(bonus('fire').attack,113);
 context.characterEquipment.fire.hand=null;assert.equal(bonus('fire').attack,0);
 context.characterEquipment.fire.hand=JSON.parse(JSON.stringify(four));assert.equal(bonus('fire').attack,113);
 console.log('PASS reforge V2 deterministic slots, migration, duplicates, locks, six equal stat intervals, 10% peak boundary, five uniform nonpeak intervals, all material tiers and combat owner');
+
+const hydrateSource=mainSource.slice(mainSource.indexOf('function hydrateEquipmentReforge('),mainSource.indexOf('/* =====================================================',mainSource.indexOf('function normalizeEquipmentSlots(')));
+const hydrateContext={window:{FourSymbolsEquipmentReforge:model},isEquipmentInventoryType:t=>['weapon','armor','head','shoulder','shoes','ring'].includes(t),migrateLegacyEquipmentStats:i=>i,console};
+const normalize=vm.runInNewContext(hydrateSource+';normalizeEquipmentSlots',hydrateContext);
+const worn={weapon:{type:'weapon',rarityKey:'purple',stats:{attack:7},reforgeStats:{attack:18}}};normalize(worn);
+assert.equal(worn.hand.reforgeAffixes.length,2);assert.equal(worn.hand.reforgeAffixes[1],null);
+const wornRaw=JSON.stringify(worn);normalize(worn);assert.equal(JSON.stringify(worn),wornRaw);
+assert.doesNotMatch(mainSource.slice(mainSource.indexOf('function migrateLegacyEquipmentStats('),mainSource.indexOf('function hydrateEquipmentReforge(')),/EquipmentReforge/,'render-time legacy normalizer does not migrate reforge slots');
