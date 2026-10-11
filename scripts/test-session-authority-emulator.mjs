@@ -1471,6 +1471,10 @@ ownedRecords.economy.sharedExp=320;
 // Emulator-only retained claim/counter fixture, not milestone reward issuance.
 ownedRecords.progress.sidecars.progress.raw=' {"eliteKills":3,"dungeonWins":2,"abyssClears":1} ';
 ownedRecords.progress.sidecars["quest-milestones"].raw=' {"date":"2020-02-29","daily":{"20":true},"commission":{"100":true}} ';
+ownedRecords.progress.sidecars["daily-dungeon-state"]={status:"present",
+    raw:' {"date":"2020-02-29","used":{"exp":true,"material":false,"equipment":true}} '};
+ownedRecords.progress.sidecars["equipment-shop-daily"]={status:"present",
+    raw:' {"date":"2020-02-29","refreshCount":2,"soldOfferIds":["2020-02-29:0:5","2020-02-29:2:0"]} '};
 ownedRecords.progress.abyssProgress.runs[40].clears=2;
 ownedRecords.progress.abyssProgress.runs[40].firstClearClaims={
     "d40-r0-s0":{status:"claimed",migrated:true}
