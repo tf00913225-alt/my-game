@@ -60,7 +60,7 @@ for(const hex of ["#FF9F38","#FF4FA7","#FF5A36","#42A5FF","#47D6A3","#C89B45"]){
 assert.match(css,/rarity-four-symbol[\s\S]*conic-gradient/);
 assert.match(css,/@keyframes teamRelicFourSymbolRarityBreath/);
 assert.doesNotMatch(css,/#game-(?:stage|ui) \.team-relic-home-tools\{/,'lazy relic CSS must not duplicate persistent utility geometry');
-assert.match(utilityCss,/#game-ui \.team-relic-home-tools\{[^}]*position:relative;[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\);[^}]*width:100%;[^}]*pointer-events:none/,'persistent utilities must reflow inside the browser city');
+assert.match(utilityCss,/#game-ui \.team-relic-home-tools\{[^}]*position:relative;[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\);[^}]*grid-row:2;[^}]*width:min\(52%,192px\);[^}]*pointer-events:none/,'persistent utilities must reflow inside the browser city');
 const utilityRule=(utilityCss.match(/#game-ui \.team-relic-home-tools \.home-card-utility\{([^}]*)\}/)||[])[1]||"";
 assert.match(utilityRule,/width:100%/);
 assert.match(utilityRule,/height:84px/);
