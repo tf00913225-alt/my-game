@@ -714,7 +714,7 @@
         synthesisState.pendingReforge=null;
         if(item){ normalizeReforgeLocks(item); }
         updateUI(); renderSynthesis();
-        showSynthesisResult(applyNew?"已套用新冶煉效果":"已保留原冶煉效果",applyNew&&item?'<div class="v141-result-item"><b>'+escapeHtml(item.name)+'</b>'+affixesHtml(reforgeModel.slots(item))+'</div>':'<p>本次材料與金幣已消耗，原有效果維持不變。</p>');
+        showSynthesisResult(applyNew?"已套用新冶煉效果":"已保留原冶煉效果",applyNew&&item?'<div class="v141-result-item"><b>'+window.FourSymbolsItemSlot.name(item.name,item)+'</b>'+affixesHtml(reforgeModel.slots(item))+'</div>':'<p>本次材料與金幣已消耗，原有效果維持不變。</p>');
         return true;
     };
 
