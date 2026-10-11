@@ -54,13 +54,7 @@
     opacity:.34 !important;
 }
 
-.shop-potion-purchase-row{
-    display:grid;
-    grid-template-columns:auto 70px minmax(0,1fr);
-    align-items:center;
-    gap:7px;
-    margin-top:8px;
-}
+
 
 .shop-potion-purchase-row label{
     color:#b3a58c;
@@ -80,10 +74,7 @@
     font:inherit;
 }
 
-.shop-potion-purchase-row .shop-potion-buy{
-    width:100%;
-    margin:0;
-}
+
 
 .skill-page-heading{
     display:flex;
@@ -206,9 +197,7 @@
 }
 
 @media (max-width:520px){
-    .shop-potion-purchase-row{
-        grid-template-columns:auto 62px minmax(0,1fr);
-    }
+
 
     .skill-preview-tabs button{
         padding:8px 2px;

@@ -30273,6 +30273,60 @@ function closeInventoryCharacterDetail(){
     }
 }
 
+/* Shared ItemSlot presentation. Series identity never participates in rarity. */
+const EQUIPMENT_RARITY_VISUALS=Object.freeze({
+    white:{color:"#D8D8D8",fill:"rgba(216,216,216,.25)"},
+    blue:{color:"#42A5FF",fill:"rgba(66,165,255,.25)"},
+    purple:{color:"#B05CFF",fill:"rgba(176,92,255,.25)"},
+    orange:{color:"#FF9F38",fill:"rgba(255,159,56,.25)"},
+    pink:{color:"#FF4FA7",fill:"rgba(255,79,167,.25)"},
+    "four-symbol":{color:"#D8D8D8",fill:"conic-gradient(from 0deg,rgba(66,165,255,.25),rgba(71,214,163,.25),rgba(200,155,69,.25),rgba(255,90,54,.25),rgba(66,165,255,.25))",frame:"conic-gradient(from 0deg,#42A5FF,#47D6A3,#C89B45,#FF5A36,#42A5FF)"}
+});
+function getEquipmentRarityKey(item){
+    const aliases={low:"white",mid:"blue",high:"purple",perfect:"orange"};
+    for(const raw of [item?.rarityKey,item?.quality,item?.tierKey,item?.legacyTierKey]){
+        const key=aliases[raw]||raw;
+        if(EQUIPMENT_RARITY_VISUALS[key]) return key;
+    }
+    return "white";
+}
+function getEquipmentNameColor(item){
+    return EQUIPMENT_RARITY_VISUALS[getEquipmentRarityKey(item)].color;
+}
+const FourSymbolsItemSlot=Object.freeze({
+    tokens(item){
+        const visual=EQUIPMENT_RARITY_VISUALS[getEquipmentRarityKey(item)];
+        return "--slot-rarity:"+(visual.frame?"transparent":visual.color)+";--equipment-name-color:"+visual.color+";--equipment-rarity-fill:"+visual.fill+";--equipment-rarity-frame:"+(visual.frame||"linear-gradient("+visual.color+","+visual.color+")");
+    },
+    apply(element,item){
+        element.classList.toggle("item-slot",!!item);
+        if(!item){ element.removeAttribute("data-item-rarity"); element.removeAttribute("style"); return; }
+        element.dataset.itemRarity=getEquipmentRarityKey(item);
+        element.setAttribute("style",this.tokens(item));
+    },
+    art(icon,item){
+        return String(icon||"◆").replace(/<span\b([^>]*)>/g,(match,attributes)=>{
+            if(!/class="[^"]*v169-item-art/.test(attributes)) return match;
+            const clean=attributes.replace(/\sdata-item-rarity="[^"]*"/g,"").replace(/\sstyle="[^"]*--equipment-rarity-fill:[^"]*"/g,"");
+            return '<span'+clean.replace(/class="([^"]*)"/,(_m,classes)=>'class="'+classes.replace(/\bitem-slot\b|v(?:17346|169)-rarity-[\w-]+/g,"").trim()+' item-slot"')+' data-item-rarity="'+getEquipmentRarityKey(item)+'" style="'+this.tokens(item)+'">';
+        });
+    },
+    neutralizeArt(element){
+        element.querySelectorAll(".v169-item-art").forEach(art=>{
+            art.classList.add("inventory-backpack-rarity-neutral");
+            art.classList.remove("item-slot");
+            art.removeAttribute("data-item-rarity");
+            art.removeAttribute("style");
+        });
+    },
+    name(name,item){
+        const text=String(name||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+        return '<span class="equipment-name" style="color:'+getEquipmentNameColor(item)+'">'+text+'</span>';
+    }
+});
+window.FourSymbolsItemSlot=FourSymbolsItemSlot;
+window.getEquipmentNameColor=getEquipmentNameColor;
+
 function renderEquipment(){
     const grid=$("equipmentGrid");
     if(!grid) return;
@@ -30304,9 +30358,11 @@ function renderEquipment(){
 
         if(item){
             box.classList.add("has-item");
+            FourSymbolsItemSlot.apply(box,item);
             box.innerHTML=`<div class="inventory-equipment-icon">${item.icon || "◆"}</div>`;
-            box.querySelectorAll(".v169-item-art").forEach(art=>art.classList.add("inventory-backpack-rarity-neutral"));
+            FourSymbolsItemSlot.neutralizeArt(box);
             box.title=item.name || slot.name;
+            label.innerHTML=FourSymbolsItemSlot.name(slot.name,item);
             box.onclick=()=>openEquippedItem(item,slot.key);
         }else{
             box.innerHTML=`<div class="inventory-equipment-icon empty">＋</div>`;
@@ -30411,6 +30467,7 @@ function renderInventoryItems(){
         box.className="inventory-item inventory-item-classic "+(item ? "has-item":"empty");
         if(item){
             const rarity=getInventoryRarityKey(item);
+            FourSymbolsItemSlot.apply(box,item);
             box.classList.add("rarity-"+rarity);
             box.dataset.rarity=rarity;
         }
@@ -30587,14 +30644,13 @@ function openItemModal(
         slotIndex;
 
 
-    $("itemModalIcon")
-        .textContent =
-        item.icon;
+    $("itemModalIcon").innerHTML=FourSymbolsItemSlot.art(item.icon,item);
 
 
     $("itemModalName")
         .textContent =
         item.name;
+    $("itemModalName").innerHTML=FourSymbolsItemSlot.name(item.name,item);
 
 
     $("itemModalStats")
@@ -30679,15 +30735,14 @@ function openEquippedItem(
         null;
 
 
-    $("itemModalIcon")
-        .textContent =
-        item.icon;
+    $("itemModalIcon").innerHTML=FourSymbolsItemSlot.art(item.icon,item);
 
 
     $("itemModalName")
         .textContent =
         item.name+
         "（已裝備）";
+    $("itemModalName").innerHTML=FourSymbolsItemSlot.name(item.name+"（已裝備）",item);
 
 
     $("itemModalStats")

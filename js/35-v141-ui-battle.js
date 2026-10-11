@@ -112,6 +112,7 @@
                 box.className="inventory-item inventory-item-classic "+(item?"has-item":"empty");
                 if(item){
                     const rarity=typeof getInventoryRarityKey==="function"?getInventoryRarityKey(item):"white";
+                    window.FourSymbolsItemSlot.apply(box,item);
                     box.classList.add("rarity-"+rarity);
                     box.dataset.rarity=rarity;
                 }
@@ -121,7 +122,7 @@
                     box.innerHTML=
                         '<div class="inventory-icon">'+(item.icon||"◆")+'</div>'+
                         '<div class="inventory-count">'+((Number(item.count)||0)>1?"×"+item.count:"")+'</div>';
-                    box.querySelectorAll(".v169-item-art").forEach(art=>art.classList.add("inventory-backpack-rarity-neutral"));
+                    window.FourSymbolsItemSlot.neutralizeArt(box);
                     const realIndex=inventoryItems.indexOf(item);
                     box.onclick=()=>{
                         document.querySelectorAll("#inventoryGrid .inventory-item-classic.is-selected").forEach(selected=>selected.classList.remove("is-selected"));
@@ -291,7 +292,7 @@
             const result=originalOpenItemModal.apply(this,arguments);
             const item=inventorySlots[slotIndex];
             const icon=document.getElementById("itemModalIcon");
-            if(icon&&item){ icon.innerHTML=item.icon||"◆"; }
+            if(icon&&item){ icon.innerHTML=window.FourSymbolsItemSlot.art(item.icon,item); }
             appendReforgeStatsToModal(item);
             syncDecomposeButton(item,slotIndex);
             syncInventoryPotionUseButton(item,slotIndex);

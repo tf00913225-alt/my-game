@@ -512,8 +512,8 @@
         {key:"shoes",slot:"shoes",name:"履",role:"magic",stats:{intelligence:20,defensePoints:10}},
         {key:"helm",slot:"head",name:"盔",role:"attack",stats:{attack:25,vitality:5}},
         {key:"crown",slot:"head",name:"冠",role:"magic",stats:{intelligence:25,vitality:5}},
-        {key:"wristguard",slot:"shoulder",name:"護腕",role:"attack",stats:{attack:25}},
-        {key:"focus",slot:"shoulder",name:"法環",role:"magic",stats:{intelligence:25}}
+        {key:"wristguard",slot:"shoulder",name:"護腕",role:"attack",stats:{attack:30}},
+        {key:"focus",slot:"shoulder",name:"法環",role:"magic",stats:{intelligence:30}}
     ];
 
     const EQUIPMENT_SETS=[
@@ -532,6 +532,9 @@
         item.levelRequirement=20;
         item.requiredElement=set.element;
         item.setVariant=piece.role;
+        item.rarityKey="pink";
+        item.quality="pink";
+        item.tierKey="pink";
         return item;
     }
     window.v132NormalizeEquipmentSetItem=normalizeEquipmentSetItem;
@@ -545,7 +548,8 @@
                 icon:equipmentSetIcon(set.id,piece.key),
                 type:piece.slot,
                 setId:set.id,
-                tierKey:"orange",
+                rarityKey:"pink",
+                tierKey:"pink",
                 levelRequirement:20,
                 price:0,
                 equipmentCombatPercentUnitVersion:2,
@@ -1506,7 +1510,7 @@
         modal.classList.add("v132-ticket-preview-detail");
 
         const title=document.getElementById("itemModalName");
-        if(title){ title.textContent=item.name; }
+        if(title){ title.innerHTML=window.FourSymbolsItemSlot.name(item.name,item); }
 
         [
             document.getElementById("itemEquipButton"),

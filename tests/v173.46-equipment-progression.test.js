@@ -16,8 +16,9 @@ assert.match(source,/\{key:"orange",label:"橙階",chance:5,min:23,max:28,reforg
 
 assert.match(source,/window\.v132NormalizeEquipmentSetItem\(item\)/);
 assert.doesNotMatch(source,/const SET_RULES=/,"late progression must not own another set stat table");
-assert.match(source,/item\.quality="orange"/);
-assert.match(source,/v17346-rarity-orange/);
+assert.doesNotMatch(source,/item\.quality="orange"/);
+assert.match(fs.readFileSync("js/27-v132-content-expansion.js","utf8"),/item\.rarityKey="pink"/);
+assert.match(source,/FourSymbolsItemSlot\.art/);
 
 assert.match(source,/reforgeSlots/);
 assert.match(source,/reforgeUsed=0/);
