@@ -2174,6 +2174,10 @@ const characterEquipment = {
 function migrateLegacyEquipmentStats(item){
     if(!item||typeof item!=="object"){ return item; }
     window.FourSymbolsEquipmentCombatMigration.migrateItem(item);
+    if(isEquipmentInventoryType(item.type)){
+        try{ window.FourSymbolsEquipmentReforge.migrateItem(item); }
+        catch(error){ console.error("保留無法安全遷移的冶煉裝備",item.id,error); }
+    }
     return typeof window.v132NormalizeEquipmentSetItem==="function"
         ?window.v132NormalizeEquipmentSetItem(item):item;
 }
@@ -2211,7 +2215,7 @@ function getEquipmentBonus(characterId){
     if(!equipment){ return bonus; }
     Object.values(equipment).forEach(item=>{
         if(!item){ return; }
-        [item.stats,item.reforgeStats,...getSocketGemStats(item)].forEach(stats=>{
+        [item.stats,window.FourSymbolsEquipmentReforge.aggregate(item),...getSocketGemStats(item)].forEach(stats=>{
             if(!stats||typeof stats!=="object"||Array.isArray(stats)){ return; }
             Object.entries(stats).forEach(([stat,value])=>{
                 if(Object.prototype.hasOwnProperty.call(bonus,stat)){

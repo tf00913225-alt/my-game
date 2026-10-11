@@ -248,6 +248,7 @@ function loadFinalRuntime(){
     const context=makeContext();
     const loaded=[];
     vm.runInContext(fs.readFileSync("functions/src/equipment-combat-percent-migration.js","utf8"),context);
+    vm.runInContext(fs.readFileSync("functions/src/equipment-reforge.js","utf8"),context);
     vm.runInContext(fs.readFileSync("js/startup/account-save-repository.js","utf8"),context,{filename:"js/startup/account-save-repository.js"});
     vm.runInContext('FourSymbolsAccountSave.activate("v170-test-uid")',context);
     EXPECTED_DIRECT_SCRIPT_PATHS.forEach(path=>{
