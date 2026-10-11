@@ -30475,6 +30475,7 @@ function renderInventoryItems(){
 
         if(item){
             box.innerHTML+=`<div class="inventory-icon">${item.icon || "◆"}</div><div class="inventory-count">${item.count>1 ? "×"+item.count : ""}</div>`;
+            FourSymbolsItemSlot.neutralizeArt(box);
             const realIndex=inventoryItems.indexOf(item);
             box.onclick=()=>{
                 document.querySelectorAll("#inventoryGrid .inventory-item-classic.is-selected").forEach(selected=>selected.classList.remove("is-selected"));
