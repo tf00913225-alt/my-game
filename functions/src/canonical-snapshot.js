@@ -78,7 +78,9 @@ function inspectTimeSidecar(key,raw){
 // eligibility, claim creation or migration defaults happen in this reader.
 function inspectClaimSidecar(key,raw){
     const fields={progress:["eliteKills","dungeonWins","abyssClears"],
-        "quest-milestones":["date","daily","commission"]}[key];
+        "quest-milestones":["date","daily","commission"],
+        "daily-dungeon-state":["date","used"],
+        "equipment-shop-daily":["date","refreshCount","soldOfferIds"]}[key];
     if(!fields){return;}
     let state;
     try{state=JSON.parse(raw);}catch(_){fail(`claim sidecar JSON: ${key}`);}
@@ -93,8 +95,28 @@ function inspectClaimSidecar(key,raw){
     }else{
         if(typeof state.date!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(state.date)||
            !Number.isFinite(Date.parse(`${state.date}T00:00:00Z`))||
-           new Date(`${state.date}T00:00:00Z`).toISOString().slice(0,10)!==state.date||
-           ["daily","commission"].some(type=>!object(state[type])||
+           new Date(`${state.date}T00:00:00Z`).toISOString().slice(0,10)!==state.date){
+            fail(`recorded claim date: ${key}`);
+        }
+        if(key==="daily-dungeon-state"){
+            if(!object(state.used)||Object.keys(state.used).sort().join("|")!=="equipment|exp|material"||
+               Object.values(state.used).some(value=>typeof value!=="boolean")){
+                fail("recorded dungeon usage");
+            }
+        }else if(key==="equipment-shop-daily"){
+            if(!Number.isSafeInteger(state.refreshCount)||state.refreshCount<0||state.refreshCount>10||
+               !Array.isArray(state.soldOfferIds)||new Set(state.soldOfferIds).size!==state.soldOfferIds.length||
+               state.soldOfferIds.some(id=>{
+                   if(typeof id!=="string"){return true;}
+                   const parts=id.split(":");
+                   return parts.length!==3||parts[0]!==state.date||
+                       !/^(0|[1-9]\d*)$/.test(parts[1])||
+                       !Number.isSafeInteger(Number(parts[1]))||Number(parts[1])>state.refreshCount||
+                       !/^[0-5]$/.test(parts[2]);
+               })){
+                fail("recorded shop refresh or purchase evidence");
+            }
+        }else if(["daily","commission"].some(type=>!object(state[type])||
                Object.entries(state[type]).some(([threshold,claimed])=>
                    !["20","40","60","80","100"].includes(threshold)||claimed!==true))){
             fail("recorded milestone date or claim markers");

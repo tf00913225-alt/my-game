@@ -32,7 +32,11 @@ function sources(count=1){
             sidecars:Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>
                 [key,makeInitialSidecars(1700000000000)[key].status==="present"?
                     makeInitialSidecars(1700000000000)[key]:
-                    {status:"present",raw:JSON.stringify({marker:key})}]))},
+                    {status:"present",raw:JSON.stringify(key==="daily-dungeon-state"?
+                        {date:"2020-02-29",used:{exp:true,material:false,equipment:true}}:
+                        key==="equipment-shop-daily"?
+                        {date:"2020-02-29",refreshCount:2,soldOfferIds:["2020-02-29:0:5","2020-02-29:2:0"]}:
+                        {marker:key})}]))},
         claimRecords,claimCheckpoint:{...base,claimCount:1,claimDigest:claimRecordsDigest(claimRecords),historicalClaimsBlocked:true},
         playableState:{...base,heroAccount:normalizeAccountState(null),bestiaryData:{slime:{seen:true,kills:9}},
             autoConfig:{...auto},autoConfig2:{...auto},autoConfig3:{...auto},
@@ -111,7 +115,8 @@ test("projection rejects oversized and non-JSON payloads before serialization ca
     const expanded=sources();
     for(const [key,entry] of Object.entries(expanded.progress.sidecars)){
         if(makeInitialSidecars(1)[key].status!=="present"){
-            entry.raw=JSON.stringify({data:"x".repeat(62000)});
+            entry.raw=["daily-dungeon-state","equipment-shop-daily"].includes(key)?
+                entry.raw+" ".repeat(62000):JSON.stringify({data:"x".repeat(62000)});
         }
     }
     expanded.playableState.bestiaryData=Object.fromEntries(Array.from({length:1999},(_,index)=>
@@ -275,6 +280,74 @@ test("historical v1 Abyss bytes stay compatible but cannot become complete sourc
     assert.equal(bundle.snapshot.progress.sidecars["abyss-state"].raw,"{}");
     assert.equal(assembleCanonicalSnapshot("uid-a",7,r).sha256,bundle.sha256);
     assert.throws(()=>assemble(r),/Abyss root schema/);assert.deepEqual(r,before);
+});
+
+test("recorded dungeon and shop evidence rejects incomplete or contradictory periods without mutation",()=>{
+    const mutations={
+        "daily-dungeon-state":[s=>delete s.used,s=>delete s.used.exp,s=>s.used.exp=1,
+            s=>s.used.material="false",s=>s.used.extra=false,s=>s.used=[],s=>s.extra=true],
+        "equipment-shop-daily":[s=>delete s.soldOfferIds,s=>s.soldOfferIds=null,
+            s=>s.refreshCount=-1,s=>s.refreshCount=11,s=>s.refreshCount=.5,s=>s.refreshCount="2",
+            s=>s.soldOfferIds.push(s.soldOfferIds[0]),s=>s.soldOfferIds=[1],
+            s=>s.soldOfferIds=["2020-03-01:0:0"],s=>s.soldOfferIds=["2020-02-29:3:0"],
+            s=>s.soldOfferIds=["2020-02-29:0:6"],s=>s.soldOfferIds=["2020-02-29:00:0"],
+            s=>s.soldOfferIds=["2020-02-29:-1:0"],s=>s.soldOfferIds=["2020-02-29:0:0:extra"],
+            s=>s.extra=true]
+    };
+    for(const [key,changes] of Object.entries(mutations)){
+        for(const change of [...changes,...["2023-02-29","2020-02-30","2020-13-01","2020-2-29",0].map(
+            date=>s=>s.date=date)]){
+            const r=sources(),state=JSON.parse(r.progress.sidecars[key].raw);
+            change(state);r.progress.sidecars[key].raw=JSON.stringify(state);
+            const before=structuredClone(r);assert.throws(()=>assemble(r),undefined,key);
+            assert.deepEqual(r,before);
+            const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=r.playableState;
+            r.progress.playableState=fields;delete r.playableState;
+            const durableBefore=structuredClone(r);
+            assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,r),undefined,key);
+            assert.deepEqual(r,durableBefore);
+        }
+    }
+});
+
+test("older dungeon usage and shop batches retain exact bytes, balances and closed readiness",()=>{
+    const r=sources();
+    for(const key of ["daily-dungeon-state","equipment-shop-daily"]){
+        r.progress.sidecars[key].raw=" "+r.progress.sidecars[key].raw+" ";
+    }
+    const before=structuredClone(r),bundle=assemble(r);
+    assert.deepEqual(bundle.projection.sidecars,r.progress.sidecars);
+    assert.deepEqual(bundle.projection.claimCheckpoint,r.claimCheckpoint);
+    assert.equal(bundle.projection.gameSave.gold,42);assert.equal(bundle.projection.gameSave.sharedExp,7);
+    assert.equal(bundle.projection.gameSave.inventoryItems.length,1);
+    assert.equal(bundle.readyForPublication,false);assert.equal(bundle.projection.authoritativeStateReady,false);
+    assert.deepEqual(r,before);
+    for(const key of ["daily-dungeon-state","equipment-shop-daily"]){
+        const changed=structuredClone(r),state=JSON.parse(changed.progress.sidecars[key].raw);
+        if(key==="daily-dungeon-state"){state.used.exp=false;}else{state.soldOfferIds.shift();}
+        changed.progress.sidecars[key].raw=JSON.stringify(state);
+        assert.notEqual(assemble(changed).sha256,bundle.sha256);
+        assert.throws(()=>verifyCanonicalPlayableProjectionAgainstSources(bundle,"uid-a",7,changed));
+    }
+    const boundary=sources();
+    boundary.progress.sidecars["equipment-shop-daily"].raw=JSON.stringify({date:"2020-02-29",
+        refreshCount:10,soldOfferIds:Array.from({length:66},(_,i)=>`2020-02-29:${Math.floor(i/6)}:${i%6}`)});
+    assert.doesNotThrow(()=>assemble(boundary));
+    const initial=makeInitialSidecars(1700000000000);
+    for(const key of ["daily-dungeon-state","equipment-shop-daily"]){
+        assert.deepEqual(initial[key],{status:"not-applicable",raw:null});
+    }
+});
+
+test("historical v1 period bytes remain compatible without inventing missing purchases",()=>{
+    for(const [key,raw] of [["daily-dungeon-state","{}"],
+        ["equipment-shop-daily",' {"date":"2020-02-29","refreshCount":2} ']]){
+        const r=sources();r.progress.sidecars[key].raw=raw;
+        const before=structuredClone(r),bundle=assembleCanonicalSnapshot("uid-a",7,r);
+        assert.equal(bundle.snapshot.progress.sidecars[key].raw,raw);
+        assert.equal(assembleCanonicalSnapshot("uid-a",7,r).sha256,bundle.sha256);
+        assert.throws(()=>assemble(r),/claim sidecar fields/);assert.deepEqual(r,before);
+    }
 });
 
 test("stored projection must match sources and cannot publish through tampered flags",()=>{
