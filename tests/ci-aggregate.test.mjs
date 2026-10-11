@@ -2,11 +2,28 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import os from 'node:os';
+import path from 'node:path';
+import {execFileSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {CHILD_GATES, requireChildGates, DEPLOYMENT_GATES, requireDeploymentGates} from '../.github/scripts/ci-aggregate.mjs';
 import {classifyChanges, applyAuthorizedLethalBossException} from '../.github/scripts/ci-change-classifier.mjs';
 
 const passed = () => Object.fromEntries(CHILD_GATES.map(key => [key, {result: 'success'}]));
+test('minimal aggregate checkout runs without an installed source parser',()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ci-aggregate-native-'));
+  const files=['ci-aggregate.mjs','ci-change-classifier.mjs'];
+  try{
+    for(const file of files)fs.copyFileSync(new URL('../.github/scripts/'+file,import.meta.url),path.join(dir,file));
+    const stdout=execFileSync(process.execPath,[path.join(dir,'ci-aggregate.mjs')],{encoding:'utf8',
+      env:{...process.env,CI_NEEDS_JSON:JSON.stringify(passed()),CI_MAIN_REQUIRED:'true',
+        CI_PLAN_JSON:JSON.stringify(classifyChanges(['js/unknown.js'],{baseRef:'main'}))}});
+    assert.match(stdout,/Repository checks: every required child passed/);
+  }finally{
+    for(const file of files)fs.unlinkSync(path.join(dir,file));
+    fs.rmdirSync(dir);
+  }
+});
 test('one-work Boss exemption permits only skipped Boss, never missing or failed gates',()=>{
   const paths=['js/39-v143-skill-animation.js'],baseSha='a'.repeat(40),headSha='b'.repeat(40);
   const plan=applyAuthorizedLethalBossException(classifyChanges(paths),{paths,baseSha,headSha,

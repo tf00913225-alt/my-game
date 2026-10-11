@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
-import {parse} from 'acorn';
+import {createRequire} from 'node:module';
 
 // Compare complete top-level declarations, never diff hunk line numbers. Any
 // change outside explicitly owned existing functions is unknown shared runtime.
@@ -22,6 +22,9 @@ const SHARED_MODULES = {
 export function classifySharedSource(before, after, sourcePath='js/00-main.js') {
   try {
     const owners=SHARED_MODULES[sourcePath];if(!owners)return null;
+    // The aggregate consumes only native policy helpers. Its minimal job does
+    // not install the parser; load Acorn only for actual source classification.
+    const {parse}=createRequire(import.meta.url)('acorn');
     const inspect = source => {
       const ast=parse(source,{ecmaVersion:'latest',sourceType:'script'});
       const functions={}, pieces=[];let cursor=0;
