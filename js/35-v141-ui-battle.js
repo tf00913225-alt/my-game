@@ -533,7 +533,9 @@
 
     function ensureMonsterShieldBars(){
         currentBattleMonsters.forEach(index=>{
-            const hp=document.querySelector("#battleMonster"+index+" .monster-hp");
+            const card=document.getElementById("battleMonster"+index);
+            const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
+            const hp=hud?.querySelector(".monster-hp");
             if(!hp||document.getElementById("battleMonsterShieldBar"+index)){ return; }
             const bar=document.createElement("div");
             bar.id="battleMonsterShieldBar"+index;

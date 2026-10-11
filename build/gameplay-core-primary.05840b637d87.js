@@ -8526,7 +8526,9 @@
 
     function ensureMonsterShieldBars(){
         currentBattleMonsters.forEach(index=>{
-            const hp=document.querySelector("#battleMonster"+index+" .monster-hp");
+            const card=document.getElementById("battleMonster"+index);
+            const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
+            const hp=hud?.querySelector(".monster-hp");
             if(!hp||document.getElementById("battleMonsterShieldBar"+index)){ return; }
             const bar=document.createElement("div");
             bar.id="battleMonsterShieldBar"+index;
@@ -11277,7 +11279,8 @@
         const card=document.getElementById("battleMonster"+index);
         const monster=typeof monsters!=="undefined"?monsters[index]:null;
         if(!card||!monster){ return; }
-        const name=card.querySelector(".battle-monster-name");
+        const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
+        const name=hud.querySelector(".battle-monster-name");
         const level=card.querySelector(".battle-monster-level");
         if(!name){ return; }
         const identity=String(monster.name||"");
@@ -11289,7 +11292,8 @@
     }
 
     function fitEnemyBars(card){
-        card.querySelectorAll(".monster-bar-text").forEach(node=>{
+        const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
+        hud.querySelectorAll(".monster-bar-text").forEach(node=>{
             node.style.removeProperty("transform");
             node.style.setProperty("font-size","13px","important");
             const available=Math.max(1,node.clientWidth||68);
@@ -11936,7 +11940,7 @@
     const originalPlay=director.play.bind(director);
     const originalDispose=director.dispose.bind(director);
     const state={
-        version:VERSION,current:null,stage:null,timers:new Set(),pendingUpdates:new Map(),hpSamples:new WeakMap(),hpTrails:new Map(),impactFlashes:new Map(),
+        version:VERSION,current:null,stage:null,timers:new Set(),pendingUpdates:new Map(),hpSamples:new WeakMap(),hpTrails:new Map(),impactFlashes:new Map(),hitOverlay:null,
         metrics:{started:0,completed:0,missingVisuals:0,legacyNodesPurged:0,delayedNumbers:0,delayedDeaths:0}
     };
     window.v143SkillAnimationState=state;
@@ -11947,6 +11951,74 @@
         return id;
     }
 
+    function clearImpactOverlays(){
+        Array.from(state.impactFlashes.values()).forEach(entry=>entry.cancel());
+        state.impactFlashes.clear();
+        if(state.hitOverlay){ state.hitOverlay.remove(); state.hitOverlay=null; }
+    }
+    function clearImpactTarget(side,index){
+        state.impactFlashes.forEach(entry=>{
+            if(entry.side===side&&entry.index===index){ entry.cancel(); }
+        });
+    }
+    function syncImpactOverlays(){
+        const page=document.getElementById("battlePage");
+        if(!page||!page.classList.contains("active")){ clearImpactOverlays(); return; }
+        state.impactFlashes.forEach((entry,artwork)=>{
+            const card=cardFor(entry.side,entry.index);
+            const entity=entityFor(entry.side,entry.index);
+            if(!artwork.isConnected||!card||card.querySelector(".v174-battle-art")!==artwork||
+               !entity||Number(entity.hp)<=0||entity.alive===false){ entry.cancel(); }
+        });
+    }
+    function createImpactFlash(artwork,side,index,current){
+        const geometry=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(side,index);
+        const projection=geometry&&geometry.artworkProjection;
+        const entity=entityFor(side,index);
+        if(!projection||!projection.rect.width||!projection.rect.height||
+           !projection.backgroundImage||projection.backgroundImage==="none"||!artwork.isConnected||
+           !entity||Number(entity.hp)<=0||entity.alive===false){ return null; }
+        const previous=state.impactFlashes.get(artwork);
+        if(previous){ previous.cancel(); }
+        if(!state.hitOverlay){
+            state.hitOverlay=document.createElement("div");
+            state.hitOverlay.className="v143-hit-feedback-overlay";
+            state.hitOverlay.setAttribute("aria-hidden","true");
+            document.body.appendChild(state.hitOverlay);
+        }
+        const node=document.createElement("i");
+        node.className="v143-hit-feedback-art";
+        node.dataset.side=side;
+        node.dataset.index=String(index);
+        node.dataset.sequence=String(current.sequence);
+        const rect=projection.rect;
+        Object.assign(node.style,{
+            left:rect.left+"px",top:rect.top+"px",width:rect.width+"px",height:rect.height+"px",
+            backgroundImage:projection.backgroundImage,backgroundSize:projection.backgroundSize,
+            backgroundPosition:projection.backgroundPosition,backgroundRepeat:projection.backgroundRepeat
+        });
+        state.hitOverlay.appendChild(node);
+        const animation=node.animate([
+            {opacity:1,offset:0,easing:"steps(1, end)"},
+            {opacity:0,offset:.4,easing:"steps(1, end)"},
+            {opacity:1,offset:.6,easing:"steps(1, end)"},
+            {opacity:0,offset:1}
+        ],{duration:200,easing:"linear"});
+        const entry={node,animation,side,index,sequence:current.sequence,cancel:()=>{
+            animation.onfinish=null;
+            animation.cancel();
+            node.remove();
+            if(state.impactFlashes.get(artwork)===entry){ state.impactFlashes.delete(artwork); }
+            if(!state.impactFlashes.size&&state.hitOverlay){ state.hitOverlay.remove(); state.hitOverlay=null; }
+        }};
+        state.impactFlashes.set(artwork,entry);
+        animation.onfinish=entry.cancel;
+        return entry;
+    }
+    window.v143ClearImpactOverlays=clearImpactOverlays;
+    window.v143ClearImpactTarget=clearImpactTarget;
+    window.v143SyncImpactOverlays=syncImpactOverlays;
+
     function clearTimers(){
         state.timers.forEach(id=>clearTimeout(id));
         state.timers.clear();
@@ -11954,8 +12026,7 @@
         state.hpTrails.forEach(entry=>{ entry.animation.cancel(); entry.node.remove(); });
         state.hpTrails.clear();
         state.hpSamples=new WeakMap();
-        state.impactFlashes.forEach(animation=>animation.cancel());
-        state.impactFlashes.clear();
+        clearImpactOverlays();
     }
 
     /* Read the final HUD projection, never delay or write gameplay HP. Boss
@@ -13030,6 +13101,7 @@
             const node=current.spriteNodes.get(String(index));
             if(node){ node.style.visibility="visible"; node.style.animationPlayState="running"; }
         }
+        window.FourSymbolsBattlePresentation?.syncHud?.();
         callbacks.filter(entry=>entry.phase!=="projection").forEach(entry=>entry.callback());
         current.presentationReadyAt=Date.now();
     }
@@ -13108,8 +13180,10 @@
             return null;
         }
         if(state.current&&!state.current.done){ cleanupCurrent(state.current,"superseded"); }
+        clearImpactOverlays();
         purgeLegacyCardVfx();
         purgeStaleRasterStages();
+        window.FourSymbolsBattlePresentation?.syncHud?.();
 
         const model=modelFor(config);
         const contract=meta&&meta.targetContract&&meta.targetContract.version==="battle-target-contract-v1"
@@ -13213,6 +13287,7 @@
 
     director.dispose=function(){
         clearTimers();
+        window.FourSymbolsBattlePresentation?.clearHud?.();
         if(state.current&&!state.current.done){ cleanupCurrent(state.current,"dispose"); }
         if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
             document.querySelectorAll("#v143-skill-stage").forEach(node=>node.remove());
@@ -13270,19 +13345,8 @@
             if(typeof window.matchMedia==="function"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){ playSound(); return; }
             if(artwork.v143ImpactRecoil){ artwork.v143ImpactRecoil.cancel(); }
             const distance=(critical?5:4)*(side==="monster"?-1:1);
-            const previousFlash=state.impactFlashes.get(artwork);
-            if(previousFlash){ previousFlash.cancel(); }
-            const baseFilter=typeof getComputedStyle==="function"?getComputedStyle(artwork).filter:"none";
-            // Two80ms pulses separated by40ms of the original artwork. This
-            // presentation finishes independently of the140ms recoil/gate.
-            const flash=artwork.animate([
-                {filter:"brightness(0) invert(1)",offset:0,easing:"steps(1, end)"},
-                {filter:baseFilter,offset:.4,easing:"steps(1, end)"},
-                {filter:"brightness(0) invert(1)",offset:.6,easing:"steps(1, end)"},
-                {filter:baseFilter,offset:1}
-            ],{duration:200,easing:"linear"});
-            state.impactFlashes.set(artwork,flash);
-            flash.onfinish=()=>{ if(state.impactFlashes.get(artwork)===flash){ state.impactFlashes.delete(artwork); } };
+            // The one hit callback owns both pulses; no new clock or gate.
+            createImpactFlash(artwork,side,unitIndex,current);
             artwork.v143ImpactRecoil=artwork.animate([
                 {translate:"0px 0px",scale:1},
                 {translate:"0px "+distance+"px",scale:critical?.975:.98,offset:.3},

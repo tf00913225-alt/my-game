@@ -690,10 +690,10 @@
     display:none;
 }
 
-#game-stage #battlePage .gameplay-boss-card > .battle-monster-name,
-#game-stage #battlePage .gameplay-boss-card > .monster-hp,
-#game-stage #battlePage .gameplay-boss-card > .monster-sp,
-#game-stage #battlePage .gameplay-boss-card > .monster-status-badges{
+.v174-unit-hud[data-boss="true"] > .battle-monster-name,
+.v174-unit-hud[data-boss="true"] > .monster-hp,
+.v174-unit-hud[data-boss="true"] > .monster-sp,
+.v174-unit-hud[data-boss="true"] > .monster-status-badges{
     position:absolute;
     left:8%;
     right:8%;
@@ -701,7 +701,7 @@
     box-sizing:border-box;
     z-index:22;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .gameplay-boss-card > .battle-monster-name{
+.v174-unit-hud[data-boss="true"] > .battle-monster-name{
     position:absolute !important;
     top:auto !important;
     bottom:0 !important;
@@ -720,8 +720,8 @@
     line-height:16px;
     text-align:center;
 }
-#game-stage #battlePage .gameplay-boss-card > .monster-hp,
-#game-stage #battlePage .gameplay-boss-card > .monster-sp{
+.v174-unit-hud[data-boss="true"] > .monster-hp,
+.v174-unit-hud[data-boss="true"] > .monster-sp{
     position:absolute !important;
     top:auto !important;
     display:block !important;
@@ -733,9 +733,9 @@
     opacity:1 !important;
     overflow:hidden !important;
 }
-#game-stage #battlePage .gameplay-boss-card > .monster-hp{bottom:29px !important;}
-#game-stage #battlePage .gameplay-boss-card > .monster-sp{bottom:17px !important;}
-#game-stage #battlePage .gameplay-boss-card .monster-bar-text{
+.v174-unit-hud[data-boss="true"] > .monster-hp{bottom:29px !important;}
+.v174-unit-hud[data-boss="true"] > .monster-sp{bottom:17px !important;}
+.v174-unit-hud[data-boss="true"] .monster-bar-text{
     display:flex !important;
     align-items:center;
     justify-content:center;
@@ -743,11 +743,11 @@
     font-size:10px;
     line-height:var(--battle-resource-bar-height,11px) !important;
 }
-#game-stage #battlePage .gameplay-boss-card > .monster-status-badges{
+.v174-unit-hud[data-boss="true"] > .monster-status-badges{
     bottom:53px;
     min-height:12px;
 }
-#game-stage #battlePage .gameplay-boss-card > .monster-hp > .boss-hp-shield-overlay{
+.v174-unit-hud[data-boss="true"] > .monster-hp > .boss-hp-shield-overlay{
     position:absolute;
     top:0;
     height:100%;
@@ -758,7 +758,7 @@
     transition:left .25s ease,width .25s ease;
     pointer-events:none;
 }
-#game-stage #battlePage .gameplay-boss-card > .monster-hp > .monster-bar-text{
+.v174-unit-hud[data-boss="true"] > .monster-hp > .monster-bar-text{
     position:relative;
     z-index:2;
 }

@@ -154,6 +154,7 @@ h1,h2,h3,
    and opacity do not stop animation timers, hit frames, damage/status/heal/SP
    settlement, relic triggers or the turn queue. */
 body.v174-battle-reading-open > .v143-skill-stage,
+body.v174-battle-reading-open > .v143-hit-feedback-overlay,
 body.v174-battle-reading-open > .v-fixed-slot-popup,
 body.v174-battle-reading-open > .damage-popup,
 body.v174-battle-reading-open > .damage-popup.v152-top-damage,
@@ -3327,8 +3328,8 @@ button:active{
     text-overflow:ellipsis;
 }
 
-.battle-player .hp-bar,
-.battle-player .sp-bar{
+.v174-unit-hud[data-side="player"] .hp-bar,
+.v174-unit-hud[data-side="player"] .sp-bar{
     position:relative;
 
     width:92px;
@@ -3340,15 +3341,15 @@ button:active{
     overflow:hidden;
 }
 
-.battle-player .hp-bar{
+.v174-unit-hud[data-side="player"] .hp-bar{
     background:#3a1111;
 }
 
-.battle-player .sp-bar{
+.v174-unit-hud[data-side="player"] .sp-bar{
     background:#101f45;
 }
 
-.battle-player .hp-bar-inner{
+.v174-unit-hud[data-side="player"] .hp-bar-inner{
     position:absolute;
     left:0;
     top:0;
@@ -3359,7 +3360,7 @@ button:active{
     background:linear-gradient(180deg,#f0605c,#c81e1e);
 }
 
-.battle-player .sp-bar-inner{
+.v174-unit-hud[data-side="player"] .sp-bar-inner{
     position:absolute;
     left:0;
     top:0;
@@ -3379,7 +3380,7 @@ button:active{
    left由JS設成目前HP佔比（緊接血量右側開始），
    寬度由JS設成護盾佔maxHP的比例。
 */
-.battle-player .hp-bar-shield-overlay{
+.v174-unit-hud[data-side="player"] .hp-bar-shield-overlay{
     position:absolute;
     top:0;
     height:100%;
@@ -3389,8 +3390,8 @@ button:active{
     transition:left .25s ease,width .25s ease;
 }
 
-.battle-player .hp-bar-text,
-.battle-player .sp-bar-text{
+.v174-unit-hud[data-side="player"] .hp-bar-text,
+.v174-unit-hud[data-side="player"] .sp-bar-text{
     position:absolute;
     left:0;
     top:0;

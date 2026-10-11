@@ -6,6 +6,9 @@ function node(){const n={style:{},setAttribute(){},removed:false,remove(){this.r
 const state={hpSamples:new WeakMap(),hpTrails:new Map(),impactFlashes:new Map(),timers:new Set(),pendingUpdates:new Map()};
 const context={state,window:{},document:{createElement:node},clearTimeout(){}};
 vm.createContext(context);
+const hpDocument=context.document;
+require("./fixtures/direct-impact-overlay-vm")(context,{animate(){return {cancel(){}};}});
+context.document=hpDocument;
 vm.runInContext(source.slice(source.indexOf("    function clearTimers("),source.indexOf("    function purgeLegacyCardVfx(")),context);
 const present=context.window.v143PresentHpLoss;
 const bar={style:{width:"100%"},animate(){},parentElement:{appendChild(){}}};
@@ -30,8 +33,8 @@ context.clearTimers();assert.ok(flashCancelled);assert.equal(state.impactFlashes
 present(bar,{hp:100},1000);assert.equal(state.hpTrails.size,0,"new entity identity never inherits previous damage");
 const impact=fs.readFileSync("tests/battle-feel-impact-20261008.test.js","utf8");
 assert.ok(impact.includes('kind==="criticalDamage"'),"existing runtime test covers critical/direct/MISS/heal/status paths");
-const frames=source.slice(source.indexOf("const flash=artwork.animate(["),source.indexOf("            playSound();",source.indexOf("const flash=artwork.animate([")));
-assert.match(frames,/filter:"brightness\(0\) invert\(1\)"/);
-assert.match(frames,/offset:\.4/);assert.match(frames,/offset:\.6/);assert.match(frames,/duration:200/);assert.match(frames,/duration:140/);
+const frames=source.slice(source.indexOf("const animation=node.animate(["),source.indexOf("    function clearTimers("));
+assert.match(frames,/opacity:1/);assert.match(frames,/offset:\.4/);assert.match(frames,/offset:\.6/);assert.match(frames,/duration:200/);
+assert.doesNotMatch(source,/const flash=artwork.animate/);
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");assert.match(css,/pointer-events:none/);assert.match(css,/\.hp-bar-inner\{transition:none;\}/);
 console.log("Two hit flashes80ms,40ms gap independent of existing recoil; HP loss260ms, repeat/heal/shield/death/identity/dispose PASS");

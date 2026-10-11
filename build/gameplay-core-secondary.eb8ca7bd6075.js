@@ -8098,6 +8098,69 @@ function syncUnitArtwork(card,kind,selectedRecord){
         card.dataset.portraitFallback=record.fallbackReason||"none";
     }
     card.style.setProperty("background-image","none","important");
+    prepareUnitHud(card,kind);
+}
+/* One real HUD per unit. Nodes keep their IDs and settlement writers; only
+   this presentation owner mounts them above document-level battle VFX. */
+const HUD_SELECTOR=":scope > .monster-status-badges,:scope > .monster-hp,:scope > .monster-sp,:scope > .hp-bar,:scope > .sp-bar,:scope > .battle-monster-name,:scope > .battle-player-id";
+let hudLayer=null;
+function unitHud(card){ return card&&card.v174UnitHud||card; }
+function prepareUnitHud(card,side){
+    let hud=card.v174UnitHud;
+    if(!hud){
+        hud=document.createElement("div");
+        hud.className="v174-unit-hud";
+        hud.dataset.side=side;
+        hud.dataset.index=String(card.id).replace(side==="monster"?"battleMonster":"battlePlayerCard","");
+        hud.v174Card=card;
+        card.v174UnitHud=hud;
+        card.appendChild(hud);
+    }
+    card.querySelectorAll(HUD_SELECTOR).forEach(node=>hud.appendChild(node));
+    hud.dataset.boss=String(card.classList.contains("gameplay-boss-card"));
+    return hud;
+}
+function clearUnitHud(side){
+    if(!hudLayer){ return; }
+    Array.from(hudLayer.children).forEach(hud=>{
+        if(side&&hud.dataset.side!==side){ return; }
+        const card=hud.v174Card;
+        if(card?.isConnected){
+            card.appendChild(hud);
+            for(const property of ["left","top","width","height","transform","opacity","visibility"]){ hud.style.removeProperty(property); }
+        }else{ if(card){ card.v174UnitHud=null; } hud.remove(); }
+    });
+    if(!hudLayer.children.length){ hudLayer.remove(); hudLayer=null; }
+}
+function syncHud(){
+    const page=document.getElementById("battlePage");
+    if(!page||!page.classList.contains("active")||document.body.classList.contains("v174-battle-reading-open")){ clearUnitHud(); return; }
+    const geometry=window.FourSymbolsBattlefieldRenderGeometry;
+    if(!geometry){ return; }
+    if(hudLayer){
+        Array.from(hudLayer.children).forEach(hud=>{
+            if(!hud.v174Card?.isConnected){ hud.remove(); }
+        });
+    }
+    page.querySelectorAll(".battle-monster[id^='battleMonster'],.battle-player[id^='battlePlayerCard']").forEach(card=>{
+        const side=card.id.startsWith("battleMonster")?"monster":"player";
+        const hud=prepareUnitHud(card,side);
+        const projection=geometry.getUnitGeometry(side,Number(hud.dataset.index))?.hudSurface;
+        if(!projection||!projection.rect.width||!projection.rect.height){ hud.style.visibility="hidden"; return; }
+        if(!hudLayer){
+            hudLayer=document.createElement("div");
+            hudLayer.className="v174-battle-hud-layer";
+            document.body.appendChild(hudLayer);
+        }
+        hudLayer.appendChild(hud);
+        hud.style.visibility="visible";
+        hud.style.left=projection.rect.left+"px";
+        hud.style.top=projection.rect.top+"px";
+        hud.style.width=projection.width+"px";
+        hud.style.height=projection.height+"px";
+        hud.style.transform="scale("+projection.scaleX+","+projection.scaleY+")";
+        hud.style.opacity=card.classList.contains("dead")?.16:card.classList.contains("down")?.35:1;
+    });
 }
 function syncResourceNumbers(){
     document.querySelectorAll("#battlePage .battle-player[id^='battlePlayerCard']").forEach(card=>{
@@ -8108,7 +8171,7 @@ function syncResourceNumbers(){
         const apply=()=>{
             const current=getPartyCharacterByIndex(index);
             if(current!==character){ return; }
-            const hp=card.querySelector(".hp-bar-text"),sp=card.querySelector(".sp-bar-text");
+            const hp=unitHud(card).querySelector(".hp-bar-text"),sp=unitHud(card).querySelector(".sp-bar-text");
             setTextIfChanged(hp,String(numericValue(character.hp)));
             const resource=getBattleSecondaryResource(character);
             setTextIfChanged(sp,resource.kind==="rage"?"怒氣 "+numericValue(resource.current)+"/12":String(numericValue(resource.current)));
@@ -8211,8 +8274,13 @@ window.FourSymbolsBattlePresentation=Object.freeze({
     applyUnit:syncUnitArtwork,
     sync:syncBattlePresentation,
     playEscape:playEscapePresentation,
-    cleanupEscape:cleanupEscapePresentation
+    cleanupEscape:cleanupEscapePresentation,
+    getUnitHud:unitHud,
+    syncHud:syncHud,
+    clearHud:clearUnitHud
 });
+window.addEventListener("resize",syncHud,{passive:true});
+window.addEventListener("pagehide",()=>clearUnitHud());
 /* V173.51: keep EXP row metadata stable after legacy list rerenders. */
 function decorateExpRows(){
     if(typeof window.v173DecorateExpPoolDistributionUi==="function")window.v173DecorateExpPoolDistributionUi();
@@ -8716,6 +8784,8 @@ ensureFunctionalStyles();runRepairs();
             markBattlefieldZones();
             canonicalizeEnemyZone();
             canonicalizeAllyZone();
+            window.FourSymbolsBattlePresentation?.syncHud?.();
+            window.v143SyncImpactOverlays?.();
         }finally{
             reconciling=false;
         }
@@ -8827,11 +8897,12 @@ ensureFunctionalStyles();runRepairs();
         const portraitRect=art&&typeof art.getBoundingClientRect==="function"
             ?plainRect(art.getBoundingClientRect())
             :unitRect;
-        const hudNodes=Array.from(card.querySelectorAll(
+        const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
+        const hudNodes=Array.from(hud.querySelectorAll(
             ".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
         ));
-        const hpNodes=Array.from(card.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
-        const spNodes=Array.from(card.querySelectorAll(".monster-sp,.sp-bar,.battle-sp-bar,.player-sp-bar,[data-hud=\"sp\"],[data-stat=\"sp\"]"));
+        const hpNodes=Array.from(hud.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
+        const spNodes=Array.from(hud.querySelectorAll(".monster-sp,.sp-bar,.battle-sp-bar,.player-sp-bar,[data-hud=\"sp\"],[data-stat=\"sp\"]"));
         const resourceState=resourceStateFor(targetSide,unitIndex);
         const hpProjection=projectionFor(hpNodes[0],resourceState&&resourceState.hpRatio,resourceState&&resourceState.shieldRatio);
         const spProjection=projectionFor(spNodes[0],resourceState&&resourceState.spRatio,0);
@@ -8866,7 +8937,17 @@ ensureFunctionalStyles();runRepairs();
             width:Math.max(0,unitRect.width-8),height:Math.max(0,feedbackBottom-feedbackTop)
         };
 
+        // The existing Unit rect is the only placement source. Display scale
+        // comes from its actual CSS box; no Slot/Boss coordinates are duplicated.
+        const cardStyle=window.getComputedStyle(card);
+        const hudWidth=parseFloat(cardStyle.width)||card.offsetWidth;
+        const hudHeight=parseFloat(cardStyle.height)||card.offsetHeight;
+        const hudSurface=hudWidth>0&&hudHeight>0?{
+            rect:cardRect,width:hudWidth,height:hudHeight,
+            scaleX:cardRect.width/hudWidth,scaleY:cardRect.height/hudHeight
+        }:null;
         return {
+            hudSurface:hudSurface,
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
             unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,spRect:spRect,artworkProjection:artworkProjection,hpProjection:hpProjection,spProjection:spProjection,hudSafeRect:hudSafeRect,
             feedbackSafeRect:feedbackSafeRect,

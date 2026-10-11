@@ -8195,6 +8195,10 @@ function showPage(page,options={}){
     target.classList.add(
         "active"
     );
+    if(page!=="battle"){
+        window.v143ClearImpactOverlays?.();
+        window.FourSymbolsBattlePresentation?.clearHud?.();
+    }else{ window.FourSymbolsBattlePresentation?.syncHud?.(); }
 
     /* Page activity is part of the Battle Reading Layer lifecycle. Clear a
        stale document-level paint suppressor synchronously after navigation. */
@@ -18669,6 +18673,8 @@ function winBattle(){
     }
 
 
+    window.v143ClearImpactOverlays?.();
+    window.FourSymbolsBattlePresentation?.clearHud?.();
     battleActive=false;
     clearBattleRoundPrompt();
     finishBattleStatisticsSession("win");
@@ -18937,6 +18943,8 @@ function loseBattle(){
     }
 
 
+    window.v143ClearImpactOverlays?.();
+    window.FourSymbolsBattlePresentation?.clearHud?.();
     battleActive=false;
     clearBattleRoundPrompt();
     finishBattleStatisticsSession("lose");
@@ -22272,6 +22280,7 @@ function killMonster(index){
     }
 
 
+    window.v143ClearImpactTarget?.("monster",index);
     monster.alive=false;
 
     monster.hp=0;
@@ -22545,6 +22554,8 @@ if(typeof window!=="undefined"){
 
 function renderBattle(){
 
+    window.FourSymbolsBattlePresentation?.clearHud?.();
+    window.v143ClearImpactOverlays?.();
     runBattleRenderHooks("before",this,arguments);
 
     const area =
@@ -22795,6 +22806,8 @@ function applyMonsterUiUpdate(index){
     runBattleMonsterUiHook("v143SystemAfterMonsterUiUpdate",index,monster);
     runBattleMonsterUiHook("v149AfterMonsterUiUpdate",index,monster);
     runBattleMonsterUiHook("v143StatusAfterMonsterUiUpdate",index,monster);
+    window.v143SyncImpactOverlays?.();
+    window.FourSymbolsBattlePresentation?.syncHud?.();
     const card=$("battleMonster"+index);
     if(hpBar&&card&&!card.classList.contains("gameplay-boss-card")&&typeof window.v143PresentHpLoss==="function"){
         window.v143PresentHpLoss(hpBar,monster,monster.maxHP);
@@ -22814,6 +22827,8 @@ function updateMonsterUI(index){
 }
 
 function renderPlayers(){
+
+    window.FourSymbolsBattlePresentation?.clearHud?.("player");
 
     const row =
         $("battlePlayerRow");
@@ -23077,6 +23092,8 @@ function updateSingleCharacterBars(
     );
 
 
+    window.v143SyncImpactOverlays?.();
+    window.FourSymbolsBattlePresentation?.syncHud?.();
     const hpBar =
         $("battlePlayerHPBar"+index);
 
@@ -23181,14 +23198,15 @@ function updateSingleCharacterBars(
     }
 
 
+    const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
     const hpText =
-        card.querySelector(
+        hud.querySelector(
             ".hp-bar-text"
         );
 
 
     const spText =
-        card.querySelector(
+        hud.querySelector(
             ".sp-bar-text"
         );
 
@@ -31932,6 +31950,7 @@ function syncBattleUiPriorityLayer(){
 
     if(stage){ stage.classList.remove("battle-ui-priority"); }
     if(body){ body.classList.toggle("v174-battle-reading-open",active); }
+    window.FourSymbolsBattlePresentation?.syncHud?.();
     return active;
 
 }

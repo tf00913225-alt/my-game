@@ -12,7 +12,7 @@ function fixture(config={id:"normal"}){
     const context={window:{v141Audio:{play:kind=>sounds.push(kind),combatFeedbackVolumeScale:2}},
         state:{current,impactFlashes:new Map(),metrics:{delayedNumbers:0}},Date:{now:()=>100},
         delayFor:()=>config.wait??297,setTimer:fn=>timers.push(fn),cardFor:()=>({querySelector:sel=>{assert.equal(sel,".v174-battle-art");return artwork;}})};
-    vm.createContext(context);vm.runInContext(hitQueue+resolver,context);
+    vm.createContext(context);require("./fixtures/direct-impact-overlay-vm")(context,artwork);vm.runInContext(hitQueue+resolver,context);
     return {context,sounds,motions,timers};
 }
 for(const kind of ["damage","criticalDamage","miss","heal","sp","shield","status"]){
@@ -21,7 +21,7 @@ for(const kind of ["damage","criticalDamage","miss","heal","sp","shield","status
     f.timers.forEach(fn=>fn());
     const damage=kind==="damage"||kind==="criticalDamage";
     assert.equal(f.motions.length,damage?2:0);
-    if(damage){assert.equal(f.motions[1].options.duration,140);assert.equal(f.motions[1].frames[1].translate,kind==="criticalDamage"?"0px -5px":"0px -4px");assert.equal(f.motions[0].frames[0].filter,"brightness(0) invert(1)");assert.equal(f.motions[0].options.duration,200);assert.equal(f.motions[0].frames[1].filter,"none");assert.deepEqual(Array.from(f.motions[0].frames,f=>f.offset),[0,.4,.6,1]);assert.equal(f.motions[0].frames[2].filter,"brightness(0) invert(1)");}
+    if(damage){assert.equal(f.motions[1].options.duration,140);assert.equal(f.motions[1].frames[1].translate,kind==="criticalDamage"?"0px -5px":"0px -4px");assert.equal(f.motions[0].frames[0].opacity,1);assert.equal(f.motions[0].options.duration,200);assert.equal(f.motions[0].frames[1].opacity,0);assert.deepEqual(Array.from(f.motions[0].frames,f=>f.offset),[0,.4,.6,1]);assert.equal(f.motions[0].frames[2].opacity,1);}
     const sound={damage:"damage",criticalDamage:"crit",miss:"dodge",shield:"block"}[kind];
     assert.deepEqual(f.sounds,sound?[sound]:[]);
 }
@@ -32,8 +32,8 @@ const repeat=fixture({id:'normal',wait:0});
 const presentHit=()=>{repeat.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');repeat.timers.splice(0).forEach(fn=>fn());};
 presentHit();const oldFlash=repeat.motions[0],oldRecoil=repeat.motions[1];presentHit();
 assert.ok(oldFlash.cancelled&&oldRecoil.cancelled);
-oldFlash.onfinish();oldRecoil.onfinish();
-assert.equal([...repeat.context.state.impactFlashes.values()][0],repeat.motions[2]);
+oldRecoil.onfinish();
+assert.equal([...repeat.context.state.impactFlashes.values()][0].animation,repeat.motions[2]);
 repeat.motions[2].onfinish();assert.equal(repeat.context.state.impactFlashes.size,0);
 const reduced=fixture();reduced.context.window.matchMedia=()=>({matches:true});
 reduced.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');reduced.timers.forEach(fn=>fn());
@@ -63,7 +63,7 @@ const spriteClasses=new Set();
 const spriteNode={style:{setProperty(key,value){this[key]=value;}},dataset:{},setAttribute(){},classList:{contains:key=>spriteClasses.has(key),add:key=>spriteClasses.add(key)}};
 const rasterMicrotasks=[];
 const spriteCurrent={duration:520,startedAt:100,firstVisibleFrameAt:0,targetSide:'monster',targetIndexes:[0],model:{sprite:{src:'normal.webp',columns:4,rows:3,frames:12,hitFrame:6,impactOnly:true}},spriteNodes:new Map(),confirmedTargets:new Set([0])};
-const raster={state:{current:spriteCurrent,stage:{}},Date:{now:()=>100},placementFor:()=> 'single',appendSpriteNode:()=>spriteNode,
+const raster={window:{},state:{current:spriteCurrent,stage:{}},Date:{now:()=>100},placementFor:()=> 'single',appendSpriteNode:()=>spriteNode,
     queueMicrotask:fn=>rasterMicrotasks.push(fn),setTimer(){},targetHitTime:()=>397,
     beginVisualTimeline(current){assert.ok(spriteClasses.has('v143-vfx-sprite-active'));assert.equal(spriteNode.style.animationPlayState,'paused');current.firstVisibleFrameAt=100;current.visualStartedAt=100;},placeSprite(_current,node){node.style.left='10px';node.style.top='20px';},requestSpriteAspect(){},cardFor:()=>({classList:{remove(){}}}),syncStatusVisualsForUnit(){}};
 vm.createContext(raster);

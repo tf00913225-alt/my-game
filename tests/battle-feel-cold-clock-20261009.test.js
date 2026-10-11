@@ -12,13 +12,14 @@ const gate={config:{duration:520},deadline:620,done:false};
 const lifecycle={state:{fallbackTimer:0},Date:{now:()=>now},window:{},setTimeout,clearTimeout,currentGate:()=>gate};
 vm.createContext(lifecycle);vm.runInContext(between(v142,"    function armGateDeadline(","    function identity("),lifecycle);
 vm.runInContext(between(v142,"    window.v142GetRemainingAnimationMs=function","    /* V142 is visual-lifecycle"),lifecycle);
-let cancelled=0;const art={animate(frames){events.push(frames[0].filter?"flash":"recoil");return {cancel(){cancelled++;}};}};
+let cancelled=0;const art={animate(frames){events.push(frames[0].opacity===1?"flash":"recoil");return {cancel(){cancelled++;}};}};
 const node={style:{visibility:"hidden",animationPlayState:"paused"},dataset:{}};
 const current={sequence:1,config:{id:"normal"},model:{hit:.57,sprite:{impactOnly:true}},duration:520,startedAt:100,visualStartedAt:0,firstVisibleFrameAt:0,targetSide:"monster",targetIndexes:[0],spriteNodes:new Map([["0",node]]),confirmedTargets:new Set([0]),gate};
 const context={state:{impactFlashes:new Map(),current,stage:null,metrics:{completed:0,delayedNumbers:0}},window:{v141Audio:{play(){events.push("audio");}}},Date:{now:()=>now},setTimeout,clearTimeout,
  setTimer:setTimeout,queueMicrotask:fn=>microtasks.push(fn),DEFAULT_HIT:.57,delayFor:()=>0,
  cardFor:()=>({classList:{remove(){}},querySelector:()=>art}),syncStatusVisualsForUnit(){},syncStatusVisualEffects(){}};
 vm.createContext(context);
+require("./fixtures/direct-impact-overlay-vm")(context,art);
 vm.runInContext(between(source,"    function queueTargetHit(","    function confirmTargetVisual("),context);
 vm.runInContext(between(source,"    function targetHitTime(","    function emitSprite("),context);
 vm.runInContext(between(source,"    function cleanupCurrent(","    let sequence="),context);
