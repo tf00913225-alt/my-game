@@ -40,7 +40,7 @@ test("the HUD keeps only city identity, resources and DEV tools",()=>{
 test("character and shop are the only two primary entrances",()=>{
     assert.equal(count(actions,/class="home-card home-card-primary"/g),2);
     assert.match(actions,/home-primary-actions[\s\S]*openHomeFeature\('character'\)[\s\S]*openHomeFeature\('shop'\)/);
-    assert.match(baseCss,/\.home-primary-actions\{[\s\S]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\);[\s\S]*width:100%/);
+    assert.match(baseCss,/\.home-primary-actions\{[^}]*grid-template-columns:repeat\(2,minmax\(0,46%\)\);[^}]*width:100%/);
     assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:78px;[\s\S]*border:1px solid rgba\(222,170,70,.9\)/);
     assert.match(baseCss,/\.home-card-primary::after\{[\s\S]*linear-gradient/);
     assert.match(baseCss,/\.home-card-primary \.home-card-label\{[\s\S]*height:19px;[\s\S]*border-top:1px solid[\s\S]*background:linear-gradient/);
@@ -50,10 +50,10 @@ test("character and shop are the only two primary entrances",()=>{
 test("eight secondary entrances reflow with readable browser dimensions",()=>{
     assert.equal(count(actions,/class="home-card home-card-secondary"/g),8);
     ["rest","synthesis","quest","forge","achievement","announcement","offlineExp","system"].forEach(type=>assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)")));
-    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*grid-template-columns:repeat\(auto-fit,minmax\(80px,1fr\)\);[\s\S]*grid-auto-rows:84px;/);
+    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*grid-template-columns:repeat\(2,minmax\(70px,22%\)\);[\s\S]*grid-auto-rows:70px;/);
     assert.doesNotMatch(baseCss,/margin-inline-(?:start|end):(34|68)px/);
-    assert.match(baseCss,/\.home-card-secondary\{[\s\S]*width:100%;[\s\S]*height:84px;[\s\S]*border:1px solid[\s\S]*background:linear-gradient[\s\S]*box-shadow:/);
-    assert.match(baseCss,/\.home-card-secondary \.home-card-icon\{[\s\S]*width:100%;[\s\S]*height:60px/);
+    assert.match(baseCss,/\.home-card-secondary\{[\s\S]*width:100%;[\s\S]*height:70px;[\s\S]*border:1px solid[\s\S]*background:linear-gradient[\s\S]*box-shadow:/);
+    assert.match(baseCss,/\.home-card-secondary \.home-card-icon\{[\s\S]*width:100%;[\s\S]*height:47px/);
     assert.match(baseCss,/\.home-card-secondary \.home-card-label\{[\s\S]*background:linear-gradient/);
     assert.ok((90-80)/90>=.10&&(90-80)/90<=.15);
     assert.ok((95-82)/95>=.10&&(95-82)/95<=.15);
@@ -127,9 +127,9 @@ test("the browser home retains a bounded content scroller and one navigation row
     assert.match(baseCss,/#homePage\{[^}]*height:100%;[^}]*overflow-y:auto;/);
     assert.match(baseCss,/#game-ui\{[^}]*grid-template-rows:minmax\(0,1fr\) auto;/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*?margin:5px 10px 0;/);
-    assert.match(baseCss,/\.home-card-grid\{[\s\S]*display:flex;[\s\S]*flex:0 0 auto/);
+    assert.match(baseCss,/\.home-card-grid\{[^}]*display:grid;[^}]*flex:0 0 auto/);
     assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:78px/);
-    assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-auto-rows:84px;/);
+    assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-auto-rows:70px;/);
     assert.doesNotMatch(baseCss,/\.home-card-grid\{[\s\S]{0,220}grid-template-columns:repeat\(4,1fr\)/);
 });
 

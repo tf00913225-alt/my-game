@@ -14,7 +14,7 @@ test("HUD uses the requested logical typography without growing its shell",()=>{
  assert.doesNotMatch(index,/homeHudCharacterList|homeHudCharacterName|homeHudCharacterLevel/);
 });
 test("utilities retain their image-over-text skin in normal browser flow",()=>{
- assert.match(utility,/#game-ui \.team-relic-home-tools\{[^}]*position:relative;[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\);[^}]*width:100%;/);
+ assert.match(utility,/#game-ui \.team-relic-home-tools\{[^}]*position:relative;[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\);[^}]*grid-row:2;[^}]*width:min\(52%,192px\);/);
  assert.match(utility,/\.home-card-utility\{[^}]*grid-template-rows:58px 24px;[^}]*height:84px;/);
  assert.match(utility,/\.home-card-icon\{[^}]*height:58px;[^}]*border-bottom:1px solid/);
  assert.match(utility,/\.home-card-label\{[^}]*font-size:13px;[^}]*line-height:18px;/);
@@ -36,8 +36,8 @@ test("roster keeps three cells while growing enough for the permanent typography
 });
 test("home cards retain readable heights and adapt to browser width",()=>{
  assert.match(base,/\.home-card-primary\{[\s\S]*?height:78px;/);
- assert.match(base,/\.home-card-secondary\{[\s\S]*?width:100%;[\s\S]*?height:84px;/);
- assert.match(base,/\.home-secondary-actions\{[\s\S]*?grid-template-columns:repeat\(auto-fit,minmax\(80px,1fr\)\);[\s\S]*?grid-auto-rows:84px;/);
+ assert.match(base,/\.home-card-secondary\{[\s\S]*?width:100%;[\s\S]*?height:70px;/);
+ assert.match(base,/\.home-secondary-actions\{[\s\S]*?grid-template-columns:repeat\(2,minmax\(70px,22%\)\);[\s\S]*?grid-auto-rows:70px;/);
  assert.match(base,/#homePage\{[\s\S]*?height:100%;[\s\S]*?overflow-y:auto;/);
 });
 console.log("\n"+passed+" V173.39 main-city pixel-tune tests passed.");

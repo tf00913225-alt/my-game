@@ -9,7 +9,7 @@ import {ROOT,ASSET_MANIFEST,findChrome,startServer,waitJson,Cdp,qaPrelude,QA_AUT
 // external account transport is the existing isolated, read-only QA seam.
 const OUT=path.join(ROOT,'artifacts/browser-qa/responsive-item');
 const VIEWPORTS=[[360,800],[360,640],[393,873],[393,660],[412,915],[412,680]];
-const DISPLAY_VIEWPORTS=[[390,844],[412,915],[768,1024],[834,1194],[1366,768],[1536,864],[1920,1080],[2560,1440]];
+const DISPLAY_VIEWPORTS=[[390,844],[412,915],[768,1024],[834,1194],[1366,768],[1536,864],[1920,1080],[2560,1440],[360,800],[393,873],[360,640],[384,688],[393,660],[412,680]];
 const settle=()=>new Promise(resolve=>setTimeout(resolve,150));
 const PREPARE=String.raw`(async()=>{
  const until=Date.now()+45000;
@@ -266,6 +266,19 @@ async function run(chrome,url,live){
   // A viewport fit is insufficient: general pages must have no transformed
   // ancestor, retain real CSS pixels, and actually reflow on wide displays.
   for(const v of DISPLAY_VIEWPORTS){
+  await c.eval(`(()=>{
+   Object.assign(player,{id:'色彩從此',gender:'female',level:70,bonusHP:5000,bonusSP:1000,hp:4770,sp:1096});
+   player2={...player,id:'誤它誤...',element:'wind',hp:5170,sp:1190};
+   player3={...player,id:'水球',element:'water',hp:7570,sp:1040};
+   for(const [key,p] of [['player2',player2],['player3',player3]]){
+    if(!characters.some(n=>n.id===key))characters.push({id:key,name:p.id});
+    characterEquipment[key]={head:null,hand:null,shoulder:null,armor:null,shoes:null,ring:null};
+   }
+   for(const slot of ['head','hand','shoulder','armor','shoes'])characterEquipment.fire[slot]=v17346GenerateEquipment(()=>.2,{slot:slot==='hand'?'weapon':slot,classType:'warrior',rarity:'orange'});
+   characterEquipment.fire.ring={id:'powerRing',name:'力量戒指',type:'ring',count:1,stats:{attack:2}};
+   inventoryItems.splice(0,inventoryItems.length,...Array.from({length:60},()=>v17346GenerateEquipment(()=>.2,{slot:'armor',classType:'warrior',rarity:'orange'})),{...getPotionDefinition('hpPotion10'),count:30},{id:'ironOre',name:'鐵礦石',type:'material',count:999});
+   gold=5740767;rebuildInventorySlots();renderInventory();v54RenderHomeRoster();
+  })()`);
    await resize(v);await c.eval("closeItemModal();closeHomeFeature();showPage('home')");await settle();
    const home=await check('#homePage',v),nav=await check('#game-ui #bottomNav',v);
    const visual=await c.eval(`(()=>{const home=homePage,s=getComputedStyle(home);return {background:s.backgroundImage,scroll:home.scrollHeight-home.clientHeight,scrollOwner:s.overflowY,oldBackground:!!home.querySelector('.home-bg-fixed-layer'),badge:home.querySelector('.home-version-badge').matches('#game-ui #homePage .home-version-badge')};})()`);
@@ -277,6 +290,16 @@ async function run(chrome,url,live){
    // requiring a fixed-height, zero-scroll composition.
    assert.equal(visual.scrollOwner,'auto','home lost its browser scroll owner');
    assert.equal(visual.oldBackground,false,'retired scrolling background layer returned');
+   const composition=await c.eval(`(()=>{
+    const box=s=>{const r=document.querySelector(s).getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width};};
+    return {cards:box('.home-card-grid'),secondary:box('.home-secondary-actions'),utility:box('.home-utility-actions'),adventure:box('#adventureHomeEntry'),roster:box('#v146HomeRoster'),columns:getComputedStyle(document.querySelector('.home-secondary-actions')).gridTemplateColumns,people:document.querySelectorAll('.v146-home-character:not(.v146-home-character-empty)').length};
+   })()`);
+   assert.equal(composition.columns.split(' ').length,2,'authored side rails replaced by auto-fit cards');
+   assert.equal(composition.people,3,'populated three-character roster not exercised');
+   assert.ok(composition.utility.width<composition.secondary.width*.6,'central utilities inflated to full width');
+   assert.ok(composition.utility.bottom<=composition.secondary.bottom+1,'utilities regained extra list row');
+   if(v[0]<800)assert.ok(composition.adventure.bottom<composition.roster.top,'central adventure moved below roster');
+   else assert.ok(composition.roster.left>=composition.cards.right,'desktop roster lost separate column');
    const homeControls=[];
    for(const selector of [...['角色','商店','休息','合成','任務','鍛造','成就','公告','離線經驗','系統','秘寶','元素匣'].map(label=>'.home-card[aria-label="'+label+'"]'),'#v146HomeRoster','.v-fixed-formation-entry','#adventureHomeEntry']){
     await c.eval(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'nearest'})`);await settle();
@@ -318,12 +341,27 @@ async function run(chrome,url,live){
    if(v[0]>=800)assert.ok(home.rect.width>700,'desktop remained a narrow stage projection');
    await c.eval("adventureHomeEntry.scrollIntoView({block:'nearest'})");await settle();
    await check('#adventureHomeEntry',v,true);
-   const entrance=await c.eval(`(()=>{const entry=adventureHomeEntry,r=entry.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);const axis=adventureHomeAxis.getBoundingClientRect(),cards=document.querySelector('.home-card-grid').getBoundingClientRect(),roster=document.getElementById('v146HomeRoster').getBoundingClientRect();return {hit:entry===hit||entry.contains(hit),afterContent:axis.top>=Math.max(cards.bottom,roster.bottom)-1};})()`);
-   assert.ok(entrance.hit&&entrance.afterContent,'adventure entrance overlaps or covers home controls');
+   const entrance=await c.eval(`(()=>{const entry=adventureHomeEntry,r=entry.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);const covered=[...homePage.querySelectorAll('.home-card,#v146HomeRoster')].filter(n=>{const b=n.getBoundingClientRect();return r.left<b.right&&b.left<r.right&&r.top<b.bottom&&b.top<r.bottom;}).map(n=>n.id||n.getAttribute('aria-label'));return {hit:entry===hit||entry.contains(hit),covered};})()`);
+   assert.ok(entrance.hit,'adventure entrance covered');
+   assert.deepEqual(entrance.covered,[],'adventure entrance overlaps home controls');
    await c.eval("showPage('inventory')");await settle();
    const bag=await check('#inventoryPage',v),frame=await measure('.inventory-classic-shell');
+   const density=await c.eval(`(()=>{
+    const grid=inventoryGridScroll,s=getComputedStyle(grid),slot=document.querySelector('.inventory-item-classic'),items=document.querySelector('.inventory-grid-classic');
+    return {height:grid.clientHeight-parseFloat(s.paddingTop)-parseFloat(s.paddingBottom),slot:slot.getBoundingClientRect().height,gap:parseFloat(getComputedStyle(items).rowGap),populated:document.querySelectorAll('.inventory-item-classic img').length,slots:document.querySelectorAll('.inventory-equipment-cell').length};
+   })()`);
+   assert.equal(density.slots,6,'equipment layout lost a slot');assert.ok(density.populated>=20,'populated inventory not exercised');
+   assert.ok(density.height>=3*density.slot+2*density.gap-1,'character showcase crowds out three complete item rows');
+   evidence.push({proportions:true,viewport:v,composition,density});
+   await screenshot('populated-backpack-'+v.join('x'));
    if(v[0]>=800)assert.ok(frame.columns.split(' ').length===2,'desktop bag did not use two columns');
    await check('.inventory-bottom-actions',v);await check('.map-inventory-overlay-close',v,true);
+   // Added short browser-chrome cases cover this work's home/backpack only.
+   // Keep the original eight widths' other-page regressions unchanged.
+   if(v[0]<800&&v[1]<=720){
+    await c.eval("closeMapInventoryOverlay();showPage('home')");
+    continue;
+   }
    await c.eval("closeMapInventoryOverlay();showPage('training')");await settle();
    assert.equal(await c.eval("bottomNav.parentElement.parentElement.id"),'game-overlay-layer','native return lost navigation domain');
    await c.eval("openHomeFeature('character')");await settle();
