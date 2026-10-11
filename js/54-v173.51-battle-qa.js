@@ -126,7 +126,7 @@ function clearUnitHud(side){
 }
 function syncHud(){
     const page=document.getElementById("battlePage");
-    if(!page||!page.classList.contains("active")||typeof battleActive!=="undefined"&&!battleActive||document.body.classList.contains("v174-battle-reading-open")||
+    if(!page||!page.classList.contains("active")||typeof battleActive!=="undefined"&&!battleActive&&!window.v143HasTerminalImpactPresentation?.()||document.body.classList.contains("v174-battle-reading-open")||
        !document.querySelector(".v143-hit-feedback-overlay")){ clearUnitHud(); return; }
     const geometry=window.FourSymbolsBattlefieldRenderGeometry;
     if(!geometry){ return; }
