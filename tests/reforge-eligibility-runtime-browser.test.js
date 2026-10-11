@@ -67,7 +67,7 @@ saveGame();const loaded=JSON.parse(saved);inventoryItems=loaded.inventoryItems;c
 window.__qaResults={passed:12,alerts:alerts.length,ownerUnchanged:window.v141StartReforge===beforeOwner};
 `;
 const markup='<!doctype html><meta charset="utf-8"><div id="homeFeatureModal"><h2 id="homeFeatureModalTitle"></h2><div id="homeFeatureModalBody"></div></div><div id="itemModal"><div><div id="itemModalIcon"></div><div id="itemModalName"></div><div id="itemModalStats"></div><div class="item-modal-buttons"><button id="itemEquipButton">穿戴</button></div></div></div><pre id="result"></pre>'+
-    script(setup+itemOwner+transaction)+script(forge)+script(progression)+script(inventory)+script('try{'+cases+'document.getElementById("result").textContent=JSON.stringify(window.__qaResults)}catch(e){document.getElementById("result").textContent=JSON.stringify({error:e.stack})}');
+    script(setup+require('../.github/scripts/fixtures/item-slot-owner.cjs')+itemOwner+transaction)+script(forge)+script(progression)+script(inventory)+script('try{'+cases+'document.getElementById("result").textContent=JSON.stringify(window.__qaResults)}catch(e){document.getElementById("result").textContent=JSON.stringify({error:e.stack})}');
 fs.writeFileSync(fixture,markup);
 try{
     const run=cp.spawnSync(chrome,['--headless=new','--no-sandbox','--disable-gpu','--allow-file-access-from-files','--user-data-dir='+profile,'--dump-dom','file:///'+fixture.replace(/\\/g,'/')],{encoding:'utf8',timeout:45000,maxBuffer:12*1024*1024});

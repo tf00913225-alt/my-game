@@ -3554,8 +3554,8 @@
                 '<button type="button" class="v132-preview-item" data-item-id="'+escapeHtml(p.id)+'" '+
                 'aria-label="查看'+escapeHtml(p.name)+'詳細資料" '+
                 'onclick="v132OpenPreviewEquipmentDetail(this.dataset.itemId)">'+
-                '<span class="v132-preview-icon">'+p.icon+'</span>'+
-                '<span class="v132-preview-item-name">'+escapeHtml(p.name)+'</span>'+
+                '<span class="v132-preview-icon">'+window.FourSymbolsItemSlot.art(p.icon,p)+'</span>'+
+                '<span class="v132-preview-item-name">'+window.FourSymbolsItemSlot.name(p.name,p)+'</span>'+
                 '<b>'+formatPreviewProbability(chance)+'</b>'+
                 '</button>'
             ).join("");
@@ -9655,7 +9655,7 @@
             const reason=item?canActuallyReforge(item,true):synthesisState.reforgeUid?"裝備已失效或 UID 重複，請重新選擇裝備。":"沒有可冶煉的裝備。";
             return '<div class="v141-synthesis-empty">'+escapeHtml(reason)+
                 '<small>只有具備至少 1 個冶煉槽、且未鎖定的裝備會出現在這裡。</small>'+
-                renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］'})),synthesisState.reforgeUid,'v141SelectReforgeItem')+
+                renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］',item:entry.item})),synthesisState.reforgeUid,'v141SelectReforgeItem')+
                 (synthesisState.pendingReforge?'<button type="button" onclick="v141ResolveReforge(false)">保留原效果</button>':'')+'</div>';
         }
         const slotCount=reforgeSlotCount(item);
@@ -9691,7 +9691,7 @@
             }).join("")
             :'<div class="v17358-no-affix-lock">首次冶煉尚無詞條可鎖定。</div>';
         return '<div class="v141-synthesis-card v17358-reforge-card">'+
-            renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］'})),synthesisState.reforgeUid,'v141SelectReforgeItem')+
+            renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］',item:entry.item})),synthesisState.reforgeUid,'v141SelectReforgeItem')+
             '<section class="v141-reforge-current"><b>'+window.FourSymbolsItemSlot.name(item.name,item)+'</b><small>冶煉槽 '+slotCount+' 格・可不限次數重洗</small><div><em>原始詞條</em>'+statsHtml(item.stats)+'</div><div><em>目前冶煉</em>'+statsHtml(item.reforgeStats)+'</div></section>'+
             '<section class="v17358-reforge-material"><div class="v17358-section-title"><b>選擇冶煉材料階級</b><span>裝備品質不限制材料；材料階級只決定本次數值範圍。</span></div><div class="v17358-reforge-tiers">'+tierButtons+'</div></section>'+
             '<section class="v17358-reforge-lock-panel"><div class="v17358-section-title"><b>鎖定詞條</b><span>最多鎖 2 條，且至少保留 1 個槽位重新冶煉。</span></div><div class="v17358-reforge-lock-list">'+lockHtml+'</div><small>目前鎖定 '+locks.length+' / '+maxLocks+' 條</small></section>'+
@@ -9725,10 +9725,9 @@
         const canonical=[content.talismans,content.ores,content.blueprints,content.tickets,content.equipmentSetItems].filter(Array.isArray).flat().find(item=>item&&item.id===value);
         const item=canonical||(inventoryItems||[]).find(candidate=>candidate&&(candidate.id===value||candidate.v141Uid===value))||allEquipment().find(candidate=>candidate.v141Uid===value);
         if(item&&item.assetPath){
-            const rarity=escapeHtml(normalizeTierKey(item.rarityKey||item.quality||item.tierKey||"white"));
             return window.FourSymbolsItemSlot.art('<span class="v169-item-art v169-equipment-art"><img src="'+escapeHtml(item.assetPath)+'" alt="" draggable="false" decoding="async"></span>',item);
         }
-        return item&&item.icon?item.icon:svgIcon("物","#caa461");
+        return item&&item.icon?(isEquipmentInventoryType(item.type)?window.FourSymbolsItemSlot.art(item.icon,item):item.icon):svgIcon("物","#caa461");
     }
 
     function renderItemPicker(label,entries,selected,handler){

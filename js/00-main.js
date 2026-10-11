@@ -30284,7 +30284,8 @@ const EQUIPMENT_RARITY_VISUALS=Object.freeze({
 });
 function getEquipmentRarityKey(item){
     const aliases={low:"white",mid:"blue",high:"purple",perfect:"orange"};
-    for(const raw of [item?.rarityKey,item?.quality,item?.tierKey,item?.legacyTierKey]){
+    for(const value of [item?.rarityKey,item?.quality,item?.tierKey,item?.legacyTierKey]){
+        const raw=String(value||"").toLowerCase();
         const key=aliases[raw]||raw;
         if(EQUIPMENT_RARITY_VISUALS[key]) return key;
     }
@@ -30296,7 +30297,7 @@ function getEquipmentNameColor(item){
 const FourSymbolsItemSlot=Object.freeze({
     tokens(item){
         const visual=EQUIPMENT_RARITY_VISUALS[getEquipmentRarityKey(item)];
-        return "--slot-rarity:"+(visual.frame?"transparent":visual.color)+";--equipment-name-color:"+visual.color+";--equipment-rarity-fill:"+visual.fill+";--equipment-rarity-frame:"+(visual.frame||"linear-gradient("+visual.color+","+visual.color+")");
+        return "--slot-rarity:"+(visual.frame?"transparent":visual.color)+";--equipment-name-color:"+visual.color+";--equipment-rarity-fill:"+(visual.frame?visual.fill:"linear-gradient("+visual.fill+","+visual.fill+")")+";--equipment-rarity-frame:"+(visual.frame||"linear-gradient("+visual.color+","+visual.color+")");
     },
     apply(element,item){
         element.classList.toggle("item-slot",!!item);
@@ -30321,7 +30322,7 @@ const FourSymbolsItemSlot=Object.freeze({
     },
     name(name,item){
         const text=String(name||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-        return '<span class="equipment-name" style="color:'+getEquipmentNameColor(item)+'">'+text+'</span>';
+        return '<span class="equipment-rarity-name" style="color:'+getEquipmentNameColor(item)+'">'+text+'</span>';
     }
 });
 window.FourSymbolsItemSlot=FourSymbolsItemSlot;
@@ -30438,15 +30439,7 @@ const INVENTORY_RARITY_DATA_TO_UI=Object.freeze({
 });
 
 function getInventoryRarityDataKey(item){
-    if(!item){ return "white"; }
-    const rawKeys=[item.rarityKey,item.quality,item.tierKey,item.legacyTierKey];
-    for(const raw of rawKeys){
-        const key=String(raw||"").toLowerCase();
-        if(Object.prototype.hasOwnProperty.call(INVENTORY_RARITY_DATA_TO_UI,key)){
-            return key;
-        }
-    }
-    return "white";
+    return getEquipmentRarityKey(item);
 }
 
 function getInventoryRarityKey(item){

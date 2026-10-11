@@ -35,6 +35,7 @@ function $(id){return document.getElementById(id);}
 function getPotionEffectDescription(){return '回復最大SP的10%';}
 function getStatText(){return Array.from({length:28},(_,i)=>'<div>長屬性 '+i+'：+100</div>').join('');}
 var selectedInventorySlot=null;
+${require("../.github/scripts/fixtures/item-slot-owner.cjs")}
 ${itemOwner}
 window.closeItemModal=function(){};
 window.v132ShowRewardModal=function(markup){document.getElementById('rewardLayer').innerHTML='<div class="v132-reward-modal">'+markup+'</div>';};

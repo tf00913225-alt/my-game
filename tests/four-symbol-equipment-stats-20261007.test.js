@@ -25,6 +25,8 @@ vm.runInContext(between(expansion,"    function getEquipmentSetCounts(","\n\n   
 vm.runInContext(between(progression,"    function applySetRule(","    /*\n       First-character equipment"),ctx);
 const normalize=ctx.window.v132NormalizeEquipmentSetItem;
 const definitions=ctx.window.v132GetContentDefinitions().equipmentSetItems;
+const combat=vm.createContext({characterEquipment:{},getSocketGemStats:()=>[]});
+vm.runInContext(between(main,"function getEquipmentBonus(","/* Equipment rarity owns capacity"),combat);
 const expected={blade:{attack:30},fan:{intelligence:30},heavyArmor:{defensePoints:25,agility:5},robe:{defensePoints:25,agility:5},boots:{attack:20,defensePoints:10},shoes:{intelligence:20,defensePoints:10},helm:{attack:25,vitality:5},crown:{intelligence:25,vitality:5},wristguard:{attack:30},focus:{intelligence:30}};
 const families={setFire:"fire",setWater:"water",setEarth:"earth",setWind:"wind"};
 assert.equal(definitions.length,40);
@@ -33,6 +35,10 @@ for(const [setId,element] of Object.entries(families)){
         const def=definitions.find(item=>item.id===setId+"_"+piece);
         assert.deepEqual(clean(def.stats),stats);
         assert.equal(def.rarityKey,"pink");assert.equal(def.tierKey,"pink");
+        combat.characterEquipment.fire={shoulder:def};
+        const actual=combat.getEquipmentBonus("fire");
+        if(piece==="wristguard")assert.equal(actual.attack,30,"formal combat getter consumes +30 attack");
+        if(piece==="focus")assert.equal(actual.intelligence,30,"formal combat getter consumes +30 intelligence");
         assert.equal(def.requiredElement,element);assert.equal(def.levelRequirement,20);
         const legacy={id:def.id,setId,stats:{attack:15,vitality:-2,evasion:10,antiCrit:0.5,statusResistance:0.25},reforgeStats:{attack:3,spirit:10},sockets:["gemVitalityI"],v141Uid:"KEEP",count:1};
         ctx.applySetRule(legacy);ctx.applySetRule(legacy);

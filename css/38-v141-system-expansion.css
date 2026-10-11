@@ -126,7 +126,6 @@
     place-items:center;
     padding:3px;
     overflow:hidden;
-    border-radius:8px;
     box-sizing:border-box;
 }
 #game-ui #inventoryPage .v169-item-art.v169-equipment-art > img{

@@ -19,7 +19,7 @@ function fixture(seed=new Map(),uid='shop-A'){
  vm.runInContext(repoSource,c);const repo=c.FourSymbolsAccountSave;repo.activate(uid);
  c.saveGame=options=>{if(reenter){const fn=reenter;reenter=null;fn();}try{repo.writeForUid(repo.getActiveUid(),{gold:c.gold,inventoryItems:c.inventoryItems},options);return true;}catch(_){return false;}};
  c.rpgAlert=(_message,o)=>{if(o.tone==='success')success++;return Promise.resolve();};
- vm.runInContext(require('./helpers/item-slot-owner.cjs'),c);
+ vm.runInContext(require('../.github/scripts/fixtures/item-slot-owner.cjs'),c);
  vm.runInContext(inventoryOwner,c);vm.runInContext(gear,c);
  const key=repo.accountKey('equipment-shop-daily');
  return {c,repo,seed,key,body,read:()=>c.FourSymbolsEquipmentShop.render(),buy:(i,id)=>c.v17346BuyEquipmentShopOffer(i,id),fail:k=>failKey=k,day:d=>day=d,reenter:fn=>reenter=fn,success:()=>success};

@@ -5,7 +5,7 @@ const forge=fs.readFileSync('js/36-v141-content-systems.js','utf8');
 function fixture(items=[],equipment={}){
  const c=vm.createContext({console,inventoryItems:items,characterEquipment:equipment,localStorage:{getItem:()=>null},setTimeout(){},
   document:{readyState:'loading',addEventListener(){},getElementById:()=>null,createElement:()=>({}),head:{appendChild(){}}},
-  FourSymbolsAccountSave:{accountKey:x=>x}});c.window=c;vm.runInContext(require('./helpers/item-slot-owner.cjs'),c);vm.runInContext(source,c);return c;
+  FourSymbolsAccountSave:{accountKey:x=>x}});c.window=c;vm.runInContext(require('../.github/scripts/fixtures/item-slot-owner.cjs'),c);vm.runInContext(source,c);return c;
 }
 const plain=x=>JSON.parse(JSON.stringify(x));
 const ranges={white:[5,10],blue:[11,16],purple:[17,22],orange:[23,28]};

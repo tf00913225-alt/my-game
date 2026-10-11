@@ -1469,8 +1469,8 @@
                 '<button type="button" class="v132-preview-item" data-item-id="'+escapeHtml(p.id)+'" '+
                 'aria-label="查看'+escapeHtml(p.name)+'詳細資料" '+
                 'onclick="v132OpenPreviewEquipmentDetail(this.dataset.itemId)">'+
-                '<span class="v132-preview-icon">'+p.icon+'</span>'+
-                '<span class="v132-preview-item-name">'+escapeHtml(p.name)+'</span>'+
+                '<span class="v132-preview-icon">'+window.FourSymbolsItemSlot.art(p.icon,p)+'</span>'+
+                '<span class="v132-preview-item-name">'+window.FourSymbolsItemSlot.name(p.name,p)+'</span>'+
                 '<b>'+formatPreviewProbability(chance)+'</b>'+
                 '</button>'
             ).join("");

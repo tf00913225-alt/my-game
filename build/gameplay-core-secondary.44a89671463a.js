@@ -6068,8 +6068,8 @@
         {key:"blue",label:"藍階",chance:40,min:11,max:16,reforgeSlots:0,shopPrice:1500,available:true},
         {key:"purple",label:"紫階",chance:15,min:17,max:22,reforgeSlots:1,shopPrice:4000,available:true},
         {key:"orange",label:"橙階",chance:5,min:23,max:28,reforgeSlots:1,shopPrice:10000,available:true},
-        {key:"pink",label:"桃紅階",chance:0,available:false,planned:true,color:"#FF4FA7"},
-        {key:"four-symbol",label:"四象階",chance:0,available:false,planned:true,fourSymbol:true,color:null}
+        {key:"pink",label:"桃紅階",chance:0,available:false,planned:true},
+        {key:"four-symbol",label:"四象階",chance:0,available:false,planned:true,fourSymbol:true}
     ];
     RARITIES.forEach(rarity=>{ rarity.color=window.getEquipmentNameColor({rarityKey:rarity.key}); });
     const RARITY_BY_KEY=Object.fromEntries(RARITIES.map(item=>[item.key,item]));
