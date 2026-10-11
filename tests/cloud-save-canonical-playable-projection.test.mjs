@@ -36,6 +36,8 @@ function sources(count=1){
                         {date:"2020-02-29",used:{exp:true,material:false,equipment:true}}:
                         key==="equipment-shop-daily"?
                         {date:"2020-02-29",refreshCount:2,soldOfferIds:["2020-02-29:0:5","2020-02-29:2:0"]}:
+                        key==="legacy-abyss-state"?
+                        {active:true,floor:3,phase:"portal",x:50,y:84,message:"寶箱已開啟",clears:2,rewardVersion:1}:
                         {marker:key})}]))},
         claimRecords,claimCheckpoint:{...base,claimCount:1,claimDigest:claimRecordsDigest(claimRecords),historicalClaimsBlocked:true},
         playableState:{...base,heroAccount:normalizeAccountState(null),bestiaryData:{slime:{seen:true,kills:9}},
@@ -43,6 +45,67 @@ function sources(count=1){
             selectedCreationElement:"water",lastSaveTimestamp:1700000000000}};
 }
 const assemble=records=>assembleCanonicalPlayableProjection("uid-a",7,records);
+
+test("legacy Abyss preservation rejects lossy or ambiguous evidence without migration",()=>{
+    const mutations=[s=>delete s.rewardVersion,s=>s.rewardVersion=0,s=>s.rewardVersion=2,
+        s=>s.rewardVersion="1",s=>s.active=1,s=>s.floor=0,s=>s.floor=6,s=>s.floor=1.5,
+        s=>s.floor="3",s=>s.phase="ready",s=>s.x=3,s=>s.x=97,s=>s.x="50",
+        s=>s.y=7,s=>s.y=95,s=>s.message=null,s=>s.clears=-1,s=>s.clears=0.5,
+        s=>s.clears=Number.MAX_SAFE_INTEGER+1,s=>s.extra=true];
+    const initial=JSON.parse(sources().progress.sidecars["legacy-abyss-state"].raw);
+    for(const change of mutations){
+        const state=structuredClone(initial);change(state);
+        for(const durable of [false,true]){
+            const records=sources();records.progress.sidecars["legacy-abyss-state"].raw=JSON.stringify(state);
+            if(durable){const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
+                records.progress.playableState=fields;delete records.playableState;}
+            const before=structuredClone(records);
+            assert.throws(()=>assemble(records),/legacy Abyss|claim sidecar fields/);
+            if(durable){assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,records),/legacy Abyss|claim sidecar fields/);}
+            assert.deepEqual(records,before);
+        }
+    }
+});
+
+test("legacy Abyss recorded phases and bytes survive snapshots and recovery archives without claims",()=>{
+    const {createRecoveryArchive,inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    for(const phase of ["boss","chest","portal","complete"]){
+        const records=sources(),state=JSON.parse(records.progress.sidecars["legacy-abyss-state"].raw);
+        Object.assign(state,{phase,floor:5,x:4,y:94,clears:7});
+        const raw=" \n"+JSON.stringify(state)+" \n";
+        records.progress.sidecars["legacy-abyss-state"].raw=raw;
+        const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
+        records.progress.playableState=fields;delete records.playableState;
+        const before=structuredClone(records),snapshot=assembleCanonicalSnapshot("uid-a",7,records),bundle=assemble(records);
+        const archive=JSON.parse(JSON.stringify(createRecoveryArchive("uid-a",7,records,snapshot)));
+        const restored=inspectRecoveryArchive(archive,"uid-a",7,snapshot);
+        assert.equal(restored.progress.sidecars["legacy-abyss-state"].raw,raw);
+        assert.equal(bundle.projection.sidecars["legacy-abyss-state"].raw,raw);
+        assert.deepEqual(restored.claimRecords,records.claimRecords);
+        assert.deepEqual(bundle.projection.gameSave.abyssProgress,records.progress.abyssProgress);
+        assert.deepEqual(bundle.projection.gameSave.gold,records.economy.gold);
+        assert.equal(archive.readyForRestore,false);assert.equal(bundle.readyForPublication,false);
+        assert.equal(bundle.projection.authoritativeStateReady,false);
+        const changed=structuredClone(records);state.phase=phase==="portal"?"chest":"portal";
+        changed.progress.sidecars["legacy-abyss-state"].raw=JSON.stringify(state);
+        assert.notEqual(assemble(changed).sha256,bundle.sha256);
+        assert.throws(()=>verifyCanonicalPlayableProjectionAgainstSources(bundle,"uid-a",7,changed),/differs/);
+        const tampered=structuredClone(archive);tampered.sourceRecords.progress.sidecars["legacy-abyss-state"].raw="{}";
+        assert.throws(()=>inspectRecoveryArchive(tampered,"uid-a",7,snapshot),/digest/);
+        assert.deepEqual(records,before);
+    }
+});
+
+test("ambiguous historical legacy Abyss v1 bytes remain compatible but cannot become complete evidence",()=>{
+    for(const raw of [' {"phase":"portal","floor":2} ',' {"phase":"portal","rewardVersion":0} ']){
+        const records=sources();records.progress.sidecars["legacy-abyss-state"].raw=raw;
+        const before=structuredClone(records),bundle=assembleCanonicalSnapshot("uid-a",7,records);
+        assert.equal(bundle.snapshot.progress.sidecars["legacy-abyss-state"].raw,raw);
+        assert.equal(assembleCanonicalSnapshot("uid-a",7,JSON.parse(JSON.stringify(records))).sha256,bundle.sha256);
+        assert.throws(()=>assemble(records),/legacy Abyss|claim sidecar fields/);
+        assert.deepEqual(records,before);
+    }
+});
 
 test("complete projection covers current save fields, slots, owned equipment and sidecar bytes without mutation",()=>{
     for(const count of [1,2,3]){
@@ -115,7 +178,7 @@ test("projection rejects oversized and non-JSON payloads before serialization ca
     const expanded=sources();
     for(const [key,entry] of Object.entries(expanded.progress.sidecars)){
         if(makeInitialSidecars(1)[key].status!=="present"){
-            entry.raw=["daily-dungeon-state","equipment-shop-daily"].includes(key)?
+            entry.raw=["daily-dungeon-state","equipment-shop-daily","legacy-abyss-state"].includes(key)?
                 entry.raw+" ".repeat(62000):JSON.stringify({data:"x".repeat(62000)});
         }
     }
