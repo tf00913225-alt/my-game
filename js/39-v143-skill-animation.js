@@ -287,7 +287,7 @@
         const projection=geometry&&geometry.artworkProjection;
         const entity=entityFor(side,index);
         if(!projection||!projection.rect.width||!projection.rect.height||
-           !projection.backgroundImage||projection.backgroundImage==="none"||!artwork.isConnected||
+           (!projection.genericPortrait&&(!projection.backgroundImage||projection.backgroundImage==="none"))||!artwork.isConnected||
            !entity||Number(entity.hp)<=0||entity.alive===false){ return null; }
         const previous=state.impactFlashes.get(artwork);
         if(previous){ previous.cancel(); }
@@ -299,6 +299,12 @@
         }
         const node=document.createElement("i");
         node.className="v143-hit-feedback-art";
+        if(projection.genericPortrait){
+            node.className+=" v174-generic-portrait";
+            Object.entries(projection.portraitVariables||{}).forEach(([name,value])=>{
+                if(value){ node.style.setProperty(name,value); }
+            });
+        }
         node.dataset.side=side;
         node.dataset.index=String(index);
         node.dataset.sequence=String(current.sequence);

@@ -29,7 +29,7 @@ try{
  });
  await page.waitForFunction(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
  await page.evaluate(()=>{clearInterval(timerId);timerId=null;});
- const scene=async(count,boss=false)=>{
+ const scene=async(count,boss=false,generic=false)=>{
   await page.evaluate(({count,boss})=>{
    v142SkillAnimationDirector.dispose();
    if(boss){
@@ -43,13 +43,13 @@ try{
    }
   },{count,boss});
   if(boss){await page.waitForFunction(()=>FourSymbolsBossBattle.isActive()&&!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));}
-  await page.evaluate(()=>{
+  await page.evaluate(generic=>{
    clearInterval(timerId);timerId=null;
    const path='assets/monsters/wild/zone-10/fire-01.webp';
    // Test-only asset selection through the formal artwork owner, not cloned DOM.
-   currentBattleMonsters.forEach(i=>{monsters[i].vGameplayPortrait=monsters[i].vGameplayBoss?'assets/monsters/boss/boss-placeholder-fire-demon.webp':path;FourSymbolsBattlePresentation.applyUnit(document.getElementById('battleMonster'+i),'monster');});
+   if(!generic)currentBattleMonsters.forEach(i=>{monsters[i].vGameplayPortrait=monsters[i].vGameplayBoss?'assets/monsters/boss/boss-placeholder-fire-demon.webp':path;FourSymbolsBattlePresentation.applyUnit(document.getElementById('battleMonster'+i),'monster');});
    FourSymbolsBattlefieldRenderGeometry.reconcile();
-  });
+  },generic);
   await page.waitForFunction(()=>[...document.querySelectorAll('.v174-battle-art')].every(a=>a.getBoundingClientRect().width>0));
  };
  const cast=async(id,side='monster',override=null)=>{
@@ -157,6 +157,20 @@ try{
  await capture('blue-ice-all-6',await cast('iceArrowRain'));
  await capture('large-fire-all-6',await cast('phoenixCry'));
  await capture('friendly-hit-all',await cast('iceArrowRain','player'));
+ await scene(1,true,true);
+ assert.equal(await page.evaluate(()=>document.querySelector('.gameplay-boss-card .v174-battle-art')?.classList.contains('v174-generic-portrait')),true,'authored Boss neutral artwork needs no test asset override');
+ await capture('boss-neutral-footprint-all',await cast('iceArrowRain'));
+ evidence.genericArtwork=await page.evaluate(()=>{
+  const entry=[...v143SkillAnimationState.impactFlashes.values()][0],art=document.querySelector('.gameplay-boss-card .v174-battle-art');
+  const actual=getComputedStyle(art,'::before'),overlay=getComputedStyle(entry.node,'::before');
+  const scale=art.getBoundingClientRect().width/parseFloat(getComputedStyle(art).width);
+  return {content:overlay.content,background:getComputedStyle(entry.node).backgroundImage,
+   widthMatch:Math.abs(parseFloat(overlay.width)-parseFloat(actual.width)*scale)<.3,
+   heightMatch:Math.abs(parseFloat(overlay.height)-parseFloat(actual.height)*scale)<.3,
+   fontMatch:Math.abs(parseFloat(overlay.fontSize)-parseFloat(actual.fontSize)*scale)<.3};
+ });
+ assert.equal(evidence.genericArtwork.background,'none');assert.ok(evidence.genericArtwork.content.includes('◇'));
+ assert.ok(evidence.genericArtwork.widthMatch&&evidence.genericArtwork.heightMatch&&evidence.genericArtwork.fontMatch,'neutral hit projection reuses the rendered artwork geometry and source paint');
  await scene(1,true);
  await capture('boss-footprint-all',await cast('iceArrowRain'));
  // Start each exclusion on an active direct cast, including DOT settlement

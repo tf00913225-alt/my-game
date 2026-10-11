@@ -459,7 +459,8 @@
 /* Offline alpha bounds are consumed by V174. The full canvas is painted once,
    preserving aspect and every nontransparent pixel; no runtime pixel scan. */
 #game-stage #battlePage .v174-battle-art.v174-normalized-portrait,
-#game-stage #battlePage .v174-battle-art.v174-generic-portrait{
+#game-stage #battlePage .v174-battle-art.v174-generic-portrait,
+.v143-hit-feedback-art.v174-generic-portrait{
     container-type:size;
     --portrait-background-size:0 0;
 }
@@ -476,7 +477,7 @@
     background-repeat:no-repeat;
     pointer-events:none;
 }
-#game-stage #battlePage .v174-battle-art.v174-generic-portrait::before{
+:is(#game-stage #battlePage .v174-battle-art,.v143-hit-feedback-art).v174-generic-portrait::before{
     content:"◇";
     position:absolute;
     left:12%;
@@ -487,6 +488,7 @@
     place-items:center;
     color:var(--ui-gold, #c89a48);
     font-size:72cqh;
+    font-style:normal;
     border:1px dashed currentColor;
     border-radius:50%;
 }
