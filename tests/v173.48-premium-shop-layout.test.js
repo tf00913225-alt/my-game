@@ -24,7 +24,7 @@ assert.match(css,/\.shop-potion-purchase-row\{[\s\S]*?grid-template-columns:48px
 assert.match(css,/\.shop-potion-purchase-row label\{[\s\S]*?display:none !important;/);
 assert.match(css,/\.shop-potion-quantity\{[\s\S]*?width:48px;[\s\S]*?max-width:48px;[\s\S]*?appearance:textfield;[\s\S]*?font-size:13px;/);
 assert.match(css,/\.shop-potion-quantity::-webkit-inner-spin-button\{[\s\S]*?-webkit-appearance:none !important;/);
-assert.match(css,/\.shop-potion-purchase-row \.shop-potion-buy\{[\s\S]*?grid-column:3;[\s\S]*?grid-row:1;[\s\S]*?height:36px !important;[\s\S]*?font-size:15px;/);
+assert.match(css,/\.shop-potion-purchase-row \.shop-potion-buy\{[\s\S]*?grid-column:3;[\s\S]*?grid-row:1;[\s\S]*?height:42px;[\s\S]*?font-size:15px;/);
 assert.ok(equip.includes("前5次免費；第6～10次尚未開放。"));
 assert.ok(loader.includes('const V_ASSET_VERSION="'+releaseMeta.cacheVersion+'";'));
 assert.ok(build.indexOf('"js/51-v169-rpg-ui.js"')<build.indexOf('"js/equipment-progression.js"'));
