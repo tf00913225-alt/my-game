@@ -23,6 +23,10 @@ test('authorized lethal repair skips only Boss on its exact unintegrated dev sna
     assert.equal(applyAuthorizedLethalBossException(before,{paths,baseSha,headSha,now,runGit}),before);
   }
   const before=plan(paths);
+  const manifestPaths=[...paths,'asset-manifest.json'];
+  const manifestGit=args=>args[0]==='diff'&&args.includes('asset-manifest.json')?'asset-manifest.json':runGit(args);
+  assert.equal(applyAuthorizedLethalBossException(before,{paths:manifestPaths,baseSha,headSha,now,runGit:manifestGit}),before);
+  assert.equal(applyAuthorizedLethalBossException(before,{paths:manifestPaths,baseSha,headSha,now,runGit:manifestGit,generatedVerified:true}).bossMode,'none');
   for(const extra of [
     {now:new Date('2026-10-18T00:00:00Z')}, {headSha:'invalid'},
     {paths:[...paths,'js/gameplay-boss-tower-system.js']},

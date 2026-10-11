@@ -107,13 +107,15 @@ export function isAuthorizedLethalBossException(plan, now = new Date()) {
 }
 
 export function applyAuthorizedLethalBossException(plan, {
-  baseSha, headSha, paths, now = new Date(),
+  baseSha, headSha, paths, generatedVerified = false, now = new Date(),
   runGit = args => execFileSync('git', args, {encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe']})
 } = {}) {
   const candidate = {...plan, bossException: {...LETHAL_BOSS_EXCEPTION, baseSha, headSha}};
   if (!isAuthorizedLethalBossException(candidate, now) || !paths?.length ||
       plan.reasons.some(reason => /unavailable|invalid|unreliable/i.test(reason)) ||
       paths.some(p => !LETHAL_EXCEPTION_POLICY_PATHS.has(p) && !LETHAL_EXCEPTION_SOURCE_PATH.test(p))) return plan;
+  const manifests = new Set(['asset-manifest.json', 'build/asset-manifest.json']);
+  if (paths.some(p => manifests.has(p)) && !generatedVerified) return plan;
   try {
     // Applies only when introducing the accepted checkpoint, never a later dev
     // push that already contains it. New combat/artwork/build changes revoke it.
@@ -122,7 +124,9 @@ export function applyAuthorizedLethalBossException(plan, {
     try {runGit(['merge-base', '--is-ancestor', LETHAL_BOSS_EXCEPTION.sourceCommit, baseSha]); alreadyIntegrated = true;}
     catch (error) {if (error.status !== 1) throw error;}
     if (alreadyIntegrated || runGit(['diff', '--name-only', LETHAL_BOSS_EXCEPTION.sourceCommit, headSha, '--',
-      ...paths.filter(p => !LETHAL_EXCEPTION_POLICY_PATHS.has(p))]).trim()) return plan;
+      // Manifests can absorb unrelated latest-dev boot CSS; the formal build
+      // must verify them, while every affected shipped JS bundle stays pinned.
+      ...paths.filter(p => !LETHAL_EXCEPTION_POLICY_PATHS.has(p) && !manifests.has(p))]).trim()) return plan;
     return {...candidate, gates: {...plan.gates, boss_balance: false}, bossMode: 'none'};
   } catch {return plan;}
 }
@@ -264,7 +268,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     }
   } catch (e) {error = `Comparison unavailable; strict fallback: ${e.message}`;}
   const plan = applyAuthorizedLethalBossException(classifyChanges(paths, {eventName: process.env.CI_EVENT_NAME, baseRef: process.env.CI_BASE_REF, addedPaths, error, responsibilities, responsibilitiesByPath, generatedVerified, fullRegression: process.env.CI_FULL_REGRESSION === 'true'}),
-    {baseSha: process.env.CI_BASE_SHA, headSha: process.env.CI_HEAD_SHA, paths});
+    {baseSha: process.env.CI_BASE_SHA, headSha: process.env.CI_HEAD_SHA, paths, generatedVerified});
   const outputs = {plan_json: JSON.stringify(plan), strict: plan.strictMode, cloud_gate: plan.gates.session_authority, full_node: plan.shadow || plan.strictMode || plan.fullRegression || !['pull_request','push'].includes(plan.eventName) || plan.baseRef === 'main' || plan.flags.monster_balance_changed || plan.flags.workflow_changed || plan.flags.cloud_changed || plan.flags.persistence_changed,
     boss_mode:plan.bossMode, ...plan.flags, ...plan.gates};
   if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT,
