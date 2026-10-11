@@ -11172,7 +11172,9 @@
         const previous=checkBattleEnd;
         checkBattleEnd=function(){
             const result=previous.apply(this,arguments);
-            if(result){ setTimeout(()=>director.dispose(),0); }
+            // V143 alone decides whether the visible battlefield still owns a
+            // committed lethal hit. Gameplay completion never waits for it.
+            if(result&&!window.v143HasTerminalImpactPresentation?.()){ director.dispose(); }
             return result;
         };
     }
@@ -11951,37 +11953,83 @@
         return id;
     }
 
-    function clearImpactOverlays(){
+    function clearImpactOverlays(reason){
+        if(reason==="render"&&impactPageVisible()){
+            const hits=state.current?.impactHits;
+            const retained=Array.from(hits?.values()||[]).some(hit=>hit.lethal&&validImpactHit(hit)&&
+                (!hit.presented||Array.from(state.impactFlashes.values()).some(entry=>entry.hit===hit)));
+            if(retained){
+                state.impactFlashes.forEach(entry=>{ if(!validImpactHit(entry.hit)){ entry.cancel(); } });
+                return;
+            }
+        }
         state.impactEpoch=(state.impactEpoch||0)+1;
+        state.impactTerminalCurrent=null;
         Array.from(state.impactFlashes.values()).forEach(entry=>entry.cancel());
         state.impactFlashes.clear();
         if(state.hitOverlay){ state.hitOverlay.remove(); state.hitOverlay=null; }
     }
-    function clearImpactTarget(side,index){
+    function impactPageVisible(){
+        const page=document.getElementById("battlePage");
+        return !!page?.classList.contains("active")&&page.isConnected!==false&&!document.hidden;
+    }
+    function validImpactHit(hit){
+        const token=typeof battleToken!=="undefined"?battleToken:null;
+        return !!hit&&hit.epoch===state.impactEpoch&&impactPageVisible()&&
+            (hit.battleToken===null||hit.battleToken===token||
+                state.impactTerminalCurrent===hit.current&&state.impactTerminalToken===token)&&
+            entityFor(hit.side,hit.index)===hit.entity&&
+            hit.current.impactHits?.get(hit.index)===hit;
+    }
+    function captureImpactTarget(current,side,index){
+        const entity=entityFor(side,index),card=cardFor(side,index);
+        const artwork=card&&card.querySelector(".v174-battle-art");
+        const projection=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(side,index)?.artworkProjection;
+        if(!entity||Number(entity.hp)<=0||entity.alive===false||!artwork||!projection){ return; }
+        if(!current.impactTargets){ current.impactTargets=new Map(); }
+        if(current.impactEpoch===undefined){ current.impactEpoch=state.impactEpoch; }
+        // DOMRect properties are prototype getters, not enumerable fields.
+        const rect=projection.rect;
+        current.impactTargets.set(index,{entity,artwork,battleToken:typeof battleToken!=="undefined"?battleToken:null,
+            projection:{...projection,rect:{left:rect.left,top:rect.top,width:rect.width,height:rect.height},portraitVariables:{...projection.portraitVariables}}});
+    }
+    function hasTerminalImpactPresentation(){
+        // The core terminal decision can precede its existing exit owner's
+        // battle_end notification. This query observes hits, not win/loss rules.
+        const current=state.impactTerminalCurrent||state.current;
+        return !!current&&Array.from(current.impactHits?.values()||[]).some(hit=>
+            hit.lethal&&validImpactHit(hit)&&(hit.scheduled&&!hit.presented||
+                Array.from(state.impactFlashes.values()).some(entry=>entry.hit===hit)));
+    }
+    function clearImpactTarget(side,index,reason){
         state.impactFlashes.forEach(entry=>{
-            if(entry.side===side&&entry.index===index){ entry.cancel(); }
+            if(entry.side===side&&entry.index===index&&
+               !(reason==="death"&&entry.hit?.lethal&&validImpactHit(entry.hit))){ entry.cancel(); }
         });
     }
     function syncImpactOverlays(){
         const page=document.getElementById("battlePage");
-        if(!page||!page.classList.contains("active")){ clearImpactOverlays(); return; }
+        if(!impactPageVisible()){ clearImpactOverlays(); return; }
         state.impactFlashes.forEach((entry,artwork)=>{
             const card=cardFor(entry.side,entry.index);
             const entity=entityFor(entry.side,entry.index);
-            if(!artwork.isConnected||!card||card.querySelector(".v174-battle-art")!==artwork||
+            if(validImpactHit(entry.hit)&&(entry.hit.lethal||Number(entity.hp)>0&&entity.alive!==false)){ return; }
+            if(entry.entity!==entity||!artwork.isConnected||!card||card.querySelector(".v174-battle-art")!==artwork||
                !entity||Number(entity.hp)<=0||entity.alive===false){ entry.cancel(); }
         });
     }
-    function createImpactFlash(artwork,side,index,current,impactEpoch){
+    function createImpactFlash(artwork,side,index,current,impactEpoch,hit){
         const page=document.getElementById("battlePage");
-        if(impactEpoch!==state.impactEpoch||!page?.classList.contains("active")||
-           typeof battleActive!=="undefined"&&!battleActive){ return null; }
+        const lethal=hit?.lethal&&validImpactHit(hit)&&!hit.presented;
+        if(impactEpoch!==state.impactEpoch||!impactPageVisible()||
+           typeof battleActive!=="undefined"&&!battleActive&&!(lethal&&state.impactTerminalCurrent===current)){ return null; }
         const geometry=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(side,index);
-        const projection=geometry&&geometry.artworkProjection;
+        const projection=validImpactHit(hit)&&(lethal||!artwork.isConnected)?hit.projection:geometry&&geometry.artworkProjection;
         const entity=entityFor(side,index);
         if(!projection||!projection.rect.width||!projection.rect.height||
-           (!projection.genericPortrait&&(!projection.backgroundImage||projection.backgroundImage==="none"))||!artwork.isConnected||
-           !entity||Number(entity.hp)<=0||entity.alive===false){ return null; }
+           (!projection.genericPortrait&&(!projection.backgroundImage||projection.backgroundImage==="none"))||
+           !entity||!lethal&&(!artwork.isConnected&&!validImpactHit(hit)||Number(entity.hp)<=0||entity.alive===false)){ return null; }
+        if(hit){ hit.presented=true; }
         const previous=state.impactFlashes.get(artwork);
         if(previous){ previous.cancel(); }
         if(!state.hitOverlay){
@@ -12014,7 +12062,7 @@
             {opacity:1,offset:.6,easing:"steps(1, end)"},
             {opacity:0,offset:1}
         ],{duration:200,easing:"linear"});
-        const entry={node,animation,side,index,sequence:current.sequence,cancel:()=>{
+        const entry={node,animation,side,index,entity,hit,sequence:current.sequence,cancel:()=>{
             animation.onfinish=null;
             animation.cancel();
             node.remove();
@@ -12032,16 +12080,39 @@
     window.v143ClearImpactOverlays=clearImpactOverlays;
     window.v143ClearImpactTarget=clearImpactTarget;
     window.v143SyncImpactOverlays=syncImpactOverlays;
+    window.v143HasTerminalImpactPresentation=hasTerminalImpactPresentation;
     window.FourSymbolsCombatEvents?.subscribe("battle_end",()=>{
-        clearImpactOverlays();
-        window.FourSymbolsBattlePresentation?.clearHud?.();
+        const current=state.current;
+        state.impactTerminalCurrent=current;
+        state.impactTerminalToken=typeof battleToken!=="undefined"?battleToken+1:null;
+        if(!hasTerminalImpactPresentation()){ clearImpactOverlays(); }
+        else{ state.impactFlashes.forEach(entry=>{ if(!entry.hit?.lethal||!validImpactHit(entry.hit)){ entry.cancel(); } }); }
+        window.FourSymbolsBattlePresentation?.syncHud?.();
     });
     window.FourSymbolsCombatEvents?.subscribe("hp_damage",event=>{
+        const current=state.current;
+        const indirect=["dot","relic","reflect","environment","self","hpCost"];
+        if(current&&!current.done&&current.impactEpoch===state.impactEpoch&&!state.impactTerminalCurrent&&impactPageVisible()&&
+           (current.config.id==="normal"||["physical","magic"].includes(current.config.category))&&
+           event.damageKind==="direct"&&!indirect.includes(event.sourceType)&&
+           event.previousHp>0&&event.actualHpLoss>0){
+            current.impactTargets?.forEach((snapshot,index)=>{
+                if(snapshot.entity!==event.target||entityFor(current.targetSide,index)!==event.target){ return; }
+                if(current.impactHits?.get(index)?.lethal){ return; }
+                if(!current.impactHits){ current.impactHits=new Map(); }
+                current.impactHits.set(index,{...snapshot,side:current.targetSide,index,current,
+                    fact:event,epoch:state.impactEpoch,lethal:event.hpAfterDamage<=0,scheduled:false,presented:false});
+            });
+        }
         if(!event.target||Number(event.target.hp)>0){ return; }
         state.impactFlashes.forEach(entry=>{
-            if(entityFor(entry.side,entry.index)===event.target){ entry.cancel(); }
+            if(entry.entity===event.target&&entry.hit?.fact!==event&&
+               !(entry.hit?.lethal&&validImpactHit(entry.hit))){ entry.cancel(); }
         });
     });
+    if(typeof document.addEventListener==="function"){
+        document.addEventListener("visibilitychange",()=>{ if(document.hidden){ director.dispose(); } });
+    }
 
     function clearTimers(){
         state.timers.forEach(id=>clearTimeout(id));
@@ -13136,6 +13207,7 @@
         const targetCard=cardFor(current.targetSide,index);
         const target=slotAnchor(current.targetSide,index,targetCard);
         if(!target){ return; }
+        captureImpactTarget(current,current.targetSide,index);
         current.emitted.add(index);
         if(current.targetIndexes.indexOf(index)<0){ current.targetIndexes.push(index); }
         if(targetCard&&targetCard.classList){ targetCard.classList.add("v143-effects-pending"); }
@@ -13230,6 +13302,7 @@
 
         const current={
             sequence:++sequence,config:config,model:model,gate:gate,
+            impactEpoch:state.impactEpoch,
             side:meta.side||"player",actorIndex:Number.isInteger(meta.actorIndex)?meta.actorIndex:0,
             targetId:meta.targetId!==undefined?meta.targetId:null,
             targetIds:Array.isArray(meta.targetIds)?meta.targetIds.slice():null,
@@ -13358,27 +13431,37 @@
         );
         const impactEpoch=state.impactEpoch;
         const fact=window.FourSymbolsCombatEvents?.lastDamageFor?.(entityFor(side,unitIndex));
+        const hit=current?.impactHits?.get(unitIndex);
+        const ownedHit=hit&&hit.fact===fact&&validImpactHit(hit)&&!hit.scheduled&&!hit.presented;
         const indirectSource=["dot","relic","reflect","environment","self","hpCost"];
         const direct=current&&!current.done&&(current.config.id==="normal"||
             current.config.category==="physical"||current.config.category==="magic")&&
+            (current.impactEpoch===undefined||current.impactEpoch===impactEpoch)&&
             (!fact||fact.damageKind==="direct"&&!indirectSource.includes(fact.sourceType))&&
             !indirectSource.includes(window.__fourSymbolsBattleEffectSource);
+        if(damage&&direct&&ownedHit){ hit.scheduled=true; }
+        const entity=entityFor(side,unitIndex);
+        const artworkAtSchedule=ownedHit?hit.artwork:cardFor(side,unitIndex)?.querySelector(".v174-battle-art");
         const present=function(){
             const audio=window.v141Audio;
             const playSound=function(){
                 const sound=damage?(critical?"crit":"damage"):kind==="shield"?"block":kind==="miss"?"dodge":null;
                 if(sound&&audio&&typeof audio.play==="function"){ audio.play(sound,audio.combatFeedbackVolumeScale); }
             };
-            if(!damage||!direct||state.current!==current||current.done){ playSound(); return; }
+            if(!damage||!direct||state.current!==current||current.done||impactEpoch!==state.impactEpoch||
+               entityFor(side,unitIndex)!==entity||hit&&!ownedHit||ownedHit&&!validImpactHit(hit)){
+                playSound(); return;
+            }
             const card=cardFor(side,unitIndex);
-            const artwork=card&&card.querySelector(".v174-battle-art");
+            const artwork=ownedHit?hit.artwork:card&&card.querySelector(".v174-battle-art");
+            if(artwork!==artworkAtSchedule){ playSound(); return; }
             if(!artwork||typeof artwork.animate!=="function"){ playSound(); return; }
             if(typeof window.matchMedia==="function"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){ playSound(); return; }
             if(artwork.v143ImpactRecoil){ artwork.v143ImpactRecoil.cancel(); }
             const distance=(critical?5:4)*(side==="monster"?-1:1);
             // The one hit callback owns both pulses; no new clock or gate.
-            createImpactFlash(artwork,side,unitIndex,current,impactEpoch);
-            artwork.v143ImpactRecoil=artwork.animate([
+            createImpactFlash(artwork,side,unitIndex,current,impactEpoch,ownedHit?hit:null);
+            if(artwork.isConnected){ artwork.v143ImpactRecoil=artwork.animate([
                 {translate:"0px 0px",scale:1},
                 {translate:"0px "+distance+"px",scale:critical?.975:.98,offset:.3},
                 {translate:"0px "+(-distance*.3)+"px",scale:1,offset:.7},
@@ -13386,6 +13469,7 @@
             ],{duration:140,easing:"ease-out"});
             const recoil=artwork.v143ImpactRecoil;
             recoil.onfinish=()=>{ if(artwork.v143ImpactRecoil===recoil){ artwork.v143ImpactRecoil=null; } };
+            }
             playSound();
         };
         if(!queueTargetHit(current,unitIndex,present,"feedback",side)){
@@ -13439,23 +13523,8 @@
         }
     }
 
-    if(typeof killMonster==="function"){
-        const previous=killMonster;
-        killMonster=function(index){
-            const args=arguments;
-            const wait=existingTargetDelay("monster",index);
-            if(wait>8){
-                state.metrics.delayedDeaths++;
-                setTimer(()=>{
-                    const monster=typeof monsters!=="undefined"?monsters[index]:null;
-                    if(monster&&monster.hp>0){ return; }
-                    previous.apply(this,args);
-                },wait);
-                return;
-            }
-            return previous.apply(this,args);
-        };
-    }
+    // Death settlement stays synchronous in the core owner. Only the captured
+    // committed hit's artwork presentation may outlive that settlement.
 
     function scheduleStatusOwnedUiUpdate(side,index,keyPrefix,callback){
         if(typeof callback!=="function"){ return; }

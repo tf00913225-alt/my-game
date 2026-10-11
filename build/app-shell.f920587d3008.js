@@ -10970,6 +10970,7 @@ function startBattle(triggerIndex){
 
 
     initializeHeroBattleCombatants();
+    window.v143ClearImpactOverlays?.();
     battleActive=true;
 
     /*
@@ -18836,8 +18837,6 @@ function winBattle(){
     }
 
 
-    window.v143ClearImpactOverlays?.();
-    window.FourSymbolsBattlePresentation?.clearHud?.();
     battleActive=false;
     clearBattleRoundPrompt();
     finishBattleStatisticsSession("win");
@@ -19106,8 +19105,6 @@ function loseBattle(){
     }
 
 
-    window.v143ClearImpactOverlays?.();
-    window.FourSymbolsBattlePresentation?.clearHud?.();
     battleActive=false;
     clearBattleRoundPrompt();
     finishBattleStatisticsSession("lose");
@@ -22443,7 +22440,7 @@ function killMonster(index){
     }
 
 
-    window.v143ClearImpactTarget?.("monster",index);
+    window.v143ClearImpactTarget?.("monster",index,"death");
     monster.alive=false;
 
     monster.hp=0;
@@ -22718,7 +22715,7 @@ if(typeof window!=="undefined"){
 function renderBattle(){
 
     window.FourSymbolsBattlePresentation?.clearHud?.();
-    window.v143ClearImpactOverlays?.();
+    window.v143ClearImpactOverlays?.("render");
     runBattleRenderHooks("before",this,arguments);
 
     const area =
