@@ -132,7 +132,7 @@
       "feature-adventure": {
         "scripts": [
           "build/feature-adventure-content.6cc9644cc366.js",
-          "build/feature-adventure-runtime.0503dbc80f3f.js",
+          "build/feature-adventure-runtime.a2de99c0a764.js",
           "build/feature-adventure-ui.2fdba238218c.js"
         ],
         "styles": [
@@ -867,9 +867,9 @@
       "sha256": "6cc9644cc366",
       "bytes": 11468
     },
-    "build/feature-adventure-runtime.0503dbc80f3f.js": {
-      "sha256": "0503dbc80f3f",
-      "bytes": 45220
+    "build/feature-adventure-runtime.a2de99c0a764.js": {
+      "sha256": "a2de99c0a764",
+      "bytes": 45081
     },
     "build/feature-adventure-ui.2fdba238218c.js": {
       "sha256": "2fdba238218c",

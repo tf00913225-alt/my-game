@@ -360,7 +360,6 @@
         runtime.visible=false;
         runtime.activePanel="map";
         runtime.selectedNodeId=null;
-        if(window.FourSymbolsAdventureUI&&typeof window.FourSymbolsAdventureUI.hide==="function"){ window.FourSymbolsAdventureUI.hide(); }
         if(typeof showPage==="function"){ showPage("home"); }
         return true;
     }
