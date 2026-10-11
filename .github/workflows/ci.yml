@@ -528,6 +528,7 @@ jobs:
           node tests/backpack-grid-bottom-action.test.js
           node .github/scripts/run-responsive-item-browser-qa.mjs
           node .github/scripts/run-forge-sockets-browser-qa.mjs
+          node .github/scripts/run-hero-page-browser-qa.mjs
 
       - name: Upload Responsive Item browser evidence
         if: always() && steps.responsive_item_browser.outcome != 'skipped'

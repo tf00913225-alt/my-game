@@ -169,6 +169,7 @@ jobs:
         run: |
           node .github/scripts/run-responsive-item-browser-qa.mjs
           node .github/scripts/run-forge-sockets-browser-qa.mjs
+          node .github/scripts/run-hero-page-browser-qa.mjs
           QA_BASE_URL="$DEV_BASE_URL" node .github/scripts/run-foreground-potion-browser-qa.mjs
 
       - name: Upload deployed Responsive Item evidence
