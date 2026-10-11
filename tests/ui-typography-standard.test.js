@@ -120,10 +120,10 @@ for (const designPx of [34,36,39,41,46]) {
 
 // Explicitly protect the compact, battle-only Boss HUD exclusion. Boss objects
 // use the normal Unit HUD and no longer own a separate function-card type scale.
-assert.match(gameplay, /\.gameplay-boss-card > \.battle-monster-name\{[\s\S]*?font-size:14px/);
-assert.match(gameplay, /\.gameplay-boss-card \.monster-bar-text\{[\s\S]*?font-size:10px/);
+assert.match(gameplay, /\.v174-unit-hud\[data-boss="true"\] > \.battle-monster-name\{[\s\S]*?font-size:14px/);
+assert.match(gameplay, /\.v174-unit-hud\[data-boss="true"\] \.monster-bar-text\{[\s\S]*?font-size:10px/);
 assert.doesNotMatch(gameplay, /\.boss-shield-value\{/);
-assert.match(gameplay, /\.gameplay-boss-card > \.monster-hp > \.boss-hp-shield-overlay\{[\s\S]*?background:rgba\(255,255,255,\.92\)/);
+assert.match(gameplay, /\.v174-unit-hud\[data-boss="true"\] > \.monster-hp > \.boss-hp-shield-overlay\{[\s\S]*?background:rgba\(255,255,255,\.92\)/);
 assert.doesNotMatch(gameplay,/boss-mechanism/);
 assert.match(relic, /\.team-relic-battle-banner b\{[^}]*17px/);
 // Relic SP feedback retired its private float and uses the battle-only owner.

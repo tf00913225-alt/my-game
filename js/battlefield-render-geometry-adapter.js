@@ -226,6 +226,8 @@
             markBattlefieldZones();
             canonicalizeEnemyZone();
             canonicalizeAllyZone();
+            window.FourSymbolsBattlePresentation?.syncHud?.();
+            window.v143SyncImpactOverlays?.();
         }finally{
             reconciling=false;
         }
@@ -337,11 +339,12 @@
         const portraitRect=art&&typeof art.getBoundingClientRect==="function"
             ?plainRect(art.getBoundingClientRect())
             :unitRect;
-        const hudNodes=Array.from(card.querySelectorAll(
+        const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
+        const hudNodes=Array.from(hud.querySelectorAll(
             ".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
         ));
-        const hpNodes=Array.from(card.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
-        const spNodes=Array.from(card.querySelectorAll(".monster-sp,.sp-bar,.battle-sp-bar,.player-sp-bar,[data-hud=\"sp\"],[data-stat=\"sp\"]"));
+        const hpNodes=Array.from(hud.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
+        const spNodes=Array.from(hud.querySelectorAll(".monster-sp,.sp-bar,.battle-sp-bar,.player-sp-bar,[data-hud=\"sp\"],[data-stat=\"sp\"]"));
         const resourceState=resourceStateFor(targetSide,unitIndex);
         const hpProjection=projectionFor(hpNodes[0],resourceState&&resourceState.hpRatio,resourceState&&resourceState.shieldRatio);
         const spProjection=projectionFor(spNodes[0],resourceState&&resourceState.spRatio,0);
@@ -376,7 +379,17 @@
             width:Math.max(0,unitRect.width-8),height:Math.max(0,feedbackBottom-feedbackTop)
         };
 
+        // The existing Unit rect is the only placement source. Display scale
+        // comes from its actual CSS box; no Slot/Boss coordinates are duplicated.
+        const cardStyle=window.getComputedStyle(card);
+        const hudWidth=parseFloat(cardStyle.width)||card.offsetWidth;
+        const hudHeight=parseFloat(cardStyle.height)||card.offsetHeight;
+        const hudSurface=hudWidth>0&&hudHeight>0?{
+            rect:cardRect,width:hudWidth,height:hudHeight,
+            scaleX:cardRect.width/hudWidth,scaleY:cardRect.height/hudHeight
+        }:null;
         return {
+            hudSurface:hudSurface,
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
             unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,spRect:spRect,artworkProjection:artworkProjection,hpProjection:hpProjection,spProjection:spProjection,hudSafeRect:hudSafeRect,
             feedbackSafeRect:feedbackSafeRect,

@@ -63,6 +63,7 @@ function element(){
             child.parentNode=null;
         },
         remove(){ if(this.parentNode){ this.parentNode.removeChild(this); } },
+        querySelectorAll(selector){ return selector.split(",").map(part=>this.querySelector(part.trim())).filter(Boolean); },
         querySelector(selector){
             selector=selector.replace(/^:scope > /,"");
             if(!selector.startsWith(".")){ return null; }
@@ -91,7 +92,7 @@ function loadRuntime(overrides={}){
         }
     };
     const context=Object.assign({
-        window:null,document,console,Math,Number,Object,Array,Set,Map,Promise,
+        window:null,document,console,Math,Number,Object,Array,Set,Map,Promise,addEventListener(){},
         getComputedStyle:node=>({getPropertyValue:key=>node.style.getPropertyValue(key),backgroundImage:node.style.backgroundImage||"none"}),
         currentBattleMonsters:[],monsters:[],autoBattle:false,
         updateAutoButton(){},openAutoBattleSettings(){},closeAutoBattleSettings(){},
@@ -175,7 +176,9 @@ test("formal Abyss portraits precede the temporary Boss fallback",()=>{
         const early=loadRuntime({currentBattleMonsters:[0,1,2,3,4],monsters:names.map(name=>({name,v141Abyss:true}))});
         early.context.v154SyncAbyssPortraits();
         early.context.v154SyncAbyssPortraits();
-        assert.equal(early.cards[0].children.length,1,"repeat sync reuses the canonical portrait child");
+        assert.equal(early.cards[0].children.length,2,"repeat sync reuses one canonical portrait and one real HUD surface");
+        assert.equal(early.cards[0].children.filter(n=>n.className==="v174-battle-art").length,1);
+        assert.equal(early.cards[0].children.filter(n=>n.className==="v174-unit-hud").length,1);
         assert.equal(early.cards[0].style.getPropertyValue("background-image"),"none","card cannot draw a second portrait");
         assert.ok(early.cards[0].style.getPropertyValue("--v152-abyss-portrait").endsWith(portrait+'")'));
         assert.match(early.cards[1].style.getPropertyValue("--v152-abyss-portrait"),/soldier\.webp/);

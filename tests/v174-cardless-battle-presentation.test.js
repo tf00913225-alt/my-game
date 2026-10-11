@@ -7,14 +7,17 @@ const vm=require('node:vm');
 const source=fs.readFileSync(path.join(__dirname,'..','js','54-v173.51-battle-qa.js'),'utf8');
 const css=fs.readFileSync(path.join(__dirname,'..','css','fixed-slot-battlefield-rendering-v2.css'),'utf8');
 
-test('cardless battle presentation keeps slot geometry and HUD owners untouched',()=>{
+test('cardless presentation keeps Slot geometry and migrates one real HUD surface',()=>{
     assert.match(source,/window\.FourSymbolsBattlePresentation=Object\.freeze\(/);
-    assert.match(css,/\.v174-cardless-unit > \.v174-battle-art ~ \*\{z-index:6;\}/);
+    assert.match(css,/\.v174-battle-hud-layer\{[^}]*z-index:16015/);
     assert.doesNotMatch(css,/\.v174-battle-art ~ \*\{[^}]*position:/);
     assert.doesNotMatch(source,/battleMonsterArea\.style/);
     assert.doesNotMatch(source,/battlePlayerRow\.style/);
     assert.doesNotMatch(source,/battleInput\.style/);
     assert.doesNotMatch(source,/turn-target-row[^\n]*style/);
+    const abyssCss=fs.readFileSync(path.join(__dirname,'..','css','45-v152-dev-fixes.css'),'utf8');
+    assert.match(abyssCss,/\.v152-abyss-portrait > :not\(\.v174-unit-hud\):not\(\.v174-battle-art\)\{/,
+        'legacy Abyss child stacking cannot take geometry ownership from the real HUD surface');
 });
 
 test('HP and SP labels are normalized to current values only without observer churn',()=>{
@@ -42,6 +45,7 @@ test('final resource presentation preserves player SP and displays Hero Rage wit
     const labels=characters.map(()=>['',''].map(()=>({value:'',get textContent(){return this.value;},set textContent(value){this.value=value;writes++;}})));
     const cards=characters.map((_,index)=>({id:'battlePlayerCard'+index,querySelector:selector=>labels[index][selector==='.hp-bar-text'?0:1]}));
     const context=vm.createContext({document:{querySelectorAll:selector=>selector.includes('battle-player')?cards:[]},getPartyCharacterByIndex:index=>characters[index]});
+    context.unitHud=card=>card.v174UnitHud||card;
     vm.runInContext([projection,numeric,setter,sync].join('\n'),context);
     vm.runInContext('syncResourceNumbers();syncResourceNumbers();',context);
     assert.deepEqual(labels.map(pair=>pair.map(node=>node.textContent)),[['87','35'],['56','怒氣 7/12']]);
@@ -78,19 +82,20 @@ test('canonical artwork updates reuse one child and preserve the selected portra
     const children=[];
     const makeStyle=()=>({setProperty(name,value){this[name]=value;}});
     const context=vm.createContext({
-        document:{body:{classList:{remove(){}}},getElementById(){return null;},querySelectorAll(){return [];},createElement(){return {style:makeStyle(),classList:{toggle(){}},querySelector(){return null;}};}},
-        getComputedStyle:()=>({getPropertyValue:()=> 'url("abyss-selected.webp")',backgroundImage:"none"}),console
+        document:{body:{classList:{remove(){}}},getElementById(){return null;},querySelectorAll(){return [];},createElement(){return {style:makeStyle(),dataset:{},classList:{toggle(){}},querySelector(){return null;},appendChild(){}};}},
+        addEventListener(){},getComputedStyle:()=>({getPropertyValue:()=> 'url("abyss-selected.webp")',backgroundImage:"none"}),console
     });
     context.window=context;
     vm.runInContext(source,context);
-    const card={dataset:{},style:makeStyle(),classList:{add(){}},
+    const card={id:"battleMonster0",dataset:{},style:makeStyle(),classList:{add(){},contains(){return false;}},querySelectorAll(){return [];},appendChild(node){children.push(node);},
         querySelector(){return children.find(node=>node.className==="v174-battle-art")||null;},
         insertBefore(node){children.unshift(node);},get firstChild(){return children[0]||null;}
     };
     const record={portraitKey:'abyss.selected',path:'abyss-selected.webp'};
     context.FourSymbolsBattlePresentation.applyUnit(card,"monster",record);
     context.FourSymbolsBattlePresentation.applyUnit(card,"monster",record);
-    assert.equal(children.length,1,"repeated updates cannot duplicate portrait DOM");
+    assert.equal(children.filter(node=>node.className==="v174-battle-art").length,1,"repeated updates cannot duplicate portrait DOM");
+    assert.equal(children.filter(node=>node.className==="v174-unit-hud").length,1,"one real HUD");
     assert.equal(children[0].style.backgroundImage,'url("abyss-selected.webp")');
     assert.equal(card.style["background-image"],"none","the card background cannot draw a second portrait");
 });

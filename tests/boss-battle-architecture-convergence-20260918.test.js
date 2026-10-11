@@ -44,7 +44,7 @@ assert.doesNotMatch(geometry,/MutationObserver|isOwnedFixedStructure/,
 assert.match(bossCss,/\.v-fixed-boss-footprint\{[\s\S]*?left:calc\(20% \+ 5px\);[\s\S]*?right:calc\(20% \+ 5px\)/);
 assert.match(bossCss,/\.battle-monster\.gameplay-boss-card\{[\s\S]*?pointer-events:auto/);
 assert.match(bossCss,/\.gameplay-boss-card > \.v174-battle-art\{[\s\S]*?background-size:contain/);
-assert.match(bossCss,/\.gameplay-boss-card > \.monster-hp > \.boss-hp-shield-overlay\{[\s\S]*?background:rgba\(255,255,255,\.92\)/);
+assert.match(bossCss,/\.v174-unit-hud\[data-boss="true"\] > \.monster-hp > \.boss-hp-shield-overlay\{[\s\S]*?background:rgba\(255,255,255,\.92\)/);
 assert.doesNotMatch(bossCss,/boss-shield-hud/);
 assert.doesNotMatch(read("css/40-v143-combat-dungeon-polish.css"),/\.battle-monster\{[\s\S]*?--v143-monster-card-width/);
 assert.match(read("css/40-v143-combat-dungeon-polish.css"),/\.battle-monster:not\(\.gameplay-boss-card\)\{/);
@@ -65,7 +65,7 @@ assert.match(fixedCss,/\.battle-monster\.v174-cardless-unit\{[\s\S]*?border:0 !i
 assert.doesNotMatch(fixedCss,/\.damage-popup\.hp-popup\{[\s\S]*?display:none/);
 assert.doesNotMatch(presentation,/v174-hit-shake|shakeArtForPopup/);
 
-assert.match(fixedCss,/\.v-fixed-enemy-slot \.monster-hp,[\s\S]*?\.v-fixed-ally-slot \.hp-bar\{bottom:calc\(var\(--battle-name-row-height\) \+ var\(--battle-resource-bar-height\)\) !important/);
+assert.match(fixedCss,/\.v174-unit-hud:not\(\[data-boss="true"\]\) \.monster-hp,[\s\S]*?\.v174-unit-hud:not\(\[data-boss="true"\]\) \.hp-bar\{bottom:calc\(var\(--battle-name-row-height\) \+ var\(--battle-resource-bar-height\)\) !important/);
 assert.match(fixedCss,/--battle-resource-bar-height:11px/);
 assert.match(fixedCss,/--battle-enemy-region-track:42fr[\s\S]*?--battle-center-region-track:16fr[\s\S]*?--battle-ally-region-track:42fr/);
 assert.match(fixedCss,/\.battle-center-region\{[\s\S]*?border:0/);

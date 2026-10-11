@@ -293,7 +293,7 @@ async function runProductionAdventureBalanceQa(){
             check(m.vAdventureEncounterId===node.encounterId&&m.context==='adventure/chapter_v1/'+node.encounterId,'encounter metadata');
             const card=document.getElementById('battleMonster'+i),art=card?.querySelector('.v174-battle-art');
             check(card?.dataset.slot===slots[i]&&art,'actual slot and artwork');
-            check(card.querySelector('.monster-hp-inner')&&card.querySelector('.monster-sp-inner'),'HP/SP UI');
+            check(FourSymbolsBattlePresentation.getUnitHud(card).querySelector('.monster-hp-inner')&&FourSymbolsBattlePresentation.getUnitHud(card).querySelector('.monster-sp-inner'),'HP/SP UI');
             const portrait=v154ResolveMonsterPortraitRecord(m);
             if(portrait.generic){
               evidence.portraitGaps.push({name:m.name,portrait});

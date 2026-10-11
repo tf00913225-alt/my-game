@@ -94,7 +94,8 @@
         const card=document.getElementById("battleMonster"+index);
         const monster=typeof monsters!=="undefined"?monsters[index]:null;
         if(!card||!monster){ return; }
-        const name=card.querySelector(".battle-monster-name");
+        const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
+        const name=hud.querySelector(".battle-monster-name");
         const level=card.querySelector(".battle-monster-level");
         if(!name){ return; }
         const identity=String(monster.name||"");
@@ -106,7 +107,8 @@
     }
 
     function fitEnemyBars(card){
-        card.querySelectorAll(".monster-bar-text").forEach(node=>{
+        const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
+        hud.querySelectorAll(".monster-bar-text").forEach(node=>{
             node.style.removeProperty("transform");
             node.style.setProperty("font-size","13px","important");
             const available=Math.max(1,node.clientWidth||68);

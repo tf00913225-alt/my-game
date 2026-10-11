@@ -865,7 +865,8 @@
         }
         const card=Number.isInteger(index)?document.getElementById("battleMonster"+index):null;
         if(!card){ return; }
-        const hpBar=card.querySelector(":scope > .monster-hp");
+        const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
+        const hpBar=hud.querySelector(":scope > .monster-hp");
         if(!hpBar){ return; }
         let shieldOverlay=hpBar.querySelector(":scope > .boss-hp-shield-overlay");
         if(!shieldOverlay){
@@ -874,7 +875,7 @@
             const label=hpBar.querySelector(":scope > .monster-bar-text");
             hpBar.insertBefore(shieldOverlay,label||null);
         }
-        card.querySelectorAll(":scope > .boss-shield-hud").forEach(node=>node.remove());
+        hud.querySelectorAll(":scope > .boss-shield-hud").forEach(node=>node.remove());
         const boss=activeBattleContext&&activeBattleContext.boss;
         const shield=boss&&boss.vBossShield;
         const current=Math.max(0,numeric(shield&&shield.current,0));

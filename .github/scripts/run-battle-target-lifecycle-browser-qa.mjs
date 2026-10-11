@@ -181,7 +181,7 @@ const heroExpression=`(async()=>{
                 check(!canSelectHostileBattlePrimary('player',0,'single'),'Stealth targeting');consumeRoundEndDurations();check(!hasNamedPersistentState(player,'stealthSkill'),'Stealth one Round End');
                 king.rage=4;king.sp=0;enemy.hp=100000;begin('heroNpc',4);queuedPlayerActions[4]={action:'normal',target:0};Math.random=()=>0;resolveQueuedPlayerAction(4,battleToken);
                 await new Promise(r=>setTimeout(r,2300));check(king.rage===0&&king.sp===0&&enemy.hp<100000,'Hero Wind skill shared damage');
-                for(const index of [3,4]){const path=getCharacterBattleArtworkPath(getPartyCharacterByIndex(index));const image=new Image();image.src=path;await image.decode();check(image.naturalWidth===1086&&image.naturalHeight===1448,'lossless portrait canvas');check(document.getElementById('battlePlayerCard'+index).textContent.includes('怒氣'),'live Rage HUD');}
+                for(const index of [3,4]){const path=getCharacterBattleArtworkPath(getPartyCharacterByIndex(index));const image=new Image();image.src=path;await image.decode();check(image.naturalWidth===1086&&image.naturalHeight===1448,'lossless portrait canvas');check(FourSymbolsBattlePresentation.getUnitHud(document.getElementById('battlePlayerCard'+index)).textContent.includes('怒氣'),'live Rage HUD');}
                 initializeHeroBattleCombatants();check(getPartyCharacterByIndex(3).rage===0&&getPartyCharacterByIndex(3).phoenixBurnStacks===0,'fresh battle transient reset');
             }
             check(JSON.stringify(system.getDomain().serialize())===accountBytes,'battle state cannot mutate Hero Save');
