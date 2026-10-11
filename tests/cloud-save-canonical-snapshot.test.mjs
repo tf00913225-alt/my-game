@@ -116,3 +116,14 @@ test("missing claim source, claim conflict, oversized or tampered snapshot canno
     sealed.snapshot.economy.gold++;
     assert.throws(()=>inspectCanonicalSnapshot(sealed,"uid-a",7),/digest/);
 });
+
+test('unpublished canonical projection preserves ordered duplicate reforge slots and historical evidence',()=>{
+ const records=sources();const item=records.inventory[1].state;
+ Object.assign(item,{equipmentCombatPercentUnitVersion:2,reforgeVersion:1,reforgeAffixes:[{stat:'attack',value:40},{stat:'attack',value:38},null],reforgeStats:{attack:18},reforgeSlots:3});
+ const raw=JSON.stringify(records);
+ const result=assembleCanonicalSnapshot('uid-a',7,records);
+ assert.deepEqual(result.snapshot.inventory[1].state.reforgeAffixes,item.reforgeAffixes);
+ assert.equal(JSON.stringify(records),raw,'original server sources remain immutable');
+ assert.equal(result.readyForPublication,false);
+ assert.deepEqual(verifyCanonicalSnapshotAgainstSources(result,'uid-a',7,records),result.snapshot);
+});

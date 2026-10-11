@@ -106,6 +106,7 @@
         const copy={...item,count};
         if(item.stats&&typeof item.stats==="object"){ copy.stats={...item.stats}; }
         if(item.reforgeStats&&typeof item.reforgeStats==="object"){ copy.reforgeStats={...item.reforgeStats}; }
+        if(Array.isArray(item.reforgeAffixes)){ copy.reforgeAffixes=item.reforgeAffixes.map(a=>a?{...a}:null); }
         return copy;
     }
 

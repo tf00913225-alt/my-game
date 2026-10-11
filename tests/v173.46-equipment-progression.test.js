@@ -9,10 +9,10 @@ const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 assert.match(build,/"js\/51-v169-rpg-ui\.js"[\s\S]*?"js\/equipment-progression\.js"/);
 assert.doesNotMatch(ui,/createElement\(["']script["']\)|equipment-progression\.js\?v=/);
 /* Ordinary equipment/shop odds remain unchanged; chest odds are independent. */
-assert.match(source,/\{key:"white",label:"白階",chance:40,min:5,max:10,reforgeSlots:0/);
-assert.match(source,/\{key:"blue",label:"藍階",chance:40,min:11,max:16,reforgeSlots:0/);
-assert.match(source,/\{key:"purple",label:"紫階",chance:15,min:17,max:22,reforgeSlots:1/);
-assert.match(source,/\{key:"orange",label:"橙階",chance:5,min:23,max:28,reforgeSlots:1/);
+assert.match(source,/\{key:"white",label:"白階",chance:40,min:5,max:10,reforgeSlots:1/);
+assert.match(source,/\{key:"blue",label:"藍階",chance:40,min:11,max:16,reforgeSlots:1/);
+assert.match(source,/\{key:"purple",label:"紫階",chance:15,min:17,max:22,reforgeSlots:2/);
+assert.match(source,/\{key:"orange",label:"橙階",chance:5,min:23,max:28,reforgeSlots:2/);
 
 assert.match(source,/window\.v132NormalizeEquipmentSetItem\(item\)/);
 assert.doesNotMatch(source,/const SET_RULES=/,"late progression must not own another set stat table");

@@ -11,12 +11,12 @@
     window.__equipmentProgressionInstalled=true;
 
     const RARITIES=[
-        {key:"white",label:"白階",chance:40,min:5,max:10,reforgeSlots:0,shopPrice:500,color:"#D8D8D8",available:true},
-        {key:"blue",label:"藍階",chance:40,min:11,max:16,reforgeSlots:0,shopPrice:1500,color:"#42A5FF",available:true},
-        {key:"purple",label:"紫階",chance:15,min:17,max:22,reforgeSlots:1,shopPrice:4000,color:"#B05CFF",available:true},
-        {key:"orange",label:"橙階",chance:5,min:23,max:28,reforgeSlots:1,shopPrice:10000,color:"#FF9F38",available:true},
-        {key:"pink",label:"桃紅階",chance:0,available:false,planned:true,color:"#FF4FA7"},
-        {key:"four-symbol",label:"四象階",chance:0,available:false,planned:true,fourSymbol:true,color:null}
+        {key:"white",label:"白階",chance:40,min:5,max:10,reforgeSlots:1,shopPrice:500,color:"#D8D8D8",available:true},
+        {key:"blue",label:"藍階",chance:40,min:11,max:16,reforgeSlots:1,shopPrice:1500,color:"#42A5FF",available:true},
+        {key:"purple",label:"紫階",chance:15,min:17,max:22,reforgeSlots:2,shopPrice:4000,color:"#B05CFF",available:true},
+        {key:"orange",label:"橙階",chance:5,min:23,max:28,reforgeSlots:2,shopPrice:10000,color:"#FF9F38",available:true},
+        {key:"pink",label:"桃紅階",reforgeSlots:3,chance:0,available:false,planned:true,color:"#FF4FA7"},
+        {key:"four-symbol",label:"四象階",reforgeSlots:4,chance:0,available:false,planned:true,fourSymbol:true,color:null}
     ];
     const RARITY_BY_KEY=Object.fromEntries(RARITIES.map(item=>[item.key,item]));
     const EQUIPMENT_SHOP_DROP_TABLE=[
@@ -793,7 +793,7 @@
             if(spec.classType&&!item.classType){ item.classType=spec.classType; changed=true; }
             if(item.rarityKey!=="white"){ item.rarityKey="white"; changed=true; }
             if(item.quality!=="white"){ item.quality="white"; changed=true; }
-            if(Number(item.reforgeSlots)!==0){ item.reforgeSlots=0; changed=true; }
+
             if(Number(item.reforgeUsed)!==0){ item.reforgeUsed=0; changed=true; }
         });
         /* Existing saves may already have a starter piece equipped rather than in inventory. */
@@ -946,7 +946,7 @@
         item.quality="orange";
         item.rarityKey="orange";
         const legacyAffixCount=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;
-        item.reforgeSlots=Math.max(1,legacyAffixCount,Math.floor(Number(item.reforgeSlots)||0));
+        item.reforgeSlots=Math.max(2,legacyAffixCount,Array.isArray(item.reforgeAffixes)?item.reforgeAffixes.length:0,Math.floor(Number(item.reforgeSlots)||0));
         // V173.58: reforgeUsed is retained only for old-save compatibility.
         // Reforging is now unlimited; reforgeSlots means affix-slot count.
         item.reforgeUsed=0;

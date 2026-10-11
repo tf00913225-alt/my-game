@@ -36,7 +36,7 @@ assert.deepEqual(projectItem(current),current,"new percentage items never conver
 const fs=require("node:fs"),vm=require("node:vm");
 const inventorySource=fs.readFileSync("js/55-v173.51-inventory-qa.js","utf8");
 const statFunction=inventorySource.split("\n").find(line=>line.startsWith("function statText("));
-const ui=vm.runInNewContext('const num=v=>Number.isFinite(Number(v))?Number(v):0;'+statFunction+';statText');
+const ui=vm.runInNewContext('const num=v=>Number.isFinite(Number(v))?Number(v):0;'+statFunction+';statText',{window:{FourSymbolsEquipmentReforge:require('../functions/src/equipment-reforge')}});
 assert.equal(ui({stats:{accuracy:1.5,evasion:10},reforgeStats:{accuracy:0.3,evasion:2}}),"命中 +1.8%　閃避 +12%","numeric reforge aggregation precedes the display suffix");
 const setSource=fs.readFileSync("js/equipment-progression.js","utf8");
 const expansion=fs.readFileSync("js/27-v132-content-expansion.js","utf8");

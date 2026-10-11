@@ -276,7 +276,7 @@ test("retired blueprints retain stable save identities but have no gameplay craf
 });
 
 test("synthesis implements exact material costs, replacement-only reforge and peak rolls",()=>{
-    ["reforgeGold:1000","reforgeGold:3000","reforgeGold:8000","reforgeGold:20000"].forEach(token=>assert.ok(contentSource.includes(token)));
+    assert.deepEqual(Object.values(require('../functions/src/equipment-reforge').TIERS).map(t=>t.gold),[1000,3000,8000,20000,30000,50000]);
     assert.doesNotMatch(contentSource,/ConsumeStackItem\(blueprint\.id/);
 
     assert.match(contentSource,/return locks===0\?50:\(locks===1\?100:150\)/);
@@ -285,7 +285,7 @@ test("synthesis implements exact material costs, replacement-only reforge and pe
     assert.match(contentSource,/reforgeMaterialTier:"white"/);
     assert.match(contentSource,/TIER_ALIASES=\{low:"white",mid:"blue",high:"purple",perfect:"orange"\}/);
     assert.match(contentSource,/裝備品質不限制材料階級/);
-    assert.match(contentSource,/item\.reforgeStats=Object\.assign\(\{\},pending\.stats\)/);
+    assert.match(contentSource,/item\.reforgeAffixes=pending\.stats\.map/);
     assert.match(contentSource,/Math\.random\(\)<\.10/);
     assert.match(contentSource,/Math\.random\(\)<\.05/);
     assert.match(contentSource,/qty\*3/);

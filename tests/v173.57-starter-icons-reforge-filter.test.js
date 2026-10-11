@@ -21,7 +21,7 @@ assert.match(eq,/function repairLegacyStarterEquipmentIcons\(\)/);
 assert.match(eq,/item\.icon=spec\.ring\?legacyStarterRingMarkup\(\):artMarkup\(spec\.path,"white"\)/);
 assert.match(eq,/item\.rarityKey="white"/);
 assert.match(eq,/item\.quality="white"/);
-assert.match(eq,/item\.reforgeSlots=0/);
+assert.doesNotMatch(eq,/item\.reforgeSlots=0/);
 assert.match(eq,/repairLegacyStarterEquipmentIcons\(\);\n\s*syncEquipmentChestPresentation\(\);\n\s*syncMainCharacterEquipmentStorage\(\)/);
 
 assert.match(synthesis,/function canActuallyReforge\(item,explain=false\)/);

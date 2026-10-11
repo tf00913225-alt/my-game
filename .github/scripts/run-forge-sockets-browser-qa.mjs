@@ -82,6 +82,50 @@ try{
   await c.eval(`v141SwitchForgeTab('reforge')`);
   assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-forge-tabs button'),n=>n.textContent)`),['冶煉','鑲嵌']);
   assert.equal(await c.eval(`Array.from(document.querySelectorAll('#homeFeatureModalBody select')).filter(n=>{const r=n.getBoundingClientRect();return r.width&&r.height}).length`),0,'visible native selector in forge');
+  // Reforge V2 exercises the final bundled owner with disposable local assets.
+  await c.eval(`(()=>{const item=inventoryItems.find(i=>i.v141Uid==='forge-qa-orange');item.reforgeAffixes=[{stat:'attack',value:40},{stat:'attack',value:35}];item.reforgeVersion=1;item.reforgeSlots=2;const ore=v132GetContentDefinitions().ores.find(i=>i.tierKey==='white');inventoryItems.push({...ore,count:1000});gold=100000;saveGame();v141SelectReforgeItem(item.v141Uid);return true;})()`);
+  assert.equal(await c.eval(`document.querySelectorAll('.v17358-affix-lock').length`),2);
+  assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v17358-reforge-tier'),b=>({disabled:b.disabled,text:b.textContent}))`),[
+   {disabled:false,text:'白階材料礦石 1000每槽 5～10・金幣 1,000'},
+   {disabled:false,text:'藍階材料礦石 0每槽 11～16・金幣 3,000'},
+   {disabled:false,text:'紫階材料礦石 0每槽 17～22・金幣 8,000'},
+   {disabled:false,text:'橙階材料礦石 0每槽 23～28・金幣 20,000'},
+   {disabled:true,text:'桃紅階材料尚未開放每槽 29～34・尚未開放・金幣 30,000'},
+   {disabled:true,text:'四象階材料尚未開放每槽 35～40・尚未開放・金幣 50,000'}]);
+  await tap('.v17358-affix-lock:first-child');
+  await c.eval(`window.__forgeQaRandom=Math.random;Math.random=()=>0;true`);
+  await tap('.v17358-reforge-card .v141-synthesis-primary');
+  await c.eval(`Math.random=window.__forgeQaRandom;delete window.__forgeQaRandom;true`);
+  assert.equal(await c.eval(`document.querySelector('.v141-reforge-compare').textContent.includes('槽 2')`),true,'comparison must preserve separate slot rows');
+  const reforgeShot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`reforge-v2-${width}.png`),Buffer.from(reforgeShot.data,'base64'));
+  await tap('[onclick="v141ResolveReforge(false)"]');
+  await c.eval(`(async()=>{const end=Date.now()+2000;while(Date.now()<end&&!document.getElementById('v132RewardModal')?.classList.contains('show'))await new Promise(r=>setTimeout(r,50));return true;})()`);
+  await tap('#v132RewardModal [onclick="v132CloseRewardModal()"]');
+  assert.deepEqual(await c.eval(`inventoryItems.find(i=>i.v141Uid==='forge-qa-orange').reforgeAffixes`),[{stat:'attack',value:40},{stat:'attack',value:35}]);
+  assert.equal(await c.eval(`gold`),99000,'keep original does not refund');
+  await c.eval(`window.__forgeQaRandom=Math.random;Math.random=()=>0;true`);
+  await tap('.v17358-reforge-card .v141-synthesis-primary');
+  await c.eval(`Math.random=window.__forgeQaRandom;delete window.__forgeQaRandom;true`);
+  await tap('[onclick="v141ResolveReforge(true)"]');
+  await c.eval(`(async()=>{const end=Date.now()+2000;while(Date.now()<end&&!document.getElementById('v132RewardModal')?.classList.contains('show'))await new Promise(r=>setTimeout(r,50));return true;})()`);
+  await tap('#v132RewardModal [onclick="v132CloseRewardModal()"]');
+  assert.deepEqual(await c.eval(`inventoryItems.find(i=>i.v141Uid==='forge-qa-orange').reforgeAffixes`),[{stat:'attack',value:40},{stat:'attack',value:10}]);
+  assert.equal(await c.eval(`gold`),98000);
+  assert.equal(await c.eval(`inventoryItems.find(i=>i.id===v132GetContentDefinitions().ores.find(i=>i.tierKey==='white').id).count`),800,'each one-lock transaction costs 100');
+  assert.equal(await c.eval(`(()=>{const item=inventoryItems.find(i=>i.v141Uid==='forge-qa-orange');return FourSymbolsEquipmentReforge.aggregate(item).attack;})()`),50,'duplicates sum once');
+  // Legacy excess slots must remain usable and visible, with one shared scroll owner.
+  await c.eval(`(()=>{const item=inventoryItems.find(i=>i.v141Uid==='forge-qa-orange');item.reforgeSlots=5;item.reforgeAffixes=[{stat:'attack',value:40},{stat:'attack',value:38},{stat:'attack',value:36},{stat:'attack',value:35},null];v141SelectReforgeItem(item.v141Uid);return true;})()`);
+  assert.equal(await c.eval(`document.querySelectorAll('.v17358-affix-lock').length`),5);
+  assert.equal(await c.eval(`document.querySelector('.v17358-affix-lock:last-child').disabled`),true,'empty excess slot cannot lock');
+  await tap('.v17358-affix-lock:first-child');await tap('.v17358-affix-lock:nth-child(2)');
+  await tap('.v17358-reforge-card .v141-synthesis-primary');
+  assert.equal(await c.eval(`document.querySelector('.v141-reforge-comparison-slots').textContent.includes('槽 5')`),true);
+  assert.equal(await c.eval(`(()=>{const area=document.querySelector('.v141-reforge-comparison-slots');return area.querySelectorAll('section').length===2&&[...area.querySelectorAll('section')].every(n=>n.scrollHeight<=n.clientHeight+1);})()`),true,'comparison content clipped');
+  const excessShot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`reforge-v2-excess-${width}.png`),Buffer.from(excessShot.data,'base64'));
+  await tap('[onclick="v141ResolveReforge(true)"]');
+  await c.eval(`(async()=>{const end=Date.now()+2000;while(Date.now()<end&&!document.getElementById('v132RewardModal')?.classList.contains('show'))await new Promise(r=>setTimeout(r,50));return true;})()`);await tap('#v132RewardModal [onclick="v132CloseRewardModal()"]');
+  assert.equal(await c.eval(`inventoryItems.find(i=>i.v141Uid==='forge-qa-orange').reforgeAffixes.length`),5);
+  assert.equal(await c.eval(`inventoryItems.find(i=>i.id===v132GetContentDefinitions().ores.find(i=>i.tierKey==='white').id).count`),650,'two locks cost 150');
   await tap('.v141-forge-tabs button:last-child');
   await openEquipmentPicker();await tap('[data-forge-value="forge-qa-orange"]');
   assert.equal(await c.eval(`document.querySelectorAll('.v141-socket').length`),1);

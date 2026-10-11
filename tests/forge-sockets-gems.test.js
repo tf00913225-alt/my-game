@@ -6,7 +6,7 @@ const main=fs.readFileSync("js/00-main.js","utf8");
 const forge=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const html=fs.readFileSync("index.html","utf8");
 const equipmentBlock=main.slice(main.indexOf("function getEquipmentBonus(characterId){"),main.indexOf("/* =====================================================\n   V119",main.indexOf("function getEquipmentBonus(characterId){")));
-const context={window:{},characterEquipment:{fire:{head:null}},console};
+const context={window:{FourSymbolsEquipmentReforge:require("../functions/src/equipment-reforge")},characterEquipment:{fire:{head:null}},console};
 vm.createContext(context);
 vm.runInContext(equipmentBlock,context);
 const api=context.window.FourSymbolsEquipmentGems;

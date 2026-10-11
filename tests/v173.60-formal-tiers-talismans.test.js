@@ -42,12 +42,15 @@ test("talisman resolution is two stage and max-skill aware",()=>{
 });
 
 test("pink and four-symbol are planned but not silently injected into current drops",()=>{
-  assert.match(equipment,/key:"pink",label:"桃紅階",chance:0,available:false,planned:true/);
-  assert.match(equipment,/key:"four-symbol",label:"四象階",chance:0,available:false,planned:true/);
+  assert.match(equipment,/key:"pink",label:"桃紅階",reforgeSlots:3,chance:0,available:false,planned:true/);
+  assert.match(equipment,/key:"four-symbol",label:"四象階",reforgeSlots:4,chance:0,available:false,planned:true/);
   const chest=content.match(/const MATERIAL_CHEST_DROP_TABLE=Object.freeze\(\[([\s\S]*?)\]\.map[\s\S]*?\);/)[1];
   assert.ok(chest.includes('itemId:"oreLow"')&&chest.includes('itemId:"orePerfect"'));
   assert.ok(!chest.includes('itemId:"orePink"')&&!chest.includes('itemId:"oreFourSymbol"'));
-  assert.match(synthesis,/尚未開放・數值待定/);
+  assert.match(synthesis,/尚未開放/);
+  const tiers=require('../functions/src/equipment-reforge').TIERS;
+  assert.deepEqual(tiers.pink,{range:[29,34],gold:30000,available:false});
+  assert.deepEqual(tiers['four-symbol'],{range:[35,40],gold:50000,available:false});
 });
 
 test("rarity visuals use the locked palette and four-symbol border",()=>{
