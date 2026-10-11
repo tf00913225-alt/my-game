@@ -2,12 +2,14 @@
 #adventureHomeAxis.adventure-home-axis{
     position:relative;
     z-index:7;
-    grid-column:1/-1;
+    grid-column:1;
+    grid-row:2;
     flex:0 0 auto;
     align-self:center;
-    width:min(100%,212px);
+    justify-self:center;
+    width:min(44%,212px);
     min-height:104px;
-    margin:12px auto;
+    margin:0;
     pointer-events:none;
     display:flex;
     justify-content:center;
