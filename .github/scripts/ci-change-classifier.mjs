@@ -88,7 +88,10 @@ const LETHAL_BOSS_EXCEPTION = Object.freeze({
 });
 const LETHAL_EXCEPTION_POLICY_PATHS = new Set([
   '.github/scripts/ci-change-classifier.mjs', '.github/scripts/ci-aggregate.mjs',
-  'tests/ci-boss-routing.test.mjs', 'tests/ci-aggregate.test.mjs'
+  'tests/ci-boss-routing.test.mjs', 'tests/ci-aggregate.test.mjs',
+  // This existing acceptance fixture corrects pre-start HP overwritten by the
+  // formal roster builder; the accepted gameplay/artwork/build stays pinned.
+  '.github/scripts/run-hit-evasion-v2-browser-qa.mjs'
 ]);
 const LETHAL_EXCEPTION_SOURCE_PATH = /^(?:js\/(?:00-main|37-v142-skill-animation|39-v143-skill-animation|54-v173\.51-battle-qa)\.js|SYSTEM_CONTRACTS\.md|tests\/battle-direct-impact-overlay-20261011\.test\.js|\.github\/scripts\/(?:fixtures\/direct-impact-overlay-vm\.cjs|lethal-impact-overlay-browser-qa\.mjs)|asset-manifest\.json|build\/(?:asset-manifest\.json|(?:app-shell|gameplay-core-primary|gameplay-core-secondary)\.[a-f0-9]+\.js)|functions\/src\/generated\/restricted-forest-instance-policy\.json)$/;
 

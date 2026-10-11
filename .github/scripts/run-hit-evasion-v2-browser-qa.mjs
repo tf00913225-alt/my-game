@@ -102,7 +102,11 @@ const expression=`(async()=>{
     player.statusEffects=[{type:"frostbite",turnsLeft:2}];
     const frostbite=getMainCharacterStats().evasion;
     player.activeBuffs=[];player.statusEffects=[];player.hp=getMainCharacterStats().maxHP;
-    const freshMonsters=async()=>{monsters=[qaMonster(1)];monsters[0].hp=monsters[0].maxHP=100000;monsters[0].alive=true;monsters[0].accuracy=0;currentZone="forest";mapCooldown=false;autoBattle=false;autoConfig.enabled=false;autoPatrolEnabled=false;startBattle(0);await waitRelic();const deadline=Date.now()+8000;while(Date.now()<deadline&&document.getElementById("battlePage")?.matches(".v141-preparing-entry,.v141-entry-moving"))await new Promise(r=>setTimeout(r,30));};
+    const freshMonsters=async()=>{monsters=[qaMonster(1)];monsters[0].alive=true;monsters[0].accuracy=0;currentZone="forest";mapCooldown=false;autoBattle=false;autoConfig.enabled=false;autoPatrolEnabled=false;startBattle(0);await waitRelic();const deadline=Date.now()+8000;while(Date.now()<deadline&&document.getElementById("battlePage")?.matches(".v141-preparing-entry,.v141-entry-moving"))await new Promise(r=>setTimeout(r,30));
+        // startBattle formally rebuilds the live wild roster. Apply the intended
+        // nonlethal QA HP to that roster, not the discarded pre-start fixture.
+        monsters.forEach(monster=>{monster.hp=monster.maxHP=100000;});
+    };
     const endBattle=async()=>{loseBattle();const deadline=Date.now()+8000;while(battleActive&&Date.now()<deadline)await new Promise(r=>setTimeout(r,30));if(battleActive)throw new Error("Battle exit did not finish");player.hp=getMainCharacterStats().maxHP;};
     const waitRelic=async()=>{const deadline=Date.now()+5000;while(!v174RelicDebugState()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,20));if(!v174RelicDebugState())throw new Error("Real relic battle did not initialize: "+JSON.stringify({battleActive,battleToken,turn,observers:Array.from(battleRoundStartObservers).map(fn=>String(fn).slice(0,800)),keys:Array.from(battleRoundBoundaryKeys),startSource:String(startBattle).slice(0,500),turnSource:String(startTurn).slice(0,500),logs:Array.from(document.querySelectorAll(".battle-log")).map(n=>n.textContent)}));};
     const relicOwned=v174RelicSystem.getOwnedState(),loadout=v174RelicSystem.getTeamLoadout();
@@ -144,6 +148,7 @@ const expression=`(async()=>{
     const combat={};
     try{
         await freshMonsters();selectedMonster=0;normalAttack();combat.manual=calls.splice(0);
+        if(!monsters[0]?.alive||monsters[0].hp<=0)throw new Error("Manual hit/evasion fixture unexpectedly killed its target");
         await endBattle();await freshMonsters();calls.splice(0);
         // Use the same time entitlement and toggle as real auto battle. Declaration,
         // initiative and animation must reach the player Hit Owner before inspection.
@@ -151,6 +156,7 @@ const expression=`(async()=>{
         const autoDeadline=Date.now()+15000;
         while(!calls.some(call=>call.side==="player")&&battleActive&&Date.now()<autoDeadline)await new Promise(r=>setTimeout(r,30));
         if(!calls.some(call=>call.side==="player"))throw new Error("Natural auto player action did not reach Hit Owner: "+JSON.stringify({battleActive,battlePhase,autoBattle,turn,queued:queuedPlayerActions[0],calls}));
+        if(!monsters[0]?.alive||monsters[0].hp<=0)throw new Error("Auto hit/evasion fixture unexpectedly killed its target");
         if(autoBattle)toggleAutoBattle();combat.autoResolution=calls.splice(0).filter(call=>call.side==="player");
         await endBattle();await freshMonsters();calls.splice(0);
         monsters[0].skillChance=0;monsters[0].skill=null;monsters[0].skills=[];processSingleMonsterAttack(0,battleToken);combat.monster=calls.splice(0);
