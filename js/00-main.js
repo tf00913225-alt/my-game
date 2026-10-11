@@ -2178,6 +2178,12 @@ function migrateLegacyEquipmentStats(item){
         ?window.v132NormalizeEquipmentSetItem(item):item;
 }
 
+function hydrateEquipmentReforge(item){
+    if(!item||!isEquipmentInventoryType(item.type)){ return; }
+    try{ window.FourSymbolsEquipmentReforge.migrateItem(item); }
+    catch(error){ console.error("保留無法安全遷移的冶煉裝備",item.id,error); }
+}
+
 function normalizeEquipmentSlots(equipment){
     if(!equipment || typeof equipment!=="object") return;
     if(!Object.prototype.hasOwnProperty.call(equipment,"head")) equipment.head=equipment.helmet||null;
@@ -2189,7 +2195,7 @@ function normalizeEquipmentSlots(equipment){
     delete equipment.weapon;
     delete equipment.helmet;
     delete equipment.accessory;
-    Object.values(equipment).forEach(migrateLegacyEquipmentStats);
+    Object.values(equipment).forEach(item=>{ migrateLegacyEquipmentStats(item); hydrateEquipmentReforge(item); });
 }
 
 
@@ -2211,7 +2217,7 @@ function getEquipmentBonus(characterId){
     if(!equipment){ return bonus; }
     Object.values(equipment).forEach(item=>{
         if(!item){ return; }
-        [item.stats,item.reforgeStats,...getSocketGemStats(item)].forEach(stats=>{
+        [item.stats,window.FourSymbolsEquipmentReforge.aggregate(item),...getSocketGemStats(item)].forEach(stats=>{
             if(!stats||typeof stats!=="object"||Array.isArray(stats)){ return; }
             Object.entries(stats).forEach(([stat,value])=>{
                 if(Object.prototype.hasOwnProperty.call(bonus,stat)){
@@ -7837,6 +7843,7 @@ function loadGame(){
                     item.id
                 ){
                     migrateLegacyEquipmentStats(item);
+                    hydrateEquipmentReforge(item);
                     inventoryItems.push(
                         item
                     );

@@ -203,10 +203,11 @@
     function appendReforgeStatsToModal(item){
         const stats=document.getElementById("itemModalStats");
         if(!stats||!item){ return; }
-        if(item.reforgeStats&&Object.keys(item.reforgeStats).length){
+        const affixes=window.FourSymbolsEquipmentReforge.slots(item);
+        if(affixes.some(Boolean)){
             stats.insertAdjacentHTML(
                 "beforeend",
-                '<section class="v141-item-reforge"><b>【冶煉】</b>'+getStatText(item.reforgeStats)+'</section>'
+                '<section class="v141-item-reforge"><b>【冶煉】</b>'+affixes.map((a,i)=>a?'<div>槽 '+(i+1)+' '+getStatText({[a.stat]:a.value})+'</div>':'<div>槽 '+(i+1)+' 空槽</div>').join('')+'</section>'
             );
         }
     }

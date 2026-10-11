@@ -25,7 +25,7 @@ vm.runInContext(between(expansion,"    function getEquipmentSetCounts(","\n\n   
 vm.runInContext(between(progression,"    function applySetRule(","    /*\n       First-character equipment"),ctx);
 const normalize=ctx.window.v132NormalizeEquipmentSetItem;
 const definitions=ctx.window.v132GetContentDefinitions().equipmentSetItems;
-const combat=vm.createContext({characterEquipment:{},getSocketGemStats:()=>[]});
+const combat=vm.createContext({window:{FourSymbolsEquipmentReforge:require("../functions/src/equipment-reforge")},characterEquipment:{},getSocketGemStats:()=>[]});
 vm.runInContext(between(main,"function getEquipmentBonus(","/* Equipment rarity owns capacity"),combat);
 const expected={blade:{attack:30},fan:{intelligence:30},heavyArmor:{defensePoints:25,agility:5},robe:{defensePoints:25,agility:5},boots:{attack:20,defensePoints:10},shoes:{intelligence:20,defensePoints:10},helm:{attack:25,vitality:5},crown:{intelligence:25,vitality:5},wristguard:{attack:30},focus:{intelligence:30}};
 const families={setFire:"fire",setWater:"water",setEarth:"earth",setWind:"wind"};

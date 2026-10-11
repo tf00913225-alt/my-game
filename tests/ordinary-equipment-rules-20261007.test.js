@@ -61,24 +61,14 @@ test('inventory, equipped UIDs, old stats and reforge stats survive repeated loa
  assert.equal(JSON.stringify({items,equipment}),before);
  assert.deepEqual(plain(c.v17362StarterWhiteStats),{ironSword:{attack:3},woodStaff:{intelligence:3},leatherHelmet:{vitality:1},leatherArmor:{vitality:2},leatherShoes:{agility:2}});
 });
-function forgeFixture(){
- // Execute the existing pure roll owner and its declarations, without booting unrelated dungeon/UI owners.
- const start=forge.indexOf('    const TIER_ALIASES=');const end=forge.indexOf('    function escapeHtml(');
- const c=vm.createContext({Math:Object.create(Math)});vm.runInContext(forge.slice(start,end),c);
- vm.runInContext(forge.slice(forge.indexOf('    function reforgeSlotCount('),forge.indexOf('    function canActuallyReforge(')),c);
- vm.runInContext(forge.slice(forge.indexOf('    function rollUniform('),forge.indexOf('    function statsHtml(')).replace(/window\./g,'globalThis.'),c);return c;
-}
-test('reforge material tier controls ranges, white/blue no sub, locks persist, special tiers reject',()=>{
- const c=forgeFixture();
+test('reforge V2 shares the canonical per-slot roll owner',()=>{
+ const model=require('../functions/src/equipment-reforge');
+ assert.match(forge,/return reforgeModel.roll/);
  for(const [tier,[min,max]] of Object.entries(ranges)){
-  for(const [random,expected] of [[0,max],[.1,min]]){
-   c.Math.random=()=>random;const item={reforgeSlots:2};const result=plain(c.v17358RollReforgeAffixes(item,tier,[]));
-   const main=Object.entries(result).find(([key])=>['attack','intelligence'].includes(key));assert.equal(main[1],expected);
-   const sub=Object.entries(result).filter(([key])=>!['attack','intelligence'].includes(key));
-   if(['white','blue'].includes(tier))assert.equal(sub.length,0);else {assert.equal(sub.length,1);assert.ok(sub[0][1]>=11&&sub[0][1]<=16);}
-  }
+  const result=model.roll({reforgeSlots:2},tier,[],()=>0);
+  assert.deepEqual(result,[{stat:'attack',value:max},{stat:'attack',value:max}]);
  }
- c.Math.random=()=>.1;const item={reforgeSlots:2,reforgeStats:{attack:99,agility:4}};
- const before=JSON.stringify(item);assert.equal(c.v17358RollReforgeAffixes(item,'purple',['attack']).attack,99);assert.equal(JSON.stringify(item),before);
- for(const tier of ['pink','four-symbol','unknown'])assert.throws(()=>c.v17358RollReforgeAffixes({reforgeSlots:2},tier,[]),/尚未開放/);
+ const item={reforgeSlots:2,reforgeStats:{attack:99,agility:4}};
+ const before=JSON.stringify(item);assert.equal(model.roll(item,'purple',[0],()=>.1)[0].value,99);assert.equal(JSON.stringify(item),before);
+ for(const tier of ['pink','four-symbol','unknown'])assert.throws(()=>model.roll({reforgeSlots:2},tier,[]),/尚未開放/);
 });

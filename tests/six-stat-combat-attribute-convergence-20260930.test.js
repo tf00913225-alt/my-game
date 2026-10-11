@@ -32,7 +32,7 @@ const context=vm.createContext({
     getCharacterSkillKey:()=>"fire",getSkillLevel:()=>0,getActiveBuffPercent:()=>0,getActiveAccuracyBonusPercent:()=>0,getPlayerDefenseDownPercent:()=>0,
     getLearnedElementEX:()=>null,skillDatabase:{windEX:{accuracyBonusPercent:0,evasionBonusPercent:0},earthEX:{maxHpMultiplier:1,defenseBonusPercent:0}},
     combineEvasionRates:values=>values.reduce((sum,value)=>sum+value,0),getFrostbiteFinalPercentPointPenalty:()=>0,
-    getMonsterDebuffValue:()=>0,getStatDownPercentFor:()=>0,Number,Math:Object.assign(Object.create(Math),{random:()=>0.5}),window:{FourSymbolsBossBattle:null,FourSymbolsEquipmentCombatMigration:require("../functions/src/equipment-combat-percent-migration")},
+    getMonsterDebuffValue:()=>0,getStatDownPercentFor:()=>0,Number,Math:Object.assign(Object.create(Math),{random:()=>0.5}),isEquipmentInventoryType:t=>["weapon","head","armor","shoes","shoulder","ring"].includes(t),window:{FourSymbolsEquipmentReforge:require("../functions/src/equipment-reforge"),FourSymbolsBossBattle:null,FourSymbolsEquipmentCombatMigration:require("../functions/src/equipment-combat-percent-migration")},
     getDamageLevelMultiplier:()=>1,getDamageContextAttacker:()=>null,getElementalDamageMultiplier:()=>1,DAMAGE_FORMULA_BASE_CONSTANT:400,DAMAGE_FORMULA_PER_TARGET_LEVEL:10,
     getOrdinaryDamageMultiplier:()=>1,getEnemyPressureMultiplier:()=>1,getDamageBudgetMultiplier:()=>1
 });

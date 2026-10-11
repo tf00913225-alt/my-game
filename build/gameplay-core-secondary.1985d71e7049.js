@@ -6064,12 +6064,12 @@
     window.__equipmentProgressionInstalled=true;
 
     const RARITIES=[
-        {key:"white",label:"白階",chance:40,min:5,max:10,reforgeSlots:0,shopPrice:500,available:true},
-        {key:"blue",label:"藍階",chance:40,min:11,max:16,reforgeSlots:0,shopPrice:1500,available:true},
-        {key:"purple",label:"紫階",chance:15,min:17,max:22,reforgeSlots:1,shopPrice:4000,available:true},
-        {key:"orange",label:"橙階",chance:5,min:23,max:28,reforgeSlots:1,shopPrice:10000,available:true},
-        {key:"pink",label:"桃紅階",chance:0,available:false,planned:true},
-        {key:"four-symbol",label:"四象階",chance:0,available:false,planned:true,fourSymbol:true}
+        {key:"white",label:"白階",chance:40,min:5,max:10,reforgeSlots:1,shopPrice:500,available:true},
+        {key:"blue",label:"藍階",chance:40,min:11,max:16,reforgeSlots:1,shopPrice:1500,available:true},
+        {key:"purple",label:"紫階",chance:15,min:17,max:22,reforgeSlots:2,shopPrice:4000,available:true},
+        {key:"orange",label:"橙階",chance:5,min:23,max:28,reforgeSlots:2,shopPrice:10000,available:true},
+        {key:"pink",label:"桃紅階",reforgeSlots:3,chance:0,available:false,planned:true},
+        {key:"four-symbol",label:"四象階",reforgeSlots:4,chance:0,available:false,planned:true,fourSymbol:true}
     ];
     RARITIES.forEach(rarity=>{ rarity.color=window.getEquipmentNameColor({rarityKey:rarity.key}); });
     const RARITY_BY_KEY=Object.fromEntries(RARITIES.map(item=>[item.key,item]));
@@ -6847,7 +6847,7 @@
             if(spec.classType&&!item.classType){ item.classType=spec.classType; changed=true; }
             if(item.rarityKey!=="white"){ item.rarityKey="white"; changed=true; }
             if(item.quality!=="white"){ item.quality="white"; changed=true; }
-            if(Number(item.reforgeSlots)!==0){ item.reforgeSlots=0; changed=true; }
+
             if(Number(item.reforgeUsed)!==0){ item.reforgeUsed=0; changed=true; }
         });
         /* Existing saves may already have a starter piece equipped rather than in inventory. */
@@ -6994,7 +6994,7 @@
         migrateLegacyEquipmentStats(item);
         window.v132NormalizeEquipmentSetItem(item);
         const legacyAffixCount=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;
-        item.reforgeSlots=Math.max(1,legacyAffixCount,Math.floor(Number(item.reforgeSlots)||0));
+        item.reforgeSlots=Math.max(2,legacyAffixCount,Array.isArray(item.reforgeAffixes)?item.reforgeAffixes.length:0,Math.floor(Number(item.reforgeSlots)||0));
         // V173.58: reforgeUsed is retained only for old-save compatibility.
         // Reforging is now unlimited; reforgeSlots means affix-slot count.
         item.reforgeUsed=0;
@@ -7499,6 +7499,7 @@
         const copy={...item,count};
         if(item.stats&&typeof item.stats==="object"){ copy.stats={...item.stats}; }
         if(item.reforgeStats&&typeof item.reforgeStats==="object"){ copy.reforgeStats={...item.reforgeStats}; }
+        if(Array.isArray(item.reforgeAffixes)){ copy.reforgeAffixes=item.reforgeAffixes.map(a=>a?{...a}:null); }
         return copy;
     }
 
@@ -8306,7 +8307,7 @@ const alertRpg=(m,o)=>typeof window.rpgAlert==="function"?window.rpgAlert(m,o||{
 function equipment(i){if(!i)return false;try{if(typeof isEquipmentInventoryType==="function")return !!isEquipmentInventoryType(i.type)}catch(_){}return TYPES.has(String(i.type||""));}
 function quality(i){if(!i)return null;return typeof getInventoryRarityDataKey==="function"?getInventoryRarityDataKey(i):String(i.rarityKey||i.quality||"").toLowerCase()||null;}
 function locked(i){return !!(i&&i.v17351Locked===true)}
-function statText(i){const all=Object.assign({},i?.stats||{});Object.entries(i?.reforgeStats||{}).forEach(([k,v])=>all[k]=num(all[k])+num(v));const L={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",energy:"能量",defensePoints:"防禦",accuracy:"命中",evasion:"閃避",antiCrit:"抗暴",statusAccuracy:"異常命中",statusResistance:"異常抗性"};const a=Object.entries(all).filter(([,v])=>num(v)!==0).map(([k,v])=>(L[k]||k)+" "+(num(v)>0?"+":"")+num(v)+(["accuracy","evasion"].includes(k)?"%":""));return a.length?a.join("　"):"無額外能力";}
+function statText(i){const all=Object.assign({},i?.stats||{});Object.entries(window.FourSymbolsEquipmentReforge.aggregate(i)).forEach(([k,v])=>all[k]=num(all[k])+num(v));const L={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",energy:"能量",defensePoints:"防禦",accuracy:"命中",evasion:"閃避",antiCrit:"抗暴",statusAccuracy:"異常命中",statusResistance:"異常抗性"};const a=Object.entries(all).filter(([,v])=>num(v)!==0).map(([k,v])=>(L[k]||k)+" "+(num(v)>0?"+":"")+num(v)+(["accuracy","evasion"].includes(k)?"%":""));return a.length?a.join("　"):"無額外能力";}
 const SLOT_ALIAS={weapon:"hand",hand:"hand",head:"head",helmet:"head",shoulder:"shoulder",wristguard:"shoulder",armor:"armor",robe:"armor",shoes:"shoes",boots:"shoes"};
 const SLOT_STORAGE_ALIASES={hand:["hand","weapon"],head:["head","helmet"],shoulder:["shoulder","wristguard"],armor:["armor","robe"],shoes:["shoes","boots"]};
 const SLOT_LABEL={head:"頭部",hand:"武器",shoulder:"護腕",armor:"衣服",shoes:"鞋子"};
@@ -8315,7 +8316,7 @@ function esc(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"
 function slot(t){const key=String(t||"").toLowerCase();return SLOT_ALIAS[key]||key}
 function equippedFor(i){if(!i||typeof characterEquipment==="undefined")return null;let k=null;try{k=typeof getBackpackEquipmentKey==="function"?getBackpackEquipmentKey(typeof inventoryCharacterIndex!=="undefined"?inventoryCharacterIndex:0):null}catch(_){}if(!k)return null;const slots=characterEquipment[k]||{},target=slot(i.type),keys=SLOT_STORAGE_ALIASES[target]||[target];for(const key of keys){if(slots[key])return slots[key]}return null;}
 function itemArt(i){if(!i)return "";const icon=i.assetPath?'<span class="v169-item-art v169-equipment-art"><img src="'+esc(i.assetPath)+'" alt="" draggable="false" decoding="async"></span>':i.icon;return window.FourSymbolsItemSlot.art(icon,i)}
-function compareStats(i){if(!i)return '<div class="v17351-compare-empty">未穿戴此部位裝備</div>';const all=Object.assign({},i.stats||{});Object.entries(i.reforgeStats||{}).forEach(([k,v])=>all[k]=num(all[k])+num(v));const rows=Object.entries(all).filter(([,v])=>num(v)!==0).map(([k,v])=>'<div class="v17351-compare-stat"><span>'+esc(COMPARE_STAT_LABEL[k]||k)+'</span><b>'+(num(v)>0?"+":"")+num(v)+(["accuracy","evasion"].includes(k)?"%":"")+'</b></div>');return rows.length?rows.join(""):'<div class="v17351-compare-empty">無額外能力</div>'}
+function compareStats(i){if(!i)return '<div class="v17351-compare-empty">未穿戴此部位裝備</div>';const all=Object.assign({},i.stats||{});Object.entries(window.FourSymbolsEquipmentReforge.aggregate(i)).forEach(([k,v])=>all[k]=num(all[k])+num(v));const rows=Object.entries(all).filter(([,v])=>num(v)!==0).map(([k,v])=>'<div class="v17351-compare-stat"><span>'+esc(COMPARE_STAT_LABEL[k]||k)+'</span><b>'+(num(v)>0?"+":"")+num(v)+(["accuracy","evasion"].includes(k)?"%":"")+'</b></div>');return rows.length?rows.join(""):'<div class="v17351-compare-empty">無額外能力</div>'}
 function saveRefresh(){if(typeof rebuildInventorySlots==="function")rebuildInventorySlots();if(typeof renderInventoryItems==="function")renderInventoryItems();if(typeof renderInventory==="function")renderInventory();if(typeof updateUI==="function")updateUI();if(typeof saveGame==="function")saveGame();}
 function clearEquipmentComparison(){const modal=document.getElementById("itemModal");if(!modal)return;modal.querySelectorAll("#v17351EquipmentCompare,#v17351EquipmentLockButton").forEach(n=>n.remove());}
 function syncDetail(item,slotIndex){
