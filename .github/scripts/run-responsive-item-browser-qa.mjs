@@ -278,6 +278,22 @@ async function run(chrome,url,live){
    assert.equal(domain.parent,'game-ui');assert.equal(domain.navParent,'game-ui');
    assert.ok(domain.ancestors.every(t=>t==='none'),'browser UI inherited a transform');
    assert.ok(domain.resources.every(size=>size>=13),'browser home text below reading minimum');
+   const resourceText=await c.eval(`(()=>{
+    const nodes=[homeHudGoldValue,homeHudExpValue],previous=nodes.map(n=>n.textContent);
+    try{
+     nodes[0].textContent='9,999,999';nodes[1].textContent='9,999,999,999';
+     return [...document.querySelectorAll('.home-hud-resources > span')].map(n=>{
+      const range=document.createRange();range.selectNodeContents(n);
+      return {box:n.getBoundingClientRect().toJSON(),text:range.getBoundingClientRect().toJSON(),overflow:n.scrollWidth-n.clientWidth,font:parseFloat(getComputedStyle(n).fontSize)};
+     });
+    }finally{nodes.forEach((n,i)=>n.textContent=previous[i]);}
+   })()`);
+   assert.equal(resourceText.length,2,'home resources missing');
+   for(const resource of resourceText){
+    assert.ok(resource.font>=13&&resource.overflow<=1,'home resource text shrunk or overflowed');
+    assert.ok(resource.text.left>=resource.box.left-1&&resource.text.right<=resource.box.right+1&&resource.text.top>=resource.box.top-1&&resource.text.bottom<=resource.box.bottom+1,'home resource glyphs escape their frame');
+   }
+   evidence.push({homeResourceText:true,viewport:v,resourceText});
    assert.ok(home.rect.bottom<=nav.rect.top+1,'navigation overlaps browser page');
    if(v[0]>=800)assert.ok(home.rect.width>700,'desktop remained a narrow stage projection');
    await c.eval("adventureHomeEntry.scrollIntoView({block:'nearest'})");await settle();
