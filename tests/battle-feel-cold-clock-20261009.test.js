@@ -19,7 +19,7 @@ const context={state:{impactFlashes:new Map(),current,stage:null,metrics:{comple
  setTimer:setTimeout,queueMicrotask:fn=>microtasks.push(fn),DEFAULT_HIT:.57,delayFor:()=>0,
  cardFor:()=>({classList:{remove(){}},querySelector:()=>art}),syncStatusVisualsForUnit(){},syncStatusVisualEffects(){}};
 vm.createContext(context);
-require("./fixtures/direct-impact-overlay-vm")(context,art);
+require("../.github/scripts/fixtures/direct-impact-overlay-vm.cjs")(context,art);
 vm.runInContext(between(source,"    function queueTargetHit(","    function confirmTargetVisual("),context);
 vm.runInContext(between(source,"    function targetHitTime(","    function emitSprite("),context);
 vm.runInContext(between(source,"    function cleanupCurrent(","    let sequence="),context);

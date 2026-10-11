@@ -158,12 +158,12 @@ window.__qaBefore=qaRects();
       playerArt:!!art,
       playerArtBackgroundSize:getComputedStyle(art).backgroundSize,
       playerArtRect:qaRect('#battlePlayerCard0 > .v174-battle-art'),
-      playerHpRect:qaRect('#battlePlayerCard0 > .hp-bar'),
-      playerSpRect:qaRect('#battlePlayerCard0 > .sp-bar'),
-      playerNameRect:qaRect('#battlePlayerCard0 > .battle-player-id'),
+      playerHpRect:qaRect('#battlePlayerCard0 .hp-bar'),
+      playerSpRect:qaRect('#battlePlayerCard0 .sp-bar'),
+      playerNameRect:qaRect('#battlePlayerCard0 .battle-player-id'),
       enemyArt:!!enemyArt,
       enemyArtRect:qaRect('#battleMonster0 > .v174-battle-art'),
-      enemyNameRect:qaRect('#battleMonster0 > .battle-monster-name'),
+      enemyNameRect:qaRect('#battleMonster0 .battle-monster-name'),
       enemyNameDisplay:getComputedStyle(enemy.querySelector('.battle-monster-name')).display,
       activeOutlineWidth:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineWidth,
       activeShadow:getComputedStyle(document.getElementById('battlePlayerCard1')).boxShadow,
@@ -186,8 +186,8 @@ window.__qaBefore=qaRects();
       playerSp:player.querySelector('.sp-bar-text').textContent,
       enemyHp:enemy.querySelector('.monster-hp .monster-bar-text').textContent,
       enemySp:enemy.querySelector('.monster-sp .monster-bar-text').textContent,
-      enemyHpRect:qaRect('#battleMonster0 > .monster-hp'),
-      enemySpRect:qaRect('#battleMonster0 > .monster-sp'),
+      enemyHpRect:qaRect('#battleMonster0 .monster-hp'),
+      enemySpRect:qaRect('#battleMonster0 .monster-sp'),
       enemyHpDisplay:getComputedStyle(enemy.querySelector('.monster-hp')).display
     };
     parent.document.getElementById('result').textContent=JSON.stringify(result);

@@ -57,7 +57,7 @@ async function runBossBalanceProductionQa(){
           check(getComputedStyle(art).backgroundImage!=='none','portrait');
           const image=new Image();image.src=getComputedStyle(art).backgroundImage.split('url(')[1]?.split(')')[0].replaceAll(String.fromCharCode(34),'').replaceAll("'",'');await image.decode();check(image.naturalWidth>0,'Boss portrait decode');
         }
-        check(document.querySelector('.gameplay-boss-card .monster-hp-inner')&&document.querySelector('.gameplay-boss-card .monster-sp-inner'),'HP/SP');
+        check(FourSymbolsBattlePresentation.getUnitHud(document.querySelector('.gameplay-boss-card'))?.querySelector('.monster-hp-inner')&&FourSymbolsBattlePresentation.getUnitHud(document.querySelector('.gameplay-boss-card'))?.querySelector('.monster-sp-inner'),'HP/SP');
         window.bossBalanceQaCapture=plan.type+'-'+plan.id+'-'+caseIndex;
         const cleanup=async()=>{
           if(battleActive)check(v132AbortDungeonBattle('qa-stop'),'formal QA abort');
@@ -795,9 +795,9 @@ try{
         const cards=Array.from(document.querySelectorAll('.v-fixed-enemy-slot > .battle-monster,.v-fixed-ally-slot > .battle-player'))
             .filter(card=>card.offsetParent!==null);
         const hud=cards.map(card=>{
-            const name=card.querySelector('.battle-monster-name,.battle-player-id');
-            const hp=card.querySelector('.monster-hp,.hp-bar');
-            const sp=card.querySelector('.monster-sp,.sp-bar');
+            const name=FourSymbolsBattlePresentation.getUnitHud(card).querySelector('.battle-monster-name,.battle-player-id');
+            const hp=FourSymbolsBattlePresentation.getUnitHud(card).querySelector('.monster-hp,.hp-bar');
+            const sp=FourSymbolsBattlePresentation.getUnitHud(card).querySelector('.monster-sp,.sp-bar');
             const visible=element=>!!element&&getComputedStyle(element).visibility==='visible'&&
                 getComputedStyle(element).display!=='none'&&element.getBoundingClientRect().width>0&&
                 element.getBoundingClientRect().height>0;
@@ -1009,12 +1009,12 @@ try{
     const resourceLayers=await client.eval(`(()=>{
         const playerCard=document.getElementById('battlePlayerCard0');
         const monsterCard=document.getElementById('battleMonster0');
-        const playerHp=playerCard?.querySelector('.hp-bar');
-        const playerSp=playerCard?.querySelector('.sp-bar');
-        const monsterHp=monsterCard?.querySelector('.monster-hp');
-        const monsterSp=monsterCard?.querySelector('.monster-sp');
-        const playerName=playerCard?.querySelector('.battle-player-id');
-        const monsterName=monsterCard?.querySelector('.battle-monster-name');
+        const playerHp=FourSymbolsBattlePresentation.getUnitHud(playerCard)?.querySelector('.hp-bar');
+        const playerSp=FourSymbolsBattlePresentation.getUnitHud(playerCard)?.querySelector('.sp-bar');
+        const monsterHp=FourSymbolsBattlePresentation.getUnitHud(monsterCard)?.querySelector('.monster-hp');
+        const monsterSp=FourSymbolsBattlePresentation.getUnitHud(monsterCard)?.querySelector('.monster-sp');
+        const playerName=FourSymbolsBattlePresentation.getUnitHud(playerCard)?.querySelector('.battle-player-id');
+        const monsterName=FourSymbolsBattlePresentation.getUnitHud(monsterCard)?.querySelector('.battle-monster-name');
         const playerArt=playerCard?.querySelector('.v174-battle-art');
         const monsterArt=monsterCard?.querySelector('.v174-battle-art');
         const rect=node=>{const value=node?.getBoundingClientRect();return value?{top:value.top,bottom:value.bottom,height:value.height}:null;};
@@ -1536,9 +1536,9 @@ try{
         const bossCard=document.getElementById('battleMonster'+bossIndex);
         const footprint=document.querySelector('.v-fixed-boss-footprint');
         const rect=node=>{const value=node?.getBoundingClientRect();return value?{left:value.left,top:value.top,right:value.right,bottom:value.bottom,width:value.width,height:value.height,centerX:value.left+value.width/2}:null;};
-        const bossHp=bossCard?.querySelector(':scope > .monster-hp');
-        const bossSp=bossCard?.querySelector(':scope > .monster-sp');
-        const bossName=bossCard?.querySelector(':scope > .battle-monster-name');
+        const bossHp=FourSymbolsBattlePresentation.getUnitHud(bossCard)?.querySelector('.monster-hp');
+        const bossSp=FourSymbolsBattlePresentation.getUnitHud(bossCard)?.querySelector('.monster-sp');
+        const bossName=FourSymbolsBattlePresentation.getUnitHud(bossCard)?.querySelector('.battle-monster-name');
         const sideVisual=index=>{const card=document.getElementById('battleMonster'+index),art=card?.querySelector(':scope > .v174-battle-art');return {index,slot:slotOf(index),card:rect(card),art:rect(art)};};
         const healReticle=getComputedStyle(healCard,'::before');
         const director=window.v142SkillAnimationDirector;

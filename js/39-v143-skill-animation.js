@@ -316,7 +316,10 @@
             animation.cancel();
             node.remove();
             if(state.impactFlashes.get(artwork)===entry){ state.impactFlashes.delete(artwork); }
-            if(!state.impactFlashes.size&&state.hitOverlay){ state.hitOverlay.remove(); state.hitOverlay=null; }
+            if(!state.impactFlashes.size&&state.hitOverlay){
+                state.hitOverlay.remove(); state.hitOverlay=null;
+                window.FourSymbolsBattlePresentation?.syncHud?.();
+            }
         }};
         state.impactFlashes.set(artwork,entry);
         animation.onfinish=entry.cancel;
@@ -325,6 +328,16 @@
     window.v143ClearImpactOverlays=clearImpactOverlays;
     window.v143ClearImpactTarget=clearImpactTarget;
     window.v143SyncImpactOverlays=syncImpactOverlays;
+    window.FourSymbolsCombatEvents?.subscribe("battle_end",()=>{
+        clearImpactOverlays();
+        window.FourSymbolsBattlePresentation?.clearHud?.();
+    });
+    window.FourSymbolsCombatEvents?.subscribe("hp_damage",event=>{
+        if(!event.target||Number(event.target.hp)>0){ return; }
+        state.impactFlashes.forEach(entry=>{
+            if(entityFor(entry.side,entry.index)===event.target){ entry.cancel(); }
+        });
+    });
 
     function clearTimers(){
         state.timers.forEach(id=>clearTimeout(id));
@@ -1469,6 +1482,7 @@
         }
         if(state.current===current){ state.current=null; state.stage=null; }
         syncStatusVisualEffects();
+        window.FourSymbolsBattlePresentation?.syncHud?.();
         state.metrics.completed++;
         if(current.gate&&!current.gate.done){ current.gate.complete(reason||"v143-raster-complete"); }
     }
@@ -1537,6 +1551,7 @@
 
         state.stage=stage;
         state.current=current;
+        window.FourSymbolsBattlePresentation?.syncHud?.();
         state.metrics.started++;
 
         if(
@@ -1637,15 +1652,19 @@
             current&&!current.done&&current.config&&current.config.id==="fireCritical"&&
             current.targetSide===side
         );
+        const fact=window.FourSymbolsCombatEvents?.lastDamageFor?.(entityFor(side,unitIndex));
+        const indirectSource=["dot","relic","reflect","environment","self","hpCost"];
         const direct=current&&!current.done&&(current.config.id==="normal"||
-            current.config.category==="physical"||current.config.category==="magic");
+            current.config.category==="physical"||current.config.category==="magic")&&
+            (!fact||fact.damageKind==="direct"&&!indirectSource.includes(fact.sourceType))&&
+            !indirectSource.includes(window.__fourSymbolsBattleEffectSource);
         const present=function(){
             const audio=window.v141Audio;
             const playSound=function(){
                 const sound=damage?(critical?"crit":"damage"):kind==="shield"?"block":kind==="miss"?"dodge":null;
                 if(sound&&audio&&typeof audio.play==="function"){ audio.play(sound,audio.combatFeedbackVolumeScale); }
             };
-            if(!damage||!direct){ playSound(); return; }
+            if(!damage||!direct||state.current!==current||current.done){ playSound(); return; }
             const card=cardFor(side,unitIndex);
             const artwork=card&&card.querySelector(".v174-battle-art");
             if(!artwork||typeof artwork.animate!=="function"){ playSound(); return; }

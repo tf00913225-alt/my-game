@@ -37,7 +37,7 @@ test("the active battle page owns one reading state until its final surface clos
         surfaces:new Set(),
         querySelector(selector){ return this.surfaces.has(selector)?{}:null; }
     };
-    const context={document:{body},$:(id)=>id==="game-stage"?stage:id==="battlePage"?page:null};
+    const context={window:{},document:{body},$:(id)=>id==="game-stage"?stage:id==="battlePage"?page:null};
     vm.runInNewContext(functionSource("syncBattleUiPriorityLayer")+";this.syncBattleUiPriorityLayer=syncBattleUiPriorityLayer;",context);
 
     const selectors=[

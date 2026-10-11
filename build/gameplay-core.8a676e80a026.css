@@ -8248,8 +8248,8 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 
 .v174-battle-hud-layer > .v174-unit-hud{position:fixed;inset:auto;}
 /* HUD uses formal Slot anchors and never participates in Unit layout. */
-.v174-unit-hud .battle-monster-name,
-.v174-unit-hud[data-side="player"] .battle-player-id{
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .battle-monster-name,
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"])[data-side="player"] .battle-player-id{
     position:absolute !important;
     top:auto !important;
     left:2px !important;
@@ -8264,7 +8264,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     opacity:1 !important;
     pointer-events:none !important;
 }
-.v174-unit-hud .battle-monster-name{
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .battle-monster-name{
     bottom:0 !important;
     background:none !important;
     border:0 !important;
@@ -8281,7 +8281,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     line-height:var(--battle-name-row-height) !important;
     z-index:24 !important;
 }
-.v174-unit-hud[data-side="player"] .battle-player-id{
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"])[data-side="player"] .battle-player-id{
     bottom:0 !important;
     height:var(--battle-name-row-height) !important;
     line-height:var(--battle-name-row-height) !important;
@@ -8291,10 +8291,10 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     align-items:center !important;
     justify-content:center !important;
 }
-.v174-unit-hud .monster-hp,
-.v174-unit-hud .monster-sp,
-.v174-unit-hud .hp-bar,
-.v174-unit-hud .sp-bar{
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .monster-hp,
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .monster-sp,
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .hp-bar,
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .sp-bar{
     position:absolute !important;
     left:4px !important;
     right:4px !important;
@@ -8309,18 +8309,18 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     z-index:20 !important;
     box-sizing:border-box !important;
 }
-.v174-unit-hud .monster-hp,
-.v174-unit-hud .hp-bar{bottom:calc(var(--battle-name-row-height) + var(--battle-resource-bar-height)) !important;}
-.v174-unit-hud .monster-sp,
-.v174-unit-hud .sp-bar{bottom:var(--battle-name-row-height) !important;}
-.v174-unit-hud .monster-bar-text,
-.v174-unit-hud .hp-bar-text,
-.v174-unit-hud .sp-bar-text{
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .monster-hp,
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .hp-bar{bottom:calc(var(--battle-name-row-height) + var(--battle-resource-bar-height)) !important;}
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .monster-sp,
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .sp-bar{bottom:var(--battle-name-row-height) !important;}
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .monster-bar-text,
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .hp-bar-text,
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .sp-bar-text{
     height:var(--battle-resource-bar-height) !important;
     font-size:9px !important;
     line-height:var(--battle-resource-bar-height) !important;
 }
-.v174-unit-hud .monster-status-badges{
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .monster-status-badges{
     position:absolute !important;
     left:0 !important;
     right:0 !important;

@@ -26,8 +26,8 @@ window.v17351FiveEnemyAutoTargetPriority=fivePriority;
 /* V174 battle presentation owner.
    Slot geometry is owned exclusively by FourSymbolsBattlefieldSlots plus the
    formal render-geometry adapter. This layer owns only artwork decoration,
-   layering and transient animation. It deliberately contains no Slot/Unit/HUD
-   top/left/right/bottom/inset/width/height positioning rules. */
+   layering and transient animation. Document HUD placement consumes only the
+   formal adapter projection; no Slot/Unit/Boss coordinate formula lives here. */
 function removeRetiredPresentationStyles(){
     const style=document.getElementById("v174-cardless-battle-style");
     if(style){ style.remove(); }
@@ -126,7 +126,8 @@ function clearUnitHud(side){
 }
 function syncHud(){
     const page=document.getElementById("battlePage");
-    if(!page||!page.classList.contains("active")||document.body.classList.contains("v174-battle-reading-open")){ clearUnitHud(); return; }
+    if(!page||!page.classList.contains("active")||document.body.classList.contains("v174-battle-reading-open")||
+       !document.querySelector(".v143-skill-stage,.v143-hit-feedback-overlay")){ clearUnitHud(); return; }
     const geometry=window.FourSymbolsBattlefieldRenderGeometry;
     if(!geometry){ return; }
     if(hudLayer){

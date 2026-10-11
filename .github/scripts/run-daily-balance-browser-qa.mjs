@@ -23,8 +23,8 @@ const expression=`(async()=>{
    check(m.skillChance===p.skillFrequency,'one skill frequency owner');
    const box=document.getElementById('battleMonster'+i),art=box?.querySelector('.v174-battle-art'),r=art?.getBoundingClientRect();
    check(r&&r.width>0&&r.height>0&&getComputedStyle(art).backgroundImage!=='none','visible portrait');
-   const hp=box.querySelector('.monster-hp-inner'),sp=box.querySelector('.monster-sp-inner');check(hp&&sp,'HP/SP UI');
-   check(box.querySelector('.monster-status-badges'),'formal status presentation');
+   const hp=FourSymbolsBattlePresentation.getUnitHud(box).querySelector('.monster-hp-inner'),sp=FourSymbolsBattlePresentation.getUnitHud(box).querySelector('.monster-sp-inner');check(hp&&sp,'HP/SP UI');
+   check(FourSymbolsBattlePresentation.getUnitHud(box).querySelector('.monster-status-badges'),'formal status presentation');
   }
  };
  async function scene(type,level,size,automatic){

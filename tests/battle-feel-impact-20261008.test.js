@@ -12,7 +12,7 @@ function fixture(config={id:"normal"}){
     const context={window:{v141Audio:{play:kind=>sounds.push(kind),combatFeedbackVolumeScale:2}},
         state:{current,impactFlashes:new Map(),metrics:{delayedNumbers:0}},Date:{now:()=>100},
         delayFor:()=>config.wait??297,setTimer:fn=>timers.push(fn),cardFor:()=>({querySelector:sel=>{assert.equal(sel,".v174-battle-art");return artwork;}})};
-    vm.createContext(context);require("./fixtures/direct-impact-overlay-vm")(context,artwork);vm.runInContext(hitQueue+resolver,context);
+    vm.createContext(context);require("../.github/scripts/fixtures/direct-impact-overlay-vm.cjs")(context,artwork);vm.runInContext(hitQueue+resolver,context);
     return {context,sounds,motions,timers};
 }
 for(const kind of ["damage","criticalDamage","miss","heal","sp","shield","status"]){
@@ -52,7 +52,7 @@ const cleanupEnd=source.indexOf('    let sequence=',cleanupStart);
 let cancelled=0;
 const art={v143ImpactRecoil:{cancel(){cancelled++;}}};
 const active={done:false,spriteNodes:[],targetIndexes:[0],targetSide:'monster'};
-const cleanupContext={state:{impactFlashes:new Map(),current:active,stage:null,metrics:{completed:0}},cardFor:()=>({classList:{remove(){}},querySelector:()=>art}),syncStatusVisualEffects(){}};
+const cleanupContext={window:{},state:{impactFlashes:new Map(),current:active,stage:null,metrics:{completed:0}},cardFor:()=>({classList:{remove(){}},querySelector:()=>art}),syncStatusVisualEffects(){}};
 vm.createContext(cleanupContext);vm.runInContext(source.slice(cleanupStart,cleanupEnd),cleanupContext);
 cleanupContext.state.impactFlashes.set(art,{cancel(){cancelled++;}});
 cleanupContext.cleanupCurrent(active,'dispose');

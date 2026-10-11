@@ -7,7 +7,7 @@ const state={hpSamples:new WeakMap(),hpTrails:new Map(),impactFlashes:new Map(),
 const context={state,window:{},document:{createElement:node},clearTimeout(){}};
 vm.createContext(context);
 const hpDocument=context.document;
-require("./fixtures/direct-impact-overlay-vm")(context,{animate(){return {cancel(){}};}});
+require("../.github/scripts/fixtures/direct-impact-overlay-vm.cjs")(context,{animate(){return {cancel(){}};}});
 context.document=hpDocument;
 vm.runInContext(source.slice(source.indexOf("    function clearTimers("),source.indexOf("    function purgeLegacyCardVfx(")),context);
 const present=context.window.v143PresentHpLoss;
