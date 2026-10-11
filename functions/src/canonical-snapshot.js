@@ -102,6 +102,72 @@ function inspectClaimSidecar(key,raw){
     }
 }
 
+// Validate retained Client save schema and its mirror, never execute an Abyss
+// lifecycle, migrate history, calculate rewards or repair claim records.
+function inspectAbyssSidecar(key,raw,progress){
+    if(key!=="abyss-state"){return;}
+    let state;
+    try{state=JSON.parse(raw);}catch(_){fail("Abyss sidecar JSON");}
+    const exact=(value,keys)=>object(value)&&
+        Object.keys(value).sort().join("|")===[...keys].sort().join("|");
+    const integer=(value,min=0,max=Number.MAX_SAFE_INTEGER)=>
+        Number.isSafeInteger(value)&&value>=min&&value<=max;
+    if(!exact(state,["version","selectedDifficulty","legacyMigrated","runs"])||
+       state.version!==3||![null,20,40].includes(state.selectedDifficulty)||
+       typeof state.legacyMigrated!=="boolean"||!exact(state.runs,["20","40"])){
+        fail("Abyss root schema");
+    }
+    require("./cloud-save-policy").validateJsonValue(state,"Abyss source",0);
+    require("./cloud-save-policy").validateJsonValue(progress.abyssProgress,"Abyss main source",0);
+    const booleans=["active","isBoss","battleCompleted","chestSpawned","chestClaimed",
+        "portalUnlocked","regionCompleted","completed"];
+    const fields=["difficulty",...booleans,"regionIndex","encounterIndex","phase",
+        "clears","completedRegions","completedStages","rewardClaims","firstClearClaims",
+        "x","y","message"];
+    for(const level of [20,40]){
+        const run=state.runs[level],stage=new RegExp(`^d${level}-r[0-4]-s[0-4]$`);
+        if(!exact(run,fields)||run.difficulty!==level||
+           booleans.some(field=>typeof run[field]!=="boolean")||
+           !integer(run.regionIndex,0,4)||!integer(run.encounterIndex,0,4)||
+           !integer(run.clears)||!["ready","chest","portal","complete"].includes(run.phase)||
+           !Number.isFinite(run.x)||run.x<4||run.x>96||
+           !Number.isFinite(run.y)||run.y<8||run.y>94||typeof run.message!=="string"||
+           !Array.isArray(run.completedRegions)||run.completedRegions.length!==5||
+           run.completedRegions.some(value=>typeof value!=="boolean")||
+           !object(run.completedStages)||Object.entries(run.completedStages).some(
+               ([id,value])=>!stage.test(id)||value!==true)||
+           !object(run.rewardClaims)||!object(run.firstClearClaims)){
+            fail("Abyss run schema");
+        }
+        for(const claims of [run.rewardClaims,run.firstClearClaims]){
+            for(const [id,claim] of Object.entries(claims)){
+                if(!stage.test(id)||!object(claim)){fail("Abyss claim identity");}
+                const reserved=exact(claim,["status","reservedAt"])&&
+                    claim.status==="granting"&&integer(claim.reservedAt,1);
+                const migrated=exact(claim,["status","migrated"])&&
+                    claim.status==="claimed"&&claim.migrated===true;
+                const claimed=exact(claim,["status","kind","gold","exp","ticketId","claimedAt"])&&
+                    claim.status==="claimed"&&["normal","emperor"].includes(claim.kind)&&
+                    integer(claim.gold)&&integer(claim.exp)&&integer(claim.claimedAt,1)&&
+                    (claim.ticketId===null||typeof claim.ticketId==="string"&&ID.test(claim.ticketId));
+                if(!reserved&&!migrated&&!claimed){fail("Abyss recorded claim schema");}
+            }
+        }
+        if(Object.entries(run.rewardClaims).some(([id,claim])=>{
+            const permanent=run.firstClearClaims[id];
+            // Client records the two reservations with separate Date.now()
+            // calls. Preserve both original times; never complete either one.
+            return !(claim.status==="granting"&&permanent?.status==="granting")&&
+                snapshotDigest(claim)!==snapshotDigest(permanent??null);
+        })){
+            fail("Abyss permanent claim evidence missing or contradictory");
+        }
+    }
+    if(snapshotDigest(state)!==snapshotDigest(progress.abyssProgress)){
+        fail("Abyss main-save and sidecar disagree");
+    }
+}
+
 // Durable sources inherit ownership/revision from progress/current. The older
 // explicit in-memory input remains available, but two sources cannot coexist.
 function inspectPlayableState(records){
@@ -283,6 +349,7 @@ function assembleCanonicalSnapshot(uid,revision,records){
         if(records.progress.playableState!==undefined&&entry.status==="present"){
             inspectTimeSidecar(key,entry.raw);
             inspectClaimSidecar(key,entry.raw);
+            inspectAbyssSidecar(key,entry.raw,records.progress);
         }
         if(CLAIM_SIDECARS.has(key)&&entry.status==="present"){
             let parsed;
@@ -401,6 +468,7 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
         validateJsonValue(parsed,`sidecar ${key}`,0);
         inspectTimeSidecar(key,entry.raw);
         inspectClaimSidecar(key,entry.raw);
+        inspectAbyssSidecar(key,entry.raw,source.snapshot.progress);
     }
     const gameSave={version:6,heroAccount:hero,player:players[0],player2:players[1],
         player3:players[2],gold:source.snapshot.economy.gold,

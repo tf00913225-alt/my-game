@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import {createRequire} from "node:module";
 import test from "node:test";
+import {readFileSync} from "node:fs";
+import vm from "node:vm";
 
 const require=createRequire(import.meta.url);
 const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-writer.js");
@@ -93,7 +95,8 @@ test("new creation persists server-generated playable fields in the existing rev
         "rested-exp-state":{battles:0,progressMs:0,lastSeenAt:1700000000000,
             blockedByElementBox:false},
         "progress":{eliteKills:0,dungeonWins:0,abyssClears:0},
-        "quest-milestones":{date:"2023-11-14",daily:{},commission:{}}
+        "quest-milestones":{date:"2023-11-14",daily:{},commission:{}},
+        "abyss-state":progress.abyssProgress
     };
     for(const [key,state] of Object.entries(initial)){
         assert.deepEqual(progress.sidecars[key],{status:"present",raw:JSON.stringify(state)});
@@ -104,6 +107,17 @@ test("new creation persists server-generated playable fields in the existing rev
     assert.deepEqual(archive.sourceRecords.progress.sidecars,progress.sidecars);
     assert.deepEqual(h.data.get(`${root}/playableSnapshots/5`).snapshot.progress.sidecars,progress.sidecars);
     assert.equal(archive.readyForRestore,false);
+    const client=readFileSync(new URL("../js/59-abyss-two-tier-runtime.js",import.meta.url),"utf8");
+    const definitions=client.slice(client.indexOf("function defaultRun("),
+        client.indexOf("function normalizeRun("));
+    const noHistoryMigration=client.slice(client.indexOf("function migrateLegacy("),
+        client.indexOf("function readMainSave("));
+    const expected=JSON.parse(JSON.stringify(vm.runInNewContext(
+        'const STATE_VERSION=3;const localStorage={getItem:()=>null};'+
+        definitions+noHistoryMigration+';migrateLegacy(defaultRoot())')));
+    assert.deepEqual(progress.abyssProgress,expected);
+    assert.deepEqual(archive.sourceRecords.progress.abyssProgress,expected);
+    assert.deepEqual(h.data.get(`${root}/playableSnapshots/5`).snapshot.progress.abyssProgress,expected);
     const count=h.committed;
     h.setClock(1800000000000);
     assert.equal((await h.writer.commitInitialSources({},args)).unchanged,true);
@@ -118,7 +132,8 @@ test("new creation persists server-generated playable fields in the existing rev
         selection:{...selection,heroAccount:fields.heroAccount}}),/Invalid initial/);
     assert.equal(imported.committed,0);
     for(const key of ["sidecars","remainingMs","lastSeenAt","newcomerRewards",
-        "daily","commission","claimRecords","quest-milestones","eliteKills"]){
+        "daily","commission","claimRecords","quest-milestones","eliteKills",
+        "abyssProgress","runs","firstClearClaims","legacyMigrated"]){
         const h=harness();
         await assert.rejects(h.writer.commitInitialSources({}, {...args,
             selection:{...selection,[key]:1}}),/Invalid initial/);

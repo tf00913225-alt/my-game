@@ -28,7 +28,8 @@ function sources(count=1){
         relics:[{...base,relicId:"relic-a",unlocked:true,level:2,exp:3,seen:true}],
         relicLoadout:{...base,relicId:"relic-a",subRelicId:null},
         progress:{...base,dailyQuestState:{claimed:true},commissionQuestState:{},achievementState:{},
-            gameplayProgress:{},abyssProgress:{},sidecars:Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>
+            gameplayProgress:{},abyssProgress:JSON.parse(makeInitialSidecars(1700000000000)["abyss-state"].raw),
+            sidecars:Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>
                 [key,makeInitialSidecars(1700000000000)[key].status==="present"?
                     makeInitialSidecars(1700000000000)[key]:
                     {status:"present",raw:JSON.stringify({marker:key})}]))},
@@ -110,7 +111,7 @@ test("projection rejects oversized and non-JSON payloads before serialization ca
     const expanded=sources();
     for(const [key,entry] of Object.entries(expanded.progress.sidecars)){
         if(makeInitialSidecars(1)[key].status!=="present"){
-            entry.raw=JSON.stringify({data:"x".repeat(55000)});
+            entry.raw=JSON.stringify({data:"x".repeat(62000)});
         }
     }
     expanded.playableState.bestiaryData=Object.fromEntries(Array.from({length:1999},(_,index)=>
@@ -216,6 +217,64 @@ test("historical v1 claim bytes remain compatible but cannot be complete evidenc
     assert.equal(assembleCanonicalSnapshot("uid-a",7,r).sha256,bundle.sha256);
     assert.throws(()=>assemble(r),/claim sidecar fields/);
     assert.deepEqual(r,before);
+});
+
+test("Abyss invalid fields, claims and mismatched mirrors block without repair",()=>{
+    const mutations=[a=>a.version=2,a=>a.selectedDifficulty=30,a=>a.legacyMigrated=1,
+        a=>delete a.runs[40],a=>a.runs[20].difficulty=40,
+        a=>a.runs[20].regionIndex=5,a=>a.runs[20].encounterIndex=.5,
+        a=>a.runs[20].active="false",a=>a.runs[20].clears=-1,
+        a=>a.runs[20].completedRegions=[false],a=>a.runs[20].x=100,
+        a=>a.runs[20].phase="unknown",a=>a.runs[20].completedStages={"d40-r0-s0":true},
+        a=>a.runs[20].firstClearClaims={"d20-r0-s0":{status:"claimed"}},
+        a=>a.runs[20].firstClearClaims={"d20-r0-s0":{status:"granting",reservedAt:"1"}},
+        a=>a.runs[20].firstClearClaims={"d20-r0-s0":{status:"claimed",migrated:false}},
+        a=>a.runs[20].rewardClaims={"d20-r0-s0":{status:"claimed",migrated:true}},
+        a=>{a.runs[20].rewardClaims={"d20-r0-s0":{status:"granting",reservedAt:1}};
+            a.runs[20].firstClearClaims={"d20-r0-s0":{status:"claimed",migrated:true}};},
+        a=>a.runs[20].extra=true];
+    for(const mutate of mutations){
+        const r=sources();mutate(r.progress.abyssProgress);
+        r.progress.sidecars["abyss-state"].raw=JSON.stringify(r.progress.abyssProgress);
+        const before=structuredClone(r);assert.throws(()=>assemble(r),/Abyss/);
+        assert.deepEqual(r,before);
+        const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=r.playableState;
+        r.progress.playableState=fields;delete r.playableState;
+        assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,r),/Abyss/);
+    }
+    const r=sources();r.progress.abyssProgress.runs[40].clears=1;
+    assert.throws(()=>assemble(r),/disagree/);
+    const lossy=sources();lossy.progress.abyssProgress.extra=undefined;
+    assert.throws(()=>assemble(lossy));
+});
+
+test("Abyss recorded first clears and reservations retain bytes without rewards",()=>{
+    const r=sources(),run=r.progress.abyssProgress.runs[40];
+    run.clears=2;
+    const claimed={status:"claimed",kind:"emperor",gold:500,exp:0,ticketId:"ticketSetEarth",claimedAt:1};
+    run.firstClearClaims={"d40-r0-s4":claimed,
+        "d40-r1-s0":{status:"granting",reservedAt:2},
+        "d40-r2-s4":{status:"claimed",migrated:true}};
+    run.rewardClaims={"d40-r0-s4":{...claimed},
+        "d40-r1-s0":{status:"granting",reservedAt:1}};
+    r.progress.sidecars["abyss-state"].raw=" "+JSON.stringify(r.progress.abyssProgress)+" ";
+    const before=structuredClone(r),bundle=assemble(r);
+    assert.deepEqual(bundle.projection.gameSave.abyssProgress,r.progress.abyssProgress);
+    assert.equal(bundle.projection.sidecars["abyss-state"].raw,r.progress.sidecars["abyss-state"].raw);
+    assert.equal(bundle.projection.gameSave.gold,42);assert.equal(bundle.projection.gameSave.sharedExp,7);
+    assert.deepEqual(bundle.projection.claimCheckpoint,r.claimCheckpoint);
+    assert.equal(bundle.readyForPublication,false);assert.deepEqual(r,before);
+    const changed=structuredClone(r);delete changed.progress.abyssProgress.runs[40].firstClearClaims["d40-r2-s4"];
+    changed.progress.sidecars["abyss-state"].raw=JSON.stringify(changed.progress.abyssProgress);
+    assert.throws(()=>verifyCanonicalPlayableProjectionAgainstSources(bundle,"uid-a",7,changed));
+});
+
+test("historical v1 Abyss bytes stay compatible but cannot become complete sources",()=>{
+    const r=sources();r.progress.sidecars["abyss-state"].raw="{}";r.progress.abyssProgress={};
+    const before=structuredClone(r),bundle=assembleCanonicalSnapshot("uid-a",7,r);
+    assert.equal(bundle.snapshot.progress.sidecars["abyss-state"].raw,"{}");
+    assert.equal(assembleCanonicalSnapshot("uid-a",7,r).sha256,bundle.sha256);
+    assert.throws(()=>assemble(r),/Abyss root schema/);assert.deepEqual(r,before);
 });
 
 test("stored projection must match sources and cannot publish through tampered flags",()=>{
