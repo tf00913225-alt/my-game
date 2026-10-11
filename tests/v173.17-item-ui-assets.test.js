@@ -120,7 +120,7 @@ test("equipment reward has a visible return action and resilient image fallback"
     assert.match(rewardOwner,/v132CloseRewardModal\(\)[\s\S]*?showPage\("dungeon"\)/,"canonical chest reward returns to the dungeon");
     assert.match(itemSource,/assets\/items\/tickets\/"\+elementKey\+"-icon\.png/);
     assert.match(itemSource,/onerror="this\.hidden=true"/);
-    assert.match(assetCss,/\.v169-item-art > img\[hidden\]\{display:none !important;\}/);
+    assert.match(read("css/49-v169-rpg-ui.css"),/\.v169-item-art > img\[hidden\]\{display:none !important;\}/);
 });
 
 test("published development label advances to V173.39",()=>{

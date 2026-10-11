@@ -18,7 +18,7 @@ const index=fs.readFileSync("index.html","utf8");
 });
 assert.ok(eq.includes('powerRing:{ring:true}'));
 assert.match(eq,/function repairLegacyStarterEquipmentIcons\(\)/);
-assert.match(eq,/item\.icon=spec\.ring\?legacyStarterRingMarkup\(\):artMarkup\(spec\.path,"white"\)/);
+assert.match(eq,/item\.icon=spec\.ring\?legacyStarterRingMarkup\(\):artMarkup\(spec\.path,"white",item\.type\)/);
 assert.match(eq,/item\.rarityKey="white"/);
 assert.match(eq,/item\.quality="white"/);
 assert.doesNotMatch(eq,/item\.reforgeSlots=0/);

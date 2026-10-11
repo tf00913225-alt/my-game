@@ -40,10 +40,11 @@ assert.match(dailyCss,/裝備寶箱  ×2/);
 // Shared art colors remain available outside the backpack. Backpack slots
 // own their outer rarity border and deliberately neutralize the inner art.
 for(const [rarity,color] of [["white","D8D8D8"],["blue","42A5FF"],["purple","B05CFF"],["orange","FF9F38"]]){
-    assert.match(rarityCss,new RegExp("\\.v169-item-art:not\\(\\.inventory-backpack-rarity-neutral\\)\\.v169-rarity-"+rarity+"[^}]*border-color:#"+color));
+    assert.match(rarityCss,new RegExp("\\.v169-item-art:not\\(\\.inventory-backpack-rarity-neutral\\):not\\(\\.item-slot\\)\\.v169-rarity-"+rarity+"[^}]*border-color:#"+color));
 }
-assert.match(ui,/box\.querySelectorAll\("\.v169-item-art"\)\.forEach\(art=>art\.classList\.add\("inventory-backpack-rarity-neutral"\)\)/);
-assert.match(read("css/22-stage-v78-character-inventory-core.css"),/\.inventory-item-classic\{[^}]*border:1px solid var\(--slot-rarity,var\(--bag-slot-border\)\)/);
+assert.match(ui,/window\.FourSymbolsItemSlot\.neutralizeArt\(box\)/);
+assert.match(read("css/49-v169-rpg-ui.css"),/\.item-slot\{border:1px solid var\(--slot-rarity\);border-radius:0;[^}]*background:var\(--equipment-rarity-fill\)/);
+assert.doesNotMatch(read("css/22-stage-v78-character-inventory-core.css"),/\.inventory-item-classic\{[^}]*border:/);
 assert.doesNotMatch(equipment,/⬜|🟦|🟪|🟧/);
 assert.match(equipment,/rarity-white/);
 assert.match(quest,/v17361ClaimAllDailyQuests/);

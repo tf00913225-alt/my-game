@@ -1,6 +1,6 @@
 /* =====================================================
    Equipment progression authority
-   - four elemental set stats / orange quality
+   - delegates elemental set data to the formal set definitions
    - explicit reforge-slot rule
    - ordinary equipment generator shared by shop + equipment chests
    - equipment dungeon chest rewards
@@ -11,13 +11,14 @@
     window.__equipmentProgressionInstalled=true;
 
     const RARITIES=[
-        {key:"white",label:"白階",chance:40,min:5,max:10,reforgeSlots:1,shopPrice:500,color:"#D8D8D8",available:true},
-        {key:"blue",label:"藍階",chance:40,min:11,max:16,reforgeSlots:1,shopPrice:1500,color:"#42A5FF",available:true},
-        {key:"purple",label:"紫階",chance:15,min:17,max:22,reforgeSlots:2,shopPrice:4000,color:"#B05CFF",available:true},
-        {key:"orange",label:"橙階",chance:5,min:23,max:28,reforgeSlots:2,shopPrice:10000,color:"#FF9F38",available:true},
-        {key:"pink",label:"桃紅階",reforgeSlots:3,chance:0,available:false,planned:true,color:"#FF4FA7"},
-        {key:"four-symbol",label:"四象階",reforgeSlots:4,chance:0,available:false,planned:true,fourSymbol:true,color:null}
+        {key:"white",label:"白階",chance:40,min:5,max:10,reforgeSlots:1,shopPrice:500,available:true},
+        {key:"blue",label:"藍階",chance:40,min:11,max:16,reforgeSlots:1,shopPrice:1500,available:true},
+        {key:"purple",label:"紫階",chance:15,min:17,max:22,reforgeSlots:2,shopPrice:4000,available:true},
+        {key:"orange",label:"橙階",chance:5,min:23,max:28,reforgeSlots:2,shopPrice:10000,available:true},
+        {key:"pink",label:"桃紅階",reforgeSlots:3,chance:0,available:false,planned:true},
+        {key:"four-symbol",label:"四象階",reforgeSlots:4,chance:0,available:false,planned:true,fourSymbol:true}
     ];
+    RARITIES.forEach(rarity=>{ rarity.color=window.getEquipmentNameColor({rarityKey:rarity.key}); });
     const RARITY_BY_KEY=Object.fromEntries(RARITIES.map(item=>[item.key,item]));
     const EQUIPMENT_SHOP_DROP_TABLE=[
         {key:"white",label:"白階",chance:70},
@@ -740,9 +741,9 @@
         for(const rarity of table){ cursor+=rarity.chance; if(roll<cursor){ return RARITY_BY_KEY[rarity.key]; } }
         throw new Error("裝備階級抽取超出範圍");
     }
-    function artMarkup(path,rarityKey){
-        if(!path){ return '<span class="v169-item-art v169-equipment-art" data-asset-state="missing" role="img" aria-label="裝備素材尚未就緒" title="裝備素材尚未就緒">◇</span>'; }
-        return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarityKey+'"><img src="'+path+'" alt="" draggable="false" onerror="this.parentElement.dataset.assetState=\'broken\';this.parentElement.setAttribute(\'role\',\'img\');this.parentElement.setAttribute(\'aria-label\',\'裝備圖片無法載入\');this.parentElement.textContent=\'◇\'"></span>';
+    function artMarkup(path,rarityKey,type){
+        if(!path){ return window.FourSymbolsItemSlot.art('<span class="v169-item-art v169-equipment-art" data-asset-state="missing" role="img" aria-label="裝備素材尚未就緒" title="裝備素材尚未就緒">◇</span>',{type,rarityKey}); }
+        return window.FourSymbolsItemSlot.art('<span class="v169-item-art v169-equipment-art"><img src="'+path+'" alt="" draggable="false" onerror="this.parentElement.dataset.assetState=\'broken\';this.parentElement.setAttribute(\'role\',\'img\');this.parentElement.setAttribute(\'aria-label\',\'裝備圖片無法載入\');this.parentElement.textContent=\'◇\'"></span>',{type,rarityKey});
     }
     const LEGACY_STARTER_EQUIPMENT_ART={
         ironSword:{path:"assets/equipment/warrior/weapon-01.png",classType:"warrior"},
@@ -786,7 +787,7 @@
             const iconText=String(item.icon||"");
             const hasRealArt=/<(?:img|svg)\\b/i.test(iconText);
             if(!hasRealArt){
-                item.icon=spec.ring?legacyStarterRingMarkup():artMarkup(spec.path,"white");
+                item.icon=spec.ring?legacyStarterRingMarkup():artMarkup(spec.path,"white",item.type);
                 changed=true;
             }
             if(spec.path&&item.assetPath!==spec.path){ item.assetPath=spec.path; changed=true; }
@@ -834,7 +835,7 @@
         return {
             equipmentCombatPercentUnitVersion:2,
             id:makeUid("gear"),v141Uid:makeUid("gearuid"),name,
-            icon:artMarkup(asset,rarity.key),type:slot,count:1,price:Math.floor(rarity.shopPrice*.2),
+            icon:artMarkup(asset,rarity.key,slot),type:slot,count:1,price:Math.floor(rarity.shopPrice*.2),
             stats:{...entry.stats},reforgeStats:null,reforgeSlots:rarity.reforgeSlots,reforgeUsed:0,
             rarityKey:rarity.key,quality:rarity.key,classType,assetPath:asset,
             shopPrice:rarity.shopPrice,v17346GeneratedEquipment:true
@@ -934,23 +935,17 @@
     window.v17346OpenEquipmentChest=openEquipmentChest;
     window.v17346ShowEquipmentChestPreview=showEquipmentChestPreview;
 
-    function addOrangeClass(icon){
-        if(typeof icon!=="string"||icon.includes("v17346-rarity-orange")){ return icon; }
-        return icon.replace(/class="([^"]*v169-item-art[^"]*)"/,(_m,classes)=>'class="'+classes+' v17346-rarity-orange"');
-    }
     function applySetRule(item){
         const defs=typeof window.v132GetContentDefinitions==="function"?window.v132GetContentDefinitions():null;
         if(!(defs?.equipmentSetItems||[]).some(def=>def.id===item?.id&&def.setId===item?.setId)){ return item; }
         migrateLegacyEquipmentStats(item);
         window.v132NormalizeEquipmentSetItem(item);
-        item.quality="orange";
-        item.rarityKey="orange";
         const legacyAffixCount=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;
         item.reforgeSlots=Math.max(2,legacyAffixCount,Array.isArray(item.reforgeAffixes)?item.reforgeAffixes.length:0,Math.floor(Number(item.reforgeSlots)||0));
         // V173.58: reforgeUsed is retained only for old-save compatibility.
         // Reforging is now unlimited; reforgeSlots means affix-slot count.
         item.reforgeUsed=0;
-        item.icon=addOrangeClass(item.icon);
+        item.icon=window.FourSymbolsItemSlot.art(item.icon,item);
         return item;
     }
 
@@ -1099,20 +1094,6 @@
         const style=document.createElement("style");
         style.id="equipment-progression-style";
         style.textContent=`
-.v169-equipment-art:is(.v17346-rarity-white,.v169-rarity-white){--equipment-rarity-fill:rgba(216,216,216,.25)}
-.v169-equipment-art:is(.v17346-rarity-blue,.v169-rarity-blue){--equipment-rarity-fill:rgba(66,165,255,.25)}
-.v169-equipment-art:is(.v17346-rarity-purple,.v169-rarity-purple){--equipment-rarity-fill:rgba(176,92,255,.25)}
-.v169-equipment-art:is(.v17346-rarity-orange,.v169-rarity-orange){--equipment-rarity-fill:rgba(255,159,56,.25)}
-.v169-equipment-art:is(.v17346-rarity-pink,.v169-rarity-pink){--equipment-rarity-fill:rgba(255,79,167,.25)}
-.v169-equipment-art:is(.v17346-rarity-four-symbol,.v169-rarity-four-symbol){--equipment-rarity-fill:conic-gradient(from 0deg,rgba(66,165,255,.25) 0%,rgba(71,214,163,.25) 25%,rgba(200,155,69,.25) 50%,rgba(255,90,54,.25) 75%,rgba(66,165,255,.25) 100%)}
-.v169-equipment-art{background:var(--equipment-rarity-fill,#090807)}
-.v17346-rarity-white:not(.inventory-backpack-rarity-neutral){border:2px solid #D8D8D8!important;box-shadow:0 0 7px rgba(216,216,216,.55)!important}
-.v17346-rarity-blue:not(.inventory-backpack-rarity-neutral){border:2px solid #42A5FF!important;box-shadow:0 0 9px rgba(66,165,255,.7)!important}
-.v17346-rarity-purple:not(.inventory-backpack-rarity-neutral){border:2px solid #B05CFF!important;box-shadow:0 0 10px rgba(176,92,255,.75)!important}
-.v17346-rarity-orange:not(.inventory-backpack-rarity-neutral){border:3px solid #FF9F38!important;box-shadow:0 0 5px #FF9F38,0 0 14px rgba(255,159,56,.9),inset 0 0 8px rgba(255,159,56,.3)!important}
-.v17346-rarity-pink:not(.inventory-backpack-rarity-neutral){border:3px solid #FF4FA7!important;box-shadow:0 0 6px #FF4FA7,0 0 16px rgba(255,79,167,.88),inset 0 0 9px rgba(255,79,167,.42)!important}
-.v17346-rarity-four-symbol:not(.inventory-backpack-rarity-neutral){border:3px solid transparent!important;background:var(--equipment-rarity-fill) padding-box,linear-gradient(#090807,#090807) padding-box,conic-gradient(from 0deg,#42A5FF 0 25%,#47D6A3 25% 50%,#C89B45 50% 75%,#FF5A36 75% 100%) border-box!important;box-shadow:0 0 8px rgba(255,90,54,.34),0 0 12px rgba(66,165,255,.32),0 0 16px rgba(71,214,163,.26)!important;animation:v17360FourSymbolRarityBreath 2.8s ease-in-out infinite!important}
-@keyframes v17360FourSymbolRarityBreath{0%,100%{filter:brightness(.96)}50%{filter:brightness(1.14)}}
 .v17346-reforge-slot{margin-top:7px;color:#ffbf5b!important;font-weight:900;letter-spacing:.06em}
 #game-ui #itemModal #v17342InventoryPotionUse{-webkit-appearance:none!important;appearance:none!important;background:linear-gradient(180deg,#d9ad55 0%,#9c641c 100%)!important;border:1px solid #f2cf83!important;color:#1a1007!important;opacity:1!important;font-weight:900!important;text-shadow:none!important;box-shadow:inset 0 1px 0 rgba(255,242,192,.42),0 3px 8px rgba(0,0,0,.34)!important}
 #game-ui #itemModal #v17342InventoryPotionUse:focus,#game-ui #itemModal #v17342InventoryPotionUse:focus-visible,#game-ui #itemModal #v17342InventoryPotionUse:active{background:linear-gradient(180deg,#edc66d 0%,#ad7524 100%)!important;color:#160d05!important;outline:2px solid rgba(255,220,139,.72)!important;outline-offset:1px!important}
@@ -1121,7 +1102,7 @@
 .v132-reward-modal-inner.v17346-preview-modal>h3{position:static!important;flex:0 0 auto!important;margin:0 0 12px!important;padding:0!important;background:transparent!important}
 .v132-reward-modal-inner.v17346-preview-modal .v132-preview-list-scroll{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overscroll-behavior:contain;touch-action:pan-y;scrollbar-gutter:stable}
 .v132-reward-modal-inner.v17346-preview-modal .v132-reward-actions{position:static!important;flex:0 0 auto!important;margin-top:12px!important;padding-top:0!important;background:transparent!important}
-.v17346-shop-card{position:relative;overflow:hidden;padding:10px 9px 9px!important;cursor:pointer;transition:filter .16s ease,background .16s ease,border-color .16s ease}.v17346-shop-card .v17346-gear-art{width:74px;height:74px;margin:0 auto 7px}.v17346-gear-art .v169-item-art{width:100%!important;height:100%!important}.v17346-shop-card .v17346-shop-name{display:block;color:#f6e7c2!important;font-size:17px!important;line-height:1.22!important;font-weight:900!important;letter-spacing:.02em}.v17346-shop-card .v17346-shop-slot{display:block;margin-top:3px;color:#c9b894!important;font-size:14px!important;line-height:1.25!important}.v17346-shop-card .v17346-stat{display:block;margin-top:3px;color:#ffe0a0!important;font-size:15px!important;line-height:1.3!important;font-weight:800!important}.v17346-shop-card .v17346-reforge-mini{display:block;margin-top:2px;color:#ffbf5b;font-size:12px;font-weight:800}.v17346-shop-card .v17346-shop-buy{-webkit-appearance:none;appearance:none;width:100%;min-height:42px;margin-top:8px;border:1px solid rgba(226,181,87,.76);border-radius:7px;font-size:15px;font-weight:900;line-height:1.15}.v17346-shop-card.is-affordable{background:linear-gradient(180deg,rgba(51,36,19,.94),rgba(19,14,10,.96))!important;box-shadow:inset 0 0 0 1px rgba(225,179,83,.08),0 0 10px rgba(211,155,54,.08)}.v17346-shop-card.is-affordable .v17346-shop-buy{background:linear-gradient(180deg,#f4d477 0%,#cf942d 58%,#a76518 100%)!important;border-color:#ffe5a0!important;color:#241506!important;text-shadow:0 1px rgba(255,239,185,.35)!important;box-shadow:inset 0 1px 0 rgba(255,248,211,.62),0 0 10px rgba(236,183,71,.32)!important}.v17346-shop-card.is-affordable .v17346-shop-buy:active{background:linear-gradient(180deg,#fff0ad,#d69a32)!important;color:#160d05!important}.v17346-shop-card.is-unaffordable{background:linear-gradient(180deg,rgba(38,29,24,.94),rgba(17,14,12,.98))!important;border-color:rgba(119,83,61,.72)!important}.v17346-shop-card.is-unaffordable .v17346-gear-art img{filter:saturate(.48) brightness(.72)}.v17346-shop-card.is-unaffordable .v17346-shop-name{color:#b9aa98!important}.v17346-shop-card.is-unaffordable[data-rarity="orange"] .v17346-shop-name{color:#d7944d!important}.v17346-shop-card.is-unaffordable .v17346-shop-slot,.v17346-shop-card.is-unaffordable .v17346-stat{color:#978878!important}.v17346-shop-card .v17346-shop-buy:disabled{background:linear-gradient(180deg,rgba(91,43,31,.82),rgba(48,27,23,.92))!important;border-color:rgba(167,79,56,.7)!important;color:#d79279!important;box-shadow:none!important;opacity:.86!important;cursor:not-allowed}.v17346-equipment-dungeon-card .v141-dungeon-cover-art{background-image:linear-gradient(rgba(5,4,3,.2),rgba(5,4,3,.68)),url('assets/ui/dungeon-equipment-v17346.png')!important;background-size:cover!important;background-position:center!important}
+.v17346-shop-card{position:relative;overflow:hidden;padding:10px 9px 9px!important;cursor:pointer;transition:filter .16s ease,background .16s ease,border-color .16s ease}.v17346-shop-card .v17346-gear-art{width:74px;height:74px;margin:0 auto 7px}.v17346-gear-art .v169-item-art{width:100%!important;height:100%!important}.v17346-shop-card .v17346-shop-name{display:block;font-size:17px!important;line-height:1.22!important;font-weight:900!important;letter-spacing:.02em}.v17346-shop-card .v17346-shop-slot{display:block;margin-top:3px;color:#c9b894!important;font-size:14px!important;line-height:1.25!important}.v17346-shop-card .v17346-stat{display:block;margin-top:3px;color:#ffe0a0!important;font-size:15px!important;line-height:1.3!important;font-weight:800!important}.v17346-shop-card .v17346-reforge-mini{display:block;margin-top:2px;color:#ffbf5b;font-size:12px;font-weight:800}.v17346-shop-card .v17346-shop-buy{-webkit-appearance:none;appearance:none;width:100%;min-height:42px;margin-top:8px;border:1px solid rgba(226,181,87,.76);border-radius:7px;font-size:15px;font-weight:900;line-height:1.15}.v17346-shop-card.is-affordable{background:linear-gradient(180deg,rgba(51,36,19,.94),rgba(19,14,10,.96))!important;box-shadow:inset 0 0 0 1px rgba(225,179,83,.08),0 0 10px rgba(211,155,54,.08)}.v17346-shop-card.is-affordable .v17346-shop-buy{background:linear-gradient(180deg,#f4d477 0%,#cf942d 58%,#a76518 100%)!important;border-color:#ffe5a0!important;color:#241506!important;text-shadow:0 1px rgba(255,239,185,.35)!important;box-shadow:inset 0 1px 0 rgba(255,248,211,.62),0 0 10px rgba(236,183,71,.32)!important}.v17346-shop-card.is-affordable .v17346-shop-buy:active{background:linear-gradient(180deg,#fff0ad,#d69a32)!important;color:#160d05!important}.v17346-shop-card.is-unaffordable{background:linear-gradient(180deg,rgba(38,29,24,.94),rgba(17,14,12,.98))!important;border-color:rgba(119,83,61,.72)!important}.v17346-shop-card.is-unaffordable .v17346-gear-art img{filter:saturate(.48) brightness(.72)}.v17346-shop-card.is-unaffordable .v17346-shop-slot,.v17346-shop-card.is-unaffordable .v17346-stat{color:#978878!important}.v17346-shop-card .v17346-shop-buy:disabled{background:linear-gradient(180deg,rgba(91,43,31,.82),rgba(48,27,23,.92))!important;border-color:rgba(167,79,56,.7)!important;color:#d79279!important;box-shadow:none!important;opacity:.86!important;cursor:not-allowed}.v17346-equipment-dungeon-card .v141-dungeon-cover-art{background-image:linear-gradient(rgba(5,4,3,.2),rgba(5,4,3,.68)),url('assets/ui/dungeon-equipment-v17346.png')!important;background-size:cover!important;background-position:center!important}
 `;
         document.head.appendChild(style);
     }
@@ -1176,7 +1157,7 @@
         const item=currentShopOffers()[safeIndex];
         if(!item||typeof window.v132ShowRewardModal!=="function"){ return; }
         const rarity=RARITY_BY_KEY[item.rarityKey]||RARITIES[0];
-        const html='<div class="v132-reward-modal-inner v17346-shop-preview-modal item-presentation-frame" data-presentation-mode="shop-preview" data-rarity="'+escapeHtml(item.rarityKey)+'"><h3>'+escapeHtml(item.name)+'</h3><div class="item-presentation-scroll" data-scroll-owner="y"><div class="v17346-shop-preview-art">'+item.icon+'</div><div class="v17346-shop-preview-info"><span>'+escapeHtml(SLOT_META[item.type].label)+'</span><strong>'+escapeHtml(statLine(item))+'</strong></div><div class="v17346-shop-preview-price">'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</div>'+(item.reforgeSlots?'<div class="v17346-shop-preview-reforge">[可冶煉]</div>':'')+'</div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button><button type="button" onclick="v17346ShowShopOfferAcquisition('+safeIndex+')">獲取途徑</button></div></div>';
+        const html='<div class="v132-reward-modal-inner v17346-shop-preview-modal item-presentation-frame" data-presentation-mode="shop-preview" data-rarity="'+escapeHtml(item.rarityKey)+'"><h3>'+window.FourSymbolsItemSlot.name(item.name,item)+'</h3><div class="item-presentation-scroll" data-scroll-owner="y"><div class="v17346-shop-preview-art">'+window.FourSymbolsItemSlot.art(item.icon,item)+'</div><div class="v17346-shop-preview-info"><span>'+escapeHtml(SLOT_META[item.type].label)+'</span><strong>'+escapeHtml(statLine(item))+'</strong></div><div class="v17346-shop-preview-price">'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</div>'+(item.reforgeSlots?'<div class="v17346-shop-preview-reforge">[可冶煉]</div>':'')+'</div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button><button type="button" onclick="v17346ShowShopOfferAcquisition('+safeIndex+')">獲取途徑</button></div></div>';
         window.v132ShowRewardModal(html);
     };
     function renderEquipmentShop(){
@@ -1190,7 +1171,7 @@
             const rarity=RARITY_BY_KEY[item.rarityKey];
             const sold=state.soldOfferIds.includes(item.offerId);
             const canBuy=!sold&&currentGold>=rarity.shopPrice&&typeof window.v132CanAddItemToInventory==="function"&&window.v132CanAddItemToInventory(item,1);
-            return '<article class="v17345-equipment-card v17346-shop-card '+(sold?'purchased':canBuy?'is-affordable':'is-unaffordable')+'" data-offer-id="'+escapeHtml(item.offerId)+'" data-rarity="'+escapeHtml(item.rarityKey)+'" role="button" tabindex="0" aria-label="預覽 '+escapeHtml(item.name)+'" onclick="v17346PreviewEquipmentShopOffer('+index+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();v17346PreviewEquipmentShopOffer('+index+')}"><div class="v17345-equipment-icon v17346-gear-art">'+item.icon+'</div><b class="v17346-shop-name">'+escapeHtml(item.name)+'</b><span class="v17346-shop-slot">'+escapeHtml(SLOT_META[item.type].label)+'</span><span class="v17346-stat">'+escapeHtml(statLine(item))+'</span>'+(item.reforgeSlots?'<span class="v17346-reforge-mini">[可冶煉]</span>':'')+'<button class="v17346-shop-buy" type="button" '+(canBuy?'onclick="event.stopPropagation();v17346BuyEquipmentShopOffer('+index+',\''+escapeHtml(item.offerId)+'\')"':'disabled aria-disabled="true"')+'>'+(sold?'已購買':rarity.shopPrice.toLocaleString("zh-TW")+' 金幣')+'</button></article>';
+            return '<article class="v17345-equipment-card v17346-shop-card '+(sold?'purchased':canBuy?'is-affordable':'is-unaffordable')+'" data-offer-id="'+escapeHtml(item.offerId)+'" data-rarity="'+escapeHtml(item.rarityKey)+'" role="button" tabindex="0" aria-label="預覽 '+escapeHtml(item.name)+'" onclick="v17346PreviewEquipmentShopOffer('+index+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();v17346PreviewEquipmentShopOffer('+index+')}"><div class="v17345-equipment-icon v17346-gear-art">'+window.FourSymbolsItemSlot.art(item.icon,item)+'</div><b class="v17346-shop-name">'+window.FourSymbolsItemSlot.name(item.name,item)+'</b><span class="v17346-shop-slot">'+escapeHtml(SLOT_META[item.type].label)+'</span><span class="v17346-stat">'+escapeHtml(statLine(item))+'</span>'+(item.reforgeSlots?'<span class="v17346-reforge-mini">[可冶煉]</span>':'')+'<button class="v17346-shop-buy" type="button" '+(canBuy?'onclick="event.stopPropagation();v17346BuyEquipmentShopOffer('+index+',\''+escapeHtml(item.offerId)+'\')"':'disabled aria-disabled="true"')+'>'+(sold?'已購買':rarity.shopPrice.toLocaleString("zh-TW")+' 金幣')+'</button></article>';
         }).join("")+'</div><div class="v17345-equipment-refresh"><div><b>今日刷新 '+state.refreshCount+' / 10</b><span>前5次免費；第6～10次尚未開放。</span></div><button type="button" '+(freeRemaining>0?'onclick="v17345RefreshEquipmentShop()"':'disabled')+'>'+(freeRemaining>0?'免費刷新（剩'+freeRemaining+'次）':'免費刷新已用完')+'</button></div></div>';
     }
     function replaceEquipmentShop(){

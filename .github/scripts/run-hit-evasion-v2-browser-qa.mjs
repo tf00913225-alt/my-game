@@ -197,13 +197,13 @@ try{
     assert.match(evidence.detail,/5%～99%/);
     assert.deepEqual(evidence.legacyArmor.stats,{defensePoints:25,agility:5});
     assert.deepEqual(evidence.set.defense,[25,30,25],"same-role three pieces add5 Defense Points, two pieces remove the bonus");
-    const setStats={blade:{attack:30},fan:{intelligence:30},heavyArmor:{defensePoints:25,agility:5},robe:{defensePoints:25,agility:5},boots:{attack:20,defensePoints:10},shoes:{intelligence:20,defensePoints:10},helm:{attack:25,vitality:5},crown:{intelligence:25,vitality:5},wristguard:{attack:25},focus:{intelligence:25}};
+    const setStats={blade:{attack:30},fan:{intelligence:30},heavyArmor:{defensePoints:25,agility:5},robe:{defensePoints:25,agility:5},boots:{attack:20,defensePoints:10},shoes:{intelligence:20,defensePoints:10},helm:{attack:25,vitality:5},crown:{intelligence:25,vitality:5},wristguard:{attack:30},focus:{intelligence:30}};
     assert.equal(evidence.currentSetPieces.length,40);
     for(const piece of evidence.currentSetPieces){assert.deepEqual(piece.stats,setStats[piece.id.split("_")[1]]);assert.equal(piece.level,20);}
     assert.equal(evidence.currentSetBonuses.length,8);
     for(const row of evidence.currentSetBonuses){
         assert.equal(row.points.defensePoints,40);assert.equal(row.points.agility,10);assert.equal(row.points.vitality,10);assert.equal(row.points.energy,5);
-        assert.equal(row.points[row.variant==="attack"?"attack":"intelligence"],105);assert.equal(row.points[row.variant==="attack"?"intelligence":"attack"],5);
+        assert.equal(row.points[row.variant==="attack"?"attack":"intelligence"],110);assert.equal(row.points[row.variant==="attack"?"intelligence":"attack"],5);
         assert.equal(row.points.evasion,0);assert.equal(row.skill,5);assert.equal(row.normal,0);assert.equal(row.other,0);
     }
     assert.equal(evidence.migrated.stats.accuracy,3);assert.deepEqual(evidence.repeated,evidence.migrated);

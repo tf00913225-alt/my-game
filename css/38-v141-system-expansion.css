@@ -126,7 +126,6 @@
     place-items:center;
     padding:3px;
     overflow:hidden;
-    border-radius:8px;
     box-sizing:border-box;
 }
 #game-ui #inventoryPage .v169-item-art.v169-equipment-art > img{
@@ -154,7 +153,7 @@
     border:0;
     border-radius:0;
     box-shadow:none;
-    background:var(--equipment-rarity-fill,transparent)!important;
+    background:transparent;
     animation:none;
 }
 
@@ -654,9 +653,9 @@
 :is(#game-stage,#game-ui) .shop-potion-stock{font-size:10px;}
 :is(#game-stage,#game-ui) .shop-potion-name{min-height:20px;font-size:13px;line-height:16px;}
 :is(#game-stage,#game-ui) .shop-potion-effect{margin:1px 0 4px;font-size:11px;line-height:14px;}
-:is(#game-stage,#game-ui) .shop-potion-purchase-row{grid-template-columns:auto 52px minmax(0,1fr);gap:4px;}
+
 :is(#game-stage,#game-ui) .shop-potion-quantity{height:31px;min-height:31px;padding:3px;font-size:13px;}
-:is(#game-stage,#game-ui) .shop-potion-purchase-row .shop-potion-buy{min-height:31px;padding:3px 4px;font-size:12px;}
+
 
 /* ----- Daily dungeon cover scaffold + in-dungeon navigation ----- */
 #game-stage #dungeonPage{

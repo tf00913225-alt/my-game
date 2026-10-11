@@ -16,7 +16,7 @@ assert.match(html,/id="inventoryGridScroll" data-scroll-owner="y"/);
 assert.match(core,/inventory-classic-shell:before/);
 assert.match(core,/inventory-title-plate/);
 assert.match(core,/clip-path:polygon/);
-assert.match(core,/rarity-myriad/);
+assert.match(read("css/49-v169-rpg-ui.css"),/item-slot\[data-item-rarity="four-symbol"\]/);
 assert.match(core,/inventory-item-classic\.is-selected/);
 assert.match(core,/inventorySlotShine/);
 assert.match(core,/aspect-ratio:1(?:;|;min-width)/);

@@ -2597,8 +2597,8 @@
         {key:"shoes",slot:"shoes",name:"履",role:"magic",stats:{intelligence:20,defensePoints:10}},
         {key:"helm",slot:"head",name:"盔",role:"attack",stats:{attack:25,vitality:5}},
         {key:"crown",slot:"head",name:"冠",role:"magic",stats:{intelligence:25,vitality:5}},
-        {key:"wristguard",slot:"shoulder",name:"護腕",role:"attack",stats:{attack:25}},
-        {key:"focus",slot:"shoulder",name:"法環",role:"magic",stats:{intelligence:25}}
+        {key:"wristguard",slot:"shoulder",name:"護腕",role:"attack",stats:{attack:30}},
+        {key:"focus",slot:"shoulder",name:"法環",role:"magic",stats:{intelligence:30}}
     ];
 
     const EQUIPMENT_SETS=[
@@ -2617,6 +2617,9 @@
         item.levelRequirement=20;
         item.requiredElement=set.element;
         item.setVariant=piece.role;
+        item.rarityKey="pink";
+        item.quality="pink";
+        item.tierKey="pink";
         return item;
     }
     window.v132NormalizeEquipmentSetItem=normalizeEquipmentSetItem;
@@ -2630,7 +2633,8 @@
                 icon:equipmentSetIcon(set.id,piece.key),
                 type:piece.slot,
                 setId:set.id,
-                tierKey:"orange",
+                rarityKey:"pink",
+                tierKey:"pink",
                 levelRequirement:20,
                 price:0,
                 equipmentCombatPercentUnitVersion:2,
@@ -3550,8 +3554,8 @@
                 '<button type="button" class="v132-preview-item" data-item-id="'+escapeHtml(p.id)+'" '+
                 'aria-label="查看'+escapeHtml(p.name)+'詳細資料" '+
                 'onclick="v132OpenPreviewEquipmentDetail(this.dataset.itemId)">'+
-                '<span class="v132-preview-icon">'+p.icon+'</span>'+
-                '<span class="v132-preview-item-name">'+escapeHtml(p.name)+'</span>'+
+                '<span class="v132-preview-icon">'+window.FourSymbolsItemSlot.art(p.icon,p)+'</span>'+
+                '<span class="v132-preview-item-name">'+window.FourSymbolsItemSlot.name(p.name,p)+'</span>'+
                 '<b>'+formatPreviewProbability(chance)+'</b>'+
                 '</button>'
             ).join("");
@@ -3591,7 +3595,7 @@
         modal.classList.add("v132-ticket-preview-detail");
 
         const title=document.getElementById("itemModalName");
-        if(title){ title.textContent=item.name; }
+        if(title){ title.innerHTML=window.FourSymbolsItemSlot.name(item.name,item); }
 
         [
             document.getElementById("itemEquipButton"),
@@ -8105,6 +8109,7 @@
                 box.className="inventory-item inventory-item-classic "+(item?"has-item":"empty");
                 if(item){
                     const rarity=typeof getInventoryRarityKey==="function"?getInventoryRarityKey(item):"white";
+                    window.FourSymbolsItemSlot.apply(box,item);
                     box.classList.add("rarity-"+rarity);
                     box.dataset.rarity=rarity;
                 }
@@ -8114,7 +8119,7 @@
                     box.innerHTML=
                         '<div class="inventory-icon">'+(item.icon||"◆")+'</div>'+
                         '<div class="inventory-count">'+((Number(item.count)||0)>1?"×"+item.count:"")+'</div>';
-                    box.querySelectorAll(".v169-item-art").forEach(art=>art.classList.add("inventory-backpack-rarity-neutral"));
+                    window.FourSymbolsItemSlot.neutralizeArt(box);
                     const realIndex=inventoryItems.indexOf(item);
                     box.onclick=()=>{
                         document.querySelectorAll("#inventoryGrid .inventory-item-classic.is-selected").forEach(selected=>selected.classList.remove("is-selected"));
@@ -8285,7 +8290,7 @@
             const result=originalOpenItemModal.apply(this,arguments);
             const item=inventorySlots[slotIndex];
             const icon=document.getElementById("itemModalIcon");
-            if(icon&&item){ icon.innerHTML=item.icon||"◆"; }
+            if(icon&&item){ icon.innerHTML=window.FourSymbolsItemSlot.art(item.icon,item); }
             appendReforgeStatsToModal(item);
             syncDecomposeButton(item,slotIndex);
             syncInventoryPotionUseButton(item,slotIndex);
@@ -9474,10 +9479,10 @@
     function renderForgePicker(label,entries,selected,handler){
         const current=entries.find(entry=>entry.value===selected)||entries[0];
         if(!current){ return ""; }
-        return '<details class="v141-forge-picker"><summary><span>'+escapeHtml(label)+'</span><b>'+escapeHtml(current.label)+'</b><i aria-hidden="true">▾</i></summary>'+
+        return '<details class="v141-forge-picker"><summary><span>'+escapeHtml(label)+'</span><b>'+(current.item?window.FourSymbolsItemSlot.name(current.label,current.item):escapeHtml(current.label))+'</b><i aria-hidden="true">▾</i></summary>'+
             '<div class="v141-forge-options" role="group" aria-label="'+escapeHtml(label)+'">'+entries.map(entry=>
                 '<button type="button" class="v141-forge-option'+(entry.value===selected?' selected':'')+'" aria-pressed="'+(entry.value===selected)+'" data-forge-value="'+escapeHtml(entry.value)+'" onclick="'+handler+'(this.dataset.forgeValue)">'+
-                '<span>'+escapeHtml(entry.label)+'</span><b aria-hidden="true">'+(entry.value===selected?'✓':'')+'</b></button>'
+                '<span>'+(entry.item?window.FourSymbolsItemSlot.name(entry.label,entry.item):escapeHtml(entry.label))+'</span><b aria-hidden="true">'+(entry.value===selected?'✓':'')+'</b></button>'
             ).join('')+'</div></details>';
     }
     function renderSocketTab(){
@@ -9493,7 +9498,7 @@
         const available=nextSocketIndex(item)>=0;
         const local=canUseLocalSockets();
         return '<div class="v141-synthesis-card v141-socket-card">'+
-            renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］'})),synthesisState.socketUid,'v141SelectSocketItem')+
+            renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］',item:entry.item})),synthesisState.socketUid,'v141SelectSocketItem')+
             '<div class="v141-socket-list" aria-label="鑲嵌孔">'+Array.from({length:capacity},(_,index)=>{
                 const id=sockets[index];
                 const gem=typeof id==="string"&&Object.prototype.hasOwnProperty.call(defs,id)?defs[id]:null;
@@ -9506,14 +9511,7 @@
     }
 
     function inferTier(item){
-        const declared=normalizeTierKey(item&&item.tierKey);
-        if(TIER_META[declared]){ return declared; }
-        if(item&&item.setId){ return "orange"; }
-        const total=Object.values(item&&item.stats||{}).reduce((sum,value)=>sum+Math.abs(Number(value)||0),0);
-        if(total>=18){ return "orange"; }
-        if(total>=10){ return "purple"; }
-        if(total>=5){ return "blue"; }
-        return "white";
+        return getEquipmentRarityKey(item);
     }
 
     function rollUniform(min,max){ return min+Math.floor(Math.random()*(max-min+1)); }
@@ -9600,7 +9598,7 @@
             const reason=item?canActuallyReforge(item,true):synthesisState.reforgeUid?"裝備已失效或 UID 重複，請重新選擇裝備。":"沒有可冶煉的裝備。";
             return '<div class="v141-synthesis-empty">'+escapeHtml(reason)+
                 '<small>只有具備至少 1 個冶煉槽、且未鎖定的裝備會出現在這裡。</small>'+
-                renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］'})),synthesisState.reforgeUid,'v141SelectReforgeItem')+
+                renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］',item:entry.item})),synthesisState.reforgeUid,'v141SelectReforgeItem')+
                 (synthesisState.pendingReforge?'<button type="button" onclick="v141ResolveReforge(false)">保留原效果</button>':'')+'</div>';
         }
         const slotCount=reforgeSlotCount(item);
@@ -9634,8 +9632,8 @@
                 '<span>'+(selected?'🔒':'◇')+'</span><b>槽 '+(index+1)+' '+(affix?escapeHtml(STAT_LABEL[affix.stat]||affix.stat)+' +'+affix.value:'空槽')+'</b><small>'+(affix?(selected?'已鎖定':'點擊鎖定'):'下次冶煉抽取')+'</small></button>';
         }).join('');
         return '<div class="v141-synthesis-card v17358-reforge-card">'+
-            renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］'})),synthesisState.reforgeUid,'v141SelectReforgeItem')+
-            '<section class="v141-reforge-current"><b>'+escapeHtml(item.name)+'</b><small>冶煉槽 '+slotCount+' 格・可不限次數重洗</small><div><em>原始詞條</em>'+statsHtml(item.stats)+'</div><div><em>目前冶煉</em>'+affixesHtml(reforgeModel.slots(item))+'</div></section>'+
+            renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］',item:entry.item})),synthesisState.reforgeUid,'v141SelectReforgeItem')+
+            '<section class="v141-reforge-current"><b>'+window.FourSymbolsItemSlot.name(item.name,item)+'</b><small>冶煉槽 '+slotCount+' 格・可不限次數重洗</small><div><em>原始詞條</em>'+statsHtml(item.stats)+'</div><div><em>目前冶煉</em>'+affixesHtml(reforgeModel.slots(item))+'</div></section>'+
             '<section class="v17358-reforge-material"><div class="v17358-section-title"><b>選擇冶煉材料階級</b><span>裝備品質不限制材料；材料階級只決定本次數值範圍。</span></div><div class="v17358-reforge-tiers">'+tierButtons+'</div></section>'+
             '<section class="v17358-reforge-lock-panel"><div class="v17358-section-title"><b>鎖定詞條</b><span>最多鎖 2 條，且至少保留 1 個槽位重新冶煉。</span></div><div class="v17358-reforge-lock-list">'+lockHtml+'</div><small>目前鎖定 '+locks.length+' / '+maxLocks+' 條</small></section>'+
             '<div class="v141-material-lines v17358-reforge-cost">'+
@@ -9668,10 +9666,9 @@
         const canonical=[content.talismans,content.ores,content.blueprints,content.tickets,content.equipmentSetItems].filter(Array.isArray).flat().find(item=>item&&item.id===value);
         const item=canonical||(inventoryItems||[]).find(candidate=>candidate&&(candidate.id===value||candidate.v141Uid===value))||allEquipment().find(candidate=>candidate.v141Uid===value);
         if(item&&item.assetPath){
-            const rarity=escapeHtml(normalizeTierKey(item.rarityKey||item.quality||item.tierKey||"white"));
-            return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarity+'"><img src="'+escapeHtml(item.assetPath)+'" alt="" draggable="false" decoding="async"></span>';
+            return window.FourSymbolsItemSlot.art('<span class="v169-item-art v169-equipment-art"><img src="'+escapeHtml(item.assetPath)+'" alt="" draggable="false" decoding="async"></span>',item);
         }
-        return item&&item.icon?item.icon:svgIcon("物","#caa461");
+        return item&&item.icon?(isEquipmentInventoryType(item.type)?window.FourSymbolsItemSlot.art(item.icon,item):item.icon):svgIcon("物","#caa461");
     }
 
     function renderItemPicker(label,entries,selected,handler){
@@ -9987,7 +9984,7 @@
         synthesisState.pendingReforge=null;
         if(item){ normalizeReforgeLocks(item); }
         updateUI(); renderSynthesis();
-        showSynthesisResult(applyNew?"已套用新冶煉效果":"已保留原冶煉效果",applyNew&&item?'<div class="v141-result-item"><b>'+escapeHtml(item.name)+'</b>'+affixesHtml(reforgeModel.slots(item))+'</div>':'<p>本次材料與金幣已消耗，原有效果維持不變。</p>');
+        showSynthesisResult(applyNew?"已套用新冶煉效果":"已保留原冶煉效果",applyNew&&item?'<div class="v141-result-item"><b>'+window.FourSymbolsItemSlot.name(item.name,item)+'</b>'+affixesHtml(reforgeModel.slots(item))+'</div>':'<p>本次材料與金幣已消耗，原有效果維持不變。</p>');
         return true;
     };
 

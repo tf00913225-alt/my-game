@@ -128,47 +128,13 @@
 #game-stage .v141-abyss-map > .v143-abyss-dialogue b{max-width:100% !important;font-size:17px !important;line-height:1.45 !important;}
 #game-stage .v141-abyss-map > .v143-abyss-dialogue span{font-size:15px !important;line-height:1.4 !important;animation:none !important;}
 
-/* Item illustrations share one safe square and rarity is identified by border glow. */
-.v169-item-art{
-    position:relative;
-    isolation:isolate;
-    display:block;
-    width:100%;
-    height:100%;
-    min-width:0;
-    min-height:0;
-    padding:3px;
-    overflow:hidden;
-    border:2px solid rgba(215,190,141,.62);
-    border-radius:9px;
-    background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.08),rgba(3,5,10,.92));
-    box-sizing:border-box;
-}
-.v169-item-art::before{
-    position:absolute;
-    inset:0;
-    z-index:0;
-    display:grid;
-    place-items:center;
-    color:#d8bd84;
-    font-size:clamp(18px,42%,32px);
-    font-weight:900;
-    line-height:1;
-    text-shadow:0 0 8px rgba(226,176,80,.58);
-}
-.v169-ticket-art::before{content:"券";}
-.v169-talisman-art::before{content:"符";}
-.v169-blueprint-art::before{content:"圖";}
-.v169-item-art > img{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;object-position:center;}
-.v169-item-art > img[hidden]{display:none !important;}
-
 .v169-talisman-art.v169-rarity-white,.v169-blueprint-art.v169-rarity-white,.v169-talisman-art.v169-rarity-low,.v169-blueprint-art.v169-rarity-low{border-color:#D8D8D8;box-shadow:0 0 5px rgba(216,216,216,.7),inset 0 0 6px rgba(216,216,216,.24);}
 .v169-talisman-art.v169-rarity-blue,.v169-blueprint-art.v169-rarity-blue,.v169-talisman-art.v169-rarity-mid,.v169-blueprint-art.v169-rarity-mid{border-color:#42A5FF;box-shadow:0 0 5px #42A5FF,0 0 12px rgba(66,165,255,.72),inset 0 0 7px rgba(66,165,255,.38);}
 .v169-talisman-art.v169-rarity-purple,.v169-blueprint-art.v169-rarity-purple,.v169-talisman-art.v169-rarity-high,.v169-blueprint-art.v169-rarity-high{border-color:#B05CFF;box-shadow:0 0 5px #B05CFF,0 0 13px rgba(176,92,255,.76),inset 0 0 7px rgba(176,92,255,.4);}
 .v169-talisman-art.v169-rarity-orange,.v169-blueprint-art.v169-rarity-orange,.v169-talisman-art.v169-rarity-perfect,.v169-blueprint-art.v169-rarity-perfect{border-color:#FF9F38;box-shadow:0 0 6px #FF9F38,0 0 14px rgba(255,159,56,.8),inset 0 0 8px rgba(255,159,56,.42);}
 .v169-talisman-art.v169-rarity-pink,.v169-blueprint-art.v169-rarity-pink{border-color:#FF4FA7;box-shadow:0 0 7px #FF4FA7,0 0 16px rgba(255,79,167,.88),inset 0 0 9px rgba(255,79,167,.48);}
 .v169-talisman-art.v169-rarity-four-symbol,.v169-blueprint-art.v169-rarity-four-symbol{border:2px solid transparent;background:linear-gradient(#090b0f,#090b0f) padding-box,conic-gradient(from 0deg,#42A5FF 0 25%,#47D6A3 25% 50%,#C89B45 50% 75%,#FF5A36 75% 100%) border-box;box-shadow:0 0 8px rgba(255,90,54,.28),0 0 12px rgba(66,165,255,.28),0 0 14px rgba(71,214,163,.24);animation:v169FourSymbolRarityBreath 2.8s ease-in-out infinite;}
-@keyframes v169FourSymbolRarityBreath{0%,100%{filter:brightness(.96)}50%{filter:brightness(1.14)}}
+
 .v132-ticket-icon .v169-item-art{width:100%;height:100%;}
 .v141-result-item > .v169-item-art{width:74px;height:74px;}
 .v141-reward-toast .v141-reward-item{display:inline-flex;align-items:center;gap:5px;}
@@ -176,12 +142,12 @@
 .v141-reward-toast .v141-reward-item-icon .v169-item-art{width:100%;height:100%;padding:1px;border-width:1px;border-radius:6px;}
 
 /* V173.62 — all tiered item art, including ore/materials, uses the same formal rarity frame. */
-.v169-item-art:not(.inventory-backpack-rarity-neutral).v169-rarity-white,.v169-item-art:not(.inventory-backpack-rarity-neutral).v169-rarity-low{border-color:#D8D8D8;box-shadow:0 0 5px rgba(216,216,216,.7),inset 0 0 6px rgba(216,216,216,.24);}
-.v169-item-art:not(.inventory-backpack-rarity-neutral).v169-rarity-blue,.v169-item-art:not(.inventory-backpack-rarity-neutral).v169-rarity-mid{border-color:#42A5FF;box-shadow:0 0 5px #42A5FF,0 0 12px rgba(66,165,255,.72),inset 0 0 7px rgba(66,165,255,.38);}
-.v169-item-art:not(.inventory-backpack-rarity-neutral).v169-rarity-purple,.v169-item-art:not(.inventory-backpack-rarity-neutral).v169-rarity-high{border-color:#B05CFF;box-shadow:0 0 5px #B05CFF,0 0 13px rgba(176,92,255,.76),inset 0 0 7px rgba(176,92,255,.4);}
-.v169-item-art:not(.inventory-backpack-rarity-neutral).v169-rarity-orange,.v169-item-art:not(.inventory-backpack-rarity-neutral).v169-rarity-perfect{border-color:#FF9F38;box-shadow:0 0 6px #FF9F38,0 0 14px rgba(255,159,56,.8),inset 0 0 8px rgba(255,159,56,.42);}
-.v169-item-art:not(.inventory-backpack-rarity-neutral).v169-rarity-pink{border-color:#FF4FA7;box-shadow:0 0 7px #FF4FA7,0 0 16px rgba(255,79,167,.88),inset 0 0 9px rgba(255,79,167,.48);}
-.v169-item-art:not(.inventory-backpack-rarity-neutral).v169-rarity-four-symbol{border:2px solid transparent;background:var(--equipment-rarity-fill,linear-gradient(transparent,transparent)) padding-box,linear-gradient(#090b0f,#090b0f) padding-box,conic-gradient(from 0deg,#42A5FF 0 25%,#47D6A3 25% 50%,#C89B45 50% 75%,#FF5A36 75% 100%) border-box;box-shadow:0 0 8px rgba(255,90,54,.28),0 0 12px rgba(66,165,255,.28),0 0 14px rgba(71,214,163,.24);animation:v169FourSymbolRarityBreath 2.8s ease-in-out infinite;}
+.v169-item-art:not(.inventory-backpack-rarity-neutral):not(.item-slot).v169-rarity-white,.v169-item-art:not(.inventory-backpack-rarity-neutral):not(.item-slot).v169-rarity-low{border-color:#D8D8D8;box-shadow:0 0 5px rgba(216,216,216,.7),inset 0 0 6px rgba(216,216,216,.24);}
+.v169-item-art:not(.inventory-backpack-rarity-neutral):not(.item-slot).v169-rarity-blue,.v169-item-art:not(.inventory-backpack-rarity-neutral):not(.item-slot).v169-rarity-mid{border-color:#42A5FF;box-shadow:0 0 5px #42A5FF,0 0 12px rgba(66,165,255,.72),inset 0 0 7px rgba(66,165,255,.38);}
+.v169-item-art:not(.inventory-backpack-rarity-neutral):not(.item-slot).v169-rarity-purple,.v169-item-art:not(.inventory-backpack-rarity-neutral):not(.item-slot).v169-rarity-high{border-color:#B05CFF;box-shadow:0 0 5px #B05CFF,0 0 13px rgba(176,92,255,.76),inset 0 0 7px rgba(176,92,255,.4);}
+.v169-item-art:not(.inventory-backpack-rarity-neutral):not(.item-slot).v169-rarity-orange,.v169-item-art:not(.inventory-backpack-rarity-neutral):not(.item-slot).v169-rarity-perfect{border-color:#FF9F38;box-shadow:0 0 6px #FF9F38,0 0 14px rgba(255,159,56,.8),inset 0 0 8px rgba(255,159,56,.42);}
+.v169-item-art:not(.inventory-backpack-rarity-neutral):not(.item-slot).v169-rarity-pink{border-color:#FF4FA7;box-shadow:0 0 7px #FF4FA7,0 0 16px rgba(255,79,167,.88),inset 0 0 9px rgba(255,79,167,.48);}
+.v169-item-art:not(.inventory-backpack-rarity-neutral):not(.item-slot).v169-rarity-four-symbol{border:2px solid transparent;background:var(--equipment-rarity-fill,linear-gradient(transparent,transparent)) padding-box,linear-gradient(#090b0f,#090b0f) padding-box,conic-gradient(from 0deg,#42A5FF 0 25%,#47D6A3 25% 50%,#C89B45 50% 75%,#FF5A36 75% 100%) border-box;box-shadow:0 0 8px rgba(255,90,54,.28),0 0 12px rgba(66,165,255,.28),0 0 14px rgba(71,214,163,.24);animation:v169FourSymbolRarityBreath 2.8s ease-in-out infinite;}
 
 /* =====================================================
    Two-tier Void Five Emperors — formal Abyss UI owner

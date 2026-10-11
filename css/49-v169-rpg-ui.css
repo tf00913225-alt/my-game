@@ -1,3 +1,42 @@
+/* Item illustrations share one safe square and rarity is identified by border glow. */
+.v169-item-art{
+    position:relative;
+    isolation:isolate;
+    display:block;
+    width:100%;
+    height:100%;
+    min-width:0;
+    min-height:0;
+    padding:3px;
+    overflow:hidden;
+    border:2px solid rgba(215,190,141,.62);
+    border-radius:9px;
+    background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.08),rgba(3,5,10,.92));
+    box-sizing:border-box;
+}
+.v169-item-art::before{
+    position:absolute;
+    inset:0;
+    z-index:0;
+    display:grid;
+    place-items:center;
+    color:#d8bd84;
+    font-size:clamp(18px,42%,32px);
+    font-weight:900;
+    line-height:1;
+    text-shadow:0 0 8px rgba(226,176,80,.58);
+}
+.v169-ticket-art::before{content:"券";}
+.v169-talisman-art::before{content:"符";}
+.v169-blueprint-art::before{content:"圖";}
+.v169-item-art > img{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;object-position:center;}
+.v169-item-art > img[hidden]{display:none !important;}
+
+/* ItemSlot is the sole equipment frame/background consumer of shared visual tokens. */
+.item-slot{border:1px solid var(--slot-rarity);border-radius:0;background:var(--equipment-rarity-fill) padding-box,linear-gradient(#090807,#090807) padding-box,var(--equipment-rarity-frame) border-box;box-shadow:inset 0 0 8px color-mix(in srgb,var(--equipment-name-color) 20%,transparent);}
+.item-slot[data-item-rarity="four-symbol"]{animation:v169FourSymbolRarityBreath 2.8s ease-in-out infinite;}
+@keyframes v169FourSymbolRarityBreath{0%,100%{filter:brightness(.96)}50%{filter:brightness(1.14)}}
+
 /* =====================================================
    V169 — RPG dialogs, fixed character tabs and UI fixes
 ===================================================== */
@@ -1113,7 +1152,7 @@
 }
 #game-ui #homeFeatureModal.v131-shop-open .shop-potion-card{
     display:grid !important;
-    grid-template-rows:18px 38px 36px !important;
+    grid-template-rows:18px 38px 42px !important;
     row-gap:3px !important;
     align-content:space-between !important;
     width:100% !important;
@@ -1224,41 +1263,41 @@
     white-space:nowrap !important;
 }
 #game-ui #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
-    display:grid !important;
-    grid-template-columns:24px minmax(56px,1fr) 54px !important;
-    grid-template-rows:36px !important;
-    align-items:center !important;
-    gap:3px !important;
-    width:100% !important;
-    min-width:0 !important;
-    min-height:0 !important;
-    height:36px !important;
-    margin:0 !important;
-    overflow:hidden !important;
+    display:grid;
+    grid-template-columns:48px minmax(56px,1fr) 54px;
+    grid-template-rows:42px;
+    align-items:center;
+    gap:3px;
+    width:100%;
+    min-width:0;
+    min-height:0;
+    height:42px;
+    margin:0;
+    overflow:hidden;
 }
 #game-ui #homeFeatureModal.v131-shop-open .shop-potion-purchase-row label{
     display:none !important;
 }
 #game-ui #homeFeatureModal.v131-shop-open .shop-potion-quantity{
-    grid-column:1 !important;
-    grid-row:1 !important;
-    width:24px !important;
-    min-width:24px !important;
-    max-width:24px !important;
-    inline-size:24px !important;
-    min-inline-size:24px !important;
-    max-inline-size:24px !important;
-    height:32px !important;
-    min-height:32px !important;
-    margin:0 !important;
-    padding:0 !important;
-    box-sizing:border-box !important;
-    -webkit-appearance:textfield !important;
-    appearance:textfield !important;
-    font-family:Arial,sans-serif !important;
-    font-size:13px !important;
-    line-height:32px !important;
-    text-align:center !important;
+    grid-column:1;
+    grid-row:1;
+    width:48px;
+    min-width:48px;
+    max-width:48px;
+    inline-size:48px;
+    min-inline-size:48px;
+    max-inline-size:48px;
+    height:38px;
+    min-height:38px;
+    margin:0;
+    padding:0 4px;
+    box-sizing:border-box;
+    -webkit-appearance:textfield;
+    appearance:textfield;
+    font-family:Arial,sans-serif;
+    font-size:13px;
+    line-height:38px;
+    text-align:center;
 }
 #game-ui #homeFeatureModal.v131-shop-open .shop-potion-quantity::-webkit-outer-spin-button,
 #game-ui #homeFeatureModal.v131-shop-open .shop-potion-quantity::-webkit-inner-spin-button{
@@ -1278,20 +1317,20 @@
     white-space:nowrap !important;
 }
 #game-ui #homeFeatureModal.v131-shop-open .shop-potion-purchase-row .shop-potion-buy{
-    grid-column:3 !important;
-    grid-row:1 !important;
-    width:54px !important;
-    min-width:54px !important;
-    height:36px !important;
-    min-height:36px !important;
-    margin:0 !important;
-    padding:0 4px !important;
-    font-size:15px !important;
-    line-height:1 !important;
-    border:1px solid #c2964d !important;
-    color:#2b1908 !important;
-    background:linear-gradient(180deg,#f1ce7a,#bd7d2d) !important;
-    font-weight:900 !important;
+    grid-column:3;
+    grid-row:1;
+    width:54px;
+    min-width:54px;
+    height:42px;
+    min-height:42px;
+    margin:0;
+    padding:0 4px;
+    font-size:15px;
+    line-height:1;
+    border:1px solid #c2964d;
+    color:#2b1908;
+    background:linear-gradient(180deg,#f1ce7a,#bd7d2d);
+    font-weight:900;
 }
 
 /* V173.49 — EXP POOL TAP / SCROLL STABILITY

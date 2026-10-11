@@ -41,8 +41,8 @@ assert.equal(ui({stats:{accuracy:1.5,evasion:10},reforgeStats:{accuracy:0.3,evas
 const setSource=fs.readFileSync("js/equipment-progression.js","utf8");
 const expansion=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
 const setConstants=expansion.slice(expansion.indexOf("    const EQUIPMENT_SET_PIECES="),expansion.indexOf("    const equipmentSetItemDefinitions="));
-const setOwner=setSource.slice(setSource.indexOf("    function addOrangeClass("),setSource.indexOf("    /*\n       First-character equipment"));
-const ctx={window:{},migrateLegacyEquipmentStats:migrateItem};
+const setOwner=setSource.slice(setSource.indexOf("    function applySetRule("),setSource.indexOf("    /*\n       First-character equipment"));
+const ctx={window:{FourSymbolsItemSlot:{art:icon=>icon}},migrateLegacyEquipmentStats:migrateItem};
 vm.runInNewContext(setConstants,ctx);
 ctx.window.v132GetContentDefinitions=()=>({equipmentSetItems:[...['setFire','setWater','setEarth','setWind'].flatMap(setId=>['heavyArmor','robe'].map(key=>({id:setId+'_'+key,setId})))]});
 const applySet=vm.runInNewContext(setOwner+";applySetRule",ctx);
