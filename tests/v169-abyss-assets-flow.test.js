@@ -33,7 +33,7 @@ test("talisman and blueprint borders follow formal white, blue, purple, orange r
     });
     assert.match(css,/v169-rarity-pink[^}]+border-color:#FF4FA7/);
     assert.match(css,/v169-rarity-four-symbol/);
-    assert.match(css,/\.v169-item-art > img\{[^}]*object-fit:contain/);
+    assert.match(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"),/\.v169-item-art > img\{[^}]*object-fit:contain/);
 });
 
 test("a persisted Abyss run pauses at a progress gate without resetting its floor",()=>{
