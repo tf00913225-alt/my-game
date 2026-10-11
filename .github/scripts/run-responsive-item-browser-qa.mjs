@@ -268,16 +268,52 @@ async function run(chrome,url,live){
   for(const v of DISPLAY_VIEWPORTS){
    await resize(v);await c.eval("closeItemModal();closeHomeFeature();showPage('home')");await settle();
    const home=await check('#homePage',v),nav=await check('#game-ui #bottomNav',v);
-   const visual=await c.eval(`(()=>{const home=homePage,s=getComputedStyle(home.querySelector('.home-bg-fixed-layer'));return {background:s.backgroundImage,scroll:home.scrollHeight-home.clientHeight,badge:home.querySelector('.home-version-badge').matches('#game-ui #homePage .home-version-badge')};})()`);
+   const visual=await c.eval(`(()=>{const home=homePage,s=getComputedStyle(home);return {background:s.backgroundImage,scroll:home.scrollHeight-home.clientHeight,scrollOwner:s.overflowY,oldBackground:!!home.querySelector('.home-bg-fixed-layer'),badge:home.querySelector('.home-version-badge').matches('#game-ui #homePage .home-version-badge')};})()`);
    assert.match(visual.background,/assets\/ui\/home-background-v17344\.png/);
    assert.doesNotMatch(visual.background,/home-background\.jpg/);
    assert.ok(visual.badge,'version badge lost browser owner');
-   if(v[0]===390||v[0]===412){assert.ok(visual.scroll<=1,'unexpected mobile home page scroll '+visual.scroll);await screenshot('migration-home-'+v.join('x'));}
+   // Readable resources may wrap with the installed font or a long value.
+   // Validate the browser scroll owner and every reachable control instead of
+   // requiring a fixed-height, zero-scroll composition.
+   assert.equal(visual.scrollOwner,'auto','home lost its browser scroll owner');
+   assert.equal(visual.oldBackground,false,'retired scrolling background layer returned');
+   const homeControls=[];
+   for(const selector of [...['角色','商店','休息','合成','任務','鍛造','成就','公告','離線經驗','系統','秘寶','元素匣'].map(label=>'.home-card[aria-label="'+label+'"]'),'#v146HomeRoster','.v-fixed-formation-entry','#adventureHomeEntry']){
+    await c.eval(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'nearest'})`);await settle();
+    const control=await measure(selector);
+    assert.notEqual(control.display,'none','home control hidden '+selector);
+    assert.ok(control.rect.width>0&&control.rect.height>0,'home control empty '+selector);
+    // A pulsing notification decoration can contribute to scrollWidth;
+    // the interactive frame itself must fit every actual clipping boundary.
+    for(const clip of [{left:0,top:0,right:v[0],bottom:v[1]},...control.clips]){
+     assert.ok(control.rect.left>=clip.left-1&&control.rect.top>=clip.top-1&&control.rect.right<=clip.right+1&&control.rect.bottom<=clip.bottom+1,'home control clipped '+selector);
+    }
+    const hit=await c.eval(`(()=>{const n=document.querySelector(${JSON.stringify(selector)}),r=n.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!h&&(h===n||n.contains(h));})()`);
+    assert.ok(hit,'home control covered '+selector);homeControls.push({selector,rect:control.rect,hit});
+   }
+   evidence.push({homeControls:true,viewport:v,visual,controls:homeControls});
+   await screenshot('migration-home-end-'+v.join('x'));
 
    const domain=await c.eval(`(()=>{const n=document.getElementById('homePage');const ancestors=[];for(let p=n;p;p=p.parentElement)ancestors.push(getComputedStyle(p).transform);return {parent:n.parentElement.id,ancestors,navParent:document.getElementById('bottomNav').parentElement.parentElement.id,resources:[...n.querySelectorAll('.home-hud-resources b,.v146-home-resource strong')].map(n=>parseFloat(getComputedStyle(n).fontSize))};})()`);
    assert.equal(domain.parent,'game-ui');assert.equal(domain.navParent,'game-ui');
    assert.ok(domain.ancestors.every(t=>t==='none'),'browser UI inherited a transform');
    assert.ok(domain.resources.every(size=>size>=13),'browser home text below reading minimum');
+   const resourceText=await c.eval(`(()=>{
+    const nodes=[homeHudGoldValue,homeHudExpValue],previous=nodes.map(n=>n.textContent);
+    try{
+     nodes[0].textContent='9,999,999';nodes[1].textContent='9,999,999,999';
+     return [...document.querySelectorAll('.home-hud-resources > span')].map(n=>{
+      const range=document.createRange();range.selectNodeContents(n);
+      return {box:n.getBoundingClientRect().toJSON(),text:range.getBoundingClientRect().toJSON(),overflow:n.scrollWidth-n.clientWidth,font:parseFloat(getComputedStyle(n).fontSize)};
+     });
+    }finally{nodes.forEach((n,i)=>n.textContent=previous[i]);}
+   })()`);
+   assert.equal(resourceText.length,2,'home resources missing');
+   for(const resource of resourceText){
+    assert.ok(resource.font>=13&&resource.overflow<=1,'home resource text shrunk or overflowed');
+    assert.ok(resource.text.left>=resource.box.left-1&&resource.text.right<=resource.box.right+1&&resource.text.top>=resource.box.top-1&&resource.text.bottom<=resource.box.bottom+1,'home resource glyphs escape their frame');
+   }
+   evidence.push({homeResourceText:true,viewport:v,resourceText});
    assert.ok(home.rect.bottom<=nav.rect.top+1,'navigation overlaps browser page');
    if(v[0]>=800)assert.ok(home.rect.width>700,'desktop remained a narrow stage projection');
    await c.eval("adventureHomeEntry.scrollIntoView({block:'nearest'})");await settle();
@@ -344,7 +380,7 @@ async function run(chrome,url,live){
    await c.eval("closeStatusHelp();closeHomeFeature();showPage('home')");
    const loaded=new Promise(resolve=>{const listener=event=>{const message=JSON.parse(String(event.data));if(message.method==='Page.loadEventFired'){c.ws.removeEventListener('message',listener);resolve();}};c.ws.addEventListener('message',listener);});
    await c.send('Page.reload',{ignoreCache:true});await loaded;await c.eval(PREPARE);await c.eval(INSTALL_MEASURE);await settle();
-   const reloaded=await c.eval("({background:getComputedStyle(document.querySelector('.home-bg-fixed-layer')).backgroundImage,roots:document.querySelectorAll('#game-ui').length})");
+   const reloaded=await c.eval("({background:getComputedStyle(homePage).backgroundImage,roots:document.querySelectorAll('#game-ui').length})");
    assert.match(reloaded.background,/home-background-v17344\.png/);assert.equal(reloaded.roots,1);
    await c.eval("openHomeFeature('character');switchCharacterTab('skill')");await settle();
    assert.ok(await c.eval("document.querySelector('.character-tab-row').getBoundingClientRect().bottom<=characterTabContent.getBoundingClientRect().top"),'reload character overlap');

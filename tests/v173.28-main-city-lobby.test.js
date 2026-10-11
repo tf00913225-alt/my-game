@@ -30,7 +30,7 @@ test("the HUD keeps only city identity, resources and DEV tools",()=>{
     assert.match(index,/id="homeHudGoldValue"/);
     assert.match(index,/id="homeHudExpValue"/);
     assert.doesNotMatch(index,/<h2>主城<\/h2>/);
-    assert.match(baseCss,/\.home-city-hud\{[\s\S]*grid-template-columns:auto minmax\(0,1fr\);[\s\S]*min-height:48px;[\s\S]*border:1px solid[\s\S]*background:/);
+    assert.match(baseCss,/\.home-city-hud\{[\s\S]*display:flex;[\s\S]*flex-wrap:wrap;[\s\S]*min-height:48px;[\s\S]*border:1px solid[\s\S]*background:/);
     assert.match(baseCss,/\.home-hud-identity\{[\s\S]*position:relative;[\s\S]*align-items:center;[\s\S]*align-self:stretch;[\s\S]*inset-inline-start:7px/);
     assert.doesNotMatch(baseCss,/\.home-hud-character-(?:list|row|avatar)/);
     assert.match(baseCss,/\.home-hud-resources\{[\s\S]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
