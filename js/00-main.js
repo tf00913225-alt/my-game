@@ -30313,6 +30313,7 @@ const FourSymbolsItemSlot=Object.freeze({
         element.setAttribute("style",this.tokens(item));
     },
     art(icon,item){
+        if(!isEquipmentInventoryType(item?.type)) return String(icon||"◆");
         return String(icon||"◆").replace(/<span\b([^>]*)>/g,(match,attributes)=>{
             if(!/class="[^"]*v169-item-art/.test(attributes)) return match;
             const clean=attributes.replace(/\sdata-item-rarity="[^"]*"/g,"").replace(/\sstyle="[^"]*--equipment-rarity-fill:[^"]*"/g,"");
