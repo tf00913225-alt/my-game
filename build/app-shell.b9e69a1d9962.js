@@ -30538,7 +30538,7 @@ const EQUIPMENT_RARITY_VISUALS=Object.freeze({
     purple:{color:"#B05CFF",fill:"rgba(176,92,255,.25)"},
     orange:{color:"#FF9F38",fill:"rgba(255,159,56,.25)"},
     pink:{color:"#FF4FA7",fill:"rgba(255,79,167,.25)"},
-    "four-symbol":{color:"#D8D8D8",fill:"conic-gradient(from 0deg,rgba(66,165,255,.25),rgba(71,214,163,.25),rgba(200,155,69,.25),rgba(255,90,54,.25),rgba(66,165,255,.25))",frame:"conic-gradient(from 0deg,#42A5FF,#47D6A3,#C89B45,#FF5A36,#42A5FF)"}
+    "four-symbol":{color:"#E5C06B",fill:"conic-gradient(from 0deg,rgba(66,165,255,.25),rgba(71,214,163,.25),rgba(200,155,69,.25),rgba(255,90,54,.25),rgba(66,165,255,.25))",frame:"conic-gradient(from 0deg,#42A5FF,#47D6A3,#C89B45,#FF5A36,#42A5FF)"}
 });
 function getEquipmentRarityKey(item){
     const aliases={low:"white",mid:"blue",high:"purple",perfect:"orange"};

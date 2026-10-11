@@ -71,3 +71,9 @@ console.log("V173.46 equipment progression specification checks passed");
 // V173.62: reforgeSlots are affix-slot capacity; attempts are unlimited.
 assert.match(source,/window\.FourSymbolsReforge\.slotCount\(item\)/);
 assert.doesNotMatch(source,/item\.reforgeUsed=Math\.min/);
+
+const rarityContext={window:{}};require("node:vm").runInNewContext(require("../.github/scripts/fixtures/item-slot-owner.cjs"),rarityContext);
+for(const [rarityKey,color] of Object.entries({white:"#D8D8D8",blue:"#42A5FF",purple:"#B05CFF",orange:"#FF9F38",pink:"#FF4FA7","four-symbol":"#E5C06B"})){
+ assert.equal(rarityContext.window.getEquipmentNameColor({rarityKey,setId:"setFire",name:"赤炎四象",icon:"orange.png"}),color,"name color must use explicit rarity only");
+}
+assert.equal(rarityContext.window.FourSymbolsItemSlot.name("補品",{type:"potion",rarityKey:"orange"}),"補品","non-equipment names retain their original presentation");
