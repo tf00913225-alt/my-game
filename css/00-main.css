@@ -599,19 +599,12 @@ button:disabled{
     box-sizing:border-box;overflow-y:auto;overflow-x:hidden;
     overscroll-behavior-y:contain;touch-action:pan-y;
     scrollbar-gutter:stable;
-}
-
-.home-bg-fixed-layer{
-    position:absolute;
-    inset:0;
-    z-index:0;
-
+    /* The scroll container paints its own background across the visible page.
+       A scrolling absolute child exposed black below its original height. */
     background-image:url(../assets/ui/home-background-v17344.png);
     background-size:cover;
     background-position:center center;
     background-repeat:no-repeat;
-
-    pointer-events:none;
 }
 
 #mapPage{
@@ -762,8 +755,8 @@ button:disabled{
 .home-city-hud{
     position:relative;
     z-index:3;
-    display:grid;
-    grid-template-columns:auto minmax(0,1fr);
+    display:flex;
+    flex-wrap:wrap;
     gap:8px;
     align-items:center;
     min-height:48px;
@@ -787,6 +780,7 @@ button:disabled{
 .home-hud-identity{
     position:relative;
     display:flex;
+    flex:0 1 auto;
     align-items:center;
     align-self:stretch;
     inset-inline-start:7px;
@@ -811,6 +805,7 @@ button:disabled{
 
 .home-hud-side{
     display:grid;
+    flex:1 1 auto;
     gap:3px;
     justify-items:stretch;
 }
@@ -823,6 +818,7 @@ button:disabled{
 
 .home-hud-resources > span{
     display:flex;
+    flex-wrap:wrap;
     align-items:baseline;
     justify-content:center;
     gap:3px;
@@ -836,15 +832,17 @@ button:disabled{
     font-size:13px;
     line-height:18px;
     box-shadow:inset 0 0 0 1px rgba(255,224,151,.05),0 2px 5px rgba(0,0,0,.3);
-    white-space:nowrap;
+    white-space:normal;
 }
 
 .home-hud-resources b{
     display:inline-block;
+    min-width:0;
     color:#ffe093;
     font-size:13px;
     font-variant-numeric:tabular-nums;
-    white-space:nowrap;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 /* V92 DEV shortcuts remain functional but deliberately recede from the lobby. */

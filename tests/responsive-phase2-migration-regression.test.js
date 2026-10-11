@@ -20,7 +20,8 @@ test('migrated IDs cannot regain stage-only presentation selectors, including in
 });
 test('the main-city owner has one canonical background and no old fallback',()=>{
  const css=read('css/00-main.css');
- assert.match(css,/\.home-bg-fixed-layer\{[^}]*background-image:url\(\.\.\/assets\/ui\/home-background-v17344\.png\)/);
+ assert.match(css,/#homePage\{[^}]*background-image:url\(\.\.\/assets\/ui\/home-background-v17344\.png\)/);
+ assert.doesNotMatch(read('index.html'),/class="home-bg-fixed-layer"/);
  assert.doesNotMatch(css,/home-background\.jpg/);
  assert.doesNotMatch(read('css/46-v154-dev-fixes.css'),/\.home-bg-fixed-layer/);
 });
