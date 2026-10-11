@@ -205,6 +205,13 @@ try{
  const idle=await page.evaluate(()=>{v142SkillAnimationDirector.dispose();return {noPlanes:!document.querySelector('.v143-hit-feedback-overlay,.v174-battle-hud-layer'),originalHudReturned:[...document.querySelectorAll('.battle-monster,.battle-player')].every(c=>!c.v174UnitHud||c.contains(c.v174UnitHud))};});
  assert.ok(idle.noPlanes&&idle.originalHudReturned);evidence.idle=idle;
  await page.screenshot({path:artifactDir+'/idle-original-hud.png'});
+ await cast('flameSlash');await page.waitForFunction(()=>__impactQaReady);
+ await page.evaluate(()=>window.addEventListener('pagehide',()=>{
+  sessionStorage.setItem('impact-qa-pagehide',JSON.stringify({remaining:v143SkillAnimationState.impactFlashes.size,hitRoot:!!document.querySelector('.v143-hit-feedback-overlay'),hudRoot:!!document.querySelector('.v174-battle-hud-layer')}));
+ },{once:true}));
+ await page.goto(url+'?impact-pagehide-qa');
+ evidence.pagehide=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('impact-qa-pagehide')));
+ assert.deepEqual(evidence.pagehide,{remaining:0,hitRoot:false,hudRoot:false},'actual browser navigation cleans before document disposal');
  assert.deepEqual(errors,[],'full-runtime page errors');
  fs.writeFileSync(artifactDir+'/evidence.json',JSON.stringify(evidence,null,2));
  console.log(JSON.stringify({result:'PASS',viewport:evidence.viewport,scenes:evidence.scenes.map(s=>s.label),exclusions:evidence.exclusions,lifecycle:evidence.lifecycle,artifactDir},null,2));

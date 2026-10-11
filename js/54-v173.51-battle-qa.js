@@ -273,7 +273,7 @@ window.FourSymbolsBattlePresentation=Object.freeze({
     clearHud:clearUnitHud
 });
 window.addEventListener("resize",syncHud,{passive:true});
-window.addEventListener("pagehide",()=>clearUnitHud());
+window.addEventListener("pagehide",()=>{ window.v143ClearImpactOverlays?.(); clearUnitHud(); });
 /* V173.51: keep EXP row metadata stable after legacy list rerenders. */
 function decorateExpRows(){
     if(typeof window.v173DecorateExpPoolDistributionUi==="function")window.v173DecorateExpPoolDistributionUi();
