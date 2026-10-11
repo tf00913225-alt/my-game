@@ -119,7 +119,7 @@ const MEASURE=`(()=>{
  const shell=document.querySelector('.native-bottom-nav-layer'),nav=document.getElementById('bottomNav');
  return {domain:shell.dataset.presentationDomain,parent:shell.parentElement.id,context:nav.dataset.navContext,owner:nav.parentElement.className,sameShell:shell===window.__navQaShell,shellCount:document.querySelectorAll('.native-bottom-nav-layer').length,legacyCount:document.querySelectorAll('#mapPageNav,#v141DungeonNav').length,visible:!shell.hidden&&getComputedStyle(shell).display!=='none',shell:rect(shell),nav:rect(nav),columns:[...nav.children].map(rect),frames:[...nav.querySelectorAll('.nav-icon-frame')].map(rect),activePage:document.querySelector('#game-ui > .page.active, #game-content .page.active')?.id};
 })()`;
-const SCENARIOS=[['home',"showPage('home')"],['training',"showPage('training')"],['patrol',"enterMap()"],['dungeon',"leaveMap();vGameplayOpenDailyDungeons()"],['gameplay',"showPage('gameplay')"],['boss',"vGameplayOpenBoss()"],['tower',"vGameplayOpenTower()"],['abyss',"vGameplayOpenAbyss()"]];
+const SCENARIOS=[['home',"showPage('home')"],['training',"showPage('training')"],['patrol',"enterMap()"],['dungeon',"leaveMap();openDungeonHub()"],['gameplay',"showPage('gameplay')"],['boss',"vGameplayOpenBoss()"],['tower',"vGameplayOpenTower()"],['abyss',"vGameplayOpenAbyss()"]];
 async function settle(client){await client.eval('new Promise(r=>setTimeout(r,150))');}
 async function swipe(client,x,y){
  console.log('Touch QA start',x,y);
@@ -192,7 +192,7 @@ async function runViewport(chrome,url,width,height){
    }
   }
   evidence.lifecycle=[];
-  for(const [name,action] of [['patrol-backpack',"showPage('training');enterMap();v148OpenContextInventory()"],['patrol-backpack-close',"closeMapInventoryOverlay()"],['dungeon-tab',"vGameplayOpenDailyDungeons();switchDungeonTab('daily')"],['battle-exit',"showPage('battle');showPage('dungeon')"],['return-home',"showPage('home')"]]){
+  for(const [name,action] of [['patrol-backpack',"showPage('training');enterMap();v148OpenContextInventory()"],['patrol-backpack-close',"closeMapInventoryOverlay()"],['dungeon-tab',"openDungeonHub();switchDungeonTab('daily')"],['battle-exit',"showPage('battle');showPage('dungeon')"],['return-home',"showPage('home')"]]){
     console.log("Lifecycle QA",name);evidence.phase=name;await client.eval(action);await settle(client);const row={name,...await client.eval(MEASURE)};evidence.lifecycle.push(row);assert.equal(row.sameShell,true);assert.equal(row.shellCount,1);assert.equal(row.legacyCount,0);
   }
   evidence.phase='foreground';console.log('Lifecycle QA background/foreground');await client.send('Page.setWebLifecycleState',{state:'frozen'});await client.send('Page.setWebLifecycleState',{state:'active'});await client.send('Page.bringToFront');await settle(client);

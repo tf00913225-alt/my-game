@@ -1366,7 +1366,7 @@
         else if(typeof switchDungeonTab==="function"){ switchDungeonTab("abyss"); }
         return true;
     }
-    function openDailyDungeons(){ cancelTowerAutoAdvance(true);abyssSession=false;if(typeof showPage==="function"){ showPage("dungeon"); }if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); } }
+    function openDungeonHub(){ cancelTowerAutoAdvance(true);abyssSession=false;if(typeof showPage==="function"){ showPage("dungeon"); } }
 
     if(typeof showPage==="function"){
         const previous=showPage;
@@ -1388,7 +1388,7 @@
     window.vGameplayOpenBoss=openBoss;
     window.vGameplayOpenTower=openTower;
     window.vGameplayOpenAbyss=openAbyss;
-    window.vGameplayOpenDailyDungeons=openDailyDungeons;
+    window.openDungeonHub=openDungeonHub;
     window.vGameplaySwitchBossTab=switchBossTab;
     window.vGameplayOpenBossDetail=openBossDetail;
     window.vGameplayCloseBossDetail=function(){ bossDetail=null;renderBossPage(); };

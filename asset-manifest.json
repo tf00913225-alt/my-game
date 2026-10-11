@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.b9e69a1d9962.js"
+          "build/app-shell.4ca74101961a.js"
         ],
         "styles": [
           "build/app-shell.a7880079c11d.css"
@@ -31,7 +31,7 @@
       },
       "feature-adventure-entry": {
         "scripts": [
-          "build/feature-adventure-entry.43c6c9446f8e.js"
+          "build/feature-adventure-entry.f61846a4ec08.js"
         ],
         "styles": [
           "build/feature-adventure-entry.b5c1d76d2ec3.css"
@@ -102,7 +102,7 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.43162bcb3650.js",
+          "build/feature-boss-relic.b42130e438e7.js",
           "build/feature-relic-progression.464cd8f702a6.js"
         ],
         "styles": [
@@ -132,8 +132,8 @@
       "feature-adventure": {
         "scripts": [
           "build/feature-adventure-content.6cc9644cc366.js",
-          "build/feature-adventure-runtime.762231c99803.js",
-          "build/feature-adventure-ui.0c92aaea1139.js"
+          "build/feature-adventure-runtime.a2de99c0a764.js",
+          "build/feature-adventure-ui.2fdba238218c.js"
         ],
         "styles": [
           "build/feature-adventure.7a3a29e4a2d0.css"
@@ -562,19 +562,19 @@
         "decode": true
       },
       {
+        "path": "build/app-shell.4ca74101961a.js",
+        "sha256": "4ca74101961a",
+        "bytes": 1116316,
+        "priority": "P1",
+        "type": "script",
+        "decode": false
+      },
+      {
         "path": "build/app-shell.a7880079c11d.css",
         "sha256": "a7880079c11d",
         "bytes": 101893,
         "priority": "P1",
         "type": "style",
-        "decode": false
-      },
-      {
-        "path": "build/app-shell.b9e69a1d9962.js",
-        "sha256": "b9e69a1d9962",
-        "bytes": 1115756,
-        "priority": "P1",
-        "type": "script",
         "decode": false
       },
       {
@@ -818,8 +818,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "4bc010a1ada3",
-    "totalBytes": 21815395,
+    "manifestHash": "86b2eceb3efe",
+    "totalBytes": 21815955,
     "totalResources": 78
   },
   "assets": {
@@ -827,9 +827,9 @@
       "sha256": "01bb53a8802f",
       "bytes": 69985
     },
-    "build/app-shell.b9e69a1d9962.js": {
-      "sha256": "b9e69a1d9962",
-      "bytes": 1115756
+    "build/app-shell.4ca74101961a.js": {
+      "sha256": "4ca74101961a",
+      "bytes": 1116316
     },
     "build/gameplay-core-primary.9a4a5c0aac99.js": {
       "sha256": "9a4a5c0aac99",
@@ -847,17 +847,17 @@
       "sha256": "745a55548522",
       "bytes": 51288
     },
-    "build/feature-boss-relic.43162bcb3650.js": {
-      "sha256": "43162bcb3650",
-      "bytes": 90891
+    "build/feature-boss-relic.b42130e438e7.js": {
+      "sha256": "b42130e438e7",
+      "bytes": 90803
     },
     "build/feature-relic-progression.464cd8f702a6.js": {
       "sha256": "464cd8f702a6",
       "bytes": 69904
     },
-    "build/feature-adventure-entry.43c6c9446f8e.js": {
-      "sha256": "43c6c9446f8e",
-      "bytes": 4631
+    "build/feature-adventure-entry.f61846a4ec08.js": {
+      "sha256": "f61846a4ec08",
+      "bytes": 4621
     },
     "build/feature-adventure-items.cf197e72837f.js": {
       "sha256": "cf197e72837f",
@@ -867,13 +867,13 @@
       "sha256": "6cc9644cc366",
       "bytes": 11468
     },
-    "build/feature-adventure-runtime.762231c99803.js": {
-      "sha256": "762231c99803",
-      "bytes": 45314
+    "build/feature-adventure-runtime.a2de99c0a764.js": {
+      "sha256": "a2de99c0a764",
+      "bytes": 45081
     },
-    "build/feature-adventure-ui.0c92aaea1139.js": {
-      "sha256": "0c92aaea1139",
-      "bytes": 27664
+    "build/feature-adventure-ui.2fdba238218c.js": {
+      "sha256": "2fdba238218c",
+      "bytes": 27627
     },
     "build/boot-core.989d1717bacd.css": {
       "sha256": "989d1717bacd",

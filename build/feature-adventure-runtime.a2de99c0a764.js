@@ -348,7 +348,6 @@
         runtime.visible=true;
         runtime.activePanel=opts.panel||"map";
         runtime.selectedNodeId=opts.focusNodeId||state&&state.currentNodeId||null;
-        if(typeof showPage==="function"&&opts.keepUnderlyingPage!==true){ showPage("home"); }
         if(window.FourSymbolsAdventureUI&&typeof window.FourSymbolsAdventureUI.show==="function"){
             window.FourSymbolsAdventureUI.show(opts);
         }
@@ -361,7 +360,6 @@
         runtime.visible=false;
         runtime.activePanel="map";
         runtime.selectedNodeId=null;
-        if(window.FourSymbolsAdventureUI&&typeof window.FourSymbolsAdventureUI.hide==="function"){ window.FourSymbolsAdventureUI.hide(); }
         if(typeof showPage==="function"){ showPage("home"); }
         return true;
     }

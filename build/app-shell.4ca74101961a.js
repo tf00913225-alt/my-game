@@ -8432,6 +8432,9 @@ function showPage(page,options={}){
     }
 
 
+    const target = $(page+"Page");
+    if(!target){ return; }
+
     document
     .querySelectorAll(".page")
     .forEach(p=>{
@@ -8441,12 +8444,13 @@ function showPage(page,options={}){
     });
 
 
-    const target =
-        $(page+"Page");
-
-
-    if(!target){
-        return;
+    // Adventure is a route, not an overlay above whichever page was last active.
+    // Project its visibility here alongside the same .page.active authority.
+    const adventurePage=$("adventurePage");
+    if(adventurePage){
+        adventurePage.hidden=page!=="adventure";
+        adventurePage.classList.toggle("is-visible",page==="adventure");
+        if(page!=="adventure"){ window.FourSymbolsAdventure?.hide(); }
     }
 
 
@@ -8516,6 +8520,7 @@ function showPage(page,options={}){
         "status",
         "skill",
         "home",
+        "adventure",
         "training",
         "dungeon",
         "gameplay",
@@ -35723,6 +35728,9 @@ window.FourSymbolsItemAcquisitionData={
        never expose the main navigation first and replace it later. */
     function foregroundSuppressionReason(){
         const app=document.getElementById("app");
+        if(document.getElementById("adventurePage")?.classList?.contains("active")){
+            return "hidden-adventure";
+        }
         if(document.getElementById("homeFeatureModal")?.classList?.contains("show")){
             return "hidden-foreground";
         }
