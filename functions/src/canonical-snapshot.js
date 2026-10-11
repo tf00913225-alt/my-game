@@ -153,8 +153,13 @@ function inspectAbyssSidecar(key,raw,progress){
                 if(!reserved&&!migrated&&!claimed){fail("Abyss recorded claim schema");}
             }
         }
-        if(Object.entries(run.rewardClaims).some(([id,claim])=>
-            snapshotDigest(claim)!==snapshotDigest(run.firstClearClaims[id]??null))){
+        if(Object.entries(run.rewardClaims).some(([id,claim])=>{
+            const permanent=run.firstClearClaims[id];
+            // Client records the two reservations with separate Date.now()
+            // calls. Preserve both original times; never complete either one.
+            return !(claim.status==="granting"&&permanent?.status==="granting")&&
+                snapshotDigest(claim)!==snapshotDigest(permanent??null);
+        })){
             fail("Abyss permanent claim evidence missing or contradictory");
         }
     }

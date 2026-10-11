@@ -230,6 +230,8 @@ test("Abyss invalid fields, claims and mismatched mirrors block without repair",
         a=>a.runs[20].firstClearClaims={"d20-r0-s0":{status:"granting",reservedAt:"1"}},
         a=>a.runs[20].firstClearClaims={"d20-r0-s0":{status:"claimed",migrated:false}},
         a=>a.runs[20].rewardClaims={"d20-r0-s0":{status:"claimed",migrated:true}},
+        a=>{a.runs[20].rewardClaims={"d20-r0-s0":{status:"granting",reservedAt:1}};
+            a.runs[20].firstClearClaims={"d20-r0-s0":{status:"claimed",migrated:true}};},
         a=>a.runs[20].extra=true];
     for(const mutate of mutations){
         const r=sources();mutate(r.progress.abyssProgress);
@@ -253,7 +255,8 @@ test("Abyss recorded first clears and reservations retain bytes without rewards"
     run.firstClearClaims={"d40-r0-s4":claimed,
         "d40-r1-s0":{status:"granting",reservedAt:2},
         "d40-r2-s4":{status:"claimed",migrated:true}};
-    run.rewardClaims={"d40-r0-s4":{...claimed}};
+    run.rewardClaims={"d40-r0-s4":{...claimed},
+        "d40-r1-s0":{status:"granting",reservedAt:1}};
     r.progress.sidecars["abyss-state"].raw=" "+JSON.stringify(r.progress.abyssProgress)+" ";
     const before=structuredClone(r),bundle=assemble(r);
     assert.deepEqual(bundle.projection.gameSave.abyssProgress,r.progress.abyssProgress);
