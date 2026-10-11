@@ -268,11 +268,31 @@ async function run(chrome,url,live){
   for(const v of DISPLAY_VIEWPORTS){
    await resize(v);await c.eval("closeItemModal();closeHomeFeature();showPage('home')");await settle();
    const home=await check('#homePage',v),nav=await check('#game-ui #bottomNav',v);
-   const visual=await c.eval(`(()=>{const home=homePage,s=getComputedStyle(home);return {background:s.backgroundImage,scroll:home.scrollHeight-home.clientHeight,badge:home.querySelector('.home-version-badge').matches('#game-ui #homePage .home-version-badge')};})()`);
+   const visual=await c.eval(`(()=>{const home=homePage,s=getComputedStyle(home);return {background:s.backgroundImage,scroll:home.scrollHeight-home.clientHeight,scrollOwner:s.overflowY,oldBackground:!!home.querySelector('.home-bg-fixed-layer'),badge:home.querySelector('.home-version-badge').matches('#game-ui #homePage .home-version-badge')};})()`);
    assert.match(visual.background,/assets\/ui\/home-background-v17344\.png/);
    assert.doesNotMatch(visual.background,/home-background\.jpg/);
    assert.ok(visual.badge,'version badge lost browser owner');
-   if(v[0]===390||v[0]===412){assert.ok(visual.scroll<=1,'unexpected mobile home page scroll '+visual.scroll);await screenshot('migration-home-'+v.join('x'));}
+   // Readable resources may wrap with the installed font or a long value.
+   // Validate the browser scroll owner and every reachable control instead of
+   // requiring a fixed-height, zero-scroll composition.
+   assert.equal(visual.scrollOwner,'auto','home lost its browser scroll owner');
+   assert.equal(visual.oldBackground,false,'retired scrolling background layer returned');
+   const homeControls=[];
+   for(const selector of [...['角色','商店','休息','合成','任務','鍛造','成就','公告','離線經驗','系統','秘寶','元素匣'].map(label=>'.home-card[aria-label="'+label+'"]'),'#v146HomeRoster','.v-fixed-formation-entry','#adventureHomeEntry']){
+    await c.eval(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'nearest'})`);await settle();
+    const control=await measure(selector);
+    assert.notEqual(control.display,'none','home control hidden '+selector);
+    assert.ok(control.rect.width>0&&control.rect.height>0,'home control empty '+selector);
+    // A pulsing notification decoration can contribute to scrollWidth;
+    // the interactive frame itself must fit every actual clipping boundary.
+    for(const clip of [{left:0,top:0,right:v[0],bottom:v[1]},...control.clips]){
+     assert.ok(control.rect.left>=clip.left-1&&control.rect.top>=clip.top-1&&control.rect.right<=clip.right+1&&control.rect.bottom<=clip.bottom+1,'home control clipped '+selector);
+    }
+    const hit=await c.eval(`(()=>{const n=document.querySelector(${JSON.stringify(selector)}),r=n.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!h&&(h===n||n.contains(h));})()`);
+    assert.ok(hit,'home control covered '+selector);homeControls.push({selector,rect:control.rect,hit});
+   }
+   evidence.push({homeControls:true,viewport:v,visual,controls:homeControls});
+   await screenshot('migration-home-end-'+v.join('x'));
 
    const domain=await c.eval(`(()=>{const n=document.getElementById('homePage');const ancestors=[];for(let p=n;p;p=p.parentElement)ancestors.push(getComputedStyle(p).transform);return {parent:n.parentElement.id,ancestors,navParent:document.getElementById('bottomNav').parentElement.parentElement.id,resources:[...n.querySelectorAll('.home-hud-resources b,.v146-home-resource strong')].map(n=>parseFloat(getComputedStyle(n).fontSize))};})()`);
    assert.equal(domain.parent,'game-ui');assert.equal(domain.navParent,'game-ui');
