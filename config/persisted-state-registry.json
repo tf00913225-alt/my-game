@@ -15,7 +15,7 @@
       "backupRequired": true,
       "migrationRequired": true,
       "authorityTier": "A",
-      "authoritativeSource": "existing protected canonical source transactions; new creation only for playableState, zero initial time/progress sidecars and empty recorded quest milestone claims",
+      "authoritativeSource": "existing protected canonical source transactions; new creation only for playableState, zero initial time/progress sidecars and empty recorded quest milestone claims; new creation also records inactive Abyss v3 main-save/sidecar evidence",
       "schemaVersion": "1; optional playableState extension",
       "restoreOwner": "functions/src/canonical-current-recovery.js",
       "deletionPolicy": "retain with original revision snapshots, archives and immutable receipts; no new cleanup enabled",
@@ -25,7 +25,18 @@
     },
     {
       "key": "four_symbols_save:<UID>",
-      "extensions": {"heroAccount": {"schemaVersion": 1, "ownerModule": "functions/src/hero-core.js", "restoreOwner": "js/00-main.js::loadGame", "contract": "docs/HERO_SYSTEM_V1.md", "missingDataBehavior": "locked zero-fragment zero-star projection; no storage write", "corruptionBehavior": "block hydration; preserve original save", "authorityTier": "B", "authoritativeSource": "UID local only; future trusted server mapping required"}},
+      "extensions": {
+        "heroAccount": {
+          "schemaVersion": 1,
+          "ownerModule": "functions/src/hero-core.js",
+          "restoreOwner": "js/00-main.js::loadGame",
+          "contract": "docs/HERO_SYSTEM_V1.md",
+          "missingDataBehavior": "locked zero-fragment zero-star projection; no storage write",
+          "corruptionBehavior": "block hydration; preserve original save",
+          "authorityTier": "B",
+          "authoritativeSource": "UID local only; future trusted server mapping required"
+        }
+      },
       "ownerModule": "js/startup/account-save-repository.js",
       "storageType": "localStorage",
       "scope": "uid+characters",
@@ -434,8 +445,8 @@
       "backupRequired": true,
       "migrationRequired": true,
       "authorityTier": "A",
-      "authoritativeSource": "future server validated state",
-      "schemaVersion": "legacy/unversioned",
+      "authoritativeSource": "new-account initial canonical source only; ongoing progression/claim authority remains unfinished",
+      "schemaVersion": "Client v3; canonical new-account copy only",
       "restoreOwner": "js/59-abyss-two-tier-runtime.js",
       "deletionPolicy": "retain until owner-approved cleanup",
       "corruptionBehavior": "block recovery/claim if gameplay critical",

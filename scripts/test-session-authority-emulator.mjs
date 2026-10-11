@@ -958,9 +958,18 @@ for(const [key,state] of Object.entries({
         lastSeenAt:initialPlayableFields.lastSaveTimestamp,blockedByElementBox:false},
     "progress":{eliteKills:0,dungeonWins:0,abyssClears:0},
     "quest-milestones":{date:new Date(initialPlayableFields.lastSaveTimestamp).toISOString().slice(0,10),
-        daily:{},commission:{}}
+        daily:{},commission:{}},
+    "abyss-state":initialArchive.get("sourceRecords.progress.abyssProgress")
 })){
     assert.deepEqual(initialTimeSidecars[key],{status:"present",raw:JSON.stringify(state)});
+}
+assert.equal(initialArchive.get("sourceRecords.progress.abyssProgress.version"),3);
+assert.equal(initialArchive.get("sourceRecords.progress.abyssProgress.legacyMigrated"),true);
+for(const level of [20,40]){
+    const run=initialArchive.get("sourceRecords.progress.abyssProgress.runs."+level);
+    assert.equal(run.active,false);
+    assert.equal(run.clears,0);
+    assert.deepEqual(run.firstClearClaims,{});
 }
 assert.deepEqual((await db.doc(`serverUsers/${y}/progress/current`).get())
     .get("sidecars"),initialTimeSidecars);
@@ -1462,6 +1471,12 @@ ownedRecords.economy.sharedExp=320;
 // Emulator-only retained claim/counter fixture, not milestone reward issuance.
 ownedRecords.progress.sidecars.progress.raw=' {"eliteKills":3,"dungeonWins":2,"abyssClears":1} ';
 ownedRecords.progress.sidecars["quest-milestones"].raw=' {"date":"2020-02-29","daily":{"20":true},"commission":{"100":true}} ';
+ownedRecords.progress.abyssProgress.runs[40].clears=2;
+ownedRecords.progress.abyssProgress.runs[40].firstClearClaims={
+    "d40-r0-s0":{status:"claimed",migrated:true}
+};
+ownedRecords.progress.sidecars["abyss-state"].raw=
+    " "+JSON.stringify(ownedRecords.progress.abyssProgress)+" ";
 const ownedBundle=assembleCanonicalSnapshot(ownedUid,2,ownedRecords);
 const ownedRoot=db.collection("serverUsers").doc(ownedUid);
 const ownedItemRef=ownedRoot.collection("inventory").doc(ownedItemId);
@@ -1473,7 +1488,8 @@ await Promise.all([
     ownedEquipRef.set(ownedRecords.equipment[0]),
     ownedRelicRef.set(ownedRecords.relics[0]),
     ownedRoot.collection("economy").doc("current").update({sharedExp:320}),
-    ownedRoot.collection("progress").doc("current").update({sidecars:ownedRecords.progress.sidecars}),
+    ownedRoot.collection("progress").doc("current").update({sidecars:ownedRecords.progress.sidecars,
+        abyssProgress:ownedRecords.progress.abyssProgress}),
     ownedRoot.collection("account").doc("current")
         .update({snapshotSha256:ownedBundle.sha256}),
     ownedRoot.collection("playableSnapshots").doc("2").set(ownedBundle),
@@ -1654,6 +1670,9 @@ const recoveredOwnedArchive=await checkRecoveryArchive(ownedUid,7);
 assert.deepEqual(recoveredOwnedArchive.get("sourceRecords.progress.playableState"),
     ownedRecords.progress.playableState);
 assert.deepEqual(recoveredOwnedArchive.get("sourceRecords.progress.sidecars"),ownedRecords.progress.sidecars);
+assert.deepEqual(recoveredOwnedArchive.get("sourceRecords.progress.abyssProgress"),ownedRecords.progress.abyssProgress);
+assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
+    .get("abyssProgress"),ownedRecords.progress.abyssProgress);
 assert.equal(recoveredOwnedArchive.get("sourceRecords.progress.serverRevision"),7);
 assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
     .get("playableState"),ownedRecords.progress.playableState);

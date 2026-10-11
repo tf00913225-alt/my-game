@@ -9,6 +9,18 @@ const ELEMENTS=new Set(["fire","water","wind","earth"]);
 const digest=value=>createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const plain=value=>value!==null&&typeof value==="object"&&!Array.isArray(value);
 
+// Save schema only: the existing Client Owner initializes these inactive runs.
+// A genuinely new account has no legacy history to migrate.
+function makeInitialAbyssState(){
+    const run=difficulty=>({difficulty,active:false,regionIndex:0,encounterIndex:0,
+        isBoss:false,phase:"ready",battleCompleted:false,chestSpawned:false,
+        chestClaimed:false,portalUnlocked:false,regionCompleted:false,
+        completed:false,clears:0,completedRegions:[false,false,false,false,false],
+        completedStages:{},rewardClaims:{},firstClearClaims:{},x:50,y:84,message:""});
+    return {version:3,selectedDifficulty:null,legacyMigrated:true,
+        runs:{20:run(20),40:run(40)}};
+}
+
 // Initial evidence only. No elapsed-time accrual, reward or historical default.
 function makeInitialSidecars(recordedAt){
     const sidecars=Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>[
@@ -24,7 +36,8 @@ function makeInitialSidecars(recordedAt){
             // V141 milestone storage uses UTC ISO dates. This is recorded
             // creation evidence, not a period rollover or claim entitlement.
             "quest-milestones":{date:new Date(recordedAt).toISOString().slice(0,10),
-                daily:{},commission:{}}
+                daily:{},commission:{}},
+            "abyss-state":makeInitialAbyssState()
         };
         for(const [key,state] of Object.entries(initial)){
             sidecars[key]={status:"present",raw:JSON.stringify(state)};
@@ -72,7 +85,8 @@ function makeInitialCharacterSources(uid,revision,operationId,selection,{recorde
         economy:{...base,gold:0,sharedExp:0},inventory:[],equipment:[],relics:[],
         relicLoadout:{...base,relicId:null,subRelicId:null},
         progress:{...base,dailyQuestState:{},commissionQuestState:{},
-            achievementState:{},gameplayProgress:{},abyssProgress:{},
+            achievementState:{},gameplayProgress:{},
+            abyssProgress:recordedAt===undefined?{}:makeInitialAbyssState(),
             ...(recordedAt===undefined?{}:{playableState:{
                 heroAccount:require("./hero-core").normalizeAccountState(null),
                 bestiaryData:{},
