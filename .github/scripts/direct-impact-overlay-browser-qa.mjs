@@ -188,7 +188,7 @@ try{
   },reason);
   if(reason==='death'||reason==='departure'){assert.equal(result.oldTargetPresent,false);}else{assert.equal(result.remaining,0);assert.equal(result.root,false);}
   evidence.lifecycle.push(result);
-  await page.evaluate(()=>{v142SkillAnimationDirector.dispose();battleActive=true;document.getElementById('battlePage').classList.add('active');currentBattleMonsters.forEach(i=>{monsters[i].hp=monsters[i].maxHP;monsters[i].alive=true;});renderBattle();});
+  await page.evaluate(()=>{v142SkillAnimationDirector.dispose();battleActive=true;showPage('battle');currentBattleMonsters.forEach(i=>{monsters[i].hp=monsters[i].maxHP;monsters[i].alive=true;});renderBattle();});
  };
  for(const reason of ['dispose','supersede','death','departure','navigation','battle-end'])await life(reason);
  const idle=await page.evaluate(()=>{v142SkillAnimationDirector.dispose();return {noPlanes:!document.querySelector('.v143-hit-feedback-overlay,.v174-battle-hud-layer'),originalHudReturned:[...document.querySelectorAll('.battle-monster,.battle-player')].every(c=>!c.v174UnitHud||c.contains(c.v174UnitHud))};});

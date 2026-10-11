@@ -13,7 +13,7 @@ assert.match(fixed,/--battle-name-row-height:14px/);
 assert.match(fixed,/--battle-resource-bar-height:11px/);
 assert.match(fixed,/\.battle-monster-name\{[\s\S]*?font-size:11px !important/);
 assert.match(fixed,/\.monster-bar-text,[\s\S]*?font-size:9px !important/);
-assert.match(boss,/\.gameplay-boss-card > \.battle-monster-name\{[\s\S]*?font-size:14px/);
-assert.match(boss,/\.gameplay-boss-card \.monster-bar-text\{[\s\S]*?font-size:10px/);
+assert.match(boss,/\.v174-unit-hud\[data-boss="true"\] > \.battle-monster-name\{[\s\S]*?font-size:14px/);
+assert.match(boss,/\.v174-unit-hud\[data-boss="true"\] \.monster-bar-text\{[\s\S]*?font-size:10px/);
 
 console.log("Current UI typography classification: general UI floor and compact battle HUD exceptions verified.");
