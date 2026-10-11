@@ -156,7 +156,7 @@ assert.doesNotMatch(statusText,/個百分點/,"player-visible status text must u
     assert.match(baseCss,/battle-command-panel-transparent\.svg/);
     assert.doesNotMatch(baseCss,/#mainBattleMenu::before\{[\s\S]*?battle-command-panel\.jpg/);
     assert.match(panelSvg,/data:image\/jpeg;base64,/);
-    assert.match(fixedCss,/\.v-fixed-enemy-slot \.battle-monster-name\{[\s\S]*?background:none !important;[\s\S]*?border:0 !important/);
+    assert.match(fixedCss,/\.v174-unit-hud:not\(\[data-boss="true"\]\) \.battle-monster-name\{[\s\S]*?background:none !important;[\s\S]*?border:0 !important/);
     assert.match(fixedCss,/\.monster-status-badges\{[\s\S]*?bottom:40px !important;[\s\S]*?min-height:24px !important;[\s\S]*?z-index:32 !important/);
     assert.match(statusCss,/--v143-status-layer-hud:34/);
     assert.match(fixedCss,/\.targetable::after,[\s\S]*?\.ally-targetable:not\(\.active-turn\)::after\{[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
