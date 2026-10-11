@@ -2068,7 +2068,7 @@ html, body{
     #game-ui #homePage.active{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);grid-template-rows:auto auto auto;gap:16px;align-content:start;}
     #game-ui #homePage .home-city-hud{grid-column:1/-1;}
     #game-ui #homePage .home-card-grid{grid-column:1;align-self:start;}
-    #game-ui #homePage .v146-home-roster{grid-column:2;align-self:start;margin:12px 0;}
+    #game-ui #homePage .v146-home-roster{grid-column:2;grid-row:2;align-self:start;margin:12px 0;}
 }
 
 
@@ -2638,7 +2638,8 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 /* Main-city persistent utility shell: boot-visible before relic gameplay executes. */
 #game-ui .team-relic-home-tools{
     position:relative;inset:auto;z-index:5;display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:12px;padding:0;
+    grid-template-columns:repeat(2,minmax(0,1fr));grid-column:1;grid-row:2;justify-self:center;align-self:end;
+    width:min(52%,192px);gap:12px;padding:0;
     box-sizing:border-box;pointer-events:none;align-items:end;
 }
 #game-ui .team-relic-home-tools .home-card-utility{
