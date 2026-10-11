@@ -85,7 +85,7 @@ test("gameplay panel keeps only the top ornament owner",()=>{
 
  test("home backdrop cannot force the full legacy surface into the home scroll area",()=>{
     const css=read("css/00-main.css");
-    assert.match(css,/\.home-bg-fixed-layer\{\s*position:absolute;\s*inset:0;/);
+    assert.match(css,/#homePage\{[^}]*position:relative;[^}]*background-image:url\(\.\.\/assets\/ui\/home-background-v17344\.png\)/);
     assert.doesNotMatch(css,/#game-stage > #app > #game-content \.home-bg-fixed-layer/);
     assert.doesNotMatch(read("css/00-main.css"),/#game-stage > #app > #game-content \.home-bg-fixed-layer/);
  });

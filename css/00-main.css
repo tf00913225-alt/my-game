@@ -599,19 +599,12 @@ button:disabled{
     box-sizing:border-box;overflow-y:auto;overflow-x:hidden;
     overscroll-behavior-y:contain;touch-action:pan-y;
     scrollbar-gutter:stable;
-}
-
-.home-bg-fixed-layer{
-    position:absolute;
-    inset:0;
-    z-index:0;
-
+    /* The scroll container paints its own background across the visible page.
+       A scrolling absolute child exposed black below its original height. */
     background-image:url(../assets/ui/home-background-v17344.png);
     background-size:cover;
     background-position:center center;
     background-repeat:no-repeat;
-
-    pointer-events:none;
 }
 
 #mapPage{

@@ -268,7 +268,7 @@ async function run(chrome,url,live){
   for(const v of DISPLAY_VIEWPORTS){
    await resize(v);await c.eval("closeItemModal();closeHomeFeature();showPage('home')");await settle();
    const home=await check('#homePage',v),nav=await check('#game-ui #bottomNav',v);
-   const visual=await c.eval(`(()=>{const home=homePage,s=getComputedStyle(home.querySelector('.home-bg-fixed-layer'));return {background:s.backgroundImage,scroll:home.scrollHeight-home.clientHeight,badge:home.querySelector('.home-version-badge').matches('#game-ui #homePage .home-version-badge')};})()`);
+   const visual=await c.eval(`(()=>{const home=homePage,s=getComputedStyle(home);return {background:s.backgroundImage,scroll:home.scrollHeight-home.clientHeight,badge:home.querySelector('.home-version-badge').matches('#game-ui #homePage .home-version-badge')};})()`);
    assert.match(visual.background,/assets\/ui\/home-background-v17344\.png/);
    assert.doesNotMatch(visual.background,/home-background\.jpg/);
    assert.ok(visual.badge,'version badge lost browser owner');
@@ -360,7 +360,7 @@ async function run(chrome,url,live){
    await c.eval("closeStatusHelp();closeHomeFeature();showPage('home')");
    const loaded=new Promise(resolve=>{const listener=event=>{const message=JSON.parse(String(event.data));if(message.method==='Page.loadEventFired'){c.ws.removeEventListener('message',listener);resolve();}};c.ws.addEventListener('message',listener);});
    await c.send('Page.reload',{ignoreCache:true});await loaded;await c.eval(PREPARE);await c.eval(INSTALL_MEASURE);await settle();
-   const reloaded=await c.eval("({background:getComputedStyle(document.querySelector('.home-bg-fixed-layer')).backgroundImage,roots:document.querySelectorAll('#game-ui').length})");
+   const reloaded=await c.eval("({background:getComputedStyle(homePage).backgroundImage,roots:document.querySelectorAll('#game-ui').length})");
    assert.match(reloaded.background,/home-background-v17344\.png/);assert.equal(reloaded.roots,1);
    await c.eval("openHomeFeature('character');switchCharacterTab('skill')");await settle();
    assert.ok(await c.eval("document.querySelector('.character-tab-row').getBoundingClientRect().bottom<=characterTabContent.getBoundingClientRect().top"),'reload character overlap');
