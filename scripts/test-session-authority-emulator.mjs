@@ -118,6 +118,8 @@ const sidecarNames=["element-box-state","daily-dungeon-state","exp-pool-growth-s
 const digest=value=>createHash("sha256").update(value,"utf8").digest("hex");
 function sealedBackup(save){
     const sidecars=Object.fromEntries(sidecarNames.map(name=>[name,{status:"missing",raw:null}]));
+    // Raw device preference is preserved, never parsed into gameplay/claims.
+    sidecars["task-tracker"]={status:"present",raw:"corrupt-ui-preference"};
     const mainRaw=JSON.stringify(save),metadataRaw=JSON.stringify({ownerUid:x});
     const mainFingerprint="v1:1:"+"a".repeat(32),sidecarManifestFingerprint="v1:1:"+"b".repeat(32);
     return {schemaVersion:2,ownerUid:x,
@@ -157,6 +159,14 @@ await rejected("saveCloudPreferences",b.idToken,{uid:x,session:sessionB,expected
 await rejected("saveCloudPreferences",b.idToken,{uid:x,session:sessionB,expectedRevision:2,preferences:{...preferences,autoConfig:{...config,skill:"x",gold:10}}},"INVALID_ARGUMENT");
 assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),2);
 await rejected("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:candidate,expectedRevision:2},"INVALID_ARGUMENT");
+const corruptClaimBackup=sealedBackup(candidate);
+corruptClaimBackup.sidecars["quest-milestones"]={status:"present",raw:"corrupt-claim"};
+corruptClaimBackup.sidecarManifestSha256=digest(JSON.stringify(corruptClaimBackup.sidecars));
+corruptClaimBackup.backupSha256=digest(JSON.stringify({ownerUid:x,mainRaw:corruptClaimBackup.mainRaw,
+    metadataRaw:corruptClaimBackup.metadataRaw,sidecars:corruptClaimBackup.sidecars}));
+await rejected("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,
+    expectedRevision:2,backup:corruptClaimBackup},"INVALID_ARGUMENT");
+assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),2);
 const firstCandidate=await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,expectedRevision:2,backup:sealedBackup(candidate)});
 assert.equal(firstCandidate.revision,1);assert.equal(firstCandidate.unchanged,false);
 const candidateRoot=`serverUsers/${x}/migrationCandidates`;
@@ -164,6 +174,7 @@ const original=(await db.doc(`${candidateRoot}/1`).get()).data();
 assert.equal(original.backup.mainRaw,JSON.stringify(candidate));
 assert.equal(original.backupSha256,sealedBackup(candidate).backupSha256);
 assert.equal(original.trusted,false);assert.deepEqual(original.snapshot,candidate);
+assert.deepEqual(original.backup.sidecars["task-tracker"],{status:"present",raw:"corrupt-ui-preference"});
 assert.equal((await db.doc(`${candidateRoot}/latest`).get()).get("fingerprint"),original.fingerprint);
 const retry=await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,expectedRevision:2,backup:sealedBackup(candidate)});
 assert.equal(retry.unchanged,true);assert.equal(retry.revision,1);assert.equal(retry.serverRevision,firstCandidate.serverRevision);
