@@ -11,7 +11,7 @@ const picker=read("js/36-v141-content-systems.js");
 const repairs=read("js/58-v173.63-functional-fixes.js");
 const guide=read("UI_GUIDELINES.md");
 
-assert.match(reforgeCss,/\.v17358-reforge-tiers\{[^}]*display:grid[^}]*grid-template-columns:repeat\(2/s);
+assert.match(reforgeCss,/\.v17358-reforge-tiers\{[^}]*display:grid[^}]*grid-template-columns:repeat\(4/s);
 assert.doesNotMatch(picker.slice(picker.indexOf("function renderReforgeTab()"),picker.indexOf("function availableTalismans()")),/v141-reforge-compare|>VS</);
 assert.match(touch,/data-scroll-owner="x\|y\|both"/);
 assert.match(rewardCss,/\.v132-reward-modal \.v132-reward-modal-inner\.v17363-text-reward-preview\{[\s\S]*?height:min\(600px/);
