@@ -22,7 +22,9 @@ function test(name,callback){
 
 function rule(source,selector){
     const blocks=[...source.replace(/\/\*[\s\S]*?\*\//g,"").matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-        .filter(match=>match[1].trim()===selector);
+        // Shared frames may use a CSS selector list; each listed selector owns
+        // the same declarations. Keep all geometry assertions below unchanged.
+        .filter(match=>match[1].split(",").some(entry=>entry.trim()===selector));
     assert.ok(blocks.length,"CSS rule exists: "+selector);
     const declarations=new Map();
     for(const block of blocks){
