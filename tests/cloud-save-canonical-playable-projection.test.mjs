@@ -113,7 +113,7 @@ test("projection rejects oversized and non-JSON payloads before serialization ca
             entry.raw=JSON.stringify({data:"x".repeat(55000)});
         }
     }
-    expanded.playableState.bestiaryData=Object.fromEntries(Array.from({length:1700},(_,index)=>
+    expanded.playableState.bestiaryData=Object.fromEntries(Array.from({length:1999},(_,index)=>
         [`monster-${index}-${"x".repeat(110)}`,{seen:true,kills:1}]));
     assert.ok(assembleCanonicalSnapshot("uid-a",7,expanded).byteLength<750*1024);
     assert.throws(()=>assemble(expanded),/playable projection exceeds internal size budget/);
@@ -169,6 +169,55 @@ test("historical v1 time bytes stay unchanged but cannot become complete playabl
     assert.throws(()=>assemble(r),/time sidecar fields/);
     assert.deepEqual(r,before);
 });
+test("recorded claim sidecars reject missing, lossy and unknown claim fields",()=>{
+    const badProgress=[{}, {eliteKills:-1,dungeonWins:0,abyssClears:0},
+        {eliteKills:0.5,dungeonWins:0,abyssClears:0},
+        {eliteKills:"0",dungeonWins:0,abyssClears:0},
+        {eliteKills:0,dungeonWins:Number.MAX_SAFE_INTEGER+1,abyssClears:0},
+        {eliteKills:0,dungeonWins:0,abyssClears:0,rewardClaimed:true}];
+    const valid={date:"2024-02-29",daily:{20:true},commission:{100:true}};
+    const badMilestones=[{}, {...valid,date:"2023-02-29"}, {...valid,date:"2024-02-30"},
+        {...valid,date:"2024-13-01"}, {...valid,date:"2024-2-29"},
+        {...valid,daily:{20:false}}, {...valid,daily:{20:1}},
+        {...valid,commission:{25:true}}, {...valid,daily:[]}, {...valid,extra:true}];
+    for(const [key,values] of [["progress",badProgress],["quest-milestones",badMilestones]]){
+        for(const value of values){
+            const r=sources();r.progress.sidecars[key].raw=JSON.stringify(value);
+            assert.throws(()=>assemble(r),undefined,key);
+            const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=r.playableState;
+            r.progress.playableState=fields;delete r.playableState;
+            assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,r),undefined,key);
+        }
+    }
+});
+
+test("older recorded milestone claims survive projection without day rollover or rewards",()=>{
+    const r=sources();
+    r.progress.sidecars.progress.raw=' {"eliteKills":4,"dungeonWins":2,"abyssClears":1} ';
+    r.progress.sidecars["quest-milestones"].raw=' {"date":"2020-02-29","daily":{"20":true,"100":true},"commission":{"40":true}} ';
+    const before=structuredClone(r),bundle=assemble(r);
+    assert.deepEqual(bundle.projection.sidecars,r.progress.sidecars);
+    assert.deepEqual(bundle.projection.claimCheckpoint,r.claimCheckpoint);
+    assert.equal(bundle.projection.gameSave.gold,42);
+    assert.equal(bundle.projection.gameSave.sharedExp,7);
+    assert.equal(bundle.readyForPublication,false);
+    assert.deepEqual(r,before);
+    const changed=structuredClone(r);
+    changed.progress.sidecars["quest-milestones"].raw=JSON.stringify({date:"2020-02-29",daily:{20:true},commission:{40:true}});
+    assert.notEqual(assemble(changed).sha256,bundle.sha256);
+    assert.throws(()=>verifyCanonicalPlayableProjectionAgainstSources(bundle,"uid-a",7,changed));
+});
+
+test("historical v1 claim bytes remain compatible but cannot be complete evidence",()=>{
+    const r=sources();
+    for(const key of ["progress","quest-milestones"]){r.progress.sidecars[key].raw="{}";}
+    const before=structuredClone(r),bundle=assembleCanonicalSnapshot("uid-a",7,r);
+    assert.deepEqual(bundle.snapshot.progress.sidecars,r.progress.sidecars);
+    assert.equal(assembleCanonicalSnapshot("uid-a",7,r).sha256,bundle.sha256);
+    assert.throws(()=>assemble(r),/claim sidecar fields/);
+    assert.deepEqual(r,before);
+});
+
 test("stored projection must match sources and cannot publish through tampered flags",()=>{
     const r=sources(),bundle=assemble(r);
     assert.deepEqual(verifyCanonicalPlayableProjectionAgainstSources(bundle,"uid-a",7,r),bundle.projection);

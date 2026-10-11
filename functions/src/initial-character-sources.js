@@ -19,7 +19,12 @@ function makeInitialSidecars(recordedAt){
             "exp-pool-growth-state":{initialized:true,unlocked:false,lastAt:recordedAt,
                 noticeShown:false,lastCapped:false,newcomerRewards:{}},
             "rested-exp-state":{battles:0,progressMs:0,lastSeenAt:recordedAt,
-                blockedByElementBox:false}
+                blockedByElementBox:false},
+            "progress":{eliteKills:0,dungeonWins:0,abyssClears:0},
+            // V141 milestone storage uses UTC ISO dates. This is recorded
+            // creation evidence, not a period rollover or claim entitlement.
+            "quest-milestones":{date:new Date(recordedAt).toISOString().slice(0,10),
+                daily:{},commission:{}}
         };
         for(const [key,state] of Object.entries(initial)){
             sidecars[key]={status:"present",raw:JSON.stringify(state)};
