@@ -30580,6 +30580,7 @@ const FourSymbolsItemSlot=Object.freeze({
     },
     name(name,item){
         const text=String(name||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+        if(!isEquipmentInventoryType(item?.type)) return text;
         return '<span class="equipment-rarity-name" style="color:'+getEquipmentNameColor(item)+'">'+text+'</span>';
     }
 });
