@@ -8181,6 +8181,9 @@ function showPage(page,options={}){
     }
 
 
+    const target = $(page+"Page");
+    if(!target){ return; }
+
     document
     .querySelectorAll(".page")
     .forEach(p=>{
@@ -8190,12 +8193,13 @@ function showPage(page,options={}){
     });
 
 
-    const target =
-        $(page+"Page");
-
-
-    if(!target){
-        return;
+    // Adventure is a route, not an overlay above whichever page was last active.
+    // Project its visibility here alongside the same .page.active authority.
+    const adventurePage=$("adventurePage");
+    if(adventurePage){
+        adventurePage.hidden=page!=="adventure";
+        adventurePage.classList.toggle("is-visible",page==="adventure");
+        if(page!=="adventure"){ window.FourSymbolsAdventure?.hide(); }
     }
 
 
@@ -8265,6 +8269,7 @@ function showPage(page,options={}){
         "status",
         "skill",
         "home",
+        "adventure",
         "training",
         "dungeon",
         "gameplay",

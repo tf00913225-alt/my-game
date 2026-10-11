@@ -31,7 +31,7 @@
         if(!root){
             root=document.createElement("section");
             root.id="adventurePage";
-            root.className="adventure-page";
+            root.className="page adventure-page";
             root.hidden=true;
             root.setAttribute("aria-label","出城冒險章節地圖");
             root.innerHTML=
@@ -340,15 +340,13 @@
         if(!root){ return; }
         const opts=options||{};
         if(opts.focusNodeId){ ui.lastFocusNodeId=opts.focusNodeId; }
-        root.hidden=false;
-        root.classList.add("is-visible");
+        showPage("adventure");
         render();
     }
     function hide(){
         const root=ensureRoot();
         if(!root){ return; }
-        root.classList.remove("is-visible");
-        root.hidden=true;
+        if(root.classList.contains("active")){ showPage("home"); }
     }
 
     function ensureTracker(){

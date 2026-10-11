@@ -35,7 +35,7 @@
         dot.setAttribute("aria-hidden",visible?"false":"true");
     }
 
-    function openAdventure(){
+    function openAdventureMap(){
         if(window.FourSymbolsAdventure&&typeof window.FourSymbolsAdventure.open==="function"){
             window.FourSymbolsAdventure.open();
             return;
@@ -48,7 +48,7 @@
             }).catch(error=>console.error("[adventure] feature load failed",error));
         }
     }
-    window.openAdventure=window.openAdventure||openAdventure;
+    window.openAdventureMap=openAdventureMap;
 
     function ensureEntry(){
         if(typeof document==="undefined"){ return null; }
@@ -61,7 +61,7 @@
             axis.className="adventure-home-axis";
             axis.innerHTML=
                 '<span class="adventure-home-gate" aria-hidden="true"></span>'+
-                '<button id="adventureHomeEntry" type="button" class="adventure-home-entry" data-feature="adventure" aria-label="出城冒險，江湖主線章節推進" onclick="openAdventure()">'+
+                '<button id="adventureHomeEntry" type="button" class="adventure-home-entry" data-feature="adventure" aria-label="出城冒險，江湖主線章節推進" onclick="openAdventureMap()">'+
                     '<span class="adventure-home-kicker">江湖主線 · 章節推進</span>'+
                     '<strong>出城冒險</strong>'+
                     '<span id="adventureHomeNotice" class="adventure-home-notice" hidden aria-hidden="true"></span>'+
