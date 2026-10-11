@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
-import {parse} from 'acorn';
+import {createRequire} from 'node:module';
 
 // Compare complete top-level declarations, never diff hunk line numbers. Any
 // change outside explicitly owned existing functions is unknown shared runtime.
@@ -22,6 +22,9 @@ const SHARED_MODULES = {
 export function classifySharedSource(before, after, sourcePath='js/00-main.js') {
   try {
     const owners=SHARED_MODULES[sourcePath];if(!owners)return null;
+    // The aggregate consumes only native policy helpers. Its minimal job does
+    // not install the parser; load Acorn only for actual source classification.
+    const {parse}=createRequire(import.meta.url)('acorn');
     const inspect = source => {
       const ast=parse(source,{ecmaVersion:'latest',sourceType:'script'});
       const functions={}, pieces=[];let cursor=0;
@@ -78,6 +81,55 @@ const GENERATED=/^(?:build\/|asset-manifest\.json$|functions\/src\/generated\/re
 
 // Single policy owner. Rollback conditional PR gates by setting this false.
 export const PR_GATES_ENABLED = true;
+
+// User-authorized, one-work exception (2026-10-11): no Boss Gate for this
+// already visually accepted lethal-hit repair. No other gate is relaxed.
+const LETHAL_BOSS_EXCEPTION = Object.freeze({
+  workId: 'BATTLE-LETHAL-HIT-OVERLAY-20261011',
+  sourceCommit: '87216848b406a5c96e6862c4e133bd6df1b86c9f',
+  expires: '2026-10-18T00:00:00Z'
+});
+const LETHAL_EXCEPTION_POLICY_PATHS = new Set([
+  '.github/scripts/ci-change-classifier.mjs', '.github/scripts/ci-aggregate.mjs',
+  'tests/ci-boss-routing.test.mjs', 'tests/ci-aggregate.test.mjs',
+  // This existing acceptance fixture corrects pre-start HP overwritten by the
+  // formal roster builder; the accepted gameplay/artwork/build stays pinned.
+  '.github/scripts/run-hit-evasion-v2-browser-qa.mjs'
+]);
+const LETHAL_EXCEPTION_SOURCE_PATH = /^(?:js\/(?:00-main|37-v142-skill-animation|39-v143-skill-animation|54-v173\.51-battle-qa)\.js|SYSTEM_CONTRACTS\.md|tests\/battle-direct-impact-overlay-20261011\.test\.js|\.github\/scripts\/(?:fixtures\/direct-impact-overlay-vm\.cjs|lethal-impact-overlay-browser-qa\.mjs)|asset-manifest\.json|build\/(?:asset-manifest\.json|(?:app-shell|gameplay-core-primary|gameplay-core-secondary)\.[a-f0-9]+\.js)|functions\/src\/generated\/restricted-forest-instance-policy\.json)$/;
+
+export function isAuthorizedLethalBossException(plan, now = new Date()) {
+  const e = plan?.bossException;
+  return !!e && plan.baseRef === 'dev' && ['pull_request', 'push'].includes(plan.eventName) &&
+    !plan.fullRegression && !plan.shadow && now.getTime() < Date.parse(LETHAL_BOSS_EXCEPTION.expires) &&
+    Object.entries(LETHAL_BOSS_EXCEPTION).every(([key, value]) => e[key] === value) &&
+    /^[a-f0-9]{40}$/.test(e.baseSha || '') && /^[a-f0-9]{40}$/.test(e.headSha || '');
+}
+
+export function applyAuthorizedLethalBossException(plan, {
+  baseSha, headSha, paths, generatedVerified = false, now = new Date(),
+  runGit = args => execFileSync('git', args, {encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe']})
+} = {}) {
+  const candidate = {...plan, bossException: {...LETHAL_BOSS_EXCEPTION, baseSha, headSha}};
+  if (!isAuthorizedLethalBossException(candidate, now) || !paths?.length ||
+      plan.reasons.some(reason => /unavailable|invalid|unreliable/i.test(reason)) ||
+      paths.some(p => !LETHAL_EXCEPTION_POLICY_PATHS.has(p) && !LETHAL_EXCEPTION_SOURCE_PATH.test(p))) return plan;
+  const manifests = new Set(['asset-manifest.json', 'build/asset-manifest.json']);
+  if (paths.some(p => manifests.has(p)) && !generatedVerified) return plan;
+  try {
+    // Applies only when introducing the accepted checkpoint, never a later dev
+    // push that already contains it. New combat/artwork/build changes revoke it.
+    runGit(['merge-base', '--is-ancestor', LETHAL_BOSS_EXCEPTION.sourceCommit, headSha]);
+    let alreadyIntegrated = false;
+    try {runGit(['merge-base', '--is-ancestor', LETHAL_BOSS_EXCEPTION.sourceCommit, baseSha]); alreadyIntegrated = true;}
+    catch (error) {if (error.status !== 1) throw error;}
+    if (alreadyIntegrated || runGit(['diff', '--name-only', LETHAL_BOSS_EXCEPTION.sourceCommit, headSha, '--',
+      // Manifests can absorb unrelated latest-dev boot CSS; the formal build
+      // must verify them, while every affected shipped JS bundle stays pinned.
+      ...paths.filter(p => !LETHAL_EXCEPTION_POLICY_PATHS.has(p) && !manifests.has(p))]).trim()) return plan;
+    return {...candidate, gates: {...plan.gates, boss_balance: false}, bossMode: 'none'};
+  } catch {return plan;}
+}
 export const CHANGE_FLAGS = Object.freeze([
   'core', 'battle', 'monster_balance', 'tower', 'daily', 'abyss', 'adventure',
   'boss', 'ui', 'inventory', 'skill', 'portrait', 'cloud', 'persistence',
@@ -215,14 +267,16 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       generatedVerified=true;
     }
   } catch (e) {error = `Comparison unavailable; strict fallback: ${e.message}`;}
-  const plan = classifyChanges(paths, {eventName: process.env.CI_EVENT_NAME, baseRef: process.env.CI_BASE_REF, addedPaths, error, responsibilities, responsibilitiesByPath, generatedVerified, fullRegression: process.env.CI_FULL_REGRESSION === 'true'});
+  const plan = applyAuthorizedLethalBossException(classifyChanges(paths, {eventName: process.env.CI_EVENT_NAME, baseRef: process.env.CI_BASE_REF, addedPaths, error, responsibilities, responsibilitiesByPath, generatedVerified, fullRegression: process.env.CI_FULL_REGRESSION === 'true'}),
+    {baseSha: process.env.CI_BASE_SHA, headSha: process.env.CI_HEAD_SHA, paths, generatedVerified});
   const outputs = {plan_json: JSON.stringify(plan), strict: plan.strictMode, cloud_gate: plan.gates.session_authority, full_node: plan.shadow || plan.strictMode || plan.fullRegression || !['pull_request','push'].includes(plan.eventName) || plan.baseRef === 'main' || plan.flags.monster_balance_changed || plan.flags.workflow_changed || plan.flags.cloud_changed || plan.flags.persistence_changed,
     boss_mode:plan.bossMode, ...plan.flags, ...plan.gates};
   if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(outputs).map(([k,v]) => `${k}=${v}\n`).join(''));
   const report = `## CI change classifier (${plan.shadow ? 'SHADOW — all original gates retained' : 'ENFORCED'})\n`+
     `Base: ${process.env.CI_BASE_SHA || 'unavailable'}; Head: ${process.env.CI_HEAD_SHA || 'unavailable'}; Boss mode: ${plan.bossMode}\n\n`+
-    '| Gate | Predicted | Effective |\n|---|---|---|\n'+Object.entries(plan.gates).map(([k,v]) => `| ${k} | ${plan.predicted[k] ? 'RUN' : 'SKIP'} | ${v ? 'RUN' : 'SKIP'} |`).join('\n')+'\n\n'+plan.reasons.join('\n')+'\n';
+    '| Gate | Predicted | Effective |\n|---|---|---|\n'+Object.entries(plan.gates).map(([k,v]) => `| ${k} | ${plan.predicted[k] ? 'RUN' : 'SKIP'} | ${v ? 'RUN' : 'SKIP'} |`).join('\n')+'\n\n'+plan.reasons.join('\n')+'\n'+
+    (plan.bossException ? `User-authorized Boss exemption: ${JSON.stringify(plan.bossException)}\n` : '');
   if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, report);
   console.log(report);
 }

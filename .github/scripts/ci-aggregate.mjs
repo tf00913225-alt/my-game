@@ -1,4 +1,5 @@
 import {pathToFileURL} from 'node:url';
+import {isAuthorizedLethalBossException} from './ci-change-classifier.mjs';
 
 // The public check name remains Repository checks. No upstream failure, queued
 // job or cancellation can become a green required check.
@@ -27,7 +28,7 @@ export function requireChildGates(needs, {mainRequired = true, plan} = {}) {
     for (const key of CHILD_GATES.filter(k => k !== 'classify')) {
       if (typeof plan.gates[key] !== 'boolean') throw Error(`Missing classifier gate ${key}`);
       if (!['main_browser', 'promotion_health'].includes(key) && (plan.strictMode || plan.shadow || plan.fullRegression || !['pull_request','push'].includes(plan.eventName) || mainRequired) &&
-          plan.gates[key] !== true) throw Error(`Full/strict policy cannot skip ${key}`);
+          plan.gates[key] !== true && !(key === 'boss_balance' && isAuthorizedLethalBossException(plan))) throw Error(`Full/strict policy cannot skip ${key}`);
     }
     if (plan.gates.promotion_health !== (plan.baseRef === 'main' && !plan.fullRegression)) throw Error('Promotion health policy mismatch');
     if (plan.gates.main_browser !== mainRequired) throw Error('Main browser policy mismatch');

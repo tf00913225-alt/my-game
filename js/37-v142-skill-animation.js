@@ -338,7 +338,9 @@
         const previous=checkBattleEnd;
         checkBattleEnd=function(){
             const result=previous.apply(this,arguments);
-            if(result){ setTimeout(()=>director.dispose(),0); }
+            // V143 alone decides whether the visible battlefield still owns a
+            // committed lethal hit. Gameplay completion never waits for it.
+            if(result&&!window.v143HasTerminalImpactPresentation?.()){ director.dispose(); }
             return result;
         };
     }
