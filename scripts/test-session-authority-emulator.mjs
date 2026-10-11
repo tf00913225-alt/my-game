@@ -955,7 +955,10 @@ for(const [key,state] of Object.entries({
     "exp-pool-growth-state":{initialized:true,unlocked:false,
         lastAt:initialPlayableFields.lastSaveTimestamp,noticeShown:false,lastCapped:false,newcomerRewards:{}},
     "rested-exp-state":{battles:0,progressMs:0,
-        lastSeenAt:initialPlayableFields.lastSaveTimestamp,blockedByElementBox:false}
+        lastSeenAt:initialPlayableFields.lastSaveTimestamp,blockedByElementBox:false},
+    "progress":{eliteKills:0,dungeonWins:0,abyssClears:0},
+    "quest-milestones":{date:new Date(initialPlayableFields.lastSaveTimestamp).toISOString().slice(0,10),
+        daily:{},commission:{}}
 })){
     assert.deepEqual(initialTimeSidecars[key],{status:"present",raw:JSON.stringify(state)});
 }
@@ -1456,6 +1459,9 @@ ownedRecords.equipment=[{...ownedBase,characterId:ownedCharacterId,
 ownedRecords.relics=[{...ownedBase,relicId:"starter-relic-0001",
     unlocked:true,level:1,exp:0}];
 ownedRecords.economy.sharedExp=320;
+// Emulator-only retained claim/counter fixture, not milestone reward issuance.
+ownedRecords.progress.sidecars.progress.raw=' {"eliteKills":3,"dungeonWins":2,"abyssClears":1} ';
+ownedRecords.progress.sidecars["quest-milestones"].raw=' {"date":"2020-02-29","daily":{"20":true},"commission":{"100":true}} ';
 const ownedBundle=assembleCanonicalSnapshot(ownedUid,2,ownedRecords);
 const ownedRoot=db.collection("serverUsers").doc(ownedUid);
 const ownedItemRef=ownedRoot.collection("inventory").doc(ownedItemId);
@@ -1467,6 +1473,7 @@ await Promise.all([
     ownedEquipRef.set(ownedRecords.equipment[0]),
     ownedRelicRef.set(ownedRecords.relics[0]),
     ownedRoot.collection("economy").doc("current").update({sharedExp:320}),
+    ownedRoot.collection("progress").doc("current").update({sidecars:ownedRecords.progress.sidecars}),
     ownedRoot.collection("account").doc("current")
         .update({snapshotSha256:ownedBundle.sha256}),
     ownedRoot.collection("playableSnapshots").doc("2").set(ownedBundle),
