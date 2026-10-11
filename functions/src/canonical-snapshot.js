@@ -74,6 +74,34 @@ function inspectTimeSidecar(key,raw){
     }
 }
 
+// Recorded progress/claim evidence only. No completion calculation, rollover,
+// eligibility, claim creation or migration defaults happen in this reader.
+function inspectClaimSidecar(key,raw){
+    const fields={progress:["eliteKills","dungeonWins","abyssClears"],
+        "quest-milestones":["date","daily","commission"]}[key];
+    if(!fields){return;}
+    let state;
+    try{state=JSON.parse(raw);}catch(_){fail(`claim sidecar JSON: ${key}`);}
+    if(!object(state)||Object.keys(state).sort().join("|")!==[...fields].sort().join("|")){
+        fail(`claim sidecar fields: ${key}`);
+    }
+    require("./cloud-save-policy").validateJsonValue(state,`claim sidecar ${key}`,0);
+    if(key==="progress"){
+        if(fields.some(field=>!Number.isSafeInteger(state[field])||state[field]<0)){
+            fail("recorded progress counters");
+        }
+    }else{
+        if(typeof state.date!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(state.date)||
+           !Number.isFinite(Date.parse(`${state.date}T00:00:00Z`))||
+           new Date(`${state.date}T00:00:00Z`).toISOString().slice(0,10)!==state.date||
+           ["daily","commission"].some(type=>!object(state[type])||
+               Object.entries(state[type]).some(([threshold,claimed])=>
+                   !["20","40","60","80","100"].includes(threshold)||claimed!==true))){
+            fail("recorded milestone date or claim markers");
+        }
+    }
+}
+
 // Durable sources inherit ownership/revision from progress/current. The older
 // explicit in-memory input remains available, but two sources cannot coexist.
 function inspectPlayableState(records){
@@ -254,6 +282,7 @@ function assembleCanonicalSnapshot(uid,revision,records){
         // sources are newer; complete projection always validates below.
         if(records.progress.playableState!==undefined&&entry.status==="present"){
             inspectTimeSidecar(key,entry.raw);
+            inspectClaimSidecar(key,entry.raw);
         }
         if(CLAIM_SIDECARS.has(key)&&entry.status==="present"){
             let parsed;
@@ -371,6 +400,7 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
         if(!object(parsed)){fail(`playable sidecar structure: ${key}`);}
         validateJsonValue(parsed,`sidecar ${key}`,0);
         inspectTimeSidecar(key,entry.raw);
+        inspectClaimSidecar(key,entry.raw);
     }
     const gameSave={version:6,heroAccount:hero,player:players[0],player2:players[1],
         player3:players[2],gold:source.snapshot.economy.gold,

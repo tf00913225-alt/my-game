@@ -91,7 +91,9 @@ test("new creation persists server-generated playable fields in the existing rev
         "exp-pool-growth-state":{initialized:true,unlocked:false,lastAt:1700000000000,
             noticeShown:false,lastCapped:false,newcomerRewards:{}},
         "rested-exp-state":{battles:0,progressMs:0,lastSeenAt:1700000000000,
-            blockedByElementBox:false}
+            blockedByElementBox:false},
+        "progress":{eliteKills:0,dungeonWins:0,abyssClears:0},
+        "quest-milestones":{date:"2023-11-14",daily:{},commission:{}}
     };
     for(const [key,state] of Object.entries(initial)){
         assert.deepEqual(progress.sidecars[key],{status:"present",raw:JSON.stringify(state)});
@@ -115,7 +117,8 @@ test("new creation persists server-generated playable fields in the existing rev
     await assert.rejects(imported.writer.commitInitialSources({}, {...args,
         selection:{...selection,heroAccount:fields.heroAccount}}),/Invalid initial/);
     assert.equal(imported.committed,0);
-    for(const key of ["sidecars","remainingMs","lastSeenAt","newcomerRewards"]){
+    for(const key of ["sidecars","remainingMs","lastSeenAt","newcomerRewards",
+        "daily","commission","claimRecords","quest-milestones","eliteKills"]){
         const h=harness();
         await assert.rejects(h.writer.commitInitialSources({}, {...args,
             selection:{...selection,[key]:1}}),/Invalid initial/);
