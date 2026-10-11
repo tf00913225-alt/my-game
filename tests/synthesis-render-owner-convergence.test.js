@@ -34,7 +34,7 @@ function harness(){
         v132AddItemToInventory(def,n){if(c.failAdd)return false;const item=c.inventoryItems.find(item=>item.id===def.id);if(item)item.count+=n;else c.inventoryItems.push({...def,count:n});return true;},
         v132RunInventoryTransaction(fn){const snapshot=JSON.stringify(c.inventoryItems);const success=fn();if(!success)c.inventoryItems=JSON.parse(snapshot);return success;}
     };
-    c.window=c;vm.createContext(c);vm.runInContext(runtime,c);
+    c.window=c;vm.createContext(c);vm.runInContext(fs.readFileSync("functions/src/equipment-reforge.js","utf8"),c);vm.runInContext(runtime,c);
     return {c,body,defs,get writes(){return writes;},get timers(){return timers;},put(id,count){c.inventoryItems.push({...defs.talismans.concat(defs.ores,defs.blueprints,defs.tickets).find(item=>item.id===id),id,count,icon:"stale-art"});},count(id){return c.inventoryItems.filter(item=>item.id===id).reduce((sum,item)=>sum+item.count,0);}};
 }
 test("first open and every selection/quantity/tab/reentry render final UI without decorators or timers",()=>{
