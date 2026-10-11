@@ -80,6 +80,7 @@ function inspectClaimSidecar(key,raw){
     const fields={progress:["eliteKills","dungeonWins","abyssClears"],
         "quest-milestones":["date","daily","commission"],
         "daily-dungeon-state":["date","used"],
+        "legacy-abyss-state":["active","floor","phase","x","y","message","clears","rewardVersion"],
         "equipment-shop-daily":["date","refreshCount","soldOfferIds"]}[key];
     if(!fields){return;}
     let state;
@@ -91,6 +92,18 @@ function inspectClaimSidecar(key,raw){
     if(key==="progress"){
         if(fields.some(field=>!Number.isSafeInteger(state[field])||state[field]<0)){
             fail("recorded progress counters");
+        }
+    }else if(key==="legacy-abyss-state"){
+        // Pre-chest portal records have ambiguous reward semantics. Retain
+        // them in historical v1 archives, never reinterpret them here.
+        if(typeof state.active!=="boolean"||!Number.isSafeInteger(state.floor)||
+           state.floor<1||state.floor>5||
+           !["boss","chest","portal","complete"].includes(state.phase)||
+           !Number.isFinite(state.x)||state.x<4||state.x>96||
+           !Number.isFinite(state.y)||state.y<8||state.y>94||
+           typeof state.message!=="string"||!Number.isSafeInteger(state.clears)||
+           state.clears<0||state.rewardVersion!==1){
+            fail("recorded legacy Abyss evidence or reward version");
         }
     }else{
         if(typeof state.date!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(state.date)||
