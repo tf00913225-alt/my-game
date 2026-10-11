@@ -225,7 +225,7 @@ function validateMigrationBackup(bundle,uid){
            (sidecar.status==="missing"?sidecar.raw!==null:typeof sidecar.raw!=="string")){
             fail("invalid-argument","Backup sidecar is invalid.");
         }
-        if(sidecar.status==="present"&&!new Set(["announcement-read","bulk-sell-quality","patrol-character-index"]).has(suffix)){
+        if(sidecar.status==="present"&&!new Set(["announcement-read","bulk-sell-quality","patrol-character-index","task-tracker"]).has(suffix)){
             try{ validateJsonValue(JSON.parse(sidecar.raw),`sidecars.${suffix}`,0); }
             catch(_){ fail("invalid-argument","Backup sidecar JSON is invalid."); }
         }
