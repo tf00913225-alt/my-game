@@ -205,6 +205,25 @@ try{
  const idle=await page.evaluate(()=>{v142SkillAnimationDirector.dispose();return {noPlanes:!document.querySelector('.v143-hit-feedback-overlay,.v174-battle-hud-layer'),originalHudReturned:[...document.querySelectorAll('.battle-monster,.battle-player')].every(c=>!c.v174UnitHud||c.contains(c.v174UnitHud))};});
  assert.ok(idle.noPlanes&&idle.originalHudReturned);evidence.idle=idle;
  await page.screenshot({path:artifactDir+'/idle-original-hud.png'});
+ await page.evaluate(async()=>{
+  if(battleActive)v132AbortDungeonBattle('qa-stop');
+  await FourSymbolsFeatures.ensure('abyss','direct-impact-hud-regression');
+  prepareWildBalanceReferenceParty(40,1);window.v133GetHighestCreatedCharacterLevel=()=>40;
+  showPage('dungeon');v132LaunchDungeonBattle(v174AbyssBuildRoster(40,0,0),()=>{});
+ });
+ await page.waitForFunction(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
+ evidence.abyssHud=await page.evaluate(()=>{
+  clearInterval(timerId);timerId=null;
+  return currentBattleMonsters.map(i=>{
+   const hud=FourSymbolsBattlePresentation.getUnitHud(document.getElementById('battleMonster'+i));
+   return {index:i,width:hud.getBoundingClientRect().width,position:getComputedStyle(hud).position,
+    bars:[...hud.querySelectorAll('.monster-hp,.monster-sp')].map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height}))};
+  });
+ });
+ assert.equal(evidence.abyssHud.length,8);
+ assert.ok(evidence.abyssHud.every(h=>h.position==='absolute'&&h.width>0&&h.bars.length===2&&h.bars.every(b=>b.width>0&&b.height>0)),
+  'real idle Abyss HUD retains formal geometry after legacy portrait decoration');
+ await scene(3);
  await cast('flameSlash');await page.waitForFunction(()=>__impactQaReady);
  await page.evaluate(()=>window.addEventListener('pagehide',()=>{
   sessionStorage.setItem('impact-qa-pagehide',JSON.stringify({remaining:v143SkillAnimationState.impactFlashes.size,hitRoot:!!document.querySelector('.v143-hit-feedback-overlay'),hudRoot:!!document.querySelector('.v174-battle-hud-layer')}));

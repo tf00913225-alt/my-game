@@ -5340,7 +5340,7 @@
     background-size:cover !important;
     background-repeat:no-repeat !important;
 }
-#game-stage #battlePage .battle-monster.v152-abyss-portrait > *{
+#game-stage #battlePage .battle-monster.v152-abyss-portrait > :not(.v174-unit-hud):not(.v174-battle-art){
     position:relative;
     z-index:2;
 }

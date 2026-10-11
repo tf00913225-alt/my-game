@@ -15,6 +15,9 @@ test('cardless presentation keeps Slot geometry and migrates one real HUD surfac
     assert.doesNotMatch(source,/battlePlayerRow\.style/);
     assert.doesNotMatch(source,/battleInput\.style/);
     assert.doesNotMatch(source,/turn-target-row[^\n]*style/);
+    const abyssCss=fs.readFileSync(path.join(__dirname,'..','css','45-v152-dev-fixes.css'),'utf8');
+    assert.match(abyssCss,/\.v152-abyss-portrait > :not\(\.v174-unit-hud\):not\(\.v174-battle-art\)\{/,
+        'legacy Abyss child stacking cannot take geometry ownership from the real HUD surface');
 });
 
 test('HP and SP labels are normalized to current values only without observer churn',()=>{
