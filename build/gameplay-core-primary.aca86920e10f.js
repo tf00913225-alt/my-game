@@ -13434,7 +13434,7 @@
         const hit=current?.impactHits?.get(unitIndex);
         const ownedHit=hit&&hit.fact===fact&&validImpactHit(hit)&&!hit.scheduled&&!hit.presented;
         const indirectSource=["dot","relic","reflect","environment","self","hpCost"];
-        const direct=current&&!current.done&&(current.config.id==="normal"||
+        const direct=current&&!current.done&&current.targetSide===side&&(current.config.id==="normal"||
             current.config.category==="physical"||current.config.category==="magic")&&
             (current.impactEpoch===undefined||current.impactEpoch===impactEpoch)&&
             (!fact||fact.damageKind==="direct"&&!indirectSource.includes(fact.sourceType))&&
@@ -13448,8 +13448,9 @@
                 const sound=damage?(critical?"crit":"damage"):kind==="shield"?"block":kind==="miss"?"dodge":null;
                 if(sound&&audio&&typeof audio.play==="function"){ audio.play(sound,audio.combatFeedbackVolumeScale); }
             };
-            if(!damage||!direct||state.current!==current||current.done||impactEpoch!==state.impactEpoch||
-               entityFor(side,unitIndex)!==entity||hit&&!ownedHit||ownedHit&&!validImpactHit(hit)){
+            if(!damage||!direct||!entity||state.current!==current||current.done||impactEpoch!==state.impactEpoch||
+               entityFor(side,unitIndex)!==entity||hit&&!ownedHit||ownedHit&&(hit.presented||!validImpactHit(hit))||
+               (Number(entity?.hp)<=0||entity?.alive===false)&&!(ownedHit&&hit.lethal)){
                 playSound(); return;
             }
             const card=cardFor(side,unitIndex);

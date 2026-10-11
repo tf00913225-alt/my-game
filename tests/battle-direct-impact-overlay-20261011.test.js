@@ -135,6 +135,7 @@ for(const terminalFirst of [false,true]){
  [...f.context.state.impactFlashes.values()][0].animation.onfinish();
  assert.equal(f.context.window.v143HasTerminalImpactPresentation(),false);
  callback();assert.equal(f.context.state.impactFlashes.size,0,'old callback cannot replay lethal hit');
+ assert.equal(f.motions.length,2,'old callback cannot replay the recoil either');
  f.entities[0].hp=1;
  f.context.settleBattleHpDamage(f.entities[0],1,{});
  f.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');
@@ -161,6 +162,21 @@ for(const sourceType of ['dot','relic','reflect','environment','self','hpCost'])
  assert.equal(f.context.state.impactFlashes.size,0,'lethal '+sourceType+' never earns direct-hit credit');
 }
 assert.doesNotMatch(source,/killMonster=function/,'V143 does not defer core death settlement');
+{
+ const f=fixture(1);f.context.window.v143ResolveBattleFeedbackTiming('player',0,'damage');
+ assert.equal(f.motions.length,0,'matching numeric index on the wrong side is not this cast target');
+}
+{
+ const f=fixture(1);f.entities[0].hp=0;f.entities[0].alive=false;
+ f.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');
+ assert.equal(f.motions.length,0,'arbitrary dead-target feedback produces neither overlay nor recoil');
+}
+{
+ const f=fixture(1);f.entities[0].hp=2;f.context.delayFor=()=>50;
+ f.context.settleBattleHpDamage(f.entities[0],1,{});f.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');
+ f.context.settleBattleHpDamage(f.entities[0],1,{sourceType:'dot',damageKind:'dot'});
+ f.jobs[0]();assert.equal(f.motions.length,0,'a prior nonlethal hit cannot become a lethal presentation credit after DOT death');
+}
 // Exercise the actual V142 terminal/dispose/pagehide bridge, not a label-only clear.
 {
  const f=fixture(1),windowEvents=new Map();f.entities[0].hp=1;
