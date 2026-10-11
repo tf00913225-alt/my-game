@@ -44,6 +44,7 @@ const open=()=>openHomeFeature('forge');
 const choose=uid=>{const picker=$('homeFeatureModalBody').querySelector('details');picker.open=true;const b=[...picker.querySelectorAll('button')].find(b=>b.dataset.forgeValue===uid);ok(b,'picker option '+uid);b.click()};
 const start=()=>{const b=$('homeFeatureModalBody').querySelector('.v141-synthesis-primary');ok(b&&!b.disabled,'start enabled');b.click();ok($('homeFeatureModalBody').textContent.includes('本次新效果'),'actual comparison appears')};
 const resolve=apply=>{const b=[...$('homeFeatureModalBody').querySelectorAll('button')].find(b=>b.textContent===(apply?'套用新效果':'保留原效果'));ok(b,'resolve control');b.click()};
+characterEquipment.alias=characterEquipment.fixture;ok(FourSymbolsReforge.canReforge(worn),'same equipped object aliases are one instance');delete characterEquipment.alias;
 const beforeOwner=window.v141StartReforge;ok(!beforeOwner.toString().includes('select['),'final owner uses state');
 open();choose('bag');const old={...bag.reforgeStats},base={...bag.stats};const firstGold=gold,firstStock=stock();start();eq(gold,firstGold-1000,'purple gold cost');eq(stock(),firstStock-50,'purple ore cost');
 choose('worn');ok($('homeFeatureModalBody').textContent.includes('purple bag'),'pending target cannot be discarded by picker');resolve(false);eq(bag.reforgeStats,old,'keep original');eq(bag.stats,base,'original attributes');

@@ -162,7 +162,8 @@
                 if(item&&isEquipmentInventoryType(item.type)&&canActuallyReforge(item)){ results.push({item,source:"已裝備"}); }
             });
         });
-        return results;
+        const seen=new Set();
+        return results.filter(entry=>{ if(seen.has(entry.item)){ return false; } seen.add(entry.item); return true; });
     }
     function findEquipmentByUid(uid){
         if(typeof uid!=="string"||!uid.trim()){ return null; }
@@ -352,8 +353,8 @@
         if(synthesisState.pendingReforge&&synthesisState.pendingReforge.uid===item.v141Uid){
             const pending=synthesisState.pendingReforge;
             const pendingLabel=(TIER_META[pending.materialTier]||material.meta).label;
-            compare='<div class="v141-reforge-compare"><section><small>目前冶煉效果</small>'+affixesHtml(reforgeModel.slots(item))+'</section><b>VS</b><section><small>本次新效果・'+pendingLabel+'材料</small>'+affixesHtml(pending.stats)+'</section>'+
-                '<div><button onclick="v141ResolveReforge(false)">保留原效果</button><button onclick="v141ResolveReforge(true)">套用新效果</button></div></div>';
+            compare='<div class="v141-reforge-compare"><div class="v141-reforge-comparison-slots" data-scroll-owner="y"><section><small>目前冶煉效果</small>'+affixesHtml(reforgeModel.slots(item))+'</section><b>VS</b><section><small>本次新效果・'+pendingLabel+'材料</small>'+affixesHtml(pending.stats)+'</section></div>'+
+                '<div class="v141-reforge-actions"><button onclick="v141ResolveReforge(false)">保留原效果</button><button onclick="v141ResolveReforge(true)">套用新效果</button></div></div>';
         }
         const tierButtons=TIER_ORDER.map(key=>{
             const info=reforgeMaterialInfo(key);
@@ -395,7 +396,7 @@
         Object.values(typeof characterEquipment!=="undefined"&&characterEquipment||{}).forEach(slots=>
             Object.values(slots||{}).forEach(item=>{ if(item&&item.v141Uid){ result.push(item); } })
         );
-        return result;
+        return [...new Set(result)];
     }
     function iconForPickerValue(value){
         const content=definitions();

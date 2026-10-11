@@ -92,7 +92,7 @@
         if(!item){ return []; }
         if(item.reforgeVersion!==undefined&&item.reforgeVersion!==VERSION){ throw Error("未知冶煉資料版本，請保留原資料"); }
         if(item.reforgeAffixes!==undefined){
-            if(!Array.isArray(item.reforgeAffixes)||!item.reforgeAffixes.every(a=>a===null||validAffix(a))){ throw Error("冶煉詞條資料異常，請保留原資料"); }
+            if(!Array.isArray(item.reforgeAffixes)||!Array.from(item.reforgeAffixes).every(a=>a===null||validAffix(a))){ throw Error("冶煉詞條資料異常，請保留原資料"); }
             return item.reforgeAffixes.map(a=>a===null?null:{...a});
         }
         const legacy=item.reforgeStats;
