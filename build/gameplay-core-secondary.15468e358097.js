@@ -6794,9 +6794,9 @@
         for(const rarity of table){ cursor+=rarity.chance; if(roll<cursor){ return RARITY_BY_KEY[rarity.key]; } }
         throw new Error("裝備階級抽取超出範圍");
     }
-    function artMarkup(path,rarityKey){
-        if(!path){ return '<span class="v169-item-art v169-equipment-art" data-asset-state="missing" role="img" aria-label="裝備素材尚未就緒" title="裝備素材尚未就緒">◇</span>'; }
-        return window.FourSymbolsItemSlot.art('<span class="v169-item-art v169-equipment-art"><img src="'+path+'" alt="" draggable="false" onerror="this.parentElement.dataset.assetState=\'broken\';this.parentElement.setAttribute(\'role\',\'img\');this.parentElement.setAttribute(\'aria-label\',\'裝備圖片無法載入\');this.parentElement.textContent=\'◇\'"></span>',{rarityKey});
+    function artMarkup(path,rarityKey,type){
+        if(!path){ return window.FourSymbolsItemSlot.art('<span class="v169-item-art v169-equipment-art" data-asset-state="missing" role="img" aria-label="裝備素材尚未就緒" title="裝備素材尚未就緒">◇</span>',{type,rarityKey}); }
+        return window.FourSymbolsItemSlot.art('<span class="v169-item-art v169-equipment-art"><img src="'+path+'" alt="" draggable="false" onerror="this.parentElement.dataset.assetState=\'broken\';this.parentElement.setAttribute(\'role\',\'img\');this.parentElement.setAttribute(\'aria-label\',\'裝備圖片無法載入\');this.parentElement.textContent=\'◇\'"></span>',{type,rarityKey});
     }
     const LEGACY_STARTER_EQUIPMENT_ART={
         ironSword:{path:"assets/equipment/warrior/weapon-01.png",classType:"warrior"},
@@ -6840,7 +6840,7 @@
             const iconText=String(item.icon||"");
             const hasRealArt=/<(?:img|svg)\\b/i.test(iconText);
             if(!hasRealArt){
-                item.icon=spec.ring?legacyStarterRingMarkup():artMarkup(spec.path,"white");
+                item.icon=spec.ring?legacyStarterRingMarkup():artMarkup(spec.path,"white",item.type);
                 changed=true;
             }
             if(spec.path&&item.assetPath!==spec.path){ item.assetPath=spec.path; changed=true; }
@@ -6888,7 +6888,7 @@
         return {
             equipmentCombatPercentUnitVersion:2,
             id:makeUid("gear"),v141Uid:makeUid("gearuid"),name,
-            icon:artMarkup(asset,rarity.key),type:slot,count:1,price:Math.floor(rarity.shopPrice*.2),
+            icon:artMarkup(asset,rarity.key,slot),type:slot,count:1,price:Math.floor(rarity.shopPrice*.2),
             stats:{...entry.stats},reforgeStats:null,reforgeSlots:rarity.reforgeSlots,reforgeUsed:0,
             rarityKey:rarity.key,quality:rarity.key,classType,assetPath:asset,
             shopPrice:rarity.shopPrice,v17346GeneratedEquipment:true
