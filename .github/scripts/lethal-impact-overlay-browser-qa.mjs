@@ -123,18 +123,19 @@ try{
   if(scenario.boss)assert.ok(info.bossFootprint?.split(' ').length>1,'formal multi-slot Boss footprint');
   await page.waitForFunction(()=>v143SkillAnimationState.impactFlashes.size===0);
   await session.send('Page.stopScreencast');
-  const frameDir=path.join(dir,scenario.label+'-frames');fs.mkdirSync(frameDir,{recursive:true});
-  frames.forEach((frame,i)=>fs.writeFileSync(path.join(frameDir,String(i).padStart(3,'0')+'.jpg'),Buffer.from(frame.data,'base64')));
+  const recordedFrames=frames.slice();
+  const frameDir=fs.mkdtempSync(path.join(dir,scenario.label+'-frames-'));
+  recordedFrames.forEach((frame,i)=>fs.writeFileSync(path.join(frameDir,String(i).padStart(3,'0')+'.jpg'),Buffer.from(frame.data,'base64')));
   const samples=await page.evaluate(()=>__qaSamples);
-  fs.writeFileSync(path.join(dir,scenario.label+'-observation.json'),JSON.stringify({info,observed,samples,frames:frames.map(f=>f.timestamp)},null,2));
+  fs.writeFileSync(path.join(dir,scenario.label+'-observation.json'),JSON.stringify({info,observed,samples,frames:recordedFrames.map(f=>f.timestamp)},null,2));
   const bases=samples.filter(s=>s.times.length&&Number.isFinite(s.times[0])).map(s=>s.at-s.times[0]).sort((a,b)=>a-b);
   const hitAt=bases[Math.floor(bases.length/2)];
   const screenshots=[];
   // Approximate temporal samples; raw compositor frames must also be inspected.
   // Multiple target callbacks may paint in different frames on a busy device.
   for(const [phase,low,high] of [['first',0,80],['gap',80,120],['second',120,200]]){
-   const frame=frames.filter(f=>f.timestamp-hitAt>=low+5&&f.timestamp-hitAt<high).sort((a,b)=>Math.abs(a.timestamp-hitAt-(low+high)/2)-Math.abs(b.timestamp-hitAt-(low+high)/2))[0];
-   assert.ok(frame,scenario.label+' compositor frame for '+phase+'; '+JSON.stringify(frames.map(f=>f.timestamp-hitAt)));
+   const frame=recordedFrames.filter(f=>f.timestamp-hitAt>=low+5&&f.timestamp-hitAt<high).sort((a,b)=>Math.abs(a.timestamp-hitAt-(low+high)/2)-Math.abs(b.timestamp-hitAt-(low+high)/2))[0];
+   assert.ok(frame,scenario.label+' compositor frame for '+phase+'; '+JSON.stringify(recordedFrames.map(f=>f.timestamp-hitAt)));
    const filename=scenario.label+'-'+phase+'.jpg';screenshots.push(filename);
    fs.writeFileSync(path.join(dir,filename),Buffer.from(frame.data,'base64'));
   }
@@ -149,7 +150,7 @@ try{
    assert.equal(terminal.battleActive,false);
   }
   assert.equal(errors.length,0,errors.join('\n'));
-  evidence.scenes.push({scenario,info,observed,samples,screenshots,terminal,compositorTimes:frames.map(f=>f.timestamp-hitAt)});
+  evidence.scenes.push({scenario,info,observed,samples,screenshots,frameDirectory:path.basename(frameDir),terminal,compositorTimes:recordedFrames.map(f=>f.timestamp-hitAt)});
   fs.writeFileSync(path.join(dir,'result.json'),JSON.stringify(evidence,null,2));
   console.log('PASS '+scenario.label+' natural 80/40/80 while VFX running');
   if(scenario.label==='single-lethal'){
