@@ -46,6 +46,41 @@ function sources(count=1){
 }
 const assemble=records=>assembleCanonicalPlayableProjection("uid-a",7,records);
 
+test("task tracker preference cannot block complete evidence or stand in for real claims",()=>{
+    const registry=JSON.parse(readFileSync(new URL("../config/persisted-state-registry.json",import.meta.url))).states;
+    const row=registry.find(entry=>entry.key==="four_symbols_account:<UID>:task-tracker");
+    assert.equal(row.scope,"uid");assert.equal(row.deviceOnly,true);assert.equal(row.backupRequired,true);
+    for(const field of ["gameplayCritical","rewardCoupled","economyCoupled","claimCoupled",
+        "cloudRequired","migrationRequired"]){assert.equal(row[field],false,field);}
+    assert.equal(row.authorityTier,"C");
+    const {createRecoveryArchive,inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    for(const entry of [{status:"missing",raw:null},
+        {status:"present",raw:' {"top":123.5,"collapsed":true} '},
+        {status:"present",raw:"corrupt-ui-preference"}]){
+        const records=sources();records.progress.sidecars["task-tracker"]=entry;
+        const before=structuredClone(records),bundle=assemble(records);
+        assert.deepEqual(bundle.projection.sidecars["task-tracker"],entry);
+        assert.equal(bundle.readyForPublication,false);assert.equal(bundle.projection.authoritativeStateReady,false);
+        const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
+        records.progress.playableState=fields;delete records.playableState;
+        const snapshot=assembleCanonicalSnapshot("uid-a",7,records);
+        const archive=JSON.parse(JSON.stringify(createRecoveryArchive("uid-a",7,records,snapshot)));
+        const restored=inspectRecoveryArchive(archive,"uid-a",7,snapshot);
+        assert.deepEqual(restored.progress.sidecars["task-tracker"],entry);
+        assert.deepEqual(restored.claimRecords,before.claimRecords);
+        assert.equal(restored.claimCheckpoint.historicalClaimsBlocked,true);
+        assert.equal(archive.readyForRestore,false);
+        for(const key of ["daily-dungeon-state","progress","quest-milestones","legacy-abyss-state",
+            "equipment-shop-daily","equipment-shop-purchases","abyss-state"]){
+            const missing=structuredClone(records);missing.progress.sidecars[key]={status:"missing",raw:null};
+            assert.throws(()=>assemble(missing),/claim-bearing sidecar missing/,key);
+        }
+        const changed=structuredClone(before);changed.progress.sidecars["task-tracker"]={status:"present",raw:"different-ui-bytes"};
+        assert.notEqual(assemble(changed).sha256,bundle.sha256);
+        assert.throws(()=>verifyCanonicalPlayableProjectionAgainstSources(bundle,"uid-a",7,changed),/differs/);
+    }
+});
+
 test("legacy Abyss preservation rejects lossy or ambiguous evidence without migration",()=>{
     const mutations=[s=>delete s.rewardVersion,s=>s.rewardVersion=0,s=>s.rewardVersion=2,
         s=>s.rewardVersion="1",s=>s.active=1,s=>s.floor=0,s=>s.floor=6,s=>s.floor=1.5,

@@ -9,7 +9,7 @@ const MAX_SNAPSHOT_BYTES=750*1024;
 const PROGRESS_FIELDS=["dailyQuestState","commissionQuestState","achievementState",
     "gameplayProgress","abyssProgress"];
 const CLAIM_SIDECARS=new Set(["daily-dungeon-state","progress","quest-milestones",
-    "task-tracker","legacy-abyss-state","equipment-shop-daily",
+    "legacy-abyss-state","equipment-shop-daily",
     "equipment-shop-purchases","abyss-state"]);
 const EQUIPMENT_SLOTS=new Set(["head","hand","shoulder","armor","shoes","ring"]);
 const EQUIPMENT_TYPES={weapon:"hand",hand:"hand",helmet:"head",head:"head",
@@ -492,7 +492,7 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
     }
     // Device-only preferences may be missing; every gameplay source must be
     // explicit. An empty/default object cannot be synthesized by this reader.
-    const deviceOnly=new Set(["announcement-read","bulk-sell-quality","patrol-character-index"]);
+    const deviceOnly=new Set(["announcement-read","bulk-sell-quality","patrol-character-index","task-tracker"]);
     const sidecars=copy(source.snapshot.progress.sidecars);
     for(const [key,entry] of Object.entries(sidecars)){
         if(deviceOnly.has(key)){continue;}
