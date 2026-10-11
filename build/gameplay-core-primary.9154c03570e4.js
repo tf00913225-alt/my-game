@@ -9398,6 +9398,7 @@
         if(!item||!isEquipmentInventoryType(item.type)){ reason="這不是合法裝備。"; }
         else if(typeof item.v141Uid!=="string"||!item.v141Uid.trim()){ reason="裝備 UID 無效，無法冶煉。"; }
         else if(findEquipmentByUid(item.v141Uid)!==item){ reason="裝備已失效或 UID 重複，無法冶煉。"; }
+        else if(!item.stats||typeof item.stats!=="object"||Array.isArray(item.stats)||!Object.values(item.stats).every(v=>typeof v==="number"&&Number.isFinite(v))||typeof item.name!=="string"||!item.name.trim()){ reason="裝備基本資料不完整，無法冶煉。"; }
         else if(!validReforgeData(item)){ reason="冶煉資料異常，請保留原資料。"; }
         else if(reforgeSlotCount(item)<=0){ reason="這件裝備沒有冶煉槽。"; }
         else if(item.v17351Locked===true){ reason="裝備已鎖定，無法冶煉"; }
@@ -9587,62 +9588,47 @@
         ).join("")+'</div>';
     }
 
+    function renderReforgeEquipmentPicker(entries,item){
+        return '<details class="v141-forge-picker v141-smelting-picker"><summary><span class="v141-smelting-art">'+(item?window.FourSymbolsItemSlot.art(item.icon,item):'<span class="v141-smelting-plus" aria-hidden="true">＋</span>')+'</span><span>'+(item?window.FourSymbolsItemSlot.name(item.name,item)+'<small>'+escapeHtml(TIER_META[reforgeModel.rarity(item)].label)+'</small>':'選擇裝備')+'</span><b>'+(item?'更換':'選擇')+'</b></summary><div class="v141-forge-options" role="group" aria-label="選擇可冶煉裝備">'+entries.map(entry=>'<button type="button" class="v141-forge-option" data-forge-value="'+escapeHtml(entry.item.v141Uid)+'" onclick="v141SelectReforgeItem(this.dataset.forgeValue)"><span class="v141-smelting-art">'+window.FourSymbolsItemSlot.art(entry.item.icon,entry.item)+'</span><span>'+window.FourSymbolsItemSlot.name(entry.item.name,entry.item)+'<small>'+escapeHtml(TIER_META[reforgeModel.rarity(entry.item)].label)+'・'+entry.source+'</small><small>'+statsHtml(entry.item.stats)+'</small></span></button>').join('')+(entries.length?'':'<p>目前沒有可冶煉裝備。</p>')+'<button type="button" onclick="this.parentElement.parentElement.open=false">取消選擇</button></div></details>';
+    }
     function renderReforgeTab(){
         const entries=allRefinableEquipment();
-        if(synthesisState.reforgeUid===null&&entries.length){
-            synthesisState.reforgeUid=entries[0].item.v141Uid;
-            synthesisState.lockedReforgeKeys=[];
+        const selected=findEquipmentByUid(synthesisState.reforgeUid);
+        const item=canActuallyReforge(selected)?selected:null;
+        const picker=renderReforgeEquipmentPicker(entries,item);
+        if(!item){
+            const reason=selected?canActuallyReforge(selected,true):synthesisState.reforgeUid?'裝備已失效，請重新選擇裝備。':'請先選擇裝備。';
+            return {content:'<div class="v141-synthesis-card v17358-reforge-card">'+picker+'</div>',footer:'<footer class="v141-smelting-footer"><p role="status">'+escapeHtml(reason)+'</p>'+(synthesisState.pendingReforge?'<button type="button" class="v141-synthesis-primary" onclick="v141ResolveReforge(false)">保留原效果</button>':'<button type="button" class="v141-synthesis-primary" disabled>開始冶煉</button>')+'</footer>'};
         }
-        const item=findEquipmentByUid(synthesisState.reforgeUid);
-        if(!canActuallyReforge(item)){
-            const reason=item?canActuallyReforge(item,true):synthesisState.reforgeUid?"裝備已失效或 UID 重複，請重新選擇裝備。":"沒有可冶煉的裝備。";
-            return '<div class="v141-synthesis-empty">'+escapeHtml(reason)+
-                '<small>只有具備至少 1 個冶煉槽、且未鎖定的裝備會出現在這裡。</small>'+
-                renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］',item:entry.item})),synthesisState.reforgeUid,'v141SelectReforgeItem')+
-                (synthesisState.pendingReforge?'<button type="button" onclick="v141ResolveReforge(false)">保留原效果</button>':'')+'</div>';
-        }
-        const slotCount=reforgeSlotCount(item);
-        const locks=normalizeReforgeLocks(item);
-        const lockSet=new Set(locks);
-        const maxLocks=Math.min(2,Math.max(0,slotCount-1));
+        const slotCount=reforgeSlotCount(item),locks=normalizeReforgeLocks(item),lockSet=new Set(locks);
         const requestedTier=normalizeTierKey(synthesisState.reforgeMaterialTier);
-        const tier=TIER_META[requestedTier]&&TIER_META[requestedTier].available!==false?requestedTier:"white";
+        const tier=TIER_META[requestedTier]&&TIER_META[requestedTier].available!==false?requestedTier:'white';
         synthesisState.reforgeMaterialTier=tier;
-        const material=reforgeMaterialInfo(tier);
-        const materialCost=reforgeMaterialCost(locks.length);
-        const currentEntries=reforgeModel.slots(item);
-        const can=canUseLocalSockets()&&material.meta.available!==false&&!!material.ore&&material.oreCount>=materialCost&&gold>=material.meta.reforgeGold&&slotCount>locks.length;
-        let compare="";
-        if(synthesisState.pendingReforge&&synthesisState.pendingReforge.uid===item.v141Uid){
-            const pending=synthesisState.pendingReforge;
-            const pendingLabel=(TIER_META[pending.materialTier]||material.meta).label;
-            compare='<div class="v141-reforge-compare"><div class="v141-reforge-comparison-slots" data-scroll-owner="y"><section><small>目前冶煉效果</small>'+affixesHtml(reforgeModel.slots(item))+'</section><b>VS</b><section><small>本次新效果・'+pendingLabel+'材料</small>'+affixesHtml(pending.stats)+'</section></div>'+
-                '<div class="v141-reforge-actions"><button onclick="v141ResolveReforge(false)">保留原效果</button><button onclick="v141ResolveReforge(true)">套用新效果</button></div></div>';
-        }
-        const tierButtons=TIER_ORDER.map(key=>{
+        const material=reforgeMaterialInfo(tier),materialCost=reforgeMaterialCost(locks.length);
+        const pending=synthesisState.pendingReforge;
+        const currentEntries=pending&&pending.uid===item.v141Uid?pending.stats:reforgeModel.slots(item);
+        const can=canUseLocalSockets()&&!!material.ore&&Number.isFinite(gold)&&material.oreCount>=materialCost&&gold>=material.meta.reforgeGold&&slotCount>locks.length;
+        const missing=[];
+        if(!canUseLocalSockets()){ missing.push('目前角色尚未開放本機冶煉交易。'); }
+        if(!material.ore){ missing.push('冶煉材料資料尚未就緒。'); }
+        else if(material.oreCount<materialCost){ missing.push('缺少'+material.ore.name+' ×'+(materialCost-material.oreCount)); }
+        if(!Number.isFinite(gold)||gold<material.meta.reforgeGold){ missing.push('金幣不足，需求 '+material.meta.reforgeGold.toLocaleString('zh-TW')); }
+        const tiers=TIER_ORDER.filter(key=>TIER_META[key].available!==false).map(key=>{
             const info=reforgeMaterialInfo(key);
-            const unavailable=info.meta.available===false;
-            return '<button type="button" class="v17358-reforge-tier '+(key===tier?'active ':'')+(unavailable?'planned':'')+'" '+
-                (unavailable?'disabled aria-disabled="true"':'onclick="v141SelectReforgeMaterialTier(\''+key+'\')"')+'>'+
-                '<b>'+info.meta.label+'材料</b><span>'+(unavailable?'尚未開放':'礦石 '+info.oreCount)+'</span><small>'+reforgeRangeText(key,slotCount)+'・金幣 '+info.meta.reforgeGold.toLocaleString('zh-TW')+'</small></button>';
-        }).join("");
-        const lockHtml=currentEntries.map((affix,index)=>{
-            const selected=lockSet.has(index);
-            return '<button type="button" class="v17358-affix-lock '+(selected?'locked':'')+'" '+(!affix||synthesisState.pendingReforge?'disabled':'')+' onclick="v141ToggleReforgeLock('+index+')">'+
-                '<span>'+(selected?'🔒':'◇')+'</span><b>槽 '+(index+1)+' '+(affix?escapeHtml(STAT_LABEL[affix.stat]||affix.stat)+' +'+affix.value:'空槽')+'</b><small>'+(affix?(selected?'已鎖定':'點擊鎖定'):'下次冶煉抽取')+'</small></button>';
+            return '<div class="v17358-reforge-tier '+(tier===key?'active':'')+'"><button type="button" class="v141-smelting-art" aria-label="'+escapeHtml(info.ore?.name||info.meta.label)+'獲取途徑" data-tier="'+key+'" onclick="v141ShowReforgeMaterialSource(this.dataset.tier)">'+(info.ore?window.FourSymbolsItemSlot.art(info.ore.icon,info.ore):'')+'</button><button type="button" class="v141-smelting-tier-choice" aria-pressed="'+(tier===key)+'" '+(pending?'disabled':'data-tier="'+key+'" onclick="v141SelectReforgeMaterialTier(this.dataset.tier)"')+'><b>'+info.meta.label+'</b><span class="'+(info.oreCount>=materialCost?'ok':'lack')+'">'+info.oreCount+' / '+materialCost+'</span></button></div>';
         }).join('');
-        return '<div class="v141-synthesis-card v17358-reforge-card">'+
-            renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］',item:entry.item})),synthesisState.reforgeUid,'v141SelectReforgeItem')+
-            '<section class="v141-reforge-current"><b>'+window.FourSymbolsItemSlot.name(item.name,item)+'</b><small>冶煉槽 '+slotCount+' 格・可不限次數重洗</small><div><em>原始詞條</em>'+statsHtml(item.stats)+'</div><div><em>目前冶煉</em>'+affixesHtml(reforgeModel.slots(item))+'</div></section>'+
-            '<section class="v17358-reforge-material"><div class="v17358-section-title"><b>選擇冶煉材料階級</b><span>裝備品質不限制材料；材料階級只決定本次數值範圍。</span></div><div class="v17358-reforge-tiers">'+tierButtons+'</div></section>'+
-            '<section class="v17358-reforge-lock-panel"><div class="v17358-section-title"><b>鎖定詞條</b><span>最多鎖 2 條，且至少保留 1 個槽位重新冶煉。</span></div><div class="v17358-reforge-lock-list">'+lockHtml+'</div><small>目前鎖定 '+locks.length+' / '+maxLocks+' 條</small></section>'+
-            '<div class="v141-material-lines v17358-reforge-cost">'+
-            '<span>'+escapeHtml(material.ore&&material.ore.name||material.meta.label+'礦石')+' <b class="'+(material.oreCount>=materialCost?'ok':'lack')+'">'+material.oreCount+' / '+materialCost+'</b></span>'+
-            '<span>金幣 <b class="'+(gold>=material.meta.reforgeGold?'ok':'lack')+'">'+material.meta.reforgeGold.toLocaleString('zh-TW')+'</b></span></div>'+
-            '<div class="v17358-reforge-cost-note">礦石消耗：未鎖定 50・鎖 1 條 100・鎖 2 條 150</div>'+
-            '<button type="button" class="v141-synthesis-primary" '+(can&&!synthesisState.pendingReforge?'':'disabled')+' onclick="v141StartReforge()">開始冶煉</button>'+
-            '<button type="button" class="v141-affix-info" onclick="v141ShowAffixInfo()">ⓘ 冶煉規則</button>'+compare+'</div>';
+        const affixes=currentEntries.map((affix,index)=>affix?'<div class="v141-smelting-affix"><b>'+escapeHtml(STAT_LABEL[affix.stat]||affix.stat)+' +'+affix.value+'</b><button type="button" class="v17358-affix-lock '+(lockSet.has(index)?'locked':'')+'" aria-pressed="'+lockSet.has(index)+'" '+(pending?'disabled':'onclick="v141ToggleReforgeLock('+index+')"')+'>'+(lockSet.has(index)?'已鎖定':'鎖定')+'</button></div>':'').join('');
+        const emptyCount=currentEntries.filter(a=>!a).length;
+        const actions=pending?'<div class="v141-reforge-actions"><button type="button" onclick="v141ResolveReforge(false)">保留原效果</button><button type="button" class="v141-synthesis-primary" onclick="v141ResolveReforge(true)">套用新效果</button></div>':'<button type="button" class="v141-synthesis-primary" '+(can?'':'disabled')+' onclick="v141StartReforge()">開始冶煉</button>';
+        return {content:'<div class="v141-synthesis-card v17358-reforge-card">'+picker+
+            '<section class="v141-reforge-current"><h3>基本屬性</h3><div>'+statsHtml(item.stats)+'</div></section>'+
+            '<section class="v17358-reforge-lock-panel" aria-live="polite"><h3>'+(pending?'本次新效果':'可冶煉詞條')+'</h3><div class="v17358-reforge-lock-list">'+affixes+'</div>'+(emptyCount?'<p>尚有 '+emptyCount+' 個正式冶煉槽未生成詞條；首次冶煉後顯示。</p>':'')+'<small>目前鎖定 '+locks.length+' / '+reforgeModel.maxLocks(item)+' 條；至少保留一槽重洗。</small></section>'+
+            '<section class="v17358-reforge-material"><h3>冶煉材料</h3><small>持有 / 本次需求・點圖示查看來源</small><div class="v17358-reforge-tiers">'+tiers+'</div><p>'+reforgeRangeText(tier,slotCount)+'・金幣需求 '+material.meta.reforgeGold.toLocaleString('zh-TW')+'</p><button type="button" class="v141-affix-info" onclick="v141ShowAffixInfo()">冶煉規則</button></section></div>',footer:'<footer class="v141-smelting-footer"><p class="v141-smelting-status" role="status">'+(pending?'材料與金幣已消耗，請選擇套用或保留。':escapeHtml(missing.join('；')||'材料足夠，可以開始冶煉。'))+'</p>'+actions+'</footer>'};
     }
+    window.v141ShowReforgeMaterialSource=function(tier){
+        const info=reforgeMaterialInfo(tier||synthesisState.reforgeMaterialTier);
+        if(info.ore){ window.FourSymbolsItemAcquisition?.show(info.ore); }
+    };
 
     function availableTalismans(){
         return definitions().talismans.filter(item=>TALISMAN_TIER_ORDER.slice(0,3).includes(normalizeTierKey(item.tierKey))&&countItem(item.id)>0);
@@ -9791,9 +9777,13 @@
         const forge=activeFeature==="forge";
         const renderers=forge?{reforge:renderReforgeTab,socket:renderSocketTab}:{talisman:renderTalismanTab,fragment:renderFragmentTab,material:renderMaterialSynthesis};
         const tab=forge?synthesisState.forgeTab:synthesisState.tab;
-        const content=renderers[tab]();
+        const rendered=renderers[tab]();
+        const content=typeof rendered==="string"?rendered:rendered.content;
+        const footer=typeof rendered==="string"?"":rendered.footer;
+        const title=document.getElementById("homeFeatureModalTitle");
+        if(title&&forge){ title.textContent=tab==="reforge"?"冶煉":"鑲嵌"; }
         const tabs=forge?'<div class="v141-synthesis-tabs v141-forge-tabs"><button type="button" class="'+(tab==="reforge"?'active':'')+'" onclick="v141SwitchForgeTab(\'reforge\')">冶煉</button><button type="button" class="'+(tab==="socket"?'active':'')+'" onclick="v141SwitchForgeTab(\'socket\')">鑲嵌</button></div>':renderSynthesisTabs();
-        body.innerHTML='<div class="v141-synthesis"><div class="v141-synthesis-wallet"><span>'+(forge?'鍛造':'合成')+'</span><b>金幣 '+Math.floor(gold).toLocaleString('zh-TW')+'</b></div>'+tabs+'<div class="v141-synthesis-body">'+content+'</div></div>';
+        body.innerHTML='<div class="v141-synthesis"><div class="v141-synthesis-wallet"><span>'+(forge?'鍛造':'合成')+'</span><b>金幣 '+Math.floor(gold).toLocaleString('zh-TW')+'</b></div>'+tabs+'<div class="v141-synthesis-body">'+content+'</div>'+footer+'</div>';
     }
     window.v141RenderSynthesis=renderSynthesis;
     window.v141SwitchForgeTab=function(tab){
@@ -10052,7 +10042,7 @@
             activeFeature=type;
             const modal=document.getElementById("homeFeatureModal");
             const title=document.getElementById("homeFeatureModalTitle");
-            if(title){ title.textContent=type==="forge"?"鍛造":"合成"; }
+            if(title){ title.textContent=type==="forge"?"冶煉":"合成"; }
             if(modal){ modal.dataset.craftingFeature=type; modal.classList.add("show","v141-synthesis-modal"); window.FourSymbolsBottomNav?.syncContext(); }
             ensureEquipmentUids();
             renderSynthesis();
@@ -10062,6 +10052,9 @@
         const originalCloseHomeFeature=closeHomeFeature;
         closeHomeFeature=function(){
             const modal=document.getElementById("homeFeatureModal");
+            if(synthesisState.pendingReforge){ return false; }
+            synthesisState.reforgeUid=null;
+            synthesisState.lockedReforgeKeys=[];
             if(modal){ modal.classList.remove("v141-synthesis-modal"); delete modal.dataset.craftingFeature; }
             return originalCloseHomeFeature.apply(this,arguments);
         };
