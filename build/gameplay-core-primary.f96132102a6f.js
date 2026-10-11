@@ -11940,7 +11940,7 @@
     const originalPlay=director.play.bind(director);
     const originalDispose=director.dispose.bind(director);
     const state={
-        version:VERSION,current:null,stage:null,timers:new Set(),pendingUpdates:new Map(),hpSamples:new WeakMap(),hpTrails:new Map(),impactFlashes:new Map(),hitOverlay:null,
+        version:VERSION,current:null,stage:null,timers:new Set(),pendingUpdates:new Map(),hpSamples:new WeakMap(),hpTrails:new Map(),impactFlashes:new Map(),hitOverlay:null,impactEpoch:0,
         metrics:{started:0,completed:0,missingVisuals:0,legacyNodesPurged:0,delayedNumbers:0,delayedDeaths:0}
     };
     window.v143SkillAnimationState=state;
@@ -11952,6 +11952,7 @@
     }
 
     function clearImpactOverlays(){
+        state.impactEpoch=(state.impactEpoch||0)+1;
         Array.from(state.impactFlashes.values()).forEach(entry=>entry.cancel());
         state.impactFlashes.clear();
         if(state.hitOverlay){ state.hitOverlay.remove(); state.hitOverlay=null; }
@@ -11971,7 +11972,10 @@
                !entity||Number(entity.hp)<=0||entity.alive===false){ entry.cancel(); }
         });
     }
-    function createImpactFlash(artwork,side,index,current){
+    function createImpactFlash(artwork,side,index,current,impactEpoch){
+        const page=document.getElementById("battlePage");
+        if(impactEpoch!==state.impactEpoch||!page?.classList.contains("active")||
+           typeof battleActive!=="undefined"&&!battleActive){ return null; }
         const geometry=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(side,index);
         const projection=geometry&&geometry.artworkProjection;
         const entity=entityFor(side,index);
@@ -13345,6 +13349,7 @@
             current&&!current.done&&current.config&&current.config.id==="fireCritical"&&
             current.targetSide===side
         );
+        const impactEpoch=state.impactEpoch;
         const fact=window.FourSymbolsCombatEvents?.lastDamageFor?.(entityFor(side,unitIndex));
         const indirectSource=["dot","relic","reflect","environment","self","hpCost"];
         const direct=current&&!current.done&&(current.config.id==="normal"||
@@ -13365,7 +13370,7 @@
             if(artwork.v143ImpactRecoil){ artwork.v143ImpactRecoil.cancel(); }
             const distance=(critical?5:4)*(side==="monster"?-1:1);
             // The one hit callback owns both pulses; no new clock or gate.
-            createImpactFlash(artwork,side,unitIndex,current);
+            createImpactFlash(artwork,side,unitIndex,current,impactEpoch);
             artwork.v143ImpactRecoil=artwork.animate([
                 {translate:"0px 0px",scale:1},
                 {translate:"0px "+distance+"px",scale:critical?.975:.98,offset:.3},

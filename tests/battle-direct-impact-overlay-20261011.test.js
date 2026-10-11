@@ -60,6 +60,14 @@ abandoned.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');
 assert.equal(abandoned.jobs.length,1);
 abandoned.context.state.current={sequence:2,done:false};abandoned.jobs[0]();
 assert.equal(abandoned.context.state.impactFlashes.size,0);
+// Clearing before the sole hit callback fires invalidates that presentation
+// generation without completing, delaying or replacing the current action.
+const endedEarly=fixture(1);endedEarly.context.delayFor=()=>50;
+endedEarly.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');
+endedEarly.events.get('battle_end')({});endedEarly.jobs[0]();
+assert.equal(endedEarly.context.state.impactFlashes.size,0);
+assert.equal(endedEarly.current.done,false);
+assert.equal(endedEarly.body.children.length,0);
 const css=fs.readFileSync('css/40-v143-combat-dungeon-polish.css','utf8'),hudCss=fs.readFileSync('css/fixed-slot-battlefield-rendering-v2.css','utf8');
 assert.match(css,/\.v143-hit-feedback-overlay\{[^}]*z-index:16010;[^}]*pointer-events:none/s);assert.match(hudCss,/\.v174-battle-hud-layer\{[^}]*z-index:16015/);
 assert.doesNotMatch(source,/const flash=artwork.animate/);

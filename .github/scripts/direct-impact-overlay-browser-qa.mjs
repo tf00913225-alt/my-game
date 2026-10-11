@@ -95,9 +95,9 @@ try{
     return {side:e.side,index:e.index,opacity:getComputedStyle(e.node).opacity,pointer:getComputedStyle(e.node).pointerEvents,rectMatch:['left','top','width','height'].every(k=>Math.abs(r[k]-p[k])<.2),duration:e.animation.effect.getTiming().duration,frames:e.animation.effect.getKeyframes().map(f=>({offset:f.offset,opacity:f.opacity}))};
    });
    const hudTests=[...document.querySelectorAll('.v174-unit-hud')].filter(h=>h.closest('.v174-battle-hud-layer')).map(h=>{
-    const hp=h.querySelector('.hp-bar,.monster-hp'),sp=h.querySelector('.sp-bar,.monster-sp'),name=h.querySelector('.battle-player-id,.battle-monster-name');
+    const hp=h.querySelector('.hp-bar,.monster-hp'),sp=h.querySelector('.sp-bar,.monster-sp'),name=h.querySelector('.battle-player-id,.battle-monster-name'),status=h.querySelector('.monster-status-badges');
     const g=FourSymbolsBattlefieldRenderGeometry.getUnitGeometry(h.dataset.side,Number(h.dataset.index));
-    return {side:h.dataset.side,index:h.dataset.index,hp:hp?.getBoundingClientRect().height,sp:sp?.getBoundingClientRect().height,name:!!name,hpAboveSp:hp.getBoundingClientRect().bottom<=sp.getBoundingClientRect().top+.2,sameNode:hp===FourSymbolsBattlePresentation.getUnitHud(h.v174Card).querySelector('.hp-bar,.monster-hp'),unitRectMatch:Math.abs(h.getBoundingClientRect().left-g.hudSurface.rect.left)<.2};
+    return {side:h.dataset.side,index:h.dataset.index,hp:hp?.getBoundingClientRect().height,sp:sp?.getBoundingClientRect().height,name:!!name,statusLineHeight:parseFloat(getComputedStyle(status).lineHeight),hpAboveSp:hp.getBoundingClientRect().bottom<=sp.getBoundingClientRect().top+.2,sameNode:hp===FourSymbolsBattlePresentation.getUnitHud(h.v174Card).querySelector('.hp-bar,.monster-hp'),unitRectMatch:Math.abs(h.getBoundingClientRect().left-g.hudSurface.rect.left)<.2};
    });
    const sprite=[...stage.querySelectorAll('.v143-vfx-sprite')].map(n=>({opacity:getComputedStyle(n).opacity,visibility:getComputedStyle(n).visibility,src:getComputedStyle(n).backgroundImage}));
    const numbers=[...document.querySelectorAll('.battle-floating-feedback')].map(n=>({z:z(n),text:n.textContent}));
@@ -109,7 +109,7 @@ try{
   assert.ok(observed.layers.vfx<observed.layers.hit&&observed.layers.hit<observed.layers.hud&&observed.layers.hud<observed.layers.name);
   assert.ok(observed.numbers.length&&observed.numbers.every(n=>n.z>observed.layers.hit),'floating numbers above hit');
   assert.equal(observed.rootPointer,'none');
-  assert.ok(observed.hudTests.every(h=>h.hp>0&&h.sp>0&&h.name&&h.hpAboveSp&&h.sameNode&&h.unitRectMatch),'real HUD nodes and geometry remain correct');
+  assert.ok(observed.hudTests.every(h=>h.hp>0&&h.sp>0&&h.name&&h.statusLineHeight===(h.side==='monster'?14:12)&&h.hpAboveSp&&h.sameNode&&h.unitRectMatch),'real HUD nodes and geometry remain correct');
   assert.ok(observed.sprite.some(s=>s.visibility==='visible'&&Number(s.opacity)>0),'authored skill VFX still visibly paints');
   assert.equal(observed.gateDuration,castInfo.duration);
   await page.screenshot({path:artifactDir+'/'+label+'.png'});
@@ -191,6 +191,17 @@ try{
   await page.evaluate(()=>{v142SkillAnimationDirector.dispose();battleActive=true;showPage('battle');currentBattleMonsters.forEach(i=>{monsters[i].hp=monsters[i].maxHP;monsters[i].alive=true;});renderBattle();});
  };
  for(const reason of ['dispose','supersede','death','departure','navigation','battle-end'])await life(reason);
+ const earlyEnd=await page.evaluate(async()=>{
+  const index=currentBattleMonsters[0],skill=skillDatabase.iceArrowRain;
+  v142SkillAnimationDirector.dispose();
+  v142SkillAnimationDirector.play({...skill,id:'iceArrowRain',duration:skill.animationDuration,resolveDuration:skill.resolveDuration},{side:'player',actorIndex:0,targetSide:'monster',targetId:index,targetIds:[index],key:'early-end'});
+  settleBattleHpDamage(monsters[index],1,{sourceType:'activeSkill',damageKind:'direct'});showMonsterHit(index,1,'hp');
+  battleActive=false;FourSymbolsCombatEvents.emit('battle_end',{});
+  await new Promise(resolve=>v143RunAtTargetHit('monster',index,resolve,true));
+  const result={reason:'battle-end-before-hit',remaining:v143SkillAnimationState.impactFlashes.size,root:!!document.querySelector('.v143-hit-feedback-overlay'),hudPlane:!!document.querySelector('.v174-battle-hud-layer')};
+  battleActive=true;return result;
+ });
+ assert.equal(earlyEnd.remaining,0);assert.equal(earlyEnd.root,false);assert.equal(earlyEnd.hudPlane,false);evidence.lifecycle.push(earlyEnd);
  const idle=await page.evaluate(()=>{v142SkillAnimationDirector.dispose();return {noPlanes:!document.querySelector('.v143-hit-feedback-overlay,.v174-battle-hud-layer'),originalHudReturned:[...document.querySelectorAll('.battle-monster,.battle-player')].every(c=>!c.v174UnitHud||c.contains(c.v174UnitHud))};});
  assert.ok(idle.noPlanes&&idle.originalHudReturned);evidence.idle=idle;
  await page.screenshot({path:artifactDir+'/idle-original-hud.png'});

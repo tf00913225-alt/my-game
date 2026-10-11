@@ -4171,7 +4171,7 @@
     display:none !important;
 }
 
-#game-stage #battlePage .battle-monster .monster-status-badges{
+.v174-unit-hud[data-side="monster"] .monster-status-badges{
     min-height:14px !important;
     max-height:14px !important;
     flex:0 0 14px !important;
