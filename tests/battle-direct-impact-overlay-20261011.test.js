@@ -36,6 +36,13 @@ for(const count of [1,3,6]){
 for(const kind of ['heal','sp','shield','miss','status','resist']){
  const f=fixture();f.context.window.v143ResolveBattleFeedbackTiming('monster',0,kind,false);assert.equal(f.context.state.impactFlashes.size,0,kind);
 }
+const generic=fixture(1);
+generic.projections[0].backgroundImage='none';
+generic.projections[0].genericPortrait=true;
+generic.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage',false);
+assert.equal(generic.context.state.impactFlashes.size,1,'formal neutral artwork still flashes without an image asset');
+assert.match([...generic.context.state.impactFlashes.values()][0].node.className,/v174-generic-portrait/);
+assert.equal(generic.jobs.length,0,'neutral artwork shares the existing hit clock');
 for(const sourceType of ['dot','relic','reflect','environment','self','hpCost']){
  const f=fixture();f.facts.set(f.entities[0],{sourceType,damageKind:sourceType==='dot'?'dot':'direct'});
  f.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage',false);assert.equal(f.context.state.impactFlashes.size,0,sourceType+' during active direct cast');
