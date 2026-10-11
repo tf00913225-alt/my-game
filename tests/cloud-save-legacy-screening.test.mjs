@@ -170,6 +170,28 @@ test("read-only draft keeps empty slots and equipped objects separate from the b
     assert.deepEqual(screenLegacyCandidateSnapshot(save,missing).missingClaimSidecars,
         ["equipment-shop-purchases"]);
     assert.deepEqual(screenLegacyCandidateSnapshot(save,sidecars).missingClaimSidecars,[]);
+    // Panel preferences remain sealed evidence, but are not reward history.
+    const baseline=screenLegacyCandidateSnapshot(save,sidecars);
+    for(const entry of [{status:"missing",raw:null},
+        {status:"present",raw:' {"top":18,"collapsed":true} '},
+        {status:"present",raw:"corrupt-ui-preference"}]){
+        const preferenceSources={...sidecars,"task-tracker":entry},before=structuredClone(preferenceSources);
+        const review=screenLegacyCandidateSnapshot(save,preferenceSources);
+        assert.deepEqual(review.blockers,baseline.blockers);
+        assert.deepEqual(review.missingClaimSidecars,[]);
+        assert.equal(review.readyForAcceptance,false);assert.equal(review.status,"blocked");
+        assert.equal(review.historicalRewardClaims.historicalGrantable,false);
+        const preserved=prepareLegacyCharacterDraft(save,preferenceSources);
+        assert.deepEqual(preserved.retainedSidecars["task-tracker"],entry);
+        assert.equal(preserved.claimHistoryBlocked,true);
+        assert.deepEqual(preferenceSources,before);
+        const actualClaimMissing={...preferenceSources,"quest-milestones":{status:"missing",raw:null}};
+        const blocked=screenLegacyCandidateSnapshot(save,actualClaimMissing);
+        assert.ok(blocked.blockers.includes("SIDECAR_BACKUP_MISSING"));
+        assert.deepEqual(blocked.missingClaimSidecars,["quest-milestones"]);
+        const actualClaimCorrupt={...preferenceSources,"equipment-shop-purchases":{status:"present",raw:"not-json"}};
+        assert.ok(screenLegacyCandidateSnapshot(save,actualClaimCorrupt).blockers.includes("SIDECAR_CLAIM_RECORD_INVALID"));
+    }
     const incomplete={...sidecars};delete incomplete["rested-exp-state"];
     assert.equal(prepareLegacyCharacterDraft(save,incomplete),null);
     const diverged={...sidecars,"abyss-state":{status:"present",raw:JSON.stringify({runs:{

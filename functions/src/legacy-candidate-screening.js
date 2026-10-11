@@ -16,7 +16,7 @@ const EQUIPMENT_SLOT_BY_KEY=Object.freeze({
 });
 const ALLY_SLOTS=new Set(["ALLY_F1","ALLY_F2","ALLY_F3","ALLY_B1","ALLY_B2","ALLY_B3"]);
 const CLAIM_SIDECARS=["daily-dungeon-state","progress","quest-milestones",
-    "task-tracker","legacy-abyss-state","equipment-shop-daily",
+    "legacy-abyss-state","equipment-shop-daily",
     "equipment-shop-purchases","abyss-state"];
 const {auditLegacyRewardClaims}=require("./legacy-reward-claim-audit.js");
 const {buildCanonicalCharacterReviewPlan}=require("./canonical-character-review-plan.js");
