@@ -86,3 +86,8 @@ const worn={weapon:{type:'weapon',rarityKey:'purple',stats:{attack:7},reforgeSta
 assert.equal(worn.hand.reforgeAffixes.length,2);assert.equal(worn.hand.reforgeAffixes[1],null);
 const wornRaw=JSON.stringify(worn);normalize(worn);assert.equal(JSON.stringify(worn),wornRaw);
 assert.doesNotMatch(mainSource.slice(mainSource.indexOf('function migrateLegacyEquipmentStats('),mainSource.indexOf('function hydrateEquipmentReforge(')),/EquipmentReforge/,'render-time legacy normalizer does not migrate reforge slots');
+
+for(const [rarity,count] of Object.entries(model.SLOTS)){
+ const legacy={type:'armor',rarityKey:rarity,reforgeSlots:9,reforgeStats:{attack:18}};
+ model.migrateItem(legacy);assert.equal(legacy.reforgeSlots,count,'known rarity replaces obsolete empty/attempt capacity');
+}

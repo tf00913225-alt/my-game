@@ -15,7 +15,7 @@ Work ID: `REFORGE-V2-20261011`。此規格取代冶煉主副槽、屬性去重�
 
 每個未鎖定槽獨立等機率抽取 attack、intelligence、vitality、energy、defensePoints、agility；允許重複。每槽 10% 取得最高值，其餘 90% 均勻抽取最低至最高減一。裝備階級不影響選用礦石或其數值。最多鎖兩槽且至少保留一槽，空槽不可鎖；0/1/2 鎖消耗 50/100/150 礦石。
 
-main-save 的每件裝備使用 `reforgeVersion:1`、`reforgeAffixes:[null | {stat,value}]` 與槽數。索引穩定、順序持久化；同屬性各自鎖定。舊 `reforgeStats` 僅保留歷史復原證據；只要 canonical array 存在，所有讀者只從 array 投影，不加算舊物件。歷史合法非六圍及數值保留，僅新抽取限制六圍與本次礦石範圍。超出標準的舊容量／詞條全部保留；未知版本、異常資料不改寫並禁止冶煉。
+main-save 的每件裝備使用 `reforgeVersion:1`、`reforgeAffixes:[null | {stat,value}]` 與槽數。索引穩定、順序持久化；同屬性各自鎖定。舊 `reforgeStats` 僅保留歷史復原證據；只要 canonical array 存在，所有讀者只從 array 投影，不加算舊物件。歷史合法非六圍及數值保留，僅新抽取限制六圍與本次礦石範圍。已知階級的過時空容量／剩餘次數不凌駕標準槽數；超出標準的歷史詞條及 canonical 槽位全部保留；未知版本、異常資料不改寫並禁止冶煉。
 
 `loadGame()` 原裝備遷移入口在既有 combat-unit migration 後處理背包與穿戴資料；不得在 render 中新增逐槽遷移。新增裝備以正式階級槽數產生，空槽的純投影不發免費屬性。舊零槽新手修復退休。槽數讀取、穿脫、反覆載入皆冪等。
 

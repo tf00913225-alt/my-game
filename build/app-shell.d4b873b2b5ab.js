@@ -105,7 +105,10 @@
     function slotCount(item){
         if(!item){ return 0; }
         if(item.reforgeSlots!=null&&(!Number.isSafeInteger(item.reforgeSlots)||item.reforgeSlots<0)){ throw Error("冶煉槽資料異常，請保留原資料"); }
-        return Math.max(SLOTS[rarity(item)],item.reforgeSlots||0,affixes(item).length);
+        const declared=[item.rarityKey,item.quality,item.tierKey,item.legacyTierKey].some(raw=>Object.hasOwn(SLOTS,ALIASES[raw]||raw))||!!item.setId;
+        // Legacy attempts/empty capacity cannot override a known equipment tier.
+        // Retain canonical slot positions and every real historical affix instead.
+        return Math.max(SLOTS[rarity(item)],declared?0:item.reforgeSlots||0,affixes(item).length);
     }
     function slots(item){
         const result=affixes(item);
