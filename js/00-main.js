@@ -661,7 +661,16 @@ window.FourSymbolsHeroSystem=Object.freeze({
         const core=window.FourSymbolsHeroCore;
         const domain=account=>core.createDomain(account,
             ()=>[player,player2,player3],calculateCharacterBaseStats,id=>skillDatabase[id]);
-        let account=heroAccountState;
+        let account=core.normalizeAccountState(heroAccountState);
+        // Saved unlocked flags are caches, not permanent acquisition rights.
+        // Re-project only the same-UID protected backend entitlement snapshot.
+        for(const definition of core.listHeroDefinitions()){
+            const id=definition.heroId,grant=window.FourSymbolsHeroAcquisition?.getEntitlement(id);
+            if(grant){
+                if(!account.heroes[id].unlocked){account=domain(account).unlockHeroDirect(id,grant.allocationSeed);}
+                else{account.heroes[id].allocationSeed=grant.allocationSeed;}
+            }else{account.heroes[id].unlocked=false;}
+        }
         // DEV battle preview only: never mutate canonical account or claim rewards.
         if(forBattle&&window.location?.hostname==="dev.four-symbols-dev.pages.dev"){
             for(const heroId of ["divineDogHongbao","vajraHeavenlyKing"]){
@@ -675,7 +684,23 @@ window.FourSymbolsHeroSystem=Object.freeze({
     },
     // Future trusted callers must atomically persist/consume through their Owner.
     // No rewards or inventory consumption are wired in Phase 1.
-    replaceAccountState:next=>{ heroAccountState=window.FourSymbolsHeroCore.normalizeAccountState(next); }
+    replaceAccountState:next=>{ heroAccountState=window.FourSymbolsHeroCore.normalizeAccountState(next); },
+    cacheConfirmedEntitlements:()=>{
+        const core=window.FourSymbolsHeroCore,before=heroAccountState;
+        let next=core.normalizeAccountState(before);
+        for(const definition of core.listHeroDefinitions()){
+            const id=definition.heroId,grant=window.FourSymbolsHeroAcquisition?.getEntitlement(id);
+            if(!grant){continue;}
+            if(!next.heroes[id].unlocked){
+                next=core.createDomain(next,()=>[player,player2,player3],calculateCharacterBaseStats,id=>skillDatabase[id])
+                    .unlockHeroDirect(id,grant.allocationSeed);
+            }else{next.heroes[id].allocationSeed=grant.allocationSeed;}
+        }
+        if(JSON.stringify(next)===JSON.stringify(before)){return true;}
+        heroAccountState=next;
+        if(typeof saveGame==="function"&&saveGame()===false){heroAccountState=before;return false;}
+        return true;
+    }
 });
 
 
@@ -24971,6 +24996,7 @@ function getHeroPageSnapshot(){
     const domain=window.FourSymbolsHeroSystem.getDomain({forBattle:true});
     const created=getCharacters().some(character=>character&&String(character.id||"").trim());
     return {roster:window.FourSymbolsHeroBattle.getRoster(),maxHeroes:window.FourSymbolsHeroBattle.maxHeroes,
+        acquisition:window.FourSymbolsHeroAcquisition?.getStatus?.()||{ready:false,busy:false,loginCount:null,chapter:null},
         editingAllowed:!battleActive&&created,
         heroes:domain.listHeroDefinitions().map(definition=>{
             const id=definition.heroId,eligible=domain.isHeroUnlocked(id),owned=canonical.isHeroUnlocked(id);
@@ -25023,7 +25049,13 @@ function renderHeroPageContent(){
             <h3>${escape(hero.definition.name)}</h3><p>${escape(elementDatabase[hero.definition.element]?.name||hero.definition.element)}・${escape(hero.definition.role)}</p>
             <p>等級 ${hero.level===null?"—":"Lv."+hero.level}</p><p>星級 ${hero.account.stars} / ${window.FourSymbolsHeroCore.contract.maxStars}</p><p>專屬碎片 ${hero.account.specificFragments}</p>
             <small>取得條件：${escape(heroPageAcquisition(hero.definition))}</small></div></div>
-            ${!hero.eligible?'<p class="hero-page-note">尚未解鎖；取得流程將於後續開放。</p>':!hero.owned?'<p class="hero-page-note">DEV 試用英雄，可直接安排出戰。</p>':""}
+            ${!hero.eligible?'<p class="hero-page-note">尚未解鎖；完成取得條件後，需連線確認永久權益。</p>':!hero.owned?'<p class="hero-page-note">DEV 試用英雄，可直接安排出戰。</p>':""}
+            <section class="hero-page-section"><h3>永久取得</h3>
+                <p>${data.acquisition.ready?(hero.definition.acquisition.kind==="cumulativeLoginDay"?`累計登入 ${data.acquisition.loginCount} / 7 天（臺北日期，每日一次）`:data.acquisition.chapter?.phase==="completed"?"第一章線上取得資格已完成。":"需以線上章節票券完成第一章取得資格。"):"需連線確認登入與英雄取得紀錄。"}</p>
+                ${data.acquisition.error?`<p class="hero-page-note">${escape(data.acquisition.error)}</p>`:""}
+                <button type="button" class="main-button" onclick="FourSymbolsHeroAcquisition.refresh()" ${data.acquisition.busy?"disabled":""}>${data.acquisition.busy?"同步中":"同步取得紀錄"}</button>
+                ${data.acquisition.chapter?.phase==="active"&&data.acquisition.chapter.nextNodeId===window.FourSymbolsAdventureContent?.chapters[data.acquisition.chapter.chapterId]?.endNodeId?'<button type="button" class="main-button" onclick="FourSymbolsHeroAcquisition.claimChapterHero()">取得神犬紅包</button>':""}
+            </section>
             <section class="hero-page-section"><h3>六圍配點</h3>${rows(Object.entries(STAT_NAMES),hero.points)}</section>
             <section class="hero-page-section"><h3>基礎戰鬥數值</h3>${rows([["maxHP","HP"],["maxSP","SP"],["attack","物理攻擊"],["magicAttack","法術攻擊"],["defense","防禦力"],["speed","速度"]],hero.stats)}</section>
             <section class="hero-page-section"><h3>怒氣技能：${escape(hero.skill?.definition?.name||"—")} ${hero.skill?"Lv."+hero.skill.level:""}</h3>

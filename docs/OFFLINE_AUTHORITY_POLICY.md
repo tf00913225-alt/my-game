@@ -2,6 +2,8 @@
 
 The current game remains locally playable; this policy defines the eventual transition and does not assert server reward writers exist. `ONLINE_REQUIRED`: paid rights, store purchases/limits, unique daily/weekly claims, Boss first-clear grants, tower milestone/chest grants, abyss first-clear/chest grants, rare relic ownership, high-value synthesis/reforge and refund/revoke. The existing local paths must remain labeled provisional until trusted writers exist.
 
+Hero acquisition has a separately authorized bounded online source (user decision 2026-10-12; `HERO_SYSTEM_V1.md`): observed server Taipei login dates and a UID-bound chapter-one ticket/ordered-intent source, with immutable unique rights/receipts/ledger. Offline local dates, chapter flags and restored saves never award or reopen Hero rights. Ordinary chapter combat remains Client simulation; the ticket does not certify battle victory. This limited Hero source neither activates generic offline settlement nor publishes/adopts a complete character save.
+
 `OFFLINE_LIMITED`: normal patrol/dungeon battle, ordinary EXP/gold/drop and ordinary quests. Client animates and simulates locally; a future server-issued attempt/ticket carries UID, source, cap, expiry, nonce and operation ID. On reconnect the backend settles only eligible bounded rewards and returns receipts, with duplicate protection and expected revision. Expired, consumed or missing tickets become conflict/review, not automatic upload. An initial simpler release may instead require connectivity for these rewards until tickets are implemented.
 
 `OFFLINE_ALLOWED`: battle animations/VFX, read-only story, UI navigation, sound, auto-battle preference and device cache. They may reset on another phone without affecting durable entitlements.

@@ -36,6 +36,33 @@ function digest(value){ return createHash("sha256").update(JSON.stringify(value)
 function snapshotDigest(value){ return digest(stable(value)); }
 function claimRecordsDigest(records){ return digest(stable(records)); }
 
+// Retained playable character fields only. The same storage guard protects
+// durable snapshots and complete projections; no stat formulas, HP/SP refill,
+// transient-state execution, defaults or historical backfill happen here.
+function inspectPlayableCharacterState(state){
+    const integers=["attack","intelligence","vitality","energy","defensePoints",
+        "agility","expNext","skillPoints","attributePoints","bonusHP","bonusSP"];
+    if(integers.some(key=>!Number.isSafeInteger(state[key])||state[key]<0)||
+       state.expNext<1||!["male","female"].includes(state.gender)||
+       ["hp","sp"].some(key=>!Number.isFinite(state[key])||state[key]<0)||
+       !Array.isArray(state.activeBuffs)||!Array.isArray(state.statusEffects)||
+       typeof state.isDefending!=="boolean"){
+        fail("complete character state");
+    }
+}
+
+// Retain an explicitly recorded serialized formation without client hydration,
+// missing-character defaults or battle execution. Null remains uninitialized.
+function inspectPlayableFormation(formation,slots){
+    if(formation==null){return;}
+    if(!object(formation)||Object.keys(formation).sort().join("|")!=="characterIndexToSlot|version"||
+       !object(formation.characterIndexToSlot)||
+       Object.keys(formation.characterIndexToSlot).sort().join("|")!==
+           slots.flatMap((id,index)=>id===null?[]:[String(index)]).join("|")){
+        fail("complete formation state");
+    }
+}
+
 // Retained skill storage shape only: no catalogue, learning/cost/element
 // eligibility, combat execution, defaults or normalization in this reader.
 // Client skill Owner stores positive levels (current global ceiling 10) and
@@ -320,10 +347,14 @@ function assembleCanonicalSnapshot(uid,revision,records){
            !Array.isArray(character.skillLoadout.equippedSkills)){
             fail("character state or slot reference");
         }
-        if(records.progress.playableState!==undefined){inspectSkillLoadout(character.skillLoadout);}
+        if(records.progress.playableState!==undefined){
+            inspectPlayableCharacterState(character.state);
+            inspectSkillLoadout(character.skillLoadout);
+        }
         seenCharacters.add(character.characterId);
     }
     const formation=records.account.formation;
+    if(records.progress.playableState!==undefined){inspectPlayableFormation(formation,slots);}
     if(formation!=null){
         const map=formation.characterIndexToSlot;
         if(!object(formation)||formation.version!==1||!object(map)||
@@ -480,21 +511,14 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
     validateJsonValue(records,"canonical sources",0);
     const source=assembleCanonicalSnapshot(uid,revision,records);
     const {extra,hero,preferences}=inspectPlayableState(records);
+    inspectPlayableFormation(source.snapshot.formation,source.snapshot.slots);
     const configKeys=["autoConfig","autoConfig2","autoConfig3"];
     const slotKeys=["fire","player2","player3"];
     const characterEquipment={},characterSkillLoadouts={};
     const players=[null,null,null];
     for(const character of source.snapshot.characters){
         const state=character.state;
-        const integers=["attack","intelligence","vitality","energy","defensePoints",
-            "agility","expNext","skillPoints","attributePoints","bonusHP","bonusSP"];
-        if(integers.some(key=>!Number.isSafeInteger(state[key])||state[key]<0)||
-           state.expNext<1||!["male","female"].includes(state.gender)||
-           ["hp","sp"].some(key=>!Number.isFinite(state[key])||state[key]<0)||
-           !Array.isArray(state.activeBuffs)||!Array.isArray(state.statusEffects)||
-           typeof state.isDefending!=="boolean"){
-            fail("complete character state");
-        }
+        inspectPlayableCharacterState(state);
         players[character.slotIndex]=copy(state);
         const key=slotKeys[character.slotIndex];
         characterEquipment[key]=Object.fromEntries([...EQUIPMENT_SLOTS].map(slot=>[slot,null]));
@@ -567,4 +591,4 @@ function verifyCanonicalPlayableProjectionAgainstSources(bundle,uid,revision,rec
 
 module.exports={assembleCanonicalSnapshot,assembleCanonicalPlayableProjection,inspectCanonicalSnapshot,
     verifyCanonicalSnapshotAgainstSources,verifyCanonicalPlayableProjectionAgainstSources,
-    claimRecordsDigest,MAX_SNAPSHOT_BYTES};
+    claimRecordsDigest,snapshotDigest,MAX_SNAPSHOT_BYTES};

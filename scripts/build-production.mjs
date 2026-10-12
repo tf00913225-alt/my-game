@@ -5,6 +5,7 @@ import {syncMonsterBalanceRuntime} from "./lib/monster-balance-runtime-source.mj
 import {syncBattleEncounterCatalog} from "./lib/cloud-battle-encounter-catalog.mjs";
 import {syncPlainPlayerNormalAttackRules} from "./lib/cloud-battle-normal-attack-rules.mjs";
 import {syncForestOpeningRoundRules} from "./lib/cloud-battle-opening-round-rules.mjs";
+import {syncHeroChapterQualification} from "./lib/hero-chapter-qualification.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
@@ -17,6 +18,7 @@ syncMonsterBalanceRuntime(ROOT,checkOnly);
 await syncBattleEncounterCatalog(ROOT,checkOnly);
 syncPlainPlayerNormalAttackRules(ROOT,checkOnly);
 syncForestOpeningRoundRules(ROOT,checkOnly);
+syncHeroChapterQualification(ROOT,checkOnly);
 const read=file=>fs.readFileSync(path.join(ROOT,file),"utf8");
 const bytes=file=>fs.readFileSync(path.join(ROOT,file));
 const hash=value=>crypto.createHash("sha256").update(value).digest("hex").slice(0,12);
@@ -42,6 +44,7 @@ const appScripts=[
     "js/equipment-factory.js",
     "functions/src/hero-core.js",
     "js/00-main.js",
+    "js/hero-acquisition-client.js",
     "js/generated-item-acquisition-data.js",
     "js/item-acquisition-registry.js",
     "js/01-stage-v8-touch-lock.js",

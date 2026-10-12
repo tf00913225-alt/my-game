@@ -18,6 +18,8 @@ DEV 固定驗證站：`https://dev.four-symbols-dev.pages.dev`。部署 SHA、�
 
 ## 近期重要架構／migration 結果
 
+- HERO-ACQUISITION-20261012（PR #871）施工永久取得來源：同 UID 的登入日期／章節票券、唯一 claims／receipts／ledger 與既有 Core 快取投影。普通戰鬥仍由 Client 模擬，不證明戰鬥結果、不延伸 frozen Server Battle；舊本機旗標不直接取得 Hero。後續 Cloud restore／migration／publication 必須保留並明確映射這些權益來源，不能以舊角色快照回滾或重開領取。完整 Cloud Save／空白換機角色恢復仍未完成；功能驗收與部署狀態查該 PR，正式契約見 docs/HERO_SYSTEM_V1.md。
+
 - HERO-CORE-PHASE1-20261007 建立 `functions/src/hero-core.js` 唯一英雄 Domain 與既有 UID main-save extension；HERO-BATTLE-PHASE2A-20261007 接入既有 Battle Owner 的 `heroNpc` 身份、6-unit 容量、普攻／受擊／死亡／合法復活／Initiative／Statistics，不重設 Core 或永久 schema。HERO-BATTLE-PHASE2B-20261008（PR #833）接續同一 Owner 的戰鬥暫存怒氣、技能、兩項被動與指定立繪；完整契約／後續邊界見 `docs/HERO_SYSTEM_V1.md`。[PR #866](https://github.com/tf00913225-alt/my-game/pull/866) 已將主城英雄入口、資料頁與 session-only 最多三人編隊合入 dev；[PR #867](https://github.com/tf00913225-alt/my-game/pull/867) 收斂立繪 decode 驗收。這些尚未發布 main，不宣稱正式編隊持久化或 Reward／Equipment 已完成；CI／整合／驗收即時結果查各 Work PR。
 
 - Monster Balance Owner Phase 1–2F 已收斂七模式：Wild、Daily、Tower、Abyss、Adventure、Personal Boss、World Boss。後續平衡校正是新工程，不重開 migration；`docs/MONSTER_BALANCE_OWNER_FINAL.md` 為總結果索引，`SYSTEM_CONTRACTS.md` 的七模式章節為跨模式契約；退場圖 `docs/monster-balance-owner-retirement-map.json`。

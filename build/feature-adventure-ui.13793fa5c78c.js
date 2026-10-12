@@ -285,9 +285,15 @@
 
     function renderChapterComplete(view){
         const claimed=view.state.chapterRewardClaimed;
+        const heroStatus=window.FourSymbolsHeroAcquisition?.getStatus?.();
+        const heroOwned=!!window.FourSymbolsHeroAcquisition?.getEntitlement?.("divineDogHongbao");
+        const heroNote=heroOwned?"神犬紅包已永久取得，可到休息 → 英雄安排出戰。":
+            heroStatus?.busy?"神犬紅包取得紀錄同步中。":
+            heroStatus?.error||"神犬紅包需完成線上章節資格確認；舊本機通關紀錄不會自動補發。";
         const body='<div class="adventure-chapter-seal">章</div><h3>'+esc(view.chapter.title)+' · 完成</h3>'+
             '<p>山路重新通行。你現在可以直接回到岔路，補走第一次沒有選的路線，不必從第一節重打。</p>'+
-            '<div class="adventure-result-box"><b>回溯探索</b><span>另一條岔路的節點仍可取得它自己的首次獎勵。</span></div>';
+            '<div class="adventure-result-box"><b>回溯探索</b><span>另一條岔路的節點仍可取得它自己的首次獎勵。</span></div>'+
+            '<p>'+esc(heroNote)+'</p><button type="button" class="adventure-button secondary" onclick="FourSymbolsHeroAcquisition.refresh()">同步英雄取得紀錄</button>';
         const actions=(claimed?'<span class="adventure-used-mark">章節獎勵已領取</span>':'<button type="button" class="adventure-button primary attention" onclick="FourSymbolsAdventure.claimChapterReward()">領取章節獎勵</button>')+
             '<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.setPanel(\'map\')">回到地圖探索</button>';
         return panelShell("章節完成","旅程告一段落",body,actions,"chapter-complete-panel");
@@ -389,5 +395,6 @@
         if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",ready,{once:true}); }
         else{ ready(); }
         document.addEventListener("four-symbols:adventure-state-change",()=>{ render();syncTracker(); });
+        document.addEventListener("four-symbols:hero-acquisition-state",()=>{ render(); });
     }
 })();
