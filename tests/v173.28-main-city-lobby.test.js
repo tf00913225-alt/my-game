@@ -49,7 +49,9 @@ test("character and shop are the only two primary entrances",()=>{
 
 test("eight secondary entrances reflow with readable browser dimensions",()=>{
     assert.equal(count(actions,/class="home-card home-card-secondary"/g),8);
-    ["rest","synthesis","quest","forge","achievement","announcement","offlineExp","system"].forEach(type=>assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)")));
+    ["hero","synthesis","quest","forge","achievement","announcement","offlineExp","system"].forEach(type=>assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)")));
+    assert.match(actions,/aria-label="英雄系統"/);
+    assert.match(read("js/00-main.js"),/onclick="openHomeFeature\('rest'\)"/); // Free rest remains reachable from Hero.
     assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*grid-template-columns:repeat\(2,minmax\(70px,22%\)\);[\s\S]*grid-auto-rows:70px;/);
     assert.doesNotMatch(baseCss,/margin-inline-(?:start|end):(34|68)px/);
     assert.match(baseCss,/\.home-card-secondary\{[\s\S]*width:100%;[\s\S]*height:70px;[\s\S]*border:1px solid[\s\S]*background:linear-gradient[\s\S]*box-shadow:/);
@@ -71,7 +73,7 @@ test("offline/system stay on the side rails while relic and element box are pers
 });
 
 test("all ten existing entry IDs and click contracts remain intact",()=>{
-    const entries={Character:"character",Shop:"shop",Rest:"rest",Synthesis:"synthesis",Quest:"quest",Forge:"forge",Achievement:"achievement",Announcement:"announcement",OfflineExp:"offlineExp",System:"system"};
+    const entries={Character:"character",Shop:"shop",Rest:"hero",Synthesis:"synthesis",Quest:"quest",Forge:"forge",Achievement:"achievement",Announcement:"announcement",OfflineExp:"offlineExp",System:"system"};
     Object.entries(entries).forEach(([id,type])=>{
         assert.equal(count(actions,new RegExp('id="homeIcon'+id+'"','g')),1);
         assert.equal(count(actions,new RegExp("openHomeFeature\\('"+type+"'\\)",'g')),1);
