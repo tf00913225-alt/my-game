@@ -1492,6 +1492,10 @@ ownedRecords.progress.abyssProgress.runs[40].firstClearClaims={
 };
 ownedRecords.progress.sidecars["abyss-state"].raw=
     " "+JSON.stringify(ownedRecords.progress.abyssProgress)+" ";
+// Emulator-only retained skill evidence, not a learning or ownership grant.
+const ownedSkillLoadout={name:"retained skill label",
+    skillLevels:{flameSlash:10,fireRocket:2},equippedSkills:["fireRocket","flameSlash"]};
+ownedRecords.characters[0].skillLoadout=ownedSkillLoadout;
 const ownedBundle=assembleCanonicalSnapshot(ownedUid,2,ownedRecords);
 const ownedRoot=db.collection("serverUsers").doc(ownedUid);
 const ownedItemRef=ownedRoot.collection("inventory").doc(ownedItemId);
@@ -1499,6 +1503,7 @@ const ownedEquipRef=ownedRoot.collection("equipment").doc(
     `${ownedCharacterId}_hand`);
 const ownedRelicRef=ownedRoot.collection("relics").doc("starter-relic-0001");
 await Promise.all([
+    ownedRoot.collection("characters").doc(ownedCharacterId).update({skillLoadout:ownedSkillLoadout}),
     ownedItemRef.set(ownedRecords.inventory[0]),
     ownedEquipRef.set(ownedRecords.equipment[0]),
     ownedRelicRef.set(ownedRecords.relics[0]),
@@ -1528,7 +1533,19 @@ assert.equal((await ownedEquipRef.get()).get("serverRevision"),4);
 assert.equal((await ownedRelicRef.get()).get("serverRevision"),4);
 assert.equal((await ownedRoot.collection("claimCheckpoints").doc("current").get())
     .get("claimCount"),1);
+const ownedCharacterRef=ownedRoot.collection("characters").doc(ownedCharacterId);
+assert.deepEqual((await ownedCharacterRef.get()).get("skillLoadout"),ownedSkillLoadout);
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+    .get("sourceRecords.characters")[0].skillLoadout,ownedSkillLoadout);
 const ownedAllocation="allocate-owned-source-exp-0001";
+await ownedCharacterRef.update({skillLoadout:{...ownedSkillLoadout,equippedSkills:["flameSlash","flameSlash"]}});
+await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
+    operationId:ownedAllocation,expectedRevision:4}),error=>error.code==="data-loss");
+assert.equal((await ownedRoot.collection("operations").doc(ownedAllocation).get()).exists,false);
+assert.equal((await ownedRoot.collection("recoveryArchives").doc("5").get()).exists,false);
+assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),4);
+assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("sharedExp"),320);
+await ownedCharacterRef.update({skillLoadout:ownedSkillLoadout});
 await ownedEquipRef.update({ownedItemId:"missing-owned-item"});
 await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
     operationId:ownedAllocation,expectedRevision:4}),
@@ -1539,6 +1556,9 @@ await ownedEquipRef.update({ownedItemId});
 const ownedAllocated=await expAllocator.allocateSharedExp(ownedRequest,{
     operationId:ownedAllocation,expectedRevision:4});
 assert.equal(ownedAllocated.allocatedRevision,5);
+assert.deepEqual((await ownedCharacterRef.get()).get("skillLoadout"),ownedSkillLoadout);
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
+    .get("sourceRecords.characters")[0].skillLoadout,ownedSkillLoadout);
 assert.equal((await ownedItemRef.get()).get("serverRevision"),5);
 assert.equal((await ownedEquipRef.get()).get("ownedItemId"),ownedItemId);
 assert.equal((await ownedEquipRef.get()).get("serverRevision"),5);

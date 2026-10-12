@@ -36,6 +36,27 @@ function digest(value){ return createHash("sha256").update(JSON.stringify(value)
 function snapshotDigest(value){ return digest(stable(value)); }
 function claimRecordsDigest(records){ return digest(stable(records)); }
 
+// Retained skill storage shape only: no catalogue, learning/cost/element
+// eligibility, combat execution, defaults or normalization in this reader.
+// Client skill Owner stores positive levels (current global ceiling 10) and
+// at most four distinct learned skill references in their recorded order.
+function inspectSkillLoadout(loadout){
+    if(!object(loadout)||!object(loadout.skillLevels)||!Array.isArray(loadout.equippedSkills)||
+       Object.keys(loadout).some(key=>!["name","skillLevels","equippedSkills"].includes(key))||
+       Object.hasOwn(loadout,"name")&&(typeof loadout.name!=="string"||!loadout.name.trim())){
+        fail("skill loadout fields");
+    }
+    require("./cloud-save-policy").validateJsonValue(loadout,"skill loadout",0);
+    if(Object.entries(loadout.skillLevels).some(([id,level])=>
+        !ID.test(id)||!Number.isSafeInteger(level)||level<1||level>10)||
+       loadout.equippedSkills.length>4||
+       new Set(loadout.equippedSkills).size!==loadout.equippedSkills.length||
+       loadout.equippedSkills.some(id=>typeof id!=="string"||!ID.test(id)||
+           !Object.hasOwn(loadout.skillLevels,id))){
+        fail("skill loadout levels or equipped references");
+    }
+}
+
 // Validate retained evidence, never sanitize it or accrue elapsed-time value.
 // Bounds come from the existing element-box, growth and rested storage owners.
 function inspectTimeSidecar(key,raw){
@@ -299,6 +320,7 @@ function assembleCanonicalSnapshot(uid,revision,records){
            !Array.isArray(character.skillLoadout.equippedSkills)){
             fail("character state or slot reference");
         }
+        if(records.progress.playableState!==undefined){inspectSkillLoadout(character.skillLoadout);}
         seenCharacters.add(character.characterId);
     }
     const formation=records.account.formation;
@@ -476,6 +498,7 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
         players[character.slotIndex]=copy(state);
         const key=slotKeys[character.slotIndex];
         characterEquipment[key]=Object.fromEntries([...EQUIPMENT_SLOTS].map(slot=>[slot,null]));
+        inspectSkillLoadout(character.skillLoadout);
         characterSkillLoadouts[key]=copy(character.skillLoadout);
     }
     const items=new Map(source.snapshot.inventory.map(item=>[item.ownedItemId,item]));

@@ -504,3 +504,59 @@ test("existing initial-character sources stay unpublished and cannot substitute 
     const bad=sources();bad.progress.sidecars["element-box-state"].raw='{"constructor":{}}';
     assert.throws(()=>assemble(bad));
 });
+
+test("complete skill evidence rejects lossy levels, unknown fields and orphan or duplicate equipped references",()=>{
+    const mutations=[
+        l=>l.skillLevels.waterSlash=0,l=>l.skillLevels.waterSlash=-1,
+        l=>l.skillLevels.waterSlash=1.5,l=>l.skillLevels.waterSlash="2",
+        l=>l.skillLevels.waterSlash=11,l=>l.skillLevels["bad id"]=2,
+        l=>l.equippedSkills=["missing"],l=>l.equippedSkills=["waterSlash","waterSlash"],
+        l=>l.equippedSkills=[2],l=>l.extra=true,l=>l.name=4,l=>l.name=" ",
+        l=>{l.skillLevels={a:1,b:1,c:1,d:1,e:1};l.equippedSkills=["a","b","c","d","e"];}
+    ];
+    for(const mutate of mutations){
+        for(const durable of [false,true]){
+            const records=sources(3);mutate(records.characters[2].skillLoadout);
+            if(durable){const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
+                records.progress.playableState=fields;delete records.playableState;}
+            const before=structuredClone(records);
+            assert.throws(()=>assemble(records),/skill loadout/);
+            if(durable){assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,records),/skill loadout/);}
+            assert.deepEqual(records,before);
+        }
+    }
+});
+test("recorded skill levels and equipped order survive every slot and recovery without learning or defaults",()=>{
+    const {createRecoveryArchive,inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    for(const count of [1,2,3]){
+        const records=sources(count);
+        records.characters.forEach((c,i)=>c.skillLoadout={name:`retained-${i}`,
+            skillLevels:{waterSlash:10,flameSlash:1,healSpell:5,waterEX:1},
+            equippedSkills:["healSpell","flameSlash","waterSlash","waterEX"]});
+        const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
+        records.progress.playableState=fields;delete records.playableState;
+        const before=structuredClone(records),snapshot=assembleCanonicalSnapshot("uid-a",7,records),bundle=assemble(records);
+        const archive=createRecoveryArchive("uid-a",7,records,snapshot);
+        const restored=inspectRecoveryArchive(archive,"uid-a",7,snapshot);
+        for(let i=0;i<count;i++){
+            const key=["fire","player2","player3"][i];
+            assert.deepEqual(bundle.projection.gameSave.characterSkillLoadouts[key],records.characters[i].skillLoadout);
+            assert.deepEqual(restored.characters[i].skillLoadout,records.characters[i].skillLoadout);
+        }
+        assert.equal(Object.keys(bundle.projection.gameSave.characterSkillLoadouts).length,count);
+        assert.deepEqual(restored.claimRecords,records.claimRecords);
+        assert.equal(bundle.readyForPublication,false);assert.equal(bundle.projection.authoritativeStateReady,false);
+        assert.equal(archive.readyForRestore,false);assert.deepEqual(records,before);
+        const changed=structuredClone(records);changed.characters[0].skillLoadout.equippedSkills.reverse();
+        assert.notEqual(assemble(changed).sha256,bundle.sha256);
+        assert.throws(()=>verifyCanonicalPlayableProjectionAgainstSources(bundle,"uid-a",7,changed),/differs/);
+    }
+});
+test("historical v1 skill evidence retains its bytes but cannot become complete playable data",()=>{
+    const records=sources();records.characters[0].skillLoadout.equippedSkills=["waterSlash","waterSlash"];
+    const before=structuredClone(records),snapshot=assembleCanonicalSnapshot("uid-a",7,records);
+    assert.deepEqual(snapshot.snapshot.characters[0].skillLoadout,records.characters[0].skillLoadout);
+    assert.throws(()=>assemble(records),/skill loadout/);assert.deepEqual(records,before);
+    records.characters[0].skillLoadout={skillLevels:{},equippedSkills:[]};
+    assert.deepEqual(assemble(records).projection.gameSave.characterSkillLoadouts.fire,records.characters[0].skillLoadout);
+});
