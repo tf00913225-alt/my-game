@@ -37,7 +37,10 @@ function makeInitialSidecars(recordedAt){
             // creation evidence, not a period rollover or claim entitlement.
             "quest-milestones":{date:new Date(recordedAt).toISOString().slice(0,10),
                 daily:{},commission:{}},
-            "abyss-state":makeInitialAbyssState()
+            "abyss-state":makeInitialAbyssState(),
+            // New-account storage evidence only; no legacy run or claim is imported.
+            "legacy-abyss-state":{active:false,floor:1,phase:"boss",x:50,y:84,
+                message:"",clears:0,rewardVersion:1}
         };
         for(const [key,state] of Object.entries(initial)){
             sidecars[key]={status:"present",raw:JSON.stringify(state)};

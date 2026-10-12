@@ -96,7 +96,9 @@ test("new creation persists server-generated playable fields in the existing rev
             blockedByElementBox:false},
         "progress":{eliteKills:0,dungeonWins:0,abyssClears:0},
         "quest-milestones":{date:"2023-11-14",daily:{},commission:{}},
-        "abyss-state":progress.abyssProgress
+        "abyss-state":progress.abyssProgress,
+        "legacy-abyss-state":{active:false,floor:1,phase:"boss",x:50,y:84,
+            message:"",clears:0,rewardVersion:1}
     };
     for(const [key,state] of Object.entries(initial)){
         assert.deepEqual(progress.sidecars[key],{status:"present",raw:JSON.stringify(state)});
@@ -118,6 +120,12 @@ test("new creation persists server-generated playable fields in the existing rev
     assert.deepEqual(progress.abyssProgress,expected);
     assert.deepEqual(archive.sourceRecords.progress.abyssProgress,expected);
     assert.deepEqual(h.data.get(`${root}/playableSnapshots/5`).snapshot.progress.abyssProgress,expected);
+    const legacyClient=readFileSync(new URL("../js/36-v141-content-systems.js",import.meta.url),"utf8");
+    const legacyFactory=legacyClient.slice(legacyClient.indexOf("function defaultAbyssState()"),
+        legacyClient.indexOf("function loadAbyssState()"));
+    const legacyDefault=JSON.parse(JSON.stringify(vm.runInNewContext(legacyFactory+";defaultAbyssState()")));
+    assert.deepEqual(JSON.parse(progress.sidecars["legacy-abyss-state"].raw),legacyDefault);
+    assert.equal(archive.sourceRecords.claimRecords.length,0);
     const count=h.committed;
     h.setClock(1800000000000);
     assert.equal((await h.writer.commitInitialSources({},args)).unchanged,true);
@@ -133,7 +141,7 @@ test("new creation persists server-generated playable fields in the existing rev
     assert.equal(imported.committed,0);
     for(const key of ["sidecars","remainingMs","lastSeenAt","newcomerRewards",
         "daily","commission","claimRecords","quest-milestones","eliteKills",
-        "abyssProgress","runs","firstClearClaims","legacyMigrated"]){
+        "abyssProgress","runs","firstClearClaims","legacyMigrated","legacy-abyss-state","rewardVersion","clears"]){
         const h=harness();
         await assert.rejects(h.writer.commitInitialSources({}, {...args,
             selection:{...selection,[key]:1}}),/Invalid initial/);
@@ -215,4 +223,13 @@ test("changed choices cannot replay the same operation receipt",async()=>{
     await h.writer.commitInitialSources({}, {operationId,expectedRevision:4,selection});
     await assert.rejects(h.writer.commitInitialSources({}, {operationId,
         expectedRevision:4,selection:{...selection,element:"water"}}),/inconsistent/);
+});
+
+
+test("historical source factory calls do not backfill the legacy Abyss sidecar",()=>{
+    const {makeInitialCharacterSources,makeInitialSidecars}=require("../functions/src/initial-character-sources.js");
+    const historical=makeInitialCharacterSources(uid,5,operationId,selection);
+    assert.deepEqual(historical.progress.sidecars["legacy-abyss-state"],{status:"not-applicable",raw:null});
+    assert.deepEqual(makeInitialSidecars()["legacy-abyss-state"],{status:"not-applicable",raw:null});
+    assert.equal(Object.hasOwn(historical.progress,"playableState"),false);
 });
