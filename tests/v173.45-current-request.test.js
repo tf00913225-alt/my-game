@@ -38,9 +38,12 @@ assert.ok(!content.includes('["craft","裝備合成"]'));
 assert.ok(content.includes('const synthesisState={\n        tab:"talisman"'));
 assert.ok(content.includes('["talisman","符咒合成"],["fragment","碎片合成"]'));
 
-// 5. Shop exposes potion/equipment pages and six equipment cards with 5 free / 10 max refreshes.
-assert.ok(equipmentShop.includes("state.refreshCount>=5"));
-assert.ok(equipmentShop.includes("stored.refreshCount>10"));
+// 5. Temporary unlimited refresh keeps integer-state validation and the
+// existing daily policy behind its explicit reversible switch.
+assert.ok(equipmentShop.includes("SHOP_UNLIMITED_REFRESH_TEST_MODE=true"));
+assert.ok(equipmentShop.includes("!SHOP_UNLIMITED_REFRESH_TEST_MODE&&state.refreshCount>=5"));
+assert.ok(!equipmentShop.includes("stored.refreshCount>10"));
+assert.ok(equipmentShop.includes("Number.isSafeInteger(stored.refreshCount)"));
 assert.ok(equipmentShop.includes("Array.from({length:6}"));
 assert.ok(shop.includes("v169SwitchShopPage"));
 assert.ok(shop.includes(">補品</button>"));
