@@ -36,6 +36,12 @@ try{
   const p=await c.eval(`(async()=>{const n=document.querySelector(${JSON.stringify(selector)});if(!n||n.disabled)throw Error('unavailable '+${JSON.stringify(selector)});n.scrollIntoView({block:'nearest'});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));const b=n.getBoundingClientRect(),x=b.left+b.width/2,y=b.top+b.height/2,h=document.elementFromPoint(x,y);if(!b.width||!b.height||!(n===h||n.contains(h)))throw Error('occluded '+${JSON.stringify(selector)});return {x,y};})()`);
   await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[p]});await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await pause();
  }
+ async function verifyArtwork(){
+  const image=await c.eval(`(async()=>{const img=document.querySelector('.hero-profile img');let timer;try{await Promise.race([img.decode(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Hero WebP decode timeout: '+img.src)),15000);})]);}finally{clearTimeout(timer);}return {loaded:img.complete&&img.naturalWidth>0,width:img.naturalWidth,height:img.naturalHeight};})()`);
+  assert.equal(image.loaded,true,'Hero WebP must finish decoding');
+  assert.equal(image.width,1086,'Hero artwork must retain its original canvas width');
+  assert.equal(image.height,1448,'Hero artwork must retain its original canvas height');
+ }
  async function open(){await c.eval(`closeHomeFeature();openHomeFeature('rest')`);await tap('#heroHomeEntry');await c.eval(`(async()=>{const end=Date.now()+15000;while(Date.now()<end&&!document.getElementById('heroPageContent'))await new Promise(r=>setTimeout(r,50));if(!document.getElementById('heroPageContent'))throw Error('hero entry failed');return true;})()`);}
  for(const [width,height] of [[360,640],[412,915],[1024,768]]){
   await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height});
@@ -54,9 +60,10 @@ try{
   await tap('[data-hero-id="vajraHeavenlyKing"].hero-picker-button');
   assert.equal(await c.eval(`document.querySelector('.hero-profile h3').textContent`),'金剛天王');
   assert.ok((await c.eval(`document.querySelector('.hero-profile img').getAttribute('src')`)).endsWith('assets/heroes/vajra-heavenly-king.webp'),'Vajra must use its formal Hero WebP');
+  await verifyArtwork();
   await tap('[data-hero-id="divineDogHongbao"].hero-picker-button');
   assert.ok((await c.eval(`document.querySelector('.hero-profile img').getAttribute('src')`)).endsWith('assets/heroes/divine-dog-hongbao.webp'),'Hongbao must use its formal Hero WebP');
-  assert.equal(await c.eval(`document.querySelector('.hero-profile img').complete&&document.querySelector('.hero-profile img').naturalWidth>0`),true);
+  await verifyArtwork();
   const geometry=await c.eval(`(()=>{const b=document.querySelector('.hero-panel').getBoundingClientRect(),s=document.getElementById('heroPageContent'),f=document.querySelector('.hero-page-footer').getBoundingClientRect();return {box:b.toJSON(),footer:f.toJSON(),overflow:s.scrollWidth-s.clientWidth,objectFit:getComputedStyle(document.querySelector('.hero-profile img')).objectFit,minFont:Math.min(...Array.from(document.querySelectorAll('.hero-page-shell p,.hero-page-shell small,.hero-page-shell dt,.hero-page-shell button'),n=>parseFloat(getComputedStyle(n).fontSize)))};})()`);
   assert.ok(geometry.box.left>=-1&&geometry.box.right<=width+1&&geometry.box.top>=-1&&geometry.box.bottom<=height+1,JSON.stringify(geometry));
   assert.ok(geometry.footer.bottom<=geometry.box.bottom&&geometry.overflow<=1,JSON.stringify(geometry));assert.equal(geometry.objectFit,'contain');assert.ok(geometry.minFont>=13);
