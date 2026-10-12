@@ -36,6 +36,21 @@ function digest(value){ return createHash("sha256").update(JSON.stringify(value)
 function snapshotDigest(value){ return digest(stable(value)); }
 function claimRecordsDigest(records){ return digest(stable(records)); }
 
+// Retained playable character fields only. The same storage guard protects
+// durable snapshots and complete projections; no stat formulas, HP/SP refill,
+// transient-state execution, defaults or historical backfill happen here.
+function inspectPlayableCharacterState(state){
+    const integers=["attack","intelligence","vitality","energy","defensePoints",
+        "agility","expNext","skillPoints","attributePoints","bonusHP","bonusSP"];
+    if(integers.some(key=>!Number.isSafeInteger(state[key])||state[key]<0)||
+       state.expNext<1||!["male","female"].includes(state.gender)||
+       ["hp","sp"].some(key=>!Number.isFinite(state[key])||state[key]<0)||
+       !Array.isArray(state.activeBuffs)||!Array.isArray(state.statusEffects)||
+       typeof state.isDefending!=="boolean"){
+        fail("complete character state");
+    }
+}
+
 // Retained skill storage shape only: no catalogue, learning/cost/element
 // eligibility, combat execution, defaults or normalization in this reader.
 // Client skill Owner stores positive levels (current global ceiling 10) and
@@ -320,7 +335,10 @@ function assembleCanonicalSnapshot(uid,revision,records){
            !Array.isArray(character.skillLoadout.equippedSkills)){
             fail("character state or slot reference");
         }
-        if(records.progress.playableState!==undefined){inspectSkillLoadout(character.skillLoadout);}
+        if(records.progress.playableState!==undefined){
+            inspectPlayableCharacterState(character.state);
+            inspectSkillLoadout(character.skillLoadout);
+        }
         seenCharacters.add(character.characterId);
     }
     const formation=records.account.formation;
@@ -486,15 +504,7 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
     const players=[null,null,null];
     for(const character of source.snapshot.characters){
         const state=character.state;
-        const integers=["attack","intelligence","vitality","energy","defensePoints",
-            "agility","expNext","skillPoints","attributePoints","bonusHP","bonusSP"];
-        if(integers.some(key=>!Number.isSafeInteger(state[key])||state[key]<0)||
-           state.expNext<1||!["male","female"].includes(state.gender)||
-           ["hp","sp"].some(key=>!Number.isFinite(state[key])||state[key]<0)||
-           !Array.isArray(state.activeBuffs)||!Array.isArray(state.statusEffects)||
-           typeof state.isDefending!=="boolean"){
-            fail("complete character state");
-        }
+        inspectPlayableCharacterState(state);
         players[character.slotIndex]=copy(state);
         const key=slotKeys[character.slotIndex];
         characterEquipment[key]=Object.fromEntries([...EQUIPMENT_SLOTS].map(slot=>[slot,null]));

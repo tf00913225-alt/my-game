@@ -1539,6 +1539,35 @@ assert.deepEqual((await ownedCharacterRef.get()).get("skillLoadout"),ownedSkillL
 assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
     .get("sourceRecords.characters")[0].skillLoadout,ownedSkillLoadout);
 const ownedAllocation="allocate-owned-source-exp-0001";
+// Corrupt only the emulator fixture and reseal its current snapshot so a
+// matching hash cannot substitute for complete retained character evidence.
+const ownedState4=(await ownedCharacterRef.get()).get("state");
+const ownedSnapshotRef4=ownedRoot.collection("playableSnapshots").doc("4");
+const ownedSnapshot4=(await ownedSnapshotRef4.get()).data();
+const incompleteState4={...ownedState4};delete incompleteState4.agility;
+const incompleteSnapshot4={...ownedSnapshot4,
+    snapshot:JSON.parse(JSON.stringify(ownedSnapshot4.snapshot))};
+incompleteSnapshot4.snapshot.characters[0].state=incompleteState4;
+incompleteSnapshot4.sha256=claimRecordsDigest(incompleteSnapshot4.snapshot);
+incompleteSnapshot4.byteLength=Buffer.byteLength(JSON.stringify(incompleteSnapshot4.snapshot),"utf8");
+await Promise.all([
+    ownedCharacterRef.update({state:incompleteState4}),
+    ownedSnapshotRef4.set(incompleteSnapshot4),
+    ownedRoot.collection("account").doc("current").update({snapshotSha256:incompleteSnapshot4.sha256})
+]);
+await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
+    operationId:ownedAllocation,expectedRevision:4}),error=>error.code==="data-loss");
+assert.equal((await ownedRoot.collection("operations").doc(ownedAllocation).get()).exists,false);
+assert.equal((await ownedRoot.collection("playableSnapshots").doc("5").get()).exists,false);
+assert.equal((await ownedRoot.collection("recoveryArchives").doc("5").get()).exists,false);
+assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),4);
+assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("sharedExp"),320);
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+    .get("sourceRecords.characters")[0].state,ownedState4);
+await Promise.all([
+    ownedCharacterRef.update({state:ownedState4}),ownedSnapshotRef4.set(ownedSnapshot4),
+    ownedRoot.collection("account").doc("current").update({snapshotSha256:ownedSnapshot4.sha256})
+]);
 await ownedCharacterRef.update({skillLoadout:{...ownedSkillLoadout,equippedSkills:["flameSlash","flameSlash"]}});
 await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
     operationId:ownedAllocation,expectedRevision:4}),error=>error.code==="data-loss");
