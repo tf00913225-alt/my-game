@@ -81,7 +81,8 @@
             }
         }finally{if(token===generation){busy=false;notify();}}
     }
-    global.FourSymbolsHeroGrowth=Object.freeze({read,mutate,testResources,getAccount:projected,
+    global.FourSymbolsHeroGrowth=Object.freeze({read,mutate,testResources,
+        retry:()=>pending?mutate(pending.heroId,pending.action):Promise.resolve(),getAccount:projected,
         getStatus:()=>({ready:!!projected(),busy,error,pending:copy(pending),
             testMode:devEnabled()&&!!dev&&devUid===uid(),devAvailable:devEnabled(),
             marrowPills:devEnabled()&&dev&&devUid===uid()?dev.pills:proof?.ownerUid===uid()?proof.marrowPills:0})});

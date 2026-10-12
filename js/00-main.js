@@ -25096,7 +25096,7 @@ function renderHeroGrowthControls(hero,data){
         ${button("unlock","碎片解鎖（100）",d.canUnlockHero(state.heroId))}
         ${button("starUp",state.stars===5?"已達五星":`升星（${d.getHeroStarCost(state.stars)} 碎片）`,d.canStarUpHero(state.heroId))}
         ${button("reroll","洗髓（1 顆）",d.canReroll(state.heroId,g.marrowPills))}
-        ${g.pending?'<p role="status">請重試前次操作確認結果。</p>':""}</section>`;
+        ${g.pending?`<p role="status">請重試前次操作確認結果。</p><button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.retry()" ${g.busy?"disabled":""}>確認前次操作</button>`:""}</section>`;
 }
 function refreshHeroPage(preserveScroll=false){
     if(!$("homeFeatureModal")?.querySelector(".hero-panel"))return;

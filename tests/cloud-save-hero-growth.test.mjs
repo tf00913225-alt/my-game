@@ -134,7 +134,8 @@ test("real growth client preserves identical intent after lost response and does
     const api=c.FourSymbolsHeroGrowth;await api.read();await api.mutate(heroId,"starUp");
     assert.ok(api.getStatus().pending);assert.equal(h.data.get(env).serverRevision,3);
     await api.mutate(heroId,"reroll");assert.equal(calls.length,1,"unknown outcome blocks other intent");
-    await api.mutate(heroId,"starUp");assert.deepEqual(calls[0],calls[1]);
+    await api.read(); // Current eligibility may change; explicit retry remains available.
+    await api.retry();assert.deepEqual(calls[0],calls[1]);
     assert.equal(h.data.get(env).serverRevision,3);assert.equal(api.getStatus().pending,null);
     assert.equal(api.getAccount().heroes[heroId].stars,1);
     c.player={id:"fixture-player",level:20};c.player2=null;c.player3=null;
