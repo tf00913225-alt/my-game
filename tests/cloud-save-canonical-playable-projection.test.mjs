@@ -627,7 +627,7 @@ test("explicit complete formations reject missing characters and discarded root 
     const {createRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
     for(const count of [1,2,3]){
         for(const durable of [false,true]){
-            for(const mutate of [f=>delete f.characterIndexToSlot[0],
+            for(const mutate of [...Array.from({length:count},(_,index)=>f=>delete f.characterIndexToSlot[index]),
                 f=>f.extra=true,f=>f.kind="ally-formation",f=>f.slotToCharacterIndex={} ]){
                 const records=sources(count);
                 if(durable){const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
