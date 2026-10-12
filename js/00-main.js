@@ -39,8 +39,6 @@ function allocatePoints(budget,archetype){
   return Object.fromEntries(shares.map(row=>[row.stat+'Points',row.points]));
 }
 
-import {levelBase,validateLevel,SIX_STAT_COEFFICIENTS} from './level-base-contract.mjs';
-import {ARCHETYPES,allocatePoints} from './monster-archetypes.mjs';
 const MODES=Object.freeze(['wild','daily','tower','abyss','adventure','personalBoss','worldBoss']);
 const RANKS=Object.freeze(['regular','elite','smallBoss','boss']);
 const GLOBAL_CALIBRATION=Object.freeze({hp:1,sp:1,damage:1,defense:1});

@@ -143,8 +143,7 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
                 tx.update(ref,{...row,...(key==="account"?{snapshotSha256:bundle.sha256}:{}),updatedAt:stamp});
             }
             c.characterRefs.forEach((ref,i)=>tx.update(ref,{...records.characters[i],updatedAt:stamp}));
-            const ownedMap=new Map([...records.inventory,...records.equipment,...records.relics,...records.claimRecords]
-                .map(row=>[row.ownedItemId||row.equipmentKey||row.relicId||row.claimKey,row]));
+            const ownedMap=new Map(records.inventory.map(row=>[row.ownedItemId,row]));
             for(const ref of c.owned.refs){
                 if(removed.has(ref.id)){tx.delete(ref);continue;}
                 const original=c.owned.records.inventory.find(i=>i.ownedItemId===ref.id);

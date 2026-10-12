@@ -2,7 +2,7 @@
 import {
     createAccountWithEmail,getSignedInUser,signInAsAnonymous,signInWithEmail,
     signInWithGoogle,reauthenticateWithGoogle,signOutFirebase
-} from "./firebase-auth.da338b70a3ba.js";
+} from "./firebase-auth.9f8c09942b79.js";
 
 const OVERLAY_ID="firebaseAuthOverlay";
 const RESUME_GRACE_MS=5000;

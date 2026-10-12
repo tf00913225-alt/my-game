@@ -12,7 +12,7 @@
     const devEnabled=()=>global.location?.hostname==="dev.four-symbols-dev.pages.dev";
     const ready=()=>global.FourSymbolsStartupPolicy?.getState?.()==="READY"&&global.navigator?.onLine!==false;
     function notify(){global.refreshHeroPage?.(true);}
-    function reset(){proof=null;pending=null;dev=null;devUid=null;error=null;generation++;notify();}
+    function reset(){proof=null;pending=null;dev=null;devUid=null;error=null;busy=false;generation++;notify();}
     function publish(value,owner,token){
         if(owner!==uid()||token!==generation){throw Error("帳號已變更。");}
         const core=global.FourSymbolsHeroCore;

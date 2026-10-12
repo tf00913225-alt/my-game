@@ -12,13 +12,13 @@ import {
     getDoc,
     getFirestore
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
-import {CLOUD_FUNCTIONS_REGION,callProtectedFunction} from "./firebase-session.2ed30ab7f07f.js";
+import {CLOUD_FUNCTIONS_REGION,callProtectedFunction} from "./firebase-session.877a7842d6bd.js";
 
 import {
     getFirebaseApp,
     getFirebaseAuth,
     initializeFirebaseAuth
-} from "./firebase-auth.da338b70a3ba.js";
+} from "./firebase-auth.9f8c09942b79.js";
 
 export const CLOUD_SAVE_WRITE_POLICY = "trusted-backend-only";
 export {CLOUD_FUNCTIONS_REGION};

@@ -1,13 +1,9 @@
-window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.73","firebaseBootstrap":"build/firebase/firebase-bootstrap.e57fffd07e88.js"});
-
+window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.73","firebaseBootstrap":"build/firebase/firebase-bootstrap.0d0c98bcdb09.js"});
 (function installFourSymbolsSupportContact(global){
 "use strict";
-
 if(!global||global.FourSymbolsSupport){ return; }
-
 const EMAIL="foursymbols.support@gmail.com";
 const OVERLAY_ID="fourSymbolsSupportOverlay";
-
 function close(){
 const overlay=document.getElementById(OVERLAY_ID);
 if(!overlay){ return false; }
@@ -15,11 +11,9 @@ overlay.hidden=true;
 overlay.setAttribute("aria-hidden","true");
 return true;
 }
-
 function ensureOverlay(){
 let overlay=document.getElementById(OVERLAY_ID);
 if(overlay){ return overlay; }
-
 overlay=document.createElement("section");
 overlay.id=OVERLAY_ID;
 overlay.className="support-contact-overlay";
@@ -34,7 +28,6 @@ overlay.innerHTML=[
 '<button id="supportContactCloseButton" type="button">關閉</button>',
 '</div>'
 ].join("");
-
 overlay.addEventListener("click",event=>{
 if(event.target===overlay){ close(); }
 });
@@ -42,7 +35,6 @@ overlay.querySelector("#supportContactCloseButton").addEventListener("click",clo
 document.body.appendChild(overlay);
 return overlay;
 }
-
 function show(){
 const overlay=ensureOverlay();
 overlay.hidden=false;
@@ -51,19 +43,15 @@ const closeButton=overlay.querySelector("#supportContactCloseButton");
 if(closeButton){ closeButton.focus({preventScroll:true}); }
 return EMAIL;
 }
-
 document.addEventListener("keydown",event=>{
 if(event.key==="Escape"){ close(); }
 });
-
 global.FourSymbolsSupport=Object.freeze({email:EMAIL,show,close});
 })(window);
-
 (function installScreenWakeLock(global){
 "use strict";
 const doc=global&&global.document;
 if(!global||!doc||global.FourSymbolsScreenWakeLock){ return; }
-
 const RETRY_DELAYS_MS=Object.freeze([1200,4000]);
 let sentinel=null;
 let requestInFlight=null;
@@ -79,18 +67,15 @@ lastAcquireReason:null,
 lastReleaseReason:null,
 retryAttempt:0
 };
-
 function supported(){
 return !!(global.navigator&&global.navigator.wakeLock&&typeof global.navigator.wakeLock.request==="function");
 }
-
 function syncDiagnostics(status){
 diagnostics.supported=supported();
 diagnostics.held=!!(sentinel&&!sentinel.released);
 if(status){ diagnostics.status=status; }
 diagnostics.retryAttempt=retryAttempt;
 }
-
 function cancelRetry(resetAttempt){
 if(retryTimer!==null){
 global.clearTimeout(retryTimer);
@@ -99,7 +84,6 @@ retryTimer=null;
 if(resetAttempt){ retryAttempt=0; }
 syncDiagnostics();
 }
-
 function scheduleRetry(reason){
 if(!supported()||doc.visibilityState!=="visible"||retryTimer!==null||retryAttempt>=RETRY_DELAYS_MS.length){
 syncDiagnostics(retryAttempt>=RETRY_DELAYS_MS.length?"retry-exhausted":diagnostics.status);
@@ -116,13 +100,11 @@ void acquire("retry-"+retryAttempt);
 },delay);
 return true;
 }
-
 async function releaseSentinel(target){
 if(target&&!target.released&&typeof target.release==="function"){
 try{ await target.release(); }catch(_){ }
 }
 }
-
 async function acquire(reason){
 const acquireReason=String(reason||"manual");
 diagnostics.supported=supported();
@@ -147,7 +129,6 @@ return acquire(acquireReason+"-generation-refresh");
 }
 return acquired;
 }
-
 const flight={generation:requestGeneration,promise:null};
 syncDiagnostics("requesting");
 flight.promise=(async()=>{
@@ -190,7 +171,6 @@ if(requestInFlight===flight){ requestInFlight=null; }
 requestInFlight=flight;
 return flight.promise;
 }
-
 async function release(reason){
 requestGeneration++;
 diagnostics.lastReleaseReason=String(reason||"manual");
@@ -201,7 +181,6 @@ syncDiagnostics("releasing");
 await releaseSentinel(current);
 syncDiagnostics("released");
 }
-
 function handleVisibilityChange(){
 if(doc.visibilityState==="visible"){
 retryAttempt=0;
@@ -210,7 +189,6 @@ void acquire("visibility-visible");
 void release("visibility-hidden");
 }
 }
-
 doc.addEventListener("visibilitychange",handleVisibilityChange);
 global.addEventListener("pageshow",()=>{
 if(doc.visibilityState==="visible"){
@@ -219,7 +197,6 @@ void acquire("pageshow");
 }
 });
 global.addEventListener("pagehide",()=>{ void release("pagehide"); });
-
 syncDiagnostics(supported()?"idle":"unsupported");
 global.FourSymbolsScreenWakeLock=Object.freeze({
 acquire,
@@ -228,14 +205,11 @@ isSupported:supported,
 isHeld:()=>!!(sentinel&&!sentinel.released),
 getDiagnostics:()=>Object.freeze(Object.assign({},diagnostics))
 });
-
 void acquire("initial-visible");
 })(typeof window!=="undefined"?window:globalThis);
-
 (function installAccountSaveRepository(global){
 "use strict";
 if(!global || global.FourSymbolsAccountSave){ return; }
-
 const LEGACY_KEY="battle_full_version_save_v5";
 const PREFIX="four_symbols_save:";
 const META_PREFIX="four_symbols_save_meta:";
@@ -260,7 +234,6 @@ v174_abyss_state_v2:"abyss-state"
 });
 const BACKUP_SIDECARS=Object.freeze([...new Set([...Object.values(LEGACY_SIDECARS),"patrol-character-index"])]);
 const PLAIN_SIDECARS=new Set(["announcement-read","bulk-sell-quality","patrol-character-index"]);
-
 function storage(){
 if(!global.localStorage){ throw coded("local-storage-unavailable","Local storage is unavailable."); }
 return global.localStorage;
@@ -425,7 +398,6 @@ try{ return {status:"available",save:parseSave(raw,"legacy-corrupt"),raw,error:n
 catch(error){ return {status:"corrupt",save:null,raw,error}; }
 }
 function migrationBackupKey(uid){ return BACKUP_PREFIX+validUid(uid)+":"+Date.now(); }
-
 function migrationBackupKeyFor(uid,mainFingerprint,manifestFingerprint){
 uid=validUid(uid);
 if(!/^v1:[0-9a-f]+:[0-9a-f]{32}$/.test(mainFingerprint||"")){
@@ -655,7 +627,6 @@ const suffix=String(name||"").trim();
 if(!suffix){ throw coded("account-key-invalid","Account sidecar name is required."); }
 return "four_symbols_account:"+uid+":"+suffix;
 }
-
 global.FourSymbolsAccountSave=Object.freeze({
 SCHEMA_VERSION,LEGACY_KEY,ACTIVE_UID_KEY,activate,deactivate,getActiveUid,
 saveKey,metadataKey,readForUid,readActive,writeForUid,inspectLegacy,
@@ -664,11 +635,9 @@ migrationBackupKeyFor,createMigrationBackup,verifyMigrationBackup,
 exportMigrationBackups,recoverArchivedMigrationSidecars,BACKUP_SIDECARS
 });
 })(typeof window!=="undefined"?window:globalThis);
-
 (function installFeatureLoader(global){
 "use strict";
 if(!global || global.FourSymbolsFeatures){ return; }
-
 let manifestPromise=null;
 const preparation=new Map();
 const execution=new Map();
@@ -680,7 +649,6 @@ const backgroundJobs=new Map();
 const assetPreparation=new Map();
 const BACKGROUND_CONCURRENCY=1;
 let backgroundActive=0;
-
 function emit(name,detail){
 try{ global.dispatchEvent(new CustomEvent(name,{detail})); }catch(_){ }
 }
@@ -858,7 +826,6 @@ global.requestIdleCallback(run,{timeout:2500});
 }else{ global.setTimeout(run,800); }
 return completion;
 }
-
 global.FourSymbolsFeatures=Object.freeze({
 ensure,prefetch,backgroundPrefetch,prefetchAssets,prefetchManifestAssets,ensureAssets,idle,
 isReady:name=>ready.has(name)||readyFeatures.has(name),
@@ -866,7 +833,6 @@ manifest,
 getBackgroundPrefetchState:()=>Object.freeze({concurrency:BACKGROUND_CONCURRENCY,active:backgroundActive,queued:backgroundQueue.filter(job=>!job.cancelled).map(job=>job.key)})
 });
 })(typeof window!=="undefined"?window:globalThis);
-
 (function installFirstPlayResourceLoader(global){
 "use strict";
 const STORAGE_KEY="four_symbols_first_play_ready";
@@ -876,7 +842,6 @@ let activePromise=null;
 let lastManifest=null;
 let lastFailed=[];
 let sessionCompleted=new Map();
-
 function readRecord(){
 try{
 const raw=global.localStorage&&global.localStorage.getItem(STORAGE_KEY);
@@ -1099,7 +1064,6 @@ const promise=run(options).finally(()=>{ if(activePromise===promise){ activeProm
 if(!options.retryFailedOnly){ activePromise=promise; }
 return promise;
 }
-
 global.FourSymbolsFirstPlay=Object.freeze({
 storageKey:STORAGE_KEY,
 prepare,
@@ -1110,11 +1074,9 @@ getLastFailed:()=>lastFailed.map(item=>({path:item.path,message:String(item.erro
 getManifest:()=>lastManifest
 });
 })(typeof window!=="undefined"?window:globalThis);
-
 (function installStartupContract(global){
 "use strict";
 if(!global||global.FourSymbolsStartupContract){ return; }
-
 const STATES=Object.freeze({
 BOOT_LOADING:"BOOT_LOADING",
 AUTH_RESOLVING:"AUTH_RESOLVING",
@@ -1149,7 +1111,6 @@ context.saveResolved===true;
 }
 global.FourSymbolsStartupContract=Object.freeze({STATES,ALLOWED,canTransition,canCreateCharacter});
 })(typeof window!=="undefined"?window:globalThis);
-
 (function installStartupStateMachine(global){
 "use strict";
 const contract=global.FourSymbolsStartupContract;
@@ -1188,16 +1149,13 @@ let citySceneShown=false;
 let openingPresentationComplete=false;
 let creationRenderPromise=null;
 let accountTransitionReloading=false;
-
 function mark(name){
 try{ if(global.performance&&typeof global.performance.mark==="function"){ global.performance.mark(name); } }catch(_){ }
 }
-
 if(creation){ creation.style.display="none"; creation.setAttribute("aria-hidden","true"); }
 if(game){ game.style.display="none"; }
 if(root){ root.hidden=false; root.dataset.owner="StartupStateMachine"; root.dataset.state=state; }
 mark("four-symbols:boot-core-ready");
-
 let appShellPromise=null;
 function startAppShell(){
 if(!appShellPromise){
