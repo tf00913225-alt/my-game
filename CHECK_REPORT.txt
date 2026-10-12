@@ -1,5 +1,64 @@
 《my-game 專案檢查報告》
 
+正式版本基線：V173.73
+文件核對日期：2026-10-12（Asia/Taipei）
+正式驗證執行日期：2026-10-03
+正式分支／production deployed SHA：f63d69dbfa66ba75637d1c3cd7fcc7d74782e356
+Game / Cache Version：173.73 / 173.73
+版本唯一來源：release/release.json
+
+一、正式 V173.73 驗證基線
+
+以下引用既有正式 CI／部署證據，不是本次重新執行 Gameplay 或手機實機驗收。
+- main CI：37120857492，attempt 1，event push，completed / success。
+  https://github.com/tf00913225-alt/my-game/actions/runs/37120857492
+  Repository checks job：111196518847；head_sha 為上述正式 SHA。
+- JavaScript syntax：352 / 352 files PASS。
+- Node unit／integration：263 / 263 suites PASS。
+- 靜態資源：405 個 unique local targets，全數存在。
+- HTML ID：4 個 HTML、255 個 static IDs，無重複。
+- Release source coherence：V173.73 / cache 173.73。
+- Release Requirements：23 / 23 VERIFIED。
+- production build synchronization、release-loader integrity、Git whitespace：PASS。
+- 每日副本 WebP：9 / 9 runtime portraits、3 / 3 preparations PASS。
+- 手機瀏覽器 QA：冒險、固定戰場、背包、技能、秘寶、觸控／捲動／導航與冷／暖啟動均 PASS。
+- Boot 關鍵包量測：78 resources / 21,593,306 bytes；returning auth 10,037.1 ms、warm city 10,516.1 ms。這是該次 CI 量測，不代表所有玩家環境。
+
+二、正式 production 部署證據
+
+- Production URL：https://tf00913225-alt.github.io/my-game/
+- Production deployment：37121755907，attempt 1，event workflow_run，completed / success。
+  https://github.com/tf00913225-alt/my-game/actions/runs/37121755907
+- Deploy／verification job：111199073315。
+- 日誌明確記錄 Deployment SHA verified: f63d69dbfa66ba75637d1c3cd7fcc7d74782e356。
+- Responsive Item real runtime QA：6 / 6 viewports PASS。
+- Forge touch runtime：390×844、412×915 PASS。
+- Battle layer/audio live mobile QA：PASS。
+- Production verification artifact：11273931287。
+  https://github.com/tf00913225-alt/my-game/actions/runs/37121755907/artifacts/11273931287
+- 上述為正式部署及 Chrome 手機尺寸驗收；不宣稱 S23 Ultra 實體長時間戰鬥、背景恢復或完整跨裝置 Cloud Save 已驗收。
+
+三、正式發布生命週期與 dev 邊界
+
+- V173.73 發布鏈：PR #772／#776／#778／#779；發布結果與有效內容收斂詳見 docs/v17373-post-release-closeout-20261003.json。
+- dev 的 release/v17373-scope.json 已是 assessment RELEASED、mode NORMAL DEVELOPMENT；currentState.activeReleaseFreeze=false、activeReleaseCandidate=null。
+- releaseCandidateSha 為 #779 的歷史已接受 correction SHA，不是目前 dev 候選；historicalReleaseFreeze 及舊候選 null／pending 記錄僅供追溯。
+- dev 根 package.json.version 已是 173.73.0，為 release source 的 metadata 投影；main 的舊 metadata 隨未來另行授權的正式發布整合，不直接修改 main。
+- dev 後續英雄、冶煉、UI、玩法與 Cloud 工程未因沿用 V173.73 版本字串而成為正式版；最新狀態以各 Work PR／即時 refs／checks 為準。
+- DEV 固定 SHA 驗證網址：https://dev.four-symbols-dev.pages.dev
+- 本報告不指定新候選、不啟動 Freeze，不重跑共同部署／完整發布驗收。
+- main/dev ahead／behind 僅為歷史線索；是否需回流必須核對有效內容，不能僅由提交數判定。
+
+四、本次文件修正範圍
+
+本次只更新 CHECK_REPORT.txt 與 HANDOFF.md，保留既有 release scope／版本來源／package metadata，不修改 Runtime、玩家公告、玩家資料或發布流程。PR 是本工作最新 CI、合併與清理狀態 Owner。本文件在 dev 更新，不表示 main 或正式網站文件已更新。
+
+五、歷史基線：V173.72（2026-09-24）
+
+下列原文完整保留為歷史證據，已由上列 V173.73 正式基線取代。其中「目前」、「Final dev」、「可安全清理」及舊 PR 待辦只代表當時觀測，不是本次工作指令或目前剩餘項目。
+
+《my-game 專案檢查報告》
+
 版本：V173.72
 更新日期：2026-09-24
 正式發布分支：main

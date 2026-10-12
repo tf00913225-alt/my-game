@@ -2,25 +2,23 @@
 
 本文件提供專案級現在狀態、重要跨工程結果與索引。治理／讀取路由由 `AGENTS.md` 唯一控制；HANDOFF 不再是每次施工必讀，也不承擔個別 Work 的即時 checkpoint。
 
-## 版本與分支狀態
+## 正式版本與發布狀態（2026-10-12 核對）
 
-- Game / Cache：`173.73 / 173.73`，來源 `release/release.json`；根 npm metadata `173.73.0` 為單向投影，不是另一個遊戲版本 Owner。
-- 正式 main：V173.73。開工觀測 `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356`；本治理工程禁止修改。
-- dev：NORMAL DEVELOPMENT；沒有本輪啟動的 Release Freeze。本治理工程開工觀測 `76f35f0014a6a87ef7d821eb243bfd892f9ed5c1`（已合併 Fire #805）。以上為 dated observation，續接必須重新查即時 refs／checks，不提交自指 latest SHA 迴圈。
-- DEV 固定驗證站：`https://dev.four-symbols-dev.pages.dev`；部署最新 SHA／CI 狀態查對應 workflow／Work PR，不從舊版本或本文件推定。
+- 正式 main：V173.73；SHA `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356`。2026-10-03 [main CI](https://github.com/tf00913225-alt/my-game/actions/runs/37120857492) 與 [Production deployment](https://github.com/tf00913225-alt/my-game/actions/runs/37121755907) 均 SUCCESS，部署日誌直接核對同一 SHA；正式 Requirements 23／23 VERIFIED。
+- 正式驗證基線：Node 263／263、JS 352／352、靜態資源 405、HTML ID 255；六尺寸 responsive、鍛造 390×844／412×915、戰鬥／音效正式瀏覽器 QA PASS。詳細基線及歷史 V173.72 證據見 [CHECK_REPORT.txt](CHECK_REPORT.txt)，本次只核對既有證據，不重新宣稱真機驗收。
+- V173.73 已發布、Freeze 已結束；dev 維持 NORMAL DEVELOPMENT，沒有本次啟動的新候選。發布結果、當時有效內容收斂與邊界見 [發布後結案紀錄](docs/v17373-post-release-closeout-20261003.json) 及 [scope](release/v17373-scope.json)；scope 的 releaseCandidateSha 與 historicalReleaseFreeze 是歷史證據，不是有效施工限制。
+- Game／Cache 唯一來源 `release/release.json`：173.73／173.73；dev 根 npm metadata 173.73.0 已正確投影。main 舊 package metadata 不另行直接修改，隨未來授權的正式發布整合。
+- dev 後續功能不因仍顯示 V173.73 而視為已正式發布。本次僅更新 dev 文件，沒有 main 發布授權，也沒有修改 main／玩家公告／Runtime。
 
-## 有效工程索引（2026-10-05 UTC 開工觀測）
+## 施工狀態與續接入口
 
-| 工程 | 即時狀態 Owner／下一步 |
-|---|---|
-| WIND-EX-LOW-HP-EVASION-20261005 | PR #806；`fix: make Wind EX low-HP bonus additive final evasion`。既有風 EX 工作續接該 PR／Branch／Latest Head／CI，不重開；未合併的規格讀該 PR Head，不假定 dev 已存在 |
-| ENGINEERING-GOVERNANCE-SLIMDOWN-20261005 | `docs/engineering-governance-slimdown-20261005` → dev；本工作 PR 管理規範瘦身的 CI／整合／清理，不接手 #806 Runtime |
+即時 Work ID／Branch／PR／Latest Head／CI／Next 由各工作 PR 管理；依 `AGENTS.md` 續接，不把本文件或舊 Open PR 表當成有效施工清單。2026-10-05 的 #806 與治理瘦身施工索引已是歷史觀測，其紀錄保留於 Git history／原 PR。
 
-Open PR 清單只反映觀測時點。沒有 Open PR 不代表整個子系統已完成：續接仍依 Work ID／任務查有效 Branch 與已合併 PR 的最新結案證據。
+DEV 固定驗證站：`https://dev.four-symbols-dev.pages.dev`。部署 SHA、必要 checks 及驗收查對應 workflow／Work PR，不從版本字串或本文件推定。main/dev 歷史分叉與提交數不能單獨證明有正式內容尚未吸收；回流需核對實際有效 diff。
 
 ## 近期重要架構／migration 結果
 
-- HERO-CORE-PHASE1-20261007 建立 `functions/src/hero-core.js` 唯一英雄 Domain 與既有 UID main-save extension；HERO-BATTLE-PHASE2A-20261007 接入既有 Battle Owner 的 `heroNpc` 身份、6-unit 容量、普攻／受擊／死亡／合法復活／Initiative／Statistics，不重設 Core 或永久 schema。HERO-BATTLE-PHASE2B-20261008（PR #833）接續同一 Owner 的戰鬥暫存怒氣、技能、兩項被動與指定立繪；完整契約／後續邊界見 `docs/HERO_SYSTEM_V1.md`。英雄頁／Reward／Equipment 未施工；CI／整合／驗收即時結果查 Work PR。
+- HERO-CORE-PHASE1-20261007 建立 `functions/src/hero-core.js` 唯一英雄 Domain 與既有 UID main-save extension；HERO-BATTLE-PHASE2A-20261007 接入既有 Battle Owner 的 `heroNpc` 身份、6-unit 容量、普攻／受擊／死亡／合法復活／Initiative／Statistics，不重設 Core 或永久 schema。HERO-BATTLE-PHASE2B-20261008（PR #833）接續同一 Owner 的戰鬥暫存怒氣、技能、兩項被動與指定立繪；完整契約／後續邊界見 `docs/HERO_SYSTEM_V1.md`。[PR #866](https://github.com/tf00913225-alt/my-game/pull/866) 已將主城英雄入口、資料頁與 session-only 最多三人編隊合入 dev；[PR #867](https://github.com/tf00913225-alt/my-game/pull/867) 收斂立繪 decode 驗收。這些尚未發布 main，不宣稱正式編隊持久化或 Reward／Equipment 已完成；CI／整合／驗收即時結果查各 Work PR。
 
 - Monster Balance Owner Phase 1–2F 已收斂七模式：Wild、Daily、Tower、Abyss、Adventure、Personal Boss、World Boss。後續平衡校正是新工程，不重開 migration；`docs/MONSTER_BALANCE_OWNER_FINAL.md` 為總結果索引，`SYSTEM_CONTRACTS.md` 的七模式章節為跨模式契約；退場圖 `docs/monster-balance-owner-retirement-map.json`。
 - Level Suppression V2 已採 `1.01 ^ levelDiff`、無人工 cap/floor，唯一 `js/00-main.js::getDamageLevelMultiplier()`；正式規格 `docs/LEVEL_SUPPRESSION_V2_20261005.md` 及 `SYSTEM_CONTRACTS.md` 相關章節。與 Hit／Evasion／Status 分離。
