@@ -3705,65 +3705,7 @@ let inventoryCharacterIndex = 0;
 
 const inventoryItems = [
 
-    {
-        id:"ironSword",
-        name:"鐵劍",
-        icon:"",
-        type:"weapon",
-        count:1,
-        price:120,
-        stats:{
-            attack:3
-        }
-    },
-
-    {
-        id:"woodStaff",
-        name:"木法杖",
-        icon:"",
-        type:"weapon",
-        count:1,
-        price:100,
-        stats:{
-            intelligence:3
-        }
-    },
-
-    {
-        id:"leatherHelmet",
-        name:"皮帽",
-        icon:"",
-        type:"helmet",
-        count:1,
-        price:80,
-        stats:{
-            vitality:1
-        }
-    },
-
-    {
-        id:"leatherArmor",
-        name:"皮甲",
-        icon:"",
-        type:"armor",
-        count:1,
-        price:150,
-        stats:{
-            vitality:2
-        }
-    },
-
-    {
-        id:"leatherShoes",
-        name:"皮鞋",
-        icon:"",
-        type:"shoes",
-        count:1,
-        price:90,
-        stats:{
-            agility:2
-        }
-    },
+    ...Object.keys(window.FourSymbolsEquipmentFactory.STARTERS).map(id=>window.FourSymbolsEquipmentFactory.starter(id)),
 
     {
         id:"hpPotion10",
@@ -7861,6 +7803,8 @@ function loadGame(){
 
         }
 
+
+        window.FourSymbolsEquipmentFactory.migrateGraph(inventoryItems,characterEquipment);
 
         normalizePotionInventoryFromLegacy(
             data
@@ -30815,7 +30759,7 @@ function openItemModal(
                 color:#b3a58c;
             "
         >
-            售價：${item.price||0} 金幣
+            售價：${isEquipmentInventoryType(item.type)?window.FourSymbolsEquipmentFactory.prices(item).sell:item.price||0} 金幣
         </div>
         `;
 
@@ -31618,9 +31562,9 @@ async function sellSelectedItem(){
     }
 
 
-    const price =
-        item.price||
-        0;
+    const price = isEquipmentInventoryType(item.type)
+        ?window.FourSymbolsEquipmentFactory.prices(item).sell
+        :item.price||0;
 
 
     if(

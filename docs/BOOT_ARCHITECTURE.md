@@ -31,6 +31,8 @@ Display tokens 位於 Critical Boot 的 `css/00-main.css`，app-shell 的 scaler
 
 一般 UI 的 `#game-ui` 由既有 app-shell Owner 一次搬移既有 DOM；顯示狀態跟隨 `#gameInterface` 的既有呈現生命週期。Boot、Auth 與角色／存檔 destination 仍由上表 Owner 決定；browser boundary 不得自行判斷 READY 或 UID。
 
+The app-shell includes `js/equipment-factory.js` immediately after the existing reforge model and before `00-main.js`. It supplies the starter equipment required by initial character state; it adds no Critical Boot feature or startup gate.
+
 ## Startup State Machine
 
 ```mermaid

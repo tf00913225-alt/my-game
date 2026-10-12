@@ -138,7 +138,7 @@ function inspectClaimSidecar(key,raw){
                 fail("recorded dungeon usage");
             }
         }else if(key==="equipment-shop-daily"){
-            if(!Number.isSafeInteger(state.refreshCount)||state.refreshCount<0||state.refreshCount>10||
+            if(!Number.isSafeInteger(state.refreshCount)||state.refreshCount<0||
                !Array.isArray(state.soldOfferIds)||new Set(state.soldOfferIds).size!==state.soldOfferIds.length||
                state.soldOfferIds.some(id=>{
                    if(typeof id!=="string"){return true;}

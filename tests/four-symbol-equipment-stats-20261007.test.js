@@ -6,7 +6,7 @@ const progression=fs.readFileSync("js/equipment-progression.js","utf8").replace(
 const polish=fs.readFileSync("js/41-v146-system-polish.js","utf8").replace(/\r\n/g,"\n");
 const between=(source,start,end)=>source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start)));
 const clean=value=>JSON.parse(JSON.stringify(value));
-const ctx=vm.createContext({window:{FourSymbolsItemSlot:{art:icon=>icon}},characterEquipment:{fire:{}},equipmentSetIcon:()=>"ART",
+const ctx=vm.createContext({window:{FourSymbolsEquipmentReforge:require("../functions/src/equipment-reforge"),FourSymbolsItemSlot:{art:icon=>icon}},characterEquipment:{fire:{}},equipmentSetIcon:()=>"ART",
     getEquipmentBonus:()=>({}),getCharacterSkillKey:character=>character?.key||null,
     migrateLegacyEquipmentStats:require("../functions/src/equipment-combat-percent-migration").migrateItem,
     Math:Object.assign(Object.create(Math),{random:()=>0.5}),

@@ -101,20 +101,8 @@
         return !!(window.v132AddItemToInventory&&window.v132AddItemToInventory(definition,amount));
     }
 
-    function makeUid(prefix){
-        return prefix+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,9);
-    }
     function ensureEquipmentUids(){
-        let changed=false;
-        inventoryItems.forEach(item=>{
-            if(item&&isEquipmentInventoryType(item.type)&&!item.v141Uid){ item.v141Uid=makeUid("bag"); changed=true; }
-        });
-        Object.values(characterEquipment||{}).forEach(equipment=>{
-            Object.values(equipment||{}).forEach(item=>{
-                if(item&&!item.v141Uid){ item.v141Uid=makeUid("equip"); changed=true; }
-            });
-        });
-        if(changed&&typeof saveGame==="function"){ saveGame(); }
+        window.FourSymbolsEquipmentFactory.migrateGraph(inventoryItems,characterEquipment);
     }
 
     function reforgeSlotCount(item){
