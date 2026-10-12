@@ -46,7 +46,7 @@ window.FourSymbolsItemAcquisitionData={
     {
       "key": "blue",
       "label": "藍階",
-      "chance": 15
+      "chance": 19
     },
     {
       "key": "purple",
@@ -56,24 +56,24 @@ window.FourSymbolsItemAcquisitionData={
     {
       "key": "orange",
       "label": "橙階",
-      "chance": 5
+      "chance": 1
     }
   ],
   "equipmentChest": [
     {
       "key": "white",
       "label": "白階",
-      "chance": 40
+      "chance": 50
     },
     {
       "key": "blue",
       "label": "藍階",
-      "chance": 40
+      "chance": 35
     },
     {
       "key": "purple",
       "label": "紫階",
-      "chance": 15
+      "chance": 10
     },
     {
       "key": "orange",

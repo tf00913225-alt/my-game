@@ -616,12 +616,12 @@
     window.v146GetCharacterGrowthAttention=getCharacterGrowthAttention;
 
     /* ----- Preserve legacy ordinary crafted equipment; blueprint metadata belongs to V132 materials. ----- */
-    const SYNTHESIS_SET_PREFIX=/^(赤炎|寒泉|岩岳|青嵐)/;
+
     const SYNTHESIS_SET_COLORS=/#(?:e24b32|4bb9e8|c59a54|55cda3)/gi;
 
     function normalizeOrdinaryCraftedItem(item){
-        if(!item||!item.v141Crafted){ return item; }
-        item.name=String(item.name||"普通裝備").replace(SYNTHESIS_SET_PREFIX,"");
+        if(!item||!item.v141Crafted||item.v146OrdinaryCrafted){ return item; }
+        // Historical set metadata removal stays here; names are owned by the factory.
         delete item.setId;
         delete item.requiredElement;
         delete item.setVariant;
@@ -629,6 +629,7 @@
             item.icon=item.icon.replace(SYNTHESIS_SET_COLORS,"#c59a54");
         }
         item.v146OrdinaryCrafted=true;
+        window.FourSymbolsEquipmentFactory.migrateItem(item);
         return item;
     }
 

@@ -34,7 +34,7 @@ function harness(){
         v132AddItemToInventory(def,n){if(c.failAdd)return false;const item=c.inventoryItems.find(item=>item.id===def.id);if(item)item.count+=n;else c.inventoryItems.push({...def,count:n});return true;},
         v132RunInventoryTransaction(fn){const snapshot=JSON.stringify(c.inventoryItems);const success=fn();if(!success)c.inventoryItems=JSON.parse(snapshot);return success;}
     };
-    c.window=c;vm.createContext(c);vm.runInContext(fs.readFileSync("functions/src/equipment-reforge.js","utf8"),c);vm.runInContext(runtime,c);
+    c.window=c;c.FourSymbolsEquipmentFactory=require("../js/equipment-factory");vm.createContext(c);vm.runInContext(fs.readFileSync("functions/src/equipment-reforge.js","utf8"),c);vm.runInContext(runtime,c);
     return {c,body,defs,get writes(){return writes;},get timers(){return timers;},put(id,count){c.inventoryItems.push({...defs.talismans.concat(defs.ores,defs.blueprints,defs.tickets).find(item=>item.id===id),id,count,icon:"stale-art"});},count(id){return c.inventoryItems.filter(item=>item.id===id).reduce((sum,item)=>sum+item.count,0);}};
 }
 test("first open and every selection/quantity/tab/reentry render final UI without decorators or timers",()=>{
@@ -82,7 +82,7 @@ test("legacy ordinary gear compatibility cannot strip canonical material bluepri
     const canonicalBefore=JSON.stringify(h.defs.blueprints),ownedBefore=JSON.stringify(h.c.inventoryItems);
     h.c.inventoryItems.push({id:"old-gear",name:"赤炎普通裝備",v141Crafted:true,setId:"setFire",requiredElement:"fire",stats:{attack:3},icon:"old-art"});
     const polish=fs.readFileSync("js/41-v146-system-polish.js","utf8");
-    const block=polish.slice(polish.indexOf("    const SYNTHESIS_SET_PREFIX="),polish.indexOf('    /* ----- Shared lifecycle.'));
+    const block=polish.slice(polish.indexOf("    const SYNTHESIS_SET_COLORS="),polish.indexOf('    /* ----- Shared lifecycle.'));
     vm.runInContext(block+"\nnormalizeOrdinarySynthesisData();",h.c);
     assert.equal(JSON.stringify(h.defs.blueprints),canonicalBefore);
     assert.equal(JSON.stringify(h.c.inventoryItems.slice(0,1)),ownedBefore);

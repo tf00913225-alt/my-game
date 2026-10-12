@@ -226,7 +226,7 @@
         candidates.forEach(item=>{
             const count=Math.max(1,Math.floor(Number(item.count)||1));
             units+=count;
-            goldValue+=Math.max(0,Math.floor(Number(item.price)||0))*count;
+            goldValue+=window.FourSymbolsEquipmentFactory.prices(item).sell*count;
             const rank=QUALITY_ORDER.indexOf(equipmentQuality(item));
             if(rank>=QUALITY_ORDER.indexOf("orange")){ hasOrangeOrAbove=true; }
         });

@@ -73,7 +73,7 @@
        影響（item.setId不存在時直接跳過）。
     */
     function appendEquipmentSetInfo(item){
-        if(!item || !equipmentSetItemDefinitions.some(def=>def.id===item.id&&def.setId===item.setId)){ return; }
+        if(!item || !equipmentSetItemDefinitions.some(def=>def.id===(item.definitionId||item.id)&&def.setId===item.setId)){ return; }
         normalizeEquipmentSetItem(item);
         const equipmentKey=getBackpackEquipmentKey(inventoryCharacterIndex);
         if(!equipmentKey){ return; }
@@ -525,7 +525,7 @@
 
     function normalizeEquipmentSetItem(item){
         const set=EQUIPMENT_SETS.find(set=>set.id===item?.setId);
-        const piece=set&&EQUIPMENT_SET_PIECES.find(piece=>item.id===set.id+"_"+piece.key);
+        const piece=set&&EQUIPMENT_SET_PIECES.find(piece=>(item.definitionId||item.id)===set.id+"_"+piece.key);
         if(!piece){ return item; }
         item.name=set.label+piece.name+"["+(piece.role==="attack"?"攻":"法")+"]";
         item.stats={...piece.stats};
@@ -645,7 +645,11 @@
                 if(inventoryItems.length>=120){
                     return false;
                 }
-                inventoryItems.push(cloneInventoryStackItem(definition,1));
+                const factory=window.FourSymbolsEquipmentFactory;
+                const owned=definition.equipmentFactoryVersion===1&&quantity===1
+                    ?definition:factory.create(definition,{ordinary:!definition.setId});
+                if(inventoryItems.some(item=>item.v141Uid===owned.v141Uid)||Object.values(typeof characterEquipment!=="undefined"?characterEquipment:{}).some(slots=>Object.values(slots||{}).some(item=>item&&item.v141Uid===owned.v141Uid))){return false;}
+                inventoryItems.push(owned);
                 remaining--;
             }
             return true;
@@ -1317,7 +1321,7 @@
         const equipment=characterEquipment[characterId];
         Object.values(equipment||{}).forEach(item=>{
             const set=EQUIPMENT_SETS.find(set=>set.id===item?.setId);
-            const piece=set&&EQUIPMENT_SET_PIECES.find(piece=>item.id===set.id+"_"+piece.key);
+            const piece=set&&EQUIPMENT_SET_PIECES.find(piece=>(item.definitionId||item.id)===set.id+"_"+piece.key);
             if(piece){
                 const key=set.id+"_"+piece.role;
                 counts[key]=(counts[key]||0)+1;
