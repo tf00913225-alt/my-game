@@ -14,7 +14,7 @@ Target: dev；Branch: feature/equipment-authority-20261012。禁止合併；能�
 
 ## 機率與測試開關
 
-`equipment-progression` 的 `SHOP_RARITY_ODDS`：70/19/10/1；`EQUIPMENT_CHEST_RARITY_ODDS`：50/35/10/5。UI 引用同表，不包含桃紅／四象。
+`equipment-progression` 的 `EQUIPMENT_SHOP_DROP_TABLE`：70/19/10/1；`EQUIPMENT_CHEST_DROP_TABLE`：50/35/10/5。UI 引用同表，不包含桃紅／四象。
 
 `SHOP_UNLIMITED_REFRESH_TEST_MODE=true`：免費無限刷新，每次更新內部安全整數序號與六件商品 UID，UI 隱藏次數。改 false 恢復既有每日限制行為，沒有決定新的正式成本／次數／重置政策。canonical reader 只放寬序號的舊 10 上限，仍校驗日期、整數、領取／購買收據與原雲端 Gate；沒有新增持久化 key。
 
