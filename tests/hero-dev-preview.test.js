@@ -35,9 +35,12 @@ test('owned progression and account replacement remain canonical; only locked he
  state=core.createDomain(state,()=>[c.player],c.calculateCharacterBaseStats,()=>null).addSpecificFragments(ids[0],50);
  state=core.createDomain(state,()=>[c.player],c.calculateCharacterBaseStats,()=>null).starUpHero(ids[0]);
  c.FourSymbolsHeroSystem.replaceAccountState(state);
+ c.FourSymbolsHeroAcquisition={getEntitlement:id=>id===ids[0]?{heroId:id,allocationSeed:123}:null};
  assert.deepEqual(c.FourSymbolsHeroSystem.getDomain({forBattle:true}).getHeroAccountState(ids[0]),state.heroes[ids[0]]);
  assert.equal(c.FourSymbolsHeroSystem.getDomain().isHeroUnlocked(ids[1]),false);
  c.FourSymbolsHeroSystem.replaceAccountState(core.normalizeAccountState());
+ assert.equal(c.FourSymbolsHeroSystem.getDomain().isHeroUnlocked(ids[0]),true,'confirmed rights survive a reverted local cache');
+ c.FourSymbolsHeroAcquisition={getEntitlement:()=>null};
  assert.equal(c.FourSymbolsHeroSystem.getDomain().isHeroUnlocked(ids[0]),false);
  assert.equal(c.initializeHeroBattleCombatants().length,2);
 });

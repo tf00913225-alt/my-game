@@ -99,7 +99,7 @@ export async function createInitialCanonicalCharacter(){throw new Error("QA neve
 export async function saveLocalAutoBattlePreferences(){throw new Error("QA never performs a cloud write");}
 export async function submitLegacyMigrationCandidate(){throw new Error("QA never performs a cloud write");}
 export async function screenLegacyMigrationCandidate(){throw new Error("QA never screens a private candidate");}
-export async function readHeroAcquisition(){throw new Error("QA cloud reads are isolated");}export async function observeHeroLogin(){throw new Error("QA cloud writes are forbidden");}export function createLocalMigrationBackup(){throw new Error("QA never creates a migration backup");}
+export async function readHeroAcquisition(){throw new Error("QA cloud reads are isolated");}export async function observeHeroLogin(){throw new Error("QA cloud writes are forbidden");}export async function ensureHeroChapterTicket(){throw new Error("QA cloud writes are forbidden");}export async function completeHeroChapterNode(){throw new Error("QA cloud writes are forbidden");}export function createLocalMigrationBackup(){throw new Error("QA never creates a migration backup");}
 `;
 
 /* Boot QA is offline: a missing session backend must never bypass auth or

@@ -1,14 +1,18 @@
 "use strict";
 
-const {createHash,randomBytes}=require("node:crypto");
+const {randomBytes}=require("node:crypto");
+const {snapshotDigest:digest}=require("./canonical-snapshot");
 const {taipeiDay}=require("./daily-checkin-policy");
 const HeroCore=require("./hero-core");
+const {createHeroChapterSource}=require("./hero-chapter-source");
 const KING="vajraHeavenlyKing";
 const CLAIM="hero-v1-"+KING;
-const digest=value=>createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const strip=data=>{const {createdAt,updatedAt,...value}=data;return value;};
-const validDay=day=>typeof day==="string"&&/^\d{8}$/.test(day)&&
-    taipeiDay(Date.parse(`${day.slice(0,4)}-${day.slice(4,6)}-${day.slice(6,8)}T04:00:00Z`))===day;
+const validDay=day=>{
+    if(typeof day!=="string"||!/^\d{8}$/.test(day)){return false;}
+    try{return taipeiDay(Date.parse(`${day.slice(0,4)}-${day.slice(4,6)}-${day.slice(6,8)}T04:00:00Z`))===day;}
+    catch(_){return false;}
+};
 
 // Acquisition rights only. This is not a character save, progression writer,
 // chapter victory verifier or a reader that publishes the full Cloud Save.
@@ -16,6 +20,11 @@ const validDay=day=>typeof day==="string"&&/^\d{8}$/.test(day)&&
 function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
     inspectExistingEnvelope,nextRevision,now=Date.now,seed=()=>randomBytes(4).readUInt32BE()||1}){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
+    const makeClaim=(uid,heroId,operationId,revision,allocationSeed,sourceSha256)=>({
+        schemaVersion:1,ownerUid:uid,kind:"hero-acquisition",heroId,
+        claimKey:"hero-v1-"+heroId,operationId,serverRevision:revision,allocationSeed,sourceSha256});
+    const chapterSource=createHeroChapterSource({fail,nextRevision,FieldValue,makeClaim});
+    const withChapter=async(tx,context)=>({...context,chapter:await chapterSource.read(tx,context)});
     function requestShape(request,observe){
         const keys=Object.keys(request.data||{}).sort().join("|");
         if(keys!==(observe?"expectedRevision|session|uid":"session|uid")||
@@ -30,7 +39,8 @@ function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
            !Number.isSafeInteger(state.serverRevision)||state.serverRevision<1||
            !Array.isArray(state.loginDays)||state.loginDays.length<1||state.loginDays.length>7||
            state.loginDays.some((day,index)=>!validDay(day)||index>0&&day<=state.loginDays[index-1])||
-           !state.entitlements||Object.keys(state.entitlements).some(id=>id!==KING)||
+           !state.entitlements||typeof state.entitlements!=="object"||Array.isArray(state.entitlements)||
+           Object.keys(state.entitlements).some(id=>id!==KING)||
            !/^[a-f0-9]{64}$/.test(state.lastHistorySha256||"")){
             fail("data-loss","Hero acquisition source is invalid.");
         }
@@ -62,7 +72,7 @@ function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
         if(envelope.kind!=="current"){fail("failed-precondition","Current account envelope required.");}
         if(!stateSnap.exists){
             if(historySnap.size||claimSnap.exists||operationsSnap.size||ledgerSet.size){fail("data-loss","Hero acquisition source is missing; rights cannot be reinitialized.");}
-            return {root,envelopeRef,stateRef,historyRef,claimRef,envelope,state:null};
+            return withChapter(tx,{root,envelopeRef,stateRef,historyRef,claimRef,envelope,state:null});
         }
         const state=inspectState(strip(stateSnap.data()),uid);
         if(state.serverRevision>envelope.serverRevision||historySnap.size!==state.loginDays.length||
@@ -78,9 +88,12 @@ function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
         for(let index=0;index<history.length;index++){
             const row=history[index],{id,sha256,...proof}=row;
             if(Object.keys(proof).sort().join("|")!==
-                "allocationSeed|day|entitlement|loginCount|operationId|ownerUid|previousHash|schemaVersion|serverRevision"||
+                "allocationSeed|day|entitlement|loginCount|operationId|ownerUid|previousHash|schemaVersion|serverRevision|sessionId|sourceRevision"||
                id!==String(row.serverRevision)||row.schemaVersion!==1||row.ownerUid!==uid||
                row.serverRevision<=previousRevision||row.serverRevision>envelope.serverRevision||
+               !Number.isSafeInteger(row.sourceRevision)||row.sourceRevision<1||
+               row.serverRevision!==row.sourceRevision+1||row.sourceRevision<previousRevision||
+               !/^[A-Za-z0-9_-]{32}$/.test(row.sessionId||"")||
                row.previousHash!==previousHash||row.day!==state.loginDays[index]||
                row.operationId!==`hero-login-${row.day}`||row.loginCount!==index+1||
                row.entitlement!== (index===6?KING:null)||sha256!==digest(proof)){
@@ -92,6 +105,7 @@ function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
             const expected={schemaVersion:1,ownerUid:uid,kind:"hero-login-observation",
                 operationId:row.operationId,serverRevision:row.serverRevision,
                 sourceSha256:sha256,day:row.day,loginCount:row.loginCount,
+                sourceRevision:row.sourceRevision,sessionId:row.sessionId,
                 entitlement:row.entitlement,allocationSeed:row.allocationSeed};
             if(!receiptSnap.exists||!ledgerSnap.exists||!receiptSnap.data().createdAt||!ledgerSnap.data().createdAt||
                digest(strip(receiptSnap.data()))!==digest(expected)||
@@ -106,22 +120,21 @@ function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
         }
         const grant=state.entitlements[KING];
         if(grant){
-            const expected={schemaVersion:1,ownerUid:uid,kind:"hero-acquisition",
-                heroId:KING,claimKey:CLAIM,operationId:grant.sourceId,
-                serverRevision:grant.grantedRevision,allocationSeed:grant.allocationSeed,
-                sourceSha256:previousHash};
+            const expected=makeClaim(uid,KING,grant.sourceId,grant.grantedRevision,grant.allocationSeed,previousHash);
             if(!claimSnap.exists||!claimSnap.data().createdAt||digest(strip(claimSnap.data()))!==digest(expected)||
                history[6].allocationSeed!==grant.allocationSeed){
                 fail("data-loss","Hero claim is missing or inconsistent; it cannot be reissued.");
             }
         }else if(claimSnap.exists){fail("data-loss","Orphan Hero claim cannot be reopened.");}
-        return {root,envelopeRef,stateRef,historyRef,claimRef,envelope,state};
+        return withChapter(tx,{root,envelopeRef,stateRef,historyRef,claimRef,envelope,state});
     }
     function result(context,unchanged=true){
         return {schemaVersion:1,ownerUid:context.envelope.data.ownerUid,
             serverRevision:context.envelope.serverRevision,
             loginCount:context.state?.loginDays.length||0,
-            entitlements:context.state?.entitlements||{},unchanged,
+            entitlements:{...(context.state?.entitlements||{}),
+                ...(context.chapter?.entitlement?{[context.chapter.entitlement.heroId]:context.chapter.entitlement}:{})},
+            chapter:chapterSource.view(context.chapter),unchanged,
             authoritativeStateReady:false};
     }
     async function read(request){
@@ -152,6 +165,7 @@ function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
                 fail("failed-precondition","Unsupported Hero acquisition policy.");
             }
             const proof={schemaVersion:1,ownerUid:session.uid,serverRevision:revision,
+                sourceRevision:envelope.serverRevision,sessionId:session.sessionId,
                 previousHash:state?.lastHistorySha256||null,day,operationId,
                 loginCount:loginDays.length,entitlement:awarded?KING:null,
                 allocationSeed:awarded?allocationSeed:null};
@@ -164,20 +178,43 @@ function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
             const stamp=FieldValue.serverTimestamp();
             const operation={schemaVersion:1,ownerUid:session.uid,kind:"hero-login-observation",
                 operationId,serverRevision:revision,sourceSha256:sha256,
+                sourceRevision:envelope.serverRevision,sessionId:session.sessionId,
                 day,loginCount:loginDays.length,entitlement:proof.entitlement,
                 allocationSeed:proof.allocationSeed};
             tx.set(stateRef,{...next,updatedAt:stamp});
             tx.create(historyRef.doc(String(revision)),{...proof,sha256,createdAt:stamp});
             tx.create(receiptRef,{...operation,createdAt:stamp});
             tx.create(ledgerRef,{...operation,createdAt:stamp});
-            if(awarded){tx.create(claimRef,{schemaVersion:1,ownerUid:session.uid,
-                kind:"hero-acquisition",heroId:KING,claimKey:CLAIM,operationId,
-                serverRevision:revision,allocationSeed,sourceSha256:sha256,createdAt:stamp});}
+            if(awarded){tx.create(claimRef,{...makeClaim(session.uid,KING,operationId,revision,allocationSeed,sha256),createdAt:stamp});}
             tx.update(envelopeRef,{serverRevision:revision,updatedAt:stamp});
             return result({...context,state:next,envelope:{...envelope,serverRevision:revision}},false);
         });
     }
-    return Object.freeze({read,observeLogin});
+    async function ensureChapterTicket(request){
+        requestShape(request,true);const time=now();
+        return runProtected(request,async(tx,session)=>{
+            const context=await readSources(tx,session.uid);
+            const next=await chapterSource.ensure(tx,session,context,time,request.data.expectedRevision);
+            return result(next,!next.changed);
+        });
+    }
+    async function completeChapterNode(request){
+        const data=request.data||{};
+        if(Object.keys(data).sort().join("|")!=="choiceId|expectedRevision|nodeId|session|ticketId|uid"||
+           typeof data.ticketId!=="string"||typeof data.nodeId!=="string"||
+           data.nodeId.length>64||data.ticketId.length>64||
+           !(data.choiceId===null||typeof data.choiceId==="string"&&data.choiceId.length<=64)||
+           !Number.isSafeInteger(data.expectedRevision)||data.expectedRevision<1){
+            fail("invalid-argument","Only an issued chapter node intent and expected revision are accepted.");
+        }
+        const time=now(),allocationSeed=seed();
+        return runProtected(request,async(tx,session)=>{
+            const context=await readSources(tx,session.uid);
+            const next=await chapterSource.complete(tx,session,context,time,data,allocationSeed);
+            return result(next,!next.changed);
+        });
+    }
+    return Object.freeze({read,observeLogin,ensureChapterTicket,completeChapterNode});
 }
 
 module.exports={createHeroAcquisition};

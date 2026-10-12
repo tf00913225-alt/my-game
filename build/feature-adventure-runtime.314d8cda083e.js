@@ -288,6 +288,12 @@
         return grantRewardObject(CONTENT.rewards[rewardId]);
     }
 
+    function recordHeroChapterNode(nodeId,choiceId=null){
+        // Qualification is a bounded online intent. Never send local save,
+        // chapterCompleted, battle result, amounts or completion timestamps.
+        window.FourSymbolsHeroAcquisition?.observeChapterNode(chapterDefinition().id,nodeId,choiceId);
+    }
+
     function completeNode(nodeId,options){
         const chapter=chapterDefinition();
         const state=chapterState();
@@ -302,6 +308,7 @@
         if(!state.chapterCompleted&&state.currentNodeId===node.id&&node.next){ state.currentNodeId=node.next; }
         if(!state.chapterCompleted&&node.type==="branch"&&opts.nextNodeId){ state.currentNodeId=opts.nextNodeId; }
         persist();
+        recordHeroChapterNode(node.id);
         return first;
     }
 
@@ -343,6 +350,7 @@
         if(!root){ showMessage("請先建立角色後再出城冒險。");return false; }
         const opts=options||{};
         if(opts.chapterId&&CONTENT.chapters[opts.chapterId]){ root.activeChapterId=opts.chapterId; }
+        window.FourSymbolsHeroAcquisition?.beginChapter(activeChapterId());
         const state=chapterState();
         if(state){ state.lastViewedAt=now(); }
         runtime.visible=true;
@@ -391,6 +399,7 @@
         state.completedNodes[node.id]={completedAt:now(),choiceId:choice.id};
         state.currentNodeId=choice.nodeId;
         persist();
+        recordHeroChapterNode(node.id,choice.id);
         return true;
     }
 
@@ -453,6 +462,7 @@
         markRewardReady(state,node);
         if(!state.chapterCompleted&&state.currentNodeId===node.id&&node.next){ state.currentNodeId=node.next; }
         persist();
+        recordHeroChapterNode(node.id);
         return true;
     }
 
@@ -467,6 +477,7 @@
         state.currentNodeId=node.id;
         runtime.activePanel="chapter-complete";
         persist();
+        recordHeroChapterNode(node.id);
         return true;
     }
 
@@ -782,6 +793,7 @@
         markRewardReady(state,node);
         if(!state.chapterCompleted&&state.currentNodeId===node.id&&node.next){ state.currentNodeId=node.next; }
         persist();
+        recordHeroChapterNode(node.id);
         return true;
     }
 

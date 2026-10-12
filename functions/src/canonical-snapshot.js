@@ -567,4 +567,4 @@ function verifyCanonicalPlayableProjectionAgainstSources(bundle,uid,revision,rec
 
 module.exports={assembleCanonicalSnapshot,assembleCanonicalPlayableProjection,inspectCanonicalSnapshot,
     verifyCanonicalSnapshotAgainstSources,verifyCanonicalPlayableProjectionAgainstSources,
-    claimRecordsDigest,MAX_SNAPSHOT_BYTES};
+    claimRecordsDigest,snapshotDigest,MAX_SNAPSHOT_BYTES};

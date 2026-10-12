@@ -28,6 +28,7 @@ test('production locked heroes remain browseable without unlock, stats or roster
 test('owned progression and level/skill/base-stat projections come from formal domain',()=>{
  const {ctx:c}=runtime();let domain=c.FourSymbolsHeroSystem.getDomain();
  c.FourSymbolsHeroSystem.replaceAccountState(domain.unlockHeroDirect(ids[0],123));
+ c.FourSymbolsHeroAcquisition={getEntitlement:id=>id===ids[0]?{heroId:id,allocationSeed:123}:null};
  domain=c.FourSymbolsHeroSystem.getDomain();c.FourSymbolsHeroSystem.replaceAccountState(domain.addSpecificFragments(ids[0],50));
  domain=c.FourSymbolsHeroSystem.getDomain();c.FourSymbolsHeroSystem.replaceAccountState(domain.starUpHero(ids[0]));
  const hero=c.getHeroPageSnapshot().heroes[0];assert.equal(hero.account.stars,1);assert.equal(hero.account.specificFragments,25);

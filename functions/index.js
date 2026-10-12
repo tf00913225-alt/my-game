@@ -232,6 +232,14 @@ exports.observeHeroLogin=onCall(CALLABLE_OPTIONS,async request=>{
     try{ return await heroAcquisition.observeLogin(await verifyGameIdentity(request)); }
     catch(error){ throw asHttpsError(error); }
 });
+exports.ensureHeroChapterTicket=onCall(CALLABLE_OPTIONS,async request=>{
+    try{ return await heroAcquisition.ensureChapterTicket(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
+exports.completeHeroChapterNode=onCall(CALLABLE_OPTIONS,async request=>{
+    try{ return await heroAcquisition.completeChapterNode(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
 // A server-priced purchase changes only an unpublished canonical character.
 // The browser supplies an item ID and quantity, never price, gold or inventory.
 exports.purchaseCanonicalPotion=onCall(CALLABLE_OPTIONS,async request=>{
