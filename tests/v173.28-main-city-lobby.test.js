@@ -34,34 +34,36 @@ test("the HUD keeps only city identity, resources and DEV tools",()=>{
     assert.match(baseCss,/\.home-hud-identity\{[\s\S]*position:relative;[\s\S]*align-items:center;[\s\S]*align-self:stretch;[\s\S]*inset-inline-start:7px/);
     assert.doesNotMatch(baseCss,/\.home-hud-character-(?:list|row|avatar)/);
     assert.match(baseCss,/\.home-hud-resources\{[\s\S]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
-    assert.match(baseCss,/\.home-hud-resources > span\{[\s\S]*min-height:20px;[\s\S]*border:1px solid[\s\S]*linear-gradient/);
+    assert.match(baseCss,/\.home-hud-resources > span\{[^}]*min-height:20px;[^}]*border:0;[^}]*background:transparent/);
 });
 
 test("character and shop are the only two primary entrances",()=>{
     assert.equal(count(actions,/class="home-card home-card-primary"/g),2);
     assert.match(actions,/home-primary-actions[\s\S]*openHomeFeature\('character'\)[\s\S]*openHomeFeature\('shop'\)/);
-    assert.match(baseCss,/\.home-primary-actions\{[^}]*grid-template-columns:repeat\(2,minmax\(0,46%\)\);[^}]*width:100%/);
-    assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:78px;[\s\S]*border:1px solid rgba\(222,170,70,.9\)/);
+    assert.match(baseCss,/\.home-primary-actions\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\);[^}]*grid-row:2;[^}]*width:100%/);
+    assert.match(baseCss,/\.home-card-primary\{[^}]*height:68px;[^}]*border:1px solid var\(--home-frame-muted\)/);
     assert.match(baseCss,/\.home-card-primary::after\{[\s\S]*linear-gradient/);
-    assert.match(baseCss,/\.home-card-primary \.home-card-label\{[\s\S]*height:19px;[\s\S]*border-top:1px solid[\s\S]*background:linear-gradient/);
+    assert.match(baseCss,/\.home-card-primary \.home-card-label\{[^}]*height:100%;[^}]*border:0;[^}]*background:transparent;[^}]*font-size:16px/);
     assert.ok((28-19)/28>=.30&&(28-19)/28<=.40);
 });
 
-test("eight secondary entrances reflow with readable browser dimensions",()=>{
-    assert.equal(count(actions,/class="home-card home-card-secondary"/g),8);
+test("four daily facilities and four recessive tools preserve all eight functions",()=>{
+    assert.equal(count(actions,/class="home-card home-card-secondary"/g),4);
+    assert.equal(count(actions,/class="home-card home-card-tertiary"/g),4);
     ["hero","synthesis","quest","forge","achievement","announcement","offlineExp","system"].forEach(type=>assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)")));
     assert.match(actions,/aria-label="英雄系統"/);
     assert.match(read("js/00-main.js"),/onclick="openHomeFeature\('rest'\)"/); // Free rest remains reachable from Hero.
-    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*grid-template-columns:repeat\(2,minmax\(70px,22%\)\);[\s\S]*grid-auto-rows:70px;/);
+    assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-template-columns:repeat\(2,minmax\(64px,20%\)\);[^}]*grid-auto-rows:68px;/);
     assert.doesNotMatch(baseCss,/margin-inline-(?:start|end):(34|68)px/);
-    assert.match(baseCss,/\.home-card-secondary\{[\s\S]*width:100%;[\s\S]*height:70px;[\s\S]*border:1px solid[\s\S]*background:linear-gradient[\s\S]*box-shadow:/);
-    assert.match(baseCss,/\.home-card-secondary \.home-card-icon\{[\s\S]*width:100%;[\s\S]*height:47px/);
-    assert.match(baseCss,/\.home-card-secondary \.home-card-label\{[\s\S]*background:linear-gradient/);
+    assert.match(baseCss,/\.home-card-secondary\{[^}]*width:100%;[^}]*height:68px;[^}]*border:1px solid[^}]*background:rgba\(17,20,16,.92\)/);
+    assert.match(baseCss,/\.home-card-secondary \.home-card-icon\{[^}]*width:32px;[^}]*height:32px/);
+    assert.match(baseCss,/\.home-card-secondary \.home-card-label\{[^}]*background:transparent;[^}]*font-size:15px/);
+    assert.match(baseCss,/\.home-card-tertiary\{[^}]*min-height:44px;[^}]*pointer-events:auto/);
     assert.ok((90-80)/90>=.10&&(90-80)/90<=.15);
     assert.ok((95-82)/95>=.10&&(95-82)/95<=.15);
 });
 
-test("offline/system stay on the side rails while relic and element box are persistent shell utilities",()=>{
+test("offline/system use the persistent tools while relic and element box retain their entries",()=>{
     assert.equal(count(actions,/openHomeFeature\('offlineExp'\)/g),1);
     assert.equal(count(actions,/openHomeFeature\('system'\)/g),1);
     assert.equal(count(actions,/class="home-card home-card-utility/g),2);
@@ -104,11 +106,11 @@ test("the roster renderer keeps all character details in the six-position advent
     assert.match(rosterRuntime,/v146-home-roster-count[^\n]*隊伍 -- \/ 6/);
     assert.match(rosterRuntime,/count\.textContent="隊伍 "\+partyIndexes\.length\+" \/ 6"/);
     assert.match(rosterRuntime,/class="v146-home-avatar"/);
-    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*gap:4px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
+    assert.match(rosterCss,/\.v146-home-roster\{[^}]*display:grid;[^}]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[^}]*gap:4px;[^}]*background:linear-gradient\(155deg,rgba\(23,26,20,.95\),rgba\(11,13,10,.94\)\)/);
     assert.match(rosterCss,/\.v146-home-roster > header\{[\s\S]*grid-column:1\/-1;[\s\S]*display:grid;[\s\S]*grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1\.55fr\) auto;[\s\S]*column-gap:8px;[\s\S]*min-height:30px;[\s\S]*font-size:15px/);
-    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*border:1px solid rgba\(190,139,59,.54\);[\s\S]*inset 0 0 13px rgba\(214,158,63,.04\)/);
+    assert.match(rosterCss,/\.v146-home-roster\{[^}]*border:1px solid var\(--home-frame-muted\);[^}]*box-shadow:0 4px 12px/);
     assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:40px minmax\(0,1fr\);[\s\S]*min-height:84px/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*border:1px solid rgba\(145,107,53,.38\);[\s\S]*inset 0 0 0 1px rgba\(255,222,146,.02\)/);
+    assert.match(rosterCss,/\.v146-home-character\{[^}]*border:0;[^}]*background:transparent;[^}]*box-shadow:none/);
     assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:40px;[\s\S]*height:40px;[\s\S]*transform:none/);
     assert.match(rosterCss,/\.v146-home-resource\{[\s\S]*height:17px;[\s\S]*margin-inline:0/);
     assert.match(rosterCss,/\.v146-home-resource strong\{[\s\S]*font-size:13px;[\s\S]*line-height:15px/);
@@ -130,8 +132,8 @@ test("the browser home retains a bounded content scroller and one navigation row
     assert.match(baseCss,/#game-ui\{[^}]*grid-template-rows:minmax\(0,1fr\) auto;/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*?margin:5px 10px 0;/);
     assert.match(baseCss,/\.home-card-grid\{[^}]*display:grid;[^}]*flex:0 0 auto/);
-    assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:78px/);
-    assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-auto-rows:70px;/);
+    assert.match(baseCss,/\.home-card-primary\{[^}]*height:68px/);
+    assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-auto-rows:68px;/);
     assert.doesNotMatch(baseCss,/\.home-card-grid\{[\s\S]{0,220}grid-template-columns:repeat\(4,1fr\)/);
 });
 

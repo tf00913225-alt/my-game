@@ -292,14 +292,27 @@ async function run(chrome,url,live){
    assert.equal(visual.oldBackground,false,'retired scrolling background layer returned');
    const composition=await c.eval(`(()=>{
     const box=s=>{const r=document.querySelector(s).getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width};};
-    return {cards:box('.home-card-grid'),secondary:box('.home-secondary-actions'),utility:box('.home-utility-actions'),adventure:box('#adventureHomeEntry'),roster:box('#v146HomeRoster'),columns:getComputedStyle(document.querySelector('.home-secondary-actions')).gridTemplateColumns,people:document.querySelectorAll('.v146-home-character:not(.v146-home-character-empty)').length};
+    return {primary:box('.home-primary-actions'),secondary:box('.home-secondary-actions'),utility:box('.home-utility-actions'),adventure:box('#adventureHomeEntry'),roster:box('#v146HomeRoster'),columns:getComputedStyle(document.querySelector('.home-secondary-actions')).gridTemplateColumns,people:document.querySelectorAll('.v146-home-character:not(.v146-home-character-empty)').length,daily:document.querySelectorAll('.home-card-secondary').length,tools:document.querySelectorAll('.home-card-tertiary').length,collections:[...document.querySelectorAll('.home-card-utility')].map(n=>({height:n.getBoundingClientRect().height,width:n.getBoundingClientRect().width})),entries:[...document.querySelectorAll('#homePage .home-card,#adventureHomeEntry')].map(n=>({label:n.getAttribute('aria-label'),rect:n.getBoundingClientRect().toJSON()}))};
    })()`);
    assert.equal(composition.columns.split(' ').length,2,'authored side rails replaced by auto-fit cards');
    assert.equal(composition.people,3,'populated three-character roster not exercised');
-   assert.ok(composition.utility.width<composition.secondary.width*.6,'central utilities inflated to full width');
-   assert.ok(composition.utility.bottom<=composition.secondary.bottom+1,'utilities regained extra list row');
-   if(v[0]<800)assert.ok(composition.adventure.bottom<composition.roster.top,'central adventure moved below roster');
-   else assert.ok(composition.roster.left>=composition.cards.right,'desktop roster lost separate column');
+   assert.equal(composition.daily,4,'daily side facilities lost their distinct hierarchy');
+   assert.equal(composition.tools,4,'recessive tool row lost a function');
+   assert.equal(composition.collections.length,2,'paired collections missing');
+   assert.ok(composition.collections.every(n=>n.height>=44&&n.height<=48&&n.width<=180),'collections regained oversized image cards');
+   assert.equal(composition.entries.length,13,'city entrance lost or duplicated');
+   for(let i=0;i<composition.entries.length;i++)for(let j=i+1;j<composition.entries.length;j++){
+    const a=composition.entries[i],b=composition.entries[j];
+    assert.ok(Math.min(a.rect.right,b.rect.right)-Math.max(a.rect.left,b.rect.left)<=1||Math.min(a.rect.bottom,b.rect.bottom)-Math.max(a.rect.top,b.rect.top)<=1,'city entrances overlap '+a.label+' / '+b.label);
+   }
+   if(v[0]<800){
+    assert.ok(composition.adventure.bottom<=composition.primary.top,'adventure obstructs the common entrances');
+    assert.ok(composition.primary.bottom<composition.utility.top,'common entrances and collection/tools lose their separate rows');
+    assert.ok(composition.utility.bottom<composition.roster.top,'tools obstruct the party HUD');
+   }else{
+    assert.ok(composition.primary.left>=composition.secondary.right,'desktop common entrances lost the right column');
+    assert.ok(composition.roster.left>=composition.secondary.right&&composition.primary.bottom<=composition.roster.top,'desktop party overlaps scene or common entrances');
+   }
    const homeControls=[];
    for(const selector of [...['角色','商店','英雄系統','合成','任務','鍛造','成就','公告','離線經驗','系統','秘寶','元素匣'].map(label=>'.home-card[aria-label="'+label+'"]'),'#v146HomeRoster','.v-fixed-formation-entry','#adventureHomeEntry']){
     await c.eval(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'nearest'})`);await settle();
