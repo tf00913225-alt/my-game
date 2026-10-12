@@ -5,31 +5,31 @@ const forge=fs.readFileSync('js/36-v141-content-systems.js','utf8');
 function fixture(items=[],equipment={}){
  const c=vm.createContext({console,inventoryItems:items,characterEquipment:equipment,localStorage:{getItem:()=>null},setTimeout(){},
   document:{readyState:'loading',addEventListener(){},getElementById:()=>null,createElement:()=>({}),head:{appendChild(){}}},
-  FourSymbolsAccountSave:{accountKey:x=>x}});c.window=c;vm.runInContext(require('../.github/scripts/fixtures/item-slot-owner.cjs'),c);vm.runInContext(source,c);return c;
+  FourSymbolsAccountSave:{accountKey:x=>x}});c.window=c;c.FourSymbolsEquipmentReforge=require("../functions/src/equipment-reforge");c.FourSymbolsEquipmentFactory=require("../js/equipment-factory");vm.runInContext(require('../.github/scripts/fixtures/item-slot-owner.cjs'),c);vm.runInContext(source,c);return c;
 }
 const plain=x=>JSON.parse(JSON.stringify(x));
 const ranges={white:[5,10],blue:[11,16],purple:[17,22],orange:[23,28]};
 test('independent shop and chest tables total 100 and deterministic boundaries exclude special tiers',()=>{
  const c=fixture();
- assert.deepEqual(plain(c.v17346EquipmentShopDropTable).map(x=>x.chance),[70,15,10,5]);
- assert.deepEqual(plain(c.v17346EquipmentChestDropTable).map(x=>x.chance),[40,40,15,5]);
+ assert.deepEqual(plain(c.v17346EquipmentShopDropTable).map(x=>x.chance),[70,19,10,1]);
+ assert.deepEqual(plain(c.v17346EquipmentChestDropTable).map(x=>x.chance),[50,35,10,5]);
  for(const table of [c.v17346EquipmentShopDropTable,c.v17346EquipmentChestDropTable]){
   assert.equal(table.reduce((n,x)=>n+x.chance,0),100);assert.deepEqual(plain(table).map(x=>x.key),Object.keys(ranges));
  }
- for(const [roll,key] of [[0,'white'],[.69999,'white'],[.7,'blue'],[.84999,'blue'],[.85,'purple'],[.94999,'purple'],[.95,'orange'],[.99999,'orange']])assert.equal(c.v17346RollEquipmentShopRarity(()=>roll),key);
- for(const [roll,key] of [[0,'white'],[.39999,'white'],[.4,'blue'],[.79999,'blue'],[.8,'purple'],[.94999,'purple'],[.95,'orange'],[.99999,'orange']]){
+ for(const [roll,key] of [[0,'white'],[.69999,'white'],[.7,'blue'],[.88999,'blue'],[.89,'purple'],[.98999,'purple'],[ .99,'orange'],[.99999,'orange']])assert.equal(c.v17346RollEquipmentShopRarity(()=>roll),key);
+ for(const [roll,key] of [[0,'white'],[.49999,'white'],[.5,'blue'],[.84999,'blue'],[.85,'purple'],[.94999,'purple'],[.95,'orange'],[.99999,'orange']]){
   const items=c.v17346RollEquipmentChestItems(()=>roll);
   assert.equal(items.length,3);assert.ok(items.every(x=>x.rarityKey===key));
  }
- const samples=[0,...Array(3).fill(0),.4,...Array(3).fill(0),.95,...Array(3).fill(0)];
+ const samples=[0,...Array(3).fill(0),.5,...Array(3).fill(0),.95,...Array(3).fill(0)];
  assert.deepEqual(plain(c.v17346RollEquipmentChestItems(()=>samples.shift())).map(x=>x.rarityKey),['white','blue','orange']);
  assert.equal(samples.length,0,'each piece consumes its own rarity roll');
 });
 test('fixed catalog owns every ordinary name, legal stat, rarity and image',()=>{
  const c=fixture(),catalog=plain(c.v17346GetEquipmentCatalog());
- assert.equal(catalog.length,661);assert.equal(new Set(catalog.map(x=>x.name)).size,661);
+ assert.equal(catalog.length,661);assert.ok(catalog.every(x=>x.name===undefined),"catalog is content, not saved names");
  const manifest=JSON.parse(fs.readFileSync('docs/equipment-catalog-20261008.json','utf8'));
- assert.deepEqual(catalog,manifest.equipment);assert.equal(manifest.images.length,301);
+ assert.deepEqual(catalog,manifest.equipment.map(({name,...entry})=>entry));assert.equal(manifest.images.length,301);
  assert.deepEqual(Object.fromEntries(Object.keys(ranges).map(key=>[key,catalog.filter(x=>x.rarityKey===key).length])),{white:91,blue:90,purple:240,orange:240});
  assert.equal(manifest.images.filter(x=>x.legacy&&x.classType==='warrior').length,90);
  assert.equal(manifest.images.filter(x=>x.legacy&&x.classType==='mage').length,91);
@@ -42,21 +42,21 @@ test('fixed catalog owns every ordinary name, legal stat, rarity and image',()=>
  }
  for(const entry of catalog){
   const pool=catalog.filter(x=>x.rarityKey===entry.rarityKey&&x.classType===entry.classType&&x.type===entry.type);
-  const roll=(pool.findIndex(x=>x.name===entry.name)+.1)/pool.length;
+  const roll=(pool.indexOf(entry)+.1)/pool.length;
   const item=c.v17346GenerateEquipment(()=>roll,{rarity:entry.rarityKey,classType:entry.classType,slot:entry.type});
-  assert.equal(item.name,entry.name);assert.deepEqual(plain(item.stats),entry.stats);assert.equal(item.assetPath,entry.assetPath);assert.match(item.icon,/<img /);
+  assert.ok(c.FourSymbolsEquipmentFactory.validName(item.name));assert.deepEqual(plain(item.stats),entry.stats);assert.equal(item.assetPath,entry.assetPath);assert.match(item.icon,/<img /);
   assert.equal(Object.keys(item.stats).length,1);const [min,max]=ranges[entry.rarityKey];assert.ok(Object.values(item.stats)[0]>=min&&Object.values(item.stats)[0]<=max);
   const power=entry.classType==='warrior'?'attack':'intelligence';
   const allowed={weapon:[power],shoulder:['vitality',power,'defensePoints'],head:['vitality',power,'agility','defensePoints'],armor:['vitality','agility',power,'defensePoints'],shoes:['vitality','agility',power]};
   assert.ok(allowed[entry.type].includes(Object.keys(item.stats)[0]));
-  item.stats.attack=999;assert.deepEqual(plain(c.v17346GetEquipmentCatalog()).find(x=>x.name===entry.name).stats,entry.stats);
+  item.stats.attack=999;assert.deepEqual(plain(c.v17346GetEquipmentCatalog()).find(x=>x.assetPath===entry.assetPath&&x.rarityKey===entry.rarityKey&&JSON.stringify(x.stats)===JSON.stringify(entry.stats)).stats,entry.stats);
  }
  for(const rarity of ['pink','four-symbol','unknown'])assert.throws(()=>c.v17346GenerateEquipment(()=>0,{rarity}),/特殊裝備/);
 });
 test('inventory, equipped UIDs, old stats and reforge stats survive repeated load/sync; starter stays fixed',()=>{
  const items=[{id:'old-gear',v141Uid:'old-uid',type:'armor',rarityKey:'orange',v17346GeneratedEquipment:true,stats:{attack:12},reforgeStats:{vitality:4},assetPath:'old.png',icon:'old'}];
  const equipment={fire:{weapon:{id:'equipped',v141Uid:'equipped-uid',stats:{intelligence:6},reforgeStats:{agility:2}}}};
- const before=JSON.stringify({items,equipment});const c=fixture(items,equipment);
+ const c=fixture(items,equipment);const before=JSON.stringify({items,equipment});
  c.v17346SyncFourElementSets();c.v17346SyncFourElementSets();
  assert.equal(JSON.stringify({items,equipment}),before);
  assert.deepEqual(plain(c.v17362StarterWhiteStats),{ironSword:{attack:3},woodStaff:{intelligence:3},leatherHelmet:{vitality:1},leatherArmor:{vitality:2},leatherShoes:{agility:2}});

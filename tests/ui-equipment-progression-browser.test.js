@@ -5,6 +5,9 @@ const path=require("node:path");
 const cp=require("node:child_process");
 
 function findChrome(){
+    for(const candidate of [process.env.CHROME_BIN,"C:/Program Files/Google/Chrome/Application/chrome.exe","C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"]){
+        if(candidate&&fs.existsSync(candidate)) return candidate;
+    }
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()) return result.stdout.trim();
@@ -40,7 +43,7 @@ ${itemOwner}
 window.closeItemModal=function(){};
 window.v132ShowRewardModal=function(markup){document.getElementById('rewardLayer').innerHTML='<div class="v132-reward-modal">'+markup+'</div>';};
 window.v132CloseRewardModal=function(){};
-</script><script src="js/equipment-progression.js"></script><script>
+</script><script src="functions/src/equipment-reforge.js"></script><script src="js/equipment-factory.js"></script><script src="js/equipment-progression.js"></script><script>
 openItemModal(0);
 const box=document.querySelector('#itemModal .item-modal-box'),stats=document.getElementById('itemModalStats'),buttons=document.querySelector('#itemModal .item-modal-buttons');
 const rect=e=>{const r=e.getBoundingClientRect();return {top:r.top,bottom:r.bottom,height:r.height,left:r.left,right:r.right};};

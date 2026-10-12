@@ -15,8 +15,12 @@ assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 assert.doesNotMatch(ui,/equipment-progression\.js\?v=|createElement\(["']script["']\)/);
 assert.doesNotMatch(equipment,/__v17347RuntimeGate/);
 
-assert.match(equipment,/weapon-\(\?:03\|04\).*?"法扇":"法杖"/s);
-assert.match(equipment,/normalizeGeneratedMageWeaponName/);
+const factory=require('../js/equipment-factory');
+for(const [asset,suffix] of [['01','法杖'],['02','法杖'],['03','法扇'],['04','法扇']]){
+    const item=factory.create({type:'weapon',classType:'mage',rarityKey:'blue',assetPath:'assets/equipment/mage/weapon-'+asset+'.png',stats:{intelligence:11}},{ordinary:true});
+    assert.ok(factory.validName(item.name));assert.ok(item.name.endsWith(suffix));
+}
+assert.doesNotMatch(equipment,/normalizeGeneratedMageWeaponName/);
 assert.doesNotMatch(equipment,/mage:\{shoulder:"法環",head:"法冠",armor:"法袍",shoes:"法履",weapon:"法器"\}/);
 
 assert.match(animation,/function castSheet\(src,placement,options\)\{[\s\S]*?renderer:"dom-sprite"/);

@@ -41,6 +41,7 @@ const bootScripts=[
 const appScripts=[
     "functions/src/equipment-combat-percent-migration.js",
     "functions/src/equipment-reforge.js",
+    "js/equipment-factory.js",
     "functions/src/hero-core.js",
     "js/00-main.js",
     "js/hero-acquisition-client.js",

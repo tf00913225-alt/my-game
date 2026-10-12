@@ -15,7 +15,7 @@ function fixture(seed=new Map(),uid='shop-A'){
   document:{readyState:'loading',addEventListener(){},getElementById:id=>id==='homeFeatureModalBody'?body:null,querySelector:()=>null,createElement:()=>({}),head:{appendChild(){}}},
   isEquipmentInventoryType:t=>['head','shoulder','armor','shoes','weapon'].includes(t),cloneInventoryStackItem:(d,n)=>({...d,count:n}),INVENTORY_MAX_STACK_DEFAULT:999,
   renderShopContent(){return c.FourSymbolsEquipmentShop.render();}
- });c.window=c;
+ });c.window=c;c.FourSymbolsEquipmentReforge=require("../functions/src/equipment-reforge");c.FourSymbolsEquipmentFactory=require("../js/equipment-factory");
  vm.runInContext(repoSource,c);const repo=c.FourSymbolsAccountSave;repo.activate(uid);
  c.saveGame=options=>{if(reenter){const fn=reenter;reenter=null;fn();}try{repo.writeForUid(repo.getActiveUid(),{gold:c.gold,inventoryItems:c.inventoryItems},options);return true;}catch(_){return false;}};
  c.rpgAlert=(_message,o)=>{if(o.tone==='success')success++;return Promise.resolve();};
@@ -39,9 +39,20 @@ test('purchase once, rapid repeat and synchronous reentry, gold/inventory/save r
  assert.equal((f.read().match(/已購買/g)||[]).length,1);assert.equal((f.read().match(/onclick="event.stopPropagation/g)||[]).length,5);
  const reload=fixture(f.seed);assert.match(reload.read(),/已購買/);assert.equal(reload.buy(0),false);
 });
-test('refresh creates new batch, stale click rejected, all six available; five free limit retained',()=>{
+test('approved prices agree across cards, preview, acquisition and saved inventory',()=>{
+ const f=fixture(),factory=f.c.FourSymbolsEquipmentFactory;let preview='';f.c.v132ShowRewardModal=html=>preview=html;
+ const cards=f.read(),offers=f.c.FourSymbolsEquipmentShop.offers();
+ for(let i=0;i<offers.length;i++){
+  const expected=factory.prices(offers[i]);assert.ok(cards.includes(expected.shop.toLocaleString('zh-TW')+' 金幣'));
+  f.c.v17346PreviewEquipmentShopOffer(i);assert.ok(preview.includes(expected.shop.toLocaleString('zh-TW')+' 金幣'));
+  const before=f.c.gold;assert.equal(f.buy(i),true);assert.equal(f.c.gold,before-expected.shop);
+  const owned=f.c.inventoryItems.at(-1);assert.equal(owned.shopPrice,expected.shop);assert.equal(owned.price,expected.sell);assert.deepEqual(factory.prices(owned),expected);
+  const saved=JSON.parse(f.seed.get(f.repo.saveKey('shop-A')));assert.equal(saved.inventoryItems.at(-1).price,expected.sell);
+ }
+});
+test('refresh creates new batch, stale click rejected, all six available; unlimited free test mode',()=>{
  const f=fixture();f.buy(0);assert.equal(f.c.v17345RefreshEquipmentShop(),true);assert.doesNotMatch(f.read(),/已購買/);assert.match(f.read(),/2026-10-06:1:0/);assert.equal(f.buy(0,'2026-10-06:0:0'),false);
- assert.equal(f.buy(0,'2026-10-06:1:0'),true);for(let i=0;i<4;i++)assert.equal(f.c.v17345RefreshEquipmentShop(),true);assert.equal(f.c.v17345RefreshEquipmentShop(),false);
+ assert.equal(f.buy(0,'2026-10-06:1:0'),true);for(let i=0;i<25;i++){const old=f.c.FourSymbolsEquipmentShop.offers();const money=f.c.gold;assert.equal(f.c.v17345RefreshEquipmentShop(),true);const next=f.c.FourSymbolsEquipmentShop.offers();assert.equal(next.length,6);assert.ok(next.every((item,index)=>item.v141Uid!==old[index].v141Uid));assert.notDeepEqual(next.map(x=>x.name),old.map(x=>x.name));assert.equal(f.c.gold,money);assert.equal(new Set(next.map(x=>x.name)).size,6);}assert.doesNotMatch(f.read(),/今日刷新|免費|剩|未開放|\/ 10/);
  f.day('2026-10-07');assert.match(f.read(),/2026-10-07:0:0/);assert.doesNotMatch(f.read(),/已購買/);
 });
 test('insufficient gold/full inventory never mark sold',()=>{

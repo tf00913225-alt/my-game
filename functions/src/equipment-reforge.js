@@ -8,7 +8,7 @@
     const VERSION=1;
     const STATS=Object.freeze(["attack","intelligence","vitality","energy","defensePoints","agility"]);
     const HISTORICAL=new Set([...STATS,"accuracy","evasion","antiCrit","statusAccuracy","statusResistance","crit","criticalChance","criticalDamage","maxHP","maxSP","defense"]);
-    const SLOTS=Object.freeze({white:1,blue:1,purple:2,orange:2,pink:3,"four-symbol":4});
+    const SLOTS=Object.freeze({white:1,blue:1,purple:2,orange:2,pink:3,"four-symbol":5});
     const TIERS=Object.freeze(Object.fromEntries(Object.keys(SLOTS).map((key,index)=>[key,Object.freeze({range:Object.freeze([5+index*6,10+index*6]),gold:[1000,3000,8000,20000,30000,50000][index],available:index<4})])));
     const ALIASES={low:"white",mid:"blue",high:"purple",perfect:"orange",red:"pink",myriad:"four-symbol"};
     function rarity(item){
