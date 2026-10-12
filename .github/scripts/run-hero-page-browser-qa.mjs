@@ -94,7 +94,31 @@ try{
   await tap('#heroHomeEntry');await tap('#heroDetailsTab');const detail=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`hero-details-${width}.png`),Buffer.from(detail.data,'base64'));
   await c.eval(`closeHomeFeature();true`);assert.equal(await c.eval(`document.getElementById('homeFeatureModal').classList.contains('show')`),false);
   assert.deepEqual(await c.eval(`window.__heroQaErrors`),[]);
-  evidence.push({width,height,geometry,realTouch:true,roster:[0,1,2],threeSlots:true,battleGuard:true,actualSaveUnchanged:true});console.log(`PASS hero page ${width}x${height}`);
+  // Exercise real growth client/Core without a backend grant or Save write.
+  const saved=await c.eval(`localStorage.getItem('four_symbols_save:skill-runtime-browser-qa')`);
+  if(live&&width===360){
+   await c.eval(`closeHomeFeature();showPage('home');true`);
+   await tap('.home-secondary-actions [aria-label="英雄系統"]');
+   await tap('#heroDetailsTab');
+   await tap('[onclick="FourSymbolsHeroGrowth.testResources()"]');
+   assert.equal(await c.eval(`FourSymbolsHeroGrowth.getStatus().testMode`),true);
+   await tap('[data-hero-id="divineDogHongbao"].hero-picker-button');
+   await tap('[onclick*="HeroGrowth.mutate"][onclick*="unlock"]');
+   await tap('[onclick*="HeroGrowth.mutate"][onclick*="starUp"]');
+   await tap('[onclick*="HeroGrowth.mutate"][onclick*="reroll"]');
+   assert.equal(await c.eval(`FourSymbolsHeroGrowth.getAccount().heroes.divineDogHongbao.stars`),1);
+   assert.equal(await c.eval(`FourSymbolsHeroGrowth.getAccount().heroes.divineDogHongbao.specificFragments`),375);
+   assert.equal(await c.eval(`FourSymbolsHeroGrowth.getStatus().marrowPills`),4);
+   assert.equal(await c.eval(`FourSymbolsHeroSystem.getDomain({forBattle:true}).getHeroAccountState('divineDogHongbao').stars`),1);
+   const growthShot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`hero-growth-${width}.png`),Buffer.from(growthShot.data,'base64'));
+   assert.equal(await c.eval(`localStorage.getItem('four_symbols_save:skill-runtime-browser-qa')`),saved,'DEV growth must not write Save');
+   // End isolated test through the real session invalidation hook before the
+   // subsequent original roster/Save acceptance at other viewports.
+   await c.eval(`dispatchEvent(new CustomEvent('four-symbols:game-session-state',{detail:{status:'revoked'}}));true`);
+   await c.eval(`FourSymbolsHeroAcquisition.sync()`);
+   await c.eval(`closeHomeFeature();true`);
+  }
+  evidence.push({width,height,geometry,realTouch:true,roster:[0,1,2],threeSlots:true,battleGuard:true,actualSaveUnchanged:true,growthClicks:live&&width===360});console.log(`PASS hero page ${width}x${height}`);
  }
  fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:live?'deployed-dev':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||null,evidence},null,2)+'\n');
 }catch(error){if(c)try{const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from(shot.data,'base64'));}catch{}fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:false,error:String(error.stack||error),evidence},null,2)+'\n');throw error;

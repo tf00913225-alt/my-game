@@ -122,3 +122,38 @@ test("DEV fixture is exact-host-only, session-only, single activation and shares
     const other=client("four-symbols-dev.pages.dev").c.FourSymbolsHeroGrowth;other.testResources();assert.equal(other.getAccount(),null);
     c.isHeroGrowthBattleActive=()=>true;await api.mutate(heroId,"starUp");assert.equal(api.getAccount().heroes[heroId].stars,1);
 });
+test("real growth client preserves identical intent after lost response and does not trust old local resources",async()=>{
+    const h=fixture({owned:true}),{c}=client("production.invalid"),calls=[];
+    c.FourSymbolsFirebaseLifecycle.readHeroGrowth=()=>h.writer.read(h.request());
+    let lost=true;
+    c.FourSymbolsFirebaseLifecycle.mutateHeroGrowth=async intent=>{
+        calls.push(structuredClone(intent));const result=await h.writer.mutate(h.request(intent));
+        if(lost){lost=false;throw Object.assign(Error("lost response"),{code:"unavailable"});}
+        return result;
+    };
+    const api=c.FourSymbolsHeroGrowth;await api.read();await api.mutate(heroId,"starUp");
+    assert.ok(api.getStatus().pending);assert.equal(h.data.get(env).serverRevision,3);
+    await api.mutate(heroId,"reroll");assert.equal(calls.length,1,"unknown outcome blocks other intent");
+    await api.mutate(heroId,"starUp");assert.deepEqual(calls[0],calls[1]);
+    assert.equal(h.data.get(env).serverRevision,3);assert.equal(api.getStatus().pending,null);
+    assert.equal(api.getAccount().heroes[heroId].stars,1);
+    c.player={id:"fixture-player",level:20};c.player2=null;c.player3=null;
+    c.calculateCharacterBaseStats=()=>({});c.skillDatabase={};
+    const main=fs.readFileSync("js/00-main.js","utf8"),start=main.indexOf("let heroAccountState=");
+    vm.runInContext(main.slice(start,main.indexOf("\n});",start)+4),c);
+    const old=Core.normalizeAccountState();old.heroes[heroId].specificFragments=999999;
+    c.FourSymbolsHeroSystem.replaceAccountState(old);
+    const state=c.FourSymbolsHeroSystem.getDomain().getHeroAccountState(heroId);
+    assert.equal(state.stars,1);assert.equal(state.specificFragments,475);
+});
+test("UID/session invalidation rejects in-flight response and clears busy/proof/test resources",async()=>{
+    const {c,handlers}=client("dev.four-symbols-dev.pages.dev"),api=c.FourSymbolsHeroGrowth;
+    api.testResources();let resolve;
+    c.FourSymbolsFirebaseLifecycle.readHeroGrowth=()=>new Promise(done=>{resolve=done;});
+    const reading=api.read();assert.equal(api.getStatus().busy,true);
+    handlers["four-symbols:game-session-state"]({detail:{status:"revoked"}});
+    assert.equal(api.getStatus().busy,false);assert.equal(api.getAccount(),null);
+    resolve({schemaVersion:1,ownerUid:uid,serverRevision:2,heroAccount:Core.normalizeAccountState(),
+        marrowPills:99,authoritativeStateReady:false});await reading;
+    assert.equal(api.getAccount(),null);assert.equal(api.getStatus().marrowPills,0);
+});
