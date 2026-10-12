@@ -301,7 +301,7 @@ async function run(chrome,url,live){
    if(v[0]<800)assert.ok(composition.adventure.bottom<composition.roster.top,'central adventure moved below roster');
    else assert.ok(composition.roster.left>=composition.cards.right,'desktop roster lost separate column');
    const homeControls=[];
-   for(const selector of [...['角色','商店','休息','合成','任務','鍛造','成就','公告','離線經驗','系統','秘寶','元素匣'].map(label=>'.home-card[aria-label="'+label+'"]'),'#v146HomeRoster','.v-fixed-formation-entry','#adventureHomeEntry']){
+   for(const selector of [...['角色','商店','英雄系統','合成','任務','鍛造','成就','公告','離線經驗','系統','秘寶','元素匣'].map(label=>'.home-card[aria-label="'+label+'"]'),'#v146HomeRoster','.v-fixed-formation-entry','#adventureHomeEntry']){
     await c.eval(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'nearest'})`);await settle();
     const control=await measure(selector);
     assert.notEqual(control.display,'none','home control hidden '+selector);
@@ -403,7 +403,7 @@ async function run(chrome,url,live){
   }
   for(const v of [[390,844],[412,915],[1366,768],[1920,1080]]){
    await resize(v);
-   for(const feature of ['forge','synthesis','autoBattleSettings','quest','announcement','system','rest']){
+   for(const feature of ['forge','synthesis','autoBattleSettings','quest','announcement','system','rest','hero']){
     await c.eval(`closeHomeFeature();openHomeFeature(${JSON.stringify(feature)})`);await settle();
     await check('#homeFeatureModal .home-feature-modal-box',v);
     assert.equal(await c.eval("homeFeatureModal.parentElement.id"),'game-ui');
