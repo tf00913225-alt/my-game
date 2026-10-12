@@ -45,6 +45,7 @@ const appScripts=[
     "functions/src/hero-core.js",
     "js/00-main.js",
     "js/hero-acquisition-client.js",
+    "js/hero-growth-client.js",
     "js/generated-item-acquisition-data.js",
     "js/item-acquisition-registry.js",
     "js/01-stage-v8-touch-lock.js",

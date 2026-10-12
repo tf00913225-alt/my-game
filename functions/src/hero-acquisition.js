@@ -214,7 +214,8 @@ function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
             return result(next,!next.changed);
         });
     }
-    return Object.freeze({read,observeLogin,ensureChapterTicket,completeChapterNode});
+    return Object.freeze({read,observeLogin,ensureChapterTicket,completeChapterNode,
+        readInTransaction:async(tx,session)=>result(await readSources(tx,session.uid))});
 }
 
 module.exports={createHeroAcquisition};

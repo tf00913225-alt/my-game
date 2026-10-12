@@ -12,6 +12,8 @@ const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-w
 const {createCanonicalResourceCredit}=require("../functions/src/canonical-resource-credit.js");
 const {createDailyCheckinGrant}=require("../functions/src/daily-checkin-grant.js");
 const {createHeroAcquisition}=require("../functions/src/hero-acquisition.js");
+const {createHeroGrowth}=require("../functions/src/hero-growth.js");
+const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
 const {createCanonicalBattleAttempt}=require("../functions/src/canonical-battle-attempt.js");
 const {createCanonicalBattleEncounter}=require("../functions/src/canonical-battle-encounter.js");
 const {resolvePlainPlayerNormalAttack}=require("../functions/src/canonical-battle-normal-attack.js");
@@ -2112,5 +2114,57 @@ assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapter/current`,st
 assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapterTickets/${storyTicket}`,storyOther.idToken,"PATCH"),403);
 console.log("PASS Hero acquisition protected Firestore/HTTP: cumulative days, concurrent day/node intents, legal chapter route, permanent stable-seed rights, lost/stale retry, takeover, private rules and corruption rejection; ordinary battle outcomes remain unverified.");
 console.log(`PASS (${direct?"direct exported handlers":"HTTP callable"}): A SUCCESS -> B takeover -> A SESSION_REVOKED -> B SUCCESS; logout, UID isolation, tampering, private rules, protected writers, concurrent takeover/write ordering, revoked/disabled Firebase identity.`);
+// Disposable emulator-only resources. No production grant surface is added.
+const growthUser=await login("accounts:signUp",{email:"hero-growth-emulator@example.test",password});
+const growthUid=growthUser.localId,growthRoot=db.collection("serverUsers").doc(growthUid);
+const growthSession=await invoke("createGameSession",growthUser.idToken,{uid:growthUid});
+await invoke("bootstrapCloudSave",growthUser.idToken,{uid:growthUid,session:growthSession});
+const growthRecords=makeInitialCharacterSources(growthUid,2,"growth-emulator-initial",{
+    displayName:"成長測試",element:"fire",gender:"female",attributes:{attack:3,vitality:2,
+        energy:1,intelligence:2,defensePoints:1,agility:1}},{recordedAt:Date.now()});
+const growthId="divineDogHongbao";
+growthRecords.progress.playableState.heroAccount.heroes[growthId].specificFragments=500;
+growthRecords.inventory.push({schemaVersion:1,ownerUid:growthUid,serverRevision:2,
+    provenance:"server-created",ownedItemId:"growth-emulator-marrow",location:"bag",
+    state:{id:"heroMarrowPill",type:"material",count:2}});
+const growthBundle=assembleCanonicalSnapshot(growthUid,2,growthRecords),growthBatch=db.batch();
+for(const name of ["account","economy","progress","relicLoadout","claimCheckpoint"]){
+    growthBatch.set(growthRoot.collection(name==="claimCheckpoint"?"claimCheckpoints":name).doc("current"),
+        {...growthRecords[name],...(name==="account"?{snapshotSha256:growthBundle.sha256}:{})});
+}
+for(const name of ["characters","inventory"]){for(const row of growthRecords[name]){
+    growthBatch.set(growthRoot.collection(name).doc(row.characterId||row.ownedItemId),row);
+}}
+growthBatch.set(growthRoot.collection("playableSnapshots").doc("2"),growthBundle);
+growthBatch.set(growthRoot.collection("recoveryArchives").doc("2"),createRecoveryArchive(growthUid,2,growthRecords,growthBundle));
+growthBatch.update(db.doc(`users/${growthUid}/saves/current`),{serverRevision:2});await growthBatch.commit();
+const growthIdentity={uid:growthUid,session:growthSession};
+assert.equal((await invoke("readHeroGrowth",growthUser.idToken,growthIdentity)).marrowPills,2);
+const growthUnlock={...growthIdentity,expectedRevision:2,heroId:growthId,action:"unlock",operationId:"growth-emulator-unlock"};
+const growthFirst=await invoke("mutateHeroGrowth",growthUser.idToken,growthUnlock);
+assert.equal(growthFirst.heroAccount.heroes[growthId].specificFragments,400);
+assert.deepEqual((await invoke("mutateHeroGrowth",growthUser.idToken,growthUnlock)).receipt,growthFirst.receipt);
+const growthStar={...growthIdentity,expectedRevision:3,heroId:growthId,action:"starUp",operationId:"growth-emulator-star-1"};
+const growthRace=await Promise.allSettled([
+    invoke("mutateHeroGrowth",growthUser.idToken,growthStar),
+    invoke("mutateHeroGrowth",growthUser.idToken,{...growthStar,operationId:"growth-emulator-star-2"})]);
+assert.equal(growthRace.filter(result=>result.status==="fulfilled").length,1);
+assert.equal(growthRace.filter(result=>result.status==="rejected").length,1);
+const growthReroll={...growthIdentity,expectedRevision:4,heroId:growthId,action:"reroll",operationId:"growth-emulator-reroll"};
+const growthRolled=await invoke("mutateHeroGrowth",growthUser.idToken,growthReroll);
+assert.equal(growthRolled.marrowPills,1);assert.equal(growthRolled.heroAccount.heroes[growthId].stars,1);
+assert.deepEqual((await invoke("mutateHeroGrowth",growthUser.idToken,growthReroll)).receipt,growthRolled.receipt);
+await checkRecoveryArchive(growthUid,5);
+await rejected("mutateHeroGrowth",growthUser.idToken,{...growthReroll,amount:10},"INVALID_ARGUMENT");
+await rejected("mutateHeroGrowth",growthUser.idToken,{...growthReroll,action:"starUp"},"DATA_LOSS");
+assert.equal(await rulesRequest(`serverUsers/${growthUid}/progress/current`,growthUser.idToken,"PATCH"),403);
+assert.equal(await rulesRequest(`serverUsers/${growthUid}/operations/growth-emulator-reroll`,growthUser.idToken),403);
+const growthLedger=growthRoot.collection("ledgerEntries").doc("growth-emulator-reroll");
+const growthLedgerBytes=(await growthLedger.get()).data();await growthLedger.delete();
+await rejected("mutateHeroGrowth",growthUser.idToken,growthReroll,"DATA_LOSS");
+await growthLedger.set(growthLedgerBytes);
+await invoke("revokeGameSession",growthUser.idToken,growthIdentity);
+await rejected("readHeroGrowth",growthUser.idToken,growthIdentity,"SESSION_REVOKED");
+console.log("PASS Hero growth real Firestore/HTTP: original Core costs, fragment unlock/star/reroll, one concurrent spend, immutable retry, archive, malformed intents, missing ledger, private rules, revoked session. Resources are emulator-only fixtures.");
 await db.terminate();
 if(direct){await getFirestore().terminate();}

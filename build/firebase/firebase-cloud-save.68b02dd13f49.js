@@ -12,13 +12,13 @@ import {
     getDoc,
     getFirestore
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
-import {CLOUD_FUNCTIONS_REGION,callProtectedFunction} from "./firebase-session.877a7842d6bd.js";
+import {CLOUD_FUNCTIONS_REGION,callProtectedFunction} from "./firebase-session.2ed30ab7f07f.js";
 
 import {
     getFirebaseApp,
     getFirebaseAuth,
     initializeFirebaseAuth
-} from "./firebase-auth.9f8c09942b79.js";
+} from "./firebase-auth.da338b70a3ba.js";
 
 export const CLOUD_SAVE_WRITE_POLICY = "trusted-backend-only";
 export {CLOUD_FUNCTIONS_REGION};
@@ -104,6 +104,10 @@ export async function bootstrapTrustedCloudSave(){
 // The server observes its own calendar date; no browser date/counter is sent.
 export async function readHeroAcquisition(){
     return callTrustedFunction("readHeroAcquisition",{});
+}
+export async function readHeroGrowth(){return callTrustedFunction("readHeroGrowth",{});}
+export async function mutateHeroGrowth({operationId,expectedRevision,heroId,action}){
+    return callTrustedFunction("mutateHeroGrowth",{operationId,expectedRevision,heroId,action});
 }
 export async function observeHeroLogin(expectedRevision){
     return callTrustedFunction("observeHeroLogin",{expectedRevision});
