@@ -58,7 +58,8 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
         for(const [id,grant] of Object.entries(rights.entitlements)){
             if(!account.heroes[id].unlocked){account=domain(account).unlockHeroDirect(id,grant.allocationSeed);}
         }
-        return {uid,root,refs,owned,records,characterRefs,envelope,account};
+        return {uid,root,refs,owned,records,characterRefs,envelope,account,
+            sourceSnapshotSha256:snapshot.data().sha256};
     }
     function view(c,unchanged=true){return {schemaVersion:1,ownerUid:c.uid,
         serverRevision:c.envelope.serverRevision,heroAccount:c.account,
@@ -92,14 +93,26 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
                    digest(audit(ledger.data()))!==digest(receipt)||!op.data().createdAt||!ledger.data().createdAt){
                     fail("data-loss","Growth receipt/ledger mismatch.");
                 }
-                const [original,archive]=await Promise.all([
+                const [original,archive,prior,priorArchive]=await Promise.all([
                     tx.get(c.root.collection("playableSnapshots").doc(String(receipt.serverRevision))),
-                    tx.get(c.root.collection("recoveryArchives").doc(String(receipt.serverRevision)))]);
+                    tx.get(c.root.collection("recoveryArchives").doc(String(receipt.serverRevision))),
+                    tx.get(c.root.collection("playableSnapshots").doc(String(receipt.sourceRevision))),
+                    tx.get(c.root.collection("recoveryArchives").doc(String(receipt.sourceRevision)))]);
                 try{
                     if(!original.exists||!archive.exists||original.data().sha256!==receipt.snapshotSha256||
                        receipt.serverRevision>c.envelope.serverRevision){throw Error("missing");}
                     const stored=inspectRecoveryArchive(archive.data(),c.uid,receipt.serverRevision,original.data());
                     if(digest(stored.progress.playableState.heroAccount)!==receipt.heroAccountSha256){throw Error("hero");}
+                    if(!prior.exists||!priorArchive.exists||prior.data().sha256!==receipt.sourceSnapshotSha256||
+                       !Number.isSafeInteger(receipt.sourceRevision)||receipt.sourceRevision<1||
+                       receipt.sourceRevision>expectedRevision||receipt.serverRevision!==expectedRevision+1){throw Error("source");}
+                    const old=inspectRecoveryArchive(priorArchive.data(),c.uid,receipt.sourceRevision,prior.data());
+                    const balances=records=>({specificFragments:records.progress.playableState.heroAccount.heroes[heroId].specificFragments,
+                        marrowPills:pillCount(records)});
+                    if(digest(balances(old))!==digest(receipt.beforeResources)||
+                       digest(balances(stored))!==digest(receipt.afterResources)||
+                       receipt.fragmentDelta!==receipt.afterResources.specificFragments-receipt.beforeResources.specificFragments||
+                       receipt.marrowPillDelta!==receipt.afterResources.marrowPills-receipt.beforeResources.marrowPills){throw Error("delta");}
                     if(action==="unlock"&&(!claim.exists||digest(audit(claim.data()))!==digest(receipt))){throw Error("claim");}
                 }catch(_){fail("data-loss","Original growth evidence missing or inconsistent.");}
                 return {...view(c),receipt};
@@ -134,7 +147,10 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
             try{bundle=assembleCanonicalSnapshot(c.uid,revision,records);archive=createRecoveryArchive(c.uid,revision,records,bundle);}
             catch(_){fail("data-loss","Growth cannot form canonical recovery evidence.");}
             const receipt={schemaVersion:1,ownerUid:c.uid,kind:"hero-growth",intent,serverRevision:revision,
+                sourceRevision:c.records.account.serverRevision,sourceSnapshotSha256:c.sourceSnapshotSha256,
                 snapshotSha256:bundle.sha256,heroAccountSha256:digest(nextAccount),
+                beforeResources:{specificFragments:before.specificFragments,marrowPills:pills},
+                afterResources:{specificFragments:nextAccount.heroes[heroId].specificFragments,marrowPills:pillCount(records)},
                 fragmentDelta:nextAccount.heroes[heroId].specificFragments-before.specificFragments,
                 marrowPillDelta:action==="reroll"?-1:0};
             const stamp=FieldValue.serverTimestamp();
