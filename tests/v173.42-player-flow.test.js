@@ -50,7 +50,7 @@ assert.match(v141,/hasExpLevelUp/);
 assert.match(index,/home-utility-actions team-relic-home-tools/);
 assert.match(index,/team-relic-home-entry[^>]*data-feature="relic"/);
 assert.match(index,/team-element-box-home-entry[^>]*data-feature="gameplay-core"/);
-assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-template-columns:repeat\(2,minmax\(70px,22%\)\);[^}]*grid-auto-rows:70px;/);
+assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-template-columns:repeat\(2,minmax\(64px,20%\)\);[^}]*grid-auto-rows:68px;/);
 assert.match(v131,/V17342_GLOBAL_EXP_REWARD_MULTIPLIER=3/);
 assert.match(v131,/function getFormalMonsterBaseExp/);
 assert.doesNotMatch(v131,/V131_EXP_MULTIPLIER/);
