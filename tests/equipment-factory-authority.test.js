@@ -60,6 +60,12 @@ test("conflicting or malformed existing identity fails before migration and pres
   const bytes=JSON.stringify(items);assert.throws(()=>factory.migrateGraph(items,{}));assert.equal(JSON.stringify(items),bytes);
  }
 });
+
+test("unmarked legacy ordinary equipment repairs invalid names once without rerolling stats",()=>{
+ const item={id:"old_reward",type:"armor",name:"幽月幽月法袍",stats:{energy:8},reforgeStats:{attack:2}};
+ factory.migrateGraph([item],{});assert.ok(factory.validName(item.name));const saved=plain(item);
+ factory.migrateGraph([item],{});assert.deepEqual(item,saved);assert.deepEqual(item.stats,{energy:8});assert.deepEqual(item.reforgeStats,{attack:2});
+});
 test("new ordinary names and one base stat survive saves; legacy duplicate fragments use UID once",()=>{
  for(const rarity of ["white","blue","purple","orange"]){for(const type of ["head","shoulder","armor","shoes","weapon"]){for(const classType of ["warrior","mage"]){
   const item=factory.create({type,classType,rarityKey:rarity,stats:{[classType==="mage"?"intelligence":"attack"]:20}},{ordinary:true});

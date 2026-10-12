@@ -237,7 +237,7 @@
         if(!item.rarityKey&&starter){item.rarityKey="white";item.quality="white";}
         if(!item.assetPath&&starter){item.assetPath=starter.assetPath;}
         if(!/<(?:img|svg)\b/i.test(String(item.icon||""))&&item.assetPath){item.icon=art(item.assetPath);}
-        if(validUid(item.v141Uid)&&!item.setId&&(starter||item.v17346GeneratedEquipment||item.ordinaryEquipment||item.v146OrdinaryCrafted)&&!validName(item.name)){item.name=nameFor(item);}
+        if(validUid(item.v141Uid)&&!item.setId&&!validName(item.name)){item.name=nameFor(item);}
         reforge.migrateItem(item);
         return item;
     }
