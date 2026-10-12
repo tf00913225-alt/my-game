@@ -7,22 +7,12 @@ const synthesis=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
-[
-  ["ironSword","assets/equipment/warrior/weapon-01.png"],
-  ["woodStaff","assets/equipment/mage/weapon-01.png"],
-  ["leatherHelmet","assets/equipment/warrior/head-01.png"],
-  ["leatherArmor","assets/equipment/warrior/armor-01.png"],
-  ["leatherShoes","assets/equipment/warrior/shoes-01.png"]
-].forEach(([id,path])=>{
-  assert.ok(eq.includes(id+':{path:"'+path+'"'),id+" starter art mapping missing");
-});
-assert.ok(eq.includes('powerRing:{ring:true}'));
-assert.match(eq,/function repairLegacyStarterEquipmentIcons\(\)/);
-assert.match(eq,/item\.icon=spec\.ring\?legacyStarterRingMarkup\(\):artMarkup\(spec\.path,"white",item\.type\)/);
-assert.match(eq,/item\.rarityKey="white"/);
-assert.match(eq,/item\.quality="white"/);
-assert.doesNotMatch(eq,/item\.reforgeSlots=0/);
-assert.match(eq,/repairLegacyStarterEquipmentIcons\(\);\n\s*syncEquipmentChestPresentation\(\);\n\s*syncMainCharacterEquipmentStorage\(\)/);
+const factory=require('../js/equipment-factory');
+for(const id of Object.keys(factory.STARTERS)){
+ const item=factory.starter(id);assert.ok(item.v141Uid);assert.match(item.icon,/<img /);assert.equal(item.reforgeSlots,1);assert.equal(Object.keys(item.stats).length,1);
+}
+assert.match(eq,/FourSymbolsEquipmentFactory.migrateGraph/);
+assert.doesNotMatch(eq,/repairStarterWhiteStats|item\.reforgeUsed=0/);
 
 assert.match(synthesis,/function canActuallyReforge\(item,explain=false\)/);
 assert.match(synthesis,/item\.v17351Locked===true/);

@@ -54,7 +54,7 @@ for(const legacy of [{attack:40,intelligence:38,vitality:36,energy:35,agility:34
 }
 const four={rarityKey:'four-symbol',reforgeAffixes:[{stat:'attack',value:40},{stat:'attack',value:38},{stat:'attack',value:35},null],reforgeStats:{attack:999}};
 assert.deepEqual(model.aggregate(four),{attack:113});
-assert.deepEqual(model.roll(four,'white',[0],()=>0),[{stat:'attack',value:40},{stat:'attack',value:10},{stat:'attack',value:10},{stat:'attack',value:10}]);
+assert.deepEqual(model.roll(four,'white',[0],()=>0),[{stat:'attack',value:40},{stat:'attack',value:10},{stat:'attack',value:10},{stat:'attack',value:10},{stat:'attack',value:10}]);
 assert.deepEqual(model.locks(four,[3,0,0,1,2]),[0,1]);
 for(const [tier,meta] of Object.entries(model.TIERS)){
  assert.deepEqual(meta.range,[5+Object.keys(model.TIERS).indexOf(tier)*6,10+Object.keys(model.TIERS).indexOf(tier)*6]);
@@ -65,7 +65,7 @@ for(const [tier,meta] of Object.entries(model.TIERS)){
    seq=[(stat+.5)/6,.1,(value+.5)/5];assert.equal(model.roll({rarityKey:'white'},tier,[],()=>seq.shift())[0].value,meta.range[0]+value);assert.equal(seq.length,0);
   }
  }
- assert.deepEqual(model.roll({rarityKey:'four-symbol'},tier,[],()=>0),Array(4).fill({stat:'attack',value:meta.range[1]}));
+ assert.deepEqual(model.roll({rarityKey:'four-symbol'},tier,[],()=>0),Array(5).fill({stat:'attack',value:meta.range[1]}));
 }
 for(const item of [{reforgeStats:{attack:'oops'}},{reforgeStats:{unknown:5}},{reforgeSlots:Infinity},{reforgeVersion:99},{reforgeAffixes:[{stat:'attack',value:NaN}]}]){
  const before=JSON.stringify(item);assert.throws(()=>model.migrateItem(item));assert.equal(JSON.stringify(item),before,'invalid original preserved atomically');

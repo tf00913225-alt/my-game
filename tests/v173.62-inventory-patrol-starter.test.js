@@ -21,15 +21,10 @@ assert.match(qol,/const qualityDiff=inventoryQualityRank\(b\)-inventoryQualityRa
 assert.match(qol,/item\.blueprintSlot[\s\S]*?material:blueprint/);
 assert.match(qol,/\/\^ore\/i\.test\(id\)[\s\S]*?material:ore/);
 
-assert.match(main,/id:"ironSword"[\s\S]*?stats:\{\s*attack:3\s*\}/);
-assert.match(main,/id:"woodStaff"[\s\S]*?stats:\{\s*intelligence:3\s*\}/);
-assert.match(main,/id:"leatherHelmet"[\s\S]*?stats:\{\s*vitality:1\s*\}/);
-assert.match(main,/id:"leatherArmor"[\s\S]*?stats:\{\s*vitality:2\s*\}/);
-assert.match(main,/id:"leatherShoes"[\s\S]*?stats:\{\s*agility:2\s*\}/);
-assert.doesNotMatch(main,/id:"woodStaff"[\s\S]{0,220}intelligence:12/);
-assert.doesNotMatch(main,/id:"leatherArmor"[\s\S]{0,240}defense:10/);
-assert.match(equipment,/const STARTER_WHITE_STATS=\{[\s\S]*?ironSword:\{attack:3\}[\s\S]*?woodStaff:\{intelligence:3\}[\s\S]*?leatherArmor:\{vitality:2\}/);
-assert.match(equipment,/Object\.values\(characterEquipment\)[\s\S]*?repairStarterWhiteStats\(item\)/);
+const starterFactory=require('../js/equipment-factory');
+assert.match(main,/FourSymbolsEquipmentFactory.starter\(id\)/);
+for(const [id,expected] of Object.entries({ironSword:{attack:3},woodStaff:{intelligence:3},leatherHelmet:{vitality:1},leatherArmor:{vitality:2},leatherShoes:{agility:2}}))assert.deepEqual(starterFactory.starter(id).stats,expected);
+assert.doesNotMatch(equipment,/repairStarterWhiteStats/);
 
 assert.doesNotMatch(battle,/stage\.style\.visibility/);
 assert.doesNotMatch(battle,/v17351-management-open.*toggle/);

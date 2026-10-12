@@ -42,8 +42,12 @@ test("talisman resolution is two stage and max-skill aware",()=>{
 });
 
 test("pink and four-symbol are planned but not silently injected into current drops",()=>{
-  assert.match(equipment,/key:"pink",label:"桃紅階",reforgeSlots:3,chance:0,available:false,planned:true/);
-  assert.match(equipment,/key:"four-symbol",label:"四象階",reforgeSlots:4,chance:0,available:false,planned:true/);
+  assert.match(equipment,/key:"pink",label:"桃紅階",reforgeSlots:3,available:false,planned:true/);
+  assert.match(equipment,/key:"four-symbol",label:"四象階",reforgeSlots:5,available:false,planned:true/);
+  for(const name of ['EQUIPMENT_SHOP_DROP_TABLE','EQUIPMENT_CHEST_DROP_TABLE']){
+    const table=equipment.match(new RegExp('const '+name+'=\\[([\\s\\S]*?)\\];'));
+    assert.ok(table,name+' is an independent table');assert.doesNotMatch(table[1],/key:"(?:pink|four-symbol)"/);
+  }
   const chest=content.match(/const MATERIAL_CHEST_DROP_TABLE=Object.freeze\(\[([\s\S]*?)\]\.map[\s\S]*?\);/)[1];
   assert.ok(chest.includes('itemId:"oreLow"')&&chest.includes('itemId:"orePerfect"'));
   assert.ok(!chest.includes('itemId:"orePink"')&&!chest.includes('itemId:"oreFourSymbol"'));

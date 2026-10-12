@@ -385,7 +385,7 @@ test("recorded dungeon and shop evidence rejects incomplete or contradictory per
         "daily-dungeon-state":[s=>delete s.used,s=>delete s.used.exp,s=>s.used.exp=1,
             s=>s.used.material="false",s=>s.used.extra=false,s=>s.used=[],s=>s.extra=true],
         "equipment-shop-daily":[s=>delete s.soldOfferIds,s=>s.soldOfferIds=null,
-            s=>s.refreshCount=-1,s=>s.refreshCount=11,s=>s.refreshCount=.5,s=>s.refreshCount="2",
+            s=>s.refreshCount=-1,s=>s.refreshCount=Number.MAX_SAFE_INTEGER+1,s=>s.refreshCount=.5,s=>s.refreshCount="2",
             s=>s.soldOfferIds.push(s.soldOfferIds[0]),s=>s.soldOfferIds=[1],
             s=>s.soldOfferIds=["2020-03-01:0:0"],s=>s.soldOfferIds=["2020-02-29:3:0"],
             s=>s.soldOfferIds=["2020-02-29:0:6"],s=>s.soldOfferIds=["2020-02-29:00:0"],
@@ -429,7 +429,7 @@ test("older dungeon usage and shop batches retain exact bytes, balances and clos
     }
     const boundary=sources();
     boundary.progress.sidecars["equipment-shop-daily"].raw=JSON.stringify({date:"2020-02-29",
-        refreshCount:10,soldOfferIds:Array.from({length:66},(_,i)=>`2020-02-29:${Math.floor(i/6)}:${i%6}`)});
+        refreshCount:25,soldOfferIds:Array.from({length:156},(_,i)=>`2020-02-29:${Math.floor(i/6)}:${i%6}`)});
     assert.doesNotThrow(()=>assemble(boundary));
     const initial=makeInitialSidecars(1700000000000);
     for(const key of ["daily-dungeon-state","equipment-shop-daily"]){
