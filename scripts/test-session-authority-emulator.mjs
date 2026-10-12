@@ -1568,6 +1568,33 @@ await Promise.all([
     ownedCharacterRef.update({state:ownedState4}),ownedSnapshotRef4.set(ownedSnapshot4),
     ownedRoot.collection("account").doc("current").update({snapshotSha256:ownedSnapshot4.sha256})
 ]);
+// An explicitly stored formation must retain every created character even
+// when the emulator source and snapshot are resealed to the same digest.
+const ownedAccountRef4=ownedRoot.collection("account").doc("current");
+const ownedFormation4=(await ownedAccountRef4.get()).get("formation");
+const incompleteFormation4={version:1,characterIndexToSlot:{}};
+const incompleteFormationSnapshot4={...ownedSnapshot4,
+    snapshot:JSON.parse(JSON.stringify(ownedSnapshot4.snapshot))};
+incompleteFormationSnapshot4.snapshot.formation=incompleteFormation4;
+incompleteFormationSnapshot4.sha256=claimRecordsDigest(incompleteFormationSnapshot4.snapshot);
+incompleteFormationSnapshot4.byteLength=Buffer.byteLength(JSON.stringify(incompleteFormationSnapshot4.snapshot),"utf8");
+await Promise.all([
+    ownedAccountRef4.update({formation:incompleteFormation4,snapshotSha256:incompleteFormationSnapshot4.sha256}),
+    ownedSnapshotRef4.set(incompleteFormationSnapshot4)
+]);
+await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
+    operationId:ownedAllocation,expectedRevision:4}),error=>error.code==="data-loss");
+assert.equal((await ownedRoot.collection("operations").doc(ownedAllocation).get()).exists,false);
+assert.equal((await ownedRoot.collection("playableSnapshots").doc("5").get()).exists,false);
+assert.equal((await ownedRoot.collection("recoveryArchives").doc("5").get()).exists,false);
+assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),4);
+assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("sharedExp"),320);
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+    .get("sourceRecords.account.formation"),ownedFormation4);
+await Promise.all([
+    ownedAccountRef4.update({formation:ownedFormation4,snapshotSha256:ownedSnapshot4.sha256}),
+    ownedSnapshotRef4.set(ownedSnapshot4)
+]);
 await ownedCharacterRef.update({skillLoadout:{...ownedSkillLoadout,equippedSkills:["flameSlash","flameSlash"]}});
 await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
     operationId:ownedAllocation,expectedRevision:4}),error=>error.code==="data-loss");

@@ -51,6 +51,18 @@ function inspectPlayableCharacterState(state){
     }
 }
 
+// Retain an explicitly recorded serialized formation without client hydration,
+// missing-character defaults or battle execution. Null remains uninitialized.
+function inspectPlayableFormation(formation,slots){
+    if(formation==null){return;}
+    if(!object(formation)||Object.keys(formation).sort().join("|")!=="characterIndexToSlot|version"||
+       !object(formation.characterIndexToSlot)||
+       Object.keys(formation.characterIndexToSlot).sort().join("|")!==
+           slots.flatMap((id,index)=>id===null?[]:[String(index)]).join("|")){
+        fail("complete formation state");
+    }
+}
+
 // Retained skill storage shape only: no catalogue, learning/cost/element
 // eligibility, combat execution, defaults or normalization in this reader.
 // Client skill Owner stores positive levels (current global ceiling 10) and
@@ -342,6 +354,7 @@ function assembleCanonicalSnapshot(uid,revision,records){
         seenCharacters.add(character.characterId);
     }
     const formation=records.account.formation;
+    if(records.progress.playableState!==undefined){inspectPlayableFormation(formation,slots);}
     if(formation!=null){
         const map=formation.characterIndexToSlot;
         if(!object(formation)||formation.version!==1||!object(map)||
@@ -498,6 +511,7 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
     validateJsonValue(records,"canonical sources",0);
     const source=assembleCanonicalSnapshot(uid,revision,records);
     const {extra,hero,preferences}=inspectPlayableState(records);
+    inspectPlayableFormation(source.snapshot.formation,source.snapshot.slots);
     const configKeys=["autoConfig","autoConfig2","autoConfig3"];
     const slotKeys=["fire","player2","player3"];
     const characterEquipment={},characterSkillLoadouts={};

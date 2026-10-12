@@ -20,7 +20,7 @@ function sources(count=1){
         skillLoadout:{skillLevels:{waterSlash:2},equippedSkills:["waterSlash"]}}]:[]);
     const claimRecords=[{...base,claimKey:"historical:all",status:"blocked"}];
     const auto={enabled:false,skill:"waterSlash",hp:30,sp:20,returnToCityWhenEmpty:true};
-    return {account:{...base,slots,formation:{version:1,characterIndexToSlot:{0:"ALLY_F2"}}},characters,
+    return {account:{...base,slots,formation:{version:1,characterIndexToSlot:Object.fromEntries(slots.flatMap((id,index)=>id===null?[]:[[index,["ALLY_F2","ALLY_B1","ALLY_F3"][index]]]))}},characters,
         economy:{...base,gold:42,sharedExp:7},inventory:[
             {...base,ownedItemId:"bag-a",location:"bag",state:{id:"potion",count:2}},
             {...base,ownedItemId:"equip-a",location:"equipped",state:{id:"sword",type:"weapon",count:1}}],
@@ -621,4 +621,66 @@ test("historical incomplete character snapshots retain their bytes without becom
     assert.deepEqual(inspectRecoveryArchive(archive,"uid-a",7,snapshot),records);
     assert.equal(Object.hasOwn(snapshot.snapshot.characters[2].state,"hp"),false);
     assert.throws(()=>assemble(records),/complete character state/);assert.deepEqual(records,before);
+});
+
+test("explicit complete formations reject missing characters and discarded root fields",()=>{
+    const {createRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    for(const count of [1,2,3]){
+        for(const durable of [false,true]){
+            for(const mutate of [...Array.from({length:count},(_,index)=>f=>delete f.characterIndexToSlot[index]),
+                f=>f.extra=true,f=>f.kind="ally-formation",f=>f.slotToCharacterIndex={} ]){
+                const records=sources(count);
+                if(durable){const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
+                    records.progress.playableState=fields;delete records.playableState;}
+                const priorSnapshot=assembleCanonicalSnapshot("uid-a",7,records);
+                mutate(records.account.formation);
+                const before=structuredClone(records);
+                assert.throws(()=>assemble(records),/complete formation state/);
+                if(durable){
+                    assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,records),/complete formation state/);
+                    assert.throws(()=>createRecoveryArchive("uid-a",7,records,priorSnapshot),/complete formation state/);
+                }
+                assert.deepEqual(records,before);
+            }
+        }
+    }
+});
+
+test("every recorded formation slot and null state survive projection and recovery exactly",()=>{
+    const {createRecoveryArchive,inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    const positions=["ALLY_F1","ALLY_F2","ALLY_F3","ALLY_B1","ALLY_B2","ALLY_B3"];
+    for(const count of [1,2,3]){
+        for(const offset of [0,1,2,3,4,5]){
+            for(const absent of [false,true]){
+                const records=sources(count);
+                records.account.formation=absent?null:{version:1,characterIndexToSlot:
+                    Object.fromEntries(records.characters.map((c,index)=>[c.slotIndex,positions[(offset+index)%6]]))};
+                const before=structuredClone(records),projection=assemble(records);
+                assert.deepEqual(projection.projection.gameSave.allyFormation,before.account.formation);
+                const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
+                records.progress.playableState=fields;delete records.playableState;
+                const snapshot=assembleCanonicalSnapshot("uid-a",7,records);
+                const archive=createRecoveryArchive("uid-a",7,records,snapshot);
+                const restored=inspectRecoveryArchive(archive,"uid-a",7,snapshot);
+                assert.deepEqual(restored.account.formation,before.account.formation);
+                assert.equal(archive.readyForRestore,false);
+                assert.equal(projection.readyForPublication,false);
+                assert.equal(projection.projection.authoritativeStateReady,false);
+                const changed=structuredClone(records);
+                changed.account.formation=absent?{version:1,characterIndexToSlot:
+                    Object.fromEntries(records.characters.map((c,index)=>[c.slotIndex,positions[(offset+index)%6]]))}:null;
+                assert.notEqual(assemble(changed).sha256,projection.sha256);
+            }
+        }
+    }
+});
+
+test("historical v1 partial formation keeps its hash but cannot become complete projection evidence",()=>{
+    const {createRecoveryArchive,inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    const records=sources(3);records.account.formation.characterIndexToSlot={0:"ALLY_F2"};
+    const before=structuredClone(records),snapshot=assembleCanonicalSnapshot("uid-a",7,records);
+    const archive=createRecoveryArchive("uid-a",7,records,snapshot);
+    assert.deepEqual(inspectRecoveryArchive(archive,"uid-a",7,snapshot).account.formation,before.account.formation);
+    assert.throws(()=>assemble(records),/complete formation state/);
+    assert.deepEqual(records,before);
 });
