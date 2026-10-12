@@ -18,7 +18,7 @@ assert.doesNotMatch(inventoryCss,/#game-ui #inventoryPage \.v169-item-art\.v169-
 assert.match(hintCss,/#allElementSkillPreviewModal \.skill-preview-body::before\{[\s\S]*font-size:16px;[\s\S]*line-height:1\.45;/);
 assert.doesNotMatch(hintCss,/body #game-stage #allElementSkillPreviewModal/);
 assert.match(rosterCss,/@media \(max-height:920px\)[\s\S]*v146-home-roster[\s\S]*margin-top:4px;[\s\S]*v146-home-character[\s\S]*min-height:78px;/);
-assert.match(hintCss,/team-relic-home-tools \.home-card-label\{[^}]*font-size:13px;[^}]*line-height:18px;[^}]*font-weight:900;/);
+assert.match(hintCss,/team-relic-home-tools \.home-card-utility \.home-card-label\{[^}]*font-size:15px;[^}]*line-height:22px;[^}]*font-weight:700;/);
 assert.match(hintCss,/home-relic-v174\.eed14e806044\.webp/);
 assert.match(rewardCss,/\.v132-reward-modal \.v132-reward-modal-inner\.v17363-text-reward-preview/);
 assert.doesNotMatch(rewardCss,/#game-stage \.v17363-text-reward-preview/);
