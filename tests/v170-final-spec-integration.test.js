@@ -196,6 +196,7 @@ function makeUniversalNode(){
 }
 
 function makeContext(){
+    let equipmentUidSequence=0;
     const noop=()=>{};
     // The headless DOM must expose the same design-size source as production.
     const displayTokens=Object.fromEntries(Array.from(
@@ -233,7 +234,7 @@ function makeContext(){
         FileReader:function(){ return dummy; },Blob:function(){},URL:{createObjectURL:()=>"",revokeObjectURL:noop},
         fetch:async()=>({ok:true,json:async()=>({}),text:async()=>""}),
         alert:noop,confirm:()=>true,prompt:()=>null,
-        performance:{now:()=>0},crypto:{randomUUID:()=>"v170-test-id"},
+        performance:{now:()=>0},crypto:{randomUUID:()=>"v170-test-id-"+(++equipmentUidSequence)},
         CSS:{escape:value=>String(value)},
         Math:Object.create(Math),Date,Number,String,Boolean,Object,Array,
         Set,Map,WeakMap,WeakSet,Promise,JSON,RegExp,Error,TypeError,parseInt,parseFloat,isNaN
@@ -249,6 +250,7 @@ function loadFinalRuntime(){
     const loaded=[];
     vm.runInContext(fs.readFileSync("functions/src/equipment-combat-percent-migration.js","utf8"),context);
     vm.runInContext(fs.readFileSync("functions/src/equipment-reforge.js","utf8"),context);
+    vm.runInContext(fs.readFileSync("js/equipment-factory.js","utf8"),context);
     vm.runInContext(fs.readFileSync("js/startup/account-save-repository.js","utf8"),context,{filename:"js/startup/account-save-repository.js"});
     vm.runInContext('FourSymbolsAccountSave.activate("v170-test-uid")',context);
     EXPECTED_DIRECT_SCRIPT_PATHS.forEach(path=>{

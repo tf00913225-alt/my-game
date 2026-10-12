@@ -30,6 +30,13 @@ test("legacy main-element alias preserves conflicting equipped pieces in invento
  assert.strictEqual(c.characterEquipment.fire.hand,a);assert.ok(c.inventoryItems.includes(b));
 });
 
+test("inventory stack normalization keeps canonical equipment references and rejects ambiguous stacks atomically",()=>{
+ const c=runtime(),main=read("js/00-main.js"),start=main.indexOf("function cloneInventoryStackItem("),end=main.indexOf("function ",main.indexOf("function normalizeInventoryStacks(")+12);
+ vm.runInContext(main.slice(start,end),c);
+ const item=c.inventoryItems[0];assert.strictEqual(c.cloneInventoryStackItem(item,1),item);
+ item.count=2;const before=JSON.stringify(c.inventoryItems);assert.throws(()=>c.normalizeInventoryStacks());assert.equal(JSON.stringify(c.inventoryItems),before);
+});
+
 test("starter passes actual equip, unequip and sale owners without replacing its identity",async()=>{
  const c=runtime(),main=read("js/00-main.js");
  Object.assign(c,{$:()=>({dataset:{}}),getInventoryEquipmentSlot:t=>t==="weapon"?"hand":t,getBackpackCharacter:()=>({}),getBackpackEquipmentKey:()=>"fire",inventoryCharacterIndex:0,

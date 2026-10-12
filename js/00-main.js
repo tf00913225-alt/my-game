@@ -1446,6 +1446,10 @@ function getInventoryItemMaxStack(item){
 }
 
 function cloneInventoryStackItem(item,count){
+    if(isEquipmentInventoryType(item.type)){
+        if(count!==1){throw Error("裝備不能複製堆疊，保留原資料");}
+        return item;
+    }
     const copy={...item};
     copy.stats=item && item.stats && typeof item.stats==="object"
         ? {...item.stats}
@@ -1455,6 +1459,9 @@ function cloneInventoryStackItem(item,count){
 }
 
 function normalizeInventoryStacks(){
+    if(inventoryItems.some(item=>item&&isEquipmentInventoryType(item.type)&&Number(item.count??1)!==1)){
+        throw Error("舊裝備堆疊數量不明確，保留原資料");
+    }
     const needsNormalization=inventoryItems.some(item=>{
         if(!item || !item.id){
             return true;
