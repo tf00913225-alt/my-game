@@ -42,6 +42,11 @@ function mime(file){
 }
 
 async function startServer({baseUrl}={}){
+    const failures=[];
+    function recordFailure(path,status,message){
+        if(failures.length===40){ failures.shift(); }
+        failures.push({path,status,message});
+    }
     const server=http.createServer(async(req,res)=>{
         const pathname=decodeURIComponent(String(req.url||"/").split("?")[0]);
         const fetchDestination=String(req.headers["sec-fetch-dest"]||"");
@@ -54,10 +59,11 @@ async function startServer({baseUrl}={}){
             // read-only account transport above is isolated from player data.
             try{
                 const upstream=await fetch(new URL(relative,baseUrl.replace(/\/$/,"")+"/"));
+                if(!upstream.ok){ recordFailure(pathname,upstream.status,"upstream HTTP failure"); }
                 res.writeHead(upstream.status,{"content-type":upstream.headers.get("content-type")||mime(relative),"cache-control":"no-store"});
                 if(relative==="index.html"){res.end((await upstream.text()).replace("<!-- build:critical-script -->",qaPrelude()+"\n<!-- build:critical-script -->"));}
                 else{res.end(Buffer.from(await upstream.arrayBuffer()));}
-            }catch(error){res.writeHead(502);res.end(String(error));}
+            }catch(error){recordFailure(pathname,502,String(error.cause?.code||error.code||error.message));res.writeHead(502);res.end(String(error));}
             return;
         }
         const file=path.resolve(ROOT,relative);
@@ -69,7 +75,32 @@ async function startServer({baseUrl}={}){
         fs.createReadStream(file).pipe(res);
     });
     await new Promise(resolve=>server.listen(0,"127.0.0.1",resolve));
-    return {server,url:`http://127.0.0.1:${server.address().port}/index.html`};
+    return {server,url:`http://127.0.0.1:${server.address().port}/index.html`,failures};
+}
+
+// Failure-only evidence: read the formal startup Owner; never change its state,
+// account, saved data, timeout or acceptance condition.
+async function collectStartupFailure(cdp,context){
+    const evidence={...context};
+    let timer;
+    try{
+        evidence.startup=await Promise.race([
+            cdp.eval(`(()=>{const error=window.FourSymbolsStartupPolicy?.getLastError?.();return {state:window.FourSymbolsStartupPolicy?.getState?.()||null,error:error?{message:String(error.message||error),code:error.code||null}:null,loaderHidden:document.getElementById('startupLoader')?.hidden??null,authVisible:document.getElementById('firebaseAuthOverlay')?.classList.contains('show')??null,failedResources:window.FourSymbolsFirstPlay?.getLastFailed?.()||[],marks:performance.getEntriesByType('mark').filter(item=>item.name.startsWith('four-symbols:')).map(item=>({name:item.name,startTime:item.startTime}))};})()`),
+            new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Startup evidence capture timeout')),3000);})
+        ]);
+    }catch(error){ evidence.captureError=String(error.message); }
+    finally{ clearTimeout(timer); }
+    const pathname=url=>{try{return new URL(url).pathname;}catch(_){return null;}};
+    const events=cdp?.events||[];
+    const requests=new Map(events.filter(event=>event.method==='Network.requestWillBeSent').map(event=>[event.params.requestId,pathname(event.params.request.url)]));
+    evidence.network=events.filter(event=>
+        event.method==='Network.loadingFailed'||event.method==='Network.responseReceived'&&event.params.response.status>=400
+    ).slice(-40).map(event=>event.method==='Network.loadingFailed'
+        ?{method:event.method,path:requests.get(event.params.requestId)||null,error:event.params.errorText,canceled:!!event.params.canceled}
+        :{method:event.method,path:pathname(event.params.response.url),status:event.params.response.status});
+    for(const event of events){if(event.method==='Network.loadingFinished'||event.method==='Network.loadingFailed'){requests.delete(event.params.requestId);}}
+    evidence.pendingResources=[...requests.values()].slice(-40);
+    return evidence;
 }
 
 function waitJson(url){
@@ -110,4 +141,4 @@ class Cdp{
 }
 
 
-export {ASSET_MANIFEST,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE,qaPrelude,findChrome,startServer,waitJson,Cdp};
+export {ASSET_MANIFEST,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE,qaPrelude,findChrome,startServer,waitJson,Cdp,collectStartupFailure};
