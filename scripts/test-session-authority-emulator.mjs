@@ -973,7 +973,9 @@ for(const [key,state] of Object.entries({
     "progress":{eliteKills:0,dungeonWins:0,abyssClears:0},
     "quest-milestones":{date:new Date(initialPlayableFields.lastSaveTimestamp).toISOString().slice(0,10),
         daily:{},commission:{}},
-    "abyss-state":initialArchive.get("sourceRecords.progress.abyssProgress")
+    "abyss-state":initialArchive.get("sourceRecords.progress.abyssProgress"),
+    "legacy-abyss-state":{active:false,floor:1,phase:"boss",x:50,y:84,
+        message:"",clears:0,rewardVersion:1}
 })){
     assert.deepEqual(initialTimeSidecars[key],{status:"present",raw:JSON.stringify(state)});
 }
@@ -1003,6 +1005,9 @@ assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/2`).get())
 assert.equal((await db.doc(`serverUsers/${y}/characters/character-${initialOperation}`).get())
     .get("state.skillPoints"),2);
 assert.equal((await initialWriter.commitInitialSources(yRequest,initialArgs)).unchanged,true);
+assert.deepEqual((await db.doc(`serverUsers/${y}/progress/current`).get())
+    .get("sidecars.legacy-abyss-state"),initialTimeSidecars["legacy-abyss-state"]);
+assert.deepEqual((await db.doc(`serverUsers/${y}/recoveryArchives/2`).get()).data(),initialArchive.data());
 await assert.rejects(initialWriter.commitInitialSources(yRequest,
     {...initialArgs,selection:{...choices,element:"fire"}}),error=>error.code==="data-loss");
 await assert.rejects(initialWriter.commitInitialSources(yRequest,
