@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
-import {findChrome,startServer,waitJson,Cdp,ASSET_MANIFEST} from './runtime-browser-qa-support.mjs';
+import {findChrome,startServer,waitJson,Cdp,ASSET_MANIFEST,collectStartupFailure} from './runtime-browser-qa-support.mjs';
 const out='artifacts/browser-qa';fs.mkdirSync(out,{recursive:true});
 const baseUrl=process.env.QA_BASE_URL||'';
 const expected=process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local';
@@ -14,18 +14,18 @@ const measure=`(()=>{const shell=document.querySelector('.native-bottom-nav-laye
 const rows=[];const returns=[];const results=[];
 async function run(width,height){
  const port=9850+Math.floor(Math.random()*100),profile=fs.mkdtempSync(path.join(os.tmpdir(),'foreground-potion-'));
- const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});let c;
+ const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});let c;let phase='chrome-startup';
  try{
  const page=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(p=>p.type==='page');c=new Cdp(page.webSocketDebuggerUrl);
- await c.send('Page.enable');await c.send('Runtime.enable');await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
+ await c.send('Page.enable');await c.send('Runtime.enable');await c.send('Network.enable');await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
  // Reset only this disposable transport UID in the new document, AFTER the
  // old production pagehide autosave. Keep the real reload/startup lifecycle.
  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:"for(const key of Object.keys(localStorage)){if(key.startsWith('four_symbols_save:skill-runtime-browser-qa')||key.startsWith('four_symbols_save_meta:skill-runtime-browser-qa'))localStorage.removeItem(key);}"});
  async function navigate(method,params){const loads=c.events.filter(e=>e.method==='Page.loadEventFired').length;await c.send(method,params);const end=Date.now()+30000;while(c.events.filter(e=>e.method==='Page.loadEventFired').length===loads){if(Date.now()>end)throw Error('Document load timeout');await new Promise(r=>setTimeout(r,50));}}
- await navigate('Page.navigate',{url:server.url});
+ phase='document-load';await navigate('Page.navigate',{url:server.url});phase='startup-cold';
  await c.send('Page.bringToFront');await c.send('Emulation.setFocusEmulationEnabled',{enabled:true});
  await c.eval(`(async()=>{for(let i=0;i<600;i++){if(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'))return;await new Promise(r=>setTimeout(r,50));}throw Error('Startup/auth not ready');})()`);
- await c.eval("closeHomeFeature();showPage('home');openHomeFeature('character')");
+ phase='foreground-and-potions';await c.eval("closeHomeFeature();showPage('home');openHomeFeature('character')");
  const cold=await c.eval(measure);assert.equal(cold.visible,false);assert.equal(cold.hitboxes,0);await c.eval('closeHomeFeature()');assert.equal((await c.eval(measure)).visible,true);
  await c.eval(`(async()=>{document.querySelector('#homePage .team-relic-home-entry').click();for(let i=0;i<600;i++){if(document.getElementById('homeFeatureModal').classList.contains('team-relic-modal'))return;await new Promise(r=>setTimeout(r,50));}throw Error('Cold relic failed to open');})()`);const coldRelic=await c.eval(measure);assert.equal(coldRelic.visible,false);assert.equal(coldRelic.hitboxes,0);await c.eval('closeHomeFeature()');assert.equal((await c.eval(measure)).visible,true);
  await c.eval(`(async()=>{for(const f of ['gameplay-core','patrol','boss-tower','abyss'])await FourSymbolsFeatures.ensure(f,'foreground-potion-qa');closeHomeFeature();showPage('home');})()`);
@@ -91,10 +91,11 @@ async function run(width,height){
  for(const guard of potions.guards)assert.deepEqual(guard,{route:guard.route,hp:4066,sp:1066,rareHP:1,rareSP:1,hpStock:0,spStock:0});
  assert.equal(potions.legacy.hp,321);assert.equal(potions.legacy.sp,456);assert.ok(potions.legacy.items.every(x=>x.mode==='flat'&&x.value===66&&x.percent===undefined));assert.equal(potions.shopFlat,true);assert.equal(potions.oldShopNote,false);
  results.push({width,height,cold,coldRelic,potions,reload:false});console.log('Actual potion settlement PASS',width,JSON.stringify(potions));
- await c.eval("showPage('home');openHomeFeature('character')");await navigate('Page.reload',{ignoreCache:true});await c.send('Page.bringToFront');await c.eval(`(async()=>{for(let i=0;i<600;i++){if(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')){closeHomeFeature();showPage('home');return;}await new Promise(r=>setTimeout(r,50));}throw Error('Reload startup/auth not ready '+JSON.stringify({state:window.FourSymbolsStartupPolicy?.getState?.(),error:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||''),text:document.body.innerText.slice(0,1000)}));})()`);assert.equal((await c.eval(measure)).visible,true);
+ phase='startup-reload';await c.eval("showPage('home');openHomeFeature('character')");await navigate('Page.reload',{ignoreCache:true});await c.send('Page.bringToFront');await c.eval(`(async()=>{for(let i=0;i<600;i++){if(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')){closeHomeFeature();showPage('home');return;}await new Promise(r=>setTimeout(r,50));}throw Error('Reload startup/auth not ready '+JSON.stringify({state:window.FourSymbolsStartupPolicy?.getState?.(),error:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||''),text:document.body.innerText.slice(0,1000)}));})()`);assert.equal((await c.eval(measure)).visible,true);
  results.at(-1).reload=true;
- }finally{c?.close();proc.kill('SIGKILL');fs.rmSync(profile,{recursive:true,force:true});}
+ }catch(error){error.diagnostics=await collectStartupFailure(c,{width,height,phase,proxyFailures:server.failures.slice()});throw error;}
+ finally{c?.close();proc.kill('SIGKILL');fs.rmSync(profile,{recursive:true,force:true});}
 }
 try{for(const [w,h] of [[390,844],[412,915]])await run(w,h);const result={passed:true,expected,environment:baseUrl?'deployed-dev':'local-production',rows,returns,results};fs.writeFileSync(`${out}/foreground-potion-qa.json`,JSON.stringify(result,null,2)+'\n');console.log('Foreground/Potion QA PASS',rows.length,'panel transitions',results.map(x=>x.potions.rows.length));}
-catch(error){fs.writeFileSync(`${out}/foreground-potion-qa.json`,JSON.stringify({passed:false,error:String(error.stack),rows,returns,results},null,2));throw error;}
+catch(error){fs.writeFileSync(`${out}/foreground-potion-qa.json`,JSON.stringify({passed:false,error:String(error.stack),diagnostics:error.diagnostics,rows,returns,results},null,2));throw error;}
 finally{await new Promise(r=>server.server.close(r));}
