@@ -30,7 +30,7 @@ function sources(count=1){
         progress:{...base,dailyQuestState:{claimed:true},commissionQuestState:{},achievementState:{},
             gameplayProgress:{},abyssProgress:JSON.parse(makeInitialSidecars(1700000000000)["abyss-state"].raw),
             sidecars:Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>
-                [key,makeInitialSidecars(1700000000000)[key].status==="present"?
+                [key,key!=="legacy-abyss-state"&&makeInitialSidecars(1700000000000)[key].status==="present"?
                     makeInitialSidecars(1700000000000)[key]:
                     {status:"present",raw:JSON.stringify(key==="daily-dungeon-state"?
                         {date:"2020-02-29",used:{exp:true,material:false,equipment:true}}:
@@ -212,7 +212,7 @@ test("projection rejects oversized and non-JSON payloads before serialization ca
         Array.from({length:20},(_,i)=>[i,"x".repeat(60000)]));assert.throws(()=>assemble(large));
     const expanded=sources();
     for(const [key,entry] of Object.entries(expanded.progress.sidecars)){
-        if(makeInitialSidecars(1)[key].status!=="present"){
+        if(key==="legacy-abyss-state"||makeInitialSidecars(1)[key].status!=="present"){
             entry.raw=["daily-dungeon-state","equipment-shop-daily","legacy-abyss-state"].includes(key)?
                 entry.raw+" ".repeat(62000):JSON.stringify({data:"x".repeat(62000)});
         }
