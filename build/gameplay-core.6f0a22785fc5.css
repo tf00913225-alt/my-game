@@ -6546,6 +6546,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     will-change:auto !important;
 }
 /* ----- Character: same Large Panel frame as shop; only tab content changes. ----- */
+#game-ui #homeFeatureModal .home-feature-modal-box.hero-panel,
 #game-ui #homeFeatureModal .home-feature-modal-box.wide{
     width:calc(100% - var(--ui-large-panel-safe-space)) !important;
     max-width:var(--ui-large-panel-max-width) !important;
@@ -6557,6 +6558,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
+#game-ui #homeFeatureModal .home-feature-modal-box.hero-panel #homeFeatureModalBody,
 #game-ui #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
     display:flex !important;
     flex:1 1 auto !important;
@@ -6565,6 +6567,74 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     min-height:0 !important;
     overflow:hidden !important;
 }
+/* Hero page shares the Large Panel frame; only its declared content viewport scrolls. */
+#game-ui #homeFeatureModal .hero-page-shell{
+    display:flex;flex-direction:column;flex:1;min-height:0;gap:var(--ui-large-panel-content-gap);
+    color:#f4ead4;font-size:15px;line-height:1.6;
+}
+#game-ui #homeFeatureModal .hero-picker{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;flex:0 0 auto;
+}
+#game-ui #homeFeatureModal .hero-picker-button{
+    display:flex;align-items:center;gap:8px;padding:8px;margin:0;min-width:0;
+    border:1px solid #80603c;border-radius:8px;background:linear-gradient(135deg,#201b16,#100f0d);
+    color:inherit;text-align:left;font-size:15px;line-height:1.4;cursor:pointer;
+}
+#game-ui #homeFeatureModal .hero-picker-button[aria-pressed="true"]{
+    border-color:#e6bb69;box-shadow:inset 0 0 14px #c89a482b;background:linear-gradient(135deg,#382719,#17130f);
+}
+#game-ui #homeFeatureModal .hero-picker-button img{width:42px;height:56px;object-fit:contain;flex:0 0 auto;}
+#game-ui #homeFeatureModal .hero-picker-button b{display:block;font-size:16px;}
+#game-ui #homeFeatureModal .hero-picker-button small{display:block;font-size:14px;color:#d5bd93;}
+#game-ui #homeFeatureModal .hero-page-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:0 0 auto;}
+#game-ui #homeFeatureModal .hero-page-tabs button,
+#game-ui #homeFeatureModal .hero-roster-actions button{
+    min-height:42px;padding:8px;border:1px solid #80603c;border-radius:6px;background:#17130f;
+    color:#f4ead4;font-size:15px;line-height:1.4;cursor:pointer;
+}
+#game-ui #homeFeatureModal .hero-page-tabs button[aria-selected="true"]{border-color:#e6bb69;background:#382719;color:#ffe0a0;}
+#game-ui #homeFeatureModal .hero-page-content{
+    flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+    touch-action:pan-y;scrollbar-gutter:stable;padding:0 4px 12px;
+}
+#game-ui #homeFeatureModal .hero-profile{display:grid;grid-template-columns:minmax(100px,.85fr) minmax(0,1.15fr);gap:12px;align-items:center;}
+#game-ui #homeFeatureModal .hero-profile-art{
+    display:grid;place-items:center;aspect-ratio:3/4;width:100%;max-width:180px;justify-self:center;
+    border-radius:10px;background:radial-gradient(ellipse at center,#51402b66,transparent 70%);
+}
+#game-ui #homeFeatureModal .hero-profile-art img{width:100%;height:100%;object-fit:contain;}
+#game-ui #homeFeatureModal .hero-profile-summary p{margin:4px 0;}
+#game-ui #homeFeatureModal .hero-profile-summary small{font-size:14px;color:#d5bd93;}
+#game-ui #homeFeatureModal .hero-page-shell h3{font-size:18px;line-height:1.5;margin:0 0 6px;color:#efcb83;}
+#game-ui #homeFeatureModal .hero-page-section{margin-top:16px;padding-top:12px;border-top:1px solid #80603c88;}
+#game-ui #homeFeatureModal .hero-page-section p{margin:6px 0;}
+#game-ui #homeFeatureModal .hero-page-note{font-size:14px;line-height:1.6;color:#d5bd93;margin:10px 0;}
+#game-ui #homeFeatureModal .hero-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin:0;}
+#game-ui #homeFeatureModal .hero-stat-grid > div{display:flex;justify-content:space-between;gap:8px;min-width:0;}
+#game-ui #homeFeatureModal .hero-stat-grid dt{color:#d5bd93;}
+#game-ui #homeFeatureModal .hero-stat-grid dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums;}
+#game-ui #homeFeatureModal .hero-roster-list{list-style:none;padding:0;margin:12px 0;display:grid;gap:12px;}
+#game-ui #homeFeatureModal .hero-roster-slot{
+    display:grid;grid-template-columns:20px 42px minmax(0,1fr);gap:8px;align-items:center;
+    padding:10px;border-top:1px solid #80603c;border-bottom:1px solid #80603c;background:linear-gradient(90deg,#34271b55,transparent);
+}
+#game-ui #homeFeatureModal .hero-roster-slot > img{width:42px;height:56px;object-fit:contain;}
+#game-ui #homeFeatureModal .hero-roster-slot > b{font-size:16px;}
+#game-ui #homeFeatureModal .hero-roster-actions{grid-column:2/4;display:flex;gap:8px;}
+#game-ui #homeFeatureModal .hero-roster-actions button{flex:1;}
+#game-ui #homeFeatureModal .hero-roster-empty{grid-template-columns:20px 1fr;min-height:62px;color:#d5bd93;}
+#game-ui #homeFeatureModal .hero-page-footer{flex:0 0 auto;border-top:1px solid #80603c;padding-top:8px;}
+#game-ui #homeFeatureModal .hero-page-footer > span{display:block;font-size:14px;color:#d5bd93;margin-bottom:6px;}
+#game-ui #homeFeatureModal .hero-page-footer > div{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+#game-ui #homeFeatureModal .hero-page-shell .main-button{margin:0;min-height:44px;font-size:15px;line-height:1.4;padding:10px;}
+#game-ui #homeFeatureModal .hero-page-shell button:disabled{opacity:.5;cursor:default;}
+#game-ui #homeFeatureModal .hero-page-shell button:focus-visible{outline:2px solid #e6bb69;outline-offset:2px;}
+@media(min-width:620px){
+    #game-ui #homeFeatureModal .hero-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+    #game-ui #homeFeatureModal .hero-roster-slot{grid-template-columns:20px 42px minmax(0,1fr) minmax(210px,1fr);}
+    #game-ui #homeFeatureModal .hero-roster-actions{grid-column:4;}
+}
+
 /* Reserve the two existing 38px action rows plus their 6px gap, including
    tabs where the contextual preview action is hidden. */
 #game-ui #homeFeatureModal .home-feature-modal-box.wide .home-feature-modal-title > div{

@@ -1,4 +1,4 @@
-# Hero System V1 — Phase 1, Phase 2A and Phase 2B
+# Hero System V1 — Phase 1, Phase 2A, Phase 2B and Phase 2C UI
 
 Work ID: HERO-CORE-PHASE1-20261007. Target: dev. Base dev: c1475726961a352811b195d65f7f54e905a80c5c.
 
@@ -56,8 +56,18 @@ Hero skills use Core-projected skill level and final skillDatabase through `cast
 
 Battle artwork maps stable Hero IDs to `assets/heroes/divine-dog-hongbao.webp` and `assets/heroes/vajra-heavenly-king.webp`. Sources are the two PNGs under `assets/inbox/英雄or怪物立繪/英雄/` at assets-library `7a6d7feb73a940a1a2599de261787f051c5841cc`. Lossless WebP preserves the original 1086×1448 RGBA canvas byte-for-byte without cropping/resizing. Existing combatant presentation uses contain.
 
-Equipment must later share the player equipment/inventory Owner with exclusive physical item ownership (no simultaneous copies). Hero page, equipment, acquisition rewards/login/story/activity fragments and additional skill AI remain subsequent phases.
+Equipment must later share the player equipment/inventory Owner with exclusive physical item ownership (no simultaneous copies). Equipment, acquisition rewards/login/story/activity fragments and additional skill AI remain subsequent phases.
 
 DEV battle preview: only the exact `dev.four-symbols-dev.pages.dev` hostname automatically supplies the two current heroes to the battle-domain projection. `FourSymbolsHeroSystem.getDomain({forBattle:true})` creates a disposable Core account copy for locked heroes, with a stable test seed; existing owned heroes retain all progression. The ordinary domain, canonical `heroAccountState`, save/load and reward claims remain unchanged. No preview entitlement exists on production, root/preview Pages URLs or localhost. The default unlocked roster therefore includes both heroes on DEV; explicit session roster selection still works. This is testing access, not chapter/login acquisition or a permanent grant.
 
 Regression: `tests/hero-core-phase1.test.js`; existing account ownership, legacy hydration and player six-stat tests remain applicable. PR is the live CI/merge/closeout Owner.
+
+## Phase 2C — Hero page and session roster
+
+Work ID: HERO-PAGE-ROSTER-20261012. The existing rest window opens the Hero page through `heroHomeEntry`, using the existing gameplay-core feature intent boundary and `openHomeFeature`/`closeHomeFeature` modal lifecycle. The page shares the Large Panel frame and declares one vertical content scroll owner; portraits reuse the existing WebP artwork Owner with contain presentation.
+
+Profiles read registry metadata, canonical stars/fragments, projected level/six stats/base combat stats/skill definition from the current Core adapter. Locked heroes can be browsed but cannot be fielded; unavailable allocation/combat stats show no fabricated values. DEV preview eligibility is visibly marked separately from canonical ownership. The page grants no chapter/login rewards or ownership and performs no star, fragment, marrow, equipment or Cloud transaction.
+
+`FourSymbolsHeroBattle.getRoster()` returns a copy of the existing effective roster. UI controls use its existing `setRoster` and `useUnlockedRoster` APIs for admission, removal, ordering and reset. Three Hero slots are displayed, while the production registry still has only two definitions. Formation is session-only and does not survive reload; no permanent Save field is added. Battle-time changes are blocked by the runtime battle flag, independently of disabled controls. Battle creation consumes the same selection and retains formal `heroNpc` identities.
+
+Regression: `tests/hero-page-roster.test.js` covers locked/owned/DEV projections, 0–3 capacity using a third-Hero test fixture, order/reset, battle-time guards and canonical isolation. `run-hero-page-browser-qa.mjs` verifies the production rest entry, real touch controls and scroll, mobile/tablet geometry, WebP presentation, modal return and actual UID-local save isolation; the existing UI CI and fixed-SHA DEV responsive verification jobs run it without an additional workflow.
