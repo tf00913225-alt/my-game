@@ -1,5 +1,15 @@
 # Hero System V1 — Phase 1, Phase 2A, Phase 2B and Phase 2C UI
 
+## Formal growth — HERO-GROWTH-20261012
+
+User scope: fragment unlock, star-up and marrow reroll UI, legal atomic resource consumption and idempotency. Formal resource issuance remains a later scope. Exact DEV hostname may activate a disposable in-memory fixture (500 fragments per registered Hero, 5 marrow pills); reopening cannot refill it, reload/account/session reset discards it, and it never calls a grant endpoint or writes Save/rights. The main-city former rest entry now opens Hero System directly; free rest remains accessible from its footer.
+
+`functions/src/hero-growth.js` uses unchanged Hero Core APIs. Its only persistent growth source is existing `progress/current.playableState.heroAccount`; marrow comes from existing canonical bag inventory. It verifies original canonical sources/snapshot/recovery archive and acquisition rights inside the existing active-session transaction. Local fragments/stars/pills or historical save imports are never accepted. No new Hero Save, resource minting, combat execution or readiness=true publication is enabled. Missing canonical character coverage blocks formal growth, while the explicitly isolated DEV fixture remains usable.
+
+Protected `readHeroGrowth` and `mutateHeroGrowth` accept identity/session and intent (Hero ID, action, operation ID, expected revision) only. Core supplies 100-fragment unlock, 25/50/75/100/150 star costs, max five stars and one-pill reroll. Server entropy is captured once outside transaction retries. Canonical sources, next revision, snapshot/archive, immutable operation/ledger and fragment-unlock unique claim (`hero-fragment-v1-<Hero>`) commit together. Replay verifies original receipt/ledger/archive; mismatched intent, stale new operations, corrupt/missing evidence and insufficient resources fail closed. Consumed empty item records disappear only from current inventory; original archives and receipts remain retained. Story/login acquisition retains independent unique source records and grants no growth resources; an already unlocked canonical Hero retains its growth seed when the later direct source is observed.
+
+Client growth uses confirmed records; unknown outcomes retain the exact pending intent for identical retry, UID/session changes invalidate proof/test fixtures, and battle-time growth is blocked. Formal resources begin at zero; no historical admission, resource grant writer, complete publication or second-device playable recovery is added. Work PR owns latest CI/emulator/browser/deployment acceptance.
+
 Work ID: HERO-CORE-PHASE1-20261007. Target: dev. Base dev: c1475726961a352811b195d65f7f54e905a80c5c.
 
 ## Formal domain and APIs

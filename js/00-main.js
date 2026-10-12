@@ -198,6 +198,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 
 
 
+
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
    - 遊戲邏輯舞台固定 1080 × 1920
@@ -661,6 +662,9 @@ window.FourSymbolsHeroSystem=Object.freeze({
         const core=window.FourSymbolsHeroCore;
         const domain=account=>core.createDomain(account,
             ()=>[player,player2,player3],calculateCharacterBaseStats,id=>skillDatabase[id]);
+        const growth=window.FourSymbolsHeroGrowth?.getAccount?.();
+        const growthStatus=window.FourSymbolsHeroGrowth?.getStatus?.();
+        if(growth&&(!growthStatus.testMode||forBattle)){return domain(growth);}
         let account=core.normalizeAccountState(heroAccountState);
         // Saved unlocked flags are caches, not permanent acquisition rights.
         // Re-project only the same-UID protected backend entitlement snapshot.
@@ -669,7 +673,7 @@ window.FourSymbolsHeroSystem=Object.freeze({
             if(grant){
                 if(!account.heroes[id].unlocked){account=domain(account).unlockHeroDirect(id,grant.allocationSeed);}
                 else{account.heroes[id].allocationSeed=grant.allocationSeed;}
-            }else{account.heroes[id].unlocked=false;}
+            }else{account.heroes[id].unlocked=false;account.heroes[id].stars=0;}
         }
         // DEV battle preview only: never mutate canonical account or claim rewards.
         if(forBattle&&window.location?.hostname==="dev.four-symbols-dev.pages.dev"){
@@ -24997,10 +25001,11 @@ function getHeroPageSnapshot(){
     const created=getCharacters().some(character=>character&&String(character.id||"").trim());
     return {roster:window.FourSymbolsHeroBattle.getRoster(),maxHeroes:window.FourSymbolsHeroBattle.maxHeroes,
         acquisition:window.FourSymbolsHeroAcquisition?.getStatus?.()||{ready:false,busy:false,loginCount:null,chapter:null},
+        growth:window.FourSymbolsHeroGrowth?.getStatus?.()||{ready:false,busy:false,marrowPills:0},
         editingAllowed:!battleActive&&created,
         heroes:domain.listHeroDefinitions().map(definition=>{
             const id=definition.heroId,eligible=domain.isHeroUnlocked(id),owned=canonical.isHeroUnlocked(id);
-            return {definition,account:canonical.getHeroAccountState(id),eligible,owned,
+            return {definition,account:(window.FourSymbolsHeroGrowth?.getAccount?.()?.heroes[id]||canonical.getHeroAccountState(id)),eligible,owned,
                 level:created?domain.getHeroLevel(id):null,
                 points:created&&eligible?domain.getHeroAllocatedStats(id):null,
                 stats:created&&eligible?domain.getHeroBaseStats(id):null,
@@ -25056,6 +25061,7 @@ function renderHeroPageContent(){
                 <button type="button" class="main-button" onclick="FourSymbolsHeroAcquisition.refresh()" ${data.acquisition.busy?"disabled":""}>${data.acquisition.busy?"同步中":"同步取得紀錄"}</button>
                 ${data.acquisition.chapter?.phase==="active"&&data.acquisition.chapter.nextNodeId===window.FourSymbolsAdventureContent?.chapters[data.acquisition.chapter.chapterId]?.endNodeId?'<button type="button" class="main-button" onclick="FourSymbolsHeroAcquisition.claimChapterHero()">取得神犬紅包</button>':""}
             </section>
+            ${renderHeroGrowthControls(hero,data)}
             <section class="hero-page-section"><h3>六圍配點</h3>${rows(Object.entries(STAT_NAMES),hero.points)}</section>
             <section class="hero-page-section"><h3>基礎戰鬥數值</h3>${rows([["maxHP","HP"],["maxSP","SP"],["attack","物理攻擊"],["magicAttack","法術攻擊"],["defense","防禦力"],["speed","速度"]],hero.stats)}</section>
             <section class="hero-page-section"><h3>怒氣技能：${escape(hero.skill?.definition?.name||"—")} ${hero.skill?"Lv."+hero.skill.level:""}</h3>
@@ -25070,9 +25076,27 @@ function renderHeroPageContent(){
             <button id="heroRosterTab" type="button" role="tab" aria-selected="${heroPageTab==="roster"}" aria-controls="heroPageContent" onclick="switchHeroPageTab('roster')">上場編隊</button></div>
         <div id="heroPageContent" class="hero-page-content" role="tabpanel" aria-labelledby="${heroPageTab==="details"?"heroDetailsTab":"heroRosterTab"}" data-scroll-owner="y">${content}</div>
         <div class="hero-page-footer"><span id="heroRosterCount">已安排 ${data.roster.length} / ${data.maxHeroes} 名英雄${battleActive?"・戰鬥中無法更動":""}</span><div>
-            <button type="button" class="main-button" onclick="openHomeFeature('rest')">返回休息</button>
+            <button type="button" class="main-button" onclick="openHomeFeature('rest')">免費休息</button>
             <button id="heroRosterToggle" type="button" class="main-button" data-hero-id="${escape(hero?.definition.heroId||"")}" onclick="toggleHeroPageRoster(this.dataset.heroId)" ${blocked?"disabled":""}>${!hero?.eligible?"尚未解鎖":selected?"休戰":"出戰"}</button>
         </div></div></div>`;
+}
+window.isHeroGrowthBattleActive=()=>battleActive;
+function renderHeroGrowthControls(hero,data){
+    const state=hero.account,g=data.growth,d=window.FourSymbolsHeroCore.createDomain(
+        {schemaVersion:1,heroes:{[state.heroId]:state}},()=>[],()=>null,()=>null);
+    const blocked=battleActive||g.busy||!g.ready;
+    const button=(action,label,available)=>`<button type="button" class="main-button" data-hero-id="${heroPageHtml(state.heroId)}" onclick="FourSymbolsHeroGrowth.mutate(this.dataset.heroId,'${action}')" ${blocked||!available?"disabled":""}>${label}</button>`;
+    return `<section class="hero-page-section"><h3>英雄成長${g.testMode?"（DEV 隔離測試）":""}</h3>
+        <p>專屬碎片 ${state.specificFragments}・洗髓丹 ${g.marrowPills}</p>
+        <p>解鎖需 100 碎片；升星依序需 25／50／75／100／150 碎片；洗髓消耗 1 顆洗髓丹，重新分配全部成長點數。</p>
+        <p class="hero-page-note">正式資源取得來源尚未開放。${g.testMode?"測試資源與成長不保存，重新載入即消失。":"正式操作需連線確認資源。"}</p>
+        ${g.error?`<p role="status">${heroPageHtml(g.error)}</p>`:""}
+        <button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.read()" ${g.busy?"disabled":""}>同步成長紀錄</button>
+        ${g.devAvailable&&!g.testMode?'<button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.testResources()">啟用 DEV 隔離測試資源</button>':""}
+        ${button("unlock","碎片解鎖（100）",d.canUnlockHero(state.heroId))}
+        ${button("starUp",state.stars===5?"已達五星":`升星（${d.getHeroStarCost(state.stars)} 碎片）`,d.canStarUpHero(state.heroId))}
+        ${button("reroll","洗髓（1 顆）",d.canReroll(state.heroId,g.marrowPills))}
+        ${g.pending?`<p role="status">請重試前次操作確認結果。</p><button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.retry()" ${g.busy?"disabled":""}>確認前次操作</button>`:""}</section>`;
 }
 function refreshHeroPage(preserveScroll=false){
     if(!$("homeFeatureModal")?.querySelector(".hero-panel"))return;

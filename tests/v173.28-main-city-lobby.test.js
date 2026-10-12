@@ -50,7 +50,9 @@ test("character and shop are the only two primary entrances",()=>{
 test("four daily facilities and four recessive tools preserve all eight functions",()=>{
     assert.equal(count(actions,/class="home-card home-card-secondary"/g),4);
     assert.equal(count(actions,/class="home-card home-card-tertiary"/g),4);
-    ["rest","synthesis","quest","forge","achievement","announcement","offlineExp","system"].forEach(type=>assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)")));
+    ["hero","synthesis","quest","forge","achievement","announcement","offlineExp","system"].forEach(type=>assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)")));
+    assert.match(actions,/aria-label="英雄系統"/);
+    assert.match(read("js/00-main.js"),/onclick="openHomeFeature\('rest'\)"/); // Free rest remains reachable from Hero.
     assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-template-columns:repeat\(2,minmax\(64px,20%\)\);[^}]*grid-auto-rows:68px;/);
     assert.doesNotMatch(baseCss,/margin-inline-(?:start|end):(34|68)px/);
     assert.match(baseCss,/\.home-card-secondary\{[^}]*width:100%;[^}]*height:68px;[^}]*border:1px solid[^}]*background:rgba\(17,20,16,.92\)/);
@@ -73,7 +75,7 @@ test("offline/system use the persistent tools while relic and element box retain
 });
 
 test("all ten existing entry IDs and click contracts remain intact",()=>{
-    const entries={Character:"character",Shop:"shop",Rest:"rest",Synthesis:"synthesis",Quest:"quest",Forge:"forge",Achievement:"achievement",Announcement:"announcement",OfflineExp:"offlineExp",System:"system"};
+    const entries={Character:"character",Shop:"shop",Rest:"hero",Synthesis:"synthesis",Quest:"quest",Forge:"forge",Achievement:"achievement",Announcement:"announcement",OfflineExp:"offlineExp",System:"system"};
     Object.entries(entries).forEach(([id,type])=>{
         assert.equal(count(actions,new RegExp('id="homeIcon'+id+'"','g')),1);
         assert.equal(count(actions,new RegExp("openHomeFeature\\('"+type+"'\\)",'g')),1);

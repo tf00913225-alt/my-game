@@ -4,6 +4,8 @@
 
 ## Hero System V1
 
+成長操作沿用 `functions/src/hero-core.js`；`functions/src/hero-growth.js` 在既有 protected transaction 中核對 canonical Hero／背包來源，以同一 revision 原子寫入扣除、收據／帳本及 snapshot／archive。正式資源來源另期，DEV 隔離測試只存在記憶體。主城原休息入口直接進英雄系統，免費休息保留於英雄頁。詳細邊界與驗證依 `docs/HERO_SYSTEM_V1.md` 的 Formal growth 與 Work PR。
+
 唯一 Hero Domain Owner 為 `functions/src/hero-core.js`，玩家與 main-save adapter 在 `js/00-main.js::FourSymbolsHeroSystem`。Registry／最低已建立玩家等級投影／無 EXP／衍生 Skill Level／0–5 星／碎片成本／seed weighted allocation／洗髓／永久 schema 由 `docs/HERO_SYSTEM_V1.md` 定義。Hero account 進既有 UID main-save，不新增 sidecar；Rage 與 passive stacks 不持久化。Phase 2A 的 `js/00-main.js::FourSymbolsHeroBattle` 只接入上場／普攻／受擊／死亡／合法復活／行動序與同一 Statistics Owner；3 玩家＋最多 3 Hero 共用既有 Slot／Target／Hit／Damage／Status／Flow。Hero 使用 `heroNpc` 身份與 battle-only state，不能取得玩家 Skill Key 或保存 HP／狀態／臨時站位。Phase 2B 的 Rage／Hero Skill／Passive／立繪由同一 battle adapter 與 Combat Events 接入；怒氣只存在正式 battle actor，技能讀 Core level 並走既有結算 Owner。Phase 2C 的主城休息→英雄頁提供 Core 唯讀投影與 session-only 編隊，沿用原 Roster／Large Panel／Touch Owner；DEV 試用不變成永久所有權。正式取得由 Hero Acquisition Owner 的伺服器日期／第一章有限票券與單次結算接入，既有 unlocked／seed 只作本機快取；跨 UID／舊存檔不得重開唯一領取。完整 Cloud Save、Equipment／Fragment Reward 留待後續；取得邊界與驗證由 Hero 契約與 Work PR 管理。
 
 ## 道具取得與補品收斂（2026-10-07）

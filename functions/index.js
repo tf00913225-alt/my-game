@@ -10,6 +10,7 @@ const {createSessionAuthority}=require("./src/session-authority");
 const {createTrustedGrantLedger}=require("./src/trusted-grant-ledger");
 const {createCanonicalResourceCredit}=require("./src/canonical-resource-credit");
 const {createHeroAcquisition}=require("./src/hero-acquisition");
+const {createHeroGrowth}=require("./src/hero-growth");
 const {createLegacyCandidateScreening}=require("./src/legacy-candidate-screening");
 const {createCanonicalRecoveryApproval}=require("./src/canonical-recovery-approval");
 const {createCanonicalCurrentRecovery}=require("./src/canonical-current-recovery");
@@ -47,6 +48,8 @@ const heroAcquisition=createHeroAcquisition({
     db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
     inspectExistingEnvelope,nextRevision
 });
+const heroGrowth=createHeroGrowth({db:getFirestore(),FieldValue,HttpsError,
+    runProtected:sessions.runProtected,inspectExistingEnvelope,nextRevision,acquisition:heroAcquisition});
 const legacyCandidateScreening=createLegacyCandidateScreening({
     db:getFirestore(),HttpsError,runProtected:sessions.runProtected,
     inspectExistingEnvelope,validateLegacySaveCandidate,validateMigrationBackup
@@ -227,6 +230,14 @@ exports.claimDailyCheckin=onCall(CALLABLE_OPTIONS,async request=>{
 exports.readHeroAcquisition=onCall(CALLABLE_OPTIONS,async request=>{
     try{ return await heroAcquisition.read(await verifyGameIdentity(request)); }
     catch(error){ throw asHttpsError(error); }
+});
+exports.readHeroGrowth=onCall(CALLABLE_OPTIONS,async request=>{
+    try{return await heroGrowth.read(await verifyGameIdentity(request));}
+    catch(error){throw asHttpsError(error);}
+});
+exports.mutateHeroGrowth=onCall(CALLABLE_OPTIONS,async request=>{
+    try{return await heroGrowth.mutate(await verifyGameIdentity(request));}
+    catch(error){throw asHttpsError(error);}
 });
 exports.observeHeroLogin=onCall(CALLABLE_OPTIONS,async request=>{
     try{ return await heroAcquisition.observeLogin(await verifyGameIdentity(request)); }
