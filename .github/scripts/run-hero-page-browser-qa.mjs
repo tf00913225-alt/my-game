@@ -5,7 +5,7 @@ import {spawn} from 'node:child_process';
 import {ASSET_MANIFEST,findChrome,startServer,waitJson,Cdp,qaPrelude,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE} from './runtime-browser-qa-support.mjs';
 
 // Existing production UI/roster Owners with an isolated UID and read-only transport.
-// Local ownership is a pure Core fixture; live DEV uses its existing preview domain.
+// Local ownership is a read-only transport fixture; live DEV uses its preview domain.
 const OUT=path.resolve('artifacts/browser-qa/responsive-item/hero');
 const ids=['divineDogHongbao','vajraHeavenlyKing'];
 const pause=(ms=350)=>new Promise(r=>setTimeout(r,ms));
@@ -25,6 +25,9 @@ try{
  proc=spawn(chrome,[...(chrome.includes('headless-shell')?[]:['--headless=new']),'--no-sandbox','--disable-gpu',`--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
  c=new Cdp((await waitJson(`http://127.0.0.1:${port}/json/list`)).find(t=>t.type==='page').webSocketDebuggerUrl);
  await c.send('Page.enable');await c.send('Runtime.enable');
+ await c.send('Page.setLifecycleEventsEnabled',{enabled:true});
+ const loadedDocuments=new Set();
+ c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Page.lifecycleEvent'&&m.params.name==='load')loadedDocuments.add(m.params.loaderId);});
  if(live){
   const stubs=new Map([[QA_AUTH_PATH,QA_AUTH_MODULE],[QA_CLOUD_PATH,QA_CLOUD_MODULE],[QA_SESSION_PATH,QA_SESSION_MODULE]]);
   c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,body=stubs.get(new URL(p.request.url).pathname);c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:{requestId:p.requestId}).catch(console.error);}});
@@ -46,13 +49,15 @@ try{
  for(const [width,height] of [[360,640],[412,915],[1024,768]]){
   await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height});
   if(width===360){
-   await c.send('Page.navigate',{url});
+   const navigation=await c.send('Page.navigate',{url});
+   const loadEnd=Date.now()+45000;while(!loadedDocuments.has(navigation.loaderId)&&Date.now()<loadEnd)await pause(50);
+   assert.ok(loadedDocuments.has(navigation.loaderId),'new document load must precede Runtime evaluation');
    await c.eval(`(async()=>{const end=Date.now()+45000;while(Date.now()<end&&!(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')))await new Promise(r=>setTimeout(r,50));if(window.FourSymbolsStartupPolicy?.getState?.()!=='READY')throw Error('startup not READY');showPage('home');return true;})()`);
    await open();
    assert.equal(await c.eval(`getHeroPageSnapshot().heroes.every(h=>!h.owned)`),true,'fixture starts canonically locked');
    if(!live){
     assert.equal(await c.eval(`document.getElementById('heroRosterToggle').disabled`),true);
-    await c.eval(`(()=>{for(const id of ${JSON.stringify(ids)})FourSymbolsHeroSystem.replaceAccountState(FourSymbolsHeroSystem.getDomain().unlockHeroDirect(id,20261012));refreshHeroPage();return true;})()`);
+    await c.eval(`(async()=>{window.__heroQaOwned=${JSON.stringify(ids)};await FourSymbolsHeroAcquisition.sync();refreshHeroPage();return true;})()`);
    }else assert.equal(await c.eval(`getHeroPageSnapshot().heroes.every(h=>h.eligible&&!h.owned)`),true,'DEV preview not canonical ownership');
    await c.eval(`window.__heroCanonical=JSON.stringify(FourSymbolsHeroSystem.getDomain().serialize());true`);
   }else await open();

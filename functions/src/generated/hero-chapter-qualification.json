@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "chapterId": "chapter_v1",
+  "startNodeId": "n01_arrival",
+  "endNodeId": "n10_finish",
+  "nodes": [
+    {
+      "id": "n01_arrival",
+      "type": "event",
+      "next": "n02_roadfight",
+      "branches": []
+    },
+    {
+      "id": "n02_roadfight",
+      "type": "battle",
+      "next": "n03_fork",
+      "branches": []
+    },
+    {
+      "id": "n03_fork",
+      "type": "branch",
+      "next": null,
+      "branches": [
+        {
+          "id": "safe",
+          "nodeId": "n04a_path"
+        },
+        {
+          "id": "bold",
+          "nodeId": "n04b_gate"
+        }
+      ]
+    },
+    {
+      "id": "n04a_path",
+      "type": "event",
+      "next": "n05_commission",
+      "branches": []
+    },
+    {
+      "id": "n04b_gate",
+      "type": "elite",
+      "next": "n05_commission",
+      "branches": []
+    },
+    {
+      "id": "n05_commission",
+      "type": "objective",
+      "next": "n06_rest",
+      "branches": []
+    },
+    {
+      "id": "n06_rest",
+      "type": "rest",
+      "next": "n07_chest",
+      "branches": []
+    },
+    {
+      "id": "n07_chest",
+      "type": "chest",
+      "next": "n08_truth",
+      "branches": []
+    },
+    {
+      "id": "n08_truth",
+      "type": "event",
+      "next": "n09_boss",
+      "branches": []
+    },
+    {
+      "id": "n09_boss",
+      "type": "boss",
+      "next": "n10_finish",
+      "branches": []
+    },
+    {
+      "id": "n10_finish",
+      "type": "finish",
+      "next": null,
+      "branches": []
+    }
+  ],
+  "sourcePath": "js/adventure/adventure-content-v1-20260915.js",
+  "sourceSha256": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+  "outcomeVerified": false
+}

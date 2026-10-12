@@ -103,8 +103,10 @@ const heroExpression=`(async()=>{
         check(JSON.stringify(previewSave.heroAccount)===JSON.stringify(locked),'DEV preview real save stays locked');
         system.replaceAccountState(beforeAccount);
     }
-    for(const id of ids){if(!FourSymbolsHeroCore.createDomain(account,getCharacters,calculateCharacterBaseStats,id=>skillDatabase[id]).isHeroUnlocked(id))account=FourSymbolsHeroCore.createDomain(account,getCharacters,calculateCharacterBaseStats,id=>skillDatabase[id]).unlockHeroDirect(id,123);}
-    system.replaceAccountState(account);const accountBytes=JSON.stringify(account);
+    // Acquisition proof comes through the isolated read-only transport fixture,
+    // never a production bypass or an unverified local unlocked flag.
+    window.__heroQaOwned=ids;await FourSymbolsHeroAcquisition.sync();
+    account=system.getDomain().serialize();const accountBytes=JSON.stringify(account);
     const originalFormation=FourSymbolsBattlefieldSlots.getSerializableAllyFormation();
     const rows=[];
     try{for(const count of [0,1,2,3]){
@@ -188,7 +190,7 @@ const heroExpression=`(async()=>{
             saveGame();const saved=JSON.parse(localStorage.getItem('four_symbols_save:skill-runtime-browser-qa'));check(JSON.stringify(saved.heroAccount)===accountBytes,'real save Hero isolation');check(Object.keys(saved.allyFormation.characterIndexToSlot).every(k=>Number(k)<3),'save excludes transient Hero slots');
             rows.push({count,units:cards.length,slots,initiative:queue.map(e=>e.type),statistics:initial.combatants.map(c=>c.kind),finished});
         }finally{Math.random=random;finish?.();pause();battleActive=false;clearInterval(timerId);clearTransientBattlePresentation();window.v142SkillAnimationDirector?.cancelAll?.();}
-    }}finally{window.FourSymbolsHeroSystem=system;system.replaceAccountState(beforeAccount);FourSymbolsHeroBattle.setRoster([]);FourSymbolsBattlefieldSlots.hydrateAllyFormation(originalFormation,[0,1,2]);}
+    }}finally{window.FourSymbolsHeroSystem=system;window.__heroQaOwned=[];await FourSymbolsHeroAcquisition.sync();system.replaceAccountState(beforeAccount);FourSymbolsHeroBattle.setRoster([]);FourSymbolsBattlefieldSlots.hydrateAllyFormation(originalFormation,[0,1,2]);}
     return rows;
 })()`;
 

@@ -4,7 +4,7 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.01bb53a8802f.js"
+      "build/boot-core.869c3a257e05.js"
     ],
     "styles": [
       "build/boot-core.989d1717bacd.css"
@@ -13,14 +13,14 @@
       "assets/ui/startup-logo.4631c0bc3f2b.jpg",
       "assets/ui/startup-main-city.d43e67af1c1c.jpg"
     ],
-    "firebaseBootstrap": "build/firebase/firebase-bootstrap.1ce663fc2f09.js"
+    "firebaseBootstrap": "build/firebase/firebase-bootstrap.53394522084f.js"
   },
   "featureManifest": {
     "schemaVersion": 1,
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.ab93fc890d94.js"
+          "build/app-shell.44dc5703c418.js"
         ],
         "styles": [
           "build/app-shell.a7880079c11d.css"
@@ -132,8 +132,8 @@
       "feature-adventure": {
         "scripts": [
           "build/feature-adventure-content.6cc9644cc366.js",
-          "build/feature-adventure-runtime.a2de99c0a764.js",
-          "build/feature-adventure-ui.2fdba238218c.js"
+          "build/feature-adventure-runtime.314d8cda083e.js",
+          "build/feature-adventure-ui.13793fa5c78c.js"
         ],
         "styles": [
           "build/feature-adventure.7a3a29e4a2d0.css"
@@ -210,8 +210,8 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.01bb53a8802f.js",
-        "sha256": "01bb53a8802f",
+        "path": "build/boot-core.869c3a257e05.js",
+        "sha256": "869c3a257e05",
         "bytes": 69985,
         "priority": "P0",
         "type": "script",
@@ -242,17 +242,17 @@
         "decode": false
       },
       {
-        "path": "build/firebase/firebase-bootstrap.1ce663fc2f09.js",
-        "sha256": "1ce663fc2f09",
-        "bytes": 5438,
+        "path": "build/firebase/firebase-bootstrap.53394522084f.js",
+        "sha256": "53394522084f",
+        "bytes": 5618,
         "priority": "P0",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/firebase/firebase-cloud-save.2d3a8e570074.js",
-        "sha256": "2d3a8e570074",
-        "bytes": 8038,
+        "path": "build/firebase/firebase-cloud-save.19454005f386.js",
+        "sha256": "19454005f386",
+        "bytes": 8779,
         "priority": "P0",
         "type": "script",
         "decode": false
@@ -562,19 +562,19 @@
         "decode": true
       },
       {
+        "path": "build/app-shell.44dc5703c418.js",
+        "sha256": "44dc5703c418",
+        "bytes": 1140347,
+        "priority": "P1",
+        "type": "script",
+        "decode": false
+      },
+      {
         "path": "build/app-shell.a7880079c11d.css",
         "sha256": "a7880079c11d",
         "bytes": 101893,
         "priority": "P1",
         "type": "style",
-        "decode": false
-      },
-      {
-        "path": "build/app-shell.ab93fc890d94.js",
-        "sha256": "ab93fc890d94",
-        "bytes": 1127458,
-        "priority": "P1",
-        "type": "script",
         "decode": false
       },
       {
@@ -818,18 +818,18 @@
         "decode": false
       }
     ],
-    "manifestHash": "95f6a842fb9f",
-    "totalBytes": 21834210,
+    "manifestHash": "bf297c3edfa4",
+    "totalBytes": 21848020,
     "totalResources": 78
   },
   "assets": {
-    "build/boot-core.01bb53a8802f.js": {
-      "sha256": "01bb53a8802f",
+    "build/boot-core.869c3a257e05.js": {
+      "sha256": "869c3a257e05",
       "bytes": 69985
     },
-    "build/app-shell.ab93fc890d94.js": {
-      "sha256": "ab93fc890d94",
-      "bytes": 1127458
+    "build/app-shell.44dc5703c418.js": {
+      "sha256": "44dc5703c418",
+      "bytes": 1140347
     },
     "build/gameplay-core-primary.9154c03570e4.js": {
       "sha256": "9154c03570e4",
@@ -867,13 +867,13 @@
       "sha256": "6cc9644cc366",
       "bytes": 11468
     },
-    "build/feature-adventure-runtime.a2de99c0a764.js": {
-      "sha256": "a2de99c0a764",
-      "bytes": 45081
+    "build/feature-adventure-runtime.314d8cda083e.js": {
+      "sha256": "314d8cda083e",
+      "bytes": 45689
     },
-    "build/feature-adventure-ui.2fdba238218c.js": {
-      "sha256": "2fdba238218c",
-      "bytes": 27627
+    "build/feature-adventure-ui.13793fa5c78c.js": {
+      "sha256": "13793fa5c78c",
+      "bytes": 28369
     },
     "build/boot-core.989d1717bacd.css": {
       "sha256": "989d1717bacd",
@@ -927,17 +927,17 @@
       "sha256": "877a7842d6bd",
       "bytes": 2882
     },
-    "build/firebase/firebase-cloud-save.2d3a8e570074.js": {
-      "sha256": "2d3a8e570074",
-      "bytes": 8038
+    "build/firebase/firebase-cloud-save.19454005f386.js": {
+      "sha256": "19454005f386",
+      "bytes": 8779
     },
     "build/firebase/firebase-auth-ui.2698bfba1bdc.js": {
       "sha256": "2698bfba1bdc",
       "bytes": 49123
     },
-    "build/firebase/firebase-bootstrap.1ce663fc2f09.js": {
-      "sha256": "1ce663fc2f09",
-      "bytes": 5438
+    "build/firebase/firebase-bootstrap.53394522084f.js": {
+      "sha256": "53394522084f",
+      "bytes": 5618
     },
     "assets/ui/startup-logo.4631c0bc3f2b.jpg": {
       "sha256": "4631c0bc3f2b",

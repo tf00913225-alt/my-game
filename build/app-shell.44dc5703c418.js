@@ -912,7 +912,16 @@ window.FourSymbolsHeroSystem=Object.freeze({
         const core=window.FourSymbolsHeroCore;
         const domain=account=>core.createDomain(account,
             ()=>[player,player2,player3],calculateCharacterBaseStats,id=>skillDatabase[id]);
-        let account=heroAccountState;
+        let account=core.normalizeAccountState(heroAccountState);
+        // Saved unlocked flags are caches, not permanent acquisition rights.
+        // Re-project only the same-UID protected backend entitlement snapshot.
+        for(const definition of core.listHeroDefinitions()){
+            const id=definition.heroId,grant=window.FourSymbolsHeroAcquisition?.getEntitlement(id);
+            if(grant){
+                if(!account.heroes[id].unlocked){account=domain(account).unlockHeroDirect(id,grant.allocationSeed);}
+                else{account.heroes[id].allocationSeed=grant.allocationSeed;}
+            }else{account.heroes[id].unlocked=false;}
+        }
         // DEV battle preview only: never mutate canonical account or claim rewards.
         if(forBattle&&window.location?.hostname==="dev.four-symbols-dev.pages.dev"){
             for(const heroId of ["divineDogHongbao","vajraHeavenlyKing"]){
@@ -926,7 +935,23 @@ window.FourSymbolsHeroSystem=Object.freeze({
     },
     // Future trusted callers must atomically persist/consume through their Owner.
     // No rewards or inventory consumption are wired in Phase 1.
-    replaceAccountState:next=>{ heroAccountState=window.FourSymbolsHeroCore.normalizeAccountState(next); }
+    replaceAccountState:next=>{ heroAccountState=window.FourSymbolsHeroCore.normalizeAccountState(next); },
+    cacheConfirmedEntitlements:()=>{
+        const core=window.FourSymbolsHeroCore,before=heroAccountState;
+        let next=core.normalizeAccountState(before);
+        for(const definition of core.listHeroDefinitions()){
+            const id=definition.heroId,grant=window.FourSymbolsHeroAcquisition?.getEntitlement(id);
+            if(!grant){continue;}
+            if(!next.heroes[id].unlocked){
+                next=core.createDomain(next,()=>[player,player2,player3],calculateCharacterBaseStats,id=>skillDatabase[id])
+                    .unlockHeroDirect(id,grant.allocationSeed);
+            }else{next.heroes[id].allocationSeed=grant.allocationSeed;}
+        }
+        if(JSON.stringify(next)===JSON.stringify(before)){return true;}
+        heroAccountState=next;
+        if(typeof saveGame==="function"&&saveGame()===false){heroAccountState=before;return false;}
+        return true;
+    }
 });
 
 
@@ -25271,6 +25296,7 @@ function getHeroPageSnapshot(){
     const domain=window.FourSymbolsHeroSystem.getDomain({forBattle:true});
     const created=getCharacters().some(character=>character&&String(character.id||"").trim());
     return {roster:window.FourSymbolsHeroBattle.getRoster(),maxHeroes:window.FourSymbolsHeroBattle.maxHeroes,
+        acquisition:window.FourSymbolsHeroAcquisition?.getStatus?.()||{ready:false,busy:false,loginCount:null,chapter:null},
         editingAllowed:!battleActive&&created,
         heroes:domain.listHeroDefinitions().map(definition=>{
             const id=definition.heroId,eligible=domain.isHeroUnlocked(id),owned=canonical.isHeroUnlocked(id);
@@ -25323,7 +25349,13 @@ function renderHeroPageContent(){
             <h3>${escape(hero.definition.name)}</h3><p>${escape(elementDatabase[hero.definition.element]?.name||hero.definition.element)}・${escape(hero.definition.role)}</p>
             <p>等級 ${hero.level===null?"—":"Lv."+hero.level}</p><p>星級 ${hero.account.stars} / ${window.FourSymbolsHeroCore.contract.maxStars}</p><p>專屬碎片 ${hero.account.specificFragments}</p>
             <small>取得條件：${escape(heroPageAcquisition(hero.definition))}</small></div></div>
-            ${!hero.eligible?'<p class="hero-page-note">尚未解鎖；取得流程將於後續開放。</p>':!hero.owned?'<p class="hero-page-note">DEV 試用英雄，可直接安排出戰。</p>':""}
+            ${!hero.eligible?'<p class="hero-page-note">尚未解鎖；完成取得條件後，需連線確認永久權益。</p>':!hero.owned?'<p class="hero-page-note">DEV 試用英雄，可直接安排出戰。</p>':""}
+            <section class="hero-page-section"><h3>永久取得</h3>
+                <p>${data.acquisition.ready?(hero.definition.acquisition.kind==="cumulativeLoginDay"?`累計登入 ${data.acquisition.loginCount} / 7 天（臺北日期，每日一次）`:data.acquisition.chapter?.phase==="completed"?"第一章線上取得資格已完成。":"需以線上章節票券完成第一章取得資格。"):"需連線確認登入與英雄取得紀錄。"}</p>
+                ${data.acquisition.error?`<p class="hero-page-note">${escape(data.acquisition.error)}</p>`:""}
+                <button type="button" class="main-button" onclick="FourSymbolsHeroAcquisition.refresh()" ${data.acquisition.busy?"disabled":""}>${data.acquisition.busy?"同步中":"同步取得紀錄"}</button>
+                ${data.acquisition.chapter?.phase==="active"&&data.acquisition.chapter.nextNodeId===window.FourSymbolsAdventureContent?.chapters[data.acquisition.chapter.chapterId]?.endNodeId?'<button type="button" class="main-button" onclick="FourSymbolsHeroAcquisition.claimChapterHero()">取得神犬紅包</button>':""}
+            </section>
             <section class="hero-page-section"><h3>六圍配點</h3>${rows(Object.entries(STAT_NAMES),hero.points)}</section>
             <section class="hero-page-section"><h3>基礎戰鬥數值</h3>${rows([["maxHP","HP"],["maxSP","SP"],["attack","物理攻擊"],["magicAttack","法術攻擊"],["defense","防禦力"],["speed","速度"]],hero.stats)}</section>
             <section class="hero-page-section"><h3>怒氣技能：${escape(hero.skill?.definition?.name||"—")} ${hero.skill?"Lv."+hero.skill.level:""}</h3>
@@ -33965,6 +33997,179 @@ try{
     );
 
 }
+
+
+/* bundled source: js/hero-acquisition-client.js */
+/* Hero acquisition transport/projection adapter. Never trusts saved claims,
+   local dates, completion counters or a restored chapter flag as entitlement. */
+(function installHeroAcquisitionClient(global){
+    "use strict";
+    let proof=null,error=null,busy=false,generation=0,pipeline=Promise.resolve(),draining=null;
+    const pendingNodes=[];
+    const copy=value=>value==null?value:JSON.parse(JSON.stringify(value));
+    function activeUid(){
+        const uid=global.FourSymbolsAccountSave?.getActiveUid?.();
+        return uid&&global.FourSymbolsFirebaseLifecycle?.getUser?.()?.uid===uid&&
+            global.FourSymbolsStartupPolicy?.getUid?.()===uid?uid:null;
+    }
+    function onlineReady(){return global.FourSymbolsStartupPolicy?.getState?.()==="READY"&&global.navigator?.onLine!==false;}
+    function errorText(problem){
+        const code=String(problem.code||"");
+        if(/data-loss|HERO_PROOF_INVALID/.test(code)){return "英雄取得紀錄不完整，已停止領取；請聯絡客服確認。";}
+        if(/SESSION_|permission-denied|unauthenticated/.test(code)){return "請重新驗證原帳號後同步英雄紀錄。";}
+        if(/aborted/.test(code)){return "帳號紀錄已更新，請再次同步。";}
+        if(/unavailable|network|deadline/.test(code)){return "目前無法連線同步；永久英雄權益仍保留在線上。";}
+        if(/failed-precondition/.test(code)){return "章節線上資格尚未完成，請重新開啟章節確認紀錄。";}
+        return /^[\u3400-\u9fff]/u.test(String(problem.message||""))?problem.message:"英雄取得紀錄暫時無法同步，請稍後再試。";
+    }
+    function inspect(value,uid){
+        const core=global.FourSymbolsHeroCore;
+        if(!value||value.schemaVersion!==1||value.ownerUid!==uid||value.authoritativeStateReady!==false||
+           !Number.isSafeInteger(value.serverRevision)||value.serverRevision<1||
+           !Number.isSafeInteger(value.loginCount)||value.loginCount<0||value.loginCount>7||
+           !value.entitlements||typeof value.entitlements!=="object"||Array.isArray(value.entitlements)||
+           !value.chapter||value.chapter.outcomeVerified!==false||
+           !["not-started","active","completed"].includes(value.chapter.phase)||
+           !Array.isArray(value.chapter.completedIntents)){
+            throw Object.assign(new Error("英雄取得紀錄無法驗證。"),{code:"HERO_PROOF_INVALID"});
+        }
+        for(const [id,grant] of Object.entries(value.entitlements)){
+            if(!core.listHeroDefinitions().some(row=>row.heroId===id)||grant.heroId!==id||
+               grant.claimKey!=="hero-v1-"+id||typeof grant.sourceId!=="string"||grant.sourceId.length>128||
+               !Number.isSafeInteger(grant.grantedRevision)||grant.grantedRevision<1||grant.grantedRevision>value.serverRevision||
+               !Number.isSafeInteger(grant.allocationSeed)||grant.allocationSeed<1||grant.allocationSeed>0xffffffff){
+                throw Object.assign(new Error("英雄永久權益資料不完整。"),{code:"HERO_PROOF_INVALID"});
+            }
+        }
+        return copy(value);
+    }
+    function notify(){
+        if(typeof global.refreshHeroPage==="function"){global.refreshHeroPage(true);}
+        document.dispatchEvent(new CustomEvent("four-symbols:hero-acquisition-state"));
+    }
+    function reconcile(){
+        // Existing Core + UID save Owner only. The receipt stays on the server;
+        // this caches the existing unlocked/seed fields, not a second rights key.
+        const core=global.FourSymbolsHeroCore,adapter=global.FourSymbolsHeroSystem;
+        if(!adapter||!proof||proof.ownerUid!==activeUid()){return;}
+        if(adapter.cacheConfirmedEntitlements()===false){
+            error="永久英雄已保留在線上，但本機快取儲存失敗；重新連線仍可取回。";
+        }
+    }
+    function publish(value,uid,token){
+        if(uid!==activeUid()||token!==generation){throw Object.assign(new Error("帳號已變更。"),{code:"ACCOUNT_CHANGED"});}
+        proof=inspect(value,uid);error=null;reconcile();notify();return copy(proof);
+    }
+    async function read(api,uid,token){
+        let value;
+        try{value=await api.readHeroAcquisition();}
+        catch(problem){
+            if(!String(problem.code||"").endsWith("failed-precondition")){throw problem;}
+            // Creates/upgrades only the existing empty envelope, never adopts
+            // local character/history. A corrupt source is not bootstrapped.
+            await api.bootstrapCloudSave();value=await api.readHeroAcquisition();
+        }
+        return publish(value,uid,token);
+    }
+    async function mutation(api,uid,token,invoke){
+        try{return publish(await invoke(proof.serverRevision),uid,token);}
+        catch(problem){
+            if(!String(problem.code||"").endsWith("aborted")){throw problem;}
+            await read(api,uid,token);return publish(await invoke(proof.serverRevision),uid,token);
+        }
+    }
+    function run(work){
+        const uid=activeUid(),token=generation;
+        const result=pipeline.then(async()=>{
+            if(!uid||uid!==activeUid()||token!==generation||!onlineReady()){
+                throw Object.assign(new Error("需連線並確認原帳號，才能取得永久英雄。"),{code:"HERO_ONLINE_REQUIRED"});
+            }
+            const api=global.FourSymbolsFirebaseLifecycle;
+            busy=true;notify();
+            try{await read(api,uid,token);return await work(api,uid,token);}
+            finally{busy=false;notify();}
+        });
+        pipeline=result.catch(problem=>{
+            if(uid===activeUid()&&token===generation){
+                error=errorText(problem);
+                if(/data-loss|HERO_PROOF_INVALID|SESSION_|ACCOUNT_CHANGED|permission-denied|unauthenticated/.test(String(problem.code||""))){proof=null;}
+                notify();
+            }
+        });
+        return result;
+    }
+    async function drain(api,uid,token){
+        if(!pendingNodes.length){return copy(proof);}
+        await mutation(api,uid,token,revision=>api.ensureHeroChapterTicket(revision));
+        while(pendingNodes.length){
+            const intent=pendingNodes[0];
+            if(intent.uid!==uid||intent.chapterId!==proof.chapter.chapterId){pendingNodes.shift();continue;}
+            const prior=proof.chapter.completedIntents.find(row=>row.nodeId===intent.nodeId);
+            if(prior){
+                if(prior.choiceId!==intent.choiceId){throw new Error("章節岔路與線上紀錄不同，無法補發英雄。");}
+                pendingNodes.shift();continue;
+            }
+            if(proof.chapter.nextNodeId!==intent.nodeId){
+                throw new Error("章節尚缺線上資格紀錄，不能依舊存檔自動補發英雄。請聯絡客服確認。");
+            }
+            const ticketId=proof.chapter.ticketId;
+            await mutation(api,uid,token,revision=>api.completeHeroChapterNode({
+                ticketId,nodeId:intent.nodeId,choiceId:intent.choiceId,expectedRevision:revision}));
+            pendingNodes.shift();
+        }
+        return copy(proof);
+    }
+    function sync(){return run(async(api,uid,token)=>{
+        await mutation(api,uid,token,revision=>api.observeHeroLogin(revision));
+        return drain(api,uid,token);
+    });}
+    function beginChapter(chapterId){return run(async(api,uid,token)=>{
+        if(chapterId!==proof.chapter.chapterId){return copy(proof);}
+        return mutation(api,uid,token,revision=>api.ensureHeroChapterTicket(revision));
+    }).catch(()=>null);}
+    function observeChapterNode(chapterId,nodeId,choiceId=null){
+        const uid=activeUid();if(!uid){return Promise.resolve(null);}
+        if(pendingNodes.length>=32){error="章節同步佇列已滿，請先連線同步。";notify();return Promise.resolve(null);}
+        pendingNodes.push({uid,chapterId,nodeId,choiceId});
+        if(!draining){
+            const task=run(drain).catch(()=>null);
+            const final=task.finally(()=>{if(draining===final){draining=null;}});
+            draining=final;
+        }
+        return draining;
+    }
+    function claimChapterHero(){return run(async(api,uid,token)=>{
+        await drain(api,uid,token);
+        if(proof.chapter.phase==="completed"){return copy(proof);}
+        const id=proof.chapter.nextNodeId;
+        if(!id||global.FourSymbolsAdventureContent?.chapters[proof.chapter.chapterId]?.endNodeId!==id){
+            throw new Error("請先完成線上章節資格流程。");
+        }
+        return mutation(api,uid,token,revision=>api.completeHeroChapterNode({
+            ticketId:proof.chapter.ticketId,nodeId:id,choiceId:null,expectedRevision:revision}));
+    }).catch(()=>null);}
+    function reset(){generation++;proof=null;error=null;pendingNodes.length=0;draining=null;notify();}
+    global.FourSymbolsHeroAcquisition=Object.freeze({
+        getEntitlement:id=>proof?.ownerUid===activeUid()?copy(proof.entitlements[id]||null):null,
+        getStatus:()=>({ready:!!proof&&proof.ownerUid===activeUid(),busy,error,
+            loginCount:proof?.ownerUid===activeUid()?proof.loginCount:null,
+            chapter:proof?.ownerUid===activeUid()?copy(proof.chapter):null}),
+        sync,refresh:()=>sync().catch(()=>null),beginChapter,observeChapterNode,claimChapterHero
+    });
+    document.addEventListener("four-symbols:startup-ready",()=>{
+        if(onlineReady()){void sync().catch(()=>null);}
+    });
+    global.addEventListener("online",()=>{if(onlineReady()){void sync().catch(()=>null);}});
+    document.addEventListener("visibilitychange",()=>{
+        if(!document.hidden&&onlineReady()){void sync().catch(()=>null);}
+    });
+    global.addEventListener("four-symbols:firebase-auth-state",event=>{
+        if(event.detail?.user?.uid!==proof?.ownerUid){reset();}
+    });
+    global.addEventListener("four-symbols:game-session-state",event=>{
+        if(["revoked","signed-out"].includes(event.detail?.status)||event.detail?.code){reset();}
+    });
+})(typeof window!=="undefined"?window:globalThis);
 
 
 /* bundled source: js/generated-item-acquisition-data.js */
