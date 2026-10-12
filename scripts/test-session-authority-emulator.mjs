@@ -11,6 +11,7 @@ const {createSessionAuthority}=require("../functions/src/session-authority.js");
 const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-writer.js");
 const {createCanonicalResourceCredit}=require("../functions/src/canonical-resource-credit.js");
 const {createDailyCheckinGrant}=require("../functions/src/daily-checkin-grant.js");
+const {createHeroAcquisition}=require("../functions/src/hero-acquisition.js");
 const {createCanonicalBattleAttempt}=require("../functions/src/canonical-battle-attempt.js");
 const {createCanonicalBattleEncounter}=require("../functions/src/canonical-battle-encounter.js");
 const {resolvePlainPlayerNormalAttack}=require("../functions/src/canonical-battle-normal-attack.js");
@@ -1938,6 +1939,75 @@ assert.equal((await db.doc(`users/${atomicUid}/saves/current`).get())
 assert.equal((await db.doc(`serverUsers/${atomicUid}/playableSnapshots/4`).get())
     .get("readyForPublication"),false);
 await checkRecoveryArchive(atomicUid,4);
+// Actual Firestore transactions and exported acquisition Callable boundaries. A new
+// disposable account avoids changing any existing canonical/source fixtures.
+const heroEmail="hero-acquisition-emulator@example.test";
+const heroUser=await login("accounts:signUp",{email:heroEmail,password});
+const heroUid=heroUser.localId;
+const heroSession=await invoke("createGameSession",heroUser.idToken,{uid:heroUid});
+await invoke("bootstrapCloudSave",heroUser.idToken,{uid:heroUid,session:heroSession});
+const heroSessions=createSessionAuthority({db,FieldValue,HttpsError});
+let heroClock=Date.now();
+const heroOwner=createHeroAcquisition({db,FieldValue,HttpsError,
+    runProtected:heroSessions.runProtected,inspectExistingEnvelope,nextRevision,
+    now:()=>heroClock,seed:()=>20261012});
+const heroRequest=(user,session,extra={})=>({auth:{uid:heroUid,token:claims(user.idToken)},
+    data:{uid:heroUid,session,...extra}});
+const heroRoot=db.collection("serverUsers").doc(heroUid);
+const heroEnvelope=db.doc(`users/${heroUid}/saves/current`);
+assert.equal((await invoke("readHeroAcquisition",heroUser.idToken,
+    {uid:heroUid,session:heroSession})).loginCount,0);
+await rejected("observeHeroLogin",heroUser.idToken,
+    {uid:heroUid,session:heroSession,expectedRevision:1,loginCount:7},"INVALID_ARGUMENT");
+await rejected("observeHeroLogin",heroUser.idToken,
+    {uid:heroUid,session:heroSession,expectedRevision:1,date:"20261018"},"INVALID_ARGUMENT");
+const heroConcurrent=await Promise.all([
+    heroOwner.observeLogin(heroRequest(heroUser,heroSession,{expectedRevision:1})),
+    heroOwner.observeLogin(heroRequest(heroUser,heroSession,{expectedRevision:1}))]);
+assert.deepEqual(heroConcurrent.map(r=>r.unchanged).sort(),[false,true]);
+assert.equal((await heroEnvelope.get()).get("serverRevision"),2);
+for(let day=2;day<=7;day++){
+    heroClock+=3*86400000; // cumulative, never a consecutive-login streak.
+    await assert.rejects(heroOwner.observeLogin(heroRequest(heroUser,heroSession,
+        {expectedRevision:1})),error=>error.code==="aborted");
+    const observation=await heroOwner.observeLogin(heroRequest(heroUser,heroSession,
+        {expectedRevision:day}));
+    assert.equal(observation.loginCount,day);
+}
+assert.equal((await heroRoot.collection("uniqueClaims").get()).size,1);
+assert.equal((await heroRoot.collection("heroAcquisitionHistory").get()).size,7);
+assert.equal((await heroRoot.collection("operations").get()).size,7);
+assert.equal((await heroRoot.collection("ledgerEntries").get()).size,7);
+const acquired=(await heroOwner.read(heroRequest(heroUser,heroSession))).entitlements;
+assert.equal(acquired.vajraHeavenlyKing.allocationSeed,20261012);
+assert.equal((await heroOwner.observeLogin(heroRequest(heroUser,heroSession,
+    {expectedRevision:1}))).unchanged,true); // lost-response retry.
+assert.equal((await invoke("observeHeroLogin",heroUser.idToken,
+    {uid:heroUid,session:heroSession,expectedRevision:1})).unchanged,true);
+while(Math.floor(Date.now()/1000)<=claims(heroUser.idToken).auth_time){
+    await new Promise(resolve=>setTimeout(resolve,100));
+}
+const heroOtherDevice=await login("accounts:signInWithPassword",{email:heroEmail,password});
+const heroOtherSession=await invoke("createGameSession",heroOtherDevice.idToken,{uid:heroUid});
+await assert.rejects(heroOwner.read(heroRequest(heroUser,heroSession)),
+    error=>error.message==="SESSION_REVOKED");
+await rejected("readHeroAcquisition",heroUser.idToken,
+    {uid:heroUid,session:heroSession},"SESSION_REVOKED");
+assert.deepEqual((await heroOwner.read(heroRequest(heroOtherDevice,heroOtherSession))).entitlements,acquired);
+assert.deepEqual((await invoke("readHeroAcquisition",heroOtherDevice.idToken,
+    {uid:heroUid,session:heroOtherSession})).entitlements,acquired);
+await assert.rejects(heroOwner.observeLogin(heroRequest(heroOtherDevice,heroOtherSession,
+    {expectedRevision:8,save:{heroAccount:{}}})),error=>error.code==="invalid-argument");
+assert.equal(await rulesRequest(`serverUsers/${heroUid}/heroAcquisition/current`,heroOtherDevice.idToken),403);
+assert.equal(await rulesRequest(`serverUsers/${heroUid}/uniqueClaims/hero-v1-vajraHeavenlyKing`,heroOtherDevice.idToken,"PATCH"),403);
+const heroClaim=heroRoot.collection("uniqueClaims").doc("hero-v1-vajraHeavenlyKing");
+await heroClaim.delete(); // emulator-only corruption; production never deletes a claim.
+const blockedHeroEnvelope=(await heroEnvelope.get()).get("serverRevision");
+await assert.rejects(heroOwner.observeLogin(heroRequest(heroOtherDevice,heroOtherSession,
+    {expectedRevision:8})),error=>error.code==="data-loss");
+assert.equal((await heroEnvelope.get()).get("serverRevision"),blockedHeroEnvelope);
+assert.equal((await heroClaim.get()).exists,false);
+console.log("PASS Hero acquisition protected Firestore Owner and HTTP/exports: distinct cumulative days, concurrent same-day requests, stable once-only entitlement, stale/lost retry, takeover, private rules and corruption rejection; client/chapter activation remains pending.");
 console.log(`PASS (${direct?"direct exported handlers":"HTTP callable"}): A SUCCESS -> B takeover -> A SESSION_REVOKED -> B SUCCESS; logout, UID isolation, tampering, private rules, protected writers, concurrent takeover/write ordering, revoked/disabled Firebase identity.`);
 await db.terminate();
 if(direct){await getFirestore().terminate();}

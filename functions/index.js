@@ -9,6 +9,7 @@ const {HttpsError,onCall}=require("firebase-functions/v2/https");
 const {createSessionAuthority}=require("./src/session-authority");
 const {createTrustedGrantLedger}=require("./src/trusted-grant-ledger");
 const {createCanonicalResourceCredit}=require("./src/canonical-resource-credit");
+const {createHeroAcquisition}=require("./src/hero-acquisition");
 const {createLegacyCandidateScreening}=require("./src/legacy-candidate-screening");
 const {createCanonicalRecoveryApproval}=require("./src/canonical-recovery-approval");
 const {createCanonicalCurrentRecovery}=require("./src/canonical-current-recovery");
@@ -39,6 +40,10 @@ const trustedGrantLedger=createTrustedGrantLedger({
     inspectExistingEnvelope,nextRevision
 });
 const canonicalResourceCredit=createCanonicalResourceCredit({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,nextRevision
+});
+const heroAcquisition=createHeroAcquisition({
     db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
     inspectExistingEnvelope,nextRevision
 });
@@ -216,6 +221,15 @@ exports.reserveTrustedGrant=onCall(CALLABLE_OPTIONS,async request=>{
 // This settles the server-clock check-in once, on an unpublished character.
 exports.claimDailyCheckin=onCall(CALLABLE_OPTIONS,async request=>{
     try{ return await canonicalResourceCredit.claimDailyCheckin(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
+// Limited Hero rights only: these do not publish/adopt a character snapshot.
+exports.readHeroAcquisition=onCall(CALLABLE_OPTIONS,async request=>{
+    try{ return await heroAcquisition.read(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
+exports.observeHeroLogin=onCall(CALLABLE_OPTIONS,async request=>{
+    try{ return await heroAcquisition.observeLogin(await verifyGameIdentity(request)); }
     catch(error){ throw asHttpsError(error); }
 });
 // A server-priced purchase changes only an unpublished canonical character.

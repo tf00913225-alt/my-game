@@ -6,7 +6,7 @@ import {
 } from "./firebase-auth.js";
 import {
     bootstrapTrustedCloudSave,createInitialCanonicalCharacter,CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,saveLocalAutoBattlePreferences,createLocalMigrationBackup,
-    submitLegacyMigrationCandidate,screenLegacyMigrationCandidate
+    submitLegacyMigrationCandidate,screenLegacyMigrationCandidate,readHeroAcquisition,observeHeroLogin
 } from "./firebase-cloud-save.js";
 import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.js";
 import {synchronizeGameSession,revokeGameSession,protectedTest,getGameSessionState} from "./firebase-session.js";
@@ -84,6 +84,7 @@ const api=Object.freeze({
     initialize:initializeLifecycle,resolveIdentity,resolveCloudSave,getUser:getSignedInUser,
     signInWithGoogle,signInWithFacebook,signInWithEmail,createAccountWithEmail,signInAsAnonymous,signOut:signOutFirebase,
     bootstrapCloudSave:bootstrapTrustedCloudSave,createInitialCanonicalCharacter,submitLegacyMigrationCandidate,screenLegacyMigrationCandidate,saveLocalAutoBattlePreferences,createLocalMigrationBackup,protectedTest,getGameSessionState,
+    readHeroAcquisition,observeHeroLogin,
     openAuth:openFirebaseAuthUi,closeAuth:closeFirebaseAuthUi,
     setUiState:setFirebaseAuthUiState,cloudSaveWritePolicy:CLOUD_SAVE_WRITE_POLICY,
     cloudFunctionsRegion:CLOUD_FUNCTIONS_REGION,dispose:()=>{ if(unsubscribe){ unsubscribe(); unsubscribe=null; } }
