@@ -60,15 +60,15 @@ for(const hex of ["#FF9F38","#FF4FA7","#FF5A36","#42A5FF","#47D6A3","#C89B45"]){
 assert.match(css,/rarity-four-symbol[\s\S]*conic-gradient/);
 assert.match(css,/@keyframes teamRelicFourSymbolRarityBreath/);
 assert.doesNotMatch(css,/#game-(?:stage|ui) \.team-relic-home-tools\{/,'lazy relic CSS must not duplicate persistent utility geometry');
-assert.match(utilityCss,/#game-ui \.team-relic-home-tools\{[^}]*position:relative;[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\);[^}]*grid-row:2;[^}]*width:min\(52%,192px\);[^}]*pointer-events:none/,'persistent utilities must reflow inside the browser city');
+assert.match(utilityCss,/#game-ui \.team-relic-home-tools\{[^}]*position:relative;[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\);[^}]*grid-row:3;[^}]*width:100%;[^}]*pointer-events:none/,'collections and tools share the original browser utility owner');
 const utilityRule=(utilityCss.match(/#game-ui \.team-relic-home-tools \.home-card-utility\{([^}]*)\}/)||[])[1]||"";
-assert.match(utilityRule,/width:100%/);
-assert.match(utilityRule,/height:84px/);
-assert.match(utilityRule,/border:1px solid rgba\(205,154,65,\.82\)/);
-assert.match(utilityRule,/background:linear-gradient\(155deg,rgba\(35,25,15,\.96\),rgba\(8,7,5,\.96\)\)/);
-assert.match(utilityRule,/box-shadow:0 4px 10px rgba\(0,0,0,\.52\)/,'persistent utility skin must remain intact');
-assert.match(utilityCss,/#game-ui \.team-relic-home-tools \.home-card-icon\{[^}]*width:100%;[^}]*height:58px/);
-assert.match(utilityCss,/#game-ui \.team-relic-home-tools \.home-card-label\{[^}]*font-size:13px;[^}]*line-height:18px;[^}]*font-weight:900/);
+assert.match(utilityRule,/width:min\(100%,180px\)/);
+assert.match(utilityRule,/height:44px/);
+assert.match(utilityRule,/border:0/);
+assert.match(utilityRule,/background:rgba\(17,20,16,.76\)/);
+assert.match(utilityRule,/box-shadow:none/,'collections must not regain competing bright card frames');
+assert.match(utilityCss,/#game-ui \.team-relic-home-tools \.home-card-utility \.home-card-icon\{[^}]*width:32px;[^}]*height:32px/);
+assert.match(utilityCss,/#game-ui \.team-relic-home-tools \.home-card-utility \.home-card-label\{[^}]*font-size:15px;[^}]*line-height:22px;[^}]*font-weight:700/);
 assert.match(utilityRule,/pointer-events:auto/,'utilities retain their hitboxes');
 assert.match(css,/\.team-relic-battle-banner\{[^}]*top:48%/,
     "relic name banner must be centered in the battlefield");

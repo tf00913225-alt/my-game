@@ -592,6 +592,8 @@ button:disabled{
 */
 
 #homePage{
+    --home-scene-height:clamp(216px,calc(45dvh - 120px),300px);
+    --home-frame-muted:rgba(145,124,86,.34);
     position:relative;
     width:min(100%,var(--ui-page-max-width));
     height:100%;min-height:0;
@@ -772,14 +774,11 @@ button:disabled{
     min-height:48px;
     margin:5px 10px 0;
     padding:3px 7px;
-    border:1px solid rgba(191,139,57,.82);
+    border:1px solid var(--home-frame-muted);
     border-radius:9px;
     background:
         linear-gradient(90deg,rgba(8,7,6,.95),rgba(31,19,11,.91) 52%,rgba(8,7,6,.94));
-    box-shadow:
-        0 5px 14px rgba(0,0,0,.52),
-        inset 0 0 0 1px rgba(255,222,143,.07),
-        inset 0 0 16px rgba(217,157,49,.1);
+    box-shadow:0 4px 12px rgba(0,0,0,.3);
 }
 
 .home-hud-identity,
@@ -806,7 +805,7 @@ button:disabled{
     gap:8px;
     color:#c99a43;
     font-family:"Noto Serif TC",serif;
-    font-size:15px;
+    font-size:20px;
     font-weight:900;
     letter-spacing:.16em;
     line-height:1.15;
@@ -835,21 +834,21 @@ button:disabled{
     min-width:0;
     min-height:20px;
     padding:4px 6px;
-    border:1px solid rgba(191,139,57,.72);
-    border-radius:7px;
-    background:linear-gradient(180deg,rgba(30,21,12,.94),rgba(8,7,5,.92));
-    color:#ceb887;
-    font-size:13px;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    color:#c6bda9;
+    font-size:14px;
     line-height:18px;
-    box-shadow:inset 0 0 0 1px rgba(255,224,151,.05),0 2px 5px rgba(0,0,0,.3);
+    box-shadow:none;
     white-space:normal;
 }
 
 .home-hud-resources b{
     display:inline-block;
     min-width:0;
-    color:#ffe093;
-    font-size:13px;
+    color:#e4d3a5;
+    font-size:15px;
     font-variant-numeric:tabular-nums;
     white-space:normal;
     overflow-wrap:anywhere;
@@ -892,37 +891,38 @@ button:disabled{
     opacity:1;
 }
 
-/* RPG lobby hierarchy: two hero entrances, two side rails, two utilities. */
+/* Phase 3: quiet side facilities, a clear central scene, then common entrances. */
 .home-card-grid{
     position:relative;
     z-index:2;
     display:grid;
     flex:0 0 auto;
     grid-template-columns:minmax(0,1fr);
-    grid-template-rows:auto auto;
-    gap:1px;
+    grid-template-rows:var(--home-scene-height) auto auto;
+    gap:10px;
     padding:1px 7px 0;
 }
 
 .home-primary-actions{
     display:grid;
-    grid-template-columns:repeat(2,minmax(0,46%));
-    grid-row:1;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-row:2;
     grid-column:1;
     justify-content:space-between;
     align-self:center;
     width:100%;
-    gap:0;
+    gap:10px;
 }
 
 .home-secondary-actions{
     display:grid;
-    grid-template-columns:repeat(2,minmax(70px,22%));
-    grid-row:2;
+    grid-template-columns:repeat(2,minmax(64px,20%));
+    grid-row:1;
     grid-column:1;
-    grid-auto-rows:70px;
+    grid-auto-rows:68px;
     justify-content:space-between;
-    gap:5px 0;
+    gap:12px 0;
+    align-content:start;
     min-height:0;
     padding:0;
 }
@@ -962,24 +962,21 @@ button:disabled{
 }
 
 .home-card-label{
-    color:#f5d67f;
+    color:#e3d5b9;
     font-family:"Noto Serif TC","標楷體","BiauKai",serif;
-    font-weight:900;
+    font-weight:700;
     text-align:center;
-    text-shadow:0 1px 3px #000,0 0 7px rgba(229,178,71,.2);
+    text-shadow:0 1px 3px #000;
     white-space:nowrap;
 }
 
 .home-card-primary{
-    height:78px;
+    height:68px;
     overflow:hidden;
-    border:1px solid rgba(222,170,70,.9);
-    border-radius:11px;
+    border:1px solid var(--home-frame-muted);
+    border-radius:7px;
     background:#0b0906;
-    box-shadow:
-        0 5px 13px rgba(0,0,0,.55),
-        0 0 10px rgba(224,169,64,.14),
-        inset 0 0 0 1px rgba(255,225,151,.08);
+    box-shadow:0 4px 10px rgba(0,0,0,.28);
 }
 
 .home-card-primary::after{
@@ -993,36 +990,39 @@ button:disabled{
 
 .home-card-primary .home-card-icon{
     position:absolute;
-    inset:0 0 19px;
+    inset:0 48% 0 0;
+    opacity:.8;
+    mask-image:linear-gradient(90deg,#000 72%,transparent);
 }
 
 .home-card-primary .home-card-label{
     position:absolute;
-    right:0;
+    right:4px;
     bottom:0;
-    left:0;
+    left:48%;
     z-index:2;
-    height:19px;
+    height:100%;
+    display:grid;place-items:center;
     padding:1px 4px;
-    border-top:1px solid rgba(218,165,66,.72);
-    background:linear-gradient(180deg,rgba(61,20,14,.98),rgba(20,10,7,.98));
-    font-size:14px;
-    line-height:16px;
+    border:0;
+    background:transparent;
+    font-size:16px;
+    line-height:22px;
     letter-spacing:.12em;
 }
 
 .home-card-secondary{
     display:grid;
-    grid-template-rows:47px 21px;
+    grid-template-rows:36px 26px;
     align-content:stretch;
     justify-items:stretch;
     width:100%;
-    height:70px;
+    height:68px;
     overflow:hidden;
-    border:1px solid rgba(205,154,65,.82);
-    border-radius:11px;
-    background:linear-gradient(155deg,rgba(35,25,15,.96),rgba(8,7,5,.96));
-    box-shadow:0 4px 10px rgba(0,0,0,.52),inset 0 0 0 1px rgba(255,224,151,.06);
+    border:1px solid var(--home-frame-muted);
+    border-radius:7px;
+    background:rgba(17,20,16,.92);
+    box-shadow:0 3px 8px rgba(0,0,0,.22);
 }
 
 .home-card-secondary:nth-child(odd){justify-self:start;}
@@ -1035,33 +1035,39 @@ button:disabled{
 .home-card-secondary:nth-child(8){margin-inline-end:0;}
 
 .home-card-secondary .home-card-icon{
-    width:100%;
-    height:47px;
+    width:32px;
+    height:32px;
+    justify-self:center;align-self:center;
     border:0;
-    border-bottom:1px solid rgba(198,151,65,.62);
-    border-radius:10px 10px 0 0;
-    box-shadow:inset 0 0 10px rgba(220,166,64,.08);
+    border-radius:5px;
+    box-shadow:none;
+    background-size:contain;
+    opacity:.76;
 }
 
 #homeIconForge{
     display:flex;
     align-items:center;
     justify-content:center;
-    background:radial-gradient(circle at 50% 46%,#4b3420,#090706 70%);
-    color:#eac47a;
+    background:transparent;
+    color:#c6b591;
     font-family:serif;
-    font-size:36px;
+    font-size:28px;
     line-height:1;
-    text-shadow:0 1px 2px #000,0 0 9px rgba(236,169,72,.6);
+    text-shadow:0 1px 2px #000;
 }
 
 .home-card-secondary .home-card-label{
     align-self:stretch;
     padding:2px 3px 1px;
-    background:linear-gradient(180deg,rgba(48,20,14,.98),rgba(14,9,6,.98));
-    font-size:13px;
-    line-height:18px;
+    background:transparent;
+    font-size:15px;
+    line-height:22px;
 }
+
+.home-card-tertiary{min-height:44px;border:0;background:transparent;pointer-events:auto;}
+.home-card-tertiary .home-card-icon{display:none;}
+.home-card-tertiary .home-card-label{display:block;padding:8px 0;color:#c8bda7;font-family:inherit;font-size:15px;line-height:22px;letter-spacing:0;}
 
 .home-gold-display{
     font-family:
