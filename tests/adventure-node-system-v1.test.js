@@ -261,4 +261,36 @@ function baseRuntime(){
     assert.match(css,/\.adventure-node-sheet/);
 })();
 
+(function testHeroQualificationUsesSuccessfulFormalChapterOwners(){
+    const c=baseRuntime(),intents=[],opened=[];
+    c.FourSymbolsHeroAcquisition={beginChapter:id=>opened.push(id),
+        observeChapterNode:(chapterId,nodeId,choiceId)=>intents.push({chapterId,nodeId,choiceId})};
+    runScript(c,"js/adventure/adventure-content-v1-20260915.js");
+    runScript(c,"js/adventure/adventure-runtime-v1-20260915.js");
+    const api=c.FourSymbolsAdventure,content=c.FourSymbolsAdventureContent;
+    const state=c.player.adventureProgress.chapters.chapter_v1;
+    api.open();assert.deepEqual(opened,["chapter_v1"]);
+    const event=id=>{
+        const node=content.chapters.chapter_v1.nodes.find(row=>row.id===id);
+        assert.equal(api.resolveEvent(id,content.events[node.eventId].choices[0].id),true);
+    };
+    event("n01_arrival");
+    assert.equal(api.beginBattle("n02_roadfight"),true);c.battleActive=false;
+    c.battleCallback({result:"lose"});assert.equal(intents.length,1,"lost battle has no qualification intent");
+    assert.equal(api.beginBattle("n02_roadfight"),true);c.battleActive=false;c.battleCallback({result:"win"});
+    assert.equal(api.selectBranch("n03_fork","illegal"),false);
+    assert.equal(api.selectBranch("n03_fork","safe"),true);event("n04a_path");
+    c.player.adventureProgress.chapters.chapter_v1.objective={sourceNodeId:"n05_commission",ready:true,turnedIn:false,active:true};
+    assert.equal(api.turnInObjective("n05_commission"),true);
+    assert.equal(api.restAtNode("n06_rest"),true);assert.equal(api.openChest("n07_chest"),true);
+    event("n08_truth");assert.equal(api.beginBattle("n09_boss"),true);
+    c.battleActive=false;c.battleCallback({result:"win"});assert.equal(api.finishChapter("n10_finish"),true);
+    assert.deepEqual(intents.map(row=>row.nodeId),["n01_arrival","n02_roadfight","n03_fork","n04a_path",
+        "n05_commission","n06_rest","n07_chest","n08_truth","n09_boss","n10_finish"]);
+    assert.ok(intents.every(row=>row.chapterId==="chapter_v1"));
+    assert.equal(intents[2].choiceId,"safe");assert.ok(intents.filter((_,i)=>i!==2).every(row=>row.choiceId===null));
+    const count=intents.length;assert.equal(api.finishChapter("n10_finish"),false);
+    assert.equal(api.openChest("n07_chest"),false);assert.equal(intents.length,count);
+})();
+
 console.log("✓ adventure node system V1 targeted regressions");
