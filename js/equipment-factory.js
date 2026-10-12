@@ -11,6 +11,8 @@
     const STATS=["attack","intelligence","vitality","energy","defensePoints","agility"];
     const BASE_PRICE={white:500,blue:1500,purple:4000,orange:10000};
     const MIN_STAT={white:5,blue:11,purple:17,orange:23};
+    const STAT_PRICE_WEIGHT=Object.freeze({attack:1,intelligence:1,vitality:1,energy:1,defensePoints:1,agility:1});
+    const SLOT_PRICE_WEIGHT=Object.freeze({weapon:1,hand:1,head:1,helmet:1,armor:1,shoes:1,shoulder:1,ring:1,accessory:1});
     const PREFIXES=["青嵐","寒星","赤霄","玄霜","碧雲","銀羽","蒼雷","暮雪","流光","紫霞","墨竹","孤峰","清泉","燎原","逐風","霜華","雲影","月華","星河","晨曦","玉衡","凌霄","雪松","金麟","白虹","翠微","秋水","夜雨","丹楓","飛鴻","長歌","海棠","天青","煙霞","寒川","曉露","春山","素心","落英","晴空"];
     const STARTERS={
         ironSword:{type:"weapon",classType:"warrior",stats:{attack:3},assetPath:"assets/equipment/warrior/weapon-01.png",price:120},
@@ -43,14 +45,14 @@
     }
     function prices(item){
         if(item.equipmentFactoryVersion===1&&item.ordinaryEquipment===true){
-            const [,value]=mainStat(item);
+            const [stat,value]=mainStat(item);
             const starter=STARTERS[item.definitionId];
-            // Preserve established tier/starter baselines. No unapproved stat-type
-            // economic weights: only a one-gold integer quality increment for now.
+            // Approved equal stat/slot weights and 2% per point above the baseline.
+            // Starter baselines retain their established economics.
             const base=starter?starter.price*5:BASE_PRICE[item.rarityKey];
             const reference=starter?Object.values(starter.stats)[0]:MIN_STAT[item.rarityKey];
             if(!Number.isFinite(base)||!TYPES.has(item.type)){ throw Error("裝備價格資料異常"); }
-            const shop=base+value-reference;
+            const shop=base*SLOT_PRICE_WEIGHT[item.type]+Math.ceil(base*.02*STAT_PRICE_WEIGHT[stat]*Math.max(0,value-reference));
             if(!Number.isSafeInteger(shop)||shop<=0){ throw Error("裝備價格超出範圍"); }
             return {shop,sell:Math.floor(shop*.2)};
         }
@@ -86,6 +88,9 @@
         if(!/<(?:img|svg)\b/i.test(String(item.icon||""))&&item.assetPath){item.icon=art(item.assetPath);}
         if(validUid(item.v141Uid)&&!item.setId&&!validName(item.name)){item.name=nameFor(item);}
         reforge.migrateItem(item);
+        if(item.equipmentFactoryVersion===1&&item.ordinaryEquipment===true){
+            const price=prices(item);item.shopPrice=price.shop;item.price=price.sell;
+        }
         return item;
     }
     function migrateGraph(inventory,equipment){
@@ -117,5 +122,5 @@
         return [...seen];
     }
     function uniqueNames(items){const names=new Set();for(const item of items){let attempt=0;while(names.has(item.name)&&attempt<PREFIXES.length){item.name=nameFor(item,++attempt);}names.add(item.name);}return items;}
-    return Object.freeze({create,starter,migrateItem,migrateGraph,prices,validUid,validName,uniqueNames,hash,STARTERS});
+    return Object.freeze({create,starter,migrateItem,migrateGraph,prices,validUid,validName,uniqueNames,hash,STARTERS,STAT_PRICE_WEIGHT,SLOT_PRICE_WEIGHT});
 });

@@ -82,7 +82,8 @@ test("shop name collision rerolls change neither instance/stat/asset nor price",
 });
 test("one price resolver is strictly monotone and ignores absent extra affixes",()=>{
  for(const rarity of ["white","blue","purple","orange"]){for(const type of ["weapon","head","armor","shoes","shoulder"]){for(const stat of reforge.STATS){
-  const low=factory.create({type,rarityKey:rarity,stats:{[stat]:20}},{ordinary:true}),high={...low,stats:{[stat]:21}};
+  const value={white:5,blue:11,purple:17,orange:23}[rarity]+3;
+  const low=factory.create({type,rarityKey:rarity,stats:{[stat]:value}},{ordinary:true}),high={...low,stats:{[stat]:value+1}};
   assert.ok(factory.prices(high).shop>factory.prices(low).shop);high.reforgeStats={attack:999};assert.equal(factory.prices(high).shop,factory.prices({...high,reforgeStats:null}).shop);
  }}}
  const core=read("js/00-main.js"),shop=read("js/equipment-progression.js"),bulk=read("js/53-v173.50-inventory-qol.js");
@@ -96,4 +97,23 @@ test("factory special equipment uses the sole V2 slot model without altering set
   const stats={attack:30,vitality:5},item=factory.create({id:"set-piece",type:"armor",setId:"setFire",rarityKey:rarity,name:"赤炎戰甲",stats});
   assert.equal(reforge.slotCount(item),count);assert.deepEqual(item.stats,stats);assert.equal(item.reforgeAffixes.length,count);
  }
+});
+
+test("approved 2% formula and 20% recovery share saved prices across every stat and slot",()=>{
+ assert.deepEqual(factory.STAT_PRICE_WEIGHT,{attack:1,intelligence:1,vitality:1,energy:1,defensePoints:1,agility:1});
+ assert.ok(Object.isFrozen(factory.STAT_PRICE_WEIGHT));assert.ok(Object.isFrozen(factory.SLOT_PRICE_WEIGHT));
+ const tiers={white:[500,5],blue:[1500,11],purple:[4000,17],orange:[10000,23]};
+ for(const [rarityKey,[base,min]] of Object.entries(tiers))for(const type of Object.keys(factory.SLOT_PRICE_WEIGHT))for(const stat of reforge.STATS)for(const extra of [0,1,3,5]){
+  assert.equal(factory.SLOT_PRICE_WEIGHT[type],1);
+  const item=factory.create({type,rarityKey,stats:{[stat]:min+extra}},{ordinary:true});
+  const price={shop:base+Math.ceil(base*.02*extra),sell:Math.floor((base+Math.ceil(base*.02*extra))*.2)};
+  assert.deepEqual(factory.prices(item),price);assert.equal(item.shopPrice,price.shop);assert.equal(item.price,price.sell);
+  const reload=plain(item);reload.shopPrice=1;reload.price=1;factory.migrateItem(reload);
+  assert.equal(reload.shopPrice,price.shop);assert.equal(reload.price,price.sell);assert.equal(reload.v141Uid,item.v141Uid);assert.equal(reload.name,item.name);assert.deepEqual(reload.stats,item.stats);
+ }
+ for(const [rarityKey,value,expected] of [["purple",20,4240],["purple",21,4320],["blue",12,1530],["orange",24,10200]]){
+  assert.equal(factory.prices(factory.create({type:"weapon",rarityKey,stats:{attack:value}},{ordinary:true})).shop,expected);
+ }
+ for(const id of Object.keys(factory.STARTERS))assert.equal(factory.prices(factory.starter(id)).sell,factory.STARTERS[id].price);
+ const legacy={id:"legacy",type:"weapon",stats:{attack:20},shopPrice:777,price:33};factory.migrateGraph([legacy],{});assert.deepEqual(factory.prices(legacy),{shop:777,sell:33});
 });

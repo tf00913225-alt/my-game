@@ -1,6 +1,6 @@
 # EQUIPMENT-AUTHORITY-20261012
 
-Target: dev；Branch: feature/equipment-authority-20261012。禁止合併；能力價格權重待使用者確認。
+Target: dev；Branch: feature/equipment-authority-20261012。禁止合併；2026-10-12 使用者已確認六種能力／部位權重各1、2%增幅與20%回收價。
 
 ## 正式來源與改接
 
@@ -18,15 +18,15 @@ Target: dev；Branch: feature/equipment-authority-20261012。禁止合併；能�
 
 `SHOP_UNLIMITED_REFRESH_TEST_MODE=true`：免費無限刷新，每次更新內部安全整數序號與六件商品 UID，UI 隱藏次數。改 false 恢復既有每日限制行為，沒有決定新的正式成本／次數／重置政策。canonical reader 只放寬序號的舊 10 上限，仍校驗日期、整數、領取／購買收據與原雲端 Gate；沒有新增持久化 key。
 
-## 價格目前實作與待確認提案
+## 已核准價格規則
 
-卡片、詳情、扣款、單件出售、批量出售共用 `factory.prices`。目前僅保留白500／藍1500／紫4000／橙10000基準與原起始回收基準；以 `P=B+(V-Vmin)` 保證主能力每多1點至少多1金，回收 `floor(P*0.2)`。Vmin=5/11/17/23，沒有初始额外詞條價格。舊／特殊裝備保留已記錄價格。這是最小單調性實作，能力種類與部位經濟差異仍待確認。
+卡片、詳情、扣款、單件出售、批量出售共用 `factory.prices`。保留白500／藍1500／紫4000／橙10000基準；Vmin=5/11/17/23。沒有初始額外詞條價格，冶煉結果不加入基礎價格。工廠裝備載入時同步保存的 shopPrice／price，不改 UID、名稱、能力或冶煉；舊版／特殊裝備保留已記錄價格。
 
 戰鬥證據：`00-main.SIX_STAT_COEFFICIENTS` 每點攻擊4、智力2.75、體力50HP、精神15SP、防禦4、敏捷1；防禦契約 K=400+目標等級×10，減傷 K/(K+Defense)。不同輸出單位及職業／技能／續航情境不能直接用4:2.75:50:15:4:1定價。
 
-建議待確認 `STAT_PRICE_WEIGHT`：attack=1、intelligence=1、vitality=1、energy=1、defensePoints=1、agility=1。理由是先以等屬性點成本保留六圍選擇，避免把HP／SP不同單位當成戰鬥等價；後續若需差異應依正式職業情境模擬，而非臆測。
+已核准並實作 `STAT_PRICE_WEIGHT`：attack=1、intelligence=1、vitality=1、energy=1、defensePoints=1、agility=1；`SLOT_PRICE_WEIGHT` 所有支援部位各1。兩份不可變表由價格 Owner 保存，沒有 UI 平行公式。
 
-完整待確認公式：`P=B[tier]*S[slot]+ceil(B[tier]*0.02*W[stat]*max(0,V-Vmin[tier]))`；回收 `floor(P*0.2)`。建議首輪 S 全部1，保留現有基準；部位參數分開保存，使用者確認部位差異後再賦值。W 與 S **尚未實作**，2% 邊際增幅亦待確認。
+公式：`P=B[tier]*S[slot]+ceil(B[tier]*0.02*W[stat]*max(0,V-Vmin[tier]))`；回收 `floor(P*0.2)`。起始裝備維持既有基準 B=原回收價×5、Vmin=原起始能力值，套用相同增幅／回收公式，避免不相關基準改價。標準普通裝備生成值至少 Vmin，因此每增加1點必定加價。
 
 例：紫階同部位+20，4000+ceil(4000*0.02*3)=4240；+21=4320；藍+12=1530；橙+24=10200。攻擊與智力在W=1下同價，但不宣稱兩者戰鬥效益相同。
 
@@ -36,4 +36,4 @@ Target: dev；Branch: feature/equipment-authority-20261012。禁止合併；能�
 
 精準自動測試覆蓋起始工廠／實際冶煉 eligibility、UID 補齊與引用、衝突前置驗證、穩定名稱、catalog 全部661筆、單主能力、兩份獨立機率表、25次免費刷新、唯一價格讀取及單調性、套裝／冶煉／canonical cloud reader 相容。實際瀏覽器覆蓋冶煉選擇、鎖定、冶煉 rollback／重載及裝備詳情／寶箱預覽。
 
-未進行正式部署、main 發布或 dev 合併；最新 Head CI 結果另記 PR。能力價格權重／部位權重是產品待確認項目，不能描述為已完成最終價格平衡。
+未進行正式部署、main 發布或 dev 合併；最新 Head CI 結果另記 PR。已採用核准價格公式；不宣稱已驗證六種能力的實戰經濟等價。免費無限刷新測試模式保留。
