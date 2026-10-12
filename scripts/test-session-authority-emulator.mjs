@@ -11,6 +11,7 @@ const {createSessionAuthority}=require("../functions/src/session-authority.js");
 const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-writer.js");
 const {createCanonicalResourceCredit}=require("../functions/src/canonical-resource-credit.js");
 const {createDailyCheckinGrant}=require("../functions/src/daily-checkin-grant.js");
+const {createHeroAcquisition}=require("../functions/src/hero-acquisition.js");
 const {createCanonicalBattleAttempt}=require("../functions/src/canonical-battle-attempt.js");
 const {createCanonicalBattleEncounter}=require("../functions/src/canonical-battle-encounter.js");
 const {resolvePlainPlayerNormalAttack}=require("../functions/src/canonical-battle-normal-attack.js");
@@ -1994,6 +1995,122 @@ assert.equal((await db.doc(`users/${atomicUid}/saves/current`).get())
 assert.equal((await db.doc(`serverUsers/${atomicUid}/playableSnapshots/4`).get())
     .get("readyForPublication"),false);
 await checkRecoveryArchive(atomicUid,4);
+// Actual Firestore transactions and exported acquisition Callable boundaries. A new
+// disposable account avoids changing any existing canonical/source fixtures.
+const heroEmail="hero-acquisition-emulator@example.test";
+const heroUser=await login("accounts:signUp",{email:heroEmail,password});
+const heroUid=heroUser.localId;
+const heroSession=await invoke("createGameSession",heroUser.idToken,{uid:heroUid});
+await invoke("bootstrapCloudSave",heroUser.idToken,{uid:heroUid,session:heroSession});
+const heroSessions=createSessionAuthority({db,FieldValue,HttpsError});
+let heroClock=Date.now();
+const heroOwner=createHeroAcquisition({db,FieldValue,HttpsError,
+    runProtected:heroSessions.runProtected,inspectExistingEnvelope,nextRevision,
+    now:()=>heroClock,seed:()=>20261012});
+const heroRequest=(user,session,extra={})=>({auth:{uid:heroUid,token:claims(user.idToken)},
+    data:{uid:heroUid,session,...extra}});
+const heroRoot=db.collection("serverUsers").doc(heroUid);
+const heroEnvelope=db.doc(`users/${heroUid}/saves/current`);
+assert.equal((await invoke("readHeroAcquisition",heroUser.idToken,
+    {uid:heroUid,session:heroSession})).loginCount,0);
+await rejected("observeHeroLogin",heroUser.idToken,
+    {uid:heroUid,session:heroSession,expectedRevision:1,loginCount:7},"INVALID_ARGUMENT");
+await rejected("observeHeroLogin",heroUser.idToken,
+    {uid:heroUid,session:heroSession,expectedRevision:1,date:"20261018"},"INVALID_ARGUMENT");
+const heroConcurrent=await Promise.all([
+    heroOwner.observeLogin(heroRequest(heroUser,heroSession,{expectedRevision:1})),
+    heroOwner.observeLogin(heroRequest(heroUser,heroSession,{expectedRevision:1}))]);
+assert.deepEqual(heroConcurrent.map(r=>r.unchanged).sort(),[false,true]);
+assert.equal((await heroEnvelope.get()).get("serverRevision"),2);
+for(let day=2;day<=7;day++){
+    heroClock+=3*86400000; // cumulative, never a consecutive-login streak.
+    await assert.rejects(heroOwner.observeLogin(heroRequest(heroUser,heroSession,
+        {expectedRevision:1})),error=>error.code==="aborted");
+    const observation=await heroOwner.observeLogin(heroRequest(heroUser,heroSession,
+        {expectedRevision:day}));
+    assert.equal(observation.loginCount,day);
+}
+assert.equal((await heroRoot.collection("uniqueClaims").get()).size,1);
+assert.equal((await heroRoot.collection("heroAcquisitionHistory").get()).size,7);
+assert.equal((await heroRoot.collection("operations").get()).size,7);
+assert.equal((await heroRoot.collection("ledgerEntries").get()).size,7);
+const acquired=(await heroOwner.read(heroRequest(heroUser,heroSession))).entitlements;
+assert.equal(acquired.vajraHeavenlyKing.allocationSeed,20261012);
+assert.equal((await heroOwner.observeLogin(heroRequest(heroUser,heroSession,
+    {expectedRevision:1}))).unchanged,true); // lost-response retry.
+assert.equal((await invoke("observeHeroLogin",heroUser.idToken,
+    {uid:heroUid,session:heroSession,expectedRevision:1})).unchanged,true);
+while(Math.floor(Date.now()/1000)<=claims(heroUser.idToken).auth_time){
+    await new Promise(resolve=>setTimeout(resolve,100));
+}
+const heroOtherDevice=await login("accounts:signInWithPassword",{email:heroEmail,password});
+const heroOtherSession=await invoke("createGameSession",heroOtherDevice.idToken,{uid:heroUid});
+await assert.rejects(heroOwner.read(heroRequest(heroUser,heroSession)),
+    error=>error.message==="SESSION_REVOKED");
+await rejected("readHeroAcquisition",heroUser.idToken,
+    {uid:heroUid,session:heroSession},"SESSION_REVOKED");
+assert.deepEqual((await heroOwner.read(heroRequest(heroOtherDevice,heroOtherSession))).entitlements,acquired);
+assert.deepEqual((await invoke("readHeroAcquisition",heroOtherDevice.idToken,
+    {uid:heroUid,session:heroOtherSession})).entitlements,acquired);
+await assert.rejects(heroOwner.observeLogin(heroRequest(heroOtherDevice,heroOtherSession,
+    {expectedRevision:8,save:{heroAccount:{}}})),error=>error.code==="invalid-argument");
+assert.equal(await rulesRequest(`serverUsers/${heroUid}/heroAcquisition/current`,heroOtherDevice.idToken),403);
+assert.equal(await rulesRequest(`serverUsers/${heroUid}/uniqueClaims/hero-v1-vajraHeavenlyKing`,heroOtherDevice.idToken,"PATCH"),403);
+const heroClaim=heroRoot.collection("uniqueClaims").doc("hero-v1-vajraHeavenlyKing");
+await heroClaim.delete(); // emulator-only corruption; production never deletes a claim.
+const blockedHeroEnvelope=(await heroEnvelope.get()).get("serverRevision");
+await assert.rejects(heroOwner.observeLogin(heroRequest(heroOtherDevice,heroOtherSession,
+    {expectedRevision:8})),error=>error.code==="data-loss");
+assert.equal((await heroEnvelope.get()).get("serverRevision"),blockedHeroEnvelope);
+assert.equal((await heroClaim.get()).exists,false);
+const storyEmail="hero-chapter-emulator@example.test";
+const storyUser=await login("accounts:signUp",{email:storyEmail,password}),storyUid=storyUser.localId;
+const storySession=await invoke("createGameSession",storyUser.idToken,{uid:storyUid});
+await invoke("bootstrapCloudSave",storyUser.idToken,{uid:storyUid,session:storySession});
+const storyData={uid:storyUid,session:storySession};
+let storyProof=await invoke("ensureHeroChapterTicket",storyUser.idToken,{...storyData,expectedRevision:1});
+const storyTicket=storyProof.chapter.ticketId;
+await rejected("completeHeroChapterNode",storyUser.idToken,{...storyData,
+    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"n10_finish",choiceId:null},"FAILED_PRECONDITION");
+await rejected("completeHeroChapterNode",storyUser.idToken,{...storyData,
+    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"n01_arrival",choiceId:null,won:true},"INVALID_ARGUMENT");
+await rejected("completeHeroChapterNode",heroOtherDevice.idToken,{uid:heroUid,session:heroOtherSession,
+    expectedRevision:8,ticketId:storyTicket,nodeId:"n01_arrival",choiceId:null},"DATA_LOSS"); // corrupt own rights; no other-UID source is read.
+const firstStep={...storyData,expectedRevision:storyProof.serverRevision,
+    ticketId:storyTicket,nodeId:"n01_arrival",choiceId:null};
+const concurrentStep=await Promise.all([
+    invoke("completeHeroChapterNode",storyUser.idToken,firstStep),
+    invoke("completeHeroChapterNode",storyUser.idToken,firstStep)]);
+assert.deepEqual(concurrentStep.map(r=>r.unchanged).sort(),[false,true]);
+storyProof=concurrentStep.find(r=>!r.unchanged);
+for(const nodeId of ["n02_roadfight","n03_fork","n04a_path","n05_commission","n06_rest",
+    "n07_chest","n08_truth","n09_boss","n10_finish"]){
+    storyProof=await invoke("completeHeroChapterNode",storyUser.idToken,{...storyData,
+        expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId,
+        choiceId:nodeId==="n03_fork"?"safe":null});
+}
+assert.equal(storyProof.chapter.phase,"completed");assert.equal(storyProof.chapter.outcomeVerified,false);
+assert.equal(storyProof.authoritativeStateReady,false);
+const storyRoot=db.collection("serverUsers").doc(storyUid);
+assert.equal((await storyRoot.collection("uniqueClaims").get()).size,1);
+assert.equal((await storyRoot.collection("heroChapterSteps").get()).size,10);
+const storyClaim=await storyRoot.collection("uniqueClaims").doc("hero-v1-divineDogHongbao").get();
+const storyGrant=storyProof.entitlements.divineDogHongbao;
+assert.equal(storyClaim.get("allocationSeed"),storyGrant.allocationSeed);
+assert.equal((await invoke("completeHeroChapterNode",storyUser.idToken,{...storyData,
+    expectedRevision:1,ticketId:storyTicket,nodeId:"n10_finish",choiceId:null})).unchanged,true);
+while(Math.floor(Date.now()/1000)<=claims(storyUser.idToken).auth_time){await new Promise(resolve=>setTimeout(resolve,100));}
+const storyOther=await login("accounts:signInWithPassword",{email:storyEmail,password});
+const storyOtherSession=await invoke("createGameSession",storyOther.idToken,{uid:storyUid});
+await rejected("readHeroAcquisition",storyUser.idToken,storyData,"SESSION_REVOKED");
+assert.deepEqual((await invoke("readHeroAcquisition",storyOther.idToken,
+    {uid:storyUid,session:storyOtherSession})).entitlements.divineDogHongbao,storyGrant);
+await rejected("completeHeroChapterNode",storyOther.idToken,{uid:storyUid,session:storyOtherSession,
+    expectedRevision:1,ticketId:storyTicket,nodeId:"n10_finish",choiceId:null,save:{chapterCompleted:true}},"INVALID_ARGUMENT");
+assert.equal((await storyRoot.collection("uniqueClaims").get()).size,1);
+assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapter/current`,storyOther.idToken),403);
+assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapterTickets/${storyTicket}`,storyOther.idToken,"PATCH"),403);
+console.log("PASS Hero acquisition protected Firestore/HTTP: cumulative days, concurrent day/node intents, legal chapter route, permanent stable-seed rights, lost/stale retry, takeover, private rules and corruption rejection; ordinary battle outcomes remain unverified.");
 console.log(`PASS (${direct?"direct exported handlers":"HTTP callable"}): A SUCCESS -> B takeover -> A SESSION_REVOKED -> B SUCCESS; logout, UID isolation, tampering, private rules, protected writers, concurrent takeover/write ordering, revoked/disabled Firebase identity.`);
 await db.terminate();
 if(direct){await getFirestore().terminate();}

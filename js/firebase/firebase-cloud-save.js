@@ -100,6 +100,21 @@ export async function bootstrapTrustedCloudSave(){
     return callTrustedFunction("bootstrapCloudSave", {});
 }
 
+// Acquisition rights are independent of a restored local character snapshot.
+// The server observes its own calendar date; no browser date/counter is sent.
+export async function readHeroAcquisition(){
+    return callTrustedFunction("readHeroAcquisition",{});
+}
+export async function observeHeroLogin(expectedRevision){
+    return callTrustedFunction("observeHeroLogin",{expectedRevision});
+}
+export async function ensureHeroChapterTicket(expectedRevision){
+    return callTrustedFunction("ensureHeroChapterTicket",{expectedRevision});
+}
+export async function completeHeroChapterNode({ticketId,nodeId,choiceId=null,expectedRevision}){
+    return callTrustedFunction("completeHeroChapterNode",{ticketId,nodeId,choiceId,expectedRevision});
+}
+
 /* Only first-character choices cross this boundary. The backend checks Auth
  * account age, active session, empty canonical sources and expected revision. */
 export async function createInitialCanonicalCharacter(selection,expectedRevision){

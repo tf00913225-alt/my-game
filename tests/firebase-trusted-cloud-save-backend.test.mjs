@@ -28,6 +28,20 @@ test("Firebase deployment includes every exported callable and deny-write rules"
     assert.ok(selected.has("firestore:rules"));
 });
 
+test("read-only browser QA modules implement the formal Cloud lifecycle import surface",()=>{
+    const bootstrap=read("js/firebase/firebase-bootstrap.js");
+    const block=bootstrap.match(/import\s*\{([^}]+)\}\s*from\s*["']\.\/firebase-cloud-save\.js["']/);
+    assert.ok(block,"Cloud lifecycle must use its existing module boundary");
+    const imports=block[1].split(",").map(name=>name.trim()).filter(Boolean);
+    for(const fixture of [".github/scripts/run-boot-architecture-browser-qa.mjs",
+        ".github/scripts/runtime-browser-qa-support.mjs",
+        ".github/scripts/run-bottom-nav-runtime-browser-qa.mjs"]){
+        const text=read(fixture);
+        const exports=new Set([...text.matchAll(/export\s+(?:async\s+)?(?:function|const)\s+(\w+)/g)].map(match=>match[1]));
+        for(const name of imports)assert.ok(exports.has(name),`${fixture} lacks Cloud export ${name}`);
+    }
+});
+
 function validSave(){
     return {
         version:6,
