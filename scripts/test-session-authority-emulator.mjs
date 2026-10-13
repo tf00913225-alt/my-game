@@ -1508,6 +1508,16 @@ const ownedQuestStates={
     commissionQuestState:{date:"2020-02-29",progress:{killMonsters:6,winBattle:3},
         claimed:{killMonsters:false,winBattle:true}}
 };
+const ownedGameplayProgress={version:1,
+    personal:Object.fromEntries([20,30,40,50,60,70,80,90,100].map(level=>
+        [`personal-${level}`,{firstClear:level===20,clears:level===20?5:0}])),
+    world:Object.fromEntries([40,60,80,100].map(level=>
+        [`world-${level}`,{completedStages:level===40?4:0,firstClear:level===40,
+            clears:level===40?2:0}])),
+    tower:{weekKey:"2020-02-24",element:"fire",completedFloor:50,highestThisWeek:50,
+        claimedFloors:{1:true,25:true,50:true},historicalHighest:75,pendingRelicChoice:true}
+};
+ownedRecords.progress.gameplayProgress=ownedGameplayProgress;
 Object.assign(ownedRecords.progress,ownedQuestStates);
 const ownedAchievementState={firstBattle:true,reachLevel10:false};
 ownedRecords.progress.achievementState=ownedAchievementState;
@@ -1528,7 +1538,8 @@ await Promise.all([
     ownedRoot.collection("economy").doc("current").update({sharedExp:320}),
     ownedRoot.collection("progress").doc("current").update({sidecars:ownedRecords.progress.sidecars,
         abyssProgress:ownedRecords.progress.abyssProgress,
-        achievementState:ownedAchievementState,...ownedQuestStates}),
+        achievementState:ownedAchievementState,...ownedQuestStates,
+        gameplayProgress:ownedGameplayProgress}),
     ownedRoot.collection("account").doc("current")
         .update({snapshotSha256:ownedBundle.sha256}),
     ownedRoot.collection("playableSnapshots").doc("2").set(ownedBundle),
@@ -1565,6 +1576,10 @@ for(const [key,state] of Object.entries(ownedQuestStates)){
     assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
         .get(`sourceRecords.progress.${key}`),state);
 }
+assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
+    .get("gameplayProgress"),ownedGameplayProgress);
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+    .get("sourceRecords.progress.gameplayProgress"),ownedGameplayProgress);
 const ownedAllocation="allocate-owned-source-exp-0001";
 // Corrupt only the emulator fixture and reseal its current snapshot so a
 // matching hash cannot substitute for complete retained character evidence.
@@ -1688,6 +1703,40 @@ for(const [key,state] of Object.entries(ownedQuestStates)){
         ]);
     }
 }
+// Matched source/snapshot hashes cannot hide malformed Boss/Tower storage.
+// All writes here affect only the existing emulator account fixture.
+for(const mutate of [s=>s.personal["personal-20"].firstClear="true",
+    s=>s.world["world-40"].completedStages=1.5,
+    s=>s.tower.claimedFloors["50"]={claimed:true},s=>s.tower.weekKey="2020-02-25"]){
+    const badGameplayProgress4=structuredClone(ownedGameplayProgress);mutate(badGameplayProgress4);
+    const badGameplaySnapshot4={...ownedSnapshot4,
+        snapshot:JSON.parse(JSON.stringify(ownedSnapshot4.snapshot))};
+    badGameplaySnapshot4.snapshot.progress.gameplayProgress=badGameplayProgress4;
+    badGameplaySnapshot4.sha256=claimRecordsDigest(badGameplaySnapshot4.snapshot);
+    badGameplaySnapshot4.byteLength=Buffer.byteLength(JSON.stringify(badGameplaySnapshot4.snapshot),"utf8");
+    await Promise.all([
+        ownedProgressRef4.update({gameplayProgress:badGameplayProgress4}),
+        ownedSnapshotRef4.set(badGameplaySnapshot4),
+        ownedAccountRef4.update({snapshotSha256:badGameplaySnapshot4.sha256})
+    ]);
+    await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
+        operationId:ownedAllocation,expectedRevision:4}),error=>error.code==="data-loss");
+    assert.equal((await ownedRoot.collection("operations").doc(ownedAllocation).get()).exists,false);
+    assert.equal((await ownedRoot.collection("playableSnapshots").doc("5").get()).exists,false);
+    assert.equal((await ownedRoot.collection("recoveryArchives").doc("5").get()).exists,false);
+    assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),4);
+    assert.equal((await ownedAccountRef4.get()).get("serverRevision"),4);
+    const retainedGameplayEconomy4=(await ownedRoot.collection("economy").doc("current").get()).data();
+    assert.equal(retainedGameplayEconomy4.sharedExp,320);
+    assert.equal(retainedGameplayEconomy4.gold,ownedSnapshot4.snapshot.economy.gold);
+    assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+        .get("sourceRecords.progress.gameplayProgress"),ownedGameplayProgress);
+    await Promise.all([
+        ownedProgressRef4.update({gameplayProgress:ownedGameplayProgress}),
+        ownedSnapshotRef4.set(ownedSnapshot4),
+        ownedAccountRef4.update({snapshotSha256:ownedSnapshot4.sha256})
+    ]);
+}
 await ownedCharacterRef.update({skillLoadout:{...ownedSkillLoadout,equippedSkills:["flameSlash","flameSlash"]}});
 await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
     operationId:ownedAllocation,expectedRevision:4}),error=>error.code==="data-loss");
@@ -1706,6 +1755,11 @@ await ownedEquipRef.update({ownedItemId});
 const ownedAllocated=await expAllocator.allocateSharedExp(ownedRequest,{
     operationId:ownedAllocation,expectedRevision:4});
 assert.equal(ownedAllocated.allocatedRevision,5);
+assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
+    .get("gameplayProgress"),ownedGameplayProgress);
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
+    .get("sourceRecords.progress.gameplayProgress"),ownedGameplayProgress);
+
 for(const [key,state] of Object.entries(ownedQuestStates)){
     assert.deepEqual((await ownedProgressRef4.get()).get(key),state);
     assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())

@@ -98,6 +98,43 @@ function inspectQuestState(key,state,allowUninitialized=false){
     }
 }
 
+// Existing Client Boss/Tower storage schema only. Keep recorded periods and
+// markers; never compute the current week, run combat or reconcile rewards.
+function inspectGameplayProgress(state,allowUninitialized=false){
+    if(allowUninitialized&&object(state)&&Object.keys(state).length===0){return;}
+    const exact=(value,keys)=>object(value)&&
+        Object.keys(value).sort().join("|")===[...keys].sort().join("|");
+    const integer=(value,max=Number.MAX_SAFE_INTEGER)=>
+        Number.isSafeInteger(value)&&value>=0&&value<=max;
+    const personalIds=[20,30,40,50,60,70,80,90,100].map(level=>`personal-${level}`);
+    const worldIds=[40,60,80,100].map(level=>`world-${level}`);
+    if(!exact(state,["version","personal","world","tower"])||state.version!==1||
+       !exact(state.personal,personalIds)||!exact(state.world,worldIds)){
+        fail("gameplay progress root or Boss source inventory");
+    }
+    for(const [group,ids] of [[state.personal,personalIds],[state.world,worldIds]]){
+        for(const id of ids){
+            const entry=group[id],world=group===state.world;
+            if(!exact(entry,world?["completedStages","firstClear","clears"]:["firstClear","clears"])||
+               typeof entry.firstClear!=="boolean"||!integer(entry.clears)||
+               world&&!integer(entry.completedStages,4)){
+                fail("gameplay progress Boss counters or first-clear markers");
+            }
+        }
+    }
+    const tower=state.tower;
+    if(!exact(tower,["weekKey","element","completedFloor","highestThisWeek",
+        "claimedFloors","historicalHighest","pendingRelicChoice"])||
+       !recordedDate(tower.weekKey)||new Date(`${tower.weekKey}T00:00:00Z`).getUTCDay()!==1||
+       !ELEMENTS.has(tower.element)||
+       ["completedFloor","highestThisWeek","historicalHighest"].some(key=>!integer(tower[key],100))||
+       typeof tower.pendingRelicChoice!=="boolean"||!object(tower.claimedFloors)||
+       Object.entries(tower.claimedFloors).some(([floor,claimed])=>
+           !/^[1-9]\d*$/.test(floor)||!integer(Number(floor),100)||claimed!==true)){
+        fail("gameplay progress Tower period, counters or recorded claims");
+    }
+}
+
 // Retained skill storage shape only: no catalogue, learning/cost/element
 // eligibility, combat execution, defaults or normalization in this reader.
 // Client skill Owner stores positive levels (current global ceiling 10) and
@@ -460,6 +497,7 @@ function assembleCanonicalSnapshot(uid,revision,records){
     }
     if(records.progress.playableState!==undefined){
         inspectAchievementState(records.progress.achievementState);
+        inspectGameplayProgress(records.progress.gameplayProgress,provenance==="server-created");
         for(const key of ["dailyQuestState","commissionQuestState"]){
             inspectQuestState(key,records.progress[key],provenance==="server-created");
         }
@@ -595,6 +633,7 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
     for(const key of ["dailyQuestState","commissionQuestState"]){
         inspectQuestState(key,source.snapshot.progress[key]);
     }
+    inspectGameplayProgress(source.snapshot.progress.gameplayProgress);
     const gameSave={version:6,heroAccount:hero,player:players[0],player2:players[1],
         player3:players[2],gold:source.snapshot.economy.gold,
         sharedExp:source.snapshot.economy.sharedExp,bestiaryData:copy(extra.bestiaryData),
