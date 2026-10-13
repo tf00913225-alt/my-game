@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const read=f=>fs.readFileSync(f,'utf8');
-const ids=['homePage','inventoryPage','homeFeatureModal','itemModal','inventoryCharacterDetailModal','skillDetailModal','statusHelpModal'];
+const ids=['homePage','inventoryPage','homeFeatureModal','itemModal','inventoryCharacterDetailModal','skillDetailModal','statusHelpModal','allElementSkillPreviewModal'];
 test('general surfaces migrate once to the native overlay and preserve lifecycle',()=>{
  const source=read('js/00-main.js'),owner=source.slice(source.indexOf('(function setupNativeGameUi()'),source.indexOf('/* Legacy V3 navigation'));
  const nodes=Object.fromEntries(ids.map(id=>[id,{id}]));let ui,observer;
@@ -14,6 +14,8 @@ test('general surfaces migrate once to the native overlay and preserve lifecycle
  for(const id of ids)assert.equal(nodes[id].parent,ui,id);
  assert.ok(ui.hidden);nodes.gameInterface.style.display='block';observer();assert.equal(ui.hidden,false);
  assert.doesNotMatch(owner,/transform|scale|game-stage/);
+ assert.doesNotMatch(read('js/25-v131-fix-batch.js'),/function promoteSkillPreview|overlay\.appendChild\(modal\)/);
+ assert.doesNotMatch(read('js/35-v141-ui-battle.js'),/document\.body\.appendChild\(modal\)/);
 });
 test('migrated IDs cannot regain stage-only presentation selectors, including injected CSS',()=>{
  const files=['index.html',...['css','js'].flatMap(dir=>fs.readdirSync(dir).filter(f=>/\.(css|js)$/.test(f)).map(f=>path.join(dir,f)))];
