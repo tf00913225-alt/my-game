@@ -225,7 +225,8 @@ class CdpClient{
         this.nextId=1;
         this.pending=new Map();
         this.socket=null;
-        this.events=[];
+        this.events=[]; this.assetRequests=new Map(); this.assetCounts=new Map(); this.assetFailures=[];
+        this.evalTimings=[];
     }
     async connect(){
         this.socket=new WebSocket(this.url);
@@ -239,6 +240,9 @@ class CdpClient{
             if(raw&&typeof raw!=="string"&&typeof raw.text==="function"){ raw=await raw.text(); }
             const message=JSON.parse(String(raw));
             if(!message.id){
+                if(message.method==="Network.requestWillBeSent"&&/\.(webp|png)(?:\?|$)/.test(message.params?.request?.url||"")){const url=message.params.request.url;this.assetRequests.set(message.params.requestId,url);if(this.assetRequests.size>500)this.assetRequests.delete(this.assetRequests.keys().next().value);this.assetCounts.set(url,(this.assetCounts.get(url)||0)+1);}
+                if(message.method==="Network.loadingFailed"&&this.assetRequests.has(message.params?.requestId)){this.assetFailures.push({url:this.assetRequests.get(message.params.requestId),error:message.params.errorText,canceled:message.params.canceled});if(this.assetFailures.length>40)this.assetFailures.shift();}
+
                 if(message.method==="Runtime.exceptionThrown"){
                     const details=message.params&&message.params.exceptionDetails;
                     this.events.push({
@@ -251,6 +255,8 @@ class CdpClient{
                         lineNumber:details&&details.lineNumber,
                         columnNumber:details&&details.columnNumber
                     });
+                }else if(message.method==="Page.javascriptDialogOpening"||message.method==="Page.javascriptDialogClosed"){
+                    this.events.push({method:message.method,params:message.params});
                 }else if(message.method==="Runtime.consoleAPICalled"){
                     const type=message.params&&message.params.type;
                     if(type==="error"||type==="warning"){
@@ -278,12 +284,15 @@ class CdpClient{
     send(method,params={}){
         const id=this.nextId++;
         return new Promise((resolve,reject)=>{
-            this.pending.set(id,{resolve,reject,method});
+            this.pending.set(id,{resolve,reject,method,startedAt:performance.now()});
             this.socket.send(JSON.stringify({id,method,params}));
         });
     }
     async eval(expression,awaitPromise=true){
+        const started=performance.now();
         const response=await this.send("Runtime.evaluate",{expression,awaitPromise,returnByValue:true,userGesture:true});
+        this.evalTimings.push({elapsedMs:performance.now()-started,expression:expression.slice(0,120)});
+        if(this.evalTimings.length>40){ this.evalTimings.shift(); }
         if(response.exceptionDetails){
             const text=response.exceptionDetails.exception?.description||response.exceptionDetails.text||"Runtime evaluation failed";
             throw new Error(text);
@@ -294,15 +303,32 @@ class CdpClient{
 }
 
 async function waitFor(client,expression,label,timeoutMs=30000){
-    const started=Date.now();
-    let last=null;
-    while(Date.now()-started<timeoutMs){
-        try{
-            last=await client.eval(`Boolean(${expression})`);
-            if(last){ return; }
-        }catch(error){ last=error.message; }
-        await sleep(180);
-    }
+    const started=performance.now();
+    let transportTimer;
+    let result;
+    try{
+        result=await Promise.race([
+            client.eval(`(async()=>{
+                const started=performance.now();
+                let last=null,diagnostic=null;
+                while(performance.now()-started<${Number(timeoutMs)}){
+                    try{last=Boolean(${expression});const elapsedMs=performance.now()-started;if(last&&elapsedMs<${Number(timeoutMs)}){return {ready:true,last,elapsedMs};}}
+                    catch(error){last=String(error?.message||error);}
+                    try{const gate=window.v142GetActiveAnimationGate?.();const current=window.v143SkillAnimationState?.current;diagnostic={at:Date.now(),gate:gate?{id:gate.config?.id,duration:gate.config?.duration,resolveDuration:gate.config?.resolveDuration,deadline:gate.deadline,done:gate.done,reason:gate.reason,visualTimelinePending:!!gate.visualTimelinePending}:null,current:current?{id:current.config?.id,sequence:current.sequence,startedAt:current.startedAt,firstVisibleFrameAt:current.firstVisibleFrameAt,duration:current.duration,done:current.done}:null,longTasks:window.__relicQaLongTasks?.slice(-8)||[]};}catch(captureError){diagnostic={captureError:String(captureError?.message||captureError)};}
+                    await new Promise(resolve=>setTimeout(resolve,180));
+                }
+                return {ready:false,last,elapsedMs:performance.now()-started,diagnostic};
+            })()`),
+            new Promise((_,reject)=>{
+                transportTimer=setTimeout(()=>reject(new Error("CDP transport stalled while waiting for "+label)),timeoutMs+10000);
+            })
+        ]);
+    }finally{ clearTimeout(transportTimer); }
+    client.waitTimings=client.waitTimings||[];
+    client.waitTimings.push({label,timeoutMs,browserElapsedMs:result?.elapsedMs,hostElapsedMs:performance.now()-started,ready:result?.ready===true,last:result?.last,diagnostic:result?.diagnostic});
+    if(client.waitTimings.length>40){ client.waitTimings.shift(); }
+    if(result?.ready===true){ return; }
+    const last=result?.last;
     if(label==="App Shell character/save owners"){
         throw new Error(
             `Timed out waiting for ${label}. Last result: ${String(last)}. `+
@@ -414,6 +440,7 @@ async function prepareAccountFirstRuntime(client,features){
 
 async function cleanupPresentationQaBattle(client){
     await client.eval("(()=>{"+
+        "try{window.__relicQaFocusObserver?.disconnect();delete window.__relicQaFocusObserver;delete window.__relicQaFocusSnapshot;}catch(_){}"+
         "try{window.__relicQaFinishRelease?.();delete window.__relicQaFinishRelease;}catch(_){}"+
         "try{if(window.v174RelicPresentationState&&window.v174RelicPresentationState().active){return false;}}catch(_){}"+
         "try{window.FourSymbolsBattleFloatingFeedback?.clear?.();}catch(_){}"+
@@ -481,11 +508,15 @@ async function launchPresentationQaMode(client,mode,relicId){
 
 async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     const id=JSON.stringify(relicId);
+    const focusExpression="(()=>{const n=document.getElementById('teamRelicBattlePresentation');const owner=window.FourSymbolsBattlefieldRenderGeometry;const state=window.v143SkillAnimationState?.current;const stageNode=document.getElementById('v143-skill-stage');if(!n?.classList.contains('targets-visible')||!n?.classList.contains('vfx-running')||state?.config?.id!=="+id+"||state.done||stageNode?.dataset.sequence!==String(state.sequence)||!stageNode.querySelector('.v143-vfx-sprite[data-skill="+id+"]'))return null;const side=state?.targetSide||null;const indexes=Array.isArray(state?.targetIndexes)?state.targetIndexes.slice():[];const overlay=owner?.getBattlefieldOverlayGeometry?.()?.rect||null;const clip=rect=>{if(!rect||!overlay){return rect||null;}const left=Math.max(overlay.left,rect.left),top=Math.max(overlay.top,rect.top),right=Math.min(overlay.left+overlay.width,rect.left+rect.width),bottom=Math.min(overlay.top+overlay.height,rect.top+rect.height);return right>left&&bottom>top?{left,top,width:right-left,height:bottom-top}:null;};const rectOf=node=>{const r=node.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height};};const artProjections=[...n.querySelectorAll('.team-relic-target-projection-art')].map(rectOf);const hpProjections=[...n.querySelectorAll('.team-relic-target-projection-hp')].map(rectOf);const diagnostics=indexes.map(index=>{const card=document.getElementById((side==='monster'?'battleMonster':'battlePlayerCard')+index);const g=owner?.getUnitGeometry?.(side,index);return {index,dom:!!card,slot:g?.slot||card?.dataset?.slot||null,artworkProjection:clip(g?.artworkProjection?.rect),hpProjection:clip(g?.hpProjection?.rect)};});const matches=(expected,actual)=>{const approx=(a,b)=>Math.abs(a-b)<=1.5;const unmatched=actual.slice();return expected.length===actual.length&&expected.every(e=>{const index=unmatched.findIndex(a=>approx(e.left,a.left)&&approx(e.top,a.top)&&approx(e.width,a.width)&&approx(e.height,a.height));if(index<0){return false;}unmatched.splice(index,1);return true;});};const expectedArt=diagnostics.map(item=>item.artworkProjection).filter(Boolean);const expectedHp=diagnostics.map(item=>item.hpProjection).filter(Boolean);const stage=document.getElementById('v143-skill-stage');const sprite=stage?.querySelector('.v143-vfx-sprite[data-skill="+id+"]');return {skillId:state.config.id,sequence:state.sequence,side,indexes,artProjections,hpProjections,targetDiagnostics:diagnostics,outlineCount:n.querySelectorAll('.team-relic-battle-target-outline').length,artGeometryMatches:matches(expectedArt,artProjections),hpGeometryMatches:matches(expectedHp,hpProjections),stageOwner:stage?.dataset.geometryOwner||null,spriteOwner:sprite?.dataset.geometryOwner||null,spriteTargetSide:sprite?.dataset.targetSide||null,spriteTargetIndexes:sprite?.dataset.targetIndexes||'',presentationLock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false};})()";
     // Use production event owners in the disposable local battle fixture.
     // DEV preview is deliberately unavailable on the production host.
     await waitFor(client,`window.v174RelicDebugState?.()?.relicId===${id}`,relicId+" initialized battle owner",7000);
     await client.eval("(()=>{currentBattleMonsters.forEach(index=>{monsters[index].hp=Math.max(100000,monsters[index].hp);monsters[index].maxHP=Math.max(100000,monsters[index].maxHP||0);});return true;})()");
     await client.eval("(()=>{window.__relicQaFinishRelease=FourSymbolsBattleFlow.interceptActionFinish(()=>!!battleDurationAction?.completed);return true;})()");
+    // Observe the finite VFX phase in the browser before triggering it. CDP
+    // scheduling may return only after that phase has already completed.
+    await client.eval("(()=>{window.__relicQaFocusObserver?.disconnect();delete window.__relicQaFocusSnapshot;const capture=()=>{const snapshot="+focusExpression+";if(snapshot){window.__relicQaFocusSnapshot=snapshot;window.__relicQaFocusObserver.disconnect();}};window.__relicQaFocusObserver=new MutationObserver(capture);window.__relicQaFocusObserver.observe(document.body,{subtree:true,childList:true,attributes:true});return true;})()");
     const before=await client.eval("window.v174RelicDebugState().totalTriggers");
     if(relicId==="relic_cold_spring_jade"){
         await client.eval("(()=>{const max=getPartyBattleStats(0).maxHP;player.hp=Math.floor(max*.4);settleBattleHpDamage(player,Math.ceil(max*.1),{attacker:monsters[currentBattleMonsters[0]],sourceType:'normalAttack',damageKind:'direct'});return true;})()");
@@ -527,14 +558,12 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     assert.ok(identity.overlay,relicId+" canonical overlay geometry missing");
     assert.ok(Math.abs(identity.rect.left-identity.overlay.left)<=1&&Math.abs(identity.rect.top-identity.overlay.top)<=1&&Math.abs(identity.rect.width-identity.overlay.width)<=1&&Math.abs(identity.rect.height-identity.overlay.height)<=1,relicId+" mask host must match canonical battlefield overlay bounds");
 
-    await waitFor(
-        client,
-        "(()=>{const n=document.getElementById('teamRelicBattlePresentation');return n?.classList.contains('targets-visible')&&n?.classList.contains('vfx-running')&&document.querySelector('#v143-skill-stage .v143-vfx-sprite[data-skill="+id+"]');})()",
-        relicId+" target focus and VFX",
-        9000
-    );
-    const focus=await client.eval("(()=>{const n=document.getElementById('teamRelicBattlePresentation');const owner=window.FourSymbolsBattlefieldRenderGeometry;const state=window.v143SkillAnimationState?.current;const side=state?.targetSide||null;const indexes=Array.isArray(state?.targetIndexes)?state.targetIndexes.slice():[];const overlay=owner?.getBattlefieldOverlayGeometry?.()?.rect||null;const clip=rect=>{if(!rect||!overlay){return rect||null;}const left=Math.max(overlay.left,rect.left),top=Math.max(overlay.top,rect.top),right=Math.min(overlay.left+overlay.width,rect.left+rect.width),bottom=Math.min(overlay.top+overlay.height,rect.top+rect.height);return right>left&&bottom>top?{left,top,width:right-left,height:bottom-top}:null;};const rectOf=node=>{const r=node.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height};};const artProjections=[...n.querySelectorAll('.team-relic-target-projection-art')].map(rectOf);const hpProjections=[...n.querySelectorAll('.team-relic-target-projection-hp')].map(rectOf);const diagnostics=indexes.map(index=>{const card=document.getElementById((side==='monster'?'battleMonster':'battlePlayerCard')+index);const g=owner?.getUnitGeometry?.(side,index);return {index,dom:!!card,slot:g?.slot||card?.dataset?.slot||null,artworkProjection:clip(g?.artworkProjection?.rect),hpProjection:clip(g?.hpProjection?.rect)};});const matches=(expected,actual)=>{const approx=(a,b)=>Math.abs(a-b)<=1.5;const unmatched=actual.slice();return expected.length===actual.length&&expected.every(e=>{const index=unmatched.findIndex(a=>approx(e.left,a.left)&&approx(e.top,a.top)&&approx(e.width,a.width)&&approx(e.height,a.height));if(index<0){return false;}unmatched.splice(index,1);return true;});};const expectedArt=diagnostics.map(item=>item.artworkProjection).filter(Boolean);const expectedHp=diagnostics.map(item=>item.hpProjection).filter(Boolean);const stage=document.getElementById('v143-skill-stage');const sprite=stage?.querySelector('.v143-vfx-sprite[data-skill="+id+"]');return {side,indexes,artProjections,hpProjections,targetDiagnostics:diagnostics,outlineCount:n.querySelectorAll('.team-relic-battle-target-outline').length,artGeometryMatches:matches(expectedArt,artProjections),hpGeometryMatches:matches(expectedHp,hpProjections),stageOwner:stage?.dataset.geometryOwner||null,spriteOwner:sprite?.dataset.geometryOwner||null,spriteTargetSide:sprite?.dataset.targetSide||null,spriteTargetIndexes:sprite?.dataset.targetIndexes||'',presentationLock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false};})()");
-    assert.ok(focus.indexes.length>=1,relicId+" resolved no battle targets");
+    // Capture the phase, animation identity, targets and geometry atomically.
+    // A second CDP read may occur after the finite animation has completed.
+    await waitFor(client,"Boolean(window.__relicQaFocusSnapshot)",mode+" "+relicId+" target focus and VFX",9000);
+    const focus=await client.eval("window.__relicQaFocusSnapshot");
+    assert.equal(focus.skillId,relicId,"Target snapshot must belong to the requested relic");
+    assert.ok(focus.indexes.length>=1,relicId+" resolved no battle targets: "+JSON.stringify({mode,focus}));
     if(targetKind==="singleAlly"){ assert.equal(focus.side,"player");assert.equal(focus.indexes.length,1); }
     if(targetKind==="allyAll"){ assert.equal(focus.side,"player"); }
     if(targetKind==="enemyAll"||targetKind==="damageStatus"){ assert.equal(focus.side,"monster"); }
@@ -550,12 +579,18 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     assert.equal(focus.spriteTargetSide,focus.side,relicId+" VFX target side drifted from focus side");
     assert.equal(focus.presentationLock,true,relicId+" presentation lock must stay held during VFX");
 
-    await waitFor(
-        client,
-        "(()=>{const p=window.v174RelicPresentationState?.();return !p?.active&&!document.getElementById('teamRelicBattlePresentation')&&!document.getElementById('v143-skill-stage')&&!document.body.classList.contains('team-relic-cinematic-active')&&!window.FourSymbolsBattleFlow?.isPresentationActive?.()&&!document.querySelector('.battle-floating-feedback');})()",
-        relicId+" complete presentation cleanup",
-        12000
-    );
+    try{
+        await waitFor(
+            client,
+            "(()=>{const p=window.v174RelicPresentationState?.();return !p?.active&&!document.getElementById('teamRelicBattlePresentation')&&!document.getElementById('v143-skill-stage')&&!document.body.classList.contains('team-relic-cinematic-active')&&!window.FourSymbolsBattleFlow?.isPresentationActive?.()&&!document.querySelector('.battle-floating-feedback');})()",
+            relicId+" complete presentation cleanup",
+            12000
+        );
+    }catch(error){
+        const diagnostics=await client.eval("(()=>{const p=window.v174RelicPresentationState?.();const current=window.v143SkillAnimationState?.current;const stage=document.getElementById('v143-skill-stage');return {relicActive:!!p?.active,relicPresentation:p||null,mask:!!document.getElementById('teamRelicBattlePresentation'),vfx:!!stage,stageSkill:stage?.dataset.skill||null,stageSequence:stage?.dataset.sequence||null,bodyClass:document.body.classList.contains('team-relic-cinematic-active'),lock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false,feedback:document.querySelectorAll('.battle-floating-feedback').length,readingState:document.body.classList.contains('v174-battle-reading-open'),animation:current?{id:current.config?.id||null,sequence:current.sequence,done:!!current.done,startedAt:current.startedAt,visualStartedAt:current.visualStartedAt,firstVisibleFrameAt:current.firstVisibleFrameAt,duration:current.duration}:null};})()").catch(diagnosticError=>({captureError:String(diagnosticError?.message||diagnosticError)}));
+        evidence.checks.relicCleanupFailure={mode,relicId,targetKind,diagnostics};
+        throw new Error(error.message+"; cleanup diagnostics: "+JSON.stringify(evidence.checks.relicCleanupFailure),{cause:error});
+    }
     const cleanup=await client.eval("(()=>({mask:!!document.getElementById('teamRelicBattlePresentation'),vfx:!!document.getElementById('v143-skill-stage'),focus:document.querySelectorAll('.team-relic-battle-target-outline').length,feedback:document.querySelectorAll('.battle-floating-feedback').length,bodyClass:document.body.classList.contains('team-relic-cinematic-active'),readingState:document.body.classList.contains('v174-battle-reading-open'),lock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false}))()");
     assert.deepEqual(cleanup,{mask:false,vfx:false,focus:0,feedback:0,bodyClass:false,readingState:true,lock:false},relicId+" presentation must expire normally while the reading drawer stays open");
     const readingClosed=await client.eval("(()=>{window.FourSymbolsBattleStatistics?.closeDrawer?.();return {readingState:document.body.classList.contains('v174-battle-reading-open'),vfx:!!document.getElementById('v143-skill-stage'),mask:!!document.getElementById('teamRelicBattlePresentation')};})()");
@@ -611,7 +646,12 @@ async function runRelicPresentationModeMatrix(client){
         let context;
         const presentations=[];
         for(const [relicId,targetKind] of relics){
+            if(process.env.RELIC_QA_PROFILE==="1"&&!evidence.profilerStarted){
+                try{evidence.performanceBefore=await client.send("Performance.getMetrics");await client.send("Profiler.enable");await client.send("Profiler.start");evidence.profilerStarted=true;}
+                catch(captureError){evidence.performanceCaptureError=String(captureError.message);}
+            }
             context=await launchPresentationQaMode(client,mode,relicId);
+            evidence.checks.relicPresentationProgress={mode,relicId,targetKind,completed:matrix};
             const snapshot=await captureRelicPresentationQa(client,relicId,targetKind,mode);
             presentations.push(snapshot);
             const baseline=identityBaseline.get(relicId);
@@ -652,6 +692,8 @@ try{
     await client.send("Emulation.setDeviceMetricsOverride",{width:412,height:915,deviceScaleFactor:3,mobile:true,screenWidth:412,screenHeight:915});
     await client.send("Page.navigate",{url:qaUrl});
     await waitFor(client,"document.readyState==='complete'","page load");
+    await client.send("Performance.enable");
+    await client.eval("(()=>{window.__relicQaLongTasks=[];try{window.__relicQaTaskObserver=new PerformanceObserver(list=>{for(const entry of list.getEntries()){window.__relicQaLongTasks.push({startTime:entry.startTime,duration:entry.duration,name:entry.name});}window.__relicQaLongTasks.splice(0,Math.max(0,window.__relicQaLongTasks.length-20));});window.__relicQaTaskObserver.observe({type:'longtask',buffered:true});}catch(error){window.__relicQaLongTaskCaptureError=String(error.message);}return true;})()");
     const accountState=await prepareAccountFirstRuntime(client,["abyss","boss-tower"]);
     evidence.checks.accountState=accountState;
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime");
@@ -1644,6 +1686,21 @@ try{
 } catch(error){
     evidence.status="FAIL";
     evidence.error=error?.stack||String(error);
+    try{evidence.performanceAfter=await client.send("Performance.getMetrics");if(evidence.profilerStarted){evidence.cpuProfile=await client.send("Profiler.stop");}}
+    catch(captureError){evidence.performanceCaptureError=String(captureError.message);}
+    if(process.platform==="linux"){const processProbe=spawnSync("ps",["-eo","pid,ppid,comm,pcpu,rss"],{encoding:"utf8"});evidence.processResources=processProbe.status===0?processProbe.stdout:String(processProbe.error?.message||processProbe.status);}
+    evidence.assetFailures=client?.assetFailures||[];
+    evidence.assetRequestCounts=[...(client?.assetCounts||[])].sort((a,b)=>b[1]-a[1]).slice(0,30);
+    evidence.runtimeEvents=client?.events?.slice(-50)||[];
+    evidence.evalTimings=client?.evalTimings||[];
+    evidence.waitTimings=client?.waitTimings||[];
+    evidence.relicPresentationAtFailure=client?await client.eval("(()=>{const p=window.v174RelicPresentationState?.();const node=document.getElementById('teamRelicBattlePresentation');const icon=node?.querySelector('.team-relic-battle-cutin-icon img');const stage=document.getElementById('v143-skill-stage');return {visibility:document.visibilityState,hidden:document.hidden,focused:document.hasFocus(),presentation:p||null,debug:window.v174RelicDebugState?.()||null,maskClass:node?.className||null,icon:icon?{src:icon.getAttribute('src'),complete:icon.complete,naturalWidth:icon.naturalWidth}:null,stageSkill:stage?.dataset.skill||null,stageSequence:stage?.dataset.sequence||null,lock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false,feedback:document.querySelectorAll('.battle-floating-feedback').length,readingState:document.body.classList.contains('v174-battle-reading-open')};})()").catch(diagnosticError=>({captureError:String(diagnosticError?.message||diagnosticError)})):{unavailable:true};
+    const probeHostStart=performance.now();
+    evidence.browserTimerProbe=client?await Promise.race([
+        client.eval("(async()=>{const started=performance.now();await new Promise(resolve=>setTimeout(resolve,420));return {completed:true,elapsedMs:performance.now()-started,visibility:document.visibilityState,hidden:document.hidden};})()").then(probe=>({...probe,hostElapsedMs:performance.now()-probeHostStart})).catch(probeError=>({captureError:String(probeError?.message||probeError)})),
+        sleep(6000).then(()=>({completed:false,observationMs:6000}))
+    ]):{unavailable:true};
+    evidence.pendingCdp=client?[...client.pending.values()].map(request=>({method:request.method,elapsedMs:performance.now()-request.startedAt})):[];
     evidence.chromeStderr=chromeStderr.slice(-5000);
     evidence.finishedAt=new Date().toISOString();
     fs.writeFileSync(path.join(artifactDir,"battle-layer-audio-live-qa.json"),JSON.stringify(evidence,null,2)+"\n");
