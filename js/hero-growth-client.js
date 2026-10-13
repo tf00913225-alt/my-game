@@ -87,7 +87,11 @@
             testMode:devEnabled()&&!!dev&&devUid===uid(),devAvailable:devEnabled(),
             marrowPills:devEnabled()&&dev&&devUid===uid()?dev.pills:proof?.ownerUid===uid()?proof.marrowPills:0})});
     global.document?.addEventListener("four-symbols:startup-ready",()=>{void read();});
-    global.document?.addEventListener("four-symbols:hero-acquisition-state",()=>{if(ready()&&!pending)void read();});
+    global.document?.addEventListener("four-symbols:hero-acquisition-state",()=>{
+        // A reset/error notification invalidates proof; it is never a read trigger.
+        const acquisition=global.FourSymbolsHeroAcquisition?.getStatus?.();
+        if(acquisition?.ready===true&&!acquisition.busy&&ready()&&!pending)void read();
+    });
     global.addEventListener("four-symbols:firebase-auth-state",e=>{if(e.detail?.user?.uid!==uid()||proof&&proof.ownerUid!==uid()||devUid&&devUid!==uid())reset();});
     global.addEventListener("four-symbols:game-session-state",e=>{if(["revoked","signed-out"].includes(e.detail?.status)||e.detail?.code){reset();busy=false;}});
 })(typeof window!=="undefined"?window:globalThis);
