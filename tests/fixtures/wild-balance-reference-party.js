@@ -2,7 +2,7 @@
 function prepareWildBalanceReferenceParty(level,partySize=3){
     // Preserve the canonical player-only balance baseline on the DEV preview host.
     if(typeof window!=='undefined'&&window.location?.hostname==='dev.four-symbols-dev.pages.dev'&&!battleActive){
-        window.FourSymbolsHeroBattle?.setRoster([]);
+        window.FourSymbolsTeamFormation={getConfirmed:()=>({heroIdToSlot:{}})}; // Isolated reference-party fixture only.
     }
     const budget=START_ATTRIBUTE_POINTS+(level-1)*5;
     const intelligence=Math.floor(budget*.35),vitality=Math.floor(budget*.2),energy=Math.floor(budget*.1),defensePoints=Math.floor(budget*.15),agility=Math.floor(budget*.15);

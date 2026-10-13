@@ -680,30 +680,57 @@ try{
     await waitFor(client,"document.querySelector('.v-fixed-formation-entry[data-feature=\"gameplay-core\"]')","home Formation entry");
     await client.eval("document.querySelector('.v-fixed-formation-entry[data-feature=\"gameplay-core\"]').click();true");
     await waitFor(client,"document.getElementById('homeFeatureModal')?.classList.contains('show')&&document.querySelectorAll('#homeFeatureModalBody .v-fixed-formation-slot').length===6","real Formation editor");
-    const formationInteraction=await client.eval(`(()=>{
+    // Isolate callable transport only; exercise the production save controller.
+    // Presentation QA must never write against the independently deployed backend.
+    const formationClientSource=fs.readFileSync('js/team-formation-client.js','utf8');
+    const formationInteraction=await client.eval(`(async()=>{
         const owner=window.FourSymbolsBattlefieldSlots;
         const slots=owner?.allySlots||[];
         const entry=document.querySelector('.v-fixed-formation-entry');
         const before=owner?.getSerializableAllyFormation?.();
+        const originalClient=window.FourSymbolsTeamFormation,originalLifecycle=window.FourSymbolsFirebaseLifecycle;
+        const indexes=[player,player2,player3].flatMap((p,i)=>p?.id?[i]:[]);
+        const heroAccount=FourSymbolsHeroCore.normalizeAccountState();
+        let confirmed={version:2,characterIndexToSlot:Object.fromEntries(indexes.map(i=>[i,before.characterIndexToSlot[i]])),heroIdToSlot:{}},revision=1,saves=0;
+        const view=()=>({schemaVersion:1,ownerUid:FourSymbolsAccountSave.getActiveUid(),serverRevision:revision,heroAccount,formation:confirmed,playerIndexes:indexes,authoritativeStateReady:false});
+        window.FourSymbolsFirebaseLifecycle={...originalLifecycle,readTeamFormation:async()=>view(),saveTeamFormation:async intent=>{
+            if(intent.expectedRevision!==revision)throw Error('Formation fixture revision mismatch');
+            confirmed=FourSymbolsTeamFormationPolicy.validate(intent.formation,indexes,[]);revision++;saves++;return view();
+        }};
+        const listeners=[],documentAdd=document.addEventListener,windowAdd=window.addEventListener;
+        document.addEventListener=function(...args){listeners.push([document,args]);return documentAdd.apply(this,args);};
+        window.addEventListener=function(...args){listeners.push([window,args]);return windowAdd.apply(this,args);};
+        try{(0,eval)(${JSON.stringify(formationClientSource)});}finally{document.addEventListener=documentAdd;window.addEventListener=windowAdd;}
+        try{
+        await FourSymbolsTeamFormation.read();
+        if(!FourSymbolsTeamFormation.getStatus().ready)throw Error('Formation fixture proof rejected');
         const source=slots.find(slot=>Number.isInteger(owner.getCharacterAtAllySlot(slot)));
         const destination=slots.find(slot=>!Number.isInteger(owner.getCharacterAtAllySlot(slot)));
         const characterIndex=source?owner.getCharacterAtAllySlot(source):null;
         const clickSlot=slot=>document.querySelector('#homeFeatureModalBody .v-fixed-formation-slot[data-slot="'+slot+'"]')?.click();
         clickSlot(source);
         clickSlot(destination);
-        const moved=Number.isInteger(characterIndex)&&owner.getCharacterAtAllySlot(destination)===characterIndex;
+        const settled=async()=>{const end=Date.now()+15000;while(FourSymbolsTeamFormation.getStatus().busy&&Date.now()<end)await new Promise(r=>setTimeout(r,30));if(FourSymbolsTeamFormation.getStatus().busy)throw Error('Formation save did not settle');};
+        await settled();
+        const moved=Number.isInteger(characterIndex)&&FourSymbolsTeamFormation.getConfirmed().characterIndexToSlot[characterIndex]===destination&&owner.getCharacterAtAllySlot(destination)===characterIndex;
         clickSlot(destination);
         clickSlot(source);
-        const restored=Number.isInteger(characterIndex)&&owner.getCharacterAtAllySlot(source)===characterIndex;
+        await settled();
+        const restored=Number.isInteger(characterIndex)&&FourSymbolsTeamFormation.getConfirmed().characterIndexToSlot[characterIndex]===source&&owner.getCharacterAtAllySlot(source)===characterIndex;
         const panel=document.querySelector('#homeFeatureModalBody .v-fixed-formation-panel');
         const slotCount=document.querySelectorAll('#homeFeatureModalBody .v-fixed-formation-slot').length;
         const after=owner?.getSerializableAllyFormation?.();
         if(typeof closeHomeFeature==='function'){closeHomeFeature();}
         return {
             entryFeature:entry?.dataset.feature||null,panel:!!panel,slotCount,
-            source,destination,characterIndex,moved,restored,
+            source,destination,characterIndex,moved,restored,saves,
             before:before?.characterIndexToSlot||null,after:after?.characterIndexToSlot||null
         };
+        }finally{
+            for(const [target,args] of listeners)target.removeEventListener(...args);
+            window.FourSymbolsTeamFormation=originalClient;window.FourSymbolsFirebaseLifecycle=originalLifecycle;
+            owner.hydrateAllyFormation(before,indexes);
+        }
     })()`);
     evidence.checks.formationInteraction=formationInteraction;
     assert.equal(formationInteraction.entryFeature,"gameplay-core","Formation entry must load the canonical gameplay owner");
@@ -712,6 +739,8 @@ try{
     assert.ok(formationInteraction.source&&formationInteraction.destination,"Formation QA needs one occupied and one empty slot");
     assert.equal(formationInteraction.moved,true,"Formation editor must move the selected character to the chosen slot");
     assert.equal(formationInteraction.restored,true,"Formation editor must support a second real move and restore the test position");
+    assert.equal(formationInteraction.saves,2,"Both moves must await the unique protected save interface");
+    assert.deepEqual(formationInteraction.after,formationInteraction.before,"Restoring the test position must preserve all party slots");
 
     const bootstrap=await client.eval(`(()=>{
         try{sessionStorage.setItem('sixiang_startup_session_ready_v1','1');}catch(_){}

@@ -1377,39 +1377,151 @@
         });
     }
 
-    let vFixedFormationSelectedCharacter=null;
+    let formationSelectedUnit=null;
+    let formationInputAbort=null;
+    let formationDrag=null;
+    let formationMessage="";
     function formationSlotLabel(slot){
-        const labels={ALLY_F1:"前左",ALLY_F2:"前中",ALLY_F3:"前右",ALLY_B1:"後左",ALLY_B2:"後中",ALLY_B3:"後右"};
-        return labels[slot]||slot;
+        const meta=fixedBattlefieldSlots().slotMeta[slot];
+        return (meta.row==="front"?"前":"後")+["左","中","右"][meta.column-1];
+    }
+    function formationPreview(){
+        const confirmed=window.FourSymbolsTeamFormation.getConfirmed();
+        if(confirmed)return confirmed;
+        const indexes=getCharacters().flatMap((character,index)=>character?.id?[index]:[]);
+        const state=fixedBattlefieldSlots().ensureAllyFormation(indexes);
+        return {version:2,characterIndexToSlot:{...state.characterIndexToSlot},heroIdToSlot:{}};
+    }
+    function formationUnitAt(value,slot){
+        const hero=Object.keys(value.heroIdToSlot).find(id=>value.heroIdToSlot[id]===slot);
+        if(hero)return "hero:"+hero;
+        const player=Object.keys(value.characterIndexToSlot).find(id=>value.characterIndexToSlot[id]===slot);
+        return player===undefined?null:"player:"+player;
+    }
+    function formationUnitData(unit){
+        if(!unit)return null;
+        if(unit.startsWith("hero:")){
+            const hero=getHeroPageSnapshot().heroes.find(row=>row.owned&&row.definition.heroId===unit.slice(5));
+            return hero?{name:hero.definition.name,artwork:hero.artwork}:null;
+        }
+        const character=getCharacters()[Number(unit.slice(7))];
+        return character?.id?{name:character.id,artwork:getCharacterBattleArtworkPath(character)}:null;
+    }
+    function formationUnitContent(unit){
+        const row=formationUnitData(unit);
+        return row?'<img src="'+heroPageHtml(row.artwork)+'" alt="'+heroPageHtml(row.name)+'立繪" draggable="false"><b>'+heroPageHtml(row.name)+'</b>':'<span>空位</span>';
+    }
+    function formationEditingAllowed(){
+        const status=window.FourSymbolsTeamFormation.getStatus();
+        const indexes=getCharacters().flatMap((character,index)=>character?.id?[index]:[]);
+        return !battleActive&&status.ready&&!status.busy&&!status.pending&&JSON.stringify(indexes)===JSON.stringify(status.playerIndexes);
     }
     function renderAllyFormationContent(){
-        const formation=ensureAllyFormationState();
-        if(!formation){ return '<div class="v-fixed-formation-empty">目前無法讀取佈陣資料。</div>'; }
-        const renderRow=(label,slots)=>'<section class="v-fixed-formation-row"><header>'+label+'</header><div class="v-fixed-formation-slots">'+slots.map(slot=>{
-            const index=fixedBattlefieldSlots().getCharacterAtAllySlot(slot);
-            const character=Number.isInteger(index)?getPartyCharacterByIndex(index):null;
-            const selected=Number.isInteger(index)&&index===vFixedFormationSelectedCharacter;
-            return '<button type="button" class="v-fixed-formation-slot'+(selected?' selected':'')+'" data-slot="'+slot+'" onclick="vFixedSelectFormationSlot(\''+slot+'\')">'+
-                '<small>'+formationSlotLabel(slot)+'</small><strong>'+(character?(character.id||('角色'+(index+1))):'空位')+'</strong></button>';
+        const value=formationPreview(),status=window.FourSymbolsTeamFormation.getStatus(),owner=fixedBattlefieldSlots();
+        const row=(label,slots)=>'<section class="v-fixed-formation-row"><header>'+label+'</header><div data-drag-owner="formation" class="v-fixed-formation-slots">'+slots.map(slot=>{
+            const unit=formationUnitAt(value,slot);
+            return '<button type="button" class="v-fixed-formation-slot'+(unit===formationSelectedUnit&&unit?' selected':'')+'" data-slot="'+slot+'"'+(unit?' data-unit="'+heroPageHtml(unit)+'"':'')+' aria-label="'+formationSlotLabel(slot)+(unit?' '+heroPageHtml(formationUnitData(unit)?.name||''):' 空位')+'"><small>'+formationSlotLabel(slot)+'</small>'+formationUnitContent(unit)+'</button>';
         }).join('')+'</div></section>';
-        return '<div class="v-fixed-formation-panel"><p>先點角色，再點目標格位；若目標已有角色會直接交換。</p>'+renderRow('前排',fixedBattlefieldSlots().allyFrontSlots)+renderRow('後排',fixedBattlefieldSlots().allyBackSlots)+'</div>';
+        const candidates=getHeroPageSnapshot().heroes.filter(hero=>hero.owned&&!Object.hasOwn(value.heroIdToSlot,hero.definition.heroId));
+        const bg=typeof mapZoneBackgroundImages!=="undefined"?mapZoneBackgroundImages.forest:null;
+        const background=bg?' style="background-image:linear-gradient(#09090955,#09090999),url(&quot;'+heroPageHtml(bg)+'&quot;)"':'';
+        return '<div class="hero-page-shell v-fixed-formation-panel"><button type="button" class="main-button" onclick="returnFromFormation()">‹ 返回</button>'+
+            '<div id="formationContent" class="hero-page-content" data-scroll-owner="y"><p class="hero-page-note">拖曳英雄到格位，或點選英雄再點格位。已上陣角色可交換位置；玩家角色不能移出。</p>'+
+            '<div class="formation-battlefield"'+background+'><div class="formation-enemy-space" aria-label="敵方區域留空">敵方區域</div>'+row('前排',owner.allyFrontSlots)+row('後排',owner.allyBackSlots)+'</div>'+
+            '<h3>候選英雄</h3><div class="formation-candidates" data-scroll-owner="x">'+candidates.map(hero=>{
+                const unit='hero:'+hero.definition.heroId;
+                return '<button type="button" data-drag-owner="formation" class="formation-candidate'+(unit===formationSelectedUnit?' selected':'')+'" data-unit="'+heroPageHtml(unit)+'">'+formationUnitContent(unit)+'</button>';
+            }).join('')+(candidates.length?'':'<p class="hero-page-note">目前沒有未上陣的已擁有英雄。</p>')+'</div>'+
+            '</div>'+
+            '<div class="formation-footer"><button type="button" class="formation-remove" data-remove="true">移出英雄</button><p role="status">'+heroPageHtml(formationMessage||status.error||(status.busy?'正在確認雲端紀錄…':status.pending?'前次保存結果尚未確認。':window.FourSymbolsTeamFormation.getConfirmed()?'已確認保存的佈陣。':'尚未保存佈陣；首次操作將建立紀錄。'))+'</p>'+
+            '<button type="button" class="main-button" onclick="FourSymbolsTeamFormation.read()"'+(status.busy?' disabled':'')+'>同步佈陣</button>'+
+            (status.pending?'<button type="button" class="main-button" onclick="FourSymbolsTeamFormation.retry()"'+(status.busy?' disabled':'')+'>確認前次保存</button>':'')+'</div></div>';
     }
     window.vFixedRenderAllyFormationContent=renderAllyFormationContent;
-    window.vFixedSelectFormationSlot=function(slot){
-        const formation=ensureAllyFormationState();
-        if(!formation||!fixedBattlefieldSlots().allySlots.includes(slot)){ return; }
-        const occupant=fixedBattlefieldSlots().getCharacterAtAllySlot(slot);
-        if(!Number.isInteger(vFixedFormationSelectedCharacter)){
-            if(!Number.isInteger(occupant)){ return; }
-            vFixedFormationSelectedCharacter=occupant;
-        }else{
-            fixedBattlefieldSlots().moveAllyCharacter(vFixedFormationSelectedCharacter,slot);
-            vFixedFormationSelectedCharacter=null;
-            if(typeof saveGame==="function"){ saveGame({source:"ally-formation"}); }
-            if(typeof window.v54RenderHomeRoster==="function"){ window.v54RenderHomeRoster(); }
+    async function placeFormationUnit(unit,targetSlot,remove=false){
+        if(!formationEditingAllowed()||!formationUnitData(unit))return false;
+        const value=formationPreview(),hero=unit.startsWith("hero:"),id=unit.slice(hero?5:7);
+        const map=hero?value.heroIdToSlot:value.characterIndexToSlot,from=map[id];
+        if(remove){if(!hero||!from)return false;delete map[id];}
+        else{
+            if(!fixedBattlefieldSlots().allySlots.includes(targetSlot))return false;
+            const occupant=formationUnitAt(value,targetSlot);
+            if(occupant&&occupant!==unit){
+                if(!from)return false;
+                const otherHero=occupant.startsWith("hero:"),otherMap=otherHero?value.heroIdToSlot:value.characterIndexToSlot;
+                otherMap[occupant.slice(otherHero?5:7)]=from;
+            }
+            if(from===targetSlot)return true;
+            map[id]=targetSlot;
         }
+        formationSelectedUnit=null;formationMessage="";
+        const ok=await window.FourSymbolsTeamFormation.save(value);
+        // Only the protected client publishes a confirmed result; no optimistic
+        // roster/slot write or Save success is manufactured by this renderer.
+        window.refreshFormationPage();return ok;
+    }
+    window.vFixedPlaceFormationUnit=placeFormationUnit;
+    window.refreshFormationPage=function(){
         const body=document.getElementById("homeFeatureModalBody");
-        if(body){ body.innerHTML=renderAllyFormationContent(); }
+        if(!body?.querySelector('.v-fixed-formation-panel'))return;
+        const scroll=document.getElementById("formationContent")?.scrollTop||0;
+        window.vFixedCleanupFormationInput();body.innerHTML=renderAllyFormationContent();
+        document.getElementById("formationContent").scrollTop=scroll;window.vFixedBindFormationInput();
+    };
+    function finishDrag(){
+        if(formationDrag){
+            const drag=formationDrag;formationDrag=null;drag.ghost?.remove();
+            if(drag.node.hasPointerCapture?.(drag.pointerId))drag.node.releasePointerCapture(drag.pointerId);
+        }
+        document.querySelectorAll('.formation-drop-target,.formation-drag-source').forEach(node=>node.classList.remove('formation-drop-target','formation-drag-source'));
+    }
+    window.vFixedCleanupFormationInput=function(){finishDrag();formationInputAbort?.abort();formationInputAbort=null;};
+    window.vFixedBindFormationInput=function(){
+        window.vFixedCleanupFormationInput();
+        const root=document.querySelector('.v-fixed-formation-panel');if(!root)return;
+        formationInputAbort=new AbortController();const signal=formationInputAbort.signal;
+        function activate(node){
+            if(!formationEditingAllowed())return;
+            if(node.closest('[data-remove]')){if(formationSelectedUnit)void placeFormationUnit(formationSelectedUnit,null,true);return;}
+            const slot=node.closest('[data-slot]')?.dataset.slot,unit=node.closest('[data-unit]')?.dataset.unit;
+            if(formationSelectedUnit&&slot&&unit!==formationSelectedUnit){void placeFormationUnit(formationSelectedUnit,slot);return;}
+            if(unit){formationSelectedUnit=unit===formationSelectedUnit?null:unit;window.refreshFormationPage();}
+        }
+        root.addEventListener('click',event=>{if(event.detail===0&&event.target.closest('[data-unit],[data-slot],[data-remove]'))activate(event.target);},{signal});
+        root.addEventListener('pointerdown',event=>{
+            if(!event.isPrimary||event.button!==0||!formationEditingAllowed())return;
+            const node=event.target.closest('[data-unit],[data-slot],[data-remove]');if(!node)return;
+            const unit=node.dataset.unit||null;
+            formationDrag={node,unit,pointerId:event.pointerId,x:event.clientX,y:event.clientY,moved:false,ghost:null};
+            node.setPointerCapture(event.pointerId);event.preventDefault();
+        },{signal});
+        root.addEventListener('pointermove',event=>{
+            const drag=formationDrag;if(!drag||event.pointerId!==drag.pointerId)return;
+            if(!drag.unit||Math.hypot(event.clientX-drag.x,event.clientY-drag.y)<8&&!drag.moved)return;
+            drag.moved=true;
+            if(!drag.ghost){
+                drag.ghost=document.createElement('div');drag.ghost.className='formation-drag-preview';drag.ghost.innerHTML=formationUnitContent(drag.unit);
+                root.appendChild(drag.ghost);drag.node.classList.add('formation-drag-source');
+            }
+            drag.ghost.style.left=event.clientX+'px';drag.ghost.style.top=event.clientY+'px';
+            root.querySelectorAll('.formation-drop-target').forEach(node=>node.classList.remove('formation-drop-target'));
+            const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-slot],[data-remove]');
+            const preview=formationPreview(),from=drag.unit.startsWith('hero:')?preview.heroIdToSlot[drag.unit.slice(5)]:preview.characterIndexToSlot[drag.unit.slice(7)];
+            if(target&&(target.dataset.remove?drag.unit.startsWith('hero:')&&from:!formationUnitAt(preview,target.dataset.slot)||from))target.classList.add('formation-drop-target');
+            event.preventDefault();
+        },{signal});
+        root.addEventListener('pointerup',event=>{
+            const drag=formationDrag;if(!drag||event.pointerId!==drag.pointerId)return;
+            const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-slot],[data-remove]');
+            finishDrag();
+            if(drag.moved){if(target)void placeFormationUnit(drag.unit,target.dataset.slot,!!target.dataset.remove);}
+            else activate(drag.node);
+            event.preventDefault();
+        },{signal});
+        root.addEventListener('pointercancel',finishDrag,{signal});
+        root.addEventListener('lostpointercapture',finishDrag,{signal});
+        window.addEventListener('blur',finishDrag,{signal});
+        document.addEventListener('visibilitychange',()=>{if(document.hidden)finishDrag();},{signal});
     };
 
     function applyPlayerElementFrames(){
