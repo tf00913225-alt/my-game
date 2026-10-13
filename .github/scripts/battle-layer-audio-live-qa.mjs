@@ -225,7 +225,7 @@ class CdpClient{
         this.nextId=1;
         this.pending=new Map();
         this.socket=null;
-        this.events=[];
+        this.events=[]; this.assetRequests=new Map(); this.assetCounts=new Map(); this.assetFailures=[];
         this.evalTimings=[];
     }
     async connect(){
@@ -240,6 +240,9 @@ class CdpClient{
             if(raw&&typeof raw!=="string"&&typeof raw.text==="function"){ raw=await raw.text(); }
             const message=JSON.parse(String(raw));
             if(!message.id){
+                if(message.method==="Network.requestWillBeSent"&&/\.(webp|png)(?:\?|$)/.test(message.params?.request?.url||"")){const url=message.params.request.url;this.assetRequests.set(message.params.requestId,url);if(this.assetRequests.size>500)this.assetRequests.delete(this.assetRequests.keys().next().value);this.assetCounts.set(url,(this.assetCounts.get(url)||0)+1);}
+                if(message.method==="Network.loadingFailed"&&this.assetRequests.has(message.params?.requestId)){this.assetFailures.push({url:this.assetRequests.get(message.params.requestId),error:message.params.errorText,canceled:message.params.canceled});if(this.assetFailures.length>40)this.assetFailures.shift();}
+
                 if(message.method==="Runtime.exceptionThrown"){
                     const details=message.params&&message.params.exceptionDetails;
                     this.events.push({
@@ -643,7 +646,7 @@ async function runRelicPresentationModeMatrix(client){
         let context;
         const presentations=[];
         for(const [relicId,targetKind] of relics){
-            if(mode==="world"&&relicId==="relic_nine_dragon_fire"){
+            if(!evidence.profilerStarted){
                 try{evidence.performanceBefore=await client.send("Performance.getMetrics");await client.send("Profiler.enable");await client.send("Profiler.start");evidence.profilerStarted=true;}
                 catch(captureError){evidence.performanceCaptureError=String(captureError.message);}
             }
@@ -1686,6 +1689,8 @@ try{
     try{evidence.performanceAfter=await client.send("Performance.getMetrics");if(evidence.profilerStarted){evidence.cpuProfile=await client.send("Profiler.stop");}}
     catch(captureError){evidence.performanceCaptureError=String(captureError.message);}
     if(process.platform==="linux"){const processProbe=spawnSync("ps",["-eo","pid,ppid,comm,pcpu,rss"],{encoding:"utf8"});evidence.processResources=processProbe.status===0?processProbe.stdout:String(processProbe.error?.message||processProbe.status);}
+    evidence.assetFailures=client?.assetFailures||[];
+    evidence.assetRequestCounts=[...(client?.assetCounts||[])].sort((a,b)=>b[1]-a[1]).slice(0,30);
     evidence.runtimeEvents=client?.events?.slice(-50)||[];
     evidence.evalTimings=client?.evalTimings||[];
     evidence.waitTimings=client?.waitTimings||[];
