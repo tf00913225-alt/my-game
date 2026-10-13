@@ -618,6 +618,7 @@ async function runRelicPresentationModeMatrix(client){
         const presentations=[];
         for(const [relicId,targetKind] of relics){
             context=await launchPresentationQaMode(client,mode,relicId);
+            evidence.checks.relicPresentationProgress={mode,relicId,targetKind,completed:matrix};
             const snapshot=await captureRelicPresentationQa(client,relicId,targetKind,mode);
             presentations.push(snapshot);
             const baseline=identityBaseline.get(relicId);
@@ -1650,6 +1651,8 @@ try{
 } catch(error){
     evidence.status="FAIL";
     evidence.error=error?.stack||String(error);
+    evidence.runtimeEvents=client?.events?.slice(-50)||[];
+    evidence.relicPresentationAtFailure=client?await client.eval("(()=>{const p=window.v174RelicPresentationState?.();const node=document.getElementById('teamRelicBattlePresentation');const icon=node?.querySelector('.team-relic-battle-cutin-icon img');const stage=document.getElementById('v143-skill-stage');return {presentation:p||null,debug:window.v174RelicDebugState?.()||null,maskClass:node?.className||null,icon:icon?{src:icon.getAttribute('src'),complete:icon.complete,naturalWidth:icon.naturalWidth}:null,stageSkill:stage?.dataset.skill||null,stageSequence:stage?.dataset.sequence||null,lock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false,feedback:document.querySelectorAll('.battle-floating-feedback').length,readingState:document.body.classList.contains('v174-battle-reading-open')};})()").catch(diagnosticError=>({captureError:String(diagnosticError?.message||diagnosticError)})):{unavailable:true};
     evidence.chromeStderr=chromeStderr.slice(-5000);
     evidence.finishedAt=new Date().toISOString();
     fs.writeFileSync(path.join(artifactDir,"battle-layer-audio-live-qa.json"),JSON.stringify(evidence,null,2)+"\n");
