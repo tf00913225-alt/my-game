@@ -28,7 +28,7 @@ assert.match(main,/box\.dataset\.rarity=rarity/);
 assert.match(renderer,/box\.classList\.add\("rarity-"\+rarity\)/);
 assert.match(renderer,/box\.classList\.add\("is-selected"\)/);
 assert.match(renderer,/item\.icon\|\|"◆"/,"existing fallback remains available when an asset is missing");
-assert.match(gameplayBundle,/V177 Backpack Visual Composition/,"canonical backpack visual owner must ship in gameplay-core");
+assert.match(gameplayBundle,/#game-ui #inventoryPage \.inventory-portrait-frame/,"canonical backpack visual owner must ship in gameplay-core");
 assert.match(html,/id="mapInventoryOverlayClose"[\s\S]*關閉背包/);
 assert.doesNotMatch(html,/inventory-title-plate-subtitle/);
 assert.doesNotMatch(html,/🔍/);
