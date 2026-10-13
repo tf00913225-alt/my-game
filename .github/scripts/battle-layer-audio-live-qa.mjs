@@ -489,7 +489,10 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     // DEV preview is deliberately unavailable on the production host.
     await waitFor(client,`window.v174RelicDebugState?.()?.relicId===${id}`,relicId+" initialized battle owner",7000);
     await client.eval("(()=>{currentBattleMonsters.forEach(index=>{monsters[index].hp=Math.max(100000,monsters[index].hp);monsters[index].maxHP=Math.max(100000,monsters[index].maxHP||0);});return true;})()");
-    await client.eval("(()=>{window.__relicQaFinishRelease=FourSymbolsBattleFlow.interceptActionFinish(()=>!!battleDurationAction?.completed);return true;})()");
+    // Round/HP fixtures dispatch no Action completion; hold unrelated queue
+    // advances throughout their presentation. The counter fixture must still
+    // publish each real enemy Action completion before the same hold applies.
+    await client.eval("(()=>{const counterFixture="+JSON.stringify(relicId==="relic_nine_dragon_fire")+";window.__relicQaFinishRelease=FourSymbolsBattleFlow.interceptActionFinish(()=>!counterFixture||!!battleDurationAction?.completed);return true;})()");
     // Observe the finite VFX phase in the browser before triggering it. CDP
     // scheduling may return only after that phase has already completed.
     await client.eval("(()=>{window.__relicQaFocusObserver?.disconnect();delete window.__relicQaFocusSnapshot;delete window.__relicQaIdentitySnapshot;const capture=()=>{const n=document.getElementById('teamRelicBattlePresentation');const img=n?.querySelector('.team-relic-battle-cutin-icon img');if(!window.__relicQaIdentitySnapshot&&n?.classList.contains('identity-visible')&&img?.complete&&img.naturalWidth>0){if(!window.FourSymbolsBattleStatistics?.openStatistics?.())return;window.__relicQaIdentitySnapshot="+identityExpression+";}const snapshot="+focusExpression+";if(snapshot){window.__relicQaFocusSnapshot=snapshot;}if(window.__relicQaIdentitySnapshot&&window.__relicQaFocusSnapshot){window.__relicQaFocusObserver.disconnect();}};window.__relicQaFocusObserver=new MutationObserver(capture);window.__relicQaFocusObserver.observe(document.body,{subtree:true,childList:true,attributes:true});return true;})()");
@@ -555,12 +558,17 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     assert.equal(focus.spriteTargetSide,focus.side,relicId+" VFX target side drifted from focus side");
     assert.equal(focus.presentationLock,true,relicId+" presentation lock must stay held during VFX");
 
+    try{
     await waitFor(
         client,
         "(()=>{const p=window.v174RelicPresentationState?.();return !p?.active&&!document.getElementById('teamRelicBattlePresentation')&&!document.getElementById('v143-skill-stage')&&!document.body.classList.contains('team-relic-cinematic-active')&&!window.FourSymbolsBattleFlow?.isPresentationActive?.()&&!document.querySelector('.battle-floating-feedback');})()",
         relicId+" complete presentation cleanup",
         12000
     );
+    }catch(error){
+        const diagnostic=await client.eval("(()=>({mode:"+JSON.stringify(mode)+",relic:window.v174RelicDebugState?.(),presentation:window.v174RelicPresentationState?.(),current:window.v143SkillAnimationState?.current?{id:v143SkillAnimationState.current.config.id,sequence:v143SkillAnimationState.current.sequence,targets:v143SkillAnimationState.current.targetIndexes}:null,turn:typeof turn==='undefined'?null:turn,phase:typeof battlePhase==='undefined'?null:battlePhase,advance:typeof battleAdvanceScheduled==='undefined'?null:battleAdvanceScheduled,lock:window.FourSymbolsBattleFlow?.isPresentationActive?.(),feedback:document.querySelectorAll('.battle-floating-feedback').length}) )()");
+        error.message+=" Diagnostic="+JSON.stringify(diagnostic);throw error;
+    }
     const cleanup=await client.eval("(()=>({mask:!!document.getElementById('teamRelicBattlePresentation'),vfx:!!document.getElementById('v143-skill-stage'),focus:document.querySelectorAll('.team-relic-battle-target-outline').length,feedback:document.querySelectorAll('.battle-floating-feedback').length,bodyClass:document.body.classList.contains('team-relic-cinematic-active'),readingState:document.body.classList.contains('v174-battle-reading-open'),lock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false}))()");
     assert.deepEqual(cleanup,{mask:false,vfx:false,focus:0,feedback:0,bodyClass:false,readingState:true,lock:false},relicId+" presentation must expire normally while the reading drawer stays open");
     const readingClosed=await client.eval("(()=>{window.FourSymbolsBattleStatistics?.closeDrawer?.();return {readingState:document.body.classList.contains('v174-battle-reading-open'),vfx:!!document.getElementById('v143-skill-stage'),mask:!!document.getElementById('teamRelicBattlePresentation')};})()");
