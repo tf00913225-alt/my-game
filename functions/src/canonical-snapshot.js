@@ -72,6 +72,32 @@ function inspectAchievementState(state){
     }
 }
 
+// Recorded Client quest storage only. No rollover, catalogue eligibility,
+// completion calculation or reward/claim authorization is performed here.
+function recordedDate(value){
+    return typeof value==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&
+        Number.isFinite(Date.parse(`${value}T00:00:00Z`))&&
+        new Date(`${value}T00:00:00Z`).toISOString().slice(0,10)===value;
+}
+function inspectQuestState(key,state,allowUninitialized=false){
+    if(allowUninitialized&&object(state)&&Object.keys(state).length===0){return;}
+    const required=key==="dailyQuestState"?["checkin","killMonsters","winBattle"]:
+        ["killMonsters","winBattle"];
+    if(!object(state)||Object.keys(state).sort().join("|")!=="claimed|date|progress"||
+       !object(state.progress)||!object(state.claimed)){
+        fail(`quest storage fields: ${key}`);
+    }
+    const ids=Object.keys(state.progress);
+    if(required.some(id=>!Object.hasOwn(state.progress,id))||
+       ids.sort().join("|")!==Object.keys(state.claimed).sort().join("|")||
+       ids.some(id=>!ID.test(id)||!Number.isSafeInteger(state.progress[id])||
+           state.progress[id]<0||typeof state.claimed[id]!=="boolean")||
+       !(recordedDate(state.date)||state.date===""&&ids.every(id=>
+           state.progress[id]===0&&state.claimed[id]===false))){
+        fail(`recorded quest date, counters or claim markers: ${key}`);
+    }
+}
+
 // Retained skill storage shape only: no catalogue, learning/cost/element
 // eligibility, combat execution, defaults or normalization in this reader.
 // Client skill Owner stores positive levels (current global ceiling 10) and
@@ -163,9 +189,7 @@ function inspectClaimSidecar(key,raw){
             fail("recorded legacy Abyss evidence or reward version");
         }
     }else{
-        if(typeof state.date!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(state.date)||
-           !Number.isFinite(Date.parse(`${state.date}T00:00:00Z`))||
-           new Date(`${state.date}T00:00:00Z`).toISOString().slice(0,10)!==state.date){
+        if(!recordedDate(state.date)){
             fail(`recorded claim date: ${key}`);
         }
         if(key==="daily-dungeon-state"){
@@ -436,6 +460,9 @@ function assembleCanonicalSnapshot(uid,revision,records){
     }
     if(records.progress.playableState!==undefined){
         inspectAchievementState(records.progress.achievementState);
+        for(const key of ["dailyQuestState","commissionQuestState"]){
+            inspectQuestState(key,records.progress[key],provenance==="server-created");
+        }
     }
     for(const [key,entry] of Object.entries(records.progress.sidecars)){
         if(!object(entry)||!(entry.status==="present"&&typeof entry.raw==="string"||
@@ -564,6 +591,9 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
         inspectTimeSidecar(key,entry.raw);
         inspectClaimSidecar(key,entry.raw);
         inspectAbyssSidecar(key,entry.raw,source.snapshot.progress);
+    }
+    for(const key of ["dailyQuestState","commissionQuestState"]){
+        inspectQuestState(key,source.snapshot.progress[key]);
     }
     const gameSave={version:6,heroAccount:hero,player:players[0],player2:players[1],
         player3:players[2],gold:source.snapshot.economy.gold,
