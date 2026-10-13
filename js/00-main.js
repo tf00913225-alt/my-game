@@ -25559,21 +25559,7 @@ function openHomeFeature(type){
            96dvh），盡量讓內容一次就能完整顯示、不用捲動。
         */
 
-        const settingsBox=
-            modal.querySelector(
-                ".home-feature-modal-box"
-            );
-
-
-        if(settingsBox){
-
-            settingsBox.style.setProperty(
-                "max-height",
-                "96dvh",
-                "important"
-            );
-
-        }
+        // The existing CSS panel owner reserves native canvas space.
 
 
         const characterSelect=

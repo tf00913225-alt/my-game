@@ -5,16 +5,18 @@ const fs=require("node:fs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
-const css=fs.readFileSync("css/33-v132-content-expansion.css","utf8");
+// The shared source keeps its legacy fallback unit at 1px; native game UI
+// supplies 3px and uses the same owner, with no additional transform.
+const css=fs.readFileSync("css/33-v132-content-expansion.css","utf8").replace(/calc\((\d+(?:\.\d+)?) \* var\(--ui-length-unit,1px\)\)/g,(_,n)=>n+'px');
 
 assert.match(css,/--ui-reward-dialog-max-width:340px;/);
 assert.match(css,/--ui-reward-dialog-height:300px;/);
-assert.match(css,/\.v132-reward-modal-inner\{[\s\S]*?width:min\(100%,var\(--ui-reward-dialog-max-width\)\);[\s\S]*?height:min\(var\(--ui-reward-dialog-height\),calc\(100dvh - 32px\)\);[\s\S]*?overflow-y:auto;/);
+assert.match(css,/\.v132-reward-modal-inner\{[\s\S]*?width:min\(100%,var\(--ui-reward-dialog-max-width\)\);[\s\S]*?height:min\(var\(--ui-reward-dialog-height\),calc\(calc\(100 \* var\(--layout-block-size,746.6667px\) \/ 100\) - 32px\)\);[\s\S]*?overflow-y:auto;/);
 assert.match(css,/\.v132-reward-modal-inner h3\{[\s\S]*?position:sticky;[\s\S]*?top:0;/);
 assert.match(css,/\.v132-reward-actions\{[\s\S]*?position:sticky;[\s\S]*?bottom:0;/);
 assert.match(css,/\.v132-reward-actions button\{[\s\S]*?min-height:44px;/);
 assert.match(css,/\.v132-ticket-preview-modal\{[\s\S]*?--ui-reward-preview|max-width:var\(--ui-reward-preview-max-width\);/);
-assert.match(css,/\.v132-ticket-preview-modal\{[\s\S]*?height:min\(var\(--ui-reward-preview-height\),calc\(100dvh - 24px\)\);[\s\S]*?overflow:hidden;/);
+assert.match(css,/\.v132-ticket-preview-modal\{[\s\S]*?height:min\(var\(--ui-reward-preview-height\),calc\(var\(--layout-block-size,746.6667px\) - 24px\)\);[\s\S]*?overflow:hidden;/);
 assert.match(css,/\.v132-ticket-preview-modal \.v132-preview-grid\{[\s\S]*?grid-template-rows:repeat\(5,minmax\(0,1fr\)\);[\s\S]*?overflow:visible;/);
 
 function findChrome(){

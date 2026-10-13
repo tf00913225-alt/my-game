@@ -1486,14 +1486,7 @@
         };
     }
 
-    function promoteSkillPreview(){
-        const modal=document.getElementById("allElementSkillPreviewModal");
-        const overlay=document.getElementById("game-overlay-layer") || document.getElementById("game-stage");
-        if(modal && overlay && modal.parentNode!==overlay){
-            overlay.appendChild(modal);
-        }
-    }
-    promoteSkillPreview();
+    // setupNativeGameUi owns the preview's single native host.
 
     const expPreviewCounts={0:0,1:0,2:0};
     const originalDistributeExpToCharacter=

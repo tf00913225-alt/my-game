@@ -42,7 +42,7 @@ async function connectChrome(chrome){
             try{socket.send(JSON.stringify({id:next,method,params}));}catch(error){clearTimeout(timer);pending.delete(next);reject(error);}
         });
         return {send,close};
-    }catch(error){close();throw error;}
+    }catch(error){await close();throw error;}
 }
 
 const chrome=findChrome();

@@ -621,7 +621,7 @@ button:disabled{
 
 #mapPage{
     position:relative;
-    min-height:100vh;
+    min-height:var(--game-legacy-height);
     margin:-14px;
     padding:14px;
 }
