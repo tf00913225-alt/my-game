@@ -226,6 +226,7 @@ class CdpClient{
         this.pending=new Map();
         this.socket=null;
         this.events=[];
+        this.evalTimings=[];
     }
     async connect(){
         this.socket=new WebSocket(this.url);
@@ -280,12 +281,15 @@ class CdpClient{
     send(method,params={}){
         const id=this.nextId++;
         return new Promise((resolve,reject)=>{
-            this.pending.set(id,{resolve,reject,method});
+            this.pending.set(id,{resolve,reject,method,startedAt:performance.now()});
             this.socket.send(JSON.stringify({id,method,params}));
         });
     }
     async eval(expression,awaitPromise=true){
+        const started=performance.now();
         const response=await this.send("Runtime.evaluate",{expression,awaitPromise,returnByValue:true,userGesture:true});
+        this.evalTimings.push({elapsedMs:performance.now()-started,expression:expression.slice(0,120)});
+        if(this.evalTimings.length>40){ this.evalTimings.shift(); }
         if(response.exceptionDetails){
             const text=response.exceptionDetails.exception?.description||response.exceptionDetails.text||"Runtime evaluation failed";
             throw new Error(text);
@@ -1654,11 +1658,14 @@ try{
     evidence.status="FAIL";
     evidence.error=error?.stack||String(error);
     evidence.runtimeEvents=client?.events?.slice(-50)||[];
+    evidence.evalTimings=client?.evalTimings||[];
     evidence.relicPresentationAtFailure=client?await client.eval("(()=>{const p=window.v174RelicPresentationState?.();const node=document.getElementById('teamRelicBattlePresentation');const icon=node?.querySelector('.team-relic-battle-cutin-icon img');const stage=document.getElementById('v143-skill-stage');return {visibility:document.visibilityState,hidden:document.hidden,focused:document.hasFocus(),presentation:p||null,debug:window.v174RelicDebugState?.()||null,maskClass:node?.className||null,icon:icon?{src:icon.getAttribute('src'),complete:icon.complete,naturalWidth:icon.naturalWidth}:null,stageSkill:stage?.dataset.skill||null,stageSequence:stage?.dataset.sequence||null,lock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false,feedback:document.querySelectorAll('.battle-floating-feedback').length,readingState:document.body.classList.contains('v174-battle-reading-open')};})()").catch(diagnosticError=>({captureError:String(diagnosticError?.message||diagnosticError)})):{unavailable:true};
+    const probeHostStart=performance.now();
     evidence.browserTimerProbe=client?await Promise.race([
-        client.eval("(async()=>{const started=performance.now();await new Promise(resolve=>setTimeout(resolve,420));return {completed:true,elapsedMs:performance.now()-started,visibility:document.visibilityState,hidden:document.hidden};})()").catch(probeError=>({captureError:String(probeError?.message||probeError)})),
-        sleep(1500).then(()=>({completed:false,observationMs:1500}))
+        client.eval("(async()=>{const started=performance.now();await new Promise(resolve=>setTimeout(resolve,420));return {completed:true,elapsedMs:performance.now()-started,visibility:document.visibilityState,hidden:document.hidden};})()").then(probe=>({...probe,hostElapsedMs:performance.now()-probeHostStart})).catch(probeError=>({captureError:String(probeError?.message||probeError)})),
+        sleep(6000).then(()=>({completed:false,observationMs:6000}))
     ]):{unavailable:true};
+    evidence.pendingCdp=client?[...client.pending.values()].map(request=>({method:request.method,elapsedMs:performance.now()-request.startedAt})):[];
     evidence.chromeStderr=chromeStderr.slice(-5000);
     evidence.finishedAt=new Date().toISOString();
     fs.writeFileSync(path.join(artifactDir,"battle-layer-audio-live-qa.json"),JSON.stringify(evidence,null,2)+"\n");
