@@ -185,8 +185,8 @@
 /* Legacy modal compatibility for other surfaces only.
    #itemModal frame, art, typography, actions and scroll migrated to css/49. */
 .item-modal:not(#itemModal) .item-modal-box{
-    width:min(92vw,470px) !important;
-    max-width:470px !important;
+    width:min(calc(var(--layout-inline-size,420px) * .92),calc(470 * var(--ui-length-unit,1px))) !important;
+    max-width:calc(470 * var(--ui-length-unit,1px)) !important;
     max-height:calc(100% - 24px) !important;
     overflow:hidden !important;
     padding:15px !important;

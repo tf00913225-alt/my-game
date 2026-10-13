@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 const qol=fs.readFileSync("js/53-v173.50-inventory-qol.js","utf8");
-const css=fs.readFileSync("css/52-v173.50-inventory-qol.css","utf8");
+const css=require("../.github/scripts/fixtures/native-ui-css-contract.cjs")(fs.readFileSync("css/52-v173.50-inventory-qol.css","utf8"));
 const recovery=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
 const equipment=fs.readFileSync("js/equipment-progression.js","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");

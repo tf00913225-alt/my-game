@@ -267,6 +267,12 @@
     display:inline-block;
 }
 
+/* Equipment acquisition/list previews: css/33 owns frame and sole list scroll. */
+.v132-reward-modal-inner.v17346-preview-modal{width:min(calc(360 * var(--ui-length-unit,1px)),calc(100% - calc(24 * var(--ui-length-unit,1px))))!important;height:min(calc(540 * var(--ui-length-unit,1px)),calc(var(--layout-block-size,746.6667px) - calc(24 * var(--ui-length-unit,1px))))!important;max-height:calc(var(--layout-block-size,746.6667px) - calc(24 * var(--ui-length-unit,1px)))!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:calc(16 * var(--ui-length-unit,1px))!important;box-sizing:border-box!important}
+.v132-reward-modal-inner.v17346-preview-modal>h3{position:static!important;flex:0 0 auto!important;margin:0 0 calc(12 * var(--ui-length-unit,1px))!important;padding:0!important;background:transparent!important}
+.v132-reward-modal-inner.v17346-preview-modal .v132-preview-list-scroll{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overscroll-behavior:contain;touch-action:pan-y;scrollbar-gutter:stable}
+.v132-reward-modal-inner.v17346-preview-modal .v132-reward-actions{position:static!important;flex:0 0 auto!important;margin-top:calc(12 * var(--ui-length-unit,1px))!important;padding-top:0!important;background:transparent!important}
+
 /* The ten-piece ticket preview is a fixed 2 × 5 summary, not a nested
    scroller. It is a deliberate Medium Modal exception to the generic compact
    reward dialog because all ten equipment outcomes must remain visible. */

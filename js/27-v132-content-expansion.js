@@ -2319,13 +2319,26 @@
 
     window.v132ShowRewardModal=function(innerHtml){
         const modal=ensureRewardModalElement();
+        // A list opened from item detail is a child dialog of that existing
+        // native surface. DOM containment keeps it above the parent without
+        // introducing another scale boundary or raising a z-index.
+        const itemModal=document.getElementById("itemModal");
+        const featureModal=document.getElementById("homeFeatureModal");
+        const host=itemModal?.classList.contains("show")?itemModal:
+            featureModal?.classList.contains("show")?featureModal:document.getElementById("game-ui");
+        if(modal.parentElement!==host){host.appendChild(modal);}
         modal.innerHTML=innerHtml;
+        modal.classList.remove("v132-detail-paused");
         modal.classList.add("show");
     };
 
     window.v132CloseRewardModal=function(){
         const modal=document.getElementById("v132RewardModal");
-        if(modal){ modal.classList.remove("show"); }
+        if(modal){
+            modal.classList.remove("show");
+            const host=document.getElementById("game-ui");
+            if(modal.parentElement!==host){host.appendChild(modal);}
+        }
     };
 
 

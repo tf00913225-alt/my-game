@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.e5b93c02c3a8.js"
+          "build/app-shell.8396fb95fc6a.js"
         ],
         "styles": [
           "build/app-shell.d5f2de4d602d.css"
@@ -49,11 +49,11 @@
       },
       "gameplay-core": {
         "scripts": [
-          "build/gameplay-core-primary.3848013c92ef.js",
-          "build/gameplay-core-secondary.77457ae186f5.js"
+          "build/gameplay-core-primary.c33aaf2ba4cb.js",
+          "build/gameplay-core-secondary.f8f71f5e022b.js"
         ],
         "styles": [
-          "build/gameplay-core.06eb974931a6.css"
+          "build/gameplay-core.8059ccb1a6cd.css"
         ],
         "dependencies": [
           "app-shell",
@@ -136,7 +136,7 @@
           "build/feature-adventure-ui.13793fa5c78c.js"
         ],
         "styles": [
-          "build/feature-adventure.e65fafd03ec7.css"
+          "build/feature-adventure.0d7c7b545813.css"
         ],
         "dependencies": [
           "gameplay-core"
@@ -562,19 +562,19 @@
         "decode": true
       },
       {
+        "path": "build/app-shell.8396fb95fc6a.js",
+        "sha256": "8396fb95fc6a",
+        "bytes": 1160694,
+        "priority": "P1",
+        "type": "script",
+        "decode": false
+      },
+      {
         "path": "build/app-shell.d5f2de4d602d.css",
         "sha256": "d5f2de4d602d",
         "bytes": 100800,
         "priority": "P1",
         "type": "style",
-        "decode": false
-      },
-      {
-        "path": "build/app-shell.e5b93c02c3a8.js",
-        "sha256": "e5b93c02c3a8",
-        "bytes": 1160261,
-        "priority": "P1",
-        "type": "script",
         "decode": false
       },
       {
@@ -794,32 +794,32 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core-primary.3848013c92ef.js",
-        "sha256": "3848013c92ef",
-        "bytes": 659074,
+        "path": "build/gameplay-core-primary.c33aaf2ba4cb.js",
+        "sha256": "c33aaf2ba4cb",
+        "bytes": 659867,
         "priority": "P2",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/gameplay-core-secondary.77457ae186f5.js",
-        "sha256": "77457ae186f5",
-        "bytes": 730525,
+        "path": "build/gameplay-core-secondary.f8f71f5e022b.js",
+        "sha256": "f8f71f5e022b",
+        "bytes": 730545,
         "priority": "P2",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/gameplay-core.06eb974931a6.css",
-        "sha256": "06eb974931a6",
-        "bytes": 418439,
+        "path": "build/gameplay-core.8059ccb1a6cd.css",
+        "sha256": "8059ccb1a6cd",
+        "bytes": 421727,
         "priority": "P2",
         "type": "style",
         "decode": false
       }
     ],
-    "manifestHash": "794264468e27",
-    "totalBytes": 21890393,
+    "manifestHash": "748b2abc14d7",
+    "totalBytes": 21894927,
     "totalResources": 78
   },
   "assets": {
@@ -827,17 +827,17 @@
       "sha256": "66da04a6f994",
       "bytes": 69985
     },
-    "build/app-shell.e5b93c02c3a8.js": {
-      "sha256": "e5b93c02c3a8",
-      "bytes": 1160261
+    "build/app-shell.8396fb95fc6a.js": {
+      "sha256": "8396fb95fc6a",
+      "bytes": 1160694
     },
-    "build/gameplay-core-primary.3848013c92ef.js": {
-      "sha256": "3848013c92ef",
-      "bytes": 659074
+    "build/gameplay-core-primary.c33aaf2ba4cb.js": {
+      "sha256": "c33aaf2ba4cb",
+      "bytes": 659867
     },
-    "build/gameplay-core-secondary.77457ae186f5.js": {
-      "sha256": "77457ae186f5",
-      "bytes": 730525
+    "build/gameplay-core-secondary.f8f71f5e022b.js": {
+      "sha256": "f8f71f5e022b",
+      "bytes": 730545
     },
     "build/feature-patrol.ab5bd3ce5582.js": {
       "sha256": "ab5bd3ce5582",
@@ -883,9 +883,9 @@
       "sha256": "d5f2de4d602d",
       "bytes": 100800
     },
-    "build/gameplay-core.06eb974931a6.css": {
-      "sha256": "06eb974931a6",
-      "bytes": 418439
+    "build/gameplay-core.8059ccb1a6cd.css": {
+      "sha256": "8059ccb1a6cd",
+      "bytes": 421727
     },
     "build/feature-patrol.1cef20d37f82.css": {
       "sha256": "1cef20d37f82",
@@ -907,9 +907,9 @@
       "sha256": "c28d0f109330",
       "bytes": 2530
     },
-    "build/feature-adventure.e65fafd03ec7.css": {
-      "sha256": "e65fafd03ec7",
-      "bytes": 23852
+    "build/feature-adventure.0d7c7b545813.css": {
+      "sha256": "0d7c7b545813",
+      "bytes": 23871
     },
     "build/firebase/firebase-config.4314d6321ba1.js": {
       "sha256": "4314d6321ba1",

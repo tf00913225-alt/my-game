@@ -25765,6 +25765,10 @@ function closeHomeFeature(){
 
 
     if(modal){
+        const childReward=document.getElementById("v132RewardModal");
+        if(childReward?.parentElement===modal&&typeof window.v132CloseRewardModal==="function"){
+            window.v132CloseRewardModal();
+        }
 
         modal.classList.remove(
             "show"
@@ -30918,6 +30922,10 @@ function openEquippedItem(
 
 
 function closeItemModal(){
+    const childReward=document.getElementById("v132RewardModal");
+    if(childReward?.parentElement===$("itemModal")&&typeof window.v132CloseRewardModal==="function"){
+        window.v132CloseRewardModal();
+    }
     window.FourSymbolsCurrentItemDetail=null;
 
     selectedInventorySlot =
