@@ -178,8 +178,8 @@ for(const element of ["fire","water","earth","wind"]){
     const fixedDate=towerDateFor(probe,element).date;
     const context=load({now:fixedDate});
     setTowerProgress(context,element,0);
-    const roster=Array.from(context.GameplaySystem.buildTowerRoster(1));
-    assert.equal(roster.length,10);
+    const roster=Array.from(context.GameplaySystem.buildTowerWaves(1)[0]);
+    assert.equal(roster.length,6);
     roster.forEach(monster=>{
         assert.equal(monster.vGameplayTower,true);
         assert.equal(monster.element,element);
@@ -190,13 +190,13 @@ for(const element of ["fire","water","earth","wind"]){
     context.currentBattleMonsters=roster.map((_,index)=>index);
     const slots=context.FourSymbolsBattlefieldSlots;
     const snapshot=slots.createEnemyFormationSnapshot(context.currentBattleMonsters,{
-        originalFormationType:10,rankWeight:index=>rankWeight(context.monsters[index])
+        encounterMode:"tower",originalFormationType:6,rankWeight:index=>rankWeight(context.monsters[index])
     });
     assert.deepEqual(Array.from(Object.values(snapshot.monsterIndexToSlot)).sort(),[
-        "ENEMY_B1","ENEMY_B2","ENEMY_B3","ENEMY_B4","ENEMY_B5",
-        "ENEMY_F1","ENEMY_F2","ENEMY_F3","ENEMY_F4","ENEMY_F5"
+        "ENEMY_B1","ENEMY_B2","ENEMY_B3",
+        "ENEMY_F1","ENEMY_F2","ENEMY_F3"
     ]);
-    assert.equal(slots.resolveEnemyTargets(snapshot,0,"all",()=>true).length,10);
+    assert.equal(slots.resolveEnemyTargets(snapshot,0,"all",()=>true).length,6);
 }
 
 {
@@ -204,15 +204,15 @@ for(const element of ["fire","water","earth","wind"]){
     const fixedDate=towerDateFor(probe,"wind").date;
     const context=load({now:fixedDate});
     setTowerProgress(context,"wind",0);
-    const roster=Array.from(context.GameplaySystem.buildTowerRoster(5));
-    assert.equal(roster.length,10);
+    const roster=Array.from(context.GameplaySystem.buildTowerWaves(5)[1]);
+    assert.equal(roster.length,6);
     context.monsters=roster;
     context.currentBattleMonsters=roster.map((_,index)=>index);
     const slots=context.FourSymbolsBattlefieldSlots;
     const snapshot=slots.createEnemyFormationSnapshot(context.currentBattleMonsters,{
-        originalFormationType:10,rankWeight:index=>rankWeight(context.monsters[index])
+        encounterMode:"tower",originalFormationType:6,rankWeight:index=>rankWeight(context.monsters[index])
     });
-    const center=slots.getAssignedMonsterAtEnemySlot(snapshot,"ENEMY_B3");
+    const center=slots.getAssignedMonsterAtEnemySlot(snapshot,"ENEMY_B2");
     assert.equal(context.monsters[center].rank,"elite");
     assert.equal(context.monsters[center].element,"wind");
 }
@@ -222,8 +222,8 @@ for(const element of ["fire","water","earth","wind"]){
     const fixedDate=towerDateFor(probe,"fire").date;
     const context=load({now:fixedDate});
     setTowerProgress(context,"fire",0);
-    const roster=Array.from(context.GameplaySystem.buildTowerRoster(10));
-    assert.equal(roster.length,10);
+    const roster=Array.from(context.GameplaySystem.buildTowerWaves(10)[1]);
+    assert.equal(roster.length,6);
     context.monsters=roster;
     context.currentBattleMonsters=roster.map((_,index)=>index);
     assert.ok(roster.every(monster=>monster.element==="fire"));
@@ -241,16 +241,16 @@ for(const element of ["fire","water","earth","wind"]){
 
     const slots=context.FourSymbolsBattlefieldSlots;
     const snapshot=slots.createEnemyFormationSnapshot(context.currentBattleMonsters,{
-        originalFormationType:10,rankWeight:index=>rankWeight(context.monsters[index])
+        encounterMode:"tower",originalFormationType:6,rankWeight:index=>rankWeight(context.monsters[index])
     });
     slots.setActiveEnemySnapshot(snapshot);
-    assert.equal(slots.getEnemySlotForMonster(snapshot,bossIndex),"ENEMY_B3");
+    assert.equal(slots.getEnemySlotForMonster(snapshot,bossIndex),"ENEMY_B2");
     const before=JSON.stringify(snapshot.monsterIndexToSlot);
     assert.deepEqual(Array.from(slots.resolveEnemyTargets(snapshot,bossIndex,"single",()=>true)),[bossIndex]);
     assert.equal(slots.resolveEnemyTargets(snapshot,bossIndex,"tri",()=>true).length,3);
-    assert.equal(slots.resolveEnemyTargets(snapshot,bossIndex,"row",()=>true).length,5);
+    assert.equal(slots.resolveEnemyTargets(snapshot,bossIndex,"row",()=>true).length,3);
     assert.equal(slots.resolveEnemyTargets(snapshot,bossIndex,"column",()=>true).length,2);
-    assert.equal(slots.resolveEnemyTargets(snapshot,bossIndex,"all",()=>true).length,10);
+    assert.equal(slots.resolveEnemyTargets(snapshot,bossIndex,"all",()=>true).length,6);
     boss.alive=false;boss.hp=0;
     slots.resolveEnemyTargets(snapshot,bossIndex,"all",index=>context.monsters[index].alive!==false&&context.monsters[index].hp>0);
     assert.equal(JSON.stringify(snapshot.monsterIndexToSlot),before);
@@ -269,16 +269,17 @@ for(const element of ["fire","water","earth","wind"]){
     assert.equal(context.vGameplaySelectTowerBand(10),true);
     assert.equal(context.lastBattleOptions.mode,"tower");
     assert.equal(context.v132ActiveDungeonRun.mode,"tower");
-    assert.equal(context.currentBattleMonsters.length,10);
-    const finalRoster=context.currentBattleMonsters.map(index=>context.monsters[index]);
+    assert.equal(context.currentBattleMonsters.length,6);
+    const finalRoster=Array.from(context.lastBattleOptions.waves[1]);
+    context.monsters=finalRoster;context.currentBattleMonsters=finalRoster.map((_,i)=>i);
     assert.ok(finalRoster.every(monster=>monster.element===week.element));
     finalRoster.forEach(monster=>assertLegalSkills(context,monster));
     const bossIndex=context.currentBattleMonsters.find(index=>context.monsters[index].vGameplayTowerBoss===true);
     const slots=context.FourSymbolsBattlefieldSlots;
     const snapshot=slots.createEnemyFormationSnapshot(context.currentBattleMonsters,{
-        originalFormationType:10,rankWeight:index=>rankWeight(context.monsters[index])
+        encounterMode:"tower",originalFormationType:6,rankWeight:index=>rankWeight(context.monsters[index])
     });
-    assert.equal(slots.getEnemySlotForMonster(snapshot,bossIndex),"ENEMY_B3");
+    assert.equal(slots.getEnemySlotForMonster(snapshot,bossIndex),"ENEMY_B2");
 }
 
 {
@@ -302,17 +303,20 @@ assert.match(contracts,/Tower Boss portrait `sizeClass="standard"`/);
 assert.doesNotMatch(uiSource,/rebalanceDungeonElements/);
 assert.doesNotMatch(towerSource,/towerObjectPlan|towerSummonPlan/);
 
-console.log("Tower Element Owner, 10-unit formation, Small Boss and skill-element guard integration passed.");
+console.log("Tower Element Owner, six-slot two-wave formation, Small Boss and skill-element guard integration passed.");
 
 // Every floor/element/rank uses common frequency and the element profile once.
 for(const element of ["fire","water","earth","wind"]){
     const probe=load(), date=towerDateFor(probe,element).date;
     const context=load({now:date});setTowerProgress(context,element,0);
     for(let floor=1;floor<=100;floor++){
-        const roster=Array.from(context.GameplaySystem.buildTowerRoster(floor));
-        assert.equal(roster.length,10,element+" floor "+floor);
+        const waves=Array.from(context.GameplaySystem.buildTowerWaves(floor),row=>Array.from(row));
+        assert.deepEqual(waves.map(row=>row.length),[6,6]);
+        const roster=waves[1];
+        assert.ok(waves[0].every(m=>m.rank===(floor%10===0?"elite":"regular")));
+        assert.equal(roster.length,6,element+" floor "+floor);
         assert.equal(roster.filter(m=>m.rank==="smallBoss").length,floor%10===0?1:0);
-        assert.equal(roster.filter(m=>m.rank==="elite").length,floor%5===0?2:0);
+        assert.equal(roster.filter(m=>m.rank==="elite").length,floor%10===0?5:floor%5===0?2:0);
         for(const m of roster){
             assert.equal(m.skillChance,floor<=30?.65:floor<=60?.70:floor<=90?.75:.8);
             if(element==="fire"){assert.equal(m.vTowerCriticalBonusPercent,15);assert.equal(m.vTowerDirectDamageMultiplier,1.15);}
@@ -333,14 +337,14 @@ for(const element of ["fire","water","earth","wind"]){
         }
         context.monsters=roster;context.currentBattleMonsters=roster.map((_,i)=>i);
         const slots=context.FourSymbolsBattlefieldSlots;
-        const snapshot=slots.createEnemyFormationSnapshot(context.currentBattleMonsters,{originalFormationType:10,rankWeight:i=>rankWeight(roster[i])});
-        assert.equal(new Set(Object.values(snapshot.monsterIndexToSlot)).size,10);
-        assert.equal(slots.resolveEnemyTargets(snapshot,0,"all",()=>true).length,10);
+        const snapshot=slots.createEnemyFormationSnapshot(context.currentBattleMonsters,{encounterMode:"tower",originalFormationType:6,rankWeight:i=>rankWeight(roster[i])});
+        assert.equal(new Set(Object.values(snapshot.monsterIndexToSlot)).size,6);
+        assert.equal(slots.resolveEnemyTargets(snapshot,0,"all",()=>true).length,6);
         assert.equal(slots.resolveEnemyTargets(snapshot,0,"single",()=>true).length,1);
         assert.ok(slots.resolveEnemyTargets(snapshot,0,"tri",()=>true).length<=3);
-        const dead=slots.getEnemySlotForMonster(snapshot,9);
-        assert.equal(slots.resolveEnemyTargets(snapshot,0,"all",i=>i!==9).length,9);
-        assert.equal(slots.getEnemySlotForMonster(snapshot,9),dead);
+        const dead=slots.getEnemySlotForMonster(snapshot,5);
+        assert.equal(slots.resolveEnemyTargets(snapshot,0,"all",i=>i!==5).length,5);
+        assert.equal(slots.getEnemySlotForMonster(snapshot,5),dead);
     }
     context.battleActive=false;context.vGameplayStartBoss("world","world-40");
     const large=context.monsters[0], before=JSON.stringify(large);

@@ -84,67 +84,30 @@ function value(context,expression){ return JSON.parse(vm.runInContext("JSON.stri
 let passed=0;
 function test(name,fn){ fn();passed++;console.log("✓ "+name); }
 
-test("fixed difficulties remain Lv20/Lv40 and only the Lv40 final five use Lv5",()=>{
-    [20,40].forEach(level=>{
-        const {context}=load({playerLevel:80});
-        for(let region=0;region<5;region++) for(let stage=0;stage<5;stage++){
-            const roster=value(context,`v174AbyssBuildRoster(${level},${region},${stage})`);
-            const expectedCount=stage<4?8:(level===40&&region===4?10:8);
-            assert.equal(roster.length,expectedCount);
-            assert.equal(roster.every(monster=>monster.level===level),true);
-            const expectedLevel=level===40&&region===4&&stage===4?5:(level===20?1:2);
-            assert.equal(roster.every(monster=>monster.v141ForceSkillLevel===expectedLevel),true);
+test("all two-wave profiles retain fixed levels and skills",()=>{
+    const {context}=load({playerLevel:80});
+    for(const level of [20,40])for(let region=0;region<5;region++)for(let stage=0;stage<5;stage++){
+        const waves=value(context,`v174AbyssBuildWaves(${level},${region},${stage})`);
+        assert.equal(waves.length,2);assert.equal(waves[0].length,6);
+        const final=level===40&&region===4&&stage===4;
+        assert.equal(waves[1].length,final?5:6);
+        assert.ok(waves.flat().every(m=>m.level===level));
+        assert.ok(waves.flat().every(m=>m.v141ForceSkillLevel===(final?5:level===20?1:2)));
+        if(stage<4){
+            assert.deepEqual(waves[0].map(m=>m.rank),Array(6).fill("regular"));
+            assert.deepEqual(waves[1].map(m=>m.rank),["elite","elite","elite","regular","regular","regular"]);
+        }else{
+            assert.deepEqual(waves[0].map(m=>m.rank),Array(6).fill("elite"));
+            if(!final)assert.deepEqual(waves[1].map(m=>m.rank),["smallBoss","elite","elite","elite","elite","elite"]);
         }
-    });
-});
-
-test("all pre-stages are three elite in front plus five regular in back",()=>{
-    const {context}=load();
-    [20,40].forEach(level=>{
-        for(let region=0;region<5;region++) for(let stage=0;stage<4;stage++){
-            const roster=value(context,`v174AbyssBuildRoster(${level},${region},${stage})`);
-            assert.deepEqual(roster.map(monster=>monster.rank),[
-                "regular","regular","regular","regular","regular","elite","elite","elite"
-            ]);
-            assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationRow),[1,1,1,1,1]);
-            assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationPosition),[0,1,2,3,4]);
-            assert.deepEqual(roster.slice(5).map(monster=>monster.v141FormationRow),[0,0,0]);
-            assert.deepEqual(roster.slice(5).map(monster=>monster.v141FormationPosition),[0,1,2]);
-        }
-    });
-});
-
-test("normal boss stages and Lv20 final use seven elite plus one emperor",()=>{
-    const {context}=load();
-    const assertBossFormation=roster=>{
-        assert.equal(roster.length,8);
-        assert.equal(roster.filter(monster=>monster.rank==="elite").length,7);
-        assert.equal(roster.filter(monster=>monster.rank==="smallBoss").length,1);
-        assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationRow),[0,0,0,0,0]);
-        assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationPosition),[0,1,2,3,4]);
-        assert.equal(roster[2].rank,"smallBoss");
-        assert.deepEqual(roster.slice(5).map(monster=>monster.v141FormationRow),[1,1,1]);
-        assert.deepEqual(roster.slice(5).map(monster=>monster.v141FormationPosition),[1,2,3]);
-    };
-    for(let region=0;region<4;region++){
-        [20,40].forEach(level=>{
-            const roster=value(context,`v174AbyssBuildRoster(${level},${region},4)`);
-            assertBossFormation(roster);
-        });
     }
-    const initialFinal=value(context,"v174AbyssBuildRoster(20,4,4)");
-    assertBossFormation(initialFinal);
-    assert.deepEqual(initialFinal.filter(monster=>monster.rank==="smallBoss").map(monster=>monster.name),["極帝天尊"]);
 });
-
-test("Lv40 final battle restores five Heavenly Emperors plus five elite in formal v155 order",()=>{
-    const {context}=load();
-    const roster=value(context,"v174AbyssBuildRoster(40,4,4)");
-    assert.equal(roster.length,10);
-    assert.deepEqual(roster.slice(0,5).map(monster=>monster.name),["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"]);
-    assert.equal(roster.slice(0,5).every(monster=>monster.rank==="smallBoss"&&monster.v141FormationRow===0),true);
-    assert.equal(roster.slice(5).every(monster=>monster.rank==="elite"&&monster.v141FormationRow===1),true);
-    assert.deepEqual(roster.slice(0,5).map(monster=>monster.v141FormationPosition),[0,1,2,3,4]);
+test("Lv40 final five retain canonical names and exact fixed loadouts",()=>{
+    const {context}=load();const waves=value(context,"v174AbyssBuildWaves(40,4,4)");
+    assert.deepEqual(waves[1].map(m=>m.name),["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"]);
+    assert.deepEqual(waves[1].map(m=>m.skillIds),[["dustStorm","flyingSandStrike"],["windHowlLightning","stormRain"],["flyingSandStrike","phoenixCry"],["iceArrowRain","iceSpin"],["dragonSlash","phoenixCry"]]);
+    assert.deepEqual(waves[1].map(m=>m.v141SupportSkillIds),[["rockWall"],["stealthSkill"],["yuanZuBlessing"],["healSpell"],["rage"]]);
+    assert.ok(waves[1].every(m=>m.rank==="smallBoss"));
 });
 
 test("Abyss HP/SP/attack/defense now match the unique owner without late durability writes",()=>{

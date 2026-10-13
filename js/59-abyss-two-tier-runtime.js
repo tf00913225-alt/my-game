@@ -405,55 +405,32 @@
             boss.v174TrueRealmFinal=true;
             roster.push(boss);
         });
-        for(let position=0;position<5;position++){
-            const elite=makeAbyssMonster("天兵天將",config,ABYSS_REGIONS[4],"elite",PRE_STAGE_COUNT,false,FINAL_TRUE_REALM_ELITE_LOADOUTS[position]);
-            elite.v141ForceSkillLevel=5;
-            elite.v141SkillLevel=5;
-            elite.v144SkillLevel=5;
-            elite.skillChance=.78;
-            elite.v141FormationRow=1;
-            elite.v141FormationPosition=position;
-            elite.v174TrueRealmFinal=true;
-            roster.push(elite);
-        }
         return roster;
     }
 
-    function buildRoster(level,regionIndex,encounterIndex){
+    function buildEncounterWaves(level,regionIndex,encounterIndex){
         const config=difficultyConfig(level);
-        const safeRegionIndex=clamp(Math.floor(numeric(regionIndex,0)),0,REGION_COUNT-1);
-        const region=ABYSS_REGIONS[safeRegionIndex];
+        const region=ABYSS_REGIONS[clamp(Math.floor(numeric(regionIndex,0)),0,REGION_COUNT-1)];
         const stage=clamp(Math.floor(numeric(encounterIndex,0)),0,STAGES_PER_REGION-1);
-        const roster=[];
-        if(stage<PRE_STAGE_COUNT){
-            for(let index=0;index<PRE_STAGE_REGULAR_COUNT;index++){
-                const monster=makeAbyssMonster("天兵天將",config,region,"regular",stage,false);
-                monster.v141FormationRow=1;monster.v141FormationPosition=index;roster.push(monster);
-            }
-            for(let index=0;index<PRE_STAGE_ELITE_COUNT;index++){
-                const monster=makeAbyssMonster("天兵天將",config,region,"elite",stage,false);
-                monster.v141FormationRow=0;monster.v141FormationPosition=index;roster.push(monster);
-            }
-            return roster;
+        const final=isTrueRealmFinal(config.id,regionIndex,stage);
+        const bossStage=stage===PRE_STAGE_COUNT;
+        const first=Array.from({length:6},(_,index)=>{
+            const loadout=final?FINAL_TRUE_REALM_ELITE_LOADOUTS[index%FINAL_TRUE_REALM_ELITE_LOADOUTS.length]:null;
+            const monster=makeAbyssMonster("天兵天將",config,region,bossStage?"elite":"regular",stage,false,loadout);
+            if(final){monster.v141ForceSkillLevel=5;monster.v141SkillLevel=5;monster.v144SkillLevel=5;monster.skillChance=.78;monster.v174TrueRealmFinal=true;}
+            return monster;
+        });
+        if(final){ return [first,buildTrueRealmFinalRoster(config)]; }
+        const second=[];
+        if(bossStage){ second.push(makeAbyssMonster(region.emperor,config,region,"smallBoss",stage,true)); }
+        while(second.length<6){
+            const rank=bossStage||second.length<3?"elite":"regular";
+            second.push(makeAbyssMonster("天兵天將",config,region,rank,stage,false));
         }
-        if(isTrueRealmFinal(config.id,safeRegionIndex,stage)){
-            return buildTrueRealmFinalRoster(config);
-        }
-        for(let position=0;position<5;position++){
-            if(position===2){
-                const boss=makeAbyssMonster(region.emperor,config,region,"smallBoss",stage,true);
-                boss.v141FormationRow=0;boss.v141FormationPosition=2;roster.push(boss);
-            }else{
-                const elite=makeAbyssMonster("天兵天將",config,region,"elite",stage,false);
-                elite.v141FormationRow=0;elite.v141FormationPosition=position;roster.push(elite);
-            }
-        }
-        for(let position=1;position<=3;position++){
-            const elite=makeAbyssMonster("天兵天將",config,region,"elite",stage,false);
-            elite.v141FormationRow=1;elite.v141FormationPosition=position;roster.push(elite);
-        }
-        return roster;
+        return [first,second];
     }
+    // Compatibility/audit catalog only; runtime always launches one wave.
+    function buildRoster(level,regionIndex,encounterIndex){ return buildEncounterWaves(level,regionIndex,encounterIndex).flat(); }
 
     function cardProgress(run){
         if(run.completed){ return "已通關"; }
@@ -616,7 +593,7 @@
     }
     function launchCurrentEncounter(){
         const run=currentRun();if(!run||battleStarting||run.phase!=="ready"||run.battleCompleted||movementState||interactionState){ return false; }
-        battleStarting=true;const roster=buildRoster(run.difficulty,run.regionIndex,run.encounterIndex);
+        battleStarting=true;const waves=buildEncounterWaves(run.difficulty,run.regionIndex,run.encounterIndex);const roster=waves[0];
         if(typeof window.v132LaunchDungeonBattle!=="function"){ battleStarting=false;throw new Error("Abyss requires v132LaunchDungeonBattle runtime owner."); }
         // A new Abyss encounter hands a fresh roster to the existing Slot Owner.
         // Indexes restart at zero; a prior encounter's snapshot must not alias them.
@@ -641,7 +618,7 @@
                 onClose:finish
             });
             if(!shown){ finish(); }
-        },{mode:"abyss"});
+        },{mode:"abyss",waves:waves});
         if(!started){ battleStarting=false; }return !!started;
     }
     function confirmBossAndLaunch(){
@@ -766,6 +743,7 @@
     window.v174AbyssDifficulties=ABYSS_DIFFICULTIES;
     window.v174AbyssRegions=ABYSS_REGIONS;
     window.v174AbyssBuildRoster=buildRoster;
+    window.v174AbyssBuildWaves=buildEncounterWaves;
     window.v174AbyssGetRootState=()=>JSON.parse(JSON.stringify(rootState));
     window.v174AbyssGetRunState=level=>JSON.parse(JSON.stringify(rootState.runs[difficultyConfig(level).id]));
     window.v174AbyssReloadState=function(){ clearTransientActions();rootState=loadRoot();persist();return window.v174AbyssGetRootState(); };
