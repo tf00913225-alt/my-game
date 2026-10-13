@@ -307,13 +307,14 @@ async function waitFor(client,expression,label,timeoutMs=30000){
         result=await Promise.race([
             client.eval(`(async()=>{
                 const started=performance.now();
-                let last=null;
+                let last=null,diagnostic=null;
                 while(performance.now()-started<${Number(timeoutMs)}){
                     try{last=Boolean(${expression});if(last){return {ready:true,last,elapsedMs:performance.now()-started};}}
                     catch(error){last=String(error?.message||error);}
+                    try{const gate=window.v142GetActiveAnimationGate?.();const current=window.v143SkillAnimationState?.current;diagnostic={at:Date.now(),gate:gate?{id:gate.config?.id,duration:gate.config?.duration,resolveDuration:gate.config?.resolveDuration,deadline:gate.deadline,done:gate.done,reason:gate.reason,visualTimelinePending:!!gate.visualTimelinePending}:null,current:current?{id:current.config?.id,sequence:current.sequence,startedAt:current.startedAt,firstVisibleFrameAt:current.firstVisibleFrameAt,duration:current.duration,done:current.done}:null,longTasks:window.__relicQaLongTasks?.slice(-8)||[]};}catch(captureError){diagnostic={captureError:String(captureError?.message||captureError)};}
                     await new Promise(resolve=>setTimeout(resolve,180));
                 }
-                return {ready:false,last,elapsedMs:performance.now()-started};
+                return {ready:false,last,elapsedMs:performance.now()-started,diagnostic};
             })()`),
             new Promise((_,reject)=>{
                 transportTimer=setTimeout(()=>reject(new Error("CDP transport stalled while waiting for "+label)),timeoutMs+10000);
@@ -321,7 +322,7 @@ async function waitFor(client,expression,label,timeoutMs=30000){
         ]);
     }finally{ clearTimeout(transportTimer); }
     client.waitTimings=client.waitTimings||[];
-    client.waitTimings.push({label,timeoutMs,browserElapsedMs:result?.elapsedMs,hostElapsedMs:performance.now()-started,ready:result?.ready===true,last:result?.last});
+    client.waitTimings.push({label,timeoutMs,browserElapsedMs:result?.elapsedMs,hostElapsedMs:performance.now()-started,ready:result?.ready===true,last:result?.last,diagnostic:result?.diagnostic});
     if(client.waitTimings.length>40){ client.waitTimings.shift(); }
     if(result?.ready===true){ return; }
     const last=result?.last;
@@ -642,6 +643,10 @@ async function runRelicPresentationModeMatrix(client){
         let context;
         const presentations=[];
         for(const [relicId,targetKind] of relics){
+            if(mode==="world"&&relicId==="relic_nine_dragon_fire"){
+                try{evidence.performanceBefore=await client.send("Performance.getMetrics");await client.send("Profiler.enable");await client.send("Profiler.start");evidence.profilerStarted=true;}
+                catch(captureError){evidence.performanceCaptureError=String(captureError.message);}
+            }
             context=await launchPresentationQaMode(client,mode,relicId);
             evidence.checks.relicPresentationProgress={mode,relicId,targetKind,completed:matrix};
             const snapshot=await captureRelicPresentationQa(client,relicId,targetKind,mode);
@@ -684,6 +689,8 @@ try{
     await client.send("Emulation.setDeviceMetricsOverride",{width:412,height:915,deviceScaleFactor:3,mobile:true,screenWidth:412,screenHeight:915});
     await client.send("Page.navigate",{url:qaUrl});
     await waitFor(client,"document.readyState==='complete'","page load");
+    await client.send("Performance.enable");
+    await client.eval("(()=>{window.__relicQaLongTasks=[];try{window.__relicQaTaskObserver=new PerformanceObserver(list=>{for(const entry of list.getEntries()){window.__relicQaLongTasks.push({startTime:entry.startTime,duration:entry.duration,name:entry.name});}window.__relicQaLongTasks.splice(0,Math.max(0,window.__relicQaLongTasks.length-20));});window.__relicQaTaskObserver.observe({type:'longtask',buffered:true});}catch(error){window.__relicQaLongTaskCaptureError=String(error.message);}return true;})()");
     const accountState=await prepareAccountFirstRuntime(client,["abyss","boss-tower"]);
     evidence.checks.accountState=accountState;
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime");
@@ -1676,6 +1683,9 @@ try{
 } catch(error){
     evidence.status="FAIL";
     evidence.error=error?.stack||String(error);
+    try{evidence.performanceAfter=await client.send("Performance.getMetrics");if(evidence.profilerStarted){evidence.cpuProfile=await client.send("Profiler.stop");}}
+    catch(captureError){evidence.performanceCaptureError=String(captureError.message);}
+    if(process.platform==="linux"){const processProbe=spawnSync("ps",["-eo","pid,ppid,comm,pcpu,rss"],{encoding:"utf8"});evidence.processResources=processProbe.status===0?processProbe.stdout:String(processProbe.error?.message||processProbe.status);}
     evidence.runtimeEvents=client?.events?.slice(-50)||[];
     evidence.evalTimings=client?.evalTimings||[];
     evidence.waitTimings=client?.waitTimings||[];
