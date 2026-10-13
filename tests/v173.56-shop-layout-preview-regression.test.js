@@ -1,13 +1,14 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const shop=fs.readFileSync("js/56-v173.51-shop-qa.js","utf8");
 const equipment=fs.readFileSync("js/equipment-progression.js","utf8");
-const css=fs.readFileSync("css/53-v173.51-qa.css","utf8");
+const css=authoredUiCss(fs.readFileSync("css/53-v173.51-qa.css","utf8"));
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
-const canonicalCss=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+const canonicalCss=authoredUiCss(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"));
 assert.match(shop,/runtime retired/);
 assert.doesNotMatch(shop,/MutationObserver|setInterval|setTimeout|innerHTML/);
 assert.match(equipment,/function replaceEquipmentShop/);

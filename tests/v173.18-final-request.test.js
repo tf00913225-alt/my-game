@@ -2,12 +2,13 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 
 const abyss=fs.readFileSync("js/36-v141-content-systems.js","utf8");
-const inventoryCss=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
-const itemCss=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+const inventoryCss=authoredUiCss(fs.readFileSync("css/22-stage-v78-character-inventory-core.css","utf8"));
+const itemCss=authoredUiCss(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"));
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
@@ -72,7 +73,7 @@ test("talisman artwork is border-box constrained to the inventory cell",()=>{
     assert.match(iconRule[0],/min-height:0;/);
     assert.match(iconRule[0],/overflow:hidden;/);
     assert.match(iconRule[0],/box-sizing:border-box;/);
-    const artRule=inventoryCss.match(/#game-ui #inventoryPage \.inventory-grid-classic \.inventory-item-classic \.inventory-icon > \.v169-item-art\{[\s\S]*?\}/);
+    const artRule=inventoryCss.match(/#game-ui #inventoryPage \.inventory-grid-classic \.inventory-item-classic \.inventory-icon\s*>\s*\.v169-item-art\{[\s\S]*?\}/);
     assert.ok(artRule);
     assert.match(artRule[0],/width:100%;[\s\S]*?height:100%;/);
     assert.match(artRule[0],/max-width:100%;[\s\S]*?max-height:100%;/);

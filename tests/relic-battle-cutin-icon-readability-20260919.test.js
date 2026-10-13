@@ -2,10 +2,11 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 
 const relic=fs.readFileSync("js/60-team-relic-system.js","utf8");
-const css=fs.readFileSync("css/55-team-relic-system.css","utf8");
+const css=authoredUiCss(fs.readFileSync("css/55-team-relic-system.css","utf8"));
 const core=fs.readFileSync("js/00-main.js","utf8");
 const v143=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const root="assets/relics/battle-icons";

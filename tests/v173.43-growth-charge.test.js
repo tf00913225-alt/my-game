@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const vm=require("node:vm");
 
 const growth=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
@@ -10,9 +11,9 @@ const battleExp=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const offline=fs.readFileSync("js/34-v141-core-systems.js","utf8");
 const dungeon=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 const elementBox=fs.readFileSync("js/49-v169-element-box-settings.js","utf8");
-const elementBoxCss=fs.readFileSync("css/48-v169-element-box-settings.css","utf8");
-const polishCss=fs.readFileSync("css/42-v146-system-polish.css","utf8");
-const homeRosterCss=fs.readFileSync("css/19-stage-v54-main-city-moderate-native-scale.css","utf8");
+const elementBoxCss=authoredUiCss(fs.readFileSync("css/48-v169-element-box-settings.css","utf8"));
+const polishCss=authoredUiCss(fs.readFileSync("css/42-v146-system-polish.css","utf8"));
+const homeRosterCss=authoredUiCss(fs.readFileSync("css/19-stage-v54-main-city-moderate-native-scale.css","utf8"));
 
 const KEY="four_symbols_account:test-uid:exp-pool-growth-state";
 const DAY=86400000;
@@ -161,13 +162,13 @@ test("growth targets stay bright and dots share the notification presentation ow
     assert.match(polishCss,/\.v146-growth-attention-target\{[^}]*opacity:1 !important;[^}]*filter:none !important/);
     assert.match(flow,/dot\.className="v141-notice-dot v146-growth-guidance-dot"/);
     assert.doesNotMatch(polishCss,/\.v146-growth-guidance-dot\{/);
-    const notificationCss=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
-    const nativeNavCss=fs.readFileSync("css/06-stage-v11-native-bottom-nav.css","utf8");
+    const notificationCss=authoredUiCss(fs.readFileSync("css/38-v141-system-expansion.css","utf8"));
+    const nativeNavCss=authoredUiCss(fs.readFileSync("css/06-stage-v11-native-bottom-nav.css","utf8"));
     assert.match(notificationCss,/\.v141-notice-dot\{[^}]*width:9px;[^}]*height:9px;[^}]*border:1px solid #f7dfad;[^}]*background:#e52e2e;[^}]*pointer-events:none/);
     assert.match(notificationCss,/@keyframes v141NoticePulse\{50%\{transform:scale\(\.9\);opacity:\.72\}\}/);
     assert.match(nativeNavCss,/#bottomNav > \.nav-button > \.v141-notice-dot\{[^}]*width:22px;[^}]*height:22px/);
 });
-test("three-character home HUD grows with readable text but remains three columns",()=>{assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);assert.match(homeRosterCss,/grid-template-columns:40px minmax\(0,1fr\)/);assert.match(homeRosterCss,/min-height:84px/);assert.match(homeRosterCss,/width:40px;height:40px/);assert.match(homeRosterCss,/\.v146-home-character-main > div:first-child\{[\s\S]*font-size:15px/);assert.match(homeRosterCss,/\.v146-home-resource strong\{[\s\S]*font-size:13px/);});
+test("three-character home HUD grows with readable text but remains three columns",()=>{assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);assert.match(homeRosterCss,/grid-template-columns:minmax\(0,1fr\)/);assert.match(homeRosterCss,/min-height:70px/);assert.match(homeRosterCss,/width:32px;height:32px/);assert.match(homeRosterCss,/\.v146-home-character-main > div:first-child\{[\s\S]*font-size:15px/);assert.match(homeRosterCss,/\.v146-home-resource strong\{[\s\S]*font-size:13px/);});
 test("ordinary Daily durability is owned once by MonsterBalance; Abyss remains excluded",()=>{
 // MonsterBalance owns Daily durability; retired V173 scaling must not return.
 const {MonsterBalance,DAILY_PARTY_DURABILITY}=require("../js/combat/monster-balance-owner.mjs");

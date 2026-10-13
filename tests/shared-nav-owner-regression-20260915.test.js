@@ -3,8 +3,9 @@
 const test=require("node:test");
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 
-const read=path=>fs.readFileSync(path,"utf8");
+const read=path=>{const source=fs.readFileSync(path,"utf8");return path.endsWith('.css')?authoredUiCss(source):source;};
 const early=read("js/35-v141-ui-battle.js");
 const polish=read("js/41-v146-system-polish.js");
 const nav=read("js/42-v148-combat-dungeon-fixes.js");
@@ -49,7 +50,7 @@ test("notification dots distinguish native and legacy coordinate planes",()=>{
 });
 
 test("gameplay presentation removes seal ownership and full-art dark overlays",()=>{
-    const gameplay=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
+    const gameplay=authoredUiCss(fs.readFileSync("css/gameplay-boss-tower.css","utf8"));
     const source=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
     const sealClass=["gameplay","mode","seal"].join("-");
     assert.doesNotMatch(gameplay,new RegExp(sealClass));
@@ -60,7 +61,7 @@ test("gameplay presentation removes seal ownership and full-art dark overlays",(
 });
 
 test("coming-soon preserves disabled semantics without dimming its artwork",()=>{
-    const gameplay=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
+    const gameplay=authoredUiCss(fs.readFileSync("css/gameplay-boss-tower.css","utf8"));
     const source=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
     assert.match(gameplay,/\.gameplay-mode-card\.coming-soon\{[\s\S]*?cursor:default;/);
     assert.doesNotMatch(gameplay,/\.gameplay-mode-card\.coming-soon\{[^}]*?(?:opacity|filter):/);
@@ -69,7 +70,7 @@ test("coming-soon preserves disabled semantics without dimming its artwork",()=>
 });
 
 test("gameplay panel keeps only the top ornament owner",()=>{
-    const gameplay=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
+    const gameplay=authoredUiCss(fs.readFileSync("css/gameplay-boss-tower.css","utf8"));
     assert.match(gameplay,/#game-stage \.gameplay-large-panel::before\{/);
     assert.doesNotMatch(gameplay,/gameplay-large-panel::after/);
     assert.doesNotMatch(gameplay,/bottom:8px/);

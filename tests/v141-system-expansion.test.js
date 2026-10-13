@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 
@@ -15,8 +16,8 @@ const uiSource=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
 const statusSource=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const finalNavSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const contentSource=fs.readFileSync("js/36-v141-content-systems.js","utf8");
-const cssSource=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
-const inventoryCss=fs.readFileSync("css/22-stage-v78-character-inventory-core.css","utf8");
+const cssSource=authoredUiCss(fs.readFileSync("css/38-v141-system-expansion.css","utf8"));
+const inventoryCss=authoredUiCss(fs.readFileSync("css/22-stage-v78-character-inventory-core.css","utf8"));
 const indexSource=fs.readFileSync("index.html","utf8");
 
 function extractFunction(source,name){
@@ -96,9 +97,9 @@ test("backpack is 120 slots rendered as five cyclic pages of 24 without drag or 
     assert.match(uiSource,/inventoryPageIndex=\(inventoryPageIndex\+Number\(direction\)\+INVENTORY_PAGE_COUNT\)%INVENTORY_PAGE_COUNT/);
     assert.match(uiSource,/box\.draggable=false/);
     assert.doesNotMatch(uiSource,/inventory-slot-number/);
-    assert.match(inventoryCss,/\.inventory-grid-classic\{[^}]*grid-template-columns:repeat\(auto-fill,minmax\(48px,1fr\)\)/);
-    assert.match(inventoryCss,/\.inventory-grid-scroll\{[^}]*overflow-y:auto/);
-    assert.match(cssSource,/\.inventory-slot-number\{\s*display:none/);
+    assert.match(inventoryCss,/\.inventory-grid-classic\{[^}]*grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+    assert.match(fs.readFileSync("css/24-stage-v85-inventory-inner-grid-scroll-root.css","utf8"),/\.inventory-grid-scroll\{[^}]*overflow-y:auto/);
+    assert.match(inventoryCss,/\.inventory-slot-number\{\s*display:none/);
 });
 
 test("monster skills cap at 1/2/3 and use fixed Lv1-Lv5 bands",()=>{

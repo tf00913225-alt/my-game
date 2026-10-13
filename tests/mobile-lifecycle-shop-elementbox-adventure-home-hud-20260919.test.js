@@ -3,9 +3,10 @@
 const test=require("node:test");
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const vm=require("node:vm");
 
-const read=path=>fs.readFileSync(path,"utf8");
+const read=path=>{const source=fs.readFileSync(path,"utf8");return path.endsWith('.css')?authoredUiCss(source):source;};
 const main=read("js/00-main.js");
 const economy=read("js/28-v133-economy-rebalance.js");
 const shop=read("js/40-v144-rules-and-abyss.js");

@@ -1,8 +1,9 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
-const css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+const css=authoredUiCss(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"));
 const equip=fs.readFileSync("js/equipment-progression.js","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const ui=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");

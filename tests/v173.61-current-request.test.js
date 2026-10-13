@@ -1,10 +1,11 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const path=require("node:path");
 const root=path.resolve(__dirname,"..");
-const read=p=>fs.readFileSync(path.join(root,p),"utf8");
+const read=p=>{const source=fs.readFileSync(path.join(root,p),"utf8");return p.endsWith('.css')?authoredUiCss(source):source;};
 const html=read("index.html");
 const mainCss=read("css/00-main.css");
 const dailyCss=read("css/43-v148-combat-dungeon-fixes.css");

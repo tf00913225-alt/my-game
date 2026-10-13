@@ -1,5 +1,6 @@
 "use strict";
 const fs=require("fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const vm=require("vm");
 const assert=require("node:assert/strict");
 
@@ -11,10 +12,10 @@ const combatSource=mainSource.slice(mainSource.indexOf("const combatEventObserve
 const policySource=mainSource.slice(mainSource.indexOf("const GENERAL_NEGATIVE_STATUS_TYPES="),mainSource.indexOf("\n});",mainSource.indexOf("const GENERAL_NEGATIVE_STATUS_TYPES="))+4);
 const repositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
 const loader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
-const css=fs.readFileSync("css/55-team-relic-system.css","utf8");
-const utilityCss=fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8");
+const css=authoredUiCss(fs.readFileSync("css/55-team-relic-system.css","utf8"));
+const utilityCss=authoredUiCss(fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8"));
 const feedbackSource=fs.readFileSync("js/battle-floating-feedback-owner.js","utf8");
-const feedbackCss=fs.readFileSync("css/battle-floating-feedback-owner.css","utf8");
+const feedbackCss=authoredUiCss(fs.readFileSync("css/battle-floating-feedback-owner.css","utf8"));
 const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 

@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 
@@ -11,8 +12,8 @@ const rules=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
 const dungeon=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const system=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
-const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
-const fixedSlotCss=fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8");
+const css=authoredUiCss(fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8"));
+const fixedSlotCss=authoredUiCss(fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8"));
 
 let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
@@ -92,7 +93,7 @@ test("every known battle skill has an explicit raster-owner manifest contract",(
 
 test("skill names are brief caster labels and hit numbers wait for the target frame",()=>{
     assert.doesNotMatch(css,/#v142-skill-stage/);
-    const labelCss=fs.readFileSync("css/battle-skill-name-presentation-owner.css","utf8");
+    const labelCss=authoredUiCss(fs.readFileSync("css/battle-skill-name-presentation-owner.css","utf8"));
     assert.match(labelCss,/body > \.skill-name-badge\{[^}]*z-index:16020;[^}]*font-size:var\(--battle-feedback-font-size\);[^}]*white-space:nowrap;[^}]*overflow:visible;/);
     assert.match(labelCss,/animation:skillBadgePop var\(--skill-name-display-duration,347ms\)/);
     assert.doesNotMatch(css,/\.skill-name-badge/);
@@ -162,7 +163,7 @@ test("V143 delegates dungeon destinations to the final owner",()=>{
     const nav=fs.readFileSync("js/04-stage-v11-native-bottom-nav-runtime.js","utf8");
     assert.match(nav,/function renderGameplayContext\(/);
     assert.match(nav,/\["返回","assets\/ui\/map-return\.png"/);
-    assert.match(fs.readFileSync("css/06-stage-v11-native-bottom-nav.css","utf8"),/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+    assert.match(authoredUiCss(fs.readFileSync("css/06-stage-v11-native-bottom-nav.css","utf8")),/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
 });
 
 test("synthesis keeps canonical icon-first material pickers while blueprint crafting is retired",()=>{
@@ -171,7 +172,7 @@ test("synthesis keeps canonical icon-first material pickers while blueprint craf
     assert.match(synthesis,/iconForPickerValue/);
     assert.doesNotMatch(system,/window\.v141CraftEquipment=/);
     assert.doesNotMatch(system,/ConsumeStackItem\(blueprint/);
-    assert.match(fs.readFileSync("css/38-v141-system-expansion.css","utf8"),/\.v143-item-picker i,[\s\S]*width:48px;height:48px/);
+    assert.match(authoredUiCss(fs.readFileSync("css/38-v141-system-expansion.css","utf8")),/\.v143-item-picker i,[\s\S]*width:48px;height:48px/);
 });
 
 test("earth shield is raster-owned while ally targeting and Barrier rules remain intact",()=>{
