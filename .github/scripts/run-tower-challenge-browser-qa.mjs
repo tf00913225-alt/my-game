@@ -23,7 +23,7 @@ const expression=`(async()=>{
    check(currentBattleMonsters.length===10,'real roster count');
    check(!document.getElementById('homeFeatureModal')?.classList.contains('show'),'battle has no covering shared modal');
    const active=currentBattleMonsters.map(i=>monsters[i]);
-   check(active.every(m=>m.balanceOwner==='MonsterBalance'&&m.mode==='tower'&&m.level===floor&&m.context==='tower/floor/'+floor),'Tower owner/floor/context');
+   check(active.every(m=>m.balanceOwner==='MonsterBalance'&&m.mode==='tower'&&m.level===(floor<=20?40:floor<=40?60:floor<=60?80:100)&&m.context==='tower/floor/'+floor),'Tower owner/floor/context');
    check(active.every(m=>!Object.hasOwn(m,'v132Dungeon')&&!Object.hasOwn(m,'v132EquipmentDungeon')),'no Tower legacy stat markers');
    check(active.filter(m=>m.rank==='smallBoss').length===(floor%10===0?1:0),'canonical smallBoss count');
    check(active.filter(m=>m.rank==='elite').length===(floor%5===0?2:0),'canonical elite count');

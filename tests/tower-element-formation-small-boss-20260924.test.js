@@ -318,7 +318,7 @@ for(const element of ["fire","water","earth","wind"]){
             if(element==="fire"){assert.equal(m.vTowerCriticalBonusPercent,15);assert.equal(m.vTowerDirectDamageMultiplier,1.15);}
             if(element==="water"){assert.equal(m.vTowerHealingMultiplier,1.15);assert.equal(m.vTowerStatusAccuracyPercent,15);assert.ok(m.skillIds.includes("freeze"));assert.ok(m.v141SupportSkillIds.includes("healSpell"));}
             const projection=context.MonsterBalance.debug(m);
-            assert.equal(m.level,floor);
+            assert.equal(m.level,floor<=20?40:floor<=40?60:floor<=60?80:100);
             assert.equal(m.balanceOwner,"MonsterBalance");
             assert.equal(m.maxHP,projection.final.maxHP);
             assert.equal(m.maxSP,projection.final.maxSP);
