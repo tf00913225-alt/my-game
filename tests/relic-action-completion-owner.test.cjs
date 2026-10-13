@@ -5,12 +5,12 @@ test('formal Action completion waits for captured follow-ups and then holds newl
     const timers=[],action={token:7,index:0,entity:{hp:100},entry:{type:'monster'}};
     const c={window:null,console,Math,Number,Object,Array,Set,Map,battleDurationAction:action,
         combatEventObservers:new Map(),battleActionFinishObservers:new Set(),battleActionFinishInterceptors:[],
-        battleActive:true,battleToken:7,battlePhase:'resolve',turn:1,initiativeIndex:0,
+        battleActive:true,battleToken:7,battleWaveState:null,battlePhase:'resolve',turn:1,initiativeIndex:0,
         battleAdvanceScheduled:false,battleAdvanceTimeoutId:null,timerId:null,
         battleStatisticsFinishAction(){},clearInterval(){},clearBattleTargetSelectionMode(){},
         checkBattleEnd:()=>false,getBattleAdvanceDelay:()=>0,setTimeout:fn=>{timers.push(fn);return timers.length;}};
     c.window=c;vm.createContext(c);
-    for(const name of ['emitCombatEvent','notifyBattleActionFinished','interceptBattleActionFinish','finishBattleDurationAction','finishPlayerAction'])vm.runInContext(declaration(name),c);
+    for(const name of ['emitCombatEvent','notifyBattleActionFinished','interceptBattleActionFinish','finishBattleDurationAction','isBattleWaveTransition','finishPlayerAction'])vm.runInContext(declaration(name),c);
     let captured=true,presentation=false,completions=0;
     c.battleActionFinishInterceptors.push(()=>presentation,()=>captured);
     c.combatEventObservers.set('action_finished',new Set([()=>{completions++;presentation=true;} ]));

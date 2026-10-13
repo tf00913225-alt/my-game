@@ -836,7 +836,7 @@ try{
     assert.equal(layout.infoExpanded,false,"Battle info must start collapsed");
     assert.equal(layout.infoAria,"false","The collapsed drawer handle must expose its state accessibly");
     Object.entries(layout.separation).forEach(([name,value])=>assert.equal(value,true,`Battle region separation failed: ${name}`));
-    assert.equal(layout.enemySlots.count,10,"The deployed enemy region must expose all ten fixed geometry slots");
+    assert.equal(layout.enemySlots.count,6,"The deployed Abyss enemy region must expose both three-column fixed geometry layers");
     assert.equal(layout.allySlots.count,6,"The deployed ally region must expose both three-column fixed geometry layers");
     assert.ok(layout.enemySlots.maxWidth-layout.enemySlots.minWidth<=1,"Enemy slot widths must be equal");
     assert.ok(layout.enemySlots.maxHeight-layout.enemySlots.minHeight<=1,"Enemy slot heights must be equal");
