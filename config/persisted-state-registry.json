@@ -25,7 +25,28 @@
     },
     {
       "key": "four_symbols_save:<UID>",
-      "extensions": {"heroAccount": {"schemaVersion": 1, "ownerModule": "functions/src/hero-core.js", "restoreOwner": "js/00-main.js::loadGame", "contract": "docs/HERO_SYSTEM_V1.md", "missingDataBehavior": "locked zero-fragment zero-star projection; no storage write", "corruptionBehavior": "block hydration; preserve original save", "authorityTier": "B", "authoritativeSource": "UID local only; future trusted server mapping required"}},
+      "extensions": {
+        "heroAccount": {
+          "schemaVersion": 1,
+          "ownerModule": "functions/src/hero-core.js",
+          "restoreOwner": "js/00-main.js::loadGame",
+          "contract": "docs/HERO_SYSTEM_V1.md",
+          "missingDataBehavior": "locked zero-fragment zero-star projection; no storage write",
+          "corruptionBehavior": "block hydration; preserve original save",
+          "authorityTier": "B",
+          "authoritativeSource": "UID local only; future trusted server mapping required"
+        },
+        "allyFormation": {
+          "schemaVersion": "1 (legacy player-only) / 2 (stable Hero IDs)",
+          "ownerModule": "functions/src/team-formation-policy.js",
+          "restoreOwner": "js/team-formation-client.js::read",
+          "contract": "docs/HERO_SYSTEM_V1.md",
+          "missingDataBehavior": "unconfigured; no automatic historical write",
+          "corruptionBehavior": "block validation; preserve original save",
+          "authorityTier": "B",
+          "authoritativeSource": "cache only; protected server account/current.formation is authoritative"
+        }
+      },
       "ownerModule": "js/startup/account-save-repository.js",
       "storageType": "localStorage",
       "scope": "uid+characters",
@@ -991,6 +1012,28 @@
       "corruptionBehavior": "fail closed; no regeneration",
       "defaultBehavior": "no terminal closure or entitlement",
       "missingDataBehavior": "block replay and progression; never regenerate or reopen"
+    },
+    {
+      "key": "serverUsers/{uid}/account/current.formation",
+      "ownerModule": "functions/src/team-formation.js",
+      "storageType": "Firestore",
+      "scope": "uid/account",
+      "deviceOnly": false,
+      "gameplayCritical": true,
+      "rewardCoupled": false,
+      "economyCoupled": false,
+      "claimCoupled": false,
+      "cloudRequired": true,
+      "backupRequired": true,
+      "migrationRequired": true,
+      "authorityTier": "A",
+      "authoritativeSource": "existing account/current formation field; active-session revision-checked bounded loadout transaction",
+      "schemaVersion": "1 historical / 2 stable heroIdToSlot",
+      "restoreOwner": "functions/src/canonical-current-recovery.js",
+      "deletionPolicy": "retain historical snapshots, archives, receipts and ledger; no cleanup enabled",
+      "corruptionBehavior": "block read/write and projection; never repair silently",
+      "defaultBehavior": "null remains unconfigured; version 2 only on explicit legal save",
+      "missingDataBehavior": "preserve legacy sources; reject missing canonical character coverage"
     }
   ]
 }

@@ -1,5 +1,7 @@
 # Canonical character schema and recovery gate — restricted unpublished implementation
 
+有限英雄編隊恢復契約由 `HERO_SYSTEM_V1.md` 的 Hero UI V2 節擁有。既有 account formation 的 v2 以玩家索引／穩定 heroId 保存唯一六格位置，snapshot／archive 檢查正式 owned Hero 及完整玩家參照；v1／null 與歷史原始 bytes 保留。這項 bounded loadout read/write 不發布完整角色、不降低本文件的 migration／recovery／readiness Gate。
+
 `users/{uid}/saves/current`: small public envelope with owner, schema, `serverRevision`, `authoritativeStateReady`, materialized snapshot revision/hash/reference and timestamps. Do not append receipt/claim maps to this document. The existing version 2 envelope remains `authoritativeStateReady:false`; the planned canonical schema version is a **separate** version and does not silently upgrade that envelope.
 
 ## Canonical schema v1 and current implementation boundary
