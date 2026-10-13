@@ -55,6 +55,10 @@ function inspectPlayableCharacterState(state){
 // missing-character defaults or battle execution. Null remains uninitialized.
 function inspectPlayableFormation(formation,slots){
     if(formation==null){return;}
+    if(formation.version===2){
+        if(Object.keys(formation.characterIndexToSlot||{}).sort().join("|")!==slots.flatMap((id,index)=>id===null?[]:[String(index)]).join("|"))fail("complete formation state");
+        return;
+    }
     if(!object(formation)||Object.keys(formation).sort().join("|")!=="characterIndexToSlot|version"||
        !object(formation.characterIndexToSlot)||
        Object.keys(formation.characterIndexToSlot).sort().join("|")!==
@@ -425,7 +429,11 @@ function assembleCanonicalSnapshot(uid,revision,records){
     }
     const formation=records.account.formation;
     if(records.progress.playableState!==undefined){inspectPlayableFormation(formation,slots);}
-    if(formation!=null){
+    if(formation?.version===2){
+        try{require("./team-formation-policy").validate(formation,slots.flatMap((id,index)=>id===null?[]:[index]),
+            Object.keys(records.progress.playableState.heroAccount.heroes).filter(id=>records.progress.playableState.heroAccount.heroes[id].unlocked));}
+        catch(_){fail("formation reference");}
+    }else if(formation!=null){
         const map=formation.characterIndexToSlot;
         if(!object(formation)||formation.version!==1||!object(map)||
            Object.entries(map).some(([index,slot])=>
