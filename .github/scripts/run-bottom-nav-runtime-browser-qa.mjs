@@ -184,7 +184,7 @@ async function runViewport(chrome,url,width,height){
     const row={mode,pass,...await client.eval(MEASURE)};evidence.rows.push(row);
     assert.equal(row.sameShell,true,mode+' shell identity');assert.equal(row.shellCount,1);assert.equal(row.legacyCount,0);assert.equal(row.visible,true,mode+' visible');
     assert.ok(Math.abs(row.nav.width-row.shell.width)<=1,mode+' native width');
-    assert.equal(row.domain,mode==='home'?'browser':'native',mode+' presentation domain');assert.equal(row.parent,mode==='home'?'game-ui':'game-overlay-layer',mode+' parent');
+    assert.equal(row.domain,'native',mode+' presentation domain');assert.equal(row.parent,'game-overlay-layer',mode+' parent');
     const base=evidence.rows.find(n=>n.domain===row.domain);for(const key of ['width','height','left','bottom'])assert.ok(Math.abs(row.nav[key]-base.nav[key])<=1,mode+' '+key);
     assert.equal(row.columns.length,5);assert.equal(row.frames.length,5);
     for(const col of row.columns)assert.ok(Math.abs(col.width-row.columns[0].width)<=1,mode+' equal columns');
@@ -231,8 +231,9 @@ async function runViewport(chrome,url,width,height){
   for(const [plane,dot] of Object.entries({legacy:evidence.notificationDots.legacy,native:evidence.notificationDots.native})){
    assert.equal(dot.computed.pointerEvents,'none',plane+' dot must not block taps');
    assert.equal(dot.insideButton,true,plane+' dot must not be clipped outside its button');
-   assert.ok(dot.maximum.width>=7&&dot.maximum.width<=9,plane+' static dot screen width '+dot.maximum.width);
-   assert.ok(dot.minimum.width>=6.3&&dot.minimum.width<=8.2,plane+' animated minimum width '+dot.minimum.width);
+   const fit=Math.min(width/1080,height/1920),logicalWidth=plane==='legacy'?27:22;
+   assert.ok(Math.abs(dot.maximum.width-logicalWidth*fit)<.2,plane+' static native dot width '+dot.maximum.width);
+   assert.ok(Math.abs(dot.minimum.width-logicalWidth*fit*.9)<.2,plane+' animated native dot width '+dot.minimum.width);
   }
   // The paginated inventory can fit without scrolling. Exercise an actually
   // overflowing formal skill panel, without injecting geometry or content.

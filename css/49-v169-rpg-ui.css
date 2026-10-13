@@ -620,10 +620,14 @@ body > .v169-rpg-dialog-layer{
 #game-ui #homeFeatureModal .hero-page-shell button:focus-visible{outline:6px solid #e6bb69;outline-offset:6px;}
 
 
-/* Reserve the two existing 38px action rows plus their 6px gap, including
-   tabs where the contextual preview action is hidden. */
+/* Keep existing header actions on one native row; reserve the row for every tab. */
 #game-ui #homeFeatureModal .home-feature-modal-box.wide .home-feature-modal-title > div{
-    min-height:calc(114px + 18px + 114px);
+    min-height:114px;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:flex-end;
+    gap:18px;
 }
 /* Header and tabs remain in normal flow; only tab content may shrink/scroll. */
 #game-ui #homeFeatureModal .character-showcase-row{

@@ -160,7 +160,7 @@ async function run(chrome,url,live){
     assert.ok(Math.abs(art.rect.width-art.rect.height)<1,'art is not square '+mode+' '+JSON.stringify(art));
     const images=await c.eval(`Array.from(document.querySelectorAll(${JSON.stringify(mode==='comparison'?'.v17351-compare-art img':'#itemModalIcon img')})).map(n=>({fit:getComputedStyle(n).objectFit,loaded:n.complete&&n.naturalWidth>0,transform:getComputedStyle(n).transform}))`);
     assert.ok(images.length>0,mode+' art missing');for(const img of images){assert.equal(img.fit,'contain');assert.ok(img.loaded,'image decode');assert.equal(img.transform,'none');}
-    if(mode==='comparison'&&v[0]<=374)assert.equal((await measure(contents)).columns.split(' ').length,1,'comparison must stack');
+    if(mode==='comparison')assert.equal((await measure(contents)).columns.split(' ').length,1,'comparison must stack');
     const batch=(mode==='potion'||mode==='chest')?await check('#v17350BatchAction',v):null;
     if(mode==='potion'||mode==='material')assert.ok(await c.eval(`document.getElementById('itemEquipButton').disabled`),'non-equipment must not offer equip');
     if(mode==='potion')assert.ok(await c.eval(`Number(document.getElementById('v17350BatchQuantity').max)>=100000`),'large owned count not exercised');
@@ -280,7 +280,7 @@ async function run(chrome,url,live){
    gold=5740767;rebuildInventorySlots();renderInventory();v54RenderHomeRoster();
   })()`);
    await resize(v);await c.eval("closeItemModal();closeHomeFeature();showPage('home')");await settle();
-   const home=await check('#homePage',v),nav=await check('#game-ui #bottomNav',v);
+   const home=await check('#homePage',v),nav=await check('#bottomNav',v);
    const visual=await c.eval(`(()=>{const home=homePage,s=getComputedStyle(home);return {background:s.backgroundImage,scroll:home.scrollHeight-home.clientHeight,scrollOwner:s.overflowY,oldBackground:!!home.querySelector('.home-bg-fixed-layer'),badge:home.querySelector('.home-version-badge').matches('#game-ui #homePage .home-version-badge')};})()`);
    assert.match(visual.background,/assets\/ui\/home-background-v17344\.png/);
    assert.doesNotMatch(visual.background,/home-background\.jpg/);
@@ -299,20 +299,15 @@ async function run(chrome,url,live){
    assert.equal(composition.daily,4,'daily side facilities lost their distinct hierarchy');
    assert.equal(composition.tools,4,'recessive tool row lost a function');
    assert.equal(composition.collections.length,2,'paired collections missing');
-   assert.ok(composition.collections.every(n=>n.height>=44&&n.height<=48&&n.width<=180),'collections regained oversized image cards');
+   assert.ok(composition.collections.every(n=>n.height/home.rect.width>=.10&&n.height/home.rect.width<=.13&&n.width/home.rect.width<=.5),'collections lost fixed canvas proportions');
    assert.equal(composition.entries.length,13,'city entrance lost or duplicated');
    for(let i=0;i<composition.entries.length;i++)for(let j=i+1;j<composition.entries.length;j++){
     const a=composition.entries[i],b=composition.entries[j];
     assert.ok(Math.min(a.rect.right,b.rect.right)-Math.max(a.rect.left,b.rect.left)<=1||Math.min(a.rect.bottom,b.rect.bottom)-Math.max(a.rect.top,b.rect.top)<=1,'city entrances overlap '+a.label+' / '+b.label);
    }
-   if(v[0]<800){
-    assert.ok(composition.adventure.bottom<=composition.primary.top,'adventure obstructs the common entrances');
-    assert.ok(composition.primary.bottom<composition.utility.top,'common entrances and collection/tools lose their separate rows');
-    assert.ok(composition.utility.bottom<composition.roster.top,'tools obstruct the party HUD');
-   }else{
-    assert.ok(composition.primary.left>=composition.secondary.right,'desktop common entrances lost the right column');
-    assert.ok(composition.roster.left>=composition.secondary.right&&composition.primary.bottom<=composition.roster.top,'desktop party overlaps scene or common entrances');
-   }
+   assert.ok(composition.adventure.bottom<=composition.primary.top,'adventure obstructs common entrances');
+   assert.ok(composition.primary.bottom<composition.utility.top,'common entrances and tools lose distinct rows');
+   assert.ok(composition.utility.bottom<composition.roster.top,'tools obstruct party HUD');
    const homeControls=[];
    for(const selector of [...['角色','商店','英雄系統','合成','任務','鍛造','成就','公告','離線經驗','系統','秘寶','元素匣'].map(label=>'.home-card[aria-label="'+label+'"]'),'#v146HomeRoster','.v-fixed-formation-entry','#adventureHomeEntry']){
     await c.eval(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'nearest'})`);await settle();
@@ -331,8 +326,8 @@ async function run(chrome,url,live){
    await screenshot('migration-home-end-'+v.join('x'));
 
    const domain=await c.eval(`(()=>{const n=document.getElementById('homePage');const ancestors=[];for(let p=n;p;p=p.parentElement)ancestors.push(getComputedStyle(p).transform);return {parent:n.parentElement.id,ancestors,navParent:document.getElementById('bottomNav').parentElement.parentElement.id,resources:[...n.querySelectorAll('.home-hud-resources b,.v146-home-resource strong')].map(n=>parseFloat(getComputedStyle(n).fontSize))};})()`);
-   assert.equal(domain.parent,'game-ui');assert.equal(domain.navParent,'game-ui');
-   assert.ok(domain.ancestors.every(t=>t==='none'),'browser UI inherited a transform');
+   assert.equal(domain.parent,'game-ui');assert.equal(domain.navParent,'game-overlay-layer');
+   assert.equal(domain.ancestors.filter(t=>t!=='none').length,1,'general UI must inherit only the stage FitScale');
    assert.ok(domain.resources.every(size=>size>=13),'browser home text below reading minimum');
    const resourceText=await c.eval(`(()=>{
     const nodes=[homeHudGoldValue,homeHudExpValue],previous=nodes.map(n=>n.textContent);
@@ -351,7 +346,7 @@ async function run(chrome,url,live){
    }
    evidence.push({homeResourceText:true,viewport:v,resourceText});
    assert.ok(home.rect.bottom<=nav.rect.top+1,'navigation overlaps browser page');
-   if(v[0]>=800)assert.ok(home.rect.width>700,'desktop remained a narrow stage projection');
+   assert.ok(Math.abs(home.rect.width/home.rect.height-1080/1704)<.002,'home lost authored native canvas bounds');
    await c.eval("adventureHomeEntry.scrollIntoView({block:'nearest'})");await settle();
    await check('#adventureHomeEntry',v,true);
    const entrance=await c.eval(`(()=>{const entry=adventureHomeEntry,r=entry.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);const covered=[...homePage.querySelectorAll('.home-card,#v146HomeRoster')].filter(n=>{const b=n.getBoundingClientRect();return r.left<b.right&&b.left<r.right&&r.top<b.bottom&&b.top<r.bottom;}).map(n=>n.id||n.getAttribute('aria-label'));return {hit:entry===hit||entry.contains(hit),covered};})()`);
@@ -361,13 +356,13 @@ async function run(chrome,url,live){
    const bag=await check('#inventoryPage',v),frame=await measure('.inventory-classic-shell');
    const density=await c.eval(`(()=>{
     const grid=inventoryGridScroll,s=getComputedStyle(grid),slot=document.querySelector('.inventory-item-classic'),items=document.querySelector('.inventory-grid-classic');
-    return {height:grid.clientHeight-parseFloat(s.paddingTop)-parseFloat(s.paddingBottom),slot:slot.getBoundingClientRect().height,gap:parseFloat(getComputedStyle(items).rowGap),populated:document.querySelectorAll('.inventory-item-classic img').length,slots:document.querySelectorAll('.inventory-equipment-cell').length};
+    return {height:grid.clientHeight-parseFloat(s.paddingTop)-parseFloat(s.paddingBottom),slot:slot.offsetHeight,gap:parseFloat(getComputedStyle(items).rowGap),populated:document.querySelectorAll('.inventory-item-classic img').length,slots:document.querySelectorAll('.inventory-equipment-cell').length};
    })()`);
    assert.equal(density.slots,6,'equipment layout lost a slot');assert.ok(density.populated>=20,'populated inventory not exercised');
-   assert.ok(density.height>=3*density.slot+2*density.gap-1,'character showcase crowds out three complete item rows');
+   assert.ok(density.height>=3*density.slot+2*density.gap-1,'character showcase crowds out three complete item rows '+JSON.stringify(density));
    evidence.push({proportions:true,viewport:v,composition,density});
    await screenshot('populated-backpack-'+v.join('x'));
-   if(v[0]>=800)assert.ok(frame.columns.split(' ').length===2,'desktop bag did not use two columns');
+   assert.equal(frame.columns.split(' ').length,1,'backpack must preserve one authored column at every viewport');
    await check('.inventory-bottom-actions',v);await check('.map-inventory-overlay-close',v,true);
    // Added short browser-chrome cases cover this work's home/backpack only.
    // Keep the original eight widths' other-page regressions unchanged.
@@ -391,7 +386,10 @@ async function run(chrome,url,live){
    await c.eval('characterTabContent.scrollTop=0');await settle();
    const first=await c.eval(`(()=>{const n=document.querySelector('#allSkillsList > :first-child'),r=n.getBoundingClientRect(),c=characterTabContent.getBoundingClientRect();return {top:r.top,bottom:r.bottom,visibleTop:c.top,visibleBottom:c.bottom};})()`);
    assert.ok(first.top>=first.visibleTop-1,'first skill covered by tab');
-   assert.ok(first.bottom<=first.visibleBottom+1,'first skill card clipped');
+   // A fixed canvas preserves readable cards; the sole tab scroller must expose
+   // the entire first card, even when loadout and points precede it.
+   await c.eval(`document.querySelector('#allSkillsList > :first-child').scrollIntoView({block:'nearest'})`);await settle();
+   await check('#allSkillsList > :first-child',v);
    await c.eval(`document.querySelector('#allSkillsList > :last-child').scrollIntoView({block:'end'})`);await settle();
    await check('#allSkillsList > :last-child',v);
    await c.eval('characterTabContent.scrollTop=0');await settle();
@@ -402,7 +400,7 @@ async function run(chrome,url,live){
 
    await c.eval("closeHomeFeature();openHomeFeature('shop')");await settle();
    const shopGrid=await check('.shop-potion-list',v);
-   if(v[0]>=1100)assert.ok(shopGrid.columns.split(' ').length>=3,'desktop shop grid remained mobile columns');
+   assert.equal(shopGrid.columns.split(' ').length,1,'shop fixed composition changed across viewports');
    await c.eval("closeHomeFeature();openHomeFeature('relic')");
    await c.eval("(async()=>{const end=Date.now()+20000;while(!document.querySelector('.team-relic-grid')&&Date.now()<end)await new Promise(r=>setTimeout(r,30));if(!document.querySelector('.team-relic-grid'))throw Error('relic list missing');})()");await settle();
    const relicGrid=await measure('.team-relic-grid');
@@ -410,7 +408,7 @@ async function run(chrome,url,live){
    await check('#homeFeatureModalBody',v);
    await c.eval("document.querySelector('.team-relic-grid > :last-child').scrollIntoView({block:'end'})");await settle();
    await check('.team-relic-grid > :last-child',v);
-   if(v[0]>=1100)assert.ok(relicGrid.columns.split(' ').length>=3,'desktop relic grid remained mobile columns');
+   assert.equal(relicGrid.columns.split(' ').length,1,'relic fixed composition changed across viewports');
    await c.eval("closeHomeFeature();showPage('home')");
    evidence.push({generalUi:true,viewport:v,home,nav,bag,character,domain,entrance,shopGrid,relicGrid});
   }
@@ -437,7 +435,7 @@ async function run(chrome,url,live){
    assert.ok(await c.eval("document.querySelector('.character-tab-row').getBoundingClientRect().bottom<=characterTabContent.getBoundingClientRect().top"),'reload character overlap');
    await c.eval('closeHomeFeature()');evidence.push({familyAndReload:true,viewport:v,reloaded});
   }
-  console.log('PASS general browser UI: eight widths, desktop reflow, reading size, shared panel and native return');
+  console.log('PASS general browser UI: fourteen viewports, fixed native composition, reading size, shared panel and native return');
   const visibility=await c.eval(`(async()=>{const source=document.getElementById('gameInterface'),ui=document.getElementById('game-ui'),previous=source.style.display;source.style.display='none';await new Promise(requestAnimationFrame);const hidden=ui.hidden;source.style.display=previous;await new Promise(requestAnimationFrame);return {hidden,restored:!ui.hidden,roots:document.querySelectorAll('#game-ui').length};})()`);
   assert.deepEqual(visibility,{hidden:true,restored:true,roots:1},'browser boundary lost original interface visibility/reentry lifecycle');
   evidence.push({generalVisibility:visibility});

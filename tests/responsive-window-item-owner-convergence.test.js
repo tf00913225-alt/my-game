@@ -60,8 +60,10 @@ assert.match(frameCss,/#itemModal \.item-modal-box\{[^}]*height:auto !important;
 assert.match(frameCss,/#itemModal #itemModalIcon\{[^}]*aspect-ratio:1 !important/);
 assert.match(frameCss,/#itemModal #itemModalIcon img,[\s\S]*?object-fit:contain !important/);
 assert.match(compareCss,/\.v17351-compare-art\{[^}]*aspect-ratio:1!important;[^}]*flex:0 0 auto!important/);
-assert.match(compareCss,/@media \(max-width:374px\)\{[\s\S]*?grid-template-columns:minmax\(0,1fr\)!important/);
-assert.match(inventoryCss,/\.inventory-grid-scroll\{[^}]*flex:1 1 auto[^}]*overflow-y:auto/);
+assert.doesNotMatch(compareCss,/@media\s*\([^)]*(?:width|height)/);
+assert.match(compareCss,/grid-template-columns:minmax\(0,1fr\)!important/);
+assert.match(read("css/22-stage-v78-character-inventory-core.css"),/\.inventory-grid-scroll\{[^}]*flex:1 1 auto/);
+assert.match(read("css/24-stage-v85-inventory-inner-grid-scroll-root.css"),/overflow-y:auto/);
 assert.doesNotMatch(inventoryCss,/\.inventory-grid-scroll\{[^}]*touch-action:none/);
 
 // Real production index/loader/runtime geometry is a separate mandatory CI suite.

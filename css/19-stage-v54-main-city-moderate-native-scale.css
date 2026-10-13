@@ -19,8 +19,8 @@
 /* Home party HUD: three equal horizontal cells, with typography sized for real phone reading. */
 #game-ui #homePage .home-version-badge{font-size:39px;line-height:51px;}
 #game-ui #homePage .v146-home-roster{
-    position:relative;z-index:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:0 0 auto;gap:12px;
-    margin:15px 30px 0;padding:15px 21px 21px;border:3px solid var(--home-frame-muted);border-radius:24px;color:#f4e7c8;
+    position:relative;z-index:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:0 0 auto;gap:6px;
+    margin:12px 30px 0;padding:12px 21px;border:3px solid var(--home-frame-muted);border-radius:24px;color:#f4e7c8;
     background:linear-gradient(155deg,rgba(23,26,20,.95),rgba(11,13,10,.94));box-shadow:0 12px 36px rgba(0,0,0,.28);
 }
 #game-ui #homePage .v146-home-roster > header{
@@ -47,32 +47,22 @@
 #game-ui #v146HomeRoster .team-relic-loadout-slot>button{grid-area:action;min-width:150px;height:90px;min-height:90px;padding:3px 24px;border:3px solid rgba(211,161,70,.7);border-radius:18px;background:linear-gradient(180deg,#493016,#21140a);color:#ffe0a0;font-size:45px;line-height:1;font-weight:900;}
 #game-ui #v146HomeRoster .team-relic-loadout-slot>button:disabled{opacity:.5;}
 #game-ui #homePage .v146-home-character{
-    display:grid;grid-template-columns:120px minmax(0,1fr);gap:15px;align-items:center;min-width:0;min-height:252px;padding:15px 12px 15px 9px;
+    display:grid;grid-template-columns:minmax(0,1fr);gap:9px;align-items:center;min-width:0;min-height:210px;padding:9px 6px;
     border:0;border-radius:0;background:transparent;
     box-shadow:none;
 }
-#game-ui #homePage .v146-home-avatar{width:120px;height:120px;overflow:hidden;transform:none;border:3px solid rgba(220,174,86,.84);border-radius:50%;background:#090806;box-shadow:0 6px 21px rgba(0,0,0,.58);}
+#game-ui #homePage .v146-home-avatar{width:96px;height:96px;overflow:hidden;transform:none;border:3px solid rgba(220,174,86,.84);border-radius:50%;background:#090806;box-shadow:0 6px 21px rgba(0,0,0,.58);}
 #game-ui #homePage .v146-home-avatar img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 22%;}
 #game-ui #homePage .v146-home-character[data-element="fire"] .v146-home-avatar{box-shadow:0 0 24px rgba(177,64,38,.34),0 6px 21px rgba(0,0,0,.58);}
 #game-ui #homePage .v146-home-character[data-element="water"] .v146-home-avatar{box-shadow:0 0 24px rgba(66,129,184,.34),0 6px 21px rgba(0,0,0,.58);}
 #game-ui #homePage .v146-home-character[data-element="wind"] .v146-home-avatar{box-shadow:0 0 24px rgba(58,151,110,.3),0 6px 21px rgba(0,0,0,.58);}
 #game-ui #homePage .v146-home-character[data-element="earth"] .v146-home-avatar{box-shadow:0 0 24px rgba(186,142,63,.34),0 6px 21px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-character-main{display:grid;gap:12px;min-width:0;}
+#game-ui #homePage .v146-home-character-main{display:grid;gap:6px;min-width:0;}
 #game-ui #homePage .v146-home-character-main > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:9px;min-width:0;font-size:45px;line-height:57px;}
 #game-ui #homePage .v146-home-character-main b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 #game-ui #homePage .v146-home-character-main span{color:#e2c58b;font-size:39px;line-height:51px;font-weight:800;white-space:nowrap;}
-#game-ui #homePage .v146-home-resource{position:relative;height:51px;margin-inline:0;overflow:hidden;border:3px solid rgba(255,255,255,.12);border-radius:2997px;background:rgba(36,16,16,.88);}
+#game-ui #homePage .v146-home-resource{position:relative;height:57px;margin-inline:0;overflow:hidden;border:3px solid rgba(255,255,255,.12);border-radius:2997px;background:rgba(36,16,16,.88);}
 #game-ui #homePage .v146-home-resource.sp{background:rgba(12,23,48,.78);}
 #game-ui #homePage .v146-home-resource i{position:absolute;inset:0 auto 0 0;background:linear-gradient(#f26763,#b91e20);}
 #game-ui #homePage .v146-home-resource.sp i{background:linear-gradient(#659bff,#2455bd);}
-#game-ui #homePage .v146-home-resource strong{position:absolute;inset:0;z-index:2;color:#fff;font-size:39px;line-height:45px;text-align:center;text-shadow:0 3px 6px #000;white-space:nowrap;}
-    #game-ui #homePage .v146-home-roster{
-        gap:6px;
-        margin-top:12px;
-        padding:12px 21px;
-    }
-    #game-ui #homePage .v146-home-character{
-        min-height:234px;
-        padding-top:9px;
-        padding-bottom:9px;
-    }
+#game-ui #homePage .v146-home-resource strong{position:absolute;inset:0;z-index:2;color:#fff;font-size:39px;line-height:51px;text-align:center;text-shadow:0 3px 6px #000;white-space:nowrap;}

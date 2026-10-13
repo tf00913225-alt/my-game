@@ -45,7 +45,7 @@
 
 /* Resource, category rail, item slots and the existing single grid scroller. */
 #game-ui #inventoryPage .inventory-right-panel{position:relative;width:100%;min-width:0;min-height:0;flex:1 1 auto;margin:0;padding:24px 30px 0;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;background:transparent}
-#game-ui #inventoryPage .inventory-wallet-bar{display:flex;align-items:center;justify-content:space-between;gap:21px;min-height:90px;margin:0 15px 9px;padding:6px 12px;border:0;background:transparent;box-shadow:none}
+#game-ui #inventoryPage .inventory-wallet-bar{display:flex;align-items:center;justify-content:space-between;gap:21px;min-height:72px;margin:0 15px 9px;padding:6px 12px;border:0;background:transparent;box-shadow:none}
 #game-ui #inventoryPage .inventory-wallet-label{color:var(--bag-muted);font-size:54px;line-height:1}
 #game-ui #inventoryPage .inventory-wallet-value{color:#d6bd79;font-size:54px;line-height:1;font-variant-numeric:tabular-nums}
 #game-ui #inventoryPage .inventory-category-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0 0 21px;padding:0 9px;border-bottom:3px solid var(--bag-frame)}
@@ -95,7 +95,7 @@
 #game-ui #homeFeatureModal .v17350-quick-sell-actions button:last-child{border-color:#9a773f;color:#2b1d08;background:linear-gradient(180deg,#e2c071,#a87831)}
 #game-ui #homeFeatureModal .v17350-quick-sell-actions button:disabled{opacity:.45}#game-ui #inventoryPage .inventory-title-plate{min-width:0;gap:30px;padding-inline:27px}#game-ui #inventoryPage .inventory-title-plate h2{font-size:60px}#game-ui #inventoryPage .inventory-character-stage{padding-inline:21px}#game-ui #inventoryPage .inventory-equipment-grid{inset-inline:21px}#game-ui #inventoryPage .inventory-classic-shell{width:100%}#game-ui #inventoryPage .inventory-character-stage{grid-template-columns:minmax(150px,1fr) minmax(396px,2.2fr) minmax(150px,1fr)}#game-ui #inventoryPage .inventory-equipment-grid{grid-template-columns:minmax(150px,1fr) minmax(396px,2.2fr) minmax(150px,1fr)}#game-ui #inventoryPage .inventory-grid-classic{gap:12px}#game-ui #inventoryPage .inventory-bottom-actions{gap:12px}#game-ui #inventoryPage .inventory-bottom-action{padding-inline:15px}
 @media (prefers-reduced-motion:reduce){#game-ui #inventoryPage .inventory-item-classic.is-selected{animation:none}}
-    #game-ui #inventoryPage .inventory-classic-shell{padding-block:12px;gap:18px;}
+    #game-ui #inventoryPage .inventory-classic-shell{padding-block:12px;gap:12px;}
     #game-ui #inventoryPage .inventory-title-plate{gap:30px;padding-block:15px 18px;}
     #game-ui #inventoryPage .inventory-character-switch{min-height:108px;}
     #game-ui #inventoryPage .inventory-character-stage{
@@ -105,7 +105,7 @@
         --inventory-equipment-grid-gap:12px;
     }
     #game-ui #inventoryPage .inventory-right-panel{padding-top:12px;}
-    #game-ui #inventoryPage .inventory-grid-scroll{padding-bottom:12px;}
+    #game-ui #inventoryPage .inventory-grid-scroll{padding-bottom:0;}
 
 
 

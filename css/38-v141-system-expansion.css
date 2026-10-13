@@ -713,18 +713,18 @@
 /* ----- Notification dots ----- */
 .v141-notice-dot{
     position:absolute;
-    right:2px;
-    top:2px;
+    right:calc(2 * var(--ui-length-unit,1px));
+    top:calc(2 * var(--ui-length-unit,1px));
     z-index:30;
     box-sizing:border-box;
-    width:9px;
-    height:9px;
-    min-width:9px;
-    min-height:9px;
-    border:1px solid #f7dfad;
+    width:calc(9 * var(--ui-length-unit,1px));
+    height:calc(9 * var(--ui-length-unit,1px));
+    min-width:calc(9 * var(--ui-length-unit,1px));
+    min-height:calc(9 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid #f7dfad;
     border-radius:50%;
     background:#e52e2e;
-    box-shadow:0 0 8px rgba(255,40,40,.85);
+    box-shadow:0 0 calc(8 * var(--ui-length-unit,1px)) rgba(255,40,40,.85);
     animation:v141NoticePulse 1.25s ease-in-out infinite;
     pointer-events:none;
 }

@@ -163,29 +163,6 @@
 
 /* V174.1 mobile regression follow-up — scoped to the five reported regressions. */
 
-/* Main-city roster: preserve the three equal slots, but return enough horizontal
-   room to the HP/SP labels and reduce the two bars instead of letting them bleed. */
-#game-ui #homePage #v146HomeRoster .v146-home-character{
-    grid-template-columns:minmax(0,1fr) !important;
-    gap:9px !important;
-    min-height:210px !important;
-    padding:9px 6px !important;
-}
-#game-ui #homePage #v146HomeRoster .v146-home-avatar{
-    width:96px !important;
-    height:96px !important;
-}
-#game-ui #homePage #v146HomeRoster .v146-home-character-main{
-    gap:6px !important;
-}
-#game-ui #homePage #v146HomeRoster .v146-home-resource{
-    height:57px !important;
-}
-#game-ui #homePage #v146HomeRoster .v146-home-resource strong{
-    font-size:39px !important;
-    line-height:51px !important;
-}
-
 /* Character creation now fits the fixed canvas without a nested scroll layer.
    This avoids Android/WebView black compositor tiles inside the scaled stage. */
 #creationPage .creation-choice-panel{

@@ -2,13 +2,15 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const read=f=>fs.readFileSync(f,'utf8');
 const ids=['homePage','inventoryPage','homeFeatureModal','itemModal','inventoryCharacterDetailModal','skillDetailModal','statusHelpModal'];
-test('all seven general surfaces migrate once to the browser boundary and preserve lifecycle',()=>{
- const source=read('js/00-main.js'),owner=source.slice(source.indexOf('(function setupBrowserGameUi()'),source.indexOf('/* Legacy V3 navigation'));
+test('general surfaces migrate once to the native overlay and preserve lifecycle',()=>{
+ const source=read('js/00-main.js'),owner=source.slice(source.indexOf('(function setupNativeGameUi()'),source.indexOf('/* Legacy V3 navigation'));
  const nodes=Object.fromEntries(ids.map(id=>[id,{id}]));let ui,observer;
  nodes.gameInterface={style:{display:'none'}};
+ nodes['game-overlay-layer']={appendChild(n){n.parent=this;}};
  const context={document:{createElement:()=>ui={dataset:{},appendChild(n){n.parent=this;}},body:{appendChild(){}},getElementById:id=>nodes[id]},MutationObserver:class{constructor(f){observer=f}observe(){}}};
  vm.runInNewContext(owner,context);
- assert.equal(ui.id,'game-ui');assert.equal(ui.dataset.presentationDomain,'browser');
+ assert.equal(ui.id,'game-ui');assert.equal(ui.dataset.presentationDomain,'native');
+ assert.equal(ui.parent,nodes['game-overlay-layer']);
  for(const id of ids)assert.equal(nodes[id].parent,ui,id);
  assert.ok(ui.hidden);nodes.gameInterface.style.display='block';observer();assert.equal(ui.hidden,false);
  assert.doesNotMatch(owner,/transform|scale|game-stage/);

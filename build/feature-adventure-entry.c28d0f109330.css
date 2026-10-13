@@ -32,6 +32,7 @@
     background:linear-gradient(180deg,#604622,#302319);
     box-shadow:inset 0 3px rgba(255,235,184,.16),0 12px 0 #5f401f,0 21px 39px rgba(0,0,0,.38);
     font-family:inherit;
+    font-size:45px;
     text-align:center;
     cursor:pointer;
     touch-action:manipulation;

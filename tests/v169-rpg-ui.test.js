@@ -198,8 +198,8 @@ test("character pages remove only historical tails without compacting their cont
     assert.match(characterCoreCss,/#characterTabContent\{[\s\S]{0,900}padding-bottom:0 !important/);
     assert.doesNotMatch(characterCoreCss,/padding-bottom:160px/);
     assert.doesNotMatch(css,/#characterTabContent\{\s*padding-bottom:0/);
-    assert.match(css,/#characterTabContent > #skillPage\{[\s\S]{0,120}padding:0 0 12px !important/);
-    assert.match(css,/#allSkillsList\{[\s\S]{0,100}padding-bottom:12px !important/);
+    assert.match(css,/#characterTabContent > #skillPage\{[\s\S]{0,120}padding:0 0 36px !important/);
+    assert.match(css,/#allSkillsList\{[\s\S]{0,100}padding-bottom:36px !important/);
     assert.doesNotMatch(css,/#statusPage[^{]*\{[^}]*display:flex !important/);
     assert.doesNotMatch(css,/#homeExpPoolCard[^{]*\{[^}]*height:100% !important/);
     assert.doesNotMatch(css,/#expDistributeList[^{]*\{[^}]*overflow:hidden/);
@@ -240,7 +240,7 @@ test("dungeon backpack reuses the shared context-aware inventory lifecycle",()=>
 });
 
 test("character panel uses safe capped browser geometry while preserving internal scroll",()=>{
-    assert.match(css,/#homeFeatureModal:has\(\.home-feature-modal-box\.wide\)\{[\s\S]*padding:max\(4px,var\(--safe-top\)\)/);
+    assert.match(css,/#homeFeatureModal:has\(\.home-feature-modal-box\.wide\)\{[^}]*padding:12px 12px 12px 12px !important/);
     assert.match(css,/\.home-feature-modal-box\.wide\{[\s\S]*width:calc\(100% - var\(--ui-large-panel-safe-space\)\) !important;[\s\S]*max-width:var\(--ui-large-panel-max-width\) !important;[\s\S]*height:min\(var\(--ui-large-panel-height\),calc\(100% - var\(--ui-large-panel-safe-space\)\)\) !important/);
     assert.match(css,/\.home-feature-modal-box\.wide #characterTabContent\{[\s\S]*overflow-y:auto !important/);
 });

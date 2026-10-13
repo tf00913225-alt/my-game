@@ -131,7 +131,7 @@ function overlap(a,b){return Math.max(0,Math.min(a.right,b.right)-Math.max(a.lef
 function outside(r){return r.left<-1||r.right>innerWidth+1||r.top<-1||r.bottom>innerHeight+1;}
 function normPoint(node,map){const r=node.getBoundingClientRect(),m=map.getBoundingClientRect();return{x:(r.left+r.width/2-m.left)/m.width,y:(r.top+r.height/2-m.top)/m.height};}
 function measure(name,html){
- const content=document.getElementById("game-content");content.innerHTML=html;void content.offsetHeight;
+ const content=document.getElementById("game-content");content.style.width=name==="home"?"1080px":"420px";content.style.height=name==="home"?"1920px":"746.6666667px";content.style.transform=name==="home"?"none":"scale("+(1080/420)+")";content.style.setProperty("--home-scene-height","444px");content.innerHTML=html;void content.offsetHeight;
  const root=document.getElementById("adventurePage")||document.getElementById("homePage")||document.getElementById("mapPage");
  const buttons=[...content.querySelectorAll("button")];const rects=buttons.map(node=>({node,r:node.getBoundingClientRect()}));const overlaps=[];
  for(let i=0;i<rects.length;i++)for(let j=i+1;j<rects.length;j++){const area=overlap(rects[i].r,rects[j].r);if(area>16)overlaps.push([i,j,Math.round(area)]);}

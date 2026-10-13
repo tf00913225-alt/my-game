@@ -502,7 +502,7 @@
 
 /* Resource, category rail, item slots and the existing single grid scroller. */
 #game-ui #inventoryPage .inventory-right-panel{position:relative;width:100%;min-width:0;min-height:0;flex:1 1 auto;margin:0;padding:24px 30px 0;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;background:transparent}
-#game-ui #inventoryPage .inventory-wallet-bar{display:flex;align-items:center;justify-content:space-between;gap:21px;min-height:90px;margin:0 15px 9px;padding:6px 12px;border:0;background:transparent;box-shadow:none}
+#game-ui #inventoryPage .inventory-wallet-bar{display:flex;align-items:center;justify-content:space-between;gap:21px;min-height:72px;margin:0 15px 9px;padding:6px 12px;border:0;background:transparent;box-shadow:none}
 #game-ui #inventoryPage .inventory-wallet-label{color:var(--bag-muted);font-size:54px;line-height:1}
 #game-ui #inventoryPage .inventory-wallet-value{color:#d6bd79;font-size:54px;line-height:1;font-variant-numeric:tabular-nums}
 #game-ui #inventoryPage .inventory-category-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0 0 21px;padding:0 9px;border-bottom:3px solid var(--bag-frame)}
@@ -552,7 +552,7 @@
 #game-ui #homeFeatureModal .v17350-quick-sell-actions button:last-child{border-color:#9a773f;color:#2b1d08;background:linear-gradient(180deg,#e2c071,#a87831)}
 #game-ui #homeFeatureModal .v17350-quick-sell-actions button:disabled{opacity:.45}#game-ui #inventoryPage .inventory-title-plate{min-width:0;gap:30px;padding-inline:27px}#game-ui #inventoryPage .inventory-title-plate h2{font-size:60px}#game-ui #inventoryPage .inventory-character-stage{padding-inline:21px}#game-ui #inventoryPage .inventory-equipment-grid{inset-inline:21px}#game-ui #inventoryPage .inventory-classic-shell{width:100%}#game-ui #inventoryPage .inventory-character-stage{grid-template-columns:minmax(150px,1fr) minmax(396px,2.2fr) minmax(150px,1fr)}#game-ui #inventoryPage .inventory-equipment-grid{grid-template-columns:minmax(150px,1fr) minmax(396px,2.2fr) minmax(150px,1fr)}#game-ui #inventoryPage .inventory-grid-classic{gap:12px}#game-ui #inventoryPage .inventory-bottom-actions{gap:12px}#game-ui #inventoryPage .inventory-bottom-action{padding-inline:15px}
 @media (prefers-reduced-motion:reduce){#game-ui #inventoryPage .inventory-item-classic.is-selected{animation:none}}
-    #game-ui #inventoryPage .inventory-classic-shell{padding-block:12px;gap:18px;}
+    #game-ui #inventoryPage .inventory-classic-shell{padding-block:12px;gap:12px;}
     #game-ui #inventoryPage .inventory-title-plate{gap:30px;padding-block:15px 18px;}
     #game-ui #inventoryPage .inventory-character-switch{min-height:108px;}
     #game-ui #inventoryPage .inventory-character-stage{
@@ -562,7 +562,7 @@
         --inventory-equipment-grid-gap:12px;
     }
     #game-ui #inventoryPage .inventory-right-panel{padding-top:12px;}
-    #game-ui #inventoryPage .inventory-grid-scroll{padding-bottom:12px;}
+    #game-ui #inventoryPage .inventory-grid-scroll{padding-bottom:0;}
 
 
 
@@ -3724,18 +3724,18 @@
 /* ----- Notification dots ----- */
 .v141-notice-dot{
     position:absolute;
-    right:2px;
-    top:2px;
+    right:calc(2 * var(--ui-length-unit,1px));
+    top:calc(2 * var(--ui-length-unit,1px));
     z-index:30;
     box-sizing:border-box;
-    width:9px;
-    height:9px;
-    min-width:9px;
-    min-height:9px;
-    border:1px solid #f7dfad;
+    width:calc(9 * var(--ui-length-unit,1px));
+    height:calc(9 * var(--ui-length-unit,1px));
+    min-width:calc(9 * var(--ui-length-unit,1px));
+    min-height:calc(9 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid #f7dfad;
     border-radius:50%;
     background:#e52e2e;
-    box-shadow:0 0 8px rgba(255,40,40,.85);
+    box-shadow:0 0 calc(8 * var(--ui-length-unit,1px)) rgba(255,40,40,.85);
     animation:v141NoticePulse 1.25s ease-in-out infinite;
     pointer-events:none;
 }
@@ -6544,10 +6544,14 @@ body > .v169-rpg-dialog-layer{
 #game-ui #homeFeatureModal .hero-page-shell button:focus-visible{outline:6px solid #e6bb69;outline-offset:6px;}
 
 
-/* Reserve the two existing 38px action rows plus their 6px gap, including
-   tabs where the contextual preview action is hidden. */
+/* Keep existing header actions on one native row; reserve the row for every tab. */
 #game-ui #homeFeatureModal .home-feature-modal-box.wide .home-feature-modal-title > div{
-    min-height:calc(114px + 18px + 114px);
+    min-height:114px;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:flex-end;
+    gap:18px;
 }
 /* Header and tabs remain in normal flow; only tab content may shrink/scroll. */
 #game-ui #homeFeatureModal .character-showcase-row{
