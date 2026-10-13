@@ -619,14 +619,18 @@ async function runRelicPresentationModeMatrix(client){
         ["relic_nine_dragon_fire","damageStatus"]
     ];
     const matrix=[];
+    evidence.checks.relicPresentationProgress=[];
     const identityBaseline=new Map();
     for(const mode of modes){
         let context;
         const presentations=[];
         for(const [relicId,targetKind] of relics){
+            evidence.checks.relicPresentationLastAttempt={mode,relicId,phase:"launch"};
             context=await launchPresentationQaMode(client,mode,relicId);
+            evidence.checks.relicPresentationLastAttempt={mode,relicId,phase:"capture",context};
             const snapshot=await captureRelicPresentationQa(client,relicId,targetKind,mode);
             presentations.push(snapshot);
+            evidence.checks.relicPresentationProgress.push({mode,relicId,context,snapshot});
             const baseline=identityBaseline.get(relicId);
             if(!baseline){ identityBaseline.set(relicId,{name:snapshot.identity.name,icon:snapshot.identity.icon}); }
             else{
@@ -1655,6 +1659,9 @@ try{
     fs.writeFileSync(path.join(artifactDir,"battle-layer-audio-live-qa.json"),JSON.stringify(evidence,null,2)+"\n");
     console.log("Battle layer/audio live mobile QA: PASS");
 } catch(error){
+    // Failure evidence only: never alter the scene or release a production lock.
+    evidence.failureState=await client?.eval("(()=>({url:location.href,hidden:document.hidden,battleActive:typeof battleActive==='undefined'?null:battleActive,token:typeof battleToken==='undefined'?null:battleToken,phase:typeof battlePhase==='undefined'?null:battlePhase,turn:typeof turn==='undefined'?null:turn,advance:typeof battleAdvanceScheduled==='undefined'?null:battleAdvanceScheduled,action:typeof battleDurationAction==='undefined'||!battleDurationAction?null:{token:battleDurationAction.token,index:battleDurationAction.index,completed:battleDurationAction.completed},run:window.v132ActiveDungeonRun?{mode:v132ActiveDungeonRun.mode,gameplayMode:v132ActiveDungeonRun.gameplayMode}:null,enemyIndexes:typeof currentBattleMonsters==='undefined'?[]:currentBattleMonsters.slice(),relic:window.v174RelicDebugState?.(),presentation:window.v174RelicPresentationState?.(),animation:window.v143SkillAnimationState?.current?{id:v143SkillAnimationState.current.config.id,sequence:v143SkillAnimationState.current.sequence,targets:v143SkillAnimationState.current.targetIndexes,done:v143SkillAnimationState.current.done}:null,locks:window.FourSymbolsBattleFlow?.isPresentationActive?.(),nodes:['battlePage','v141BattleTransition','teamRelicBattlePresentation','v143-skill-stage'].map(id=>{const n=document.getElementById(id);return {id,exists:!!n,className:n?.className,dataset:n?{...n.dataset}:null,display:n?getComputedStyle(n).display:null};}),feedback:document.querySelectorAll('.battle-floating-feedback').length}) )()").catch(diagnosticError=>({unavailable:String(diagnosticError)}));
+    evidence.runtimeErrors=client?.events.filter(e=>e.method==='Runtime.exceptionThrown'||e.method==='Runtime.consoleAPICalled').slice(-20);
     evidence.status="FAIL";
     evidence.error=error?.stack||String(error);
     evidence.chromeStderr=chromeStderr.slice(-5000);
