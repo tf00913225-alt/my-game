@@ -646,7 +646,7 @@ async function runRelicPresentationModeMatrix(client){
         let context;
         const presentations=[];
         for(const [relicId,targetKind] of relics){
-            if(!evidence.profilerStarted){
+            if(process.env.RELIC_QA_PROFILE==="1"&&!evidence.profilerStarted){
                 try{evidence.performanceBefore=await client.send("Performance.getMetrics");await client.send("Profiler.enable");await client.send("Profiler.start");evidence.profilerStarted=true;}
                 catch(captureError){evidence.performanceCaptureError=String(captureError.message);}
             }

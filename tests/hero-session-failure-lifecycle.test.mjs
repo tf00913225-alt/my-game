@@ -53,11 +53,17 @@ test('real acquisition reset notifications cannot recursively retry failed growt
 });
 
 test('signed-out, revoked and blocked notifications invalidate proofs without starting cloud reads',async()=>{
-    const h=harness();
+    const h=harness();h.recover();
+    await h.window.FourSymbolsHeroAcquisition.sync();await h.flush();
+    assert.equal(h.window.FourSymbolsHeroGrowth.getStatus().ready,true);
+    assert.equal(h.window.FourSymbolsTeamFormation.getStatus().ready,true);
     for(const detail of [{status:'signed-out'},{status:'revoked'},{status:'blocked',code:'SESSION_REAUTH_REQUIRED'}]){
         h.emit(detail);await h.flush();
     }
-    assert.deepEqual(h.counts,{growth:0,formation:0});
+    assert.deepEqual(h.counts,{growth:1,formation:1});
+    assert.equal(h.window.FourSymbolsHeroAcquisition.getStatus().ready,false);
+    assert.equal(h.window.FourSymbolsHeroGrowth.getStatus().ready,false);
+    assert.equal(h.window.FourSymbolsTeamFormation.getStatus().ready,false);
 });
 
 test('confirmed acquisition publication still synchronizes both readers after busy work finishes',async()=>{
