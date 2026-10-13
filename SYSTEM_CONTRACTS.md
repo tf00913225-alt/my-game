@@ -202,7 +202,7 @@
 - Persistent state Gate returns a reason. `sameNameDuplicate` is a silent reject before hit rolling or mutation; `exclusiveConflict` (Freeze/Petrify) emits formal status MISS; resistance remains distinct.
 - 普通攻擊名稱顯示 700ms，動畫仍為 520ms，名稱不取得流程鎖；其他技能名稱維持 duration × 2/3。唯一 Core Queue resolve delay 為 visualRemaining + 650ms；技能秒數與 Hit Frame 不變。普通 Impact 的視覺時鐘於同步 settlement／DOM task 完成後由 V143 啟動，Hit task 先投影正式資源／狀態，再揭示 Impact 與同批浮字／recoil／SFX。初始化待完成時 V142 remaining 保留 authored duration；cold hit 的既有 140ms recoil 不得被到期清理截斷，dispose／supersede 仍立即取消。
 - 深淵／四象塔換波沿用同一 Core Queue 的 visualRemaining + 650ms，不另疊等待、不建立新 Session、不發布第二次 battle_start。第一波全滅進入 WAVE_TRANSITION，正式 Action／追擊／秘寶及呈現鎖釋放後才換敵人；第二波全滅才 BATTLE_COMPLETE 並走原有單次結算。玩家 HP、SP、怒氣、狀態、秘寶計數及統計保留；換波不額外遞減持續時間或新增回合。舊敵人及目標引用釋放，第二波用不重用的實體索引與既有 Fixed Slot 快照。
-- 深淵前置關為六普通→三精英三普通；帝王關為六精英→一帝王五精英；Lv.40 最終戰為六精英→東、天、極、北、南五位天尊（第六格空位）。天尊沿用正式固定技能；等級、MonsterBalance 數值 Owner、獎勵及地圖通關流程不變。
+- 深淵前置關為六普通→三精英三普通；帝王關為六精英→一帝王五精英；Lv.40 最終戰第一波沿用水、土、火、風四種精英配置循環為水／土／火／風／水／土（保留舊前五名，不因循環五人格位名單而追加第三補師），第二波為東、天、極、北、南五位天尊（第六格空位）。天尊沿用正式固定技能；等級、MonsterBalance 數值 Owner、獎勵及地圖通關流程不變。
 - 戰場怪物 identity 僅名稱，等級讀正式 entity.level 於 Battle Status Detail 顯示；玩家 ID／SP／HP HUD 共用名稱列與資源條 tokens 連續相接，不改 Slot／artwork geometry。
 - Skill-name presentation derives color from `skill.element` through `data-skill-element`; character element must not participate. It is a document-level fixed viewport surface and shares the ordinary floating-feedback visual font size.
 

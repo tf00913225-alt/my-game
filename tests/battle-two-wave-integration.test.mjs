@@ -207,3 +207,15 @@ test('all six second-wave enemies resolve a formal action without repeating alre
   assert.deepEqual(actions.filter(a=>a.type==='player').map(a=>a.index).sort(),[1,2]);
   assert.deepEqual(r.json('__outcomes'),[]);
 });
+
+test('final elite extension retains the four-element cycle and +10 reference clears both waves',()=>{
+  for(const randomPolicy of ['neutral','seeded']){
+    const report=buildAbyssTtkMatrix({randomPolicy,
+      caseFilter:c=>c.difficulty===40&&c.partyLevel===50&&c.region===4&&c.stage===4});
+    assert.equal(report.cases,1);assert.equal(report.gate.passed,true);
+    const row=report.rows[0],first=row.initialMonsters.slice(0,6);
+    assert.deepEqual(first.map(m=>m.element),['water','earth','fire','wind','water','earth']);
+    assert.equal(first.filter(m=>m.supportIds.includes('healSpell')).length,2);
+    assert.equal(row.clear,true);assert.ok(row.survivors>0);
+  }
+});

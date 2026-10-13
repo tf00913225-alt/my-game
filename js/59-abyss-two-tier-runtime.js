@@ -80,15 +80,14 @@
         "北帝天尊":Object.freeze({element:"water",skills:Object.freeze(["iceArrowRain","iceSpin"]),supports:Object.freeze(["healSpell"])}),
         "南帝天尊":Object.freeze({element:"fire",skills:Object.freeze(["dragonSlash","phoenixCry"]),supports:Object.freeze(["rage"])})
     });
-    /* The five final heavenly soldiers remain a single canonical companion
-       loadout. Keeping them here preserves the approved formation without
-       reintroducing a V144/V155 final-roster patch. */
+    /* Extend the original water/earth/fire/wind/water formation by cycling
+       its four distinct loadouts. Cycling a five-slot roster would append a
+       third healer instead of the next earth elite in the six-slot wave. */
     const FINAL_TRUE_REALM_ELITE_LOADOUTS=Object.freeze([
         Object.freeze({element:"water",skills:Object.freeze([]),supports:Object.freeze(["healSpell"])}),
         Object.freeze({element:"earth",skills:Object.freeze(["stoneBreakSky"]),supports:Object.freeze([])}),
         Object.freeze({element:"fire",skills:Object.freeze(["flameTornado"]),supports:Object.freeze([])}),
-        Object.freeze({element:"wind",skills:Object.freeze([]),supports:Object.freeze(["dodgeSkill"])}),
-        Object.freeze({element:"water",skills:Object.freeze([]),supports:Object.freeze(["healSpell"])})
+        Object.freeze({element:"wind",skills:Object.freeze([]),supports:Object.freeze(["dodgeSkill"])})
     ]);
 
     const BOSS_POSITIONS=Object.freeze([[50,27],[50,27],[50,25],[50,27],[50,24]]);

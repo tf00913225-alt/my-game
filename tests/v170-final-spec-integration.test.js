@@ -1078,37 +1078,35 @@ test("all daily dungeons share three six-enemy waves and Gold replaces Equipment
     assert.match(dungeonSource,/v132BeginEquipmentDungeon=function\(\)\{ return beginFormalDailyDungeon\("gold"\); \}/);
 });
 
-test("Abyss floors one through five keep exact compositions, skill levels and additional HP",()=>{
+test("Abyss waves keep exact final compositions, skill levels and canonical fixed slots",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         Object.assign(player,{id:"主角",level:70});player2=null;player3=null;
         Math.random=function(){ return 0; };
         return [1,2,3,4,5].map(floor=>{
-            const roster=floor===5?v174AbyssBuildRoster(40,4,4):v141BuildAbyssRoster(floor);
+            const waves=v174AbyssBuildWaves(40,floor-1,4),roster=waves.flat();
             return {floor:floor,count:roster.length,names:roster.map(monster=>monster.name),
                 ranks:roster.map(monster=>monster.rank),elements:roster.map(monster=>monster.element),
                 forceLevels:roster.map(monster=>monster.v141ForceSkillLevel),
                 extraHP:roster.map(monster=>monster.v141ExtraHP),
                 skills:roster.map(monster=>monster.skillIds.slice()),
                 supports:roster.map(monster=>Array.from(monster.v141SupportSkillIds||[])),
-                rows:roster.map(monster=>monster.v141FormationRow),
-                positions:roster.map(monster=>monster.v141FormationPosition)};
+                slots:waves.map(row=>Object.values(FourSymbolsBattlefieldSlots.createEnemyFormationSnapshot(row.map((_,i)=>i),{encounterMode:"abyss",originalFormationType:row.length,rankWeight:i=>row[i].rank==="smallBoss"?3:2}).monsterIndexToSlot))};
         });
     })()`);
     const final=result[4];
-    assert.equal(final.count,10);
-    assert.deepEqual(final.names,["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊",
-        "天兵天將","天兵天將","天兵天將","天兵天將","天兵天將"]);
-    assert.deepEqual(final.ranks,["smallBoss","smallBoss","smallBoss","smallBoss","smallBoss","elite","elite","elite","elite","elite"]);
-    assert.deepEqual(final.elements,["earth","wind","light","water","fire","water","earth","fire","wind","water"]);
-    assert.deepEqual(final.forceLevels,[5,5,5,5,5,5,5,5,5,5]);
-    assert.deepEqual(final.skills.slice(0,5),[["dustStorm","flyingSandStrike"],["windHowlLightning","stormRain"],["flyingSandStrike","phoenixCry"],
+    assert.equal(final.count,11);
+    assert.deepEqual(final.names,[...Array(6).fill("天兵天將"),"東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"]);
+    assert.deepEqual(final.ranks,[...Array(6).fill("elite"),...Array(5).fill("smallBoss")]);
+    assert.deepEqual(final.elements,["water","earth","fire","wind","water","earth","earth","wind","light","water","fire"]);
+    assert.deepEqual(final.forceLevels,Array(11).fill(5));
+    assert.deepEqual(final.skills.slice(6),[["dustStorm","flyingSandStrike"],["windHowlLightning","stormRain"],["flyingSandStrike","phoenixCry"],
         ["iceArrowRain","iceSpin"],["dragonSlash","phoenixCry"]]);
-    assert.deepEqual(final.supports.slice(0,5),[["rockWall"],["stealthSkill"],["yuanZuBlessing"],["healSpell"],["rage"]]);
-    assert.deepEqual(final.skills.slice(5),[[],["stoneBreakSky"],["flameTornado"],[],[]]);
-    assert.deepEqual(final.supports.slice(5),[["healSpell"],[],[],["dodgeSkill"],["healSpell"]]);
-    assert.deepEqual(final.rows,[0,0,0,0,0,1,1,1,1,1]);
-    assert.deepEqual(final.positions,[0,1,2,3,4,0,1,2,3,4]);
+    assert.deepEqual(final.supports.slice(6),[["rockWall"],["stealthSkill"],["yuanZuBlessing"],["healSpell"],["rage"]]);
+    assert.deepEqual(final.skills.slice(0,6),[[],["stoneBreakSky"],["flameTornado"],[],[],["stoneBreakSky"]]);
+    assert.deepEqual(final.supports.slice(0,6),[["healSpell"],[],[],["dodgeSkill"],["healSpell"],[]]);
+    assert.deepEqual(final.slots.map(row=>row.length),[6,5]);
+    final.slots.forEach(row=>{assert.equal(new Set(row).size,row.length);assert.ok(row.every(slot=>/^ENEMY_[BF][123]$/.test(slot)));});
 });
 
 test("enemy Heal Spell affects only one same-row trio for both North Emperor and water elites",()=>{
@@ -1536,7 +1534,7 @@ test("damage safety, full pressure matrix and Abyss level brackets remain formal
     assert.equal(result.reverse,1);
     assert.deepEqual(result.rankAttack,[result.rankAttack[0],result.rankAttack[0],result.rankAttack[0]]);
     assert.deepEqual(result.abyssLevels,[2,2,2,2]);
-    assert.equal(result.floor5Count,10);
+    assert.equal(result.floor5Count,11);
     assert.ok(result.floor5Levels.every(level=>level===5));
     assert.ok(Number.isFinite(result.low)&&result.low>=1,result.low);
     assert.ok(Number.isFinite(result.high)&&result.high>=1,result.high);

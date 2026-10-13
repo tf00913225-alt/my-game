@@ -725,12 +725,12 @@ try{
         }
         window.v133GetHighestCreatedCharacterLevel=()=>40;
         if(typeof showPage==='function'){showPage('dungeon');}
-        const roster=v174AbyssBuildRoster(40,0,0);
+        const waves=v174AbyssBuildWaves(40,0,0),roster=waves[0];
         window.__battleLayerQaDungeonOutcome=null;
         const started=window.v132LaunchDungeonBattle(roster,outcome=>{
             window.__battleLayerQaDungeonOutcome=outcome;
             if(typeof showPage==='function'){showPage('dungeon');}
-        });
+        },{mode:'abyss',waves});
         window.__battleLayerQaInitialBattleToken=Number(battleToken)||0;
         return {
             started:!!started,
@@ -741,7 +741,7 @@ try{
     })()`);
     evidence.checks.bootstrap=bootstrap;
     assert.equal(bootstrap.started,true,"Shared dungeon launcher did not start a real battle");
-    assert.equal(bootstrap.rosterCount,8,"Abyss pre-stage QA roster must contain 5 regular plus 3 elite enemies");
+    assert.equal(bootstrap.rosterCount,6,"Abyss pre-stage first wave must contain six regular enemies");
     assert.equal(bootstrap.skillVolumeScale,2,"Deployed skill SFX multiplier must be exactly 2.0 (+100%)");
     assert.equal(bootstrap.combatFeedbackVolumeScale,2,"Deployed general battle feedback multiplier must be exactly 2.0 (+100%)");
 
@@ -846,7 +846,7 @@ try{
     assert.equal(layout.regions.elementBoxLogical.height,66,"Element Box button height must be the restored 66px layout size");
     assert.ok(layout.enemySlots.minHeight>92,"Enemy slots must remain visibly larger than the previous compact cards");
     assert.ok(layout.allySlots.minHeight>100,"Ally slots must retain the enlarged portrait layout");
-    assert.ok(layout.hud.length>=9,"The real Abyss battle must expose one ally and eight enemy card HUDs");
+    assert.ok(layout.hud.length>=7,"The real Abyss battle must expose one ally and six enemy card HUDs");
     assert.ok(layout.hud.every(entry=>entry.name&&entry.hp&&entry.sp),"Every live combatant must keep its name, HP and SP visible");
 
     const normalAttackPerformance=await client.eval(`(async()=>{
@@ -1105,8 +1105,8 @@ try{
     assert.equal(iceArrowRain?.placement,"battlefield","All-target VFX must use the complete battlefield placement");
     assert.equal(iceArrowRain?.frameFit,"cover","All-target VFX must preserve its source-frame aspect");
     assert.equal(iceArrowRain?.areaId,"fixed-enemy-zone","Ice Arrow Rain must bind to the complete enemy fixed zone");
-    assert.equal(iceArrowRain?.geometrySlots.length,10,"Full-range VFX geometry must retain all ten slots regardless of occupancy");
-    assert.equal(iceArrowRain?.targetIndexes.length,8,"The real eight-enemy battle must expose all living targets to Ice Arrow Rain");
+    assert.equal(iceArrowRain?.geometrySlots.length,6,"Full-range VFX geometry must retain all six current-wave slots regardless of occupancy");
+    assert.equal(iceArrowRain?.targetIndexes.length,6,"The real six-enemy wave must expose all living targets to Ice Arrow Rain");
     assert.ok(iceArrowRain.spriteBox.width>=iceArrowRain.bounds.width-1,"Ice Arrow Rain must cover the complete enemy width");
     assert.ok(iceArrowRain.spriteBox.height>=iceArrowRain.bounds.height-1,"Ice Arrow Rain must cover the complete enemy height");
     assert.ok(Math.abs(iceArrowRain.spriteBox.width/iceArrowRain.spriteBox.height-iceArrowRain.frameAspect)<=.02,"Ice Arrow Rain must not flatten its source frame");
