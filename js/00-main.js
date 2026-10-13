@@ -5582,7 +5582,8 @@ function moveDropdownListToBody(selectId){
         .getBoundingClientRect();
 
 
-    document.getElementById("game-ui").appendChild(list);
+    const host=(label||wrapper).closest("#game-ui .home-feature-modal,#game-ui .item-modal")||document.getElementById("game-ui");
+    host.appendChild(list);
     const origin=window.FourSymbolsDisplay.clientToSurface("native",labelRect.left,labelRect.bottom);
     const edge=window.FourSymbolsDisplay.clientToSurface("native",labelRect.right,labelRect.bottom);
 
@@ -5593,6 +5594,17 @@ function moveDropdownListToBody(selectId){
     list.style.top=
         (origin.y+12)+
         "px";
+    const top=window.FourSymbolsDisplay.clientToSurface("native",labelRect.left,labelRect.top);
+    const nativeHeight=window.FourSymbolsDisplay.dimensions.nativeHeight;
+    const below=nativeHeight-origin.y-12,above=top.y-12;
+    if(above>below){
+        list.style.top="auto";
+        list.style.bottom=(nativeHeight-top.y+12)+"px";
+        list.style.setProperty("--ui-dropdown-space",Math.max(0,above)+"px");
+    }else{
+        list.style.bottom="auto";
+        list.style.setProperty("--ui-dropdown-space",Math.max(0,below)+"px");
+    }
 
     list.style.left=
         origin.x+
@@ -5636,8 +5648,8 @@ function moveDropdownListToBody(selectId){
        有沒有跟著調整過。
     */
 
-    list.style.zIndex=
-        "6100";
+    // The existing dialog host provides stacking; retain the CSS dropdown tier.
+    list.style.zIndex="";
 
 
     /*
@@ -5713,6 +5725,8 @@ function moveDropdownListBack(selectId){
 
     list.style.zIndex=
         "";
+    list.style.bottom="";
+    list.style.removeProperty("--ui-dropdown-space");
 
 
     if(

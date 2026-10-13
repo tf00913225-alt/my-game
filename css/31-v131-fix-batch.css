@@ -250,21 +250,6 @@
    問題出現的機率。如果之後還是常常發生，需要使用者提供
    螢幕錄影（不是截圖）才能確認是不是同一種情況。
 */
-#game-ui #inventoryPortraitFrame{
-    overflow:hidden;
-}
-
-#game-ui #inventoryPortraitFrame .v131-inventory-portrait{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    object-position:center 18%;
-    display:block;
-    z-index:0;
-}
-
 .v131-unlock-ready{ position:relative !important; }
 
 .v131-unlock-dot{

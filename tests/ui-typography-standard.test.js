@@ -60,7 +60,7 @@ enforceNoTinyText(owners.abyss);
 // exclude only that documented decorative class, never backpack content text.
 const inventoryHtml=read('index.html');
 assert.match(inventoryHtml, /class="inventory-title-plate" aria-label="背包"[\s\S]*?class="inventory-title-plate-kicker">INVENTORY<\/span>\s*<h2>背包<\/h2>/);
-assert.match(inventory, /\.inventory-title-plate h2\{[^}]*font-size:22px/);
+assert.match(inventory, /\.inventory-title-plate h2\{[^}]*font-size:20px/);
 enforceNoTinyText(owners.inventory, text => text.replace(/#game-stage #inventoryPage \.inventory-title-plate-kicker\{[^}]*\}/, ''));
 enforceNoTinyText(owners.abyssLayout);
 enforceNoTinyText(owners.patrol);

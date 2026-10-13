@@ -6,7 +6,7 @@ const crypto=require("node:crypto");
 const fs=require("node:fs");
 const {spawnSync}=require("node:child_process");
 const read=file=>fs.readFileSync(file,"utf8");
-const inventoryCss=authoredUiCss(read("css/38-v141-system-expansion.css"));
+const inventoryCss=authoredUiCss(read("css/22-stage-v78-character-inventory-core.css"));
 const hintCss=authoredUiCss(read("css/56-v174-critical-ui-regressions.css"));
 const rosterCss=authoredUiCss(read("css/19-stage-v54-main-city-moderate-native-scale.css"));
 const relicCss=authoredUiCss(read("css/55-team-relic-system.css"));

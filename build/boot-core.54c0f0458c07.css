@@ -3929,6 +3929,7 @@ button:active{
 }
 
 .custom-dropdown-list{
+    --ui-dropdown-limit:min(calc(220 * var(--ui-length-unit,1px)),max(0px,var(--ui-dropdown-space,var(--layout-block-size,746.6667px))));
     position:absolute;
     top:calc(100% + calc(4 * var(--ui-length-unit,1px)));
     left:0;
@@ -3951,7 +3952,7 @@ button:active{
 }
 
 .custom-dropdown.open .custom-dropdown-list{
-    max-height:calc(220 * var(--ui-length-unit,1px));
+    max-height:var(--ui-dropdown-limit);
     opacity:1;
     overflow-y:auto;
 }
@@ -3990,9 +3991,10 @@ button:active{
 */
 
 .custom-dropdown-list.open{
-    max-height:calc(220 * var(--ui-length-unit,1px));
+    max-height:var(--ui-dropdown-limit);
     opacity:1;
     overflow-y:auto;
+    pointer-events:auto;
 }
 
 .custom-dropdown-item{

@@ -424,6 +424,17 @@ async function run(chrome,url,live){
     if(feature==='autoBattleSettings'){
      const stacking=await c.eval("({ui:Number(getComputedStyle(document.getElementById('game-ui')).zIndex),stage:Number(getComputedStyle(document.getElementById('game-stage')).zIndex)})");
      assert.ok(stacking.ui>stacking.stage,'element box raised obsolete stage ancestor');
+     for(const id of ['autoSettingsCharacterSelect','autoSettingsActionSelect','autoSettingsHP','autoSettingsSP']){
+      const label='#'+id+'_customUI .custom-dropdown-label';
+      await c.eval(`document.querySelector(${JSON.stringify(label)}).scrollIntoView({block:'nearest'})`);await settle();
+      await click(label,v);await settle();
+      const menu=await check('.custom-dropdown-list.open',v);
+      assert.equal(await c.eval("document.querySelector('.custom-dropdown-list.open').parentElement.id"),'homeFeatureModal','dropdown must escape body scroll into its native dialog');
+      const hit=await c.eval(`(()=>{const n=document.querySelector('.custom-dropdown-list.open'),r=n.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!h&&(h===n||n.contains(h));})()`);
+      assert.ok(hit,'native dropdown is covered');assert.ok(menu.rect.height>24,'dropdown has no usable menu');
+      await c.eval(`closeCustomDropdown(${JSON.stringify(id)})`);await settle();
+      assert.equal(await c.eval(`customDropdownRegistry[${JSON.stringify(id)}].list.parentElement===customDropdownRegistry[${JSON.stringify(id)}].originalParent`),true,'dropdown did not restore original DOM');
+     }
     }
    }
    await c.eval("closeHomeFeature();showPage('inventory');openInventoryCharacterDetail()");await settle();await check('#inventoryCharacterDetailModal .item-modal-box',v);
