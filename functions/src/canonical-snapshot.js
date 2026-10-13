@@ -63,6 +63,15 @@ function inspectPlayableFormation(formation,slots){
     }
 }
 
+// Retained Client achievement storage only. Markers never prove eligibility,
+// create a claim or authorize rewards; catalogue reconciliation is separate.
+function inspectAchievementState(state){
+    if(!object(state)||Object.entries(state).some(([id,claimed])=>
+       !ID.test(id)||typeof claimed!=="boolean")){
+        fail("achievement claim markers");
+    }
+}
+
 // Retained skill storage shape only: no catalogue, learning/cost/element
 // eligibility, combat execution, defaults or normalization in this reader.
 // Client skill Owner stores positive levels (current global ceiling 10) and
@@ -425,6 +434,9 @@ function assembleCanonicalSnapshot(uid,revision,records){
        Object.keys(records.progress.sidecars).sort().join("|")!==LEGACY_BACKUP_SIDECARS.join("|")){
         fail("progress or sidecar inventory");
     }
+    if(records.progress.playableState!==undefined){
+        inspectAchievementState(records.progress.achievementState);
+    }
     for(const [key,entry] of Object.entries(records.progress.sidecars)){
         if(!object(entry)||!(entry.status==="present"&&typeof entry.raw==="string"||
              entry.status==="missing"&&entry.raw===null||
@@ -512,6 +524,7 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
     const source=assembleCanonicalSnapshot(uid,revision,records);
     const {extra,hero,preferences}=inspectPlayableState(records);
     inspectPlayableFormation(source.snapshot.formation,source.snapshot.slots);
+    inspectAchievementState(source.snapshot.progress.achievementState);
     const configKeys=["autoConfig","autoConfig2","autoConfig3"];
     const slotKeys=["fire","player2","player3"];
     const characterEquipment={},characterSkillLoadouts={};
