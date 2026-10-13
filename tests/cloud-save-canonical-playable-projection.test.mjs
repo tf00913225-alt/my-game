@@ -684,3 +684,46 @@ test("historical v1 partial formation keeps its hash but cannot become complete 
     assert.throws(()=>assemble(records),/complete formation state/);
     assert.deepEqual(records,before);
 });
+
+test("achievement claim markers remain exact across complete slots, durable snapshots and recovery archives",()=>{
+    const {createRecoveryArchive,inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    for(const count of [1,2,3]){
+        const records=sources(count);
+        records.progress.achievementState={firstBattle:true,reachLevel10:false};
+        const before=structuredClone(records),bundle=assemble(records);
+        assert.deepEqual(bundle.projection.gameSave.achievementState,before.progress.achievementState);
+        assert.deepEqual(records,before);
+        assert.equal(bundle.readyForPublication,false);
+        const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
+        records.progress.playableState=fields;delete records.playableState;
+        const snapshot=assembleCanonicalSnapshot("uid-a",7,records);
+        const archive=JSON.parse(JSON.stringify(createRecoveryArchive("uid-a",7,records,snapshot)));
+        const restored=inspectRecoveryArchive(archive,"uid-a",7,snapshot);
+        assert.deepEqual(restored.progress.achievementState,before.progress.achievementState);
+        assert.deepEqual(restored.claimRecords,before.claimRecords);
+        assert.deepEqual(restored.claimCheckpoint,before.claimCheckpoint);
+        assert.equal(archive.readyForRestore,false);
+    }
+});
+
+test("malformed achievement markers cannot become complete evidence or durable playable snapshots",()=>{
+    for(const state of [{firstBattle:"true"},{firstBattle:1},{firstBattle:null},
+        {firstBattle:{claimed:true}},{firstBattle:[]},{"":true},{"bad id":false}]){
+        const records=sources();records.progress.achievementState=state;
+        assert.throws(()=>assemble(records),/achievement claim/);
+        const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
+        records.progress.playableState=fields;delete records.playableState;
+        assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,records),/achievement claim/);
+    }
+});
+
+test("historical achievement bytes stay compatible but never satisfy complete projection evidence",()=>{
+    const {createRecoveryArchive,inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    const records=sources();records.progress.achievementState={firstBattle:{claimed:true}};
+    const snapshot=assembleCanonicalSnapshot("uid-a",7,records);
+    const archive=JSON.parse(JSON.stringify(createRecoveryArchive("uid-a",7,records,snapshot)));
+    const restored=inspectRecoveryArchive(archive,"uid-a",7,snapshot);
+    assert.deepEqual(restored.progress.achievementState,records.progress.achievementState);
+    assert.equal(archive.readyForRestore,false);
+    assert.throws(()=>assemble(restored),/achievement claim/);
+});
