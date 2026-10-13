@@ -251,6 +251,8 @@ class CdpClient{
                         lineNumber:details&&details.lineNumber,
                         columnNumber:details&&details.columnNumber
                     });
+                }else if(message.method==="Page.javascriptDialogOpening"||message.method==="Page.javascriptDialogClosed"){
+                    this.events.push({method:message.method,params:message.params});
                 }else if(message.method==="Runtime.consoleAPICalled"){
                     const type=message.params&&message.params.type;
                     if(type==="error"||type==="warning"){
@@ -1652,7 +1654,11 @@ try{
     evidence.status="FAIL";
     evidence.error=error?.stack||String(error);
     evidence.runtimeEvents=client?.events?.slice(-50)||[];
-    evidence.relicPresentationAtFailure=client?await client.eval("(()=>{const p=window.v174RelicPresentationState?.();const node=document.getElementById('teamRelicBattlePresentation');const icon=node?.querySelector('.team-relic-battle-cutin-icon img');const stage=document.getElementById('v143-skill-stage');return {presentation:p||null,debug:window.v174RelicDebugState?.()||null,maskClass:node?.className||null,icon:icon?{src:icon.getAttribute('src'),complete:icon.complete,naturalWidth:icon.naturalWidth}:null,stageSkill:stage?.dataset.skill||null,stageSequence:stage?.dataset.sequence||null,lock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false,feedback:document.querySelectorAll('.battle-floating-feedback').length,readingState:document.body.classList.contains('v174-battle-reading-open')};})()").catch(diagnosticError=>({captureError:String(diagnosticError?.message||diagnosticError)})):{unavailable:true};
+    evidence.relicPresentationAtFailure=client?await client.eval("(()=>{const p=window.v174RelicPresentationState?.();const node=document.getElementById('teamRelicBattlePresentation');const icon=node?.querySelector('.team-relic-battle-cutin-icon img');const stage=document.getElementById('v143-skill-stage');return {visibility:document.visibilityState,hidden:document.hidden,focused:document.hasFocus(),presentation:p||null,debug:window.v174RelicDebugState?.()||null,maskClass:node?.className||null,icon:icon?{src:icon.getAttribute('src'),complete:icon.complete,naturalWidth:icon.naturalWidth}:null,stageSkill:stage?.dataset.skill||null,stageSequence:stage?.dataset.sequence||null,lock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false,feedback:document.querySelectorAll('.battle-floating-feedback').length,readingState:document.body.classList.contains('v174-battle-reading-open')};})()").catch(diagnosticError=>({captureError:String(diagnosticError?.message||diagnosticError)})):{unavailable:true};
+    evidence.browserTimerProbe=client?await Promise.race([
+        client.eval("(async()=>{const started=performance.now();await new Promise(resolve=>setTimeout(resolve,420));return {completed:true,elapsedMs:performance.now()-started,visibility:document.visibilityState,hidden:document.hidden};})()").catch(probeError=>({captureError:String(probeError?.message||probeError)})),
+        sleep(1500).then(()=>({completed:false,observationMs:1500}))
+    ]):{unavailable:true};
     evidence.chromeStderr=chromeStderr.slice(-5000);
     evidence.finishedAt=new Date().toISOString();
     fs.writeFileSync(path.join(artifactDir,"battle-layer-audio-live-qa.json"),JSON.stringify(evidence,null,2)+"\n");
