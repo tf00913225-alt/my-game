@@ -206,14 +206,12 @@
 #game-stage .v132-dungeon-list>div[style*="font-size:11px"]{font-size:14px!important;line-height:1.5!important;}
 #game-stage .v17361-reward-icon>em{font-size:13px!important;line-height:17px!important;}
 /* Native all-skill preview is scaled from 1080 design space; 34px is the real 13px floor at a 420px phone. */
-#game-stage #allElementSkillPreviewModal .skill-preview-card span{font-size:calc(34 * var(--ui-length-unit,1px))!important;}
-#game-stage #allElementSkillPreviewModal .skill-preview-heading button{font-size:calc(39 * var(--ui-length-unit,1px))!important;}
 
-/* Body-mounted reward dialogs are not descendants of #game-stage. */
+/* Reward dialogs inherit the game's fixed native spacing token. */
 .v132-reward-note{font-size:calc(14 * var(--ui-length-unit,1px))!important;line-height:1.55!important;}
-.v132-ticket-preview-modal p,.v132-ticket-preview-modal .v132-preview-item{font-size:14px!important;line-height:1.45!important;}
-.v132-set-title{font-size:16px!important;line-height:1.35!important;}
-.v132-set-bonus{font-size:14px!important;line-height:1.5!important;}
+.v132-ticket-preview-modal p,.v132-ticket-preview-modal .v132-preview-item{font-size:calc(14 * var(--ui-length-unit,1px))!important;line-height:1.45!important;}
+.v132-set-title{font-size:calc(16 * var(--ui-length-unit,1px))!important;line-height:1.35!important;}
+.v132-set-bonus{font-size:calc(14 * var(--ui-length-unit,1px))!important;line-height:1.5!important;}
 .v132-reward-modal .v17363-preview-heading small{font:700 calc(13 * var(--ui-length-unit,1px))/1.3 Cinzel,serif!important;letter-spacing:.16em!important;}
 .v132-reward-modal .v17363-preview-group b{font-size:calc(16 * var(--ui-length-unit,1px))!important;line-height:1.4!important;}
 .v132-reward-modal .v17363-preview-group em{font-size:calc(13 * var(--ui-length-unit,1px))!important;line-height:1.4!important;}

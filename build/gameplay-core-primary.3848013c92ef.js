@@ -2062,7 +2062,6 @@
         syncElementBoxForBattle({silent:true});
         applyBattleFormation();
         syncInventoryPortrait();
-        promoteSkillPreview();
         syncCharacterCreationAvailability();
         renderExpDistributeList();
         ensureElementBoxStatsUI();

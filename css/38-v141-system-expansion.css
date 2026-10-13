@@ -732,29 +732,7 @@
 :is(#game-stage,#game-ui) .home-feature-button{position:relative;}
 @keyframes v141NoticePulse{50%{transform:scale(.9);opacity:.72}}
 
-/* ----- Skill preview moved outside transformed game stage ----- */
-#game-ui #allElementSkillPreviewModal{
-    position:fixed !important;
-    inset:0 !important;
-    z-index:15000 !important;
-    padding:max(calc(14 * var(--ui-length-unit,1px)),env(safe-area-inset-top)) calc(14 * var(--ui-length-unit,1px)) max(calc(14 * var(--ui-length-unit,1px)),env(safe-area-inset-bottom)) !important;
-    box-sizing:border-box;
-    background:rgba(0,0,0,.88) !important;
-}
-
-#game-ui #allElementSkillPreviewModal.show{display:flex !important;}
-
-#game-ui #allElementSkillPreviewModal .skill-preview-dialog{
-    width:min(calc(94 * var(--layout-inline-size,420px) / 100),calc(720 * var(--ui-length-unit,1px))) !important;
-    max-width:calc(720 * var(--ui-length-unit,1px)) !important;
-    max-height:calc(92 * var(--layout-block-size,746.6667px) / 100) !important;
-    border:calc(2 * var(--ui-length-unit,1px)) solid #ad7d37 !important;
-    background:linear-gradient(170deg,#281d11,#0d0a07) !important;
-    transform:none !important;
-    filter:none !important;
-    isolation:isolate;
-}
-
+/* Skill preview visual typography; frame and scroll belong to css/30. */
 #game-ui #allElementSkillPreviewModal .skill-preview-heading h2{font-size:calc(22 * var(--ui-length-unit,1px)) !important;}
 #game-ui #allElementSkillPreviewModal .skill-preview-heading button{font-size:calc(15 * var(--ui-length-unit,1px)) !important;padding:calc(8 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px)) !important;}
 #game-ui #allElementSkillPreviewModal .skill-preview-tabs button{min-height:calc(39 * var(--ui-length-unit,1px));font-size:calc(15 * var(--ui-length-unit,1px)) !important;padding:calc(7 * var(--ui-length-unit,1px)) calc(4 * var(--ui-length-unit,1px)) !important;}

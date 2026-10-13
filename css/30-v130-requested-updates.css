@@ -205,9 +205,8 @@
 
 /*
    Unified Large Panel ownership for the all-element skill preview.
-   V141 reparents this modal to <body>, so it cannot inherit the stage-scoped
-   design tokens. Use the shared token names with their current canonical
-   fallbacks, keep heading/tabs fixed, and let only the skill list scroll.
+   The original modal inherits native tokens from its single #game-ui host.
+   Keep heading/tabs in normal flow and let only the skill list scroll.
 */
 #game-ui #allElementSkillPreviewModal .skill-preview-dialog{
     width:min(var(--ui-large-panel-max-width,calc(396 * var(--ui-length-unit,1px))),calc(calc(100 * var(--layout-inline-size,420px) / 100) - var(--ui-large-panel-safe-space,calc(24 * var(--ui-length-unit,1px))))) !important;

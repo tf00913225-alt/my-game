@@ -1865,42 +1865,6 @@
     box-shadow:0 0 calc(10 * var(--ui-length-unit,1px)) rgba(255,224,138,.45) !important;
 }
 
-#game-stage #game-overlay-layer #allElementSkillPreviewModal,
-#game-stage #allElementSkillPreviewModal{
-    position:absolute !important;
-    inset:0 !important;
-    z-index:9800 !important;
-    pointer-events:auto !important;
-    align-items:center !important;
-    justify-content:center !important;
-    overflow:hidden !important;
-    touch-action:pan-y !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-dialog{
-    width:94% !important;
-    height:min(92%,calc(1680 * var(--ui-length-unit,1px))) !important;
-    max-height:92% !important;
-    min-height:0 !important;
-    display:flex !important;
-    flex-direction:column !important;
-    overflow:hidden !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-body{
-    flex:1 1 auto !important;
-    min-height:0 !important;
-    height:0 !important;
-    max-height:none !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    touch-action:pan-y !important;
-    -webkit-overflow-scrolling:touch !important;
-    overscroll-behavior-y:contain !important;
-    padding-bottom:calc(90 * var(--ui-length-unit,1px)) !important;
-    transform:translateZ(0) !important;
-}
-
 /*
    ★ 修正（依照使用者回報「破圖」，附截圖顯示捲動時文字
    疊在一起、看起來像亂碼）：
@@ -1919,11 +1883,6 @@
    問題出現的機率。如果之後還是常常發生，需要使用者提供
    螢幕錄影（不是截圖）才能確認是不是同一種情況。
 */
-#game-stage #allElementSkillPreviewModal .skill-preview-card{
-    contain:content !important;
-    will-change:transform !important;
-}
-
 #game-ui #inventoryPortraitFrame{
     overflow:hidden;
 }
@@ -2164,33 +2123,6 @@
    - 技能說明文字：螢幕約15px（這裡39px）
    標題/分頁按鈕的規則見下面另外新增的區塊。
 */
-#game-stage #allElementSkillPreviewModal .skill-preview-card span{
-    font-size:calc(33 * var(--ui-length-unit,1px)) !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-card p{
-    font-size:calc(39 * var(--ui-length-unit,1px)) !important;
-    line-height:1.5 !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-card strong{
-    font-size:calc(44 * var(--ui-length-unit,1px)) !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-heading h2{
-    font-size:calc(49 * var(--ui-length-unit,1px)) !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-heading button{
-    font-size:calc(33 * var(--ui-length-unit,1px)) !important;
-    padding:calc(10 * var(--ui-length-unit,1px)) calc(16 * var(--ui-length-unit,1px)) !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-tabs button{
-    font-size:calc(39 * var(--ui-length-unit,1px)) !important;
-    padding:calc(14 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px)) !important;
-}
-
 :is(#game-stage,#game-ui) .stat-explanation{
     font-size:14px !important;
     line-height:1.7 !important;
@@ -3743,29 +3675,7 @@
 :is(#game-stage,#game-ui) .home-feature-button{position:relative;}
 @keyframes v141NoticePulse{50%{transform:scale(.9);opacity:.72}}
 
-/* ----- Skill preview moved outside transformed game stage ----- */
-#game-ui #allElementSkillPreviewModal{
-    position:fixed !important;
-    inset:0 !important;
-    z-index:15000 !important;
-    padding:max(calc(14 * var(--ui-length-unit,1px)),env(safe-area-inset-top)) calc(14 * var(--ui-length-unit,1px)) max(calc(14 * var(--ui-length-unit,1px)),env(safe-area-inset-bottom)) !important;
-    box-sizing:border-box;
-    background:rgba(0,0,0,.88) !important;
-}
-
-#game-ui #allElementSkillPreviewModal.show{display:flex !important;}
-
-#game-ui #allElementSkillPreviewModal .skill-preview-dialog{
-    width:min(calc(94 * var(--layout-inline-size,420px) / 100),calc(720 * var(--ui-length-unit,1px))) !important;
-    max-width:calc(720 * var(--ui-length-unit,1px)) !important;
-    max-height:calc(92 * var(--layout-block-size,746.6667px) / 100) !important;
-    border:calc(2 * var(--ui-length-unit,1px)) solid #ad7d37 !important;
-    background:linear-gradient(170deg,#281d11,#0d0a07) !important;
-    transform:none !important;
-    filter:none !important;
-    isolation:isolate;
-}
-
+/* Skill preview visual typography; frame and scroll belong to css/30. */
 #game-ui #allElementSkillPreviewModal .skill-preview-heading h2{font-size:calc(22 * var(--ui-length-unit,1px)) !important;}
 #game-ui #allElementSkillPreviewModal .skill-preview-heading button{font-size:calc(15 * var(--ui-length-unit,1px)) !important;padding:calc(8 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px)) !important;}
 #game-ui #allElementSkillPreviewModal .skill-preview-tabs button{min-height:calc(39 * var(--ui-length-unit,1px));font-size:calc(15 * var(--ui-length-unit,1px)) !important;padding:calc(7 * var(--ui-length-unit,1px)) calc(4 * var(--ui-length-unit,1px)) !important;}
@@ -4816,14 +4726,12 @@
 #game-stage .v132-dungeon-list>div[style*="font-size:11px"]{font-size:14px!important;line-height:1.5!important;}
 #game-stage .v17361-reward-icon>em{font-size:13px!important;line-height:17px!important;}
 /* Native all-skill preview is scaled from 1080 design space; 34px is the real 13px floor at a 420px phone. */
-#game-stage #allElementSkillPreviewModal .skill-preview-card span{font-size:calc(34 * var(--ui-length-unit,1px))!important;}
-#game-stage #allElementSkillPreviewModal .skill-preview-heading button{font-size:calc(39 * var(--ui-length-unit,1px))!important;}
 
-/* Body-mounted reward dialogs are not descendants of #game-stage. */
+/* Reward dialogs inherit the game's fixed native spacing token. */
 .v132-reward-note{font-size:calc(14 * var(--ui-length-unit,1px))!important;line-height:1.55!important;}
-.v132-ticket-preview-modal p,.v132-ticket-preview-modal .v132-preview-item{font-size:14px!important;line-height:1.45!important;}
-.v132-set-title{font-size:16px!important;line-height:1.35!important;}
-.v132-set-bonus{font-size:14px!important;line-height:1.5!important;}
+.v132-ticket-preview-modal p,.v132-ticket-preview-modal .v132-preview-item{font-size:calc(14 * var(--ui-length-unit,1px))!important;line-height:1.45!important;}
+.v132-set-title{font-size:calc(16 * var(--ui-length-unit,1px))!important;line-height:1.35!important;}
+.v132-set-bonus{font-size:calc(14 * var(--ui-length-unit,1px))!important;line-height:1.5!important;}
 .v132-reward-modal .v17363-preview-heading small{font:700 calc(13 * var(--ui-length-unit,1px))/1.3 Cinzel,serif!important;letter-spacing:.16em!important;}
 .v132-reward-modal .v17363-preview-group b{font-size:calc(16 * var(--ui-length-unit,1px))!important;line-height:1.4!important;}
 .v132-reward-modal .v17363-preview-group em{font-size:calc(13 * var(--ui-length-unit,1px))!important;line-height:1.4!important;}

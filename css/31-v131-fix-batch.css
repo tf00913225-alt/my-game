@@ -232,42 +232,6 @@
     box-shadow:0 0 calc(10 * var(--ui-length-unit,1px)) rgba(255,224,138,.45) !important;
 }
 
-#game-stage #game-overlay-layer #allElementSkillPreviewModal,
-#game-stage #allElementSkillPreviewModal{
-    position:absolute !important;
-    inset:0 !important;
-    z-index:9800 !important;
-    pointer-events:auto !important;
-    align-items:center !important;
-    justify-content:center !important;
-    overflow:hidden !important;
-    touch-action:pan-y !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-dialog{
-    width:94% !important;
-    height:min(92%,calc(1680 * var(--ui-length-unit,1px))) !important;
-    max-height:92% !important;
-    min-height:0 !important;
-    display:flex !important;
-    flex-direction:column !important;
-    overflow:hidden !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-body{
-    flex:1 1 auto !important;
-    min-height:0 !important;
-    height:0 !important;
-    max-height:none !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    touch-action:pan-y !important;
-    -webkit-overflow-scrolling:touch !important;
-    overscroll-behavior-y:contain !important;
-    padding-bottom:calc(90 * var(--ui-length-unit,1px)) !important;
-    transform:translateZ(0) !important;
-}
-
 /*
    ★ 修正（依照使用者回報「破圖」，附截圖顯示捲動時文字
    疊在一起、看起來像亂碼）：
@@ -286,11 +250,6 @@
    問題出現的機率。如果之後還是常常發生，需要使用者提供
    螢幕錄影（不是截圖）才能確認是不是同一種情況。
 */
-#game-stage #allElementSkillPreviewModal .skill-preview-card{
-    contain:content !important;
-    will-change:transform !important;
-}
-
 #game-ui #inventoryPortraitFrame{
     overflow:hidden;
 }
@@ -531,33 +490,6 @@
    - 技能說明文字：螢幕約15px（這裡39px）
    標題/分頁按鈕的規則見下面另外新增的區塊。
 */
-#game-stage #allElementSkillPreviewModal .skill-preview-card span{
-    font-size:calc(33 * var(--ui-length-unit,1px)) !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-card p{
-    font-size:calc(39 * var(--ui-length-unit,1px)) !important;
-    line-height:1.5 !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-card strong{
-    font-size:calc(44 * var(--ui-length-unit,1px)) !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-heading h2{
-    font-size:calc(49 * var(--ui-length-unit,1px)) !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-heading button{
-    font-size:calc(33 * var(--ui-length-unit,1px)) !important;
-    padding:calc(10 * var(--ui-length-unit,1px)) calc(16 * var(--ui-length-unit,1px)) !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-tabs button{
-    font-size:calc(39 * var(--ui-length-unit,1px)) !important;
-    padding:calc(14 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px)) !important;
-}
-
 :is(#game-stage,#game-ui) .stat-explanation{
     font-size:14px !important;
     line-height:1.7 !important;
