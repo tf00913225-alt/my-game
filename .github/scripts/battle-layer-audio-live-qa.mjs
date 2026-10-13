@@ -312,7 +312,7 @@ async function waitFor(client,expression,label,timeoutMs=30000){
                 const started=performance.now();
                 let last=null,diagnostic=null;
                 while(performance.now()-started<${Number(timeoutMs)}){
-                    try{last=Boolean(${expression});if(last){return {ready:true,last,elapsedMs:performance.now()-started};}}
+                    try{last=Boolean(${expression});const elapsedMs=performance.now()-started;if(last&&elapsedMs<${Number(timeoutMs)}){return {ready:true,last,elapsedMs};}}
                     catch(error){last=String(error?.message||error);}
                     try{const gate=window.v142GetActiveAnimationGate?.();const current=window.v143SkillAnimationState?.current;diagnostic={at:Date.now(),gate:gate?{id:gate.config?.id,duration:gate.config?.duration,resolveDuration:gate.config?.resolveDuration,deadline:gate.deadline,done:gate.done,reason:gate.reason,visualTimelinePending:!!gate.visualTimelinePending}:null,current:current?{id:current.config?.id,sequence:current.sequence,startedAt:current.startedAt,firstVisibleFrameAt:current.firstVisibleFrameAt,duration:current.duration,done:current.done}:null,longTasks:window.__relicQaLongTasks?.slice(-8)||[]};}catch(captureError){diagnostic={captureError:String(captureError?.message||captureError)};}
                     await new Promise(resolve=>setTimeout(resolve,180));

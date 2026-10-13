@@ -9,12 +9,13 @@ const end=source.indexOf("async function prepareAccountFirstRuntime(",start);
 assert.ok(start>=0&&end>start,"Test must execute the production QA wait Owner");
 const owner=source.slice(start,end);
 
-function harness({readyAt=500,replyDelay=0,predicateError=false,disconnected=false,hung=false}={}){
+function harness({readyAt=500,replyDelay=0,predicateError=false,disconnected=false,hung=false,predicateCost=0}={}){
     let browserNow=0,hostNow=0;
     const timers=[];
     const window={};
     Object.defineProperty(window,"ready",{get(){
         if(predicateError){throw new Error("real predicate failure");}
+        browserNow+=predicateCost;
         return browserNow>=readyAt;
     }});
     const browser={window,performance:{now:()=>browserNow},setTimeout(callback,ms){browserNow+=ms;callback();}};
@@ -97,4 +98,11 @@ test("wait evidence remains bounded across repeated scenes",async()=>{
 test("startup failure retains runtime evidence",async()=>{
     const h=harness({readyAt:Infinity});
     await assert.rejects(h.run(7000,"App Shell character/save owners"),/Recent runtime events:.*actual runtime event/);
+});
+
+test("a predicate that blocks beyond the original deadline cannot return a late success",async()=>{
+    const h=harness({readyAt:0,predicateCost:7100});
+    await assert.rejects(h.run(7000),/Timed out waiting/);
+    assert.equal(h.client.waitTimings[0].ready,false);
+    assert.ok(h.client.waitTimings[0].browserElapsedMs>7000);
 });
