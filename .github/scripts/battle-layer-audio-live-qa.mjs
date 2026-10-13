@@ -610,7 +610,27 @@ async function runBossReadingLayerQa(client,bossIndex){
     return {opened,completed};
 }
 
+async function installRelicPhaseLogpoints(client){
+    const bundle=fs.readdirSync('build').find(file=>/^gameplay-core-secondary\.[0-9a-f]{12}\.js$/.test(file));
+    assert.ok(bundle,"Relic diagnostic source bundle missing");
+    const lines=fs.readFileSync(path.join('build',bundle),'utf8').replace(/\r\n/g,'\n').split('\n');
+    await client.send('Debugger.enable');
+    await client.eval('window.__relicQaPhaseTrace=[];true');
+    const points=[['wait scheduled','function waitMs(ms)',null],['exit/target waits scheduled','return Promise.all([waitMs(RELIC_IDENTITY_EXIT_MS)',null],['exit/target waits complete','return Promise.all([waitMs(RELIC_IDENTITY_EXIT_MS)','.then(()=>node)'],['VFX phase','function enterRelicVfxPhase(node)',null],['VFX play','const relicGate=playRelicVfx(',null],['cinematic end','function endRelicCinematic(node)',null]];
+    const locations=[];
+    for(const [label,marker,completion] of points){
+        const lineNumber=lines.findIndex(line=>line.includes(marker));
+        assert.ok(lineNumber>=0,'Relic logpoint source missing: '+label);
+        const columnNumber=completion?lines[lineNumber].indexOf(completion)+'.then(()=>'.length:lines[lineNumber].indexOf(marker);
+        const condition="(()=>{const trace=window.__relicQaPhaseTrace;if(trace&&trace.length<160)trace.push({at:Date.now(),point:"+JSON.stringify(label)+",ms:typeof ms==='undefined'?null:ms,token:typeof battleToken==='undefined'?null:battleToken,relic:window.v174RelicDebugState?.()?.relicId,classes:document.getElementById('teamRelicBattlePresentation')?.className});return false;})()";
+        const result=await client.send('Debugger.setBreakpointByUrl',{urlRegex:bundle.replace(/\./g,'\\.')+'(?:\\?.*)?$',lineNumber,columnNumber,condition});
+        locations.push({label,lineNumber,columnNumber,locations:result.locations});
+    }
+    evidence.checks.relicPhaseLogpoints=locations;
+}
+
 async function runRelicPresentationModeMatrix(client){
+    await installRelicPhaseLogpoints(client);
     const modes=["normal","daily","abyss","tower","personal","world"];
     const relics=[
         ["relic_cold_spring_jade","singleAlly"],
@@ -1660,7 +1680,7 @@ try{
     console.log("Battle layer/audio live mobile QA: PASS");
 } catch(error){
     // Failure evidence only: never alter the scene or release a production lock.
-    evidence.failureState=await client?.eval("(()=>({url:location.href,hidden:document.hidden,qaProbe:window.__relicQaProbe,qaIdentity:window.__relicQaIdentitySnapshot,qaFocus:window.__relicQaFocusSnapshot,party:typeof getExistingPartyIndexes==='function'?getExistingPartyIndexes().map(i=>({i,hp:getPartyCharacterByIndex(i)?.hp,id:getPartyCharacterByIndex(i)?.id})):[],sprites:[...document.querySelectorAll('#v143-skill-stage .v143-vfx-sprite')].map(n=>({className:n.className,dataset:{...n.dataset},visibility:getComputedStyle(n).visibility})),battleActive:typeof battleActive==='undefined'?null:battleActive,token:typeof battleToken==='undefined'?null:battleToken,phase:typeof battlePhase==='undefined'?null:battlePhase,turn:typeof turn==='undefined'?null:turn,advance:typeof battleAdvanceScheduled==='undefined'?null:battleAdvanceScheduled,action:typeof battleDurationAction==='undefined'||!battleDurationAction?null:{token:battleDurationAction.token,index:battleDurationAction.index,completed:battleDurationAction.completed},run:window.v132ActiveDungeonRun?{mode:v132ActiveDungeonRun.mode,gameplayMode:v132ActiveDungeonRun.gameplayMode}:null,enemyIndexes:typeof currentBattleMonsters==='undefined'?[]:currentBattleMonsters.slice(),relic:window.v174RelicDebugState?.(),presentation:window.v174RelicPresentationState?.(),animation:window.v143SkillAnimationState?.current?{id:v143SkillAnimationState.current.config.id,sequence:v143SkillAnimationState.current.sequence,targets:v143SkillAnimationState.current.targetIndexes,done:v143SkillAnimationState.current.done}:null,locks:window.FourSymbolsBattleFlow?.isPresentationActive?.(),nodes:['battlePage','v141BattleTransition','teamRelicBattlePresentation','v143-skill-stage'].map(id=>{const n=document.getElementById(id);return {id,exists:!!n,className:n?.className,dataset:n?{...n.dataset}:null,display:n?getComputedStyle(n).display:null};}),feedback:document.querySelectorAll('.battle-floating-feedback').length}) )()").catch(diagnosticError=>({unavailable:String(diagnosticError)}));
+    evidence.failureState=await client?.eval("(()=>({url:location.href,hidden:document.hidden,phaseTrace:window.__relicQaPhaseTrace,qaProbe:window.__relicQaProbe,qaIdentity:window.__relicQaIdentitySnapshot,qaFocus:window.__relicQaFocusSnapshot,party:typeof getExistingPartyIndexes==='function'?getExistingPartyIndexes().map(i=>({i,hp:getPartyCharacterByIndex(i)?.hp,id:getPartyCharacterByIndex(i)?.id})):[],sprites:[...document.querySelectorAll('#v143-skill-stage .v143-vfx-sprite')].map(n=>({className:n.className,dataset:{...n.dataset},visibility:getComputedStyle(n).visibility})),battleActive:typeof battleActive==='undefined'?null:battleActive,token:typeof battleToken==='undefined'?null:battleToken,phase:typeof battlePhase==='undefined'?null:battlePhase,turn:typeof turn==='undefined'?null:turn,advance:typeof battleAdvanceScheduled==='undefined'?null:battleAdvanceScheduled,action:typeof battleDurationAction==='undefined'||!battleDurationAction?null:{token:battleDurationAction.token,index:battleDurationAction.index,completed:battleDurationAction.completed},run:window.v132ActiveDungeonRun?{mode:v132ActiveDungeonRun.mode,gameplayMode:v132ActiveDungeonRun.gameplayMode}:null,enemyIndexes:typeof currentBattleMonsters==='undefined'?[]:currentBattleMonsters.slice(),relic:window.v174RelicDebugState?.(),presentation:window.v174RelicPresentationState?.(),animation:window.v143SkillAnimationState?.current?{id:v143SkillAnimationState.current.config.id,sequence:v143SkillAnimationState.current.sequence,targets:v143SkillAnimationState.current.targetIndexes,done:v143SkillAnimationState.current.done}:null,locks:window.FourSymbolsBattleFlow?.isPresentationActive?.(),nodes:['battlePage','v141BattleTransition','teamRelicBattlePresentation','v143-skill-stage'].map(id=>{const n=document.getElementById(id);return {id,exists:!!n,className:n?.className,dataset:n?{...n.dataset}:null,display:n?getComputedStyle(n).display:null};}),feedback:document.querySelectorAll('.battle-floating-feedback').length}) )()").catch(diagnosticError=>({unavailable:String(diagnosticError)}));
     evidence.runtimeErrors=client?.events.filter(e=>e.method==='Runtime.exceptionThrown'||e.method==='Runtime.consoleAPICalled').slice(-20);
     evidence.status="FAIL";
     evidence.error=error?.stack||String(error);
