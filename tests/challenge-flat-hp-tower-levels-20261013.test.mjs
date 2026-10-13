@@ -15,10 +15,11 @@ test('Tower level bands include boundary floors',()=>{
 
 test('Tower and Abyss use additive HP after existing profiles, once per monster',()=>{
   for(const rank of ['regular','elite','smallBoss']){
-    const bonus=CHALLENGE_FLAT_HP[rank];
-    for(const mode of ['tower','abyss']){
-      const spec={monsterKey:`test.${mode}.${rank}`,name:'測試敵人',level:40,element:'fire',archetype:'balanced',rank,mode,context:mode==='tower'?'tower/floor/10':'abyss/40/east/stage/1',
-        ...(mode==='abyss'?{abyssDifficulty:40,abyssRegion:'east',abyssStage:0}:{})};
+    const bonus={regular:1500,elite:4500,smallBoss:10000}[rank];
+    assert.equal(CHALLENGE_FLAT_HP[rank],bonus);
+    for(const [mode,level] of [['tower',40],['abyss',20],['abyss',40]]){
+      const spec={monsterKey:`test.${mode}.${rank}`,name:'測試敵人',level,element:'fire',archetype:'balanced',rank,mode,context:mode==='tower'?'tower/floor/10':`abyss/${level}/east/stage/1`,
+        ...(mode==='abyss'?{abyssDifficulty:level,abyssRegion:'east',abyssStage:0}:{})};
       const projection=MonsterBalance.preview(spec);
       const before=projection.breakdown.find(step=>step.step==='element').output.maxHP;
       assert.equal(projection.final.maxHP,before*projection.profiles.globalCalibration.hp+bonus);
@@ -31,7 +32,9 @@ test('Tower and Abyss use additive HP after existing profiles, once per monster'
 });
 
 test('Other modes do not receive challenge HP bonuses',()=>{
-  const projection=MonsterBalance.preview({name:'一般野怪',level:40,element:'fire',archetype:'balanced',rank:'regular',mode:'wild',context:'wild/zone-01'});
-  const before=projection.breakdown.find(step=>step.step==='element').output.maxHP;
-  assert.equal(projection.final.maxHP,before*projection.profiles.globalCalibration.hp);
+  for(const [mode,rank] of [['wild','regular'],['daily','regular'],['adventure','regular'],['personalBoss','boss'],['worldBoss','boss']]){
+    const projection=MonsterBalance.preview({monsterKey:'isolation.'+mode,name:'其他玩法',level:40,element:'fire',archetype:'balanced',rank,mode,context:mode==='adventure'?'adventure/test/test':mode+'/isolation',...(mode==='adventure'?{chapterId:'test',encounterId:'test'}:{}),...(mode==='daily'?{dailyType:'exp',wave:1,slot:0,partySize:1,highestPartyLevel:40,skillFrequency:0.5}:{}),...(mode==='worldBoss'?{worldStage:1}:{})});
+    const before=projection.breakdown.find(step=>step.step==='element').output.maxHP;
+    assert.equal(projection.final.maxHP,before*projection.profiles.globalCalibration.hp);
+  }
 });
