@@ -80,6 +80,13 @@ function auditLegacyFormation(save,blockers){
     // Older saves may predate formation persistence. A missing formation is
     // not evidence of reward eligibility and never supplies a canonical ID.
     if(formation===undefined||formation===null){ return; }
+    if(formation.version===2){
+        try{require("./team-formation-policy").validate(formation,
+            [save.player,save.player2,save.player3].flatMap((character,index)=>character?.id?[index]:[]),
+            require("./hero-core").listHeroDefinitions().map(hero=>hero.heroId));}
+        catch(_){blockers.add("FORMATION_STRUCTURE_INVALID");}
+        return; // Structural screening never confers Hero ownership.
+    }
     const map=formation.characterIndexToSlot;
     if(!formation||typeof formation!=="object"||Array.isArray(formation)||
        formation.version!==1||!map||typeof map!=="object"||Array.isArray(map)){

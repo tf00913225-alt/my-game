@@ -2207,7 +2207,42 @@ const growthLedger=growthRoot.collection("ledgerEntries").doc("growth-emulator-r
 const growthLedgerBytes=(await growthLedger.get()).data();await growthLedger.delete();
 await rejected("mutateHeroGrowth",growthUser.idToken,growthReroll,"DATA_LOSS");
 await growthLedger.set(growthLedgerBytes);
-await invoke("revokeGameSession",growthUser.idToken,growthIdentity);
+// Same real protected transport, canonical source, snapshot and archive Owners.
+// This writes a bounded loadout only; no battle simulation or resource grant.
+const formationIntent={...growthIdentity,expectedRevision:5,operationId:"formation-emulator-save-0001",
+    formation:{version:2,characterIndexToSlot:{0:"ALLY_F2"},heroIdToSlot:{[growthId]:"ALLY_B2"}}};
+const formationFirst=await invoke("saveTeamFormation",growthUser.idToken,formationIntent);
+assert.deepEqual(formationFirst.formation,formationIntent.formation);
+assert.deepEqual((await invoke("readTeamFormation",growthUser.idToken,growthIdentity)).formation,formationIntent.formation);
+await checkRecoveryArchive(growthUid,6);
+await rejected("saveTeamFormation",growthUser.idToken,{...formationIntent,operationId:"formation-emulator-invalid1",expectedRevision:6,
+    formation:{...formationIntent.formation,heroIdToSlot:{[growthId]:"ALLY_F2"}}},"INVALID_ARGUMENT");
+await rejected("saveTeamFormation",growthUser.idToken,{...formationIntent,operationId:"formation-emulator-unowned1",expectedRevision:6,
+    formation:{...formationIntent.formation,heroIdToSlot:{vajraHeavenlyKing:"ALLY_B2"}}},"INVALID_ARGUMENT");
+const swapFormation={version:2,characterIndexToSlot:{0:"ALLY_B2"},heroIdToSlot:{[growthId]:"ALLY_F2"}};
+const formationRace=await Promise.allSettled([
+    invoke("saveTeamFormation",growthUser.idToken,{...formationIntent,expectedRevision:6,operationId:"formation-emulator-race-0001",formation:swapFormation}),
+    invoke("saveTeamFormation",growthUser.idToken,{...formationIntent,expectedRevision:6,operationId:"formation-emulator-race-0002",formation:swapFormation})]);
+assert.equal(formationRace.filter(row=>row.status==="fulfilled").length,1);
+assert.equal(formationRace.filter(row=>row.status==="rejected").length,1);
+assert.deepEqual((await invoke("saveTeamFormation",growthUser.idToken,formationIntent)).receipt,formationFirst.receipt);
+const formationLedger=growthRoot.collection("ledgerEntries").doc(formationIntent.operationId),formationLedgerBytes=(await formationLedger.get()).data();
+await formationLedger.delete();await rejected("saveTeamFormation",growthUser.idToken,formationIntent,"DATA_LOSS");
+await formationLedger.set(formationLedgerBytes);
+assert.equal(await rulesRequest(`serverUsers/${growthUid}/account/current`,growthUser.idToken,"PATCH"),403);
+assert.equal(await rulesRequest(`serverUsers/${growthUid}/operations/${formationIntent.operationId}`,growthUser.idToken),403);
+while(Math.floor(Date.now()/1000)<=claims(growthUser.idToken).auth_time){await new Promise(resolve=>setTimeout(resolve,100));}
+const formationOtherDevice=await login("accounts:signInWithPassword",{email:"hero-growth-emulator@example.test",password});
+const formationOtherSession=await invoke("createGameSession",formationOtherDevice.idToken,{uid:growthUid});
+await rejected("readTeamFormation",growthUser.idToken,growthIdentity,"SESSION_REVOKED");
+assert.deepEqual((await invoke("readTeamFormation",formationOtherDevice.idToken,{uid:growthUid,session:formationOtherSession})).formation,swapFormation);
+const removedFormation={...swapFormation,heroIdToSlot:{}};
+await invoke("saveTeamFormation",formationOtherDevice.idToken,{uid:growthUid,session:formationOtherSession,expectedRevision:7,
+    operationId:"formation-emulator-remove-01",formation:removedFormation});
+await checkRecoveryArchive(growthUid,8);
+await invoke("revokeGameSession",formationOtherDevice.idToken,{uid:growthUid,session:formationOtherSession});
+console.log("PASS Team formation real Firestore/HTTP: stable IDs, slot exchange/removal, reload/read, latest revision/concurrency, immutable retry, archive/ledger, private rules, old-device rejection and new-device restore.");
+
 await rejected("readHeroGrowth",growthUser.idToken,growthIdentity,"SESSION_REVOKED");
 console.log("PASS Hero growth real Firestore/HTTP: original Core costs, fragment unlock/star/reroll, one concurrent spend, immutable retry, archive, malformed intents, missing ledger, private rules, revoked session. Resources are emulator-only fixtures.");
 await db.terminate();

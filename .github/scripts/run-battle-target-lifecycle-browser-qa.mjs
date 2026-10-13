@@ -90,11 +90,11 @@ const heroExpression=`(async()=>{
     player2=buildAdditionalCharacter('QA B','water','male');registerAdditionalCharacter(2,player2);
     player3=buildAdditionalCharacter('QA C','earth','male');registerAdditionalCharacter(3,player3);
     for(const p of getCharacters()){p.level=50;p.hp=100000;p.bonusHP=100000;p.activeBuffs=[];p.statusEffects=[];}
+    const formationOwner=window.FourSymbolsTeamFormation;window.FourSymbolsTeamFormation={getConfirmed:()=>null};
     const system=FourSymbolsHeroSystem;const ids=FourSymbolsHeroCore.listHeroDefinitions().map(d=>d.heroId);
     const beforeAccount=system.getDomain().serialize();let account=beforeAccount;
     if(location.hostname==='dev.four-symbols-dev.pages.dev'){
         const locked=FourSymbolsHeroCore.normalizeAccountState();system.replaceAccountState(locked);
-        FourSymbolsHeroBattle.useUnlockedRoster();
         const preview=initializeHeroBattleCombatants();
         check(JSON.stringify(preview.map(h=>h.heroId))===JSON.stringify(ids),'DEV default two Hero preview');
         check(preview.every(h=>h.combatantKind==='heroNpc'),'DEV preview formal identity');
@@ -119,7 +119,7 @@ const heroExpression=`(async()=>{
             getHeroBaseStats:id=>domain.getHeroBaseStats(id===third?ids[0]:id),
             getHeroAllocatedStats:id=>domain.getHeroAllocatedStats(id===third?ids[0]:id),
             getHeroSkillProjection:id=>domain.getHeroSkillProjection(id===third?ids[0]:id)})};
-        FourSymbolsHeroBattle.setRoster([...ids,third].slice(0,count));
+        window.FourSymbolsTeamFormation={getConfirmed:()=>({heroIdToSlot:Object.fromEntries([...ids,third].slice(0,count).map((id,i)=>[id,"ALLY_B"+(i+1)]))})};
         const enemy=MonsterBalance.build({monsterKey:'qa.hero',name:'QA Enemy',level:50,element:'water',archetype:'balanced',rank:'regular',mode:'wild',context:'qa/hero'});
         Object.assign(enemy,{hp:100000,maxHP:100000,sp:1000,maxSP:1000,skillIds:[],skillChance:0,v141SupportSkillIds:[],v132FixedSkillLoadout:true});
         monsters=[enemy];currentZone='forest';mapCooldown=false;autoConfig.enabled=false;autoConfig2.enabled=false;autoConfig3.enabled=false;
@@ -190,7 +190,7 @@ const heroExpression=`(async()=>{
             saveGame();const saved=JSON.parse(localStorage.getItem('four_symbols_save:skill-runtime-browser-qa'));check(JSON.stringify(saved.heroAccount)===accountBytes,'real save Hero isolation');check(Object.keys(saved.allyFormation.characterIndexToSlot).every(k=>Number(k)<3),'save excludes transient Hero slots');
             rows.push({count,units:cards.length,slots,initiative:queue.map(e=>e.type),statistics:initial.combatants.map(c=>c.kind),finished});
         }finally{Math.random=random;finish?.();pause();battleActive=false;clearInterval(timerId);clearTransientBattlePresentation();window.v142SkillAnimationDirector?.cancelAll?.();}
-    }}finally{window.FourSymbolsHeroSystem=system;window.__heroQaOwned=[];await FourSymbolsHeroAcquisition.sync();system.replaceAccountState(beforeAccount);FourSymbolsHeroBattle.setRoster([]);FourSymbolsBattlefieldSlots.hydrateAllyFormation(originalFormation,[0,1,2]);}
+    }}finally{window.FourSymbolsHeroSystem=system;window.__heroQaOwned=[];await FourSymbolsHeroAcquisition.sync();system.replaceAccountState(beforeAccount);window.FourSymbolsTeamFormation=formationOwner;FourSymbolsBattlefieldSlots.hydrateAllyFormation(originalFormation,[0,1,2]);}
     return rows;
 })()`;
 
