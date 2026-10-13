@@ -8,13 +8,13 @@
     align-items:center !important;
     justify-content:center !important;
     box-sizing:border-box !important;
-    padding:12px !important;
+    padding:36px !important;
     overflow:hidden !important;
 }
 #game-ui #homeFeatureModal.v131-shop-open .home-feature-modal-box{
     width:100% !important;
-    max-width:396px !important;
-    max-height:calc(100% - 24px) !important;
+    max-width:1188px !important;
+    max-height:calc(100% - 72px) !important;
     margin:0 auto !important;
     box-sizing:border-box !important;
     overflow:hidden !important;

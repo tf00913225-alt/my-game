@@ -4398,7 +4398,7 @@
         modal=document.createElement("div");
         modal.id="v132RewardModal";
         modal.className="v132-reward-modal";
-        document.body.appendChild(modal);
+        document.getElementById("game-ui").appendChild(modal);
         return modal;
     }
 
@@ -9082,15 +9082,7 @@
         },()=>alert("廣告未完成，未增加元素匣時數。"));
     };
 
-    if(typeof openAllElementSkillPreview==="function"){
-        const originalOpenAllElementSkillPreview=openAllElementSkillPreview;
-        openAllElementSkillPreview=function(){
-            const modal=document.getElementById("allElementSkillPreviewModal");
-            if(modal&&modal.parentElement!==document.body){ document.body.appendChild(modal); }
-            if(modal){ modal.classList.add("v141-body-preview"); }
-            return originalOpenAllElementSkillPreview.apply(this,arguments);
-        };
-    }
+    // Skill preview is mounted once by the canonical game UI lifecycle.
 
     /* =====================================================
        Daily dungeon covers and dungeon navigation
@@ -9262,8 +9254,6 @@
         installTaskTracker();
         ensureInventoryPager();
         updateNotificationDots();
-        const preview=document.getElementById("allElementSkillPreviewModal");
-        if(preview&&preview.parentElement!==document.body){ document.body.appendChild(preview); preview.classList.add("v141-body-preview"); }
     }
     if(document.readyState==="loading"){
         document.addEventListener("DOMContentLoaded",boot,{once:true});

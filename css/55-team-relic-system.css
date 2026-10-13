@@ -1,33 +1,33 @@
 /* Team Relic System — black/gold mobile UI. */
-#game-ui #homeFeatureModal.team-relic-modal .team-relic-loading{display:grid;place-items:center;min-height:260px;padding:24px;color:#f4ead4;font-size:16px;line-height:24px;font-weight:800;text-align:center;}
+#game-ui #homeFeatureModal.team-relic-modal .team-relic-loading{display:grid;place-items:center;min-height:780px;padding:72px;color:#f4ead4;font-size:48px;line-height:72px;font-weight:800;text-align:center;}
 #game-ui #homeFeatureModal.team-relic-modal .team-relic-loading-error{color:#ffb5a6;}
-:is(#game-stage,#game-ui) .team-relic-notice-dot{position:absolute;right:-2px;top:-2px;z-index:5;}
+:is(#game-stage,#game-ui) .team-relic-notice-dot{position:absolute;right:calc(-2 * var(--ui-length-unit,1px));top:calc(-2 * var(--ui-length-unit,1px));z-index:5;}
 /* Main-city relic summary styling lives in the app-shell first-screen owner. */
-#game-ui #homeFeatureModal.team-relic-modal{padding:max(4px,var(--safe-top)) max(4px,var(--safe-right)) max(4px,var(--safe-bottom)) max(4px,var(--safe-left)) !important;}
-#game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide{position:relative!important;width:calc(100% - 8px)!important;max-width:var(--ui-large-panel-max-width)!important;height:min(var(--ui-large-panel-height),calc(100% - 8px))!important;max-height:calc(100% - 8px)!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;border:2px solid rgba(174,126,51,.86);background:linear-gradient(180deg,#17120d,#070706 78%);}
-#game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-title{flex:0 0 auto;min-height:44px;border-bottom:1px solid rgba(206,154,61,.45);background:linear-gradient(180deg,rgba(45,31,15,.96),rgba(15,12,8,.96));}
-#game-ui #homeFeatureModal.team-relic-modal #homeFeatureModalTitle{font-family:"Noto Serif TC",serif;letter-spacing:.2em;color:#f0d28d;font-size:20px;}
-#game-ui #homeFeatureModal.team-relic-modal .home-feature-close-btn{align-items:center!important;justify-content:center!important;width:auto!important;min-width:68px!important;height:38px!important;padding:0 12px!important;font-size:15px!important;line-height:36px!important;font-weight:900!important;border:1px solid #8a6a3a!important;border-radius:7px!important;background:linear-gradient(180deg,#2c2419,#0f0c09)!important;color:#f4ead4!important;text-shadow:0 1px 2px #000!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 6px rgba(0,0,0,.45)!important;}
+#game-ui #homeFeatureModal.team-relic-modal{padding:max(12px,var(--safe-top)) max(12px,var(--safe-right)) max(12px,var(--safe-bottom)) max(12px,var(--safe-left)) !important;}
+#game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide{position:relative!important;width:calc(100% - 24px)!important;max-width:var(--ui-large-panel-max-width)!important;height:min(var(--ui-large-panel-height),calc(100% - 24px))!important;max-height:calc(100% - 24px)!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;border:6px solid rgba(174,126,51,.86);background:linear-gradient(180deg,#17120d,#070706 78%);}
+#game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-title{flex:0 0 auto;min-height:132px;border-bottom:3px solid rgba(206,154,61,.45);background:linear-gradient(180deg,rgba(45,31,15,.96),rgba(15,12,8,.96));}
+#game-ui #homeFeatureModal.team-relic-modal #homeFeatureModalTitle{font-family:"Noto Serif TC",serif;letter-spacing:.2em;color:#f0d28d;font-size:60px;}
+#game-ui #homeFeatureModal.team-relic-modal .home-feature-close-btn{align-items:center!important;justify-content:center!important;width:auto!important;min-width:204px!important;height:114px!important;padding:0 36px!important;font-size:45px!important;line-height:108px!important;font-weight:900!important;border:3px solid #8a6a3a!important;border-radius:21px!important;background:linear-gradient(180deg,#2c2419,#0f0c09)!important;color:#f4ead4!important;text-shadow:0 3px 6px #000!important;box-shadow:inset 0 3px 0 rgba(255,255,255,.05),0 6px 18px rgba(0,0,0,.45)!important;}
 #game-ui #homeFeatureModal.team-relic-modal #statusHelpButton,
 #game-ui #homeFeatureModal.team-relic-modal #skillPreviewHeaderButton{display:none!important;}
 #game-ui #homeFeatureModal.team-relic-modal:not(.team-relic-detail-mode) .home-feature-close-btn:not(#statusHelpButton):not(#skillPreviewHeaderButton){display:inline-flex!important;}
 #game-ui #homeFeatureModal.team-relic-modal.team-relic-detail-mode .home-feature-close-btn{display:none!important;}
-#game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide #homeFeatureModalBody{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important;padding:9px!important;box-sizing:border-box;}
-:is(#game-stage,#game-ui) .team-relic-page,:is(#game-stage,#game-ui) .team-relic-detail{min-height:100%;color:#e7dcc7;font-size:15px;line-height:1.5;box-sizing:border-box;}
-:is(#game-stage,#game-ui) .team-relic-resource-line{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;color:#b4a58c;font-size:14px;line-height:20px;}
+#game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide #homeFeatureModalBody{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important;padding:27px!important;box-sizing:border-box;}
+:is(#game-stage,#game-ui) .team-relic-page,:is(#game-stage,#game-ui) .team-relic-detail{min-height:100%;color:#e7dcc7;font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.5;box-sizing:border-box;}
+:is(#game-stage,#game-ui) .team-relic-resource-line{display:flex;justify-content:space-between;gap:calc(8 * var(--ui-length-unit,1px));align-items:center;margin-bottom:calc(8 * var(--ui-length-unit,1px));color:#b4a58c;font-size:calc(14 * var(--ui-length-unit,1px));line-height:calc(20 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .team-relic-resource-line b{color:#d2b878;font-weight:800;}
 :is(#game-stage,#game-ui) .team-relic-current-card{
     display:grid;
-    grid-template-columns:76px minmax(0,1fr);
+    grid-template-columns:calc(76 * var(--ui-length-unit,1px)) minmax(0,1fr);
     grid-template-rows:auto auto;
-    gap:6px 9px;
+    gap:calc(6 * var(--ui-length-unit,1px)) calc(9 * var(--ui-length-unit,1px));
     align-items:start;
-    padding:10px;
-    margin-bottom:9px;
-    border:1px solid rgba(200,154,72,.24);
-    border-radius:10px;
+    padding:calc(10 * var(--ui-length-unit,1px));
+    margin-bottom:calc(9 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(200,154,72,.24);
+    border-radius:calc(10 * var(--ui-length-unit,1px));
     background:linear-gradient(145deg,rgba(31,23,14,.72),rgba(8,7,5,.90));
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.025),0 5px 14px rgba(0,0,0,.28);
+    box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(255,238,196,.025),0 calc(5 * var(--ui-length-unit,1px)) calc(14 * var(--ui-length-unit,1px)) rgba(0,0,0,.28);
 }
 /* List, equipped and detail views all expose the same square art contract.
    Runtime still resolves a single def.iconPath and the UI decides only size. */
@@ -37,79 +37,79 @@
 :is(#game-stage,#game-ui) .team-relic-current-art img,
 :is(#game-stage,#game-ui) .team-relic-card-art img,
 :is(#game-stage,#game-ui) .team-relic-detail-art img{display:block;width:100%;height:100%;object-fit:contain;}
-:is(#game-stage,#game-ui) .team-relic-current-art{grid-row:1/3;width:76px;display:flex;align-items:center;justify-content:center;border-radius:10px;}
+:is(#game-stage,#game-ui) .team-relic-current-art{grid-row:1/3;width:calc(76 * var(--ui-length-unit,1px));display:flex;align-items:center;justify-content:center;border-radius:calc(10 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .team-relic-current-copy{min-width:0;}
-:is(#game-stage,#game-ui) .team-relic-current-copy small{display:block;color:#b7a786;font-size:14px;margin-bottom:2px;line-height:19px;}
-:is(#game-stage,#game-ui) .team-relic-current-copy b{display:block;color:#f4d48e;font-size:17px;line-height:22px;}
-:is(#game-stage,#game-ui) .team-relic-current-copy b span{font-size:13px;color:#c7b27f;}
-:is(#game-stage,#game-ui) .team-relic-current-copy p{margin:4px 0 0;color:#d8ccb7;font-size:15px;line-height:21px;}
-:is(#game-stage,#game-ui) .team-relic-current-actions{display:flex;gap:6px;justify-content:flex-end;}
+:is(#game-stage,#game-ui) .team-relic-current-copy small{display:block;color:#b7a786;font-size:calc(14 * var(--ui-length-unit,1px));margin-bottom:calc(2 * var(--ui-length-unit,1px));line-height:calc(19 * var(--ui-length-unit,1px));}
+:is(#game-stage,#game-ui) .team-relic-current-copy b{display:block;color:#f4d48e;font-size:calc(17 * var(--ui-length-unit,1px));line-height:calc(22 * var(--ui-length-unit,1px));}
+:is(#game-stage,#game-ui) .team-relic-current-copy b span{font-size:calc(13 * var(--ui-length-unit,1px));color:#c7b27f;}
+:is(#game-stage,#game-ui) .team-relic-current-copy p{margin:calc(4 * var(--ui-length-unit,1px)) 0 0;color:#d8ccb7;font-size:calc(15 * var(--ui-length-unit,1px));line-height:calc(21 * var(--ui-length-unit,1px));}
+:is(#game-stage,#game-ui) .team-relic-current-actions{display:flex;gap:calc(6 * var(--ui-length-unit,1px));justify-content:flex-end;}
 :is(#game-stage,#game-ui) .team-relic-current-actions button,:is(#game-stage,#game-ui) .team-relic-select-first{
-    min-width:68px;
-    min-height:44px;
-    padding:7px 10px;
-    border:1px solid rgba(200,154,72,.40);
-    border-radius:7px;
+    min-width:calc(68 * var(--ui-length-unit,1px));
+    min-height:calc(44 * var(--ui-length-unit,1px));
+    padding:calc(7 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(200,154,72,.40);
+    border-radius:calc(7 * var(--ui-length-unit,1px));
     background:linear-gradient(180deg,#2b2419,#14110d);
     color:#ead9b4;
-    font-size:15px;
+    font-size:calc(15 * var(--ui-length-unit,1px));
     font-weight:900;
 }
-:is(#game-stage,#game-ui) .team-relic-current-card.empty{grid-template-columns:60px minmax(0,1fr) auto;align-items:center;}
-:is(#game-stage,#game-ui) .team-relic-empty-slot{grid-row:1/3;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border:1px dashed #7d653d;border-radius:10px;color:#7f725c;font:900 24px "Noto Serif TC",serif;background:#0a0908;}
+:is(#game-stage,#game-ui) .team-relic-current-card.empty{grid-template-columns:calc(60 * var(--ui-length-unit,1px)) minmax(0,1fr) auto;align-items:center;}
+:is(#game-stage,#game-ui) .team-relic-empty-slot{grid-row:1/3;width:calc(52 * var(--ui-length-unit,1px));height:calc(52 * var(--ui-length-unit,1px));display:flex;align-items:center;justify-content:center;border:calc(1 * var(--ui-length-unit,1px)) dashed #7d653d;border-radius:calc(10 * var(--ui-length-unit,1px));color:#7f725c;font:900 calc(24 * var(--ui-length-unit,1px)) "Noto Serif TC",serif;background:#0a0908;}
 :is(#game-stage,#game-ui) .team-relic-current-card.empty .team-relic-select-first{grid-column:3;grid-row:1/3;}
-:is(#game-stage,#game-ui) .team-relic-tabs{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:2px 1px 8px;margin:0 -1px 7px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scrollbar-width:none;}
+:is(#game-stage,#game-ui) .team-relic-tabs{display:flex;gap:calc(6 * var(--ui-length-unit,1px));overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:calc(2 * var(--ui-length-unit,1px)) calc(1 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px));margin:0 calc(-1 * var(--ui-length-unit,1px)) calc(7 * var(--ui-length-unit,1px));-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scrollbar-width:none;}
 :is(#game-stage,#game-ui) .team-relic-tabs::-webkit-scrollbar{display:none;}
 :is(#game-stage,#game-ui) .team-relic-tabs button{
     flex:0 0 auto;
-    min-width:52px;
-    min-height:44px;
-    padding:8px 11px;
-    border:1px solid rgba(123,95,53,.62);
-    border-radius:22px;
+    min-width:calc(52 * var(--ui-length-unit,1px));
+    min-height:calc(44 * var(--ui-length-unit,1px));
+    padding:calc(8 * var(--ui-length-unit,1px)) calc(11 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(123,95,53,.62);
+    border-radius:calc(22 * var(--ui-length-unit,1px));
     background:#15110d;
     color:#bcb09b;
-    font-size:15px;
+    font-size:calc(15 * var(--ui-length-unit,1px));
     font-weight:800;
 }
-:is(#game-stage,#game-ui) .team-relic-tabs button.active{border-color:#d6a24a;color:#f2d38c;background:linear-gradient(180deg,#4b3218,#20150b);box-shadow:0 0 8px rgba(208,153,62,.18);}
-:is(#game-stage,#game-ui) .team-relic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px;padding-bottom:14px;}
+:is(#game-stage,#game-ui) .team-relic-tabs button.active{border-color:#d6a24a;color:#f2d38c;background:linear-gradient(180deg,#4b3218,#20150b);box-shadow:0 0 calc(8 * var(--ui-length-unit,1px)) rgba(208,153,62,.18);}
+:is(#game-stage,#game-ui) .team-relic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,calc(240 * var(--ui-length-unit,1px))),1fr));gap:calc(12 * var(--ui-length-unit,1px));padding-bottom:calc(14 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .team-relic-card{
     position:relative;
     min-width:0;
-    min-height:184px;
-    padding:8px;
-    border:1px solid rgba(200,154,72,.20);
-    border-radius:9px;
+    min-height:calc(184 * var(--ui-length-unit,1px));
+    padding:calc(8 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(200,154,72,.20);
+    border-radius:calc(9 * var(--ui-length-unit,1px));
     background:linear-gradient(155deg,rgba(27,21,14,.76),rgba(8,7,5,.92));
     color:#ded3c0;
     display:grid;
-    grid-template-columns:68px minmax(0,1fr);
-    grid-template-rows:min-content min-content 38px;
-    gap:3px 8px;
+    grid-template-columns:calc(68 * var(--ui-length-unit,1px)) minmax(0,1fr);
+    grid-template-rows:min-content min-content calc(38 * var(--ui-length-unit,1px));
+    gap:calc(3 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px));
     align-content:center;
     align-items:center;
     text-align:left;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.02),0 4px 10px rgba(0,0,0,.28);
+    box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(255,238,196,.02),0 calc(4 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px)) rgba(0,0,0,.28);
     -webkit-tap-highlight-color:transparent;
 }
 :is(#game-stage,#game-ui) .team-relic-card:active{transform:scale(.98);filter:brightness(1.08);}
 :is(#game-stage,#game-ui) .team-relic-card.locked{filter:saturate(.35) brightness(.65);}
-:is(#game-stage,#game-ui) .team-relic-card.equipped{box-shadow:0 0 0 1px #d8aa55,0 0 12px rgba(214,166,75,.32),inset 0 0 12px rgba(214,166,75,.06);}
-:is(#game-stage,#game-ui) .team-relic-card-art{grid-column:1;grid-row:1/3;width:68px;display:flex;align-items:center;justify-content:center;margin:0;border-radius:7px;}
-:is(#game-stage,#game-ui) .team-relic-card-name{grid-column:2;grid-row:1;align-self:end;min-width:0;font-family:"Noto Serif TC",serif;font-size:16px;line-height:21px;font-weight:900;color:#f0dfbd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-:is(#game-stage,#game-ui) .team-relic-card-meta{grid-column:2;grid-row:2;align-self:start;min-width:0;font-size:14px;line-height:19px;color:#b0a38f;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-:is(#game-stage,#game-ui) .team-relic-card em{position:absolute;right:5px;top:5px;z-index:4;padding:2px 6px;border:1px solid #d8aa55;border-radius:10px;background:#3c2710;color:#ffe19a;font-size:13px;line-height:17px;font-style:normal;font-weight:900;}
+:is(#game-stage,#game-ui) .team-relic-card.equipped{box-shadow:0 0 0 calc(1 * var(--ui-length-unit,1px)) #d8aa55,0 0 calc(12 * var(--ui-length-unit,1px)) rgba(214,166,75,.32),inset 0 0 calc(12 * var(--ui-length-unit,1px)) rgba(214,166,75,.06);}
+:is(#game-stage,#game-ui) .team-relic-card-art{grid-column:1;grid-row:1/3;width:calc(68 * var(--ui-length-unit,1px));display:flex;align-items:center;justify-content:center;margin:0;border-radius:calc(7 * var(--ui-length-unit,1px));}
+:is(#game-stage,#game-ui) .team-relic-card-name{grid-column:2;grid-row:1;align-self:end;min-width:0;font-family:"Noto Serif TC",serif;font-size:calc(16 * var(--ui-length-unit,1px));line-height:calc(21 * var(--ui-length-unit,1px));font-weight:900;color:#f0dfbd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+:is(#game-stage,#game-ui) .team-relic-card-meta{grid-column:2;grid-row:2;align-self:start;min-width:0;font-size:calc(14 * var(--ui-length-unit,1px));line-height:calc(19 * var(--ui-length-unit,1px));color:#b0a38f;margin-top:calc(2 * var(--ui-length-unit,1px));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+:is(#game-stage,#game-ui) .team-relic-card em{position:absolute;right:calc(5 * var(--ui-length-unit,1px));top:calc(5 * var(--ui-length-unit,1px));z-index:4;padding:calc(2 * var(--ui-length-unit,1px)) calc(6 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #d8aa55;border-radius:calc(10 * var(--ui-length-unit,1px));background:#3c2710;color:#ffe19a;font-size:calc(13 * var(--ui-length-unit,1px));line-height:calc(17 * var(--ui-length-unit,1px));font-style:normal;font-weight:900;}
 :is(#game-stage,#game-ui) .team-relic-card .team-relic-card-open-overlay{position:absolute;inset:0;z-index:1;width:100%;height:100%;margin:0;padding:0;border:0;border-radius:inherit;background:transparent;box-shadow:none;}
 :is(#game-stage,#game-ui) .team-relic-card .team-relic-card-art,
 :is(#game-stage,#game-ui) .team-relic-card .team-relic-card-name,
 :is(#game-stage,#game-ui) .team-relic-card .team-relic-card-meta{position:relative;z-index:2;pointer-events:none;}
-:is(#game-stage,#game-ui) .team-relic-card .team-relic-equip{grid-column:1/-1;grid-row:3;z-index:3;align-self:end;min-height:34px;margin-top:5px;border:1px solid rgba(218,170,77,.78);border-radius:7px;background:linear-gradient(180deg,#533719,#24160b);color:#ffe09a;font-size:15px;line-height:20px;font-weight:900;}
+:is(#game-stage,#game-ui) .team-relic-card .team-relic-equip{grid-column:1/-1;grid-row:3;z-index:3;align-self:end;min-height:calc(34 * var(--ui-length-unit,1px));margin-top:calc(5 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid rgba(218,170,77,.78);border-radius:calc(7 * var(--ui-length-unit,1px));background:linear-gradient(180deg,#533719,#24160b);color:#ffe09a;font-size:calc(15 * var(--ui-length-unit,1px));line-height:calc(20 * var(--ui-length-unit,1px));font-weight:900;}
 :is(#game-stage,#game-ui) .team-relic-card .team-relic-equip:disabled{opacity:.5;filter:grayscale(.45);}
-:is(#game-stage,#game-ui) .team-relic-placeholder{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;position:relative;border:2px solid #8b6a34;background:radial-gradient(circle at 50% 45%,#49331a,#0a0908 72%);box-shadow:inset 0 0 11px rgba(246,205,119,.09),0 0 8px rgba(0,0,0,.5);}
-:is(#game-stage,#game-ui) .team-relic-placeholder.large{width:66px;height:66px;}
-:is(#game-stage,#game-ui) .team-relic-placeholder i{font-style:normal;font:900 24px "Noto Serif TC",serif;color:#d8bd7b;text-shadow:0 1px 1px #000;}
-:is(#game-stage,#game-ui) .team-relic-placeholder b{position:absolute;right:-4px;bottom:-4px;min-width:21px;height:21px;line-height:21px;text-align:center;border-radius:50%;border:1px solid #8b6a34;background:#120e09;color:#bca46d;font-size:13px;}
+:is(#game-stage,#game-ui) .team-relic-placeholder{width:calc(54 * var(--ui-length-unit,1px));height:calc(54 * var(--ui-length-unit,1px));border-radius:50%;display:grid;place-items:center;position:relative;border:calc(2 * var(--ui-length-unit,1px)) solid #8b6a34;background:radial-gradient(circle at 50% 45%,#49331a,#0a0908 72%);box-shadow:inset 0 0 calc(11 * var(--ui-length-unit,1px)) rgba(246,205,119,.09),0 0 calc(8 * var(--ui-length-unit,1px)) rgba(0,0,0,.5);}
+:is(#game-stage,#game-ui) .team-relic-placeholder.large{width:calc(66 * var(--ui-length-unit,1px));height:calc(66 * var(--ui-length-unit,1px));}
+:is(#game-stage,#game-ui) .team-relic-placeholder i{font-style:normal;font:900 calc(24 * var(--ui-length-unit,1px)) "Noto Serif TC",serif;color:#d8bd7b;text-shadow:0 calc(1 * var(--ui-length-unit,1px)) calc(1 * var(--ui-length-unit,1px)) #000;}
+:is(#game-stage,#game-ui) .team-relic-placeholder b{position:absolute;right:calc(-4 * var(--ui-length-unit,1px));bottom:calc(-4 * var(--ui-length-unit,1px));min-width:calc(21 * var(--ui-length-unit,1px));height:calc(21 * var(--ui-length-unit,1px));line-height:calc(21 * var(--ui-length-unit,1px));text-align:center;border-radius:50%;border:calc(1 * var(--ui-length-unit,1px)) solid #8b6a34;background:#120e09;color:#bca46d;font-size:calc(13 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .team-relic-card.rarity-white,
 :is(#game-stage,#game-ui) .team-relic-detail-hero.rarity-white{border-color:#d8d8d8!important;}
 :is(#game-stage,#game-ui) .team-relic-card.rarity-blue,
@@ -122,28 +122,28 @@
 :is(#game-stage,#game-ui) .team-relic-detail-hero.rarity-pink{border-color:#FF4FA7!important;}
 :is(#game-stage,#game-ui) .team-relic-card.rarity-four-symbol,
 :is(#game-stage,#game-ui) .team-relic-detail-hero.rarity-four-symbol{
-    border:2px solid transparent!important;
+    border:calc(2 * var(--ui-length-unit,1px)) solid transparent!important;
     background:linear-gradient(160deg,#1b1712,#090807) padding-box,conic-gradient(from 0deg,#FF5A36 0 25%,#42A5FF 25% 50%,#47D6A3 50% 75%,#C89B45 75% 100%) border-box!important;
-    box-shadow:0 0 8px rgba(255,90,54,.28),0 0 12px rgba(66,165,255,.28),0 0 14px rgba(71,214,163,.24);
+    box-shadow:0 0 calc(8 * var(--ui-length-unit,1px)) rgba(255,90,54,.28),0 0 calc(12 * var(--ui-length-unit,1px)) rgba(66,165,255,.28),0 0 calc(14 * var(--ui-length-unit,1px)) rgba(71,214,163,.24);
     animation:teamRelicFourSymbolRarityBreath 2.8s ease-in-out infinite;
 }
 @keyframes teamRelicFourSymbolRarityBreath{
     0%,100%{box-shadow:0 0 7px rgba(255,90,54,.24),0 0 10px rgba(66,165,255,.24),0 0 12px rgba(71,214,163,.2);}
     50%{box-shadow:0 0 11px rgba(255,90,54,.42),0 0 16px rgba(66,165,255,.4),0 0 18px rgba(71,214,163,.34),0 0 14px rgba(200,155,69,.3);}
 }
-#game-ui #homeFeatureModal.team-relic-modal .team-relic-detail-back{position:absolute;top:5px;right:8px;z-index:6;min-width:126px;height:38px;margin:0;padding:0 10px;border:1px solid #8a6a3a;border-radius:7px;background:linear-gradient(180deg,#2c2419,#0f0c09);color:#f4ead4;font-size:0!important;font-weight:900;text-shadow:0 1px 2px #000;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 6px rgba(0,0,0,.45);}
-#game-ui #homeFeatureModal.team-relic-modal .team-relic-detail-back::after{content:"返回秘寶列表";font-size:15px;line-height:36px;white-space:nowrap;}
-:is(#game-stage,#game-ui) .team-relic-detail-hero{display:grid;grid-template-columns:minmax(96px,34%) minmax(0,1fr);grid-template-rows:auto auto auto;gap:2px 12px;align-items:center;text-align:left;padding:13px 12px;margin-bottom:9px;border:1px solid #7d643d;border-radius:11px;background:radial-gradient(circle at 28% 50%,rgba(71,48,21,.9),rgba(8,8,7,.96) 72%);}
-:is(#game-stage,#game-ui) .team-relic-detail-art{grid-column:1;grid-row:1/4;width:100%;max-width:132px;display:flex;align-items:center;justify-content:center;justify-self:center;margin:0;border-radius:10px;}
-:is(#game-stage,#game-ui) .team-relic-detail-hero h2{grid-column:2;grid-row:1;align-self:end;min-width:0;margin:0 0 3px;font:900 22px/27px "Noto Serif TC",serif;color:#f2dcaa;letter-spacing:.08em;overflow-wrap:anywhere;}
-:is(#game-stage,#game-ui) .team-relic-detail-hero p{grid-column:2;grid-row:2;min-width:0;margin:0;color:#c3b493;font-size:15px;line-height:21px;}
-:is(#game-stage,#game-ui) .team-relic-detail-hero strong{grid-column:2;grid-row:3;align-self:start;min-width:0;display:block;margin-top:4px;color:#d0bd87;font-size:14px;line-height:20px;overflow-wrap:anywhere;}
-:is(#game-stage,#game-ui) .team-relic-detail section{margin-bottom:8px;padding:10px;border:1px solid rgba(127,99,57,.46);border-radius:8px;background:rgba(16,13,10,.78);}
-:is(#game-stage,#game-ui) .team-relic-detail section h3{margin:0 0 5px;color:#d4af67;font-size:18px;line-height:23px;letter-spacing:.05em;}
-:is(#game-stage,#game-ui) .team-relic-detail section p{margin:0;color:#ddd2bf;font-size:15px;line-height:21px;}
-:is(#game-stage,#game-ui) .team-relic-upgrade b{display:block;margin-top:5px;color:#f0d18a;font-size:16px;line-height:21px;}
-:is(#game-stage,#game-ui) .team-relic-detail-actions{position:sticky;bottom:-9px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:9px 0;background:linear-gradient(180deg,rgba(7,7,6,0),#070706 30%);}
-:is(#game-stage,#game-ui) .team-relic-detail-actions button{min-height:44px;border:1px solid #bc8a3e;border-radius:8px;background:linear-gradient(180deg,#543719,#24150a);color:#ffe09a;font-size:15px;font-weight:900;}
+#game-ui #homeFeatureModal.team-relic-modal .team-relic-detail-back{position:absolute;top:15px;right:24px;z-index:6;min-width:378px;height:114px;margin:0;padding:0 30px;border:3px solid #8a6a3a;border-radius:21px;background:linear-gradient(180deg,#2c2419,#0f0c09);color:#f4ead4;font-size:0!important;font-weight:900;text-shadow:0 3px 6px #000;box-shadow:inset 0 3px 0 rgba(255,255,255,.05),0 6px 18px rgba(0,0,0,.45);}
+#game-ui #homeFeatureModal.team-relic-modal .team-relic-detail-back::after{content:"返回秘寶列表";font-size:45px;line-height:108px;white-space:nowrap;}
+:is(#game-stage,#game-ui) .team-relic-detail-hero{display:grid;grid-template-columns:minmax(calc(96 * var(--ui-length-unit,1px)),34%) minmax(0,1fr);grid-template-rows:auto auto auto;gap:calc(2 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px));align-items:center;text-align:left;padding:calc(13 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px));margin-bottom:calc(9 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #7d643d;border-radius:calc(11 * var(--ui-length-unit,1px));background:radial-gradient(circle at 28% 50%,rgba(71,48,21,.9),rgba(8,8,7,.96) 72%);}
+:is(#game-stage,#game-ui) .team-relic-detail-art{grid-column:1;grid-row:1/4;width:100%;max-width:calc(132 * var(--ui-length-unit,1px));display:flex;align-items:center;justify-content:center;justify-self:center;margin:0;border-radius:calc(10 * var(--ui-length-unit,1px));}
+:is(#game-stage,#game-ui) .team-relic-detail-hero h2{grid-column:2;grid-row:1;align-self:end;min-width:0;margin:0 0 calc(3 * var(--ui-length-unit,1px));font:900 calc(22 * var(--ui-length-unit,1px))/calc(27 * var(--ui-length-unit,1px)) "Noto Serif TC",serif;color:#f2dcaa;letter-spacing:.08em;overflow-wrap:anywhere;}
+:is(#game-stage,#game-ui) .team-relic-detail-hero p{grid-column:2;grid-row:2;min-width:0;margin:0;color:#c3b493;font-size:calc(15 * var(--ui-length-unit,1px));line-height:calc(21 * var(--ui-length-unit,1px));}
+:is(#game-stage,#game-ui) .team-relic-detail-hero strong{grid-column:2;grid-row:3;align-self:start;min-width:0;display:block;margin-top:calc(4 * var(--ui-length-unit,1px));color:#d0bd87;font-size:calc(14 * var(--ui-length-unit,1px));line-height:calc(20 * var(--ui-length-unit,1px));overflow-wrap:anywhere;}
+:is(#game-stage,#game-ui) .team-relic-detail section{margin-bottom:calc(8 * var(--ui-length-unit,1px));padding:calc(10 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid rgba(127,99,57,.46);border-radius:calc(8 * var(--ui-length-unit,1px));background:rgba(16,13,10,.78);}
+:is(#game-stage,#game-ui) .team-relic-detail section h3{margin:0 0 calc(5 * var(--ui-length-unit,1px));color:#d4af67;font-size:calc(18 * var(--ui-length-unit,1px));line-height:calc(23 * var(--ui-length-unit,1px));letter-spacing:.05em;}
+:is(#game-stage,#game-ui) .team-relic-detail section p{margin:0;color:#ddd2bf;font-size:calc(15 * var(--ui-length-unit,1px));line-height:calc(21 * var(--ui-length-unit,1px));}
+:is(#game-stage,#game-ui) .team-relic-upgrade b{display:block;margin-top:calc(5 * var(--ui-length-unit,1px));color:#f0d18a;font-size:calc(16 * var(--ui-length-unit,1px));line-height:calc(21 * var(--ui-length-unit,1px));}
+:is(#game-stage,#game-ui) .team-relic-detail-actions{position:sticky;bottom:calc(-9 * var(--ui-length-unit,1px));display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(8 * var(--ui-length-unit,1px));padding:calc(9 * var(--ui-length-unit,1px)) 0;background:linear-gradient(180deg,rgba(7,7,6,0),#070706 30%);}
+:is(#game-stage,#game-ui) .team-relic-detail-actions button{min-height:calc(44 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #bc8a3e;border-radius:calc(8 * var(--ui-length-unit,1px));background:linear-gradient(180deg,#543719,#24150a);color:#ffe09a;font-size:calc(15 * var(--ui-length-unit,1px));font-weight:900;}
 :is(#game-stage,#game-ui) .team-relic-detail-actions button:disabled{opacity:.42;filter:grayscale(.5);}
 /* Relic battle cinematic owner: viewport dim -> target apertures -> identity -> VFX -> restore.
    The presentation is a document-level fixed surface so Dungeon/Tower/Boss DOM
@@ -188,8 +188,6 @@ body > .team-relic-battle-presentation .team-relic-battle-cutin-copy strong{
 #game-stage .team-relic-battle-icon{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border:1px solid #c59643;border-radius:9px;background:#21150a;overflow:hidden;}
 #game-stage .team-relic-battle-icon img{display:block;width:100%;height:100%;object-fit:contain;}
 
-@media(max-width:390px){:is(#game-stage,#game-ui) .team-relic-current-card{grid-template-columns:68px minmax(0,1fr);padding:8px;}:is(#game-stage,#game-ui) .team-relic-current-art{width:68px;}:is(#game-stage,#game-ui) .team-relic-card{grid-template-columns:62px minmax(0,1fr);min-height:178px;padding:7px;gap:3px 7px;}:is(#game-stage,#game-ui) .team-relic-card-art{width:62px;}:is(#game-stage,#game-ui) .team-relic-detail-hero{grid-template-columns:minmax(92px,34%) minmax(0,1fr);gap:2px 9px;padding:12px 10px;}}
-
 /* Foreground Projection: transparent artwork plus data-driven HP and SP bars. */
 .team-relic-battle-dim{position:absolute;inset:0;background:#000;opacity:0;transition:opacity var(--team-relic-dim-in,180ms) ease;pointer-events:none;}
 .team-relic-battle-presentation.dim-visible .team-relic-battle-dim{opacity:.78;}
@@ -197,10 +195,10 @@ body > .team-relic-battle-presentation .team-relic-battle-cutin-copy strong{
 .team-relic-battle-presentation.targets-visible .team-relic-target-projection-layer{opacity:1;}
 .team-relic-target-projection-art,.team-relic-target-projection-resource{position:absolute;box-sizing:border-box;pointer-events:none;}
 .team-relic-target-projection-art{background-color:transparent;}
-.team-relic-target-projection-resource{overflow:hidden;border-radius:5px;}
+.team-relic-target-projection-resource{overflow:hidden;border-radius:calc(5 * var(--ui-length-unit,1px));}
 .team-relic-target-projection-resource-fill{position:absolute;inset:0 auto 0 0;height:100%;transition:width .25s ease;}
 .team-relic-target-projection-hp{background:#3a1111;}
 .team-relic-target-projection-hp .team-relic-target-projection-resource-fill{background:linear-gradient(180deg,#f0605c,#c81e1e);}
 .team-relic-target-projection-sp{background:#101f45;}
 .team-relic-target-projection-sp .team-relic-target-projection-resource-fill{background:linear-gradient(180deg,#5b8fff,#2050c0);}
-.team-relic-target-projection-shield{position:absolute;top:0;bottom:0;background:rgba(255,255,255,.86);box-shadow:inset 0 0 2px rgba(0,0,0,.35);}
+.team-relic-target-projection-shield{position:absolute;top:0;bottom:0;background:rgba(255,255,255,.86);box-shadow:inset 0 0 calc(2 * var(--ui-length-unit,1px)) rgba(0,0,0,.35);}

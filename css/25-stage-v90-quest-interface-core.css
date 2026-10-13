@@ -8,26 +8,26 @@
 ========================================================= */
 
 #game-ui #homeFeatureModal.quest-mode{
-    padding:12px !important;
+    padding:36px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .home-feature-modal-box{
     width:100% !important;
-    max-width:var(--ui-large-panel-max-width,396px) !important;
-    height:min(var(--ui-large-panel-height,620px),calc(100% - var(--ui-large-panel-safe-space,24px))) !important;
-    max-height:calc(100% - var(--ui-large-panel-safe-space,24px)) !important;
+    max-width:var(--ui-large-panel-max-width,1188px) !important;
+    height:min(var(--ui-large-panel-height,1860px),calc(100% - var(--ui-large-panel-safe-space,72px))) !important;
+    max-height:calc(100% - var(--ui-large-panel-safe-space,72px)) !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
     overflow:hidden !important;
-    padding:11px !important;
+    padding:33px !important;
     box-sizing:border-box !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .home-feature-modal-title{
     flex:0 0 auto !important;
-    margin-bottom:6px !important;
-    font-size:20px !important;
+    margin-bottom:18px !important;
+    font-size:60px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode #homeFeatureModalBody{
@@ -49,19 +49,19 @@
     display:grid !important;
     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
     gap:0 !important;
-    margin:0 0 5px !important;
-    border-bottom:1px solid rgba(138,106,58,.55) !important;
+    margin:0 0 15px !important;
+    border-bottom:3px solid rgba(138,106,58,.55) !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-tab{
     position:relative !important;
-    min-height:44px !important;
-    padding:7px 4px 9px !important;
+    min-height:132px !important;
+    padding:21px 12px 27px !important;
     border:0 !important;
     border-radius:0 !important;
     background:transparent !important;
     color:#b9aa91 !important;
-    font-size:14px !important;
+    font-size:42px !important;
     font-weight:700 !important;
     line-height:1 !important;
     box-shadow:none !important;
@@ -72,9 +72,9 @@
     position:absolute !important;
     left:18% !important;
     right:18% !important;
-    bottom:-1px !important;
-    height:3px !important;
-    border-radius:3px 3px 0 0 !important;
+    bottom:-3px !important;
+    height:9px !important;
+    border-radius:9px 9px 0 0 !important;
     background:transparent !important;
 }
 
@@ -84,7 +84,7 @@
 
 #game-ui #homeFeatureModal.quest-mode .quest-tab.active::after{
     background:#f0b429 !important;
-    box-shadow:0 0 7px rgba(240,180,41,.45) !important;
+    box-shadow:0 0 21px rgba(240,180,41,.45) !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-tab-body{
@@ -95,22 +95,22 @@
     -webkit-overflow-scrolling:touch !important;
     overscroll-behavior-y:contain !important;
     touch-action:pan-y !important;
-    padding:2px 2px 6px !important;
+    padding:6px 6px 18px !important;
     scrollbar-gutter:stable !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-list{
     display:flex !important;
     flex-direction:column !important;
-    gap:7px !important;
+    gap:21px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-card{
-    padding:10px 10px !important;
-    border:1px solid rgba(200,154,72,.20) !important;
-    border-radius:9px !important;
+    padding:30px 30px !important;
+    border:3px solid rgba(200,154,72,.20) !important;
+    border-radius:27px !important;
     background:linear-gradient(155deg,rgba(29,22,14,.66),rgba(9,7,5,.80)) !important;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.02) !important;
+    box-shadow:inset 0 3px 0 rgba(255,238,196,.02) !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-card-head,
@@ -119,25 +119,25 @@
     display:flex !important;
     align-items:center !important;
     justify-content:space-between !important;
-    gap:6px !important;
+    gap:18px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-card-name{
     min-width:0 !important;
     color:#f3e7cc !important;
-    font-size:14px !important;
+    font-size:42px !important;
     font-weight:800 !important;
     line-height:1.15 !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-status{
     flex:0 0 auto !important;
-    padding:3px 7px !important;
-    border:1px solid rgba(138,106,58,.65) !important;
-    border-radius:999px !important;
+    padding:9px 21px !important;
+    border:3px solid rgba(138,106,58,.65) !important;
+    border-radius:2997px !important;
     color:#c9bca6 !important;
     background:#17110b !important;
-    font-size:10px !important;
+    font-size:30px !important;
     font-weight:700 !important;
 }
 
@@ -151,29 +151,29 @@
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-card-desc{
-    margin-top:2px !important;
+    margin-top:6px !important;
     color:#b9aa91 !important;
-    font-size:11px !important;
+    font-size:33px !important;
     line-height:1.32 !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-progress-line{
-    margin-top:6px !important;
+    margin-top:18px !important;
     color:#aa9b83 !important;
-    font-size:10px !important;
+    font-size:30px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-progress-line strong{
     color:#e7d6b7 !important;
-    font-size:11px !important;
+    font-size:33px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-progress-track{
-    height:6px !important;
-    margin-top:4px !important;
+    height:18px !important;
+    margin-top:12px !important;
     overflow:hidden !important;
-    border:1px solid rgba(138,106,58,.55) !important;
-    border-radius:999px !important;
+    border:3px solid rgba(138,106,58,.55) !important;
+    border-radius:2997px !important;
     background:#090705 !important;
 }
 
@@ -185,7 +185,7 @@
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-card-foot{
-    margin-top:7px !important;
+    margin-top:21px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-reward{
@@ -193,9 +193,9 @@
     display:flex !important;
     flex-wrap:wrap !important;
     align-items:center !important;
-    gap:4px 6px !important;
+    gap:12px 18px !important;
     color:#e0cda8 !important;
-    font-size:10px !important;
+    font-size:30px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-reward-label{
@@ -205,14 +205,14 @@
 
 #game-ui #homeFeatureModal.quest-mode .quest-claim-btn{
     flex:0 0 auto !important;
-    min-width:68px !important;
-    min-height:44px !important;
-    padding:5px 9px !important;
-    border:1px solid #a67836 !important;
-    border-radius:6px !important;
+    min-width:204px !important;
+    min-height:132px !important;
+    padding:15px 27px !important;
+    border:3px solid #a67836 !important;
+    border-radius:18px !important;
     background:linear-gradient(180deg,#5d2417,#2c100a) !important;
     color:#ffe27a !important;
-    font-size:11px !important;
+    font-size:33px !important;
     font-weight:800 !important;
 }
 
@@ -223,36 +223,36 @@
 /* ----- V90 enlarged fixed completion reward area ----- */
 #game-ui #homeFeatureModal.quest-mode .quest-completion-panel{
     flex:0 0 auto !important;
-    margin-top:7px !important;
-    padding:8px 9px 9px !important;
-    border:1px solid rgba(200,154,72,.22) !important;
-    border-radius:10px !important;
+    margin-top:21px !important;
+    padding:24px 27px 27px !important;
+    border:3px solid rgba(200,154,72,.22) !important;
+    border-radius:30px !important;
     background:linear-gradient(180deg,rgba(26,19,12,.82),rgba(10,8,6,.88)) !important;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.02) !important;
+    box-shadow:inset 0 3px 0 rgba(255,238,196,.02) !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-completion-head{
     display:flex !important;
     align-items:center !important;
     justify-content:space-between !important;
-    gap:8px !important;
+    gap:24px !important;
     color:#e8d5ad !important;
-    font-size:11px !important;
+    font-size:33px !important;
     font-weight:800 !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-completion-head strong{
     color:#ffe27a !important;
-    font-size:12px !important;
+    font-size:36px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-completion-track{
-    height:5px !important;
-    margin:5px 0 7px !important;
+    height:15px !important;
+    margin:15px 0 21px !important;
     overflow:hidden !important;
-    border-radius:999px !important;
+    border-radius:2997px !important;
     background:#080604 !important;
-    border:1px solid rgba(138,106,58,.48) !important;
+    border:3px solid rgba(138,106,58,.48) !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-completion-fill{
@@ -264,7 +264,7 @@
 #game-ui #homeFeatureModal.quest-mode .quest-completion-milestones{
     display:grid !important;
     grid-template-columns:repeat(5,minmax(0,1fr)) !important;
-    gap:6px !important;
+    gap:18px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-milestone{
@@ -278,9 +278,9 @@
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-milestone-percent{
-    margin-bottom:4px !important;
+    margin-bottom:12px !important;
     color:#bfae91 !important;
-    font-size:10px !important;
+    font-size:30px !important;
     font-weight:800 !important;
 }
 
@@ -290,24 +290,24 @@
 
 #game-ui #homeFeatureModal.quest-mode .quest-milestone-slot{
     position:relative !important;
-    min-height:78px !important;
+    min-height:234px !important;
     display:flex !important;
     flex-direction:column !important;
     align-items:center !important;
     justify-content:center !important;
-    padding:4px !important;
-    border:1px solid rgba(138,106,58,.55) !important;
-    border-radius:6px !important;
+    padding:12px !important;
+    border:3px solid rgba(138,106,58,.55) !important;
+    border-radius:18px !important;
     background:rgba(0,0,0,.25) !important;
     color:#8f8371 !important;
-    font-size:9px !important;
+    font-size:27px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-milestone-chest{
     display:block !important;
-    width:48px !important;
-    height:48px !important;
-    margin:0 auto 2px !important;
+    width:144px !important;
+    height:144px !important;
+    margin:0 auto 6px !important;
     object-fit:contain !important;
     opacity:1 !important;
     filter:none !important;
@@ -325,18 +325,18 @@
 
 #game-ui #homeFeatureModal.quest-mode .quest-milestone.reached:not(.claimed) .quest-milestone-slot{
     border-color:#b8862c !important;
-    box-shadow:inset 0 0 8px rgba(240,180,41,.09) !important;
+    box-shadow:inset 0 0 24px rgba(240,180,41,.09) !important;
     color:#d9c59c !important;
 }
 #game-ui #homeFeatureModal.quest-mode .quest-milestone.reached:not(.claimed) .quest-milestone-slot::after{
     content:"" !important;
     position:absolute !important;
-    right:4px !important;
-    top:4px !important;
-    width:9px !important;
-    height:9px !important;
-    border:2px solid #fff0dc !important;
+    right:12px !important;
+    top:12px !important;
+    width:27px !important;
+    height:27px !important;
+    border:6px solid #fff0dc !important;
     border-radius:50% !important;
     background:#ff2d2d !important;
-    box-shadow:0 0 7px rgba(255,45,45,.9) !important;
+    box-shadow:0 0 21px rgba(255,45,45,.9) !important;
 }

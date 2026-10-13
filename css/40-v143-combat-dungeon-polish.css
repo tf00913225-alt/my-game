@@ -384,10 +384,6 @@
 .v143-abyss-dialogue span{color:#c5b99f;font-size:14px !important;animation:v143DialogueHint 1s ease-in-out infinite alternate;}
 @keyframes v143DialogueHint{to{opacity:.52;transform:translateY(3px)}}
 
-@media (max-height:720px){
-    #game-stage #dungeonPage{padding-bottom:82px !important;}
-    #game-stage .v143-abyss-dialogue b{font-size:19px !important;}
-}
 
 @media (prefers-reduced-motion:reduce){
     .v143-vfx-sprite.v143-vfx-sprite-active{

@@ -191,7 +191,7 @@
     min-height:0 !important;
     max-height:none !important;
     overflow:visible !important;
-    padding-bottom:240px !important;
+    padding-bottom:720px !important;
     touch-action:pan-y !important;
 }
 
@@ -208,28 +208,28 @@
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
-    gap:8px !important;
-    border:2px solid #e8a93c !important;
+    gap:calc(8 * var(--ui-length-unit,1px)) !important;
+    border:calc(2 * var(--ui-length-unit,1px)) solid #e8a93c !important;
     background:linear-gradient(135deg,#2d1d0d,#120e09) !important;
     color:#f5ecd9 !important;
-    font-size:15px !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
     font-weight:800 !important;
-    box-shadow:0 0 12px rgba(232,169,60,.28) !important;
+    box-shadow:0 0 calc(12 * var(--ui-length-unit,1px)) rgba(232,169,60,.28) !important;
 }
 
 :is(#game-stage,#game-ui) #skillPage #skillPoints{
     display:inline-flex !important;
-    min-width:52px !important;
-    min-height:34px !important;
+    min-width:calc(52 * var(--ui-length-unit,1px)) !important;
+    min-height:calc(34 * var(--ui-length-unit,1px)) !important;
     align-items:center !important;
     justify-content:center !important;
-    padding:2px 10px !important;
-    border-radius:999px !important;
+    padding:calc(2 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px)) !important;
+    border-radius:calc(999 * var(--ui-length-unit,1px)) !important;
     background:#e8a93c !important;
     color:#17100a !important;
-    font-size:22px !important;
+    font-size:calc(22 * var(--ui-length-unit,1px)) !important;
     line-height:1 !important;
-    box-shadow:0 0 10px rgba(255,224,138,.45) !important;
+    box-shadow:0 0 calc(10 * var(--ui-length-unit,1px)) rgba(255,224,138,.45) !important;
 }
 
 #game-stage #game-overlay-layer #allElementSkillPreviewModal,
@@ -246,7 +246,7 @@
 
 #game-stage #allElementSkillPreviewModal .skill-preview-dialog{
     width:94% !important;
-    height:min(92%,1680px) !important;
+    height:min(92%,calc(1680 * var(--ui-length-unit,1px))) !important;
     max-height:92% !important;
     min-height:0 !important;
     display:flex !important;
@@ -264,7 +264,7 @@
     touch-action:pan-y !important;
     -webkit-overflow-scrolling:touch !important;
     overscroll-behavior-y:contain !important;
-    padding-bottom:90px !important;
+    padding-bottom:calc(90 * var(--ui-length-unit,1px)) !important;
     transform:translateZ(0) !important;
 }
 
@@ -431,41 +431,41 @@
 
 .v131-element-box-stats{
     display:grid;
-    gap:6px;
-    margin:10px 0 8px;
-    padding:10px;
-    border:1px solid #6f5228;
-    border-radius:9px;
+    gap:calc(6 * var(--ui-length-unit,1px));
+    margin:calc(10 * var(--ui-length-unit,1px)) 0 calc(8 * var(--ui-length-unit,1px));
+    padding:calc(10 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid #6f5228;
+    border-radius:calc(9 * var(--ui-length-unit,1px));
     background:#0d0b08;
 }
 
 .v131-element-box-title{
     color:#f0c866;
-    font-size:16px;
+    font-size:calc(16 * var(--ui-length-unit,1px));
     font-weight:900;
-    margin-bottom:2px;
+    margin-bottom:calc(2 * var(--ui-length-unit,1px));
 }
 
 .v131-element-box-stats > div:not(.v131-element-box-title){
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:10px;
-    font-size:14px;
+    gap:calc(10 * var(--ui-length-unit,1px));
+    font-size:calc(14 * var(--ui-length-unit,1px));
     line-height:1.4;
     color:#b9aa8c;
 }
 
 .v131-element-box-stats strong{
     color:#f0dfb7;
-    font-size:15px;
+    font-size:calc(15 * var(--ui-length-unit,1px));
     text-align:right;
 }
 
 .v131-element-box-stats .remaining{
-    margin-top:2px;
-    padding-top:7px;
-    border-top:1px solid rgba(240,180,41,.22);
+    margin-top:calc(2 * var(--ui-length-unit,1px));
+    padding-top:calc(7 * var(--ui-length-unit,1px));
+    border-top:calc(1 * var(--ui-length-unit,1px)) solid rgba(240,180,41,.22);
 }
 
 .v131-element-box-stats .remaining strong{ color:#ffdf69; }
@@ -474,21 +474,21 @@
 :is(#game-stage,#game-ui) #homeExpPoolCard,
 :is(#game-stage,#game-ui) #statusPage,
 :is(#game-stage,#game-ui) #skillPage{
-    font-size:15px;
+    font-size:calc(15 * var(--ui-length-unit,1px));
 }
 
 #game-ui #characterTabContent p,
 #game-ui #characterTabContent small,
 #game-ui #characterTabContent .description,
 :is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-caption{
-    font-size:14px !important;
+    font-size:calc(14 * var(--ui-length-unit,1px)) !important;
     line-height:1.55 !important;
 }
 
 /*
    ★ 修正（依照使用者要求，「技能/能力值/經驗分配/
    能力屬性說明頁面文字再大一點，框框不變動」）：
-   上面 #characterTabContent{font-size:14px} 這條
+   上面 #characterTabContent{font-size:calc(14 * var(--ui-length-unit,1px))} 這條
    只是設「繼承用的預設值」，但下面這幾個元素各自
    都有自己更明確的font-size規則，字級的繼承鏈在
    那裡就被切斷了，所以視覺上根本沒有變大。
@@ -498,16 +498,16 @@
 */
 
 :is(#game-stage,#game-ui) #statusPage .status-row{
-    font-size:15px !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
 }
 
 :is(#game-stage,#game-ui) #allSkillsList .skill-row-desc{
-    font-size:15px !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
     line-height:1.5 !important;
 }
 
 :is(#game-stage,#game-ui) #allSkillsList .skill-row-text b{
-    font-size:17px !important;
+    font-size:calc(17 * var(--ui-length-unit,1px)) !important;
 }
 
 /*
@@ -532,30 +532,30 @@
    標題/分頁按鈕的規則見下面另外新增的區塊。
 */
 #game-stage #allElementSkillPreviewModal .skill-preview-card span{
-    font-size:33px !important;
+    font-size:calc(33 * var(--ui-length-unit,1px)) !important;
 }
 
 #game-stage #allElementSkillPreviewModal .skill-preview-card p{
-    font-size:39px !important;
+    font-size:calc(39 * var(--ui-length-unit,1px)) !important;
     line-height:1.5 !important;
 }
 
 #game-stage #allElementSkillPreviewModal .skill-preview-card strong{
-    font-size:44px !important;
+    font-size:calc(44 * var(--ui-length-unit,1px)) !important;
 }
 
 #game-stage #allElementSkillPreviewModal .skill-preview-heading h2{
-    font-size:49px !important;
+    font-size:calc(49 * var(--ui-length-unit,1px)) !important;
 }
 
 #game-stage #allElementSkillPreviewModal .skill-preview-heading button{
-    font-size:33px !important;
-    padding:10px 16px !important;
+    font-size:calc(33 * var(--ui-length-unit,1px)) !important;
+    padding:calc(10 * var(--ui-length-unit,1px)) calc(16 * var(--ui-length-unit,1px)) !important;
 }
 
 #game-stage #allElementSkillPreviewModal .skill-preview-tabs button{
-    font-size:39px !important;
-    padding:14px 8px !important;
+    font-size:calc(39 * var(--ui-length-unit,1px)) !important;
+    padding:calc(14 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px)) !important;
 }
 
 :is(#game-stage,#game-ui) .stat-explanation{
@@ -602,14 +602,14 @@
 #creationPage .creation-stat-details[open] .creation-stat-details-body,
 #creationPage .creation-stat-details-body{font-size:39px !important;line-height:1.6 !important;}
 #creationPage .creation-start small{font-size:34px !important;line-height:1.25 !important;}
-#creationSkillDetailModal .creation-skill-detail-path{font-size:36px !important;line-height:1.35 !important;}
-#creationSkillDetailModal .creation-skill-detail-tag{font-size:34px !important;line-height:1.3 !important;}
-#creationSkillDetailModal .creation-skill-detail-description{font-size:39px !important;line-height:1.6 !important;}
-#creationSkillDetailModal .creation-skill-detail-meta{font-size:36px !important;line-height:1.55 !important;}
-#creationSkillDetailModal .creation-skill-detail-section-title{font-size:46px !important;line-height:1.3 !important;}
+#creationSkillDetailModal .creation-skill-detail-path{font-size:calc(36 * var(--ui-length-unit,1px)) !important;line-height:1.35 !important;}
+#creationSkillDetailModal .creation-skill-detail-tag{font-size:calc(34 * var(--ui-length-unit,1px)) !important;line-height:1.3 !important;}
+#creationSkillDetailModal .creation-skill-detail-description{font-size:calc(39 * var(--ui-length-unit,1px)) !important;line-height:1.6 !important;}
+#creationSkillDetailModal .creation-skill-detail-meta{font-size:calc(36 * var(--ui-length-unit,1px)) !important;line-height:1.55 !important;}
+#creationSkillDetailModal .creation-skill-detail-section-title{font-size:calc(46 * var(--ui-length-unit,1px)) !important;line-height:1.3 !important;}
 #creationSkillDetailModal .creation-skill-detail-level-row,
-#creationSkillDetailModal .creation-skill-detail-level-row b{font-size:39px !important;line-height:1.55 !important;}
-#creationSkillDetailModal .creation-skill-detail-close{font-size:39px !important;}
+#creationSkillDetailModal .creation-skill-detail-level-row b{font-size:calc(39 * var(--ui-length-unit,1px)) !important;line-height:1.55 !important;}
+#creationSkillDetailModal .creation-skill-detail-close{font-size:calc(39 * var(--ui-length-unit,1px)) !important;}
 
 /* Fixed battlefield ally slots: structural owner, not a positional workaround. */
 #game-stage #battlePlayerRow.v-fixed-ally-formation{
@@ -639,23 +639,24 @@
     height:102px;
 }
 .v146-home-roster>header .v-fixed-formation-entry{
+    font-size:calc(15 * var(--ui-length-unit,1px));
     margin-left:0;
-    min-width:54px;
-    min-height:30px;
-    border:1px solid rgba(223,187,95,.7);
-    border-radius:8px;
+    min-width:calc(54 * var(--ui-length-unit,1px));
+    min-height:calc(30 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(223,187,95,.7);
+    border-radius:calc(8 * var(--ui-length-unit,1px));
     background:rgba(31,24,14,.92);
     color:#f2d783;
     font-weight:800;
 }
-.v-fixed-formation-panel{display:flex;flex-direction:column;gap:14px;}
+.v-fixed-formation-panel{display:flex;flex-direction:column;gap:calc(14 * var(--ui-length-unit,1px));}
 .v-fixed-formation-panel>p{margin:0;text-align:center;line-height:1.5;}
-.v-fixed-formation-row>header{margin-bottom:6px;font-weight:900;color:#e5c76f;}
-.v-fixed-formation-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.v-fixed-formation-row>header{margin-bottom:calc(6 * var(--ui-length-unit,1px));font-weight:900;color:#e5c76f;}
+.v-fixed-formation-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(8 * var(--ui-length-unit,1px));}
 .v-fixed-formation-slot{
-    min-height:72px;padding:8px 4px;border:1px solid rgba(198,165,78,.55);border-radius:10px;
-    background:rgba(20,18,15,.82);color:#f5ead0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+    min-height:calc(72 * var(--ui-length-unit,1px));padding:calc(8 * var(--ui-length-unit,1px)) calc(4 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid rgba(198,165,78,.55);border-radius:calc(10 * var(--ui-length-unit,1px));
+    background:rgba(20,18,15,.82);color:#f5ead0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(5 * var(--ui-length-unit,1px));
 }
-.v-fixed-formation-slot small{font-size:12px;color:#bda96f;}
-.v-fixed-formation-slot strong{font-size:15px;}
-.v-fixed-formation-slot.selected{outline:2px solid #f2cf63;box-shadow:0 0 12px rgba(242,207,99,.35);}
+.v-fixed-formation-slot small{font-size:calc(12 * var(--ui-length-unit,1px));color:#bda96f;}
+.v-fixed-formation-slot strong{font-size:calc(15 * var(--ui-length-unit,1px));}
+.v-fixed-formation-slot.selected{outline:calc(2 * var(--ui-length-unit,1px)) solid #f2cf63;box-shadow:0 0 calc(12 * var(--ui-length-unit,1px)) rgba(242,207,99,.35);}

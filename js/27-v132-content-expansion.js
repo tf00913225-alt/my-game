@@ -2313,7 +2313,7 @@
         modal=document.createElement("div");
         modal.id="v132RewardModal";
         modal.className="v132-reward-modal";
-        document.body.appendChild(modal);
+        document.getElementById("game-ui").appendChild(modal);
         return modal;
     }
 

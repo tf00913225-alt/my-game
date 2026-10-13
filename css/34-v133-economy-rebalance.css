@@ -3,13 +3,13 @@
 */
 
 .v133-shop-tier-note{
-    margin-bottom:10px;
-    padding:6px 10px;
-    border-radius:6px;
+    margin-bottom:calc(10 * var(--ui-length-unit,1px));
+    padding:calc(6 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));
+    border-radius:calc(6 * var(--ui-length-unit,1px));
     background:#100e0b;
-    border:1px solid #6a5230;
+    border:calc(1 * var(--ui-length-unit,1px)) solid #6a5230;
     color:#e8a93c;
-    font-size:12px;
+    font-size:calc(12 * var(--ui-length-unit,1px));
     text-align:center;
     font-weight:bold;
 }

@@ -194,17 +194,17 @@ html, body{
     pointer-events:none;
     user-select:none;
     -webkit-user-drag:none;
-    transform:translateZ(0) scale(.96);
+    transform:none;
     filter:brightness(.88) saturate(.92);
-    transition:filter .14s ease, transform .14s ease;
+    transition:filter .14s ease;
 }
 #game-stage > #game-overlay-layer #bottomNav > .nav-button.active .nav-art-button{
     filter:brightness(1.12) saturate(1.08) drop-shadow(0 0 5px rgba(240,180,41,.58));
-    transform:translateZ(0) scale(1.02);
+    transform:none;
 }
 #game-stage > #game-overlay-layer #bottomNav > .nav-button:active .nav-art-button{
     filter:brightness(1.2) saturate(1.08);
-    transform:translateZ(0) scale(.92);
+    transform:none;
 }
 #game-stage > #game-overlay-layer #bottomNav > .nav-button > *{pointer-events:none;}
 /* Notification contract for the native 1080 x 1920 plane.  Twenty-two
@@ -221,16 +221,6 @@ html, body{
     border-width:2px;
     z-index:30;
 }
-
-/* Browser-domain navigation shares the same shell and buttons. */
-#game-ui > .native-bottom-nav-layer{grid-row:2;width:min(100%,var(--ui-page-max-width));margin:0 auto;height:76px;pointer-events:auto;}
-#game-ui > .native-bottom-nav-layer[hidden]{display:none;}
-#game-ui #bottomNav{position:relative;inset:auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));width:100%;max-width:none;height:100%;margin:0;transform:none;box-sizing:border-box;border:0;border-top:2px solid #8a6a3a;background:linear-gradient(0deg,#0e0c0a,#1c1712);}
-#game-ui #bottomNav > .nav-button{position:relative;display:grid;place-items:center;width:100%;height:100%;min-width:0;padding:0;border:0;background:transparent;touch-action:manipulation;}
-#game-ui #bottomNav .nav-icon-frame{width:64px;height:64px;pointer-events:none;}
-#game-ui #bottomNav .nav-art-button{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;filter:brightness(.88);transition:filter .14s ease;}
-#game-ui #bottomNav .active .nav-art-button{filter:brightness(1.12) drop-shadow(0 0 5px rgba(240,180,41,.58));}
-#game-ui #bottomNav > .nav-button > .v141-notice-dot{width:8px;height:8px;min-width:8px;min-height:8px;right:12%;top:8px;border-width:1px;}
 
 
 /* bundled source: css/08-stage-v14-character-scroll-fix.css */
@@ -1999,80 +1989,65 @@ html, body{
 
 /* Main-city party HUD is first-screen UI; keep its visual owner in app-shell. */
 /* Home party HUD: three equal horizontal cells, with typography sized for real phone reading. */
-#game-ui #homePage .home-version-badge{font-size:13px;line-height:17px;}
+#game-ui #homePage .home-version-badge{font-size:39px;line-height:51px;}
 #game-ui #homePage .v146-home-roster{
-    position:relative;z-index:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:0 0 auto;gap:4px;
-    margin:5px 10px 0;padding:5px 7px 7px;border:1px solid var(--home-frame-muted);border-radius:8px;color:#f4e7c8;
-    background:linear-gradient(155deg,rgba(23,26,20,.95),rgba(11,13,10,.94));box-shadow:0 4px 12px rgba(0,0,0,.28);
+    position:relative;z-index:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:0 0 auto;gap:12px;
+    margin:15px 30px 0;padding:15px 21px 21px;border:3px solid var(--home-frame-muted);border-radius:24px;color:#f4e7c8;
+    background:linear-gradient(155deg,rgba(23,26,20,.95),rgba(11,13,10,.94));box-shadow:0 12px 36px rgba(0,0,0,.28);
 }
 #game-ui #homePage .v146-home-roster > header{
     grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.55fr) auto;
-    align-items:center;column-gap:8px;min-height:30px;color:#f0cb70;font-size:15px;line-height:20px;letter-spacing:.04em;
+    align-items:center;column-gap:24px;min-height:90px;color:#f0cb70;font-size:45px;line-height:60px;letter-spacing:.04em;
 }
 #game-ui #homePage .v146-home-roster > header>b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-ui #homePage .v146-home-roster > header span{min-width:0;color:#c7ad76;font-size:13px;line-height:18px;font-weight:800;}
+#game-ui #homePage .v146-home-roster > header span{min-width:0;color:#c7ad76;font-size:39px;line-height:54px;font-weight:800;}
 #game-ui #homePage .v146-home-roster > header .v146-home-roster-count{white-space:nowrap;}
 #game-ui #homePage .v146-home-roster > header .v146-home-roster-gold{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-#game-ui #homePage .v146-home-roster > header .v146-home-roster-gold strong{color:#f2cf79;font-size:13px;line-height:18px;font-weight:900;}
+#game-ui #homePage .v146-home-roster > header .v146-home-roster-gold strong{color:#f2cf79;font-size:39px;line-height:54px;font-weight:900;}
 #game-ui #homePage .v146-home-character-placeholder,
 #game-ui #homePage .v146-home-character-empty{opacity:.72;}
 #game-ui #homePage .v146-home-character-placeholder .v146-home-avatar,
 #game-ui #homePage .v146-home-character-empty .v146-home-avatar{background:linear-gradient(135deg,rgba(80,60,34,.42),rgba(18,16,12,.88));}
 #game-ui #v146HomeRoster .team-relic-loadout-slot{
-    grid-column:1/-1;min-height:44px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;
-    grid-template-areas:"label name action";column-gap:6px;row-gap:0;align-items:center;
-    padding:3px 5px;border:1px solid rgba(178,126,49,.52);border-radius:7px;background:linear-gradient(90deg,rgba(42,28,14,.84),rgba(10,9,7,.9));box-sizing:border-box;
+    grid-column:1/-1;min-height:132px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+    grid-template-areas:"label name action";column-gap:18px;row-gap:0;align-items:center;
+    padding:9px 15px;border:3px solid rgba(178,126,49,.52);border-radius:21px;background:linear-gradient(90deg,rgba(42,28,14,.84),rgba(10,9,7,.9));box-sizing:border-box;
 }
-#game-ui #v146HomeRoster .team-relic-loadout-slot>span{grid-area:label;color:#bda46d;font-size:13px;font-weight:800;white-space:nowrap;}
-#game-ui #v146HomeRoster .team-relic-loadout-slot>b{grid-area:name;min-width:0;color:#f2d696;font-size:15px;line-height:19px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#game-ui #v146HomeRoster .team-relic-loadout-slot>span{grid-area:label;color:#bda46d;font-size:39px;font-weight:800;white-space:nowrap;}
+#game-ui #v146HomeRoster .team-relic-loadout-slot>b{grid-area:name;min-width:0;color:#f2d696;font-size:45px;line-height:57px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 #game-ui #v146HomeRoster .team-relic-loadout-slot>small{display:none;}
-#game-ui #v146HomeRoster .team-relic-loadout-slot>button{grid-area:action;min-width:50px;height:30px;min-height:30px;padding:1px 8px;border:1px solid rgba(211,161,70,.7);border-radius:6px;background:linear-gradient(180deg,#493016,#21140a);color:#ffe0a0;font-size:15px;line-height:1;font-weight:900;}
+#game-ui #v146HomeRoster .team-relic-loadout-slot>button{grid-area:action;min-width:150px;height:90px;min-height:90px;padding:3px 24px;border:3px solid rgba(211,161,70,.7);border-radius:18px;background:linear-gradient(180deg,#493016,#21140a);color:#ffe0a0;font-size:45px;line-height:1;font-weight:900;}
 #game-ui #v146HomeRoster .team-relic-loadout-slot>button:disabled{opacity:.5;}
 #game-ui #homePage .v146-home-character{
-    display:grid;grid-template-columns:40px minmax(0,1fr);gap:5px;align-items:center;min-width:0;min-height:84px;padding:5px 4px 5px 3px;
+    display:grid;grid-template-columns:120px minmax(0,1fr);gap:15px;align-items:center;min-width:0;min-height:252px;padding:15px 12px 15px 9px;
     border:0;border-radius:0;background:transparent;
     box-shadow:none;
 }
-#game-ui #homePage .v146-home-avatar{width:40px;height:40px;overflow:hidden;transform:none;border:1px solid rgba(220,174,86,.84);border-radius:50%;background:#090806;box-shadow:0 2px 7px rgba(0,0,0,.58);}
+#game-ui #homePage .v146-home-avatar{width:120px;height:120px;overflow:hidden;transform:none;border:3px solid rgba(220,174,86,.84);border-radius:50%;background:#090806;box-shadow:0 6px 21px rgba(0,0,0,.58);}
 #game-ui #homePage .v146-home-avatar img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 22%;}
-#game-ui #homePage .v146-home-character[data-element="fire"] .v146-home-avatar{box-shadow:0 0 8px rgba(177,64,38,.34),0 2px 7px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-character[data-element="water"] .v146-home-avatar{box-shadow:0 0 8px rgba(66,129,184,.34),0 2px 7px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-character[data-element="wind"] .v146-home-avatar{box-shadow:0 0 8px rgba(58,151,110,.3),0 2px 7px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-character[data-element="earth"] .v146-home-avatar{box-shadow:0 0 8px rgba(186,142,63,.34),0 2px 7px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-character-main{display:grid;gap:4px;min-width:0;}
-#game-ui #homePage .v146-home-character-main > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:3px;min-width:0;font-size:15px;line-height:19px;}
+#game-ui #homePage .v146-home-character[data-element="fire"] .v146-home-avatar{box-shadow:0 0 24px rgba(177,64,38,.34),0 6px 21px rgba(0,0,0,.58);}
+#game-ui #homePage .v146-home-character[data-element="water"] .v146-home-avatar{box-shadow:0 0 24px rgba(66,129,184,.34),0 6px 21px rgba(0,0,0,.58);}
+#game-ui #homePage .v146-home-character[data-element="wind"] .v146-home-avatar{box-shadow:0 0 24px rgba(58,151,110,.3),0 6px 21px rgba(0,0,0,.58);}
+#game-ui #homePage .v146-home-character[data-element="earth"] .v146-home-avatar{box-shadow:0 0 24px rgba(186,142,63,.34),0 6px 21px rgba(0,0,0,.58);}
+#game-ui #homePage .v146-home-character-main{display:grid;gap:12px;min-width:0;}
+#game-ui #homePage .v146-home-character-main > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:9px;min-width:0;font-size:45px;line-height:57px;}
 #game-ui #homePage .v146-home-character-main b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-ui #homePage .v146-home-character-main span{color:#e2c58b;font-size:13px;line-height:17px;font-weight:800;white-space:nowrap;}
-#game-ui #homePage .v146-home-resource{position:relative;height:17px;margin-inline:0;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(36,16,16,.88);}
+#game-ui #homePage .v146-home-character-main span{color:#e2c58b;font-size:39px;line-height:51px;font-weight:800;white-space:nowrap;}
+#game-ui #homePage .v146-home-resource{position:relative;height:51px;margin-inline:0;overflow:hidden;border:3px solid rgba(255,255,255,.12);border-radius:2997px;background:rgba(36,16,16,.88);}
 #game-ui #homePage .v146-home-resource.sp{background:rgba(12,23,48,.78);}
 #game-ui #homePage .v146-home-resource i{position:absolute;inset:0 auto 0 0;background:linear-gradient(#f26763,#b91e20);}
 #game-ui #homePage .v146-home-resource.sp i{background:linear-gradient(#659bff,#2455bd);}
-#game-ui #homePage .v146-home-resource strong{position:absolute;inset:0;z-index:2;color:#fff;font-size:13px;line-height:15px;text-align:center;text-shadow:0 1px 2px #000;white-space:nowrap;}
-
-/* Keep the complete three-character roster plus relic loadout above the fixed
-   bottom navigation on short phone viewports. */
-@media (max-height:920px){
+#game-ui #homePage .v146-home-resource strong{position:absolute;inset:0;z-index:2;color:#fff;font-size:39px;line-height:45px;text-align:center;text-shadow:0 3px 6px #000;white-space:nowrap;}
     #game-ui #homePage .v146-home-roster{
-        gap:2px;
-        margin-top:4px;
-        padding:4px 7px;
+        gap:6px;
+        margin-top:12px;
+        padding:12px 21px;
     }
     #game-ui #homePage .v146-home-character{
-        min-height:78px;
-        padding-top:3px;
-        padding-bottom:3px;
+        min-height:234px;
+        padding-top:9px;
+        padding-bottom:9px;
     }
-}
-
-@media (min-width:800px){
-    #game-ui #homePage.active{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);grid-template-rows:auto auto auto auto;gap:16px;align-content:start;}
-    #game-ui #homePage .home-city-hud{grid-column:1/-1;}
-    #game-ui #homePage .home-card-grid{display:contents;}
-    #game-ui #homePage .home-secondary-actions{grid-column:1;grid-row:2/span 2;min-height:360px;}
-    #game-ui #homePage .home-primary-actions{grid-column:2;grid-row:2;grid-template-columns:minmax(0,1fr);gap:12px;align-self:start;}
-    #game-ui #homePage .home-utility-actions{grid-column:1/-1;grid-row:4;}
-    #game-ui #homePage .v146-home-roster{grid-column:2;grid-row:3;align-self:start;margin:0;}
-}
 
 
 /* bundled source: css/20-stage-v60-training-only-safety.css */
@@ -2161,13 +2136,13 @@ html, body{
     min-height:max-content !important;
     max-height:none !important;
     overflow:visible !important;
-    padding-bottom:220px !important;
+    padding-bottom:660px !important;
     touch-action:pan-y !important;
 }
 
 #game-ui #homeFeatureModal #allSkillsList{
     overflow:visible !important;
-    padding-bottom:80px !important;
+    padding-bottom:240px !important;
 }
 
 /* All battle portraits now use the selected character's inline artwork. */
@@ -2202,16 +2177,16 @@ html, body{
 
 .shop-potion-purchase-row label{
     color:#b3a58c;
-    font-size:12px;
+    font-size:calc(12 * var(--ui-length-unit,1px));
 }
 
 .shop-potion-quantity{
     width:100%;
     min-width:0;
     box-sizing:border-box;
-    padding:8px 6px;
-    border:1px solid #8a6a3a;
-    border-radius:6px;
+    padding:calc(8 * var(--ui-length-unit,1px)) calc(6 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid #8a6a3a;
+    border-radius:calc(6 * var(--ui-length-unit,1px));
     background:#17120d;
     color:#f7e8c1;
     text-align:center;
@@ -2239,7 +2214,7 @@ html, body{
     display:none;
     align-items:center;
     justify-content:center;
-    padding:18px;
+    padding:calc(18 * var(--ui-length-unit,1px));
     box-sizing:border-box;
     background:rgba(0,0,0,.82);
 }
@@ -2249,37 +2224,37 @@ html, body{
 }
 
 .skill-preview-dialog{
-    width:min(92%,760px);
+    width:min(92%,calc(760 * var(--ui-length-unit,1px)));
     max-height:88%;
     display:flex;
     flex-direction:column;
     overflow:hidden;
-    border:2px solid #a77a35;
-    border-radius:12px;
+    border:calc(2 * var(--ui-length-unit,1px)) solid #a77a35;
+    border-radius:calc(12 * var(--ui-length-unit,1px));
     background:linear-gradient(180deg,#22190f,#100d0a);
-    box-shadow:0 14px 40px rgba(0,0,0,.75);
+    box-shadow:0 calc(14 * var(--ui-length-unit,1px)) calc(40 * var(--ui-length-unit,1px)) rgba(0,0,0,.75);
 }
 
 .skill-preview-heading{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:10px;
-    padding:13px 14px;
-    border-bottom:1px solid #6f5228;
+    gap:calc(10 * var(--ui-length-unit,1px));
+    padding:calc(13 * var(--ui-length-unit,1px)) calc(14 * var(--ui-length-unit,1px));
+    border-bottom:calc(1 * var(--ui-length-unit,1px)) solid #6f5228;
 }
 
 .skill-preview-heading h2{
     margin:0;
     color:#f4d690;
-    font-size:20px;
+    font-size:calc(20 * var(--ui-length-unit,1px));
 }
 
 .skill-preview-heading button,
 .skill-preview-tabs button{
-    border:1px solid #8a6a3a;
-    border-radius:6px;
-    padding:8px 10px;
+    border:calc(1 * var(--ui-length-unit,1px)) solid #8a6a3a;
+    border-radius:calc(6 * var(--ui-length-unit,1px));
+    padding:calc(8 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));
     background:#21180f;
     color:#e8d4aa;
     font-weight:800;
@@ -2288,8 +2263,8 @@ html, body{
 .skill-preview-tabs{
     display:grid;
     grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:5px;
-    padding:9px;
+    gap:calc(5 * var(--ui-length-unit,1px));
+    padding:calc(9 * var(--ui-length-unit,1px));
 }
 
 .skill-preview-tabs button.active{
@@ -2303,21 +2278,21 @@ html, body{
     overflow-y:auto;
     touch-action:pan-y;
     -webkit-overflow-scrolling:touch;
-    padding:0 10px 22px;
+    padding:0 calc(10 * var(--ui-length-unit,1px)) calc(22 * var(--ui-length-unit,1px));
 }
 
 .skill-preview-card{
-    margin:7px 0;
-    padding:10px;
-    border:1px solid #594424;
-    border-radius:8px;
+    margin:calc(7 * var(--ui-length-unit,1px)) 0;
+    padding:calc(10 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid #594424;
+    border-radius:calc(8 * var(--ui-length-unit,1px));
     background:rgba(255,255,255,.035);
 }
 
 .skill-preview-card > div{
     display:flex;
     justify-content:space-between;
-    gap:8px;
+    gap:calc(8 * var(--ui-length-unit,1px));
 }
 
 .skill-preview-card strong{
@@ -2326,13 +2301,13 @@ html, body{
 
 .skill-preview-card span{
     color:#9f9178;
-    font-size:12px;
+    font-size:calc(12 * var(--ui-length-unit,1px));
 }
 
 .skill-preview-card p{
-    margin:6px 0 0;
+    margin:calc(6 * var(--ui-length-unit,1px)) 0 0;
     color:#ded5c5;
-    font-size:13px;
+    font-size:calc(13 * var(--ui-length-unit,1px));
     line-height:1.55;
 }
 
@@ -2340,14 +2315,12 @@ html, body{
     display:none !important;
 }
 
-@media (max-width:520px){
-
 
     .skill-preview-tabs button{
-        padding:8px 2px;
-        font-size:12px;
+        padding:calc(8 * var(--ui-length-unit,1px)) calc(2 * var(--ui-length-unit,1px));
+        font-size:calc(12 * var(--ui-length-unit,1px));
     }
-}
+
 
 /*
    Unified Large Panel ownership for the all-element skill preview.
@@ -2355,11 +2328,11 @@ html, body{
    design tokens. Use the shared token names with their current canonical
    fallbacks, keep heading/tabs fixed, and let only the skill list scroll.
 */
-html body .skill-preview-modal.v141-body-preview .skill-preview-dialog{
-    width:min(var(--ui-large-panel-max-width,396px),calc(100vw - var(--ui-large-panel-safe-space,24px))) !important;
-    max-width:var(--ui-large-panel-max-width,396px) !important;
-    height:min(var(--ui-large-panel-height,620px),calc(100dvh - var(--ui-large-panel-safe-space,24px))) !important;
-    max-height:calc(100dvh - var(--ui-large-panel-safe-space,24px)) !important;
+#game-ui #allElementSkillPreviewModal .skill-preview-dialog{
+    width:min(var(--ui-large-panel-max-width,calc(396 * var(--ui-length-unit,1px))),calc(calc(100 * var(--layout-inline-size,420px) / 100) - var(--ui-large-panel-safe-space,calc(24 * var(--ui-length-unit,1px))))) !important;
+    max-width:var(--ui-large-panel-max-width,calc(396 * var(--ui-length-unit,1px))) !important;
+    height:min(var(--ui-large-panel-height,calc(620 * var(--ui-length-unit,1px))),calc(calc(100 * var(--layout-block-size,746.6667px) / 100) - var(--ui-large-panel-safe-space,calc(24 * var(--ui-length-unit,1px))))) !important;
+    max-height:calc(calc(100 * var(--layout-block-size,746.6667px) / 100) - var(--ui-large-panel-safe-space,calc(24 * var(--ui-length-unit,1px)))) !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
@@ -2367,23 +2340,23 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-dialog{
     box-sizing:border-box !important;
 }
 
-html body .skill-preview-modal.v141-body-preview .skill-preview-heading,
-html body .skill-preview-modal.v141-body-preview .skill-preview-tabs{
+#game-ui #allElementSkillPreviewModal .skill-preview-heading,
+#game-ui #allElementSkillPreviewModal .skill-preview-tabs{
     flex:0 0 auto !important;
 }
 
-html body .skill-preview-modal.v141-body-preview .skill-preview-tabs button{
-    min-height:var(--ui-large-panel-tab-height,42px) !important;
+#game-ui #allElementSkillPreviewModal .skill-preview-tabs button{
+    min-height:var(--ui-large-panel-tab-height,calc(42 * var(--ui-length-unit,1px))) !important;
 }
 
-html body .skill-preview-modal.v141-body-preview .skill-preview-body{
+#game-ui #allElementSkillPreviewModal .skill-preview-body{
     flex:1 1 auto !important;
     height:auto !important;
     min-height:0 !important;
     max-height:none !important;
     overflow-x:hidden !important;
     overflow-y:auto !important;
-    padding-bottom:12px !important;
+    padding-bottom:calc(12 * var(--ui-length-unit,1px)) !important;
     -webkit-overflow-scrolling:touch !important;
     overscroll-behavior-y:contain !important;
     touch-action:pan-y !important;
@@ -2540,14 +2513,14 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     display:block;
     position:relative;
     z-index:1;
-    margin:0 0 10px;
-    padding:9px 12px;
+    margin:0 0 calc(10 * var(--ui-length-unit,1px));
+    padding:calc(9 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px));
     box-sizing:border-box;
-    border:2px solid rgba(218,166,76,.42);
-    border-radius:10px;
+    border:calc(2 * var(--ui-length-unit,1px)) solid rgba(218,166,76,.42);
+    border-radius:calc(10 * var(--ui-length-unit,1px));
     background:linear-gradient(180deg,rgba(78,53,21,.68),rgba(24,18,11,.86));
     color:#f0d89c;
-    font-size:16px;
+    font-size:calc(16 * var(--ui-length-unit,1px));
     line-height:1.45;
     font-weight:900;
     text-align:left;
@@ -2561,23 +2534,23 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
    room to the HP/SP labels and reduce the two bars instead of letting them bleed. */
 #game-ui #homePage #v146HomeRoster .v146-home-character{
     grid-template-columns:minmax(0,1fr) !important;
-    gap:3px !important;
-    min-height:70px !important;
-    padding:3px 2px !important;
+    gap:9px !important;
+    min-height:210px !important;
+    padding:9px 6px !important;
 }
 #game-ui #homePage #v146HomeRoster .v146-home-avatar{
-    width:32px !important;
-    height:32px !important;
+    width:96px !important;
+    height:96px !important;
 }
 #game-ui #homePage #v146HomeRoster .v146-home-character-main{
-    gap:2px !important;
+    gap:6px !important;
 }
 #game-ui #homePage #v146HomeRoster .v146-home-resource{
-    height:19px !important;
+    height:57px !important;
 }
 #game-ui #homePage #v146HomeRoster .v146-home-resource strong{
-    font-size:13px !important;
-    line-height:17px !important;
+    font-size:39px !important;
+    line-height:51px !important;
 }
 
 /* Character creation now fits the fixed canvas without a nested scroll layer.
@@ -2631,17 +2604,17 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 #game-ui .team-relic-home-tools{
     position:relative;inset:auto;z-index:5;display:grid;
     grid-template-columns:repeat(4,minmax(0,1fr));grid-column:1;grid-row:3;justify-self:center;align-self:start;
-    width:100%;gap:4px;padding:0;
+    width:100%;gap:12px;padding:0;
     box-sizing:border-box;pointer-events:none;align-items:end;
 }
 #game-ui .team-relic-home-tools .home-card-utility{
-    display:flex;align-items:center;justify-content:center;gap:8px;grid-column:span 2;
-    justify-self:center;width:min(100%,180px);height:44px;pointer-events:auto;position:relative;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;gap:24px;grid-column:span 2;
+    justify-self:center;width:min(100%,540px);height:132px;pointer-events:auto;position:relative;overflow:hidden;
     border:0;border-radius:0;background:rgba(17,20,16,.76);box-shadow:none;
 }
-#game-ui .team-relic-home-tools .home-card-utility:active{transform:translateY(1px) scale(.97);filter:brightness(1.12);}
-#game-ui .team-relic-home-tools .home-card-utility .home-card-icon{display:flex;align-items:center;justify-content:center;width:32px;height:32px;flex:0 0 32px;overflow:hidden;border:0;border-radius:50%;background-position:center;background-size:contain;background-repeat:no-repeat;opacity:.8;}
-#game-ui .team-relic-home-tools .home-card-utility .home-card-label{padding:2px 3px;background:transparent;font-size:15px;line-height:22px;font-weight:700;}
+#game-ui .team-relic-home-tools .home-card-utility:active{transform:translateY(3px) scale(.97);filter:brightness(1.12);}
+#game-ui .team-relic-home-tools .home-card-utility .home-card-icon{display:flex;align-items:center;justify-content:center;width:96px;height:96px;flex:0 0 96px;overflow:hidden;border:0;border-radius:50%;background-position:center;background-size:contain;background-repeat:no-repeat;opacity:.8;}
+#game-ui .team-relic-home-tools .home-card-utility .home-card-label{padding:6px 9px;background:transparent;font-size:45px;line-height:66px;font-weight:700;}
 #game-ui .team-relic-home-tools .home-card-utility .home-card-icon img{width:100%;height:100%;object-fit:contain;display:block;}
 #game-ui .team-relic-home-entry .home-card-icon{background-image:url("../assets/ui/home-relic-v174.eed14e806044.webp");}
 #game-ui .team-relic-home-entry .team-relic-home-glyph{font-size:0;color:transparent;text-shadow:none;}
@@ -2654,7 +2627,7 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 #game-ui #homeFeatureModal.ad-free-service-info-mode{
     z-index:12000;
     box-sizing:border-box;
-    padding:14px;
+    padding:42px;
     overflow:hidden;
     overscroll-behavior:contain;
     background:
@@ -2664,29 +2637,29 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-box{
     display:flex;
-    width:calc(100% - var(--ui-medium-modal-safe-space,28px));
-    max-width:var(--ui-medium-modal-max-width,360px);
-    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px));
+    width:calc(100% - var(--ui-medium-modal-safe-space,84px));
+    max-width:var(--ui-medium-modal-max-width,1080px);
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,84px));
     min-height:0;
     box-sizing:border-box;
     flex-direction:column;
     overflow:hidden;
-    border:2px solid #b98a3f;
-    border-radius:13px;
+    border:6px solid #b98a3f;
+    border-radius:39px;
     background:
         linear-gradient(145deg,rgba(37,27,17,.98),rgba(9,8,7,.99) 58%,rgba(18,13,9,.99));
     box-shadow:
-        0 18px 46px rgba(0,0,0,.72),
-        inset 0 0 0 1px rgba(255,225,151,.07),
-        inset 0 0 28px rgba(186,128,43,.08);
+        0 54px 138px rgba(0,0,0,.72),
+        inset 0 0 0 3px rgba(255,225,151,.07),
+        inset 0 0 84px rgba(186,128,43,.08);
 }
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title{
     flex:0 0 auto;
-    min-height:52px;
+    min-height:156px;
     box-sizing:border-box;
-    padding:12px 14px 10px;
-    border-bottom:1px solid rgba(194,147,68,.52);
+    padding:36px 42px 30px;
+    border-bottom:3px solid rgba(194,147,68,.52);
     background:
         linear-gradient(180deg,rgba(53,37,20,.96),rgba(18,13,9,.96));
 }
@@ -2694,11 +2667,11 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 #game-ui #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title > span{
     color:#f0cf83;
     font-family:"Noto Serif TC",serif;
-    font-size:20px;
+    font-size:60px;
     font-weight:900;
-    letter-spacing:1px;
+    letter-spacing:3px;
     line-height:1.35;
-    text-shadow:0 1px 2px #000,0 0 10px rgba(229,173,66,.18);
+    text-shadow:0 3px 6px #000,0 0 30px rgba(229,173,66,.18);
 }
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .home-feature-modal-title > div{
@@ -2709,7 +2682,7 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     flex:1 1 auto;
     min-height:0;
     box-sizing:border-box;
-    padding:14px;
+    padding:42px;
     overflow-x:hidden;
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
@@ -2724,9 +2697,9 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     min-width:0;
     box-sizing:border-box;
     flex-direction:column;
-    gap:12px;
+    gap:36px;
     color:#ddd2bd;
-    font-size:15px;
+    font-size:45px;
     line-height:1.65;
 }
 
@@ -2735,52 +2708,52 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     box-sizing:border-box;
     flex-direction:column;
     align-items:center;
-    gap:4px;
-    padding:12px 10px 11px;
-    border:1px solid rgba(193,145,65,.58);
-    border-radius:10px;
+    gap:12px;
+    padding:36px 30px 33px;
+    border:3px solid rgba(193,145,65,.58);
+    border-radius:30px;
     background:
         radial-gradient(circle at 50% 0,rgba(211,159,70,.12),transparent 58%),
         rgba(20,15,10,.86);
-    box-shadow:inset 0 0 18px rgba(213,159,60,.04);
+    box-shadow:inset 0 0 54px rgba(213,159,60,.04);
     text-align:center;
 }
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-subtitle{
     color:#ead7ad;
     font-family:"Noto Serif TC",serif;
-    font-size:17px;
+    font-size:51px;
     font-weight:900;
-    letter-spacing:.5px;
+    letter-spacing:1.5px;
 }
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-price{
     color:#f2c769;
     font-family:"Cinzel","Noto Serif TC",serif;
-    font-size:28px;
+    font-size:84px;
     font-weight:900;
     line-height:1.25;
-    letter-spacing:.4px;
-    text-shadow:0 0 12px rgba(233,176,62,.16);
+    letter-spacing:1.2px;
+    text-shadow:0 0 36px rgba(233,176,62,.16);
 }
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-badge{
     color:#ae9a77;
-    font-size:13px;
+    font-size:39px;
     font-weight:700;
-    letter-spacing:.3px;
+    letter-spacing:0.9px;
 }
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy{
     box-sizing:border-box;
-    padding:11px 12px;
-    border:1px solid rgba(137,104,57,.44);
-    border-radius:9px;
+    padding:33px 36px;
+    border:3px solid rgba(137,104,57,.44);
+    border-radius:27px;
     background:rgba(8,7,6,.62);
 }
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy p{
-    margin:0 0 8px;
+    margin:0 0 24px;
 }
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-copy p:last-child{
@@ -2791,10 +2764,10 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     display:flex;
     box-sizing:border-box;
     flex-direction:column;
-    gap:9px;
-    padding:11px;
-    border:1px solid rgba(154,116,60,.48);
-    border-radius:9px;
+    gap:27px;
+    padding:33px;
+    border:3px solid rgba(154,116,60,.48);
+    border-radius:27px;
     background:rgba(15,11,8,.72);
 }
 
@@ -2802,7 +2775,7 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     display:flex;
     min-width:0;
     align-items:flex-start;
-    gap:6px;
+    gap:18px;
     color:#cabd9f;
     overflow-wrap:anywhere;
 }
@@ -2826,23 +2799,23 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions{
     display:grid;
     grid-template-columns:1fr;
-    gap:7px;
+    gap:21px;
 }
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button,
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button{
-    min-height:44px;
+    min-height:132px;
     box-sizing:border-box;
-    padding:8px 10px;
-    border:1px solid #806439;
-    border-radius:8px;
+    padding:24px 30px;
+    border:3px solid #806439;
+    border-radius:24px;
     background:linear-gradient(180deg,#302519,#17110c);
     color:#dfd1b6;
     font-family:"Noto Sans TC",sans-serif;
-    font-size:14px;
+    font-size:42px;
     font-weight:800;
     line-height:1.35;
-    letter-spacing:.2px;
+    letter-spacing:0.6px;
 }
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button:disabled,
@@ -2855,22 +2828,22 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-policy-actions button:focus-visible,
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions button:focus-visible{
-    outline:2px solid #f0d289;
-    outline-offset:2px;
+    outline:6px solid #f0d289;
+    outline-offset:6px;
 }
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-todo-note{
     margin:0;
     color:#8f8574;
-    font-size:12px;
+    font-size:36px;
     line-height:1.55;
 }
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions{
     display:grid;
     grid-template-columns:1fr;
-    gap:8px;
-    padding-top:2px;
+    gap:24px;
+    padding-top:6px;
 }
 
 #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-actions .ad-free-service-acknowledge{
@@ -2878,23 +2851,20 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     background:linear-gradient(180deg,#e8c66e,#b9792c);
     color:#261707;
     font-weight:900;
-    box-shadow:inset 0 1px 0 rgba(255,248,213,.24),0 3px 10px rgba(0,0,0,.3);
+    box-shadow:inset 0 3px 0 rgba(255,248,213,.24),0 9px 30px rgba(0,0,0,.3);
 }
-
-@media (max-width:360px){
     #game-ui #homeFeatureModal.ad-free-service-info-mode{
-        padding:10px;
+        padding:30px;
     }
 
     #game-ui #homeFeatureModal.ad-free-service-info-mode #homeFeatureModalBody{
-        padding:11px;
+        padding:33px;
     }
 
     #game-ui #homeFeatureModal.ad-free-service-info-mode .ad-free-service-panel{
-        gap:10px;
-        font-size:14px;
+        gap:30px;
+        font-size:42px;
     }
-}
 
 
 /* bundled source: css/release-update-notification.css */
@@ -2906,25 +2876,25 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 
 #game-stage > #game-overlay-layer .release-update-marquee{
     position:absolute;
-    left:42px;
-    top:30px;
-    width:996px;
-    min-height:132px;
+    left:calc(42 * var(--ui-length-unit,1px));
+    top:calc(30 * var(--ui-length-unit,1px));
+    width:calc(996 * var(--ui-length-unit,1px));
+    min-height:calc(132 * var(--ui-length-unit,1px));
     margin:0;
-    padding:18px 26px;
+    padding:calc(18 * var(--ui-length-unit,1px)) calc(26 * var(--ui-length-unit,1px));
     box-sizing:border-box;
     display:grid;
     grid-template-columns:auto minmax(0,1fr) auto;
     align-items:center;
-    gap:16px;
+    gap:calc(16 * var(--ui-length-unit,1px));
     overflow:hidden;
-    border:2px solid rgba(208,162,72,.9);
-    border-radius:18px;
+    border:calc(2 * var(--ui-length-unit,1px)) solid rgba(208,162,72,.9);
+    border-radius:calc(18 * var(--ui-length-unit,1px));
     color:#f4ead6;
     background:
         linear-gradient(90deg,rgba(88,53,18,.97),rgba(22,17,11,.97) 30%,rgba(11,10,8,.98)),
         #14100b;
-    box-shadow:0 8px 22px rgba(0,0,0,.5),inset 0 1px rgba(255,230,162,.22);
+    box-shadow:0 calc(8 * var(--ui-length-unit,1px)) calc(22 * var(--ui-length-unit,1px)) rgba(0,0,0,.5),inset 0 calc(1 * var(--ui-length-unit,1px)) rgba(255,230,162,.22);
     font-family:"Noto Serif TC",serif;
     text-align:left;
     cursor:pointer;
@@ -2938,12 +2908,12 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 
 #game-stage > #game-overlay-layer .release-update-marquee-tag{
     flex:0 0 auto;
-    padding:7px 13px;
-    border:1px solid rgba(255,218,136,.9);
-    border-radius:8px;
+    padding:calc(7 * var(--ui-length-unit,1px)) calc(13 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(255,218,136,.9);
+    border-radius:calc(8 * var(--ui-length-unit,1px));
     color:#271806;
     background:linear-gradient(180deg,#f8d887,#bf7e2f);
-    font-size:34px;
+    font-size:calc(34 * var(--ui-length-unit,1px));
     font-weight:900;
     letter-spacing:.08em;
     line-height:1;
@@ -2954,7 +2924,7 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     min-width:0;
     overflow:hidden;
     color:#f3e5c9;
-    font-size:38px;
+    font-size:calc(38 * var(--ui-length-unit,1px));
     font-weight:700;
     line-height:1.2;
     text-overflow:ellipsis;
@@ -2964,7 +2934,7 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 #game-stage > #game-overlay-layer .release-update-marquee-action{
     flex:0 0 auto;
     color:#f2c866;
-    font-size:34px;
+    font-size:calc(34 * var(--ui-length-unit,1px));
     font-weight:900;
     letter-spacing:.08em;
     white-space:nowrap;
@@ -2986,13 +2956,13 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 }
 
 #game-ui #homeFeatureModal.release-update-modal{
-    padding:14px;
+    padding:42px;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .home-feature-modal-box{
-    width:min(94%,390px);
-    max-width:390px;
-    max-height:88dvh;
+    width:min(94%,1170px);
+    max-width:1170px;
+    max-height:1689.6px;
     min-height:0;
     display:flex;
     flex-direction:column;
@@ -3003,7 +2973,7 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 #game-ui #homeFeatureModal.release-update-modal .home-feature-modal-title{
     flex:0 0 auto;
     margin-bottom:0;
-    padding-bottom:10px;
+    padding-bottom:30px;
 }
 
 #game-ui #homeFeatureModal.release-update-modal #homeFeatureModalBody{
@@ -3011,7 +2981,7 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     min-height:0;
     overflow-x:hidden;
     overflow-y:auto;
-    padding:12px 2px 2px;
+    padding:36px 6px 6px;
     box-sizing:border-box;
     -webkit-overflow-scrolling:touch;
     overscroll-behavior-y:contain;
@@ -3025,29 +2995,29 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 #game-ui #homeFeatureModal.release-update-modal .release-update-detail,
 #game-ui #homeFeatureModal.release-update-modal .release-update-announcement{
     color:#f1e7d4;
-    font-size:16px;
+    font-size:48px;
     line-height:1.65;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-version,
 #game-ui #homeFeatureModal.release-update-modal .release-update-announcement-version{
-    margin:0 0 8px;
+    margin:0 0 24px;
     color:#f4ca72;
-    font-size:18px;
+    font-size:54px;
     font-weight:900;
     letter-spacing:.04em;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-intro,
 #game-ui #homeFeatureModal.release-update-modal .release-update-announcement-status{
-    margin:0 0 12px;
+    margin:0 0 36px;
     color:#d8c6a4;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-detail h3{
-    margin:0 0 7px;
+    margin:0 0 21px;
     color:#f1cf86;
-    font-size:17px;
+    font-size:51px;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-notes{
@@ -3056,34 +3026,34 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-notes li{
-    margin:0 0 8px;
+    margin:0 0 24px;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-published{
-    margin:14px 0 0;
+    margin:42px 0 0;
     color:#ae9c7e;
-    font-size:14px;
+    font-size:42px;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-suppress-today{
     display:flex;
     align-items:center;
     justify-content:flex-end;
-    gap:7px;
-    margin:12px 1px -4px;
+    gap:21px;
+    margin:36px 3px -12px;
     color:#baa98c;
-    font-size:13px;
+    font-size:39px;
     font-weight:700;
-    line-height:18px;
+    line-height:54px;
     cursor:pointer;
     user-select:none;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-suppress-today-input{
-    width:18px;
-    height:18px;
+    width:54px;
+    height:54px;
     margin:0;
-    flex:0 0 18px;
+    flex:0 0 54px;
     accent-color:#d3a04c;
     cursor:pointer;
 }
@@ -3091,8 +3061,8 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 #game-ui #homeFeatureModal.release-update-modal .release-update-actions{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px;
-    margin-top:18px;
+    gap:30px;
+    margin-top:54px;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-actions:has(:only-child){
@@ -3101,9 +3071,9 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-actions button,
 #game-ui #homeFeatureModal .release-update-announcement .release-update-primary{
-    min-height:52px;
-    padding:8px 12px;
-    font-size:16px;
+    min-height:156px;
+    padding:24px 36px;
+    font-size:48px;
     font-weight:900;
     letter-spacing:.04em;
 }
@@ -3119,18 +3089,18 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
 #game-ui #homeFeatureModal .release-update-announcement{
     max-width:34em;
     margin:0 auto;
-    padding:4px 3px 16px;
+    padding:12px 9px 48px;
     color:#ded1b8;
-    font-size:16px;
+    font-size:48px;
     line-height:1.7;
     overflow-wrap:anywhere;
 }
 
 #game-ui #homeFeatureModal .release-update-announcement p{
-    margin:0 0 10px;
+    margin:0 0 30px;
 }
 
 #game-ui #homeFeatureModal .release-update-announcement .release-update-primary{
     width:100%;
-    margin-top:4px;
+    margin-top:12px;
 }

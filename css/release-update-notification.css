@@ -6,25 +6,25 @@
 
 #game-stage > #game-overlay-layer .release-update-marquee{
     position:absolute;
-    left:42px;
-    top:30px;
-    width:996px;
-    min-height:132px;
+    left:calc(42 * var(--ui-length-unit,1px));
+    top:calc(30 * var(--ui-length-unit,1px));
+    width:calc(996 * var(--ui-length-unit,1px));
+    min-height:calc(132 * var(--ui-length-unit,1px));
     margin:0;
-    padding:18px 26px;
+    padding:calc(18 * var(--ui-length-unit,1px)) calc(26 * var(--ui-length-unit,1px));
     box-sizing:border-box;
     display:grid;
     grid-template-columns:auto minmax(0,1fr) auto;
     align-items:center;
-    gap:16px;
+    gap:calc(16 * var(--ui-length-unit,1px));
     overflow:hidden;
-    border:2px solid rgba(208,162,72,.9);
-    border-radius:18px;
+    border:calc(2 * var(--ui-length-unit,1px)) solid rgba(208,162,72,.9);
+    border-radius:calc(18 * var(--ui-length-unit,1px));
     color:#f4ead6;
     background:
         linear-gradient(90deg,rgba(88,53,18,.97),rgba(22,17,11,.97) 30%,rgba(11,10,8,.98)),
         #14100b;
-    box-shadow:0 8px 22px rgba(0,0,0,.5),inset 0 1px rgba(255,230,162,.22);
+    box-shadow:0 calc(8 * var(--ui-length-unit,1px)) calc(22 * var(--ui-length-unit,1px)) rgba(0,0,0,.5),inset 0 calc(1 * var(--ui-length-unit,1px)) rgba(255,230,162,.22);
     font-family:"Noto Serif TC",serif;
     text-align:left;
     cursor:pointer;
@@ -38,12 +38,12 @@
 
 #game-stage > #game-overlay-layer .release-update-marquee-tag{
     flex:0 0 auto;
-    padding:7px 13px;
-    border:1px solid rgba(255,218,136,.9);
-    border-radius:8px;
+    padding:calc(7 * var(--ui-length-unit,1px)) calc(13 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(255,218,136,.9);
+    border-radius:calc(8 * var(--ui-length-unit,1px));
     color:#271806;
     background:linear-gradient(180deg,#f8d887,#bf7e2f);
-    font-size:34px;
+    font-size:calc(34 * var(--ui-length-unit,1px));
     font-weight:900;
     letter-spacing:.08em;
     line-height:1;
@@ -54,7 +54,7 @@
     min-width:0;
     overflow:hidden;
     color:#f3e5c9;
-    font-size:38px;
+    font-size:calc(38 * var(--ui-length-unit,1px));
     font-weight:700;
     line-height:1.2;
     text-overflow:ellipsis;
@@ -64,7 +64,7 @@
 #game-stage > #game-overlay-layer .release-update-marquee-action{
     flex:0 0 auto;
     color:#f2c866;
-    font-size:34px;
+    font-size:calc(34 * var(--ui-length-unit,1px));
     font-weight:900;
     letter-spacing:.08em;
     white-space:nowrap;
@@ -86,13 +86,13 @@
 }
 
 #game-ui #homeFeatureModal.release-update-modal{
-    padding:14px;
+    padding:42px;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .home-feature-modal-box{
-    width:min(94%,390px);
-    max-width:390px;
-    max-height:88dvh;
+    width:min(94%,1170px);
+    max-width:1170px;
+    max-height:1689.6px;
     min-height:0;
     display:flex;
     flex-direction:column;
@@ -103,7 +103,7 @@
 #game-ui #homeFeatureModal.release-update-modal .home-feature-modal-title{
     flex:0 0 auto;
     margin-bottom:0;
-    padding-bottom:10px;
+    padding-bottom:30px;
 }
 
 #game-ui #homeFeatureModal.release-update-modal #homeFeatureModalBody{
@@ -111,7 +111,7 @@
     min-height:0;
     overflow-x:hidden;
     overflow-y:auto;
-    padding:12px 2px 2px;
+    padding:36px 6px 6px;
     box-sizing:border-box;
     -webkit-overflow-scrolling:touch;
     overscroll-behavior-y:contain;
@@ -125,29 +125,29 @@
 #game-ui #homeFeatureModal.release-update-modal .release-update-detail,
 #game-ui #homeFeatureModal.release-update-modal .release-update-announcement{
     color:#f1e7d4;
-    font-size:16px;
+    font-size:48px;
     line-height:1.65;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-version,
 #game-ui #homeFeatureModal.release-update-modal .release-update-announcement-version{
-    margin:0 0 8px;
+    margin:0 0 24px;
     color:#f4ca72;
-    font-size:18px;
+    font-size:54px;
     font-weight:900;
     letter-spacing:.04em;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-intro,
 #game-ui #homeFeatureModal.release-update-modal .release-update-announcement-status{
-    margin:0 0 12px;
+    margin:0 0 36px;
     color:#d8c6a4;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-detail h3{
-    margin:0 0 7px;
+    margin:0 0 21px;
     color:#f1cf86;
-    font-size:17px;
+    font-size:51px;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-notes{
@@ -156,34 +156,34 @@
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-notes li{
-    margin:0 0 8px;
+    margin:0 0 24px;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-published{
-    margin:14px 0 0;
+    margin:42px 0 0;
     color:#ae9c7e;
-    font-size:14px;
+    font-size:42px;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-suppress-today{
     display:flex;
     align-items:center;
     justify-content:flex-end;
-    gap:7px;
-    margin:12px 1px -4px;
+    gap:21px;
+    margin:36px 3px -12px;
     color:#baa98c;
-    font-size:13px;
+    font-size:39px;
     font-weight:700;
-    line-height:18px;
+    line-height:54px;
     cursor:pointer;
     user-select:none;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-suppress-today-input{
-    width:18px;
-    height:18px;
+    width:54px;
+    height:54px;
     margin:0;
-    flex:0 0 18px;
+    flex:0 0 54px;
     accent-color:#d3a04c;
     cursor:pointer;
 }
@@ -191,8 +191,8 @@
 #game-ui #homeFeatureModal.release-update-modal .release-update-actions{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px;
-    margin-top:18px;
+    gap:30px;
+    margin-top:54px;
 }
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-actions:has(:only-child){
@@ -201,9 +201,9 @@
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-actions button,
 #game-ui #homeFeatureModal .release-update-announcement .release-update-primary{
-    min-height:52px;
-    padding:8px 12px;
-    font-size:16px;
+    min-height:156px;
+    padding:24px 36px;
+    font-size:48px;
     font-weight:900;
     letter-spacing:.04em;
 }
@@ -219,18 +219,18 @@
 #game-ui #homeFeatureModal .release-update-announcement{
     max-width:34em;
     margin:0 auto;
-    padding:4px 3px 16px;
+    padding:12px 9px 48px;
     color:#ded1b8;
-    font-size:16px;
+    font-size:48px;
     line-height:1.7;
     overflow-wrap:anywhere;
 }
 
 #game-ui #homeFeatureModal .release-update-announcement p{
-    margin:0 0 10px;
+    margin:0 0 30px;
 }
 
 #game-ui #homeFeatureModal .release-update-announcement .release-update-primary{
     width:100%;
-    margin-top:4px;
+    margin-top:12px;
 }

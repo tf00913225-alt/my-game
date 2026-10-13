@@ -4,11 +4,11 @@
 
 /* Element Box auto-use text: larger and more readable at the upper center. */
 #game-stage .v17342-element-box-use-notice{
-    font-size:27px !important;
+    font-size:calc(27 * var(--ui-length-unit,1px)) !important;
     font-weight:900 !important;
     line-height:1.4 !important;
     letter-spacing:.02em !important;
-    text-shadow:0 2px 5px rgba(0,0,0,.98),0 0 10px rgba(0,0,0,.82) !important;
+    text-shadow:0 calc(2 * var(--ui-length-unit,1px)) calc(5 * var(--ui-length-unit,1px)) rgba(0,0,0,.98),0 0 calc(10 * var(--ui-length-unit,1px)) rgba(0,0,0,.82) !important;
 }
 
 /* Batch use/open: a compact row above the existing item-detail actions. */
