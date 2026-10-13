@@ -33,7 +33,7 @@ function runtime(count=2){
  setTimeout:noop,clearTimeout:noop,
  skillDatabase:{revive:{name:'Revive',spCost:1,reviveHealPercentByLevel:[20]},waterEX:{}},healBonusMultiplier:1,
  spendActiveSkillSP:(c,n)=>c.sp-=n,showPlayerSpPopup:noop,showPlayerHit:noop};
- ctx.window=ctx;vm.createContext(ctx);
+ ctx.FourSymbolsHeroCore=core;ctx.window=ctx;vm.createContext(ctx);
  vm.runInContext(decl('calculateCharacterBaseStats'),ctx);
  for(const id of core.listHeroDefinitions().map(d=>d.heroId))account=core.createDomain(account,()=>players,ctx.calculateCharacterBaseStats,()=>null).unlockHeroDirect(id,10);
  const original=JSON.stringify(account);
@@ -45,7 +45,8 @@ function runtime(count=2){
  if(count===3){d.getHeroSkillProjection=id=>domain.getHeroSkillProjection(id===third?ids[0]:id);}
  ctx.FourSymbolsHeroSystem={getDomain:()=>d};
  vm.runInContext(main.slice(main.indexOf('// Battle-only roster.'),main.indexOf('function getCharacterArtworkPath(')),ctx);
- ctx.FourSymbolsHeroBattle.setRoster([...ids,third].slice(0,count));
+ ctx.FourSymbolsTeamFormationPolicy=require('../functions/src/team-formation-policy');
+ ctx.FourSymbolsTeamFormation={getConfirmed:()=>({heroIdToSlot:Object.fromEntries([...ids,third].slice(0,count).map((id,i)=>[id,'ALLY_B'+(i+1)]))})};
  ctx.initializeHeroBattleCombatants();ctx.battleActive=true;
  for(const n of ['getAdditionalCharacterBattleStats','getPartyBattleStats','getLivingParty','getRevivableAllySlots','buildInitiativeQueue','getBattleStatisticsOwner','getBattleStatisticsCombatantKind','buildBattleStatisticsCombatant','beginBattleStatisticsSession','battleStatisticsBeginAction','battleStatisticsFinishAction','createEnemyActionTargetSnapshot','resolveEnemyActionTargets','secondaryCharacterNormalAttack','castReviveSkill'])vm.runInContext(decl(n),ctx);
  vm.runInContext(fs.readFileSync('js/battlefield-slot-owner.js','utf8'),ctx);
@@ -72,8 +73,8 @@ test('Hero uses domain projection and shared Buff projection; no player EX/loado
  const {ctx,domain}=runtime(2);const h=ctx.getPartyCharacterByIndex(3);
  assert.deepEqual(plain(ctx.getPartyBattleStats(3)),plain(domain.getHeroBaseStats(h.heroId)));
  h.activeBuffs.push({type:'dodgeSkill',percent:25,turnsLeft:1});assert.equal(ctx.getPartyBattleStats(3).evasion,25);
- assert.throws(()=>ctx.FourSymbolsHeroBattle.setRoster([]),/during battle/);
- ctx.battleActive=false;assert.throws(()=>ctx.FourSymbolsHeroBattle.setRoster(['unknown']));assert.throws(()=>ctx.FourSymbolsHeroBattle.setRoster([h.heroId,h.heroId]));
+ assert.equal(ctx.FourSymbolsHeroBattle.setRoster,undefined,'retired session write cannot bypass protected formation');
+ ctx.battleActive=false;ctx.FourSymbolsTeamFormation={getConfirmed:()=>({heroIdToSlot:{unknown:'ALLY_B1'}})};assert.throws(()=>ctx.initializeHeroBattleCombatants());
 });
 test('Natural Hero declaration queues one basic action per identity and clears prior manual highlight',()=>{
  const {ctx}=runtime(3);let cleared=0,resolved=0;

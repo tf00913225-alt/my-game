@@ -27,7 +27,10 @@ function sources(count=1){
         equipment:[{...base,characterId:"char-a",slot:"hand",ownedItemId:"equip-a"}],
         relics:[{...base,relicId:"relic-a",unlocked:true,level:2,exp:3,seen:true}],
         relicLoadout:{...base,relicId:"relic-a",subRelicId:null},
-        progress:{...base,dailyQuestState:{claimed:true},commissionQuestState:{},achievementState:{},
+        progress:{...base,dailyQuestState:{date:"2020-02-29",progress:{checkin:1,killMonsters:4,winBattle:2},
+            claimed:{checkin:true,killMonsters:false,winBattle:false}},
+            commissionQuestState:{date:"2020-02-29",progress:{killMonsters:6,winBattle:3},
+            claimed:{killMonsters:false,winBattle:true}},achievementState:{},
             gameplayProgress:{},abyssProgress:JSON.parse(makeInitialSidecars(1700000000000)["abyss-state"].raw),
             sidecars:Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>
                 [key,key!=="legacy-abyss-state"&&makeInitialSidecars(1700000000000)[key].status==="present"?
@@ -726,4 +729,106 @@ test("historical achievement bytes stay compatible but never satisfy complete pr
     assert.deepEqual(restored.progress.achievementState,records.progress.achievementState);
     assert.equal(archive.readyForRestore,false);
     assert.throws(()=>assemble(restored),/achievement claim/);
+});
+
+test("recorded daily and commission quest evidence survives every slot and recovery without rollover",()=>{
+    const {createRecoveryArchive,inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    for(const count of [1,2,3]){
+        const records=sources(count);
+        for(const key of ["dailyQuestState","commissionQuestState"]){
+            records.progress[key].progress.retainedQuest_2=Number.MAX_SAFE_INTEGER;
+            records.progress[key].claimed.retainedQuest_2=false;
+        }
+        const before=structuredClone(records),bundle=assemble(records);
+        for(const key of ["dailyQuestState","commissionQuestState"]){
+            assert.deepEqual(bundle.projection.gameSave[key],before.progress[key]);
+        }
+        assert.equal(bundle.readyForPublication,false);
+        assert.equal(bundle.projection.authoritativeStateReady,false);
+        assert.deepEqual(records,before);
+        const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
+        records.progress.playableState=fields;delete records.playableState;
+        const snapshot=assembleCanonicalSnapshot("uid-a",7,records);
+        const archive=JSON.parse(JSON.stringify(createRecoveryArchive("uid-a",7,records,snapshot)));
+        const restored=inspectRecoveryArchive(archive,"uid-a",7,snapshot);
+        for(const key of ["dailyQuestState","commissionQuestState"]){
+            assert.deepEqual(restored.progress[key],before.progress[key]);
+        }
+        assert.deepEqual(restored.claimRecords,before.claimRecords);
+        assert.deepEqual(restored.claimCheckpoint,before.claimCheckpoint);
+        assert.equal(archive.readyForRestore,false);
+    }
+});
+
+test("malformed quest storage cannot become complete evidence or durable playable snapshots",()=>{
+    const changes=[
+        s=>{delete s.date;},s=>s.extra=true,s=>s.date="2023-02-29",
+        s=>s.date="2020-02-30",s=>s.date=1700000000000,s=>s.date="2020-2-29",
+        s=>s.progress.killMonsters=-1,s=>s.progress.killMonsters=1.5,
+        s=>s.progress.killMonsters="4",s=>s.progress.killMonsters=Number.MAX_SAFE_INTEGER+1,
+        s=>s.claimed.killMonsters="false",s=>s.claimed.killMonsters={claimed:true},
+        s=>{delete s.progress.killMonsters;},s=>{delete s.claimed.winBattle;},
+        s=>s.progress.orphan=1,s=>s.claimed.orphan=false,
+        s=>{s.progress["bad id"]=1;s.claimed["bad id"]=false;},
+        s=>s.progress=[],s=>s.claimed=[],s=>s.date=""
+    ];
+    for(const key of ["dailyQuestState","commissionQuestState"]){
+        for(const change of [s=>{for(const k of Object.keys(s)){delete s[k];}},...changes]){
+            const records=sources();change(records.progress[key]);
+            const before=structuredClone(records);
+            assert.throws(()=>assemble(records),/quest/);
+            const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
+            records.progress.playableState=fields;delete records.playableState;
+            assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,records),/quest/);
+            delete records.progress.playableState;records.playableState=before.playableState;
+            assert.deepEqual(records,before);
+        }
+    }
+});
+
+test("historical v1 quest bytes remain compatible but cannot stand in for complete evidence",()=>{
+    const {createRecoveryArchive,inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    for(const key of ["dailyQuestState","commissionQuestState"]){
+        const records=sources();records.progress[key]={claimed:true};
+        const before=structuredClone(records),snapshot=assembleCanonicalSnapshot("uid-a",7,records);
+        const archive=JSON.parse(JSON.stringify(createRecoveryArchive("uid-a",7,records,snapshot)));
+        const restored=inspectRecoveryArchive(archive,"uid-a",7,snapshot);
+        assert.deepEqual(restored.progress[key],before.progress[key]);
+        assert.equal(assembleCanonicalSnapshot("uid-a",7,restored).sha256,snapshot.sha256);
+        assert.equal(archive.readyForRestore,false);
+        assert.throws(()=>assemble(restored),/quest/);
+        assert.deepEqual(records,before);
+    }
+});
+
+test("server-created uninitialized quests stay unpublished while explicit zero states preserve their empty date",()=>{
+    const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
+    const records=makeInitialCharacterSources("uid-a",7,"create-quest",{displayName:"new hero",
+        element:"water",gender:"female",
+        attributes:{attack:1,intelligence:2,vitality:3,energy:4,defensePoints:0,agility:0}},
+        {recordedAt:1700000000000});
+    const initial=structuredClone(records);
+    assert.equal(assembleCanonicalSnapshot("uid-a",7,records).readyForPublication,false);
+    assert.deepEqual(records,initial);
+    // Test-only explicit sidecars isolate the empty quest evidence. The factory
+    // remains unchanged and cannot create a complete published projection.
+    records.progress.sidecars=structuredClone(sources().progress.sidecars);
+    assert.throws(()=>assemble(records),/quest/);
+    for(const key of ["dailyQuestState","commissionQuestState"]){
+        records.progress[key]=structuredClone(sources().progress[key]);
+        records.progress[key].date="";
+        for(const id of Object.keys(records.progress[key].progress)){
+            records.progress[key].progress[id]=0;records.progress[key].claimed[id]=false;
+        }
+    }
+    const bundle=assemble(records);
+    for(const key of ["dailyQuestState","commissionQuestState"]){
+        assert.deepEqual(bundle.projection.gameSave[key],records.progress[key]);
+        for(const mutate of [s=>s.progress.killMonsters=1,s=>s.claimed.killMonsters=true]){
+            const bad=structuredClone(records);mutate(bad.progress[key]);
+            assert.throws(()=>assemble(bad),/quest/);
+            assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,bad),/quest/);
+        }
+    }
+    assert.equal(bundle.readyForPublication,false);
 });

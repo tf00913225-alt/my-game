@@ -173,6 +173,6 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
             return {...view({...c,records,account:nextAccount,envelope:{...c.envelope,serverRevision:revision}},false),receipt};
         });
     }
-    return Object.freeze({read,mutate});
+    return Object.freeze({read,mutate,readInTransaction:context});
 }
 module.exports={createHeroGrowth};

@@ -19,14 +19,13 @@ test('exact DEV host gets both formal heroes in the default battle roster withou
  assert.equal(JSON.stringify(c.FourSymbolsHeroSystem.getDomain().serialize()),before);
  assert.equal(vm.runInContext('JSON.stringify(heroAccountState)',c),before,'actual save source stays locked');
  assert.deepEqual(c.FourSymbolsHeroSystem.getDomain({forBattle:true}).serialize(),projection,'preview seed is stable');
- c.FourSymbolsHeroBattle.setRoster([ids[1]]);assert.equal(c.initializeHeroBattleCombatants().length,1);
- c.FourSymbolsHeroBattle.useUnlockedRoster();assert.equal(c.initializeHeroBattleCombatants().length,2);
+ assert.equal(c.FourSymbolsHeroBattle.setRoster,undefined);assert.equal(c.FourSymbolsHeroBattle.useUnlockedRoster,undefined);
  c.location.hostname='tf00913225-alt.github.io';assert.equal(c.initializeHeroBattleCombatants().length,0);
 });
 for(const host of ['tf00913225-alt.github.io','four-symbols-dev.pages.dev','other.four-symbols-dev.pages.dev','dev.four-symbols-dev.pages.dev.evil.invalid','localhost','127.0.0.1','']){
  test('no automatic heroes on '+(host||'missing host'),()=>{
   const c=runtime(host);assert.equal(c.initializeHeroBattleCombatants().length,0);
-  assert.throws(()=>c.FourSymbolsHeroBattle.setRoster(ids),/locked/);
+  assert.equal(c.FourSymbolsHeroBattle.setRoster,undefined);
  });
 }
 test('owned progression and account replacement remain canonical; only locked heroes receive preview access',()=>{

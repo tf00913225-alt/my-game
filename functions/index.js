@@ -11,6 +11,7 @@ const {createTrustedGrantLedger}=require("./src/trusted-grant-ledger");
 const {createCanonicalResourceCredit}=require("./src/canonical-resource-credit");
 const {createHeroAcquisition}=require("./src/hero-acquisition");
 const {createHeroGrowth}=require("./src/hero-growth");
+const {createTeamFormation}=require("./src/team-formation");
 const {createLegacyCandidateScreening}=require("./src/legacy-candidate-screening");
 const {createCanonicalRecoveryApproval}=require("./src/canonical-recovery-approval");
 const {createCanonicalCurrentRecovery}=require("./src/canonical-current-recovery");
@@ -50,6 +51,8 @@ const heroAcquisition=createHeroAcquisition({
 });
 const heroGrowth=createHeroGrowth({db:getFirestore(),FieldValue,HttpsError,
     runProtected:sessions.runProtected,inspectExistingEnvelope,nextRevision,acquisition:heroAcquisition});
+const teamFormation=createTeamFormation({db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    nextRevision,readContext:heroGrowth.readInTransaction});
 const legacyCandidateScreening=createLegacyCandidateScreening({
     db:getFirestore(),HttpsError,runProtected:sessions.runProtected,
     inspectExistingEnvelope,validateLegacySaveCandidate,validateMigrationBackup
@@ -230,6 +233,12 @@ exports.claimDailyCheckin=onCall(CALLABLE_OPTIONS,async request=>{
 exports.readHeroAcquisition=onCall(CALLABLE_OPTIONS,async request=>{
     try{ return await heroAcquisition.read(await verifyGameIdentity(request)); }
     catch(error){ throw asHttpsError(error); }
+});
+exports.readTeamFormation=onCall(CALLABLE_OPTIONS,async request=>{
+    try{return await teamFormation.read(await verifyGameIdentity(request));}catch(error){throw asHttpsError(error);}
+});
+exports.saveTeamFormation=onCall(CALLABLE_OPTIONS,async request=>{
+    try{return await teamFormation.save(await verifyGameIdentity(request));}catch(error){throw asHttpsError(error);}
 });
 exports.readHeroGrowth=onCall(CALLABLE_OPTIONS,async request=>{
     try{return await heroGrowth.read(await verifyGameIdentity(request));}
