@@ -75,8 +75,11 @@ assert.match(fixedCss,/\.battle-element-box-button\{[\s\S]*?width:66px !importan
 
 assert.match(home,/openSharedFormation\(\\'home\\'\)/);
 assert.match(formation,/window\.vFixedRenderAllyFormationContent=renderAllyFormationContent/);
-assert.match(formation,/moveAllyCharacter\(vFixedFormationSelectedCharacter,slot\)/);
-assert.match(formation,/saveGame\(\{source:"ally-formation"\}\)/);
+assert.match(formation,/window\.vFixedPlaceFormationUnit=placeFormationUnit/);
+assert.match(formation,/const ok=await window\.FourSymbolsTeamFormation\.save\(value\)/);
+assert.match(formation,/window\.refreshFormationPage\(\);return ok/);
+assert.doesNotMatch(formation,/vFixedFormationSelectedCharacter|moveAllyCharacter\(|saveGame\(\{source:"ally-formation"\}\)/,
+    "Formation changes must use the confirmed protected save controller, never the retired local writer");
 
 assert.match(core,/window\.FourSymbolsBattleFlow=Object\.freeze/);
 assert.match(core,/interceptActionFinish\(interceptor\)/);
