@@ -1,7 +1,8 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
-const read=p=>fs.readFileSync(p,"utf8");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
+const read=p=>{const source=fs.readFileSync(p,"utf8");return p.endsWith('.css')?authoredUiCss(source):source;};
 const main=read("js/00-main.js");
 const core=read("js/34-v141-core-systems.js");
 const ui=read("js/35-v141-ui-battle.js");

@@ -2,12 +2,13 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 
 const characterRuntime=fs.readFileSync(
     "js/19-stage-v78-character-inventory-runtime.js",
     "utf8"
 );
-const characterCss=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+const characterCss=authoredUiCss(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"));
 const functionalRepairs=fs.readFileSync(
     "js/58-v173.63-functional-fixes.js",
     "utf8"
@@ -20,8 +21,8 @@ const productionBuild=fs.readFileSync("scripts/build-production.mjs","utf8");
 
 assert.match(
     characterCss,
-    /#homeFeatureModal \.home-feature-modal-box\.wide\{[^}]*width[\s\S]*calc\(100% - 8px\)[^}]*height:[^}]*calc\(100% - 8px\)/,
-    "CSS character owner must use the full mobile canvas"
+    /#homeFeatureModal \.home-feature-modal-box\.wide\{[^}]*width:calc\(100% - var\(--ui-large-panel-safe-space\)\)[^}]*height:min\(var\(--ui-large-panel-height\),calc\(100% - var\(--ui-large-panel-safe-space\)\)\)/,
+    "CSS character owner must use the single native panel frame"
 );
 assert.doesNotMatch(
     characterRuntime,

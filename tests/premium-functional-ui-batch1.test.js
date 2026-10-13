@@ -2,10 +2,11 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 
 const ROOT=path.resolve(__dirname,"..");
-const read=relative=>fs.readFileSync(path.join(ROOT,relative),"utf8");
+const read=relative=>{const source=fs.readFileSync(path.join(ROOT,relative),"utf8");return relative.endsWith('.css')?authoredUiCss(source):source;};
 
 const authUi=read("js/firebase/firebase-auth-ui.js");
 const authCss=read("css/firebase-auth.css");

@@ -2,11 +2,12 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 const vm=require("node:vm");
 
 const root=path.resolve(__dirname,"..");
-const read=relative=>fs.readFileSync(path.join(root,relative),"utf8");
+const read=relative=>{const source=fs.readFileSync(path.join(root,relative),"utf8");return relative.endsWith('.css')?authoredUiCss(source):source;};
 const itemSource=read("js/27-v132-content-expansion.js");
 const touchSource=read("js/01-stage-v8-touch-lock.js");
 const rewardCss=read("css/33-v132-content-expansion.css");
@@ -105,7 +106,7 @@ test("ticket choices keep image and label in separate layout boxes",()=>{
 
 test("item preview stays inside the stage with a reachable return button",()=>{
     assert.match(itemCss,/max-height:calc\(100% - 24px\) !important/);
-    const frameCss=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+    const frameCss=authoredUiCss(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"));
     assert.match(frameCss,/#itemModal #itemModalIcon\{[^}]*aspect-ratio:1 !important/);
     assert.doesNotMatch(itemCss,/#itemModal \.item-modal-icon/);
     assert.match(frameCss,/#itemModal #itemModalStats\{[^}]*overflow-y:auto !important/);

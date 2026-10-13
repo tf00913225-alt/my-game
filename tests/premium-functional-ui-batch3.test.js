@@ -1,7 +1,8 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
-const read=p=>fs.readFileSync(p,"utf8");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
+const read=p=>{const source=fs.readFileSync(p,"utf8");return p.endsWith('.css')?authoredUiCss(source):source;};
 const inventoryJs=read("js/35-v141-ui-battle.js");
 const inventoryQol=read("js/53-v173.50-inventory-qol.js");
 const scrollOwner=read("js/19-stage-v78-character-inventory-runtime.js");
@@ -22,7 +23,7 @@ assert.match(characterCss,/\.home-feature-modal-box\.wide #characterTabContent\{
 assert.doesNotMatch(scrollCss,/app\.on-inventory-page \.content\{/);
 assert.match(scrollCss,/\.inventory-grid-scroll\{[^}]*overflow-y:auto;[^}]*touch-action:pan-y;/);
 assert.match(relicJs,/function prepareRelicModal\(\)/);
-assert.match(inventoryCss,/inventory-grid-classic\{[\s\S]*?repeat\(auto-fill,minmax\(48px,1fr\)\)/);
+assert.match(inventoryCss,/inventory-grid-classic\{[\s\S]*?repeat\(5,minmax\(0,1fr\)\)/);
 assert.match(inventoryCss,/inventory-item-classic\{[^}]*box-sizing:border-box/);
 assert.match(characterCss,/\.item-slot\{border:1px solid var\(--slot-rarity\);border-radius:0;[^}]*background:var\(--equipment-rarity-fill\)/);
 assert.doesNotMatch(inventoryCss,/inventory-item-classic\{[^}]*border:/);

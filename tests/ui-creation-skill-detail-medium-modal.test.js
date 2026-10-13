@@ -2,11 +2,12 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
-const detailCss=fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8");
-const nativeCss=fs.readFileSync("css/29-v125-character-creation-native.css","utf8");
+const detailCss=authoredUiCss(fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8"));
+const nativeCss=authoredUiCss(fs.readFileSync("css/29-v125-character-creation-native.css","utf8"));
 const runtime=fs.readFileSync("js/24-v125-character-creation-native-runtime.js","utf8");
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 
