@@ -300,15 +300,31 @@ class CdpClient{
 }
 
 async function waitFor(client,expression,label,timeoutMs=30000){
-    const started=Date.now();
-    let last=null;
-    while(Date.now()-started<timeoutMs){
-        try{
-            last=await client.eval(`Boolean(${expression})`);
-            if(last){ return; }
-        }catch(error){ last=error.message; }
-        await sleep(180);
-    }
+    const started=performance.now();
+    let transportTimer;
+    let result;
+    try{
+        result=await Promise.race([
+            client.eval(`(async()=>{
+                const started=performance.now();
+                let last=null;
+                while(performance.now()-started<${Number(timeoutMs)}){
+                    try{last=Boolean(${expression});if(last){return {ready:true,last,elapsedMs:performance.now()-started};}}
+                    catch(error){last=String(error?.message||error);}
+                    await new Promise(resolve=>setTimeout(resolve,180));
+                }
+                return {ready:false,last,elapsedMs:performance.now()-started};
+            })()`),
+            new Promise((_,reject)=>{
+                transportTimer=setTimeout(()=>reject(new Error("CDP transport stalled while waiting for "+label)),timeoutMs+10000);
+            })
+        ]);
+    }finally{ clearTimeout(transportTimer); }
+    client.waitTimings=client.waitTimings||[];
+    client.waitTimings.push({label,timeoutMs,browserElapsedMs:result?.elapsedMs,hostElapsedMs:performance.now()-started,ready:result?.ready===true,last:result?.last});
+    if(client.waitTimings.length>40){ client.waitTimings.shift(); }
+    if(result?.ready===true){ return; }
+    const last=result?.last;
     if(label==="App Shell character/save owners"){
         throw new Error(
             `Timed out waiting for ${label}. Last result: ${String(last)}. `+
@@ -420,6 +436,7 @@ async function prepareAccountFirstRuntime(client,features){
 
 async function cleanupPresentationQaBattle(client){
     await client.eval("(()=>{"+
+        "try{window.__relicQaFocusObserver?.disconnect();delete window.__relicQaFocusObserver;delete window.__relicQaFocusSnapshot;}catch(_){}"+
         "try{window.__relicQaFinishRelease?.();delete window.__relicQaFinishRelease;}catch(_){}"+
         "try{if(window.v174RelicPresentationState&&window.v174RelicPresentationState().active){return false;}}catch(_){}"+
         "try{window.FourSymbolsBattleFloatingFeedback?.clear?.();}catch(_){}"+
@@ -487,11 +504,15 @@ async function launchPresentationQaMode(client,mode,relicId){
 
 async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     const id=JSON.stringify(relicId);
+    const focusExpression="(()=>{const n=document.getElementById('teamRelicBattlePresentation');const owner=window.FourSymbolsBattlefieldRenderGeometry;const state=window.v143SkillAnimationState?.current;const stageNode=document.getElementById('v143-skill-stage');if(!n?.classList.contains('targets-visible')||!n?.classList.contains('vfx-running')||state?.config?.id!=="+id+"||state.done||stageNode?.dataset.sequence!==String(state.sequence)||!stageNode.querySelector('.v143-vfx-sprite[data-skill="+id+"]'))return null;const side=state?.targetSide||null;const indexes=Array.isArray(state?.targetIndexes)?state.targetIndexes.slice():[];const overlay=owner?.getBattlefieldOverlayGeometry?.()?.rect||null;const clip=rect=>{if(!rect||!overlay){return rect||null;}const left=Math.max(overlay.left,rect.left),top=Math.max(overlay.top,rect.top),right=Math.min(overlay.left+overlay.width,rect.left+rect.width),bottom=Math.min(overlay.top+overlay.height,rect.top+rect.height);return right>left&&bottom>top?{left,top,width:right-left,height:bottom-top}:null;};const rectOf=node=>{const r=node.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height};};const artProjections=[...n.querySelectorAll('.team-relic-target-projection-art')].map(rectOf);const hpProjections=[...n.querySelectorAll('.team-relic-target-projection-hp')].map(rectOf);const diagnostics=indexes.map(index=>{const card=document.getElementById((side==='monster'?'battleMonster':'battlePlayerCard')+index);const g=owner?.getUnitGeometry?.(side,index);return {index,dom:!!card,slot:g?.slot||card?.dataset?.slot||null,artworkProjection:clip(g?.artworkProjection?.rect),hpProjection:clip(g?.hpProjection?.rect)};});const matches=(expected,actual)=>{const approx=(a,b)=>Math.abs(a-b)<=1.5;const unmatched=actual.slice();return expected.length===actual.length&&expected.every(e=>{const index=unmatched.findIndex(a=>approx(e.left,a.left)&&approx(e.top,a.top)&&approx(e.width,a.width)&&approx(e.height,a.height));if(index<0){return false;}unmatched.splice(index,1);return true;});};const expectedArt=diagnostics.map(item=>item.artworkProjection).filter(Boolean);const expectedHp=diagnostics.map(item=>item.hpProjection).filter(Boolean);const stage=document.getElementById('v143-skill-stage');const sprite=stage?.querySelector('.v143-vfx-sprite[data-skill="+id+"]');return {skillId:state.config.id,sequence:state.sequence,side,indexes,artProjections,hpProjections,targetDiagnostics:diagnostics,outlineCount:n.querySelectorAll('.team-relic-battle-target-outline').length,artGeometryMatches:matches(expectedArt,artProjections),hpGeometryMatches:matches(expectedHp,hpProjections),stageOwner:stage?.dataset.geometryOwner||null,spriteOwner:sprite?.dataset.geometryOwner||null,spriteTargetSide:sprite?.dataset.targetSide||null,spriteTargetIndexes:sprite?.dataset.targetIndexes||'',presentationLock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false};})()";
     // Use production event owners in the disposable local battle fixture.
     // DEV preview is deliberately unavailable on the production host.
     await waitFor(client,`window.v174RelicDebugState?.()?.relicId===${id}`,relicId+" initialized battle owner",7000);
     await client.eval("(()=>{currentBattleMonsters.forEach(index=>{monsters[index].hp=Math.max(100000,monsters[index].hp);monsters[index].maxHP=Math.max(100000,monsters[index].maxHP||0);});return true;})()");
     await client.eval("(()=>{window.__relicQaFinishRelease=FourSymbolsBattleFlow.interceptActionFinish(()=>!!battleDurationAction?.completed);return true;})()");
+    // Observe the finite VFX phase in the browser before triggering it. CDP
+    // scheduling may return only after that phase has already completed.
+    await client.eval("(()=>{window.__relicQaFocusObserver?.disconnect();delete window.__relicQaFocusSnapshot;const capture=()=>{const snapshot="+focusExpression+";if(snapshot){window.__relicQaFocusSnapshot=snapshot;window.__relicQaFocusObserver.disconnect();}};window.__relicQaFocusObserver=new MutationObserver(capture);window.__relicQaFocusObserver.observe(document.body,{subtree:true,childList:true,attributes:true});return true;})()");
     const before=await client.eval("window.v174RelicDebugState().totalTriggers");
     if(relicId==="relic_cold_spring_jade"){
         await client.eval("(()=>{const max=getPartyBattleStats(0).maxHP;player.hp=Math.floor(max*.4);settleBattleHpDamage(player,Math.ceil(max*.1),{attacker:monsters[currentBattleMonsters[0]],sourceType:'normalAttack',damageKind:'direct'});return true;})()");
@@ -533,14 +554,12 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     assert.ok(identity.overlay,relicId+" canonical overlay geometry missing");
     assert.ok(Math.abs(identity.rect.left-identity.overlay.left)<=1&&Math.abs(identity.rect.top-identity.overlay.top)<=1&&Math.abs(identity.rect.width-identity.overlay.width)<=1&&Math.abs(identity.rect.height-identity.overlay.height)<=1,relicId+" mask host must match canonical battlefield overlay bounds");
 
-    await waitFor(
-        client,
-        "(()=>{const n=document.getElementById('teamRelicBattlePresentation');return n?.classList.contains('targets-visible')&&n?.classList.contains('vfx-running')&&document.querySelector('#v143-skill-stage .v143-vfx-sprite[data-skill="+id+"]');})()",
-        relicId+" target focus and VFX",
-        9000
-    );
-    const focus=await client.eval("(()=>{const n=document.getElementById('teamRelicBattlePresentation');const owner=window.FourSymbolsBattlefieldRenderGeometry;const state=window.v143SkillAnimationState?.current;const side=state?.targetSide||null;const indexes=Array.isArray(state?.targetIndexes)?state.targetIndexes.slice():[];const overlay=owner?.getBattlefieldOverlayGeometry?.()?.rect||null;const clip=rect=>{if(!rect||!overlay){return rect||null;}const left=Math.max(overlay.left,rect.left),top=Math.max(overlay.top,rect.top),right=Math.min(overlay.left+overlay.width,rect.left+rect.width),bottom=Math.min(overlay.top+overlay.height,rect.top+rect.height);return right>left&&bottom>top?{left,top,width:right-left,height:bottom-top}:null;};const rectOf=node=>{const r=node.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height};};const artProjections=[...n.querySelectorAll('.team-relic-target-projection-art')].map(rectOf);const hpProjections=[...n.querySelectorAll('.team-relic-target-projection-hp')].map(rectOf);const diagnostics=indexes.map(index=>{const card=document.getElementById((side==='monster'?'battleMonster':'battlePlayerCard')+index);const g=owner?.getUnitGeometry?.(side,index);return {index,dom:!!card,slot:g?.slot||card?.dataset?.slot||null,artworkProjection:clip(g?.artworkProjection?.rect),hpProjection:clip(g?.hpProjection?.rect)};});const matches=(expected,actual)=>{const approx=(a,b)=>Math.abs(a-b)<=1.5;const unmatched=actual.slice();return expected.length===actual.length&&expected.every(e=>{const index=unmatched.findIndex(a=>approx(e.left,a.left)&&approx(e.top,a.top)&&approx(e.width,a.width)&&approx(e.height,a.height));if(index<0){return false;}unmatched.splice(index,1);return true;});};const expectedArt=diagnostics.map(item=>item.artworkProjection).filter(Boolean);const expectedHp=diagnostics.map(item=>item.hpProjection).filter(Boolean);const stage=document.getElementById('v143-skill-stage');const sprite=stage?.querySelector('.v143-vfx-sprite[data-skill="+id+"]');return {side,indexes,artProjections,hpProjections,targetDiagnostics:diagnostics,outlineCount:n.querySelectorAll('.team-relic-battle-target-outline').length,artGeometryMatches:matches(expectedArt,artProjections),hpGeometryMatches:matches(expectedHp,hpProjections),stageOwner:stage?.dataset.geometryOwner||null,spriteOwner:sprite?.dataset.geometryOwner||null,spriteTargetSide:sprite?.dataset.targetSide||null,spriteTargetIndexes:sprite?.dataset.targetIndexes||'',presentationLock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false};})()");
-    assert.ok(focus.indexes.length>=1,relicId+" resolved no battle targets");
+    // Capture the phase, animation identity, targets and geometry atomically.
+    // A second CDP read may occur after the finite animation has completed.
+    await waitFor(client,"Boolean(window.__relicQaFocusSnapshot)",mode+" "+relicId+" target focus and VFX",9000);
+    const focus=await client.eval("window.__relicQaFocusSnapshot");
+    assert.equal(focus.skillId,relicId,"Target snapshot must belong to the requested relic");
+    assert.ok(focus.indexes.length>=1,relicId+" resolved no battle targets: "+JSON.stringify({mode,focus}));
     if(targetKind==="singleAlly"){ assert.equal(focus.side,"player");assert.equal(focus.indexes.length,1); }
     if(targetKind==="allyAll"){ assert.equal(focus.side,"player"); }
     if(targetKind==="enemyAll"||targetKind==="damageStatus"){ assert.equal(focus.side,"monster"); }
@@ -1659,6 +1678,7 @@ try{
     evidence.error=error?.stack||String(error);
     evidence.runtimeEvents=client?.events?.slice(-50)||[];
     evidence.evalTimings=client?.evalTimings||[];
+    evidence.waitTimings=client?.waitTimings||[];
     evidence.relicPresentationAtFailure=client?await client.eval("(()=>{const p=window.v174RelicPresentationState?.();const node=document.getElementById('teamRelicBattlePresentation');const icon=node?.querySelector('.team-relic-battle-cutin-icon img');const stage=document.getElementById('v143-skill-stage');return {visibility:document.visibilityState,hidden:document.hidden,focused:document.hasFocus(),presentation:p||null,debug:window.v174RelicDebugState?.()||null,maskClass:node?.className||null,icon:icon?{src:icon.getAttribute('src'),complete:icon.complete,naturalWidth:icon.naturalWidth}:null,stageSkill:stage?.dataset.skill||null,stageSequence:stage?.dataset.sequence||null,lock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false,feedback:document.querySelectorAll('.battle-floating-feedback').length,readingState:document.body.classList.contains('v174-battle-reading-open')};})()").catch(diagnosticError=>({captureError:String(diagnosticError?.message||diagnosticError)})):{unavailable:true};
     const probeHostStart=performance.now();
     evidence.browserTimerProbe=client?await Promise.race([
