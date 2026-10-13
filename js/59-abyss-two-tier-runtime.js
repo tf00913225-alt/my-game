@@ -18,8 +18,6 @@
     const LEGACY_STORAGE_KEY=ACCOUNT_REPOSITORY.accountKey("legacy-abyss-state",ACTIVE_UID);
     const STATE_VERSION=3;
     const PRE_STAGE_COUNT=4;
-    const PRE_STAGE_REGULAR_COUNT=5;
-    const PRE_STAGE_ELITE_COUNT=3;
     const STAGES_PER_REGION=5;
     const REGION_COUNT=5;
 
@@ -393,15 +391,13 @@
 
     function buildTrueRealmFinalRoster(config){
         const roster=[];
-        FINAL_TRUE_REALM_EMPERORS.forEach((definition,position)=>{
+        FINAL_TRUE_REALM_EMPERORS.forEach(definition=>{
             const emperorRegion=ABYSS_REGIONS[definition.regionIndex];
             const loadout=FINAL_TRUE_REALM_LOADOUTS[definition.name];
             const boss=makeAbyssMonster(definition.name,config,emperorRegion,"smallBoss",PRE_STAGE_COUNT,true,loadout,"extreme");
             boss.v141ForceSkillLevel=5;
             boss.v141SkillLevel=5;
             boss.v144SkillLevel=5;
-            boss.v141FormationRow=0;
-            boss.v141FormationPosition=position;
             boss.v174TrueRealmFinal=true;
             roster.push(boss);
         });

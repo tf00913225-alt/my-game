@@ -3896,6 +3896,7 @@ function commitBattleWaveTransition(){
     currentBattleMonsters=next.map((monster,position)=>{
         const index=offset+position;
         monster.alive=true;monster.hp=monster.maxHP;monster.sp=monster.maxSP;
+        window.v144ConfigureMonsterEncounterSkills?.(monster,state.mode+"-"+battleToken+"-wave-2");
         monster.statusEffects=[];monsters[index]=monster;return index;
     });
     state.waves=[];state.index=1;state.phase="WAVE_2_ACTIVE";
@@ -4337,6 +4338,10 @@ function beginBattleStatisticsSession(){
 }
 
 function finishBattleStatisticsSession(result){
+    if(battleWaveState&&battleWaveState.token===battleToken){
+        battleWaveState.phase="BATTLE_COMPLETE";
+        battleWaveState.waves=[];
+    }
     battleStatisticsFinishAction();
     const owner=getBattleStatisticsOwner();
     if(owner&&typeof owner.finish==="function"){
@@ -13442,6 +13447,14 @@ function processNextCombatant(token){
 
     if(checkBattleEnd()){
         return;
+    }
+
+    // This boundary has no unfinished action. Status/relic deaths must not
+    // create a dummy action or a second post-action delay before wave two.
+    if(isBattleWaveTransition()){
+        battleWaveState.actionFinished=true;
+        battleResolutionResumeToken=token;
+        if(commitBattleWaveTransition()!==true){ return; }
     }
 
 

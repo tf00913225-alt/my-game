@@ -44,11 +44,16 @@ assert.ok(
     "the core round_end boundary must settle before turn increments"
 );
 const startTurn=extractFunction(core,"startTurn");
+const roundDeclaration=extractFunction(core,"beginBattleRoundDeclaration");
+assert.ok(startTurn.indexOf('notifyBattleRoundBoundary("round_start",token)')>=0);
 assert.ok(
     startTurn.indexOf('notifyBattleRoundBoundary("round_start",token)')<
-    startTurn.indexOf('battlePhase=\n        "declare"'),
+    startTurn.indexOf('beginBattleRoundDeclaration(token)'),
     "the core round_start boundary must precede the new declare phase"
 );
+assert.match(roundDeclaration,/battlePhase=\s*"declare"/);
+assert.doesNotMatch(roundDeclaration,/notifyBattleRoundBoundary|turn\+\+/,
+    "continuing a wave at round start must not create another round boundary");
 assert.match(extractFunction(core,"beginCharacterTurn"),/battlePresentationLocks\.size>0[\s\S]*battleInputResumeToken=token[\s\S]*return;/);
 
 assert.doesNotMatch(relic,/startTurn=function\(/,"team relic must not wrap the core round owner");
