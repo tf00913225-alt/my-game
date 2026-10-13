@@ -255,7 +255,7 @@
             const currentGold=typeof gold!=="undefined"
                 ?Math.max(0,Math.floor(rosterNumber(gold))).toLocaleString("zh-TW")
                 :"0";
-            header.innerHTML='<b>冒險隊伍</b><span class="v146-home-roster-count">隊伍 -- / 6</span><span class="v146-home-roster-gold">金幣 <strong id="v146HomeRosterGoldValue">'+currentGold+'</strong></span><button type="button" class="v-fixed-formation-entry" data-feature="gameplay-core" onclick="openHomeFeature(\'formation\')">佈陣</button>';
+            header.innerHTML='<b>冒險隊伍</b><span class="v146-home-roster-count">隊伍 -- / 6</span><span class="v146-home-roster-gold">金幣 <strong id="v146HomeRosterGoldValue">'+currentGold+'</strong></span><button type="button" class="v-fixed-formation-entry" data-feature="gameplay-core" onclick="openSharedFormation(\'home\')">佈陣</button>';
             roster.appendChild(header);
         }
         if(!roster.querySelector(".v146-home-character")){

@@ -5,7 +5,12 @@ const path=require("node:path");
 const cp=require("node:child_process");
 const net=require("node:net");
 const root=path.resolve(__dirname,"..");
-const findChrome=()=>process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||["google-chrome","google-chrome-stable","chromium","chromium-browser"].map(name=>cp.spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"})).find(r=>r.status===0&&r.stdout.trim())?.stdout.trim()||"";
+const findChrome=()=>{
+    const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    if(configured&&fs.existsSync(configured))return configured;
+    return ["google-chrome","google-chrome-stable","chromium","chromium-browser"].map(name=>cp.spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"})).find(r=>r.status===0&&r.stdout.trim())?.stdout.trim()||"";
+};
+
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function freePort(){return new Promise((resolve,reject)=>{const server=net.createServer();server.once("error",reject);server.listen(0,"127.0.0.1",()=>{const port=server.address().port;server.close(()=>resolve(port));});});}
 async function connectChrome(chrome){
@@ -20,12 +25,18 @@ async function connectChrome(chrome){
     const close=async()=>{rejectPending(new Error("Backpack Chrome connection closed"));socket?.close();if(child.exitCode===null){child.kill("SIGKILL");await new Promise(resolve=>child.once("exit",resolve));}await fs.promises.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:100});};
     try{
         // Match the existing shared browser readiness budget, not 100 polls.
-        let target;const deadline=Date.now()+15000;
+        let target,lastProbe="not attempted";const deadline=Date.now()+15000;
         while(!target&&Date.now()<deadline){
             if(launchError||exit)throw new Error(`Backpack Chrome launch failed: ${launchError?.message||JSON.stringify(exit)}\n${stderr}`);
-            try{target=(await (await fetch(`http://127.0.0.1:${port}/json/list`,{signal:AbortSignal.timeout(1000)})).json()).find(row=>row.type==="page"&&row.webSocketDebuggerUrl);}catch(_){}if(!target)await sleep(50);
+            try{
+                const response=await fetch(`http://127.0.0.1:${port}/json/list`,{signal:AbortSignal.timeout(1000)});
+                const targets=await response.json();
+                lastProbe=JSON.stringify({status:response.status,targets:targets.map(row=>({type:row.type,debugger:!!row.webSocketDebuggerUrl}))});
+                target=targets.find(row=>row.type==="page"&&row.webSocketDebuggerUrl);
+            }catch(error){lastProbe=String(error.stack||error)+(error.cause?" cause="+String(error.cause):"");}
+            if(!target)await sleep(50);
         }
-        assert.ok(target,`Chrome DevTools target unavailable within 15 seconds\n${stderr}`);
+        assert.ok(target,`Chrome DevTools target unavailable within 15 seconds: ${JSON.stringify({chrome,pid:child.pid,port,exit:exit||null,lastProbe})}\n${stderr}`);
         socket=new WebSocket(target.webSocketDebuggerUrl);
         await new Promise((resolve,reject)=>{
             const timer=setTimeout(()=>reject(new Error("Backpack Chrome socket open timed out")),5000);

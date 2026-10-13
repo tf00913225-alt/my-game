@@ -199,6 +199,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 
 
 
+
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
    - 遊戲邏輯舞台固定 1080 × 1920
@@ -662,9 +663,11 @@ window.FourSymbolsHeroSystem=Object.freeze({
         const core=window.FourSymbolsHeroCore;
         const domain=account=>core.createDomain(account,
             ()=>[player,player2,player3],calculateCharacterBaseStats,id=>skillDatabase[id]);
+        const formationAccount=window.FourSymbolsTeamFormation?.getAccount?.();
         const growth=window.FourSymbolsHeroGrowth?.getAccount?.();
         const growthStatus=window.FourSymbolsHeroGrowth?.getStatus?.();
         if(growth&&(!growthStatus.testMode||forBattle)){return domain(growth);}
+        if(formationAccount){return domain(formationAccount);}
         let account=core.normalizeAccountState(heroAccountState);
         // Saved unlocked flags are caches, not permanent acquisition rights.
         // Re-project only the same-UID protected backend entitlement snapshot.
@@ -4781,19 +4784,20 @@ function $(id){
 // Battle-only roster. Player/save/loadout Owners continue to use getCharacters().
 // Numeric battle indexes 3..5 are slots, never player4/player5/player6 identities.
 let heroBattleCombatants=[];
-let heroBattleSelection=null;
 const HERO_BASIC_ATTACK_CONFIG=Object.freeze({enabled:true,skill:"normal",hp:0,sp:0});
 
 function getHeroBattleRosterIds(domain=window.FourSymbolsHeroSystem.getDomain({forBattle:true})){
-    return heroBattleSelection===null
-        ?domain.listHeroDefinitions().filter(def=>domain.isHeroUnlocked(def.heroId)).map(def=>def.heroId)
-        :heroBattleSelection.slice();
+    const formation=window.FourSymbolsTeamFormation?.getConfirmed?.();
+    if(formation)return window.FourSymbolsTeamFormationPolicy.roster(formation);
+    if(window.FourSymbolsTeamFormation?.getStatus?.().ready)return [];
+    return domain.listHeroDefinitions().filter(def=>domain.isHeroUnlocked(def.heroId)).map(def=>def.heroId);
 }
 
 function initializeHeroBattleCombatants(){
+    window.FourSymbolsTeamFormation?.projectToBattle?.();
     const domain=window.FourSymbolsHeroSystem.getDomain({forBattle:true});
     const ids=getHeroBattleRosterIds(domain);
-    if(ids.length>3||new Set(ids).size!==ids.length){ throw new Error("invalid Hero battle roster"); }
+    if(ids.length>window.FourSymbolsHeroCore.contract.maxHeroes||new Set(ids).size!==ids.length){ throw new Error("invalid Hero battle roster"); }
     const next=ids.map(heroId=>{
         const definition=domain.getHeroDefinition(heroId);
         if(!domain.isHeroUnlocked(heroId)){ throw new Error("locked Hero cannot enter battle"); }
@@ -4808,23 +4812,9 @@ function initializeHeroBattleCombatants(){
 }
 
 window.FourSymbolsHeroBattle=Object.freeze({
-    maxHeroes:3,maxPlayerCharacters:3,
-    // UI reads a copy of the same session roster consumed by battle initialization.
-    getRoster:()=>getHeroBattleRosterIds(),
-    // Selection is session-only. Acquisition and permanent loadout remain later phases.
-    setRoster(heroIds){
-        if(battleActive){ throw new Error("cannot replace combatant identity during battle"); }
-        if(!Array.isArray(heroIds)||heroIds.length>3||new Set(heroIds).size!==heroIds.length){
-            throw new Error("invalid Hero battle roster");
-        }
-        const domain=window.FourSymbolsHeroSystem.getDomain({forBattle:true});
-        heroIds.forEach(id=>{domain.getHeroDefinition(id);if(!domain.isHeroUnlocked(id)){throw new Error("locked Hero");}});
-        heroBattleSelection=heroIds.slice();
-    },
-    useUnlockedRoster(){
-        if(battleActive){ throw new Error("cannot replace combatant identity during battle"); }
-        heroBattleSelection=null;
-    }
+    maxHeroes:window.FourSymbolsHeroCore.contract.maxHeroes,
+    maxPlayerCharacters:window.FourSymbolsHeroCore.contract.maxPlayerCharacters,
+    getRoster:()=>getHeroBattleRosterIds()
 });
 
 function getPartyCharacterByIndex(index){
@@ -7016,7 +7006,7 @@ function saveGame(options={}){
                     window.FourSymbolsBattlefieldSlots &&
                     typeof window.FourSymbolsBattlefieldSlots.getSerializableAllyFormation==="function"
                 )
-                ? window.FourSymbolsBattlefieldSlots.getSerializableAllyFormation([0,1,2])
+                ? (window.FourSymbolsTeamFormation?.getConfirmed?.() || (existingRelicSaveData?.allyFormation?.version===2?existingRelicSaveData.allyFormation:window.FourSymbolsBattlefieldSlots.getSerializableAllyFormation([0,1,2])))
                 : (
                     existingRelicSaveData &&
                     existingRelicSaveData.allyFormation
@@ -7241,6 +7231,11 @@ function loadGame(){
 
         // Validate the optional extension before mutating any existing character.
         const hydratedHeroAccount=window.FourSymbolsHeroCore.normalizeAccountState(data.heroAccount);
+        if(data.allyFormation?.version===2){
+            window.FourSymbolsTeamFormationPolicy.validate(data.allyFormation,
+                [data.player,data.player2,data.player3].flatMap((character,index)=>character?.id?[index]:[]),
+                window.FourSymbolsHeroCore.listHeroDefinitions().map(hero=>hero.heroId));
+        } // Structural cache validation only; the protected reader supplies authority.
         heroAccountState=hydratedHeroAccount;
         Object.assign(
             player,
@@ -7706,7 +7701,7 @@ function loadGame(){
             typeof window.FourSymbolsBattlefieldSlots.hydrateAllyFormation==="function"
         ){
             window.FourSymbolsBattlefieldSlots.hydrateAllyFormation(
-                savedAllyFormation,
+                savedAllyFormation?.version===2?{version:1,characterIndexToSlot:savedAllyFormation.characterIndexToSlot}:savedAllyFormation,
                 getExistingPartyIndexes()
             );
         }else if(typeof window!=="undefined"){
@@ -25005,7 +25000,9 @@ function setQuestTouchMode(active){
 
 // Hero page is a read-only Core projection; roster writes go only to the battle Owner.
 let heroPageSelectedId=null;
-let heroPageTab="details";
+let heroPageTab="overview";
+let heroPageElement="all";
+let heroPageListScroll=0;
 function heroPageHtml(value){
     return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[char]);
 }
@@ -25040,28 +25037,11 @@ function heroPagePassive(definition){
     return "尚無被動能力";
 }
 function heroPageArtwork(hero,className=""){
-    return hero.artwork?`<img class="${className}" src="${heroPageHtml(hero.artwork)}" alt="${heroPageHtml(hero.definition.name)}立繪" draggable="false">`:`<span class="hero-art-placeholder">英雄</span>`;
+    return hero.artwork?`<img class="${className}" src="${heroPageHtml(hero.artwork)}" alt="${heroPageHtml(hero.definition.name)}立繪" draggable="false">`:`<span role="status">立繪素材缺失</span>`;
 }
-function renderHeroPageContent(){
-    const data=getHeroPageSnapshot(),escape=heroPageHtml;
-    if(!data.heroes.some(hero=>hero.definition.heroId===heroPageSelectedId))heroPageSelectedId=data.heroes[0]?.definition.heroId||null;
-    const hero=data.heroes.find(entry=>entry.definition.heroId===heroPageSelectedId);
-    const selected=hero&&data.roster.includes(hero.definition.heroId);
-    const picker=data.heroes.map(entry=>`<button type="button" class="hero-picker-button" data-hero-id="${escape(entry.definition.heroId)}" aria-pressed="${entry===hero}" onclick="selectHeroPage(this.dataset.heroId)">
-        ${heroPageArtwork(entry)}<span><b>${escape(entry.definition.name)}</b><small>${entry.owned?"已解鎖":entry.eligible?"DEV 試用":"未解鎖"}</small></span></button>`).join("");
+function renderHeroDetailContent(hero,data){
+    const escape=heroPageHtml;
     let content="";
-    if(heroPageTab==="roster"){
-        content=`<p class="hero-page-note">最多安排 ${data.maxHeroes} 名英雄，與玩家角色共同出戰。編隊於本次登入期間有效。</p><ol class="hero-roster-list">`+
-            Array.from({length:data.maxHeroes},(_,index)=>{
-                const id=data.roster[index],entry=data.heroes.find(row=>row.definition.heroId===id);
-                if(!entry)return `<li class="hero-roster-slot hero-roster-empty"><span>${index+1}</span><b>未安排英雄</b></li>`;
-                return `<li class="hero-roster-slot"><span>${index+1}</span>${heroPageArtwork(entry)}<b>${escape(entry.definition.name)}</b><div class="hero-roster-actions">
-                    <button type="button" data-hero-id="${escape(id)}" aria-label="${escape(entry.definition.name)}移前" onclick="moveHeroPageRoster(this.dataset.heroId,-1)" ${!data.editingAllowed||index===0?"disabled":""}>移前</button>
-                    <button type="button" data-hero-id="${escape(id)}" aria-label="${escape(entry.definition.name)}移後" onclick="moveHeroPageRoster(this.dataset.heroId,1)" ${!data.editingAllowed||index===data.roster.length-1?"disabled":""}>移後</button>
-                    <button type="button" data-hero-id="${escape(id)}" aria-label="${escape(entry.definition.name)}休戰" onclick="toggleHeroPageRoster(this.dataset.heroId)" ${!data.editingAllowed?"disabled":""}>休戰</button></div></li>`;
-            }).join("")+`</ol><p class="hero-page-note">選擇上方英雄，再按「出戰」即可加入編隊。不安排英雄時，仍可由玩家角色出戰。</p>
-            <button type="button" class="main-button hero-default-roster" onclick="resetHeroPageRoster()" ${!data.editingAllowed?"disabled":""}>恢復預設編隊</button>`;
-    }else if(hero){
         const numeric=value=>Number.isFinite(value)?Math.round(value):"—";
         const rows=(entries,values)=>`<dl class="hero-stat-grid">${entries.map(([key,label])=>`<div><dt>${escape(label)}</dt><dd>${numeric(values?.[key])}</dd></div>`).join("")}</dl>`;
         content=`<div class="hero-profile"><div class="hero-profile-art">${heroPageArtwork(hero)}</div><div class="hero-profile-summary">
@@ -25082,17 +25062,23 @@ function renderHeroPageContent(){
                 <p>怒氣達 ${window.FourSymbolsHeroCore.contract.rage.skillThreshold} 時，於下一次行動施放，消耗 ${window.FourSymbolsHeroCore.contract.rage.skillCost} 怒氣。</p>
                 <p>${escape(hero.skill?.definition?.description||"建立玩家角色後可查看技能資料。")}</p></section>
             <section class="hero-page-section"><h3>${escape(hero.definition.name)}被動</h3><p>${escape(heroPagePassive(hero.definition))}</p></section>`;
-    }else content='<p class="hero-page-note">目前沒有英雄資料。</p>';
-    const blocked=!data.editingAllowed||!hero?.eligible||(!selected&&data.roster.length>=data.maxHeroes);
-    return `<div class="hero-page-shell"><div class="hero-picker" aria-label="選擇英雄">${picker}</div>
-        <div class="hero-page-tabs" role="tablist" aria-label="英雄頁分頁">
-            <button id="heroDetailsTab" type="button" role="tab" aria-selected="${heroPageTab==="details"}" aria-controls="heroPageContent" onclick="switchHeroPageTab('details')">英雄資料</button>
-            <button id="heroRosterTab" type="button" role="tab" aria-selected="${heroPageTab==="roster"}" aria-controls="heroPageContent" onclick="switchHeroPageTab('roster')">上場編隊</button></div>
-        <div id="heroPageContent" class="hero-page-content" role="tabpanel" aria-labelledby="${heroPageTab==="details"?"heroDetailsTab":"heroRosterTab"}" data-scroll-owner="y">${content}</div>
-        <div class="hero-page-footer"><span id="heroRosterCount">已安排 ${data.roster.length} / ${data.maxHeroes} 名英雄${battleActive?"・戰鬥中無法更動":""}</span><div>
-            <button type="button" class="main-button" onclick="openHomeFeature('rest')">免費休息</button>
-            <button id="heroRosterToggle" type="button" class="main-button" data-hero-id="${escape(hero?.definition.heroId||"")}" onclick="toggleHeroPageRoster(this.dataset.heroId)" ${blocked?"disabled":""}>${!hero?.eligible?"尚未解鎖":selected?"休戰":"出戰"}</button>
-        </div></div></div>`;
+    return content;
+}
+function renderHeroPageContent(){
+    const data=getHeroPageSnapshot(),escape=heroPageHtml;
+    const hero=data.heroes.find(row=>row.owned&&row.definition.heroId===heroPageSelectedId);
+    const overview=heroPageTab!=="details"||!hero;
+    const order=new Map(data.roster.map((id,index)=>[id,index]));
+    const heroes=data.heroes.filter(row=>row.owned&&(heroPageElement==="all"||row.definition.element===heroPageElement))
+        .sort((a,b)=>(order.get(a.definition.heroId)??Number.MAX_SAFE_INTEGER)-(order.get(b.definition.heroId)??Number.MAX_SAFE_INTEGER));
+    const toolbar=overview?`<div class="hero-overview-tools"><button type="button" class="main-button" onclick="openSharedFormation('hero')">佈陣</button>
+        <div class="hero-element-tabs" role="tablist" aria-label="英雄元素分類">${[["all","全部"],["fire","火"],["water","水"],["wind","風"],["earth","土"]].map(([id,label])=>`<button type="button" role="tab" aria-selected="${heroPageElement===id}" onclick="filterHeroPage('${id}')">${label}</button>`).join("")}</div></div>`:
+        '<button type="button" class="main-button hero-detail-back" onclick="returnHeroOverview()">‹ 返回英雄列表</button>';
+    const content=overview?`<div class="hero-card-grid">${heroes.map(row=>`<button type="button" class="hero-card" data-hero-id="${escape(row.definition.heroId)}" onclick="selectHeroPage(this.dataset.heroId)">
+        ${heroPageArtwork(row)}<b>${escape(row.definition.name)}</b><span>${escape(elementDatabase[row.definition.element]?.name||row.definition.element)}・${row.account.stars} 星</span><span>Lv.${row.level??"—"}${order.has(row.definition.heroId)?"・上陣":""}</span></button>`).join("")}</div>
+        ${heroes.length?"":'<p class="hero-page-note">此分類目前沒有已擁有英雄。</p>'}
+        <p class="hero-page-note">英雄技能依等級自動提升。</p>` : renderHeroDetailContent(hero,data);
+    return `<div class="hero-page-shell">${toolbar}<div id="heroPageContent" class="hero-page-content" data-scroll-owner="y">${content}</div></div>`;
 }
 window.isHeroGrowthBattleActive=()=>battleActive;
 function renderHeroGrowthControls(hero,data){
@@ -25120,36 +25106,26 @@ function refreshHeroPage(preserveScroll=false){
 }
 function selectHeroPage(id){
     window.FourSymbolsHeroCore.getHeroDefinition(id);
-    heroPageSelectedId=id;
-    refreshHeroPage();
+    if(!getHeroPageSnapshot().heroes.some(hero=>hero.owned&&hero.definition.heroId===id))return;
+    heroPageListScroll=$("heroPageContent")?.scrollTop||0;
+    heroPageSelectedId=id;heroPageTab="details";refreshHeroPage();
 }
-function switchHeroPageTab(tab){
-    if(!["details","roster"].includes(tab))return;
-    heroPageTab=tab;
-    refreshHeroPage();
+function filterHeroPage(element){
+    if(!["all","fire","water","wind","earth"].includes(element))return;
+    heroPageElement=element;heroPageListScroll=0;refreshHeroPage();
 }
-function toggleHeroPageRoster(id){
-    if(battleActive){rpgAlert("戰鬥中無法變更英雄編隊。");return;}
-    const roster=window.FourSymbolsHeroBattle.getRoster();
-    if(!window.FourSymbolsHeroSystem.getDomain({forBattle:true}).isHeroUnlocked(id)){rpgAlert("此英雄尚未解鎖。");return;}
-    const next=roster.includes(id)?roster.filter(heroId=>heroId!==id):roster.concat(id);
-    if(next.length>window.FourSymbolsHeroBattle.maxHeroes){rpgAlert("最多安排 3 名英雄出戰。");return;}
-    window.FourSymbolsHeroBattle.setRoster(next);
-    refreshHeroPage(true);
+function returnHeroOverview(){heroPageTab="overview";refreshHeroPage();if($("heroPageContent"))$("heroPageContent").scrollTop=heroPageListScroll;}
+async function openSharedFormation(origin="home"){
+    if(origin==="hero")heroPageListScroll=$("heroPageContent")?.scrollTop||0;
+    try{
+        await window.FourSymbolsFeatures.ensure("gameplay-core","team-formation");
+        window.vFixedFormationReturnTarget=origin;
+        openHomeFeature('formation');
+    }catch(error){rpgAlert("佈陣模組載入失敗，請確認連線後重試。");}
 }
-function moveHeroPageRoster(id,direction){
-    if(battleActive){rpgAlert("戰鬥中無法變更英雄編隊。");return;}
-    if(direction!==-1&&direction!==1)return;
-    const roster=window.FourSymbolsHeroBattle.getRoster(),index=roster.indexOf(id),target=index+direction;
-    if(index<0||target<0||target>=roster.length)return;
-    [roster[index],roster[target]]=[roster[target],roster[index]];
-    window.FourSymbolsHeroBattle.setRoster(roster);
-    refreshHeroPage(true);
-}
-function resetHeroPageRoster(){
-    if(battleActive){rpgAlert("戰鬥中無法變更英雄編隊。");return;}
-    window.FourSymbolsHeroBattle.useUnlockedRoster();
-    refreshHeroPage(true);
+function returnFromFormation(){
+    if(window.vFixedFormationReturnTarget==="hero"){openHomeFeature('hero');returnHeroOverview();}
+    else closeHomeFeature();
 }
 
 function openHomeFeature(type){
@@ -25223,7 +25199,7 @@ function openHomeFeature(type){
     else if(type==="hero"){
         titleEl.textContent="英雄";
         modal.querySelector(".home-feature-modal-box")?.classList.add("hero-panel");
-        heroPageTab="details";
+        heroPageTab="overview";
         bodyEl.innerHTML=renderHeroPageContent();
     }
     else if(type==="expPool"){
@@ -25329,10 +25305,10 @@ function openHomeFeature(type){
     }
     else if(type==="formation"){
         titleEl.textContent="佈陣";
-        bodyEl.innerHTML=
-            typeof window.vFixedRenderAllyFormationContent==="function"
-            ? window.vFixedRenderAllyFormationContent()
-            : "";
+        modal.querySelector(".home-feature-modal-box")?.classList.add("formation-panel");
+        bodyEl.innerHTML=window.vFixedRenderAllyFormationContent();
+        window.vFixedBindFormationInput?.();
+        void window.FourSymbolsTeamFormation?.read?.();
     }
     else if(type==="offlineExp"){
 
@@ -25753,6 +25729,7 @@ function restoreBorrowedElement(){
 
 
 function closeHomeFeature(){
+    window.vFixedCleanupFormationInput?.();
 
     const modal=
         $("homeFeatureModal");
@@ -25809,7 +25786,7 @@ function closeHomeFeature(){
             box.classList.remove(
                 "wide"
             );
-            box.classList.remove("hero-panel");
+            box.classList.remove("hero-panel","formation-panel");
 
         }
 

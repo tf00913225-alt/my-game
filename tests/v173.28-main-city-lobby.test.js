@@ -54,8 +54,9 @@ test("four daily facilities and four recessive tools preserve all eight function
     assert.equal(count(actions,/class="home-card home-card-tertiary"/g),4);
     ["hero","synthesis","quest","forge","achievement","announcement","offlineExp","system"].forEach(type=>assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)")));
     assert.match(actions,/aria-label="英雄系統"/);
-    assert.match(read("js/00-main.js"),/onclick="openHomeFeature\('rest'\)"/); // Free rest remains reachable from Hero.
+    assert.doesNotMatch(read("js/00-main.js").slice(read("js/00-main.js").indexOf("function renderHeroPageContent()"),read("js/00-main.js").indexOf("function openHomeFeature(type)")),/openHomeFeature\('rest'\)/); // Hero UI no longer exposes rest.
     assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-template-columns:repeat\(2,minmax\(192px,20%\)\);[^}]*grid-auto-rows:204px;/);
+
     assert.doesNotMatch(baseCss,/margin-inline-(?:start|end):(34|68)px/);
     assert.match(baseCss,/\.home-card-secondary\{[^}]*width:100%;[^}]*height:204px;[^}]*border:3px solid[^}]*background:rgba\(17,20,16,.92\)/);
     assert.match(baseCss,/\.home-card-secondary \.home-card-icon\{[^}]*width:96px;[^}]*height:96px/);

@@ -215,3 +215,6 @@ export function createLocalMigrationBackup(){
     }
     return repository.createMigrationBackup(uid);
 }
+
+export async function readTeamFormation(){return callTrustedFunction("readTeamFormation",{});}
+export async function saveTeamFormation(intent){return callTrustedFunction("saveTeamFormation",intent);}
