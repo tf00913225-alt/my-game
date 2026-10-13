@@ -550,12 +550,18 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     assert.equal(focus.spriteTargetSide,focus.side,relicId+" VFX target side drifted from focus side");
     assert.equal(focus.presentationLock,true,relicId+" presentation lock must stay held during VFX");
 
-    await waitFor(
-        client,
-        "(()=>{const p=window.v174RelicPresentationState?.();return !p?.active&&!document.getElementById('teamRelicBattlePresentation')&&!document.getElementById('v143-skill-stage')&&!document.body.classList.contains('team-relic-cinematic-active')&&!window.FourSymbolsBattleFlow?.isPresentationActive?.()&&!document.querySelector('.battle-floating-feedback');})()",
-        relicId+" complete presentation cleanup",
-        12000
-    );
+    try{
+        await waitFor(
+            client,
+            "(()=>{const p=window.v174RelicPresentationState?.();return !p?.active&&!document.getElementById('teamRelicBattlePresentation')&&!document.getElementById('v143-skill-stage')&&!document.body.classList.contains('team-relic-cinematic-active')&&!window.FourSymbolsBattleFlow?.isPresentationActive?.()&&!document.querySelector('.battle-floating-feedback');})()",
+            relicId+" complete presentation cleanup",
+            12000
+        );
+    }catch(error){
+        const diagnostics=await client.eval("(()=>{const p=window.v174RelicPresentationState?.();const current=window.v143SkillAnimationState?.current;const stage=document.getElementById('v143-skill-stage');return {relicActive:!!p?.active,relicPresentation:p||null,mask:!!document.getElementById('teamRelicBattlePresentation'),vfx:!!stage,stageSkill:stage?.dataset.skill||null,stageSequence:stage?.dataset.sequence||null,bodyClass:document.body.classList.contains('team-relic-cinematic-active'),lock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false,feedback:document.querySelectorAll('.battle-floating-feedback').length,readingState:document.body.classList.contains('v174-battle-reading-open'),animation:current?{id:current.config?.id||null,sequence:current.sequence,done:!!current.done,startedAt:current.startedAt,visualStartedAt:current.visualStartedAt,firstVisibleFrameAt:current.firstVisibleFrameAt,duration:current.duration}:null};})()").catch(diagnosticError=>({captureError:String(diagnosticError?.message||diagnosticError)}));
+        evidence.checks.relicCleanupFailure={mode,relicId,targetKind,diagnostics};
+        throw new Error(error.message+"; cleanup diagnostics: "+JSON.stringify(evidence.checks.relicCleanupFailure),{cause:error});
+    }
     const cleanup=await client.eval("(()=>({mask:!!document.getElementById('teamRelicBattlePresentation'),vfx:!!document.getElementById('v143-skill-stage'),focus:document.querySelectorAll('.team-relic-battle-target-outline').length,feedback:document.querySelectorAll('.battle-floating-feedback').length,bodyClass:document.body.classList.contains('team-relic-cinematic-active'),readingState:document.body.classList.contains('v174-battle-reading-open'),lock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false}))()");
     assert.deepEqual(cleanup,{mask:false,vfx:false,focus:0,feedback:0,bodyClass:false,readingState:true,lock:false},relicId+" presentation must expire normally while the reading drawer stays open");
     const readingClosed=await client.eval("(()=>{window.FourSymbolsBattleStatistics?.closeDrawer?.();return {readingState:document.body.classList.contains('v174-battle-reading-open'),vfx:!!document.getElementById('v143-skill-stage'),mask:!!document.getElementById('teamRelicBattlePresentation')};})()");
