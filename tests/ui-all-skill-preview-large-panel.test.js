@@ -1,3 +1,4 @@
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 "use strict";
 
 const assert=require("node:assert/strict");
@@ -5,16 +6,18 @@ const fs=require("node:fs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
-const owner=fs.readFileSync("css/30-v130-requested-updates.css","utf8");
-const hintOwner=fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8");
+const owner=authoredUiCss(fs.readFileSync("css/30-v130-requested-updates.css","utf8"));
+const hintOwner=authoredUiCss(fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8"));
 
-assert.match(owner,/html body \.skill-preview-modal\.v141-body-preview \.skill-preview-dialog\{[\s\S]*?max-width:var\(--ui-large-panel-max-width,396px\) !important;[\s\S]*?height:min\(var\(--ui-large-panel-height,620px\),calc\(100dvh - var\(--ui-large-panel-safe-space,24px\)\)\) !important;/);
-assert.match(owner,/html body \.skill-preview-modal\.v141-body-preview \.skill-preview-heading,[\s\S]*?\.skill-preview-tabs\{[\s\S]*?flex:0 0 auto !important;/);
-assert.match(owner,/html body \.skill-preview-modal\.v141-body-preview \.skill-preview-tabs button\{[\s\S]*?min-height:var\(--ui-large-panel-tab-height,42px\) !important;/);
-assert.match(owner,/html body \.skill-preview-modal\.v141-body-preview \.skill-preview-body\{[\s\S]*?flex:1 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?scrollbar-gutter:stable !important;/);
+assert.match(owner,/#game-ui #allElementSkillPreviewModal \.skill-preview-dialog\{[\s\S]*?max-width:var\(--ui-large-panel-max-width,396px\) !important;[\s\S]*?height:min\(var\(--ui-large-panel-height,620px\),calc\(calc\(100 \* var\(--layout-block-size,746.6667px\) \/ 100\) - var\(--ui-large-panel-safe-space,24px\)\)\) !important;/);
+assert.match(owner,/#game-ui #allElementSkillPreviewModal \.skill-preview-heading,[\s\S]*?\.skill-preview-tabs\{[\s\S]*?flex:0 0 auto !important;/);
+assert.match(owner,/#game-ui #allElementSkillPreviewModal \.skill-preview-tabs button\{[\s\S]*?min-height:var\(--ui-large-panel-tab-height,42px\) !important;/);
+assert.match(owner,/#game-ui #allElementSkillPreviewModal \.skill-preview-body\{[\s\S]*?flex:1 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?scrollbar-gutter:stable !important;/);
 assert.match(hintOwner,/#allElementSkillPreviewModal \.skill-preview-body::before\{[\s\S]*?克制：你的元素剋對方＝你佔優勢[\s\S]*?被克制：對方元素剋你＝你處於劣勢[\s\S]*?white-space:pre-line;/);
 
 function findChrome(){
+    const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    if(configured&&fs.existsSync(configured))return configured;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -30,7 +33,7 @@ if(!chrome){
 
 const fixture=path.join(process.cwd(),".ui-all-skill-preview-large-panel.html");
 const fileUrl="file://"+fixture.replace(/\\/g,"/");
-const html=`<!doctype html><html><head><meta charset="utf-8">
+const html=require("../.github/scripts/fixtures/native-ui-css-contract.cjs").legacyFixture(`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/00-main.css">
 <link rel="stylesheet" href="css/30-v130-requested-updates.css">
 <link rel="stylesheet" href="css/31-v131-fix-batch.css">
@@ -59,7 +62,7 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
  body.innerHTML=Array.from({length:40},(_,i)=>'<div class="skill-preview-card"><strong>技能 '+i+'</strong><p>這是一段較長的技能說明，用來確認只有技能列表區可以上下捲動。</p></div>').join(''); void dialog.offsetHeight; const long=snap();
  document.getElementById('result').textContent=JSON.stringify({short,long});
 })();
-</script></body></html>`;
+</script></body></html>`);
 
 fs.writeFileSync(fixture,html,"utf8");
 try{

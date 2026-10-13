@@ -87,20 +87,20 @@
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:6px;
+    gap:calc(6 * var(--ui-length-unit,1px));
     color:#ad9d81;
-    font-size:14px;
+    font-size:calc(14 * var(--ui-length-unit,1px));
     line-height:1.4;
 }
 :is(#game-stage,#game-ui) #expDistributeList .v173-exp-row-meta b{
     margin-left:auto;
-    padding:2px 6px;
-    border:1px solid rgba(200,153,69,.58);
-    border-radius:999px;
+    padding:calc(2 * var(--ui-length-unit,1px)) calc(6 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(200,153,69,.58);
+    border-radius:calc(999 * var(--ui-length-unit,1px));
     color:#ffd77d;
     background:rgba(86,54,18,.42);
-    font-size:13px;
-    line-height:17px;
+    font-size:calc(13 * var(--ui-length-unit,1px));
+    line-height:calc(17 * var(--ui-length-unit,1px));
     white-space:nowrap;
 }
 

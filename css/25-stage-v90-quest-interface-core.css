@@ -95,7 +95,7 @@
     -webkit-overflow-scrolling:touch !important;
     overscroll-behavior-y:contain !important;
     touch-action:pan-y !important;
-    padding:6px 6px 18px !important;
+    padding:calc(6 * var(--ui-length-unit,1px)) calc(6 * var(--ui-length-unit,1px)) 18px !important;
     scrollbar-gutter:stable !important;
 }
 
@@ -137,7 +137,7 @@
     border-radius:2997px !important;
     color:#c9bca6 !important;
     background:#17110b !important;
-    font-size:30px !important;
+    font-size:39px !important;
     font-weight:700 !important;
 }
 
@@ -153,19 +153,19 @@
 #game-ui #homeFeatureModal.quest-mode .quest-card-desc{
     margin-top:6px !important;
     color:#b9aa91 !important;
-    font-size:33px !important;
+    font-size:39px !important;
     line-height:1.32 !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-progress-line{
     margin-top:18px !important;
     color:#aa9b83 !important;
-    font-size:30px !important;
+    font-size:39px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-progress-line strong{
     color:#e7d6b7 !important;
-    font-size:33px !important;
+    font-size:39px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-progress-track{
@@ -195,7 +195,7 @@
     align-items:center !important;
     gap:12px 18px !important;
     color:#e0cda8 !important;
-    font-size:30px !important;
+    font-size:39px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-reward-label{
@@ -212,7 +212,7 @@
     border-radius:18px !important;
     background:linear-gradient(180deg,#5d2417,#2c100a) !important;
     color:#ffe27a !important;
-    font-size:33px !important;
+    font-size:39px !important;
     font-weight:800 !important;
 }
 
@@ -237,13 +237,13 @@
     justify-content:space-between !important;
     gap:24px !important;
     color:#e8d5ad !important;
-    font-size:33px !important;
+    font-size:39px !important;
     font-weight:800 !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-completion-head strong{
     color:#ffe27a !important;
-    font-size:36px !important;
+    font-size:39px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-completion-track{
@@ -280,7 +280,7 @@
 #game-ui #homeFeatureModal.quest-mode .quest-milestone-percent{
     margin-bottom:12px !important;
     color:#bfae91 !important;
-    font-size:30px !important;
+    font-size:39px !important;
     font-weight:800 !important;
 }
 

@@ -1,3 +1,4 @@
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 "use strict";
 
 const assert=require("node:assert/strict");
@@ -5,8 +6,8 @@ const fs=require("node:fs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
-const restCss=fs.readFileSync("css/37-v139-rested-experience.css","utf8");
-const sharedCss=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+const restCss=authoredUiCss(fs.readFileSync("css/37-v139-rested-experience.css","utf8"));
+const sharedCss=authoredUiCss(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"));
 
 assert.match(sharedCss,/--ui-medium-modal-max-width:360px;/);
 assert.match(sharedCss,/--ui-medium-modal-height:540px;/);
@@ -20,6 +21,8 @@ assert.match(restCss,/#homeFeatureModal:has\(#restButton\) \.home-feature-modal-
 assert.match(restCss,/#homeFeatureModal:has\(#restButton\) #restButton\{[\s\S]*?min-height:44px !important;/);
 
 function findChrome(){
+    const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    if(configured&&fs.existsSync(configured))return configured;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -35,7 +38,7 @@ if(!chrome){
 
 const fixture=path.join(process.cwd(),".ui-rest-medium-modal-smoke.html");
 const fileUrl="file://"+fixture.replace(/\\/g,"/");
-const html=`<!doctype html><html><head><meta charset="utf-8">
+const html=require("../.github/scripts/fixtures/native-ui-css-contract.cjs").legacyFixture(`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/00-main.css">
 <link rel="stylesheet" href="css/37-v139-rested-experience.css">
 <link rel="stylesheet" href="css/38-v141-system-expansion.css">
@@ -60,7 +63,7 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  copy.innerHTML=Array.from({length:45},(_,i)=>'<p>休息說明 '+i+'：測試內容。</p>').join('');void box.offsetHeight;const long=snap('long');
  document.getElementById('result').textContent=JSON.stringify({short,long});
 })();
-</script></body></html>`;
+</script></body></html>`);
 
 fs.writeFileSync(fixture,html,"utf8");
 try{

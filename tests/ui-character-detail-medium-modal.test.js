@@ -1,3 +1,4 @@
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 "use strict";
 
 const assert=require("node:assert/strict");
@@ -5,8 +6,8 @@ const fs=require("node:fs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
-const detailCss=fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8");
-const sharedCss=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+const detailCss=authoredUiCss(fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8"));
+const sharedCss=authoredUiCss(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"));
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 
 assert.match(sharedCss,/--ui-medium-modal-max-width:360px;/);
@@ -18,6 +19,8 @@ assert.match(detailCss,/#inventoryCharacterDetailModal \.close-item-button\{[\s\
 assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
 
 function findChrome(){
+    const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    if(configured&&fs.existsSync(configured))return configured;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -33,7 +36,7 @@ if(!chrome){
 
 const fixture=path.join(process.cwd(),".ui-character-detail-medium-smoke.html");
 const fileUrl="file://"+fixture.replace(/\\/g,"/");
-const html=`<!doctype html><html><head><meta charset="utf-8">
+const html=require("../.github/scripts/fixtures/native-ui-css-contract.cjs").legacyFixture(`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/00-main.css">
 <link rel="stylesheet" href="css/23-stage-v77-inventory-detail-ui.css">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
@@ -59,7 +62,7 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  stats.innerHTML=Array.from({length:36},(_,i)=>row(i)).join('');void box.offsetHeight;const long=snap('long');
  document.getElementById('result').textContent=JSON.stringify({short,long});
 })();
-</script></body></html>`;
+</script></body></html>`);
 
 fs.writeFileSync(fixture,html,"utf8");
 try{

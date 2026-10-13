@@ -111,14 +111,14 @@
    技能說明多寡不得再改變整個視窗大小。
 */
 #game-ui #skillDetailModal .item-modal-box{
-    width:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
-    max-width:var(--ui-medium-modal-max-width,360px) !important;
-    height:min(var(--ui-medium-modal-height,540px),calc(100% - var(--ui-medium-modal-safe-space,28px))) !important;
-    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    width:calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px)))) !important;
+    max-width:var(--ui-medium-modal-max-width,calc(360 * var(--ui-length-unit,1px))) !important;
+    height:min(var(--ui-medium-modal-height,calc(540 * var(--ui-length-unit,1px))),calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px))))) !important;
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px)))) !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
-    gap:var(--ui-medium-modal-content-gap,10px) !important;
+    gap:var(--ui-medium-modal-content-gap,calc(10 * var(--ui-length-unit,1px))) !important;
     overflow:hidden !important;
     box-sizing:border-box !important;
     touch-action:pan-y !important;
@@ -138,25 +138,25 @@
     overscroll-behavior-y:contain !important;
     touch-action:pan-y !important;
     scrollbar-gutter:stable !important;
-    font-size:15px !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
     line-height:1.55 !important;
 }
 #game-ui #skillDetailModal #skillDetailStats span[style*="font-size:11px"]{
-    font-size:13px !important;
+    font-size:calc(13 * var(--ui-length-unit,1px)) !important;
     line-height:1.35 !important;
 }
 #game-ui #skillDetailModal #skillDetailStats div[style*="font-size:11px"],
 #game-ui #skillDetailModal #skillDetailStats div[style*="font-size:12px"]{
-    font-size:15px !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
     line-height:1.5 !important;
 }
 #game-ui #skillDetailModal #skillDetailStats .v17364-progression-hint{
-    font-size:14px !important;
+    font-size:calc(14 * var(--ui-length-unit,1px)) !important;
     line-height:1.45 !important;
 }
 #game-ui #skillDetailModal #skillDetailStats .v17364-progression-detail,
 #game-ui #skillDetailModal #skillDetailStats .v17364-progression-detail > div{
-    font-size:15px !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
     line-height:1.45 !important;
 }
 #game-ui #skillDetailModal .close-item-button{
@@ -169,14 +169,14 @@
    這裡由 Medium Modal 規格接管外框，只有說明 .item-stat-list 捲動。
 */
 #game-ui #statusHelpModal .item-modal-box{
-    width:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
-    max-width:var(--ui-medium-modal-max-width,360px) !important;
-    height:min(var(--ui-medium-modal-height,540px),calc(100% - var(--ui-medium-modal-safe-space,28px))) !important;
-    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    width:calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px)))) !important;
+    max-width:var(--ui-medium-modal-max-width,calc(360 * var(--ui-length-unit,1px))) !important;
+    height:min(var(--ui-medium-modal-height,calc(540 * var(--ui-length-unit,1px))),calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px))))) !important;
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px)))) !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
-    gap:var(--ui-medium-modal-content-gap,10px) !important;
+    gap:var(--ui-medium-modal-content-gap,calc(10 * var(--ui-length-unit,1px))) !important;
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
@@ -197,7 +197,7 @@
 }
 #game-ui #statusHelpModal .close-item-button{
     margin-top:0 !important;
-    min-height:44px !important;
+    min-height:calc(44 * var(--ui-length-unit,1px)) !important;
 }
 
 /*
@@ -253,9 +253,9 @@
 
 /* Skill detail icon is an icon, not a full-width repeating banner. */
 #game-ui #skillDetailModal #skillDetailIcon{
-    width:88px!important;height:88px!important;min-height:88px!important;
-    align-self:center!important;margin:0 auto 8px!important;overflow:hidden!important;
-    border-radius:12px!important;background-position:center!important;
+    width:calc(88 * var(--ui-length-unit,1px))!important;height:calc(88 * var(--ui-length-unit,1px))!important;min-height:calc(88 * var(--ui-length-unit,1px))!important;
+    align-self:center!important;margin:0 auto calc(8 * var(--ui-length-unit,1px))!important;overflow:hidden!important;
+    border-radius:calc(12 * var(--ui-length-unit,1px))!important;background-position:center!important;
     background-size:contain!important;background-repeat:no-repeat!important;
     background-color:rgba(9,8,6,.88)!important;
 }

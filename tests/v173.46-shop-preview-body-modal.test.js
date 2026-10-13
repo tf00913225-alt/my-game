@@ -1,24 +1,27 @@
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
-const css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
-const legacyCss=fs.readFileSync("css/33-v132-content-expansion.css","utf8");
+const css=authoredUiCss(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"));
+const legacyCss=authoredUiCss(fs.readFileSync("css/33-v132-content-expansion.css","utf8"));
 const content=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
 const equipment=fs.readFileSync("js/equipment-progression.js","utf8");
 
-assert.match(content,/modal\.id="v132RewardModal"[\s\S]*?document\.body\.appendChild\(modal\)/);
-assert.match(css,/\.v132-reward-modal \.v17346-shop-preview-modal\.item-presentation-frame\{[\s\S]*?height:auto !important;[\s\S]*?max-height:calc\(100dvh - 28px\) !important;[\s\S]*?overflow:hidden !important;/);
+assert.match(content,/modal\.id="v132RewardModal"[\s\S]*?document\.getElementById\("game-ui"\)\.appendChild\(modal\)/);
+assert.match(css,/\.v132-reward-modal \.v17346-shop-preview-modal\.item-presentation-frame\{[\s\S]*?height:auto !important;[\s\S]*?max-height:calc\(calc\(100 \* var\(--layout-block-size,746.6667px\) \/ 100\) - 28px\) !important;[\s\S]*?overflow:hidden !important;/);
 assert.match(css,/\.v17346-shop-preview-modal \.item-presentation-scroll\{[\s\S]*?overflow-y:auto;[\s\S]*?scrollbar-gutter:stable;/);
-assert.match(css,/\.v17346-shop-preview-modal \.v17346-shop-preview-art\{[\s\S]*?width:clamp\(96px,min\(42vw,22dvh\),168px\) !important;[\s\S]*?aspect-ratio:1 !important;/);
+assert.match(css,/\.v17346-shop-preview-modal \.v17346-shop-preview-art\{[\s\S]*?width:clamp\(96px,min\(calc\(42 \* var\(--layout-inline-size,420px\) \/ 100\),calc\(22 \* var\(--layout-block-size,746.6667px\) \/ 100\)\),168px\) !important;[\s\S]*?aspect-ratio:1 !important;/);
 assert.match(css,/\.v17346-shop-preview-modal \.v17346-shop-preview-art img,[\s\S]*?object-fit:contain !important;/);
 assert.match(css,/\.v132-reward-modal \.v17346-shop-preview-modal \.v132-reward-actions\{[\s\S]*?position:static !important;/);
 assert.doesNotMatch(legacyCss,/v17346-shop-preview-modal/);
 assert.match(equipment,/item-presentation-frame[\s\S]*?item-presentation-scroll/);
 
 function findChrome(){
+    const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    if(configured&&fs.existsSync(configured))return configured;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -34,7 +37,7 @@ if(!chrome){
 
 const fixture=path.join(process.cwd(),".v17346-shop-preview-overflow.html");
 const fileUrl="file://"+fixture.replace(/\\/g,"/");
-const html=`<!doctype html><html><head><meta charset="utf-8">
+const html=require("../.github/scripts/fixtures/native-ui-css-contract.cjs").legacyFixture(`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/33-v132-content-expansion.css">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
 <link rel="stylesheet" href="css/50-v169-abyss-flow.css">
@@ -43,7 +46,7 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 const q=s=>document.querySelector(s),rect=e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
 const modal=q('.v17346-shop-preview-modal'),art=q('.v17346-shop-preview-art'),item=q('.v169-item-art'),img=q('.v169-item-art img'),actions=q('.v132-reward-actions');
 document.querySelector('#result').textContent=JSON.stringify({modal:rect(modal),art:rect(art),item:rect(item),img:rect(img),actions:rect(actions),overflow:modal.scrollWidth-modal.clientWidth});
-</script></body></html>`;
+</script></body></html>`);
 fs.writeFileSync(fixture,html,"utf8");
 try{
     const run=cp.spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1","--window-size=390,844","--dump-dom",fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});

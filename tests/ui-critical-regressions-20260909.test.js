@@ -1,7 +1,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
-const read=path=>fs.readFileSync(path,"utf8");
+const read=path=>{const source=fs.readFileSync(path,"utf8");return path.endsWith('.css')?require("../.github/scripts/fixtures/native-ui-css-contract.cjs")(source):source;};
 
 const bootstrap=read("js/23-v125-character-creation-bootstrap.js");
 const layout=read("js/19-stage-v78-character-inventory-runtime.js");

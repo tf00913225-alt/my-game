@@ -3,10 +3,10 @@
 ===================================================== */
 
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status.v169-element-box-active{
-    grid-template-columns:minmax(0,1fr) minmax(108px,120px);
-    gap:8px;
-    min-height:74px;
-    padding:9px 10px;
+    grid-template-columns:minmax(0,1fr) minmax(calc(108 * var(--ui-length-unit,1px)),120px);
+    gap:calc(8 * var(--ui-length-unit,1px));
+    min-height:calc(74 * var(--ui-length-unit,1px));
+    padding:calc(9 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));
     overflow:visible;
     box-sizing:border-box;
 }
@@ -77,8 +77,8 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     min-height:0 !important;
     max-height:none !important;
     flex-direction:column !important;
-    gap:8px !important;
-    padding:0 2px 24px !important;
+    gap:calc(8 * var(--ui-length-unit,1px)) !important;
+    padding:0 calc(2 * var(--ui-length-unit,1px)) calc(24 * var(--ui-length-unit,1px)) !important;
     overflow:visible !important;
     box-sizing:border-box !important;
 }
@@ -92,8 +92,8 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
         linear-gradient(110deg,rgba(100,58,18,.26),rgba(18,13,9,.96) 52%),
         linear-gradient(180deg,#21170d,#120e0a) !important;
     box-shadow:
-        inset 0 0 18px rgba(240,180,41,.045),
-        0 8px 14px rgba(0,0,0,.34) !important;
+        inset 0 0 calc(18 * var(--ui-length-unit,1px)) rgba(240,180,41,.045),
+        0 calc(8 * var(--ui-length-unit,1px)) calc(14 * var(--ui-length-unit,1px)) rgba(0,0,0,.34) !important;
 }
 
 /* Active mode only needs the real stop action. Hiding the disabled duplicate
@@ -103,101 +103,101 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 }
 
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status{
-    min-height:74px;
-    padding:9px 10px;
+    min-height:calc(74 * var(--ui-length-unit,1px));
+    padding:calc(9 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status-copy strong{
-    font-size:16px;
-    line-height:21px;
+    font-size:calc(16 * var(--ui-length-unit,1px));
+    line-height:calc(21 * var(--ui-length-unit,1px));
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status-copy small{
-    font-size:14px;
-    line-height:19px;
+    font-size:calc(14 * var(--ui-length-unit,1px));
+    line-height:calc(19 * var(--ui-length-unit,1px));
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-panel-kicker{
-    font-size:13px;
-    line-height:17px;
+    font-size:calc(13 * var(--ui-length-unit,1px));
+    line-height:calc(17 * var(--ui-length-unit,1px));
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-setting-card{
-    min-height:64px;
-    padding:9px 10px;
+    min-height:calc(64 * var(--ui-length-unit,1px));
+    padding:calc(9 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-setting-meta span{
-    font-size:14px;
-    line-height:19px;
+    font-size:calc(14 * var(--ui-length-unit,1px));
+    line-height:calc(19 * var(--ui-length-unit,1px));
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-setting-meta strong{
-    font-size:16px;
-    line-height:21px;
+    font-size:calc(16 * var(--ui-length-unit,1px));
+    line-height:calc(21 * var(--ui-length-unit,1px));
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-threshold-card{
-    padding:9px;
+    padding:calc(9 * var(--ui-length-unit,1px));
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-threshold-head{
-    margin-bottom:7px;
+    margin-bottom:calc(7 * var(--ui-length-unit,1px));
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-threshold-head strong{
-    font-size:15px;
-    line-height:20px;
+    font-size:calc(15 * var(--ui-length-unit,1px));
+    line-height:calc(20 * var(--ui-length-unit,1px));
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-threshold-head small{
-    font-size:14px;
-    line-height:19px;
+    font-size:calc(14 * var(--ui-length-unit,1px));
+    line-height:calc(19 * var(--ui-length-unit,1px));
     white-space:normal;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-return-card{
-    min-height:64px;
-    padding:9px 10px;
+    min-height:calc(64 * var(--ui-length-unit,1px));
+    padding:calc(9 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-return-copy strong{
-    font-size:15px;
-    line-height:20px;
+    font-size:calc(15 * var(--ui-length-unit,1px));
+    line-height:calc(20 * var(--ui-length-unit,1px));
 }
 #autoBattleSettingsPanel.v131-element-box-panel .auto-return-copy small{
-    font-size:14px;
-    line-height:19px;
+    font-size:calc(14 * var(--ui-length-unit,1px));
+    line-height:calc(19 * var(--ui-length-unit,1px));
 }
 #autoBattleSettingsPanel.v131-element-box-panel #v131ElementBoxStats{
-    margin:2px 0 0 !important;
-    padding:9px 10px !important;
+    margin:calc(2 * var(--ui-length-unit,1px)) 0 0 !important;
+    padding:calc(9 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px)) !important;
 }
 #autoBattleSettingsPanel.v131-element-box-panel #v131ElementBoxStats > small{
     display:block !important;
-    font-size:14px !important;
+    font-size:calc(14 * var(--ui-length-unit,1px)) !important;
     line-height:1.5 !important;
 }
 #autoBattleSettingsPanel.v131-element-box-panel .v141-element-box-remaining,
 #autoBattleSettingsPanel.v131-element-box-panel .v141-element-box-ad{
-    min-height:48px !important;
+    min-height:calc(48 * var(--ui-length-unit,1px)) !important;
 }
 
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status #autoBattleButton{
     width:100% !important;
     min-width:0 !important;
-    height:44px !important;
-    min-height:44px !important;
-    padding-inline:7px !important;
-    font-size:15px !important;
+    height:calc(44 * var(--ui-length-unit,1px)) !important;
+    min-height:calc(44 * var(--ui-length-unit,1px)) !important;
+    padding-inline:calc(7 * var(--ui-length-unit,1px)) !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
 }
 
 #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-dropdown .custom-dropdown-label,
 #autoBattleSettingsPanel.v131-element-box-panel .auto-settings-actions .main-button{
-    min-height:44px !important;
-    font-size:15px !important;
+    min-height:calc(44 * var(--ui-length-unit,1px)) !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
 }
 
 #autoBattleSettingsPanel .v169-element-box-stop{
     width:100%;
-    height:44px;
-    min-height:44px;
+    height:calc(44 * var(--ui-length-unit,1px));
+    min-height:calc(44 * var(--ui-length-unit,1px));
     min-width:0;
-    padding:0 7px;
-    border:1px solid #8f4c35;
-    border-radius:9px;
+    padding:0 calc(7 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid #8f4c35;
+    border-radius:calc(9 * var(--ui-length-unit,1px));
     color:#ffd9b0;
     background:linear-gradient(180deg,rgba(126,43,29,.92),rgba(54,18,13,.98));
-    box-shadow:inset 0 1px 0 rgba(255,226,146,.1),0 3px 0 #260a06,0 5px 10px rgba(0,0,0,.28);
-    font:900 15px/1 sans-serif;
+    box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(255,226,146,.1),0 calc(3 * var(--ui-length-unit,1px)) 0 #260a06,0 calc(5 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px)) rgba(0,0,0,.28);
+    font:900 calc(15 * var(--ui-length-unit,1px))/1 sans-serif;
     letter-spacing:.03em;
     cursor:pointer;
     touch-action:manipulation;
@@ -206,7 +206,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 
 #autoBattleSettingsPanel .v169-element-box-stop:active{
     filter:brightness(1.13);
-    transform:translateY(1px);
+    transform:translateY(calc(1 * var(--ui-length-unit,1px)));
 }
 
 #autoBattleSettingsPanel .v169-element-box-stop[hidden]{display:none !important;}
@@ -215,30 +215,30 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 /* V173.42 — shared recovery section and active-session edit lock. */
 #autoBattleSettingsPanel .v17342-element-box-shared{
     display:block;
-    margin:4px 0 0;
-    padding:9px;
-    border:1px solid rgba(193,144,67,.62);
-    border-radius:11px;
+    margin:calc(4 * var(--ui-length-unit,1px)) 0 0;
+    padding:calc(9 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(193,144,67,.62);
+    border-radius:calc(11 * var(--ui-length-unit,1px));
     background:linear-gradient(160deg,rgba(42,30,18,.92),rgba(10,9,7,.96));
 }
 #autoBattleSettingsPanel .v17342-element-box-shared-head{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:6px;
-    margin-bottom:5px;
+    gap:calc(6 * var(--ui-length-unit,1px));
+    margin-bottom:calc(5 * var(--ui-length-unit,1px));
     color:#f2ce83;
 }
-#autoBattleSettingsPanel .v17342-element-box-shared-head b{font-size:16px;}
-#autoBattleSettingsPanel .v17342-element-box-shared-head span{font-size:14px;color:#bba57a;}
+#autoBattleSettingsPanel .v17342-element-box-shared-head b{font-size:calc(16 * var(--ui-length-unit,1px));}
+#autoBattleSettingsPanel .v17342-element-box-shared-head span{font-size:calc(14 * var(--ui-length-unit,1px));color:#bba57a;}
 #autoBattleSettingsPanel .v17342-element-box-lock-notice{
-    margin:4px 0;
-    padding:8px 9px;
-    border:1px solid rgba(216,89,59,.72);
-    border-radius:9px;
+    margin:calc(4 * var(--ui-length-unit,1px)) 0;
+    padding:calc(8 * var(--ui-length-unit,1px)) calc(9 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(216,89,59,.72);
+    border-radius:calc(9 * var(--ui-length-unit,1px));
     color:#ffd7b8;
     background:rgba(80,25,17,.86);
-    font-size:15px;
+    font-size:calc(15 * var(--ui-length-unit,1px));
     line-height:1.45;
     font-weight:900;
     text-align:center;

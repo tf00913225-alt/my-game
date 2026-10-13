@@ -1,3 +1,4 @@
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 "use strict";
 
 const assert=require("node:assert/strict");
@@ -5,7 +6,7 @@ const fs=require("node:fs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
-const css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+const css=authoredUiCss(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"));
 const itemRuntime=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
 const mainRuntime=fs.readFileSync("js/00-main.js","utf8");
 
@@ -24,6 +25,8 @@ assert.match(itemRuntime,/const definition=item&&typeof getPotionDefinition==="f
 assert.match(itemRuntime,/if\(!definition\)\{[\s\S]*?if\(button\)\{ button\.remove\(\); \}[\s\S]*?return;/);
 
 function findChrome(){
+    const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    if(configured&&fs.existsSync(configured))return configured;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -39,7 +42,7 @@ if(!chrome){
 
 const fixture=path.join(process.cwd(),".ui-medium-item-detail-smoke.html");
 const fileUrl="file://"+fixture.replace(/\\/g,"/");
-const html=`<!doctype html><html><head><meta charset="utf-8">
+const html=require("../.github/scripts/fixtures/native-ui-css-contract.cjs").legacyFixture(`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/00-main.css">
 <link rel="stylesheet" href="css/23-stage-v77-inventory-detail-ui.css">
 <link rel="stylesheet" href="css/38-v141-system-expansion.css">
@@ -66,7 +69,7 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  use.remove();document.getElementById('itemModal').classList.remove('item-modal-mode-compact');document.getElementById('itemModal').classList.add('item-modal-mode-equipment');equip.textContent='穿戴';stats.innerHTML=Array.from({length:45},(_,i)=>'<p>裝備屬性 '+i+'</p>').join('');void box.offsetHeight;const equipment=snap('equipment');
  document.getElementById('result').textContent=JSON.stringify({potion,equipment});
 })();
-</script></body></html>`;
+</script></body></html>`);
 
 fs.writeFileSync(fixture,html,"utf8");
 try{
