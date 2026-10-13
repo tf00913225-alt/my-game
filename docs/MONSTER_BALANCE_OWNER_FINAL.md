@@ -14,7 +14,7 @@ Rechecked against opening dev 3b4ffbc2963cc472fa13857e2923cb80506e93e4 on 2026-1
 |---|---|---|---|---|---|---|---|
 | wild | registered zone identity/spec | monster-archetypes / MonsterBalance | regular/elite | Wild, original beginner compatibility | identity only | MonsterBalance projection, core consumes once | RETIRED |
 | daily | V148 formal encounter definition | monster-archetypes / MonsterBalance | regular/elite/boss | Daily, original party durability/protection | identity only | MonsterBalance projection, core consumes once | RETIRED |
-| tower | Owner floor=N => level=N | monster-archetypes / MonsterBalance | regular/elite/smallBoss | Tower | Owner pre-battle Earth/Wind; existing Fire/Water gameplay metadata | MonsterBalance projection, core consumes once | RETIRED |
+| tower | Owner tier levels: floors1–20 Lv40,21–40 Lv60,41–60 Lv80,61–100 Lv100 | monster-archetypes / MonsterBalance | regular/elite/smallBoss | Tower | Owner pre-battle Earth/Wind; existing Fire/Water gameplay metadata | MonsterBalance projection, core consumes once | RETIRED |
 | abyss | formal fixed Lv20/Lv40 definition and region/stage | monster-archetypes / MonsterBalance | regular/elite/smallBoss | Abyss original stage/final challenge | identity only | MonsterBalance projection, core consumes once | RETIRED |
 | adventure | fixed chapter encounter definition | monster-archetypes / MonsterBalance | regular/elite/smallBoss | Adventure | identity only | MonsterBalance projection, core consumes once | RETIRED |
 | personalBoss | fixed personal definition Lv20..100 | monster-archetypes / MonsterBalance | boss body, elite reinforcement | Personal Boss | identity only | MonsterBalance projection, core consumes once | RETIRED |
@@ -24,8 +24,30 @@ Every level-to-combat conversion uses level-base-contract.mjs and
 monster-balance-owner.mjs. Ability budget is (level-1)*5 for every rank.
 Fixed archetypes belong to explicit content specs; no random allocation
 builder remains. monster-archetypes.mjs is the canonical allocation dependency
-of the sole MonsterBalance projection. Earlier mode calibration is unchanged:
-288 frozen starting-dev references plus the existing formal mode regressions.
+of the sole MonsterBalance projection. Earlier non-challenge mode calibration is unchanged. Historical 288-row fixtures
+remain frozen; current regressions allow only the approved challenge HP delta.
+
+## Current challenge calibration and acceptance — 2026-10-13
+
+Work ID: TOWER-ABYSS-FLAT-HP-TIER-LEVELS-20261013; PR #882.
+MonsterBalance adds fixed HP after the existing final profiles, once only:
+regular +1500, elite +4500, smallBoss +10000, only for tower and abyss.
+Tower levels are 40/60/80/100 for floors 1–20/21–40/41–60/61–100.
+Abyss retains fixed Lv20/Lv40. All other formulas and gameplay owners remain.
+
+The user explicitly permits unequipped reference parties to lose and owns
+in-game difficulty acceptance. Tower/Abyss TTK matrices retain every case,
+round count and win/loss outcome as diagnostic evidence; a loss alone no longer
+fails CI. The old guaranteed-clear/survivor requirement is superseded.
+Automated gates still require matrix coverage, formal Owner projection equality,
+correct tier/difficulty levels, finite resources, legal reference skill budgets,
+bounded execution and hard-control caps. Abyss retains its no-first-round-wipe
+check. Browser QA validates natural victory OR defeat completion: wins retain
+chest/reward checks, defeats must not advance progress or grant a chest/reward.
+Auth, Session, Save, reward once-only, lifecycle and required CI checks remain.
+Historical Phase2C/2D source-bound outcome reports below are unchanged evidence,
+not current difficulty thresholds. Personal/World Boss and other modes retain
+their existing acceptance requirements. CI/deployment status belongs to PR #882.
 
 ## Physically retired numerical authorities
 
