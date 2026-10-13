@@ -88,9 +88,9 @@ assert.match(adapter,/slice\(0,6\)/);
 
 // The existing formation owner is lazy-loaded on the first click instead of opening an empty shell.
 assert.match(home,/class="v-fixed-formation-entry" data-feature="gameplay-core"/);
-assert.match(home,/openHomeFeature\(\\'formation\\'\)/);
+assert.match(home,/openSharedFormation\(\\'home\\'\)/);
 assert.match(formation,/vFixedRenderAllyFormationContent/);
-assert.match(formation,/vFixedSelectFormationSlot/);
+assert.match(formation,/vFixedPlaceFormationUnit/);
 
 // The initiative owner has a bounded final safety net for VFX, MISS and DOM exceptions.
 assert.match(main,/const BATTLE_ACTION_WATCHDOG_MS=7000/);

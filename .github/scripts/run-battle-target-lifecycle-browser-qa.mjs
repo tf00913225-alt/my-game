@@ -119,7 +119,7 @@ const heroExpression=`(async()=>{
             getHeroBaseStats:id=>domain.getHeroBaseStats(id===third?ids[0]:id),
             getHeroAllocatedStats:id=>domain.getHeroAllocatedStats(id===third?ids[0]:id),
             getHeroSkillProjection:id=>domain.getHeroSkillProjection(id===third?ids[0]:id)})};
-        window.FourSymbolsTeamFormation={getConfirmed:()=>({heroIdToSlot:Object.fromEntries([...ids,third].slice(0,count).map((id,i)=>[id,"ALLY_B"+(i+1)]))})};
+        window.FourSymbolsTeamFormation={getConfirmed:()=>({version:2,characterIndexToSlot:{0:"ALLY_F1",1:"ALLY_F2",2:"ALLY_F3"},heroIdToSlot:Object.fromEntries([...ids,third].slice(0,count).map((id,i)=>[id,"ALLY_B"+(i+1)]))})};
         const enemy=MonsterBalance.build({monsterKey:'qa.hero',name:'QA Enemy',level:50,element:'water',archetype:'balanced',rank:'regular',mode:'wild',context:'qa/hero'});
         Object.assign(enemy,{hp:100000,maxHP:100000,sp:1000,maxSP:1000,skillIds:[],skillChance:0,v141SupportSkillIds:[],v132FixedSkillLoadout:true});
         monsters=[enemy];currentZone='forest';mapCooldown=false;autoConfig.enabled=false;autoConfig2.enabled=false;autoConfig3.enabled=false;

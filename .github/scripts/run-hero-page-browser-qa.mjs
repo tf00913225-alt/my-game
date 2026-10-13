@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import {spawn} from 'node:child_process';
+import {spawn,execFileSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {ASSET_MANIFEST,findChrome,startServer,waitJson,Cdp,qaPrelude,QA_CLOUD_MODULE} from './runtime-browser-qa-support.mjs';
 const require=createRequire(import.meta.url),Core=require('../../functions/src/hero-core'),Policy=require('../../functions/src/team-formation-policy');
@@ -55,11 +55,13 @@ try{
  const loads=new Set();c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Page.lifecycleEvent'&&m.params.name==='load')loads.add(m.params.loaderId);});
  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')+`;window.__heroQaOwned=${JSON.stringify(ids)};window.__heroQaErrors=[];addEventListener('error',e=>{if(e.message)window.__heroQaErrors.push(e.message)});`});
  async function waitReady(){await c.eval(`(async()=>{const end=Date.now()+45000;while(Date.now()<end&&!(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')))await new Promise(r=>setTimeout(r,50));if(FourSymbolsStartupPolicy.getState()!=='READY')throw Error('startup not READY');await FourSymbolsHeroAcquisition.sync();await FourSymbolsHeroGrowth.read();await FourSymbolsTeamFormation.read();showPage('home');return true;})()`);}
- async function point(selector){return c.eval(`(async()=>{const query=${JSON.stringify(selector)},root=query.startsWith('[data-')?document.querySelector('.v-fixed-formation-panel'):document;const n=root?.querySelector(query);if(!n||n.disabled)throw Error('unavailable '+query);n.scrollIntoView({block:'nearest'});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));const b=n.getBoundingClientRect(),x=b.left+b.width/2,y=b.top+b.height/2,h=document.elementFromPoint(x,y);if(!(h===n||n.contains(h)))throw Error('occluded '+query+' '+JSON.stringify({box:b.toJSON(),hit:h?.outerHTML.slice(0,250)}));return {x,y};})()`);}
+ async function point(selector){return c.eval(`(async()=>{const query=${JSON.stringify(selector)},root=query.startsWith('[data-')?document.querySelector('.v-fixed-formation-panel'):document;let n=root?.querySelector(query);if(!n||n.disabled)throw Error('unavailable '+query);n.scrollIntoView({block:'nearest'});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));n=(query.startsWith('[data-')?document.querySelector('.v-fixed-formation-panel'):document)?.querySelector(query);if(!n?.isConnected)throw Error('formation/control detached during synchronization');const b=n.getBoundingClientRect(),x=b.left+b.width/2,y=b.top+b.height/2,h=document.elementFromPoint(x,y);if(!(h===n||n.contains(h)))throw Error('occluded '+query+' '+JSON.stringify({box:b.toJSON(),hit:h?.outerHTML.slice(0,250)}));return {x,y};})()`);}
  let mobile=true;
  async function press(p){if(mobile)await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[p]});else await c.send('Input.dispatchMouseEvent',{type:'mousePressed',...p,button:'left',clickCount:1});}
  async function release(p){if(mobile)await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});else await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',...p,button:'left',clickCount:1});}
- async function tap(selector){const p=await point(selector);await press(p);await release(p);await pause();}
+ async function tap(selector){
+  if(selector.startsWith('[data-'))await c.eval(`(async()=>{const end=Date.now()+15000;while(FourSymbolsTeamFormation.getStatus().busy&&Date.now()<end)await new Promise(r=>setTimeout(r,50));if(FourSymbolsTeamFormation.getStatus().busy)throw Error('formation synchronization did not finish');return true;})()`);
+  const p=await point(selector);await press(p);await release(p);await pause();}
  async function drag(from,to){const a=await point(from),b=await point(to);await press(a);for(let i=1;i<=8;i++){const p={x:a.x+(b.x-a.x)*i/8,y:a.y+(b.y-a.y)*i/8};if(mobile)await c.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[p]});else await c.send('Input.dispatchMouseEvent',{type:'mouseMoved',...p,button:'left',buttons:1});await pause(20);}await release(b);await pause(400);}
  async function screenshot(name){fs.writeFileSync(path.join(OUT,name+'.png'),Buffer.from((await c.send('Page.captureScreenshot',{format:'png'})).data,'base64'));}
  for(const [width,height] of [[360,640],[412,915],[1280,800]]){
@@ -125,7 +127,7 @@ try{
   await c.eval(`closeHomeFeature();true`);assert.deepEqual(await c.eval(`window.__heroQaErrors`),[]);
   evidence.push({width,height,grid,geo,fgeo,actualPointerInput:true,saveReload:true,swapRemove:true,sharedEntrances:true});console.log(`PASS Hero V2 ${width}x${height}`);
  }
- fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:process.env.DEV_BASE_URL?'deployed-bytes-isolated-transport':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||null,evidence},null,2)+'\n');
+ fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:process.env.DEV_BASE_URL?'deployed-bytes-isolated-transport':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),evidence},null,2)+'\n');
 }catch(error){if(c)try{fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from((await c.send('Page.captureScreenshot',{format:'png'})).data,'base64'));}catch{}fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:false,error:String(error.stack||error),evidence},null,2));throw error;
 }finally{
  c?.close();server?.server.close();if(proc){proc.kill('SIGTERM');await Promise.race([new Promise(r=>proc.once('exit',r)),pause(3000)]);}
