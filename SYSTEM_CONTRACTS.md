@@ -44,6 +44,9 @@
 - 敵方免費追擊沿用原 action snapshot。原 primary 存活且合法時必須沿用；被上一擊擊敗時，由同一 Core Target Owner 的 `retargetEnemyFollowUpSnapshot` 從原 Snapshot 身份中選取目前存活且合法的 primary，並鎖定給後續追擊。存活但失去合法性／身份被替換時不得 fallback；無合法 Survivor 才停止。範圍由正式 Slot Owner 解析後仍限原存活快照。全體技維持原全體語意但不納入稍後復活者。V149 只擁有追擊次數與演出，不擁有重新選目標的決策權。
 
 - 一般戰鬥維持 `single / tri / row / column / all` 的 Fixed Slot（固定格位）規則。
+- 敵方六格 V1 仍由 `js/battlefield-slot-owner.js` 唯一控制。`wild / daily / abyss / tower` 的新遭遇在原始名單不超過六名時使用 `standard-six`：後排 `ENEMY_B1/B2/B3`、前排 `ENEMY_F1/F2/F3`；沿用原 ID 的前後排與欄位語意，不改我方格位。遭遇建立後固定同一份 snapshot，死亡不重排、不把空格納入目標。
+- 超過六名的一般遭遇保留完整 `legacy-ten` 名單及幾何，snapshot／戰場 DOM 明確標記 `pending-wave-migration`。目前深淵八／十名與四象塔十名均待第二階段換波，不得標示已完成六格遷移；本階段不改敵人数值、掉落或通關條件。個人／世界 Boss、特殊物件、援軍及 Adventure 維持原規則。
+- 六格 DOM、技能範圍與 VFX 共用上述 snapshot。正式 `css/fixed-slot-battlefield-rendering-v2.css` 依格位來源投影每排欄數；只有 `standard-six` 使用敵方／操作／我方 `48/16/36` 區域比例，其他模式保留 `42/16/42`。立繪沿用 V174 與 Registry Alpha Bounds（透明輪廓範圍）的等比例、不裁切投影，不新增座標或圖片縮放 Owner。
 - `FourSymbolsBattleSkillTargeting` 是技能 Target Shape（目標形狀）與 hostile primary eligibility（敵對主要目標可選性）的唯一協調入口；玩家→敵方、敵方→玩家、手動、自動與支援技能都必須使用同一份正式 Skill Data／effective target type，再交由 `FourSymbolsBattlefieldSlots` 解析幾何。禁止同一 Skill ID 因施放方不同而硬寫第二份目標人數或範圍。
 - Stealth（隱身）只禁止成為 hostile primary target（敵對主要選定目標）：普通攻擊與任何需要指定 primary 的 `single / tri / row / column` 都不得選中隱身單位；但 `tri / row / column / all` 已由其他合法 primary／全體範圍解析出的波及名單仍可包含隱身單位。
 - Boss（頭目）專屬模式內，Boss、援軍、圖騰、戰旗、法器與技能召喚物都是獨立的數字索引 target entity（目標單位）。

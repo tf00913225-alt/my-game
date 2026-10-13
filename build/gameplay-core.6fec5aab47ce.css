@@ -7891,6 +7891,13 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     --battle-item-menu-gap:8px;
 }
 
+/* Six wider columns still need portrait height. Allocate it within the same
+   track owner; Boss/overflow encounters retain the original 42/16/42 tracks. */
+#game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"]{
+    --battle-enemy-region-track:48fr;
+    --battle-ally-region-track:36fr;
+}
+
 /* Enemy, controls and allies are the three structural tracks. Battle info is
    an independent bottom drawer so opening it never reflows fixed Slots. */
 #game-stage #battlePage.v-fixed-slot-render-v2 > .battle-wrap{
@@ -8187,7 +8194,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     left:var(--battle-enemy-inline-padding) !important;
     right:var(--battle-enemy-inline-padding) !important;
     display:grid !important;
-    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    grid-template-columns:repeat(var(--battle-enemy-columns,5),minmax(0,1fr)) !important;
     gap:var(--battle-slot-column-gap) !important;
     width:auto !important;
     height:var(--battle-enemy-row-height) !important;
