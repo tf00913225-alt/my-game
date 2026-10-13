@@ -44,6 +44,10 @@ correct tier/difficulty levels, finite resources, legal reference skill budgets,
 bounded execution and hard-control caps. Abyss retains its no-first-round-wipe
 check. Browser QA validates natural victory OR defeat completion: wins retain
 chest/reward checks, defeats must not advance progress or grant a chest/reward.
+Browser victory probes use legal Lv40/Lv60/Lv100 references, and the natural
+defeat probe starts an injured Lv20 party at 10% HP; these are isolated QA
+resources, not player stat/formula changes. Full difficulty matrices retain
+their original unlock/+10/+20 party references and every outcome.
 Auth, Session, Save, reward once-only, lifecycle and required CI checks remain.
 Historical Phase2C/2D source-bound outcome reports below are unchanged evidence,
 not current difficulty thresholds. Personal/World Boss and other modes retain
