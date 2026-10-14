@@ -1,10 +1,12 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 const {spawnSync}=require("node:child_process");
 
 function findChrome(){
+    if(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH&&fs.existsSync(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH))return process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const probe=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
         if(probe.status===0&&probe.stdout.trim()){ return probe.stdout.trim(); }
@@ -118,7 +120,7 @@ setTimeout(function(){
   },120);
 },80);
 </script></body></html>`;
-fs.writeFileSync(fixture,html,"utf8");
+fs.writeFileSync(fixture,authoredUiCss.legacyFixture(html),"utf8");
 try{
     const chrome=findChrome();
     assert.ok(chrome,"Chrome is required for critical regression browser QA");

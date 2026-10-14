@@ -2,10 +2,12 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 const {spawnSync}=require("node:child_process");
 
 function findChrome(){
+    if(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH&&fs.existsSync(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH))return process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const probe=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
         if(probe.status===0&&probe.stdout.trim()){ return probe.stdout.trim(); }
@@ -77,7 +79,7 @@ html,body{margin:0;width:${width}px;height:${height}px;overflow:hidden;backgroun
 
 function run(chrome,width,height){
     const file=path.join(process.cwd(),`.team-relic-browser-qa-${width}.html`);
-    fs.writeFileSync(file,fixture(width,height),"utf8");
+    fs.writeFileSync(file,authoredUiCss.legacyFixture(fixture(width,height)),"utf8");
     try{
         const fileUrl="file://"+file.replace(/\\/g,"/");
         const result=spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--dump-dom",fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:12*1024*1024});
@@ -98,8 +100,8 @@ function verify(data,width,height){
     assert.ok(data.box.top>=data.stage.top-tolerance&&data.box.bottom<=data.stage.bottom+tolerance,`${width}px relic modal escapes vertically`);
     /* The modal owns 4px outer padding and an additional 8px safe inset, so
        a 16px total delta on each axis is the intended full-screen frame. */
-    assert.ok(data.box.width>=width-20&&Math.abs(data.box.height-Math.min(760,height-16))<=1,
-        `${width}px relic modal violates the browser Large Panel ceiling (${data.box.width}x${data.box.height})`);
+    assert.ok(data.box.width>=width-20&&Math.abs(data.box.height-Math.min(620,height-16))<=1,
+        `${width}px relic modal violates the authored-unit Large Panel ceiling (${data.box.width}x${data.box.height})`);
     assert.match(data.body.overflowY,/auto|scroll/,`${width}px legacy wide-modal CSS retook scroll ownership`);
     assert.equal(data.body.overflowX,"hidden");assert.equal(data.body.touchAction,"pan-y");
     assert.ok(data.body.scrollHeight>data.body.clientHeight&&data.body.after>data.body.before,`${width}px relic body cannot actually scroll`);

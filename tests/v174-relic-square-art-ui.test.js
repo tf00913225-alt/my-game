@@ -2,11 +2,12 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 const {spawnSync}=require("node:child_process");
 
 const source=fs.readFileSync("js/60-team-relic-system.js","utf8");
-const css=fs.readFileSync("css/55-team-relic-system.css","utf8");
+const css=authoredUiCss(fs.readFileSync("css/55-team-relic-system.css","utf8"));
 
 /* Runtime source contract: all three UI surfaces already resolve through the
    same iconPath field and helper. The UI task must not introduce parallel art
@@ -39,6 +40,7 @@ assert.match(css,/\.team-relic-detail-hero p\{[^}]*grid-column:2/);
 assert.match(css,/\.team-relic-detail-hero strong\{[^}]*grid-column:2/);
 
 function findChrome(){
+    if(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH&&fs.existsSync(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH))return process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const probe=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
         if(probe.status===0&&probe.stdout.trim()){ return probe.stdout.trim(); }
@@ -63,7 +65,7 @@ function fixture(width,height){
 
 function run(chrome,width,height){
     const file=path.join(process.cwd(),`.relic-square-art-qa-${width}.html`);
-    fs.writeFileSync(file,fixture(width,height),"utf8");
+    fs.writeFileSync(file,authoredUiCss.legacyFixture(fixture(width,height)),"utf8");
     try{
         const result=spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--dump-dom","file://"+file.replace(/\\/g,"/")],{encoding:"utf8",timeout:30000,maxBuffer:12*1024*1024});
         assert.equal(result.status,0,result.stderr||`relic square-art browser fixture failed at ${width}px`);

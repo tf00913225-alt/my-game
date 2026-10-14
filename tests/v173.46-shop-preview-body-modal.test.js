@@ -11,7 +11,7 @@ const content=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
 const equipment=fs.readFileSync("js/equipment-progression.js","utf8");
 
 assert.match(content,/modal\.id="v132RewardModal"[\s\S]*?document\.getElementById\("game-ui"\)\.appendChild\(modal\)/);
-assert.match(css,/\.v132-reward-modal \.v17346-shop-preview-modal\.item-presentation-frame\{[\s\S]*?height:auto !important;[\s\S]*?max-height:calc\(calc\(100 \* var\(--layout-block-size,746.6667px\) \/ 100\) - 28px\) !important;[\s\S]*?overflow:hidden !important;/);
+assert.match(css,/\.v132-reward-modal \.v17346-shop-preview-modal\.item-presentation-frame\{[\s\S]*?height:auto !important;[\s\S]*?max-height:calc\(var\(--layout-block-size,746.6667px\) - 28px\) !important;[\s\S]*?overflow:hidden !important;/);
 assert.match(css,/\.v17346-shop-preview-modal \.item-presentation-scroll\{[\s\S]*?overflow-y:auto;[\s\S]*?scrollbar-gutter:stable;/);
 assert.match(css,/\.v17346-shop-preview-modal \.v17346-shop-preview-art\{[\s\S]*?width:clamp\(96px,min\(calc\(42 \* var\(--layout-inline-size,420px\) \/ 100\),calc\(22 \* var\(--layout-block-size,746.6667px\) \/ 100\)\),168px\) !important;[\s\S]*?aspect-ratio:1 !important;/);
 assert.match(css,/\.v17346-shop-preview-modal \.v17346-shop-preview-art img,[\s\S]*?object-fit:contain !important;/);

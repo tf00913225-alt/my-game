@@ -3,7 +3,8 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const path=require("node:path");
 const {spawnSync}=require("node:child_process");
-function findChrome(){for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){const p=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});if(p.status===0&&p.stdout.trim())return p.stdout.trim();}return "";}
+function findChrome(){
+    if(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH&&fs.existsSync(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH))return process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){const p=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});if(p.status===0&&p.stdout.trim())return p.stdout.trim();}return "";}
 function decode(v){return v.replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'");}
 const file=path.join(process.cwd(),".creation-critical-browser.html");
 const html=`<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="css/29-v125-character-creation-native.css"><link rel="stylesheet" href="css/56-v174-critical-ui-regressions.css"><style>html,body{margin:0;width:1080px;height:1920px;background:#000;overflow:hidden}#creationPage{display:block!important}</style></head><body>

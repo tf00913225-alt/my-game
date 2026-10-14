@@ -9,7 +9,7 @@ const cp=require("node:child_process");
 const owner=authoredUiCss(fs.readFileSync("css/30-v130-requested-updates.css","utf8"));
 const hintOwner=authoredUiCss(fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8"));
 
-assert.match(owner,/#game-ui #allElementSkillPreviewModal \.skill-preview-dialog\{[\s\S]*?max-width:var\(--ui-large-panel-max-width,396px\) !important;[\s\S]*?height:min\(var\(--ui-large-panel-height,620px\),calc\(calc\(100 \* var\(--layout-block-size,746.6667px\) \/ 100\) - var\(--ui-large-panel-safe-space,24px\)\)\) !important;/);
+assert.match(owner,/#game-ui #allElementSkillPreviewModal \.skill-preview-dialog\{[\s\S]*?max-width:var\(--ui-large-panel-max-width,396px\) !important;[\s\S]*?height:min\(var\(--ui-large-panel-height,620px\),calc\(var\(--layout-block-size,746.6667px\) - var\(--ui-large-panel-safe-space,24px\)\)\) !important;/);
 assert.match(owner,/#game-ui #allElementSkillPreviewModal \.skill-preview-heading,[\s\S]*?\.skill-preview-tabs\{[\s\S]*?flex:0 0 auto !important;/);
 assert.match(owner,/#game-ui #allElementSkillPreviewModal \.skill-preview-tabs button\{[\s\S]*?min-height:var\(--ui-large-panel-tab-height,42px\) !important;/);
 assert.match(owner,/#game-ui #allElementSkillPreviewModal \.skill-preview-body\{[\s\S]*?flex:1 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?scrollbar-gutter:stable !important;/);

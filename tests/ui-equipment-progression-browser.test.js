@@ -1,10 +1,12 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
 function findChrome(){
+    if(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH&&fs.existsSync(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH))return process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
     for(const candidate of [process.env.CHROME_BIN,"C:/Program Files/Google/Chrome/Application/chrome.exe","C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"]){
         if(candidate&&fs.existsSync(candidate)) return candidate;
     }
@@ -26,7 +28,7 @@ const ownerEnd=mainSource.indexOf("function openEquippedItem(",ownerStart);
 assert.ok(ownerStart>=0&&ownerEnd>ownerStart,"formal item lifecycle owner boundaries missing");
 const itemOwner=mainSource.slice(ownerStart,ownerEnd).replace(/<\/script/gi,"<\\/script");
 const html=`<!doctype html><html><head><meta charset="utf-8">
-<link rel="stylesheet" href="css/00-main.css"><link rel="stylesheet" href="css/49-v169-rpg-ui.css"><style>
+<link rel="stylesheet" href="css/00-main.css"><link rel="stylesheet" href="css/33-v132-content-expansion.css"><link rel="stylesheet" href="css/49-v169-rpg-ui.css"><style>
 html,body{margin:0;width:420px;height:747px;background:#000;overflow:hidden}#game-ui{width:420px!important;height:747px!important;position:relative!important;left:0!important;top:0!important;transform:none!important}
 .item-modal,.v132-reward-modal{position:absolute!important;inset:0!important;display:flex;align-items:center;justify-content:center}
 .v132-reward-modal{z-index:20;background:rgba(0,0,0,.65)}.v132-reward-modal-inner{width:360px;max-height:540px;padding:16px;box-sizing:border-box;background:#21180f;border:2px solid #e6a93d;overflow-y:auto}.v132-reward-modal-inner h3{position:sticky;top:0}.v132-preview-list-scroll{max-height:280px;overflow-y:auto}.v132-reward-actions{position:sticky;bottom:0}.v132-reward-actions button{height:48px;width:100%}
@@ -41,6 +43,7 @@ var selectedInventorySlot=null;
 ${require("../.github/scripts/fixtures/item-slot-owner.cjs")}
 ${itemOwner}
 window.closeItemModal=function(){};
+document.getElementById("game-ui").appendChild(document.getElementById("rewardLayer")); // Fixture follows the native shared-window host.
 window.v132ShowRewardModal=function(markup){document.getElementById('rewardLayer').innerHTML='<div class="v132-reward-modal">'+markup+'</div>';};
 window.v132CloseRewardModal=function(){};
 </script><script src="functions/src/equipment-reforge.js"></script><script src="js/equipment-factory.js"></script><script src="js/equipment-progression.js"></script><script>
@@ -50,12 +53,12 @@ const rect=e=>{const r=e.getBoundingClientRect();return {top:r.top,bottom:r.bott
 const potion={box:rect(box),stats:rect(stats),buttons:rect(buttons),gap:rect(buttons).top-rect(stats).bottom,mode:document.getElementById('itemModal').dataset.presentationMode,statsOverflow:getComputedStyle(stats).overflowY,boxHeight:getComputedStyle(box).height,buttonMargin:getComputedStyle(buttons).marginTop};
 openItemModal(1);
 const equipment={box:rect(box),mode:document.getElementById('itemModal').dataset.presentationMode,statsOverflow:getComputedStyle(stats).overflowY,scrollHeight:stats.scrollHeight,clientHeight:stats.clientHeight};
-v132ShowRewardModal('<div class="v132-reward-modal-inner"><h3>材料寶箱 開啟預覽</h3><div class="v132-preview-list-scroll">'+Array.from({length:8},(_,i)=>'<div style="height:70px">獎勵 '+i+'</div>').join('')+'</div><div class="v132-reward-actions"><button>關閉</button></div></div>');
+v132ShowRewardModal('<div class="v132-reward-modal-inner v17346-preview-modal"><h3>材料寶箱 開啟預覽</h3><div class="v132-preview-list-scroll">'+Array.from({length:8},(_,i)=>'<div style="height:70px">獎勵 '+i+'</div>').join('')+'</div><div class="v132-reward-actions"><button>關閉</button></div></div>');
 const preview=document.querySelector('.v17346-preview-modal'),title=preview.querySelector('h3'),list=preview.querySelector('.v132-preview-list-scroll'),actions=preview.querySelector('.v132-reward-actions');
 const previewShot={box:rect(preview),title:rect(title),list:rect(list),actions:rect(actions),overflow:getComputedStyle(preview).overflow,listOverflow:getComputedStyle(list).overflowY};
 document.getElementById('result').textContent=JSON.stringify({potion,equipment,previewShot,accountKeys:window.__accountKeys});
 </script></body></html>`;
-fs.writeFileSync(fixture,html,"utf8");
+fs.writeFileSync(fixture,authoredUiCss.legacyFixture(html),"utf8");
 try{
     const run=cp.spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1","--window-size=420,747","--dump-dom",fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});
     assert.equal(run.status,0,run.stderr||"Chrome failed");
