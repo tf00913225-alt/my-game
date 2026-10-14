@@ -296,7 +296,7 @@ const freshQuestStates={
 const freshProgressRef=db.doc(`serverUsers/${freshUid}/progress/current`);
 const freshQuestProgress=await freshProgressRef.get();
 const freshQuestSnapshot=(await db.doc(`serverUsers/${freshUid}/playableSnapshots/2`).get()).data();
-const freshQuestArchive=await checkRecoveryArchive(freshUid,2);
+const freshQuestArchive=(await checkRecoveryArchive(freshUid,2)).data();
 for(const [key,state] of Object.entries(freshQuestStates)){
     assert.deepEqual(freshQuestProgress.get(key),state);
     assert.deepEqual(freshQuestSnapshot.snapshot.progress[key],state);
