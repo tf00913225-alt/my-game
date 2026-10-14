@@ -156,6 +156,7 @@
         if(activeMatches){ return existing; }
         if(!requested.length){ return null; }
         const snapshot=owner.createEnemyFormationSnapshot(requested,{
+            encounterMode:owner.getCurrentEncounterMode(),
             originalFormationType:requested.length,
             rankWeight:getFormationRankWeight
         });
@@ -173,6 +174,7 @@
         const activeMatches=snapshot&&requested.every(index=>!!owner.getEnemySlotForMonster(snapshot,index));
         if(!bossAuthority.owns&&!activeMatches){
             snapshot=owner.createEnemyFormationSnapshot(requested,{
+                encounterMode:owner.getCurrentEncounterMode(),
                 originalFormationType:Math.max(1,requested.length),
                 rankWeight:getFormationRankWeight
             });
@@ -235,7 +237,7 @@
         area.classList.add("v131-formation","v-fixed-enemy-zone");
         area.dataset.monsterCount=String(indexes.length);
         area.dataset.formationType=String(snapshot.originalFormationType);
-        [owner.enemyBackSlots,owner.enemyFrontSlots].forEach((rowSlots,rowIndex)=>{
+        owner.getEnemyRenderSlotRows(snapshot).forEach((rowSlots,rowIndex)=>{
             const rowEl=document.createElement("div");
             rowEl.className="v131-monster-row v131-monster-row-"+(rowIndex+1)+" v-fixed-enemy-row";
             rowSlots.forEach(slot=>{

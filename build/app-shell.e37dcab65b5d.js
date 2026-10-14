@@ -4223,6 +4223,97 @@ let battleAdvanceScheduled=false;
 const MANUAL_RESOLUTION_START_MS=250;
 const AUTO_DECLARE_HANDOFF_MS=100;
 const AUTO_DECISION_DELAY_MS=50;
+/* Same-battle Wave Controller. Content owns rosters; the core owns lifecycle.
+   No new Session, opening event, resource reset, or independent timer is allowed. */
+let battleWaveState=null;
+function validateBattleWaves(mode,waves){
+    if(!waves){ return; }
+    if(!["abyss","tower"].includes(mode)||!Array.isArray(waves)||waves.length!==2||
+       waves.some(row=>!Array.isArray(row)||row.length<1||row.length>6)){
+        throw new Error("Invalid six-slot battle waves");
+    }
+    const identities=waves.flat();
+    if(identities.some(m=>!m||typeof m!=="object")||new Set(identities).size!==identities.length){
+        throw new Error("Duplicate or invalid wave entity");
+    }
+}
+function initializeBattleWaves(mode,waves){
+    validateBattleWaves(mode,waves);
+    battleWaveState=waves?{token:battleToken,mode:mode,waves:waves.map(row=>row.slice()),
+        index:0,phase:"WAVE_1_ACTIVE",actionFinished:false,nextPrepared:false,roundEnded:false,roundStarting:false}:null;
+    if(!battleWaveState){ return; }
+    const state=battleWaveState;
+    const prepared=window.v154PreparePortraitsForEncounter(state.waves[1]);
+    const accept=result=>{
+        if(state!==battleWaveState||state.token!==battleToken||!battleActive){ return; }
+        if(!result||result.state!=="ready"){ window.v132AbortDungeonBattle("wave-preparation-failed");return; }
+        state.nextPrepared=true;
+        if(isBattleWaveTransition()&&state.actionFinished&&!battleAdvanceScheduled){ processNextCombatant(state.token); }
+    };
+    if(prepared&&typeof prepared.then==="function"){ Promise.resolve(prepared).then(accept,()=>accept(null)); }
+    else{ accept(prepared); }
+}
+function isBattleWaveTransition(){
+    return !!(battleWaveState&&battleWaveState.token===battleToken&&battleWaveState.phase==="WAVE_TRANSITION");
+}
+function requestBattleWaveTransition(){
+    const state=battleWaveState;
+    if(!state||state.token!==battleToken||state.phase==="BATTLE_COMPLETE"){ return false; }
+    if(state.phase==="WAVE_TRANSITION"){ return true; }
+    if(state.index===1){ state.phase="BATTLE_COMPLETE";state.waves=[];return false; }
+    state.phase="WAVE_TRANSITION";
+    state.actionFinished=false;
+    actionReady=false;pendingAction=null;
+    closeMenus();clearBattleTargetSelectionMode();updateActionHudVisibility();
+    return true;
+}
+function battleWaveHudText(){
+    const state=battleWaveState;
+    return state&&state.token===battleToken?"・"+(state.index+1)+"／2":"";
+}
+function commitBattleWaveTransition(){
+    const state=battleWaveState;
+    if(!battleActive||!isBattleWaveTransition()||!state.actionFinished||!state.nextPrepared||battlePresentationLocks.size){ return false; }
+    const oldIndexes=currentBattleMonsters.slice();
+    const next=state.waves[1];
+    const offset=monsters.length;
+    // Keep indexes monotonic: a late old-target callback cannot alias wave two.
+    const remainingPlayers=new Set(initiativeQueue.slice(initiativeIndex)
+        .filter(e=>e.type!=="monster").map(e=>e.characterIndex));
+    clearBattleActionWatchdog();
+    window.v142SkillAnimationDirector?.dispose?.();
+    clearTransientBattlePresentation();
+    oldIndexes.forEach(index=>{ delete monsters[index]; });
+    currentBattleMonsters=next.map((monster,position)=>{
+        const index=offset+position;
+        monster.alive=true;monster.hp=monster.maxHP;monster.sp=monster.maxSP;
+        window.v144ConfigureMonsterEncounterSkills?.(monster,state.mode+"-"+battleToken+"-wave-2");
+        monster.statusEffects=[];monsters[index]=monster;return index;
+    });
+    state.waves=[];state.index=1;state.phase="WAVE_2_ACTIVE";
+    window.FourSymbolsBattlefieldSlots.clearActiveEnemySnapshot();
+    selectedMonster=currentBattleMonsters[0];
+    renderBattle();
+    const snapshot=window.FourSymbolsBattlefieldSlots.getActiveEnemySnapshot();
+    selectedMonster=window.FourSymbolsBattlefieldSlots.getNextEnemyPrimaryTarget(snapshot,index=>isBattleTargetAlive("monster",index));
+    initiativeQueue=buildInitiativeQueue().filter(entry=>entry.type==="monster"||remainingPlayers.has(entry.characterIndex));
+    initiativeQueue.forEach(entry=>{if(entry.type==="monster")entry.targetSnapshot=createEnemyActionTargetSnapshot(entry.monsterIndex,battleToken);});
+    initiativeIndex=0;processedInitiativeIndexes=new Set();
+    const indicator=$("battleTurnIndicator");
+    if(indicator){ indicator.textContent="第"+turn+"回合"+battleWaveHudText(); }
+    addBattleLog("第二波敵人進場（2／2），戰鬥繼續。");
+    if(state.roundEnded){state.roundEnded=false;turn++;startTurn(state.token);return "round-started";}
+    if(state.roundStarting){state.roundStarting=false;beginBattleRoundDeclaration(state.token);return "round-started";}
+    return true;
+}
+if(typeof window!=="undefined"){
+    window.FourSymbolsBattleWaves=Object.freeze({
+        validate:validateBattleWaves,
+        initialize:initializeBattleWaves,
+        getState:()=>battleWaveState?{phase:battleWaveState.phase,index:battleWaveState.index,token:battleWaveState.token}:null
+    });
+}
+
 const POST_ACTION_DELAY_MS=650;
 const battleActionFinishObservers=new Set();
 /* Synchronous settlement notifications. Combat owners publish committed facts;
@@ -4638,6 +4729,10 @@ function beginBattleStatisticsSession(){
 }
 
 function finishBattleStatisticsSession(result){
+    if(battleWaveState&&battleWaveState.token===battleToken){
+        battleWaveState.phase="BATTLE_COMPLETE";
+        battleWaveState.waves=[];
+    }
     battleStatisticsFinishAction();
     const owner=getBattleStatisticsOwner();
     if(owner&&typeof owner.finish==="function"){
@@ -11210,6 +11305,7 @@ function startBattle(triggerIndex){
     mapCooldown=true;
 
     battleToken++;
+    battleWaveState=null;
     clearTransientBattlePresentation();
     battleRoundBoundaryKeys=new Set();
     battlePresentationLocks.clear();
@@ -11602,7 +11698,7 @@ function startTurn(token){
     if(turnIndicator){
 
         turnIndicator.textContent=
-            "第"+turn+"回合";
+            "第"+turn+"回合"+battleWaveHudText();
 
     }
 
@@ -11654,6 +11750,17 @@ function startTurn(token){
        改成呼叫beginCharacterTurn()開始宣告流程。
     */
 
+    if(isBattleWaveTransition()){
+        battleWaveState.actionFinished=true;
+        battleWaveState.roundStarting=true;
+        battleResolutionResumeToken=token;
+        commitBattleWaveTransition();return;
+    }
+    beginBattleRoundDeclaration(token);
+}
+
+function beginBattleRoundDeclaration(token){
+    if(!battleActive||token!==battleToken){ return; }
     battlePhase=
         "declare";
 
@@ -13715,10 +13822,22 @@ function processNextCombatant(token){
     }
     battleResolutionResumeToken=null;
 
+    if(isBattleWaveTransition()){
+        if(getExistingPartyIndexes().every(i=>!getPartyCharacterByIndex(i)||getPartyCharacterByIndex(i).hp<=0)){ checkBattleEnd();return; }
+        if(commitBattleWaveTransition()!==true){ return; }
+    }
     notifyBeforeCombatant(token);
 
     if(checkBattleEnd()){
         return;
+    }
+
+    // This boundary has no unfinished action. Status/relic deaths must not
+    // create a dummy action or a second post-action delay before wave two.
+    if(isBattleWaveTransition()){
+        battleWaveState.actionFinished=true;
+        battleResolutionResumeToken=token;
+        if(commitBattleWaveTransition()!==true){ return; }
     }
 
 
@@ -13760,6 +13879,11 @@ function processNextCombatant(token){
         }
 
 
+        if(isBattleWaveTransition()){
+            battleWaveState.actionFinished=true;
+            battleWaveState.roundEnded=true;
+            commitBattleWaveTransition();return;
+        }
         turn++;
 
         startTurn(token);
@@ -17963,6 +18087,7 @@ function finishPlayerAction(){
     if(checkBattleEnd()){
         return;
     }
+    if(isBattleWaveTransition()){ battleWaveState.actionFinished=true; }
 
     /* A single action may reach this helper through animation and fallback
        paths. Only the first call is allowed to advance the queue. */
@@ -18986,6 +19111,7 @@ function checkBattleEnd(){
 
 
     if(!alive){
+        if(requestBattleWaveTransition()){ return false; }
 
         winBattle();
 
@@ -34380,7 +34506,11 @@ try{
             testMode:devEnabled()&&!!dev&&devUid===uid(),devAvailable:devEnabled(),
             marrowPills:devEnabled()&&dev&&devUid===uid()?dev.pills:proof?.ownerUid===uid()?proof.marrowPills:0})});
     global.document?.addEventListener("four-symbols:startup-ready",()=>{void read();});
-    global.document?.addEventListener("four-symbols:hero-acquisition-state",()=>{if(ready()&&!pending)void read();});
+    global.document?.addEventListener("four-symbols:hero-acquisition-state",()=>{
+        // A reset/error notification invalidates proof; it is never a read trigger.
+        const acquisition=global.FourSymbolsHeroAcquisition?.getStatus?.();
+        if(acquisition?.ready===true&&!acquisition.busy&&ready()&&!pending)void read();
+    });
     global.addEventListener("four-symbols:firebase-auth-state",e=>{if(e.detail?.user?.uid!==uid()||proof&&proof.ownerUid!==uid()||devUid&&devUid!==uid())reset();});
     global.addEventListener("four-symbols:game-session-state",e=>{if(["revoked","signed-out"].includes(e.detail?.status)||e.detail?.code){reset();busy=false;}});
 })(typeof window!=="undefined"?window:globalThis);
@@ -34466,7 +34596,11 @@ try{
             project();
         }});
     global.document?.addEventListener("four-symbols:startup-ready",()=>{void read();});
-    global.document?.addEventListener("four-symbols:hero-acquisition-state",()=>{if(ready()&&!pending)void read();});
+    global.document?.addEventListener("four-symbols:hero-acquisition-state",()=>{
+        // A reset/error notification invalidates proof; it is never a read trigger.
+        const acquisition=global.FourSymbolsHeroAcquisition?.getStatus?.();
+        if(acquisition?.ready===true&&!acquisition.busy&&ready()&&!pending)void read();
+    });
     global.addEventListener("four-symbols:firebase-auth-state",()=>{if(proof?.ownerUid!==uid())reset();});
     global.addEventListener("four-symbols:game-session-state",event=>{
         if(["revoked","signed-out"].includes(event.detail?.status)||event.detail?.code)reset();

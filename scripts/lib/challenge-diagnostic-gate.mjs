@@ -13,7 +13,7 @@ export function evaluateChallengeDiagnostic(rows,mode){
     if(!Number.isInteger(row.rounds)||row.rounds<1||row.rounds>60||typeof row.clear!=='boolean'||!Number.isInteger(row.survivors)||row.survivors<0||row.survivors>row.partySize)reasons.push('invalid outcome');
     if(row.initialParty.length!==row.partySize||row.finalParty.length!==row.partySize||[...row.initialParty,...row.finalParty].some(hp=>!Number.isFinite(hp)||hp<0))reasons.push('invalid party resources');
     if(row.reference.skillCost>row.reference.skillBudget)reasons.push('illegal reference skill budget');
-    const expectedUnits=mode==='tower'||(row.difficulty===40&&row.region===4&&row.stage===4)?10:8;
+    const expectedUnits=mode==='tower'?10:(row.difficulty===40&&row.region===4&&row.stage===4?11:12);
     if(row.initialMonsters.length!==expectedUnits)reasons.push('roster size');
     for(const monster of row.initialMonsters){
       try{

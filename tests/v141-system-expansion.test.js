@@ -300,18 +300,18 @@ test("formal two-tier Abyss keeps five regions, center bosses and click-only fin
     const {MonsterBalance}=require('../js/combat/monster-balance-owner.mjs');
     for(const level of [20,40])for(let region=0;region<5;region++)for(let stage=0;stage<5;stage++){
         const roster=context.v174AbyssBuildRoster(level,region,stage);
-        assert.equal(roster.length,level===40&&region===4&&stage===4?10:8);
+        assert.equal(roster.length,level===40&&region===4&&stage===4?11:12);
         for(const m of roster){
             assert.equal(m.balanceOwner,'MonsterBalance');assert.equal(m.mode,'abyss');assert.equal(m.level,level);
             const projection=MonsterBalance.preview(m.balanceProjection.identity);
             assert.equal(m.maxHP,projection.final.maxHP);assert.equal(m.maxSP,projection.final.maxSP);
         }
-        if(stage===4&&!(level===40&&region===4)){assert.equal(roster[2].rank,'smallBoss');assert.equal(roster[2].v141FormationPosition,2);}
+        if(stage===4&&!(level===40&&region===4)){assert.equal(roster[6].rank,'smallBoss');assert.equal(context.v174AbyssBuildWaves(level,region,stage)[1][0].rank,'smallBoss');}
     }
     const final=context.v174AbyssBuildRoster(40,4,4);
-    assert.deepEqual(Array.from(final.slice(0,5),m=>m.name),['東帝天尊','天帝天尊','極帝天尊','北帝天尊','南帝天尊']);
-    assert.equal(final.slice(0,5).every(m=>m.rank==='smallBoss'),true);
-    assert.equal(final.slice(5).every(m=>m.rank==='elite'),true);
+    assert.deepEqual(Array.from(final.slice(6),m=>m.name),['東帝天尊','天帝天尊','極帝天尊','北帝天尊','南帝天尊']);
+    assert.equal(final.slice(6).every(m=>m.rank==='smallBoss'),true);
+    assert.equal(final.slice(0,6).every(m=>m.rank==='elite'),true);
     assert.match(owner,/run\.phase="chest"/);
     assert.match(owner,/window\.v141OpenAbyssChest=claimChest/);
     assert.match(owner,/source\.currentSrc\|\|source\.src/);

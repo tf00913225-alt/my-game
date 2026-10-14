@@ -8,7 +8,7 @@ const boss=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
 const polish=fs.readFileSync("css/42-v146-system-polish.css","utf8");
 const relic=fs.readFileSync("css/55-team-relic-system.css","utf8");
 
-assert.match(fixed,/#battleMonsterArea > \.v-fixed-enemy-row\{[\s\S]*?grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+assert.match(fixed,/#battleMonsterArea > \.v-fixed-enemy-row\{[\s\S]*?grid-template-columns:repeat\(var\(--battle-enemy-columns,5\),minmax\(0,1fr\)\)/);
 assert.match(fixed,/#battlePlayerRow > \.v-fixed-ally-slot-row\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
 assert.match(fixed,/--battle-resource-bar-height:11px/);
 assert.match(fixed,/\.monster-bar-text,[\s\S]*?font-size:9px !important/);

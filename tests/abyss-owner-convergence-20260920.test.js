@@ -27,7 +27,8 @@ emperorLoadouts.forEach(([name,skills,supports])=>{
     assert.ok(roster.includes('skills:Object.freeze('+JSON.stringify(skills)+'),supports:Object.freeze('+JSON.stringify(supports)+')'),`${name} skill/support IDs must remain canonical`);
 });
 assert.match(roster,/boss\.v141ForceSkillLevel=5/);
-assert.match(roster,/elite\.v141ForceSkillLevel=5/);
+assert.match(roster,/if\(final\)\{monster\.v141ForceSkillLevel=5;monster\.v141SkillLevel=5;monster\.v144SkillLevel=5/,
+    "the first-wave final elites must retain all three formal Lv5 skill projections");
 assert.match(roster,/v174TrueRealmFinal=true/);
 
 assert.match(v141Core,/v141TryMonsterSpecialAction\(monsterIndex,token\)/,"the single monster-turn wrapper must call the shared support dispatcher once");
