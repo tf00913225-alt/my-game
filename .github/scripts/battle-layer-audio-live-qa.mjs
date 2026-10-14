@@ -338,6 +338,34 @@ async function waitFor(client,expression,label,timeoutMs=30000){
     throw new Error(`Timed out waiting for ${label}. Last result: ${String(last)}`);
 }
 
+// Disposable QA end fixture: the first wave is not a terminal victory.
+// Drive the existing settled Core Queue; never fake action completion or edit
+// Wave Controller flags. The existing browser wait owns the original deadline.
+function finishBattleLayerQaEndFixture(){
+    const result=window.__battleLayerQaEndResult;
+    if(typeof battleActive==="undefined"){ return false; }
+    if(!battleActive){ result.ended=true;return true; }
+    const wave=window.FourSymbolsBattleWaves?.getState?.();
+    if(wave?.index===0&&(
+        battlePhase!=="resolve"||battleAdvanceScheduled||
+        (typeof battleDurationAction!=="undefined"&&battleDurationAction&&
+            !battleDurationAction.completed)||
+        window.FourSymbolsBattleFlow?.isPresentationActive?.()
+    )){ return false; }
+    (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).forEach(index=>{
+        if(typeof monsters!=="undefined"&&monsters[index]){
+            monsters[index].hp=0;monsters[index].alive=false;
+        }
+    });
+    if(wave?.index===0){
+        processNextCombatant(battleToken);
+        if(!battleActive){ result.ended=true; }
+    }else{
+        result.ended=checkBattleEnd();
+    }
+    return battleActive===false;
+}
+
 async function prepareAccountFirstRuntime(client,features){
     await waitFor(client,"window.FourSymbolsStartupPolicy&&(FourSymbolsStartupPolicy.getState()==='ERROR'||['AUTH_REQUIRED','NEED_CHARACTER','READY','OFFLINE_READY'].includes(FourSymbolsStartupPolicy.getState())||(document.getElementById('privacyConsentGate')&&!document.getElementById('privacyConsentGate').hidden&&document.getElementById('startupProgress')?.getAttribute('aria-valuenow')==='100'))","First Play/privacy/account startup destination",120000);
     let state=await client.eval("FourSymbolsStartupPolicy.getState()");
@@ -1614,16 +1642,11 @@ try{
     const endTransitionStart=await client.eval(`(()=>{
         if(typeof closeHomeFeature==='function'){closeHomeFeature();}
         const initialToken=Number(window.__battleLayerQaInitialBattleToken)||0;
-        if(typeof battleActive!=='undefined'&&battleActive){
-            (typeof currentBattleMonsters!=='undefined'?currentBattleMonsters:[]).forEach(index=>{
-                if(typeof monsters!=='undefined'&&monsters[index]){monsters[index].hp=0;monsters[index].alive=false;}
-            });
-        }
-        const ended=typeof battleActive!=='undefined'&&!battleActive
-            ?true:(typeof checkBattleEnd==='function'?checkBattleEnd():false);
-        return {initialToken,ended};
+        window.__battleLayerQaEndResult={ended:false};
+        window.__battleLayerQaCompleteEnd=${finishBattleLayerQaEndFixture.toString()};
+        return {initialToken};
     })()`);
-    await waitFor(client,"typeof battleActive!=='undefined'&&battleActive===false","battle victory flow release",5000);
+    await waitFor(client,"window.__battleLayerQaCompleteEnd()","battle victory flow release",5000);
     await waitFor(client,"['win','lose'].includes(window.__battleLayerQaDungeonOutcome?.result)","battle-end dungeon callback",6000);
     const endTransition=await client.eval(`({
         ended:${JSON.stringify(true)},battleActive:!!battleActive,
@@ -1633,7 +1656,7 @@ try{
         battlePageActive:document.getElementById('battlePage')?.classList.contains('active')||false,
         stageCount:document.querySelectorAll('#v143-skill-stage').length
     })`);
-    endTransition.ended=endTransitionStart.ended;
+    endTransition.ended=await client.eval("window.__battleLayerQaEndResult.ended");
     evidence.checks.battleEndTransition=endTransition;
     assert.equal(endTransition.ended,true,"Defeating the final targets must enter the formal battle-end path");
     assert.equal(endTransition.battleActive,false,"Battle-end path must clear battleActive");
@@ -1801,7 +1824,7 @@ try{
     console.log("Battle layer/audio live mobile QA: PASS");
 } catch(error){
     // Failure evidence only: never alter the scene or release a production lock.
-    evidence.failureState=await client?.eval("(()=>({url:location.href,hidden:document.hidden,phaseTrace:window.__relicQaPhaseTrace,qaProbe:window.__relicQaProbe,qaIdentity:window.__relicQaIdentitySnapshot,qaFocus:window.__relicQaFocusSnapshot,party:typeof getExistingPartyIndexes==='function'?getExistingPartyIndexes().map(i=>({i,hp:getPartyCharacterByIndex(i)?.hp,id:getPartyCharacterByIndex(i)?.id})):[],sprites:[...document.querySelectorAll('#v143-skill-stage .v143-vfx-sprite')].map(n=>({className:n.className,dataset:{...n.dataset},visibility:getComputedStyle(n).visibility})),battleActive:typeof battleActive==='undefined'?null:battleActive,token:typeof battleToken==='undefined'?null:battleToken,phase:typeof battlePhase==='undefined'?null:battlePhase,turn:typeof turn==='undefined'?null:turn,advance:typeof battleAdvanceScheduled==='undefined'?null:battleAdvanceScheduled,action:typeof battleDurationAction==='undefined'||!battleDurationAction?null:{token:battleDurationAction.token,index:battleDurationAction.index,completed:battleDurationAction.completed},run:window.v132ActiveDungeonRun?{mode:v132ActiveDungeonRun.mode,gameplayMode:v132ActiveDungeonRun.gameplayMode}:null,enemyIndexes:typeof currentBattleMonsters==='undefined'?[]:currentBattleMonsters.slice(),relic:window.v174RelicDebugState?.(),presentation:window.v174RelicPresentationState?.(),animation:window.v143SkillAnimationState?.current?{id:v143SkillAnimationState.current.config.id,sequence:v143SkillAnimationState.current.sequence,targets:v143SkillAnimationState.current.targetIndexes,done:v143SkillAnimationState.current.done}:null,locks:window.FourSymbolsBattleFlow?.isPresentationActive?.(),nodes:['battlePage','v141BattleTransition','teamRelicBattlePresentation','v143-skill-stage'].map(id=>{const n=document.getElementById(id);return {id,exists:!!n,className:n?.className,dataset:n?{...n.dataset}:null,display:n?getComputedStyle(n).display:null};}),feedback:document.querySelectorAll('.battle-floating-feedback').length}) )()").catch(diagnosticError=>({unavailable:String(diagnosticError)}));
+    evidence.failureState=await client?.eval("(()=>({url:location.href,hidden:document.hidden,phaseTrace:window.__relicQaPhaseTrace,qaProbe:window.__relicQaProbe,qaIdentity:window.__relicQaIdentitySnapshot,qaFocus:window.__relicQaFocusSnapshot,party:typeof getExistingPartyIndexes==='function'?getExistingPartyIndexes().map(i=>({i,hp:getPartyCharacterByIndex(i)?.hp,id:getPartyCharacterByIndex(i)?.id})):[],sprites:[...document.querySelectorAll('#v143-skill-stage .v143-vfx-sprite')].map(n=>({className:n.className,dataset:{...n.dataset},visibility:getComputedStyle(n).visibility})),battleActive:typeof battleActive==='undefined'?null:battleActive,token:typeof battleToken==='undefined'?null:battleToken,phase:typeof battlePhase==='undefined'?null:battlePhase,turn:typeof turn==='undefined'?null:turn,advance:typeof battleAdvanceScheduled==='undefined'?null:battleAdvanceScheduled,action:typeof battleDurationAction==='undefined'||!battleDurationAction?null:{token:battleDurationAction.token,index:battleDurationAction.index,completed:battleDurationAction.completed},waves:window.FourSymbolsBattleWaves?.getState?.(),run:window.v132ActiveDungeonRun?{mode:v132ActiveDungeonRun.mode,gameplayMode:v132ActiveDungeonRun.gameplayMode}:null,enemyIndexes:typeof currentBattleMonsters==='undefined'?[]:currentBattleMonsters.slice(),relic:window.v174RelicDebugState?.(),presentation:window.v174RelicPresentationState?.(),animation:window.v143SkillAnimationState?.current?{id:v143SkillAnimationState.current.config.id,sequence:v143SkillAnimationState.current.sequence,targets:v143SkillAnimationState.current.targetIndexes,done:v143SkillAnimationState.current.done}:null,locks:window.FourSymbolsBattleFlow?.isPresentationActive?.(),nodes:['battlePage','v141BattleTransition','teamRelicBattlePresentation','v143-skill-stage'].map(id=>{const n=document.getElementById(id);return {id,exists:!!n,className:n?.className,dataset:n?{...n.dataset}:null,display:n?getComputedStyle(n).display:null};}),feedback:document.querySelectorAll('.battle-floating-feedback').length}) )()").catch(diagnosticError=>({unavailable:String(diagnosticError)}));
     evidence.runtimeErrors=client?.events.filter(e=>e.method==='Runtime.exceptionThrown'||e.method==='Runtime.consoleAPICalled').slice(-20);
     evidence.status="FAIL";
     evidence.error=error?.stack||String(error);
