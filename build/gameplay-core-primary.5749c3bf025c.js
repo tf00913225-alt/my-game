@@ -1503,7 +1503,8 @@
                 drag.ghost=document.createElement('div');drag.ghost.className='formation-drag-preview';drag.ghost.innerHTML=formationUnitContent(drag.unit);
                 root.appendChild(drag.ghost);drag.node.classList.add('formation-drag-source');
             }
-            drag.ghost.style.left=event.clientX+'px';drag.ghost.style.top=event.clientY+'px';
+            const point=window.FourSymbolsDisplay.clientToSurface('native',event.clientX,event.clientY);
+            drag.ghost.style.left=point.x+'px';drag.ghost.style.top=point.y+'px';
             root.querySelectorAll('.formation-drop-target').forEach(node=>node.classList.remove('formation-drop-target'));
             const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-slot],[data-remove]');
             const preview=formationPreview(),from=drag.unit.startsWith('hero:')?preview.heroIdToSlot[drag.unit.slice(5)]:preview.characterIndexToSlot[drag.unit.slice(7)];
@@ -1630,14 +1631,7 @@
         };
     }
 
-    function promoteSkillPreview(){
-        const modal=document.getElementById("allElementSkillPreviewModal");
-        const overlay=document.getElementById("game-overlay-layer") || document.getElementById("game-stage");
-        if(modal && overlay && modal.parentNode!==overlay){
-            overlay.appendChild(modal);
-        }
-    }
-    promoteSkillPreview();
+    // setupNativeGameUi owns the preview's single native host.
 
     const expPreviewCounts={0:0,1:0,2:0};
     const originalDistributeExpToCharacter=
@@ -2213,7 +2207,6 @@
         syncElementBoxForBattle({silent:true});
         applyBattleFormation();
         syncInventoryPortrait();
-        promoteSkillPreview();
         syncCharacterCreationAvailability();
         renderExpDistributeList();
         ensureElementBoxStatsUI();
@@ -4548,19 +4541,32 @@
         modal=document.createElement("div");
         modal.id="v132RewardModal";
         modal.className="v132-reward-modal";
-        document.body.appendChild(modal);
+        document.getElementById("game-ui").appendChild(modal);
         return modal;
     }
 
     window.v132ShowRewardModal=function(innerHtml){
         const modal=ensureRewardModalElement();
+        // A list opened from item detail is a child dialog of that existing
+        // native surface. DOM containment keeps it above the parent without
+        // introducing another scale boundary or raising a z-index.
+        const itemModal=document.getElementById("itemModal");
+        const featureModal=document.getElementById("homeFeatureModal");
+        const host=itemModal?.classList.contains("show")?itemModal:
+            featureModal?.classList.contains("show")?featureModal:document.getElementById("game-ui");
+        if(modal.parentElement!==host){host.appendChild(modal);}
         modal.innerHTML=innerHtml;
+        modal.classList.remove("v132-detail-paused");
         modal.classList.add("show");
     };
 
     window.v132CloseRewardModal=function(){
         const modal=document.getElementById("v132RewardModal");
-        if(modal){ modal.classList.remove("show"); }
+        if(modal){
+            modal.classList.remove("show");
+            const host=document.getElementById("game-ui");
+            if(modal.parentElement!==host){host.appendChild(modal);}
+        }
     };
 
 
@@ -9232,15 +9238,7 @@
         },()=>alert("廣告未完成，未增加元素匣時數。"));
     };
 
-    if(typeof openAllElementSkillPreview==="function"){
-        const originalOpenAllElementSkillPreview=openAllElementSkillPreview;
-        openAllElementSkillPreview=function(){
-            const modal=document.getElementById("allElementSkillPreviewModal");
-            if(modal&&modal.parentElement!==document.body){ document.body.appendChild(modal); }
-            if(modal){ modal.classList.add("v141-body-preview"); }
-            return originalOpenAllElementSkillPreview.apply(this,arguments);
-        };
-    }
+    // Skill preview is mounted once by the canonical game UI lifecycle.
 
     /* =====================================================
        Daily dungeon covers and dungeon navigation
@@ -9412,8 +9410,6 @@
         installTaskTracker();
         ensureInventoryPager();
         updateNotificationDots();
-        const preview=document.getElementById("allElementSkillPreviewModal");
-        if(preview&&preview.parentElement!==document.body){ document.body.appendChild(preview); preview.classList.add("v141-body-preview"); }
     }
     if(document.readyState==="loading"){
         document.addEventListener("DOMContentLoaded",boot,{once:true});

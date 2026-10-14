@@ -1,12 +1,13 @@
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const read=p=>fs.readFileSync(p,"utf8");
-const reforgeCss=read("css/38-v141-system-expansion.css");
+const reforgeCss=authoredUiCss(read("css/38-v141-system-expansion.css"));
 const touch=read("js/01-stage-v8-touch-lock.js");
-const rewardCss=read("css/33-v132-content-expansion.css");
+const rewardCss=authoredUiCss(read("css/33-v132-content-expansion.css"));
 const inventory=read("js/55-v173.51-inventory-qa.js");
-const compareCss=read("css/53-v173.51-qa.css");
+const compareCss=authoredUiCss(read("css/53-v173.51-qa.css"));
 const picker=read("js/36-v141-content-systems.js");
 const repairs=read("js/58-v173.63-functional-fixes.js");
 const guide=read("UI_GUIDELINES.md");

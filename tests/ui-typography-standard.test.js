@@ -1,9 +1,10 @@
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
 const ROOT = path.resolve(__dirname, '..');
-const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8');
+const read = (file) => {const source=fs.readFileSync(path.join(ROOT,file),'utf8');return file.endsWith('.css')?authoredUiCss(source):source;};
 
 const owners = {
   skillFix: 'css/31-v131-fix-batch.css',
@@ -59,7 +60,7 @@ enforceNoTinyText(owners.abyss);
 // exclude only that documented decorative class, never backpack content text.
 const inventoryHtml=read('index.html');
 assert.match(inventoryHtml, /class="inventory-title-plate" aria-label="背包"[\s\S]*?class="inventory-title-plate-kicker">INVENTORY<\/span>\s*<h2>背包<\/h2>/);
-assert.match(inventory, /\.inventory-title-plate h2\{[^}]*font-size:22px/);
+assert.match(inventory, /\.inventory-title-plate h2\{[^}]*font-size:20px/);
 enforceNoTinyText(owners.inventory, text => text.replace(/#game-stage #inventoryPage \.inventory-title-plate-kicker\{[^}]*\}/, ''));
 enforceNoTinyText(owners.abyssLayout);
 enforceNoTinyText(owners.patrol);
@@ -90,7 +91,8 @@ assert.match(homePolish, /\.v173-exp-charge-status small\{[^}]*font-size:14px/);
 assert.match(homePolish, /\.skill-loadout-slot-name\{font-size:15px/);
 assert.match(homePolish, /\.map-player-name\{[^}]*font-size:13px/);
 assert.match(homePolish, /\.v132-reward-modal \.v17363-preview-group p\{font-size:15px/);
-assert.match(homePolish, /#allElementSkillPreviewModal \.skill-preview-card span\{font-size:34px/);
+assert.doesNotMatch(homePolish, /#allElementSkillPreviewModal/);
+assert.match(read('css/38-v141-system-expansion.css'), /#allElementSkillPreviewModal \.skill-preview-card span\{font-size:14px/);
 assert.match(detail, /#skillDetailStats \.v17364-progression-hint\{[\s\S]*?font-size:14px/);
 // V177 owns backpack typography in css/22; css/52 must not reclaim it.
 assert.match(inventory, /\.inventory-category-tab\{[^}]*font-size:18px/);
@@ -129,7 +131,7 @@ assert.match(relic, /\.team-relic-battle-banner b\{[^}]*17px/);
 // Relic SP feedback retired its private float and uses the battle-only owner.
 assert.doesNotMatch(relic, /team-relic-sp-float/);
 assert.match(read('js/60-team-relic-system.js'), /function showRelicSpFloat\(index,amount\)\{[^}]*\}[\s\S]*?emitRelicPlayerHit\(amount,"sp",index,true\)/);
-const feedbackCss=read('css/battle-floating-feedback-owner.css');
+const feedbackCss=authoredUiCss(read('css/battle-floating-feedback-owner.css'));
 assert.match(feedbackCss, /font-size:var\(--battle-feedback-font-size,18px\)/);
 assert.match(feedbackCss, /data-feedback-kind="sp"\]\{color:#2c8de8;/);
 assert.doesNotMatch(read('css/45-v152-dev-fixes.css'), /v152-frostbite-blocked|凍傷禁止使用技能/);

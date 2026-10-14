@@ -223,10 +223,10 @@ test('backpack Chrome transport rejects stalled commands and cleans up without w
     reply(value){const event=new Event('message');event.data=JSON.stringify({id:this.request.id,result:value});this.dispatchEvent(event);}
   }
   const connect=vm.runInNewContext(source.split('\nconst chrome=findChrome();')[0]+'\nconnectChrome;',{
-    require:name=>name==='node:fs'?{mkdtempSync:()=>'/unused-fixture-profile',rmSync:()=>removed++}:
-      name==='node:child_process'?{spawn:()=>({kill:()=>killed++,
+    require:name=>name==='node:fs'?{mkdtempSync:()=>'/unused-fixture-profile',promises:{rm:async()=>removed++}}:
+      name==='node:child_process'?{spawn:()=>({get exitCode(){return launchFailure?1:null;},kill:()=>killed++,
         stderr:{on:(event,read)=>{if(launchFailure)read('fixture Chrome launch diagnostic');}},
-        once:(event,read)=>{if(launchFailure&&event==='exit')queueMicrotask(()=>read(1,null));}})}:
+        once:(event,read)=>{if(event==='exit'&&(launchFailure||killed>0))queueMicrotask(()=>read(1,null));}})}:
       name==='node:net'?{createServer:()=>({once(){},listen(port,host,ready){ready();},address:()=>({port:12345}),close(done){done();}})}:require(name),
     __dirname:new URL('.',import.meta.url).pathname,
     WebSocket:FakeSocket,AbortSignal,
@@ -240,9 +240,9 @@ test('backpack Chrome transport rejects stalled commands and cleans up without w
     await assert.rejects(browser.send('Page.captureScreenshot'),/CDP timed out after 30 seconds: Page.captureScreenshot/);
     const closed=browser.send('Page.navigate');socket.close();
     await assert.rejects(closed,/closed before response/);
-  }finally{browser.close();}
+  }finally{await browser.close();}
   assert.equal(killed,1);assert.equal(removed,1);
   launchFailure=true;
   await assert.rejects(connect('fixture-chrome'),/Chrome launch failed:.*"code":1[\s\S]*fixture Chrome launch diagnostic/);
-  assert.equal(killed,2);assert.equal(removed,2);
+  assert.equal(killed,1);assert.equal(removed,2);
 });

@@ -2,10 +2,12 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
 function findChrome(){
+    if(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH&&fs.existsSync(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH))return process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -56,7 +58,7 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;}
 })();
 </script></body></html>`;
 
-fs.writeFileSync(fixture,html,"utf8");
+fs.writeFileSync(fixture,authoredUiCss.legacyFixture(html),"utf8");
 try{
     const run=cp.spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1","--window-size=1080,1920","--dump-dom",fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});
     assert.equal(run.status,0,run.stderr||"Chrome feature layout fixture failed");

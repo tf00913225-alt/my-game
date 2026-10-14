@@ -146,14 +146,14 @@
     display:block;
     position:relative;
     z-index:1;
-    margin:0 0 10px;
-    padding:9px 12px;
+    margin:0 0 calc(10 * var(--ui-length-unit,1px));
+    padding:calc(9 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px));
     box-sizing:border-box;
-    border:2px solid rgba(218,166,76,.42);
-    border-radius:10px;
+    border:calc(2 * var(--ui-length-unit,1px)) solid rgba(218,166,76,.42);
+    border-radius:calc(10 * var(--ui-length-unit,1px));
     background:linear-gradient(180deg,rgba(78,53,21,.68),rgba(24,18,11,.86));
     color:#f0d89c;
-    font-size:16px;
+    font-size:calc(16 * var(--ui-length-unit,1px));
     line-height:1.45;
     font-weight:900;
     text-align:left;
@@ -162,29 +162,6 @@
 }
 
 /* V174.1 mobile regression follow-up — scoped to the five reported regressions. */
-
-/* Main-city roster: preserve the three equal slots, but return enough horizontal
-   room to the HP/SP labels and reduce the two bars instead of letting them bleed. */
-#game-ui #homePage #v146HomeRoster .v146-home-character{
-    grid-template-columns:minmax(0,1fr) !important;
-    gap:3px !important;
-    min-height:70px !important;
-    padding:3px 2px !important;
-}
-#game-ui #homePage #v146HomeRoster .v146-home-avatar{
-    width:32px !important;
-    height:32px !important;
-}
-#game-ui #homePage #v146HomeRoster .v146-home-character-main{
-    gap:2px !important;
-}
-#game-ui #homePage #v146HomeRoster .v146-home-resource{
-    height:19px !important;
-}
-#game-ui #homePage #v146HomeRoster .v146-home-resource strong{
-    font-size:13px !important;
-    line-height:17px !important;
-}
 
 /* Character creation now fits the fixed canvas without a nested scroll layer.
    This avoids Android/WebView black compositor tiles inside the scaled stage. */
@@ -237,17 +214,17 @@
 #game-ui .team-relic-home-tools{
     position:relative;inset:auto;z-index:5;display:grid;
     grid-template-columns:repeat(4,minmax(0,1fr));grid-column:1;grid-row:3;justify-self:center;align-self:start;
-    width:100%;gap:4px;padding:0;
+    width:100%;gap:12px;padding:0;
     box-sizing:border-box;pointer-events:none;align-items:end;
 }
 #game-ui .team-relic-home-tools .home-card-utility{
-    display:flex;align-items:center;justify-content:center;gap:8px;grid-column:span 2;
-    justify-self:center;width:min(100%,180px);height:44px;pointer-events:auto;position:relative;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;gap:24px;grid-column:span 2;
+    justify-self:center;width:min(100%,540px);height:132px;pointer-events:auto;position:relative;overflow:hidden;
     border:0;border-radius:0;background:rgba(17,20,16,.76);box-shadow:none;
 }
-#game-ui .team-relic-home-tools .home-card-utility:active{transform:translateY(1px) scale(.97);filter:brightness(1.12);}
-#game-ui .team-relic-home-tools .home-card-utility .home-card-icon{display:flex;align-items:center;justify-content:center;width:32px;height:32px;flex:0 0 32px;overflow:hidden;border:0;border-radius:50%;background-position:center;background-size:contain;background-repeat:no-repeat;opacity:.8;}
-#game-ui .team-relic-home-tools .home-card-utility .home-card-label{padding:2px 3px;background:transparent;font-size:15px;line-height:22px;font-weight:700;}
+#game-ui .team-relic-home-tools .home-card-utility:active{transform:translateY(3px) scale(.97);filter:brightness(1.12);}
+#game-ui .team-relic-home-tools .home-card-utility .home-card-icon{display:flex;align-items:center;justify-content:center;width:96px;height:96px;flex:0 0 96px;overflow:hidden;border:0;border-radius:50%;background-position:center;background-size:contain;background-repeat:no-repeat;opacity:.8;}
+#game-ui .team-relic-home-tools .home-card-utility .home-card-label{padding:6px 9px;background:transparent;font-size:45px;line-height:66px;font-weight:700;}
 #game-ui .team-relic-home-tools .home-card-utility .home-card-icon img{width:100%;height:100%;object-fit:contain;display:block;}
 #game-ui .team-relic-home-entry .home-card-icon{background-image:url("../assets/ui/home-relic-v174.eed14e806044.webp");}
 #game-ui .team-relic-home-entry .team-relic-home-glyph{font-size:0;color:transparent;text-shadow:none;}

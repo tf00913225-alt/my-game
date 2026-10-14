@@ -2,11 +2,12 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
-const detailCss=fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8");
-const nativeCss=fs.readFileSync("css/29-v125-character-creation-native.css","utf8");
+const detailCss=authoredUiCss(fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8"));
+const nativeCss=authoredUiCss(fs.readFileSync("css/29-v125-character-creation-native.css","utf8"));
 const runtime=fs.readFileSync("js/24-v125-character-creation-native-runtime.js","utf8");
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 
@@ -23,6 +24,7 @@ assert.doesNotMatch(touchLock,/\.creation-skill-detail-box/);
 assert.match(nativeCss,/#creationSkillDetailModal\{[\s\S]*?width:1080px;[\s\S]*?height:1920px;/);
 
 function findChrome(){
+    if(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH&&fs.existsSync(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH))return process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }

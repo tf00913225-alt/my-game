@@ -7,10 +7,10 @@
 
 /* HP / SP 常駐資訊：只留一條小資訊帶 */
 #game-ui #inventoryPage .inventory-stats-panel{
-    margin:6px 0 8px !important;
-    padding:8px 10px !important;
+    margin:18px 0 24px !important;
+    padding:24px 30px !important;
     min-height:0 !important;
-    border-width:1px 0 !important;
+    border-width:3px 0 !important;
     border-style:solid !important;
     border-color:rgba(200,154,72,.16) !important;
     border-radius:0 !important;
@@ -23,17 +23,17 @@
 #game-ui #inventoryPage .inventory-detailed-stats{
     display:grid !important;
     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    gap:8px !important;
+    gap:24px !important;
 }
 #game-ui #inventoryPage .inventory-stat-primary{
     display:flex !important;
     justify-content:space-between !important;
     align-items:center !important;
-    min-height:38px !important;
-    padding:6px 4px !important;
-    font-size:15px !important;
+    min-height:114px !important;
+    padding:18px 12px !important;
+    font-size:45px !important;
     border:0 !important;
-    border-bottom:1px solid rgba(200,154,72,.12) !important;
+    border-bottom:3px solid rgba(200,154,72,.12) !important;
     border-radius:0 !important;
     background:transparent !important;
 }
@@ -43,26 +43,26 @@
     z-index:9000 !important;
 }
 #inventoryCharacterDetailModal .inventory-character-detail-box{
-    width:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
-    max-width:var(--ui-medium-modal-max-width,360px) !important;
-    height:min(var(--ui-medium-modal-height,540px),calc(100% - var(--ui-medium-modal-safe-space,28px))) !important;
-    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    width:calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px)))) !important;
+    max-width:var(--ui-medium-modal-max-width,calc(360 * var(--ui-length-unit,1px))) !important;
+    height:min(var(--ui-medium-modal-height,calc(540 * var(--ui-length-unit,1px))),calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px))))) !important;
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px)))) !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
-    gap:var(--ui-medium-modal-content-gap,10px) !important;
+    gap:var(--ui-medium-modal-content-gap,calc(10 * var(--ui-length-unit,1px))) !important;
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
 #inventoryCharacterDetailModal .inventory-character-detail-grid{
     display:grid !important;
     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    gap:8px !important;
+    gap:calc(8 * var(--ui-length-unit,1px)) !important;
     width:100% !important;
     min-height:0 !important;
     flex:1 1 auto !important;
     margin:0 !important;
-    padding:2px 2px 4px 0 !important;
+    padding:calc(2 * var(--ui-length-unit,1px)) calc(2 * var(--ui-length-unit,1px)) calc(4 * var(--ui-length-unit,1px)) 0 !important;
     overflow-x:hidden !important;
     overflow-y:auto !important;
     overscroll-behavior-y:contain !important;
@@ -74,25 +74,25 @@
     display:flex !important;
     align-items:center !important;
     justify-content:space-between !important;
-    gap:8px !important;
-    min-height:44px !important;
-    padding:8px 4px !important;
+    gap:calc(8 * var(--ui-length-unit,1px)) !important;
+    min-height:calc(44 * var(--ui-length-unit,1px)) !important;
+    padding:calc(8 * var(--ui-length-unit,1px)) calc(4 * var(--ui-length-unit,1px)) !important;
     border:0 !important;
-    border-bottom:1px solid rgba(200,154,72,.14) !important;
+    border-bottom:calc(1 * var(--ui-length-unit,1px)) solid rgba(200,154,72,.14) !important;
     border-radius:0 !important;
     background:transparent !important;
-    font-size:14px !important;
+    font-size:calc(14 * var(--ui-length-unit,1px)) !important;
 }
 
 .inventory-character-detail-note{
     grid-column:1 / -1;
-    margin-top:8px;
-    padding:8px 9px;
-    border:1px solid rgba(180,138,65,.55);
-    border-radius:7px;
+    margin-top:calc(8 * var(--ui-length-unit,1px));
+    padding:calc(8 * var(--ui-length-unit,1px)) calc(9 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(180,138,65,.55);
+    border-radius:calc(7 * var(--ui-length-unit,1px));
     background:rgba(18,14,10,.72);
     color:#cfc3ad;
-    font-size:14px;
+    font-size:calc(14 * var(--ui-length-unit,1px));
     line-height:1.5;
 }
 
@@ -111,14 +111,14 @@
    技能說明多寡不得再改變整個視窗大小。
 */
 #game-ui #skillDetailModal .item-modal-box{
-    width:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
-    max-width:var(--ui-medium-modal-max-width,360px) !important;
-    height:min(var(--ui-medium-modal-height,540px),calc(100% - var(--ui-medium-modal-safe-space,28px))) !important;
-    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    width:calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px)))) !important;
+    max-width:var(--ui-medium-modal-max-width,calc(360 * var(--ui-length-unit,1px))) !important;
+    height:min(var(--ui-medium-modal-height,calc(540 * var(--ui-length-unit,1px))),calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px))))) !important;
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px)))) !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
-    gap:var(--ui-medium-modal-content-gap,10px) !important;
+    gap:var(--ui-medium-modal-content-gap,calc(10 * var(--ui-length-unit,1px))) !important;
     overflow:hidden !important;
     box-sizing:border-box !important;
     touch-action:pan-y !important;
@@ -138,25 +138,25 @@
     overscroll-behavior-y:contain !important;
     touch-action:pan-y !important;
     scrollbar-gutter:stable !important;
-    font-size:15px !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
     line-height:1.55 !important;
 }
 #game-ui #skillDetailModal #skillDetailStats span[style*="font-size:11px"]{
-    font-size:13px !important;
+    font-size:calc(13 * var(--ui-length-unit,1px)) !important;
     line-height:1.35 !important;
 }
 #game-ui #skillDetailModal #skillDetailStats div[style*="font-size:11px"],
 #game-ui #skillDetailModal #skillDetailStats div[style*="font-size:12px"]{
-    font-size:15px !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
     line-height:1.5 !important;
 }
 #game-ui #skillDetailModal #skillDetailStats .v17364-progression-hint{
-    font-size:14px !important;
+    font-size:calc(14 * var(--ui-length-unit,1px)) !important;
     line-height:1.45 !important;
 }
 #game-ui #skillDetailModal #skillDetailStats .v17364-progression-detail,
 #game-ui #skillDetailModal #skillDetailStats .v17364-progression-detail > div{
-    font-size:15px !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
     line-height:1.45 !important;
 }
 #game-ui #skillDetailModal .close-item-button{
@@ -169,14 +169,14 @@
    這裡由 Medium Modal 規格接管外框，只有說明 .item-stat-list 捲動。
 */
 #game-ui #statusHelpModal .item-modal-box{
-    width:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
-    max-width:var(--ui-medium-modal-max-width,360px) !important;
-    height:min(var(--ui-medium-modal-height,540px),calc(100% - var(--ui-medium-modal-safe-space,28px))) !important;
-    max-height:calc(100% - var(--ui-medium-modal-safe-space,28px)) !important;
+    width:calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px)))) !important;
+    max-width:var(--ui-medium-modal-max-width,calc(360 * var(--ui-length-unit,1px))) !important;
+    height:min(var(--ui-medium-modal-height,calc(540 * var(--ui-length-unit,1px))),calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px))))) !important;
+    max-height:calc(100% - var(--ui-medium-modal-safe-space,calc(28 * var(--ui-length-unit,1px)))) !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
-    gap:var(--ui-medium-modal-content-gap,10px) !important;
+    gap:var(--ui-medium-modal-content-gap,calc(10 * var(--ui-length-unit,1px))) !important;
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
@@ -197,7 +197,7 @@
 }
 #game-ui #statusHelpModal .close-item-button{
     margin-top:0 !important;
-    min-height:44px !important;
+    min-height:calc(44 * var(--ui-length-unit,1px)) !important;
 }
 
 /*
@@ -207,10 +207,10 @@
    Header／摘要／底部關閉固定，只有等級清單負責垂直捲動。
 */
 #game-stage #creationSkillDetailModal .creation-skill-detail-box{
-    width:920px !important;
-    max-width:920px !important;
-    height:1390px !important;
-    max-height:calc(100% - 96px) !important;
+    width:calc(920 * var(--ui-length-unit,1px)) !important;
+    max-width:calc(920 * var(--ui-length-unit,1px)) !important;
+    height:calc(1390 * var(--ui-length-unit,1px)) !important;
+    max-height:calc(100% - calc(96 * var(--ui-length-unit,1px))) !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
@@ -226,13 +226,13 @@
     flex:0 0 auto !important;
 }
 #game-stage #creationSkillDetailModal .creation-skill-detail-header{
-    grid-template-columns:92.571px minmax(0,1fr) 124px !important;
+    grid-template-columns:calc(92.571 * var(--ui-length-unit,1px)) minmax(0,1fr) calc(124 * var(--ui-length-unit,1px)) !important;
 }
 #game-stage #creationSkillDetailModal .creation-skill-detail-x{
-    width:124px !important;
-    height:124px !important;
-    min-width:124px !important;
-    min-height:124px !important;
+    width:calc(124 * var(--ui-length-unit,1px)) !important;
+    height:calc(124 * var(--ui-length-unit,1px)) !important;
+    min-width:calc(124 * var(--ui-length-unit,1px)) !important;
+    min-height:calc(124 * var(--ui-length-unit,1px)) !important;
 }
 #game-stage #creationSkillDetailModal .creation-skill-detail-levels{
     flex:1 1 auto !important;
@@ -246,16 +246,16 @@
     scrollbar-gutter:stable !important;
 }
 #game-stage #creationSkillDetailModal .creation-skill-detail-close{
-    height:124px !important;
-    min-height:124px !important;
+    height:calc(124 * var(--ui-length-unit,1px)) !important;
+    min-height:calc(124 * var(--ui-length-unit,1px)) !important;
 }
 
 
 /* Skill detail icon is an icon, not a full-width repeating banner. */
 #game-ui #skillDetailModal #skillDetailIcon{
-    width:88px!important;height:88px!important;min-height:88px!important;
-    align-self:center!important;margin:0 auto 8px!important;overflow:hidden!important;
-    border-radius:12px!important;background-position:center!important;
+    width:calc(88 * var(--ui-length-unit,1px))!important;height:calc(88 * var(--ui-length-unit,1px))!important;min-height:calc(88 * var(--ui-length-unit,1px))!important;
+    align-self:center!important;margin:0 auto calc(8 * var(--ui-length-unit,1px))!important;overflow:hidden!important;
+    border-radius:calc(12 * var(--ui-length-unit,1px))!important;background-position:center!important;
     background-size:contain!important;background-repeat:no-repeat!important;
     background-color:rgba(9,8,6,.88)!important;
 }

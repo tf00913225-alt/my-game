@@ -28,17 +28,18 @@ const html=width=>`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/31-v131-fix-batch.css">
 <style>
 html,body{margin:0;width:${width}px;height:900px;overflow:hidden;background:#050505}
-#game-ui{width:${width}px!important;height:900px!important;transform:none!important;overflow:hidden!important}
-#homePage{display:block!important;width:${width}px!important;height:900px!important}
+#game-stage{position:relative;width:1080px;height:1920px;transform-origin:top left;transform:scale(${Math.min(width/1080,900/1920)});}
+#game-ui{width:1080px!important;height:1920px!important;overflow:hidden!important}
+#homePage{display:block!important;width:1080px!important;height:1704px!important}
 #v146HomeRoster{margin:8px 10px!important;width:auto!important}
-</style></head><body><div id="game-ui"><div id="homePage">${cityHud}
+</style></head><body><div id="game-stage"><div id="game-ui"><div id="homePage">${cityHud}
 <section id="v146HomeRoster" class="v146-home-roster"><header>
 <b>冒險隊伍</b><span class="v146-home-roster-count">隊伍 3 / 6</span>
 <span class="v146-home-roster-gold">金幣 <strong>9,999,999</strong></span>
 <button type="button" class="v-fixed-formation-entry">佈陣</button>
 </header><div class="v146-home-character">甲</div><div class="v146-home-character">乙</div><div class="v146-home-character">丙</div>
 <div class="team-relic-loadout-slot"><span>隊伍秘寶</span><b>乾坤玉壺 Lv.1</b><button>更換</button></div></section>
-</div></div><pre id="result"></pre><script>
+</div></div></div><pre id="result"></pre><script>
 const rect=e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};};
 const overlap=(a,b)=>a.left<b.right&&b.left<a.right&&a.top<b.bottom&&b.top<a.bottom;
 const root=document.documentElement,page=document.getElementById('homePage'),header=document.querySelector('#v146HomeRoster>header'),count=document.querySelector('.v146-home-roster-count'),gold=document.querySelector('.v146-home-roster-gold'),formation=document.querySelector('.v-fixed-formation-entry');
@@ -55,7 +56,7 @@ try{
         const match=run.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
         assert.ok(match,"header geometry result missing");
         const data=JSON.parse(match[1].replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"'));
-        assert.equal(data.pageWidth,width);
+        assert.ok(Math.abs(data.pageWidth-1080*Math.min(width/1080,900/1920))<.02,"page follows the one native stage projection");
         assert.ok(data.header.width>0&&data.header.height>0,`${width}px header is not visible`);
         assert.equal(data.countGold,false,`${width}px team count overlaps gold`);
         assert.equal(data.goldFormation,false,`${width}px gold overlaps formation button`);

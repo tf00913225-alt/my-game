@@ -241,17 +241,18 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
     }
 })();
 
-/* Browser layout boundary. Move the existing general-page nodes once; their
-   data, handlers and navigation lifecycle remain owned by the same runtime.
-   The remaining game-content and native overlay retain the Phase 1 projection. */
-(function setupBrowserGameUi(){
+/* General UI shares the native 1080 x 1920 canvas. Move existing nodes once;
+   preserve their data, handlers and navigation lifecycle. The legacy content
+   boundary remains only for pages that still require its local coordinates. */
+(function setupNativeGameUi(){
     const ui=document.createElement("div");
     ui.id="game-ui";
     ui.hidden=true;
-    ui.dataset.presentationDomain="browser";
-    document.body.appendChild(ui);
+    ui.dataset.presentationDomain="native";
+    document.getElementById("game-overlay-layer").appendChild(ui);
     for(const id of ["homePage","inventoryPage","homeFeatureModal","itemModal",
-                     "inventoryCharacterDetailModal","skillDetailModal","statusHelpModal"]){
+                     "inventoryCharacterDetailModal","skillDetailModal","statusHelpModal",
+                     "allElementSkillPreviewModal"]){
         const node=document.getElementById(id);
         if(node) ui.appendChild(node);
     }
@@ -267,9 +268,8 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 
 /* Legacy V3 navigation positioning retired; FourSymbolsBottomNav owns the shell. */
 
-/* Display dimensions and the legacy projection are owned by css/00-main.css.
-   General UI uses browser CSS pixels; only stage-bound presentation uses
-   native/legacy coordinates. The legacy surface remains until its pages migrate. */
+/* css/00-main.css owns logical dimensions. This remains the sole final fit
+   scale and coordinate-conversion owner for every game surface. */
 const displayTokens = getComputedStyle(document.documentElement);
 const GAME_WIDTH = Number(displayTokens.getPropertyValue("--stage-design-width"));
 const GAME_HEIGHT = Number(displayTokens.getPropertyValue("--stage-design-height"));
@@ -5675,24 +5675,36 @@ function moveDropdownListToBody(selectId){
         .getBoundingClientRect();
 
 
-    document.body.appendChild(
-        list
-    );
+    const host=(label||wrapper).closest("#game-ui .home-feature-modal,#game-ui .item-modal")||document.getElementById("game-ui");
+    host.appendChild(list);
+    const origin=window.FourSymbolsDisplay.clientToSurface("native",labelRect.left,labelRect.bottom);
+    const edge=window.FourSymbolsDisplay.clientToSurface("native",labelRect.right,labelRect.bottom);
 
 
     list.style.position=
-        "fixed";
+        "absolute";
 
     list.style.top=
-        (labelRect.bottom+4)+
+        (origin.y+12)+
         "px";
+    const top=window.FourSymbolsDisplay.clientToSurface("native",labelRect.left,labelRect.top);
+    const nativeHeight=window.FourSymbolsDisplay.dimensions.nativeHeight;
+    const below=nativeHeight-origin.y-12,above=top.y-12;
+    if(above>below){
+        list.style.top="auto";
+        list.style.bottom=(nativeHeight-top.y+12)+"px";
+        list.style.setProperty("--ui-dropdown-space",Math.max(0,above)+"px");
+    }else{
+        list.style.bottom="auto";
+        list.style.setProperty("--ui-dropdown-space",Math.max(0,below)+"px");
+    }
 
     list.style.left=
-        labelRect.left+
+        origin.x+
         "px";
 
     list.style.width=
-        labelRect.width+
+        (edge.x-origin.x)+
         "px";
 
     list.style.right=
@@ -5729,8 +5741,8 @@ function moveDropdownListToBody(selectId){
        有沒有跟著調整過。
     */
 
-    list.style.zIndex=
-        "6100";
+    // The existing dialog host provides stacking; retain the CSS dropdown tier.
+    list.style.zIndex="";
 
 
     /*
@@ -5806,6 +5818,8 @@ function moveDropdownListBack(selectId){
 
     list.style.zIndex=
         "";
+    list.style.bottom="";
+    list.style.removeProperty("--ui-dropdown-space");
 
 
     if(
@@ -20534,7 +20548,7 @@ function openAutoBattleSettings(){
     if(
         !battleActive &&
         panel.parentNode!==
-        document.body
+        document.getElementById("game-ui")
     ){
 
         autoSettingsOriginalParent=
@@ -20544,7 +20558,7 @@ function openAutoBattleSettings(){
             panel.nextSibling;
 
 
-        document.body.appendChild(
+        document.getElementById("game-ui").appendChild(
             panel
         );
 
@@ -25669,21 +25683,7 @@ function openHomeFeature(type){
            96dvh），盡量讓內容一次就能完整顯示、不用捲動。
         */
 
-        const settingsBox=
-            modal.querySelector(
-                ".home-feature-modal-box"
-            );
-
-
-        if(settingsBox){
-
-            settingsBox.style.setProperty(
-                "max-height",
-                "96dvh",
-                "important"
-            );
-
-        }
+        // The existing CSS panel owner reserves native canvas space.
 
 
         const characterSelect=
@@ -25890,6 +25890,10 @@ function closeHomeFeature(){
 
 
     if(modal){
+        const childReward=document.getElementById("v132RewardModal");
+        if(childReward?.parentElement===modal&&typeof window.v132CloseRewardModal==="function"){
+            window.v132CloseRewardModal();
+        }
 
         modal.classList.remove(
             "show"
@@ -26443,22 +26447,22 @@ function renderCharacterShowcaseContent(){
             if(character){
                 html+=
 
-                    '<div class="character-showcase-choice" style="width:86px;text-align:center;'+
+                    '<div class="character-showcase-choice" style="width:calc(86 * var(--ui-length-unit,1px));text-align:center;'+
                     'cursor:pointer;" onclick="selectCharacterForTabs('+
                     slotIndex+
                     ');">'+
 
                     '<div id="characterAvatar'+
                     slotIndex+
-                    '" class="character-showcase-avatar" style="width:56px;height:56px;margin:0 auto;'+
+                    '" class="character-showcase-avatar" style="width:calc(56 * var(--ui-length-unit,1px));height:calc(56 * var(--ui-length-unit,1px));margin:0 auto;'+
                     'border-radius:50%;background-color:#15100a;background-image:url(\''+
                     getCharacterArtworkPath(character)+
                     '\');background-size:cover;background-position:center 18%;'+
-                    'border:2px solid #f0b429;display:flex;align-items:center;'+
-                    'justify-content:center;font-size:18px;transition:opacity .15s;">'+
+                    'border:calc(2 * var(--ui-length-unit,1px)) solid #f0b429;display:flex;align-items:center;'+
+                    'justify-content:center;font-size:calc(18 * var(--ui-length-unit,1px));transition:opacity .15s;">'+
                     "</div>"+
 
-                    '<div style="font-size:11px;font-weight:bold;margin-top:2px;'+
+                    '<div style="font-size:calc(15 * var(--ui-length-unit,1px));font-weight:bold;margin-top:calc(2 * var(--ui-length-unit,1px));'+
                     'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+
                     character.id+
                     "</div>"+
@@ -26488,7 +26492,7 @@ function renderCharacterShowcaseContent(){
 
                     '<div id="characterAvatarLevel'+
                     slotIndex+
-                    '" style="font-size:10px;color:#b3a58c;">'+
+                    '" style="font-size:calc(13 * var(--ui-length-unit,1px));color:#b3a58c;">'+
                     "Lv."+character.level+
                     "</div>"+
 
@@ -26510,7 +26514,7 @@ function renderCharacterShowcaseContent(){
 
                 html+=
 
-                    '<div style="width:66px;text-align:center;'+
+                    '<div style="width:calc(66 * var(--ui-length-unit,1px));text-align:center;'+
                     'cursor:pointer;opacity:'+
                     (eligible?"1":".55")+
                     ';" onclick="'+
@@ -26523,19 +26527,19 @@ function renderCharacterShowcaseContent(){
                     )+
                     '">'+
 
-                    '<div style="width:40px;height:40px;margin:0 auto;'+
+                    '<div style="width:calc(40 * var(--ui-length-unit,1px));height:calc(40 * var(--ui-length-unit,1px));margin:0 auto;'+
                     'border-radius:50%;background:linear-gradient(160deg,#241c12,#15100a);'+
-                    'border:2px dashed #8a6a3a;display:flex;align-items:center;'+
-                    'justify-content:center;font-size:16px;">'+
+                    'border:calc(2 * var(--ui-length-unit,1px)) dashed #8a6a3a;display:flex;align-items:center;'+
+                    'justify-content:center;font-size:calc(16 * var(--ui-length-unit,1px));">'+
                     ""+
                     "</div>"+
 
-                    '<div style="font-size:11px;font-weight:bold;margin-top:2px;'+
+                    '<div style="font-size:calc(15 * var(--ui-length-unit,1px));font-weight:bold;margin-top:calc(2 * var(--ui-length-unit,1px));'+
                     'color:#8a8a8a;">'+
                     "未解鎖"+
                     "</div>"+
 
-                    '<div style="font-size:10px;color:#7a6f5c;">'+
+                    '<div style="font-size:calc(13 * var(--ui-length-unit,1px));color:#7a6f5c;">'+
                     (
                         eligible
                         ?
@@ -26576,19 +26580,19 @@ function renderCharacterShowcaseContent(){
         '<div class="character-tab-row">'+
 
         '<button id="characterTabBtnExpPool" class="home-feature-buy-btn"'+
-        'style="flex:1;padding:10px 6px;font-size:18px;min-height:52px;"'+
+        'style="flex:1;padding:calc(10 * var(--ui-length-unit,1px)) calc(6 * var(--ui-length-unit,1px));font-size:calc(18 * var(--ui-length-unit,1px));min-height:calc(52 * var(--ui-length-unit,1px));"'+
         'onclick="switchCharacterTab(\'expPool\')">'+
         "經驗池分配"+
         "</button>"+
 
         '<button id="characterTabBtnStatus" class="home-feature-buy-btn"'+
-        'style="flex:1;padding:10px 6px;font-size:18px;min-height:52px;"'+
+        'style="flex:1;padding:calc(10 * var(--ui-length-unit,1px)) calc(6 * var(--ui-length-unit,1px));font-size:calc(18 * var(--ui-length-unit,1px));min-height:calc(52 * var(--ui-length-unit,1px));"'+
         'onclick="switchCharacterTab(\'status\')">'+
         "能力值"+
         "</button>"+
 
         '<button id="characterTabBtnSkill" class="home-feature-buy-btn"'+
-        'style="flex:1;padding:10px 6px;font-size:18px;min-height:52px;"'+
+        'style="flex:1;padding:calc(10 * var(--ui-length-unit,1px)) calc(6 * var(--ui-length-unit,1px));font-size:calc(18 * var(--ui-length-unit,1px));min-height:calc(52 * var(--ui-length-unit,1px));"'+
         'onclick="switchCharacterTab(\'skill\')">'+
         "技能"+
         "</button>"+
@@ -26662,7 +26666,7 @@ function renderOfflineExpContent(){
         offlineElapsedMinutesForDisplay>
         OFFLINE_EXP_MAX_MINUTES
         ?
-        '<div style="font-size:11px;color:#e8836b;margin-top:4px;">'+
+        '<div style="font-size:calc(11 * var(--ui-length-unit,1px));color:#e8836b;margin-top:calc(4 * var(--ui-length-unit,1px));">'+
         "（離線經驗最多只計算8小時，超過的部分不會額外累積）"+
         "</div>"
         :
@@ -26671,7 +26675,7 @@ function renderOfflineExpContent(){
 
     return (
 
-        '<div style="font-size:13px;line-height:1.8;">'+
+        '<div style="font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.8;">'+
 
         "離線時間："+hours+"小時"+minutes+"分鐘<br>"+
 
@@ -26683,7 +26687,7 @@ function renderOfflineExpContent(){
 
         cappedNotice+
 
-        '<div style="font-size:11px;color:#b3a58c;margin-top:8px;">'+
+        '<div style="font-size:calc(11 * var(--ui-length-unit,1px));color:#b3a58c;margin-top:calc(8 * var(--ui-length-unit,1px));">'+
         "離線經驗會直接加進共用經驗池，"+
         "每分鐘"+OFFLINE_EXP_PER_MINUTE+"點，"+
         "最多計算8小時。"+
@@ -26691,7 +26695,7 @@ function renderOfflineExpContent(){
 
         "</div>"+
 
-        '<button class="home-feature-buy-btn"style="width:100%;margin-top:12px;padding:10px;"'+
+        '<button class="home-feature-buy-btn"style="width:100%;margin-top:calc(12 * var(--ui-length-unit,1px));padding:calc(10 * var(--ui-length-unit,1px));"'+
 
         (
             pendingOfflineExp<=0
@@ -26728,7 +26732,7 @@ function renderOfflineExpContent(){
             pendingOfflineExp>0
             ?
             '<button class="home-feature-buy-btn"'+
-            'style="width:100%;margin-top:8px;padding:10px;'+
+            'style="width:100%;margin-top:calc(8 * var(--ui-length-unit,1px));padding:calc(10 * var(--ui-length-unit,1px));'+
             'background:linear-gradient(180deg,#f0b429,#c9791e);'+
             'color:#2a1706;"'+
             'onclick="claimOfflineExpWithAd()">'+
@@ -27349,7 +27353,7 @@ function renderDungeonTabContent(tabName){
 
         return (
 
-            '<div style="font-size:13px;line-height:1.8;color:#b3a58c;">'+
+            '<div style="font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.8;color:#b3a58c;">'+
             "深淵副本尚未設計完成。"+
             "</div>"
 
@@ -27360,7 +27364,7 @@ function renderDungeonTabContent(tabName){
 
     return (
 
-        '<div style="font-size:13px;line-height:1.8;color:#b3a58c;">'+
+        '<div style="font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.8;color:#b3a58c;">'+
         "日常副本尚未設計完成。"+
         "</div>"
 
@@ -27421,7 +27425,7 @@ function renderBossTabContent(tabName){
 
         return (
 
-            '<div style="font-size:13px;line-height:1.8;color:#b3a58c;">'+
+            '<div style="font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.8;color:#b3a58c;">'+
             "地獄BOSS尚未設計完成。"+
             "</div>"
 
@@ -27432,7 +27436,7 @@ function renderBossTabContent(tabName){
 
     return (
 
-        '<div style="font-size:13px;line-height:1.8;color:#b3a58c;">'+
+        '<div style="font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.8;color:#b3a58c;">'+
         "個人BOSS尚未設計完成。"+
         "</div>"
 
@@ -27683,7 +27687,7 @@ function renderAchievementContent(){
                 "<span>"+
                 achievement.name+
                 "<br>"+
-                '<span style="font-size:11px;color:#b3a58c;">'+
+                '<span style="font-size:calc(11 * var(--ui-length-unit,1px));color:#b3a58c;">'+
                 achievement.desc+
                 "獎勵："+rewardText+
                 "</span>"+
@@ -27804,7 +27808,7 @@ function renderAnnouncementContent(){
 
     return (
 
-        '<div style="font-size:13px;line-height:1.8;">'+
+        '<div style="font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.8;">'+
 
         "主城全新改版！<br>"+
         "新增商店、圖鑑、每日任務、成就系統，"+
@@ -31043,6 +31047,10 @@ function openEquippedItem(
 
 
 function closeItemModal(){
+    const childReward=document.getElementById("v132RewardModal");
+    if(childReward?.parentElement===$("itemModal")&&typeof window.v132CloseRewardModal==="function"){
+        window.v132CloseRewardModal();
+    }
     window.FourSymbolsCurrentItemDetail=null;
 
     selectedInventorySlot =

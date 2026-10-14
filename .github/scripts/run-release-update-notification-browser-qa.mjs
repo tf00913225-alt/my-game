@@ -19,6 +19,7 @@ const sleep=milliseconds=>new Promise(resolve=>setTimeout(resolve,milliseconds))
 const read=relative=>fs.readFileSync(path.join(ROOT,relative),"utf8");
 
 function findChrome(){
+    if(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH && fs.existsSync(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH)) return process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -79,17 +80,16 @@ function createFixture(){
 #homeFeatureModalBody{min-height:0;}
 </style></head><body>
 <div id="game-viewport"><div id="game-stage">
-  <div id="game-overlay-layer" aria-hidden="true"></div>
-  <div id="app"><div id="game-content">
-    <button id="qaBattleAction" type="button">戰鬥技能</button>
-  </div></div>
-</div></div>
-<div id="game-ui">
+  <div id="game-overlay-layer"><div id="game-ui">
     <div id="homeFeatureModal" class="home-feature-modal"><div class="home-feature-modal-box">
       <div class="home-feature-modal-title"><span id="homeFeatureModalTitle">標題</span><div><button class="home-feature-close-btn" type="button" onclick="closeHomeFeature()">返回</button></div></div>
       <div id="homeFeatureModalBody"></div>
     </div></div>
-</div>
+  </div></div>
+  <div id="app"><div id="game-content">
+    <button id="qaBattleAction" type="button">戰鬥技能</button>
+  </div></div>
+</div></div>
 <script>${inlineScript(prelude)}</script>
 <script>${inlineScript(read("js/release-update-notification.js"))}</script>
 <script>document.dispatchEvent(new Event("four-symbols:startup-ready"));</script>

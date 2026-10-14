@@ -21,9 +21,3 @@
     border-color:#a84d42;
     box-shadow:0 0 30px rgba(178,50,38,.46),inset 0 0 14px rgba(177,52,42,.13);
 }
-
-@media (max-width:390px){
-    #game-stage #battlePage .v141-battle-transition{gap:8px !important;}
-    #game-stage #battlePage .v141-battle-transition span{width:45px !important;}
-    #game-stage #battlePage .v141-battle-transition b{min-width:112px !important;font-size:24px !important;}
-}

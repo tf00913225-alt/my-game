@@ -13,10 +13,10 @@ const abyss=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");
 const relic=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
 const synthesis=fs.readFileSync("js/36-v141-content-systems.js","utf8");
-const synthesisCss=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
+const synthesisCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs")(fs.readFileSync("css/38-v141-system-expansion.css","utf8"));
 const abyssCss=fs.readFileSync("css/50-v169-abyss-flow.css","utf8");
 const mainCss=fs.readFileSync("css/00-main.css","utf8");
-const homeRosterCss=fs.readFileSync("css/19-stage-v54-main-city-moderate-native-scale.css","utf8");
+const homeRosterCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs")(fs.readFileSync("css/19-stage-v54-main-city-moderate-native-scale.css","utf8"));
 const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 
 assert.match(build,/"js\/battle-statistics-system\.js"/,"Battle Statistics must be part of gameplay-core");
@@ -124,7 +124,7 @@ assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrad
 assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art > img\{[\s\S]*?object-fit:contain/);
 assert.doesNotMatch(abyssCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art/);
 
-assert.match(mainCss,/#homePage\{[\s\S]*?height:100%;[\s\S]*?overflow:hidden;/);
-assert.match(homeRosterCss,/\.v146-home-roster\{[\s\S]*?margin:5px 10px 0;/,"roster must not reserve a second navigation height");
+assert.match(mainCss,/#homePage\{[\s\S]*?height:calc\(100% - 216px\);[\s\S]*?overflow-y:auto;/);
+assert.match(homeRosterCss,/\.v146-home-roster\{[\s\S]*?margin:4px 10px 0;/,"roster must not reserve a second navigation height");
 
 console.log("Battle statistics / relic / talisman / Boss / Tower focused contracts passed");

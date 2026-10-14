@@ -17,77 +17,52 @@
 
 /* Main-city party HUD is first-screen UI; keep its visual owner in app-shell. */
 /* Home party HUD: three equal horizontal cells, with typography sized for real phone reading. */
-#game-ui #homePage .home-version-badge{font-size:13px;line-height:17px;}
+#game-ui #homePage .home-version-badge{font-size:39px;line-height:51px;}
 #game-ui #homePage .v146-home-roster{
-    position:relative;z-index:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:0 0 auto;gap:4px;
-    margin:5px 10px 0;padding:5px 7px 7px;border:1px solid var(--home-frame-muted);border-radius:8px;color:#f4e7c8;
-    background:linear-gradient(155deg,rgba(23,26,20,.95),rgba(11,13,10,.94));box-shadow:0 4px 12px rgba(0,0,0,.28);
+    position:relative;z-index:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:0 0 auto;gap:6px;
+    margin:12px 30px 0;padding:12px 21px;border:3px solid var(--home-frame-muted);border-radius:24px;color:#f4e7c8;
+    background:linear-gradient(155deg,rgba(23,26,20,.95),rgba(11,13,10,.94));box-shadow:0 12px 36px rgba(0,0,0,.28);
 }
 #game-ui #homePage .v146-home-roster > header{
     grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.55fr) auto;
-    align-items:center;column-gap:8px;min-height:30px;color:#f0cb70;font-size:15px;line-height:20px;letter-spacing:.04em;
+    align-items:center;column-gap:24px;min-height:90px;color:#f0cb70;font-size:45px;line-height:60px;letter-spacing:.04em;
 }
 #game-ui #homePage .v146-home-roster > header>b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-ui #homePage .v146-home-roster > header span{min-width:0;color:#c7ad76;font-size:13px;line-height:18px;font-weight:800;}
+#game-ui #homePage .v146-home-roster > header span{min-width:0;color:#c7ad76;font-size:39px;line-height:54px;font-weight:800;}
 #game-ui #homePage .v146-home-roster > header .v146-home-roster-count{white-space:nowrap;}
 #game-ui #homePage .v146-home-roster > header .v146-home-roster-gold{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-#game-ui #homePage .v146-home-roster > header .v146-home-roster-gold strong{color:#f2cf79;font-size:13px;line-height:18px;font-weight:900;}
+#game-ui #homePage .v146-home-roster > header .v146-home-roster-gold strong{color:#f2cf79;font-size:39px;line-height:54px;font-weight:900;}
 #game-ui #homePage .v146-home-character-placeholder,
 #game-ui #homePage .v146-home-character-empty{opacity:.72;}
 #game-ui #homePage .v146-home-character-placeholder .v146-home-avatar,
 #game-ui #homePage .v146-home-character-empty .v146-home-avatar{background:linear-gradient(135deg,rgba(80,60,34,.42),rgba(18,16,12,.88));}
 #game-ui #v146HomeRoster .team-relic-loadout-slot{
-    grid-column:1/-1;min-height:44px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;
-    grid-template-areas:"label name action";column-gap:6px;row-gap:0;align-items:center;
-    padding:3px 5px;border:1px solid rgba(178,126,49,.52);border-radius:7px;background:linear-gradient(90deg,rgba(42,28,14,.84),rgba(10,9,7,.9));box-sizing:border-box;
+    grid-column:1/-1;min-height:132px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+    grid-template-areas:"label name action";column-gap:18px;row-gap:0;align-items:center;
+    padding:9px 15px;border:3px solid rgba(178,126,49,.52);border-radius:21px;background:linear-gradient(90deg,rgba(42,28,14,.84),rgba(10,9,7,.9));box-sizing:border-box;
 }
-#game-ui #v146HomeRoster .team-relic-loadout-slot>span{grid-area:label;color:#bda46d;font-size:13px;font-weight:800;white-space:nowrap;}
-#game-ui #v146HomeRoster .team-relic-loadout-slot>b{grid-area:name;min-width:0;color:#f2d696;font-size:15px;line-height:19px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#game-ui #v146HomeRoster .team-relic-loadout-slot>span{grid-area:label;color:#bda46d;font-size:39px;font-weight:800;white-space:nowrap;}
+#game-ui #v146HomeRoster .team-relic-loadout-slot>b{grid-area:name;min-width:0;color:#f2d696;font-size:45px;line-height:57px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 #game-ui #v146HomeRoster .team-relic-loadout-slot>small{display:none;}
-#game-ui #v146HomeRoster .team-relic-loadout-slot>button{grid-area:action;min-width:50px;height:30px;min-height:30px;padding:1px 8px;border:1px solid rgba(211,161,70,.7);border-radius:6px;background:linear-gradient(180deg,#493016,#21140a);color:#ffe0a0;font-size:15px;line-height:1;font-weight:900;}
+#game-ui #v146HomeRoster .team-relic-loadout-slot>button{grid-area:action;min-width:150px;height:90px;min-height:90px;padding:3px 24px;border:3px solid rgba(211,161,70,.7);border-radius:18px;background:linear-gradient(180deg,#493016,#21140a);color:#ffe0a0;font-size:45px;line-height:1;font-weight:900;}
 #game-ui #v146HomeRoster .team-relic-loadout-slot>button:disabled{opacity:.5;}
 #game-ui #homePage .v146-home-character{
-    display:grid;grid-template-columns:40px minmax(0,1fr);gap:5px;align-items:center;min-width:0;min-height:84px;padding:5px 4px 5px 3px;
+    display:grid;grid-template-columns:minmax(0,1fr);gap:9px;align-items:center;min-width:0;min-height:210px;padding:9px 6px;
     border:0;border-radius:0;background:transparent;
     box-shadow:none;
 }
-#game-ui #homePage .v146-home-avatar{width:40px;height:40px;overflow:hidden;transform:none;border:1px solid rgba(220,174,86,.84);border-radius:50%;background:#090806;box-shadow:0 2px 7px rgba(0,0,0,.58);}
+#game-ui #homePage .v146-home-avatar{width:96px;height:96px;overflow:hidden;transform:none;border:3px solid rgba(220,174,86,.84);border-radius:50%;background:#090806;box-shadow:0 6px 21px rgba(0,0,0,.58);}
 #game-ui #homePage .v146-home-avatar img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 22%;}
-#game-ui #homePage .v146-home-character[data-element="fire"] .v146-home-avatar{box-shadow:0 0 8px rgba(177,64,38,.34),0 2px 7px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-character[data-element="water"] .v146-home-avatar{box-shadow:0 0 8px rgba(66,129,184,.34),0 2px 7px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-character[data-element="wind"] .v146-home-avatar{box-shadow:0 0 8px rgba(58,151,110,.3),0 2px 7px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-character[data-element="earth"] .v146-home-avatar{box-shadow:0 0 8px rgba(186,142,63,.34),0 2px 7px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-character-main{display:grid;gap:4px;min-width:0;}
-#game-ui #homePage .v146-home-character-main > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:3px;min-width:0;font-size:15px;line-height:19px;}
+#game-ui #homePage .v146-home-character[data-element="fire"] .v146-home-avatar{box-shadow:0 0 24px rgba(177,64,38,.34),0 6px 21px rgba(0,0,0,.58);}
+#game-ui #homePage .v146-home-character[data-element="water"] .v146-home-avatar{box-shadow:0 0 24px rgba(66,129,184,.34),0 6px 21px rgba(0,0,0,.58);}
+#game-ui #homePage .v146-home-character[data-element="wind"] .v146-home-avatar{box-shadow:0 0 24px rgba(58,151,110,.3),0 6px 21px rgba(0,0,0,.58);}
+#game-ui #homePage .v146-home-character[data-element="earth"] .v146-home-avatar{box-shadow:0 0 24px rgba(186,142,63,.34),0 6px 21px rgba(0,0,0,.58);}
+#game-ui #homePage .v146-home-character-main{display:grid;gap:6px;min-width:0;}
+#game-ui #homePage .v146-home-character-main > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:9px;min-width:0;font-size:45px;line-height:57px;}
 #game-ui #homePage .v146-home-character-main b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-ui #homePage .v146-home-character-main span{color:#e2c58b;font-size:13px;line-height:17px;font-weight:800;white-space:nowrap;}
-#game-ui #homePage .v146-home-resource{position:relative;height:17px;margin-inline:0;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(36,16,16,.88);}
+#game-ui #homePage .v146-home-character-main span{color:#e2c58b;font-size:39px;line-height:51px;font-weight:800;white-space:nowrap;}
+#game-ui #homePage .v146-home-resource{position:relative;height:57px;margin-inline:0;overflow:hidden;border:3px solid rgba(255,255,255,.12);border-radius:2997px;background:rgba(36,16,16,.88);}
 #game-ui #homePage .v146-home-resource.sp{background:rgba(12,23,48,.78);}
 #game-ui #homePage .v146-home-resource i{position:absolute;inset:0 auto 0 0;background:linear-gradient(#f26763,#b91e20);}
 #game-ui #homePage .v146-home-resource.sp i{background:linear-gradient(#659bff,#2455bd);}
-#game-ui #homePage .v146-home-resource strong{position:absolute;inset:0;z-index:2;color:#fff;font-size:13px;line-height:15px;text-align:center;text-shadow:0 1px 2px #000;white-space:nowrap;}
-
-/* Keep the complete three-character roster plus relic loadout above the fixed
-   bottom navigation on short phone viewports. */
-@media (max-height:920px){
-    #game-ui #homePage .v146-home-roster{
-        gap:2px;
-        margin-top:4px;
-        padding:4px 7px;
-    }
-    #game-ui #homePage .v146-home-character{
-        min-height:78px;
-        padding-top:3px;
-        padding-bottom:3px;
-    }
-}
-
-@media (min-width:800px){
-    #game-ui #homePage.active{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);grid-template-rows:auto auto auto auto;gap:16px;align-content:start;}
-    #game-ui #homePage .home-city-hud{grid-column:1/-1;}
-    #game-ui #homePage .home-card-grid{display:contents;}
-    #game-ui #homePage .home-secondary-actions{grid-column:1;grid-row:2/span 2;min-height:360px;}
-    #game-ui #homePage .home-primary-actions{grid-column:2;grid-row:2;grid-template-columns:minmax(0,1fr);gap:12px;align-self:start;}
-    #game-ui #homePage .home-utility-actions{grid-column:1/-1;grid-row:4;}
-    #game-ui #homePage .v146-home-roster{grid-column:2;grid-row:3;align-self:start;margin:0;}
-}
+#game-ui #homePage .v146-home-resource strong{position:absolute;inset:0;z-index:2;color:#fff;font-size:39px;line-height:51px;text-align:center;text-shadow:0 3px 6px #000;white-space:nowrap;}

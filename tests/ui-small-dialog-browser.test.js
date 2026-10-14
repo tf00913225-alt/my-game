@@ -2,15 +2,16 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
-const css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+const css=authoredUiCss(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"));
 const ui=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
 
 assert.match(css,/--ui-small-dialog-max-width:340px;/);
 assert.match(css,/--ui-small-dialog-height:300px;/);
-assert.match(css,/\.v169-rpg-dialog\{[\s\S]*?width:min\(100%,var\(--ui-small-dialog-max-width\)\);[\s\S]*?height:min\(var\(--ui-small-dialog-height\),calc\(100dvh - var\(--ui-small-dialog-safe-space\)\)\);[\s\S]*?display:flex;/);
+assert.match(css,/\.v169-rpg-dialog\{[\s\S]*?width:min\(100%,var\(--ui-small-dialog-max-width\)\);[\s\S]*?height:min\(var\(--ui-small-dialog-height\),calc\(var\(--layout-block-size,746\.6667px\) - var\(--ui-small-dialog-safe-space\)\)\);[\s\S]*?display:flex;/);
 assert.match(css,/\.v169-rpg-dialog-message\{[\s\S]*?flex:1 1 auto;[\s\S]*?overflow-y:auto;[\s\S]*?touch-action:pan-y;[\s\S]*?scrollbar-gutter:stable;[\s\S]*?font-size:15px;/);
 assert.match(css,/\.v169-rpg-dialog-actions\{[\s\S]*?flex:0 0 auto;/);
 assert.match(css,/\.v169-rpg-dialog-button\{[\s\S]*?min-height:44px;[\s\S]*?font-size:15px;/);
@@ -18,6 +19,7 @@ assert.match(ui,/window\.rpgConfirm=function\(message,options\)/);
 assert.match(ui,/window\.rpgAlert=function\(message,options\)/);
 
 function findChrome(){
+    if(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH&&fs.existsSync(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH))return process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -59,7 +61,7 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
 })();
 </script></body></html>`;
 
-fs.writeFileSync(fixture,html,"utf8");
+fs.writeFileSync(fixture,authoredUiCss.legacyFixture(html),"utf8");
 try{
     const run=cp.spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1","--window-size=420,747","--dump-dom",fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});
     assert.equal(run.status,0,run.stderr||"Chrome Small Dialog fixture failed");

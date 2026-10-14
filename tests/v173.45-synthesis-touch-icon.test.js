@@ -2,11 +2,12 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const vm=require("node:vm");
 
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
-const synthesisCss=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
-const abyssCss=fs.readFileSync("css/50-v169-abyss-flow.css","utf8");
+const synthesisCss=authoredUiCss(fs.readFileSync("css/38-v141-system-expansion.css","utf8"));
+const abyssCss=authoredUiCss(fs.readFileSync("css/50-v169-abyss-flow.css","utf8"));
 
 assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
 assert.match(touchLock,/const canX=[\s\S]*?overflowX==="auto"[\s\S]*?node\.scrollWidth>node\.clientWidth\+1/);

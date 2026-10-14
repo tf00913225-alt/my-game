@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
@@ -10,6 +11,7 @@ const out=path.join(root,"artifacts/browser-qa/premium-functional-ui");
 fs.mkdirSync(out,{recursive:true});
 
 function findChrome(){
+    if(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH&&fs.existsSync(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH))return process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
   for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
     const result=cp.spawnSync("which",[name],{encoding:"utf8"});
     if(result.status===0&&result.stdout.trim()) return result.stdout.trim();
@@ -182,7 +184,7 @@ async function verifySurface(client,width,height,surface,markup){
   }
   const runtime=wide?'<script src="js/19-stage-v78-character-inventory-runtime.js"></script>':'';
   const page=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050403}#game-viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}#game-stage{position:relative;width:1080px;height:1920px;flex:0 0 1080px;transform-origin:center center;overflow:hidden}#game-content{position:absolute;left:0;top:0;width:420px;height:746.6667px;transform:scale(2.5714285714);transform-origin:top left}#homeFeatureModal{display:flex!important}.qa-test-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}</style></head><body><div id="game-ui"><div id="homeFeatureModal" class="${classes}"><div class="home-feature-modal-box ${wide?"wide":""}"><div class="home-feature-modal-title"><span class="qa-test-title">功能型 UI・${surface}</span><button class="home-feature-close-btn qa-major">返回</button></div><div id="homeFeatureModalBody">${surfaceMarkup}</div></div></div></div>${runtime}<script>document.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{button.dataset.qaClicked='1';}));</script></body></html>`;
-  fs.writeFileSync(fixture,page,"utf8");
+  fs.writeFileSync(fixture,authoredUiCss.legacyFixture(page,{width,height}),"utf8");
   try{
     await configureViewport(client,width,height);
     await navigate(client,fixtureUrl(fixture));
@@ -211,11 +213,11 @@ async function verifySurface(client,width,height,surface,markup){
       // owner reserves 4 logical pixels per edge without inline geometry.
       assert.equal(data.inline.width,"","retired layout writer must not claim frame width");
       assert.equal(data.inline.height,"","retired layout writer must not claim frame height");
-      assert.ok(Math.abs(parseFloat(data.computed.width)-Math.min(width-32,960))<=1,"browser Large Panel side inset/maximum missing");
+      assert.ok(Math.abs(parseFloat(data.computed.width)-Math.min(width-32,396))<=1,"authored-unit Large Panel side inset/maximum missing");
       // css/00 native ancestry keeps its 96% height ceiling; content
       // flexing can make this frame shorter than the requested 8px inset.
       assert.equal(data.computed.maxHeight,"calc(100% - 24px)","browser Large Panel height ceiling missing");
-      assert.ok(Math.abs(parseFloat(data.computed.height)-Math.min(760,height-32))<=1,"character panel violates browser Large Panel height");
+      assert.ok(Math.abs(parseFloat(data.computed.height)-Math.min(620,height-32))<=1,"character panel violates browser Large Panel height");
       interactions.exp=await hitClick(client,".v131-exp-preview-btn");
       interactions.status=await hitClick(client,".status-btn");
       interactions.confirm=await hitClick(client,"#confirmStatusButton");
@@ -231,7 +233,7 @@ async function verifySurface(client,width,height,surface,markup){
 
 async function verifyDialog(client,width,height){
   const dialog=path.join(root,`.premium-functional-${width}x${height}-dialog.html`);
-  fs.writeFileSync(dialog,`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}</head><body><div id="v169RpgDialogLayer" class="v169-rpg-dialog-layer show"><section class="v169-rpg-dialog" data-kind="confirm" data-tone="danger"><div class="v169-rpg-dialog-crest">⚠</div><h2>刪除角色</h2><div class="v169-rpg-dialog-message">這是不可逆操作。確認長文字仍可閱讀、取消與危險按鈕不被裝飾遮住。</div><div class="v169-rpg-dialog-actions"><button class="v169-rpg-dialog-button secondary">返回</button><button class="v169-rpg-dialog-button primary danger">確認刪除</button></div></section></div><script>document.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{button.dataset.qaClicked='1';}));</script></body></html>`,"utf8");
+  fs.writeFileSync(dialog,authoredUiCss.legacyFixture(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${links}</head><body><div id="v169RpgDialogLayer" class="v169-rpg-dialog-layer show"><section class="v169-rpg-dialog" data-kind="confirm" data-tone="danger"><div class="v169-rpg-dialog-crest">⚠</div><h2>刪除角色</h2><div class="v169-rpg-dialog-message">這是不可逆操作。確認長文字仍可閱讀、取消與危險按鈕不被裝飾遮住。</div><div class="v169-rpg-dialog-actions"><button class="v169-rpg-dialog-button secondary">返回</button><button class="v169-rpg-dialog-button primary danger">確認刪除</button></div></section></div><script>document.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{button.dataset.qaClicked='1';}));</script></body></html>`),"utf8");
   try{
     await configureViewport(client,width,height);
     await navigate(client,fixtureUrl(dialog));

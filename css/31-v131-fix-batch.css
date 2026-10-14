@@ -191,7 +191,7 @@
     min-height:0 !important;
     max-height:none !important;
     overflow:visible !important;
-    padding-bottom:240px !important;
+    padding-bottom:720px !important;
     touch-action:pan-y !important;
 }
 
@@ -208,64 +208,28 @@
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
-    gap:8px !important;
-    border:2px solid #e8a93c !important;
+    gap:calc(8 * var(--ui-length-unit,1px)) !important;
+    border:calc(2 * var(--ui-length-unit,1px)) solid #e8a93c !important;
     background:linear-gradient(135deg,#2d1d0d,#120e09) !important;
     color:#f5ecd9 !important;
-    font-size:15px !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
     font-weight:800 !important;
-    box-shadow:0 0 12px rgba(232,169,60,.28) !important;
+    box-shadow:0 0 calc(12 * var(--ui-length-unit,1px)) rgba(232,169,60,.28) !important;
 }
 
 :is(#game-stage,#game-ui) #skillPage #skillPoints{
     display:inline-flex !important;
-    min-width:52px !important;
-    min-height:34px !important;
+    min-width:calc(52 * var(--ui-length-unit,1px)) !important;
+    min-height:calc(34 * var(--ui-length-unit,1px)) !important;
     align-items:center !important;
     justify-content:center !important;
-    padding:2px 10px !important;
-    border-radius:999px !important;
+    padding:calc(2 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px)) !important;
+    border-radius:calc(999 * var(--ui-length-unit,1px)) !important;
     background:#e8a93c !important;
     color:#17100a !important;
-    font-size:22px !important;
+    font-size:calc(22 * var(--ui-length-unit,1px)) !important;
     line-height:1 !important;
-    box-shadow:0 0 10px rgba(255,224,138,.45) !important;
-}
-
-#game-stage #game-overlay-layer #allElementSkillPreviewModal,
-#game-stage #allElementSkillPreviewModal{
-    position:absolute !important;
-    inset:0 !important;
-    z-index:9800 !important;
-    pointer-events:auto !important;
-    align-items:center !important;
-    justify-content:center !important;
-    overflow:hidden !important;
-    touch-action:pan-y !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-dialog{
-    width:94% !important;
-    height:min(92%,1680px) !important;
-    max-height:92% !important;
-    min-height:0 !important;
-    display:flex !important;
-    flex-direction:column !important;
-    overflow:hidden !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-body{
-    flex:1 1 auto !important;
-    min-height:0 !important;
-    height:0 !important;
-    max-height:none !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    touch-action:pan-y !important;
-    -webkit-overflow-scrolling:touch !important;
-    overscroll-behavior-y:contain !important;
-    padding-bottom:90px !important;
-    transform:translateZ(0) !important;
+    box-shadow:0 0 calc(10 * var(--ui-length-unit,1px)) rgba(255,224,138,.45) !important;
 }
 
 /*
@@ -286,26 +250,6 @@
    問題出現的機率。如果之後還是常常發生，需要使用者提供
    螢幕錄影（不是截圖）才能確認是不是同一種情況。
 */
-#game-stage #allElementSkillPreviewModal .skill-preview-card{
-    contain:content !important;
-    will-change:transform !important;
-}
-
-#game-ui #inventoryPortraitFrame{
-    overflow:hidden;
-}
-
-#game-ui #inventoryPortraitFrame .v131-inventory-portrait{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    object-position:center 18%;
-    display:block;
-    z-index:0;
-}
-
 .v131-unlock-ready{ position:relative !important; }
 
 .v131-unlock-dot{
@@ -330,19 +274,19 @@
 :is(#game-stage,#game-ui) #expDistributeList{
     display:flex;
     flex-direction:column;
-    gap:7px;
+    gap:calc(7 * var(--ui-length-unit,1px));
 }
 
 .v131-exp-row{
     display:grid;
     grid-template-columns:minmax(0,1fr) auto;
-    gap:5px 8px;
+    gap:calc(5 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px));
     align-items:center;
-    padding:10px 10px 9px;
-    border:1px solid rgba(200,154,72,.24);
-    border-radius:9px;
+    padding:calc(10 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px)) calc(9 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(200,154,72,.24);
+    border-radius:calc(9 * var(--ui-length-unit,1px));
     background:linear-gradient(145deg,rgba(29,22,14,.76),rgba(10,8,6,.86));
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.025);
+    box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(255,238,196,.025);
 }
 
 .v131-exp-name{
@@ -350,13 +294,13 @@
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
-    font-size:15px;
+    font-size:calc(15 * var(--ui-length-unit,1px));
     font-weight:800;
     color:#f3dfb2;
 }
 
 .v131-exp-level{
-    font-size:14px;
+    font-size:calc(14 * var(--ui-length-unit,1px));
     color:#b7a98e;
     text-align:right;
 }
@@ -370,37 +314,37 @@
 .v131-exp-preview-btn{
     grid-column:1 / -1;
     width:100%;
-    min-height:44px;
-    padding:8px 10px;
-    border:1px solid rgba(200,154,72,.42);
-    border-radius:8px;
+    min-height:calc(44 * var(--ui-length-unit,1px));
+    padding:calc(8 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(200,154,72,.42);
+    border-radius:calc(8 * var(--ui-length-unit,1px));
     background:linear-gradient(180deg,#2b2419,#14110d);
     color:#e7d7b5;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.035);
-    font-size:15px;
+    box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(255,238,196,.035);
+    font-size:calc(15 * var(--ui-length-unit,1px));
     font-weight:900;
 }
 
 .v131-exp-preview-summary{
     text-align:right;
     color:#cfbd98;
-    font-size:14px;
+    font-size:calc(14 * var(--ui-length-unit,1px));
     line-height:1.4;
-    padding:3px 2px;
+    padding:calc(3 * var(--ui-length-unit,1px)) calc(2 * var(--ui-length-unit,1px));
 }
 
 .v131-exp-actions{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:8px;
+    gap:calc(8 * var(--ui-length-unit,1px));
 }
 
 .v131-exp-actions button{
-    min-height:44px;
-    padding:9px 8px;
-    border:1px solid #a77a35;
-    border-radius:8px;
-    font-size:15px;
+    min-height:calc(44 * var(--ui-length-unit,1px));
+    padding:calc(9 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid #a77a35;
+    border-radius:calc(8 * var(--ui-length-unit,1px));
+    font-size:calc(15 * var(--ui-length-unit,1px));
     font-weight:900;
 }
 
@@ -431,41 +375,41 @@
 
 .v131-element-box-stats{
     display:grid;
-    gap:6px;
-    margin:10px 0 8px;
-    padding:10px;
-    border:1px solid #6f5228;
-    border-radius:9px;
+    gap:calc(6 * var(--ui-length-unit,1px));
+    margin:calc(10 * var(--ui-length-unit,1px)) 0 calc(8 * var(--ui-length-unit,1px));
+    padding:calc(10 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid #6f5228;
+    border-radius:calc(9 * var(--ui-length-unit,1px));
     background:#0d0b08;
 }
 
 .v131-element-box-title{
     color:#f0c866;
-    font-size:16px;
+    font-size:calc(16 * var(--ui-length-unit,1px));
     font-weight:900;
-    margin-bottom:2px;
+    margin-bottom:calc(2 * var(--ui-length-unit,1px));
 }
 
 .v131-element-box-stats > div:not(.v131-element-box-title){
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:10px;
-    font-size:14px;
+    gap:calc(10 * var(--ui-length-unit,1px));
+    font-size:calc(14 * var(--ui-length-unit,1px));
     line-height:1.4;
     color:#b9aa8c;
 }
 
 .v131-element-box-stats strong{
     color:#f0dfb7;
-    font-size:15px;
+    font-size:calc(15 * var(--ui-length-unit,1px));
     text-align:right;
 }
 
 .v131-element-box-stats .remaining{
-    margin-top:2px;
-    padding-top:7px;
-    border-top:1px solid rgba(240,180,41,.22);
+    margin-top:calc(2 * var(--ui-length-unit,1px));
+    padding-top:calc(7 * var(--ui-length-unit,1px));
+    border-top:calc(1 * var(--ui-length-unit,1px)) solid rgba(240,180,41,.22);
 }
 
 .v131-element-box-stats .remaining strong{ color:#ffdf69; }
@@ -474,21 +418,21 @@
 :is(#game-stage,#game-ui) #homeExpPoolCard,
 :is(#game-stage,#game-ui) #statusPage,
 :is(#game-stage,#game-ui) #skillPage{
-    font-size:15px;
+    font-size:calc(15 * var(--ui-length-unit,1px));
 }
 
 #game-ui #characterTabContent p,
 #game-ui #characterTabContent small,
 #game-ui #characterTabContent .description,
 :is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-caption{
-    font-size:14px !important;
+    font-size:calc(14 * var(--ui-length-unit,1px)) !important;
     line-height:1.55 !important;
 }
 
 /*
    ★ 修正（依照使用者要求，「技能/能力值/經驗分配/
    能力屬性說明頁面文字再大一點，框框不變動」）：
-   上面 #characterTabContent{font-size:14px} 這條
+   上面 #characterTabContent{font-size:calc(14 * var(--ui-length-unit,1px))} 這條
    只是設「繼承用的預設值」，但下面這幾個元素各自
    都有自己更明確的font-size規則，字級的繼承鏈在
    那裡就被切斷了，所以視覺上根本沒有變大。
@@ -498,16 +442,16 @@
 */
 
 :is(#game-stage,#game-ui) #statusPage .status-row{
-    font-size:15px !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
 }
 
 :is(#game-stage,#game-ui) #allSkillsList .skill-row-desc{
-    font-size:15px !important;
+    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
     line-height:1.5 !important;
 }
 
 :is(#game-stage,#game-ui) #allSkillsList .skill-row-text b{
-    font-size:17px !important;
+    font-size:calc(17 * var(--ui-length-unit,1px)) !important;
 }
 
 /*
@@ -531,35 +475,8 @@
    - 技能說明文字：螢幕約15px（這裡39px）
    標題/分頁按鈕的規則見下面另外新增的區塊。
 */
-#game-stage #allElementSkillPreviewModal .skill-preview-card span{
-    font-size:33px !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-card p{
-    font-size:39px !important;
-    line-height:1.5 !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-card strong{
-    font-size:44px !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-heading h2{
-    font-size:49px !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-heading button{
-    font-size:33px !important;
-    padding:10px 16px !important;
-}
-
-#game-stage #allElementSkillPreviewModal .skill-preview-tabs button{
-    font-size:39px !important;
-    padding:14px 8px !important;
-}
-
 :is(#game-stage,#game-ui) .stat-explanation{
-    font-size:14px !important;
+    font-size:calc(14 * var(--ui-length-unit,1px)) !important;
     line-height:1.7 !important;
 }
 
@@ -602,14 +519,14 @@
 #creationPage .creation-stat-details[open] .creation-stat-details-body,
 #creationPage .creation-stat-details-body{font-size:39px !important;line-height:1.6 !important;}
 #creationPage .creation-start small{font-size:34px !important;line-height:1.25 !important;}
-#creationSkillDetailModal .creation-skill-detail-path{font-size:36px !important;line-height:1.35 !important;}
-#creationSkillDetailModal .creation-skill-detail-tag{font-size:34px !important;line-height:1.3 !important;}
-#creationSkillDetailModal .creation-skill-detail-description{font-size:39px !important;line-height:1.6 !important;}
-#creationSkillDetailModal .creation-skill-detail-meta{font-size:36px !important;line-height:1.55 !important;}
-#creationSkillDetailModal .creation-skill-detail-section-title{font-size:46px !important;line-height:1.3 !important;}
+#creationSkillDetailModal .creation-skill-detail-path{font-size:calc(36 * var(--ui-length-unit,1px)) !important;line-height:1.35 !important;}
+#creationSkillDetailModal .creation-skill-detail-tag{font-size:calc(34 * var(--ui-length-unit,1px)) !important;line-height:1.3 !important;}
+#creationSkillDetailModal .creation-skill-detail-description{font-size:calc(39 * var(--ui-length-unit,1px)) !important;line-height:1.6 !important;}
+#creationSkillDetailModal .creation-skill-detail-meta{font-size:calc(36 * var(--ui-length-unit,1px)) !important;line-height:1.55 !important;}
+#creationSkillDetailModal .creation-skill-detail-section-title{font-size:calc(46 * var(--ui-length-unit,1px)) !important;line-height:1.3 !important;}
 #creationSkillDetailModal .creation-skill-detail-level-row,
-#creationSkillDetailModal .creation-skill-detail-level-row b{font-size:39px !important;line-height:1.55 !important;}
-#creationSkillDetailModal .creation-skill-detail-close{font-size:39px !important;}
+#creationSkillDetailModal .creation-skill-detail-level-row b{font-size:calc(39 * var(--ui-length-unit,1px)) !important;line-height:1.55 !important;}
+#creationSkillDetailModal .creation-skill-detail-close{font-size:calc(39 * var(--ui-length-unit,1px)) !important;}
 
 /* Fixed battlefield ally slots: structural owner, not a positional workaround. */
 #game-stage #battlePlayerRow.v-fixed-ally-formation{
@@ -639,34 +556,35 @@
     height:102px;
 }
 .v146-home-roster>header .v-fixed-formation-entry{
+    font-size:calc(15 * var(--ui-length-unit,1px));
     margin-left:0;
-    min-width:54px;
-    min-height:30px;
-    border:1px solid rgba(223,187,95,.7);
-    border-radius:8px;
+    min-width:calc(54 * var(--ui-length-unit,1px));
+    min-height:calc(30 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(223,187,95,.7);
+    border-radius:calc(8 * var(--ui-length-unit,1px));
     background:rgba(31,24,14,.92);
     color:#f2d783;
     font-weight:800;
 }
-.v-fixed-formation-panel{gap:10px;}
-.v-fixed-formation-row>header{margin:4px 0;font-size:16px;font-weight:700;color:#efcb83;}
-.v-fixed-formation-slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
-.v-fixed-formation-slot{min-width:0;min-height:120px;padding:6px 3px;margin:0;border:1px solid #a08043;border-radius:10px;background:#16120da8;color:#f4ead4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;touch-action:none;}
-.v-fixed-formation-slot small{font-size:14px;color:#e4c98e;}
-.v-fixed-formation-slot b{font-size:15px;line-height:1.5;overflow-wrap:anywhere;}
-.v-fixed-formation-slot img{display:block;width:100%;height:94px;object-fit:contain;}
-.v-fixed-formation-slot span{font-size:15px;}
-.v-fixed-formation-slot.selected,.formation-candidate.selected{outline:2px solid #e6bb69;outline-offset:-2px;}
-.formation-battlefield{padding:10px;background-color:#181610;background-size:cover;background-position:center;border:1px solid #80603c;border-radius:10px;}
-.formation-enemy-space{min-height:60px;display:grid;place-items:center;font-size:14px;color:#e4c98e;text-shadow:0 1px 3px #000;}
-.formation-candidates{display:flex;gap:8px;overflow-x:auto;overscroll-behavior:contain;touch-action:pan-x;padding:6px 2px 10px;}
-.formation-candidate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex:0 0 104px;min-width:0;margin:0;padding:6px;border:1px solid #80603c;border-radius:8px;background:#17130f;color:#f4ead4;touch-action:none;}
-.formation-candidate img{width:88px;height:100px;object-fit:contain;}
-.formation-candidate b{font-size:15px;line-height:1.5;}
-.formation-remove{display:block;min-height:44px;flex:1;padding:10px;margin:0;border:1px dashed #b39159;border-radius:8px;background:#201811;color:#f4ead4;font-size:15px;line-height:1.5;touch-action:none;}
-.formation-footer{flex:0 0 auto;border-top:1px solid #80603c;padding-top:6px;display:flex;flex-wrap:wrap;gap:6px;}
-.formation-footer p{order:-1;width:100%;font-size:14px;line-height:1.5;margin:0;}
-.formation-drop-target{outline:3px solid #e6bb69;outline-offset:-3px;background-color:#493718;}
+.v-fixed-formation-panel{gap:calc(10 * var(--ui-length-unit,1px));}
+.v-fixed-formation-row>header{margin:calc(4 * var(--ui-length-unit,1px)) 0;font-size:calc(16 * var(--ui-length-unit,1px));font-weight:700;color:#efcb83;}
+.v-fixed-formation-slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:calc(8 * var(--ui-length-unit,1px));}
+.v-fixed-formation-slot{min-width:0;min-height:calc(120 * var(--ui-length-unit,1px));padding:calc(6 * var(--ui-length-unit,1px)) calc(3 * var(--ui-length-unit,1px));margin:0;border:calc(1 * var(--ui-length-unit,1px)) solid #a08043;border-radius:calc(10 * var(--ui-length-unit,1px));background:#16120da8;color:#f4ead4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(3 * var(--ui-length-unit,1px));touch-action:none;}
+.v-fixed-formation-slot small{font-size:calc(14 * var(--ui-length-unit,1px));color:#e4c98e;}
+.v-fixed-formation-slot b{font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.5;overflow-wrap:anywhere;}
+.v-fixed-formation-slot img{display:block;width:100%;height:calc(94 * var(--ui-length-unit,1px));object-fit:contain;}
+.v-fixed-formation-slot span{font-size:calc(15 * var(--ui-length-unit,1px));}
+.v-fixed-formation-slot.selected,.formation-candidate.selected{outline:calc(2 * var(--ui-length-unit,1px)) solid #e6bb69;outline-offset:calc(-2 * var(--ui-length-unit,1px));}
+.formation-battlefield{padding:calc(10 * var(--ui-length-unit,1px));background-color:#181610;background-size:cover;background-position:center;border:calc(1 * var(--ui-length-unit,1px)) solid #80603c;border-radius:calc(10 * var(--ui-length-unit,1px));}
+.formation-enemy-space{min-height:calc(60 * var(--ui-length-unit,1px));display:grid;place-items:center;font-size:calc(14 * var(--ui-length-unit,1px));color:#e4c98e;text-shadow:0 calc(1 * var(--ui-length-unit,1px)) calc(3 * var(--ui-length-unit,1px)) #000;}
+.formation-candidates{display:flex;gap:calc(8 * var(--ui-length-unit,1px));overflow-x:auto;overscroll-behavior:contain;touch-action:pan-x;padding:calc(6 * var(--ui-length-unit,1px)) calc(2 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));}
+.formation-candidate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(4 * var(--ui-length-unit,1px));flex:0 0 calc(104 * var(--ui-length-unit,1px));min-width:0;margin:0;padding:calc(6 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #80603c;border-radius:calc(8 * var(--ui-length-unit,1px));background:#17130f;color:#f4ead4;touch-action:none;}
+.formation-candidate img{width:calc(88 * var(--ui-length-unit,1px));height:calc(100 * var(--ui-length-unit,1px));object-fit:contain;}
+.formation-candidate b{font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.5;}
+.formation-remove{display:block;min-height:calc(44 * var(--ui-length-unit,1px));flex:1;padding:calc(10 * var(--ui-length-unit,1px));margin:0;border:calc(1 * var(--ui-length-unit,1px)) dashed #b39159;border-radius:calc(8 * var(--ui-length-unit,1px));background:#201811;color:#f4ead4;font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.5;touch-action:none;}
+.formation-footer{flex:0 0 auto;border-top:calc(1 * var(--ui-length-unit,1px)) solid #80603c;padding-top:calc(6 * var(--ui-length-unit,1px));display:flex;flex-wrap:wrap;gap:calc(6 * var(--ui-length-unit,1px));}
+.formation-footer p{order:-1;width:100%;font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.5;margin:0;}
+.formation-drop-target{outline:calc(3 * var(--ui-length-unit,1px)) solid #e6bb69;outline-offset:calc(-3 * var(--ui-length-unit,1px));background-color:#493718;}
 .formation-drag-source{opacity:.5;}
-.formation-drag-preview{position:fixed;z-index:2;pointer-events:none;display:flex;flex-direction:column;align-items:center;width:84px;padding:6px;background:#17130fe8;border:2px solid #e6bb69;border-radius:8px;translate:-50% -50%;color:#f4ead4;font-size:14px;}
-.formation-drag-preview img{width:64px;height:86px;object-fit:contain;}
+.formation-drag-preview{position:fixed;z-index:2;pointer-events:none;display:flex;flex-direction:column;align-items:center;width:calc(84 * var(--ui-length-unit,1px));padding:calc(6 * var(--ui-length-unit,1px));background:#17130fe8;border:calc(2 * var(--ui-length-unit,1px)) solid #e6bb69;border-radius:calc(8 * var(--ui-length-unit,1px));translate:-50% -50%;color:#f4ead4;font-size:calc(14 * var(--ui-length-unit,1px));}
+.formation-drag-preview img{width:calc(64 * var(--ui-length-unit,1px));height:calc(86 * var(--ui-length-unit,1px));object-fit:contain;}

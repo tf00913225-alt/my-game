@@ -28,7 +28,7 @@
 
 8. 不順手全面重構；只在本次修改的同一子系統內做小範圍收斂。
 
-9. Display 尺寸、stage scale、browser／native／legacy 座標分工與 compatibility 退場由 `UI_GUIDELINES.md` 第十三節唯一規定；不得另建 responsive scaler 或後置 viewport lock。
+9. 全裝置共用固定遊戲畫布；Display 尺寸、唯一 stage fit scale、座標轉換與 legacy compatibility 退場由 `UI_GUIDELINES.md` 第十三節唯一規定。不得另建 responsive scaler、第二套桌面／平板版型或後置 viewport lock。
 
 ## 0A. 架構級 Bug
 

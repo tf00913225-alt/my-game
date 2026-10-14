@@ -416,7 +416,8 @@
                 drag.ghost=document.createElement('div');drag.ghost.className='formation-drag-preview';drag.ghost.innerHTML=formationUnitContent(drag.unit);
                 root.appendChild(drag.ghost);drag.node.classList.add('formation-drag-source');
             }
-            drag.ghost.style.left=event.clientX+'px';drag.ghost.style.top=event.clientY+'px';
+            const point=window.FourSymbolsDisplay.clientToSurface('native',event.clientX,event.clientY);
+            drag.ghost.style.left=point.x+'px';drag.ghost.style.top=point.y+'px';
             root.querySelectorAll('.formation-drop-target').forEach(node=>node.classList.remove('formation-drop-target'));
             const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-slot],[data-remove]');
             const preview=formationPreview(),from=drag.unit.startsWith('hero:')?preview.heroIdToSlot[drag.unit.slice(5)]:preview.characterIndexToSlot[drag.unit.slice(7)];
@@ -543,14 +544,7 @@
         };
     }
 
-    function promoteSkillPreview(){
-        const modal=document.getElementById("allElementSkillPreviewModal");
-        const overlay=document.getElementById("game-overlay-layer") || document.getElementById("game-stage");
-        if(modal && overlay && modal.parentNode!==overlay){
-            overlay.appendChild(modal);
-        }
-    }
-    promoteSkillPreview();
+    // setupNativeGameUi owns the preview's single native host.
 
     const expPreviewCounts={0:0,1:0,2:0};
     const originalDistributeExpToCharacter=
@@ -1126,7 +1120,6 @@
         syncElementBoxForBattle({silent:true});
         applyBattleFormation();
         syncInventoryPortrait();
-        promoteSkillPreview();
         syncCharacterCreationAvailability();
         renderExpDistributeList();
         ensureElementBoxStatsUI();

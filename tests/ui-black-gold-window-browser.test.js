@@ -2,10 +2,12 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
 function findChrome(){
+    if(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH&&fs.existsSync(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH))return process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -20,7 +22,7 @@ if(!chrome){
 }
 
 const root=process.cwd();
-const source=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+const source=authoredUiCss(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"));
 const marker="/* =====================================================\n   Shared Black-Gold Window Skin — visual-only owner";
 const markerIndex=source.indexOf(marker);
 assert.ok(markerIndex>=0,"black-gold skin marker must exist");
@@ -100,8 +102,8 @@ function run(file){
 }
 
 fs.writeFileSync(baselineCss,source.slice(0,markerIndex),"utf8");
-fs.writeFileSync(baselineHtml,fixture(".ui-black-gold-baseline.css"),"utf8");
-fs.writeFileSync(themedHtml,fixture("css/49-v169-rpg-ui.css"),"utf8");
+fs.writeFileSync(baselineHtml,authoredUiCss.legacyFixture(fixture(".ui-black-gold-baseline.css")),"utf8");
+fs.writeFileSync(themedHtml,authoredUiCss.legacyFixture(fixture("css/49-v169-rpg-ui.css")),"utf8");
 
 try{
     const before=run(baselineHtml);

@@ -1,7 +1,8 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
-const read=p=>fs.readFileSync(p,"utf8");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
+const read=p=>{const source=fs.readFileSync(p,"utf8");return p.endsWith('.css')?authoredUiCss(source):source;};
 const inventoryCss=read("css/22-stage-v78-character-inventory-core.css");
 const abyssCss=read("css/50-v169-abyss-flow.css");
 const inventoryJs=read("js/35-v141-ui-battle.js");
@@ -17,7 +18,7 @@ const finalNav=read("js/04-stage-v11-native-bottom-nav-runtime.js");
 const finalNavBridge=read("js/42-v148-combat-dungeon-fixes.js");
 assert.match(inventoryJs,/const INVENTORY_PAGE_SIZE=24;/);
 assert.match(inventoryJs,/for\(let index=0;index<INVENTORY_PAGE_SIZE;index\+\+\)/);
-assert.match(inventoryCss,/inventory-grid-classic[\s\S]*grid-template-columns:repeat\(auto-fill,minmax\(48px,1fr\)\)/);
+assert.match(inventoryCss,/inventory-grid-classic[\s\S]*grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
 assert.match(inventoryCss,/inventory-grid-classic \.inventory-item-classic \.inventory-icon\s*>\s*\.v169-item-art\s*>\s*img\{[^}]*object-fit:contain;[^}]*object-position:center/);
 assert.doesNotMatch(abyssCss,/#game-stage #inventoryPage \.inventory-item-classic \.inventory-icon > \.v169-item-art\{/);
 assert.doesNotMatch(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*top:0!important/,

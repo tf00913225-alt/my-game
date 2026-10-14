@@ -14,9 +14,7 @@
         const nav=document.getElementById("bottomNav");
         const overlay=document.getElementById("game-overlay-layer");
         if(!nav||!overlay){ return null; }
-        const ui=document.getElementById("game-ui");
-        const generalActive=!!ui?.querySelector(":scope > .page.active");
-        const destination=generalActive?ui:overlay;
+        const destination=overlay;
         if(!mainButtons){
             mainButtons=Array.from(nav.children);
             mainButtons.forEach(button=>{
@@ -36,7 +34,7 @@
             destination.appendChild(shell);
         }
         if(shell.parentElement!==destination){ destination.appendChild(shell); }
-        shell.dataset.presentationDomain=generalActive?"browser":"native";
+        shell.dataset.presentationDomain="native";
         return nav;
     }
     function renderMain(page){

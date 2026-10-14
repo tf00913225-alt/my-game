@@ -1,3 +1,4 @@
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 "use strict";
 
 const assert=require("node:assert/strict");
@@ -5,11 +6,11 @@ const crypto=require("node:crypto");
 const fs=require("node:fs");
 const {spawnSync}=require("node:child_process");
 const read=file=>fs.readFileSync(file,"utf8");
-const inventoryCss=read("css/38-v141-system-expansion.css");
-const hintCss=read("css/56-v174-critical-ui-regressions.css");
-const rosterCss=read("css/19-stage-v54-main-city-moderate-native-scale.css");
-const relicCss=read("css/55-team-relic-system.css");
-const rewardCss=read("css/33-v132-content-expansion.css");
+const inventoryCss=authoredUiCss(read("css/22-stage-v78-character-inventory-core.css"));
+const hintCss=authoredUiCss(read("css/56-v174-critical-ui-regressions.css"));
+const rosterCss=authoredUiCss(read("css/19-stage-v54-main-city-moderate-native-scale.css"));
+const relicCss=authoredUiCss(read("css/55-team-relic-system.css"));
+const rewardCss=authoredUiCss(read("css/33-v132-content-expansion.css"));
 const equipmentJs=read("js/equipment-progression.js");
 const html=read("index.html");
 const manifest=JSON.parse(read("asset-manifest.json"));
@@ -17,12 +18,14 @@ assert.match(inventoryCss,/#game-ui #inventoryPage \.v169-item-art\.v169-equipme
 assert.doesNotMatch(inventoryCss,/#game-ui #inventoryPage \.v169-item-art\.v169-equipment-art\{[^}]*!important/s);
 assert.match(hintCss,/#allElementSkillPreviewModal \.skill-preview-body::before\{[\s\S]*font-size:16px;[\s\S]*line-height:1\.45;/);
 assert.doesNotMatch(hintCss,/body #game-stage #allElementSkillPreviewModal/);
-assert.match(rosterCss,/@media \(max-height:920px\)[\s\S]*v146-home-roster[\s\S]*margin-top:4px;[\s\S]*v146-home-character[\s\S]*min-height:78px;/);
+assert.doesNotMatch(rosterCss,/@media\s*\([^)]*(?:width|height)/);
+assert.match(rosterCss,/\.v146-home-roster\{[^}]*margin:4px 10px 0;/);
+assert.match(rosterCss,/\.v146-home-character\{[^}]*min-height:70px;/);
 assert.match(hintCss,/team-relic-home-tools \.home-card-utility \.home-card-label\{[^}]*font-size:15px;[^}]*line-height:22px;[^}]*font-weight:700;/);
 assert.match(hintCss,/home-relic-v174\.eed14e806044\.webp/);
 assert.match(rewardCss,/\.v132-reward-modal \.v132-reward-modal-inner\.v17363-text-reward-preview/);
 assert.doesNotMatch(rewardCss,/#game-stage \.v17363-text-reward-preview/);
-assert.match(rewardCss,/width:min\(calc\(100vw - 32px\),392px\) !important;[\s\S]*max-width:calc\(100vw - 32px\) !important;/);
+assert.match(rewardCss,/width:min\(calc\(var\(--layout-inline-size,420px\) - 32px\),392px\) !important;[\s\S]*max-width:calc\(var\(--layout-inline-size,420px\) - 32px\) !important;/);
 const start=equipmentJs.indexOf("window.v17346ShowEquipmentDungeonPreview"),end=equipmentJs.indexOf("if(typeof renderDungeonTabContent",start),preview=equipmentJs.slice(start,end);
 assert.match(preview,/equipmentChestOddsText/);assert.match(preview,/v17363-text-reward-preview/);assert.match(preview,/裝備品階機率/);
 assert.doesNotMatch(preview,/previewAssets|v17361-reward-icon|<img/);

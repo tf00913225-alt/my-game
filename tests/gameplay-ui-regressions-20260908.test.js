@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 
 (async()=>{
 const {MonsterBalance,TOWER_MODE_PROFILE}=await import("../js/combat/monster-balance-owner.mjs");
@@ -14,7 +15,7 @@ const vfxRuntime=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const vfxCss=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
-const compactModalCss=fs.readFileSync("css/37-v139-rested-experience.css","utf8");
+const compactModalCss=authoredUiCss(fs.readFileSync("css/37-v139-rested-experience.css","utf8"));
 const dungeonNav=fs.readFileSync("js/04-stage-v11-native-bottom-nav-runtime.js","utf8");
 
 /* Boss objects share numeric enemy target identity and cardless presentation. */

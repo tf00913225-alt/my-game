@@ -1,16 +1,17 @@
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 "use strict";
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 
-const css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+const css=authoredUiCss(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"));
 const marker="Shared Black-Gold Window Skin — visual-only owner";
 const markerIndex=css.indexOf(marker);
 assert.ok(markerIndex>=0,"shared black-gold skin marker must exist");
 const skin=css.slice(markerIndex);
 
 // Backpack deliberately has its own V177 frame; shared skin must not reclaim it.
-const backpack=fs.readFileSync("css/22-stage-v78-character-inventory-core.css","utf8");
+const backpack=authoredUiCss(fs.readFileSync("css/22-stage-v78-character-inventory-core.css","utf8"));
 assert.doesNotMatch(skin,/\.inventory-classic-shell/);
 assert.match(backpack,/\.inventory-classic-shell\{[^}]*background:[^}]*border:1px solid var\(--bag-frame\);[^}]*box-shadow:inset/);
 

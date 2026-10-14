@@ -2,10 +2,11 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 
-const read=path=>fs.readFileSync(path,"utf8");
+const read=path=>{const source=fs.readFileSync(path,"utf8");return path.endsWith('.css')?authoredUiCss(source):source;};
 const runtime=read("js/19-stage-v78-character-inventory-runtime.js");
 const coreCss=read("css/22-stage-v78-character-inventory-core.css");
 const finalCss=read("css/31-v131-fix-batch.css");
@@ -58,14 +59,14 @@ test("the retired V78 export cannot write character or backpack geometry",()=>{
 test("the browser character uses the shared capped Large Panel owner",()=>{
     assert.match(sharedCss,/--ui-large-panel-max-width:396px/);
     assert.match(sharedCss,/--ui-large-panel-height:620px/);
-    assert.match(sharedCss,/#game-ui\{[^}]*--ui-large-panel-max-width:960px;[^}]*--ui-large-panel-height:760px;/);
+    assert.doesNotMatch(sharedCss,/#game-ui\{[^}]*--ui-large-panel-max-width:960px;[^}]*--ui-large-panel-height:760px;/);
     assert.doesNotMatch(sharedCss,/#game-ui #homeFeatureModal \.home-feature-modal-box\.wide\{[^}]*max-width:none !important;/);
     assert.match(sharedCss,/\.home-feature-modal-box\.wide #homeFeatureModalBody\{[\s\S]{0,220}flex:1 1 auto !important/);
     assert.match(sharedCss,/#characterTabContent\{[\s\S]{0,220}flex:1 1 auto !important/);
 });
 
 test("backpack geometry no longer competes with the character modal",()=>{
-    assert.match(coreCss,/#game-ui #inventoryPage \.inventory-classic-shell\{[^}]*width:100%;[^}]*height:100%;/);
+    assert.match(coreCss,/#game-ui #inventoryPage \.inventory-classic-shell\{[^}]*height:100%;[^}]*max-height:100%;/);
     assert.doesNotMatch(coreCss,/#characterTabContent|\.home-feature-modal-box\.wide/);
     assert.doesNotMatch(runtime,/transform\s*:\s*scale\s*\(|dataset\.characterTab|fixedCharacterTab/);
 });
@@ -75,7 +76,7 @@ test("long character tabs retain their CSS scroll owner and backpack has its own
     assert.match(content,/overflow-y:auto !important;/);
     assert.match(content,/overflow-x:hidden !important;/);
     assert.match(content,/touch-action:pan-y !important;/);
-    assert.match(rule(coreCss,"#game-ui #inventoryPage .inventory-grid-scroll"),/overflow-y:auto;[^}]*scrollbar-gutter:stable;/);
+    assert.match(rule(read("css/24-stage-v85-inventory-inner-grid-scroll-root.css"),"#game-ui #inventoryPage .inventory-grid-scroll"),/overflow-y:auto;[^}]*scrollbar-gutter:stable;/);
     assert.doesNotMatch(finalCss,/\.inventory-grid-scroll\{/);
 });
 

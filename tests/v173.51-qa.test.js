@@ -1,12 +1,13 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const battle=fs.readFileSync("js/54-v173.51-battle-qa.js","utf8");
 const inventory=fs.readFileSync("js/55-v173.51-inventory-qa.js","utf8");
 const shop=fs.readFileSync("js/56-v173.51-shop-qa.js","utf8");
 const quest=fs.readFileSync("js/57-v173.51-quest-qa.js","utf8");
-const css=fs.readFileSync("css/53-v173.51-qa.css","utf8");
+const css=authoredUiCss(fs.readFileSync("css/53-v173.51-qa.css","utf8"));
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const qol=fs.readFileSync("js/53-v173.50-inventory-qol.js","utf8");
 const equipment=fs.readFileSync("js/equipment-progression.js","utf8");

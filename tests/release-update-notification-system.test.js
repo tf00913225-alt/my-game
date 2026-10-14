@@ -2,12 +2,13 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const path=require("node:path");
 const vm=require("node:vm");
 const {URL}=require("node:url");
 
 const ROOT=path.resolve(__dirname,"..");
-const read=relative=>fs.readFileSync(path.join(ROOT,relative),"utf8");
+const read=relative=>{const source=fs.readFileSync(path.join(ROOT,relative),"utf8");return relative.endsWith(".css")?authoredUiCss(source):source;};
 const runtimeSource=read("js/release-update-notification.js");
 const manifestPath="release/release-update.json";
 
@@ -231,7 +232,7 @@ async function test(name,callback){
         const manifest=JSON.parse(read(manifestPath));
         const release=JSON.parse(read("release/release.json"));
         const build=read("scripts/build-production.mjs");
-        const headers=read("_headers");
+        const headers=read("_headers").replace(/\r\n/g,"\n");
         const css=read("css/release-update-notification.css");
         assert.equal(manifest.releaseVersion,"V"+release.version);
         assert.equal(release.updateNoticeFile,manifestPath);

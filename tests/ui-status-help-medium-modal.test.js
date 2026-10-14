@@ -6,7 +6,7 @@ const path=require("node:path");
 const cp=require("node:child_process");
 const vm=require("node:vm");
 
-const css=fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8");
+const css=require("../.github/scripts/fixtures/native-ui-css-contract.cjs")(fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8"));
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 const index=fs.readFileSync("index.html","utf8");
 
@@ -49,6 +49,8 @@ const row={
 assert.equal(window.FourSymbolsGestureArbiter.findScrollOwner(row)?.node,body,"status help copy must resolve to its own scroll owner");
 
 function findChrome(){
+    const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    if(configured&&fs.existsSync(configured))return configured;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -63,7 +65,7 @@ if(!chrome){
 
 const fixture=path.join(process.cwd(),".ui-status-help-smoke.html");
 const fileUrl="file://"+fixture.replace(/\\/g,"/");
-const html=`<!doctype html><html><head><meta charset="utf-8">
+const html=require("../.github/scripts/fixtures/native-ui-css-contract.cjs").legacyFixture(`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/00-main.css">
 <link rel="stylesheet" href="css/23-stage-v77-inventory-detail-ui.css">
 <link rel="stylesheet" href="css/38-v141-system-expansion.css">
@@ -86,7 +88,7 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  body.innerHTML=Array.from({length:55},(_,i)=>'<p><b>能力 '+i+'</b> 詳細效果與計算說明</p>').join('');void box.offsetHeight;const long=snap('long');
  document.getElementById('result').textContent=JSON.stringify({short,long});
 })();
-</script></body></html>`;
+</script></body></html>`);
 fs.writeFileSync(fixture,html,"utf8");
 try{
     const run=cp.spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1","--window-size=420,747","--dump-dom",fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});

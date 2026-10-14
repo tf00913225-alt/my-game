@@ -30,11 +30,11 @@ assert.match(shopUi,/FourSymbolsEquipmentShop\.render\(\)/,"shell delegates the 
 assert.match(equipment,/v17345-equipment-wallet"><span>目前金幣<\/span><b>'\+goldText\+'/);
 assert.match(shopCss,/\.v17345-equipment-wallet\{[\s\S]{0,260}display:flex !important/);
 assert.doesNotMatch(shopCss,/\.v17345-equipment-wallet\{\s*display:none !important/);
-assert.match(shopCss,/grid-template-rows:32px minmax\(0,1fr\) 58px !important/);
+assert.match(shopCss,/grid-template-rows:96px minmax\(0,1fr\) 174px !important/);
 
 assert.match(home,/id="v146HomeRosterGoldValue"/);
 assert.match(home,/class="v146-home-roster-gold">金幣/);
-assert.match(homeCss,/\.v146-home-roster-gold strong\{[^{}]*font-size:13px/);
+assert.match(homeCss,/\.v146-home-roster-gold strong\{[^{}]*font-size:39px/);
 assert.match(main,/\$\("v146HomeRosterGoldValue"\)/);
 
 assert.match(offlineUi,/onclick="claimOfflineExpWithAd\(\)">廣告雙倍<\/button>/);

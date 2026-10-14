@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const path=require("node:path");
 const cp=require("node:child_process");
 
-const detailCss=fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8");
+const detailCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs")(fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8"));
 const touchSource=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 
 assert.match(detailCss,/#game-ui #skillDetailModal \.item-modal-box\{[\s\S]*?max-width:var\(--ui-medium-modal-max-width,360px\) !important;[\s\S]*?height:min\(var\(--ui-medium-modal-height,540px\),calc\(100% - var\(--ui-medium-modal-safe-space,28px\)\)\) !important;/);
@@ -14,6 +14,8 @@ assert.match(detailCss,/#game-ui #skillDetailModal \.close-item-button\{[\s\S]*?
 assert.match(touchSource,/data-scroll-owner="x\|y\|both"/);
 
 function findChrome(){
+    const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    if(configured&&fs.existsSync(configured))return configured;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -29,7 +31,7 @@ if(!chrome){
 
 const fixture=path.join(process.cwd(),".ui-medium-skill-detail-smoke.html");
 const fileUrl="file://"+fixture.replace(/\\/g,"/");
-const html=`<!doctype html><html><head><meta charset="utf-8">
+const html=require("../.github/scripts/fixtures/native-ui-css-contract.cjs").legacyFixture(`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/00-main.css">
 <link rel="stylesheet" href="css/23-stage-v77-inventory-detail-ui.css">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
@@ -51,7 +53,7 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  stats.innerHTML=Array.from({length:45},(_,i)=>'<p>技能效果說明 '+i+'</p>').join('');void box.offsetHeight;const long=snap();
  document.getElementById('result').textContent=JSON.stringify({short,long});
 })();
-</script></body></html>`;
+</script></body></html>`);
 
 fs.writeFileSync(fixture,html,"utf8");
 try{

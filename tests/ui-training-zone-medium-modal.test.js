@@ -15,6 +15,8 @@ assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
 assert.doesNotMatch(runtime,/box\.style\.setProperty\("width"|box\.style\.setProperty\("max-height"|box\.style\.setProperty\("overflow-y"/);
 
 function findChrome(){
+    const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    if(configured&&fs.existsSync(configured))return configured;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -30,7 +32,7 @@ if(!chrome){
 
 const fixture=path.join(process.cwd(),".ui-training-zone-medium-modal-smoke.html");
 const fileUrl="file://"+fixture.replace(/\\/g,"/");
-const html=`<!doctype html><html><head><meta charset="utf-8">
+const html=require("../.github/scripts/fixtures/native-ui-css-contract.cjs").legacyFixture(`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/00-main.css">
 <link rel="stylesheet" href="css/20-stage-v60-training-only-safety.css">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
@@ -52,7 +54,7 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  body.scrollTop=body.scrollHeight;void box.offsetHeight;const scrolled=snap('scrolled');
  document.getElementById('result').textContent=JSON.stringify({short,long,scrolled,scrollTop:body.scrollTop});
 })();
-</script></body></html>`;
+</script></body></html>`);
 
 fs.writeFileSync(fixture,html,"utf8");
 try{

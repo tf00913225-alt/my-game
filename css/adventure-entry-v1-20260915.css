@@ -7,9 +7,9 @@
     flex:0 0 auto;
     align-self:start;
     justify-self:center;
-    width:min(44%,212px);
+    width:min(44%,636px);
     height:var(--home-scene-height);
-    min-height:104px;
+    min-height:312px;
     margin:0;
     pointer-events:none;
     display:flex;
@@ -22,16 +22,17 @@
     position:relative;
     z-index:2;
     pointer-events:auto;
-    width:min(92%,190px);
-    min-height:56px;
+    width:min(92%,570px);
+    min-height:168px;
     margin:0;
-    padding:8px 12px 9px;
-    border:1px solid rgba(231,194,119,.78);
-    border-radius:9px 9px 13px 13px;
+    padding:24px 36px 27px;
+    border:3px solid rgba(231,194,119,.78);
+    border-radius:27px 27px 39px 39px;
     color:#f5dfad;
     background:linear-gradient(180deg,#604622,#302319);
-    box-shadow:inset 0 1px rgba(255,235,184,.16),0 4px 0 #5f401f,0 7px 13px rgba(0,0,0,.38);
+    box-shadow:inset 0 3px rgba(255,235,184,.16),0 12px 0 #5f401f,0 21px 39px rgba(0,0,0,.38);
     font-family:inherit;
+    font-size:45px;
     text-align:center;
     cursor:pointer;
     touch-action:manipulation;
@@ -40,42 +41,39 @@
 }
 #adventureHomeEntry strong{
     display:block;
-    margin-top:2px;
-    font-size:clamp(18px,5vw,24px);
+    margin-top:6px;
+    font-size:clamp(54px,54px,72px);
     line-height:1.05;
     letter-spacing:.12em;
-    text-shadow:0 1px 1px #000,0 0 10px rgba(213,168,80,.18);
+    text-shadow:0 3px 3px #000,0 0 30px rgba(213,168,80,.18);
 }
 .adventure-home-kicker{
     display:block;
     color:#cdbb91;
-    font-size:13px;
+    font-size:39px;
     line-height:1.2;
     letter-spacing:.05em;
     white-space:nowrap;
 }
 .adventure-home-notice{
     position:absolute;
-    top:-5px;
-    right:-5px;
-    width:12px;
-    height:12px;
-    border:2px solid #f3d48b;
+    top:-15px;
+    right:-15px;
+    width:36px;
+    height:36px;
+    border:6px solid #f3d48b;
     border-radius:50%;
     background:#b62d22;
-    box-shadow:0 0 0 2px rgba(0,0,0,.48),0 0 9px rgba(196,53,39,.7);
+    box-shadow:0 0 0 6px rgba(0,0,0,.48),0 0 27px rgba(196,53,39,.7);
 }
 .adventure-home-notice[hidden]{display:none!important;}
-#adventureHomeEntry:focus-visible{outline:2px solid #f7df9e;outline-offset:3px;}
-#adventureHomeEntry:active{margin-top:2px;box-shadow:inset 0 1px rgba(255,235,184,.12),0 2px 0 #5f401f,0 4px 8px rgba(0,0,0,.38);}
+#adventureHomeEntry:focus-visible{outline:6px solid #f7df9e;outline-offset:9px;}
+#adventureHomeEntry:active{margin-top:6px;box-shadow:inset 0 3px rgba(255,235,184,.12),0 6px 0 #5f401f,0 12px 24px rgba(0,0,0,.38);}
 @keyframes adventureHomeBreath{0%,100%{filter:brightness(.96)}50%{filter:brightness(1.08)}}
-@media (max-width:379px){
-    #adventureHomeAxis.adventure-home-axis{width:180px;min-height:84px;}
-    #adventureHomeEntry.adventure-home-entry{min-height:52px;padding:7px 9px;}
-}
-@media (min-width:800px){
-    #adventureHomeAxis.adventure-home-axis{grid-row:2/span 2;align-self:stretch;height:100%;}
-}
+    #adventureHomeAxis.adventure-home-axis{width:540px;min-height:252px;}
+    #adventureHomeEntry.adventure-home-entry{min-height:156px;padding:21px 27px;}
+
+
 @media (prefers-reduced-motion:reduce){
     #adventureHomeEntry.adventure-home-entry{animation:none!important;transition:none!important;}
 }

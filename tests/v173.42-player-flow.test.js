@@ -1,3 +1,4 @@
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
@@ -14,14 +15,14 @@ const tuning=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 const settings=fs.readFileSync("js/49-v169-element-box-settings.js","utf8");
 const waterRules=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 const frostbiteOwner=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
-const settingsCss=fs.readFileSync("css/48-v169-element-box-settings.css","utf8");
+const settingsCss=authoredUiCss(fs.readFileSync("css/48-v169-element-box-settings.css","utf8"));
 const index=fs.readFileSync("index.html","utf8");
-const baseCss=fs.readFileSync("css/00-main.css","utf8");
-const questCss=fs.readFileSync("css/25-stage-v90-quest-interface-core.css","utf8");
-const creationCss=fs.readFileSync("css/29-v125-character-creation-native.css","utf8");
-const homeCss=fs.readFileSync("css/42-v146-system-polish.css","utf8");
-const homeRosterCss=fs.readFileSync("css/19-stage-v54-main-city-moderate-native-scale.css","utf8");
-const abyssCss=fs.readFileSync("css/46-v154-dev-fixes.css","utf8");
+const baseCss=authoredUiCss(fs.readFileSync("css/00-main.css","utf8"));
+const questCss=authoredUiCss(fs.readFileSync("css/25-stage-v90-quest-interface-core.css","utf8"));
+const creationCss=authoredUiCss(fs.readFileSync("css/29-v125-character-creation-native.css","utf8"));
+const homeCss=authoredUiCss(fs.readFileSync("css/42-v146-system-polish.css","utf8"));
+const homeRosterCss=authoredUiCss(fs.readFileSync("css/19-stage-v54-main-city-moderate-native-scale.css","utf8"));
+const abyssCss=authoredUiCss(fs.readFileSync("css/46-v154-dev-fixes.css","utf8"));
 const core=fs.readFileSync("js/00-main.js","utf8");
 
 assert.match(v141,/v17342UseInventoryPotion/);

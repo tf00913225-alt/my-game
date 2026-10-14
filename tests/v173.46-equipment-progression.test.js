@@ -57,7 +57,7 @@ assert.doesNotMatch(source,/v17346-potion-detail/);
 assert.doesNotMatch(source,/#game-stage #itemModal[^\n]*height:auto!important/);
 assert.match(fs.readFileSync("js/00-main.js","utf8"),/setItemModalPresentationMode\(isEquipment\?"equipment":"compact"\)/);
 assert.match(source,/v17346-preview-modal/);
-assert.match(source,/\.v132-preview-list-scroll\{flex:1 1 auto!important/);
+assert.match(fs.readFileSync("css/33-v132-content-expansion.css","utf8"),/\.v132-preview-list-scroll\{flex:1 1 auto!important/);
 
 const assetPaths=[
  "assets/equipment/warrior/bracer-01.png","assets/equipment/warrior/head-01.png","assets/equipment/warrior/armor-01.png","assets/equipment/warrior/shoes-01.png","assets/equipment/warrior/weapon-01.png",

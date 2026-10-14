@@ -17,8 +17,18 @@
     let activeDialog=null;
     let dialogElements=null;
 
+    function dialogHost(){
+        const ui=document.getElementById("game-ui");
+        const game=document.getElementById("gameInterface");
+        // Preserve the existing critical account/boot alert boundary. In-game
+        // dialogs reuse the same DOM and queue inside the native canvas.
+        return ui&&!ui.hidden&&game&&game.style.display!=="none"?ui:document.body;
+    }
+
     function ensureDialogElements(){
         if(dialogElements&&dialogElements.layer.isConnected){
+            const host=dialogHost();
+            if(dialogElements.layer.parentElement!==host){ host.appendChild(dialogElements.layer); }
             return dialogElements;
         }
 
@@ -60,7 +70,7 @@
         actions.append(cancelButton,confirmButton);
         panel.append(crest,title,message,actions);
         layer.appendChild(panel);
-        document.body.appendChild(layer);
+        dialogHost().appendChild(layer);
 
         cancelButton.addEventListener("click",()=>settleDialog(false));
         confirmButton.addEventListener("click",()=>settleDialog(true));

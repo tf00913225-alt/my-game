@@ -2,10 +2,11 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const vm=require("node:vm");
 
 const rpgUi=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
-const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
+const relicCss=authoredUiCss(fs.readFileSync("css/55-team-relic-system.css","utf8"));
 const relicRuntime=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const abyss=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");
 
@@ -47,7 +48,7 @@ for(const [options,primary,danger] of [[{},false,false],[{danger:true},true,true
 assert.equal(created.filter(node=>node.id==="v169RpgDialogLayer").length,1,"all tones reuse one dialog layer");
 
 assert.doesNotMatch(relicCss,/map-return\.png/);
-assert.match(fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8"),/\.team-relic-home-tools\{[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\);[^}]*grid-row:3;[^}]*width:100%;[^}]*gap:4px;/);
+assert.match(authoredUiCss(fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8")),/\.team-relic-home-tools\{[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\);[^}]*grid-row:3;[^}]*width:100%;[^}]*gap:4px;/);
 assert.match(relicCss,/#statusHelpButton,\s*\n#game-ui #homeFeatureModal\.team-relic-modal #skillPreviewHeaderButton\{display:none!important;\}/,
     "relic modal must never expose the character status-help or all-skill-preview header controls");
 assert.match(relicCss,/\.team-relic-modal:not\(\.team-relic-detail-mode\) \.home-feature-close-btn:not\(#statusHelpButton\):not\(#skillPreviewHeaderButton\)\{display:inline-flex!important;\}/,

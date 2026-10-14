@@ -154,12 +154,6 @@
     overflow-y:auto !important;
 }
 
-@media (max-height:720px){
-    #game-stage #app.v141-dungeon-active #dungeonPage,
-    #game-stage #app.v141-dungeon-active #dungeonPage.active{
-        padding-bottom:80px !important;
-    }
-}
 
 @media (prefers-reduced-motion:reduce){
 }

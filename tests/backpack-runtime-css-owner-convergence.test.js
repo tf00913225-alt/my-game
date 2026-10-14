@@ -17,18 +17,19 @@ const browser=read("tests/backpack-visual-composition-browser.test.js");
 // Permanent gate: source ownership checks are paired with full production-stack browser QA.
 assert.match(css22,/--inventory-equipment-slot-size/);
 assert.match(css22,/--inventory-equipment-cell-height/);
-assert.match(css22,/#game-ui #inventoryPage #inventoryCharacterDetailButton\{[^}]*width:44px[^}]*height:44px/);
+assert.match(css22,/#game-ui #inventoryPage #inventoryCharacterDetailButton\{[^}]*width:132px[^}]*height:132px/);
 assert.doesNotMatch(css23,/inventory-character-detail-button/);
 assert.doesNotMatch(css31,/inventoryCharacterDetailButton/);
 assert.doesNotMatch(css24,/102-SLOT|102-slot|exactly 102|no pagination|flex:1 1 auto !important/);
 assert.match(css22,/#inventoryPage\{[^}]*height:100%;[^}]*overflow:hidden;/);
 assert.doesNotMatch(css24,/inventory-classic-shell|inventory-right-panel/);
 assert.match(css24,/inventoryGridScroll|inventory-grid-scroll/);
-assert.match(css38,/inventory-backpack-rarity-neutral/);
+assert.match(css22,/inventory-backpack-rarity-neutral/);
+assert.doesNotMatch(css38,/#game-ui #inventoryPage/);
 assert.match(css50,/v169-item-art:not\(\.inventory-backpack-rarity-neutral\)/);
 assert.match(read("js/58-v173.63-functional-fixes.js"),/v169-material-art:not\(\.inventory-backpack-rarity-neutral\)/);
 assert.doesNotMatch(css22,/inventory-item-classic:before/);
-assert.match(read("css/49-v169-rpg-ui.css"),/border:1px solid var\(--slot-rarity\)/);
+assert.match(read("css/49-v169-rpg-ui.css"),/border:calc\(1 \* var\(--ui-length-unit,1px\)\) solid var\(--slot-rarity\)/);
 for(const rarity of ["white","blue","purple","orange","pink","four-symbol"]){
     assert.doesNotMatch(css55,new RegExp(`#game-stage \\.rarity-${rarity}`),`Team Relic ${rarity} selector must not be global`);
     assert.match(css55,new RegExp(`team-relic-[^,{]+\\.rarity-${rarity}`),`Team Relic ${rarity} selector must carry Team Relic context`);
