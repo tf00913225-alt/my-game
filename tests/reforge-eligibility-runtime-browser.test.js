@@ -14,7 +14,8 @@ assert.deepEqual(writers,["36-v141-content-systems.js"],"one final runtime refor
 const candidates=[process.env.CHROME_BIN,"C:/Program Files/Google/Chrome/Application/chrome.exe","C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe","/usr/bin/google-chrome","/usr/bin/chromium","/usr/bin/chromium-browser"].filter(Boolean);
 const chrome=candidates.find(p=>fs.existsSync(p));
 if(!chrome){ console.log("reforge runtime browser: SKIPPED (Chrome unavailable)"); process.exit(0); }
-const main=read("js/00-main.js"),v132=read("js/27-v132-content-expansion.js");
+const main=read("js/00-main.js").replace(/\r\n/g,"\n"),v132=read("js/27-v132-content-expansion.js");
+const displayOwner=main.slice(main.indexOf('const displayTokens ='),main.indexOf('/* =====================================================\n   基本設定'));
 const itemOwner=main.slice(main.indexOf("const ITEM_MODAL_PRESENTATION_MODES = new Set(["),main.indexOf("function openEquippedItem("));
 const transaction=v132.slice(v132.indexOf("    function cloneInventorySnapshot(){"),v132.indexOf("    /* =====================================================",v132.indexOf("window.v132RunInventoryTransaction=runInventoryTransaction;")));
 const script=s=>"<script>"+s.replace(/<\/script/gi,"<\\/script")+"</script>";
@@ -83,10 +84,11 @@ for(const [rarity,stats] of Object.entries({white:{attack:6},blue:{intelligence:
  const details=document.querySelector('.v141-smelting-picker');details.open=true;[...details.querySelectorAll('button')].find(b=>b.textContent==='取消選擇').click();ok(!details.open,'cancel picker');
 }
 const incomplete=gear('incomplete');delete incomplete.stats;inventoryItems.push(incomplete);ok(!FourSymbolsReforge.canReforge(incomplete),'incomplete shared eligibility');v141RenderSynthesis();ok(!document.querySelector('[data-forge-value="incomplete"]'),'incomplete filtered');
-// Real final CSS and browser-domain shell at narrow, phone and desktop widths.
+// Real final CSS and the production native stage/Display Owner at each frame.
 const layouts=[];
 for(const [width,height] of [[320,568],[390,844],[1280,900]]){
- const surface=$('game-ui');surface.style.width=width+'px';surface.style.height=height+'px';
+ const surface=$('game-viewport');surface.style.setProperty('width',width+'px','important');surface.style.setProperty('height',height+'px','important');updateGameStageScale();
+ eq([$('game-ui').clientWidth,$('game-ui').clientHeight],[1080,1920],'single native canvas');
  const body=document.querySelector('.v141-synthesis-body');void surface.offsetHeight;
  ok(body.scrollWidth<=body.clientWidth+1,'no horizontal overflow '+width);
  const box=document.querySelector('.home-feature-modal-box').getBoundingClientRect();ok(box.width<=width+1&&box.height<=height+1,'panel fits '+width);
@@ -98,7 +100,11 @@ window.__qaResults={passed:12,layouts,alerts:alerts.length,ownerUnchanged:window
 `;
 const markup='<!doctype html><meta charset="utf-8">'+['00-main','38-v141-system-expansion','40-v143-combat-dungeon-polish','49-v169-rpg-ui','50-v169-abyss-flow','53-v173.51-qa'].map(n=>'<link rel="stylesheet" href="css/'+n+'.css">').join('')+'<style>html,body{margin:0;}#game-ui{position:relative!important;inset:auto!important;width:390px;height:844px;}#homeFeatureModal{position:absolute!important;inset:0!important;}</style><div id="game-ui"><div id="homeFeatureModal" class="home-feature-modal"><div class="home-feature-modal-box"><div class="home-feature-modal-title"><span id="homeFeatureModalTitle"></span><button onclick="closeHomeFeature()">返回</button></div><div id="homeFeatureModalBody"></div></div></div></div><div id="itemModal"><div><div id="itemModalIcon"></div><div id="itemModalName"></div><div id="itemModalStats"></div><div class="item-modal-buttons"><button id="itemEquipButton">穿戴</button></div></div></div><pre id="result"></pre>'+
     script(read('functions/src/equipment-reforge.js'))+script(read('js/equipment-factory.js'))+script(setup+require('../.github/scripts/fixtures/item-slot-owner.cjs')+itemOwner+transaction)+script(forge)+script(progression)+script(inventory)+script('try{'+cases+'document.getElementById("result").textContent=JSON.stringify(window.__qaResults)}catch(e){document.getElementById("result").textContent=JSON.stringify({error:e.stack})}');
-fs.writeFileSync(fixture,markup);
+const nativeMarkup=markup.replace('<style>html,body{margin:0;}#game-ui{position:relative!important;inset:auto!important;width:390px;height:844px;}#homeFeatureModal{position:absolute!important;inset:0!important;}</style>',
+ '<link rel="stylesheet" href="css/03-stage-v4-viewport-lock.css"><style>#game-ui{display:block!important;position:absolute!important;inset:0!important;width:1080px!important;height:1920px!important}#homeFeatureModal{position:absolute!important;inset:0!important;}</style>')
+ .replace('<div id="game-ui">','<div id="game-viewport"><div id="game-stage"><div id="game-overlay-layer"><div id="game-ui">')
+ .replace('<pre id="result"></pre>','<pre id="result"></pre></div></div></div>'+script(displayOwner));
+fs.writeFileSync(fixture,nativeMarkup);
 try{
     const run=cp.spawnSync(chrome,['--headless=new','--no-sandbox','--disable-gpu','--allow-file-access-from-files','--user-data-dir='+profile,'--dump-dom','file:///'+fixture.replace(/\\/g,'/')],{encoding:'utf8',timeout:45000,maxBuffer:12*1024*1024});
     assert.equal(run.status,0,run.stderr);
