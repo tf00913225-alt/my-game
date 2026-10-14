@@ -101,7 +101,7 @@ assert.match(layoutCss,/--battle-center-region-track:16fr/);
 assert.match(layoutCss,/--battle-ally-region-track:42fr/);
 assert.match(layoutCss,/grid-template-rows:[\s\S]*var\(--battle-enemy-region-track\)[\s\S]*var\(--battle-center-region-track\)[\s\S]*var\(--battle-ally-region-track\)/);
 assert.doesNotMatch(layoutCss,/--battle-info-region-track/,"battle info must not consume a structural grid track");
-assert.match(layoutCss,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/,"enemy slots remain equal width");
+assert.match(layoutCss,/grid-template-columns:repeat\(var\(--battle-enemy-columns,5\),minmax\(0,1fr\)\)/,"enemy slots remain equal width");
 assert.match(layoutCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/,"ally slots remain equal width");
 assert.match(layoutCss,/--battle-ally-row-height:calc\(/,"front/back ally containers share one size token");
 assert.match(layoutCss,/\.battle-info-region\{[\s\S]*position:absolute !important;[\s\S]*transform:translateY\(calc\(100% - var\(--battle-info-handle-height\)\)\)/,"battle log is a collapsed bottom drawer");

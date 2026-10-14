@@ -1927,6 +1927,9 @@
         });
 
         currentBattleMonsters=monsterList.map((m,i)=>i);
+        // A new roster can reuse numeric indexes from a previous encounter.
+        // Capture its own profile once; redraw/death must retain that snapshot.
+        window.FourSymbolsBattlefieldSlots?.clearActiveEnemySnapshot();
         currentBattleMonsters.forEach(i=>{
             monsters[i].alive=true;
             monsters[i].hp=monsters[i].maxHP;

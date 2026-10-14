@@ -30,7 +30,7 @@ assert.match(ownerSource,/getSideRect/);
 assert.match(adapterSource,/const slots=window\.FourSymbolsBattlefieldSlots/);
 assert.doesNotMatch(adapterSource,/ENEMY_LAYOUTS\s*=|ALLY_LAYOUTS\s*=/,"render adapter must not create another Slot table");
 assert.match(adapterSource,/replaceChildren\(fragment\)/,"legacy formation DOM must be reconciled into formal Slot containers");
-assert.match(adapterSource,/slots\.enemyBackSlots,slots\.enemyFrontSlots/);
+assert.match(adapterSource,/slots\.getEnemyRenderSlotRows\(snapshot\)/);
 assert.match(adapterSource,/slots\.allyFrontSlots,slots\.allyBackSlots/);
 assert.match(adapterSource,/dataset\.geometryOwner="fixed-slot"/);
 assert.match(adapterSource,/neutralizeLegacyPresentationGeometry/);
@@ -213,3 +213,5 @@ assert.deepEqual(JSON.parse(JSON.stringify(owner.bossFootprintSlots)),["ENEMY_B2
 
 assert.match(qaSource,/V174 battle presentation owner/);
 console.log("Fixed Slot Battlefield Rendering V2 regression contract passed.");
+
+assert.match(css, /\[data-enemy-battlefield-profile="standard-six"\]\{[\s\S]*?--battle-enemy-region-track:48fr;[\s\S]*?--battle-ally-region-track:36fr;/,"only standard six-slot profile reallocates portrait height");

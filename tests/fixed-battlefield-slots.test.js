@@ -99,3 +99,77 @@ retargetAlive.delete(1);
 assert.equal(next(),4,"after B dies the following actual action retargets E");
 
 console.log("fixed battlefield slot model: PASS");
+
+// V1 ordinary profiles share the existing owner, but never truncate legacy encounters.
+for(const mode of ['wild','daily','abyss','tower']){
+ for(let count=1;count<=10;count++){
+  const indexes=Array.from({length:count},(_,i)=>i);
+  const snapshot=slots.createEnemyFormationSnapshot(indexes,{encounterMode:mode});
+  assert.equal(snapshot.battlefieldProfile,count<=6?'standard-six':'legacy-ten');
+  assert.equal(snapshot.migrationStatus,count<=6?'six-slot-ready':'pending-wave-migration');
+  assert.equal(Object.keys(snapshot.monsterIndexToSlot).length,count);
+  assert.equal(new Set(Object.values(snapshot.monsterIndexToSlot)).size,count);
+  assert.equal(slots.getEnemyRenderSlotRows(snapshot).flat().length,count<=6?6:10);
+ }
+}
+const six=slots.createEnemyFormationSnapshot([0,1,2,3,4,5],{encounterMode:'daily'});
+slots.setActiveEnemySnapshot(six);
+assert.deepEqual(Object.values(six.monsterIndexToSlot),['ENEMY_B1','ENEMY_B2','ENEMY_B3','ENEMY_F1','ENEMY_F2','ENEMY_F3']);
+assert.deepEqual(slots.getSideSlots('monster'),slots.standardEnemySlots);
+assert.deepEqual(slots.getGeometrySlotsFromShape('monster','ENEMY_F1','tri'),['ENEMY_F1','ENEMY_F2','ENEMY_F3']);
+assert.deepEqual(slots.resolveEnemyTargets(six,1,'single',()=>true),[1]);
+assert.deepEqual(slots.resolveEnemyTargets(six,1,'tri',()=>true),[0,1,2]);
+assert.deepEqual(slots.resolveEnemyTargets(six,1,'column',()=>true),[1,4]);
+assert.deepEqual(slots.resolveEnemyTargets(six,1,'all',()=>true),[0,1,2,3,4,5]);
+const beforeSix=JSON.stringify(six);
+assert.deepEqual(slots.resolveEnemyTargets(six,1,'all',i=>i!==2),[0,1,3,4,5]);
+assert.equal(slots.getEnemySlotForMonster(six,5),'ENEMY_F3');
+assert.equal(JSON.stringify(six),beforeSix,'death/target filtering never rearranges slots');
+assert.equal(slots.assignMonsterToEnemySlot(six,6,'ENEMY_F4'),false,'six profile refuses seventh-slot assignment');
+slots.removeMonsterFromEnemySlot(six,2);
+assert.deepEqual(slots.resolveEnemyTargets(six,1,'row',()=>true),[0,1],'empty slots cannot be targets');
+assert.equal(slots.getEnemySlotForMonster(six,5),'ENEMY_F3');
+assert.equal(slots.assignMonsterToEnemySlot(six,7,'ENEMY_F3'),false,'occupied slot refuses second entity');
+assert.throws(()=>slots.createEnemyFormationSnapshot([0,0],{encounterMode:'wild'}),/Duplicate/);
+assert.throws(()=>slots.createEnemyFormationSnapshot(Array.from({length:11},(_,i)=>i),{encounterMode:'tower'}),/capacity/);
+for(const mode of ['boss','personal','world','adventure','legacy-dungeon']){
+ const special=slots.createEnemyFormationSnapshot([0,1,2],{encounterMode:mode});
+ assert.equal(special.battlefieldProfile,'legacy-ten');
+ assert.equal(special.migrationStatus,'special-or-legacy');
+}
+slots.setActiveEnemySnapshot(bossSnapshot);
+assert.equal(slots.getSideSlots('monster').length,10,'Boss retains ten-slot geometry');
+slots.clearActiveEnemySnapshot();
+context.window.v132ActiveDungeonRun={mode:'tower'};
+assert.equal(slots.getCurrentEncounterMode(),'tower');
+context.window.v132ActiveDungeonRun=null;
+assert.equal(slots.getCurrentEncounterMode(),'wild');
+const launch=fs.readFileSync(new URL('../js/27-v132-content-expansion.js',import.meta.url),'utf8');
+assert.match(launch,/currentBattleMonsters=monsterList.map[\s\S]*?clearActiveEnemySnapshot\(\);[\s\S]*?renderBattle\(\)/,'new dungeon roster resets reused numeric identities before first render');
+console.log('ordinary six-slot / legacy overflow / Boss profile regressions: PASS');
+
+const main=fs.readFileSync(new URL('../js/00-main.js',import.meta.url),'utf8');
+const initiative=main.match(/^function buildInitiativeQueue\([\s\S]*?^\}/m)[0];
+const actionContext={currentBattleMonsters:[0,1,2,3,4,5],monsters:Array.from({length:6},(_,i)=>({alive:true,hp:100,agility:10+i})),getExistingPartyIndexes:()=>[0,1,2,3,4,5],getPartyCharacterByIndex:()=>({hp:100}),getPartyBattleStats:()=>({agility:5}),getMonsterAgility:m=>m.agility};
+vm.createContext(actionContext);vm.runInContext(initiative,actionContext);
+const queue=actionContext.buildInitiativeQueue();
+assert.deepEqual(queue.filter(e=>e.type==='monster').map(e=>e.monsterIndex).sort(),[0,1,2,3,4,5],'all six enemies enter the formal action queue exactly once');
+assert.equal(queue.filter(e=>e.type==='player').length,6,'all six allies retain their actions');
+actionContext.monsters[2].alive=false;
+assert.equal(actionContext.buildInitiativeQueue().filter(e=>e.type==='monster').length,5,'death removes action without compacting entity indexes');
+console.log('six enemy / six ally core initiative queue: PASS');
+
+const end=main.match(/^function checkBattleEnd\([\s\S]*?^\}/m)[0];
+let winCount=0,deathCount=0;
+actionContext.battleActive=true;
+actionContext.killMonster=i=>{actionContext.monsters[i].alive=false;deathCount++;};
+actionContext.winBattle=()=>{winCount++;actionContext.battleActive=false;};
+actionContext.loseBattle=()=>{throw new Error('living party cannot lose');};
+vm.runInContext(end,actionContext);
+assert.equal(actionContext.checkBattleEnd(),false,'surviving sixth enemy prevents early victory');
+actionContext.monsters.forEach(m=>{m.hp=0;});
+assert.equal(actionContext.checkBattleEnd(),true);
+assert.equal(deathCount,5,'each remaining live entity enters canonical death exactly once');
+assert.equal(winCount,1);
+actionContext.checkBattleEnd();assert.equal(winCount,1,'terminal recheck cannot repeat victory settlement');
+console.log('six-slot death / victory / once-only terminal boundary: PASS');

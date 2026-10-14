@@ -440,7 +440,7 @@ async function prepareAccountFirstRuntime(client,features){
 
 async function cleanupPresentationQaBattle(client){
     await client.eval("(()=>{"+
-        "try{window.__relicQaFocusObserver?.disconnect();delete window.__relicQaFocusObserver;delete window.__relicQaFocusSnapshot;}catch(_){}"+
+        "try{window.__relicQaFocusObserver?.disconnect();delete window.__relicQaFocusObserver;delete window.__relicQaFocusSnapshot;delete window.__relicQaIdentitySnapshot;}catch(_){}"+
         "try{window.__relicQaFinishRelease?.();delete window.__relicQaFinishRelease;}catch(_){}"+
         "try{if(window.v174RelicPresentationState&&window.v174RelicPresentationState().active){return false;}}catch(_){}"+
         "try{window.FourSymbolsBattleFloatingFeedback?.clear?.();}catch(_){}"+
@@ -508,15 +508,108 @@ async function launchPresentationQaMode(client,mode,relicId){
 
 async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     const id=JSON.stringify(relicId);
-    const focusExpression="(()=>{const n=document.getElementById('teamRelicBattlePresentation');const owner=window.FourSymbolsBattlefieldRenderGeometry;const state=window.v143SkillAnimationState?.current;const stageNode=document.getElementById('v143-skill-stage');if(!n?.classList.contains('targets-visible')||!n?.classList.contains('vfx-running')||state?.config?.id!=="+id+"||state.done||stageNode?.dataset.sequence!==String(state.sequence)||!stageNode.querySelector('.v143-vfx-sprite[data-skill="+id+"]'))return null;const side=state?.targetSide||null;const indexes=Array.isArray(state?.targetIndexes)?state.targetIndexes.slice():[];const overlay=owner?.getBattlefieldOverlayGeometry?.()?.rect||null;const clip=rect=>{if(!rect||!overlay){return rect||null;}const left=Math.max(overlay.left,rect.left),top=Math.max(overlay.top,rect.top),right=Math.min(overlay.left+overlay.width,rect.left+rect.width),bottom=Math.min(overlay.top+overlay.height,rect.top+rect.height);return right>left&&bottom>top?{left,top,width:right-left,height:bottom-top}:null;};const rectOf=node=>{const r=node.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height};};const artProjections=[...n.querySelectorAll('.team-relic-target-projection-art')].map(rectOf);const hpProjections=[...n.querySelectorAll('.team-relic-target-projection-hp')].map(rectOf);const diagnostics=indexes.map(index=>{const card=document.getElementById((side==='monster'?'battleMonster':'battlePlayerCard')+index);const g=owner?.getUnitGeometry?.(side,index);return {index,dom:!!card,slot:g?.slot||card?.dataset?.slot||null,artworkProjection:clip(g?.artworkProjection?.rect),hpProjection:clip(g?.hpProjection?.rect)};});const matches=(expected,actual)=>{const approx=(a,b)=>Math.abs(a-b)<=1.5;const unmatched=actual.slice();return expected.length===actual.length&&expected.every(e=>{const index=unmatched.findIndex(a=>approx(e.left,a.left)&&approx(e.top,a.top)&&approx(e.width,a.width)&&approx(e.height,a.height));if(index<0){return false;}unmatched.splice(index,1);return true;});};const expectedArt=diagnostics.map(item=>item.artworkProjection).filter(Boolean);const expectedHp=diagnostics.map(item=>item.hpProjection).filter(Boolean);const stage=document.getElementById('v143-skill-stage');const sprite=stage?.querySelector('.v143-vfx-sprite[data-skill="+id+"]');return {skillId:state.config.id,sequence:state.sequence,side,indexes,artProjections,hpProjections,targetDiagnostics:diagnostics,outlineCount:n.querySelectorAll('.team-relic-battle-target-outline').length,artGeometryMatches:matches(expectedArt,artProjections),hpGeometryMatches:matches(expectedHp,hpProjections),stageOwner:stage?.dataset.geometryOwner||null,spriteOwner:sprite?.dataset.geometryOwner||null,spriteTargetSide:sprite?.dataset.targetSide||null,spriteTargetIndexes:sprite?.dataset.targetIndexes||'',presentationLock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false};})()";
+    function captureIdentitySnapshot(){
+        const node=document.getElementById('teamRelicBattlePresentation');
+        if(!node){ return null; }
+        const rect=node.getBoundingClientRect();
+        const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.()?.rect;
+        const image=node.querySelector('.team-relic-battle-cutin-icon img');
+        const plain=rect=>rect?{left:rect.left,top:rect.top,width:rect.width,height:rect.height}:null;
+        const style=getComputedStyle(node);
+        return {parentIsBody:node.parentElement===document.body,
+            name:node.querySelector('.team-relic-battle-cutin-copy strong')?.textContent||'',
+            icon:image?.getAttribute('src')||'',visibility:style.visibility,opacity:style.opacity,
+            readingState:document.body.classList.contains('v174-battle-reading-open'),
+            rect:plain(rect),overlay:plain(overlay)};
+    }
+    function captureFocusSnapshot(relicId){
+        const node=document.getElementById('teamRelicBattlePresentation');
+        const owner=window.FourSymbolsBattlefieldRenderGeometry;
+        const state=window.v143SkillAnimationState?.current;
+        const stage=document.getElementById('v143-skill-stage');
+        if(!node?.classList.contains('targets-visible')||!node.classList.contains('vfx-running')||
+           state?.config?.id!==relicId||state.done||stage?.dataset.sequence!==String(state.sequence)){
+            return null;
+        }
+        const escapedId=CSS.escape(relicId);
+        const spriteSelector=`.v143-vfx-sprite[data-skill="${escapedId}"]`;
+        const sprite=stage.querySelector(spriteSelector);
+        if(!sprite){ return null; }
+        const side=state.targetSide||null;
+        const indexes=Array.isArray(state.targetIndexes)?state.targetIndexes.slice():[];
+        const plain=rect=>rect?{left:rect.left,top:rect.top,width:rect.width,height:rect.height}:null;
+        const overlay=plain(owner?.getBattlefieldOverlayGeometry?.()?.rect);
+        const project=rect=>{
+            const source=plain(rect);
+            if(!source){ return {source:null,rect:null,reason:'missing-canonical-projection'}; }
+            if(!overlay){ return {source,rect:null,reason:'missing-overlay'}; }
+            const left=Math.max(overlay.left,source.left),top=Math.max(overlay.top,source.top);
+            const right=Math.min(overlay.left+overlay.width,source.left+source.width);
+            const bottom=Math.min(overlay.top+overlay.height,source.top+source.height);
+            return right>left&&bottom>top
+                ?{source,rect:{left,top,width:right-left,height:bottom-top},reason:null}
+                :{source,rect:null,reason:'clipped-outside-overlay'};
+        };
+        const rectOf=node=>plain(node.getBoundingClientRect());
+        const artProjections=[...node.querySelectorAll('.team-relic-target-projection-art')].map(rectOf);
+        const hpProjections=[...node.querySelectorAll('.team-relic-target-projection-hp')].map(rectOf);
+        const diagnostics=indexes.map(index=>{
+            const card=document.getElementById((side==='monster'?'battleMonster':'battlePlayerCard')+index);
+            const geometry=owner?.getUnitGeometry?.(side,index);
+            const artwork=project(geometry?.artworkProjection?.rect);
+            const hp=project(geometry?.hpProjection?.rect);
+            return {index,dom:!!card,slot:geometry?.slot||card?.dataset.slot||null,
+                artworkProjection:artwork.rect,hpProjection:hp.rect,artwork,hp};
+        });
+        const matches=(expected,actual)=>{
+            const keys=['left','top','width','height'];
+            const unmatched=actual.map((rect,index)=>({rect,index}));
+            const failures=[];
+            for(const entry of expected){
+                if(!entry.rect){
+                    failures.push({targetIndex:entry.index,reason:entry.reason,source:entry.source,expected:null});
+                    continue;
+                }
+                const position=unmatched.findIndex(candidate=>keys.every(key=>
+                    Math.abs(entry.rect[key]-candidate.rect[key])<=1.5));
+                if(position>=0){ unmatched.splice(position,1);continue; }
+                const nearest=unmatched.map(candidate=>({actualIndex:candidate.index,rect:candidate.rect,
+                    delta:Object.fromEntries(keys.map(key=>[key,candidate.rect[key]-entry.rect[key]]))}))
+                    .sort((a,b)=>keys.reduce((sum,key)=>sum+Math.abs(a.delta[key]),0)-
+                        keys.reduce((sum,key)=>sum+Math.abs(b.delta[key]),0))[0]||null;
+                failures.push({targetIndex:entry.index,reason:'unmatched-expected-rect',expected:entry.rect,nearestActual:nearest});
+            }
+            if(unmatched.length){ failures.push({reason:'unmatched-actual-rects',actual:unmatched}); }
+            return {matched:failures.length===0&&expected.length===actual.length,
+                tolerance:1.5,expectedCount:expected.length,actualCount:actual.length,failures};
+        };
+        // Retain every target, including missing/clipped projections: no silent filtering.
+        const expectedArt=diagnostics.map(item=>({index:item.index,...item.artwork}));
+        const expectedHp=diagnostics.map(item=>({index:item.index,...item.hp}));
+        const artGeometryDiagnostics=matches(expectedArt,artProjections);
+        const hpGeometryDiagnostics=matches(expectedHp,hpProjections);
+        return {skillId:state.config.id,sequence:state.sequence,side,indexes,artProjections,hpProjections,
+            targetDiagnostics:diagnostics,outlineCount:node.querySelectorAll('.team-relic-battle-target-outline').length,
+            artGeometryMatches:artGeometryDiagnostics.matched,hpGeometryMatches:hpGeometryDiagnostics.matched,
+            artGeometryDiagnostics,hpGeometryDiagnostics,
+            stageOwner:stage.dataset.geometryOwner||null,spriteOwner:sprite.dataset.geometryOwner||null,
+            spriteTargetSide:sprite.dataset.targetSide||null,spriteTargetIndexes:sprite.dataset.targetIndexes||'',
+            presentationLock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false};
+    }
+    const identityExpression=`(${captureIdentitySnapshot.toString()})()`;
+    const focusExpression=`(${captureFocusSnapshot.toString()})(${id})`;
+
     // Use production event owners in the disposable local battle fixture.
     // DEV preview is deliberately unavailable on the production host.
     await waitFor(client,`window.v174RelicDebugState?.()?.relicId===${id}`,relicId+" initialized battle owner",7000);
     await client.eval("(()=>{currentBattleMonsters.forEach(index=>{monsters[index].hp=Math.max(100000,monsters[index].hp);monsters[index].maxHP=Math.max(100000,monsters[index].maxHP||0);});return true;})()");
-    await client.eval("(()=>{window.__relicQaFinishRelease=FourSymbolsBattleFlow.interceptActionFinish(()=>!!battleDurationAction?.completed);return true;})()");
+    // Round/HP fixtures dispatch no Action completion; hold unrelated queue
+    // advances throughout their presentation. The counter fixture must still
+    // publish each real enemy Action completion before the same hold applies.
+    await client.eval("(()=>{const counterFixture="+JSON.stringify(relicId==="relic_nine_dragon_fire")+";window.__relicQaFinishRelease=FourSymbolsBattleFlow.interceptActionFinish(()=>!counterFixture||!!battleDurationAction?.completed);return true;})()");
     // Observe the finite VFX phase in the browser before triggering it. CDP
     // scheduling may return only after that phase has already completed.
-    await client.eval("(()=>{window.__relicQaFocusObserver?.disconnect();delete window.__relicQaFocusSnapshot;const capture=()=>{const snapshot="+focusExpression+";if(snapshot){window.__relicQaFocusSnapshot=snapshot;window.__relicQaFocusObserver.disconnect();}};window.__relicQaFocusObserver=new MutationObserver(capture);window.__relicQaFocusObserver.observe(document.body,{subtree:true,childList:true,attributes:true});return true;})()");
+    await client.eval("(()=>{window.__relicQaFocusObserver?.disconnect();delete window.__relicQaFocusSnapshot;delete window.__relicQaIdentitySnapshot;window.__relicQaProbe={calls:0};const capture=()=>{window.__relicQaProbe.calls++;const n=document.getElementById('teamRelicBattlePresentation');const img=n?.querySelector('.team-relic-battle-cutin-icon img');if(!window.__relicQaIdentitySnapshot&&n?.classList.contains('identity-visible')&&img?.complete&&img.naturalWidth>0){if(!window.FourSymbolsBattleStatistics?.openStatistics?.())return;window.__relicQaIdentitySnapshot="+identityExpression+";}const snapshot="+focusExpression+";const state=window.v143SkillAnimationState?.current;const stage=document.getElementById('v143-skill-stage');window.__relicQaProbe.last={at:Date.now(),requested:"+id+",identityCached:!!window.__relicQaIdentitySnapshot,focusCached:!!window.__relicQaFocusSnapshot,classes:n?.className,currentId:state?.config?.id,sequence:state?.sequence,done:state?.done,targets:state?.targetIndexes,stageSequence:stage?.dataset.sequence,spriteCount:stage?.querySelectorAll('.v143-vfx-sprite').length,matchingSprite:!!stage&&[...stage.querySelectorAll('.v143-vfx-sprite')].some(sprite=>sprite.dataset.skill==="+id+")};if(snapshot){window.__relicQaFocusSnapshot=snapshot;}if(window.__relicQaIdentitySnapshot&&window.__relicQaFocusSnapshot){window.__relicQaFocusObserver.disconnect();}};window.__relicQaFocusObserver=new MutationObserver(capture);window.__relicQaFocusObserver.observe(document.body,{subtree:true,childList:true,attributes:true});return true;})()");
     const before=await client.eval("window.v174RelicDebugState().totalTriggers");
     if(relicId==="relic_cold_spring_jade"){
         await client.eval("(()=>{const max=getPartyBattleStats(0).maxHP;player.hp=Math.floor(max*.4);settleBattleHpDamage(player,Math.ceil(max*.1),{attacker:monsters[currentBattleMonsters[0]],sourceType:'normalAttack',damageKind:'direct'});return true;})()");
@@ -542,13 +635,13 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     assert.equal(after,before+1,"Relic production event must trigger exactly once: "+relicId);
     await waitFor(
         client,
-        "(()=>{const n=document.getElementById('teamRelicBattlePresentation');const img=n?.querySelector('.team-relic-battle-cutin-icon img');return n?.classList.contains('identity-visible')&&img?.complete&&img.naturalWidth>0;})()",
+        "Boolean(window.__relicQaIdentitySnapshot)",
         relicId+" identity/icon",
         8000
     );
-    const readingOpened=await client.eval("Boolean(window.FourSymbolsBattleStatistics?.openStatistics?.())");
+    const readingOpened=await client.eval("Boolean(window.__relicQaIdentitySnapshot?.readingState)");
     assert.equal(readingOpened,true,relicId+" reading drawer did not open during cinematic");
-    const identity=await client.eval("(()=>{const n=document.getElementById('teamRelicBattlePresentation');const r=n.getBoundingClientRect();const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.();const img=n.querySelector('.team-relic-battle-cutin-icon img');return {parentIsBody:n.parentElement===document.body,name:n.querySelector('.team-relic-battle-cutin-copy strong')?.textContent||'',icon:img?.getAttribute('src')||'',visibility:getComputedStyle(n).visibility,opacity:getComputedStyle(n).opacity,readingState:document.body.classList.contains('v174-battle-reading-open'),rect:{left:r.left,top:r.top,width:r.width,height:r.height},overlay:overlay&&overlay.rect?{left:overlay.rect.left,top:overlay.rect.top,width:overlay.rect.width,height:overlay.rect.height}:null};})()");
+    const identity=await client.eval("window.__relicQaIdentitySnapshot");
     assert.equal(identity.parentIsBody,true,relicId+" presentation must be document-level");
     assert.ok(identity.name,relicId+" identity name missing");
     assert.ok(identity.icon,relicId+" identity icon missing");
@@ -567,13 +660,13 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     if(targetKind==="singleAlly"){ assert.equal(focus.side,"player");assert.equal(focus.indexes.length,1); }
     if(targetKind==="allyAll"){ assert.equal(focus.side,"player"); }
     if(targetKind==="enemyAll"||targetKind==="damageStatus"){ assert.equal(focus.side,"monster"); }
-    const expectedArtCount=focus.targetDiagnostics.filter(item=>item.artworkProjection).length;
-    const expectedHpCount=focus.targetDiagnostics.filter(item=>item.hpProjection).length;
-    assert.equal(focus.artProjections.length,expectedArtCount,relicId+" artwork projections must equal canonical target artwork geometry: "+JSON.stringify({mode,side:focus.side,indexes:focus.indexes,artProjections:focus.artProjections,targetDiagnostics:focus.targetDiagnostics}));
-    assert.equal(focus.hpProjections.length,expectedHpCount,relicId+" HP projections must equal canonical target HP geometry");
+    const expectedArtCount=focus.targetDiagnostics.length;
+    const expectedHpCount=focus.targetDiagnostics.length;
+    assert.equal(focus.artProjections.length,expectedArtCount,relicId+" artwork projections must equal canonical target artwork geometry: "+JSON.stringify({mode,...focus.artGeometryDiagnostics}));
+    assert.equal(focus.hpProjections.length,expectedHpCount,relicId+" HP projections must equal canonical target HP geometry: "+JSON.stringify(focus.hpGeometryDiagnostics));
     assert.equal(focus.outlineCount,0,relicId+" must not restore the retired full-Unit outline owner");
-    assert.equal(focus.artGeometryMatches,true,relicId+" foreground artwork projections must match canonical artwork geometry: "+JSON.stringify({artProjections:focus.artProjections,targetDiagnostics:focus.targetDiagnostics}));
-    assert.equal(focus.hpGeometryMatches,true,relicId+" foreground HP projections must match canonical HP geometry: "+JSON.stringify({hpProjections:focus.hpProjections,targetDiagnostics:focus.targetDiagnostics}));
+    assert.equal(focus.artGeometryMatches,true,relicId+" foreground artwork projections must match canonical artwork geometry: "+JSON.stringify(focus.artGeometryDiagnostics));
+    assert.equal(focus.hpGeometryMatches,true,relicId+" foreground HP projections must match canonical HP geometry: "+JSON.stringify(focus.hpGeometryDiagnostics));
     assert.equal(focus.stageOwner,"fixed-slot",relicId+" VFX stage must use Fixed Slot geometry");
     assert.equal(focus.spriteOwner,"fixed-slot",relicId+" VFX sprite must use Fixed Slot geometry");
     assert.equal(focus.spriteTargetSide,focus.side,relicId+" VFX target side drifted from focus side");
@@ -632,7 +725,27 @@ async function runBossReadingLayerQa(client,bossIndex){
     return {opened,completed};
 }
 
+async function installRelicPhaseLogpoints(client){
+    const bundle=fs.readdirSync('build').find(file=>/^gameplay-core-secondary\.[0-9a-f]{12}\.js$/.test(file));
+    assert.ok(bundle,"Relic diagnostic source bundle missing");
+    const lines=fs.readFileSync(path.join('build',bundle),'utf8').replace(/\r\n/g,'\n').split('\n');
+    await client.send('Debugger.enable');
+    await client.eval('window.__relicQaPhaseTrace=[];true');
+    const points=[['wait scheduled','function waitMs(ms)',null],['exit/target waits scheduled','return Promise.all([waitMs(RELIC_IDENTITY_EXIT_MS)',null],['exit/target waits complete','return Promise.all([waitMs(RELIC_IDENTITY_EXIT_MS)','.then(()=>node)'],['VFX phase','function enterRelicVfxPhase(node)',null],['VFX play','const relicGate=playRelicVfx(',null],['cinematic end','function endRelicCinematic(node)',null]];
+    const locations=[];
+    for(const [label,marker,completion] of points){
+        const lineNumber=lines.findIndex(line=>line.includes(marker));
+        assert.ok(lineNumber>=0,'Relic logpoint source missing: '+label);
+        const columnNumber=completion?lines[lineNumber].indexOf(completion)+'.then(()=>'.length:lines[lineNumber].indexOf(marker);
+        const condition="(()=>{const trace=window.__relicQaPhaseTrace;if(trace&&trace.length<160)trace.push({at:Date.now(),point:"+JSON.stringify(label)+",ms:typeof ms==='undefined'?null:ms,token:typeof battleToken==='undefined'?null:battleToken,relic:window.v174RelicDebugState?.()?.relicId,classes:document.getElementById('teamRelicBattlePresentation')?.className});return false;})()";
+        const result=await client.send('Debugger.setBreakpointByUrl',{urlRegex:bundle.replace(/\./g,'\\.')+'(?:\\?.*)?$',lineNumber,columnNumber,condition});
+        locations.push({label,lineNumber,columnNumber,locations:result.locations});
+    }
+    evidence.checks.relicPhaseLogpoints=locations;
+}
+
 async function runRelicPresentationModeMatrix(client){
+    await installRelicPhaseLogpoints(client);
     const modes=["normal","daily","abyss","tower","personal","world"];
     const relics=[
         ["relic_cold_spring_jade","singleAlly"],
@@ -641,6 +754,7 @@ async function runRelicPresentationModeMatrix(client){
         ["relic_nine_dragon_fire","damageStatus"]
     ];
     const matrix=[];
+    evidence.checks.relicPresentationProgress=[];
     const identityBaseline=new Map();
     for(const mode of modes){
         let context;
@@ -650,10 +764,12 @@ async function runRelicPresentationModeMatrix(client){
                 try{evidence.performanceBefore=await client.send("Performance.getMetrics");await client.send("Profiler.enable");await client.send("Profiler.start");evidence.profilerStarted=true;}
                 catch(captureError){evidence.performanceCaptureError=String(captureError.message);}
             }
+            evidence.checks.relicPresentationLastAttempt={mode,relicId,phase:"launch"};
             context=await launchPresentationQaMode(client,mode,relicId);
-            evidence.checks.relicPresentationProgress={mode,relicId,targetKind,completed:matrix};
+            evidence.checks.relicPresentationLastAttempt={mode,relicId,phase:"capture",context};
             const snapshot=await captureRelicPresentationQa(client,relicId,targetKind,mode);
             presentations.push(snapshot);
+            evidence.checks.relicPresentationProgress.push({mode,relicId,context,snapshot});
             const baseline=identityBaseline.get(relicId);
             if(!baseline){ identityBaseline.set(relicId,{name:snapshot.identity.name,icon:snapshot.identity.icon}); }
             else{
@@ -1684,6 +1800,9 @@ try{
     fs.writeFileSync(path.join(artifactDir,"battle-layer-audio-live-qa.json"),JSON.stringify(evidence,null,2)+"\n");
     console.log("Battle layer/audio live mobile QA: PASS");
 } catch(error){
+    // Failure evidence only: never alter the scene or release a production lock.
+    evidence.failureState=await client?.eval("(()=>({url:location.href,hidden:document.hidden,phaseTrace:window.__relicQaPhaseTrace,qaProbe:window.__relicQaProbe,qaIdentity:window.__relicQaIdentitySnapshot,qaFocus:window.__relicQaFocusSnapshot,party:typeof getExistingPartyIndexes==='function'?getExistingPartyIndexes().map(i=>({i,hp:getPartyCharacterByIndex(i)?.hp,id:getPartyCharacterByIndex(i)?.id})):[],sprites:[...document.querySelectorAll('#v143-skill-stage .v143-vfx-sprite')].map(n=>({className:n.className,dataset:{...n.dataset},visibility:getComputedStyle(n).visibility})),battleActive:typeof battleActive==='undefined'?null:battleActive,token:typeof battleToken==='undefined'?null:battleToken,phase:typeof battlePhase==='undefined'?null:battlePhase,turn:typeof turn==='undefined'?null:turn,advance:typeof battleAdvanceScheduled==='undefined'?null:battleAdvanceScheduled,action:typeof battleDurationAction==='undefined'||!battleDurationAction?null:{token:battleDurationAction.token,index:battleDurationAction.index,completed:battleDurationAction.completed},run:window.v132ActiveDungeonRun?{mode:v132ActiveDungeonRun.mode,gameplayMode:v132ActiveDungeonRun.gameplayMode}:null,enemyIndexes:typeof currentBattleMonsters==='undefined'?[]:currentBattleMonsters.slice(),relic:window.v174RelicDebugState?.(),presentation:window.v174RelicPresentationState?.(),animation:window.v143SkillAnimationState?.current?{id:v143SkillAnimationState.current.config.id,sequence:v143SkillAnimationState.current.sequence,targets:v143SkillAnimationState.current.targetIndexes,done:v143SkillAnimationState.current.done}:null,locks:window.FourSymbolsBattleFlow?.isPresentationActive?.(),nodes:['battlePage','v141BattleTransition','teamRelicBattlePresentation','v143-skill-stage'].map(id=>{const n=document.getElementById(id);return {id,exists:!!n,className:n?.className,dataset:n?{...n.dataset}:null,display:n?getComputedStyle(n).display:null};}),feedback:document.querySelectorAll('.battle-floating-feedback').length}) )()").catch(diagnosticError=>({unavailable:String(diagnosticError)}));
+    evidence.runtimeErrors=client?.events.filter(e=>e.method==='Runtime.exceptionThrown'||e.method==='Runtime.consoleAPICalled').slice(-20);
     evidence.status="FAIL";
     evidence.error=error?.stack||String(error);
     try{evidence.performanceAfter=await client.send("Performance.getMetrics");if(evidence.profilerStarted){evidence.cpuProfile=await client.send("Profiler.stop");}}

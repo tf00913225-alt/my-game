@@ -85,6 +85,7 @@
         const complete=snapshot&&requested.every(index=>!!slots.getEnemySlotForMonster(snapshot,index));
         if(!complete&&requested.length){
             snapshot=slots.createEnemyFormationSnapshot(requested,{
+                encounterMode:slots.getCurrentEncounterMode(),
                 originalFormationType:requested.length,
                 rankWeight:enemyRankWeight
             });
@@ -125,11 +126,12 @@
         const bossCard=Number.isInteger(bossIndex)?cards.get(bossIndex):null;
 
         const fragment=document.createDocumentFragment();
-        [slots.enemyBackSlots,slots.enemyFrontSlots].forEach((rowSlots,rowIndex)=>{
+        slots.getEnemyRenderSlotRows(snapshot).forEach((rowSlots,rowIndex)=>{
             const row=document.createElement("div");
             row.className="v-fixed-slot-row v-fixed-enemy-row";
             row.dataset.slotRow=rowIndex===0?"back":"front";
             row.dataset.geometryOwner="fixed-slot";
+            row.style.setProperty("--battle-enemy-columns",String(rowSlots.length));
             rowSlots.forEach(slot=>{
                 const holder=makeSlot("v-fixed-battle-slot v-fixed-enemy-slot",slot);
                 const index=slots.getAssignedMonsterAtEnemySlot(snapshot,slot);
@@ -160,6 +162,10 @@
         area.dataset.geometryOwner="fixed-slot";
         area.dataset.monsterCount=String(indexes.length);
         area.dataset.formationType=String(snapshot.originalFormationType||indexes.length);
+        area.dataset.battlefieldProfile=snapshot.battlefieldProfile;
+        const page=document.getElementById("battlePage");
+        if(page){ page.dataset.enemyBattlefieldProfile=snapshot.battlefieldProfile; }
+        area.dataset.migrationStatus=snapshot.migrationStatus;
         area.classList.toggle("gameplay-boss-active",!!bossCard);
     }
 

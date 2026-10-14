@@ -56,6 +56,11 @@ const v154Css=read("css/46-v154-dev-fixes.css").replace(/<\/style/gi,"<\\/style"
 const geometryCss=read("css/fixed-slot-battlefield-rendering-v2.css").replace(/<\/style/gi,"<\\/style");
 const bossCss=read("css/gameplay-boss-tower.css").replace(/<\/style/gi,"<\\/style");
 
+const presentationSource=read("js/54-v173.51-battle-qa.js");
+const portraitSource=presentationSource.slice(presentationSource.indexOf("function syncUnitArtwork("),presentationSource.indexOf("function clearUnitHud("));
+const portraitRegistry=JSON.parse(read("config/monster-portrait-registry.json")).presentation;
+const portraitSamples=Object.keys(portraitRegistry.assets).filter(p=>p.startsWith("assets/monsters/wild/zone-01/")).slice(0,6);
+
 function fixtureHtml(width,height){
     return `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
@@ -94,6 +99,10 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
 </script><script>${ownerSource}</script><script>${v131FormationSource}</script><script>${v131EnemyApplySource}</script><script>${adapterSource}</script><script>${feedbackSource}</script><script>${mainRenderHookSource}</script><script>${mainRenderSource}</script>
 <script>
 (function(){
+${portraitSource}
+ const portraitMetadata=${JSON.stringify(portraitRegistry)},portraitPaths=${JSON.stringify(portraitSamples)};
+ window.v154GetPortraitPresentation=function(path){return portraitMetadata.assets[path];};
+ window.v154GetPortraitScaleContract=function(){return portraitMetadata.classes;};
  const owner=window.FourSymbolsBattlefieldSlots,adapter=window.FourSymbolsBattlefieldRenderGeometry;
  function enemyCard(index){var c=document.createElement('div');c.id='battleMonster'+index;c.className='battle-monster '+(index===4?'abyss-unit':'');c.dataset.rank=window.monsters[index].rank;c.innerHTML='<div class="v174-battle-art"></div><div class="battle-monster-name v143-monster-identity">怪物'+index+'</div><div class="monster-status-badges"></div><div class="monster-hp"></div><div class="monster-sp"></div>';return c;}
  function allyCard(index){var c=document.createElement('div');c.id='battlePlayerCard'+index;c.className='battle-player';c.innerHTML='<div class="v174-battle-art"></div><div class="battle-player-id">角色'+index+'</div><div class="monster-status-badges"></div><div class="hp-bar"></div><div class="sp-bar"></div>';return c;}
@@ -203,7 +212,22 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
    queueSnapshot:feedbackQueueSnapshot,
    monster0Geometry:monster0FeedbackGeometry,monster1Geometry:monster1FeedbackGeometry,monster2Geometry:monster2FeedbackGeometry,
    player0Geometry:player0FeedbackGeometry,player1Geometry:player1FeedbackGeometry,player2Geometry:player2FeedbackGeometry
- },stageOverflow:getComputedStyle(stage).overflow,pageScroll:{width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight,clientWidth:document.documentElement.clientWidth,clientHeight:document.documentElement.clientHeight},enemySlots:document.querySelectorAll('.v-fixed-enemy-slot').length,allySlots:document.querySelectorAll('.v-fixed-ally-slot').length,legacyClasses:{enemy:document.getElementById('battleMonsterArea').className,ally:document.getElementById('battlePlayerRow').className}};document.getElementById('result').textContent=JSON.stringify(result);},40);
+ },stageOverflow:getComputedStyle(stage).overflow,pageScroll:{width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight,clientWidth:document.documentElement.clientWidth,clientHeight:document.documentElement.clientHeight},enemySlots:document.querySelectorAll('.v-fixed-enemy-slot').length,allySlots:document.querySelectorAll('.v-fixed-ally-slot').length,legacyClasses:{enemy:document.getElementById('battleMonsterArea').className,ally:document.getElementById('battlePlayerRow').className}};
+ function portraitProbe(mode){
+  window.FourSymbolsBossBattle=null;window.v132ActiveDungeonRun={mode:mode};addCards(6,6,false);
+  return portraitPaths.map(function(path,index){
+   const card=document.getElementById('battleMonster'+index);
+   card.v174UnitHud=card.querySelector('.v174-unit-hud');
+   syncUnitArtwork(card,'monster',{path:path,portraitKey:path});
+   const art=card.querySelector('.v174-battle-art'),paint=art.querySelector('.v174-portrait-paint'),r=paint.getBoundingClientRect(),a=art.getBoundingClientRect(),m=portraitMetadata.assets[path],b=m.alphaBounds;
+   const visible={left:r.left+r.width*b[0]/m.width,top:r.top+r.height*b[1]/m.height,right:r.left+r.width*b[2]/m.width,bottom:r.top+r.height*b[3]/m.height,width:r.width*(b[2]-b[0])/m.width,height:r.height*(b[3]-b[1])/m.height};
+   return {path:path,visible:visible,art:{left:a.left,top:a.top,right:a.right,bottom:a.bottom},slot:card.dataset.slot,hudTop:card.v174UnitHud.querySelector('.monster-hp').getBoundingClientRect().top};
+  });
+ }
+ result.portraits={legacy:portraitProbe('adventure'),six:portraitProbe('wild')};
+ result.sixProfile=document.getElementById('battleMonsterArea').dataset.battlefieldProfile;
+ result.sixRows=Array.from(document.querySelectorAll('.v-fixed-enemy-row')).map(row=>Array.from(row.children).map(slot=>slot.dataset.slot));
+document.getElementById('result').textContent=JSON.stringify(result);},40);
 })();
 </script></body></html>`;
 }
@@ -216,7 +240,7 @@ function runViewport(chrome,width,height){
     assert.equal(result.status,0,result.stderr||`browser fixture failed ${width}x${height}`);
     const match=result.stdout.match(/<pre id="result"[^>]*>([\s\S]*?)<\/pre>/);assert.ok(match,`missing QA result ${width}x${height}`);const data=JSON.parse(decode(match[1]));assert.ok(!data.fixtureError,data.fixtureError);
     if(width===412&&height===915){
-        const screenshot=path.join(ARTIFACT_DIR,"boss-battle-convergence-412x915.png");
+        const screenshot=path.join(ARTIFACT_DIR,"enemy-six-slots-412x915.png");
         const shot=spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--virtual-time-budget=1200",`--screenshot=${screenshot}`,fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});
         assert.equal(shot.status,0,shot.stderr||"Boss mobile screenshot failed");
         assert.ok(fs.existsSync(screenshot),"Boss mobile screenshot evidence missing");
@@ -267,7 +291,17 @@ function runViewport(chrome,width,height){
     );
     assert.ok(data.turnUi.targetSelecting.promptRect.bottom<=baseline.center.bottom+.5,"target prompt stays inside center region");
     close(baseline.elementBox.width,66,"element box width");close(baseline.elementBox.height,66,"element box height");
-    for(const count of [1,3,5,6,8,10]){const scenario=data.scenarios[count];assert.equal(scenario.slots,10);close(scenario.lower.enemy.height,baseline.enemy.height,`enemy region height count ${count}`);close(scenario.lower.center.height,baseline.center.height,`center region height count ${count}`);close(scenario.lower.ally.top,baseline.ally.top,`ally top count ${count}`);close(scenario.lower.middle.top,baseline.middle.top,`middle top count ${count}`);close(scenario.lower.action.top,baseline.action.top,`action top count ${count}`);scenario.unitRects.forEach(function(rect){close(rect.width,scenario.unitRects[0].width,`enemy card width count ${count}`);close(rect.height,scenario.unitRects[0].height,`enemy card height count ${count}`);assert.ok(rect.bottom<=scenario.lower.enemy.bottom+.5,`enemy card stays above center count ${count}`);});for(const shape of ["single","tri","row","column","all"]){close(scenario[shape].width,data.scenarios[1][shape].width,`${shape} width count ${count}`);close(scenario[shape].height,data.scenarios[1][shape].height,`${shape} height count ${count}`);close(scenario[shape].centerX,(scenario[shape].left+scenario[shape].right)/2,`${shape} centerX count ${count}`);close(scenario[shape].centerY,(scenario[shape].top+scenario[shape].bottom)/2,`${shape} centerY count ${count}`);}}
+    for(const count of [1,3,5,6,8,10]){const scenario=data.scenarios[count],profileBaseline=data.scenarios[count<=6?1:8].lower;assert.equal(scenario.slots,count<=6?6:10);close(scenario.lower.enemy.height,profileBaseline.enemy.height,`enemy region height count ${count}`);close(scenario.lower.center.height,profileBaseline.center.height,`center region height count ${count}`);close(scenario.lower.ally.top,profileBaseline.ally.top,`ally top count ${count}`);close(scenario.lower.middle.top,profileBaseline.middle.top,`middle top count ${count}`);close(scenario.lower.action.top,profileBaseline.action.top,`action top count ${count}`);scenario.unitRects.forEach(function(rect){close(rect.width,scenario.unitRects[0].width,`enemy card width count ${count}`);close(rect.height,scenario.unitRects[0].height,`enemy card height count ${count}`);assert.ok(rect.bottom<=scenario.lower.enemy.bottom+.5,`enemy card stays above center count ${count}`);});for(const shape of ["single","tri","row","column","all"]){close(scenario[shape].width,data.scenarios[count<=6?1:8][shape].width,`${shape} width count ${count}`);close(scenario[shape].height,data.scenarios[count<=6?1:8][shape].height,`${shape} height count ${count}`);close(scenario[shape].centerX,(scenario[shape].left+scenario[shape].right)/2,`${shape} centerX count ${count}`);close(scenario[shape].centerY,(scenario[shape].top+scenario[shape].bottom)/2,`${shape} centerY count ${count}`);}}
+    fs.writeFileSync(path.join(ARTIFACT_DIR,"six-slot-portrait-probe.json"),JSON.stringify(data.portraits,null,2));
+    assert.equal(data.sixProfile,"standard-six");
+    assert.deepEqual(data.sixRows,[["ENEMY_B1","ENEMY_B2","ENEMY_B3"],["ENEMY_F1","ENEMY_F2","ENEMY_F3"]]);
+    data.portraits.six.forEach((sample,index)=>{
+        const old=data.portraits.legacy[index];
+        assert.ok(sample.visible.width>=old.visible.width-.5,"portrait must not shrink");
+        assert.ok(sample.visible.left>=sample.art.left-.5&&sample.visible.right<=sample.art.right+.5,"complete alpha bounds stay in artwork width");
+        assert.ok(sample.visible.top>=sample.art.top-.5&&sample.visible.bottom<=sample.hudTop+.5,"portrait remains above HP HUD");
+    });
+    assert.ok(data.portraits.six.some((sample,index)=>sample.visible.height>data.portraits.legacy[index].visible.height*1.1),"three columns materially enlarge width-limited portraits");
     const allyBaseline=data.allyScenarios[1].lower;for(const count of [1,2,3,4,5,6]){const scenario=data.allyScenarios[count];assert.equal(scenario.slots,6);close(scenario.lower.ally.height,allyBaseline.ally.height,`ally zone height party ${count}`);close(scenario.lower.action.top,allyBaseline.action.top,`action top party ${count}`);scenario.unitRects.forEach(function(rect,index){close(rect.width,scenario.unitRects[0].width,`ally card width party ${count}`);close(rect.height,scenario.unitRects[0].height,`ally card height party ${count}`);assert.ok(rect.top>=scenario.lower.allyRegion.top-.5,`ally card stays below center party ${count}`);assert.ok(rect.bottom<=scenario.lower.allyRegion.bottom+.5,`ally card stays inside ally region party ${count}`);scenario.unitRects.slice(index+1).forEach(other=>assert.ok(rect.right<=other.left+.5||other.right<=rect.left+.5||rect.bottom<=other.top+.5||other.bottom<=rect.top+.5,`ally cards overlap party ${count}`));});scenario.hudRects.forEach(function(hud){assert.ok(hud.art.bottom<=hud.hp.top+.5,`ally art/HP overlap party ${count}`);assert.ok(hud.hp.bottom<=hud.sp.top+.5,`ally HP/SP overlap party ${count}`);assert.ok(hud.sp.bottom<=hud.name.top+.5,`ally SP/name overlap party ${count}`);assert.equal(hud.logicalHp,11);assert.equal(hud.logicalSp,11);});}assert.equal(data.splitAlly.assigned[1],"ALLY_B2");close(data.splitAlly.lower.ally.height,allyBaseline.ally.height,"split front/back ally zone height");
     assert.ok(data.scenarios[3].unitRects[0].height>100,"enemy cards are visibly taller than the previous 92px owner");
     assert.ok(data.allyScenarios[3].unitRects[0].height>116,"ally cards are visibly taller than the previous 86px owner");
