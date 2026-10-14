@@ -45,7 +45,7 @@ for(const level of [1,30,50,100]){
     assert.equal(wind.final.speed,wind.derived.speed*1.15);
     assert.equal(wind.profiles.element.metadata.evasionBonusPercent,15);
     const earth=MonsterBalance.preview({...spec,element:"earth"});
-    assert.equal(earth.final.maxHP,Math.round(earth.derived.maxHP*TOWER_MODE_PROFILE.hp*1.15));
+    assert.equal(earth.final.maxHP,Math.round(earth.derived.maxHP*TOWER_MODE_PROFILE.hp*1.15)+1500);
     assert.equal(earth.final.defense,Math.round(earth.derived.defense*1.15));
 }
 

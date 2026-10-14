@@ -528,7 +528,7 @@
         const identityKey=portraitKey||("tower-"+element+"-"+role+"-"+floor);
         return window.MonsterBalance.build({
             monsterKey:"tower."+element+"."+role+"."+identityKey,
-            name:name,level:floor,element:element,archetype:"balanced",
+            name:name,level:window.MonsterBalance.towerLevelForFloor(floor),element:element,archetype:"balanced",
             rank:rank,mode:"tower",context:"tower/floor/"+floor
         });
     }

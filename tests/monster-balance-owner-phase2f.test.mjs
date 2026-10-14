@@ -96,7 +96,7 @@ test('288 frozen starting-dev projections preserve every prior-mode numerical pr
  assert.equal(evidence.sourceHead,'9fff3664d2767739fe8cd5c893f2985f8032d5ef');
  assert.equal(evidence.rows.length,288);
  assert.deepEqual([...new Set(evidence.rows.map(r=>r.spec.mode))].sort(),['abyss','adventure','daily','tower','wild']);
- for(const row of evidence.rows){const p=MonsterBalance.preview(row.spec);assert.deepEqual(p.allocation,row.allocation);assert.deepEqual(p.final,row.final);assert.equal(p.finalDamagePressure,row.pressure);}
+ for(const row of evidence.rows){const p=MonsterBalance.preview(row.spec);assert.deepEqual(p.allocation,row.allocation);const bonus=['tower','abyss'].includes(row.spec.mode)?({regular:1500,elite:4500,smallBoss:10000}[row.spec.rank]||0):0;assert.deepEqual(p.final,{...row.final,maxHP:row.final.maxHP+bonus});assert.equal(p.finalDamagePressure,row.pressure);}
 });
 
 test('all thirteen Boss definitions, four stage gameplay schedules and six objects preserve the starting-dev contract',()=>{

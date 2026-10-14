@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {evaluateChallengeDiagnostic} from './lib/challenge-diagnostic-gate.mjs';
 import {fileURLToPath} from 'node:url';
 import {loadLegacyRuntime} from './monster-balance-shadow-matrix.mjs';
 
@@ -28,7 +29,7 @@ export function buildAbyssTtkMatrix({randomPolicy='neutral',caseFilter=null}={})
       FourSymbolsBattlefieldSlots.clearActiveEnemySnapshot();
       v131GrantElementBoxHours(1,32);autoConfig.enabled=true;autoConfig.skill=reference.skill;autoBattle=true;for(const i of getExistingPartyIndexes()){const config=getPartyAutoConfig(i);config.enabled=true;config.skill=reference.skill;}
       const initialParty=getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp);
-      const initialMonsters=roster.map(m=>({name:m.name,rank:m.rank,level:m.level,element:m.element,hp:m.maxHP,sp:m.maxSP,attack:m.attack,magicAttack:m.magicAttack,defense:m.defense,speed:m.agility,owner:m.balanceOwner||'legacy',pressure:getEnemyPressureMultiplier(m,player),skillFrequency:m.skillChance,skillIds:m.skillIds,supportIds:m.v141SupportSkillIds||[]}));
+      const initialMonsters=roster.map(m=>({spec:m.balanceProjection.identity,name:m.name,rank:m.rank,level:m.level,element:m.element,hp:m.maxHP,sp:m.maxSP,attack:m.attack,magicAttack:m.magicAttack,defense:m.defense,speed:m.agility,owner:m.balanceOwner||'legacy',pressure:getEnemyPressureMultiplier(m,player),skillFrequency:m.skillChance,skillIds:m.skillIds,supportIds:m.v141SupportSkillIds||[]}));
       let rounds=0,firstRoundParty=null;const skills=[],controlRolls=[];const badgeOwner=showMonsterSkillNameBadge,statusRollOwner=rollStatusEffectHit;
       rollStatusEffectHit=function(...args){const hit=statusRollOwner(...args);if(args[5])controlRolls.push({round:turn,targetRank:args[6],chance:calculateStatusEffectChance(...args),hit});return hit;};
       showMonsterSkillNameBadge=function(name,...args){skills.push(name);return badgeOwner(name,...args);};
@@ -49,9 +50,7 @@ export function buildAbyssTtkMatrix({randomPolicy='neutral',caseFilter=null}={})
     rows.push(row);
   }
   const failures=rows.filter(r=>!r.clear||r.survivors===0);
-  const unexpectedLosses=failures.filter(r=>!(r.difficulty===40&&r.partyLevel===40&&r.region===4&&r.stage===4));
-  const instantWipes=rows.filter(r=>r.firstRoundParty.every(hp=>hp<=0));
-  const gate={passed:unexpectedLosses.length===0&&instantWipes.length===0,policy:'All unlock/+10/+20 references clear+survive, except the explicitly retained unequipped two-member Lv40 final challenge loss. Final +10/+20 three-member references must clear; no first-round wipe, no 2-round target.',unexpectedLosses,instantWipes};
+  const gate=evaluateChallengeDiagnostic(rows,'abyss');
   return {gate,randomPolicy,workId:'MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004',method:'Formal Abyss roster, current player stat/skill owners, the actual shared launch, two-wave controller, Core Queue, enemy AI, damage/status and round-end owners under a deterministic diagnostic timer. Default neutral0.5 or per-case seeded LCG rolls recorded in randomPolicy/randomSeed; two members below Lv50, three from Lv50, no equipment; animation lifecycle requires separate Chrome evidence.',cases:rows.length,failures,rows};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){

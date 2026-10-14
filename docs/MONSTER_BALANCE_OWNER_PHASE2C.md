@@ -11,6 +11,10 @@ Phase2C COMPLETE: PR #788 MERGED; final Head 17f0c3116b298334bd0eb15ce1c8c13def5
 Requirement: 1/1 VERIFIED. This phase did not modify main.
 Current seven-mode migration status: [COMPLETE](MONSTER_BALANCE_OWNER_FINAL.md).
 
+Current Tower/Abyss difficulty acceptance is owned by
+[the 2026-10-13 calibration contract](MONSTER_BALANCE_OWNER_FINAL.md#current-challenge-calibration-and-acceptance--2026-10-13).
+Historical floor=level and guaranteed-clear thresholds below are superseded.
+
 ## Historical implementation and verification record
 
 Below are source-time specifications, checkpoints and stop instructions. Later

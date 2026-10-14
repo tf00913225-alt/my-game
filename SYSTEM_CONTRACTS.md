@@ -156,9 +156,9 @@
 
 ## Four-Symbol Tower Formation／Small Boss 契約
 
-- 四象塔每個元素、每層（含第 100 層）固定 10 個真實戰鬥單位，唯一格位 `B1...B5 + F1...F5`。一般層 10 Regular；每 5 層且非 10 倍數為 2 Elite + 8 Regular；每 10 層為 1 Tower Boss + 2 Elite + 7 Regular。All 結算所有存活目標；其他目標形狀不變。
-- 10 人 Boss 層 `ENEMY_B3` 永遠是唯一 Tower Boss；沒有 Boss 的 10 人特殊層，`ENEMY_B3` 優先為 Elite。死亡後 Slot 不重排、不補位。
-- Tower Boss gameplay `rank="boss"`，但不是 Large Boss entity：固定單格 `ENEMY_B3`、`unitKind="tower-boss"`、不啟用 `FourSymbolsBossBattle` 的中央六格 footprint、B1/B5 援軍、F1/F5 Boss objects、Boss Shield／Mechanism Inspector。
+- 四象塔每層由正式波次 Owner 管理兩波，每波六名，唯一格位 `ENEMY_B1/B2/B3 + ENEMY_F1/F2/F3`。普通層兩波各六 Regular；精英層第一波六 Regular、第二波二 Elite 四 Regular；Boss 層第一波六 Elite、第二波一 Tower Boss 五 Elite。All 僅結算目前波次所有存活目標。
+- 第二波 Boss 層 `ENEMY_B2` 是唯一 Tower Boss 的中央格位。死亡後 Slot 不重排、不補位。
+- Tower Boss gameplay `rank="boss"`，但不是 Large Boss entity：固定單格 `ENEMY_B2`、`unitKind="tower-boss"`、不啟用 `FourSymbolsBossBattle` 的中央六格 footprint、B1/B5 援軍、F1/F5 Boss objects、Boss Shield／Mechanism Inspector。
 - Large Boss 架構只保留 Personal Boss 與 World Boss；Abyss 仍使用自己的正式編成 Owner。
 - Tower Boss portrait `sizeClass="standard"`，正式規格 1024×1536、2:3；`rank` 與 portrait `sizeClass` 不得混為同一語意。
 

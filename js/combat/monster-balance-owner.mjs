@@ -35,6 +35,12 @@ export const WORLD_BOSS_STAGE_PROFILES=Object.freeze([
   Object.freeze({number:4,hp:1,damage:1.12})
 ]);
 export const ABYSS_STAGE_HP=Object.freeze([0.90,0.95,1,1.05,1.10]);
+// Fixed post-profile HP bonuses for the two challenge modes only.
+export const CHALLENGE_FLAT_HP=Object.freeze({regular:1500,elite:4500,smallBoss:10000});
+export function towerLevelForFloor(floor){
+  if(!Number.isInteger(floor)||floor<1||floor>100)throw new RangeError('Tower floor must be 1..100');
+  return floor<=20?40:floor<=40?60:floor<=60?80:100;
+}
 const clone=value=>JSON.parse(JSON.stringify(value));
 function normalizeSpec(spec){
   if(!spec||typeof spec!=='object') throw new TypeError('monster spec required');
@@ -114,18 +120,20 @@ function preview(spec){
   const afterRank={...derived,maxSP:derived.maxSP*(rank.sp||1),maxHP:derived.maxHP*rank.hp,defense:derived.defense*rank.defense};
   const afterMode={...afterRank,maxHP:afterRank.maxHP*mode.hp*(mode.partySizeDurability||1)*stage.hp,maxSP:afterRank.maxSP*mode.sp,physicalAttack:afterRank.physicalAttack*(identity.mode!=='wild'?1:mode.damage),magicAttack:afterRank.magicAttack*(identity.mode!=='wild'?1:mode.damage),defense:afterRank.defense*mode.defense,speed:afterRank.speed*mode.speed};
   const afterElement={...afterMode,maxHP:Math.round(afterMode.maxHP*element.hp),defense:['wild','daily'].includes(identity.mode)?afterMode.defense:Math.round(afterMode.defense*element.defense),speed:afterMode.speed*element.speed};
-  const final={...afterElement,maxHP:afterElement.maxHP*globalCalibration.hp,maxSP:afterElement.maxSP*globalCalibration.sp,physicalAttack:afterElement.physicalAttack*globalCalibration.damage,magicAttack:afterElement.magicAttack*globalCalibration.damage,defense:afterElement.defense*globalCalibration.defense};
+  const challengeBonus=['tower','abyss'].includes(identity.mode)?CHALLENGE_FLAT_HP[identity.rank]||0:0;
+  const final={...afterElement,maxHP:afterElement.maxHP*globalCalibration.hp+challengeBonus,maxSP:afterElement.maxSP*globalCalibration.sp,physicalAttack:afterElement.physicalAttack*globalCalibration.damage,magicAttack:afterElement.magicAttack*globalCalibration.damage,defense:afterElement.defense*globalCalibration.defense};
   return {identity,base,resourceBase:{...RESOURCE_BASE,speed:0},allocation,derived,profiles,final,finalDamagePressure:rank.finalDamagePressure*mode.damage*stage.damage,legacyMultiplier:'NONE',...(identity.mode==='daily'?{skillFrequency:mode.skillFrequency}:{}),provenance:{stats:'MonsterBalance',damagePressure:'MonsterBalance Rank Profile consumed once by core damage settlement'},aiIntent:clone(ARCHETYPES[identity.archetype].aiIntent),pendingProductDecisions:[],breakdown:[
     {step:'levelBase',formula:'30 + (level - 1) * growth; budget = (level - 1) * 5',input:identity.level,output:{...base}},
     {step:'allocation',method:'largest remainder; canonical STAT_ORDER ties',weights:{...ARCHETYPES[identity.archetype].weights},output:{...allocation}},
     {step:'sixStatConversion',coefficients:{...SIX_STAT_COEFFICIENTS},resourceBase:{...RESOURCE_BASE},output:{...derived}},
     {step:'rank',profile:{...rank},output:afterRank},{step:'mode',profile:clone(mode),output:afterMode},
-    {step:'element',profile:clone(element),output:afterElement},{step:'globalCalibration',profile:{...globalCalibration},output:{...final}}
+    {step:'element',profile:clone(element),output:afterElement},{step:'globalCalibration',profile:{...globalCalibration},output:{...final}},
+    {step:'challengeFlatHp',mode:identity.mode,rank:identity.rank,bonus:challengeBonus,appliedOnce:true}
   ]};
 }
 function previewTower(spec,floor){
   validateLevel(floor);
-  return preview({...spec,mode:'tower',context:'tower/floor/'+floor,level:floor});
+  return preview({...spec,mode:'tower',context:'tower/floor/'+floor,level:towerLevelForFloor(floor)});
 }
 function previewTowerRoster(spec,floor){
   validateLevel(floor);
@@ -145,4 +153,4 @@ function debug(entity){
   if(!entity||entity.balanceOwner!=='MonsterBalance'||!entity.balanceProjection) throw new TypeError('Owner entity required');
   return clone(entity.balanceProjection);
 }
-export const MonsterBalance=Object.freeze({preview,build,debug,previewTower,previewTowerRoster,archetypes:ARCHETYPES,modes:MODES,ranks:RANKS,globalCalibration:GLOBAL_CALIBRATION});
+export const MonsterBalance=Object.freeze({preview,build,debug,previewTower,previewTowerRoster,towerLevelForFloor,archetypes:ARCHETYPES,modes:MODES,ranks:RANKS,globalCalibration:GLOBAL_CALIBRATION});
