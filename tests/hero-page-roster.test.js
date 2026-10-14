@@ -17,61 +17,49 @@ function runtime(hostname='production.invalid'){
  ctx.window=ctx;ctx.getCharacters=()=>[ctx.player,ctx.player2,ctx.player3];vm.createContext(ctx);vm.runInContext(adapter+'\n'+roster+'\n'+ui,ctx);
  return {ctx,alerts};
 }
-test('production locked heroes remain browseable without unlock, stats or roster mutation',()=>{
- const {ctx:c}=runtime(),before=c.FourSymbolsHeroSystem.getDomain().serialize();
- const data=c.getHeroPageSnapshot();assert.equal(data.heroes.length,2);assert.equal(data.heroes[0].level,18);
- assert.ok(data.heroes.every(hero=>!hero.eligible&&!hero.owned&&hero.stats===null));
- assert.match(c.renderHeroPageContent(),/尚未解鎖/);assert.match(c.renderHeroPageContent(),/heroRosterToggle[^>]*disabled/);
- c.toggleHeroPageRoster(ids[0]);assert.equal(c.FourSymbolsHeroBattle.getRoster().length,0);
- assert.deepEqual(c.FourSymbolsHeroSystem.getDomain().serialize(),before);
+test('overview shows only canonical owned heroes; DEV battle previews do not become owned cards',()=>{
+ const {ctx:c}=runtime('dev.four-symbols-dev.pages.dev');
+ assert.ok(c.getHeroPageSnapshot().heroes.every(hero=>hero.eligible&&!hero.owned));
+ assert.match(c.renderHeroPageContent(),/目前沒有已擁有英雄/);
+ assert.doesNotMatch(c.renderHeroPageContent(),/class="hero-card"/);
+ assert.doesNotMatch(c.renderHeroPageContent(),/免費休息|休戰|heroRosterTab/);
 });
-test('owned progression and level/skill/base-stat projections come from formal domain',()=>{
- const {ctx:c}=runtime();let domain=c.FourSymbolsHeroSystem.getDomain();
- c.FourSymbolsHeroSystem.replaceAccountState(domain.unlockHeroDirect(ids[0],123));
- c.FourSymbolsHeroAcquisition={getEntitlement:id=>id===ids[0]?{heroId:id,allocationSeed:123}:null};
- domain=c.FourSymbolsHeroSystem.getDomain();c.FourSymbolsHeroSystem.replaceAccountState(domain.addSpecificFragments(ids[0],50));
- domain=c.FourSymbolsHeroSystem.getDomain();c.FourSymbolsHeroSystem.replaceAccountState(domain.starUpHero(ids[0]));
- const hero=c.getHeroPageSnapshot().heroes[0];assert.equal(hero.account.stars,1);assert.equal(hero.account.specificFragments,25);
- assert.equal(hero.level,18);assert.equal(hero.skill.level,2);assert.equal(hero.stats.magicAttack,202);
- assert.deepEqual(plain(hero.points),plain(c.FourSymbolsHeroSystem.getDomain().getHeroAllocatedStats(ids[0])));
+function own(c){
+ c.FourSymbolsHeroAcquisition={getEntitlement:id=>({heroId:id,allocationSeed:123})};
+}
+test('element filters share Core elements, fixed order and stable formation-first sorting',()=>{
+ const {ctx:c}=runtime();own(c);
+ const formation={version:2,characterIndexToSlot:{0:'ALLY_F1',1:'ALLY_F3'},heroIdToSlot:{vajraHeavenlyKing:'ALLY_B1',divineDogHongbao:'ALLY_B3'}};
+ c.FourSymbolsTeamFormationPolicy=require('../functions/src/team-formation-policy');
+ c.FourSymbolsTeamFormation={getConfirmed:()=>formation};
+ const all=c.renderHeroPageContent();assert.ok(all.indexOf('金剛天王')<all.indexOf('神犬紅包'));
+ assert.match(all,/全部[\s\S]*火[\s\S]*水[\s\S]*風[\s\S]*土/);
+ c.filterHeroPage('fire');const fire=c.renderHeroPageContent();assert.match(fire,/神犬紅包/);assert.doesNotMatch(fire,/金剛天王/);
+ c.filterHeroPage('water');assert.doesNotMatch(c.renderHeroPageContent(),/class="hero-card"/);
+ c.filterHeroPage('all');assert.equal((c.renderHeroPageContent().match(/class="hero-card"/g)||[]).length,2);
+ assert.deepEqual(Array.from(c.FourSymbolsHeroBattle.getRoster()),ids.slice().reverse());
+ const css=fs.readFileSync('css/49-v169-rpg-ui.css','utf8');assert.match(css,/\.hero-card-grid\{[^}]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+});
+test('full detail subpage preserves Core skill/stats/star controls and escapes content',()=>{
+ const {ctx:c}=runtime();own(c);c.selectHeroPage(ids[0]);
  c.skillDatabase.phoenixCry.description='<img src=x onerror=alert(1)>';
- const html=c.renderHeroPageContent();assert.match(html,/&lt;img src=x onerror=alert\(1\)&gt;/);assert.doesNotMatch(html,/<img src=x/);
+ const html=c.renderHeroPageContent();assert.match(html,/hero-detail-back/);assert.match(html,/基礎戰鬥數值/);assert.match(html,/火鳳天鳴 Lv.2/);
+ assert.match(html,/HeroGrowth.mutate[\s\S]*starUp/);assert.match(html,/&lt;img src=x onerror=alert\(1\)&gt;/);assert.doesNotMatch(html,/<img src=x/);
+ c.returnHeroOverview();assert.match(c.renderHeroPageContent(),/hero-card-grid/);
 });
-test('DEV UI toggles 0/1/2 heroes, reorders and resets the same battle roster without Save changes',()=>{
- const {ctx:c}=runtime('dev.four-symbols-dev.pages.dev'),before=c.FourSymbolsHeroSystem.getDomain().serialize();
- const snapshot=c.getHeroPageSnapshot();assert.ok(snapshot.heroes.every(hero=>hero.eligible&&!hero.owned));
- const copy=c.FourSymbolsHeroBattle.getRoster();copy.length=0;assert.equal(c.FourSymbolsHeroBattle.getRoster().length,2);
- c.moveHeroPageRoster(ids[1],-1);assert.deepEqual(Array.from(c.FourSymbolsHeroBattle.getRoster()),ids.slice().reverse());
- assert.deepEqual(Array.from(c.initializeHeroBattleCombatants(),hero=>hero.heroId),ids.slice().reverse());
- c.toggleHeroPageRoster(ids[0]);assert.equal(c.initializeHeroBattleCombatants().length,1);
- c.toggleHeroPageRoster(ids[1]);assert.equal(c.initializeHeroBattleCombatants().length,0);
- c.toggleHeroPageRoster(ids[0]);assert.equal(c.initializeHeroBattleCombatants().length,1);
- c.resetHeroPageRoster();assert.equal(c.initializeHeroBattleCombatants().length,2);
- assert.deepEqual(c.FourSymbolsHeroSystem.getDomain().serialize(),before);
- c.switchHeroPageTab('roster');assert.match(c.renderHeroPageContent(),/本次登入期間有效/);
- assert.equal((c.renderHeroPageContent().match(/<li class="hero-roster-slot/g)||[]).length,3);
+test('battle uses saved stable Hero IDs and projects six slots without changing Hero growth',()=>{
+ const {ctx:c}=runtime();own(c);const before=JSON.stringify(c.FourSymbolsHeroSystem.getDomain().serialize());
+ let projected=0;
+ c.FourSymbolsTeamFormationPolicy=require('../functions/src/team-formation-policy');
+ c.FourSymbolsTeamFormation={getConfirmed:()=>({heroIdToSlot:{vajraHeavenlyKing:'ALLY_F2',divineDogHongbao:'ALLY_B3'}}),projectToBattle:()=>{projected++;}};
+ assert.deepEqual(Array.from(c.initializeHeroBattleCombatants(),hero=>hero.heroId),ids.slice().reverse());assert.equal(projected,1);
+ assert.equal(JSON.stringify(c.FourSymbolsHeroSystem.getDomain().serialize()),before);
+ assert.equal(c.FourSymbolsHeroBattle.setRoster,undefined);
 });
-test('battle-time UI requests cannot mutate roster, actor identity or transient state',()=>{
- const {ctx:c,alerts}=runtime('dev.four-symbols-dev.pages.dev');const actors=c.initializeHeroBattleCombatants();
- actors[0].hp=12;actors[0].rage=9;c.battleActive=true;
- const before=JSON.stringify(actors);c.toggleHeroPageRoster(ids[0]);c.moveHeroPageRoster(ids[1],-1);c.resetHeroPageRoster();
- assert.equal(alerts.length,3);assert.equal(JSON.stringify(actors),before);
- assert.deepEqual(Array.from(c.FourSymbolsHeroBattle.getRoster()),ids);
- assert.match(c.renderHeroPageContent(),/戰鬥中無法更動/);assert.match(c.renderHeroPageContent(),/heroRosterToggle[^>]*disabled/);
-});
-test('missing created players cannot project stats or enable roster editing',()=>{
- const {ctx:c}=runtime('dev.four-symbols-dev.pages.dev');c.player=null;c.player2=null;
- const snapshot=c.getHeroPageSnapshot();assert.equal(snapshot.editingAllowed,false);assert.ok(snapshot.heroes.every(hero=>hero.stats===null&&hero.level===null));
- assert.match(c.renderHeroPageContent(),/heroRosterToggle[^>]*disabled/);
-});
-test('three-Hero UI capacity uses a disposable domain fixture, never the production registry',()=>{
- const {ctx:c}=runtime();const defs=core.listHeroDefinitions().concat({...core.getHeroDefinition(ids[0]),heroId:'fixtureThirdHero',name:'第三名測試英雄'});
- const domain={listHeroDefinitions:()=>defs,isHeroUnlocked:()=>true,getHeroDefinition:id=>defs.find(def=>def.heroId===id),
-  getHeroAccountState:id=>({heroId:id,stars:0,specificFragments:0}),getHeroLevel:()=>18,getHeroAllocatedStats:()=>({attack:4}),
-  getHeroBaseStats:c.calculateCharacterBaseStats,getHeroSkillProjection:()=>({level:2,definition:c.skillDatabase.phoenixCry})};
- c.FourSymbolsHeroSystem={getDomain:()=>domain};
- assert.equal(c.getHeroPageSnapshot().roster.length,3);assert.equal(c.initializeHeroBattleCombatants().length,3);
- c.switchHeroPageTab('roster');assert.equal((c.renderHeroPageContent().match(/<li class="hero-roster-slot/g)||[]).length,3);
- assert.match(c.renderHeroPageContent(),/第三名測試英雄/);assert.throws(()=>c.FourSymbolsHeroBattle.setRoster(defs.map(def=>def.heroId).concat('fourth')),/invalid/);
- assert.equal(core.listHeroDefinitions().length,2);
+test('both entrances share one renderer/controller; obsolete list and write handlers are retired',()=>{
+ const mainCity=fs.readFileSync('js/16-stage-v54-main-city-runtime.js','utf8'),formation=fs.readFileSync('js/25-v131-fix-batch.js','utf8');
+ assert.match(mainCity,/openSharedFormation/);assert.match(main,/openSharedFormation\('hero'\)/);
+ assert.match(formation,/FourSymbolsTeamFormation\.save\(value\)/);assert.match(formation,/pointerdown[\s\S]*pointermove[\s\S]*pointerup[\s\S]*pointercancel/);
+ assert.doesNotMatch(formation,/vFixedSelectFormationSlot|vFixedFormationSelectedCharacter/);
+ assert.doesNotMatch(main,/function toggleHeroPageRoster|function moveHeroPageRoster|function resetHeroPageRoster/);
 });

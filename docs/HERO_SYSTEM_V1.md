@@ -1,5 +1,25 @@
 # Hero System V1 — Phase 1, Phase 2A, Phase 2B and Phase 2C UI
 
+## Hero UI V2 / persisted team formation — HERO-UI-V2-20261013
+
+使用者於 2026-10-13 明確授權英雄編隊／站位保存契約擴充；技能維持自動升級。本節取代下方歷史 Phase 2A/2C 的 session-only UI／編隊說明，歷史證據保留。
+
+英雄首頁／完整詳情生命週期仍由 `js/00-main.js` 擁有。首頁只列正式已擁有英雄，每排三張，依 Core 元素篩選，已上陣英雄依六格順序優先；詳情沿用能力、怒氣技能、取得與成長接口。英雄頁移除休息入口及舊編隊清單，其他系統使用的休息函式／資料不刪除。立繪沿用 `getCharacterBattleArtworkPath` 的兩張 `assets/heroes/*.webp`；戰場背景讀取 `mapZoneBackgroundImages.forest`，不產生新素材、不啟動戰鬥。
+
+舊 `heroBattleSelection`、`setRoster` 與 `useUnlockedRoster` 已退休；戰鬥只讀取確認後的同一 formation。未配置的 exact DEV battle preview 維持既有唯讀測試投影，不能透過英雄 UI 保存試用所有權。
+
+兩入口皆由 `openSharedFormation` 經唯一 feature loader 開啟 `openHomeFeature('formation')`。唯一佈陣 renderer／Pointer Events owner：`js/25-v131-fix-batch.js`；唯一 Client 確認／保存來源：`js/team-formation-client.js::FourSymbolsTeamFormation`。六格／前後排取原 `FourSymbolsBattlefieldSlots`。拖曳、點選後點格位、交換與英雄移出共用同一保存接口；玩家角色仍全部上陣，上限 3 玩家＋最多 3 英雄。
+
+原 `account/current.formation` v2：`{version:2,characterIndexToSlot:{0..2:ALLY_*},heroIdToSlot:{heroId:ALLY_*}}`。英雄以穩定 ID 保存，格位順序投影為戰鬥索引 3..5，戰鬥前重新投影；不保存戰鬥物件、HP／怒氣／技能等級。`functions/src/team-formation-policy.js` 是共用儲存／合法性契約；戰場座標及 render 仍由原 Slot Owner 控制。全隊位置唯一，只接納現存玩家與正式已擁有英雄、六格內且最多三名英雄。
+
+`functions/src/team-formation.js` 的 `readTeamFormation`／`saveTeamFormation` 重用 `hero-growth.js::readInTransaction` 的 canonical source／snapshot／archive／entitlement 驗證，並使用既有 active-session transaction。保存只接受位置意圖、expected revision、operation ID，不接受本機所有權旗標、星級、資源或完整存檔。既有 account／progress、同 revision sources、snapshot、recovery archive、不可變 operation／ledger 與 envelope revision 原子保存。重試核對原始意圖／收據／封存；未知結果保留相同操作，不顯示成功。
+
+重新登入透過受保護 read 恢復有限編隊資料；UID／Session 變更丟棄在途回應及 proof；戰鬥中的 read 延至下一場前套用。舊 v1／null 與歷史封存保留，v2 只在明確成功保存時寫入，不回填歷史、不改 migration acceptance。UID local save 可保留確認的 v2 快取，但快取不提供正式編隊權威。無 canonical character 或雲端拒絕時阻擋保存；這不宣稱完整換機角色恢復。
+
+Cloud gate：持久化編隊／重新登入恢復是使用者本次明定驗收，省略將直接阻擋目標。沒有 Client Gameplay→Server、戰鬥公式複製或 server combat lifecycle；只新增必要 bounded read/write callable，重用既有資料路徑。`authoritativeStateReady:false` 及完整 Cloud Save publication／migration／recovery Gate 維持。PR 不合併；新 callable 需既有 dev workflow 部署後才能於 DEV 使用。
+
+Regression：`cloud-save-team-formation.test.mjs`、`hero-page-roster.test.js` 與既有 Core／growth／battle／snapshot tests。既有 `run-hero-page-browser-qa.mjs` 驗證完整 bundle 的手機／桌面輸入與幾何；隔離 transport 不是正式部署證據。既有 Session Authority emulator gate 加驗保存、takeover 讀回、舊裝置拒絕與 archive／ledger／rules，不新增 workflow。最新 Head／CI／部署／待辦由 Work PR 記錄。
+
 ## Formal growth — HERO-GROWTH-20261012
 
 User scope: fragment unlock, star-up and marrow reroll UI, legal atomic resource consumption and idempotency. Formal resource issuance remains a later scope. Exact DEV hostname may activate a disposable in-memory fixture (500 fragments per registered Hero, 5 marrow pills); reopening cannot refill it, reload/account/session reset discards it, and it never calls a grant endpoint or writes Save/rights. The main-city former rest entry now opens Hero System directly; free rest remains accessible from its footer.

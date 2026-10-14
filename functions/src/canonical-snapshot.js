@@ -55,11 +55,87 @@ function inspectPlayableCharacterState(state){
 // missing-character defaults or battle execution. Null remains uninitialized.
 function inspectPlayableFormation(formation,slots){
     if(formation==null){return;}
+    if(formation.version===2){
+        if(Object.keys(formation.characterIndexToSlot||{}).sort().join("|")!==slots.flatMap((id,index)=>id===null?[]:[String(index)]).join("|"))fail("complete formation state");
+        return;
+    }
     if(!object(formation)||Object.keys(formation).sort().join("|")!=="characterIndexToSlot|version"||
        !object(formation.characterIndexToSlot)||
        Object.keys(formation.characterIndexToSlot).sort().join("|")!==
            slots.flatMap((id,index)=>id===null?[]:[String(index)]).join("|")){
         fail("complete formation state");
+    }
+}
+
+// Retained Client achievement storage only. Markers never prove eligibility,
+// create a claim or authorize rewards; catalogue reconciliation is separate.
+function inspectAchievementState(state){
+    if(!object(state)||Object.entries(state).some(([id,claimed])=>
+       !ID.test(id)||typeof claimed!=="boolean")){
+        fail("achievement claim markers");
+    }
+}
+
+// Recorded Client quest storage only. No rollover, catalogue eligibility,
+// completion calculation or reward/claim authorization is performed here.
+function recordedDate(value){
+    return typeof value==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&
+        Number.isFinite(Date.parse(`${value}T00:00:00Z`))&&
+        new Date(`${value}T00:00:00Z`).toISOString().slice(0,10)===value;
+}
+function inspectQuestState(key,state,allowUninitialized=false){
+    if(allowUninitialized&&object(state)&&Object.keys(state).length===0){return;}
+    const required=key==="dailyQuestState"?["checkin","killMonsters","winBattle"]:
+        ["killMonsters","winBattle"];
+    if(!object(state)||Object.keys(state).sort().join("|")!=="claimed|date|progress"||
+       !object(state.progress)||!object(state.claimed)){
+        fail(`quest storage fields: ${key}`);
+    }
+    const ids=Object.keys(state.progress);
+    if(required.some(id=>!Object.hasOwn(state.progress,id))||
+       ids.sort().join("|")!==Object.keys(state.claimed).sort().join("|")||
+       ids.some(id=>!ID.test(id)||!Number.isSafeInteger(state.progress[id])||
+           state.progress[id]<0||typeof state.claimed[id]!=="boolean")||
+       !(recordedDate(state.date)||state.date===""&&ids.every(id=>
+           state.progress[id]===0&&state.claimed[id]===false))){
+        fail(`recorded quest date, counters or claim markers: ${key}`);
+    }
+}
+
+// Existing Client Boss/Tower storage schema only. Keep recorded periods and
+// markers; never compute the current week, run combat or reconcile rewards.
+function inspectGameplayProgress(state,allowUninitialized=false){
+    if(allowUninitialized&&object(state)&&Object.keys(state).length===0){return;}
+    const exact=(value,keys)=>object(value)&&
+        Object.keys(value).sort().join("|")===[...keys].sort().join("|");
+    const integer=(value,max=Number.MAX_SAFE_INTEGER)=>
+        Number.isSafeInteger(value)&&value>=0&&value<=max;
+    const personalIds=[20,30,40,50,60,70,80,90,100].map(level=>`personal-${level}`);
+    const worldIds=[40,60,80,100].map(level=>`world-${level}`);
+    if(!exact(state,["version","personal","world","tower"])||state.version!==1||
+       !exact(state.personal,personalIds)||!exact(state.world,worldIds)){
+        fail("gameplay progress root or Boss source inventory");
+    }
+    for(const [group,ids] of [[state.personal,personalIds],[state.world,worldIds]]){
+        for(const id of ids){
+            const entry=group[id],world=group===state.world;
+            if(!exact(entry,world?["completedStages","firstClear","clears"]:["firstClear","clears"])||
+               typeof entry.firstClear!=="boolean"||!integer(entry.clears)||
+               world&&!integer(entry.completedStages,4)){
+                fail("gameplay progress Boss counters or first-clear markers");
+            }
+        }
+    }
+    const tower=state.tower;
+    if(!exact(tower,["weekKey","element","completedFloor","highestThisWeek",
+        "claimedFloors","historicalHighest","pendingRelicChoice"])||
+       !recordedDate(tower.weekKey)||new Date(`${tower.weekKey}T00:00:00Z`).getUTCDay()!==1||
+       !ELEMENTS.has(tower.element)||
+       ["completedFloor","highestThisWeek","historicalHighest"].some(key=>!integer(tower[key],100))||
+       typeof tower.pendingRelicChoice!=="boolean"||!object(tower.claimedFloors)||
+       Object.entries(tower.claimedFloors).some(([floor,claimed])=>
+           !/^[1-9]\d*$/.test(floor)||!integer(Number(floor),100)||claimed!==true)){
+        fail("gameplay progress Tower period, counters or recorded claims");
     }
 }
 
@@ -154,9 +230,7 @@ function inspectClaimSidecar(key,raw){
             fail("recorded legacy Abyss evidence or reward version");
         }
     }else{
-        if(typeof state.date!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(state.date)||
-           !Number.isFinite(Date.parse(`${state.date}T00:00:00Z`))||
-           new Date(`${state.date}T00:00:00Z`).toISOString().slice(0,10)!==state.date){
+        if(!recordedDate(state.date)){
             fail(`recorded claim date: ${key}`);
         }
         if(key==="daily-dungeon-state"){
@@ -355,7 +429,11 @@ function assembleCanonicalSnapshot(uid,revision,records){
     }
     const formation=records.account.formation;
     if(records.progress.playableState!==undefined){inspectPlayableFormation(formation,slots);}
-    if(formation!=null){
+    if(formation?.version===2){
+        try{require("./team-formation-policy").validate(formation,slots.flatMap((id,index)=>id===null?[]:[index]),
+            Object.keys(records.progress.playableState.heroAccount.heroes).filter(id=>records.progress.playableState.heroAccount.heroes[id].unlocked));}
+        catch(_){fail("formation reference");}
+    }else if(formation!=null){
         const map=formation.characterIndexToSlot;
         if(!object(formation)||formation.version!==1||!object(map)||
            Object.entries(map).some(([index,slot])=>
@@ -424,6 +502,13 @@ function assembleCanonicalSnapshot(uid,revision,records){
        !object(records.progress.sidecars)||
        Object.keys(records.progress.sidecars).sort().join("|")!==LEGACY_BACKUP_SIDECARS.join("|")){
         fail("progress or sidecar inventory");
+    }
+    if(records.progress.playableState!==undefined){
+        inspectAchievementState(records.progress.achievementState);
+        inspectGameplayProgress(records.progress.gameplayProgress,provenance==="server-created");
+        for(const key of ["dailyQuestState","commissionQuestState"]){
+            inspectQuestState(key,records.progress[key],provenance==="server-created");
+        }
     }
     for(const [key,entry] of Object.entries(records.progress.sidecars)){
         if(!object(entry)||!(entry.status==="present"&&typeof entry.raw==="string"||
@@ -512,6 +597,7 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
     const source=assembleCanonicalSnapshot(uid,revision,records);
     const {extra,hero,preferences}=inspectPlayableState(records);
     inspectPlayableFormation(source.snapshot.formation,source.snapshot.slots);
+    inspectAchievementState(source.snapshot.progress.achievementState);
     const configKeys=["autoConfig","autoConfig2","autoConfig3"];
     const slotKeys=["fire","player2","player3"];
     const characterEquipment={},characterSkillLoadouts={};
@@ -552,6 +638,10 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
         inspectClaimSidecar(key,entry.raw);
         inspectAbyssSidecar(key,entry.raw,source.snapshot.progress);
     }
+    for(const key of ["dailyQuestState","commissionQuestState"]){
+        inspectQuestState(key,source.snapshot.progress[key]);
+    }
+    inspectGameplayProgress(source.snapshot.progress.gameplayProgress);
     const gameSave={version:6,heroAccount:hero,player:players[0],player2:players[1],
         player3:players[2],gold:source.snapshot.economy.gold,
         sharedExp:source.snapshot.economy.sharedExp,bestiaryData:copy(extra.bestiaryData),

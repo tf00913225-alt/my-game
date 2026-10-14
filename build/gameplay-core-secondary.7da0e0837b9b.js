@@ -10850,10 +10850,9 @@ ensureFunctionalStyles();runRepairs();
         });
     }
     function resolveBattleIdentityIcon(def){
-        const candidates=[def&&def.battleIconPath,def&&def.iconPath].filter(Boolean);
-        let chain=Promise.reject(new Error("沒有可用秘寶身份圖示"));
-        candidates.forEach(path=>{chain=chain.catch(()=>loadBattleIdentityImage(path));});
-        return chain;
+        // Battle identity is the dedicated registry asset in every mode.
+        // A decode/load failure must remain visible, not substitute list artwork.
+        return loadBattleIdentityImage(def&&def.battleIconPath);
     }
     async function beginRelicCinematic(def,target){
         if(!hasLiveBattlePresentationHost()||!def||!document.body){return null;}
