@@ -347,7 +347,6 @@ function finishBattleLayerQaEndFixture(){
     if(!battleActive){ result.ended=true;return true; }
     const wave=window.FourSymbolsBattleWaves?.getState?.();
     if(wave?.index===0&&(
-        battlePhase!=="resolve"||battleAdvanceScheduled||
         (typeof battleDurationAction!=="undefined"&&battleDurationAction&&
             !battleDurationAction.completed)||
         window.FourSymbolsBattleFlow?.isPresentationActive?.()
@@ -358,6 +357,10 @@ function finishBattleLayerQaEndFixture(){
         }
     });
     if(wave?.index===0){
+        // Defeat the fixture targets at a settled boundary even during manual
+        // declaration or the existing post-action delay. Let an already queued
+        // continuation consume that delay; never dispatch a second one.
+        if(battleAdvanceScheduled){ return false; }
         processNextCombatant(battleToken);
         if(!battleActive){ result.ended=true; }
     }else{
