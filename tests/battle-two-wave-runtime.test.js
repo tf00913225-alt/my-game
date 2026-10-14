@@ -85,3 +85,18 @@ test("QA end fixture preserves one-wave completion and already-finished behavior
  assert.equal(finish(),true);assert.equal(r.ctx.wins,1);
  assert.equal(finish(),true);assert.equal(r.ctx.wins,1);
 });
+
+test("Abyss QA startup waits for the actual Policy, loader and Auth overlay without an unbound reference",()=>{
+ const source=fs.readFileSync(".github/scripts/run-abyss-balance-browser-qa.mjs","utf8");
+ const match=source.match(/await wait\(\(\)=>([^\n]+)\);/);
+ assert.ok(match,"actual Abyss startup predicate");
+ const state={policy:"READY",loaderHidden:false,authVisible:false};
+ const context={window:{},document:{getElementById:id=>id==="startupLoader"?{hidden:state.loaderHidden}:
+   {classList:{contains:()=>state.authVisible}}}};
+ const read=()=>vm.runInNewContext("("+match[1]+")",context);
+ assert.doesNotThrow(read);assert.equal(read(),false);
+ context.window.FourSymbolsStartupPolicy={getState:()=>state.policy};
+ assert.equal(read(),false);state.loaderHidden=true;assert.equal(read(),true);
+ state.authVisible=true;assert.equal(read(),false);state.authVisible=false;
+ state.policy="ERROR";assert.equal(read(),false);state.policy="AUTH_REQUIRED";assert.equal(read(),false);
+});
