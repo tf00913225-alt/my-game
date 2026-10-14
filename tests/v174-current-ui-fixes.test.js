@@ -25,7 +25,7 @@ assert.match(hintCss,/team-relic-home-tools \.home-card-utility \.home-card-labe
 assert.match(hintCss,/home-relic-v174\.eed14e806044\.webp/);
 assert.match(rewardCss,/\.v132-reward-modal \.v132-reward-modal-inner\.v17363-text-reward-preview/);
 assert.doesNotMatch(rewardCss,/#game-stage \.v17363-text-reward-preview/);
-assert.match(rewardCss,/width:min\(calc\(calc\(100 \* var\(--layout-inline-size,420px\) \/ 100\) - 32px\),392px\) !important;[\s\S]*max-width:calc\(calc\(100 \* var\(--layout-inline-size,420px\) \/ 100\) - 32px\) !important;/);
+assert.match(rewardCss,/width:min\(calc\(var\(--layout-inline-size,420px\) - 32px\),392px\) !important;[\s\S]*max-width:calc\(var\(--layout-inline-size,420px\) - 32px\) !important;/);
 const start=equipmentJs.indexOf("window.v17346ShowEquipmentDungeonPreview"),end=equipmentJs.indexOf("if(typeof renderDungeonTabContent",start),preview=equipmentJs.slice(start,end);
 assert.match(preview,/equipmentChestOddsText/);assert.match(preview,/v17363-text-reward-preview/);assert.match(preview,/裝備品階機率/);
 assert.doesNotMatch(preview,/previewAssets|v17361-reward-icon|<img/);
