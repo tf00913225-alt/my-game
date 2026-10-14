@@ -812,7 +812,7 @@ test("historical v1 quest bytes remain compatible but cannot stand in for comple
     }
 });
 
-test("server-created uninitialized quests stay unpublished while explicit zero states preserve their empty date",()=>{
+test("new-account zero quests preserve their empty date while historical uninitialized quests stay blocked",()=>{
     const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
     const records=makeInitialCharacterSources("uid-a",7,"create-quest",{displayName:"new hero",
         element:"water",gender:"female",
@@ -821,17 +821,15 @@ test("server-created uninitialized quests stay unpublished while explicit zero s
     const initial=structuredClone(records);
     assert.equal(assembleCanonicalSnapshot("uid-a",7,records).readyForPublication,false);
     assert.deepEqual(records,initial);
-    // Test-only explicit sidecars isolate the empty quest evidence. The factory
-    // remains unchanged and cannot create a complete published projection.
+    assert.throws(()=>assemble(records),/sidecar missing/);
+    // Complete test-only dependencies isolate the actual new-account quest sources.
+    // Production still lacks other domains and remains unpublished.
     records.progress.sidecars=structuredClone(sources().progress.sidecars);
     records.progress.gameplayProgress=recordedGameplay();
-    assert.throws(()=>assemble(records),/quest/);
     for(const key of ["dailyQuestState","commissionQuestState"]){
-        records.progress[key]=structuredClone(sources().progress[key]);
-        records.progress[key].date="";
-        for(const id of Object.keys(records.progress[key].progress)){
-            records.progress[key].progress[id]=0;records.progress[key].claimed[id]=false;
-        }
+        const historical=structuredClone(records);historical.progress[key]={};
+        assert.throws(()=>assemble(historical),/quest/);
+        assert.equal(assembleCanonicalSnapshot("uid-a",7,historical).readyForPublication,false);
     }
     const bundle=assemble(records);
     for(const key of ["dailyQuestState","commissionQuestState"]){
