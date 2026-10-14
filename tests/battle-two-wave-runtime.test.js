@@ -64,13 +64,53 @@ test("QA end fixture waits for unfinished actions, queued continuation and prese
  r.ctx.battleDurationAction={completed:false};
  assert.equal(finish(),false);assert.ok(r.first.every(m=>m.hp===100));
  r.ctx.battleDurationAction.completed=true;r.ctx.battleAdvanceScheduled=true;
- assert.equal(finish(),false);assert.ok(r.first.every(m=>m.hp===100));
+ assert.equal(finish(),false);assert.ok(r.first.every(m=>m.hp===0));
+ assert.equal(r.ctx.FourSymbolsBattleWaves.getState().index,0);
+ r.first.forEach(m=>{m.hp=100;m.alive=true;});
  r.ctx.battleAdvanceScheduled=false;r.ctx.battlePresentationLocks.add("cinematic");
  r.ctx.FourSymbolsBattleFlow={isPresentationActive:()=>r.ctx.battlePresentationLocks.size>0};
  assert.equal(finish(),false);assert.ok(r.first.every(m=>m.hp===100));
  r.ctx.battlePresentationLocks.clear();
  assert.equal(finish(),false);assert.equal(r.ctx.FourSymbolsBattleWaves.getState().index,1);
  assert.equal(finish(),true);
+});
+test("QA end fixture handles manual declaration without inventing an action or round",()=>{
+ const r=runtime({realQueue:true}),finish=endFixture(r);
+ r.ctx.battlePhase="declare";
+ assert.equal(finish(),false);
+ assert.equal(r.ctx.FourSymbolsBattleWaves.getState().index,1);
+ assert.equal(r.ctx.actionFinishedEvents,0);assert.equal(r.ctx.durationFinishes,0);
+ assert.equal(r.ctx.delayReads,0);assert.equal(r.ctx.turn,4);
+ assert.equal(finish(),true);assert.equal(r.ctx.wins,1);
+});
+test("QA target cleanup is consumed by the original formal post-action timer exactly once",()=>{
+ const r=runtime({realQueue:true}),finish=endFixture(r),c=r.ctx;
+ r.first.forEach(m=>{m.hp=100;m.alive=true;});
+ const next=c.processNextCombatant;let dispatches=0;
+ c.processNextCombatant=token=>{dispatches++;return next(token);};
+ c.finishPlayerAction();
+ assert.equal(r.timers.length,1);assert.equal(c.actionFinishedEvents,1);
+ assert.equal(c.delayReads,1);assert.equal(c.battleAdvanceScheduled,true);
+ assert.equal(finish(),false);assert.ok(r.first.every(m=>m.hp===0&&!m.alive));
+ assert.equal(c.FourSymbolsBattleWaves.getState().index,0);
+ assert.equal(dispatches,0);assert.equal(r.timers.length,1);
+ assert.equal(c.actionFinishedEvents,1);assert.equal(c.durationFinishes,1);
+ r.flush();
+ assert.equal(dispatches,1);assert.equal(c.FourSymbolsBattleWaves.getState().index,1);
+ assert.equal(r.timers.length,0);assert.equal(c.delayReads,1);
+ assert.equal(c.actionFinishedEvents,1);assert.equal(c.durationFinishes,1);
+ assert.equal(finish(),true);assert.equal(c.wins,1);
+ assert.equal(finish(),true);assert.equal(c.wins,1);
+});
+test("obsolete formal continuation cannot dispatch or spawn a second wave",()=>{
+ const r=runtime({realQueue:true}),finish=endFixture(r),c=r.ctx;
+ r.first.forEach(m=>{m.hp=100;m.alive=true;});
+ const next=c.processNextCombatant;let dispatches=0;
+ c.processNextCombatant=token=>{dispatches++;return next(token);};
+ c.finishPlayerAction();assert.equal(finish(),false);
+ c.battleToken++;r.flush();
+ assert.equal(dispatches,0);assert.equal(c.monsters.length,6);
+ assert.equal(c.cleanups,0);assert.equal(c.wins,0);
 });
 test("QA end fixture retains deferred second-wave preparation and one final win",async()=>{
  const r=runtime({realQueue:true,deferred:true}),finish=endFixture(r);

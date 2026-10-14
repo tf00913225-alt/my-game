@@ -347,7 +347,6 @@ function finishBattleLayerQaEndFixture(){
     if(!battleActive){ result.ended=true;return true; }
     const wave=window.FourSymbolsBattleWaves?.getState?.();
     if(wave?.index===0&&(
-        battlePhase!=="resolve"||battleAdvanceScheduled||
         (typeof battleDurationAction!=="undefined"&&battleDurationAction&&
             !battleDurationAction.completed)||
         window.FourSymbolsBattleFlow?.isPresentationActive?.()
@@ -358,6 +357,10 @@ function finishBattleLayerQaEndFixture(){
         }
     });
     if(wave?.index===0){
+        // Defeat the fixture targets at a settled boundary even during manual
+        // declaration or the existing post-action delay. Let an already queued
+        // continuation consume that delay; never dispatch a second one.
+        if(battleAdvanceScheduled){ return false; }
         processNextCombatant(battleToken);
         if(!battleActive){ result.ended=true; }
     }else{
@@ -934,6 +937,10 @@ try{
             player.id=player.id||'battle-layer-live-qa';
             player.name=player.name||'QA俠客';
             player.level=40;
+            // Give this presentation fixture a legal resource ceiling: damage
+            // settlement clamps current HP to the formal maximum.
+            player.bonusHP=1000000;
+            player.bonusSP=100000;
             player.hp=Math.max(9999,Number(player.hp)||0);
             player.sp=Math.max(9999,Number(player.sp)||0);
             player.element='fire';
