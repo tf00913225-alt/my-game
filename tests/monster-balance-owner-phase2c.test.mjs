@@ -12,13 +12,13 @@ const baseSpec=(floor,element,rank='regular',slot=0)=>({
 
 test('Tower Runtime build is explicit, floor=N, deterministic and owner-only',()=>{
   for(const element of elements)for(let floor=1;floor<=100;floor++){
-    const ranks=floor%10===0?['smallBoss','elite','elite',...Array(7).fill('regular')]
-      :floor%5===0?['elite','elite',...Array(8).fill('regular')]
-      :Array(10).fill('regular');
+    const ranks=floor%10===0?[...Array(6).fill('elite'),'smallBoss',...Array(5).fill('elite')]
+      :floor%5===0?[...Array(6).fill('regular'),'elite','elite',...Array(4).fill('regular')]
+      :Array(12).fill('regular');
     const roster=ranks.map((rank,slot)=>MonsterBalance.build(baseSpec(floor,element,rank,slot)));
-    assert.equal(roster.length,10);
+    assert.equal(roster.length,12);
     assert.equal(roster.filter(m=>m.rank==='smallBoss').length,floor%10===0?1:0);
-    assert.equal(roster.filter(m=>m.rank==='elite').length,floor%5===0?2:0);
+    assert.equal(roster.filter(m=>m.rank==='elite').length,floor%10===0?11:floor%5===0?2:0);
     for(const monster of roster){
       assert.equal(monster.level,floor);
       assert.equal(monster.mode,'tower');

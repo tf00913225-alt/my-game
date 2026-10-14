@@ -445,8 +445,9 @@ test("Tower uses normal Fixed Slot geometry while Personal/World keep Large Boss
     context.GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:9,highestThisWeek:9,historicalHighest:9,claimedFloors:{},pendingRelicChoice:false}},now);
     assert.equal(context.vGameplaySelectTowerBand(10),true);
     assert.equal(context.lastBattleOptions.mode,"tower");
-    assert.equal(context.currentBattleMonsters.length,10);
-    const towerBoss=context.monsters.find(monster=>monster&&monster.vGameplayTowerBoss===true);
+    assert.equal(context.currentBattleMonsters.length,6);
+    assert.deepEqual(Array.from(context.lastBattleOptions.waves,row=>row.length),[6,6]);
+    const towerBoss=context.lastBattleOptions.waves[1].find(monster=>monster&&monster.vGameplayTowerBoss===true);
     assert.ok(towerBoss);
     assert.equal(towerBoss.unitKind,"tower-boss");
     assert.equal(context.FourSymbolsBossBattle.isActive(),false);

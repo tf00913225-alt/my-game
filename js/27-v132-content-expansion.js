@@ -1867,6 +1867,8 @@
             return false;
         }
 
+        if(opts.waves){ window.FourSymbolsBattleWaves.validate(String(opts.mode||"legacy-dungeon"),opts.waves); }
+        if(opts.waves&&opts.waves[0]!==monsterList){ throw new Error("Initial roster must be wave one"); }
         window.v132ActiveDungeonRun={
             identityVersion:1,
             mode:String(opts.mode||"legacy-dungeon"),
@@ -1879,7 +1881,7 @@
             startedAt:Date.now()
         };
 
-        monsters=monsterList;
+        monsters=monsterList.slice();
         currentZone="dungeon";
 
         initializeHeroBattleCombatants();
@@ -1926,6 +1928,7 @@
             character.isDefending=false;
         });
 
+        window.FourSymbolsBattleWaves?.initialize(String(opts.mode||"legacy-dungeon"),opts.waves);
         currentBattleMonsters=monsterList.map((m,i)=>i);
         // A new roster can reuse numeric indexes from a previous encounter.
         // Capture its own profile once; redraw/death must retain that snapshot.
