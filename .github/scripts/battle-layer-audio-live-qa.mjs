@@ -906,6 +906,10 @@ try{
             player.id=player.id||'battle-layer-live-qa';
             player.name=player.name||'QA俠客';
             player.level=40;
+            // Give this presentation fixture a legal resource ceiling: damage
+            // settlement clamps current HP to the formal maximum.
+            player.bonusHP=1000000;
+            player.bonusSP=100000;
             player.hp=Math.max(9999,Number(player.hp)||0);
             player.sp=Math.max(9999,Number(player.sp)||0);
             player.element='fire';
