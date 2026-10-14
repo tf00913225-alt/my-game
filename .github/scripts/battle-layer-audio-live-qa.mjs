@@ -1611,6 +1611,22 @@ try{
         return document.querySelectorAll('#v143-skill-stage').length;
     })()`);
 
+    const firstWaveEnd=await client.eval(`(()=>{
+        const state=window.FourSymbolsBattleWaves?.getState();
+        if(!state||state.index!==0){throw new Error('Victory QA requires active first wave');}
+        currentBattleMonsters.forEach(index=>{monsters[index].hp=0;monsters[index].alive=false;});
+        const ended=checkBattleEnd();
+        if(ended||!battleActive){throw new Error('First wave incorrectly completed the battle');}
+        finishPlayerAction(battleToken);
+        return {ended,battleActive,token:battleToken};
+    })()`);
+    evidence.checks.firstWaveEnd=firstWaveEnd;
+    await waitFor(client,"window.FourSymbolsBattleWaves?.getState()?.phase==='WAVE_2_ACTIVE'","formal second wave entry",15000);
+    const secondWaveEntry=await client.eval(`({token:battleToken,targets:currentBattleMonsters.length})`);
+    assert.equal(secondWaveEntry.token,firstWaveEnd.token,"Wave transition must preserve the battle token");
+    assert.equal(secondWaveEntry.targets,6,"Second wave must enter with six enemies");
+    evidence.checks.secondWaveEntry=secondWaveEntry;
+
     const endTransitionStart=await client.eval(`(()=>{
         if(typeof closeHomeFeature==='function'){closeHomeFeature();}
         const initialToken=Number(window.__battleLayerQaInitialBattleToken)||0;
