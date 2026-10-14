@@ -21,6 +21,25 @@ function makeInitialAbyssState(){
         runs:{20:run(20),40:run(40)}};
 }
 
+// New-account storage evidence matching GameplaySystem.normalizeState(null, time).
+// Only capture the creation week's empty record; no rollover, battle or reward.
+function makeInitialGameplayProgress(recordedAt){
+    const instant=new Date(recordedAt);
+    const midnight=Date.UTC(instant.getUTCFullYear(),instant.getUTCMonth(),instant.getUTCDate());
+    const monday=midnight-((instant.getUTCDay()+6)%7)*86400000;
+    const weekIndex=Math.floor((monday-Date.UTC(1970,0,5))/(7*86400000));
+    const order=["fire","earth","water","wind"];
+    return {version:1,
+        personal:Object.fromEntries([20,30,40,50,60,70,80,90,100].map(level=>
+            [`personal-${level}`,{firstClear:false,clears:0}])),
+        world:Object.fromEntries([40,60,80,100].map(level=>
+            [`world-${level}`,{completedStages:0,firstClear:false,clears:0}])),
+        tower:{weekKey:new Date(monday).toISOString().slice(0,10),
+            element:order[((weekIndex%order.length)+order.length)%order.length],
+            completedFloor:0,highestThisWeek:0,claimedFloors:{},
+            historicalHighest:0,pendingRelicChoice:false}};
+}
+
 // Initial evidence only. No elapsed-time accrual, reward or historical default.
 function makeInitialSidecars(recordedAt){
     const sidecars=Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>[
@@ -87,8 +106,17 @@ function makeInitialCharacterSources(uid,revision,operationId,selection,{recorde
             skillLoadout:{name:selection.displayName,skillLevels:{},equippedSkills:[]}}],
         economy:{...base,gold:0,sharedExp:0},inventory:[],equipment:[],relics:[],
         relicLoadout:{...base,relicId:null,subRelicId:null},
-        progress:{...base,dailyQuestState:{},commissionQuestState:{},
-            achievementState:{},gameplayProgress:{},
+        progress:{...base,
+            // Record the Client's pre-period zero state only for genuine new creation.
+            // No daily rollover, completion, reward or historical backfill.
+            dailyQuestState:recordedAt===undefined?{}:{
+                date:"",progress:{checkin:0,killMonsters:0,winBattle:0},
+                claimed:{checkin:false,killMonsters:false,winBattle:false}},
+            commissionQuestState:recordedAt===undefined?{}:{
+                date:"",progress:{killMonsters:0,winBattle:0},
+                claimed:{killMonsters:false,winBattle:false}},
+            achievementState:{},gameplayProgress:recordedAt===undefined?{}:
+                makeInitialGameplayProgress(recordedAt),
             abyssProgress:recordedAt===undefined?{}:makeInitialAbyssState(),
             ...(recordedAt===undefined?{}:{playableState:{
                 heroAccount:require("./hero-core").normalizeAccountState(null),

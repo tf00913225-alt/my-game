@@ -135,11 +135,11 @@ test('Phase2F migrates Boss; Tower and Adventure coverage is preserved',()=>{
  const tower=actual.filter(row=>row.mode==='tower'||row.mode==='towerBoss');
  assert.equal(tower.length,72);
  for(const row of tower){
-  assert.equal(row.value.level,row.level);
+  assert.equal(row.value.level,row.level<=20?40:row.level<=40?60:row.level<=60?80:100);
   assert.ok(['regular','elite','smallBoss'].includes(row.value.rank));
   if(row.mode==='towerBoss')assert.equal(row.value.rank,'smallBoss');
   const archetype='balanced',rank=row.mode==='towerBoss'?'smallBoss':row.rank;
-  const projection=MonsterBalance.preview({monsterKey:'tower-test',name:row.value.name,level:row.level,element:row.element,archetype,rank,mode:'tower',context:'tower/floor/'+row.level});
+  const projection=MonsterBalance.preview({monsterKey:'tower-test',name:row.value.name,level:row.level<=20?40:row.level<=40?60:row.level<=60?80:100,element:row.element,archetype,rank,mode:'tower',context:'tower/floor/'+row.level});
   assert.equal(row.value.maxHP,projection.final.maxHP);
   assert.equal(row.value.maxSP,projection.final.maxSP);
   assert.equal(row.value.attack,projection.final.physicalAttack);

@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {evaluateChallengeDiagnostic} from './lib/challenge-diagnostic-gate.mjs';
 import {fileURLToPath} from 'node:url';
 import {loadLegacyRuntime} from './monster-balance-shadow-matrix.mjs';
 
@@ -36,7 +37,7 @@ export function buildTowerTtkMatrix(){
       FourSymbolsBattlefieldSlots.clearActiveEnemySnapshot();Math.random=()=>.5;
       autoBattle=true;for(const i of getExistingPartyIndexes()){const config=getPartyAutoConfig(i);config.enabled=true;config.skill=reference.skill;}
       const initialParty=getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp);
-      const initialMonsters=roster.map(m=>({rank:m.rank,level:m.level,hp:m.maxHP,sp:m.maxSP,attack:m.attack,magicAttack:m.magicAttack,defense:m.defense,speed:m.agility,owner:m.balanceOwner,pressure:m.balanceProjection.finalDamagePressure}));
+      const initialMonsters=roster.map(m=>({spec:m.balanceProjection.identity,rank:m.rank,level:m.level,hp:m.maxHP,sp:m.maxSP,attack:m.attack,magicAttack:m.magicAttack,defense:m.defense,speed:m.agility,owner:m.balanceOwner,pressure:m.balanceProjection.finalDamagePressure}));
       let rounds=0;
       for(let round=1;round<=60;round++){
         turn=round;rounds++;
@@ -65,7 +66,7 @@ export function buildTowerTtkMatrix(){
   return {
     workId:'MONSTER-BALANCE-OWNER-P2C-TOWER-20261004',
     method:'Formal current player stats/skills, initiative, enemy AI, damage and status owners; neutral 0.5 rolls; Tower unlock Lv30 minimum; 2 members below floor50 and 3 members from floor50. Animation lifecycle is verified separately in Chrome.',
-    cases:rows.length,failures,rows
+    gate:evaluateChallengeDiagnostic(rows,'tower'),cases:rows.length,failures,rows
   };
 }
 
@@ -73,7 +74,7 @@ if(process.argv[1]===fileURLToPath(import.meta.url)){
   const report=buildTowerTtkMatrix();
   if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n');
   const summary={
-    cases:report.cases,
+    gate:report.gate.passed,cases:report.cases,
     failures:report.failures.map(r=>({element:r.element,floor:r.floor,kind:r.kind,rounds:r.rounds,clear:r.clear,survivors:r.survivors})),
     maxRounds:Math.max(...report.rows.map(r=>r.rounds)),
     byKind:Object.fromEntries(['regular','elite','smallBoss'].map(kind=>[kind,{
@@ -82,5 +83,5 @@ if(process.argv[1]===fileURLToPath(import.meta.url)){
     }]))
   };
   console.log(JSON.stringify(summary));
-  if(report.failures.length)process.exitCode=1;
+  if(!report.gate.passed)process.exitCode=1;
 }

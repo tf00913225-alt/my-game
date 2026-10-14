@@ -2,12 +2,23 @@ import assert from "node:assert/strict";
 import {createRequire} from "node:module";
 import {readFileSync} from "node:fs";
 import test from "node:test";
+import vm from "node:vm";
 const require=createRequire(import.meta.url);
 const {assembleCanonicalSnapshot,assembleCanonicalPlayableProjection,
     verifyCanonicalPlayableProjectionAgainstSources,claimRecordsDigest}=require("../functions/src/canonical-snapshot.js");
 const {LEGACY_BACKUP_SIDECARS,ALLOWED_SAVE_KEYS}=require("../functions/src/cloud-save-policy.js");
 const {normalizeAccountState}=require("../functions/src/hero-core.js");
 const {makeInitialSidecars}=require("../functions/src/initial-character-sources.js");
+
+// Storage parity uses the actual Client Owner, without starting a battle.
+const gameplayClient={console,setTimeout:()=>0,clearTimeout:()=>{},saveGame:()=>{},
+    FourSymbolsAccountSave:{getActiveUid:()=>"fixture",saveKey:()=>"fixture",
+        readForUid:()=>({status:"missing"})}};
+gameplayClient.window=gameplayClient;
+vm.runInNewContext(readFileSync(new URL("../js/gameplay-boss-tower-system.js",import.meta.url),"utf8"),
+    gameplayClient);
+const recordedGameplay=()=>JSON.parse(JSON.stringify(
+    gameplayClient.GameplaySystem.normalizeState(null,Date.UTC(2020,1,24))));
 
 function sources(count=1){
     const base={schemaVersion:1,ownerUid:"uid-a",serverRevision:7,provenance:"grandfathered-unverified-history"};
@@ -31,7 +42,7 @@ function sources(count=1){
             claimed:{checkin:true,killMonsters:false,winBattle:false}},
             commissionQuestState:{date:"2020-02-29",progress:{killMonsters:6,winBattle:3},
             claimed:{killMonsters:false,winBattle:true}},achievementState:{},
-            gameplayProgress:{},abyssProgress:JSON.parse(makeInitialSidecars(1700000000000)["abyss-state"].raw),
+            gameplayProgress:recordedGameplay(),abyssProgress:JSON.parse(makeInitialSidecars(1700000000000)["abyss-state"].raw),
             sidecars:Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>
                 [key,key!=="legacy-abyss-state"&&makeInitialSidecars(1700000000000)[key].status==="present"?
                     makeInitialSidecars(1700000000000)[key]:
@@ -801,7 +812,7 @@ test("historical v1 quest bytes remain compatible but cannot stand in for comple
     }
 });
 
-test("server-created uninitialized quests stay unpublished while explicit zero states preserve their empty date",()=>{
+test("new-account zero quests preserve their empty date while historical uninitialized quests stay blocked",()=>{
     const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
     const records=makeInitialCharacterSources("uid-a",7,"create-quest",{displayName:"new hero",
         element:"water",gender:"female",
@@ -810,16 +821,15 @@ test("server-created uninitialized quests stay unpublished while explicit zero s
     const initial=structuredClone(records);
     assert.equal(assembleCanonicalSnapshot("uid-a",7,records).readyForPublication,false);
     assert.deepEqual(records,initial);
-    // Test-only explicit sidecars isolate the empty quest evidence. The factory
-    // remains unchanged and cannot create a complete published projection.
+    assert.throws(()=>assemble(records),/sidecar missing/);
+    // Complete test-only dependencies isolate the actual new-account quest sources.
+    // Production still lacks other domains and remains unpublished.
     records.progress.sidecars=structuredClone(sources().progress.sidecars);
-    assert.throws(()=>assemble(records),/quest/);
+    records.progress.gameplayProgress=recordedGameplay();
     for(const key of ["dailyQuestState","commissionQuestState"]){
-        records.progress[key]=structuredClone(sources().progress[key]);
-        records.progress[key].date="";
-        for(const id of Object.keys(records.progress[key].progress)){
-            records.progress[key].progress[id]=0;records.progress[key].claimed[id]=false;
-        }
+        const historical=structuredClone(records);historical.progress[key]={};
+        assert.throws(()=>assemble(historical),/quest/);
+        assert.equal(assembleCanonicalSnapshot("uid-a",7,historical).readyForPublication,false);
     }
     const bundle=assemble(records);
     for(const key of ["dailyQuestState","commissionQuestState"]){
@@ -831,4 +841,101 @@ test("server-created uninitialized quests stay unpublished while explicit zero s
         }
     }
     assert.equal(bundle.readyForPublication,false);
+});
+
+test("Client Boss and Tower storage survives every slot and recovery without week rollover or rewards",()=>{
+    const {createRecoveryArchive,inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    for(const count of [1,2,3]){
+        const records=sources(count),state=records.progress.gameplayProgress;
+        state.personal["personal-20"]={firstClear:true,clears:5};
+        state.world["world-40"]={completedStages:4,firstClear:true,clears:2};
+        state.world["world-60"]={completedStages:2,firstClear:false,clears:0};
+        Object.assign(state.tower,{completedFloor:50,highestThisWeek:50,historicalHighest:75,
+            claimedFloors:{1:true,25:true,50:true},pendingRelicChoice:true});
+        const before=structuredClone(records),bundle=assemble(records);
+        assert.deepEqual(bundle.projection.gameSave.gameplayProgress,before.progress.gameplayProgress);
+        assert.deepEqual(records,before);
+        assert.equal(bundle.readyForPublication,false);
+        assert.equal(bundle.projection.authoritativeStateReady,false);
+        const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
+        records.progress.playableState=fields;delete records.playableState;
+        const snapshot=assembleCanonicalSnapshot("uid-a",7,records);
+        const archive=JSON.parse(JSON.stringify(createRecoveryArchive("uid-a",7,records,snapshot)));
+        const restored=inspectRecoveryArchive(archive,"uid-a",7,snapshot);
+        assert.deepEqual(restored.progress.gameplayProgress,before.progress.gameplayProgress);
+        assert.deepEqual(restored.claimRecords,before.claimRecords);
+        assert.deepEqual(restored.claimCheckpoint,before.claimCheckpoint);
+        assert.equal(archive.readyForRestore,false);
+    }
+});
+
+test("missing or lossy Boss and Tower records cannot become durable playable or complete evidence",()=>{
+    const changes=[
+        s=>s.version=2,s=>s.extra=true,s=>{delete s.personal;},s=>s.personal={},
+        s=>{delete s.personal["personal-20"];},s=>s.personal["unknown-boss"]={firstClear:false,clears:0},
+        s=>s.personal["personal-20"].firstClear="false",s=>s.personal["personal-20"].clears="2",
+        s=>s.personal["personal-20"].clears=-1,s=>s.personal["personal-20"].clears=1.5,
+        s=>s.personal["personal-20"].clears=Number.MAX_SAFE_INTEGER+1,
+        s=>s.personal["personal-20"].rewardClaimed=true,
+        s=>s.world={},s=>{delete s.world["world-40"];},
+        s=>s.world["world-40"].completedStages=5,s=>s.world["world-40"].completedStages=1.5,
+        s=>s.world["world-40"].firstClear={claimed:true},
+        s=>s.world["world-40"].clears=null,s=>s.world["world-40"].extra=true,
+        s=>s.tower={},s=>s.tower.weekKey="2023-02-29",s=>s.tower.weekKey="2020-02-25",
+        s=>s.tower.weekKey="",s=>s.tower.element="light",
+        s=>s.tower.completedFloor=101,s=>s.tower.completedFloor="1",
+        s=>s.tower.highestThisWeek=-1,s=>s.tower.historicalHighest=0.5,
+        s=>s.tower.claimedFloors={"01":true},s=>s.tower.claimedFloors={0:true},
+        s=>s.tower.claimedFloors={101:true},s=>s.tower.claimedFloors={1:"true"},
+        s=>s.tower.claimedFloors={1:false},s=>s.tower.claimedFloors={1:{claimed:true}},
+        s=>s.tower.pendingRelicChoice="false",s=>s.tower.extra=true
+    ];
+    for(const change of changes){
+        const records=sources();change(records.progress.gameplayProgress);
+        const before=structuredClone(records);
+        assert.throws(()=>assemble(records),/gameplay progress/);
+        const {schemaVersion,ownerUid,serverRevision,provenance,...fields}=records.playableState;
+        records.progress.playableState=fields;delete records.playableState;
+        assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,records),/gameplay progress/);
+        delete records.progress.playableState;records.playableState=before.playableState;
+        assert.deepEqual(records,before);
+    }
+});
+
+test("historical v1 Boss and Tower bytes keep their hash without satisfying complete evidence",()=>{
+    const {createRecoveryArchive,inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    const records=sources();records.progress.gameplayProgress={tower:{claimedFloors:{50:"true"}}};
+    const before=structuredClone(records),snapshot=assembleCanonicalSnapshot("uid-a",7,records);
+    const archive=JSON.parse(JSON.stringify(createRecoveryArchive("uid-a",7,records,snapshot)));
+    const restored=inspectRecoveryArchive(archive,"uid-a",7,snapshot);
+    assert.deepEqual(restored.progress.gameplayProgress,before.progress.gameplayProgress);
+    assert.equal(assembleCanonicalSnapshot("uid-a",7,restored).sha256,snapshot.sha256);
+    assert.equal(archive.readyForRestore,false);
+    assert.throws(()=>assemble(restored),/gameplay progress/);
+    assert.deepEqual(records,before);
+});
+
+test("new-account Boss and Tower sources satisfy storage projection without publication or history defaults",()=>{
+    const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
+    const records=makeInitialCharacterSources("uid-a",7,"create-gameplay",{displayName:"new hero",
+        element:"water",gender:"female",
+        attributes:{attack:1,intelligence:2,vitality:3,energy:4,defensePoints:0,agility:0}},
+        {recordedAt:1700000000000});
+    const expected=JSON.parse(JSON.stringify(gameplayClient.GameplaySystem.normalizeState(null,1700000000000)));
+    assert.deepEqual(records.progress.gameplayProgress,expected);
+    const before=structuredClone(records);
+    assert.equal(assembleCanonicalSnapshot("uid-a",7,records).readyForPublication,false);
+    assert.deepEqual(records,before);
+    assert.throws(()=>assemble(records),/sidecar missing/);
+    // Explicit test-only period/history sources isolate this domain.
+    // Production creation remains incomplete and unpublished.
+    records.progress.sidecars=structuredClone(sources().progress.sidecars);
+    const historical=structuredClone(records);historical.progress.gameplayProgress={};
+    assert.throws(()=>assemble(historical),/gameplay progress/);
+    assert.equal(assembleCanonicalSnapshot("uid-a",7,historical).readyForPublication,false);
+    const bundle=assemble(records);
+    assert.deepEqual(bundle.projection.gameSave.gameplayProgress,expected);
+    assert.equal(bundle.readyForPublication,false);
+    assert.equal(bundle.projection.authoritativeStateReady,false);
+    assert.equal(assembleCanonicalSnapshot("uid-a",7,records).readyForPublication,false);
 });

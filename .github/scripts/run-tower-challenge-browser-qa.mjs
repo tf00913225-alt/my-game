@@ -20,13 +20,13 @@ const expression=`(async()=>{
    const realNow=Date.now;let roster;
    try{Date.now=()=>dates[element];const week=GameplaySystem.getWeekInfo(Date.now());GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:floor-1}},Date.now());roster=GameplaySystem.buildTowerRoster(floor);check(vGameplaySelectTowerBand(floor)===true,'Tower entry refused');}finally{Date.now=realNow;}
    await wait(()=>battleActive);await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
-   check(currentBattleMonsters.length===10,'real roster count');
+   check(currentBattleMonsters.length===6,'real roster count');
    check(!document.getElementById('homeFeatureModal')?.classList.contains('show'),'battle has no covering shared modal');
    const active=currentBattleMonsters.map(i=>monsters[i]);
-   check(active.every(m=>m.balanceOwner==='MonsterBalance'&&m.mode==='tower'&&m.level===floor&&m.context==='tower/floor/'+floor),'Tower owner/floor/context');
+   check(active.every(m=>m.balanceOwner==='MonsterBalance'&&m.mode==='tower'&&m.level===(floor<=20?40:floor<=40?60:floor<=60?80:100)&&m.context==='tower/floor/'+floor),'Tower owner/floor/context');
    check(active.every(m=>!Object.hasOwn(m,'v132Dungeon')&&!Object.hasOwn(m,'v132EquipmentDungeon')),'no Tower legacy stat markers');
-   check(active.filter(m=>m.rank==='smallBoss').length===(floor%10===0?1:0),'canonical smallBoss count');
-   check(active.filter(m=>m.rank==='elite').length===(floor%5===0?2:0),'canonical elite count');
+   check(active.filter(m=>m.rank==='smallBoss').length===0,'canonical smallBoss count');
+   check(active.filter(m=>m.rank==='elite').length===(floor%10===0?6:0),'canonical elite count');
    for(const m of active){
      const p=MonsterBalance.debug(m);check(m.maxHP===p.final.maxHP&&m.maxSP===p.final.maxSP&&m.attack===p.final.physicalAttack&&m.magicAttack===p.final.magicAttack&&m.defense===p.final.defense&&m.agility===p.final.speed,'render stats equal owner projection');
      if(element==='fire')check(m.vTowerCriticalBonusPercent===15&&getMonsterCriticalChance(m)===25&&getTowerDirectDamageMultiplier(m,{damageKind:'direct'})===1.15,'fire critical/direct damage +15');
@@ -35,12 +35,16 @@ const expression=`(async()=>{
      if(element==='earth')check(p.profiles.element.hp===1.15&&p.profiles.element.defense===1.15,'earth owner HP/defense +15');
    }
    const slots=FourSymbolsBattlefieldSlots.getActiveEnemySnapshot();
-   check(slots&&new Set(Object.values(slots.monsterIndexToSlot)).size===10,'unique battle slots');
+   check(slots&&new Set(Object.values(slots.monsterIndexToSlot)).size===6,'unique battle slots');
    const chance=floor<=30?.65:floor<=60?.7:floor<=90?.75:.8;
    check(currentBattleMonsters.every(i=>monsters[i].skillChance===chance),'common skill chance');
    const units=currentBattleMonsters.map(i=>({index:i,rank:monsters[i].rank,level:monsters[i].level,owner:monsters[i].balanceOwner,mode:monsters[i].mode,maxSP:monsters[i].maxSP,attack:monsters[i].attack,magicAttack:monsters[i].magicAttack,finalDamagePressure:monsters[i].balanceProjection.finalDamagePressure,context:monsters[i].context,chance:monsters[i].skillChance,slot:FourSymbolsBattlefieldSlots.getEnemySlotForMonster(slots,i),evasion:getMonsterEvasion(monsters[i]),speed:getMonsterAgility(monsters[i]),hp:monsters[i].maxHP,defense:getMonsterEffectiveDefense(monsters[i])}));
-   check(units.filter(u=>u.rank==='smallBoss').every(u=>u.slot==='ENEMY_B3'),'single B3 smallBoss');
-   check(units.every(u=>{const r=document.getElementById('battleMonster'+u.index)?.getBoundingClientRect();return r&&r.width>0&&r.height>0&&r.left>=0&&r.right<=innerWidth+1;}),'ten visible targets');
+   const second=roster.slice(6);check(second.length===6,'complete second-wave catalog');
+   check(second.filter(m=>m.rank==='smallBoss').length===(floor%10===0?1:0),'second-wave Boss count');
+   check(second.filter(m=>m.rank==='elite').length===(floor%10===0?5:floor%5===0?2:0),'second-wave elite count');
+   const secondSlots=FourSymbolsBattlefieldSlots.createEnemyFormationSnapshot(second.map((_,i)=>i),{encounterMode:'tower',originalFormationType:6,rankWeight:i=>second[i].rank==='smallBoss'?3:second[i].rank==='elite'?2:1});
+   check(second.filter(m=>m.rank==='smallBoss').every(m=>FourSymbolsBattlefieldSlots.getEnemySlotForMonster(secondSlots,second.indexOf(m))==='ENEMY_B2'),'second-wave central Boss slot');
+   check(units.every(u=>{const r=document.getElementById('battleMonster'+u.index)?.getBoundingClientRect();return r&&r.width>0&&r.height>0&&r.left>=0&&r.right<=innerWidth+1;}),'six visible targets');
    evidence.matrix.push({element,floor,units});return roster;
  };
  const exit=async()=>{loseBattle();await wait(()=>!battleActive);await new Promise(r=>setTimeout(r,1300));};
@@ -63,23 +67,23 @@ const expression=`(async()=>{
  await new Promise(r=>setTimeout(r,4500));check(caster.sp<spBefore&&ally.hp>1,'real water heal action');
  await exit();
  await enter('water',100);
- // Ten-unit highest-frequency natural queue, observed through formal lifecycle subscriptions.
+ // Six-unit highest-frequency natural queue, observed through formal lifecycle subscriptions.
  const queueRandom=Math.random;Math.random=()=>.4;const skillNames=[];const badgeOwner=showMonsterSkillNameBadge;showMonsterSkillNameBadge=function(name,...args){skillNames.push(name);return badgeOwner(name,...args);};
  const actions=[];const off=FourSymbolsBattleFlow.subscribeBeforeCombatant(event=>{const unit=event.queue[event.index];if(unit?.type==='monster')actions.push(unit.monsterIndex);});
  let ended=false;const endOff=FourSymbolsBattleFlow.subscribeRoundEnd(()=>{ended=true;});
  queuedPlayerActions={};for(const i of getExistingPartyIndexes())queuedPlayerActions[i]={action:'defend'};
  for(const i of currentBattleMonsters){monsters[i].sp=100000;monsters[i].hp=monsters[i].maxHP;}
  try{startResolutionPhase(battleToken);await wait(()=>ended,100000);}finally{off();endOff();Math.random=queueRandom;showMonsterSkillNameBadge=badgeOwner;}
- check(actions.length===10&&new Set(actions).size===10,'10 x 80 queue completes exactly once');evidence.actions=actions;evidence.freezeSkills=skillNames;check(skillNames.includes(skillDatabase.freeze.name),'real water Freeze decision');
+ check(actions.length===6&&new Set(actions).size===6,'6 x 80 queue completes exactly once');evidence.actions=actions;evidence.freezeSkills=skillNames;check(skillNames.includes(skillDatabase.freeze.name),'real water Freeze decision');
  await exit();
  await enter('fire',1);
- // Actual all-target skill, ten independent settlements and feedback events.
+ // Actual all-target skill, six independent settlements and feedback events.
  characterSkillLoadouts.fire.skillLevels.iceArrowRain=1;player.sp=100000;activeBattleCharacterIndex=0;selectedMonster=currentBattleMonsters[0];
  const ids=currentBattleMonsters.slice();for(const i of ids){monsters[i].hp=monsters[i].maxHP=100000;monsters[i].evasion=0;}
  const hitOwner=showMonsterHit, feedback=[];showMonsterHit=function(index,amount,type,...rest){if(type==='hp')feedback.push({index,amount});return hitOwner(index,amount,type,...rest);};
  try{Math.random=()=>.5;castDamageSkill('iceArrowRain');await new Promise(r=>setTimeout(r,5500));}finally{Math.random=oldRandom;showMonsterHit=hitOwner;}
- check(ids.every(i=>monsters[i].hp<100000),'AOE damages all 10');check(feedback.length===10&&new Set(feedback.map(x=>x.index)).size===10,'AOE feedback exactly once per target');evidence.aoe=feedback;
- evidence.battleScreenshotPending=true;vGameplayRenderTower();evidence.rules=document.getElementById('towerPageContent').textContent;check(evidence.rules.includes('每層固定 10 名敵人')&&evidence.rules.includes('65%')&&evidence.rules.includes('80%'),'visible tower rules');
+ check(ids.every(i=>monsters[i].hp<100000),'AOE damages all 6');check(feedback.length===6&&new Set(feedback.map(x=>x.index)).size===6,'AOE feedback exactly once per target');evidence.aoe=feedback;
+ evidence.battleScreenshotPending=true;vGameplayRenderTower();evidence.rules=document.getElementById('towerPageContent').textContent;check(evidence.rules.includes('每層兩波、每波 6 名敵人')&&evidence.rules.includes('65%')&&evidence.rules.includes('80%'),'visible tower rules');
  return evidence;
 })()`;
 const deployedBase=process.env.TOWER_QA_BASE_URL;

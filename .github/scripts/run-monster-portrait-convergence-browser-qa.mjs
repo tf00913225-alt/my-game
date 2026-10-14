@@ -41,11 +41,11 @@ const expression=String.raw`(async()=>{
   check(Math.abs((bottom-top)-expected)<1.1,'body-height contract drift '+record.portraitKey);
   evidence.geometry.push({label,portraitKey:record.portraitKey,sizeClass:cls,slotHeight:a.height,visualBodyTop:top,visualBodyBottom:bottom,visualBodyHeight:bottom-top,baseline,clipped,overflow:false,widthLimited:expected<target*a.height-1});
  };
- async function scene(roster,label){
+ async function scene(roster,label,encounterMode="legacy-dungeon"){
   monsters=roster;currentBattleMonsters=roster.map((m,i)=>i);battleActive=false;
   roster.forEach(m=>{m.alive=true;m.hp=m.hp||100;m.maxHP=m.maxHP||100;m.sp=m.sp||0;m.maxSP=m.maxSP||1;m.level=m.level||70;v154BindMonsterPortraitIdentity(m);});
   const prepared=await v154PreparePortraitsForEncounter(roster);check(prepared.state==='ready','portrait preparation '+label);
-  FourSymbolsBattlefieldSlots.setActiveEnemySnapshot(FourSymbolsBattlefieldSlots.createEnemyFormationSnapshot(currentBattleMonsters,{originalFormationType:roster.length}));
+  FourSymbolsBattlefieldSlots.setActiveEnemySnapshot(FourSymbolsBattlefieldSlots.createEnemyFormationSnapshot(currentBattleMonsters,{encounterMode,originalFormationType:roster.length}));
   showPage('battle');renderBattle();
   roster.forEach((m,i)=>measure(m,i,label+'/first'));
   renderBattle();roster.forEach((m,i)=>measure(m,i,label+'/redraw'));
@@ -54,8 +54,8 @@ const expression=String.raw`(async()=>{
  }
  const wild=targets.filter(t=>t.portraitKey.startsWith('wild.')).slice(0,5).map(t=>({...t}));await scene(wild,'Wild');
  for(const type of ['exp','material','gold']){const waves=v148BuildDailyDungeonWaves(type).waves;for(let i=0;i<waves.length;i++){await scene(waves[i],'Daily/'+type+'/'+i);evidence.nativeRosters.push('Daily/'+type+'/'+i);}}
- for(const floor of [1,5,10,100]){await scene(GameplaySystem.buildTowerRoster(floor),'Tower/'+floor);evidence.nativeRosters.push('Tower/'+floor);}
- for(const region of [0,1,2,3,4])for(const stage of [0,4]){await scene(v174AbyssBuildRoster(40,region,stage),'Abyss/'+region+'/'+stage);evidence.nativeRosters.push('Abyss/'+region+'/'+stage);}
+ for(const floor of [1,5,10,100])for(const [wave,row] of GameplaySystem.buildTowerWaves(floor).entries()){const label='Tower/'+floor+'/wave/'+(wave+1);await scene(row,label,'tower');evidence.nativeRosters.push(label);}
+ for(const region of [0,1,2,3,4])for(const stage of [0,4])for(const [wave,row] of v174AbyssBuildWaves(40,region,stage).entries()){const label='Abyss/'+region+'/'+stage+'/wave/'+(wave+1);await scene(row,label,'abyss');evidence.nativeRosters.push(label);}
  for(const encounter of Object.values(FourSymbolsAdventureContent.encounters)){
   const roster=encounter.enemies.map(e=>MonsterBalance.build({...e,mode:'adventure',chapterId:'chapter_v1',encounterId:encounter.id,context:'adventure/chapter_v1/'+encounter.id}));
   await scene(roster,'Adventure/'+encounter.id);evidence.nativeRosters.push('Adventure/'+encounter.id);

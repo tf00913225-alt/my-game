@@ -195,12 +195,14 @@ assert.doesNotMatch(source,/killMonster=function/,'V143 does not defer core deat
  const f=fixture(1);f.entities[0].hp=1;f.entities[0].noRewards=true;
  f.current.model={sprite:{impactOnly:true}};f.current.hitReached=false;
  const main=fs.readFileSync('js/00-main.js','utf8');
- Object.assign(f.context,{monsters:f.entities,currentBattleMonsters:[0],battleActive:true,
+ Object.assign(f.context,{monsters:f.entities,currentBattleMonsters:[0],battleActive:true,battleWaveState:null,
   $:()=>null,addBattleLog(){},updateMonsterUI:()=>f.context.syncImpactOverlays(),
   getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:()=>({hp:100}),
   winBattle(){f.context.emitCombatEvent('battle_end',{});f.context.battleActive=false;}});
  const killStart=main.indexOf('function killMonster('),endStart=main.indexOf('function checkBattleEnd(');
- vm.runInContext(main.slice(killStart,main.indexOf('\n/*',killStart))+main.slice(endStart,main.indexOf('\nfunction applyPostBattleAutoRecovery(',endStart)),f.context);
+ const waveGuard=main.match(/^function requestBattleWaveTransition\([\s\S]*?^\}/m);
+ assert.ok(waveGuard,'terminal fixture loads the formal optional-wave guard');
+ vm.runInContext(waveGuard[0]+main.slice(killStart,main.indexOf('\n/*',killStart))+main.slice(endStart,main.indexOf('\nfunction applyPostBattleAutoRecovery(',endStart)),f.context);
  f.context.settleBattleHpDamage(f.entities[0],1,{});f.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');
  assert.equal(f.context.checkBattleEnd(),true);assert.equal(f.entities[0].alive,false);assert.equal(f.context.battleActive,false);
  assert.equal(f.jobs.length,0,'no death, battle_end or presentation cleanup timer');

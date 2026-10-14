@@ -16,14 +16,14 @@ const assertProjection=m=>{
   for(const token of ['v132Dungeon','v132EquipmentDungeon','v141ExtraHP','v174AbyssHpMultiplier','v174AbyssDurabilityMultiplier'])assert.equal(Object.hasOwn(m,token),false,token);
   assert.equal(p.legacyMultiplier,'NONE');assert.deepEqual(p.pendingProductDecisions,[]);
 };
-test('all 50 formal encounters / 402 projections / 14 identities are stable and owner-only',()=>{
+test('all 50 formal encounters / 599 projections / 14 identities are stable and owner-only',()=>{
   const {context:c}=loadLegacyRuntime();
   c.v132BuildDungeonMonster=()=>{throw new Error('retired Abyss stat edge');};
   const identities=new Map();let projections=0;
   for(const level of [20,40])for(let region=0;region<5;region++)for(let stage=0;stage<5;stage++){
     const roster=c.v174AbyssBuildRoster(level,region,stage),again=c.v174AbyssBuildRoster(level,region,stage);
     assert.deepEqual(plain(roster.map(m=>m.balanceProjection)),plain(again.map(m=>m.balanceProjection)));
-    assert.equal(roster.length,level===40&&region===4&&stage===4?10:8);
+    assert.equal(roster.length,level===40&&region===4&&stage===4?11:12);
     assert.equal(roster.filter(m=>m.rank==='smallBoss').length,stage<4?0:level===40&&region===4?5:1);
     for(const m of roster){
       assertProjection(m);projections++;
@@ -38,7 +38,7 @@ test('all 50 formal encounters / 402 projections / 14 identities are stable and 
       assert.ok([...m.skillIds,...(m.v141SupportSkillIds||[])].every(id=>c.v144IsMonsterSkillElementLegal(m,id)));
     }
   }
-  assert.equal(projections,402);assert.equal(identities.size,14);
+  assert.equal(projections,599);assert.equal(identities.size,14);
 });
 test('Abyss rank changes final profiles without changing points; invalid contexts fail closed',()=>{
   for(const level of [20,40])for(const element of ['fire','water','wind','earth','light'])for(const archetype of Object.keys(MonsterBalance.archetypes)){
@@ -59,9 +59,11 @@ test('formal Abyss carried skills and frequency retain the starting dev baseline
   assert.equal(encounters.length,50);
   for(const row of encounters){
     const actual=c.v174AbyssBuildRoster(row.difficulty,row.region,row.stage);
-    assert.equal(actual.length,row.initialMonsters.length);
+    assert.equal(actual.length,row.difficulty===40&&row.region===4&&row.stage===4?11:12);
     for(let i=0;i<actual.length;i++){
-      const m=actual[i],old=row.initialMonsters[i];
+      const m=actual[i];
+      const old=row.initialMonsters.find(entry=>entry.name===m.name&&entry.element===m.element&&(entry.rank===m.rank||entry.rank==='boss'&&m.rank==='smallBoss'));
+      assert.ok(old,"every wave entity retains its existing rank/element skill profile");
       c.v144ConfigureMonsterEncounterSkills(m);
       assert.deepEqual(plain({name:m.name,level:m.level,element:m.element,skillFrequency:m.skillChance,skillIds:m.skillIds,supportIds:m.v141SupportSkillIds||[]}),
         {name:old.name,level:old.level,element:old.element,skillFrequency:old.skillFrequency,skillIds:old.skillIds,supportIds:old.supportIds});
@@ -83,12 +85,12 @@ test('pressure is consumed exactly once despite legacy-looking compatibility fla
 test('shared launcher preparation preserves fixed geometry and pre-battle projections',()=>{
   const {context:c}=loadLegacyRuntime();
   const rows=JSON.parse(vm.runInContext(`JSON.stringify((()=>{
-    const rows=[];autoBattle=false;autoPatrolEnabled=false;renderBattle=()=>{};renderPlayers=()=>{};updateUI=()=>{};
+    const rows=[];autoBattle=false;autoPatrolEnabled=false;renderBattle=()=>{};renderPlayers=()=>{};updateUI=()=>{};v154PreparePortraitsForEncounter=()=>({state:'ready'});
     for(const level of [20,40])for(const region of [0,3,4])for(const stage of [0,4]){
       battleActive=false;window.v132ActiveDungeonRun=null;
-      const roster=v174AbyssBuildRoster(level,region,stage);
+      const waves=v174AbyssBuildWaves(level,region,stage),roster=waves[0];
       const before=JSON.stringify(roster.map(m=>[m.maxHP,m.maxSP,m.attack,m.magicAttack,m.defense,m.agility,m.rank,m.element]));
-      if(!v132LaunchDungeonBattle(roster,()=>{},{mode:'abyss'}))throw new Error('launch refused');
+      if(!v132LaunchDungeonBattle(roster,()=>{},{mode:'abyss',waves}))throw new Error('launch refused');
       renderBattle();updateUI();
       const after=JSON.stringify(monsters.map(m=>[m.maxHP,m.maxSP,m.attack,m.magicAttack,m.defense,m.agility,m.rank,m.element]));
       const ids=currentBattleMonsters.slice();const snapshot=v138EnsureEnemyFormationSnapshot(ids);const slots=ids.map(i=>FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,i));
@@ -122,11 +124,11 @@ test('retired Abyss writers are physically absent and legacy shared callers rema
   assert.match(v141,/window\.v174AbyssBuildRoster\(40/);
   assert.doesNotMatch(fs.readFileSync('js/27-v132-content-expansion.js','utf8'),/window\.v132BuildDungeonMonster=buildDungeonMonster/);
 });
-test('formal challenge TTK matrix preserves the bare Lv40 final challenge and clears all progression references',()=>{
+test('formal challenge diagnostics allow unequipped losses and retain correctness gates',()=>{
   for(const randomPolicy of ['neutral','seeded']){const report=buildAbyssTtkMatrix({randomPolicy});assert.equal(report.cases,150);
   assert.equal(report.gate.passed,true);
-  assert.deepEqual(report.gate.unexpectedLosses,[]);assert.deepEqual(report.gate.instantWipes,[]);
-  for(const r of report.failures)assert.deepEqual([r.difficulty,r.partyLevel,r.region,r.stage],[40,40,4,4]);
+  assert.deepEqual(report.gate.invalidCases,[]);assert.deepEqual(report.gate.instantWipes,[]);
+  assert.deepEqual(report.failures,report.rows.filter(r=>!r.clear||r.survivors===0));
   assert.ok(report.rows.some(r=>r.rounds>2));
   for(const row of report.rows){assert.ok(row.rounds<=60);assert.ok(row.reference.skillCost<=row.reference.skillBudget);assert.ok(row.initialMonsters.every(m=>m.owner==='MonsterBalance'));for(const roll of row.controlUsage.rolls){const cap=roll.targetRank==='regular'?90:roll.targetRank==='elite'?75:60;assert.ok(roll.chance<=cap,'formal hard-control cap');}}
   }

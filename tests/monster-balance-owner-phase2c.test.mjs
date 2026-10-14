@@ -7,20 +7,20 @@ const elements=['fire','water','earth','wind'];
 const baseSpec=(floor,element,rank='regular',slot=0)=>({
   monsterKey:`tower.${element}.${rank}.${floor}.${slot}`,
   name:rank==='smallBoss'?'四象守關者':'四象塔衛',
-  level:floor,element,archetype:'balanced',rank,mode:'tower',context:`tower/floor/${floor}`
+  level:floor<=20?40:floor<=40?60:floor<=60?80:100,element,archetype:'balanced',rank,mode:'tower',context:`tower/floor/${floor}`
 });
 
-test('Tower Runtime build is explicit, floor=N, deterministic and owner-only',()=>{
+test('Tower Runtime build is explicit, tier levels, deterministic and owner-only',()=>{
   for(const element of elements)for(let floor=1;floor<=100;floor++){
-    const ranks=floor%10===0?['smallBoss','elite','elite',...Array(7).fill('regular')]
-      :floor%5===0?['elite','elite',...Array(8).fill('regular')]
-      :Array(10).fill('regular');
+    const ranks=floor%10===0?[...Array(6).fill('elite'),'smallBoss',...Array(5).fill('elite')]
+      :floor%5===0?[...Array(6).fill('regular'),'elite','elite',...Array(4).fill('regular')]
+      :Array(12).fill('regular');
     const roster=ranks.map((rank,slot)=>MonsterBalance.build(baseSpec(floor,element,rank,slot)));
-    assert.equal(roster.length,10);
+    assert.equal(roster.length,12);
     assert.equal(roster.filter(m=>m.rank==='smallBoss').length,floor%10===0?1:0);
-    assert.equal(roster.filter(m=>m.rank==='elite').length,floor%5===0?2:0);
+    assert.equal(roster.filter(m=>m.rank==='elite').length,floor%10===0?11:floor%5===0?2:0);
     for(const monster of roster){
-      assert.equal(monster.level,floor);
+      assert.equal(monster.level,floor<=20?40:floor<=40?60:floor<=60?80:100);
       assert.equal(monster.mode,'tower');
       assert.equal(monster.context,`tower/floor/${floor}`);
       assert.equal(monster.balanceOwner,'MonsterBalance');
@@ -29,7 +29,7 @@ test('Tower Runtime build is explicit, floor=N, deterministic and owner-only',()
       assert.equal(Object.hasOwn(monster,'v132EquipmentDungeon'),false);
       assert.equal(monster.balanceProjection.legacyMultiplier,'NONE');
       assert.equal(monster.balanceProjection.pendingProductDecisions.length,0);
-      assert.equal(monster.balanceProjection.base.abilityPointBudget,(floor-1)*5);
+      assert.equal(monster.balanceProjection.base.abilityPointBudget,((floor<=20?40:floor<=40?60:floor<=60?80:100)-1)*5);
       assert.deepEqual(monster.balanceProjection.allocation,MonsterBalance.preview(baseSpec(floor,element,monster.rank)).allocation);
     }
   }
@@ -66,7 +66,7 @@ test('Tower element stat projection is owned once while gameplay metadata stays 
   assert.equal(wind.final.speed,wind.derived.speed*1.15);
   assert.deepEqual(wind.profiles.element.metadata,{evasionBonusPercent:15});
   const earth=MonsterBalance.preview(baseSpec(50,'earth'));
-  assert.equal(earth.final.maxHP,Math.round(earth.derived.maxHP*TOWER_MODE_PROFILE.hp*1.15));
+  assert.equal(earth.final.maxHP,Math.round(earth.derived.maxHP*TOWER_MODE_PROFILE.hp*1.15)+1500);
   assert.equal(earth.final.defense,Math.round(earth.derived.defense*1.15));
 });
 

@@ -64,11 +64,15 @@ assert.match(relicCss,/#game-ui #homeFeatureModal\.team-relic-modal \.team-relic
 assert.match(relicCss,/#game-ui #homeFeatureModal\.team-relic-modal \.team-relic-detail-back::after\{content:"返回秘寶列表";[^}]*font-size:15px/,
     "the detail return label must have exactly one visible 15px action source");
 
-assert.match(abyss,/for\(let position=0;position<5;position\+\+\)[\s\S]*?for\(let position=1;position<=3;position\+\+\)/,
-    "normal emperor stages must keep the five-slot front row and only three centered rear elites");
+assert.match(abyss,/function buildEncounterWaves\([\s\S]*?const first=Array\.from\(\{length:6\}/,
+    "normal emperor stages must begin with the formal six-enemy first wave");
+assert.match(abyss,/if\(bossStage\)\{ second\.push\(makeAbyssMonster\(region\.emperor,config,region,"smallBoss",stage,true\)\); \}[\s\S]*?while\(second\.length<6\)[\s\S]*?return \[first,second\];/,
+    "normal emperor second wave must retain the fixed emperor plus five elites within six slots");
 assert.doesNotMatch(abyss,/for\(let index=0;index<10;index\+\+\)/,
     "legacy one-boss plus nine-elite construction must be removed");
-assert.match(abyss,/function buildTrueRealmFinalRoster\(config\)[\s\S]*?for\(let position=0;position<5;position\+\+\)/,
-    "Lv40 true-realm final five-emperor formation remains separately owned and unchanged");
+assert.match(abyss,/function buildTrueRealmFinalRoster\(config\)[\s\S]*?FINAL_TRUE_REALM_EMPERORS\.forEach\(definition=>\{[\s\S]*?FINAL_TRUE_REALM_LOADOUTS\[definition\.name\]/,
+    "Lv40 final five emperors must retain their canonical fixed loadouts");
+assert.match(abyss,/if\(final\)\{ return \[first,buildTrueRealmFinalRoster\(config\)\]; \}/,
+    "Lv40 final five emperors must enter only the second wave");
 
 console.log("✓ relic navigation, dialog button and Abyss boss polish tests passed");

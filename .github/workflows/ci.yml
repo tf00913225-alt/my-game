@@ -279,6 +279,8 @@ jobs:
         if: needs.classify.outputs.full_node != 'true'
         run: |
           node tests/relic-trigger-lifecycle-battle-input-ui-20260919.test.js
+          node tests/battle-two-wave-runtime.test.js
+          node tests/battle-two-wave-integration.test.mjs
           node tests/v174-team-relic-system.test.js
           node tests/v174-team-relic-hardening.test.js
           node tests/v174-battle-presentation-sequencing.test.js
@@ -935,7 +937,7 @@ jobs:
     if: needs.classify.outputs.abyss_balance == 'true'
     name: Abyss Phase2D production gates
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
         with:

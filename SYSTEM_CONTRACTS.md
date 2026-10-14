@@ -44,6 +44,9 @@
 - 敵方免費追擊沿用原 action snapshot。原 primary 存活且合法時必須沿用；被上一擊擊敗時，由同一 Core Target Owner 的 `retargetEnemyFollowUpSnapshot` 從原 Snapshot 身份中選取目前存活且合法的 primary，並鎖定給後續追擊。存活但失去合法性／身份被替換時不得 fallback；無合法 Survivor 才停止。範圍由正式 Slot Owner 解析後仍限原存活快照。全體技維持原全體語意但不納入稍後復活者。V149 只擁有追擊次數與演出，不擁有重新選目標的決策權。
 
 - 一般戰鬥維持 `single / tri / row / column / all` 的 Fixed Slot（固定格位）規則。
+- 敵方六格 V1 仍由 `js/battlefield-slot-owner.js` 唯一控制。`wild / daily / abyss / tower` 的新遭遇在原始名單不超過六名時使用 `standard-six`：後排 `ENEMY_B1/B2/B3`、前排 `ENEMY_F1/F2/F3`；沿用原 ID 的前後排與欄位語意，不改我方格位。遭遇建立後固定同一份 snapshot，死亡不重排、不把空格納入目標。
+- 超過六名的一般遭遇保留完整 `legacy-ten` 名單及幾何，snapshot／戰場 DOM 明確標記 `pending-wave-migration`。深淵及四象塔正式遭遇由既有 `js/00-main.js::FourSymbolsBattleWaves` 單一波次 Owner 管理兩波，每波最多六名；不得將兩波的完整資料目錄直接送入渲染。個人／世界 Boss、特殊物件、援軍及 Adventure 維持原規則。
+- 六格 DOM、技能範圍與 VFX 共用上述 snapshot。正式 `css/fixed-slot-battlefield-rendering-v2.css` 依格位來源投影每排欄數；只有 `standard-six` 使用敵方／操作／我方 `48/16/36` 區域比例，其他模式保留 `42/16/42`。立繪沿用 V174 與 Registry Alpha Bounds（透明輪廓範圍）的等比例、不裁切投影，不新增座標或圖片縮放 Owner。
 - `FourSymbolsBattleSkillTargeting` 是技能 Target Shape（目標形狀）與 hostile primary eligibility（敵對主要目標可選性）的唯一協調入口；玩家→敵方、敵方→玩家、手動、自動與支援技能都必須使用同一份正式 Skill Data／effective target type，再交由 `FourSymbolsBattlefieldSlots` 解析幾何。禁止同一 Skill ID 因施放方不同而硬寫第二份目標人數或範圍。
 - Stealth（隱身）只禁止成為 hostile primary target（敵對主要選定目標）：普通攻擊與任何需要指定 primary 的 `single / tri / row / column` 都不得選中隱身單位；但 `tri / row / column / all` 已由其他合法 primary／全體範圍解析出的波及名單仍可包含隱身單位。
 - Boss（頭目）專屬模式內，Boss、援軍、圖騰、戰旗、法器與技能召喚物都是獨立的數字索引 target entity（目標單位）。
@@ -153,9 +156,9 @@
 
 ## Four-Symbol Tower Formation／Small Boss 契約
 
-- 四象塔每個元素、每層（含第 100 層）固定 10 個真實戰鬥單位，唯一格位 `B1...B5 + F1...F5`。一般層 10 Regular；每 5 層且非 10 倍數為 2 Elite + 8 Regular；每 10 層為 1 Tower Boss + 2 Elite + 7 Regular。All 結算所有存活目標；其他目標形狀不變。
-- 10 人 Boss 層 `ENEMY_B3` 永遠是唯一 Tower Boss；沒有 Boss 的 10 人特殊層，`ENEMY_B3` 優先為 Elite。死亡後 Slot 不重排、不補位。
-- Tower Boss gameplay `rank="boss"`，但不是 Large Boss entity：固定單格 `ENEMY_B3`、`unitKind="tower-boss"`、不啟用 `FourSymbolsBossBattle` 的中央六格 footprint、B1/B5 援軍、F1/F5 Boss objects、Boss Shield／Mechanism Inspector。
+- 四象塔每層由正式波次 Owner 管理兩波，每波六名，唯一格位 `ENEMY_B1/B2/B3 + ENEMY_F1/F2/F3`。普通層兩波各六 Regular；精英層第一波六 Regular、第二波二 Elite 四 Regular；Boss 層第一波六 Elite、第二波一 Tower Boss 五 Elite。All 僅結算目前波次所有存活目標。
+- 第二波 Boss 層 `ENEMY_B2` 是唯一 Tower Boss 的中央格位。死亡後 Slot 不重排、不補位。
+- Tower Boss gameplay `rank="boss"`，但不是 Large Boss entity：固定單格 `ENEMY_B2`、`unitKind="tower-boss"`、不啟用 `FourSymbolsBossBattle` 的中央六格 footprint、B1/B5 援軍、F1/F5 Boss objects、Boss Shield／Mechanism Inspector。
 - Large Boss 架構只保留 Personal Boss 與 World Boss；Abyss 仍使用自己的正式編成 Owner。
 - Tower Boss portrait `sizeClass="standard"`，正式規格 1024×1536、2:3；`rank` 與 portrait `sizeClass` 不得混為同一語意。
 
@@ -198,6 +201,8 @@
 - A live V143 impact is scheduled as one target-plus-`impactId` batch. Its requests register before the batch flushes and sort Shield → Damage/Critical/MISS/Resist → Status. Synthetic feedback without an `impactId` stays on the normal queue; clear cancels every pending batch.
 - Persistent state Gate returns a reason. `sameNameDuplicate` is a silent reject before hit rolling or mutation; `exclusiveConflict` (Freeze/Petrify) emits formal status MISS; resistance remains distinct.
 - 普通攻擊名稱顯示 700ms，動畫仍為 520ms，名稱不取得流程鎖；其他技能名稱維持 duration × 2/3。唯一 Core Queue resolve delay 為 visualRemaining + 650ms；技能秒數與 Hit Frame 不變。普通 Impact 的視覺時鐘於同步 settlement／DOM task 完成後由 V143 啟動，Hit task 先投影正式資源／狀態，再揭示 Impact 與同批浮字／recoil／SFX。初始化待完成時 V142 remaining 保留 authored duration；cold hit 的既有 140ms recoil 不得被到期清理截斷，dispose／supersede 仍立即取消。
+- 深淵／四象塔換波沿用同一 Core Queue 的 visualRemaining + 650ms，不另疊等待、不建立新 Session、不發布第二次 battle_start。第一波全滅進入 WAVE_TRANSITION，正式 Action／追擊／秘寶及呈現鎖釋放後才換敵人；第二波全滅才 BATTLE_COMPLETE 並走原有單次結算。玩家 HP、SP、怒氣、狀態、秘寶計數及統計保留；換波不額外遞減持續時間或新增回合。舊敵人及目標引用釋放，第二波用不重用的實體索引與既有 Fixed Slot 快照。
+- 深淵前置關為六普通→三精英三普通；帝王關為六精英→一帝王五精英；Lv.40 最終戰第一波沿用水、土、火、風四種精英配置循環為水／土／火／風／水／土（保留舊前五名，不因循環五人格位名單而追加第三補師），第二波為東、天、極、北、南五位天尊（第六格空位）。天尊沿用正式固定技能；等級、MonsterBalance 數值 Owner、獎勵及地圖通關流程不變。
 - 戰場怪物 identity 僅名稱，等級讀正式 entity.level 於 Battle Status Detail 顯示；玩家 ID／SP／HP HUD 共用名稱列與資源條 tokens 連續相接，不改 Slot／artwork geometry。
 - Skill-name presentation derives color from `skill.element` through `data-skill-element`; character element must not participate. It is a document-level fixed viewport surface and shares the ordinary floating-feedback visual font size.
 
@@ -247,6 +252,6 @@
 - Water Status Accuracy +15 個百分點適用 Soft／DoT／Hard Control。先加入 `calculateStatusEffectChance` 正式公式，最後 Clamp：一般 Status 5～95%；Player→Regular 5～90%、Elite 5～75%、Boss 5～60%；Enemy→Player Hard Control 5～60%，與施放怪物 rank 無關。30+15=45；52+15=67→60。
 - Wind：最終 Evasion +15 個百分點（不另設上限）；Agility／Speed ×1.15，只影響速度，不增加 Evasion 或 Accuracy。
 - Earth：Defense ×1.15、Max HP ×1.15、建立時 hp=maxHP，Profile 同場冪等，不在 render/reload/round 疊加。
-- Profile 僅套 Tower metadata；其他玩法的敵人数量、技能頻率與戰鬥數值保持既有規則。入口顯示當週元素特性、樓層施放率與每層固定 10 名敵人。
+- Profile 僅套 Tower metadata；其他玩法的敵人数量、技能頻率與戰鬥數值保持既有規則。入口顯示當週元素特性、樓層施放率與每層兩波、每波六名敵人。普通層兩波各六名普通怪；精英層第一波六名普通怪、第二波二精英四普通；Boss 層第一波六精英、第二波一 Boss 五精英。
 
 本批已核准暫定獎勵：四象塔每週每10層首次通關體質寶石×1，沿用既有每週樓層領取記錄；裝備副本每次通關等機率抽取赤炎／寒泉／岩岳／青嵐碎片一種×10（各25%），與寶箱一起領取及廣告雙倍。數量與分布集中於各玩法正式 Reward Owner。

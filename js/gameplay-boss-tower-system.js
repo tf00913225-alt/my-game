@@ -389,7 +389,7 @@
         const next=Math.min(TOWER_FLOORS,tower.completedFloor+1);
         content.innerHTML='<div class="tower-home">'+towerChoiceMarkup()+
             '<section class="tower-element-hero" data-tower-element="'+escapeHtml(tower.element)+'" style="--tower-color:'+element.color+';--tower-glow:'+element.glow+'"><div><small>本週元素試煉</small><h3>'+escapeHtml(element.label)+'元素</h3><strong>'+tower.completedFloor+' / 100</strong><p>'+escapeHtml(element.style)+'</p></div></section>'+
-            '<p class="tower-challenge-rules">每層固定 10 名敵人。敵方技能施放率隨樓層提升：1～30 層 65%、31～60 層 70%、61～90 層 75%、91～100 層 80%。</p>'+
+            '<p class="tower-challenge-rules">每層兩波、每波 6 名敵人。敵方技能施放率隨樓層提升：1～30 層 65%、31～60 層 70%、61～90 層 75%、91～100 層 80%。</p>'+
             '<div class="tower-summary-grid"><div><small>本週最高</small><b>'+tower.highestThisWeek+' 層</b></div><div><small>歷史最高</small><b>'+tower.historicalHighest+' 層</b></div><div><small>下一層</small><b>第 '+next+' 層</b></div><div><small>下一重要獎勵</small><b>第 '+nextTowerRewardFloor(tower.completedFloor)+' 層</b></div></div>'+
             (level<TOWER_UNLOCK_LEVEL?'<div class="boss-overview-line"><span>四象塔於 Lv30 開放</span><b>目前 Lv.'+level+'</b></div>':'')+
             '<label class="tower-auto-advance"><input type="checkbox" '+(towerAutoAdvanceEnabled?'checked ':'')+(level<TOWER_UNLOCK_LEVEL||tower.pendingRelicChoice||tower.completedFloor>=TOWER_FLOORS?'disabled ':'')+'onchange="vGameplayToggleTowerAutoAdvance(this.checked)"><span>自動挑戰下一層</span></label>'+
@@ -528,7 +528,7 @@
         const identityKey=portraitKey||("tower-"+element+"-"+role+"-"+floor);
         return window.MonsterBalance.build({
             monsterKey:"tower."+element+"."+role+"."+identityKey,
-            name:name,level:floor,element:element,archetype:"balanced",
+            name:name,level:window.MonsterBalance.towerLevelForFloor(floor),element:element,archetype:"balanced",
             rank:rank,mode:"tower",context:"tower/floor/"+floor
         });
     }
@@ -565,26 +565,22 @@
         applyTowerChallengeProfile(monster);
         return monster;
     }
-    function buildTowerRoster(floor){
+    function buildTowerWaves(floor){
         const element=state.tower.element,level=floor;
-        const special=floor%5===0;
-        if(!special){
-            return Array.from({length:10},(_,index)=>buildTowerTroop(level,element,"regular",floor,index));
+        const bossFloor=floor%10===0,eliteFloor=floor%5===0;
+        const first=Array.from({length:6},(_,index)=>buildTowerTroop(level,element,bossFloor?"elite":"regular",floor,index));
+        const second=[];
+        if(bossFloor){
+            second.push(buildTowerBossMonster({id:"tower-"+floor,name:towerBossName(element,floor),level:level,element:element},floor));
         }
-        const roster=[];
-        if(floor%10===0){
-            const definition={id:"tower-"+floor,name:towerBossName(element,floor),level:level,element:element};
-            roster.push(buildTowerBossMonster(definition,floor));
+        while(second.length<6){
+            const rank=bossFloor||eliteFloor&&second.length<2?"elite":"regular";
+            second.push(buildTowerTroop(level,element,rank,floor,second.length));
         }
-        const eliteCount=2;
-        for(let i=0;i<eliteCount;i++){
-            roster.push(buildTowerTroop(level,element,"elite",floor,i));
-        }
-        while(roster.length<10){
-            roster.push(buildTowerTroop(level,element,"regular",floor,roster.length));
-        }
-        return roster;
+        return [first,second];
     }
+    // Flat catalog remains available for audits; never hand it to the renderer.
+    function buildTowerRoster(floor){ return buildTowerWaves(floor).flat(); }
 
     function isLargeBossContext(){
         return !!(activeBattleContext&&(activeBattleContext.mode==="personal"||activeBattleContext.mode==="world"));
@@ -1294,8 +1290,9 @@
         ensureCurrentTowerWeek();
         const target=clamp(Math.floor(numeric(floor,state.tower.completedFloor+1)),1,TOWER_FLOORS);
         if(battleStarting||highestCharacterLevel()<TOWER_UNLOCK_LEVEL||state.tower.pendingRelicChoice||target>state.tower.completedFloor+1){ return false; }
-        const roster=buildTowerRoster(target);
-        const towerBoss=roster.find(monster=>monster&&monster.vGameplayTowerBoss===true)||null;
+        const waves=buildTowerWaves(target);
+        const roster=waves[0];
+        const towerBoss=waves[1].find(monster=>monster&&monster.vGameplayTowerBoss===true)||null;
         activeBattleContext={
             mode:"tower",
             floor:target,
@@ -1304,11 +1301,11 @@
         };
         battleStarting=true;
         const launch=()=>{
-            roster.forEach(bindTowerMonsterIdentity);
+            waves.flat().forEach(bindTowerMonsterIdentity);
             const started=window.v132LaunchDungeonBattle(
                 roster,
                 outcome=>completeTowerFloor(target,outcome),
-                {mode:"tower"}
+                {mode:"tower",waves:waves}
             );
             battleStarting=false;
             if(!started){ activeBattleContext=null;return false; }
@@ -1320,7 +1317,7 @@
             console.warn("[tower-portrait] shared encounter preparation owner unavailable");
             return false;
         }
-        const preparation=window.v154PreparePortraitsForEncounter(roster);
+        const preparation=window.v154PreparePortraitsForEncounter(waves.flat());
         if(preparation&&typeof preparation.then!=="function"){
             if(preparation.state!=="ready"){
                 battleStarting=false;
@@ -1451,6 +1448,7 @@
          getTowerFloorKind:towerFloorKind,
          getTowerPortraitAssetId:towerPortraitAssetId,
          buildTowerRoster:buildTowerRoster,
+         buildTowerWaves:buildTowerWaves,
          applyTowerElementProfile:applyTowerElementProfile,
          applyTowerChallengeProfile:applyTowerChallengeProfile,
          getTowerSkillChance:towerSkillChance,
