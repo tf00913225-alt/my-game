@@ -294,3 +294,78 @@ test("historical empty quest snapshots and receipt replay are preserved without 
     assert.deepEqual(historical.progress.dailyQuestState,{});
     assert.deepEqual(historical.progress.commissionQuestState,{});
 });
+
+
+function clientInitialGameplay(recordedAt){
+    const client={console,setTimeout:()=>0,clearTimeout:()=>{},saveGame:()=>{},
+        FourSymbolsAccountSave:{getActiveUid:()=>"fixture",saveKey:()=>"fixture",
+            readForUid:()=>({status:"missing"})}};
+    client.window=client;
+    vm.runInNewContext(readFileSync(new URL("../js/gameplay-boss-tower-system.js",import.meta.url),"utf8"),client);
+    return JSON.parse(JSON.stringify(client.GameplaySystem.normalizeState(null,recordedAt)));
+}
+
+test("new-account Boss and Tower storage matches the actual Client at UTC week boundaries",async()=>{
+    const times=[Date.UTC(1970,0,5),Date.UTC(2020,1,23,23,59,59,999),
+        Date.UTC(2020,1,24),Date.UTC(2020,2,2),Date.UTC(2020,2,9),Date.UTC(2020,2,16),
+        Date.UTC(2023,11,31,23,59,59,999),Date.UTC(2024,0,1),
+        Date.UTC(2024,1,29),Date.UTC(2026,9,15),1700000000000];
+    const elements=new Set();
+    for(const recordedAt of times){
+        const expected=clientInitialGameplay(recordedAt),h=harness();
+        elements.add(expected.tower.element);h.setClock(recordedAt);
+        const args={operationId,expectedRevision:4,selection};
+        await h.writer.commitInitialSources({},args);
+        const progress=h.data.get(`${root}/progress/current`);
+        const snapshot=h.data.get(`${root}/playableSnapshots/5`);
+        const archive=h.data.get(`${root}/recoveryArchives/5`);
+        assert.deepEqual(progress.gameplayProgress,expected);
+        assert.deepEqual(snapshot.snapshot.progress.gameplayProgress,expected);
+        assert.deepEqual(archive.sourceRecords.progress.gameplayProgress,expected);
+        assert.equal(snapshot.readyForPublication,false);assert.equal(archive.readyForRestore,false);
+        assert.equal(h.data.get(save).authoritativeStateReady,false);
+        assert.equal(archive.sourceRecords.claimRecords.length,0);
+        assert.equal(h.data.get(`${root}/economy/current`).gold,0);
+        const before=JSON.stringify([...h.data]),count=h.committed;
+        h.setClock(recordedAt+35*86400000);
+        await h.writer.commitInitialSources({},args);
+        assert.equal(h.committed,count);assert.equal(JSON.stringify([...h.data]),before);
+    }
+    assert.deepEqual([...elements].sort(),["earth","fire","water","wind"]);
+});
+
+test("Client Boss progress, Tower periods and claim markers cannot be imported at creation",async()=>{
+    for(const key of ["gameplayProgress","tower","weekKey","claimedFloors","personal","world",
+        "firstClear","completedStages","historicalHighest","pendingRelicChoice"]){
+        const h=harness();
+        await assert.rejects(h.writer.commitInitialSources({},{
+            operationId,expectedRevision:4,selection:{...selection,[key]:clientInitialGameplay(1700000000000)}
+        }),/Invalid initial/);
+        assert.equal(h.committed,0);
+    }
+});
+
+test("historical empty Boss and Tower receipts and original factory hash remain unchanged",async()=>{
+    const {assembleCanonicalSnapshot}=require("../functions/src/canonical-snapshot.js");
+    const {createRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
+    const historical=makeInitialCharacterSources(uid,5,operationId,selection);
+    assert.deepEqual(historical.progress.gameplayProgress,{});
+    assert.equal(assembleCanonicalSnapshot(uid,5,historical).sha256,
+        "d2a7e43cffce469abde068d3f993079b5eef072adb2c4169154c567fa430bb54");
+    const h=harness(),args={operationId,expectedRevision:4,selection};
+    await h.writer.commitInitialSources({},args);
+    const records=structuredClone(h.data.get(`${root}/recoveryArchives/5`).sourceRecords);
+    records.progress.gameplayProgress={};
+    const snapshot=assembleCanonicalSnapshot(uid,5,records);
+    const archive=createRecoveryArchive(uid,5,records,snapshot);
+    h.data.set(`${root}/progress/current`,records.progress);
+    h.data.set(`${root}/playableSnapshots/5`,snapshot);
+    h.data.set(`${root}/recoveryArchives/5`,archive);
+    h.data.get(`${root}/operations/${operationId}`).snapshotSha256=snapshot.sha256;
+    const before=JSON.stringify([...h.data]),count=h.committed;
+    h.setClock(1900000000000);
+    await h.writer.commitInitialSources({},args);
+    assert.equal(h.committed,count);assert.equal(JSON.stringify([...h.data]),before);
+});
+
