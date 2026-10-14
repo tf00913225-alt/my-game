@@ -286,8 +286,36 @@ assert.equal((await db.doc(`serverUsers/${freshUid}/economy/current`).get())
     .get("gold"),0);
 assert.equal((await db.doc(`serverUsers/${freshUid}/playableSnapshots/2`).get())
     .get("readyForPublication"),false);
+// New-account quest storage evidence only: no period rollover or reward.
+const freshQuestStates={
+    dailyQuestState:{date:"",progress:{checkin:0,killMonsters:0,winBattle:0},
+        claimed:{checkin:false,killMonsters:false,winBattle:false}},
+    commissionQuestState:{date:"",progress:{killMonsters:0,winBattle:0},
+        claimed:{killMonsters:false,winBattle:false}}
+};
+const freshProgressRef=db.doc(`serverUsers/${freshUid}/progress/current`);
+const freshQuestProgress=await freshProgressRef.get();
+const freshQuestSnapshot=(await db.doc(`serverUsers/${freshUid}/playableSnapshots/2`).get()).data();
+const freshQuestArchive=(await checkRecoveryArchive(freshUid,2)).data();
+for(const [key,state] of Object.entries(freshQuestStates)){
+    assert.deepEqual(freshQuestProgress.get(key),state);
+    assert.deepEqual(freshQuestSnapshot.snapshot.progress[key],state);
+    assert.deepEqual(freshQuestArchive.sourceRecords.progress[key],state);
+    await assert.rejects(invoke("createInitialCanonicalCharacter",freshUser.idToken,
+        {...freshPayload,selection:{...choices,[key]:state}}),error=>
+        ["invalid-argument","INVALID_ARGUMENT"].includes(error.code));
+}
+assert.equal(freshQuestArchive.readyForRestore,false);
+assert.equal(freshQuestSnapshot.readyForPublication,false);
+assert.equal(freshQuestArchive.sourceRecords.claimRecords.length,0);
+assert.equal((await db.doc(`users/${freshUid}/saves/current`).get())
+    .get("authoritativeStateReady"),false);
 assert.equal((await invoke("createInitialCanonicalCharacter",freshUser.idToken,
     freshPayload)).unchanged,true);
+const freshQuestReplay=await freshProgressRef.get();
+assert.deepEqual(freshQuestReplay.data(),freshQuestProgress.data());
+assert.ok(freshQuestReplay.updateTime.isEqual(freshQuestProgress.updateTime));
+console.log("Initial quests real callable: exact zero sources, archive, replay, rejected imports and false readiness PASS");
 await assert.rejects(invoke("createInitialCanonicalCharacter",freshUser.idToken,
     {...freshPayload,selection:{...choices,displayName:"另一人"}}),error=>
     ["data-loss","DATA_LOSS"].includes(error.code));

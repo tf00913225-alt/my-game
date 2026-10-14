@@ -87,7 +87,15 @@ function makeInitialCharacterSources(uid,revision,operationId,selection,{recorde
             skillLoadout:{name:selection.displayName,skillLevels:{},equippedSkills:[]}}],
         economy:{...base,gold:0,sharedExp:0},inventory:[],equipment:[],relics:[],
         relicLoadout:{...base,relicId:null,subRelicId:null},
-        progress:{...base,dailyQuestState:{},commissionQuestState:{},
+        progress:{...base,
+            // Record the Client's pre-period zero state only for genuine new creation.
+            // No daily rollover, completion, reward or historical backfill.
+            dailyQuestState:recordedAt===undefined?{}:{
+                date:"",progress:{checkin:0,killMonsters:0,winBattle:0},
+                claimed:{checkin:false,killMonsters:false,winBattle:false}},
+            commissionQuestState:recordedAt===undefined?{}:{
+                date:"",progress:{killMonsters:0,winBattle:0},
+                claimed:{killMonsters:false,winBattle:false}},
             achievementState:{},gameplayProgress:{},
             abyssProgress:recordedAt===undefined?{}:makeInitialAbyssState(),
             ...(recordedAt===undefined?{}:{playableState:{

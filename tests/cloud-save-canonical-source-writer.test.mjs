@@ -233,3 +233,64 @@ test("historical source factory calls do not backfill the legacy Abyss sidecar",
     assert.deepEqual(makeInitialSidecars()["legacy-abyss-state"],{status:"not-applicable",raw:null});
     assert.equal(Object.hasOwn(historical.progress,"playableState"),false);
 });
+
+test("new-account quest sources match the actual Client initial declarations without rewards",async()=>{
+    const client=readFileSync(new URL("../js/00-main.js",import.meta.url),"utf8");
+    const expected={};
+    for(const key of ["dailyQuestState","commissionQuestState"]){
+        const declaration=client.match(new RegExp("let "+key+"=\\{[\\s\\S]*?^\\};","m"));
+        assert.ok(declaration,"Client initial quest declaration missing: "+key);
+        expected[key]=JSON.parse(JSON.stringify(vm.runInNewContext(declaration[0]+";"+key)));
+    }
+    const h=harness(),args={operationId,expectedRevision:4,selection};
+    await h.writer.commitInitialSources({},args);
+    const progress=h.data.get(`${root}/progress/current`);
+    const snapshot=h.data.get(`${root}/playableSnapshots/5`);
+    const archive=h.data.get(`${root}/recoveryArchives/5`);
+    for(const [key,state] of Object.entries(expected)){
+        assert.deepEqual(progress[key],state);
+        assert.deepEqual(snapshot.snapshot.progress[key],state);
+        assert.deepEqual(archive.sourceRecords.progress[key],state);
+        assert.equal(state.date,"");
+        assert.ok(Object.values(state.progress).every(value=>value===0));
+        assert.ok(Object.values(state.claimed).every(value=>value===false));
+        const imported=harness();
+        await assert.rejects(imported.writer.commitInitialSources({},{
+            ...args,selection:{...selection,[key]:state}}),/Invalid initial/);
+        assert.equal(imported.committed,0);
+    }
+    assert.equal(snapshot.readyForPublication,false);
+    assert.equal(archive.readyForRestore,false);
+    assert.equal(h.data.get(save).authoritativeStateReady,false);
+    assert.equal(archive.sourceRecords.claimRecords.length,0);
+    assert.equal(h.data.get(`${root}/economy/current`).gold,0);
+    const before=JSON.stringify([...h.data]),count=h.committed;
+    h.setClock(1900000000000);
+    await h.writer.commitInitialSources({},args);
+    assert.equal(h.committed,count);
+    assert.equal(JSON.stringify([...h.data]),before);
+});
+
+test("historical empty quest snapshots and receipt replay are preserved without backfill",async()=>{
+    const {assembleCanonicalSnapshot}=require("../functions/src/canonical-snapshot.js");
+    const {createRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    const h=harness(),args={operationId,expectedRevision:4,selection};
+    await h.writer.commitInitialSources({},args);
+    const records=structuredClone(h.data.get(`${root}/recoveryArchives/5`).sourceRecords);
+    records.progress.dailyQuestState={};
+    records.progress.commissionQuestState={};
+    const snapshot=assembleCanonicalSnapshot(uid,5,records);
+    const archive=createRecoveryArchive(uid,5,records,snapshot);
+    h.data.set(`${root}/progress/current`,records.progress);
+    h.data.set(`${root}/playableSnapshots/5`,snapshot);
+    h.data.set(`${root}/recoveryArchives/5`,archive);
+    h.data.get(`${root}/operations/${operationId}`).snapshotSha256=snapshot.sha256;
+    const before=JSON.stringify([...h.data]),count=h.committed;
+    await h.writer.commitInitialSources({},args);
+    assert.equal(h.committed,count);
+    assert.equal(JSON.stringify([...h.data]),before);
+    const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
+    const historical=makeInitialCharacterSources(uid,5,operationId,selection);
+    assert.deepEqual(historical.progress.dailyQuestState,{});
+    assert.deepEqual(historical.progress.commissionQuestState,{});
+});
