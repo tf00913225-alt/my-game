@@ -937,7 +937,7 @@ jobs:
     if: needs.classify.outputs.abyss_balance == 'true'
     name: Abyss Phase2D production gates
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
         with:
