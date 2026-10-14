@@ -1,5 +1,7 @@
 /* Real Auth + Functions + Firestore emulator integration. Never target live data. */
 import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import vm from "node:vm";
 import {createRequire} from "node:module";
 import {createHash,randomBytes} from "node:crypto";
 const require=createRequire(new URL("../functions/package.json",import.meta.url));
@@ -305,6 +307,22 @@ for(const [key,state] of Object.entries(freshQuestStates)){
         {...freshPayload,selection:{...choices,[key]:state}}),error=>
         ["invalid-argument","INVALID_ARGUMENT"].includes(error.code));
 }
+// Compare real callable source storage with the actual Client Owner at the
+// server-pinned creation instant. No Client lifecycle or reward is executed.
+const freshGameplayClient={console,setTimeout:()=>0,clearTimeout:()=>{},saveGame:()=>{},
+    FourSymbolsAccountSave:{getActiveUid:()=>"fixture",saveKey:()=>"fixture",
+        readForUid:()=>({status:"missing"})}};
+freshGameplayClient.window=freshGameplayClient;
+vm.runInNewContext(readFileSync(new URL("../js/gameplay-boss-tower-system.js",import.meta.url),"utf8"),
+    freshGameplayClient);
+const freshGameplayExpected=JSON.parse(JSON.stringify(freshGameplayClient.GameplaySystem.normalizeState(
+    null,freshQuestProgress.get("playableState.lastSaveTimestamp"))));
+assert.deepEqual(freshQuestProgress.get("gameplayProgress"),freshGameplayExpected);
+assert.deepEqual(freshQuestSnapshot.snapshot.progress.gameplayProgress,freshGameplayExpected);
+assert.deepEqual(freshQuestArchive.sourceRecords.progress.gameplayProgress,freshGameplayExpected);
+await assert.rejects(invoke("createInitialCanonicalCharacter",freshUser.idToken,
+    {...freshPayload,selection:{...choices,gameplayProgress:freshGameplayExpected}}),error=>
+    ["invalid-argument","INVALID_ARGUMENT"].includes(error.code));
 assert.equal(freshQuestArchive.readyForRestore,false);
 assert.equal(freshQuestSnapshot.readyForPublication,false);
 assert.equal(freshQuestArchive.sourceRecords.claimRecords.length,0);
@@ -315,6 +333,7 @@ assert.equal((await invoke("createInitialCanonicalCharacter",freshUser.idToken,
 const freshQuestReplay=await freshProgressRef.get();
 assert.deepEqual(freshQuestReplay.data(),freshQuestProgress.data());
 assert.ok(freshQuestReplay.updateTime.isEqual(freshQuestProgress.updateTime));
+console.log("Initial Boss/Tower real callable: exact Client initial storage, archive, replay, rejected imports and false readiness PASS");
 console.log("Initial quests real callable: exact zero sources, archive, replay, rejected imports and false readiness PASS");
 await assert.rejects(invoke("createInitialCanonicalCharacter",freshUser.idToken,
     {...freshPayload,selection:{...choices,displayName:"另一人"}}),error=>
