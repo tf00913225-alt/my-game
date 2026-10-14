@@ -30,8 +30,8 @@ for(const skill of [
 }
 assert.doesNotMatch(abyssBundle,/FINAL_BOSS_RULES|v144PatchFinalAbyssRoster|v155PatchFinalAbyssRoster/);
 assert.doesNotMatch(gameplayJs,/56-v173\.51-shop-qa|v17351ShopQa/);
-assert.match(gameplayCss,/grid-template-rows:32px minmax\(0,1fr\) 58px !important/);
-assert.doesNotMatch(gameplayCss,/grid-template-rows:minmax\(0,1fr\) 64px!important/);
+assert.match(gameplayCss,/grid-template-rows:96px minmax\(0,1fr\) 174px !important/);
+assert.doesNotMatch(gameplayCss,/grid-template-rows:minmax\(0,1fr\) (?:64|192)px!important/);
 assert.match(appCss,/v146-home-roster > header/);
 assert.match(appCss,/display:grid;grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1\.55fr\) auto/);
 console.log("Production bundle owner/cascade checks passed");
