@@ -915,23 +915,27 @@ test("historical v1 Boss and Tower bytes keep their hash without satisfying comp
     assert.deepEqual(records,before);
 });
 
-test("server-created empty gameplay initialization stays unpublished and cannot replace recorded Client progress",()=>{
+test("new-account Boss and Tower sources satisfy storage projection without publication or history defaults",()=>{
     const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
     const records=makeInitialCharacterSources("uid-a",7,"create-gameplay",{displayName:"new hero",
         element:"water",gender:"female",
         attributes:{attack:1,intelligence:2,vitality:3,energy:4,defensePoints:0,agility:0}},
         {recordedAt:1700000000000});
+    const expected=JSON.parse(JSON.stringify(gameplayClient.GameplaySystem.normalizeState(null,1700000000000)));
+    assert.deepEqual(records.progress.gameplayProgress,expected);
     const before=structuredClone(records);
     assert.equal(assembleCanonicalSnapshot("uid-a",7,records).readyForPublication,false);
     assert.deepEqual(records,before);
-    // Explicit test-only sources isolate this domain. Production creation is unchanged.
+    assert.throws(()=>assemble(records),/sidecar missing/);
+    // Explicit test-only period/history sources isolate this domain.
+    // Production creation remains incomplete and unpublished.
     records.progress.sidecars=structuredClone(sources().progress.sidecars);
-    for(const key of ["dailyQuestState","commissionQuestState"]){
-        records.progress[key]=structuredClone(sources().progress[key]);
-    }
-    assert.throws(()=>assemble(records),/gameplay progress/);
-    records.progress.gameplayProgress=recordedGameplay();
-    assert.deepEqual(assemble(records).projection.gameSave.gameplayProgress,recordedGameplay());
-    assert.equal(assemble(records).readyForPublication,false);
+    const historical=structuredClone(records);historical.progress.gameplayProgress={};
+    assert.throws(()=>assemble(historical),/gameplay progress/);
+    assert.equal(assembleCanonicalSnapshot("uid-a",7,historical).readyForPublication,false);
+    const bundle=assemble(records);
+    assert.deepEqual(bundle.projection.gameSave.gameplayProgress,expected);
+    assert.equal(bundle.readyForPublication,false);
+    assert.equal(bundle.projection.authoritativeStateReady,false);
     assert.equal(assembleCanonicalSnapshot("uid-a",7,records).readyForPublication,false);
 });
