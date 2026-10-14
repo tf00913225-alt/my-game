@@ -939,4 +939,3 @@ test("new-account Boss and Tower sources satisfy storage projection without publ
     assert.equal(bundle.projection.authoritativeStateReady,false);
     assert.equal(assembleCanonicalSnapshot("uid-a",7,records).readyForPublication,false);
 });
-

@@ -2403,4 +2403,3 @@ await rejected("readHeroGrowth",growthUser.idToken,growthIdentity,"SESSION_REVOK
 console.log("PASS Hero growth real Firestore/HTTP: original Core costs, fragment unlock/star/reroll, one concurrent spend, immutable retry, archive, malformed intents, missing ledger, private rules, revoked session. Resources are emulator-only fixtures.");
 await db.terminate();
 if(direct){await getFirestore().terminate();}
-

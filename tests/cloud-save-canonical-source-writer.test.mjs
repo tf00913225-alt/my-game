@@ -368,4 +368,3 @@ test("historical empty Boss and Tower receipts and original factory hash remain 
     await h.writer.commitInitialSources({},args);
     assert.equal(h.committed,count);assert.equal(JSON.stringify([...h.data]),before);
 });
-

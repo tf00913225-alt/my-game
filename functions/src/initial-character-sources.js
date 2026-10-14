@@ -131,4 +131,3 @@ function makeInitialCharacterSources(uid,revision,operationId,selection,{recorde
 }
 
 module.exports={makeInitialCharacterSources,makeInitialSidecars};
-

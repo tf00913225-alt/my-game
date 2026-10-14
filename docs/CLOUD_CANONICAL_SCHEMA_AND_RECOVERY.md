@@ -90,4 +90,3 @@ The seal's immutable `combatRulesReady:false`, `outcomeVerified:false`, `rewardE
 ### Protected restricted Forest instance establishment (2026-10-05)
 
 Private restrictedBattles/{attemptId}, restrictedBattleAttempts/{attemptId} and restrictedBattlePolicies/{policySha256} retain instance and consumption evidence; subsequent immutable round/terminal history also exists; operations/{operationId} carries their immutable receipt. Preserve these with original preparations, policies, snapshot/archive and receipt history. No restore/deletion writer or playable state is enabled. Full lifecycle/input/policy/backup boundaries are owned by `CLOUD_OPERATION_SETTLEMENT_CONTRACT.md`, same-named section; latest execution status is PR #802.
-
