@@ -59,3 +59,10 @@ test("one resize subscription per target and CSS alone owns the legacy transform
 test("missing design tokens fail explicitly instead of silently inventing another dimension owner",()=>{
     assert.throws(()=>fixture({tokens:false}),/Display design tokens are unavailable/);
 });
+
+test("static stage fit does not pin Android's initial oversized compositing surface",()=>{
+    const stage=read("css/03-stage-v4-viewport-lock.css").match(/#game-stage\{([^}]+)\}/)[1];
+    assert.doesNotMatch(stage,/will-change\s*:\s*transform/);
+    assert.match(stage,/contain:layout paint size !important/);
+    assert.match(owner,/stage\.style\.transform = "scale\("/);
+});
