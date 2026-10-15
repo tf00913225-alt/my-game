@@ -10,6 +10,7 @@ if(baseUrl){
     const manifest=await (await fetch(baseUrl+'/release-manifest.json',{cache:'no-store'})).json();
     assert.equal(manifest.commitSha,expected,'live QA must use exact deployed SHA');
 }
+await import('./run-terminal-visual-handoff-browser-qa.mjs');
 // Read-only disposable account transport; all production bundles and target,
 // attack, follow-up, damage, VFX and finish owners are real and unmodified.
 const expression=`(async()=>{

@@ -7,7 +7,7 @@ function runtime({deferred=false,realQueue=false}={}){
  const first=Array.from({length:6},(_,i)=>({id:"first"+i,hp:0,maxHP:100,maxSP:20,alive:true,agility:2}));
  const second=Array.from({length:6},(_,i)=>({id:"second"+i,hp:100,maxHP:100,maxSP:20,alive:true,agility:3}));
  const ctx={console,Promise,Set,Map,Array,Object,Number,Math,window:{},battleToken:7,battleActive:true,turn:4,monsters:first.slice(),currentBattleMonsters:first.map((_,i)=>i),selectedMonster:0,
- initiativeQueue:[{type:"player",characterIndex:0},{type:"player",characterIndex:1},...first.map((_,i)=>({type:"monster",monsterIndex:i}))],initiativeIndex:0,processedInitiativeIndexes:new Set(),battlePresentationLocks:new Set(),battleAdvanceScheduled:false,battlePhase:"resolve",timerId:null,
+ initiativeQueue:[{type:"player",characterIndex:0},{type:"player",characterIndex:1},...first.map((_,i)=>({type:"monster",monsterIndex:i}))],initiativeIndex:0,processedInitiativeIndexes:new Set(),battlePresentationLocks:new Set(),battleAdvanceScheduled:false,battleTerminalPresentationToken:null,battlePhase:"resolve",timerId:null,
  getExistingPartyIndexes:()=>[0,1],getPartyCharacterByIndex:i=>party[i],getPartyBattleStats:()=>({agility:5}),getMonsterAgility:m=>m.agility,
  killMonster:i=>{ctx.monsters[i].alive=false;ctx.deaths++;},deaths:0,wins:0,losses:0,winBattle:()=>{ctx.wins++;ctx.battleActive=false;},loseBattle:()=>{ctx.losses++;ctx.battleActive=false;},
  closeMenus:noop,clearBattleTargetSelectionMode:noop,updateActionHudVisibility:noop,clearBattleActionWatchdog:noop,clearTransientBattlePresentation:()=>{ctx.cleanups++;},cleanups:0,
@@ -124,6 +124,23 @@ test("QA end fixture preserves one-wave completion and already-finished behavior
  r.ctx.FourSymbolsBattleWaves.initialize("tower",null);
  assert.equal(finish(),true);assert.equal(r.ctx.wins,1);
  assert.equal(finish(),true);assert.equal(r.ctx.wins,1);
+});
+
+test("QA terminal handoff waits for the formal timer and VFX before the separate outcome callback",()=>{
+ const source=fs.readFileSync(".github/scripts/battle-layer-audio-live-qa.mjs","utf8");
+ const helper=source.match(/^function battleLayerQaTerminalHandoffReady\([\s\S]*?^\}/m);
+ assert.ok(helper,"actual Browser QA handoff predicate");
+ let remaining=500,calls=0;
+ const c={window:{__battleLayerQaEndResult:{ended:false},__battleLayerQaCompleteEnd:()=>{calls++;},v142GetRemainingAnimationMs:()=>remaining},Number,battleAdvanceScheduled:false};
+ vm.createContext(c);vm.runInContext(helper[0],c);
+ assert.equal(c.battleLayerQaTerminalHandoffReady(),false);
+ c.window.__battleLayerQaEndResult.ended=true;
+ assert.equal(c.battleLayerQaTerminalHandoffReady(),false,"terminal decision alone cannot skip visual completion");
+ remaining=0;c.battleAdvanceScheduled=true;
+ assert.equal(c.battleLayerQaTerminalHandoffReady(),false,"formal post-action beat must complete");
+ c.battleAdvanceScheduled=false;
+ assert.equal(c.battleLayerQaTerminalHandoffReady(),true);
+ assert.equal(calls,4,"each poll still drives the real settled-boundary fixture");
 });
 
 test("Abyss QA startup waits for the actual Policy, loader and Auth overlay without an unbound reference",()=>{

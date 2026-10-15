@@ -3,6 +3,7 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
+const {parseExpressionAt}=require("acorn");
 
 const core=fs.readFileSync("js/00-main.js","utf8");
 const relic=fs.readFileSync("js/60-team-relic-system.js","utf8");
@@ -14,22 +15,17 @@ const rippleCss=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
 function extractFunction(source,name){
     const start=source.indexOf("function "+name+"(");
     assert.notEqual(start,-1,"missing function "+name);
-    const open=source.indexOf("{",start);
-    let depth=0,quote=null,escaped=false;
-    for(let index=open;index<source.length;index++){
-        const char=source[index];
-        if(quote){
-            if(escaped){escaped=false;continue;}
-            if(char==="\\"){escaped=true;continue;}
-            if(char===quote){quote=null;}
-            continue;
-        }
-        if(char==='"'||char==="'"||char.charCodeAt(0)===96){quote=char;continue;}
-        if(char==="{"){depth++;}
-        if(char==="}"&&--depth===0){return source.slice(start,index+1);}
-    }
-    throw new Error("unterminated function "+name);
+    // Existing Acorn dependency owns JS syntax, including apostrophes/braces
+    // inside comments, regular expressions and template interpolation.
+    const node=parseExpressionAt(source,start,{ecmaVersion:"latest"});
+    assert.equal(node.type,"FunctionExpression");
+    assert.equal(node.id.name,name);
+    return source.slice(start,node.end);
 }
+
+const extractionProbe="function probe(){ /* character's { projection */ return `x${/}/.test('}')}`; }";
+assert.equal(extractFunction(extractionProbe+"\nfunction next(){}","probe"),extractionProbe,
+    "function extraction must ignore comment quotes and respect template/regex syntax");
 
 const flowBlock=core.slice(core.indexOf("window.FourSymbolsBattleFlow=Object.freeze"),core.indexOf("function getBattleAdvanceDelay"));
 assert.match(flowBlock,/subscribeRoundStart\(observer\)/);
