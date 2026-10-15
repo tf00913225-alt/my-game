@@ -3,6 +3,7 @@
 const {createHash}=require("node:crypto");
 const {LEGACY_BACKUP_SIDECARS}=require("./cloud-save-policy");
 const {newcomerExpNext}=require("./canonical-newcomer-exp");
+const {taipeiDay}=require("./daily-checkin-policy");
 
 const STAT_KEYS=["attack","intelligence","vitality","energy","defensePoints","agility"];
 const ELEMENTS=new Set(["fire","water","wind","earth"]);
@@ -45,7 +46,13 @@ function makeInitialSidecars(recordedAt){
     const sidecars=Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>[
         key,{status:"not-applicable",raw:null}]));
     if(recordedAt!==undefined){
+        // Reuse the existing server Taipei day Owner at pinned creation time.
+        // Storage evidence only: never roll over history or issue entitlements.
+        const day=taipeiDay(recordedAt);
+        const date=`${day.slice(0,4)}-${day.slice(4,6)}-${day.slice(6,8)}`;
         const initial={
+            "daily-dungeon-state":{date,used:{exp:false,material:false,equipment:false}},
+            "equipment-shop-daily":{date,refreshCount:0,soldOfferIds:[]},
             "element-box-state":{remainingMs:0},
             "exp-pool-growth-state":{initialized:true,unlocked:false,lastAt:recordedAt,
                 noticeShown:false,lastCapped:false,newcomerRewards:{}},

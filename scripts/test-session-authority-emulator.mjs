@@ -16,6 +16,7 @@ const {createDailyCheckinGrant}=require("../functions/src/daily-checkin-grant.js
 const {createHeroAcquisition}=require("../functions/src/hero-acquisition.js");
 const {createHeroGrowth}=require("../functions/src/hero-growth.js");
 const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
+const {taipeiDay}=require("../functions/src/daily-checkin-policy.js");
 const {createCanonicalBattleAttempt}=require("../functions/src/canonical-battle-attempt.js");
 const {createCanonicalBattleEncounter}=require("../functions/src/canonical-battle-encounter.js");
 const {resolvePlainPlayerNormalAttack}=require("../functions/src/canonical-battle-normal-attack.js");
@@ -323,6 +324,25 @@ assert.deepEqual(freshQuestArchive.sourceRecords.progress.gameplayProgress,fresh
 await assert.rejects(invoke("createInitialCanonicalCharacter",freshUser.idToken,
     {...freshPayload,selection:{...choices,gameplayProgress:freshGameplayExpected}}),error=>
     ["invalid-argument","INVALID_ARGUMENT"].includes(error.code));
+const freshPeriodDay=taipeiDay(freshQuestProgress.get("playableState.lastSaveTimestamp"));
+const freshPeriodDate=freshPeriodDay.slice(0,4)+"-"+freshPeriodDay.slice(4,6)+"-"+freshPeriodDay.slice(6,8);
+for(const [key,state] of Object.entries({
+    "daily-dungeon-state":{date:freshPeriodDate,used:{exp:false,material:false,equipment:false}},
+    "equipment-shop-daily":{date:freshPeriodDate,refreshCount:0,soldOfferIds:[]}
+})){
+    const entry={status:"present",raw:JSON.stringify(state)};
+    assert.deepEqual(freshQuestProgress.get("sidecars")[key],entry);
+    assert.deepEqual(freshQuestSnapshot.snapshot.progress.sidecars[key],entry);
+    assert.deepEqual(freshQuestArchive.sourceRecords.progress.sidecars[key],entry);
+    await assert.rejects(invoke("createInitialCanonicalCharacter",freshUser.idToken,
+        {...freshPayload,selection:{...choices,[key]:state}}),error=>
+        ["invalid-argument","INVALID_ARGUMENT"].includes(error.code));
+}
+const {assembleCanonicalPlayableProjection}=require("../functions/src/canonical-snapshot.js");
+const freshComplete=assembleCanonicalPlayableProjection(freshUid,2,freshQuestArchive.sourceRecords);
+assert.equal(freshComplete.readyForPublication,false);
+assert.equal(freshComplete.projection.authoritativeStateReady,false);
+assert.deepEqual(freshComplete.projection.sidecars,freshQuestProgress.get("sidecars"));
 assert.equal(freshQuestArchive.readyForRestore,false);
 assert.equal(freshQuestSnapshot.readyForPublication,false);
 assert.equal(freshQuestArchive.sourceRecords.claimRecords.length,0);
@@ -334,6 +354,7 @@ const freshQuestReplay=await freshProgressRef.get();
 assert.deepEqual(freshQuestReplay.data(),freshQuestProgress.data());
 assert.ok(freshQuestReplay.updateTime.isEqual(freshQuestProgress.updateTime));
 console.log("Initial Boss/Tower real callable: exact Client initial storage, archive, replay, rejected imports and false readiness PASS");
+console.log("Initial Taipei period sources real callable: source/snapshot/archive, complete unpublished projection, rejected imports and replay PASS");
 console.log("Initial quests real callable: exact zero sources, archive, replay, rejected imports and false readiness PASS");
 await assert.rejects(invoke("createInitialCanonicalCharacter",freshUser.idToken,
     {...freshPayload,selection:{...choices,displayName:"另一人"}}),error=>
@@ -1011,7 +1032,11 @@ console.log("Restricted instance actual device takeover/revocation: old session 
 assert.deepEqual(initialArchive.get("sourceRecords.claimRecords"),[]);
 const initialPlayableFields=initialArchive.get("sourceRecords.progress.playableState");
 const initialTimeSidecars=initialArchive.get("sourceRecords.progress.sidecars");
+const initialPeriodDay=taipeiDay(initialPlayableFields.lastSaveTimestamp);
+const initialPeriodDate=initialPeriodDay.slice(0,4)+"-"+initialPeriodDay.slice(4,6)+"-"+initialPeriodDay.slice(6,8);
 for(const [key,state] of Object.entries({
+    "daily-dungeon-state":{date:initialPeriodDate,used:{exp:false,material:false,equipment:false}},
+    "equipment-shop-daily":{date:initialPeriodDate,refreshCount:0,soldOfferIds:[]},
     "element-box-state":{remainingMs:0},
     "exp-pool-growth-state":{initialized:true,unlocked:false,
         lastAt:initialPlayableFields.lastSaveTimestamp,noticeShown:false,lastCapped:false,newcomerRewards:{}},
