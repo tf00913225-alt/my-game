@@ -479,7 +479,77 @@ await periodOriginalArchive.ref.delete();
 await assert.rejects(periodWriter.observeDailyPeriod(periodRequest,winningPeriodArgs),
     error=>error.code==="data-loss");
 await periodOriginalArchive.ref.set(periodOriginalArchive.data());
+// Apply only the explicit untouched initial lineage; no consumption writer or
+// public callable is introduced. Actual Firestore transactions must stay atomic.
+periodClock=freshQuestProgress.get("playableState.lastSaveTimestamp")+86400000;
+const applyArgs={operationId:"period-application-emulator-0001",periodId:laterPeriodId,expectedRevision:2};
+const appliedMarkerRef=periodRoot.collection("operations").doc(laterPeriodId.replace("daily-period-","daily-period-applied-"));
+abortPeriodObservation=true;
+await assert.rejects(periodWriter.applyDailyPeriod(periodRequest,applyArgs),/simulated period commit failure/);
+abortPeriodObservation=false;
+assert.equal((await appliedMarkerRef.get()).exists,false);
+assert.equal((await periodRoot.collection("playableSnapshots").doc("3").get()).exists,false);
+assert.equal((await periodRoot.collection("account").doc("current").get()).get("serverRevision"),2);
+for(const name of ["pendingGrants","grantOperations","uniqueClaims","ledgerEntries","rewardEvents"]){
+    const ref=periodRoot.collection(name).doc("unreconciled-consumption-emulator");
+    await ref.set({status:"pending"});
+    await assert.rejects(periodWriter.applyDailyPeriod(periodRequest,applyArgs),error=>error.code==="failed-precondition");
+    assert.equal((await appliedMarkerRef.get()).exists,false);await ref.delete();
+}
+await assert.rejects(periodWriter.applyDailyPeriod({...periodRequest,auth:null},applyArgs),error=>error.code==="unauthenticated");
+await assert.rejects(periodWriter.applyDailyPeriod({...periodRequest,data:{uid:freshUid,session:sessionY}},applyArgs),
+    error=>error.message==="SESSION_INVALID");
+const applyRace=await Promise.allSettled([periodWriter.applyDailyPeriod(periodRequest,applyArgs),
+    periodWriter.applyDailyPeriod(periodRequest,{...applyArgs,operationId:"period-application-emulator-0002"})]);
+assert.equal(applyRace.filter(row=>row.status==="fulfilled").length,1);
+assert.equal(applyRace.filter(row=>row.status==="rejected"&&row.reason.code==="already-exists").length,1);
+const appliedMarker=await appliedMarkerRef.get();
+const winningApplyArgs={...applyArgs,operationId:appliedMarker.get("operationId")};
+const appliedReceiptRef=periodRoot.collection("operations").doc(winningApplyArgs.operationId);
+assert.equal(appliedMarker.get("consumption.status"),"verified-empty");
+assert.equal(appliedMarker.get("audit.operationCount"),3);
+assert.equal(appliedMarker.get("authoritativeStateReady"),false);
+assert.equal(appliedMarker.get("rewardEligible"),false);
+const appliedArchive=await checkRecoveryArchive(freshUid,3),appliedRecords=appliedArchive.data().sourceRecords;
+assert.equal(appliedArchive.get("readyForRestore"),false);
+assert.equal(assembleCanonicalPlayableProjection(freshUid,3,appliedRecords).readyForPublication,false);
+for(const key of ["daily-dungeon-state","equipment-shop-daily"]){
+    assert.equal(JSON.parse(appliedRecords.progress.sidecars[key].raw).date,periodSource.get("targetDate"));
+}
+assert.deepEqual(appliedRecords.progress.playableState,freshQuestArchive.sourceRecords.progress.playableState);
+assert.equal(appliedRecords.economy.gold,0);assert.deepEqual(appliedRecords.claimRecords,[]);
+for(const ref of [periodSourceRef,winningPeriodReceiptRef,periodRoot.collection("playableSnapshots").doc("2")]){
+    const old=ref.path===periodSourceRef.path?periodSource:
+        ref.path===winningPeriodReceiptRef.path?winningPeriodReceipt:null;
+    if(old)assert.deepEqual((await ref.get()).data(),old.data());
+}
+periodClock+=35*86400000;
+const appliedBefore=await appliedMarkerRef.get();
+assert.equal((await periodWriter.applyDailyPeriod(periodRequest,winningApplyArgs)).unchanged,true);
+assert.ok((await appliedMarkerRef.get()).updateTime.isEqual(appliedBefore.updateTime));
+await assert.rejects(periodWriter.applyDailyPeriod(periodRequest,{...winningApplyArgs,expectedRevision:3}),
+    error=>error.code==="data-loss");
+for(const ref of [appliedReceiptRef,appliedMarkerRef,periodRoot.collection("playableSnapshots").doc("3"),
+    periodRoot.collection("recoveryArchives").doc("3")]){
+    const old=await ref.get();await ref.delete();
+    await assert.rejects(periodWriter.applyDailyPeriod(periodRequest,winningApplyArgs),error=>error.code==="data-loss");
+    await ref.set(old.data());
+}
+assert.equal(await rulesRequest(`serverUsers/${freshUid}/operations/${appliedMarkerRef.id}`,freshUser.idToken),403);
+periodClock=freshQuestProgress.get("playableState.lastSaveTimestamp")+2*86400000;
+const secondPeriod=await periodWriter.observeDailyPeriod(periodRequest,
+    {operationId:"period-observation-emulator-0003",expectedRevision:3});
+const secondApply=await periodWriter.applyDailyPeriod(periodRequest,
+    {operationId:"period-application-emulator-0003",periodId:secondPeriod.periodId,expectedRevision:3});
+assert.equal(secondApply.appliedRevision,4);await checkRecoveryArchive(freshUid,4);
+assert.equal((await periodWriter.applyDailyPeriod(periodRequest,winningApplyArgs)).unchanged,true);
+for(const name of ["ledgerEntries","grantOperations","claimRecords","pendingGrants","uniqueClaims","rewardEvents"]){
+    assert.equal((await periodRoot.collection(name).get()).size,0);
+}
+console.log("Protected zero-consumption daily application real Firestore PASS: atomic rollback, economic inventory rejection, concurrent once-only revision, immutable historical replay, missing-proof rejection, repeated zero lineage, private rules and closed readiness.");
 await invoke("revokeGameSession",freshUser.idToken,{uid:freshUid,session:freshSession});
+await assert.rejects(periodWriter.applyDailyPeriod(periodRequest,winningApplyArgs),
+    error=>["SESSION_REVOKED","SESSION_INVALID"].includes(error.message));
 await assert.rejects(periodWriter.observeDailyPeriod(periodRequest,winningPeriodArgs),
     error=>["SESSION_REVOKED","SESSION_INVALID"].includes(error.message));
 console.log("Daily period evidence real Firestore PASS: Taipei server observation, atomic abort, concurrent single source, cross-day immutable replay, exact snapshot/archive/source retention, missing-proof rejection, private rules, UID/session protection and no progression/reward/revision changes.");

@@ -14,6 +14,163 @@ const root=`serverUsers/${uid}`;
 const operationId="init-character-0001";
 const observationId="observe-period-0001";
 const observation={operationId:observationId,expectedRevision:5};
+const application={operationId:"apply-period-0001",periodId:"daily-period-20261016",expectedRevision:5};
+
+async function applicationHarness(){
+    const h=await periodHarness();
+    await h.writer.observeDailyPeriod({},observation);
+    return h;
+}
+async function rejectedApplication(h,args=application,pattern){
+    const before=JSON.stringify([...h.data]),count=h.committed;
+    await assert.rejects(h.writer.applyDailyPeriod({},args),pattern);
+    assert.equal(h.committed,count);assert.equal(JSON.stringify([...h.data]),before);
+}
+
+test("zero-consumption application blocks pending entitlements, orphan ledgers and unknown operations",async()=>{
+    for(const name of ["pendingGrants","grantOperations","uniqueClaims","ledgerEntries","rewardEvents"]){
+        const h=await applicationHarness();h.data.set(root+"/"+name+"/unrelated-id",{status:"pending"});
+        await rejectedApplication(h,application,/Economic history or pending/);
+    }
+    for(const row of [{schemaVersion:1,ownerUid:uid,kind:"dungeon-complete"},
+        {schemaVersion:1,ownerUid:uid,kind:"shop-purchase"},
+        {schemaVersion:1,ownerUid:uid},
+        {schemaVersion:1,ownerUid:"other",kind:"daily-period-source"}]){
+        const h=await applicationHarness();h.data.set(root+"/operations/unrelated-id",row);
+        await rejectedApplication(h,application,/Unreconciled operation|inventory is inconsistent/);
+    }
+    const h=await applicationHarness();
+    for(let i=0;i<399;i++)h.data.set(root+"/operations/history-"+i,{schemaVersion:1,ownerUid:uid,kind:"unknown"});
+    await rejectedApplication(h,application,/controlled limit/);
+});
+
+test("protected zero-consumption day application atomically advances sources, snapshot and archive only",async()=>{
+    const h=await applicationHarness();
+    const before=JSON.parse(JSON.stringify([...h.data])),old=new Map(before);
+    const result=await h.writer.applyDailyPeriod({},application);
+    assert.equal(result.appliedRevision,6);assert.equal(result.targetDate,"2026-10-16");
+    assert.equal(result.authoritativeStateReady,false);assert.equal(result.rewardEligible,false);
+    assert.equal(h.data.get(save).serverRevision,6);
+    const archive=h.data.get(root+"/recoveryArchives/6"),records=archive.sourceRecords;
+    assert.equal(archive.readyForRestore,false);
+    assert.equal(h.data.get(root+"/playableSnapshots/6").readyForPublication,false);
+    const {assembleCanonicalPlayableProjection}=require("../functions/src/canonical-snapshot.js");
+    assert.equal(assembleCanonicalPlayableProjection(uid,6,records).readyForPublication,false);
+    for(const key of ["daily-dungeon-state","equipment-shop-daily"]){
+        assert.equal(JSON.parse(records.progress.sidecars[key].raw).date,"2026-10-16");
+        assert.deepEqual(h.data.get(root+"/progress/current").sidecars[key],records.progress.sidecars[key]);
+    }
+    for(const [path,value] of old){
+        if(/\/(playableSnapshots|recoveryArchives|operations)\//.test(path)){
+            assert.equal(JSON.stringify(h.data.get(path)),JSON.stringify(value));
+        }
+    }
+    assert.equal(records.economy.gold,0);assert.equal(records.economy.sharedExp,0);
+    assert.deepEqual(records.inventory,[]);assert.deepEqual(records.claimRecords,[]);
+    assert.equal(records.claimCheckpoint.claimDigest,old.get(root+"/claimCheckpoints/current").claimDigest);
+    const marker=h.data.get(root+"/operations/daily-period-applied-20261016");
+    assert.equal(marker.consumption.status,"verified-empty");
+    assert.equal(marker.consumption.initialSnapshotSha256,old.get(root+"/playableSnapshots/5").sha256);
+    assert.deepEqual(marker.consumption.periods,
+        old.get(root+"/operations/daily-period-20261016").periods);
+    assert.equal([...h.data.keys()].some(key=>key.includes("/ledgerEntries/")),false);
+    assert.equal([...h.data.keys()].some(key=>key.includes("/grantOperations/")),false);
+    assert.deepEqual(records.progress.playableState,
+        old.get(root+"/progress/current").playableState);
+    const after=JSON.stringify([...h.data]),count=h.committed;
+    h.setClock(Date.parse("2026-11-20T16:00:00Z"));
+    assert.deepEqual(await h.writer.applyDailyPeriod({},application),{...result,unchanged:true});
+    assert.equal(h.committed,count);assert.equal(JSON.stringify([...h.data]),after);
+    await rejectedApplication(h,{...application,expectedRevision:6},/intent/);
+    await rejectedApplication(h,{...application,periodId:"daily-period-20261017"},/intent/);
+    await rejectedApplication(h,{...application,operationId:"apply-period-0002"},/already applied/);
+});
+
+test("later zero periods use the prior protected application and never regenerate consumed sources",async()=>{
+    const h=await applicationHarness();
+    await h.writer.applyDailyPeriod({},application);
+    h.setClock(Date.parse("2026-10-16T16:00:00Z"));
+    await h.writer.observeDailyPeriod({},{operationId:"observe-period-0002",expectedRevision:6});
+    const second={operationId:"apply-period-0002",periodId:"daily-period-20261017",expectedRevision:6};
+    const result=await h.writer.applyDailyPeriod({},second);
+    assert.equal(result.appliedRevision,7);assert.equal(result.targetDate,"2026-10-17");
+    assert.equal((await h.writer.applyDailyPeriod({},application)).unchanged,true);
+    assert.equal((await h.writer.applyDailyPeriod({},second)).unchanged,true);
+    h.data.delete(root+"/operations/apply-period-0001");
+    await rejectedApplication(h,second,/receipt is missing/);
+});
+
+test("daily application rejects client state, stale or expired observations and namespace overlap",async()=>{
+    for(const key of ["date","observedAt","used","refreshCount","soldOfferIds","gold",
+        "claimed","consumption","rewardEligible","authoritativeStateReady"]){
+        const h=await applicationHarness();
+        await rejectedApplication(h,{...application,[key]:true},/only operation/);
+    }
+    const stale=await applicationHarness();
+    await rejectedApplication(stale,{...application,expectedRevision:4},/REVISION_CONFLICT/);
+    const expired=await applicationHarness();expired.setClock(Date.parse("2026-10-16T16:00:00Z"));
+    await rejectedApplication(expired,application,/current server period/);
+    for(const collection of ["operations","grantOperations","ledgerEntries"]){
+        for(const id of [application.operationId,"daily-period-applied-20261016"]){
+            const h=await applicationHarness();h.data.set(root+"/"+collection+"/"+id,{kind:"other"});
+            await rejectedApplication(h);
+        }
+    }
+    const candidate=await applicationHarness();candidate.data.get(save).migrationCandidateStatus="received";
+    await rejectedApplication(candidate,application,/Unresolved migration/);
+});
+
+test("used flags, purchases, refreshes, claims and state changes cannot masquerade as zero consumption",async()=>{
+    for(const change of [
+        records=>{const s=JSON.parse(records.progress.sidecars["daily-dungeon-state"].raw);
+            s.used.exp=true;records.progress.sidecars["daily-dungeon-state"].raw=JSON.stringify(s);},
+        records=>{const s=JSON.parse(records.progress.sidecars["equipment-shop-daily"].raw);
+            s.refreshCount=1;records.progress.sidecars["equipment-shop-daily"].raw=JSON.stringify(s);},
+        records=>{const s=JSON.parse(records.progress.sidecars["equipment-shop-daily"].raw);
+            s.soldOfferIds=["2026-10-15:0:0"];
+            records.progress.sidecars["equipment-shop-daily"].raw=JSON.stringify(s);},
+        records=>{records.economy.gold=10;},
+        records=>{records.progress.playableState.autoConfig.enabled=true;},
+        records=>{records.progress.sidecars["equipment-shop-purchases"]={status:"present",raw:"{}"};}
+    ]){
+        const h=await periodHarness();
+        rewritePeriodSources(h,change);
+        // Reflect valid-but-untrusted current sources without rewriting the
+        // immutable creation receipt: a same-revision edited archive is not
+        // a legitimate consumption proof.
+        const source=h.data.get(root+"/recoveryArchives/5").sourceRecords;
+        h.data.set(root+"/economy/current",source.economy);
+        await h.writer.observeDailyPeriod({},observation);
+        await rejectedApplication(h);
+    }
+    const noOrigin=await applicationHarness();
+    noOrigin.data.delete(root+"/operations/"+operationId);
+    await rejectedApplication(noOrigin,application,/Original zero/);
+});
+
+test("missing or corrupt application/observation/snapshot/archive proof fails without writes",async()=>{
+    for(const path of ["operations/daily-period-20261016","operations/"+observationId,
+        "playableSnapshots/5","recoveryArchives/5","progress/current","claimCheckpoints/current"]){
+        const h=await applicationHarness();h.data.delete(root+"/"+path);
+        await rejectedApplication(h);
+    }
+    for(const path of ["operations/daily-period-applied-20261016",
+        "operations/"+application.operationId,"playableSnapshots/6","recoveryArchives/6"]){
+        const h=await applicationHarness();await h.writer.applyDailyPeriod({},application);
+        h.data.delete(root+"/"+path);await rejectedApplication(h);
+    }
+    for(const field of ["sourceSha256","consumption","snapshotSha256","inputRevision",
+        "rewardEligible","authoritativeStateReady"]){
+        const h=await applicationHarness();await h.writer.applyDailyPeriod({},application);
+        h.data.get(root+"/operations/daily-period-applied-20261016")[field]="corrupt";
+        await rejectedApplication(h);
+    }
+    const h=await applicationHarness();
+    const current=JSON.parse(JSON.stringify(h.data.get(root+"/progress/current")));
+    current.sidecars["daily-dungeon-state"].raw="{}";
+    h.data.set(root+"/progress/current",current);
+    await rejectedApplication(h,application,/Current sources differ/);
+});
 
 async function periodHarness(){
     const h=harness();
@@ -260,6 +417,7 @@ function harness(candidate="none"){
             migrationCandidateGameSaveVersion:6,migrationCandidateByteLength:100})}]]);
     const ref=path=>({path,collection(name){return collection(`${path}/${name}`);}});
     const collection=path=>({path,doc(id){return ref(`${path}/${id}`);},
+        limit(max){return {path,query:true,max};},
         where(field,operator,value){
             assert.equal(operator,"==");
             return {limit:()=>({path,filter:row=>row[field]===value})};
@@ -268,10 +426,11 @@ function harness(candidate="none"){
     let committed=0;
     const transaction={
         async get(reference){
-            if(typeof reference.doc==="function"||reference.filter){
+            if(typeof reference.doc==="function"||reference.filter||reference.query){
                 return {docs:[...data].filter(([key])=>key.startsWith(reference.path+"/")&&
                     !key.slice(reference.path.length+1).includes("/"))
-                    .filter(([,value])=>!reference.filter||reference.filter(value)).map(([key,value])=>({
+                    .filter(([,value])=>!reference.filter||reference.filter(value))
+                    .slice(0,reference.max??Infinity).map(([key,value])=>({
                     id:key.slice(reference.path.length+1),ref:ref(key),data:()=>value}))};
             }
             const value=data.get(reference.path);
