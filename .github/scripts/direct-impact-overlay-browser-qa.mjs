@@ -143,10 +143,10 @@ try{
  assert.equal(await page.evaluate(()=>window.__impactPointerReached),true);
  const reading=await page.evaluate(()=>{
   closeBattleStatusDetailModal();
-  setBattleInfoExpanded(true);
   const original=window.__impactReadingHud,card=window.__impactReadingCard;
+  openBattleStatusDetailModal('monster',currentBattleMonsters[0]);
   const open={sameNode:original===FourSymbolsBattlePresentation.getUnitHud(card),returned:card.contains(original),hitHidden:getComputedStyle(v143SkillAnimationState.hitOverlay).visibility==='hidden',bodyLayerGone:!document.querySelector('.v174-battle-hud-layer')};
-  setBattleInfoExpanded(false);
+  closeBattleStatusDetailModal();
   return {open,restoredSameNode:original===FourSymbolsBattlePresentation.getUnitHud(card),restoredPlane:!!original.closest('.v174-battle-hud-layer')};
  });
  assert.ok(Object.values(reading.open).every(Boolean));
@@ -237,6 +237,22 @@ try{
  assert.equal(evidence.abyssHud.length,8);
  assert.ok(evidence.abyssHud.every(h=>h.position==='absolute'&&h.width>0&&h.bars.length===2&&h.bars.every(b=>b.width>0&&b.height>0)),
   'real idle Abyss HUD retains formal geometry after legacy portrait decoration');
+ evidence.battleLogRetirement=[];
+ for(const viewport of [{width:360,height:800},{width:1280,height:960}]){
+  await page.setViewportSize(viewport);
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  const state=await page.evaluate(()=>{
+   const turn=document.getElementById('battleTurnIndicator'),stage=document.getElementById('game-stage');
+   const r=turn.getBoundingClientRect(),s=stage.getBoundingClientRect();
+   return {absent:!document.querySelector('.battle-info-region,#battleInfo,#battleInfoToggle,#mapBattleInfo,#mapBattleOverlay,.v17342-abyss-battle-info'),turnText:turn.textContent,turnVisible:r.width>0&&r.height>0&&r.left>=s.left-.5&&r.top>=s.top-.5&&r.right<=s.right+.5&&r.bottom<=s.bottom+.5};
+  });
+  assert.equal(state.absent,true,'retired battle logs stay absent on mobile and PC');
+  assert.equal(state.turnVisible,true,'current round remains inside the fixed canvas');
+  assert.match(state.turnText,/第\s*\d+\s*回合/);
+  evidence.battleLogRetirement.push({viewport,...state});
+  await page.screenshot({path:artifactDir+'/battle-log-retired-'+viewport.width+'.png'});
+ }
+ await page.setViewportSize(evidence.viewport);
  await scene(3);
  await cast('flameSlash');await page.waitForFunction(()=>__impactQaReady);
  await page.evaluate(()=>window.addEventListener('pagehide',()=>{

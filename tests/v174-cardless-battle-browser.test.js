@@ -89,7 +89,7 @@ function innerHtml(){
 <div class="battle-center-region"><div class="turn-target-row" id="turnTargetRow"><span>第 3 回合　目標：天兵1</span><strong>9</strong></div>
 <div class="battle-middle"><div id="battleActionRegion"><div id="battleCommandRow"><button>攻擊</button><button>技能</button><button>防禦</button><button>元素匣</button></div></div></div></div>
 <div id="battlePlayerRow" class="battle-ally-region v-fixed-ally-zone v-fixed-zone-v2"><div class="v-fixed-slot-row v-fixed-ally-slot-row v-fixed-ally-slot-row-front" data-slot-row="front">${playerSlot(0,835,412)}${playerSlot(1,798,468)}${playerSlot(2,752,506)}</div></div>
-<div class="battle-info-region"><div class="battle-info-header-row"></div><div id="battleInfo" class="battle-info">戰鬥紀錄</div></div>
+<div id="battleTurnIndicator">第 1 回合</div>
 </div></div></div></div></div></div>
 <script>
 var battleActive=true;

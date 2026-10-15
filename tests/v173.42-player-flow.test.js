@@ -45,7 +45,7 @@ assert.match(recovery,/showElementBoxUseNotice/);
 assert.match(abyssCss,/v17342-element-box-use-notice/);
 assert.match(abyssCss,/overflow-y:auto !important/);
 assert.match(core,/pendingElementBoxNotices/);
-assert.match(abyss,/v17342-abyss-battle-info/);
+assert.doesNotMatch(abyss,/v17342-abyss-battle-info/,"retired battle log UI must stay absent");
 assert.match(abyssCss,/aspect-ratio:9\/16/);
 assert.match(v141,/hasExpLevelUp/);
 assert.match(index,/home-utility-actions team-relic-home-tools/);

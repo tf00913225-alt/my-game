@@ -33,24 +33,24 @@ test("persistent body status owner keeps hard-control base fixed under the two-s
   assert.match(css,/\.v143-status-visual-petrify\{[\s\S]*?animation:none/);
 });
 
-test("battle information handles and turn timer follow the requested interaction contract",()=>{
+test("battle information is retired and turn timer remains visible",()=>{
   const html=read("index.html");
   const css=read("css/fixed-slot-battlefield-rendering-v2.css");
   const js=read("js/00-main.js");
   const stats=read("js/battle-statistics-system.js");
-  assert.match(html,/id="battleInfoToggle"[\s\S]*?>戰鬥資訊<\/button>/);
+  assert.doesNotMatch(html,/battleInfoToggle/,"retired battle log UI must stay absent");
   assert.ok(html.indexOf('id="battleActionRegion"')<html.indexOf('id="turnTargetRow"'),"turn row should be inside the battle action region");
   assert.match(css,/#battleActionRegion > \.turn-target-row[\s\S]*?opacity:1/);
   assert.match(css,/\.turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ 44px\);[\s\S]*?opacity:1/);
   assert.match(css,/\.turn-target-row\.battle-item-open\{[\s\S]*?opacity:1/);
   assert.match(css,/#battleActionRegion\.target-selecting > \.turn-target-row\{[\s\S]*?top:auto;[\s\S]*?bottom:calc\(var\(--battle-target-prompt-height\) \+ var\(--battle-target-select-gap\)\);[\s\S]*?opacity:1/);
-  assert.match(css,/\.battle-info-region #battleTurnIndicator\{[\s\S]*?opacity:1/);
-  assert.match(css,/\.battle-info-region\.is-expanded #battleTurnIndicator\{[\s\S]*?opacity:1/);
+  assert.doesNotMatch(css,/battle-info-region/,"retired battle log UI must stay absent");
+  assert.doesNotMatch(css,/battle-info-region/,"retired battle log UI must stay absent");
   assert.match(stats,/aria-label","戰鬥數據"/);
   assert.match(stats,/innerHTML="<span>戰<\/span><span>鬥<\/span><span>數<\/span><span>據<\/span>"/);
   assert.match(js,/function syncBattleUiPriorityLayer\(\)/);
   assert.doesNotMatch(js,/function installBattleInfoHandleDrag\(\)|__battleInfoHandleDragInstalled|__suppressNextBattleInfoClick/);
-  assert.match(css,/#battleInfoToggle\.battle-info-toggle\{[\s\S]*?border:1px solid rgba\(210,158,64,\.9\);[\s\S]*?background-color:rgba\(0,0,0,\.82\) !important;[\s\S]*?background-image:none !important;[\s\S]*?box-shadow:none;[\s\S]*?touch-action:manipulation;[\s\S]*?cursor:pointer/);
+  assert.doesNotMatch(css,/battleInfoToggle/,"retired battle log UI must stay absent");
   assert.doesNotMatch(css,/battle-info-toggle\.is-dragging|cursor:ew-resize/);
   assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?z-index:18070 !important/);
   const legacyBattleCss=read("css/31-v131-fix-batch.css");
@@ -59,9 +59,9 @@ test("battle information handles and turn timer follow the requested interaction
     /#game-stage #battlePage button,\s*\n#game-stage #battlePage button img/,
     "legacy icon transparency must never clear every battle button background"
   );
-  assert.match(css,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
-  assert.match(css,/\.battle-info-region\.is-expanded > #battleInfo\{[\s\S]*?background:rgba\(0,0,0,\.92\) !important/);
-  assert.match(js,/toggle\.textContent=next\?"返回":"戰鬥資訊"/);
+  assert.doesNotMatch(css,/battle-info-region/,"retired battle log UI must stay absent");
+  assert.doesNotMatch(css,/battle-info-region/,"retired battle log UI must stay absent");
+  assert.doesNotMatch(js,/toggleBattleInfoPanel/);
   const mainCss=read("css/00-main.css");
   assert.match(mainCss,/\.skill-quick-button \.sq-sp-block\[hidden\]\{[\s\S]*?display:none;/);
   assert.match(mainCss,/#battlePage\{[\s\S]*?--battle-command-row-height:66px;[\s\S]*?--battle-command-art-overhang:34px;[\s\S]*?--battle-command-visual-height:calc\(var\(--battle-command-row-height\) \+ var\(--battle-command-art-overhang\)\);/);
@@ -79,13 +79,13 @@ test("battle reading state suppresses detached transient paint across stacking c
   assert.doesNotMatch(mainCss,/#game-stage\.battle-ui-priority\{[\s\S]*?z-index:/);
   assert.match(mainCss,/body\.v174-battle-reading-open > \.v143-skill-stage,[\s\S]*?body\.v174-battle-reading-open > \.v-fixed-slot-popup,[\s\S]*?body\.v174-battle-reading-open > \.damage-popup,[\s\S]*?body\.v174-battle-reading-open > \.damage-popup\.v152-top-damage,[\s\S]*?body\.v174-battle-reading-open > \.battle-floating-feedback,[\s\S]*?body\.v174-battle-reading-open > \.skill-name-badge,[\s\S]*?body\.v174-battle-reading-open > \.team-relic-battle-presentation,[\s\S]*?body\.v174-battle-reading-open #game-stage \.team-relic-battle-banner\{[\s\S]*?visibility:hidden !important;[\s\S]*?opacity:0 !important;/);
   assert.doesNotMatch(mainCss,/body\.v174-battle-reading-open[\s\S]{0,900}display:none/);
-  assert.match(fixedCss,/\.battle-info-region\{[\s\S]*?z-index:18060 !important/);
+  assert.doesNotMatch(fixedCss,/battle-info-region/,"retired battle log UI must stay absent");
   assert.match(statsCss,/z-index:18072/);
   assert.match(vfxCss,/\.battle-status-detail-modal\{[\s\S]*?z-index:18120/);
   assert.match(vfxCss,/\.v143-skill-stage\{[\s\S]*?z-index:16000/);
-  assert.match(fixedCss,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
-  assert.match(fixedCss,/\.battle-info-region\.is-expanded\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
-  assert.match(fixedCss,/\.battle-info-region\.is-expanded > #battleInfo\{[\s\S]*?background:rgba\(0,0,0,\.92\) !important/);
+  assert.doesNotMatch(fixedCss,/battle-info-region/,"retired battle log UI must stay absent");
+  assert.doesNotMatch(fixedCss,/battle-info-region/,"retired battle log UI must stay absent");
+  assert.doesNotMatch(fixedCss,/battle-info-region/,"retired battle log UI must stay absent");
 });
 
 test("new skill icons and 4x3 cast sheets use dedicated WebP runtime assets",()=>{

@@ -575,21 +575,7 @@ button:disabled{
     display:block;
 }
 
-/*
-   ★ 新增（依照使用者要求）：
-   巡邏／地圖頁面現在只留自動戰鬥、自動巡怪、
-   戰鬥資訊這三個面板（都在#mapBattleOverlay
-   裡，是mapPage以外的獨立元素，不受這裡影響），
-   原本的標題/說明文字/走格子地圖/怪物圖示/
-   離開地圖按鈕全部拿掉了，畫面會很空，
-   所以這裡直接把使用者提供的森林小徑圖片
-   當成這個頁面最底層的背景。
 
-   min-height:100vh確保就算內容很少（現在
-   幾乎沒有內容），背景圖還是能鋪滿整個
-   畫面高度，不會只蓋到內容那一小塊就結束、
-   下面露出一截黑底。
-*/
 
 #homePage{
     --home-scene-height:444px;
@@ -1437,9 +1423,7 @@ button:disabled{
 #battlePage.active{
     display:block;
 
-    /* V96 ROOT FIX：戰鬥頁本身不再當 scroll owner。
-       戰鬥紀錄 #battleInfo 才是唯一需要垂直捲動的區域，
-       避免 Samsung Browser 在可視高度變化時讓整頁重新捲動/重排。 */
+
     height:100%;
     overflow:hidden;
 }
@@ -1718,9 +1702,7 @@ button:disabled{
 
     gap:4px;
 
-    /* V99：battleInfo 才是戰鬥頁唯一的垂直捲動區。
-       這裡改回 visible，讓上下加高的技能覆蓋層不會被 battle-middle
-       裁切或產生第二個捲軸。 */
+
     overflow:visible;
 }
 
@@ -2968,66 +2950,16 @@ button:active{
     pointer-events:none!important;
 }
 
-.battle-info{
-    /* V96：戰鬥資訊改成唯一的剩餘空間填充區。
-       高度只由 .battle-wrap 的 Flex 決定，不再混用 JS viewport 量測。 */
 
-    /* V96 ROOT FIX：由 Flex 一次決定剩餘高度。
-       不再由 fillBattleInfoGap() 先清 height 再量測再寫回，
-       因此不會隨 visualViewport.resize 反覆跳動。 */
-    flex:1 1 0;
-    min-height:82px;
-    height:auto;
 
-    margin-top:0;
 
-    background:transparent;
-    border:0;
-    border-radius:0;
-
-    padding:8px 10px;
-
-    overflow-y:auto;
-
-    font-size:13px;
-    line-height:18px;
-
-    color:#e8ddc7;
-}
-
-/* Patrol log is a separate UI owner from the formal battle drawer.
-   It is always a fixed black record panel and never inherits drawer chrome. */
-#mapBattleInfo{
-    flex:0 0 96px;
-    min-height:96px;
-    height:96px;
-    margin:0;
-    padding:8px 10px;
-    overflow-y:auto;
-    pointer-events:auto;
-    color:#e8ddc7;
-    background:rgba(0,0,0,.88);
-    border:1px solid rgba(138,106,58,.58);
-    border-radius:6px;
-    box-shadow:none;
-}
 
 /* V96 — 戰鬥資訊頂列：元素匣取代底部大型自動戰鬥面板。 */
 /* V108 — 元素匣改成真正獨立的戰鬥頁懸浮按鈕。
    按鈕不再用自己的寬度參與 header row 排版；
    白框、黑色按鈕底與盒狀陰影全部移除。
    仍保留原本 onclick，自動戰鬥設定功能完全不變。 */
-.battle-info-header-row{
-    /* V108：元素匣已脫離這一列，這裡只保留回合文字的必要高度。 */
-    flex:0 0 28px;
-    min-height:28px;
-    position:relative;
-    display:flex;
-    align-items:center;
-    gap:0;
-    margin-top:2px;
-    padding-left:0;
-}
+
 
 #battleTurnIndicator{
     margin:0 !important;
@@ -3037,9 +2969,7 @@ button:active{
     white-space:nowrap;
 }
 
-/* V109：真正可重複拖曳的懸浮元素匣。
-   直接掛在 #battlePage 底下，完全脫離 battle-info-header-row 的文件流。
-   Pointer 拖曳只綁定這顆按鈕；單擊才開設定，拖曳不觸發設定。 */
+
 #battlePage > .battle-element-box-button{
     position:absolute !important;
     left:8px !important;
@@ -3086,12 +3016,6 @@ button:active{
     pointer-events:none;
 }
 
-.battle-line{
-    min-height:19px;
-    border-bottom:1px solid rgba(255,255,255,.04);
-    padding-bottom:1px;
-    margin-bottom:1px;
-}
 
 .battle-player{
     position:relative;
@@ -4688,30 +4612,7 @@ button:active{
    像素級精準。
 */
 
-/*
-   ★ 修正（依照使用者回報，「自動戰鬥
-   設定框的下緣，貼齊戰鬥資訊框的上緣，
-   要往上移」）：
-   之前的86px是隨便抓的數字，沒有真的
-   對齊。改成照#mapBattleOverlay／
-   #mapBattleInfo實際的CSS數字算出來的
-   精確值，而不是用JS去量測（量測那套
-   已經證實是「按下去沒反應」bug的來源，
-   這裡故意繼續用純CSS數字）：
 
-   導覽列高度70px（#mapBattleOverlay的
-   bottom:70px）
-   + 覆蓋層自己的下內距6px
-     （padding:0 6px 6px）
-   + 戰鬥資訊框高度96px
-     （#mapBattleInfo的flex:0 0 96px）
-   = 172px，
-
-   這就是戰鬥資訊框「上緣」距離畫面下緣
-   的實際距離，設定視窗的padding-bottom
-   設成一樣的172px，兩者下緣/上緣就會
-   剛好貼齊、不重疊也不留空隙。
-*/
 
 .home-feature-modal.dock-bottom{
     align-items:flex-end;
@@ -6176,13 +6077,6 @@ button:active{
     bottom:78px !important;
 }
 
-#game-stage > #app > #game-content #mapBattleOverlay{
-    position:absolute !important;
-    left:0 !important;
-    right:0 !important;
-    bottom:70px !important;
-    width:var(--game-legacy-width) !important;
-}
 
 #game-stage > #app > #game-content > div[style*="position:fixed"][style*="bottom:0"]{
     position:absolute !important;

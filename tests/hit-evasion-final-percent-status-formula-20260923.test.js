@@ -152,7 +152,7 @@ assert.doesNotMatch(statusText,/個百分點/,"player-visible status text must u
     assert.match(patrol,/function decodeSource\(source\)/);
     assert.match(patrol,/image\.style\.visibility="hidden"/);
     assert.match(patrol,/decodedSources\.has\(source\)/);
-    assert.match(baseCss,/#mapBattleInfo\{[\s\S]*?background:rgba\(0,0,0,\.88\)/);
+    assert.doesNotMatch(baseCss,/#mapBattleInfo/,"retired battle log UI must stay absent");
     assert.match(baseCss,/battle-command-panel-transparent\.svg/);
     assert.doesNotMatch(baseCss,/#mainBattleMenu::before\{[\s\S]*?battle-command-panel\.jpg/);
     assert.match(panelSvg,/data:image\/jpeg;base64,/);
@@ -161,15 +161,15 @@ assert.doesNotMatch(statusText,/個百分點/,"player-visible status text must u
     assert.match(statusCss,/--v143-status-layer-hud:34/);
     assert.match(fixedCss,/\.targetable::after,[\s\S]*?\.ally-targetable:not\(\.active-turn\)::after\{[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
     assert.match(fixedCss,/\.ally-targetable::before,[\s\S]*?\.targetable::before,[\s\S]*?\.target::before\{/);
-    assert.match(fixedCss,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent/);
-    assert.match(fixedCss,/\.battle-info-region\.is-expanded > #battleInfo\{[\s\S]*?background:rgba\(0,0,0,\.92\) !important/);
+    assert.doesNotMatch(fixedCss,/battle-info-region/,"retired battle log UI must stay absent");
+    assert.doesNotMatch(fixedCss,/battle-info-region/,"retired battle log UI must stay absent");
     assert.match(fixedCss,/#battleActionRegion\.target-selecting > \.turn-target-row\{[\s\S]*?top:auto;[\s\S]*?bottom:calc\(var\(--battle-target-prompt-height\) \+ var\(--battle-target-select-gap\)\);[\s\S]*?opacity:1/);
 }
 
 {
     assert.doesNotMatch(main,/installBattleInfoHandleDrag|__battleInfoHandleDragInstalled|__suppressNextBattleInfoClick/);
     assert.doesNotMatch(fixedCss,/battle-info-toggle\.is-dragging|cursor:ew-resize/);
-    assert.match(fixedCss,/#battleInfoToggle\.battle-info-toggle\{[\s\S]*?touch-action:manipulation;[\s\S]*?cursor:pointer/);
+    assert.doesNotMatch(fixedCss,/battleInfoToggle/,"retired battle log UI must stay absent");
 }
 
 console.log("Hit/evasion/status formula + battle UI owner convergence: PASS");

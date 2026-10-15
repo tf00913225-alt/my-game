@@ -146,13 +146,7 @@
 }
 
 /* Abyss battles keep the standard combat information panel visible. */
-#game-stage #battlePage.v152-abyss-battle #battleInfo{
-    display:block !important;
-    min-height:42px !important;
-    visibility:visible !important;
-    opacity:1 !important;
-    overflow-y:auto !important;
-}
+
 
 
 @media (prefers-reduced-motion:reduce){

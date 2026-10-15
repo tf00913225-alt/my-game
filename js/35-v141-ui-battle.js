@@ -825,15 +825,13 @@
         page.dataset.v141MoveReady="1";
         page.addEventListener("click",function(event){
             if(battleActive||patrolInFightAnimation||event.defaultPrevented){ return; }
-            if(event.target.closest("button,#v141TaskTracker,[id^='mapMonster'],#v131PatrolAppearanceSwitchWrap,#mapBattleOverlay")){ return; }
+            if(event.target.closest("button,#v141TaskTracker,[id^='mapMonster'],#v131PatrolAppearanceSwitchWrap")){ return; }
             const wrap=document.getElementById("patrolCharacterWrap");
             if(!wrap){ return; }
             const rect=page.getBoundingClientRect();
             if(!rect.width||!rect.height){ return; }
             const x=Math.max(.12,Math.min(.88,(event.clientX-rect.left)/rect.width));
-            const overlay=document.getElementById("mapBattleOverlay");
-            const overlayRect=overlay&&overlay.style.display!=="none"?overlay.getBoundingClientRect():null;
-            const bottomClient=overlayRect&&overlayRect.top>rect.top?overlayRect.top-12:rect.top+rect.height*.62;
+            const bottomClient=rect.top+rect.height*.62;
             const y=Math.max(.16,Math.min((bottomClient-rect.top)/rect.height,(event.clientY-rect.top)/rect.height));
             const oldX=parseFloat(wrap.style.left)||50;
             const oldY=parseFloat(wrap.style.top)||37;
@@ -898,7 +896,7 @@
         const page=document.getElementById("mapPage");
         const tracker=document.getElementById("v141TaskTracker");
         if(!page||!tracker){ return; }
-        const maxTop=Math.max(72,page.clientHeight-70-(document.getElementById("mapBattleOverlay")?.offsetHeight||102)-tracker.offsetHeight-8);
+        const maxTop=Math.max(72,page.clientHeight-70-102-tracker.offsetHeight-8);
         taskTrackerState.top=Math.max(72,Math.min(maxTop,taskTrackerState.top));
         tracker.style.top=taskTrackerState.top+"px";
     }

@@ -218,8 +218,6 @@
     function markBattlefieldZones(){
         const page=document.getElementById("battlePage");
         if(page){ page.classList.add("v-fixed-slot-render-v2"); page.dataset.geometryOwner="fixed-slot"; }
-        const info=document.querySelector("#battlePage .battle-info-region");
-        if(info){ info.classList.add("v-fixed-battle-info-zone"); info.dataset.geometryOwner="fixed-slot"; }
         const action=document.getElementById("battleActionRegion")||document.getElementById("battleCommandRow");
         if(action){ action.classList.add("v-fixed-action-zone"); action.dataset.geometryOwner="fixed-slot"; }
     }

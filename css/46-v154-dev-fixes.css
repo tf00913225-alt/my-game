@@ -217,32 +217,10 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     flex-direction:column !important;
     min-height:0 !important;
 }
-#game-stage #dungeonPage.v146-abyss-active .v17342-abyss-battle-info{
-    flex:0 0 82px;
-    min-height:82px;
-    padding:5px 8px 7px;
-    overflow:hidden;
-    border-top:1px solid rgba(190,142,65,.72);
-    background:linear-gradient(180deg,rgba(24,17,10,.96),rgba(7,6,5,.98));
-    color:#e9dcc0;
-}
-#game-stage #dungeonPage.v146-abyss-active .v17342-abyss-battle-info > b{
-    display:block;
-    margin-bottom:3px;
-    color:#f1c66f;
-    font-size:12px;
-}
-#game-stage #dungeonPage.v146-abyss-active .v17342-abyss-battle-log{
-    height:54px;
-    overflow-y:auto;
-    overscroll-behavior-y:contain;
-    touch-action:pan-y;
-    -webkit-overflow-scrolling:touch;
-    font-size:10px;
-    line-height:1.35;
 
-}
-#game-stage #dungeonPage.v146-abyss-active .v17342-abyss-battle-empty{color:#9f947d;}
+
+
+
 #game-stage #dungeonPage.v146-abyss-active .v141-abyss-boss{
     width:120px !important;
     height:168px !important;

@@ -8982,15 +8982,13 @@
         page.dataset.v141MoveReady="1";
         page.addEventListener("click",function(event){
             if(battleActive||patrolInFightAnimation||event.defaultPrevented){ return; }
-            if(event.target.closest("button,#v141TaskTracker,[id^='mapMonster'],#v131PatrolAppearanceSwitchWrap,#mapBattleOverlay")){ return; }
+            if(event.target.closest("button,#v141TaskTracker,[id^='mapMonster'],#v131PatrolAppearanceSwitchWrap")){ return; }
             const wrap=document.getElementById("patrolCharacterWrap");
             if(!wrap){ return; }
             const rect=page.getBoundingClientRect();
             if(!rect.width||!rect.height){ return; }
             const x=Math.max(.12,Math.min(.88,(event.clientX-rect.left)/rect.width));
-            const overlay=document.getElementById("mapBattleOverlay");
-            const overlayRect=overlay&&overlay.style.display!=="none"?overlay.getBoundingClientRect():null;
-            const bottomClient=overlayRect&&overlayRect.top>rect.top?overlayRect.top-12:rect.top+rect.height*.62;
+            const bottomClient=rect.top+rect.height*.62;
             const y=Math.max(.16,Math.min((bottomClient-rect.top)/rect.height,(event.clientY-rect.top)/rect.height));
             const oldX=parseFloat(wrap.style.left)||50;
             const oldY=parseFloat(wrap.style.top)||37;
@@ -9055,7 +9053,7 @@
         const page=document.getElementById("mapPage");
         const tracker=document.getElementById("v141TaskTracker");
         if(!page||!tracker){ return; }
-        const maxTop=Math.max(72,page.clientHeight-70-(document.getElementById("mapBattleOverlay")?.offsetHeight||102)-tracker.offsetHeight-8);
+        const maxTop=Math.max(72,page.clientHeight-70-102-tracker.offsetHeight-8);
         taskTrackerState.top=Math.max(72,Math.min(maxTop,taskTrackerState.top));
         tracker.style.top=taskTrackerState.top+"px";
     }
@@ -10506,11 +10504,6 @@
         const phaseLabels={boss:"等待挑戰",chest:"寶箱待開啟",portal:"寶箱已領取・傳送點已開啟"};
         return "目前進度：第 "+abyssState.floor+" / 5 層・"+(phaseLabels[abyssState.phase]||"挑戰進行中");
     }
-    function abyssBattleInfoMarkup(){
-        const source=document.getElementById("battleInfo");
-        const html=source&&String(source.innerHTML||"").trim();
-        return html||'<div class="v17342-abyss-battle-empty">尚無戰鬥資訊</div>';
-    }
 
     function renderAbyss(){
         if(abyssState.phase==="complete"){
@@ -10534,7 +10527,7 @@
             '<div id="v141AbyssMap" class="v141-abyss-map floor-'+floor+'" onclick="v141AbyssMoveByEvent(event)">'+
             '<div id="v141AbyssSpeech" class="v141-abyss-speech"></div>'+boss+portal+chest+
             '<div id="v141AbyssPlayer" class="v141-abyss-player" style="left:'+abyssState.x+'%;top:'+abyssState.y+'%"><span></span><small>玩家</small></div></div>'+
-            '<section class="v17342-abyss-battle-info" aria-label="戰鬥資訊"><b>戰鬥資訊</b><div class="v17342-abyss-battle-log">'+abyssBattleInfoMarkup()+'</div></section></div>';
+            '</div>';
     }
 
     function syncAbyssPlayerArt(){

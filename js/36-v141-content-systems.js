@@ -1086,11 +1086,6 @@
         const phaseLabels={boss:"等待挑戰",chest:"寶箱待開啟",portal:"寶箱已領取・傳送點已開啟"};
         return "目前進度：第 "+abyssState.floor+" / 5 層・"+(phaseLabels[abyssState.phase]||"挑戰進行中");
     }
-    function abyssBattleInfoMarkup(){
-        const source=document.getElementById("battleInfo");
-        const html=source&&String(source.innerHTML||"").trim();
-        return html||'<div class="v17342-abyss-battle-empty">尚無戰鬥資訊</div>';
-    }
 
     function renderAbyss(){
         if(abyssState.phase==="complete"){
@@ -1114,7 +1109,7 @@
             '<div id="v141AbyssMap" class="v141-abyss-map floor-'+floor+'" onclick="v141AbyssMoveByEvent(event)">'+
             '<div id="v141AbyssSpeech" class="v141-abyss-speech"></div>'+boss+portal+chest+
             '<div id="v141AbyssPlayer" class="v141-abyss-player" style="left:'+abyssState.x+'%;top:'+abyssState.y+'%"><span></span><small>玩家</small></div></div>'+
-            '<section class="v17342-abyss-battle-info" aria-label="戰鬥資訊"><b>戰鬥資訊</b><div class="v17342-abyss-battle-log">'+abyssBattleInfoMarkup()+'</div></section></div>';
+            '</div>';
     }
 
     function syncAbyssPlayerArt(){

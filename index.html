@@ -38,7 +38,7 @@
 <link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/ui/startup-main-city.d43e67af1c1c.jpg" fetchpriority="high">
 <!-- build:critical-style -->
-<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.d2a84424f112.css">
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.8215776933e5.css">
 <!-- /build:critical-style -->
 </head>
 
@@ -1673,27 +1673,7 @@
 
 </section>
 
-<section class="battle-info-region" aria-label="戰鬥資訊區">
-
-<div class="battle-info-header-row">
-    <button
-        id="battleInfoToggle"
-        class="battle-info-toggle"
-        type="button"
-        aria-controls="battleInfo"
-        aria-expanded="false"
-        aria-label="展開戰鬥資訊"
-        onclick="toggleBattleInfoPanel()"
-    >戰鬥資訊</button>
-    <div id="battleTurnIndicator">第 1 回合</div>
-</div>
-
-<div
-    id="battleInfo"
-    class="battle-info"
-></div>
-
-</section>
+<div id="battleTurnIndicator">第 1 回合</div>
 
 <!-- V96：底部固定自動戰鬥列已移除。
      戰鬥頁改由上方「元素匣」icon開啟同一套設定。 -->
@@ -2243,58 +2223,9 @@
     再手動組出absolute座標。
 -->
 
-<!--
-    ★ 修正（依照使用者要求，「把下面兩個
-    元素拿掉」）：
-    原本這裡有兩塊「自動戰鬥」／「自動巡怪」
-    大面板（各帶啟動/設定按鈕），跟左上角
-    的快捷圖示鈕（quickAutoBattleToggle／
-    quickAutoPatrolToggle，見#mapPageBgLayer
-    下方那個.map-quick-toggle-row）功能完全
-    重複，兩份「開/關」入口同時存在反而
-    佔位置、不好看，這裡整塊拿掉。
 
-    開/關功能還在——左上角快捷圖示鈕就是
-    唯一入口，一樣呼叫toggleAutoBattle()／
-    toggleAutoPatrol()。原本「設定」按鈕
-    （開自動戰鬥設定視窗）也還在——下方
-    地圖頁面導覽列（#mapPageNav）最右邊
-    的「自動戰鬥」那顆本來就會開同一個
-    設定視窗，不會因為這裡拿掉而少了入口。
 
-    拿掉這塊之後，mapBattleOverlay底下只剩
-    mapBattleInfo這一個子元素，column-reverse
-    排版會讓它自然貼齊容器底部（原本兩塊
-    面板的位置），不用額外調整。
--->
 
-<div
-    id="mapBattleOverlay"
-    style="
-        display:none;
-        position:fixed;
-        left:0;
-        right:0;
-        bottom:70px;
-        z-index:190;
-        flex-direction:column-reverse;
-        gap:6px;
-        padding:0 6px 6px;
-        pointer-events:none;
-    "
->
-
-<div
-    id="mapBattleInfo"
-    class="battle-info"
-    style="
-        pointer-events:auto;
-        flex:0 0 96px;
-        margin:0;
-    "
-></div>
-
-</div>
 
 <!-- =====================================================
      導覽

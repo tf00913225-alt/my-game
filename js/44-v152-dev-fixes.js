@@ -228,8 +228,6 @@
         const abyss=roster.some(entry=>entry.monster.v141Abyss);
         const battlePage=document.getElementById("battlePage");
         if(battlePage){ battlePage.classList.toggle("v152-abyss-battle",abyss); }
-        const info=document.getElementById("battleInfo");
-        if(abyss&&info){ info.hidden=false; info.removeAttribute("hidden"); }
 
         const earlyAbyss=abyss&&roster.length<=5&&!roster.some(entry=>entry.monster.name==="極帝天尊");
         roster.forEach(entry=>{
@@ -265,7 +263,7 @@
         return {
             version:VERSION,independentSkillPointDisplay:true,removedFireBurstStrike:!(typeof skillDatabase!=="undefined"&&skillDatabase.fireBurstStrike),
             rageAppliedByCriticalResolver:true,damagePopupAboveVfx:true,taskTrackerRemoved:true,
-            autoRecoveryOnMapEntry:true,abyssBattleInfo:true,abyssPortraits:true
+            autoRecoveryOnMapEntry:true,abyssPortraits:true
         };
     };
 })();

@@ -1416,7 +1416,7 @@
         page.dataset.v148ManualMoveBlocked="1";
         page.addEventListener("click",event=>{
             if(event.target&&event.target.closest&&event.target.closest(
-                "button,#v141TaskTracker,[id^='mapMonster'],#v131PatrolAppearanceSwitchWrap,#mapBattleOverlay"
+                "button,#v141TaskTracker,[id^='mapMonster'],#v131PatrolAppearanceSwitchWrap"
             )){ return; }
             event.stopImmediatePropagation();
         },true);
