@@ -1128,8 +1128,8 @@ const retryButton=document.getElementById("startupRetryButton");
 const creation=document.getElementById("creationPage");
 const game=document.getElementById("gameInterface");
 const build=global.__FOUR_SYMBOLS_BUILD__||{};
-const introLogoTargetMs=Math.max(5000,Number(root&&root.dataset.logoTargetMs)||5000);
-const introCityTargetMs=5000;
+const logoTargetMs=Math.max(5000,Number(root&&root.dataset.logoTargetMs)||5000);
+const cityTargetMs=5000;
 const CREATION_PORTRAITS=[
 "assets/characters/female_fire.jpg","assets/characters/female_water.jpg",
 "assets/characters/female_wind.jpg","assets/characters/female_earth.jpg",
@@ -1144,9 +1144,8 @@ let cloudResult=null;
 let transitionToken=0;
 let firebase=null;
 let lastError=null;
-let introTimer=0;
 let citySceneShown=false;
-let openingPresentationComplete=false;
+let openingDone=false;
 let creationRenderPromise=null;
 let accountTransitionReloading=false;
 function mark(name){
@@ -1184,25 +1183,39 @@ if(!contract.canTransition(state,next)){ throw new Error("Invalid startup transi
 state=next; if(root){ root.dataset.state=state; }
 emit("four-symbols:startup-state",payload); return state;
 }
-function showCityScene(reason="boot-progress"){
+function showCity(reason="boot-progress"){
 if(citySceneShown){ return; }
 citySceneShown=true;
-if(introTimer){ global.clearTimeout(introTimer); introTimer=0; }
 if(logoScene){ logoScene.classList.remove("is-active"); logoScene.setAttribute("aria-hidden","true"); }
 if(cityScene){ cityScene.classList.add("is-active"); cityScene.setAttribute("aria-hidden","false"); }
 if(root){ root.dataset.scene="city"; root.dataset.sceneReason=reason; }
 mark("four-symbols:intro-city-visible");
 }
-function scheduleCityScene(){
-if(!root||citySceneShown||introTimer){ return; }
-introTimer=global.setTimeout(()=>showCityScene("logo-target"),introLogoTargetMs);
+let exit=null;
+function showLoader(){
+if(exit){
+global.clearTimeout(exit.timer);
+exit.resolve();
+exit=null;
 }
-function showLoader(){ if(root){ root.hidden=false; root.classList.remove("is-leaving"); root.setAttribute("aria-hidden","false"); } }
+if(root){ root.hidden=false; root.classList.remove("is-leaving"); root.setAttribute("aria-hidden","false"); }
+}
 function hideLoader(){
-if(!root){ return Promise.resolve(); }
-showCityScene("destination-ready");
+if(!root||root.hidden){ return Promise.resolve(); }
+if(exit){ return exit.promise; }
+showCity("destination-ready");
 root.classList.add("is-leaving");
-return new Promise(resolve=>global.setTimeout(()=>{ root.hidden=true; root.setAttribute("aria-hidden","true"); resolve(); },360));
+const task={};
+task.promise=new Promise(resolve=>{
+task.resolve=resolve;
+task.timer=global.setTimeout(()=>{
+if(exit!==task){ return; }
+root.hidden=true; root.setAttribute("aria-hidden","true");
+exit=null; resolve();
+},parseFloat(global.getComputedStyle(root).transitionDuration)*1000||0);
+});
+exit=task;
+return task.promise;
 }
 function accountUi(mode,message,error=false,migration=null){
 firebase.setUiState({mode,user:activeUser,message,error,migration});
@@ -1293,6 +1306,7 @@ firebase.setUiState({mode:state,migration:null});
 firebase.closeAuth(); status("載入完成","主城已可操作");
 mark("four-symbols:critical-ready");
 await hideLoader();
+if(token!==transitionToken){ return; }
 mark("four-symbols:main-city-interactive");
 emit("four-symbols:startup-ready",{uid:resolvedUid,offline});
 document.dispatchEvent(new CustomEvent("v173.20:startup-entered"));
@@ -1322,7 +1336,7 @@ void hideLoader();
 mark("four-symbols:critical-ready"); mark("four-symbols:migration-ui-interactive");
 }
 async function resolveSaveFor(user){
-showCityScene("identity-resolved");
+showCity("identity-resolved");
 const token=++transitionToken;
 activeUser=user; resolvedUid=user.uid; saveResolved=false; cloudResult=null; lastError=null;
 startAppShell();
@@ -1396,7 +1410,7 @@ saveResolved=true; mark("four-symbols:save-resolved"); status("帳號資料已�
 return enterCreation(token).catch(error=>fail(error,"創角介面載入失敗。",token));
 }
 function requireAuth(){
-showCityScene("auth-required");
+showCity("auth-required");
 activeUser=null; resolvedUid=null; saveResolved=false; cloudResult=null;
 if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.deactivate(); }else{ global.FourSymbolsAccountSave.deactivate(); }
 transition(STATES.AUTH_REQUIRED); status("帳號服務已就緒","請登入、註冊或以 Firebase 訪客 UID 開始");
@@ -1406,7 +1420,7 @@ mark("four-symbols:critical-ready"); mark("four-symbols:auth-ui-interactive");
 }
 function fail(error,message,token=transitionToken){
 if(token!==transitionToken){ return; }
-showCityScene("startup-error");
+showCity("startup-error");
 lastError=error; saveResolved=false;
 if(state!==STATES.ERROR){ transition(STATES.ERROR,{error}); }
 showLoader(); status("啟動失敗",message);
@@ -1455,23 +1469,23 @@ global.addEventListener("four-symbols:privacy-ready",()=>{ global.clearTimeout(t
 });
 }
 async function runOpeningPresentation(returning,retryOnly){
-openingPresentationComplete=false;
-if(retryOnly){ showCityScene("resource-retry"); return; }
+openingDone=false;
+if(retryOnly){ showCity("resource-retry"); return; }
 if(root){ root.dataset.audience=returning?"returning":"first-boot"; }
-await delay(introLogoTargetMs);
-showCityScene(returning?"returning-logo-complete":"first-boot-logo-complete");
-await delay(introCityTargetMs);
-openingPresentationComplete=true;
+await delay(logoTargetMs);
+showCity(returning?"returning-logo-complete":"first-boot-logo-complete");
+await delay(cityTargetMs);
+openingDone=true;
 const readyPercent=Number(progress&&progress.getAttribute("aria-valuenow")||0);
 if(readyPercent<100){ status(returning?"正在更新必要資源":"正在準備必要資源","載入完成前將維持第二幕，不會提前進入帳號或創角畫面"); }
 }
 function renderFirstPlayProgress(value){
-const holdOnSecondScene=openingPresentationComplete&&Number(value.percent)<100;
+const holdOnSecondScene=openingDone&&Number(value.percent)<100;
 render(value.percent,holdOnSecondScene?(root&&root.dataset.audience==="returning"?"正在更新必要資源":"正在準備必要資源"):value.title,value.detail);
 if(root){ root.dataset.firstPlayPath=value.path||""; root.dataset.firstPlayPriority=value.priority||""; }
 }
 function showResourceFailure(error){
-lastError=error; showCityScene("resource-error"); showLoader();
+lastError=error; showCity("resource-error"); showLoader();
 const failed=global.FourSymbolsFirstPlay&&global.FourSymbolsFirstPlay.getLastFailed?global.FourSymbolsFirstPlay.getLastFailed():[];
 const summary=failed.slice(0,2).map(item=>item.path).join("、");
 status("部分必要資源載入失敗",summary?"失敗："+summary:"請檢查網路後重新下載失敗項目");

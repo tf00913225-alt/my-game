@@ -7755,7 +7755,7 @@ body.creation-fixed-active{
    browser viewport；不能再以 #game-stage 的 50%/50% 原點顯示原生尺寸。
 ===================================================== */
 
-#game-stage > #startupLoader{
+body > #startupLoader{
     position:fixed;
     inset:0;
     z-index:2147483646;
@@ -7772,14 +7772,15 @@ body.creation-fixed-active{
     touch-action:manipulation;
     user-select:none;
     -webkit-user-select:none;
-    transition:opacity .72s ease,visibility 0s linear .72s;
+    transition:none;
 }
 
-#game-stage > #startupLoader[hidden]{
+body > #startupLoader[hidden]{
     display:none !important;
 }
 
-#game-stage > #startupLoader.is-leaving{
+body > #startupLoader.is-leaving{
+    transition:opacity .36s ease,visibility 0s linear .36s;
     opacity:0;
     visibility:hidden;
     pointer-events:none;

@@ -237,6 +237,22 @@ async function waitFor(client,expression,label,timeoutMs=22000){
     throw new Error(`Timed out waiting for ${label}. ${last}`);
 }
 
+async function startupFrames(client){
+    const frames=await client.eval("window.__qaStartupFrames");
+    assert.ok(frames.length>0,"startup frame evidence missing");
+    for(const frame of frames){
+        if(!frame.hidden){
+            assert.equal(frame.body,true,"startup shell entered a transformed presentation domain");
+            assert.ok(Math.abs(frame.x)<1&&Math.abs(frame.y)<1&&Math.abs(frame.width-frame.viewportWidth)<1&&Math.abs(frame.height-frame.viewportHeight)<1,"startup shell no longer covers viewport: "+JSON.stringify(frame));
+        }
+        if(frame.state==="SAVE_LOADING"){
+            assert.equal(frame.hidden,false,"loading shell disappeared before city visual readiness: "+JSON.stringify(frame));
+            assert.equal(frame.opacity,1,"loading shell is fading during save/visual preparation");
+        }
+    }
+    return frames;
+}
+
 async function browserDiagnostic(client){
     if(!client){ return null; }
     let page=null;
@@ -304,7 +320,13 @@ try{
     await client.send("Emulation.setTouchEmulationEnabled",{enabled:true,maxTouchPoints:5});
     await client.send("Page.addScriptToEvaluateOnNewDocument",{source:`
       window.__qaAccountFrames=[];
-      function accountFrame(){
+      window.__qaStartupFrames=[];
+      function accountFrame(t){
+        const root=document.getElementById('startupLoader');
+        if(root&&window.FourSymbolsStartupPolicy){
+          const r=root.getBoundingClientRect();
+          window.__qaStartupFrames.push({t,state:FourSymbolsStartupPolicy.getState(),hidden:root.hidden,opacity:Number(getComputedStyle(root).opacity),body:root.parentElement===document.body,x:r.x,y:r.y,width:r.width,height:r.height,viewportWidth:innerWidth,viewportHeight:innerHeight});
+        }
         const overlay=document.getElementById('firebaseAuthOverlay');
         const panel=document.getElementById('firebaseSignedInPanel');
         if(overlay?.classList.contains('show')){
@@ -369,6 +391,7 @@ try{
     }
     const signedOut=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),creation:getComputedStyle(document.getElementById("creationPage")).display,labels:[...document.querySelectorAll("#firebaseSignedOutPanel button")].map(button=>button.textContent.trim()),uid:FourSymbolsStartupPolicy.getUid(),featureResources:performance.getEntriesByType("resource").map(entry=>entry.name).filter(name=>/app-shell|gameplay-core|feature-/.test(name))}))()`);
     assert.equal(signedOut.state,"AUTH_REQUIRED");assert.equal(signedOut.creation,"none");assert.equal(signedOut.uid,null);
+    evidence.checks.signedOutStartupFrames=await startupFrames(client);
     for(const label of ["Google 登入","訪客開始遊戲","Email 登入","建立帳號"]){assert.ok(signedOut.labels.includes(label),"Missing auth action: "+label);}
     assert.ok(signedOut.featureResources.some(name=>/app-shell/.test(name)),"First Play did not warm app-shell");assert.ok(signedOut.featureResources.some(name=>/gameplay-core/.test(name)),"First Play did not warm gameplay-core");assert.ok(signedOut.featureResources.some(name=>/feature-patrol/.test(name)),"First Play did not warm patrol");assert.equal(signedOut.featureResources.some(name=>/feature-(?:abyss|skill|boss-relic)/.test(name)),false,"First Play eagerly fetched a deep optional feature");
     evidence.checks.authFirst=signedOut;evidence.performance.coldAuth=await metrics(client,"four-symbols:auth-ui-interactive");
@@ -498,6 +521,7 @@ try{
     evidence.checks.autoResume={frames:resumeFrames.length,noAccountFlash:true,directEnter:true,timerClean:true,viewports:[390,420],sessionErrorPresentation:true};
     const cityVisual=await client.eval(`(()=>{const mark=name=>performance.getEntriesByName(name).at(-1)?.startTime||0;const images=[...document.querySelectorAll("#homePage img,#bottomNav img,#mainBottomNav img")].filter(image=>image.currentSrc&&image.getClientRects().length>0&&getComputedStyle(image).visibility!=="hidden"&&getComputedStyle(image).display!=="none");const home=document.getElementById("homePage");const backgrounds=[home,...home.querySelectorAll(".home-bg-fixed-layer,.home-card-icon")].map(node=>getComputedStyle(node).backgroundImage).filter(value=>value&&value!=="none"&&/url\\(/.test(value));return {dataReady:mark("four-symbols:main-city-data-ready"),visualReady:mark("four-symbols:main-city-visual-ready"),interactive:mark("four-symbols:main-city-interactive"),loaderHidden:document.getElementById("startupLoader").hidden,rosterReady:document.getElementById("v146HomeRoster")?.dataset.ready||null,imagesDecoded:images.length>0&&images.every(image=>image.complete&&image.naturalWidth>0),backgroundsReady:backgrounds.length>0&&backgrounds.every(value=>value&&value!=="none")};})()`);
     assert.ok(cityVisual.dataReady>0&&cityVisual.visualReady>=cityVisual.dataReady);assert.ok(cityVisual.interactive>=cityVisual.visualReady);assert.equal(cityVisual.loaderHidden,true);assert.equal(cityVisual.rosterReady,"true");assert.equal(cityVisual.imagesDecoded,true);assert.equal(cityVisual.backgroundsReady,true);evidence.checks.mainCityVisualReady=cityVisual;
+    evidence.checks.restoredCityStartupFrames=await startupFrames(client);
     await client.eval(`document.querySelector(".team-relic-home-entry")?.click()`);
     await waitFor(client,"performance.getEntriesByName('four-symbols:relic-visual-ready').length>0&&document.querySelectorAll('.team-relic-card-art img').length===20","cold relic visual ready",20000);
     const relicReady=await client.eval(`(()=>({runtime:performance.getEntriesByName("four-symbols:relic-runtime-ready").length,visual:performance.getEntriesByName("four-symbols:relic-visual-ready").length,cards:document.querySelectorAll(".team-relic-card-art img").length,decoded:[...document.querySelectorAll(".team-relic-card-art img")].every(image=>image.complete&&image.naturalWidth>0),loading:!!document.querySelector(".team-relic-loading")}))()`);

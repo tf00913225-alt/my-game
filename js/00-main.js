@@ -472,15 +472,6 @@ const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";
         }catch(_){ }
     }
 
-    if(lifecycleDiagnostics.sessionPreviouslyEntered){
-        const startupRoot=document.getElementById("startupLoader");
-        if(startupRoot){
-            startupRoot.hidden=true;
-            startupRoot.dataset.sessionResume="1";
-            startupRoot.setAttribute("aria-hidden","true");
-        }
-    }
-
     document.addEventListener("v173.20:startup-entered",rememberEnteredSession);
 
     document.addEventListener("visibilitychange",function(){
