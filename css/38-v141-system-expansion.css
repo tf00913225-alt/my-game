@@ -602,14 +602,6 @@
 :is(#game-stage,#game-ui) .home-feature-button{position:relative;}
 @keyframes v141NoticePulse{50%{transform:scale(.9);opacity:.72}}
 
-/* Skill preview visual typography; frame and scroll belong to css/30. */
-#game-ui #allElementSkillPreviewModal .skill-preview-heading h2{font-size:calc(22 * var(--ui-length-unit,1px)) !important;}
-#game-ui #allElementSkillPreviewModal .skill-preview-heading button{font-size:calc(15 * var(--ui-length-unit,1px)) !important;padding:calc(8 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px)) !important;}
-#game-ui #allElementSkillPreviewModal .skill-preview-tabs button{min-height:calc(39 * var(--ui-length-unit,1px));font-size:calc(15 * var(--ui-length-unit,1px)) !important;padding:calc(7 * var(--ui-length-unit,1px)) calc(4 * var(--ui-length-unit,1px)) !important;}
-#game-ui #allElementSkillPreviewModal .skill-preview-card strong{font-size:calc(17 * var(--ui-length-unit,1px)) !important;}
-#game-ui #allElementSkillPreviewModal .skill-preview-card span{font-size:calc(14 * var(--ui-length-unit,1px)) !important;}
-#game-ui #allElementSkillPreviewModal .skill-preview-card p{font-size:calc(15 * var(--ui-length-unit,1px)) !important;line-height:1.6 !important;}
-
 /* ----- Synthesis system ----- */
 #game-stage .v17363-material-card>p{font-size:14px!important;line-height:1.45!important}
 #game-stage .v17363-material-field,#game-stage .v17363-material-field-label{font-size:14px!important;line-height:1.4!important}

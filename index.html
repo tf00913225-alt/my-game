@@ -2434,28 +2434,6 @@
 
     </div>
 
-    <!--
-        ★ 新增（依照使用者要求，「全技能預覽
-        文字按鈕，應該放在技能頁面的返回
-        下面」）：
-        跟statusHelpButton同一套作法，預設
-        隱藏，只有切到「技能」分頁時
-        （switchCharacterTab("skill")）才
-        顯示，並且刻意放在返回按鈕正下方
-        （同一個靠右對齊的欄位，換行變成
-        第二排），不是原本跟著「技能配裝」
-        標題並排的位置。
-    -->
-
-    <button
-        id="skillPreviewHeaderButton"
-        class="home-feature-close-btn"
-        style="display:none;"
-        onclick="openAllElementSkillPreview()"
-    >
-        全屬性技能預覽
-    </button>
-
     </div>
 </div>
 
@@ -2658,23 +2636,6 @@
 
 </div>
 
-</div>
-
-
-<!-- V130：四元素技能功能預覽 -->
-<div
-    id="allElementSkillPreviewModal"
-    class="skill-preview-modal"
-    aria-hidden="true"
->
-    <div class="skill-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="skillPreviewTitle">
-        <div class="skill-preview-heading">
-            <h2 id="skillPreviewTitle">全屬性技能預覽</h2>
-            <button type="button" onclick="closeAllElementSkillPreview()">返回</button>
-        </div>
-        <div id="skillPreviewTabs" class="skill-preview-tabs"></div>
-        <div id="skillPreviewBody" class="skill-preview-body"></div>
-    </div>
 </div>
 
 

@@ -245,9 +245,8 @@ test("character panel uses safe capped browser geometry while preserving interna
     assert.match(css,/\.home-feature-modal-box\.wide #characterTabContent\{[\s\S]*overflow-y:auto !important/);
 });
 
-test("perpetual modal glow and skill-card compositing are static",()=>{
+test("perpetual modal glow is static",()=>{
     assert.match(css,/\.item-modal-box,\s*\.home-feature-modal:not\(#trainingZoneModal\) > \.home-feature-modal-box\{\s*animation:none !important/);
-    assert.match(css,/\.skill-preview-card\{\s*will-change:auto !important/);
 });
 
 test("V169 styles and runtimes are deployed last under fresh cache keys",()=>{

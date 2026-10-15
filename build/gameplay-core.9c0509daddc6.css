@@ -1978,27 +1978,7 @@
     font-size:calc(17 * var(--ui-length-unit,1px)) !important;
 }
 
-/*
-   ★ 修正（依照使用者要求，「標題、選單、內容都要放大，
-   而且要可以捲動...35好像太大了。妳幫我調一個標題、
-   選單、內容都舒服的大小」）：
-   上一輪用90px（換算後螢幕上約35px）確認太大、而且這次
-   使用者也回報「不能捲動」——這個「不能捲動」是真的bug
-   （見js/01-stage-v8-touch-lock.js的修正，全域觸控鎖
-   白名單一直沒有把.skill-preview-body加進去，手指滑動
-   一直被擋掉，只是內容變大、真的需要捲動之後才會被踩到），
-   不是這裡字級的問題，但兩個問題剛好同一輪一起修。
 
-   這裡改成三層都各自給一個「螢幕上看起來舒服、不用瞇眼睛
-   也不會過大」的字級，全部依照實測的0.388889縮放比例
-   （螢幕實際px ÷ 0.388889 = 這裡要寫的設計稿px）反推：
-   - 標題「全屬性技能預覽」：螢幕約19px（這裡49px）
-   - 屬性分頁按鈕（火/水/風/土屬性）：螢幕約15px（這裡39px）
-   - 技能名稱：螢幕約17px（這裡44px）
-   - 物理/法術/增益等分類標籤：螢幕約13px（這裡33px）
-   - 技能說明文字：螢幕約15px（這裡39px）
-   標題/分頁按鈕的規則見下面另外新增的區塊。
-*/
 :is(#game-stage,#game-ui) .stat-explanation{
     font-size:calc(14 * var(--ui-length-unit,1px)) !important;
     line-height:1.7 !important;
@@ -3437,14 +3417,6 @@
 
 :is(#game-stage,#game-ui) .home-feature-button{position:relative;}
 @keyframes v141NoticePulse{50%{transform:scale(.9);opacity:.72}}
-
-/* Skill preview visual typography; frame and scroll belong to css/30. */
-#game-ui #allElementSkillPreviewModal .skill-preview-heading h2{font-size:calc(22 * var(--ui-length-unit,1px)) !important;}
-#game-ui #allElementSkillPreviewModal .skill-preview-heading button{font-size:calc(15 * var(--ui-length-unit,1px)) !important;padding:calc(8 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px)) !important;}
-#game-ui #allElementSkillPreviewModal .skill-preview-tabs button{min-height:calc(39 * var(--ui-length-unit,1px));font-size:calc(15 * var(--ui-length-unit,1px)) !important;padding:calc(7 * var(--ui-length-unit,1px)) calc(4 * var(--ui-length-unit,1px)) !important;}
-#game-ui #allElementSkillPreviewModal .skill-preview-card strong{font-size:calc(17 * var(--ui-length-unit,1px)) !important;}
-#game-ui #allElementSkillPreviewModal .skill-preview-card span{font-size:calc(14 * var(--ui-length-unit,1px)) !important;}
-#game-ui #allElementSkillPreviewModal .skill-preview-card p{font-size:calc(15 * var(--ui-length-unit,1px)) !important;line-height:1.6 !important;}
 
 /* ----- Synthesis system ----- */
 #game-stage .v17363-material-card>p{font-size:14px!important;line-height:1.45!important}
@@ -6124,11 +6096,6 @@ body > .v169-rpg-dialog-layer{
     padding:calc(8 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px)) !important;
     font-size:calc(15 * var(--ui-length-unit,1px)) !important;
 }
-
-/* A permanently promoted layer made skill cards shimmer while scrolling. */
-.skill-preview-card{
-    will-change:auto !important;
-}
 /* ----- Character: same Large Panel frame as shop; only tab content changes. ----- */
 #game-ui #homeFeatureModal .home-feature-modal-box.formation-panel,
 #game-ui #homeFeatureModal .home-feature-modal-box.hero-panel,
@@ -8200,9 +8167,8 @@ body > .v169-rpg-dialog-layer{
 #game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-title{flex:0 0 auto;min-height:132px;border-bottom:3px solid rgba(206,154,61,.45);background:linear-gradient(180deg,rgba(45,31,15,.96),rgba(15,12,8,.96));}
 #game-ui #homeFeatureModal.team-relic-modal #homeFeatureModalTitle{font-family:"Noto Serif TC",serif;letter-spacing:.2em;color:#f0d28d;font-size:60px;}
 #game-ui #homeFeatureModal.team-relic-modal .home-feature-close-btn{align-items:center!important;justify-content:center!important;width:auto!important;min-width:204px!important;height:114px!important;padding:0 36px!important;font-size:45px!important;line-height:108px!important;font-weight:900!important;border:3px solid #8a6a3a!important;border-radius:21px!important;background:linear-gradient(180deg,#2c2419,#0f0c09)!important;color:#f4ead4!important;text-shadow:0 3px 6px #000!important;box-shadow:inset 0 3px 0 rgba(255,255,255,.05),0 6px 18px rgba(0,0,0,.45)!important;}
-#game-ui #homeFeatureModal.team-relic-modal #statusHelpButton,
-#game-ui #homeFeatureModal.team-relic-modal #skillPreviewHeaderButton{display:none!important;}
-#game-ui #homeFeatureModal.team-relic-modal:not(.team-relic-detail-mode) .home-feature-close-btn:not(#statusHelpButton):not(#skillPreviewHeaderButton){display:inline-flex!important;}
+#game-ui #homeFeatureModal.team-relic-modal #statusHelpButton{display:none!important;}
+#game-ui #homeFeatureModal.team-relic-modal:not(.team-relic-detail-mode) .home-feature-close-btn:not(#statusHelpButton){display:inline-flex!important;}
 #game-ui #homeFeatureModal.team-relic-modal.team-relic-detail-mode .home-feature-close-btn{display:none!important;}
 #game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide #homeFeatureModalBody{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important;padding:27px!important;box-sizing:border-box;}
 :is(#game-stage,#game-ui) .team-relic-page,:is(#game-stage,#game-ui) .team-relic-detail{min-height:100%;color:#e7dcc7;font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.5;box-sizing:border-box;}

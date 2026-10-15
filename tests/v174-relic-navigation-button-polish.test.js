@@ -49,9 +49,8 @@ assert.equal(created.filter(node=>node.id==="v169RpgDialogLayer").length,1,"all 
 
 assert.doesNotMatch(relicCss,/map-return\.png/);
 assert.match(authoredUiCss(fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8")),/\.team-relic-home-tools\{[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\);[^}]*grid-row:3;[^}]*width:100%;[^}]*gap:4px;/);
-assert.match(relicCss,/#statusHelpButton,\s*\n#game-ui #homeFeatureModal\.team-relic-modal #skillPreviewHeaderButton\{display:none!important;\}/,
-    "relic modal must never expose the character status-help or all-skill-preview header controls");
-assert.match(relicCss,/\.team-relic-modal:not\(\.team-relic-detail-mode\) \.home-feature-close-btn:not\(#statusHelpButton\):not\(#skillPreviewHeaderButton\)\{display:inline-flex!important;\}/,
+assert.match(relicCss,/#statusHelpButton\{display:none!important;\}/, "relic modal hides status help");
+assert.match(relicCss,/\.team-relic-modal:not\(\.team-relic-detail-mode\) \.home-feature-close-btn:not\(#statusHelpButton\)\{display:inline-flex!important;\}/,
     "only the real modal return button may be forced visible in relic list mode");
 assert.match(relicCss,/\.team-relic-modal\.team-relic-detail-mode \.home-feature-close-btn\{display:none!important;\}/,
     "explicit detail mode removes the redundant modal return control");

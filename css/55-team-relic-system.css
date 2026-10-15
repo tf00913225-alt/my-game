@@ -8,9 +8,8 @@
 #game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-title{flex:0 0 auto;min-height:132px;border-bottom:3px solid rgba(206,154,61,.45);background:linear-gradient(180deg,rgba(45,31,15,.96),rgba(15,12,8,.96));}
 #game-ui #homeFeatureModal.team-relic-modal #homeFeatureModalTitle{font-family:"Noto Serif TC",serif;letter-spacing:.2em;color:#f0d28d;font-size:60px;}
 #game-ui #homeFeatureModal.team-relic-modal .home-feature-close-btn{align-items:center!important;justify-content:center!important;width:auto!important;min-width:204px!important;height:114px!important;padding:0 36px!important;font-size:45px!important;line-height:108px!important;font-weight:900!important;border:3px solid #8a6a3a!important;border-radius:21px!important;background:linear-gradient(180deg,#2c2419,#0f0c09)!important;color:#f4ead4!important;text-shadow:0 3px 6px #000!important;box-shadow:inset 0 3px 0 rgba(255,255,255,.05),0 6px 18px rgba(0,0,0,.45)!important;}
-#game-ui #homeFeatureModal.team-relic-modal #statusHelpButton,
-#game-ui #homeFeatureModal.team-relic-modal #skillPreviewHeaderButton{display:none!important;}
-#game-ui #homeFeatureModal.team-relic-modal:not(.team-relic-detail-mode) .home-feature-close-btn:not(#statusHelpButton):not(#skillPreviewHeaderButton){display:inline-flex!important;}
+#game-ui #homeFeatureModal.team-relic-modal #statusHelpButton{display:none!important;}
+#game-ui #homeFeatureModal.team-relic-modal:not(.team-relic-detail-mode) .home-feature-close-btn:not(#statusHelpButton){display:inline-flex!important;}
 #game-ui #homeFeatureModal.team-relic-modal.team-relic-detail-mode .home-feature-close-btn{display:none!important;}
 #game-ui #homeFeatureModal.team-relic-modal .home-feature-modal-box.wide #homeFeatureModalBody{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important;padding:27px!important;box-sizing:border-box;}
 :is(#game-stage,#game-ui) .team-relic-page,:is(#game-stage,#game-ui) .team-relic-detail{min-height:100%;color:#e7dcc7;font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.5;box-sizing:border-box;}

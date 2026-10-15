@@ -16,8 +16,6 @@ const html=read("index.html");
 const manifest=JSON.parse(read("asset-manifest.json"));
 assert.match(inventoryCss,/#game-ui #inventoryPage \.v169-item-art\.v169-equipment-art\{[\s\S]*place-items:center;[\s\S]*object-fit:contain;/);
 assert.doesNotMatch(inventoryCss,/#game-ui #inventoryPage \.v169-item-art\.v169-equipment-art\{[^}]*!important/s);
-assert.match(hintCss,/#allElementSkillPreviewModal \.skill-preview-body::before\{[\s\S]*font-size:16px;[\s\S]*line-height:1\.45;/);
-assert.doesNotMatch(hintCss,/body #game-stage #allElementSkillPreviewModal/);
 assert.doesNotMatch(rosterCss,/@media\s*\([^)]*(?:width|height)/);
 assert.match(rosterCss,/\.v146-home-roster\{[^}]*margin:4px 10px 0;/);
 assert.match(rosterCss,/\.v146-home-character\{[^}]*min-height:70px;/);

@@ -10132,11 +10132,6 @@ ensureFunctionalStyles();runRepairs();
             return levelBreakdownHtml(skill);
         };
     }
-    if(typeof window.getSkillPreviewSummary==="function"){
-        window.getSkillPreviewSummary=function(skill){
-            return descriptionFor(skill);
-        };
-    }
 
     function renderSkillDetailProgression(skillId){
         if(typeof document==="undefined"){ return; }

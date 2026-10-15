@@ -166,11 +166,6 @@ assert.doesNotMatch(gameplayCss,/boss-mechanism-card|boss-mechanism-slot/);
 
 /* Requirement 3: all-element preview explicitly distinguishes advantage from
    disadvantage and stays on the real body-mounted modal owner. */
-assert.match(skillPreviewCss,/元素克制｜土剋水・水剋火・火剋風・風剋土/);
-assert.match(skillPreviewCss,/克制：你的元素剋對方＝你佔優勢/);
-assert.match(skillPreviewCss,/被克制：對方元素剋你＝你處於劣勢/);
-assert.match(skillPreviewCss,/#allElementSkillPreviewModal \.skill-preview-body::before\{[\s\S]*?white-space:pre-line;/);
-assert.doesNotMatch(skillPreviewCss,/body #game-stage #allElementSkillPreviewModal/);
 
 /* Requirement 4: first character Lv20 grants exactly the two designated,
    already-formal blue/runtime-ready starter relics, once per save. */

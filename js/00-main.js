@@ -251,8 +251,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
     ui.dataset.presentationDomain="native";
     document.getElementById("game-overlay-layer").appendChild(ui);
     for(const id of ["homePage","inventoryPage","homeFeatureModal","itemModal",
-                     "inventoryCharacterDetailModal","skillDetailModal","statusHelpModal",
-                     "allElementSkillPreviewModal"]){
+                     "inventoryCharacterDetailModal","skillDetailModal","statusHelpModal"]){
         const node=document.getElementById(id);
         if(node) ui.appendChild(node);
     }
@@ -25999,31 +25998,9 @@ function closeHomeFeature(){
     }
 
 
-    /*
-       ★ 修正（依照使用者回報，「自動戰鬥的框...套用並
-       期待按鈕再戰鬥中根本沒有反應」旁邊那張截圖，
-       「全屬性技能預覽」按鈕出現在自動戰鬥設定視窗上）：
-       跟上面statusHelpButton同一個bug、漏了同一個地方
-       沒重置——skillPreviewHeaderButton只有在
-       switchCharacterTab()裡被設成顯示/隱藏，只要玩家
-       進過一次角色視窗的「技能」分頁，這顆按鈕的
-       inline style.display會停在"inline-block"，
-       之後不管開什麼視窗（自動戰鬥設定、商店、任務……）
-       都會殘留顯示，因為切分頁跟關視窗是兩條不同路徑，
-       關視窗那邊原本沒有重置到它。這裡補上跟
-       statusHelpButton一樣的收尾重置。
-    */
-
-    const skillPreviewBtn=
-        $("skillPreviewHeaderButton");
 
 
-    if(skillPreviewBtn){
 
-        skillPreviewBtn.style.display=
-            "none";
-
-    }
 
 
     restoreBorrowedElement();
@@ -26170,30 +26147,9 @@ function switchCharacterTab(tabName){
     }
 
 
-    /*
-       ★ 新增（依照使用者要求，「全技能預覽
-       文字按鈕，應該放在技能頁面的返回
-       下面」）：
-       跟statusHelpButton同一套邏輯，只有
-       切到「技能」分頁才顯示，其他分頁
-       自動隱藏。
-    */
-
-    const skillPreviewBtn=
-        $("skillPreviewHeaderButton");
 
 
-    if(skillPreviewBtn){
 
-        skillPreviewBtn.style.display=
-
-            tabName==="skill"
-            ?
-            "inline-block"
-            :
-            "none";
-
-    }
 
 
     const container=
@@ -29005,134 +28961,6 @@ function confirmStatus(){
 /* =====================================================
    技能
 ===================================================== */
-
-const SKILL_PREVIEW_ELEMENTS=["fire","water","wind","earth"];
-
-function getSkillPreviewSummary(skill){
-
-    const scopes={
-        single:"攻擊單一敵人",
-        tri:"攻擊相鄰的一排敵人",
-        row:"攻擊一整排敵人",
-        column:"攻擊同一直列敵人",
-        all:"攻擊敵方全體",
-        ally:"支援一名友方",
-        allyAll:"支援我方全體",
-        deadAlly:"復活一名倒下的友方",
-        none:"被動生效"
-    };
-
-    const effects=[];
-
-    if(skill.category==="physical"){
-        effects.push("造成物理傷害");
-    }
-    if(skill.category==="magic"){
-        effects.push("造成法術傷害");
-    }
-    if(skill.burnChance){ effects.push("可能附加燃燒"); }
-    if(skill.freezeChance){ effects.push("可能使目標冰封"); }
-    if(skill.stunChance){ effects.push("可能使目標暈眩並降低命中"); }
-    if(skill.agilityDownChance){ effects.push("可能降低目標敏捷"); }
-    if(skill.damageDownChance){ effects.push("可能降低目標造成的傷害"); }
-    if(skill.defenseDownChance){ effects.push("可能降低目標防禦"); }
-    if(skill.statDownChance){ effects.push("可能降低目標多項能力"); }
-    if(skill.lifestealPercentByLevel){ effects.push("可吸收傷害回復自身"); }
-    if(skill.selfShieldByLevel){ effects.push("為自己建立護盾"); }
-    if(skill.allyShieldByLevel){ effects.push("為我方建立護盾"); }
-
-    if(skill.category==="heal"){
-        effects.push("回復友方生命與能量");
-    }
-    if(skill.category==="revive"){
-        effects.push("讓倒下的友方重新參戰");
-    }
-    if(skill.category==="passive"){
-        effects.push("永久強化該元素的戰鬥特色");
-    }
-
-    const namedEffects={
-        rage:"提升我方爆擊能力",
-        dodgeSkill:"提升我方閃躲能力",
-        stealthSkill:"讓友方進入隱身",
-        dinghaishenzhen:"提升我方異常狀態抗性",
-        rockWall:"提升我方防禦能力",
-        earthShield:"賦予友方反傷效果",
-        barrier:"為友方建立傷害結界"
-    };
-
-    if(namedEffects[skill.id]){
-        effects.push(namedEffects[skill.id]);
-    }
-
-    return [
-        scopes[skill.targetType]||"特殊效果",
-        ...effects
-    ].filter(Boolean).join("；")+"。";
-
-}
-
-function renderAllElementSkillPreview(element){
-
-    const body=$("skillPreviewBody");
-    const tabs=$("skillPreviewTabs");
-
-    if(!body || !tabs){ return; }
-
-    const selected=SKILL_PREVIEW_ELEMENTS.includes(element)
-        ? element
-        : "fire";
-
-    tabs.innerHTML=SKILL_PREVIEW_ELEMENTS.map(key=>{
-        const data=elementDatabase[key];
-        return '<button type="button" class="'+
-            (key===selected ? "active" : "")+
-            '" onclick="renderAllElementSkillPreview(\''+key+'\')">'+
-            data.name+'屬性</button>';
-    }).join("");
-
-    const categoryNames={
-        physical:"物理",
-        magic:"法術",
-        buff:"增益",
-        heal:"回復",
-        revive:"復活",
-        passive:"被動"
-    };
-
-    const skills=Object.values(skillDatabase).filter(
-        skill=>skill.element===selected
-    );
-
-    body.innerHTML=skills.map(skill=>
-        '<article class="skill-preview-card">'+
-            '<div><strong>'+skill.name+'</strong><span>'+
-            (categoryNames[skill.category]||"特殊")+'</span></div>'+
-            '<p>'+getSkillPreviewSummary(skill)+'</p>'+
-        '</article>'
-    ).join("");
-
-    body.scrollTop=0;
-}
-
-function openAllElementSkillPreview(){
-
-    const modal=$("allElementSkillPreviewModal");
-    if(!modal){ return; }
-
-    renderAllElementSkillPreview("fire");
-    modal.classList.add("show");
-    modal.setAttribute("aria-hidden","false");
-}
-
-function closeAllElementSkillPreview(){
-
-    const modal=$("allElementSkillPreviewModal");
-    if(!modal){ return; }
-
-    modal.classList.remove("show");
-    modal.setAttribute("aria-hidden","true");
-}
 
 function changeSkillCharacterArrow(direction){
 
