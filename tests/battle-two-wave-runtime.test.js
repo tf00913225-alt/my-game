@@ -126,6 +126,23 @@ test("QA end fixture preserves one-wave completion and already-finished behavior
  assert.equal(finish(),true);assert.equal(r.ctx.wins,1);
 });
 
+test("QA terminal handoff waits for the formal timer and VFX before the separate outcome callback",()=>{
+ const source=fs.readFileSync(".github/scripts/battle-layer-audio-live-qa.mjs","utf8");
+ const helper=source.match(/^function battleLayerQaTerminalHandoffReady\([\s\S]*?^\}/m);
+ assert.ok(helper,"actual Browser QA handoff predicate");
+ let remaining=500,calls=0;
+ const c={window:{__battleLayerQaEndResult:{ended:false},__battleLayerQaCompleteEnd:()=>{calls++;},v142GetRemainingAnimationMs:()=>remaining},Number,battleAdvanceScheduled:false};
+ vm.createContext(c);vm.runInContext(helper[0],c);
+ assert.equal(c.battleLayerQaTerminalHandoffReady(),false);
+ c.window.__battleLayerQaEndResult.ended=true;
+ assert.equal(c.battleLayerQaTerminalHandoffReady(),false,"terminal decision alone cannot skip visual completion");
+ remaining=0;c.battleAdvanceScheduled=true;
+ assert.equal(c.battleLayerQaTerminalHandoffReady(),false,"formal post-action beat must complete");
+ c.battleAdvanceScheduled=false;
+ assert.equal(c.battleLayerQaTerminalHandoffReady(),true);
+ assert.equal(calls,4,"each poll still drives the real settled-boundary fixture");
+});
+
 test("Abyss QA startup waits for the actual Policy, loader and Auth overlay without an unbound reference",()=>{
  const source=fs.readFileSync(".github/scripts/run-abyss-balance-browser-qa.mjs","utf8");
  const match=source.match(/await wait\(\(\)=>([^\n]+)\);/);

@@ -369,6 +369,15 @@ function finishBattleLayerQaEndFixture(){
     return battleActive===false;
 }
 
+function battleLayerQaTerminalHandoffReady(){
+    window.__battleLayerQaCompleteEnd();
+    // A terminal decision can still own a skill + post-action handoff. The
+    // following callback wait owns the unchanged V141 exit, not this phase.
+    return window.__battleLayerQaEndResult.ended===true&&
+        !battleAdvanceScheduled&&
+        !(Number(window.v142GetRemainingAnimationMs?.())>0);
+}
+
 async function prepareAccountFirstRuntime(client,features){
     await waitFor(client,"window.FourSymbolsStartupPolicy&&(FourSymbolsStartupPolicy.getState()==='ERROR'||['AUTH_REQUIRED','NEED_CHARACTER','READY','OFFLINE_READY'].includes(FourSymbolsStartupPolicy.getState())||(document.getElementById('privacyConsentGate')&&!document.getElementById('privacyConsentGate').hidden&&document.getElementById('startupProgress')?.getAttribute('aria-valuenow')==='100'))","First Play/privacy/account startup destination",120000);
     let state=await client.eval("FourSymbolsStartupPolicy.getState()");
@@ -1651,9 +1660,10 @@ try{
         const initialToken=Number(window.__battleLayerQaInitialBattleToken)||0;
         window.__battleLayerQaEndResult={ended:false};
         window.__battleLayerQaCompleteEnd=${finishBattleLayerQaEndFixture.toString()};
+        window.__battleLayerQaTerminalHandoffReady=${battleLayerQaTerminalHandoffReady.toString()};
         return {initialToken};
     })()`);
-    await waitFor(client,"window.__battleLayerQaCompleteEnd()","battle victory flow release",5000);
+    await waitFor(client,"window.__battleLayerQaTerminalHandoffReady()","battle terminal presentation handoff",5000);
     await waitFor(client,"['win','lose'].includes(window.__battleLayerQaDungeonOutcome?.result)","battle-end dungeon callback",6000);
     const endTransition=await client.eval(`({
         ended:${JSON.stringify(true)},battleActive:!!battleActive,
