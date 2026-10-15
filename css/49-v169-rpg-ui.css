@@ -529,11 +529,6 @@ body > .v169-rpg-dialog-layer{
     padding:calc(8 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px)) !important;
     font-size:calc(15 * var(--ui-length-unit,1px)) !important;
 }
-
-/* A permanently promoted layer made skill cards shimmer while scrolling. */
-.skill-preview-card{
-    will-change:auto !important;
-}
 /* ----- Character: same Large Panel frame as shop; only tab content changes. ----- */
 #game-ui #homeFeatureModal .home-feature-modal-box.formation-panel,
 #game-ui #homeFeatureModal .home-feature-modal-box.hero-panel,

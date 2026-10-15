@@ -70,7 +70,7 @@ test("Water UI descriptions are left to the formal progression owner",()=>{
     assert.equal(context.getSkillEffectPreviewText(context.skillDatabase.waterKnife,1),"legacy-effect");
     assert.equal(context.buildSkillLevelBreakdownHTML(context.skillDatabase.waterKnife),"legacy-levels");
     assert.doesNotMatch(source,/getSkillPreviewSummary\s*=|getSkillEffectPreviewText\s*=|buildSkillLevelBreakdownHTML\s*=/);
-    assert.match(progression,/window\.getSkillPreviewSummary=function/);
+    assert.doesNotMatch(progression,/window\.getSkillPreviewSummary=function/);
 });
 
 console.log("\nV169 Water runtime compatibility suite: "+passed+" tests passed.");

@@ -28,7 +28,6 @@ assert.doesNotMatch(bootstrap,/creation-native-active[\s\S]*classList\.add/);
 assert.match(uiCss,/grid-template-columns:52% 48%/);
 assert.match(uiCss,/\.creation-portrait-image\{[\s\S]*?bottom:0;[\s\S]*?width:100%;[\s\S]*?height:100%;[\s\S]*?object-fit:contain/);
 assert.match(uiCss,/土剋水・水剋火・火剋風・風剋土/);
-assert.match(uiCss,/#allElementSkillPreviewModal \.skill-preview-body::before/);
 
 assert.match(inventory,/SLOT_STORAGE_ALIASES/);
 assert.match(inventory,/shoulder:\["shoulder","wristguard"\]/);

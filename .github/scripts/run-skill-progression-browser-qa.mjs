@@ -5,7 +5,7 @@ import path from "node:path";
 import {spawn} from "node:child_process";
 import {ROOT,findChrome,startServer,waitJson,Cdp} from "./runtime-browser-qa-support.mjs";
 const ARTIFACT_DIR=path.join(ROOT,"artifacts","browser-qa");
-const VIEWPORTS=[[360,800],[393,873],[412,915]];
+const VIEWPORTS=[[360,800],[393,873],[412,915],[1280,960]];
 const QA_LABELS=Object.freeze({
     heal:"治療術",
     revive:"復活術",
@@ -58,6 +58,10 @@ const PREPARE_RUNTIME=`(async()=>{
             upgradeEligibility:typeof window.v17364GetSkillUpgradeEligibility,
             errors:runtimeErrors.slice(-8)
         }));
+    }
+    document.getElementById("firebaseDirectEnterButton")?.click();
+    if(!await waitFor(()=>!document.querySelector('.firebase-auth-overlay.show'))){
+        throw new Error("account resume overlay still blocks skill page");
     }
     player.id="QA 火角色";player.element="fire";player.level=70;player.skillPoints=999;
     player2={id:"QA 水角色",element:"water",level:70,skillPoints:999};
@@ -172,7 +176,7 @@ async function runViewport(chrome,url,width,height,capture){
         // owner.  Feature modules call accountKey() during installation, so setting this
         // only after navigation is too late and produces a false bootstrap failure.
         await client.send("Page.addScriptToEvaluateOnNewDocument",{source:'localStorage.setItem("four_symbols_active_uid","skill-runtime-browser-qa");'});
-        await client.send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height,screenOrientation:{type:"portraitPrimary",angle:0}});
+        await client.send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:width<700,screenWidth:width,screenHeight:height,screenOrientation:{type:"portraitPrimary",angle:0}});
         await client.send("Page.navigate",{url});
         await client.eval(PREPARE_RUNTIME);
         const evidence=await client.eval(COLLECT_EVIDENCE);
@@ -188,6 +192,22 @@ async function runViewport(chrome,url,width,height,capture){
         assert.ok(evidence.guidance.length>0,"learnable action has no Guidance Dot");
         for(const item of evidence.guidance){ assertVisibleAction("Guidance Dot parent",item.parent);assert.ok(item.dot.visibleRectWidth>0&&item.dot.visibleRectHeight>0,"Guidance Dot is not visible"); }
         for(const card of evidence.allCards){ assert.equal(card.tagName,"BUTTON","div.skill-action-card is forbidden in formal Runtime"); }
+        const retirement=await client.eval(`(async()=>{
+            const absent=!document.querySelector('#allElementSkillPreviewModal,#skillPreviewHeaderButton,.skill-preview-modal');
+            const detail=document.querySelector('#allSkillsList [onclick^="showSkillDetail"]');
+            if(!detail)throw Error('normal skill detail action missing');
+            detail.scrollIntoView({block:"center"});
+            await new Promise(resolve=>{const timer=setTimeout(resolve,250);requestAnimationFrame(()=>requestAnimationFrame(()=>{clearTimeout(timer);resolve();}));});
+            const r=detail.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
+            if(!hit||!(hit===detail||detail.contains(hit)))throw Error('normal detail action blocked '+JSON.stringify({rect:r.toJSON(),hit:hit?.outerHTML.slice(0,250)}));
+            detail.click();
+            const shown=document.getElementById('skillDetailModal').classList.contains('show');
+            closeSkillDetail();
+            const closed=!document.getElementById('skillDetailModal').classList.contains('show');
+            return {absent,shown,closed,skillList:!!document.getElementById('allSkillsList')};
+        })()`);
+        assert.deepEqual(retirement,{absent:true,shown:true,closed:true,skillList:true});
+        evidence.retirement=retirement;
         if(capture){
             const screenshot=await client.send("Page.captureScreenshot",{format:"png"});
             fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-393x873.png"),Buffer.from(screenshot.data,"base64"));

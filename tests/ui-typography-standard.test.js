@@ -91,8 +91,6 @@ assert.match(homePolish, /\.v173-exp-charge-status small\{[^}]*font-size:14px/);
 assert.match(homePolish, /\.skill-loadout-slot-name\{font-size:15px/);
 assert.match(homePolish, /\.map-player-name\{[^}]*font-size:13px/);
 assert.match(homePolish, /\.v132-reward-modal \.v17363-preview-group p\{font-size:15px/);
-assert.doesNotMatch(homePolish, /#allElementSkillPreviewModal/);
-assert.match(read('css/38-v141-system-expansion.css'), /#allElementSkillPreviewModal \.skill-preview-card span\{font-size:14px/);
 assert.match(detail, /#skillDetailStats \.v17364-progression-hint\{[\s\S]*?font-size:14px/);
 // V177 owns backpack typography in css/22; css/52 must not reclaim it.
 assert.match(inventory, /\.inventory-category-tab\{[^}]*font-size:18px/);

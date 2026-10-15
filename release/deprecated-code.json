@@ -252,7 +252,10 @@
       "id": "DEP-WIND-EX-LOW-HP-HIT-CAP",
       "description": "Wind EX low-HP final-hit cap is replaced by additive final Evasion; old field and player-visible cap text must not return.",
       "enabled": true,
-      "forbidden": ["lowHpFinalHitCapPercent", "最終命中率最高為 50"]
+      "forbidden": [
+        "lowHpFinalHitCapPercent",
+        "最終命中率最高為 50"
+      ]
     },
     {
       "id": "DEP-LEVEL-SUPPRESSION-V2",
@@ -262,6 +265,21 @@
         "LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL",
         "LEVEL_DIFF_FACTOR_MIN_PHYSICAL",
         "LEVEL_DIFF_FACTOR_MAX_PHYSICAL"
+      ]
+    },
+    {
+      "id": "DEP-skill-preview-removal-20261015",
+      "description": "全屬性技能預覽已移除；正常技能列表、學習、升級與詳細功能保留。",
+      "enabled": true,
+      "forbidden": [
+        "allElementSkillPreviewModal",
+        "skillPreviewHeaderButton",
+        "openAllElementSkillPreview",
+        "closeAllElementSkillPreview",
+        "renderAllElementSkillPreview",
+        "getSkillPreviewSummary",
+        "SKILL_PREVIEW_ELEMENTS",
+        "skill-preview-card"
       ]
     }
   ]
