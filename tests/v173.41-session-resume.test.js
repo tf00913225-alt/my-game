@@ -49,9 +49,9 @@ function harness(initialReady){
 
 {
     const h=harness(true);
-    assert.equal(h.root.hidden,true,"same-tab reload must skip the long loader");
-    assert.equal(h.root.dataset.sessionResume,"1");
-    assert.equal(h.root.attributes["aria-hidden"],"true");
+    assert.equal(h.root.hidden,false,"same-tab reload must leave visual readiness to Startup");
+    assert.equal(h.root.dataset.sessionResume,undefined,"diagnostics cannot install a presentation override");
+    assert.equal(h.root.attributes["aria-hidden"],undefined);
     h.context.document.hidden=true;
     h.documentListeners.visibilitychange();
     assert.equal(h.saves,1,"backgrounding must immediately save");
