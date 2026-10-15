@@ -12,6 +12,164 @@ const uid="uid-a";
 const save=`users/${uid}/saves/current`;
 const root=`serverUsers/${uid}`;
 const operationId="init-character-0001";
+const observationId="observe-period-0001";
+const observation={operationId:observationId,expectedRevision:5};
+
+async function periodHarness(){
+    const h=harness();
+    h.setClock(Date.parse("2026-10-15T15:59:59.999Z"));
+    await h.writer.commitInitialSources({}, {operationId,expectedRevision:4,selection});
+    h.setClock(Date.parse("2026-10-15T16:00:00.000Z"));
+    return h;
+}
+function rewritePeriodSources(h,change){
+    const {assembleCanonicalSnapshot}=require("../functions/src/canonical-snapshot.js");
+    const {createRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    const records=structuredClone(h.data.get(root+"/recoveryArchives/5").sourceRecords);
+    change(records);
+    const bundle=assembleCanonicalSnapshot(uid,5,records);
+    h.data.set(root+"/progress/current",records.progress);
+    h.data.set(root+"/account/current",{...records.account,snapshotSha256:bundle.sha256});
+    h.data.set(root+"/playableSnapshots/5",bundle);
+    h.data.set(root+"/recoveryArchives/5",createRecoveryArchive(uid,5,records,bundle));
+}
+async function unchangedRejection(h,args=observation,pattern){
+    const before=JSON.stringify([...h.data]),count=h.committed;
+    await assert.rejects(h.writer.observeDailyPeriod({},args),pattern);
+    assert.equal(h.committed,count);assert.equal(JSON.stringify([...h.data]),before);
+}
+
+test("daily observation pins Taipei midnight/year/leap periods without changing any gameplay bytes",async()=>{
+    for(const [before,after,date] of [
+        ["2026-10-15T15:59:59.999Z","2026-10-15T16:00:00.000Z","2026-10-16"],
+        ["2026-12-31T15:59:59.999Z","2026-12-31T16:00:00.000Z","2027-01-01"],
+        ["2024-02-28T15:59:59.999Z","2024-02-28T16:00:00.000Z","2024-02-29"],
+        ["2024-02-29T15:59:59.999Z","2024-02-29T16:00:00.000Z","2024-03-01"]]){
+        const h=harness();h.setClock(Date.parse(before));
+        await h.writer.commitInitialSources({}, {operationId,expectedRevision:4,selection});
+        await unchangedRejection(h,observation,/later daily/);
+        h.setClock(Date.parse(after));
+        const original=new Map([...h.data].map(([k,v])=>[k,JSON.stringify(v)])),count=h.committed;
+        const result=await h.writer.observeDailyPeriod({},observation);
+        assert.equal(result.targetDate,date);assert.equal(result.sourceRevision,5);
+        assert.equal(result.authoritativeStateReady,false);assert.equal(result.rewardEligible,false);
+        assert.equal(h.committed,count+2);
+        for(const [key,bytes] of original){assert.equal(JSON.stringify(h.data.get(key)),bytes);}
+        assert.equal(h.data.size,original.size+2);
+        const marker=h.data.get(root+"/operations/"+result.periodId);
+        assert.equal(marker.snapshotSha256,h.data.get(root+"/playableSnapshots/5").sha256);
+        assert.equal(marker.observedAt,Date.parse(after));
+        const beforeRetry=JSON.stringify([...h.data]);
+        h.setClock(Date.parse(after)+35*86400000);
+        assert.deepEqual(await h.writer.observeDailyPeriod({},observation),{...result,unchanged:true});
+        assert.equal(JSON.stringify([...h.data]),beforeRetry);assert.equal(h.committed,count+2);
+        await unchangedRejection(h,{...observation,expectedRevision:6},/intent/);
+    }
+});
+
+test("recorded dungeon usage and shop purchase batches remain exact in a later-day source",async()=>{
+    const h=await periodHarness();
+    rewritePeriodSources(h,records=>{
+        records.progress.sidecars["daily-dungeon-state"].raw=
+            ' { "date":"2026-10-15","used":{"exp":true,"material":false,"equipment":true} } ';
+        records.progress.sidecars["equipment-shop-daily"].raw=
+            '{"date":"2026-10-15","refreshCount":2,"soldOfferIds":["2026-10-15:0:1","2026-10-15:2:5"]}';
+    });
+    const raw=structuredClone(h.data.get(root+"/progress/current").sidecars);
+    const result=await h.writer.observeDailyPeriod({},observation);
+    assert.deepEqual(h.data.get(root+"/progress/current").sidecars,raw);
+    const marker=h.data.get(root+"/operations/"+result.periodId);
+    const {createHash}=require("node:crypto");
+    for(const key of ["daily-dungeon-state","equipment-shop-daily"]){
+        assert.equal(marker.periods[key].rawSha256,
+            createHash("sha256").update(raw[key].raw,"utf8").digest("hex"));
+    }
+    await unchangedRejection(h,{...observation,operationId:"observe-period-0002"},/already observed/);
+    h.data.get(save).serverRevision=6;h.data.get(root+"/account/current").serverRevision=6;
+    assert.equal((await h.writer.observeDailyPeriod({},observation)).unchanged,true);
+});
+
+test("either lagging period can be observed but future, missing, historical and corrupt sources fail closed",async()=>{
+    for(const key of ["daily-dungeon-state","equipment-shop-daily"]){
+        const h=await periodHarness();
+        rewritePeriodSources(h,records=>{
+            const state=JSON.parse(records.progress.sidecars[key].raw);
+            state.date="2026-10-16";records.progress.sidecars[key].raw=JSON.stringify(state);
+        });
+        assert.equal((await h.writer.observeDailyPeriod({},observation)).unchanged,false);
+        for(const change of [
+            records=>{records.progress.sidecars[key]={status:"not-applicable",raw:null};},
+            records=>{const state=JSON.parse(records.progress.sidecars[key].raw);
+                state.date="2026-10-17";records.progress.sidecars[key].raw=JSON.stringify(state);}]){
+            const blocked=await periodHarness();
+            // Historical v1 intentionally accepts opaque sidecar bytes; the
+            // observation must still reject them without inventing a source.
+            rewritePeriodSources(blocked,change);
+            await unchangedRejection(blocked,observation,/inconsistent/);
+        }
+        const missing=await periodHarness();
+        delete missing.data.get(root+"/progress/current").sidecars[key];
+        await unchangedRejection(missing,observation,/inconsistent/);
+        const corrupt=await periodHarness();
+        corrupt.data.get(root+"/progress/current").sidecars[key].raw="{";
+        await unchangedRejection(corrupt,observation,/inconsistent/);
+    }
+});
+
+test("daily observation rejects imported dates, rewards, stale revisions and namespace collisions",async()=>{
+    for(const extra of ["date","targetDate","observedAt","used","refreshCount","soldOfferIds",
+        "gold","claimed","rewardEligible","authoritativeStateReady"]){
+        const h=await periodHarness();
+        await unchangedRejection(h,{...observation,[extra]:true},/only an ID/);
+    }
+    for(const args of [{...observation,expectedRevision:4},
+        {...observation,operationId:"daily-period-20261016"}]){
+        const h=await periodHarness();await unchangedRejection(h,args);
+    }
+    for(const collection of ["operations","grantOperations","ledgerEntries"]){
+        for(const id of [observationId,"daily-period-20261016"]){
+            const h=await periodHarness();h.data.set(root+"/"+collection+"/"+id,{kind:"other"});
+            await unchangedRejection(h);
+        }
+    }
+    for(const key of [root+"/account/current",root+"/characters/character-"+operationId,
+        root+"/economy/current",root+"/progress/current",root+"/claimCheckpoints/current",
+        root+"/playableSnapshots/5",root+"/recoveryArchives/5"]){
+        const h=await periodHarness();h.data.delete(key);await unchangedRejection(h);
+    }
+    const tampered=await periodHarness();
+    tampered.data.get(root+"/progress/current").sidecars["daily-dungeon-state"].raw="{}";
+    await unchangedRejection(tampered,observation,/inconsistent/);
+});
+
+test("missing or altered original observation proof cannot be regenerated by replay or another intent",async()=>{
+    for(const id of [observationId,"daily-period-20261016"]){
+        const h=await periodHarness();await h.writer.observeDailyPeriod({},observation);
+        h.data.delete(root+"/operations/"+id);
+        await unchangedRejection(h);
+        if(id===observationId){
+            h.setClock(Date.parse("2026-10-20T16:00:00.000Z"));
+            await unchangedRejection(h,observation,/missing its receipt/);
+        }
+    }
+    for(const path of [root+"/playableSnapshots/5",root+"/recoveryArchives/5"]){
+        const h=await periodHarness();await h.writer.observeDailyPeriod({},observation);
+        h.data.delete(path);await unchangedRejection(h,observation,/proof/);
+    }
+    for(const field of ["targetDate","observedAt","sourceRevision","snapshotSha256",
+        "characterId","ownerUid","sha256","periods","rewardEligible","authoritativeStateReady"]){
+        const h=await periodHarness();await h.writer.observeDailyPeriod({},observation);
+        h.data.get(root+"/operations/daily-period-20261016")[field]="corrupt";
+        await unchangedRejection(h,observation,/proof/);
+        await unchangedRejection(h,{...observation,operationId:"observe-period-0002"},/proof/);
+    }
+    for(const field of ["kind","ownerUid","sourceSha256","expectedRevision","rewardEligible"]){
+        const h=await periodHarness();await h.writer.observeDailyPeriod({},observation);
+        h.data.get(root+"/operations/"+observationId)[field]="corrupt";
+        await unchangedRejection(h);
+        await unchangedRejection(h,{...observation,operationId:"observe-period-0002"});
+    }
+});
 
 const selection={displayName:"英雄",element:"fire",gender:"female",
     attributes:{attack:3,vitality:2,energy:1,intelligence:2,defensePoints:1,agility:1}};
@@ -101,11 +259,21 @@ function harness(candidate="none"){
             migrationCandidateFingerprint:"a".repeat(64),
             migrationCandidateGameSaveVersion:6,migrationCandidateByteLength:100})}]]);
     const ref=path=>({path,collection(name){return collection(`${path}/${name}`);}});
-    const collection=path=>({doc(id){return ref(`${path}/${id}`);}});
+    const collection=path=>({path,doc(id){return ref(`${path}/${id}`);},
+        where(field,operator,value){
+            assert.equal(operator,"==");
+            return {limit:()=>({path,filter:row=>row[field]===value})};
+        }});
     const db={collection};
     let committed=0;
     const transaction={
         async get(reference){
+            if(typeof reference.doc==="function"||reference.filter){
+                return {docs:[...data].filter(([key])=>key.startsWith(reference.path+"/")&&
+                    !key.slice(reference.path.length+1).includes("/"))
+                    .filter(([,value])=>!reference.filter||reference.filter(value)).map(([key,value])=>({
+                    id:key.slice(reference.path.length+1),ref:ref(key),data:()=>value}))};
+            }
             const value=data.get(reference.path);
             return {exists:value!==undefined,data:()=>value,get:key=>value?.[key]};
         },

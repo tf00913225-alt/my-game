@@ -33,6 +33,8 @@ Recorded dungeon usage and shop purchase arrays retain their existing keys and C
 
 ### Protected restricted Forest instance establishment (2026-10-05)
 
+The existing private `serverUsers/{uid}/operations/{id}` path also retains immutable `daily-period-source` and `daily-period-observation` records under `canonical-source-writer.js`. Preserve both records and their original snapshot/recovery archive together as required backup evidence; no TTL, deletion, restore writer or browser access is enabled. These records observe server dates without clearing usage/purchases or granting rewards. Detailed schema, original-proof replay and false-readiness boundaries are owned by `CLOUD_CANONICAL_SCHEMA_AND_RECOVERY.md`, Work ID `CLOUDSAVE-DAILY-PERIOD-EVIDENCE-20261015`.
+
 Three private instance/consumption/policy paths are registered under canonical-restricted-battle.js, authority Tier B, backupRequired true. Corruption/missing evidence blocks progression/replay; no defaults regenerate instances or entitlements. Existing operations path retains the receipt. No TTL/deletion/restore writer is enabled. Full lifecycle/input/policy/backup boundaries are owned by `CLOUD_OPERATION_SETTLEMENT_CONTRACT.md`, same-named section; latest execution status is PR #802.
 
 
