@@ -629,6 +629,11 @@ function assembleCanonicalPlayableProjection(uid,revision,records){
     const sidecars=copy(source.snapshot.progress.sidecars);
     for(const [key,entry] of Object.entries(sidecars)){
         if(deviceOnly.has(key)){continue;}
+        // This reserved key has no runtime writer. Only an explicit trusted
+        // server-created absence is inapplicable; historical/missing/corrupt
+        // evidence still blocks, and present bytes must survive unchanged.
+        if(key==="equipment-shop-purchases"&&source.snapshot.provenance==="server-created"&&
+           entry.status==="not-applicable"&&entry.raw===null){continue;}
         if(entry.status!=="present"){ fail(`playable sidecar missing: ${key}`); }
         let parsed;
         try{parsed=JSON.parse(entry.raw);}catch(_){fail(`playable sidecar JSON: ${key}`);}
