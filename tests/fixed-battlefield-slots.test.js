@@ -162,6 +162,7 @@ console.log('six enemy / six ally core initiative queue: PASS');
 const end=main.match(/^function checkBattleEnd\([\s\S]*?^\}/m)[0];
 let winCount=0,deathCount=0;
 actionContext.battleActive=true;
+actionContext.battleAdvanceScheduled=false;
 actionContext.killMonster=i=>{actionContext.monsters[i].alive=false;deathCount++;};
 actionContext.winBattle=()=>{winCount++;actionContext.battleActive=false;};
 actionContext.loseBattle=()=>{throw new Error('living party cannot lose');};

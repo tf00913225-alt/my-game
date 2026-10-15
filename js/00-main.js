@@ -17709,7 +17709,7 @@ function finishPlayerAction(){
     clearBattleTargetSelectionMode();
 
 
-    if(checkBattleEnd()){
+    if(checkBattleEnd(true)){
         return;
     }
     if(isBattleWaveTransition()){ battleWaveState.actionFinished=true; }
@@ -18695,7 +18695,7 @@ function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
    戰鬥結束
 ===================================================== */
 
-function checkBattleEnd(){
+function checkBattleEnd(afterAction=false){
 
     if(!battleActive){
         return true;
@@ -18737,6 +18737,25 @@ function checkBattleEnd(){
 
     if(!alive){
         if(requestBattleWaveTransition()){ return false; }
+
+        /* Terminal actions use the same managed handoff as other actions.
+           Death/HP settlement is already committed; only victory presentation
+           waits for this action's visual lifetime and formal post-action beat.
+           Re-entrant checks must not bypass an already scheduled handoff. */
+        if(battleAdvanceScheduled){ return true; }
+        const visualRemaining=typeof window!=="undefined"&&typeof window.v142GetRemainingAnimationMs==="function"
+            ?Math.max(0,Number(window.v142GetRemainingAnimationMs())||0):0;
+        if(visualRemaining>0||afterAction){
+            const token=battleToken;
+            battleAdvanceScheduled=true;
+            battleAdvanceTimeoutId=setTimeout(()=>{
+                battleAdvanceTimeoutId=null;
+                battleAdvanceScheduled=false;
+                if(!battleActive||token!==battleToken){ return; }
+                checkBattleEnd();
+            },getBattleAdvanceDelay("resolve"));
+            return true;
+        }
 
         winBattle();
 

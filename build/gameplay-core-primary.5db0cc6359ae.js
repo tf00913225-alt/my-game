@@ -11255,9 +11255,10 @@
         const previous=checkBattleEnd;
         checkBattleEnd=function(){
             const result=previous.apply(this,arguments);
-            // V143 alone decides whether the visible battlefield still owns a
-            // committed lethal hit. Gameplay completion never waits for it.
-            if(result&&!window.v143HasTerminalImpactPresentation?.()){ director.dispose(); }
+            // A true result can mean the core has scheduled a terminal visual
+            // handoff. Only an actually ended battle may dispose its renderer.
+            // V143 still owns preservation of an already committed lethal hit.
+            if(result&&!battleActive&&!window.v143HasTerminalImpactPresentation?.()){ director.dispose(); }
             return result;
         };
     }

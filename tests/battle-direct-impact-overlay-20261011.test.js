@@ -182,6 +182,7 @@ assert.doesNotMatch(source,/killMonster=function/,'V143 does not defer core deat
  const f=fixture(1),windowEvents=new Map();f.entities[0].hp=1;
  f.context.window.addEventListener=(type,fn)=>windowEvents.set(type,fn);
  f.context.checkBattleEnd=()=>true;
+ f.context.battleActive=true;
  const bridge=fs.readFileSync('js/37-v142-skill-animation.js','utf8');
  vm.runInContext(bridge.slice(bridge.indexOf('    if(typeof checkBattleEnd==='),bridge.indexOf('\n})();',bridge.indexOf('    if(typeof checkBattleEnd==='))),f.context);
  f.context.settleBattleHpDamage(f.entities[0],1,{});f.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');
@@ -190,12 +191,12 @@ assert.doesNotMatch(source,/killMonster=function/,'V143 does not defer core deat
  assert.equal(f.context.checkBattleEnd(),true);assert.equal(f.context.state.impactFlashes.size,1,'terminal bridge never delays core completion or disposes visible lethal hit');
  windowEvents.get('pagehide')();assert.equal(f.context.state.impactFlashes.size,0,'real pagehide bridge immediately disposes');
 }
-// Core death and end decisions run synchronously while the presentation is queued.
+// Core death remains synchronous; a boundary without an active skill gate ends immediately.
 {
  const f=fixture(1);f.entities[0].hp=1;f.entities[0].noRewards=true;
  f.current.model={sprite:{impactOnly:true}};f.current.hitReached=false;
  const main=fs.readFileSync('js/00-main.js','utf8');
- Object.assign(f.context,{monsters:f.entities,currentBattleMonsters:[0],battleActive:true,battleWaveState:null,
+ Object.assign(f.context,{monsters:f.entities,currentBattleMonsters:[0],battleActive:true,battleWaveState:null,battleAdvanceScheduled:false,
   $:()=>null,addBattleLog(){},updateMonsterUI:()=>f.context.syncImpactOverlays(),
   getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:()=>({hp:100}),
   winBattle(){f.context.emitCombatEvent('battle_end',{});f.context.battleActive=false;}});
