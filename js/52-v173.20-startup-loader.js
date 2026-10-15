@@ -82,31 +82,31 @@
         if(root){ root.dataset.scene="city"; root.dataset.sceneReason=reason; }
         mark("four-symbols:intro-city-visible");
     }
-    let exitOp=null;
+    let exit=null;
     function showLoader(){
-        if(exitOp){
-            global.clearTimeout(exitOp.timer);
-            exitOp.resolve();
-            exitOp=null;
+        if(exit){
+            global.clearTimeout(exit.timer);
+            exit.resolve();
+            exit=null;
         }
         if(root){ root.hidden=false; root.classList.remove("is-leaving"); root.setAttribute("aria-hidden","false"); }
     }
     function hideLoader(){
         if(!root||root.hidden){ return Promise.resolve(); }
-        if(exitOp){ return exitOp.promise; }
+        if(exit){ return exit.promise; }
         showCity("destination-ready");
         root.classList.add("is-leaving");
-        const exit={};
-        exit.promise=new Promise(resolve=>{
-            exit.resolve=resolve;
-            exit.timer=global.setTimeout(()=>{
-                if(exitOp!==exit){ return; }
+        const task={};
+        task.promise=new Promise(resolve=>{
+            task.resolve=resolve;
+            task.timer=global.setTimeout(()=>{
+                if(exit!==task){ return; }
                 root.hidden=true; root.setAttribute("aria-hidden","true");
-                exitOp=null; resolve();
+                exit=null; resolve();
             },parseFloat(global.getComputedStyle(root).transitionDuration)*1000||0);
         });
-        exitOp=exit;
-        return exit.promise;
+        exit=task;
+        return task.promise;
     }
     function accountUi(mode,message,error=false,migration=null){
         firebase.setUiState({mode,user:activeUser,message,error,migration});

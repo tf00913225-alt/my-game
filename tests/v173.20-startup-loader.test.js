@@ -52,7 +52,7 @@ console.log("✓ account-first startup state machine with real readiness");
         setTimeout(fn,ms){assert.equal(ms,360);timers.set(++nextTimer,fn);return nextTimer;},
         clearTimeout(){}
     };
-    const lifecycle=source.slice(source.indexOf("    let exitOp=null;"),source.indexOf("    function accountUi("));
+    const lifecycle=source.slice(source.indexOf("    let exit=null;"),source.indexOf("    function accountUi("));
     const context={root,global,Promise,parseFloat,showCity(){}};
     vm.runInNewContext(lifecycle+"this.show=showLoader;this.hide=hideLoader;",context);
     const first=context.hide();assert.equal(context.hide(),first,"one active exit per shell");
