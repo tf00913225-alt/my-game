@@ -90,7 +90,12 @@ const expression=`(async()=>{
 })()`;
 const server=await startServer({baseUrl}),profile=fs.mkdtempSync(path.join(os.tmpdir(),'terminal-visual-qa-'));
 const port=9900+Math.floor(Math.random()*90);
-const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore',windowsHide:true});
+const chrome=findChrome();
+const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-gpu','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:['ignore','ignore','pipe'],windowsHide:true});
+let chromeStderr='',chromeExit=null,chromeSpawnError=null;
+proc.stderr.on('data',chunk=>{chromeStderr=(chromeStderr+chunk).slice(-4000);});
+proc.on('exit',(code,signal)=>{chromeExit={code,signal};});
+proc.on('error',error=>{chromeSpawnError=String(error.message);});
 const out=path.join(ROOT,'artifacts/browser-qa');fs.mkdirSync(out,{recursive:true});let cdp;
 try{
     const page=(await waitJson('http://127.0.0.1:'+port+'/json/list')).find(p=>p.type==='page');
@@ -109,6 +114,9 @@ try{
     console.log('Terminal visual handoff: single/tri/all, queued declaration and two-wave terminal phases PASS');
 }catch(error){
     const detail=cdp?await collectStartupFailure(cdp,{error:String(error.stack||error)}):{};
+    detail.chromeProcess={executable:chrome,pid:proc.pid??null,port,
+        exit:chromeExit,spawnError:chromeSpawnError,stderr:chromeStderr};
+    if(!cdp){console.error('Terminal visual Chrome startup diagnostics: '+JSON.stringify(detail.chromeProcess));}
     if(cdp){detail.rows=await cdp.eval('window.__terminalVisualQaRows||[]');}
     fs.writeFileSync(path.join(out,'terminal-visual-handoff.json'),JSON.stringify({passed:false,expected,baseUrl,detail,failures:server.failures},null,2));throw error;
 }finally{
