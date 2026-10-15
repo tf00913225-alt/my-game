@@ -6,8 +6,11 @@ import {spawn} from 'node:child_process';
 import {ROOT,findChrome,startServer,waitJson,Cdp,collectStartupFailure} from './runtime-browser-qa-support.mjs';
 const baseUrl=process.env.QA_BASE_URL||'';
 const expected=process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local';
+const endFixture=fs.readFileSync('.github/scripts/battle-layer-audio-live-qa.mjs','utf8').match(/^function finishBattleLayerQaEndFixture\([\s\S]*?^\}/m)?.[0];
+assert.ok(endFixture,'use the actual formal QA end fixture');
 if(baseUrl){assert.equal((await (await fetch(baseUrl+'/release-manifest.json',{cache:'no-store'})).json()).commitSha,expected);}
 const expression=`(async()=>{
+    ${endFixture}
     const wait=async(fn,label,ms=30000)=>{const end=Date.now()+ms;while(!fn()&&Date.now()<end)await new Promise(r=>setTimeout(r,20));if(!fn())throw Error(label);};
     await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY','startup');
     await FourSymbolsFeatures.ensure('gameplay-core','terminal-visual-qa');
@@ -45,6 +48,20 @@ const expression=`(async()=>{
             await wait(()=>!battleActive,'settlement',15000);
         }finally{Math.random=random;release();}
     }
+    autoBattle=false;autoConfig.enabled=false;autoPatrolEnabled=false;
+    monsters=[MonsterBalance.build({monsterKey:'qa.terminal.declaration',name:'QA terminal declaration',level:1,element:'earth',archetype:'balanced',rank:'regular',mode:'wild',context:'qa/terminal'})];
+    Object.assign(monsters[0],{hp:100,maxHP:100,alive:true,noRewards:true});
+    mapCooldown=false;startBattle(0);await wait(()=>battleActive&&turn>=1,'declaration battle begin');
+    await wait(()=>!document.getElementById('battlePage').matches('.v141-entry-moving,.v141-preparing-entry'),'declaration entry');
+    clearInterval(timerId);const release=FourSymbolsBattleFlow.acquirePauseLock('terminal-declaration-qa');
+    try{
+        battlePhase='declare';activeBattleCharacterIndex=0;finishPlayerAction();
+        if(!battleAdvanceScheduled)throw Error('formal declaration handoff missing');
+        window.__battleLayerQaEndResult={ended:false};
+        const start=performance.now();finishBattleLayerQaEndFixture();
+        await wait(()=>finishBattleLayerQaEndFixture(),'formal terminal fixture release',5000);
+        rows.push({scenario:'queued-declaration-terminal',elapsed:performance.now()-start,ended:window.__battleLayerQaEndResult.ended,battleActive});
+    }finally{release();}
     return rows;
 })()`;
 const server=await startServer({baseUrl}),profile=fs.mkdtempSync(path.join(os.tmpdir(),'terminal-visual-qa-'));
@@ -63,9 +80,9 @@ try{
         if(running){const shot=await cdp.send('Page.captureScreenshot',{format:'jpeg',quality:65});fs.writeFileSync(path.join(out,'terminal-visual-'+String(frame++).padStart(3,'0')+'.jpg'),Buffer.from(shot.data,'base64'));}
     }
     const outcome=await result;if(outcome.error)throw outcome.error;
-    const rows=outcome.value;assert.equal(rows.length,3);assert.equal(server.failures.length,0);
+    const rows=outcome.value;assert.equal(rows.length,4);assert.equal(rows[3].ended,true);assert.equal(rows[3].battleActive,false);assert.equal(server.failures.length,0);
     fs.writeFileSync(path.join(out,'terminal-visual-handoff.json'),JSON.stringify({passed:true,expected,baseUrl,rows},null,2));
-    console.log('Terminal visual handoff: full production single/tri/all PASS');
+    console.log('Terminal visual handoff: full production single/tri/all and queued declaration release PASS');
 }catch(error){
     const detail=cdp?await collectStartupFailure(cdp,{error:String(error.stack||error)}):{};
     if(cdp){detail.rows=await cdp.eval('window.__terminalVisualQaRows||[]');}

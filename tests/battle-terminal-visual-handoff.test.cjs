@@ -13,7 +13,7 @@ function fixture(){
             explosiveFlurry:{id:'explosiveFlurry',name:'火爆亂擊',element:'fire',category:'physical',targetType:'tri'},
             phoenixCry:{id:'phoenixCry',name:'火鳳天鳴',element:'fire',category:'magic',targetType:'all'}},
         battleActive:true,battleToken:7,battleWaveState:null,battlePhase:'resolve',initiativeIndex:0,turn:1,activeBattleCharacterIndex:0,
-        battleAdvanceScheduled:false,battleAdvanceTimeoutId:null,timerId:null,POST_ACTION_DELAY_MS:650,
+        battleAdvanceScheduled:false,battleAdvanceTimeoutId:null,battleTerminalPresentationToken:null,timerId:null,POST_ACTION_DELAY_MS:650,
         getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:i=>party[i],currentBattleMonsters:[0],monsters:enemies,
         killMonster:i=>{enemies[i].alive=false;},winBattle:()=>{wins.push(now);c.battleActive=false;},loseBattle:()=>{c.battleActive=false;c.lost=true;},
         battleStatisticsFinishAction:noop,interceptBattleActionFinish:()=>false,notifyBattleActionFinished:noop,finishBattleDurationAction:noop,
@@ -61,4 +61,22 @@ test('MISS with a surviving enemy continues the same action queue',()=>{
 });
 test('defeat keeps priority and its existing immediate decision',()=>{
     const f=fixture();f.play('flameSlash');f.party[0].hp=0;assert.equal(f.c.checkBattleEnd(),true);assert.equal(f.c.lost,true);assert.equal(f.wins.length,0);
+});
+test('a pending ordinary declaration timer does not block a settled terminal boundary',()=>{
+    const f=fixture();f.c.battlePhase='declare';f.c.battleAdvanceScheduled=true;
+    f.c.battleAdvanceTimeoutId=f.c.setTimeout(()=>{},250);
+    assert.equal(f.c.checkBattleEnd(),true);assert.deepEqual(f.wins,[0]);
+});
+test('terminal visual handoff replaces an unrelated ordinary declaration timer',()=>{
+    const f=fixture();f.c.battlePhase='declare';f.c.battleAdvanceScheduled=true;
+    f.c.battleAdvanceTimeoutId=f.c.setTimeout(()=>{f.c.unrelatedDeclarationRan=true;},250);
+    f.play('flameSlash');f.c.checkBattleEnd();f.advance(1410);
+    assert.equal(f.c.unrelatedDeclarationRan,undefined);assert.deepEqual(f.wins,[1410]);
+});
+test('an obsolete terminal callback cannot clear the next battle handoff',()=>{
+    const f=fixture();f.play('flameSlash');f.c.finishPlayerAction();
+    const stale=f.timers.get(f.c.battleAdvanceTimeoutId).fn;
+    f.c.battleToken++;f.c.battleTerminalPresentationToken=f.c.battleToken;f.c.battleAdvanceTimeoutId=999;
+    stale();assert.equal(f.c.battleAdvanceScheduled,true);assert.equal(f.c.battleAdvanceTimeoutId,999);
+    assert.equal(f.c.battleTerminalPresentationToken,f.c.battleToken);assert.equal(f.wins.length,0);
 });

@@ -4210,6 +4210,9 @@ let timerId=null;
 /* Every declare/resolve step owns one deterministic advance timer. */
 let battleAdvanceTimeoutId=null;
 let battleAdvanceScheduled=false;
+/* Only a terminal visual handoff may block a re-entrant end check. A normal
+   declaration/queue timer is not evidence that terminal presentation waits. */
+let battleTerminalPresentationToken=null;
 /* Queue timing has one owner: this module. V142/V143 report visual time only. */
 const MANUAL_RESOLUTION_START_MS=250;
 const AUTO_DECLARE_HANDOFF_MS=100;
@@ -11310,6 +11313,7 @@ function startBattle(triggerIndex){
     mapCooldown=true;
 
     battleToken++;
+    battleTerminalPresentationToken=null;
     battleWaveState=null;
     clearTransientBattlePresentation();
     battleRoundBoundaryKeys=new Set();
@@ -19122,16 +19126,19 @@ function checkBattleEnd(afterAction=false){
            Death/HP settlement is already committed; only victory presentation
            waits for this action's visual lifetime and formal post-action beat.
            Re-entrant checks must not bypass an already scheduled handoff. */
-        if(battleAdvanceScheduled){ return true; }
+        if(battleTerminalPresentationToken===battleToken){ return true; }
         const visualRemaining=typeof window!=="undefined"&&typeof window.v142GetRemainingAnimationMs==="function"
             ?Math.max(0,Number(window.v142GetRemainingAnimationMs())||0):0;
         if(visualRemaining>0||afterAction){
             const token=battleToken;
+            if(battleAdvanceTimeoutId){ clearTimeout(battleAdvanceTimeoutId); }
+            battleTerminalPresentationToken=token;
             battleAdvanceScheduled=true;
             battleAdvanceTimeoutId=setTimeout(()=>{
+                if(!battleActive||token!==battleToken){ return; }
                 battleAdvanceTimeoutId=null;
                 battleAdvanceScheduled=false;
-                if(!battleActive||token!==battleToken){ return; }
+                battleTerminalPresentationToken=null;
                 checkBattleEnd();
             },getBattleAdvanceDelay("resolve"));
             return true;
@@ -19230,6 +19237,7 @@ function winBattle(){
 
 
     battleToken++;
+    battleTerminalPresentationToken=null;
     clearTransientBattlePresentation();
 
     /*
@@ -19498,6 +19506,7 @@ function loseBattle(){
 
 
     battleToken++;
+    battleTerminalPresentationToken=null;
     clearTransientBattlePresentation();
 
 
@@ -19720,6 +19729,7 @@ function resolveEscapeAttempt(characterIndex){
                 clearBattleActionWatchdog();
                 battleAdvanceScheduled=false;
                 battleToken++;
+    battleTerminalPresentationToken=null;
                 if(typeof finishBattleStatisticsSession==="function"){ finishBattleStatisticsSession("escape"); }
                 closeMenus();
                 if(window.v142SkillAnimationDirector){ window.v142SkillAnimationDirector.dispose(); }

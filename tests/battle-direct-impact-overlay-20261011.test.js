@@ -196,7 +196,7 @@ assert.doesNotMatch(source,/killMonster=function/,'V143 does not defer core deat
  const f=fixture(1);f.entities[0].hp=1;f.entities[0].noRewards=true;
  f.current.model={sprite:{impactOnly:true}};f.current.hitReached=false;
  const main=fs.readFileSync('js/00-main.js','utf8');
- Object.assign(f.context,{monsters:f.entities,currentBattleMonsters:[0],battleActive:true,battleWaveState:null,battleAdvanceScheduled:false,
+ Object.assign(f.context,{monsters:f.entities,currentBattleMonsters:[0],battleActive:true,battleToken:7,battleWaveState:null,battleAdvanceScheduled:false,battleTerminalPresentationToken:null,
   $:()=>null,addBattleLog(){},updateMonsterUI:()=>f.context.syncImpactOverlays(),
   getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:()=>({hp:100}),
   winBattle(){f.context.emitCombatEvent('battle_end',{});f.context.battleActive=false;}});

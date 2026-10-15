@@ -7,7 +7,7 @@ function runtime({deferred=false,realQueue=false}={}){
  const first=Array.from({length:6},(_,i)=>({id:"first"+i,hp:0,maxHP:100,maxSP:20,alive:true,agility:2}));
  const second=Array.from({length:6},(_,i)=>({id:"second"+i,hp:100,maxHP:100,maxSP:20,alive:true,agility:3}));
  const ctx={console,Promise,Set,Map,Array,Object,Number,Math,window:{},battleToken:7,battleActive:true,turn:4,monsters:first.slice(),currentBattleMonsters:first.map((_,i)=>i),selectedMonster:0,
- initiativeQueue:[{type:"player",characterIndex:0},{type:"player",characterIndex:1},...first.map((_,i)=>({type:"monster",monsterIndex:i}))],initiativeIndex:0,processedInitiativeIndexes:new Set(),battlePresentationLocks:new Set(),battleAdvanceScheduled:false,battlePhase:"resolve",timerId:null,
+ initiativeQueue:[{type:"player",characterIndex:0},{type:"player",characterIndex:1},...first.map((_,i)=>({type:"monster",monsterIndex:i}))],initiativeIndex:0,processedInitiativeIndexes:new Set(),battlePresentationLocks:new Set(),battleAdvanceScheduled:false,battleTerminalPresentationToken:null,battlePhase:"resolve",timerId:null,
  getExistingPartyIndexes:()=>[0,1],getPartyCharacterByIndex:i=>party[i],getPartyBattleStats:()=>({agility:5}),getMonsterAgility:m=>m.agility,
  killMonster:i=>{ctx.monsters[i].alive=false;ctx.deaths++;},deaths:0,wins:0,losses:0,winBattle:()=>{ctx.wins++;ctx.battleActive=false;},loseBattle:()=>{ctx.losses++;ctx.battleActive=false;},
  closeMenus:noop,clearBattleTargetSelectionMode:noop,updateActionHudVisibility:noop,clearBattleActionWatchdog:noop,clearTransientBattlePresentation:()=>{ctx.cleanups++;},cleanups:0,
