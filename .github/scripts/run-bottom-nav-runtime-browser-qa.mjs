@@ -130,7 +130,7 @@ async function swipe(client,x,y){
 async function runViewport(chrome,url,width,height){
  const profile=fs.mkdtempSync(path.join(os.tmpdir(),'nav-runtime-qa-')),port=9600+Math.floor(Math.random()*300);
  const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-timer-throttling','--disable-renderer-backgrounding','--disable-backgrounding-occluded-windows','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:['ignore','ignore','pipe']});
- let launchError='';proc.stderr.on('data',chunk=>{launchError=(launchError+chunk).slice(-4000);});proc.on('error',error=>{launchError=String(error);});
+ let launchError='',spawnError=null,exit=null;proc.stderr.on('data',chunk=>{launchError=(launchError+chunk).slice(-4000);});proc.on('error',error=>{spawnError=String(error);});proc.once('exit',(code,signal)=>{exit={code,signal};});
  let client;const evidence={viewport:{width,height},rows:[]};
  try{
   const page=(await waitJson(`http://127.0.0.1:${port}/json/list`).catch(error=>{throw new Error('Navigation Chrome startup failed: '+chrome+' exit='+proc.exitCode+' '+launchError,{cause:error});})).find(x=>x.type==='page');client=new Cdp(page.webSocketDebuggerUrl);
@@ -253,7 +253,13 @@ async function runViewport(chrome,url,width,height){
   evidence.phase='reload';await client.send('Page.reload',{ignoreCache:true});await client.send('Page.bringToFront');await client.send('Emulation.setFocusEmulationEnabled',{enabled:true});await new Promise(r=>setTimeout(r,300));await client.eval(PREPARE);evidence.reload=await client.eval(MEASURE);assert.equal(evidence.reload.shellCount,1);assert.equal(evidence.reload.legacyCount,0);
   const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,`navigation-home-${width}x${height}.png`),Buffer.from(shot.data,'base64'));
   return evidence;
- }catch(error){if(client){try{const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,`navigation-failure-${width}x${height}.png`),Buffer.from(shot.data,'base64'));}catch(captureError){evidence.captureError=String(captureError);}}error.navEvidence=evidence;throw error;}finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}}
+ }catch(error){
+  evidence.chromeProcess={executable:chrome,pid:proc.pid??null,exit,spawnError,stderr:launchError};
+  // Failure-only evidence from this child; no player data, launch flags or Gate changes.
+  if(process.platform==='linux'&&proc.pid){try{evidence.chromeProcess.status=fs.readFileSync(`/proc/${proc.pid}/status`,'utf8').split('\n').filter(line=>/^(Name|State|Threads|VmRSS|VmSize):/.test(line));}catch(statusError){evidence.chromeProcess.statusError=String(statusError.code||statusError);}}
+  if(!client)console.error('Navigation Chrome startup diagnostics:',JSON.stringify(evidence.chromeProcess));
+  if(client){try{const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,`navigation-failure-${width}x${height}.png`),Buffer.from(shot.data,'base64'));}catch(captureError){evidence.captureError=String(captureError);}}error.navEvidence=evidence;throw error;
+ }finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}}
 }
 fs.mkdirSync(ARTIFACT_DIR,{recursive:true});
 const server=await startServer();const results=[];
