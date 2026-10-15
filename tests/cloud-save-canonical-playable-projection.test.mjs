@@ -60,6 +60,90 @@ function sources(count=1){
 }
 const assemble=records=>assembleCanonicalPlayableProjection("uid-a",7,records);
 
+// Test-only recorded period sources isolate reserved-history applicability.
+// The production factory still has no trusted dungeon/shop period writer.
+function newAccountWithPeriodFixtures(){
+    const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
+    const records=makeInitialCharacterSources("uid-a",7,"create-reserved-history",{
+        displayName:"new hero",element:"water",gender:"female",
+        attributes:{attack:1,intelligence:2,vitality:3,energy:4,defensePoints:0,agility:0}
+    },{recordedAt:1700000000000});
+    const periods=sources().progress.sidecars;
+    for(const key of ["daily-dungeon-state","equipment-shop-daily"]){
+        records.progress.sidecars[key]=structuredClone(periods[key]);
+    }
+    return records;
+}
+
+test("server-created explicit inapplicable reserved history survives unpublished projection and archive",()=>{
+    const {createRecoveryArchive,inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    const records=newAccountWithPeriodFixtures(),before=structuredClone(records);
+    const snapshot=assembleCanonicalSnapshot("uid-a",7,records),bundle=assemble(records);
+    const key="equipment-shop-purchases",entry={status:"not-applicable",raw:null};
+    assert.deepEqual(bundle.projection.sidecars[key],entry);
+    assert.equal(bundle.readyForPublication,false);
+    assert.equal(bundle.projection.authoritativeStateReady,false);
+    assert.equal(bundle.projection.gameSave.gold,0);
+    assert.deepEqual(bundle.projection.claimCheckpoint,records.claimCheckpoint);
+    assert.equal(records.claimRecords.length,0);
+    assert.equal(snapshot.readyForPublication,false);
+    const archive=JSON.parse(JSON.stringify(createRecoveryArchive("uid-a",7,records,snapshot)));
+    const restored=inspectRecoveryArchive(archive,"uid-a",7,snapshot);
+    assert.deepEqual(restored,records);
+    assert.deepEqual(assemble(restored),bundle);
+    assert.equal(archive.readyForRestore,false);
+    assert.deepEqual(verifyCanonicalPlayableProjectionAgainstSources(bundle,"uid-a",7,records),bundle.projection);
+    const changed=structuredClone(records);
+    changed.progress.sidecars[key]={status:"present",raw:' {"reserved":"retained"} '};
+    assert.notEqual(assemble(changed).sha256,bundle.sha256);
+    assert.throws(()=>verifyCanonicalPlayableProjectionAgainstSources(bundle,"uid-a",7,changed),/differs/);
+    assert.equal(assembleCanonicalSnapshot("uid-a",7,records).sha256,snapshot.sha256);
+    assert.deepEqual(records,before);
+});
+
+test("reserved-history exception never turns missing or corrupt source into an empty purchase record",()=>{
+    const key="equipment-shop-purchases";
+    for(const entry of [{status:"missing",raw:null},{status:"not-applicable",raw:"{}"},
+        {status:"present",raw:null},{status:"present",raw:"corrupt"},
+        {status:"present",raw:"[]"},{status:"present",raw:"null"}]){
+        const records=newAccountWithPeriodFixtures();records.progress.sidecars[key]=entry;
+        const before=structuredClone(records);
+        assert.throws(()=>assemble(records),/sidecar/);
+        assert.deepEqual(records,before);
+    }
+    for(const entry of [{status:"missing",raw:null},{status:"not-applicable",raw:null},
+        {status:"present",raw:"corrupt"}]){
+        const historical=sources();historical.progress.sidecars[key]=entry;
+        const before=structuredClone(historical);
+        assert.throws(()=>assemble(historical),/sidecar/);
+        assert.deepEqual(historical,before);
+    }
+    const mixed=newAccountWithPeriodFixtures();mixed.account.provenance="grandfathered-unverified-history";
+    assert.throws(()=>assemble(mixed),/provenance|revision/);
+});
+
+test("present reserved purchase bytes and blocked historical claims remain exact",()=>{
+    const key="equipment-shop-purchases",raw=' \n{"legacyPurchase":"opaque-history","claimed":true} \n';
+    for(const records of [sources(),newAccountWithPeriodFixtures()]){
+        records.progress.sidecars[key]={status:"present",raw};
+        const before=structuredClone(records),bundle=assemble(records);
+        assert.equal(bundle.projection.sidecars[key].raw,raw);
+        assert.deepEqual(bundle.projection.claimCheckpoint,records.claimCheckpoint);
+        assert.equal(bundle.projection.claimCheckpoint.historicalClaimsBlocked,
+            records.account.provenance==="grandfathered-unverified-history");
+        assert.deepEqual(records,before);
+    }
+});
+
+test("server-created provenance cannot exempt active gameplay sidecars or enable publication",()=>{
+    for(const key of ["daily-dungeon-state","equipment-shop-daily","progress","quest-milestones",
+        "legacy-abyss-state","abyss-state","element-box-state","exp-pool-growth-state","rested-exp-state"]){
+        const records=newAccountWithPeriodFixtures();
+        records.progress.sidecars[key]={status:"not-applicable",raw:null};
+        assert.throws(()=>assemble(records),/playable sidecar missing/,key);
+    }
+});
+
 test("task tracker preference cannot block complete evidence or stand in for real claims",()=>{
     const registry=JSON.parse(readFileSync(new URL("../config/persisted-state-registry.json",import.meta.url))).states;
     const row=registry.find(entry=>entry.key==="four_symbols_account:<UID>:task-tracker");
