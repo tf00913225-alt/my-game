@@ -16,6 +16,78 @@ const operationId="init-character-0001";
 const selection={displayName:"英雄",element:"fire",gender:"female",
     attributes:{attack:3,vitality:2,energy:1,intelligence:2,defensePoints:1,agility:1}};
 
+test("new period sources use the existing Taipei server day at calendar boundaries",async()=>{
+    for(const [instant,date] of [
+        ["2026-10-15T15:59:59.999Z","2026-10-15"],
+        ["2026-10-15T16:00:00.000Z","2026-10-16"],
+        ["2026-12-31T16:00:00.000Z","2027-01-01"],
+        ["2024-02-28T16:00:00.000Z","2024-02-29"],
+        ["2024-02-29T16:00:00.000Z","2024-03-01"]]){
+        const h=harness();h.setClock(Date.parse(instant));
+        const args={operationId,expectedRevision:4,selection};
+        await h.writer.commitInitialSources({},args);
+        const archive=h.data.get(`${root}/recoveryArchives/5`);
+        const records=archive.sourceRecords;
+        const expected={"daily-dungeon-state":{date,used:{exp:false,material:false,equipment:false}},
+            "equipment-shop-daily":{date,refreshCount:0,soldOfferIds:[]}};
+        for(const [key,state] of Object.entries(expected)){
+            const entry={status:"present",raw:JSON.stringify(state)};
+            assert.deepEqual(records.progress.sidecars[key],entry);
+            assert.deepEqual(h.data.get(`${root}/progress/current`).sidecars[key],entry);
+            assert.deepEqual(h.data.get(`${root}/playableSnapshots/5`).snapshot.progress.sidecars[key],entry);
+        }
+        const {assembleCanonicalPlayableProjection}=require("../functions/src/canonical-snapshot.js");
+        const bundle=assembleCanonicalPlayableProjection(uid,5,records);
+        assert.equal(bundle.readyForPublication,false);
+        assert.equal(bundle.projection.authoritativeStateReady,false);
+        assert.equal(archive.readyForRestore,false);
+        assert.equal(records.claimRecords.length,0);
+        assert.equal(records.economy.gold,0);
+        const before=JSON.stringify([...h.data]),writes=h.committed;
+        h.setClock(Date.parse(instant)+86400000*35);
+        assert.equal((await h.writer.commitInitialSources({},args)).unchanged,true);
+        assert.equal(h.committed,writes);assert.equal(JSON.stringify([...h.data]),before);
+    }
+});
+
+test("historical absent period sources and creation replay never backfill",async()=>{
+    const {makeInitialCharacterSources,makeInitialSidecars}=require("../functions/src/initial-character-sources.js");
+    const {assembleCanonicalSnapshot,assembleCanonicalPlayableProjection}=require("../functions/src/canonical-snapshot.js");
+    const {createRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    const h=harness(),args={operationId,expectedRevision:4,selection};
+    await h.writer.commitInitialSources({},args);
+    const records=structuredClone(h.data.get(`${root}/recoveryArchives/5`).sourceRecords);
+    for(const key of ["daily-dungeon-state","equipment-shop-daily"]){
+        records.progress.sidecars[key]={status:"not-applicable",raw:null};
+        assert.deepEqual(makeInitialSidecars()[key],{status:"not-applicable",raw:null});
+        assert.deepEqual(makeInitialCharacterSources(uid,5,operationId,selection).progress.sidecars[key],
+            {status:"not-applicable",raw:null});
+    }
+    const snapshot=assembleCanonicalSnapshot(uid,5,records);
+    const archive=createRecoveryArchive(uid,5,records,snapshot);
+    h.data.set(`${root}/progress/current`,records.progress);
+    h.data.set(`${root}/playableSnapshots/5`,snapshot);
+    h.data.set(`${root}/recoveryArchives/5`,archive);
+    h.data.get(`${root}/operations/${operationId}`).snapshotSha256=snapshot.sha256;
+    const before=JSON.stringify([...h.data]),writes=h.committed;
+    h.setClock(1900000000000);
+    assert.equal((await h.writer.commitInitialSources({},args)).unchanged,true);
+    assert.equal(h.committed,writes);assert.equal(JSON.stringify([...h.data]),before);
+    assert.throws(()=>assembleCanonicalPlayableProjection(uid,5,records),/sidecar missing/);
+});
+
+test("new period sources are independent of the Functions host timezone",()=>{
+    const {execFileSync}=require("node:child_process");
+    const factory=require.resolve("../functions/src/initial-character-sources.js");
+    const code=`const {makeInitialSidecars}=require(${JSON.stringify(factory)});`+
+        `console.log(makeInitialSidecars(Date.parse('2026-10-15T16:00:00Z'))['equipment-shop-daily'].raw);`;
+    for(const TZ of ["UTC","America/Los_Angeles","Pacific/Kiritimati"]){
+        assert.deepEqual(JSON.parse(execFileSync(process.execPath,["-e",code],
+            {encoding:"utf8",env:{...process.env,TZ}})),
+            {date:"2026-10-16",refreshCount:0,soldOfferIds:[]});
+    }
+});
+
 function harness(candidate="none"){
     let sessionId="creation-session-one";
     let clock=1700000000000;
@@ -89,6 +161,8 @@ test("new creation persists server-generated playable fields in the existing rev
     const archive=h.data.get(`${root}/recoveryArchives/5`);
     assert.deepEqual(archive.sourceRecords.progress.playableState,fields);
     const initial={
+        "daily-dungeon-state":{date:"2023-11-15",used:{exp:false,material:false,equipment:false}},
+        "equipment-shop-daily":{date:"2023-11-15",refreshCount:0,soldOfferIds:[]},
         "element-box-state":{remainingMs:0},
         "exp-pool-growth-state":{initialized:true,unlocked:false,lastAt:1700000000000,
             noticeShown:false,lastCapped:false,newcomerRewards:{}},
@@ -134,14 +208,17 @@ test("new creation persists server-generated playable fields in the existing rev
     assert.deepEqual(h.data.get(`${root}/progress/current`).sidecars,progress.sidecars);
     assert.equal(h.data.get(`${root}/economy/current`).sharedExp,0);
     const {assembleCanonicalPlayableProjection}=require("../functions/src/canonical-snapshot.js");
-    assert.throws(()=>assembleCanonicalPlayableProjection(uid,5,archive.sourceRecords),/sidecar missing/);
+    const complete=assembleCanonicalPlayableProjection(uid,5,archive.sourceRecords);
+    assert.equal(complete.readyForPublication,false);
+    assert.equal(complete.projection.authoritativeStateReady,false);
     const imported=harness();
     await assert.rejects(imported.writer.commitInitialSources({}, {...args,
         selection:{...selection,heroAccount:fields.heroAccount}}),/Invalid initial/);
     assert.equal(imported.committed,0);
     for(const key of ["sidecars","remainingMs","lastSeenAt","newcomerRewards",
         "daily","commission","claimRecords","quest-milestones","eliteKills",
-        "abyssProgress","runs","firstClearClaims","legacyMigrated","legacy-abyss-state","rewardVersion","clears"]){
+        "abyssProgress","runs","firstClearClaims","legacyMigrated","legacy-abyss-state","rewardVersion","clears",
+        "daily-dungeon-state","equipment-shop-daily","date","used","refreshCount","soldOfferIds"]){
         const h=harness();
         await assert.rejects(h.writer.commitInitialSources({}, {...args,
             selection:{...selection,[key]:1}}),/Invalid initial/);
