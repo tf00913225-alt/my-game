@@ -378,6 +378,112 @@ const initialized=await initialWriter.commitInitialSources(yRequest,initialArgs)
 assert.equal(initialized.sourceRevision,2);
 const initialArchive=await checkRecoveryArchive(y,2);
 
+// Later-day evidence only: exercise the existing owner against real protected
+// Firestore transactions. All fixtures stay inside the guarded demo project.
+let periodClock=freshQuestProgress.get("playableState.lastSaveTimestamp");
+let abortPeriodObservation=false;
+const periodWriter=createCanonicalSourceWriter({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,nextRevision,now:()=>periodClock,
+    runProtected:(request,operation)=>writerSessions.runProtected(request,async(tx,session)=>{
+        const result=await operation(tx,session);
+        if(abortPeriodObservation){throw new Error("simulated period commit failure");}
+        return result;
+    })});
+const periodRequest={auth:{uid:freshUid,token:claims(freshUser.idToken)},
+    data:{uid:freshUid,session:freshSession}};
+const periodArgs={operationId:"period-observation-emulator-0001",expectedRevision:2};
+await assert.rejects(periodWriter.observeDailyPeriod(periodRequest,periodArgs),
+    error=>error.code==="failed-precondition");
+periodClock+=86400000;
+const laterPeriodId="daily-period-"+taipeiDay(periodClock);
+const periodRoot=db.collection("serverUsers").doc(freshUid);
+const periodSourceRef=periodRoot.collection("operations").doc(laterPeriodId);
+const periodReceiptRef=periodRoot.collection("operations").doc(periodArgs.operationId);
+const periodPreservedRefs=[
+    db.doc(`users/${freshUid}/saves/current`),
+    ...["account","economy","progress","relicLoadout","claimCheckpoints"].map(name=>
+        periodRoot.collection(name).doc("current")),
+    periodRoot.collection("characters").doc(freshQuestArchive.sourceRecords.account.slots[0]),
+    periodRoot.collection("playableSnapshots").doc("2"),
+    periodRoot.collection("recoveryArchives").doc("2")];
+const periodBefore=await Promise.all(periodPreservedRefs.map(ref=>ref.get()));
+abortPeriodObservation=true;
+await assert.rejects(periodWriter.observeDailyPeriod(periodRequest,periodArgs),
+    /simulated period commit failure/);
+abortPeriodObservation=false;
+assert.equal((await periodSourceRef.get()).exists,false);
+assert.equal((await periodReceiptRef.get()).exists,false);
+await assert.rejects(periodWriter.observeDailyPeriod({...periodRequest,
+    data:{uid:freshUid,session:sessionY}},periodArgs),error=>error.message==="SESSION_INVALID");
+await assert.rejects(periodWriter.observeDailyPeriod({...periodRequest,auth:null},periodArgs),
+    error=>error.code==="unauthenticated");
+await assert.rejects(periodWriter.observeDailyPeriod(periodRequest,
+    {...periodArgs,expectedRevision:1}),error=>error.code==="aborted");
+for(const key of ["date","observedAt","used","soldOfferIds","gold","rewardEligible"]){
+    await assert.rejects(periodWriter.observeDailyPeriod(periodRequest,
+        {...periodArgs,[key]:true}),error=>error.code==="invalid-argument");
+}
+const periodRace=await Promise.allSettled([
+    periodWriter.observeDailyPeriod(periodRequest,periodArgs),
+    periodWriter.observeDailyPeriod(periodRequest,
+        {...periodArgs,operationId:"period-observation-emulator-0002"})]);
+assert.equal(periodRace.filter(row=>row.status==="fulfilled").length,1);
+assert.equal(periodRace.filter(row=>row.status==="rejected"&&
+    row.reason.code==="already-exists").length,1);
+const periodSource=await periodSourceRef.get();
+const winningPeriodArgs={operationId:periodSource.get("operationId"),expectedRevision:2};
+const winningPeriodReceiptRef=periodRoot.collection("operations").doc(winningPeriodArgs.operationId);
+const winningPeriodReceipt=await winningPeriodReceiptRef.get();
+const periodResult=periodRace.find(row=>row.status==="fulfilled").value;
+assert.equal(periodSource.get("authoritativeStateReady"),false);
+assert.equal(periodSource.get("rewardEligible"),false);
+assert.equal(periodSource.get("snapshotSha256"),freshQuestSnapshot.sha256);
+for(const key of ["daily-dungeon-state","equipment-shop-daily"]){
+    assert.equal(periodSource.get("periods")[key].rawSha256,createHash("sha256")
+        .update(freshQuestProgress.get("sidecars")[key].raw,"utf8").digest("hex"));
+}
+periodClock+=35*86400000;
+const concurrentPeriodRetry=await Promise.all([
+    periodWriter.observeDailyPeriod(periodRequest,winningPeriodArgs),
+    periodWriter.observeDailyPeriod(periodRequest,winningPeriodArgs)]);
+for(const result of concurrentPeriodRetry){
+    assert.deepEqual(result,{...periodResult,unchanged:true});
+}
+assert.ok((await periodSourceRef.get()).updateTime.isEqual(periodSource.updateTime));
+assert.ok((await winningPeriodReceiptRef.get()).updateTime.isEqual(winningPeriodReceipt.updateTime));
+await assert.rejects(periodWriter.observeDailyPeriod(periodRequest,
+    {...winningPeriodArgs,expectedRevision:3}),error=>error.code==="data-loss");
+for(let index=0;index<periodPreservedRefs.length;index++){
+    const after=await periodPreservedRefs[index].get(),before=periodBefore[index];
+    assert.deepEqual(after.data(),before.data());assert.ok(after.updateTime.isEqual(before.updateTime));
+}
+for(const collection of ["ledgerEntries","grantOperations","claimRecords"]){
+    assert.equal((await periodRoot.collection(collection).get()).size,0);
+}
+assert.equal(await rulesRequest(`serverUsers/${freshUid}/operations/${laterPeriodId}`,
+    freshUser.idToken),403);
+assert.equal(await rulesRequest(`serverUsers/${freshUid}/operations/${laterPeriodId}`,
+    freshUser.idToken,"PATCH"),403);
+assert.equal(await rulesRequest(`serverUsers/${freshUid}/operations/${laterPeriodId}`,
+    yUser.idToken),403);
+await winningPeriodReceiptRef.delete();
+await assert.rejects(periodWriter.observeDailyPeriod(periodRequest,winningPeriodArgs),
+    error=>error.code==="data-loss"); // Original receipt cannot regenerate after midnight.
+await winningPeriodReceiptRef.set(winningPeriodReceipt.data());
+await periodSourceRef.delete();
+await assert.rejects(periodWriter.observeDailyPeriod(periodRequest,winningPeriodArgs),
+    error=>error.code==="data-loss");
+await periodSourceRef.set(periodSource.data());
+const periodOriginalArchive=await periodRoot.collection("recoveryArchives").doc("2").get();
+await periodOriginalArchive.ref.delete();
+await assert.rejects(periodWriter.observeDailyPeriod(periodRequest,winningPeriodArgs),
+    error=>error.code==="data-loss");
+await periodOriginalArchive.ref.set(periodOriginalArchive.data());
+await invoke("revokeGameSession",freshUser.idToken,{uid:freshUid,session:freshSession});
+await assert.rejects(periodWriter.observeDailyPeriod(periodRequest,winningPeriodArgs),
+    error=>["SESSION_REVOKED","SESSION_INVALID"].includes(error.message));
+console.log("Daily period evidence real Firestore PASS: Taipei server observation, atomic abort, concurrent single source, cross-day immutable replay, exact snapshot/archive/source retention, missing-proof rejection, private rules, UID/session protection and no progression/reward/revision changes.");
+
 // Foundation D preparation: internal owner, real session and Firestore transaction.
 // No callable, game hook, enemy/result acceptance or reward entitlement.
 let battleClock=Date.now(),abortBattle=false;
