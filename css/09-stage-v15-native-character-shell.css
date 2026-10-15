@@ -1555,19 +1555,8 @@
 }
 
 /* Battle information */
-#game-stage > #app > #game-content #battlePage .battle-info{
-    /* V96：移除 V32 舊的 110px 固定高度，讓紀錄填滿元素匣列以下的剩餘空間。 */
-    flex:1 1 0 !important;
-    min-height:82px !important;
-    height:auto !important;
-    padding:9px 11px !important;
-    font-size:14px !important;
-    line-height:19px !important;
-}
 
-#game-stage > #app > #game-content #battlePage .battle-line{
-    min-height:20px !important;
-}
+
 
 /* Quick skill overlay typography is owned by fixed-slot-battlefield-rendering-v2.css. */
 

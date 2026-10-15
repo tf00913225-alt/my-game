@@ -281,6 +281,27 @@
         "SKILL_PREVIEW_ELEMENTS",
         "skill-preview-card"
       ]
+    },
+    {
+      "id": "DEP-012-battle-information-removal",
+      "description": "戰鬥資訊抽屜及巡怪／深淵紀錄 UI 退場；回合及必要內部事件保留。",
+      "enabled": true,
+      "forbidden": [
+        "battleInfoToggle",
+        "id=\"battleInfo\"",
+        "mapBattleInfo",
+        "mapBattleOverlay",
+        "battle-info-region",
+        "battle-info-header-row",
+        "battle-info-toggle",
+        "setBattleInfoExpanded",
+        "toggleBattleInfoPanel",
+        "fillBattleInfoGap",
+        "abyssBattleInfoMarkup",
+        "v17342-abyss-battle-info",
+        "v17342-abyss-battle-log",
+        "v17342-abyss-battle-empty"
+      ]
     }
   ]
 }

@@ -4732,7 +4732,6 @@ function finishBattleStatisticsSession(result){
         owner.finish({result:String(result||"")});
     }
     closeBattleStatusDetailModal();
-    setBattleInfoExpanded(false);
     syncBattleUiPriorityLayer();
     activeBattleStatisticsAction=null;
 }
@@ -8919,21 +8918,7 @@ function showPage(page,options={}){
        技能/背包）都不需要，一併隱藏。
     */
 
-    const mapBattleOverlay=
-        $("mapBattleOverlay");
 
-
-    if(mapBattleOverlay){
-
-        mapBattleOverlay.style.display=
-
-            page==="map"
-            ?
-            "flex"
-            :
-            "none";
-
-    }
 
 
     /*
@@ -23257,10 +23242,7 @@ function renderBattle(){
    是否有確實生效。
 */
 
-function fillBattleInfoGap(){
-    /* V96 compatibility stub：舊函式名稱保留，避免其他舊程式參照時報錯。
-       實際高度完全交給 CSS Flex，不再讀 visualViewport、不再寫 inline height。 */
-}
+
 
 
 /*
@@ -32495,8 +32477,7 @@ function syncBattleUiPriorityLayer(){
 
     const statusDetail=page.querySelector(".battle-status-detail-modal:not([hidden])");
     const sideDrawer=page.querySelector(".battle-insight-drawer.open");
-    const battleInfo=page.querySelector(".battle-info-region.is-expanded");
-    const active=page.classList.contains("active")&&!!(statusDetail||sideDrawer||battleInfo);
+    const active=page.classList.contains("active")&&!!(statusDetail||sideDrawer);
 
     if(stage){ stage.classList.remove("battle-ui-priority"); }
     if(body){ body.classList.toggle("v174-battle-reading-open",active); }
@@ -32509,73 +32490,18 @@ if(typeof window!=="undefined"){
     window.syncBattleUiPriorityLayer=syncBattleUiPriorityLayer;
 }
 
-function setBattleInfoExpanded(expanded){
-
-    const region=document.querySelector("#battlePage .battle-info-region");
-    const toggle=$("battleInfoToggle");
-
-    if(!region||!toggle){ return false; }
-
-    const next=!!expanded;
-    region.classList.toggle("is-expanded",next);
-    toggle.textContent=next?"返回":"戰鬥資訊";
-    toggle.setAttribute("aria-expanded",next?"true":"false");
-    toggle.setAttribute("aria-label",next?"收合戰鬥資訊":"展開戰鬥資訊");
-    syncBattleUiPriorityLayer();
-    return true;
-
-}
-
-function toggleBattleInfoPanel(){
-
-    const region=document.querySelector("#battlePage .battle-info-region");
-    return setBattleInfoExpanded(!(region&&region.classList.contains("is-expanded")));
-
-}
-
 function clearBattleLog(){
 
-    setBattleInfoExpanded(false);
 
-    $("battleInfo")
-        .innerHTML="";
 
     /* V173.42: Element Box can use potions while no battle is running.
-       Carry those notices into the next battle-info panel exactly once. */
+       Deliver queued notices to the existing combat observer chain exactly once. */
     const pendingElementBoxNotices=
         typeof window!=="undefined"&&Array.isArray(window.v17342PendingBattleNotices)
             ? window.v17342PendingBattleNotices.splice(0)
             : [];
     pendingElementBoxNotices.forEach(message=>addBattleLog(message));
 
-
-    /*
-       ★ 新增（依照使用者要求，巡邏頁面的
-       戰鬥資訊覆蓋層）：
-       新戰鬥開始清空紀錄的同時，
-       巡邏頁面那份也要一起清空，
-       不然新戰鬥打到一半，巡邏頁面卻還
-       殘留著上上一場的舊紀錄，兩邊會對不起來。
-    */
-
-    const mapInfo=
-        $("mapBattleInfo");
-
-
-    if(mapInfo){
-
-        mapInfo.innerHTML=
-            "";
-
-    }
-
-
-    /*
-       ★ 新增（依照使用者要求）：
-       新戰鬥開始，固定顯示的回合數標籤
-       也要重置回第1回合，不然會殘留
-       上一場戰鬥結束時的回合數。
-    */
 
     const turnIndicator=
         $("battleTurnIndicator");
@@ -32692,133 +32618,8 @@ function updateActionHudVisibility(){
 
 
 function addBattleLog(text){
-
-    const info =
-        $("battleInfo");
-
-
-    if(!info){
-        return;
-    }
-
-
-    /*
-       ★ 修正（依照使用者要求）：
-       之前每加一行新訊息，就強制把捲軸拉到
-       最底部，導致使用者往上滑想看之前的
-       紀錄時，一有新訊息進來就被強制拉回去，
-       完全看不到想看的內容。
-
-       改成先判斷「使用者現在是不是已經在
-       接近底部」（容許20px的誤差），
-       只有在「原本就在底部附近」的情況下，
-       才自動捲到新訊息；如果使用者已經
-       主動往上滑開一段距離，代表他正在
-       回頭看之前的紀錄，這時候新訊息進來
-       不會打斷他，捲動位置維持不變。
-    */
-
-    const wasNearBottom=
-
-        info.scrollHeight-
-        info.scrollTop-
-        info.clientHeight
-        <20;
-
-
-    const line =
-        document.createElement(
-            "div"
-        );
-
-
-    line.className =
-        "battle-line";
-
-
-    line.textContent =
-        text;
-
-
-    info.appendChild(
-        line
-    );
-
-
-    while(
-        info.children.length>80
-    ){
-
-        info.removeChild(
-            info.firstChild
-        );
-
-    }
-
-
-    if(wasNearBottom){
-
-        info.scrollTop =
-            info.scrollHeight;
-
-    }
-
-
-    /*
-       ★ 新增（依照使用者要求，巡邏頁面的
-       戰鬥資訊覆蓋層）：
-       每加一行戰鬥紀錄，同步複製一份到
-       巡邏頁面那份戰鬥資訊框——這是唯一
-       負責寫入戰鬥紀錄文字的地方，
-       在這裡同步最單純，不用另外找
-       每一個呼叫addBattleLog()的地方
-       各自處理。這份不用處理「捲到底部」
-       的邏輯，玩家離開戰鬥、回到地圖之後
-       才會看到這份，不會有「新訊息一直
-       打斷正在看的內容」的問題。
-    */
-
-    const mapInfo=
-        $("mapBattleInfo");
-
-
-    if(mapInfo){
-
-        const mapLine=
-            document.createElement(
-                "div"
-            );
-
-
-        mapLine.className=
-            "battle-line";
-
-
-        mapLine.textContent=
-            text;
-
-
-        mapInfo.appendChild(
-            mapLine
-        );
-
-
-        while(
-            mapInfo.children.length>80
-        ){
-
-            mapInfo.removeChild(
-                mapInfo.firstChild
-            );
-
-        }
-
-
-        mapInfo.scrollTop=
-            mapInfo.scrollHeight;
-
-    }
-
+    // The visible log is retired. Keep this endpoint for existing combat
+    // observers (including reflect damage popups); they run before delegation.
 }
 
 

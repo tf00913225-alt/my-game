@@ -13,8 +13,6 @@
        content height in the canonical three-track grid. */
     --battle-center-region-track:16fr;
     --battle-ally-region-track:42fr;
-    --battle-info-panel-height:150px;
-    --battle-info-handle-height:34px;
     --battle-target-prompt-height:60px;
     --battle-target-select-gap:6px;
     --battle-region-gap:4px;
@@ -46,8 +44,7 @@
     --battle-ally-region-track:36fr;
 }
 
-/* Enemy, controls and allies are the three structural tracks. Battle info is
-   an independent bottom drawer so opening it never reflows fixed Slots. */
+
 #game-stage #battlePage.v-fixed-slot-render-v2 > .battle-wrap{
     position:relative !important;
     display:grid !important;
@@ -58,10 +55,21 @@
     gap:var(--battle-region-gap) !important;
     min-height:0 !important;
 }
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleTurnIndicator{
+    position:absolute !important;
+    top:0;
+    right:8px;
+    z-index:2;
+    color:#f5cf72;
+    font-size:14px;
+    line-height:20px;
+    font-weight:900;
+    pointer-events:none;
+}
+
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-enemy-region,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-ally-region,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-ally-region{
     position:relative;
     width:100%;
     min-width:0;
@@ -200,112 +208,7 @@
     box-sizing:border-box;
     transform:none !important;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region{
-    position:absolute !important;
-    left:0 !important;
-    right:0 !important;
-    bottom:0 !important;
-    z-index:18060 !important;
-    display:grid;
-    grid-template-rows:var(--battle-info-handle-height) minmax(0,1fr);
-    gap:0;
-    width:100% !important;
-    height:var(--battle-info-panel-height) !important;
-    padding:0 4px 4px;
-    overflow:visible !important;
-    border:0;
-    background:transparent;
-    box-shadow:none;
-    pointer-events:none;
-    transform:translateY(calc(100% - var(--battle-info-handle-height)));
-    transition:transform .26s ease;
-}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region:not(.is-expanded){
-    background:transparent;
-    border:0;
-    box-shadow:none;
-}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded{
-    pointer-events:auto;
-    transform:translateY(0);
-    border:0;
-    border-radius:0;
-    background:transparent;
-    box-shadow:none;
-}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region > .battle-info-header-row{
-    position:relative;
-    height:var(--battle-info-handle-height);
-    min-height:var(--battle-info-handle-height);
-    margin:0;
-    pointer-events:none;
-}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleInfoToggle.battle-info-toggle{
-    position:absolute;
-    left:auto;
-    right:4px;
-    top:0;
-    z-index:2;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:96px;
-    height:32px;
-    margin:0;
-    padding:0 10px;
-    border:1px solid rgba(210,158,64,.9);
-    border-bottom:0;
-    border-radius:10px 10px 0 0;
-    color:#f5cf72;
-    background-color:rgba(0,0,0,.82) !important;
-    background-image:none !important;
-    box-shadow:none;
-    font-size:14px;
-    line-height:26px;
-    font-weight:900;
-    white-space:nowrap;
-    transform:none;
-    touch-action:manipulation;
-    user-select:none;
-    -webkit-user-select:none;
-    cursor:pointer;
-    pointer-events:auto;
-}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region #battleTurnIndicator{
-    position:absolute;
-    left:8px;
-    top:5px;
-    opacity:1;
-    color:#f5cf72;
-    font-size:14px;
-    line-height:24px;
-    font-weight:900;
-    pointer-events:none;
-    transition:opacity .16s ease;
-}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded #battleTurnIndicator{
-    opacity:1;
-}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region > #battleInfo{
-    min-height:0 !important;
-    height:100% !important;
-    margin:0 !important;
-    padding:5px 8px !important;
-    overflow-x:hidden !important;
-    overflow-y:auto !important;
-    box-sizing:border-box !important;
-    pointer-events:auto;
-    background:transparent !important;
-    border:0 !important;
-    border-radius:0 !important;
-    box-shadow:none !important;
-}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded > #battleInfo{
-    background:rgba(0,0,0,.92) !important;
-    border:1px solid rgba(138,106,58,.68) !important;
-    border-bottom:0 !important;
-    border-radius:8px 8px 0 0 !important;
-}
+
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-ally-region{
     display:block;
 }
@@ -768,8 +671,7 @@
     #game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art{animation:none !important;}
     #game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.target::before,
     #game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.ally-targetable::before{animation:none !important;}
-    #game-stage #battlePage.v-fixed-slot-render-v2 .battle-info-region,
-    #game-stage #battlePage.v-fixed-slot-render-v2 .battle-info-toggle > span{transition:none !important;}
+
 }
 
 

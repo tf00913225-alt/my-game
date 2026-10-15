@@ -16,8 +16,7 @@
     z-index:1 !important;
 }
 
-#game-stage > #app > #game-content #battlePage > #battleTurnIndicator,
-#game-stage > #app > #game-content #battlePage > #battleInfo{
+#game-stage > #app > #game-content #battlePage > #battleTurnIndicator{
     position:relative !important;
     z-index:2 !important;
 }

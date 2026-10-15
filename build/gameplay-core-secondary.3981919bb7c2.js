@@ -2699,7 +2699,7 @@
         page.dataset.v148ManualMoveBlocked="1";
         page.addEventListener("click",event=>{
             if(event.target&&event.target.closest&&event.target.closest(
-                "button,#v141TaskTracker,[id^='mapMonster'],#v131PatrolAppearanceSwitchWrap,#mapBattleOverlay"
+                "button,#v141TaskTracker,[id^='mapMonster'],#v131PatrolAppearanceSwitchWrap"
             )){ return; }
             event.stopImmediatePropagation();
         },true);
@@ -3722,8 +3722,6 @@
         const abyss=roster.some(entry=>entry.monster.v141Abyss);
         const battlePage=document.getElementById("battlePage");
         if(battlePage){ battlePage.classList.toggle("v152-abyss-battle",abyss); }
-        const info=document.getElementById("battleInfo");
-        if(abyss&&info){ info.hidden=false; info.removeAttribute("hidden"); }
 
         const earlyAbyss=abyss&&roster.length<=5&&!roster.some(entry=>entry.monster.name==="極帝天尊");
         roster.forEach(entry=>{
@@ -3759,7 +3757,7 @@
         return {
             version:VERSION,independentSkillPointDisplay:true,removedFireBurstStrike:!(typeof skillDatabase!=="undefined"&&skillDatabase.fireBurstStrike),
             rageAppliedByCriticalResolver:true,damagePopupAboveVfx:true,taskTrackerRemoved:true,
-            autoRecoveryOnMapEntry:true,abyssBattleInfo:true,abyssPortraits:true
+            autoRecoveryOnMapEntry:true,abyssPortraits:true
         };
     };
 })();
@@ -8677,8 +8675,6 @@ ensureFunctionalStyles();runRepairs();
     function markBattlefieldZones(){
         const page=document.getElementById("battlePage");
         if(page){ page.classList.add("v-fixed-slot-render-v2"); page.dataset.geometryOwner="fixed-slot"; }
-        const info=document.querySelector("#battlePage .battle-info-region");
-        if(info){ info.classList.add("v-fixed-battle-info-zone"); info.dataset.geometryOwner="fixed-slot"; }
         const action=document.getElementById("battleActionRegion")||document.getElementById("battleCommandRow");
         if(action){ action.classList.add("v-fixed-action-zone"); action.dataset.geometryOwner="fixed-slot"; }
     }

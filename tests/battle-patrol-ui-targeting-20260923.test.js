@@ -20,12 +20,12 @@ test("skill descriptions use percent symbols instead of 個百分點",()=>{
   assert.doesNotMatch(skill,/個百分點/);
 });
 
-test("battle info tab is fixed and turn countdown remains fully visible",()=>{
+test("battle log is retired and turn countdown remains fully visible",()=>{
   const main=read("js/00-main.js");
   const css=read("css/fixed-slot-battlefield-rendering-v2.css");
   assert.doesNotMatch(main,/installBattleInfoHandleDrag|__battleInfoHandleDragInstalled|__suppressNextBattleInfoClick/);
   assert.doesNotMatch(css,/battle-info-toggle\.is-dragging|cursor:ew-resize/);
-  assert.match(css,/#battleInfoToggle\.battle-info-toggle\{[\s\S]*?right:4px;[\s\S]*?touch-action:manipulation;[\s\S]*?cursor:pointer/);
+  assert.doesNotMatch(css,/battleInfoToggle/,"retired battle log UI must stay absent");
   assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?z-index:18070 !important/);
   assert.match(css,/\.turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ 44px\);[\s\S]*?opacity:1/);
   assert.match(css,/\.turn-target-row\.battle-item-open\{[\s\S]*?opacity:1/);
@@ -46,9 +46,9 @@ test("patrol navigation is a five-key shared-owner shell and appearance switch i
   assert.match(patrolCss,/#v131PatrolAppearanceSwitchWrap\{[\s\S]*?top:12px;/);
 });
 
-test("system contracts permanently forbid patrol duplicate return and battle-info dragging",()=>{
+test("system contracts preserve patrol navigation and retire battle log UI",()=>{
   const contracts=read("SYSTEM_CONTRACTS.md");
-  assert.match(contracts,/Battle Info Tab 固定錨定於戰鬥畫面右下；不可拖曳、不可自由定位/);
+  assert.match(contracts,/戰鬥資訊抽屜、巡怪與深淵戰鬥紀錄 UI 已退場/);
   assert.match(contracts,/順序固定為「角色／背包／秘寶／元素匣／返回」/);
   assert.match(contracts,/回合／倒數列必須保持 100% 可見/);
 });

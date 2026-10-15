@@ -245,7 +245,7 @@ test("patrol movement, left task tracker, global tap feedback and red dots are w
     assert.match(uiSource,/distance\/125/);
     assert.match(uiSource,/cubic-bezier\(\.22,\.61,\.36,1\)/);
     assert.match(uiSource,/setPointerCapture/);
-    assert.match(uiSource,/mapBattleOverlay/);
+    assert.doesNotMatch(uiSource,/mapBattleOverlay/,"retired patrol log must not reserve a movement overlay");
     assert.match(uiSource,/v141-tap-ripple/);
     ["homeIconQuest","homeIconAchievement","homeIconOfflineExp","homeIconAnnouncement","dungeonNav"].forEach(id=>assert.ok(uiSource.includes(id)));
     assert.match(cssSource,/image-rendering:auto !important/);

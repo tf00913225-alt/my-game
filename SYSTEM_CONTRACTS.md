@@ -68,8 +68,7 @@
 - Target Reticle（目標準星）由 Fixed Slot V2 唯一投影；敵方、我方、Boss、援軍與可破壞 Boss object 共用同一金色準星。歷史 `::after` 準星不得與正式 `::before` 準星並存。
 - Status Icon（狀態圖示）HUD 必須位於 HP／SP 資源條之上，正式 24px Icon 不得被塞入低於自身高度的容器或被資源條 z-index 蓋住。
 - Stealth（隱身）有效期間只將 combatant artwork（戰鬥立繪本體）投影為 `opacity: 0.35`；HP／SP、名稱、Status Icon、Target/VFX 錨點不得一起變透明。狀態解除或死亡後必須在正式狀態同步時移除半透明呈現。
-- 正式 Battle Info Drawer（戰鬥資訊抽屜）外殼永遠透明；收合／展開都保留左側回合文字，只有右側「戰鬥資訊／返回」小 Tab 與展開後的紀錄正文可有黑底。巡怪 `#mapBattleInfo` 是獨立固定黑色紀錄框，不得再共享正式 Drawer 外觀 owner。
-- Battle Info Tab 固定錨定於戰鬥畫面右下；不可拖曳、不可自由定位。展開／收合只允許改變 Drawer（抽屜）狀態，不得改變 Tab 錨點。
+- 戰鬥資訊抽屜、巡怪與深淵戰鬥紀錄 UI 已退場；不得重建入口、視窗或鏡像 DOM。回合標籤由正式戰場獨立顯示，內部戰鬥事件及其 observer（觀察者）仍保留。
 - 巡怪頁底部導覽與副本／Gameplay 共用 `js/04-stage-v11-native-bottom-nav-runtime.js::FourSymbolsBottomNav.syncContext()` 的 app-shell context navigation owner；順序固定為「角色／背包／秘寶／元素匣／返回」，冷進野怪區不得等待或預載 gameplay-core 才取得正確情境。`js/42-v148-combat-dungeon-fixes.js::syncContextNavigation()` 只保留深淵頂部返回控制與相容轉呼叫，不得重新持有底部情境選擇。巡怪頁不得再建立右上角第二顆返回鈕或自行硬寫另一套底部按鈕 markup。
 - 通知紅點共用 `css/38-v141-system-expansion.css::.v141-notice-dot` 的呈現契約；browser／1080×1920 native 底部導覽只可由 `css/06-stage-v11-native-bottom-nav.css` 做各域明確尺寸設定。同一導航殼的域選擇由 `FourSymbolsBottomNav` 控制，跨呈現域的位置轉換依 `UI_GUIDELINES.md` 第十三節的唯一 Display Owner，紅點不得攔截點擊或在呼吸動畫最小幀失去可辨識性。
 - 手動戰鬥在技能／物品／目標選擇期間，回合／倒數列必須保持 100% 可見並位於選擇 UI 上層；不得以降低 opacity（透明度）或被其他 UI 覆蓋的方式讓位。
@@ -136,7 +135,7 @@
 - 正式統計欄位只有：實際總傷害、有效治療量、實際承受傷害、真正 Critical（暴擊）次數。技能施放次數不是正式欄位。
 - 傷害／治療只能從戰鬥結算前後的實際 HP 差額或正式 settlement（結算）事件累積；不得讀浮字、VFX、紅字顏色或戰鬥紀錄反推。
 - Shield（護盾）、減傷、Barrier（結界）、無敵／吸收後未真正扣 HP 的部分不得算承受傷害；Overheal（過量治療）未另有正式規則前不得算入有效治療。
-- 左側「戰鬥數據」Drawer（抽屜）與右側 Boss 功能卡 Drawer 都是 non-blocking observer UI（非阻塞觀察介面）：打開時不得取得 `FourSymbolsBattleFlow` pause／presentation lock，Auto／Manual Battle（自動／手動戰鬥）都必須照常推進。玩家主動打開戰鬥數據、Boss 功能卡、戰鬥資訊或戰鬥狀態視窗時，該互動資訊層必須暫時位於技能 VFX 與傷害／治療浮字之上，禁止被瞬時演出遮住；關閉後恢復一般戰場繪製順序。左側「戰鬥數據」入口固定貼齊戰場左邊並允許玩家上下拖移。
+- 左側「戰鬥數據」Drawer（抽屜）與右側 Boss 功能卡 Drawer 都是 non-blocking observer UI（非阻塞觀察介面）：打開時不得取得 `FourSymbolsBattleFlow` pause／presentation lock，Auto／Manual Battle（自動／手動戰鬥）都必須照常推進。玩家主動打開戰鬥數據、Boss 功能卡或戰鬥狀態視窗時，該互動資訊層必須暫時位於技能 VFX 與傷害／治療浮字之上，禁止被瞬時演出遮住；關閉後恢復一般戰場繪製順序。左側「戰鬥數據」入口固定貼齊戰場左邊並允許玩家上下拖移。
 - Auto Battle（自動戰鬥）回合提示是正式 round lifecycle 的 500ms observer presentation，不取得 Presentation Lock，可與 Auto declaration 同時進行。Auto decision 50ms／declare handoff 100ms；Manual declaration 保留 250ms。
 - 個人 Boss、世界 Boss、深淵可在 battle finish 後顯示 `FourSymbolsBattleStatistics` 的 frozen snapshot，直到玩家主動關閉；一般巡怪與每日副本不得因此增加長駐結算 Modal。
 
@@ -208,7 +207,7 @@
 
 ## Battle Reading Layer Contract (2026-10-01)
 
-- `body.v174-battle-reading-open` is the sole semantic owner for Battle Reading Surface state. It is active while Battle Info, Battle Statistics, Boss Mechanism or Battle Status Detail is visibly open on the active battle page; the last surface closing, battle teardown or page navigation must remove it.
+- `body.v174-battle-reading-open` is the sole semantic owner for Battle Reading Surface state. It is active while Battle Statistics, Boss Mechanism or Battle Status Detail is visibly open on the active battle page; the last surface closing, battle teardown or page navigation must remove it.
 - While that state is active, every Document-Level Transient Battle Presentation (including skill VFX/Sprite Sheet, skill name, damage/heal/SP/critical/MISS/resist/status feedback, detached popup compatibility surfaces and the complete Team Relic cinematic/dim/target projection/VFX presentation) must suppress paint and must not cover reading UI. The in-stage relic banner follows the same transient-paint rule.
 - Reading state never pauses or cancels Battle Simulation or presentation lifecycle. Hit frames, damage, status, healing/SP settlement, relic triggers, action completion and turn queue continue normally; hidden presentations expire on their original timeline and must not replay when the final reading surface closes.
 - A z-index comparison between elements in different stacking contexts is not sufficient evidence that a Battle Reading Surface paints above document-level VFX. Regression verification must assert the semantic reading state and computed transient-paint suppression while lifecycle completion continues.

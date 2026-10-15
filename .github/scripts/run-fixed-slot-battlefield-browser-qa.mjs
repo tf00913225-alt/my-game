@@ -37,7 +37,7 @@ const mainRenderHookSource=mainSource.slice(
 ).replace(/<\/script/gi,"<\\/script");
 const mainRenderSource=mainSource.slice(
     mainSource.indexOf("function renderBattle(){"),
-    mainSource.indexOf("function fillBattleInfoGap(")
+    mainSource.indexOf("function runBattleMonsterUiHook(")
 ).replace(/<\/script/gi,"<\\/script");
 const adapterSource=read("js/battlefield-render-geometry-adapter.js").replace(/<\/script/gi,"<\\/script");
 const feedbackSource=read("js/battle-floating-feedback-owner.js").replace(/<\/script/gi,"<\\/script");
@@ -81,7 +81,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120e09;col
 <section class="battle-enemy-region"><div class="battle-title">戰鬥</div><div id="battleMonsterArea" class="battle-monsters v131-formation"></div></section>
 <section class="battle-center-region"><div class="battle-middle"><div id="battleActionRegion" class="v-fixed-action-zone" style="position:relative;display:flex;flex-direction:column;gap:4px"><div id="turnTargetRow" class="turn-target-row">第 1 回合</div><div id="battleTargetPrompt" class="battle-target-prompt"><div class="battle-target-prompt-copy"><div class="battle-target-prompt-action">選擇［怒火］的我方目標</div><div class="battle-target-prompt-hint">選擇目標</div></div><button class="battle-target-back">返回</button></div><div id="battleCommandRow" style="display:flex;gap:5px;flex:0 0 66px;position:relative"><div id="mainBattleMenu" class="battle-menu" style="flex:1">操作區</div></div></div></div></section>
 <section class="battle-ally-region"><div id="battlePlayerRow" class="battle-player-row"></div></section>
-<section class="battle-info-region"><div class="battle-info-header-row"><button id="battleInfoToggle" class="battle-info-toggle" type="button" aria-expanded="false">戰鬥資訊</button><div id="battleTurnIndicator">第 1 回合</div></div><div id="battleInfo" class="battle-info">戰鬥資訊</div></section>
+<div id="battleTurnIndicator">第 1 回合</div>
 </div><button class="battle-element-box-button" type="button">元素匣</button></section></div></div></div><pre id="result" hidden></pre>
 <script>
 window.__allyIndexes=[0,1,2];
@@ -115,7 +115,7 @@ ${portraitSource}
  }
  function rect(sel){var node=document.querySelector(sel),r=node.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height,centerX:r.left+r.width/2,centerY:r.top+r.height/2};}
  function commandVisualTop(){var menu=document.getElementById('mainBattleMenu'),r=menu.getBoundingClientRect(),style=getComputedStyle(menu,'::before'),scaleY=menu.offsetHeight?r.height/menu.offsetHeight:1,top=parseFloat(style.top)||0;return r.top+top*scaleY;}
- function lower(){return {enemy:rect('.battle-enemy-region'),center:rect('.battle-center-region'),allyRegion:rect('.battle-ally-region'),ally:rect('#battlePlayerRow'),infoRegion:rect('.battle-info-region'),infoToggle:rect('#battleInfoToggle'),middle:rect('.battle-middle'),action:rect('#battleActionRegion'),turn:rect('#turnTargetRow'),command:rect('#mainBattleMenu'),commandVisualTop:commandVisualTop(),info:rect('#battleInfo'),elementBox:rect('.battle-element-box-button'),centerBackground:getComputedStyle(document.querySelector('.battle-center-region')).backgroundImage};}
+ function lower(){return {enemy:rect('.battle-enemy-region'),center:rect('.battle-center-region'),allyRegion:rect('.battle-ally-region'),ally:rect('#battlePlayerRow'),middle:rect('.battle-middle'),action:rect('#battleActionRegion'),turn:rect('#turnTargetRow'),command:rect('#mainBattleMenu'),commandVisualTop:commandVisualTop(),elementBox:rect('.battle-element-box-button'),centerBackground:getComputedStyle(document.querySelector('.battle-center-region')).backgroundImage};}
  function unitRects(selector){return Array.from(document.querySelectorAll(selector)).filter(function(node){return node.children.length;}).map(function(node){return rect('#'+node.children[0].id);});}
  function hudRects(selector){return Array.from(document.querySelectorAll(selector)).filter(function(node){return node.children.length;}).map(function(slot){var card=slot.children[0],art=card.querySelector('.v174-battle-art'),hp=card.querySelector('.monster-hp,.hp-bar'),sp=card.querySelector('.monster-sp,.sp-bar'),name=card.querySelector('.battle-monster-name,.battle-player-id');return {id:card.id,art:rect('#'+card.id+' .v174-battle-art'),hp:rect('#'+card.id+' .monster-hp,#'+card.id+' .hp-bar'),sp:rect('#'+card.id+' .monster-sp,#'+card.id+' .sp-bar'),name:rect('#'+card.id+' .battle-monster-name,#'+card.id+' .battle-player-id'),logicalHp:hp.offsetHeight,logicalSp:sp.offsetHeight};});}
  function clipChain(node){var result=[];for(var p=node.parentElement;p&&p.id!=='game-stage';p=p.parentElement){var cs=getComputedStyle(p);result.push({tag:p.id||p.className,overflow:cs.overflow,overflowX:cs.overflowX,overflowY:cs.overflowY,contain:cs.contain});}return result;}
@@ -178,11 +178,8 @@ ${portraitSource}
  turnNode.classList.add('skill-picker-open');turnUi.skillPicker={opacity:getComputedStyle(turnNode).opacity};turnNode.classList.remove('skill-picker-open');
  turnNode.classList.add('battle-item-open');turnUi.itemPicker={opacity:getComputedStyle(turnNode).opacity};turnNode.classList.remove('battle-item-open');
  actionRegion.classList.add('target-selecting');turnUi.targetSelecting={opacity:getComputedStyle(turnNode).opacity,pointerEvents:getComputedStyle(turnNode).pointerEvents,rect:rect('#turnTargetRow'),promptRect:rect('#battleTargetPrompt')};actionRegion.classList.remove('target-selecting');
- var drawer=document.querySelector('.battle-info-region'),turnIndicator=document.getElementById('battleTurnIndicator');drawer.style.transition='none';turnIndicator.style.transition='none';
- var collapsedDrawer={region:rect('.battle-info-region'),toggle:rect('#battleInfoToggle'),info:rect('#battleInfo'),handleText:document.getElementById('battleInfoToggle').textContent.trim(),turnOpacity:getComputedStyle(turnIndicator).opacity};
- drawer.classList.add('is-expanded');
- var expandedDrawer={region:rect('.battle-info-region'),toggle:rect('#battleInfoToggle'),info:rect('#battleInfo'),turnOpacity:getComputedStyle(turnIndicator).opacity};
- drawer.classList.remove('is-expanded');
+ var turnIndicator=document.getElementById('battleTurnIndicator');
+ var logRetirement={absent:!document.querySelector('.battle-info-region,#battleInfoToggle,#battleInfo'),turn:rect('#battleTurnIndicator'),turnOpacity:getComputedStyle(turnIndicator).opacity};
  addCards(5,6,false);
  var bossSnapshot=owner.createEnemyFormationSnapshot([0],{originalFormationType:6});
  bossSnapshot.bossBattleSnapshot=true;
@@ -202,7 +199,7 @@ ${portraitSource}
  var bossLifecycle={initial:bossLifecycleEvidence()};
  window.monsters[3].alive=false;window.monsters[3].hp=0;owner.removeMonsterFromEnemySlot(bossSnapshot,3);window.renderBattle();bossLifecycle.afterF1=bossLifecycleEvidence();
  window.monsters[4].alive=false;window.monsters[4].hp=0;owner.removeMonsterFromEnemySlot(bossSnapshot,4);window.renderBattle();window.renderBattle();bossLifecycle.afterF5=bossLifecycleEvidence();
- setTimeout(function(){var legacyStyle=document.getElementById('v174-cardless-battle-style');var result={viewport:{width:${width},height:${height}},scenarios:scenarios,allyScenarios:allyScenarios,splitAlly:splitAlly,manualControl:manualControl,collapsedDrawer:collapsedDrawer,expandedDrawer:expandedDrawer,turnUi:turnUi,artwork:artwork,beforeDeath:beforeDeath,afterDeath:afterDeath,targetSlot:targetSlot,targetRect:targetRect,boss:bossEvidence,bossLifecycle:bossLifecycle,legacyStyle:{owner:legacyStyle&&legacyStyle.dataset.geometryOwner,textLength:legacyStyle?legacyStyle.textContent.length:-1},feedback:{
+ setTimeout(function(){var legacyStyle=document.getElementById('v174-cardless-battle-style');var result={viewport:{width:${width},height:${height}},scenarios:scenarios,allyScenarios:allyScenarios,splitAlly:splitAlly,manualControl:manualControl,logRetirement:logRetirement,turnUi:turnUi,artwork:artwork,beforeDeath:beforeDeath,afterDeath:afterDeath,targetSlot:targetSlot,targetRect:targetRect,boss:bossEvidence,bossLifecycle:bossLifecycle,legacyStyle:{owner:legacyStyle&&legacyStyle.dataset.geometryOwner,textLength:legacyStyle?legacyStyle.textContent.length:-1},feedback:{
 	   monster0:monster0Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
 	   monster1:monster1Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
 	   monster2:monster2Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
@@ -253,13 +250,9 @@ function runViewport(chrome,width,height){
     assert.ok(baseline.center.bottom<=baseline.allyRegion.top+.5,"center operation region must end before the ally region");
     assert.ok(baseline.action.top>=baseline.center.top-.5&&baseline.action.bottom<=baseline.center.bottom+.5,"action controls stay inside the center region");
     assert.equal(baseline.centerBackground,"none","center controls must not own a black translucent background");
-    assert.ok(data.collapsedDrawer.toggle.top>=baseline.allyRegion.bottom-35&&data.collapsedDrawer.toggle.bottom<=baseline.allyRegion.bottom+.5,"collapsed drawer exposes its complete 32px touch handle above the bottom edge");
-    assert.ok(data.collapsedDrawer.info.top>=baseline.allyRegion.bottom-.5,"collapsed battle log must stay below the battlefield");
-    assert.ok(data.expandedDrawer.region.bottom<=baseline.allyRegion.bottom+.5,"expanded drawer stays anchored to the battlefield bottom");
-    assert.ok(data.expandedDrawer.info.top<data.expandedDrawer.info.bottom&&data.expandedDrawer.info.bottom<=baseline.allyRegion.bottom+.5,"expanded battle log must slide fully into view");
-    assert.equal(data.collapsedDrawer.handleText,"戰鬥資訊","battle info handle uses horizontal text");
-    assert.equal(data.collapsedDrawer.turnOpacity,"1","collapsed drawer shows current round");
-    assert.equal(data.expandedDrawer.turnOpacity,"1","expanded drawer keeps the current round visible");
+    assert.equal(data.logRetirement.absent,true,"retired battle log DOM must be absent");
+    assert.equal(data.logRetirement.turnOpacity,"1","current round remains visible");
+    assert.ok(data.logRetirement.turn.height>0&&data.logRetirement.turn.bottom<=baseline.allyRegion.bottom+.5,"current round stays in the battlefield");
     assert.equal(data.turnUi.normal.opacity,"1");
     assert.equal(data.turnUi.normal.pointerEvents,"none","turn timer must never block target selection");
     assert.equal(data.turnUi.skillPicker.opacity,"1");
@@ -370,6 +363,6 @@ function runViewport(chrome,width,height){
 fs.mkdirSync(ARTIFACT_DIR,{recursive:true});
 try{
     const chrome=findChrome();const results=VIEWPORTS.map(([width,height])=>runViewport(chrome,width,height));
-    const evidence={suite:"fixed-slot-battlefield-rendering-v2",passed:true,viewports:results.map(item=>item.viewport),checks:{threeStructuralRegions:true,centerControlsIsolated:true,centerBackgroundRemoved:true,bottomBattleInfoDrawer:true,drawerCollapsedAndExpanded:true,largeElementBox:true,enemyCounts:[1,3,5,6,8,10],allyCounts:[1,2,3,4,5,6],manualActiveCharacterFlash:true,manualActiveCharacterUnique:true,autoHasNoManualFlash:true,equalEnemyCardGeometry:true,equalAllyCardGeometry:true,sixAllyNoOverlap:true,enlargedUnitCards:true,splitAllyFormation:true,deathDoesNotCompress:true,bossSingleEntity:true,bossSixSlotFootprint:true,bossHudAnchored:true,bossSnapshotIdentityStableAfterObjectDeath:true,bossObjectDeathDoesNotCompact:true,bossSideUnits:["ENEMY_B1","ENEMY_B5","ENEMY_F1","ENEMY_F5"],bossSideUnitsDoNotOverlap:true,bossSideArtworkSeparated:true,bossSideArtworkShiftedOutward:true,bossAndObjectReticles:true,dynamicCardlessImmediate:true,vfxShapes:["single","tri","row","column","all"],vfxCenterUsesGeometry:true,vfxScaleStable:true,artworkKinds:["player","regular","elite","boss","abyss"],artworkNoBattlefieldClip:true,popupKinds:["damage","critical","status","shield","miss","heal","sp"],popupUsesCanonicalUnitGeometry:true,popupCollisionFree:true,popupHudSafe:true,unifiedTypography:true,legacyRuntimeGeometryNeutralized:true,noPageScroll:true},results};
+    const evidence={suite:"fixed-slot-battlefield-rendering-v2",passed:true,viewports:results.map(item=>item.viewport),checks:{threeStructuralRegions:true,centerControlsIsolated:true,centerBackgroundRemoved:true,battleLogRemoved:true,currentRoundVisible:true,largeElementBox:true,enemyCounts:[1,3,5,6,8,10],allyCounts:[1,2,3,4,5,6],manualActiveCharacterFlash:true,manualActiveCharacterUnique:true,autoHasNoManualFlash:true,equalEnemyCardGeometry:true,equalAllyCardGeometry:true,sixAllyNoOverlap:true,enlargedUnitCards:true,splitAllyFormation:true,deathDoesNotCompress:true,bossSingleEntity:true,bossSixSlotFootprint:true,bossHudAnchored:true,bossSnapshotIdentityStableAfterObjectDeath:true,bossObjectDeathDoesNotCompact:true,bossSideUnits:["ENEMY_B1","ENEMY_B5","ENEMY_F1","ENEMY_F5"],bossSideUnitsDoNotOverlap:true,bossSideArtworkSeparated:true,bossSideArtworkShiftedOutward:true,bossAndObjectReticles:true,dynamicCardlessImmediate:true,vfxShapes:["single","tri","row","column","all"],vfxCenterUsesGeometry:true,vfxScaleStable:true,artworkKinds:["player","regular","elite","boss","abyss"],artworkNoBattlefieldClip:true,popupKinds:["damage","critical","status","shield","miss","heal","sp"],popupUsesCanonicalUnitGeometry:true,popupCollisionFree:true,popupHudSafe:true,unifiedTypography:true,legacyRuntimeGeometryNeutralized:true,noPageScroll:true},results};
     fs.writeFileSync(path.join(ARTIFACT_DIR,"fixed-slot-battlefield-rendering-v2.json"),JSON.stringify(evidence,null,2)+"\n","utf8");console.log("Fixed Slot Battlefield Rendering V2 mobile browser QA passed:",VIEWPORTS.map(v=>v.join("x")).join(", "));
 }finally{try{fs.unlinkSync(FIXTURE);}catch(_){}}

@@ -1007,10 +1007,7 @@ try{
         const enemy=rectFor(document.querySelector('.battle-enemy-region'));
         const center=rectFor(document.querySelector('.battle-center-region'));
         const ally=rectFor(document.querySelector('.battle-ally-region'));
-        const infoRegion=rectFor(document.querySelector('.battle-info-region'));
-        const infoToggle=rectFor(document.getElementById('battleInfoToggle'));
         const action=rectFor(document.getElementById('battleActionRegion'));
-        const info=rectFor(document.getElementById('battleInfo'));
         const elementBoxNode=document.querySelector('.battle-element-box-button');
         const elementBox=rectFor(elementBoxNode);
         const elementBoxLogical=elementBoxNode?{
@@ -1039,17 +1036,13 @@ try{
         return {
             viewport:{width:innerWidth,height:innerHeight},
             pageClass:document.getElementById('battlePage')?.className||'',
-            regions:{wrap,enemy,center,ally,infoRegion,infoToggle,action,info,elementBox,elementBoxLogical,enemyArea,allyArea},
+            regions:{wrap,enemy,center,ally,action,elementBox,elementBoxLogical,enemyArea,allyArea},
             centerBackground:getComputedStyle(document.querySelector('.battle-center-region')).backgroundImage,
-            infoExpanded:document.querySelector('.battle-info-region')?.classList.contains('is-expanded')||false,
-            infoAria:document.getElementById('battleInfoToggle')?.getAttribute('aria-expanded')||null,
             separation:{
                 enemyBeforeCenter:enemy.bottom<=center.top+1,
                 centerBeforeAlly:center.bottom<=ally.top+1,
                 actionInsideCenter:inside(action,center),
                 allyFillsBattleBottom:Math.abs(ally.bottom-wrap.bottom)<=1,
-                collapsedHandleInside:inside(infoToggle,wrap),
-                collapsedInfoBelowBattle:info.top>=wrap.bottom-1,
                 enemyAreaInsideEnemy:inside(enemyArea,enemy),
                 allyAreaInsideAlly:inside(allyArea,ally),
                 enemyCardsClearCenter:enemyCards.every(card=>!intersects(card,center)),
@@ -1064,8 +1057,6 @@ try{
     assert.equal(layout.viewport.width,412,"Live battle QA must use the portrait mobile viewport");
     assert.match(layout.pageClass,/v-fixed-slot-render-v2/,"Deployed battle must use the Fixed Slot V2 layout owner");
     assert.equal(layout.centerBackground,"none","The middle operation region must not keep a black translucent background");
-    assert.equal(layout.infoExpanded,false,"Battle info must start collapsed");
-    assert.equal(layout.infoAria,"false","The collapsed drawer handle must expose its state accessibly");
     Object.entries(layout.separation).forEach(([name,value])=>assert.equal(value,true,`Battle region separation failed: ${name}`));
     assert.equal(layout.enemySlots.count,6,"The deployed Abyss enemy region must expose both three-column fixed geometry layers");
     assert.equal(layout.allySlots.count,6,"The deployed ally region must expose both three-column fixed geometry layers");
@@ -1192,50 +1183,10 @@ try{
 
     evidence.checks.skillTouchFlood=await battleSkillTouchFloodQa(client,artifactDir);
 
-    const infoDrawer=await client.eval(`(()=>{
-        const region=document.querySelector('#battlePage .battle-info-region');
-        const button=document.getElementById('battleInfoToggle');
-        const info=document.getElementById('battleInfo');
-        const turn=document.getElementById('battleTurnIndicator');
-        if(!region||!button||!info||!turn||typeof toggleBattleInfoPanel!=='function'){return null;}
-        region.style.transition='none';
-        const rect=node=>{const value=node.getBoundingClientRect();return {top:value.top,bottom:value.bottom,height:value.height};};
-        const snapshot=()=>({
-            region:rect(region),
-            info:rect(info),
-            aria:button.getAttribute('aria-expanded'),
-            className:region.className,
-            label:button.textContent.trim(),
-            regionBackground:getComputedStyle(region).backgroundColor,
-            buttonBackground:getComputedStyle(button).backgroundColor,
-            infoBackground:getComputedStyle(info).backgroundColor,
-            turnOpacity:getComputedStyle(turn).opacity
-        });
-        toggleBattleInfoPanel();
-        const expanded=snapshot();
-        toggleBattleInfoPanel();
-        const collapsed=snapshot();
-        region.style.removeProperty('transition');
-        return {expanded,collapsed};
-    })()`);
-    evidence.checks.battleInfoDrawer=infoDrawer;
-    assert.ok(infoDrawer,"Live battle must expose the formal battle-info drawer owner");
-    assert.equal(infoDrawer.expanded.aria,"true","Tapping the handle must expand battle info");
-    assert.equal(infoDrawer.expanded.label,"返回","Expanded battle info handle must become 返回");
-    assert.match(infoDrawer.expanded.className,/is-expanded/);
-    assert.ok(infoDrawer.expanded.info.top<layout.regions.wrap.bottom,"Expanded battle info must slide into the battlefield viewport");
-    assert.equal(infoDrawer.collapsed.aria,"false","Tapping again must collapse battle info");
-    assert.equal(infoDrawer.collapsed.label,"戰鬥資訊","Collapsed battle info handle must restore 戰鬥資訊");
-    assert.equal(infoDrawer.collapsed.regionBackground,"rgba(0, 0, 0, 0)","Collapsed battle-info drawer shell must stay transparent");
-    assert.equal(infoDrawer.expanded.regionBackground,"rgba(0, 0, 0, 0)","Expanded battle-info drawer shell must stay transparent");
-    assert.notEqual(infoDrawer.collapsed.buttonBackground,"rgba(0, 0, 0, 0)","Collapsed 戰鬥資訊 tab must retain its own backing");
-    assert.notEqual(infoDrawer.expanded.buttonBackground,"rgba(0, 0, 0, 0)","Expanded 返回 tab must retain its own backing");
-    assert.equal(infoDrawer.collapsed.infoBackground,"rgba(0, 0, 0, 0)","Collapsed battle log body must remain transparent/off-canvas");
-    assert.notEqual(infoDrawer.expanded.infoBackground,"rgba(0, 0, 0, 0)","Expanded battle log body alone owns the black backing");
-    assert.equal(infoDrawer.collapsed.turnOpacity,"1","Collapsed drawer keeps the current round visible");
-    assert.equal(infoDrawer.expanded.turnOpacity,"1","Expanded drawer keeps the current round visible");
-    assert.doesNotMatch(infoDrawer.collapsed.className,/is-expanded/);
-    assert.ok(infoDrawer.collapsed.info.top>=layout.regions.wrap.bottom-1,"Collapsed battle info must return below the battlefield viewport");
+    const logRetirement=await client.eval(`(()=>{const turn=document.getElementById('battleTurnIndicator');const rect=turn?.getBoundingClientRect();return {absent:!document.querySelector('.battle-info-region,#battleInfoToggle,#battleInfo,#mapBattleInfo,#mapBattleOverlay'),turnVisible:!!rect&&rect.width>0&&rect.height>0&&getComputedStyle(turn).opacity!=='0'};})()`);
+    evidence.checks.battleLogRetirement=logRetirement;
+    assert.equal(logRetirement.absent,true,"Retired battle information and patrol log DOM must be absent");
+    assert.equal(logRetirement.turnVisible,true,"Current battle round must remain visible");
 
     const resourceLayers=await client.eval(`(()=>{
         const playerCard=document.getElementById('battlePlayerCard0');

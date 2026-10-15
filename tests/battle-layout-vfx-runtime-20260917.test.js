@@ -92,7 +92,7 @@ for(const [element,groups] of Object.entries(ELEMENT_DAMAGE_SKILLS)){
     }
 }
 
-assert.match(index,/<section class="battle-enemy-region"[\s\S]*id="battleMonsterArea"[\s\S]*<section class="battle-center-region"[\s\S]*id="battleActionRegion"[\s\S]*id="turnTargetRow"[\s\S]*<section class="battle-ally-region"[\s\S]*id="battlePlayerRow"[\s\S]*<section class="battle-info-region"[\s\S]*id="battleInfo"/);
+assert.match(index,/<section class="battle-enemy-region"[\s\S]*id="battleMonsterArea"[\s\S]*<section class="battle-center-region"[\s\S]*id="battleActionRegion"[\s\S]*id="turnTargetRow"[\s\S]*<section class="battle-ally-region"[\s\S]*id="battlePlayerRow"[\s\S]*id="battleTurnIndicator"/);
 const centerMarkup=index.slice(index.indexOf('<section class="battle-center-region"'),index.indexOf('<section class="battle-ally-region"'));
 assert.doesNotMatch(centerMarkup,/id="battleInfo"/,"the bottom battle log must not be owned by the middle controls");
 assert.doesNotMatch(index,/<div class="battle-monster-gap-filler"><\/div>/,"legacy space-filler must not own battle layout");
@@ -104,10 +104,10 @@ assert.doesNotMatch(layoutCss,/--battle-info-region-track/,"battle info must not
 assert.match(layoutCss,/grid-template-columns:repeat\(var\(--battle-enemy-columns,5\),minmax\(0,1fr\)\)/,"enemy slots remain equal width");
 assert.match(layoutCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/,"ally slots remain equal width");
 assert.match(layoutCss,/--battle-ally-row-height:calc\(/,"front/back ally containers share one size token");
-assert.match(layoutCss,/\.battle-info-region\{[\s\S]*position:absolute !important;[\s\S]*transform:translateY\(calc\(100% - var\(--battle-info-handle-height\)\)\)/,"battle log is a collapsed bottom drawer");
-assert.match(layoutCss,/\.battle-info-region\.is-expanded\{[\s\S]*transform:translateY\(0\)/,"battle log drawer can expand without reflowing Slots");
+assert.doesNotMatch(layoutCss,/battle-info-region/,"retired battle log UI must stay absent");
+assert.doesNotMatch(layoutCss,/battle-info-region/,"retired battle log UI must stay absent");
 assert.match(layoutCss,/\.battle-center-region\{[\s\S]*background:none !important/,"middle controls must not own a black translucent plate");
-assert.match(index,/id="battleInfoToggle"[\s\S]*aria-expanded="false"[\s\S]*onclick="toggleBattleInfoPanel\(\)"/);
+assert.doesNotMatch(index,/battleInfoToggle/,"retired battle log UI must stay absent");
 assert.match(layoutCss,/\.battle-element-box-button\{[\s\S]*width:66px !important;[\s\S]*height:66px !important/,"the mobile element-box touch target keeps its original large size");
 assert.match(layoutCss,/\.v-fixed-ally-slot\{[\s\S]*overflow:visible !important/,"unit artwork must not be clipped by its slot");
 assert.match(layoutCss,/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[\s\S]*overflow:visible !important/,"VFX stage must not clip at a card or region boundary");

@@ -64,9 +64,9 @@ assert.ok(battle.includes('marker.includes("commission")||marker.includes("委�
 assert.ok(battle.includes('setQuestNoticeDot(tab,notices.commission,"委託任務獎勵可領取")'));
 assert.ok(battle.includes('setQuestNoticeDot(tab,notices.daily,"每日任務獎勵可領取")'));
 
-// 8. Abyss log is a real touch-scroll owner and the emperor/chest platform is the requested upper arena.
+// 8. Abyss log is retired; the upper arena and generic touch-scroll contract remain.
 assert.ok(content.includes("function bossPosition(){ return [61,21]; }"));
-assert.ok(content.includes('class="v17342-abyss-battle-log"'));
+assert.ok(!content.includes('class="v17342-abyss-battle-log"'),"retired Abyss battle log must not be rendered");
 // The gesture owner infers legacy scrolling from real overflow, not a whitelist.
 const vm=require("node:vm");
 const documentElement={};
@@ -80,6 +80,6 @@ assert.equal(gesture.FourSymbolsGestureArbiter.findScrollOwner(log).node,log);
 assert.equal(gesture.FourSymbolsGestureArbiter.findScrollOwner(log).axes,"y");
 log.scrollHeight=200;
 assert.equal(gesture.FourSymbolsGestureArbiter.findScrollOwner(log),null,"a fitting log must not claim scrolling");
-assert.match(elementCss,/\.v17342-abyss-battle-log\{[\s\S]*?overflow-y:auto;[\s\S]*?touch-action:pan-y/);
+assert.doesNotMatch(elementCss,/\.v17342-abyss-battle-log\{/,"retired Abyss log must not keep a scroll owner");
 
 console.log("V173.50 current request regression checks passed");
