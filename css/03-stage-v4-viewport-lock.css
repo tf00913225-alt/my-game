@@ -48,7 +48,8 @@ html, body{
     transform-origin:center center !important;
     z-index:0 !important;
     contain:layout paint size !important;
-    will-change:transform;
+    /* Static fit does not need permanent promotion: Android DPR4 retained
+       stale page/scroll tiles above shared windows when hinted at first paint. */
 }
 
 /* No descendant may create a document-level horizontal overflow. */
