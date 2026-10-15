@@ -4,10 +4,10 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.d858c8c1dac6.js"
+      "build/boot-core.2d94612da5ae.js"
     ],
     "styles": [
-      "build/boot-core.54c0f0458c07.css"
+      "build/boot-core.d2a84424f112.css"
     ],
     "images": [
       "assets/ui/startup-logo.4631c0bc3f2b.jpg",
@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.042d682b3fc5.js"
+          "build/app-shell.92b03185d2d8.js"
         ],
         "styles": [
           "build/app-shell.d5f2de4d602d.css"
@@ -210,19 +210,19 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.54c0f0458c07.css",
-        "sha256": "54c0f0458c07",
-        "bytes": 219729,
+        "path": "build/boot-core.2d94612da5ae.js",
+        "sha256": "2d94612da5ae",
+        "bytes": 70001,
         "priority": "P0",
-        "type": "style",
+        "type": "script",
         "decode": false
       },
       {
-        "path": "build/boot-core.d858c8c1dac6.js",
-        "sha256": "d858c8c1dac6",
-        "bytes": 69985,
+        "path": "build/boot-core.d2a84424f112.css",
+        "sha256": "d2a84424f112",
+        "bytes": 219729,
         "priority": "P0",
-        "type": "script",
+        "type": "style",
         "decode": false
       },
       {
@@ -562,9 +562,9 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.042d682b3fc5.js",
-        "sha256": "042d682b3fc5",
-        "bytes": 1175266,
+        "path": "build/app-shell.92b03185d2d8.js",
+        "sha256": "92b03185d2d8",
+        "bytes": 1174953,
         "priority": "P1",
         "type": "script",
         "decode": false
@@ -818,18 +818,18 @@
         "decode": false
       }
     ],
-    "manifestHash": "69888d848683",
-    "totalBytes": 21920736,
+    "manifestHash": "ca4d1cce7df0",
+    "totalBytes": 21920439,
     "totalResources": 78
   },
   "assets": {
-    "build/boot-core.d858c8c1dac6.js": {
-      "sha256": "d858c8c1dac6",
-      "bytes": 69985
+    "build/boot-core.2d94612da5ae.js": {
+      "sha256": "2d94612da5ae",
+      "bytes": 70001
     },
-    "build/app-shell.042d682b3fc5.js": {
-      "sha256": "042d682b3fc5",
-      "bytes": 1175266
+    "build/app-shell.92b03185d2d8.js": {
+      "sha256": "92b03185d2d8",
+      "bytes": 1174953
     },
     "build/gameplay-core-primary.5749c3bf025c.js": {
       "sha256": "5749c3bf025c",
@@ -875,8 +875,8 @@
       "sha256": "13793fa5c78c",
       "bytes": 28369
     },
-    "build/boot-core.54c0f0458c07.css": {
-      "sha256": "54c0f0458c07",
+    "build/boot-core.d2a84424f112.css": {
+      "sha256": "d2a84424f112",
       "bytes": 219729
     },
     "build/app-shell.d5f2de4d602d.css": {

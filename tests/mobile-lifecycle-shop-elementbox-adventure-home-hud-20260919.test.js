@@ -60,7 +60,7 @@ test("mobile lifecycle diagnostics distinguish reload/discard metadata while bac
     assert.equal(first.wasDiscarded,true);
     assert.equal(first.navigationType,"reload");
     assert.equal(first.sessionPreviouslyEntered,true);
-    assert.equal(startup.hidden,true,"same-tab entered session may skip the long presentation shell only");
+    assert.equal(startup.hidden,false,"only Startup may hide its shell after destination visual readiness");
 
     document.hidden=true;
     documentEvents.emit("visibilitychange");
