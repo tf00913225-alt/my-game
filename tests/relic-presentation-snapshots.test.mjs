@@ -24,7 +24,7 @@ function fixture({id='relic_test',canonical=rect(),actual=rect(),missing=false}=
     const browser={window:{FourSymbolsBattlefieldRenderGeometry:{getBattlefieldOverlayGeometry:()=>({rect:overlay}),
         getUnitGeometry:()=>({slot:'ALLY_F2',artworkProjection:missing?null:{rect:canonical},hpProjection:{rect:canonical}})},
         v143SkillAnimationState:{current:{config:{id},sequence:7,targetSide:'player',targetIndexes:[4],done:false}},
-        FourSymbolsBattleFlow:{isPresentationActive:()=>true},FourSymbolsBattleStatistics:{openStatistics:()=>true}},
+        FourSymbolsBattleFlow:{isPresentationActive:()=>true},FourSymbolsBattleStatistics:{setBossMechanisms:()=>{},openBossMechanisms:()=>true}},
         document:{body,getElementById:name=>name==='teamRelicBattlePresentation'?node:name==='v143-skill-stage'?stage:{dataset:{slot:'ALLY_F2'}}},
         getComputedStyle:()=>({visibility:'hidden',opacity:'0'}),CSS:{escape:value=>{escapeCalls.push(value);return cssEscape(value);}},
         MutationObserver:class{constructor(callback){this.callback=callback;}observe(){this.callback();}disconnect(){}},Date};

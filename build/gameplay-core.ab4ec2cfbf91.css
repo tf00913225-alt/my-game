@@ -1,7 +1,6 @@
 
 /* bundled source: css/battle-statistics-system.css */
 /* Battle Statistics / Detailed battle status UI owner. */
-#battlePage .battle-stats-edge-button,
 #battlePage .battle-mechanism-alert{
     position:absolute;
     z-index:18070;
@@ -10,26 +9,7 @@
     color:#f5d67f;
     box-shadow:0 3px 10px rgba(0,0,0,.58);
 }
-#battlePage .battle-stats-edge-button[hidden],
 #battlePage .battle-mechanism-alert[hidden]{display:none;}
-#battlePage .battle-stats-edge-button{
-    top:82px;
-    left:0;
-    width:29px;
-    min-height:112px;
-    padding:7px 4px;
-    border-left:0;
-    border-radius:0 8px 8px 0;
-    font-size:15px;
-    font-weight:900;
-    line-height:1.25;
-    touch-action:none;
-    user-select:none;
-    -webkit-user-select:none;
-    cursor:ns-resize;
-}
-#battlePage .battle-stats-edge-button.is-dragging{filter:brightness(1.18);}
-#battlePage .battle-stats-edge-button span{display:block;}
 #battlePage .battle-mechanism-alert{
     top:98px;
     right:0;
@@ -63,7 +43,6 @@
     transition:transform .18s ease-out;
     pointer-events:none;
 }
-#battlePage .battle-stats-drawer{left:0;transform:translateX(-102%);border-left:0;}
 #battlePage .battle-boss-mechanism-drawer{right:0;transform:translateX(102%);border-right:0;}
 #battlePage .battle-insight-drawer.open{transform:translateX(0);pointer-events:auto;}
 #battlePage.v-fixed-slot-render-v2 .battle-center-region{
@@ -94,7 +73,7 @@
     overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;
 }
-.battle-stat-card,.battle-result-stat-card,.battle-mechanism-card{
+.battle-result-stat-card,.battle-mechanism-card{
     margin:0 0 9px;
     padding:9px;
     border:1px solid rgba(158,116,51,.56);

@@ -135,7 +135,7 @@
 - 正式統計欄位只有：實際總傷害、有效治療量、實際承受傷害、真正 Critical（暴擊）次數。技能施放次數不是正式欄位。
 - 傷害／治療只能從戰鬥結算前後的實際 HP 差額或正式 settlement（結算）事件累積；不得讀浮字、VFX、紅字顏色或戰鬥紀錄反推。
 - Shield（護盾）、減傷、Barrier（結界）、無敵／吸收後未真正扣 HP 的部分不得算承受傷害；Overheal（過量治療）未另有正式規則前不得算入有效治療。
-- 左側「戰鬥數據」Drawer（抽屜）與右側 Boss 功能卡 Drawer 都是 non-blocking observer UI（非阻塞觀察介面）：打開時不得取得 `FourSymbolsBattleFlow` pause／presentation lock，Auto／Manual Battle（自動／手動戰鬥）都必須照常推進。玩家主動打開戰鬥數據、Boss 功能卡或戰鬥狀態視窗時，該互動資訊層必須暫時位於技能 VFX 與傷害／治療浮字之上，禁止被瞬時演出遮住；關閉後恢復一般戰場繪製順序。左側「戰鬥數據」入口固定貼齊戰場左邊並允許玩家上下拖移。
+- 戰鬥數據入口、拖曳控制及統計抽屜已退場。右側 Boss 功能卡 Drawer 是 non-blocking observer UI（非阻塞觀察介面）：打開時不得取得 `FourSymbolsBattleFlow` pause／presentation lock，自動／手動戰鬥都照常推進。Boss 功能卡或戰鬥狀態視窗開啟時，資訊層必須位於技能 VFX 與浮字之上；關閉後恢復一般繪製順序。
 - Auto Battle（自動戰鬥）回合提示是正式 round lifecycle 的 500ms observer presentation，不取得 Presentation Lock，可與 Auto declaration 同時進行。Auto decision 50ms／declare handoff 100ms；Manual declaration 保留 250ms。
 - 個人 Boss、世界 Boss、深淵可在 battle finish 後顯示 `FourSymbolsBattleStatistics` 的 frozen snapshot，直到玩家主動關閉；一般巡怪與每日副本不得因此增加長駐結算 Modal。
 
@@ -207,7 +207,7 @@
 
 ## Battle Reading Layer Contract (2026-10-01)
 
-- `body.v174-battle-reading-open` is the sole semantic owner for Battle Reading Surface state. It is active while Battle Statistics, Boss Mechanism or Battle Status Detail is visibly open on the active battle page; the last surface closing, battle teardown or page navigation must remove it.
+- `body.v174-battle-reading-open` is the sole semantic owner for Battle Reading Surface state. It is active while Boss Mechanism or Battle Status Detail is visibly open on the active battle page; the last surface closing, battle teardown or page navigation must remove it.
 - While that state is active, every Document-Level Transient Battle Presentation (including skill VFX/Sprite Sheet, skill name, damage/heal/SP/critical/MISS/resist/status feedback, detached popup compatibility surfaces and the complete Team Relic cinematic/dim/target projection/VFX presentation) must suppress paint and must not cover reading UI. The in-stage relic banner follows the same transient-paint rule.
 - Reading state never pauses or cancels Battle Simulation or presentation lifecycle. Hit frames, damage, status, healing/SP settlement, relic triggers, action completion and turn queue continue normally; hidden presentations expire on their original timeline and must not replay when the final reading surface closes.
 - A z-index comparison between elements in different stacking contexts is not sufficient evidence that a Battle Reading Surface paints above document-level VFX. Regression verification must assert the semantic reading state and computed transient-paint suppression while lifecycle completion continues.
