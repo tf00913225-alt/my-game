@@ -2327,15 +2327,8 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     assert.equal(new Set([...current.keys()].map(path=>path.split("/").at(-2))).size,10);
     await approvalIssuer.issue({auth:{uid:"emulator-operator",token:{cloudSaveOperator:true}},
         data:{ownerUid:ownedUid,operationId,sourceRevision:8,ttlSeconds:900}});
-    const before=await dump(),envelopeBefore=(await envelopeRef.get()).data();
-    for(const [path,row] of current)assert.deepEqual(source(before.get(path)),row,path);
-    const erase=db.batch();for(const path of current.keys())erase.delete(db.doc(path));
-    await erase.commit();
-    const damaged=await dump();
-    for(const path of current.keys())assert.equal(damaged.has(path),false,path);
-    assert.equal(damaged.size,before.size-current.size);
-
-    // A fresh identity takes over the same UID; the old session cannot repair.
+    // Takeover legitimately changes private session records. Capture the loss
+    // baseline afterwards so every restore assertion also protects those records.
     while(Math.floor(Date.now()/1000)<=claims(ownedUser.idToken).auth_time){
         await new Promise(resolve=>setTimeout(resolve,100));
     }
@@ -2344,6 +2337,13 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     const session=await invoke("createGameSession",device.idToken,{uid:ownedUid});
     const request={auth:{uid:ownedUid,token:claims(device.idToken)},data:{uid:ownedUid,session}};
     const payload={uid:ownedUid,session,...intent};
+    const before=await dump(),envelopeBefore=(await envelopeRef.get()).data();
+    for(const [path,row] of current)assert.deepEqual(source(before.get(path)),row,path);
+    const erase=db.batch();for(const path of current.keys())erase.delete(db.doc(path));
+    await erase.commit();
+    const damaged=await dump();
+    for(const path of current.keys())assert.equal(damaged.has(path),false,path);
+    assert.equal(damaged.size,before.size-current.size);
     await rejected("restoreCanonicalCurrent",ownedUser.idToken,
         {uid:ownedUid,session:ownedSession,...intent},"SESSION_REVOKED");
     assert.deepEqual(await dump(),damaged);
