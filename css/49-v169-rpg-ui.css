@@ -530,7 +530,6 @@ body > .v169-rpg-dialog-layer{
     font-size:calc(15 * var(--ui-length-unit,1px)) !important;
 }
 /* ----- Character: same Large Panel frame as shop; only tab content changes. ----- */
-#game-ui #homeFeatureModal .home-feature-modal-box.formation-panel,
 #game-ui #homeFeatureModal .home-feature-modal-box.hero-panel,
 #game-ui #homeFeatureModal .home-feature-modal-box.wide{
     width:calc(100% - var(--ui-large-panel-safe-space)) !important;
@@ -542,6 +541,18 @@ body > .v169-rpg-dialog-layer{
     flex-direction:column !important;
     overflow:hidden !important;
     box-sizing:border-box !important;
+}
+#game-ui #homeFeatureModal .home-feature-modal-box.formation-panel{
+    width:min(calc(100% - var(--ui-large-panel-safe-space)),calc((var(--layout-block-size) - var(--ui-large-panel-safe-space)) * 9 / 16));
+    height:auto;
+    aspect-ratio:9 / 16;
+    max-height:calc(100% - var(--ui-large-panel-safe-space));
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-sizing:border-box;
+    padding:calc(12 * var(--ui-length-unit));
 }
 #game-ui #homeFeatureModal .home-feature-modal-box.formation-panel #homeFeatureModalBody,
 #game-ui #homeFeatureModal .home-feature-modal-box.hero-panel #homeFeatureModalBody,

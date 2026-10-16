@@ -55,7 +55,7 @@ try{
  const loads=new Set();c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Page.lifecycleEvent'&&m.params.name==='load')loads.add(m.params.loaderId);});
  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')+`;window.__heroQaOwned=${JSON.stringify(ids)};window.__heroQaErrors=[];addEventListener('error',e=>{if(e.message)window.__heroQaErrors.push(e.message)});`});
  async function waitReady(){await c.eval(`(async()=>{const end=Date.now()+45000;while(Date.now()<end&&!(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')))await new Promise(r=>setTimeout(r,50));if(FourSymbolsStartupPolicy.getState()!=='READY')throw Error('startup not READY');await FourSymbolsHeroAcquisition.sync();await FourSymbolsHeroGrowth.read();await FourSymbolsTeamFormation.read();showPage('home');return true;})()`);}
- async function point(selector){return c.eval(`(async()=>{const query=${JSON.stringify(selector)},root=query.startsWith('[data-')?document.querySelector('.v-fixed-formation-panel'):document;let n=root?.querySelector(query);if(!n||n.disabled)throw Error('unavailable '+query);n.scrollIntoView({block:'nearest'});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));n=(query.startsWith('[data-')?document.querySelector('.v-fixed-formation-panel'):document)?.querySelector(query);if(!n?.isConnected)throw Error('formation/control detached during synchronization');const b=n.getBoundingClientRect(),x=b.left+b.width/2,y=b.top+b.height/2,h=document.elementFromPoint(x,y);if(!(h===n||n.contains(h)))throw Error('occluded '+query+' '+JSON.stringify({box:b.toJSON(),hit:h?.outerHTML.slice(0,250)}));return {x,y};})()`);}
+ async function point(selector){return c.eval(`(async()=>{const query=${JSON.stringify(selector)},root=query.startsWith('[data-')?document.querySelector('.v-fixed-formation-panel'):document;let n=root?.querySelector(query);if(!n||n.disabled)throw Error('unavailable '+query);if(!n.closest('.v-fixed-formation-panel'))n.scrollIntoView({block:'nearest'});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));n=(query.startsWith('[data-')?document.querySelector('.v-fixed-formation-panel'):document)?.querySelector(query);if(!n?.isConnected)throw Error('formation/control detached during synchronization');const b=n.getBoundingClientRect(),x=b.left+b.width/2,y=b.top+b.height/2,h=document.elementFromPoint(x,y);if(!(h===n||n.contains(h)))throw Error('occluded '+query+' '+JSON.stringify({box:b.toJSON(),hit:h?.outerHTML.slice(0,250)}));return {x,y};})()`);}
  let mobile=true;
  async function press(p){if(mobile)await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[p]});else await c.send('Input.dispatchMouseEvent',{type:'mousePressed',...p,button:'left',clickCount:1});}
  async function release(p){if(mobile)await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});else await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',...p,button:'left',clickCount:1});}
@@ -94,12 +94,18 @@ try{
    await tap('[data-unit="hero:vajraHeavenlyKing"].formation-candidate');await tap('[data-slot="ALLY_B3"]');
    assert.equal(await c.eval(`FourSymbolsTeamFormation.getConfirmed().heroIdToSlot.divineDogHongbao`),'ALLY_B2');
   }
+  const beforeSwap=await c.eval('FourSymbolsTeamFormation.getConfirmed()');
   await drag('[data-unit="hero:divineDogHongbao"].v-fixed-formation-slot','[data-unit="hero:vajraHeavenlyKing"].v-fixed-formation-slot');
+  const afterSwap=await c.eval('FourSymbolsTeamFormation.getConfirmed()');
+  assert.equal(afterSwap.heroIdToSlot.divineDogHongbao,beforeSwap.heroIdToSlot.vajraHeavenlyKing);
+  assert.equal(afterSwap.heroIdToSlot.vajraHeavenlyKing,beforeSwap.heroIdToSlot.divineDogHongbao);
   assert.equal(await c.eval(`document.querySelectorAll('.formation-drag-preview').length`),0);
   const saved=await c.eval(`FourSymbolsTeamFormation.getConfirmed()`);assert.equal(new Set([...Object.values(saved.characterIndexToSlot),...Object.values(saved.heroIdToSlot)]).size,3);
   assert.equal(await c.eval(`FourSymbolsBattlefieldSlots.getAllySlotForCharacter(3)`),Object.entries(saved.heroIdToSlot).sort((a,b)=>Policy.slots.indexOf(a[1])-Policy.slots.indexOf(b[1]))[0][1]);
-  const fgeo=await c.eval(`(()=>{const box=document.querySelector('.formation-panel').getBoundingClientRect(),n=document.getElementById('formationContent');return {box:box.toJSON(),overflow:n.scrollWidth-n.clientWidth,bg:getComputedStyle(document.querySelector('.formation-battlefield')).backgroundImage};})()`);
+  const fgeo=await c.eval(`(()=>{const box=document.querySelector('.formation-panel').getBoundingClientRect(),n=document.getElementById('formationContent');return {box:box.toJSON(),overflow:n.scrollWidth-n.clientWidth,verticalOverflow:n.scrollHeight-n.clientHeight,scrollTop:n.scrollTop,bg:getComputedStyle(document.querySelector('.formation-battlefield')).backgroundImage};})()`);
   assert.ok(fgeo.box.right<=width+1&&fgeo.box.bottom<=height+1&&fgeo.overflow<=1,JSON.stringify(fgeo));assert.match(fgeo.bg,/forest\.jpg/);
+  assert.ok(Math.abs(fgeo.box.width/fgeo.box.height-9/16)<0.002,JSON.stringify(fgeo));
+  assert.ok(fgeo.verticalOverflow<=1&&fgeo.scrollTop===0,JSON.stringify(fgeo));
   await screenshot('formation-'+width);
   if(width===360){
    const before=await c.eval(`JSON.stringify(FourSymbolsTeamFormation.getConfirmed())`);
