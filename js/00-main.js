@@ -6262,7 +6262,7 @@ function updateCreationScreenContext(){
             "選擇你的元素之道，建立"+ordinal+"冒險者";
     }
 
-    if(submitLabel){
+    if(submitLabel&&!initialCharacterCreationPending){
         submitLabel.textContent=
             creationTargetSlot===1
             ? "開始冒險"
@@ -6790,6 +6790,14 @@ function createSecondCharacter(){
 ===================================================== */
 
 let initialCharacterCreationPending=false;
+function updateInitialCharacterCreationFeedback(message){
+    const button=$("creationSubmitButton"),label=$("creationSubmitLabel");
+    if(button){
+        button.disabled=initialCharacterCreationPending;
+        button.setAttribute("aria-busy",String(initialCharacterCreationPending));
+    }
+    if(label){label.textContent=message||(creationTargetSlot===1?"開始冒險":"完成創建");}
+}
 async function createCharacter(){
 
     if(creationTargetSlot===2 || creationTargetSlot===3){
@@ -6871,6 +6879,7 @@ async function createCharacter(){
         attributes:Object.fromEntries(Object.keys(creationStats).map(key=>
             [key,creationStats[key]]))};
     initialCharacterCreationPending=true;
+    updateInitialCharacterCreationFeedback("正在確認帳號…");
     try{
         const bootstrap=await firebase.bootstrapCloudSave();
         if(accountSave.getActiveUid()!==uid||
@@ -6878,6 +6887,7 @@ async function createCharacter(){
            accountSave.readForUid(uid).status!=="empty"){
             throw new Error("Account changed during creation.");
         }
+        updateInitialCharacterCreationFeedback("正在建立角色…");
         const committed=await firebase.createInitialCanonicalCharacter(
             selection,bootstrap.serverRevision);
         if(committed.authoritativeStateReady!==false||
@@ -6889,6 +6899,7 @@ async function createCharacter(){
         }
     }catch(error){
         initialCharacterCreationPending=false;
+        updateInitialCharacterCreationFeedback("創角未完成，請重試");
         console.error("受保護創角未完成；本機角色尚未建立。",error);
         const oldAccount=String(error&&error.message||"")
             .includes("Existing accounts require the original-device migration path");
@@ -6981,10 +6992,12 @@ async function createCharacter(){
         console.error("創角存檔失敗；角色未建立。",
             new Error("Account save commit failed."));
         initialCharacterCreationPending=false;
+        updateInitialCharacterCreationFeedback("創角未完成，請重試");
         return false;
     }
 
     initialCharacterCreationPending=false;
+    updateInitialCharacterCreationFeedback();
     window.FourSymbolsStartupPolicy.notifyCharacterCreated();
     $("creationPage").style.display="none";
     $("gameInterface").style.display="block";

@@ -60,13 +60,19 @@ test("additional character step one has a return action while first creation doe
         creationPrimaryNextButton:{hidden:false},
         creationAdditionalStepOneActions:{hidden:true}
     };
-    const context=vm.createContext({creationTargetSlot:1,$:id=>nodes[id]||null});
+    const context=vm.createContext({creationTargetSlot:1,initialCharacterCreationPending:false,$:id=>nodes[id]||null});
     vm.runInContext(extractFunction(main,"updateCreationScreenContext"),context);
 
     context.updateCreationScreenContext();
     assert.equal(nodes.creationPrimaryNextButton.hidden,false);
     assert.equal(nodes.creationAdditionalStepOneActions.hidden,true);
     assert.equal(nodes.creationCancelButton.hidden,true);
+
+    context.initialCharacterCreationPending=true;
+    nodes.creationSubmitLabel.textContent="正在建立角色…";
+    context.updateCreationScreenContext();
+    assert.equal(nodes.creationSubmitLabel.textContent,"正在建立角色…","context refresh preserves pending request feedback");
+    context.initialCharacterCreationPending=false;
 
     context.creationTargetSlot=2;
     context.updateCreationScreenContext();
