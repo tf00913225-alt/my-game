@@ -2176,6 +2176,41 @@ assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
 assert.equal((await recovery.restoreCurrent(ownedRequest,recoveryArgs)).unchanged,true);
 assert.equal((await invoke("restoreCanonicalCurrent",ownedUser.idToken,recoveryPayload))
     .unchanged,true);
+// Retried recovery must prove the original approval, audit and restored archive,
+// not merely an internally valid materialized snapshot. Emulator fixtures only.
+const recoveryAuditRef=ownedRoot.collection("recoveryAudits").doc(recoveryOperation);
+const recoveryReceiptRef=ownedRoot.collection("operations").doc(recoveryOperation);
+const recoveryBefore=(await db.doc(`users/${ownedUid}/saves/current`).get()).data();
+for(const [ref,patch] of [
+    [recoveredOwnedArchive.ref,null],
+    [recoveredOwnedArchive.ref,{"sourceRecords.economy.gold":999}],
+    [recoveredOwnedArchive.ref,{readyForRestore:true}],
+    [approvalRef,{ownerUid:"other-recovery-owner"}],
+    [approvalRef,{sourceRevision:5}],
+    [approvalRef,{sourceSha256:"a".repeat(64)}],
+    [approvalRef,{snapshotSha256:"b".repeat(64)}],
+    [approvalRef,{approvedBy:"other-operator"}],
+    [recoveryAuditRef,{kind:"other-operation"}],
+    [recoveryAuditRef,{sourceSha256:"a".repeat(64)}],
+    [recoveryAuditRef,{approvedBy:"other-operator"}],
+    [recoveryAuditRef,{authoritativeStateReady:true}],
+    [recoveryReceiptRef,{authoritativeStateReady:true}]
+]){
+    const original=(await ref.get()).data();
+    if(patch===null){await ref.delete();}else{await ref.update(patch);}
+    await assert.rejects(invoke("restoreCanonicalCurrent",ownedUser.idToken,recoveryPayload),
+        error=>["data-loss","DATA_LOSS"].includes(error.code));
+    assert.deepEqual((await db.doc(`users/${ownedUid}/saves/current`).get()).data(),recoveryBefore);
+    if(patch===null){assert.equal((await ref.get()).exists,false);}
+    await ref.set(original);
+}
+const usedApproval=(await approvalRef.get()).data();
+await approvalRef.update({expiresAt:Timestamp.fromMillis(Date.now()-1000)});
+assert.equal((await invoke("restoreCanonicalCurrent",ownedUser.idToken,recoveryPayload)).unchanged,true);
+await approvalRef.set(usedApproval);
+assert.equal((await recoveredOwnedArchive.ref.get()).get("readyForRestore"),false);
+assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("authoritativeStateReady"),false);
+console.log("Recovery replay original evidence real Firestore PASS: missing/corrupt archive, approval/audit tampering refused; expired original replay retained without revision or authority changes.");
 assert.equal((await goldWriter.creditReservedGrant(ownedRequest,{
     grantId:ownedGrant,operationId:ownedCreditOperation,expectedRevision:3}))
     .unchanged,true);
