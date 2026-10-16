@@ -16,6 +16,9 @@ function load(){
   vm.runInContext(`
     prepareWildBalanceReferenceParty(100,3);autoBattle=false;autoPatrolEnabled=false;
     saveGame=()=>{};updateUI=()=>{};renderPlayers=()=>{};populateSkillQuickBar=()=>{};
+    // Source lifecycle tests settle the presentation boundary explicitly;
+    // physical/browser QA separately verifies the real Animation.finished path.
+    window.v141PresentBattleWave=({replace,complete})=>{replace();complete();return ()=>{};};
     window.__frames=[];window.__outcomes=[];window.__events=[];
     FourSymbolsCombatEvents.subscribe('battle_start',event=>__events.push(event));
     renderBattle=()=>{
