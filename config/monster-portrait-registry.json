@@ -73,7 +73,7 @@
     "portraitTargets": 205,
     "existingTargets": 159,
     "plannedTargets": 46,
-    "uniqueRuntimeNames": 181,
+    "uniqueRuntimeNames": 201,
     "assetPoolCounts": {
       "normal": 10,
       "elite": 19,
@@ -1773,7 +1773,7 @@
     "tower-water": [
       [
         "tower.water.normal-04",
-        "天兵天將",
+        "踏波釣叟",
         "water",
         "regular",
         "standard",
@@ -1782,7 +1782,7 @@
       ],
       [
         "tower.water.normal-05",
-        "天兵天將",
+        "踏浪槍客",
         "water",
         "regular",
         "standard",
@@ -1791,7 +1791,7 @@
       ],
       [
         "tower.water.normal-10",
-        "天兵天將",
+        "溺骨刀卒",
         "water",
         "regular",
         "standard",
@@ -1800,7 +1800,7 @@
       ],
       [
         "tower.water.normal-13",
-        "天兵天將",
+        "潮刃浪客",
         "water",
         "regular",
         "standard",
@@ -1809,7 +1809,7 @@
       ],
       [
         "tower.water.normal-14",
-        "天兵天將",
+        "泉甲石衛",
         "water",
         "regular",
         "standard",
@@ -1818,7 +1818,7 @@
       ],
       [
         "tower.water.normal-16",
-        "天兵天將",
+        "斷潮熊衛",
         "water",
         "regular",
         "standard",
@@ -1827,7 +1827,7 @@
       ],
       [
         "tower.water.normal-17",
-        "天兵天將",
+        "碧潮機兵",
         "water",
         "regular",
         "standard",
@@ -1836,7 +1836,7 @@
       ],
       [
         "tower.water.normal-18",
-        "天兵天將",
+        "浪槳獺卒",
         "water",
         "regular",
         "standard",
@@ -1845,7 +1845,7 @@
       ],
       [
         "tower.water.normal-19",
-        "天兵天將",
+        "蓮苞藤妖",
         "water",
         "regular",
         "standard",
@@ -1854,7 +1854,7 @@
       ],
       [
         "tower.water.normal-20",
-        "天兵天將",
+        "寒鰓槍卒",
         "water",
         "regular",
         "standard",
@@ -1863,7 +1863,7 @@
       ],
       [
         "tower.water.elite-01",
-        "天兵天將",
+        "霜鬃獅衛",
         "water",
         "elite",
         "standard",
@@ -1872,7 +1872,7 @@
       ],
       [
         "tower.water.elite-02",
-        "天兵天將",
+        "沼甲槍衛",
         "water",
         "elite",
         "standard",
@@ -1881,7 +1881,7 @@
       ],
       [
         "tower.water.elite-03",
-        "天兵天將",
+        "冰晶巫后",
         "water",
         "elite",
         "standard",
@@ -1890,7 +1890,7 @@
       ],
       [
         "tower.water.elite-04",
-        "天兵天將",
+        "沉鉤浪客",
         "water",
         "elite",
         "standard",
@@ -1899,7 +1899,7 @@
       ],
       [
         "tower.water.elite-05",
-        "天兵天將",
+        "寒鬃狼衛",
         "water",
         "elite",
         "standard",
@@ -1908,7 +1908,7 @@
       ],
       [
         "tower.water.elite-06",
-        "天兵天將",
+        "殘盔刀魂",
         "water",
         "elite",
         "standard",
@@ -1917,7 +1917,7 @@
       ],
       [
         "tower.water.elite-07",
-        "天兵天將",
+        "礁甲蟹衛",
         "water",
         "elite",
         "standard",
@@ -1926,7 +1926,7 @@
       ],
       [
         "tower.water.elite-08",
-        "天兵天將",
+        "玄潮甲衛",
         "water",
         "elite",
         "standard",
@@ -1935,7 +1935,7 @@
       ],
       [
         "tower.water.elite-09",
-        "天兵天將",
+        "霜鬚槍侯",
         "water",
         "elite",
         "standard",
@@ -1944,7 +1944,7 @@
       ],
       [
         "tower.water.elite-10",
-        "天兵天將",
+        "裂潮熊衛",
         "water",
         "elite",
         "standard",

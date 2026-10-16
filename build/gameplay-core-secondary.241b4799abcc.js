@@ -3939,9 +3939,11 @@
         })();
     }
     window.v154ResolveMonsterPortraitRecord=resolveMonsterPortraitRecord;
-    window.v154BindMonsterPortraitIdentity=function(monster){
-        const record=monster&&monsterPortraitByKey.get(monster.portraitKey);
-        if(record&&record.group==="assetPool"&&record.assetClass!=="shared-npc"){
+    window.v154BindMonsterPortraitIdentity=function(monster,resolvedRecord){
+        const record=resolvedRecord||(monster&&monsterPortraitByKey.get(monster.portraitKey));
+        const waterTower=record&&record.element==="water"&&monster.vGameplayTower===true&&monster.element==="water"&&
+            (record.group==="tower-water"||record.group==="wild");
+        if(record&&((record.group==="assetPool"&&record.assetClass!=="shared-npc")||waterTower)){
             monster.name=record.name;
             monster.displayName=record.name;
         }
@@ -4011,9 +4013,8 @@
                     ?window.FourSymbolsFeatures.ensureAssets([record.path])
                     :Promise.reject(new Error("feature asset decoder unavailable"));
                 return assets.then(()=>{
-                    // Only an explicit adopted asset establishes a Tower identity.
-                    const name=record.group==="assetPool"&&record.assetClass!=="shared-npc"?record.name:null;
-                    if(name){ monster.name=name;monster.displayName=name; }
+                    // Bind the explicit Registry identity after preparation, including a cold water Tower entry.
+                    window.v154BindMonsterPortraitIdentity(monster,record);
                     monster.portraitPath=record.path;
                     return {state:"ready",monster:monster,record:record};
                 }).catch(error=>({state:"failed",monster:monster,record:record,error:error}));

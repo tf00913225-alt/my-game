@@ -50,7 +50,7 @@
       "gameplay-core": {
         "scripts": [
           "build/gameplay-core-primary.c2a197963b5d.js",
-          "build/gameplay-core-secondary.bc41352f7fc0.js"
+          "build/gameplay-core-secondary.241b4799abcc.js"
         ],
         "styles": [
           "build/gameplay-core.ba578e9c70a2.css"
@@ -802,9 +802,9 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core-secondary.bc41352f7fc0.js",
-        "sha256": "bc41352f7fc0",
-        "bytes": 730788,
+        "path": "build/gameplay-core-secondary.241b4799abcc.js",
+        "sha256": "241b4799abcc",
+        "bytes": 730942,
         "priority": "P2",
         "type": "script",
         "decode": false
@@ -818,8 +818,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "757def74cef2",
-    "totalBytes": 21887610,
+    "manifestHash": "2530656435bf",
+    "totalBytes": 21887764,
     "totalResources": 78
   },
   "assets": {
@@ -835,9 +835,9 @@
       "sha256": "c2a197963b5d",
       "bytes": 664033
     },
-    "build/gameplay-core-secondary.bc41352f7fc0.js": {
-      "sha256": "bc41352f7fc0",
-      "bytes": 730788
+    "build/gameplay-core-secondary.241b4799abcc.js": {
+      "sha256": "241b4799abcc",
+      "bytes": 730942
     },
     "build/feature-patrol.ab5bd3ce5582.js": {
       "sha256": "ab5bd3ce5582",
@@ -1266,7 +1266,7 @@
     "water": [
       {
         "assetId": "tower.water.normal-04",
-        "displayName": "天兵天將",
+        "displayName": "踏波釣叟",
         "path": "assets/monsters/tower/water/normal-04.webp",
         "sha256": "c1a60bf52dbd",
         "bytes": 1498546,
@@ -1274,7 +1274,7 @@
       },
       {
         "assetId": "tower.water.normal-05",
-        "displayName": "天兵天將",
+        "displayName": "踏浪槍客",
         "path": "assets/monsters/tower/water/normal-05.webp",
         "sha256": "06ed78b35240",
         "bytes": 1572640,
@@ -1282,7 +1282,7 @@
       },
       {
         "assetId": "tower.water.normal-10",
-        "displayName": "天兵天將",
+        "displayName": "溺骨刀卒",
         "path": "assets/monsters/tower/water/normal-10.webp",
         "sha256": "d04f2d6e3b74",
         "bytes": 1829630,
@@ -1290,7 +1290,7 @@
       },
       {
         "assetId": "tower.water.normal-13",
-        "displayName": "天兵天將",
+        "displayName": "潮刃浪客",
         "path": "assets/monsters/tower/water/normal-13.webp",
         "sha256": "bedc665d3ee4",
         "bytes": 1654690,
@@ -1298,7 +1298,7 @@
       },
       {
         "assetId": "tower.water.normal-14",
-        "displayName": "天兵天將",
+        "displayName": "泉甲石衛",
         "path": "assets/monsters/tower/water/normal-14.webp",
         "sha256": "16b5fa1addce",
         "bytes": 1843228,
@@ -1306,7 +1306,7 @@
       },
       {
         "assetId": "tower.water.normal-16",
-        "displayName": "天兵天將",
+        "displayName": "斷潮熊衛",
         "path": "assets/monsters/tower/water/normal-16.webp",
         "sha256": "9da6fe464811",
         "bytes": 2057264,
@@ -1314,7 +1314,7 @@
       },
       {
         "assetId": "tower.water.normal-17",
-        "displayName": "天兵天將",
+        "displayName": "碧潮機兵",
         "path": "assets/monsters/tower/water/normal-17.webp",
         "sha256": "7eafcba67960",
         "bytes": 1982718,
@@ -1322,7 +1322,7 @@
       },
       {
         "assetId": "tower.water.normal-18",
-        "displayName": "天兵天將",
+        "displayName": "浪槳獺卒",
         "path": "assets/monsters/tower/water/normal-18.webp",
         "sha256": "8cb7d67a71d2",
         "bytes": 1802224,
@@ -1330,7 +1330,7 @@
       },
       {
         "assetId": "tower.water.normal-19",
-        "displayName": "天兵天將",
+        "displayName": "蓮苞藤妖",
         "path": "assets/monsters/tower/water/normal-19.webp",
         "sha256": "13792ce55981",
         "bytes": 1730032,
@@ -1338,7 +1338,7 @@
       },
       {
         "assetId": "tower.water.normal-20",
-        "displayName": "天兵天將",
+        "displayName": "寒鰓槍卒",
         "path": "assets/monsters/tower/water/normal-20.webp",
         "sha256": "7eb68cb48341",
         "bytes": 1762430,
@@ -1346,7 +1346,7 @@
       },
       {
         "assetId": "tower.water.elite-01",
-        "displayName": "天兵天將",
+        "displayName": "霜鬃獅衛",
         "path": "assets/monsters/tower/water/elite-01.webp",
         "sha256": "e8e9cd08351a",
         "bytes": 1970888,
@@ -1354,7 +1354,7 @@
       },
       {
         "assetId": "tower.water.elite-02",
-        "displayName": "天兵天將",
+        "displayName": "沼甲槍衛",
         "path": "assets/monsters/tower/water/elite-02.webp",
         "sha256": "a467be5569c4",
         "bytes": 1996284,
@@ -1362,7 +1362,7 @@
       },
       {
         "assetId": "tower.water.elite-03",
-        "displayName": "天兵天將",
+        "displayName": "冰晶巫后",
         "path": "assets/monsters/tower/water/elite-03.webp",
         "sha256": "8c1607d8bf62",
         "bytes": 1821882,
@@ -1370,7 +1370,7 @@
       },
       {
         "assetId": "tower.water.elite-04",
-        "displayName": "天兵天將",
+        "displayName": "沉鉤浪客",
         "path": "assets/monsters/tower/water/elite-04.webp",
         "sha256": "b6769244725a",
         "bytes": 1625224,
@@ -1378,7 +1378,7 @@
       },
       {
         "assetId": "tower.water.elite-05",
-        "displayName": "天兵天將",
+        "displayName": "寒鬃狼衛",
         "path": "assets/monsters/tower/water/elite-05.webp",
         "sha256": "4851214c6204",
         "bytes": 1890514,
@@ -1386,7 +1386,7 @@
       },
       {
         "assetId": "tower.water.elite-06",
-        "displayName": "天兵天將",
+        "displayName": "殘盔刀魂",
         "path": "assets/monsters/tower/water/elite-06.webp",
         "sha256": "dd8ae3d5bf31",
         "bytes": 1897494,
@@ -1394,7 +1394,7 @@
       },
       {
         "assetId": "tower.water.elite-07",
-        "displayName": "天兵天將",
+        "displayName": "礁甲蟹衛",
         "path": "assets/monsters/tower/water/elite-07.webp",
         "sha256": "3aa904f8f0c3",
         "bytes": 1827698,
@@ -1402,7 +1402,7 @@
       },
       {
         "assetId": "tower.water.elite-08",
-        "displayName": "天兵天將",
+        "displayName": "玄潮甲衛",
         "path": "assets/monsters/tower/water/elite-08.webp",
         "sha256": "bc0218787e45",
         "bytes": 1958020,
@@ -1410,7 +1410,7 @@
       },
       {
         "assetId": "tower.water.elite-09",
-        "displayName": "天兵天將",
+        "displayName": "霜鬚槍侯",
         "path": "assets/monsters/tower/water/elite-09.webp",
         "sha256": "f57c18919498",
         "bytes": 1764724,
@@ -1418,7 +1418,7 @@
       },
       {
         "assetId": "tower.water.elite-10",
-        "displayName": "天兵天將",
+        "displayName": "裂潮熊衛",
         "path": "assets/monsters/tower/water/elite-10.webp",
         "sha256": "e712ada88d66",
         "bytes": 2074524,
