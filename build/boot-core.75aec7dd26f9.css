@@ -3951,7 +3951,7 @@ button:active{
 .status-number{
     flex:1;
     text-align:center;
-    font-size:13px;
+    font-size:calc(15 * var(--ui-length-unit,1px));
     white-space:nowrap;
 }
 
