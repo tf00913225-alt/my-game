@@ -29,7 +29,7 @@ const factorySource=name=>{
 const balanceCalls=[];
 const context={
   FIRE_TOWER_PORTRAIT_PLAN:registry.fireTowerCoverage,
-  WIND_TOWER_PORTRAIT_PLAN:{},EARTH_TOWER_PORTRAIT_PLAN:{},
+  WIND_TOWER_PORTRAIT_PLAN:{},EARTH_TOWER_PORTRAIT_PLAN:{},WATER_TOWER_PORTRAIT_PLAN:registry.waterTowerCoverage,
   window:{v154BindMonsterPortraitIdentity(monster){
     const entry=pool.find(e=>e.assetId===monster.portraitKey);
     assert.ok(entry,"formal fire key absent from Registry");

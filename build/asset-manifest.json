@@ -102,7 +102,7 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.e0f23aef2d9c.js",
+          "build/feature-boss-relic.caaaa748a2e9.js",
           "build/feature-relic-progression.464cd8f702a6.js"
         ],
         "styles": [
@@ -847,9 +847,9 @@
       "sha256": "a4c94d6d868f",
       "bytes": 49892
     },
-    "build/feature-boss-relic.e0f23aef2d9c.js": {
-      "sha256": "e0f23aef2d9c",
-      "bytes": 90055
+    "build/feature-boss-relic.caaaa748a2e9.js": {
+      "sha256": "caaaa748a2e9",
+      "bytes": 90974
     },
     "build/feature-relic-progression.464cd8f702a6.js": {
       "sha256": "464cd8f702a6",
@@ -1264,6 +1264,166 @@
       }
     ],
     "water": [
+      {
+        "assetId": "tower.water.normal-04",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/normal-04.webp",
+        "sha256": "c1a60bf52dbd",
+        "bytes": 1498546,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.normal-05",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/normal-05.webp",
+        "sha256": "06ed78b35240",
+        "bytes": 1572640,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.normal-10",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/normal-10.webp",
+        "sha256": "d04f2d6e3b74",
+        "bytes": 1829630,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.normal-13",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/normal-13.webp",
+        "sha256": "bedc665d3ee4",
+        "bytes": 1654690,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.normal-14",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/normal-14.webp",
+        "sha256": "16b5fa1addce",
+        "bytes": 1843228,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.normal-16",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/normal-16.webp",
+        "sha256": "9da6fe464811",
+        "bytes": 2057264,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.normal-17",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/normal-17.webp",
+        "sha256": "7eafcba67960",
+        "bytes": 1982718,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.normal-18",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/normal-18.webp",
+        "sha256": "8cb7d67a71d2",
+        "bytes": 1802224,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.normal-19",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/normal-19.webp",
+        "sha256": "13792ce55981",
+        "bytes": 1730032,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.normal-20",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/normal-20.webp",
+        "sha256": "7eb68cb48341",
+        "bytes": 1762430,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.elite-01",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/elite-01.webp",
+        "sha256": "e8e9cd08351a",
+        "bytes": 1970888,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.elite-02",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/elite-02.webp",
+        "sha256": "a467be5569c4",
+        "bytes": 1996284,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.elite-03",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/elite-03.webp",
+        "sha256": "8c1607d8bf62",
+        "bytes": 1821882,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.elite-04",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/elite-04.webp",
+        "sha256": "b6769244725a",
+        "bytes": 1625224,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.elite-05",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/elite-05.webp",
+        "sha256": "4851214c6204",
+        "bytes": 1890514,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.elite-06",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/elite-06.webp",
+        "sha256": "dd8ae3d5bf31",
+        "bytes": 1897494,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.elite-07",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/elite-07.webp",
+        "sha256": "3aa904f8f0c3",
+        "bytes": 1827698,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.elite-08",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/elite-08.webp",
+        "sha256": "bc0218787e45",
+        "bytes": 1958020,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.elite-09",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/elite-09.webp",
+        "sha256": "f57c18919498",
+        "bytes": 1764724,
+        "decode": true
+      },
+      {
+        "assetId": "tower.water.elite-10",
+        "displayName": "天兵天將",
+        "path": "assets/monsters/tower/water/elite-10.webp",
+        "sha256": "e712ada88d66",
+        "bytes": 2074524,
+        "decode": true
+      },
       {
         "assetId": "wild.zone-01.water-01",
         "displayName": "水靈狐",

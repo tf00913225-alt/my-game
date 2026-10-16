@@ -29,7 +29,7 @@ for(const row of rows){
     assert.equal(entry.runtime.path,row[fields.path]);
 }
 
-assert.deepEqual(new Set((manifest.runtimePortraits.water||[]).map(entry=>entry.assetId)),new Set(rows.map(row=>row[fields.portraitKey])));
+assert.deepEqual(new Set((manifest.runtimePortraits.water||[]).filter(entry=>entry.assetId.startsWith("wild.")).map(entry=>entry.assetId)),new Set(rows.map(row=>row[fields.portraitKey])));
 assert.ok(manifest.runtimePortraits.fire.every(entry=>!String(entry.assetId).includes(".water-")),"fire manifest must exclude water wild portraits");
 assert.ok(manifest.runtimePortraits.wind.every(entry=>!String(entry.assetId).includes(".water-")),"wind manifest must exclude water wild portraits");
 assert.equal(registry.groups.wild.filter(row=>row[fields.element]==="water"&&row[fields.status]==="planned").length,8,"second water identities remain planned");
