@@ -84,7 +84,9 @@ function createCanonicalRecoveryApproval({db,Timestamp,HttpsError,inspectExistin
 
             if(approval.exists){
                 const existing=approval.data();
-                if(existing.ownerUid!==ownerUid||existing.operationId!==operationId||
+                if(existing.schemaVersion!==1||
+                   existing.kind!=="canonical-current-recovery-approval"||
+                   existing.ownerUid!==ownerUid||existing.operationId!==operationId||
                    existing.sourceRevision!==sourceRevision||
                    existing.sourceSha256!==sourceSha256||
                    existing.snapshotSha256!==snapshotSha256||

@@ -7,6 +7,7 @@ const {makeInitialCharacterSources}=require("../functions/src/initial-character-
 const {assembleCanonicalSnapshot,claimRecordsDigest}=require("../functions/src/canonical-snapshot.js");
 const {createRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
 const {createCanonicalCurrentRecovery}=require("../functions/src/canonical-current-recovery.js");
+const {createCanonicalRecoveryApproval}=require("../functions/src/canonical-recovery-approval.js");
 const uid="recovery-owner",root=`serverUsers/${uid}`;
 const args={operationId:"recover-original-proof-0001",expectedRevision:6};
 const selection={displayName:"英雄",element:"fire",gender:"female",
@@ -45,15 +46,17 @@ function harness(){
         [`${root}/recoveryApprovals/${args.operationId}`,approval]
     ]);
     const ref=path=>({path,collection:name=>collection(`${path}/${name}`)});
-    const collection=path=>({doc:id=>ref(`${path}/${id}`)});
+    const collection=path=>({path,query:true,doc:id=>ref(`${path}/${id}`)});
     let writes=0,revoked=false;
-    const tx={get:async ref=>{const value=data.get(ref.path);return {
+    const tx={get:async ref=>{if(ref.query)return {size:0,docs:[]};
+        const value=data.get(ref.path);return {
         exists:value!==undefined,data:()=>value,get:key=>value?.[key]};}};
     for(const name of ["create","set","update","delete"]){
         tx[name]=()=>{writes++;throw Error("Replay attempted a write");};
     }
     class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
-    const recovery=createCanonicalCurrentRecovery({db:{collection},FieldValue:{},HttpsError,
+    const recovery=createCanonicalCurrentRecovery({db:{collection},
+        FieldValue:{serverTimestamp:()=>"test-server-stamp"},HttpsError,
         runProtected:(_request,operation)=>{
             if(revoked)throw new HttpsError("permission-denied","SESSION_REVOKED");
             return operation(tx,{uid});
@@ -110,4 +113,59 @@ test("retry still requires active session and refuses a public ready account",as
     const ready=harness();ready.data.get(`users/${uid}/saves/current`).authoritativeStateReady=true;
     await assert.rejects(ready.recovery.restoreCurrent({},args),error=>error.code==="failed-precondition");
     assert.equal(h.writes(),0);assert.equal(ready.writes(),0);
+});
+
+function pending(h){
+    h.data.get(`users/${uid}/saves/current`).serverRevision=6;
+    h.data.delete(`${root}/operations/${args.operationId}`);
+    h.data.delete(`${root}/recoveryAudits/${args.operationId}`);
+    const approval=h.data.get(`${root}/recoveryApprovals/${args.operationId}`);
+    approval.status="approved";
+    delete approval.usedRevision;
+    approval.expiresAt={toMillis:()=>Date.parse("2026-12-01T00:00:00Z")};
+    return approval;
+}
+function issuer(h){
+    class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
+    const ref=path=>({path,collection:name=>collection(`${path}/${name}`)});
+    const collection=path=>({doc:id=>ref(`${path}/${id}`)});
+    const tx={get:async ref=>{const value=h.data.get(ref.path);return {
+        exists:value!==undefined,data:()=>value,get:key=>value?.[key]};},
+    create:()=>{throw Error("Existing approval must never be regenerated");}};
+    return createCanonicalRecoveryApproval({db:{collection,runTransaction:operation=>operation(tx)},
+        Timestamp:{fromMillis:ms=>({toMillis:()=>ms})},HttpsError,
+        inspectExistingEnvelope:record=>({kind:"current",serverRevision:record.serverRevision,data:record}),
+        now:()=>Date.parse("2026-11-01T00:00:00Z")});
+}
+const approvalRequest={auth:{uid:"operator-original",token:{cloudSaveOperator:true}},
+    data:{ownerUid:uid,operationId:args.operationId,sourceRevision:6}};
+test("operator issuance replay rejects missing or unsupported approval schema and kind without regeneration",async()=>{
+    for(const patch of [{schemaVersion:undefined},{schemaVersion:2},{kind:undefined},
+        {kind:"canonical-current-recovery"}]){
+        const h=harness();Object.assign(pending(h),patch);
+        const before=JSON.stringify([...h.data]);
+        await assert.rejects(issuer(h).issue(approvalRequest),error=>error.code==="data-loss");
+        assert.equal(JSON.stringify([...h.data]),before);assert.equal(h.writes(),0);
+    }
+});
+test("valid existing operator approval remains read-only with its original expiry",async()=>{
+    const h=harness(),approval=pending(h),before=JSON.stringify([...h.data]);
+    const result=await issuer(h).issue(approvalRequest);
+    assert.equal(result.unchanged,true);assert.equal(result.approved,true);
+    assert.equal(result.expiresAtMs,approval.expiresAt.toMillis());
+    assert.equal(JSON.stringify([...h.data]),before);assert.equal(h.writes(),0);
+});
+test("first recovery rejects wrong-kind or missing-kind approval before canonical writes",async()=>{
+    for(const kind of [undefined,"canonical-current-recovery"]){
+        const h=harness();pending(h).kind=kind;
+        const before=JSON.stringify([...h.data]);
+        await assert.rejects(h.recovery.restoreCurrent({},args),error=>error.code==="permission-denied");
+        assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
+    }
+});
+test("used recovery approval must retain its original kind on historical retry",async()=>{
+    for(const kind of [undefined,"canonical-current-recovery"]){
+        const h=harness();h.data.get(`${root}/recoveryApprovals/${args.operationId}`).kind=kind;
+        await reject(h);
+    }
 });
