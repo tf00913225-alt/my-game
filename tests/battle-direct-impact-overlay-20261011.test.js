@@ -202,6 +202,8 @@ assert.doesNotMatch(source,/killMonster=function/,'V143 does not defer core deat
   winBattle(){f.context.emitCombatEvent('battle_end',{});f.context.battleActive=false;}});
  const killStart=main.indexOf('function killMonster('),endStart=main.indexOf('function checkBattleEnd(');
  const waveGuard=main.match(/^function requestBattleWaveTransition\([\s\S]*?^\}/m);
+ f.context.battleEscapePendingToken=null;
+ vm.runInContext(main.match(/^function isBattleEscapePending\([^\n]+/m)[0],f.context);
  assert.ok(waveGuard,'terminal fixture loads the formal optional-wave guard');
  vm.runInContext(waveGuard[0]+main.slice(killStart,main.indexOf('\n/*',killStart))+main.slice(endStart,main.indexOf('\nfunction applyPostBattleAutoRecovery(',endStart)),f.context);
  f.context.settleBattleHpDamage(f.entities[0],1,{});f.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');

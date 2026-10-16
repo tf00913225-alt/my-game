@@ -170,6 +170,8 @@ actionContext.winBattle=()=>{winCount++;actionContext.battleActive=false;};
 actionContext.loseBattle=()=>{throw new Error('living party cannot lose');};
 // This fixture is a one-wave battle; use the same core optional-wave guard.
 actionContext.battleWaveState=null;
+actionContext.battleEscapePendingToken=null;
+vm.runInContext(main.match(/^function isBattleEscapePending\([^\n]+/m)[0],actionContext);
 vm.runInContext(main.match(/^function requestBattleWaveTransition\([\s\S]*?^\}/m)[0],actionContext);
 vm.runInContext(end,actionContext);
 assert.equal(actionContext.checkBattleEnd(),false,'surviving sixth enemy prevents early victory');

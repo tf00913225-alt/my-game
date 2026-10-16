@@ -3996,6 +3996,7 @@
         monsters=monsterList.slice();
         currentZone="dungeon";
 
+        window.FourSymbolsBattleWaves.dispose();
         initializeHeroBattleCombatants();
         battleActive=true;
         battleToken++;
@@ -4092,6 +4093,7 @@
         const run=window.v132ActiveDungeonRun;
         if(!run){ return false; }
         battleActive=false;
+        window.FourSymbolsBattleWaves.dispose();
         clearBattleRoundPrompt();
         finishBattleStatisticsSession(String(reason||"escape"));
         autoBattle=false;

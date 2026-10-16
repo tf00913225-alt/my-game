@@ -4220,6 +4220,21 @@ const AUTO_DECISION_DELAY_MS=50;
 /* Same-battle Wave Controller. Content owns rosters; the core owns lifecycle.
    No new Session, opening event, resource reset, or independent timer is allowed. */
 let battleWaveState=null;
+let battleEscapePendingToken=null;
+function isBattleEscapePending(){ return battleEscapePendingToken===battleToken; }
+function beginSuccessfulBattleEscape(){
+    battleEscapePendingToken=battleToken;
+    clearBattleActionWatchdog();
+    if(battleAdvanceTimeoutId){clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;}
+    battleAdvanceScheduled=false;
+    battleResolutionResumeToken=null;battleInputResumeToken=null;battleAutoActionResume=null;
+    queuedPlayerActions={};initiativeQueue=[];
+    cancelBattleWavePresentation();battleWaveState=null;
+}
+function disposeBattleWaves(){
+    cancelBattleWavePresentation();battleWaveState=null;
+    battleEscapePendingToken=null;
+}
 function validateBattleWaves(mode,waves){
     if(!waves){ return; }
     if(!["abyss","tower"].includes(mode)||!Array.isArray(waves)||waves.length!==2||
@@ -4233,6 +4248,7 @@ function validateBattleWaves(mode,waves){
 }
 function initializeBattleWaves(mode,waves){
     validateBattleWaves(mode,waves);
+    battleEscapePendingToken=null;
     battleWaveState=waves?{token:battleToken,mode:mode,waves:waves.map(row=>row.slice()),
         index:0,phase:"WAVE_1_ACTIVE",actionFinished:false,nextPrepared:false,roundEnded:false,roundStarting:false}:null;
     if(!battleWaveState){ return; }
@@ -4251,6 +4267,7 @@ function isBattleWaveTransition(){
     return !!(battleWaveState&&battleWaveState.token===battleToken&&battleWaveState.phase==="WAVE_TRANSITION");
 }
 function requestBattleWaveTransition(){
+    if(isBattleEscapePending()){ return false; }
     const state=battleWaveState;
     if(!state||state.token!==battleToken||state.phase==="BATTLE_COMPLETE"){ return false; }
     if(state.phase==="WAVE_TRANSITION"){ return true; }
@@ -4267,7 +4284,7 @@ function battleWaveHudText(){
 }
 function commitBattleWaveTransition(){
     const state=battleWaveState;
-    if(!battleActive||!isBattleWaveTransition()||!state.actionFinished||!state.nextPrepared||battlePresentationLocks.size){ return false; }
+    if(!battleActive||isBattleEscapePending()||!isBattleWaveTransition()||!state.actionFinished||!state.nextPrepared||battlePresentationLocks.size){ return false; }
     if(state.presentationPending){ return false; }
     state.presentationPending=true;
     state.presentation="exit";
@@ -4342,6 +4359,7 @@ if(typeof window!=="undefined"){
     window.FourSymbolsBattleWaves=Object.freeze({
         validate:validateBattleWaves,
         initialize:initializeBattleWaves,
+        dispose:disposeBattleWaves,
         getState:()=>battleWaveState?{phase:battleWaveState.phase,index:battleWaveState.index,token:battleWaveState.token,presentation:battleWaveState.presentation||null}:null
     });
 }
@@ -4609,7 +4627,7 @@ if(typeof window!=="undefined"){
 }
 
 function resumeBattleAfterPresentationLocks(){
-    if(battlePresentationLocks.size>0||!battleActive){ return; }
+    if(battlePresentationLocks.size>0||!battleActive||isBattleEscapePending()){ return; }
 
     if(
         battleAutoActionResume&&
@@ -11685,7 +11703,7 @@ function startBattle(triggerIndex){
 function startTurn(token){
 
     if(
-        !battleActive ||
+        !battleActive || isBattleEscapePending() ||
         token!==battleToken
     ){
         return;
@@ -13843,7 +13861,7 @@ function startResolutionPhase(token){
 function processNextCombatant(token){
 
     if(
-        !battleActive ||
+        !battleActive || isBattleEscapePending() ||
         token!==battleToken
     ){
         return;
@@ -18086,6 +18104,7 @@ function windArrowAttack(){
 ===================================================== */
 
 function finishPlayerAction(){
+    if(isBattleEscapePending()){ return; }
 
     battleStatisticsFinishAction();
     if(interceptBattleActionFinish()){
@@ -19105,6 +19124,7 @@ function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
 ===================================================== */
 
 function checkBattleEnd(afterAction=false){
+    if(isBattleEscapePending()){ return true; }
 
     if(!battleActive){
         return true;
@@ -19698,6 +19718,8 @@ function attemptEscape(){
 */
 
 function resolveEscapeAttempt(characterIndex){
+    if(!battleActive||isBattleEscapePending()){ return; }
+    const escapeToken=battleToken;
 
     clearInterval(timerId);
     timerId=null;
@@ -19709,6 +19731,7 @@ function resolveEscapeAttempt(characterIndex){
     const escapingCharacter=getPartyCharacterByIndex(characterIndex)||player;
     const chance=Math.max(10,Math.min(95,50+(escapingCharacter.level-highestLevel)*5));
     const succeeded=Math.random()*100<chance;
+    if(succeeded){beginSuccessfulBattleEscape();}
     const presentationOwner=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
     const feedbackOwner=typeof window!=="undefined"?window.FourSymbolsBattleFloatingFeedback:null;
     const motion=presentationOwner&&typeof presentationOwner.playEscape==="function"
@@ -19721,21 +19744,26 @@ function resolveEscapeAttempt(characterIndex){
     if(!succeeded){
         addBattleLog("逃脫失敗！");
         Promise.resolve(motion).then(()=>{
+            if(!battleActive||battleToken!==escapeToken){ return; }
             const feedback=feedbackOwner&&typeof feedbackOwner.emitEscapeFailure==="function"
                 ?feedbackOwner.emitEscapeFailure(characterIndex)
                 :null;
             return feedback&&feedback.promise?feedback.promise:Promise.resolve();
         }).then(()=>{
-            if(typeof battleActive==="undefined"||battleActive){ finishPlayerAction(); }
+            if(battleActive&&battleToken===escapeToken){ finishPlayerAction(); }
         }).catch(()=>{
-            if(typeof battleActive==="undefined"||battleActive){ finishPlayerAction(); }
+            if(battleActive&&battleToken===escapeToken){ finishPlayerAction(); }
         });
         return;
     }
 
     addBattleLog("成功逃脫！");
     Promise.resolve(motion).then(()=>{
+        if(!battleActive||battleToken!==escapeToken){ return; }
+        let routed=false;
         const finishEscapeRoute=()=>{
+            if(routed||!battleActive||battleToken!==escapeToken){ return false; }
+            routed=true;
             emitCombatEvent("battle_end",{result:"escape"});
             if(window.v132ActiveDungeonRun&&typeof window.v132AbortDungeonBattle==="function"){
                 window.v132AbortDungeonBattle("escape");
