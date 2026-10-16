@@ -69,7 +69,7 @@ assetPaths.forEach(file=>assert.equal(fs.existsSync(file),true,file));
 console.log("V173.46 equipment progression specification checks passed");
 
 // V173.62: reforgeSlots are affix-slot capacity; attempts are unlimited.
-assert.match(source,/window\.FourSymbolsReforge\.slotCount\(item\)/);
+assert.match(source,/window\.FourSymbolsReforge\.slots\(item\)\.filter\(affix=>affix===null\)\.length/);
 assert.doesNotMatch(source,/item\.reforgeUsed=Math\.min/);
 
 const rarityContext={window:{}};require("node:vm").runInNewContext(require("../.github/scripts/fixtures/item-slot-owner.cjs"),rarityContext);

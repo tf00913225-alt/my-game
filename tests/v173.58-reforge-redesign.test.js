@@ -26,7 +26,7 @@ assert.match(synthesis,/裝備品質不限制材料階級/);
 assert.match(synthesis,/未鎖定消耗 50 礦石/);
 assert.match(synthesis,/鎖 1 條 100 礦石/);
 assert.match(synthesis,/鎖 2 條 150 礦石/);
-assert.match(equipment,/window\.FourSymbolsReforge\.slotCount\(item\)/);
+assert.match(equipment,/window\.FourSymbolsReforge\.slots\(item\)\.filter\(affix=>affix===null\)\.length/);
 assert.doesNotMatch(equipment,/merged\[key\]=/);
 assert.doesNotMatch(equipment,/item\.reforgeUsed=Math\.min/);
 assert.match(css,/V173\.58 — FREE-MATERIAL REFORGE UI/);
