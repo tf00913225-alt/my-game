@@ -70,8 +70,8 @@
     }
   },
   "snapshot": {
-    "portraitTargets": 185,
-    "existingTargets": 139,
+    "portraitTargets": 205,
+    "existingTargets": 159,
     "plannedTargets": 46,
     "uniqueRuntimeNames": 181,
     "assetPoolCounts": {
@@ -1768,6 +1768,188 @@
         "standard",
         "assets/monsters/adventure/boss-guard-wind.webp",
         "planned"
+      ]
+    ],
+    "tower-water": [
+      [
+        "tower.water.normal-04",
+        "天兵天將",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/tower/water/normal-04.webp",
+        "existing"
+      ],
+      [
+        "tower.water.normal-05",
+        "天兵天將",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/tower/water/normal-05.webp",
+        "existing"
+      ],
+      [
+        "tower.water.normal-10",
+        "天兵天將",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/tower/water/normal-10.webp",
+        "existing"
+      ],
+      [
+        "tower.water.normal-13",
+        "天兵天將",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/tower/water/normal-13.webp",
+        "existing"
+      ],
+      [
+        "tower.water.normal-14",
+        "天兵天將",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/tower/water/normal-14.webp",
+        "existing"
+      ],
+      [
+        "tower.water.normal-16",
+        "天兵天將",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/tower/water/normal-16.webp",
+        "existing"
+      ],
+      [
+        "tower.water.normal-17",
+        "天兵天將",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/tower/water/normal-17.webp",
+        "existing"
+      ],
+      [
+        "tower.water.normal-18",
+        "天兵天將",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/tower/water/normal-18.webp",
+        "existing"
+      ],
+      [
+        "tower.water.normal-19",
+        "天兵天將",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/tower/water/normal-19.webp",
+        "existing"
+      ],
+      [
+        "tower.water.normal-20",
+        "天兵天將",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/tower/water/normal-20.webp",
+        "existing"
+      ],
+      [
+        "tower.water.elite-01",
+        "天兵天將",
+        "water",
+        "elite",
+        "standard",
+        "assets/monsters/tower/water/elite-01.webp",
+        "existing"
+      ],
+      [
+        "tower.water.elite-02",
+        "天兵天將",
+        "water",
+        "elite",
+        "standard",
+        "assets/monsters/tower/water/elite-02.webp",
+        "existing"
+      ],
+      [
+        "tower.water.elite-03",
+        "天兵天將",
+        "water",
+        "elite",
+        "standard",
+        "assets/monsters/tower/water/elite-03.webp",
+        "existing"
+      ],
+      [
+        "tower.water.elite-04",
+        "天兵天將",
+        "water",
+        "elite",
+        "standard",
+        "assets/monsters/tower/water/elite-04.webp",
+        "existing"
+      ],
+      [
+        "tower.water.elite-05",
+        "天兵天將",
+        "water",
+        "elite",
+        "standard",
+        "assets/monsters/tower/water/elite-05.webp",
+        "existing"
+      ],
+      [
+        "tower.water.elite-06",
+        "天兵天將",
+        "water",
+        "elite",
+        "standard",
+        "assets/monsters/tower/water/elite-06.webp",
+        "existing"
+      ],
+      [
+        "tower.water.elite-07",
+        "天兵天將",
+        "water",
+        "elite",
+        "standard",
+        "assets/monsters/tower/water/elite-07.webp",
+        "existing"
+      ],
+      [
+        "tower.water.elite-08",
+        "天兵天將",
+        "water",
+        "elite",
+        "standard",
+        "assets/monsters/tower/water/elite-08.webp",
+        "existing"
+      ],
+      [
+        "tower.water.elite-09",
+        "天兵天將",
+        "water",
+        "elite",
+        "standard",
+        "assets/monsters/tower/water/elite-09.webp",
+        "existing"
+      ],
+      [
+        "tower.water.elite-10",
+        "天兵天將",
+        "water",
+        "elite",
+        "standard",
+        "assets/monsters/tower/water/elite-10.webp",
+        "existing"
       ]
     ]
   },
@@ -6268,6 +6450,226 @@
         ],
         "sha256": "02ce60d15a6e9168f04013d7bbdedcacc8392e605c41ca9d36c514a1f01aa470"
       },
+      "assets/monsters/tower/water/normal-04.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          17,
+          13,
+          1024,
+          1536
+        ],
+        "sha256": "c1a60bf52dbdf417fc3192876bf42df40dd158a9dd023bc7d0bc70e91a125253"
+      },
+      "assets/monsters/tower/water/normal-05.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          23,
+          1010,
+          1536
+        ],
+        "sha256": "06ed78b3524026a26368190d07565e9ff0c1fae18b16504c885e2ab071592f5c"
+      },
+      "assets/monsters/tower/water/normal-10.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          9,
+          1024,
+          1536
+        ],
+        "sha256": "d04f2d6e3b743c758e9910514118ad6e20f7a8163d97ac7e3f1a71f793ee0a83"
+      },
+      "assets/monsters/tower/water/normal-13.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          31,
+          13,
+          1012,
+          1536
+        ],
+        "sha256": "bedc665d3ee46d45306b6369b44f214d6f5265b46e4b0ff934f4b0abd9b5f97c"
+      },
+      "assets/monsters/tower/water/normal-14.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1006,
+          1536
+        ],
+        "sha256": "16b5fa1addce8850dbfeccfdd3e953a293d44e5726faa5c1833423c665729f7c"
+      },
+      "assets/monsters/tower/water/normal-16.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "9da6fe46481149f87f613196cf35b7fbee3415a6803cd0ddc44247a8c8267b9c"
+      },
+      "assets/monsters/tower/water/normal-17.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "7eafcba679600fe788929c74904c24a79a37e01d5e35970726f0ea64fc0adf72"
+      },
+      "assets/monsters/tower/water/normal-18.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          17,
+          1024,
+          1536
+        ],
+        "sha256": "8cb7d67a71d20730247135808dbcfc176b6a0aedf25631c1320854638c6fb581"
+      },
+      "assets/monsters/tower/water/normal-19.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          33,
+          1004,
+          1536
+        ],
+        "sha256": "13792ce559816c5a17437e001622f3ac59e7a489dd4c6e50287c82af16f43029"
+      },
+      "assets/monsters/tower/water/normal-20.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          17,
+          1010,
+          1536
+        ],
+        "sha256": "7eb68cb48341c402e32ac135869a2cce7201599fda2a9c672d5952bfd2bf79e9"
+      },
+      "assets/monsters/tower/water/elite-01.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          19,
+          1008,
+          1536
+        ],
+        "sha256": "e8e9cd08351ae5b0a91229107b9e55861689e07cab2139ec9c169da275354c94"
+      },
+      "assets/monsters/tower/water/elite-02.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          14,
+          15,
+          1024,
+          1536
+        ],
+        "sha256": "a467be5569c4613d0b52832371020a6497216ffd4cfbd05178173c2f439ad59e"
+      },
+      "assets/monsters/tower/water/elite-03.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          14,
+          1010,
+          1520
+        ],
+        "sha256": "8c1607d8bf625efd3694a74d2844d5fcabaa448a5d6c51a2c74d6ea104a5f520"
+      },
+      "assets/monsters/tower/water/elite-04.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          34,
+          19,
+          1008,
+          1518
+        ],
+        "sha256": "b6769244725aed3fe86eba32dfe0b39b11320d6748df1963ff96c715d0b80f1f"
+      },
+      "assets/monsters/tower/water/elite-05.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          19,
+          1020,
+          1536
+        ],
+        "sha256": "4851214c6204d4299876e9dd98a520cbf989b0f1210823f4832cb2871d3a3d33"
+      },
+      "assets/monsters/tower/water/elite-06.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "dd8ae3d5bf31b1d5f00dd77583045b6126f60f03a4fae14b42eb2dc79e0a7f3b"
+      },
+      "assets/monsters/tower/water/elite-07.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          8,
+          1024,
+          1536
+        ],
+        "sha256": "3aa904f8f0c32c9b108d7ff73729a7421705b77d9aca875d6de8f16f28d64828"
+      },
+      "assets/monsters/tower/water/elite-08.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          18,
+          1024,
+          1536
+        ],
+        "sha256": "bc0218787e45064c9bb579dab7eb111e6bfe4d84f8cd86094f1c4a3ac181995c"
+      },
+      "assets/monsters/tower/water/elite-09.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          4,
+          1024,
+          1536
+        ],
+        "sha256": "f57c1891949801777ada9fc163c32b7adda7f48b6805aab78f9010e0ddc2139e"
+      },
+      "assets/monsters/tower/water/elite-10.webp": {
+        "width": 1024,
+        "height": 1536,
+        "alphaBounds": [
+          0,
+          0,
+          1024,
+          1536
+        ],
+        "sha256": "e712ada88d66a06b23dd65ec93a77b34bcbae3a4bc06e1dc3714ecda6be39b4a"
+      },
       "assets/monsters/wild/fire-pool/mon-fire-normal-001.webp": {
         "width": 1024,
         "height": 1536,
@@ -6522,5 +6924,82 @@
         "sha256": "3f49f788302c77cc034123d8c22a13d16e2d85935d18cd37000e533b3daa10f3"
       }
     }
+  },
+  "waterTowerCoverage": {
+    "normalByBand": [
+      [
+        "wild.zone-03.water-01",
+        "wild.zone-01.water-01"
+      ],
+      [
+        "wild.zone-06.water-01",
+        "tower.water.normal-04"
+      ],
+      [
+        "tower.water.normal-05",
+        "wild.zone-04.water-01"
+      ],
+      [
+        "wild.zone-05.water-01",
+        "wild.zone-07.water-01"
+      ],
+      [
+        "wild.zone-08.water-01",
+        "tower.water.normal-10"
+      ],
+      [
+        "wild.zone-10.water-01",
+        "wild.zone-09.water-01"
+      ],
+      [
+        "tower.water.normal-13",
+        "tower.water.normal-14"
+      ],
+      [
+        "wild.zone-02.water-01",
+        "tower.water.normal-16"
+      ],
+      [
+        "tower.water.normal-17",
+        "tower.water.normal-18"
+      ],
+      [
+        "tower.water.normal-19",
+        "tower.water.normal-20"
+      ]
+    ],
+    "eliteByBand": [
+      [
+        "tower.water.elite-01"
+      ],
+      [
+        "tower.water.elite-02"
+      ],
+      [
+        "tower.water.elite-03"
+      ],
+      [
+        "tower.water.elite-04"
+      ],
+      [
+        "tower.water.elite-05"
+      ],
+      [
+        "tower.water.elite-06"
+      ],
+      [
+        "tower.water.elite-07"
+      ],
+      [
+        "tower.water.elite-08"
+      ],
+      [
+        "tower.water.elite-09"
+      ],
+      [
+        "tower.water.elite-10"
+      ]
+    ],
+    "bossByFloor": {}
   }
 }

@@ -357,8 +357,11 @@ const adoptedPoolPortraits=element=>portraitRegistry.assetPool.entries
 const existingWildPortraits=element=>(portraitRegistry.groups.wild||[])
     .filter(row=>row[portraitFields.element]===element&&row[portraitFields.status]==="existing")
     .map(row=>({assetId:row[portraitFields.portraitKey],displayName:row[portraitFields.name],path:row[portraitFields.path]}));
+const waterTowerPortraits=(portraitRegistry.groups["tower-water"]||[])
+    .filter(row=>row[portraitFields.status]==="existing")
+    .map(row=>({assetId:row[portraitFields.portraitKey],displayName:row[portraitFields.name],path:row[portraitFields.path]}));
 const runtimePortraits=Object.fromEntries(["fire","water","wind","earth"].map(element=>[element,
-    [...adoptedPoolPortraits(element),...(["water","earth"].includes(element)?existingWildPortraits(element):[])]
+    [...adoptedPoolPortraits(element),...(element==="water"?waterTowerPortraits:[]),...(["water","earth"].includes(element)?existingWildPortraits(element):[])]
         .map(entry=>{
             const content=bytes(entry.path);
             return {...entry,sha256:hash(content),bytes:content.length,decode:true};
