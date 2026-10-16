@@ -71,10 +71,11 @@ assert.match(battle,/battleResolutionResumeToken/);
 assert.match(battle,/battleAutoActionResume/);
 assert.match(battle,/finishBattleStatisticsSession\("win"\)/);
 assert.match(battle,/finishBattleStatisticsSession\("lose"\)/);
-assert.match(statsCss,/\.battle-stats-edge-button[\s\S]*left:0/);
+assert.doesNotMatch(statsSource,/battleStatsEdgeButton|battleStatsDrawer|installStatsEdgeDrag|openStatistics/);
+assert.doesNotMatch(statsCss,/battle-stats-edge-button|battle-stats-drawer/);
+assert.equal(stats.openStatistics,undefined);
 assert.match(statsCss,/\.battle-mechanism-alert[\s\S]*right:0/);
 assert.match(statsCss,/@keyframes battleMechanismAlertPulse/);
-assert.match(statsCss,/\.battle-stats-drawer\{left:0;transform:translateX\(-102%\)/);
 assert.match(statsCss,/\.battle-boss-mechanism-drawer\{right:0;transform:translateX\(102%\)/);
 assert.doesNotMatch(
     statsSource,
@@ -86,8 +87,6 @@ assert.match(
     /staleScrim=document\.getElementById\("battleInsightScrim"\)[\s\S]*?staleScrim\.remove\(\)/,
     "legacy scrim cleanup may remain only to remove stale DOM from an older runtime"
 );
-assert.match(statsSource,/function installStatsEdgeDrag\(edge,root\)/);
-assert.match(statsCss,/\.battle-stats-edge-button[\s\S]*touch-action:none/);
 assert.match(statsCss,/\.battle-insight-drawer\{[\s\S]*z-index:18072/);
 assert.match(statsCss,/\.battle-statistics-result-panel\{[\s\S]*width:min\(780px,calc\(100% - 56px\)\)/);
 assert.match(statsCss,/\.battle-statistics-result-panel > header h2\{[\s\S]*font-size:22px/);

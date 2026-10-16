@@ -302,6 +302,19 @@
         "v17342-abyss-battle-log",
         "v17342-abyss-battle-empty"
       ]
+    },
+    {
+      "id": "DEP-013-battle-statistics-drawer-removal",
+      "description": "戰鬥數據入口與統計抽屜退場；Boss功能卡、統計資料及詳細結算另有保留責任。",
+      "enabled": true,
+      "forbidden": [
+        "battleStatsEdgeButton",
+        "battleStatsDrawer",
+        "installStatsEdgeDrag",
+        "openStatistics",
+        "battle-stats-edge-button",
+        "battle-stats-drawer"
+      ]
     }
   ]
 }

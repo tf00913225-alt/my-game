@@ -713,82 +713,10 @@
     function appRoot(){
         return document.getElementById("game-content")||document.getElementById("app")||document.body;
     }
-    function clampEdgeTop(edge,root,value){
-        const height=Math.max(1,Number(root&&root.clientHeight)||0);
-        const edgeHeight=Math.max(1,Number(edge&&edge.offsetHeight)||0);
-        const minTop=8;
-        const maxTop=Math.max(minTop,height-edgeHeight-8);
-        return Math.max(minTop,Math.min(maxTop,Number(value)||minTop));
-    }
-    function installStatsEdgeDrag(edge,root){
-        if(!edge||!root||edge.__battleStatsEdgeDragInstalled){ return; }
-        edge.__battleStatsEdgeDragInstalled=true;
-        let drag=null;
-
-        function finishDrag(event){
-            if(!drag){ return; }
-            if(event&&event.pointerId!==undefined&&drag.pointerId!==undefined&&event.pointerId!==drag.pointerId){ return; }
-            const moved=drag.moved;
-            drag=null;
-            edge.classList.remove("is-dragging");
-            if(moved){
-                edge.__suppressNextClick=true;
-                setTimeout(()=>{ edge.__suppressNextClick=false; },0);
-            }
-        }
-
-        edge.addEventListener("pointerdown",event=>{
-            if(event.button!==undefined&&event.button!==0){ return; }
-            const rect=root.getBoundingClientRect();
-            const rootHeight=Math.max(1,Number(root.clientHeight)||rect.height||1);
-            drag={
-                pointerId:event.pointerId,
-                startClientY:Number(event.clientY)||0,
-                startTop:clampEdgeTop(edge,root,edge.offsetTop),
-                scaleY:rect.height>0?rootHeight/rect.height:1,
-                moved:false
-            };
-            edge.classList.add("is-dragging");
-            if(typeof edge.setPointerCapture==="function"&&event.pointerId!==undefined){
-                try{ edge.setPointerCapture(event.pointerId); }catch(_){ }
-            }
-            event.preventDefault();
-        });
-        edge.addEventListener("pointermove",event=>{
-            if(!drag||event.pointerId!==drag.pointerId){ return; }
-            const delta=((Number(event.clientY)||0)-drag.startClientY)*drag.scaleY;
-            if(!drag.moved&&Math.abs(delta)>=3){ drag.moved=true; }
-            if(!drag.moved){ return; }
-            edge.style.top=clampEdgeTop(edge,root,drag.startTop+delta)+"px";
-            event.preventDefault();
-        });
-        edge.addEventListener("pointerup",finishDrag);
-        edge.addEventListener("pointercancel",finishDrag);
-    }
     function ensureBattleUi(){
         if(typeof document==="undefined"){ return null; }
         const root=battleRoot();
         if(!root){ return null; }
-
-        let edge=document.getElementById("battleStatsEdgeButton");
-        if(!edge){
-            edge=document.createElement("button");
-            edge.type="button";
-            edge.id="battleStatsEdgeButton";
-            edge.className="battle-stats-edge-button";
-            edge.setAttribute("aria-label","戰鬥數據");
-            edge.innerHTML="<span>戰</span><span>鬥</span><span>數</span><span>據</span>";
-            edge.addEventListener("click",event=>{
-                if(edge.__suppressNextClick){
-                    edge.__suppressNextClick=false;
-                    event.preventDefault();
-                    event.stopImmediatePropagation();
-                    return;
-                }
-                openBattleDrawer("stats");
-            });
-            root.appendChild(edge);
-        }
 
         let alertButton=document.getElementById("battleMechanismAlert");
         if(!alertButton){
@@ -805,17 +733,6 @@
         const staleScrim=document.getElementById("battleInsightScrim");
         if(staleScrim&&typeof staleScrim.remove==="function"){ staleScrim.remove(); }
 
-        let statsDrawer=document.getElementById("battleStatsDrawer");
-        if(!statsDrawer){
-            statsDrawer=document.createElement("aside");
-            statsDrawer.id="battleStatsDrawer";
-            statsDrawer.className="battle-insight-drawer battle-stats-drawer";
-            statsDrawer.setAttribute("aria-label","戰鬥數據");
-            statsDrawer.innerHTML='<header><b>戰鬥數據</b><button type="button" data-close>×</button></header><div class="battle-insight-drawer-body"></div>';
-            statsDrawer.querySelector("[data-close]").addEventListener("click",closeBattleDrawer);
-            root.appendChild(statsDrawer);
-        }
-
         let bossDrawer=document.getElementById("battleBossMechanismDrawer");
         if(!bossDrawer){
             bossDrawer=document.createElement("aside");
@@ -826,40 +743,17 @@
             bossDrawer.querySelector("[data-close]").addEventListener("click",closeBattleDrawer);
             root.appendChild(bossDrawer);
         }
-        installStatsEdgeDrag(edge,root);
-        return {edge,alertButton,statsDrawer,bossDrawer};
+        return {alertButton,bossDrawer};
     }
     function syncBattleEntryVisibility(){
         const ui=ensureBattleUi();
         if(!ui){ return; }
         const active=!!(session&&session.active);
-        ui.edge.hidden=!active;
         ui.alertButton.hidden=!active||bossMechanisms.length===0;
         if(!active){ closeBattleDrawer(); }
     }
     function statRow(label,value){
         return '<div><span>'+escapeHtml(label)+'</span><b>'+formatValue(value)+'</b></div>';
-    }
-    function renderStatsDrawer(){
-        const drawer=document.getElementById("battleStatsDrawer");
-        const body=drawer&&drawer.querySelector(".battle-insight-drawer-body");
-        if(!body){ return; }
-        const snapshot=currentSnapshot();
-        const combatants=snapshot&&Array.isArray(snapshot.combatants)?snapshot.combatants:[];
-        body.innerHTML=combatants.length?combatants.map(item=>
-            '<article class="battle-stat-card">'+
-                '<div class="battle-stat-identity">'+
-                    (item.portrait?'<img src="'+escapeHtml(item.portrait)+'" alt="">':'<span class="battle-stat-avatar-fallback" aria-hidden="true">◆</span>')+
-                    '<div><b>'+escapeHtml(item.name)+'</b><small>'+escapeHtml(item.kind==="heroNpc"?"英雄 NPC":item.kind==="reinforcement"?"援軍":"玩家角色")+'</small></div>'+
-                '</div>'+
-                '<div class="battle-stat-grid">'+
-                    statRow("總傷害",item.damageDealt)+
-                    statRow("造成治療量",item.healingDone)+
-                    statRow("承受傷害",item.damageTaken)+
-                    statRow("暴擊次數",item.criticalHits)+
-                '</div>'+
-            '</article>'
-        ).join(""):'<p class="battle-insight-empty">目前沒有可統計的我方戰鬥單位。</p>';
     }
     function mechanismMarkup(item){
         const remaining=item.remaining===null||item.remaining===undefined||item.remaining===""
@@ -886,8 +780,8 @@
     }
     function openBattleDrawer(kind){
         if(!session||!session.active){ return false; }
-        const next=kind==="boss"?"boss":"stats";
-        if(next==="boss"&&bossMechanisms.length===0){ return false; }
+        if(kind!=="boss"||bossMechanisms.length===0){ return false; }
+        const next="boss";
         const ui=ensureBattleUi();
         if(!ui){ return false; }
 
@@ -895,25 +789,22 @@
         closeBattleDrawer();
         openDrawer=next;
 
-        const drawer=next==="boss"?ui.bossDrawer:ui.statsDrawer;
+        const drawer=ui.bossDrawer;
         drawer.classList.add("open");
-        if(next==="boss"){ renderBossDrawer(); }else{ renderStatsDrawer(); }
+        renderBossDrawer();
         if(typeof window.syncBattleUiPriorityLayer==="function"){ window.syncBattleUiPriorityLayer(); }
         return true;
     }
     function closeBattleDrawer(){
         if(typeof document!=="undefined"){
-            const stats=document.getElementById("battleStatsDrawer");
             const boss=document.getElementById("battleBossMechanismDrawer");
-            if(stats){ stats.classList.remove("open"); }
             if(boss){ boss.classList.remove("open"); }
         }
         openDrawer=null;
         if(typeof window.syncBattleUiPriorityLayer==="function"){ window.syncBattleUiPriorityLayer(); }
     }
     function syncOpenDrawer(){
-        if(openDrawer==="stats"){ renderStatsDrawer(); }
-        else if(openDrawer==="boss"){ renderBossDrawer(); }
+        if(openDrawer==="boss"){ renderBossDrawer(); }
     }
 
     function ensureResultModal(){
@@ -1075,7 +966,6 @@
         getCombatantIdByBattleIndex:getCombatantIdByBattleIndex,
         setBossMechanisms:setBossMechanisms,
         clearBossMechanisms:clearBossMechanisms,
-        openStatistics:function(){ return openBattleDrawer("stats"); },
         openBossMechanisms:function(){ return openBattleDrawer("boss"); },
         closeDrawer:closeBattleDrawer,
         showResultDetails:showResultDetails,
