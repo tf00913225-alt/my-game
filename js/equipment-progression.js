@@ -934,7 +934,8 @@
     syncFourElementSets();
     window.v17346SyncFourElementSets=syncFourElementSets;
     function remainingReforgeSlots(item){
-        return window.FourSymbolsReforge?window.FourSymbolsReforge.slotCount(item):0;
+        if(!item||!isEquipmentInventoryType(item.type)){ return 0; }
+        return window.FourSymbolsReforge?window.FourSymbolsReforge.slots(item).filter(affix=>affix===null).length:0;
     }
     window.v17346RemainingReforgeSlots=remainingReforgeSlots;
 
@@ -942,12 +943,15 @@
         const stats=document.getElementById("itemModalStats");
         if(!stats){ return; }
         stats.querySelectorAll(".v17346-reforge-slot").forEach(node=>node.remove());
-        const count=remainingReforgeSlots(item);
+        if(!item||!isEquipmentInventoryType(item.type)){ return; }
         const owner=window.FourSymbolsReforge;
-        const reason=owner?owner.reason(item):"冶煉功能尚未就緒。";
-        for(let index=0;index<count;index++){
-            stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot">'+(reason?escapeHtml(reason)+'（冶煉槽 '+(index+1)+' / '+count+'）':'[可冶煉]')+'</div>');
-        }
+        if(!owner){ return; }
+        let slots;
+        try{ slots=owner.slots(item); }
+        catch(_){ stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot">冶煉資料異常，請保留原資料。</div>');return; }
+        slots.forEach((affix,index)=>stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot" data-reforge-slot="'+index+'">'+escapeHtml(owner.slotText(affix))+'</div>'));
+        const reason=owner.reason(item);
+        if(reason){ stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot v17346-reforge-reason">'+escapeHtml(reason)+'</div>'); }
     }
     window.v17346AppendReforgeMarkers=appendReforgeMarkers;
     function configureEquipmentChestModal(item){
