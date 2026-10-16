@@ -1208,6 +1208,9 @@
     let formationInputAbort=null;
     let formationDrag=null;
     let formationMessage="";
+    function formationPlayerIndexes(){
+        return [0,1,2].filter(index=>getPartyCharacterByIndex(index)?.id);
+    }
     function formationSlotLabel(slot){
         const meta=fixedBattlefieldSlots().slotMeta[slot];
         return (meta.row==="front"?"前":"後")+["左","中","右"][meta.column-1];
@@ -1215,7 +1218,7 @@
     function formationPreview(){
         const confirmed=window.FourSymbolsTeamFormation.getConfirmed();
         if(confirmed)return confirmed;
-        const indexes=getCharacters().flatMap((character,index)=>character?.id?[index]:[]);
+        const indexes=formationPlayerIndexes();
         const state=fixedBattlefieldSlots().ensureAllyFormation(indexes);
         return {version:2,characterIndexToSlot:{...state.characterIndexToSlot},heroIdToSlot:{}};
     }
@@ -1231,7 +1234,8 @@
             const hero=getHeroPageSnapshot().heroes.find(row=>row.owned&&row.definition.heroId===unit.slice(5));
             return hero?{name:hero.definition.name,artwork:hero.artwork}:null;
         }
-        const character=getCharacters()[Number(unit.slice(7))];
+        const index=Number(unit.slice(7));
+        const character=[0,1,2].includes(index)?getPartyCharacterByIndex(index):null;
         return character?.id?{name:character.id,artwork:getCharacterBattleArtworkPath(character)}:null;
     }
     function formationUnitContent(unit){
@@ -1240,22 +1244,22 @@
     }
     function formationEditingAllowed(){
         const status=window.FourSymbolsTeamFormation.getStatus();
-        const indexes=getCharacters().flatMap((character,index)=>character?.id?[index]:[]);
+        const indexes=formationPlayerIndexes();
         return !battleActive&&status.ready&&!status.busy&&!status.pending&&JSON.stringify(indexes)===JSON.stringify(status.playerIndexes);
     }
     function renderAllyFormationContent(){
         const value=formationPreview(),status=window.FourSymbolsTeamFormation.getStatus(),owner=fixedBattlefieldSlots();
         const row=(label,slots)=>'<section class="v-fixed-formation-row"><header>'+label+'</header><div data-drag-owner="formation" class="v-fixed-formation-slots">'+slots.map(slot=>{
             const unit=formationUnitAt(value,slot);
-            return '<button type="button" class="v-fixed-formation-slot'+(unit===formationSelectedUnit&&unit?' selected':'')+'" data-slot="'+slot+'"'+(unit?' data-unit="'+heroPageHtml(unit)+'"':'')+' aria-label="'+formationSlotLabel(slot)+(unit?' '+heroPageHtml(formationUnitData(unit)?.name||''):' 空位')+'"><small>'+formationSlotLabel(slot)+'</small>'+formationUnitContent(unit)+'</button>';
+            return '<button type="button" class="v-fixed-formation-slot'+(unit===formationSelectedUnit&&unit?' selected':'')+'" data-slot="'+slot+'"'+(unit?' data-unit="'+heroPageHtml(unit)+'"':'')+' aria-label="'+formationSlotLabel(slot)+(unit?' '+heroPageHtml(formationUnitData(unit)?.name||''):' 空位')+'">'+formationUnitContent(unit)+'</button>';
         }).join('')+'</div></section>';
         const candidates=getHeroPageSnapshot().heroes.filter(hero=>hero.owned&&!Object.hasOwn(value.heroIdToSlot,hero.definition.heroId));
         const bg=typeof mapZoneBackgroundImages!=="undefined"?mapZoneBackgroundImages.forest:null;
         const background=bg?' style="background-image:linear-gradient(#09090955,#09090999),url(&quot;'+heroPageHtml(bg)+'&quot;)"':'';
         return '<div class="hero-page-shell v-fixed-formation-panel"><button type="button" class="main-button" onclick="returnFromFormation()">‹ 返回</button>'+
-            '<div id="formationContent" class="hero-page-content" data-scroll-owner="y"><p class="hero-page-note">拖曳英雄到格位，或點選英雄再點格位。已上陣角色可交換位置；玩家角色不能移出。</p>'+
-            '<div class="formation-battlefield"'+background+'><div class="formation-enemy-space" aria-label="敵方區域留空">敵方區域</div>'+row('前排',owner.allyFrontSlots)+row('後排',owner.allyBackSlots)+'</div>'+
-            '<h3>候選英雄</h3><div class="formation-candidates" data-scroll-owner="x">'+candidates.map(hero=>{
+            '<div id="formationContent"><p class="hero-page-note">點擊角色再點格位，或拖曳交換位置。</p>'+
+            '<div class="formation-battlefield"'+background+'>'+row('前排',owner.allyFrontSlots)+row('後排',owner.allyBackSlots)+'</div>'+
+            '<div class="formation-candidates" aria-label="候選英雄">'+candidates.map(hero=>{
                 const unit='hero:'+hero.definition.heroId;
                 return '<button type="button" data-drag-owner="formation" class="formation-candidate'+(unit===formationSelectedUnit?' selected':'')+'" data-unit="'+heroPageHtml(unit)+'">'+formationUnitContent(unit)+'</button>';
             }).join('')+(candidates.length?'':'<p class="hero-page-note">目前沒有未上陣的已擁有英雄。</p>')+'</div>'+
