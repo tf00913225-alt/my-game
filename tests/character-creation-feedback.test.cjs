@@ -24,4 +24,3 @@ test('cloud rejection restores retry feedback without creating or saving a local
 test('account change during request remains fail closed and restores button',async()=>{
  const f=fixture(),pending=f.c.createCharacter();f.changeUid();f.bootstrap.resolve({serverRevision:0});assert.equal(await pending,false);assert.equal(f.calls().commitCalls,0);assert.equal(f.calls().saves,0);assert.equal(f.button.disabled,false);
 });
-
