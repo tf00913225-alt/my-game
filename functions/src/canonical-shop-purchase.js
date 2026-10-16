@@ -136,9 +136,11 @@ function createCanonicalShopPurchase({db,FieldValue,HttpsError,runProtected,
             tx.update(accountRef,{serverRevision:revision,snapshotSha256:bundle.sha256,updatedAt:stamp});
             tx.update(characterRef,{serverRevision:revision,updatedAt:stamp});
             tx.update(economyRef,{serverRevision:revision,gold:economy.gold-cost,updatedAt:stamp});
-            for(const ref of [loadoutRef,progressRef,checkpointRef]){
+            for(const ref of [loadoutRef,progressRef]){
                 tx.update(ref,{serverRevision:revision,updatedAt:stamp});
             }
+            tx.update(checkpointRef,{serverRevision:revision,
+                claimDigest:nextRecords.claimCheckpoint.claimDigest,updatedAt:stamp});
             advanceOwnedSources(tx,owned.refs,revision,stamp);
             tx.create(itemRef,{...item,createdAt:stamp,updatedAt:stamp});
             tx.create(root.collection("playableSnapshots").doc(String(revision)),
