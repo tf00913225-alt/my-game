@@ -137,7 +137,7 @@
 - Shield（護盾）、減傷、Barrier（結界）、無敵／吸收後未真正扣 HP 的部分不得算承受傷害；Overheal（過量治療）未另有正式規則前不得算入有效治療。
 - 戰鬥數據入口、拖曳控制及統計抽屜已退場。右側 Boss 功能卡 Drawer 是 non-blocking observer UI（非阻塞觀察介面）：打開時不得取得 `FourSymbolsBattleFlow` pause／presentation lock，自動／手動戰鬥都照常推進。Boss 功能卡或戰鬥狀態視窗開啟時，資訊層必須位於技能 VFX 與浮字之上；關閉後恢復一般繪製順序。
 - Auto Battle（自動戰鬥）回合提示是正式 round lifecycle 的 500ms observer presentation，不取得 Presentation Lock，可與 Auto declaration 同時進行。Auto decision 50ms／declare handoff 100ms；Manual declaration 保留 250ms。
-- 個人 Boss、世界 Boss、深淵可在 battle finish 後顯示 `FourSymbolsBattleStatistics` 的 frozen snapshot，直到玩家主動關閉；一般巡怪與每日副本不得因此增加長駐結算 Modal。
+- Boss、深淵及其他玩法不顯示戰鬥詳細統計視窗。必要返回與進度更新直接由正式 battle-end callback 執行，不依賴視窗 onClose；既有勝敗、獎勵提示、首通、防重領、存檔與雲端權威保留。統計資料暫保留供其他正式 consumer 使用。
 
 ## Boss 功能卡資訊契約
 

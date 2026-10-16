@@ -468,4 +468,26 @@ test("weekly and reward state remains persistent",()=>{
     assert.equal(value(second.context,"GameplaySystem.getSerializableState().personal['personal-20'].firstClear"),true);
 });
 
+test("personal and world completion return immediately without a result UI and preserve rewards",()=>{
+    for(const mode of ["personal","world"])for(const result of ["win","lose","escape"]){
+        const {context}=load();const pages=[],rewards=[];
+        context.showPage=page=>pages.push(page);
+        context.v141ShowBlackGoldReward=reward=>rewards.push(reward);
+        context.FourSymbolsBattleStatistics={showResultDetails:()=>{throw Error("retired UI called");},clearBossMechanisms:()=>{}};
+        const id=mode==="personal"?"personal-20":context.GameplaySystem.worldBosses[0].id;
+        assert.equal(context.vGameplayStartBoss(mode,id),true);
+        finishBattle(context,result);
+        assert.equal(pages.at(-1),"boss");
+        assert.equal(context.FourSymbolsBossBattle.isActive(),false);
+        const progress=value(context,`GameplaySystem.getSerializableState().${mode}['${id}']`);
+        if(mode==="personal"){
+            assert.equal(progress.firstClear,result==="win");
+            assert.equal(progress.clears,result==="win"?1:0);
+            assert.equal(rewards.length,result==="win"?1:0);
+        }else{
+            assert.equal(progress.completedStages,result==="win"?1:0);
+            assert.equal(rewards.length,0,"early world stage grants no final reward");
+        }
+    }
+});
 console.log("All "+passed+" Boss target-entity runtime tests passed.");

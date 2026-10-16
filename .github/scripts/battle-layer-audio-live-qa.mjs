@@ -154,7 +154,6 @@ async function runBossBalanceProductionQa(){
         const expectedOre=final&&definition.ore?(plan.repeat?(plan.type==='personal'?1:0):(definition.firstOre||1)):0;check(oreCount(definition.ore)-beforeOre===expectedOre,'unchanged ore reward');
         const beforeProgress=beforeState[plan.type][plan.id];check(progress.clears===beforeProgress.clears+(final?1:0),'clear count');
         if(definition.relic){const owned=v174RelicSystem.getOwnedState()[definition.relic];if(final)check(owned.unlocked,'first/repeat relic reward');else check(JSON.stringify(owned)===beforeRelic,'no premature relic reward');}check(!FourSymbolsBossBattle.isActive(),'release Boss context');
-        if(document.getElementById('battleStatisticsResultModal')?.hidden===false)FourSymbolsBattleStatistics.hideResultDetails(true);
         evidence.scenes.push({...plan,kind:'natural-victory',rounds,completedRounds,actions,survivors,shields,objects,reinforcements,initial,finalHP:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),gold:gold-beforeGold,configuredGold:expectedGold,killGold,ore:oreCount(definition.ore)-beforeOre,expectedOre,progress,settlementVerified:true,...(fast?{cleanup:await cleanup()}: {})});
        }
        return evidence;
@@ -489,7 +488,6 @@ async function cleanupPresentationQaBattle(client){
         "try{if(window.v132ActiveDungeonRun&&typeof window.v132AbortDungeonBattle==='function'){window.v132AbortDungeonBattle('qa-presentation');}}catch(_){}"+
         "try{if(typeof battleActive!=='undefined'&&battleActive){battleActive=false;autoBattle=false;actionReady=false;pendingAction=null;clearInterval(timerId);timerId=null;if(typeof battleAdvanceTimeoutId!=='undefined'&&battleAdvanceTimeoutId){clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;}if(typeof battleAdvanceScheduled!=='undefined'){battleAdvanceScheduled=false;}battleToken++;}}catch(_){}"+
         "try{if(window.__battlePresentationQaNormalBackup){monsters=window.__battlePresentationQaNormalBackup.monsters;currentZone=window.__battlePresentationQaNormalBackup.currentZone;mapCooldown=window.__battlePresentationQaNormalBackup.mapCooldown;delete window.__battlePresentationQaNormalBackup;}}catch(_){}"+
-        "try{window.FourSymbolsBattleStatistics?.hideResultDetails?.(false);}catch(_){}"+
         "try{document.querySelectorAll('.team-relic-battle-presentation,.battle-floating-feedback').forEach(node=>node.remove());document.body.classList.remove('team-relic-cinematic-active');}catch(_){}"+
         "try{if(typeof showPage==='function'){showPage('home');}}catch(_){}"+
         "return true;})()");
@@ -1634,38 +1632,9 @@ try{
     assert.ok(endTransition.activePage,"Battle-end callback must hand control to a non-battle page");
     assert.equal(endTransition.stageCount,0,"Battle-end path must leave no V143 stage behind");
 
-    const resultModalReadability=await client.eval(`(()=>{
-        const api=window.FourSymbolsBattleStatistics;
-        if(!api||typeof api.showResultDetails!=='function'){return null;}
-        const shown=api.showResultDetails({title:'戰鬥詳細結算',subtitle:'Browser QA'});
-        const modal=document.getElementById('battleStatisticsResultModal');
-        const panel=modal?.querySelector('.battle-statistics-result-panel');
-        const title=modal?.querySelector('[data-title]');
-        const label=modal?.querySelector('.battle-stat-grid span');
-        const value=modal?.querySelector('.battle-stat-grid b');
-        const close=modal?.querySelector('[data-close]');
-        const rect=node=>{const r=node?.getBoundingClientRect();return r?{width:r.width,height:r.height}:null;};
-        const result={
-            shown,parentId:modal?.parentElement?.id||null,hidden:modal?.hidden??true,
-            panel:rect(panel),title:rect(title),label:rect(label),value:rect(value),close:rect(close),
-            titleFont:getComputedStyle(title).fontSize,labelFont:getComputedStyle(label).fontSize,
-            valueFont:getComputedStyle(value).fontSize,closeFont:getComputedStyle(close).fontSize
-        };
-        return result;
-    })()`);
-    evidence.checks.resultModalReadability=resultModalReadability;
-    assert.ok(resultModalReadability?.shown,"Detailed battle result modal must open from the final snapshot");
-    assert.equal(resultModalReadability.parentId,"game-content","Battle result modal must use the legacy game-content coordinate owner");
-    assert.equal(resultModalReadability.hidden,false,"Detailed battle result modal must be visible while inspected");
-    assert.equal(resultModalReadability.titleFont,"22px","Detailed result title should use normal mobile typography");
-    assert.equal(resultModalReadability.valueFont,"19px","Detailed result values should not dominate the panel");
-    assert.ok(resultModalReadability.title?.height>=24,`Battle result title is too small on mobile: ${resultModalReadability.title?.height}`);
-    assert.ok(resultModalReadability.label?.height>=13,`Battle result label is too small on mobile: ${resultModalReadability.label?.height}`);
-    assert.ok(resultModalReadability.value?.height>=18,`Battle result value is too small on mobile: ${resultModalReadability.value?.height}`);
-    assert.ok(resultModalReadability.close?.height>=50,`Battle result close button is too small on mobile: ${resultModalReadability.close?.height}`);
-    const resultScreenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
-    if(resultScreenshot.data){ fs.writeFileSync(path.join(artifactDir,"battle-result-modal-mobile.png"),Buffer.from(resultScreenshot.data,"base64")); }
-    await client.eval("window.FourSymbolsBattleStatistics?.hideResultDetails(false);true");
+    const resultRetirement=await client.eval("(()=>({absent:!document.getElementById('battleStatisticsResultModal'),apiAbsent:typeof FourSymbolsBattleStatistics.showResultDetails==='undefined'&&typeof FourSymbolsBattleStatistics.hideResultDetails==='undefined'}))()");
+    assert.deepEqual(resultRetirement,{absent:true,apiAbsent:true},'Detailed battle result UI must stay retired');
+    evidence.checks.resultRetirement=resultRetirement;
     const bossBootstrap=await client.eval(`(()=>{
         if(typeof player!=='undefined'&&player){
             player.level=100;
