@@ -36,7 +36,8 @@ function fixture({fragments=500,pills=2,owned=false}={}){
             const run=tail.then(async()=>{
                 if(!active||request.data.uid!==uid||request.data.session!=="active"){throw new HttpsError("permission-denied","SESSION_INVALID");}
                 const staged=new Map(structuredClone([...data]));let writing=false;
-                const snap=(path,value)=>({id:path.split("/").at(-1),ref:ref(path),exists:value!==undefined,data:()=>value});
+                const snap=(path,value)=>({id:path.split("/").at(-1),ref:ref(path),exists:value!==undefined,
+                    data:()=>value,get:key=>key.split(".").reduce((row,part)=>row?.[part],value)});
                 const check=()=>{writing=true;if(failWrites)throw Error("transaction interrupted");};
                 const tx={get:async r=>{assert.equal(writing,false);return r.query?{
                     docs:[...staged].filter(([p])=>p.startsWith(r.path+"/")&&p.split("/").length===r.path.split("/").length+1)
