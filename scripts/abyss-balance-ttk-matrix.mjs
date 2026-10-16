@@ -8,7 +8,7 @@ export function buildAbyssTtkMatrix({randomPolicy='neutral',caseFilter=null}={})
   if(!['neutral','seeded'].includes(randomPolicy))throw new TypeError('Unknown Abyss diagnostic random policy');
   const {context:c}=loadLegacyRuntime();
   vm.runInContext(fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','utf8'),c);
-  vm.runInContext('updateUI=()=>{};saveGame=()=>{};renderPlayers=()=>{};populateSkillQuickBar=()=>{};renderBattle=()=>{v138EnsureEnemyFormationSnapshot(currentBattleMonsters);};v154PreparePortraitsForEncounter=()=>({state:"ready"});',c);
+  vm.runInContext('updateUI=()=>{};saveGame=()=>{};renderPlayers=()=>{};populateSkillQuickBar=()=>{};renderBattle=()=>{v138EnsureEnemyFormationSnapshot(currentBattleMonsters);};v154PreparePortraitsForEncounter=()=>({state:"ready"});v141PresentBattleWave=({replace,complete})=>{replace();complete();return ()=>{};};',c);
   const timers=new Map();let timerId=0,clock=0;
   c.setTimeout=(fn,ms)=>{const id=++timerId;timers.set(id,{fn,at:clock+Math.max(0,Number(ms)||0)});return id;};
   c.clearTimeout=id=>timers.delete(id);c.performance.now=()=>clock;

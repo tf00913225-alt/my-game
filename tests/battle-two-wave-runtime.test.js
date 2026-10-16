@@ -2,7 +2,7 @@
 const test=require("node:test"),assert=require("node:assert/strict"),fs=require("node:fs"),vm=require("node:vm");
 const main=fs.readFileSync("js/00-main.js","utf8");
 const declaration=name=>{const match=main.match(new RegExp("^function "+name+"\\([\\s\\S]*?^\\}","m"));assert.ok(match,name);return match[0];};
-function runtime({deferred=false,realQueue=false}={}){
+function runtime({deferred=false,realQueue=false,visual=false}={}){
  const noop=()=>{},timers=[],party=[{hp:71,sp:23,rage:9,activeBuffs:[{remaining:2}],statusEffects:[{remaining:3}]},{hp:60,sp:17}],indicator={};let ready;
  const first=Array.from({length:6},(_,i)=>({id:"first"+i,hp:0,maxHP:100,maxSP:20,alive:true,agility:2}));
  const second=Array.from({length:6},(_,i)=>({id:"second"+i,hp:100,maxHP:100,maxSP:20,alive:true,agility:3}));
@@ -16,7 +16,10 @@ function runtime({deferred=false,realQueue=false}={}){
  battleStatisticsFinishAction:noop,interceptBattleActionFinish:()=>ctx.intercept,intercept:false,notifyBattleActionFinished:()=>{ctx.actionFinishedEvents++;},actionFinishedEvents:0,finishBattleDurationAction:()=>{ctx.durationFinishes++;},durationFinishes:0,
  clearInterval:noop,setTimeout:(fn,delay)=>{timers.push({fn,delay});return timers.length;},getBattleAdvanceDelay:()=>{ctx.delayReads++;return 810;},delayReads:0,
  processNextCombatant:token=>{if(token===ctx.battleToken)ctx.commitBattleWaveTransition();},beginCharacterTurn:noop,getPartyAutoConfig:()=>({enabled:false}),autoBattle:false,activeBattleCharacterIndex:0};
- ctx.window=ctx;ctx.v154PreparePortraitsForEncounter=()=>deferred?new Promise(resolve=>{ready=resolve;}):{state:"ready"};ctx.v132AbortDungeonBattle=()=>{ctx.battleActive=false;ctx.aborted=true;};vm.createContext(ctx);
+ ctx.window=ctx;ctx.v154PreparePortraitsForEncounter=()=>deferred?new Promise(resolve=>{ready=resolve;}):{state:"ready"};ctx.v132AbortDungeonBattle=()=>{ctx.battleActive=false;ctx.aborted=true;};
+ ctx.FourSymbolsBattleFlow={acquirePresentationLock:()=>{const lock={};ctx.battlePresentationLocks.add(lock);return ()=>ctx.battlePresentationLocks.delete(lock);}};
+ ctx.v141PresentBattleWave=callbacks=>{ctx.waveVisual=callbacks;if(!visual){callbacks.replace();callbacks.complete();}return ()=>{ctx.visualCancelled=true;};};
+ vm.createContext(ctx);
  vm.runInContext(fs.readFileSync("js/battlefield-slot-owner.js","utf8"),ctx);
  vm.runInContext(main.slice(main.indexOf("let battleWaveState=null;"),main.indexOf("const POST_ACTION_DELAY_MS=650;"))+["checkBattleEnd","buildInitiativeQueue","finishPlayerAction"].map(declaration).join("\n"),ctx);
  if(realQueue){
@@ -34,6 +37,29 @@ test("player HP SP rage buffs debuffs and identity survive transition",()=>{cons
 test("follow-up interception and presentation locks block transition",()=>{const r=runtime(),c=r.ctx;c.intercept=true;r.finish();assert.equal(r.timers.length,0);c.intercept=false;r.finish();c.battlePresentationLocks.add("relic");r.flush();assert.equal(c.FourSymbolsBattleWaves.getState().phase,"WAVE_TRANSITION");c.battlePresentationLocks.clear();assert.equal(c.commitBattleWaveTransition(),true);});
 test("asynchronous portrait readiness resumes after the one action delay",async()=>{const r=runtime({deferred:true});r.finish();r.flush();assert.equal(r.ctx.FourSymbolsBattleWaves.getState().phase,"WAVE_TRANSITION");r.ready();await Promise.resolve();assert.equal(r.ctx.FourSymbolsBattleWaves.getState().phase,"WAVE_2_ACTIVE");assert.equal(r.ctx.delayReads,1);});
 test("portrait callback from obsolete battle cannot spawn wave two",async()=>{const r=runtime({deferred:true});r.finish();r.flush();r.ctx.battleToken++;r.ready();await Promise.resolve();assert.equal(r.ctx.monsters.length,6);assert.equal(r.ctx.cleanups,0);});
+
+test("whole-group exit completes before replacement; entry completion alone releases the wave lock",()=>{
+ const r=runtime({visual:true}),c=r.ctx,before=JSON.stringify(r.party);
+ r.finish();r.flush();
+ assert.equal(c.FourSymbolsBattleWaves.getState().presentation,"exit");
+ assert.deepEqual(Array.from(c.currentBattleMonsters),[0,1,2,3,4,5]);
+ assert.equal(c.battlePresentationLocks.size,1);assert.equal(c.commitBattleWaveTransition(),false);
+ c.waveVisual.replace();
+ assert.deepEqual(Array.from(c.currentBattleMonsters),[6,7,8,9,10,11]);
+ assert.equal(c.FourSymbolsBattleWaves.getState().phase,"WAVE_TRANSITION");
+ assert.equal(c.FourSymbolsBattleWaves.getState().presentation,"enter");
+ assert.equal(c.battlePresentationLocks.size,1);assert.equal(JSON.stringify(r.party),before);
+ c.waveVisual.complete();assert.equal(c.FourSymbolsBattleWaves.getState().phase,"WAVE_2_ACTIVE");
+ assert.equal(c.battlePresentationLocks.size,0);assert.equal(r.timers.length,0);
+});
+
+test("cancelled/obsolete wave presentation cannot replace entities or resume combat",()=>{
+ const r=runtime({visual:true}),c=r.ctx;r.finish();r.flush();c.battleToken++;
+ assert.equal(c.waveVisual.replace(),false);c.waveVisual.complete();
+ assert.equal(c.monsters.length,6);assert.equal(c.cleanups,0);
+ c.cancelBattleWavePresentation();assert.equal(c.visualCancelled,true);
+ assert.equal(c.battlePresentationLocks.size,0);
+});
 test("defeat wins priority over wave transition and final settlement occurs once",()=>{const r=runtime();r.party.forEach(p=>p.hp=0);assert.equal(r.ctx.checkBattleEnd(),true);assert.equal(r.ctx.losses,1);assert.equal(r.ctx.wins,0);assert.equal(r.ctx.cleanups,0);const win=runtime();win.finish();win.flush();win.ctx.currentBattleMonsters.forEach(i=>win.ctx.monsters[i].hp=0);assert.equal(win.ctx.checkBattleEnd(),true);assert.equal(win.ctx.checkBattleEnd(),true);assert.equal(win.ctx.wins,1);assert.equal(win.ctx.FourSymbolsBattleWaves.getState().phase,"BATTLE_COMPLETE");});
 test("invalid oversized and duplicate entity plans fail closed",()=>{const r=runtime();assert.throws(()=>r.ctx.FourSymbolsBattleWaves.validate("tower",[r.first,r.first]));assert.throws(()=>r.ctx.FourSymbolsBattleWaves.validate("boss",[r.first,r.second]));assert.throws(()=>r.ctx.FourSymbolsBattleWaves.validate("tower",[r.first,[...r.second,{}]]));});
 
@@ -68,7 +94,7 @@ test("QA end fixture waits for unfinished actions, queued continuation and prese
  assert.equal(r.ctx.FourSymbolsBattleWaves.getState().index,0);
  r.first.forEach(m=>{m.hp=100;m.alive=true;});
  r.ctx.battleAdvanceScheduled=false;r.ctx.battlePresentationLocks.add("cinematic");
- r.ctx.FourSymbolsBattleFlow={isPresentationActive:()=>r.ctx.battlePresentationLocks.size>0};
+ r.ctx.FourSymbolsBattleFlow.isPresentationActive=()=>r.ctx.battlePresentationLocks.size>0;
  assert.equal(finish(),false);assert.ok(r.first.every(m=>m.hp===100));
  r.ctx.battlePresentationLocks.clear();
  assert.equal(finish(),false);assert.equal(r.ctx.FourSymbolsBattleWaves.getState().index,1);

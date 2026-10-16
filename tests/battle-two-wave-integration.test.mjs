@@ -16,6 +16,9 @@ function load(){
   vm.runInContext(`
     prepareWildBalanceReferenceParty(100,3);autoBattle=false;autoPatrolEnabled=false;
     saveGame=()=>{};updateUI=()=>{};renderPlayers=()=>{};populateSkillQuickBar=()=>{};
+    // Source lifecycle tests settle the presentation boundary explicitly;
+    // physical/browser QA separately verifies the real Animation.finished path.
+    window.v141PresentBattleWave=({replace,complete})=>{replace();complete();return ()=>{};};
     window.__frames=[];window.__outcomes=[];window.__events=[];
     FourSymbolsCombatEvents.subscribe('battle_start',event=>__events.push(event));
     renderBattle=()=>{
@@ -103,6 +106,54 @@ test('shared failure path stops pending wave and returns one loss',()=>{
   assert.deepEqual(r.json('__outcomes'),['lose']);
   assert.equal(r.run('battleActive'),false);
   assert.equal(r.json('__frames').some(frame=>frame.ids[0]===6),false);
+});
+
+for(const wave of [0,1]){
+  test('successful escape in wave '+(wave+1)+' blocks late continuation and retry starts wave one',async()=>{
+    const r=load();
+    r.run(`window.__waves=v174AbyssBuildWaves(40,4,4);v132LaunchDungeonBattle(__waves[0],o=>__outcomes.push(o.result),{mode:'abyss',waves:__waves});`);
+    r.enter();
+    if(wave===1){r.run(`battlePhase='resolve';initiativeQueue=buildInitiativeQueue();initiativeIndex=0;currentBattleMonsters.forEach(i=>monsters[i].hp=0);finishPlayerAction();`);r.advance();}
+    r.run(`
+      window.__escapeEnds=[];FourSymbolsCombatEvents.subscribe('battle_end',e=>__escapeEnds.push(e.result));
+      window.FourSymbolsBattlePresentation={playEscape:()=>new Promise(resolve=>window.__resolveEscape=resolve),cleanupEscape:()=>{}};
+      window.__originalRandom=Math.random;Math.random=()=>0;resolveEscapeAttempt(0);Math.random=__originalRandom;
+      window.__escapeRoster=currentBattleMonsters.slice();window.__escapeToken=battleToken;
+      currentBattleMonsters.forEach(i=>monsters[i].hp=0);
+      finishPlayerAction();processNextCombatant(battleToken);startTurn(battleToken);
+    `);
+    assert.equal(r.run('isBattleEscapePending()'),true);
+    assert.equal(r.run('FourSymbolsBattleWaves.getState()'),null);
+    assert.deepEqual(r.json('currentBattleMonsters'),r.json('__escapeRoster'));
+    assert.equal(r.run('battleAdvanceScheduled'),false);assert.deepEqual(r.json('__outcomes'),[]);
+    r.run('__resolveEscape(true)');for(let i=0;i<5;i++)await Promise.resolve();
+    r.presentation(460);r.presentation(120);for(let i=0;i<5;i++)await Promise.resolve();
+    assert.equal(r.run('battleActive'),false);assert.equal(r.run('FourSymbolsBattleFlow.isPresentationActive()'),false);
+    assert.deepEqual(r.json('__outcomes'),['escape']);assert.deepEqual(r.json('__escapeEnds'),['escape']);
+    r.run(`window.__retry=v174AbyssBuildWaves(40,4,4);v132LaunchDungeonBattle(__retry[0],()=>{}, {mode:'abyss',waves:__retry});`);
+    assert.equal(r.run('FourSymbolsBattleWaves.getState().index'),0);
+    assert.equal(r.run('FourSymbolsBattleWaves.getState().phase'),'WAVE_1_ACTIVE');
+    assert.deepEqual(r.json('currentBattleMonsters'),[0,1,2,3,4,5]);
+    assert.equal(r.run('isBattleEscapePending()'),false);
+  });
+}
+
+test('an escape animation callback from an aborted encounter cannot abort its replacement',async()=>{
+  const r=load();r.run(`window.__waves=GameplaySystem.buildTowerWaves(1);v132LaunchDungeonBattle(__waves[0],o=>__outcomes.push(o.result),{mode:'tower',waves:__waves});`);r.enter();
+  r.run(`FourSymbolsBattlePresentation={playEscape:()=>new Promise(resolve=>window.__oldEscape=resolve),cleanupEscape:()=>{}};window.__random=Math.random;Math.random=()=>0;resolveEscapeAttempt(0);Math.random=__random;v132AbortDungeonBattle('external');window.__newWaves=GameplaySystem.buildTowerWaves(1);v132LaunchDungeonBattle(__newWaves[0],o=>__outcomes.push(o.result),{mode:'tower',waves:__newWaves});window.__newToken=battleToken;__oldEscape(true);`);
+  for(let i=0;i<5;i++)await Promise.resolve();
+  assert.equal(r.run('battleActive'),true);assert.equal(r.run('battleToken===__newToken'),true);
+  assert.equal(r.run('FourSymbolsBattleWaves.getState().index'),0);assert.deepEqual(r.json('__outcomes'),['external']);
+});
+
+test('dungeon abort during wave exit cancels presentation and stale callbacks cannot spawn wave two',()=>{
+  const r=load();r.run(`window.v141PresentBattleWave=callbacks=>{window.__waveCallbacks=callbacks;return ()=>window.__waveCancelled=true;};window.__waves=v174AbyssBuildWaves(40,4,4);v132LaunchDungeonBattle(__waves[0],o=>__outcomes.push(o.result),{mode:'abyss',waves:__waves});`);r.enter();
+  r.run(`battlePhase='resolve';initiativeQueue=[];initiativeIndex=0;currentBattleMonsters.forEach(i=>monsters[i].hp=0);finishPlayerAction();`);r.advance();
+  assert.equal(r.run('FourSymbolsBattleWaves.getState().presentation'),'exit');
+  r.run(`v132AbortDungeonBattle('escape');window.__replacement=__waveCallbacks.replace();__waveCallbacks.complete();`);
+  assert.equal(r.run('__waveCancelled'),true);assert.equal(r.run('__replacement'),false);
+  assert.equal(r.run('FourSymbolsBattleWaves.getState()'),null);assert.equal(r.run('FourSymbolsBattleFlow.isPresentationActive()'),false);
+  assert.deepEqual(r.json('__outcomes'),['escape']);assert.equal(r.run('battleActive'),false);
 });
 
 test('round-start deaths continue declaration without an extra round-start event',()=>{

@@ -596,6 +596,46 @@
     window.v141PrepareBattleRender=v141PrepareBattleRender;
     window.v141AfterBattleRender=v141AfterBattleRender;
 
+    // Same-battle waves move the existing Fixed Slot group, including artwork,
+    // names and resources. Completion belongs to Animation.finished, never a
+    // second combat timer. Durations/easing match the existing V141 exit/entry.
+    window.v141PresentBattleWave=function({token,replace,complete,fail}){
+        const area=document.getElementById("battleMonsterArea");
+        let animation=null,cancelled=false;
+        const current=()=>!cancelled&&battleActive&&token===battleToken&&area?.isConnected;
+        const cancel=()=>{cancelled=true;animation?.cancel();animation=null;};
+        (async()=>{
+            try{
+                if(!current()||!area.getBoundingClientRect().height){throw Error("Missing visible wave group");}
+                animation=area.animate([
+                    {transform:"translateY(0)",opacity:1},
+                    {transform:"translateY(-110%)",opacity:0}
+                ],{duration:780,easing:"cubic-bezier(.55,.05,.8,.25)",fill:"both"});
+                await animation.finished;
+                if(!current()){return;}
+                if(replace()!==true){return;}
+                // The old group's held offscreen pose also hides the new DOM
+                // until its decoded artwork is ready for the entry animation.
+                await Promise.all(Array.from(area.querySelectorAll("img"),img=>img.decode()));
+                if(!current()){return;}
+                animation.cancel();
+                animation=area.animate([
+                    {transform:"translateY(-110%)",opacity:0},
+                    {transform:"translateY(0)",opacity:1}
+                ],{duration:700,easing:"cubic-bezier(.2,.78,.3,1)",fill:"both"});
+                await animation.finished;
+                if(!current()){return;}
+                animation.cancel();animation=null;
+                // Observe an actually painted, settled frame before the Core
+                // Queue resumes; no fixed waiting interval is added.
+                await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+                if(current()){complete();}
+            }catch(error){if(!cancelled){cancel();fail(error);}}
+            finally{if(!current()){cancel();}}
+        })();
+        return cancel;
+    };
+
     /* =====================================================
        Battle transitions and post-battle reward timing
     ===================================================== */

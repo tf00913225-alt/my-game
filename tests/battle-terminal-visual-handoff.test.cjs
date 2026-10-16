@@ -12,14 +12,14 @@ function fixture(){
         skillDatabase:{flameSlash:{id:'flameSlash',name:'火焰斬',element:'fire',category:'physical',targetType:'single'},
             explosiveFlurry:{id:'explosiveFlurry',name:'火爆亂擊',element:'fire',category:'physical',targetType:'tri'},
             phoenixCry:{id:'phoenixCry',name:'火鳳天鳴',element:'fire',category:'magic',targetType:'all'}},
-        battleActive:true,battleToken:7,battleWaveState:null,battlePhase:'resolve',initiativeIndex:0,turn:1,activeBattleCharacterIndex:0,
+        battleActive:true,battleToken:7,battleWaveState:null,battleEscapePendingToken:null,battlePhase:'resolve',initiativeIndex:0,turn:1,activeBattleCharacterIndex:0,
         battleAdvanceScheduled:false,battleAdvanceTimeoutId:null,battleTerminalPresentationToken:null,timerId:null,POST_ACTION_DELAY_MS:650,
         getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:i=>party[i],currentBattleMonsters:[0],monsters:enemies,
         killMonster:i=>{enemies[i].alive=false;},winBattle:()=>{wins.push(now);c.battleActive=false;},loseBattle:()=>{c.battleActive=false;c.lost=true;},
         battleStatisticsFinishAction:noop,interceptBattleActionFinish:()=>false,notifyBattleActionFinished:noop,finishBattleDurationAction:noop,
         clearBattleTargetSelectionMode:noop,isBattleWaveTransition:()=>false,processNextCombatant:()=>{c.advanced=true;},showSkillNameBadge:noop};
     c.window=c;vm.createContext(c);
-    for(const name of ['requestBattleWaveTransition','getBattleAdvanceDelay','checkBattleEnd','finishPlayerAction'])vm.runInContext(declaration(name),c);
+    for(const name of ['isBattleEscapePending','requestBattleWaveTransition','getBattleAdvanceDelay','checkBattleEnd','finishPlayerAction'])vm.runInContext(declaration(name),c);
     vm.runInContext(bridge,c);
     const advance=target=>{while(true){const job=[...timers].filter(([,t])=>t.at<=target).sort((a,b)=>a[1].at-b[1].at)[0];if(!job)break;now=job[1].at;timers.delete(job[0]);job[1].fn();}now=target;};
     const play=id=>c.v142SkillAnimationDirector.play(c.v142GetSkillAnimationConfig(id),{key:id,side:'player',render:false});

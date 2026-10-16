@@ -5,12 +5,12 @@ test('formal Action completion waits for captured follow-ups and then holds newl
     const timers=[],action={token:7,index:0,entity:{hp:100},entry:{type:'monster'}};
     const c={window:null,console,Math,Number,Object,Array,Set,Map,battleDurationAction:action,
         combatEventObservers:new Map(),battleActionFinishObservers:new Set(),battleActionFinishInterceptors:[],
-        battleActive:true,battleToken:7,battleWaveState:null,battlePhase:'resolve',turn:1,initiativeIndex:0,
+        battleActive:true,battleToken:7,battleWaveState:null,battleEscapePendingToken:null,battlePhase:'resolve',turn:1,initiativeIndex:0,
         battleAdvanceScheduled:false,battleAdvanceTimeoutId:null,timerId:null,
         battleStatisticsFinishAction(){},clearInterval(){},clearBattleTargetSelectionMode(){},
         checkBattleEnd:()=>false,getBattleAdvanceDelay:()=>0,setTimeout:fn=>{timers.push(fn);return timers.length;}};
     c.window=c;vm.createContext(c);
-    for(const name of ['emitCombatEvent','notifyBattleActionFinished','interceptBattleActionFinish','finishBattleDurationAction','isBattleWaveTransition','finishPlayerAction'])vm.runInContext(declaration(name),c);
+    for(const name of ['isBattleEscapePending','emitCombatEvent','notifyBattleActionFinished','interceptBattleActionFinish','finishBattleDurationAction','isBattleWaveTransition','finishPlayerAction'])vm.runInContext(declaration(name),c);
     let captured=true,presentation=false,completions=0;
     c.battleActionFinishInterceptors.push(()=>presentation,()=>captured);
     c.combatEventObservers.set('action_finished',new Set([()=>{completions++;presentation=true;} ]));
@@ -25,14 +25,15 @@ test('successful escape publishes Battle End for normal and dungeon routes; fail
         const c={window:null,Math:Object.assign(Object.create(Math),{random:()=>succeeds?0:1}),Promise,
             timerId:null,monsters:[{alive:true,level:1}],currentBattleMonsters:[0],player:{level:1},
             battleActive:true,autoBattle:true,actionReady:true,pendingAction:{},battleAdvanceTimeoutId:null,
-            battleAdvanceScheduled:false,battleToken:1,
+            battleAdvanceScheduled:false,battleToken:1,battleEscapePendingToken:null,battleWaveState:null,
+            battleResolutionResumeToken:null,battleInputResumeToken:null,battleAutoActionResume:null,queuedPlayerActions:{},initiativeQueue:[],
             clearInterval(){},getPartyCharacterByIndex:()=>null,addBattleLog(){},
             finishPlayerAction(){finishes++;},clearBattleRoundPrompt(){},clearBattleActionWatchdog(){},
             finishBattleStatisticsSession(){},closeMenus(){},showPage(){},setMapCooldown(){},
             startMonsterMovement(){},ensureAutoPatrolInterval(){},
             emitCombatEvent(type,payload){assert.equal(type,'battle_end');assert.equal(payload.result,'escape');state=null;ends++;},
             v132ActiveDungeonRun:dungeon?{}:null,v132AbortDungeonBattle(){aborts++;c.battleActive=false;}};
-        c.window=c;vm.createContext(c);vm.runInContext(declaration('resolveEscapeAttempt'),c);
+        c.window=c;vm.createContext(c);for(const name of ['isBattleEscapePending','cancelBattleWavePresentation','beginSuccessfulBattleEscape','resolveEscapeAttempt'])vm.runInContext(declaration(name),c);
         c.resolveEscapeAttempt(0);await new Promise(resolve=>setImmediate(resolve));
         assert.equal(ends,succeeds?1:0);assert.equal(state===null,succeeds);
         assert.equal(finishes,succeeds?0:1);assert.equal(aborts,dungeon&&succeeds?1:0);

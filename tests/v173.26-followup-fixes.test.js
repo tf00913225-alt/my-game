@@ -82,7 +82,7 @@ test("round-end cleanup resynchronizes Sprites; round-start only projects settle
     let ticks=0;
     const context={
         window:null,Set,
-        battleActive:true,battleToken:7,turn:2,battleWaveState:null,
+        battleActive:true,battleToken:7,turn:2,battleWaveState:null,battleEscapePendingToken:null,
         ROUND_ANNOUNCE_LEAD_MS:450,setTimeout:fn=>{ fn();return 1; },
         battlePhase:"",activeBattleCharacterIndex:-1,
         declaredCharacterIndexes:null,resolutionPhaseStarted:true,
@@ -108,7 +108,9 @@ test("round-end cleanup resynchronizes Sprites; round-start only projects settle
     vm.createContext(context);
     const waveGuard=main.match(/^function isBattleWaveTransition\([\s\S]*?^\}/m);
     assert.ok(waveGuard,"round fixture loads the formal optional-wave guard");
-    vm.runInContext(waveGuard[0]+startTurn,context);
+    const escapeGuard=main.match(/^function isBattleEscapePending\([\s\S]*?^\}/m);
+    assert.ok(escapeGuard,"round fixture loads the formal escape guard");
+    vm.runInContext(escapeGuard[0]+waveGuard[0]+startTurn,context);
     context.startTurn(7);
     assert.equal(ticks,0,"round start cannot consume durations again");
     assert.equal(synced.statuses.length,1);
