@@ -88,16 +88,10 @@ assert.match(
     "legacy scrim cleanup may remain only to remove stale DOM from an older runtime"
 );
 assert.match(statsCss,/\.battle-insight-drawer\{[\s\S]*z-index:18072/);
-assert.match(statsCss,/\.battle-statistics-result-panel\{[\s\S]*width:min\(780px,calc\(100% - 56px\)\)/);
-assert.match(statsCss,/\.battle-statistics-result-panel > header h2\{[\s\S]*font-size:22px/);
-assert.match(statsCss,/\.battle-statistics-result-panel \.battle-stat-grid b\{font-size:19px/);
 
 assert.match(boss,/function bossMechanismInspectorCards\(\)/);
 assert.match(boss,/getActiveMechanisms:function\(\)/);
 assert.match(boss,/stats\.setBossMechanisms\(bossMechanismInspectorCards\(\)\)/);
-assert.match(boss,/showBossBattleResult\(/);
-assert.match(abyss,/title:"深淵・戰鬥詳細結算"/);
-assert.match(abyss,/onClose:finish/);
 
 assert.match(boss,/class="tower-auto-advance"/);
 assert.match(boss,/vGameplayToggleTowerAutoAdvance/);
@@ -127,3 +121,8 @@ assert.match(mainCss,/#homePage\{[\s\S]*?height:calc\(100% - 216px\);[\s\S]*?ove
 assert.match(homeRosterCss,/\.v146-home-roster\{[\s\S]*?margin:4px 10px 0;/,"roster must not reserve a second navigation height");
 
 console.log("Battle statistics / relic / talisman / Boss / Tower focused contracts passed");
+
+assert.doesNotMatch(statsSource,/battleStatisticsResultModal|showResultDetails|hideResultDetails/);
+assert.doesNotMatch(statsCss,/battle-statistics-result|battle-result-stat-card|battle-stat-grid/);
+assert.doesNotMatch(boss,/showBossBattleResult|showResultDetails/);
+assert.doesNotMatch(abyss,/showResultDetails|onClose:finish/);

@@ -1173,23 +1173,9 @@
         if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
         if(typeof window.v141ShowBlackGoldReward==="function"){ window.v141ShowBlackGoldReward({gold:goldAmount,exp:0,items:[]}); }
     }
-    function showBossBattleResult(title,outcome,onClose){
-        const stats=window.FourSymbolsBattleStatistics;
-        if(!stats||typeof stats.showResultDetails!=="function"){ return false; }
-        return stats.showResultDetails({
-            title:title,
-            subtitle:outcome&&outcome.result==="win"?"挑戰勝利":"挑戰失敗",
-            onClose:onClose
-        });
-    }
-    function isSettledBossOutcome(outcome){
-        const result=String(outcome&&outcome.result||"");
-        return result==="win"||result==="lose";
-    }
     function releaseBossBattleContext(detail){
-        /* Battle authority ends when the battle ends, not when the result modal
-           is eventually closed. Holding activeBattleContext here allowed the next
-           Dungeon/Tower battle to inherit the previous Boss snapshot. */
+        /* Release the Boss owner before returning through the battle-end callback,
+           so the next Dungeon/Tower battle cannot inherit its snapshot. */
         cleanupBossBattlePresentation();
         activeBattleContext=null;
         bossDetail=detail||null;
@@ -1206,8 +1192,7 @@
             if(typeof showPage==="function"){ showPage("boss"); }
             renderBossPage();
         };
-        if(!isSettledBossOutcome(outcome)){ finish();return; }
-        if(!showBossBattleResult(definition.name+"・戰鬥詳細結算",outcome,finish)){ finish(); }
+        finish();
     }
     function completeWorldStage(definition,stage,outcome){
         const progress=state.world[definition.id];
@@ -1224,8 +1209,7 @@
             if(typeof showPage==="function"){ showPage("boss"); }
             renderBossPage();
         };
-        if(!isSettledBossOutcome(outcome)){ finish();return; }
-        if(!showBossBattleResult(definition.name+"・"+WORLD_STAGE_PROFILES[stage-1].label+"詳細結算",outcome,finish)){ finish(); }
+        finish();
     }
     function startBoss(type,id){
         if(battleStarting||typeof battleActive!=="undefined"&&battleActive){ return false; }

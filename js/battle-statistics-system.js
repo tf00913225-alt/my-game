@@ -15,7 +15,6 @@
     let finalSnapshot=null;
     let bossMechanisms=[];
     let openDrawer=null;
-    let resultCloseCallback=null;
 
     function number(value){
         const result=Number(value);
@@ -63,15 +62,8 @@
         if(!session||!session.active||!id){ return null; }
         return session.combatants.get(String(id))||null;
     }
-    function formatValue(value){
-        return Math.max(0,Math.floor(number(value))).toLocaleString("zh-TW");
-    }
-
     function battleRoot(){
         return document.getElementById("battlePage");
-    }
-    function appRoot(){
-        return document.getElementById("game-content")||document.getElementById("app")||document.body;
     }
     function ensureBattleUi(){
         if(typeof document==="undefined"){ return null; }
@@ -111,9 +103,6 @@
         const active=!!(session&&session.active);
         ui.alertButton.hidden=!active||bossMechanisms.length===0;
         if(!active){ closeBattleDrawer(); }
-    }
-    function statRow(label,value){
-        return '<div><span>'+escapeHtml(label)+'</span><b>'+formatValue(value)+'</b></div>';
     }
     function mechanismMarkup(item){
         const remaining=item.remaining===null||item.remaining===undefined||item.remaining===""
@@ -167,58 +156,8 @@
         if(openDrawer==="boss"){ renderBossDrawer(); }
     }
 
-    function ensureResultModal(){
-        if(typeof document==="undefined"){ return null; }
-        let modal=document.getElementById("battleStatisticsResultModal");
-        if(modal){ return modal; }
-        modal=document.createElement("section");
-        modal.id="battleStatisticsResultModal";
-        modal.className="battle-statistics-result-modal";
-        modal.hidden=true;
-        modal.innerHTML='<div class="battle-statistics-result-panel"><header><div><small>Battle Result Details（戰鬥詳細結算）</small><h2 data-title>戰鬥詳細結算</h2><p data-subtitle></p></div></header><div class="battle-statistics-result-body"></div><footer><button type="button" data-close>關閉</button></footer></div>';
-        modal.querySelector("[data-close]").addEventListener("click",()=>hideResultDetails(true));
-        appRoot().appendChild(modal);
-        return modal;
-    }
-    function showResultDetails(options){
-        if(!finalSnapshot||!Array.isArray(finalSnapshot.combatants)){ return false; }
-        const modal=ensureResultModal();
-        if(!modal){ return false; }
-        const config=options&&typeof options==="object"?options:{};
-        resultCloseCallback=typeof config.onClose==="function"?config.onClose:null;
-        modal.querySelector("[data-title]").textContent=String(config.title||"戰鬥詳細結算");
-        modal.querySelector("[data-subtitle]").textContent=String(config.subtitle||"");
-        const body=modal.querySelector(".battle-statistics-result-body");
-        body.innerHTML=finalSnapshot.combatants.map(item=>
-            '<article class="battle-result-stat-card">'+
-                '<div class="battle-stat-identity">'+
-                    (item.portrait?'<img src="'+escapeHtml(item.portrait)+'" alt="">':'<span class="battle-stat-avatar-fallback" aria-hidden="true">◆</span>')+
-                    '<div><b>'+escapeHtml(item.name)+'</b><small>'+escapeHtml(item.kind==="heroNpc"?"英雄 NPC":item.kind==="reinforcement"?"援軍":"玩家角色")+'</small></div>'+
-                '</div>'+
-                '<div class="battle-stat-grid">'+
-                    statRow("總傷害",item.damageDealt)+
-                    statRow("造成治療量",item.healingDone)+
-                    statRow("承受傷害",item.damageTaken)+
-                    statRow("暴擊次數",item.criticalHits)+
-                '</div>'+
-            '</article>'
-        ).join("");
-        modal.hidden=false;
-        return true;
-    }
-    function hideResultDetails(invokeCallback){
-        const modal=typeof document!=="undefined"?document.getElementById("battleStatisticsResultModal"):null;
-        if(modal){ modal.hidden=true; }
-        const callback=resultCloseCallback;
-        resultCloseCallback=null;
-        if(invokeCallback!==false&&typeof callback==="function"){
-            try{ callback(); }catch(error){ console.error("戰鬥詳細結算關閉回呼失敗：",error); }
-        }
-    }
-
     function begin(config){
         closeBattleDrawer();
-        hideResultDetails(false);
         bossMechanisms=[];
         const input=config&&typeof config==="object"?config:{};
         session={
@@ -327,8 +266,6 @@
         setBossMechanisms:setBossMechanisms,
         clearBossMechanisms:clearBossMechanisms,
         openBossMechanisms:function(){ return openBattleDrawer("boss"); },
-        closeDrawer:closeBattleDrawer,
-        showResultDetails:showResultDetails,
-        hideResultDetails:hideResultDetails
+        closeDrawer:closeBattleDrawer
     });
 })();
