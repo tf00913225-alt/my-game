@@ -93,8 +93,8 @@ function block(source,startToken,endToken){
 }
 
 {
-    assert.match(stats,/function appRoot\(\)\{\s*return document\.getElementById\("game-content"\)\|\|document\.getElementById\("app"\)/);
-    assert.doesNotMatch(read("css/battle-statistics-system.css"),/battle-statistics-result-modal[\s\S]{0,500}transform:\s*scale\(/);
+    assert.doesNotMatch(stats,/function appRoot\(|battleStatisticsResultModal|showResultDetails|hideResultDetails/,"retired result UI owner must stay absent");
+    assert.doesNotMatch(read("css/battle-statistics-system.css"),/battle-statistics-result-modal/,"retired result surface must not retain CSS");
 }
 
 {
