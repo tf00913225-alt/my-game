@@ -89,7 +89,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                    audit.sourceRevision!==expectedRevision||
                    audit.restoredRevision!==receipt.restoredRevision||
                    audit.snapshotSha256!==receipt.snapshotSha256||
-                   approval.schemaVersion!==1||approval.ownerUid!==uid||
+                   approval.schemaVersion!==1||
+                   approval.kind!=="canonical-current-recovery-approval"||approval.ownerUid!==uid||
                    approval.operationId!==operationId||approval.sourceRevision!==expectedRevision||
                    approval.sourceSha256!==receipt.sourceSha256||
                    approval.snapshotSha256!==snapshotSnap.get("sha256")||
@@ -128,7 +129,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 fail("aborted","CLOUD_REVISION_CONFLICT");
             }
             const approval=approvalSnap.data();
-            if(!approvalSnap.exists||approval.schemaVersion!==1||approval.ownerUid!==uid||
+            if(!approvalSnap.exists||approval.schemaVersion!==1||
+               approval.kind!=="canonical-current-recovery-approval"||approval.ownerUid!==uid||
                approval.operationId!==operationId||approval.status!=="approved"||
                approval.sourceRevision!==expectedRevision||
                approval.sourceSha256!==archiveSnap.get("sourceSha256")||

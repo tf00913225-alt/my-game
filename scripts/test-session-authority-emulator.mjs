@@ -2117,6 +2117,28 @@ const replayedApproval=await approvalIssuer.issue({
     data:approvalPayload
 });
 assert.equal(replayedApproval.unchanged,true);
+// Approval identity is required both when reissuing and when consuming it.
+// Corrupt fixtures remain untouched and cannot advance the canonical revision.
+const approvalTypeBefore=(await approvalRef.get()).data();
+const approvalTypeEnvelope=(await db.doc(`users/${ownedUid}/saves/current`).get()).data();
+for(const patch of [{schemaVersion:FieldValue.delete()},{schemaVersion:2},
+    {kind:FieldValue.delete()},{kind:"canonical-current-recovery"}]){
+    await approvalRef.update(patch);
+    const corrupt=(await approvalRef.get()).data();
+    await assert.rejects(approvalIssuer.issue({
+        auth:{uid:"emulator-operator",token:{cloudSaveOperator:true}},data:approvalPayload
+    }),error=>error.code==="data-loss");
+    await assert.rejects(invoke("restoreCanonicalCurrent",ownedUser.idToken,recoveryPayload),
+        error=>["permission-denied","PERMISSION_DENIED"].includes(error.code));
+    assert.deepEqual((await approvalRef.get()).data(),corrupt);
+    assert.deepEqual((await db.doc(`users/${ownedUid}/saves/current`).get()).data(),approvalTypeEnvelope);
+    assert.equal((await ownedRoot.collection("operations").doc(recoveryOperation).get()).exists,false);
+    assert.equal((await ownedRoot.collection("recoveryAudits").doc(recoveryOperation).get()).exists,false);
+    assert.equal((await ownedRoot.collection("playableSnapshots").doc("7").get()).exists,false);
+    assert.equal((await ownedRoot.collection("recoveryArchives").doc("7").get()).exists,false);
+    await approvalRef.set(approvalTypeBefore);
+}
+console.log("Recovery approval identity real Firestore PASS: missing/unsupported schema and kind refused by issuer and first restore without writes.");
 await approvalRef.update({expiresAt:Timestamp.fromMillis(Date.now()-1000)});
 await assert.rejects(recovery.restoreCurrent(ownedRequest,recoveryArgs),
     error=>error.code==="permission-denied");
@@ -2185,6 +2207,8 @@ for(const [ref,patch] of [
     [recoveredOwnedArchive.ref,null],
     [recoveredOwnedArchive.ref,{"sourceRecords.economy.gold":999}],
     [recoveredOwnedArchive.ref,{readyForRestore:true}],
+    [approvalRef,{kind:FieldValue.delete()}],
+    [approvalRef,{kind:"canonical-current-recovery"}],
     [approvalRef,{ownerUid:"other-recovery-owner"}],
     [approvalRef,{sourceRevision:5}],
     [approvalRef,{sourceSha256:"a".repeat(64)}],
