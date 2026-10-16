@@ -6085,6 +6085,1046 @@
         }
       },
       "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.normal-04",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.normal-04",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_0000000049c08230b6fe137610bd23bf.png",
+        "sha256": "83b3fb295951a96d597f682e788e072b4eed94f495f06629bcbed4154f4a2bd1",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/normal-04.webp",
+        "sha256": "c1a60bf52dbdf417fc3192876bf42df40dd158a9dd023bc7d0bc70e91a125253",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.normal-05",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.normal-05",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_000000005c048206868893b39d74a272.png",
+        "sha256": "dc8be4c5040c3da7595cf09d8496b62c561a7d6d9157d783a2e9d064791eaea6",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/normal-05.webp",
+        "sha256": "06ed78b3524026a26368190d07565e9ff0c1fae18b16504c885e2ab071592f5c",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.normal-10",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.normal-10",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000747881f4bfa351bae8ba700e.png",
+        "sha256": "092a0758e36fcb941e8e37c24441fc0723308a2fc462cc3875897a8d5b012de4",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/normal-10.webp",
+        "sha256": "d04f2d6e3b743c758e9910514118ad6e20f7a8163d97ac7e3f1a71f793ee0a83",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.normal-13",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.normal-13",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000b52c820a9e942154e338f84e.png",
+        "sha256": "b06e5796a1dbc31143586beb22d58313d29c5af6b1d86b4beeef71888bd94106",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/normal-13.webp",
+        "sha256": "bedc665d3ee46d45306b6369b44f214d6f5265b46e4b0ff934f4b0abd9b5f97c",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.normal-14",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.normal-14",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000b834821199756e171dbbdfc3.png",
+        "sha256": "e2d8c6abc3265024573f79df7bcb0d7a363e3b567f2afc7ad1bfd1cd8bbcae4a",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/normal-14.webp",
+        "sha256": "16b5fa1addce8850dbfeccfdd3e953a293d44e5726faa5c1833423c665729f7c",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.normal-16",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.normal-16",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000ced48211993b9fd9a92c11fe.png",
+        "sha256": "9ce6a5e5dbec8759dddf16535550c096de30f6031b5a6b7997cd9692445219dd",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/normal-16.webp",
+        "sha256": "9da6fe46481149f87f613196cf35b7fbee3415a6803cd0ddc44247a8c8267b9c",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.normal-17",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.normal-17",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000d44c81fbbb43f7b84ba42b33.png",
+        "sha256": "db2accfd0964b063aa15780b091df1aa2f9798e3f3a17eb7e52f4b45d73d9f14",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/normal-17.webp",
+        "sha256": "7eafcba679600fe788929c74904c24a79a37e01d5e35970726f0ea64fc0adf72",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.normal-18",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.normal-18",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000dc008211af83b88e3cff5c25.png",
+        "sha256": "ad14d5cfd818ccd4e7ccfd065db3f87acabce516cf9f7e4fd6b60f65fa767323",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/normal-18.webp",
+        "sha256": "8cb7d67a71d20730247135808dbcfc176b6a0aedf25631c1320854638c6fb581",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.normal-19",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.normal-19",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000ec848206a268abe7c7cb30a4.png",
+        "sha256": "ac57da739f8652726ee089bc228f25f41965dff2823549f250eb444fdf57d1d3",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/normal-19.webp",
+        "sha256": "13792ce559816c5a17437e001622f3ac59e7a489dd4c6e50287c82af16f43029",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.normal-20",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.normal-20",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000eef08230a17b2e06cc118063.png",
+        "sha256": "273b4256ba0da4a1dea44a5a472d27a61386581deb2d27805fab656d797d5cff",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/normal-20.webp",
+        "sha256": "7eb68cb48341c402e32ac135869a2cce7201599fda2a9c672d5952bfd2bf79e9",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.elite-01",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.elite-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/菁英怪/file_000000001370820eb8daa114d9142b44.png",
+        "sha256": "3fd87696b7c2208325bbe27bb851795731ae0e6a58960e0dff6f4dfa806f6c41",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/elite-01.webp",
+        "sha256": "e8e9cd08351ae5b0a91229107b9e55861689e07cab2139ec9c169da275354c94",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.elite-02",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.elite-02",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/菁英怪/file_000000003bdc8246b33fff6adbe67030.png",
+        "sha256": "68bed2f31ddd6e4a6a80fbe7a7fc2627caed10e621b5b50b68042a0b18781368",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/elite-02.webp",
+        "sha256": "a467be5569c4613d0b52832371020a6497216ffd4cfbd05178173c2f439ad59e",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.elite-03",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.elite-03",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/菁英怪/file_000000004d748208901868f2e4fb6351.png",
+        "sha256": "f0025dd977536a86d0982a58945868d4a6324f251dec6895f5a4e95fe5d81270",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/elite-03.webp",
+        "sha256": "8c1607d8bf625efd3694a74d2844d5fcabaa448a5d6c51a2c74d6ea104a5f520",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.elite-04",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.elite-04",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/菁英怪/file_00000000537c820eb80d7aaf8672fb64.png",
+        "sha256": "62e36b2374268056aec01dac78723651350f926cacec3f0b23ef9e6fa9fc2561",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/elite-04.webp",
+        "sha256": "b6769244725aed3fe86eba32dfe0b39b11320d6748df1963ff96c715d0b80f1f",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.elite-05",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.elite-05",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/菁英怪/file_000000006b2c81f696ddbcb6f86eed02.png",
+        "sha256": "a85cb62eef3532c2cbc996630a95a026b332abf65addcb1d589cfa2ab3caf0bd",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/elite-05.webp",
+        "sha256": "4851214c6204d4299876e9dd98a520cbf989b0f1210823f4832cb2871d3a3d33",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.elite-06",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.elite-06",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/菁英怪/file_0000000079f08211aae43f05b14364f7.png",
+        "sha256": "7ea6bc021076c66954dfba1a9614727effa1c7498446cc22e6e8ec9e1c0d84d5",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/elite-06.webp",
+        "sha256": "dd8ae3d5bf31b1d5f00dd77583045b6126f60f03a4fae14b42eb2dc79e0a7f3b",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.elite-07",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.elite-07",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/菁英怪/file_00000000944c820a8f99cb63b93ebbfb.png",
+        "sha256": "2da821848e14490895cac18bdd6117371028c9d4366fc09a5fadfa6774d3b14e",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/elite-07.webp",
+        "sha256": "3aa904f8f0c32c9b108d7ff73729a7421705b77d9aca875d6de8f16f28d64828",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.elite-08",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.elite-08",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/菁英怪/file_0000000097f481f4b7e4c501b4cf2a4a.png",
+        "sha256": "198d4088b92da3f09e29a9d0d1cfc8458c815b024cba8191b456062c3dbb3f0d",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/elite-08.webp",
+        "sha256": "bc0218787e45064c9bb579dab7eb111e6bfe4d84f8cd86094f1c4a3ac181995c",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.elite-09",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.elite-09",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/菁英怪/file_00000000ad648211b777fc1b0421a9c3.png",
+        "sha256": "9acc4372b550e086d702061850a53aebc4e36fb4c8a32bed1dcdb9c71272621f",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/elite-09.webp",
+        "sha256": "f57c1891949801777ada9fc163c32b7adda7f48b6805aab78f9010e0ddc2139e",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "tower.water.elite-10",
+      "displayName": "天兵天將",
+      "portraitKey": "tower.water.elite-10",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "f4c6886fa28522a7e7d4c936d050333d97908bbf",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/菁英怪/file_00000000e41082119a22a9ef75320dcc.png",
+        "sha256": "5e244fd2c31c405b618ccb950a9a815ccc7cc32b54f09ae534bedab95f4cb944",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project asset",
+          "reference": "assets-library@f4c6886fa28522a7e7d4c936d050333d97908bbf",
+          "capturedAt": "2026-10-17",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; authorized water tower import"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/water/elite-10.webp",
+        "sha256": "e712ada88d66a06b23dd65ec93a77b34bcbae3a4bc06e1dc3714ecda6be39b4a",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "Image.save(runtime, WEBP, lossless=True, exact=True); RGBA pixel equality verified",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
     }
   ]
 }
