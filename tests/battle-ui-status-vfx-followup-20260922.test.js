@@ -46,8 +46,8 @@ test("battle information is retired and turn timer remains visible",()=>{
   assert.match(css,/#battleActionRegion\.target-selecting > \.turn-target-row\{[\s\S]*?top:auto;[\s\S]*?bottom:calc\(var\(--battle-target-prompt-height\) \+ var\(--battle-target-select-gap\)\);[\s\S]*?opacity:1/);
   assert.doesNotMatch(css,/battle-info-region/,"retired battle log UI must stay absent");
   assert.doesNotMatch(css,/battle-info-region/,"retired battle log UI must stay absent");
-  assert.match(stats,/aria-label","戰鬥數據"/);
-  assert.match(stats,/innerHTML="<span>戰<\/span><span>鬥<\/span><span>數<\/span><span>據<\/span>"/);
+  assert.doesNotMatch(stats,/battleStatsEdgeButton|battleStatsDrawer|openStatistics/,"retired statistics UI must stay absent");
+  assert.match(stats,/aria-label","查看 Boss 功能卡"/,"remaining Boss inspector must retain its entry");
   assert.match(js,/function syncBattleUiPriorityLayer\(\)/);
   assert.doesNotMatch(js,/function installBattleInfoHandleDrag\(\)|__battleInfoHandleDragInstalled|__suppressNextBattleInfoClick/);
   assert.doesNotMatch(css,/battleInfoToggle/,"retired battle log UI must stay absent");
