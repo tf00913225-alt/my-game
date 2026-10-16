@@ -1,6 +1,6 @@
 "use strict";
 
-const {assembleCanonicalSnapshot,claimRecordsDigest,inspectCanonicalSnapshot}=
+const {assembleCanonicalSnapshot,claimRecordsDigest}=
     require("./canonical-snapshot");
 const {inspectRecoveryArchive,createRecoveryArchive}=
     require("./canonical-recovery-archive");
@@ -15,6 +15,19 @@ const SETS={
 };
 const SINGLES={account:"current",economy:"current",relicLoadout:"current",
     progress:"current",claimCheckpoint:"current"};
+
+function restoredRecords(records,revision){
+    const next={...records};
+    for(const name of Object.keys(SINGLES)){
+        next[name]={...records[name],serverRevision:revision};
+    }
+    for(const name of Object.keys(SETS)){
+        next[name]=records[name].map(record=>({...record,serverRevision:revision}));
+    }
+    next.claimCheckpoint={...next.claimCheckpoint,
+        claimDigest:claimRecordsDigest(next.claimRecords)};
+    return next;
+}
 
 // Internal operator-approved repair of the *current* canonical revision only.
 // No earlier revision or later claim/receipt can be rolled back. Approval must
@@ -61,29 +74,50 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 const receipt=operationSnap.data(),audit=auditSnap.data(),
                     approval=approvalSnap.data();
                 if(grantSnap.exists||ledgerSnap.exists||!auditSnap.exists||!approvalSnap.exists||
-                   receipt.kind!=="canonical-current-recovery"||receipt.ownerUid!==uid||
+                   receipt.schemaVersion!==1||receipt.kind!=="canonical-current-recovery"||receipt.ownerUid!==uid||
                    receipt.operationId!==operationId||receipt.sourceRevision!==expectedRevision||
                    receipt.sourceSha256!==archiveSnap.get("sourceSha256")||
                    !Number.isSafeInteger(receipt.restoredRevision)||
                    receipt.restoredRevision!==expectedRevision+1||
                    receipt.restoredRevision>envelope.serverRevision||
                    !/^[a-f0-9]{64}$/.test(receipt.snapshotSha256||"")||
+                   receipt.authoritativeStateReady!==false||
+                   typeof receipt.approvedBy!=="string"||!receipt.approvedBy.trim()||
+                   ["schemaVersion","kind","sourceSha256","approvedBy","authoritativeStateReady"]
+                       .some(key=>audit?.[key]!==receipt[key])||
                    audit.ownerUid!==uid||audit.operationId!==operationId||
                    audit.sourceRevision!==expectedRevision||
                    audit.restoredRevision!==receipt.restoredRevision||
                    audit.snapshotSha256!==receipt.snapshotSha256||
+                   approval.schemaVersion!==1||approval.ownerUid!==uid||
+                   approval.operationId!==operationId||approval.sourceRevision!==expectedRevision||
+                   approval.sourceSha256!==receipt.sourceSha256||
+                   approval.snapshotSha256!==snapshotSnap.get("sha256")||
+                   approval.approvedBy!==receipt.approvedBy||
+                   typeof approval.expiresAt?.toMillis!=="function"||
                    approval.status!=="used"||
                    approval.usedRevision!==receipt.restoredRevision){
                     fail("data-loss","Recovery receipt or audit is inconsistent.");
                 }
-                const restored=await tx.get(root.collection("playableSnapshots")
-                    .doc(String(receipt.restoredRevision)));
+                const [restored,restoredArchive]=await Promise.all([
+                    tx.get(root.collection("playableSnapshots").doc(String(receipt.restoredRevision))),
+                    tx.get(root.collection("recoveryArchives").doc(String(receipt.restoredRevision)))
+                ]);
                 try{
-                    if(!restored.exists||restored.get("sha256")!==receipt.snapshotSha256){
-                        throw new Error("Missing recovered snapshot.");
+                    if(!restored.exists||!restoredArchive.exists||
+                       restored.get("sha256")!==receipt.snapshotSha256){
+                        throw new Error("Missing recovered evidence.");
                     }
-                    inspectCanonicalSnapshot(restored.data(),uid,receipt.restoredRevision);
-                }catch(_){fail("data-loss","Recovered snapshot is inconsistent.");}
+                    inspectRecoveryArchive(restoredArchive.data(),uid,
+                        receipt.restoredRevision,restored.data());
+                    const next=restoredRecords(records,receipt.restoredRevision);
+                    const expected=assembleCanonicalSnapshot(uid,receipt.restoredRevision,next);
+                    const expectedArchive=createRecoveryArchive(uid,receipt.restoredRevision,next,expected);
+                    if(expected.sha256!==receipt.snapshotSha256||
+                       expectedArchive.sourceSha256!==restoredArchive.get("sourceSha256")){
+                        throw new Error("Recovered sources differ from the approved original.");
+                    }
+                }catch(_){fail("data-loss","Recovered snapshot or archive is inconsistent.");}
                 return {restoredRevision:receipt.restoredRevision,unchanged:true,
                     authoritativeStateReady:false};
             }
@@ -123,15 +157,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 }
             }
             const revision=nextRevision(envelope);
-            const next={...records};
-            for(const name of Object.keys(SINGLES)){
-                next[name]={...records[name],serverRevision:revision};
-            }
-            for(const name of setNames){
-                next[name]=records[name].map(record=>({...record,serverRevision:revision}));
-            }
-            next.claimCheckpoint={...next.claimCheckpoint,
-                claimDigest:claimRecordsDigest(next.claimRecords)};
+            const next=restoredRecords(records,revision);
             let bundle,archive;
             try{
                 bundle=assembleCanonicalSnapshot(uid,revision,next);
