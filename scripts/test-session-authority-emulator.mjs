@@ -2295,6 +2295,111 @@ await assert.rejects(shop.purchase(ownedRequest,{...shopArgs,quantity:2}),
 await checkRecoveryArchive(ownedUid,8);
 assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     .get("readyForPublication"),false);
+// Rehearse loss of every current canonical domain, not just one damaged value.
+// Retained envelope, immutable snapshot/archive and operator approval survive.
+// This is the existing single-character/current-revision lane, emulator only.
+{
+    const {source}=require("../functions/src/canonical-owned-sources.js");
+    const archived=(await checkRecoveryArchive(ownedUid,8)).get("sourceRecords");
+    const operationId="recover-all-current-sources-0001";
+    const approval=ownedRoot.collection("recoveryApprovals").doc(operationId);
+    const envelopeRef=db.doc(`users/${ownedUid}/saves/current`);
+    const intent={operationId,expectedRevision:8};
+    const singles={account:"account",economy:"economy",progress:"progress",
+        relicLoadout:"relicLoadout",claimCheckpoint:"claimCheckpoints"};
+    const sets={characters:row=>row.characterId,inventory:row=>row.ownedItemId,
+        equipment:row=>`${row.characterId}_${row.slot}`,relics:row=>row.relicId,
+        claimRecords:row=>row.claimKey};
+    const documentMap=records=>new Map([
+        ...Object.entries(singles).map(([name,collection])=>
+            [`${ownedRoot.path}/${collection}/current`,records[name]]),
+        ...Object.entries(sets).flatMap(([name,key])=>records[name].map(row=>
+            [`${ownedRoot.path}/${name}/${key(row)}`,row]))
+    ]);
+    const dump=async()=>{
+        const collections=await ownedRoot.listCollections();
+        const queries=await Promise.all(collections.map(collection=>collection.get()));
+        return new Map(queries.flatMap(query=>query.docs.map(doc=>[doc.ref.path,doc.data()]))
+            .sort(([a],[b])=>a.localeCompare(b,"en")));
+    };
+    for(const name of Object.keys(sets))assert.ok(archived[name].length>0,name);
+    const current=documentMap(archived);
+    assert.equal(new Set([...current.keys()].map(path=>path.split("/").at(-2))).size,10);
+    await approvalIssuer.issue({auth:{uid:"emulator-operator",token:{cloudSaveOperator:true}},
+        data:{ownerUid:ownedUid,operationId,sourceRevision:8,ttlSeconds:900}});
+    const before=await dump(),envelopeBefore=(await envelopeRef.get()).data();
+    for(const [path,row] of current)assert.deepEqual(source(before.get(path)),row,path);
+    const erase=db.batch();for(const path of current.keys())erase.delete(db.doc(path));
+    await erase.commit();
+    const damaged=await dump();
+    for(const path of current.keys())assert.equal(damaged.has(path),false,path);
+    assert.equal(damaged.size,before.size-current.size);
+
+    // A fresh identity takes over the same UID; the old session cannot repair.
+    while(Math.floor(Date.now()/1000)<=claims(ownedUser.idToken).auth_time){
+        await new Promise(resolve=>setTimeout(resolve,100));
+    }
+    const device=await login("accounts:signInWithPassword",{
+        email:"session-owned-sources@example.test",password});
+    const session=await invoke("createGameSession",device.idToken,{uid:ownedUid});
+    const request={auth:{uid:ownedUid,token:claims(device.idToken)},data:{uid:ownedUid,session}};
+    const payload={uid:ownedUid,session,...intent};
+    await rejected("restoreCanonicalCurrent",ownedUser.idToken,
+        {uid:ownedUid,session:ownedSession,...intent},"SESSION_REVOKED");
+    assert.deepEqual(await dump(),damaged);
+
+    // Unknown claim rights cannot be hidden by restoring the retained archive.
+    const unknown=ownedRoot.collection("claimRecords").doc("rehearsal-unknown-claim");
+    await unknown.set({schemaVersion:1,ownerUid:ownedUid,serverRevision:8,
+        provenance:"server-created",claimKey:unknown.id,status:"claimed"});
+    const withUnknown=await dump();
+    await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+    assert.deepEqual(await dump(),withUnknown);
+    await unknown.delete();
+
+    const rollback=createCanonicalCurrentRecovery({db,FieldValue,HttpsError,
+        inspectExistingEnvelope,nextRevision,
+        runProtected:(input,operation)=>writerSessions.runProtected(input,async(tx,active)=>{
+            await operation(tx,active);throw new Error("rehearsal rollback after all writes");
+        })});
+    await assert.rejects(rollback.restoreCurrent(request,intent),/rehearsal rollback/);
+    assert.deepEqual(await dump(),damaged);
+    assert.deepEqual((await envelopeRef.get()).data(),envelopeBefore);
+
+    // Intentionally discard the first response, then resolve the same intent.
+    await invoke("restoreCanonicalCurrent",device.idToken,payload);
+    const committed=await dump(),committedEnvelope=(await envelopeRef.get()).data();
+    assert.deepEqual(await invoke("restoreCanonicalCurrent",device.idToken,payload),
+        {restoredRevision:9,unchanged:true,authoritativeStateReady:false});
+    assert.deepEqual(await dump(),committed);
+    assert.deepEqual((await envelopeRef.get()).data(),committedEnvelope);
+    const expected=structuredClone(archived);
+    for(const rows of Object.values(expected)){
+        for(const row of Array.isArray(rows)?rows:[rows])row.serverRevision=9;
+    }
+    expected.claimCheckpoint.claimDigest=claimRecordsDigest(expected.claimRecords);
+    for(const [path,row] of documentMap(expected))assert.deepEqual(source(committed.get(path)),row,path);
+    for(const [path,row] of before){
+        if(!current.has(path)&&path!==approval.path)assert.deepEqual(committed.get(path),row,path);
+    }
+    const added=["operations/","recoveryAudits/"].map(path=>`${ownedRoot.path}/${path}${operationId}`)
+        .concat([`${ownedRoot.path}/playableSnapshots/9`,`${ownedRoot.path}/recoveryArchives/9`]).sort();
+    assert.deepEqual([...committed.keys()].filter(path=>!before.has(path)).sort(),added);
+    assert.equal(committed.size,before.size+4);
+    const restoredArchive=await checkRecoveryArchive(ownedUid,9);
+    assert.deepEqual(restoredArchive.get("sourceRecords"),expected);
+    assert.equal(restoredArchive.get("snapshotSha256"),assembleCanonicalSnapshot(ownedUid,9,expected).sha256);
+    assert.equal(committedEnvelope.serverRevision,9);
+    assert.equal(committedEnvelope.authoritativeStateReady,false);
+    assert.equal(committed.get(approval.path).status,"used");
+    assert.equal(committed.get(approval.path).usedRevision,9);
+    assert.equal((await shop.purchase(request,shopArgs)).unchanged,true);
+    assert.equal((await goldWriter.creditReservedGrant(request,{
+        grantId:ownedGrant,operationId:ownedCreditOperation,expectedRevision:3})).unchanged,true);
+    assert.deepEqual(await dump(),committed);
+    assert.deepEqual((await envelopeRef.get()).data(),committedEnvelope);
+    console.log(`Current recovery full-source-loss rehearsal real Firestore PASS: ${current.size} documents / 10 domains; rollback, unknown claim and old-session refusal, new-session HTTP restore, discarded-response replay, exact source/archive parity and immutable receipt/ledger/claim history. Readiness remains false; not historical/disaster/second-phone acceptance.`);
+}
 // The opposite order is fenced too: a reserved grant cannot become a new
 // character's operation receipt under the same UID.
 const collisionUser=await login("accounts:signUp",{
