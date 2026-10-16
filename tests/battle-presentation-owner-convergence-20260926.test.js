@@ -123,13 +123,13 @@ const worldCompletion=bossRuntime.slice(
 for(const [name,block] of [["personal",personalCompletion],["world",worldCompletion]]){
   assert.ok(
     block.indexOf("releaseBossBattleContext(detail)")>=0&&
-    block.indexOf("releaseBossBattleContext(detail)")<block.indexOf("showBossBattleResult"),
-    name+" Boss context must release before result presentation"
+    block.indexOf("releaseBossBattleContext(detail)")<block.lastIndexOf("finish();"),
+    name+" Boss context must release before returning from battle"
   );
   assert.match(
     block,
-    /if\(!isSettledBossOutcome\(outcome\)\)\{ finish\(\);return; \}/,
-    name+" Boss escape/abort must not be held by a lose-result modal"
+    /finish\(\);/,
+    name+" Boss completion must return directly without a modal"
   );
 }
 

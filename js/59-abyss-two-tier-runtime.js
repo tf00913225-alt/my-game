@@ -606,13 +606,7 @@
                 resolveBattleResult(outcome&&outcome.result);
                 if(typeof switchDungeonTab==="function"){ switchDungeonTab("abyss"); }else{ refresh(); }
             };
-            const stats=window.FourSymbolsBattleStatistics;
-            const shown=stats&&typeof stats.showResultDetails==="function"&&stats.showResultDetails({
-                title:"深淵・戰鬥詳細結算",
-                subtitle:outcome&&outcome.result==="win"?"挑戰勝利":"挑戰失敗",
-                onClose:finish
-            });
-            if(!shown){ finish(); }
+            finish();
         },{mode:"abyss",waves:waves});
         if(!started){ battleStarting=false; }return !!started;
     }

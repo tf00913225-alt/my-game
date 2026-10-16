@@ -234,4 +234,20 @@ test("Lv20/Lv40 state remains separate and full run completes after exactly 25 c
     assert.equal(lv20.completed,true);
 });
 
+test("formal encounter completion returns and resolves progress without result-modal dismissal",()=>{
+    for(const result of ["win","lose","escape"]){
+        const {context}=load();const pages=[],tabs=[];let complete;
+        context.showPage=page=>pages.push(page);context.switchDungeonTab=tab=>tabs.push(tab);
+        context.FourSymbolsBattleStatistics={showResultDetails:()=>{throw Error("retired UI called");}};
+        context.v132LaunchDungeonBattle=(_roster,callback)=>{complete=callback;return true;};
+        context.v174AbyssSelectDifficulty(20);
+        assert.equal(context.v174AbyssStartEncounter(),true);
+        complete({result});
+        assert.equal(pages.at(-1),"dungeon");assert.equal(tabs.at(-1),"abyss");
+        const run=value(context,"v174AbyssGetRunState(20)");
+        assert.equal(run.phase,result==="win"?"chest":"ready");
+        assert.equal(run.battleCompleted,result==="win");
+        assert.equal(context.gold,0,"battle completion does not bypass the chest reward owner");
+    }
+});
 console.log(`All ${passed} Abyss regression tests passed.`);

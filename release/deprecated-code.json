@@ -315,6 +315,20 @@
         "battle-stats-edge-button",
         "battle-stats-drawer"
       ]
+    },
+    {
+      "id": "DEP-014-battle-result-details-removal",
+      "description": "戰鬥詳細統計視窗退場，必要返回與進度屬正式battle-end callback。",
+      "enabled": true,
+      "forbidden": [
+        "battleStatisticsResultModal",
+        "showResultDetails",
+        "hideResultDetails",
+        "showBossBattleResult",
+        "battle-statistics-result-modal",
+        "battle-statistics-result-panel",
+        "battle-result-stat-card"
+      ]
     }
   ]
 }
