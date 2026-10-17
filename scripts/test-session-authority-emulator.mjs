@@ -2815,5 +2815,71 @@ console.log("PASS Team formation real Firestore/HTTP: stable IDs, slot exchange/
 
 await rejected("readHeroGrowth",growthUser.idToken,growthIdentity,"SESSION_REVOKED");
 console.log("PASS Hero growth real Firestore/HTTP: original Core costs, fragment unlock/star/reroll, one concurrent spend, immutable retry, archive, malformed intents, missing ledger, private rules, revoked session. Resources are emulator-only fixtures.");
+// Same source validation/active session and HTTP boundary as production; resources
+// are earned from seven observed dates, never seeded into this fixture's inventory.
+const loginRewardEmail="hero-login-reward-emulator@example.test";
+const loginRewardUser=await login("accounts:signUp",{email:loginRewardEmail,password});
+const loginRewardUid=loginRewardUser.localId;
+const loginRewardSession=await invoke("createGameSession",loginRewardUser.idToken,{uid:loginRewardUid});
+const loginRewardIdentity={uid:loginRewardUid,session:loginRewardSession};
+await invoke("bootstrapCloudSave",loginRewardUser.idToken,loginRewardIdentity);
+const loginRewardRoot=db.collection("serverUsers").doc(loginRewardUid);
+const loginRewardRecords=makeInitialCharacterSources(loginRewardUid,2,"login-reward-initial",{
+    displayName:"登入獎勵測試",element:"fire",gender:"female",attributes:{attack:3,vitality:2,
+        energy:1,intelligence:2,defensePoints:1,agility:1}},{recordedAt:Date.now()});
+const loginRewardBundle=assembleCanonicalSnapshot(loginRewardUid,2,loginRewardRecords),loginRewardBatch=db.batch();
+for(const name of ["account","economy","progress","relicLoadout","claimCheckpoint"]){
+    loginRewardBatch.set(loginRewardRoot.collection(name==="claimCheckpoint"?"claimCheckpoints":name).doc("current"),
+        {...loginRewardRecords[name],...(name==="account"?{snapshotSha256:loginRewardBundle.sha256}:{})});
+}
+for(const row of loginRewardRecords.characters){loginRewardBatch.set(loginRewardRoot.collection("characters").doc(row.characterId),row);}
+loginRewardBatch.set(loginRewardRoot.collection("playableSnapshots").doc("2"),loginRewardBundle);
+loginRewardBatch.set(loginRewardRoot.collection("recoveryArchives").doc("2"),createRecoveryArchive(loginRewardUid,2,loginRewardRecords,loginRewardBundle));
+loginRewardBatch.update(db.doc(`users/${loginRewardUid}/saves/current`),{serverRevision:2});await loginRewardBatch.commit();
+const loginRewardIntent=(day,revision)=>({...loginRewardIdentity,milestoneDay:day,
+    operationId:`hero-login-reward-v1-day${day}`,expectedRevision:revision});
+await rejected("claimHeroLoginReward",loginRewardUser.idToken,loginRewardIntent(3,2),"FAILED_PRECONDITION");
+let loginRewardClock=Date.now();
+const loginRewardSource=createHeroAcquisition({db,FieldValue,HttpsError,runProtected:heroSessions.runProtected,
+    inspectExistingEnvelope,nextRevision,now:()=>loginRewardClock,seed:()=>20261017});
+for(let day=1;day<=7;day++){
+    await loginRewardSource.observeLogin({auth:{uid:loginRewardUid,token:claims(loginRewardUser.idToken)},
+        data:{...loginRewardIdentity,expectedRevision:day+1}});loginRewardClock+=3*86400000;
+}
+const loginRewardRace=await Promise.all([
+    invoke("claimHeroLoginReward",loginRewardUser.idToken,loginRewardIntent(3,9)),
+    invoke("claimHeroLoginReward",loginRewardUser.idToken,loginRewardIntent(3,9))]);
+assert.deepEqual(loginRewardRace[0].receipt,loginRewardRace[1].receipt);
+assert.equal(loginRewardRace[1].heroAccount.heroes.divineDogHongbao.specificFragments,25);
+assert.equal(loginRewardRace[1].marrowPills,1);
+await rejected("claimHeroLoginReward",loginRewardUser.idToken,loginRewardIntent(7,9),"ABORTED");
+const loginRewardSecond=await invoke("claimHeroLoginReward",loginRewardUser.idToken,loginRewardIntent(7,10));
+assert.equal(loginRewardSecond.heroAccount.heroes.vajraHeavenlyKing.specificFragments,25);
+assert.equal(loginRewardSecond.heroAccount.heroes.vajraHeavenlyKing.unlocked,true);
+assert.equal(loginRewardSecond.marrowPills,2);assert.equal(loginRewardSecond.authoritativeStateReady,false);
+await invoke("mutateHeroGrowth",loginRewardUser.idToken,{...loginRewardIdentity,expectedRevision:11,
+    operationId:"login-reward-star-0001",heroId:"vajraHeavenlyKing",action:"starUp"});
+await invoke("mutateHeroGrowth",loginRewardUser.idToken,{...loginRewardIdentity,expectedRevision:12,
+    operationId:"login-reward-roll-0001",heroId:"vajraHeavenlyKing",action:"reroll"});
+assert.equal((await invoke("readHeroGrowth",loginRewardUser.idToken,loginRewardIdentity)).marrowPills,1);
+assert.deepEqual((await invoke("claimHeroLoginReward",loginRewardUser.idToken,loginRewardIntent(3,9))).receipt,loginRewardRace[0].receipt);
+await checkRecoveryArchive(loginRewardUid,13);
+await rejected("claimHeroLoginReward",loginRewardUser.idToken,{...loginRewardIntent(3,13),amount:25},"INVALID_ARGUMENT");
+assert.equal(await rulesRequest(`serverUsers/${loginRewardUid}/uniqueClaims/hero-login-reward-v1-day3`,loginRewardUser.idToken,"PATCH"),403);
+while(Math.floor(Date.now()/1000)<=claims(loginRewardUser.idToken).auth_time){await new Promise(resolve=>setTimeout(resolve,100));}
+const loginRewardOther=await login("accounts:signInWithPassword",{email:loginRewardEmail,password});
+const loginRewardOtherSession=await invoke("createGameSession",loginRewardOther.idToken,{uid:loginRewardUid});
+await rejected("claimHeroLoginReward",loginRewardUser.idToken,loginRewardIntent(3,13),"SESSION_REVOKED");
+const loginRewardRestored=await invoke("claimHeroLoginReward",loginRewardOther.idToken,
+    {...loginRewardIntent(3,13),session:loginRewardOtherSession});
+assert.deepEqual(loginRewardRestored.receipt,loginRewardRace[0].receipt);
+assert.equal(loginRewardRestored.heroAccount.heroes.vajraHeavenlyKing.stars,1);
+assert.deepEqual(loginRewardRestored.loginRewards.map(row=>row.claimed),[true,true]);
+const loginRewardLedger=loginRewardRoot.collection("ledgerEntries").doc("hero-login-reward-v1-day3");
+const loginRewardLedgerBytes=(await loginRewardLedger.get()).data();await loginRewardLedger.delete();
+await rejected("claimHeroLoginReward",loginRewardOther.idToken,{...loginRewardIntent(3,13),session:loginRewardOtherSession},"DATA_LOSS");
+await loginRewardLedger.set(loginRewardLedgerBytes);
+console.log("PASS Hero login rewards real Firestore/HTTP: recorded days, existing-history catch-up, concurrent exactly-once credit, growth consumption, immutable retry, original archives, session takeover and private rules; no migration/readiness.");
+
 await db.terminate();
 if(direct){await getFirestore().terminate();}

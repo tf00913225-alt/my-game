@@ -25292,6 +25292,21 @@ function renderHeroDetailContent(hero,data){
             <section class="hero-page-section"><h3>${escape(hero.definition.name)}被動</h3><p>${escape(heroPagePassive(hero.definition))}</p></section>`;
     return content;
 }
+function renderHeroLoginRewards(data){
+    const g=data.growth,blocked=g.busy||g.testMode||battleActive||!!g.pending;
+    const rows=g.loginRewards||[];
+    return `<section class="hero-page-section" aria-label="累計登入獎勵"><h3>累計登入獎勵</h3>
+        <p>臺北日期累計，不需連續登入。每項限領一次，達標後可補領。</p>
+        ${rows.length?rows.map(row=>`<div class="hero-login-reward" data-login-day="${row.day}">
+            <p>第 ${row.day} 天：${row.day===3?"神犬紅包":"金剛天王"}碎片 ×25、洗髓丹 ×1</p>
+            <button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.claimLoginReward(${row.day})" ${blocked||row.claimed||!row.eligible?"disabled":""}>${row.claimed?"已領取":row.eligible?"領取獎勵":"未達成"}</button></div>`).join(""):
+            '<p>第 3 天：神犬紅包碎片 ×25、洗髓丹 ×1<br>第 7 天：金剛天王碎片 ×25、洗髓丹 ×1</p><p>需連線並具備完整伺服器角色資料才能領取；不以本機舊存檔補發。</p>'}
+        ${g.error?`<p role="status">${heroPageHtml(g.error)}</p>`:""}
+        ${g.testMode?'<p>目前為 DEV 隔離測試，正式獎勵領取已停用。</p>':""}
+        <button type="button" class="main-button" onclick="FourSymbolsHeroAcquisition.refresh()" ${g.busy||data.acquisition.busy?"disabled":""}>同步登入與獎勵</button>
+        ${g.pending?'<button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.retry()">確認前次操作</button>':""}
+    </section>`;
+}
 function renderHeroPageContent(){
     const data=getHeroPageSnapshot(),escape=heroPageHtml;
     const hero=data.heroes.find(row=>row.owned&&row.definition.heroId===heroPageSelectedId);
@@ -25302,7 +25317,7 @@ function renderHeroPageContent(){
     const toolbar=overview?`<div class="hero-overview-tools"><button type="button" class="main-button" onclick="openSharedFormation('hero')">佈陣</button>
         <div class="hero-element-tabs" role="tablist" aria-label="英雄元素分類">${[["all","全部"],["fire","火"],["water","水"],["wind","風"],["earth","土"]].map(([id,label])=>`<button type="button" role="tab" aria-selected="${heroPageElement===id}" onclick="filterHeroPage('${id}')">${label}</button>`).join("")}</div></div>`:
         '<button type="button" class="main-button hero-detail-back" onclick="returnHeroOverview()">‹ 返回英雄列表</button>';
-    const content=overview?`<div class="hero-card-grid">${heroes.map(row=>`<button type="button" class="hero-card" data-hero-id="${escape(row.definition.heroId)}" onclick="selectHeroPage(this.dataset.heroId)">
+    const content=overview?`${renderHeroLoginRewards(data)}<div class="hero-card-grid">${heroes.map(row=>`<button type="button" class="hero-card" data-hero-id="${escape(row.definition.heroId)}" onclick="selectHeroPage(this.dataset.heroId)">
         ${heroPageArtwork(row)}<b>${escape(row.definition.name)}</b><span>${escape(elementDatabase[row.definition.element]?.name||row.definition.element)}・${row.account.stars} 星</span><span>Lv.${row.level??"—"}${order.has(row.definition.heroId)?"・上陣":""}</span></button>`).join("")}</div>
         ${heroes.length?"":'<p class="hero-page-note">此分類目前沒有已擁有英雄。</p>'}
         <p class="hero-page-note">英雄技能依等級自動提升。</p>` : renderHeroDetailContent(hero,data);
