@@ -152,7 +152,10 @@ try{
   await tap('.v141-socket-card .v141-synthesis-primary');
   assert.equal(await c.eval(`getEquipmentBonus('fire').vitality`),1);
   assert.equal(await c.eval(`(()=>{loadGame(JSON.parse(JSON.stringify(FourSymbolsAccountSave.readActive().save)));return getEquipmentBonus('fire').vitality;})()`),1,'hydration lost sockets');
-  assert.equal(await c.eval(`(()=>{unequipItem('armor');return getEquipmentBonus('fire').vitality;})()`),0,'unequip retains gem effect');
+  await c.eval(`closeHomeFeature();showPage('inventory');selectInventoryCharacter(0);true`);await pause();
+  await tap('#equipmentGrid .inventory-equipment-cell:nth-child(4) .inventory-equipment-slot');
+  await tap('#itemEquipButton');
+  assert.equal(await c.eval(`getEquipmentBonus('fire').vitality`),0,'unequip retains gem effect');
   assert.deepEqual(await c.eval(`FourSymbolsAccountSave.readActive().save.inventoryItems.find(n=>n.v141Uid==='forge-qa-equipped').sockets`),['gemVitalityI']);
   await c.eval(`closeHomeFeature();openHomeFeature('synthesis')`);await pause();
   await tap('[onclick="v141SwitchSynthesisTab(\'material\')"]');
