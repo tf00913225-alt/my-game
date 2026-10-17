@@ -227,3 +227,26 @@ console.log('Shared portrait reserved / explicit-only / Content identity isolati
     assert.equal(failed.paths.length,0);
     console.log('Shared portrait encounter preparation / decode failure passed.');
 })().catch(error=>{console.error(error);process.exitCode=1;});
+
+(async()=>{
+    const formal=JSON.parse(fs.readFileSync('config/monster-portrait-registry.json','utf8'));
+    const keys=[...formal.waterTowerCoverage.normalByBand.flat(),...formal.waterTowerCoverage.eliteByBand.flat()];
+    const rows=new Map(Object.values(formal.groups).flat().map(row=>[row[0],row]));
+    const runtime=loadRuntime([]);
+    runtime.context.fetch=async()=>({ok:true,json:async()=>formal});
+    runtime.context.FourSymbolsFeatures={ensureAssets:async()=>{}};
+    const roster=keys.map((key,i)=>({name:'天兵天將',element:'water',rank:i<20?'regular':'elite',vGameplayTower:true,portraitKey:key,hp:100,maxHP:100,sp:50,attack:12,skillIds:['freeze'],dropGold:42}));
+    const before=JSON.parse(JSON.stringify(roster));
+    const result=await runtime.context.v154PreparePortraitsForEncounter(roster);
+    assert.equal(result.state,'ready','cold registry prepares water Tower identities');
+    for(let i=0;i<roster.length;i++){
+        const actor=roster[i];assert.equal(actor.name,rows.get(actor.portraitKey)[1]);assert.notEqual(actor.name,'天兵天將');assert.equal(actor.displayName,actor.name);
+        const {name,displayName,portraitPath,...after}=actor;const {name:oldName,...old}=before[i];assert.deepEqual(after,old,'only presentation name/path may change');
+        runtime.context.v154BindMonsterPortraitIdentity(actor);assert.equal(actor.name,rows.get(actor.portraitKey)[1],'warm/repeated binding stable');
+    }
+    for(const actor of [{name:'天兵天將',element:'water',portraitKey:'soldier.water',v141Abyss:true},{name:'深淵守衛',element:'water',portraitKey:keys[0]},{name:'異域人物',element:'fire',vGameplayTower:true,portraitKey:keys[0]}]){
+        const name=actor.name;runtime.context.v154BindMonsterPortraitIdentity(actor);assert.equal(actor.name,name,'water naming cannot leak to Abyss or other Content');
+    }
+    assert.equal(runtime.context.v154ResolveMonsterPortraitRecord({name:'天兵天將',element:'water',v141Abyss:true}).portraitKey,'soldier.water');
+    console.log('Water Tower 30 cold/warm appearance identities, numeric/skill/drop isolation and Abyss naming PASS.');
+})().catch(error=>{console.error(error);process.exitCode=1;});

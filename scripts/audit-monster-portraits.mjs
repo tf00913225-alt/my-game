@@ -163,6 +163,10 @@ const towerIds=new Set(collectMatches(bossTower,/"(MON_(?:FIRE|WIND|EARTH)_(?:NO
 (registry.assetPool?.entries||[]).filter(entry=>["wind","earth"].includes(entry.element)&&entry.status==="adopted"&&towerIds.has(entry.assetId))
     .forEach(entry=>discovered.push(entry.displayName));
 
+const waterTowerIds=new Set(collectMatches(bossTower,/"(tower\.water\.(?:normal|elite)-\d{2})"/g));
+targets.filter(target=>target.group==="tower-water"&&waterTowerIds.has(target.portraitKey))
+    .forEach(target=>discovered.push(target.name));
+
 const runtimeNames=uniq(discovered);
 const registryNames=uniq(targets.map(target=>target.name));
 const unregistered=runtimeNames.filter(name=>!registryNames.includes(name)).sort();
