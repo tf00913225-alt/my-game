@@ -119,7 +119,7 @@
         const cards=new Map();
         indexes.forEach(index=>{
             const card=document.getElementById("battleMonster"+index);
-            if(card){ applyPresentation(card,"monster");cards.set(index,card); }
+            if(card){ cards.set(index,card); }
         });
         const bossOwner=bossBattleOwner();
         const bossIndex=bossOwner&&typeof bossOwner.getBossIndex==="function"?bossOwner.getBossIndex():null;
@@ -137,6 +137,7 @@
                 const index=slots.getAssignedMonsterAtEnemySlot(snapshot,slot);
                 const card=Number.isInteger(index)&&index!==bossIndex?cards.get(index):null;
                 if(card){
+                    applyPresentation(card,"monster");
                     card.dataset.slot=slot;
                     card.dataset.geometryOwner="fixed-slot";
                     holder.appendChild(card);
@@ -151,6 +152,7 @@
             footprint.dataset.geometryOwner="fixed-slot";
             footprint.dataset.slots=slots.bossFootprintSlots.join(" ");
             bossCard.classList.add("gameplay-boss-card");
+            applyPresentation(bossCard,"monster");
             bossCard.dataset.slot="ENEMY_B3";
             bossCard.dataset.geometryOwner="fixed-slot";
             footprint.appendChild(bossCard);

@@ -73,7 +73,7 @@ const enemy=index.indexOf('<section class="battle-enemy-region"');
 const center=index.indexOf('<section class="battle-center-region"');
 const ally=index.indexOf('<section class="battle-ally-region"');
 const info=index.indexOf('<div id="battleTurnIndicator"');
-assert.ok(enemy<center&&center<ally&&ally<info,"battle DOM must be enemy → controls → allies → bottom info");
+assert.ok(enemy<center&&center<info&&info<ally,"battle DOM must be enemy → controls with round → allies");
 assert.doesNotMatch(index.slice(center,ally),/id="battleInfo"/);
 assert.doesNotMatch(css,/--battle-info-region-track/);
 assert.match(css,/grid-template-rows:\s*minmax\(0,var\(--battle-enemy-region-track\)\)[\s\S]*var\(--battle-ally-region-track\)/);

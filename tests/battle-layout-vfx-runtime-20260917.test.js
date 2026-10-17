@@ -92,13 +92,13 @@ for(const [element,groups] of Object.entries(ELEMENT_DAMAGE_SKILLS)){
     }
 }
 
-assert.match(index,/<section class="battle-enemy-region"[\s\S]*id="battleMonsterArea"[\s\S]*<section class="battle-center-region"[\s\S]*id="battleActionRegion"[\s\S]*id="turnTargetRow"[\s\S]*<section class="battle-ally-region"[\s\S]*id="battlePlayerRow"[\s\S]*id="battleTurnIndicator"/);
+assert.match(index,/<section class="battle-enemy-region"[\s\S]*id="battleMonsterArea"[\s\S]*<section class="battle-center-region"[\s\S]*id="battleActionRegion"[\s\S]*id="battleTurnIndicator"[\s\S]*id="turnTargetRow"[\s\S]*<section class="battle-ally-region"[\s\S]*id="battlePlayerRow"/);
 const centerMarkup=index.slice(index.indexOf('<section class="battle-center-region"'),index.indexOf('<section class="battle-ally-region"'));
 assert.doesNotMatch(centerMarkup,/id="battleInfo"/,"the bottom battle log must not be owned by the middle controls");
 assert.doesNotMatch(index,/<div class="battle-monster-gap-filler"><\/div>/,"legacy space-filler must not own battle layout");
 assert.match(layoutCss,/--battle-enemy-region-track:42fr/);
-assert.match(layoutCss,/--battle-center-region-track:16fr/);
-assert.match(layoutCss,/--battle-ally-region-track:42fr/);
+assert.match(layoutCss,/--battle-center-region-track:24fr/);
+assert.match(layoutCss,/--battle-ally-region-track:34fr/);
 assert.match(layoutCss,/grid-template-rows:[\s\S]*var\(--battle-enemy-region-track\)[\s\S]*var\(--battle-center-region-track\)[\s\S]*var\(--battle-ally-region-track\)/);
 assert.doesNotMatch(layoutCss,/--battle-info-region-track/,"battle info must not consume a structural grid track");
 assert.match(layoutCss,/grid-template-columns:repeat\(var\(--battle-enemy-columns,5\),minmax\(0,1fr\)\)/,"enemy slots remain equal width");

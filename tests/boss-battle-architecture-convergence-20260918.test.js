@@ -67,7 +67,7 @@ assert.doesNotMatch(presentation,/v174-hit-shake|shakeArtForPopup/);
 
 assert.match(fixedCss,/\.v174-unit-hud:not\(\[data-boss="true"\]\) \.monster-hp,[\s\S]*?\.v174-unit-hud:not\(\[data-boss="true"\]\) \.hp-bar\{bottom:calc\(var\(--battle-name-row-height\) \+ var\(--battle-resource-bar-height\)\) !important/);
 assert.match(fixedCss,/--battle-resource-bar-height:11px/);
-assert.match(fixedCss,/--battle-enemy-region-track:42fr[\s\S]*?--battle-center-region-track:16fr[\s\S]*?--battle-ally-region-track:42fr/);
+assert.match(fixedCss,/--battle-enemy-region-track:42fr[\s\S]*?--battle-center-region-track:24fr[\s\S]*?--battle-ally-region-track:34fr/);
 assert.match(fixedCss,/\.battle-center-region\{[\s\S]*?border:0/);
 assert.doesNotMatch(fixedCss,/battle-info-region/,"retired battle log UI must stay absent");
 assert.doesNotMatch(fixedCss,/battleInfoToggle/,"retired battle log UI must stay absent");

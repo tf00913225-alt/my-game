@@ -192,9 +192,6 @@ ${portraitSource}
  window.FourSymbolsBossBattle={getBossIndex:function(){return 0;},isBossIndex:function(index){return index===0;},isActive:function(){return true;},getEnemyFormationSnapshot:function(){if(owner.getActiveEnemySnapshot()!==bossSnapshot)owner.setActiveEnemySnapshot(bossSnapshot);return bossSnapshot;},ownsEnemyFormationSnapshot:function(snapshot){return snapshot===bossSnapshot;}};
  adapter.reconcile();
  var bossCard=document.getElementById('battleMonster0'),leftObject=document.getElementById('battleMonster3');
- // The formal V174 renderer refreshes Boss identity after the Slot owner marks
- // the footprint. Keep the fixture's presentation boundary in the same state.
- window.FourSymbolsBattlePresentation.applyUnit(bossCard);
  bossCard.classList.add('targetable');leftObject.classList.add('targetable');
  var bossFootprint=document.querySelector('.v-fixed-boss-footprint'),bossReticle=getComputedStyle(bossCard,'::before'),objectReticle=getComputedStyle(leftObject,'::before');
  var bossHp=bossCard.querySelector('.monster-hp'),bossSp=bossCard.querySelector('.monster-sp'),bossName=bossCard.querySelector('.battle-monster-name');
