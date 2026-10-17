@@ -288,29 +288,28 @@ async function run(chrome,url,live){
    assert.match(visual.background,/assets\/ui\/home-background-v17344\.png/);
    assert.doesNotMatch(visual.background,/home-background\.jpg/);
    assert.ok(visual.badge,'version badge lost browser owner');
-   // Readable resources may wrap with the installed font or a long value.
-   // Validate the browser scroll owner and every reachable control instead of
-   // requiring a fixed-height, zero-scroll composition.
-   assert.equal(visual.scrollOwner,'auto','home lost its browser scroll owner');
+   // The approved city fits the one native canvas; every control is checked below.
+   assert.equal(visual.scrollOwner,'hidden','home must stay inside its fixed canvas');
    assert.equal(visual.oldBackground,false,'retired scrolling background layer returned');
    const composition=await c.eval(`(()=>{
     const box=s=>{const r=document.querySelector(s).getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width};};
-    return {primary:box('.home-primary-actions'),secondary:box('.home-secondary-actions'),utility:box('.home-utility-actions'),adventure:box('#adventureHomeEntry'),roster:box('#v146HomeRoster'),columns:getComputedStyle(document.querySelector('.home-secondary-actions')).gridTemplateColumns,people:document.querySelectorAll('.v146-home-character:not(.v146-home-character-empty)').length,daily:document.querySelectorAll('.home-card-secondary').length,tools:document.querySelectorAll('.home-card-tertiary').length,collections:[...document.querySelectorAll('.home-card-utility')].map(n=>({height:n.getBoundingClientRect().height,width:n.getBoundingClientRect().width})),entries:[...document.querySelectorAll('#homePage .home-card,#adventureHomeEntry')].map(n=>({label:n.getAttribute('aria-label'),rect:n.getBoundingClientRect().toJSON()}))};
+    return {rails:box('.home-city-entrances'),utility:box('.home-utility-actions'),adventure:box('#adventureHomeEntry'),roster:box('#v146HomeRoster'),relic:box('#homePage>.team-relic-loadout-slot'),columns:getComputedStyle(document.querySelector('#v146HomeRoster')).gridTemplateColumns,people:document.querySelectorAll('.v146-home-character').length,portraits:document.querySelectorAll('#homePartyScene img').length,side:document.querySelectorAll('.home-city-entrances>.home-card').length,tools:document.querySelectorAll('.home-card-tertiary').length,collections:[...document.querySelectorAll('.home-card-utility')].map(n=>({height:n.getBoundingClientRect().height,width:n.getBoundingClientRect().width})),entries:[...document.querySelectorAll('#homePage .home-card,#adventureHomeEntry')].map(n=>({label:n.getAttribute('aria-label'),rect:n.getBoundingClientRect().toJSON()}))};
    })()`);
-   assert.equal(composition.columns.split(' ').length,2,'authored side rails replaced by auto-fit cards');
+   assert.equal(composition.columns.split(' ').length,3,'borderless status must retain three authored columns');
    assert.equal(composition.people,3,'populated three-character roster not exercised');
-   assert.equal(composition.daily,4,'daily side facilities lost their distinct hierarchy');
+   assert.equal(composition.portraits,3,'city must display the three real players without hero artwork');
+   assert.equal(composition.side,8,'side facilities lost an entrance');
    assert.equal(composition.tools,4,'recessive tool row lost a function');
    assert.equal(composition.collections.length,2,'paired collections missing');
-   assert.ok(composition.collections.every(n=>n.height/home.rect.width>=.10&&n.height/home.rect.width<=.13&&n.width/home.rect.width<=.5),'collections lost fixed canvas proportions');
+   assert.ok(composition.collections.every(n=>Math.abs(n.height/home.rect.width-180/1080)<.002&&Math.abs(n.width/home.rect.width-144/1080)<.002),'collections lost native side-entrance proportions');
    assert.equal(composition.entries.length,13,'city entrance lost or duplicated');
    for(let i=0;i<composition.entries.length;i++)for(let j=i+1;j<composition.entries.length;j++){
     const a=composition.entries[i],b=composition.entries[j];
     assert.ok(Math.min(a.rect.right,b.rect.right)-Math.max(a.rect.left,b.rect.left)<=1||Math.min(a.rect.bottom,b.rect.bottom)-Math.max(a.rect.top,b.rect.top)<=1,'city entrances overlap '+a.label+' / '+b.label);
    }
-   assert.ok(composition.adventure.bottom<=composition.primary.top,'adventure obstructs common entrances');
-   assert.ok(composition.primary.bottom<composition.utility.top,'common entrances and tools lose distinct rows');
-   assert.ok(composition.utility.bottom<composition.roster.top,'tools obstruct party HUD');
+   assert.ok(composition.roster.bottom<=composition.rails.top,'side entrances obstruct the top status');
+   assert.ok(composition.adventure.bottom<=composition.utility.top,'story entrance obstructs lower tools');
+   assert.ok(composition.utility.bottom<=composition.relic.top,'tools obstruct relic summary');
    const homeControls=[];
    for(const selector of [...['角色','商店','英雄系統','合成','任務','鍛造','成就','公告','離線經驗','系統','秘寶','元素匣'].map(label=>'.home-card[aria-label="'+label+'"]'),'#v146HomeRoster','.v-fixed-formation-entry','#adventureHomeEntry']){
     await c.eval(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'nearest'})`);await settle();
@@ -328,7 +327,7 @@ async function run(chrome,url,live){
    evidence.push({homeControls:true,viewport:v,visual,controls:homeControls});
    await screenshot('migration-home-end-'+v.join('x'));
 
-   const domain=await c.eval(`(()=>{const n=document.getElementById('homePage');const ancestors=[];for(let p=n;p;p=p.parentElement)ancestors.push(getComputedStyle(p).transform);return {parent:n.parentElement.id,ancestors,navParent:document.getElementById('bottomNav').parentElement.parentElement.id,resources:[...n.querySelectorAll('.home-hud-resources b,.v146-home-resource strong')].map(n=>parseFloat(getComputedStyle(n).fontSize))};})()`);
+   const domain=await c.eval(`(()=>{const n=document.getElementById('homePage');const ancestors=[];for(let p=n;p;p=p.parentElement)ancestors.push(getComputedStyle(p).transform);return {parent:n.parentElement.id,ancestors,navParent:document.getElementById('bottomNav').parentElement.parentElement.id,resources:[...n.querySelectorAll('.home-hud-resources b,.home-status-meter>span:first-child')].map(n=>parseFloat(getComputedStyle(n).fontSize))};})()`);
    assert.equal(domain.parent,'game-ui');assert.equal(domain.navParent,'game-overlay-layer');
    assert.equal(domain.ancestors.filter(t=>t!=='none').length,1,'general UI must inherit only the stage FitScale');
    assert.ok(domain.resources.every(size=>size>=13),'browser home text below reading minimum');
