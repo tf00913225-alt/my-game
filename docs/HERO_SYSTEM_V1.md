@@ -1,5 +1,15 @@
 # Hero System V1 — Phase 1, Phase 2A, Phase 2B and Phase 2C UI
 
+## Hero equipment — HERO-EQUIPMENT-20261017
+
+Hero equipment extends the existing `js/00-main.js` inventory/equipment Owner. The six canonical slots are head/hand/shoulder/armor/shoes/ring. UID main-save `characterEquipment` stores loadouts under `heroNpc:<registry heroId>`; Hero Core/account schema remains unchanged. The same factory instance `v141Uid`, bag, item detail/comparison, element/level restrictions, socket/reforge/set bonuses and `getEquipmentBonus`/player stat formula serve players and Heroes. Hero equipment keys never become player skill keys. Battle creation uses equipped maximum HP/SP and the existing live battle getters include the same equipment bonuses. No Hero battle transient fields are saved.
+
+All owned Heroes can manage equipment in their existing Hero detail page. Only confirmed fielded, owned Heroes additionally appear in the existing backpack character/portrait selector; unfielded Heroes do not appear there. Both entrances refer to the same objects and loadouts. No player4/5/6 identity, duplicate inventory, new image or second equipment formula is introduced.
+
+The detail dialog captures UID, stable subject and physical item before mutation. The shared transfer rejects missing bag items, duplicate ownership, stale subjects, lost ownership/formation and active battles. Wear exchanges the bag item with the existing slot atomically; a full bag blocks unequip. Save refusal/exception restores the same bag and equipped objects before any success refresh. Legacy Hero-less saves initialize empty Hero slots; duplicate physical references block instead of minting copies or deleting originals. Historical main-element aliases remain compatible.
+
+This is the existing UID-local equipment authority, not trusted Cloud asset ownership or cross-device equipment recovery. It adds no browser key, server writer, rewards, admission, readiness or historical migration authority. Existing main-save backup/candidate retention preserves the added map entries; complete canonical equipment writer/reader and recovery gates remain pending. Targeted evidence is maintained by Work PR #917; `tests/hero-equipment.test.js` and the existing Hero Browser QA cover these entry points and shared transfers.
+
 ## Hero UI V2 / persisted team formation — HERO-UI-V2-20261013
 
 使用者於 2026-10-13 明確授權英雄編隊／站位保存契約擴充；技能維持自動升級。本節取代下方歷史 Phase 2A/2C 的 session-only UI／編隊說明，歷史證據保留。

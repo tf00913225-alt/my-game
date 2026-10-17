@@ -1387,7 +1387,7 @@
     function syncInventoryPortrait(){
         const frame=document.getElementById("inventoryPortraitFrame");
         if(!frame || typeof getPartyCharacterByIndex!=="function"){ return; }
-        const character=getPartyCharacterByIndex(inventoryCharacterIndex);
+        const character=getBackpackCharacter(inventoryCharacterIndex);
         if(!character){ return; }
         const placeholder=frame.querySelector(".inventory-portrait-placeholder");
         if(placeholder){ placeholder.style.display="none"; }
@@ -2128,7 +2128,7 @@
     function appendEquipmentSetInfo(item){
         if(!item || !equipmentSetItemDefinitions.some(def=>def.id===(item.definitionId||item.id)&&def.setId===item.setId)){ return; }
         normalizeEquipmentSetItem(item);
-        const equipmentKey=getBackpackEquipmentKey(inventoryCharacterIndex);
+        const equipmentKey=getEquipmentSelection()?.key||getBackpackEquipmentKey(inventoryCharacterIndex);
         if(!equipmentKey){ return; }
         const counts=getEquipmentSetCounts(equipmentKey);
         const count=counts[item.setId+"_"+item.setVariant]||0;
@@ -3403,7 +3403,8 @@
     // Only direct skills of the set's element consume this source. Normal
     // attacks and unrelated elements must never inherit the five-piece bonus.
     window.v132GetEquipmentSetSkillDamageBonusPercent=function(character,skill){
-        const key=typeof getCharacterSkillKey==="function"?getCharacterSkillKey(character):null;
+        const key=character?.combatantKind==="heroNpc"?"heroNpc:"+character.heroId:
+            typeof getCharacterSkillKey==="function"?getCharacterSkillKey(character):null;
         if(!key||!skill||!character){ return 0; }
         const set=EQUIPMENT_SETS.find(set=>set.element===character.element&&set.element===skill.element);
         if(!set){ return 0; }
@@ -3419,10 +3420,11 @@
     if(typeof equipSelectedItem==="function"){
         const originalEquipSelectedItem=equipSelectedItem;
         equipSelectedItem=function(){
-            const item=inventorySlots[selectedInventorySlot];
-            const character=getBackpackCharacter(inventoryCharacterIndex);
+            const selection=getEquipmentSelection();
+            const item=selection?.item;
+            const character=selection?.character;
 
-            if(document.getElementById("itemEquipButton")?.dataset.slot){
+            if(selection?.slot){
                 return originalEquipSelectedItem.apply(this,arguments);
             }
             normalizeEquipmentSetItem(item);
@@ -8152,7 +8154,7 @@
     }
 
     function getCreatedBackpackIndexes(){
-        return [0,1,2].filter(index=>!!getBackpackCharacter(index));
+        return getBackpackPartyCharacters().map((character,index)=>character?index:null).filter(index=>index!==null);
     }
 
     if(typeof changeInventoryCharacter==="function"){
@@ -8253,6 +8255,7 @@
         const definition=item&&typeof getPotionDefinition==="function"?getPotionDefinition(item.id):null;
         const character=typeof getBackpackCharacter==="function"?getBackpackCharacter(inventoryCharacterIndex):null;
         const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(inventoryCharacterIndex):null;
+        if(character?.combatantKind==="heroNpc"){return false;}
         if(!definition||!character||!stats){ return false; }
         const resource=definition.resource;
         const maxValue=resource==="hp"?Number(stats.maxHP):Number(stats.maxSP);

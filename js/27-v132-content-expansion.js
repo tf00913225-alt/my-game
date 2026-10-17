@@ -75,7 +75,7 @@
     function appendEquipmentSetInfo(item){
         if(!item || !equipmentSetItemDefinitions.some(def=>def.id===(item.definitionId||item.id)&&def.setId===item.setId)){ return; }
         normalizeEquipmentSetItem(item);
-        const equipmentKey=getBackpackEquipmentKey(inventoryCharacterIndex);
+        const equipmentKey=getEquipmentSelection()?.key||getBackpackEquipmentKey(inventoryCharacterIndex);
         if(!equipmentKey){ return; }
         const counts=getEquipmentSetCounts(equipmentKey);
         const count=counts[item.setId+"_"+item.setVariant]||0;
@@ -1350,7 +1350,8 @@
     // Only direct skills of the set's element consume this source. Normal
     // attacks and unrelated elements must never inherit the five-piece bonus.
     window.v132GetEquipmentSetSkillDamageBonusPercent=function(character,skill){
-        const key=typeof getCharacterSkillKey==="function"?getCharacterSkillKey(character):null;
+        const key=character?.combatantKind==="heroNpc"?"heroNpc:"+character.heroId:
+            typeof getCharacterSkillKey==="function"?getCharacterSkillKey(character):null;
         if(!key||!skill||!character){ return 0; }
         const set=EQUIPMENT_SETS.find(set=>set.element===character.element&&set.element===skill.element);
         if(!set){ return 0; }
@@ -1366,10 +1367,11 @@
     if(typeof equipSelectedItem==="function"){
         const originalEquipSelectedItem=equipSelectedItem;
         equipSelectedItem=function(){
-            const item=inventorySlots[selectedInventorySlot];
-            const character=getBackpackCharacter(inventoryCharacterIndex);
+            const selection=getEquipmentSelection();
+            const item=selection?.item;
+            const character=selection?.character;
 
-            if(document.getElementById("itemEquipButton")?.dataset.slot){
+            if(selection?.slot){
                 return originalEquipSelectedItem.apply(this,arguments);
             }
             normalizeEquipmentSetItem(item);
