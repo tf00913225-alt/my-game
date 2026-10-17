@@ -473,7 +473,7 @@
     function syncInventoryPortrait(){
         const frame=document.getElementById("inventoryPortraitFrame");
         if(!frame || typeof getPartyCharacterByIndex!=="function"){ return; }
-        const character=getPartyCharacterByIndex(inventoryCharacterIndex);
+        const character=getBackpackCharacter(inventoryCharacterIndex);
         if(!character){ return; }
         const placeholder=frame.querySelector(".inventory-portrait-placeholder");
         if(placeholder){ placeholder.style.display="none"; }

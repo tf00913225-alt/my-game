@@ -7,7 +7,7 @@ const roster=main.slice(main.indexOf('// Battle-only roster.'),main.indexOf('fun
 const ids=['divineDogHongbao','vajraHeavenlyKing'];
 function runtime(hostname){
  const ctx={location:{hostname},FourSymbolsHeroCore:core,player:{id:'p',level:30},player2:null,player3:null,
-  skillDatabase:{phoenixCry:{},windHowlLightning:{}},calculateCharacterBaseStats:()=>({maxHP:100,maxSP:50}),battleActive:false};
+  skillDatabase:{phoenixCry:{},windHowlLightning:{}},getEquipmentBonus:()=>({}),calculateCharacterBaseStats:()=>({maxHP:100,maxSP:50}),battleActive:false};
  ctx.window=ctx;vm.createContext(ctx);vm.runInContext(adapter+'\n'+roster,ctx);return ctx;
 }
 test('exact DEV host gets both formal heroes in the default battle roster without canonical ownership',()=>{

@@ -2242,6 +2242,10 @@ function normalizeEquipmentSlots(equipment){
    裝備加成
 ===================================================== */
 
+// Hero loadouts share the existing UID equipment graph, never Hero Core state.
+for(const definition of window.FourSymbolsHeroCore.listHeroDefinitions()){
+    characterEquipment['heroNpc:'+definition.heroId]={head:null,hand:null,shoulder:null,armor:null,shoes:null,ring:null};
+}
 normalizeEquipmentSlots(characterEquipment.fire);
 normalizeEquipmentSlots(characterEquipment.water);
 normalizeEquipmentSlots(characterEquipment.wind);
@@ -2554,9 +2558,10 @@ function hasActiveBuff(
 */
 
 function getAdditionalCharacterBattleStats(character,characterKey){
-    const bonus=getEquipmentBonus(characterKey);
+    const equipmentKey=character?.combatantKind==='heroNpc'?'heroNpc:'+character.heroId:characterKey;
+    const bonus=getEquipmentBonus(equipmentKey);
     const base=calculateCharacterBaseStats(character,bonus);
-    const earthEXLevel=characterKey?getSkillLevel(characterKey,"earthEX"):0;
+    const earthEXLevel=character?.combatantKind!=="heroNpc"&&characterKey?getSkillLevel(characterKey,"earthEX"):0;
     const evasionBuffPercent=getActiveBuffPercent(character,"dodgeSkill");
     const defenseBuffPercent=getActiveBuffPercent(character,"rockWall");
     const defenseDownPercent=getPlayerDefenseDownPercent(character);
@@ -4953,7 +4958,7 @@ function initializeHeroBattleCombatants(){
     const next=ids.map(heroId=>{
         const definition=domain.getHeroDefinition(heroId);
         if(!domain.isHeroUnlocked(heroId)){ throw new Error("locked Hero cannot enter battle"); }
-        const stats=domain.getHeroBaseStats(heroId);
+        const stats=calculateCharacterBaseStats({level:domain.getHeroLevel(heroId),...domain.getHeroAllocatedStats(heroId)},getEquipmentBonus('heroNpc:'+heroId));
         return {id:heroId,name:definition.name,heroId,combatantId:"heroNpc:"+heroId,
             combatantKind:"heroNpc",element:definition.element,level:domain.getHeroLevel(heroId),
             ...domain.getHeroAllocatedStats(heroId),hp:stats.maxHP,sp:stats.maxSP,
@@ -7947,6 +7952,10 @@ function loadGame(){
            裝備資料
         */
 
+        for(const definition of window.FourSymbolsHeroCore.listHeroDefinitions()){
+            characterEquipment['heroNpc:'+definition.heroId]={head:null,hand:null,shoulder:null,armor:null,shoes:null,ring:null};
+        }
+
         if(
             data.characterEquipment
         ){
@@ -8015,6 +8024,7 @@ function loadGame(){
 
 
         window.FourSymbolsEquipmentFactory.migrateGraph(inventoryItems,characterEquipment);
+        window.FourSymbolsEquipmentFactory.validateOwnership(inventoryItems,characterEquipment);
 
         normalizePotionInventoryFromLegacy(
             data
@@ -25236,7 +25246,7 @@ function getHeroPageSnapshot(){
             return {definition,account:(window.FourSymbolsHeroGrowth?.getAccount?.()?.heroes[id]||canonical.getHeroAccountState(id)),eligible,owned,
                 level:created?domain.getHeroLevel(id):null,
                 points:created&&eligible?domain.getHeroAllocatedStats(id):null,
-                stats:created&&eligible?domain.getHeroBaseStats(id):null,
+                stats:created&&eligible?calculateCharacterBaseStats({level:domain.getHeroLevel(id),...domain.getHeroAllocatedStats(id)},getEquipmentBonus('heroNpc:'+id)):null,
                 skill:created?domain.getHeroSkillProjection(id):null,
                 artwork:getCharacterBattleArtworkPath({combatantKind:"heroNpc",heroId:id})};
         })};
@@ -25273,6 +25283,7 @@ function renderHeroDetailContent(hero,data){
                 ${data.acquisition.chapter?.phase==="active"&&data.acquisition.chapter.nextNodeId===window.FourSymbolsAdventureContent?.chapters[data.acquisition.chapter.chapterId]?.endNodeId?'<button type="button" class="main-button" onclick="FourSymbolsHeroAcquisition.claimChapterHero()">取得神犬紅包</button>':""}
             </section>
             ${renderHeroGrowthControls(hero,data)}
+            ${renderHeroEquipment(hero,data)}
             <section class="hero-page-section"><h3>六圍配點</h3>${rows(Object.entries(STAT_NAMES),hero.points)}</section>
             <section class="hero-page-section"><h3>基礎戰鬥數值</h3>${rows([["maxHP","HP"],["maxSP","SP"],["attack","物理攻擊"],["magicAttack","法術攻擊"],["defense","防禦力"],["speed","速度"]],hero.stats)}</section>
             <section class="hero-page-section"><h3>怒氣技能：${escape(hero.skill?.definition?.name||"—")} ${hero.skill?"Lv."+hero.skill.level:""}</h3>
@@ -30225,18 +30236,67 @@ function removeEquippedSkill(index){
 let inventoryFilter = "equipment";
 const INVENTORY_CATEGORY_SLOT_COUNT = 120;
 
+function getHeroEquipmentCharacter(id){
+    const domain=window.FourSymbolsHeroSystem.getDomain();
+    if(!domain.isHeroUnlocked(id))return null;
+    const definition=domain.getHeroDefinition(id);
+    return {id:definition.name,name:definition.name,heroId:id,combatantKind:'heroNpc',element:definition.element,
+        level:domain.getHeroLevel(id),...domain.getHeroAllocatedStats(id)};
+}
 function getBackpackPartyCharacters(){
-    return [player, player2, player3];
+    return [player,player2,player3,...window.FourSymbolsHeroBattle.getRoster().map(id=>getHeroEquipmentCharacter(id)).filter(Boolean)];
 }
-
-function getBackpackCharacter(index){
-    return getBackpackPartyCharacters()[index] || null;
-}
-
+function getBackpackCharacter(index){return getBackpackPartyCharacters()[index]||null;}
 function getBackpackEquipmentKey(index){
-    return getBackpackCharacter(index)
-        ? getPartyCharacterKey(index)
-        : null;
+    const character=getBackpackCharacter(index);
+    return character?.combatantKind==='heroNpc'?'heroNpc:'+character.heroId:character?getPartyCharacterKey(index):null;
+}
+// Capture the subject and physical item when opening a detail dialog. Neither
+// later inventory sorting nor formation edits can redirect a pending action.
+let equipmentDetailSelection=null;
+function getEquipmentSelection(){
+    const selection=equipmentDetailSelection;
+    if(!selection)return null;
+    if(!selection.uid||selection.uid!==window.FourSymbolsAccountSave?.getActiveUid?.())return null;
+    if(selection.heroId){
+        if(selection.origin==='backpack'&&!window.FourSymbolsHeroBattle.getRoster().includes(selection.heroId))return null;
+        const character=getHeroEquipmentCharacter(selection.heroId);
+        return character?{...selection,character}:null;
+    }
+    const character=getPartyCharacterByIndex(selection.index);
+    return character===selection.character?selection:null;
+}
+function captureEquipmentSelection(item,heroId=null,slot=null){
+    const character=heroId?getHeroEquipmentCharacter(heroId):getBackpackCharacter(inventoryCharacterIndex);
+    if(!character){equipmentDetailSelection=null;return;}
+    equipmentDetailSelection={uid:window.FourSymbolsAccountSave?.getActiveUid?.(),character,item,slot,
+        heroId:character.combatantKind==='heroNpc'?character.heroId:null,index:inventoryCharacterIndex,
+        key:heroId?'heroNpc:'+heroId:getBackpackEquipmentKey(inventoryCharacterIndex),origin:heroId?'hero':'backpack'};
+}
+function renderHeroEquipment(hero,data){
+    if(!hero.owned)return '';
+    const id=hero.definition.heroId,equipment=characterEquipment['heroNpc:'+id];
+    const button=(item,slot)=>`<button type="button" class="hero-equipment-item" data-hero="${heroPageHtml(id)}" data-uid="${heroPageHtml(item?.v141Uid||'')}" data-slot="${slot||''}"
+        onclick="openHeroEquipmentItem(this.dataset.hero,this.dataset.uid,this.dataset.slot)" ${!data.editingAllowed?'disabled':''}>
+        ${item?FourSymbolsItemSlot.art(item.icon,item):'<span>＋</span>'}<span>${slot?({head:'頭',hand:'手',shoulder:'護腕',armor:'衣服',shoes:'鞋子',ring:'戒指'}[slot])+ '：':''}${item?FourSymbolsItemSlot.name(item.name,item):'未裝備'}</span></button>`;
+    return `<section class="hero-page-section hero-equipment-section"><h3>裝備</h3><div class="hero-equipment-slots">${Object.entries(equipment).map(([slot,item])=>button(item,slot)).join('')}</div>
+        <h3>共用背包裝備</h3><p>穿戴、替換或脫下均使用同一背包；其他角色已穿戴的裝備需先脫下。</p>
+        <div class="hero-equipment-bag">${inventoryItems.filter(item=>getInventoryEquipmentSlot(item.type)).map(item=>button(item,null)).join('')||'<p>背包沒有可穿戴裝備。</p>'}</div></section>`;
+}
+function openHeroEquipmentItem(heroId,uid,slot){
+    if(battleActive||!getHeroEquipmentCharacter(heroId))return;
+    if(slot){
+        const item=characterEquipment['heroNpc:'+heroId]?.[slot];
+        if(!item){return;}
+        openEquippedItem(item,slot,heroId);
+    }else{
+        const item=inventoryItems.find(item=>item.v141Uid===uid);
+        if(!item)return;
+        // Existing detail and comparison renderers consume the shared slot map.
+        inventoryFilter='equipment';rebuildInventorySlots();
+        const index=inventorySlots.indexOf(item);if(index<0)return;
+        openItemModal(index,heroId);
+    }
 }
 
 function getInventoryEquipmentSlot(itemType){
@@ -30305,18 +30365,21 @@ function renderInventoryCharacterTabs(){
     const wrap=$("inventoryCharacterTabs");
     if(!wrap) return;
 
-    const charactersList=[player,player2,player3];
+    const charactersList=getBackpackPartyCharacters();
+    if(!charactersList[inventoryCharacterIndex])inventoryCharacterIndex=0;
     const character=charactersList[inventoryCharacterIndex];
 
-    const leftDisabled=inventoryCharacterIndex<=0;
-    const rightDisabled=inventoryCharacterIndex>=charactersList.length-1 || !charactersList[inventoryCharacterIndex+1];
+    const previous=charactersList.findLastIndex((c,i)=>c&&i<inventoryCharacterIndex);
+    const next=charactersList.findIndex((c,i)=>c&&i>inventoryCharacterIndex);
+    const leftDisabled=previous<0;
+    const rightDisabled=next<0;
 
     wrap.innerHTML=`
         <button type="button"
             class="inventory-character-arrow"
             aria-label="上一個角色"
             ${leftDisabled ? "disabled" : ""}
-            onclick="selectInventoryCharacter(${Math.max(0,inventoryCharacterIndex-1)})">‹</button>
+            onclick="selectInventoryCharacter(${Math.max(0,previous)})">‹</button>
 
         <div class="inventory-character-name">
             <span>${character ? (character.id || "角色"+(inventoryCharacterIndex+1)) : "角色"+(inventoryCharacterIndex+1)}</span>
@@ -30327,7 +30390,7 @@ function renderInventoryCharacterTabs(){
             class="inventory-character-arrow"
             aria-label="下一個角色"
             ${rightDisabled ? "disabled" : ""}
-            onclick="selectInventoryCharacter(${Math.min(charactersList.length-1,inventoryCharacterIndex+1)})">›</button>
+            onclick="selectInventoryCharacter(${next<0?inventoryCharacterIndex:next})">›</button>
     `;
 }
 
@@ -30675,6 +30738,7 @@ function renderInventoryItems(){
 }
 
 function renderInventory(){
+    if(!getBackpackCharacter(inventoryCharacterIndex))inventoryCharacterIndex=0;
     const character=getBackpackCharacter(inventoryCharacterIndex);
     const nameEl=$("inventoryCharacterName");
     if(nameEl){
@@ -30803,7 +30867,7 @@ window.setItemModalPresentationMode=setItemModalPresentationMode;
 
 
 function openItemModal(
-    slotIndex
+    slotIndex,heroId=null
 ){
 
     const item =
@@ -30817,6 +30881,7 @@ function openItemModal(
     }
 
 
+    captureEquipmentSelection(item,heroId);
     window.FourSymbolsCurrentItemDetail=item;
     selectedInventorySlot =
         slotIndex;
@@ -30905,8 +30970,9 @@ function openItemModal(
 
 function openEquippedItem(
     item,
-    slot
+    slot,heroId=null
 ){
+    captureEquipmentSelection(item,heroId,slot);
     window.FourSymbolsCurrentItemDetail=item;
 
     selectedInventorySlot =
@@ -30964,6 +31030,7 @@ function closeItemModal(){
         window.v132CloseRewardModal();
     }
     window.FourSymbolsCurrentItemDetail=null;
+    equipmentDetailSelection=null;
 
     selectedInventorySlot =
         null;
@@ -31448,189 +31515,39 @@ function closeStatusHelp(){
    穿戴
 ===================================================== */
 
+// One transfer Owner for player and Hero equipment. UID-local, as before;
+// item UIDs establish physical identity, never trusted Cloud ownership.
+function commitEquipmentTransfer(selection,slot,item,unequip=false){
+    if(battleActive||!selection||!slot||!item)return false;
+    const equipment=characterEquipment[selection.key];
+    if(!equipment)return false;
+    try{window.FourSymbolsEquipmentFactory.validateOwnership(inventoryItems,characterEquipment);}catch(error){alert(error.message);return false;}
+    const bagIndex=inventoryItems.indexOf(item),old=equipment[slot];
+    if(unequip){if(old!==item||inventoryItems.length>=120)return false;}
+    else if(bagIndex<0||getInventoryEquipmentSlot(item.type)!==slot)return false;
+    const before=inventoryItems.slice();
+    try{
+        if(unequip){inventoryItems.push(item);equipment[slot]=null;}
+        else{inventoryItems.splice(bagIndex,1);if(old)inventoryItems.push(old);equipment[slot]=item;}
+        window.FourSymbolsEquipmentFactory.validateOwnership(inventoryItems,characterEquipment);
+        if(saveGame()!==true)throw Error('裝備變更尚未存檔，已還原。');
+    }catch(error){
+        inventoryItems.splice(0,inventoryItems.length,...before);equipment[slot]=old;
+        alert(error.message);return false;
+    }
+    closeItemModal();rebuildInventorySlots();renderInventory();updateUI();refreshHeroPage(true);return true;
+}
 function equipSelectedItem(){
-
-    const button =
-        $("itemEquipButton");
-
-
-    if(button.dataset.slot){
-
-        unequipItem(
-            button.dataset.slot
-        );
-
-        return;
-
-    }
-
-
-    if(
-        selectedInventorySlot===null
-    ){
-        return;
-    }
-
-
-    const item =
-        inventorySlots[
-            selectedInventorySlot
-        ];
-
-
-    if(
-        !item ||
-        item.type==="potion"
-    ){
-        return;
-    }
-
-
-    const character =
-        getBackpackCharacter(
-            inventoryCharacterIndex
-        );
-
-
-    if(!character){
-        return;
-    }
-
-
-    const equipmentKey =
-        getBackpackEquipmentKey(
-            inventoryCharacterIndex
-        );
-
-
-    const equipment =
-        characterEquipment[equipmentKey];
-
-
-    const equipmentSlot =
-        getInventoryEquipmentSlot(item.type);
-
-
-    if(!equipmentSlot){
-        return;
-    }
-
-
-    const oldItem =
-        equipment[equipmentSlot];
-
-
-    if(oldItem){
-
-        inventoryItems.push(
-            oldItem
-        );
-
-    }
-
-
-    const actualIndex =
-        inventoryItems.indexOf(
-            item
-        );
-
-
-    if(actualIndex>=0){
-
-        inventoryItems.splice(
-            actualIndex,
-            1
-        );
-
-    }
-
-
-    equipment[equipmentSlot] =
-        item;
-
-
-    closeItemModal();
-
-    rebuildInventorySlots();
-
-    renderInventory();
-
-    updateUI();
-
-    saveGame();
-
+    const selection=getEquipmentSelection();if(!selection)return false;
+    if(selection.slot)return unequipItem(selection.slot);
+    return commitEquipmentTransfer(selection,getInventoryEquipmentSlot(selection.item.type),selection.item);
 }
-
-
-/* =====================================================
-   脫下
-===================================================== */
-
 function unequipItem(slot){
-
-    const character =
-        getBackpackCharacter(
-            inventoryCharacterIndex
-        );
-
-
-    if(!character){
-        return;
-    }
-
-
-    const equipmentKey =
-        getBackpackEquipmentKey(
-            inventoryCharacterIndex
-        );
-
-
-    const equipment =
-        characterEquipment[equipmentKey];
-
-
-    const item =
-        equipment[slot];
-
-
-    if(!item){
-        return;
-    }
-
-
-    if(
-        inventoryItems.length>=120
-    ){
-
-        alert(
-            "背包已滿，無法脫下裝備。"
-        );
-
-        return;
-
-    }
-
-
-    inventoryItems.push(
-        item
-    );
-
-
-    equipment[slot]=null;
-
-
-    closeItemModal();
-
-    rebuildInventorySlots();
-
-    renderInventory();
-
-    updateUI();
-
-    saveGame();
-
+    const selection=getEquipmentSelection();
+    if(!selection||selection.slot!==slot)return false;
+    if(inventoryItems.length>=120){alert('背包已滿，無法脫下裝備。');return false;}
+    return commitEquipmentTransfer(selection,slot,selection.item,true);
 }
-
 
 /* =====================================================
    售出

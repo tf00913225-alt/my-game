@@ -37,6 +37,7 @@ html,body{margin:0;width:420px;height:747px;background:#000;overflow:hidden}#gam
 window.inventorySlots=[{id:'sp10',type:'potion',name:'回復10%SP藥水',icon:'◇',stats:{},reforgeSlots:0},{id:'qa-equipment',type:'armor',name:'裝備長內容測試',icon:'◇',stats:{attack:10},reforgeSlots:0}];window.inventoryItems=[];window.characterEquipment={};
 window.__accountKeys=[];window.FourSymbolsAccountSave={accountKey:function(suffix){window.__accountKeys.push(suffix);return 'four_symbols_account:fixture-uid:'+suffix;}};
 function $(id){return document.getElementById(id);}
+function captureEquipmentSelection(){} // Geometry fixture has no equipment actor/mutation.
 function getPotionEffectDescription(){return '回復最大SP的10%';}
 function getStatText(){return Array.from({length:28},(_,i)=>'<div>長屬性 '+i+'：+100</div>').join('');}
 var selectedInventorySlot=null;

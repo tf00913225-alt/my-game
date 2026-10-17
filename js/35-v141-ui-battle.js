@@ -162,7 +162,7 @@
     }
 
     function getCreatedBackpackIndexes(){
-        return [0,1,2].filter(index=>!!getBackpackCharacter(index));
+        return getBackpackPartyCharacters().map((character,index)=>character?index:null).filter(index=>index!==null);
     }
 
     if(typeof changeInventoryCharacter==="function"){
@@ -263,6 +263,7 @@
         const definition=item&&typeof getPotionDefinition==="function"?getPotionDefinition(item.id):null;
         const character=typeof getBackpackCharacter==="function"?getBackpackCharacter(inventoryCharacterIndex):null;
         const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(inventoryCharacterIndex):null;
+        if(character?.combatantKind==="heroNpc"){return false;}
         if(!definition||!character||!stats){ return false; }
         const resource=definition.resource;
         const maxValue=resource==="hp"?Number(stats.maxHP):Number(stats.maxSP);
