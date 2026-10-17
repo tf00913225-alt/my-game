@@ -226,4 +226,4 @@ assert.match(fs.readFileSync("index.html","utf8"), /id="battleActionRegion"[\s\S
 assert.doesNotMatch(fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8"), /#battlePage \.battle-monster-name\.v143-monster-identity\{/);
 assert.doesNotMatch(fs.readFileSync("css/45-v152-dev-fixes.css","utf8"), /#battlePage \.battle-monster-name\.v143-monster-identity\{/);
 assert.match(css,/--battle-name-row-height:16px;/);
-assert.match(css,/--battle-art-hud-reserve:40px;/);
+assert.match(css,/--battle-art-hud-reserve:44px;/);

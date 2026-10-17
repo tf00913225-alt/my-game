@@ -29,9 +29,9 @@
     --battle-ally-inline-padding:4px;
     --battle-art-overhang-x:5px;
     --battle-art-overhang-top:6px;
-    --battle-art-hud-reserve:40px;
+    --battle-art-hud-reserve:44px;
     --battle-name-row-height:16px;
-    --battle-resource-bar-height:11px;
+    --battle-resource-bar-height:13px;
     --battle-enemy-safe-top:12px;
     --battle-item-menu-top-offset:116px;
     --battle-item-menu-gap:8px;
@@ -43,7 +43,8 @@
 #game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"]{
     --battle-enemy-region-track:40fr;
     --battle-title-height:0px;
-    --battle-enemy-safe-top:6px;
+    --battle-enemy-safe-top:12px;
+    --battle-art-overhang-top:12px;
     --battle-center-region-track:24fr;
     --battle-ally-region-track:36fr;
 }
@@ -385,8 +386,8 @@
     pointer-events:none !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player > .v174-battle-art{
-    --battle-art-hud-reserve:40px;
-    --battle-art-overhang-top:10px;
+    --battle-art-hud-reserve:44px;
+    --battle-art-overhang-top:7px;
 }
 /* Offline alpha bounds are consumed by V174. The full canvas is painted once,
    preserving aspect and every nontransparent pixel; no runtime pixel scan. */
@@ -446,6 +447,8 @@
     --battle-resource-bar-height:11px;
     color:#f4ead4;font-family:"Noto Sans TC",sans-serif;
 }
+
+.v174-unit-hud:not([data-boss="true"]){--battle-resource-bar-height:13px;}
 
 .v174-battle-hud-layer > .v174-unit-hud{position:fixed;inset:auto;}
 /* HUD uses formal Slot anchors and never participates in Unit layout. */
@@ -533,6 +536,10 @@
     max-height:24px !important;
     overflow:visible !important;
     z-index:32 !important;
+}
+
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .monster-status-badges:empty{
+    display:none !important;
 }
 
 /* Fixed Slot is the production owner of the manual-control indicator. The
