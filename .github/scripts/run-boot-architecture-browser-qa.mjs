@@ -356,9 +356,7 @@ try{
     evidence.checks.firstPlayPrivacyAccepted=await client.eval(`JSON.parse(localStorage.getItem("four_symbols_privacy_consent"))`);
     assert.equal(evidence.checks.firstPlayPrivacyAccepted.privacyPolicyVersion,"2026-09-11-v2");
 
-    // CASE 3: a stale manifest gets a differential update. The 5+5 branding
-    // finishes first, but scene 2 remains visible until the deliberately slow
-    // changed asset completes.
+    // CASE 3: scene 2 remains visible while a real changed resource is pending.
     await clear();const updateStarted=Date.now();await navigate("manifest-update");await sleep(10100);
     const updateHold=await client.eval(`(()=>({scene:document.getElementById("startupLoader").dataset.scene,hidden:document.getElementById("startupLoader").hidden,title:document.getElementById("startupStatusTitle").textContent,percent:Number(document.getElementById("startupProgress").getAttribute("aria-valuenow")),authShown:document.getElementById("firebaseAuthOverlay")?.classList.contains("show")||false}))()`);
     assert.equal(updateHold.scene,"city");assert.equal(updateHold.hidden,false);assert.match(updateHold.title,/更新必要資源/);assert.ok(updateHold.percent<100);assert.equal(updateHold.authShown,false);evidence.checks.manifestUpdateHold={...updateHold,elapsedMs:Date.now()-updateStarted};
@@ -395,7 +393,7 @@ try{
     for(const label of ["Google 登入","訪客開始遊戲","Email 登入","建立帳號"]){assert.ok(signedOut.labels.includes(label),"Missing auth action: "+label);}
     assert.ok(signedOut.featureResources.some(name=>/app-shell/.test(name)),"First Play did not warm app-shell");assert.ok(signedOut.featureResources.some(name=>/gameplay-core/.test(name)),"First Play did not warm gameplay-core");assert.ok(signedOut.featureResources.some(name=>/feature-patrol/.test(name)),"First Play did not warm patrol");assert.equal(signedOut.featureResources.some(name=>/feature-(?:abyss|skill|boss-relic)/.test(name)),false,"First Play eagerly fetched a deep optional feature");
     evidence.checks.authFirst=signedOut;evidence.performance.coldAuth=await metrics(client,"four-symbols:auth-ui-interactive");
-    assert.ok(evidence.performance.coldAuth.readyMs>=9800&&evidence.performance.coldAuth.readyMs<=13000,"Returning auth UI must respect the deliberate 5s + 5s brand opening");
+    assert.ok(evidence.performance.coldAuth.readyMs<=5000,"Controlled auth UI must be interactive within 5 seconds");
     const authPresentation=await client.eval(`(()=>{const o=document.getElementById("firebaseAuthOverlay"),d=o.querySelector(".firebase-auth-dialog"),t=o.querySelector(".firebase-auth-title"),r=d.getBoundingClientRect(),bg=getComputedStyle(o,"::before").backgroundImage;return {backdrop:bg,dialogWidth:r.width,titleFont:parseFloat(getComputedStyle(t).fontSize),cityRequested:performance.getEntriesByType("resource").some(e=>new URL(e.name).pathname.endsWith("/assets/ui/startup-main-city.d43e67af1c1c.jpg"))};})()`);
     assert.match(authPresentation.backdrop,/startup-main-city\.d43e67af1c1c\.jpg/);assert.ok(authPresentation.dialogWidth<=390);assert.ok(authPresentation.titleFont<=27);assert.equal(authPresentation.cityRequested,true);evidence.checks.authPresentation=authPresentation;
 
@@ -593,7 +591,7 @@ try{
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='READY'&&window.FourSymbolsStartupPolicy?.getUid()==='uid-B'&&performance.getEntriesByName('four-symbols:main-city-interactive').length>0","warm account restore",15000);
     assert.equal(await client.eval(`localStorage.getItem("__qa_candidate_backup_uid_B")`),candidateAfterReload,"Fresh-device restore removed the original QA candidate backup");
     evidence.performance.warmExisting=await metrics(client,"four-symbols:main-city-interactive");
-    assert.ok(evidence.performance.warmExisting.readyMs>=9800&&evidence.performance.warmExisting.readyMs<=15000,"Warm returning main city did not respect the deliberate 5s + 5s brand opening");
+    assert.ok(evidence.performance.warmExisting.readyMs<=3000,"Controlled warm main city must be interactive within 3 seconds");
     evidence.checks.warmRestore=await client.eval(`(()=>({uid:FourSymbolsStartupPolicy.getUid(),playerId:player.id,creation:getComputedStyle(document.getElementById("creationPage")).display,game:getComputedStyle(document.getElementById("gameInterface")).display}))()`);
     assert.equal(evidence.checks.warmRestore.uid,"uid-B");assert.equal(evidence.checks.warmRestore.playerId,"角色-B");assert.equal(evidence.checks.warmRestore.creation,"none");assert.notEqual(evidence.checks.warmRestore.game,"none");
     await client.send("Emulation.setDeviceMetricsOverride",{width:412,height:915,deviceScaleFactor:3,mobile:true,screenWidth:412,screenHeight:915});

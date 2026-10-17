@@ -34,12 +34,33 @@ assert.equal(manifest.featureManifest.features.patrol,"feature-patrol");
 assert.match(html,/startupCityScene/);
 assert.match(html,/startup-main-city\.d43e67af1c1c\.jpg/);
 assert.match(source,/showCity/);
-assert.match(source,/const logoTargetMs=Math\.max\(5000,/);
-assert.match(source,/const cityTargetMs=5000/);
-assert.match(source,/await delay\(logoTargetMs\);[\s\S]*?showCity[\s\S]*?await delay\(cityTargetMs\)/);
+assert.match(html,/data-logo-target-ms="900"/);
+assert.doesNotMatch(source,/cityTargetMs|await presentation|await delay\(logoTargetMs\)/);
+assert.match(source,/function runOpeningPresentation[\s\S]*?global\.setTimeout/);
 assert.match(source,/CREATION_PORTRAITS/);
 assert.match(source,/await prepareCreationRender\(\)/);
 console.log("✓ account-first startup state machine with real readiness");
+
+// Presentation cannot hold real readiness or overwrite a later destination.
+{
+    const vm=require('node:vm'),timers=new Map(),calls=[];let id=0;
+    const context={root:{dataset:{}},logoTargetMs:900,openingDone:false,state:'BOOT_LOADING',
+        STATES:{BOOT_LOADING:'BOOT_LOADING'},progress:{getAttribute:()=>30},
+        showCity:reason=>calls.push(reason),status:()=>calls.push('status'),
+        global:{setTimeout(fn,ms){assert.equal(ms,900);timers.set(++id,fn);return id;},clearTimeout(key){timers.delete(key);}}};
+    vm.createContext(context);
+    vm.runInContext(source.slice(source.indexOf('    let openingTimer=null;'),source.indexOf('    function renderFirstPlayProgress('))+'this.present=runOpeningPresentation;',context);
+    assert.equal(context.present(true,false),undefined,'presentation must return without a pending promise');
+    assert.deepEqual(calls,[]);
+    context.state='AUTH_REQUIRED';timers.get(1)();
+    assert.deepEqual(calls,[],'late presentation timer cannot change the account destination');
+    context.state='BOOT_LOADING';context.present(false,false);timers.get(2)();
+    assert.deepEqual(calls,['first-boot-logo-complete','status'],'real resource loading retains scene two');
+    context.present(true,false);context.present(true,true);
+    assert.equal(timers.has(3),false,'retry cancels the old presentation timer');
+    assert.equal(calls.at(-1),'resource-retry');
+    console.log('✓ opening presentation is non-blocking and destination-safe');
+}
 
 // Exercise the real presentation lifecycle, including a callback already queued
 // when a new destination requests the shell again.
