@@ -86,3 +86,30 @@ test("old receipts lack delta evidence: retain and block without invented backfi
     const h=fixture();delete h.data.get(prefix+`ledgerEntries/${operationId}`).creditEvidenceVersion;
     for(const run of [h.credit,h.reserve])await assert.rejects(run(),e=>e.code==="failed-precondition"&&e.message==="CREDIT_EVIDENCE_REQUIRED");
 });
+function reservation(){
+    const h=fixture("exp");
+    h.data.get(prefix+`pendingGrants/${grantId}`).status="reserved";
+    const receipt=h.data.get(prefix+`grantOperations/${operationId}`);
+    receipt.creditedToCharacter=false;delete receipt.creditRevision;delete receipt.snapshotSha256;
+    for(const path of [`ledgerEntries/${operationId}`,`uniqueClaims/${grantId}`,`claimRecords/${grantId}`]){
+        h.data.delete(prefix+path);
+    }
+    return h;
+}
+test("reservation replay preserves original uncredited result without touching later balance",async()=>{
+    const h=reservation(),before=JSON.stringify([...h.data]);
+    assert.equal((await h.reserve()).creditedToCharacter,false);
+    assert.equal((await h.reserve()).unchanged,true);
+    assert.equal(JSON.stringify([...h.data]),before);
+});
+test("shared reservation proof retains identity, event-state and ledger refusal",async()=>{
+    for(const mutate of [
+        h=>h.data.get(prefix+`grantOperations/${operationId}`).createdAt=null,
+        h=>h.data.get(prefix+`grantOperations/${operationId}`).creditedToCharacter="false",
+        h=>h.data.get(prefix+`pendingGrants/${grantId}`).status="credited",
+        h=>h.data.set(prefix+`ledgerEntries/${operationId}`,{amount:25})]){
+        const h=reservation();mutate(h);const before=JSON.stringify([...h.data]);
+        await assert.rejects(h.reserve(),e=>e.code==="data-loss");
+        assert.equal(JSON.stringify([...h.data]),before);
+    }
+});

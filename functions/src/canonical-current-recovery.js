@@ -4,7 +4,7 @@ const {assembleCanonicalSnapshot,claimRecordsDigest}=
     require("./canonical-snapshot");
 const {inspectRecoveryArchive,createRecoveryArchive}=
     require("./canonical-recovery-archive");
-const {verifyCreditedGrant}=require("./credited-grant-evidence");
+const {verifyCreditedGrant,verifyReservedGrant}=require("./credited-grant-evidence");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 const SETS={
@@ -171,15 +171,49 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             }
             // Canonical claim sources may all be lost. Independent retained
             // rights must agree with the archive, not be hidden by its rollback.
-            const claims=await tx.get(root.collection("uniqueClaims").limit(401));
+            const [claims,receipts]=await Promise.all([
+                tx.get(root.collection("uniqueClaims").limit(401)),
+                tx.get(root.collection("grantOperations").limit(401))
+            ]);
             // Each credit proof reads at most 12 documents, including its claim,
             // grant/receipt/ledger/collision and original event/snapshot/archive.
-            if(queries.reduce((sum,query)=>sum+query.size,0)+claims.docs.length*12>400){
+            // Inventory reads are additional; a reservation may need three point
+            // reads and the original event plus its snapshot/archive (six total).
+            const reservedCount=receipts.docs.filter(doc=>doc.get("creditedToCharacter")===false).length;
+            if(queries.reduce((sum,query)=>sum+query.size,0)+claims.docs.length*12+
+               receipts.docs.length+reservedCount*6>400){
                 fail("failed-precondition","Recovery claim evidence exceeds the transaction budget.");
             }
             const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
             if(claims.docs.length!==archivedClaims.size){
                 fail("data-loss","Independent claims differ from the recovery archive.");
+            }
+            let creditedCount=0;
+            for(const doc of receipts.docs){
+                const receipt=doc.data();
+                if(receipt.operationId!==doc.id||!OPERATION_ID.test(doc.id)){
+                    fail("data-loss","Grant receipt identity blocks recovery.");
+                }
+                if(receipt.creditedToCharacter===true){
+                    if(archivedClaims.get(receipt.grantId)?.operationId!==doc.id){
+                        fail("data-loss","An unmatched credited receipt blocks recovery.");
+                    }
+                    creditedCount++;
+                }else if(receipt.creditedToCharacter===false&&OPERATION_ID.test(receipt.grantId||"")){
+                    const [grant,ledger,other]=await Promise.all([
+                        tx.get(root.collection("pendingGrants").doc(receipt.grantId)),
+                        tx.get(root.collection("ledgerEntries").doc(doc.id)),
+                        tx.get(root.collection("operations").doc(doc.id))
+                    ]);
+                    await verifyReservedGrant({tx,root,uid,grantId:receipt.grantId,operationId:doc.id,
+                        currentRevision:expectedRevision,grant:grant.data(),receipt,
+                        ledgerExists:ledger.exists,otherOperationExists:other.exists,fail});
+                }else{
+                    fail("data-loss","Unknown grant receipt state blocks recovery.");
+                }
+            }
+            if(creditedCount!==archivedClaims.size){
+                fail("data-loss","Credited receipt inventory differs from the recovery archive.");
             }
             for(const doc of claims.docs){
                 const record=archivedClaims.get(doc.id),claim=doc.data();
