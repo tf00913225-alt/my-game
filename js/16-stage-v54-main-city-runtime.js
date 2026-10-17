@@ -290,17 +290,12 @@
         return true;
     }
 
-    /* Read the same confirmed formation and Hero domain; never create battle actors. */
+    /* City artwork projects existing player characters only; formation stays unchanged. */
     function deployedHomeParty(){
         const indexes=typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes().filter(index=>index<3):[];
         const characters=indexes.map(index=>({index,character:getPartyCharacterByIndex(index),stats:getPartyBattleStats(index)}))
             .filter(row=>row.character&&row.stats);
-        const formation=window.FourSymbolsTeamFormation?.getConfirmed?.();
-        const domain=window.FourSymbolsHeroSystem?.getDomain?.();
-        const heroIds=formation&&domain?window.FourSymbolsTeamFormationPolicy.roster(formation):[];
-        const heroes=heroIds.filter(id=>domain.isHeroUnlocked(id)).map(heroId=>({heroId,
-            character:{heroId,combatantKind:"heroNpc",id:domain.getHeroDefinition(heroId).name,level:domain.getHeroLevel(heroId)}}));
-        return {characters,heroes};
+        return {characters};
     }
     function renderHomeRoster(){
         firstScreenVisualReadyPromise=null;
@@ -313,21 +308,27 @@
         const banner=document.getElementById("homeBannerName");
         if(banner){banner.textContent=party.characters[0]?.character.id||"四象江湖";}
         const count=roster.querySelector(".v146-home-roster-count");
-        if(count){count.textContent="出戰 "+(party.characters.length+party.heroes.length)+" / 6";}
+        if(count){count.textContent="角色 "+party.characters.length+" 人";}
         const cards=party.characters.map(({index,character,stats})=>{
             const hp=Math.max(0,Math.min(rosterNumber(stats.maxHP),rosterNumber(character.hp)));
             const sp=Math.max(0,Math.min(rosterNumber(stats.maxSP),rosterNumber(character.sp)));
-            return '<article class="v146-home-character" data-home-roster-slot="'+index+'"><b title="'+rosterEscape(character.id)+'">'+rosterEscape(character.id||("角色"+(index+1)))+'</b><span>Lv.'+Math.max(1,Math.floor(rosterNumber(character.level)||1))+'</span><strong title="HP '+Math.floor(hp)+' / '+Math.floor(rosterNumber(stats.maxHP))+'">HP '+rosterResourceText(hp)+'/'+rosterResourceText(stats.maxHP)+'</strong><strong title="SP '+Math.floor(sp)+' / '+Math.floor(rosterNumber(stats.maxSP))+'">SP '+rosterResourceText(sp)+'/'+rosterResourceText(stats.maxSP)+'</strong></article>';
+            const meter=(label,value,max)=>{
+                const limit=Math.max(0,rosterNumber(max));
+                const text=label+' '+Math.floor(value)+' / '+Math.floor(limit);
+                const percent=limit>0?Math.max(0,Math.min(100,value/limit*100)):0;
+                return '<div class="home-status-meter" data-resource="'+label.toLowerCase()+'" title="'+text+'"><span>'+label+'</span><span class="home-status-track" role="meter" aria-label="'+rosterEscape(character.id)+' '+label+'" aria-valuemin="0" aria-valuemax="'+limit+'" aria-valuenow="'+value+'" aria-valuetext="'+text+'"><i style="width:'+percent+'%"></i></span></div>';
+            };
+            return '<article class="v146-home-character" data-home-roster-slot="'+index+'"><b title="'+rosterEscape(character.id)+'">'+rosterEscape(character.id||("角色"+(index+1)))+'</b><span>Lv.'+Math.max(1,Math.floor(rosterNumber(character.level)||1))+'</span>'+meter('HP',hp,stats.maxHP)+meter('SP',sp,stats.maxSP)+'</article>';
         });
         roster.querySelectorAll(".v146-home-character").forEach(node=>node.remove());
         roster.insertAdjacentHTML("beforeend",cards.join(""));
         const scene=document.getElementById("homePartyScene");
         if(scene){
-            const members=[...party.characters,...party.heroes];
+            const members=party.characters;
             scene.dataset.partySize=String(members.length);
-            scene.innerHTML=members.map(({character,heroId,index},position)=>{
+            scene.innerHTML=members.map(({character,index},position)=>{
                 const artwork=getCharacterBattleArtworkPath(character);
-                return '<figure class="home-party-portrait" data-city-position="'+position+'" '+(heroId?'data-hero-position="'+(position-party.characters.length)+'" ':'')+'data-party-identity="'+rosterEscape(heroId||("character:"+index))+'"><img src="'+rosterEscape(artwork)+'" alt="'+rosterEscape(character.id)+' Lv.'+Math.max(1,Math.floor(rosterNumber(character.level)||1))+'" draggable="false" decoding="async"></figure>';
+                return '<figure class="home-party-portrait" data-city-position="'+position+'" data-party-identity="character:'+index+'"><img src="'+rosterEscape(artwork)+'" alt="'+rosterEscape(character.id)+' Lv.'+Math.max(1,Math.floor(rosterNumber(character.level)||1))+'" draggable="false" decoding="async"></figure>';
             }).join("");
         }
         roster.dataset.ready="true";syncHomeRelicSummary();return true;

@@ -159,7 +159,7 @@ html, body{
     transform:none;
     box-sizing:border-box;
     border:0;
-    border-top:5px solid #8a6a3a;
+    border-top:2px solid #8a6a3a;
     border-radius:0;
     background:linear-gradient(0deg,#0e0c0a,#1c1712);
 }
@@ -208,6 +208,24 @@ html, body{
     transform:none;
 }
 #game-stage > #game-overlay-layer #bottomNav > .nav-button > *{pointer-events:none;}
+/* Main navigation uses live labels and the same thin gold stroke as city entries.
+   Context-specific navigation retains its existing art and lifecycle. */
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] > .nav-button{
+    flex-direction:column;gap:9px;color:#cbb78e;
+}
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] .nav-icon-frame{
+    flex:0 0 108px;width:108px;height:108px;
+}
+#game-stage > #game-overlay-layer #bottomNav .nav-icon-frame svg{display:block;width:100%;height:100%;}
+#game-stage > #game-overlay-layer #bottomNav .nav-line-label{font:600 42px/54px "Noto Serif TC",serif;white-space:nowrap;}
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] > .nav-button.active{
+    color:#ffe3a0;background:radial-gradient(ellipse at bottom,#b887323b,transparent 75%);
+}
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] > .nav-button.active::after{
+    content:"";position:absolute;bottom:12px;left:24%;right:24%;height:3px;background:#e6be68;box-shadow:0 0 15px #e6be6877;
+}
+#game-stage > #game-overlay-layer #bottomNav > .nav-button:focus-visible{outline:4px solid #ffe3a0;outline-offset:-6px;}
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] > .nav-button:active{color:#fff0cc;}
 /* Notification contract for the native 1080 x 1920 plane.  Twenty-two
    logical pixels project to roughly 8 CSS px on current phone widths; this is
    intentionally different from the legacy-content unit below. */
@@ -1963,23 +1981,26 @@ html, body{
 /* bundled source: css/19-stage-v54-main-city-moderate-native-scale.css */
 /* Main city roster and deployed-party presentation. Native 1080 coordinates. */
 #game-ui #homePage .v146-home-roster{
-    position:relative;z-index:8;display:grid;grid-template-columns:minmax(0,1fr);
-    margin:0 -18px;padding:0 30px 9px;min-width:0;
-    border-bottom:3px solid #a38148;background:linear-gradient(90deg,#100e0beF,#28231aeF,#100e0beF);
+    position:relative;z-index:8;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px 24px;
+    margin:0 -18px;padding:0 30px 21px;min-width:0;
+    border-bottom:1px solid #a3814877;background:linear-gradient(#100e0bef,#100e0bb0,transparent);
 }
 #game-ui #homePage .v146-home-roster>header{
-    display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:66px;
+    grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:66px;
     color:#cbb78e;font-size:39px;line-height:54px;
 }
 #game-ui #homePage .v146-home-character{
-    display:grid;grid-template-columns:minmax(0,1fr) 135px 330px 288px;align-items:center;gap:12px;
-    min-height:60px;min-width:0;border-top:1px solid #b4935844;color:#eee3cf;
+    display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 9px;
+    min-width:0;padding:9px 0;color:#eee3cf;
     font-size:39px;line-height:54px;font-variant-numeric:tabular-nums;
 }
-#game-ui #homePage .v146-home-character b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;}
+#game-ui #homePage .v146-home-character b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:45px;font-weight:600;}
 #game-ui #homePage .v146-home-character span{color:#e5c890;white-space:nowrap;}
-#game-ui #homePage .v146-home-character strong{font-weight:500;white-space:nowrap;}
-#game-ui #homePage .v146-home-character-placeholder{color:#b8a889;}
+#game-ui #homePage .home-status-meter{grid-column:1/-1;display:flex;align-items:center;gap:12px;min-width:0;line-height:48px;}
+#game-ui #homePage .home-status-meter>span:first-child{flex:0 0 60px;color:#e4d8be;}
+#game-ui #homePage .home-status-track{display:block;flex:1;min-width:0;height:18px;overflow:hidden;border:1px solid #a5865277;border-radius:12px;background:#0b0b0bcc;}
+#game-ui #homePage .home-status-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(#f68a84,#c43c3c);}
+#game-ui #homePage [data-resource="sp"] .home-status-track i{background:linear-gradient(#8ed6fa,#3688c9);}
 #game-ui #homePage>.team-relic-loadout-slot{
     position:relative;z-index:8;grid-column:1;grid-row:4;display:grid;
     grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px;
@@ -2353,8 +2374,8 @@ html, body{
 #game-ui .team-relic-home-tools{
     position:relative;z-index:8;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
     grid-column:1;grid-row:2;min-height:0;padding:0 9px;
-    border:3px solid #a07a40;border-radius:6px;
-    background:linear-gradient(90deg,#0b0907e8,#281e12ed,#0b0907e8);
+    border:0;border-block:1px solid #a07a4088;border-radius:0;
+    background:linear-gradient(90deg,#0b0907b0,#281e12c0,#0b0907b0);
 }
 #game-ui .team-relic-home-tools>.home-card+.home-card{border-left:2px solid #98713b77;}
 

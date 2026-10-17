@@ -18,8 +18,8 @@ assert.match(inventoryCss,/#game-ui #inventoryPage \.v169-item-art\.v169-equipme
 assert.doesNotMatch(inventoryCss,/#game-ui #inventoryPage \.v169-item-art\.v169-equipment-art\{[^}]*!important/s);
 assert.doesNotMatch(rosterCss,/@media\s*\([^)]*(?:width|height)/);
 assert.match(rosterCss,/\.v146-home-roster\{[^}]*margin:0 -18px;/);
-assert.match(rosterCss,/\.v146-home-character\{[^}]*min-height:20px;/);
-assert.match(read('css/00-main.css'),/\.home-card-label\{[^}]*font-size:45px;[^}]*line-height:60px/);
+assert.match(rosterCss,/\.home-status-meter\{[^}]*line-height:16px;/);
+assert.match(read('css/00-main.css'),/\.home-card-label\{[^}]*font-size:42px;[^}]*line-height:60px/);
 assert.match(html,/team-relic-home-glyph"><svg/);
 assert.match(rewardCss,/\.v132-reward-modal \.v132-reward-modal-inner\.v17363-text-reward-preview/);
 assert.doesNotMatch(rewardCss,/#game-stage \.v17363-text-reward-preview/);

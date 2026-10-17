@@ -9,16 +9,16 @@ function partyFixture(){
  vm.createContext(context);vm.runInContext(source.slice(source.indexOf('    function deployedHomeParty(){'),source.indexOf('    function renderHomeRoster(){')),context);
  return {context,players,owned,setFormation:f=>confirmed=f};
 }
-test('city includes every existing player and only confirmed deployed owned heroes in formation order',()=>{
- const f=partyFixture(),p=f.context.deployedHomeParty();assert.deepEqual(Array.from(p.characters,r=>r.index),[0,1,2]);assert.deepEqual(Array.from(p.heroes,r=>r.heroId),['a','b']);
- assert.equal(p.heroes[0].character.hp,undefined,'city must not fabricate persistent Hero HP');
+test('city projects real player characters while leaving hero formation untouched',()=>{
+ const f=partyFixture(),p=f.context.deployedHomeParty();assert.deepEqual(Array.from(p.characters,r=>r.index),[0,1,2]);assert.equal(p.heroes,undefined);
  const before=JSON.stringify(f.players);f.context.deployedHomeParty();assert.equal(JSON.stringify(f.players),before);
- f.setFormation({heroIdToSlot:{b:'ALLY_B3'}});assert.deepEqual(Array.from(f.context.deployedHomeParty().heroes,r=>r.heroId),['b']);
- f.owned.delete('b');assert.equal(f.context.deployedHomeParty().heroes.length,0);
+ f.setFormation({heroIdToSlot:{b:'ALLY_B3'}});assert.equal(f.context.deployedHomeParty().characters.length,3);
+ f.context.window.FourSymbolsTeamFormation.getConfirmed=()=>{throw Error('city must not depend on hero formation');};
+ assert.equal(f.context.deployedHomeParty().characters.length,3);
 });
 test('empty, sparse and pending formation states never create placeholder deployed actors or preview heroes',()=>{
  const f=partyFixture();f.players[1]=null;f.setFormation(null);
- assert.deepEqual(Array.from(f.context.deployedHomeParty().characters,r=>r.index),[0,2]);assert.equal(f.context.deployedHomeParty().heroes.length,0);
+ assert.deepEqual(Array.from(f.context.deployedHomeParty().characters,r=>r.index),[0,2]);
  f.players.fill(null);assert.equal(f.context.deployedHomeParty().characters.length,0);
 });
 test('all twelve city features, story route, formation and resource identities remain unique',()=>{
@@ -32,6 +32,26 @@ test('all twelve city features, story route, formation and resource identities r
 });
 test('city remains under the original first-screen renderer and refresh bridge',()=>{
  assert.match(source,/prepareFirstScreenVisuals/);assert.match(source,/firstScreenVisualReadyPromise=null/);
- assert.match(read('js/00-main.js'),/function refreshHeroPage\(preserveScroll=false\)\{\s*window.v54RenderHomeRoster\?\.\(\)/);
+ assert.doesNotMatch(source,/FourSymbolsHeroSystem|FourSymbolsTeamFormationPolicy|data-hero-position/);
  assert.doesNotMatch(source,/initializeHeroBattleCombatants|setInterval|createTreeWalker/);
+});
+
+test('renderer follows sparse player counts, real artwork selectors and clamped resource fractions without mutations',()=>{
+ const f=partyFixture(),count={},scene={dataset:{}},roster={dataset:{},querySelector:()=>count,querySelectorAll:()=>[],insertAdjacentHTML:(_,html)=>roster.html=html};
+ Object.assign(f.context,{firstScreenVisualReadyPromise:null,ensureHomeRosterShell:()=>roster,syncRosterResource:()=>{},syncHomeRelicSummary:()=>{},rosterNumber:n=>Number(n)||0,rosterEscape:s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'),document:{getElementById:id=>id==='homePartyScene'?scene:null},elementDatabase:{fire:{},water:{},wind:{}}});
+ const main=read('js/00-main.js');vm.runInContext(main.slice(main.indexOf('function getCharacterBattleArtworkPath('),main.indexOf('function getCharacterDisplayNameByIndex(')),f.context);
+ vm.runInContext(source.slice(source.indexOf('    function renderHomeRoster(){'),source.indexOf('    window.v54RenderHomeRoster=')),f.context);
+ Object.assign(f.players[0],{id:'甲<"',gender:'male',element:'fire',hp:300,sp:120,level:40});
+ Object.assign(f.players[1],{gender:'female',element:'water',hp:900,sp:-5});
+ Object.assign(f.players[2],{gender:'male',element:'wind',hp:600,sp:200});
+ const before=JSON.stringify(f.players);f.context.renderHomeRoster();
+ assert.equal(scene.dataset.partySize,'3');assert.equal(count.textContent,'角色 3 人');
+ for(const path of ['male_fire','female_water','male_wind'])assert.ok(scene.innerHTML.includes('battle_'+path+'.png'));
+ assert.equal((scene.innerHTML.match(/<figure/g)||[]).length,3);assert.doesNotMatch(scene.innerHTML,/assets\/heroes/);
+ assert.match(roster.html,/aria-valuenow="300" aria-valuetext="HP 300 \/ 600"/);assert.match(roster.html,/width:50%/);
+ assert.match(roster.html,/aria-valuenow="0" aria-valuetext="SP 0 \/ 200"/);assert.match(roster.html,/甲&lt;&quot;/);
+ assert.equal(JSON.stringify(f.players),before);
+ f.players[1]=null;f.context.renderHomeRoster();assert.equal(scene.dataset.partySize,'2');assert.match(scene.innerHTML,/character:2/);
+ f.players[2]=null;f.context.renderHomeRoster();assert.equal(scene.dataset.partySize,'1');
+ f.players[0]=null;f.context.renderHomeRoster();assert.equal(scene.innerHTML,'');assert.equal(count.textContent,'角色 0 人');
 });

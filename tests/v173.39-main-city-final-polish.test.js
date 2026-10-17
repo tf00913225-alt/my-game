@@ -11,5 +11,5 @@ test('city presentation preserves the sole canvas and owns no viewport breakpoin
 });
 test('only side entrances and lower tools own their geometry; data stays live text',()=>{
  const html=read('index.html'),css=read('css/00-main.css');assert.equal((html.match(/data-city-entry="/g)||[]).length,8);
- assert.match(read('css/19-stage-v54-main-city-moderate-native-scale.css'),/grid-template-columns:minmax\(0,1fr\) 135px 330px 288px/); // roster is verified separately below
+ assert.match(read('css/19-stage-v54-main-city-moderate-native-scale.css'),/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
 });

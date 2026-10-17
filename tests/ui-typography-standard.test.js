@@ -86,7 +86,7 @@ assert.equal(below13(nonBattlePolish).length, 0, 'V146 non-battle typography mus
 // Hierarchy: 13px is a floor, not a blanket replacement.
 assert.match(homeRoster, /\.v146-home-roster>header\{[^}]*font-size:13px/);
 assert.match(homeRoster, /\.v146-home-character\{[^}]*font-size:13px/);
-assert.match(homeRoster, /\.v146-home-character strong\{[^}]*white-space:nowrap/);
+assert.match(homeRoster, /\.v146-home-character span\{[^}]*white-space:nowrap/);
 assert.match(homePolish, /\.v173-exp-charge-status b\{[^}]*font-size:16px/);
 assert.match(homePolish, /\.v173-exp-charge-status small\{[^}]*font-size:14px/);
 assert.match(homePolish, /\.skill-loadout-slot-name\{font-size:15px/);
