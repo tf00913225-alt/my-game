@@ -7,8 +7,8 @@ import {
 import {
     bootstrapTrustedCloudSave,createInitialCanonicalCharacter,CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,saveLocalAutoBattlePreferences,createLocalMigrationBackup,
     submitLegacyMigrationCandidate,screenLegacyMigrationCandidate,readHeroAcquisition,observeHeroLogin,
-    ensureHeroChapterTicket,completeHeroChapterNode,readHeroGrowth,mutateHeroGrowth,claimHeroLoginReward,readTeamFormation,saveTeamFormation
-} from "./firebase-cloud-save.f5ab2e500d6d.js";
+    ensureHeroChapterTicket,completeHeroChapterNode,readHeroGrowth,mutateHeroGrowth,claimHeroLoginReward,claimHeroDailySupply,readTeamFormation,saveTeamFormation
+} from "./firebase-cloud-save.51aec2128714.js";
 import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.2698bfba1bdc.js";
 import {synchronizeGameSession,revokeGameSession,protectedTest,getGameSessionState} from "./firebase-session.877a7842d6bd.js";
 
@@ -85,7 +85,7 @@ const api=Object.freeze({
     initialize:initializeLifecycle,resolveIdentity,resolveCloudSave,getUser:getSignedInUser,
     signInWithGoogle,signInWithFacebook,signInWithEmail,createAccountWithEmail,signInAsAnonymous,signOut:signOutFirebase,
     bootstrapCloudSave:bootstrapTrustedCloudSave,createInitialCanonicalCharacter,submitLegacyMigrationCandidate,screenLegacyMigrationCandidate,saveLocalAutoBattlePreferences,createLocalMigrationBackup,protectedTest,getGameSessionState,
-    readHeroAcquisition,observeHeroLogin,ensureHeroChapterTicket,completeHeroChapterNode,readHeroGrowth,mutateHeroGrowth,claimHeroLoginReward,readTeamFormation,saveTeamFormation,
+    readHeroAcquisition,observeHeroLogin,ensureHeroChapterTicket,completeHeroChapterNode,readHeroGrowth,mutateHeroGrowth,claimHeroLoginReward,claimHeroDailySupply,readTeamFormation,saveTeamFormation,
     openAuth:openFirebaseAuthUi,closeAuth:closeFirebaseAuthUi,
     setUiState:setFirebaseAuthUiState,cloudSaveWritePolicy:CLOUD_SAVE_WRITE_POLICY,
     cloudFunctionsRegion:CLOUD_FUNCTIONS_REGION,dispose:()=>{ if(unsubscribe){ unsubscribe(); unsubscribe=null; } }

@@ -1,15 +1,16 @@
 "use strict";
 const {randomBytes}=require("node:crypto");
 const Core=require("./hero-core");
+const {taipeiDay}=require("./daily-checkin-policy");
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,snapshotDigest:digest,
     claimRecordsDigest}=require("./canonical-snapshot");
 const {createRecoveryArchive,inspectRecoveryArchive}=require("./canonical-recovery-archive");
 const {source,readOwnedSources,advanceOwnedRecords}=require("./canonical-owned-sources");
 
 // Existing progress/current playableState.heroAccount and inventory remain the
-// only growth/resource sources. Only the two approved login milestones issue resources.
+// only growth/resource sources. Approved milestones and daily supply share this writer.
 function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExistingEnvelope,
-    nextRevision,acquisition,seed=()=>randomBytes(4).readUInt32BE()||1}){
+    nextRevision,acquisition,now=Date.now,seed=()=>randomBytes(4).readUInt32BE()||1}){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
     const domain=account=>Core.createDomain(account,()=>[],()=>null,()=>null);
     const keys=value=>Object.keys(value||{}).sort().join("|");
@@ -24,6 +25,46 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
         Object.freeze({day:3,heroId:"divineDogHongbao",fragments:25,marrowPills:1}),
         Object.freeze({day:7,heroId:"vajraHeavenlyKing",fragments:25,marrowPills:1})]);
     const rewardId=day=>"hero-login-reward-v1-day"+day;
+    const dailyFragments=Object.freeze({divineDogHongbao:5,vajraHeavenlyKing:5});
+    const dailyId=day=>"hero-daily-supply-v1-"+day;
+    const validDay=day=>typeof day==="string"&&/^\d{8}$/.test(day)&&
+        Number.isFinite(Date.parse(`${day.slice(0,4)}-${day.slice(4,6)}-${day.slice(6)}T00:00:00Z`))&&
+        new Date(`${day.slice(0,4)}-${day.slice(4,6)}-${day.slice(6)}T00:00:00Z`).toISOString().slice(0,10).replaceAll("-","")===day;
+    const dailyBalances=records=>({fragments:Object.fromEntries(Object.keys(dailyFragments).map(id=>
+        [id,records.progress.playableState.heroAccount.heroes[id].specificFragments])),marrowPills:pillCount(records)});
+    async function dailyReceipt(tx,c,day){
+        const id=dailyId(day),snaps=await Promise.all(["operations","ledgerEntries","uniqueClaims"]
+            .map(name=>tx.get(c.root.collection(name).doc(id))));
+        if(!snaps.some(s=>s.exists))return null;
+        if(snaps.some(s=>!s.exists||!s.data().createdAt)||
+           snaps.some(s=>digest(audit(s.data()))!==digest(audit(snaps[0].data())))){
+            fail("data-loss","Daily supply evidence missing or inconsistent.");
+        }
+        const r=audit(snaps[0].data());
+        try{
+            if(r.schemaVersion!==1||r.kind!=="hero-daily-supply"||r.ownerUid!==c.uid||
+               keys(r.intent)!=="expectedRevision|operationId|periodDate"||r.intent.operationId!==id||r.intent.periodDate!==day||
+               !Number.isSafeInteger(r.intent.expectedRevision)||r.intent.expectedRevision<1||
+               !Number.isSafeInteger(r.sourceRevision)||r.sourceRevision<1||r.sourceRevision>r.intent.expectedRevision||
+               r.serverRevision!==r.intent.expectedRevision+1||r.serverRevision>c.envelope.serverRevision||
+               !Number.isSafeInteger(r.dailyEvidence?.observedAtMs)||taipeiDay(r.dailyEvidence.observedAtMs)!==day||
+               r.dailyEvidence.periodDate!==day||digest(r.fragmentDeltas)!==digest(dailyFragments)||r.marrowPillDelta!==1){throw Error("receipt");}
+            const [prior,priorArchive,next,nextArchive]=await Promise.all([
+                tx.get(c.root.collection("playableSnapshots").doc(String(r.sourceRevision))),
+                tx.get(c.root.collection("recoveryArchives").doc(String(r.sourceRevision))),
+                tx.get(c.root.collection("playableSnapshots").doc(String(r.serverRevision))),
+                tx.get(c.root.collection("recoveryArchives").doc(String(r.serverRevision)))]);
+            if(!prior.exists||!priorArchive.exists||!next.exists||!nextArchive.exists||
+               prior.data().sha256!==r.sourceSnapshotSha256||next.data().sha256!==r.snapshotSha256){throw Error("source");}
+            const before=inspectRecoveryArchive(priorArchive.data(),c.uid,r.sourceRevision,prior.data());
+            const after=inspectRecoveryArchive(nextArchive.data(),c.uid,r.serverRevision,next.data());
+            const b=dailyBalances(before),a=dailyBalances(after);
+            if(digest(b)!==digest(r.dailyBeforeResources)||digest(a)!==digest(r.dailyAfterResources)||
+               Object.keys(dailyFragments).some(id=>a.fragments[id]-b.fragments[id]!==5)||
+               a.marrowPills-b.marrowPills!==1||digest(after.progress.playableState.heroAccount)!==r.heroAccountSha256){throw Error("delta");}
+        }catch(_){fail("data-loss","Original daily supply source/archive is incomplete.");}
+        return r;
+    }
     async function loginRewards(tx,c){
         const rows=[];
         for(const policy of loginPolicies){
@@ -121,11 +162,13 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
         const c={uid,root,refs,owned,records,characterRefs,envelope,account,
             loginEvidence:rights.loginEvidence,sourceSnapshotSha256:snapshot.data().sha256};
         c.loginRewards=await loginRewards(tx,c);
+        const periodDate=taipeiDay(now());
+        c.dailySupply={periodDate,fragments:dailyFragments,marrowPills:1,claimed:!!await dailyReceipt(tx,c,periodDate)};
         return c;
     }
     function view(c,unchanged=true){return {schemaVersion:1,ownerUid:c.uid,
         serverRevision:c.envelope.serverRevision,heroAccount:c.account,
-        marrowPills:pillCount(c.records),loginRewards:c.loginRewards,unchanged,authoritativeStateReady:false};}
+        marrowPills:pillCount(c.records),loginRewards:c.loginRewards,dailySupply:c.dailySupply,unchanged,authoritativeStateReady:false};}
     async function read(request){
         if(keys(request.data)!=="session|uid"){fail("invalid-argument","Only active identity/session accepted.");}
         return runProtected(request,async(tx,session)=>view(await context(tx,session)));
@@ -202,7 +245,7 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
         });
     }
 
-    async function commit(tx,c,{nextAccount,owned,removed,revision,before,pills,action,heroId,kind,intent,opRef,ledgerRef,claimRef}){
+    async function commit(tx,c,{nextAccount,owned,removed,revision,before,pills,action,heroId,kind,intent,opRef,ledgerRef,claimRef,dailyEvidence}){
             const records={...c.records,...owned,
                 account:{...c.records.account,serverRevision:revision},
                 characters:c.records.characters.map(row=>({...row,serverRevision:revision})),
@@ -220,7 +263,9 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
                 beforeResources:{specificFragments:before.specificFragments,marrowPills:pills},
                 afterResources:{specificFragments:nextAccount.heroes[heroId].specificFragments,marrowPills:pillCount(records)},
                 fragmentDelta:nextAccount.heroes[heroId].specificFragments-before.specificFragments,
-                marrowPillDelta:action==="reroll"?-1:action==="loginReward"?1:0,
+                marrowPillDelta:action==="reroll"?-1:["loginReward","dailySupply"].includes(action)?1:0,
+                ...(action==="dailySupply"?{dailyEvidence,fragmentDeltas:dailyFragments,
+                    dailyBeforeResources:dailyBalances(c.records),dailyAfterResources:dailyBalances(records)}:{}),
                 ...(action==="loginReward"?{loginEvidence:c.loginEvidence}:{})};
             const stamp=FieldValue.serverTimestamp();
             for(const [key,ref] of Object.entries(c.refs)){
@@ -242,10 +287,11 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
             tx.create(c.root.collection("playableSnapshots").doc(String(revision)),{...bundle,createdAt:stamp});
             tx.create(c.root.collection("recoveryArchives").doc(String(revision)),{...archive,createdAt:stamp});
             tx.create(opRef,{...receipt,createdAt:stamp});tx.create(ledgerRef,{...receipt,createdAt:stamp});
-            if(action==="unlock"||action==="loginReward"){tx.create(claimRef,{...receipt,createdAt:stamp});}
+            if(["unlock","loginReward","dailySupply"].includes(action)){tx.create(claimRef,{...receipt,createdAt:stamp});}
             tx.update(db.collection("users").doc(c.uid).collection("saves").doc("current"),{serverRevision:revision,updatedAt:stamp});
             const loginRewards=c.loginRewards.map(row=>action==="loginReward"&&row.day===intent.milestoneDay?{...row,claimed:true}:row);
-            return {...view({...c,records,account:nextAccount,loginRewards,envelope:{...c.envelope,serverRevision:revision}},false),receipt};
+            const dailySupply=action==="dailySupply"?{...c.dailySupply,claimed:true}:c.dailySupply;
+            return {...view({...c,records,account:nextAccount,loginRewards,dailySupply,envelope:{...c.envelope,serverRevision:revision}},false),receipt};
     }
     async function claimLoginReward(request){
         const data=request.data||{},policy=loginPolicies.find(row=>row.day===data.milestoneDay);
@@ -267,23 +313,53 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
             let nextAccount;
             try{nextAccount=domain(c.account).addSpecificFragments(heroId,policy.fragments);}
             catch(_){fail("failed-precondition","Hero fragment capacity exceeded.");}
-            if(pills>=Number.MAX_SAFE_INTEGER){fail("failed-precondition","Marrow resource capacity exceeded.");}
             const revision=nextRevision(c.envelope),owned=advanceOwnedRecords(c.records,revision);
-            const item=owned.inventory.filter(row=>row.location==="bag"&&row.state.id===Core.contract.rerollItem.id)
-                .sort((a,b)=>a.ownedItemId.localeCompare(b.ownedItemId,"en"))[0];
-            if(item){item.state={...item.state,count:item.state.count+policy.marrowPills};}
-            else{
-                if(c.owned.refs.length>=400){fail("failed-precondition","Owned source transaction budget exceeded.");}
-                const ownedItemId=data.operationId+"-marrow";
-                if(owned.inventory.some(row=>row.ownedItemId===ownedItemId)){fail("data-loss","Reward item identity conflict.");}
-                owned.inventory.push({schemaVersion:1,ownerUid:c.uid,serverRevision:revision,provenance:"server-created",
-                    ownedItemId,location:"bag",state:{id:Core.contract.rerollItem.id,type:"material",count:policy.marrowPills}});
-            }
+            addRewardPill(c,owned,revision,data.operationId,pills,policy.marrowPills);
             const intent={operationId:data.operationId,expectedRevision:data.expectedRevision,milestoneDay:policy.day};
             return commit(tx,c,{nextAccount,owned,removed:new Set(),revision,before,pills,action:"loginReward",heroId,
                 kind:"hero-login-reward",intent,opRef,ledgerRef,claimRef});
         });
     }
-    return Object.freeze({read,mutate,claimLoginReward,readInTransaction:context});
+    async function claimDailySupply(request){
+        const data=request.data||{},observedAtMs=now(),day=taipeiDay(observedAtMs);
+        if(keys(data)!=="expectedRevision|operationId|periodDate|session|uid"||!validDay(data.periodDate)||
+           data.operationId!==dailyId(data.periodDate)||!Number.isSafeInteger(data.expectedRevision)||data.expectedRevision<1){
+            fail("invalid-argument","Only the server-projected date, fixed operation ID and revision accepted.");
+        }
+        return runProtected(request,async(tx,session)=>{
+            const c=await context(tx,session),receipt=await dailyReceipt(tx,c,data.periodDate);
+            if(receipt)return {...view(c),receipt};
+            if(data.periodDate!==day||taipeiDay(now())!==day){fail("failed-precondition","Daily supply date expired; no catch-up.");}
+            if(c.envelope.serverRevision!==data.expectedRevision){fail("aborted","CLOUD_REVISION_CONFLICT");}
+            let nextAccount=c.account;
+            try{for(const [id,amount] of Object.entries(dailyFragments)){nextAccount=domain(nextAccount).addSpecificFragments(id,amount);}}
+            catch(_){fail("failed-precondition","Hero fragment capacity exceeded.");}
+            const pills=pillCount(c.records),revision=nextRevision(c.envelope),owned=advanceOwnedRecords(c.records,revision);
+            addRewardPill(c,owned,revision,data.operationId,pills,1);
+            // No external effects inside the transaction; retries cannot roll into a new day.
+            if(taipeiDay(now())!==day){fail("failed-precondition","Daily supply date expired; synchronize again.");}
+            const intent={operationId:data.operationId,expectedRevision:data.expectedRevision,periodDate:day};
+            return commit(tx,c,{nextAccount,owned,removed:new Set(),revision,before:c.account.heroes.divineDogHongbao,
+                pills,action:"dailySupply",heroId:"divineDogHongbao",kind:"hero-daily-supply",intent,
+                dailyEvidence:{periodDate:day,observedAtMs},
+                opRef:c.root.collection("operations").doc(data.operationId),
+                ledgerRef:c.root.collection("ledgerEntries").doc(data.operationId),
+                claimRef:c.root.collection("uniqueClaims").doc(data.operationId)});
+        });
+    }
+    function addRewardPill(c,owned,revision,operationId,pills,count){
+        if(!Number.isSafeInteger(pills+count)){fail("failed-precondition","Marrow resource capacity exceeded.");}
+        const item=owned.inventory.filter(row=>row.location==="bag"&&row.state.id===Core.contract.rerollItem.id)
+            .sort((a,b)=>a.ownedItemId.localeCompare(b.ownedItemId,"en"))[0];
+        if(item){item.state={...item.state,count:item.state.count+count};}
+        else{
+            if(c.owned.refs.length>=400){fail("failed-precondition","Owned source transaction budget exceeded.");}
+            const ownedItemId=operationId+"-marrow";
+            if(owned.inventory.some(row=>row.ownedItemId===ownedItemId)){fail("data-loss","Reward item identity conflict.");}
+            owned.inventory.push({schemaVersion:1,ownerUid:c.uid,serverRevision:revision,provenance:"server-created",
+                ownedItemId,location:"bag",state:{id:Core.contract.rerollItem.id,type:"material",count}});
+        }
+    }
+    return Object.freeze({read,mutate,claimLoginReward,claimDailySupply,readInTransaction:context});
 }
 module.exports={createHeroGrowth};

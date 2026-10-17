@@ -2881,5 +2881,46 @@ await rejected("claimHeroLoginReward",loginRewardOther.idToken,{...loginRewardIn
 await loginRewardLedger.set(loginRewardLedgerBytes);
 console.log("PASS Hero login rewards real Firestore/HTTP: recorded days, existing-history catch-up, concurrent exactly-once credit, growth consumption, immutable retry, original archives, session takeover and private rules; no migration/readiness.");
 
+// Daily supply uses the same complete canonical account, protected HTTP adapter
+// and immutable recovery evidence. No player account or production resource writes.
+const dailyIdentity={uid:loginRewardUid,session:loginRewardOtherSession};
+const dailyView=await invoke("readHeroGrowth",loginRewardOther.idToken,dailyIdentity);
+const dailyDate=dailyView.dailySupply.periodDate,dailyKey='hero-daily-supply-v1-'+dailyDate;
+const dailyIntent={...dailyIdentity,periodDate:dailyDate,operationId:dailyKey,expectedRevision:dailyView.serverRevision};
+await rejected("claimHeroDailySupply",loginRewardOther.idToken,{...dailyIntent,amount:5},"INVALID_ARGUMENT");
+const dailyRace=await Promise.all([invoke("claimHeroDailySupply",loginRewardOther.idToken,dailyIntent),
+    invoke("claimHeroDailySupply",loginRewardOther.idToken,dailyIntent)]);
+assert.deepEqual(dailyRace[0].receipt,dailyRace[1].receipt);
+for(const id of ['divineDogHongbao','vajraHeavenlyKing']){
+    assert.equal(dailyRace[1].heroAccount.heroes[id].specificFragments,dailyView.heroAccount.heroes[id].specificFragments+5);
+}
+assert.equal(dailyRace[1].marrowPills,dailyView.marrowPills+1);assert.equal(dailyRace[1].dailySupply.claimed,true);
+assert.equal(dailyRace[1].authoritativeStateReady,false);
+await checkRecoveryArchive(loginRewardUid,dailyRace[1].serverRevision);
+await rejected("claimHeroDailySupply",loginRewardUser.idToken,{...dailyIntent,session:loginRewardSession},"SESSION_REVOKED");
+assert.deepEqual((await invoke("claimHeroDailySupply",loginRewardOther.idToken,
+    {...dailyIntent,expectedRevision:dailyRace[1].serverRevision})).receipt,dailyRace[0].receipt);
+for(const name of ['operations','ledgerEntries','uniqueClaims']){
+    const ref=loginRewardRoot.collection(name).doc(dailyKey),bytes=(await ref.get()).data();assert.ok(bytes);
+    assert.equal(await rulesRequest(`serverUsers/${loginRewardUid}/${name}/${dailyKey}`,loginRewardOther.idToken,"PATCH"),403);
+    await ref.delete();await rejected("claimHeroDailySupply",loginRewardOther.idToken,dailyIntent,"DATA_LOSS");await ref.set(bytes);
+}
+let supplyClock=Date.parse('2026-10-18T15:59:59Z');
+const supplyWriter=createHeroGrowth({db,FieldValue,HttpsError,runProtected:heroSessions.runProtected,
+    inspectExistingEnvelope,nextRevision,acquisition:loginRewardSource,now:()=>supplyClock});
+const supplyRequest=(day,revision)=>({auth:{uid:loginRewardUid,token:claims(loginRewardOther.idToken)},
+    data:{...dailyIdentity,periodDate:day,operationId:'hero-daily-supply-v1-'+day,expectedRevision:revision}});
+// Advance into future emulator-only days, never backfill an unclaimed date.
+supplyClock=Date.parse('2090-10-18T15:59:59Z');
+const supplyBefore=await supplyWriter.read({auth:{uid:loginRewardUid,token:claims(loginRewardOther.idToken)},data:dailyIdentity});
+const supplyFirst=await supplyWriter.claimDailySupply(supplyRequest('20901018',supplyBefore.serverRevision));
+supplyClock=Date.parse('2090-10-18T16:00:00Z');
+const supplyNext=await supplyWriter.claimDailySupply(supplyRequest('20901019',supplyFirst.serverRevision));
+assert.equal(supplyNext.marrowPills,supplyFirst.marrowPills+1);
+supplyClock=Date.parse('2090-10-21T00:00:00Z');
+await assert.rejects(supplyWriter.claimDailySupply(supplyRequest('20901020',supplyNext.serverRevision)),{code:'failed-precondition'});
+assert.deepEqual((await supplyWriter.claimDailySupply(supplyRequest('20901018',1))).receipt,supplyFirst.receipt);
+console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pill, concurrent exactly-once credit, immutable retry, Taipei rollover/no catch-up, archives, revoked session and private rules.");
+
 await db.terminate();
 if(direct){await getFirestore().terminate();}
