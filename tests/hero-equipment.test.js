@@ -79,6 +79,7 @@ test('Hero uses shared gear/reforge/gem bonus without player skill identity or m
  item.rarityKey='orange';item.sockets=['gemVitalityI'];c.characterEquipment[key(ids[0])].hand=item;
  const actor=c.getHeroEquipmentCharacter(ids[0]),before=JSON.stringify(c.FourSymbolsHeroSystem.getDomain().serialize());
  const stats=c.getAdditionalCharacterBattleStats(actor,null);assert.equal(stats.attack,55);assert.equal(stats.maxHP,150);
+ assert.equal(c.getAdditionalCharacterBattleStats(actor,key(ids[0])).attack,55,'backpack equipment key cannot become a player skill key');
  assert.equal(c.getEquipmentBonus(key(ids[0])).vitality,1);
  assert.equal(JSON.stringify(c.FourSymbolsHeroSystem.getDomain().serialize()),before);
 });

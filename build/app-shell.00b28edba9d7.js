@@ -2961,7 +2961,7 @@ function getAdditionalCharacterBattleStats(character,characterKey){
     const equipmentKey=character?.combatantKind==='heroNpc'?'heroNpc:'+character.heroId:characterKey;
     const bonus=getEquipmentBonus(equipmentKey);
     const base=calculateCharacterBaseStats(character,bonus);
-    const earthEXLevel=characterKey?getSkillLevel(characterKey,"earthEX"):0;
+    const earthEXLevel=character?.combatantKind!=="heroNpc"&&characterKey?getSkillLevel(characterKey,"earthEX"):0;
     const evasionBuffPercent=getActiveBuffPercent(character,"dodgeSkill");
     const defenseBuffPercent=getActiveBuffPercent(character,"rockWall");
     const defenseDownPercent=getPlayerDefenseDownPercent(character);
