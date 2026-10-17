@@ -7,7 +7,7 @@ import {
 import {
     bootstrapTrustedCloudSave,createInitialCanonicalCharacter,CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,saveLocalAutoBattlePreferences,createLocalMigrationBackup,
     submitLegacyMigrationCandidate,screenLegacyMigrationCandidate,readHeroAcquisition,observeHeroLogin,
-    ensureHeroChapterTicket,completeHeroChapterNode,readHeroGrowth,mutateHeroGrowth,readTeamFormation,saveTeamFormation
+    ensureHeroChapterTicket,completeHeroChapterNode,readHeroGrowth,mutateHeroGrowth,claimHeroLoginReward,readTeamFormation,saveTeamFormation
 } from "./firebase-cloud-save.js";
 import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.js";
 import {synchronizeGameSession,revokeGameSession,protectedTest,getGameSessionState} from "./firebase-session.js";
@@ -85,7 +85,7 @@ const api=Object.freeze({
     initialize:initializeLifecycle,resolveIdentity,resolveCloudSave,getUser:getSignedInUser,
     signInWithGoogle,signInWithFacebook,signInWithEmail,createAccountWithEmail,signInAsAnonymous,signOut:signOutFirebase,
     bootstrapCloudSave:bootstrapTrustedCloudSave,createInitialCanonicalCharacter,submitLegacyMigrationCandidate,screenLegacyMigrationCandidate,saveLocalAutoBattlePreferences,createLocalMigrationBackup,protectedTest,getGameSessionState,
-    readHeroAcquisition,observeHeroLogin,ensureHeroChapterTicket,completeHeroChapterNode,readHeroGrowth,mutateHeroGrowth,readTeamFormation,saveTeamFormation,
+    readHeroAcquisition,observeHeroLogin,ensureHeroChapterTicket,completeHeroChapterNode,readHeroGrowth,mutateHeroGrowth,claimHeroLoginReward,readTeamFormation,saveTeamFormation,
     openAuth:openFirebaseAuthUi,closeAuth:closeFirebaseAuthUi,
     setUiState:setFirebaseAuthUiState,cloudSaveWritePolicy:CLOUD_SAVE_WRITE_POLICY,
     cloudFunctionsRegion:CLOUD_FUNCTIONS_REGION,dispose:()=>{ if(unsubscribe){ unsubscribe(); unsubscribe=null; } }

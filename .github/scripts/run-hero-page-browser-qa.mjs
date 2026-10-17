@@ -9,9 +9,9 @@ const OUT=path.resolve('artifacts/browser-qa/responsive-item/hero'),uid='skill-r
 const pause=(ms=250)=>new Promise(r=>setTimeout(r,ms));
 fs.mkdirSync(OUT,{recursive:true});
 let server,proc,c,profile;const evidence=[];
-let account=Core.normalizeAccountState(),formation=null,revision=1,pills=5;const receipts=new Map();
+let account=Core.normalizeAccountState(),formation=null,revision=1,pills=5;const receipts=new Map(),loginClaims=new Set();
 for(const id of ids){account.heroes[id].unlocked=true;account.heroes[id].specificFragments=500;}
-const view=()=>({schemaVersion:1,ownerUid:uid,serverRevision:revision,heroAccount:account,formation,playerIndexes:[0],marrowPills:pills,authoritativeStateReady:false});
+const view=()=>({schemaVersion:1,ownerUid:uid,serverRevision:revision,heroAccount:account,formation,playerIndexes:[0],marrowPills:pills,loginRewards:[3,7].map((day,i)=>({day,heroId:ids[i],fragments:25,marrowPills:1,eligible:true,claimed:loginClaims.has(day)})),authoritativeStateReady:false});
 async function handleRequest(req,res){
  if(!req.url.startsWith('/__qa_hero/'))return false;
  let data;try{let raw='';for await(const chunk of req)raw+=chunk;data=raw?JSON.parse(raw):{};}catch{res.writeHead(400);res.end('{}');return true;}
@@ -21,6 +21,13 @@ async function handleRequest(req,res){
    const prior=receipts.get(data.operationId);
    if(prior){assert.deepEqual(data,prior);}
    else{assert.equal(data.expectedRevision,revision);formation=Policy.validate(data.formation,[0],ids);receipts.set(data.operationId,data);revision++;}
+  }
+  if(req.url.endsWith('/loginReward')){
+   assert.ok([3,7].includes(data.milestoneDay));assert.equal(data.operationId,'hero-login-reward-v1-day'+data.milestoneDay);
+   if(!loginClaims.has(data.milestoneDay)){
+    assert.equal(data.expectedRevision,revision);const id=ids[data.milestoneDay===3?0:1];
+    account=Core.createDomain(account,()=>[],()=>null,()=>null).addSpecificFragments(id,25);pills++;revision++;loginClaims.add(data.milestoneDay);
+   }
   }
   if(req.url.endsWith('/growth')){
    assert.equal(data.expectedRevision,revision);const d=Core.createDomain(account,()=>[],()=>null,()=>null);
@@ -35,10 +42,11 @@ let cloudModule=QA_CLOUD_MODULE;
 for(const [name,body] of [
  ['readTeamFormation',`return (await fetch('/__qa_hero/read')).json();`],
  ['saveTeamFormation',`const response=await fetch('/__qa_hero/save',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...intent,fail:!!window.__qaFormationFail})});if(!response.ok)throw Object.assign(Error('QA rejected'),{code:'aborted'});const value=await response.json();if(window.__qaFormationLost){window.__qaFormationLost=false;throw Object.assign(Error('lost response'),{code:'unavailable'});}return value;`],
+ ['claimHeroLoginReward',`const response=await fetch('/__qa_hero/loginReward',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(intent)});if(!response.ok)throw Object.assign(Error('QA rejected'),{code:'aborted'});const value=await response.json();if(window.__qaLoginLost){window.__qaLoginLost=false;throw Object.assign(Error('lost response'),{code:'unavailable'});}return value;`],
  ['readHeroGrowth',`return (await fetch('/__qa_hero/read')).json();`],
  ['mutateHeroGrowth',`const response=await fetch('/__qa_hero/growth',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(intent)});if(!response.ok)throw Object.assign(Error('QA rejected'),{code:'aborted'});return response.json();`]]){
  const re=new RegExp(`export async function ${name}\\(\\)\\{[^}]*\\}`);
- assert.ok(re.test(cloudModule));cloudModule=cloudModule.replace(re,`export async function ${name}(${name.startsWith('save')||name.startsWith('mutate')?'intent':''}){${body}}`);
+ assert.ok(re.test(cloudModule));cloudModule=cloudModule.replace(re,`export async function ${name}(${name.startsWith('save')||name.startsWith('mutate')||name.startsWith('claim')?'intent':''}){${body}}`);
 }
 try{
  const live=process.env.DEV_BASE_URL;
@@ -71,6 +79,19 @@ try{
   if(width===360){const n=await c.send('Page.navigate',{url:server.url});const end=Date.now()+45000;while(!loads.has(n.loaderId)&&Date.now()<end)await pause(50);assert.ok(loads.has(n.loaderId));await waitReady();}
   await c.eval(`closeHomeFeature();openHomeFeature('hero');true`);await pause();
   assert.equal(await c.eval(`document.querySelectorAll('.hero-card').length`),2);
+  assert.equal(await c.eval(`document.querySelectorAll('.hero-login-reward').length`),2);
+  if(width===360){
+   const before=await c.eval(`FourSymbolsHeroGrowth.getAccount().heroes.divineDogHongbao.specificFragments`);
+   await c.eval(`window.__qaLoginLost=true;true`);await tap('[onclick="FourSymbolsHeroGrowth.claimLoginReward(3)"]');
+   assert.equal(await c.eval(`FourSymbolsHeroGrowth.getStatus().pending.milestoneDay`),3);
+   await tap('[onclick="FourSymbolsHeroGrowth.retry()"]');
+   assert.equal(await c.eval(`FourSymbolsHeroGrowth.getStatus().pending`),null);
+   assert.equal(await c.eval(`FourSymbolsHeroGrowth.getAccount().heroes.divineDogHongbao.specificFragments`),before+25);
+   await tap('[onclick="FourSymbolsHeroGrowth.claimLoginReward(7)"]');
+   assert.deepEqual(await c.eval(`FourSymbolsHeroGrowth.getStatus().loginRewards.map(row=>row.claimed)`),[true,true]);
+   await screenshot('hero-login-rewards-'+width);
+  }
+  assert.equal(await c.eval(`document.querySelectorAll('.hero-login-reward button:disabled').length`),2);
   const grid=await c.eval(`(()=>{const n=document.querySelector('.hero-card-grid');return {columns:getComputedStyle(n).gridTemplateColumns.split(' ').length,overflow:n.scrollWidth-n.clientWidth};})()`);
   assert.equal(grid.columns,3);assert.ok(grid.overflow<=1);assert.equal(await c.eval(`document.querySelectorAll('.hero-element-tabs button').length`),5);
   await tap(`[onclick="filterHeroPage('fire')"]`);assert.equal(await c.eval(`document.querySelectorAll('.hero-card').length`),1);
@@ -165,6 +186,11 @@ try{
   await c.eval(`showPage('home');closeHomeFeature();true`);assert.deepEqual(await c.eval(`window.__heroQaErrors`),[]);
   evidence.push({width,height,grid,geo,fgeo,actualPointerInput:true,saveReload:true,swapRemove:true,sharedEntrances:true});console.log(`PASS Hero V2 ${width}x${height}`);
  }
+ account=Core.normalizeAccountState();
+ await c.eval(`window.__heroQaOwned=[];FourSymbolsHeroAcquisition.sync()`);await c.eval(`FourSymbolsHeroGrowth.read()`);
+ await c.eval(`openHomeFeature('hero');true`);await pause();
+ assert.equal(await c.eval(`document.querySelectorAll('.hero-card').length`),0);
+ assert.equal(await c.eval(`document.querySelectorAll('.hero-login-reward').length`),2,'rewards accessible without owned Heroes');
  fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:process.env.DEV_BASE_URL?'deployed-bytes-isolated-transport':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),evidence},null,2)+'\n');
 }catch(error){if(c)try{fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from((await c.send('Page.captureScreenshot',{format:'png'})).data,'base64'));}catch{}fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:false,error:String(error.stack||error),evidence},null,2));throw error;
 }finally{

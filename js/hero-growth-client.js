@@ -22,6 +22,11 @@
            JSON.stringify(stable(core.normalizeAccountState(value.heroAccount)))!==JSON.stringify(stable(value.heroAccount))){
             proof=null;throw Error("英雄成長紀錄無法驗證，已停止操作。");
         }
+        if(value.loginRewards!==undefined&&(!Array.isArray(value.loginRewards)||value.loginRewards.length!==2||
+           value.loginRewards.some((row,i)=>row.day!==[3,7][i]||row.heroId!==["divineDogHongbao","vajraHeavenlyKing"][i]||
+               row.fragments!==25||row.marrowPills!==1||typeof row.eligible!=="boolean"||typeof row.claimed!=="boolean"))){
+            proof=null;throw Error("登入獎勵紀錄無法驗證。");
+        }
         proof=copy(value);error=null;notify();return copy(proof);
     }
     async function read(){
@@ -46,9 +51,11 @@
         proof?.ownerUid===uid()?copy(proof.heroAccount):null;}
     async function mutate(heroId,action){
         if(busy||global.isHeroGrowthBattleActive?.())return;
-        const owner=uid(),token=generation;
+        const owner=uid(),token=generation,reward=action==="loginReward";
+        if(reward&&![3,7].includes(heroId))return;
+        if(reward&&dev){error="請重新載入以離開 DEV 隔離測試，再領取正式獎勵。";notify();return;}
         if(!owner){error="請先確認原帳號。";notify();return;}
-        if(pending&&(pending.heroId!==heroId||pending.action!==action)){
+        if(pending&&(reward?pending.milestoneDay!==heroId:pending.heroId!==heroId||pending.action!==action)){
             error="前次操作尚未確認，請重試原操作。";notify();return;
         }
         busy=true;notify();
@@ -65,10 +72,13 @@
                 if(!ready())throw Error("需連線才能確認扣除結果。");
                 if(!pending){
                     if(!proof||proof.ownerUid!==owner)throw Error("請先同步成長紀錄。");
-                    pending={operationId:global.crypto.randomUUID().replaceAll("-",""),
+                    pending=reward?{operationId:"hero-login-reward-v1-day"+heroId,
+                        expectedRevision:proof.serverRevision,milestoneDay:heroId}:
+                        {operationId:global.crypto.randomUUID().replaceAll("-",""),
                         expectedRevision:proof.serverRevision,heroId,action};
                 }
-                const value=await global.FourSymbolsFirebaseLifecycle.mutateHeroGrowth(pending);
+                const value=reward?await global.FourSymbolsFirebaseLifecycle.claimHeroLoginReward(pending):
+                    await global.FourSymbolsFirebaseLifecycle.mutateHeroGrowth(pending);
                 publish(value,owner,token);pending=null;
             }
         }catch(problem){
@@ -82,8 +92,10 @@
         }finally{if(token===generation){busy=false;notify();}}
     }
     global.FourSymbolsHeroGrowth=Object.freeze({read,mutate,testResources,
-        retry:()=>pending?mutate(pending.heroId,pending.action):Promise.resolve(),getAccount:projected,
+        claimLoginReward:day=>mutate(day,"loginReward"),
+        retry:()=>pending?mutate(pending.milestoneDay??pending.heroId,pending.milestoneDay?"loginReward":pending.action):Promise.resolve(),getAccount:projected,
         getStatus:()=>({ready:!!projected(),busy,error,pending:copy(pending),
+            loginRewards:proof?.ownerUid===uid()?copy(proof.loginRewards||[]):[],
             testMode:devEnabled()&&!!dev&&devUid===uid(),devAvailable:devEnabled(),
             marrowPills:devEnabled()&&dev&&devUid===uid()?dev.pills:proof?.ownerUid===uid()?proof.marrowPills:0})});
     global.document?.addEventListener("four-symbols:startup-ready",()=>{void read();});

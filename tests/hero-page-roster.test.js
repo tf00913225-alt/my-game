@@ -33,9 +33,9 @@ test('element filters share Core elements, fixed order and stable formation-firs
  const formation={version:2,characterIndexToSlot:{0:'ALLY_F1',1:'ALLY_F3'},heroIdToSlot:{vajraHeavenlyKing:'ALLY_B1',divineDogHongbao:'ALLY_B3'}};
  c.FourSymbolsTeamFormationPolicy=require('../functions/src/team-formation-policy');
  c.FourSymbolsTeamFormation={getConfirmed:()=>formation};
- const all=c.renderHeroPageContent();assert.ok(all.indexOf('金剛天王')<all.indexOf('神犬紅包'));
+ const all=c.renderHeroPageContent(),cards=all.slice(all.indexOf('class="hero-card-grid"'));assert.ok(cards.indexOf('金剛天王')<cards.indexOf('神犬紅包'));
  assert.match(all,/全部[\s\S]*火[\s\S]*水[\s\S]*風[\s\S]*土/);
- c.filterHeroPage('fire');const fire=c.renderHeroPageContent();assert.match(fire,/神犬紅包/);assert.doesNotMatch(fire,/金剛天王/);
+ c.filterHeroPage('fire');const fire=c.renderHeroPageContent().split('class="hero-card-grid"')[1];assert.match(fire,/神犬紅包/);assert.doesNotMatch(fire,/金剛天王/);
  c.filterHeroPage('water');assert.doesNotMatch(c.renderHeroPageContent(),/class="hero-card"/);
  c.filterHeroPage('all');assert.equal((c.renderHeroPageContent().match(/class="hero-card"/g)||[]).length,2);
  assert.deepEqual(Array.from(c.FourSymbolsHeroBattle.getRoster()),ids.slice().reverse());
