@@ -8,6 +8,7 @@ const {createRecoveryArchive}=require("../functions/src/canonical-recovery-archi
 const {createCanonicalCurrentRecovery}=require("../functions/src/canonical-current-recovery.js");
 const uid="surviving-revision-owner",root=`serverUsers/${uid}`,env=`users/${uid}/saves/current`;
 const intent={operationId:"recover-surviving-revision-0001",expectedRevision:6};
+const grantId="retained-claim",creditId="retained-credit-proof-0001";
 function fixture(){
     const records=makeInitialCharacterSources(uid,6,"create-surviving-revision-0001",{
         displayName:"英雄",element:"fire",gender:"female",
@@ -20,7 +21,13 @@ function fixture(){
     records.equipment=[{...base,characterId,slot:"hand",ownedItemId:"retained-sword"}];
     records.relics=[{...base,relicId:"retained-relic",unlocked:true,level:1,exp:0}];
     records.relicLoadout={...records.relicLoadout,relicId:"retained-relic"};
-    records.claimRecords=[{...base,claimKey:"retained-claim",status:"claimed"}];
+    const prior=structuredClone(records);
+    for(const rows of Object.values(prior)){
+        for(const row of Array.isArray(rows)?rows:[rows])row.serverRevision=5;
+    }
+    const priorSnapshot=assembleCanonicalSnapshot(uid,5,prior);
+    records.economy.gold=25;
+    records.claimRecords=[{...base,claimKey:grantId,status:"claimed",grantId,operationId:creditId}];
     records.claimCheckpoint={...records.claimCheckpoint,claimCount:1,
         claimDigest:claimRecordsDigest(records.claimRecords)};
     const snapshot=assembleCanonicalSnapshot(uid,6,records);
@@ -40,8 +47,21 @@ function fixture(){
             operationId:intent.operationId,sourceRevision:6,sourceSha256:archive.sourceSha256,
             snapshotSha256:snapshot.sha256,approvedBy:"operator",status:"approved",
             expiresAt:{toMillis:()=>Date.parse("2026-12-01T00:00:00Z")}}]]);
+    // Original credit evidence belongs to the existing grant Owner. Recovery
+    // must verify it, not synthesize rights from an archived claim marker.
+    const common={schemaVersion:1,ownerUid:uid,grantId,operationId:creditId};
+    data.set(`${root}/playableSnapshots/5`,priorSnapshot);
+    data.set(`${root}/recoveryArchives/5`,createRecoveryArchive(uid,5,prior,priorSnapshot));
+    data.set(`${root}/pendingGrants/${grantId}`,{schemaVersion:1,ownerUid:uid,
+        source:"server-event",kind:"gold",amount:25,status:"credited",claimedByOperationId:creditId});
+    data.set(`${root}/grantOperations/${creditId}`,{...common,kind:"gold",amount:25,
+        serverRevision:5,creditRevision:6,snapshotSha256:snapshot.sha256,creditedToCharacter:true});
+    data.set(`${root}/ledgerEntries/${creditId}`,{...common,kind:"gold",amount:25,
+        creditRevision:6,snapshotSha256:snapshot.sha256,creditEvidenceVersion:1,
+        sourceRevision:5,sourceSnapshotSha256:priorSnapshot.sha256,balanceBefore:0,balanceAfter:25});
+    data.set(`${root}/uniqueClaims/${grantId}`,{...common,creditRevision:6});
     const ref=path=>({path,id:path.split("/").at(-1),collection:name=>collection(`${path}/${name}`)});
-    const collection=path=>({path,query:true,doc:id=>ref(`${path}/${id}`)});
+    const collection=path=>({path,query:true,doc:id=>ref(`${path}/${id}`),limit:()=>collection(path)});
     const snap=(path,value)=>({id:path.split("/").at(-1),exists:value!==undefined,
         data:()=>value,get:key=>key.split(".").reduce((row,part)=>row?.[part],value)});
     let writes=0;
@@ -74,6 +94,46 @@ test("a surviving newer source in each of ten domains blocks old-envelope recove
         const h=fixture();h.data.set(path,{...h.data.get(path),serverRevision:8});await refused(h);
     }
 });
+test("full source loss cannot hide a later or unknown independently retained unique claim",async()=>{
+    for(const extra of [false,true]){
+        const h=fixture();for(const path of h.current.keys())h.data.delete(path);
+        const id=extra?"later-independent-claim":grantId;
+        h.data.set(`${root}/uniqueClaims/${id}`,{schemaVersion:1,ownerUid:uid,
+            grantId:id,operationId:creditId,creditRevision:8});
+        await refused(h);
+    }
+});
+test("archived claims require original grant, receipt, ledger and historical source evidence",async()=>{
+    for(const path of [`pendingGrants/${grantId}`,`grantOperations/${creditId}`,
+        `ledgerEntries/${creditId}`,`uniqueClaims/${grantId}`,"playableSnapshots/5","recoveryArchives/5"]){
+        const h=fixture();for(const current of h.current.keys())h.data.delete(current);
+        h.data.delete(`${root}/${path}`);await refused(h);
+    }
+});
+test("inconsistent independent credit proof cannot be accepted merely because archive hashes agree",async()=>{
+    for(const [path,field,value] of [
+        [`grantOperations/${creditId}`,"amount",26],
+        [`ledgerEntries/${creditId}`,"balanceAfter",26],
+        [`uniqueClaims/${grantId}`,"ownerUid","other-owner"],
+        [`uniqueClaims/${grantId}`,"grantId","other-grant"],
+        [`uniqueClaims/${grantId}`,"operationId","other-credit-proof-0001"]]){
+        const h=fixture();h.data.set(`${root}/${path}`,{...h.data.get(`${root}/${path}`),[field]:value});
+        await refused(h);
+    }
+});
+test("unbounded independent claim evidence is refused before reads can grow without limit",async()=>{
+    const h=fixture();for(let i=0;i<34;i++)h.data.set(`${root}/uniqueClaims/extra-${i}`,{});
+    const before=JSON.stringify([...h.data]);
+    await assert.rejects(h.recovery.restoreCurrent({},intent),e=>e.code==="failed-precondition");
+    assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
+});
+test("old credit receipts without delta evidence remain blocked without backfill",async()=>{
+    const h=fixture();delete h.data.get(`${root}/ledgerEntries/${creditId}`).creditEvidenceVersion;
+    const before=JSON.stringify([...h.data]);
+    await assert.rejects(h.recovery.restoreCurrent({},intent),e=>e.code==="failed-precondition"&&
+        e.message==="CREDIT_EVIDENCE_REQUIRED");
+    assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
+});
 test("unknown surviving revision cannot be silently treated as old or missing",async()=>{
     for(const path of fixture().current.keys()){
         for(const revision of [undefined,null,"7",0,-1,6.5,Number.MAX_SAFE_INTEGER+1]){
@@ -97,6 +157,8 @@ test("known older/current sources and entirely missing sources still restore wit
         // A completed original intent remains read-only even after newer live sources.
         h.data.get(env).serverRevision=9;
         for(const path of h.current.keys())h.data.set(path,{...h.data.get(path),serverRevision:9});
+        h.data.set(`${root}/uniqueClaims/later-read-only-claim`,{schemaVersion:1,ownerUid:uid,
+            grantId:"later-read-only-claim",operationId:"later-read-only-credit",creditRevision:9});
         const before=JSON.stringify([...h.data]),count=h.writes();
         assert.deepEqual(await h.recovery.restoreCurrent({},intent),{
             restoredRevision:7,unchanged:true,authoritativeStateReady:false});
