@@ -117,8 +117,8 @@ assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrad
 assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art > img\{[\s\S]*?object-fit:contain/);
 assert.doesNotMatch(abyssCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art/);
 
-assert.match(mainCss,/#homePage\{[\s\S]*?height:calc\(100% - 216px\);[\s\S]*?overflow-y:auto;/);
-assert.match(homeRosterCss,/\.v146-home-roster\{[\s\S]*?margin:4px 10px 0;/,"roster must not reserve a second navigation height");
+assert.match(mainCss,/#homePage\{[^}]*height:calc\(100% - 216px\);[^}]*overflow:hidden;/);
+assert.match(homeRosterCss,/\.v146-home-roster\{[^}]*position:relative;[^}]*margin:0 -18px;/,"roster must not reserve a second navigation height");
 
 console.log("Battle statistics / relic / talisman / Boss / Tower focused contracts passed");
 

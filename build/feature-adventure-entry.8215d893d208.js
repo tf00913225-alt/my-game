@@ -60,10 +60,9 @@
             axis.id="adventureHomeAxis";
             axis.className="adventure-home-axis";
             axis.innerHTML=
-                '<span class="adventure-home-gate" aria-hidden="true"></span>'+
                 '<button id="adventureHomeEntry" type="button" class="adventure-home-entry" data-feature="adventure" aria-label="出城冒險，江湖主線章節推進" onclick="openAdventureMap()">'+
+                    '<strong>出城冒險　›</strong>'+
                     '<span class="adventure-home-kicker">江湖主線 · 章節推進</span>'+
-                    '<strong>出城冒險</strong>'+
                     '<span id="adventureHomeNotice" class="adventure-home-notice" hidden aria-hidden="true"></span>'+
                 '</button>';
             home.appendChild(axis);

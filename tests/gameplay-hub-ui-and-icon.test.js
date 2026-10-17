@@ -50,7 +50,8 @@ function pngRgba(path){
 const bottom=html.slice(html.indexOf('<div id="bottomNav"'),html.indexOf("</div>",html.indexOf('<div id="bottomNav"'))+6);
 assert.equal((bottom.match(/class="nav-button /g)||[]).length,5,"bottom navigation must remain five buttons");
 assert.match(bottom,/id="bossNav"[\s\S]*onclick="showPage\('gameplay'\)"[\s\S]*aria-label="玩法"[\s\S]*title="玩法"/);
-assert.match(bottom,/src="assets\/ui\/nav-gameplay\.png"/);
+assert.equal((bottom.match(/<svg viewBox="0 0 64 64"/g)||[]).length,5,'main navigation uses five consistent vector icons');
+assert.match(bottom,/<span class="nav-line-label" aria-hidden="true">玩法<\/span>/);
 assert.match(bottom,/<span class="nav-sr-only">玩法<\/span>/);
 assert.doesNotMatch(bottom,/nav-boss\.png|aria-label="BOSS"/);
 

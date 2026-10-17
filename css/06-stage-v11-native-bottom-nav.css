@@ -21,7 +21,7 @@
     transform:none;
     box-sizing:border-box;
     border:0;
-    border-top:5px solid #8a6a3a;
+    border-top:2px solid #8a6a3a;
     border-radius:0;
     background:linear-gradient(0deg,#0e0c0a,#1c1712);
 }
@@ -70,6 +70,24 @@
     transform:none;
 }
 #game-stage > #game-overlay-layer #bottomNav > .nav-button > *{pointer-events:none;}
+/* Main navigation uses live labels and the same thin gold stroke as city entries.
+   Context-specific navigation retains its existing art and lifecycle. */
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] > .nav-button{
+    flex-direction:column;gap:9px;color:#cbb78e;
+}
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] .nav-icon-frame{
+    flex:0 0 108px;width:108px;height:108px;
+}
+#game-stage > #game-overlay-layer #bottomNav .nav-icon-frame svg{display:block;width:100%;height:100%;}
+#game-stage > #game-overlay-layer #bottomNav .nav-line-label{font:600 42px/54px "Noto Serif TC",serif;white-space:nowrap;}
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] > .nav-button.active{
+    color:#ffe3a0;background:radial-gradient(ellipse at bottom,#b887323b,transparent 75%);
+}
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] > .nav-button.active::after{
+    content:"";position:absolute;bottom:12px;left:24%;right:24%;height:3px;background:#e6be68;box-shadow:0 0 15px #e6be6877;
+}
+#game-stage > #game-overlay-layer #bottomNav > .nav-button:focus-visible{outline:4px solid #ffe3a0;outline-offset:-6px;}
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] > .nav-button:active{color:#fff0cc;}
 /* Notification contract for the native 1080 x 1920 plane.  Twenty-two
    logical pixels project to roughly 8 CSS px on current phone widths; this is
    intentionally different from the legacy-content unit below. */

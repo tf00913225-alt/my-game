@@ -7,7 +7,7 @@
       "build/boot-core.ac6c047c205e.js"
     ],
     "styles": [
-      "build/boot-core.75aec7dd26f9.css"
+      "build/boot-core.2ca4ce6d8a3a.css"
     ],
     "images": [
       "assets/ui/startup-logo.4631c0bc3f2b.jpg",
@@ -20,10 +20,10 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.4901f0bd8de6.js"
+          "build/app-shell.c6ca7896a209.js"
         ],
         "styles": [
-          "build/app-shell.68c5e7524f9e.css"
+          "build/app-shell.58ccbe864128.css"
         ],
         "dependencies": [
           "feature-adventure-entry"
@@ -31,10 +31,10 @@
       },
       "feature-adventure-entry": {
         "scripts": [
-          "build/feature-adventure-entry.f61846a4ec08.js"
+          "build/feature-adventure-entry.8215d893d208.js"
         ],
         "styles": [
-          "build/feature-adventure-entry.c28d0f109330.css"
+          "build/feature-adventure-entry.f68f5350eccc.css"
         ],
         "dependencies": []
       },
@@ -210,9 +210,9 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.75aec7dd26f9.css",
-        "sha256": "75aec7dd26f9",
-        "bytes": 215995,
+        "path": "build/boot-core.2ca4ce6d8a3a.css",
+        "sha256": "2ca4ce6d8a3a",
+        "bytes": 211309,
         "priority": "P0",
         "type": "style",
         "decode": false
@@ -562,19 +562,19 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.4901f0bd8de6.js",
-        "sha256": "4901f0bd8de6",
-        "bytes": 1179758,
+        "path": "build/app-shell.58ccbe864128.css",
+        "sha256": "58ccbe864128",
+        "bytes": 91246,
         "priority": "P1",
-        "type": "script",
+        "type": "style",
         "decode": false
       },
       {
-        "path": "build/app-shell.68c5e7524f9e.css",
-        "sha256": "68c5e7524f9e",
-        "bytes": 94494,
+        "path": "build/app-shell.c6ca7896a209.js",
+        "sha256": "c6ca7896a209",
+        "bytes": 1178674,
         "priority": "P1",
-        "type": "style",
+        "type": "script",
         "decode": false
       },
       {
@@ -818,8 +818,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "5bad5ef57206",
-    "totalBytes": 21898031,
+    "manifestHash": "7da20b68173e",
+    "totalBytes": 21889013,
     "totalResources": 78
   },
   "assets": {
@@ -827,9 +827,9 @@
       "sha256": "ac6c047c205e",
       "bytes": 70000
     },
-    "build/app-shell.4901f0bd8de6.js": {
-      "sha256": "4901f0bd8de6",
-      "bytes": 1179758
+    "build/app-shell.c6ca7896a209.js": {
+      "sha256": "c6ca7896a209",
+      "bytes": 1178674
     },
     "build/gameplay-core-primary.2cc0829037ae.js": {
       "sha256": "2cc0829037ae",
@@ -855,9 +855,9 @@
       "sha256": "464cd8f702a6",
       "bytes": 69904
     },
-    "build/feature-adventure-entry.f61846a4ec08.js": {
-      "sha256": "f61846a4ec08",
-      "bytes": 4621
+    "build/feature-adventure-entry.8215d893d208.js": {
+      "sha256": "8215d893d208",
+      "bytes": 4547
     },
     "build/feature-adventure-items.cf197e72837f.js": {
       "sha256": "cf197e72837f",
@@ -875,13 +875,13 @@
       "sha256": "13793fa5c78c",
       "bytes": 28369
     },
-    "build/boot-core.75aec7dd26f9.css": {
-      "sha256": "75aec7dd26f9",
-      "bytes": 215995
+    "build/boot-core.2ca4ce6d8a3a.css": {
+      "sha256": "2ca4ce6d8a3a",
+      "bytes": 211309
     },
-    "build/app-shell.68c5e7524f9e.css": {
-      "sha256": "68c5e7524f9e",
-      "bytes": 94494
+    "build/app-shell.58ccbe864128.css": {
+      "sha256": "58ccbe864128",
+      "bytes": 91246
     },
     "build/gameplay-core.cf2e007f204a.css": {
       "sha256": "cf2e007f204a",
@@ -903,9 +903,9 @@
       "sha256": "9be899415972",
       "bytes": 7656
     },
-    "build/feature-adventure-entry.c28d0f109330.css": {
-      "sha256": "c28d0f109330",
-      "bytes": 2530
+    "build/feature-adventure-entry.f68f5350eccc.css": {
+      "sha256": "f68f5350eccc",
+      "bytes": 1306
     },
     "build/feature-adventure.0d7c7b545813.css": {
       "sha256": "0d7c7b545813",
