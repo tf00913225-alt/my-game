@@ -24,9 +24,9 @@
     --battle-ally-row-gap:8px;
     --battle-ally-row-height:calc((100% - var(--battle-ally-row-gap)) / 2);
     --battle-slot-column-gap:4px;
-    --battle-ally-column-gap:8px;
+    --battle-ally-column-gap:4px;
     --battle-enemy-inline-padding:4px;
-    --battle-ally-inline-padding:14px;
+    --battle-ally-inline-padding:4px;
     --battle-art-overhang-x:5px;
     --battle-art-overhang-top:6px;
     --battle-art-hud-reserve:39px;
@@ -37,13 +37,25 @@
     --battle-item-menu-gap:8px;
 }
 
-/* Six wider columns still need portrait height. Allocate it within the same
-   track owner; Boss/overflow encounters retain the original 42/16/42 tracks. */
+/* The six-unit field reserves the complete turn + command-art stack.
+   Its measured portrait height is retained below while unused alpha headroom
+   yields space to the center; the ally track and Boss tracks stay unchanged. */
 #game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"]{
-    --battle-enemy-region-track:48fr;
+    --battle-enemy-region-track:44fr;
+    --battle-center-region-track:20fr;
     --battle-ally-region-track:36fr;
 }
 
+
+/* Keep the existing visible heights in the single fixed logical canvas;
+   only alpha headroom is reclaimed for the command/turn stack. */
+#game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"] .battle-monster > .v174-normalized-portrait{
+    --battle-portrait-visible-height:101.55px;
+    --battle-portrait-baseline:100%;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"] .battle-monster[data-portrait-size-class="ELITE"] > .v174-normalized-portrait{
+    --battle-portrait-visible-height:105.27px;
+}
 
 #game-stage #battlePage.v-fixed-slot-render-v2 > .battle-wrap{
     position:relative !important;
@@ -365,6 +377,9 @@
     animation:none !important;
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
     pointer-events:none !important;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player > .v174-battle-art{
+    --battle-art-hud-reserve:36px;
 }
 /* Offline alpha bounds are consumed by V174. The full canvas is painted once,
    preserving aspect and every nontransparent pixel; no runtime pixel scan. */
