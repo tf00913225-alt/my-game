@@ -751,7 +751,7 @@ button:disabled{
 .home-version-badge{font-size:24px;line-height:30px;color:#a99775;}
 .home-hud-side{display:grid;gap:6px;}
 .home-hud-resources{display:flex;gap:24px;align-items:center;}
-.home-hud-resources>span{display:flex;align-items:baseline;gap:12px;white-space:nowrap;color:#d8c5a1;font-size:39px;line-height:54px;}
+.home-hud-resources>span{display:flex;align-items:baseline;gap:12px;white-space:nowrap;color:#d8c5a1;font-size:39px;line-height:66px;}
 .home-hud-resources b{font-size:42px;color:#ffe5ad;font-variant-numeric:tabular-nums;}
 /* Existing DEV actions are retained; they are not part of the player hierarchy. */
 .home-test-tools{display:flex;align-items:center;justify-content:flex-end;gap:9px;}

@@ -350,7 +350,9 @@ async function run(chrome,url,live){
    assert.ok(home.rect.bottom<=nav.rect.top+1,'navigation overlaps browser page');
    assert.ok(Math.abs(home.rect.width/home.rect.height-1080/1704)<.002,'home lost authored native canvas bounds');
    await c.eval("adventureHomeEntry.scrollIntoView({block:'nearest'})");await settle();
-   await check('#adventureHomeEntry',v,true);
+   await check('#adventureHomeEntry',v);
+   await check('#adventureHomeEntry strong',v,true);
+   await check('#adventureHomeEntry .adventure-home-kicker',v,true);
    const entrance=await c.eval(`(()=>{const entry=adventureHomeEntry,r=entry.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);const covered=[...homePage.querySelectorAll('.home-card,#v146HomeRoster')].filter(n=>{const b=n.getBoundingClientRect();return r.left<b.right&&b.left<r.right&&r.top<b.bottom&&b.top<r.bottom;}).map(n=>n.id||n.getAttribute('aria-label'));return {hit:entry===hit||entry.contains(hit),covered};})()`);
    assert.ok(entrance.hit,'adventure entrance covered');
    assert.deepEqual(entrance.covered,[],'adventure entrance overlaps home controls');
