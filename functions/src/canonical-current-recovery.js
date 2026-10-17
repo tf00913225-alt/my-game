@@ -152,6 +152,16 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             if(queries.reduce((sum,query)=>sum+query.size,0)>400){
                 fail("failed-precondition","Recovery source set exceeds the transaction budget.");
             }
+            // A damaged envelope is not evidence that surviving sources are old.
+            // Never overwrite a later or unresolvable revision with this archive.
+            for(const doc of [...singles,...queries.flatMap(query=>query.docs)]){
+                if(doc.exists){
+                    const revision=doc.get("serverRevision");
+                    if(!Number.isSafeInteger(revision)||revision<1||revision>expectedRevision){
+                        fail("data-loss","Surviving source revision blocks current recovery.");
+                    }
+                }
+            }
             for(let i=0;i<setNames.length;i++){
                 const name=setNames[i],keys=new Set(records[name].map(SETS[name]));
                 if(queries[i].docs.some(doc=>!keys.has(doc.id))){
