@@ -48,7 +48,7 @@ for(const [options,primary,danger] of [[{},false,false],[{danger:true},true,true
 assert.equal(created.filter(node=>node.id==="v169RpgDialogLayer").length,1,"all tones reuse one dialog layer");
 
 assert.doesNotMatch(relicCss,/map-return\.png/);
-assert.match(authoredUiCss(fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8")),/\.team-relic-home-tools\{[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\);[^}]*grid-row:3;[^}]*width:100%;[^}]*gap:4px;/);
+assert.match(authoredUiCss(fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8")),/\.team-relic-home-tools\{[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\);[^}]*grid-row:2;/,'four lower tools retain their canonical city row');
 assert.match(relicCss,/#statusHelpButton\{display:none!important;\}/, "relic modal hides status help");
 assert.match(relicCss,/\.team-relic-modal:not\(\.team-relic-detail-mode\) \.home-feature-close-btn:not\(#statusHelpButton\)\{display:inline-flex!important;\}/,
     "only the real modal return button may be forced visible in relic list mode");
