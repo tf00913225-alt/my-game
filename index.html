@@ -38,7 +38,7 @@
 <link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/ui/startup-main-city.d43e67af1c1c.jpg" fetchpriority="high">
 <!-- build:critical-style -->
-<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.2ca4ce6d8a3a.css">
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.e0290d7de96a.css">
 <!-- /build:critical-style -->
 </head>
 
@@ -1356,22 +1356,13 @@
     class="page"
 >
 
-<button
-    id="battleElementBoxButton"
-    class="battle-element-box-button"
-    aria-label="元素匣／自動戰鬥設定"
-    title="元素匣／自動戰鬥設定"
->
-    <img draggable="false" src="assets/battle/element-box.png" alt="元素匣" loading="lazy" decoding="async">
-</button>
+
 
 <div class="battle-wrap">
 
 <section class="battle-enemy-region" aria-label="敵方戰鬥區">
 
-<div class="battle-title">
-     戰鬥
-</div>
+
 
 <div
     id="battleMonsterArea"
@@ -1438,6 +1429,19 @@
         gap:4px;
     "
 >
+
+<div class="battle-title">
+     戰鬥
+</div>
+<div id="battleTurnIndicator">第 1 回合</div>
+<button
+    id="battleElementBoxButton"
+    class="battle-element-box-button"
+    aria-label="元素匣／自動戰鬥設定"
+    title="元素匣／自動戰鬥設定"
+>
+    <img draggable="false" src="assets/battle/element-box.png" alt="元素匣" loading="lazy" decoding="async">
+</button>
 
 <div
     id="turnTargetRow"
@@ -1664,7 +1668,7 @@
 
 </section>
 
-<div id="battleTurnIndicator">第 1 回合</div>
+
 
 <!-- V96：底部固定自動戰鬥列已移除。
      戰鬥頁改由上方「元素匣」icon開啟同一套設定。 -->

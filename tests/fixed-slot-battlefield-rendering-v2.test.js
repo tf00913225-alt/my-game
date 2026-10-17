@@ -214,7 +214,9 @@ assert.deepEqual(JSON.parse(JSON.stringify(owner.bossFootprintSlots)),["ENEMY_B2
 assert.match(qaSource,/V174 battle presentation owner/);
 console.log("Fixed Slot Battlefield Rendering V2 regression contract passed.");
 
-assert.match(css, /\[data-enemy-battlefield-profile="standard-six"\]\{[\s\S]*?--battle-enemy-region-track:44fr;[\s\S]*?--battle-center-region-track:20fr;[\s\S]*?--battle-ally-region-track:36fr;/,"only standard six-slot profile reallocates portrait height");
+assert.match(css, /\[data-enemy-battlefield-profile="standard-six"\]\{[\s\S]*?--battle-enemy-region-track:40fr;[\s\S]*?--battle-center-region-track:24fr;[\s\S]*?--battle-ally-region-track:36fr;/,"only standard six-slot profile reallocates portrait height");
 
 assert.match(css,/--battle-portrait-visible-height:101\.55px;/,"six-slot normal art preserves measured visible height");
 assert.match(css,/--battle-portrait-visible-height:105\.27px;/,"elite art preserves its larger class height");
+
+assert.match(fs.readFileSync("index.html","utf8"), /id="battleActionRegion"[\s\S]*?id="battleElementBoxButton"[\s\S]*?id="turnTargetRow"/,"element box shares the formal operation reserve");
