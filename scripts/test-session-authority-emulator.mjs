@@ -2357,6 +2357,23 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     assert.deepEqual(await dump(),withUnknown);
     await unknown.delete();
 
+    // A stale/damaged envelope must not authorize overwriting surviving newer
+    // sources. Missing revision evidence is equally unreconciled. Emulator only.
+    for(const [path,row] of current){
+        for(const revision of [10,null]){
+            const surviving={...row,serverRevision:revision};
+            if(revision===null)delete surviving.serverRevision;
+            await db.doc(path).set(surviving);
+            const withSurvivor=await dump();
+            await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+            assert.deepEqual(await dump(),withSurvivor);
+            assert.deepEqual((await envelopeRef.get()).data(),envelopeBefore);
+            await db.doc(path).delete();
+        }
+    }
+    assert.deepEqual(await dump(),damaged);
+    console.log(`Current recovery surviving-revision fence real Firestore PASS: ${current.size} known documents; newer and missing revisions refuse without writes, approval consumption or history changes.`);
+
     const rollback=createCanonicalCurrentRecovery({db,FieldValue,HttpsError,
         inspectExistingEnvelope,nextRevision,
         runProtected:(input,operation)=>writerSessions.runProtected(input,async(tx,active)=>{
