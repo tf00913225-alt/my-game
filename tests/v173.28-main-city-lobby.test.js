@@ -1,166 +1,57 @@
 "use strict";
-
-const assert=require("node:assert/strict");
-const fs=require("node:fs");
-const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
-
-// Resolve the fixed native spacing token for source-level geometry contracts.
-const nativeCss=s=>s.replace(/calc\((\d+(?:\.\d+)?) \* var\(--ui-length-unit,1px\)\)/g,(_,n)=>(Number(n)*3)+'px');
-const read=path=>fs.readFileSync(path,"utf8");
-const index=read("index.html");
-const utilityCss=nativeCss(fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8"));
-const baseCss=nativeCss(read("css/00-main.css"));
-const v54Css=read("css/19-stage-v54-main-city-moderate-native-scale.css");
-const v54Runtime=read("js/16-stage-v54-main-city-runtime.js");
-const rosterCss=read("css/19-stage-v54-main-city-moderate-native-scale.css");
-const rosterRuntime=read("js/16-stage-v54-main-city-runtime.js");
-const loader=read("js/20-anonymous-20.js")+read("scripts/build-production.mjs");
-
-const actionStart=index.indexOf('<div class="home-card-grid"');
-const actionEnd=index.indexOf('<div\n    id="homeRestCard"',actionStart);
-assert.ok(actionStart>=0&&actionEnd>actionStart,"main-city action markup exists");
-const actions=index.slice(actionStart,actionEnd);
-
-let passed=0;
-function test(name,callback){callback();passed++;console.log("✓ "+name);}
-function count(source,pattern){return (source.match(pattern)||[]).length;}
-
-test("the HUD keeps only city identity, resources and DEV tools",()=>{
-    assert.match(index,/class="home-city-hud"[^>]*aria-label="主城與資源資訊"/);
-    assert.doesNotMatch(index,/homeHudCharacterList|homeHudCharacterName|homeHudCharacterLevel/);
-    assert.doesNotMatch(index,/home-hud-character-(?:list|row|avatar)/);
-    assert.match(index,/id="homeHudGoldValue"/);
-    assert.match(index,/id="homeHudExpValue"/);
-    assert.doesNotMatch(index,/<h2>主城<\/h2>/);
-    assert.match(baseCss,/\.home-city-hud\{[\s\S]*display:grid;[\s\S]*grid-template-columns:minmax\(0,1fr\);[\s\S]*min-height:144px;[\s\S]*border:3px solid[\s\S]*background:/);
-    assert.match(baseCss,/\.home-hud-identity\{[\s\S]*position:relative;[\s\S]*align-items:center;[\s\S]*align-self:stretch;[\s\S]*inset-inline-start:21px/);
-    assert.doesNotMatch(baseCss,/\.home-hud-character-(?:list|row|avatar)/);
-    assert.match(baseCss,/\.home-hud-resources\{[\s\S]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
-    assert.match(baseCss,/\.home-hud-resources > span\{[^}]*min-height:60px;[^}]*border:0;[^}]*background:transparent/);
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const read=p=>fs.readFileSync(p,'utf8').replace(/\r\n/g,'\n');
+const source=read('js/16-stage-v54-main-city-runtime.js'),html=read('index.html');
+function partyFixture(){
+ const players=[{id:'甲'},{id:'乙'},{id:'丙'}],owned=new Set(['a','b']);let confirmed={heroIdToSlot:{b:'ALLY_B3',a:'ALLY_B1'}};
+ const context={window:{FourSymbolsTeamFormation:{getConfirmed:()=>confirmed},FourSymbolsTeamFormationPolicy:require('../functions/src/team-formation-policy'),FourSymbolsHeroSystem:{getDomain:()=>({isHeroUnlocked:id=>owned.has(id),getHeroDefinition:id=>({name:id}),getHeroLevel:()=>35})}},
+ getExistingPartyIndexes:()=>players.flatMap((p,i)=>p?[i]:[]),getPartyCharacterByIndex:i=>players[i],getPartyBattleStats:()=>({maxHP:600,maxSP:200})};
+ vm.createContext(context);vm.runInContext(source.slice(source.indexOf('    function deployedHomeParty(){'),source.indexOf('    function renderHomeRoster(){')),context);
+ return {context,players,owned,setFormation:f=>confirmed=f};
+}
+test('city projects real player characters while leaving hero formation untouched',()=>{
+ const f=partyFixture(),p=f.context.deployedHomeParty();assert.deepEqual(Array.from(p.characters,r=>r.index),[0,1,2]);assert.equal(p.heroes,undefined);
+ const before=JSON.stringify(f.players);f.context.deployedHomeParty();assert.equal(JSON.stringify(f.players),before);
+ f.setFormation({heroIdToSlot:{b:'ALLY_B3'}});assert.equal(f.context.deployedHomeParty().characters.length,3);
+ f.context.window.FourSymbolsTeamFormation.getConfirmed=()=>{throw Error('city must not depend on hero formation');};
+ assert.equal(f.context.deployedHomeParty().characters.length,3);
+});
+test('empty, sparse and pending formation states never create placeholder deployed actors or preview heroes',()=>{
+ const f=partyFixture();f.players[1]=null;f.setFormation(null);
+ assert.deepEqual(Array.from(f.context.deployedHomeParty().characters,r=>r.index),[0,2]);
+ f.players.fill(null);assert.equal(f.context.deployedHomeParty().characters.length,0);
+});
+test('all twelve city features, story route, formation and resource identities remain unique',()=>{
+ const city=html.slice(html.indexOf('<div class="home-card-grid"'),html.indexOf('id="homeRestCard"'));
+ for(const action of ['character','hero','shop','quest','relic','autoBattleSettings','forge','synthesis','achievement','announcement','offlineExp','system']){
+  assert.equal(city.split("openHomeFeature('"+action+"')").length-1,1,action);
+ }
+ for(const id of ['homeHudGoldValue','homeHudExpValue','homeBannerName'])assert.equal(html.split('id="'+id+'"').length-1,1,id);
+ assert.match(source,/openSharedFormation/);assert.match(read('js/adventure/adventure-entry-v1-20260915.js'),/onclick="openAdventureMap\(\)"/);
+ assert.match(source,/rosterEscape\(character.id/);assert.match(source,/getCharacterBattleArtworkPath\(character\)/);
+});
+test('city remains under the original first-screen renderer and refresh bridge',()=>{
+ assert.match(source,/prepareFirstScreenVisuals/);assert.match(source,/firstScreenVisualReadyPromise=null/);
+ assert.doesNotMatch(source,/FourSymbolsHeroSystem|FourSymbolsTeamFormationPolicy|data-hero-position/);
+ assert.doesNotMatch(source,/initializeHeroBattleCombatants|setInterval|createTreeWalker/);
 });
 
-test("character and shop are the only two primary entrances",()=>{
-    assert.equal(count(actions,/class="home-card home-card-primary"/g),2);
-    assert.match(actions,/home-primary-actions[\s\S]*openHomeFeature\('character'\)[\s\S]*openHomeFeature\('shop'\)/);
-    assert.match(baseCss,/\.home-primary-actions\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\);[^}]*grid-row:2;[^}]*width:100%/);
-    assert.match(baseCss,/\.home-card-primary\{[^}]*height:204px;[^}]*border:3px solid var\(--home-frame-muted\)/);
-    assert.match(baseCss,/\.home-card-primary::after\{[\s\S]*linear-gradient/);
-    assert.match(baseCss,/\.home-card-primary \.home-card-label\{[^}]*height:100%;[^}]*border:0;[^}]*background:transparent;[^}]*font-size:48px/);
-    assert.ok((28-19)/28>=.30&&(28-19)/28<=.40);
+test('renderer follows sparse player counts, real artwork selectors and clamped resource fractions without mutations',()=>{
+ const f=partyFixture(),count={},scene={dataset:{}},roster={dataset:{},querySelector:()=>count,querySelectorAll:()=>[],insertAdjacentHTML:(_,html)=>roster.html=html};
+ Object.assign(f.context,{firstScreenVisualReadyPromise:null,ensureHomeRosterShell:()=>roster,syncRosterResource:()=>{},syncHomeRelicSummary:()=>{},rosterNumber:n=>Number(n)||0,rosterEscape:s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'),document:{getElementById:id=>id==='homePartyScene'?scene:null},elementDatabase:{fire:{},water:{},wind:{}}});
+ const main=read('js/00-main.js');vm.runInContext(main.slice(main.indexOf('function getCharacterBattleArtworkPath('),main.indexOf('function getCharacterDisplayNameByIndex(')),f.context);
+ vm.runInContext(source.slice(source.indexOf('    function renderHomeRoster(){'),source.indexOf('    window.v54RenderHomeRoster=')),f.context);
+ Object.assign(f.players[0],{id:'甲<"',gender:'male',element:'fire',hp:300,sp:120,level:40});
+ Object.assign(f.players[1],{gender:'female',element:'water',hp:900,sp:-5});
+ Object.assign(f.players[2],{gender:'male',element:'wind',hp:600,sp:200});
+ const before=JSON.stringify(f.players);f.context.renderHomeRoster();
+ assert.equal(scene.dataset.partySize,'3');assert.equal(count.textContent,'角色 3 人');
+ for(const path of ['male_fire','female_water','male_wind'])assert.ok(scene.innerHTML.includes('battle_'+path+'.png'));
+ assert.equal((scene.innerHTML.match(/<figure/g)||[]).length,3);assert.doesNotMatch(scene.innerHTML,/assets\/heroes/);
+ assert.match(roster.html,/aria-valuenow="300" aria-valuetext="HP 300 \/ 600"/);assert.match(roster.html,/width:50%/);
+ assert.match(roster.html,/aria-valuenow="0" aria-valuetext="SP 0 \/ 200"/);assert.match(roster.html,/甲&lt;&quot;/);
+ assert.equal(JSON.stringify(f.players),before);
+ f.players[1]=null;f.context.renderHomeRoster();assert.equal(scene.dataset.partySize,'2');assert.match(scene.innerHTML,/character:2/);
+ f.players[2]=null;f.context.renderHomeRoster();assert.equal(scene.dataset.partySize,'1');
+ f.players[0]=null;f.context.renderHomeRoster();assert.equal(scene.innerHTML,'');assert.equal(count.textContent,'角色 0 人');
 });
-
-test("four daily facilities and four recessive tools preserve all eight functions",()=>{
-    assert.equal(count(actions,/class="home-card home-card-secondary"/g),4);
-    assert.equal(count(actions,/class="home-card home-card-tertiary"/g),4);
-    ["hero","synthesis","quest","forge","achievement","announcement","offlineExp","system"].forEach(type=>assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)")));
-    assert.match(actions,/aria-label="英雄系統"/);
-    assert.doesNotMatch(read("js/00-main.js").slice(read("js/00-main.js").indexOf("function renderHeroPageContent()"),read("js/00-main.js").indexOf("function openHomeFeature(type)")),/openHomeFeature\('rest'\)/); // Hero UI no longer exposes rest.
-    assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-template-columns:repeat\(2,minmax\(192px,20%\)\);[^}]*grid-auto-rows:204px;/);
-
-    assert.doesNotMatch(baseCss,/margin-inline-(?:start|end):(34|68)px/);
-    assert.match(baseCss,/\.home-card-secondary\{[^}]*width:100%;[^}]*height:204px;[^}]*border:3px solid[^}]*background:rgba\(17,20,16,.92\)/);
-    assert.match(baseCss,/\.home-card-secondary \.home-card-icon\{[^}]*width:96px;[^}]*height:96px/);
-    assert.match(baseCss,/\.home-card-secondary \.home-card-label\{[^}]*background:transparent;[^}]*font-size:45px/);
-    assert.match(baseCss,/\.home-card-tertiary\{[^}]*min-height:132px;[^}]*pointer-events:auto/);
-    assert.ok((90-80)/90>=.10&&(90-80)/90<=.15);
-    assert.ok((95-82)/95>=.10&&(95-82)/95<=.15);
-});
-
-test("offline/system use the persistent tools while relic and element box retain their entries",()=>{
-    assert.equal(count(actions,/openHomeFeature\('offlineExp'\)/g),1);
-    assert.equal(count(actions,/openHomeFeature\('system'\)/g),1);
-    assert.equal(count(actions,/class="home-card home-card-utility/g),2);
-    assert.match(actions,/home-utility-actions team-relic-home-tools/);
-    assert.match(actions,/team-relic-home-entry[^>]*data-feature="relic"/);
-    assert.match(actions,/team-element-box-home-entry[^>]*data-feature="gameplay-core"/);
-    assert.match(actions,/homeIconOfflineExp/);
-    assert.match(actions,/homeIconSystem/);
-});
-
-test("all ten existing entry IDs and click contracts remain intact",()=>{
-    const entries={Character:"character",Shop:"shop",Rest:"hero",Synthesis:"synthesis",Quest:"quest",Forge:"forge",Achievement:"achievement",Announcement:"announcement",OfflineExp:"offlineExp",System:"system"};
-    Object.entries(entries).forEach(([id,type])=>{
-        assert.equal(count(actions,new RegExp('id="homeIcon'+id+'"','g')),1);
-        assert.equal(count(actions,new RegExp("openHomeFeature\\('"+type+"'\\)",'g')),1);
-    });
-    assert.equal(count(actions,/<button type="button" class="home-card /g),12);
-});
-
-test("DEV gold and EXP shortcuts remain direct but visually recessive",()=>{
-    assert.match(index,/id="testGoldMillionButton" onclick="grantTestGoldMillion\(\)"/);
-    assert.match(index,/id="testExpTenMillionButton" onclick="grantTestExpTenMillion\(\)"/);
-    assert.match(baseCss,/\.home-test-button\{[\s\S]*height:48px;[\s\S]*opacity:.78/);
-    assert.doesNotMatch(baseCss,/\.home-test-button\{[\s\S]{0,260}height:102px/);
-});
-
-test("the historical V54 bridge no longer flattens hierarchy with inline important fonts",()=>{
-    assert.doesNotMatch(v54Runtime,/createTreeWalker|font-size|setProperty\(/);
-    assert.match(v54Runtime,/home\.classList\.add\("main-city-lobby-ready"\)/);
-    assert.doesNotMatch(v54Css,/#game-stage #homePage button,[\s\S]*font-size:54px !important/);
-});
-
-test("the roster renderer keeps all character details in the six-position adventure formation",()=>{
-    assert.match(rosterRuntime,/const partyIndexes=getExistingPartyIndexes\(\)\.slice\(0,3\)/);
-    assert.doesNotMatch(rosterRuntime,/homeHudCharacterList|homeHudCharacterName|homeHudCharacterLevel/);
-    assert.doesNotMatch(rosterRuntime,/home-hud-character-(?:list|row|avatar)/);
-    assert.doesNotMatch(rosterRuntime,/primaryCharacter=partyIndexes/);
-    assert.match(rosterRuntime,/homeHudGoldValue/);
-    assert.match(rosterRuntime,/homeHudExpValue/);
-    assert.match(rosterRuntime,/v146-home-roster-count[^\n]*隊伍 -- \/ 6/);
-    assert.match(rosterRuntime,/count\.textContent="隊伍 "\+partyIndexes\.length\+" \/ 6"/);
-    assert.match(rosterRuntime,/class="v146-home-avatar"/);
-    assert.match(rosterCss,/\.v146-home-roster\{[^}]*display:grid;[^}]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[^}]*gap:6px;[^}]*background:linear-gradient\(155deg,rgba\(23,26,20,.95\),rgba\(11,13,10,.94\)\)/);
-    assert.match(rosterCss,/\.v146-home-roster > header\{[\s\S]*grid-column:1\/-1;[\s\S]*display:grid;[\s\S]*grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1\.55fr\) auto;[\s\S]*column-gap:24px;[\s\S]*min-height:90px;[\s\S]*font-size:45px/);
-    assert.match(rosterCss,/\.v146-home-roster\{[^}]*border:3px solid var\(--home-frame-muted\);[^}]*box-shadow:0 12px 36px/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:minmax\(0,1fr\);[\s\S]*min-height:210px/);
-    assert.match(rosterCss,/\.v146-home-character\{[^}]*border:0;[^}]*background:transparent;[^}]*box-shadow:none/);
-    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:96px;[\s\S]*height:96px;[\s\S]*transform:none/);
-    assert.match(rosterCss,/\.v146-home-resource\{[\s\S]*height:57px;[\s\S]*margin-inline:0/);
-    assert.match(rosterCss,/\.v146-home-resource strong\{[\s\S]*font-size:39px;[\s\S]*line-height:51px/);
-    ["fire","water","wind","earth"].forEach(element=>assert.match(rosterCss,new RegExp('data-element="'+element+'"')));
-});
-
-test("gold and EXP share one compact formatter without ellipsis",()=>{
-    const numericSource=rosterRuntime.match(/function rosterNumber\(value\)\{[\s\S]*?\n    \}/)[0];
-    const formatterSource=rosterRuntime.match(/function rosterResourceText\(value\)\{[\s\S]*?\n    \}/)[0];
-    const formatValues=Function(numericSource+"\n"+formatterSource+"\nreturn [rosterResourceText(12485243),rosterResourceText(104852430),rosterResourceText(1248524300)];");
-    assert.deepEqual(formatValues(),["1248萬","1.05億","12.5億"]);
-    assert.match(rosterRuntime,/syncRosterResource\(document.getElementById\("homeHudGoldValue"\),[^\n]+\);[\s\S]*syncRosterResource\(document.getElementById\("homeHudExpValue"\),[^\n]+\);/);
-    assert.doesNotMatch(formatterSource,/\.\.\./);
-    assert.doesNotMatch(baseCss,/\.home-hud-resources b\{[\s\S]{0,180}text-overflow:ellipsis/);
-});
-
-test("the browser home retains a bounded content scroller and one navigation row",()=>{
-    assert.match(baseCss,/#homePage\{[^}]*height:calc\(100% - 216px\);[^}]*overflow-y:auto;/);
-    assert.match(baseCss,/#game-ui\{[^}]*grid-template-rows:minmax\(0,1fr\);/);
-    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*?margin:12px 30px 0;/);
-    assert.match(baseCss,/\.home-card-grid\{[^}]*display:grid;[^}]*flex:0 0 auto/);
-    assert.match(baseCss,/\.home-card-primary\{[^}]*height:204px/);
-    assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-auto-rows:204px;/);
-    assert.doesNotMatch(baseCss,/\.home-card-grid\{[\s\S]{0,220}grid-template-columns:repeat\(4,1fr\)/);
-});
-
-test("the three-character roster fits above the shared navigation",()=>{
-    const safeHeight=746.6666667-10-78-(14*2);
-    const hudHeight=5+48;
-    const actionHeight=1+90+1+256;
-    const rosterHeight=45.5+5+23+4+84+7+2;
-    assert.ok(hudHeight+actionHeight+rosterHeight<=safeHeight);
-    assert.match(utilityCss,/#game-ui \.team-relic-home-tools\{[^}]*position:relative;/);
-    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
-    assert.match(rosterCss,/\.v146-home-character\{[\s\S]*min-height:210px/);
-    assert.match(rosterCss,/\.v146-home-avatar\{[\s\S]*width:96px;[\s\S]*height:96px/);
-});
-
-test("development cache and visible version stay synchronized",()=>{
-    assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
-    assert.ok(index.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
-    assert.ok(index.includes('aria-label="目前版本 V'+releaseMeta.version+'"'));
-    assert.ok(index.includes(">V"+releaseMeta.version+"</div>"));
-    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.css/);
-    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
-    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
-    assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
-});
-
-console.log("\n"+passed+" V173.39 main-city lobby tests passed.");

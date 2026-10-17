@@ -168,7 +168,7 @@ test("growth targets stay bright and dots share the notification presentation ow
     assert.match(notificationCss,/@keyframes v141NoticePulse\{50%\{transform:scale\(\.9\);opacity:\.72\}\}/);
     assert.match(nativeNavCss,/#bottomNav > \.nav-button > \.v141-notice-dot\{[^}]*width:22px;[^}]*height:22px/);
 });
-test("three-character home HUD grows with readable text but remains three columns",()=>{assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);assert.match(homeRosterCss,/grid-template-columns:minmax\(0,1fr\)/);assert.match(homeRosterCss,/min-height:70px/);assert.match(homeRosterCss,/width:32px;height:32px/);assert.match(homeRosterCss,/\.v146-home-character-main > div:first-child\{[\s\S]*font-size:15px/);assert.match(homeRosterCss,/\.v146-home-resource strong\{[\s\S]*font-size:13px/);});
+test("home HUD keeps readable borderless columns while scene owns portraits",()=>{assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);assert.match(homeRosterCss,/\.home-status-meter\{[^}]*line-height:16px/);assert.match(homeRosterCss,/\.v146-home-character\{[^}]*font-size:13px/);assert.doesNotMatch(homeRosterCss,/v146-home-avatar|v146-home-resource/);});
 test("ordinary Daily durability is owned once by MonsterBalance; Abyss remains excluded",()=>{
 // MonsterBalance owns Daily durability; retired V173 scaling must not return.
 const {MonsterBalance,DAILY_PARTY_DURABILITY}=require("../js/combat/monster-balance-owner.mjs");

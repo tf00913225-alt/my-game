@@ -159,7 +159,7 @@ html, body{
     transform:none;
     box-sizing:border-box;
     border:0;
-    border-top:5px solid #8a6a3a;
+    border-top:2px solid #8a6a3a;
     border-radius:0;
     background:linear-gradient(0deg,#0e0c0a,#1c1712);
 }
@@ -208,6 +208,24 @@ html, body{
     transform:none;
 }
 #game-stage > #game-overlay-layer #bottomNav > .nav-button > *{pointer-events:none;}
+/* Main navigation uses live labels and the same thin gold stroke as city entries.
+   Context-specific navigation retains its existing art and lifecycle. */
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] > .nav-button{
+    flex-direction:column;gap:9px;color:#cbb78e;
+}
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] .nav-icon-frame{
+    flex:0 0 108px;width:108px;height:108px;
+}
+#game-stage > #game-overlay-layer #bottomNav .nav-icon-frame svg{display:block;width:100%;height:100%;}
+#game-stage > #game-overlay-layer #bottomNav .nav-line-label{font:600 42px/54px "Noto Serif TC",serif;white-space:nowrap;}
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] > .nav-button.active{
+    color:#ffe3a0;background:radial-gradient(ellipse at bottom,#b887323b,transparent 75%);
+}
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] > .nav-button.active::after{
+    content:"";position:absolute;bottom:12px;left:24%;right:24%;height:3px;background:#e6be68;box-shadow:0 0 15px #e6be6877;
+}
+#game-stage > #game-overlay-layer #bottomNav > .nav-button:focus-visible{outline:4px solid #ffe3a0;outline-offset:-6px;}
+#game-stage > #game-overlay-layer #bottomNav[data-nav-context="main"] > .nav-button:active{color:#fff0cc;}
 /* Notification contract for the native 1080 x 1920 plane.  Twenty-two
    logical pixels project to roughly 8 CSS px on current phone widths; this is
    intentionally different from the legacy-content unit below. */
@@ -1961,73 +1979,43 @@ html, body{
 
 
 /* bundled source: css/19-stage-v54-main-city-moderate-native-scale.css */
-/* V54 historical city scale bridge.
-   V173.33 keeps the lobby's explicit primary, secondary and utility typography
-   in css/00-main.css, so this file must not flatten every entrance back to one
-   inline-equivalent size. Bottom navigation and battle remain untouched. */
-
-#game-ui #homePage button img,
-#game-ui #homePage a img,
-#game-ui #homePage [role="button"] img,
-#game-ui #homePage .menu-item img,
-#game-ui #homePage .menu-card img,
-#game-ui #homePage .home-menu-item img,
-#game-ui #homePage .home-card img{
-    object-fit:cover !important;
-}
-
-
-/* Main-city party HUD is first-screen UI; keep its visual owner in app-shell. */
-/* Home party HUD: three equal horizontal cells, with typography sized for real phone reading. */
-#game-ui #homePage .home-version-badge{font-size:39px;line-height:51px;}
+/* Main city roster and deployed-party presentation. Native 1080 coordinates. */
 #game-ui #homePage .v146-home-roster{
-    position:relative;z-index:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:0 0 auto;gap:6px;
-    margin:12px 30px 0;padding:12px 21px;border:3px solid var(--home-frame-muted);border-radius:24px;color:#f4e7c8;
-    background:linear-gradient(155deg,rgba(23,26,20,.95),rgba(11,13,10,.94));box-shadow:0 12px 36px rgba(0,0,0,.28);
+    position:relative;z-index:8;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px 24px;
+    margin:0 -18px;padding:0 30px 21px;min-width:0;
+    border-bottom:1px solid #a3814877;background:linear-gradient(#100e0bef,#100e0bb0,transparent);
 }
-#game-ui #homePage .v146-home-roster > header{
-    grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.55fr) auto;
-    align-items:center;column-gap:24px;min-height:90px;color:#f0cb70;font-size:45px;line-height:60px;letter-spacing:.04em;
+#game-ui #homePage .v146-home-roster>header{
+    grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:66px;
+    color:#cbb78e;font-size:39px;line-height:54px;
 }
-#game-ui #homePage .v146-home-roster > header>b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-ui #homePage .v146-home-roster > header span{min-width:0;color:#c7ad76;font-size:39px;line-height:54px;font-weight:800;}
-#game-ui #homePage .v146-home-roster > header .v146-home-roster-count{white-space:nowrap;}
-#game-ui #homePage .v146-home-roster > header .v146-home-roster-gold{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-#game-ui #homePage .v146-home-roster > header .v146-home-roster-gold strong{color:#f2cf79;font-size:39px;line-height:54px;font-weight:900;}
-#game-ui #homePage .v146-home-character-placeholder,
-#game-ui #homePage .v146-home-character-empty{opacity:.72;}
-#game-ui #homePage .v146-home-character-placeholder .v146-home-avatar,
-#game-ui #homePage .v146-home-character-empty .v146-home-avatar{background:linear-gradient(135deg,rgba(80,60,34,.42),rgba(18,16,12,.88));}
-#game-ui #v146HomeRoster .team-relic-loadout-slot{
-    grid-column:1/-1;min-height:132px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;
-    grid-template-areas:"label name action";column-gap:18px;row-gap:0;align-items:center;
-    padding:9px 15px;border:3px solid rgba(178,126,49,.52);border-radius:21px;background:linear-gradient(90deg,rgba(42,28,14,.84),rgba(10,9,7,.9));box-sizing:border-box;
-}
-#game-ui #v146HomeRoster .team-relic-loadout-slot>span{grid-area:label;color:#bda46d;font-size:39px;font-weight:800;white-space:nowrap;}
-#game-ui #v146HomeRoster .team-relic-loadout-slot>b{grid-area:name;min-width:0;color:#f2d696;font-size:45px;line-height:57px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-ui #v146HomeRoster .team-relic-loadout-slot>small{display:none;}
-#game-ui #v146HomeRoster .team-relic-loadout-slot>button{grid-area:action;min-width:150px;height:90px;min-height:90px;padding:3px 24px;border:3px solid rgba(211,161,70,.7);border-radius:18px;background:linear-gradient(180deg,#493016,#21140a);color:#ffe0a0;font-size:45px;line-height:1;font-weight:900;}
-#game-ui #v146HomeRoster .team-relic-loadout-slot>button:disabled{opacity:.5;}
 #game-ui #homePage .v146-home-character{
-    display:grid;grid-template-columns:minmax(0,1fr);gap:9px;align-items:center;min-width:0;min-height:210px;padding:9px 6px;
-    border:0;border-radius:0;background:transparent;
-    box-shadow:none;
+    display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 9px;
+    min-width:0;padding:9px 0;color:#eee3cf;
+    font-size:39px;line-height:54px;font-variant-numeric:tabular-nums;
 }
-#game-ui #homePage .v146-home-avatar{width:96px;height:96px;overflow:hidden;transform:none;border:3px solid rgba(220,174,86,.84);border-radius:50%;background:#090806;box-shadow:0 6px 21px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-avatar img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 22%;}
-#game-ui #homePage .v146-home-character[data-element="fire"] .v146-home-avatar{box-shadow:0 0 24px rgba(177,64,38,.34),0 6px 21px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-character[data-element="water"] .v146-home-avatar{box-shadow:0 0 24px rgba(66,129,184,.34),0 6px 21px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-character[data-element="wind"] .v146-home-avatar{box-shadow:0 0 24px rgba(58,151,110,.3),0 6px 21px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-character[data-element="earth"] .v146-home-avatar{box-shadow:0 0 24px rgba(186,142,63,.34),0 6px 21px rgba(0,0,0,.58);}
-#game-ui #homePage .v146-home-character-main{display:grid;gap:6px;min-width:0;}
-#game-ui #homePage .v146-home-character-main > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:9px;min-width:0;font-size:45px;line-height:57px;}
-#game-ui #homePage .v146-home-character-main b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-ui #homePage .v146-home-character-main span{color:#e2c58b;font-size:39px;line-height:51px;font-weight:800;white-space:nowrap;}
-#game-ui #homePage .v146-home-resource{position:relative;height:57px;margin-inline:0;overflow:hidden;border:3px solid rgba(255,255,255,.12);border-radius:2997px;background:rgba(36,16,16,.88);}
-#game-ui #homePage .v146-home-resource.sp{background:rgba(12,23,48,.78);}
-#game-ui #homePage .v146-home-resource i{position:absolute;inset:0 auto 0 0;background:linear-gradient(#f26763,#b91e20);}
-#game-ui #homePage .v146-home-resource.sp i{background:linear-gradient(#659bff,#2455bd);}
-#game-ui #homePage .v146-home-resource strong{position:absolute;inset:0;z-index:2;color:#fff;font-size:39px;line-height:51px;text-align:center;text-shadow:0 3px 6px #000;white-space:nowrap;}
+#game-ui #homePage .v146-home-character b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:45px;font-weight:600;}
+#game-ui #homePage .v146-home-character span{color:#e5c890;white-space:nowrap;}
+#game-ui #homePage .home-status-meter{grid-column:1/-1;display:flex;align-items:center;gap:12px;min-width:0;line-height:48px;}
+#game-ui #homePage .home-status-meter>span:first-child{flex:0 0 60px;color:#e4d8be;}
+#game-ui #homePage .home-status-track{display:block;flex:1;min-width:0;height:18px;overflow:hidden;border:1px solid #a5865277;border-radius:12px;background:#0b0b0bcc;}
+#game-ui #homePage .home-status-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(#f68a84,#c43c3c);}
+#game-ui #homePage [data-resource="sp"] .home-status-track i{background:linear-gradient(#8ed6fa,#3688c9);}
+#game-ui #homePage>.team-relic-loadout-slot{
+    position:relative;z-index:8;grid-column:1;grid-row:4;display:grid;
+    grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px;
+    min-height:120px;padding:6px 18px;border:2px solid #8e6d3e;border-radius:6px;
+    background:linear-gradient(90deg,#15100beF,#2c2216ef,#15100bef);color:#e8d5a6;
+}
+#game-ui #homePage>.team-relic-loadout-slot>span{font-size:39px;white-space:nowrap;}
+#game-ui #homePage>.team-relic-loadout-slot>b{font-size:42px;line-height:54px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* Trigger descriptions remain in the existing relic detail; the summary keeps its original scope. */
+#game-ui #homePage>.team-relic-loadout-slot>small{display:none;}
+#game-ui #homePage>.team-relic-loadout-slot>button{
+    min-width:150px;height:90px;min-height:90px;border:2px solid #b18a48;border-radius:6px;
+    color:#f8dfab;background:#382816;font-family:inherit;font-size:42px;font-weight:600;line-height:1.2;
+}
+#game-ui #homePage>.team-relic-loadout-slot>button:disabled{opacity:.5;}
 
 
 /* bundled source: css/20-stage-v60-training-only-safety.css */
@@ -2382,26 +2370,14 @@ html, body{
 
 /* Battle artwork sizing is owned by js/54-v173.51-battle-qa.js. */
 
-/* Main-city persistent utility shell: boot-visible before relic gameplay executes. */
+/* Main-city lower tools; side facilities use the original city entrance Owner. */
 #game-ui .team-relic-home-tools{
-    position:relative;inset:auto;z-index:5;display:grid;
-    grid-template-columns:repeat(4,minmax(0,1fr));grid-column:1;grid-row:3;justify-self:center;align-self:start;
-    width:100%;gap:12px;padding:0;
-    box-sizing:border-box;pointer-events:none;align-items:end;
+    position:relative;z-index:8;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+    grid-column:1;grid-row:2;min-height:0;padding:0 9px;
+    border:0;border-block:1px solid #a07a4088;border-radius:0;
+    background:linear-gradient(90deg,#0b0907b0,#281e12c0,#0b0907b0);
 }
-#game-ui .team-relic-home-tools .home-card-utility{
-    display:flex;align-items:center;justify-content:center;gap:24px;grid-column:span 2;
-    justify-self:center;width:min(100%,540px);height:132px;pointer-events:auto;position:relative;overflow:hidden;
-    border:0;border-radius:0;background:rgba(17,20,16,.76);box-shadow:none;
-}
-#game-ui .team-relic-home-tools .home-card-utility:active{transform:translateY(3px) scale(.97);filter:brightness(1.12);}
-#game-ui .team-relic-home-tools .home-card-utility .home-card-icon{display:flex;align-items:center;justify-content:center;width:96px;height:96px;flex:0 0 96px;overflow:hidden;border:0;border-radius:50%;background-position:center;background-size:contain;background-repeat:no-repeat;opacity:.8;}
-#game-ui .team-relic-home-tools .home-card-utility .home-card-label{padding:6px 9px;background:transparent;font-size:45px;line-height:66px;font-weight:700;}
-#game-ui .team-relic-home-tools .home-card-utility .home-card-icon img{width:100%;height:100%;object-fit:contain;display:block;}
-#game-ui .team-relic-home-entry .home-card-icon{background-image:url("../assets/ui/home-relic-v174.eed14e806044.webp");}
-#game-ui .team-relic-home-entry .team-relic-home-glyph{font-size:0;color:transparent;text-shadow:none;}
-#game-ui .team-element-box-home-entry .home-card-icon{background-image:url("../assets/ui/home-element-box-v174.webp");}
-#game-ui .team-element-box-home-entry .home-card-icon img{display:none;}
+#game-ui .team-relic-home-tools>.home-card+.home-card{border-left:2px solid #98713b77;}
 
 
 /* bundled source: css/ad-free-service-info-modal.css */

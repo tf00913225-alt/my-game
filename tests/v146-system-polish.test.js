@@ -226,7 +226,7 @@ test("inventory, home, synthesis, nav and slow exit all use the latest mobile co
     assert.doesNotMatch(css,/v141DungeonNav/);
     assert.match(css,/\.v146-abyss-return/);
     assert.match(rules,/"戰鬥失敗"/);
-    assert.match(index,/assets\/ui\/home-shop\.png/);
+    assert.match(index,/id="homeIconShop"[^>]*><svg[\s\S]*?id="city-gold-shop"/,'shop uses the approved filled vector icon');
     /* The dungeon utility slot is now the requested 元素匣 entry; 秘寶 remains
        the third slot and uses the transparent V175 WebP asset. */
     assert.match(finalNavSource,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);

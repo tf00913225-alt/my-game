@@ -38,7 +38,7 @@
 <link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/ui/startup-main-city.d43e67af1c1c.jpg" fetchpriority="high">
 <!-- build:critical-style -->
-<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.75aec7dd26f9.css">
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.2ca4ce6d8a3a.css">
 <!-- /build:critical-style -->
 </head>
 
@@ -737,7 +737,7 @@
 <header class="home-city-hud" aria-label="主城與資源資訊">
     <div class="home-hud-identity">
         <div class="home-hud-kicker">
-            <span>四象主城</span>
+            <span class="home-banner-label">江湖旗號</span><strong id="homeBannerName">四象江湖</strong>
             <div
                 id="homeVersionBadge"
                 class="home-version-badge"
@@ -764,66 +764,57 @@
 </header>
 
 <div class="home-card-grid" aria-label="主城功能">
-    <div class="home-primary-actions">
-        <button type="button" class="home-card home-card-primary" onclick="openHomeFeature('character')" aria-label="角色">
-            <span id="homeIconCharacter" class="home-card-icon" style="background-image:url(assets/ui/home-character.png);"></span>
+    <div id="homePartyScene" class="home-party-scene" role="group" aria-label="出戰隊伍立繪"></div>
+    <div class="home-city-entrances" aria-label="城內設施">
+        <button type="button" data-city-entry="0" class="home-card home-card-primary" onclick="openHomeFeature('character')" aria-label="角色">
+            <span id="homeIconCharacter" class="home-card-icon"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="city-gold-character" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0b8"/><stop offset=".38" stop-color="#d8ad59"/><stop offset=".72" stop-color="#a16c30"/><stop offset="1" stop-color="#e8c479"/></linearGradient></defs><g fill="url(#city-gold-character)" stroke="#e6c783" stroke-width="1.4"><circle cx="32" cy="18" r="11"/><path d="M10 57v-9a22 22 0 0 1 44 0v9Z"/></g><g stroke="#4d351d" stroke-width="2.3"><path d="m23 36 9 10 9-10M32 46v11"/></g></svg></span>
             <span class="home-card-label">角色</span>
         </button>
-
-        <button type="button" class="home-card home-card-primary" onclick="openHomeFeature('shop')" aria-label="商店">
-            <span id="homeIconShop" class="home-card-icon" style="background-image:url(assets/ui/home-shop.png);"></span>
+        <button type="button" data-city-entry="1" class="home-card home-card-secondary" onclick="openHomeFeature('hero')" aria-label="英雄系統">
+            <span id="homeIconRest" class="home-card-icon"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="city-gold-hero" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0b8"/><stop offset=".38" stop-color="#d8ad59"/><stop offset=".72" stop-color="#a16c30"/><stop offset="1" stop-color="#e8c479"/></linearGradient></defs><g fill="url(#city-gold-hero)" stroke="#e6c783" stroke-width="1.4"><path d="m32 4 23 9-3 25q-2 13-20 23Q14 51 12 38L9 13Z"/></g><g stroke="#4d351d" stroke-width="2"><path d="m32 10 17 7-3 21q-2 9-14 16-12-7-14-16l-3-21Z"/><path fill="#4d351d" stroke="none" d="m32 17 5 10 11 2-8 8 2 11-10-5-10 5 2-11-8-8 11-2Z"/></g></svg></span>
+            <span class="home-card-label">英雄</span>
+        </button>
+        <button type="button" data-city-entry="2" class="home-card home-card-primary" onclick="openHomeFeature('shop')" aria-label="商店">
+            <span id="homeIconShop" class="home-card-icon"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="city-gold-shop" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0b8"/><stop offset=".38" stop-color="#d8ad59"/><stop offset=".72" stop-color="#a16c30"/><stop offset="1" stop-color="#e8c479"/></linearGradient></defs><g fill="url(#city-gold-shop)" stroke="#e6c783" stroke-width="1.4"><path d="M11 29h42v28H11Z"/><path d="M4 25 32 6l28 19-5 6H9Z"/></g><g stroke="#4d351d" stroke-width="2.3"><path d="M26 57V39h12v18M16 36h6v9h-6Zm26 0h6v9h-6ZM14 23h36"/></g></svg></span>
             <span class="home-card-label">商店</span>
         </button>
-    </div>
-
-    <div class="home-secondary-actions" aria-label="城內設施">
-        <button type="button" class="home-card home-card-secondary" onclick="openHomeFeature('hero')" aria-label="英雄系統">
-            <span id="homeIconRest" class="home-card-icon" style="background-color:#000;background-image:url(assets/ui/home-rest.png);"></span>
-            <span class="home-card-label">英雄系統</span>
-        </button>
-
-        <button type="button" class="home-card home-card-secondary" onclick="openHomeFeature('synthesis')" aria-label="合成">
-            <span id="homeIconSynthesis" class="home-card-icon" style="background-color:#000;background-image:url(assets/ui/home-synthesis.png);"></span>
-            <span class="home-card-label">合成</span>
-        </button>
-
-        <button type="button" class="home-card home-card-secondary" onclick="openHomeFeature('quest')" aria-label="任務">
-            <span id="homeIconQuest" class="home-card-icon" style="background-color:#000;background-image:url(assets/ui/home-quest.png);"></span>
+        <button type="button" data-city-entry="3" class="home-card home-card-secondary" onclick="openHomeFeature('quest')" aria-label="任務">
+            <span id="homeIconQuest" class="home-card-icon"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="city-gold-quest" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0b8"/><stop offset=".38" stop-color="#d8ad59"/><stop offset=".72" stop-color="#a16c30"/><stop offset="1" stop-color="#e8c479"/></linearGradient></defs><g fill="url(#city-gold-quest)" stroke="#e6c783" stroke-width="1.4"><path d="M15 8h37v47H15Z"/><path d="M9 8h8v10H9a5 5 0 0 1 0-10Zm8 37h37a5 5 0 0 1 0 10H17a5 5 0 0 1 0-10Z"/></g><g stroke="#4d351d" stroke-width="2.3"><path d="M25 20h17M25 28h17m-17 8h11M17 45v10"/></g></svg></span>
             <span class="home-card-label">任務</span>
         </button>
-
-        <button type="button" class="home-card home-card-secondary" data-feature="gameplay-core" onclick="openHomeFeature('forge')" aria-label="鍛造">
-            <span id="homeIconForge" class="home-card-icon" aria-hidden="true">⚒︎</span>
+        <button type="button" data-city-entry="4" class="home-card home-card-utility team-relic-home-entry" data-feature="relic" onclick="openHomeFeature('relic')" aria-label="秘寶">
+            <span class="home-card-icon team-relic-home-glyph"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="city-gold-relic" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0b8"/><stop offset=".38" stop-color="#d8ad59"/><stop offset=".72" stop-color="#a16c30"/><stop offset="1" stop-color="#e8c479"/></linearGradient></defs><g fill="url(#city-gold-relic)" stroke="#e6c783" stroke-width="1.4"><path d="M7 27q0-19 25-19t25 19v29H7Z"/></g><g stroke="#4d351d" stroke-width="2.3"><path d="M7 28h50M16 14v42m32-42v42"/><path fill="#302114" d="M26 25h12v16H26Z"/><path stroke="#ffe7a5" d="M31 29h2v6"/></g></svg></span><span class="home-card-label">秘寶</span>
+        </button>
+        <button type="button" data-city-entry="5" class="home-card home-card-utility team-element-box-home-entry" data-feature="gameplay-core" onclick="openHomeFeature('autoBattleSettings')" aria-label="元素匣">
+            <span class="home-card-icon"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="city-gold-autoBattleSettings" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0b8"/><stop offset=".38" stop-color="#d8ad59"/><stop offset=".72" stop-color="#a16c30"/><stop offset="1" stop-color="#e8c479"/></linearGradient></defs><g fill="url(#city-gold-autoBattleSettings)" stroke="#e6c783" stroke-width="1.4"><path d="M10 25h44v33H10Z"/><path d="M8 16 17 7h30l9 9v6H8Z"/><path d="M5 22h54v8H5Z"/></g><g stroke="#4d351d" stroke-width="2" stroke-linejoin="round"><path d="M14 16h36M12 32h12v7h-6v7m34-14H40v7h6v7M15 49h6v6h-6Zm28 0h6v6h-6Z"/><path fill="#291d12" d="m32 27 12 15-12 15-12-15Z"/><path fill="#e4bc6a" d="m32 31 8 11-8 11-8-11Z"/><path stroke="#fff0b8" stroke-width="1.2" d="M32 32v19m-7-9h14"/></g></svg></span><span class="home-card-label">元素匣</span>
+        </button>
+        <button type="button" data-city-entry="6" class="home-card home-card-secondary" data-feature="gameplay-core" onclick="openHomeFeature('forge')" aria-label="鍛造">
+            <span id="homeIconForge" class="home-card-icon"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="city-gold-forge" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0b8"/><stop offset=".38" stop-color="#d8ad59"/><stop offset=".72" stop-color="#a16c30"/><stop offset="1" stop-color="#e8c479"/></linearGradient></defs><g fill="url(#city-gold-forge)" stroke="#e6c783" stroke-width="1.4"><path d="M16 5 42 23 32 36 6 18Z"/><path d="M28 30 35 35 17 57 10 52Z"/><path d="M33 40h27l-8 10H40l-7-6Z"/><path d="M41 50h9v6h5v4H35v-4h6Z"/></g><g stroke="#4d351d" stroke-width="2"><path d="m15 13 18 13m-8 13-9 12m23-8h13"/></g></svg></span>
             <span class="home-card-label">鍛造</span>
         </button>
-
+        <button type="button" data-city-entry="7" class="home-card home-card-secondary" onclick="openHomeFeature('synthesis')" aria-label="合成">
+            <span id="homeIconSynthesis" class="home-card-icon"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="city-gold-synthesis" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0b8"/><stop offset=".38" stop-color="#d8ad59"/><stop offset=".72" stop-color="#a16c30"/><stop offset="1" stop-color="#e8c479"/></linearGradient></defs><g fill="url(#city-gold-synthesis)" stroke="#e6c783" stroke-width="1.4"><path d="M24 6h16v6h-3v15l18 26q3 6-5 6H14q-8 0-5-6l18-26V12h-3Z"/></g><g stroke="#4d351d" stroke-width="2.3"><path d="M27 13h10M20 40h24"/><path fill="#3c2b19" d="M20 44h24l7 10H13Z"/><circle fill="#ffe7a5" stroke="none" cx="27" cy="49" r="2"/><circle fill="#ffe7a5" stroke="none" cx="38" cy="52" r="2"/></g></svg></span>
+            <span class="home-card-label">合成</span>
+        </button>
     </div>
-
-    <div class="home-utility-actions team-relic-home-tools" aria-label="主城常駐功能">
-        <button type="button" class="home-card home-card-utility team-relic-home-entry" data-feature="relic" onclick="openHomeFeature('relic')" aria-label="秘寶">
-            <span class="home-card-icon team-relic-home-glyph">寶</span><span class="home-card-label">秘寶</span>
-        </button>
-        <button type="button" class="home-card home-card-utility team-element-box-home-entry" data-feature="gameplay-core" onclick="openHomeFeature('autoBattleSettings')" aria-label="元素匣">
-            <span class="home-card-icon"><img src="assets/ui/nav-element-box.png" alt="" draggable="false" loading="lazy" decoding="async"></span><span class="home-card-label">元素匣</span>
-        </button>
+    <div class="home-utility-actions team-relic-home-tools" aria-label="主城工具列">
         <button type="button" class="home-card home-card-tertiary" onclick="openHomeFeature('achievement')" aria-label="成就">
-            <span id="homeIconAchievement" class="home-card-icon" style="background-color:#000;background-image:url(assets/ui/home-achievement.png);"></span>
+            <span id="homeIconAchievement" class="home-card-icon"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7h26v14q0 16-13 16T19 21Zm0 5H8v7q0 12 14 12m23-19h11v7q0 12-14 12M32 37v15m-13 5h26m-24-5h22"/></svg></span>
             <span class="home-card-label">成就</span>
         </button>
         <button type="button" class="home-card home-card-tertiary" onclick="openHomeFeature('announcement')" aria-label="公告">
-            <span id="homeIconAnnouncement" class="home-card-icon" style="background-image:url(assets/ui/home-announcement.png);"></span>
+            <span id="homeIconAnnouncement" class="home-card-icon"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22h12L51 10v44L24 42H12Zm10 20 5 15h9l-5-12M6 26v12m51-17 5-5m-5 25 5 5"/></svg></span>
             <span class="home-card-label">公告</span>
         </button>
         <button type="button" class="home-card home-card-tertiary" onclick="openHomeFeature('offlineExp')" aria-label="離線經驗">
-            <span id="homeIconOfflineExp" class="home-card-icon" style="background-image:url(assets/ui/home-offline-exp.png);"></span>
+            <span id="homeIconOfflineExp" class="home-card-icon"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 32h44q0 25-22 25T10 32Zm-4 0h52M22 25q-8-8 0-15m10 15q-8-8 0-18m10 18q-8-8 0-15"/></svg></span>
             <span class="home-card-label">離線經驗</span>
         </button>
         <button type="button" class="home-card home-card-tertiary" onclick="openHomeFeature('system')" aria-label="系統">
-            <span id="homeIconSystem" class="home-card-icon" style="background-color:#000;background-image:url(assets/ui/home-system.png);"></span>
+            <span id="homeIconSystem" class="home-card-icon"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m26 5-2 9-8 4-8-3-5 10 7 6v8l-7 6 6 10 9-3 7 4 2 8h12l2-9 7-4 9 3 5-10-7-6v-8l7-6-6-10-9 3-7-4-2-8Z" transform="translate(1 -2) scale(.94)"/><circle cx="32" cy="32" r="10"/></svg></span>
             <span class="home-card-label">系統</span>
         </button>
     </div>
-
 </div>
 
 <div
@@ -2248,7 +2239,7 @@
     onclick="showPage('inventory')"
     aria-label="背包"
 >
-<img class="nav-art-button" src="assets/ui/nav-backpack.png" alt="" aria-hidden="true" loading="eager" decoding="async">
+<span class="nav-icon-frame"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="city-gold-inventoryNav" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0b8"/><stop offset=".38" stop-color="#d8ad59"/><stop offset=".72" stop-color="#a16c30"/><stop offset="1" stop-color="#e8c479"/></linearGradient></defs><g fill="url(#city-gold-inventoryNav)" stroke="#e6c783" stroke-width="1.4"><path d="M23 17v-5a9 9 0 0 1 18 0v5h7l7 15v25H9V32l7-15Z"/></g><g stroke="#4d351d" stroke-width="2.3"><path d="M25 17v-5a7 7 0 0 1 14 0v5M16 19h32v16H16ZM9 36h46M20 37v11h6V37m12 0v11h6V37"/></g></svg></span><span class="nav-line-label" aria-hidden="true">背包</span>
 <span class="nav-sr-only">背包</span>
 </button>
 
@@ -2258,7 +2249,7 @@
     onclick="showPage('training')"
     aria-label="野怪區"
 >
-<img class="nav-art-button" src="assets/ui/nav-training.png" alt="" aria-hidden="true" loading="eager" decoding="async">
+<span class="nav-icon-frame"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="city-gold-trainingNav" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0b8"/><stop offset=".38" stop-color="#d8ad59"/><stop offset=".72" stop-color="#a16c30"/><stop offset="1" stop-color="#e8c479"/></linearGradient></defs><g fill="url(#city-gold-trainingNav)" stroke="#e6c783" stroke-width="1.4"><path transform="rotate(-42 32 32)" d="M32 4 37 11v27h7v6h-9v12l-3 4-3-4V44h-9v-6h7V11Z"/><path transform="rotate(42 32 32)" d="M32 4 37 11v27h7v6h-9v12l-3 4-3-4V44h-9v-6h7V11Z"/></g><g stroke="#4d351d" stroke-width="2"><path transform="rotate(-42 32 32)" d="M32 12v23m-2 13h4m-4 5h4"/><path transform="rotate(42 32 32)" d="M32 12v23m-2 13h4m-4 5h4"/></g></svg></span><span class="nav-line-label" aria-hidden="true">野怪區</span>
 <span class="nav-sr-only">野怪區</span>
 </button>
 
@@ -2268,7 +2259,7 @@
     onclick="showPage('home')"
     aria-label="主城"
 >
-<img class="nav-art-button" src="assets/ui/nav-home.png" alt="" aria-hidden="true" loading="eager" decoding="async">
+<span class="nav-icon-frame"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="city-gold-homeNav" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0b8"/><stop offset=".38" stop-color="#d8ad59"/><stop offset=".72" stop-color="#a16c30"/><stop offset="1" stop-color="#e8c479"/></linearGradient></defs><g fill="url(#city-gold-homeNav)" stroke="#e6c783" stroke-width="1.4"><path d="M12 27h40v30H12ZM5 24q16-3 27-16 11 13 27 16l-6 6H11ZM18 11q9-1 14-8 5 7 14 8l-3 5H21ZM4 56h56v5H4Z"/></g><g stroke="#4d351d" stroke-width="2.3"><path d="M12 37h40M22 29v8m20-8v8M26 56V43h12v13M17 43v9m30-9v9M17 24h30"/></g></svg></span><span class="nav-line-label" aria-hidden="true">主城</span>
 <span class="nav-sr-only">主城</span>
 </button>
 
@@ -2279,7 +2270,7 @@
     onclick="openDungeonHub()"
     aria-label="副本"
 >
-<img class="nav-art-button" src="assets/ui/nav-dungeon.png" alt="" aria-hidden="true" loading="eager" decoding="async">
+<span class="nav-icon-frame"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="city-gold-dungeonNav" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0b8"/><stop offset=".38" stop-color="#d8ad59"/><stop offset=".72" stop-color="#a16c30"/><stop offset="1" stop-color="#e8c479"/></linearGradient></defs><g fill="url(#city-gold-dungeonNav)" stroke="#e6c783" stroke-width="1.4"><path d="M8 57V23l12-6L32 4l12 13 12 6v34Z"/></g><g stroke="#4d351d" stroke-width="2.3"><path fill="#21180f" d="M23 57V34a9 9 0 0 1 18 0v23Z"/><path d="M8 25h12m24 0h12M13 32v7m38-7v7M13 45v7m38-7v7M27 19h10"/></g></svg></span><span class="nav-line-label" aria-hidden="true">副本</span>
 <span class="nav-sr-only">副本</span>
 </button>
 
@@ -2290,7 +2281,7 @@
     aria-label="玩法"
     title="玩法"
 >
-<img class="nav-art-button" src="assets/ui/nav-gameplay.png" alt="" aria-hidden="true" loading="eager" decoding="async">
+<span class="nav-icon-frame"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="city-gold-bossNav" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0b8"/><stop offset=".38" stop-color="#d8ad59"/><stop offset=".72" stop-color="#a16c30"/><stop offset="1" stop-color="#e8c479"/></linearGradient></defs><g fill="url(#city-gold-bossNav)" stroke="#e6c783" stroke-width="1.4"><path d="M18 10 51 15 44 55 11 50ZM10 7q1-4 5-3t3 5L10 51q-1 4-5 3t-3-5ZM51 13q1-4 5-3t3 5L51 57q-1 4-5 3t-3-5Z"/></g><g stroke="#4d351d" stroke-width="2.3"><path d="M17 18l27 4M14 44l27 4M22 37q14 5 14-5t-8-5m6-2 4-5 4 4M9 11l-6 37m51-31-6 36"/><circle cx="21" cy="36" r="3" fill="#4d351d" stroke="none"/><circle cx="27" cy="27" r="2.5" fill="#4d351d" stroke="none"/></g></svg></span><span class="nav-line-label" aria-hidden="true">玩法</span>
 <span class="nav-sr-only">玩法</span>
 </button>
 

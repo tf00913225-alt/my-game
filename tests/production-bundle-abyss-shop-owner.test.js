@@ -32,6 +32,6 @@ assert.doesNotMatch(abyssBundle,/FINAL_BOSS_RULES|v144PatchFinalAbyssRoster|v155
 assert.doesNotMatch(gameplayJs,/56-v173\.51-shop-qa|v17351ShopQa/);
 assert.match(gameplayCss,/grid-template-rows:96px minmax\(0,1fr\) 174px !important/);
 assert.doesNotMatch(gameplayCss,/grid-template-rows:minmax\(0,1fr\) (?:64|192)px!important/);
-assert.match(appCss,/v146-home-roster > header/);
-assert.match(appCss,/display:grid;grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1\.55fr\) auto/);
+assert.match(appCss,/#game-ui #homePage \.v146-home-roster>header\{/);
+assert.match(appCss,/#game-ui #homePage \.v146-home-roster\{[^}]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
 console.log("Production bundle owner/cascade checks passed");

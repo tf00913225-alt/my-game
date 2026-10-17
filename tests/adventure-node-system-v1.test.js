@@ -238,7 +238,7 @@ function baseRuntime(){
     const touchLock=read("js/01-stage-v8-touch-lock.js");
     assert.doesNotMatch(entryCss+css,/transform\s*:\s*scale\s*\(/i,"Adventure CSS must not own whole-surface scaling");
     assert.match(entryCss,/pointer-events:none/);assert.match(css,/pointer-events:none/);
-    assert.match(entryCss,/prefers-reduced-motion/);assert.match(css,/prefers-reduced-motion/);
+    assert.doesNotMatch(entryCss,/@keyframes|\banimation\s*:/,'static city entry must not restore decorative motion');assert.match(css,/prefers-reduced-motion/);
     assert.match(css,/overflow-x:hidden/);assert.match(css,/safe-area-inset-top/);assert.match(css,/safe-area-inset-bottom/);
     assert.match(css,/#adventurePage\.adventure-page\{[\s\S]*?display:flex;[\s\S]*?flex-direction:column;/,"Adventure page must size its view from the actual header height");
     assert.match(css,/\.adventure-view\{[^}]*flex:1 1 auto;[^}]*min-height:0;[^}]*overflow-y:auto;/,"Adventure map must keep one flexible vertical scroll owner");
