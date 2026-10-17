@@ -209,6 +209,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 
 
 
+
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
    - 遊戲邏輯舞台固定 1080 × 1920
@@ -25307,6 +25308,15 @@ function renderHeroLoginRewards(data){
         ${g.pending?'<button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.retry()">確認前次操作</button>':""}
     </section>`;
 }
+function renderHeroDailySupply(data){
+    const g=data.growth,s=g.dailySupply,blocked=g.busy||g.testMode||battleActive||!!g.pending;
+    return `<section class="hero-page-section" aria-label="英雄每日補給"><h3>英雄每日補給</h3>
+        <p>神犬紅包碎片 ×5、金剛天王碎片 ×5、洗髓丹合計 ×1。</p>
+        <p>以伺服器臺北日期判定，每日限領一次，未領日期不補發。</p>
+        ${s?`<p>補給日期：${heroPageHtml(s.periodDate)}</p><button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.claimDailySupply()" ${blocked||s.claimed?"disabled":""}>${s.claimed?"今日已領取":"領取今日補給"}</button>`:
+            '<p>需連線並具備完整伺服器角色資料；請同步登入與獎勵。</p>'}
+    </section>`;
+}
 function renderHeroPageContent(){
     const data=getHeroPageSnapshot(),escape=heroPageHtml;
     const hero=data.heroes.find(row=>row.owned&&row.definition.heroId===heroPageSelectedId);
@@ -25317,7 +25327,7 @@ function renderHeroPageContent(){
     const toolbar=overview?`<div class="hero-overview-tools"><button type="button" class="main-button" onclick="openSharedFormation('hero')">佈陣</button>
         <div class="hero-element-tabs" role="tablist" aria-label="英雄元素分類">${[["all","全部"],["fire","火"],["water","水"],["wind","風"],["earth","土"]].map(([id,label])=>`<button type="button" role="tab" aria-selected="${heroPageElement===id}" onclick="filterHeroPage('${id}')">${label}</button>`).join("")}</div></div>`:
         '<button type="button" class="main-button hero-detail-back" onclick="returnHeroOverview()">‹ 返回英雄列表</button>';
-    const content=overview?`${renderHeroLoginRewards(data)}<div class="hero-card-grid">${heroes.map(row=>`<button type="button" class="hero-card" data-hero-id="${escape(row.definition.heroId)}" onclick="selectHeroPage(this.dataset.heroId)">
+    const content=overview?`${renderHeroDailySupply(data)}${renderHeroLoginRewards(data)}<div class="hero-card-grid">${heroes.map(row=>`<button type="button" class="hero-card" data-hero-id="${escape(row.definition.heroId)}" onclick="selectHeroPage(this.dataset.heroId)">
         ${heroPageArtwork(row)}<b>${escape(row.definition.name)}</b><span>${escape(elementDatabase[row.definition.element]?.name||row.definition.element)}・${row.account.stars} 星</span><span>Lv.${row.level??"—"}${order.has(row.definition.heroId)?"・上陣":""}</span></button>`).join("")}</div>
         ${heroes.length?"":'<p class="hero-page-note">此分類目前沒有已擁有英雄。</p>'}
         <p class="hero-page-note">英雄技能依等級自動提升。</p>` : renderHeroDetailContent(hero,data);
@@ -25332,7 +25342,7 @@ function renderHeroGrowthControls(hero,data){
     return `<section class="hero-page-section"><h3>英雄成長${g.testMode?"（DEV 隔離測試）":""}</h3>
         <p>專屬碎片 ${state.specificFragments}・洗髓丹 ${g.marrowPills}</p>
         <p>解鎖需 100 碎片；升星依序需 25／50／75／100／150 碎片；洗髓消耗 1 顆洗髓丹，重新分配全部成長點數。</p>
-        <p class="hero-page-note">正式資源取得來源尚未開放。${g.testMode?"測試資源與成長不保存，重新載入即消失。":"正式操作需連線確認資源。"}</p>
+        <p class="hero-page-note">正式資源可由英雄首頁的累計登入獎勵與每日補給取得。${g.testMode?"測試資源與成長不保存，重新載入即消失。":"正式操作需連線確認資源。"}</p>
         ${g.error?`<p role="status">${heroPageHtml(g.error)}</p>`:""}
         <button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.read()" ${g.busy?"disabled":""}>同步成長紀錄</button>
         ${g.devAvailable&&!g.testMode?'<button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.testResources()">啟用 DEV 隔離測試資源</button>':""}
