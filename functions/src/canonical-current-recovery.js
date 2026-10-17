@@ -4,6 +4,7 @@ const {assembleCanonicalSnapshot,claimRecordsDigest}=
     require("./canonical-snapshot");
 const {inspectRecoveryArchive,createRecoveryArchive}=
     require("./canonical-recovery-archive");
+const {verifyCreditedGrant}=require("./credited-grant-evidence");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 const SETS={
@@ -167,6 +168,34 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 if(queries[i].docs.some(doc=>!keys.has(doc.id))){
                     fail("data-loss","Unexpected current source blocks recovery.");
                 }
+            }
+            // Canonical claim sources may all be lost. Independent retained
+            // rights must agree with the archive, not be hidden by its rollback.
+            const claims=await tx.get(root.collection("uniqueClaims").limit(401));
+            // Each credit proof reads at most 12 documents, including its claim,
+            // grant/receipt/ledger/collision and original event/snapshot/archive.
+            if(queries.reduce((sum,query)=>sum+query.size,0)+claims.docs.length*12>400){
+                fail("failed-precondition","Recovery claim evidence exceeds the transaction budget.");
+            }
+            const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
+            if(claims.docs.length!==archivedClaims.size){
+                fail("data-loss","Independent claims differ from the recovery archive.");
+            }
+            for(const doc of claims.docs){
+                const record=archivedClaims.get(doc.id),claim=doc.data();
+                if(!record||record.grantId!==doc.id||!OPERATION_ID.test(record.operationId||"")){
+                    fail("data-loss","Unsupported or unmatched recovery claim.");
+                }
+                const grantId=doc.id,operationId=record.operationId;
+                const [grant,receipt,ledger,other]=await Promise.all([
+                    tx.get(root.collection("pendingGrants").doc(grantId)),
+                    tx.get(root.collection("grantOperations").doc(operationId)),
+                    tx.get(root.collection("ledgerEntries").doc(operationId)),
+                    tx.get(root.collection("operations").doc(operationId))
+                ]);
+                await verifyCreditedGrant({tx,root,uid,grantId,operationId,
+                    currentRevision:expectedRevision,grant:grant.data(),receipt:receipt.data(),
+                    ledger:ledger.data(),claim,claimRecord:record,otherOperationExists:other.exists,fail});
             }
             const revision=nextRevision(envelope);
             const next=restoredRecords(records,revision);

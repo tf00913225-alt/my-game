@@ -2357,6 +2357,38 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     assert.deepEqual(await dump(),withUnknown);
     await unknown.delete();
 
+    // Canonical claimRecords are gone; independent once-only rights and their
+    // original credit proof still have to agree before any repair writes.
+    const independentClaim=ownedRoot.collection("uniqueClaims").doc("rehearsal-later-independent-claim");
+    await independentClaim.set({schemaVersion:1,ownerUid:ownedUid,
+        grantId:independentClaim.id,operationId:"rehearsal-later-credit-0001",creditRevision:10});
+    const withIndependent=await dump();
+    await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+    assert.deepEqual(await dump(),withIndependent);
+    await independentClaim.delete();
+    const retainedClaim=archived.claimRecords.find(row=>row.grantId===ownedGrant);
+    assert.ok(retainedClaim,"Rehearsal must contain an original credited grant");
+    const creditProof=[
+        ownedRoot.collection("uniqueClaims").doc(ownedGrant),
+        ownedRoot.collection("pendingGrants").doc(ownedGrant),
+        ownedRoot.collection("grantOperations").doc(retainedClaim.operationId),
+        ownedRoot.collection("ledgerEntries").doc(retainedClaim.operationId)
+    ];
+    for(const ref of creditProof){
+        const original=(await ref.get()).data();assert.ok(original);
+        await ref.delete();const missingProof=await dump();
+        await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+        assert.deepEqual(await dump(),missingProof);
+        await ref.set(original);
+    }
+    const ledger=creditProof[3],originalLedger=(await ledger.get()).data();
+    await ledger.update({balanceAfter:originalLedger.balanceAfter+1});
+    const badLedger=await dump();
+    await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+    assert.deepEqual(await dump(),badLedger);await ledger.set(originalLedger);
+    assert.deepEqual(await dump(),damaged);
+    console.log("Current recovery independent credit reconciliation real Firestore PASS: later unique claim, missing retained claim/grant/receipt/ledger and corrupt delta refuse without writes; original history remains exact.");
+
     // A stale/damaged envelope must not authorize overwriting surviving newer
     // sources. Missing revision evidence is equally unreconciled. Emulator only.
     for(const [path,row] of current){
