@@ -231,45 +231,23 @@
     }
 
     function homeRosterPlaceholder(index){
-        return '<article class="v146-home-character v146-home-character-placeholder" data-home-roster-slot="'+index+'" aria-busy="true">'+
-            '<div class="v146-home-avatar" aria-hidden="true"></div>'+
-            '<div class="v146-home-character-main"><div><b>隊伍資料載入中</b><span>--</span></div>'+
-            '<div class="v146-home-resource hp"><i style="width:0%"></i><strong>HP --</strong></div>'+
-            '<div class="v146-home-resource sp"><i style="width:0%"></i><strong>SP --</strong></div></div></article>';
+        return '<article class="v146-home-character v146-home-character-placeholder" data-home-roster-slot="'+index+'" aria-busy="true"><b>隊伍資料載入中</b><span>Lv.--</span><strong>HP --</strong><strong>SP --</strong></article>';
     }
-
     function ensureHomeRosterShell(){
         const page=document.getElementById("homePage");
         const grid=page&&page.querySelector(".home-card-grid");
         if(!page||!grid){ return null; }
         let roster=document.getElementById("v146HomeRoster");
         if(!roster){
-            roster=document.createElement("section");
-            roster.id="v146HomeRoster";
-            roster.className="v146-home-roster";
-            roster.setAttribute("aria-label","冒險隊伍");
-            grid.insertAdjacentElement("afterend",roster);
+            roster=document.createElement("section");roster.id="v146HomeRoster";roster.className="v146-home-roster";
+            roster.setAttribute("aria-label","出戰角色資訊");grid.insertAdjacentElement("beforebegin",roster);
+            roster.innerHTML='<header><span class="v146-home-roster-count">隊伍 -- / 6</span><button type="button" class="v-fixed-formation-entry" data-feature="gameplay-core" onclick="openSharedFormation(\'home\')">佈陣</button></header>';
+            for(let index=0;index<3;index++){roster.insertAdjacentHTML("beforeend",homeRosterPlaceholder(index));}
         }
-        if(!roster.querySelector(":scope > header")){
-            const header=document.createElement("header");
-            const currentGold=typeof gold!=="undefined"
-                ?Math.max(0,Math.floor(rosterNumber(gold))).toLocaleString("zh-TW")
-                :"0";
-            header.innerHTML='<b>冒險隊伍</b><span class="v146-home-roster-count">隊伍 -- / 6</span><span class="v146-home-roster-gold">金幣 <strong id="v146HomeRosterGoldValue">'+currentGold+'</strong></span><button type="button" class="v-fixed-formation-entry" data-feature="gameplay-core" onclick="openSharedFormation(\'home\')">佈陣</button>';
-            roster.appendChild(header);
-        }
-        if(!roster.querySelector(".v146-home-character")){
-            for(let index=0;index<3;index++){
-                roster.insertAdjacentHTML("beforeend",homeRosterPlaceholder(index));
-            }
-        }
-        let relicSlot=roster.querySelector(".team-relic-loadout-slot");
-        if(!relicSlot){
-            relicSlot=document.createElement("div");
-            relicSlot.className="team-relic-loadout-slot";
-            relicSlot.dataset.ready="false";
-            relicSlot.innerHTML='<span>隊伍秘寶</span><b>秘寶資料載入中</b><small>等待正式存檔完成解析</small><button type="button" data-feature="relic" onclick="openHomeFeature(\'relic\')" disabled>選擇</button>';
-            roster.appendChild(relicSlot);
+        if(!page.querySelector(".team-relic-loadout-slot")){
+            const slot=document.createElement("div");slot.className="team-relic-loadout-slot";slot.dataset.ready="false";
+            slot.innerHTML='<span>隊伍秘寶</span><b>秘寶資料載入中</b><small>等待正式存檔完成解析</small><button type="button" data-feature="relic" onclick="openHomeFeature(\'relic\')" disabled>選擇</button>';
+            page.appendChild(slot);
         }
         return roster;
     }
@@ -290,7 +268,7 @@
 
     function syncHomeRelicSummary(){
         const roster=ensureHomeRosterShell();
-        const slot=roster&&roster.querySelector(".team-relic-loadout-slot");
+        const slot=roster&&document.querySelector("#homePage > .team-relic-loadout-slot");
         if(!slot){ return false; }
         const save=readHomeRelicSave();
         if(!save){
@@ -312,52 +290,47 @@
         return true;
     }
 
+    /* Read the same confirmed formation and Hero domain; never create battle actors. */
+    function deployedHomeParty(){
+        const indexes=typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes().filter(index=>index<3):[];
+        const characters=indexes.map(index=>({index,character:getPartyCharacterByIndex(index),stats:getPartyBattleStats(index)}))
+            .filter(row=>row.character&&row.stats);
+        const formation=window.FourSymbolsTeamFormation?.getConfirmed?.();
+        const domain=window.FourSymbolsHeroSystem?.getDomain?.();
+        const heroIds=formation&&domain?window.FourSymbolsTeamFormationPolicy.roster(formation):[];
+        const heroes=heroIds.filter(id=>domain.isHeroUnlocked(id)).map(heroId=>({heroId,
+            character:{heroId,combatantKind:"heroNpc",id:domain.getHeroDefinition(heroId).name,level:domain.getHeroLevel(heroId)}}));
+        return {characters,heroes};
+    }
     function renderHomeRoster(){
         firstScreenVisualReadyPromise=null;
         const roster=ensureHomeRosterShell();
         if(!roster||typeof getExistingPartyIndexes!=="function"){ return false; }
-        const partyIndexes=getExistingPartyIndexes().slice(0,3);
-        const availableExp=typeof window.v173GetAvailableExpPool==="function"
-            ?window.v173GetAvailableExpPool(Date.now())
-            :(typeof sharedExp!=="undefined"?sharedExp:0);
+        const party=deployedHomeParty();
+        const availableExp=typeof window.v173GetAvailableExpPool==="function"?window.v173GetAvailableExpPool(Date.now()):(typeof sharedExp!=="undefined"?sharedExp:0);
         syncRosterResource(document.getElementById("homeHudGoldValue"),typeof gold!=="undefined"?gold:0);
         syncRosterResource(document.getElementById("homeHudExpValue"),availableExp);
-        syncRosterResource(document.getElementById("v146HomeRosterGoldValue"),typeof gold!=="undefined"?gold:0);
+        const banner=document.getElementById("homeBannerName");
+        if(banner){banner.textContent=party.characters[0]?.character.id||"四象江湖";}
         const count=roster.querySelector(".v146-home-roster-count");
-        if(count){ count.textContent="隊伍 "+partyIndexes.length+" / 6"; }
-
-        const cards=[];
-        for(let slotIndex=0;slotIndex<3;slotIndex++){
-            const index=partyIndexes[slotIndex];
-            const character=typeof index==="number"&&typeof getPartyCharacterByIndex==="function"
-                ?getPartyCharacterByIndex(index)
-                :null;
-            const stats=typeof index==="number"&&typeof getPartyBattleStats==="function"
-                ?getPartyBattleStats(index)
-                :null;
-            if(!character||!stats){
-                cards.push('<article class="v146-home-character v146-home-character-empty" data-home-roster-slot="'+slotIndex+'"><div class="v146-home-avatar" aria-hidden="true"></div><div class="v146-home-character-main"><div><b>隊伍空位</b><span>--</span></div><div class="v146-home-resource hp"><i style="width:0%"></i><strong>HP --</strong></div><div class="v146-home-resource sp"><i style="width:0%"></i><strong>SP --</strong></div></div></article>');
-                continue;
-            }
+        if(count){count.textContent="出戰 "+(party.characters.length+party.heroes.length)+" / 6";}
+        const cards=party.characters.map(({index,character,stats})=>{
             const hp=Math.max(0,Math.min(rosterNumber(stats.maxHP),rosterNumber(character.hp)));
             const sp=Math.max(0,Math.min(rosterNumber(stats.maxSP),rosterNumber(character.sp)));
-            const hpPercent=rosterNumber(stats.maxHP)>0?hp/rosterNumber(stats.maxHP)*100:0;
-            const spPercent=rosterNumber(stats.maxSP)>0?sp/rosterNumber(stats.maxSP)*100:0;
-            const artwork=typeof getCharacterArtworkPath==="function"?getCharacterArtworkPath(character):"";
-            cards.push('<article class="v146-home-character" data-home-roster-slot="'+slotIndex+'" data-element="'+rosterEscape(character.element||"fire")+'">'+
-                '<div class="v146-home-avatar"><img src="'+rosterEscape(artwork)+'" alt="'+rosterEscape(character.id||"角色")+'頭像"></div>'+
-                '<div class="v146-home-character-main"><div><b>'+rosterEscape(character.id||("角色"+(index+1)))+'</b><span>Lv.'+Math.max(1,Math.floor(rosterNumber(character.level)||1))+'</span></div>'+
-                '<div class="v146-home-resource hp"><i style="width:'+hpPercent+'%"></i><strong>HP '+Math.floor(hp)+' / '+Math.floor(rosterNumber(stats.maxHP))+'</strong></div>'+
-                '<div class="v146-home-resource sp"><i style="width:'+spPercent+'%"></i><strong>SP '+Math.floor(sp)+' / '+Math.floor(rosterNumber(stats.maxSP))+'</strong></div></div></article>');
-        }
-
+            return '<article class="v146-home-character" data-home-roster-slot="'+index+'"><b title="'+rosterEscape(character.id)+'">'+rosterEscape(character.id||("角色"+(index+1)))+'</b><span>Lv.'+Math.max(1,Math.floor(rosterNumber(character.level)||1))+'</span><strong title="HP '+Math.floor(hp)+' / '+Math.floor(rosterNumber(stats.maxHP))+'">HP '+rosterResourceText(hp)+'/'+rosterResourceText(stats.maxHP)+'</strong><strong title="SP '+Math.floor(sp)+' / '+Math.floor(rosterNumber(stats.maxSP))+'">SP '+rosterResourceText(sp)+'/'+rosterResourceText(stats.maxSP)+'</strong></article>';
+        });
         roster.querySelectorAll(".v146-home-character").forEach(node=>node.remove());
-        const relicSlot=roster.querySelector(".team-relic-loadout-slot");
-        if(relicSlot){ relicSlot.insertAdjacentHTML("beforebegin",cards.join("")); }
-        else{ roster.insertAdjacentHTML("beforeend",cards.join("")); }
-        roster.dataset.ready="true";
-        syncHomeRelicSummary();
-        return true;
+        roster.insertAdjacentHTML("beforeend",cards.join(""));
+        const scene=document.getElementById("homePartyScene");
+        if(scene){
+            const members=[...party.characters,...party.heroes];
+            scene.dataset.partySize=String(members.length);
+            scene.innerHTML=members.map(({character,heroId,index},position)=>{
+                const artwork=getCharacterBattleArtworkPath(character);
+                return '<figure class="home-party-portrait" data-city-position="'+position+'" '+(heroId?'data-hero-position="'+(position-party.characters.length)+'" ':'')+'data-party-identity="'+rosterEscape(heroId||("character:"+index))+'"><img src="'+rosterEscape(artwork)+'" alt="'+rosterEscape(character.id)+' Lv.'+Math.max(1,Math.floor(rosterNumber(character.level)||1))+'" draggable="false" decoding="async"></figure>';
+            }).join("");
+        }
+        roster.dataset.ready="true";syncHomeRelicSummary();return true;
     }
     window.v54RenderHomeRoster=renderHomeRoster;
     window.FourSymbolsHomeRelicSummary=Object.freeze({

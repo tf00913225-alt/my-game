@@ -61,16 +61,9 @@ for(const hex of ["#FF9F38","#FF4FA7","#FF5A36","#42A5FF","#47D6A3","#C89B45"]){
 assert.match(css,/rarity-four-symbol[\s\S]*conic-gradient/);
 assert.match(css,/@keyframes teamRelicFourSymbolRarityBreath/);
 assert.doesNotMatch(css,/#game-(?:stage|ui) \.team-relic-home-tools\{/,'lazy relic CSS must not duplicate persistent utility geometry');
-assert.match(utilityCss,/#game-ui \.team-relic-home-tools\{[^}]*position:relative;[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\);[^}]*grid-row:3;[^}]*width:100%;[^}]*pointer-events:none/,'collections and tools share the original browser utility owner');
-const utilityRule=(utilityCss.match(/#game-ui \.team-relic-home-tools \.home-card-utility\{([^}]*)\}/)||[])[1]||"";
-assert.match(utilityRule,/width:min\(100%,180px\)/);
-assert.match(utilityRule,/height:44px/);
-assert.match(utilityRule,/border:0/);
-assert.match(utilityRule,/background:rgba\(17,20,16,.76\)/);
-assert.match(utilityRule,/box-shadow:none/,'collections must not regain competing bright card frames');
-assert.match(utilityCss,/#game-ui \.team-relic-home-tools \.home-card-utility \.home-card-icon\{[^}]*width:32px;[^}]*height:32px/);
-assert.match(utilityCss,/#game-ui \.team-relic-home-tools \.home-card-utility \.home-card-label\{[^}]*font-size:15px;[^}]*line-height:22px;[^}]*font-weight:700/);
-assert.match(utilityRule,/pointer-events:auto/,'utilities retain their hitboxes');
+assert.match(utilityCss,/#game-ui \.team-relic-home-tools\{[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\);[^}]*grid-row:2/,'four lower tools share one Owner');
+assert.match(fs.readFileSync("index.html","utf8"),/home-city-entrances[\s\S]*team-relic-home-entry/,'relic remains on the original city surface');
+assert.match(fs.readFileSync('css/00-main.css','utf8'),/\.home-card\{[^}]*pointer-events:auto/,'side facilities retain hit targets');
 assert.match(css,/\.team-relic-battle-banner\{[^}]*top:48%/,
     "relic name banner must be centered in the battlefield");
 assert.doesNotMatch(css,/\.team-relic-sp-float\{|\.damage-popup\.sp-popup\{[^}]*top:/,

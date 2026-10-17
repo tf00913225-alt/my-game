@@ -25316,6 +25316,7 @@ function renderHeroGrowthControls(hero,data){
         ${g.pending?`<p role="status">請重試前次操作確認結果。</p><button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.retry()" ${g.busy?"disabled":""}>確認前次操作</button>`:""}</section>`;
 }
 function refreshHeroPage(preserveScroll=false){
+    window.v54RenderHomeRoster?.();
     if(!$("homeFeatureModal")?.querySelector(".hero-panel"))return;
     const scrollTop=preserveScroll?$("heroPageContent")?.scrollTop||0:0;
     $("homeFeatureModalBody").innerHTML=renderHeroPageContent();

@@ -51,7 +51,7 @@ assert.match(v141,/hasExpLevelUp/);
 assert.match(index,/home-utility-actions team-relic-home-tools/);
 assert.match(index,/team-relic-home-entry[^>]*data-feature="relic"/);
 assert.match(index,/team-element-box-home-entry[^>]*data-feature="gameplay-core"/);
-assert.match(baseCss,/\.home-secondary-actions\{[^}]*grid-template-columns:repeat\(2,minmax\(64px,20%\)\);[^}]*grid-auto-rows:68px;/);
+assert.match(baseCss,/\.home-city-entrances\{[^}]*pointer-events:none/);
 assert.match(v131,/V17342_GLOBAL_EXP_REWARD_MULTIPLIER=3/);
 assert.match(v131,/function getFormalMonsterBaseExp/);
 assert.doesNotMatch(v131,/V131_EXP_MULTIPLIER/);
@@ -178,7 +178,7 @@ assert.match(navShell,/\["返回","assets\/ui\/map-return\.png"/);
 assert.match(dungeonPolish,/topReturn\.setAttribute\("aria-label","返回上一層"\)/);
 assert.match(navShell,/grid-template-columns|renderGameplayContext/);
 
-assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+assert.match(homeRosterCss,/grid-template-columns:minmax\(0,1fr\) 45px 110px 96px/);
 assert.match(creationCss,/creation-stat-details\[open\] \.creation-stat-details-body\{[\s\S]*font-size:32px/);
 assert.match(questCss,/quest-milestone\.reached:not\(\.claimed\) \.quest-milestone-slot::after/);
 assert.match(questCss,/quest-milestone:not\(\.reached\)[\s\S]*opacity:\.5 !important/);
