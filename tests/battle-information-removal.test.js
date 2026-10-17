@@ -11,7 +11,7 @@ test('battle and patrol logs are removed while the round has one surviving DOM o
     const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
     assert.doesNotMatch(html,/battleInfoToggle|id="battleInfo"|mapBattleInfo|mapBattleOverlay|battle-info-region/);
     assert.equal((html.match(/id="battleTurnIndicator"/g)||[]).length,1);
-    assert.match(html,/<\/section>\s*<div id="battleTurnIndicator">第 1 回合<\/div>/);
+    assert.match(html,/id="battleActionRegion"[\s\S]*?<div id="battleTurnIndicator">第 1 回合<\/div>[\s\S]*?id="turnTargetRow"/);
     assert.doesNotMatch(main,/setBattleInfoExpanded|toggleBattleInfoPanel|fillBattleInfoGap/);
 });
 

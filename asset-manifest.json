@@ -53,7 +53,7 @@
           "build/gameplay-core-secondary.6c7101a1fcd7.js"
         ],
         "styles": [
-          "build/gameplay-core.fd3f38352bd7.css"
+          "build/gameplay-core.4d0fc745d32e.css"
         ],
         "dependencies": [
           "app-shell",
@@ -810,16 +810,16 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core.fd3f38352bd7.css",
-        "sha256": "fd3f38352bd7",
-        "bytes": 411590,
+        "path": "build/gameplay-core.4d0fc745d32e.css",
+        "sha256": "4d0fc745d32e",
+        "bytes": 411667,
         "priority": "P2",
         "type": "style",
         "decode": false
       }
     ],
-    "manifestHash": "4213aa697549",
-    "totalBytes": 21890525,
+    "manifestHash": "777843553cc8",
+    "totalBytes": 21890602,
     "totalResources": 78
   },
   "assets": {
@@ -883,9 +883,9 @@
       "sha256": "58ccbe864128",
       "bytes": 91246
     },
-    "build/gameplay-core.fd3f38352bd7.css": {
-      "sha256": "fd3f38352bd7",
-      "bytes": 411590
+    "build/gameplay-core.4d0fc745d32e.css": {
+      "sha256": "4d0fc745d32e",
+      "bytes": 411667
     },
     "build/feature-patrol.1cef20d37f82.css": {
       "sha256": "1cef20d37f82",

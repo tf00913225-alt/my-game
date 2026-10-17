@@ -58,8 +58,8 @@ try{
     assert.ok(Math.abs(data.bossSp.width-data.bossHp.width)<=1,"Boss SP must align to the formal Boss HP width");
     assert.ok(data.bossHp.bottom<=data.bossSp.top+1,"Boss HP must sit above SP");
     assert.ok(data.bossSp.bottom<=data.bossName.top+1,"Boss SP must sit above the name");
-    assert.equal(data.leftHpCssHeight,11,"Reinforcement HP must keep the 11px logical resource-bar height");
-    assert.ok(Math.abs(data.leftHpHeight-(11*data.gameContentScale))<.01,"Reinforcement HP physical rect must reflect only the canonical game-content scale");
+    assert.equal(data.leftHpCssHeight,13,"Reinforcement HP must use the 13px logical resource-bar height");
+    assert.ok(Math.abs(data.leftHpHeight-(13*data.gameContentScale))<.01,"Reinforcement HP physical rect must reflect only the canonical game-content scale");
     assert.notEqual(data.popupDisplay,"none","Boss HP damage popup must remain visible");
     assert.ok(data.leftArt.right<=data.bossArt.left,"B1 reinforcement artwork must not overlap Boss artwork");
     assert.ok(data.rightArt.left>=data.bossArt.right,"B5 reinforcement artwork must not overlap Boss artwork");

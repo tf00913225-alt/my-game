@@ -32,14 +32,18 @@ const expression=String.raw`(async()=>{
   check(paint,'missing normalized paint '+record.portraitKey);
   const a=art.getBoundingClientRect(),p=paint.getBoundingClientRect(),meta=registry.presentation.assets[record.path];
   const [l,t,r,b]=meta.alphaBounds,top=p.top+p.height*t/meta.height,bottom=p.top+p.height*b/meta.height,left=p.left+p.width*l/meta.width,right=p.left+p.width*r/meta.width;
-  const baseline=a.top+a.height*.96,clipped=top<a.top-1||bottom>a.bottom+1||left<a.left-1||right>a.right+1;
+  const cls=card.dataset.portraitSizeClass;
+  const fixedSix=document.getElementById('battlePage').dataset.enemyBattlefieldProfile==='standard-six'&&['STANDARD','ELITE'].includes(cls)&&!card.classList.contains('gameplay-boss-card');
+  const projection=a.height/parseFloat(getComputedStyle(art).height);
+  const baseline=a.top+a.height*(fixedSix?1:.96),clipped=top<a.top-1||bottom>a.bottom+1||left<a.left-1||right>a.right+1;
   check(a.height>0&&p.height>0,'zero presentation geometry '+record.portraitKey);
   check(!clipped,'clipped alpha silhouette '+record.portraitKey+' '+JSON.stringify({a:a.toJSON(),p:p.toJSON(),top,bottom,left,right}));
   check(Math.abs(bottom-baseline)<1,'bottom baseline drift '+record.portraitKey);
-  const cls=card.dataset.portraitSizeClass,target=registry.presentation.classes[cls].bodyHeight;
-  const expected=Math.min(target*a.height,a.width/(r-l)*(b-t));
+  const target=registry.presentation.classes[cls].bodyHeight;
+  const targetHeight=fixedSix?(cls==='ELITE'?105.27:101.55)*projection:target*a.height;
+  const expected=Math.min(targetHeight,a.width/(r-l)*(b-t));
   check(Math.abs((bottom-top)-expected)<1.1,'body-height contract drift '+record.portraitKey);
-  evidence.geometry.push({label,portraitKey:record.portraitKey,sizeClass:cls,slotHeight:a.height,visualBodyTop:top,visualBodyBottom:bottom,visualBodyHeight:bottom-top,baseline,clipped,overflow:false,widthLimited:expected<target*a.height-1});
+  evidence.geometry.push({label,portraitKey:record.portraitKey,sizeClass:cls,slotHeight:a.height,visualBodyTop:top,visualBodyBottom:bottom,visualBodyHeight:bottom-top,baseline,clipped,overflow:false,widthLimited:expected<targetHeight-1});
  };
  async function scene(roster,label,encounterMode="legacy-dungeon"){
   monsters=roster;currentBattleMonsters=roster.map((m,i)=>i);battleActive=false;

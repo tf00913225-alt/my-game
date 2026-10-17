@@ -7315,7 +7315,7 @@ body > .v169-rpg-dialog-layer{
 
 /* Keep the existing visible heights in the single fixed logical canvas;
    only alpha headroom is reclaimed for the command/turn stack. */
-#game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"] .battle-monster > .v174-normalized-portrait{
+#game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"] .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{
     --battle-portrait-visible-height:101.55px;
     --battle-portrait-baseline:100%;
 }
