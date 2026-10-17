@@ -378,6 +378,7 @@
         if(root){ root.dataset.firstPlayPath=value.path||""; root.dataset.firstPlayPriority=value.priority||""; }
     }
     function showResourceFailure(error){
+        if(openingTimer!==null){ global.clearTimeout(openingTimer); openingTimer=null; }
         lastError=error; showCity("resource-error"); showLoader();
         const failed=global.FourSymbolsFirstPlay&&global.FourSymbolsFirstPlay.getLastFailed?global.FourSymbolsFirstPlay.getLastFailed():[];
         const summary=failed.slice(0,2).map(item=>item.path).join("、");

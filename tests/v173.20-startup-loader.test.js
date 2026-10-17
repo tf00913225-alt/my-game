@@ -59,6 +59,10 @@ console.log("✓ account-first startup state machine with real readiness");
     context.present(true,false);context.present(true,true);
     assert.equal(timers.has(3),false,'retry cancels the old presentation timer');
     assert.equal(calls.at(-1),'resource-retry');
+    context.showLoader=()=>{};context.retryButton=null;context.emit=()=>{};
+    vm.runInContext(source.slice(source.indexOf('    function showResourceFailure('),source.indexOf('    async function startFirebaseLifecycle('))+'this.resourceFail=showResourceFailure;',context);
+    context.present(false,false);context.resourceFail(new Error('resource failure'));
+    assert.equal(timers.has(4),false,'a failed resource cancels presentation before it can overwrite the error');
     console.log('✓ opening presentation is non-blocking and destination-safe');
 }
 
