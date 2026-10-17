@@ -30257,7 +30257,7 @@ let equipmentDetailSelection=null;
 function getEquipmentSelection(){
     const selection=equipmentDetailSelection;
     if(!selection)return null;
-    if(selection.uid!==window.FourSymbolsAccountSave?.getActiveUid?.())return null;
+    if(!selection.uid||selection.uid!==window.FourSymbolsAccountSave?.getActiveUid?.())return null;
     if(selection.heroId){
         if(selection.origin==='backpack'&&!window.FourSymbolsHeroBattle.getRoster().includes(selection.heroId))return null;
         const character=getHeroEquipmentCharacter(selection.heroId);

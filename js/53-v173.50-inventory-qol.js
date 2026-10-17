@@ -400,6 +400,7 @@
         const definition=typeof getPotionDefinition==="function"?getPotionDefinition(item.id):null;
         const character=typeof getBackpackCharacter==="function"?getBackpackCharacter(inventoryCharacterIndex):null;
         const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(inventoryCharacterIndex):null;
+        if(character?.combatantKind==="heroNpc"){return {used:0,message:"英雄僅能在背包管理裝備。"};}
         if(!definition||!character||!stats){ return {used:0,message:"目前無法使用這項補品。"}; }
         const resource=definition.resource;
         const maxValue=resource==="hp"?Number(stats.maxHP):Number(stats.maxSP);

@@ -1661,3 +1661,4 @@ body > .v169-rpg-dialog-layer{
 .hero-equipment-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px;border:1px solid #6d5632;background:#211b16;color:#eee3cc;font:inherit;min-width:0;}
 .hero-equipment-item>img,.hero-equipment-item>svg{width:56px;height:56px;object-fit:contain;}
 .hero-equipment-item>span{overflow-wrap:anywhere;}
+.hero-equipment-bag>p{grid-column:1/-1;}
