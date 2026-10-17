@@ -1128,8 +1128,7 @@ const retryButton=document.getElementById("startupRetryButton");
 const creation=document.getElementById("creationPage");
 const game=document.getElementById("gameInterface");
 const build=global.__FOUR_SYMBOLS_BUILD__||{};
-const logoTargetMs=Math.max(5000,Number(root&&root.dataset.logoTargetMs)||5000);
-const cityTargetMs=5000;
+const logoTargetMs=Math.max(0,Number(root&&root.dataset.logoTargetMs)||900);
 const CREATION_PORTRAITS=[
 "assets/characters/female_fire.jpg","assets/characters/female_water.jpg",
 "assets/characters/female_wind.jpg","assets/characters/female_earth.jpg",
@@ -1460,7 +1459,6 @@ return;
 if(state===STATES.AUTH_RESOLVING||state===STATES.AUTH_REQUIRED){ void resolveSaveFor(user); }
 }
 let firebaseBootPromise=null;
-const delay=ms=>new Promise(resolve=>global.setTimeout(resolve,ms));
 async function waitForPrivacyApi(){
 if(global.FourSymbolsPrivacy){ return global.FourSymbolsPrivacy; }
 return new Promise((resolve,reject)=>{
@@ -1468,16 +1466,20 @@ const timer=global.setTimeout(()=>reject(new Error("Privacy policy gate did not 
 global.addEventListener("four-symbols:privacy-ready",()=>{ global.clearTimeout(timer); resolve(global.FourSymbolsPrivacy); },{once:true});
 });
 }
-async function runOpeningPresentation(returning,retryOnly){
+let openingTimer=null;
+function runOpeningPresentation(returning,retryOnly){
+global.clearTimeout(openingTimer);
 openingDone=false;
 if(retryOnly){ showCity("resource-retry"); return; }
 if(root){ root.dataset.audience=returning?"returning":"first-boot"; }
-await delay(logoTargetMs);
+openingTimer=global.setTimeout(()=>{
+openingTimer=null;
+if(state!==STATES.BOOT_LOADING){ return; }
 showCity(returning?"returning-logo-complete":"first-boot-logo-complete");
-await delay(cityTargetMs);
 openingDone=true;
 const readyPercent=Number(progress&&progress.getAttribute("aria-valuenow")||0);
 if(readyPercent<100){ status(returning?"正在更新必要資源":"正在準備必要資源","載入完成前將維持第二幕，不會提前進入帳號或創角畫面"); }
+},logoTargetMs);
 }
 function renderFirstPlayProgress(value){
 const holdOnSecondScene=openingDone&&Number(value.percent)<100;
@@ -1485,6 +1487,7 @@ render(value.percent,holdOnSecondScene?(root&&root.dataset.audience==="returning
 if(root){ root.dataset.firstPlayPath=value.path||""; root.dataset.firstPlayPriority=value.priority||""; }
 }
 function showResourceFailure(error){
+global.clearTimeout(openingTimer); openingTimer=null;
 lastError=error; showCity("resource-error"); showLoader();
 const failed=global.FourSymbolsFirstPlay&&global.FourSymbolsFirstPlay.getLastFailed?global.FourSymbolsFirstPlay.getLastFailed():[];
 const summary=failed.slice(0,2).map(item=>item.path).join("、");
@@ -1529,7 +1532,7 @@ const firstPlay=global.FourSymbolsFirstPlay;
 if(!firstPlay){ throw new Error("First Play resource loader is unavailable."); }
 const privacy=await waitForPrivacyApi();
 const returning=firstPlay.hasCompletedRecord();
-const presentation=runOpeningPresentation(returning,retryFailedOnly);
+runOpeningPresentation(returning,retryFailedOnly);
 let firebasePromise=null;
 if(returning&&privacy.hasConsent()){
 firebasePromise=startFirebaseLifecycle();
@@ -1540,8 +1543,7 @@ let packResult;
 try{
 const prepare=retryFailedOnly?firstPlay.retryFailed:firstPlay.prepare;
 packResult=await prepare({onProgress:renderFirstPlayProgress});
-}catch(error){ await presentation; showResourceFailure(error); return; }
-await presentation;
+}catch(error){ showResourceFailure(error); return; }
 render(100,"遊戲資源準備完成","必要資源已下載、驗證並可渲染");
 mark("four-symbols:first-play-ready");
 emit("four-symbols:first-play-ready",{returning,manifestChanged:packResult.manifestChanged,totalBytes:packResult.totalBytes});
