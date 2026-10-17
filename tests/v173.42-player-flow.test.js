@@ -178,7 +178,7 @@ assert.match(navShell,/\["返回","assets\/ui\/map-return\.png"/);
 assert.match(dungeonPolish,/topReturn\.setAttribute\("aria-label","返回上一層"\)/);
 assert.match(navShell,/grid-template-columns|renderGameplayContext/);
 
-assert.match(homeRosterCss,/grid-template-columns:minmax\(0,1fr\) 45px 110px 96px/);
+assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
 assert.match(creationCss,/creation-stat-details\[open\] \.creation-stat-details-body\{[\s\S]*font-size:32px/);
 assert.match(questCss,/quest-milestone\.reached:not\(\.claimed\) \.quest-milestone-slot::after/);
 assert.match(questCss,/quest-milestone:not\(\.reached\)[\s\S]*opacity:\.5 !important/);

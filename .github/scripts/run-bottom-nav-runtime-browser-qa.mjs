@@ -188,7 +188,8 @@ async function runViewport(chrome,url,width,height){
     const base=evidence.rows.find(n=>n.domain===row.domain);for(const key of ['width','height','left','bottom'])assert.ok(Math.abs(row.nav[key]-base.nav[key])<=1,mode+' '+key);
     assert.equal(row.columns.length,5);assert.equal(row.frames.length,5);
     for(const col of row.columns)assert.ok(Math.abs(col.width-row.columns[0].width)<=1,mode+' equal columns');
-    for(const frame of row.frames){assert.ok(Math.abs(frame.height-base.frames[0].height)<=1,mode+' frame height');assert.ok(Math.abs(frame.width-base.frames[0].width)<=1,mode+' frame width');}
+    const frameSize=row.nav.width*(row.context==='main'?108:180)/1080;
+    for(const frame of row.frames){assert.ok(Math.abs(frame.height-frameSize)<=1,mode+' native frame height');assert.ok(Math.abs(frame.width-frameSize)<=1,mode+' native frame width');}
    }
   }
   evidence.lifecycle=[];
@@ -199,9 +200,9 @@ async function runViewport(chrome,url,width,height){
   evidence.foreground=await client.eval(MEASURE);assert.equal(evidence.foreground.sameShell,true);assert.equal(evidence.foreground.visible,true);
   await client.eval("showPage('home')");await settle(client);
   evidence.phase='home';console.log('Home scroll QA');evidence.home=await client.eval(`(()=>{const n=document.getElementById('homePage'),r=n.getBoundingClientRect();return {clientHeight:n.clientHeight,scrollHeight:n.scrollHeight,scrollTop:n.scrollTop,overflow:getComputedStyle(n).overflowY,rect:{left:r.left,top:r.top,width:r.width,height:r.height},documentScroll:document.scrollingElement.scrollTop};})()`);
-  assert.equal(evidence.home.overflow,'auto');assert.ok(evidence.home.scrollHeight>=evidence.home.clientHeight,JSON.stringify(evidence.home));await client.eval('homePage.scrollTop=0');
+  assert.equal(evidence.home.overflow,'hidden');assert.equal(evidence.home.scrollHeight,evidence.home.clientHeight,'city must fit without hidden overflow');await client.eval('homePage.scrollTop=0');
   const hr=evidence.home.rect;await swipe(client,hr.left+hr.width/2,Math.min(height-100,hr.top+hr.height*.7));
-  evidence.homeAfterSwipe=await client.eval("({scrollTop:homePage.scrollTop,documentScroll:document.scrollingElement.scrollTop})");if(evidence.home.scrollHeight>evidence.home.clientHeight+1)assert.ok(evidence.homeAfterSwipe.scrollTop>0,'overflowing browser home must scroll on touch');else assert.equal(evidence.homeAfterSwipe.scrollTop,0);assert.equal(evidence.homeAfterSwipe.documentScroll,0);
+  evidence.homeAfterSwipe=await client.eval("({scrollTop:homePage.scrollTop,documentScroll:document.scrollingElement.scrollTop})");assert.equal(evidence.homeAfterSwipe.scrollTop,0,'fixed city must not move on swipe');assert.equal(evidence.homeAfterSwipe.documentScroll,0);
   // Use the real inventory grid and its real scroll owner. QA-only inventory
   // data supplies enough rows; no production state or CSS is replaced.
   evidence.phase='inventory';console.log('Inventory scroll QA');await client.eval(`inventoryItems.splice(0,inventoryItems.length,...Array.from({length:80},(_,i)=>({id:'qa-scroll-'+i,name:'測試材料'+i,type:'material',rarityKey:'white',count:1})));showPage('inventory');setInventoryFilter('material');renderInventory();`);await settle(client);
