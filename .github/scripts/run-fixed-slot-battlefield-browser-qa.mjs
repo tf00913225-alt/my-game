@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import os from "node:os";
 import {spawnSync} from "node:child_process";
 
 const ROOT=process.cwd();
@@ -44,6 +45,7 @@ const feedbackSource=read("js/battle-floating-feedback-owner.js").replace(/<\/sc
 const feedbackCss=read("css/battle-floating-feedback-owner.css").replace(/<\/style/gi,"<\\/style");
 const mainCssSource=read("css/00-main.css");
 const commandGeometryCss=[
+    mainCssSource.match(/#battlePage \.battle-element-box-button\{[\s\S]*?\n\}/)?.[0],
     mainCssSource.match(/#battlePage\{\s*--battle-command-row-height:[\s\S]*?\n\}/)?.[0],
     mainCssSource.match(/#mainBattleMenu\{[\s\S]*?\n\}/)?.[0],
     mainCssSource.match(/#mainBattleMenu::before\{[\s\S]*?\n\}/)?.[0]
@@ -65,7 +67,7 @@ function fixtureHtml(width,height){
     return `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120e09;color:#fff;font-family:sans-serif}
-#game-stage{width:${width}px;height:${height}px;overflow:hidden}
+#game-stage{position:fixed;left:0;top:0;width:420px;height:746.667px;transform-origin:top left;transform:scale(${Math.min(width/420,height/746.667)});overflow:hidden}
 #app,#game-content{width:100%;height:100%}
 #battlePage{position:relative;width:100%;height:100%;overflow:visible}
 .battle-wrap{height:100%;display:flex;flex-direction:column;gap:3px;overflow:visible}
@@ -78,11 +80,10 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120e09;col
 <style id="v174-cardless-battle-style">#battlePage .v174-battle-art{inset:999px!important}#battlePage .battle-wrap{overflow:hidden!important}</style>
 <style>${commandGeometryCss}</style><style>${identityCss}</style><style>${v154Css}</style><style>${geometryCss}</style><style>${bossCss}</style><style>${feedbackCss}</style></head><body>
 <div id="game-stage"><div id="app"><div id="game-content"><section id="battlePage" class="v-fixed-slot-render-v2"><div class="battle-wrap">
-<section class="battle-enemy-region"><div class="battle-title">戰鬥</div><div id="battleMonsterArea" class="battle-monsters v131-formation"></div></section>
-<section class="battle-center-region"><div class="battle-middle"><div id="battleActionRegion" class="v-fixed-action-zone" style="position:relative;display:flex;flex-direction:column;gap:4px"><div id="turnTargetRow" class="turn-target-row">第 1 回合</div><div id="battleTargetPrompt" class="battle-target-prompt"><div class="battle-target-prompt-copy"><div class="battle-target-prompt-action">選擇［怒火］的我方目標</div><div class="battle-target-prompt-hint">選擇目標</div></div><button class="battle-target-back">返回</button></div><div id="battleCommandRow" style="display:flex;gap:5px;flex:0 0 66px;position:relative"><div id="mainBattleMenu" class="battle-menu" style="flex:1">操作區</div></div></div></div></section>
+<section class="battle-enemy-region"><div id="battleMonsterArea" class="battle-monsters v131-formation"></div></section>
+<section class="battle-center-region"><div class="battle-middle"><div id="battleActionRegion" class="v-fixed-action-zone" style="position:relative;display:flex;flex-direction:column;gap:4px"><div class="battle-title">戰鬥</div><div id="battleTurnIndicator">第 1 回合</div><button id="battleElementBoxButton" class="battle-element-box-button" type="button">元素匣</button><div id="turnTargetRow" class="turn-target-row">第 1 回合</div><div id="battleTargetPrompt" class="battle-target-prompt"><div class="battle-target-prompt-copy"><div class="battle-target-prompt-action">選擇［怒火］的我方目標</div><div class="battle-target-prompt-hint">選擇目標</div></div><button class="battle-target-back">返回</button></div><div id="battleCommandRow" style="display:flex;gap:5px;flex:0 0 66px;position:relative"><div id="mainBattleMenu" class="battle-menu" style="flex:1">操作區</div></div></div></div></section>
 <section class="battle-ally-region"><div id="battlePlayerRow" class="battle-player-row"></div></section>
-<div id="battleTurnIndicator">第 1 回合</div>
-</div><button class="battle-element-box-button" type="button">元素匣</button></section></div></div></div><pre id="result" hidden></pre>
+</div></section></div></div></div><pre id="result" hidden></pre>
 <script>
 window.__allyIndexes=[0,1,2];
 window.getExistingPartyIndexes=function(){return window.__allyIndexes.slice();};
@@ -233,15 +234,17 @@ function close(a,b,label,tolerance=.5){assert.ok(Math.abs(a-b)<=tolerance,`${lab
 function runViewport(chrome,width,height){
     fs.writeFileSync(FIXTURE,fixtureHtml(width,height),"utf8");
     const fileUrl="file://"+FIXTURE.replace(/\\/g,"/");
-    const result=spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--virtual-time-budget=1200","--dump-dom",fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:24*1024*1024});
-    assert.equal(result.status,0,result.stderr||`browser fixture failed ${width}x${height}`);
+    const browserProfile=fs.mkdtempSync(path.join(os.tmpdir(),"fixed-slot-qa-"));
+    const result=spawnSync(chrome,["--headless=new",`--user-data-dir=${browserProfile}`,"--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--virtual-time-budget=1200","--dump-dom",fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:24*1024*1024});
+    assert.equal(result.status,0,result.stderr||String(result.error||`browser fixture failed ${width}x${height}`));
     const match=result.stdout.match(/<pre id="result"[^>]*>([\s\S]*?)<\/pre>/);assert.ok(match,`missing QA result ${width}x${height}`);const data=JSON.parse(decode(match[1]));assert.ok(!data.fixtureError,data.fixtureError);
     if(width===412&&height===915){
         const screenshot=path.join(ARTIFACT_DIR,"enemy-six-slots-412x915.png");
-        const shot=spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--virtual-time-budget=1200",`--screenshot=${screenshot}`,fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});
+        const shot=spawnSync(chrome,["--headless=new",`--user-data-dir=${browserProfile}`,"--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--virtual-time-budget=1200",`--screenshot=${screenshot}`,fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});
         assert.equal(shot.status,0,shot.stderr||"Boss mobile screenshot failed");
         assert.ok(fs.existsSync(screenshot),"Boss mobile screenshot evidence missing");
     }
+    const canvasScale=Math.min(width/420,height/746.667);
     assert.equal(data.enemySlots,10);assert.equal(data.allySlots,6);
     assert.equal(data.legacyStyle.owner,null);assert.equal(data.legacyStyle.textLength,-1,"legacy runtime geometry style must be removed rather than kept as an override");
     assert.doesNotMatch(data.legacyClasses.enemy,/battle-monsters|v131-formation|v141-fixed-formation/);assert.doesNotMatch(data.legacyClasses.ally,/battle-player-row/);
@@ -283,7 +286,7 @@ function runViewport(chrome,width,height){
         JSON.stringify({turn:data.turnUi.targetSelecting.rect,prompt:data.turnUi.targetSelecting.promptRect,center:baseline.center})
     );
     assert.ok(data.turnUi.targetSelecting.promptRect.bottom<=baseline.center.bottom+.5,"target prompt stays inside center region");
-    close(baseline.elementBox.width,66,"element box width");close(baseline.elementBox.height,66,"element box height");
+    close(baseline.elementBox.width,66*canvasScale,"element box width");close(baseline.elementBox.height,66*canvasScale,"element box height");
     for(const count of [1,3,5,6,8,10]){const scenario=data.scenarios[count],profileBaseline=data.scenarios[count<=6?1:8].lower;assert.equal(scenario.slots,count<=6?6:10);close(scenario.lower.enemy.height,profileBaseline.enemy.height,`enemy region height count ${count}`);close(scenario.lower.center.height,profileBaseline.center.height,`center region height count ${count}`);close(scenario.lower.ally.top,profileBaseline.ally.top,`ally top count ${count}`);close(scenario.lower.middle.top,profileBaseline.middle.top,`middle top count ${count}`);close(scenario.lower.action.top,profileBaseline.action.top,`action top count ${count}`);scenario.unitRects.forEach(function(rect){close(rect.width,scenario.unitRects[0].width,`enemy card width count ${count}`);close(rect.height,scenario.unitRects[0].height,`enemy card height count ${count}`);assert.ok(rect.bottom<=scenario.lower.enemy.bottom+.5,`enemy card stays above center count ${count}`);});for(const shape of ["single","tri","row","column","all"]){close(scenario[shape].width,data.scenarios[count<=6?1:8][shape].width,`${shape} width count ${count}`);close(scenario[shape].height,data.scenarios[count<=6?1:8][shape].height,`${shape} height count ${count}`);close(scenario[shape].centerX,(scenario[shape].left+scenario[shape].right)/2,`${shape} centerX count ${count}`);close(scenario[shape].centerY,(scenario[shape].top+scenario[shape].bottom)/2,`${shape} centerY count ${count}`);}}
     fs.writeFileSync(path.join(ARTIFACT_DIR,"six-slot-portrait-probe.json"),JSON.stringify(data.portraits,null,2));
     assert.equal(data.sixProfile,"standard-six");
@@ -295,9 +298,9 @@ function runViewport(chrome,width,height){
         assert.ok(sample.visible.top>=sample.art.top-.5&&sample.visible.bottom<=sample.hudTop+.5,"portrait remains above HP HUD");
     });
     assert.ok(data.portraits.six.some((sample,index)=>sample.visible.height>data.portraits.legacy[index].visible.height*1.1),"three columns materially enlarge width-limited portraits");
-    const allyBaseline=data.allyScenarios[1].lower;for(const count of [1,2,3,4,5,6]){const scenario=data.allyScenarios[count];assert.equal(scenario.slots,6);close(scenario.lower.ally.height,allyBaseline.ally.height,`ally zone height party ${count}`);close(scenario.lower.action.top,allyBaseline.action.top,`action top party ${count}`);scenario.unitRects.forEach(function(rect,index){close(rect.width,scenario.unitRects[0].width,`ally card width party ${count}`);close(rect.height,scenario.unitRects[0].height,`ally card height party ${count}`);assert.ok(rect.top>=scenario.lower.allyRegion.top-.5,`ally card stays below center party ${count}`);assert.ok(rect.bottom<=scenario.lower.allyRegion.bottom+.5,`ally card stays inside ally region party ${count}`);scenario.unitRects.slice(index+1).forEach(other=>assert.ok(rect.right<=other.left+.5||other.right<=rect.left+.5||rect.bottom<=other.top+.5||other.bottom<=rect.top+.5,`ally cards overlap party ${count}`));});scenario.hudRects.forEach(function(hud){assert.ok(hud.art.bottom<=hud.hp.top+.5,`ally art/HP overlap party ${count}`);assert.ok(hud.hp.bottom<=hud.sp.top+.5,`ally HP/SP overlap party ${count}`);assert.ok(hud.sp.bottom<=hud.name.top+.5,`ally SP/name overlap party ${count}`);assert.equal(hud.logicalHp,11);assert.equal(hud.logicalSp,11);});}assert.equal(data.splitAlly.assigned[1],"ALLY_B2");close(data.splitAlly.lower.ally.height,allyBaseline.ally.height,"split front/back ally zone height");
+    const allyBaseline=data.allyScenarios[1].lower;for(const count of [1,2,3,4,5,6]){const scenario=data.allyScenarios[count];assert.equal(scenario.slots,6);close(scenario.lower.ally.height,allyBaseline.ally.height,`ally zone height party ${count}`);close(scenario.lower.action.top,allyBaseline.action.top,`action top party ${count}`);scenario.unitRects.forEach(function(rect,index){close(rect.width,scenario.unitRects[0].width,`ally card width party ${count}`);close(rect.height,scenario.unitRects[0].height,`ally card height party ${count}`);assert.ok(rect.top>=scenario.lower.allyRegion.top-.5,`ally card stays below center party ${count}`);assert.ok(rect.bottom<=scenario.lower.allyRegion.bottom+.5,`ally card stays inside ally region party ${count}`);scenario.unitRects.slice(index+1).forEach(other=>assert.ok(rect.right<=other.left+.5||other.right<=rect.left+.5||rect.bottom<=other.top+.5||other.bottom<=rect.top+.5,`ally cards overlap party ${count}`));});scenario.hudRects.forEach(function(hud){assert.ok(hud.art.top>=scenario.lower.action.bottom-.5,`ally art must stay below command region party ${count}`);scenario.hudRects.forEach(function(other){if(other===hud)return;assert.ok(hud.art.right<=other.name.left+.5||hud.art.left>=other.name.right-.5||hud.art.bottom<=other.name.top+.5||hud.art.top>=other.name.bottom-.5,`ally art must not overlap another HUD name party ${count}`);});assert.ok(hud.art.bottom<=hud.hp.top+.5,`ally art/HP overlap party ${count}`);assert.ok(hud.hp.bottom<=hud.sp.top+.5,`ally HP/SP overlap party ${count}`);assert.ok(hud.sp.bottom<=hud.name.top+.5,`ally SP/name overlap party ${count}`);assert.equal(hud.logicalHp,13);assert.equal(hud.logicalSp,13);});}assert.equal(data.splitAlly.assigned[1],"ALLY_B2");close(data.splitAlly.lower.ally.height,allyBaseline.ally.height,"split front/back ally zone height");
     assert.ok(data.scenarios[3].unitRects[0].height>100,"enemy cards are visibly taller than the previous 92px owner");
-    assert.ok(data.allyScenarios[3].unitRects[0].height>116,"ally cards are visibly taller than the previous 86px owner");
+    assert.ok(data.allyScenarios[3].unitRects[0].height>116*canvasScale,"ally cards are visibly taller than the previous 86px owner");
     close(data.beforeDeath.e2.left,data.afterDeath.e2.left,"death must not move right unit");close(data.beforeDeath.e2.top,data.afterDeath.e2.top,"death must not move right unit vertically");
     for(const [kind,art] of Object.entries(data.artwork)){assert.equal(art.backgroundSize,"contain",`${kind} artwork must use contain`);assert.equal(art.overflow,"visible",`${kind} artwork overflow`);assert.equal(art.contain,"none",`${kind} artwork contain`);assert.equal(art.clipChain.some(entry=>/hidden|clip/.test(entry.overflow)||/hidden|clip/.test(entry.overflowX)||/hidden|clip/.test(entry.overflowY)),false,`${kind} artwork has clipping ancestor`);}
     function separated(items,label){for(let i=0;i<items.length;i++){for(let j=i+1;j<items.length;j++){const a=items[i].rect,b=items[j].rect;assert.ok(a.bottom<=b.top+.5||b.bottom<=a.top+.5||a.right<=b.left+.5||b.right<=a.left+.5,label+" overlap: "+JSON.stringify({a:items[i],b:items[j]}));}}}
@@ -350,7 +353,7 @@ function runViewport(chrome,width,height){
     assert.equal(data.stageOverflow,"visible");
     close(data.boss.footprint.left,data.boss.card.left,"Boss card left fills six-Slot footprint");close(data.boss.footprint.right,data.boss.card.right,"Boss card right fills six-Slot footprint");close(data.boss.footprint.top,data.boss.card.top,"Boss card top fills six-Slot footprint");close(data.boss.footprint.bottom,data.boss.card.bottom,"Boss card bottom fills six-Slot footprint");
     assert.equal(data.boss.bossCount,1,"Boss must remain one DOM target");assert.equal(data.boss.slots,"ENEMY_B2 ENEMY_B3 ENEMY_B4 ENEMY_F2 ENEMY_F3 ENEMY_F4");assert.equal(data.boss.cardless,true,"Boss-side dynamic Units must be cardless immediately");assert.equal(data.boss.pointerEvents,"auto");assert.equal(data.boss.background,"none");
-    assert.equal(data.boss.hud.hpPosition,"absolute","Boss HP must escape the V154 relative HUD rule");assert.equal(data.boss.hud.spPosition,"absolute","Boss SP must escape the V154 relative HUD rule");assert.equal(data.boss.hud.hpDisplay,"block");assert.equal(data.boss.hud.spDisplay,"block");assert.equal(data.boss.hud.hp.height,11);assert.equal(data.boss.hud.sp.height,11);assert.ok(data.boss.hud.hp.bottom<=data.boss.hud.sp.top+1,"Boss HP must sit above SP");assert.ok(data.boss.hud.sp.bottom<=data.boss.hud.name.top+1,"Boss SP must sit above the name");
+    assert.equal(data.boss.hud.hpPosition,"absolute","Boss HP must escape the V154 relative HUD rule");assert.equal(data.boss.hud.spPosition,"absolute","Boss SP must escape the V154 relative HUD rule");assert.equal(data.boss.hud.hpDisplay,"block");assert.equal(data.boss.hud.spDisplay,"block");close(data.boss.hud.hp.height,11*canvasScale,"Boss HP canvas projection");close(data.boss.hud.sp.height,11*canvasScale,"Boss SP canvas projection");assert.ok(data.boss.hud.hp.bottom<=data.boss.hud.sp.top+1,"Boss HP must sit above SP");assert.ok(data.boss.hud.sp.bottom<=data.boss.hud.name.top+1,"Boss SP must sit above the name");
     data.boss.reinforcements.concat(data.boss.objects).forEach(function(side){assert.ok(side.card.right<=data.boss.footprint.left+.5||side.card.left>=data.boss.footprint.right-.5,"Boss side Unit must not invade central footprint");assert.ok(side.art.right<=data.boss.art.left+.5||side.art.left>=data.boss.art.right-.5,"Boss side artwork must not overlap Boss artwork");});
     [data.boss.reinforcements[0],data.boss.objects[0]].forEach(function(side){assert.ok(side.art.centerX<=side.card.centerX-6,"left Boss-side artwork must visibly shift outward");});
     [data.boss.reinforcements[1],data.boss.objects[1]].forEach(function(side){assert.ok(side.art.centerX>=side.card.centerX+6,"right Boss-side artwork must visibly shift outward");});

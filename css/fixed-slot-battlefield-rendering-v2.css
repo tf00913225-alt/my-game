@@ -11,8 +11,8 @@
        command row overflowed roughly 9px into the ally region on 412x915.
        Keep both combat sides balanced and reserve the center's real minimum
        content height in the canonical three-track grid. */
-    --battle-center-region-track:16fr;
-    --battle-ally-region-track:42fr;
+    --battle-center-region-track:24fr;
+    --battle-ally-region-track:34fr;
     --battle-target-prompt-height:60px;
     --battle-target-select-gap:6px;
     --battle-region-gap:4px;
@@ -24,26 +24,41 @@
     --battle-ally-row-gap:8px;
     --battle-ally-row-height:calc((100% - var(--battle-ally-row-gap)) / 2);
     --battle-slot-column-gap:4px;
-    --battle-ally-column-gap:8px;
+    --battle-ally-column-gap:4px;
     --battle-enemy-inline-padding:4px;
-    --battle-ally-inline-padding:14px;
+    --battle-ally-inline-padding:4px;
     --battle-art-overhang-x:5px;
     --battle-art-overhang-top:6px;
-    --battle-art-hud-reserve:39px;
-    --battle-name-row-height:14px;
-    --battle-resource-bar-height:11px;
+    --battle-art-hud-reserve:44px;
+    --battle-name-row-height:16px;
+    --battle-resource-bar-height:13px;
     --battle-enemy-safe-top:12px;
     --battle-item-menu-top-offset:116px;
     --battle-item-menu-gap:8px;
 }
 
-/* Six wider columns still need portrait height. Allocate it within the same
-   track owner; Boss/overflow encounters retain the original 42/16/42 tracks. */
+/* The six-unit field reserves the complete turn + command-art stack.
+   Its measured portrait height is retained below while unused alpha headroom
+   yields space to the center; the ally track and Boss tracks stay unchanged. */
 #game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"]{
-    --battle-enemy-region-track:48fr;
+    --battle-enemy-region-track:40fr;
+    --battle-title-height:0px;
+    --battle-enemy-safe-top:12px;
+    --battle-art-overhang-top:12px;
+    --battle-center-region-track:24fr;
     --battle-ally-region-track:36fr;
 }
 
+
+/* Keep the existing visible heights in the single fixed logical canvas;
+   only alpha headroom is reclaimed for the command/turn stack. */
+#game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"] .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{
+    --battle-portrait-visible-height:101.55px;
+    --battle-portrait-baseline:100%;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"] .battle-monster[data-portrait-size-class="ELITE"] > .v174-normalized-portrait{
+    --battle-portrait-visible-height:105.27px;
+}
 
 #game-stage #battlePage.v-fixed-slot-render-v2 > .battle-wrap{
     position:relative !important;
@@ -58,7 +73,7 @@
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleTurnIndicator{
     position:absolute !important;
     top:0;
-    right:8px;
+    right:82px;
     z-index:2;
     color:#f5cf72;
     font-size:14px;
@@ -82,13 +97,16 @@
     display:grid;
     grid-template-rows:var(--battle-title-height) minmax(0,1fr);
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-enemy-region > .battle-title{
-    width:100%;
-    height:var(--battle-title-height) !important;
-    min-height:var(--battle-title-height) !important;
-    max-height:var(--battle-title-height) !important;
-    flex-basis:var(--battle-title-height) !important;
-    line-height:var(--battle-title-height) !important;
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region .battle-title{
+    position:absolute;
+    top:0;
+    left:8px;
+    width:max-content;
+    height:20px !important;
+    min-height:20px !important;
+    max-height:20px !important;
+    flex-basis:20px !important;
+    line-height:20px !important;
     margin:0 !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region{
@@ -226,6 +244,7 @@
    offset keeps the top row and its intentional artwork overhang inside the
    visible game-stage instead of letting portrait mobile browsers crop it. */
 #game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea.v-fixed-enemy-zone{
+    grid-row:2;
     position:relative !important;
     top:0 !important;
     display:block !important;
@@ -366,6 +385,10 @@
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
     pointer-events:none !important;
 }
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player > .v174-battle-art{
+    --battle-art-hud-reserve:44px;
+    --battle-art-overhang-top:7px;
+}
 /* Offline alpha bounds are consumed by V174. The full canvas is painted once,
    preserving aspect and every nontransparent pixel; no runtime pixel scan. */
 #game-stage #battlePage .v174-battle-art.v174-normalized-portrait,
@@ -420,10 +443,12 @@
 .v174-battle-hud-layer{position:fixed;inset:0;z-index:16015;pointer-events:none;}
 .v174-unit-hud{
     position:absolute;inset:0;transform-origin:0 0;pointer-events:none;
-    --battle-name-row-height:14px;
+    --battle-name-row-height:16px;
     --battle-resource-bar-height:11px;
     color:#f4ead4;font-family:"Noto Sans TC",sans-serif;
 }
+
+.v174-unit-hud:not([data-boss="true"]){--battle-resource-bar-height:13px;}
 
 .v174-battle-hud-layer > .v174-unit-hud{position:fixed;inset:auto;}
 /* HUD uses formal Slot anchors and never participates in Unit layout. */
@@ -456,7 +481,7 @@
     align-items:center !important;
     justify-content:center !important;
     padding:0 2px !important;
-    font-size:11px !important;
+    font-size:16px !important;
     line-height:var(--battle-name-row-height) !important;
     z-index:24 !important;
 }
@@ -464,7 +489,7 @@
     bottom:0 !important;
     height:var(--battle-name-row-height) !important;
     line-height:var(--battle-name-row-height) !important;
-    font-size:12px !important;
+    font-size:16px !important;
     z-index:20 !important;
     display:flex !important;
     align-items:center !important;
@@ -496,7 +521,9 @@
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .hp-bar-text,
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .sp-bar-text{
     height:var(--battle-resource-bar-height) !important;
-    font-size:9px !important;
+    font-size:13px !important;
+    letter-spacing:normal;
+    font-weight:900;
     line-height:var(--battle-resource-bar-height) !important;
 }
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .monster-status-badges{
@@ -509,6 +536,10 @@
     max-height:24px !important;
     overflow:visible !important;
     z-index:32 !important;
+}
+
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .monster-status-badges:empty{
+    display:none !important;
 }
 
 /* Fixed Slot is the production owner of the manual-control indicator. The
@@ -621,10 +652,10 @@
 
 /* Initial placement keeps the draggable Element Box beside the center controls.
    Its original 66px touch target is part of the mobile interaction contract. */
-#game-stage #battlePage.v-fixed-slot-render-v2 > .battle-element-box-button{
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .battle-element-box-button{
     left:auto !important;
     right:8px !important;
-    top:calc(34% + 4px) !important;
+    top:0 !important;
     bottom:auto !important;
     width:66px !important;
     height:66px !important;

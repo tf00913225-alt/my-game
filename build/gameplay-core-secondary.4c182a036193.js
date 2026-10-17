@@ -7996,12 +7996,12 @@ function syncUnitArtwork(card,kind,selectedRecord){
         const contract=window.v154GetPortraitScaleContract()[sizeClass];
         const [left,top,right,bottom]=metadata.alphaBounds;
         const aspect=metadata.width/metadata.height,bw=(right-left)/metadata.width,bh=(bottom-top)/metadata.height;
-        const width='min('+1/bw*100+'cqw, '+contract.bodyHeight*aspect/bh*100+'cqh)';
+        const width='min('+1/bw*100+'cqw, calc(var(--battle-portrait-visible-height, '+contract.bodyHeight*100+'cqh) * '+aspect/bh+'))';
         paint.style.setProperty("--portrait-width",width);
         paint.style.setProperty("--portrait-aspect",String(aspect));
         paint.style.setProperty("--portrait-center",String((left+right)/2/metadata.width));
         paint.style.setProperty("--portrait-bottom",String(bottom/metadata.height));
-        paint.style.setProperty("--portrait-baseline",String(contract.baseline*100)+"%");
+        paint.style.setProperty("--portrait-baseline","var(--battle-portrait-baseline, "+String(contract.baseline*100)+"%)");
         card.dataset.portraitSizeClass=sizeClass;
     }else{
         if(paint)paint.remove();
@@ -8582,7 +8582,7 @@ ensureFunctionalStyles();runRepairs();
         const cards=new Map();
         indexes.forEach(index=>{
             const card=document.getElementById("battleMonster"+index);
-            if(card){ applyPresentation(card,"monster");cards.set(index,card); }
+            if(card){ cards.set(index,card); }
         });
         const bossOwner=bossBattleOwner();
         const bossIndex=bossOwner&&typeof bossOwner.getBossIndex==="function"?bossOwner.getBossIndex():null;
@@ -8600,6 +8600,7 @@ ensureFunctionalStyles();runRepairs();
                 const index=slots.getAssignedMonsterAtEnemySlot(snapshot,slot);
                 const card=Number.isInteger(index)&&index!==bossIndex?cards.get(index):null;
                 if(card){
+                    applyPresentation(card,"monster");
                     card.dataset.slot=slot;
                     card.dataset.geometryOwner="fixed-slot";
                     holder.appendChild(card);
@@ -8614,6 +8615,7 @@ ensureFunctionalStyles();runRepairs();
             footprint.dataset.geometryOwner="fixed-slot";
             footprint.dataset.slots=slots.bossFootprintSlots.join(" ");
             bossCard.classList.add("gameplay-boss-card");
+            applyPresentation(bossCard,"monster");
             bossCard.dataset.slot="ENEMY_B3";
             bossCard.dataset.geometryOwner="fixed-slot";
             footprint.appendChild(bossCard);

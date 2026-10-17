@@ -27,7 +27,7 @@
     font-size:20px !important;
 }
 
-#game-stage > #app > #game-content #battlePage .battle-monster-name.v143-monster-identity{
+#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card .battle-monster-name.v143-monster-identity{
     display:block !important;
     width:100% !important;
     min-width:0 !important;
@@ -68,7 +68,7 @@
     border-radius:4px !important;
 }
 
-#game-stage #battlePage .battle-monster .monster-bar-text{
+#game-stage #battlePage .battle-monster.gameplay-boss-card .monster-bar-text{
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;

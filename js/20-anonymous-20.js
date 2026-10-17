@@ -162,8 +162,9 @@ const V_ASSET_VERSION="173.73";
         button.dataset.dragReady="1";
         let drag=null; let suppressClick=false; const threshold=5;
         function logicalScale(){
-            const rect=page.getBoundingClientRect();
-            return {rect,sx:rect.width?page.clientWidth/rect.width:1,sy:rect.height?page.clientHeight/rect.height:1};
+            const host=button.offsetParent||page;
+            const rect=host.getBoundingClientRect();
+            return {rect,host,sx:rect.width?host.clientWidth/rect.width:1,sy:rect.height?host.clientHeight/rect.height:1};
         }
         button.addEventListener("pointerdown",event=>{
             if(event.pointerType==="mouse"&&event.button!==0){ return; }
@@ -178,8 +179,8 @@ const V_ASSET_VERSION="173.73";
             const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
             if(!drag.moved&&Math.hypot(dx,dy)>=threshold){ drag.moved=true; }
             if(!drag.moved){ return; }
-            const left=Math.max(0,Math.min(Math.max(0,page.clientWidth-button.offsetWidth),drag.left+dx*drag.sx));
-            const top=Math.max(0,Math.min(Math.max(0,page.clientHeight-button.offsetHeight),drag.top+dy*drag.sy));
+            const left=Math.max(0,Math.min(Math.max(0,(button.offsetParent||page).clientWidth-button.offsetWidth),drag.left+dx*drag.sx));
+            const top=Math.max(0,Math.min(Math.max(0,(button.offsetParent||page).clientHeight-button.offsetHeight),drag.top+dy*drag.sy));
             button.style.setProperty("left",left+"px","important"); button.style.setProperty("top",top+"px","important");
             button.style.setProperty("bottom","auto","important"); event.preventDefault();
         });

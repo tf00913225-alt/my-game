@@ -11,7 +11,7 @@ const relic=fs.readFileSync("css/55-team-relic-system.css","utf8");
 assert.match(fixed,/#battleMonsterArea > \.v-fixed-enemy-row\{[\s\S]*?grid-template-columns:repeat\(var\(--battle-enemy-columns,5\),minmax\(0,1fr\)\)/);
 assert.match(fixed,/#battlePlayerRow > \.v-fixed-ally-slot-row\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
 assert.match(fixed,/--battle-resource-bar-height:11px/);
-assert.match(fixed,/\.monster-bar-text,[\s\S]*?font-size:9px !important/);
+assert.match(fixed,/\.monster-bar-text,[\s\S]*?font-size:13px !important/);
 assert.doesNotMatch(fixed,/battle-info-region/,"retired battle log UI must stay absent");
 assert.doesNotMatch(fixed,/battle-info-toggle/,"retired battle log UI must stay absent");
 

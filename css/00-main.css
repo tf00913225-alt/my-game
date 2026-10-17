@@ -2719,7 +2719,7 @@ button:active{
 }
 
 
-#battlePage > .battle-element-box-button{
+#battlePage .battle-element-box-button{
     position:absolute !important;
     left:8px !important;
     bottom:96px !important;
@@ -2743,17 +2743,17 @@ button:active{
     -webkit-user-drag:none;
 }
 
-#battlePage > .battle-element-box-button.dragging{
+#battlePage .battle-element-box-button.dragging{
     cursor:grabbing;
     transform:none !important;
 }
 
 
-#battlePage > .battle-element-box-button:active{
+#battlePage .battle-element-box-button:active{
     transform:scale(.92);
 }
 
-#battlePage > .battle-element-box-button img{
+#battlePage .battle-element-box-button img{
     display:block;
     width:100%;
     height:100%;
