@@ -2,7 +2,7 @@
 
 // Only a trusted backend can create a grant record. This owner reserves an
 // entitlement once; it never trusts a browser-supplied kind or amount.
-const {verifyCreditedGrant}=require("./credited-grant-evidence");
+const {verifyCreditedGrant,verifyGrantReceiptIdentity,verifyReservedGrant}=require("./credited-grant-evidence");
 const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
 const ID_PATTERN=/^[A-Za-z0-9_-]{16,64}$/;
 const GRANT_SCHEMA_VERSION=1;
@@ -45,21 +45,9 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
                 }
                 const receipt=receiptSnapshot.data();
                 const grant=grantSnapshot.exists?grantSnapshot.data():null;
-                if(receipt.schemaVersion!==GRANT_SCHEMA_VERSION||receipt.ownerUid!==uid||
-                   receipt.grantId!==grantId||receipt.operationId!==operationId||
-                   !Number.isSafeInteger(receipt.serverRevision)||receipt.serverRevision<1||
-                   receipt.serverRevision>envelope.serverRevision||
-                   !receipt.createdAt||typeof receipt.createdAt.toMillis!=="function"||
-                   !grant||receipt.kind!==grant.kind||grant.schemaVersion!==GRANT_SCHEMA_VERSION||grant.ownerUid!==uid||
-                   !["gold","exp"].includes(grant.kind)||grant.source!=="server-event"||
-                   !Number.isSafeInteger(grant.amount)||grant.amount<1||grant.amount>100000||
-                   grant.amount!==receipt.amount||
-                   grant.claimedByOperationId!==operationId){
-                    fail("data-loss","Grant receipt is inconsistent.");
-                }
-                const proof=await readDailyCheckinEvidence({tx:transaction,root:privateRef,uid,grantId,grant,fail});
-                if(proof&&receipt.sourceEventSha256!==proof.sha256)fail("data-loss","Grant event binding is inconsistent.");
                 if(receipt.creditedToCharacter===true){
+                    verifyGrantReceiptIdentity({uid,grantId,operationId,
+                        currentRevision:envelope.serverRevision,grant,receipt,fail});
                     const [claim,claimRecord]=await Promise.all([
                         transaction.get(privateRef.collection("uniqueClaims").doc(grantId)),
                         transaction.get(privateRef.collection("claimRecords").doc(grantId))
@@ -74,10 +62,9 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
                         currentServerRevision:envelope.serverRevision,unchanged:true,
                         creditedToCharacter:true,creditRevision:receipt.creditRevision};
                 }
-                if(receipt.creditedToCharacter!==false||grant.status!=="reserved"||
-                   ledgerSnapshot.exists){
-                    fail("data-loss","Grant reservation receipt is inconsistent.");
-                }
+                await verifyReservedGrant({tx:transaction,root:privateRef,uid,grantId,operationId,
+                    currentRevision:envelope.serverRevision,grant,receipt,
+                    ledgerExists:ledgerSnapshot.exists,otherOperationExists:operationSnapshot.exists,fail});
                 return {grantId,operationId,serverRevision:receipt.serverRevision,
                     currentServerRevision:envelope.serverRevision,unchanged:true,creditedToCharacter:false};
             }
