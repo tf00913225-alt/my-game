@@ -143,7 +143,7 @@
         const actual=await digest(buffer);
         if(!actual.startsWith(String(resource.sha256||""))){ throw new Error(`${resource.path} SHA-256 verification failed.`); }
         if(resource.decode){ await decodeImage(buffer,response.headers.get("content-type"),resource.path); }
-        warmResource(resource);
+        record&&warmResource(resource);
         if(resource.bytes&&accounted<resource.bytes){
             state.loadedBytes+=resource.bytes-accounted;
             accounted=resource.bytes;
