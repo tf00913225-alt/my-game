@@ -220,3 +220,10 @@ assert.match(css,/--battle-portrait-visible-height:101\.55px;/,"six-slot normal 
 assert.match(css,/--battle-portrait-visible-height:105\.27px;/,"elite art preserves its larger class height");
 
 assert.match(fs.readFileSync("index.html","utf8"), /id="battleActionRegion"[\s\S]*?id="battleElementBoxButton"[\s\S]*?id="turnTargetRow"/,"element box shares the formal operation reserve");
+
+// Ordinary HUD typography is owned by Fixed Slot; historical identity rules
+// remain scoped to the separate Boss card contract.
+assert.doesNotMatch(fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8"), /#battlePage \.battle-monster-name\.v143-monster-identity\{/);
+assert.doesNotMatch(fs.readFileSync("css/45-v152-dev-fixes.css","utf8"), /#battlePage \.battle-monster-name\.v143-monster-identity\{/);
+assert.match(css,/--battle-name-row-height:16px;/);
+assert.match(css,/--battle-art-hud-reserve:40px;/);

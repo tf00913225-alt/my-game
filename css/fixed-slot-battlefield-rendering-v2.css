@@ -29,8 +29,8 @@
     --battle-ally-inline-padding:4px;
     --battle-art-overhang-x:5px;
     --battle-art-overhang-top:6px;
-    --battle-art-hud-reserve:39px;
-    --battle-name-row-height:14px;
+    --battle-art-hud-reserve:40px;
+    --battle-name-row-height:16px;
     --battle-resource-bar-height:11px;
     --battle-enemy-safe-top:12px;
     --battle-item-menu-top-offset:116px;
@@ -100,7 +100,7 @@
     position:absolute;
     top:0;
     left:8px;
-    width:100%;
+    width:max-content;
     height:20px !important;
     min-height:20px !important;
     max-height:20px !important;
@@ -385,7 +385,8 @@
     pointer-events:none !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player > .v174-battle-art{
-    --battle-art-hud-reserve:36px;
+    --battle-art-hud-reserve:40px;
+    --battle-art-overhang-top:10px;
 }
 /* Offline alpha bounds are consumed by V174. The full canvas is painted once,
    preserving aspect and every nontransparent pixel; no runtime pixel scan. */
@@ -441,7 +442,7 @@
 .v174-battle-hud-layer{position:fixed;inset:0;z-index:16015;pointer-events:none;}
 .v174-unit-hud{
     position:absolute;inset:0;transform-origin:0 0;pointer-events:none;
-    --battle-name-row-height:14px;
+    --battle-name-row-height:16px;
     --battle-resource-bar-height:11px;
     color:#f4ead4;font-family:"Noto Sans TC",sans-serif;
 }
@@ -477,7 +478,7 @@
     align-items:center !important;
     justify-content:center !important;
     padding:0 2px !important;
-    font-size:11px !important;
+    font-size:16px !important;
     line-height:var(--battle-name-row-height) !important;
     z-index:24 !important;
 }
@@ -485,7 +486,7 @@
     bottom:0 !important;
     height:var(--battle-name-row-height) !important;
     line-height:var(--battle-name-row-height) !important;
-    font-size:12px !important;
+    font-size:16px !important;
     z-index:20 !important;
     display:flex !important;
     align-items:center !important;
@@ -517,7 +518,9 @@
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .hp-bar-text,
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .sp-bar-text{
     height:var(--battle-resource-bar-height) !important;
-    font-size:9px !important;
+    font-size:13px !important;
+    letter-spacing:normal;
+    font-weight:900;
     line-height:var(--battle-resource-bar-height) !important;
 }
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud:not([data-boss="true"]) .monster-status-badges{

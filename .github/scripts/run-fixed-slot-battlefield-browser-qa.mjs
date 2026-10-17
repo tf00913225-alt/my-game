@@ -44,6 +44,7 @@ const feedbackSource=read("js/battle-floating-feedback-owner.js").replace(/<\/sc
 const feedbackCss=read("css/battle-floating-feedback-owner.css").replace(/<\/style/gi,"<\\/style");
 const mainCssSource=read("css/00-main.css");
 const commandGeometryCss=[
+    mainCssSource.match(/#battlePage \.battle-element-box-button\{[\s\S]*?\n\}/)?.[0],
     mainCssSource.match(/#battlePage\{\s*--battle-command-row-height:[\s\S]*?\n\}/)?.[0],
     mainCssSource.match(/#mainBattleMenu\{[\s\S]*?\n\}/)?.[0],
     mainCssSource.match(/#mainBattleMenu::before\{[\s\S]*?\n\}/)?.[0]
@@ -78,11 +79,10 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120e09;col
 <style id="v174-cardless-battle-style">#battlePage .v174-battle-art{inset:999px!important}#battlePage .battle-wrap{overflow:hidden!important}</style>
 <style>${commandGeometryCss}</style><style>${identityCss}</style><style>${v154Css}</style><style>${geometryCss}</style><style>${bossCss}</style><style>${feedbackCss}</style></head><body>
 <div id="game-stage"><div id="app"><div id="game-content"><section id="battlePage" class="v-fixed-slot-render-v2"><div class="battle-wrap">
-<section class="battle-enemy-region"><div class="battle-title">戰鬥</div><div id="battleMonsterArea" class="battle-monsters v131-formation"></div></section>
-<section class="battle-center-region"><div class="battle-middle"><div id="battleActionRegion" class="v-fixed-action-zone" style="position:relative;display:flex;flex-direction:column;gap:4px"><div id="turnTargetRow" class="turn-target-row">第 1 回合</div><div id="battleTargetPrompt" class="battle-target-prompt"><div class="battle-target-prompt-copy"><div class="battle-target-prompt-action">選擇［怒火］的我方目標</div><div class="battle-target-prompt-hint">選擇目標</div></div><button class="battle-target-back">返回</button></div><div id="battleCommandRow" style="display:flex;gap:5px;flex:0 0 66px;position:relative"><div id="mainBattleMenu" class="battle-menu" style="flex:1">操作區</div></div></div></div></section>
+<section class="battle-enemy-region"><div id="battleMonsterArea" class="battle-monsters v131-formation"></div></section>
+<section class="battle-center-region"><div class="battle-middle"><div id="battleActionRegion" class="v-fixed-action-zone" style="position:relative;display:flex;flex-direction:column;gap:4px"><div class="battle-title">戰鬥</div><div id="battleTurnIndicator">第 1 回合</div><button id="battleElementBoxButton" class="battle-element-box-button" type="button">元素匣</button><div id="turnTargetRow" class="turn-target-row">第 1 回合</div><div id="battleTargetPrompt" class="battle-target-prompt"><div class="battle-target-prompt-copy"><div class="battle-target-prompt-action">選擇［怒火］的我方目標</div><div class="battle-target-prompt-hint">選擇目標</div></div><button class="battle-target-back">返回</button></div><div id="battleCommandRow" style="display:flex;gap:5px;flex:0 0 66px;position:relative"><div id="mainBattleMenu" class="battle-menu" style="flex:1">操作區</div></div></div></div></section>
 <section class="battle-ally-region"><div id="battlePlayerRow" class="battle-player-row"></div></section>
-<div id="battleTurnIndicator">第 1 回合</div>
-</div><button class="battle-element-box-button" type="button">元素匣</button></section></div></div></div><pre id="result" hidden></pre>
+</div></section></div></div></div><pre id="result" hidden></pre>
 <script>
 window.__allyIndexes=[0,1,2];
 window.getExistingPartyIndexes=function(){return window.__allyIndexes.slice();};
