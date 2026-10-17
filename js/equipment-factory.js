@@ -121,6 +121,26 @@
         seen.forEach(migrateItem);
         return [...seen];
     }
+    function validateOwnership(inventory,equipment){
+        const seen=new Map(),elementAliases=new Set();
+        const claim=(item,owner)=>{
+            if(!item||!TYPES.has(item.type))return;
+            if(!validUid(item.v141Uid))throw Error('裝備實例缺少有效 UID，保留原資料');
+            if(seen.has(item.v141Uid))throw Error('同一件裝備不能同時位於背包或多個穿戴位置，保留原資料');
+            seen.set(item.v141Uid,owner);
+        };
+        inventory.forEach(item=>claim(item,'bag'));
+        Object.entries(equipment||{}).forEach(([owner,slots])=>{
+            // Main elemental aliases survive JSON round trips as distinct maps.
+            // Hero and additional-player owners never participate in this alias.
+            if(['fire','water','wind'].includes(owner)){
+                const signature=JSON.stringify(Object.entries(slots||{}).sort(([a],[b])=>a.localeCompare(b)).map(([slot,item])=>[slot,item?.v141Uid||null]));
+                if(elementAliases.has(signature))return;elementAliases.add(signature);
+            }
+            Object.values(slots||{}).forEach(item=>claim(item,owner));
+        });
+        return true;
+    }
     function uniqueNames(items){const names=new Set();for(const item of items){let attempt=0;while(names.has(item.name)&&attempt<PREFIXES.length){item.name=nameFor(item,++attempt);}names.add(item.name);}return items;}
-    return Object.freeze({create,starter,migrateItem,migrateGraph,prices,validUid,validName,uniqueNames,hash,STARTERS,STAT_PRICE_WEIGHT,SLOT_PRICE_WEIGHT});
+    return Object.freeze({create,starter,migrateItem,migrateGraph,validateOwnership,prices,validUid,validName,uniqueNames,hash,STARTERS,STAT_PRICE_WEIGHT,SLOT_PRICE_WEIGHT});
 });

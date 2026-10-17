@@ -7723,6 +7723,7 @@
         const definition=typeof getPotionDefinition==="function"?getPotionDefinition(item.id):null;
         const character=typeof getBackpackCharacter==="function"?getBackpackCharacter(inventoryCharacterIndex):null;
         const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(inventoryCharacterIndex):null;
+        if(character?.combatantKind==="heroNpc"){return {used:0,message:"英雄僅能在背包管理裝備。"};}
         if(!definition||!character||!stats){ return {used:0,message:"目前無法使用這項補品。"}; }
         const resource=definition.resource;
         const maxValue=resource==="hp"?Number(stats.maxHP):Number(stats.maxSP);
@@ -8244,7 +8245,7 @@ const SLOT_LABEL={head:"頭部",hand:"武器",shoulder:"護腕",armor:"衣服",s
 const COMPARE_STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",energy:"能量",defensePoints:"防禦",accuracy:"命中",evasion:"閃避",antiCrit:"抗暴",statusAccuracy:"異常命中",statusResistance:"異常抗性"};
 function esc(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
 function slot(t){const key=String(t||"").toLowerCase();return SLOT_ALIAS[key]||key}
-function equippedFor(i){if(!i||typeof characterEquipment==="undefined")return null;let k=null;try{k=typeof getBackpackEquipmentKey==="function"?getBackpackEquipmentKey(typeof inventoryCharacterIndex!=="undefined"?inventoryCharacterIndex:0):null}catch(_){}if(!k)return null;const slots=characterEquipment[k]||{},target=slot(i.type),keys=SLOT_STORAGE_ALIASES[target]||[target];for(const key of keys){if(slots[key])return slots[key]}return null;}
+function equippedFor(i){if(!i||typeof characterEquipment==="undefined")return null;let k=null;try{k=getEquipmentSelection()?.key||(typeof getBackpackEquipmentKey==="function"?getBackpackEquipmentKey(typeof inventoryCharacterIndex!=="undefined"?inventoryCharacterIndex:0):null)}catch(_){}if(!k)return null;const slots=characterEquipment[k]||{},target=slot(i.type),keys=SLOT_STORAGE_ALIASES[target]||[target];for(const key of keys){if(slots[key])return slots[key]}return null;}
 function itemArt(i){if(!i)return "";const icon=i.assetPath?'<span class="v169-item-art v169-equipment-art"><img src="'+esc(i.assetPath)+'" alt="" draggable="false" decoding="async"></span>':i.icon;return window.FourSymbolsItemSlot.art(icon,i)}
 function compareStats(i){if(!i)return '<div class="v17351-compare-empty">未穿戴此部位裝備</div>';const all=Object.assign({},i.stats||{});Object.entries(window.FourSymbolsEquipmentReforge.aggregate(i)).forEach(([k,v])=>all[k]=num(all[k])+num(v));const rows=Object.entries(all).filter(([,v])=>num(v)!==0).map(([k,v])=>'<div class="v17351-compare-stat"><span>'+esc(COMPARE_STAT_LABEL[k]||k)+'</span><b>'+(num(v)>0?"+":"")+num(v)+(["accuracy","evasion"].includes(k)?"%":"")+'</b></div>');return rows.length?rows.join(""):'<div class="v17351-compare-empty">無額外能力</div>'}
 function saveRefresh(){if(typeof rebuildInventorySlots==="function")rebuildInventorySlots();if(typeof renderInventoryItems==="function")renderInventoryItems();if(typeof renderInventory==="function")renderInventory();if(typeof updateUI==="function")updateUI();if(typeof saveGame==="function")saveGame();}

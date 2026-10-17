@@ -10,6 +10,7 @@ const plain=value=>JSON.parse(JSON.stringify(value));
 function runtime(hostname='production.invalid'){
  const alerts=[],ctx={location:{hostname},FourSymbolsHeroCore:core,player:{id:'p1',level:40},player2:{id:'p2',level:18},player3:null,battleActive:false,
   skillDatabase:{phoenixCry:{name:'火鳳天鳴',description:'全體燃燒'},windHowlLightning:{name:'風哮電擊',description:'單體法術'}},
+  getEquipmentBonus:()=>({}),renderHeroEquipment:()=>'',
   calculateCharacterBaseStats:()=>({maxHP:999,maxSP:555,attack:101,magicAttack:202,defense:303,speed:44}),
   STAT_NAMES:{attack:'攻擊',intelligence:'智力',vitality:'體質',energy:'能量',defensePoints:'防禦',agility:'敏捷'},elementDatabase:{fire:{name:'火'},wind:{name:'風'}},
   getCharacterBattleArtworkPath:actor=>actor.combatantKind==='heroNpc'?'/'+actor.heroId+'.webp':'',

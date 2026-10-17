@@ -55,7 +55,7 @@ try{
  const loads=new Set();c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Page.lifecycleEvent'&&m.params.name==='load')loads.add(m.params.loaderId);});
  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')+`;window.__heroQaOwned=${JSON.stringify(ids)};window.__heroQaErrors=[];addEventListener('error',e=>{if(e.message)window.__heroQaErrors.push(e.message)});`});
  async function waitReady(){await c.eval(`(async()=>{const end=Date.now()+45000;while(Date.now()<end&&!(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')))await new Promise(r=>setTimeout(r,50));if(FourSymbolsStartupPolicy.getState()!=='READY')throw Error('startup not READY');await FourSymbolsHeroAcquisition.sync();await FourSymbolsHeroGrowth.read();await FourSymbolsTeamFormation.read();showPage('home');return true;})()`);}
- async function point(selector){return c.eval(`(async()=>{const query=${JSON.stringify(selector)},root=query.startsWith('[data-')?document.querySelector('.v-fixed-formation-panel'):document;let n=root?.querySelector(query);if(!n||n.disabled)throw Error('unavailable '+query);if(!n.closest('.v-fixed-formation-panel'))n.scrollIntoView({block:'nearest'});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));n=(query.startsWith('[data-')?document.querySelector('.v-fixed-formation-panel'):document)?.querySelector(query);if(!n?.isConnected)throw Error('formation/control detached during synchronization');const b=n.getBoundingClientRect(),x=b.left+b.width/2,y=b.top+b.height/2,h=document.elementFromPoint(x,y);if(!(h===n||n.contains(h)))throw Error('occluded '+query+' '+JSON.stringify({box:b.toJSON(),hit:h?.outerHTML.slice(0,250)}));return {x,y};})()`);}
+ async function point(selector){return c.eval(`(async()=>{const query=${JSON.stringify(selector)},root=query.startsWith('[data-')?document.querySelector('.v-fixed-formation-panel'):document;let n=root?.querySelector(query);if(!n||n.disabled)throw Error('unavailable '+query);if(!n.closest('.v-fixed-formation-panel'))n.scrollIntoView({block:'center',behavior:'instant'});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));n=(query.startsWith('[data-')?document.querySelector('.v-fixed-formation-panel'):document)?.querySelector(query);if(!n?.isConnected)throw Error('formation/control detached during synchronization');const b=n.getBoundingClientRect(),x=b.left+b.width/2,y=b.top+b.height/2,h=document.elementFromPoint(x,y);if(!(h===n||n.contains(h)))throw Error('occluded '+query+' '+JSON.stringify({box:b.toJSON(),hit:h?.outerHTML.slice(0,250)}));return {x,y};})()`);}
  let mobile=true;
  async function press(p){if(mobile)await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[p]});else await c.send('Input.dispatchMouseEvent',{type:'mousePressed',...p,button:'left',clickCount:1});}
  async function release(p){if(mobile)await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});else await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',...p,button:'left',clickCount:1});}
@@ -81,6 +81,30 @@ try{
   const geo=await c.eval(`(()=>{const b=document.querySelector('.hero-panel').getBoundingClientRect(),n=document.getElementById('heroPageContent');return {box:b.toJSON(),overflow:n.scrollWidth-n.clientWidth,minFont:Math.min(...Array.from(document.querySelectorAll('.hero-page-shell p,.hero-page-shell small,.hero-page-shell button'),n=>parseFloat(getComputedStyle(n).fontSize)))};})()`);
   assert.ok(geo.box.left>=0&&geo.box.right<=width+1&&geo.box.top>=0&&geo.box.bottom<=height+1&&geo.overflow<=1,JSON.stringify(geo));assert.ok(geo.minFont>=13);
   await screenshot('hero-details-'+width);
+  // The actual shared detail, comparison and equip button must remain usable
+  // above the Hero page. No direct calls to the transfer Owner here.
+  const gear=await c.eval(`(()=>{let item=inventoryItems.find(i=>i.type==='weapon');if(!item){item=FourSymbolsEquipmentFactory.starter('ironSword');inventoryItems.push(item);saveGame();refreshHeroPage(true);}return {uid:item.v141Uid,heroAttack:getHeroPageSnapshot().heroes[0].stats.attack};})()`);
+  await tap('.hero-equipment-bag [data-uid="'+gear.uid+'"]');
+  assert.equal(await c.eval(`getEquipmentSelection().heroId`),ids[0]);
+  await tap('#itemEquipButton');
+  assert.equal(await c.eval(`characterEquipment['heroNpc:divineDogHongbao'].hand?.v141Uid`),gear.uid);
+  assert.equal(await c.eval(`inventoryItems.some(i=>i.v141Uid===${JSON.stringify(gear.uid)})`),false);
+  assert.ok(await c.eval(`getHeroPageSnapshot().heroes[0].stats.attack`)>gear.heroAttack);
+  assert.equal(await c.eval(`FourSymbolsEquipmentFactory.validateOwnership(inventoryItems,characterEquipment)`),true);
+  await screenshot('hero-equipment-'+width);
+  if(width===360){
+   // Exercise the actual saved-byte reader/hydration Owner in the admitted UID
+   // session. Reloading a dirty QA account is intentionally blocked by the
+   // independent historical Cloud admission Gate; never weaken that Gate.
+   assert.equal(await c.eval(`(()=>{const saved=FourSymbolsAccountSave.readForUid(${JSON.stringify(uid)}).save;characterEquipment['heroNpc:divineDogHongbao'].hand=null;return loadGame(saved);})()`),true);
+   assert.equal(await c.eval(`characterEquipment['heroNpc:divineDogHongbao'].hand?.v141Uid`),gear.uid,'same UID hydrate restores the physical Hero loadout');
+   assert.equal(await c.eval(`FourSymbolsEquipmentFactory.validateOwnership(inventoryItems,characterEquipment)`),true);
+   await c.eval(`openHomeFeature('hero');selectHeroPage('divineDogHongbao');true`);await pause();
+  }
+  await tap('.hero-equipment-slots [data-slot="hand"]');await tap('#itemEquipButton');
+  assert.equal(await c.eval(`characterEquipment['heroNpc:divineDogHongbao'].hand`),null);
+  assert.equal(await c.eval(`inventoryItems.some(i=>i.v141Uid===${JSON.stringify(gear.uid)})`),true);
+
   if(width===360){
    await c.eval(`FourSymbolsHeroGrowth.read()`);await tap('[onclick*="HeroGrowth.mutate"][onclick*="starUp"]');assert.equal(await c.eval(`FourSymbolsHeroGrowth.getAccount().heroes.divineDogHongbao.stars`),1);
    await c.eval(`FourSymbolsTeamFormation.read()`);
@@ -130,7 +154,15 @@ try{
   await tap(`[onclick="returnFromFormation()"]`);assert.equal(await c.eval(`!!document.querySelector('.hero-card-grid')`),true);
   await c.eval(`closeHomeFeature();true`);await tap('.v-fixed-formation-entry');assert.equal(await c.eval(`!!document.querySelector('.formation-battlefield')`),true);
   assert.equal(await c.eval(`battleActive`),false,'preview must not start battle');
-  await c.eval(`closeHomeFeature();true`);assert.deepEqual(await c.eval(`window.__heroQaErrors`),[]);
+  await c.eval(`closeHomeFeature();showPage('inventory');selectInventoryCharacter(3);true`);await pause();
+  const backpack=await c.eval(`(()=>{const character=getBackpackCharacter(inventoryCharacterIndex),img=document.querySelector('.v131-inventory-portrait');return {kind:character?.combatantKind,id:character?.heroId,key:getBackpackEquipmentKey(inventoryCharacterIndex),src:img?.getAttribute('src'),count:getBackpackPartyCharacters().filter(Boolean).length};})()`);
+  assert.equal(backpack.kind,'heroNpc');assert.equal(backpack.key,'heroNpc:'+backpack.id);assert.match(backpack.src,/assets\/heroes\/.*\.webp/);assert.equal(backpack.count,3);
+  const backpackGear=await c.eval(`(()=>{let item=inventoryItems.find(i=>i.type==='weapon');if(!item){item=FourSymbolsEquipmentFactory.starter('ironSword');inventoryItems.push(item);saveGame();renderInventory();}return {uid:item.v141Uid,index:getFilteredInventoryItems().indexOf(item)};})()`);
+  await tap('#inventoryGrid .inventory-item:nth-child('+(backpackGear.index+1)+')');await tap('#itemEquipButton');
+  assert.equal(await c.eval(`characterEquipment[getBackpackEquipmentKey(inventoryCharacterIndex)].hand?.v141Uid`),backpackGear.uid);
+  await tap('#equipmentGrid .inventory-equipment-cell:nth-child(2) .inventory-equipment-slot');await tap('#itemEquipButton');
+  assert.equal(await c.eval(`characterEquipment[getBackpackEquipmentKey(inventoryCharacterIndex)].hand`),null);
+  await c.eval(`showPage('home');closeHomeFeature();true`);assert.deepEqual(await c.eval(`window.__heroQaErrors`),[]);
   evidence.push({width,height,grid,geo,fgeo,actualPointerInput:true,saveReload:true,swapRemove:true,sharedEntrances:true});console.log(`PASS Hero V2 ${width}x${height}`);
  }
  fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:process.env.DEV_BASE_URL?'deployed-bytes-isolated-transport':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),evidence},null,2)+'\n');

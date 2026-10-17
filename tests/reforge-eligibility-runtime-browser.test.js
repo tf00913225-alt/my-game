@@ -26,6 +26,7 @@ var inventoryItems=[],inventorySlots=Array(120).fill(null),characterEquipment={}
 let activeUid='fixture';window.FourSymbolsAccountSave={accountKey:k=>'fixture:'+k,readActive:()=>({status:'ready',uid:activeUid,metadata:{ownerUid:activeUid,cloudBaseFingerprint:null,source:'local'}})};
 window.v132GetContentDefinitions=()=>({ores:[{id:'oreWhite',type:'material',name:'白階礦石',tierKey:'white'}],equipmentSetItems:[],equipmentSets:[],talismans:[],blueprints:[],tickets:[]});
 function $(id){return document.getElementById(id)}
+function captureEquipmentSelection(){} // Reforge fixture renders details without changing equipment owners.
 function isEquipmentInventoryType(t){return ['weapon','hand','head','shoulder','shoes','armor'].includes(t)}
 function getStatText(s){return Object.entries(s||{}).map(([k,v])=>'<div>'+k+' +'+v+'</div>').join('')}
 function rebuildInventorySlots(){inventorySlots.fill(null);inventoryItems.forEach((i,n)=>inventorySlots[n]=i)}

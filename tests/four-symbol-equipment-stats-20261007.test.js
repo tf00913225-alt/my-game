@@ -16,7 +16,7 @@ const ctx=vm.createContext({window:{FourSymbolsEquipmentReforge:require("../func
     getRelicDirectDamageMultiplier:()=>1,
     elementDatabase:{fire:{name:"火"},water:{name:"水"},earth:{name:"土"},wind:{name:"風"}},
     inventorySlots:[],selectedInventorySlot:0,inventoryCharacterIndex:0,
-    getBackpackCharacter:()=>ctx.actor,document:{getElementById:()=>({dataset:{}})},
+    getBackpackCharacter:()=>ctx.actor,getEquipmentSelection:()=>({item:ctx.inventorySlots[ctx.selectedInventorySlot],character:ctx.actor}),document:{getElementById:()=>({dataset:{}})},
     alert:message=>ctx.alerts.push(message),alerts:[],equipSelectedItem:()=>{ctx.equipped++;},equipped:0
 });
 vm.runInContext(between(expansion,"    const EQUIPMENT_SET_PIECES=","    function getEquipmentSetItemDefinitions("),ctx);
