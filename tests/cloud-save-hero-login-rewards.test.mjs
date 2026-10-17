@@ -105,6 +105,7 @@ test('real client keeps fixed milestone intent after lost response, blocks other
     c.window=c;vm.createContext(c);vm.runInContext(fs.readFileSync('js/hero-growth-client.js','utf8'),c);
     const api=c.FourSymbolsHeroGrowth;await api.read();await api.claimLoginReward(3);
     assert.equal(api.getStatus().pending.milestoneDay,3);
+    assert.match(api.getStatus().error,/不會重複發放/);
     await api.claimLoginReward(7);assert.equal(calls.length,1);
     await api.retry();assert.deepEqual(calls[0],calls[1]);assert.equal(api.getStatus().pending,null);
     assert.equal(api.getStatus().loginRewards[0].claimed,true);

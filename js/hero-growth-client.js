@@ -69,7 +69,7 @@
                     d.rerollHeroAllocation(heroId,seed,dev.pills);
                 dev={account:next,pills:dev.pills-(action==="reroll"?1:0),revision:dev.revision+1};error=null;
             }else{
-                if(!ready())throw Error("需連線才能確認扣除結果。");
+                if(!ready())throw Error(reward?"需連線才能確認領取結果。":"需連線才能確認扣除結果。");
                 if(!pending){
                     if(!proof||proof.ownerUid!==owner)throw Error("請先同步成長紀錄。");
                     pending=reward?{operationId:"hero-login-reward-v1-day"+heroId,
@@ -86,8 +86,9 @@
                 const code=String(problem.code||"");
                 if(/data-loss|permission-denied|unauthenticated|SESSION_/.test(code)){proof=null;}
                 if(/aborted|failed-precondition|invalid-argument/.test(code)){pending=null;proof=null;}
-                error=pending?"操作結果尚未確認；請重試同一操作，系統不會重複扣除。":
-                    "資源不足或紀錄尚未就緒，請同步後再試。";
+                error=pending?(reward?"領取結果尚未確認；請重試同一獎勵，系統不會重複發放。":
+                    "操作結果尚未確認；請重試同一操作，系統不會重複扣除。"):
+                    reward?"獎勵資格或伺服器角色資料尚未就緒，請同步後再試。":"資源不足或紀錄尚未就緒，請同步後再試。";
             }
         }finally{if(token===generation){busy=false;notify();}}
     }
