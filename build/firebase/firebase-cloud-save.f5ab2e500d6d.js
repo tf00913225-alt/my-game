@@ -105,6 +105,9 @@ export async function bootstrapTrustedCloudSave(){
 export async function readHeroAcquisition(){
     return callTrustedFunction("readHeroAcquisition",{});
 }
+export async function claimHeroLoginReward({operationId,expectedRevision,milestoneDay}){
+    return callTrustedFunction("claimHeroLoginReward",{operationId,expectedRevision,milestoneDay});
+}
 export async function readHeroGrowth(){return callTrustedFunction("readHeroGrowth",{});}
 export async function mutateHeroGrowth({operationId,expectedRevision,heroId,action}){
     return callTrustedFunction("mutateHeroGrowth",{operationId,expectedRevision,heroId,action});

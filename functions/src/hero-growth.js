@@ -7,7 +7,7 @@ const {createRecoveryArchive,inspectRecoveryArchive}=require("./canonical-recove
 const {source,readOwnedSources,advanceOwnedRecords}=require("./canonical-owned-sources");
 
 // Existing progress/current playableState.heroAccount and inventory remain the
-// only growth/resource sources. No resource minting or legacy adoption endpoint.
+// only growth/resource sources. Only the two approved login milestones issue resources.
 function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExistingEnvelope,
     nextRevision,acquisition,seed=()=>randomBytes(4).readUInt32BE()||1}){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
@@ -20,6 +20,66 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
             if(!Number.isSafeInteger(count)){fail("data-loss","Invalid resource total.");}
             return count;
         },0);
+    const loginPolicies=Object.freeze([
+        Object.freeze({day:3,heroId:"divineDogHongbao",fragments:25,marrowPills:1}),
+        Object.freeze({day:7,heroId:"vajraHeavenlyKing",fragments:25,marrowPills:1})]);
+    const rewardId=day=>"hero-login-reward-v1-day"+day;
+    async function loginRewards(tx,c){
+        const rows=[];
+        for(const policy of loginPolicies){
+            const id=rewardId(policy.day);
+            const [op,ledger,claim]=await Promise.all(["operations","ledgerEntries","uniqueClaims"]
+                .map(name=>tx.get(c.root.collection(name).doc(id))));
+            if(op.exists||ledger.exists||claim.exists){
+                if(!op.exists||!ledger.exists||!claim.exists||!op.data().createdAt||
+                   !ledger.data().createdAt||!claim.data().createdAt||
+                   digest(audit(op.data()))!==digest(audit(ledger.data()))||
+                   digest(audit(op.data()))!==digest(audit(claim.data()))){
+                    fail("data-loss","Login reward evidence missing or inconsistent.");
+                }
+                const receipt=audit(op.data());
+                await verifyLoginReward(tx,c,policy,receipt);
+            }
+            rows.push({...policy,eligible:(c.loginEvidence?.loginCount||0)>=policy.day,claimed:op.exists});
+        }
+        return rows;
+    }
+    async function verifyLoginReward(tx,c,policy,r){
+        const id=rewardId(policy.day),proof=r.loginEvidence;
+        if(r.kind!=="hero-login-reward"||r.schemaVersion!==1||r.ownerUid!==c.uid||
+           r.intent?.operationId!==id||r.intent?.milestoneDay!==policy.day||
+           !Number.isSafeInteger(r.intent.expectedRevision)||r.intent.expectedRevision<1||
+           !Number.isSafeInteger(r.sourceRevision)||r.sourceRevision<1||
+           r.sourceRevision>r.intent.expectedRevision||r.serverRevision!==r.intent.expectedRevision+1||
+           r.serverRevision>c.envelope.serverRevision||!proof||
+           !Number.isSafeInteger(proof.serverRevision)||proof.serverRevision>r.intent.expectedRevision||
+           !Number.isSafeInteger(proof.loginCount)||proof.loginCount<policy.day||proof.loginCount>7||
+           r.fragmentDelta!==policy.fragments||r.marrowPillDelta!==policy.marrowPills){
+            fail("data-loss","Login reward receipt is invalid.");
+        }
+        const [prior,priorArchive,next,nextArchive,history]=await Promise.all([
+            tx.get(c.root.collection("playableSnapshots").doc(String(r.sourceRevision))),
+            tx.get(c.root.collection("recoveryArchives").doc(String(r.sourceRevision))),
+            tx.get(c.root.collection("playableSnapshots").doc(String(r.serverRevision))),
+            tx.get(c.root.collection("recoveryArchives").doc(String(r.serverRevision))),
+            tx.get(c.root.collection("heroAcquisitionHistory").doc(String(proof.serverRevision)))]);
+        try{
+            if(!prior.exists||!priorArchive.exists||!next.exists||!nextArchive.exists||!history.exists||
+               !history.data().createdAt||prior.data().sha256!==r.sourceSnapshotSha256||
+               next.data().sha256!==r.snapshotSha256){throw Error("missing");}
+            const {sha256,...login}=audit(history.data());
+            if(sha256!==proof.sha256||digest(login)!==sha256||login.ownerUid!==c.uid||
+               login.serverRevision!==proof.serverRevision||login.loginCount!==proof.loginCount){throw Error("login");}
+            const before=inspectRecoveryArchive(priorArchive.data(),c.uid,r.sourceRevision,prior.data());
+            const after=inspectRecoveryArchive(nextArchive.data(),c.uid,r.serverRevision,next.data());
+            const balances=records=>({specificFragments:records.progress.playableState.heroAccount.heroes[policy.heroId].specificFragments,
+                marrowPills:pillCount(records)});
+            if(digest(balances(before))!==digest(r.beforeResources)||digest(balances(after))!==digest(r.afterResources)||
+               r.afterResources.specificFragments-r.beforeResources.specificFragments!==policy.fragments||
+               r.afterResources.marrowPills-r.beforeResources.marrowPills!==policy.marrowPills||
+               digest(after.progress.playableState.heroAccount)!==r.heroAccountSha256){throw Error("delta");}
+        }catch(_){fail("data-loss","Original login reward source/archive is incomplete.");}
+    }
     async function context(tx,session){
         const uid=session.uid,root=db.collection("serverUsers").doc(uid);
         const rights=await acquisition.readInTransaction(tx,session);
@@ -58,12 +118,14 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
         for(const [id,grant] of Object.entries(rights.entitlements)){
             if(!account.heroes[id].unlocked){account=domain(account).unlockHeroDirect(id,grant.allocationSeed);}
         }
-        return {uid,root,refs,owned,records,characterRefs,envelope,account,
-            sourceSnapshotSha256:snapshot.data().sha256};
+        const c={uid,root,refs,owned,records,characterRefs,envelope,account,
+            loginEvidence:rights.loginEvidence,sourceSnapshotSha256:snapshot.data().sha256};
+        c.loginRewards=await loginRewards(tx,c);
+        return c;
     }
     function view(c,unchanged=true){return {schemaVersion:1,ownerUid:c.uid,
         serverRevision:c.envelope.serverRevision,heroAccount:c.account,
-        marrowPills:pillCount(c.records),unchanged,authoritativeStateReady:false};}
+        marrowPills:pillCount(c.records),loginRewards:c.loginRewards,unchanged,authoritativeStateReady:false};}
     async function read(request){
         if(keys(request.data)!=="session|uid"){fail("invalid-argument","Only active identity/session accepted.");}
         return runProtected(request,async(tx,session)=>view(await context(tx,session)));
@@ -135,6 +197,12 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
                 if(item.state.count===1){removed.add(item.ownedItemId);owned.inventory=owned.inventory.filter(i=>i!==item);}
                 else{item.state={...item.state,count:item.state.count-1};}
             }
+            return commit(tx,c,{nextAccount,owned,removed,revision,before,pills,action,heroId,
+                kind:"hero-growth",intent,opRef,ledgerRef,claimRef});
+        });
+    }
+
+    async function commit(tx,c,{nextAccount,owned,removed,revision,before,pills,action,heroId,kind,intent,opRef,ledgerRef,claimRef}){
             const records={...c.records,...owned,
                 account:{...c.records.account,serverRevision:revision},
                 characters:c.records.characters.map(row=>({...row,serverRevision:revision})),
@@ -146,13 +214,14 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
             let bundle,archive;
             try{bundle=assembleCanonicalSnapshot(c.uid,revision,records);archive=createRecoveryArchive(c.uid,revision,records,bundle);}
             catch(_){fail("data-loss","Growth cannot form canonical recovery evidence.");}
-            const receipt={schemaVersion:1,ownerUid:c.uid,kind:"hero-growth",intent,serverRevision:revision,
+            const receipt={schemaVersion:1,ownerUid:c.uid,kind,intent,serverRevision:revision,
                 sourceRevision:c.records.account.serverRevision,sourceSnapshotSha256:c.sourceSnapshotSha256,
                 snapshotSha256:bundle.sha256,heroAccountSha256:digest(nextAccount),
                 beforeResources:{specificFragments:before.specificFragments,marrowPills:pills},
                 afterResources:{specificFragments:nextAccount.heroes[heroId].specificFragments,marrowPills:pillCount(records)},
                 fragmentDelta:nextAccount.heroes[heroId].specificFragments-before.specificFragments,
-                marrowPillDelta:action==="reroll"?-1:0};
+                marrowPillDelta:action==="reroll"?-1:action==="loginReward"?1:0,
+                ...(action==="loginReward"?{loginEvidence:c.loginEvidence}:{})};
             const stamp=FieldValue.serverTimestamp();
             for(const [key,ref] of Object.entries(c.refs)){
                 const row=key==="claimCheckpoints"?records.claimCheckpoint:records[key];
@@ -165,14 +234,56 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
                 const original=c.owned.records.inventory.find(i=>i.ownedItemId===ref.id);
                 tx.update(ref,original?{...ownedMap.get(ref.id),updatedAt:stamp}:{serverRevision:revision,updatedAt:stamp});
             }
+            for(const item of owned.inventory){
+                if(!c.records.inventory.some(old=>old.ownedItemId===item.ownedItemId)){
+                    tx.create(c.root.collection("inventory").doc(item.ownedItemId),{...item,createdAt:stamp,updatedAt:stamp});
+                }
+            }
             tx.create(c.root.collection("playableSnapshots").doc(String(revision)),{...bundle,createdAt:stamp});
             tx.create(c.root.collection("recoveryArchives").doc(String(revision)),{...archive,createdAt:stamp});
             tx.create(opRef,{...receipt,createdAt:stamp});tx.create(ledgerRef,{...receipt,createdAt:stamp});
-            if(action==="unlock"){tx.create(claimRef,{...receipt,createdAt:stamp});}
+            if(action==="unlock"||action==="loginReward"){tx.create(claimRef,{...receipt,createdAt:stamp});}
             tx.update(db.collection("users").doc(c.uid).collection("saves").doc("current"),{serverRevision:revision,updatedAt:stamp});
-            return {...view({...c,records,account:nextAccount,envelope:{...c.envelope,serverRevision:revision}},false),receipt};
+            const loginRewards=c.loginRewards.map(row=>action==="loginReward"&&row.day===intent.milestoneDay?{...row,claimed:true}:row);
+            return {...view({...c,records,account:nextAccount,loginRewards,envelope:{...c.envelope,serverRevision:revision}},false),receipt};
+    }
+    async function claimLoginReward(request){
+        const data=request.data||{},policy=loginPolicies.find(row=>row.day===data.milestoneDay);
+        if(keys(data)!=="expectedRevision|milestoneDay|operationId|session|uid"||!policy||
+           data.operationId!==rewardId(policy.day)||!Number.isSafeInteger(data.expectedRevision)||data.expectedRevision<1){
+            fail("invalid-argument","Only an approved milestone, its fixed operation ID and revision accepted.");
+        }
+        return runProtected(request,async(tx,session)=>{
+            const c=await context(tx,session),state=c.loginRewards.find(row=>row.day===policy.day);
+            const opRef=c.root.collection("operations").doc(data.operationId);
+            const ledgerRef=c.root.collection("ledgerEntries").doc(data.operationId);
+            const claimRef=c.root.collection("uniqueClaims").doc(data.operationId);
+            if(state.claimed){
+                const receipt=await tx.get(opRef);return {...view(c),receipt:audit(receipt.data())};
+            }
+            if(!state.eligible){fail("failed-precondition","Recorded server login milestone not reached.");}
+            if(c.envelope.serverRevision!==data.expectedRevision){fail("aborted","CLOUD_REVISION_CONFLICT");}
+            const heroId=policy.heroId,before=c.account.heroes[heroId],pills=pillCount(c.records);
+            let nextAccount;
+            try{nextAccount=domain(c.account).addSpecificFragments(heroId,policy.fragments);}
+            catch(_){fail("failed-precondition","Hero fragment capacity exceeded.");}
+            if(pills>=Number.MAX_SAFE_INTEGER){fail("failed-precondition","Marrow resource capacity exceeded.");}
+            const revision=nextRevision(c.envelope),owned=advanceOwnedRecords(c.records,revision);
+            const item=owned.inventory.filter(row=>row.location==="bag"&&row.state.id===Core.contract.rerollItem.id)
+                .sort((a,b)=>a.ownedItemId.localeCompare(b.ownedItemId,"en"))[0];
+            if(item){item.state={...item.state,count:item.state.count+policy.marrowPills};}
+            else{
+                if(c.owned.refs.length>=400){fail("failed-precondition","Owned source transaction budget exceeded.");}
+                const ownedItemId=data.operationId+"-marrow";
+                if(owned.inventory.some(row=>row.ownedItemId===ownedItemId)){fail("data-loss","Reward item identity conflict.");}
+                owned.inventory.push({schemaVersion:1,ownerUid:c.uid,serverRevision:revision,provenance:"server-created",
+                    ownedItemId,location:"bag",state:{id:Core.contract.rerollItem.id,type:"material",count:policy.marrowPills}});
+            }
+            const intent={operationId:data.operationId,expectedRevision:data.expectedRevision,milestoneDay:policy.day};
+            return commit(tx,c,{nextAccount,owned,removed:new Set(),revision,before,pills,action:"loginReward",heroId,
+                kind:"hero-login-reward",intent,opRef,ledgerRef,claimRef});
         });
     }
-    return Object.freeze({read,mutate,readInTransaction:context});
+    return Object.freeze({read,mutate,claimLoginReward,readInTransaction:context});
 }
 module.exports={createHeroGrowth};
