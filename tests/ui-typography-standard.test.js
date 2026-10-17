@@ -52,6 +52,7 @@ const qa = read(owners.qa);
 const relic = read(owners.relic);
 const gameplay = read(owners.gameplay);
 const docs = read('UI_GUIDELINES.md');
+assert.match(read('css/00-main.css'), /\.status-number\{[^}]*font-size:15px/, 'ability values use the same native UI length units as their labels');
 
 // Formal player-facing owners that should contain no sub-13px declarations.
 enforceNoTinyText(owners.elementBox);

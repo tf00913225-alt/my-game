@@ -40,6 +40,9 @@
     content:"";
     position:absolute;
     inset:0;
+    width:min(100%,56.25dvh);
+    height:min(100%,177.777778vw);
+    margin:auto;
     z-index:0;
     pointer-events:none;
     background:url("../assets/ui/startup-main-city.d43e67af1c1c.jpg") center/cover no-repeat;

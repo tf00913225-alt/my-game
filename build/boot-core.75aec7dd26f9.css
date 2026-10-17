@@ -3951,7 +3951,7 @@ button:active{
 .status-number{
     flex:1;
     text-align:center;
-    font-size:13px;
+    font-size:calc(15 * var(--ui-length-unit,1px));
     white-space:nowrap;
 }
 
@@ -7683,6 +7683,9 @@ body > #startupLoader.is-leaving{
 #startupLoader .startup-scene{
     position:absolute;
     inset:0;
+    width:min(100%,56.25dvh);
+    height:min(100%,177.777778vw);
+    margin:auto;
     overflow:hidden;
     opacity:0;
     transition:opacity 1.05s ease;
@@ -7782,7 +7785,7 @@ body > #startupLoader.is-leaving{
     right:auto;
     bottom:max(18px,env(safe-area-inset-bottom));
     z-index:4;
-    width:min(calc(100% - 28px),680px);
+    width:min(calc(100% - 28px),calc(56.25dvh - 28px),680px);
     min-height:0;
     box-sizing:border-box;
     padding:clamp(15px,4.4vw,30px) clamp(16px,5vw,34px) clamp(14px,4vw,26px);
@@ -7915,13 +7918,13 @@ body > #startupLoader.is-leaving{
 }
 
 @keyframes startupLogoBreath{
-    from{transform:scale(1);filter:brightness(.94) contrast(1.03);}
-    to{transform:scale(1.012);filter:brightness(1.08) contrast(1.06);}
+    from{filter:brightness(.94) contrast(1.03);}
+    to{filter:brightness(1.08) contrast(1.06);}
 }
 
 @keyframes startupCityDrift{
-    from{transform:scale(1.035);filter:brightness(.88) saturate(.92);}
-    to{transform:scale(1);filter:brightness(1) saturate(1);}
+    from{filter:brightness(.88) saturate(.92);}
+    to{filter:brightness(1) saturate(1);}
 }
 
 @keyframes startupEnterBlink{
@@ -7976,6 +7979,9 @@ body > #startupLoader.is-leaving{
     content:"";
     position:absolute;
     inset:0;
+    width:min(100%,56.25dvh);
+    height:min(100%,177.777778vw);
+    margin:auto;
     z-index:0;
     pointer-events:none;
     background:url("../assets/ui/startup-main-city.d43e67af1c1c.jpg") center/cover no-repeat;
