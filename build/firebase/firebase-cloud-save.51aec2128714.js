@@ -108,6 +108,9 @@ export async function readHeroAcquisition(){
 export async function claimHeroLoginReward({operationId,expectedRevision,milestoneDay}){
     return callTrustedFunction("claimHeroLoginReward",{operationId,expectedRevision,milestoneDay});
 }
+export async function claimHeroDailySupply({operationId,expectedRevision,periodDate}){
+    return callTrustedFunction("claimHeroDailySupply",{operationId,expectedRevision,periodDate});
+}
 export async function readHeroGrowth(){return callTrustedFunction("readHeroGrowth",{});}
 export async function mutateHeroGrowth({operationId,expectedRevision,heroId,action}){
     return callTrustedFunction("mutateHeroGrowth",{operationId,expectedRevision,heroId,action});

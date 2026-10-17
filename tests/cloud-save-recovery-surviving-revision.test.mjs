@@ -88,6 +88,63 @@ async function refused(h){
     await assert.rejects(h.recovery.restoreCurrent({},intent),e=>e.code==="data-loss");
     assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
 }
+const reservedId="retained-reservation-0001",reservedGrant="retained-reserved-grant-0001";
+function addReservation(h){
+    const stamp={toMillis:()=>1};
+    h.data.set(`${root}/pendingGrants/${reservedGrant}`,{schemaVersion:1,ownerUid:uid,
+        source:"server-event",kind:"exp",amount:30,status:"reserved",
+        claimedByOperationId:reservedId,createdAt:stamp});
+    h.data.set(`${root}/grantOperations/${reservedId}`,{schemaVersion:1,ownerUid:uid,
+        grantId:reservedGrant,operationId:reservedId,kind:"exp",amount:30,
+        serverRevision:5,creditedToCharacter:false,createdAt:stamp});
+}
+test("receipt inventory detects an extra credited operation even when its unique claim is lost",async()=>{
+    for(const grant of [grantId,"later-orphaned-grant-0001"]){
+        const h=fixture();for(const path of h.current.keys())h.data.delete(path);
+        h.data.set(`${root}/grantOperations/later-orphaned-credit-0001`,{
+            ...h.data.get(`${root}/grantOperations/${creditId}`),grantId:grant,
+            operationId:"later-orphaned-credit-0001",serverRevision:7,creditRevision:8});
+        await refused(h);
+    }
+});
+test("unknown receipt credit state cannot disappear from recovery reconciliation",async()=>{
+    for(const flag of [undefined,null,"false",0]){
+        const h=fixture();addReservation(h);
+        h.data.get(`${root}/grantOperations/${reservedId}`).creditedToCharacter=flag;
+        await refused(h);
+    }
+});
+test("a valid uncredited reservation survives source loss and does not grant or spend",async()=>{
+    const h=fixture();addReservation(h);
+    const reservation=h.data.get(`${root}/grantOperations/${reservedId}`);
+    const grant=h.data.get(`${root}/pendingGrants/${reservedGrant}`);
+    for(const path of h.current.keys())h.data.delete(path);
+    assert.equal((await h.recovery.restoreCurrent({},intent)).restoredRevision,7);
+    assert.deepEqual(h.data.get(`${root}/grantOperations/${reservedId}`),reservation);
+    assert.deepEqual(h.data.get(`${root}/pendingGrants/${reservedGrant}`),grant);
+    assert.equal(h.data.get(`${root}/economy/current`).gold,25);
+    assert.equal(h.data.get(`${root}/economy/current`).sharedExp,0);
+    assert.equal(h.data.has(`${root}/uniqueClaims/${reservedGrant}`),false);
+    assert.equal(h.data.has(`${root}/ledgerEntries/${reservedId}`),false);
+});
+test("reserved receipts need their original grant, revision, identity and empty ledger",async()=>{
+    const changes=[
+        h=>h.data.delete(`${root}/pendingGrants/${reservedGrant}`),
+        h=>h.data.get(`${root}/grantOperations/${reservedId}`).serverRevision=8,
+        h=>h.data.get(`${root}/grantOperations/${reservedId}`).ownerUid="foreign-owner",
+        h=>h.data.get(`${root}/grantOperations/${reservedId}`).createdAt=null,
+        h=>h.data.get(`${root}/pendingGrants/${reservedGrant}`).status="credited",
+        h=>h.data.set(`${root}/ledgerEntries/${reservedId}`,{amount:30}),
+        h=>h.data.set(`${root}/operations/${reservedId}`,{kind:"shop-purchase"})
+    ];
+    for(const change of changes){const h=fixture();addReservation(h);change(h);await refused(h);}
+});
+test("receipt inventory over budget is rejected before per-receipt proof reads",async()=>{
+    const h=fixture();for(let i=0;i<401;i++)h.data.set(`${root}/grantOperations/extra-${i}`,{});
+    const before=JSON.stringify([...h.data]);
+    await assert.rejects(h.recovery.restoreCurrent({},intent),e=>e.code==="failed-precondition");
+    assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
+});
 test("a surviving newer source in each of ten domains blocks old-envelope recovery before writes",async()=>{
     const probe=fixture();assert.equal(probe.current.size,10);
     for(const path of probe.current.keys()){

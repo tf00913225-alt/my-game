@@ -9,9 +9,9 @@ const OUT=path.resolve('artifacts/browser-qa/responsive-item/hero'),uid='skill-r
 const pause=(ms=250)=>new Promise(r=>setTimeout(r,ms));
 fs.mkdirSync(OUT,{recursive:true});
 let server,proc,c,profile;const evidence=[];
-let account=Core.normalizeAccountState(),formation=null,revision=1,pills=5;const receipts=new Map(),loginClaims=new Set();
+let account=Core.normalizeAccountState(),formation=null,revision=1,pills=5,dailyClaimed=false;const receipts=new Map(),loginClaims=new Set();
 for(const id of ids){account.heroes[id].unlocked=true;account.heroes[id].specificFragments=500;}
-const view=()=>({schemaVersion:1,ownerUid:uid,serverRevision:revision,heroAccount:account,formation,playerIndexes:[0],marrowPills:pills,loginRewards:[3,7].map((day,i)=>({day,heroId:ids[i],fragments:25,marrowPills:1,eligible:true,claimed:loginClaims.has(day)})),authoritativeStateReady:false});
+const view=()=>({schemaVersion:1,ownerUid:uid,serverRevision:revision,heroAccount:account,formation,playerIndexes:[0],marrowPills:pills,loginRewards:[3,7].map((day,i)=>({day,heroId:ids[i],fragments:25,marrowPills:1,eligible:true,claimed:loginClaims.has(day)})),dailySupply:{periodDate:'20261018',fragments:{divineDogHongbao:5,vajraHeavenlyKing:5},marrowPills:1,claimed:dailyClaimed},authoritativeStateReady:false});
 async function handleRequest(req,res){
  if(!req.url.startsWith('/__qa_hero/'))return false;
  let data;try{let raw='';for await(const chunk of req)raw+=chunk;data=raw?JSON.parse(raw):{};}catch{res.writeHead(400);res.end('{}');return true;}
@@ -29,6 +29,10 @@ async function handleRequest(req,res){
     account=Core.createDomain(account,()=>[],()=>null,()=>null).addSpecificFragments(id,25);pills++;revision++;loginClaims.add(data.milestoneDay);
    }
   }
+  if(req.url.endsWith('/dailySupply')){
+   assert.equal(data.operationId,'hero-daily-supply-v1-20261018');assert.equal(data.periodDate,'20261018');
+   if(!dailyClaimed){assert.equal(data.expectedRevision,revision);for(const id of ids)account=Core.createDomain(account,()=>[],()=>null,()=>null).addSpecificFragments(id,5);pills++;revision++;dailyClaimed=true;}
+  }
   if(req.url.endsWith('/growth')){
    assert.equal(data.expectedRevision,revision);const d=Core.createDomain(account,()=>[],()=>null,()=>null);
    account=data.action==='starUp'?d.starUpHero(data.heroId):data.action==='reroll'?d.rerollHeroAllocation(data.heroId,12345,pills):d.unlockHero(data.heroId,12345);
@@ -44,6 +48,7 @@ for(const [name,body] of [
  ['saveTeamFormation',`const response=await fetch('/__qa_hero/save',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...intent,fail:!!window.__qaFormationFail})});if(!response.ok)throw Object.assign(Error('QA rejected'),{code:'aborted'});const value=await response.json();if(window.__qaFormationLost){window.__qaFormationLost=false;throw Object.assign(Error('lost response'),{code:'unavailable'});}return value;`],
  ['claimHeroLoginReward',`const response=await fetch('/__qa_hero/loginReward',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(intent)});if(!response.ok)throw Object.assign(Error('QA rejected'),{code:'aborted'});const value=await response.json();if(window.__qaLoginLost){window.__qaLoginLost=false;throw Object.assign(Error('lost response'),{code:'unavailable'});}return value;`],
  ['readHeroGrowth',`return (await fetch('/__qa_hero/read')).json();`],
+ ['claimHeroDailySupply',`const response=await fetch('/__qa_hero/dailySupply',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(intent)});if(!response.ok)throw Object.assign(Error('QA rejected'),{code:'aborted'});const value=await response.json();if(window.__qaDailyLost){window.__qaDailyLost=false;throw Object.assign(Error('lost response'),{code:'unavailable'});}return value;`],
  ['mutateHeroGrowth',`const response=await fetch('/__qa_hero/growth',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(intent)});if(!response.ok)throw Object.assign(Error('QA rejected'),{code:'aborted'});return response.json();`]]){
  const re=new RegExp(`export async function ${name}\\(\\)\\{[^}]*\\}`);
  assert.ok(re.test(cloudModule));cloudModule=cloudModule.replace(re,`export async function ${name}(${name.startsWith('save')||name.startsWith('mutate')||name.startsWith('claim')?'intent':''}){${body}}`);
@@ -81,6 +86,14 @@ try{
   assert.equal(await c.eval(`document.querySelectorAll('.hero-card').length`),2);
   assert.equal(await c.eval(`document.querySelectorAll('.hero-login-reward').length`),2);
   if(width===360){
+   const dailyBefore=await c.eval(`({fragments:Object.fromEntries(Object.entries(FourSymbolsHeroGrowth.getAccount().heroes).map(([id,h])=>[id,h.specificFragments])),pills:FourSymbolsHeroGrowth.getStatus().marrowPills})`);
+   await c.eval(`window.__qaDailyLost=true;true`);await tap('[onclick="FourSymbolsHeroGrowth.claimDailySupply()"]');
+   assert.equal(await c.eval(`FourSymbolsHeroGrowth.getStatus().pending.periodDate`),'20261018');
+   await tap('[onclick="FourSymbolsHeroGrowth.retry()"]');
+   assert.equal(await c.eval(`FourSymbolsHeroGrowth.getStatus().pending`),null);
+   for(const id of ids)assert.equal(await c.eval(`FourSymbolsHeroGrowth.getAccount().heroes[${JSON.stringify(id)}].specificFragments`),dailyBefore.fragments[id]+5);
+   assert.equal(await c.eval(`FourSymbolsHeroGrowth.getStatus().marrowPills`),dailyBefore.pills+1);
+   await screenshot('hero-daily-supply-'+width);
    const before=await c.eval(`FourSymbolsHeroGrowth.getAccount().heroes.divineDogHongbao.specificFragments`);
    await c.eval(`window.__qaLoginLost=true;true`);await tap('[onclick="FourSymbolsHeroGrowth.claimLoginReward(3)"]');
    assert.equal(await c.eval(`FourSymbolsHeroGrowth.getStatus().pending.milestoneDay`),3);
@@ -92,6 +105,7 @@ try{
    await screenshot('hero-login-rewards-'+width);
   }
   assert.equal(await c.eval(`document.querySelectorAll('.hero-login-reward button:disabled').length`),2);
+  assert.equal(await c.eval(`document.querySelector('[onclick="FourSymbolsHeroGrowth.claimDailySupply()"]').disabled`),true);
   const grid=await c.eval(`(()=>{const n=document.querySelector('.hero-card-grid');return {columns:getComputedStyle(n).gridTemplateColumns.split(' ').length,overflow:n.scrollWidth-n.clientWidth};})()`);
   assert.equal(grid.columns,3);assert.ok(grid.overflow<=1);assert.equal(await c.eval(`document.querySelectorAll('.hero-element-tabs button').length`),5);
   await tap(`[onclick="filterHeroPage('fire')"]`);assert.equal(await c.eval(`document.querySelectorAll('.hero-card').length`),1);
@@ -191,6 +205,7 @@ try{
  await c.eval(`openHomeFeature('hero');true`);await pause();
  assert.equal(await c.eval(`document.querySelectorAll('.hero-card').length`),0);
  assert.equal(await c.eval(`document.querySelectorAll('.hero-login-reward').length`),2,'rewards accessible without owned Heroes');
+ assert.equal(await c.eval(`document.querySelector('[aria-label="英雄每日補給"]')!==null`),true,'daily supply accessible without owned Heroes');
  fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:process.env.DEV_BASE_URL?'deployed-bytes-isolated-transport':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),evidence},null,2)+'\n');
 }catch(error){if(c)try{fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from((await c.send('Page.captureScreenshot',{format:'png'})).data,'base64'));}catch{}fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:false,error:String(error.stack||error),evidence},null,2));throw error;
 }finally{

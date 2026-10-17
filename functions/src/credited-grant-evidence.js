@@ -6,6 +6,32 @@ const positive=value=>Number.isSafeInteger(value)&&value>=1;
 const balance=value=>Number.isSafeInteger(value)&&value>=0;
 const digest=value=>typeof value==="string"&&/^[a-f0-9]{64}$/.test(value);
 
+// Original reservation receipt identity, shared by reservation replay and repair.
+function verifyGrantReceiptIdentity({uid,grantId,operationId,currentRevision,grant,receipt,fail}){
+    if(!receipt||receipt.schemaVersion!==1||receipt.ownerUid!==uid||
+       receipt.grantId!==grantId||receipt.operationId!==operationId||
+       !positive(receipt.serverRevision)||receipt.serverRevision>currentRevision||
+       !receipt.createdAt||typeof receipt.createdAt.toMillis!=="function"||
+       !grant||receipt.kind!==grant.kind||grant.schemaVersion!==1||grant.ownerUid!==uid||
+       !["gold","exp"].includes(grant.kind)||grant.source!=="server-event"||
+       !positive(grant.amount)||grant.amount>100000||grant.amount!==receipt.amount||
+       grant.claimedByOperationId!==operationId){
+        fail("data-loss","Grant receipt is inconsistent.");
+    }
+}
+async function verifyReservedGrant({tx,root,uid,grantId,operationId,currentRevision,
+    grant,receipt,ledgerExists,otherOperationExists,fail}){
+    if(otherOperationExists)fail("data-loss","Grant operation ID overlaps another operation.");
+    verifyGrantReceiptIdentity({uid,grantId,operationId,currentRevision,grant,receipt,fail});
+    const proof=await readDailyCheckinEvidence({tx,root,uid,grantId,grant,fail});
+    if(proof&&receipt.sourceEventSha256!==proof.sha256){
+        fail("data-loss","Grant event binding is inconsistent.");
+    }
+    if(receipt.creditedToCharacter!==false||grant.status!=="reserved"||ledgerExists){
+        fail("data-loss","Grant reservation receipt is inconsistent.");
+    }
+}
+
 // Shared by settlement and reservation retries. Never recreate missing proof,
 // consult browser history, or compare an old credit to today's mutable balance.
 async function verifyCreditedGrant({tx,root,uid,grantId,operationId,currentRevision,
@@ -73,4 +99,4 @@ async function verifyCreditedGrant({tx,root,uid,grantId,operationId,currentRevis
     }
 }
 
-module.exports={verifyCreditedGrant};
+module.exports={verifyCreditedGrant,verifyGrantReceiptIdentity,verifyReservedGrant};

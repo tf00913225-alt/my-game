@@ -2337,6 +2337,18 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     const session=await invoke("createGameSession",device.idToken,{uid:ownedUid});
     const request={auth:{uid:ownedUid,token:claims(device.idToken)},data:{uid:ownedUid,session}};
     const payload={uid:ownedUid,session,...intent};
+    // Isolated retained reservation fixture: not credited, never synthesized by
+    // recovery. Both recovery and the original reservation reader must preserve it.
+    const reservedGrantId="rehearsal-reserved-grant-0001";
+    const reservedOperationId="rehearsal-reserved-operation-0001";
+    const reservedGrantRef=ownedRoot.collection("pendingGrants").doc(reservedGrantId);
+    const reservedReceiptRef=ownedRoot.collection("grantOperations").doc(reservedOperationId);
+    const reservedStamp=Timestamp.fromMillis(Date.now());
+    await reservedGrantRef.set({schemaVersion:1,ownerUid:ownedUid,source:"server-event",
+        kind:"exp",amount:30,status:"reserved",claimedByOperationId:reservedOperationId,createdAt:reservedStamp});
+    await reservedReceiptRef.set({schemaVersion:1,ownerUid:ownedUid,grantId:reservedGrantId,
+        operationId:reservedOperationId,kind:"exp",amount:30,serverRevision:7,
+        creditedToCharacter:false,createdAt:reservedStamp});
     const before=await dump(),envelopeBefore=(await envelopeRef.get()).data();
     for(const [path,row] of current)assert.deepEqual(source(before.get(path)),row,path);
     const erase=db.batch();for(const path of current.keys())erase.delete(db.doc(path));
@@ -2388,6 +2400,22 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     assert.deepEqual(await dump(),badLedger);await ledger.set(originalLedger);
     assert.deepEqual(await dump(),damaged);
     console.log("Current recovery independent credit reconciliation real Firestore PASS: later unique claim, missing retained claim/grant/receipt/ledger and corrupt delta refuse without writes; original history remains exact.");
+
+    const orphanReceipt=ownedRoot.collection("grantOperations").doc("rehearsal-orphaned-credit-0001");
+    const originalCredit=(await creditProof[2].get()).data();
+    await orphanReceipt.set({...originalCredit,operationId:orphanReceipt.id,
+        grantId:"rehearsal-orphaned-grant-0001",serverRevision:9,creditRevision:10});
+    const withOrphanReceipt=await dump();
+    await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+    assert.deepEqual(await dump(),withOrphanReceipt);await orphanReceipt.delete();
+    const reservedReceipt=(await reservedReceiptRef.get()).data();
+    for(const patch of [{creditedToCharacter:"false"},{serverRevision:10},{ownerUid:"foreign-owner"}]){
+        await reservedReceiptRef.update(patch);const badReservation=await dump();
+        await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+        assert.deepEqual(await dump(),badReservation);await reservedReceiptRef.set(reservedReceipt);
+    }
+    assert.deepEqual(await dump(),damaged);
+    console.log("Current recovery receipt inventory real Firestore PASS: unmatched credited receipt and unknown/future/foreign reservation refuse without writes; valid uncredited reservation remains retained.");
 
     // A stale/damaged envelope must not authorize overwriting surviving newer
     // sources. Missing revision evidence is equally unreconciled. Emulator only.
@@ -2445,6 +2473,9 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     assert.equal((await shop.purchase(request,shopArgs)).unchanged,true);
     assert.equal((await goldWriter.creditReservedGrant(request,{
         grantId:ownedGrant,operationId:ownedCreditOperation,expectedRevision:3})).unchanged,true);
+    const reservedRetry=await invoke("reserveTrustedGrant",device.idToken,{uid:ownedUid,session,
+        grantId:reservedGrantId,operationId:reservedOperationId,expectedRevision:7});
+    assert.equal(reservedRetry.unchanged,true);assert.equal(reservedRetry.creditedToCharacter,false);
     assert.deepEqual(await dump(),committed);
     assert.deepEqual((await envelopeRef.get()).data(),committedEnvelope);
     console.log(`Current recovery full-source-loss rehearsal real Firestore PASS: ${current.size} documents / 10 domains; rollback, unknown claim and old-session refusal, new-session HTTP restore, discarded-response replay, exact source/archive parity and immutable receipt/ledger/claim history. Readiness remains false; not historical/disaster/second-phone acceptance.`);
@@ -2880,6 +2911,47 @@ const loginRewardLedgerBytes=(await loginRewardLedger.get()).data();await loginR
 await rejected("claimHeroLoginReward",loginRewardOther.idToken,{...loginRewardIntent(3,13),session:loginRewardOtherSession},"DATA_LOSS");
 await loginRewardLedger.set(loginRewardLedgerBytes);
 console.log("PASS Hero login rewards real Firestore/HTTP: recorded days, existing-history catch-up, concurrent exactly-once credit, growth consumption, immutable retry, original archives, session takeover and private rules; no migration/readiness.");
+
+// Daily supply uses the same complete canonical account, protected HTTP adapter
+// and immutable recovery evidence. No player account or production resource writes.
+const dailyIdentity={uid:loginRewardUid,session:loginRewardOtherSession};
+const dailyView=await invoke("readHeroGrowth",loginRewardOther.idToken,dailyIdentity);
+const dailyDate=dailyView.dailySupply.periodDate,dailyKey='hero-daily-supply-v1-'+dailyDate;
+const dailyIntent={...dailyIdentity,periodDate:dailyDate,operationId:dailyKey,expectedRevision:dailyView.serverRevision};
+await rejected("claimHeroDailySupply",loginRewardOther.idToken,{...dailyIntent,amount:5},"INVALID_ARGUMENT");
+const dailyRace=await Promise.all([invoke("claimHeroDailySupply",loginRewardOther.idToken,dailyIntent),
+    invoke("claimHeroDailySupply",loginRewardOther.idToken,dailyIntent)]);
+assert.deepEqual(dailyRace[0].receipt,dailyRace[1].receipt);
+for(const id of ['divineDogHongbao','vajraHeavenlyKing']){
+    assert.equal(dailyRace[1].heroAccount.heroes[id].specificFragments,dailyView.heroAccount.heroes[id].specificFragments+5);
+}
+assert.equal(dailyRace[1].marrowPills,dailyView.marrowPills+1);assert.equal(dailyRace[1].dailySupply.claimed,true);
+assert.equal(dailyRace[1].authoritativeStateReady,false);
+await checkRecoveryArchive(loginRewardUid,dailyRace[1].serverRevision);
+await rejected("claimHeroDailySupply",loginRewardUser.idToken,{...dailyIntent,session:loginRewardSession},"SESSION_REVOKED");
+assert.deepEqual((await invoke("claimHeroDailySupply",loginRewardOther.idToken,
+    {...dailyIntent,expectedRevision:dailyRace[1].serverRevision})).receipt,dailyRace[0].receipt);
+for(const name of ['operations','ledgerEntries','uniqueClaims']){
+    const ref=loginRewardRoot.collection(name).doc(dailyKey),bytes=(await ref.get()).data();assert.ok(bytes);
+    assert.equal(await rulesRequest(`serverUsers/${loginRewardUid}/${name}/${dailyKey}`,loginRewardOther.idToken,"PATCH"),403);
+    await ref.delete();await rejected("claimHeroDailySupply",loginRewardOther.idToken,dailyIntent,"DATA_LOSS");await ref.set(bytes);
+}
+let supplyClock=Date.parse('2026-10-18T15:59:59Z');
+const supplyWriter=createHeroGrowth({db,FieldValue,HttpsError,runProtected:heroSessions.runProtected,
+    inspectExistingEnvelope,nextRevision,acquisition:loginRewardSource,now:()=>supplyClock});
+const supplyRequest=(day,revision)=>({auth:{uid:loginRewardUid,token:claims(loginRewardOther.idToken)},
+    data:{...dailyIdentity,periodDate:day,operationId:'hero-daily-supply-v1-'+day,expectedRevision:revision}});
+// Advance into future emulator-only days, never backfill an unclaimed date.
+supplyClock=Date.parse('2090-10-18T15:59:59Z');
+const supplyBefore=await supplyWriter.read({auth:{uid:loginRewardUid,token:claims(loginRewardOther.idToken)},data:dailyIdentity});
+const supplyFirst=await supplyWriter.claimDailySupply(supplyRequest('20901018',supplyBefore.serverRevision));
+supplyClock=Date.parse('2090-10-18T16:00:00Z');
+const supplyNext=await supplyWriter.claimDailySupply(supplyRequest('20901019',supplyFirst.serverRevision));
+assert.equal(supplyNext.marrowPills,supplyFirst.marrowPills+1);
+supplyClock=Date.parse('2090-10-21T00:00:00Z');
+await assert.rejects(supplyWriter.claimDailySupply(supplyRequest('20901020',supplyNext.serverRevision)),{code:'failed-precondition'});
+assert.deepEqual((await supplyWriter.claimDailySupply(supplyRequest('20901018',1))).receipt,supplyFirst.receipt);
+console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pill, concurrent exactly-once credit, immutable retry, Taipei rollover/no catch-up, archives, revoked session and private rules.");
 
 await db.terminate();
 if(direct){await getFirestore().terminate();}
