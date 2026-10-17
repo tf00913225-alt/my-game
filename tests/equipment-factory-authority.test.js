@@ -40,10 +40,12 @@ test("inventory stack normalization keeps canonical equipment references and rej
 test("starter passes actual equip, unequip and sale owners without replacing its identity",async()=>{
  const c=runtime(),main=read("js/00-main.js");
  Object.assign(c,{$:()=>({dataset:{}}),getInventoryEquipmentSlot:t=>t==="weapon"?"hand":t,getBackpackCharacter:()=>({}),getBackpackEquipmentKey:()=>"fire",inventoryCharacterIndex:0,
-  closeItemModal(){},rebuildInventorySlots(){},renderInventory(){},updateUI(){},saveGame(){},updateGoldDisplay(){},rpgConfirm:async()=>true});
- vm.runInContext("let selectedInventorySlot=0; let inventorySlots=inventoryItems; let gold=0;"+main.slice(main.indexOf("function equipSelectedItem(){"),main.indexOf("/* =====================================================\n   自動戰鬥設定",main.indexOf("function equipSelectedItem(){"))),c);
+  battleActive:false,refreshHeroPage(){},getEquipmentSelection:()=>c.selection,
+  closeItemModal(){},rebuildInventorySlots(){},renderInventory(){},updateUI(){},saveGame(){return true;},updateGoldDisplay(){},rpgConfirm:async()=>true});
+ vm.runInContext("let selectedInventorySlot=0; let inventorySlots=inventoryItems; let gold=0;"+main.slice(main.indexOf("function commitEquipmentTransfer("),main.indexOf("/* =====================================================\n   自動戰鬥設定",main.indexOf("function equipSelectedItem(){"))),c);
+ c.selection={key:'fire',item:c.inventoryItems[0]};
  const item=c.inventoryItems[0];c.equipSelectedItem();assert.strictEqual(c.characterEquipment.fire.hand,item);assert.ok(!c.inventoryItems.includes(item));
- c.unequipItem("hand");assert.strictEqual(c.characterEquipment.fire.hand,null);assert.ok(c.inventoryItems.includes(item));
+ c.selection.slot='hand';c.unequipItem("hand");assert.strictEqual(c.characterEquipment.fire.hand,null);assert.ok(c.inventoryItems.includes(item));
  vm.runInContext("selectedInventorySlot=inventoryItems.length-1;",c);await c.sellSelectedItem();assert.ok(!c.inventoryItems.includes(item));
  assert.equal(vm.runInContext("gold",c),factory.prices(item).sell);
 });
