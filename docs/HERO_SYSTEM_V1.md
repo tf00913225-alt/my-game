@@ -1,5 +1,17 @@
 # Hero System V1 — Phase 1, Phase 2A, Phase 2B and Phase 2C UI
 
+## Login growth rewards — HERO-LOGIN-REWARDS-20261017
+
+User-approved first issuance source: cumulative server Taipei login day 3 grants 25 divineDogHongbao fragments + 1 heroMarrowPill; day 7 grants 25 vajraHeavenlyKing fragments + 1 pill. Each is once per UID, non-consecutive, non-expiring and non-cyclic. Verified existing 3/7-day histories qualify for manual catch-up. Unrecorded historical dates/local counters do not qualify. The original seven-day login cap, acquisition history and direct King entitlement remain unchanged. This section supersedes older statements that all resource issuance is future work; activities, drops and other sources remain unopened.
+
+The existing hero-growth.js Owner adds claimHeroLoginReward and shares its canonical commit with growth consumption. The protected request contains only identity/session, milestoneDay (3 or 7), expectedRevision and its fixed operationId hero-login-reward-v1-day3/day7. The fixed per-UID operation is also the uniqueClaims and ledgerEntries key. Expected revision gates a new credit; a verified existing milestone returns its original receipt even with a newer/stale expected revision, without another credit. Changing milestone/operation binding or supplying amounts/items/dates is rejected.
+
+Acquisition's internal reader supplies verified login history evidence; it is not a browser grant token. Credits atomically add fragments through unchanged Core and add/merge canonical bag pills with original sources, next revision, snapshots, recovery archives and immutable receipt/ledger/claim. Reads and retries verify all three records, original login proof and source/output archives/deltas; missing/corrupt evidence blocks instead of refilling. Unavailable canonical character coverage blocks credit but never blocks the independent login observation or King entitlement. No local save adoption, new browser key, battle writer or complete Cloud readiness is enabled.
+
+The existing Hero overview shows both milestones even without an owned Hero, supports explicit claim/sync/unknown-outcome retry, and displays only confirmed resource/claim state. UID/session changes discard pending UI proof; a new device re-reads the same fixed claims. DEV disposable resources cannot claim real rewards while test mode is active. This is a bounded Hero growth read/credit, not full fresh-device character recovery or local backpack synchronization.
+
+Regression: cloud-save-hero-login-rewards.test.mjs plus existing acquisition/growth/formation tests; actual protected emulator and Hero browser QA extend existing runners/workflows. Work PR owns latest Head, CI, backend deployment and acceptance. No main release.
+
 ## Hero equipment — HERO-EQUIPMENT-20261017
 
 Hero equipment extends the existing `js/00-main.js` inventory/equipment Owner. The six canonical slots are head/hand/shoulder/armor/shoes/ring. UID main-save `characterEquipment` stores loadouts under `heroNpc:<registry heroId>`; Hero Core/account schema remains unchanged. The same factory instance `v141Uid`, bag, item detail/comparison, element/level restrictions, socket/reforge/set bonuses and `getEquipmentBonus`/player stat formula serve players and Heroes. Hero equipment keys never become player skill keys. Battle creation uses equipped maximum HP/SP and the existing live battle getters include the same equipment bonuses. No Hero battle transient fields are saved.

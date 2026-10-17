@@ -25,7 +25,10 @@ function fixture({fragments=500,pills=2,owned=false}={}){
     data.set(`${root}/playableSnapshots/2`,bundle);
     data.set(`${root}/recoveryArchives/2`,createRecoveryArchive(uid,2,records,bundle));
     const ref=path=>({path,id:path.split("/").at(-1),collection:name=>collection(`${path}/${name}`)});
-    const collection=path=>({path,query:true,doc:id=>ref(`${path}/${id}`)});
+    const collection=(path,filter=null,max=Infinity,sort=null)=>({path,filter,max,sort,query:true,doc:id=>ref(`${path}/${id}`),
+        where:(key,op,value)=>{assert.equal(op,"==");return collection(path,{key,value},max,sort);},
+        orderBy:(key,direction)=>collection(path,filter,max,{key,direction}),
+        limit:count=>collection(path,filter,count,sort)});
     let active=true,failWrites=false,tail=Promise.resolve();
     class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
     const deps={db:{collection},FieldValue:{serverTimestamp:()=>({seconds:1})},HttpsError,
@@ -41,9 +44,11 @@ function fixture({fragments=500,pills=2,owned=false}={}){
                 const check=()=>{writing=true;if(failWrites)throw Error("transaction interrupted");};
                 const tx={get:async r=>{assert.equal(writing,false);return r.query?{
                     docs:[...staged].filter(([p])=>p.startsWith(r.path+"/")&&p.split("/").length===r.path.split("/").length+1)
-                        .map(([p,v])=>snap(p,v))}:snap(r.path,staged.get(r.path));},
+                        .filter(([,v])=>!r.filter||v[r.filter.key]===r.filter.value).sort((a,b)=>r.sort?(a[1][r.sort.key]-b[1][r.sort.key])*(r.sort.direction==="desc"?-1:1):0).slice(0,r.max)
+                        .map(([p,v])=>snap(p,v)),get size(){return this.docs.length;}}:snap(r.path,staged.get(r.path));},
                     update:(r,v)=>{check();assert.ok(staged.has(r.path));staged.set(r.path,{...staged.get(r.path),...v});},
                     create:(r,v)=>{check();assert.equal(staged.has(r.path),false);staged.set(r.path,v);},
+                    set:(r,v)=>{check();staged.set(r.path,v);},
                     delete:r=>{check();staged.delete(r.path);}};
                 const value=await operation(tx,{uid,sessionId:"A".repeat(32)});
                 data.clear();for(const entry of staged)data.set(...entry);return value;

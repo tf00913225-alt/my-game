@@ -244,6 +244,10 @@ exports.readHeroGrowth=onCall(CALLABLE_OPTIONS,async request=>{
     try{return await heroGrowth.read(await verifyGameIdentity(request));}
     catch(error){throw asHttpsError(error);}
 });
+exports.claimHeroLoginReward=onCall(CALLABLE_OPTIONS,async request=>{
+    try{return await heroGrowth.claimLoginReward(await verifyGameIdentity(request));}
+    catch(error){throw asHttpsError(error);}
+});
 exports.mutateHeroGrowth=onCall(CALLABLE_OPTIONS,async request=>{
     try{return await heroGrowth.mutate(await verifyGameIdentity(request));}
     catch(error){throw asHttpsError(error);}

@@ -215,7 +215,12 @@ function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
         });
     }
     return Object.freeze({read,observeLogin,ensureChapterTicket,completeChapterNode,
-        readInTransaction:async(tx,session)=>result(await readSources(tx,session.uid))});
+        readInTransaction:async(tx,session)=>{
+            const context=await readSources(tx,session.uid);
+            return {...result(context),loginEvidence:context.state?{
+                loginCount:context.state.loginDays.length,serverRevision:context.state.serverRevision,
+                sha256:context.state.lastHistorySha256}:null};
+        }});
 }
 
 module.exports={createHeroAcquisition};

@@ -25692,6 +25692,21 @@ function renderHeroDetailContent(hero,data){
             <section class="hero-page-section"><h3>${escape(hero.definition.name)}被動</h3><p>${escape(heroPagePassive(hero.definition))}</p></section>`;
     return content;
 }
+function renderHeroLoginRewards(data){
+    const g=data.growth,blocked=g.busy||g.testMode||battleActive||!!g.pending;
+    const rows=g.loginRewards||[];
+    return `<section class="hero-page-section" aria-label="累計登入獎勵"><h3>累計登入獎勵</h3>
+        <p>臺北日期累計，不需連續登入。每項限領一次，達標後可補領。</p>
+        ${rows.length?rows.map(row=>`<div class="hero-login-reward" data-login-day="${row.day}">
+            <p>第 ${row.day} 天：${row.day===3?"神犬紅包":"金剛天王"}碎片 ×25、洗髓丹 ×1</p>
+            <button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.claimLoginReward(${row.day})" ${blocked||row.claimed||!row.eligible?"disabled":""}>${row.claimed?"已領取":row.eligible?"領取獎勵":"未達成"}</button></div>`).join(""):
+            '<p>第 3 天：神犬紅包碎片 ×25、洗髓丹 ×1<br>第 7 天：金剛天王碎片 ×25、洗髓丹 ×1</p><p>需連線並具備完整伺服器角色資料才能領取；不以本機舊存檔補發。</p>'}
+        ${g.error?`<p role="status">${heroPageHtml(g.error)}</p>`:""}
+        ${g.testMode?'<p>目前為 DEV 隔離測試，正式獎勵領取已停用。</p>':""}
+        <button type="button" class="main-button" onclick="FourSymbolsHeroAcquisition.refresh()" ${g.busy||data.acquisition.busy?"disabled":""}>同步登入與獎勵</button>
+        ${g.pending?'<button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.retry()">確認前次操作</button>':""}
+    </section>`;
+}
 function renderHeroPageContent(){
     const data=getHeroPageSnapshot(),escape=heroPageHtml;
     const hero=data.heroes.find(row=>row.owned&&row.definition.heroId===heroPageSelectedId);
@@ -25702,7 +25717,7 @@ function renderHeroPageContent(){
     const toolbar=overview?`<div class="hero-overview-tools"><button type="button" class="main-button" onclick="openSharedFormation('hero')">佈陣</button>
         <div class="hero-element-tabs" role="tablist" aria-label="英雄元素分類">${[["all","全部"],["fire","火"],["water","水"],["wind","風"],["earth","土"]].map(([id,label])=>`<button type="button" role="tab" aria-selected="${heroPageElement===id}" onclick="filterHeroPage('${id}')">${label}</button>`).join("")}</div></div>`:
         '<button type="button" class="main-button hero-detail-back" onclick="returnHeroOverview()">‹ 返回英雄列表</button>';
-    const content=overview?`<div class="hero-card-grid">${heroes.map(row=>`<button type="button" class="hero-card" data-hero-id="${escape(row.definition.heroId)}" onclick="selectHeroPage(this.dataset.heroId)">
+    const content=overview?`${renderHeroLoginRewards(data)}<div class="hero-card-grid">${heroes.map(row=>`<button type="button" class="hero-card" data-hero-id="${escape(row.definition.heroId)}" onclick="selectHeroPage(this.dataset.heroId)">
         ${heroPageArtwork(row)}<b>${escape(row.definition.name)}</b><span>${escape(elementDatabase[row.definition.element]?.name||row.definition.element)}・${row.account.stars} 星</span><span>Lv.${row.level??"—"}${order.has(row.definition.heroId)?"・上陣":""}</span></button>`).join("")}</div>
         ${heroes.length?"":'<p class="hero-page-note">此分類目前沒有已擁有英雄。</p>'}
         <p class="hero-page-note">英雄技能依等級自動提升。</p>` : renderHeroDetailContent(hero,data);
@@ -34117,6 +34132,11 @@ try{
            JSON.stringify(stable(core.normalizeAccountState(value.heroAccount)))!==JSON.stringify(stable(value.heroAccount))){
             proof=null;throw Error("英雄成長紀錄無法驗證，已停止操作。");
         }
+        if(value.loginRewards!==undefined&&(!Array.isArray(value.loginRewards)||value.loginRewards.length!==2||
+           value.loginRewards.some((row,i)=>row.day!==[3,7][i]||row.heroId!==["divineDogHongbao","vajraHeavenlyKing"][i]||
+               row.fragments!==25||row.marrowPills!==1||typeof row.eligible!=="boolean"||typeof row.claimed!=="boolean"))){
+            proof=null;throw Error("登入獎勵紀錄無法驗證。");
+        }
         proof=copy(value);error=null;notify();return copy(proof);
     }
     async function read(){
@@ -34141,9 +34161,11 @@ try{
         proof?.ownerUid===uid()?copy(proof.heroAccount):null;}
     async function mutate(heroId,action){
         if(busy||global.isHeroGrowthBattleActive?.())return;
-        const owner=uid(),token=generation;
+        const owner=uid(),token=generation,reward=action==="loginReward";
+        if(reward&&![3,7].includes(heroId))return;
+        if(reward&&dev){error="請重新載入以離開 DEV 隔離測試，再領取正式獎勵。";notify();return;}
         if(!owner){error="請先確認原帳號。";notify();return;}
-        if(pending&&(pending.heroId!==heroId||pending.action!==action)){
+        if(pending&&(reward?pending.milestoneDay!==heroId:pending.heroId!==heroId||pending.action!==action)){
             error="前次操作尚未確認，請重試原操作。";notify();return;
         }
         busy=true;notify();
@@ -34157,13 +34179,16 @@ try{
                     d.rerollHeroAllocation(heroId,seed,dev.pills);
                 dev={account:next,pills:dev.pills-(action==="reroll"?1:0),revision:dev.revision+1};error=null;
             }else{
-                if(!ready())throw Error("需連線才能確認扣除結果。");
+                if(!ready())throw Error(reward?"需連線才能確認領取結果。":"需連線才能確認扣除結果。");
                 if(!pending){
                     if(!proof||proof.ownerUid!==owner)throw Error("請先同步成長紀錄。");
-                    pending={operationId:global.crypto.randomUUID().replaceAll("-",""),
+                    pending=reward?{operationId:"hero-login-reward-v1-day"+heroId,
+                        expectedRevision:proof.serverRevision,milestoneDay:heroId}:
+                        {operationId:global.crypto.randomUUID().replaceAll("-",""),
                         expectedRevision:proof.serverRevision,heroId,action};
                 }
-                const value=await global.FourSymbolsFirebaseLifecycle.mutateHeroGrowth(pending);
+                const value=reward?await global.FourSymbolsFirebaseLifecycle.claimHeroLoginReward(pending):
+                    await global.FourSymbolsFirebaseLifecycle.mutateHeroGrowth(pending);
                 publish(value,owner,token);pending=null;
             }
         }catch(problem){
@@ -34171,14 +34196,17 @@ try{
                 const code=String(problem.code||"");
                 if(/data-loss|permission-denied|unauthenticated|SESSION_/.test(code)){proof=null;}
                 if(/aborted|failed-precondition|invalid-argument/.test(code)){pending=null;proof=null;}
-                error=pending?"操作結果尚未確認；請重試同一操作，系統不會重複扣除。":
-                    "資源不足或紀錄尚未就緒，請同步後再試。";
+                error=pending?(reward?"領取結果尚未確認；請重試同一獎勵，系統不會重複發放。":
+                    "操作結果尚未確認；請重試同一操作，系統不會重複扣除。"):
+                    reward?"獎勵資格或伺服器角色資料尚未就緒，請同步後再試。":"資源不足或紀錄尚未就緒，請同步後再試。";
             }
         }finally{if(token===generation){busy=false;notify();}}
     }
     global.FourSymbolsHeroGrowth=Object.freeze({read,mutate,testResources,
-        retry:()=>pending?mutate(pending.heroId,pending.action):Promise.resolve(),getAccount:projected,
+        claimLoginReward:day=>mutate(day,"loginReward"),
+        retry:()=>pending?mutate(pending.milestoneDay??pending.heroId,pending.milestoneDay?"loginReward":pending.action):Promise.resolve(),getAccount:projected,
         getStatus:()=>({ready:!!projected(),busy,error,pending:copy(pending),
+            loginRewards:proof?.ownerUid===uid()?copy(proof.loginRewards||[]):[],
             testMode:devEnabled()&&!!dev&&devUid===uid(),devAvailable:devEnabled(),
             marrowPills:devEnabled()&&dev&&devUid===uid()?dev.pills:proof?.ownerUid===uid()?proof.marrowPills:0})});
     global.document?.addEventListener("four-symbols:startup-ready",()=>{void read();});
