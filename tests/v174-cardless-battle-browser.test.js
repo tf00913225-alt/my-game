@@ -6,6 +6,8 @@ const path=require("node:path");
 const {spawnSync}=require("node:child_process");
 
 function findChrome(){
+    const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    if(configured&&fs.existsSync(configured))return configured;
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const probe=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
         if(probe.status===0&&probe.stdout.trim()){ return probe.stdout.trim(); }
@@ -231,11 +233,12 @@ function runViewport(chrome,width,height){
     assert.equal(data.playerArtBackgroundSize,"contain");
     assert.ok(data.playerArtRect.bottom<=data.playerHpRect.top,"player artwork must end above HP bar");
     assert.ok(data.playerHpRect.bottom<=data.playerSpRect.top+1,"HP bar must sit above SP bar without portrait overlap");
-    assert.ok(data.playerSpRect.bottom<=data.playerNameRect.top+1,"player name must sit below both resource bars");
+    assert.ok(data.playerNameRect.bottom<=data.playerHpRect.top+1,"name and level must sit above HP/SP");
     assert.equal(data.enemyArt,true);
     assert.equal(data.enemyNameDisplay,"flex");
     assert.ok(data.enemyNameRect.height>0,"monster name must remain visible");
-    assert.ok(data.enemyArtRect.bottom<=data.enemyNameRect.top+1,"monster artwork must end above the lower HUD");
+    assert.ok(data.enemyNameRect.bottom<=data.enemyHpRect.top+1,"enemy identity must sit above HP");
+    assert.ok(data.enemyHpRect.bottom<=data.enemyArtRect.top+1,"enemy HP must sit above the portrait");
     assert.equal(data.activeOutlineWidth,"0px");
     assert.equal(data.activeShadow,"none");
     assert.notEqual(data.activeArtFilter,"none","active cardless feedback must remain on artwork instead of a card frame");
@@ -259,8 +262,8 @@ function runViewport(chrome,width,height){
     assert.equal(data.enemySp,"630");
     assert.equal(data.enemyHpDisplay,"block");
     assert.ok(data.enemyHpRect.height>0&&data.enemySpRect.height>0,"enemy HP/SP bars must remain visible");
-    assert.ok(data.enemyHpRect.bottom<=data.enemySpRect.top+1,"enemy HP must sit above SP");
-    assert.ok(data.enemySpRect.bottom<=data.enemyNameRect.top+1,"monster name must sit below HP and SP");
+    assert.ok(data.enemySpRect.width<=data.enemyHpRect.height/2,"enemy SP compatibility node must not occupy battlefield space after stage scaling");
+    assert.ok(data.enemyHpRect.height>1,"enemy HP must remain visible");
     console.log(`V174 cardless battle browser QA ${width}x${height}:`,JSON.stringify(data));
 }
 

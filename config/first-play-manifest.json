@@ -11,6 +11,7 @@
     {"id": "feature-patrol", "priority": "P2"}
   ],
   "assets": [
+    {"path": "assets/battle/moonlit-sanctuary-depth-20261018.webp", "priority": "P2", "type": "image", "decode": true},
     {"path": "privacy-consent.html", "priority": "P0", "type": "html"},
     {"path": "privacy.html", "priority": "P0", "type": "html"},
 

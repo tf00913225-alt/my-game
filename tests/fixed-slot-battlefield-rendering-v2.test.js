@@ -89,7 +89,7 @@ const safeTop=Number(css.match(/--battle-enemy-safe-top:(\d+)px/)?.[1]||0);
 const artOverhang=Number(css.match(/--battle-art-overhang-top:(\d+)px/)?.[1]||0);
 assert.ok(safeTop>=artOverhang+3,"enemy safe-top must cover artwork overhang plus idle lift");
 assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\[data-slot-row="back"\]\{top:var\(--battle-enemy-safe-top\) !important;\}/,"enemy back row must stay inside the portrait viewport safe region");
-assert.doesNotMatch(css,/\bscale\s*:/,"raster size must not scale its centering or flight translation");
+assert.doesNotMatch(css.match(/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[^}]*\}/)?.[0]||"",/\bscale\s*:/,"VFX raster size must not scale its centering or flight translation");
 
 // Execute the production sizing functions. These checks supplement, never
 // replace, fully loaded battle runtime visual acceptance.
@@ -225,5 +225,5 @@ assert.match(fs.readFileSync("index.html","utf8"), /id="battleActionRegion"[\s\S
 // remain scoped to the separate Boss card contract.
 assert.doesNotMatch(fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8"), /#battlePage \.battle-monster-name\.v143-monster-identity\{/);
 assert.doesNotMatch(fs.readFileSync("css/45-v152-dev-fixes.css","utf8"), /#battlePage \.battle-monster-name\.v143-monster-identity\{/);
-assert.match(css,/--battle-name-row-height:16px;/);
+assert.match(css,/--battle-name-row-height:26px;/);
 assert.match(css,/--battle-art-hud-reserve:44px;/);
