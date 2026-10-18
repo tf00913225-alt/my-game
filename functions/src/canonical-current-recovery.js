@@ -175,11 +175,12 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             }
             // Canonical claim sources may all be lost. Independent retained
             // rights must agree with the archive, not be hidden by its rollback.
-            const [claims,receipts,ledgers,grants]=await Promise.all([
+            const [claims,receipts,ledgers,grants,events]=await Promise.all([
                 tx.get(root.collection("uniqueClaims").limit(401)),
                 tx.get(root.collection("grantOperations").limit(401)),
                 tx.get(root.collection("ledgerEntries").limit(401)),
-                tx.get(root.collection("pendingGrants").limit(401))
+                tx.get(root.collection("pendingGrants").limit(401)),
+                tx.get(root.collection("rewardEvents").limit(401))
             ]);
             // Each credit proof reads at most 12 documents, including its claim,
             // grant/receipt/ledger/collision and original event/snapshot/archive.
@@ -188,11 +189,12 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             // a debit's receipt, snapshot/archive and the shop Owner's snapshot.
             // Pending-grant inventory adds one read per row and three original
             // event/snapshot/archive reads for each unconsumed pending grant.
+            // Each event inventory row reserves three original proof reads too.
             const reservedCount=receipts.docs.filter(doc=>doc.get("creditedToCharacter")===false).length;
             const pendingCount=grants.docs.filter(doc=>doc.get("status")==="pending").length;
             if(queries.reduce((sum,query)=>sum+query.size,0)+claims.docs.length*12+
                receipts.docs.length+ledgers.docs.length*5+reservedCount*6+
-               grants.docs.length+pendingCount*3>400){
+               grants.docs.length+pendingCount*3+events.docs.length*4>400){
                 fail("failed-precondition","Recovery claim evidence exceeds the transaction budget.");
             }
             const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
@@ -203,6 +205,18 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             // Reuse the original credit/debit Owners; never infer a missing
             // receipt from a balance or regenerate an operation during repair.
             const receiptById=new Map(receipts.docs.map(doc=>[doc.id,doc.data()]));
+            // Events survive independently of grants. Losing a grant must not
+            // hide an original reward observation or authorize recreating it.
+            const grantById=new Map(grants.docs.map(doc=>[doc.id,doc.data()]));
+            for(const doc of events.docs){
+                const grant=grantById.get(doc.id);
+                if(!grant){fail("data-loss","An orphaned reward event blocks recovery.");}
+                const proof=await readDailyCheckinEvidence({tx,root,uid,grantId:doc.id,grant,fail});
+                if(!proof||proof.event.sourceRevision>expectedRevision||
+                   proof.event.characterId!==records.account.slots[0]){
+                    fail("data-loss","An unknown, later or foreign reward event blocks recovery.");
+                }
+            }
             // Retained consumed grants need their original receipt too. Pending
             // rights need an independently versioned event; never use an old
             // balance, creation time or absent receipt as evidence of eligibility.
