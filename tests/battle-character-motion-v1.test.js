@@ -22,11 +22,12 @@ test('Core classes drive one state; death and revive have no gameplay delay',()=
     f.art.v143ImpactRecoil={};sync();assert.equal(f.art.dataset.motion,'hit');
     f.classes.add('dodge-back');sync();assert.equal(f.art.dataset.motion,'dodging');
     f.entity.hp=0;sync();assert.equal(f.art.dataset.motion,'dying');
-    f.classes.clear();f.art.v143ImpactRecoil=null;f.entity.hp=35;sync();assert.equal(f.art.dataset.motion,'idle');
+    f.classes.clear();f.classes.add('dying');f.art.v143ImpactRecoil=null;f.entity.hp=35;sync();assert.equal(f.art.dataset.motion,'idle','HP authority wins over the old delayed death class');
     assert.equal(f.entity.hp,35);
 });
 test('cast uses existing duration without extending it and stale finish cannot clear replacement',()=>{
     const f=fixture(),config={id:'fireRocket',category:'magic',duration:1200};
+    assert.doesNotThrow(()=>f.context.endCharacterCast(f.card,undefined),'late owner installation may have no cast handle');
     f.classes.add('attacker-lunge-down');
     const first=f.context.startCharacterCast(f.card,config,1200);
     assert.equal(first.options.duration,300);assert.equal(config.duration,1200);

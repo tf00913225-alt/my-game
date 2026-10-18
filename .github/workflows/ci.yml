@@ -452,7 +452,11 @@ jobs:
       - name: Run Fixed Slot battlefield 9x16 mobile browser QA
         id: fixed_slot_browser
         if: success()
-        run: node .github/scripts/run-fixed-slot-battlefield-browser-qa.mjs
+        env:
+          EXPECTED_COMMIT_SHA: ${{ inputs.candidate_sha || github.event.pull_request.head.sha || github.sha }}
+        run: |
+          node .github/scripts/run-fixed-slot-battlefield-browser-qa.mjs
+          node .github/scripts/run-battle-character-motion-browser-qa.mjs
 
       - name: Upload Fixed Slot battlefield browser evidence
         if: always() && steps.fixed_slot_browser.outcome != 'skipped'
@@ -462,6 +466,7 @@ jobs:
           path: |
             artifacts/browser-qa/fixed-slot-battlefield-rendering-v2.json
             artifacts/browser-qa/boss-battle-convergence-412x915.png
+            artifacts/character-motion/
           if-no-files-found: error
           retention-days: 90
 

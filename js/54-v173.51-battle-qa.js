@@ -60,7 +60,8 @@ function syncUnitArtwork(card,kind,selectedRecord){
     let action=art.querySelector(":scope > .v174-action-motion");
     if(!action){action=document.createElement("div");action.className="v174-action-motion";art.appendChild(action);}
     let paint=action.querySelector(":scope > .v174-portrait-paint");
-    if(!paint){paint=document.createElement("div");paint.className="v174-portrait-paint";action.appendChild(paint);}
+    if(record?.generic){if(paint)paint.remove();paint=null;}
+    else if(!paint){paint=document.createElement("div");paint.className="v174-portrait-paint";action.appendChild(paint);}
     // Slot identity gives repeatable, unsynchronised breathing without RNG.
     const phase=Number(String(card.id).replace(/\D/g,""))||0;
     art.style.setProperty("--battle-idle-phase",String(-((phase*613+(kind==="monster"?271:0))%3400))+"ms");
@@ -87,7 +88,7 @@ function syncUnitArtwork(card,kind,selectedRecord){
         paint.style.setProperty("--portrait-baseline","var(--battle-portrait-baseline, "+String(contract.baseline*100)+"%)");
         card.dataset.portraitSizeClass=sizeClass;
     }else{
-        for(const property of ["--portrait-width","--portrait-aspect","--portrait-center","--portrait-bottom","--portrait-baseline"]){paint.style.removeProperty(property);}
+        if(paint)for(const property of ["--portrait-width","--portrait-aspect","--portrait-center","--portrait-bottom","--portrait-baseline"]){paint.style.removeProperty(property);}
         if(!record)delete card.dataset.portraitSizeClass;
     }
     if(record){
@@ -108,7 +109,14 @@ function syncUnitMotion(card){
     const index=Number(String(card.id).replace(/\D/g,""));
     let entity=null;
     try{entity=side==="monster"?monsters[index]:getPartyCharacterByIndex(index);}catch(_){}
-    const defeated=entity&&(Number(entity.hp)<=0||entity.alive===false)||
+    const previousEntity=art.v174MotionEntity;
+    art.v174MotionEntity=entity;
+    if(previousEntity!==undefined&&previousEntity!==entity){
+        card.classList.remove("attacker-lunge-up","attacker-lunge-down","dodge-back");
+        if(art.v174Cast)endCharacterCast(card,art.v174Cast);
+    }
+    // Formal HP/alive wins over a delayed historical dying/dead CSS class.
+    const defeated=entity?(Number(entity.hp)<=0||entity.alive===false):
         ["dying","dead","down","v146-defeated"].some(name=>card.classList.contains(name));
     if(defeated&&art.v174Cast){endCharacterCast(card,art.v174Cast);}
     art.dataset.motion=defeated?"dying":card.classList.contains("dodge-back")?"dodging":
@@ -117,7 +125,7 @@ function syncUnitMotion(card){
 }
 function endCharacterCast(card,motion){
     const art=card?.querySelector(":scope > .v174-battle-art");
-    if(!art||art.v174Cast!==motion)return;
+    if(!art||!motion||art.v174Cast!==motion)return;
     art.v174Cast=null;
     motion.cancel();
     syncUnitMotion(card);
@@ -372,6 +380,9 @@ window.FourSymbolsBattlePresentation=Object.freeze({
 });
 window.addEventListener("resize",syncHud,{passive:true});
 window.addEventListener("pagehide",()=>{ window.v143ClearImpactOverlays?.(); clearUnitHud(); clearCharacterMotions(); });
+if(typeof document.addEventListener==="function")document.addEventListener("visibilitychange",()=>{
+    if(document.hidden)clearCharacterMotions();else syncBattlePresentation();
+});
 /* V173.51: keep EXP row metadata stable after legacy list rerenders. */
 function decorateExpRows(){
     if(typeof window.v173DecorateExpPoolDistributionUi==="function")window.v173DecorateExpPoolDistributionUi();

@@ -12,7 +12,7 @@ assert.doesNotMatch(boss,/boss-mechanism-card|boss-mechanism-slot/);
 const battle=read("js/54-v173.51-battle-qa.js");
 const fixedBattle=read("css/fixed-slot-battlefield-rendering-v2.css");
 assert.doesNotMatch(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?position:absolute!important/);
-assert.match(fixedBattle,/v-fixed-ally-slot > \.battle-player > \.v174-battle-art\{[\s\S]*?background-size:var\(--portrait-background-size, contain\) !important/);
+assert.match(fixedBattle,/v-fixed-ally-slot > \.battle-player > \.v174-battle-art\{[\s\S]*?background-size:0 0 !important/);
 assert.match(fixedBattle,/\.v174-unit-hud :is\(\.monster-hp,\.hp-bar\)\{bottom:8px !important/);
 assert.match(fixedBattle,/\.v174-unit-hud .sp-bar\{bottom:0 !important/);
 
@@ -47,3 +47,5 @@ assert.match(relicCss,/team-relic-modal\.team-relic-detail-mode \.home-feature-c
 const main=read("js/00-main.js");
 assert.match(main,/帳號管理[\s\S]{0,360}切換帳號／綁定帳號/);
 console.log("V173.65 UI/battle/auth polish regression checks passed");
+
+assert.match(fixedBattle,/\.v174-portrait-paint\{[^}]*background-size:contain/,"The single inner image paint preserves source aspect ratio");
