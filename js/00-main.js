@@ -30405,8 +30405,8 @@ function renderInventoryCharacterTabs(){
             onclick="selectInventoryCharacter(${Math.max(0,previous)})">‹</button>
 
         <div class="inventory-character-name">
-            <span>${character ? (character.id || "角色"+(inventoryCharacterIndex+1)) : "角色"+(inventoryCharacterIndex+1)}</span>
-            ${character ? `<small class="inventory-character-level">Lv.${character.level || 1}</small>` : `<small class="inventory-character-level">尚未建立</small>`}
+            <span></span>
+            <small class="inventory-character-level"></small>
         </div>
 
         <button type="button"
@@ -30415,6 +30415,24 @@ function renderInventoryCharacterTabs(){
             ${rightDisabled ? "disabled" : ""}
             onclick="selectInventoryCharacter(${next<0?inventoryCharacterIndex:next})">›</button>
     `;
+    wrap.querySelector(".inventory-character-name span").textContent=
+        character ? (character.id || "角色"+(inventoryCharacterIndex+1)) : "角色"+(inventoryCharacterIndex+1);
+    wrap.querySelector(".inventory-character-level").textContent=
+        character ? "Lv."+(character.level || 1) : "尚未建立";
+}
+
+function renderInventoryCharacterSummary(){
+    const summary=$("inventoryCharacterSummary");
+    if(!summary) return;
+    const character=getBackpackCharacter(inventoryCharacterIndex);
+    const element=$("inventorySummaryElement");
+    const level=$("inventorySummaryLevel");
+    const elementKey=character?.element||"";
+    const definition=elementDatabase[elementKey];
+    summary.dataset.element=elementKey;
+    if(element) element.textContent=character ? (definition?.name || definition?.label || elementKey || "無屬性") : "尚未建立";
+    if(level) level.textContent=character ? "等級 "+(character.level || 1) : "";
+    renderInventoryStats();
 }
 
 function renderInventoryStats(){
@@ -30422,24 +30440,20 @@ function renderInventoryStats(){
     const el=$("inventoryStats");
     if(!el) return;
 
-    if(!stats){
-        el.innerHTML='<div class="inventory-empty-character">第三角色尚未建立</div>';
-        return;
-    }
+    el.replaceChildren();
+    if(!stats) return;
 
-    /*
-       V77：
-       背包常駐資訊只留 HP / SP。
-       其他能力改由立繪右上角放大鏡開啟詳細資訊。
-    */
-    el.innerHTML=`
-        <div class="inventory-stat-row inventory-stat-primary">
-            <span>HP</span><b>${stats.maxHP}</b>
-        </div>
-        <div class="inventory-stat-row inventory-stat-primary">
-            <span>SP</span><b>${stats.maxSP}</b>
-        </div>
-    `;
+    // Display the existing stat owner's limits; these are not current resources.
+    for(const [label,value] of [["最大 HP",stats.maxHP],["最大 SP",stats.maxSP]]){
+        const row=document.createElement("div");
+        row.className="inventory-stat-row inventory-stat-primary inventory-character-resource-row";
+        const title=document.createElement("span");
+        title.textContent=label;
+        const amount=document.createElement("b");
+        amount.textContent=String(value);
+        row.append(title,amount);
+        el.appendChild(row);
+    }
 }
 
 function getInventoryCharacterCriticalStats(index){
@@ -30769,6 +30783,7 @@ function renderInventory(){
     }
 
     renderInventoryCharacterTabs();
+    renderInventoryCharacterSummary();
     renderEquipment();
     renderInventoryItems();
     if(typeof window!=="undefined"&&typeof window.v131SyncInventoryPortrait==="function"){
