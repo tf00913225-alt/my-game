@@ -347,13 +347,13 @@
             :unitRect;
         const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
         const hudNodes=Array.from(hud.querySelectorAll(
-            ".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
+            ".monster-hp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
         ));
         const hpNodes=Array.from(hud.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
         const spNodes=Array.from(hud.querySelectorAll(".monster-sp,.sp-bar,.battle-sp-bar,.player-sp-bar,[data-hud=\"sp\"],[data-stat=\"sp\"]"));
         const resourceState=resourceStateFor(targetSide,unitIndex);
         const hpProjection=projectionFor(hpNodes[0],resourceState&&resourceState.hpRatio,resourceState&&resourceState.shieldRatio);
-        const spProjection=projectionFor(spNodes[0],resourceState&&resourceState.spRatio,0);
+        const spProjection=targetSide==="monster"?null:projectionFor(spNodes[0],resourceState&&resourceState.spRatio,0);
         const hpRect=hpProjection&&hpProjection.rect;
         const spRect=spProjection&&spProjection.rect;
         const paint=art&&art.querySelector(".v174-portrait-paint")||art;
@@ -387,6 +387,12 @@
         }
         if(feedbackBottom<=feedbackTop){
             feedbackBottom=Math.min(unitRect.bottom-4,feedbackTop+24);
+        }
+        // The approved enemy HUD is above its portrait. Read the real HUD
+        // projection and reserve feedback below it; allies retain bottom HUDs.
+        if(hud.dataset?.anchor==="top"){
+            feedbackTop=Math.max(unitRect.top+6,Math.min(unitRect.bottom-24,hudBottom+8));
+            feedbackBottom=unitRect.bottom-6;
         }
         const feedbackSafeRect={
             left:unitRect.left+4,top:feedbackTop,right:unitRect.right-4,bottom:feedbackBottom,

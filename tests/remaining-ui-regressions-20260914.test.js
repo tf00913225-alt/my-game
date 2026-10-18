@@ -23,8 +23,8 @@ assert.match(inventoryCss,/inventory-grid-classic \.inventory-item-classic \.inv
 assert.doesNotMatch(abyssCss,/#game-stage #inventoryPage \.inventory-item-classic \.inventory-icon > \.v169-item-art\{/);
 assert.doesNotMatch(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*top:0!important/,
     "legacy V173.51 runtime must not move enemy names above the card");
-assert.match(battlefieldCss,/\.v174-unit-hud:not\(\[data-boss="true"\]\) \.battle-monster-name\{[\s\S]*bottom:0 !important;[\s\S]*z-index:24 !important/,
-    "the Fixed Slot layout owner must keep enemy names below their artwork");
+assert.match(battlefieldCss,/\.v174-unit-hud\[data-side="monster"\] \.battle-monster-name\{top:0 !important;bottom:auto !important/,
+    "the Fixed Slot layout owner anchors enemy names above their HP and artwork");
 assert.match(battlefieldCss,/\.v-fixed-battle-slot > \.battle-monster > \.v174-battle-art,[\s\S]*bottom:var\(--battle-art-hud-reserve\) !important/,
     "the Fixed Slot layout owner must reserve card-bottom HUD space");
 assert.match(battlefieldCss,/battle-player\.v174-cardless-unit\.active-turn\{[\s\S]*outline:0 !important;[\s\S]*box-shadow:none !important/);

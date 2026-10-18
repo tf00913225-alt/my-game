@@ -97,6 +97,39 @@ function syncUnitArtwork(card,kind,selectedRecord){
 const HUD_SELECTOR=":scope > .monster-status-badges,:scope > .monster-hp,:scope > .monster-sp,:scope > .hp-bar,:scope > .sp-bar,:scope > .battle-monster-name,:scope > .battle-player-id";
 let hudLayer=null;
 function unitHud(card){ return card&&card.v174UnitHud||card; }
+function syncIdentity(card,side,entity){
+    if(!card)return;
+    if(!entity){
+        const index=Number(String(card.id).replace(side==="monster"?"battleMonster":"battlePlayerCard",""));
+        try{entity=side==="monster"?monsters[index]:getPartyCharacterByIndex(index);}catch(_){}
+    }
+    if(!entity)return;
+    const identity=unitHud(card).querySelector(side==="monster"?".battle-monster-name":".battle-player-id");
+    if(!identity)return;
+    let emblem=identity.querySelector(".battle-identity-element");
+    if(!emblem){
+        identity.replaceChildren();
+        emblem=document.createElement("span");emblem.className="battle-identity-element";
+        const copy=document.createElement("span");copy.className="battle-identity-copy";
+        const name=document.createElement("span");name.className="battle-identity-name";
+        const level=document.createElement("span");level.className="battle-identity-level";
+        copy.append(name,level);identity.append(emblem,copy);
+    }
+    const element=String(entity.element||"");
+    const meta=typeof elementDatabase!=="undefined"?elementDatabase[element]:null;
+    if(emblem.dataset.element!==element){
+        emblem.dataset.element=element;
+        emblem.setAttribute("aria-label",meta?.name||"無屬性");
+        if(meta){
+            const glyph=document.createElement("span");
+            glyph.className="elem-icon elem-icon-"+element;
+            glyph.setAttribute("aria-hidden","true");
+            emblem.replaceChildren(glyph);
+        }else setTextIfChanged(emblem,"無");
+    }
+    setTextIfChanged(identity.querySelector(".battle-identity-name"),String(side==="monster"?entity.name||"":entity.id||entity.name||""));
+    setTextIfChanged(identity.querySelector(".battle-identity-level"),"Lv."+numericValue(entity.level));
+}
 function prepareUnitHud(card,side){
     let hud=card.v174UnitHud;
     if(!hud){
@@ -110,6 +143,8 @@ function prepareUnitHud(card,side){
     }
     card.querySelectorAll(HUD_SELECTOR).forEach(node=>hud.appendChild(node));
     hud.dataset.boss=String(card.classList.contains("gameplay-boss-card"));
+    hud.dataset.anchor=side==="monster"?"top":"bottom";
+    syncIdentity(card,side);
     return hud;
 }
 function clearUnitHud(side){
@@ -265,6 +300,7 @@ function playEscapePresentation(characterIndex,succeeded){
 window.FourSymbolsBattlePresentation=Object.freeze({
     version:"cardless-presentation-v3",
     applyUnit:syncUnitArtwork,
+    syncIdentity:syncIdentity,
     sync:syncBattlePresentation,
     playEscape:playEscapePresentation,
     cleanupEscape:cleanupEscapePresentation,

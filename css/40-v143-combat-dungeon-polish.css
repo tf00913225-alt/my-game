@@ -27,25 +27,6 @@
     font-size:20px !important;
 }
 
-#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card .battle-monster-name.v143-monster-identity{
-    display:block !important;
-    width:100% !important;
-    min-width:0 !important;
-    min-height:19px !important;
-    max-height:19px !important;
-    flex:0 0 19px !important;
-    overflow:visible !important;
-    color:#fff2cf !important;
-    font-size:16px !important;
-    font-weight:900 !important;
-    line-height:19px !important;
-    letter-spacing:-.25px !important;
-    text-align:center !important;
-    white-space:nowrap !important;
-    text-overflow:clip !important;
-    overflow-wrap:normal !important;
-    transform-origin:center top;
-}
 
 #game-stage > #app > #game-content #battlePage .battle-monster-level[hidden]{
     display:none !important;

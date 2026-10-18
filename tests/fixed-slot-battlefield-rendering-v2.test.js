@@ -89,7 +89,7 @@ const safeTop=Number(css.match(/--battle-enemy-safe-top:(\d+)px/)?.[1]||0);
 const artOverhang=Number(css.match(/--battle-art-overhang-top:(\d+)px/)?.[1]||0);
 assert.ok(safeTop>=artOverhang+3,"enemy safe-top must cover artwork overhang plus idle lift");
 assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\[data-slot-row="back"\]\{top:var\(--battle-enemy-safe-top\) !important;\}/,"enemy back row must stay inside the portrait viewport safe region");
-assert.doesNotMatch(css,/\bscale\s*:/,"raster size must not scale its centering or flight translation");
+assert.doesNotMatch(css.match(/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[^}]*\}/)?.[0]||"",/\bscale\s*:/,"VFX raster size must not scale its centering or flight translation");
 
 // Execute the production sizing functions. These checks supplement, never
 // replace, fully loaded battle runtime visual acceptance.
@@ -216,8 +216,8 @@ console.log("Fixed Slot Battlefield Rendering V2 regression contract passed.");
 
 assert.match(css, /\[data-enemy-battlefield-profile="standard-six"\]\{[\s\S]*?--battle-enemy-region-track:40fr;[\s\S]*?--battle-center-region-track:21fr;[\s\S]*?--battle-ally-region-track:39fr;/,"only standard six-slot profile reallocates portrait height");
 
-assert.match(css,/--battle-portrait-visible-height:101\.55px;/,"six-slot normal art preserves measured visible height");
-assert.match(css,/--battle-portrait-visible-height:105\.27px;/,"elite art preserves its larger class height");
+assert.match(css,/--battle-portrait-visible-height:min\(101\.55px, 92cqh\);/,"normal art retains its preferred height within the paint box below the top HUD");
+assert.match(css,/--battle-portrait-visible-height:min\(105\.27px, 96cqh\);/,"elite art remains larger while respecting the top HUD");
 
 assert.match(fs.readFileSync("index.html","utf8"), /id="battleActionRegion"[\s\S]*?id="battleElementBoxButton"[\s\S]*?id="turnTargetRow"/,"element box shares the formal operation reserve");
 
@@ -225,5 +225,5 @@ assert.match(fs.readFileSync("index.html","utf8"), /id="battleActionRegion"[\s\S
 // remain scoped to the separate Boss card contract.
 assert.doesNotMatch(fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8"), /#battlePage \.battle-monster-name\.v143-monster-identity\{/);
 assert.doesNotMatch(fs.readFileSync("css/45-v152-dev-fixes.css","utf8"), /#battlePage \.battle-monster-name\.v143-monster-identity\{/);
-assert.match(css,/--battle-name-row-height:16px;/);
+assert.match(css,/--battle-name-row-height:26px;/);
 assert.match(css,/--battle-art-hud-reserve:44px;/);

@@ -11242,11 +11242,15 @@
         const name=hud.querySelector(".battle-monster-name");
         const level=card.querySelector(".battle-monster-level");
         if(!name){ return; }
-        const identity=String(monster.name||"");
-        if(name.textContent.trim()!==identity){ name.textContent=identity; }
+        const presentation=window.FourSymbolsBattlePresentation;
+        if(presentation?.syncIdentity)presentation.syncIdentity(card,"monster",monster);
+        else if(name.textContent.trim()!==String(monster.name||""))name.textContent=String(monster.name||"");
         name.classList.add("v143-monster-identity");
         if(level){ level.hidden=true; level.setAttribute("aria-hidden","true"); }
-        fitEnemyIdentity(card,name);
+        // Fixed Slot owns the structured identity; legacy fitting must not
+        // flatten the name/level or distort the elemental emblem.
+        if(!name.querySelector(".battle-identity-copy"))fitEnemyIdentity(card,name);
+        else {name.style.removeProperty("font-size");name.style.removeProperty("transform");name.style.removeProperty("width");}
         fitEnemyBars(card);
     }
 

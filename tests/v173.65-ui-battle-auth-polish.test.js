@@ -13,8 +13,8 @@ const battle=read("js/54-v173.51-battle-qa.js");
 const fixedBattle=read("css/fixed-slot-battlefield-rendering-v2.css");
 assert.doesNotMatch(battle,/battle-player\.v174-cardless-unit>\.v174-battle-art\{[\s\S]*?position:absolute!important/);
 assert.match(fixedBattle,/v-fixed-ally-slot > \.battle-player > \.v174-battle-art\{[\s\S]*?background-size:var\(--portrait-background-size, contain\) !important/);
-assert.match(fixedBattle,/\.v174-unit-hud:not\(\[data-boss="true"\]\) \.monster-hp,[\s\S]*?bottom:calc\(var\(--battle-name-row-height\) \+ var\(--battle-resource-bar-height\)\) !important/);
-assert.match(fixedBattle,/\.v174-unit-hud:not\(\[data-boss="true"\]\) \.monster-sp,[\s\S]*?bottom:var\(--battle-name-row-height\) !important/);
+assert.match(fixedBattle,/\.v174-unit-hud :is\(\.monster-hp,\.hp-bar\)\{bottom:8px !important/);
+assert.match(fixedBattle,/\.v174-unit-hud .sp-bar\{bottom:0 !important/);
 
 const city=read("js/16-stage-v54-main-city-runtime.js");
 const cityCss=read("css/19-stage-v54-main-city-moderate-native-scale.css");
