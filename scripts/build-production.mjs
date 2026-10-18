@@ -54,7 +54,6 @@ const appScripts=[
     "js/02-stage-v9-native-coordinate-api.js",
     "js/03-stage-v10-battle-log-scroll-runtime.js",
     "js/04-stage-v11-native-bottom-nav-runtime.js",
-    "js/06-stage-v39-battle-map-background-runtime.js",
     "js/07-stage-v40-root-battle-background-runtime.js",
     "js/08-stage-v41-runtime.js",
     "js/09-stage-v45-runtime.js",

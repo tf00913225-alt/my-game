@@ -3,21 +3,6 @@
    Baseline reset: V41.
 */
 
-/* Darken ONLY the actual battle map image. No pseudo overlay, no extra
-   element, and no change to battlePage dimensions. */
-#game-stage > #app > #game-content #battlePage > .battle-bg-shared{
-    position:absolute !important;
-    left:0 !important;
-    top:0 !important;
-    width:420px !important;
-    height:746.6666667px !important;
-    z-index:0 !important;
-    pointer-events:none !important;
-    background-size:cover !important;
-    background-position:center top !important;
-    background-repeat:no-repeat !important;
-}
-
 /* Explicitly remove every previous veil approach. */
 #game-stage > #app > #game-content #battlePage::before,
 #game-stage > #app > #game-content #battlePage::after,

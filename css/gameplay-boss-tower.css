@@ -673,8 +673,8 @@
     z-index:1;
     left:0;
     right:0;
-    top:-4px;
-    bottom:44px;
+    top:36px;
+    bottom:6px;
     width:auto;
     height:auto;
     background-position:center bottom;
@@ -688,63 +688,7 @@
     display:none;
 }
 
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-boss="true"] > .battle-monster-name,
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-boss="true"] > .monster-hp,
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-boss="true"] > .monster-sp,
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-boss="true"] > .monster-status-badges{
-    position:absolute;
-    left:8%;
-    right:8%;
-    width:auto;
-    box-sizing:border-box;
-    z-index:22;
-}
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-boss="true"] > .battle-monster-name{
-    position:absolute !important;
-    top:auto !important;
-    bottom:0 !important;
-    display:flex !important;
-    align-items:center;
-    justify-content:center;
-    flex:none !important;
-    width:auto !important;
-    height:16px !important;
-    min-height:16px !important;
-    max-height:16px !important;
-    margin:0 !important;
-    padding:0 !important;
-    color:#f4d88f;
-    font-size:14px;
-    line-height:16px;
-    text-align:center;
-}
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-boss="true"] > .monster-hp,
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-boss="true"] > .monster-sp{
-    position:absolute !important;
-    top:auto !important;
-    display:block !important;
-    flex:none !important;
-    margin:0 !important;
-    height:var(--battle-resource-bar-height,11px) !important;
-    min-height:var(--battle-resource-bar-height,11px) !important;
-    visibility:visible !important;
-    opacity:1 !important;
-    overflow:hidden !important;
-}
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-boss="true"] > .monster-hp{bottom:29px !important;}
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-boss="true"] > .monster-sp{bottom:17px !important;}
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-boss="true"] .monster-bar-text{
-    display:flex !important;
-    align-items:center;
-    justify-content:center;
-    height:var(--battle-resource-bar-height,11px) !important;
-    font-size:10px;
-    line-height:var(--battle-resource-bar-height,11px) !important;
-}
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-boss="true"] > .monster-status-badges{
-    bottom:53px;
-    min-height:12px;
-}
+/* Boss identity/resources share the canonical Fixed Slot HUD; shield remains here. */
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-boss="true"] > .monster-hp > .boss-hp-shield-overlay{
     position:absolute;
     top:0;

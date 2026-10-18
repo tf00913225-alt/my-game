@@ -33,12 +33,12 @@ test("V143 assets stay ordered before later patches under the current cache vers
     assert.deepEqual(order.slice().sort((a,b)=>a-b),order);
 });
 
-test("enemy identity starts at 16px, never drops below 12px and bars use 12px bold text",()=>{
-    assert.match(system,/const identity=String\(monster\.name\|\|""\)/);
+test("enemy identity delegates to the compact live Entity HUD while legacy fitting remains isolated",()=>{
+    assert.match(system,/presentation\.syncIdentity\(card,"monster",monster\)/);
     assert.doesNotMatch(system,/monster\.name\+" Lv"\+monster\.level/);
     assert.match(system,/let size=16/);
     assert.match(system,/while\(size>12/);
-    assert.match(css,/\.battle-monster-name\.v143-monster-identity[\s\S]*font-size:16px !important/);
+    assert.match(fixedSlotCss,/\.battle-identity-name\{[^}]*font-size:11px/);
     assert.match(css,/\.monster-bar-text[\s\S]*font-size:var\(--v143-monster-bar-font-size,12px\) !important;[\s\S]*font-weight:900/);
     // Ordinary monster cards keep the V143 76x100 contract through fallback values;
     // the formal Boss target entity owns its distinct HUD and is excluded here.

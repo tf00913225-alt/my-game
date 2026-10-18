@@ -93,19 +93,6 @@
 /* Battle Floating Feedback Owner now owns popup layering. */
 
 /* Enemy identity is centered on its actual card width. */
-#game-stage > #app > #game-content #battlePage .battle-monster.gameplay-boss-card .battle-monster-name.v143-monster-identity{
-    display:flex !important;
-    width:100% !important;
-    align-self:center !important;
-    align-items:center !important;
-    justify-content:center !important;
-    margin-right:auto !important;
-    margin-left:auto !important;
-    padding:0 !important;
-    box-sizing:border-box !important;
-    text-align:center !important;
-    transform-origin:center center !important;
-}
 
 /* Abyss floors 1–4 use the supplied emperor/soldier illustrations. */
 #game-stage #battlePage .battle-monster.v152-abyss-portrait{

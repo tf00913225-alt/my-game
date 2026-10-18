@@ -1215,7 +1215,7 @@ try{
             monsterHpVisible:getComputedStyle(monsterHp).visibility,
             player:{art:rect(playerArt),hp:rect(playerHp),sp:rect(playerSp),name:rect(playerName)},
             monster:{art:rect(monsterArt),hp:rect(monsterHp),sp:rect(monsterSp),name:rect(monsterName)},
-            logicalHeights:{playerHp:playerHp?.offsetHeight||0,monsterHp:monsterHp?.offsetHeight||0}
+            logicalHeights:{playerHp:playerHp?.offsetHeight||0,monsterHp:monsterHp?.offsetHeight||0,monsterSpWidth:monsterSp?.offsetWidth||0}
         };
         playerStatus.remove();
         monsterStatus.remove();
@@ -1225,16 +1225,17 @@ try{
     assert.ok(resourceLayers.playerHpZ>resourceLayers.playerStatusZ,"Player HP bar must render above status VFX");
     assert.ok(resourceLayers.playerSpZ>resourceLayers.playerStatusZ,"Player SP bar must render above status VFX");
     assert.ok(resourceLayers.monsterHpZ>resourceLayers.monsterStatusZ,"Enemy HP bar must render above status VFX");
-    assert.ok(resourceLayers.monsterSpZ>resourceLayers.monsterStatusZ,"Enemy SP bar must render above status VFX");
+    assert.equal(resourceLayers.logicalHeights.monsterSpWidth,1,"Enemy SP compatibility node stays off the visible HUD");
     assert.equal(resourceLayers.playerHpVisible,"visible","Player HP bar must remain visible");
     assert.equal(resourceLayers.monsterHpVisible,"visible","Enemy HP bar must remain visible");
-    for(const [side,hud] of Object.entries({player:resourceLayers.player,monster:resourceLayers.monster})){
-        assert.ok(hud.art.bottom<=hud.hp.top+1,`${side} artwork must end close to and above HP`);
-        assert.ok(hud.hp.bottom<=hud.sp.top+1,`${side} HP must sit above SP`);
-        assert.ok(hud.sp.bottom<=hud.name.top+1,`${side} name must sit below both resource bars`);
-    }
+    const allyHud=resourceLayers.player,enemyHud=resourceLayers.monster;
+    assert.ok(allyHud.art.bottom<=allyHud.name.top+1,"ally portrait ends above identity");
+    assert.ok(allyHud.name.bottom<=allyHud.hp.top+1,"ally identity sits above HP");
+    assert.ok(allyHud.hp.bottom<=allyHud.sp.top+1,"ally HP sits above SP");
+    assert.ok(enemyHud.name.bottom<=enemyHud.hp.top+1,"enemy identity sits above HP");
+    assert.ok(enemyHud.hp.bottom<=enemyHud.art.top+1,"enemy top HUD stays above portrait");
     assert.equal(resourceLayers.logicalHeights.monsterHp,resourceLayers.logicalHeights.playerHp,"Enemy and player resource bars must use the same formal owner height");
-    assert.equal(resourceLayers.logicalHeights.monsterHp,13,"Ordinary battle resource bars must use the shared 13px logical height");
+    assert.equal(resourceLayers.logicalHeights.monsterHp,6,"Battle resource bars use the shared thin logical height");
 
     const iceArrowRain=await client.eval(`(()=>{
         const director=window.v142SkillAnimationDirector;
@@ -1732,9 +1733,9 @@ try{
     assert.equal(bossMode.bossHud.hpPosition,"absolute","Boss HP must remain on its absolute HUD anchor");
     assert.equal(bossMode.bossHud.spPosition,"absolute","Boss SP must remain on its absolute HUD anchor");
     assert.equal(bossMode.bossHud.hpDisplay,"block");assert.equal(bossMode.bossHud.spDisplay,"block");
-    assert.equal(Math.round(bossMode.bossHud.hp.height),11);assert.equal(Math.round(bossMode.bossHud.sp.height),11);
-    assert.ok(bossMode.bossHud.hp.bottom<=bossMode.bossHud.sp.top+1,"Boss HP must sit above SP");
-    assert.ok(bossMode.bossHud.sp.bottom<=bossMode.bossHud.name.top+1,"Boss SP must sit above the name");
+    assert.equal(Math.round(bossMode.bossHud.hp.height),6);assert.equal(Math.round(bossMode.bossHud.sp.height),1);
+    assert.ok(bossMode.bossHud.name.bottom<=bossMode.bossHud.hp.top+1,"Boss identity sits above HP");
+    assert.equal(Math.round(bossMode.bossHud.sp.width),1,"Boss SP remains a compatibility node after stage scaling");
     bossMode.sideVisuals.forEach(side=>{assert.ok(side.art.right<=bossMode.bossArt.left+1||side.art.left>=bossMode.bossArt.right-1,"Boss-side artwork must not overlap Boss artwork");if(/[15]$/.test(side.slot)){const left=/1$/.test(side.slot);assert.ok(left?side.art.centerX<=side.card.centerX-6:side.art.centerX>=side.card.centerX+6,"Boss-side artwork must visibly shift outward");}});
     assert.equal(bossMode.vfx.targetIndexes.length,1,"Boss tri VFX damage identity must remain one selected entity");
     assert.equal(bossMode.vfx.geometrySlots.length,3,"Boss tri VFX must retain its authored three-Slot visual width");
