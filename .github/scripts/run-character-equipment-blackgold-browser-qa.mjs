@@ -117,8 +117,9 @@ try{
         // Overflow fixture uses the real inventory renderer and gesture owner.
         await c.eval("inventoryItems.push(...Array.from({length:80},(_,i)=>({id:'qa-character-material-'+i,name:'驗收材料'+i,type:'material',rarityKey:'white',count:1})));renderInventory();");
         await tap('#inventoryCategoryTabs [data-filter="material"]');
-        const bag=await c.eval(`(()=>{const e=document.getElementById('inventoryGridScroll');return {count:document.getElementById('inventoryGrid').children.length,client:e.clientHeight,scroll:e.scrollHeight,overflow:getComputedStyle(e).overflowY,owner:FourSymbolsGestureArbiter.findScrollOwner(e)?.node.id};})()`);
+        const bag=await c.eval(`(()=>{const e=document.getElementById('inventoryGridScroll'),style=getComputedStyle(e),slot=document.querySelector('.inventory-item-classic'),grid=document.querySelector('.inventory-grid-classic');return {count:document.getElementById('inventoryGrid').children.length,client:e.clientHeight,scroll:e.scrollHeight,contentHeight:e.clientHeight-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom),slotHeight:slot.offsetHeight,rowGap:parseFloat(getComputedStyle(grid).rowGap),overflow:style.overflowY,owner:FourSymbolsGestureArbiter.findScrollOwner(e)?.node.id};})()`);
         assert.ok(bag.count>0);assert.ok(bag.client>0);assert.ok(['auto','scroll'].includes(bag.overflow));
+        assert.ok(bag.contentHeight>=3*bag.slotHeight+2*bag.rowGap-1,'character presentation must preserve three complete backpack rows');
         if(bag.scroll>bag.client+1){
             assert.equal(bag.owner,'inventoryGridScroll');
             const r=await c.eval("(()=>{const r=inventoryGridScroll.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height*.7};})()");
