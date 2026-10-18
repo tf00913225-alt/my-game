@@ -100,9 +100,10 @@ test("retained ledger inventory cannot hide a later credit after its receipt and
 test("unsupported ledger identity cannot be ignored even at an old revision",async()=>{
     for(const patch of [{operationId:creditId},{ownerUid:"foreign-owner"},
         {grantId:"unknown-retained-grant"},{kind:"hero-growth"}]){
-        const h=fixture();h.data.delete(`${root}/ledgerEntries/${creditId}`);
+        const h=fixture(),originalLedger=h.data.get(`${root}/ledgerEntries/${creditId}`);
+        h.data.delete(`${root}/ledgerEntries/${creditId}`);
         h.data.set(`${root}/ledgerEntries/orphaned-ledger-proof-0001`,{
-            ...h.data.get(`${root}/ledgerEntries/${creditId}`),
+            ...originalLedger,
             operationId:"orphaned-ledger-proof-0001",...patch});
         await refused(h);
     }
