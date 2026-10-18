@@ -40,7 +40,7 @@ const expression=String.raw`(async()=>{
   check(!clipped,'clipped alpha silhouette '+record.portraitKey+' '+JSON.stringify({a:a.toJSON(),p:p.toJSON(),top,bottom,left,right}));
   check(Math.abs(bottom-baseline)<1,'bottom baseline drift '+record.portraitKey);
   const target=registry.presentation.classes[cls].bodyHeight;
-  const targetHeight=fixedSix?(cls==='ELITE'?105.27:101.55)*projection:target*a.height;
+  const targetHeight=fixedSix?Math.min((cls==='ELITE'?105.27:101.55)*projection,a.height*(cls==='ELITE'?.96:.92)):target*a.height;
   const expected=Math.min(targetHeight,a.width/(r-l)*(b-t));
   check(Math.abs((bottom-top)-expected)<1.1,'body-height contract drift '+record.portraitKey);
   evidence.geometry.push({label,portraitKey:record.portraitKey,sizeClass:cls,slotHeight:a.height,visualBodyTop:top,visualBodyBottom:bottom,visualBodyHeight:bottom-top,baseline,clipped,overflow:false,widthLimited:expected<targetHeight-1});
