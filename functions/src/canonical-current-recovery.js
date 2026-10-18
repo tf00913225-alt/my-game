@@ -7,6 +7,7 @@ const {inspectRecoveryArchive,createRecoveryArchive}=
 const {verifyCreditedGrant,verifyReservedGrant}=require("./credited-grant-evidence");
 const {verifyShopPurchaseEvidence}=require("./canonical-shop-purchase");
 const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
+const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 const SETS={
@@ -211,7 +212,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 const operation=await tx.get(root.collection("operations").doc(doc.id));
                 const debit=operation.data();
                 if(receipt||!operation.exists||debit.schemaVersion!==1||debit.ownerUid!==uid||
-                   debit.operationId!==doc.id||!["shop-purchase","exp-allocation"].includes(debit.kind)){
+                   debit.operationId!==doc.id||!["shop-purchase","exp-allocation","attribute-allocation"].includes(debit.kind)){
                     fail("data-loss","An unmatched ledger entry blocks recovery.");
                 }
                 const debitRevision=debit.kind==="shop-purchase"?debit.purchasedRevision:debit.allocatedRevision;
@@ -228,7 +229,10 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                     const original=inspectRecoveryArchive(debitArchive.data(),uid,debitRevision,debitSnapshot.data());
                     if(original.account.slots[0]!==records.account.slots[0]||
                        (debit.kind==="exp-allocation"&&!original.characters.some(row=>
-                           row.characterId===debit.characterId&&row.state.level===debit.levelAfter))){
+                           row.characterId===debit.characterId&&row.state.level===debit.levelAfter))||
+                       (debit.kind==="attribute-allocation"&&!original.characters.some(row=>
+                           row.characterId===debit.characterId&&row.state[debit.stat]===debit.statAfter&&
+                           row.state.attributePoints===debit.pointsAfter))){
                         throw new Error("Debit character differs from its original source");
                     }
                 }catch(_){fail("data-loss","Original debit snapshot or archive is inconsistent.");}
@@ -236,8 +240,10 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                     receipt:debit,ledger,grantExists:false,fail};
                 if(debit.kind==="shop-purchase"){
                     await verifyShopPurchaseEvidence({...proof,itemId:debit.itemId,quantity:debit.quantity});
-                }else{
+                }else if(debit.kind==="exp-allocation"){
                     verifyExpAllocationEvidence({...proof,characterId:records.account.slots[0]});
+                }else{
+                    verifyAttributeAllocationEvidence({...proof,characterId:records.account.slots[0],stat:debit.stat});
                 }
             }
             if(creditLedgerCount!==archivedClaims.size){

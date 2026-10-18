@@ -122,12 +122,14 @@ function addDebit(h,kind){
     h.data.set(`${root}/recoveryArchives/4`,createRecoveryArchive(uid,4,records,snapshot));
     const receipt={schemaVersion:1,ownerUid:uid,operationId:debitId,kind,snapshotSha256:snapshot.sha256,
         ...(kind==="shop-purchase"?{itemId:"hpPotion10",quantity:1,cost:20,ownedItemId,purchasedRevision:4}:
-            {characterId,cost:10,levelAfter:2,allocatedRevision:4})};
+            kind==="exp-allocation"?{characterId,cost:10,levelAfter:2,allocatedRevision:4}:
+            {characterId,stat:"vitality",statAfter:records.characters[0].state.vitality,
+                pointsAfter:records.characters[0].state.attributePoints,allocatedRevision:4})};
     h.data.set(`${root}/operations/${debitId}`,receipt);
-    h.data.set(`${root}/ledgerEntries/${debitId}`,{...receipt,amount:-receipt.cost});
+    h.data.set(`${root}/ledgerEntries/${debitId}`,{...receipt,amount:kind==="attribute-allocation"?-1:-receipt.cost});
 }
-test("supported purchase and EXP debit history survives full source loss without replaying costs",async()=>{
-    for(const kind of ["shop-purchase","exp-allocation"]){
+test("supported purchase, EXP and attribute debit history survives full source loss without replaying costs",async()=>{
+    for(const kind of ["shop-purchase","exp-allocation","attribute-allocation"]){
         const h=fixture();addDebit(h,kind);
         const receipt=h.data.get(`${root}/operations/${debitId}`),ledger=h.data.get(`${root}/ledgerEntries/${debitId}`);
         for(const path of h.current.keys())h.data.delete(path);
@@ -139,12 +141,12 @@ test("supported purchase and EXP debit history survives full source loss without
     }
 });
 test("debit ledgers require their original receipt, revision and intact snapshot/archive",async()=>{
-    for(const kind of ["shop-purchase","exp-allocation"]){
+    for(const kind of ["shop-purchase","exp-allocation","attribute-allocation"]){
         for(const change of [
             h=>h.data.delete(`${root}/operations/${debitId}`),
             h=>h.data.get(`${root}/operations/${debitId}`).ownerUid="foreign-owner",
             h=>h.data.get(`${root}/operations/${debitId}`)[kind==="shop-purchase"?"purchasedRevision":"allocatedRevision"]=8,
-            h=>h.data.get(`${root}/ledgerEntries/${debitId}`).amount=-1,
+            h=>h.data.get(`${root}/ledgerEntries/${debitId}`).amount=-999,
             h=>h.data.delete(`${root}/playableSnapshots/4`),
             h=>h.data.delete(`${root}/recoveryArchives/4`),
             h=>h.data.get(`${root}/recoveryArchives/4`).sourceSha256="a".repeat(64),

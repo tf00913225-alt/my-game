@@ -2425,7 +2425,7 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     const withOrphanLedger=await dump();
     await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
     assert.deepEqual(await dump(),withOrphanLedger);await orphanLedger.delete();
-    for(const id of [shopArgs.operationId,ownedAllocation]){
+    for(const id of [shopArgs.operationId,ownedAllocation,attributeOperation]){
         const debitRef=ownedRoot.collection("operations").doc(id);
         const debitLedgerRef=ownedRoot.collection("ledgerEntries").doc(id);
         const debit=(await debitRef.get()).data(),debitLedger=(await debitLedgerRef.get()).data();
@@ -2442,7 +2442,7 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
         assert.deepEqual(await dump(),corruptDebit);await debitLedgerRef.set(debitLedger);
     }
     assert.deepEqual(await dump(),damaged);
-    console.log("Current recovery ledger inventory real Firestore PASS: orphan ledger and missing/later/corrupt debit proof refuse without writes; original purchase/EXP ledger history retained for approved restore.");
+    console.log("Current recovery ledger inventory real Firestore PASS: orphan ledger and missing/later/corrupt debit proof refuse without writes; original purchase/EXP/attribute ledger history retained for approved restore.");
 
     // A stale/damaged envelope must not authorize overwriting surviving newer
     // sources. Missing revision evidence is equally unreconciled. Emulator only.
