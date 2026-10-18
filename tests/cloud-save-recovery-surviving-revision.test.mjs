@@ -213,6 +213,22 @@ function addDebit(h,kind){
     h.data.set(`${root}/operations/${debitId}`,receipt);
     h.data.set(`${root}/ledgerEntries/${debitId}`,{...receipt,amount:kind==="attribute-allocation"?-1:-receipt.cost});
 }
+test("retained debit receipts cannot disappear behind missing ledgers",async()=>{
+    for(const kind of ["shop-purchase","exp-allocation","attribute-allocation"]){
+        for(const missingSources of [false,true]){
+            const h=fixture();addDebit(h,kind);
+            h.data.delete(`${root}/ledgerEntries/${debitId}`);
+            if(missingSources)for(const path of h.current.keys())h.data.delete(path);
+            await refused(h);
+        }
+    }
+});
+test("operation receipt inventory is bounded before reverse debit reconciliation",async()=>{
+    const h=fixture();for(let i=0;i<401;i++)h.data.set(`${root}/operations/retained-${i}`,{});
+    const before=JSON.stringify([...h.data]);
+    await assert.rejects(h.recovery.restoreCurrent({},intent),e=>e.code==="failed-precondition");
+    assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
+});
 test("supported purchase, EXP and attribute debit history survives full source loss without replaying costs",async()=>{
     for(const kind of ["shop-purchase","exp-allocation","attribute-allocation"]){
         const h=fixture();addDebit(h,kind);
@@ -379,6 +395,7 @@ test("known older/current sources and entirely missing sources still restore wit
             operationId:"later-read-only-credit",creditRevision:9});
         h.data.set(`${root}/pendingGrants/later-read-only-grant`,{status:"unknown-later-history"});
         h.data.set(`${root}/rewardEvents/later-read-only-event`,{eventType:"unknown-later-history"});
+        h.data.set(`${root}/operations/later-read-only-debit`,{kind:"shop-purchase",purchasedRevision:9});
         const before=JSON.stringify([...h.data]),count=h.writes();
         assert.deepEqual(await h.recovery.restoreCurrent({},intent),{
             restoredRevision:7,unchanged:true,authoritativeStateReady:false});
