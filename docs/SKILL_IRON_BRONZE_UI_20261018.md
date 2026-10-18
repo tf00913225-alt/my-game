@@ -28,7 +28,7 @@ Work ID: UI-SKILL-IRON-BRONZE-20261018
 | Runtime | 尺寸 | 母圖 SHA256 | Runtime SHA256 |
 |---|---|---|---|
 | `assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp` | 1254×1254 | `361b11980df8913e15ad32fe8c055db54b4d3cc3a40f146550de948ddf14185d` | `827d9ba9a6f8d8b990c9b27a9a7c0d400459f19df9c868b0d51af5ebaaa80ba1` |
-| `assets/ui/skill-iron-bronze/title.9d58221ab504.webp` | 1983×793 | `a4859fcef3a9b02e9ee7ad4a46b69dded95f90f3f9f6aba5bb76a858bae82b96` | `9d58221ab504ad987b3d3048a9d65c682a0e64d20967ffd5e36944c21fce73d1` |
+| `assets/ui/skill-iron-bronze/title-short.bb578519c9f4.webp` | 2079×756 | `7e501593f25d6876800bb548f937402634fcbc76abd8fb3691850884d20a4ffa` | `bb578519c9f421daac11a46c4fc0e50d1482be9f378406d5bf7b2bc9603d620d` |
 
 生成要求：panel 為正面方形暗鐵紋理、古銅直邊與角落龍雲雕飾，中央無文字，供 nine-slice；title 為透明背景橫向龍首與空白古銅銘牌，沒有文字、數字或操作圖案。未使用整張介面截圖作背景。
 
@@ -39,3 +39,13 @@ Work ID: UI-SKILL-IRON-BRONZE-20261018
 原正式技能 production browser QA 增加：兩素材與原頭像／技能圖完整解碼、技能狀態關閉清理、三個角色頁籤框幾何不變、原單一捲動來源。原四元素、學習／升級／裝備、點數不足、前置／等級限制、滿級及技能詳細測試保留。
 
 舊 source tests 改讀目前 CSS Owner；列表寬度驗證改依實際 grid 同欄上下按鈕計算，仍檢查文字與圖案／兩個按鈕均不重疊、字級與點擊尺寸。跨頁驗收使用既有完整 responsive-item QA，不另建共同 CI 或部署流程。最新 SHA、CI、部署與截圖紀錄以本 Work ID 的 PR 為準。
+
+## 核准標題列修正
+
+Work ID: UI-SKILL-HEADER-BRONZE-20261018。使用者核准短銘牌置中與同材質返回按鈕 DEMO 後實作；只有技能狀態套用，其他頁籤、共用框幾何與原返回事件不變。
+
+長銘牌原先是整條 header 的 72% 背景，文字以獨立左 padding 定位，導致文字偏左且尾端空白。改將短銘牌與原標題文字放在同一個原 span，由 flex 置中於避開左側龍紋的文字區；寬度為原標題列 45%。短銘牌以原比例顯示，不裁切或拉伸圖案。標題及原返回按鈕共用 38 個既有 UI 長度單位，保持原共用 header 行高；返回按鈕以古銅倒角、細框及純裝飾箭頭呈現，原點擊／鍵盤事件不變。未新增 DOM、縮放、JavaScript 或互動來源。
+
+短銘牌以內建 imagegen 依核准圖生成：透明背景、左側小龍浮雕、暗鐵古銅空白書寫區、細金邊、無文字／數字／其他介面。母圖 exec-fe317504-3bf4-4614-b1f0-22b14eb656df.png；正常 lossless/exact WebP 轉換，尺寸與 RGBA 逐位元組相同、alpha 0–255。舊長銘牌已無正式 consumer，隨本修正退役；panel 素材沿用。
+
+既有技能 Browser QA 改從真正標題 span 驗證新圖 decode，並檢查短銘牌、置中與按鈕同高；原技能功能與單一 scroller 契約保留。V169 的框架幾何禁令仍保護 panel／scroll，只將已授權的標題與按鈕元件排除，不允許技能狀態另寫框尺寸。

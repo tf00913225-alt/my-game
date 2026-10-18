@@ -190,17 +190,29 @@ async function runViewport(chrome,url,width,height,capture){
                 for(const url of urls){const image=new Image();image.src=url;await image.decode();}
                 return urls;
             };
-            const chrome=[...await decode(getComputedStyle(box).borderImageSource),...await decode(getComputedStyle(box.querySelector('.home-feature-modal-title')).backgroundImage)];
+            const chrome=[...await decode(getComputedStyle(box).borderImageSource),...await decode(getComputedStyle(box.querySelector('#homeFeatureModalTitle')).backgroundImage)];
             const art=[];
             for(const node of document.querySelectorAll('.character-showcase-avatar,#skillPage .skill-row-icon,#skillPage .skill-loadout-slot-icon')){
                 art.push(...await decode(getComputedStyle(node).backgroundImage));
             }
             const scroll={content:getComputedStyle(document.getElementById('characterTabContent')).overflowY,page:getComputedStyle(document.getElementById('skillPage')).overflowY,list:getComputedStyle(document.getElementById('allSkillsList')).overflowY};
+            const title=box.querySelector('#homeFeatureModalTitle');
+            const back=box.querySelector('.character-header-actions button[onclick="closeHomeFeature()"]');
+            const rect=node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};};
+            const titleStyle=getComputedStyle(title),titleRect=rect(title);
+            const range=document.createRange();range.selectNodeContents(title);
+            const textRect=range.getBoundingClientRect(),scale=titleRect.w/title.offsetWidth;
+            const center=titleRect.x+(parseFloat(titleStyle.paddingLeft)+(title.offsetWidth-parseFloat(titleStyle.paddingLeft)-parseFloat(titleStyle.paddingRight))/2)*scale;
+            const header={title:titleRect,back:rect(back),row:rect(title.parentElement),centerError:Math.abs(textRect.x+textRect.width/2-center)};
             const selected=modal.dataset.characterTab;
             closeHomeFeature();const cleared=!modal.hasAttribute('data-character-tab');
             openHomeFeature('character');switchCharacterTab('skill');selectedSkillElementTab='water';renderSkillLoadout();
-            return {frames,chrome,art,scroll,selected,cleared};
+            return {frames,chrome,art,scroll,selected,cleared,header};
         })()`);
+        assert.ok(Math.abs(skin.header.title.h-skin.header.back.h)<.1,'skill title and return must share a height');
+        assert.ok(skin.header.title.w/skin.header.row.w<.5,'skill plaque must stay compact');
+        assert.ok(skin.header.title.x+skin.header.title.w<skin.header.back.x,'title overlaps return');
+        assert.ok(skin.header.centerError<4,'skill text must center inside its usable plaque region');
         assert.equal(skin.selected,'skill');assert.equal(skin.cleared,true,'skill chrome leaks after closing');
         assert.ok(skin.frames.every(frame=>frame.every((value,i)=>Math.abs(value-skin.frames[0][i])<.1)),'shared character frame jumps between tabs');
         assert.equal(skin.chrome.length,2,'both generated decorative assets must decode');
