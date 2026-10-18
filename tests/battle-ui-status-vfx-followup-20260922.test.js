@@ -64,11 +64,11 @@ test("battle information is retired and turn timer remains visible",()=>{
   assert.doesNotMatch(js,/toggleBattleInfoPanel/);
   const mainCss=read("css/00-main.css");
   assert.match(mainCss,/\.skill-quick-button \.sq-sp-block\[hidden\]\{[\s\S]*?display:none;/);
-  assert.match(mainCss,/#battlePage\{[\s\S]*?--battle-command-row-height:66px;[\s\S]*?--battle-command-art-overhang:34px;[\s\S]*?--battle-command-visual-height:calc\(var\(--battle-command-row-height\) \+ var\(--battle-command-art-overhang\)\);/);
+  assert.match(mainCss,/#battlePage\{[\s\S]*?--battle-command-row-height:66px;[\s\S]*?--battle-command-art-overhang:0px;[\s\S]*?--battle-command-visual-height:calc\(var\(--battle-command-row-height\) \+ var\(--battle-command-art-overhang\)\);/);
   assert.doesNotMatch(mainCss,/--battle-center-min-height/);
-  assert.doesNotMatch(css,/--battle-command-row-height:66px|--battle-command-art-overhang:34px/);
+  assert.doesNotMatch(css,/--battle-command-row-height:66px|--battle-command-art-overhang:0px/);
   assert.match(css,/grid-template-rows:[\s\S]*?minmax\(0,var\(--battle-center-region-track\)\)/);
-  assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?position:absolute;[\s\S]*?bottom:var\(--battle-command-visual-height\)/);
+  assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?position:absolute;[\s\S]*?top:0;[\s\S]*?bottom:auto;/);
 });
 
 test("battle reading state suppresses detached transient paint across stacking contexts",()=>{

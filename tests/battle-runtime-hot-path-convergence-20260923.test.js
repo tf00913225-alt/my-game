@@ -84,11 +84,11 @@ function block(source,startToken,endToken){
     assert.doesNotMatch(mainCss,/\.battle-info\{/);
     assert.doesNotMatch(fixedCss,/battle-info-region/,"retired battle log UI must stay absent");
     assert.doesNotMatch(fixedCss,/battle-info-region/,"retired battle log UI must stay absent");
-    assert.match(mainCss,/#battlePage\{[\s\S]*?--battle-command-row-height:66px;[\s\S]*?--battle-command-art-overhang:34px;[\s\S]*?--battle-command-visual-height:calc\(var\(--battle-command-row-height\) \+ var\(--battle-command-art-overhang\)\);[\s\S]*?--battle-turn-row-height:36px;/);
+    assert.match(mainCss,/#battlePage\{[\s\S]*?--battle-command-row-height:66px;[\s\S]*?--battle-command-art-overhang:0px;[\s\S]*?--battle-command-visual-height:calc\(var\(--battle-command-row-height\) \+ var\(--battle-command-art-overhang\)\);[\s\S]*?--battle-turn-row-height:36px;/);
     assert.doesNotMatch(mainCss,/--battle-center-min-height/);
-    assert.doesNotMatch(fixedCss,/--battle-command-row-height:66px|--battle-command-art-overhang:34px/);
+    assert.doesNotMatch(fixedCss,/--battle-command-row-height:66px|--battle-command-art-overhang:0px/);
     assert.match(fixedCss,/minmax\(0,var\(--battle-center-region-track\)\)/);
-    assert.match(fixedCss,/#battleActionRegion > \.turn-target-row\{[\s\S]*?bottom:var\(--battle-command-visual-height\)/);
+    assert.match(fixedCss,/#battleActionRegion > \.turn-target-row\{[\s\S]*?top:0;[\s\S]*?bottom:auto;/);
     assert.doesNotMatch(fixedCss,/#battleActionRegion > \.turn-target-row\{[\s\S]*?bottom:78px/);
 }
 

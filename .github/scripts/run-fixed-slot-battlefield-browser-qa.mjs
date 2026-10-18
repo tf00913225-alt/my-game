@@ -48,7 +48,8 @@ const commandGeometryCss=[
     mainCssSource.match(/#battlePage \.battle-element-box-button\{[\s\S]*?\n\}/)?.[0],
     mainCssSource.match(/#battlePage\{\s*--battle-command-row-height:[\s\S]*?\n\}/)?.[0],
     mainCssSource.match(/#mainBattleMenu\{[\s\S]*?\n\}/)?.[0],
-    mainCssSource.match(/#mainBattleMenu::before\{[\s\S]*?\n\}/)?.[0]
+    mainCssSource.match(/#mainBattleMenu::before\{[\s\S]*?\n\}/)?.[0],
+    ...Array.from(mainCssSource.matchAll(/#mainBattleMenu > \.menu-button[^{}]*\{[^}]*\}/g),match=>match[0])
 ].filter(Boolean).join("\n").replace(/<\/style/gi,"<\\/style");
 if(!commandGeometryCss.includes("--battle-command-visual-height")||!commandGeometryCss.includes("#mainBattleMenu::before")){
     throw new Error("Canonical battle command geometry rules missing from css/00-main.css");
@@ -81,7 +82,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120e09;col
 <style>${commandGeometryCss}</style><style>${identityCss}</style><style>${v154Css}</style><style>${geometryCss}</style><style>${bossCss}</style><style>${feedbackCss}</style></head><body>
 <div id="game-stage"><div id="app"><div id="game-content"><section id="battlePage" class="v-fixed-slot-render-v2"><div class="battle-wrap">
 <section class="battle-enemy-region"><div id="battleMonsterArea" class="battle-monsters v131-formation"></div></section>
-<section class="battle-center-region"><div class="battle-middle"><div id="battleActionRegion" class="v-fixed-action-zone" style="position:relative;display:flex;flex-direction:column;gap:4px"><div class="battle-title">戰鬥</div><div id="battleTurnIndicator">第 1 回合</div><button id="battleElementBoxButton" class="battle-element-box-button" type="button">元素匣</button><div id="turnTargetRow" class="turn-target-row">第 1 回合</div><div id="battleTargetPrompt" class="battle-target-prompt"><div class="battle-target-prompt-copy"><div class="battle-target-prompt-action">選擇［怒火］的我方目標</div><div class="battle-target-prompt-hint">選擇目標</div></div><button class="battle-target-back">返回</button></div><div id="battleCommandRow" style="display:flex;gap:5px;flex:0 0 66px;position:relative"><div id="mainBattleMenu" class="battle-menu" style="flex:1">操作區</div></div></div></div></section>
+<section class="battle-center-region"><div class="battle-middle"><div id="battleActionRegion" class="v-fixed-action-zone" style="position:relative;display:flex;flex-direction:column;gap:4px"><div class="battle-title">戰鬥</div><div id="battleTurnIndicator">第 1 回合</div><button id="battleElementBoxButton" class="battle-element-box-button" type="button">元素匣</button><div id="turnTargetRow" class="turn-target-row">第 1 回合</div><div id="battleTargetPrompt" class="battle-target-prompt"><div class="battle-target-prompt-copy"><div class="battle-target-prompt-action">選擇［怒火］的我方目標</div><div class="battle-target-prompt-hint">選擇目標</div></div><button class="battle-target-back">返回</button></div><div id="battleCommandRow" style="display:flex;gap:5px;flex:0 0 66px;position:relative"><div id="mainBattleMenu" class="battle-menu" style="flex:1"><button class="menu-button skill">技能</button><button class="menu-button">普通攻擊</button><button class="menu-button defend">防禦</button><button class="menu-button item">背包</button><button class="menu-button run">逃脫</button></div></div></div></div></section>
 <section class="battle-ally-region"><div id="battlePlayerRow" class="battle-player-row"></div></section>
 </div></section></div></div></div><pre id="result" hidden></pre>
 <script>
@@ -116,7 +117,7 @@ ${portraitSource}
  }
  function rect(sel){var node=document.querySelector(sel),r=node.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height,centerX:r.left+r.width/2,centerY:r.top+r.height/2};}
  function commandVisualTop(){var menu=document.getElementById('mainBattleMenu'),r=menu.getBoundingClientRect(),style=getComputedStyle(menu,'::before'),scaleY=menu.offsetHeight?r.height/menu.offsetHeight:1,top=parseFloat(style.top)||0;return r.top+top*scaleY;}
- function lower(){return {enemy:rect('.battle-enemy-region'),center:rect('.battle-center-region'),allyRegion:rect('.battle-ally-region'),ally:rect('#battlePlayerRow'),middle:rect('.battle-middle'),action:rect('#battleActionRegion'),turn:rect('#turnTargetRow'),command:rect('#mainBattleMenu'),commandVisualTop:commandVisualTop(),elementBox:rect('.battle-element-box-button'),centerBackground:getComputedStyle(document.querySelector('.battle-center-region')).backgroundImage};}
+ function lower(){return {enemy:rect('.battle-enemy-region'),center:rect('.battle-center-region'),allyRegion:rect('.battle-ally-region'),ally:rect('#battlePlayerRow'),middle:rect('.battle-middle'),action:rect('#battleActionRegion'),turn:rect('#turnTargetRow'),command:rect('#mainBattleMenu'),commandVisualTop:commandVisualTop(),elementBox:rect('.battle-element-box-button'),commandButtons:Array.from(document.querySelectorAll('#mainBattleMenu > .menu-button')).map(n=>({rect:n.getBoundingClientRect().toJSON(),font:getComputedStyle(n).fontSize,hit:document.elementFromPoint(n.getBoundingClientRect().x+n.getBoundingClientRect().width/2,n.getBoundingClientRect().y+n.getBoundingClientRect().height/2)===n})),centerBackground:getComputedStyle(document.querySelector('.battle-center-region')).backgroundImage};}
  function unitRects(selector){return Array.from(document.querySelectorAll(selector)).filter(function(node){return node.children.length;}).map(function(node){return rect('#'+node.children[0].id);});}
  function hudRects(selector){return Array.from(document.querySelectorAll(selector)).filter(function(node){return node.children.length;}).map(function(slot){var card=slot.children[0],art=card.querySelector('.v174-battle-art'),hp=card.querySelector('.monster-hp,.hp-bar'),sp=card.querySelector('.monster-sp,.sp-bar'),name=card.querySelector('.battle-monster-name,.battle-player-id');return {id:card.id,art:rect('#'+card.id+' .v174-battle-art'),hp:rect('#'+card.id+' .monster-hp,#'+card.id+' .hp-bar'),sp:rect('#'+card.id+' .monster-sp,#'+card.id+' .sp-bar'),name:rect('#'+card.id+' .battle-monster-name,#'+card.id+' .battle-player-id'),logicalHp:hp.offsetHeight,logicalSp:sp.offsetHeight};});}
  function clipChain(node){var result=[];for(var p=node.parentElement;p&&p.id!=='game-stage';p=p.parentElement){var cs=getComputedStyle(p);result.push({tag:p.id||p.className,overflow:cs.overflow,overflowX:cs.overflowX,overflowY:cs.overflowY,contain:cs.contain});}return result;}
@@ -277,7 +278,13 @@ function runViewport(chrome,width,height){
     assert.deepEqual(data.manualControl.targetSelection.active,["battlePlayerCard1"]);
     assert.equal(data.manualControl.targetSelection.frame.animationName,"v174ManualActiveTurnFrameFlash","ally target selection must not suppress the manual active frame");
     assert.equal(data.manualControl.targetSelection.reticleAnimation,"none","multi-target reticles remain static");
-    close(data.turnUi.normal.rect.bottom,baseline.commandVisualTop,"turn timer bottom aligns with command art visual top",.8);
+    close(data.turnUi.normal.rect.top,baseline.action.top,"turn timer occupies the shared information band",.8);
+    assert.ok(baseline.command.height/canvasScale>=66-.1,"command touch row retains 66 logical pixels");
+    assert.ok(baseline.elementBox.height/canvasScale>=66-.1,"Element Box retains 66 logical pixels");
+    assert.ok(baseline.elementBox.bottom<=baseline.commandVisualTop+.8,"Element Box must not overlap command controls");
+    assert.equal(baseline.commandButtons.length,5);
+    baseline.commandButtons.forEach(button=>{assert.ok(button.rect.height/canvasScale>=66-.1);assert.ok(button.rect.width/canvasScale>=70);assert.equal(button.font,"16px");assert.equal(button.hit,true,"visible command center must hit its own control");});
+    assert.ok(data.allyScenarios[6].hudRects[0].art.height/canvasScale>99,"six-party artwork must exceed the pre-P4 94.9 logical-pixel height");
     assert.ok(data.turnUi.normal.rect.bottom<=baseline.commandVisualTop+.8,"turn timer must not overlap command art");
     assert.ok(data.turnUi.targetSelecting.rect.top>=baseline.center.top-.5,"target-selecting turn timer stays inside center region");
     assert.ok(

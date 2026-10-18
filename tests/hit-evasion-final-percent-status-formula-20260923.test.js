@@ -153,7 +153,7 @@ assert.doesNotMatch(statusText,/個百分點/,"player-visible status text must u
     assert.match(patrol,/image\.style\.visibility="hidden"/);
     assert.match(patrol,/decodedSources\.has\(source\)/);
     assert.doesNotMatch(baseCss,/#mapBattleInfo/,"retired battle log UI must stay absent");
-    assert.match(baseCss,/battle-command-panel-transparent\.svg/);
+    assert.match(baseCss,/--battle-command-art-overhang:0px;/,"compact command row must not spend height on raster ornament");
     assert.doesNotMatch(baseCss,/#mainBattleMenu::before\{[\s\S]*?battle-command-panel\.jpg/);
     assert.match(panelSvg,/data:image\/jpeg;base64,/);
     assert.match(fixedCss,/\.v174-unit-hud:not\(\[data-boss="true"\]\) \.battle-monster-name\{[\s\S]*?background:none !important;[\s\S]*?border:0 !important/);
