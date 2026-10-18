@@ -105,7 +105,7 @@ async function seedParty(page){
                 costs:costs.map(element=>element.textContent.trim())
             };
         });
-        assert.match(skillUi.label,/剩餘技能點/);
+        assert.match(skillUi.label,/技能點/);
         assert.equal(skillUi.pointText,"45");
         assert.ok(skillUi.pointFont>=22);
         assert.ok(skillUi.costs.length>=1);

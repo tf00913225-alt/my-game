@@ -10,22 +10,6 @@
     overscroll-behavior-y:contain !important;
 }
 
-#game-ui #homeFeatureModal #characterTabContent > #skillPage{
-    display:block !important;
-    position:static !important;
-    height:max-content !important;
-    min-height:max-content !important;
-    max-height:none !important;
-    overflow:visible !important;
-    padding-bottom:660px !important;
-    touch-action:pan-y !important;
-}
-
-#game-ui #homeFeatureModal #allSkillsList{
-    overflow:visible !important;
-    padding-bottom:240px !important;
-}
-
 /* All battle portraits now use the selected character's inline artwork. */
 #game-stage > #app > #game-content #battlePage .battle-player{
     flex:1 1 0 !important;
@@ -75,18 +59,6 @@
 }
 
 
-
-.skill-page-heading{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    margin-bottom:8px;
-}
-
-.skill-page-heading h2{
-    margin:0;
-}
 
 .creation-cancel-additional[hidden]{
     display:none !important;

@@ -38,7 +38,7 @@
 <link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/ui/startup-main-city.d43e67af1c1c.jpg" fetchpriority="high">
 <!-- build:critical-style -->
-<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.a03c8d7fc562.css">
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.31d70ee9e28d.css">
 <!-- /build:critical-style -->
 </head>
 
@@ -2011,10 +2011,6 @@
     class="page"
 >
 
-<div class="skill-page-heading">
-    <h2>技能配裝</h2>
-</div>
-
 <div
     id="skillCharacterSwitchCard"
     class="card"
@@ -2053,25 +2049,13 @@
 
 </div>
 
-<div class="card">
-
-<b>戰鬥技能欄</b>
-
-<div
-    id="skillLoadout"
-    class="skill-loadout-row"
-></div>
-
-</div>
-
-<div class="card v138-skill-point-summary">
-
- 剩餘技能點：
-<b id="skillPoints">0</b>
-
-</div>
-
 <div id="skillElementTabs" class="skill-element-tabs" role="tablist" aria-label="技能元素分類"></div>
+<section class="skill-loadout-card" aria-label="已裝備技能">
+    <header class="skill-section-heading"><b>已裝備技能</b><div class="v138-skill-point-summary">技能點 <b id="skillPoints">0</b></div></header>
+    <div id="skillLoadout" class="skill-loadout-row"></div>
+    <p class="skill-loadout-hint">點擊已裝備技能可卸下</p>
+</section>
+<h3 class="skill-list-heading">技能列表</h3>
 
 <!--
     ★ 修正（依照使用者要求，「不用特別再做
