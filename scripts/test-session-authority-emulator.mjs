@@ -2417,6 +2417,33 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     assert.deepEqual(await dump(),damaged);
     console.log("Current recovery receipt inventory real Firestore PASS: unmatched credited receipt and unknown/future/foreign reservation refuse without writes; valid uncredited reservation remains retained.");
 
+    // A surviving ledger is independent evidence even if its later receipt and
+    // claim index are both gone. Existing purchase/EXP debits remain supported.
+    const orphanLedger=ownedRoot.collection("ledgerEntries").doc("rehearsal-orphaned-ledger-0001");
+    await orphanLedger.set({...originalLedger,operationId:orphanLedger.id,
+        grantId:"rehearsal-orphaned-grant-0001",creditRevision:10});
+    const withOrphanLedger=await dump();
+    await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+    assert.deepEqual(await dump(),withOrphanLedger);await orphanLedger.delete();
+    for(const id of [shopArgs.operationId,ownedAllocation]){
+        const debitRef=ownedRoot.collection("operations").doc(id);
+        const debitLedgerRef=ownedRoot.collection("ledgerEntries").doc(id);
+        const debit=(await debitRef.get()).data(),debitLedger=(await debitLedgerRef.get()).data();
+        assert.ok(debit);assert.ok(debitLedger);
+        await debitRef.delete();const missingDebit=await dump();
+        await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+        assert.deepEqual(await dump(),missingDebit);await debitRef.set(debit);
+        const field=debit.kind==="shop-purchase"?"purchasedRevision":"allocatedRevision";
+        await debitRef.update({[field]:10});const laterDebit=await dump();
+        await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+        assert.deepEqual(await dump(),laterDebit);await debitRef.set(debit);
+        await debitLedgerRef.update({amount:debitLedger.amount-1});const corruptDebit=await dump();
+        await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+        assert.deepEqual(await dump(),corruptDebit);await debitLedgerRef.set(debitLedger);
+    }
+    assert.deepEqual(await dump(),damaged);
+    console.log("Current recovery ledger inventory real Firestore PASS: orphan ledger and missing/later/corrupt debit proof refuse without writes; original purchase/EXP ledger history retained for approved restore.");
+
     // A stale/damaged envelope must not authorize overwriting surviving newer
     // sources. Missing revision evidence is equally unreconciled. Emulator only.
     for(const [path,row] of current){
