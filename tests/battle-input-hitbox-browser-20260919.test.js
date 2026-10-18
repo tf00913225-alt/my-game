@@ -8,6 +8,8 @@ const {pathToFileURL}=require("node:url");
 const {spawnSync}=require("node:child_process");
 
 function findChrome(){
+    const configured=String(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||"").trim();
+    if(configured&&fs.existsSync(configured)){return configured;}
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=spawnSync("bash",["-lc","command -v "+name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){return result.stdout.trim();}
@@ -30,7 +32,10 @@ function cssRule(selector){
     assert.ok(end>start,"unterminated geometry owner: "+selector);
     return mainCss.slice(start,end+1);
 }
+const commandTokens=mainCss.match(/#battlePage\{\s*--battle-command-row-height:[\s\S]*?\n\}/)?.[0];
+assert.ok(commandTokens,"formal command sizing tokens must exist");
 const css=[
+    commandTokens,
     cssRule("#mainBattleMenu"),
     cssRule("#mainBattleMenu > .menu-button"),
     cssRule("#mainBattleMenu > .menu-button.skill"),
@@ -98,9 +103,10 @@ for(const [width,height] of [[390,844],[412,915]]){
     for(let index=0;index<data.rects.length-1;index++){
         assert.ok(data.rects[index].right<=data.rects[index+1].left+.05,"hitboxes overlap at "+width+"px");
     }
-    const expected=[.156,.331,.503,.673,.847];
-    data.rects.forEach((rect,index)=>assert.ok(Math.abs(rect.ratio-expected[index])<.008,rect.id+" center does not match artwork at "+width+"px"));
-    assert.deepEqual(data.centerOwners,["skill","normal","item","defend","run"],"each artwork center must resolve to its own command at "+width+"px");
+    const expected=[.105,.3025,.5,.6975,.895];
+    data.rects.forEach((rect,index)=>assert.ok(Math.abs(rect.ratio-expected[index])<.008,rect.id+" center does not match visible compact button at "+width+"px"));
+    data.rects.forEach(rect=>{assert.ok(rect.right-rect.left>=70,"command width must remain touchable");assert.equal(rect.bottom-rect.top,66,"compact command retains 66px height");});
+    assert.deepEqual(data.centerOwners,["skill","normal","item","defend","run"],"each visible button center must resolve to its own command at "+width+"px");
     assert.equal(data.normalClicks,20,"rapid pointer input must preserve normal-attack onclick behavior");
     assert.equal(data.battleRippleCount,0,"battle input must not allocate global ripple DOM");
     assert.ok(data.outsideRippleCount<=1,"global non-battle feedback must reuse at most one ripple node");
