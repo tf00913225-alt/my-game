@@ -184,54 +184,7 @@
     padding-bottom:0 !important;
 }
 
-#game-ui #homeFeatureModal #characterTabContent > #skillPage{
-    display:block !important;
-    position:static !important;
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-    overflow:visible !important;
-    padding-bottom:720px !important;
-    touch-action:pan-y !important;
-}
-
-#game-ui #homeFeatureModal #characterTabContent > #skillPage .content,
-#game-ui #homeFeatureModal #allSkillsList,
-#game-ui #homeFeatureModal .skill-loadout-list{
-    height:auto !important;
-    max-height:none !important;
-    overflow:visible !important;
-}
-
 /* V138：剩餘技能點改成高對比資訊條，未點詳細也能看到學習成本。 */
-:is(#game-stage,#game-ui) #skillPage .v138-skill-point-summary{
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    gap:calc(8 * var(--ui-length-unit,1px)) !important;
-    border:calc(2 * var(--ui-length-unit,1px)) solid #e8a93c !important;
-    background:linear-gradient(135deg,#2d1d0d,#120e09) !important;
-    color:#f5ecd9 !important;
-    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
-    font-weight:800 !important;
-    box-shadow:0 0 calc(12 * var(--ui-length-unit,1px)) rgba(232,169,60,.28) !important;
-}
-
-:is(#game-stage,#game-ui) #skillPage #skillPoints{
-    display:inline-flex !important;
-    min-width:calc(52 * var(--ui-length-unit,1px)) !important;
-    min-height:calc(34 * var(--ui-length-unit,1px)) !important;
-    align-items:center !important;
-    justify-content:center !important;
-    padding:calc(2 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px)) !important;
-    border-radius:calc(999 * var(--ui-length-unit,1px)) !important;
-    background:#e8a93c !important;
-    color:#17100a !important;
-    font-size:calc(22 * var(--ui-length-unit,1px)) !important;
-    line-height:1 !important;
-    box-shadow:0 0 calc(10 * var(--ui-length-unit,1px)) rgba(255,224,138,.45) !important;
-}
-
 /*
    ★ 修正（依照使用者回報「破圖」，附截圖顯示捲動時文字
    疊在一起、看起來像亂碼）：
@@ -416,8 +369,7 @@
 
 #game-ui #characterTabContent,
 :is(#game-stage,#game-ui) #homeExpPoolCard,
-:is(#game-stage,#game-ui) #statusPage,
-:is(#game-stage,#game-ui) #skillPage{
+:is(#game-stage,#game-ui) #statusPage{
     font-size:calc(15 * var(--ui-length-unit,1px));
 }
 
@@ -444,16 +396,6 @@
 :is(#game-stage,#game-ui) #statusPage .status-row{
     font-size:calc(15 * var(--ui-length-unit,1px)) !important;
 }
-
-:is(#game-stage,#game-ui) #allSkillsList .skill-row-desc{
-    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
-    line-height:1.5 !important;
-}
-
-:is(#game-stage,#game-ui) #allSkillsList .skill-row-text b{
-    font-size:calc(17 * var(--ui-length-unit,1px)) !important;
-}
-
 
 :is(#game-stage,#game-ui) .stat-explanation{
     font-size:calc(14 * var(--ui-length-unit,1px)) !important;

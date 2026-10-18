@@ -9,6 +9,7 @@ const main=read("js/00-main.js");
 const progression=read("js/60-v173.64-skill-progression-rebalance.js");
 const context=read("js/42-v148-combat-dungeon-fixes.js");
 const mainCss=read("css/00-main.css");
+const skillCss=read("css/49-v169-rpg-ui.css");
 const inventoryCss=read("css/24-stage-v85-inventory-inner-grid-scroll-root.css");
 const battleCss=read("css/fixed-slot-battlefield-rendering-v2.css");
 
@@ -26,15 +27,16 @@ assert.match(main,/getSkillLearnEligibilityForUi\(skillOwner,skill,skillLevels\)
 assert.match(main,/skill-category-badge \$\{skill\.category\}/);
 assert.doesNotMatch(main,/skill-action-card-top|actionIcon/);
 assert.doesNotMatch(mainCss,/skill-action-card-top/);
-const actionCardBlock=mainCss.slice(mainCss.indexOf(".skill-action-card{"),mainCss.indexOf("}",mainCss.indexOf(".skill-action-card{"))+1);
-assert.match(actionCardBlock,/align-self:center/);
+const actionCardBlock=skillCss.slice(skillCss.indexOf(".skill-action-card{"),skillCss.indexOf("}",skillCss.indexOf(".skill-action-card{"))+1);
+assert.match(actionCardBlock,/grid-column:3/);
+assert.doesNotMatch(mainCss,/\.skill-action-card\{/);
 assert.match(actionCardBlock,/height:auto/);
 assert.doesNotMatch(actionCardBlock,/height:\s*100%/);
 assert.doesNotMatch(main,/isSkillPrereqMet\(/);
 assert.doesNotMatch(context,/openMapInventoryOverlay\(normalized\)/);
 assert.doesNotMatch(context,/mapWasActive|mapPage\.classList\.add\("active"\)/);
 assert.doesNotMatch(context,/if\(dungeonActive\|\|!gameplayPageId\)\{ return openMapInventoryOverlay\(\); \}/);
-assert.match(mainCss,/grid-template-columns:repeat\(4,minmax\(0,1fr\)/);
+assert.match(skillCss,/\.skill-element-tabs\{[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)/);
 assert.doesNotMatch(mainCss,/\.skill-element-tab\.learn\{/);
 assert.doesNotMatch(mainCss,/skill-section-divider|skill-section-learned|skill-section-unlearned/);
 assert.doesNotMatch(inventoryCss,/inventory-overlay-open/);

@@ -261,7 +261,6 @@ html, body{
 }
 
 #characterTabContent > #statusPage,
-#characterTabContent > #skillPage,
 #characterTabContent > #inventoryPage{
     min-height:0 !important;
     overflow:visible !important;
@@ -310,7 +309,6 @@ html, body{
 /* When the status/skill pages are borrowed into the character modal,
    their old full-page layout must not create a second competing scroll. */
 #characterTabContent #statusPage,
-#characterTabContent #skillPage,
 #characterTabContent #inventoryPage{
     height:auto !important;
     max-height:none !important;
@@ -2097,22 +2095,6 @@ html, body{
     overscroll-behavior-y:contain !important;
 }
 
-#game-ui #homeFeatureModal #characterTabContent > #skillPage{
-    display:block !important;
-    position:static !important;
-    height:max-content !important;
-    min-height:max-content !important;
-    max-height:none !important;
-    overflow:visible !important;
-    padding-bottom:660px !important;
-    touch-action:pan-y !important;
-}
-
-#game-ui #homeFeatureModal #allSkillsList{
-    overflow:visible !important;
-    padding-bottom:240px !important;
-}
-
 /* All battle portraits now use the selected character's inline artwork. */
 #game-stage > #app > #game-content #battlePage .battle-player{
     flex:1 1 0 !important;
@@ -2162,18 +2144,6 @@ html, body{
 }
 
 
-
-.skill-page-heading{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    margin-bottom:8px;
-}
-
-.skill-page-heading h2{
-    margin:0;
-}
 
 .creation-cancel-additional[hidden]{
     display:none !important;
