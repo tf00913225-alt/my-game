@@ -6807,6 +6807,65 @@ body > .v169-rpg-dialog-layer{
     min-height:calc(38 * var(--ui-length-unit,1px));
 }
 
+/* Skill iron/bronze presentation: replaces the old css/00,31,42 writers.
+   The existing character content viewport remains the only scroll owner. */
+#game-ui #skillPage{
+    --skill-iron:#151515;--skill-bronze:#9d7949;--skill-edge:#66513b;
+    --skill-paper:#eee3ce;--skill-muted:#c2b49e;
+    color:var(--skill-paper);font-size:calc(15 * var(--ui-length-unit,1px));
+}
+#game-ui #skillPage .skill-element-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(4 * var(--ui-length-unit,1px));margin:0 0 calc(8 * var(--ui-length-unit,1px));}
+#game-ui #skillPage .skill-element-tab{display:flex;align-items:center;justify-content:center;gap:calc(4 * var(--ui-length-unit,1px));min-width:0;min-height:calc(42 * var(--ui-length-unit,1px));padding:calc(4 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid var(--skill-edge);border-radius:0;background:linear-gradient(#34312a,#151515);color:var(--skill-muted);font-size:calc(14 * var(--ui-length-unit,1px));font-weight:800;line-height:1.3;}
+#game-ui #skillPage .skill-element-tab::before{content:"";width:calc(18 * var(--ui-length-unit,1px));height:calc(18 * var(--ui-length-unit,1px));background:currentColor;mask:var(--skill-element-symbol) center/contain no-repeat;}
+#game-ui #skillPage .skill-element-tab.fire{--skill-element-symbol:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13 1c3 7-4 8 0 12 3-1 4-4 4-6 9 10 3 16-5 16S0 16 5 10c0 4 2 5 3 5C5 8 13 8 13 1Z'/%3E%3C/svg%3E");}
+#game-ui #skillPage .skill-element-tab.water{--skill-element-symbol:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1S3 12 3 16a9 9 0 0 0 18 0C21 12 12 1 12 1Zm-5 15c0 3 2 4 4 5-4 0-6-2-4-5Z'/%3E%3C/svg%3E");}
+#game-ui #skillPage .skill-element-tab.wind{--skill-element-symbol:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M1 8h14a3 3 0 1 0-3-3H9a6 6 0 1 1 6 6H1Zm0 5h17a5 5 0 1 1-5 5h3a2 2 0 1 0 2-2H1Zm0 5h8v3H1Z'/%3E%3C/svg%3E");}
+#game-ui #skillPage .skill-element-tab.earth{--skill-element-symbol:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m1 22 6-17 5 12 4-16 7 21Zm5-5h3L7 11Zm9 0h4l-3-9Z'/%3E%3C/svg%3E");}
+#game-ui #skillPage .skill-element-tab.active{border-color:#e3b06b;color:#ffe1a2;background:radial-gradient(ellipse at bottom,#ae5d1b88,transparent),linear-gradient(#4b3625,#241a12);box-shadow:inset 0 0 calc(7 * var(--ui-length-unit,1px)) #e6a03c44;}
+#game-ui #skillPage .skill-loadout-card{padding:calc(8 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid var(--skill-edge);background:linear-gradient(135deg,#29251fb3,#121212ee);}
+#game-ui #skillPage .skill-section-heading{display:flex;align-items:center;justify-content:space-between;gap:calc(6 * var(--ui-length-unit,1px));font-size:calc(16 * var(--ui-length-unit,1px));line-height:1.5;}
+#game-ui #skillPage .v138-skill-point-summary{display:flex;align-items:center;gap:calc(6 * var(--ui-length-unit,1px));font-size:calc(14 * var(--ui-length-unit,1px));color:var(--skill-muted);}
+#game-ui #skillPoints{color:#f6d28f;font-size:calc(20 * var(--ui-length-unit,1px));font-variant-numeric:tabular-nums;}
+#game-ui #skillPage .skill-loadout-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(8 * var(--ui-length-unit,1px));margin-top:calc(6 * var(--ui-length-unit,1px));}
+#game-ui #skillPage .skill-loadout-slot{display:flex;flex-direction:column;align-items:center;gap:calc(3 * var(--ui-length-unit,1px));min-width:0;min-height:0;padding:0;background:transparent;border:0;border-radius:0;color:var(--skill-paper);text-align:center;cursor:pointer;}
+#game-ui #skillPage .skill-loadout-slot-icon{width:calc(48 * var(--ui-length-unit,1px));height:calc(48 * var(--ui-length-unit,1px));box-sizing:border-box;border:calc(2 * var(--ui-length-unit,1px)) ridge #a88c5d;background-color:#171615;background-size:contain;background-position:center;background-repeat:no-repeat;box-shadow:0 0 0 calc(1 * var(--ui-length-unit,1px)) #080807;}
+#game-ui #skillPage .skill-loadout-slot-name{width:100%;min-width:0;font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.4;font-weight:700;overflow-wrap:anywhere;}
+#game-ui #skillPage .skill-loadout-slot-icon:empty:not([style])::after{content:"＋";display:grid;place-items:center;height:100%;color:#9d8b6b;font-size:calc(30 * var(--ui-length-unit,1px));}
+#game-ui #skillPage .skill-loadout-hint{margin:calc(4 * var(--ui-length-unit,1px)) 0 0;font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.4;color:var(--skill-muted);text-align:center;}
+#game-ui #skillPage .skill-list-heading{margin:calc(10 * var(--ui-length-unit,1px)) 0 calc(6 * var(--ui-length-unit,1px));padding:0 calc(6 * var(--ui-length-unit,1px));border-bottom:calc(1 * var(--ui-length-unit,1px)) solid var(--skill-edge);font-size:calc(18 * var(--ui-length-unit,1px));line-height:1.6;color:#f0d39d;}
+#game-ui #skillPage .skill-loadout-list{display:grid;gap:calc(6 * var(--ui-length-unit,1px));margin:0;}
+#game-ui #skillPage .skill-row{display:grid;grid-template-columns:calc(48 * var(--ui-length-unit,1px)) minmax(0,1fr) calc(80 * var(--ui-length-unit,1px));grid-template-rows:auto auto;align-items:center;column-gap:calc(8 * var(--ui-length-unit,1px));row-gap:calc(5 * var(--ui-length-unit,1px));min-height:calc(108 * var(--ui-length-unit,1px));padding:calc(8 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #62513b;border-radius:0;background:linear-gradient(110deg,#2c2923dd,#171716);box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 #b7a07a33,inset 0 calc(-2 * var(--ui-length-unit,1px)) 0 #0008;color:var(--skill-paper);font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.45;}
+#game-ui #skillPage .skill-row-icon{grid-column:1;grid-row:1/3;width:100%;aspect-ratio:1;border:calc(2 * var(--ui-length-unit,1px)) ridge #9e875c;box-sizing:border-box;background-color:#151515;background-size:contain;background-repeat:no-repeat;background-position:center;box-shadow:0 0 0 calc(1 * var(--ui-length-unit,1px)) #000;}
+#game-ui #skillPage .skill-row-text{grid-column:2;grid-row:1/3;min-width:0;overflow-wrap:anywhere;}
+#game-ui #skillPage .skill-row-text b{font-size:calc(17 * var(--ui-length-unit,1px));line-height:1.5;color:#f5e0b5;}
+#game-ui #skillPage .skill-category-badge{display:inline-block;margin-left:calc(4 * var(--ui-length-unit,1px));color:var(--skill-muted);font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.5;}
+#game-ui #skillPage .skill-row-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--skill-muted);font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.5;}
+#game-ui #skillPage .skill-row-prerequisite{color:#edbd7d;}
+#game-ui #skillPage .skill-row-detail-link{display:inline-block;color:#e4c18a;font-size:calc(14 * var(--ui-length-unit,1px));font-weight:700;line-height:1.5;cursor:pointer;}
+#game-ui #skillPage .skill-action-card{grid-column:3;min-width:0;width:100%;min-height:calc(44 * var(--ui-length-unit,1px));height:auto;margin:0;padding:calc(5 * var(--ui-length-unit,1px));border:calc(2 * var(--ui-length-unit,1px)) ridge #b89353;border-radius:0;background:linear-gradient(120deg,#85552a,#3f2918 65%,#211810);box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 #f3cf8f77,0 calc(2 * var(--ui-length-unit,1px)) calc(3 * var(--ui-length-unit,1px)) #0009;color:#fff0ca;font:inherit;cursor:pointer;appearance:none;}
+#game-ui #skillPage .skill-action-card[data-skill-action="growth"]{grid-row:1;}
+#game-ui #skillPage .skill-action-card[data-skill-action="equip"]{grid-row:2;}
+#game-ui #skillPage .skill-action-card:disabled{border-color:#655944;background:linear-gradient(#2e2c27,#161615);color:#aaa08d;opacity:.7;cursor:default;}
+#game-ui #skillPage .skill-action-card-label{display:block;font-size:calc(15 * var(--ui-length-unit,1px));font-weight:800;line-height:1.4;overflow-wrap:anywhere;}
+#game-ui #skillPage .skill-action-card:not(:disabled):active{background:#24190f;box-shadow:inset 0 calc(2 * var(--ui-length-unit,1px)) calc(5 * var(--ui-length-unit,1px)) #0009;}
+#game-ui #skillPage button:focus-visible{outline:calc(2 * var(--ui-length-unit,1px)) solid #ffe3a0;outline-offset:calc(2 * var(--ui-length-unit,1px));}
+
+/* Original character selector: one geometry owner for every tab. */
+#game-ui #homeFeatureModal .character-showcase-choice{position:relative;width:calc(86 * var(--ui-length-unit,1px));text-align:center;cursor:pointer;padding:15px 9px 12px;border:6px solid transparent;border-radius:36px;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
+#game-ui #homeFeatureModal .character-showcase-choice.is-current-character{border-color:var(--character-choice-edge,#ffe08a);background:var(--character-choice-fill,linear-gradient(180deg,rgba(158,104,24,.35),rgba(18,12,7,.16)));box-shadow:var(--character-choice-shadow,0 0 0 6px rgba(255,186,58,.22),0 0 45px rgba(255,166,32,.48));}
+#game-ui #homeFeatureModal .character-showcase-avatar{width:calc(56 * var(--ui-length-unit,1px));height:calc(56 * var(--ui-length-unit,1px));margin:0 auto;border:calc(2 * var(--ui-length-unit,1px)) solid #f0b429;border-radius:50%;background-color:#15100a;background-position:center 18%;background-size:cover;background-repeat:no-repeat;display:flex;align-items:center;justify-content:center;font-size:calc(18 * var(--ui-length-unit,1px));transition:opacity .15s;}
+#game-ui #homeFeatureModal .character-showcase-avatar.is-current-character{border-color:var(--character-avatar-edge,#fff0ab);box-shadow:var(--character-avatar-shadow,0 0 0 9px rgba(255,176,42,.55),0 0 48px rgba(255,130,28,.9));}
+
+/* Explicit skill-tab visual state, owned and cleared by switch/closeHomeFeature. */
+#game-ui #homeFeatureModal[data-character-tab="skill"]{--character-choice-edge:transparent;--character-choice-fill:transparent;--character-choice-shadow:none;--character-avatar-edge:#efc379;--character-avatar-shadow:0 0 0 6px #251c12,0 0 36px #d8953d88;}
+#game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-box.wide{border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 30px / 0 stretch;background:#151515;box-shadow:0 0 30px #000c;}
+#game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-title{background:transparent url('../assets/ui/skill-iron-bronze/title.9d58221ab504.webp') left center/72% auto no-repeat;box-shadow:none;border:0;}
+#game-ui #homeFeatureModal[data-character-tab="skill"] #homeFeatureModalTitle{padding-left:calc(56 * var(--ui-length-unit,1px));font-size:calc(24 * var(--ui-length-unit,1px));color:#ffe0a1;letter-spacing:.16em;text-shadow:0 2px 4px #000;}
+#game-ui #homeFeatureModal[data-character-tab="skill"] #homeFeatureModalBody{background:transparent;box-shadow:none;}
+#game-ui #homeFeatureModal[data-character-tab="skill"] .character-showcase-avatar{background-size:230%;background-position:center 12%;}
+#game-ui #homeFeatureModal[data-character-tab="skill"] .character-tab-row button{border-radius:0;background:linear-gradient(#37332b,#171716);border-color:#67543b;color:#d8c7a6;}
+#game-ui #homeFeatureModal[data-character-tab="skill"] .character-tab-row button.active{background:linear-gradient(#76502a,#37251a);border-color:#d3ab68;color:#fff0cd;}
+
 /* =====================================================
    Shared Black-Gold Window Skin — visual-only owner
    Geometry, stacking, overflow and interaction remain owned by existing rules.
@@ -7041,65 +7100,6 @@ body > .v169-rpg-dialog-layer{
 .hero-equipment-item>img,.hero-equipment-item>svg{width:56px;height:56px;object-fit:contain;}
 .hero-equipment-item>span{overflow-wrap:anywhere;}
 .hero-equipment-bag>p{grid-column:1/-1;}
-
-/* Skill iron/bronze presentation: replaces the old css/00,31,42 writers.
-   The existing character content viewport remains the only scroll owner. */
-#game-ui #skillPage{
-    --skill-iron:#151515;--skill-bronze:#9d7949;--skill-edge:#66513b;
-    --skill-paper:#eee3ce;--skill-muted:#c2b49e;
-    color:var(--skill-paper);font-size:calc(15 * var(--ui-length-unit,1px));
-}
-#game-ui #skillPage .skill-element-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(4 * var(--ui-length-unit,1px));margin:0 0 calc(8 * var(--ui-length-unit,1px));}
-#game-ui #skillPage .skill-element-tab{display:flex;align-items:center;justify-content:center;gap:calc(4 * var(--ui-length-unit,1px));min-width:0;min-height:calc(42 * var(--ui-length-unit,1px));padding:calc(4 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid var(--skill-edge);border-radius:0;background:linear-gradient(#34312a,#151515);color:var(--skill-muted);font-size:calc(14 * var(--ui-length-unit,1px));font-weight:800;line-height:1.3;}
-#game-ui #skillPage .skill-element-tab::before{content:"";width:calc(18 * var(--ui-length-unit,1px));height:calc(18 * var(--ui-length-unit,1px));background:currentColor;mask:var(--skill-element-symbol) center/contain no-repeat;}
-#game-ui #skillPage .skill-element-tab.fire{--skill-element-symbol:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13 1c3 7-4 8 0 12 3-1 4-4 4-6 9 10 3 16-5 16S0 16 5 10c0 4 2 5 3 5C5 8 13 8 13 1Z'/%3E%3C/svg%3E");}
-#game-ui #skillPage .skill-element-tab.water{--skill-element-symbol:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1S3 12 3 16a9 9 0 0 0 18 0C21 12 12 1 12 1Zm-5 15c0 3 2 4 4 5-4 0-6-2-4-5Z'/%3E%3C/svg%3E");}
-#game-ui #skillPage .skill-element-tab.wind{--skill-element-symbol:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M1 8h14a3 3 0 1 0-3-3H9a6 6 0 1 1 6 6H1Zm0 5h17a5 5 0 1 1-5 5h3a2 2 0 1 0 2-2H1Zm0 5h8v3H1Z'/%3E%3C/svg%3E");}
-#game-ui #skillPage .skill-element-tab.earth{--skill-element-symbol:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m1 22 6-17 5 12 4-16 7 21Zm5-5h3L7 11Zm9 0h4l-3-9Z'/%3E%3C/svg%3E");}
-#game-ui #skillPage .skill-element-tab.active{border-color:#e3b06b;color:#ffe1a2;background:radial-gradient(ellipse at bottom,#ae5d1b88,transparent),linear-gradient(#4b3625,#241a12);box-shadow:inset 0 0 calc(7 * var(--ui-length-unit,1px)) #e6a03c44;}
-#game-ui #skillPage .skill-loadout-card{padding:calc(8 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid var(--skill-edge);background:linear-gradient(135deg,#29251fb3,#121212ee);}
-#game-ui #skillPage .skill-section-heading{display:flex;align-items:center;justify-content:space-between;gap:calc(6 * var(--ui-length-unit,1px));font-size:calc(16 * var(--ui-length-unit,1px));line-height:1.5;}
-#game-ui #skillPage .v138-skill-point-summary{display:flex;align-items:center;gap:calc(6 * var(--ui-length-unit,1px));font-size:calc(14 * var(--ui-length-unit,1px));color:var(--skill-muted);}
-#game-ui #skillPoints{color:#f6d28f;font-size:calc(20 * var(--ui-length-unit,1px));font-variant-numeric:tabular-nums;}
-#game-ui #skillPage .skill-loadout-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(8 * var(--ui-length-unit,1px));margin-top:calc(6 * var(--ui-length-unit,1px));}
-#game-ui #skillPage .skill-loadout-slot{display:flex;flex-direction:column;align-items:center;gap:calc(3 * var(--ui-length-unit,1px));min-width:0;min-height:0;padding:0;background:transparent;border:0;border-radius:0;color:var(--skill-paper);text-align:center;cursor:pointer;}
-#game-ui #skillPage .skill-loadout-slot-icon{width:calc(48 * var(--ui-length-unit,1px));height:calc(48 * var(--ui-length-unit,1px));box-sizing:border-box;border:calc(2 * var(--ui-length-unit,1px)) ridge #a88c5d;background-color:#171615;background-size:contain;background-position:center;background-repeat:no-repeat;box-shadow:0 0 0 calc(1 * var(--ui-length-unit,1px)) #080807;}
-#game-ui #skillPage .skill-loadout-slot-name{width:100%;min-width:0;font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.4;font-weight:700;overflow-wrap:anywhere;}
-#game-ui #skillPage .skill-loadout-slot-icon:empty:not([style])::after{content:"＋";display:grid;place-items:center;height:100%;color:#9d8b6b;font-size:calc(30 * var(--ui-length-unit,1px));}
-#game-ui #skillPage .skill-loadout-hint{margin:calc(4 * var(--ui-length-unit,1px)) 0 0;font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.4;color:var(--skill-muted);text-align:center;}
-#game-ui #skillPage .skill-list-heading{margin:calc(10 * var(--ui-length-unit,1px)) 0 calc(6 * var(--ui-length-unit,1px));padding:0 calc(6 * var(--ui-length-unit,1px));border-bottom:calc(1 * var(--ui-length-unit,1px)) solid var(--skill-edge);font-size:calc(18 * var(--ui-length-unit,1px));line-height:1.6;color:#f0d39d;}
-#game-ui #skillPage .skill-loadout-list{display:grid;gap:calc(6 * var(--ui-length-unit,1px));margin:0;}
-#game-ui #skillPage .skill-row{display:grid;grid-template-columns:calc(48 * var(--ui-length-unit,1px)) minmax(0,1fr) calc(80 * var(--ui-length-unit,1px));grid-template-rows:auto auto;align-items:center;column-gap:calc(8 * var(--ui-length-unit,1px));row-gap:calc(5 * var(--ui-length-unit,1px));min-height:calc(108 * var(--ui-length-unit,1px));padding:calc(8 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #62513b;border-radius:0;background:linear-gradient(110deg,#2c2923dd,#171716);box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 #b7a07a33,inset 0 calc(-2 * var(--ui-length-unit,1px)) 0 #0008;color:var(--skill-paper);font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.45;}
-#game-ui #skillPage .skill-row-icon{grid-column:1;grid-row:1/3;width:100%;aspect-ratio:1;border:calc(2 * var(--ui-length-unit,1px)) ridge #9e875c;box-sizing:border-box;background-color:#151515;background-size:contain;background-repeat:no-repeat;background-position:center;box-shadow:0 0 0 calc(1 * var(--ui-length-unit,1px)) #000;}
-#game-ui #skillPage .skill-row-text{grid-column:2;grid-row:1/3;min-width:0;overflow-wrap:anywhere;}
-#game-ui #skillPage .skill-row-text b{font-size:calc(17 * var(--ui-length-unit,1px));line-height:1.5;color:#f5e0b5;}
-#game-ui #skillPage .skill-category-badge{display:inline-block;margin-left:calc(4 * var(--ui-length-unit,1px));color:var(--skill-muted);font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.5;}
-#game-ui #skillPage .skill-row-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--skill-muted);font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.5;}
-#game-ui #skillPage .skill-row-prerequisite{color:#edbd7d;}
-#game-ui #skillPage .skill-row-detail-link{display:inline-block;color:#e4c18a;font-size:calc(14 * var(--ui-length-unit,1px));font-weight:700;line-height:1.5;cursor:pointer;}
-#game-ui #skillPage .skill-action-card{grid-column:3;min-width:0;width:100%;min-height:calc(44 * var(--ui-length-unit,1px));height:auto;margin:0;padding:calc(5 * var(--ui-length-unit,1px));border:calc(2 * var(--ui-length-unit,1px)) ridge #b89353;border-radius:0;background:linear-gradient(120deg,#85552a,#3f2918 65%,#211810);box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 #f3cf8f77,0 calc(2 * var(--ui-length-unit,1px)) calc(3 * var(--ui-length-unit,1px)) #0009;color:#fff0ca;font:inherit;cursor:pointer;appearance:none;}
-#game-ui #skillPage .skill-action-card[data-skill-action="growth"]{grid-row:1;}
-#game-ui #skillPage .skill-action-card[data-skill-action="equip"]{grid-row:2;}
-#game-ui #skillPage .skill-action-card:disabled{border-color:#655944;background:linear-gradient(#2e2c27,#161615);color:#aaa08d;opacity:.7;cursor:default;}
-#game-ui #skillPage .skill-action-card-label{display:block;font-size:calc(15 * var(--ui-length-unit,1px));font-weight:800;line-height:1.4;overflow-wrap:anywhere;}
-#game-ui #skillPage .skill-action-card:not(:disabled):active{background:#24190f;box-shadow:inset 0 calc(2 * var(--ui-length-unit,1px)) calc(5 * var(--ui-length-unit,1px)) #0009;}
-#game-ui #skillPage button:focus-visible{outline:calc(2 * var(--ui-length-unit,1px)) solid #ffe3a0;outline-offset:calc(2 * var(--ui-length-unit,1px));}
-
-/* Original character selector: one geometry owner for every tab. */
-#game-ui #homeFeatureModal .character-showcase-choice{position:relative;width:calc(86 * var(--ui-length-unit,1px));text-align:center;cursor:pointer;padding:15px 9px 12px;border:6px solid transparent;border-radius:36px;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
-#game-ui #homeFeatureModal .character-showcase-choice.is-current-character{border-color:var(--character-choice-edge,#ffe08a);background:var(--character-choice-fill,linear-gradient(180deg,rgba(158,104,24,.35),rgba(18,12,7,.16)));box-shadow:var(--character-choice-shadow,0 0 0 6px rgba(255,186,58,.22),0 0 45px rgba(255,166,32,.48));}
-#game-ui #homeFeatureModal .character-showcase-avatar{width:calc(56 * var(--ui-length-unit,1px));height:calc(56 * var(--ui-length-unit,1px));margin:0 auto;border:calc(2 * var(--ui-length-unit,1px)) solid #f0b429;border-radius:50%;background-color:#15100a;background-position:center 18%;background-size:cover;background-repeat:no-repeat;display:flex;align-items:center;justify-content:center;font-size:calc(18 * var(--ui-length-unit,1px));transition:opacity .15s;}
-#game-ui #homeFeatureModal .character-showcase-avatar.is-current-character{border-color:var(--character-avatar-edge,#fff0ab);box-shadow:var(--character-avatar-shadow,0 0 0 9px rgba(255,176,42,.55),0 0 48px rgba(255,130,28,.9));}
-
-/* Explicit skill-tab visual state, owned and cleared by switch/closeHomeFeature. */
-#game-ui #homeFeatureModal[data-character-tab="skill"]{--character-choice-edge:transparent;--character-choice-fill:transparent;--character-choice-shadow:none;--character-avatar-edge:#efc379;--character-avatar-shadow:0 0 0 6px #251c12,0 0 36px #d8953d88;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-box.wide{border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 30px / 0 stretch;background:#151515;box-shadow:0 0 30px #000c;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-title{background:transparent url('../assets/ui/skill-iron-bronze/title.9d58221ab504.webp') left center/72% auto no-repeat;box-shadow:none;border:0;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] #homeFeatureModalTitle{padding-left:calc(56 * var(--ui-length-unit,1px));font-size:calc(24 * var(--ui-length-unit,1px));color:#ffe0a1;letter-spacing:.16em;text-shadow:0 2px 4px #000;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] #homeFeatureModalBody{background:transparent;box-shadow:none;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] .character-showcase-avatar{background-size:230%;background-position:center 12%;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] .character-tab-row button{border-radius:0;background:linear-gradient(#37332b,#171716);border-color:#67543b;color:#d8c7a6;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] .character-tab-row button.active{background:linear-gradient(#76502a,#37251a);border-color:#d3ab68;color:#fff0cd;}
 
 
 /* bundled source: css/52-v173.50-inventory-qol.css */
