@@ -34,6 +34,7 @@ const visualGeometry=`(()=>{
         portrait:image?{rect:rect(image),naturalWidth:image.naturalWidth,naturalHeight:image.naturalHeight,complete:image.complete,objectFit:getComputedStyle(image).objectFit,objectPosition:getComputedStyle(image).objectPosition}:null,
         text:leaves.map(e=>({text:e.textContent,rect:rect(e),fontSize:parseFloat(getComputedStyle(e).fontSize),visualFontSize:parseFloat(getComputedStyle(e).fontSize)*scale})),
         typography:[...document.querySelectorAll('#inventoryCharacterTabs .inventory-character-name span,#inventoryCharacterTabs small,#inventoryCharacterSummary h3,#inventoryCharacterSummary p,#inventoryStats span,#inventoryStats b,#equipmentGrid .inventory-equipment-slot-label,#equipmentGrid .equipment-rarity-name,#inventoryCharacterDetailButton')].filter(visible).map(e=>({text:e.textContent,visualFontSize:parseFloat(getComputedStyle(e).fontSize)*scale})),
+        equipmentCells:[...grid.querySelectorAll('.inventory-equipment-cell')].map(cell=>{const label=cell.querySelector('.inventory-equipment-slot-label'),slot=cell.querySelector('.inventory-equipment-slot');return {cell:rect(cell),slot:rect(slot),label:rect(label),text:label.textContent,lineHeight:parseFloat(getComputedStyle(label).lineHeight)*scale};}),
         controls:[...grid.querySelectorAll('.has-item'),document.getElementById('inventoryCharacterDetailButton')].map(e=>{const r=rect(e),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {label:e.title||e.getAttribute('aria-label'),rect:r,hit:!!hit&&(e===hit||e.contains(hit))};})};
 })()`;
 function assertVisualGeometry(g){
@@ -45,6 +46,14 @@ function assertVisualGeometry(g){
     assert.ok(g.summary.bottom<=g.grid.top+1||g.summary.top>=g.grid.bottom-1||g.summary.right<=g.grid.left+1||g.summary.left>=g.grid.right-1,'summary cannot intersect equipment row');
     for(const text of g.text){assert.ok(inside(text.rect,g.summary),'summary child escapes its frame: '+JSON.stringify(text));assert.ok(text.visualFontSize>=12.95,'actual summary text must be at least 13px: '+JSON.stringify(text));}
     g.typography.forEach(text=>assert.ok(text.visualFontSize>=12.95,'actual character/equipment text must be at least 13px: '+JSON.stringify(text)));
+    assert.equal(g.equipmentCells.length,6);
+    const slotHeight=g.equipmentCells[0].slot.height;
+    for(const cell of g.equipmentCells){
+        assert.ok(Math.abs(cell.slot.width-cell.slot.height)<=1,'equipment slot must stay square: '+JSON.stringify(cell));
+        assert.ok(Math.abs(cell.slot.height-slotHeight)<=1,'six equipment slots must keep the same height: '+JSON.stringify(cell));
+        assert.ok(Number.isFinite(cell.lineHeight)&&cell.label.height+0.5>=cell.lineHeight,'equipment label must not flex below its line height: '+JSON.stringify(cell));
+        assert.ok(inside(cell.label,cell.cell)&&inside(cell.label,g.grid),'equipment label must fit cell and grid: '+JSON.stringify(cell));
+    }
     g.controls.forEach(control=>assert.equal(control.hit,true,'equipment/detail touch hit obstructed: '+JSON.stringify(control)));
 }
 try{
