@@ -100,10 +100,11 @@ function $(id){return document.getElementById(id)}
 function getExistingPartyIndexes(){return [0,1,2];}
 ${highlightSource}
 updateActiveCharacterHighlight();
-var monsters=Array.from({length:10},function(_,index){return {hp:1380-index*5,sp:630-index*3,maxHP:2000,maxSP:800};});
+var elementDatabase={fire:{name:'火'},water:{name:'水'},wind:{name:'風'},earth:{name:'土'}};
+var monsters=Array.from({length:10},function(_,index){return {name:'怪物'+index,level:85,element:'water',hp:1380-index*5,sp:630-index*3,maxHP:2000,maxSP:800};});
 ${resourceSource}
 ${secondaryResourceSource}
-var qaParty=[{hp:835,sp:412},{hp:798,sp:468},{hp:752,sp:506}];
+var qaParty=[{id:'華辰',level:80,element:'fire',hp:835,sp:412},{id:'白清瑤',level:80,element:'water',hp:798,sp:468},{id:'玄天',level:80,element:'wind',hp:752,sp:506}];
 function getPartyCharacterByIndex(index){return qaParty[index]||null;}
 function qaRect(selector){var r=document.querySelector(selector).getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height,right:r.right,bottom:r.bottom};}
 function qaRects(){return {enemy0:qaRect('#battleMonster0'),enemy5:qaRect('#battleMonster5'),player0:qaRect('#battlePlayerCard0'),player2:qaRect('#battlePlayerCard2'),turn:qaRect('#turnTargetRow'),actions:qaRect('#battleActionRegion')};}
@@ -192,6 +193,10 @@ window.__qaBefore=qaRects();
       enemySpRect:qaRect('#battleMonster0 .monster-sp'),
       enemyHpDisplay:getComputedStyle(enemy.querySelector('.monster-hp')).display
     };
+    var identity=player.querySelector('.battle-player-id'),level=identity.querySelector('.battle-identity-level');
+    qaParty[0].level=81;window.FourSymbolsBattlePresentation.syncIdentity(player,'player');
+    window.FourSymbolsBattlePresentation.syncIdentity(player,'player');
+    result.identity={name:identity.querySelector('.battle-identity-name').textContent,level:level.textContent,reused:identity.querySelector('.battle-identity-level')===level,count:identity.querySelectorAll('.battle-identity-copy').length,element:identity.querySelector('.battle-identity-element').dataset.element,enemyLevel:enemy.querySelector('.battle-identity-level').textContent};
     parent.document.getElementById('result').textContent=JSON.stringify(result);
   },260);
 })();
@@ -213,6 +218,7 @@ function runViewport(chrome,width,height){
     const match=result.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
     assert.ok(match,`V174 browser result missing at ${width}x${height}`);
     const data=JSON.parse(decode(match[1]));
+    assert.deepEqual(data.identity,{name:'華辰',level:'Lv.81',reused:true,count:1,element:'fire',enemyLevel:'Lv.85'},'identity reads live entity data and reuses one HUD during repeated updates');
     assert.equal(data.manualCount,1,"one manual current-character indicator");
     assert.equal(data.autoCount,0,"automatic declaration clears the preceding manual frame");
     assert.equal(data.autoFrameAnimation,"none");
