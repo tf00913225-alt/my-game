@@ -191,9 +191,14 @@ test("character CSS owns natural scrolling after the inline writer retires",()=>
     assert.doesNotMatch(layoutSource,/setProperty|MutationObserver|setTimeout|requestAnimationFrame/);
     assert.match(css,/\.home-feature-modal-box\.wide #characterTabContent\{[^}]*overflow-x:hidden !important;[^}]*overflow-y:auto !important;[^}]*touch-action:pan-y !important;/);
     assert.doesNotMatch(layoutSource,/dataset\.characterTab|fixedCharacterTab/);
-    const skillSkins=[...css.matchAll(/[^{}]*\[data-character-tab="skill"\][^{}]*\{([^}]*)\}/g)];
+    const skillSkins=[...css.matchAll(/([^{}]*\[data-character-tab="skill"\][^{}]*)\{([^}]*)\}/g)];
     assert.ok(skillSkins.length>0,"explicit skill skin state is present");
-    for(const skin of skillSkins){assert.doesNotMatch(skin[1],/(?:^|;)\s*(?:width|height|min-width|min-height|max-width|max-height|overflow):/,"skill state cannot become a second frame geometry owner");}
+    for(const skin of skillSkins){
+        // The approved compact title/button may share a height; the panel and
+        // scroll/frame owners must remain independent of skill-tab state.
+        const headerPart=/#homeFeatureModalTitle|\.character-header-actions \.home-feature-close-btn/.test(skin[1]);
+        if(!headerPart)assert.doesNotMatch(skin[2],/(?:^|;)\s*(?:width|height|min-width|min-height|max-width|max-height|overflow):/,"skill state cannot become a second frame geometry owner");
+    }
 });
 
 test("character pages remove only historical tails without compacting their content",()=>{
