@@ -474,8 +474,12 @@
         const frame=document.getElementById("inventoryPortraitFrame");
         if(!frame || typeof getPartyCharacterByIndex!=="function"){ return; }
         const character=getBackpackCharacter(inventoryCharacterIndex);
-        if(!character){ return; }
         const placeholder=frame.querySelector(".inventory-portrait-placeholder");
+        if(!character){
+            frame.querySelector(".v131-inventory-portrait")?.remove();
+            if(placeholder){ placeholder.style.display=""; }
+            return;
+        }
         if(placeholder){ placeholder.style.display="none"; }
         let img=frame.querySelector(".v131-inventory-portrait");
         if(!img){
