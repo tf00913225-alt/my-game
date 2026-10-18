@@ -58,7 +58,7 @@ try{
     assert.ok(data.bossHp.width>data.bossSp.width,"HP is the visible enemy resource");
     assert.ok(Math.abs(data.bossSp.width-data.gameContentScale)<.05,"Boss SP stays a single logical-pixel compatibility node");
     assert.ok(data.bossName.bottom<=data.bossHp.top+1,"Boss identity sits above HP");
-    assert.equal(data.leftHpCssHeight,6,"Reinforcement HP must use the 13px logical resource-bar height");
+    assert.equal(data.leftHpCssHeight,6,"Reinforcement HP shares the thin 6px logical resource-bar height");
     assert.ok(Math.abs(data.leftHpHeight-(6*data.gameContentScale))<.01,"Reinforcement HP physical rect must reflect only the canonical game-content scale");
     assert.notEqual(data.popupDisplay,"none","Boss HP damage popup must remain visible");
     assert.ok(data.leftArt.right<=data.bossArt.left,"B1 reinforcement artwork must not overlap Boss artwork");
