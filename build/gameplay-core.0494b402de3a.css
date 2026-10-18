@@ -6859,8 +6859,34 @@ body > .v169-rpg-dialog-layer{
 /* Explicit skill-tab visual state, owned and cleared by switch/closeHomeFeature. */
 #game-ui #homeFeatureModal[data-character-tab="skill"]{--character-choice-edge:transparent;--character-choice-fill:transparent;--character-choice-shadow:none;--character-avatar-edge:#efc379;--character-avatar-shadow:0 0 0 6px #251c12,0 0 36px #d8953d88;}
 #game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-box.wide{border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 30px / 0 stretch;background:#151515;box-shadow:0 0 30px #000c;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-title{background:transparent url('../assets/ui/skill-iron-bronze/title.9d58221ab504.webp') left center/72% auto no-repeat;box-shadow:none;border:0;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] #homeFeatureModalTitle{padding-left:calc(56 * var(--ui-length-unit,1px));font-size:calc(24 * var(--ui-length-unit,1px));color:#ffe0a1;letter-spacing:.16em;text-shadow:0 2px 4px #000;}
+#game-ui #homeFeatureModal[data-character-tab="skill"]{
+    --skill-header-height:calc(38 * var(--ui-length-unit,1px));
+    --skill-header-inset:calc(4 * var(--ui-length-unit,1px));
+    --skill-header-text:#ffe0a1;
+}
+#game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-title{background:transparent;box-shadow:none;border:0;}
+#game-ui #homeFeatureModal[data-character-tab="skill"] #homeFeatureModalTitle{
+    flex:0 0 45%;min-width:0;box-sizing:border-box;height:var(--skill-header-height);
+    display:flex;align-items:center;justify-content:center;
+    padding:0 calc(12 * var(--ui-length-unit,1px)) 0 calc(34 * var(--ui-length-unit,1px));
+    background:transparent url('../assets/ui/skill-iron-bronze/title-short.bb578519c9f4.webp') center/100% auto no-repeat;
+    font-size:calc(24 * var(--ui-length-unit,1px));line-height:1;color:var(--skill-header-text);letter-spacing:.16em;text-shadow:0 2px 4px #000;
+}
+#game-ui #homeFeatureModal[data-character-tab="skill"] .character-header-actions .home-feature-close-btn{
+    position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;
+    box-sizing:border-box;height:var(--skill-header-height);min-height:var(--skill-header-height);margin:0;
+    padding:0 calc(12 * var(--ui-length-unit,1px));border:0;border-radius:0;
+    background:transparent;box-shadow:none;color:var(--skill-header-text);font-size:calc(16 * var(--ui-length-unit,1px));line-height:1;
+}
+#game-ui #homeFeatureModal[data-character-tab="skill"] .character-header-actions .home-feature-close-btn::before{content:'‹';margin-right:calc(5 * var(--ui-length-unit,1px));font-size:1.5em;line-height:1;}
+#game-ui #homeFeatureModal[data-character-tab="skill"] .character-header-actions .home-feature-close-btn::after{
+    content:'';position:absolute;z-index:-1;inset:var(--skill-header-inset) 0;pointer-events:none;
+    border:calc(1 * var(--ui-length-unit,1px)) solid #a78245;border-radius:calc(3 * var(--ui-length-unit,1px));
+    background:linear-gradient(135deg,#a0793c33,transparent 45%),linear-gradient(180deg,#503a20,#2c2012 48%,#19130b);
+    box-shadow:inset 0 0 0 calc(2 * var(--ui-length-unit,1px)) #21180e,inset 0 calc(3 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px)) #d7ad5d33,0 calc(1 * var(--ui-length-unit,1px)) calc(3 * var(--ui-length-unit,1px)) #000;
+}
+#game-ui #homeFeatureModal[data-character-tab="skill"] .character-header-actions .home-feature-close-btn:hover::after{border-color:#d2af6d;}
+#game-ui #homeFeatureModal[data-character-tab="skill"] .character-header-actions .home-feature-close-btn:focus-visible{outline:calc(2 * var(--ui-length-unit,1px)) solid #e6bb69;outline-offset:calc(2 * var(--ui-length-unit,1px));}
 #game-ui #homeFeatureModal[data-character-tab="skill"] #homeFeatureModalBody{background:transparent;box-shadow:none;}
 #game-ui #homeFeatureModal[data-character-tab="skill"] .character-showcase-avatar{background-size:230%;background-position:center 12%;}
 #game-ui #homeFeatureModal[data-character-tab="skill"] .character-tab-row button{border-radius:0;background:linear-gradient(#37332b,#171716);border-color:#67543b;color:#d8c7a6;}
