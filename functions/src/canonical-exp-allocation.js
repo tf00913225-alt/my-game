@@ -10,6 +10,22 @@ const ID=/^[A-Za-z0-9_-]{16,64}$/;
 // js/28-v133-economy-rebalance.js owns the current game level ceiling.
 const MAX_CHARACTER_LEVEL=100;
 
+function verifyExpAllocationEvidence({uid,operationId,currentRevision,characterId,
+    receipt,ledger,grantExists,fail}){
+    if(grantExists||!ledger||receipt.ownerUid!==uid||receipt.operationId!==operationId||
+       receipt.kind!=="exp-allocation"||receipt.characterId!==characterId||
+       !Number.isSafeInteger(receipt.allocatedRevision)||receipt.allocatedRevision<1||
+       receipt.allocatedRevision>currentRevision||!Number.isSafeInteger(receipt.cost)||receipt.cost<1||
+       !Number.isSafeInteger(receipt.levelAfter)||receipt.levelAfter<2||
+       !/^[a-f0-9]{64}$/.test(receipt.snapshotSha256||"")||
+       ledger.ownerUid!==uid||ledger.operationId!==operationId||ledger.kind!=="exp-allocation"||
+       ledger.characterId!==receipt.characterId||ledger.amount!==-receipt.cost||
+       ledger.levelAfter!==receipt.levelAfter||ledger.allocatedRevision!==receipt.allocatedRevision||
+       ledger.snapshotSha256!==receipt.snapshotSha256){
+        fail("data-loss","EXP allocation receipt is inconsistent.");
+    }
+}
+
 // One server-created character, one level per protected operation. The client
 // supplies an operation ID and expected revision, never a cost or new stats.
 function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
@@ -52,25 +68,8 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
             }
             if(operationSnap.exists){
                 const receipt=operationSnap.data(),ledger=ledgerSnap.data();
-                if(grantOperationSnap.exists||!ledgerSnap.exists||
-                   receipt.ownerUid!==uid||receipt.operationId!==operationId||
-                   receipt.kind!=="exp-allocation"||
-                   receipt.characterId!==account.slots[0]||
-                   !Number.isSafeInteger(receipt.allocatedRevision)||
-                   receipt.allocatedRevision<1||
-                   receipt.allocatedRevision>envelope.serverRevision||
-                   !Number.isSafeInteger(receipt.cost)||receipt.cost<1||
-                   !Number.isSafeInteger(receipt.levelAfter)||receipt.levelAfter<2||
-                   !/^[a-f0-9]{64}$/.test(receipt.snapshotSha256||"")||
-                   ledger.ownerUid!==uid||ledger.operationId!==operationId||
-                   ledger.kind!=="exp-allocation"||
-                   ledger.characterId!==receipt.characterId||
-                   ledger.amount!==-receipt.cost||
-                   ledger.levelAfter!==receipt.levelAfter||
-                   ledger.allocatedRevision!==receipt.allocatedRevision||
-                   ledger.snapshotSha256!==receipt.snapshotSha256){
-                    fail("data-loss","EXP allocation receipt is inconsistent.");
-                }
+                verifyExpAllocationEvidence({uid,operationId,currentRevision:envelope.serverRevision,
+                    characterId:account.slots[0],receipt,ledger,grantExists:grantOperationSnap.exists,fail});
                 return {allocatedRevision:receipt.allocatedRevision,
                     cost:receipt.cost,levelAfter:receipt.levelAfter,unchanged:true,
                     authoritativeStateReady:false};
@@ -187,4 +186,4 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
     }
     return Object.freeze({allocateSharedExp});
 }
-module.exports={createCanonicalExpAllocation};
+module.exports={createCanonicalExpAllocation,verifyExpAllocationEvidence};
