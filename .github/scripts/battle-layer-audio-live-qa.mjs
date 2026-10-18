@@ -52,7 +52,7 @@ async function runBossBalanceProductionQa(){
         const art=document.querySelector('.gameplay-boss-card .v174-battle-art'),portrait=v154ResolveMonsterPortraitRecord(boss);check(art,'portrait artwork');
         if(portrait.generic){
           check(portrait.requestedPortraitKey==='boss.'+definition.id&&portrait.fallbackReason==='planned','registered Boss planned identity');
-          check(art.classList.contains('v174-generic-portrait')&&getComputedStyle(art).backgroundImage==='none'&&getComputedStyle(art,'::before').content.includes('◇'),'visible Boss neutral fallback');
+          check(art.classList.contains('v174-generic-portrait')&&getComputedStyle(art).backgroundImage==='none'&&getComputedStyle(art.querySelector('.v174-action-motion'),'::before').content.includes('◇'),'visible Boss neutral fallback');
         }else{
           check(getComputedStyle(art).backgroundImage!=='none','portrait');
           const image=new Image();image.src=getComputedStyle(art).backgroundImage.split('url(')[1]?.split(')')[0].replaceAll(String.fromCharCode(34),'').replaceAll("'",'');await image.decode();check(image.naturalWidth>0,'Boss portrait decode');
