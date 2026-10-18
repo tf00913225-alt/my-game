@@ -4,7 +4,8 @@ const {assembleCanonicalSnapshot,claimRecordsDigest}=
     require("./canonical-snapshot");
 const {inspectRecoveryArchive,createRecoveryArchive}=
     require("./canonical-recovery-archive");
-const {verifyCreditedGrant,verifyReservedGrant}=require("./credited-grant-evidence");
+const {verifyCreditedGrant,verifyReservedGrant,verifyServerIssuedGrant}=require("./credited-grant-evidence");
+const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
 const {verifyShopPurchaseEvidence}=require("./canonical-shop-purchase");
 const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
@@ -174,19 +175,24 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             }
             // Canonical claim sources may all be lost. Independent retained
             // rights must agree with the archive, not be hidden by its rollback.
-            const [claims,receipts,ledgers]=await Promise.all([
+            const [claims,receipts,ledgers,grants]=await Promise.all([
                 tx.get(root.collection("uniqueClaims").limit(401)),
                 tx.get(root.collection("grantOperations").limit(401)),
-                tx.get(root.collection("ledgerEntries").limit(401))
+                tx.get(root.collection("ledgerEntries").limit(401)),
+                tx.get(root.collection("pendingGrants").limit(401))
             ]);
             // Each credit proof reads at most 12 documents, including its claim,
             // grant/receipt/ledger/collision and original event/snapshot/archive.
             // Inventory reads are additional; a reservation reserves six proof
             // reads. Each ledger reserves its inventory read plus four reads for
             // a debit's receipt, snapshot/archive and the shop Owner's snapshot.
+            // Pending-grant inventory adds one read per row and three original
+            // event/snapshot/archive reads for each unconsumed pending grant.
             const reservedCount=receipts.docs.filter(doc=>doc.get("creditedToCharacter")===false).length;
+            const pendingCount=grants.docs.filter(doc=>doc.get("status")==="pending").length;
             if(queries.reduce((sum,query)=>sum+query.size,0)+claims.docs.length*12+
-               receipts.docs.length+ledgers.docs.length*5+reservedCount*6>400){
+               receipts.docs.length+ledgers.docs.length*5+reservedCount*6+
+               grants.docs.length+pendingCount*3>400){
                 fail("failed-precondition","Recovery claim evidence exceeds the transaction budget.");
             }
             const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
@@ -197,6 +203,34 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             // Reuse the original credit/debit Owners; never infer a missing
             // receipt from a balance or regenerate an operation during repair.
             const receiptById=new Map(receipts.docs.map(doc=>[doc.id,doc.data()]));
+            // Retained consumed grants need their original receipt too. Pending
+            // rights need an independently versioned event; never use an old
+            // balance, creation time or absent receipt as evidence of eligibility.
+            const receiptsByGrant=new Set(receipts.docs.map(doc=>doc.get("grantId")));
+            for(const doc of grants.docs){
+                const grant=doc.data();
+                if(grant.status==="pending"){
+                    verifyServerIssuedGrant({uid,grant,fail});
+                    if(grant.claimedByOperationId!==null||receiptsByGrant.has(doc.id)){
+                        fail("data-loss","Pending grant consumption evidence is inconsistent.");
+                    }
+                    const proof=await readDailyCheckinEvidence({tx,root,uid,grantId:doc.id,grant,fail});
+                    if(!proof){fail("failed-precondition","VERSIONED_PENDING_GRANT_EVIDENCE_REQUIRED");}
+                    if(proof.event.sourceRevision>expectedRevision||
+                       proof.event.characterId!==records.account.slots[0]){
+                        fail("data-loss","A later or foreign pending grant blocks recovery.");
+                    }
+                }else{
+                    const receipt=receiptById.get(grant.claimedByOperationId);
+                    if(!["reserved","credited"].includes(grant.status)||!receipt||
+                       receipt.grantId!==doc.id||receipt.operationId!==grant.claimedByOperationId||
+                       receipt.creditedToCharacter!==(grant.status==="credited")){
+                        fail("data-loss","An orphaned or unknown grant blocks recovery.");
+                    }
+                    // Existing receipt/claim loops below verify original grant,
+                    // revision/event/history and no competing operation/ledger.
+                }
+            }
             let creditLedgerCount=0;
             for(const doc of ledgers.docs){
                 const ledger=doc.data(),receipt=receiptById.get(doc.id);
