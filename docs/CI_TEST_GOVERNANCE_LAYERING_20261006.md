@@ -3,8 +3,8 @@
 Work ID: `CI-TEST-GOVERNANCE-LAYERING-20261006`
 Target: dev; main writes forbidden.
 Branch: `feature/ci-test-governance-layering-20261006`.
-Status: Original layering integrated. Current Boss tier optimization is owned by
-Work ID CI-BOSS-TIERED-GATES-20261008, branch feature/ci-boss-tiered-gates-20261008.
+Status: Layering and Boss tiers integrated. Current affected-area routing repair is owned by
+Work ID CI-IMPACT-ROUTING-20261018, branch fix/ci-impact-routing-20261018.
 Latest Head, Required CI, integration and cleanup evidence belong to its PR.
 
 ## Current routing owner (supersedes historical phase restrictions below)
@@ -13,6 +13,19 @@ The classifier remains the single routing owner. PR comparisons require a real
 merge base and exact PR head; only its checkout receives full ancestry. dev push
 compares exact before/after trees. Missing SHA, unrelated histories, invalid/new
 unowned runtime and unexplained generated outputs retain strict fallback.
+
+### 2026-10-18 依實際影響範圍驗收
+
+分類與輸出仍由同一個 `ci-change-classifier.mjs` 決定，不新增另一套 workflow 或測試 runner。原必要安全條件不降級；「改什麼測什麼」包含其真正相依範圍，並非只看檔名。
+
+- 已知共享 CSS 以固定版本 PostCSS／selector parser 比較實際規則與宣告，再檢查正向 UI／戰鬥作用域。技能頁樣式不等於技能公式；同一個檔案中的商店與戰鬥樣式分開判斷。全域 token、import、未知 selector、逃離作用域的 sibling combinator、cascade 順序變更或解析失敗回到 Full。
+- `index.html` 只隔離既有 UI roots 中的標題／按鈕文字、樣式與 SVG 圖案屬性。非標籤數值、ID、資料綁定、事件、form controls、可執行內容及 Startup／Auth／root 外部位元組保持不變才可縮小範圍。正式 build marker 區塊只有在獨立 build／產物驗證後才可正規化；不能以此放過手改啟動程式。
+- 已知驗收腳本與既有 UI 契約測試回到其實際 Owner；修改技能頁驗收不再被當成整個 CI 引擎改動。共用帳號／transport helper、未知或新程式仍保守處理。CI 引擎／workflow 修改保留原完整 Node 契約與 Boss Fast／Full 能力自驗，不豁免必要 gates。
+- `ui_mode` 是同一 classifier 的附帶輸出：`skill`、`inventory`、`all` 或 `smoke`。它沿原 PR/dev/deploy 呼叫鏈傳遞。技能專項跑技能、共享框／navigation／touch；不跑無關的鍛造、背包構圖或更新通知。共同 UI 變更跑 UI 各相關群組。Publisher 與 exact-SHA responsive smoke 仍必要，手動部署預設 `all`，非法 mode 直接失敗。
+- `core_checks` 的局部群組改依功能旗標執行，混合的 UI／怪物／深淵／戰鬥群組已拆開；全部原測試命令保留，Full 仍由原 runner 發現同一批測試。純 UI 不再順帶執行技能公式、秘寶 lifecycle 或怪物平衡測試。必要的 UID isolation 基線、CI 失敗傳播、持久化 registry、圖片／架構 guard、完整建置／資源／ID／版本／immutable artifact 檢查仍保留。
+- Cloud／Save／Auth／persistence、公式／獎勵／結算、發布、混合高風險或無法證明隔離的變更維持原必要安全／完整驗收。未知影響、缺 SHA、建置驗證失敗、無來源的生成產物不會變成跳過。Aggregate 仍拒絕 required failure／cancelled／missing／未授權 skipped。
+
+本次驗證包含真實 #929 技能標題修復的完整 Git diff 重播（PR 與 dev push），兩者均為 core＋UI、沒有 Boss／Abyss／Session；另測混合安全變更、誤導檔名、共享 HTML、global CSS、失敗傳播及實際 workflow 條件。最新 Head、遠端 CI 與整合證據以本 Work ID 的 PR 為準，不把尚未執行的遠端結果寫成通過。
 
 Known existing presentation declarations in js/00-main.js and explicitly mapped
 reforge/shop declarations in the shared content/equipment modules are compared by Acorn
@@ -40,9 +53,9 @@ unchanged to deployed QA: `none` for reliably isolated inventory/shop/docs;
 unknown/shared effects, core/lifecycle/settlement, Cloud/persistence, release and manual/nightly.
 Cloud/persistence uses Boss Full on both PR and dev, including its required flag.
 Inventory/reforge routes still execute the existing eligibility, synthesis,
-equipment and selection regressions in core_checks. Its six affected suites
-and the nine core targeted groups run sequentially only when full_node is
-false; the existing Full runner discovers those same files once in the same
+equipment and selection regressions in core_checks. Its affected suites
+and the affected core targeted groups run sequentially only when full_node is
+false and their responsibility flags require them; the existing Full runner discovers those same files once in the same
 job, Node version and source snapshot. v173.51-qa belongs to the core layout
 group, so the inventory loop does not repeat it. CI routing self-tests and
 the permanent image pipeline remain early prerequisite gates; separate job,

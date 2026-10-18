@@ -79,6 +79,112 @@ export function classifySharedSource(before, after, sourcePath='js/00-main.js') 
 }
 const GENERATED=/^(?:build\/|asset-manifest\.json$|functions\/src\/generated\/restricted-forest-instance-policy\.json$)/;
 
+const SHARED_CSS = new Set(['css/00-main.css','css/30-v130-requested-updates.css',
+  'css/31-v131-fix-batch.css','css/42-v146-system-polish.css','css/44-v149-skill-ui-rules.css','css/49-v169-rpg-ui.css']);
+
+// Compare actual rule/declaration changes in shared files. Global tokens,
+// imports, unknown selectors, cascade reordering and parser failures stay Full.
+// Parsers are lazy: the minimal aggregate checkout needs no dependencies.
+export function classifySharedCss(before, after) {
+  try {
+    const require=createRequire(import.meta.url);
+    const postcss=require('postcss'), selectors=require('postcss-selector-parser');
+    const inspect=source=>{
+      const rows=[],counts=new Map();
+      const add=(key,value,selector=null)=>{
+        const occurrence=counts.get(key)||0;counts.set(key,occurrence+1);
+        rows.push({key:key+'#'+occurrence,value,selector});
+      };
+      const visit=(parent,context='')=>{
+        for(const node of parent.nodes||[]) {
+          if(node.type==='comment')continue;
+          if(node.type==='atrule'&&['media','supports'].includes(node.name)&&node.nodes) {
+            visit(node,context+'@'+node.name+' '+node.params+'/');continue;
+          }
+          if(node.type==='rule'&&node.nodes.every(n=>['decl','comment'].includes(n.type))) {
+            add(context+node.selector,JSON.stringify(node.nodes.filter(n=>n.type==='decl').map(n=>[n.prop,n.value,!!n.important])),node.selector);
+          } else add(context+node.type+':'+(node.name||node.prop||''),node.toString());
+        }
+      };
+      visit(postcss.parse(source));return rows;
+    };
+    const a=inspect(before),b=inspect(after),am=new Map(a.map(n=>[n.key,n])),bm=new Map(b.map(n=>[n.key,n]));
+    if(JSON.stringify(a.filter(n=>bm.has(n.key)).map(n=>n.key))!==JSON.stringify(b.filter(n=>am.has(n.key)).map(n=>n.key)))return null;
+    const changed=[...a.filter(n=>bm.get(n.key)?.value!==n.value),...b.filter(n=>am.get(n.key)?.value!==n.value)];
+    if(!changed.length)return ['ui','ui_shared'];
+    const responsibilities=new Set();
+    for(const row of changed) {
+      if(!row.selector)return null;
+      const ast=selectors().astSync(row.selector);
+      for(const selector of ast.nodes) {
+        // Sibling combinators could escape an otherwise positive ancestor scope.
+        if(selector.nodes.some(n=>n.type==='combinator'&&!['','>'].includes(n.value.trim())))return null;
+        const ids=selector.nodes.filter(n=>n.type==='id').map(n=>n.value);
+        const classes=selector.nodes.filter(n=>n.type==='class').map(n=>n.value);
+        let scope;
+        if(ids.includes('battlePage'))scope=['ui','battle'];
+        else if(ids.includes('mapPage'))scope=['ui','tower','battle'];
+        else if(ids.includes('skillPage')||ids.includes('homeFeatureModal')&&selector.nodes.some(n=>n.type==='attribute'&&n.attribute==='data-character-tab'&&n.operator==='='&&n.value==='skill'))scope=['ui','skill_ui'];
+        else if(ids.includes('inventoryPage'))scope=['ui','inventory'];
+        else if(ids.some(id=>['homeFeatureModal','homePage','skillDetailModal','statusHelpModal','inventoryCharacterDetailModal','itemModal'].includes(id))||classes.some(c=>['home-feature-modal-box','item-modal-box','creation-skill-detail-box','v169-rpg-dialog'].includes(c)))scope=['ui','ui_shared'];
+        else return null;
+        scope.forEach(k=>responsibilities.add(k));
+      }
+    }
+    return [...responsibilities];
+  } catch {return null;}
+}
+
+// Only presentation inside established UI roots may be isolated from the
+// shared document. Events, IDs, data bindings, form controls and executable
+// content retain their complete fingerprint; Startup/Auth/outside bytes stay fixed.
+export function classifySharedHtml(before, after, {generatedVerified=false}={}) {
+  try {
+    const html=createRequire(import.meta.url)('parse5');
+    const roots=new Map([
+      ['homePage',['ui','ui_shared']],['homeFeatureModal',['ui','ui_shared']],
+      ['inventoryPage',['ui','inventory']],['skillPage',['ui','skill_ui']],
+      ['skillDetailModal',['ui','skill_ui']],['statusHelpModal',['ui','ui_shared']]
+    ]);
+    const visualTags=new Set(['div','span','p','h1','h2','h3','h4','button','section','header','footer','label','strong','b','small','ul','li','a','img','svg','g','path','circle','ellipse','rect','line','polyline','polygon']);
+    const visualAttrs=new Set(['class','style','title','width','height','alt']);
+    const svgAttrs=new Set(['viewBox','viewbox','d','fill','stroke','stroke-width','stroke-linecap','stroke-linejoin','cx','cy','r','rx','ry','x','y','x1','x2','y1','y2','points','transform','xmlns']);
+    const fingerprint=(node,labelContext=false)=>{
+      if(node.nodeName==='#comment')return null;
+      if(node.nodeName==='#text')return labelContext&&!/[0-9]/.test(node.value)?'#label':node.value;
+      if(!visualTags.has(node.tagName))return html.serializeOuter(node);
+      const label=labelContext||['button','label','h1','h2','h3','h4'].includes(node.tagName)||node.attrs?.some(a=>a.name==='id'&&a.value==='homeFeatureModalTitle');
+      return [node.tagName,(node.attrs||[]).filter(a=>!visualAttrs.has(a.name)&&!(node.tagName==='img'&&['src','srcset'].includes(a.name))&&!(node.namespaceURI==='http://www.w3.org/2000/svg'&&svgAttrs.has(a.name))),
+        (node.childNodes||[]).map(child=>fingerprint(child,label)).filter(n=>n!==null)];
+    };
+    const inspect=input=>{
+      const source=generatedVerified?input.replace(/<!-- build:(critical-style|critical-script) -->[\s\S]*?<!-- \/build:\1 -->/g,(_,name)=>`<!-- build:${name} --><!-- /build:${name} -->`):input;
+      const errors=[],parts=[];
+      const tree=html.parse(source,{sourceCodeLocationInfo:true,onParseError:e=>errors.push(e.code)});
+      const visit=node=>{
+        const id=node.attrs?.find(a=>a.name==='id')?.value;
+        if(roots.has(id)) {
+          const loc=node.sourceCodeLocation;if(!loc?.endTag)throw Error('Unclosed UI scope');
+          parts.push({id,start:loc.startOffset,end:loc.endOffset,effect:JSON.stringify(fingerprint(node))});return;
+        }
+        (node.childNodes||[]).forEach(visit);
+      };visit(tree);
+      if(new Set(parts.map(p=>p.id)).size!==parts.length)throw Error('Duplicate UI scope');
+      let rest='',cursor=0;
+      for(const p of parts){rest+=source.slice(cursor,p.start)+`UI:${p.id}`;p.text=source.slice(p.start,p.end);cursor=p.end;}
+      rest+=source.slice(cursor);return {rest,parts,errors};
+    };
+    const a=inspect(before),b=inspect(after);
+    if(a.rest!==b.rest||JSON.stringify(a.errors)!==JSON.stringify(b.errors)||a.parts.length!==b.parts.length)return null;
+    const result=new Set();
+    for(let i=0;i<a.parts.length;i++) {
+      const x=a.parts[i],y=b.parts[i];if(x.id!==y.id||x.effect!==y.effect)return null;
+      if(x.text!==y.text)roots.get(x.id).forEach(k=>result.add(k));
+    }
+    return result.size?[...result]:null;
+  } catch {return null;}
+}
+
 // Single policy owner. Rollback conditional PR gates by setting this false.
 export const PR_GATES_ENABLED = true;
 
@@ -132,7 +238,7 @@ export function applyAuthorizedLethalBossException(plan, {
 }
 export const CHANGE_FLAGS = Object.freeze([
   'core', 'battle', 'monster_balance', 'tower', 'daily', 'abyss', 'adventure',
-  'boss', 'ui', 'inventory', 'skill', 'portrait', 'cloud', 'persistence',
+  'boss', 'ui', 'ui_shared', 'inventory', 'skill', 'skill_ui', 'portrait', 'cloud', 'persistence',
   'release', 'workflow', 'unknown_runtime'
 ]);
 export const BROWSER_GATES = Object.freeze([
@@ -143,6 +249,24 @@ export const BROWSER_GATES = Object.freeze([
 
 // Narrow owners only. Anything outside these routes is strict, including new
 // runtime files. Generated build/manifest changes are deliberately strict.
+const QA_OWNERS = {
+  '.github/scripts/run-skill-progression-browser-qa.mjs':['ui','skill_ui'],
+  '.github/scripts/run-responsive-item-browser-qa.mjs':['ui','ui_shared'],
+  '.github/scripts/run-touch-scroll-navigation-browser-qa.mjs':['ui','ui_shared'],
+  '.github/scripts/run-release-update-notification-browser-qa.mjs':['ui','ui_shared'],
+  '.github/scripts/run-forge-sockets-browser-qa.mjs':['ui','inventory'],
+  '.github/scripts/run-hero-page-browser-qa.mjs':['ui','ui_shared'],
+  '.github/scripts/run-foreground-potion-browser-qa.mjs':['ui','inventory'],
+  '.github/scripts/run-fixed-slot-battlefield-browser-qa.mjs':['battle'],
+  '.github/scripts/run-battle-target-lifecycle-browser-qa.mjs':['battle'],
+  '.github/scripts/run-daily-balance-browser-qa.mjs':['daily','battle'],
+  '.github/scripts/run-abyss-balance-browser-qa.mjs':['abyss','battle'],
+  '.github/scripts/run-adventure-browser-qa.mjs':['adventure','ui'],
+  'tests/v169-rpg-ui.test.js':['ui','ui_shared'],
+  'tests/ui-black-gold-window-skin.test.js':['ui','ui_shared'],
+  'tests/ui-typography-standard.test.js':['ui','ui_shared'],
+  'tests/ui-typography-mobile-browser.test.js':['ui','ui_shared']
+};
 const OWNERS = [
   [/^(?:functions\/|js\/firebase\/|firestore\.rules$|firebase.*\.json$)/, ['cloud', 'persistence']],
   [/^js\/startup\//, ['cloud', 'persistence']],
@@ -154,13 +278,13 @@ const OWNERS = [
   [/^js\/adventure\/adventure-(?:ui|entry|items|content|runtime)-v1-20260915\.js$/, ['adventure', 'battle', 'ui']],
   [/^js\/(?:04-stage-v11-native-bottom-nav-runtime|19-stage-v78-character-inventory-runtime|53-v173\.50-inventory-qol|55-v173\.51-inventory-qa|56-v173\.51-shop-qa|release-update-notification)\.js$/, ['ui', 'inventory']],
   [/^css\/(?:06-stage-v11-native-bottom-nav|08-stage-v14-character-scroll-fix|09-stage-v15-native-character-shell|22-stage-v78-character-inventory-core|23-stage-v77-inventory-detail-ui|24-stage-v85-inventory-inner-grid-scroll-root|52-v173\.50-inventory-qol|release-update-notification|ad-free-service-info-modal)\.css$/, ['ui', 'inventory']],
-  [/^css\/44-v149-skill-ui-rules\.css$/, ['ui', 'skill']],
   [/^css\/battle-(?:floating-feedback|skill-name-presentation)-owner\.css$/, ['ui', 'battle']],
   [/^css\/adventure-(?:entry-v1|v1)-20260915\.css$/, ['adventure', 'ui']],
   [/^tests\/(?:cloud-save-|session-|firebase-|account-save-|auth-before-)/, ['cloud', 'persistence']],
   [/^tests\/(?:backpack-|responsive-window-|bottom-nav-|starter-potion-|forge-sockets-|reforge-eligibility-|ui-synthesis-|v173\.(?:46-equipment-progression|51-qa|57-starter-icons-reforge-filter|58-reforge-redesign)|ui-critical-)/, ['ui', 'inventory']],
   [/^tests\/(?:monster-portrait-|daily-dungeon-portrait-|water-wild-portrait-|wind-tower-portrait-)/, ['portrait', 'battle']],
-  [/^assets\/(?:icons|items|relics|ui|fonts)\//, ['ui', 'inventory']],
+  [/^assets\/ui\/skill-iron-bronze\//, ['ui', 'skill_ui']],
+  [/^assets\/(?:icons|items|relics|ui|fonts)\//, ['ui', 'ui_shared']],
   [/^assets\/(?:skills|vfx|audio)\//, ['battle', 'skill', 'portrait']]
 ];
 
@@ -169,7 +293,10 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
   responsibilities = null, responsibilitiesByPath = {}, generatedVerified = false} = {}) {
   const flags = Object.fromEntries(CHANGE_FLAGS.map(k => [`${k}_changed`, false]));
   const reasons = [];
-  const mark = (...keys) => keys.forEach(k => {flags[`${k}_changed`] = true;});
+  const mark = (...keys) => {
+    keys.forEach(k => {flags[`${k}_changed`] = true;});
+    if(keys.includes('ui')&&!keys.some(k=>['inventory','skill_ui','ui_shared'].includes(k)))flags.ui_shared_changed=true;
+  };
   const strict = (reason, ...keys) => {reasons.push(reason); mark('core', ...keys);};
   if (!Array.isArray(paths) || !paths.length || error) strict(error || 'No reliable changed-path input', 'unknown_runtime');
   for (const p of Array.isArray(paths) ? paths : []) {
@@ -182,6 +309,9 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
     }
     const responsibility=p==='js/00-main.js'?responsibilities:responsibilitiesByPath[p];
     if(SHARED_MODULES[p] && Array.isArray(responsibility) && responsibility.length && responsibility.every(k=>['ui','inventory','battle','boss','monster_balance'].includes(k))) {mark(...responsibility);continue;}
+    if(SHARED_CSS.has(p)&&!addedPaths.includes(p)&&Array.isArray(responsibility)&&responsibility.length&&responsibility.every(k=>['ui','ui_shared','inventory','skill_ui','battle','tower'].includes(k))) {mark(...responsibility);continue;}
+    if(p==='index.html'&&!addedPaths.includes(p)&&Array.isArray(responsibility)&&responsibility.length&&responsibility.every(k=>['ui','ui_shared','inventory','skill_ui'].includes(k))) {mark(...responsibility);continue;}
+    if(QA_OWNERS[p]&&!addedPaths.includes(p)){mark(...QA_OWNERS[p]);continue;}
     if (/^(?:\.github\/scripts\/(?:ci-(?:change-classifier|aggregate)|full-regression-health)\.mjs|tests\/(?:ci-(?:boss-routing|change-classifier|aggregate|concurrency).*|full-regression-health.test)\.mjs|\.github\/workflows\/(?:ci|deploy-dev-cloudflare)\.yml|package\.json|package-lock\.json)$/.test(p)) {mark('workflow');continue;}
     if (/^(?:\.github\/|ci\/|package(?:-lock)?\.json$|scripts\/.*(?:build|deployment|release)|release\/|feature-manifest\.json$|config\/(?:boot|feature|first-play)-manifest\.json$)/.test(p)) {
       strict(`CI/build/release owner: ${p}`, 'workflow', 'release'); continue;
@@ -211,7 +341,7 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
   const predicted = {
     core_checks: true,
     battle_browser: full || f('battle') || f('skill') || f('monster_balance'),
-    ui_browser: full || f('ui') || f('inventory') || f('skill'),
+    ui_browser: full || f('ui') || f('inventory') || f('skill') || f('skill_ui'),
     daily_browser: full || f('daily') || f('monster_balance'),
     tower_wild_browser: full || f('tower') || f('monster_balance'),
     portrait_browser: full || f('portrait'),
@@ -229,7 +359,8 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
   const bossMode=shadow || bossFull ? 'full' : gates.boss_balance ? 'fast' : 'none';
   // Gate policy edits must exercise the retained Full capability themselves.
   if(bossFull){predicted.boss_balance=true;gates.boss_balance=true;}
-  return {policyVersion: 1, eventName, baseRef, strictMode, shadow, fullRegression: nightly, flags, reasons, predicted, gates, bossMode};
+  const uiMode=full||shadow||f('workflow')||f('cloud')||f('persistence')||f('ui_shared')||f('inventory')&&(f('skill_ui')||f('skill')) ? 'all' : f('inventory') ? 'inventory' : f('skill_ui')||f('skill') ? 'skill' : 'smoke';
+  return {policyVersion: 1, eventName, baseRef, strictMode, shadow, fullRegression: nightly, flags, reasons, predicted, gates, bossMode, uiMode};
 }
 
 export function changedPaths(base, head, added = false, eventName = 'pull_request') {
@@ -255,6 +386,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       execFileSync('git',['show',`${comparisonBase}:${p}`],{encoding:'utf8',maxBuffer:8*1024*1024}),
       execFileSync('git',['show',`${process.env.CI_HEAD_SHA}:${p}`],{encoding:'utf8',maxBuffer:8*1024*1024}),p);
     responsibilities=responsibilitiesByPath['js/00-main.js'];
+    for(const p of paths.filter(p=>SHARED_CSS.has(p)&&!addedPaths.includes(p)))responsibilitiesByPath[p]=classifySharedCss(
+      execFileSync('git',['show',`${comparisonBase}:${p}`],{encoding:'utf8',maxBuffer:8*1024*1024}),
+      execFileSync('git',['show',`${process.env.CI_HEAD_SHA}:${p}`],{encoding:'utf8',maxBuffer:8*1024*1024}));
     if(paths.some(p=>GENERATED.test(p))) {
       // Build --check certifies manifests, every shipped bundle and generated
       // policy against actual formal source, without executing changed outputs.
@@ -266,11 +400,14 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       }
       generatedVerified=true;
     }
+    if(paths.includes('index.html')&&!addedPaths.includes('index.html'))responsibilitiesByPath['index.html']=classifySharedHtml(
+      execFileSync('git',['show',`${comparisonBase}:index.html`],{encoding:'utf8',maxBuffer:8*1024*1024}),
+      execFileSync('git',['show',`${process.env.CI_HEAD_SHA}:index.html`],{encoding:'utf8',maxBuffer:8*1024*1024}),{generatedVerified});
   } catch (e) {error = `Comparison unavailable; strict fallback: ${e.message}`;}
   const plan = applyAuthorizedLethalBossException(classifyChanges(paths, {eventName: process.env.CI_EVENT_NAME, baseRef: process.env.CI_BASE_REF, addedPaths, error, responsibilities, responsibilitiesByPath, generatedVerified, fullRegression: process.env.CI_FULL_REGRESSION === 'true'}),
     {baseSha: process.env.CI_BASE_SHA, headSha: process.env.CI_HEAD_SHA, paths, generatedVerified});
   const outputs = {plan_json: JSON.stringify(plan), strict: plan.strictMode, cloud_gate: plan.gates.session_authority, full_node: plan.shadow || plan.strictMode || plan.fullRegression || !['pull_request','push'].includes(plan.eventName) || plan.baseRef === 'main' || plan.flags.monster_balance_changed || plan.flags.workflow_changed || plan.flags.cloud_changed || plan.flags.persistence_changed,
-    boss_mode:plan.bossMode, ...plan.flags, ...plan.gates};
+    boss_mode:plan.bossMode, ui_mode:plan.uiMode, ...plan.flags, ...plan.gates};
   if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(outputs).map(([k,v]) => `${k}=${v}\n`).join(''));
   const report = `## CI change classifier (${plan.shadow ? 'SHADOW — all original gates retained' : 'ENFORCED'})\n`+

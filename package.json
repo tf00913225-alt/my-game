@@ -12,6 +12,10 @@
     "portrait:finalize-master": "node scripts/finalize-monster-portrait-from-master.mjs"
   },
   "devDependencies": {
-    "acorn": "8.15.0"
+    "acorn": "8.15.0",
+    "parse5": "8.0.1",
+    "postcss": "8.5.30",
+    "postcss-selector-parser": "7.1.6",
+    "yaml": "2.9.1"
   }
 }
