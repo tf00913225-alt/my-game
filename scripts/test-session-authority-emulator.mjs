@@ -2349,6 +2349,14 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     await reservedReceiptRef.set({schemaVersion:1,ownerUid:ownedUid,grantId:reservedGrantId,
         operationId:reservedOperationId,kind:"exp",amount:30,serverRevision:7,
         creditedToCharacter:false,createdAt:reservedStamp});
+    // Issue an actual pending grant through the original Owner before source
+    // loss. Recovery must retain it without reserving or crediting its value.
+    const pendingIssuer=createDailyCheckinGrant({db,FieldValue,HttpsError,inspectExistingEnvelope,
+        runProtected:writerSessions.runProtected,now:()=>Date.parse("2026-10-18T12:00:00Z")});
+    const pendingIssue=await pendingIssuer.issue(request);
+    assert.equal(pendingIssue.status,"pending");
+    const pendingRef=ownedRoot.collection("pendingGrants").doc(pendingIssue.grantId);
+    const pendingEventRef=ownedRoot.collection("rewardEvents").doc(pendingIssue.grantId);
     const before=await dump(),envelopeBefore=(await envelopeRef.get()).data();
     for(const [path,row] of current)assert.deepEqual(source(before.get(path)),row,path);
     const erase=db.batch();for(const path of current.keys())erase.delete(db.doc(path));
@@ -2444,6 +2452,26 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     assert.deepEqual(await dump(),damaged);
     console.log("Current recovery ledger inventory real Firestore PASS: orphan ledger and missing/later/corrupt debit proof refuse without writes; original purchase/EXP/attribute ledger history retained for approved restore.");
 
+    const orphanGrant=ownedRoot.collection("pendingGrants").doc("rehearsal-orphaned-grant-0001");
+    const originalGrant=(await creditProof[1].get()).data();
+    for(const status of ["reserved","credited","unknown"]){
+        await orphanGrant.set({...originalGrant,status,claimedByOperationId:"rehearsal-missing-receipt-0001"});
+        const orphaned=await dump();
+        await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+        assert.deepEqual(await dump(),orphaned);await orphanGrant.delete();
+    }
+    const pendingOriginal=(await pendingRef.get()).data(),eventOriginal=(await pendingEventRef.get()).data();
+    for(const patch of [{amount:999},{ownerUid:"foreign-owner"},{claimedByOperationId:"unresolved-operation-0001"}]){
+        await pendingRef.update(patch);const corrupt=await dump();
+        await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+        assert.deepEqual(await dump(),corrupt);await pendingRef.set(pendingOriginal);
+    }
+    await pendingEventRef.delete();const missingPendingProof=await dump();
+    await rejected("restoreCanonicalCurrent",device.idToken,payload,"FAILED_PRECONDITION");
+    assert.deepEqual(await dump(),missingPendingProof);await pendingEventRef.set(eventOriginal);
+    assert.deepEqual(await dump(),damaged);
+    console.log("Current recovery pending-grant inventory real Firestore PASS: orphan consumed grants and corrupt/missing pending event evidence refuse without writes; original pending right remains unconsumed.");
+
     // A stale/damaged envelope must not authorize overwriting surviving newer
     // sources. Missing revision evidence is equally unreconciled. Emulator only.
     for(const [path,row] of current){
@@ -2503,6 +2531,10 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     const reservedRetry=await invoke("reserveTrustedGrant",device.idToken,{uid:ownedUid,session,
         grantId:reservedGrantId,operationId:reservedOperationId,expectedRevision:7});
     assert.equal(reservedRetry.unchanged,true);assert.equal(reservedRetry.creditedToCharacter,false);
+    const pendingRetry=await pendingIssuer.issue(request);
+    assert.equal(pendingRetry.unchanged,true);assert.equal(pendingRetry.status,"pending");
+    assert.deepEqual((await pendingRef.get()).data(),pendingOriginal);
+    assert.deepEqual((await pendingEventRef.get()).data(),eventOriginal);
     assert.deepEqual(await dump(),committed);
     assert.deepEqual((await envelopeRef.get()).data(),committedEnvelope);
     console.log(`Current recovery full-source-loss rehearsal real Firestore PASS: ${current.size} documents / 10 domains; rollback, unknown claim and old-session refusal, new-session HTTP restore, discarded-response replay, exact source/archive parity and immutable receipt/ledger/claim history. Readiness remains false; not historical/disaster/second-phone acceptance.`);

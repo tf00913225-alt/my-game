@@ -6,6 +6,16 @@ const positive=value=>Number.isSafeInteger(value)&&value>=1;
 const balance=value=>Number.isSafeInteger(value)&&value>=0;
 const digest=value=>typeof value==="string"&&/^[a-f0-9]{64}$/.test(value);
 
+// Original server-issued grant shape, shared by new reservations and recovery.
+function verifyServerIssuedGrant({uid,grant,fail}){
+    if(!grant||grant.schemaVersion!==1||grant.ownerUid!==uid||
+       !["gold","exp"].includes(grant.kind)||grant.source!=="server-event"||
+       !positive(grant.amount)||grant.amount>100000||
+       !grant.createdAt||typeof grant.createdAt.toMillis!=="function"){
+        fail("data-loss","Server-issued grant is invalid.");
+    }
+}
+
 // Original reservation receipt identity, shared by reservation replay and repair.
 function verifyGrantReceiptIdentity({uid,grantId,operationId,currentRevision,grant,receipt,fail}){
     if(!receipt||receipt.schemaVersion!==1||receipt.ownerUid!==uid||
@@ -99,4 +109,4 @@ async function verifyCreditedGrant({tx,root,uid,grantId,operationId,currentRevis
     }
 }
 
-module.exports={verifyCreditedGrant,verifyGrantReceiptIdentity,verifyReservedGrant};
+module.exports={verifyCreditedGrant,verifyGrantReceiptIdentity,verifyReservedGrant,verifyServerIssuedGrant};

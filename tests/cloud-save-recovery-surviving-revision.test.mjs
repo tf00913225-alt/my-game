@@ -6,6 +6,7 @@ const {makeInitialCharacterSources}=require("../functions/src/initial-character-
 const {assembleCanonicalSnapshot,claimRecordsDigest}=require("../functions/src/canonical-snapshot.js");
 const {createRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
 const {createCanonicalCurrentRecovery}=require("../functions/src/canonical-current-recovery.js");
+const {eventDigest}=require("../functions/src/daily-checkin-event-evidence.js");
 const uid="surviving-revision-owner",root=`serverUsers/${uid}`,env=`users/${uid}/saves/current`;
 const intent={operationId:"recover-surviving-revision-0001",expectedRevision:6};
 const grantId="retained-claim",creditId="retained-credit-proof-0001";
@@ -88,6 +89,72 @@ async function refused(h){
     await assert.rejects(h.recovery.restoreCurrent({},intent),e=>e.code==="data-loss");
     assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
 }
+const pendingId="daily-checkin-20261018";
+function addPending(h,revision=5){
+    const stamp={toMillis:()=>1},records=structuredClone(h.data.get(`${root}/recoveryArchives/5`).sourceRecords);
+    if(revision!==5){
+        for(const rows of Object.values(records)){
+            for(const row of Array.isArray(rows)?rows:[rows])row.serverRevision=revision;
+        }
+        const snapshot=assembleCanonicalSnapshot(uid,revision,records);
+        h.data.set(`${root}/playableSnapshots/${revision}`,snapshot);
+        h.data.set(`${root}/recoveryArchives/${revision}`,createRecoveryArchive(uid,revision,records,snapshot));
+    }
+    const event={schemaVersion:1,ownerUid:uid,eventId:pendingId,eventType:"daily-checkin",
+        periodDate:"20261018",kind:"gold",amount:50,characterId:records.account.slots[0],sourceRevision:revision};
+    const digest=eventDigest(event);
+    h.data.set(`${root}/rewardEvents/${pendingId}`,{...event,sha256:digest,createdAt:stamp});
+    h.data.set(`${root}/pendingGrants/${pendingId}`,{schemaVersion:1,ownerUid:uid,
+        source:"server-event",eventType:"daily-checkin",periodDate:"20261018",kind:"gold",amount:50,
+        status:"pending",claimedByOperationId:null,sourceEventSha256:digest,createdAt:stamp});
+}
+test("orphaned consumed grants cannot hide missing receipt and claim history",async()=>{
+    for(const status of ["reserved","credited","unknown"]){
+        const h=fixture();for(const path of h.current.keys())h.data.delete(path);
+        h.data.set(`${root}/pendingGrants/orphaned-consumed-grant-0001`,{
+            ...h.data.get(`${root}/pendingGrants/${grantId}`),status,
+            claimedByOperationId:"orphaned-consumed-operation-0001"});
+        await refused(h);
+    }
+});
+test("pending daily grants require original event, identity and nonfuture source evidence",async()=>{
+    for(const change of [
+        h=>h.data.delete(`${root}/rewardEvents/${pendingId}`),
+        h=>h.data.get(`${root}/pendingGrants/${pendingId}`).ownerUid="foreign-owner",
+        h=>h.data.get(`${root}/pendingGrants/${pendingId}`).amount=999,
+        h=>h.data.get(`${root}/pendingGrants/${pendingId}`).claimedByOperationId="unresolved-operation-0001",
+        h=>h.data.get(`${root}/pendingGrants/${pendingId}`).createdAt=null,
+        h=>addPending(h,8)
+    ]){
+        const h=fixture();addPending(h);change(h);const before=JSON.stringify([...h.data]);
+        await assert.rejects(h.recovery.restoreCurrent({},intent),e=>["data-loss","failed-precondition"].includes(e.code));
+        assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
+    }
+});
+test("valid pending event-bound grant survives complete source loss without being reserved or credited",async()=>{
+    const h=fixture();addPending(h);
+    const grant=h.data.get(`${root}/pendingGrants/${pendingId}`),event=h.data.get(`${root}/rewardEvents/${pendingId}`);
+    for(const path of h.current.keys())h.data.delete(path);
+    assert.equal((await h.recovery.restoreCurrent({},intent)).restoredRevision,7);
+    assert.deepEqual(h.data.get(`${root}/pendingGrants/${pendingId}`),grant);
+    assert.deepEqual(h.data.get(`${root}/rewardEvents/${pendingId}`),event);
+    assert.equal(h.data.get(`${root}/economy/current`).gold,25);
+    assert.equal([...h.data.values()].filter(row=>row.grantId===pendingId).length,0);
+});
+test("unversioned pending grants stay retained but block recovery instead of inferring eligibility",async()=>{
+    const h=fixture();h.data.set(`${root}/pendingGrants/unversioned-pending-grant-0001`,{
+        schemaVersion:1,ownerUid:uid,source:"server-event",kind:"gold",amount:5,
+        status:"pending",claimedByOperationId:null,createdAt:{toMillis:()=>1}});
+    const before=JSON.stringify([...h.data]);
+    await assert.rejects(h.recovery.restoreCurrent({},intent),e=>e.code==="failed-precondition");
+    assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
+});
+test("pending-grant inventory is bounded before per-grant evidence reads",async()=>{
+    const h=fixture();for(let i=0;i<401;i++)h.data.set(`${root}/pendingGrants/orphan-${i}`,{});
+    const before=JSON.stringify([...h.data]);
+    await assert.rejects(h.recovery.restoreCurrent({},intent),e=>e.code==="failed-precondition");
+    assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
+});
 test("retained ledger inventory cannot hide a later credit after its receipt and claim index are lost",async()=>{
     for(const grant of [grantId,"later-orphaned-grant-0001"]){
         const h=fixture();for(const path of h.current.keys())h.data.delete(path);
@@ -293,6 +360,7 @@ test("known older/current sources and entirely missing sources still restore wit
             grantId:"later-read-only-claim",operationId:"later-read-only-credit",creditRevision:9});
         h.data.set(`${root}/ledgerEntries/later-read-only-credit`,{schemaVersion:1,ownerUid:uid,
             operationId:"later-read-only-credit",creditRevision:9});
+        h.data.set(`${root}/pendingGrants/later-read-only-grant`,{status:"unknown-later-history"});
         const before=JSON.stringify([...h.data]),count=h.writes();
         assert.deepEqual(await h.recovery.restoreCurrent({},intent),{
             restoredRevision:7,unchanged:true,authoritativeStateReady:false});

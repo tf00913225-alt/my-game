@@ -2,7 +2,7 @@
 
 // Only a trusted backend can create a grant record. This owner reserves an
 // entitlement once; it never trusts a browser-supplied kind or amount.
-const {verifyCreditedGrant,verifyGrantReceiptIdentity,verifyReservedGrant}=require("./credited-grant-evidence");
+const {verifyCreditedGrant,verifyGrantReceiptIdentity,verifyReservedGrant,verifyServerIssuedGrant}=require("./credited-grant-evidence");
 const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
 const ID_PATTERN=/^[A-Za-z0-9_-]{16,64}$/;
 const GRANT_SCHEMA_VERSION=1;
@@ -76,12 +76,7 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
             }
             if(!grantSnapshot.exists){ fail("failed-precondition","No server-issued grant exists."); }
             const grant=grantSnapshot.data();
-            if(grant.schemaVersion!==GRANT_SCHEMA_VERSION||grant.ownerUid!==uid||
-               !["gold","exp"].includes(grant.kind)||grant.source!=="server-event"||
-               !Number.isSafeInteger(grant.amount)||grant.amount<1||grant.amount>100000||
-               !grant.createdAt||typeof grant.createdAt.toMillis!=="function"){
-                fail("data-loss","Server-issued grant is invalid.");
-            }
+            verifyServerIssuedGrant({uid,grant,fail});
             if(grant.status!=="pending"||grant.claimedByOperationId!==null){
                 fail("already-exists","Grant already has a receipt.");
             }
