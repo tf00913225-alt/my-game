@@ -7,12 +7,10 @@
 
 #game-stage #battlePage.v-fixed-slot-render-v2{
     --battle-enemy-region-track:42fr;
-    /* The center owns a 36px turn row plus the 66px command row. At 14fr the
-       command row overflowed roughly 9px into the ally region on 412x915.
-       Keep both combat sides balanced and reserve the center's real minimum
-       content height in the canonical three-track grid. */
-    --battle-center-region-track:24fr;
-    --battle-ally-region-track:34fr;
+    /* A shared 66px information band and 66px command row replace the
+       decorative 100px raster command stack. Reclaimed space belongs to allies. */
+    --battle-center-region-track:21fr;
+    --battle-ally-region-track:37fr;
     --battle-target-prompt-height:60px;
     --battle-target-select-gap:6px;
     --battle-region-gap:4px;
@@ -37,16 +35,15 @@
     --battle-item-menu-gap:8px;
 }
 
-/* The six-unit field reserves the complete turn + command-art stack.
-   Its measured portrait height is retained below while unused alpha headroom
-   yields space to the center; the ally track and Boss tracks stay unchanged. */
+/* Enemy tracks and normalized portraits stay unchanged; three former center
+   fractions enlarge the ally rows without borrowing enemy HUD space. */
 #game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"]{
     --battle-enemy-region-track:40fr;
     --battle-title-height:0px;
     --battle-enemy-safe-top:12px;
     --battle-art-overhang-top:12px;
-    --battle-center-region-track:24fr;
-    --battle-ally-region-track:36fr;
+    --battle-center-region-track:21fr;
+    --battle-ally-region-track:39fr;
 }
 
 
@@ -72,7 +69,8 @@
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleTurnIndicator{
     position:absolute !important;
-    top:0;
+    top:8px;
+    left:140px;
     right:82px;
     z-index:2;
     color:#f5cf72;
@@ -98,6 +96,7 @@
     grid-template-rows:var(--battle-title-height) minmax(0,1fr);
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region .battle-title{
+    display:none;
     position:absolute;
     top:0;
     left:8px;
@@ -129,15 +128,16 @@
     position:absolute;
     left:0;
     right:0;
-    bottom:var(--battle-command-visual-height);
-    align-self:center;
+    top:0;
+    bottom:auto;
+    align-self:flex-start;
     flex:0 0 var(--battle-turn-row-height);
     width:max-content;
     min-width:112px;
     height:var(--battle-turn-row-height);
     min-height:var(--battle-turn-row-height);
     max-height:var(--battle-turn-row-height);
-    margin:0 auto;
+    margin:0;
     opacity:1;
     transform:none !important;
     transition:opacity .16s ease-out;
@@ -145,10 +145,12 @@
     z-index:18070 !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open{
+    top:auto;
     bottom:calc(var(--battle-command-visual-height) + 44px);
     opacity:1;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.battle-item-open{
+    top:auto;
     bottom:calc(var(--battle-command-visual-height) + var(--battle-item-menu-top-offset) + var(--battle-item-menu-gap));
     opacity:1;
 }

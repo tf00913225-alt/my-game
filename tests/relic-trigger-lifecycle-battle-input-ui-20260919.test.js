@@ -119,8 +119,8 @@ presentationActive=false;
 hudContext.updateActionHudVisibility();
 assert.equal(nodes.battleCommandRow.classList.contains("battle-hud-hidden"),false,"manual HUD returns only after the core presentation lock releases");
 
-assert.match(mainCss,/--battle-command-skill-left:6\.8%/);
-assert.match(mainCss,/--battle-command-run-width:17\.75%/);
+assert.match(mainCss,/--battle-command-skill-left:1%/);
+assert.match(mainCss,/--battle-command-run-width:19%/);
 assert.doesNotMatch(fixesCss,/Skill hotspot|width:21\.5%/);
 
 assert.match(ui,/event\.target\.closest\("#battlePage"\)\)\{ return; \}/);

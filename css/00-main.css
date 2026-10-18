@@ -5623,7 +5623,7 @@ button:active{
 ===================================================== */
 #battlePage{
     --battle-command-row-height:66px;
-    --battle-command-art-overhang:34px;
+    --battle-command-art-overhang:0px;
     --battle-command-visual-height:calc(var(--battle-command-row-height) + var(--battle-command-art-overhang));
     --battle-turn-row-height:36px;
 }
@@ -5636,16 +5636,16 @@ button:active{
     min-height:66px !important;
     background:none !important;
     border:0 !important;
-    --battle-command-skill-left:6.8%;
-    --battle-command-skill-width:17.6%;
-    --battle-command-normal-left:24.4%;
-    --battle-command-normal-width:17.45%;
-    --battle-command-item-left:41.85%;
-    --battle-command-item-width:16.95%;
-    --battle-command-defend-left:58.8%;
-    --battle-command-defend-width:17.05%;
-    --battle-command-run-left:75.85%;
-    --battle-command-run-width:17.75%;
+    --battle-command-skill-left:1%;
+    --battle-command-skill-width:19%;
+    --battle-command-normal-left:20.75%;
+    --battle-command-normal-width:19%;
+    --battle-command-item-left:40.5%;
+    --battle-command-item-width:19%;
+    --battle-command-defend-left:60.25%;
+    --battle-command-defend-width:19%;
+    --battle-command-run-left:80%;
+    --battle-command-run-width:19%;
 }
 
 #mainBattleMenu::before{
@@ -5657,7 +5657,7 @@ button:active{
     bottom:0;
     z-index:1;
     pointer-events:none;
-    background-image:url("../assets/battle/battle-command-panel-transparent.svg");
+    background-image:linear-gradient(180deg,#9c7130 0%,#31210d 9%,#120e08 50%,#31210d 91%,#9c7130 100%);
     background-repeat:no-repeat;
     background-position:center center;
     background-size:100% 100%;
@@ -5673,13 +5673,13 @@ button:active{
     min-height:0 !important;
     margin:0 !important;
     padding:0 !important;
-    border:0 !important;
+    border:1px solid #b78d45 !important;
     border-radius:12px !important;
-    background:transparent !important;
-    box-shadow:none !important;
-    color:transparent !important;
-    font-size:0 !important;
-    line-height:0 !important;
+    background:linear-gradient(180deg,#453016,#171007 48%,#30200d) !important;
+    box-shadow:inset 0 0 0 2px #1c140b !important;
+    color:#ffe3a1 !important;
+    font-size:16px !important;
+    line-height:22px !important;
     text-shadow:none !important;
     z-index:3 !important;
     cursor:pointer;
