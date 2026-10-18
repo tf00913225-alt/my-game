@@ -3,6 +3,9 @@ name: Deploy dev to Cloudflare Pages
 on:
   workflow_call:
     inputs:
+      ui_mode:
+        type: string
+        default: all
       boss_mode:
         type: string
         default: full
@@ -138,6 +141,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
+      UI_QA_MODE: ${{ github.event_name == 'workflow_dispatch' && 'all' || inputs.ui_mode }}
+      RESPONSIVE_GENERAL_UI_ONLY: ${{ github.event_name != 'workflow_dispatch' && (inputs.ui_mode == 'skill' || inputs.ui_mode == 'smoke') && '1' || '' }}
       DEV_BASE_URL: https://dev.four-symbols-dev.pages.dev
       EXPECTED_BRANCH: dev
       EXPECTED_COMMIT_SHA: ${{ github.sha }}
@@ -153,6 +158,7 @@ jobs:
           package-manager-cache: false
       - name: Require exact deployed candidate before QA
         run: |
+          case "$UI_QA_MODE" in all|inventory|skill|smoke) ;; *) exit 1 ;; esac
           test "$(git rev-parse HEAD)" = "$EXPECTED_COMMIT_SHA"
           test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$EXPECTED_COMMIT_SHA"
           node .github/scripts/release-gate.mjs verify-deployed
@@ -168,9 +174,17 @@ jobs:
         id: responsive_item_live
         run: |
           node .github/scripts/run-responsive-item-browser-qa.mjs
+
+      - name: Verify affected deployed inventory interactions
+        if: env.UI_QA_MODE == 'all' || env.UI_QA_MODE == 'inventory'
+        run: |
           node .github/scripts/run-forge-sockets-browser-qa.mjs
           node .github/scripts/run-hero-page-browser-qa.mjs
           QA_BASE_URL="$DEV_BASE_URL" node .github/scripts/run-foreground-potion-browser-qa.mjs
+
+      - name: Verify affected deployed skill page
+        if: env.UI_QA_MODE == 'all' || env.UI_QA_MODE == 'skill'
+        run: node .github/scripts/run-skill-progression-browser-qa.mjs
 
       - name: Upload deployed Responsive Item evidence
         if: always() && steps.responsive_item_live.outcome != 'skipped'
@@ -180,6 +194,8 @@ jobs:
           path: |
             artifacts/browser-qa/responsive-item/
             artifacts/browser-qa/foreground-*
+            artifacts/browser-qa/skill-inventory-semantic-browser-qa.json
+            artifacts/browser-qa/skill-*.png
           if-no-files-found: error
           retention-days: 90
 

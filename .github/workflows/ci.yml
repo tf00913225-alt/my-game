@@ -43,6 +43,9 @@ jobs:
       ui_changed: ${{ steps.classify.outputs.ui_changed }}
       inventory_changed: ${{ steps.classify.outputs.inventory_changed }}
       skill_changed: ${{ steps.classify.outputs.skill_changed }}
+      skill_ui_changed: ${{ steps.classify.outputs.skill_ui_changed }}
+      ui_shared_changed: ${{ steps.classify.outputs.ui_shared_changed }}
+      ui_mode: ${{ steps.classify.outputs.ui_mode }}
       portrait_changed: ${{ steps.classify.outputs.portrait_changed }}
       cloud_changed: ${{ steps.classify.outputs.cloud_changed }}
       persistence_changed: ${{ steps.classify.outputs.persistence_changed }}
@@ -87,7 +90,7 @@ jobs:
       - name: Install pinned CI parser
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Verify classifier fixtures before emitting policy
-        run: node --test tests/ci-change-classifier.test.mjs tests/ci-boss-routing.test.mjs tests/ci-concurrency.test.mjs
+        run: node --test tests/ci-change-classifier.test.mjs tests/ci-change-classifier-impact.test.mjs tests/ci-boss-routing.test.mjs tests/ci-concurrency.test.mjs
       - name: Compute fail-closed PR/full plan
         id: classify
         env:
@@ -161,7 +164,7 @@ jobs:
           node --check .github/scripts/run-water-wild-portrait-browser-qa.mjs
 
       - name: Verify CI aggregate failure propagation
-        run: node --test tests/ci-change-classifier.test.mjs tests/ci-boss-routing.test.mjs tests/ci-concurrency.test.mjs tests/ci-aggregate.test.mjs tests/session-repository-checks-wait.test.mjs tests/full-regression-health.test.mjs
+        run: node --test tests/ci-change-classifier.test.mjs tests/ci-change-classifier-impact.test.mjs tests/ci-boss-routing.test.mjs tests/ci-concurrency.test.mjs tests/ci-aggregate.test.mjs tests/session-repository-checks-wait.test.mjs tests/full-regression-health.test.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
@@ -193,11 +196,11 @@ jobs:
           retention-days: 90
 
       - name: Run Release Update Notification targeted regression
-        if: needs.classify.outputs.full_node != 'true'
+        if: needs.classify.outputs.full_node != 'true' && (needs.classify.outputs.ui_shared_changed == 'true' || needs.classify.outputs.release_changed == 'true')
         run: node tests/release-update-notification-system.test.js
 
       - name: Run Adventure V1 targeted regression
-        if: needs.classify.outputs.full_node != 'true'
+        if: needs.classify.outputs.full_node != 'true' && (needs.classify.outputs.adventure_changed == 'true')
         run: node tests/adventure-node-system-v1.test.js
 
       - name: Run Cloud Save Phase 3 UID isolation regressions
@@ -209,7 +212,7 @@ jobs:
           node tests/firebase-auth-foundation.test.mjs
 
       - name: Run Fixed Slot battlefield rendering regression
-        if: needs.classify.outputs.full_node != 'true'
+        if: needs.classify.outputs.full_node != 'true' && (needs.classify.outputs.battle_changed == 'true' || needs.classify.outputs.portrait_changed == 'true')
         run: |
           node tests/boss-snapshot-owner-lifecycle-convergence-20261001.test.js
           node tests/fixed-slot-battlefield-rendering-v2.test.js
@@ -217,31 +220,47 @@ jobs:
           node tests/hero-core-phase1.test.js
           node tests/hero-battle-phase2a.test.js
 
-      - name: Run battle layout, timing and range-VFX regressions
-        if: needs.classify.outputs.full_node != 'true'
+      - name: Run affected monster balance contracts
+        if: needs.classify.outputs.full_node != 'true' && (needs.classify.outputs.monster_balance_changed == 'true')
         run: |
           node tests/monster-balance-owner-phase1.test.mjs
           node tests/monster-balance-owner-phase2a.test.mjs
           node tests/monster-balance-owner-phase2b.test.mjs
+
+      - name: Run affected Abyss contracts
+        if: needs.classify.outputs.full_node != 'true' && (needs.classify.outputs.abyss_changed == 'true' || needs.classify.outputs.monster_balance_changed == 'true')
+        run: |
           node tests/abyss-owner-convergence-20260920.test.js
           node tests/abyss-two-tier-refactor.test.js
+
+      - name: Run affected portrait contracts
+        if: needs.classify.outputs.full_node != 'true' && (needs.classify.outputs.portrait_changed == 'true')
+        run: |
           node tests/monster-portrait-runtime.test.js
           node tests/daily-dungeon-portrait-assets.test.js
           node tests/daily-dungeon-portrait-owner-convergence-20260928.test.js
           node tests/monster-portrait-import-workflow.test.js
+
+      - name: Run affected shared UI contracts
+        if: needs.classify.outputs.full_node != 'true' && (needs.classify.outputs.ui_changed == 'true')
+        run: |
           node tests/v173.51-qa.test.js
           node tests/v173.56-shop-layout-preview-regression.test.js
           node tests/production-bundle-abyss-shop-owner.test.js
           node tests/ui-panel-browser-layout.test.js
           node tests/main-city-roster-header-browser.test.js
+          node tests/gameplay-activity-art-integration-20260927.test.js
+          node tests/v174-gameplay-cover-16x9-browser.test.js
+
+      - name: Run battle layout, timing and range-VFX regressions
+        if: needs.classify.outputs.full_node != 'true' && (needs.classify.outputs.battle_changed == 'true' || needs.classify.outputs.skill_changed == 'true' || needs.classify.outputs.boss_changed == 'true' || needs.classify.outputs.tower_changed == 'true')
+        run: |
           node tests/battle-layout-vfx-runtime-20260917.test.js
           node tests/battle-presentation-followup-browser.test.js
           node tests/battle-status-info-assets-20260922.test.js
           node tests/boss-battle-architecture-convergence-20260918.test.js
           node tests/gameplay-boss-tower-system.test.js
           node tests/enemy-resource-integer-presentation.test.mjs
-          node tests/gameplay-activity-art-integration-20260927.test.js
-          node tests/v174-gameplay-cover-16x9-browser.test.js
           node tests/tower-element-formation-small-boss-20260924.test.js
           node tests/battle-stats-relic-tower-auto-20260920.test.js
           node tests/v142-skill-animation.test.js
@@ -253,30 +272,33 @@ jobs:
           node tests/battle-presentation-owner-convergence-20260926.test.js
 
       - name: Run skill and relic owner convergence regressions
-        if: needs.classify.outputs.full_node != 'true'
+        if: needs.classify.outputs.full_node != 'true' && (needs.classify.outputs.skill_changed == 'true' || needs.classify.outputs.battle_changed == 'true')
         run: |
           node tests/skill-progression-rebalance.test.js
           node tests/skill-relic-owner-convergence-20260923.test.js
 
       - name: Run Gameplay context navigation regression
-        if: needs.classify.outputs.full_node != 'true'
+        if: needs.classify.outputs.full_node != 'true' && (needs.classify.outputs.ui_changed == 'true' || needs.classify.outputs.adventure_changed == 'true' || needs.classify.outputs.battle_changed == 'true')
         run: node tests/gameplay-context-nav-actions-20260915.test.js
 
       - name: Run Gameplay UI regression
-        if: needs.classify.outputs.full_node != 'true'
+        if: needs.classify.outputs.full_node != 'true' && (needs.classify.outputs.ui_changed == 'true')
         run: |
           node tests/gameplay-ui-regressions-20260908.test.js
-          node tests/forge-sockets-gems.test.js
+
+      - name: Run affected presentation contracts
+        if: needs.classify.outputs.ui_changed == 'true' && needs.classify.outputs.full_node != 'true'
+        run: node --test tests/v169-rpg-ui.test.js tests/ui-black-gold-window-skin.test.js tests/ui-typography-standard.test.js
 
       - name: Run affected inventory and reforge regressions
         if: needs.classify.outputs.inventory_changed == 'true' && needs.classify.outputs.full_node != 'true'
         run: |
-          for file in tests/reforge-eligibility-runtime-browser.test.js tests/ui-synthesis-dungeon-equipment-comparison-regression.test.js tests/ui-synthesis-large-panel-browser.test.js tests/v173.46-equipment-progression.test.js tests/v173.57-starter-icons-reforge-filter.test.js tests/v173.58-reforge-redesign.test.js; do
+          for file in tests/forge-sockets-gems.test.js tests/reforge-eligibility-runtime-browser.test.js tests/ui-synthesis-dungeon-equipment-comparison-regression.test.js tests/ui-synthesis-large-panel-browser.test.js tests/v173.46-equipment-progression.test.js tests/v173.57-starter-icons-reforge-filter.test.js tests/v173.58-reforge-redesign.test.js; do
             node "$file"
           done
 
       - name: Run relic lifecycle and battle input regressions
-        if: needs.classify.outputs.full_node != 'true'
+        if: needs.classify.outputs.full_node != 'true' && (needs.classify.outputs.skill_changed == 'true' || needs.classify.outputs.battle_changed == 'true')
         run: |
           node tests/relic-trigger-lifecycle-battle-input-ui-20260919.test.js
           node tests/battle-two-wave-runtime.test.js
@@ -509,6 +531,10 @@ jobs:
         if: success()
         run: |
           node tests/bottom-nav-home-scroll-browser.test.js
+
+      - name: Run affected foreground item interaction
+        if: needs.classify.outputs.ui_mode == 'all' || needs.classify.outputs.ui_mode == 'inventory'
+        run: |
           node tests/starter-potion-recovery.test.js
           node .github/scripts/run-foreground-potion-browser-qa.mjs
 
@@ -526,11 +552,17 @@ jobs:
 
       - name: Run Responsive Item owner and production runtime regression
         id: responsive_item_browser
+        env:
+          RESPONSIVE_GENERAL_UI_ONLY: ${{ (needs.classify.outputs.ui_mode == 'skill' || needs.classify.outputs.ui_mode == 'smoke') && '1' || '' }}
         run: |
           node tests/responsive-window-item-owner-convergence.test.js
           node tests/ui-critical-regressions-20260909.test.js
-          node tests/backpack-grid-bottom-action.test.js
           node .github/scripts/run-responsive-item-browser-qa.mjs
+
+      - name: Run affected inventory and hero presentation
+        if: needs.classify.outputs.ui_mode == 'all' || needs.classify.outputs.ui_mode == 'inventory'
+        run: |
+          node tests/backpack-grid-bottom-action.test.js
           node .github/scripts/run-forge-sockets-browser-qa.mjs
           node .github/scripts/run-hero-page-browser-qa.mjs
 
@@ -559,7 +591,7 @@ jobs:
 
       - name: Run Release Update Notification mobile browser QA
         id: release_update_browser
-        if: success()
+        if: success() && (needs.classify.outputs.ui_mode == 'all' || needs.classify.outputs.release_changed == 'true')
         run: node .github/scripts/run-release-update-notification-browser-qa.mjs
 
       - name: Upload Release Update Notification browser evidence
@@ -577,7 +609,7 @@ jobs:
 
       - name: Run skill progression mobile browser QA
         id: skill_inventory_browser
-        if: success()
+        if: success() && (needs.classify.outputs.ui_mode == 'all' || needs.classify.outputs.ui_mode == 'skill')
         run: node .github/scripts/run-skill-progression-browser-qa.mjs
 
       - name: Upload Skill / Inventory browser evidence
@@ -599,7 +631,7 @@ jobs:
 
       - name: Run Backpack visual composition browser QA
         id: backpack_visual_browser
-        if: success()
+        if: success() && (needs.classify.outputs.ui_mode == 'all' || needs.classify.outputs.ui_mode == 'inventory')
         run: node tests/backpack-visual-composition-browser.test.js
 
       - name: Upload Backpack visual composition evidence
@@ -1199,6 +1231,7 @@ jobs:
     if: ${{ !cancelled() && needs.verify.result == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/dev' }}
     uses: ./.github/workflows/deploy-dev-cloudflare.yml
     with:
+      ui_mode: ${{ needs.classify.outputs.ui_mode }}
       boss_required: ${{ needs.classify.outputs.boss_balance == 'true' }}
       boss_mode: ${{ needs.classify.outputs.boss_mode }}
       tower_required: ${{ needs.classify.outputs.tower_wild_browser == 'true' }}
