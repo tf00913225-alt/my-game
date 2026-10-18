@@ -24,7 +24,8 @@ export function requireChildGates(needs, {mainRequired = true, plan} = {}) {
   if (unexpected.length) throw Error(`Unknown aggregate dependencies: ${unexpected.join(', ')}`);
   if (plan) {
     if (plan.policyVersion !== 1 || typeof plan.strictMode !== 'boolean' || typeof plan.shadow !== 'boolean' ||
-        !plan.gates || plan.gates.core_checks !== true) throw Error('Invalid classifier policy');
+        !plan.gates || plan.gates.core_checks !== true ||
+        !['all','inventory','skill','smoke'].includes(plan.uiMode)) throw Error('Invalid classifier policy');
     for (const key of CHILD_GATES.filter(k => k !== 'classify')) {
       if (typeof plan.gates[key] !== 'boolean') throw Error(`Missing classifier gate ${key}`);
       if (!['main_browser', 'promotion_health'].includes(key) && (plan.strictMode || plan.shadow || plan.fullRegression || !['pull_request','push'].includes(plan.eventName) || mainRequired) &&
