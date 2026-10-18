@@ -264,12 +264,12 @@ async function runViewport(chrome,url,width,height,capture){
 
 fs.mkdirSync(ARTIFACT_DIR,{recursive:true});
 const chrome=findChrome();
-const server=await startServer();
+const server=await startServer({baseUrl:process.env.DEV_BASE_URL});
 try{
     const results=[];
     for(const [width,height] of VIEWPORTS){ results.push(await runViewport(chrome,server.url,width,height,width===393)); }
     const manifest=JSON.parse(fs.readFileSync(path.join(ROOT,"build","asset-manifest.json"),"utf8"));
-    const evidence={suite:"skill-runtime-browser-qa",passed:true,commitSha:process.env.GITHUB_SHA||"unknown",runtimeUrl:server.url,productionCascade:[...manifest.critical.styles,...manifest.featureManifest.bundles["app-shell"].styles,...manifest.featureManifest.bundles["gameplay-core"].styles],results};
+    const evidence={suite:"skill-runtime-browser-qa",passed:true,commitSha:process.env.GITHUB_SHA||"unknown",runtimeUrl:server.url,deploymentBaseUrl:process.env.DEV_BASE_URL||null,productionCascade:[...manifest.critical.styles,...manifest.featureManifest.bundles["app-shell"].styles,...manifest.featureManifest.bundles["gameplay-core"].styles],results};
     fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-inventory-semantic-browser-qa.json"),JSON.stringify(evidence,null,2)+"\n","utf8");
     console.log("Real Skill Runtime mobile browser QA passed:",VIEWPORTS.map(item=>item.join("x")).join(", "));
 }catch(error){

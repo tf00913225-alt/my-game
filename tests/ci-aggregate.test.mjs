@@ -176,21 +176,23 @@ test('core targeted suites and full runner cover the same files exactly once',()
     'Run Cloud Save Phase 3 UID isolation regressions','Run Fixed Slot battlefield rendering regression',
     'Run battle layout, timing and range-VFX regressions','Run skill and relic owner convergence regressions',
     'Run Gameplay context navigation regression','Run Gameplay UI regression',
-    'Run relic lifecycle and battle input regressions'
+    'Run relic lifecycle and battle input regressions',
+    'Run affected monster balance contracts','Run affected Abyss contracts',
+    'Run affected portrait contracts','Run affected shared UI contracts','Run affected presentation contracts'
   ];
   const targeted=names.map(name=>{
     const step=steps.find(s=>s.startsWith(name+'\n'));
     assert.ok(step,name);
-    assert.match(step,/\n        if: needs\.classify\.outputs\.full_node != 'true'\n/);
+    assert.match(step,/\n        if: [^\n]*needs\.classify\.outputs\.full_node != 'true'(?: && [^\n]+)?\n/);
     assert.doesNotMatch(step,/\n        (?:env|working-directory|continue-on-error):/);
-    const files=[...step.matchAll(/node (tests\/[^\s]+\.test\.(?:js|cjs|mjs))/g)].map(m=>m[1]);
+    const files=[...step.matchAll(/tests\/[^\s;]+\.test\.(?:js|cjs|mjs)/g)].map(m=>m[0]);
     assert.ok(files.length,name);
     return files;
   }).flat();
   const inventory=steps.find(s=>s.startsWith('Run affected inventory and reforge regressions\n'));
   assert.match(inventory,/inventory_changed == 'true' && needs\.classify\.outputs\.full_node != 'true'/);
   const inventoryFiles=[...inventory.matchAll(/tests\/[^\s;]+\.test\.(?:js|cjs|mjs)/g)].map(m=>m[0]);
-  assert.equal(inventoryFiles.length,6);
+  assert.equal(inventoryFiles.length,7);
   assert.equal(targeted.filter(p=>p==='tests/v173.51-qa.test.js').length,1);
   const root=new URL('../tests/',import.meta.url);
   const discovered=fs.readdirSync(root,{recursive:true}).filter(p=>/\.test\.(?:js|cjs|mjs)$/.test(p)).map(p=>'tests/'+p.replaceAll('\\','/'));
