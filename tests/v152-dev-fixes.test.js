@@ -238,8 +238,8 @@ test("dungeon art, scrolling, five-slot nav and Abyss combat info are all wired"
     assert.match(css,/\.v141-reward-toast[\s\S]*pointer-events:auto !important/);
     assert.doesNotMatch(css,/#battleInfo/,"retired battle log UI must stay absent");
     assert.doesNotMatch(css,/menu-button\.skill[\s\S]*width:21\.5%/);
-    assert.match(mainCss,/--battle-command-skill-left:6\.8%/);
-    assert.match(mainCss,/--battle-command-run-width:17\.75%/);
+    assert.match(mainCss,/--battle-command-skill-left:1%/);
+    assert.match(mainCss,/--battle-command-run-width:19%/);
 });
 
 console.log(`\nV152 dev-fixes suite: ${passed} tests passed.`);
