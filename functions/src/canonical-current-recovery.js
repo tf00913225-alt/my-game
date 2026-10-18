@@ -175,12 +175,13 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             }
             // Canonical claim sources may all be lost. Independent retained
             // rights must agree with the archive, not be hidden by its rollback.
-            const [claims,receipts,ledgers,grants,events]=await Promise.all([
+            const [claims,receipts,ledgers,grants,events,operations]=await Promise.all([
                 tx.get(root.collection("uniqueClaims").limit(401)),
                 tx.get(root.collection("grantOperations").limit(401)),
                 tx.get(root.collection("ledgerEntries").limit(401)),
                 tx.get(root.collection("pendingGrants").limit(401)),
-                tx.get(root.collection("rewardEvents").limit(401))
+                tx.get(root.collection("rewardEvents").limit(401)),
+                tx.get(root.collection("operations").limit(401))
             ]);
             // Each credit proof reads at most 12 documents, including its claim,
             // grant/receipt/ledger/collision and original event/snapshot/archive.
@@ -190,11 +191,13 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             // Pending-grant inventory adds one read per row and three original
             // event/snapshot/archive reads for each unconsumed pending grant.
             // Each event inventory row reserves three original proof reads too.
+            // Operation inventory adds one read per row. Supported debit proof
+            // is already reserved by the matching ledger above; do not replay it.
             const reservedCount=receipts.docs.filter(doc=>doc.get("creditedToCharacter")===false).length;
             const pendingCount=grants.docs.filter(doc=>doc.get("status")==="pending").length;
             if(queries.reduce((sum,query)=>sum+query.size,0)+claims.docs.length*12+
                receipts.docs.length+ledgers.docs.length*5+reservedCount*6+
-               grants.docs.length+pendingCount*3+events.docs.length*4>400){
+               grants.docs.length+pendingCount*3+events.docs.length*4+operations.docs.length>400){
                 fail("failed-precondition","Recovery claim evidence exceeds the transaction budget.");
             }
             const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
@@ -205,6 +208,16 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             // Reuse the original credit/debit Owners; never infer a missing
             // receipt from a balance or regenerate an operation during repair.
             const receiptById=new Map(receipts.docs.map(doc=>[doc.id,doc.data()]));
+            // Debit receipts survive independently of their ledger. Every known
+            // purchase/allocation must reach the original full debit proof below,
+            // even when its ledger was lost with the current canonical sources.
+            const ledgerIds=new Set(ledgers.docs.map(doc=>doc.id));
+            for(const doc of operations.docs){
+                if(["shop-purchase","exp-allocation","attribute-allocation"].includes(doc.get("kind"))&&
+                   !ledgerIds.has(doc.id)){
+                    fail("data-loss","A debit receipt without its original ledger blocks recovery.");
+                }
+            }
             // Events survive independently of grants. Losing a grant must not
             // hide an original reward observation or authorize recreating it.
             const grantById=new Map(grants.docs.map(doc=>[doc.id,doc.data()]));

@@ -2438,6 +2438,11 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
         const debitLedgerRef=ownedRoot.collection("ledgerEntries").doc(id);
         const debit=(await debitRef.get()).data(),debitLedger=(await debitLedgerRef.get()).data();
         assert.ok(debit);assert.ok(debitLedger);
+        // Reverse reconciliation: retaining only the original debit receipt
+        // must not make the missing ledger invisible to approved source repair.
+        await debitLedgerRef.delete();const missingDebitLedger=await dump();
+        await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+        assert.deepEqual(await dump(),missingDebitLedger);await debitLedgerRef.set(debitLedger);
         await debitRef.delete();const missingDebit=await dump();
         await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
         assert.deepEqual(await dump(),missingDebit);await debitRef.set(debit);
@@ -2451,6 +2456,7 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     }
     assert.deepEqual(await dump(),damaged);
     console.log("Current recovery ledger inventory real Firestore PASS: orphan ledger and missing/later/corrupt debit proof refuse without writes; original purchase/EXP/attribute ledger history retained for approved restore.");
+    console.log("Current recovery debit-receipt inventory real Firestore PASS: original purchase/EXP/attribute receipts with lost ledgers refuse without writes; retained receipt/ledger bytes remain exact.");
 
     const orphanGrant=ownedRoot.collection("pendingGrants").doc("rehearsal-orphaned-grant-0001");
     const originalGrant=(await creditProof[1].get()).data();
