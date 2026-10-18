@@ -38,6 +38,13 @@ test('shared HTML ignores generated headers only with independently verified bui
   assert.equal(classifySharedHtml(before,after),null);
   assert.deepEqual(classifySharedHtml(before,after,{generatedVerified:true}),['ui','ui_shared']);
   assert.equal(classifySharedHtml(before,after.replace('</head>','<script>skipAuth()</script></head>'),{generatedVerified:true}),null);
+  const generatedOnly=before.replace('old.css','new.css');
+  assert.equal(classifySharedHtml(before,generatedOnly),null);
+  assert.deepEqual(classifySharedHtml(before,generatedOnly,{generatedVerified:true}),[]);
+  const css='css/00-main.css';
+  onlyUi(plan([css,'index.html','build/asset-manifest.json'],{generatedVerified:true,
+    responsibilitiesByPath:{[css]:['ui','skill_ui'],'index.html':[]}}));
+  assert.equal(plan(['index.html','build/asset-manifest.json'],{generatedVerified:true,responsibilitiesByPath:{'index.html':[]}}).strictMode,true,'generated-only changes require a real source');
 });
 
 test('shared CSS uses changed selectors, never its mixed file name',()=>{

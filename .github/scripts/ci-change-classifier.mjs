@@ -181,7 +181,7 @@ export function classifySharedHtml(before, after, {generatedVerified=false}={}) 
       const x=a.parts[i],y=b.parts[i];if(x.id!==y.id||x.effect!==y.effect)return null;
       if(x.text!==y.text)roots.get(x.id).forEach(k=>result.add(k));
     }
-    return result.size?[...result]:null;
+    return result.size?[...result]:generatedVerified&&before!==after?[]:null;
   } catch {return null;}
 }
 
@@ -310,6 +310,7 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
     const responsibility=p==='js/00-main.js'?responsibilities:responsibilitiesByPath[p];
     if(SHARED_MODULES[p] && Array.isArray(responsibility) && responsibility.length && responsibility.every(k=>['ui','inventory','battle','boss','monster_balance'].includes(k))) {mark(...responsibility);continue;}
     if(SHARED_CSS.has(p)&&!addedPaths.includes(p)&&Array.isArray(responsibility)&&responsibility.length&&responsibility.every(k=>['ui','ui_shared','inventory','skill_ui','battle','tower'].includes(k))) {mark(...responsibility);continue;}
+    if(p==='index.html'&&generatedVerified&&Array.isArray(responsibility)&&responsibility.length===0&&paths.some(x=>/^(?:js\/|css\/|assets\/|config\/)/.test(x)))continue;
     if(p==='index.html'&&!addedPaths.includes(p)&&Array.isArray(responsibility)&&responsibility.length&&responsibility.every(k=>['ui','ui_shared','inventory','skill_ui'].includes(k))) {mark(...responsibility);continue;}
     if(QA_OWNERS[p]&&!addedPaths.includes(p)){mark(...QA_OWNERS[p]);continue;}
     if (/^(?:\.github\/scripts\/(?:ci-(?:change-classifier|aggregate)|full-regression-health)\.mjs|tests\/(?:ci-(?:boss-routing|change-classifier|aggregate|concurrency).*|full-regression-health.test)\.mjs|\.github\/workflows\/(?:ci|deploy-dev-cloudflare)\.yml|package\.json|package-lock\.json)$/.test(p)) {mark('workflow');continue;}
