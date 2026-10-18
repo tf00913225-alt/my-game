@@ -109,8 +109,8 @@ test('final potion Owner preserves revival target and canonical declaration sele
 });
 
 test('final battle UI clears defeated state after either shared revival; old timed owner is retired',()=>{
- const party=[{hp:50},{hp:0}],classes=[new Set(),new Set()],ctx={currentBattleMonsters:[],monsters:[],getExistingPartyIndexes:()=>[0,1],getPartyCharacterByIndex:i=>party[i],$:id=>({classList:{toggle:(key,on)=>{const set=classes[Number(id.slice(-1))];on?set.add(key):set.delete(key);}}})};
- vm.runInNewContext(declaration('syncBattleDefeatedCards'),ctx);ctx.syncBattleDefeatedCards();assert.ok(classes[1].has('v146-defeated'));party[1].hp=35;ctx.syncBattleDefeatedCards();assert.equal(classes[1].has('v146-defeated'),false);
+ const party=[{hp:50},{hp:0}],classes=[new Set(),new Set()],synced=[],ctx={window:{FourSymbolsBattlePresentation:{syncMotion:card=>synced.push(card)}},currentBattleMonsters:[],monsters:[],getExistingPartyIndexes:()=>[0,1],getPartyCharacterByIndex:i=>party[i],$:id=>({classList:{toggle:(key,on)=>{const set=classes[Number(id.slice(-1))];on?set.add(key):set.delete(key);}}})};
+ vm.runInNewContext(declaration('syncBattleDefeatedCards'),ctx);ctx.syncBattleDefeatedCards();assert.ok(classes[1].has('v146-defeated'));party[1].hp=35;ctx.syncBattleDefeatedCards();assert.equal(classes[1].has('v146-defeated'),false);assert.equal(synced.length,4,'each HP projection synchronizes both party cards, including revival');
  assert.match(declaration('updateUI'),/updateBattlePlayerBars\(\);\s*syncBattleDefeatedCards\(\);/);
  assert.doesNotMatch(read('js/41-v146-system-polish.js'),/syncDefeatedCards/);
 });

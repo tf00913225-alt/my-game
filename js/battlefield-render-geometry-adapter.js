@@ -356,7 +356,7 @@
         const spProjection=targetSide==="monster"?null:projectionFor(spNodes[0],resourceState&&resourceState.spRatio,0);
         const hpRect=hpProjection&&hpProjection.rect;
         const spRect=spProjection&&spProjection.rect;
-        const paint=art&&art.querySelector(".v174-portrait-paint")||art;
+        const paint=art&&(art.querySelector(".v174-portrait-paint")||art.querySelector(".v174-action-motion"))||art;
         const paintRect=paint&&paint!==art?paint.getBoundingClientRect():portraitRect;
         const artworkProjection=paint&&paintRect?{rect:paintRect,backgroundImage:String(paint.style&&paint.style.backgroundImage||window.getComputedStyle(paint).backgroundImage||""),backgroundSize:String(paint.style&&paint.style.backgroundSize||window.getComputedStyle(paint).backgroundSize||"contain"),backgroundPosition:String(paint.style&&paint.style.backgroundPosition||window.getComputedStyle(paint).backgroundPosition||"center"),backgroundRepeat:String(paint.style&&paint.style.backgroundRepeat||window.getComputedStyle(paint).backgroundRepeat||"no-repeat")} : null;
         if(artworkProjection&&art.classList?.contains("v174-generic-portrait")){

@@ -6,7 +6,7 @@ const fixed=fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8"
 const css=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
 const boss=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const relic=fs.readFileSync("js/relic-progression-drop-system.js","utf8");
-assert.match(fixed,/v-fixed-battle-slot > \.battle-monster > \.v174-battle-art,[\s\S]*?v-fixed-ally-slot > \.battle-player > \.v174-battle-art\{[\s\S]*?background-size:var\(--portrait-background-size, contain\) !important/);
+assert.match(fixed,/v-fixed-battle-slot > \.battle-monster > \.v174-battle-art,[\s\S]*?v-fixed-ally-slot > \.battle-player > \.v174-battle-art\{[\s\S]*?background-size:0 0 !important/);
 assert.match(fixed,/bottom:var\(--battle-art-hud-reserve\) !important/);
 assert.doesNotMatch(fixed,/\.v174-battle-art\{[^}]*?background-size:cover !important/s,"combat art must not regress to cover cropping");
 assert.doesNotMatch(battle,/battle-player\.v174-cardless-unit\{[^}]*?(?:width|max-width|min-height|height):/s,"art sizing must not resize player combat slots");
@@ -19,3 +19,5 @@ const detail=boss.slice(boss.indexOf("function bossDetailMarkup"),boss.indexOf("
 assert.ok(detail.indexOf("gameplay-primary-action")<detail.indexOf("boss-detail-grid"),"BOSS challenge action must render above recommended-party grid");
 assert.match(relic,/grid\.insertBefore\(section,grid\.firstElementChild\)/,"relic preview must be first detail section");
 console.log("V174.1 battle/gameplay layout ordering regression checks passed");
+
+assert.match(fixed,/\.v174-portrait-paint\{[^}]*background-size:contain/,"The single inner image paint preserves source aspect ratio");

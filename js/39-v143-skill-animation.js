@@ -1544,6 +1544,7 @@
             }
         }
         current.done=true;
+        window.FourSymbolsBattlePresentation?.endCast?.(current.actorCard,current.characterMotion);
         current.spriteNodes.forEach(node=>{ if(node.v143MotionAnimation){ node.v143MotionAnimation.cancel(); } });
         current.targetIndexes.forEach(index=>{
             const card=cardFor(current.targetSide,index);
@@ -1556,6 +1557,7 @@
             if(artwork&&artwork.v143ImpactRecoil){
                 artwork.v143ImpactRecoil.cancel();
                 artwork.v143ImpactRecoil=null;
+                window.FourSymbolsBattlePresentation?.syncMotion?.(card);
             }
         });
         if(state.stage&&state.stage.dataset.sequence===String(current.sequence)&&typeof state.stage.remove==="function"){
@@ -1633,6 +1635,7 @@
 
         state.stage=stage;
         state.current=current;
+        current.characterMotion=window.FourSymbolsBattlePresentation?.startCast?.(current.actorCard,config,duration);
         window.FourSymbolsBattlePresentation?.syncHud?.();
         state.metrics.started++;
 
@@ -1693,6 +1696,7 @@
         clearTimers();
         window.FourSymbolsBattlePresentation?.clearHud?.();
         if(state.current&&!state.current.done){ cleanupCurrent(state.current,"dispose"); }
+        window.FourSymbolsBattlePresentation?.clearMotions?.();
         if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
             document.querySelectorAll("#v143-skill-stage").forEach(node=>node.remove());
         }
@@ -1767,14 +1771,16 @@
             const distance=(critical?5:4)*(side==="monster"?-1:1);
             // The one hit callback owns both pulses; no new clock or gate.
             createImpactFlash(artwork,side,unitIndex,current,impactEpoch,ownedHit?hit:null);
-            if(artwork.isConnected){ artwork.v143ImpactRecoil=artwork.animate([
+            const motion=artwork.querySelector?.(":scope > .v174-action-motion")||artwork;
+            if(artwork.isConnected){ artwork.v143ImpactRecoil=motion.animate([
                 {translate:"0px 0px",scale:1},
                 {translate:"0px "+distance+"px",scale:critical?.975:.98,offset:.3},
                 {translate:"0px "+(-distance*.3)+"px",scale:1,offset:.7},
                 {translate:"0px 0px",scale:1}
             ],{duration:140,easing:"ease-out"});
             const recoil=artwork.v143ImpactRecoil;
-            recoil.onfinish=()=>{ if(artwork.v143ImpactRecoil===recoil){ artwork.v143ImpactRecoil=null; } };
+            window.FourSymbolsBattlePresentation?.syncMotion?.(card);
+            recoil.onfinish=()=>{ if(artwork.v143ImpactRecoil===recoil){ artwork.v143ImpactRecoil=null; window.FourSymbolsBattlePresentation?.syncMotion?.(card); } };
             }
             playSound();
         };

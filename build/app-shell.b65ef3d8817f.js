@@ -610,6 +610,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 
 
 
+
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
    - 遊戲邏輯舞台固定 1080 × 1920
@@ -11348,6 +11349,7 @@ function clearTransientBattlePresentation(){
     if(feedback&&typeof feedback.clear==="function"){ feedback.clear(); }
     const presentation=window.FourSymbolsBattlePresentation;
     if(presentation&&typeof presentation.cleanupEscape==="function"){ presentation.cleanupEscape(); }
+    presentation?.clearMotions?.();
 }
 
 function startBattle(triggerIndex){
@@ -24724,6 +24726,7 @@ function lungePlayerCard(characterIndex){
     element.classList.add(
         "attacker-lunge-up"
     );
+    window.FourSymbolsBattlePresentation?.syncMotion?.(element);
 
 
     setTimeout(()=>{
@@ -24731,6 +24734,7 @@ function lungePlayerCard(characterIndex){
         element.classList.remove(
             "attacker-lunge-up"
         );
+        window.FourSymbolsBattlePresentation?.syncMotion?.(element);
 
     },450);
 
@@ -24759,6 +24763,7 @@ function lungeMonsterCard(index){
     element.classList.add(
         "attacker-lunge-down"
     );
+    window.FourSymbolsBattlePresentation?.syncMotion?.(element);
 
 
     setTimeout(()=>{
@@ -24766,6 +24771,7 @@ function lungeMonsterCard(index){
         element.classList.remove(
             "attacker-lunge-down"
         );
+        window.FourSymbolsBattlePresentation?.syncMotion?.(element);
 
     },450);
 
@@ -24796,6 +24802,7 @@ function showDodgeAnimation(element){
     element.classList.add(
         "dodge-back"
     );
+    window.FourSymbolsBattlePresentation?.syncMotion?.(element);
 
 
     setTimeout(()=>{
@@ -24803,6 +24810,7 @@ function showDodgeAnimation(element){
         element.classList.remove(
             "dodge-back"
         );
+        window.FourSymbolsBattlePresentation?.syncMotion?.(element);
 
     },450);
 
@@ -33288,7 +33296,7 @@ function syncBattleDefeatedCards(){
     currentBattleMonsters.forEach(index=>{
         const apply=()=>{
             const monster=monsters[index],card=$("battleMonster"+index);
-            if(card){ card.classList.toggle("v146-defeated",!monster||monster.alive===false||Number(monster.hp)<=0); }
+            if(card){ card.classList.toggle("v146-defeated",!monster||monster.alive===false||Number(monster.hp)<=0); window.FourSymbolsBattlePresentation?.syncMotion?.(card); }
         };
         if(typeof window!=="undefined"&&typeof window.v143ScheduleMonsterUiUpdate==="function"){ window.v143ScheduleMonsterUiUpdate(index,apply,"defeated"); }
         else{ apply(); }
@@ -33296,7 +33304,7 @@ function syncBattleDefeatedCards(){
     getExistingPartyIndexes().forEach(index=>{
         const apply=()=>{
             const character=getPartyCharacterByIndex(index),card=$("battlePlayerCard"+index);
-            if(card){ card.classList.toggle("v146-defeated",!character||Number(character.hp)<=0); }
+            if(card){ card.classList.toggle("v146-defeated",!character||Number(character.hp)<=0); window.FourSymbolsBattlePresentation?.syncMotion?.(card); }
         };
         if(typeof window!=="undefined"&&typeof window.v143SchedulePlayerStatusUiUpdate==="function"){ window.v143SchedulePlayerStatusUiUpdate(index,apply,"defeated"); }
         else{ apply(); }

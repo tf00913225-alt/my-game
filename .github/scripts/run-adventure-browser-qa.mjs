@@ -299,7 +299,7 @@ async function runProductionAdventureBalanceQa(){
               evidence.portraitGaps.push({name:m.name,portrait});
               check(portrait.requestedPortraitKey===m.monsterKey&&portrait.fallbackReason==='planned','registered planned identity');
               check(art.classList.contains('v174-generic-portrait')&&getComputedStyle(art).backgroundImage==='none','visible neutral fallback without wrong monster image');
-              check(getComputedStyle(art,'::before').content.includes('◇'),'generic fallback rendered');
+              check(getComputedStyle(art.querySelector('.v174-action-motion'),'::before').content.includes('◇'),'generic fallback rendered');
             }else{
               const url=getComputedStyle(art).backgroundImage.split('url(')[1]?.split(')')[0].replaceAll('"','').replaceAll("'",'');check(url,'visible portrait URL');
               const image=new Image();image.src=url;await image.decode();check(image.naturalWidth>0,'portrait decode');evidence.decodedPortraits.push({name:m.name,url,width:image.naturalWidth,height:image.naturalHeight});

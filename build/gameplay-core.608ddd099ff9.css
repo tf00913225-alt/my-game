@@ -7652,16 +7652,15 @@ body > .v169-rpg-dialog-layer{
     height:auto !important;
     display:block !important;
     z-index:1 !important;
-    background-size:var(--portrait-background-size, contain) !important;
+    background-size:0 0 !important;
     background-position:center bottom !important;
     background-repeat:no-repeat !important;
     background-color:transparent !important;
     overflow:visible !important;
     contain:none !important;
     transform-origin:center bottom !important;
-    /* Dense battles previously promoted every portrait to a continuously
-       animated/filtering compositor layer. Keep portraits static between
-       actions; attacker lunge and target reticle still animate on demand. */
+    /* Geometry, depth and grounded shadow stay on this stationary frame.
+       Only its inner paint breathes; no permanent will-change/filter loop. */
     animation:none !important;
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
     pointer-events:none !important;
@@ -7686,8 +7685,28 @@ body > .v169-rpg-dialog-layer{
     container-type:size;
     --portrait-background-size:0 0;
 }
-#game-stage #battlePage .v174-battle-art > .v174-portrait-paint{
+#game-stage #battlePage .v174-action-motion{
     position:absolute;
+    inset:0;
+    background-image:inherit;
+    background-size:0 0;
+    transform-origin:center bottom;
+    pointer-events:none;
+}
+#game-stage #battlePage .v174-portrait-paint{
+    position:absolute;
+    inset:0;
+    background-image:inherit;
+    background-size:contain;
+    background-position:center bottom;
+    background-repeat:no-repeat;
+    transform-origin:center bottom;
+    animation:v174BattleIdle 3.4s ease-in-out var(--battle-idle-phase,0ms) infinite;
+    pointer-events:none;
+}
+#game-stage #battlePage .v174-normalized-portrait .v174-portrait-paint{
+    position:absolute;
+    inset:auto;
     width:var(--portrait-width);
     aspect-ratio:var(--portrait-aspect);
     height:auto;
@@ -7699,7 +7718,7 @@ body > .v169-rpg-dialog-layer{
     background-repeat:no-repeat;
     pointer-events:none;
 }
-:is(#game-stage #battlePage .v174-battle-art,.v143-hit-feedback-art).v174-generic-portrait::before{
+:is(#game-stage #battlePage .v174-generic-portrait > .v174-action-motion,.v143-hit-feedback-art.v174-generic-portrait)::before{
     content:"◇";
     position:absolute;
     left:12%;
@@ -7713,6 +7732,18 @@ body > .v169-rpg-dialog-layer{
     font-style:normal;
     border:1px dashed currentColor;
     border-radius:50%;
+}
+#game-stage #battlePage .v174-generic-portrait > .v174-action-motion::before{
+    transform-origin:center bottom;
+    animation:v174BattleIdle 3.4s ease-in-out var(--battle-idle-phase,0ms) infinite;
+}
+#game-stage #battlePage .v174-battle-art:not([data-motion="idle"]) .v174-portrait-paint,
+#game-stage #battlePage .v174-generic-portrait:not([data-motion="idle"]) > .v174-action-motion::before{
+    animation-play-state:paused;
+}
+#game-stage #battlePage:not(.active) .v174-portrait-paint,
+#game-stage #battlePage:not(.active) .v174-generic-portrait > .v174-action-motion::before{
+    animation-play-state:paused;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art::after{
     content:"";
@@ -7884,8 +7915,11 @@ body > .v169-rpg-dialog-layer{
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-up,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-down{animation:none !important;}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-up > .v174-battle-art{animation:v174BattleLungeUp .45s ease !important;}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-down > .v174-battle-art{animation:v174BattleLungeDown .45s ease !important;}
+#game-stage #battlePage .attacker-lunge-up > .v174-battle-art > .v174-action-motion{animation:v174BattleLungeUp .45s ease;}
+#game-stage #battlePage .attacker-lunge-down > .v174-battle-art > .v174-action-motion{animation:v174BattleLungeDown .45s ease;}
+#game-stage #battlePage .dodge-back{animation:none;}
+#game-stage #battlePage .dodge-back > .v174-battle-art > .v174-action-motion{animation:dodgeBack .45s ease;}
+#game-stage #battlePage .v174-battle-art[data-motion="dying"] > .v174-action-motion{animation:v174BattleDeath .45s ease-out both;}
 
 /* Status artwork is anchored to the Slot-sized Unit, not to source image bounds. */
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v143-status-visual{
@@ -7937,24 +7971,33 @@ body > .v169-rpg-dialog-layer{
 
 @keyframes v174BattleIdle{
     0%,100%{transform:translateY(0) scale(1)}
-    50%{transform:translateY(-3px) scale(1.015)}
+    50%{transform:translateY(-1.5px) scale(1.006)}
 }
 @keyframes v174BattleLungeUp{
     0%,100%{transform:translateY(0) scale(1)}
+    22%{transform:translateY(2px) scale(.99)}
     38%{transform:translateY(-13px) scale(1.035)}
     68%{transform:translateY(-5px) scale(1.015)}
 }
 @keyframes v174BattleLungeDown{
     0%,100%{transform:translateY(0) scale(1)}
+    22%{transform:translateY(-2px) scale(.99)}
     38%{transform:translateY(13px) scale(1.035)}
     68%{transform:translateY(5px) scale(1.015)}
+}
+@keyframes v174BattleDeath{
+    from{transform:translateY(0) scale(1);opacity:1}
+    to{transform:translateY(5px) scale(.97);opacity:.35}
 }
 @keyframes v174TargetReticlePulse{
     from{opacity:.58;filter:brightness(.92)}
     to{opacity:1;filter:brightness(1.3)}
 }
 @media (prefers-reduced-motion:reduce){
-    #game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art{animation:none !important;}
+    #game-stage #battlePage .v174-action-motion,
+    #game-stage #battlePage .v174-portrait-paint,
+    #game-stage #battlePage .v174-generic-portrait > .v174-action-motion::before{animation:none !important;}
+    #game-stage #battlePage .v174-battle-art[data-motion="dying"] > .v174-action-motion{opacity:.35;}
     #game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.target::before,
     #game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.ally-targetable::before{animation:none !important;}
 

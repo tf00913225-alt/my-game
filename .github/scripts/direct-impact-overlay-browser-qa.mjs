@@ -162,7 +162,7 @@ try{
  await capture('boss-neutral-footprint-all',await cast('iceArrowRain'));
  evidence.genericArtwork=await page.evaluate(()=>{
   const entry=[...v143SkillAnimationState.impactFlashes.values()][0],art=document.querySelector('.gameplay-boss-card .v174-battle-art');
-  const actual=getComputedStyle(art,'::before'),overlay=getComputedStyle(entry.node,'::before');
+  const actual=getComputedStyle(art.querySelector('.v174-action-motion'),'::before'),overlay=getComputedStyle(entry.node,'::before');
   const scale=art.getBoundingClientRect().width/parseFloat(getComputedStyle(art).width);
   return {content:overlay.content,background:getComputedStyle(entry.node).backgroundImage,
    widthMatch:Math.abs(parseFloat(overlay.width)-parseFloat(actual.width)*scale)<.3,

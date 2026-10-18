@@ -74,13 +74,14 @@ test('Abyss keeps its existing portrait owner but avoids double-rendering artwor
     assert.match(source,/card\.querySelector\(":scope > \.v174-battle-art"\)/);
     assert.match(source,/if\(!art\)\{art=document\.createElement\("div"\)/);
     assert.match(source,/art\.style\.backgroundImage=source\|\|"none"/);
-    assert.match(css,/\.v174-battle-art\{[^}]*background-size:var\(--portrait-background-size, contain\) !important/);
+    assert.match(css,/\.v174-battle-art\{[^}]*background-size:0 0 !important/);
+    assert.match(css,/\.v174-portrait-paint\{[^}]*background-size:contain/);
     assert.doesNotMatch(source,/removeChild\([^)]*v162-abyss-battle-portrait-art/);
 });
 
 test('canonical artwork updates reuse one child and preserve the selected portrait',()=>{
     const children=[];
-    const makeStyle=()=>({setProperty(name,value){this[name]=value;}});
+    const makeStyle=()=>({setProperty(name,value){this[name]=value;},removeProperty(name){delete this[name];}});
     const context=vm.createContext({
         document:{body:{classList:{remove(){}}},getElementById(){return null;},querySelectorAll(){return [];},createElement(){return {style:makeStyle(),dataset:{},classList:{toggle(){}},querySelector(){return null;},appendChild(){}};}},
         addEventListener(){},getComputedStyle:()=>({getPropertyValue:()=> 'url("abyss-selected.webp")',backgroundImage:"none"}),console

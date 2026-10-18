@@ -21,8 +21,11 @@ const expression=String.raw`(async()=>{
  const measure=(m,i,label)=>{
   const card=document.getElementById('battleMonster'+i),art=card?.querySelector('.v174-battle-art'),paint=art?.querySelector('.v174-portrait-paint');
   const record=v154ResolveMonsterPortraitRecord(m);check(card&&art,'missing final presentation '+label);
+  // This gate measures the authored neutral alpha baseline. Motion has its
+  // own dynamic matrix; stop only its idle animation for this static sample.
+  art.getAnimations({subtree:true}).filter(a=>a.animationName==='v174BattleIdle').forEach(a=>a.cancel());
   if(record.generic){
-   const pseudo=getComputedStyle(art,'::before'),box=art.getBoundingClientRect(),cls=card.dataset.portraitSizeClass,contract=registry.presentation.classes[cls];
+   const pseudo=getComputedStyle(art.querySelector('.v174-action-motion'),'::before'),box=art.getBoundingClientRect(),cls=card.dataset.portraitSizeClass,contract=registry.presentation.classes[cls];
    const projection=box.height/parseFloat(getComputedStyle(art).height),bodyHeight=parseFloat(pseudo.height)*projection,bottomOffset=parseFloat(pseudo.bottom)*projection;
    check(!paint&&pseudo.content.includes('◇'),'generic fallback is visible');check(record.path===null,'fallback must not impersonate a monster');
    check(box.height>0&&Math.abs(bodyHeight/box.height-contract.bodyHeight)<.02,'generic class height '+label);

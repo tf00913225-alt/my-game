@@ -113,12 +113,14 @@ test("new skill icons and 4x3 cast sheets use dedicated WebP runtime assets",()=
   }
 });
 
-test("dense battle portraits no longer run a permanent compositor animation",()=>{
+test("dense battle motion leaves geometry and filters static while only inner paint breathes",()=>{
   const css=read("css/fixed-slot-battlefield-rendering-v2.css");
   const artRule=css.match(/\.v-fixed-battle-slot > \.battle-monster > \.v174-battle-art,[\s\S]*?\.v-fixed-ally-slot > \.battle-player > \.v174-battle-art\{([\s\S]*?)\n\}/);
   assert.ok(artRule,"canonical portrait art rule should exist");
   assert.match(artRule[1],/animation:none !important/);
   assert.doesNotMatch(artRule[1],/will-change:transform,filter/);
+  assert.match(css,/\.v174-portrait-paint\{[^}]*animation:v174BattleIdle 3\.4s/);
+  assert.match(css,/data-motion="idle"[\s\S]*animation-play-state:paused/);
   assert.match(css,/\.v174-cardless-unit > \.v174-battle-art::after\{[\s\S]*?opacity:\.72/);
 });
 

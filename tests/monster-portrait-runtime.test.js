@@ -170,7 +170,7 @@ assert.match(dailySource,/monster\.portraitKey=dailyMonsterPortraitKey\(type,ran
     "daily dungeon monsters must carry an explicit portrait key");
 assert.doesNotMatch(source,/background-size:contain!important/,
     "portrait selection runtime must not inject a second geometry owner");
-assert.match(battlefieldCss,/\.v174-battle-art\{[\s\S]*background-size:var\(--portrait-background-size, contain\) !important/,
+assert.match(battlefieldCss,/\.v174-battle-art\{[\s\S]*background-size:0 0 !important/,
     "the canonical Fixed Slot stylesheet owns no-crop portrait geometry");
 assert.equal((source.match(/renderBattle=function/g)||[]).length,0);
 assert.match(source,/window\.v154AfterBattleRender=v154AfterBattleRender/);
@@ -250,3 +250,5 @@ console.log('Shared portrait reserved / explicit-only / Content identity isolati
     assert.equal(runtime.context.v154ResolveMonsterPortraitRecord({name:'天兵天將',element:'water',v141Abyss:true}).portraitKey,'soldier.water');
     console.log('Water Tower 30 cold/warm appearance identities, numeric/skill/drop isolation and Abyss naming PASS.');
 })().catch(error=>{console.error(error);process.exitCode=1;});
+
+assert.match(battlefieldCss,/\.v174-portrait-paint\{[^}]*background-size:contain/,"The single inner image paint preserves source aspect ratio");
