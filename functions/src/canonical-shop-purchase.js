@@ -12,6 +12,30 @@ const ID=/^[A-Za-z0-9_-]{16,64}$/;
 const PRICES=Object.freeze({hpPotion10:20,spPotion10:25,
     hpPotion100:180,spPotion100:220});
 
+async function verifyShopPurchaseEvidence({tx,root,uid,operationId,currentRevision,
+    itemId,quantity,receipt,ledger,grantExists,fail}){
+    const cost=PRICES[itemId]*quantity,ownedItemId=`shop-${operationId}`;
+    if(!ID.test(operationId||"")||!Object.hasOwn(PRICES,itemId)||
+       !Number.isSafeInteger(quantity)||quantity<1||quantity>999||grantExists||!ledger||
+       receipt.kind!=="shop-purchase"||receipt.ownerUid!==uid||
+       receipt.operationId!==operationId||receipt.itemId!==itemId||
+       receipt.quantity!==quantity||receipt.cost!==cost||receipt.ownedItemId!==ownedItemId||
+       !Number.isSafeInteger(receipt.purchasedRevision)||receipt.purchasedRevision<2||
+       receipt.purchasedRevision>currentRevision||!/^[a-f0-9]{64}$/.test(receipt.snapshotSha256||"")||
+       ledger.kind!==receipt.kind||ledger.ownerUid!==uid||ledger.operationId!==operationId||
+       ledger.itemId!==itemId||ledger.quantity!==quantity||ledger.ownedItemId!==ownedItemId||
+       ledger.amount!==-cost||ledger.purchasedRevision!==receipt.purchasedRevision||
+       ledger.snapshotSha256!==receipt.snapshotSha256){
+        fail("data-loss","Shop purchase receipt is inconsistent.");
+    }
+    const original=await tx.get(root.collection("playableSnapshots").doc(String(receipt.purchasedRevision)));
+    if(!original.exists||original.get("sha256")!==receipt.snapshotSha256||
+       !original.get("snapshot.inventory")?.some(item=>item.ownedItemId===ownedItemId&&
+           item.state?.id===itemId&&item.state.count===quantity)){
+        fail("data-loss","Original purchased item snapshot is missing.");
+    }
+}
+
 function createCanonicalShopPurchase({db,FieldValue,HttpsError,runProtected,
     inspectExistingEnvelope,nextRevision}){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
@@ -55,30 +79,9 @@ function createCanonicalShopPurchase({db,FieldValue,HttpsError,runProtected,
             }
             if(operationSnap.exists){
                 const receipt=operationSnap.data(),ledger=ledgerSnap.data();
-                if(grantSnap.exists||!ledgerSnap.exists||
-                   receipt.kind!=="shop-purchase"||receipt.ownerUid!==uid||
-                   receipt.operationId!==operationId||receipt.itemId!==itemId||
-                   receipt.quantity!==quantity||receipt.cost!==cost||
-                   receipt.ownedItemId!==ownedItemId||
-                   !Number.isSafeInteger(receipt.purchasedRevision)||
-                   receipt.purchasedRevision<2||receipt.purchasedRevision>envelope.serverRevision||
-                   !/^[a-f0-9]{64}$/.test(receipt.snapshotSha256||"")||
-                   ledger.kind!==receipt.kind||ledger.ownerUid!==uid||
-                   ledger.operationId!==operationId||ledger.itemId!==itemId||
-                   ledger.quantity!==quantity||ledger.ownedItemId!==ownedItemId||
-                   ledger.amount!==-cost||
-                   ledger.purchasedRevision!==receipt.purchasedRevision||
-                   ledger.snapshotSha256!==receipt.snapshotSha256){
-                    fail("data-loss","Shop purchase receipt is inconsistent.");
-                }
-                const original=await tx.get(root.collection("playableSnapshots")
-                    .doc(String(receipt.purchasedRevision)));
-                if(!original.exists||original.get("sha256")!==receipt.snapshotSha256||
-                   !original.get("snapshot.inventory")?.some(item=>
-                       item.ownedItemId===ownedItemId&&item.state?.id===itemId&&
-                       item.state.count===quantity)){
-                    fail("data-loss","Original purchased item snapshot is missing.");
-                }
+                await verifyShopPurchaseEvidence({tx,root,uid,operationId,
+                    currentRevision:envelope.serverRevision,itemId,quantity,receipt,ledger,
+                    grantExists:grantSnap.exists,fail});
                 return {purchasedRevision:receipt.purchasedRevision,ownedItemId,
                     cost,unchanged:true,authoritativeStateReady:false};
             }
@@ -160,4 +163,4 @@ function createCanonicalShopPurchase({db,FieldValue,HttpsError,runProtected,
     return Object.freeze({purchase});
 }
 
-module.exports={createCanonicalShopPurchase};
+module.exports={createCanonicalShopPurchase,verifyShopPurchaseEvidence};

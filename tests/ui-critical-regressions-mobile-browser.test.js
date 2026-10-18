@@ -40,6 +40,7 @@ const html=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/30-v130-requested-updates.css">
 <link rel="stylesheet" href="css/31-v131-fix-batch.css">
 <link rel="stylesheet" href="css/29-v125-character-creation-native.css">
+<link rel="stylesheet" href="css/49-v169-rpg-ui.css">
 <link rel="stylesheet" href="css/55-team-relic-system.css">
 <link id="v174-critical-ui-regression-style" rel="stylesheet" href="css/56-v174-critical-ui-regressions.css">
 <style>
@@ -50,7 +51,7 @@ html,body{margin:0;width:390px;height:844px;background:#050505;overflow:hidden}
 #homeFeatureModalBody{height:760px;min-height:0}
 #skillPage{width:360px}
 #skillLoadout,#skillElementTabs{display:none}
-#goldTest{position:absolute;left:4px;top:70px;z-index:20;background:rgb(238,196,92);color:rgb(35,23,5);text-shadow:0 2px 2px #000}
+#homeFeatureModal #goldTest{position:absolute;left:4px;top:70px;z-index:20;background:rgb(238,196,92);color:rgb(35,23,5);text-shadow:0 2px 2px #000}
 #creationPage{display:none!important}
 </style></head><body><div id="game-ui">
 <div id="homeFeatureModal" class="home-feature-modal show team-relic-modal team-relic-mode"><section class="home-feature-modal-box wide"><button id="goldTest">黃底黑字</button><div id="homeFeatureModalBody"><div id="characterTabContent"><div id="skillPage"><div id="skillLoadout"></div><div id="skillElementTabs"></div><div id="allSkillsList"></div></div></div></div></section></div>
@@ -89,7 +90,7 @@ setTimeout(function(){
     var iconRect=row.querySelector('.skill-row-icon').getBoundingClientRect();
     var actionRects=Array.from(row.querySelectorAll('.skill-action-card')).map(function(node){var r=node.getBoundingClientRect();return {left:r.left,right:r.right,width:r.width};});
     var contentWidth=rowRect.width-parseFloat(rowStyle.paddingLeft)-parseFloat(rowStyle.paddingRight)-parseFloat(rowStyle.borderLeftWidth)-parseFloat(rowStyle.borderRightWidth);
-    var availableTextWidth=contentWidth-iconRect.width-actionRects.reduce(function(total,r){return total+r.width;},0)-parseFloat(rowStyle.columnGap)*(row.children.length-1);
+    var availableTextWidth=contentWidth-iconRect.width-Math.max(...actionRects.map(function(r){return r.width;}))-parseFloat(rowStyle.columnGap)*2;
     scenes.push({id:id,label:label.textContent.trim(),disabled:action.disabled,
       width:rect.width,height:rect.height,fontSize:getComputedStyle(label).fontSize,
       textWidth:textRect.width,availableTextWidth:availableTextWidth,textDoesNotOverlap:textRect.left>=iconRect.right&&actionRects.every(function(r){return textRect.right<=r.left;}),textFits:text.scrollWidth<=text.clientWidth+1,textFont:getComputedStyle(text.querySelector(".skill-row-desc")).fontSize,
@@ -152,9 +153,8 @@ try{
         assert.ok(row.width<=112&&row.width>=72,"canonical compact button width: "+JSON.stringify(row));
         assert.ok(row.height>=44,"skill action touch height");
         assert.ok(parseFloat(row.fontSize)>=13&&parseFloat(row.textFont)>=13,"readable skill text");
-        // The flex owner gives text all remaining space after the icon and every
-        // action. Learned skills have both growth and equip buttons; comparing
-        // text with one button depends on font metrics rather than this contract.
+        // The grid owner reserves one action column; growth/equip stack in it.
+        // Text retains the remaining width and must never intersect either action.
         assert.ok(row.textWidth>0&&Math.abs(row.textWidth-row.availableTextWidth)<=1,"description occupies remaining row width: "+JSON.stringify(row));
         assert.equal(row.textDoesNotOverlap,true,"description must not overlap icon or actions");
         assert.equal(row.textFits,true,"skill text must fit its column");

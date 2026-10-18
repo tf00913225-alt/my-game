@@ -8,6 +8,23 @@ const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
 const STATS=new Set(["attack","intelligence","vitality","energy","defensePoints","agility"]);
 
+function verifyAttributeAllocationEvidence({uid,operationId,currentRevision,characterId,stat,
+    receipt,ledger,grantExists,fail}){
+    if(!STATS.has(stat)||grantExists||!ledger||receipt.ownerUid!==uid||
+       receipt.operationId!==operationId||receipt.kind!=="attribute-allocation"||receipt.stat!==stat||
+       receipt.characterId!==characterId||!Number.isSafeInteger(receipt.allocatedRevision)||
+       receipt.allocatedRevision<1||receipt.allocatedRevision>currentRevision||
+       !Number.isSafeInteger(receipt.statAfter)||receipt.statAfter<1||
+       !Number.isSafeInteger(receipt.pointsAfter)||receipt.pointsAfter<0||
+       !/^[a-f0-9]{64}$/.test(receipt.snapshotSha256||"")||
+       ledger.ownerUid!==uid||ledger.operationId!==operationId||ledger.kind!=="attribute-allocation"||
+       ledger.characterId!==receipt.characterId||ledger.stat!==stat||ledger.amount!==-1||
+       ledger.statAfter!==receipt.statAfter||ledger.pointsAfter!==receipt.pointsAfter||
+       ledger.allocatedRevision!==receipt.allocatedRevision||ledger.snapshotSha256!==receipt.snapshotSha256){
+        fail("data-loss","Attribute allocation receipt is inconsistent.");
+    }
+}
+
 function migrateLegacyCanonicalCharacterState(state){
     if(!state||typeof state!=="object"||Array.isArray(state)){ throw new Error("Invalid canonical character state."); }
     const next={...state};
@@ -71,25 +88,8 @@ function createCanonicalAttributeAllocation({db,FieldValue,HttpsError,runProtect
             }
             if(operationSnap.exists){
                 const receipt=operationSnap.data(),ledger=ledgerSnap.data();
-                if(grantOperationSnap.exists||!ledgerSnap.exists||
-                   receipt.ownerUid!==uid||receipt.operationId!==operationId||
-                   receipt.kind!=="attribute-allocation"||receipt.stat!==stat||
-                   receipt.characterId!==account.slots[0]||
-                   !Number.isSafeInteger(receipt.allocatedRevision)||
-                   receipt.allocatedRevision<1||
-                   receipt.allocatedRevision>envelope.serverRevision||
-                   !Number.isSafeInteger(receipt.statAfter)||receipt.statAfter<1||
-                   !Number.isSafeInteger(receipt.pointsAfter)||receipt.pointsAfter<0||
-                   !/^[a-f0-9]{64}$/.test(receipt.snapshotSha256||"")||
-                   ledger.ownerUid!==uid||ledger.operationId!==operationId||
-                   ledger.kind!=="attribute-allocation"||
-                   ledger.characterId!==receipt.characterId||ledger.stat!==stat||
-                   ledger.amount!==-1||ledger.statAfter!==receipt.statAfter||
-                   ledger.pointsAfter!==receipt.pointsAfter||
-                   ledger.allocatedRevision!==receipt.allocatedRevision||
-                   ledger.snapshotSha256!==receipt.snapshotSha256){
-                    fail("data-loss","Attribute allocation receipt is inconsistent.");
-                }
+                verifyAttributeAllocationEvidence({uid,operationId,currentRevision:envelope.serverRevision,
+                    characterId:account.slots[0],stat,receipt,ledger,grantExists:grantOperationSnap.exists,fail});
                 return {allocatedRevision:receipt.allocatedRevision,stat,
                     statAfter:receipt.statAfter,pointsAfter:receipt.pointsAfter,
                     unchanged:true,authoritativeStateReady:false};
@@ -184,4 +184,4 @@ function createCanonicalAttributeAllocation({db,FieldValue,HttpsError,runProtect
     }
     return Object.freeze({allocateAttributePoint});
 }
-module.exports={createCanonicalAttributeAllocation,migrateLegacyCanonicalCharacterState};
+module.exports={createCanonicalAttributeAllocation,migrateLegacyCanonicalCharacterState,verifyAttributeAllocationEvidence};

@@ -17,7 +17,6 @@
 }
 
 #characterTabContent > #statusPage,
-#characterTabContent > #skillPage,
 #characterTabContent > #inventoryPage{
     min-height:0 !important;
     overflow:visible !important;
@@ -66,7 +65,6 @@
 /* When the status/skill pages are borrowed into the character modal,
    their old full-page layout must not create a second competing scroll. */
 #characterTabContent #statusPage,
-#characterTabContent #skillPage,
 #characterTabContent #inventoryPage{
     height:auto !important;
     max-height:none !important;

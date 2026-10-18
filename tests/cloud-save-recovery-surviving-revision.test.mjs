@@ -88,6 +88,81 @@ async function refused(h){
     await assert.rejects(h.recovery.restoreCurrent({},intent),e=>e.code==="data-loss");
     assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
 }
+test("retained ledger inventory cannot hide a later credit after its receipt and claim index are lost",async()=>{
+    for(const grant of [grantId,"later-orphaned-grant-0001"]){
+        const h=fixture();for(const path of h.current.keys())h.data.delete(path);
+        h.data.set(`${root}/ledgerEntries/later-orphaned-ledger-0001`,{
+            ...h.data.get(`${root}/ledgerEntries/${creditId}`),grantId:grant,
+            operationId:"later-orphaned-ledger-0001",creditRevision:8});
+        await refused(h);
+    }
+});
+test("unsupported ledger identity cannot be ignored even at an old revision",async()=>{
+    for(const patch of [{operationId:creditId},{ownerUid:"foreign-owner"},
+        {grantId:"unknown-retained-grant"},{kind:"hero-growth"}]){
+        const h=fixture(),originalLedger=h.data.get(`${root}/ledgerEntries/${creditId}`);
+        h.data.delete(`${root}/ledgerEntries/${creditId}`);
+        h.data.set(`${root}/ledgerEntries/orphaned-ledger-proof-0001`,{
+            ...originalLedger,
+            operationId:"orphaned-ledger-proof-0001",...patch});
+        await refused(h);
+    }
+});
+const debitId="retained-debit-operation-0001";
+function addDebit(h,kind){
+    const records=structuredClone(h.data.get(`${root}/recoveryArchives/5`).sourceRecords);
+    for(const rows of Object.values(records)){
+        for(const row of Array.isArray(rows)?rows:[rows])row.serverRevision=4;
+    }
+    const characterId=records.account.slots[0],ownedItemId=`shop-${debitId}`;
+    records.characters[0].state.level=2;
+    records.inventory.push({schemaVersion:1,ownerUid:uid,serverRevision:4,provenance:"server-created",
+        ownedItemId,location:"bag",state:{id:"hpPotion10",type:"potion",count:1}});
+    const snapshot=assembleCanonicalSnapshot(uid,4,records);
+    h.data.set(`${root}/playableSnapshots/4`,snapshot);
+    h.data.set(`${root}/recoveryArchives/4`,createRecoveryArchive(uid,4,records,snapshot));
+    const receipt={schemaVersion:1,ownerUid:uid,operationId:debitId,kind,snapshotSha256:snapshot.sha256,
+        ...(kind==="shop-purchase"?{itemId:"hpPotion10",quantity:1,cost:20,ownedItemId,purchasedRevision:4}:
+            kind==="exp-allocation"?{characterId,cost:10,levelAfter:2,allocatedRevision:4}:
+            {characterId,stat:"vitality",statAfter:records.characters[0].state.vitality,
+                pointsAfter:records.characters[0].state.attributePoints,allocatedRevision:4})};
+    h.data.set(`${root}/operations/${debitId}`,receipt);
+    h.data.set(`${root}/ledgerEntries/${debitId}`,{...receipt,amount:kind==="attribute-allocation"?-1:-receipt.cost});
+}
+test("supported purchase, EXP and attribute debit history survives full source loss without replaying costs",async()=>{
+    for(const kind of ["shop-purchase","exp-allocation","attribute-allocation"]){
+        const h=fixture();addDebit(h,kind);
+        const receipt=h.data.get(`${root}/operations/${debitId}`),ledger=h.data.get(`${root}/ledgerEntries/${debitId}`);
+        for(const path of h.current.keys())h.data.delete(path);
+        assert.equal((await h.recovery.restoreCurrent({},intent)).restoredRevision,7);
+        assert.deepEqual(h.data.get(`${root}/operations/${debitId}`),receipt);
+        assert.deepEqual(h.data.get(`${root}/ledgerEntries/${debitId}`),ledger);
+        assert.equal(h.data.get(`${root}/economy/current`).gold,25);
+        assert.equal(h.data.get(`${root}/economy/current`).sharedExp,0);
+    }
+});
+test("debit ledgers require their original receipt, revision and intact snapshot/archive",async()=>{
+    for(const kind of ["shop-purchase","exp-allocation","attribute-allocation"]){
+        for(const change of [
+            h=>h.data.delete(`${root}/operations/${debitId}`),
+            h=>h.data.get(`${root}/operations/${debitId}`).ownerUid="foreign-owner",
+            h=>h.data.get(`${root}/operations/${debitId}`)[kind==="shop-purchase"?"purchasedRevision":"allocatedRevision"]=8,
+            h=>h.data.get(`${root}/ledgerEntries/${debitId}`).amount=-999,
+            h=>h.data.delete(`${root}/playableSnapshots/4`),
+            h=>h.data.delete(`${root}/recoveryArchives/4`),
+            h=>h.data.get(`${root}/recoveryArchives/4`).sourceSha256="a".repeat(64),
+            h=>h.data.set(`${root}/grantOperations/${debitId}`,{creditedToCharacter:false})
+        ]){
+            const h=fixture();addDebit(h,kind);change(h);await refused(h);
+        }
+    }
+});
+test("ledger inventory over budget refuses without writes",async()=>{
+    const h=fixture();for(let i=0;i<401;i++)h.data.set(`${root}/ledgerEntries/orphan-${i}`,{});
+    const before=JSON.stringify([...h.data]);
+    await assert.rejects(h.recovery.restoreCurrent({},intent),e=>e.code==="failed-precondition");
+    assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
+});
 const reservedId="retained-reservation-0001",reservedGrant="retained-reserved-grant-0001";
 function addReservation(h){
     const stamp={toMillis:()=>1};
@@ -216,6 +291,8 @@ test("known older/current sources and entirely missing sources still restore wit
         for(const path of h.current.keys())h.data.set(path,{...h.data.get(path),serverRevision:9});
         h.data.set(`${root}/uniqueClaims/later-read-only-claim`,{schemaVersion:1,ownerUid:uid,
             grantId:"later-read-only-claim",operationId:"later-read-only-credit",creditRevision:9});
+        h.data.set(`${root}/ledgerEntries/later-read-only-credit`,{schemaVersion:1,ownerUid:uid,
+            operationId:"later-read-only-credit",creditRevision:9});
         const before=JSON.stringify([...h.data]),count=h.writes();
         assert.deepEqual(await h.recovery.restoreCurrent({},intent),{
             restoredRevision:7,unchanged:true,authoritativeStateReady:false});

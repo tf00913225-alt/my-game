@@ -26409,6 +26409,7 @@ function closeHomeFeature(){
 
 
     if(modal){
+        delete modal.dataset.characterTab;
         const childReward=document.getElementById("v132RewardModal");
         if(childReward?.parentElement===modal&&typeof window.v132CloseRewardModal==="function"){
             window.v132CloseRewardModal();
@@ -26684,6 +26685,11 @@ function switchCharacterTab(tabName){
         pageEl,
         container
     );
+    const characterModal=$("homeFeatureModal");
+    if(characterModal){characterModal.dataset.characterTab=tabName;}
+    const characterTitle=$("homeFeatureModalTitle");
+    if(characterTitle){characterTitle.textContent=tabName==="skill"?"技能":"角色";}
+
 
     if(window.v78ApplyCharacterInventoryLayout){
         window.v78ApplyCharacterInventoryLayout();
@@ -26744,14 +26750,10 @@ function switchCharacterTab(tabName){
 
             if(btn){
 
-                btn.style.opacity=
-
-                    name.toLowerCase()===
-                    tabName.toLowerCase()
-                    ?
-                    "1"
-                    :
-                    ".55";
+                const selected=name.toLowerCase()===tabName.toLowerCase();
+                btn.style.opacity=selected?"1":".55";
+                btn.classList.toggle("active",selected);
+                btn.setAttribute("aria-pressed",String(selected));
 
             }
 
@@ -26923,19 +26925,15 @@ function renderCharacterShowcaseContent(){
             if(character){
                 html+=
 
-                    '<div class="character-showcase-choice" style="width:calc(86 * var(--ui-length-unit,1px));text-align:center;'+
-                    'cursor:pointer;" onclick="selectCharacterForTabs('+
+                    '<div class="character-showcase-choice" onclick="selectCharacterForTabs('+
                     slotIndex+
                     ');">'+
 
                     '<div id="characterAvatar'+
                     slotIndex+
-                    '" class="character-showcase-avatar" style="width:calc(56 * var(--ui-length-unit,1px));height:calc(56 * var(--ui-length-unit,1px));margin:0 auto;'+
-                    'border-radius:50%;background-color:#15100a;background-image:url(\''+
+                    '" class="character-showcase-avatar" style="background-image:url(\''+
                     getCharacterArtworkPath(character)+
-                    '\');background-size:cover;background-position:center 18%;'+
-                    'border:calc(2 * var(--ui-length-unit,1px)) solid #f0b429;display:flex;align-items:center;'+
-                    'justify-content:center;font-size:calc(18 * var(--ui-length-unit,1px));transition:opacity .15s;">'+
+                    '\');">'+
                     "</div>"+
 
                     '<div style="font-size:calc(15 * var(--ui-length-unit,1px));font-weight:bold;margin-top:calc(2 * var(--ui-length-unit,1px));'+

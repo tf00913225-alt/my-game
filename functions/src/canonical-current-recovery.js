@@ -5,6 +5,9 @@ const {assembleCanonicalSnapshot,claimRecordsDigest}=
 const {inspectRecoveryArchive,createRecoveryArchive}=
     require("./canonical-recovery-archive");
 const {verifyCreditedGrant,verifyReservedGrant}=require("./credited-grant-evidence");
+const {verifyShopPurchaseEvidence}=require("./canonical-shop-purchase");
+const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
+const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 const SETS={
@@ -171,22 +174,80 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             }
             // Canonical claim sources may all be lost. Independent retained
             // rights must agree with the archive, not be hidden by its rollback.
-            const [claims,receipts]=await Promise.all([
+            const [claims,receipts,ledgers]=await Promise.all([
                 tx.get(root.collection("uniqueClaims").limit(401)),
-                tx.get(root.collection("grantOperations").limit(401))
+                tx.get(root.collection("grantOperations").limit(401)),
+                tx.get(root.collection("ledgerEntries").limit(401))
             ]);
             // Each credit proof reads at most 12 documents, including its claim,
             // grant/receipt/ledger/collision and original event/snapshot/archive.
-            // Inventory reads are additional; a reservation may need three point
-            // reads and the original event plus its snapshot/archive (six total).
+            // Inventory reads are additional; a reservation reserves six proof
+            // reads. Each ledger reserves its inventory read plus four reads for
+            // a debit's receipt, snapshot/archive and the shop Owner's snapshot.
             const reservedCount=receipts.docs.filter(doc=>doc.get("creditedToCharacter")===false).length;
             if(queries.reduce((sum,query)=>sum+query.size,0)+claims.docs.length*12+
-               receipts.docs.length+reservedCount*6>400){
+               receipts.docs.length+ledgers.docs.length*5+reservedCount*6>400){
                 fail("failed-precondition","Recovery claim evidence exceeds the transaction budget.");
             }
             const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
             if(claims.docs.length!==archivedClaims.size){
                 fail("data-loss","Independent claims differ from the recovery archive.");
+            }
+            // A lost claim/receipt index cannot hide a retained economic delta.
+            // Reuse the original credit/debit Owners; never infer a missing
+            // receipt from a balance or regenerate an operation during repair.
+            const receiptById=new Map(receipts.docs.map(doc=>[doc.id,doc.data()]));
+            let creditLedgerCount=0;
+            for(const doc of ledgers.docs){
+                const ledger=doc.data(),receipt=receiptById.get(doc.id);
+                if(ledger.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
+                   ledger.schemaVersion!==1||ledger.ownerUid!==uid){
+                    fail("data-loss","An unmatched ledger entry blocks recovery.");
+                }
+                if(receipt?.creditedToCharacter===true&&
+                   archivedClaims.get(ledger.grantId)?.operationId===doc.id){
+                    creditLedgerCount++;
+                    continue; // Full credit proof is checked below.
+                }
+                const operation=await tx.get(root.collection("operations").doc(doc.id));
+                const debit=operation.data();
+                if(receipt||!operation.exists||debit.schemaVersion!==1||debit.ownerUid!==uid||
+                   debit.operationId!==doc.id||!["shop-purchase","exp-allocation","attribute-allocation"].includes(debit.kind)){
+                    fail("data-loss","An unmatched ledger entry blocks recovery.");
+                }
+                const debitRevision=debit.kind==="shop-purchase"?debit.purchasedRevision:debit.allocatedRevision;
+                if(!Number.isSafeInteger(debitRevision)||debitRevision<2||debitRevision>expectedRevision){
+                    fail("data-loss","A later or unknown debit revision blocks recovery.");
+                }
+                const [debitSnapshot,debitArchive]=await Promise.all([
+                    tx.get(root.collection("playableSnapshots").doc(String(debitRevision))),
+                    tx.get(root.collection("recoveryArchives").doc(String(debitRevision)))
+                ]);
+                try{
+                    if(!debitSnapshot.exists||!debitArchive.exists||
+                       debitSnapshot.get("sha256")!==debit.snapshotSha256)throw new Error("Missing debit proof");
+                    const original=inspectRecoveryArchive(debitArchive.data(),uid,debitRevision,debitSnapshot.data());
+                    if(original.account.slots[0]!==records.account.slots[0]||
+                       (debit.kind==="exp-allocation"&&!original.characters.some(row=>
+                           row.characterId===debit.characterId&&row.state.level===debit.levelAfter))||
+                       (debit.kind==="attribute-allocation"&&!original.characters.some(row=>
+                           row.characterId===debit.characterId&&row.state[debit.stat]===debit.statAfter&&
+                           row.state.attributePoints===debit.pointsAfter))){
+                        throw new Error("Debit character differs from its original source");
+                    }
+                }catch(_){fail("data-loss","Original debit snapshot or archive is inconsistent.");}
+                const proof={tx,root,uid,operationId:doc.id,currentRevision:expectedRevision,
+                    receipt:debit,ledger,grantExists:false,fail};
+                if(debit.kind==="shop-purchase"){
+                    await verifyShopPurchaseEvidence({...proof,itemId:debit.itemId,quantity:debit.quantity});
+                }else if(debit.kind==="exp-allocation"){
+                    verifyExpAllocationEvidence({...proof,characterId:records.account.slots[0]});
+                }else{
+                    verifyAttributeAllocationEvidence({...proof,characterId:records.account.slots[0],stat:debit.stat});
+                }
+            }
+            if(creditLedgerCount!==archivedClaims.size){
+                fail("data-loss","Credit ledger inventory differs from the recovery archive.");
             }
             let creditedCount=0;
             for(const doc of receipts.docs){

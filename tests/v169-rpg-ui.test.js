@@ -191,15 +191,17 @@ test("character CSS owns natural scrolling after the inline writer retires",()=>
     assert.doesNotMatch(layoutSource,/setProperty|MutationObserver|setTimeout|requestAnimationFrame/);
     assert.match(css,/\.home-feature-modal-box\.wide #characterTabContent\{[^}]*overflow-x:hidden !important;[^}]*overflow-y:auto !important;[^}]*touch-action:pan-y !important;/);
     assert.doesNotMatch(layoutSource,/dataset\.characterTab|fixedCharacterTab/);
-    assert.doesNotMatch(css,/data-character-tab=/);
+    const skillSkins=[...css.matchAll(/[^{}]*\[data-character-tab="skill"\][^{}]*\{([^}]*)\}/g)];
+    assert.ok(skillSkins.length>0,"explicit skill skin state is present");
+    for(const skin of skillSkins){assert.doesNotMatch(skin[1],/(?:^|;)\s*(?:width|height|min-width|min-height|max-width|max-height|overflow):/,"skill state cannot become a second frame geometry owner");}
 });
 
 test("character pages remove only historical tails without compacting their content",()=>{
     assert.match(characterCoreCss,/#characterTabContent\{[\s\S]{0,900}padding-bottom:0 !important/);
     assert.doesNotMatch(characterCoreCss,/padding-bottom:160px/);
     assert.doesNotMatch(css,/#characterTabContent\{\s*padding-bottom:0/);
-    assert.match(css,/#characterTabContent > #skillPage\{[\s\S]{0,120}padding:0 0 36px !important/);
-    assert.match(css,/#allSkillsList\{[\s\S]{0,100}padding-bottom:36px !important/);
+    assert.match(css,/#characterTabContent > #skillPage\{[^}]*padding:0 0 36px;/);
+    assert.match(css,/#allSkillsList\{[^}]*padding-bottom:36px;/);
     assert.doesNotMatch(css,/#statusPage[^{]*\{[^}]*display:flex !important/);
     assert.doesNotMatch(css,/#homeExpPoolCard[^{]*\{[^}]*height:100% !important/);
     assert.doesNotMatch(css,/#expDistributeList[^{]*\{[^}]*overflow:hidden/);

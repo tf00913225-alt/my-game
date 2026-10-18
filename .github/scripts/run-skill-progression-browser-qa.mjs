@@ -179,7 +179,35 @@ async function runViewport(chrome,url,width,height,capture){
         await client.send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:width<700,screenWidth:width,screenHeight:height,screenOrientation:{type:"portraitPrimary",angle:0}});
         await client.send("Page.navigate",{url});
         await client.eval(PREPARE_RUNTIME);
+        const skin=await client.eval(String.raw`(async()=>{
+            const modal=document.getElementById('homeFeatureModal');
+            const box=modal.querySelector('.home-feature-modal-box');
+            const rectangle=()=>{const r=box.getBoundingClientRect();return [r.x,r.y,r.width,r.height];};
+            const frames=[rectangle()];
+            for(const tab of ['status','expPool','skill']){switchCharacterTab(tab);frames.push(rectangle());}
+            const decode=async value=>{
+                const urls=[...value.matchAll(/url\("([^"]+)"\)/g)].map(match=>match[1]);
+                for(const url of urls){const image=new Image();image.src=url;await image.decode();}
+                return urls;
+            };
+            const chrome=[...await decode(getComputedStyle(box).borderImageSource),...await decode(getComputedStyle(box.querySelector('.home-feature-modal-title')).backgroundImage)];
+            const art=[];
+            for(const node of document.querySelectorAll('.character-showcase-avatar,#skillPage .skill-row-icon,#skillPage .skill-loadout-slot-icon')){
+                art.push(...await decode(getComputedStyle(node).backgroundImage));
+            }
+            const scroll={content:getComputedStyle(document.getElementById('characterTabContent')).overflowY,page:getComputedStyle(document.getElementById('skillPage')).overflowY,list:getComputedStyle(document.getElementById('allSkillsList')).overflowY};
+            const selected=modal.dataset.characterTab;
+            closeHomeFeature();const cleared=!modal.hasAttribute('data-character-tab');
+            openHomeFeature('character');switchCharacterTab('skill');selectedSkillElementTab='water';renderSkillLoadout();
+            return {frames,chrome,art,scroll,selected,cleared};
+        })()`);
+        assert.equal(skin.selected,'skill');assert.equal(skin.cleared,true,'skill chrome leaks after closing');
+        assert.ok(skin.frames.every(frame=>frame.every((value,i)=>Math.abs(value-skin.frames[0][i])<.1)),'shared character frame jumps between tabs');
+        assert.equal(skin.chrome.length,2,'both generated decorative assets must decode');
+        assert.ok(skin.art.length>=3&&skin.art.every(url=>!url.includes('/build/assets/')),'character/skill illustration URLs must remain document-relative');
+        assert.deepEqual(skin.scroll,{content:'auto',page:'visible',list:'visible'},'only the original character viewport may scroll');
         const evidence=await client.eval(COLLECT_EVIDENCE);
+        evidence.skin=skin;
         latestEvidence=evidence;
         assert.equal(evidence.runtime.renderer,true,"QA did not execute the formal renderSkillLoadout owner");
         for(const [name,action] of Object.entries(evidence.water)){ assertVisibleAction(name,action); }

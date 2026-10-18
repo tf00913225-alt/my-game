@@ -8,6 +8,7 @@ const read = (file) => {const source=fs.readFileSync(path.join(ROOT,file),'utf8'
 
 const owners = {
   skillFix: 'css/31-v131-fix-batch.css',
+  skillSkin: 'css/49-v169-rpg-ui.css',
   patrol: 'css/32-v131-patrol-appearance.css',
   inventoryBack: 'css/35-v134-fixes.css',
   rest: 'css/37-v139-rested-experience.css',
@@ -89,7 +90,7 @@ assert.match(homeRoster, /\.v146-home-character\{[^}]*font-size:13px/);
 assert.match(homeRoster, /\.v146-home-character span\{[^}]*white-space:nowrap/);
 assert.match(homePolish, /\.v173-exp-charge-status b\{[^}]*font-size:16px/);
 assert.match(homePolish, /\.v173-exp-charge-status small\{[^}]*font-size:14px/);
-assert.match(homePolish, /\.skill-loadout-slot-name\{font-size:15px/);
+assert.match(read(owners.skillSkin), /\.skill-loadout-slot-name\{[^}]*font-size:15px/);
 assert.match(homePolish, /\.map-player-name\{[^}]*font-size:13px/);
 assert.match(homePolish, /\.v132-reward-modal \.v17363-preview-group p\{font-size:15px/);
 assert.match(detail, /#skillDetailStats \.v17364-progression-hint\{[\s\S]*?font-size:14px/);

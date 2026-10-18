@@ -187,8 +187,6 @@
 }
 
 /* Other formal non-battle mobile owners discovered by the full typography scan. */
-:is(#game-stage,#game-ui) #skillPage .skill-loadout-slot{min-height:calc(60 * var(--ui-length-unit,1px))!important;font-size:calc(15 * var(--ui-length-unit,1px))!important;line-height:1.25!important;}
-:is(#game-stage,#game-ui) #skillPage .skill-loadout-slot-name{font-size:calc(15 * var(--ui-length-unit,1px))!important;line-height:calc(18 * var(--ui-length-unit,1px))!important;}
 :is(#game-stage,#game-ui) #statusPage .status-points-line{font-size:calc(14 * var(--ui-length-unit,1px))!important;line-height:1.45!important;}
 :is(#game-stage,#game-ui) #statusPage .status-formula-hint,:is(#game-stage,#game-ui) #statusPage .status-preview-bar-label{font-size:calc(14 * var(--ui-length-unit,1px))!important;line-height:1.4!important;}
 #game-stage #mapPage .map-player-name{max-width:62px!important;font-size:13px!important;line-height:17px!important;}
@@ -198,9 +196,6 @@
 #game-stage #mapPage .map-follower-level{font-size:13px!important;line-height:17px!important;}
 #game-ui #homeFeatureModal [onclick*="selectCharacterForTabs"]>div[style*="font-size:11px"],#game-ui #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:11px"]{font-size:45px!important;line-height:57px!important;}
 #game-ui #homeFeatureModal [id^="characterAvatarLevel"],#game-ui #homeFeatureModal [onclick*="openCharacterCreation"]>div[style*="font-size:10px"]{font-size:42px!important;line-height:54px!important;}
-#game-ui #homeFeatureModal .character-showcase-choice{position:relative;padding:15px 9px 12px;border:6px solid transparent;border-radius:36px;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
-#game-ui #homeFeatureModal .character-showcase-choice.is-current-character{border-color:#ffe08a;background:linear-gradient(180deg,rgba(158,104,24,.35),rgba(18,12,7,.16));box-shadow:0 0 0 6px rgba(255,186,58,.22),0 0 45px rgba(255,166,32,.48);}
-#game-ui #homeFeatureModal .character-showcase-avatar.is-current-character{border-color:#fff0ab!important;box-shadow:0 0 0 9px rgba(255,176,42,.55),0 0 48px rgba(255,130,28,.9)!important;}
 #game-ui #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody>div:first-child{font-size:45px!important;line-height:1.7!important;}
 #game-ui #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody div[style*="font-size:11px"]{font-size:42px!important;line-height:1.55!important;}
 #game-stage .v132-dungeon-list>div[style*="font-size:11px"]{font-size:14px!important;line-height:1.5!important;}
