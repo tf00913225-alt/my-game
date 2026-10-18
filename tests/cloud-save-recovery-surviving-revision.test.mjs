@@ -108,6 +108,23 @@ function addPending(h,revision=5){
         source:"server-event",eventType:"daily-checkin",periodDate:"20261018",kind:"gold",amount:50,
         status:"pending",claimedByOperationId:null,sourceEventSha256:digest,createdAt:stamp});
 }
+test("retained original reward event cannot disappear behind a missing grant",async()=>{
+    const h=fixture();addPending(h);h.data.delete(`${root}/pendingGrants/${pendingId}`);
+    for(const path of h.current.keys())h.data.delete(path);
+    await refused(h);
+});
+test("unknown event kinds cannot be ignored even when a same-ID grant remains",async()=>{
+    const h=fixture();
+    h.data.set(`${root}/rewardEvents/${grantId}`,{schemaVersion:1,ownerUid:uid,eventId:grantId,
+        eventType:"unsupported-reward",kind:"gold",amount:25,sourceRevision:5,createdAt:{toMillis:()=>1}});
+    await refused(h);
+});
+test("reward-event inventory is bounded before per-event source verification",async()=>{
+    const h=fixture();for(let i=0;i<401;i++)h.data.set(`${root}/rewardEvents/orphan-${i}`,{});
+    const before=JSON.stringify([...h.data]);
+    await assert.rejects(h.recovery.restoreCurrent({},intent),e=>e.code==="failed-precondition");
+    assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
+});
 test("orphaned consumed grants cannot hide missing receipt and claim history",async()=>{
     for(const status of ["reserved","credited","unknown"]){
         const h=fixture();for(const path of h.current.keys())h.data.delete(path);
@@ -361,6 +378,7 @@ test("known older/current sources and entirely missing sources still restore wit
         h.data.set(`${root}/ledgerEntries/later-read-only-credit`,{schemaVersion:1,ownerUid:uid,
             operationId:"later-read-only-credit",creditRevision:9});
         h.data.set(`${root}/pendingGrants/later-read-only-grant`,{status:"unknown-later-history"});
+        h.data.set(`${root}/rewardEvents/later-read-only-event`,{eventType:"unknown-later-history"});
         const before=JSON.stringify([...h.data]),count=h.writes();
         assert.deepEqual(await h.recovery.restoreCurrent({},intent),{
             restoredRevision:7,unchanged:true,authoritativeStateReady:false});

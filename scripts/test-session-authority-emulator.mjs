@@ -2472,6 +2472,24 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     assert.deepEqual(await dump(),damaged);
     console.log("Current recovery pending-grant inventory real Firestore PASS: orphan consumed grants and corrupt/missing pending event evidence refuse without writes; original pending right remains unconsumed.");
 
+    // The original event remains independent when its grant is lost. Refuse
+    // instead of ignoring it or allowing the issuer to recreate missing rights.
+    await pendingRef.delete();const orphanEvent=await dump();
+    await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+    assert.deepEqual(await dump(),orphanEvent);await pendingRef.set(pendingOriginal);
+    const unsupportedEvent=ownedRoot.collection("rewardEvents").doc(ownedGrant);
+    await unsupportedEvent.set({...eventOriginal,eventId:ownedGrant,eventType:"unsupported-reward"});
+    const unknownEvent=await dump();
+    await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+    assert.deepEqual(await dump(),unknownEvent);await unsupportedEvent.delete();
+    for(const patch of [{ownerUid:"foreign-owner"},{sha256:"a".repeat(64)}]){
+        await pendingEventRef.update(patch);const corruptEvent=await dump();
+        await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+        assert.deepEqual(await dump(),corruptEvent);await pendingEventRef.set(eventOriginal);
+    }
+    assert.deepEqual(await dump(),damaged);
+    console.log("Current recovery reward-event inventory real Firestore PASS: orphan event, unsupported same-ID observation and foreign/corrupt source evidence refuse without writes; original event and pending right retained.");
+
     // A stale/damaged envelope must not authorize overwriting surviving newer
     // sources. Missing revision evidence is equally unreconciled. Emulator only.
     for(const [path,row] of current){
