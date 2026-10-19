@@ -3530,43 +3530,56 @@
     }
 }
 
-/* V173.58 — FREE-MATERIAL REFORGE UI: browser-domain single page */
-#game-ui .v17358-reforge-card{display:flex;flex-direction:column;gap:36px;min-width:0;}
-#game-ui .v17358-reforge-card h3{margin:0 0 24px;font-size:54px;line-height:1.4;color:var(--ui-gold,#c89a48);}
-#game-ui .v17358-reforge-card p{margin:24px 0;font-size:45px;line-height:1.5;overflow-wrap:anywhere;}
-#game-ui .v17358-reforge-card small{display:block;font-size:42px;line-height:1.45;}
-#game-ui .v141-smelting-picker summary{display:grid;grid-template-columns:calc(96 * var(--ui-length-unit,1px)) minmax(0,1fr) auto;gap:calc(12 * var(--ui-length-unit,1px));align-items:center;min-height:calc(112 * var(--ui-length-unit,1px));}
-#game-ui .v141-smelting-picker summary>.v141-smelting-art{width:calc(96 * var(--ui-length-unit,1px));height:calc(96 * var(--ui-length-unit,1px));}
-#game-ui .v141-smelting-picker summary>span{grid-column:auto;}
-#game-ui .v141-smelting-picker summary>span:nth-child(2){font-size:calc(18 * var(--ui-length-unit,1px));line-height:1.4;overflow-wrap:anywhere;}
-#game-ui .v141-smelting-picker .v141-forge-option{display:grid;grid-template-columns:168px minmax(0,1fr);gap:36px;align-items:center;text-align:left;}
-#game-ui .v141-smelting-picker .v141-forge-option .v141-smelting-art{width:168px;height:168px;}
-#game-ui .v141-smelting-picker .v141-forge-options{position:static;max-height:960px;overflow-y:auto;}
-#game-ui .v141-smelting-art{display:block;width:calc(64 * var(--ui-length-unit,1px));height:calc(64 * var(--ui-length-unit,1px));min-width:0;}
+/* Reforge presentation: equipment rail, selected identity, affixes and fixed cost/actions. */
+#game-ui .v17358-reforge-card{display:flex;flex-direction:column;gap:12px;min-width:0;padding:18px;}
+#game-ui .v17358-reforge-card h3{margin:0;font-size:54px;line-height:1.3;color:var(--rpg-window-gold-hi,#F0D38A);overflow-wrap:anywhere;}
+#game-ui .v17358-reforge-card p{margin:12px 0;font-size:45px;line-height:1.4;overflow-wrap:anywhere;}
+#game-ui .v17358-reforge-card small{font-size:42px;line-height:1.4;}
+#game-ui .v141-smelting-picker{margin:0;border:0;background:transparent;min-width:0;}
+#game-ui .v141-smelting-picker .v141-forge-options{display:flex;gap:18px;padding:6px;overflow-x:auto;overflow-y:hidden;touch-action:pan-x;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;}
+#game-ui .v141-smelting-picker .v141-forge-option{flex:0 0 144px;width:144px;min-height:144px;padding:6px;justify-content:center;}
+#game-ui .v141-smelting-picker .v141-forge-option.selected{border-color:var(--rpg-window-gold-hi,#F0D38A);box-shadow:inset 0 0 0 3px var(--rpg-window-gold,#C69A45);}
+#game-ui .v141-smelting-art{display:block;width:132px;height:132px;min-width:0;}
 #game-ui .v141-smelting-art .v169-item-art{width:100%;height:100%;}
 #game-ui .v141-smelting-art img{width:100%;height:100%;object-fit:contain;}
-#game-ui .v141-smelting-plus{display:grid;place-items:center;width:100%;height:100%;border:calc(1 * var(--ui-length-unit,1px)) dashed var(--ui-gold,#c89a48);border-radius:var(--radius-md,10px);font-size:calc(36 * var(--ui-length-unit,1px));}
-#game-ui .v17358-reforge-material,#game-ui .v17358-reforge-lock-panel{padding:36px;border:3px solid #72552d;border-radius:var(--radius-md,30px);background:var(--ui-bg,#17130f);}
-#game-ui .v17358-reforge-tiers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;}
-#game-ui .v17358-reforge-tier{display:flex;flex-direction:column;align-items:center;gap:18px;min-width:0;padding:24px 9px;border:3px solid #72552d;border-radius:21px;background:#15100a;color:var(--ui-text,#f4ead4);font-size:45px;line-height:1.4;}
-#game-ui .v17358-reforge-tier.active{border-color:var(--ui-gold,#c89a48);background:#39250d;}
-#game-ui .v17358-reforge-tier .v141-smelting-art{width:min(100%,156px);height:auto;aspect-ratio:1;min-height:0;padding:0;border:0;background:transparent;}
-#game-ui .v141-smelting-tier-choice{display:flex;flex-direction:column;gap:calc(4 * var(--ui-length-unit,1px));width:100%;padding:calc(4 * var(--ui-length-unit,1px)) 0;border:0;background:transparent;color:inherit;font-size:calc(15 * var(--ui-length-unit,1px));}
-#game-ui .v141-smelting-tier-choice span{font-size:calc(13 * var(--ui-length-unit,1px));overflow-wrap:anywhere;}
-#game-ui .v141-smelting-footer{flex:0 0 auto;padding:calc(8 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));border-top:calc(1 * var(--ui-length-unit,1px)) solid #72552d;background:var(--ui-bg,#17130f);}
-#game-ui .v141-smelting-footer p{margin:0 0 calc(8 * var(--ui-length-unit,1px));font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.45;}
-#game-ui .v17358-reforge-lock-list{display:flex;flex-direction:column;gap:24px;}
-#game-ui .v141-smelting-affix{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:calc(6 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px));padding:calc(10 * var(--ui-length-unit,1px)) 0;border-bottom:calc(1 * var(--ui-length-unit,1px)) solid var(--rpg-window-gold-dark,#73582D);font-size:calc(16 * var(--ui-length-unit,1px));line-height:1.4;}
-#game-ui .v141-smelting-affix>b{grid-column:1;overflow-wrap:anywhere;}
-#game-ui .v141-smelting-affix>.v17358-affix-lock{grid-column:2;grid-row:1 / span 3;}
-#game-ui .v141-reforge-slot-label,#game-ui .v141-reforge-old-value{grid-column:1;font-size:calc(14 * var(--ui-length-unit,1px));color:var(--rpg-window-text-muted,#B9AD98);overflow-wrap:anywhere;}
-#game-ui .v17358-reforge-card .v141-reforge-help{font-size:calc(15 * var(--ui-length-unit,1px));color:var(--rpg-window-text-muted,#B9AD98);}
-#game-ui .v17358-affix-lock{flex:0 0 auto;min-height:calc(44 * var(--ui-length-unit,1px));padding:calc(8 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #72552d;border-radius:calc(7 * var(--ui-length-unit,1px));background:#15100a;color:var(--ui-text,#f4ead4);font-size:calc(15 * var(--ui-length-unit,1px));}
-#game-ui .v17358-affix-lock.locked{border-color:var(--ui-gold,#c89a48);background:#39250d;color:#ffe1a0;}
-#game-ui .v17358-reforge-card .lack{color:#e8a092;}
-#game-ui .v17358-reforge-card .ok{color:#b8d7a0;}
-#game-ui .v141-reforge-actions{display:flex;flex-wrap:wrap;gap:24px;}
-#game-ui .v141-reforge-actions>button{flex:1;min-height:132px;font-size:48px;}
+#game-ui .v141-reforge-current{padding:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:6px;}
+#game-ui .v141-reforge-current .v141-reforge-portrait{width:216px;height:216px;}
+#game-ui .v141-reforge-current .v141-reforge-identity{display:flex;align-items:center;justify-content:center;gap:18px;margin:0;width:100%;min-width:0;}
+#game-ui .v141-reforge-identity h3{min-width:0;font-size:54px;}
+#game-ui .v141-reforge-identity>.v141-affix-info{min-height:132px;padding:0 12px;border:0;background:transparent;color:var(--rpg-window-text-muted,#B9AD98);font-size:45px;}
+#game-ui .v141-reforge-stats{flex:0 0 auto;color:var(--rpg-window-text-muted,#B9AD98);font-size:42px;}
+#game-ui .v141-reforge-stats summary{display:flex;align-items:center;justify-content:center;min-height:132px;padding:0 12px;cursor:pointer;}
+#game-ui .v141-reforge-stats>div{display:flex;flex-wrap:wrap;gap:12px;padding:12px;border:3px solid var(--rpg-window-gold-dark,#73582D);background:var(--rpg-window-inset,#12110E);}
+#game-ui .v17358-reforge-lock-panel{padding:0;border:0;background:transparent;}
+#game-ui .v17358-reforge-lock-panel>h3{font-size:48px;margin-bottom:6px;}
+#game-ui .v17358-reforge-lock-list{display:flex;flex-direction:column;gap:0;}
+#game-ui .v141-smelting-affix{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;column-gap:12px;min-height:132px;padding:0;border-bottom:3px solid var(--rpg-window-gold-dark,#73582D);font-size:48px;line-height:1.35;}
+#game-ui .v141-smelting-affix>b{grid-column:2;overflow-wrap:anywhere;}
+#game-ui .v141-smelting-affix>.v17358-affix-lock{grid-column:3;grid-row:1 / span 2;}
+#game-ui .v141-reforge-slot-label{grid-column:1;grid-row:1 / span 2;font-size:39px;color:var(--rpg-window-text-muted,#B9AD98);}
+#game-ui .v141-reforge-old-value{grid-column:2;font-size:42px;color:var(--rpg-window-text-muted,#B9AD98);overflow-wrap:anywhere;}
+#game-ui .v17358-affix-lock{min-height:132px;padding:12px 18px;border:3px solid var(--rpg-window-gold-dark,#73582D);border-radius:18px;background:var(--rpg-window-inset,#12110E);color:var(--rpg-window-text,#EEE7D8);font-size:45px;}
+#game-ui .v17358-affix-lock.locked{border-color:var(--rpg-window-gold,#C69A45);background:#39250d;color:var(--rpg-window-gold-hi,#F0D38A);}
+#game-ui .v141-smelting-footer{flex:0 0 auto;padding:18px 24px;border-top:3px solid var(--rpg-window-gold-dark,#73582D);background:var(--rpg-window-panel,#201D17);}
+#game-ui .v141-smelting-footer p{margin:6px 0;font-size:42px;line-height:1.35;}
+#game-ui .v17358-reforge-material{padding:0;border:0;background:transparent;}
+#game-ui .v17358-reforge-tiers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+#game-ui .v17358-reforge-tier{display:flex;flex-direction:column;align-items:center;min-width:0;padding:0 3px;border:3px solid var(--rpg-window-gold-dark,#73582D);border-radius:18px;background:var(--rpg-window-inset,#12110E);color:var(--rpg-window-text,#EEE7D8);}
+#game-ui .v17358-reforge-tier.active{border-color:var(--rpg-window-gold,#C69A45);background:#39250d;}
+#game-ui .v141-smelting-tier-choice{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:100%;min-height:132px;padding:0;border:0;background:transparent;color:inherit;font-size:45px;}
+#game-ui .v141-smelting-tier-choice span{font-size:39px;line-height:1.25;overflow-wrap:anywhere;}
+#game-ui .v141-reforge-purchase{display:grid;grid-template-columns:132px minmax(0,1fr) minmax(0,1.45fr);gap:18px;align-items:center;margin-top:12px;}
+#game-ui .v141-reforge-material-source{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:132px;padding:0;border:0;background:transparent;color:var(--rpg-window-text-muted,#B9AD98);font-size:39px;line-height:1;}
+#game-ui .v141-reforge-material-source .v141-smelting-art{width:78px;height:78px;}
+#game-ui .v141-reforge-material-source>span:last-child{font-size:39px;}
+#game-ui .v141-reforge-cost{min-width:0;font-size:42px;line-height:1.35;overflow-wrap:anywhere;}
+#game-ui .v141-reforge-cost small{display:block;font-size:39px;color:var(--rpg-window-text-muted,#B9AD98);}
+#game-ui .v141-reforge-view .lack{color:#e8a092;}
+#game-ui .v141-reforge-view .ok{color:#b8d7a0;}
+#game-ui .v141-reforge-actions{display:flex;gap:18px;}
+#game-ui .v141-reforge-actions>button{flex:1;min-height:132px;font-size:45px;}
+#game-ui .v141-reforge-empty{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;}
+#game-ui .v141-smelting-plus{display:grid;place-items:center;width:168px;height:168px;border:3px dashed var(--rpg-window-gold,#C69A45);border-radius:18px;font-size:108px;}
 
 
 /* bundled source: css/39-v142-skill-animation.css */
