@@ -88,12 +88,12 @@ setTimeout(function(){
     var textRect=text.getBoundingClientRect();
     var rowRect=row.getBoundingClientRect(),rowStyle=getComputedStyle(row);
     var iconRect=row.querySelector('.skill-row-icon').getBoundingClientRect();
-    var actionRects=Array.from(row.querySelectorAll('.skill-action-card')).map(function(node){var r=node.getBoundingClientRect();return {left:r.left,right:r.right,width:r.width};});
+    var actionRects=Array.from(row.querySelectorAll('button')).map(function(node){var r=node.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width};});
     var contentWidth=rowRect.width-parseFloat(rowStyle.paddingLeft)-parseFloat(rowStyle.paddingRight)-parseFloat(rowStyle.borderLeftWidth)-parseFloat(rowStyle.borderRightWidth);
-    var availableTextWidth=contentWidth-iconRect.width-Math.max(...actionRects.map(function(r){return r.width;}))-parseFloat(rowStyle.columnGap)*2;
+    var availableTextWidth=contentWidth-iconRect.width-parseFloat(rowStyle.columnGap);
     scenes.push({id:id,label:label.textContent.trim(),disabled:action.disabled,
       width:rect.width,height:rect.height,fontSize:getComputedStyle(label).fontSize,
-      textWidth:textRect.width,availableTextWidth:availableTextWidth,textDoesNotOverlap:textRect.left>=iconRect.right&&actionRects.every(function(r){return textRect.right<=r.left;}),textFits:text.scrollWidth<=text.clientWidth+1,textFont:getComputedStyle(text.querySelector(".skill-row-desc")).fontSize,
+      textWidth:textRect.width,availableTextWidth:availableTextWidth,textDoesNotOverlap:textRect.left>=iconRect.right&&actionRects.every(function(r){return r.top>=textRect.bottom-1&&r.left>=rowRect.left&&r.right<=rowRect.right+1;}),textFits:text.scrollWidth<=text.clientWidth+1,textFont:getComputedStyle(text.querySelector(".skill-row-desc")).fontSize,
       labelFits:label.scrollWidth<=label.clientWidth+1,
       gate:characterSkillLoadouts.fire.skillLevels[id]
         ?window.v17364GetSkillUpgradeEligibility(player,skillDatabase[id],characterSkillLoadouts.fire.skillLevels[id])
@@ -153,8 +153,8 @@ try{
         assert.ok(row.width<=112&&row.width>=72,"canonical compact button width: "+JSON.stringify(row));
         assert.ok(row.height>=44,"skill action touch height");
         assert.ok(parseFloat(row.fontSize)>=13&&parseFloat(row.textFont)>=13,"readable skill text");
-        // The grid owner reserves one action column; growth/equip stack in it.
-        // Text retains the remaining width and must never intersect either action.
+        // The description spans the space beside the icon. All detail/growth/equip
+        // controls occupy the following row and remain inside the card bounds.
         assert.ok(row.textWidth>0&&Math.abs(row.textWidth-row.availableTextWidth)<=1,"description occupies remaining row width: "+JSON.stringify(row));
         assert.equal(row.textDoesNotOverlap,true,"description must not overlap icon or actions");
         assert.equal(row.textFits,true,"skill text must fit its column");

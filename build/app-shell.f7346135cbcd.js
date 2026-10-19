@@ -29880,6 +29880,7 @@ function renderSkillLoadout(){
         box.className =
             "skill-row";
         box.dataset.skillId=skillId;
+        box.dataset.skillState=isMaxLevel?"mastered":isLearned?"learned":"unlearned";
 
 
         let actionLabel;
@@ -29968,7 +29969,8 @@ function renderSkillLoadout(){
         ></div>
 
         <div class="skill-row-text">
-            <b>${skill.name}</b>
+            <div class="skill-row-heading"><b>${skill.name}</b></div>
+            <div class="skill-row-meta">
             <span class="skill-category-badge ${skill.category}">${getSkillCategoryLabel(skill.category)}</span>
             ${
             isLearned
@@ -29982,9 +29984,9 @@ function renderSkillLoadout(){
                     ""
                 )
                 :
-                ""
+                "未學習"
             }
-            <br>
+            </div>
             <span class="skill-row-desc">
                 ${skill.description}
             </span>
@@ -29993,21 +29995,21 @@ function renderSkillLoadout(){
                 !prereqMet&&eligibility.prerequisiteRequired
                 ?
                 `
-                <br>
-                <span style="color:#f59e0b;">
-                    🔒 ${eligibility.reason}
+                <span class="skill-row-prerequisite">
+                    ${eligibility.reason}
                 </span>
                 `
                 :
                 ""
             }
-            <span
+        </div>
+            <button type="button"
                 class="skill-row-detail-link"
                 onclick="showSkillDetail('${skillId}')"
+                aria-label="查看${skill.name}詳情"
             >
-                ……詳細»
-            </span>
-        </div>
+                詳情 <span aria-hidden="true">›</span>
+            </button>
 
         <button
             type="button"
