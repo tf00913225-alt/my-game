@@ -1682,12 +1682,8 @@
         };
     };
     window.v131GrantElementBoxHours=function(hours,maxHours){
-        const safeHours=Math.max(0,Number(hours)||0);
-        const capMs=Math.max(0,Number(maxHours)||32)*60*60*1000;
-        elementBoxState.remainingMs=Math.min(
-            capMs,
-            Math.max(0,elementBoxState.remainingMs)+safeHours*60*60*1000
-        );
+        elementBoxState.remainingMs=window.FourSymbolsAccountModeTimePolicy.grantElementBox(
+            elementBoxState.remainingMs,hours,maxHours);
         persistElementBoxState();
         updateElementBoxStatsUI();
         return Math.max(0,Math.floor(elementBoxState.remainingMs));
@@ -1698,11 +1694,11 @@
         const delta=Math.max(0,now-elementBoxLastTick);
         elementBoxLastTick=now;
         if(elementBoxActive && elementBoxState.remainingMs>0){
-            const used=Math.min(delta,elementBoxState.remainingMs);
-            elementBoxState.remainingMs-=used;
-            elementBoxSession.activeMs+=used;
-            if(elementBoxState.remainingMs<=0){
-                elementBoxState.remainingMs=0;
+            const debit=window.FourSymbolsAccountModeTimePolicy.debitElementBox(
+                elementBoxState.remainingMs,delta,elementBoxActive);
+            elementBoxState.remainingMs=debit.remainingMs;
+            elementBoxSession.activeMs+=debit.used;
+            if(debit.exhausted){
                 stopElementBoxWhenTimeEnds();
             }
         }
@@ -6253,32 +6249,11 @@
     }
 
     function accrueRestedMilliseconds(elapsedMs){
-        const safeElapsed=Math.max(0,Math.floor(Number(elapsedMs)||0));
-        if(safeElapsed<=0 || restedState.battles>=RESTED_EXP_MAX_BATTLES){
-            if(restedState.battles>=RESTED_EXP_MAX_BATTLES){
-                restedState.progressMs=0;
-            }
-            return 0;
-        }
-
-        /* 超過累積上限所需的時間沒有差別，先封頂避免異常時鐘
-           產生不必要的大數字。 */
-        const cappedElapsed=Math.min(
-            safeElapsed,
-            RESTED_EXP_MAX_BATTLES*RESTED_EXP_MS_PER_BATTLE
-        );
-        const totalMs=restedState.progressMs+cappedElapsed;
-        const earned=Math.floor(totalMs/RESTED_EXP_MS_PER_BATTLE);
-        const accepted=Math.min(
-            earned,
-            RESTED_EXP_MAX_BATTLES-restedState.battles
-        );
-
-        restedState.battles+=accepted;
-        restedState.progressMs=restedState.battles>=RESTED_EXP_MAX_BATTLES
-            ? 0
-            : totalMs-earned*RESTED_EXP_MS_PER_BATTLE;
-        return accepted;
+        const result=window.FourSymbolsAccountModeTimePolicy.accrueRested(
+            restedState.battles,restedState.progressMs,elapsedMs);
+        restedState.battles=result.battles;
+        restedState.progressMs=result.progressMs;
+        return result.accepted;
     }
 
     function getNextRestedBattleText(){
