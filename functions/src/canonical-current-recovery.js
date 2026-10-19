@@ -11,7 +11,9 @@ const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
-const {decodeRecoveryAuditArtifact}=require("./recovery-audit-artifact");
+const {decodeRecoveryAuditArtifact,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
+    inventoryDocumentMetadata,INVENTORY_LIMITS}=require("./recovery-audit-artifact");
+const {createHash}=require("node:crypto");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 const SETS={
@@ -25,6 +27,8 @@ const SINGLES={account:"current",economy:"current",relicLoadout:"current",
     progress:"current",claimCheckpoint:"current"};
 const RECOVERY_AUDIT_FENCE_COLLECTION="recoveryAuditFence";
 const RECOVERY_AUDIT_RUN_COLLECTION="recoveryAuditRuns";
+const RECOVERY_INVENTORY_STATE_COLLECTION="captureState";
+const RECOVERY_INVENTORY_PAGE_COLLECTION="inventoryPages";
 const HEX=/^[a-f0-9]{64}$/;
 const SESSION_ID=/^[A-Za-z0-9_-]{32}$/;
 function inspectRecoveryAuditFence(value,uid,fail){
@@ -240,6 +244,158 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 cancelledBySessionId:session.sessionId,cancelledBySessionRevision:session.revision,updatedAt:FieldValue.serverTimestamp()};
             tx.set(fenceRef,next);tx.set(runRef,{...next,kind:"canonical-recovery-audit-run",beginIntentSha256:run.beginIntentSha256});
             return {auditId:run.auditId,epoch:run.epoch,status:"cancelled",unchanged:false};
+        });
+    }
+    const inventoryFlags=Object.freeze({authoritativeStateReady:false,candidateProofValid:false,trustedCaptureVerified:false,restoreAuthorized:false});
+    function inventoryExact(row,keys,label){
+        if(!row||Object.keys(row).sort().join("|")!==keys.slice().sort().join("|"))fail("data-loss",`Inventory ${label} shape differs.`);
+    }
+    const inventoryHash=bytes=>createHash("sha256").update(bytes).digest("hex");
+    const inventoryCompare=(a,b)=>Buffer.compare(Buffer.from(a,"utf8"),Buffer.from(b,"utf8"));
+    const inventoryId=id=>typeof id==="string"&&id.length>0&&!id.includes("/")&&Buffer.from(id,"utf8").toString("utf8")===id;
+    const inventoryBinding=run=>Object.fromEntries(["ownerUid","auditId","epoch","sessionId","sessionRevision","sourceRevision",
+        "sourceSha256","snapshotSha256","approvalOperationId","approvalBindingSha256"].map(key=>[key,run[key]]));
+    function inventoryStateHash(row){const {stateSha256,createdAt,updatedAt,...payload}=row;return snapshotDigest(payload);}
+    function inspectInventoryState(row,run,namespaces){
+        const binding=inventoryBinding(run);
+        inventoryExact(row,["schemaVersion","kind",...Object.keys(binding),"prepareOperationId","prepareIntentSha256","namespaceListSha256",
+            "phase","namespaceIndex","afterDocumentId","nextSequence","capturedCount","lastPageOperationId","lastPageSha256",
+            "inventoryExhausted","stateSha256","createdAt","updatedAt"],"state");
+        if(row.schemaVersion!==1||row.kind!=="canonical-recovery-inventory-state"||
+           Object.keys(binding).some(key=>row[key]!==binding[key])||!OPERATION_ID.test(row.prepareOperationId||"")||
+           row.prepareIntentSha256!==snapshotDigest({action:"prepare-inventory",auditId:run.auditId,expectedEpoch:run.epoch,operationId:row.prepareOperationId})||
+           row.namespaceListSha256!==snapshotDigest(namespaces)||!["preparing","inventory","blocked"].includes(row.phase)||
+           !Number.isSafeInteger(row.namespaceIndex)||row.namespaceIndex<0||row.namespaceIndex>namespaces.length||
+           !(row.afterDocumentId===null||inventoryId(row.afterDocumentId))||!Number.isSafeInteger(row.nextSequence)||row.nextSequence<1||
+           !Number.isSafeInteger(row.capturedCount)||row.capturedCount<0||
+           row.inventoryExhausted!==(row.namespaceIndex===namespaces.length)||
+           (row.inventoryExhausted&&row.afterDocumentId!==null)||
+           typeof row.createdAt?.toMillis!=="function"||typeof row.updatedAt?.toMillis!=="function"||
+           !HEX.test(row.stateSha256||"")||row.stateSha256!==inventoryStateHash(row)||
+           (row.nextSequence===1?(row.phase!=="preparing"||row.namespaceIndex!==0||row.afterDocumentId!==null||row.capturedCount!==0||
+               row.lastPageOperationId!==null||row.lastPageSha256!==null):
+               (row.phase==="preparing"||!OPERATION_ID.test(row.lastPageOperationId||"")||!HEX.test(row.lastPageSha256||"")))){
+            fail("data-loss","Inventory state is inconsistent.");
+        }
+        return row;
+    }
+    async function inventoryContext(tx,session,auditId,epoch){
+        const root=db.collection("serverUsers").doc(session.uid);
+        const [fenceSnap,runSnap]=await Promise.all([
+            tx.get(root.collection(RECOVERY_AUDIT_FENCE_COLLECTION).doc("current")),
+            tx.get(root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(auditId))]);
+        const fence=inspectRecoveryAuditFence(fenceSnap.exists?fenceSnap.data():undefined,session.uid,fail),run=inspectAuditRun(runSnap.data(),session.uid,auditId);
+        matchingAuditFence(fence,run);
+        if(run.status!=="active"||run.epoch!==epoch||run.sessionId!==session.sessionId||run.sessionRevision!==session.revision)
+            fail("failed-precondition","Inventory audit epoch or session is no longer current.");
+        const binding=await verifyAuditApproval(tx,root,session.uid,run.sourceRevision,run.approvalOperationId);
+        if(Object.keys(binding).some(key=>binding[key]!==run[key]))fail("data-loss","Inventory approval binding changed.");
+        const runRef=root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(auditId);
+        return {run,namespaces:recoveryAuditNamespaces(session.uid,2),stateRef:runRef.collection(RECOVERY_INVENTORY_STATE_COLLECTION).doc("current"),runRef};
+    }
+    async function prepareInventory(request,args){
+        auditIntent("prepare inventory",args,["auditId","expectedEpoch","operationId"]);
+        return runRecoveryAuditMaintenance(request,args.auditId,async(tx,session)=>{
+            const {run,namespaces,stateRef}=await inventoryContext(tx,session,args.auditId,args.expectedEpoch);
+            const snap=await tx.get(stateRef),intentSha256=snapshotDigest({action:"prepare-inventory",...args});
+            if(snap.exists){
+                const state=inspectInventoryState(snap.data(),run,namespaces);
+                if(state.prepareIntentSha256!==intentSha256)fail("already-exists","Inventory preparation has another intent.");
+                return {...inventoryFlags,auditId:run.auditId,epoch:run.epoch,prepareSha256:intentSha256,nextSequence:1,phase:"preparing",unchanged:true};
+            }
+            const stamp=FieldValue.serverTimestamp(),state={schemaVersion:1,kind:"canonical-recovery-inventory-state",...inventoryBinding(run),
+                prepareOperationId:args.operationId,prepareIntentSha256:intentSha256,namespaceListSha256:snapshotDigest(namespaces),
+                phase:"preparing",namespaceIndex:0,afterDocumentId:null,nextSequence:1,capturedCount:0,lastPageOperationId:null,
+                lastPageSha256:null,inventoryExhausted:false,createdAt:stamp,updatedAt:stamp};
+            state.stateSha256=inventoryStateHash(state);tx.create(stateRef,state);
+            return {...inventoryFlags,auditId:run.auditId,epoch:run.epoch,prepareSha256:intentSha256,nextSequence:1,phase:"preparing",unchanged:false};
+        });
+    }
+    function inspectInventoryPage(row,args,run,state,namespaces,pendingCreate=false){
+        inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","intentSha256","payloadSha256","payloadBytes","createdAt"],"page");
+        if(row.schemaVersion!==1||row.kind!=="canonical-recovery-inventory-page"||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||
+           row.epoch!==run.epoch||row.operationId!==args.operationId||row.intentSha256!==snapshotDigest({action:"capture-inventory-page",...args})||
+           !HEX.test(row.payloadSha256||"")||!Buffer.isBuffer(row.payloadBytes)||inventoryHash(row.payloadBytes)!==row.payloadSha256||
+           (!pendingCreate&&typeof row.createdAt?.toMillis!=="function"))fail("data-loss","Inventory page seal is inconsistent.");
+        let payload;try{payload=decodeInventoryPayload(row.payloadBytes);}catch(error){fail("data-loss",error.message);}
+        inventoryExact(payload,["schemaVersion","sequence","namespaceIndex","namespacePath","cursorBefore","cursorAfter","entries",
+            "terminalEmpty","inventoryExhausted","previousPageSha256","auditBindingSha256"],"payload");
+        if(payload.schemaVersion!==1||payload.sequence!==args.expectedSequence||!Number.isSafeInteger(payload.sequence)||payload.sequence<1||
+           !Number.isSafeInteger(payload.namespaceIndex)||payload.namespaceIndex<0||payload.namespaceIndex>=namespaces.length||
+           payload.namespacePath!==namespaces[payload.namespaceIndex]||!(payload.cursorBefore===null||inventoryId(payload.cursorBefore))||
+           !Array.isArray(payload.entries)||payload.entries.length>INVENTORY_LIMITS.rows||
+           payload.terminalEmpty!==(payload.entries.length===0)||
+           payload.inventoryExhausted!==(payload.terminalEmpty&&payload.namespaceIndex===namespaces.length-1)||
+           payload.auditBindingSha256!==snapshotDigest(inventoryBinding(run))||
+           (payload.sequence===1?(payload.namespaceIndex!==0||payload.cursorBefore!==null||payload.previousPageSha256!==null):!HEX.test(payload.previousPageSha256||"")))
+            fail("data-loss","Inventory page payload is inconsistent.");
+        let previous=payload.cursorBefore;
+        for(const entry of payload.entries){
+            inventoryExact(entry,["id","updateTime","typedDataSha256","typedDataByteLength"],"entry");
+            inventoryExact(entry.updateTime,["seconds","nanoseconds"],"version");
+            const version=entry.updateTime;
+            if(!inventoryId(entry.id)||(previous!==null&&inventoryCompare(previous,entry.id)>=0)||!HEX.test(entry.typedDataSha256||"")||
+               !Number.isSafeInteger(entry.typedDataByteLength)||entry.typedDataByteLength<1||entry.typedDataByteLength>2*1024*1024||
+               !Number.isInteger(version.seconds)||version.seconds<-62135596800||version.seconds>253402300799||
+               !Number.isInteger(version.nanoseconds)||version.nanoseconds<0||version.nanoseconds>999999999)fail("data-loss","Inventory entry is inconsistent.");
+            previous=entry.id;
+        }
+        if(payload.cursorAfter!==(payload.entries.length?previous:null)||payload.sequence>=state.nextSequence||payload.namespaceIndex>state.namespaceIndex||
+           state.capturedCount<payload.entries.length||(state.nextSequence===2&&state.capturedCount!==payload.entries.length))
+            fail("data-loss","Inventory page and state differ.");
+        if(payload.sequence===state.nextSequence-1&&(state.lastPageOperationId!==row.operationId||state.lastPageSha256!==row.payloadSha256||
+           state.namespaceIndex!==payload.namespaceIndex+(payload.terminalEmpty?1:0)||state.afterDocumentId!==payload.cursorAfter||
+           state.inventoryExhausted!==payload.inventoryExhausted))fail("data-loss","Inventory latest page and state differ.");
+        if(payload.namespaceIndex===state.namespaceIndex&&payload.entries.length&&
+           (state.afterDocumentId===null||inventoryCompare(state.afterDocumentId,payload.cursorAfter)<0))fail("data-loss","Inventory cursor precedes its receipt.");
+        return payload;
+    }
+    function inventoryPageResult(args,run,payload,sha256,unchanged){
+        return {...inventoryFlags,auditId:run.auditId,epoch:run.epoch,operationId:args.operationId,sequence:payload.sequence,
+            namespaceIndex:payload.namespaceIndex,cursorBefore:payload.cursorBefore,cursorAfter:payload.cursorAfter,
+            entryCount:payload.entries.length,terminalEmpty:payload.terminalEmpty,inventoryExhausted:payload.inventoryExhausted,pageSha256:sha256,unchanged};
+    }
+    async function captureInventoryPage(request,args){
+        auditIntent("capture inventory page",args,["auditId","expectedEpoch","operationId","expectedSequence"]);
+        if(!Number.isSafeInteger(args.expectedSequence)||args.expectedSequence<1)fail("invalid-argument","An inventory sequence is required.");
+        return runRecoveryAuditMaintenance(request,args.auditId,async(tx,session)=>{
+            const {run,namespaces,stateRef,runRef}=await inventoryContext(tx,session,args.auditId,args.expectedEpoch);
+            const pageRef=runRef.collection(RECOVERY_INVENTORY_PAGE_COLLECTION).doc(args.operationId);
+            const [stateSnap,pageSnap]=await Promise.all([tx.get(stateRef),tx.get(pageRef)]);
+            const state=inspectInventoryState(stateSnap.data(),run,namespaces);
+            if(pageSnap.exists){
+                const row=pageSnap.data(),payload=inspectInventoryPage(row,args,run,state,namespaces);
+                return inventoryPageResult(args,run,payload,row.payloadSha256,true);
+            }
+            if(state.phase==="blocked"||state.inventoryExhausted||state.nextSequence!==args.expectedSequence)
+                fail("failed-precondition","Inventory cursor is not current.");
+            const namespace=namespaces[state.namespaceIndex];
+            let query=db.collection(namespace).orderBy("__name__");
+            if(state.afterDocumentId!==null)query=query.startAfter(db.doc(`${namespace}/${state.afterDocumentId}`));
+            const rows=await tx.get(query.limit(INVENTORY_LIMITS.rows));
+            let entries,payload,payloadBytes;
+            try{
+                entries=rows.docs.map(doc=>inventoryDocumentMetadata(doc,namespace));
+                if(rows.size!==entries.length||entries.length>INVENTORY_LIMITS.rows)throw Error("Invalid inventory query result");
+                let previous=state.afterDocumentId;
+                for(const entry of entries){if(previous!==null&&inventoryCompare(previous,entry.id)>=0)throw Error("Invalid inventory query ordering");previous=entry.id;}
+                payload={schemaVersion:1,sequence:args.expectedSequence,namespaceIndex:state.namespaceIndex,namespacePath:namespace,
+                    cursorBefore:state.afterDocumentId,cursorAfter:entries.length?previous:null,entries,terminalEmpty:entries.length===0,
+                    inventoryExhausted:entries.length===0&&state.namespaceIndex===namespaces.length-1,
+                    previousPageSha256:state.lastPageSha256,auditBindingSha256:snapshotDigest(inventoryBinding(run))};
+                payloadBytes=encodeInventoryPayload(payload);
+            }catch(error){fail("data-loss",error.message);}
+            const nextSequence=state.nextSequence+1,capturedCount=state.capturedCount+entries.length;
+            if(!Number.isSafeInteger(nextSequence)||!Number.isSafeInteger(capturedCount))fail("failed-precondition","Inventory sequence is exhausted.");
+            const stamp=FieldValue.serverTimestamp(),sha256=inventoryHash(payloadBytes),next={...state,phase:"inventory",
+                namespaceIndex:state.namespaceIndex+(payload.terminalEmpty?1:0),afterDocumentId:payload.cursorAfter,nextSequence,capturedCount,
+                lastPageOperationId:args.operationId,lastPageSha256:sha256,inventoryExhausted:payload.inventoryExhausted,updatedAt:stamp};
+            next.stateSha256=inventoryStateHash(next);
+            const page={schemaVersion:1,kind:"canonical-recovery-inventory-page",ownerUid:run.ownerUid,auditId:run.auditId,epoch:run.epoch,
+                operationId:args.operationId,intentSha256:snapshotDigest({action:"capture-inventory-page",...args}),payloadSha256:sha256,payloadBytes,createdAt:stamp};
+            inspectInventoryPage(page,args,run,next,namespaces,true);
+            tx.create(pageRef,page);tx.set(stateRef,next);
+            return inventoryPageResult(args,run,payload,sha256,false);
         });
     }
     async function verifyDebitRecoveryEvidence(tx,root,uid,expectedRevision,records,doc,ledger,receipt){
@@ -830,8 +986,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             fail("data-loss",error.message);
         }
     }
-    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,beginAudit,resumeAudit,cancelAudit});
+    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage});
 }
 
 module.exports={createCanonicalCurrentRecovery,inspectRecoveryAuditFence,
-    RECOVERY_AUDIT_FENCE_COLLECTION,RECOVERY_AUDIT_RUN_COLLECTION};
+    RECOVERY_AUDIT_FENCE_COLLECTION,RECOVERY_AUDIT_RUN_COLLECTION,RECOVERY_INVENTORY_STATE_COLLECTION,RECOVERY_INVENTORY_PAGE_COLLECTION};

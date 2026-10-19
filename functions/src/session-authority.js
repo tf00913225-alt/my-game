@@ -1,7 +1,8 @@
 "use strict";
 
 const {createHash,randomBytes,timingSafeEqual}=require("node:crypto");
-const {inspectRecoveryAuditFence,RECOVERY_AUDIT_FENCE_COLLECTION,RECOVERY_AUDIT_RUN_COLLECTION}=require("./canonical-current-recovery");
+const {inspectRecoveryAuditFence,RECOVERY_AUDIT_FENCE_COLLECTION,RECOVERY_AUDIT_RUN_COLLECTION,
+    RECOVERY_INVENTORY_STATE_COLLECTION,RECOVERY_INVENTORY_PAGE_COLLECTION}=require("./canonical-current-recovery");
 const SCHEMA_VERSION=1;
 const ID_PATTERN=/^[A-Za-z0-9_-]{32}$/;
 const SECRET_PATTERN=/^[A-Za-z0-9_-]{43}$/;
@@ -141,8 +142,14 @@ function createSessionAuthority({db,FieldValue,HttpsError,now=Date.now}){
             for(const method of ["create","set","update","delete"]){
                 facade[method]=(reference,...args)=>{
                     if(mode==="ordinary"&&fence?.status==="active")fail("RECOVERY_AUDIT_MAINTENANCE","failed-precondition");
-                    if(mode==="maintenance"&&![fencePath,`serverUsers/${session.uid}/${RECOVERY_AUDIT_RUN_COLLECTION}/${auditId}`].includes(reference?.path)){
-                        fail("RECOVERY_AUDIT_WRITE_SCOPE");
+                    if(mode==="maintenance"){
+                        const auditPath=`serverUsers/${session.uid}/${RECOVERY_AUDIT_RUN_COLLECTION}/${auditId}`;
+                        const pagePrefix=`${auditPath}/${RECOVERY_INVENTORY_PAGE_COLLECTION}/`;
+                        const pageId=reference?.path?.startsWith(pagePrefix)?reference.path.slice(pagePrefix.length):null;
+                        const inventoryState=reference?.path===`${auditPath}/${RECOVERY_INVENTORY_STATE_COLLECTION}/current`;
+                        if(![fencePath,auditPath].includes(reference?.path)&&
+                           !(inventoryState&&["create","set"].includes(method))&&
+                           !(method==="create"&&/^[A-Za-z0-9_-]{16,64}$/.test(pageId||"")))fail("RECOVERY_AUDIT_WRITE_SCOPE");
                     }
                     if(mode==="maintenance"&&method==="delete")fail("RECOVERY_AUDIT_WRITE_SCOPE");
                     if(mode==="session"&&![session.reference.path,session.recordRef.path].includes(reference?.path))fail("SESSION_WRITE_SCOPE");

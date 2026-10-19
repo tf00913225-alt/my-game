@@ -6,7 +6,7 @@ import {createRequire} from "node:module";
 import {createHash,randomBytes} from "node:crypto";
 const require=createRequire(new URL("../functions/package.json",import.meta.url));
 const {initializeApp}=require("firebase-admin/app");
-const {getFirestore,Timestamp,FieldValue}=require("firebase-admin/firestore");
+const {getFirestore,Timestamp,FieldValue,FieldPath}=require("firebase-admin/firestore");
 const {getAuth}=require("firebase-admin/auth");
 const {HttpsError}=require("firebase-functions/v2/https");
 const {createSessionAuthority}=require("../functions/src/session-authority.js");
@@ -3703,6 +3703,203 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
     assert.equal((await probe.get()).get("afterCancel"),true);
     console.log("PASS recovery audit fence: actual absent-read SDK retry blocks later writes; zero/private writers, approval and maintenance scope; reads/original retries survive; real takeover/revoke and expired-approval source-loss cancel; canonical readiness stays false.");
     console.log("PASS actual ordinary-writer versus begin race on missing fence: server commit timestamps or zero-write maintenance rejection prove serialization; cancel restores normal writes.");
+}
+
+// Real SDK inventory capture remains an internal, metadata-only audit segment.
+// No artifact promotion, restore permit or additional callable is exercised.
+{
+    const {recoveryAuditNamespaces,decodeInventoryPayload}=require("../functions/src/recovery-audit-artifact.js");
+    const {createCanonicalPatrolSettlement}=require("../functions/src/canonical-patrol-settlement.js");
+    const email="recovery-inventory-pages@example.test",account=await login("accounts:signUp",{email,password});
+    const uid=account.localId,root=db.collection("serverUsers").doc(uid),save=db.doc(`users/${uid}/saves/current`);
+    let token=account.idToken,session=await invoke("createGameSession",token,{uid});
+    const empty=await invoke("bootstrapCloudSave",token,{uid,session});
+    await invoke("createInitialCanonicalCharacter",token,{uid,session,selection:choices,expectedRevision:empty.serverRevision});
+    let clock=(await checkRecoveryArchive(uid,2)).get("sourceRecords.progress.playableState.lastSaveTimestamp");
+    const attempts=[];
+    const observedDb={doc:path=>db.doc(path),runTransaction:callback=>db.runTransaction(async raw=>{
+        const attempt={reads:0,queries:0,writes:0,paths:[]};attempts.push(attempt);
+        const tx={get:async reference=>{
+            const result=await raw.get(reference);
+            const query=typeof reference.collection!=="function";
+            attempt.reads+=query?Math.max(1,result.size):1;
+            if(query)attempt.queries++;
+            else attempt.paths.push(reference.path);
+            return result;
+        }};
+        for(const method of ["create","set","update","delete"])tx[method]=(...args)=>{
+            attempt.writes++;return raw[method](...args);
+        };
+        return callback(tx);
+    })};
+    const authority=createSessionAuthority({db:observedDb,FieldValue,HttpsError,now:()=>clock});
+    const request=()=>({auth:{uid,token:claims(token)},data:{uid,session}});
+    const deps={db,FieldValue,Timestamp,HttpsError,now:()=>clock,inspectExistingEnvelope,nextRevision,
+        runProtected:authority.runProtected,runRecoveryAuditMaintenance:authority.runRecoveryAuditMaintenance};
+    const recovery=createCanonicalCurrentRecovery(deps),patrol=createCanonicalPatrolSettlement(deps);
+    // Real zero-value events provide a namespace longer than one page without
+    // inserting fabricated economics, receipts or source revisions.
+    for(let sequence=0;sequence<18;sequence++)await patrol.observePresence(request(),{
+        operationId:`inventory-mode-event-${String(sequence).padStart(8,"0")}`,expectedRevision:2,expectedSequence:sequence,
+        intent:sequence===0?"reopen":"heartbeat",elementBox:"keep"});
+    const auditId="inventory-audit-operation-001",approvalOperationId="inventory-approval-operation1";
+    await createCanonicalRecoveryApproval(deps).issue({auth:{uid:"inventory-audit-operator",token:{cloudSaveOperator:true}},
+        data:{ownerUid:uid,operationId:approvalOperationId,sourceRevision:2,ttlSeconds:60}});
+    await recovery.beginAudit(request(),{operationId:auditId,expectedRevision:2,approvalOperationId});
+    const runRef=root.collection("recoveryAuditRuns").doc(auditId),fenceRef=root.collection("recoveryAuditFence").doc("current");
+    const stateRef=runRef.collection("captureState").doc("current"),pageRef=id=>runRef.collection("inventoryPages").doc(id);
+    const pair=value=>value?{seconds:value.seconds,nanoseconds:value.nanoseconds}:null;
+    const row=snapshot=>({exists:snapshot.exists,data:snapshot.data()??null,updateTime:pair(snapshot.updateTime)});
+    const controls=await Promise.all([runRef.get(),fenceRef.get()]).then(rows=>rows.map(row));
+    const namespacePaths=recoveryAuditNamespaces(uid,2),expected=new Map();
+    for(const path of namespacePaths){
+        const snapshot=await db.collection(path).orderBy(FieldPath.documentId()).get();
+        expected.set(path,snapshot.docs.map(doc=>({path:doc.ref.path,updateTime:pair(doc.updateTime)})));
+    }
+    const assets=async()=>{
+        const paths=["account","characters","economy","inventory","equipment","relics","relicLoadout","progress","claimCheckpoints","claimRecords"];
+        const result=[[save.path,row(await save.get())]];
+        for(const name of paths)for(const doc of (await root.collection(name).get()).docs)result.push([doc.ref.path,row(doc)]);
+        return result.sort(([a],[b])=>Buffer.compare(Buffer.from(a),Buffer.from(b)));
+    };
+    const assetBefore=await assets();
+    const closed=result=>{
+        for(const key of ["authoritativeStateReady","candidateProofValid","trustedCaptureVerified","restoreAuthorized"])
+            assert.equal(result[key],false,key+" must stay closed during inventory capture");
+    };
+    async function measured(operation,{reads,writes,queries}={}){
+        const start=attempts.length,result=await operation(),actual=attempts.slice(start);
+        assert.ok(actual.length>0);
+        for(const attempt of actual){
+            if(reads!==undefined)assert.ok(attempt.reads<=reads,`Inventory attempt read budget ${attempt.reads}>${reads}`);
+            if(writes!==undefined)assert.ok(attempt.writes<=writes);
+            if(queries!==undefined)assert.equal(attempt.queries,queries);
+            else assert.ok(attempt.queries<=1,"A capture attempt may execute only one bounded namespace query");
+            assert.ok(attempt.paths.includes(root.collection("sessionAuthority").doc("current").path));
+            assert.ok(attempt.paths.includes(fenceRef.path));
+        }
+        closed(result);return {result,actual};
+    }
+    const prepare={auditId,expectedEpoch:1,operationId:"inventory-prepare-operation1"};
+    const prepareRollback=createCanonicalCurrentRecovery({...deps,
+        runRecoveryAuditMaintenance:(req,id,operation)=>authority.runRecoveryAuditMaintenance(req,id,async(tx,active)=>{
+            await operation(tx,active);throw Error("inventory preparation rollback after staged state");
+        })});
+    await assert.rejects(()=>prepareRollback.prepareInventory(request(),prepare),/inventory preparation rollback/);
+    assert.equal((await stateRef.get()).exists,false);
+    const prepared=await measured(()=>recovery.prepareInventory(request(),prepare),{reads:10,writes:1,queries:0});
+    assert.equal(prepared.result.nextSequence,1);
+    assert.equal((await stateRef.get()).exists,true);
+    const prepareVersion=row(await stateRef.get());
+    const preparedRetry=await measured(()=>recovery.prepareInventory(request(),prepare),{reads:10,writes:0,queries:0});
+    assert.equal(preparedRetry.result.unchanged,true);assert.deepEqual(row(await stateRef.get()),prepareVersion);
+    let sequence=1,operationSerial=0;
+    const input=()=>({auditId,expectedEpoch:1,operationId:`inventory-page-${String(++operationSerial).padStart(8,"0")}`,expectedSequence:sequence});
+    const pages=[];
+    async function accept(args,result){
+        assert.equal(result.sequence,sequence);assert.ok(result.entryCount<=16);
+        assert.equal(result.terminalEmpty,result.entryCount===0);
+        const stored=await pageRef(args.operationId).get();assert.equal(stored.exists,true);
+        const data=stored.data();assert.ok(Buffer.isBuffer(data.payloadBytes));assert.ok(data.payloadBytes.length<=128*1024);
+        assert.equal(createHash("sha256").update(data.payloadBytes).digest("hex"),result.pageSha256);
+        const payload=decodeInventoryPayload(data.payloadBytes),path=namespacePaths[result.namespaceIndex];
+        assert.equal(payload.namespacePath,path);assert.equal(payload.sequence,sequence);
+        const offset=pages.filter(page=>page.result.namespaceIndex===result.namespaceIndex)
+            .reduce((sum,page)=>sum+page.result.entryCount,0);
+        assert.deepEqual(payload.entries.map(entry=>({path:`${path}/${entry.id}`,updateTime:entry.updateTime})),
+            expected.get(path).slice(offset,offset+result.entryCount),"Exact SDK updateTime seconds and nanoseconds must survive the typed payload");
+        for(const entry of payload.entries){
+            assert.deepEqual(Object.keys(entry).sort(),["id","typedDataByteLength","typedDataSha256","updateTime"]);
+            assert.match(entry.typedDataSha256,/^[a-f0-9]{64}$/);assert.ok(entry.typedDataByteLength>0);
+        }
+        pages.push({args,result,data});sequence++;
+    }
+    // A real staged-write rollback must retain neither the new page nor its
+    // cursor advance. The same operation can subsequently commit normally.
+    const first=input(),beforeRollback=row(await stateRef.get());
+    const rollback=createCanonicalCurrentRecovery({...deps,
+        runRecoveryAuditMaintenance:(req,id,operation)=>authority.runRecoveryAuditMaintenance(req,id,async(tx,active)=>{
+            await operation(tx,active);throw Error("inventory rollback after staged page writes");
+        })});
+    await assert.rejects(()=>rollback.captureInventoryPage(request(),first),/inventory rollback/);
+    assert.deepEqual(row(await stateRef.get()),beforeRollback);assert.equal((await pageRef(first.operationId).get()).exists,false);
+    const firstResult=await measured(()=>recovery.captureInventoryPage(request(),first),{reads:27,writes:2});
+    await accept(first,firstResult.result);
+    assert.equal(firstResult.result.entryCount,1);assert.equal(firstResult.result.terminalEmpty,false,
+        "A nonempty namespace with fewer than16 rows still needs a real empty query");
+    const originalPage=row(await pageRef(first.operationId).get()),originalState=row(await stateRef.get());
+    const replay=await measured(()=>recovery.captureInventoryPage(request(),first),{reads:11,writes:0,queries:0});
+    assert.equal(replay.result.unchanged,true);assert.equal(replay.result.pageSha256,firstResult.result.pageSha256);
+    assert.deepEqual(row(await pageRef(first.operationId).get()),originalPage);assert.deepEqual(row(await stateRef.get()),originalState);
+    await assert.rejects(()=>recovery.captureInventoryPage(request(),{...first,expectedSequence:first.expectedSequence+1}));
+    assert.deepEqual(row(await stateRef.get()),originalState);
+    await pageRef(first.operationId).update({payloadSha256:"0".repeat(64)}); // Explicit emulator-only receipt damage.
+    await assert.rejects(()=>recovery.captureInventoryPage(request(),first),/seal|inconsistent|digest/i);
+    assert.deepEqual(row(await stateRef.get()),originalState);
+    await pageRef(first.operationId).set(originalPage.data); // Restore only the deliberately damaged test proof.
+    // Keep real same-operation concurrency. Both first attempts may query;
+    // only the committed retry is required to avoid another query.
+    const concurrent=input();
+    const race=await measured(()=>Promise.all([recovery.captureInventoryPage(request(),concurrent),
+        recovery.captureInventoryPage(request(),concurrent)]).then(results=>{
+        assert.equal(results[0].pageSha256,results[1].pageSha256);
+        results.forEach(closed);
+        assert.ok(results.some(result=>result.unchanged));return results[0];
+    }),{reads:27,writes:2});
+    await accept(concurrent,race.result);
+    assert.equal(race.result.entryCount,0);assert.equal(race.result.terminalEmpty,true);
+    let injected=false,retryCallbacks=0;
+    const retrying=createCanonicalCurrentRecovery({...deps,
+        runRecoveryAuditMaintenance:(req,id,operation)=>authority.runRecoveryAuditMaintenance(req,id,async(tx,active)=>{
+            retryCallbacks++;const result=await operation(tx,active);
+            if(!injected){injected=true;throw Object.assign(Error("inventory SDK callback retry"),{code:10});}
+            return result;
+        })});
+    const retried=input(),retryResult=await measured(()=>retrying.captureInventoryPage(request(),retried),{reads:27,writes:2});
+    assert.ok(retryCallbacks>=2);await accept(retried,retryResult.result);
+    // A finite test guard covers every fixed namespace plus its explicit empty
+    // tail and the one deliberately multi-page event namespace.
+    for(let guard=0;!pages.at(-1).result.inventoryExhausted&&guard<namespacePaths.length*3+4;guard++){
+        const next=input(),captured=await measured(()=>recovery.captureInventoryPage(request(),next),{reads:27,writes:2});
+        await accept(next,captured.result);
+    }
+    assert.equal(pages.at(-1).result.inventoryExhausted,true);
+    for(const [index,path] of namespacePaths.entries()){
+        const captured=pages.filter(page=>page.result.namespaceIndex===index),source=expected.get(path);
+        assert.ok(captured.length>0,path);
+        assert.equal(captured.at(-1).result.terminalEmpty,true,path+" must terminate with an actual empty query");
+        assert.equal(captured.reduce((sum,page)=>sum+page.result.entryCount,0),source.length,path);
+    }
+    const modeIndex=namespacePaths.indexOf(root.collection("modeTimeEvents").path);
+    assert.deepEqual(pages.filter(page=>page.result.namespaceIndex===modeIndex).map(page=>page.result.entryCount),[16,2,0]);
+    assert.equal((await runRef.collection("inventoryPages").get()).size,pages.length);
+    assert.deepEqual(await Promise.all([runRef.get(),fenceRef.get()]).then(rows=>rows.map(row)),controls);
+    assert.deepEqual(await assets(),assetBefore);
+    await assert.rejects(()=>patrol.observePresence(request(),{operationId:"inventory-fenced-heartbeat1",expectedRevision:2,
+        expectedSequence:18,intent:"heartbeat",elementBox:"keep"}),/RECOVERY_AUDIT_MAINTENANCE/);
+    // Expire the approval between real SDK attempts of an original page retry.
+    // A second attempt must re-read its live gate rather than reuse a permit.
+    let expiryCallbacks=0;
+    const expiry=createCanonicalCurrentRecovery({...deps,
+        runRecoveryAuditMaintenance:(req,id,operation)=>authority.runRecoveryAuditMaintenance(req,id,async(tx,active)=>{
+            expiryCallbacks++;const result=await operation(tx,active);
+            if(expiryCallbacks===1){clock+=61000;throw Object.assign(Error("inventory approval expires before retry"),{code:10});}
+            return result;
+        })});
+    const frozenState=row(await stateRef.get());
+    await assert.rejects(()=>expiry.captureInventoryPage(request(),first),/approval/i);
+    assert.ok(expiryCallbacks>=2);assert.deepEqual(row(await stateRef.get()),frozenState);
+    const oldRequest=request();
+    while(Math.floor(Date.now()/1000)<=claims(token).auth_time)await new Promise(resolve=>setTimeout(resolve,100));
+    const nextLogin=await login("accounts:signInWithPassword",{email,password});
+    token=nextLogin.idToken;session=await invoke("createGameSession",token,{uid});
+    await assert.rejects(()=>recovery.captureInventoryPage(oldRequest,first),/SESSION_REVOKED/);
+    await assert.rejects(()=>recovery.captureInventoryPage(request(),first));
+    await recovery.cancelAudit(request(),{operationId:"inventory-cancel-operation1",auditId,expectedEpoch:1});
+    await assert.rejects(()=>recovery.captureInventoryPage(request(),first));
+    assert.deepEqual(row(await stateRef.get()),frozenState);assert.deepEqual(await assets(),assetBefore);
+    assert.equal((await save.get()).get("authoritativeStateReady"),false);
+    console.log("PASS recovery inventory capture actual SDK: fixed namespaces,16-document pages and true-empty tails, metadata/cursor receipts, bounded reads/writes, rollback/retry/concurrent once-only, no-query lost-response replay, live expiry/takeover/cancel refusal and unchanged assets/readiness.");
 }
 
 await db.terminate();

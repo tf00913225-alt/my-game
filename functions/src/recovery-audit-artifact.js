@@ -12,6 +12,12 @@ const NAMES=Object.freeze(["account","characters","economy","inventory","equipme
     "patrolSettlements","patrolClosures","recoveryApprovals","recoveryAudits"]);
 const bad=message=>{throw Error(`Invalid recovery audit artifact: ${message}`);};
 const compareNames=(a,b)=>Buffer.compare(Buffer.from(a,"utf8"),Buffer.from(b,"utf8"));
+const INVENTORY_LIMITS=Object.freeze({rows:16,payloadBytes:128*1024});
+function recoveryAuditNamespaces(uid,version=2){
+    if(typeof uid!=="string"||!uid||uid.includes("/")||![1,2].includes(version))bad("namespace identity");
+    const names=version===2?[...NAMES,"recoveryAuditFence","recoveryAuditRuns"]:NAMES;
+    return Object.freeze([...names.map(name=>`serverUsers/${uid}/${name}`),`users/${uid}/saves`]);
+}
 const exact=(value,keys)=>{
     if(!value||Array.isArray(value)||typeof value!=="object"||
        Object.keys(value).sort().join("|")!==keys.slice().sort().join("|"))bad("frame shape");
@@ -51,6 +57,52 @@ function value(node,depth=0){
         return Object.freeze(result);
     }
     bad("unsupported typed value");
+}
+// The inverse of the same bounded typed codec used by candidate documents.
+// Map order is canonical; Firestore map enumeration order is not evidence.
+function encodedValue(row,depth=0,budget={nodes:0}){
+    if(depth>LIMITS.depth||++budget.nodes>LIMITS.nodes)bad("typed value or resource limit");
+    if(row===null)return ["null"];
+    if(typeof row==="string"||typeof row==="boolean")return [typeof row,row];
+    if(typeof row==="number"&&Number.isFinite(row))return ["number",Object.is(row,-0)?"-0":row];
+    if(row&&typeof row.toMillis==="function"){
+        const stamp=new ArtifactTimestamp(row.seconds,row.nanoseconds);
+        return ["timestamp",stamp.seconds,stamp.nanoseconds];
+    }
+    if(Array.isArray(row)){
+        for(let index=0;index<row.length;index++)if(!Object.hasOwn(row,index))bad("sparse typed array");
+        return ["array",row.map(child=>encodedValue(child,depth+1,budget))];
+    }
+    if(row&&typeof row==="object"&&[Object.prototype,null].includes(Object.getPrototypeOf(row))){
+        return ["object",Object.keys(row).sort().map(key=>{
+            if(["__proto__","constructor","prototype"].includes(key)||!Object.hasOwn(Object.getOwnPropertyDescriptor(row,key),"value"))bad("object key");
+            return [key,encodedValue(row[key],depth+1,budget)];
+        })];
+    }
+    bad("unsupported typed value");
+}
+function encodeInventoryPayload(payload){
+    const bytes=Buffer.from(JSON.stringify(encodedValue(payload)),"utf8");
+    if(bytes.length>INVENTORY_LIMITS.payloadBytes)bad("inventory payload size");
+    return bytes;
+}
+function decodeInventoryPayload(bytes){
+    if(!Buffer.isBuffer(bytes)||!bytes.length||bytes.length>INVENTORY_LIMITS.payloadBytes)bad("inventory payload size");
+    const text=bytes.toString("utf8");let parsed;
+    try{parsed=JSON.parse(text);}catch(_){bad("inventory payload JSON");}
+    if(JSON.stringify(parsed)!==text||!Buffer.from(text).equals(bytes))bad("inventory payload encoding");
+    return value(parsed);
+}
+function inventoryDocumentMetadata(snapshot,namespace){
+    if(!snapshot?.exists||typeof snapshot.id!=="string"||!snapshot.id||snapshot.id.includes("/")||
+       Buffer.from(snapshot.id,"utf8").toString("utf8")!==snapshot.id||snapshot.ref?.path!==`${namespace}/${snapshot.id}`)
+        bad("inventory document identity");
+    // Exact SDK versions are mandatory. No data timestamp/millisecond fallback.
+    const stamp=new ArtifactTimestamp(snapshot.updateTime?.seconds,snapshot.updateTime?.nanoseconds);
+    const bytes=Buffer.from(JSON.stringify(encodedValue(snapshot.data())),"utf8");
+    if(bytes.length>LIMITS.frameBytes)bad("typed document size");
+    return Object.freeze({id:snapshot.id,updateTime:Object.freeze({seconds:stamp.seconds,nanoseconds:stamp.nanoseconds}),
+        typedDataSha256:createHash("sha256").update(bytes).digest("hex"),typedDataByteLength:bytes.length});
 }
 function clone(row){
     if(row instanceof ArtifactTimestamp)return new ArtifactTimestamp(row.seconds,row.nanoseconds);
@@ -107,8 +159,7 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
            !Array.isArray(control.recordedAt)||control.recordedAt[0]!=="timestamp")bad("audit control identity");
         auditControl=Object.freeze({...control,recordedAt:value(control.recordedAt)});
     }
-    const names=header.schemaVersion===2?[...NAMES,"recoveryAuditFence","recoveryAuditRuns"]:NAMES;
-    const namespacePaths=[...names.map(name=>`${root.path}/${name}`),save.path.slice(0,save.path.lastIndexOf("/"))];
+    const namespacePaths=recoveryAuditNamespaces(uid,header.schemaVersion);
     const allowed=new Set(namespacePaths),documents=new Map(),absences=new Set(),inventories=new Map();
     const parent=path=>typeof path==="string"?path.slice(0,path.lastIndexOf("/")):"";
     const validPath=path=>typeof path==="string"&&allowed.has(parent(path))&&path.split("/").every(part=>part.length>0);
@@ -184,4 +235,5 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
         }});
 }
 
-module.exports={decodeRecoveryAuditArtifact};
+module.exports={decodeRecoveryAuditArtifact,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
+    inventoryDocumentMetadata,INVENTORY_LIMITS};
