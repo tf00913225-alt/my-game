@@ -765,13 +765,13 @@ button:disabled{
 .home-city-entrances{position:absolute;z-index:8;inset:72px 0 162px;pointer-events:none;}
 .home-city-entrances>.home-card{position:absolute;}
 .home-city-entrances>[data-city-entry="0"]{left:0;top:0;}
-.home-city-entrances>[data-city-entry="1"]{left:0;top:216px;}
-.home-city-entrances>[data-city-entry="2"]{left:0;top:432px;}
-.home-city-entrances>[data-city-entry="3"]{left:0;top:648px;}
+.home-city-entrances>[data-city-entry="1"]{left:0;top:calc((100% - 144px) / 3);}
+.home-city-entrances>[data-city-entry="2"]{left:0;top:calc((100% - 144px) * 2 / 3);}
+.home-city-entrances>[data-city-entry="3"]{left:0;top:calc(100% - 144px);}
 .home-city-entrances>[data-city-entry="4"]{right:0;top:0;}
-.home-city-entrances>[data-city-entry="5"]{right:0;top:216px;}
-.home-city-entrances>[data-city-entry="6"]{right:0;top:432px;}
-.home-city-entrances>[data-city-entry="7"]{right:0;top:648px;}
+.home-city-entrances>[data-city-entry="5"]{right:0;top:calc((100% - 144px) / 3);}
+.home-city-entrances>[data-city-entry="6"]{right:0;top:calc((100% - 144px) * 2 / 3);}
+.home-city-entrances>[data-city-entry="7"]{right:0;top:calc(100% - 144px);}
 
 .home-card{
     position:relative;min-width:0;margin:0;padding:0;cursor:pointer;color:#f6e4bb;
@@ -779,11 +779,13 @@ button:disabled{
     -webkit-tap-highlight-color:transparent;
 }
 .home-city-entrances>.home-card{
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
-    width:144px;height:180px;box-sizing:border-box;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    width:144px;height:144px;box-sizing:border-box;
     border:0;border-radius:12px;
     background:linear-gradient(90deg,#100e0bc9,#100e0b80,#100e0b22);
 }
+.home-city-entrances .home-card-icon{width:72px;height:72px;}
+.home-city-entrances .home-card-label{line-height:54px;}
 .home-city-entrances .v141-notice-dot{top:18px;right:9px;}
 .home-card:active{filter:brightness(1.25);}
 .home-card:focus-visible{outline:6px solid #ffe4a3;outline-offset:3px;}

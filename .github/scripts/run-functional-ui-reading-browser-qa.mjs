@@ -80,6 +80,8 @@ try{
  const skillIds=await c.eval("Object.keys(skillDatabase).filter(id=>{const s=skillDatabase[id];return s.element&&Object.hasOwn(s,'learnLevel')&&s.category!=='monster';})");
  for(const id of skillIds){await c.eval(`showSkillDetail(${JSON.stringify(id)})`);await capture('skill-'+id,'#skillDetailModal');await c.eval('closeSkillDetail()');}
  await c.eval("closeHomeFeature();showPage('home')");await capture('home','#homePage');
+ const homeHits=await c.eval("Array.from(document.querySelectorAll('#homePage .home-card')).filter(e=>e.getBoundingClientRect().width>0).map(e=>{const r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {label:e.getAttribute('aria-label'),hit:hit===e||e.contains(hit)};})");
+ assert.ok(homeHits.length>=12&&homeHits.every(e=>e.hit),'home entries are covered: '+JSON.stringify(homeHits));
  await c.eval("openMapInventoryOverlay('home')");await capture('inventory','#inventoryPage');
  await c.eval('openInventoryCharacterDetail()');await capture('character-detail','#inventoryCharacterDetailModal');await c.eval('closeInventoryCharacterDetail();closeMapInventoryOverlay()');
  await c.eval("openHomeFeature('character');switchCharacterTab('status');showStatusHelp()");await capture('status-help','#statusHelpModal');await c.eval('closeStatusHelp();closeHomeFeature()');
