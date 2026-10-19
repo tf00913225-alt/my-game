@@ -204,6 +204,240 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         return {restoredRevision:receipt.restoredRevision,unchanged:true,
             authoritativeStateReady:false};
     }
+    async function verifyRecoveryRights(tx,root,uid,expectedRevision,records,{
+        claims,receipts,ledgers,grants,events,operations,modeSources,modeEvents,
+        patrolTickets,patrolStates,patrolSettlements,patrolClosures,patrolModeEvents,
+        patrolOwnedModeEvents,patrolOperationIds}){
+        const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
+        if(claims.docs.length!==archivedClaims.size){
+            fail("data-loss","Independent claims differ from the recovery archive.");
+        }
+        // A lost claim/receipt index cannot hide a retained economic delta.
+        // Reuse the original credit/debit Owners; never infer a missing
+        // receipt from a balance or regenerate an operation during repair.
+        const receiptById=new Map(receipts.docs.map(doc=>[doc.id,doc.data()]));
+        const verifiedPatrolOperations=new Set(),ticketProofs=new Map();
+        for(const doc of patrolTickets.docs){
+            const proof=await patrolEvidence.verifyRetainedTicket(tx,root,uid,records.account,doc,expectedRevision);
+            ticketProofs.set(doc.id,proof);
+            for(const operationId of proof.verifiedOperationIds)verifiedPatrolOperations.add(operationId);
+        }
+        if(patrolStates.docs.length!==ticketProofs.size){
+            fail("data-loss","Patrol ticket checkpoint inventory differs from retained sources.");
+        }
+        for(const doc of patrolStates.docs){
+            const {createdAt,updatedAt,...state}=doc.data();
+            if(!ticketProofs.has(doc.id)||snapshotDigest(state)!==snapshotDigest(ticketProofs.get(doc.id).state)){
+                fail("data-loss","An orphaned Patrol checkpoint blocks recovery.");
+            }
+        }
+        for(const doc of patrolSettlements.docs){
+            if(!verifiedPatrolOperations.has(doc.id))fail("data-loss","An unindexed Patrol earning blocks recovery.");
+            await patrolEvidence.verifyRetainedSettlement(tx,root,uid,records.account,doc,expectedRevision);
+        }
+        for(const doc of patrolClosures.docs){
+            const proof=ticketProofs.get(doc.get("ticketId"));
+            if(!proof||proof.state.status!=="abandoned"||proof.state.terminalOperationId!==doc.id){
+                fail("data-loss","An orphaned Patrol closure blocks recovery.");
+            }
+            await patrolEvidence.verifyRetainedClosure(tx,root,uid,records.account,doc,expectedRevision);
+        }
+        for(const doc of [...patrolModeEvents.docs,...patrolOwnedModeEvents.docs]){
+            if(doc.get("schemaVersion")!==2||doc.get("resultOwner")!=="forest-patrol-settlement"||
+               !verifiedPatrolOperations.has(doc.id)||!patrolOperationIds.has(doc.id)){
+                fail("data-loss","A Forest mode component lacks its original earning source.");
+            }
+        }
+        await patrolEvidence.verifyCurrentEvidence(tx,root,uid,records.account,expectedRevision);
+        await modeEvidence.verifyCurrentEvidence(tx,root,uid,records.account,records,expectedRevision);
+        for(const doc of modeSources.docs){
+            await modeEvidence.verifyRetainedSource(tx,root,uid,records.account,doc,expectedRevision);
+        }
+        const verifiedModeOperations=new Set();
+        for(const doc of modeEvents.docs){
+            if(doc.get("schemaVersion")===2){
+                if(!verifiedPatrolOperations.has(doc.id))fail("data-loss","An orphaned Forest value event blocks recovery.");
+                continue; // Full source-specific proof already checked this exact component.
+            }
+            await modeEvidence.verifyRetainedEvent(tx,root,uid,records.account,doc,expectedRevision);
+            verifiedModeOperations.add(doc.id);
+        }
+        // Debit receipts survive independently of their ledger. Every known
+        // purchase/allocation must reach the original full debit proof below,
+        // even when its ledger was lost with the current canonical sources.
+        const ledgerIds=new Set(ledgers.docs.map(doc=>doc.id));
+        for(const doc of operations.docs){
+            const value=doc.data();
+            if(value.schemaVersion!==1||value.ownerUid!==uid){
+                fail("data-loss","Operation inventory identity blocks recovery.");
+            }
+            if(value.kind==="forest-patrol-settlement"){
+                if(receiptById.has(doc.id)||!ledgerIds.has(doc.id)||!verifiedPatrolOperations.has(doc.id)){
+                    fail("data-loss","A Patrol operation lacks its original source and signed ledger.");
+                }
+            }else if(value.kind==="account-mode-time"){
+                if(receiptById.has(doc.id)||!ledgerIds.has(doc.id)){
+                    fail("data-loss","A mode operation lacks its original signed ledger or overlaps a grant.");
+                }
+                if(!verifiedModeOperations.has(doc.id)){
+                    await modeEvidence.verifyRetainedOperation(tx,root,uid,records.account,doc,expectedRevision);
+                }
+                verifiedModeOperations.add(doc.id);
+            }else if(["shop-purchase","exp-allocation","attribute-allocation"].includes(value.kind)){
+                if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||!ledgerIds.has(doc.id)){
+                    fail("data-loss","A debit receipt without its original ledger blocks recovery.");
+                }
+            }else{
+                if(receiptById.has(doc.id)||ledgerIds.has(doc.id)){
+                    fail("data-loss","A source operation overlaps economic evidence.");
+                }
+                if(value.kind==="canonical-current-recovery"){
+                    if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
+                       !Number.isSafeInteger(value.sourceRevision)||value.sourceRevision<2||
+                       !Number.isSafeInteger(value.restoredRevision)||
+                       value.restoredRevision>expectedRevision){
+                        fail("data-loss","Retained recovery identity blocks recovery.");
+                    }
+                    const [archiveSnap,snapshotSnap,approvalSnap,auditSnap,grantSnap,ledgerSnap]=
+                        await Promise.all([
+                            root.collection("recoveryArchives").doc(String(value.sourceRevision)),
+                            root.collection("playableSnapshots").doc(String(value.sourceRevision)),
+                            root.collection("recoveryApprovals").doc(doc.id),
+                            root.collection("recoveryAudits").doc(doc.id),
+                            root.collection("grantOperations").doc(doc.id),
+                            root.collection("ledgerEntries").doc(doc.id)
+                        ].map(ref=>tx.get(ref)));
+                    let original;
+                    try{
+                        if(!archiveSnap.exists||!snapshotSnap.exists)throw Error("Missing recovery source");
+                        original=inspectRecoveryArchive(archiveSnap.data(),uid,
+                            value.sourceRevision,snapshotSnap.data());
+                        if(original.account.provenance!=="server-created"||
+                           original.account.slots.some((id,index)=>id!==null&&id!==records.account.slots[index])){
+                            throw Error("Recovery character differs");
+                        }
+                    }catch(_){fail("data-loss","Retained recovery source is inconsistent.");}
+                    await verifyRecoveredResult(tx,root,uid,doc.id,value.sourceRevision,expectedRevision,
+                        {archiveSnap,snapshotSnap,approvalSnap,operationSnap:doc,auditSnap,grantSnap,ledgerSnap},original);
+                }else{
+                    await sourceEvidence.verifyRetainedOperation(tx,root,uid,records.account,doc);
+                }
+            }
+        }
+        // Events survive independently of grants. Losing a grant must not
+        // hide an original reward observation or authorize recreating it.
+        const grantById=new Map(grants.docs.map(doc=>[doc.id,doc.data()]));
+        for(const doc of events.docs){
+            const grant=grantById.get(doc.id);
+            if(!grant){fail("data-loss","An orphaned reward event blocks recovery.");}
+            const proof=await readDailyCheckinEvidence({tx,root,uid,grantId:doc.id,grant,fail});
+            if(!proof||proof.event.sourceRevision>expectedRevision||
+               proof.event.characterId!==records.account.slots[0]){
+                fail("data-loss","An unknown, later or foreign reward event blocks recovery.");
+            }
+        }
+        // Retained consumed grants need their original receipt too. Pending
+        // rights need an independently versioned event; never use an old
+        // balance, creation time or absent receipt as evidence of eligibility.
+        const receiptsByGrant=new Set(receipts.docs.map(doc=>doc.get("grantId")));
+        for(const doc of grants.docs){
+            const grant=doc.data();
+            if(grant.status==="pending"){
+                verifyServerIssuedGrant({uid,grant,fail});
+                if(grant.claimedByOperationId!==null||receiptsByGrant.has(doc.id)){
+                    fail("data-loss","Pending grant consumption evidence is inconsistent.");
+                }
+                const proof=await readDailyCheckinEvidence({tx,root,uid,grantId:doc.id,grant,fail});
+                if(!proof){fail("failed-precondition","VERSIONED_PENDING_GRANT_EVIDENCE_REQUIRED");}
+                if(proof.event.sourceRevision>expectedRevision||
+                   proof.event.characterId!==records.account.slots[0]){
+                    fail("data-loss","A later or foreign pending grant blocks recovery.");
+                }
+            }else{
+                const receipt=receiptById.get(grant.claimedByOperationId);
+                if(!["reserved","credited"].includes(grant.status)||!receipt||
+                   receipt.grantId!==doc.id||receipt.operationId!==grant.claimedByOperationId||
+                   receipt.creditedToCharacter!==(grant.status==="credited")){
+                    fail("data-loss","An orphaned or unknown grant blocks recovery.");
+                }
+                // Existing receipt/claim loops below verify original grant,
+                // revision/event/history and no competing operation/ledger.
+            }
+        }
+        let creditLedgerCount=0;
+        for(const doc of ledgers.docs){
+            const ledger=doc.data(),receipt=receiptById.get(doc.id);
+            if(ledger.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
+               ledger.schemaVersion!==1||ledger.ownerUid!==uid){
+                fail("data-loss","An unmatched ledger entry blocks recovery.");
+            }
+            if(ledger.kind==="forest-patrol-settlement"){
+                if(receipt||!verifiedPatrolOperations.has(doc.id)){
+                    fail("data-loss","An unmatched signed Patrol ledger blocks recovery.");
+                }
+                continue; // Complete Forest proof checked the original asset and mode delta.
+            }
+            if(ledger.kind==="account-mode-time"){
+                if(receipt||!verifiedModeOperations.has(doc.id)){
+                    fail("data-loss","An unmatched signed mode ledger blocks recovery.");
+                }
+                continue; // Original mode Owner verified this exact immutable ledger.
+            }
+            if(receipt?.creditedToCharacter===true&&
+               archivedClaims.get(ledger.grantId)?.operationId===doc.id){
+                creditLedgerCount++;
+                continue; // Full credit proof is checked below.
+            }
+            await verifyDebitRecoveryEvidence(tx,root,uid,expectedRevision,records,doc,ledger,receipt);
+        }
+        if(creditLedgerCount!==archivedClaims.size){
+            fail("data-loss","Credit ledger inventory differs from the recovery archive.");
+        }
+        let creditedCount=0;
+        for(const doc of receipts.docs){
+            const receipt=doc.data();
+            if(receipt.operationId!==doc.id||!OPERATION_ID.test(doc.id)){
+                fail("data-loss","Grant receipt identity blocks recovery.");
+            }
+            if(receipt.creditedToCharacter===true){
+                if(archivedClaims.get(receipt.grantId)?.operationId!==doc.id){
+                    fail("data-loss","An unmatched credited receipt blocks recovery.");
+                }
+                creditedCount++;
+            }else if(receipt.creditedToCharacter===false&&OPERATION_ID.test(receipt.grantId||"")){
+                const [grant,ledger,other]=await Promise.all([
+                    tx.get(root.collection("pendingGrants").doc(receipt.grantId)),
+                    tx.get(root.collection("ledgerEntries").doc(doc.id)),
+                    tx.get(root.collection("operations").doc(doc.id))
+                ]);
+                await verifyReservedGrant({tx,root,uid,grantId:receipt.grantId,operationId:doc.id,
+                    currentRevision:expectedRevision,grant:grant.data(),receipt,
+                    ledgerExists:ledger.exists,otherOperationExists:other.exists,fail});
+            }else{
+                fail("data-loss","Unknown grant receipt state blocks recovery.");
+            }
+        }
+        if(creditedCount!==archivedClaims.size){
+            fail("data-loss","Credited receipt inventory differs from the recovery archive.");
+        }
+        for(const doc of claims.docs){
+            const record=archivedClaims.get(doc.id),claim=doc.data();
+            if(!record||record.grantId!==doc.id||!OPERATION_ID.test(record.operationId||"")){
+                fail("data-loss","Unsupported or unmatched recovery claim.");
+            }
+            const grantId=doc.id,operationId=record.operationId;
+            const [grant,receipt,ledger,other]=await Promise.all([
+                tx.get(root.collection("pendingGrants").doc(grantId)),
+                tx.get(root.collection("grantOperations").doc(operationId)),
+                tx.get(root.collection("ledgerEntries").doc(operationId)),
+                tx.get(root.collection("operations").doc(operationId))
+            ]);
+            await verifyCreditedGrant({tx,root,uid,grantId,operationId,
+                currentRevision:expectedRevision,grant:grant.data(),receipt:receipt.data(),
+                ledger:ledger.data(),claim,claimRecord:record,otherOperationExists:other.exists,fail});
+        }
+    }
+
     async function restoreCurrent(request,{operationId,expectedRevision}){
         if(!OPERATION_ID.test(operationId||"")||
            !Number.isSafeInteger(expectedRevision)||expectedRevision<2){
@@ -335,234 +569,10 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                modeEvidence.currentEvidenceReadBudget(modeHeadEvent?.data()??{schemaVersion:1})>400){
                 fail("failed-precondition","Recovery claim evidence exceeds the transaction budget.");
             }
-            const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
-            if(claims.docs.length!==archivedClaims.size){
-                fail("data-loss","Independent claims differ from the recovery archive.");
-            }
-            // A lost claim/receipt index cannot hide a retained economic delta.
-            // Reuse the original credit/debit Owners; never infer a missing
-            // receipt from a balance or regenerate an operation during repair.
-            const receiptById=new Map(receipts.docs.map(doc=>[doc.id,doc.data()]));
-            const verifiedPatrolOperations=new Set(),ticketProofs=new Map();
-            for(const doc of patrolTickets.docs){
-                const proof=await patrolEvidence.verifyRetainedTicket(tx,root,uid,records.account,doc,expectedRevision);
-                ticketProofs.set(doc.id,proof);
-                for(const operationId of proof.verifiedOperationIds)verifiedPatrolOperations.add(operationId);
-            }
-            if(patrolStates.docs.length!==ticketProofs.size){
-                fail("data-loss","Patrol ticket checkpoint inventory differs from retained sources.");
-            }
-            for(const doc of patrolStates.docs){
-                const {createdAt,updatedAt,...state}=doc.data();
-                if(!ticketProofs.has(doc.id)||snapshotDigest(state)!==snapshotDigest(ticketProofs.get(doc.id).state)){
-                    fail("data-loss","An orphaned Patrol checkpoint blocks recovery.");
-                }
-            }
-            for(const doc of patrolSettlements.docs){
-                if(!verifiedPatrolOperations.has(doc.id))fail("data-loss","An unindexed Patrol earning blocks recovery.");
-                await patrolEvidence.verifyRetainedSettlement(tx,root,uid,records.account,doc,expectedRevision);
-            }
-            for(const doc of patrolClosures.docs){
-                const proof=ticketProofs.get(doc.get("ticketId"));
-                if(!proof||proof.state.status!=="abandoned"||proof.state.terminalOperationId!==doc.id){
-                    fail("data-loss","An orphaned Patrol closure blocks recovery.");
-                }
-                await patrolEvidence.verifyRetainedClosure(tx,root,uid,records.account,doc,expectedRevision);
-            }
-            for(const doc of [...patrolModeEvents.docs,...patrolOwnedModeEvents.docs]){
-                if(doc.get("schemaVersion")!==2||doc.get("resultOwner")!=="forest-patrol-settlement"||
-                   !verifiedPatrolOperations.has(doc.id)||!patrolOperationIds.has(doc.id)){
-                    fail("data-loss","A Forest mode component lacks its original earning source.");
-                }
-            }
-            await patrolEvidence.verifyCurrentEvidence(tx,root,uid,records.account,expectedRevision);
-            await modeEvidence.verifyCurrentEvidence(tx,root,uid,records.account,records,expectedRevision);
-            for(const doc of modeSources.docs){
-                await modeEvidence.verifyRetainedSource(tx,root,uid,records.account,doc,expectedRevision);
-            }
-            const verifiedModeOperations=new Set();
-            for(const doc of modeEvents.docs){
-                if(doc.get("schemaVersion")===2){
-                    if(!verifiedPatrolOperations.has(doc.id))fail("data-loss","An orphaned Forest value event blocks recovery.");
-                    continue; // Full source-specific proof already checked this exact component.
-                }
-                await modeEvidence.verifyRetainedEvent(tx,root,uid,records.account,doc,expectedRevision);
-                verifiedModeOperations.add(doc.id);
-            }
-            // Debit receipts survive independently of their ledger. Every known
-            // purchase/allocation must reach the original full debit proof below,
-            // even when its ledger was lost with the current canonical sources.
-            const ledgerIds=new Set(ledgers.docs.map(doc=>doc.id));
-            for(const doc of operations.docs){
-                const value=doc.data();
-                if(value.schemaVersion!==1||value.ownerUid!==uid){
-                    fail("data-loss","Operation inventory identity blocks recovery.");
-                }
-                if(value.kind==="forest-patrol-settlement"){
-                    if(receiptById.has(doc.id)||!ledgerIds.has(doc.id)||!verifiedPatrolOperations.has(doc.id)){
-                        fail("data-loss","A Patrol operation lacks its original source and signed ledger.");
-                    }
-                }else if(value.kind==="account-mode-time"){
-                    if(receiptById.has(doc.id)||!ledgerIds.has(doc.id)){
-                        fail("data-loss","A mode operation lacks its original signed ledger or overlaps a grant.");
-                    }
-                    if(!verifiedModeOperations.has(doc.id)){
-                        await modeEvidence.verifyRetainedOperation(tx,root,uid,records.account,doc,expectedRevision);
-                    }
-                    verifiedModeOperations.add(doc.id);
-                }else if(["shop-purchase","exp-allocation","attribute-allocation"].includes(value.kind)){
-                    if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||!ledgerIds.has(doc.id)){
-                        fail("data-loss","A debit receipt without its original ledger blocks recovery.");
-                    }
-                }else{
-                    if(receiptById.has(doc.id)||ledgerIds.has(doc.id)){
-                        fail("data-loss","A source operation overlaps economic evidence.");
-                    }
-                    if(value.kind==="canonical-current-recovery"){
-                        if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
-                           !Number.isSafeInteger(value.sourceRevision)||value.sourceRevision<2||
-                           !Number.isSafeInteger(value.restoredRevision)||
-                           value.restoredRevision>expectedRevision){
-                            fail("data-loss","Retained recovery identity blocks recovery.");
-                        }
-                        const [archiveSnap,snapshotSnap,approvalSnap,auditSnap,grantSnap,ledgerSnap]=
-                            await Promise.all([
-                                root.collection("recoveryArchives").doc(String(value.sourceRevision)),
-                                root.collection("playableSnapshots").doc(String(value.sourceRevision)),
-                                root.collection("recoveryApprovals").doc(doc.id),
-                                root.collection("recoveryAudits").doc(doc.id),
-                                root.collection("grantOperations").doc(doc.id),
-                                root.collection("ledgerEntries").doc(doc.id)
-                            ].map(ref=>tx.get(ref)));
-                        let original;
-                        try{
-                            if(!archiveSnap.exists||!snapshotSnap.exists)throw Error("Missing recovery source");
-                            original=inspectRecoveryArchive(archiveSnap.data(),uid,
-                                value.sourceRevision,snapshotSnap.data());
-                            if(original.account.provenance!=="server-created"||
-                               original.account.slots.some((id,index)=>id!==null&&id!==records.account.slots[index])){
-                                throw Error("Recovery character differs");
-                            }
-                        }catch(_){fail("data-loss","Retained recovery source is inconsistent.");}
-                        await verifyRecoveredResult(tx,root,uid,doc.id,value.sourceRevision,expectedRevision,
-                            {archiveSnap,snapshotSnap,approvalSnap,operationSnap:doc,auditSnap,grantSnap,ledgerSnap},original);
-                    }else{
-                        await sourceEvidence.verifyRetainedOperation(tx,root,uid,records.account,doc);
-                    }
-                }
-            }
-            // Events survive independently of grants. Losing a grant must not
-            // hide an original reward observation or authorize recreating it.
-            const grantById=new Map(grants.docs.map(doc=>[doc.id,doc.data()]));
-            for(const doc of events.docs){
-                const grant=grantById.get(doc.id);
-                if(!grant){fail("data-loss","An orphaned reward event blocks recovery.");}
-                const proof=await readDailyCheckinEvidence({tx,root,uid,grantId:doc.id,grant,fail});
-                if(!proof||proof.event.sourceRevision>expectedRevision||
-                   proof.event.characterId!==records.account.slots[0]){
-                    fail("data-loss","An unknown, later or foreign reward event blocks recovery.");
-                }
-            }
-            // Retained consumed grants need their original receipt too. Pending
-            // rights need an independently versioned event; never use an old
-            // balance, creation time or absent receipt as evidence of eligibility.
-            const receiptsByGrant=new Set(receipts.docs.map(doc=>doc.get("grantId")));
-            for(const doc of grants.docs){
-                const grant=doc.data();
-                if(grant.status==="pending"){
-                    verifyServerIssuedGrant({uid,grant,fail});
-                    if(grant.claimedByOperationId!==null||receiptsByGrant.has(doc.id)){
-                        fail("data-loss","Pending grant consumption evidence is inconsistent.");
-                    }
-                    const proof=await readDailyCheckinEvidence({tx,root,uid,grantId:doc.id,grant,fail});
-                    if(!proof){fail("failed-precondition","VERSIONED_PENDING_GRANT_EVIDENCE_REQUIRED");}
-                    if(proof.event.sourceRevision>expectedRevision||
-                       proof.event.characterId!==records.account.slots[0]){
-                        fail("data-loss","A later or foreign pending grant blocks recovery.");
-                    }
-                }else{
-                    const receipt=receiptById.get(grant.claimedByOperationId);
-                    if(!["reserved","credited"].includes(grant.status)||!receipt||
-                       receipt.grantId!==doc.id||receipt.operationId!==grant.claimedByOperationId||
-                       receipt.creditedToCharacter!==(grant.status==="credited")){
-                        fail("data-loss","An orphaned or unknown grant blocks recovery.");
-                    }
-                    // Existing receipt/claim loops below verify original grant,
-                    // revision/event/history and no competing operation/ledger.
-                }
-            }
-            let creditLedgerCount=0;
-            for(const doc of ledgers.docs){
-                const ledger=doc.data(),receipt=receiptById.get(doc.id);
-                if(ledger.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
-                   ledger.schemaVersion!==1||ledger.ownerUid!==uid){
-                    fail("data-loss","An unmatched ledger entry blocks recovery.");
-                }
-                if(ledger.kind==="forest-patrol-settlement"){
-                    if(receipt||!verifiedPatrolOperations.has(doc.id)){
-                        fail("data-loss","An unmatched signed Patrol ledger blocks recovery.");
-                    }
-                    continue; // Complete Forest proof checked the original asset and mode delta.
-                }
-                if(ledger.kind==="account-mode-time"){
-                    if(receipt||!verifiedModeOperations.has(doc.id)){
-                        fail("data-loss","An unmatched signed mode ledger blocks recovery.");
-                    }
-                    continue; // Original mode Owner verified this exact immutable ledger.
-                }
-                if(receipt?.creditedToCharacter===true&&
-                   archivedClaims.get(ledger.grantId)?.operationId===doc.id){
-                    creditLedgerCount++;
-                    continue; // Full credit proof is checked below.
-                }
-                await verifyDebitRecoveryEvidence(tx,root,uid,expectedRevision,records,doc,ledger,receipt);
-            }
-            if(creditLedgerCount!==archivedClaims.size){
-                fail("data-loss","Credit ledger inventory differs from the recovery archive.");
-            }
-            let creditedCount=0;
-            for(const doc of receipts.docs){
-                const receipt=doc.data();
-                if(receipt.operationId!==doc.id||!OPERATION_ID.test(doc.id)){
-                    fail("data-loss","Grant receipt identity blocks recovery.");
-                }
-                if(receipt.creditedToCharacter===true){
-                    if(archivedClaims.get(receipt.grantId)?.operationId!==doc.id){
-                        fail("data-loss","An unmatched credited receipt blocks recovery.");
-                    }
-                    creditedCount++;
-                }else if(receipt.creditedToCharacter===false&&OPERATION_ID.test(receipt.grantId||"")){
-                    const [grant,ledger,other]=await Promise.all([
-                        tx.get(root.collection("pendingGrants").doc(receipt.grantId)),
-                        tx.get(root.collection("ledgerEntries").doc(doc.id)),
-                        tx.get(root.collection("operations").doc(doc.id))
-                    ]);
-                    await verifyReservedGrant({tx,root,uid,grantId:receipt.grantId,operationId:doc.id,
-                        currentRevision:expectedRevision,grant:grant.data(),receipt,
-                        ledgerExists:ledger.exists,otherOperationExists:other.exists,fail});
-                }else{
-                    fail("data-loss","Unknown grant receipt state blocks recovery.");
-                }
-            }
-            if(creditedCount!==archivedClaims.size){
-                fail("data-loss","Credited receipt inventory differs from the recovery archive.");
-            }
-            for(const doc of claims.docs){
-                const record=archivedClaims.get(doc.id),claim=doc.data();
-                if(!record||record.grantId!==doc.id||!OPERATION_ID.test(record.operationId||"")){
-                    fail("data-loss","Unsupported or unmatched recovery claim.");
-                }
-                const grantId=doc.id,operationId=record.operationId;
-                const [grant,receipt,ledger,other]=await Promise.all([
-                    tx.get(root.collection("pendingGrants").doc(grantId)),
-                    tx.get(root.collection("grantOperations").doc(operationId)),
-                    tx.get(root.collection("ledgerEntries").doc(operationId)),
-                    tx.get(root.collection("operations").doc(operationId))
-                ]);
-                await verifyCreditedGrant({tx,root,uid,grantId,operationId,
-                    currentRevision:expectedRevision,grant:grant.data(),receipt:receipt.data(),
-                    ledger:ledger.data(),claim,claimRecord:record,otherOperationExists:other.exists,fail});
-            }
+            await verifyRecoveryRights(tx,root,uid,expectedRevision,records,{
+                claims,receipts,ledgers,grants,events,operations,modeSources,modeEvents,
+                patrolTickets,patrolStates,patrolSettlements,patrolClosures,patrolModeEvents,
+                patrolOwnedModeEvents,patrolOperationIds});
             return writeRecoveredRevision(tx,root,uid,operationId,expectedRevision,
                 {envelope,records,archiveSnap,approval,queries,singles,setNames,singleNames,
                     envelopeRef,approvalRef,operationRef,auditRef});
