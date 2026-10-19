@@ -515,10 +515,33 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             await modeEvidence.verifyRetainedNonValueEvent(kernel,root,uid,records.account,event,revision);
         }else fail("invalid-argument","Unsupported proof component.");
     }
+    // Proof semantics: original canonical source validation and retained Owner
+    // kernel. The shared capture lifecycle owns all gates, cursors and writes.
+    async function buildProofPayload({tx,session,run,namespaces,dependencies,inventory,index,version,args}){
+        const root=db.collection("serverUsers").doc(session.uid),base=await Promise.all([
+            tx.get(db.doc("users/"+session.uid+"/saves/current")),tx.get(root.collection("recoveryArchives").doc(String(run.sourceRevision))),
+            tx.get(root.collection("playableSnapshots").doc(String(run.sourceRevision)))]);
+        const source=inspectCurrentRecoverySource(session.uid,run.sourceRevision,{envelopeSnap:base[0],archiveSnap:base[1],snapshotSnap:base[2]});
+        let kernelReads=0;
+        const kernel={get:reference=>{if(typeof reference?.collection!=="function")fail("data-loss","Forest proof requires point reads only.");
+            if(++kernelReads>60)fail("resource-exhausted","Forest proof kernel read budget exceeded.");return tx.get(reference);}};
+        await verifyProofUnit(tx,kernel,root,session.uid,source.records,run.sourceRevision,args.component,args.sourceId);
+        const documents=[...dependencies.values()].filter(row=>namespaces.includes(row.path.slice(0,row.path.lastIndexOf("/"))))
+            .sort((a,b)=>inventoryCompare(a.path,b.path));
+        for(const row of documents)proofMembership(row.path,row,index,namespaces);
+        const payload={schemaVersion:version,kind:proofKind(version,"payload"),ownerUid:session.uid,sourceRevision:run.sourceRevision,
+            ...proofTarget(version,args.component,args.sourceId),inventoryStateSha256:inventory.stateSha256,documents};
+        return payload;
+    }
     async function captureProof(request,args){
         auditIntent("capture proof",args,["auditId","expectedEpoch","operationId","expectedSequence","component","sourceId"]);
         if(!proofComponent(args.component)||!OPERATION_ID.test(args.sourceId||"")||!Number.isSafeInteger(args.expectedSequence)||args.expectedSequence<1)
             fail("invalid-argument","A supported proof component, source and sequence are required.");
+        return captureEvidence(request,args,buildProofPayload,checkProofCapsule);
+    }
+    // One private capture transaction lifecycle. Semantic fronts are fixed by
+    // this Owner, never supplied by request data or a public callback registry.
+    async function captureEvidence(request,args,buildPayload,checkPayload){
         return runRecoveryAuditMaintenance(request,args.auditId,async(rawTx,session)=>{
             // Session Authority has already read its two Session records and fence.
             // Reserve query limits BEFORE sending a read, then release unused slots.
@@ -590,23 +613,12 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 }
                 const bytes=Buffer.concat(chunks);if(inventoryHash(bytes)!==receipt.payloadSha256)fail("data-loss","Forest proof complete payload differs.");
                 const payload=decodeProofPayload(bytes);
-                await checkProofCapsule(payload,run,inventory,index,namespaces,version,args.component,args.sourceId);return result(receipt,true);
+                await checkPayload(payload,run,inventory,index,namespaces,version,args.component,args.sourceId);return result(receipt,true);
             }
             if((state?.nextSequence??1)!==args.expectedSequence)fail("failed-precondition","Forest proof sequence is not current.");
-            const root=db.collection("serverUsers").doc(session.uid),base=await Promise.all([
-                tx.get(db.doc("users/"+session.uid+"/saves/current")),tx.get(root.collection("recoveryArchives").doc(String(run.sourceRevision))),
-                tx.get(root.collection("playableSnapshots").doc(String(run.sourceRevision)))]);
-            const source=inspectCurrentRecoverySource(session.uid,run.sourceRevision,{envelopeSnap:base[0],archiveSnap:base[1],snapshotSnap:base[2]});
-            let kernelReads=0;
-            const kernel={get:reference=>{if(typeof reference?.collection!=="function")fail("data-loss","Forest proof requires point reads only.");
-                if(++kernelReads>60)fail("resource-exhausted","Forest proof kernel read budget exceeded.");return tx.get(reference);}};
-            await verifyProofUnit(tx,kernel,root,session.uid,source.records,run.sourceRevision,args.component,args.sourceId);
-            const documents=[...dependencies.values()].filter(row=>namespaces.includes(row.path.slice(0,row.path.lastIndexOf("/"))))
-                .sort((a,b)=>inventoryCompare(a.path,b.path));
-            for(const row of documents)proofMembership(row.path,row,index,namespaces);
-            let bytes,payload={schemaVersion:version,kind:proofKind(version,"payload"),ownerUid:session.uid,sourceRevision:run.sourceRevision,
-                ...proofTarget(version,args.component,args.sourceId),inventoryStateSha256:inventory.stateSha256,documents};
-            try{bytes=encodeProofPayload(payload);await checkProofCapsule(decodeProofPayload(bytes),run,inventory,index,namespaces,version,args.component,args.sourceId);}
+            const payload=await buildPayload({tx,session,run,namespaces,dependencies,inventory,index,version,args});
+            let bytes;
+            try{bytes=encodeProofPayload(payload);await checkPayload(decodeProofPayload(bytes),run,inventory,index,namespaces,version,args.component,args.sourceId);}
             catch(error){if(error instanceof HttpsError)throw error;fail("data-loss",error.message);}
             const chunks=[];for(let offset=0;offset<bytes.length;offset+=PATROL_PROOF_LIMITS.chunkBytes)chunks.push(bytes.subarray(offset,offset+PATROL_PROOF_LIMITS.chunkBytes));
             const stamp=FieldValue.serverTimestamp(),receipt={schemaVersion:version,kind:proofKind(version,"page"),ownerUid:session.uid,auditId:run.auditId,
