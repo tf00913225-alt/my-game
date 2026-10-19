@@ -48,6 +48,109 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     const patrolEvidence=createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
         inspectExistingEnvelope,nextRevision,now});
     const modeEvidence=patrolEvidence.modeOwner;
+    function inspectCurrentRecoverySource(uid,expectedRevision,{envelopeSnap,archiveSnap,snapshotSnap}){
+        if(!envelopeSnap.exists||!archiveSnap.exists||!snapshotSnap.exists){
+            fail("failed-precondition","Current recovery sources are missing.");
+        }
+        const envelope=inspectExistingEnvelope(envelopeSnap.data(),uid);
+        if(envelope.kind!=="current"||envelope.data.authoritativeStateReady!==false){
+            fail("failed-precondition","Only an unpublished canonical account can be repaired.");
+        }
+        let records;
+        try{records=inspectRecoveryArchive(archiveSnap.data(),uid,
+            expectedRevision,snapshotSnap.data());}
+        catch(_){fail("data-loss","Recovery archive or original snapshot is corrupt.");}
+        if(records.account.provenance!=="server-created"){
+            fail("failed-precondition","Only a server-created canonical account is eligible.");
+        }
+        return {envelope,records};
+    }
+    async function verifyDebitRecoveryEvidence(tx,root,uid,expectedRevision,records,doc,ledger,receipt){
+        const operation=await tx.get(root.collection("operations").doc(doc.id));
+        const debit=operation.data();
+        if(receipt||!operation.exists||debit.schemaVersion!==1||debit.ownerUid!==uid||
+           debit.operationId!==doc.id||!["shop-purchase","exp-allocation","attribute-allocation"].includes(debit.kind)){
+            fail("data-loss","An unmatched ledger entry blocks recovery.");
+        }
+        const debitRevision=debit.kind==="shop-purchase"?debit.purchasedRevision:debit.allocatedRevision;
+        if(!Number.isSafeInteger(debitRevision)||debitRevision<2||debitRevision>expectedRevision){
+            fail("data-loss","A later or unknown debit revision blocks recovery.");
+        }
+        const [debitSnapshot,debitArchive]=await Promise.all([
+            tx.get(root.collection("playableSnapshots").doc(String(debitRevision))),
+            tx.get(root.collection("recoveryArchives").doc(String(debitRevision)))
+        ]);
+        try{
+            if(!debitSnapshot.exists||!debitArchive.exists||
+               debitSnapshot.get("sha256")!==debit.snapshotSha256)throw new Error("Missing debit proof");
+            const original=inspectRecoveryArchive(debitArchive.data(),uid,debitRevision,debitSnapshot.data());
+            if(original.account.slots.some((id,index)=>id!==null&&id!==records.account.slots[index])||
+               (debit.kind!=="shop-purchase"&&!records.account.slots.includes(debit.characterId))||
+               (debit.kind==="exp-allocation"&&!original.characters.some(row=>
+                   row.characterId===debit.characterId&&row.state.level===debit.levelAfter))||
+               (debit.kind==="attribute-allocation"&&!original.characters.some(row=>
+                   row.characterId===debit.characterId&&row.state[debit.stat]===debit.statAfter&&
+                   row.state.attributePoints===debit.pointsAfter))){
+                throw new Error("Debit character differs from its original source");
+            }
+        }catch(_){fail("data-loss","Original debit snapshot or archive is inconsistent.");}
+        const proof={tx,root,uid,operationId:doc.id,currentRevision:expectedRevision,
+            receipt:debit,ledger,grantExists:false,fail};
+        if(debit.kind==="shop-purchase"){
+            await verifyShopPurchaseEvidence({...proof,itemId:debit.itemId,quantity:debit.quantity});
+        }else if(debit.kind==="exp-allocation"){
+            verifyExpAllocationEvidence({...proof,characterId:debit.characterId});
+        }else{
+            verifyAttributeAllocationEvidence({...proof,characterId:debit.characterId,stat:debit.stat});
+        }
+    }
+    // Private write kernel: restoreCurrent calls this only after every existing
+    // source/inventory proof in the same protected transaction has completed.
+    function writeRecoveredRevision(tx,root,uid,operationId,expectedRevision,
+        {envelope,records,archiveSnap,approval,queries,singles,setNames,singleNames,
+            envelopeRef,approvalRef,operationRef,auditRef}){
+        const revision=nextRevision(envelope);
+        const next=restoredRecords(records,revision);
+        let bundle,archive;
+        try{
+            bundle=assembleCanonicalSnapshot(uid,revision,next);
+            archive=createRecoveryArchive(uid,revision,next,bundle);
+        }catch(_){fail("data-loss","Recovered sources cannot form a complete revision.");}
+        const stamp=FieldValue.serverTimestamp();
+        const originalStamp=snapshot=>
+            typeof snapshot?.get("createdAt")?.toMillis==="function"
+                ?snapshot.get("createdAt"):stamp;
+        for(let i=0;i<singleNames.length;i++){
+            const name=singleNames[i],id=SINGLES[name];
+            const ref=root.collection(name==="claimCheckpoint"?"claimCheckpoints":name).doc(id);
+            tx.set(ref,{...next[name],...(name==="account"?{snapshotSha256:bundle.sha256}:{}),
+                createdAt:originalStamp(singles[i]),updatedAt:stamp});
+        }
+        for(const name of setNames){
+            const existing=new Map(queries[setNames.indexOf(name)].docs.map(doc=>[doc.id,doc]));
+            for(const record of next[name]){
+                tx.set(root.collection(name).doc(SETS[name](record)),
+                    {...record,createdAt:originalStamp(existing.get(SETS[name](record))),
+                        updatedAt:stamp});
+            }
+        }
+        tx.create(root.collection("playableSnapshots").doc(String(revision)),
+            {...bundle,createdAt:stamp});
+        tx.create(root.collection("recoveryArchives").doc(String(revision)),
+            {...archive,createdAt:stamp});
+        const receipt={schemaVersion:1,ownerUid:uid,
+            kind:"canonical-current-recovery",operationId,
+            sourceRevision:expectedRevision,restoredRevision:revision,
+            sourceSha256:archiveSnap.get("sourceSha256"),
+            snapshotSha256:bundle.sha256,approvedBy:approval.approvedBy,
+            authoritativeStateReady:false,createdAt:stamp};
+        tx.create(operationRef,receipt);
+        tx.create(auditRef,receipt);
+        tx.update(approvalRef,{status:"used",usedRevision:revision,usedAt:stamp});
+        tx.update(envelopeRef,{serverRevision:revision,updatedAt:stamp});
+        return {restoredRevision:revision,unchanged:false,
+            authoritativeStateReady:false};
+    }
     async function verifyRecoveredResult(tx,root,uid,operationId,expectedRevision,maxRevision,
         {archiveSnap,snapshotSnap,approvalSnap,operationSnap,auditSnap,grantSnap,ledgerSnap},records){
         const receipt=operationSnap.data(),audit=auditSnap.data(),
@@ -121,20 +224,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 auditRef,grantRef,ledgerRef];
             const [envelopeSnap,archiveSnap,snapshotSnap,approvalSnap,operationSnap,
                 auditSnap,grantSnap,ledgerSnap]=await Promise.all(refs.map(ref=>tx.get(ref)));
-            if(!envelopeSnap.exists||!archiveSnap.exists||!snapshotSnap.exists){
-                fail("failed-precondition","Current recovery sources are missing.");
-            }
-            const envelope=inspectExistingEnvelope(envelopeSnap.data(),uid);
-            if(envelope.kind!=="current"||envelope.data.authoritativeStateReady!==false){
-                fail("failed-precondition","Only an unpublished canonical account can be repaired.");
-            }
-            let records;
-            try{records=inspectRecoveryArchive(archiveSnap.data(),uid,
-                expectedRevision,snapshotSnap.data());}
-            catch(_){fail("data-loss","Recovery archive or original snapshot is corrupt.");}
-            if(records.account.provenance!=="server-created"){
-                fail("failed-precondition","Only a server-created canonical account is eligible.");
-            }
+            const {envelope,records}=inspectCurrentRecoverySource(uid,expectedRevision,
+                {envelopeSnap,archiveSnap,snapshotSnap});
             if(operationSnap.exists){
                 return verifyRecoveredResult(tx,root,uid,operationId,expectedRevision,envelope.serverRevision,
                     {archiveSnap,snapshotSnap,approvalSnap,operationSnap,auditSnap,grantSnap,ledgerSnap},records);
@@ -424,43 +515,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                     creditLedgerCount++;
                     continue; // Full credit proof is checked below.
                 }
-                const operation=await tx.get(root.collection("operations").doc(doc.id));
-                const debit=operation.data();
-                if(receipt||!operation.exists||debit.schemaVersion!==1||debit.ownerUid!==uid||
-                   debit.operationId!==doc.id||!["shop-purchase","exp-allocation","attribute-allocation"].includes(debit.kind)){
-                    fail("data-loss","An unmatched ledger entry blocks recovery.");
-                }
-                const debitRevision=debit.kind==="shop-purchase"?debit.purchasedRevision:debit.allocatedRevision;
-                if(!Number.isSafeInteger(debitRevision)||debitRevision<2||debitRevision>expectedRevision){
-                    fail("data-loss","A later or unknown debit revision blocks recovery.");
-                }
-                const [debitSnapshot,debitArchive]=await Promise.all([
-                    tx.get(root.collection("playableSnapshots").doc(String(debitRevision))),
-                    tx.get(root.collection("recoveryArchives").doc(String(debitRevision)))
-                ]);
-                try{
-                    if(!debitSnapshot.exists||!debitArchive.exists||
-                       debitSnapshot.get("sha256")!==debit.snapshotSha256)throw new Error("Missing debit proof");
-                    const original=inspectRecoveryArchive(debitArchive.data(),uid,debitRevision,debitSnapshot.data());
-                    if(original.account.slots.some((id,index)=>id!==null&&id!==records.account.slots[index])||
-                       (debit.kind!=="shop-purchase"&&!records.account.slots.includes(debit.characterId))||
-                       (debit.kind==="exp-allocation"&&!original.characters.some(row=>
-                           row.characterId===debit.characterId&&row.state.level===debit.levelAfter))||
-                       (debit.kind==="attribute-allocation"&&!original.characters.some(row=>
-                           row.characterId===debit.characterId&&row.state[debit.stat]===debit.statAfter&&
-                           row.state.attributePoints===debit.pointsAfter))){
-                        throw new Error("Debit character differs from its original source");
-                    }
-                }catch(_){fail("data-loss","Original debit snapshot or archive is inconsistent.");}
-                const proof={tx,root,uid,operationId:doc.id,currentRevision:expectedRevision,
-                    receipt:debit,ledger,grantExists:false,fail};
-                if(debit.kind==="shop-purchase"){
-                    await verifyShopPurchaseEvidence({...proof,itemId:debit.itemId,quantity:debit.quantity});
-                }else if(debit.kind==="exp-allocation"){
-                    verifyExpAllocationEvidence({...proof,characterId:debit.characterId});
-                }else{
-                    verifyAttributeAllocationEvidence({...proof,characterId:debit.characterId,stat:debit.stat});
-                }
+                await verifyDebitRecoveryEvidence(tx,root,uid,expectedRevision,records,doc,ledger,receipt);
             }
             if(creditLedgerCount!==archivedClaims.size){
                 fail("data-loss","Credit ledger inventory differs from the recovery archive.");
@@ -508,47 +563,9 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                     currentRevision:expectedRevision,grant:grant.data(),receipt:receipt.data(),
                     ledger:ledger.data(),claim,claimRecord:record,otherOperationExists:other.exists,fail});
             }
-            const revision=nextRevision(envelope);
-            const next=restoredRecords(records,revision);
-            let bundle,archive;
-            try{
-                bundle=assembleCanonicalSnapshot(uid,revision,next);
-                archive=createRecoveryArchive(uid,revision,next,bundle);
-            }catch(_){fail("data-loss","Recovered sources cannot form a complete revision.");}
-            const stamp=FieldValue.serverTimestamp();
-            const originalStamp=snapshot=>
-                typeof snapshot?.get("createdAt")?.toMillis==="function"
-                    ?snapshot.get("createdAt"):stamp;
-            for(let i=0;i<singleNames.length;i++){
-                const name=singleNames[i],id=SINGLES[name];
-                const ref=root.collection(name==="claimCheckpoint"?"claimCheckpoints":name).doc(id);
-                tx.set(ref,{...next[name],...(name==="account"?{snapshotSha256:bundle.sha256}:{}),
-                    createdAt:originalStamp(singles[i]),updatedAt:stamp});
-            }
-            for(const name of setNames){
-                const existing=new Map(queries[setNames.indexOf(name)].docs.map(doc=>[doc.id,doc]));
-                for(const record of next[name]){
-                    tx.set(root.collection(name).doc(SETS[name](record)),
-                        {...record,createdAt:originalStamp(existing.get(SETS[name](record))),
-                            updatedAt:stamp});
-                }
-            }
-            tx.create(root.collection("playableSnapshots").doc(String(revision)),
-                {...bundle,createdAt:stamp});
-            tx.create(root.collection("recoveryArchives").doc(String(revision)),
-                {...archive,createdAt:stamp});
-            const receipt={schemaVersion:1,ownerUid:uid,
-                kind:"canonical-current-recovery",operationId,
-                sourceRevision:expectedRevision,restoredRevision:revision,
-                sourceSha256:archiveSnap.get("sourceSha256"),
-                snapshotSha256:bundle.sha256,approvedBy:approval.approvedBy,
-                authoritativeStateReady:false,createdAt:stamp};
-            tx.create(operationRef,receipt);
-            tx.create(auditRef,receipt);
-            tx.update(approvalRef,{status:"used",usedRevision:revision,usedAt:stamp});
-            tx.update(envelopeRef,{serverRevision:revision,updatedAt:stamp});
-            return {restoredRevision:revision,unchanged:false,
-                authoritativeStateReady:false};
+            return writeRecoveredRevision(tx,root,uid,operationId,expectedRevision,
+                {envelope,records,archiveSnap,approval,queries,singles,setNames,singleNames,
+                    envelopeRef,approvalRef,operationRef,auditRef});
         });
     }
     return Object.freeze({restoreCurrent});
