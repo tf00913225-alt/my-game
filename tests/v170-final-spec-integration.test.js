@@ -22,6 +22,7 @@ const v158Source=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 
 const EXPECTED_DIRECT_SCRIPT_PATHS=[
     "functions/src/hero-core.js",
+    "functions/src/patrol-reward-policy.js",
     "js/00-main.js",
     "js/01-stage-v8-touch-lock.js",
     "js/02-stage-v9-native-coordinate-api.js",
@@ -1724,6 +1725,33 @@ test("Level Suppression V2 after ALL generated production feature bundles",()=>{
         loaded.add(name);
     }
     for(const name of Object.keys(features))load(name);
+    const rewards=evaluateJson(context,`(()=>{
+        Math.random=()=>.5;
+        const ranks=["regular","elite","boss"];
+        const goldRows=ranks.map(rank=>{
+            const monster={name:"reward parity",level:20,rank};
+            const before=gold;
+            const base=getMonsterGoldDrop(monster),awarded=awardMonsterGoldDrop(monster);
+            return {base,awarded,delta:gold-before};
+        });
+        let draws=0;
+        Math.random=()=>{draws++;return .5;};
+        const absentGold=getMonsterGoldDrop(null),nullDraws=draws;
+        const variance=[0,.999999999999].map(sample=>{
+            Math.random=()=>{draws++;return sample;};
+            return ranks.map(rank=>getMonsterGoldDrop({level:20,rank}));
+        });
+        return {goldRows,variance,draws,nullDraws,absentGold,beginner:v173GetBeginnerForestBattleExp(),
+            unit:v17342GetBeginnerForestMonsterExpUnit(),
+            standard:v173CalculateStandardPatrolExp([{level:20,rank:"elite"}],20),
+            elementBox:v173ApplyPatrolExpMode(700,{elementBox:true,rested:true})};
+    })()`);
+    assert.deepEqual(rewards.goldRows,[{base:43,awarded:215,delta:215},
+        {base:86,awarded:430,delta:430},{base:215,awarded:1075,delta:1075}]);
+    assert.equal(rewards.beginner,293);assert.equal(rewards.unit,98);
+    assert.equal(rewards.standard,1050);assert.equal(rewards.elementBox,490);
+    assert.deepEqual(rewards.variance,[[36,73,182],[49,98,247]]);
+    assert.equal(rewards.absentGold,0);assert.equal(rewards.nullDraws,0);assert.equal(rewards.draws,6);
     const report=evaluateJson(context,`(function(){
         Math.random=function(){return .5;};
         Object.assign(player,{id:"V2",element:"light",activeBuffs:[],statusEffects:[],hp:1000});

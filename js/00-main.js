@@ -22461,22 +22461,8 @@ function getMonsterGoldDrop(monster){
         return 0;
     }
 
-    const level=Math.max(1,Math.floor(Number(monster.level)||1));
-    const rank=getMonsterRank(monster);
-    const rankMultiplier=
-        rank==="boss"
-        ? 8
-        : rank==="elite"
-        ? 3
-        : 1;
-
-    const base=level*2+3;
-    const variance=0.85+Math.random()*0.30;
-
-    return Math.max(
-        1,
-        Math.floor(base*rankMultiplier*variance)
-    );
+    return window.FourSymbolsPatrolRewardPolicy.baseGold(
+        monster.level,getMonsterRank(monster),Math.random());
 }
 
 function awardMonsterGoldDrop(monster){

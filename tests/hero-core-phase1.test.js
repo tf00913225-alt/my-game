@@ -104,7 +104,10 @@ assert.equal(saveContext.loadGame({...saved,heroAccount:{schemaVersion:99,heroes
 assert.deepEqual(saveContext.heroAccountState,state,"invalid extension must leave current account unchanged");
 assert.match(main,/heroAccount:window\.FourSymbolsHeroCore\.normalizeAccountState\(heroAccountState\)/);
 assert.ok(hydrateStart<main.indexOf("            data.player",hydrateStart));
-assert.match(fs.readFileSync("scripts/build-production.mjs","utf8"),/"functions\/src\/hero-core.js",\s*"js\/00-main.js"/);
+const appScriptBlock=fs.readFileSync("scripts/build-production.mjs","utf8").match(/const appScripts=\[([\s\S]*?)\];/)[1];
+const appScriptPaths=[...appScriptBlock.matchAll(/"([^"]+\.js)"/g)].map(match=>match[1]);
+assert.equal(appScriptPaths.filter(path=>path==="functions/src/hero-core.js").length,1);
+assert.ok(appScriptPaths.indexOf("js/00-main.js")>appScriptPaths.indexOf("functions/src/hero-core.js"));
 assert.equal(core.contract.rage.persisted,false);assert.equal(core.contract.runtimeReady,false);
 assert.doesNotMatch(fs.readFileSync("functions/src/hero-core.js","utf8"),/localStorage|document\.|Date\.now|Math\.random/);
 console.log("PASS Hero Phase 1: registry, level, stats, fragments/stars, deterministic allocation, skills, legacy hydration and canonical roundtrip");
