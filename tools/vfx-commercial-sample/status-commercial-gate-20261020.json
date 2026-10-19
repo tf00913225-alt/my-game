@@ -330,5 +330,208 @@
     "Rage screenshot does not demonstrate a normal-combat dedicated status icon adequately compensating for weak body identity.",
     "No regeneration, runtime changes, phone operation or commit performed for this report."
   ],
-  "stopRule": "Retain statically passing presentations unless new player-visible defects appear. Do not iterate for minor hue preference, invisible pixels or arbitrary prompt padding."
+  "stopRule": "Retain statically passing presentations unless new player-visible defects appear. Do not iterate for minor hue preference, invisible pixels or arbitrary prompt padding.",
+  "contrastV2Followup": {
+    "date": "2026-10-20",
+    "head": "590b1390631aaf550a5803e718325ae211baa818",
+    "evidence": "artifacts/vfx-status-contrast-v2/evidence.json",
+    "contrastEvidence": "artifacts/vfx-status-contrast-v2/rage-contrast.json",
+    "imagesIndividuallyViewed": [
+      "rage-player-off.png",
+      "rage-player-min.png",
+      "rage-player-max.png",
+      "rage-monster-off.png",
+      "rage-monster-min.png",
+      "rage-monster-max.png",
+      "status-rage.png",
+      "status-dodgeSkill.png",
+      "status-dinghaishenzhen.png"
+    ],
+    "imageDirectory": "artifacts/vfx-status-contrast-v2",
+    "findings": [
+      {
+        "id": "rage",
+        "staticGate": "PASS",
+        "scope": "Player and monster, including off/min/max comparison",
+        "supersedes": "Original 4b2cb548 static FAIL",
+        "reason": "At opacity .60, added orange-red side flames and lower-body loop are visibly different from off on both portraits. At .80 actor face, silhouette and HUD remain readable. Increased contrast resolves the observed weak body presence without enlarging footprint.",
+        "furtherArtIterationRequired": false
+      },
+      {
+        "id": "dinghaishenzhen",
+        "staticGate": "PASS",
+        "scope": "Player portrait only",
+        "supersedes": "Original player identity NEEDS_EVIDENCE",
+        "reason": "Height .74 makes pale cyan-white rising lower-body aura visibly taller than the low green dodgeSkill foot ring. Body and HUD remain readable.",
+        "enemyNewGeometryGate": "NEEDS_EVIDENCE",
+        "furtherArtIterationRequired": false
+      },
+      {
+        "id": "dodgeSkill",
+        "staticGate": "PASS",
+        "scope": "Player comparison against revised dinghaishenzhen",
+        "supersedes": "Original player pairwise identity NEEDS_EVIDENCE",
+        "reason": "Low green foot ring remains contained and is distinguishable from the revised taller pale cyan-white calm aura. No additional dodge art adjustment is justified by this static comparison.",
+        "enemyPairwiseIdentityGate": "NEEDS_EVIDENCE",
+        "furtherArtIterationRequired": false
+      }
+    ],
+    "overallCommercialGate": "NEEDS_EVIDENCE",
+    "overallReason": "Observed rage static defect is resolved. Revised calm aura and dodge pair are statically acceptable on player. Enemy revised calm comparison and motion/continuous performance evidence remain outstanding.",
+    "limits": [
+      "Original review and counts remain historical; this append supersedes only the explicit scopes above.",
+      "New status-dinghaishenzhen and status-dodgeSkill evidence is player-side only. Do not claim a fresh enemy visual acceptance for height .74.",
+      "Off/min/max screenshots prove visibility/containment at sampled opacity endpoints, not pulse continuity or smooth layer rotation.",
+      "Dynamic recording has not been reviewed in this append.",
+      "No runtime changes, phone operation, commit or extra art iteration."
+    ],
+    "stopRule": "Seal accepted static composition unless new player-visible defects appear; do not pursue small aesthetic preferences."
+  },
+  "contrastV2EnemyFollowup": {
+    "date": "2026-10-20",
+    "head": "590b1390631aaf550a5803e718325ae211baa818",
+    "evidence": "artifacts/vfx-status-contrast-v2-enemy/evidence.json",
+    "imagesIndividuallyViewed": [
+      "artifacts/vfx-status-contrast-v2-enemy/status-dinghaishenzhen.png",
+      "artifacts/vfx-status-contrast-v2-enemy/status-dodgeSkill.png",
+      "artifacts/vfx-status-contrast-v2-enemy/status-rage.png"
+    ],
+    "findings": [
+      {
+        "id": "dinghaishenzhen",
+        "staticGate": "PASS",
+        "reason": "Enemy revised calm aura has a visible pale cyan-white rising lower-body envelope. It is taller and broader vertically than low green dodge ring, while face and HUD remain clear."
+      },
+      {
+        "id": "dodgeSkill",
+        "staticGate": "PASS",
+        "reason": "Enemy low green foot ring is discernible from the revised taller calm aura and remains contained."
+      },
+      {
+        "id": "rage",
+        "staticGate": "PASS",
+        "reason": "Enemy orange-red side flames and lower loop are clearly visible against blue portrait; face/HUD remain readable. Confirms previous contrast endpoint PASS."
+      }
+    ],
+    "supersedes": "Enemy revised calm geometry and pairwise identity NEEDS_EVIDENCE in contrastV2Followup",
+    "currentBodyStaticSummary": {
+      "PASS": 14,
+      "FAIL": 0,
+      "NEEDS_EVIDENCE": 0
+    },
+    "currentAllStatusStaticSummary": {
+      "PASS": 21,
+      "FAIL": 0,
+      "NEEDS_EVIDENCE": 0
+    },
+    "dynamicGate": "NEEDS_EVIDENCE",
+    "dynamicLimit": "This reviewer attempted CUA background iab access, received Browser is not available: iab, and listBrowsers returned empty. No video was visually reviewed; root will review through available browser.",
+    "overallCommercialGate": "NEEDS_EVIDENCE",
+    "stopRule": "All 21 static presentations are accepted within captured portrait scope; do not further iterate without new player-visible defects. Original history is retained."
+  },
+  "sampledCycleReview": {
+    "date": "2026-10-20",
+    "headAtReview": "590b1390631aaf550a5803e718325ae211baa818",
+    "sourceDirectory": "artifacts/vfx-status-contrast-v2",
+    "imagesIndividuallyViewed": [
+      "rage-phases.png",
+      "dodgeSkill-phases.png",
+      "dinghaishenzhen-phases.png",
+      "burn-phases.png",
+      "stun-phases.png",
+      "freeze-phases.png",
+      "petrify-phases.png",
+      "shield-phases.png",
+      "earthShield-phases.png",
+      "rockWall-phases.png",
+      "barrier-phases.png",
+      "yuanZuBlessing-phases.png",
+      "fireSoulResonance-phases.png",
+      "bloodBurn-phases.png"
+    ],
+    "sampledCycleGate": "NEEDS_EVIDENCE",
+    "evidenceValidity": "NOT_ESTABLISHED",
+    "reason": "All fourteen six-phase strips visually show essentially the same baseline portraits without their expected status bodies. Stun has no yellow head stars; freeze/petrify have no cocoon; rage enemy has no orange-red side aura visible in accepted static captures. These strips do not establish any sampled status cycle.",
+    "runtimeDefectConfirmed": false,
+    "followup": "Check actual decoded frames after seek completion against original video and confirm recorded interval contains on-state. Do not change art to address this evidence issue.",
+    "continuousGate": "NEEDS_EVIDENCE",
+    "performanceGate": "NEEDS_EVIDENCE",
+    "limits": [
+      "Even correct six-phase samples at 0.42 second intervals cannot prove 60fps or absence of inter-sample flicker/jumps.",
+      "Existing 21 static PASS results remain accepted; invalid or unverified sampled strips do not overturn those images.",
+      "No original video playback was possible in this reviewer browser surface."
+    ],
+    "perStatus": [
+      {
+        "id": "rage",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      },
+      {
+        "id": "dodgeSkill",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      },
+      {
+        "id": "dinghaishenzhen",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      },
+      {
+        "id": "burn",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      },
+      {
+        "id": "stun",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      },
+      {
+        "id": "freeze",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      },
+      {
+        "id": "petrify",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      },
+      {
+        "id": "shield",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      },
+      {
+        "id": "earthShield",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      },
+      {
+        "id": "rockWall",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      },
+      {
+        "id": "barrier",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      },
+      {
+        "id": "yuanZuBlessing",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      },
+      {
+        "id": "fireSoulResonance",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      },
+      {
+        "id": "bloodBurn",
+        "sampledCycleGate": "NEEDS_EVIDENCE",
+        "reason": "Expected status presentation not established in provided phase strip"
+      }
+    ]
+  }
 }

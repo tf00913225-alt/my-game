@@ -99,7 +99,7 @@
         stormFlurry:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/storm-flurry-cast.png?v=173.24","group",{scale:1.08,minSize:190,alignToSlots:true})},
         windCrossSlash:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/wind-cross-slash-cast.png?v=173.24","single",{scale:2.25,maxSize:280})},
         dizzyFist:{hit:.5,deferredStatusTypes:["stun"],sprite:castSheet("assets/vfx/wind/dizzy-fist-cast.png?v=173.24","single",{scale:2.35,maxSize:290})},
-        windSpell:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/wind-spell-cast.png?v=173.24","group",{scale:1.08,minSize:190,alignToSlots:true})},
+        windSpell:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/wind-spell-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
         stormCircle:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/storm-circle-cast.png?v=173.24","group",{scale:1.08,minSize:190,alignToSlots:true})},
         windHowlLightning:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/wind-howl-lightning-cast.png?v=173.24","single",{scale:2.35,maxSize:290})},
         stormRain:{hit:.5,deferredStatusTypes:["stun"],sprite:castSheet("assets/vfx/wind/storm-rain-cast-v2.webp","battlefield",{scale:1.08,minSize:280})},

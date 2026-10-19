@@ -5,7 +5,8 @@
 <main><h1>USB 真機 VFX 前後對照</h1><p>同一台 Samsung Note9 的實際遊戲測試畫面。這是施放瞬間的對照；動畫連續性、命中與清理另有測試紀錄。</p>
 <label for="case">選擇技能或狀態　</label><select id="case"></select><p id="note"></p>
 <div class="pair"><figure><figcaption>修改前／上一輪</figcaption><div class="source" id="beforeSource"></div><img id="before" alt="修改前手機截圖"></figure><figure><figcaption>目前候選</figcaption><div class="source" id="afterSource"></div><img id="after" alt="目前候選手機截圖"></figure></div>
-<p>使用獨立唯讀 QA 帳號。較早基線與本輪的瀏覽器可視高度略有差異；圖片完整呈現，沒有裁切或重繪截圖。</p></main>
+<p>使用獨立唯讀 QA 帳號。較早基線與本輪的瀏覽器可視高度略有差異；圖片完整呈現，沒有裁切或重繪截圖。</p>
+<h2>持續狀態：USB 實機完整錄影</h2><p>候選 590b1390，14 種身體狀態逐項開／關，玩家與敵方同步展示。原始手機錄影，尚待獨立動態驗收。</p><video controls preload="metadata" style="width:min(100%,460px)" src="../../artifacts/vfx-status-contrast-v2/status-cycle.mp4"></video></main>
 <script>
 const rows=[
  ['flameSlash','火焰斬','skill','斬柱改為纖細斜弧，保留火焰辨識，檢查命中星芒與角色可讀性。'],
@@ -39,9 +40,10 @@ function show(){const [id,label,kind,note]=rows[Number(picker.value)];const base
 const originalRage=kind==='status'&&id==='rage';
 const before=originalRage?'../../artifacts/vfx-status-anchors-player/status-rage-original.png':baseline&&kind==='skill'?`../../artifacts/vfx-usb-runtime/before-${id}.png`:`../../artifacts/vfx-checkpoint18/${kind}-${id}.png`;
 const revisedGroup=['rage','windSpell'];
-const folder=kind==='status'?'vfx-status-anchors-player':revisedGroup.includes(id)?'vfx-status-polish':'vfx-final';
+const revisedStatus=kind==='status'&&['rage','dodgeSkill','dinghaishenzhen'].includes(id);
+const folder=kind==='status'?(revisedStatus?'vfx-status-contrast-v2':'vfx-status-anchors-player'):revisedGroup.includes(id)?'vfx-status-polish':'vfx-final';
 document.getElementById('before').src=before;document.getElementById('after').src=`../../artifacts/${folder}/${kind}-${id}.png`;
 document.getElementById('beforeSource').textContent=originalRage?'同一候選環境：原素材重播':baseline&&kind==='skill'?'原始基線 b767d31e':'上一輪 checkpoint 18f92b26';
-document.getElementById('afterSource').textContent=kind==='status'?'狀態候選 4b2cb548':revisedGroup.includes(id)?'取消過度放大候選 b145e2d7':'素材候選 067fa105';document.getElementById('note').textContent=note;}
+document.getElementById('afterSource').textContent=kind==='status'?(revisedStatus?'局部修正候選 590b1390':'狀態候選 4b2cb548'):revisedGroup.includes(id)?'取消過度放大候選 b145e2d7':'素材候選 067fa105';document.getElementById('note').textContent=note;}
 picker.onchange=show;show();
 </script></html>

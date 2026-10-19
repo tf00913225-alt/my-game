@@ -272,5 +272,65 @@
       "conclusion": "Intentional lack of body/HUD visual retained; absence is not a failure.",
       "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
     }
+  ],
+  "enemyDinghaishenzhenResolution": {
+    "reviewHead": "590b1390631aaf550a5803e718325ae211baa818",
+    "screenshot": "artifacts/vfx-status-contrast-v2-enemy/status-dinghaishenzhen.png",
+    "evidence": "artifacts/vfx-status-contrast-v2-enemy/evidence.json",
+    "classification": "LOCAL_VETO_RESOLVED_BOTH_SIDES_STOP_REFINEMENT",
+    "conclusion": "New enemy image visibly restores pale blue U-shaped cloud flow around lower body and feet at opacity .479929, with approximately 66.28 by 65.69 rendered CSS-pixel bounds. Cloud remains visible against blue fox, while face, upper silhouette and HP/name remain clear. Together with previous player follow-up, the local over-shrink veto is resolved on both sides.",
+    "next": "Retain .74 height and stop discretionary refinement of this status. Previous enemy NEEDS_EVIDENCE entry is historical and now resolved. No general rollback, source redraw or geometry change is warranted.",
+    "limits": "Focused static visual review only; not performance or commercial completion. No other already-retained statuses were reopened."
+  },
+  "followUpReviews": [
+    {
+      "reviewHead": "590b1390631aaf550a5803e718325ae211baa818",
+      "reviewDate": "2026-10-20",
+      "scope": "Focused follow-up; historical 4b2cb548 conclusions above remain unchanged.",
+      "evidenceDirectory": "artifacts/vfx-status-contrast-v2",
+      "imagesViewed": [
+        "status-dinghaishenzhen.png",
+        "status-rage.png",
+        "status-dodgeSkill.png",
+        "rage-player-off.png",
+        "rage-player-min.png",
+        "rage-player-max.png",
+        "rage-monster-off.png",
+        "rage-monster-min.png",
+        "rage-monster-max.png"
+      ],
+      "metadataViewed": [
+        "rage-contrast.json"
+      ],
+      "decisions": [
+        {
+          "id": "dinghaishenzhen",
+          "classification": "LOCAL_VETO_RESOLVED_FOR_PLAYER",
+          "conclusion": "Height .74 restores visible pale blue cloud U and bilateral flow around lower body; distinct from green dodgeSkill. Face, upper portrait and HUD remain clear. Previous player over-shrink is resolved without full rollback.",
+          "remainingEvidence": "No new enemy dinghaishenzhen still exists in this evidence directory. Enemy follow-up is NEEDS_EVIDENCE; do not claim both-side clearance from player image.",
+          "next": "Retain .74 candidate; no further discretionary player refinement. Only verify enemy at same profile."
+        },
+        {
+          "id": "rage",
+          "classification": "RETAIN_STOP_REFINEMENT",
+          "conclusion": "Off/min .60/max .80 pairs show improved orange aura along red player's torso and lower silhouette. Red-on-red blending remains natural but effect is no longer judged absent. Blue enemy shows a clear orange U at .60 and .80; eyes, face and central body remain readable, and HP/name are untouched. No new opaque fire face or column. This limited opacity change is not overcorrection.",
+          "next": "Retain .60-.80; stop discretionary contrast, size and source refinement unless a concrete new regression appears."
+        },
+        {
+          "id": "dodgeSkill",
+          "classification": "RETAIN_STOP_REFINEMENT",
+          "conclusion": "Unchanged green foot wind remains visible, with distinct hue and lower silhouette versus restored pale cloud. No new regression in control image."
+        }
+      ],
+      "qualityClaim": "Focused static visual veto review only; not commercial completion or performance/duration-owner acceptance.",
+      "currentStopRefinementAddition": [
+        "rage",
+        "dinghaishenzhen:player"
+      ],
+      "currentPending": [
+        "dinghaishenzhen:enemy new-profile still"
+      ],
+      "runtimeOrPhoneChangesMade": false
+    }
   ]
 }

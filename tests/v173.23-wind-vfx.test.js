@@ -315,7 +315,7 @@ test("all eleven casts keep Sprite timing while six persistent states use low-mo
     Object.entries(CASTS).forEach(([id,spec])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id);
-        const expectedSource=id==="stormRain"?"assets/vfx/wind/storm-rain-cast-v2.webp":"assets/vfx/wind/"+spec.file+"?v=173.24";
+        const expectedSource=id==="stormRain"?"assets/vfx/wind/storm-rain-cast-v2.webp":id==="windSpell"?"assets/vfx/wind/wind-spell-wide-v2.webp":"assets/vfx/wind/"+spec.file+"?v=173.24";
         assert.equal(model.sprite.src,expectedSource,id);
         assert.deepEqual(
             Array.from([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame]),
@@ -365,6 +365,26 @@ function losslessWebpInfo(file){
  for(let o=12;o+8<=b.length;){const type=b.toString("ascii",o,o+4),size=b.readUInt32LE(o+4),p=o+8;assert.ok(p+size<=b.length,"complete WebP chunk");if(type==="VP8L"){assert.equal(b[p],0x2f);const bits=b.readUInt32LE(p+1);return {width:1+(bits&16383),height:1+((bits>>>14)&16383),alpha:(bits>>>28)&1};}o=p+size+(size%2);}
  throw new Error("Expected lossless VP8L image");
 }
+
+test("windSpell wide source preserves native frame aspect before and after image metadata arrives",()=>{
+    const candidate="assets/vfx/wind/wind-spell-wide-v2.webp",bytes=fs.readFileSync(candidate);
+    const info=losslessWebpInfo(bytes);
+    assert.deepEqual([info.width,info.height],[2172,724]);
+    assert.equal(info.alpha,1);
+    assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"),"73b005cb0199578af99938aa083b10cd6a465f6151b973ce6a57f5c6922df42c");
+    const sprite=loadRuntime().context.v143SkillAnimationManifest.windSpell.sprite;
+    assert.equal(sprite.src,candidate);
+    const actualAspect=(info.width/sprite.columns)/(info.height/sprite.rows);
+    assert.equal(actualAspect,2.25);
+    assert.equal(sprite.cellAspect,actualAspect,'fallback agrees with the actual fractional-height cell');
+    const start=animation.indexOf('function frameAspectFor('),end=animation.indexOf('function applySpriteBox(',start);
+    assert.ok(start>=0&&end>start);
+    const cache=new Map(),context={spriteFrameAspectCache:cache,Math,Number,String};
+    vm.createContext(context);vm.runInContext(animation.slice(start,end),context);
+    assert.equal(context.frameAspectFor(sprite),actualAspect,'cold-cache layout must already be wide');
+    cache.set(candidate,actualAspect);
+    assert.equal(context.frameAspectFor(sprite),actualAspect,'loaded metadata must not change source shape');
+});
 
 test("Wind casts use one DOM Sprite Sheet node and never invoke Canvas drawing",()=>{
     const runtime=loadRuntime();
