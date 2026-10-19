@@ -631,8 +631,9 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
         const [before,after]=await Promise.all([
             originalRecords(tx,root,uid,event.sourceRevision,event.sourceSnapshotSha256),
             originalRecords(tx,root,uid,event.resultRevision,event.resultSnapshotSha256)]);
+        const sourceModes=modes(before);
         if(before.account.slots[0]!==account.slots[0]||after.account.slots[0]!==account.slots[0]||
-           !same(event.beforeModes,modes(before))||!same(event.afterModes,modes(after))){
+           !same(event.beforeModes,sourceModes)||!same(event.afterModes,modes(after))){
             fail("data-loss","Embedded Forest mode state differs from its original snapshots.");
         }
         validateHead(event.beforeHead,uid,account.slots[0],event.sourceRevision);
@@ -646,7 +647,7 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
            !same(predecessor.get("afterState"),headState(event.beforeHead))){
             fail("data-loss","Embedded Forest mode predecessor is missing.");
         }
-        const derived=patrolTransition(event.beforeHead,event.beforeModes,event.intent,event.observedAtMs,event.sessionId);
+        const derived=patrolTransition(event.beforeHead,sourceModes,event.intent,event.observedAtMs,event.sessionId);
         const expectedState={schemaVersion:1,kind:KIND,ownerUid:uid,characterId:account.slots[0],
             sequence:event.sequence,sessionId:event.sessionId,epochId:derived.epochId,
             presence:derived.presence,elementBoxActive:derived.elementBoxActive,
