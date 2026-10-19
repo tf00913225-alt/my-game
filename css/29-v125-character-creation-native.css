@@ -75,11 +75,11 @@ body.creation-fixed-active{
     scrollbar-width:none;
     -webkit-text-size-adjust:100%;
     text-size-adjust:100%;
-    background-color:#050407;
+    background-color:var(--rpg-window-iron,#0D0C09);
     background-image:
         radial-gradient(circle at 50% -10%, rgba(177,128,47,.24), transparent 34%),
-        radial-gradient(circle at 12% 24%, rgba(91,57,131,.18), transparent 38%),
-        linear-gradient(180deg,#171123 0%,#0c0912 42%,#050407 100%);
+        radial-gradient(circle at 12% 24%, rgba(115,88,45,.18), transparent 38%),
+        linear-gradient(180deg,var(--rpg-window-panel,#201D17) 0%,var(--rpg-window-inset,#12110E) 42%,var(--rpg-window-iron,#0D0C09) 100%);
     color:#f5ead5;
 }
 
@@ -203,7 +203,7 @@ body.creation-fixed-active{
     border:2.571px solid rgba(198,146,68,.58);
     border-radius:41.143px;
     background:
-        linear-gradient(135deg,rgba(38,27,49,.98),rgba(9,7,12,.99));
+        linear-gradient(135deg,rgba(32,29,23,.98),rgba(13,12,9,.99));
     box-shadow:
         inset 0 0 0 2.571px rgba(255,232,178,.035),
         0 25.714px 77.143px rgba(0,0,0,.35);
@@ -239,7 +239,7 @@ body.creation-fixed-active{
     min-width:0;
     min-height:760px;
     overflow:hidden;
-    background:linear-gradient(180deg,#0c0912,#030303);
+    background:linear-gradient(180deg,var(--rpg-window-inset,#12110E),#030303);
     border-right:2.571px solid rgba(211,157,73,.28);
 }
 
@@ -488,7 +488,7 @@ body.creation-fixed-active{
     border:2.571px solid rgba(129,96,55,.62);
     border-radius:36px;
     background:
-        linear-gradient(145deg,rgba(31,24,38,.96),rgba(13,10,17,.98));
+        linear-gradient(145deg,var(--rpg-window-panel,#201D17),var(--rpg-window-inset,#12110E));
     box-shadow:
         inset 0 2.571px 0 rgba(255,255,255,.025),
         0 18px 48.857px rgba(0,0,0,.18);
@@ -589,7 +589,7 @@ body.creation-fixed-active{
 #creationPage .creation-next span,
 #creationPage .creation-back span{
     font-family:"Noto Serif TC",serif;
-    font-size:39px;
+    font-size:48px;
     font-weight:900;
     letter-spacing:4px;
 }
@@ -799,7 +799,7 @@ body.creation-fixed-active{
     box-sizing:border-box;
     overflow:hidden;
     border-color:rgba(225,168,68,.55);
-    background:linear-gradient(155deg,#21192a 0%,#0d0a12 58%,#070609 100%);
+    background:linear-gradient(155deg,var(--rpg-window-panel,#201D17) 0%,var(--rpg-window-inset,#12110E) 58%,var(--rpg-window-iron,#0D0C09) 100%);
     box-shadow:0 30px 100px rgba(0,0,0,.66);
 }
 
@@ -967,7 +967,7 @@ body.creation-fixed-active{
 
 #creationPage .creation-start span{
     font-family:"Noto Serif TC",serif;
-    font-size:39px;
+    font-size:48px;
     font-weight:900;
     letter-spacing:7.714px;
 }
@@ -1128,7 +1128,7 @@ body.creation-fixed-active{
     border-radius:41.143px;
     background:
         radial-gradient(circle at 90% 0%,var(--creation-skill-glow,rgba(217,90,56,.15)),transparent 38%),
-        linear-gradient(155deg,#21192a 0%,#0d0a12 55%,#070609 100%);
+        linear-gradient(155deg,var(--rpg-window-panel,#201D17) 0%,var(--rpg-window-inset,#12110E) 55%,var(--rpg-window-iron,#0D0C09) 100%);
     color:#f5ead5;
     box-shadow:
         inset 0 2.571px 0 rgba(255,255,255,.04),

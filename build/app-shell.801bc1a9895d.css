@@ -2011,7 +2011,7 @@ html, body{
 #game-ui #homePage>.team-relic-loadout-slot>small{display:none;}
 #game-ui #homePage>.team-relic-loadout-slot>button{
     min-width:150px;height:132px;min-height:132px;border:2px solid #b18a48;border-radius:6px;
-    color:#f8dfab;background:#382816;font-family:inherit;font-size:42px;font-weight:600;line-height:1.2;
+    color:#f8dfab;background:#382816;font-family:inherit;font-size:45px;font-weight:600;line-height:1.2;
 }
 #game-ui #homePage>.team-relic-loadout-slot>button:disabled{opacity:.5;}
 

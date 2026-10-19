@@ -27,12 +27,13 @@ const measure=String.raw`(selector)=>{
   if(!text||!e||e.closest('script,style,[aria-hidden="true"],.nav-sr-only,.inventory-title-plate-kicker'))continue;
   const s=getComputedStyle(e),r=e.getBoundingClientRect();
   if(!r.width||!r.height||s.visibility==='hidden'||s.display==='none')continue;
-  if(/^[＋+×‹›◀▶▼▲▾◇◆…·—→]+$/.test(text))continue;
+  if(/^[＋+×‹›◀▶▼▲▾◇◆…·—→←？]+$/.test(text))continue;
   const after=getComputedStyle(e,'::after');
   const replaced=parseFloat(s.fontSize)===0&&after.content&&after.content!=='none';
   const font=parseFloat(replaced?after.fontSize:s.fontSize)*elementScale(e);
   const button=!!e.closest('button,[role="tab"],[role="button"]');
-  rows.push({text:text.slice(0,90),font,button,selector:e.id?'#'+e.id:e.tagName.toLowerCase()+'.'+String(e.className).trim().replace(/\s+/g,'.'),parent:e.parentElement.id||e.parentElement.className});
+  const primary=button&&e.matches('button,#creationSubmitLabel,.creation-next>span,.creation-back>span,.element-option .element-name')&&!e.closest('.home-test-tools');
+  rows.push({text:text.slice(0,90),font,button,primary,selector:e.id?'#'+e.id:e.tagName.toLowerCase()+'.'+String(e.className).trim().replace(/\s+/g,'.'),parent:e.parentElement.id||e.parentElement.className});
  }
  for(const e of host.querySelectorAll('button,[role="tab"],[role="button"]')){
   const s=getComputedStyle(e),r=e.getBoundingClientRect();if(!r.width||!r.height||s.visibility==='hidden'||!e.textContent.trim())continue;
@@ -106,7 +107,22 @@ try{
   ['tower-overview','vGameplayToggleTowerOverview()','#towerPage'],
   ['abyss','vGameplayOpenAbyss()','#dungeonPage'],
   ['adventure','openAdventureMap()','#adventurePage']
- ]){await c.eval(action);await capture(name,selector);}
+ ]){await c.eval(action);await capture(name,selector);
+  if(name==='abyss'){
+   const geometry=await c.eval("(()=>{const b=document.querySelector('.v174-abyss-leave'),list=document.querySelector('.v174-abyss-card-list'),r=b.getBoundingClientRect(),l=list.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {hit:h===b||b.contains(h),separate:l.top>=r.bottom-1,overflow:list.scrollHeight>list.clientHeight+1,x:l.right-12,y:l.bottom-12,to:l.top+16,before:list.scrollTop};})()");
+   assert.ok(geometry.hit&&geometry.separate,'abyss cards cover return control');
+   if(geometry.overflow){
+    await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:geometry.x,y:geometry.y}]});
+    for(let i=1;i<=8;i++){await c.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:geometry.x,y:geometry.y+(geometry.to-geometry.y)*i/8}]});await new Promise(r=>setTimeout(r,20));}
+    await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await settle();
+    assert.ok(await c.eval("document.querySelector('.v174-abyss-card-list').scrollTop>0"),'abyss list cannot touch-scroll');
+    await c.eval("(()=>{const e=document.querySelector('.v174-abyss-card-list');e.scrollTop=e.scrollHeight;})()");
+    const reachable=await c.eval("(()=>{const e=document.querySelector('.v174-abyss-card-list');return e.lastElementChild.getBoundingClientRect().bottom<=e.getBoundingClientRect().bottom+1;})()");assert.ok(reachable,'last abyss card unreachable');
+   }
+  }
+ }
+ const position=await c.eval("(()=>{const e=document.querySelector('.adventure-view');e.scrollTop=1000;const before=e.scrollTop;FourSymbolsAdventureUI.render();return {before,after:e.scrollTop};})()");assert.ok(Math.abs(position.before-position.after)<=1,'map rerender moved player scroll position');
+ const originalCoordinates=await c.eval("(()=>{const v=FourSymbolsAdventure.getView(),nodes=[...v.chapter.nodes,...v.chapter.hiddenNodes];return Array.from(document.querySelectorAll('.adventure-node')).every(e=>{const n=nodes.find(n=>n.id===e.dataset.nodeId);return parseFloat(e.style.getPropertyValue('--node-x'))===n.x&&parseFloat(e.style.getPropertyValue('--node-y'))===n.y;});})()");assert.ok(originalCoordinates,'map layout rewrites original node coordinates');
  const mapOverlap=await c.eval(`(()=>{const nodes=Array.from(document.querySelectorAll('#adventurePage .adventure-node')).map(e=>({id:e.dataset.nodeId,r:e.getBoundingClientRect()}));return nodes.flatMap((a,i)=>nodes.slice(i+1).filter(b=>Math.min(a.r.right,b.r.right)-Math.max(a.r.left,b.r.left)>2&&Math.min(a.r.bottom,b.r.bottom)-Math.max(a.r.top,b.r.top)>2).map(b=>[a.id,b.id]));})()`);
  assert.deepEqual(mapOverlap,[],'adventure map nodes overlap');
  await c.eval("showPage('home');openHomeFeature('quest')");
@@ -118,10 +134,11 @@ try{
  const creationFit=await c.eval("(()=>{const role=document.querySelector('.creation-role-card').getBoundingClientRect(),box=document.querySelector('.creation-showcase').getBoundingClientRect();return role.bottom<=box.bottom+1;})()");assert.ok(creationFit,'creation role description clipped');
  await c.eval("showCreationSkillDetail('flameSlash')");await capture('creation-skill-detail','#creationSkillDetailModal');await c.eval('closeCreationSkillDetail()');
  await c.eval('setCreationStep(2)');await capture('creation-step-2','#creationPage');await c.eval('cancelAdditionalCharacterCreation()');
- const report={viewport,scenes:scenes.map(s=>({name:s.name,textCount:s.rows.length,small:s.rows.filter(x=>x.font<12.9),smallControls:s.rows.filter(x=>x.button&&x.font<14.9),overflow:s.overflow,clippedControls:s.controls.filter(x=>x.overflow)}))};
+ const report={viewport,scenes:scenes.map(s=>({name:s.name,textCount:s.rows.length,small:s.rows.filter(x=>x.font<12.9),smallControls:s.rows.filter(x=>x.button&&x.font<14.9),smallPrimaryControls:s.rows.filter(x=>x.primary&&x.font<14.9),overflow:s.overflow,clippedControls:s.controls.filter(x=>x.overflow)}))};
  fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2));
  fs.writeFileSync(path.join(out,'all-text.json'),JSON.stringify(scenes,null,2));
  if(process.env.UI_READING_AUDIT_ONLY!=='1'){
+ assert.deepEqual(report.scenes.flatMap(s=>s.smallPrimaryControls.map(x=>s.name+': '+x.text+' '+x.font)),[],'primary actions below 15px');
  assert.deepEqual(report.scenes.flatMap(s=>s.clippedControls.map(x=>s.name+': '+x.label)),[],'functional UI clips button labels');
  assert.deepEqual(report.scenes.flatMap(s=>s.overflow.map(x=>s.name+': '+x.text)),[],'functional UI headings overflow');
  assert.deepEqual(report.scenes.flatMap(s=>s.small.map(x=>s.name+': '+x.selector+' '+x.text)),[],'functional UI contains unreadable text');

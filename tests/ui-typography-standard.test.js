@@ -105,7 +105,7 @@ assert.match(relic, /\.team-relic-card-name\{[^}]*font-size:16px/);
 assert.match(relic, /\.team-relic-detail section h3\{[^}]*font-size:18px/);
 assert.match(relic, /\.team-relic-tabs button\{[^}]*font-size:15px/);
 assert.match(gameplay, /\.gameplay-mode-copy h3\{[^}]*font-size:22px/);
-assert.match(gameplay, /\.gameplay-fixed-tabs button\{[^}]*font-size:16px/);
+assert.match(gameplay, /\.gameplay-fixed-tabs button\{[^}]*font-size:18px/);
 assert.match(gameplay, /\.boss-detail-grid h4\{[^}]*font-size:18px/);
 assert.match(qa, /\.v17346-shop-name\{font-size:16px!important/);
 assert.match(qa, /\.v17346-shop-buy\{[^}]*font-size:15px!important/);

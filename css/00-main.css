@@ -4206,7 +4206,7 @@ button:active{
     border:calc(1 * var(--ui-length-unit,1px)) solid #8a6a3a;
     border-radius:calc(6 * var(--ui-length-unit,1px));
     color:#e8ddc7;
-    font-size:calc(14 * var(--ui-length-unit,1px));
+    font-size:calc(15 * var(--ui-length-unit,1px));
     padding:calc(2 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));
     cursor:pointer;
 }

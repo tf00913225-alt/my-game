@@ -89,7 +89,7 @@
 
 #game-stage .gameplay-back-button{
     min-width:78px;
-    min-height:40px;
+    min-height:52px;
     padding:8px 10px;
     border:1px solid #8d6937;
     border-radius:8px;
@@ -228,12 +228,12 @@
 }
 
 #game-stage .gameplay-fixed-tabs button{
-    min-height:var(--ui-large-panel-tab-height,42px);
+    min-height:max(52px,var(--ui-large-panel-tab-height,42px));
     border:1px solid #71532f;
     border-radius:8px;
     color:#bfae91;
     background:linear-gradient(180deg,#2a2015,#130e09);
-    font-size:16px;
+    font-size:18px;
     font-weight:900;
 }
 
@@ -334,7 +334,7 @@
 
 #game-stage .boss-detail-back{
     align-self:flex-start;
-    min-height:36px;
+    min-height:52px;
     padding:6px 0;
     border:0;
     color:#c9ae72;
@@ -444,7 +444,7 @@
 #game-stage .gameplay-primary-action,
 #game-stage .tower-secondary-action{
     width:100%;
-    min-height:46px;
+    min-height:52px;
     padding:10px 14px;
     border:1px solid #d1a052;
     border-radius:9px;

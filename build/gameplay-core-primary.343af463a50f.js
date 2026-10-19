@@ -9767,7 +9767,7 @@
         const content=typeof rendered==="string"?rendered:rendered.content;
         const footer=typeof rendered==="string"?"":rendered.footer;
         const title=document.getElementById("homeFeatureModalTitle");
-        if(title&&forge){ title.textContent=tab==="reforge"?"冶煉":"鑲嵌"; }
+        if(title&&forge){ title.textContent="鍛造"; }
         const tabs=forge?'<div class="v141-synthesis-tabs v141-forge-tabs"><button type="button" class="'+(tab==="reforge"?'active':'')+'" onclick="v141SwitchForgeTab(\'reforge\')">冶煉</button><button type="button" class="'+(tab==="socket"?'active':'')+'" onclick="v141SwitchForgeTab(\'socket\')">鑲嵌</button></div>':renderSynthesisTabs();
         body.innerHTML='<div class="v141-synthesis"><div class="v141-synthesis-wallet"><span>'+(forge?'鍛造':'合成')+'</span><b>金幣 '+Math.floor(gold).toLocaleString('zh-TW')+'</b></div>'+tabs+'<div class="v141-synthesis-body">'+content+'</div>'+footer+'</div>';
     }
@@ -10028,7 +10028,7 @@
             activeFeature=type;
             const modal=document.getElementById("homeFeatureModal");
             const title=document.getElementById("homeFeatureModalTitle");
-            if(title){ title.textContent=type==="forge"?"冶煉":"合成"; }
+            if(title){ title.textContent=type==="forge"?"鍛造":"合成"; }
             if(modal){ modal.dataset.craftingFeature=type; modal.classList.add("show","v141-synthesis-modal"); window.FourSymbolsBottomNav?.syncContext(); }
             ensureEquipmentUids();
             renderSynthesis();

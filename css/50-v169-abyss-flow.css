@@ -190,7 +190,12 @@
     min-height:0;
     flex:1 1 auto;
     flex-direction:column;
-    justify-content:center;
+    justify-content:flex-start;
+    overflow-y:auto;
+    overflow-x:hidden;
+    touch-action:pan-y;
+    overscroll-behavior-y:contain;
+    -webkit-overflow-scrolling:touch;
     gap:12px;
 }
 #game-stage .v174-abyss-card{
@@ -222,7 +227,7 @@
     bottom:10px;
     z-index:4;
     min-width:112px;
-    min-height:42px;
+    min-height:52px;
     padding:8px 13px;
     border:1px solid #c79b50;
     border-radius:999px;
