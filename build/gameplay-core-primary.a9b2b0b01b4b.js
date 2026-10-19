@@ -946,21 +946,17 @@
           目的是讓「掛機」明顯比「手動玩」慢，避免無腦掛機
           就能在短時間衝到滿等。
     */
-    const ELEMENT_BOX_EXP_RATIO=0.70;
-    const V17342_GLOBAL_EXP_REWARD_MULTIPLIER=3;
-    const V17342_GLOBAL_GOLD_REWARD_MULTIPLIER=5;
-    const V173_BEGINNER_FOREST_TARGET_BATTLES=20;
-    const V173_BEGINNER_FOREST_FALLBACK_EXP=690;
+    const rewardPolicy=window.FourSymbolsPatrolRewardPolicy;
 
     function getBeginnerForestBattleExp(){
         if(typeof window.v133GetExpNextForLevel!=="function"){
-            return V173_BEGINNER_FOREST_FALLBACK_EXP;
+            return rewardPolicy.beginnerForestBattleExp(null);
         }
-        let totalRequired=0;
+        const thresholds=[];
         for(let level=1;level<=9;level++){
-            totalRequired+=Math.max(1,Math.round(Number(window.v133GetExpNextForLevel(level))||0));
+            thresholds.push(window.v133GetExpNextForLevel(level));
         }
-        return Math.max(1,Math.ceil(totalRequired/V173_BEGINNER_FOREST_TARGET_BATTLES));
+        return rewardPolicy.beginnerForestBattleExp(thresholds);
     }
 
     window.v173GetBeginnerForestBattleExp=getBeginnerForestBattleExp;
@@ -969,27 +965,23 @@
         /* V173.40 targeted ~20 battles using one flat battle reward.
            V173.42 keeps that old 3-monster reference value, but pays per
            defeated monster so 1 / 2 / 3 monsters are no longer identical. */
-        return Math.max(1,Math.ceil(getBeginnerForestBattleExp()/3));
+        return rewardPolicy.beginnerForestMonsterExpUnit(getBeginnerForestBattleExp());
     }
     window.v17342GetBeginnerForestMonsterExpUnit=getBeginnerForestMonsterExpUnit;
 
     function getMonsterExpRankMultiplier(monster){
-        const rank=getMonsterRank(monster);
-        if(rank==="boss"){ return 3; }
-        if(rank==="elite"){ return 1.5; }
-        return 1;
+        return rewardPolicy.expRankMultiplier(getMonsterRank(monster));
     }
 
     /* Formal base EXP: a normal monster's own reward before rank/mode rules.
        35 is the established Lv×10 × historical 3.5 result, now encoded at
        this data owner so every player-facing reward remains unchanged. */
     function getFormalMonsterBaseExp(monster){
-        return Math.max(0,Math.floor((Number(monster&&monster.level)||0)*35));
+        return rewardPolicy.formalMonsterBaseExp(monster&&monster.level);
     }
 
     function getPatrolProgressionExpMultiplier(level){
-        const safeLevel=Math.max(1,Math.floor(Number(level)||1));
-        return safeLevel<20 ? V17342_GLOBAL_EXP_REWARD_MULTIPLIER : 1;
+        return rewardPolicy.progressionExpMultiplier(level);
     }
 
     function getPatrolProgressionReferenceLevel(){
@@ -1009,21 +1001,12 @@
     }
 
     function calculateStandardPatrolExp(monsterList,progressionLevel){
-        const rankAdjustedExp=(Array.isArray(monsterList)?monsterList:[]).reduce((total,monster)=>{
-            if(!monster){ return total; }
-            return total+getFormalMonsterBaseExp(monster)*getMonsterExpRankMultiplier(monster);
-        },0);
-        return Math.max(0,Math.floor(
-            rankAdjustedExp*getPatrolProgressionExpMultiplier(progressionLevel)
-        ));
+        return rewardPolicy.standardPatrolExp((Array.isArray(monsterList)?monsterList:[])
+            .map(monster=>monster?{level:monster.level,rank:getMonsterRank(monster)}:null),progressionLevel);
     }
 
     function applyPatrolExpMode(standardExp,options){
-        const safeExp=Math.max(0,Math.floor(Number(standardExp)||0));
-        const mode=options&&typeof options==="object"?options:{};
-        if(mode.elementBox){ return Math.round(safeExp*ELEMENT_BOX_EXP_RATIO); }
-        if(mode.rested){ return Math.round(safeExp*2); }
-        return safeExp;
+        return rewardPolicy.applyExpMode(standardExp,options);
     }
 
     window.v173GetPatrolProgressionExpMultiplier=getPatrolProgressionExpMultiplier;
@@ -1793,12 +1776,12 @@
         const originalAwardMonsterGoldDrop=awardMonsterGoldDrop;
         awardMonsterGoldDrop=function(){
             const baseAmount=Math.max(0,Number(originalAwardMonsterGoldDrop.apply(this,arguments))||0);
-            const bonusAmount=Math.max(0,Math.floor(baseAmount*(V17342_GLOBAL_GOLD_REWARD_MULTIPLIER-1)));
+            const amount=rewardPolicy.awardedGoldFromBase(baseAmount);
+            const bonusAmount=amount-baseAmount;
             if(bonusAmount>0){
                 gold+=bonusAmount;
                 if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
             }
-            const amount=baseAmount+bonusAmount;
             recordElementBoxMonsterGold(amount);
             return amount;
         };
@@ -1976,11 +1959,7 @@
                     const monster=monsters[index];
                     return monster ? total+getMonsterExpRankMultiplier(monster) : total;
                 },0);
-                finalExp=Math.max(1,Math.round(
-                    getBeginnerForestMonsterExpUnit()*
-                    Math.max(1,beginnerMonsterUnits)*
-                    V17342_GLOBAL_EXP_REWARD_MULTIPLIER
-                ));
+                finalExp=rewardPolicy.beginnerForestExp(getBeginnerForestBattleExp(),beginnerMonsterUnits);
             }
 
             /* 元素匣（自動掛機）只給70%EXP，金幣/掉落/材料不受影響
@@ -5338,19 +5317,6 @@
     }
     if(typeof renderExpDistributeList==="function"){ renderExpDistributeList(); }
     if(typeof setTimeout==="function"){ setTimeout(installLateGrowthEnhancements,0); }
-
-    /* 2. 怪物金幣掉落rank倍率 */
-    if(typeof getMonsterGoldDrop==="function"){
-        getMonsterGoldDrop=function(monster){
-            if(!monster){ return 0; }
-            const level=Math.max(1,Math.floor(Number(monster.level)||1));
-            const rank=getMonsterRank(monster);
-            const rankMultiplier=rank==="boss"?5:rank==="elite"?2:1;
-            const base=level*2+3;
-            const variance=0.85+Math.random()*0.30;
-            return Math.max(1,Math.floor(base*rankMultiplier*variance));
-        };
-    }
 
     /* 3. 商店價格 */
     const SHOP_PRICE_TIERS=[

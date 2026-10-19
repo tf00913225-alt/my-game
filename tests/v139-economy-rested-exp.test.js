@@ -13,6 +13,7 @@ const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSy
 const indexSource=fs.readFileSync("index.html","utf8");
 const uiGuidelines=fs.readFileSync("UI_GUIDELINES.md","utf8");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
+const rewardPolicy=require("../functions/src/patrol-reward-policy.js");
 
 function makeZoneConfig(){
     const variables={
@@ -79,7 +80,7 @@ function makeEconomyContext(){
         getMonsterRank:monster=>monster.rank||"regular",
         getExistingPartyIndexes:()=>players.map((_,index)=>index),
         getPartyCharacterByIndex:index=>players[index]||null,
-        getMonsterGoldDrop:()=>0,
+        FourSymbolsPatrolRewardPolicy:rewardPolicy,
         localStorage:{
             getItem:key=>storage.has(key)?storage.get(key):null,
             setItem:(key,value)=>storage.set(key,String(value))
@@ -91,6 +92,8 @@ function makeEconomyContext(){
         saveGame:()=>{}
     });
     context.window=context;
+    vm.runInContext(mainSource.slice(mainSource.indexOf("function getMonsterGoldDrop(monster)"),
+        mainSource.indexOf("function awardMonsterGoldDrop(monster)")),context);
     vm.runInContext(v133Source,context);
     return context;
 }
@@ -123,13 +126,14 @@ test("formal growth curve is owned by runtime zone EXP × target battle anchors 
 
 test("monster EXP is formal at source, keeps rank multipliers, newcomer-only ×3, and element-box 70%",()=>{
     assert.match(v131Source,/function getFormalMonsterBaseExp/);
-    assert.match(v131Source,/\*35/);
+    assert.match(v131Source,/rewardPolicy\.formalMonsterBaseExp/);
     assert.doesNotMatch(v131Source,/V131_EXP_MULTIPLIER/);
     assert.doesNotMatch(v133Source,/TRAINING_EXP_MULTIPLIER/);
-    assert.match(v131Source,/const ELEMENT_BOX_EXP_RATIO=0\.70/);
-    assert.match(v131Source,/rank==="boss"\)\{ return 3; \}/);
-    assert.match(v131Source,/rank==="elite"\)\{ return 1\.5; \}/);
-    assert.match(v131Source,/safeLevel<20 \? V17342_GLOBAL_EXP_REWARD_MULTIPLIER : 1/);
+    assert.equal(rewardPolicy.constants.elementBoxExpRatio,0.70);
+    assert.equal(rewardPolicy.expRankMultiplier("boss"),3);
+    assert.equal(rewardPolicy.expRankMultiplier("elite"),1.5);
+    assert.equal(rewardPolicy.progressionExpMultiplier(19),3);
+    assert.equal(rewardPolicy.progressionExpMultiplier(20),1);
     assert.match(v131Source,/finalExp=applyPatrolExpMode\(finalExp,\{elementBox:true\}\)/);
 });
 
@@ -198,6 +202,7 @@ test("rested multiplier is only called outside the element-box branch",()=>{
 });
 
 test("gold, highest-level shop tiers, and exact six potion prices remain enforced",()=>{
+    assert.doesNotMatch(v133Source,/getMonsterGoldDrop\s*=/,"retired late gold getter must not regain arithmetic ownership");
     const context=makeEconomyContext();
     assert.equal(vm.runInContext("getMonsterGoldDrop({level:20,rank:'regular'})",context),43);
     assert.equal(vm.runInContext("getMonsterGoldDrop({level:20,rank:'elite'})",context),86);

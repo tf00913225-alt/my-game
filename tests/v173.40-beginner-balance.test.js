@@ -30,17 +30,18 @@ test("newbie forest normal attacks are final 10 to 15 before defend or shields a
 });
 
 test("newbie EXP keeps the Lv1-to-10 reference but now pays per monster and follows global x3",()=>{
-    assert.match(rewards,/const V173_BEGINNER_FOREST_TARGET_BATTLES=20;/);
-    assert.match(rewards,/const V173_BEGINNER_FOREST_FALLBACK_EXP=690;/);
+    const policy=require("../functions/src/patrol-reward-policy.js");
+    assert.equal(policy.constants.beginnerTargetBattles,20);
+    assert.equal(policy.constants.beginnerFallbackExp,690);
     assert.match(rewards,/for\(let level=1;level<=9;level\+\+\)[\s\S]*?v133GetExpNextForLevel\(level\)/);
-    assert.match(rewards,/Math\.ceil\(totalRequired\/V173_BEGINNER_FOREST_TARGET_BATTLES\)/);
-    assert.match(rewards,/function getBeginnerForestMonsterExpUnit\(\)[\s\S]*?getBeginnerForestBattleExp\(\)\/3/);
-    assert.match(rewards,/if\(isBeginnerForestBattle\)\{[\s\S]*?currentBattleMonsters\.reduce[\s\S]*?getBeginnerForestMonsterExpUnit\(\)[\s\S]*?V17342_GLOBAL_EXP_REWARD_MULTIPLIER/);
-    // Current forest curve sanity: avg battle EXP 184; level target-battles 3,4,6,7,8,10,11,12,14.
-    const targetBattles=[3,4,6,7,8,10,11,12,14];
-    const total=targetBattles.reduce((sum,battles)=>sum+184*battles,0);
-    assert.equal(total,13800);
-    assert.equal(Math.ceil(total/20),690);
+    assert.match(rewards,/rewardPolicy\.beginnerForestBattleExp\(thresholds\)/);
+    assert.match(rewards,/function getBeginnerForestMonsterExpUnit\(\)[\s\S]*?rewardPolicy\.beginnerForestMonsterExpUnit\(getBeginnerForestBattleExp\(\)\)/);
+    assert.match(rewards,/if\(isBeginnerForestBattle\)\{[\s\S]*?currentBattleMonsters\.reduce[\s\S]*?rewardPolicy\.beginnerForestExp\(getBeginnerForestBattleExp\(\),beginnerMonsterUnits\)/);
+    const {newcomerExpNext}=require("../functions/src/canonical-newcomer-exp.js");
+    const thresholds=Array.from({length:9},(_,index)=>newcomerExpNext(index+1));
+    assert.equal(thresholds.reduce((sum,value)=>sum+value,0),5850);
+    assert.equal(policy.beginnerForestBattleExp(thresholds),293);
+    assert.equal(policy.beginnerForestExp(293,1),294);
     assert.doesNotMatch(curve,/TRAINING_EXP_MULTIPLIER|V131_EXP_MULTIPLIER|legacyExpMultiplier/);
 });
 
