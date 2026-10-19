@@ -24,6 +24,7 @@ const EXPECTED_DIRECT_SCRIPT_PATHS=[
     "functions/src/hero-core.js",
     "functions/src/patrol-reward-policy.js",
     "functions/src/patrol-drop-policy.js",
+    "functions/src/account-mode-time-policy.js",
     "js/00-main.js",
     "js/01-stage-v8-touch-lock.js",
     "js/02-stage-v9-native-coordinate-api.js",

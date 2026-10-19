@@ -62,7 +62,10 @@ function fixture(){
         sourceRevision:5,sourceSnapshotSha256:priorSnapshot.sha256,balanceBefore:0,balanceAfter:25});
     data.set(`${root}/uniqueClaims/${grantId}`,{...common,creditRevision:6});
     const ref=path=>({path,id:path.split("/").at(-1),collection:name=>collection(`${path}/${name}`)});
-    const collection=path=>({path,query:true,doc:id=>ref(`${path}/${id}`),limit:()=>collection(path)});
+    const collection=(path,filters=[],order=null,maximum=Infinity)=>({path,query:true,filters,order,maximum,
+        doc:id=>ref(`${path}/${id}`),limit:max=>collection(path,filters,order,max),
+        where:(key,operator,value)=>{assert.equal(operator,"==");return collection(path,[...filters,[key,value]],order,maximum);},
+        orderBy:(key,direction)=>collection(path,filters,[key,direction],maximum)});
     const snap=(path,value)=>({id:path.split("/").at(-1),exists:value!==undefined,
         data:()=>value,get:key=>key.split(".").reduce((row,part)=>row?.[part],value)});
     let writes=0;
@@ -74,8 +77,11 @@ function fixture(){
         runProtected:async(_request,operation)=>{
             const staged=new Map(data);let writing=false;
             const tx={get:async r=>{assert.equal(writing,false);if(!r.query)return snap(r.path,staged.get(r.path));
-                const docs=[...staged].filter(([path])=>path.startsWith(r.path+"/")&&
-                    path.split("/").length===r.path.split("/").length+1).map(([p,v])=>snap(p,v));
+                let docs=[...staged].filter(([path])=>path.startsWith(r.path+"/")&&
+                    path.split("/").length===r.path.split("/").length+1).map(([p,v])=>snap(p,v))
+                    .filter(doc=>r.filters.every(([key,value])=>doc.get(key)===value));
+                if(r.order){const [key,direction]=r.order;docs.sort((a,b)=>(a.get(key)-b.get(key))*(direction==="desc"?-1:1));}
+                docs=docs.slice(0,r.maximum);
                 return {docs,size:docs.length};},
                 set:(r,v)=>{writing=true;writes++;staged.set(r.path,v);},
                 create:(r,v)=>{assert.equal(staged.has(r.path),false);tx.set(r,v);},
