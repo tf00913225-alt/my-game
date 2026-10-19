@@ -756,6 +756,7 @@
             try{
                 return originalShowCreation.apply(this,arguments);
             }finally{
+                window.closeCreationSkillDetail();
                 setCreationTouchMode(true);
                 installCreationGestureLock();
                 applyCreationStep(1);

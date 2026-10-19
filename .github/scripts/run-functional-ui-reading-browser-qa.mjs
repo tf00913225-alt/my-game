@@ -47,7 +47,7 @@ const measure=String.raw`(selector)=>{
   const r=e.getBoundingClientRect();if(!r.width||!r.height)continue;
   if(e.scrollWidth>e.clientWidth+1)overflow.push({text:e.textContent.trim().slice(0,60),width:r.width,scroll:e.scrollWidth,client:e.clientWidth});
  }
- return {rows,controls,overflow,images:host.querySelectorAll('img').length};
+ return {rows,controls,overflow};
 }`;
 try{
  const target=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(t=>t.type==='page');
@@ -58,11 +58,12 @@ try{
  await c.eval("(()=>{const armor=v17346GenerateEquipment(()=>.2,{slot:'armor',classType:'warrior',rarity:'orange'});inventoryItems.push(armor,{...getPotionDefinition('hpPotion10'),count:30});characterEquipment.fire.armor=armor;rebuildInventorySlots();renderInventory();})()");
  const capture=async(name,selector='#homeFeatureModal')=>{
   await settle();const data=await c.eval(`(${measure})(${JSON.stringify(selector)})`);
-  assert.ok(data.rows.length||data.controls.length||data.images,name+': empty UI coverage');
+  assert.ok(data.rows.length||data.controls.length,name+': empty UI coverage');
   scenes.push({name,...data});fs.writeFileSync(path.join(out,'all-text.json'),JSON.stringify(scenes,null,2));
   const image=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(image.data,'base64'));
   console.log(name+': '+data.rows.length+' text nodes, '+data.rows.filter(x=>x.font<12.9).length+' below minimum');
  };
+ if(process.env.UI_READING_CREATION_ONLY!=='1'){
  await c.eval("selectedSkillElementTab='fire';renderSkillLoadout();showSkillDetail('flameSlash')");
  await capture('skill-detail','#skillDetailModal');await c.eval('closeSkillDetail()');
  for(const feature of ['character','shop','forge','synthesis','autoBattleSettings','quest','announcement','system','rest','expPool','offlineExp','hero','relic','achievement']){
@@ -111,6 +112,12 @@ try{
  await c.eval("showPage('home');openHomeFeature('quest')");
  const questScroll=await c.eval("(()=>{const e=document.querySelector('.quest-completion-milestones');e.scrollLeft=e.scrollWidth;return {left:e.scrollLeft,last:e.lastElementChild.getBoundingClientRect().right,edge:e.getBoundingClientRect().right,count:e.children.length};})()");
  assert.ok(questScroll.count===5&&questScroll.left>0&&questScroll.last<=questScroll.edge+1,'all quest milestones must be reachable');
+ }
+ await c.eval("closeHomeFeature();showPage('home');openCharacterCreation(3)");await capture('creation-step-1','#creationPage');
+ for(const element of ['water','wind','earth']){await c.eval(`selectElement(${JSON.stringify(element)})`);await capture('creation-'+element,'#creationPage');}
+ const creationFit=await c.eval("(()=>{const role=document.querySelector('.creation-role-card').getBoundingClientRect(),box=document.querySelector('.creation-showcase').getBoundingClientRect();return role.bottom<=box.bottom+1;})()");assert.ok(creationFit,'creation role description clipped');
+ await c.eval("showCreationSkillDetail('flameSlash')");await capture('creation-skill-detail','#creationSkillDetailModal');await c.eval('closeCreationSkillDetail()');
+ await c.eval('setCreationStep(2)');await capture('creation-step-2','#creationPage');await c.eval('cancelAdditionalCharacterCreation()');
  const report={viewport,scenes:scenes.map(s=>({name:s.name,textCount:s.rows.length,small:s.rows.filter(x=>x.font<12.9),smallControls:s.rows.filter(x=>x.button&&x.font<14.9),overflow:s.overflow,clippedControls:s.controls.filter(x=>x.overflow)}))};
  fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2));
  fs.writeFileSync(path.join(out,'all-text.json'),JSON.stringify(scenes,null,2));

@@ -98,7 +98,7 @@ assert.match(detail, /#skillDetailStats \.v17364-progression-hint\{[\s\S]*?font-
 assert.match(inventory, /\.inventory-category-tab\{[^}]*font-size:18px/);
 assert.match(inventory, /\.inventory-item-classic \.inventory-count\{[^}]*font-size:18px/);
 assert.doesNotMatch(read('css/52-v173.50-inventory-qol.css'), /\.inventory-category-tab\{|\.inventory-count\{/);
-assert.match(skillFix, /#creationPage \.creation-step-progress\{font-size:34px/);
+assert.match(skillFix, /#creationPage \.creation-step-progress\{font-size:39px/);
 assert.match(skillFix, /#creationPage \.creation-role-description\{font-size:39px/);
 assert.match(skillFix, /#creationPage \.creation-stats-card \.creation-label\{font-size:41px/);
 assert.match(relic, /\.team-relic-card-name\{[^}]*font-size:16px/);
