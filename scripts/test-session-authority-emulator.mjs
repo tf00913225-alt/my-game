@@ -1,6 +1,6 @@
 /* Real Auth + Functions + Firestore emulator integration. Never target live data. */
 import assert from "node:assert/strict";
-import {readFileSync} from "node:fs";
+import {readFileSync,openSync,fstatSync,readSync,closeSync} from "node:fs";
 import vm from "node:vm";
 import {createRequire} from "node:module";
 import {createHash,randomBytes} from "node:crypto";
@@ -3240,9 +3240,25 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
     const {patrolVictoryExp}=require("../functions/src/patrol-ticket-policy.js");
     // Failure context only: preserve the SDK error (including its original
     // stack) as cause and retain its code/details. Never retry or mask it.
+    let forestDiagnosticPrinted=false;
     async function forestStage(label,operation){
         try{return await operation();}
         catch(cause){
+            if(!forestDiagnosticPrinted&&process.env.GCLOUD_PROJECT==="demo-four-symbols-session"&&
+               process.env.FIRESTORE_EMULATOR_HOST==="127.0.0.1:18080"){
+                forestDiagnosticPrinted=true;
+                let handle;
+                try{
+                    handle=openSync("firestore-debug.log","r");
+                    const size=fstatSync(handle).size,bytes=Buffer.alloc(Math.min(size,65536));
+                    readSync(handle,bytes,0,bytes.length,size-bytes.length);
+                    const tail=bytes.toString("utf8").trimEnd().split(/\r?\n/).slice(-100)
+                        .map(line=>line.slice(0,2000)).join("\n");
+                    console.error(`Forest emulator failure ${label}; bounded Firestore diagnostic tail:\n${tail}`);
+                }catch(diagnosticError){
+                    console.error(`Forest emulator diagnostic unavailable: ${diagnosticError.code||diagnosticError.message}`);
+                }finally{if(handle!==undefined){try{closeSync(handle);}catch(_){/* Preserve the transaction error. */}}}
+            }
             const error=new Error(`Forest emulator stage ${label}: ${cause.message}`,{cause});
             if(cause.code!==undefined)error.code=cause.code;
             if(cause.details!==undefined)error.details=cause.details;

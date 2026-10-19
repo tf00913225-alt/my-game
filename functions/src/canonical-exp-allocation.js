@@ -94,7 +94,8 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
                priorSnap.get("sha256")!==account.snapshotSha256){
                 fail("data-loss","Previous canonical snapshot is missing.");
             }
-            const owned=await readOwnedSources(tx,root,fail);
+            const owned=await readOwnedSources(tx,root,fail,
+                {accountSnapshot:accountSnap,currentSnapshot:priorSnap});
             const records={account:source(account),characters:[source(characterSnap.data())],
                 economy:source(economy),...owned.records,
                 relicLoadout:source(loadoutSnap.data()),progress:source(progressSnap.data()),
