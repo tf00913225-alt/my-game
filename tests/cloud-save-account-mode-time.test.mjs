@@ -411,3 +411,158 @@ test('actual operator approval and current recovery retain mode value evidence t
     assert.equal((await recovery.restoreCurrent(h.request(),intent)).unchanged,true);
     assert.deepEqual(snapshot(h),before);assert.equal(h.writes,writes);
 });
+
+// A deliberately small stand-in for the independent Forest evidence Owner.
+// It checks its own test reward and invokes only the mode component reader;
+// it never re-enters mode-current or its source-specific dispatch.
+function withPatrolEvidence(h){
+    let fullProofCalls=0;
+    h.owner=createCanonicalAccountModeTime({...h.dependencies,patrolSettlementEvidenceReadBudget:12,
+        verifyPatrolSettlementEvidence:async context=>{
+            fullProofCalls++;
+            const {tx,root,uid,account,event,receipt,ledger,maxEnvelopeRevision,verifyPatrolModeComponent}=context;
+            await verifyPatrolModeComponent(tx,root,uid,account,event,receipt,ledger,maxEnvelopeRevision);
+            const read=revision=>tx.get(root.collection('recoveryArchives').doc(String(revision)));
+            const [before,after]=await Promise.all([read(event.sourceRevision),read(event.resultRevision)]);
+            assert.equal(after.get('sourceRecords.economy.gold'),before.get('sourceRecords.economy.gold')+11);
+        }});
+    return ()=>fullProofCalls;
+}
+async function settlePatrolModeFixture(h,settlementKind,{memberIndex=settlementKind==='member'?0:null,
+    rollback=false}={}){
+    const operationId=`forest-mode-fixture-${String(++serial).padStart(6,'0')}`;
+    const expectedRevision=h.revision,resultRevision=expectedRevision+1;
+    const before=copy(h.data.get(h.root+'/recoveryArchives/'+h.data.get(h.root+'/account/current').serverRevision).sourceRecords);
+    const sourceRevision=before.account.serverRevision;
+    const sourceSnapshotSha256=h.data.get(h.root+'/playableSnapshots/'+sourceRevision).sha256;
+    if(rollback)h.abortNext();
+    return h.dependencies.runProtected(h.request(),async(tx,session)=>{
+        const root=h.dependencies.db.doc(h.root);
+        const plan=await h.owner.preparePatrolSettlement(tx,{root,uid:h.uid,session,operationId,
+            expectedRevision,expectedSequence:h.data.get(h.root+'/modeTime/current').sequence,
+            sourceRecords:before,sourceSnapshotSha256,serverNow:h.clock,resultRevision,
+            settlementKind,memberIndex,sourceId:`forest-source-fixture-${serial}`});
+        const after=copy(before);
+        for(const rows of Object.values(after))for(const row of Array.isArray(rows)?rows:[rows])row.serverRevision=resultRevision;
+        after.economy.gold+=11;
+        if(settlementKind==='win')after.economy.sharedExp+=plan.mode.rested?588:plan.mode.elementBox?206:294;
+        after.progress.sidecars['element-box-state'].raw=JSON.stringify(plan.modeState.elementBox);
+        after.progress.sidecars['rested-exp-state'].raw=JSON.stringify(plan.modeState.rested);
+        after.claimCheckpoint.claimDigest=claimRecordsDigest(after.claimRecords);
+        const bundle=assembleCanonicalSnapshot(h.uid,resultRevision,after);
+        const settlementCoreSha256=snapshotDigest({operationId,sourceSnapshotSha256,resultSnapshotSha256:bundle.sha256});
+        const {event}=h.owner.writePatrolModeEvidence(tx,plan,{resultRecords:after,
+            resultSnapshotSha256:bundle.sha256,settlementCoreSha256});
+        const pair={schemaVersion:1,kind:'forest-patrol-settlement',ownerUid:h.uid,operationId,
+            sourceRevision,envelopeRevision:expectedRevision,resultRevision,resultEnvelopeRevision:resultRevision,
+            snapshotSha256:bundle.sha256,modeEventSha256:event.sha256,modeHeadSha256:event.headSha256,
+            settlementCoreSha256,createdAt:Timestamp.fromMillis(h.clock)};
+        tx.create(root.collection('operations').doc(operationId),pair);
+        tx.create(root.collection('ledgerEntries').doc(operationId),{...pair,modeDelta:event.delta});
+        for(const [key,collection] of Object.entries({account:'account',economy:'economy',progress:'progress',
+            relicLoadout:'relicLoadout',claimCheckpoint:'claimCheckpoints'})){
+            tx.update(root.collection(collection).doc('current'),{...after[key],
+                ...(key==='account'?{snapshotSha256:bundle.sha256}:{})});
+        }
+        for(const row of after.characters)tx.update(root.collection('characters').doc(row.characterId),{serverRevision:resultRevision});
+        tx.create(root.collection('playableSnapshots').doc(String(resultRevision)),bundle);
+        tx.create(root.collection('recoveryArchives').doc(String(resultRevision)),createRecoveryArchive(h.uid,resultRevision,after,bundle));
+        tx.update(h.dependencies.db.doc(h.save),{serverRevision:resultRevision});
+        return {event,mode:copy(plan.mode),after};
+    });
+}
+
+test('Forest member/win/loss/escape share one canonical transaction and consume rested only on wins',async()=>{
+    const h=await seeded();await presence(h);await presence(h,'rest');h.advance(240000);await presence(h,'resume');
+    const fullProofCalls=withPatrolEvidence(h);
+    const member=await settlePatrolModeFixture(h,'member');
+    assert.equal(member.after.economy.gold,11);assert.equal(member.after.economy.sharedExp,0);
+    assert.equal(member.after.progress.sidecars['rested-exp-state'].raw.includes('"battles":2'),true);
+    assert.equal(member.mode.rested,false);assert.equal(member.event.schemaVersion,2);assert.equal(member.event.modeChanged,false);
+    const win1=await settlePatrolModeFixture(h,'win');
+    assert.equal(win1.mode.rested,true);assert.equal(JSON.parse(win1.after.progress.sidecars['rested-exp-state'].raw).battles,1);
+    const loss=await settlePatrolModeFixture(h,'loss');
+    assert.equal(loss.mode.rested,false);assert.equal(JSON.parse(loss.after.progress.sidecars['rested-exp-state'].raw).battles,1);
+    const escaped=await settlePatrolModeFixture(h,'escape');
+    assert.equal(escaped.mode.rested,false);assert.equal(JSON.parse(escaped.after.progress.sidecars['rested-exp-state'].raw).battles,1);
+    const win2=await settlePatrolModeFixture(h,'win');
+    assert.equal(win2.mode.rested,true);assert.equal(JSON.parse(win2.after.progress.sidecars['rested-exp-state'].raw).battles,0);
+    assert.equal(win2.after.economy.sharedExp,1176);assert.equal(win2.after.economy.gold,55);
+    await presence(h,'heartbeat');
+    assert.ok(fullProofCalls()>=5,'v2 dispatch invokes the independent proof Owner without recursive mode-current');
+});
+
+test('Forest member time debit and winning ElementBox mode exclude rested consumption and roll back atomically',async()=>{
+    const h=await seeded();await presence(h);await presence(h,'rest');h.advance(120000);await presence(h,'resume');
+    await grant(h);await presence(h,'heartbeat','start');withPatrolEvidence(h);h.advance(1000);
+    await refuses(h,()=>settlePatrolModeFixture(h,'member',{rollback:true}),/simulated rollback/);
+    const member=await settlePatrolModeFixture(h,'member');
+    assert.equal(member.mode.elementBox,true);assert.equal(member.event.delta.elementBoxMs,-1000);
+    assert.equal(JSON.parse(member.after.progress.sidecars['rested-exp-state'].raw).battles,1);
+    h.advance(1000);const won=await settlePatrolModeFixture(h,'win');
+    assert.equal(won.mode.elementBox,true);assert.equal(won.mode.rested,false);
+    assert.equal(won.after.economy.sharedExp,206);
+    assert.equal(JSON.parse(won.after.progress.sidecars['rested-exp-state'].raw).battles,1);
+});
+
+test('prepared Forest mode plans cannot be forged, moved across transactions or created while resting',async()=>{
+    const h=await seeded();await presence(h);withPatrolEvidence(h);
+    const before=copy(h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords);
+    const setup=(tx,session)=>h.owner.preparePatrolSettlement(tx,{root:h.dependencies.db.doc(h.root),uid:h.uid,session,
+        operationId:'forest-plan-binding-0001',expectedRevision:h.revision,expectedSequence:h.data.get(h.root+'/modeTime/current').sequence,
+        sourceRecords:before,sourceSnapshotSha256:h.data.get(h.root+'/playableSnapshots/'+h.revision).sha256,
+        serverNow:h.clock,resultRevision:h.revision+1,settlementKind:'win',memberIndex:null,sourceId:'forest-bound-source-0001'});
+    const plan=await h.dependencies.runProtected(h.request(),setup);
+    for(const candidate of [{...plan},plan]){
+        await refuses(h,()=>h.dependencies.runProtected(h.request(),async tx=>{
+            h.owner.writePatrolModeEvidence(tx,candidate,{resultRecords:before,
+                resultSnapshotSha256:'a'.repeat(64),settlementCoreSha256:'b'.repeat(64)});
+        }),error=>error.code==='failed-precondition');
+    }
+    await presence(h,'rest');
+    await refuses(h,()=>settlePatrolModeFixture(h,'win'),error=>error.code==='failed-precondition');
+});
+
+test('v2 current evidence fails closed without its specific Forest verifier and binds original outcome/sequence',async()=>{
+    const h=await seeded();await presence(h);withPatrolEvidence(h);
+    const result=await settlePatrolModeFixture(h,'member');
+    const path=h.root+'/modeTimeEvents/'+result.event.operationId;
+    const valid=copy(h.data.get(path));
+    h.owner=createCanonicalAccountModeTime(h.dependencies);
+    await refuses(h,()=>presence(h,'heartbeat'),error=>error.code==='failed-precondition');
+    withPatrolEvidence(h);
+    for(const field of ['settlementKind','memberIndex','expectedSequence']){
+        const damaged=copy(valid);damaged.intent[field]=field==='settlementKind'?'win':field==='memberIndex'?3:999;
+        h.data.set(path,damaged);
+        await refuses(h,()=>presence(h,'heartbeat'),error=>error.code==='data-loss');
+        h.data.set(path,copy(valid));
+    }
+    await presence(h,'heartbeat');
+});
+
+test('Forest plans bind the live canonical pointer and reject mutation of their public mode projection',async()=>{
+    const h=await seeded();await presence(h);withPatrolEvidence(h);
+    const stale=copy(h.data.get(h.root+'/recoveryArchives/2').sourceRecords);
+    const staleSha=h.data.get(h.root+'/playableSnapshots/2').sha256;
+    advanceUnrelatedCanonicalRevision(h);
+    const prepare=(tx,session,records,hash)=>h.owner.preparePatrolSettlement(tx,{
+        root:h.dependencies.db.doc(h.root),uid:h.uid,session,operationId:'forest-plan-live-source-0001',
+        expectedRevision:h.revision,expectedSequence:h.data.get(h.root+'/modeTime/current').sequence,
+        sourceRecords:records,sourceSnapshotSha256:hash,serverNow:h.clock,resultRevision:h.revision+1,
+        settlementKind:'win',memberIndex:null,sourceId:'forest-live-source-0001'});
+    await refuses(h,()=>h.dependencies.runProtected(h.request(),(tx,session)=>prepare(tx,session,stale,staleSha)),
+        error=>error.code==='data-loss');
+    await refuses(h,()=>h.dependencies.runProtected(h.request(),async(tx,session)=>{
+        const before=copy(h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords);
+        const hash=h.data.get(h.root+'/playableSnapshots/'+h.revision).sha256;
+        const plan=await prepare(tx,session,before,hash);
+        plan.modeState.rested.battles=99;
+        const after=copy(before),next=h.revision+1;
+        for(const rows of Object.values(after))for(const row of Array.isArray(rows)?rows:[rows])row.serverRevision=next;
+        after.progress.sidecars['rested-exp-state'].raw=JSON.stringify(plan.modeState.rested);
+        after.claimCheckpoint.claimDigest=claimRecordsDigest(after.claimRecords);
+        const bundle=assembleCanonicalSnapshot(h.uid,next,after);
+        h.owner.writePatrolModeEvidence(tx,plan,{resultRecords:after,resultSnapshotSha256:bundle.sha256,
+            settlementCoreSha256:'a'.repeat(64)});
+    }),error=>error.code==='data-loss');
+});

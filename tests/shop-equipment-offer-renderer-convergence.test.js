@@ -16,6 +16,7 @@ function fixture(seed=new Map(),uid='shop-A'){
   isEquipmentInventoryType:t=>['head','shoulder','armor','shoes','weapon'].includes(t),cloneInventoryStackItem:(d,n)=>({...d,count:n}),INVENTORY_MAX_STACK_DEFAULT:999,
   renderShopContent(){return c.FourSymbolsEquipmentShop.render();}
  });c.window=c;c.FourSymbolsEquipmentReforge=require("../functions/src/equipment-reforge");c.FourSymbolsEquipmentFactory=require("../js/equipment-factory");
+ c.FourSymbolsInventoryStackPolicy=require('../functions/src/inventory-stack-policy');
  vm.runInContext(repoSource,c);const repo=c.FourSymbolsAccountSave;repo.activate(uid);
  c.saveGame=options=>{if(reenter){const fn=reenter;reenter=null;fn();}try{repo.writeForUid(repo.getActiveUid(),{gold:c.gold,inventoryItems:c.inventoryItems},options);return true;}catch(_){return false;}};
  c.rpgAlert=(_message,o)=>{if(o.tone==='success')success++;return Promise.resolve();};

@@ -17,12 +17,16 @@ const same=(a,b)=>snapshotDigest(a)===snapshotDigest(b);
 // intervals; they do not prove physical browser visibility or an ad impression.
 // No callable, Client hook, combat lifecycle or playable publication is enabled.
 function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
-    inspectExistingEnvelope,nextRevision,now=Date.now}){
+    inspectExistingEnvelope,nextRevision,now=Date.now,verifyPatrolSettlementEvidence,
+    patrolSettlementEvidenceReadBudget=0}){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
     const sourceOwner=createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
         inspectExistingEnvelope,nextRevision,now});
     const ref=(root,name,id)=>root.collection(name).doc(id);
     const digestHead=(state,eventSha256)=>snapshotDigest({...state,eventSha256});
+    const patrolPlans=new WeakMap(),verifyingPatrol=new WeakMap();
+    const forestReadBudget=Number.isSafeInteger(patrolSettlementEvidenceReadBudget)&&
+        patrolSettlementEvidenceReadBudget>0?patrolSettlementEvidenceReadBudget:0;
     function modes(records){
         try{
             const sidecars=records.progress.sidecars;
@@ -216,6 +220,21 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
         }else if(receipt||ledger)fail("data-loss","Presence-only mode event overlaps an economic operation.");
     }
     async function verifyEvent(tx,root,uid,account,event,receipt,ledger,maxEnvelopeRevision=account.serverRevision){
+        if(event?.schemaVersion===2){
+            if(event.resultOwner!=="forest-patrol-settlement"||
+               typeof verifyPatrolSettlementEvidence!=="function"||forestReadBudget===0){
+                fail("failed-precondition","The Forest settlement proof Owner is unavailable.");
+            }
+            let active=verifyingPatrol.get(tx);
+            if(!active){active=new Set();verifyingPatrol.set(tx,active);}
+            if(active.has(event.operationId))fail("data-loss","Recursive Forest settlement verification is invalid.");
+            active.add(event.operationId);
+            try{
+                await verifyPatrolSettlementEvidence({tx,root,uid,account,event,receipt,ledger,
+                    maxEnvelopeRevision,verifyPatrolModeComponent});
+            }finally{active.delete(event.operationId);}
+            return event;
+        }
         if(!event||event.schemaVersion!==1||event.kind!==KIND||event.ownerUid!==uid||
            !ID.test(event.operationId||"")||!Number.isSafeInteger(event.sequence)||event.sequence<1||
            !Number.isSafeInteger(event.sourceRevision)||event.sourceRevision<2||
@@ -319,10 +338,10 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
         }
         await verifyEvent(tx,root,uid,account,event,operation.data(),ledger.data(),maxEnvelopeRevision);
     }
-    function retainedEventReadBudget(){return 20;}
+    function retainedEventReadBudget(){return 20+forestReadBudget;}
     function retainedOperationReadBudget(kind){return kind===KIND?20:0;}
     function retainedSourceReadBudget(){return 32;}
-    function currentEvidenceReadBudget(){return 40;}
+    function currentEvidenceReadBudget(){return 40+forestReadBudget;}
     async function verifyRetainedSource(tx,root,uid,account,row,maxEnvelopeRevision=account.serverRevision){
         const ad=row.data();validateAd(ad,uid,row.id);
         const readEvent=async operationId=>{
@@ -564,6 +583,176 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
             return response(event,false);
         });
     }
+    function patrolTransition(head,before,intent,time,sessionId){
+        if(!head||head.presence!=="foreground"||head.sessionId!==sessionId){
+            fail("failed-precondition","Forest settlement requires the acknowledged foreground session.");
+        }
+        const derived=transition(head,before,{...intent,action:"heartbeat",elementBox:"keep"},time,sessionId,null);
+        let rested=false;
+        if(intent.settlementKind==="win"&&!derived.elementBoxActive){
+            const consumed=timePolicy.consumeRestedBattle(derived.after.rested.battles);
+            rested=consumed.applied;
+            if(rested){
+                derived.after.rested.battles=consumed.remainingBattles;
+                derived.after.rested.lastSeenAt=time;
+                derived.after.rested.blockedByElementBox=derived.elementBoxActive;
+            }
+        }
+        return {...derived,mode:{elementBox:derived.elementBoxActive,rested}};
+    }
+    function validPatrolIntent(intent){
+        return intent?.action==="forest-settlement"&&ID.test(intent.operationId||"")&&
+            ID.test(intent.sourceId||"")&&["member","win","loss","escape"].includes(intent.settlementKind)&&
+            (intent.settlementKind==="member"?Number.isSafeInteger(intent.memberIndex)&&
+                intent.memberIndex>=0&&intent.memberIndex<=2:intent.memberIndex===null)&&
+            Number.isSafeInteger(intent.expectedRevision)&&intent.expectedRevision>=2&&
+            Number.isSafeInteger(intent.expectedSequence)&&intent.expectedSequence>=1;
+    }
+    // This is a component reader, never an entry to mode-current or Forest
+    // dispatch. The Forest evidence Owner separately verifies the full earning
+    // delta; this reader proves only the embedded time/consumption component.
+    async function verifyPatrolModeComponent(tx,root,uid,account,event,receipt,ledger,
+        maxEnvelopeRevision=account.serverRevision){
+        if(!event||event.schemaVersion!==2||event.kind!==KIND||event.resultOwner!=="forest-patrol-settlement"||
+           event.ownerUid!==uid||!validPatrolIntent(event.intent)||event.intent.ownerUid!==uid||
+           event.operationId!==event.intent.operationId||event.sequence!==event.intent.expectedSequence+1||
+           !Number.isSafeInteger(event.sourceRevision)||event.sourceRevision<2||
+           !Number.isSafeInteger(event.envelopeRevision)||event.envelopeRevision<event.sourceRevision||
+           event.intent.expectedRevision!==event.envelopeRevision||
+           !Number.isSafeInteger(maxEnvelopeRevision)||maxEnvelopeRevision<account.serverRevision||
+           event.envelopeRevision>maxEnvelopeRevision||event.resultEnvelopeRevision>maxEnvelopeRevision||
+           !Number.isSafeInteger(event.resultRevision)||event.resultRevision!==event.envelopeRevision+1||
+           event.resultRevision>account.serverRevision||event.resultEnvelopeRevision!==event.resultRevision||
+           typeof event.modeChanged!=="boolean"||
+           !/^[a-f0-9]{64}$/.test(event.settlementCoreSha256||"")||
+           event.intentSha256!==snapshotDigest(event.intent)||event.sha256!==snapshotDigest(eventPayload(event))){
+            fail("data-loss","Embedded Forest mode event is inconsistent.");
+        }
+        const [before,after]=await Promise.all([
+            originalRecords(tx,root,uid,event.sourceRevision,event.sourceSnapshotSha256),
+            originalRecords(tx,root,uid,event.resultRevision,event.resultSnapshotSha256)]);
+        if(before.account.slots[0]!==account.slots[0]||after.account.slots[0]!==account.slots[0]||
+           !same(event.beforeModes,modes(before))||!same(event.afterModes,modes(after))){
+            fail("data-loss","Embedded Forest mode state differs from its original snapshots.");
+        }
+        validateHead(event.beforeHead,uid,account.slots[0],event.sourceRevision);
+        if(event.beforeHead.sequence!==event.intent.expectedSequence||
+           !same(event.beforeHead.modeState,event.beforeModes)){
+            fail("data-loss","Embedded Forest mode predecessor differs.");
+        }
+        const predecessor=await tx.get(ref(root,"modeTimeEvents",event.beforeHead.lastOperationId));
+        if(!predecessor.exists||predecessor.get("sha256")!==event.beforeHead.eventSha256||
+           predecessor.get("headSha256")!==snapshotDigest(headState(event.beforeHead))||
+           !same(predecessor.get("afterState"),headState(event.beforeHead))){
+            fail("data-loss","Embedded Forest mode predecessor is missing.");
+        }
+        const derived=patrolTransition(event.beforeHead,event.beforeModes,event.intent,event.observedAtMs,event.sessionId);
+        const expectedState={schemaVersion:1,kind:KIND,ownerUid:uid,characterId:account.slots[0],
+            sequence:event.sequence,sessionId:event.sessionId,epochId:derived.epochId,
+            presence:derived.presence,elementBoxActive:derived.elementBoxActive,
+            pendingAdSourceId:derived.pendingAdSourceId,observedAtMs:event.observedAtMs,
+            modeState:derived.after,canonicalRevision:event.resultRevision,
+            canonicalSnapshotSha256:event.resultSnapshotSha256,lastOperationId:event.operationId};
+        if(!same(event.afterModes,derived.after)||!same(event.mode,derived.mode)||
+           !same(event.delta,delta(event.beforeModes,derived.after))||
+           event.modeChanged===same(event.beforeModes,derived.after)||
+           !same(event.afterState,expectedState)||event.headSha256!==snapshotDigest(expectedState)){
+            fail("data-loss","Embedded Forest mode consumption differs from its original intent.");
+        }
+        if(!receipt||!ledger||[receipt,ledger].some(row=>row.schemaVersion!==1||
+               row.kind!=="forest-patrol-settlement"||row.ownerUid!==uid||row.operationId!==event.operationId||
+               row.sourceRevision!==event.sourceRevision||row.envelopeRevision!==event.envelopeRevision||
+               row.resultRevision!==event.resultRevision||row.resultEnvelopeRevision!==event.resultEnvelopeRevision||
+               row.snapshotSha256!==event.resultSnapshotSha256||row.modeEventSha256!==event.sha256||
+               row.modeHeadSha256!==event.headSha256||row.settlementCoreSha256!==event.settlementCoreSha256)||
+           !same(ledger.modeDelta,event.delta)){
+            fail("data-loss","Embedded Forest mode receipt or ledger binding differs.");
+        }
+        return {mode:clone(derived.mode),modeState:clone(derived.after),delta:clone(event.delta),
+            sequence:event.sequence,headSha256:event.headSha256};
+    }
+    async function preparePatrolSettlement(tx,{root,uid,session,operationId,expectedRevision,expectedSequence,
+        sourceRecords,sourceSnapshotSha256,serverNow,resultRevision,settlementKind,memberIndex,sourceId}){
+        const intent={action:"forest-settlement",operationId,ownerUid:uid,expectedRevision,expectedSequence,
+            settlementKind,memberIndex,sourceId};
+        if(!tx||!root||session?.uid!==uid||typeof session.sessionId!=="string"||!session.sessionId||
+           !validPatrolIntent(intent)||!Number.isSafeInteger(serverNow)||serverNow<1||
+           !Number.isSafeInteger(resultRevision)||resultRevision!==expectedRevision+1||
+           !/^[a-f0-9]{64}$/.test(sourceSnapshotSha256||"")){
+            fail("invalid-argument","Only a bound Forest settlement mode intent is accepted.");
+        }
+        const envelopeRef=db.collection("users").doc(uid).collection("saves").doc("current");
+        const [envelopeSnap,accountSnap,collision]=await Promise.all([
+            tx.get(envelopeRef),tx.get(ref(root,"account","current")),
+            tx.get(ref(root,"modeTimeEvents",operationId))]);
+        if(collision.exists)fail("failed-precondition","Forest settlement mode operation is already used.");
+        if(!envelopeSnap.exists)fail("data-loss","Forest mode envelope is missing.");
+        const envelope=inspectExistingEnvelope(envelopeSnap.data(),uid),account=sourceRecords?.account;
+        if(envelope.kind!=="current"||envelope.data.authoritativeStateReady!==false||
+           envelope.serverRevision!==expectedRevision){fail("aborted","CLOUD_REVISION_CONFLICT");}
+        if(account?.ownerUid!==uid||account.provenance!=="server-created"||
+           !Number.isSafeInteger(account.serverRevision)||account.serverRevision>expectedRevision||
+           typeof account.slots?.[0]!=="string"||account.slots[1]!==null||account.slots[2]!==null){
+            fail("failed-precondition","Canonical Forest mode source is not eligible.");
+        }
+        if(!accountSnap.exists||accountSnap.get("snapshotSha256")!==sourceSnapshotSha256||
+           !same(source(accountSnap.data()),account)){
+            fail("data-loss","Forest mode plan does not bind the current canonical account.");
+        }
+        let bundle;
+        try{bundle=assembleCanonicalSnapshot(uid,account.serverRevision,sourceRecords);}
+        catch(_){fail("data-loss","Canonical Forest mode source is invalid.");}
+        if(bundle.sha256!==sourceSnapshotSha256)fail("data-loss","Canonical Forest mode source hash differs.");
+        const original=await originalRecords(tx,root,uid,account.serverRevision,sourceSnapshotSha256);
+        if(!same(original,sourceRecords))fail("data-loss","Canonical Forest mode source differs from its archive.");
+        const head=await verifyCurrentEvidence(tx,root,uid,account,sourceRecords,expectedRevision);
+        if(!head||head.sequence!==expectedSequence)fail("aborted","MODE_SEQUENCE_CONFLICT");
+        const before=modes(sourceRecords),derived=patrolTransition(head,before,intent,serverNow,session.sessionId);
+        const handle=Object.freeze({modeState:clone(derived.after),mode:clone(derived.mode),
+            delta:delta(before,derived.after),sequence:expectedSequence+1,observedAtMs:serverNow});
+        patrolPlans.set(handle,{tx,root,uid,sessionId:session.sessionId,intent,sourceRecords:clone(sourceRecords),
+            sourceSnapshotSha256,resultRevision,serverNow,before,head:clone(headState(head)),
+            beforeHead:{...headState(head),eventSha256:head.eventSha256,sha256:head.sha256},derived:clone(derived)});
+        return handle;
+    }
+    function writePatrolModeEvidence(tx,handle,{resultRecords,resultSnapshotSha256,settlementCoreSha256}){
+        const plan=patrolPlans.get(handle);
+        if(!plan||plan.tx!==tx)fail("failed-precondition","A Forest mode plan belongs to its original transaction.");
+        if(typeof verifyPatrolSettlementEvidence!=="function"||forestReadBudget===0){
+            fail("failed-precondition","The Forest settlement proof Owner is unavailable.");
+        }
+        const {uid,root,intent,derived,before}=plan;
+        let bundle;
+        try{bundle=assembleCanonicalSnapshot(uid,plan.resultRevision,resultRecords);}
+        catch(_){fail("data-loss","Forest mode result source is invalid.");}
+        if(!/^[a-f0-9]{64}$/.test(settlementCoreSha256||"")||bundle.sha256!==resultSnapshotSha256||
+           resultRecords.account.slots[0]!==plan.sourceRecords.account.slots[0]||
+           !same(modes(resultRecords),derived.after)){
+            fail("data-loss","Forest mode result does not match its prepared transaction.");
+        }
+        const afterState={schemaVersion:1,kind:KIND,ownerUid:uid,
+            characterId:plan.sourceRecords.account.slots[0],sequence:intent.expectedSequence+1,
+            sessionId:plan.sessionId,epochId:derived.epochId,presence:derived.presence,
+            elementBoxActive:derived.elementBoxActive,pendingAdSourceId:derived.pendingAdSourceId,
+            observedAtMs:plan.serverNow,modeState:derived.after,canonicalRevision:plan.resultRevision,
+            canonicalSnapshotSha256:resultSnapshotSha256,lastOperationId:intent.operationId};
+        const payload={schemaVersion:2,kind:KIND,resultOwner:"forest-patrol-settlement",ownerUid:uid,
+            operationId:intent.operationId,intent,intentSha256:snapshotDigest(intent),sessionId:plan.sessionId,
+            sequence:afterState.sequence,observedAtMs:plan.serverNow,beforeHead:plan.beforeHead,
+            beforeModes:before,afterModes:derived.after,mode:derived.mode,modeChanged:!same(before,derived.after),
+            delta:delta(before,derived.after),sourceRevision:plan.sourceRecords.account.serverRevision,
+            envelopeRevision:intent.expectedRevision,sourceSnapshotSha256:plan.sourceSnapshotSha256,
+            resultRevision:plan.resultRevision,resultEnvelopeRevision:plan.resultRevision,
+            resultSnapshotSha256,settlementCoreSha256,afterState,headSha256:snapshotDigest(afterState)};
+        const event={...payload,sha256:snapshotDigest(payload)},stamp=FieldValue.serverTimestamp();
+        const head={...afterState,eventSha256:event.sha256,sha256:digestHead(afterState,event.sha256),updatedAt:stamp};
+        // Consume this internal handle before writing. A plan cannot be forged,
+        // replayed in another transaction, or reused for a second private event.
+        patrolPlans.delete(handle);
+        tx.create(ref(root,"modeTimeEvents",intent.operationId),{...event,createdAt:stamp});
+        tx.set(ref(root,"modeTime","current"),head);
+        return {event,head};
+    }
     async function readSettlementMode(tx,root,uid,session,account,records,maxEnvelopeRevision=account.serverRevision){
         // Admission/read evidence only. A future earning writer must atomically
         // advance the acknowledged time interval and consume its rested right
@@ -582,7 +771,8 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
         abandonSimulatedAd:(request,args)=>perform(request,"abandon-ad",args),
         readSettlementMode,verifyRetainedOperation,retainedOperationReadBudget,verifyCurrentEvidence,
         currentEvidenceReadBudget,verifyRetainedSource,retainedSourceReadBudget,
-        verifyRetainedEvent,retainedEventReadBudget});
+        verifyRetainedEvent,retainedEventReadBudget,preparePatrolSettlement,
+        writePatrolModeEvidence,verifyPatrolModeComponent});
 }
 
 module.exports={createCanonicalAccountModeTime};
