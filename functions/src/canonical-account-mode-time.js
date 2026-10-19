@@ -250,8 +250,8 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
            event.intent.expectedRevision!==event.envelopeRevision||
            event.intent.expectedSequence!==event.sequence-1||event.intentSha256!==snapshotDigest(event.intent)||
            event.sha256!==snapshotDigest(eventPayload(event)))fail("data-loss","Retained mode event is inconsistent.");
-        const before=await originalRecords(tx,root,uid,event.sourceRevision,event.sourceSnapshotSha256);
-        if(before.account.slots[0]!==account.slots[0]||!same(modes(before),event.beforeModes)){
+        const before=await originalRecords(tx,root,uid,event.sourceRevision,event.sourceSnapshotSha256),sourceModes=modes(before);
+        if(before.account.slots[0]!==account.slots[0]||!same(sourceModes,event.beforeModes)){
             fail("data-loss","Retained mode event differs from its original source.");
         }
         if(event.beforeHead){
@@ -284,7 +284,7 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
             }
             ad={...ad,status:"pending",consumedBy:null,closedAtMs:null};
         }
-        const derived=transition(event.beforeHead,event.beforeModes,event.intent,event.observedAtMs,event.sessionId,ad);
+        const derived=transition(event.beforeHead,sourceModes,event.intent,event.observedAtMs,event.sessionId,ad);
         if(!same(derived.after,event.afterModes)||!same(event.delta,delta(event.beforeModes,event.afterModes))||
            event.modeChanged===same(event.beforeModes,event.afterModes)){
             fail("data-loss","Retained mode delta differs from its original intent.");
@@ -302,7 +302,7 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
         }
         if(event.modeChanged){
             const after=await originalRecords(tx,root,uid,event.resultRevision,event.resultSnapshotSha256);
-            const expected=nextRecords(before,event.resultRevision,event.beforeModes,event.afterModes);
+            const expected=nextRecords(before,event.resultRevision,sourceModes,derived.after);
             if(!same(after,expected))fail("data-loss","Retained mode result archive differs from its original delta.");
         }else if(event.sourceSnapshotSha256!==event.resultSnapshotSha256){
             fail("data-loss","Presence-only mode event changed its canonical snapshot.");
@@ -632,8 +632,9 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
         const [before,after]=await Promise.all([
             originalRecords(tx,root,uid,event.sourceRevision,event.sourceSnapshotSha256),
             originalRecords(tx,root,uid,event.resultRevision,event.resultSnapshotSha256)]);
+        const sourceModes=modes(before);
         if(before.account.slots[0]!==account.slots[0]||after.account.slots[0]!==account.slots[0]||
-           !same(event.beforeModes,modes(before))||!same(event.afterModes,modes(after))){
+           !same(event.beforeModes,sourceModes)||!same(event.afterModes,modes(after))){
             fail("data-loss","Embedded Forest mode state differs from its original snapshots.");
         }
         validateHead(event.beforeHead,uid,account.slots[0],event.sourceRevision);
@@ -647,7 +648,7 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
            !same(predecessor.get("afterState"),headState(event.beforeHead))){
             fail("data-loss","Embedded Forest mode predecessor is missing.");
         }
-        const derived=patrolTransition(event.beforeHead,event.beforeModes,event.intent,event.observedAtMs,event.sessionId);
+        const derived=patrolTransition(event.beforeHead,sourceModes,event.intent,event.observedAtMs,event.sessionId);
         const expectedState={schemaVersion:1,kind:KIND,ownerUid:uid,characterId:account.slots[0],
             sequence:event.sequence,sessionId:event.sessionId,epochId:derived.epochId,
             presence:derived.presence,elementBoxActive:derived.elementBoxActive,

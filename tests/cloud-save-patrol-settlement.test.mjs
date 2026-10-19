@@ -427,3 +427,40 @@ test('draining concurrent current readers preserves the original first rejection
         assert.equal(settled,true);assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);
     }
 });
+test('v2 retained rested win derives exact sidecar bytes from its archive despite unordered evidence maps',async()=>{
+    const h=await seeded(),presence=async intent=>h.forest.observePresence(h.request(),{
+        operationId:id('presence'),expectedRevision:h.revision,expectedSequence:h.data.get(h.root+'/modeTime/current').sequence,intent,elementBox:'keep'});
+    await presence('rest');h.advance(120000);await presence('resume');
+    const ticket=await issue(h);await member(h,ticket.ticketId);const won=await terminal(h,ticket.ticketId);
+    assert.equal(won.result.reward.exp,588);
+    assert.equal(JSON.parse(records(h).progress.sidecars['rested-exp-state'].raw).battles,0);
+    const root=h.dependencies.db.doc(h.root),eventPath=h.root+'/modeTimeEvents/'+won.input.operationId,
+        original=copy([...h.data]),writes=h.writes;
+    function permuted(tx,fault){return {get:async reference=>{
+        const snap=await tx.get(reference);if(!snap.exists)return snap;const raw=snap.data();
+        if(reference.path.includes('/modeTimeEvents/'))for(const name of ['beforeModes','afterModes']){
+            if(raw[name]?.rested){const state=raw[name].rested;
+                raw[name].rested=Object.fromEntries(Object.keys(state).sort().map(key=>[key,state[key]]));}
+        }
+        if(reference.path===eventPath){
+            assert.notDeepEqual(Object.keys(raw.beforeModes.rested),Object.keys(h.data.get(eventPath).beforeModes.rested));
+            if(fault==='value')raw.beforeModes.rested.battles++;
+            if(fault==='delta')raw.delta.restedBattles++;
+            if(fault==='hash')raw.sha256='f'.repeat(64);
+            if(fault==='value'||fault==='delta'){const {sha256,createdAt,...payload}=raw;raw.sha256=snapshotDigest(payload);}
+        }
+        if(fault==='raw'&&reference.path.includes('/recoveryArchives/'))raw.sourceRecords.progress.sidecars['rested-exp-state'].raw+=' ';
+        return {id:snap.id,ref:snap.ref,exists:true,updateTime:snap.updateTime,data:()=>raw,
+            get:key=>key.split('.').reduce((value,part)=>value?.[part],raw)};
+    }};}
+    for(const [method,collection,sourceId] of [['verifyRetainedTicket','patrolTickets',ticket.ticketId],
+        ['verifyRetainedSettlement','patrolSettlements',won.input.operationId]]){
+        const check=async tx=>{h.forest.beginEvidenceAttempt(tx);return h.forest[method](tx,root,h.uid,records(h).account,
+            await tx.get(root.collection(collection).doc(sourceId)),h.revision);};
+        await h.dependencies.runProtected(h.request(),check);
+        await h.dependencies.runProtected(h.request(),tx=>check(permuted(tx)));
+        for(const fault of ['value','delta','hash','raw'])await refused(h,()=>
+            h.dependencies.runProtected(h.request(),tx=>check(permuted(tx,fault))),error=>error.code==='data-loss');
+    }
+    assert.deepEqual([...h.data],original,'retained proof preserves every original raw archive and sidecar');assert.equal(h.writes,writes);
+});

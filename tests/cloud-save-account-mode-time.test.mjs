@@ -488,3 +488,34 @@ test('Forest plans bind the live canonical pointer and reject mutation of their 
             settlementCoreSha256:'a'.repeat(64)});
     }),error=>error.code==='data-loss');
 });
+
+test('v1 retained proof derives exact sidecar bytes from canonical archive despite unordered event maps',async()=>{
+    const h=await seeded();await presence(h);await presence(h,'rest');h.advance(120000);
+    const accrued=await presence(h,'resume'),eventPath=h.root+'/modeTimeEvents/'+accrued.operationId;
+    const root=h.dependencies.db.collection('serverUsers').doc(h.uid),original=snapshot(h);
+    function permuted(tx,fault){return {get:async reference=>{
+        const snap=await tx.get(reference);if(!snap.exists)return snap;
+        const raw=snap.data();
+        if(reference.path.includes('/modeTimeEvents/'))for(const name of ['beforeModes','afterModes']){
+            if(raw[name]?.rested){const state=raw[name].rested;
+                raw[name].rested=Object.fromEntries(Object.keys(state).sort().map(key=>[key,state[key]]));}
+        }
+        if(reference.path===eventPath){
+            assert.notDeepEqual(Object.keys(raw.afterModes.rested),Object.keys(h.data.get(eventPath).afterModes.rested));
+            if(fault==='value')raw.beforeModes.rested.battles++;
+            if(fault==='delta')raw.delta.restedBattles++;
+            if(fault==='hash')raw.sha256='f'.repeat(64);
+            if(fault==='value'||fault==='delta'){const {sha256,createdAt,...payload}=raw;raw.sha256=snapshotDigest(payload);}
+        }
+        if(fault==='raw'&&reference.path.includes('/recoveryArchives/'))raw.sourceRecords.progress.sidecars['rested-exp-state'].raw+=' ';
+        return {id:snap.id,ref:snap.ref,exists:true,data:()=>raw,get:key=>key.split('.').reduce((value,part)=>value?.[part],raw)};
+    }};}
+    const check=async tx=>h.owner.verifyRetainedEvent(tx,root,h.uid,h.data.get(h.root+'/account/current'),
+        await tx.get(h.dependencies.db.doc(eventPath)),h.revision);
+    await h.dependencies.runProtected(h.request(),check);
+    await h.dependencies.runProtected(h.request(),tx=>check(permuted(tx)));
+    assert.deepEqual(snapshot(h),original,'proof reads preserve every original raw source and receipt');
+    for(const fault of ['value','delta','hash','raw'])await refuses(h,()=>
+        h.dependencies.runProtected(h.request(),tx=>check(permuted(tx,fault))),error=>error.code==='data-loss');
+    assert.deepEqual(snapshot(h),original);
+});
