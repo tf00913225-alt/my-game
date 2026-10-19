@@ -39,7 +39,7 @@ async function readCharacterSources(tx,root,account,fail){
     return {records,refs};
 }
 
-async function readOwnedSources(tx,root,fail){
+async function readOwnedSources(tx,root,fail,preloaded){
     const snapshots=await Promise.all([
         ...SOURCE_COLLECTIONS.map(([name])=>tx.get(root.collection(name))),
         tx.get(root.collection("claimRecords"))
@@ -75,15 +75,27 @@ async function readOwnedSources(tx,root,fail){
         if(typeof uid!=="string"||!uid){
             fail("data-loss","Owned inventory root identity is missing.");
         }
-        const accountSnap=await tx.get(root.collection("account").doc("current"));
+        const accountRef=root.collection("account").doc("current");
+        // A caller may reuse snapshots already read in THIS callback attempt.
+        // Accept DocumentSnapshots only, never a raw inventory or cached rows.
+        if(preloaded!==undefined&&(!preloaded||
+           preloaded.accountSnapshot?.ref?.path!==accountRef.path||
+           typeof preloaded.accountSnapshot?.data!=="function"||
+           typeof preloaded.currentSnapshot?.data!=="function")){
+            fail("data-loss","Preloaded inventory ordering references are inconsistent.");
+        }
+        const accountSnap=preloaded===undefined?await tx.get(accountRef):preloaded.accountSnapshot;
         const account=accountSnap.data();
         if(!accountSnap.exists||account?.schemaVersion!==1||account.ownerUid!==uid||
            !Number.isSafeInteger(account.serverRevision)||account.serverRevision<1||
            !/^[a-f0-9]{64}$/.test(account.snapshotSha256||"")){
             fail("data-loss","Owned inventory ordering account is inconsistent.");
         }
-        const snapshotSnap=await tx.get(root.collection("playableSnapshots")
-            .doc(String(account.serverRevision)));
+        const snapshotRef=root.collection("playableSnapshots").doc(String(account.serverRevision));
+        if(preloaded!==undefined&&preloaded.currentSnapshot?.ref?.path!==snapshotRef.path){
+            fail("data-loss","Preloaded inventory snapshot reference is inconsistent.");
+        }
+        const snapshotSnap=preloaded===undefined?await tx.get(snapshotRef):preloaded.currentSnapshot;
         let inventory;
         try{
             if(!snapshotSnap.exists||snapshotSnap.get("sha256")!==account.snapshotSha256){

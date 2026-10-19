@@ -1,6 +1,6 @@
 /* Real Auth + Functions + Firestore emulator integration. Never target live data. */
 import assert from "node:assert/strict";
-import {readFileSync} from "node:fs";
+import {readFileSync,openSync,fstatSync,readSync,closeSync} from "node:fs";
 import vm from "node:vm";
 import {createRequire} from "node:module";
 import {createHash,randomBytes} from "node:crypto";
@@ -3240,9 +3240,25 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
     const {patrolVictoryExp}=require("../functions/src/patrol-ticket-policy.js");
     // Failure context only: preserve the SDK error (including its original
     // stack) as cause and retain its code/details. Never retry or mask it.
+    let forestDiagnosticPrinted=false;
     async function forestStage(label,operation){
         try{return await operation();}
         catch(cause){
+            if(!forestDiagnosticPrinted&&process.env.GCLOUD_PROJECT==="demo-four-symbols-session"&&
+               process.env.FIRESTORE_EMULATOR_HOST==="127.0.0.1:18080"){
+                forestDiagnosticPrinted=true;
+                let handle;
+                try{
+                    handle=openSync("firestore-debug.log","r");
+                    const size=fstatSync(handle).size,bytes=Buffer.alloc(Math.min(size,65536));
+                    readSync(handle,bytes,0,bytes.length,size-bytes.length);
+                    const tail=bytes.toString("utf8").trimEnd().split(/\r?\n/).slice(-100)
+                        .map(line=>line.slice(0,2000)).join("\n");
+                    console.error(`Forest emulator failure ${label}; bounded Firestore diagnostic tail:\n${tail}`);
+                }catch(diagnosticError){
+                    console.error(`Forest emulator diagnostic unavailable: ${diagnosticError.code||diagnosticError.message}`);
+                }finally{if(handle!==undefined){try{closeSync(handle);}catch(_){/* Preserve the transaction error. */}}}
+            }
             const error=new Error(`Forest emulator stage ${label}: ${cause.message}`,{cause});
             if(cause.code!==undefined)error.code=cause.code;
             if(cause.details!==undefined)error.details=cause.details;
@@ -3356,7 +3372,37 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
     console.log("Forest repeat checkpoint: takeover completed; checking revoked session and reopening mode.");
     await forestStage("repeat/takeover/old-session-refusal",()=>h.refuses(()=>h.forest.settleTerminal(oldRequest,winInput)));
     await forestStage("repeat/takeover/mode-reopen",()=>h.presence("reopen"));
-    const allocator=createCanonicalExpAllocation(h.deps);
+    const allocator=createCanonicalExpAllocation({...h.deps,
+        runProtected:(request,operation)=>{
+            let attempt=0;
+            return writerSessions.runProtected(request,async(tx,active)=>{
+                const currentAttempt=++attempt;
+                let readSequence=0;
+                // Bind every SDK method to its original transaction. Only get
+                // failures gain context; reads retain their original ordering.
+                const traced=new Proxy(tx,{get(target,key){
+                    if(key!=="get"){
+                        const value=Reflect.get(target,key,target);
+                        return typeof value==="function"?value.bind(target):value;
+                    }
+                    return async(reference,...args)=>{
+                        const sequence=++readSequence;
+                        const kind=typeof reference?.collection==="function"?"document":"query";
+                        const path=typeof reference?.path==="string"?reference.path:
+                            `[${reference?.constructor?.name||"unknown query"}]`;
+                        try{return await target.get(reference,...args);}
+                        catch(cause){
+                            const error=new Error(`Forest allocator transaction attempt ${currentAttempt} read ${sequence} ${kind} ${path}: ${cause.message}`,{cause});
+                            for(const field of ["code","details","detail"]){
+                                if(cause[field]!==undefined)error[field]=cause[field];
+                            }
+                            throw error;
+                        }
+                    };
+                }});
+                return operation(traced,active);
+            });
+        }});
     async function allocateAvailable(){
         for(let guard=0;guard<9;guard++){
             const current=(await h.root.collection("characters").doc(charId).get()).get("state");
