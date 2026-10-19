@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "policyId": "wild-forest-patrol-source-v1",
+  "scope": "patrol-source-data-only",
+  "sourceDigests": {
+    "js/00-main.js": "45177390fe7fbfbbf65e1a3957c6a530d2a93b99f490a0b2fba5112b930814c9",
+    "js/34-v141-core-systems.js": "a0687d64c6d8a8896f6e1ba990580578f283bae5cc99177bc46c0120f95b74d0",
+    "config/wild-monster-archetypes.json": "958f32c3c27dc3e88c43fe28a415dd070031559c207f8ada1a128fdb47d9c00c"
+  },
+  "zones": {
+    "forest": {
+      "runtimeZone": "forest",
+      "context": "wild/zone-01",
+      "requiredLevel": 0,
+      "mapEntries": [
+        {
+          "entryId": "forest:0",
+          "name": "哥布林",
+          "level": 3,
+          "element": "fire",
+          "monsterKey": "wild.zone-01.fire-01",
+          "context": "wild/zone-01"
+        },
+        {
+          "entryId": "forest:1",
+          "name": "水靈狐",
+          "level": 2,
+          "element": "water",
+          "monsterKey": "wild.zone-01.water-01",
+          "context": "wild/zone-01"
+        },
+        {
+          "entryId": "forest:2",
+          "name": "哥布林",
+          "level": 3,
+          "element": "fire",
+          "monsterKey": "wild.zone-01.fire-01",
+          "context": "wild/zone-01"
+        },
+        {
+          "entryId": "forest:3",
+          "name": "水靈狐",
+          "level": 2,
+          "element": "water",
+          "monsterKey": "wild.zone-01.water-01",
+          "context": "wild/zone-01"
+        },
+        {
+          "entryId": "forest:4",
+          "name": "哥布林",
+          "level": 3,
+          "element": "fire",
+          "monsterKey": "wild.zone-01.fire-01",
+          "context": "wild/zone-01"
+        },
+        {
+          "entryId": "forest:5",
+          "name": "水靈狐",
+          "level": 2,
+          "element": "water",
+          "monsterKey": "wild.zone-01.water-01",
+          "context": "wild/zone-01"
+        },
+        {
+          "entryId": "forest:6",
+          "name": "風芽魈",
+          "level": 3,
+          "element": "wind",
+          "monsterKey": "wild.zone-01.wind-01",
+          "context": "wild/zone-01"
+        },
+        {
+          "entryId": "forest:7",
+          "name": "岩薯卒",
+          "level": 3,
+          "element": "earth",
+          "monsterKey": "wild.zone-01.earth-01",
+          "context": "wild/zone-01"
+        }
+      ],
+      "selection": {
+        "maxMapEntries": 8,
+        "triggerIncluded": true,
+        "sampleWithoutReplacement": true,
+        "groupMin": 1,
+        "groupMax": 3,
+        "shuffle": "fisher-yates-descending",
+        "outputOrder": "entry-index-ascending",
+        "eligiblePool": "alive-excluding-trigger"
+      },
+      "rank": {
+        "eliteChance": 0.1,
+        "otherwise": "regular"
+      }
+    }
+  },
+  "outcomeVerified": false,
+  "rewardEligible": false,
+  "sha256": "ca66120a8b9bddff785018da18857230e08a3aef55c538d848e0de788840b8d5"
+}
