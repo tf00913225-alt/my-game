@@ -80,7 +80,7 @@
         return to==="planned"?"planned":"locked";
     }
     function mapDisplayY(view,value){
-        const rows=Array.from(new Set(view.chapter.nodes.map(node=>Number(node.y)))).sort((a,b)=>a-b);
+        const rows=Array.from(new Set([...view.chapter.nodes,...(view.chapter.hiddenNodes||[])].map(node=>Number(node.y)))).sort((a,b)=>a-b);
         const y=Number(value),upper=rows.findIndex(row=>row>=y);
         if(upper<0){ return 96; }
         if(upper===0){ return 4; }

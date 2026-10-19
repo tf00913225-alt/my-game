@@ -139,7 +139,7 @@
     display:block;
     margin-top:calc(6 * var(--ui-length-unit,1px));
     color:#bdae94;
-    font-size:calc(13 * var(--ui-length-unit,1px));
+    font-size:calc(16 * var(--ui-length-unit,1px));
     line-height:1.45;
 }
 

@@ -47,7 +47,7 @@ const measure=String.raw`(selector)=>{
   const r=e.getBoundingClientRect();if(!r.width||!r.height)continue;
   if(e.scrollWidth>e.clientWidth+1)overflow.push({text:e.textContent.trim().slice(0,60),width:r.width,scroll:e.scrollWidth,client:e.clientWidth});
  }
- return {rows,controls,overflow};
+ return {rows,controls,overflow,images:host.querySelectorAll('img').length};
 }`;
 try{
  const target=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(t=>t.type==='page');
@@ -58,14 +58,14 @@ try{
  await c.eval("(()=>{const armor=v17346GenerateEquipment(()=>.2,{slot:'armor',classType:'warrior',rarity:'orange'});inventoryItems.push(armor,{...getPotionDefinition('hpPotion10'),count:30});characterEquipment.fire.armor=armor;rebuildInventorySlots();renderInventory();})()");
  const capture=async(name,selector='#homeFeatureModal')=>{
   await settle();const data=await c.eval(`(${measure})(${JSON.stringify(selector)})`);
-  assert.ok(data.rows.length,name+': empty UI coverage');
-  scenes.push({name,...data});
+  assert.ok(data.rows.length||data.controls.length||data.images,name+': empty UI coverage');
+  scenes.push({name,...data});fs.writeFileSync(path.join(out,'all-text.json'),JSON.stringify(scenes,null,2));
   const image=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(image.data,'base64'));
   console.log(name+': '+data.rows.length+' text nodes, '+data.rows.filter(x=>x.font<12.9).length+' below minimum');
  };
  await c.eval("selectedSkillElementTab='fire';renderSkillLoadout();showSkillDetail('flameSlash')");
  await capture('skill-detail','#skillDetailModal');await c.eval('closeSkillDetail()');
- for(const feature of ['character','shop','forge','synthesis','autoBattleSettings','quest','announcement','system','rest','hero','relic','achievement']){
+ for(const feature of ['character','shop','forge','synthesis','autoBattleSettings','quest','announcement','system','rest','expPool','offlineExp','hero','relic','achievement']){
   await c.eval(`closeHomeFeature();showPage('home');openHomeFeature(${JSON.stringify(feature)})`);
   if(feature==='relic')await c.eval("(async()=>{const end=Date.now()+15000;while(!document.querySelector('.team-relic-grid')&&Date.now()<end)await new Promise(r=>setTimeout(r,50));if(!document.querySelector('.team-relic-grid'))throw Error('relic content did not load');})()");
   await capture(feature);
@@ -75,6 +75,10 @@ try{
    await c.eval(tabs[i].click);await capture(feature+'-tab-'+i);
   }
  }
+ await c.eval("closeHomeFeature();openHomeFeature('character');switchCharacterTab('skill')");
+ for(const element of ['fire','water','wind','earth']){await c.eval(`selectedSkillElementTab=${JSON.stringify(element)};renderSkillLoadout()`);await capture('skills-'+element);}
+ const skillIds=await c.eval("Object.keys(skillDatabase).filter(id=>{const s=skillDatabase[id];return s.element&&Object.hasOwn(s,'learnLevel')&&s.category!=='monster';})");
+ for(const id of skillIds){await c.eval(`showSkillDetail(${JSON.stringify(id)})`);await capture('skill-'+id,'#skillDetailModal');await c.eval('closeSkillDetail()');}
  await c.eval("closeHomeFeature();showPage('home')");await capture('home','#homePage');
  await c.eval("openMapInventoryOverlay('home')");await capture('inventory','#inventoryPage');
  await c.eval('openInventoryCharacterDetail()');await capture('character-detail','#inventoryCharacterDetailModal');await c.eval('closeInventoryCharacterDetail();closeMapInventoryOverlay()');

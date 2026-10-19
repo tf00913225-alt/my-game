@@ -31,7 +31,7 @@
 /* Trigger descriptions remain in the existing relic detail; the summary keeps its original scope. */
 #game-ui #homePage>.team-relic-loadout-slot>small{display:none;}
 #game-ui #homePage>.team-relic-loadout-slot>button{
-    min-width:150px;height:90px;min-height:90px;border:2px solid #b18a48;border-radius:6px;
+    min-width:150px;height:132px;min-height:132px;border:2px solid #b18a48;border-radius:6px;
     color:#f8dfab;background:#382816;font-family:inherit;font-size:42px;font-weight:600;line-height:1.2;
 }
 #game-ui #homePage>.team-relic-loadout-slot>button:disabled{opacity:.5;}
