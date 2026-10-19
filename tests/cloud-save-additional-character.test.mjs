@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import {storeHarness,selection,copy} from './helpers/canonical-store-harness.mjs';
+import {storeHarness,selection,copy} from '../scripts/test-helpers/canonical-store-harness.mjs';
 const require=createRequire(import.meta.url);
 const {createCanonicalPatrolSettlement}=require('../functions/src/canonical-patrol-settlement');
 const {createCanonicalExpAllocation}=require('../functions/src/canonical-exp-allocation');
