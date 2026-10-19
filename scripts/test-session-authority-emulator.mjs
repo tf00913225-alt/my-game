@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {readFileSync,openSync,fstatSync,readSync,closeSync} from "node:fs";
 import vm from "node:vm";
 import {createRequire,Module} from "node:module";
+import {AsyncLocalStorage} from "node:async_hooks";
 import {createHash,randomBytes} from "node:crypto";
 const require=createRequire(new URL("../functions/package.json",import.meta.url));
 const {initializeApp}=require("firebase-admin/app");
@@ -4201,13 +4202,16 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
 {
     const h=patrolProofSdkFixture;assert.ok(h);
     const publicationReadTime=(await h.save.get()).readTime;assert.ok(publicationReadTime instanceof Timestamp);
-    let clock=publicationReadTime.toMillis(),depth=0,abortOnce=false,rollbackOnce=false,loseResponse=false;
+    let clock=publicationReadTime.toMillis(),abortOnce=false,rollbackOnce=false,loseResponse=false;
+    const publicationTransactions=new AsyncLocalStorage();
     const traces=[],observedDb={doc:path=>db.doc(path),runTransaction:callback=>db.runTransaction(async raw=>{
         const trace={reads:0,queries:0,writes:0};traces.push(trace);
         const tx={get:async ref=>{const snap=await raw.get(ref),query=typeof ref.collection!=="function";
             trace.reads+=query?Math.max(1,snap.size):1;trace.queries+=query?1:0;return snap;}};
         for(const name of ["create","set","update","delete"])tx[name]=(...args)=>{trace.writes++;return raw[name](...args);};
-        depth++;try{return await callback(tx);}finally{depth--;}
+        // Only this callback's async descendants are inside its transaction.
+        // A different concurrent callback must not mark an outside publisher.
+        return publicationTransactions.run(Object.freeze({transaction:true}),()=>callback(tx));
     })};
     const authority=createSessionAuthority({db:observedDb,FieldValue,HttpsError,now:()=>clock});
     const maintenance=async(req,id,operation,publicationId)=>{
@@ -4246,18 +4250,27 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
         ...args,operationId:"publication-sdk-raw-"+String(sequence).padStart(6,"0"),expectedSequence:sequence,startOrdinal:offset,count:Math.min(16,count-offset)})).nextOrdinal;
     const objects=new Map(),ioCalls=[];let nextGeneration=9007199254740993n,lostCreate=true;
     const io={bucketName:"fake-private-candidate-bucket",
-        async lookupMetadata(input){assert.equal(depth,0);ioCalls.push("lookup");return objects.get(input.objectName)?.metadata??null;},
+        async lookupMetadata(input){assert.equal(publicationTransactions.getStore(),undefined);ioCalls.push("lookup");return objects.get(input.objectName)?.metadata??null;},
         async createOnly(input){
-            assert.equal(depth,0);ioCalls.push("create");assert.equal(input.ifGenerationMatch,"0");
+            assert.equal(publicationTransactions.getStore(),undefined);ioCalls.push("create");assert.equal(input.ifGenerationMatch,"0");
             if(objects.has(input.objectName))throw Object.assign(Error("exists"),{code:"ALREADY_EXISTS"});
             const metadata={bucketName:input.bucketName,objectName:input.objectName,generation:String(nextGeneration++),size:input.bytes.length};
             objects.set(input.objectName,{metadata,bytes:Buffer.from(input.bytes)});
             if(lostCreate){lostCreate=false;throw Object.assign(Error("lost create response"),{code:"UNKNOWN_COMMIT"});}return metadata;
         },
-        async readExact(input){assert.equal(depth,0);ioCalls.push("read");const value=objects.get(input.objectName);
+        async readExact(input){assert.equal(publicationTransactions.getStore(),undefined);ioCalls.push("read");const value=objects.get(input.objectName);
             if(!value||value.metadata.generation!==input.generation)throw Error("missing exact fake generation");
             return {metadata:{...value.metadata},bytes:Buffer.from(value.bytes)};
         }};
+    // Prove the guard still rejects every IO method from an actual callback,
+    // before any fake Storage side effect. The parallel publishers below
+    // independently prove that another callback cannot cause a false refusal.
+    await observedDb.runTransaction(async tx=>{
+        await tx.get(h.save);
+        for(const method of ["lookupMetadata","createOnly","readExact"])
+            await assert.rejects(()=>io[method]({}),{code:"ERR_ASSERTION"});
+    });
+    assert.equal(ioCalls.length,0);assert.equal(objects.size,0);
     // Test-only lexical access; no exported factory method, runtime dependency
     // or deployable Storage adapter is added to production.
     const filename=require.resolve("../functions/src/canonical-current-recovery.js"),compiled=new Module(filename);
