@@ -119,3 +119,16 @@ eligibility/damage behavior, latest-head CI or commercial release readiness.
 `assets/full` contains candidate and rejected artwork with provenance; presence
 or lossless conversion alone never means runtime adoption or visual PASS.
 `usb-comparison.html` retains baseline/checkpoint phone comparisons.
+
+The b1ede88d USB batch records 11 native-wide cast candidates and the correctly
+single-recipient barrier replay in `artifacts/vfx-wide-batch-usb`. All hit
+observations retain an active battle and six formal HUDs; all casts clean up.
+This is technical evidence only. The full recording is decoded at 12fps in
+`sequence-frames`; fixed-offset `contact-frames` often sample the tail and must
+not be used alone to infer missing art or approve peak placement.
+
+The mixed-status soak at ade43a48 retains 12 body visuals and 30 icons across
+six units, then clears them all. Its periodic long tasks require profiling;
+the initial 601.2ms interval may include fixture startup and is not a proven
+steady-state maximum. This is not a performance pass. Status artwork is
+unchanged from ade43a48 to b1ede88d.

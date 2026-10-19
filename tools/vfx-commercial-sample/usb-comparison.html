@@ -6,7 +6,8 @@
 <label for="case">選擇技能或狀態　</label><select id="case"></select><p id="note"></p>
 <div class="pair"><figure><figcaption>修改前／上一輪</figcaption><div class="source" id="beforeSource"></div><img id="before" alt="修改前手機截圖"></figure><figure><figcaption>目前候選</figcaption><div class="source" id="afterSource"></div><img id="after" alt="目前候選手機截圖"></figure></div>
 <p>使用獨立唯讀 QA 帳號。較早基線與本輪的瀏覽器可視高度略有差異；圖片完整呈現，沒有裁切或重繪截圖。</p>
-<h2>持續狀態：USB 實機完整錄影</h2><p>候選 590b1390，14 種身體狀態逐項開／關，玩家與敵方同步展示。原始手機錄影，尚待獨立動態驗收。</p><video controls preload="metadata" style="width:min(100%,460px)" src="../../artifacts/vfx-status-contrast-v2/status-cycle.mp4"></video></main>
+<h2>最新群體候選：USB 實機完整錄影</h2><p>候選 b1ede88d：11 招原生寬幅素材與單體結界檢查。這是審核中的原始手機錄影，尚未全部通過商業品質；逐項檢查目標對齊、遮擋、命中與消退。</p><video controls preload="metadata" style="width:min(100%,460px)" src="../../artifacts/vfx-wide-batch-usb/skill-cycle.mp4"></video>
+<h2>持續狀態：USB 實機完整錄影</h2><p>候選 590b1390，14 種身體狀態逐項開／關，玩家與敵方同步展示。21 種狀態靜態畫面通過，8 種脈動狀態已完成抽樣動態檢查；六人混合狀態效能仍在驗證。</p><video controls preload="metadata" style="width:min(100%,460px)" src="../../artifacts/vfx-status-contrast-v2/status-cycle.mp4"></video></main>
 <script>
 const rows=[
  ['flameSlash','火焰斬','skill','斬柱改為纖細斜弧，保留火焰辨識，檢查命中星芒與角色可讀性。'],
@@ -16,6 +17,13 @@ const rows=[
  ['earthShield','萬象土盾施放','skill','單人土盾改為單盾，檢查不再畫出三個盾。'],
  ['fireSoulResonance','火魂共鳴施放','skill','環流中央保留透明空間，檢查相鄰幀位置。'],
  ['windSpell','群體風法','skill','改為原生寬扁三道風卷，三個目標各有接觸；保留安全範圍與角色資訊。'],
+ ['explosiveFlurry','火爆亂擊','skill','三道交叉火刃保留斬擊特色；USB 畫面審核通過，停止額外精修。'],
+ ['stormCircle','風焰術','skill','三道風刃仍接觸目標，尺寸與辨識達標，保留目前版本。'],
+ ['petrifyFist','石盾拳','skill','保留岩拳接觸與碎石，USB 畫面審核通過。'],
+ ['earthquakeCrush','地裂重拳','skill','保留三點岩石衝擊，不為追求完全同心而繼續重畫。'],
+ ['stoneThrow','落石術','skill','岩塊與目標接觸範圍通過，保留角色與血條可讀性。'],
+ ['sandWind','滾石術','skill','保留滾石材質與三個作用點，停止額外精修。'],
+ ['barrier','結界施放','skill','依正式單體友方目標驗證；保留單一結界與角色資訊。'],
  ['stormRain','風起雲湧','skill','三道分離旋風取代滿幅霧團，檢查各目標辨識。'],
  ['iceArrowRain','冰箭雨','skill','保留全體範圍，檢查血條、裁切與命中。'],
  ['rage','怒火常駐','status','火臉改為中空火環，保留人物與既有狀態辨識。'],
@@ -41,9 +49,11 @@ const originalRage=kind==='status'&&id==='rage';
 const before=originalRage?'../../artifacts/vfx-status-anchors-player/status-rage-original.png':baseline&&kind==='skill'?`../../artifacts/vfx-usb-runtime/before-${id}.png`:`../../artifacts/vfx-checkpoint18/${kind}-${id}.png`;
 const revisedGroup=['rage','windSpell'];
 const revisedStatus=kind==='status'&&['rage','dodgeSkill','dinghaishenzhen'].includes(id);
+const passedPeakFrames={explosiveFlurry:16,stormCircle:36,petrifyFist:104,earthquakeCrush:132,stoneThrow:154,sandWind:176,barrier:272};
+const currentPeak=kind==='skill'&&passedPeakFrames[id];
 const folder=kind==='status'?(revisedStatus?'vfx-status-contrast-v2':'vfx-status-anchors-player'):revisedGroup.includes(id)?'vfx-status-polish':'vfx-final';
-document.getElementById('before').src=before;document.getElementById('after').src=kind==='skill'&&id==='flameSlash'?'../../artifacts/vfx-remaining-hit/flame-contact.png':kind==='skill'&&id==='windSpell'?'../../artifacts/vfx-wind-wide/skill-windSpell.png':`../../artifacts/${folder}/${kind}-${id}.png`;
+document.getElementById('before').src=before;document.getElementById('after').src=currentPeak?`../../artifacts/vfx-wide-batch-usb/sequence-frames/frame-${String(currentPeak).padStart(4,'0')}.png`:kind==='skill'&&id==='flameSlash'?'../../artifacts/vfx-remaining-hit/flame-contact.png':kind==='skill'&&id==='windSpell'?'../../artifacts/vfx-wind-wide/skill-windSpell.png':`../../artifacts/${folder}/${kind}-${id}.png`;
 document.getElementById('beforeSource').textContent=originalRage?'同一候選環境：原素材重播':baseline&&kind==='skill'?'原始基線 b767d31e':'上一輪 checkpoint 18f92b26';
-document.getElementById('afterSource').textContent=kind==='status'?(revisedStatus?'局部修正候選 590b1390':'狀態候選 4b2cb548'):id==='flameSlash'?'USB 原片命中影格 ade43a48（含手機瀏覽器介面）':id==='windSpell'?'原生寬扁風卷 ade43a48':revisedGroup.includes(id)?'取消過度放大候選 b145e2d7':'素材候選 067fa105';document.getElementById('note').textContent=note;}
+document.getElementById('afterSource').textContent=currentPeak?'USB 原片審核影格 b1ede88d（含手機瀏覽器介面）':kind==='status'?(revisedStatus?'局部修正候選 590b1390':'狀態候選 4b2cb548'):id==='flameSlash'?'USB 原片命中影格 ade43a48（含手機瀏覽器介面）':id==='windSpell'?'原生寬扁風卷 ade43a48':revisedGroup.includes(id)?'取消過度放大候選 b145e2d7':'素材候選 067fa105';document.getElementById('note').textContent=note;}
 picker.onchange=show;show();
 </script></html>

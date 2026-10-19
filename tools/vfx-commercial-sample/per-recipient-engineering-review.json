@@ -1,0 +1,55 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewDate": "2026-10-20",
+  "reviewer": "independent timing_review",
+  "baseHead": "b1ede88d7c61e290f4f09933f1043d0bee981800",
+  "scope": "Uncommitted opt-in calm cast per-recipient engineering diff, after recipient guard fix",
+  "decision": "ENGINEERING_FOCUSED_PASS_USB_PENDING",
+  "runtimeOwner": "js/39-v143-skill-animation.js",
+  "findings": [
+    "Explicit sprite.presentation per-recipient reuses existing single emitter; formal allyAll target authority is retained.",
+    "Portrait artworkProjection center and minor dimension sizing affect only opted-in presentation.",
+    "Initial recipient set is snapshotted. registerTarget and emitSprite reject unrelated indices only when this snapshot exists; ordinary casts keep existing late registration.",
+    "A reproduced failure allowed unrelated feedback to create a third node for explicit recipients [0,2]. Guard fix resolves the regression.",
+    "Existing addSprite shared clock, negative-delay late catchup, hit callback draining and cleanup remain in use; no second renderer or procedural frame loop introduced."
+  ],
+  "tests": [
+    {
+      "file": "tests/v173.23-wind-vfx.test.js",
+      "result": "PASS",
+      "count": 22,
+      "coverage": [
+        "3/6/partial recipient node count",
+        "formal target type retained",
+        "portrait center and bounded size",
+        "per-index confirmation keys",
+        "single common clock handoff",
+        "callback once-only",
+        "valid late recipient -500ms catchup",
+        "enemy confirmation",
+        "supersede/dispose cleanup",
+        "nonrecipient late feedback rejection",
+        "lossless candidate dimensions/alpha/hash/byte identity"
+      ]
+    },
+    {
+      "file": "tests/v166-water-vfx.test.js",
+      "result": "PASS",
+      "count": 22,
+      "coverage": "Existing water timing/targeting plus reviewed source identity checks; original PNG decode/hash baseline retained"
+    },
+    {
+      "file": "tests/vfx-cast-clock-20261019.test.js",
+      "result": "PASS",
+      "coverage": "RAF handoff, track alignment, shared targets, rejection, disposal and fallback"
+    }
+  ],
+  "diffCheck": "PASS for modified focused tests",
+  "limits": [
+    "Review covers working-tree diff at recorded base, not a committed or CI-approved release.",
+    "Engineering PASS does not prove phone footprint, source identity at final fit, animation continuity, hit feel or sustained performance.",
+    "USB acceptance remains pending for this presentation behavior/source snapshot.",
+    "Stop engineering refinement unless new concrete failure appears; no runtime changes in this review."
+  ],
+  "next": "Root integrates checkpoints; independent water/heal recipient source review begins only after generation/conversion evidence is available."
+}

@@ -11742,12 +11742,12 @@
 
         waterKnife:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-blade-slash-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
         frostPunch:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/frost-fist-vfx.png?v=166","single",{scale:2.15,maxSize:260})},
-        iceSpin:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/frost-spinning-slash-vfx.png?v=166","single",{scale:1.95,maxSize:235})},
+        iceSpin:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/ice-spin-wide-v2.webp","single",{scale:1.95,maxSize:235,cellAspect:2.2448275862068967})},
         frostCrush:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/freeze-heavy-strike-vfx.png?v=166","single",{scale:2.35,maxSize:290})},
         waterBall:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-ball-wide-v2.webp","group",{scale:1.22,minSize:150,maxSize:500,alignToSlots:true,cellAspect:2.25})},
         // Keep every authored frame at its original source angle while the
         // complete sheet moves between actor and target. Hit timing is unchanged.
-        floodBeast:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/tidal-beast-vfx.png?v=166","targetTrajectory",{travelToTargets:true,preserveSourceOrientation:true,scale:1.85,minSize:175,maxSize:250,motionPhases:{flightStart:2,turnFrame:5,impactStart:6,flightSourceAngle:0,turnSourceAngle:90}})},
+        floodBeast:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/tidal-beast-safe-v3.webp","targetTrajectory",{travelToTargets:true,preserveSourceOrientation:true,scale:1.85,minSize:175,maxSize:250,motionPhases:{flightStart:2,turnFrame:5,impactStart:6,flightSourceAngle:0,turnSourceAngle:90}})},
         iceArrowRain:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/frost-arrow-rain-vfx.png?v=173.19","battlefield",{fixedFormation:true,coverageScale:1.22,minWidth:140,minHeight:140})},
         freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270})},
         healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/heal-spell-wide-v2.webp","single",{scale:2.05,maxSize:250,cellAspect:2.25})},
@@ -11756,7 +11756,7 @@
         waterEX:{hit:.74,noVisual:true,passive:true},
 
         stormFist:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/storm-fist-cast.png?v=173.24","single",{scale:2.15,maxSize:260})},
-        stormFlurry:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/storm-flurry-cast.png?v=173.24","group",{scale:1.08,minSize:190,alignToSlots:true})},
+        stormFlurry:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/storm-flurry-wide-v3.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
         windCrossSlash:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/wind-cross-slash-cast.png?v=173.24","single",{scale:2.25,maxSize:280})},
         dizzyFist:{hit:.5,deferredStatusTypes:["stun"],sprite:castSheet("assets/vfx/wind/dizzy-fist-cast.png?v=173.24","single",{scale:2.35,maxSize:290})},
         windSpell:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/wind-spell-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
@@ -11765,7 +11765,7 @@
         stormRain:{hit:.5,deferredStatusTypes:["stun"],sprite:castSheet("assets/vfx/wind/storm-rain-cast-v2.webp","battlefield",{scale:1.08,minSize:280})},
         dodgeSkill:{hit:.5,deferredStatusTypes:["dodgeSkill"],sprite:castSheet("assets/vfx/wind/dodge-skill-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
         stealthSkill:{hit:.5,deferredStatusTypes:["stealthSkill"],sprite:castSheet("assets/vfx/wind/stealth-skill-cast.png?v=173.24","single",{scale:2.15,maxSize:260})},
-        dinghaishenzhen:{hit:.5,deferredStatusTypes:["dinghaishenzhen"],sprite:castSheet("assets/vfx/wind/dinghaishenzhen-cast.png?v=173.24","battlefield",{scale:1.08,minSize:280})},
+        dinghaishenzhen:{hit:.5,deferredStatusTypes:["dinghaishenzhen"],sprite:castSheet("assets/vfx/wind/calm-mind-cast-person-v2.webp","battlefield",{scale:1.08,minSize:280,presentation:"per-recipient"})},
         windEX:{hit:.74,noVisual:true,passive:true},
         /* Monster-only legacy derivative: use an existing formal Wind sheet,
            never a generated text/particle fallback. */
@@ -12321,6 +12321,9 @@
     function placementFor(config,sprite,targetTypeOverride){
         const authored=String(sprite&&sprite.placement||"single");
         const targetType=String(targetTypeOverride||config&&config.targetType||"single");
+        // Explicit recipient artwork reuses the existing single-node emitter.
+        // The formal target type/recipient set and hit authority stay unchanged.
+        if(sprite&&sprite.presentation==="per-recipient"){ return "single"; }
         if(/^(all|enemyAll|allyAll)$/i.test(targetType)){ return "battlefield"; }
         if(/^(tri|allyTri|row|column|horizontal-3)$/i.test(targetType)){
             return authored==="trajectory"?"trajectory":"group";
@@ -12474,7 +12477,7 @@
     const statusRotationByUnit=new Map();
     const hardControlContractViolationByUnit=new Map();
 
-    function syncStatusVisual(side,index,type,showBody,presentationGeometry){
+    function syncStatusVisual(side,index,type,showBody,presentationGeometry,presentationSnapshot){
         const spec=STATUS_VISUALS[type];
         const card=cardFor(side,index);
         const entity=entityFor(side,index);
@@ -12510,15 +12513,15 @@
             card.appendChild(node);
         }
 
-        const anchor=slotAnchor(side,index,card);
+        const anchor=presentationSnapshot&&presentationSnapshot.anchor;
         if(!anchor){ return; }
-        placeStatusBodyVisual(node,side,index,type,card,anchor,presentationGeometry);
+        placeStatusBodyVisual(node,side,index,type,card,anchor,presentationGeometry,presentationSnapshot.cardRect);
     }
 
-    function placeStatusBodyVisual(node,side,index,type,card,anchor,geometry){
+    function placeStatusBodyVisual(node,side,index,type,card,anchor,geometry,measuredCardRect){
         const profile=STATUS_BODY_PRESENTATION[type];
         if(!profile){ return; }
-        const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
+        const cardRect=measuredCardRect||anchor.rect;
         const paint=geometry?.artworkProjection?.rect;
         const projected=geometry?.portraitRect;
         const portrait=paint&&paint.width>0&&paint.height>0?paint:
@@ -12577,9 +12580,21 @@
         }
     }
 
-    function syncStatusVisualsForUnit(side,index,advanceRotation){
+    function readStatusPresentation(side,index){
         const entity=entityFor(side,index);
         const card=cardFor(side,index);
+        const baseBodyTypes=activeBodyStatusTypesForLayer(entity,side,index,STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE);
+        const rotatingBodyTypes=activeBodyStatusTypesForLayer(entity,side,index,STATUS_VISUAL_LAYERS.ROTATING);
+        const hasBody=!!(card&&(baseBodyTypes.length||rotatingBodyTypes.length));
+        const geometry=hasBody?window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry?.(side,index):null;
+        const anchor=hasBody?slotAnchor(side,index,card):null;
+        const cardRect=hasBody&&typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor&&anchor.rect;
+        return {entity:entity,card:card,baseBodyTypes:baseBodyTypes,rotatingBodyTypes:rotatingBodyTypes,geometry:geometry,anchor:anchor,cardRect:cardRect};
+    }
+
+    function syncStatusVisualsForUnit(side,index,advanceRotation,presentationSnapshot){
+        const snapshot=presentationSnapshot||readStatusPresentation(side,index);
+        const {entity,card,baseBodyTypes,rotatingBodyTypes}=snapshot;
         const stealthActive=!!(
             entity&&Number(entity.hp)>0&&
             (side!=="monster"||entity.alive!==false)&&
@@ -12588,12 +12603,6 @@
         if(card&&card.classList&&typeof card.classList.toggle==="function"){
             card.classList.toggle("v143-unit-stealthed",stealthActive);
         }
-        const baseBodyTypes=activeBodyStatusTypesForLayer(
-            entity,side,index,STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
-        );
-        const rotatingBodyTypes=activeBodyStatusTypesForLayer(
-            entity,side,index,STATUS_VISUAL_LAYERS.ROTATING
-        );
         reportHardControlVisualContractViolation(side,index,baseBodyTypes);
 
         const rotationKey=side+":"+index;
@@ -12611,23 +12620,27 @@
         const activeRotatingBodyType=rotation&&rotatingBodyTypes.length
             ?rotatingBodyTypes[rotation.index%rotatingBodyTypes.length]
             :null;
-        const presentationGeometry=baseBodyTypes.length||rotatingBodyTypes.length
-            ?window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry?.(side,index):null;
+        const presentationGeometry=snapshot.geometry;
 
         Object.keys(RAW_STATUS_VISUALS).forEach(type=>{
             const spec=RAW_STATUS_VISUALS[type];
             const showBody=spec&&spec.visualLayer===STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
                 ?baseBodyTypes.includes(type)
                 :type===activeRotatingBodyType;
-            syncStatusVisual(side,index,type,showBody,presentationGeometry);
+            syncStatusVisual(side,index,type,showBody,presentationGeometry,snapshot);
         });
     }
 
     function syncStatusVisualEffects(advanceRotation){
-        purgeLegacyCardVfx();
         const enemyIndexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[];
-        enemyIndexes.forEach(index=>syncStatusVisualsForUnit("monster",index,advanceRotation===true));
-        for(let index=0;index<6;index++){ syncStatusVisualsForUnit("player",index,advanceRotation===true); }
+        // Read the entire pass before any status removal/append/style write.
+        // A new rotating body must not force layout for the next unit or layer.
+        const presentations=enemyIndexes.map(index=>({side:"monster",index:index,snapshot:readStatusPresentation("monster",index)}));
+        for(let index=0;index<6;index++){
+            presentations.push({side:"player",index:index,snapshot:readStatusPresentation("player",index)});
+        }
+        purgeLegacyCardVfx();
+        presentations.forEach(entry=>syncStatusVisualsForUnit(entry.side,entry.index,advanceRotation===true,entry.snapshot));
     }
 
     function removeStatusVisualEffects(){
@@ -13006,14 +13019,19 @@
         node.dataset.placement=placement;
 
         if(placement==="single"){
-            const size=authoredSquareSize(sprite,target.rect,{scale:1.8,min:96,max:184,minRatio:1.18,maxRatio:1.68});
+            const portrait=sprite.presentation==="per-recipient"
+                ?window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection?.rect:null;
+            const hasPortrait=portrait&&Number(portrait.width)>0&&Number(portrait.height)>0;
+            const center=hasPortrait?{x:portrait.left+portrait.width/2,y:portrait.top+portrait.height/2}:target;
+            const body=hasPortrait?Math.min(portrait.width,portrait.height):0;
+            const size=authoredSquareSize(sprite,hasPortrait?{width:body,height:body}:target.rect,{scale:1.8,min:96,max:184,minRatio:1.18,maxRatio:1.68});
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
             node.dataset.geometrySlot=target.slot;
-            node.style.left=target.x+"px";
-            node.style.top=target.y+"px";
+            node.style.left=center.x+"px";
+            node.style.top=center.y+"px";
             applySpriteBox(node,size,size,sprite);
-            fitRangeArt(node,current,target.rect,{x:target.x,y:target.y});
+            fitRangeArt(node,current,target.rect,center);
             return;
         }
 
@@ -13275,6 +13293,7 @@
 
     function emitSprite(current,index,allowDefeated){
         if(!state.stage||current.emitted.has(index)||!current.validTargets.has(index)){ return; }
+        if(current.recipientTargets&&!current.recipientTargets.has(index)){ return; }
         if(!allowDefeated&&!canReceive(current.config,current.targetSide,index)){ return; }
         const targetCard=cardFor(current.targetSide,index);
         const target=slotAnchor(current.targetSide,index,targetCard);
@@ -13292,6 +13311,7 @@
     function registerTarget(targetSide,index,allowDefeated){
         const current=state.current;
         if(!current||current.done||current.targetSide!==targetSide){ return null; }
+        if(current.recipientTargets&&!current.recipientTargets.has(index)){ return null; }
         const single=String(current.targetType||current.config.targetType||"")==="single";
         if(single&&current.targetIndexes.length&&current.targetIndexes.indexOf(index)<0){ return null; }
         if(!current.validTargets.has(index)){ current.validTargets.add(index); }
@@ -13389,6 +13409,9 @@
             duration:duration,hitReached:false,done:false,cleanupTimer:0
         };
         current.targetIndexes=initialTargetIndexes(config,current,targetSide);
+        if(model.sprite&&model.sprite.presentation==="per-recipient"){
+            current.recipientTargets=new Set(current.targetIndexes);
+        }
 
         const stage=document.createElement("div");
         stage.id="v143-skill-stage";

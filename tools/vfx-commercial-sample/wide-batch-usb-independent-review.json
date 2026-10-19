@@ -1,0 +1,153 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "b1ede88d7c61e290f4f09933f1043d0bee981800",
+  "scope": "Independent physical USB decoded-sequence peak/tail static review. Uses actual labels and skill-video timing; does not use superseded fixed-offset contact-frames.",
+  "evidence": "artifacts/vfx-wide-batch-usb/skill-video.json",
+  "frameDirectory": "artifacts/vfx-wide-batch-usb/sequence-frames",
+  "method": "Viewed multiple original full-phone frames per listed cast across contact and release. This is sampled sequence evidence, not claim to have watched every decoded frame.",
+  "counts": {
+    "reviewed": 12,
+    "passStopRefinement": 7,
+    "failLocalPresentation": 5
+  },
+  "reviews": [
+    {
+      "id": "explosiveFlurry",
+      "classification": "PASS_STOP_REFINEMENT",
+      "representativePeakFrame": 16,
+      "viewedFrames": [
+        12,
+        16,
+        20
+      ],
+      "conclusion": "Crossed fire blades and explosion retain identity. Although inward shifted, broad cutting/contact area still reaches each outer fox; HUD remains readable."
+    },
+    {
+      "id": "stormCircle",
+      "classification": "PASS_STOP_REFINEMENT",
+      "representativePeakFrame": 36,
+      "viewedFrames": [
+        36,
+        40,
+        44
+      ],
+      "conclusion": "Circular wind cuts visibly cross each intended fox; open centers and HP/name readability retained. No need for perfect geometric centering."
+    },
+    {
+      "id": "waterBall",
+      "classification": "FAIL_LOCAL_PRESENTATION",
+      "representativePeakFrame": 60,
+      "viewedFrames": [
+        60,
+        64,
+        68
+      ],
+      "conclusion": "Outer orb/jet centers approximately235/485 versus outer fox centers165/555 in full720px frame. Narrow impacts clearly land between enemies. Fix only this presentation alignment."
+    },
+    {
+      "id": "healSpell",
+      "classification": "FAIL_LOCAL_PRESENTATION",
+      "representativePeakFrame": 84,
+      "viewedFrames": [
+        80,
+        84,
+        88
+      ],
+      "conclusion": "Outer healing cores are inward of beneficiaries; water bases and activation bloom sit across name/Lv area. Source identity and cleanup remain valid."
+    },
+    {
+      "id": "petrifyFist",
+      "classification": "PASS_STOP_REFINEMENT",
+      "representativePeakFrame": 104,
+      "viewedFrames": [
+        100,
+        104,
+        108,
+        112
+      ],
+      "conclusion": "Clenched stone fists and contact bursts remain clear. Outer burst edges contact outer fox body; modest inward offset is acceptable. Clears by112."
+    },
+    {
+      "id": "earthquakeCrush",
+      "classification": "PASS_STOP_REFINEMENT",
+      "representativePeakFrame": 132,
+      "viewedFrames": [
+        124,
+        128,
+        132,
+        136
+      ],
+      "conclusion": "Downward fists and stone eruption remain recognizable; contact footprint reaches each target despite imperfect centers. Enemy HP/name preserved; clears136."
+    },
+    {
+      "id": "stoneThrow",
+      "classification": "PASS_STOP_REFINEMENT",
+      "representativePeakFrame": 154,
+      "viewedFrames": [
+        152,
+        154,
+        160
+      ],
+      "conclusion": "Falling boulders and ground burst retain impact. Broad rubble reaches outer target feet/body; no demonstrated empty-only impact requiring refinement."
+    },
+    {
+      "id": "sandWind",
+      "classification": "PASS_STOP_REFINEMENT",
+      "representativePeakFrame": 176,
+      "viewedFrames": [
+        176,
+        180,
+        184
+      ],
+      "conclusion": "Rolling boulders still reach outer enemy silhouettes; rotation identity survives, fade visible180 and clear184. Prior source-tail concern is not a persistent cleanup failure here."
+    },
+    {
+      "id": "rage",
+      "classification": "FAIL_LOCAL_PRESENTATION",
+      "representativePeakFrame": 200,
+      "viewedFrames": [
+        200,
+        204,
+        208
+      ],
+      "conclusion": "Outer buff arrows stand inward of outer players; lower orange rings overlap names/Lv. This is cast-only positioning/HUD failure, not persistent rage status failure."
+    },
+    {
+      "id": "dodgeSkill",
+      "classification": "FAIL_LOCAL_PRESENTATION",
+      "representativePeakFrame": 224,
+      "viewedFrames": [
+        224,
+        228,
+        232
+      ],
+      "conclusion": "Green wind stream/rings sit inward and across player name/Lv area instead of visibly surrounding beneficiaries; tail clears."
+    },
+    {
+      "id": "rockWall",
+      "classification": "FAIL_LOCAL_PRESENTATION",
+      "representativePeakFrame": 248,
+      "viewedFrames": [
+        248,
+        252,
+        256
+      ],
+      "conclusion": "Outer paired stone fins are displaced toward inside gaps rather than flanking recipient; bases overlap player name strip. Source stone identity survives; positioning needs local correction."
+    },
+    {
+      "id": "barrier",
+      "classification": "PASS_STOP_REFINEMENT",
+      "representativePeakFrame": 272,
+      "viewedFrames": [
+        272,
+        276,
+        284
+      ],
+      "conclusion": "Single gold barrier correctly centered on one selected red actor, bounded to card; face/HP/title remain readable through brief glow. No three-recipient regression; clears284."
+    }
+  ],
+  "policy": "Do not generalize five local failures into all-wide rollback. Do not restore previously rejected global art recenter/enlargement. Retain source art and approved persistent statuses; correct only demonstrated contact/HUD presentation. Seven passed casts stop discretionary refinement.",
+  "technicalVsVisual": "battleActive true, six hit HUD nodes and cleanup0 in metadata are valid technical inputs but do not override observed placement failures.",
+  "limits": "These PASS results clear scoped visual overcorrection/readability concerns in sampled physical frames; not whole-game commercial completion or frame-time performance pass.",
+  "runtimeOrPhoneChangesMade": false
+}

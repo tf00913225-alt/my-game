@@ -111,12 +111,12 @@ function loadRuntime(options={}){
     body.appendChild(monsterArea);
     body.appendChild(playerArea);
     const cards={battleMonsterArea:monsterArea,battlePlayerRow:playerArea};
-    const monsterRects=[
+    const monsterRects=options.monsterRects||[
         {left:300,top:90,right:376,bottom:190,width:76,height:100},
         {left:420,top:90,right:496,bottom:190,width:76,height:100},
         {left:540,top:90,right:616,bottom:190,width:76,height:100}
     ];
-    const playerRects=[
+    const playerRects=options.playerRects||[
         {left:40,top:360,right:158,bottom:476,width:118,height:116},
         {left:180,top:360,right:298,bottom:476,width:118,height:116},
         {left:320,top:360,right:438,bottom:476,width:118,height:116}
@@ -178,7 +178,7 @@ function loadRuntime(options={}){
         cancelAnimationFrame(){},
         setTimeout(callback,delay){ const id=++timerId; scheduled.push({id,callback,delay}); return id; },
         clearTimeout(){},
-        monsters,currentBattleMonsters:[0,1,2],
+        monsters,currentBattleMonsters:monsterRects.map((_,index)=>index),
         queuedPlayerActions:{0:{target:1,targetAlly:1}},
         getSkillTargets(center,targetType){
             const living=[0,1,2].filter(index=>monsters[index]&&monsters[index].alive!==false&&monsters[index].hp>0);
@@ -205,6 +205,8 @@ function loadRuntime(options={}){
         ENEMY_F1:monsterRects[0],ENEMY_F2:monsterRects[1],ENEMY_F3:monsterRects[2],
         ALLY_F1:playerRects[0],ALLY_F2:playerRects[1],ALLY_F3:playerRects[2]
     };
+    monsterRects.forEach((rect,index)=>{ slotRects["ENEMY_F"+(index+1)]=rect; });
+    playerRects.forEach((rect,index)=>{ slotRects["ALLY_F"+(index+1)]=rect; });
     function plainRect(rect,slots){
         return Object.assign({},rect,{centerX:rect.left+rect.width/2,centerY:rect.top+rect.height/2,slots:slots||[]});
     }
@@ -237,6 +239,7 @@ function loadRuntime(options={}){
             return this.getSlotRect(slot);
         }
     };
+    if(options.renderGeometry){ context.FourSymbolsBattlefieldRenderGeometry=options.renderGeometry; }
     context.window=context;
     context.v142SkillAnimationDirector={
         play(config){
@@ -315,7 +318,7 @@ test("all eleven casts keep Sprite timing while six persistent states use low-mo
     Object.entries(CASTS).forEach(([id,spec])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id);
-        const expectedSource=id==="stormRain"?"assets/vfx/wind/storm-rain-cast-v2.webp":id==="windSpell"?"assets/vfx/wind/wind-spell-wide-v2.webp":id==="stormCircle"?"assets/vfx/wind/storm-circle-wide-v2.webp":id==="dodgeSkill"?"assets/vfx/wind/dodge-skill-wide-v2.webp":"assets/vfx/wind/"+spec.file+"?v=173.24";
+        const expectedSource=id==="dinghaishenzhen"?"assets/vfx/wind/calm-mind-cast-person-v2.webp":id==="stormFlurry"?"assets/vfx/wind/storm-flurry-wide-v3.webp":id==="stormRain"?"assets/vfx/wind/storm-rain-cast-v2.webp":id==="windSpell"?"assets/vfx/wind/wind-spell-wide-v2.webp":id==="stormCircle"?"assets/vfx/wind/storm-circle-wide-v2.webp":id==="dodgeSkill"?"assets/vfx/wind/dodge-skill-wide-v2.webp":"assets/vfx/wind/"+spec.file+"?v=173.24";
         assert.equal(model.sprite.src,expectedSource,id);
         assert.deepEqual(
             Array.from([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame]),
@@ -615,6 +618,100 @@ test("wide group candidates retain exact lossless bytes, alpha and native frame 
         assert.equal((info.width/manifest[id].sprite.columns)/(info.height/manifest[id].sprite.rows),2.25,id);
         assert.equal(manifest[id].sprite.cellAspect,2.25,id+" cold-cache source ratio");
     });
+});
+
+test("stormFlurry reviewed wide source keeps paired-fist cast contract",()=>{
+    const bytes=fs.readFileSync("assets/vfx/wind/storm-flurry-wide-v3.webp"),info=losslessWebpInfo(bytes);
+    assert.deepEqual([info.width,info.height,info.alpha],[2172,724,1]);
+    assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"),"60856e15c9f6474f1dbf07d60dc9f39081bf4f197444fbcc727a106e96141ade");
+    assert.deepEqual(bytes,fs.readFileSync("tools/vfx-commercial-sample/assets/full/storm-flurry-wide-v3.webp"));
+    const model=loadRuntime().context.v143SkillAnimationManifest.stormFlurry,s=model.sprite;
+    assert.equal(s.src,"assets/vfx/wind/storm-flurry-wide-v3.webp");
+    assert.deepEqual([s.columns,s.rows,s.frames,s.hitFrame],[4,3,12,7]);
+    assert.equal(s.cellAspect,(info.width/4)/(info.height/3));
+    assert.equal(s.cellAspect,2.25);
+    assert.deepEqual([s.placement,s.scale,s.minSize,s.alignToSlots],["group",1.08,190,true]);
+    assert.equal(model.hit,.5);
+    assert.deepEqual(Array.from(model.deferredStatusTypes),["damageDown"]);
+});
+
+test("calm recipient source remains exact transparent square 4x3 art",()=>{
+ const bytes=fs.readFileSync("assets/vfx/wind/calm-mind-cast-person-v2.webp"),info=losslessWebpInfo(bytes);
+ assert.deepEqual([info.width,info.height,info.alpha],[1448,1086,1]);
+ assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"),"72a44e3f6137481f928619b234a707e6a4c40f154da6a42834af791439b6be8f");
+ assert.deepEqual(bytes,fs.readFileSync("tools/vfx-commercial-sample/assets/full/calm-mind-cast-person-v2.webp"));
+ const sprite=loadRuntime().context.v143SkillAnimationManifest.dinghaishenzhen.sprite;
+ assert.equal(sprite.presentation,"per-recipient");assert.equal(sprite.placement,"battlefield","formal authored declaration retained");
+ assert.deepEqual([sprite.columns,sprite.rows,sprite.frames],[4,3,12]);assert.equal((info.width/4)/(info.height/3),1);
+});
+
+function calmFixture(count,indexes){
+ const rects=Array.from({length:count},(_,i)=>({left:40+i*70,top:360,right:100+i*70,bottom:476,width:60,height:116}));
+ const portraits=rects.map((r,i)=>({left:r.left+5,top:375,width:40,height:80}));
+ const runtime=loadRuntime({playerRects:rects,renderGeometry:{getUnitGeometry(side,i){return side==="player"&&portraits[i]?{artworkProjection:{rect:portraits[i]}}:null;}}});
+ runtime.setClock(100);
+ const gate=runtime.context.v142SkillAnimationDirector.play(config("dinghaishenzhen","allyAll","buff"),{side:"player",actorIndex:0,targetSide:"player",targetId:indexes[0],targetIds:indexes});
+ return {runtime,gate,portraits};
+}
+
+test("calm emits one portrait-centered node per actual recipient for three/six/partial parties",()=>{
+ for(const [count,indexes] of [[3,[0,1,2]],[6,[0,1,2,3,4,5]],[6,[1,4]]]){
+  const {runtime,portraits}=calmFixture(count,indexes),current=runtime.context.v143SkillAnimationState.current;
+  const nodes=stageSprites(runtime).sprites;
+  assert.equal(nodes.length,indexes.length);assert.equal(current.targetType,"allyAll");
+  assert.deepEqual(nodes.map(n=>Number(n.dataset.targetIndex)),indexes);
+  assert.deepEqual(Array.from(current.spriteNodes.keys()),indexes.map(String));
+  indexes.forEach((i,j)=>{const n=nodes[j],p=portraits[i];assert.equal(n.dataset.targetIndexes,String(i));assert.equal(n.dataset.placement,"single");assert.equal(n.style.left,(p.left+p.width/2)+"px");assert.equal(n.style.top,(p.top+p.height/2)+"px");assert.ok(parseFloat(n.style.width)>0&&parseFloat(n.style.width)<=68,"portrait minor dimension caps configured battlefield minimum rather than retaining 280px");assert.equal(n.style.getPropertyValue("--v143-sprite-delay"),"0ms");});
+  assert.equal(runtime.raf.length,1,"one common clock handoff");
+  runtime.context.v142SkillAnimationDirector.dispose();assert.equal(runtime.context.v143SkillAnimationState.current,null);
+  assert.equal(runtime.body.querySelectorAll("#v143-skill-stage").length,0);
+ }
+});
+
+test("calm confirmation keys and callbacks remain independent and once-only on shared hit clock",()=>{
+ const {runtime}=calmFixture(3,[0,2]),current=runtime.context.v143SkillAnimationState.current;let hits=[];
+ for(const i of [0,2])runtime.context.v143RunAtTargetHit("player",i,()=>hits.push(i));
+ assert.equal(current.spriteNodes.get("0").dataset.confirmedHit,"true");assert.equal(current.spriteNodes.get("2").dataset.confirmedHit,"true");
+ assert.equal(current.spriteNodes.size,2,"confirmation reuses each correct recipient node");
+ runtime.setClock(100);assert.equal(current.visualStartedAt,100);
+ const hitJobs=runtime.scheduled.filter(j=>j.delay===1100);assert.equal(hitJobs.length,2);
+ runtime.setClock(1200);hitJobs.forEach(j=>j.callback());runtime.setClock(1216);runtime.setClock(1233);
+ assert.deepEqual(hits,[0,2]);hitJobs.forEach(j=>j.callback());runtime.setClock(1249);runtime.setClock(1266);assert.deepEqual(hits,[0,2],"repeat settle cannot replay drained callbacks");
+ runtime.context.v142SkillAnimationDirector.dispose();assert.equal(current.hitCallbacks.size,0);
+});
+
+test("calm late valid recipient catches up without restarting siblings",()=>{
+ const {runtime}=calmFixture(3,[0,2]),current=runtime.context.v143SkillAnimationState.current;
+ runtime.setClock(100);const old=current.spriteNodes.get("0");
+ current.spriteNodes.get("2").remove();current.spriteNodes.delete("2");current.emitted.delete(2);
+ runtime.setClock(600);runtime.context.v143RunAtTargetHit("player",2,()=>{});
+ const late=current.spriteNodes.get("2");assert.equal(late.dataset.emission,"late");assert.equal(late.style.getPropertyValue("--v143-sprite-delay"),"-500ms");assert.equal(current.visualStartedAt,100);assert.equal(current.spriteNodes.get("0"),old);assert.equal(current.spriteNodes.size,2);
+ runtime.context.v142SkillAnimationDirector.dispose();
+});
+
+test("enemy calm uses the same opt-in recipient keys and cancels abandoned hit work",()=>{
+ const runtime=loadRuntime({renderGeometry:{getUnitGeometry(side,i){return side==="monster"?{artworkProjection:{rect:{left:310+i*120,top:105,width:40,height:70}}}:null;}}});
+ runtime.setClock(100);
+ runtime.context.v142SkillAnimationDirector.play(config("dinghaishenzhen","allyAll","buff"),{side:"monster",actorIndex:0,targetSide:"monster",targetId:0,targetIds:[0,2]});
+ const old=runtime.context.v143SkillAnimationState.current;let hits=0;
+ runtime.context.v143RunAtTargetHit("monster",2,()=>hits++);
+ assert.equal(old.spriteNodes.get("2").dataset.confirmedHit,"true");
+ assert.equal(old.spriteNodes.get("0").dataset.confirmedHit,"false");
+ assert.equal(old.spriteNodes.get("2").style.left,"570px");
+ runtime.setClock(100);
+ const abandoned=runtime.scheduled.filter(j=>j.delay===1100);
+ runtime.context.v142SkillAnimationDirector.play(config("stormFist","single","physical"),{side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[1]});
+ assert.equal(old.done,true);assert.equal(old.hitCallbacks.size,0);
+ abandoned.forEach(j=>j.callback());runtime.setClock(1216);runtime.setClock(1233);
+ assert.equal(hits,0,"superseded calm cannot deliver abandoned feedback");
+ runtime.context.v142SkillAnimationDirector.dispose();
+});
+
+test("calm explicit partial recipients reject unrelated late feedback nodes",()=>{
+ const {runtime}=calmFixture(3,[0,2]),current=runtime.context.v143SkillAnimationState.current;
+ runtime.context.v143ResolveBattleFeedbackTiming("player",1,"heal",false);
+ assert.equal(current.spriteNodes.has("1"),false,"nonrecipient feedback must not expand explicit calm recipient art");
+ assert.deepEqual(Array.from(current.emitted),[0,2]);runtime.context.v142SkillAnimationDirector.dispose();
 });
 
 console.log("\n"+passed+" V173.39 wind Sprite VFX tests passed.");

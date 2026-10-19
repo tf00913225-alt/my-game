@@ -1,0 +1,140 @@
+{
+  "source": "C:/Users/User/.codex/generated_images/01a15425-277b-7140-b0e5-d3891f17519d/exec-9540384f-74e6-4e39-ab6f-bcd73397ba86.png",
+  "output": "tools/vfx-commercial-sample/assets/full/water-orb-recipient-v1.webp",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "grid": [
+    4,
+    3
+  ],
+  "cell": [
+    362,
+    362
+  ],
+  "losslessRgbaEqual": true,
+  "sha256": "93cbbb60b0d796da8aa745fefbc20c5eddad53a23d8603e0927b20e4de81db97",
+  "frames": [
+    {
+      "frame": 1,
+      "alpha64Bounds": [
+        119,
+        139,
+        254,
+        334
+      ],
+      "minPaddingFraction": 0.07734806629834254
+    },
+    {
+      "frame": 2,
+      "alpha64Bounds": [
+        65,
+        91,
+        295,
+        342
+      ],
+      "minPaddingFraction": 0.055248618784530384
+    },
+    {
+      "frame": 3,
+      "alpha64Bounds": [
+        52,
+        81,
+        293,
+        340
+      ],
+      "minPaddingFraction": 0.06077348066298342
+    },
+    {
+      "frame": 4,
+      "alpha64Bounds": [
+        43,
+        81,
+        306,
+        342
+      ],
+      "minPaddingFraction": 0.055248618784530384
+    },
+    {
+      "frame": 5,
+      "alpha64Bounds": [
+        41,
+        33,
+        328,
+        341
+      ],
+      "minPaddingFraction": 0.058011049723756904
+    },
+    {
+      "frame": 6,
+      "alpha64Bounds": [
+        23,
+        67,
+        342,
+        344
+      ],
+      "minPaddingFraction": 0.049723756906077346
+    },
+    {
+      "frame": 7,
+      "alpha64Bounds": [
+        23,
+        64,
+        335,
+        348
+      ],
+      "minPaddingFraction": 0.03867403314917127
+    },
+    {
+      "frame": 8,
+      "alpha64Bounds": [
+        22,
+        84,
+        335,
+        346
+      ],
+      "minPaddingFraction": 0.04419889502762431
+    },
+    {
+      "frame": 9,
+      "alpha64Bounds": [
+        30,
+        24,
+        342,
+        306
+      ],
+      "minPaddingFraction": 0.055248618784530384
+    },
+    {
+      "frame": 10,
+      "alpha64Bounds": [
+        35,
+        64,
+        331,
+        304
+      ],
+      "minPaddingFraction": 0.0856353591160221
+    },
+    {
+      "frame": 11,
+      "alpha64Bounds": [
+        32,
+        83,
+        336,
+        305
+      ],
+      "minPaddingFraction": 0.0718232044198895
+    },
+    {
+      "frame": 12,
+      "alpha64Bounds": [
+        61,
+        130,
+        311,
+        303
+      ],
+      "minPaddingFraction": 0.1408839779005525
+    }
+  ]
+}

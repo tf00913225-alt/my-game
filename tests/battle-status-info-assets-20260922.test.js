@@ -34,7 +34,7 @@ test("status body art uses the projected character and per-status presentation o
   assert.match(js,/geometry\?\.artworkProjection\?\.rect/);
   assert.match(js,/geometry\?\.portraitRect/);
   assert.match(js,/geometry\?\.hudSurface\?\.scaleX/);
-  assert.match(js,/placeStatusBodyVisual\(node,side,index,type,card,anchor,presentationGeometry\)/);
+  assert.match(js,/placeStatusBodyVisual\(node,side,index,type,card,anchor,presentationGeometry,presentationSnapshot\.cardRect\)/);
   assert.match(js,/node\.style\.backgroundSize="contain"/);
 });
 

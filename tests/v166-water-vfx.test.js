@@ -391,7 +391,7 @@ test("water manifest uses the exact files, twelve frames, frame-eight hit and re
     Object.entries(CAST_ASSETS).forEach(([id,filename])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id+" sprite metadata");
-        const runtimeFile={waterBall:"water-ball-wide-v2.webp",healSpell:"heal-spell-wide-v2.webp"}[id];
+        const runtimeFile={floodBeast:"tidal-beast-safe-v3.webp",iceSpin:"ice-spin-wide-v2.webp",waterBall:"water-ball-wide-v2.webp",healSpell:"heal-spell-wide-v2.webp"}[id];
         assert.equal(model.sprite.src.split("?")[0],"assets/vfx/water/"+(runtimeFile||filename),id);
         const cacheVersion=["waterBall","iceArrowRain"].includes(id)?"?v=173.19":"?v=166";
         assert.ok(model.sprite.src.endsWith(runtimeFile||cacheVersion),id+" exact runtime source/cache version");
@@ -446,7 +446,7 @@ test("Ice Spin centers its fixed tri-target artwork on the shape and preserves t
         assert.equal(sprites[0].style.left,"458px");
         assert.equal(runtime.context.v143SkillAnimationState.current.targetId,indexes[0]);
         assert.equal(sprites[0].style.width,"316px");
-        assert.equal(sprites[0].style.height,"316px","Ice Spin preserves its authored square frame across the fixed tri-target footprint");
+        assert.equal(sprites[0].style.height,Math.round(316/2.2448275862068967)+"px","Ice Spin preserves its actual wide frame ratio across the unchanged fixed tri-target width");
         indexes.forEach(index=>runtime.context.showMonsterHit(index,10,"hp"));
         const delayedNumbers=runtime.scheduled.slice(-indexes.length);
         assert.equal(delayedNumbers.length,indexes.length);
@@ -789,6 +789,30 @@ test("wide group candidates retain exact lossless bytes, alpha and native frame 
         assert.equal((info.width/manifest[id].sprite.columns)/(info.height/manifest[id].sprite.rows),2.25,id);
         assert.equal(manifest[id].sprite.cellAspect,2.25,id+" cold-cache source ratio");
     });
+});
+
+test("iceSpin reviewed wide source keeps exact aspect and existing cast contract",()=>{
+    const bytes=fs.readFileSync("assets/vfx/water/ice-spin-wide-v2.webp"),info=losslessWebpInfo(bytes);
+    assert.deepEqual([info.width,info.height,info.alpha],[2170,725,1]);
+    assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"),"86573490352909d0cb1840807302690abc5038ab1492c1518f7f3f3ce75b1683");
+    assert.deepEqual(bytes,fs.readFileSync("tools/vfx-commercial-sample/assets/full/iceSpin-wide-v2.webp"));
+    const model=loadRuntime().context.v143SkillAnimationManifest.iceSpin,s=model.sprite;
+    assert.equal(s.src,"assets/vfx/water/ice-spin-wide-v2.webp");
+    assert.deepEqual([s.columns,s.rows,s.frames,s.hitFrame],[4,3,12,7]);
+    assert.equal(s.cellAspect,(info.width/4)/(info.height/3));
+    assert.equal(s.cellAspect,2.2448275862068967);
+    assert.deepEqual([s.placement,s.scale,s.maxSize],["single",1.95,235]);
+    assert.equal(model.hit,.5833333333);
+    assert.deepEqual(Array.from(model.deferredStatusTypes),["frostbite"]);
+});
+
+test("tidal safe source remains exact transparent square 4x3 art",()=>{
+ const bytes=fs.readFileSync("assets/vfx/water/tidal-beast-safe-v3.webp"),info=losslessWebpInfo(bytes);
+ assert.deepEqual([info.width,info.height,info.alpha],[1448,1086,1]);
+ assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"),"ddfc4d99a350626ac382c50e254eba99108f64b15de0bdf1d074fffc948a2550");
+ assert.deepEqual(bytes,fs.readFileSync("tools/vfx-commercial-sample/assets/full/tidal-beast-safe-v3.webp"));
+ const sprite=loadRuntime().context.v143SkillAnimationManifest.floodBeast.sprite;
+ assert.equal(sprite.src,"assets/vfx/water/tidal-beast-safe-v3.webp");assert.equal((info.width/4)/(info.height/3),1);assert.deepEqual([sprite.columns,sprite.rows,sprite.frames],[4,3,12]);
 });
 
 console.log("\nV166 Water VFX suite: "+passed+" tests passed.");
