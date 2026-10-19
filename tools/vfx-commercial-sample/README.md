@@ -1,7 +1,7 @@
 # VFX commercial sample 01
 
 Work ID: VFX-COMMERCIAL-SAMPLE-20261019
-Target: three isolated visual samples for user comparison
+Target: 44 active skills, four passive entries and 21 statuses; original three-sample preview retained below
 Branch: feature/vfx-commercial-sample-20261019
 Base dev: 07402d4cc56cff6e43bade758ef81c87ce2af072
 
@@ -73,42 +73,49 @@ RAF medians near 16.7ms coexist with long action-start frames. This short
 test does not certify sustained performance, endurance or gameplay safety.
 The raw traces and six phone screenshots are in artifacts/vfx-usb-runtime.
 
-## Full four-element/status follow-up
+## Full four-element/status follow-up (current inventory)
 
-The work now covers 44 active skills, four intentionally passive entries and
-21 formal statuses. `coverage-matrix.json` records their formal owners.
-`usb-full-matrix-20261019.json` records the first full Note9 presentation run
-at d6f181c4: all 44 casts cleaned up, 21 status entries were exercised, and
-there were no runtime exceptions. It includes screenshot hashes and explicit
-limits: these were presentation casts, not full skill eligibility/damage tests.
-Screenshot capture affects RAF intervals, so they do not certify performance.
+The work covers 44 active skills, four intentionally passive entries and 21
+formal statuses. `coverage-matrix.json` keeps historical technical runs and
+review findings separate from current acceptance. Its current inventory head
+is ade43a48; older evidence remains bound to its recorded head.
 
-Independent screenshot review found that edge-primary group art had shrunk
-around one target, single-target artwork could still reach the viewport edge,
-and a timer could present feedback while CSS still showed the preceding frame.
-The subsequent checkpoint centers group art on canonical shape bounds, fits
-single art safely without changing hit anchors, and uses a one-shot paint-frame
-handoff for ordinary hit feedback. A new open-center rage status aura replaces
-the opaque fire face; its HUD icon and gameplay state remain unchanged.
-These subsequent changes require a fresh USB run.
+All 21 statuses now have scoped static PASS on both phone sides at 590b1390.
+`status-commercial-gate-20261020.json` preserves the initial rage failure and
+subsequent accepted contrast correction (.60-.80), plus the accepted taller
+calm aura. Eight pulse statuses also pass sampled-cycle visibility, placement
+and brightness-change review using original full FFmpeg-decoded phone frames
+under `artifacts/vfx-status-contrast-v2/decoded/frames.json`. The earlier browser
+phase strips were invalid and were rejected; they are retained as history.
+Sparse samples do not prove continuous smoothness or 60fps. Continuous motion
+and sustained performance remain pending; accepted static art is not reopened
+for discretionary refinement.
 
-Status lifecycle checks on the isolated phone fixture exercised two-second
-rotation with fixed hard control, cleansed input, zero-duration input, death,
-revival, enemy status rendering and 24px detached HUD icons. All visual nodes
-were removed after cleanup. This is not a retest of the round-end duration owner.
+Status lifecycle snapshots exercise layer rotation, selective cleanse, expiry,
+death, revival and final zero remaining nodes. These are technical observations,
+not animation-smoothness or round-end gameplay-duration acceptance.
 
-`assets/full` contains artwork candidates and generation evidence. Candidates
-are not runtime imports merely because they decode or have lossless conversion.
-The earth-shield and fire-soul sheets still require independent art review.
-Commercial visual acceptance remains pending; review findings are retained in
-the adjacent independent/USB visual review JSON files.
+Active windSpell now uses `assets/vfx/wind/wind-spell-wide-v2.webp`, a native
+wide 4x3 source with cellAspect 2.25. At ade43a48 its source and phone static
+three-target range/readability geometry are accepted; dynamic continuity and
+performance remain pending. See `wind-wide-source-review.json` and
+`wind-wide-overcorrection-review.json`. Stop further source/static refinement
+unless a new player-visible defect appears.
 
-The next candidate imports nine reviewed images (eight cast sheets and the
-rage body aura); `runtime-import-review.json` records byte identity and source
-provenance. These are phone-test candidates, not an automatic art pass. Group
-art now uses the complete safe side with minimum necessary translation, and
-ordinary hit feedback uses a bounded two-frame paint fence. Non-travel raster
-art fades after frame eight instead of staying opaque until an abrupt stop.
-Stun is placed near the head at reduced scale; two dark HUD icons receive a
-thin contrast outline. `usb-comparison.html` shows full phone screenshots with
-the baseline/checkpoint source labeled per case.
+Active earthShield uses the single-shield candidate with `single` placement
+for its formal `self` target (scale 1.7, maxSize 225). Older group-placement
+findings in the inventory refer to historical snapshots.
+
+The complete-safe-side minimum-translation `allowArtRecenter` proposal was
+rejected and reverted at b145; it is not current runtime behavior. Historical
+screenshots and technical results from that proposal do not endorse it.
+Ordinary hit feedback retains the bounded paint fence; raster presentation
+and gameplay settlement remain separate owners.
+
+`usb-full-matrix-20261019.json` and later matrix artifacts preserve technical
+presentation evidence, including exceptions and node cleanup at their exact
+heads. They do not establish art acceptance for all 44 skills, full skill
+eligibility/damage behavior, latest-head CI or commercial release readiness.
+`assets/full` contains candidate and rejected artwork with provenance; presence
+or lossless conversion alone never means runtime adoption or visual PASS.
+`usb-comparison.html` retains baseline/checkpoint phone comparisons.

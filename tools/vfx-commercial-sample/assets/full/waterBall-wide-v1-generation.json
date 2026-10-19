@@ -1,0 +1,653 @@
+{
+  "id": "waterBall",
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "tool": "built-in imagegen",
+  "reviewHead": "ade43a48ce618330055f9add290abb175ef9470d",
+  "formalShape": "tri",
+  "originalSource": "assets/vfx/water/water-orb-vfx.png",
+  "selectedMother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-3a9cc1b6-be44-4ab3-98fe-92fb483bbe98.png",
+  "attempts": [
+    {
+      "number": 1,
+      "prompt": "Edit source reference into one transparent fantasy game VFX sprite sheet, not a scene. Exact sheet layout FOUR columns by THREE rows, twelve frames in row-major order. Overall image aspect 3:1, each individual cell native wide 2.25:1 (for example overall2160x720, cells540x240). Each cell contains EXACTLY THREE separate small effects horizontally centered at x18%,50%,82%, one per target, with transparent gaps. Keep the three centers and shared floor baseline y80% fixed throughout all twelve frames, no baseline hopping on row transitions. Leave transparent safe margins on every cell, no intercell lines or labels. Frames1-3 gather,4-7 build,FRAME8 strongest impact/activation,9-12 progressively dissipate in place to nearly invisible. Original pixel proportions, crisp small-screen silhouettes, no broad fog blanket, no full-height opaque wall, no character, no text, no background. Genuine alpha transparency. Preserve water-orb skill identity: three discrete deep-blue swirling water orbs gather independently then each erupts into a short clean azure water jet at frame8, sharp white splash edges and individual circular water bases. Orbs become water columns coherently, with no merged wave between targets. Frames9-12 droplets and short ripples diminish without shifting floor.",
+      "mother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-e37f7c8a-a907-495b-bc33-5cba52cb5753.png"
+    },
+    {
+      "number": 2,
+      "prompt": "Edit source reference into one transparent fantasy game VFX sprite sheet, not a scene. Exact sheet layout FOUR columns by THREE rows, twelve frames in row-major order. Overall image aspect 3:1, each individual cell native wide 2.25:1 (for example overall2160x720, cells540x240). Each cell contains EXACTLY THREE separate small effects horizontally centered at x18%,50%,82%, one per target, with transparent gaps. Keep the three centers and shared floor baseline y80% fixed throughout all twelve frames, no baseline hopping on row transitions. Leave transparent safe margins on every cell, no intercell lines or labels. Frames1-3 gather,4-7 build,FRAME8 strongest impact/activation,9-12 progressively dissipate in place to nearly invisible. Original pixel proportions, crisp small-screen silhouettes, no broad fog blanket, no full-height opaque wall, no character, no text, no background. Genuine alpha transparency. Preserve water-orb skill identity: three discrete deep-blue swirling water orbs gather independently then each erupts into a short clean azure water jet at frame8, sharp white splash edges and individual circular water bases. Orbs become water columns coherently, with no merged wave between targets. Frames9-12 droplets and short ripples diminish without shifting floor.\nCORRECTION: Recreate fresh clean art, not the previous source's dense fog. Exactly12 CELLS on a 4x3 grid. KEEP EVERY EFFECT WELL INSIDE ITS CELL: all strong visible pixels restricted to local x8%-92%, y18%-78%, baseline y78%. At least20% blank transparent vertical gap BETWEEN ROWS, no glows or particles crossing row seams. Three small disconnected clean symbols, each no wider than22% cellwidth, visibly transparent gaps between them. Strong opacity only on narrow edges; interior mostly transparent. Water/ice forms must not connect into a horizontal wall. Same baseline in all rows; fading last frames shrink toward the baseline, not upward. Frame8 is strongest. Do not add solid pale blue hazy blobs.",
+      "mother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-3a9cc1b6-be44-4ab3-98fe-92fb483bbe98.png",
+      "firstAttemptRejected": "Strong alpha crosses row boundaries; first result is not an eligible runtime candidate."
+    }
+  ],
+  "candidateOnly": true,
+  "independentReview": "pending",
+  "phonePass": false,
+  "commercialPass": false,
+  "selfReview": {
+    "status": "candidate-for-independent-review",
+    "identity": "Three blue water orbs gather then become three water jets, frame8 strongest jet/splash.",
+    "risks": [
+      "Frame4 to5 baseline lowers by about17 source pixels; frame8 to9 rises about21 source pixels while dissipating. Confirm no visible bounce in sequence.",
+      "Low-alpha horizontal/vertical guide-like RGB is visible in some previews; alpha seam measurements below must be considered by independent reviewer.",
+      "Centers remain separate but green/cyan low-alpha haze may connect them at peak."
+    ]
+  },
+  "runtimeCandidate": "tools/vfx-commercial-sample/assets/full/waterBall-wide-v1.webp",
+  "size": [
+    2172,
+    724
+  ],
+  "grid": [
+    4,
+    3
+  ],
+  "cellSize": [
+    543.0,
+    241.33333333333334
+  ],
+  "cellAspect": 2.25,
+  "lossless": true,
+  "exactRGBAEqualToMother": true,
+  "sha256": "188ff5373337bdf91a6c1054c8b06aa7d6919458e03f664dbe36844263ed66f1",
+  "bytes": 1214530,
+  "frameMetrics": [
+    {
+      "frame": 1,
+      "alpha": {
+        "8": {
+          "bounds": [
+            68,
+            72,
+            494,
+            197
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            69,
+            75,
+            492,
+            196
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 127.28,
+          "alphaWeight": 746394
+        },
+        {
+          "centerX": 282.26,
+          "alphaWeight": 781665
+        },
+        {
+          "centerX": 431.59,
+          "alphaWeight": 785884
+        }
+      ]
+    },
+    {
+      "frame": 2,
+      "alpha": {
+        "8": {
+          "bounds": [
+            63,
+            56,
+            488,
+            197
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            64,
+            58,
+            486,
+            196
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 122.51,
+          "alphaWeight": 1353782
+        },
+        {
+          "centerX": 274.11,
+          "alphaWeight": 1445910
+        },
+        {
+          "centerX": 429.69,
+          "alphaWeight": 1375409
+        }
+      ]
+    },
+    {
+      "frame": 3,
+      "alpha": {
+        "8": {
+          "bounds": [
+            59,
+            55,
+            485,
+            197
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            61,
+            57,
+            484,
+            196
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 117.43,
+          "alphaWeight": 1587172
+        },
+        {
+          "centerX": 271.58,
+          "alphaWeight": 1705341
+        },
+        {
+          "centerX": 428.3,
+          "alphaWeight": 1600220
+        }
+      ]
+    },
+    {
+      "frame": 4,
+      "alpha": {
+        "8": {
+          "bounds": [
+            53,
+            50,
+            487,
+            197
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            54,
+            52,
+            487,
+            196
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 115.84,
+          "alphaWeight": 1798017
+        },
+        {
+          "centerX": 269.88,
+          "alphaWeight": 1914441
+        },
+        {
+          "centerX": 428.41,
+          "alphaWeight": 1792956
+        }
+      ]
+    },
+    {
+      "frame": 5,
+      "alpha": {
+        "8": {
+          "bounds": [
+            60,
+            40,
+            496,
+            213
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            61,
+            42,
+            495,
+            213
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 124.59,
+          "alphaWeight": 1970828
+        },
+        {
+          "centerX": 281.09,
+          "alphaWeight": 1961130
+        },
+        {
+          "centerX": 434.41,
+          "alphaWeight": 2064851
+        }
+      ]
+    },
+    {
+      "frame": 6,
+      "alpha": {
+        "8": {
+          "bounds": [
+            60,
+            36,
+            491,
+            214
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            62,
+            37,
+            487,
+            213
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 121.6,
+          "alphaWeight": 2179307
+        },
+        {
+          "centerX": 275.81,
+          "alphaWeight": 2184519
+        },
+        {
+          "centerX": 429.19,
+          "alphaWeight": 2236039
+        }
+      ]
+    },
+    {
+      "frame": 7,
+      "alpha": {
+        "8": {
+          "bounds": [
+            52,
+            32,
+            491,
+            221
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            54,
+            33,
+            490,
+            219
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 116.08,
+          "alphaWeight": 2547891
+        },
+        {
+          "centerX": 273.05,
+          "alphaWeight": 2449621
+        },
+        {
+          "centerX": 426.39,
+          "alphaWeight": 2538286
+        }
+      ]
+    },
+    {
+      "frame": 8,
+      "alpha": {
+        "8": {
+          "bounds": [
+            46,
+            23,
+            496,
+            223
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            46,
+            27,
+            495,
+            220
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 117.93,
+          "alphaWeight": 2965783
+        },
+        {
+          "centerX": 273.07,
+          "alphaWeight": 3168880
+        },
+        {
+          "centerX": 423.96,
+          "alphaWeight": 2912350
+        }
+      ]
+    },
+    {
+      "frame": 9,
+      "alpha": {
+        "8": {
+          "bounds": [
+            63,
+            52,
+            497,
+            201
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            67,
+            54,
+            496,
+            199
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 124.57,
+          "alphaWeight": 1497216
+        },
+        {
+          "centerX": 281.75,
+          "alphaWeight": 1501649
+        },
+        {
+          "centerX": 436.31,
+          "alphaWeight": 1389402
+        }
+      ]
+    },
+    {
+      "frame": 10,
+      "alpha": {
+        "8": {
+          "bounds": [
+            60,
+            67,
+            490,
+            201
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            61,
+            72,
+            487,
+            198
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 122.8,
+          "alphaWeight": 1099723
+        },
+        {
+          "centerX": 276.76,
+          "alphaWeight": 1006161
+        },
+        {
+          "centerX": 428.21,
+          "alphaWeight": 1011496
+        }
+      ]
+    },
+    {
+      "frame": 11,
+      "alpha": {
+        "8": {
+          "bounds": [
+            57,
+            91,
+            487,
+            201
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            59,
+            92,
+            485,
+            198
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 117.89,
+          "alphaWeight": 755262
+        },
+        {
+          "centerX": 273.0,
+          "alphaWeight": 701200
+        },
+        {
+          "centerX": 425.61,
+          "alphaWeight": 671629
+        }
+      ]
+    },
+    {
+      "frame": 12,
+      "alpha": {
+        "8": {
+          "bounds": [
+            54,
+            108,
+            486,
+            199
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            55,
+            113,
+            485,
+            198
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 115.16,
+          "alphaWeight": 503957
+        },
+        {
+          "centerX": 270.7,
+          "alphaWeight": 496179
+        },
+        {
+          "centerX": 424.44,
+          "alphaWeight": 508176
+        }
+      ]
+    }
+  ],
+  "seamRows": [
+    {
+      "y": 240,
+      "maxAlpha": 2,
+      "alpha64Count": 0
+    },
+    {
+      "y": 241,
+      "maxAlpha": 2,
+      "alpha64Count": 0
+    },
+    {
+      "y": 242,
+      "maxAlpha": 2,
+      "alpha64Count": 0
+    },
+    {
+      "y": 481,
+      "maxAlpha": 2,
+      "alpha64Count": 0
+    },
+    {
+      "y": 482,
+      "maxAlpha": 2,
+      "alpha64Count": 0
+    },
+    {
+      "y": 483,
+      "maxAlpha": 2,
+      "alpha64Count": 0
+    }
+  ],
+  "strongEdgeTouchFrames": [],
+  "alpha8EdgeTouchFrames": []
+}

@@ -391,9 +391,10 @@ test("water manifest uses the exact files, twelve frames, frame-eight hit and re
     Object.entries(CAST_ASSETS).forEach(([id,filename])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id+" sprite metadata");
-        assert.equal(model.sprite.src.split("?")[0],"assets/vfx/water/"+filename,id);
+        const runtimeFile={waterBall:"water-ball-wide-v2.webp",healSpell:"heal-spell-wide-v2.webp"}[id];
+        assert.equal(model.sprite.src.split("?")[0],"assets/vfx/water/"+(runtimeFile||filename),id);
         const cacheVersion=["waterBall","iceArrowRain"].includes(id)?"?v=173.19":"?v=166";
-        assert.ok(model.sprite.src.endsWith(cacheVersion),id+" cache version");
+        assert.ok(model.sprite.src.endsWith(runtimeFile||cacheVersion),id+" exact runtime source/cache version");
         assert.equal(model.sprite.renderer,"dom-sprite",id+" DOM Sprite renderer");
         assert.deepEqual(
             [model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame],
@@ -611,7 +612,7 @@ test("tri-target Freeze and ally-all Heal use their fixed semantic footprints",(
     assert.equal(healSprites[0].dataset.placement,"battlefield");
     assert.equal(healSprites[0].style.left,"240px");
     assert.equal(healSprites[0].style.width,"440px");
-    assert.equal(healSprites[0].style.height,"440px","Heal preserves its authored square frame over the complete ally formation");
+    assert.equal(healSprites[0].style.height,"196px","Heal keeps the native wide frame over the complete ally formation");
 });
 
 test("Freeze uses a fixed image and Frostbite uses a fixed icon without opening an action gate",()=>{
@@ -776,4 +777,25 @@ test("Tidal Beast cast/flight/impact metadata is shared for both sides and all t
     assert.equal(stageSprites(runtime).sprites[0].dataset.travel,"true","shared legacy flight stays valid for other skills");
 });
 
+
+test("wide group candidates retain exact lossless bytes, alpha and native frame ratio",()=>{
+    const manifest=loadRuntime().context.v143SkillAnimationManifest;
+    const entries=[["waterBall", "water/water-ball-wide-v2.webp", "188ff5373337bdf91a6c1054c8b06aa7d6919458e03f664dbe36844263ed66f1"], ["healSpell", "water/heal-spell-wide-v2.webp", "b47b8dd089cc093a15506a50645562cab5afb4e0d7329d084038c6e1dc6b34d3"]];
+    entries.forEach(([id,file,hash])=>{
+        const candidate="assets/vfx/"+file,bytes=fs.readFileSync(candidate),info=losslessWebpInfo(bytes);
+        assert.deepEqual([info.width,info.height,info.alpha],[2172,724,1],id);
+        assert.equal(require("node:crypto").createHash("sha256").update(bytes).digest("hex"),hash,id);
+        assert.equal(manifest[id].sprite.src,candidate,id);
+        assert.equal((info.width/manifest[id].sprite.columns)/(info.height/manifest[id].sprite.rows),2.25,id);
+        assert.equal(manifest[id].sprite.cellAspect,2.25,id+" cold-cache source ratio");
+    });
+});
+
 console.log("\nV166 Water VFX suite: "+passed+" tests passed.");
+
+function losslessWebpInfo(file){
+ const b=Buffer.isBuffer(file)?file:fs.readFileSync(file);
+ assert.equal(b.toString("ascii",0,4),"RIFF");assert.equal(b.toString("ascii",8,12),"WEBP");
+ for(let o=12;o+8<=b.length;){const type=b.toString("ascii",o,o+4),size=b.readUInt32LE(o+4),p=o+8;assert.ok(p+size<=b.length,"complete WebP chunk");if(type==="VP8L"){assert.equal(b[p],0x2f);const bits=b.readUInt32LE(p+1);return {width:1+(bits&16383),height:1+((bits>>>14)&16383),alpha:(bits>>>28)&1};}o=p+size+(size%2);}
+ throw new Error("Expected lossless VP8L image");
+}

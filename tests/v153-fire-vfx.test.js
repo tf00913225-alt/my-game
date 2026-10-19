@@ -266,18 +266,18 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
     const expected={
         flameSlash:["flame-slash-cast-v2.webp","single"],
         fireCritical:["fire-critical-cast.png","single"],
-        explosiveFlurry:["explosive-flurry-cast.png","group"],
+        explosiveFlurry:["explosive-flurry-wide-v2.webp","group"],
         dragonSlash:["dragon-slash-cast-v2.webp","single"],
         fireRocket:["fire-rocket-cast.png","trajectory"],
         blazeSpell:["blaze-spell-cast-v2.webp","single"],
         flameTornado:["flame-tornado-cast-v2.webp","single"],
         phoenixCry:["phoenix-cry-cast.png","battlefield"],
-        rage:["rage-cast-v2.webp","single"]
+        rage:["rage-wide-v2.webp","single"]
     };
     Object.entries(expected).forEach(([id,[filename,placement]])=>{
         const sprite=manifest[id].sprite;
         assert.ok(sprite.src.split("?")[0].endsWith(filename),id);
-        if(id!=="flameSlash"&&id!=="rage"&&id!=="blazeSpell"&&id!=="dragonSlash"&&id!=="flameTornado"){ assert.ok(sprite.src.endsWith("?v=165"),id); }
+        if(id!=="explosiveFlurry"&&id!=="flameSlash"&&id!=="rage"&&id!=="blazeSpell"&&id!=="dragonSlash"&&id!=="flameTornado"){ assert.ok(sprite.src.endsWith("?v=165"),id); }
         assert.deepEqual([sprite.columns,sprite.rows,sprite.frames,sprite.hitFrame],[4,3,12,7],id);
         assert.equal(sprite.placement,placement,id);
         assert.equal(manifest[id].hit,.5833333333,id);
@@ -311,7 +311,7 @@ test("tri skills follow valid targets while Phoenix Cry keeps one full-field she
     assert.equal(triSprites[0].style.left,"438px");
     assert.equal(triSprites[0].style.top,"140px");
     assert.equal(triSprites[0].style.width,"276px","three-target cast keeps the fixed three-slot width");
-    assert.equal(triSprites[0].style.height,"276px","three-target cast preserves its authored square frame while covering the fixed footprint");
+    assert.equal(triSprites[0].style.height,"123px","three-target cast keeps native 2.25 frame aspect within raster rounding");
     assert.equal(triStage.children.some(node=>node.className.includes("v143-skill-flight")),false);
     assert.equal(triStage.children.some(node=>node.className.includes("v143-skill-field")),false);
 
@@ -448,7 +448,7 @@ test("Rage creates one shared full-ally cast sheet",()=>{
     assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
     assert.equal(sprites[0].dataset.placement,"battlefield");
     assert.equal(sprites[0].style.width,"600px");
-    assert.equal(sprites[0].style.height,"600px","full-ally Rage preserves its authored square frame while covering the ally side");
+    assert.equal(sprites[0].style.height,"267px","full-ally Rage preserves its native wide frame while covering the ally side");
 });
 
 test("enemy Rage allyTri animates only the three explicit targets",()=>{
@@ -574,6 +574,20 @@ test("cast sheets stay one-shot while Burn and Rage use single-image breathing",
     assert.match(animation,/rage:statusVisual\("assets\/vfx\/status\/rage-aura-v2\.webp","pulse","activeBuffs"/);
     assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+});
+
+
+test("wide group candidates retain exact lossless bytes, alpha and native frame ratio",()=>{
+    const manifest=loadRuntime().context.v143SkillAnimationManifest;
+    const entries=[["rage", "fire/rage-wide-v2.webp", "df6403daa4c3b6bd8e3eede4cdb97c7e26acd2e8de6f1ffec9468bac9a4aad28"], ["explosiveFlurry", "fire/explosive-flurry-wide-v2.webp", "65de2193edc2789153b1c7f77f054919686c515b9cd0b2a8c6be7a9320170cd9"]];
+    entries.forEach(([id,file,hash])=>{
+        const candidate="assets/vfx/"+file,bytes=fs.readFileSync(candidate),info=losslessWebpInfo(bytes);
+        assert.deepEqual([info.width,info.height,info.alpha],[2172,724,1],id);
+        assert.equal(require("node:crypto").createHash("sha256").update(bytes).digest("hex"),hash,id);
+        assert.equal(manifest[id].sprite.src,candidate,id);
+        assert.equal((info.width/manifest[id].sprite.columns)/(info.height/manifest[id].sprite.rows),2.25,id);
+        assert.equal(manifest[id].sprite.cellAspect,2.25,id+" cold-cache source ratio");
+    });
 });
 
 console.log(`\n${passed} V153 Fire VFX tests passed.`);

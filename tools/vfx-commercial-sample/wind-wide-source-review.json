@@ -534,5 +534,65 @@
     "result": "14 checks passed",
     "originalPNGDimensionsAndHashesRetained": true,
     "cellAspectColdAndWarmCacheMatchesNative": true
+  },
+  "phoneStaticReview": {
+    "head": "ade43a48ce618330055f9add290abb175ef9470d",
+    "device": "SM-N960F Android 10 physical USB Chrome",
+    "evidence": "artifacts/vfx-wind-wide/evidence.json",
+    "screenshot": "artifacts/vfx-wind-wide/skill-windSpell.png",
+    "skill": "windSpell",
+    "targetType": "tri",
+    "targets": [
+      0,
+      1,
+      2
+    ],
+    "result": "static-range-readability-accepted-stop-asset-refinement",
+    "threeTargetContact": "Three separate wind curls extend across the enemy row and visibly overlap left, middle and right targets. Outer curls overlap targets laterally rather than precisely sharing their centers; range is nevertheless clearly three-target, no longer compressed into the middle slot.",
+    "characterReadability": "All three creature silhouettes remain identifiable. The middle target receives the largest translucent overlay; it is not replaced by an opaque green mass.",
+    "hud": "All three names, levels and red HP bars remain legible. No effect crosses into the ally HUD or command area.",
+    "boundary": "No visible frame edge cut, rectangular seam or viewport clipping in the sampled still.",
+    "decision": "Stop static source/size refinement for this candidate; retain current geometry and source.",
+    "limitations": [
+      "Single still cannot establish animation continuity or sustained performance.",
+      "Frame 8 to 9 upward contraction risk still requires video review.",
+      "This observation does not validate every other primary slot, target formation or survivor combination."
+    ]
+  },
+  "phoneSequenceReview": {
+    "head": "ade43a48ce618330055f9add290abb175ef9470d",
+    "evidence": "artifacts/vfx-wind-wide/skill-video.json",
+    "recording": "artifacts/vfx-wind-wide/skill-cycle.mp4",
+    "reviewedDecodedFrames": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "sampling": "Original-size uncropped decoded first-cast frames, 12 fps, viewed as adjacent still sequence; not full-rate video playback.",
+    "decision": "No material visual blocker observed; stop asset refinement.",
+    "middle": "Frames 6-9 preserve three independent wind curls; frames 10-11 show three clear white impact cores without opaque whole-target replacement. HUD and target silhouettes remain readable.",
+    "tail": "Frames 12 to 13 visibly reduce height and brightness together; this reads as dissipation rather than an isolated upward jump. Frames 15-16 fade to clear field. Earlier source frame 8-to-9 jump concern is not a blocking defect in the observed phone sequence.",
+    "identity": "Wind ribbons and three-target separation remain consistent through sampled middle and tail.",
+    "lifecycleReportedByEvidence": {
+      "casts": 3,
+      "remainingPerCast": [
+        0,
+        0,
+        0
+      ],
+      "stageNodes": 0
+    },
+    "limits": [
+      "Lifecycle values are read from supplied evidence, not independently replayed on device.",
+      "12 fps samples cannot prove absence of every sub-frame hitch or sustained performance."
+    ]
   }
 }

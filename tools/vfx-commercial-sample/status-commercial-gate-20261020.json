@@ -5,8 +5,8 @@
   "head": "4b2cb54869fa8ee7b703bd62fdc1f68f477931c5",
   "device": "SM-N960F Android 10 physical USB Chrome",
   "scope": "Independent static visual review of all 42 phone status screenshots, plus read-only lifecycle snapshot interpretation",
-  "overallCommercialGate": "FAIL",
-  "overallReason": "Rage body state presence fails static identity. Two subtle foot auras need semantic evidence. Motion quality and sustained performance are not established.",
+  "overallCommercialGate": "NEEDS_EVIDENCE",
+  "overallReason": "CURRENT: all 21 scoped status static presentations PASS after 590b1390 contrast/height followups; eight pulse sampled cycles PASS via direct FFmpeg frames. Initial rage FAIL is historical and resolved. Continuous animation and sustained performance remain pending.",
   "evidence": {
     "player": "artifacts/vfx-status-anchors-player/evidence.json",
     "enemy": "artifacts/vfx-status-anchors-enemy/evidence.json",
@@ -533,5 +533,120 @@
         "reason": "Expected status presentation not established in provided phase strip"
       }
     ]
+  },
+  "decodedSampledCycleFollowup": {
+    "date": "2026-10-20",
+    "headAtReview": "ade43a48ce618330055f9add290abb175ef9470d",
+    "evidenceHead": "590b1390631aaf550a5803e718325ae211baa818",
+    "source": "artifacts/vfx-status-contrast-v2/decoded/frames.json",
+    "method": "Independent view_image inspection of original full decoded phone frames",
+    "imagesIndividuallyViewed": [
+      "artifacts/vfx-status-contrast-v2/decoded/rage-0.png",
+      "artifacts/vfx-status-contrast-v2/decoded/rage-3.png",
+      "artifacts/vfx-status-contrast-v2/decoded/rage-5.png",
+      "artifacts/vfx-status-contrast-v2/decoded/dodgeSkill-0.png",
+      "artifacts/vfx-status-contrast-v2/decoded/dodgeSkill-3.png",
+      "artifacts/vfx-status-contrast-v2/decoded/dodgeSkill-5.png",
+      "artifacts/vfx-status-contrast-v2/decoded/dinghaishenzhen-0.png",
+      "artifacts/vfx-status-contrast-v2/decoded/dinghaishenzhen-3.png",
+      "artifacts/vfx-status-contrast-v2/decoded/dinghaishenzhen-5.png",
+      "artifacts/vfx-status-contrast-v2/decoded/stun-0.png",
+      "artifacts/vfx-status-contrast-v2/decoded/stun-3.png",
+      "artifacts/vfx-status-contrast-v2/decoded/stun-5.png",
+      "artifacts/vfx-status-contrast-v2/decoded/yuanZuBlessing-0.png",
+      "artifacts/vfx-status-contrast-v2/decoded/yuanZuBlessing-3.png",
+      "artifacts/vfx-status-contrast-v2/decoded/yuanZuBlessing-5.png",
+      "artifacts/vfx-status-contrast-v2/decoded/fireSoulResonance-0.png",
+      "artifacts/vfx-status-contrast-v2/decoded/fireSoulResonance-3.png",
+      "artifacts/vfx-status-contrast-v2/decoded/fireSoulResonance-5.png",
+      "artifacts/vfx-status-contrast-v2/decoded/bloodBurn-0.png",
+      "artifacts/vfx-status-contrast-v2/decoded/bloodBurn-3.png",
+      "artifacts/vfx-status-contrast-v2/decoded/bloodBurn-5.png",
+      "artifacts/vfx-status-contrast-v2/decoded/burn-0.png",
+      "artifacts/vfx-status-contrast-v2/decoded/burn-3.png",
+      "artifacts/vfx-status-contrast-v2/decoded/burn-5.png"
+    ],
+    "sampledCycleGate": "PASS",
+    "scope": "Eight pulse statuses, both sides, sampled visibility/placement/change of brightness and observed switch endpoints only",
+    "findings": [
+      "Rage added orange-red side flames remain present on both actors at on samples; footprint and face/HUD readability remain stable.",
+      "Dodge lower green foot ring and calm taller pale cyan-white lower-body aura differ visibly in sampled on frames.",
+      "Stun yellow head stars appear on both actors; sampled head placement stays below enemy HUD and above player head.",
+      "Blessing gold, soul orange-gold, bloodBurn crimson and burn orange lower-body effects are present, contained and vary visibly in brightness between on samples.",
+      "Several filename phase-5 frames already show the next OFF label or next status ON label; classify by visible in-frame label rather than assuming all six named frames belong to one ON interval.",
+      "Observed OFF frames and all-cleared bloodBurn-5 show no previous body layer remaining. No sampled actor/HUD displacement or oversized overlay observed."
+    ],
+    "supersedes": "Prior sampledCycleReview evidence-validity blocker for these eight pulse statuses; invalid browser phase-strip record remains historical",
+    "perStatus": [
+      {
+        "id": "rage",
+        "sampledCycleGate": "PASS",
+        "continuousGate": "NEEDS_EVIDENCE"
+      },
+      {
+        "id": "dodgeSkill",
+        "sampledCycleGate": "PASS",
+        "continuousGate": "NEEDS_EVIDENCE"
+      },
+      {
+        "id": "dinghaishenzhen",
+        "sampledCycleGate": "PASS",
+        "continuousGate": "NEEDS_EVIDENCE"
+      },
+      {
+        "id": "stun",
+        "sampledCycleGate": "PASS",
+        "continuousGate": "NEEDS_EVIDENCE"
+      },
+      {
+        "id": "yuanZuBlessing",
+        "sampledCycleGate": "PASS",
+        "continuousGate": "NEEDS_EVIDENCE"
+      },
+      {
+        "id": "fireSoulResonance",
+        "sampledCycleGate": "PASS",
+        "continuousGate": "NEEDS_EVIDENCE"
+      },
+      {
+        "id": "bloodBurn",
+        "sampledCycleGate": "PASS",
+        "continuousGate": "NEEDS_EVIDENCE"
+      },
+      {
+        "id": "burn",
+        "sampledCycleGate": "PASS",
+        "continuousGate": "NEEDS_EVIDENCE"
+      }
+    ],
+    "staticHardControls": "Existing static PASS retained; no redundant aesthetic iteration or new cycle claim for the six static body presentations.",
+    "continuousGate": "NEEDS_EVIDENCE",
+    "performanceGate": "NEEDS_EVIDENCE",
+    "overallCommercialGate": "NEEDS_EVIDENCE",
+    "limits": [
+      "Viewed phases 0,3,5 for each listed status, 24 full original frames; not all 84 frames.",
+      "Sampled endpoint/brightness variation PASS does not establish smooth pulse interpolation, absence of inter-frame flicker, or 60fps.",
+      "No continuous playback visual review was possible in this reviewer browser surface.",
+      "Sustained performance requires separate frame-interval evidence."
+    ],
+    "stopRule": "No player-visible defect found in valid sampled frames; retain accepted art and geometry. Remaining evidence is continuous motion/performance, not further art refinement."
+  },
+  "historicalInitialOverallGate": {
+    "head": "4b2cb54869fa8ee7b703bd62fdc1f68f477931c5",
+    "gate": "FAIL",
+    "reason": "Rage body state presence fails static identity. Two subtle foot auras need semantic evidence. Motion quality and sustained performance are not established."
+  },
+  "currentGateSummary": {
+    "evidenceHead": "590b1390631aaf550a5803e718325ae211baa818",
+    "staticPASS": 21,
+    "staticFAIL": 0,
+    "sampledPulsePASS": 8,
+    "continuous": "NEEDS_EVIDENCE",
+    "sustainedPerformance": "NEEDS_EVIDENCE",
+    "latestSections": [
+      "contrastV2EnemyFollowup",
+      "decodedSampledCycleFollowup"
+    ],
+    "initialRageFailure": "RESOLVED; retained in historicalInitialOverallGate and original rows"
   }
 }

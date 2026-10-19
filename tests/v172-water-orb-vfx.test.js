@@ -23,7 +23,7 @@ test("Water Ball uses the supplied 1536×1152 raster sheet",()=>{
     );
     assert.match(
         animation,
-        /waterBall:\{hit:DEFAULT_HIT,sprite:castSheet\("assets\/vfx\/water\/water-orb-vfx\.png\?v=173\.19","group",\{[\s\S]*?alignToSlots:true[\s\S]*?\}\)\}/
+        /waterBall:\{hit:DEFAULT_HIT,sprite:castSheet\("assets\/vfx\/water\/water-ball-wide-v2\.webp","group",\{[\s\S]*?alignToSlots:true[\s\S]*?\}\)\}/
     );
 });
 

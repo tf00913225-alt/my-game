@@ -185,10 +185,10 @@ test("the raster renderer creates one shared Water Ball Sprite Sheet node withou
     assert.equal(sprite.dataset.columns,"4");
     assert.equal(sprite.dataset.rows,"3");
     assert.equal(sprite.dataset.frames,"12");
-    assert.match(sprite.style.backgroundImage,/water-orb-vfx\.png\?v=173\.19/);
-    assert.equal(sprite.style.left,"318px","three-target VFX is centered on the explicit primary target");
-    assert.equal(sprite.style.top,"130px");
-    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(|requestAnimationFrame\(/);
+    assert.match(sprite.style.backgroundImage,/water-ball-wide-v2\.webp/);
+    assert.equal(sprite.style.left,"460px","three-target artwork uses the fixed shape center independently of the primary");
+    assert.equal(sprite.style.top,"165px","group artwork stays at the canonical shape center");
+    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(/);
 });
 
 test("Ice Arrow Rain stays centered on the full monster battlefield",()=>{

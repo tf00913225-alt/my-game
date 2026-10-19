@@ -315,7 +315,7 @@ test("all eleven casts keep Sprite timing while six persistent states use low-mo
     Object.entries(CASTS).forEach(([id,spec])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id);
-        const expectedSource=id==="stormRain"?"assets/vfx/wind/storm-rain-cast-v2.webp":id==="windSpell"?"assets/vfx/wind/wind-spell-wide-v2.webp":"assets/vfx/wind/"+spec.file+"?v=173.24";
+        const expectedSource=id==="stormRain"?"assets/vfx/wind/storm-rain-cast-v2.webp":id==="windSpell"?"assets/vfx/wind/wind-spell-wide-v2.webp":id==="stormCircle"?"assets/vfx/wind/storm-circle-wide-v2.webp":id==="dodgeSkill"?"assets/vfx/wind/dodge-skill-wide-v2.webp":"assets/vfx/wind/"+spec.file+"?v=173.24";
         assert.equal(model.sprite.src,expectedSource,id);
         assert.deepEqual(
             Array.from([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame]),
@@ -601,6 +601,20 @@ test("the development cache release is V173.39",()=>{
     assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
     assert.ok(index.includes('<title>四象江湖傳 V'+releaseMeta.version+'</title>'));
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
+});
+
+
+test("wide group candidates retain exact lossless bytes, alpha and native frame ratio",()=>{
+    const manifest=loadRuntime().context.v143SkillAnimationManifest;
+    const entries=[["dodgeSkill", "wind/dodge-skill-wide-v2.webp", "8a4aa1a86af263d47b613c6df6a3ffa875c02a476591c675bed1917defacca72"], ["stormCircle", "wind/storm-circle-wide-v2.webp", "3886439d276022db61ad22afb6656fab827fe45f946767c6f172ede253fa5c0e"]];
+    entries.forEach(([id,file,hash])=>{
+        const candidate="assets/vfx/"+file,bytes=fs.readFileSync(candidate),info=losslessWebpInfo(bytes);
+        assert.deepEqual([info.width,info.height,info.alpha],[2172,724,1],id);
+        assert.equal(require("node:crypto").createHash("sha256").update(bytes).digest("hex"),hash,id);
+        assert.equal(manifest[id].sprite.src,candidate,id);
+        assert.equal((info.width/manifest[id].sprite.columns)/(info.height/manifest[id].sprite.rows),2.25,id);
+        assert.equal(manifest[id].sprite.cellAspect,2.25,id+" cold-cache source ratio");
+    });
 });
 
 console.log("\n"+passed+" V173.39 wind Sprite VFX tests passed.");

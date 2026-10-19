@@ -15,7 +15,7 @@ assert.match(v142,/window\.v142PlaySkillAnimationFromBadge=function/);
 assert.doesNotMatch(v142,/const previous=showSkillNameBadge/);
 assert.match(main,/v142PlaySkillAnimationFromBadge\("player",skillName,elementType,[\s\S]*?characterIndex\|\|0,targetContract\.targetId,targetContract\.targetIds,targetContract/);
 assert.match(main,/v142PlaySkillAnimationFromBadge\("monster",skillName,elementType,[\s\S]*?monsterIndex\|\|0,targetContract\.targetId,targetContract\.targetIds,targetContract/);
-assert.match(animation,/water-orb-vfx\.png\?v=173\.19/);
+assert.match(animation,/water-ball-wide-v2\.webp/);
 assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
 assert.ok(index.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
 

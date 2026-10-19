@@ -72,7 +72,7 @@ test("Ice Arrow Rain uses one centered full-field raster sheet without tiles",()
 test("Rage cast and loop remain visible and card-anchored on both sides",()=>{
     assert.match(
         animation,
-        /rage:\{[\s\S]*?rage-cast-v2\.webp[\s\S]*?scale:1\.08,minSize:96,maxSize:148/
+        /rage:\{[\s\S]*?rage-wide-v2\.webp[\s\S]*?scale:1\.08,minSize:96,maxSize:148/
     );
     assert.match(
         animation,

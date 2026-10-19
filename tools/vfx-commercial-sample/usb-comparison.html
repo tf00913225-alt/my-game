@@ -15,7 +15,7 @@ const rows=[
  ['rage','怒火施放','skill','移除矩形底，保留向上增益標誌。'],
  ['earthShield','萬象土盾施放','skill','單人土盾改為單盾，檢查不再畫出三個盾。'],
  ['fireSoulResonance','火魂共鳴施放','skill','環流中央保留透明空間，檢查相鄰幀位置。'],
- ['windSpell','群體風法','skill','群體藝術框使用完整可視側，保留三個正式目標。'],
+ ['windSpell','群體風法','skill','改為原生寬扁三道風卷，三個目標各有接觸；保留安全範圍與角色資訊。'],
  ['stormRain','風起雲湧','skill','三道分離旋風取代滿幅霧團，檢查各目標辨識。'],
  ['iceArrowRain','冰箭雨','skill','保留全體範圍，檢查血條、裁切與命中。'],
  ['rage','怒火常駐','status','火臉改為中空火環，保留人物與既有狀態辨識。'],
@@ -42,8 +42,8 @@ const before=originalRage?'../../artifacts/vfx-status-anchors-player/status-rage
 const revisedGroup=['rage','windSpell'];
 const revisedStatus=kind==='status'&&['rage','dodgeSkill','dinghaishenzhen'].includes(id);
 const folder=kind==='status'?(revisedStatus?'vfx-status-contrast-v2':'vfx-status-anchors-player'):revisedGroup.includes(id)?'vfx-status-polish':'vfx-final';
-document.getElementById('before').src=before;document.getElementById('after').src=`../../artifacts/${folder}/${kind}-${id}.png`;
+document.getElementById('before').src=before;document.getElementById('after').src=kind==='skill'&&id==='flameSlash'?'../../artifacts/vfx-remaining-hit/flame-contact.png':kind==='skill'&&id==='windSpell'?'../../artifacts/vfx-wind-wide/skill-windSpell.png':`../../artifacts/${folder}/${kind}-${id}.png`;
 document.getElementById('beforeSource').textContent=originalRage?'同一候選環境：原素材重播':baseline&&kind==='skill'?'原始基線 b767d31e':'上一輪 checkpoint 18f92b26';
-document.getElementById('afterSource').textContent=kind==='status'?(revisedStatus?'局部修正候選 590b1390':'狀態候選 4b2cb548'):revisedGroup.includes(id)?'取消過度放大候選 b145e2d7':'素材候選 067fa105';document.getElementById('note').textContent=note;}
+document.getElementById('afterSource').textContent=kind==='status'?(revisedStatus?'局部修正候選 590b1390':'狀態候選 4b2cb548'):id==='flameSlash'?'USB 原片命中影格 ade43a48（含手機瀏覽器介面）':id==='windSpell'?'原生寬扁風卷 ade43a48':revisedGroup.includes(id)?'取消過度放大候選 b145e2d7':'素材候選 067fa105';document.getElementById('note').textContent=note;}
 picker.onchange=show;show();
 </script></html>

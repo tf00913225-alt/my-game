@@ -1,0 +1,24 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "ade43a48ce618330055f9add290abb175ef9470d",
+  "classification": "STATIC_OVERCORRECTION_GATE_PASS_STOP_SOURCE_REFINEMENT",
+  "scope": "Independent comparison of one native-wide windSpell phone still with status-polish baseline; runtime read-only.",
+  "imagesViewed": [
+    "artifacts/vfx-wind-wide/skill-windSpell.png",
+    "artifacts/vfx-status-polish/skill-windSpell.png"
+  ],
+  "evidence": "artifacts/vfx-wind-wide/evidence.json",
+  "sourceChangeVerified": "js39 diff changes windSpell src and declares cellAspect:2.25; existing group placement, scale:1.08, minSize:190, alignToSlots:true, hit and deferred status remain unchanged.",
+  "findings": {
+    "hud": "New wind strokes begin below enemy red HP bars in supplied still. Names, level text and HP bars remain readable; no new player HUD or element-wheel obstruction.",
+    "identity": "Three teal spiral wind columns with green leaves and foot vortices clearly preserve wind/tornado identity. Compared with prior dense white-green central eruption, new scene expresses the three-target span with less opaque central fill.",
+    "occlusion": "Middle fox is partially crossed by translucent wind spiral; this is transient cast overlap on the intended target. Side fox faces remain readable; no opaque full-row slab or ground-only displaced effect is present.",
+    "size": "Artwork spans intended three-enemy row. It does not extend into upper HUD or down toward player row; increased horizontal source composition alone is not demonstrated over-enlargement."
+  },
+  "decision": "Retain this source candidate and stop discretionary source/static refinement. No demonstrated overcorrection warrants rollback or geometry/scale adjustment.",
+  "limits": [
+    "One still cannot establish all animation-frame peaks, sequence continuity, hit timing or performance.",
+    "This is a focused static overcorrection clearance, not complete commercial or dynamic acceptance."
+  ],
+  "runtimeOrPhoneChangesMade": false
+}
