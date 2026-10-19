@@ -344,3 +344,86 @@ test('Forest-configured presence retries refresh callback proofs while retaining
         expectedSequence:h.data.get(h.root+'/modeTime/current').sequence,intent:'heartbeat',elementBox:'keep'});
     assert.deepEqual(ticketReads,[1,1]);
 });
+
+test('a rejected archive cannot settle the transaction callback while an owned query and its ordering reads are pending',async()=>{
+    const h=await seeded({sample:0}),ticket=await issue(h);
+    await member(h,ticket.ticketId);await terminal(h,ticket.ticketId,'loss');
+    assert.ok(records(h).inventory.length>0);
+    h.data.delete(h.root+'/recoveryArchives/'+h.revision);
+    const before=copy([...h.data]),writes=h.writes;
+    let releaseQuery,queryEntered,archiveReturned,settled=false;
+    const gate=new Promise(resolve=>{releaseQuery=resolve;});
+    const entered=new Promise(resolve=>{queryEntered=resolve;});
+    const archiveRead=new Promise(resolve=>{archiveReturned=resolve;});
+    const reads=[];
+    const forest=createCanonicalPatrolSettlement({...h.dependencies,
+        runProtected:(request,operation)=>h.dependencies.runProtected(request,async(tx,session)=>{
+            const traced={...tx,get:async ref=>{
+                if(ref.query&&ref.path===h.root+'/inventory'){
+                    queryEntered();await gate;
+                }
+                const result=await tx.get(ref);reads.push(ref.path);
+                if(ref.path===h.root+'/recoveryArchives/'+h.revision)archiveReturned();
+                return result;
+            }};
+            try{return await operation(traced,session);}
+            finally{settled=true;}
+        })});
+    const pending=forest.issueTicket(h.request(),{operationId:id('drain-archive'),expectedRevision:h.revision,
+        triggerEntryId:'forest:0',availableEntryIds:['forest:0']}).then(()=>null,error=>error);
+    try{
+        await Promise.all([entered,archiveRead]);
+        // Yield one event-loop turn to drain already queued microtasks, not a
+        // clock delay or a retry. The owned-query gate is still explicitly held.
+        await new Promise(resolve=>setImmediate(resolve));
+        assert.equal(settled,false,'transaction callback rejected before outstanding reader completed');
+    }finally{releaseQuery();await pending;}
+    const error=await pending;
+    assert.equal(error.code,'data-loss');assert.match(error.message,/Original Patrol snapshot or recovery archive/);
+    assert.equal(settled,true);
+    assert.equal(reads.filter(path=>path===h.root+'/account/current').length,2,
+        'the delayed owned reader must finish its sequential ordering proof before rejection');
+    assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);
+});
+
+test('draining concurrent current readers preserves the original first rejection object in every reader order and writes nothing',async()=>{
+    for(const order of [['character','archive','owned'],['owned','character','archive'],['archive','owned','character']]){
+        const h=await seeded(),before=copy([...h.data]),writes=h.writes;
+        const characterPath=h.root+'/characters/'+records(h).account.slots[0];
+        const gates=Object.fromEntries(order.map(kind=>{
+            let reject,entered;
+            const promise=new Promise((_resolve,rejectPromise)=>{reject=rejectPromise;});
+            const called=new Promise(resolve=>{entered=resolve;});
+            return [kind,{promise,called,reject,entered}];
+        }));
+        let settled=false;
+        const forest=createCanonicalPatrolSettlement({...h.dependencies,
+            runProtected:(request,operation)=>h.dependencies.runProtected(request,async(tx,session)=>{
+                const traced={...tx,get:ref=>{
+                    const kind=ref.path===characterPath?'character':
+                        ref.query&&ref.path===h.root+'/inventory'?'owned':
+                        ref.path===h.root+'/recoveryArchives/'+h.revision?'archive':null;
+                    if(kind){gates[kind].entered();return gates[kind].promise;}
+                    return tx.get(ref);
+                }};
+                try{return await operation(traced,session);}
+                finally{settled=true;}
+            })});
+        const pending=forest.issueTicket(h.request(),{operationId:id('drain-errors'),expectedRevision:h.revision,
+            triggerEntryId:'forest:0',availableEntryIds:['forest:0']}).then(()=>null,error=>error);
+        await Promise.all(Object.values(gates).map(gate=>gate.called));
+        const errors=order.map(kind=>Object.assign(Error('injected '+kind),{code:10,details:kind}));
+        try{
+            for(let index=0;index<order.length;index++){
+                gates[order[index]].reject(errors[index]);
+                await new Promise(resolve=>setImmediate(resolve));
+                if(index<order.length-1)assert.equal(settled,false,'all started readers must drain before rejection');
+            }
+        }finally{
+            for(const kind of order)gates[kind].reject(Error('release test gate'));
+            await pending;
+        }
+        assert.equal(await pending,errors[0],'do not wrap, reorder or replace the first SDK/Owner error');
+        assert.equal(settled,true);assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);
+    }
+});

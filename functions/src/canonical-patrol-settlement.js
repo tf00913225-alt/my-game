@@ -122,9 +122,19 @@ function createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
             fail("failed-precondition","Unpublished canonical Patrol sources are required.");
         }
         if(expectedRevision!==null&&expectedRevision!==envelope.serverRevision)fail("aborted","CLOUD_REVISION_CONFLICT");
-        const [characters,owned,original]=await Promise.all([
+        // A sibling may reject while readOwnedSources still has sequential
+        // transaction reads to issue. Drain all three before allowing the SDK
+        // to roll back; keep Promise.all's first rejection object unchanged.
+        let readFailed=false,firstReadError;
+        const completed=await Promise.allSettled([
             readCharacterSources(cache(tx).proxy,root,account,fail),readOwnedSources(tx,root,fail),
-            archived(tx,root,uid,account.serverRevision,account.snapshotSha256)]);
+            archived(tx,root,uid,account.serverRevision,account.snapshotSha256)].map(promise=>
+                promise.catch(error=>{
+                    if(!readFailed){readFailed=true;firstReadError=error;}
+                    throw error;
+                })));
+        if(readFailed)throw firstReadError;
+        const [characters,owned,original]=completed.map(result=>result.value);
         const records={...owned.records,characters:characters.records,
             ...Object.fromEntries(Object.keys(SINGLE).map((key,index)=>[key,source(singleSnaps[index].data())]))};
         const snapshot=await read(tx,ref(root,"playableSnapshots",String(account.serverRevision)));
