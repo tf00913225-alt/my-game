@@ -2,7 +2,8 @@
 import assert from "node:assert/strict";
 import {readFileSync,openSync,fstatSync,readSync,closeSync} from "node:fs";
 import vm from "node:vm";
-import {createRequire} from "node:module";
+import {createRequire,Module} from "node:module";
+import {AsyncLocalStorage} from "node:async_hooks";
 import {createHash,randomBytes} from "node:crypto";
 const require=createRequire(new URL("../functions/package.json",import.meta.url));
 const {initializeApp}=require("firebase-admin/app");
@@ -3986,7 +3987,10 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     const {recoveryAuditNamespaces,decodeProofPayload,inventoryDocumentMetadata,PATROL_PROOF_LIMITS}=require("../functions/src/recovery-audit-artifact.js");
     const {createCanonicalPatrolSettlement}=require("../functions/src/canonical-patrol-settlement.js");
     const h=patrolProofSdkFixture;assert.ok(h);
-    let clock=h.clock;
+    // This audit has its own control clock. The earning actor deliberately
+    // advanced two minutes for rested EXP; that is not the SDK commit clock.
+    const auditReadTime=(await h.save.get()).readTime;assert.ok(auditReadTime instanceof Timestamp);
+    let clock=auditReadTime.toMillis();
     let originalTickets=await h.root.collection("patrolTickets").get();
     // Earlier rested/elite earnings can reach Lv10 in fewer than20 battles.
     // Top up only the missing genuine battles, rather than replaying a fixture.
@@ -4033,6 +4037,10 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
         chunk=(id,index)=>run.collection("proofPayloadChunks").doc(id+"_"+String(index).padStart(2,"0"));
     const row=snap=>({exists:snap.exists,data:snap.data()??null,updateTime:snap.updateTime});
     const controls=await Promise.all([run.get(),fence.get()]).then(rows=>rows.map(row));
+    const auditApproval=(await h.root.collection("recoveryApprovals").doc(approvalOperationId).get()).data();
+    const compareAuditTime=(a,b)=>a.seconds-b.seconds||a.nanoseconds-b.nanoseconds;
+    assert.ok(compareAuditTime(auditApproval.issuedAt,controls[0].data.createdAt)<=0&&
+        compareAuditTime(controls[0].data.createdAt,auditApproval.expiresAt)<0,"Original audit commit must lie within its exact approval interval");
     const assets=await h.capture();
     const closed=result=>{for(const key of ["authoritativeStateReady","candidateProofValid","trustedCaptureVerified","restoreAuthorized"])assert.equal(result[key],false);};
     await recovery.prepareInventory(h.request(),{auditId,expectedEpoch:1,operationId:"proof-sdk-inventory-prepare1"});
@@ -4187,6 +4195,135 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     await assert.rejects(()=>recovery.captureProof(h.request(),input));assert.deepEqual(row(await state.get()),finalState);
     assert.equal((await h.save.get()).get("authoritativeStateReady"),false);
     console.log("PASS Forest proof component actual SDK: genuine multi-battle/Lv10/slot2 plus three-member unit, complete inventory admission, typed bounded chunks committed by real SDK, rollback/retry/CAS concurrency, original-chunk receipt replay, missing/corrupt chunk zero repair, live gates and all readiness closed. Payload bytes are not SDK wire-size measurements.");
+}
+
+// Private publication acceptance: real Firestore/Session/query/Timestamp only;
+// object storage is explicitly fake and cannot contact GCS or change IAM.
+{
+    const h=patrolProofSdkFixture;assert.ok(h);
+    const publicationReadTime=(await h.save.get()).readTime;assert.ok(publicationReadTime instanceof Timestamp);
+    let clock=publicationReadTime.toMillis(),abortOnce=false,rollbackOnce=false,loseResponse=false;
+    const publicationTransactions=new AsyncLocalStorage();
+    const traces=[],observedDb={doc:path=>db.doc(path),runTransaction:callback=>db.runTransaction(async raw=>{
+        const trace={reads:0,queries:0,writes:0};traces.push(trace);
+        const tx={get:async ref=>{const snap=await raw.get(ref),query=typeof ref.collection!=="function";
+            trace.reads+=query?Math.max(1,snap.size):1;trace.queries+=query?1:0;return snap;}};
+        for(const name of ["create","set","update","delete"])tx[name]=(...args)=>{trace.writes++;return raw[name](...args);};
+        // Only this callback's async descendants are inside its transaction.
+        // A different concurrent callback must not mark an outside publisher.
+        return publicationTransactions.run(Object.freeze({transaction:true}),()=>callback(tx));
+    })};
+    const authority=createSessionAuthority({db:observedDb,FieldValue,HttpsError,now:()=>clock});
+    const maintenance=async(req,id,operation,publicationId)=>{
+        const result=await authority.runRecoveryAuditMaintenance(req,id,async(tx,session)=>{
+            const value=await operation(tx,session);
+            if(abortOnce){abortOnce=false;throw Object.assign(Error("publication SDK retry"),{code:10});}
+            if(rollbackOnce){rollbackOnce=false;throw Error("publication staged rollback");}
+            return value;
+        },publicationId);
+        if(loseResponse){loseResponse=false;throw Error("publication lost ACK response");}
+        return result;
+    };
+    const deps={...h.deps,Timestamp,now:()=>clock,runProtected:authority.runProtected,runRecoveryAuditMaintenance:maintenance};
+    const recovery=createCanonicalCurrentRecovery(deps),auditId="publication-sdk-audit-0001",approvalId="publication-sdk-approval-01";
+    const sourceRevision=await h.revision();
+    assert.ok((await h.root.collection("patrolTickets").get()).size>=20);
+    const before=await checkRecoveryArchive(h.uid,sourceRevision);
+    assert.equal(before.get("sourceRecords.characters").length,2);assert.equal(before.get("sourceRecords.characters")[0].state.level,10);
+    await createCanonicalRecoveryApproval(deps).issue({auth:{uid:"publication-operator",token:{cloudSaveOperator:true}},
+        data:{ownerUid:h.uid,operationId:approvalId,sourceRevision,ttlSeconds:900}});
+    const begun=await recovery.beginAudit(h.request(),{operationId:auditId,expectedRevision:sourceRevision,approvalOperationId:approvalId});
+    assert.equal(begun.epoch,2);
+    const assets=await h.capture();
+    const args={auditId,expectedEpoch:2,operationId:"publication-sdk-manifest-01"},run=h.root.collection("recoveryAuditRuns").doc(auditId);
+    const publicationApproval=(await h.root.collection("recoveryApprovals").doc(approvalId).get()).data(),publicationRun=(await run.get()).data();
+    const comparePublicationTime=(a,b)=>a.seconds-b.seconds||a.nanoseconds-b.nanoseconds;
+    assert.ok(comparePublicationTime(publicationApproval.issuedAt,publicationRun.createdAt)<=0&&
+        comparePublicationTime(publicationRun.createdAt,publicationApproval.expiresAt)<0,"Publication audit commit must lie within its exact approval interval");
+    await recovery.prepareInventory(h.request(),{...args,operationId:"publication-sdk-prepare-inventory"});
+    let complete=false;
+    for(let sequence=1;!complete&&sequence<=318;sequence++)complete=(await recovery.captureInventoryPage(h.request(),{
+        ...args,operationId:"publication-sdk-inventory-"+String(sequence).padStart(6,"0"),expectedSequence:sequence})).inventoryExhausted;
+    assert.equal(complete,true);
+    const count=(await run.collection("captureState").doc("current").get()).get("capturedCount");let offset=0;
+    for(let sequence=1;offset<count;sequence++)offset=(await recovery.captureRawInventory(h.request(),{
+        ...args,operationId:"publication-sdk-raw-"+String(sequence).padStart(6,"0"),expectedSequence:sequence,startOrdinal:offset,count:Math.min(16,count-offset)})).nextOrdinal;
+    const objects=new Map(),ioCalls=[];let nextGeneration=9007199254740993n,lostCreate=true;
+    const io={bucketName:"fake-private-candidate-bucket",
+        async lookupMetadata(input){assert.equal(publicationTransactions.getStore(),undefined);ioCalls.push("lookup");return objects.get(input.objectName)?.metadata??null;},
+        async createOnly(input){
+            assert.equal(publicationTransactions.getStore(),undefined);ioCalls.push("create");assert.equal(input.ifGenerationMatch,"0");
+            if(objects.has(input.objectName))throw Object.assign(Error("exists"),{code:"ALREADY_EXISTS"});
+            const metadata={bucketName:input.bucketName,objectName:input.objectName,generation:String(nextGeneration++),size:input.bytes.length};
+            objects.set(input.objectName,{metadata,bytes:Buffer.from(input.bytes)});
+            if(lostCreate){lostCreate=false;throw Object.assign(Error("lost create response"),{code:"UNKNOWN_COMMIT"});}return metadata;
+        },
+        async readExact(input){assert.equal(publicationTransactions.getStore(),undefined);ioCalls.push("read");const value=objects.get(input.objectName);
+            if(!value||value.metadata.generation!==input.generation)throw Error("missing exact fake generation");
+            return {metadata:{...value.metadata},bytes:Buffer.from(value.bytes)};
+        }};
+    // Prove the guard still rejects every IO method from an actual callback,
+    // before any fake Storage side effect. The parallel publishers below
+    // independently prove that another callback cannot cause a false refusal.
+    await observedDb.runTransaction(async tx=>{
+        await tx.get(h.save);
+        for(const method of ["lookupMetadata","createOnly","readExact"])
+            await assert.rejects(()=>io[method]({}),{code:"ERR_ASSERTION"});
+    });
+    assert.equal(ioCalls.length,0);assert.equal(objects.size,0);
+    // Test-only lexical access; no exported factory method, runtime dependency
+    // or deployable Storage adapter is added to production.
+    const filename=require.resolve("../functions/src/canonical-current-recovery.js"),compiled=new Module(filename);
+    compiled.filename=filename;compiled.paths=Module._nodeModulePaths(filename.slice(0,Math.max(filename.lastIndexOf("/"),filename.lastIndexOf("\\"))));
+    const native=compiled.require.bind(compiled);compiled.require=name=>name==="test-only-publication-fake-io"?io:native(name);
+    const needle="return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact",source=readFileSync(filename,"utf8");
+    assert.equal(source.split(needle).length,2);
+    compiled._compile(source.replace("const immutableCandidateIO=null;","const immutableCandidateIO=require('test-only-publication-fake-io');")
+        .replace(needle,"return Object.freeze({pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,publishPreparedCandidate,ackCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact"),filename);
+    const publication=compiled.exports.createCanonicalCurrentRecovery(deps);
+    assert.equal(Object.hasOwn(recovery,"pinCandidatePublication"),false);
+    async function gate(operation,writes){const start=traces.length,result=await operation();
+        assert.ok(traces.length>start);for(const trace of traces.slice(start)){assert.equal(trace.reads,13);assert.equal(trace.queries,0);assert.ok(trace.writes<=writes);}return result;}
+    const pin=await gate(()=>publication.pinCandidatePublication(h.request(),args),0),scanStart=traces.length;
+    const material=await publication.loadPinnedRawCapture(pin),artifact=await publication.assemblePinnedCandidate(pin,material);
+    assert.equal(traces.length,scanStart,"Outside SDK snapshot scans and memory proof do not run a protected transaction");
+    const manifestRef=run.collection("candidatePublications").doc(args.operationId);
+    rollbackOnce=true;await assert.rejects(()=>publication.prepareCandidatePublication(h.request(),pin,artifact),/staged rollback/);
+    assert.equal((await manifestRef.get()).exists,false);
+    abortOnce=true;const prepared=await gate(()=>publication.prepareCandidatePublication(h.request(),pin,artifact),1);
+    await gate(()=>publication.prepareCandidatePublication(h.request(),pin,artifact),0);
+    const manifest=(await manifestRef.get()).data();
+    const proof=await gate(()=>publication.publishPreparedCandidate(h.request(),prepared),0);
+    assert.equal(ioCalls.filter(name=>name==="create").length,1);assert.equal(objects.size,1);
+    loseResponse=true;await assert.rejects(()=>publication.ackCandidatePublication(h.request(),prepared,proof),/lost ACK response/);
+    assert.equal((await manifestRef.get()).get("status"),"acknowledged");
+    await assert.rejects(()=>publication.ackCandidatePublication(h.request(),prepared,proof),/unconsumed/);
+    const refreshed=await gate(()=>publication.publishPreparedCandidate(h.request(),prepared),0);
+    const ack=await gate(()=>publication.ackCandidatePublication(h.request(),prepared,refreshed),0);
+    assert.equal(ack.generation,"9007199254740993");assert.equal(ack.unchanged,true);
+    const {generation,objectSize,ackAt,...ackTuple}=(await manifestRef.get()).data();
+    assert.deepEqual(ackTuple,{...manifest,status:"acknowledged"});assert.equal(objectSize,manifest.artifactByteLength);assert.ok(ackAt instanceof Timestamp);
+    for(const key of ["candidateProofValid","trustedCaptureVerified","restoreAuthorized","authoritativeStateReady"])assert.equal(ack[key],false);
+    const freshProofs=await Promise.all([publication.publishPreparedCandidate(h.request(),prepared),publication.publishPreparedCandidate(h.request(),prepared)]);
+    const raced=await Promise.all(freshProofs.map(value=>publication.ackCandidatePublication(h.request(),prepared,value)));
+    assert.ok(raced.every(value=>value.unchanged));assert.equal((await run.collection("candidatePublications").get()).size,1);
+    const pending=await publication.publishPreparedCandidate(h.request(),prepared);clock+=901000;
+    const ioBefore=ioCalls.length,attemptStart=traces.length;
+    await assert.rejects(()=>publication.ackCandidatePublication(h.request(),prepared,pending),/approval/i);
+    await assert.rejects(()=>publication.publishPreparedCandidate(h.request(),prepared),/approval/i);
+    assert.equal(ioCalls.length,ioBefore);assert.ok(traces.slice(attemptStart).every(value=>value.writes===0));
+    assert.deepEqual(await h.capture(),assets);
+    const oldRequest=h.request();
+    while(Math.floor(Date.now()/1000)<=claims(h.token).auth_time)await new Promise(resolve=>setTimeout(resolve,100));
+    const next=await login("accounts:signInWithPassword",{email:h.email,password});
+    h.setIdentity(next.idToken,await invoke("createGameSession",next.idToken,{uid:h.uid}));
+    await assert.rejects(()=>publication.publishPreparedCandidate(oldRequest,prepared),/SESSION_REVOKED/);
+    await assert.rejects(()=>publication.publishPreparedCandidate(h.request(),prepared),/epoch or session/);
+    await recovery.cancelAudit(h.request(),{auditId,expectedEpoch:2,operationId:"publication-sdk-cancel-audit"});
+    await assert.rejects(()=>publication.publishPreparedCandidate(h.request(),prepared));
+    assert.deepEqual((await checkRecoveryArchive(h.uid,sourceRevision)).data(),before.data());
+    assert.equal((await h.save.get()).get("authoritativeStateReady"),false);
+    console.log("PASS private immutable candidate publication: actual Firestore Session/SDK cursors/Timestamps on existing20-battle Lv10/slot2 actor; original raw full-chain/strict proofs;13-point gates, rollback/SDK retry, exact immutable tuple, fakeStorage-only64-bit generation/fullread/lost responses/read-only ACK races, expiry/takeover/cancel refusal. No actual GCS, production adapter, trusted backup or restore authority.");
 }
 
 await db.terminate();

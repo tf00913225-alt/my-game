@@ -12,7 +12,7 @@ const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocat
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
 const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,
-    encodeRecoveryAuditCandidate,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
+    prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
     inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
 const {createHash}=require("node:crypto");
 
@@ -84,6 +84,14 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     const patrolEvidence=createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
         inspectExistingEnvelope,nextRevision,now});
     const modeEvidence=patrolEvidence.modeOwner;
+    // Publication preparation is deliberately unreachable from the factory and has no
+    // production IO adapter. Tests may inspect these lexical functions only.
+    const immutableCandidateIO=null;
+    const publicationPins=new WeakMap(),publicationMaterials=new WeakMap(),publicationArtifacts=new WeakMap(),publicationPreparations=new WeakMap();
+    const publicationReadProofs=new WeakMap();
+    function requirePublicationPreparation(){
+        if(immutableCandidateIO===null)fail("failed-precondition","Immutable candidate publication is unavailable.");
+    }
     function inspectCurrentRecoverySource(uid,expectedRevision,{envelopeSnap,archiveSnap,snapshotSnap}){
         if(!envelopeSnap.exists||!archiveSnap.exists||!snapshotSnap.exists){
             fail("failed-precondition","Current recovery sources are missing.");
@@ -1446,8 +1454,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     }
     // Candidate bytes remain local to this readonly assembly. No mutable Buffer,
     // captured records or capability escapes to a restore/publication caller.
-    async function verifyRawRecoveryAuditCandidate(input){
-        const budget=createRecoveryAuditAssemblyBudget();
+    async function assembleRawCandidate(input,budget=createRecoveryAuditAssemblyBudget()){
         try{
             const union=inspectCompleteRawCapture(input,budget),{ownerUid:uid,sourceRevision:expectedRevision,auditId}=input.binding;
             const selected=union.documents.find(row=>row.path===`serverUsers/${uid}/${RECOVERY_AUDIT_RUN_COLLECTION}/${auditId}`);
@@ -1456,9 +1463,10 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             const run=selected.data,recorded=timestampPair(run.createdAt),auditControl={auditId,epoch:run.epoch,
                 sessionId:run.sessionId,sessionRevision:run.sessionRevision,recordedAt:["timestamp",recorded.seconds,recorded.nanoseconds]};
             const namespaceIds=new Map(union.namespaces.map(row=>[row.path,new Set(row.ids)])),absent=new Set();
+            const encode=prepareRecoveryAuditCandidateEncoding({uid,expectedRevision,auditControl,
+                documents:union.documents,namespaces:union.namespaces},budget);
             for(;;){
-                const bytes=encodeRecoveryAuditCandidate({uid,expectedRevision,auditControl,documents:union.documents,
-                    namespaces:union.namespaces,absences:[...absent]},budget);
+                const bytes=encode([...absent]);
                 const view=decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},budget);
                 let result,error,missing;
                 try{result=await verifyCandidateStrict(view,uid,expectedRevision);}
@@ -1467,7 +1475,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 // Sticky resource exhaustion cannot be hidden by an original
                 // Owner replacing a lookup error with its own strict rejection.
                 const usage=recoveryAuditAssemblyUsage(budget);
-                if(result)return Object.freeze({...result,assemblyUsage:usage});
+                if(result)return {bytes,summary:Object.freeze({...result,assemblyUsage:usage})};
                 if(!missing.length)throw error;
                 let added=false;
                 for(const path of missing){
@@ -1481,6 +1489,235 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             if(error instanceof HttpsError)throw error;
             fail("data-loss",error.message);
         }
+    }
+    async function verifyRawRecoveryAuditCandidate(input){
+        return (await assembleRawCandidate(input)).summary;
+    }
+    function publicationIdentity(map,value){
+        const identity=Object.freeze({});map.set(identity,value);return identity;
+    }
+    function publicationValue(map,identity){
+        const value=identity&&map.get(identity);
+        if(!value)fail("permission-denied","An original private candidate identity is required.");
+        return value;
+    }
+    // Thirteen point reads including the original Session runner's three.
+    // This does not include the separately bounded outside-transaction scan.
+    async function publicationContext(tx,session,args){
+        const context=await inventoryContext(tx,session,args.auditId,args.expectedEpoch);
+        const {run,namespaces,stateRef,runRef}=context;
+        const inventory=inspectInventoryState((await tx.get(stateRef)).data(),run,namespaces);
+        admitProofInventory(inventory,namespaces);
+        const rawState=inspectProofState((await tx.get(runRef.collection("proofState").doc("current"))).data(),run,inventory);
+        if(rawState.schemaVersion!==3||rawState.rawNextOffset!==inventory.capturedCount)
+            fail("failed-precondition","A complete raw capture cursor is required.");
+        const receipt=inspectRawReceipt((await tx.get(runRef.collection("patrolProofPages").doc(rawState.lastOperationId))).data(),run,inventory);
+        if(receipt.sequence!==rawState.nextSequence-1||rawReceiptHash(receipt)!==rawState.lastReceiptSha256||
+           receipt.endOrdinal!==rawState.rawNextOffset||receipt.startOrdinal!==rawState.lastStartOrdinal||
+           receipt.count!==rawState.lastCount||receipt.payloadSha256!==rawState.lastPayloadSha256)
+            fail("data-loss","Publication raw capture head differs.");
+        const reference=runRef.collection("candidatePublications").doc(args.operationId),existing=await tx.get(reference);
+        const tuple={ownerUid:session.uid,auditId:run.auditId,epoch:run.epoch,operationId:args.operationId,
+            sessionId:session.sessionId,sessionRevision:session.revision,sourceRevision:run.sourceRevision,
+            sourceSha256:run.sourceSha256,snapshotSha256:run.snapshotSha256,approvalOperationId:run.approvalOperationId,
+            approvalBindingSha256:run.approvalBindingSha256,inventoryStateSha256:inventory.stateSha256,
+            rawStateSha256:rawState.stateSha256,rawLastReceiptSha256:rawState.lastReceiptSha256};
+        return {...context,inventory,rawState,tuple,reference,existing};
+    }
+    async function pinCandidatePublication(request,args){
+        requirePublicationPreparation();
+        auditIntent("pin publication",args,["auditId","expectedEpoch","operationId"]);
+        // A failed/retried callback never mints an identity. Only its committed
+        // result is retained in the private map after run resolves.
+        const pinned=await runRecoveryAuditMaintenance(request,args.auditId,async(tx,session)=>{
+            const value=await publicationContext(tx,session,args);
+            return {args:{...args},tuple:value.tuple,run:value.run,inventory:value.inventory,rawState:value.rawState,runRef:value.runRef};
+        },args.operationId);
+        return publicationIdentity(publicationPins,pinned);
+    }
+    async function loadPinnedRawCapture(pin){
+        requirePublicationPreparation();
+        const pinned=publicationValue(publicationPins,pin),budget=createRecoveryAuditAssemblyBudget();
+        const input={binding:{ownerUid:pinned.tuple.ownerUid,auditId:pinned.tuple.auditId,epoch:pinned.tuple.epoch,
+            sourceRevision:pinned.tuple.sourceRevision,inventoryStateSha256:pinned.tuple.inventoryStateSha256},
+            run:pinned.run,inventoryState:pinned.inventory,rawState:pinned.rawState};
+        let wireBytes=0,scanReads=0;
+        // Immutable capture paths only. SDK materialization is separately
+        // bounded, not charged as thirteen transaction reads or called full
+        // history support. B1 reserves these actual buffers once before parse.
+        for(const [name,key,maximum] of [["inventoryPages","inventoryPages",317],
+            ["patrolProofPages","rawReceipts",pinned.inventory.capturedCount],
+            ["proofPayloadChunks","rawChunks",pinned.inventory.capturedCount*8]]){
+            const rows=[];let after=null;
+            for(;;){
+                recoveryAuditAssemblyUsage(budget);
+                let query=pinned.runRef.collection(name).orderBy("__name__").limit(16);
+                if(after)query=query.startAfter(after);
+                const result=await query.get();scanReads+=Math.max(1,result.size);
+                recoveryAuditAssemblyUsage(budget);
+                if(result.empty)break;
+                if(result.size>16||rows.length+result.size>maximum)fail("resource-exhausted","Publication capture scan exceeds its bounds.");
+                for(const snapshot of result.docs){
+                    const row=snapshot.data();
+                    if(name==="patrolProofPages"){
+                        inspectRawReceipt(row,pinned.run,pinned.inventory);
+                        if(snapshot.id!==row.operationId)fail("data-loss","Publication receipt ID differs.");
+                    }else{
+                        if(name==="inventoryPages")inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","intentSha256","payloadSha256","payloadBytes","createdAt"],"publication inventory page");
+                        else{
+                            const receipt=input.rawReceipts.find(entry=>entry.id===row?.operationId)?.row;
+                            if(!receipt||snapshot.id!==row.operationId+"_"+String(row.chunkIndex).padStart(2,"0"))
+                                fail("data-loss","Publication chunk ID differs.");
+                            inspectCapsuleChunk(row,row.chunkIndex,receipt,pinned.run,3);
+                        }
+                        const bytes=row?.payloadBytes;
+                        if(!Buffer.isBuffer(bytes)||bytes.length>(name==="inventoryPages"?128*1024:256*1024))
+                            fail("data-loss","Publication capture bytes are inconsistent.");
+                        wireBytes+=bytes.length;
+                        if(wireBytes>256*1024*1024)fail("resource-exhausted","Publication capture scan exceeds its byte bound.");
+                    }
+                    rows.push({id:snapshot.id,row});
+                }
+                after=result.docs.at(-1);
+            }
+            input[key]=rows;
+        }
+        recoveryAuditAssemblyUsage(budget);
+        return publicationIdentity(publicationMaterials,{pin,input,budget,scanReads,wireBytes});
+    }
+    async function assemblePinnedCandidate(pin,material){
+        requirePublicationPreparation();
+        publicationValue(publicationPins,pin);
+        const value=publicationValue(publicationMaterials,material);
+        if(value.pin!==pin)fail("permission-denied","Candidate material belongs to another pin.");
+        const artifact=await assembleRawCandidate(value.input,value.budget);
+        publicationMaterials.delete(material);
+        return publicationIdentity(publicationArtifacts,{pin,bytes:artifact.bytes,summary:artifact.summary});
+    }
+    async function prepareCandidatePublication(request,pin,artifactIdentity){
+        requirePublicationPreparation();
+        const pinned=publicationValue(publicationPins,pin),artifact=publicationValue(publicationArtifacts,artifactIdentity);
+        if(artifact.pin!==pin)fail("permission-denied","Candidate artifact belongs to another pin.");
+        const {args}=pinned;
+        const value=await runRecoveryAuditMaintenance(request,args.auditId,async(tx,session)=>{
+            const current=await publicationContext(tx,session,args);
+            if(snapshotDigest(current.tuple)!==snapshotDigest(pinned.tuple))fail("aborted","Publication capture binding changed.");
+            const tuple={schemaVersion:1,kind:"canonical-recovery-candidate-publication",...pinned.tuple,
+                intentSha256:snapshotDigest({action:"prepare-candidate-publication",...pinned.tuple}),
+                candidateEncodingVersion:2,bucketName:immutableCandidateIO.bucketName,
+                objectName:`private/recovery-candidates/v1/${session.uid}/${args.auditId}/${args.expectedEpoch}/${args.operationId}.csra`,
+                artifactSha256:inventoryHash(artifact.bytes),artifactByteLength:artifact.bytes.length,status:"prepared",...inventoryFlags};
+            if(typeof tuple.bucketName!=="string"||!tuple.bucketName)fail("failed-precondition","A private publication destination is unavailable.");
+            if(current.existing.exists){
+                inspectPublicationManifest(current.existing.data(),tuple);
+            }else tx.create(current.reference,{...tuple,createdAt:FieldValue.serverTimestamp()});
+            return tuple;
+        },args.operationId);
+        return publicationIdentity(publicationPreparations,{pin,artifactIdentity,tuple:value});
+    }
+    const publicationGeneration=value=>typeof value==="string"&&/^[1-9][0-9]{0,19}$/.test(value);
+    function inspectPublicationManifest(row,tuple){
+        if(!row)fail("data-loss","Original candidate publication manifest is missing.");
+        const {createdAt,...value}=row;
+        if(typeof createdAt?.toMillis!=="function"||!Number.isSafeInteger(createdAt.toMillis()))
+            fail("data-loss","Original candidate publication timestamp differs.");
+        timestampPair(createdAt);
+        if(row.status==="acknowledged"){
+            const {generation,objectSize,ackAt,...original}=value;
+            if(!publicationGeneration(generation)||objectSize!==tuple.artifactByteLength||
+               typeof ackAt?.toMillis!=="function"||!Number.isSafeInteger(ackAt.toMillis()))
+                fail("data-loss","Original candidate acknowledgement differs.");
+            timestampPair(ackAt);
+            if(snapshotDigest({...original,status:"prepared"})!==snapshotDigest(tuple))
+                fail("data-loss","Original candidate publication manifest differs.");
+        }else if(snapshotDigest(value)!==snapshotDigest(tuple))fail("data-loss","Original candidate publication manifest differs.");
+        return row;
+    }
+    async function livePreparedPublication(request,identity){
+        const prepared=publicationValue(publicationPreparations,identity),pinned=publicationValue(publicationPins,prepared.pin);
+        const artifact=publicationValue(publicationArtifacts,prepared.artifactIdentity);
+        const manifest=await runRecoveryAuditMaintenance(request,pinned.args.auditId,async(tx,session)=>{
+            const current=await publicationContext(tx,session,pinned.args);
+            if(snapshotDigest(current.tuple)!==snapshotDigest(pinned.tuple))fail("aborted","Publication capture binding changed.");
+            return inspectPublicationManifest(current.existing.data(),prepared.tuple);
+        },pinned.args.operationId);
+        return {prepared,pinned,artifact,manifest};
+    }
+    function publicationMetadata(value,tuple){
+        inventoryExact(value,["bucketName","objectName","generation","size"],"publication object metadata");
+        if(value.bucketName!==tuple.bucketName||value.objectName!==tuple.objectName||
+           !publicationGeneration(value.generation)||value.size!==tuple.artifactByteLength)
+            fail("data-loss","Candidate object metadata differs from its manifest.");
+        return value;
+    }
+    async function publishPreparedCandidate(request,identity){
+        requirePublicationPreparation();
+        if(["createOnly","lookupMetadata","readExact"].some(name=>typeof immutableCandidateIO[name]!=="function"))
+            fail("failed-precondition","Immutable candidate IO is unavailable.");
+        // This protected read finishes before any external side effect. There
+        // is no Firestore/Storage distributed transaction: ACK rechecks again.
+        const {prepared,artifact,manifest}=await livePreparedPublication(request,identity),tuple=prepared.tuple;
+        const name={bucketName:tuple.bucketName,objectName:tuple.objectName};
+        let metadata;
+        if(manifest.status==="acknowledged")metadata={...name,generation:manifest.generation,size:manifest.objectSize};
+        else{
+            metadata=await immutableCandidateIO.lookupMetadata({...name});
+            if(metadata===null){
+                let created;
+                try{
+                    created=publicationMetadata(await immutableCandidateIO.createOnly({...name,
+                        bytes:Buffer.from(artifact.bytes),ifGenerationMatch:"0"}),tuple);
+                }catch(error){
+                    if(!["ALREADY_EXISTS","UNKNOWN_COMMIT"].includes(error.code))throw error;
+                }
+                metadata=await immutableCandidateIO.lookupMetadata({...name});
+                if(metadata===null)fail("unavailable","Original immutable candidate object is not available.");
+                if(created&&metadata.generation!==created.generation)fail("data-loss","Created candidate generation changed.");
+            }
+        }
+        publicationMetadata(metadata,tuple);
+        const response=await immutableCandidateIO.readExact({...name,generation:metadata.generation});
+        inventoryExact(response,["metadata","bytes"],"publication exact read");
+        const observed=publicationMetadata(response.metadata,tuple);
+        if(observed.generation!==metadata.generation||!Buffer.isBuffer(response.bytes)||response.bytes.length!==tuple.artifactByteLength)
+            fail("data-loss","Exact candidate generation or bytes differ.");
+        const generation=observed.generation,bytes=Buffer.from(response.bytes);
+        if(inventoryHash(bytes)!==tuple.artifactSha256)fail("data-loss","Immutable candidate bytes differ from the original manifest.");
+        const result=await verifyRecoveryAuditArtifact({uid:tuple.ownerUid,expectedRevision:tuple.sourceRevision,artifactBytes:bytes});
+        if(result.candidateProofValid!==true||result.trustedCaptureVerified!==false||result.restoreAuthorized!==false||
+           result.authoritativeStateReady!==false||result.ownerUid!==tuple.ownerUid||result.sourceRevision!==tuple.sourceRevision||
+           result.sourceSha256!==tuple.sourceSha256||result.snapshotSha256!==tuple.snapshotSha256)
+            fail("data-loss","Immutable candidate original proof differs.");
+        return publicationIdentity(publicationReadProofs,{identity,tupleSha256:snapshotDigest(tuple),
+            generation,size:bytes.length,sha256:inventoryHash(bytes),consumed:false,unusable:false});
+    }
+    async function ackCandidatePublication(request,identity,readIdentity){
+        requirePublicationPreparation();
+        const prepared=publicationValue(publicationPreparations,identity),proof=publicationValue(publicationReadProofs,readIdentity);
+        const pinned=publicationValue(publicationPins,prepared.pin),tuple=prepared.tuple;
+        if(proof.identity!==identity||proof.consumed||proof.unusable||proof.tupleSha256!==snapshotDigest(tuple)||
+           proof.size!==tuple.artifactByteLength||proof.sha256!==tuple.artifactSha256)
+            fail("permission-denied","An original unconsumed exact candidate read is required.");
+        let result;
+        try{result=await runRecoveryAuditMaintenance(request,pinned.args.auditId,async(tx,session)=>{
+            const current=await publicationContext(tx,session,pinned.args);
+            if(snapshotDigest(current.tuple)!==snapshotDigest(pinned.tuple))fail("aborted","Publication capture binding changed.");
+            const manifest=inspectPublicationManifest(current.existing.data(),tuple),unchanged=manifest.status==="acknowledged";
+            if(unchanged){
+                if(manifest.generation!==proof.generation||manifest.objectSize!==proof.size)
+                    fail("data-loss","Original acknowledged candidate generation differs.");
+            }else tx.update(current.reference,{status:"acknowledged",generation:proof.generation,objectSize:proof.size,ackAt:FieldValue.serverTimestamp()});
+            return Object.freeze({...inventoryFlags,status:"acknowledged",auditId:tuple.auditId,operationId:tuple.operationId,
+                artifactSha256:tuple.artifactSha256,generation:proof.generation,unchanged});
+        },pinned.args.operationId);}
+        catch(error){
+            // SDK callback retries stay within the awaited runner. Any outer
+            // failure (including a committed-but-lost response) requires a
+            // fresh exact-generation full read, without hiding its error.
+            proof.unusable=true;throw error;
+        }
+        // Only successful transaction resolution consumes a usable proof.
+        proof.consumed=true;return result;
     }
     // Candidate-only internal consistency review. This does not establish that
     // a trusted capture included all live documents, grant approval, or return

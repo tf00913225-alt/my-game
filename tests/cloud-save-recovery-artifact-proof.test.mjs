@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {createRequire,Module} from 'node:module';
 import {readFileSync} from 'node:fs';
 import {dirname} from 'node:path';
+import {createHash} from 'node:crypto';
 import {storeHarness,selection,copy} from '../scripts/test-helpers/canonical-store-harness.mjs';
 const require=createRequire(import.meta.url);
 const {createCanonicalCurrentRecovery}=require('../functions/src/canonical-current-recovery');
@@ -152,7 +153,7 @@ async function controlledFixture(){
 function cloneMaterial(m){return {...m,docs:new Map([...m.docs].map(([path,data])=>[path,copy(data)])),
     absent:new Set(m.absent),paths:m.paths.slice(),auditControl:m.auditControl?copy(m.auditControl):undefined};}
 
-function assemblyHelperFaults({operations,nodes,clock}={}){
+function assemblyHelperFaults({operations,nodes,bytes,clock}={}){
     const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);
     compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
     const native=compiled.require.bind(compiled);compiled.require=name=>name==='node:perf_hooks'&&clock?{performance:{now:clock}}:native(name);
@@ -160,9 +161,68 @@ function assemblyHelperFaults({operations,nodes,clock}={}){
     assert(source.includes('bytes:256*1024*1024,nodes:16000000,operations:16384,passes:64,milliseconds:30000'));
     // Resource fault injection only. No production/request quota option exists.
     if(nodes!==undefined)source=source.replace('nodes:16000000','nodes:'+nodes);
+    if(bytes!==undefined)source=source.replace('bytes:256*1024*1024','bytes:'+bytes);
     if(operations!==undefined)source=source.replace('operations:16384','operations:'+operations);
     compiled._compile(source,filename);return compiled.exports;
 }
+
+test('prepared fixed frames preserve fresh wire bytes and hashes while isolating their snapshot, output buffers and one budget',()=>{
+    const helper=require('../functions/src/recovery-audit-artifact');
+    const fixed={uid:'encoding-test-uid',expectedRevision:2,auditControl:{auditId:'encoding-test-audit-001',epoch:1,
+        sessionId:'a'.repeat(32),sessionRevision:1,recordedAt:['timestamp',1700000000,123]},
+        documents:[{path:'serverUsers/encoding-test-uid/account/current',data:{value:1,nested:['x',false,null]}}],
+        namespaces:[{path:'serverUsers/encoding-test-uid/account',ids:['current'],terminalEmpty:true}]};
+    const before=copy(fixed),token=helper.createRecoveryAuditAssemblyBudget();helper.reserveRecoveryAuditRawInputs(token,[]);
+    const encode=helper.prepareRecoveryAuditCandidateEncoding(fixed,token),cache=helper.recoveryAuditAssemblyUsage(token);
+    assert(Object.isFrozen(encode));assert(cache.bytes>0);assert.equal(cache.passes,0);assert.equal(cache.reservedBytes,0);
+    let expectedWork=cache.bytes;
+    for(const absences of [[],['serverUsers/encoding-test-uid/operations/absent-operation-01'],
+        ['serverUsers/encoding-test-uid/grantOperations/absent-operation-01','serverUsers/encoding-test-uid/ledgerEntries/absent-operation-01']]){
+        const original=helper.encodeRecoveryAuditCandidate({...before,absences}),actual=encode(absences);
+        assert(actual.equals(original));assert.equal(createHash('sha256').update(actual).digest('hex'),createHash('sha256').update(original).digest('hex'));
+        expectedWork+=actual.length;assert.equal(helper.recoveryAuditAssemblyUsage(token).bytes,expectedWork);
+    }
+    fixed.documents[0].data.value=9;fixed.auditControl.epoch=2;fixed.namespaces[0].ids.push('other');
+    const original=helper.encodeRecoveryAuditCandidate({...before,absences:[]});
+    assert(encode([]).equals(original));assert(!helper.encodeRecoveryAuditCandidate({...fixed,absences:[]}).equals(original),'fresh API reads each current input');
+    const escaped=encode([]);escaped.fill(0);assert(encode([]).equals(original),'outputs never alias the cached bytes');
+    assert.throws(()=>encode([],helper.createRecoveryAuditAssemblyBudget()),/only absences/);
+    assert.throws(()=>helper.prepareRecoveryAuditCandidateEncoding(before,{}),/unknown assembly budget/);
+    assert.throws(()=>helper.prepareRecoveryAuditCandidateEncoding(before,undefined),/unknown assembly budget/);
+    for(const data of [{bad:()=>{}},{bad:undefined}]){
+        const value={...before,documents:[{path:before.documents[0].path,data}]};let oldError;
+        try{helper.encodeRecoveryAuditCandidate({...value,absences:[]});}catch(error){oldError=error.message;}
+        const budget=helper.createRecoveryAuditAssemblyBudget();helper.reserveRecoveryAuditRawInputs(budget,[]);
+        assert.throws(()=>helper.prepareRecoveryAuditCandidateEncoding(value,budget),error=>error.message===oldError);
+    }
+});
+
+test('fixed cache and every copied output pay real byte/node/pass/deadline costs before Buffer allocation, without spending raw reservations',()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),fixed={uid:'encoding-limit-uid',expectedRevision:2,
+        auditControl:{auditId:'encoding-limit-audit-01',epoch:1,sessionId:'a'.repeat(32),sessionRevision:1,recordedAt:['timestamp',1700000000,0]},
+        documents:[{path:'serverUsers/encoding-limit-uid/account/current',data:{value:1}}],namespaces:[]};
+    const beforeAllocation=operation=>{let count=0;const alloc=Buffer.alloc;Buffer.alloc=(...args)=>{count++;return alloc(...args);};
+        try{assert.throws(operation,/assembly bytes|reservation is incomplete|assembly nodes|assembly deadline|assembly passes/);}finally{Buffer.alloc=alloc;}
+        assert.equal(count,0);};
+    for(const fault of [{bytes:8},{nodes:2}]){
+        const limited=assemblyHelperFaults(fault),token=limited.createRecoveryAuditAssemblyBudget();limited.reserveRecoveryAuditRawInputs(token,[]);
+        beforeAllocation(()=>limited.prepareRecoveryAuditCandidateEncoding(fixed,token));
+    }
+    const reserved=helper.createRecoveryAuditAssemblyBudget();helper.reserveRecoveryAuditRawInputs(reserved,[Buffer.from('not-consumed')]);
+    beforeAllocation(()=>helper.prepareRecoveryAuditCandidateEncoding(fixed,reserved));
+    const token=helper.createRecoveryAuditAssemblyBudget();helper.reserveRecoveryAuditRawInputs(token,[]);
+    helper.prepareRecoveryAuditCandidateEncoding(fixed,token);const cacheBytes=helper.recoveryAuditAssemblyUsage(token).bytes;
+    const outputBytes=helper.encodeRecoveryAuditCandidate({...fixed,absences:[]}).length;
+    const limited=assemblyHelperFaults({bytes:cacheBytes+outputBytes-1}),byteToken=limited.createRecoveryAuditAssemblyBudget();
+    limited.reserveRecoveryAuditRawInputs(byteToken,[]);const encode=limited.prepareRecoveryAuditCandidateEncoding(fixed,byteToken);
+    beforeAllocation(()=>encode([]));
+    let now=0;const timed=assemblyHelperFaults({clock:()=>now}),timeToken=timed.createRecoveryAuditAssemblyBudget();
+    timed.reserveRecoveryAuditRawInputs(timeToken,[]);const timeEncode=timed.prepareRecoveryAuditCandidateEncoding(fixed,timeToken);
+    now=30001;beforeAllocation(()=>timeEncode([]));
+    const passes=helper.createRecoveryAuditAssemblyBudget();helper.reserveRecoveryAuditRawInputs(passes,[]);
+    const many=helper.prepareRecoveryAuditCandidateEncoding(fixed,passes);for(let index=0;index<64;index++)many([]);
+    beforeAllocation(()=>many([]));
+});
 
 test('fixed assembly token protects reserved raw bytes, terminal reservations, node/pass/deadline limits and charges closed-view late reads',async()=>{
     const helper=require('../functions/src/recovery-audit-artifact'),m=await closedFixture(),db=queryDb(m.h.dependencies.db);

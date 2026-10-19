@@ -126,7 +126,7 @@ function createSessionAuthority({db,FieldValue,HttpsError,now=Date.now}){
         }
     }
 
-    async function run(request,operation,mode="ordinary",auditId=null){
+    async function run(request,operation,mode="ordinary",auditId=null,publicationOperationId=null){
         return db.runTransaction(async transaction=>{
             const session=await requireActiveSession(transaction,request);
             const fencePath=`serverUsers/${session.uid}/${RECOVERY_AUDIT_FENCE_COLLECTION}/current`;
@@ -151,7 +151,10 @@ function createSessionAuthority({db,FieldValue,HttpsError,now=Date.now}){
                         const proofPageId=reference?.path?.startsWith(proofPagePrefix)?reference.path.slice(proofPagePrefix.length):null;
                         const chunkId=reference?.path?.startsWith(chunkPrefix)?reference.path.slice(chunkPrefix.length):null;
                         const inventoryState=reference?.path===`${auditPath}/${RECOVERY_INVENTORY_STATE_COLLECTION}/current`;
+                        const publication=publicationOperationId!==null&&reference?.path===
+                            `${auditPath}/candidatePublications/${publicationOperationId}`&&["create","update"].includes(method);
                         if(![fencePath,auditPath].includes(reference?.path)&&
+                           !publication&&
                            !((inventoryState||proofState)&&["create","set"].includes(method))&&
                            !(method==="create"&&(/^[A-Za-z0-9_-]{16,64}$/.test(proofPageId||"")||/^[A-Za-z0-9_-]{16,64}_0[0-7]$/.test(chunkId||"")))&&
                            !(method==="create"&&/^[A-Za-z0-9_-]{16,64}$/.test(pageId||"")))fail("RECOVERY_AUDIT_WRITE_SCOPE");
@@ -166,9 +169,10 @@ function createSessionAuthority({db,FieldValue,HttpsError,now=Date.now}){
         });
     }
     function runProtected(request,operation){return run(request,operation);}
-    function runRecoveryAuditMaintenance(request,auditId,operation){
-        if(!/^[A-Za-z0-9_-]{16,64}$/.test(auditId||"")||typeof operation!=="function")fail("RECOVERY_AUDIT_INVALID");
-        return run(request,operation,"maintenance",auditId);
+    function runRecoveryAuditMaintenance(request,auditId,operation,publicationOperationId=null){
+        if(!/^[A-Za-z0-9_-]{16,64}$/.test(auditId||"")||typeof operation!=="function"||
+           (publicationOperationId!==null&&!/^[A-Za-z0-9_-]{16,64}$/.test(publicationOperationId)))fail("RECOVERY_AUDIT_INVALID");
+        return run(request,operation,"maintenance",auditId,publicationOperationId);
     }
 
     async function revoke(request){

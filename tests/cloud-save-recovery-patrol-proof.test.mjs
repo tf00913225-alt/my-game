@@ -17,7 +17,7 @@ const {createRecoveryArchive}=require('../functions/src/canonical-recovery-archi
 const {assembleCanonicalSnapshot}=require('../functions/src/canonical-snapshot');
 const {snapshotDigest}=require('../functions/src/canonical-snapshot');
 const auditId='proof-component-audit-0001',approvalId='proof-component-approval-01';
-async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus=null,historicalSession=false,zeroHeartbeat=false,beforeAudit=null,currentLoss=true}={}){
+async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus=null,historicalSession=false,zeroHeartbeat=false,beforeAudit=null,currentLoss=true,normal=false}={}){
     const h=storeHarness({optimisticTransactions:true}),sessions=createSessionAuthority(h.dependencies);let authTime=Math.floor(h.clock/1000),session;
     const request=()=>({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid,...(session?{session}:{})}});
     session=await sessions.create(request());
@@ -39,7 +39,7 @@ async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus
         h.data.set(h.root+'/inventory/structural-pressure-item',records.inventory[0]);
         h.data.set(h.root+'/playableSnapshots/3',bundle);h.data.set(h.root+'/recoveryArchives/3',archive);h.data.get(h.save).serverRevision=3;
     }
-    const forest=createCanonicalPatrolSettlement({...deps,randomBytes:size=>Buffer.alloc(size,255)}),tickets=[];let serial=0;
+    const forest=createCanonicalPatrolSettlement({...deps,randomBytes:size=>Buffer.alloc(size,normal?0:255)}),tickets=[];let serial=0;
     const id=name=>`proof-${name}-${String(++serial).padStart(8,'0')}`;
     const reopenId=id('reopen');
     await forest.observePresence(request(),{operationId:reopenId,expectedRevision:h.revision,expectedSequence:0,intent:'reopen',elementBox:'keep'});
@@ -80,7 +80,7 @@ async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus
         session=await sessions.create({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid}});}
     if(battles>=20&&currentLoss)for(const path of [...h.data.keys()])if(['account','characters','economy','inventory','equipment','relics','relicLoadout','progress','claimRecords','claimCheckpoints']
         .some(name=>path.startsWith(h.root+'/'+name+'/')))h.data.delete(path);
-    if(beforeAudit)await beforeAudit(h);
+    if(beforeAudit)await beforeAudit(h,{deps,request});
     await createCanonicalRecoveryApproval(deps).issue({auth:{uid:'proof-operator',token:{cloudSaveOperator:true}},data:{ownerUid:h.uid,operationId:approvalId,sourceRevision:h.revision,ttlSeconds:60}});
     const recovery=createCanonicalCurrentRecovery(deps);await recovery.beginAudit(request(),{operationId:auditId,expectedRevision:h.revision,approvalOperationId:approvalId});
     await recovery.prepareInventory(request(),{auditId,expectedEpoch:1,operationId:'proof-prepare-operation-01'});
@@ -835,6 +835,44 @@ test('actual twenty-battle active and current-loss raw captures assemble through
         assert.deepEqual(material,input);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);assert.equal(f.traces.length,traces);
         t.diagnostic(JSON.stringify({currentLoss,...result.assemblyUsage}));
     }
+});
+
+test('rich twenty-normal-battle multi-character and rested history closes every original byte through a second audit within unchanged assembly limits',async t=>{
+    const f=await fixture({battles:20,three:false,normal:true,rested:true,adStatus:'abandoned',currentLoss:false,
+        beforeAudit:async(h,{deps,request})=>{
+            const characterId=h.data.get(h.root+'/account/current').slots[1];
+            await require('../functions/src/canonical-attribute-allocation').createCanonicalAttributeAllocation(deps).allocateAttributePoint(request(),{
+                operationId:'rich-secondary-attribute',expectedRevision:h.revision,characterId,stat:'attack'});
+            await createCanonicalExpAllocation(deps).allocateSharedExp(request(),{
+                operationId:'rich-secondary-experience',expectedRevision:h.revision,characterId});
+            const full=createCanonicalPatrolSettlement({...deps,randomBytes:size=>Buffer.alloc(size,255)}),ticketId='rich-extra-three-member-ticket';
+            const issued=await full.issueTicket(request(),{operationId:ticketId,expectedRevision:h.revision,
+                triggerEntryId:'forest:0',availableEntryIds:['forest:0','forest:1','forest:2']});
+            assert.equal(issued.members.length,3);
+            for(const memberIndex of [2,0,1])await full.settleMember(request(),{operationId:'rich-three-member-'+memberIndex,
+                expectedRevision:h.revision,ticketId,memberIndex});
+            await full.settleTerminal(request(),{operationId:'rich-three-member-win',expectedRevision:h.revision,ticketId,kind:'win'});
+        }});
+    await f.recovery.cancelAudit(f.request(),{operationId:'rich-cancel-original-audit',auditId,expectedEpoch:1});
+    const selected='rich-second-audit-for-candidate',approval='rich-second-approval-candidate';
+    await createCanonicalRecoveryApproval(f.deps).issue({auth:{uid:'rich-operator',token:{cloudSaveOperator:true}},
+        data:{ownerUid:f.h.uid,operationId:approval,sourceRevision:f.h.revision,ttlSeconds:60}});
+    await f.recovery.beginAudit(f.request(),{operationId:selected,expectedRevision:f.h.revision,approvalOperationId:approval});
+    await f.recovery.prepareInventory(f.request(),{auditId:selected,expectedEpoch:2,operationId:'rich-second-inventory-prepare'});
+    let done=false;for(let sequence=1;!done;sequence++)done=(await f.recovery.captureInventoryPage(f.request(),{
+        auditId:selected,expectedEpoch:2,operationId:'rich-second-inventory-'+String(sequence).padStart(6,'0'),expectedSequence:sequence})).inventoryExhausted;
+    f.root=f.h.root+'/recoveryAuditRuns/'+selected;
+    const material=await completeRawMaterial(f,{id:selected,epoch:2}),before=copy([...f.h.data]),writes=f.h.writes,traces=f.traces.length;
+    assert.equal(material.inventoryState.capturedCount,382);assert.equal(f.tickets.length,20);
+    const recovery=createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)});
+    const result=await recovery.verifyRawRecoveryAuditCandidate(material);
+    assert.equal(result.candidateProofValid,true);assert.equal(result.documentCount,382);assert.equal(result.absenceCount,59);
+    for(const key of ['authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[key],false);
+    const usage=result.assemblyUsage;
+    assert.equal(usage.reservedBytes,0);assert(usage.nodes<=16000000);assert(usage.bytes<=256*1024*1024);
+    assert(usage.operations<=16384);assert(usage.passes<=64);assert(usage.elapsedMs<=30000);
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);assert.equal(f.traces.length,traces);
+    t.diagnostic(JSON.stringify({richPresentDocuments:382,...usage}));
 });
 
 test('assembly B1 admits actual aggregate chunk bytes before any concat/parse and rejects retained semantic corruption without dropping raw records',async()=>{
