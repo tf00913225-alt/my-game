@@ -1722,9 +1722,13 @@ const ownedRequest={auth:{uid:ownedUid,token:claims(ownedUser.idToken)},
     data:{uid:ownedUid,session:ownedSession}};
 await initialWriter.commitInitialSources(ownedRequest,{
     operationId:ownedOperation,expectedRevision:1,selection:choices});
-const ownedRecords=(await db.doc(`serverUsers/${ownedUid}/recoveryArchives/2`).get())
-    .get("sourceRecords");
-const ownedBase={schemaVersion:1,ownerUid:ownedUid,serverRevision:2,
+const ownedInitialEvidence=await Promise.all([
+    `serverUsers/${ownedUid}/operations/${ownedOperation}`,
+    `serverUsers/${ownedUid}/playableSnapshots/2`,
+    `serverUsers/${ownedUid}/recoveryArchives/2`
+].map(async path=>[path,(await db.doc(path).get()).data()]));
+const ownedRecords=structuredClone(ownedInitialEvidence[2][1].sourceRecords);
+const ownedBase={schemaVersion:1,ownerUid:ownedUid,serverRevision:3,
     provenance:"server-created"};
 const ownedItemId="server-owned-starter-blade-0001";
 const ownedCharacterId=ownedRecords.account.slots[0];
@@ -1772,28 +1776,36 @@ ownedRecords.progress.achievementState=ownedAchievementState;
 const ownedSkillLoadout={name:"retained skill label",
     skillLevels:{flameSlash:10,fireRocket:2},equippedSkills:["fireRocket","flameSlash"]};
 ownedRecords.characters[0].skillLoadout=ownedSkillLoadout;
-const ownedBundle=assembleCanonicalSnapshot(ownedUid,2,ownedRecords);
 const ownedRoot=db.collection("serverUsers").doc(ownedUid);
 const ownedItemRef=ownedRoot.collection("inventory").doc(ownedItemId);
 const ownedEquipRef=ownedRoot.collection("equipment").doc(
     `${ownedCharacterId}_hand`);
 const ownedRelicRef=ownedRoot.collection("relics").doc("starter-relic-0001");
-await Promise.all([
-    ownedRoot.collection("characters").doc(ownedCharacterId).update({skillLoadout:ownedSkillLoadout}),
-    ownedItemRef.set(ownedRecords.inventory[0]),
-    ownedEquipRef.set(ownedRecords.equipment[0]),
-    ownedRelicRef.set(ownedRecords.relics[0]),
-    ownedRoot.collection("economy").doc("current").update({sharedExp:320}),
-    ownedRoot.collection("progress").doc("current").update({sidecars:ownedRecords.progress.sidecars,
-        abyssProgress:ownedRecords.progress.abyssProgress,
-        achievementState:ownedAchievementState,...ownedQuestStates,
-        gameplayProgress:ownedGameplayProgress}),
-    ownedRoot.collection("account").doc("current")
-        .update({snapshotSha256:ownedBundle.sha256}),
-    ownedRoot.collection("playableSnapshots").doc("2").set(ownedBundle),
-    ownedRoot.collection("recoveryArchives").doc("2")
-        .set(createRecoveryArchive(ownedUid,2,ownedRecords,ownedBundle))
-]);
+// Preserve the original creation receipt and immutable revision-2 evidence.
+// Enrichment is a separate emulator-only retained revision, never a product writer.
+for(const rows of Object.values(ownedRecords)){
+    for(const row of Array.isArray(rows)?rows:[rows])row.serverRevision=3;
+}
+const ownedFixtureBundle=assembleCanonicalSnapshot(ownedUid,3,ownedRecords);
+const ownedFixtureBatch=db.batch();
+for(const [name,collection] of Object.entries({account:"account",economy:"economy",
+    relicLoadout:"relicLoadout",progress:"progress",claimCheckpoint:"claimCheckpoints"})){
+    ownedFixtureBatch.set(ownedRoot.collection(collection).doc("current"),
+        {...ownedRecords[name],...(name==="account"?{snapshotSha256:ownedFixtureBundle.sha256}:{})});
+}
+for(const [name,key] of Object.entries({characters:row=>row.characterId,
+    inventory:row=>row.ownedItemId,equipment:row=>`${row.characterId}_${row.slot}`,
+    relics:row=>row.relicId,claimRecords:row=>row.claimKey})){
+    for(const row of ownedRecords[name])ownedFixtureBatch.set(ownedRoot.collection(name).doc(key(row)),row);
+}
+ownedFixtureBatch.create(ownedRoot.collection("playableSnapshots").doc("3"),ownedFixtureBundle);
+ownedFixtureBatch.create(ownedRoot.collection("recoveryArchives").doc("3"),
+    createRecoveryArchive(ownedUid,3,ownedRecords,ownedFixtureBundle));
+ownedFixtureBatch.update(db.doc(`users/${ownedUid}/saves/current`),{serverRevision:3});
+await ownedFixtureBatch.commit();
+for(const [path,row] of ownedInitialEvidence)assert.deepEqual((await db.doc(path).get()).data(),row,path);
+assert.equal((await initialWriter.commitInitialSources(ownedRequest,{
+    operationId:ownedOperation,expectedRevision:1,selection:choices})).unchanged,true);
 const ownedGrant="grant-owned-source-gold-0001";
 const ownedCreditOperation="credit-owned-source-gold-0001";
 await ownedRoot.collection("pendingGrants").doc(ownedGrant).set({
@@ -1803,36 +1815,36 @@ await ownedRoot.collection("pendingGrants").doc(ownedGrant).set({
 });
 await invoke("reserveTrustedGrant",ownedUser.idToken,{
     uid:ownedUid,session:ownedSession,grantId:ownedGrant,
-    operationId:ownedCreditOperation,expectedRevision:2});
+    operationId:ownedCreditOperation,expectedRevision:3});
 await goldWriter.creditReservedGrant(ownedRequest,{
-    grantId:ownedGrant,operationId:ownedCreditOperation,expectedRevision:3});
-assert.equal((await ownedItemRef.get()).get("serverRevision"),4);
-assert.equal((await ownedEquipRef.get()).get("serverRevision"),4);
-assert.equal((await ownedRelicRef.get()).get("serverRevision"),4);
+    grantId:ownedGrant,operationId:ownedCreditOperation,expectedRevision:4});
+assert.equal((await ownedItemRef.get()).get("serverRevision"),5);
+assert.equal((await ownedEquipRef.get()).get("serverRevision"),5);
+assert.equal((await ownedRelicRef.get()).get("serverRevision"),5);
 assert.equal((await ownedRoot.collection("claimCheckpoints").doc("current").get())
     .get("claimCount"),1);
 const ownedCharacterRef=ownedRoot.collection("characters").doc(ownedCharacterId);
 assert.deepEqual((await ownedCharacterRef.get()).get("skillLoadout"),ownedSkillLoadout);
-assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
     .get("sourceRecords.characters")[0].skillLoadout,ownedSkillLoadout);
 assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
     .get("achievementState"),ownedAchievementState);
-assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
     .get("sourceRecords.progress.achievementState"),ownedAchievementState);
 for(const [key,state] of Object.entries(ownedQuestStates)){
     assert.deepEqual((await ownedRoot.collection("progress").doc("current").get()).get(key),state);
-    assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+    assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
         .get(`sourceRecords.progress.${key}`),state);
 }
 assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
     .get("gameplayProgress"),ownedGameplayProgress);
-assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
     .get("sourceRecords.progress.gameplayProgress"),ownedGameplayProgress);
 const ownedAllocation="allocate-owned-source-exp-0001";
 // Corrupt only the emulator fixture and reseal its current snapshot so a
 // matching hash cannot substitute for complete retained character evidence.
 const ownedState4=(await ownedCharacterRef.get()).get("state");
-const ownedSnapshotRef4=ownedRoot.collection("playableSnapshots").doc("4");
+const ownedSnapshotRef4=ownedRoot.collection("playableSnapshots").doc("5");
 const ownedSnapshot4=(await ownedSnapshotRef4.get()).data();
 const incompleteState4={...ownedState4};delete incompleteState4.agility;
 const incompleteSnapshot4={...ownedSnapshot4,
@@ -1846,13 +1858,13 @@ await Promise.all([
     ownedRoot.collection("account").doc("current").update({snapshotSha256:incompleteSnapshot4.sha256})
 ]);
 await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
-    operationId:ownedAllocation,expectedRevision:4}),error=>error.code==="data-loss");
+    operationId:ownedAllocation,expectedRevision:5}),error=>error.code==="data-loss");
 assert.equal((await ownedRoot.collection("operations").doc(ownedAllocation).get()).exists,false);
-assert.equal((await ownedRoot.collection("playableSnapshots").doc("5").get()).exists,false);
-assert.equal((await ownedRoot.collection("recoveryArchives").doc("5").get()).exists,false);
-assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),4);
+assert.equal((await ownedRoot.collection("playableSnapshots").doc("6").get()).exists,false);
+assert.equal((await ownedRoot.collection("recoveryArchives").doc("6").get()).exists,false);
+assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),5);
 assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("sharedExp"),320);
-assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
     .get("sourceRecords.characters")[0].state,ownedState4);
 await Promise.all([
     ownedCharacterRef.update({state:ownedState4}),ownedSnapshotRef4.set(ownedSnapshot4),
@@ -1873,13 +1885,13 @@ await Promise.all([
     ownedSnapshotRef4.set(incompleteFormationSnapshot4)
 ]);
 await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
-    operationId:ownedAllocation,expectedRevision:4}),error=>error.code==="data-loss");
+    operationId:ownedAllocation,expectedRevision:5}),error=>error.code==="data-loss");
 assert.equal((await ownedRoot.collection("operations").doc(ownedAllocation).get()).exists,false);
-assert.equal((await ownedRoot.collection("playableSnapshots").doc("5").get()).exists,false);
-assert.equal((await ownedRoot.collection("recoveryArchives").doc("5").get()).exists,false);
-assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),4);
+assert.equal((await ownedRoot.collection("playableSnapshots").doc("6").get()).exists,false);
+assert.equal((await ownedRoot.collection("recoveryArchives").doc("6").get()).exists,false);
+assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),5);
 assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("sharedExp"),320);
-assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
     .get("sourceRecords.account.formation"),ownedFormation4);
 await Promise.all([
     ownedAccountRef4.update({formation:ownedFormation4,snapshotSha256:ownedSnapshot4.sha256}),
@@ -1900,13 +1912,13 @@ for(const badAchievementState4 of [{firstBattle:"true"},{firstBattle:{claimed:tr
         ownedAccountRef4.update({snapshotSha256:badAchievementSnapshot4.sha256})
     ]);
     await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
-        operationId:ownedAllocation,expectedRevision:4}),error=>error.code==="data-loss");
+        operationId:ownedAllocation,expectedRevision:5}),error=>error.code==="data-loss");
     assert.equal((await ownedRoot.collection("operations").doc(ownedAllocation).get()).exists,false);
-    assert.equal((await ownedRoot.collection("playableSnapshots").doc("5").get()).exists,false);
-    assert.equal((await ownedRoot.collection("recoveryArchives").doc("5").get()).exists,false);
-    assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),4);
+    assert.equal((await ownedRoot.collection("playableSnapshots").doc("6").get()).exists,false);
+    assert.equal((await ownedRoot.collection("recoveryArchives").doc("6").get()).exists,false);
+    assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),5);
     assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("sharedExp"),320);
-    assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+    assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
         .get("sourceRecords.progress.achievementState"),ownedAchievementState);
 }
 await Promise.all([
@@ -1931,17 +1943,17 @@ for(const [key,state] of Object.entries(ownedQuestStates)){
             ownedAccountRef4.update({snapshotSha256:badQuestSnapshot4.sha256})
         ]);
         await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
-            operationId:ownedAllocation,expectedRevision:4}),error=>error.code==="data-loss");
+            operationId:ownedAllocation,expectedRevision:5}),error=>error.code==="data-loss");
         assert.equal((await ownedRoot.collection("operations").doc(ownedAllocation).get()).exists,false);
-        assert.equal((await ownedRoot.collection("playableSnapshots").doc("5").get()).exists,false);
-        assert.equal((await ownedRoot.collection("recoveryArchives").doc("5").get()).exists,false);
-        assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),4);
-        assert.equal((await ownedAccountRef4.get()).get("serverRevision"),4);
+        assert.equal((await ownedRoot.collection("playableSnapshots").doc("6").get()).exists,false);
+        assert.equal((await ownedRoot.collection("recoveryArchives").doc("6").get()).exists,false);
+        assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),5);
+        assert.equal((await ownedAccountRef4.get()).get("serverRevision"),5);
         const retainedEconomy4=(await ownedRoot.collection("economy").doc("current").get()).data();
         assert.equal(retainedEconomy4.sharedExp,320);
         assert.equal(retainedEconomy4.gold,ownedSnapshot4.snapshot.economy.gold);
         for(const [retainedKey,retainedState] of Object.entries(ownedQuestStates)){
-            assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+            assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
                 .get(`sourceRecords.progress.${retainedKey}`),retainedState);
         }
         await Promise.all([
@@ -1968,16 +1980,16 @@ for(const mutate of [s=>s.personal["personal-20"].firstClear="true",
         ownedAccountRef4.update({snapshotSha256:badGameplaySnapshot4.sha256})
     ]);
     await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
-        operationId:ownedAllocation,expectedRevision:4}),error=>error.code==="data-loss");
+        operationId:ownedAllocation,expectedRevision:5}),error=>error.code==="data-loss");
     assert.equal((await ownedRoot.collection("operations").doc(ownedAllocation).get()).exists,false);
-    assert.equal((await ownedRoot.collection("playableSnapshots").doc("5").get()).exists,false);
-    assert.equal((await ownedRoot.collection("recoveryArchives").doc("5").get()).exists,false);
-    assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),4);
-    assert.equal((await ownedAccountRef4.get()).get("serverRevision"),4);
+    assert.equal((await ownedRoot.collection("playableSnapshots").doc("6").get()).exists,false);
+    assert.equal((await ownedRoot.collection("recoveryArchives").doc("6").get()).exists,false);
+    assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),5);
+    assert.equal((await ownedAccountRef4.get()).get("serverRevision"),5);
     const retainedGameplayEconomy4=(await ownedRoot.collection("economy").doc("current").get()).data();
     assert.equal(retainedGameplayEconomy4.sharedExp,320);
     assert.equal(retainedGameplayEconomy4.gold,ownedSnapshot4.snapshot.economy.gold);
-    assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("4").get())
+    assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
         .get("sourceRecords.progress.gameplayProgress"),ownedGameplayProgress);
     await Promise.all([
         ownedProgressRef4.update({gameplayProgress:ownedGameplayProgress}),
@@ -1987,55 +1999,55 @@ for(const mutate of [s=>s.personal["personal-20"].firstClear="true",
 }
 await ownedCharacterRef.update({skillLoadout:{...ownedSkillLoadout,equippedSkills:["flameSlash","flameSlash"]}});
 await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
-    operationId:ownedAllocation,expectedRevision:4}),error=>error.code==="data-loss");
+    operationId:ownedAllocation,expectedRevision:5}),error=>error.code==="data-loss");
 assert.equal((await ownedRoot.collection("operations").doc(ownedAllocation).get()).exists,false);
-assert.equal((await ownedRoot.collection("recoveryArchives").doc("5").get()).exists,false);
-assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),4);
+assert.equal((await ownedRoot.collection("recoveryArchives").doc("6").get()).exists,false);
+assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),5);
 assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("sharedExp"),320);
 await ownedCharacterRef.update({skillLoadout:ownedSkillLoadout});
 await ownedEquipRef.update({ownedItemId:"missing-owned-item"});
 await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
-    operationId:ownedAllocation,expectedRevision:4}),
+    operationId:ownedAllocation,expectedRevision:5}),
     error=>error.code==="data-loss");
 assert.equal((await ownedRoot.collection("operations").doc(ownedAllocation).get()).exists,false);
 assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("sharedExp"),320);
 await ownedEquipRef.update({ownedItemId});
 const ownedAllocated=await expAllocator.allocateSharedExp(ownedRequest,{
-    operationId:ownedAllocation,expectedRevision:4});
-assert.equal(ownedAllocated.allocatedRevision,5);
+    operationId:ownedAllocation,expectedRevision:5});
+assert.equal(ownedAllocated.allocatedRevision,6);
 assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
     .get("gameplayProgress"),ownedGameplayProgress);
-assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("6").get())
     .get("sourceRecords.progress.gameplayProgress"),ownedGameplayProgress);
 
 for(const [key,state] of Object.entries(ownedQuestStates)){
     assert.deepEqual((await ownedProgressRef4.get()).get(key),state);
-    assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
+    assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("6").get())
         .get(`sourceRecords.progress.${key}`),state);
 }
 assert.deepEqual((await ownedProgressRef4.get()).get("achievementState"),ownedAchievementState);
-assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("6").get())
     .get("sourceRecords.progress.achievementState"),ownedAchievementState);
 assert.deepEqual((await ownedCharacterRef.get()).get("skillLoadout"),ownedSkillLoadout);
-assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("5").get())
+assert.deepEqual((await ownedRoot.collection("recoveryArchives").doc("6").get())
     .get("sourceRecords.characters")[0].skillLoadout,ownedSkillLoadout);
-assert.equal((await ownedItemRef.get()).get("serverRevision"),5);
+assert.equal((await ownedItemRef.get()).get("serverRevision"),6);
 assert.equal((await ownedEquipRef.get()).get("ownedItemId"),ownedItemId);
-assert.equal((await ownedEquipRef.get()).get("serverRevision"),5);
-assert.equal((await ownedRelicRef.get()).get("serverRevision"),5);
+assert.equal((await ownedEquipRef.get()).get("serverRevision"),6);
+assert.equal((await ownedRelicRef.get()).get("serverRevision"),6);
 assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("sharedExp"),20);
-assert.equal((await ownedRoot.collection("playableSnapshots").doc("5").get())
+assert.equal((await ownedRoot.collection("playableSnapshots").doc("6").get())
     .get("readyForPublication"),false);
 // Spend one server-earned ability point without accepting a browser stat value
 // or refilling current HP/SP. Retain equipped ownership in the same revision.
 const attributeAllocator=createCanonicalAttributeAllocation({db,FieldValue,HttpsError,
     inspectExistingEnvelope,nextRevision,runProtected:writerSessions.runProtected});
 const attributeOperation="allocate-attribute-vitality-0001";
-const attributeArgs={operationId:attributeOperation,expectedRevision:5,stat:"vitality"};
+const attributeArgs={operationId:attributeOperation,expectedRevision:6,stat:"vitality"};
 await assert.rejects(attributeAllocator.allocateAttributePoint(ownedRequest,
     {...attributeArgs,stat:"gold"}),error=>error.code==="invalid-argument");
 await assert.rejects(attributeAllocator.allocateAttributePoint(ownedRequest,
-    {...attributeArgs,expectedRevision:4}),error=>error.code==="aborted");
+    {...attributeArgs,expectedRevision:5}),error=>error.code==="aborted");
 let abortAttribute=true;
 const rollbackAttribute=createCanonicalAttributeAllocation({db,FieldValue,HttpsError,
     inspectExistingEnvelope,nextRevision,
@@ -2048,11 +2060,11 @@ await assert.rejects(rollbackAttribute.allocateAttributePoint(ownedRequest,attri
     /simulated attribute rollback/);
 abortAttribute=false;
 assert.equal((await ownedRoot.collection("operations").doc(attributeOperation).get()).exists,false);
-assert.equal((await ownedRoot.collection("recoveryArchives").doc("6").get()).exists,false);
-assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),5);
+assert.equal((await ownedRoot.collection("recoveryArchives").doc("7").get()).exists,false);
+assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),6);
 const assigned=await attributeAllocator.allocateAttributePoint(ownedRequest,attributeArgs);
-assert.equal(assigned.allocatedRevision,6);
-const assignedArchive=await checkRecoveryArchive(ownedUid,6);
+assert.equal(assigned.allocatedRevision,7);
+const assignedArchive=await checkRecoveryArchive(ownedUid,7);
 assert.equal(assignedArchive.get("sourceRecords.inventory")[0].ownedItemId,ownedItemId);
 assert.equal(assigned.statAfter,3);
 assert.equal(assigned.pointsAfter,4);
@@ -2062,26 +2074,26 @@ assert.equal(assignedState.hp,200);
 assert.equal(assignedState.sp,80);
 assert.equal(assignedState.vitality,3);
 assert.equal(assignedState.attributePoints,4);
-assert.equal((await ownedItemRef.get()).get("serverRevision"),6);
+assert.equal((await ownedItemRef.get()).get("serverRevision"),7);
 assert.equal((await ownedEquipRef.get()).get("ownedItemId"),ownedItemId);
-assert.equal((await ownedRelicRef.get()).get("serverRevision"),6);
+assert.equal((await ownedRelicRef.get()).get("serverRevision"),7);
 assert.equal((await ownedRoot.collection("claimRecords").doc(ownedGrant).get())
-    .get("serverRevision"),6);
+    .get("serverRevision"),7);
 assert.equal((await ownedRoot.collection("claimCheckpoints").doc("current").get())
     .get("claimCount"),1);
 assert.equal((await ownedRoot.collection("ledgerEntries")
     .doc(attributeOperation).get()).get("amount"),-1);
-assert.equal((await ownedRoot.collection("playableSnapshots").doc("6").get())
+assert.equal((await ownedRoot.collection("playableSnapshots").doc("7").get())
     .get("readyForPublication"),false);
 assert.equal((await attributeAllocator.allocateAttributePoint(ownedRequest,attributeArgs))
     .unchanged,true);
 await assert.rejects(attributeAllocator.allocateAttributePoint(ownedRequest,{
-    operationId:ownedCreditOperation,expectedRevision:6,stat:"vitality"}),
+    operationId:ownedCreditOperation,expectedRevision:7,stat:"vitality"}),
     error=>error.code==="failed-precondition");
 // An operator-approved same-head repair advances the canonical revision while
 // retaining unique claims, operation receipts and the immutable original.
 const recoveryOperation="recover-current-owned-source-0001";
-const recoveryArgs={operationId:recoveryOperation,expectedRevision:6};
+const recoveryArgs={operationId:recoveryOperation,expectedRevision:7};
 const recovery=createCanonicalCurrentRecovery({db,FieldValue,HttpsError,
     inspectExistingEnvelope,nextRevision,runProtected:writerSessions.runProtected});
 await assert.rejects(recovery.restoreCurrent(ownedRequest,recoveryArgs),
@@ -2099,7 +2111,7 @@ const approvalIssuer=createCanonicalRecoveryApproval({
 });
 const approvalRef=ownedRoot.collection("recoveryApprovals").doc(recoveryOperation);
 const approvalPayload={ownerUid:ownedUid,operationId:recoveryOperation,
-    sourceRevision:6,ttlSeconds:120};
+    sourceRevision:7,ttlSeconds:120};
 await assert.rejects(approvalIssuer.issue({
     auth:{uid:"emulator-non-operator",token:{cloudSaveOperator:false}},
     data:approvalPayload
@@ -2134,8 +2146,8 @@ for(const patch of [{schemaVersion:FieldValue.delete()},{schemaVersion:2},
     assert.deepEqual((await db.doc(`users/${ownedUid}/saves/current`).get()).data(),approvalTypeEnvelope);
     assert.equal((await ownedRoot.collection("operations").doc(recoveryOperation).get()).exists,false);
     assert.equal((await ownedRoot.collection("recoveryAudits").doc(recoveryOperation).get()).exists,false);
-    assert.equal((await ownedRoot.collection("playableSnapshots").doc("7").get()).exists,false);
-    assert.equal((await ownedRoot.collection("recoveryArchives").doc("7").get()).exists,false);
+    assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get()).exists,false);
+    assert.equal((await ownedRoot.collection("recoveryArchives").doc("8").get()).exists,false);
     await approvalRef.set(approvalTypeBefore);
 }
 console.log("Recovery approval identity real Firestore PASS: missing/unsupported schema and kind refused by issuer and first restore without writes.");
@@ -2152,7 +2164,7 @@ await assert.rejects(recovery.restoreCurrent(ownedRequest,recoveryArgs),
     error=>error.code==="data-loss");
 await assignedArchive.ref.set(oldArchive);
 const unexpectedClaim=ownedRoot.collection("claimRecords").doc("unexpected-recovery-claim");
-await unexpectedClaim.set({schemaVersion:1,ownerUid:ownedUid,serverRevision:6,
+await unexpectedClaim.set({schemaVersion:1,ownerUid:ownedUid,serverRevision:7,
     provenance:"server-created",claimKey:"unexpected-recovery-claim",status:"claimed"});
 await assert.rejects(recovery.restoreCurrent(ownedRequest,recoveryArgs),
     error=>error.code==="data-loss");
@@ -2171,26 +2183,26 @@ const rollbackRecovery=createCanonicalCurrentRecovery({db,FieldValue,HttpsError,
 await assert.rejects(rollbackRecovery.restoreCurrent(ownedRequest,recoveryArgs),
     /simulated recovery rollback/);
 abortRecovery=false;
-assert.equal((await ownedRoot.collection("recoveryArchives").doc("7").get()).exists,false);
+assert.equal((await ownedRoot.collection("recoveryArchives").doc("8").get()).exists,false);
 assert.equal((await ownedRoot.collection("operations").doc(recoveryOperation).get()).exists,false);
 assert.equal((await approvalRef.get()).get("status"),"approved");
 const recovered=await invoke("restoreCanonicalCurrent",ownedUser.idToken,recoveryPayload);
-assert.equal(recovered.restoredRevision,7);
-assert.equal((await ownedItemRef.get()).get("serverRevision"),7);
+assert.equal(recovered.restoredRevision,8);
+assert.equal((await ownedItemRef.get()).get("serverRevision"),8);
 assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("gold"),originalGold);
 assert.equal((await ownedRoot.collection("claimRecords").doc(ownedGrant).get())
-    .get("serverRevision"),7);
+    .get("serverRevision"),8);
 assert.equal((await ownedRoot.collection("recoveryAudits").doc(recoveryOperation).get())
-    .get("sourceRevision"),6);
+    .get("sourceRevision"),7);
 assert.equal((await approvalRef.get()).get("status"),"used");
-const recoveredOwnedArchive=await checkRecoveryArchive(ownedUid,7);
+const recoveredOwnedArchive=await checkRecoveryArchive(ownedUid,8);
 assert.deepEqual(recoveredOwnedArchive.get("sourceRecords.progress.playableState"),
     ownedRecords.progress.playableState);
 assert.deepEqual(recoveredOwnedArchive.get("sourceRecords.progress.sidecars"),ownedRecords.progress.sidecars);
 assert.deepEqual(recoveredOwnedArchive.get("sourceRecords.progress.abyssProgress"),ownedRecords.progress.abyssProgress);
 assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
     .get("abyssProgress"),ownedRecords.progress.abyssProgress);
-assert.equal(recoveredOwnedArchive.get("sourceRecords.progress.serverRevision"),7);
+assert.equal(recoveredOwnedArchive.get("sourceRecords.progress.serverRevision"),8);
 assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
     .get("playableState"),ownedRecords.progress.playableState);
 assert.deepEqual((await ownedRoot.collection("progress").doc("current").get())
@@ -2210,7 +2222,7 @@ for(const [ref,patch] of [
     [approvalRef,{kind:FieldValue.delete()}],
     [approvalRef,{kind:"canonical-current-recovery"}],
     [approvalRef,{ownerUid:"other-recovery-owner"}],
-    [approvalRef,{sourceRevision:5}],
+    [approvalRef,{sourceRevision:6}],
     [approvalRef,{sourceSha256:"a".repeat(64)}],
     [approvalRef,{snapshotSha256:"b".repeat(64)}],
     [approvalRef,{approvedBy:"other-operator"}],
@@ -2236,19 +2248,19 @@ assert.equal((await recoveredOwnedArchive.ref.get()).get("readyForRestore"),fals
 assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("authoritativeStateReady"),false);
 console.log("Recovery replay original evidence real Firestore PASS: missing/corrupt archive, approval/audit tampering refused; expired original replay retained without revision or authority changes.");
 assert.equal((await goldWriter.creditReservedGrant(ownedRequest,{
-    grantId:ownedGrant,operationId:ownedCreditOperation,expectedRevision:3}))
+    grantId:ownedGrant,operationId:ownedCreditOperation,expectedRevision:4}))
     .unchanged,true);
 assert.equal((await attributeAllocator.allocateAttributePoint(ownedRequest,attributeArgs))
     .unchanged,true);
 await assert.rejects(recovery.restoreCurrent(ownedRequest,{
-    operationId:"recover-current-owned-source-0002",expectedRevision:6}),
+    operationId:"recover-current-owned-source-0002",expectedRevision:7}),
     error=>error.code==="aborted");
 // A server-priced purchase spends credited gold and creates one owned bag
 // stack at the same canonical revision. Neither a browser price nor a balance
 // is accepted; receipt replay cannot buy the item a second time.
 const shop=createCanonicalShopPurchase({db,FieldValue,HttpsError,
     inspectExistingEnvelope,nextRevision,runProtected:writerSessions.runProtected});
-const shopArgs={operationId:"shop-potion-owned-source-0001",expectedRevision:7,
+const shopArgs={operationId:"shop-potion-owned-source-0001",expectedRevision:8,
     itemId:"hpPotion10",quantity:1};
 await assert.rejects(shop.purchase(ownedRequest,{...shopArgs,itemId:"hpPotion50"}),
     error=>error.code==="invalid-argument");
@@ -2256,7 +2268,7 @@ await assert.rejects(shop.purchase(ownedRequest,{...shopArgs,quantity:1000}),
     error=>error.code==="invalid-argument");
 await assert.rejects(shop.purchase(ownedRequest,{...shopArgs,quantity:2}),
     error=>error.code==="failed-precondition");
-await assert.rejects(shop.purchase(ownedRequest,{...shopArgs,expectedRevision:6}),
+await assert.rejects(shop.purchase(ownedRequest,{...shopArgs,expectedRevision:7}),
     error=>error.code==="aborted");
 const shopEconomyRef=ownedRoot.collection("economy").doc("current");
 await shopEconomyRef.update({gold:999});
@@ -2277,34 +2289,34 @@ abortShop=false;
 const shopItemRef=ownedRoot.collection("inventory").doc(`shop-${shopArgs.operationId}`);
 assert.equal((await shopItemRef.get()).exists,false);
 assert.equal((await ownedRoot.collection("operations").doc(shopArgs.operationId).get()).exists,false);
-assert.equal((await ownedRoot.collection("recoveryArchives").doc("8").get()).exists,false);
+assert.equal((await ownedRoot.collection("recoveryArchives").doc("9").get()).exists,false);
 const purchased=await shop.purchase(ownedRequest,shopArgs);
-assert.equal(purchased.purchasedRevision,8);
+assert.equal(purchased.purchasedRevision,9);
 assert.equal(purchased.cost,20);
 assert.equal((await shopEconomyRef.get()).get("gold"),originalGold-20);
 assert.equal((await shopItemRef.get()).get("state.count"),1);
-assert.equal((await ownedItemRef.get()).get("serverRevision"),8);
+assert.equal((await ownedItemRef.get()).get("serverRevision"),9);
 assert.equal((await ownedRoot.collection("claimRecords").doc(ownedGrant).get())
-    .get("serverRevision"),8);
+    .get("serverRevision"),9);
 assert.equal((await ownedRoot.collection("ledgerEntries").doc(shopArgs.operationId).get())
     .get("amount"),-20);
 assert.equal((await shop.purchase(ownedRequest,shopArgs)).unchanged,true);
 assert.equal((await shopEconomyRef.get()).get("gold"),originalGold-20);
 await assert.rejects(shop.purchase(ownedRequest,{...shopArgs,quantity:2}),
     error=>error.code==="data-loss");
-await checkRecoveryArchive(ownedUid,8);
-assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
+await checkRecoveryArchive(ownedUid,9);
+assert.equal((await ownedRoot.collection("playableSnapshots").doc("9").get())
     .get("readyForPublication"),false);
 // Rehearse loss of every current canonical domain, not just one damaged value.
 // Retained envelope, immutable snapshot/archive and operator approval survive.
 // This is the existing single-character/current-revision lane, emulator only.
 {
     const {source}=require("../functions/src/canonical-owned-sources.js");
-    const archived=(await checkRecoveryArchive(ownedUid,8)).get("sourceRecords");
+    const archived=(await checkRecoveryArchive(ownedUid,9)).get("sourceRecords");
     const operationId="recover-all-current-sources-0001";
     const approval=ownedRoot.collection("recoveryApprovals").doc(operationId);
     const envelopeRef=db.doc(`users/${ownedUid}/saves/current`);
-    const intent={operationId,expectedRevision:8};
+    const intent={operationId,expectedRevision:9};
     const singles={account:"account",economy:"economy",progress:"progress",
         relicLoadout:"relicLoadout",claimCheckpoint:"claimCheckpoints"};
     const sets={characters:row=>row.characterId,inventory:row=>row.ownedItemId,
@@ -2324,9 +2336,10 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     };
     for(const name of Object.keys(sets))assert.ok(archived[name].length>0,name);
     const current=documentMap(archived);
+    assert.equal(current.size,11);
     assert.equal(new Set([...current.keys()].map(path=>path.split("/").at(-2))).size,10);
     await approvalIssuer.issue({auth:{uid:"emulator-operator",token:{cloudSaveOperator:true}},
-        data:{ownerUid:ownedUid,operationId,sourceRevision:8,ttlSeconds:900}});
+        data:{ownerUid:ownedUid,operationId,sourceRevision:9,ttlSeconds:900}});
     // Takeover legitimately changes private session records. Capture the loss
     // baseline afterwards so every restore assertion also protects those records.
     while(Math.floor(Date.now()/1000)<=claims(ownedUser.idToken).auth_time){
@@ -2347,7 +2360,7 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     await reservedGrantRef.set({schemaVersion:1,ownerUid:ownedUid,source:"server-event",
         kind:"exp",amount:30,status:"reserved",claimedByOperationId:reservedOperationId,createdAt:reservedStamp});
     await reservedReceiptRef.set({schemaVersion:1,ownerUid:ownedUid,grantId:reservedGrantId,
-        operationId:reservedOperationId,kind:"exp",amount:30,serverRevision:7,
+        operationId:reservedOperationId,kind:"exp",amount:30,serverRevision:8,
         creditedToCharacter:false,createdAt:reservedStamp});
     // Issue an actual pending grant through the original Owner before source
     // loss. Recovery must retain it without reserving or crediting its value.
@@ -2370,7 +2383,7 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
 
     // Unknown claim rights cannot be hidden by restoring the retained archive.
     const unknown=ownedRoot.collection("claimRecords").doc("rehearsal-unknown-claim");
-    await unknown.set({schemaVersion:1,ownerUid:ownedUid,serverRevision:8,
+    await unknown.set({schemaVersion:1,ownerUid:ownedUid,serverRevision:9,
         provenance:"server-created",claimKey:unknown.id,status:"claimed"});
     const withUnknown=await dump();
     await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
@@ -2381,7 +2394,7 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     // original credit proof still have to agree before any repair writes.
     const independentClaim=ownedRoot.collection("uniqueClaims").doc("rehearsal-later-independent-claim");
     await independentClaim.set({schemaVersion:1,ownerUid:ownedUid,
-        grantId:independentClaim.id,operationId:"rehearsal-later-credit-0001",creditRevision:10});
+        grantId:independentClaim.id,operationId:"rehearsal-later-credit-0001",creditRevision:11});
     const withIndependent=await dump();
     await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
     assert.deepEqual(await dump(),withIndependent);
@@ -2412,12 +2425,12 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     const orphanReceipt=ownedRoot.collection("grantOperations").doc("rehearsal-orphaned-credit-0001");
     const originalCredit=(await creditProof[2].get()).data();
     await orphanReceipt.set({...originalCredit,operationId:orphanReceipt.id,
-        grantId:"rehearsal-orphaned-grant-0001",serverRevision:9,creditRevision:10});
+        grantId:"rehearsal-orphaned-grant-0001",serverRevision:10,creditRevision:11});
     const withOrphanReceipt=await dump();
     await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
     assert.deepEqual(await dump(),withOrphanReceipt);await orphanReceipt.delete();
     const reservedReceipt=(await reservedReceiptRef.get()).data();
-    for(const patch of [{creditedToCharacter:"false"},{serverRevision:10},{ownerUid:"foreign-owner"}]){
+    for(const patch of [{creditedToCharacter:"false"},{serverRevision:11},{ownerUid:"foreign-owner"}]){
         await reservedReceiptRef.update(patch);const badReservation=await dump();
         await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
         assert.deepEqual(await dump(),badReservation);await reservedReceiptRef.set(reservedReceipt);
@@ -2429,7 +2442,7 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     // claim index are both gone. Existing purchase/EXP debits remain supported.
     const orphanLedger=ownedRoot.collection("ledgerEntries").doc("rehearsal-orphaned-ledger-0001");
     await orphanLedger.set({...originalLedger,operationId:orphanLedger.id,
-        grantId:"rehearsal-orphaned-grant-0001",creditRevision:10});
+        grantId:"rehearsal-orphaned-grant-0001",creditRevision:11});
     const withOrphanLedger=await dump();
     await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
     assert.deepEqual(await dump(),withOrphanLedger);await orphanLedger.delete();
@@ -2447,7 +2460,7 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
         await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
         assert.deepEqual(await dump(),missingDebit);await debitRef.set(debit);
         const field=debit.kind==="shop-purchase"?"purchasedRevision":"allocatedRevision";
-        await debitRef.update({[field]:10});const laterDebit=await dump();
+        await debitRef.update({[field]:11});const laterDebit=await dump();
         await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
         assert.deepEqual(await dump(),laterDebit);await debitRef.set(debit);
         await debitLedgerRef.update({amount:debitLedger.amount-1});const corruptDebit=await dump();
@@ -2457,6 +2470,30 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     assert.deepEqual(await dump(),damaged);
     console.log("Current recovery ledger inventory real Firestore PASS: orphan ledger and missing/later/corrupt debit proof refuse without writes; original purchase/EXP/attribute ledger history retained for approved restore.");
     console.log("Current recovery debit-receipt inventory real Firestore PASS: original purchase/EXP/attribute receipts with lost ledgers refuse without writes; retained receipt/ledger bytes remain exact.");
+
+    // Current-source loss cannot hide unsupported or malformed retained operations.
+    const unknownOperation=ownedRoot.collection("operations").doc("rehearsal-unknown-operation-0001");
+    for(const kind of ["unknown-operation","battle-source-preparation","restricted-battle-round",null]){
+        const row={schemaVersion:1,ownerUid:ownedUid,operationId:unknownOperation.id,sourceRevision:9};
+        if(kind!==null)row.kind=kind;
+        await unknownOperation.set(row);const unsupported=await dump();
+        await rejected("restoreCanonicalCurrent",device.idToken,payload,"FAILED_PRECONDITION");
+        assert.deepEqual(await dump(),unsupported);
+        assert.deepEqual((await envelopeRef.get()).data(),envelopeBefore);
+        await unknownOperation.delete();
+    }
+    const initialReceiptRef=ownedRoot.collection("operations").doc(ownedOperation);
+    const initialReceipt=(await initialReceiptRef.get()).data();
+    for(const patch of [{schemaVersion:2},{ownerUid:"foreign-owner"},
+        {operationId:"rehearsal-mismatched-operation-0001"},{sourceRevision:FieldValue.delete()}]){
+        await initialReceiptRef.update(patch);const malformed=await dump();
+        await rejected("restoreCanonicalCurrent",device.idToken,payload,"DATA_LOSS");
+        assert.deepEqual(await dump(),malformed);
+        assert.deepEqual((await envelopeRef.get()).data(),envelopeBefore);
+        await initialReceiptRef.set(initialReceipt);
+    }
+    assert.deepEqual(await dump(),damaged);
+    console.log("Current recovery operation inventory real Firestore PASS: unknown/missing/frozen kinds and malformed initial receipts refuse without writes; immutable original creation proof retained.");
 
     const orphanGrant=ownedRoot.collection("pendingGrants").doc("rehearsal-orphaned-grant-0001");
     const originalGrant=(await creditProof[1].get()).data();
@@ -2499,7 +2536,7 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     // A stale/damaged envelope must not authorize overwriting surviving newer
     // sources. Missing revision evidence is equally unreconciled. Emulator only.
     for(const [path,row] of current){
-        for(const revision of [10,null]){
+        for(const revision of [11,null]){
             const surviving={...row,serverRevision:revision};
             if(revision===null)delete surviving.serverRevision;
             await db.doc(path).set(surviving);
@@ -2526,12 +2563,12 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     await invoke("restoreCanonicalCurrent",device.idToken,payload);
     const committed=await dump(),committedEnvelope=(await envelopeRef.get()).data();
     assert.deepEqual(await invoke("restoreCanonicalCurrent",device.idToken,payload),
-        {restoredRevision:9,unchanged:true,authoritativeStateReady:false});
+        {restoredRevision:10,unchanged:true,authoritativeStateReady:false});
     assert.deepEqual(await dump(),committed);
     assert.deepEqual((await envelopeRef.get()).data(),committedEnvelope);
     const expected=structuredClone(archived);
     for(const rows of Object.values(expected)){
-        for(const row of Array.isArray(rows)?rows:[rows])row.serverRevision=9;
+        for(const row of Array.isArray(rows)?rows:[rows])row.serverRevision=10;
     }
     expected.claimCheckpoint.claimDigest=claimRecordsDigest(expected.claimRecords);
     for(const [path,row] of documentMap(expected))assert.deepEqual(source(committed.get(path)),row,path);
@@ -2539,21 +2576,21 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
         if(!current.has(path)&&path!==approval.path)assert.deepEqual(committed.get(path),row,path);
     }
     const added=["operations/","recoveryAudits/"].map(path=>`${ownedRoot.path}/${path}${operationId}`)
-        .concat([`${ownedRoot.path}/playableSnapshots/9`,`${ownedRoot.path}/recoveryArchives/9`]).sort();
+        .concat([`${ownedRoot.path}/playableSnapshots/10`,`${ownedRoot.path}/recoveryArchives/10`]).sort();
     assert.deepEqual([...committed.keys()].filter(path=>!before.has(path)).sort(),added);
     assert.equal(committed.size,before.size+4);
-    const restoredArchive=await checkRecoveryArchive(ownedUid,9);
+    const restoredArchive=await checkRecoveryArchive(ownedUid,10);
     assert.deepEqual(restoredArchive.get("sourceRecords"),expected);
-    assert.equal(restoredArchive.get("snapshotSha256"),assembleCanonicalSnapshot(ownedUid,9,expected).sha256);
-    assert.equal(committedEnvelope.serverRevision,9);
+    assert.equal(restoredArchive.get("snapshotSha256"),assembleCanonicalSnapshot(ownedUid,10,expected).sha256);
+    assert.equal(committedEnvelope.serverRevision,10);
     assert.equal(committedEnvelope.authoritativeStateReady,false);
     assert.equal(committed.get(approval.path).status,"used");
-    assert.equal(committed.get(approval.path).usedRevision,9);
+    assert.equal(committed.get(approval.path).usedRevision,10);
     assert.equal((await shop.purchase(request,shopArgs)).unchanged,true);
     assert.equal((await goldWriter.creditReservedGrant(request,{
-        grantId:ownedGrant,operationId:ownedCreditOperation,expectedRevision:3})).unchanged,true);
+        grantId:ownedGrant,operationId:ownedCreditOperation,expectedRevision:4})).unchanged,true);
     const reservedRetry=await invoke("reserveTrustedGrant",device.idToken,{uid:ownedUid,session,
-        grantId:reservedGrantId,operationId:reservedOperationId,expectedRevision:7});
+        grantId:reservedGrantId,operationId:reservedOperationId,expectedRevision:8});
     assert.equal(reservedRetry.unchanged,true);assert.equal(reservedRetry.creditedToCharacter,false);
     const pendingRetry=await pendingIssuer.issue(request);
     assert.equal(pendingRetry.unchanged,true);assert.equal(pendingRetry.status,"pending");
@@ -2561,6 +2598,16 @@ assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
     assert.deepEqual((await pendingEventRef.get()).data(),eventOriginal);
     assert.deepEqual(await dump(),committed);
     assert.deepEqual((await envelopeRef.get()).data(),committedEnvelope);
+    for(const [path,row] of ownedInitialEvidence)assert.deepEqual((await db.doc(path).get()).data(),row,path);
+    // Original completion stays read-only even after unsupported later history.
+    await unknownOperation.set({schemaVersion:1,ownerUid:ownedUid,
+        operationId:unknownOperation.id,kind:"unknown-operation",sourceRevision:11});
+    const laterHistory=await dump();
+    assert.deepEqual(await invoke("restoreCanonicalCurrent",device.idToken,payload),
+        {restoredRevision:10,unchanged:true,authoritativeStateReady:false});
+    assert.deepEqual(await dump(),laterHistory);
+    assert.deepEqual((await envelopeRef.get()).data(),committedEnvelope);
+    await unknownOperation.delete();assert.deepEqual(await dump(),committed);
     console.log(`Current recovery full-source-loss rehearsal real Firestore PASS: ${current.size} documents / 10 domains; rollback, unknown claim and old-session refusal, new-session HTTP restore, discarded-response replay, exact source/archive parity and immutable receipt/ledger/claim history. Readiness remains false; not historical/disaster/second-phone acceptance.`);
 }
 // The opposite order is fenced too: a reserved grant cannot become a new

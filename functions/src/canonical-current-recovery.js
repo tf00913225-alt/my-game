@@ -9,6 +9,7 @@ const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
 const {verifyShopPurchaseEvidence}=require("./canonical-shop-purchase");
 const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
+const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 const SETS={
@@ -41,6 +42,61 @@ function restoredRecords(records,revision){
 function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     inspectExistingEnvelope,nextRevision,now=Date.now}){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
+    const sourceEvidence=createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
+        inspectExistingEnvelope,nextRevision,now});
+    async function verifyRecoveredResult(tx,root,uid,operationId,expectedRevision,maxRevision,
+        {archiveSnap,snapshotSnap,approvalSnap,operationSnap,auditSnap,grantSnap,ledgerSnap},records){
+        const receipt=operationSnap.data(),audit=auditSnap.data(),
+            approval=approvalSnap.data();
+        if(grantSnap.exists||ledgerSnap.exists||!auditSnap.exists||!approvalSnap.exists||
+           receipt.schemaVersion!==1||receipt.kind!=="canonical-current-recovery"||receipt.ownerUid!==uid||
+           receipt.operationId!==operationId||receipt.sourceRevision!==expectedRevision||
+           receipt.sourceSha256!==archiveSnap.get("sourceSha256")||
+           !Number.isSafeInteger(receipt.restoredRevision)||
+           receipt.restoredRevision!==expectedRevision+1||
+           receipt.restoredRevision>maxRevision||
+           !/^[a-f0-9]{64}$/.test(receipt.snapshotSha256||"")||
+           receipt.authoritativeStateReady!==false||
+           typeof receipt.approvedBy!=="string"||!receipt.approvedBy.trim()||
+           ["schemaVersion","kind","sourceSha256","approvedBy","authoritativeStateReady"]
+               .some(key=>audit?.[key]!==receipt[key])||
+           audit.ownerUid!==uid||audit.operationId!==operationId||
+           audit.sourceRevision!==expectedRevision||
+           audit.restoredRevision!==receipt.restoredRevision||
+           audit.snapshotSha256!==receipt.snapshotSha256||
+           approval.schemaVersion!==1||
+           approval.kind!=="canonical-current-recovery-approval"||approval.ownerUid!==uid||
+           approval.operationId!==operationId||approval.sourceRevision!==expectedRevision||
+           approval.sourceSha256!==receipt.sourceSha256||
+           approval.snapshotSha256!==snapshotSnap.get("sha256")||
+           approval.approvedBy!==receipt.approvedBy||
+           typeof approval.expiresAt?.toMillis!=="function"||
+           approval.status!=="used"||
+           approval.usedRevision!==receipt.restoredRevision){
+            fail("data-loss","Recovery receipt or audit is inconsistent.");
+        }
+        const [restored,restoredArchive]=await Promise.all([
+            tx.get(root.collection("playableSnapshots").doc(String(receipt.restoredRevision))),
+            tx.get(root.collection("recoveryArchives").doc(String(receipt.restoredRevision)))
+        ]);
+        try{
+            if(!restored.exists||!restoredArchive.exists||
+               restored.get("sha256")!==receipt.snapshotSha256){
+                throw new Error("Missing recovered evidence.");
+            }
+            inspectRecoveryArchive(restoredArchive.data(),uid,
+                receipt.restoredRevision,restored.data());
+            const next=restoredRecords(records,receipt.restoredRevision);
+            const expected=assembleCanonicalSnapshot(uid,receipt.restoredRevision,next);
+            const expectedArchive=createRecoveryArchive(uid,receipt.restoredRevision,next,expected);
+            if(expected.sha256!==receipt.snapshotSha256||
+               expectedArchive.sourceSha256!==restoredArchive.get("sourceSha256")){
+                throw new Error("Recovered sources differ from the approved original.");
+            }
+        }catch(_){fail("data-loss","Recovered snapshot or archive is inconsistent.");}
+        return {restoredRevision:receipt.restoredRevision,unchanged:true,
+            authoritativeStateReady:false};
+    }
     async function restoreCurrent(request,{operationId,expectedRevision}){
         if(!OPERATION_ID.test(operationId||"")||
            !Number.isSafeInteger(expectedRevision)||expectedRevision<2){
@@ -76,56 +132,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 fail("failed-precondition","Only the first server-created character is eligible.");
             }
             if(operationSnap.exists){
-                const receipt=operationSnap.data(),audit=auditSnap.data(),
-                    approval=approvalSnap.data();
-                if(grantSnap.exists||ledgerSnap.exists||!auditSnap.exists||!approvalSnap.exists||
-                   receipt.schemaVersion!==1||receipt.kind!=="canonical-current-recovery"||receipt.ownerUid!==uid||
-                   receipt.operationId!==operationId||receipt.sourceRevision!==expectedRevision||
-                   receipt.sourceSha256!==archiveSnap.get("sourceSha256")||
-                   !Number.isSafeInteger(receipt.restoredRevision)||
-                   receipt.restoredRevision!==expectedRevision+1||
-                   receipt.restoredRevision>envelope.serverRevision||
-                   !/^[a-f0-9]{64}$/.test(receipt.snapshotSha256||"")||
-                   receipt.authoritativeStateReady!==false||
-                   typeof receipt.approvedBy!=="string"||!receipt.approvedBy.trim()||
-                   ["schemaVersion","kind","sourceSha256","approvedBy","authoritativeStateReady"]
-                       .some(key=>audit?.[key]!==receipt[key])||
-                   audit.ownerUid!==uid||audit.operationId!==operationId||
-                   audit.sourceRevision!==expectedRevision||
-                   audit.restoredRevision!==receipt.restoredRevision||
-                   audit.snapshotSha256!==receipt.snapshotSha256||
-                   approval.schemaVersion!==1||
-                   approval.kind!=="canonical-current-recovery-approval"||approval.ownerUid!==uid||
-                   approval.operationId!==operationId||approval.sourceRevision!==expectedRevision||
-                   approval.sourceSha256!==receipt.sourceSha256||
-                   approval.snapshotSha256!==snapshotSnap.get("sha256")||
-                   approval.approvedBy!==receipt.approvedBy||
-                   typeof approval.expiresAt?.toMillis!=="function"||
-                   approval.status!=="used"||
-                   approval.usedRevision!==receipt.restoredRevision){
-                    fail("data-loss","Recovery receipt or audit is inconsistent.");
-                }
-                const [restored,restoredArchive]=await Promise.all([
-                    tx.get(root.collection("playableSnapshots").doc(String(receipt.restoredRevision))),
-                    tx.get(root.collection("recoveryArchives").doc(String(receipt.restoredRevision)))
-                ]);
-                try{
-                    if(!restored.exists||!restoredArchive.exists||
-                       restored.get("sha256")!==receipt.snapshotSha256){
-                        throw new Error("Missing recovered evidence.");
-                    }
-                    inspectRecoveryArchive(restoredArchive.data(),uid,
-                        receipt.restoredRevision,restored.data());
-                    const next=restoredRecords(records,receipt.restoredRevision);
-                    const expected=assembleCanonicalSnapshot(uid,receipt.restoredRevision,next);
-                    const expectedArchive=createRecoveryArchive(uid,receipt.restoredRevision,next,expected);
-                    if(expected.sha256!==receipt.snapshotSha256||
-                       expectedArchive.sourceSha256!==restoredArchive.get("sourceSha256")){
-                        throw new Error("Recovered sources differ from the approved original.");
-                    }
-                }catch(_){fail("data-loss","Recovered snapshot or archive is inconsistent.");}
-                return {restoredRevision:receipt.restoredRevision,unchanged:true,
-                    authoritativeStateReady:false};
+                return verifyRecoveredResult(tx,root,uid,operationId,expectedRevision,envelope.serverRevision,
+                    {archiveSnap,snapshotSnap,approvalSnap,operationSnap,auditSnap,grantSnap,ledgerSnap},records);
             }
             if(auditSnap.exists||grantSnap.exists||ledgerSnap.exists){
                 fail("failed-precondition","Recovery operation ID is already used.");
@@ -191,13 +199,17 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             // Pending-grant inventory adds one read per row and three original
             // event/snapshot/archive reads for each unconsumed pending grant.
             // Each event inventory row reserves three original proof reads too.
-            // Operation inventory adds one read per row. Supported debit proof
-            // is already reserved by the matching ledger above; do not replay it.
+            // Operation inventory adds its original source Owner's bounded proof
+            // reads. Debit proof is already reserved by its matching ledger.
             const reservedCount=receipts.docs.filter(doc=>doc.get("creditedToCharacter")===false).length;
             const pendingCount=grants.docs.filter(doc=>doc.get("status")==="pending").length;
+            const operationProofReads=operations.docs.reduce((sum,doc)=>sum+
+                (doc.get("kind")==="canonical-current-recovery"?8:
+                    sourceEvidence.retainedOperationReadBudget(doc.get("kind"))),0);
             if(queries.reduce((sum,query)=>sum+query.size,0)+claims.docs.length*12+
                receipts.docs.length+ledgers.docs.length*5+reservedCount*6+
-               grants.docs.length+pendingCount*3+events.docs.length*4+operations.docs.length>400){
+               grants.docs.length+pendingCount*3+events.docs.length*4+
+               operations.docs.length+operationProofReads>400){
                 fail("failed-precondition","Recovery claim evidence exceeds the transaction budget.");
             }
             const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
@@ -213,9 +225,50 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             // even when its ledger was lost with the current canonical sources.
             const ledgerIds=new Set(ledgers.docs.map(doc=>doc.id));
             for(const doc of operations.docs){
-                if(["shop-purchase","exp-allocation","attribute-allocation"].includes(doc.get("kind"))&&
-                   !ledgerIds.has(doc.id)){
-                    fail("data-loss","A debit receipt without its original ledger blocks recovery.");
+                const value=doc.data();
+                if(value.schemaVersion!==1||value.ownerUid!==uid){
+                    fail("data-loss","Operation inventory identity blocks recovery.");
+                }
+                if(["shop-purchase","exp-allocation","attribute-allocation"].includes(value.kind)){
+                    if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||!ledgerIds.has(doc.id)){
+                        fail("data-loss","A debit receipt without its original ledger blocks recovery.");
+                    }
+                }else{
+                    if(receiptById.has(doc.id)||ledgerIds.has(doc.id)){
+                        fail("data-loss","A source operation overlaps economic evidence.");
+                    }
+                    if(value.kind==="canonical-current-recovery"){
+                        if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
+                           !Number.isSafeInteger(value.sourceRevision)||value.sourceRevision<2||
+                           !Number.isSafeInteger(value.restoredRevision)||
+                           value.restoredRevision>expectedRevision){
+                            fail("data-loss","Retained recovery identity blocks recovery.");
+                        }
+                        const [archiveSnap,snapshotSnap,approvalSnap,auditSnap,grantSnap,ledgerSnap]=
+                            await Promise.all([
+                                root.collection("recoveryArchives").doc(String(value.sourceRevision)),
+                                root.collection("playableSnapshots").doc(String(value.sourceRevision)),
+                                root.collection("recoveryApprovals").doc(doc.id),
+                                root.collection("recoveryAudits").doc(doc.id),
+                                root.collection("grantOperations").doc(doc.id),
+                                root.collection("ledgerEntries").doc(doc.id)
+                            ].map(ref=>tx.get(ref)));
+                        let original;
+                        try{
+                            if(!archiveSnap.exists||!snapshotSnap.exists)throw Error("Missing recovery source");
+                            original=inspectRecoveryArchive(archiveSnap.data(),uid,
+                                value.sourceRevision,snapshotSnap.data());
+                            if(original.account.provenance!=="server-created"||
+                               original.account.slots[0]!==records.account.slots[0]||
+                               original.account.slots[1]!==null||original.account.slots[2]!==null){
+                                throw Error("Recovery character differs");
+                            }
+                        }catch(_){fail("data-loss","Retained recovery source is inconsistent.");}
+                        await verifyRecoveredResult(tx,root,uid,doc.id,value.sourceRevision,expectedRevision,
+                            {archiveSnap,snapshotSnap,approvalSnap,operationSnap:doc,auditSnap,grantSnap,ledgerSnap},original);
+                    }else{
+                        await sourceEvidence.verifyRetainedOperation(tx,root,uid,records.account,doc);
+                    }
                 }
             }
             // Events survive independently of grants. Losing a grant must not
