@@ -31,6 +31,7 @@ function loadRuntime(options={}){
             setItem:(key,value)=>{ values.set(key,String(value)); }
         },
         FourSymbolsAccountSave:{accountKey:name=>"four_symbols_account:test-uid:"+name},
+        FourSymbolsPatrolRewardPolicy:require("../functions/src/patrol-reward-policy.js"),
         document:{
             getElementById:id=>id==="v131EbGold"?goldNode:null,
             addEventListener(){},createElement(){ return {}; }
