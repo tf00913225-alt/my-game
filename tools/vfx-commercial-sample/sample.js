@@ -3,7 +3,7 @@
 const samples={
  slash:{name:"火焰斬",old:"../../assets/vfx/fire/flame-slash-cast.png",asset:"assets/flame-slash.webp",duration:760,oldSize:400,newSize:300,targets:1,note:"火焰斬：參考圖框由 400 縮至 300 邏輯像素（寬高各 −25%）。以單一斬痕及第八幀集中亮點取代大片爆炎，播放仍為 760ms。"},
  ice:{name:"冰箭雨",old:"../../assets/vfx/water/frost-arrow-rain-vfx.png",asset:"assets/ice-arrow-rain.webp",duration:1600,oldSize:880,newSize:690,targets:3,note:"冰箭雨：參考圖框由 880 縮至 690（寬高各 −22%）。保留群體箭雨意象，移除大片藍色霧幕，命中收在地面碎冰，播放仍為 1600ms。"},
- relic:{name:"九龍火秘寶",old:"../../assets/vfx/relic/relic_nine_dragon_fire.webp",asset:"assets/nine-dragon-fire-v3.webp",impactAsset:"assets/nine-dragon-fire-impact-v3.webp",duration:2550,oldSize:520,newSize:500,targets:3,note:"九龍火第三版：保留九龍纏繞，重繪龍頭與陣紋，尺寸維持 500（原版約 96%）。第八幀使用獨立高解析命中圖，保留完整火環；聚龍漸亮、散火連續淡出。2550ms 與 12 個時間幀不變，尚未接入正式戰鬥。"}
+ relic:{name:"九龍火秘寶",old:"assets/nine-dragon-fire-original.webp",asset:"assets/nine-dragon-fire-v3.webp",impactAsset:"assets/nine-dragon-fire-impact-v3.webp",duration:2550,oldSize:520,newSize:500,targets:3,note:"九龍火第三版歷史預覽：保留九龍纏繞與獨立命中圖。正式施工候選另由 USB 對照頁呈現；此預覽不代表目前遊戲版本。"}
 };
 let selected="slash",playing=true,start=performance.now(),speed=1,pausedElapsed=0;
 const articles=[...document.querySelectorAll("article")],range=document.querySelector("#frame");

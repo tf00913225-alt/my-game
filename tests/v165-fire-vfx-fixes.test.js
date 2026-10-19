@@ -135,7 +135,7 @@ test("Fire Rocket travels from its caster to the real target group before bursti
 
 test("the current cache version publishes the repaired sheets and choreography",()=>{
     assert.match(animation,/dragon-slash-cast-v2\.webp/);
-    assert.match(animation,/rage-wide-v2\.webp/);
+    assert.match(animation,/rage-recipient-v1\.webp/);
     assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });

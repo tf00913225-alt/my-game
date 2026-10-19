@@ -1,7 +1,8 @@
 /* =====================================================
    V143 — single-owner raster battle VFX runtime
    V174 cleanup: official PNG Sprite Sheets/status loops only.
-   Fixed Slot geometry is the only battle position/coverage source.
+   Fixed Slot geometry owns battle coverage; its formal artwork projection
+   anchors explicitly authored recipient effects within that same formation.
    No Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback.
 ===================================================== */
 (function installV143SkillAnimationRuntime(){
@@ -75,7 +76,7 @@
         blazeSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/blaze-spell-cast-v2.webp","single",{scale:2.15,maxSize:260})},
         flameTornado:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-tornado-cast-v2.webp","single",{scale:2.35,maxSize:300})},
         phoenixCry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/phoenix-cry-cast.png?v=165","battlefield",{scale:1.12,minSize:280})},
-        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-wide-v2.webp","single",{scale:1.08,minSize:96,maxSize:148,cellAspect:2.25})},
+        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-recipient-v1.webp","single",{scale:1.08,minSize:96,maxSize:148,presentation:"per-recipient"})},
         fireSoulResonance:{hit:DEFAULT_HIT,deferredActorStatusTypes:["fireSoulResonance"],sprite:castSheet("assets/vfx/fire/fire-soul-resonance-cast-v2.webp","single",{scale:1.7,maxSize:225})},
         bloodBurnArt:{hit:DEFAULT_HIT,deferredActorStatusTypes:["bloodBurn"],sprite:castSheet("assets/vfx/fire/blood-burn-art-cast.webp","single",{scale:1.7,maxSize:225})},
         fireEX:{hit:.74,noVisual:true,passive:true},
@@ -84,13 +85,13 @@
         frostPunch:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/frost-fist-vfx.png?v=166","single",{scale:2.15,maxSize:260})},
         iceSpin:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/ice-spin-wide-v2.webp","single",{scale:1.95,maxSize:235,cellAspect:2.2448275862068967})},
         frostCrush:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/freeze-heavy-strike-vfx.png?v=166","single",{scale:2.35,maxSize:290})},
-        waterBall:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-ball-wide-v2.webp","group",{scale:1.22,minSize:150,maxSize:500,alignToSlots:true,cellAspect:2.25})},
-        // Keep every authored frame at its original source angle while the
-        // complete sheet moves between actor and target. Hit timing is unchanged.
-        floodBeast:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/tidal-beast-safe-v3.webp","targetTrajectory",{travelToTargets:true,preserveSourceOrientation:true,scale:1.85,minSize:175,maxSize:250,motionPhases:{flightStart:2,turnFrame:5,impactStart:6,flightSourceAngle:0,turnSourceAngle:90}})},
+        waterBall:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-orb-recipient-v1.webp","group",{scale:1.22,minSize:150,maxSize:500,alignToSlots:true,presentation:"per-recipient"})},
+        // Match each authored head angle to the travel direction; the splash
+        // returns upright only after the complete source reaches its endpoint.
+        floodBeast:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/tidal-beast-safe-v3.webp","targetTrajectory",{travelToTargets:true,scale:1.85,minSize:175,maxSize:250,motionPhases:{flightStart:2,turnFrame:5,impactStart:6,flightSourceAngle:0,turnSourceAngle:90}})},
         iceArrowRain:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/frost-arrow-rain-vfx.png?v=173.19","battlefield",{fixedFormation:true,coverageScale:1.22,minWidth:140,minHeight:140})},
         freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270})},
-        healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/heal-spell-wide-v2.webp","single",{scale:2.05,maxSize:250,cellAspect:2.25})},
+        healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/heal-recipient-v1.webp","single",{scale:2.05,maxSize:250,presentation:"per-recipient"})},
         revive:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-revive-vfx.png?v=166","single",{scale:2.3,maxSize:285})},
         purifyMind:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/purify-mind-cast.webp","single",{scale:2.05,maxSize:250})},
         waterEX:{hit:.74,noVisual:true,passive:true},
@@ -102,8 +103,8 @@
         windSpell:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/wind-spell-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
         stormCircle:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/storm-circle-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
         windHowlLightning:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/wind-howl-lightning-cast.png?v=173.24","single",{scale:2.35,maxSize:290})},
-        stormRain:{hit:.5,deferredStatusTypes:["stun"],sprite:castSheet("assets/vfx/wind/storm-rain-cast-v2.webp","battlefield",{scale:1.08,minSize:280})},
-        dodgeSkill:{hit:.5,deferredStatusTypes:["dodgeSkill"],sprite:castSheet("assets/vfx/wind/dodge-skill-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
+        stormRain:{hit:.5,deferredStatusTypes:["stun"],sprite:castSheet("assets/vfx/wind/storm-rain-recipient-v1.webp","battlefield",{scale:1.08,minSize:280,presentation:"per-recipient"})},
+        dodgeSkill:{hit:.5,deferredStatusTypes:["dodgeSkill"],sprite:castSheet("assets/vfx/wind/dodge-recipient-v1.webp","group",{scale:1.08,minSize:190,alignToSlots:true,presentation:"per-recipient"})},
         stealthSkill:{hit:.5,deferredStatusTypes:["stealthSkill"],sprite:castSheet("assets/vfx/wind/stealth-skill-cast.png?v=173.24","single",{scale:2.15,maxSize:260})},
         dinghaishenzhen:{hit:.5,deferredStatusTypes:["dinghaishenzhen"],sprite:castSheet("assets/vfx/wind/calm-mind-cast-person-v2.webp","battlefield",{scale:1.08,minSize:280,presentation:"per-recipient"})},
         windEX:{hit:.74,noVisual:true,passive:true},
@@ -121,7 +122,7 @@
         flyingSandStrike:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/flying-sand-strike-cast.png?v=173.39","battlefield",{scale:1.08,minSize:280})},
         dustStorm:{hit:.5,deferredStatusTypes:["petrify"],sprite:castSheet("assets/vfx/earth/dust-storm-cast.png?v=173.39","single",{scale:2.4,maxSize:300})},
         earthShield:{hit:.5,deferredStatusTypes:["earthShield"],sprite:castSheet("assets/vfx/earth/earth-shield-cast-v2.webp","single",{scale:1.7,maxSize:225})},
-        rockWall:{hit:.5,deferredStatusTypes:["rockWall"],sprite:castSheet("assets/vfx/earth/rock-wall-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
+        rockWall:{hit:.5,deferredStatusTypes:["rockWall"],sprite:castSheet("assets/vfx/earth/rock-wall-recipient-v1.webp","group",{scale:1.08,minSize:190,alignToSlots:true,presentation:"per-recipient"})},
         barrier:{hit:.5,deferredStatusTypes:["barrier"],sprite:castSheet("assets/vfx/earth/barrier-cast.png?v=173.39","single",{scale:2.25,maxSize:280})},
         earthEX:{hit:.74,noVisual:true,passive:true},
 
@@ -132,7 +133,7 @@
         relic_xuanwu_seal:relicSheet("assets/vfx/relic/relic_xuanwu_seal.webp",8),
         relic_soul_bell:relicSheet("assets/vfx/relic/relic_soul_bell.webp",8),
         relic_tiangang_banner:relicSheet("assets/vfx/relic/relic_tiangang_banner.webp",9),
-        relic_nine_dragon_fire:relicSheet("assets/vfx/relic/relic_nine_dragon_fire.webp",8),
+        relic_nine_dragon_fire:relicSheet("assets/vfx/relic/relic_nine_dragon_fire.webp?v=6a58936606a0",8),
         relic_cold_spring_jade:relicSheet("assets/vfx/relic/relic_cold_spring_jade.webp",7),
         relic_qinglan_feather:relicSheet("assets/vfx/relic/relic_qinglan_feather.webp",6),
         relic_rock_mountain_seal:relicSheet("assets/vfx/relic/relic_rock_mountain_seal.webp",7),

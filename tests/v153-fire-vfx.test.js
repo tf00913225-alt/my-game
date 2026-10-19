@@ -272,7 +272,7 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
         blazeSpell:["blaze-spell-cast-v2.webp","single"],
         flameTornado:["flame-tornado-cast-v2.webp","single"],
         phoenixCry:["phoenix-cry-cast.png","battlefield"],
-        rage:["rage-wide-v2.webp","single"]
+        rage:["rage-recipient-v1.webp","single"]
     };
     Object.entries(expected).forEach(([id,[filename,placement]])=>{
         const sprite=manifest[id].sprite;
@@ -436,7 +436,7 @@ test("MISS still plays the formal skill Sprite and keeps MISS feedback on hit ti
     assert.equal(runtime.misses[0][2],"MISS");
 });
 
-test("Rage creates one shared full-ally cast sheet",()=>{
+test("Rage creates one portrait-sized cast sheet per explicit ally",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("rage",1500,"allyAll","buff"),
@@ -444,11 +444,10 @@ test("Rage creates one shared full-ally cast sheet",()=>{
     );
     const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
     const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
-    assert.equal(sprites.length,1);
-    assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(sprites[0].dataset.placement,"battlefield");
-    assert.equal(sprites[0].style.width,"600px");
-    assert.equal(sprites[0].style.height,"267px","full-ally Rage preserves its native wide frame while covering the ally side");
+    assert.equal(sprites.length,3);
+    assert.deepEqual(sprites.map(n=>n.dataset.targetIndex),["0","1","2"]);
+    assert.ok(sprites.every(n=>n.dataset.placement==="single"&&n.style.width===n.style.height));
+    assert.equal(runtime.context.v143SkillAnimationState.current.targetType,"allyAll");
 });
 
 test("enemy Rage allyTri animates only the three explicit targets",()=>{
@@ -459,12 +458,12 @@ test("enemy Rage allyTri animates only the three explicit targets",()=>{
         {side:"monster",actorIndex:0,targetSide:"monster",targetId:5,targetIds:[4,5,6]}
     );
     const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
-    assert.equal(stage.children.filter(node=>node.className.includes("v143-vfx-sprite")).length,1);
+    assert.equal(stage.children.filter(node=>node.className.includes("v143-vfx-sprite")).length,3);
     [4,5,6].forEach(index=>runtime.context.v141PlayCardEffect("monster",index,"buff"));
     const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
-    assert.equal(sprites.length,1);
-    assert.equal(sprites[0].dataset.targetIndexes,"4,5,6");
-    assert.equal(sprites[0].dataset.placement,"group");
+    assert.equal(sprites.length,3);
+    assert.deepEqual(sprites.map(n=>n.dataset.targetIndex),["4","5","6"]);
+    assert.ok(sprites.every(n=>n.dataset.placement==="single"));
 });
 
 test("enemy Rage loop begins on the hit frame and follows its canonical ledger",()=>{
@@ -577,16 +576,18 @@ test("cast sheets stay one-shot while Burn and Rage use single-image breathing",
 });
 
 
-test("wide group candidates retain exact lossless bytes, alpha and native frame ratio",()=>{
+test("wide baseline bytes remain exact and active wide sources retain their native ratio",()=>{
     const manifest=loadRuntime().context.v143SkillAnimationManifest;
     const entries=[["rage", "fire/rage-wide-v2.webp", "df6403daa4c3b6bd8e3eede4cdb97c7e26acd2e8de6f1ffec9468bac9a4aad28"], ["explosiveFlurry", "fire/explosive-flurry-wide-v2.webp", "65de2193edc2789153b1c7f77f054919686c515b9cd0b2a8c6be7a9320170cd9"]];
     entries.forEach(([id,file,hash])=>{
         const candidate="assets/vfx/"+file,bytes=fs.readFileSync(candidate),info=losslessWebpInfo(bytes);
         assert.deepEqual([info.width,info.height,info.alpha],[2172,724,1],id);
         assert.equal(require("node:crypto").createHash("sha256").update(bytes).digest("hex"),hash,id);
+        if(!["rage"].includes(id)){
         assert.equal(manifest[id].sprite.src,candidate,id);
         assert.equal((info.width/manifest[id].sprite.columns)/(info.height/manifest[id].sprite.rows),2.25,id);
         assert.equal(manifest[id].sprite.cellAspect,2.25,id+" cold-cache source ratio");
+        }else{ assert.equal(manifest[id].sprite.presentation,"per-recipient",id); assert.notEqual(manifest[id].sprite.src,candidate,id+" rejected placement source is retired"); }
     });
 });
 

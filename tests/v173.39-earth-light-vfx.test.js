@@ -142,7 +142,7 @@ test("all casts use DOM Sprite Sheets, frame seven impact and the requested plac
     Object.entries(CASTS).forEach(([id,spec])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id);
-        const wideFile={rockWall:"rock-wall-wide-v2.webp",petrifyFist:"petrify-fist-wide-v2.webp",earthquakeCrush:"earthquake-crush-wide-v2.webp",stoneThrow:"stone-throw-wide-v2.webp",sandWind:"rolling-stone-wide-v2.webp"}[id];
+        const wideFile={rockWall:"rock-wall-recipient-v1.webp",petrifyFist:"petrify-fist-wide-v2.webp",earthquakeCrush:"earthquake-crush-wide-v2.webp",stoneThrow:"stone-throw-wide-v2.webp",sandWind:"rolling-stone-wide-v2.webp"}[id];
         assert.equal(model.sprite.src,wideFile?"assets/vfx/earth/"+wideFile:spec.file+(spec.file.endsWith(".webp")?"":"?v=173.39"),id);
         assert.deepEqual(Array.from([
             model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame
@@ -278,16 +278,18 @@ test("V173.39 cache version loads the new owner code without stale V173.38 brows
 });
 
 
-test("wide group candidates retain exact lossless bytes, alpha and native frame ratio",()=>{
+test("wide baseline bytes remain exact and active wide sources retain their native ratio",()=>{
     const manifest=statusRuntime().context.v143SkillAnimationManifest;
     const entries=[["rockWall", "earth/rock-wall-wide-v2.webp", "45989080b9506d5804d07daf79c308b41f16810c90ed50c713b58318e98cf683"], ["petrifyFist", "earth/petrify-fist-wide-v2.webp", "1d76cf65922b6329189ce7540a5161442943a5f3f2380261524abcdf89799045"], ["earthquakeCrush", "earth/earthquake-crush-wide-v2.webp", "2f8325f12475965ae3b96f008231ceca6394c9f9827fa51b856d21d25b47bd4a"], ["stoneThrow", "earth/stone-throw-wide-v2.webp", "3aab7fc59305527a2d1603ae94882dfc6aefabca8798489c4b155ea095a755bc"], ["sandWind", "earth/rolling-stone-wide-v2.webp", "b9fca4658b97fd690db1a877040a7ae66bc92a0fe51e232fb2d2f949a63ae1a3"]];
     entries.forEach(([id,file,hash])=>{
         const candidate="assets/vfx/"+file,bytes=fs.readFileSync(candidate),info=losslessWebpInfo(bytes);
         assert.deepEqual([info.width,info.height,info.alpha],[2172,724,1],id);
         assert.equal(require("node:crypto").createHash("sha256").update(bytes).digest("hex"),hash,id);
+        if(!["rockWall"].includes(id)){
         assert.equal(manifest[id].sprite.src,candidate,id);
         assert.equal((info.width/manifest[id].sprite.columns)/(info.height/manifest[id].sprite.rows),2.25,id);
         assert.equal(manifest[id].sprite.cellAspect,2.25,id+" cold-cache source ratio");
+        }else{ assert.equal(manifest[id].sprite.presentation,"per-recipient",id); assert.notEqual(manifest[id].sprite.src,candidate,id+" rejected placement source is retired"); }
     });
 });
 

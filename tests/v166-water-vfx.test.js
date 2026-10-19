@@ -391,7 +391,7 @@ test("water manifest uses the exact files, twelve frames, frame-eight hit and re
     Object.entries(CAST_ASSETS).forEach(([id,filename])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id+" sprite metadata");
-        const runtimeFile={floodBeast:"tidal-beast-safe-v3.webp",iceSpin:"ice-spin-wide-v2.webp",waterBall:"water-ball-wide-v2.webp",healSpell:"heal-spell-wide-v2.webp"}[id];
+        const runtimeFile={floodBeast:"tidal-beast-safe-v3.webp",iceSpin:"ice-spin-wide-v2.webp",waterBall:"water-orb-recipient-v1.webp",healSpell:"heal-recipient-v1.webp"}[id];
         assert.equal(model.sprite.src.split("?")[0],"assets/vfx/water/"+(runtimeFile||filename),id);
         const cacheVersion=["waterBall","iceArrowRain"].includes(id)?"?v=173.19":"?v=166";
         assert.ok(model.sprite.src.endsWith(runtimeFile||cacheVersion),id+" exact runtime source/cache version");
@@ -456,7 +456,7 @@ test("Ice Spin centers its fixed tri-target artwork on the shape and preserves t
     });
 });
 
-test("Water Ball renders one canonical three-slot sheet regardless of surviving targets",()=>{
+test("Water Ball renders one sheet at each explicit surviving recipient without changing its primary",()=>{
     [[1],[0,2],[0,1,2]].forEach(indexes=>{
         const monsters=[0,1,2].map(index=>({
             alive:indexes.includes(index),hp:indexes.includes(index)?100:0,
@@ -469,13 +469,16 @@ test("Water Ball renders one canonical three-slot sheet regardless of surviving 
             {side:"player",actorIndex:0,targetSide:"monster",targetId:primary,targetIds:indexes}
         );
         const sprites=stageSprites(runtime).sprites;
-        assert.equal(sprites.length,1,indexes.join(","));
-        assert.equal(sprites[0].dataset.placement,"group");
-        assert.equal(sprites[0].dataset.targetIndexes,indexes.join(","));
-        assert.equal(sprites[0].style.left,"458px");
+        assert.equal(sprites.length,indexes.length,indexes.join(","));
+        sprites.forEach((sprite,i)=>{
+            assert.equal(sprite.dataset.placement,"single");
+            assert.equal(sprite.dataset.targetIndexes,String(indexes[i]));
+            assert.equal(sprite.style.left,(338+120*indexes[i])+"px");
+            assert.equal(sprite.style.top,"140px");
+            assert.equal(sprite.style["--v143-sprite-duration"],"1400ms");
+        });
         assert.equal(runtime.context.v143SkillAnimationState.current.targetId,primary);
-        assert.equal(sprites[0].style.top,"140px");
-        assert.equal(sprites[0].style["--v143-sprite-duration"],"1400ms");
+        assert.equal(runtime.context.v143SkillAnimationState.current.targetType,"tri");
     });
 
     const beast=loadRuntime();
@@ -497,13 +500,13 @@ test("enemy Water Ball uses its explicit player target group",()=>{
         castConfig("waterBall","tri"),
         {side:"monster",actorIndex:0,targetSide:"player",targetId:0,targetIds:[0,2]}
     );
-    assert.equal(stageSprites(runtime).sprites.length,1,"explicit targets render before hit callbacks");
+    assert.equal(stageSprites(runtime).sprites.length,2,"each explicit target renders before hit callbacks");
     runtime.context.v141PlayCardEffect("player",0,"damage");
     runtime.context.v141PlayCardEffect("player",2,"damage");
     const sprites=stageSprites(runtime).sprites;
-    assert.equal(sprites.length,1);
-    assert.equal(sprites[0].dataset.placement,"group");
-    assert.equal(sprites[0].dataset.targetIndexes,"0,2");
+    assert.equal(sprites.length,2);
+    assert.deepEqual(sprites.map(s=>s.dataset.targetIndex),["0","2"]);
+    assert.ok(sprites.every(s=>s.dataset.placement==="single"));
 });
 
 test("Ice Arrow Rain keeps one fixed full-enemy-formation footprint",()=>{
@@ -607,12 +610,10 @@ test("tri-target Freeze and ally-all Heal use their fixed semantic footprints",(
         {side:"player",actorIndex:0,targetSide:"player",targetId:0,targetIds:[0,1,2]}
     );
     const healSprites=stageSprites(heal).sprites;
-    assert.equal(healSprites.length,1);
-    assert.equal(healSprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(healSprites[0].dataset.placement,"battlefield");
-    assert.equal(healSprites[0].style.left,"240px");
-    assert.equal(healSprites[0].style.width,"440px");
-    assert.equal(healSprites[0].style.height,"196px","Heal keeps the native wide frame over the complete ally formation");
+    assert.equal(healSprites.length,3);
+    assert.deepEqual(healSprites.map(s=>s.dataset.targetIndex),["0","1","2"]);
+    assert.ok(healSprites.every(s=>s.dataset.placement==="single"&&s.style.width===s.style.height));
+    assert.equal(heal.context.v143SkillAnimationState.current.targetType,"allyAll","presentation does not narrow formal target semantics");
 });
 
 test("Freeze uses a fixed image and Frostbite uses a fixed icon without opening an action gate",()=>{
@@ -762,8 +763,9 @@ test("Tidal Beast cast/flight/impact metadata is shared for both sides and all t
             assert.match(frames[0].transform,/0px\).*rotate\(0deg\)/,"cast stays upright at caster");
             const dx=Number.parseFloat(sprite.style["--v143-sprite-dx"]),dy=Number.parseFloat(sprite.style["--v143-sprite-dy"]);
             const angle=Math.atan2(dy,dx)*180/Math.PI;
-            assert.match(frames[2].transform,/rotate\(0deg\)$/,"flight preserves the authored upright orientation");
-            assert.match(frames[4].transform,/rotate\(0deg\)$/,"turn preserves the authored upright orientation");
+            const rotation=frame=>Number(frame.transform.match(/rotate\(([-\d.]+)deg\)$/)[1]);
+            assert.ok(Math.abs(rotation(frames[2])-angle)<1e-8,"right-facing authored flight follows the actual travel heading");
+            assert.ok(Math.abs(rotation(frames[4])+90-angle)<1e-8,"down-facing turn source follows the same travel heading");
             assert.ok(frames[6].transform.includes(dx+"px")&&frames[6].transform.includes(dy+"px"));
             assert.match(frames[6].transform,/rotate\(0deg\)$/,"impact is upright at destination");
             assert.equal(sprite.motionOptions.duration,1350);
@@ -778,16 +780,18 @@ test("Tidal Beast cast/flight/impact metadata is shared for both sides and all t
 });
 
 
-test("wide group candidates retain exact lossless bytes, alpha and native frame ratio",()=>{
+test("wide baseline bytes remain exact and active wide sources retain their native ratio",()=>{
     const manifest=loadRuntime().context.v143SkillAnimationManifest;
     const entries=[["waterBall", "water/water-ball-wide-v2.webp", "188ff5373337bdf91a6c1054c8b06aa7d6919458e03f664dbe36844263ed66f1"], ["healSpell", "water/heal-spell-wide-v2.webp", "b47b8dd089cc093a15506a50645562cab5afb4e0d7329d084038c6e1dc6b34d3"]];
     entries.forEach(([id,file,hash])=>{
         const candidate="assets/vfx/"+file,bytes=fs.readFileSync(candidate),info=losslessWebpInfo(bytes);
         assert.deepEqual([info.width,info.height,info.alpha],[2172,724,1],id);
         assert.equal(require("node:crypto").createHash("sha256").update(bytes).digest("hex"),hash,id);
+        if(!["waterBall","healSpell"].includes(id)){
         assert.equal(manifest[id].sprite.src,candidate,id);
         assert.equal((info.width/manifest[id].sprite.columns)/(info.height/manifest[id].sprite.rows),2.25,id);
         assert.equal(manifest[id].sprite.cellAspect,2.25,id+" cold-cache source ratio");
+        }else{ assert.equal(manifest[id].sprite.presentation,"per-recipient",id); assert.notEqual(manifest[id].sprite.src,candidate,id+" rejected placement source is retired"); }
     });
 });
 

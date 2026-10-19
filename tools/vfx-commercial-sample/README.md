@@ -38,7 +38,7 @@ restores identity; it does not claim an artwork quality upgrade. The first
 generated relic candidate is retained as review history but is not selected.
 Flame Slash and Ice Arrow Rain are unchanged.
 
-## Nine Dragon Fire revision 3 (current)
+## Nine Dragon Fire revision 3 (historical preview)
 
 The accepted identity baseline remains the original intertwined dragon
 composition, with a 500 logical-pixel review box (original: 520), 2550ms
@@ -132,3 +132,24 @@ six units, then clears them all. Its periodic long tasks require profiling;
 the initial 601.2ms interval may include fixture startup and is not a proven
 steady-state maximum. This is not a performance pass. Status artwork is
 unchanged from ade43a48 to b1ede88d.
+
+The 20ec calm recipient prototype passed independent USB geometry review for
+three allies, six enemies (presentation only) and partial recipients. Controlled
+reuse is limited to the six confirmed placement failures; each replacement
+still needs its own phone gate. iceSpin and stormFlurry contact/identity/release
+passed cross-review and are closed to discretionary refinement. Flood Beast's
+source boundary is corrected; its remaining backwards-flight finding is being
+fixed through the existing phase headings, preserving endpoints and timing.
+
+Nine Dragon Fire v4 is a source-approved single-sheet candidate for the relic
+originally requested by the user. It replaces the catalog asset in place with
+a content-hash URL query; no extra relic entry or custom impact-image renderer
+is added. The exact original is preserved in `assets/nine-dragon-fire-original.webp`
+and the historical sample points there. Physical identity, peak clearance and
+release still require USB acceptance. Other relics remain excluded.
+
+The 20ec batched-status warm 30-second phone soak retains the same 12 bodies and
+30 icons: p95 33.4ms, p99 50.2ms, six long tasks totaling391ms versus the earlier
+35 totaling5955ms. The remaining139ms task is unassigned; this is an improvement,
+not a blanket performance pass. Extra tracing and final phone gates are pending
+USB reauthorization after the device returned `unauthorized`.

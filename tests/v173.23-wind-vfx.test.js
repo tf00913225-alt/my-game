@@ -318,7 +318,7 @@ test("all eleven casts keep Sprite timing while six persistent states use low-mo
     Object.entries(CASTS).forEach(([id,spec])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id);
-        const expectedSource=id==="dinghaishenzhen"?"assets/vfx/wind/calm-mind-cast-person-v2.webp":id==="stormFlurry"?"assets/vfx/wind/storm-flurry-wide-v3.webp":id==="stormRain"?"assets/vfx/wind/storm-rain-cast-v2.webp":id==="windSpell"?"assets/vfx/wind/wind-spell-wide-v2.webp":id==="stormCircle"?"assets/vfx/wind/storm-circle-wide-v2.webp":id==="dodgeSkill"?"assets/vfx/wind/dodge-skill-wide-v2.webp":"assets/vfx/wind/"+spec.file+"?v=173.24";
+        const expectedSource=id==="dinghaishenzhen"?"assets/vfx/wind/calm-mind-cast-person-v2.webp":id==="stormFlurry"?"assets/vfx/wind/storm-flurry-wide-v3.webp":id==="stormRain"?"assets/vfx/wind/storm-rain-recipient-v1.webp":id==="windSpell"?"assets/vfx/wind/wind-spell-wide-v2.webp":id==="stormCircle"?"assets/vfx/wind/storm-circle-wide-v2.webp":id==="dodgeSkill"?"assets/vfx/wind/dodge-recipient-v1.webp":"assets/vfx/wind/"+spec.file+"?v=173.24";
         assert.equal(model.sprite.src,expectedSource,id);
         assert.deepEqual(
             Array.from([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame]),
@@ -357,7 +357,8 @@ test("stormRain uses the reviewed lossless twelve-cell candidate while stormSpel
     assert.equal(info.width/4,362);assert.equal(info.height/3,362);
     assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"),"518147f7f9afca6a63b825e2caf0250698e8d9d4702207c3293e2318148aa792");
     const manifest=loadRuntime().context.v143SkillAnimationManifest;
-    assert.equal(manifest.stormRain.sprite.src,candidate);
+    assert.equal(manifest.stormRain.sprite.src,"assets/vfx/wind/storm-rain-recipient-v1.webp");
+    assert.equal(manifest.stormRain.sprite.presentation,"per-recipient");
     assert.equal(manifest.stormSpell.sprite.src,"assets/vfx/wind/storm-rain-cast.png?v=173.24");
     assert.equal(manifest.stormSpell.sprite.reusedFrom,"stormRain");
 });
@@ -427,12 +428,10 @@ test("single, three-lane and battlefield casts each own one correctly positioned
         {side:"player",actorIndex:0,targetId:0,targetIds:[0,1,2],targetSide:"monster"}
     );
     const allSprites=stageSprites(all).sprites;
-    assert.equal(allSprites.length,1,"one battlefield sheet");
-    assert.equal(allSprites[0].dataset.placement,"battlefield");
-    assert.equal(allSprites[0].dataset.areaId,"fixed-enemy-zone");
-    assert.equal(allSprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(allSprites[0].style.left,"480px");
-    assert.equal(allSprites[0].style.top,"170px");
+    assert.equal(allSprites.length,3,"one funnel per explicit battlefield recipient");
+    assert.deepEqual(allSprites.map(n=>n.dataset.targetIndex),["0","1","2"]);
+    assert.ok(allSprites.every(n=>n.dataset.placement==="single"));
+    assert.equal(all.context.v143SkillAnimationState.current.targetType,"all");
 });
 
 test("three-target wind sheets keep their canonical three-slot artwork center after casualties",()=>{
@@ -465,7 +464,7 @@ test("three-target wind sheets keep their canonical three-slot artwork center af
     assert.deepEqual(placements[1],placements[0],"casualties do not shrink or move the three-target sheet");
 });
 
-test("full-field wind sheets stay locked to the complete enemy area after casualties",()=>{
+test("non-recipient full-field wind sheets stay locked to the complete enemy area after casualties",()=>{
     const placements=[];
     [
         undefined,
@@ -478,7 +477,7 @@ test("full-field wind sheets stay locked to the complete enemy area after casual
         const runtime=loadRuntime(monsters?{monsters}:{});
         const targetIds=(monsters||runtime.monsters).map((monster,index)=>monster.alive?index:null).filter(Number.isInteger);
         runtime.context.v142SkillAnimationDirector.play(
-            config("stormRain","all","magic"),
+            {id:"stormSpell",name:"stormSpell",element:"wind",category:"magic",targetType:"all",duration:1700,resolveDuration:1700},
             {side:"player",actorIndex:0,targetId:targetIds[0],targetIds,targetSide:"monster"}
         );
         const sprite=stageSprites(runtime).sprites[0];
@@ -523,7 +522,7 @@ test("frame seven exposes formal attack feedback timing while buffs never create
     [0,1,2].forEach(index=>buff.context.v141PlayCardEffect("player",index,"buff"));
     buff.setClock(800);
     runTimers(buff,800);
-    assert.equal(stageSprites(buff).sprites.length,1,"one shared three-position buff sheet");
+    assert.equal(stageSprites(buff).sprites.length,3,"one buff sheet per explicit recipient");
     assert.equal(buff.monsterHits.length,0);
     assert.equal(buff.playerHits.length,0);
     [0,1,2].forEach(index=>{
@@ -607,16 +606,18 @@ test("the development cache release is V173.39",()=>{
 });
 
 
-test("wide group candidates retain exact lossless bytes, alpha and native frame ratio",()=>{
+test("wide baseline bytes remain exact and active wide sources retain their native ratio",()=>{
     const manifest=loadRuntime().context.v143SkillAnimationManifest;
     const entries=[["dodgeSkill", "wind/dodge-skill-wide-v2.webp", "8a4aa1a86af263d47b613c6df6a3ffa875c02a476591c675bed1917defacca72"], ["stormCircle", "wind/storm-circle-wide-v2.webp", "3886439d276022db61ad22afb6656fab827fe45f946767c6f172ede253fa5c0e"]];
     entries.forEach(([id,file,hash])=>{
         const candidate="assets/vfx/"+file,bytes=fs.readFileSync(candidate),info=losslessWebpInfo(bytes);
         assert.deepEqual([info.width,info.height,info.alpha],[2172,724,1],id);
         assert.equal(require("node:crypto").createHash("sha256").update(bytes).digest("hex"),hash,id);
+        if(!["dodgeSkill"].includes(id)){
         assert.equal(manifest[id].sprite.src,candidate,id);
         assert.equal((info.width/manifest[id].sprite.columns)/(info.height/manifest[id].sprite.rows),2.25,id);
         assert.equal(manifest[id].sprite.cellAspect,2.25,id+" cold-cache source ratio");
+        }else{ assert.equal(manifest[id].sprite.presentation,"per-recipient",id); assert.notEqual(manifest[id].sprite.src,candidate,id+" rejected placement source is retired"); }
     });
 });
 
@@ -712,6 +713,103 @@ test("calm explicit partial recipients reject unrelated late feedback nodes",()=
  runtime.context.v143ResolveBattleFeedbackTiming("player",1,"heal",false);
  assert.equal(current.spriteNodes.has("1"),false,"nonrecipient feedback must not expand explicit calm recipient art");
  assert.deepEqual(Array.from(current.emitted),[0,2]);runtime.context.v142SkillAnimationDirector.dispose();
+});
+
+
+const RECIPIENT_CAST_CASES=[
+  {
+    "id": "waterBall",
+    "element": "water",
+    "name": "water-orb-recipient-v1",
+    "type": "tri",
+    "category": "magic",
+    "duration": 1400,
+    "hash": "93cbbb60b0d796da8aa745fefbc20c5eddad53a23d8603e0927b20e4de81db97"
+  },
+  {
+    "id": "healSpell",
+    "element": "water",
+    "name": "heal-recipient-v1",
+    "type": "allyTri",
+    "category": "heal",
+    "duration": 1250,
+    "hash": "2e29ad935f6206b9af7196799cf4fc72d89f17b9ede009fda43a1ad054cb3737"
+  },
+  {
+    "id": "rage",
+    "element": "fire",
+    "name": "rage-recipient-v1",
+    "type": "allyTri",
+    "category": "buff",
+    "duration": 1500,
+    "hash": "b375c26a4682389f39f5e4f6de09c497e2202c7b8db7156db4015679c213d4fd"
+  },
+  {
+    "id": "dodgeSkill",
+    "element": "wind",
+    "name": "dodge-recipient-v1",
+    "type": "allyTri",
+    "category": "buff",
+    "duration": 1600,
+    "hash": "b0c103f51eaf797e1bfae2f1978f97a3a61546a4183a4677ec7e911bcb5b6c72"
+  },
+  {
+    "id": "rockWall",
+    "element": "earth",
+    "name": "rock-wall-recipient-v1",
+    "type": "allyTri",
+    "category": "buff",
+    "duration": 1700,
+    "hash": "63a72336806d201d97c45a45694348607dda1e41fc7c44fce2416ed962e47619"
+  },
+  {
+    "id": "stormRain",
+    "element": "wind",
+    "name": "storm-rain-recipient-v1",
+    "type": "all",
+    "category": "magic",
+    "duration": 1700,
+    "hash": "14030ab012199d821152b8a3585233893a85c9fc6a4cb18b278ecccccf7bcb46"
+  },
+  {
+    "id": "dinghaishenzhen",
+    "element": "wind",
+    "name": "calm-mind-cast-person-v2",
+    "type": "allyAll",
+    "category": "buff",
+    "duration": 2200,
+    "hash": "72a44e3f6137481f928619b234a707e6a4c40f154da6a42834af791439b6be8f"
+  }
+];
+test("recipient replacements preserve exact lossless source bytes, alpha and square frame ratio",()=>{
+ const manifest=loadRuntime().context.v143SkillAnimationManifest;
+ for(const spec of RECIPIENT_CAST_CASES){
+  const file="assets/vfx/"+spec.element+"/"+spec.name+".webp",bytes=fs.readFileSync(file),info=losslessWebpInfo(bytes),sprite=manifest[spec.id].sprite;
+  assert.deepEqual([info.width,info.height,info.alpha],[1448,1086,1],spec.id);
+  assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"),spec.hash,spec.id);
+  assert.deepEqual(bytes,fs.readFileSync("tools/vfx-commercial-sample/assets/full/"+spec.name+".webp"),spec.id);
+  assert.equal(sprite.src,file);assert.equal(sprite.presentation,"per-recipient");
+  assert.deepEqual([sprite.columns,sprite.rows,sprite.frames,sprite.hitFrame],[4,3,12,7]);
+  assert.equal((info.width/sprite.columns)/(info.height/sprite.rows),1);
+ }
+});
+test("recipient casts preserve formal target sets across both sides, six-slot formations and casualties",()=>{
+ for(const spec of RECIPIENT_CAST_CASES){for(const count of [3,6]){for(const partial of [false,true]){
+  const all=/^(all|allyAll)$/.test(spec.type),indexes=partial?(count===3?[0,2]:[1,4]):count===3?[0,1,2]:all?[0,1,2,3,4,5]:[1,3,5];
+  const side=/^ally/.test(spec.type)?"player":"monster";
+  const rects=Array.from({length:count},(_,i)=>({left:30+i*65,top:360,right:90+i*65,bottom:476,width:60,height:116}));
+  const portraits=rects.map(r=>({left:r.left+5,top:375,width:40,height:80}));
+  const runtime=loadRuntime({playerRects:rects,monsterRects:rects,renderGeometry:{getUnitGeometry(s,i){return s===side&&portraits[i]?{artworkProjection:{rect:portraits[i]}}:null;}}});runtime.setClock(100);
+  const config={id:spec.id,name:spec.id,element:spec.element,category:spec.category,targetType:spec.type,duration:spec.duration,resolveDuration:spec.duration};
+  runtime.context.v142SkillAnimationDirector.play(config,{side:"player",actorIndex:0,targetSide:side,targetId:indexes[0],targetIds:indexes});
+  const current=runtime.context.v143SkillAnimationState.current,nodes=stageSprites(runtime).sprites;
+  assert.equal(nodes.length,indexes.length,spec.id);assert.equal(current.targetType,spec.type);
+  assert.deepEqual(Array.from(current.targetIds),indexes);assert.deepEqual(nodes.map(n=>Number(n.dataset.targetIndex)),indexes);
+  indexes.forEach((i,j)=>{const n=nodes[j],p=portraits[i];assert.equal(n.style.left,(p.left+p.width/2)+"px");assert.equal(n.style.top,(p.top+p.height/2)+"px");assert.equal(n.style.getPropertyValue("--v143-sprite-duration"),spec.duration+"ms");assert.equal(n.style.getPropertyValue("--v143-sprite-delay"),"0ms");});
+  const outsider=Array.from({length:count},(_,i)=>i).find(i=>!indexes.includes(i));
+  if(outsider!==undefined){runtime.context.v143ResolveBattleFeedbackTiming(side,outsider,"heal",false);assert.equal(current.spriteNodes.has(String(outsider)),false,spec.id+" does not expand recipient set");}
+  assert.equal(runtime.raf.length,1);let delivered=0;runtime.context.v143RunAtTargetHit(side,indexes[0],()=>delivered++);runtime.context.v142SkillAnimationDirector.dispose();assert.equal(current.hitCallbacks.size,0);assert.equal(delivered,0);assert.equal(runtime.body.querySelectorAll("#v143-skill-stage").length,0);
+ }}}
 });
 
 console.log("\n"+passed+" V173.39 wind Sprite VFX tests passed.");
