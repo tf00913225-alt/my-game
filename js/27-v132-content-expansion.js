@@ -773,10 +773,7 @@
           獨立判定）
     ===================================================== */
 
-    const NORMAL_DROP_TABLE=Object.freeze([
-        {itemId:"freezeTalismanLow",chance:.05,quantity:1},{itemId:"stealthTalismanLow",chance:.05,quantity:1},
-        {itemId:"barrierTalismanLow",chance:.05,quantity:1},{itemId:"oreLow",chance:.05,quantity:1}
-    ].map(Object.freeze));
+    const patrolDropPolicy=window.FourSymbolsPatrolDropPolicy;
 
     function awardMonsterMaterialDrop(monster){
         /*
@@ -787,11 +784,12 @@
         if(window.v132ActiveDungeonRun){ return; }
 
         const gained=[];
-        NORMAL_DROP_TABLE.forEach(row=>{
-            if(Math.random()>=row.chance){ return; }
+        patrolDropPolicy.normalRows.forEach((entry,index)=>{
+            const row=patrolDropPolicy.normalDrop(index,Math.random());
+            if(!row){ return; }
             const definition=getTalismanDefinition(row.itemId)||getOreDefinition(row.itemId);
             if(!definition){ return; }
-            if(addItemToInventory(definition,1)){
+            if(addItemToInventory(definition,row.quantity)){
                 gained.push(definition.name);
             }
         });
