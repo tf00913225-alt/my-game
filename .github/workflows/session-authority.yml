@@ -70,6 +70,8 @@ jobs:
           distribution: temurin
           java-version: '21'
       - run: npm --prefix functions ci --no-audit --no-fund
+      - name: Install pinned repository build dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - run: node --test tests/session-client.test.mjs tests/session-repository-checks-wait.test.mjs
       - run: node --test tests/cloud-save-*.test.mjs tests/firebase-trusted-cloud-save-backend.test.mjs
       - name: Verify account boot with session backend unavailable
