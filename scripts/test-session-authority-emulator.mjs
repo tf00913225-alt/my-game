@@ -3083,5 +3083,153 @@ await assert.rejects(supplyWriter.claimDailySupply(supplyRequest('20901020',supp
 assert.deepEqual((await supplyWriter.claimDailySupply(supplyRequest('20901018',1))).receipt,supplyFirst.receipt);
 console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pill, concurrent exactly-once credit, immutable retry, Taipei rollover/no catch-up, archives, revoked session and private rules.");
 
+// Isolated mode-time integration: real HTTP identity/bootstrap/creation and
+// actual Firestore transactions. Internal clocks below are emulator-only;
+// these intents have no production callable or Client activation.
+{
+    const {createCanonicalAccountModeTime}=require("../functions/src/canonical-account-mode-time.js");
+    const email="account-mode-time-emulator@example.test";
+    const user=await login("accounts:signUp",{email,password}),uid=user.localId;
+    let token=user.idToken,session=await invoke("createGameSession",token,{uid});
+    const root=db.collection("serverUsers").doc(uid),save=db.doc(`users/${uid}/saves/current`);
+    const envelope=await invoke("bootstrapCloudSave",token,{uid,session});
+    await invoke("createInitialCanonicalCharacter",token,{uid,session,selection:choices,
+        expectedRevision:envelope.serverRevision});
+    const original=await checkRecoveryArchive(uid,2);
+    let modeClock=original.get("sourceRecords.progress.playableState.lastSaveTimestamp"),serial=0;
+    assert.ok(Number.isSafeInteger(modeClock));
+    const deps={db,FieldValue,HttpsError,inspectExistingEnvelope,nextRevision,
+        runProtected:writerSessions.runProtected,now:()=>modeClock};
+    const owner=createCanonicalAccountModeTime(deps);
+    const request=()=>({auth:{uid,token:claims(token)},data:{uid,session}});
+    const intent=async extra=>({operationId:`mode-emulator-${String(++serial).padStart(8,"0")}`,
+        expectedRevision:(await save.get()).get("serverRevision"),
+        expectedSequence:(await root.collection("modeTime").doc("current").get()).get("sequence")??0,...extra});
+    const presence=async(action="heartbeat",elementBox="keep")=>owner.observePresence(request(),
+        await intent({intent:action,elementBox}));
+    const capture=async()=>{
+        const rows=[[save.path,(await save.get())]];
+        for(const collection of await root.listCollections()){
+            for(const doc of (await collection.get()).docs)rows.push([doc.ref.path,doc]);
+        }
+        return rows.map(([path,doc])=>[path,{data:doc.data(),version:doc.updateTime?.toMillis()}])
+            .sort(([a],[b])=>a.localeCompare(b));
+    };
+    const refuses=async operation=>{
+        const before=await capture();await assert.rejects(operation);
+        assert.deepEqual(await capture(),before,"Rejected mode intents must commit zero writes");
+    };
+    await presence("reopen");
+    const originalOperationCount=(await root.collection("operations").get()).size;
+    for(let i=0;i<2;i++){modeClock+=30000;await presence();}
+    assert.equal((await root.collection("operations").get()).size,originalOperationCount);
+    assert.equal((await save.get()).get("serverRevision"),2);
+    await presence("rest");modeClock+=120000;
+    const rested=await presence("resume");assert.equal(rested.modeState.rested.battles,1);
+    await checkRecoveryArchive(uid,rested.canonicalRevision);
+    const started=await owner.beginSimulatedAd(request(),await intent());
+    await refuses(async()=>owner.beginSimulatedAd(request(),await intent()));
+    const complete=await intent({sourceId:started.sourceId});modeClock+=2999;
+    await refuses(()=>owner.completeSimulatedAd(request(),complete));modeClock++;
+    // Discard the first response as a transport-loss rehearsal.
+    await owner.completeSimulatedAd(request(),complete);
+    const earned=await owner.completeSimulatedAd(request(),complete);
+    assert.equal(earned.unchanged,true);assert.equal(earned.modeState.elementBox.remainingMs,28800000);
+    await checkRecoveryArchive(uid,earned.canonicalRevision);
+    const abandoned=await owner.beginSimulatedAd(request(),await intent());
+    const abandonedResult=await owner.abandonSimulatedAd(request(),await intent({sourceId:abandoned.sourceId}));
+    assert.equal(abandonedResult.modeState.elementBox.remainingMs,28800000);
+    assert.equal((await root.collection("simulatedAdSources").doc(abandoned.sourceId).get()).get("status"),"abandoned");
+    await refuses(async()=>owner.completeSimulatedAd(request(),await intent({sourceId:abandoned.sourceId})));
+    await presence("heartbeat","start");modeClock+=1000;const charged=await presence();
+    assert.equal(charged.modeState.elementBox.remainingMs,28799000);
+    await presence("rest");modeClock+=1000;const background=await presence("resume");
+    assert.equal(background.modeState.elementBox.remainingMs,28798000);
+    await presence("rest");modeClock+=1000;const reopened=await presence("reopen");
+    assert.equal(reopened.modeState.elementBox.remainingMs,28798000);
+    assert.equal(reopened.modeState.rested.battles,1);
+    modeClock+=1000;
+    const concurrent=await intent({intent:"heartbeat",elementBox:"keep"});
+    const race=await Promise.allSettled([
+        owner.observePresence(request(),concurrent),
+        owner.observePresence(request(),{...concurrent,operationId:"mode-emulator-concurrent-other"})]);
+    assert.equal(race.filter(row=>row.status==="fulfilled").length,1);
+    assert.equal(race.filter(row=>row.status==="rejected").length,1);
+    await refuses(()=>owner.observePresence(request(),{...concurrent,operationId:"mode-emulator-stale-attempt"}));
+    assert.equal((await owner.completeSimulatedAd(request(),complete)).unchanged,true);
+    for(const [collection,id] of [["simulatedAdSources",started.sourceId],
+        ["modeTimeEvents",complete.operationId],["ledgerEntries",complete.operationId]]){
+        const proof=root.collection(collection).doc(id),saved=(await proof.get()).data();
+        await proof.delete();await refuses(()=>owner.completeSimulatedAd(request(),complete));await proof.set(saved);
+        await proof.update({ownerUid:"foreign-mode-owner"});
+        await refuses(()=>owner.completeSimulatedAd(request(),complete));await proof.set(saved);
+    }
+    const currentArchive=root.collection("recoveryArchives").doc(String((await save.get()).get("serverRevision")));
+    const archiveBytes=(await currentArchive.get()).data();
+    await currentArchive.delete();await refuses(()=>presence());await currentArchive.set(archiveBytes);
+    await currentArchive.update({sourceSha256:"0".repeat(64)});
+    await refuses(()=>presence());await currentArchive.set(archiveBytes);
+    const privatePaths=["modeTime/current",`modeTimeEvents/${complete.operationId}`,
+        `simulatedAdSources/${started.sourceId}`];
+    for(const path of privatePaths){
+        for(const browserToken of [token,yUser.idToken])for(const method of ["GET","PATCH"]){
+            assert.equal(await rulesRequest(`${root.path}/${path}`,browserToken,method),403);
+        }
+    }
+    const refusedIntent=await intent({intent:"heartbeat",elementBox:"keep"});
+    await refuses(()=>owner.observePresence({auth:null,data:{uid,session}},refusedIntent));
+    await refuses(()=>owner.observePresence({auth:{uid,token:claims(token)},data:{uid:y,session}},refusedIntent));
+    const oldRequest=request();
+    // Auth emulator login epochs use whole seconds; this wait is bounded.
+    const newerLoginDeadline=Date.now()+2500;
+    while(Math.floor(Date.now()/1000)<=claims(token).auth_time&&Date.now()<newerLoginDeadline){
+        await new Promise(resolve=>setTimeout(resolve,100));
+    }
+    assert.ok(Math.floor(Date.now()/1000)>claims(token).auth_time);
+    const other=await login("accounts:signInWithPassword",{email,password});
+    token=other.idToken;session=await invoke("createGameSession",token,{uid});
+    await refuses(()=>owner.observePresence(oldRequest,refusedIntent));
+    await refuses(()=>presence("resume"));await presence("reopen");
+    const latestRevision=(await save.get()).get("serverRevision");
+    const beforeLoss=await checkRecoveryArchive(uid,latestRevision),retainedBefore=await capture();
+    const recoveryId="mode-emulator-current-recovery";
+    const approval=createCanonicalRecoveryApproval({db,Timestamp,HttpsError,inspectExistingEnvelope,now:()=>modeClock});
+    await approval.issue({auth:{uid:"emulator-mode-operator",token:{cloudSaveOperator:true}},
+        data:{ownerUid:uid,operationId:recoveryId,sourceRevision:latestRevision}});
+    const recover=createCanonicalCurrentRecovery(deps),restoreIntent={operationId:recoveryId,expectedRevision:latestRevision};
+    // An older value event survives independently of BOTH economic indexes;
+    // later zero-value presence must not hide this original earned entitlement.
+    const economicRefs=[root.collection("operations").doc(complete.operationId),
+        root.collection("ledgerEntries").doc(complete.operationId)];
+    const economicBytes=await Promise.all(economicRefs.map(async ref=>(await ref.get()).data()));
+    for(const ref of economicRefs)await ref.delete();
+    await refuses(()=>recover.restoreCurrent(request(),restoreIntent));
+    for(let index=0;index<economicRefs.length;index++)await economicRefs[index].set(economicBytes[index]);
+    const consumedSource=root.collection("simulatedAdSources").doc(started.sourceId);
+    const consumedBytes=(await consumedSource.get()).data();
+    await consumedSource.update({consumedBy:"mode-emulator-wrong-consumer"});
+    await refuses(()=>recover.restoreCurrent(request(),restoreIntent));await consumedSource.set(consumedBytes);
+    const remove=db.batch();
+    for(const name of ["account","economy","inventory","equipment","characters","relics",
+        "relicLoadout","progress","claimCheckpoints","claimRecords"]){
+        for(const doc of (await root.collection(name).get()).docs)remove.delete(doc.ref);
+    }
+    await remove.commit();
+    const restored=await recover.restoreCurrent(request(),restoreIntent);
+    assert.equal(restored.restoredRevision,latestRevision+1);
+    const afterRecovery=await checkRecoveryArchive(uid,restored.restoredRevision);
+    assert.deepEqual(afterRecovery.get("sourceRecords.progress.sidecars"),beforeLoss.get("sourceRecords.progress.sidecars"));
+    for(const [path,value] of retainedBefore.filter(([path])=>/\/(modeTime|modeTimeEvents|simulatedAdSources|ledgerEntries)\//.test(path))){
+        assert.deepEqual((await db.doc(path).get()).data(),value.data,"Recovery must retain mode rights/history");
+    }
+    const afterRestoreBytes=await capture();
+    assert.equal((await owner.completeSimulatedAd(request(),complete)).unchanged,true);
+    assert.equal((await recover.restoreCurrent(request(),restoreIntent)).unchanged,true);
+    assert.deepEqual(await capture(),afterRestoreBytes);
+    await invoke("revokeGameSession",token,{uid,session});
+    await refuses(()=>owner.completeSimulatedAd(request(),complete));
+    console.log("PASS isolated account mode time actual Firestore: protected identity, private zero heartbeats, rested/ElementBox clock transitions, serial simulated grant, replay/concurrency, corrupt-proof rejection, rules and current-source-loss recovery; all readiness remains closed.");
+}
+
 await db.terminate();
 if(direct){await getFirestore().terminate();}

@@ -67,6 +67,7 @@ function makeEconomyContext(){
     ];
     const storage=new Map();
     const context=vm.createContext({
+        FourSymbolsAccountModeTimePolicy:require("../functions/src/account-mode-time-policy.js"),
         console,
         Math:math,
         Number,String,Object,Array,Infinity,JSON,Date,
@@ -149,6 +150,7 @@ test("rested EXP accrues every two minutes, caps at 300, and consumes one battle
         addEventListener:(type,handler)=>{ listeners[type]=handler; }
     };
     const context=vm.createContext({
+        FourSymbolsAccountModeTimePolicy:require("../functions/src/account-mode-time-policy.js"),
         console,Math,Number,String,Object,Array,JSON,Date,
         player:{id:"主角"},
         document,

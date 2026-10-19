@@ -19,6 +19,7 @@ function loadRuntime(options={}){
     let now=0;
     let tick=null;
     const context={
+        FourSymbolsAccountModeTimePolicy:require("../functions/src/account-mode-time-policy.js"),
         window:null,console,Math,Number,Object,Array,Set,Map,JSON,Infinity,
         Date:{now:()=>now},
         gold:Number(options.gold)||0,

@@ -10,6 +10,7 @@ const {verifyShopPurchaseEvidence}=require("./canonical-shop-purchase");
 const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
+const {createCanonicalAccountModeTime}=require("./canonical-account-mode-time");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 const SETS={
@@ -43,6 +44,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     inspectExistingEnvelope,nextRevision,now=Date.now}){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
     const sourceEvidence=createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
+        inspectExistingEnvelope,nextRevision,now});
+    const modeEvidence=createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
         inspectExistingEnvelope,nextRevision,now});
     async function verifyRecoveredResult(tx,root,uid,operationId,expectedRevision,maxRevision,
         {archiveSnap,snapshotSnap,approvalSnap,operationSnap,auditSnap,grantSnap,ledgerSnap},records){
@@ -183,13 +186,15 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             }
             // Canonical claim sources may all be lost. Independent retained
             // rights must agree with the archive, not be hidden by its rollback.
-            const [claims,receipts,ledgers,grants,events,operations]=await Promise.all([
+            const [claims,receipts,ledgers,grants,events,operations,modeSources,modeEvents]=await Promise.all([
                 tx.get(root.collection("uniqueClaims").limit(401)),
                 tx.get(root.collection("grantOperations").limit(401)),
                 tx.get(root.collection("ledgerEntries").limit(401)),
                 tx.get(root.collection("pendingGrants").limit(401)),
                 tx.get(root.collection("rewardEvents").limit(401)),
-                tx.get(root.collection("operations").limit(401))
+                tx.get(root.collection("operations").limit(401)),
+                tx.get(root.collection("simulatedAdSources").limit(401)),
+                tx.get(root.collection("modeTimeEvents").where("modeChanged","==",true).limit(401))
             ]);
             // Each credit proof reads at most 12 documents, including its claim,
             // grant/receipt/ledger/collision and original event/snapshot/archive.
@@ -205,11 +210,16 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             const pendingCount=grants.docs.filter(doc=>doc.get("status")==="pending").length;
             const operationProofReads=operations.docs.reduce((sum,doc)=>sum+
                 (doc.get("kind")==="canonical-current-recovery"?8:
-                    sourceEvidence.retainedOperationReadBudget(doc.get("kind"))),0);
+                    doc.get("kind")==="account-mode-time"?
+                        modeEvidence.retainedOperationReadBudget(doc.get("kind")):
+                        sourceEvidence.retainedOperationReadBudget(doc.get("kind"))),0);
             if(queries.reduce((sum,query)=>sum+query.size,0)+claims.docs.length*12+
                receipts.docs.length+ledgers.docs.length*5+reservedCount*6+
                grants.docs.length+pendingCount*3+events.docs.length*4+
-               operations.docs.length+operationProofReads>400){
+               operations.docs.length+operationProofReads+
+               modeSources.docs.length*(1+modeEvidence.retainedSourceReadBudget())+
+               modeEvents.docs.length*(1+modeEvidence.retainedEventReadBudget())+
+               modeEvidence.currentEvidenceReadBudget()>400){
                 fail("failed-precondition","Recovery claim evidence exceeds the transaction budget.");
             }
             const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
@@ -220,6 +230,15 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             // Reuse the original credit/debit Owners; never infer a missing
             // receipt from a balance or regenerate an operation during repair.
             const receiptById=new Map(receipts.docs.map(doc=>[doc.id,doc.data()]));
+            await modeEvidence.verifyCurrentEvidence(tx,root,uid,records.account,records,expectedRevision);
+            for(const doc of modeSources.docs){
+                await modeEvidence.verifyRetainedSource(tx,root,uid,records.account,doc,expectedRevision);
+            }
+            const verifiedModeOperations=new Set();
+            for(const doc of modeEvents.docs){
+                await modeEvidence.verifyRetainedEvent(tx,root,uid,records.account,doc,expectedRevision);
+                verifiedModeOperations.add(doc.id);
+            }
             // Debit receipts survive independently of their ledger. Every known
             // purchase/allocation must reach the original full debit proof below,
             // even when its ledger was lost with the current canonical sources.
@@ -229,7 +248,15 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 if(value.schemaVersion!==1||value.ownerUid!==uid){
                     fail("data-loss","Operation inventory identity blocks recovery.");
                 }
-                if(["shop-purchase","exp-allocation","attribute-allocation"].includes(value.kind)){
+                if(value.kind==="account-mode-time"){
+                    if(receiptById.has(doc.id)||!ledgerIds.has(doc.id)){
+                        fail("data-loss","A mode operation lacks its original signed ledger or overlaps a grant.");
+                    }
+                    if(!verifiedModeOperations.has(doc.id)){
+                        await modeEvidence.verifyRetainedOperation(tx,root,uid,records.account,doc,expectedRevision);
+                    }
+                    verifiedModeOperations.add(doc.id);
+                }else if(["shop-purchase","exp-allocation","attribute-allocation"].includes(value.kind)){
                     if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||!ledgerIds.has(doc.id)){
                         fail("data-loss","A debit receipt without its original ledger blocks recovery.");
                     }
@@ -317,6 +344,12 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 if(ledger.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
                    ledger.schemaVersion!==1||ledger.ownerUid!==uid){
                     fail("data-loss","An unmatched ledger entry blocks recovery.");
+                }
+                if(ledger.kind==="account-mode-time"){
+                    if(receipt||!verifiedModeOperations.has(doc.id)){
+                        fail("data-loss","An unmatched signed mode ledger blocks recovery.");
+                    }
+                    continue; // Original mode Owner verified this exact immutable ledger.
                 }
                 if(receipt?.creditedToCharacter===true&&
                    archivedClaims.get(ledger.grantId)?.operationId===doc.id){

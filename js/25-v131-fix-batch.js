@@ -785,12 +785,8 @@
         };
     };
     window.v131GrantElementBoxHours=function(hours,maxHours){
-        const safeHours=Math.max(0,Number(hours)||0);
-        const capMs=Math.max(0,Number(maxHours)||32)*60*60*1000;
-        elementBoxState.remainingMs=Math.min(
-            capMs,
-            Math.max(0,elementBoxState.remainingMs)+safeHours*60*60*1000
-        );
+        elementBoxState.remainingMs=window.FourSymbolsAccountModeTimePolicy.grantElementBox(
+            elementBoxState.remainingMs,hours,maxHours);
         persistElementBoxState();
         updateElementBoxStatsUI();
         return Math.max(0,Math.floor(elementBoxState.remainingMs));
@@ -801,11 +797,11 @@
         const delta=Math.max(0,now-elementBoxLastTick);
         elementBoxLastTick=now;
         if(elementBoxActive && elementBoxState.remainingMs>0){
-            const used=Math.min(delta,elementBoxState.remainingMs);
-            elementBoxState.remainingMs-=used;
-            elementBoxSession.activeMs+=used;
-            if(elementBoxState.remainingMs<=0){
-                elementBoxState.remainingMs=0;
+            const debit=window.FourSymbolsAccountModeTimePolicy.debitElementBox(
+                elementBoxState.remainingMs,delta,elementBoxActive);
+            elementBoxState.remainingMs=debit.remainingMs;
+            elementBoxSession.activeMs+=debit.used;
+            if(debit.exhausted){
                 stopElementBoxWhenTimeEnds();
             }
         }
