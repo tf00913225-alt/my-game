@@ -52,7 +52,8 @@ rippleContext.spawnButtonRipple({closest:()=>false,matches:()=>true},180,500);
 
 // Replaced geometry is deleted rather than hidden behind another late override.
 assert.doesNotMatch(legacySystemCss,/#itemModal \./);
-assert.match(legacySystemCss,/\.item-modal:not\(#itemModal\)/);
+assert.doesNotMatch(legacySystemCss,/\.item-modal:not\(#itemModal\)/);
+assert.match(legacyDetailCss,/#game-ui \.item-modal:not\(#itemModal\) \.item-modal-box\{[^}]*font-size:calc\(15 \* var\(--ui-length-unit/);
 assert.doesNotMatch(legacyRewardCss,/v17346-shop-preview-modal|height:400px|min-height:400px|max-height:400px/);
 assert.doesNotMatch(equipment,/v17346-potion-detail|v17346-shop-preview-modal\{[^}]*width:|v17346-shop-preview-art\{[^}]*width:/);
 assert.doesNotMatch(compareCss,/v17351-equipment-comparison \.item-modal-box|v17351-locked-equipment \.item-modal-box/);

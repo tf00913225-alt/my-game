@@ -29,7 +29,9 @@ assert.match(characterCss,/\.item-slot\{border:1px solid var\(--slot-rarity\);bo
 assert.doesNotMatch(inventoryCss,/inventory-item-classic\{[^}]*border:/);
 assert.match(detailCss,/inventory-stat-primary\{[\s\S]*?border-bottom:1px solid rgba\(200,154,72,.12\)/);
 assert.match(detailCss,/inventory-character-detail-row\{[\s\S]*?min-height:44px/);
-assert.match(systemCss,/\.item-modal:not\(#itemModal\) \.item-modal-box\{[\s\S]*?border:1px solid rgba\(200,154,72,.72\)/);
+assert.doesNotMatch(systemCss,/\.item-modal:not\(#itemModal\)/);
+assert.match(detailCss,/\.item-modal:not\(#itemModal\) \.item-modal-box\{[^}]*font-size:15px/);
+assert.match(characterCss,/Shared Black-Gold Window Skin — visual-only owner[\s\S]*?\.item-modal-box/);
 assert.match(relicCss,/team-relic-current-actions button,:is\(#game-stage,#game-ui\) \.team-relic-select-first\{[\s\S]*?min-height:44px/);
 assert.match(relicCss,/team-relic-tabs button\{[\s\S]*?min-height:44px/);
 assert.match(relicCss,/\.rarity-white\{border-color:#d8d8d8!important;/);

@@ -337,7 +337,13 @@
         const title=root.querySelector("#adventureHeaderTitle"),meta=root.querySelector("#adventureHeaderMeta");
         if(title){ title.textContent=view.chapter.title; }
         if(meta){ meta.innerHTML='<span>建議 Lv.'+esc(view.chapter.suggestedLevel)+'</span><span>主線章節</span>'; }
-        if(ui.body){ ui.body.innerHTML=renderPanel(view); }
+        if(ui.body){
+            if(ui.body.querySelector('.adventure-map-canvas')){ ui.mapScrollTop=ui.body.scrollTop; }
+            ui.body.innerHTML=renderPanel(view);
+            if(ui.body.querySelector('.adventure-map-canvas')&&Number.isFinite(ui.mapScrollTop)){
+                ui.body.scrollTop=ui.mapScrollTop;
+            }
+        }
         syncTracker(view);
     }
 
@@ -348,6 +354,13 @@
         if(opts.focusNodeId){ ui.lastFocusNodeId=opts.focusNodeId; }
         showPage("adventure");
         render();
+        const view=runtimeView(),map=ui.body&&ui.body.querySelector('.adventure-map-canvas');
+        const focusId=opts.focusNodeId||view?.state?.currentNodeId;
+        const node=map&&Array.from(map.querySelectorAll('[data-node-id]')).find(entry=>entry.dataset.nodeId===focusId);
+        if(node){
+            ui.body.scrollTop=map.offsetTop+node.offsetTop-ui.body.clientHeight/2;
+            ui.mapScrollTop=ui.body.scrollTop;
+        }
     }
     function hide(){
         const root=ensureRoot();

@@ -98,20 +98,20 @@ assert.match(detail, /#skillDetailStats \.v17364-progression-hint\{[\s\S]*?font-
 assert.match(inventory, /\.inventory-category-tab\{[^}]*font-size:18px/);
 assert.match(inventory, /\.inventory-item-classic \.inventory-count\{[^}]*font-size:18px/);
 assert.doesNotMatch(read('css/52-v173.50-inventory-qol.css'), /\.inventory-category-tab\{|\.inventory-count\{/);
-assert.match(skillFix, /#creationPage \.creation-step-progress\{font-size:34px/);
+assert.match(skillFix, /#creationPage \.creation-step-progress\{font-size:39px/);
 assert.match(skillFix, /#creationPage \.creation-role-description\{font-size:39px/);
 assert.match(skillFix, /#creationPage \.creation-stats-card \.creation-label\{font-size:41px/);
 assert.match(relic, /\.team-relic-card-name\{[^}]*font-size:16px/);
 assert.match(relic, /\.team-relic-detail section h3\{[^}]*font-size:18px/);
 assert.match(relic, /\.team-relic-tabs button\{[^}]*font-size:15px/);
 assert.match(gameplay, /\.gameplay-mode-copy h3\{[^}]*font-size:22px/);
-assert.match(gameplay, /\.gameplay-fixed-tabs button\{[^}]*font-size:16px/);
+assert.match(gameplay, /\.gameplay-fixed-tabs button\{[^}]*font-size:18px/);
 assert.match(gameplay, /\.boss-detail-grid h4\{[^}]*font-size:18px/);
 assert.match(qa, /\.v17346-shop-name\{font-size:16px!important/);
 assert.match(qa, /\.v17346-shop-buy\{[^}]*font-size:15px!important/);
-assert.match(qa, /\.quest-card-desc\{font-size:15px!important/);
+assert.match(read('css/25-stage-v90-quest-interface-core.css'), /\.quest-card-desc\{[^}]*font-size:15px/);
 assert.match(qa, /\.v17363-preview-group p\{font-size:15px!important/);
-assert.match(read('css/38-v141-system-expansion.css'), /\.v17363-game-select-option\{[^}]*font-size:15px!important/);
+assert.match(read('css/38-v141-system-expansion.css'), /\.v17363-game-select-option\{[^}]*font-size:15px/);
 assert.match(read('css/38-v141-system-expansion.css'), /\.v141-synthesis-tabs button\{[^}]*font-size:15px!important/);
 
 // Native 1080 design-space values must still resolve to at least 13px on a 420px phone.

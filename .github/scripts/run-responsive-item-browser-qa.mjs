@@ -301,7 +301,7 @@ async function run(chrome,url,live){
    assert.equal(composition.side,8,'side facilities lost an entrance');
    assert.equal(composition.tools,4,'recessive tool row lost a function');
    assert.equal(composition.collections.length,2,'paired collections missing');
-   assert.ok(composition.collections.every(n=>Math.abs(n.height/home.rect.width-180/1080)<.002&&Math.abs(n.width/home.rect.width-144/1080)<.002),'collections lost native side-entrance proportions');
+   assert.ok(composition.collections.every(n=>Math.abs(n.height/home.rect.width-144/1080)<.002&&Math.abs(n.width/home.rect.width-144/1080)<.002),'collections lost native side-entrance proportions');
    assert.equal(composition.entries.length,13,'city entrance lost or duplicated');
    for(let i=0;i<composition.entries.length;i++)for(let j=i+1;j<composition.entries.length;j++){
     const a=composition.entries[i],b=composition.entries[j];

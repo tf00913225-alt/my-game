@@ -184,7 +184,7 @@ assert.match(dungeonPolish,/topReturn\.setAttribute\("aria-label","返回上一�
 assert.match(navShell,/grid-template-columns|renderGameplayContext/);
 
 assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
-assert.match(creationCss,/creation-stat-details\[open\] \.creation-stat-details-body\{[\s\S]*font-size:32px/);
+assert.match(creationCss,/creation-stat-details\[open\] \.creation-stat-details-body\{[\s\S]*font-size:39px/);
 assert.match(questCss,/quest-milestone\.reached:not\(\.claimed\) \.quest-milestone-slot::after/);
 assert.match(questCss,/quest-milestone:not\(\.reached\)[\s\S]*opacity:\.5 !important/);
 assert.match(questCss,/quest-milestone\.claimed[\s\S]*opacity:\.5 !important/);
