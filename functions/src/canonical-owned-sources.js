@@ -1,5 +1,7 @@
 "use strict";
 
+const {inspectCanonicalSnapshot}=require("./canonical-snapshot");
+
 // Read the complete owned sets in the same transaction as the snapshot check.
 // Claims and owned items are advanced with every canonical revision.
 const SOURCE_COLLECTIONS=[
@@ -39,6 +41,42 @@ async function readOwnedSources(tx,root,fail){
     }).sort((a,b)=>a.claimKey.localeCompare(b.claimKey,"en"));
     if(refs.length>400){
         fail("failed-precondition","Owned source set exceeds the transaction budget.");
+    }
+    if(records.inventory.length){
+        // Firestore collection order is document-ID order, not bag insertion
+        // order. The current canonical snapshot retains the original sequence;
+        // only that same-transaction source may order the live owned records.
+        const uid=root.id||root.path?.split("/").at(-1);
+        if(typeof uid!=="string"||!uid){
+            fail("data-loss","Owned inventory root identity is missing.");
+        }
+        const accountSnap=await tx.get(root.collection("account").doc("current"));
+        const account=accountSnap.data();
+        if(!accountSnap.exists||account?.schemaVersion!==1||account.ownerUid!==uid||
+           !Number.isSafeInteger(account.serverRevision)||account.serverRevision<1||
+           !/^[a-f0-9]{64}$/.test(account.snapshotSha256||"")){
+            fail("data-loss","Owned inventory ordering account is inconsistent.");
+        }
+        const snapshotSnap=await tx.get(root.collection("playableSnapshots")
+            .doc(String(account.serverRevision)));
+        let inventory;
+        try{
+            if(!snapshotSnap.exists||snapshotSnap.get("sha256")!==account.snapshotSha256){
+                throw Error("Current inventory snapshot is missing or mismatched.");
+            }
+            inventory=inspectCanonicalSnapshot(snapshotSnap.data(),uid,account.serverRevision).inventory;
+            if(!Array.isArray(inventory)){throw Error("Current inventory sequence is missing.");}
+        }catch(_){fail("data-loss","Owned inventory ordering snapshot is inconsistent.");}
+        const byId=new Map(records.inventory.map(record=>[record.ownedItemId,record]));
+        const order=inventory.map(record=>record?.ownedItemId);
+        if(byId.size!==records.inventory.length||order.length!==byId.size||
+           order.some(id=>typeof id!=="string"||!id||!byId.has(id))||
+           new Set(order).size!==order.length){
+            fail("data-loss","Owned inventory ordering set differs from current sources.");
+        }
+        // Preserve live quantities/fields for the caller's full snapshot check.
+        // Snapshot rows supply order only and never replace damaged source data.
+        records.inventory=order.map(id=>byId.get(id));
     }
     return {records,refs};
 }
