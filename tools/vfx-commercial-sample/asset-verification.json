@@ -1,0 +1,68 @@
+[
+  {
+    "asset": "tools\\vfx-commercial-sample\\assets\\flame-slash.webp",
+    "source": "exec-3fd23b41-e374-4beb-9564-8674575d4c78.png",
+    "size": [
+      1448,
+      1086
+    ],
+    "grid": [
+      4,
+      3
+    ],
+    "cell": [
+      362,
+      362
+    ],
+    "losslessPixelMatch": true,
+    "alphaExtrema": [
+      0,
+      253
+    ],
+    "sha256": "5207c5e3486fbe9fb84f00e82d40465f8de0f26d9579b60a62c0f9f39225fcfe"
+  },
+  {
+    "asset": "tools\\vfx-commercial-sample\\assets\\ice-arrow-rain.webp",
+    "source": "exec-ebfa32e3-1df5-4311-859e-83efc3c05145.png",
+    "size": [
+      1448,
+      1086
+    ],
+    "grid": [
+      4,
+      3
+    ],
+    "cell": [
+      362,
+      362
+    ],
+    "losslessPixelMatch": true,
+    "alphaExtrema": [
+      0,
+      252
+    ],
+    "sha256": "7651389c1a72545adccb004ca48ed276c08a91d1a47ceb80d6dbdc688e835b4e"
+  },
+  {
+    "asset": "tools\\vfx-commercial-sample\\assets\\nine-dragon-fire.webp",
+    "source": "exec-cf8150ae-e5c7-43fe-b27d-6061db12c890.png",
+    "size": [
+      1448,
+      1086
+    ],
+    "grid": [
+      4,
+      3
+    ],
+    "cell": [
+      362,
+      362
+    ],
+    "losslessPixelMatch": true,
+    "alphaExtrema": [
+      0,
+      253
+    ],
+    "sha256": "0ced505fcf7c38d4f8856975481352df985dbe169f35198d5213f43b2111ae6f"
+  }
+]
