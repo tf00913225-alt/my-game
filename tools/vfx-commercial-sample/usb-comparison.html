@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>USB 真機 VFX 前後對照</title>
+<style>body{margin:0;background:#101722;color:#e9edf3;font:16px/1.6 system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:24px}h1{font-size:24px;margin:0 0 8px}p{color:#aeb9ca;margin:8px 0 18px}select{padding:10px 14px;background:#202d40;color:inherit;border:1px solid #68778d;border-radius:6px;font:inherit;min-width:240px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:20px}figure{margin:18px 0}figcaption{margin:0 0 8px;font-weight:600}img{width:100%;height:auto;display:block;background:#172033;border-radius:8px}.source{font-size:13px;color:#aeb9ca;overflow-wrap:anywhere}#note{padding:12px;background:#1d2a3d;border-radius:6px}@media(max-width:600px){main{padding:12px}.pair{gap:8px}h1{font-size:20px}}</style>
+<main><h1>USB 真機 VFX 前後對照</h1><p>同一台 Samsung Note9 的實際遊戲測試畫面。這是施放瞬間的對照；動畫連續性、命中與清理另有測試紀錄。</p>
+<label for="case">選擇技能或狀態　</label><select id="case"></select><p id="note"></p>
+<div class="pair"><figure><figcaption>修改前／上一輪</figcaption><div class="source" id="beforeSource"></div><img id="before" alt="修改前手機截圖"></figure><figure><figcaption>目前候選</figcaption><div class="source" id="afterSource"></div><img id="after" alt="目前候選手機截圖"></figure></div>
+<p>使用獨立唯讀 QA 帳號。較早基線與本輪的瀏覽器可視高度略有差異；圖片完整呈現，沒有裁切或重繪截圖。</p></main>
+<script>
+const rows=[
+ ['flameSlash','火焰斬','skill','斬柱改為纖細斜弧，保留火焰辨識，檢查命中星芒與角色可讀性。'],
+ ['dragonSlash','龍斬','skill','保留龍首與盤身，檢查裁切、開場與尾段消散。'],
+ ['blazeSpell','火法','skill','完整火焰尖弧取代平切大柱，檢查法陣與收尾。'],
+ ['rage','怒火施放','skill','移除矩形底，保留向上增益標誌。'],
+ ['earthShield','萬象土盾施放','skill','單人土盾改為單盾，檢查不再畫出三個盾。'],
+ ['fireSoulResonance','火魂共鳴施放','skill','環流中央保留透明空間，檢查相鄰幀位置。'],
+ ['windSpell','群體風法','skill','群體藝術框使用完整可視側，保留三個正式目標。'],
+ ['stormRain','風起雲湧','skill','三道分離旋風取代滿幅霧團，檢查各目標辨識。'],
+ ['iceArrowRain','冰箭雨','skill','保留全體範圍，檢查血條、裁切與命中。'],
+ ['rage','怒火常駐','status','火臉改為中空火環，保留人物與既有狀態辨識。'],
+ ['stun','暈眩','status','全身星旋移到頭部附近，避免遮住臉胸。'],
+ ['agilityDown','重力圖示','status','檢查 24px 暗色圖示輪廓對比。'],
+ ['defenseDown','破防圖示','status','檢查 24px 暗色圖示輪廓對比。']
+];
+const picker=document.getElementById('case');rows.forEach((r,i)=>picker.add(new Option(r[1],i)));
+function show(){const [id,label,kind,note]=rows[Number(picker.value)];const baseline=id==='flameSlash'||id==='iceArrowRain';
+const originalRage=kind==='status'&&id==='rage';
+const before=originalRage?'../../artifacts/vfx-final/status-rage-original.png':baseline&&kind==='skill'?`../../artifacts/vfx-usb-runtime/before-${id}.png`:`../../artifacts/vfx-checkpoint18/${kind}-${id}.png`;
+document.getElementById('before').src=before;document.getElementById('after').src=`../../artifacts/vfx-final/${kind}-${id}.png`;
+document.getElementById('beforeSource').textContent=originalRage?'同一候選環境：原素材重播':baseline&&kind==='skill'?'原始基線 b767d31e':'上一輪 checkpoint 18f92b26';
+document.getElementById('afterSource').textContent='新候選：實際 Head 以 vfx-final/evidence.json 為準';document.getElementById('note').textContent=note;}
+picker.onchange=show;show();
+</script></html>

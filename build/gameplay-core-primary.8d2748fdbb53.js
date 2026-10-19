@@ -11726,17 +11726,17 @@
     const RAW_MANIFEST={
         normal:{hit:.57,sprite:castSheet("assets/vfx/normal/normal-impact.webp","single",{hitFrame:6,scale:.85,maxSize:100,impactOnly:true})},
 
-        flameSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-slash-cast.png","single",{scale:1.85,maxSize:220})},
+        flameSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-slash-cast-v2.webp","single",{scale:1.85,maxSize:220})},
         fireCritical:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260})},
         fireBurstStrike:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260,reusedFrom:"fireCritical"})},
         explosiveFlurry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/explosive-flurry-cast.png?v=165","group",{scale:1.08,minSize:190,alignToSlots:true})},
-        dragonSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/dragon-slash-cast.png?v=165","single",{scale:2.35,maxSize:300})},
+        dragonSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/dragon-slash-cast-v2.webp","single",{scale:2.35,maxSize:300})},
         fireRocket:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-rocket-cast.png?v=165","trajectory",{travelToTargets:true,scale:.72,minSize:180,maxSize:280})},
-        blazeSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/blaze-spell-cast.png?v=165","single",{scale:2.15,maxSize:260})},
-        flameTornado:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-tornado-cast.png?v=165","single",{scale:2.35,maxSize:300})},
+        blazeSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/blaze-spell-cast-v2.webp","single",{scale:2.15,maxSize:260})},
+        flameTornado:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-tornado-cast-v2.webp","single",{scale:2.35,maxSize:300})},
         phoenixCry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/phoenix-cry-cast.png?v=165","battlefield",{scale:1.12,minSize:280})},
-        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","single",{scale:1.08,minSize:96,maxSize:148})},
-        fireSoulResonance:{hit:DEFAULT_HIT,deferredActorStatusTypes:["fireSoulResonance"],sprite:castSheet("assets/vfx/fire/fire-soul-resonance-cast.webp","single",{scale:1.7,maxSize:225})},
+        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast-v2.webp","single",{scale:1.08,minSize:96,maxSize:148})},
+        fireSoulResonance:{hit:DEFAULT_HIT,deferredActorStatusTypes:["fireSoulResonance"],sprite:castSheet("assets/vfx/fire/fire-soul-resonance-cast-v2.webp","single",{scale:1.7,maxSize:225})},
         bloodBurnArt:{hit:DEFAULT_HIT,deferredActorStatusTypes:["bloodBurn"],sprite:castSheet("assets/vfx/fire/blood-burn-art-cast.webp","single",{scale:1.7,maxSize:225})},
         fireEX:{hit:.74,noVisual:true,passive:true},
 
@@ -11762,7 +11762,7 @@
         windSpell:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/wind-spell-cast.png?v=173.24","group",{scale:1.08,minSize:190,alignToSlots:true})},
         stormCircle:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/storm-circle-cast.png?v=173.24","group",{scale:1.08,minSize:190,alignToSlots:true})},
         windHowlLightning:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/wind-howl-lightning-cast.png?v=173.24","single",{scale:2.35,maxSize:290})},
-        stormRain:{hit:.5,deferredStatusTypes:["stun"],sprite:castSheet("assets/vfx/wind/storm-rain-cast.png?v=173.24","battlefield",{scale:1.08,minSize:280})},
+        stormRain:{hit:.5,deferredStatusTypes:["stun"],sprite:castSheet("assets/vfx/wind/storm-rain-cast-v2.webp","battlefield",{scale:1.08,minSize:280})},
         dodgeSkill:{hit:.5,deferredStatusTypes:["dodgeSkill"],sprite:castSheet("assets/vfx/wind/dodge-skill-cast.png?v=173.24","group",{scale:1.08,minSize:190,alignToSlots:true})},
         stealthSkill:{hit:.5,deferredStatusTypes:["stealthSkill"],sprite:castSheet("assets/vfx/wind/stealth-skill-cast.png?v=173.24","single",{scale:2.15,maxSize:260})},
         dinghaishenzhen:{hit:.5,deferredStatusTypes:["dinghaishenzhen"],sprite:castSheet("assets/vfx/wind/dinghaishenzhen-cast.png?v=173.24","battlefield",{scale:1.08,minSize:280})},
@@ -11780,7 +11780,7 @@
         sandWind:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/sand-wind-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true,preserveSourceAspect:true})},
         flyingSandStrike:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/flying-sand-strike-cast.png?v=173.39","battlefield",{scale:1.08,minSize:280})},
         dustStorm:{hit:.5,deferredStatusTypes:["petrify"],sprite:castSheet("assets/vfx/earth/dust-storm-cast.png?v=173.39","single",{scale:2.4,maxSize:300})},
-        earthShield:{hit:.5,deferredStatusTypes:["earthShield"],sprite:castSheet("assets/vfx/earth/earth-shield-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true})},
+        earthShield:{hit:.5,deferredStatusTypes:["earthShield"],sprite:castSheet("assets/vfx/earth/earth-shield-cast-v2.webp","single",{scale:1.7,maxSize:225})},
         rockWall:{hit:.5,deferredStatusTypes:["rockWall"],sprite:castSheet("assets/vfx/earth/rock-wall-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true})},
         barrier:{hit:.5,deferredStatusTypes:["barrier"],sprite:castSheet("assets/vfx/earth/barrier-cast.png?v=173.39","single",{scale:2.25,maxSize:280})},
         earthEX:{hit:.74,noVisual:true,passive:true},
@@ -12896,21 +12896,30 @@
         image.src=key;
     }
 
-    function fitRangeArt(node,current,bounds,center){
+    function fitRangeArt(node,current,bounds,center,allowArtRecenter){
         const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.()?.rect;
         const side=geometryOwner()?.getSideRect?.(current.targetSide);
         if(!overlay||!side){ return; }
         const left=Math.max(overlay.left,side.left),right=Math.min(overlay.right,side.right);
         const top=Math.max(overlay.top,side.top),bottom=Math.min(overlay.bottom,side.bottom);
         const width=parseFloat(node.style.width),height=parseFloat(node.style.height);
-        const availableWidth=2*Math.min(center.x-left,right-center.x);
-        const availableHeight=2*Math.min(center.y-top,bottom-center.y);
+        const availableWidth=allowArtRecenter?right-left:2*Math.min(center.x-left,right-center.x);
+        const availableHeight=allowArtRecenter?bottom-top:2*Math.min(center.y-top,bottom-center.y);
         if(!(width>0&&height>0&&availableWidth>0&&availableHeight>0)){
             node.dataset.artFit="unavailable";
             node.style.visibility="hidden";
             return;
         }
         const fit=Math.min(1,availableWidth/width,availableHeight/height);
+        if(allowArtRecenter){
+            // A wide authored group must use the whole visible side, not the
+            // small symmetric space below a low portrait anchor. Move only its
+            // artwork box by the minimum distance; target geometry stays fixed.
+            center.x=clamp(center.x,left+width*fit/2,right-width*fit/2);
+            center.y=clamp(center.y,top+height*fit/2,bottom-height*fit/2);
+            node.dataset.artCenterX=String(center.x);
+            node.dataset.artCenterY=String(center.y);
+        }
         node.style.width=(width*fit)+"px";
         node.style.height=(height*fit)+"px";
         node.dataset.artFit="safe";
@@ -13040,7 +13049,7 @@
             :primaryAnchor
             ?{x:primaryAnchor.x,y:primaryAnchor.y}
             :{x:bounds.centerX,y:bounds.centerY};
-        fitRangeArt(node,current,bounds,destination);
+        fitRangeArt(node,current,bounds,destination,placement==="group");
         if(primaryAnchor){ node.dataset.geometrySlot=primaryAnchor.slot; }
         const actor=placement==="trajectory"?slotAnchor(current.side,current.actorIndex,current.actorCard):null;
         if(placement==="trajectory"&&sprite.travelToTargets&&actor){
@@ -13147,10 +13156,13 @@
             beginVisualTimeline(current);
             current.targetIndexes.forEach(index=>setTimer(
                 ()=>{
-                    // A timer can run before the document timeline advances.
-                    // Present this hit on the next paint frame, once per target.
+                    // A timer may run in the same render cycle as its RAF.
+                    // A bounded two-frame fence crosses that cycle before hit;
+                    // it never samples or renders an ongoing animation loop.
                     const presentHit=()=>settleTargetVisual(current,index);
-                    if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(presentHit); }
+                    if(typeof requestAnimationFrame==="function"){
+                        requestAnimationFrame(()=>requestAnimationFrame(presentHit));
+                    }
                     else{ presentHit(); }
                 },Math.max(0,targetHitTime(current,index)-Date.now())
             ));

@@ -102,3 +102,13 @@ are not runtime imports merely because they decode or have lossless conversion.
 The earth-shield and fire-soul sheets still require independent art review.
 Commercial visual acceptance remains pending; review findings are retained in
 the adjacent independent/USB visual review JSON files.
+
+The next candidate imports nine reviewed images (eight cast sheets and the
+rage body aura); `runtime-import-review.json` records byte identity and source
+provenance. These are phone-test candidates, not an automatic art pass. Group
+art now uses the complete safe side with minimum necessary translation, and
+ordinary hit feedback uses a bounded two-frame paint fence. Non-travel raster
+art fades after frame eight instead of staying opaque until an abrupt stop.
+Stun is placed near the head at reduced scale; two dark HUD icons receive a
+thin contrast outline. `usb-comparison.html` shows full phone screenshots with
+the baseline/checkpoint source labeled per case.

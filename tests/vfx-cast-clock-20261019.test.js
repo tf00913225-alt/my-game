@@ -31,9 +31,12 @@ function fixture(withRaf=true){
     assert.equal(f.frames.length,0,"handoff does not recursively schedule frames");
     assert.deepEqual(f.jobs.map(job=>job.delay),[1200,700,700],"all targets use the same authored hit offset");
     f.jobs[1].fn();f.jobs[2].fn();
-    assert.equal(f.frames.length,2,"each target timer hands off exactly once to the paint clock");
+    assert.equal(f.frames.length,2,"each target timer starts one bounded paint fence");
     assert.deepEqual(f.events,[["restart",1200]],"timer task must not present against an old CSS timeline sample");
     f.frames.shift()(1050);f.frames.shift()(1050);
+    assert.deepEqual(f.events,[["restart",1200]],"first fence frame can still belong to the timer render cycle");
+    assert.equal(f.frames.length,2,"only the final paint frame remains for each target");
+    f.frames.shift()(1067);f.frames.shift()(1067);
     assert.deepEqual(f.events,[["restart",1200],0,2]);
     assert.equal(f.frames.length,0,"hit callbacks cannot create a procedural frame loop");
 }

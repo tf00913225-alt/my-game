@@ -213,7 +213,8 @@ test("CSS advances one formal 4x3 sheet row-major without Canvas fallback",()=>{
     assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(/);
     assert.equal((animation.match(/requestAnimationFrame\(start\)/g)||[]).length,1,"only one clock handoff, never a procedural frame loop");
     assert.equal((animation.match(/requestAnimationFrame\(presentHit\)/g)||[]).length,1,"only one hit paint-handoff callsite");
-    assert.equal((animation.match(/requestAnimationFrame\s*\(/g)||[]).length,2,"no additional procedural RAF render loop");
+    assert.equal((animation.match(/requestAnimationFrame\s*\(/g)||[]).length,3,"one start and a bounded two-frame hit fence, no render loop");
+    assert.match(animation,/requestAnimationFrame\(\(\)=>requestAnimationFrame\(presentHit\)\)/);
     assert.match(animation,/const presentHit=\(\)=>settleTargetVisual\(current,index\);/);
     assert.doesNotMatch(css,/data-skill="iceArrowRain"[\s\S]*?v166-water-cast-sprite/);
 });

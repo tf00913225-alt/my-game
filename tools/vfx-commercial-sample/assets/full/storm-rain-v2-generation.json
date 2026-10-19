@@ -1,0 +1,362 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "assetId": "stormRain",
+  "status": "source-reviewed-for-runtime-candidate",
+  "runtimeQaState": "not-reviewed",
+  "tool": "built-in image_gen",
+  "attemptCount": 2,
+  "originalSource": "assets/vfx/wind/storm-rain-cast.png",
+  "output": "tools/vfx-commercial-sample/assets/full/storm-rain-v2.webp",
+  "selectedGeneratedMother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-b2637ad0-7ae8-43ac-b3cf-cc49f4d8cf5f.png",
+  "attempts": [
+    {
+      "mother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-d3a3f64f-200c-4d48-aa4e-4c26714a997b.png",
+      "prompt": "Use case: precise-object-edit. Edit target: attached wind storm-rain game sprite sheet. Replace its enormous fog/cloud masses with THREE clearly separated small turquoise/emerald wind cyclones or wind-blade curls in a horizontal row within EACH animation cell. Exactly4 columns x3 rows, 12 equal square cells, read row-major. Overall canvas4:3. True RGBA transparent background; no checkerboard, grids, dividers, labels or ground scene. Match polished luminous emerald/cyan wind identity but NO clouds, mist blankets, large discs, white wash or solid central fill. Each cell: three thin ribbon cyclones at local x25%,50%,75%, all same ground line local y65%, each at most16% cell width and30% cell height; tallest tip above y35%. Generous negative space and wholly transparent gaps between the three. Wind ribbons have sharp fine bright edges and hollow clear centers so underlying characters remain readable. All art and faint glow within central80% width and70% height; completely transparent gutters. Animation stable positions: frames1-2 three tiny rings/wisps gathering;3-4 three small thin spirals rise;5-6 sharper blade-ribbon curls;7 peak impact, THREE crisp small star glints one at each base and thin flaring spiral edges, do not fill/merge;8 glints gone and curls already smaller;9 three partial arcs;10 a few small blade fragments;11 sparse three sets of motes;12 almost empty three tiny fading sparks. Must be the SAME THREE columns from phase to phase, not one giant tornado, not random target positions. Commercial game atlas, subtle controlled glow, clean high-resolution fine edges, continuous build-impact-decay, no full-width fog or opaque core.",
+      "review": "Three columns established and cloud blanket removed, but curls remain too tall/wide and closely packed. Iterated to slimmer shorter curls."
+    },
+    {
+      "mother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-b2637ad0-7ae8-43ac-b3cf-cc49f4d8cf5f.png",
+      "prompt": "Use case: precise-object-edit. Edit target: attached12-frame4x3 wind animation atlas. Keep exactly3 emerald/cyan wind ribbon cyclones in EACH cell, stable left/center/right columns. Keep4 equal columns x3 equal rows and frame7 base-glint peak, row-major. CORRECTION: each of the3 cyclones must be much THINNER, SHORTER and clearly SEPARATED, only12% of a cell width and25% of its height. Three centers at x25%,50%,75% of EACH cell, common base y65%. This leaves approximately13% cell width of completely transparent gap between neighbors. Whole trio bounded x15%..85%, y35%..70%, never touch any cell edges. Strongest frame7 consists of3 very small base star flashes plus slim hollow spiral ribbons; no solid aqua cones, leaves, cloudy interiors or connecting fog. Frame1 three tiny wisps, frames2-6 rise slowly;7 bright three-point impact;8 half-height curls;9 three small curved fragments;10 smaller fragments;11 three tiny motes;12 three almost invisible tiny sparks. Do not move the three column centers through the animation. Reduce luminous alpha coverage drastically while preserving the sharp white-green ribbon cutting edges. True transparent alpha, no painted background, no grid/labels/checkerboard. At least12% transparent outer padding including glow and motes. Commercial restrained wind VFX designed for seeing three characters through and between the cyclones.",
+      "review": "Three horizontally separated curls remain identifiable across the sequence. Frame7 has three small base glints and highest measured visible-alpha area; later phases decline monotonically. Source candidate, requires independent review and phone placement testing."
+    }
+  ],
+  "grid": {
+    "columns": 4,
+    "rows": 3,
+    "frames": 12,
+    "order": "row-major",
+    "cellDimensions": [
+      362,
+      362
+    ],
+    "authoredHitFraction": 0.5,
+    "peakFrame": 7
+  },
+  "conversion": {
+    "format": "WebP",
+    "lossless": true,
+    "exact": true,
+    "method": 6,
+    "sourceDimensions": [
+      1448,
+      1086
+    ],
+    "outputDimensions": [
+      1448,
+      1086
+    ],
+    "rgbaPixelEquality": true,
+    "resized": false,
+    "cropped": false,
+    "rearranged": false,
+    "sourcePngSha256": "05e192521c4bdc9aea1e188299fd2c4e9db69510592b831925f652d5cbc0ac27",
+    "webpSha256": "518147f7f9afca6a63b825e2caf0250698e8d9d4702207c3293e2318148aa792",
+    "webpBytes": 539266
+  },
+  "alphaValidation": {
+    "method": "Full per-cell alpha scan, each border pixel counted once, strong alpha threshold64. Between-column vertical samples at37.5%/62.5% cell width diagnose separation, not complete contour segmentation.",
+    "trueAlpha": true,
+    "strongBorderContactFrames": [],
+    "frames": [
+      {
+        "frame": 1,
+        "alpha64Bounds": [
+          66,
+          278,
+          306,
+          327
+        ],
+        "borderPixelsAlpha64": 0,
+        "visiblePixelsAlpha64": 4972,
+        "fullyTransparentPixels": 111508,
+        "betweenColumnSamples": [
+          {
+            "localX": 136,
+            "maxAlpha": 2,
+            "strongPixels": 0
+          },
+          {
+            "localX": 226,
+            "maxAlpha": 2,
+            "strongPixels": 0
+          }
+        ]
+      },
+      {
+        "frame": 2,
+        "alpha64Bounds": [
+          67,
+          267,
+          317,
+          331
+        ],
+        "borderPixelsAlpha64": 0,
+        "visiblePixelsAlpha64": 6987,
+        "fullyTransparentPixels": 109548,
+        "betweenColumnSamples": [
+          {
+            "localX": 136,
+            "maxAlpha": 7,
+            "strongPixels": 0
+          },
+          {
+            "localX": 226,
+            "maxAlpha": 158,
+            "strongPixels": 17
+          }
+        ]
+      },
+      {
+        "frame": 3,
+        "alpha64Bounds": [
+          66,
+          229,
+          298,
+          332
+        ],
+        "borderPixelsAlpha64": 0,
+        "visiblePixelsAlpha64": 8656,
+        "fullyTransparentPixels": 104756,
+        "betweenColumnSamples": [
+          {
+            "localX": 136,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          },
+          {
+            "localX": 226,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          }
+        ]
+      },
+      {
+        "frame": 4,
+        "alpha64Bounds": [
+          59,
+          197,
+          304,
+          336
+        ],
+        "borderPixelsAlpha64": 0,
+        "visiblePixelsAlpha64": 11828,
+        "fullyTransparentPixels": 96288,
+        "betweenColumnSamples": [
+          {
+            "localX": 136,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          },
+          {
+            "localX": 226,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          }
+        ]
+      },
+      {
+        "frame": 5,
+        "alpha64Bounds": [
+          59,
+          162,
+          308,
+          315
+        ],
+        "borderPixelsAlpha64": 0,
+        "visiblePixelsAlpha64": 13910,
+        "fullyTransparentPixels": 95610,
+        "betweenColumnSamples": [
+          {
+            "localX": 136,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          },
+          {
+            "localX": 226,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          }
+        ]
+      },
+      {
+        "frame": 6,
+        "alpha64Bounds": [
+          60,
+          160,
+          314,
+          313
+        ],
+        "borderPixelsAlpha64": 0,
+        "visiblePixelsAlpha64": 14750,
+        "fullyTransparentPixels": 93196,
+        "betweenColumnSamples": [
+          {
+            "localX": 136,
+            "maxAlpha": 2,
+            "strongPixels": 0
+          },
+          {
+            "localX": 226,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          }
+        ]
+      },
+      {
+        "frame": 7,
+        "alpha64Bounds": [
+          59,
+          159,
+          316,
+          323
+        ],
+        "borderPixelsAlpha64": 0,
+        "visiblePixelsAlpha64": 17297,
+        "fullyTransparentPixels": 88214,
+        "betweenColumnSamples": [
+          {
+            "localX": 136,
+            "maxAlpha": 12,
+            "strongPixels": 0
+          },
+          {
+            "localX": 226,
+            "maxAlpha": 5,
+            "strongPixels": 0
+          }
+        ]
+      },
+      {
+        "frame": 8,
+        "alpha64Bounds": [
+          62,
+          194,
+          305,
+          313
+        ],
+        "borderPixelsAlpha64": 0,
+        "visiblePixelsAlpha64": 9869,
+        "fullyTransparentPixels": 103924,
+        "betweenColumnSamples": [
+          {
+            "localX": 136,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          },
+          {
+            "localX": 226,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          }
+        ]
+      },
+      {
+        "frame": 9,
+        "alpha64Bounds": [
+          72,
+          159,
+          308,
+          269
+        ],
+        "borderPixelsAlpha64": 0,
+        "visiblePixelsAlpha64": 6156,
+        "fullyTransparentPixels": 105811,
+        "betweenColumnSamples": [
+          {
+            "localX": 136,
+            "maxAlpha": 8,
+            "strongPixels": 0
+          },
+          {
+            "localX": 226,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          }
+        ]
+      },
+      {
+        "frame": 10,
+        "alpha64Bounds": [
+          70,
+          169,
+          305,
+          269
+        ],
+        "borderPixelsAlpha64": 0,
+        "visiblePixelsAlpha64": 4762,
+        "fullyTransparentPixels": 109191,
+        "betweenColumnSamples": [
+          {
+            "localX": 136,
+            "maxAlpha": 2,
+            "strongPixels": 0
+          },
+          {
+            "localX": 226,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          }
+        ]
+      },
+      {
+        "frame": 11,
+        "alpha64Bounds": [
+          79,
+          203,
+          296,
+          265
+        ],
+        "borderPixelsAlpha64": 0,
+        "visiblePixelsAlpha64": 2055,
+        "fullyTransparentPixels": 119662,
+        "betweenColumnSamples": [
+          {
+            "localX": 136,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          },
+          {
+            "localX": 226,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          }
+        ]
+      },
+      {
+        "frame": 12,
+        "alpha64Bounds": [
+          81,
+          220,
+          284,
+          261
+        ],
+        "borderPixelsAlpha64": 0,
+        "visiblePixelsAlpha64": 540,
+        "fullyTransparentPixels": 116889,
+        "betweenColumnSamples": [
+          {
+            "localX": 136,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          },
+          {
+            "localX": 226,
+            "maxAlpha": 1,
+            "strongPixels": 0
+          }
+        ]
+      }
+    ]
+  },
+  "visualReview": {
+    "threeColumnIdentity": "pass for source candidate: three curls/mote clusters, no merged giant tornado",
+    "cloudBlanket": "removed in source; no full-width bright mist carpet",
+    "peak": "frame7 three base glints; alpha64 area17297, then9869/6156/4762/2055/540 for frames8-12",
+    "continuity": "overall gather/rise/peak/decay improved; neighboring curls change bend direction, requires actual12-frame playback for smoothness",
+    "padding": "zero alpha64 border contact; tightest strong-alpha bottom margin26px (~7.18%) in frame4, no observed clipping. Prompt12% target not uniformly met.",
+    "separation": "peak inter-column samples max alpha12/5; frame2 second gap sample has17 strong pixels and needs playback inspection, no broad bridging fog",
+    "placementCaveat": "Generated bases sit around local y86-92% in early/peak cells rather than requested65%; validate actual ground alignment and whether three curls remain aligned with recipients. Do not compensate by changing gameplay target geometry.",
+    "commercialReadiness": "not-passed; independent source/USB tests pending"
+  },
+  "next": "Independent source review, then candidate-only phone comparison. Do not silently replace runtime assets."
+}

@@ -3719,7 +3719,8 @@
 }
 @keyframes v143RasterCastOpacity{
     0%,100%{opacity:0}
-    2%,97%{opacity:1}
+    2%,66.666667%{opacity:1}
+    83.333333%{opacity:.4}
 }
 
 .v143-skill-stage[data-element="fire"] .v143-vfx-sprite{
@@ -3755,7 +3756,8 @@
 
 @keyframes v143RasterCastEnvelope{
     0%{opacity:0;transform:translate(-50%,-50%) scale(.98)}
-    2%,97%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    2%,66.666667%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    83.333333%{opacity:.4;transform:translate(-50%,-50%) scale(1)}
     100%{opacity:0;transform:translate(-50%,-50%) scale(1)}
 }
 
@@ -3853,6 +3855,15 @@
     animation:none !important;
     opacity:1 !important;
     transform:none !important;
+}
+
+:is(#game-stage #battlePage,.v174-battle-hud-layer) :is(.v143-status-icon-agilityDown,.v143-status-icon-defenseDown){
+    filter:drop-shadow(0 0 1px rgba(229,246,255,.95));
+}
+
+#game-stage #battlePage .v143-status-visual-stun{
+    top:20%;
+    transform:translate(-50%,-50%) scale(.52);
 }
 
 #game-stage #battlePage .v143-status-visual-burn{

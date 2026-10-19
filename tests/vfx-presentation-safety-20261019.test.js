@@ -15,7 +15,7 @@ function functionSource(source,name,next){
 const rect=(left,top,width,height)=>({left,top,right:left+width,bottom:top+height,width,height,centerX:left+width/2,centerY:top+height/2});
 function fitRuntime(side,overlay){
     const context={window:{FourSymbolsBattlefieldRenderGeometry:{getBattlefieldOverlayGeometry:()=>({rect:overlay})}},
-        geometryOwner:()=>({getSideRect:()=>side}),Math,parseFloat,String};
+        geometryOwner:()=>({getSideRect:()=>side}),Math,parseFloat,String,clamp:(v,min,max)=>Math.max(min,Math.min(max,v))};
     vm.createContext(context);
     vm.runInContext(functionSource(animation,"fitRangeArt","emittedSpriteTargets"),context);
     return context.fitRangeArt;
@@ -51,6 +51,17 @@ test("an edge tri anchor retains its center and footprint while fitting proporti
     fit(small,{targetSide:"player"},bounds,center);
     assert.equal(small.style.width,"40px");assert.equal(small.style.height,"20px");
 });
+test("low group art uses the visible side with minimal translation instead of shrinking to one slot",()=>{
+    const safe=rect(0,0,360,300),center={x:180,y:240},bounds=rect(0,180,360,120);
+    const node={style:{width:"360px",height:"360px"},dataset:{targetIndexes:"0,1,2"}};
+    const semantic=JSON.stringify(bounds);
+    fitRuntime(safe,safe)(node,{targetSide:"monster"},bounds,center,true);
+    assert.equal(parseFloat(node.style.width),300);
+    assert.equal(parseFloat(node.style.height),300);
+    assert.equal(center.x,180);assert.equal(center.y,150);
+    assertInside(node,center,safe);
+    assert.equal(node.dataset.targetIndexes,"0,1,2");assert.equal(JSON.stringify(bounds),semantic);
+});
 test("tri geometry is the canonical three-slot footprint regardless of surviving target indexes",()=>{
     const footprint=rect(0,20,360,120);footprint.slots=["F1","F2","F3"];
     const calls=[];
@@ -74,7 +85,7 @@ test("an edge primary keeps its hit identity while three-slot artwork centers ac
     const context={window:{FourSymbolsBattlefieldRenderGeometry:{getBattlefieldOverlayGeometry:()=>({rect:safe})}},
         geometryOwner:()=>({getSideRect:()=>safe}),placementFor:()=>"group",emittedSpriteTargets:current=>current.targetIndexes,
         geometryBounds:()=>bounds,geometryPrimaryAnchor:()=>primary,frameAspectFor:()=>1,
-        SPRITE_SCALE_MULTIPLIER:1,PLACEMENT_SIZE_SCALE:{group:1},Math,Number,String,Array,parseFloat};
+        SPRITE_SCALE_MULTIPLIER:1,PLACEMENT_SIZE_SCALE:{group:1},Math,Number,String,Array,parseFloat,clamp:(v,min,max)=>Math.max(min,Math.min(max,v))};
     vm.createContext(context);
     vm.runInContext(functionSource(animation,"applySpriteBox","requestSpriteAspect")+
         functionSource(animation,"fitRangeArt","emittedSpriteTargets")+

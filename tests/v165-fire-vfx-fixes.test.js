@@ -110,17 +110,15 @@ function verifySheet(path,expectedHash,expectedNonzero,expectedAlphaSum){
     assert.deepEqual([nonzero,alphaSum,maxAlpha],[expectedNonzero,expectedAlphaSum,253],path);
 }
 
-test("Rage and Dragon Slash preserve all twelve normalized source frames",()=>{
-    verifySheet(
-        "assets/vfx/fire/rage-cast.png",
-        "7be0f810daf8037135140711c4d09d40ecc19b062d97888d53f51be72b430133",
-        935210,125072850
-    );
-    verifySheet(
-        "assets/vfx/fire/dragon-slash-cast.png",
-        "3317d75fb86c9c5f4feccb440240fcc88309f0fe195e387f46aadc227d66b723",
-        1324757,207033241
-    );
+test("replacement fire sheets preserve reviewed lossless alpha WebP sources",()=>{
+    const rageInfo=losslessWebpInfo("assets/vfx/fire/rage-cast-v2.webp");
+    assert.deepEqual([rageInfo.width,rageInfo.height,rageInfo.alpha],[1448,1086,1]);
+    assert.equal(rageInfo.width/4,rageInfo.height/3);
+    for(const [runtime,candidate] of [["rage-cast-v2.webp","rage-v2.webp"],["dragon-slash-cast-v2.webp","dragon-slash-v2.webp"],["blaze-spell-cast-v2.webp","blaze-spell-v2.webp"],["flame-tornado-cast-v2.webp","flame-tornado-v2.webp"]]){
+      const runtimePath="assets/vfx/fire/"+runtime,info=losslessWebpInfo(runtimePath);
+      assert.deepEqual([info.width,info.height,info.alpha],[1448,1086,1]);assert.equal(info.width/4,info.height/3);
+      assert.equal(crypto.createHash("sha256").update(fs.readFileSync(runtimePath)).digest("hex"),crypto.createHash("sha256").update(fs.readFileSync("tools/vfx-commercial-sample/assets/full/"+candidate)).digest("hex"));
+    }
 });
 
 test("Fire Rocket travels from its caster to the real target group before bursting",()=>{
@@ -136,10 +134,18 @@ test("Fire Rocket travels from its caster to the real target group before bursti
 });
 
 test("the current cache version publishes the repaired sheets and choreography",()=>{
-    assert.match(animation,/dragon-slash-cast\.png\?v=165/);
-    assert.match(animation,/rage-cast\.png\?v=165/);
+    assert.match(animation,/dragon-slash-cast-v2\.webp/);
+    assert.match(animation,/rage-cast-v2\.webp/);
     assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
 console.log("\nV165 Fire VFX fixes suite: "+passed+" tests passed.");
+
+
+function losslessWebpInfo(file){
+ const b=Buffer.isBuffer(file)?file:fs.readFileSync(file);
+ assert.equal(b.toString("ascii",0,4),"RIFF");assert.equal(b.toString("ascii",8,12),"WEBP");
+ for(let o=12;o+8<=b.length;){const type=b.toString("ascii",o,o+4),size=b.readUInt32LE(o+4),p=o+8;assert.ok(p+size<=b.length,"complete WebP chunk");if(type==="VP8L"){assert.equal(b[p],0x2f);const bits=b.readUInt32LE(p+1);return {width:1+(bits&16383),height:1+((bits>>>14)&16383),alpha:(bits>>>28)&1};}o=p+size+(size%2);}
+ throw new Error("Expected lossless VP8L image");
+}

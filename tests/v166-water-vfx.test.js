@@ -428,7 +428,7 @@ test("single-target sheets stay centered on the actual selected card",()=>{
     });
 });
 
-test("Ice Spin creates one fixed tri-target sheet centered on the explicit primary target",()=>{
+test("Ice Spin centers its fixed tri-target artwork on the shape and preserves the explicit primary",()=>{
     [[1],[0,2],[0,1,2]].forEach(indexes=>{
         const monsters=[0,1,2].map(index=>({
             alive:indexes.includes(index),hp:indexes.includes(index)?100:0,
@@ -442,7 +442,8 @@ test("Ice Spin creates one fixed tri-target sheet centered on the explicit prima
         const {sprites}=stageSprites(runtime);
         assert.equal(sprites.length,1,indexes.join(","));
         assert.equal(sprites[0].dataset.targetIndexes,indexes.join(","));
-        assert.equal(sprites[0].style.left,["338px","458px","578px"][indexes[0]]);
+        assert.equal(sprites[0].style.left,"458px");
+        assert.equal(runtime.context.v143SkillAnimationState.current.targetId,indexes[0]);
         assert.equal(sprites[0].style.width,"316px");
         assert.equal(sprites[0].style.height,"316px","Ice Spin preserves its authored square frame across the fixed tri-target footprint");
         indexes.forEach(index=>runtime.context.showMonsterHit(index,10,"hp"));
@@ -454,7 +455,7 @@ test("Ice Spin creates one fixed tri-target sheet centered on the explicit prima
     });
 });
 
-test("Water Ball renders one sheet centered on the actual living target group",()=>{
+test("Water Ball renders one canonical three-slot sheet regardless of surviving targets",()=>{
     [[1],[0,2],[0,1,2]].forEach(indexes=>{
         const monsters=[0,1,2].map(index=>({
             alive:indexes.includes(index),hp:indexes.includes(index)?100:0,
@@ -470,7 +471,8 @@ test("Water Ball renders one sheet centered on the actual living target group",(
         assert.equal(sprites.length,1,indexes.join(","));
         assert.equal(sprites[0].dataset.placement,"group");
         assert.equal(sprites[0].dataset.targetIndexes,indexes.join(","));
-        assert.equal(sprites[0].style.left,["338px","458px","578px"][primary]);
+        assert.equal(sprites[0].style.left,"458px");
+        assert.equal(runtime.context.v143SkillAnimationState.current.targetId,primary);
         assert.equal(sprites[0].style.top,"140px");
         assert.equal(sprites[0].style["--v143-sprite-duration"],"1400ms");
     });
@@ -593,7 +595,8 @@ test("tri-target Freeze and ally-all Heal use their fixed semantic footprints",(
     const freezeSprites=stageSprites(freeze).sprites;
     assert.equal(freezeSprites.length,1);
     assert.equal(freezeSprites[0].dataset.targetIndexes,"0,2");
-    assert.equal(freezeSprites[0].style.left,"338px");
+    assert.equal(freezeSprites[0].style.left,"458px");
+    assert.equal(freeze.context.v143SkillAnimationState.current.targetId,0);
     assert.equal(freezeSprites[0].style.width,"316px");
     assert.equal(freezeSprites[0].style.height,"316px","Freeze preserves its authored square frame across the fixed tri-target footprint");
 

@@ -254,7 +254,13 @@ function loadRuntime(options={}){
     vm.runInContext(animation,context);
     return {
         context,body,cards,monsters,party,scheduled,raf,drawCalls,monsterHits,playerHits,cardEffects,
-        setClock(value){ clock=value; },
+        setClock(value){
+            // Paint the newly scheduled cast at its initial clock before
+            // advancing to hit/completion; production starts its timeline on RAF.
+            const pendingFrames=raf.splice(0);
+            pendingFrames.forEach(callback=>callback(clock));
+            clock=value;
+        },
         imageCount(){ return imageCount; },
         tick(value){
             clock=value;
@@ -302,7 +308,8 @@ test("all eleven casts keep Sprite timing while six persistent states use low-mo
     Object.entries(CASTS).forEach(([id,spec])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id);
-        assert.equal(model.sprite.src,"assets/vfx/wind/"+spec.file+"?v=173.24",id);
+        const expectedSource=id==="stormRain"?"assets/vfx/wind/storm-rain-cast-v2.webp":"assets/vfx/wind/"+spec.file+"?v=173.24";
+        assert.equal(model.sprite.src,expectedSource,id);
         assert.deepEqual(
             Array.from([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame]),
             [4,3,12,7],id
@@ -330,6 +337,27 @@ test("all eleven casts keep Sprite timing while six persistent states use low-mo
         assert.equal(visual.duration,undefined,type+" must not own a persistent frame clock");
     });
 });
+
+test("stormRain uses the reviewed lossless twelve-cell candidate while stormSpell retains its original sheet",()=>{
+    const candidate="assets/vfx/wind/storm-rain-cast-v2.webp";
+    const bytes=fs.readFileSync(candidate);
+    const info=losslessWebpInfo(bytes);
+    assert.deepEqual([info.width,info.height],[1448,1086]);
+    assert.equal(info.alpha,1,"wind ribbons must retain alpha");
+    assert.equal(info.width/4,362);assert.equal(info.height/3,362);
+    assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"),"518147f7f9afca6a63b825e2caf0250698e8d9d4702207c3293e2318148aa792");
+    const manifest=loadRuntime().context.v143SkillAnimationManifest;
+    assert.equal(manifest.stormRain.sprite.src,candidate);
+    assert.equal(manifest.stormSpell.sprite.src,"assets/vfx/wind/storm-rain-cast.png?v=173.24");
+    assert.equal(manifest.stormSpell.sprite.reusedFrom,"stormRain");
+});
+
+function losslessWebpInfo(file){
+ const b=Buffer.isBuffer(file)?file:fs.readFileSync(file);
+ assert.equal(b.toString("ascii",0,4),"RIFF");assert.equal(b.toString("ascii",8,12),"WEBP");
+ for(let o=12;o+8<=b.length;){const type=b.toString("ascii",o,o+4),size=b.readUInt32LE(o+4),p=o+8;assert.ok(p+size<=b.length,"complete WebP chunk");if(type==="VP8L"){assert.equal(b[p],0x2f);const bits=b.readUInt32LE(p+1);return {width:1+(bits&16383),height:1+((bits>>>14)&16383),alpha:(bits>>>28)&1};}o=p+size+(size%2);}
+ throw new Error("Expected lossless VP8L image");
+}
 
 test("Wind casts use one DOM Sprite Sheet node and never invoke Canvas drawing",()=>{
     const runtime=loadRuntime();

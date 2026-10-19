@@ -4,6 +4,13 @@
   "asset": "tools/vfx-commercial-sample/assets/full/rage-status-v2.webp",
   "runtimeAsset": "assets/vfx/status/rage-aura-v2.webp",
   "decision": "ACCEPT_FOR_DEVICE_CANDIDATE_ONLY",
+  "independentMeasurements": {
+    "size": [1254, 1254],
+    "runtimeRgbaEquality": true,
+    "central35to65PercentAlpha16Coverage": 0.08393783112524537,
+    "central40to60PercentX25to75PercentYAlpha16Coverage": 0.022639902908302992,
+    "centralOpeningCaveat": "The center is mostly open but not entirely alpha0: the exact generation prompt's fully empty central rectangle was not achieved. Candidate permission relies on low occupied fraction and requires device portrait visibility validation."
+  },
   "method": "Viewed full source with view_image; read generation evidence; independently sampled alpha and compared runtime copy RGBA.",
   "observations": [
     "Recognizable warm red/orange flame aura, no face or opaque central fire pillar. Large open center should allow artwork head and torso to remain readable.",

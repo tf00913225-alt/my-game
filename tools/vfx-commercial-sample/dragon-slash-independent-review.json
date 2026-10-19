@@ -1,0 +1,331 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+  "reference": "assets/vfx/fire/dragon-slash-cast.png",
+  "method": "view_image original,V2,V3; independent alpha bounds/border and motherRGBA equality; current CSS fade source read.",
+  "reviews": [
+    {
+      "version": 2,
+      "source": "tools/vfx-commercial-sample/assets/full/dragon-slash-v2.webp",
+      "sha256": "b8deae02abb44d17e7e2ed099d98e5576a2b993cb2ff63179af138bb42ecb87f",
+      "rgbaMotherEquality": true,
+      "decision": "approved-for-isolated-phone-candidate-with-existing-fade",
+      "frames": [
+        {
+          "frame": 1,
+          "alpha64Bounds": [
+            60,
+            72,
+            315,
+            338
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 28930
+        },
+        {
+          "frame": 2,
+          "alpha64Bounds": [
+            28,
+            65,
+            327,
+            337
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 43430
+        },
+        {
+          "frame": 3,
+          "alpha64Bounds": [
+            28,
+            71,
+            328,
+            339
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 45830
+        },
+        {
+          "frame": 4,
+          "alpha64Bounds": [
+            26,
+            71,
+            337,
+            331
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 37991
+        },
+        {
+          "frame": 5,
+          "alpha64Bounds": [
+            41,
+            44,
+            343,
+            310
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 42641
+        },
+        {
+          "frame": 6,
+          "alpha64Bounds": [
+            41,
+            52,
+            338,
+            317
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 40457
+        },
+        {
+          "frame": 7,
+          "alpha64Bounds": [
+            38,
+            46,
+            329,
+            312
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 42737
+        },
+        {
+          "frame": 8,
+          "alpha64Bounds": [
+            53,
+            52,
+            329,
+            315
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 43454
+        },
+        {
+          "frame": 9,
+          "alpha64Bounds": [
+            46,
+            38,
+            330,
+            297
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 36187
+        },
+        {
+          "frame": 10,
+          "alpha64Bounds": [
+            52,
+            31,
+            324,
+            309
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 28106
+        },
+        {
+          "frame": 11,
+          "alpha64Bounds": [
+            43,
+            41,
+            321,
+            299
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 16674
+        },
+        {
+          "frame": 12,
+          "alpha64Bounds": [
+            50,
+            60,
+            304,
+            303
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 4318
+        }
+      ]
+    },
+    {
+      "version": 3,
+      "source": "tools/vfx-commercial-sample/assets/full/dragon-slash-v3.webp",
+      "sha256": "208668bda5a959c897f10c4ef36e98ddd486a7ba0e705d07ac4ec90d82c0f65e",
+      "rgbaMotherEquality": true,
+      "decision": "rejected-source-cell-contact",
+      "frames": [
+        {
+          "frame": 1,
+          "alpha64Bounds": [
+            134,
+            175,
+            221,
+            308
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 1012
+        },
+        {
+          "frame": 2,
+          "alpha64Bounds": [
+            89,
+            123,
+            293,
+            324
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 15573
+        },
+        {
+          "frame": 3,
+          "alpha64Bounds": [
+            31,
+            62,
+            351,
+            344
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 52349
+        },
+        {
+          "frame": 4,
+          "alpha64Bounds": [
+            29,
+            70,
+            344,
+            337
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 44557
+        },
+        {
+          "frame": 5,
+          "alpha64Bounds": [
+            38,
+            40,
+            362,
+            316
+          ],
+          "alpha64BorderPixels": 4,
+          "alpha16BorderPixels": 10,
+          "alpha64Coverage": 48975
+        },
+        {
+          "frame": 6,
+          "alpha64Bounds": [
+            0,
+            48,
+            361,
+            317
+          ],
+          "alpha64BorderPixels": 3,
+          "alpha16BorderPixels": 15,
+          "alpha64Coverage": 46994
+        },
+        {
+          "frame": 7,
+          "alpha64Bounds": [
+            32,
+            44,
+            343,
+            319
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 3,
+          "alpha64Coverage": 53630
+        },
+        {
+          "frame": 8,
+          "alpha64Bounds": [
+            30,
+            46,
+            339,
+            319
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 54503
+        },
+        {
+          "frame": 9,
+          "alpha64Bounds": [
+            50,
+            43,
+            334,
+            298
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 27200
+        },
+        {
+          "frame": 10,
+          "alpha64Bounds": [
+            112,
+            44,
+            294,
+            294
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 7558
+        },
+        {
+          "frame": 11,
+          "alpha64Bounds": [
+            109,
+            108,
+            269,
+            254
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 959
+        },
+        {
+          "frame": 12,
+          "alpha64Bounds": [
+            138,
+            166,
+            203,
+            237
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha16BorderPixels": 0,
+          "alpha64Coverage": 247
+        }
+      ]
+    }
+  ],
+  "decision": "V2 may be tested on phone using existing66.666667-percent fade start. V3 must not be used.",
+  "reasoning": [
+    "Original is an opaque orange atlas with black horizontal strips and source-edge slashes. V2 removes the rectangular background while retaining recognisable dragon head, coiled body and bright crossed slash.",
+    "V2 all alpha64 cell borders are clear, retaining dragon identity without the technical clipping of V3.",
+    "V2 starts with a relatively large coiled flame and remains visibly full at frame12. Existing CSS opacity0to1 over first2percent gives only brief onset softening; it does not create gathering anticipation. This is a known art limitation, not a claimed repair.",
+    "Current v143SpriteAppear keyframes remain fully opaque through66.666667percent and fade to0.4 at83.333333percent then0 at100percent. This can legitimately dissipate V2 final frames without resampling atlas or altering hit timing. It does not cure a cell border defect, so cannot legitimise V3.",
+    "DragonSlash is a high-tier single-target attack; dragon scale/recognition should not be reduced until identity disappears. Actual actor/HUD readability still needs same-scene phone comparison."
+  ],
+  "phoneGate": [
+    "V2 plus fade only: verify dragon readable, no sprite-cell clipping, and target/HUD visibility.",
+    "Check abrupt onset from largeframe1 and whether visual weight builds toward formal hit rather than constant fullness.",
+    "Verify final dragon/crossed-slash energy dissipates naturally under fade; reject if it simply looks like a static picture turning transparent.",
+    "Verify source-frame geometry changes do not produce abrupt jumps, and peak aligns to formal hit."
+  ],
+  "formalIntegrationState": "pending-phone-gate; candidate eligibility is not commercial-completion pass",
+  "redrawPolicy": "No mandatory further generation before isolated candidate test. If onset or fade still looks abrupt on device, needs-art remains and V2 must not be called finished.",
+  "noEdits": "No runtime/manifest/source asset changes by reviewer."
+}
