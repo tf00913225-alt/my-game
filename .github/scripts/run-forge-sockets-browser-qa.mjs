@@ -57,18 +57,21 @@ try{
  const viewports=JSON.parse(process.env.FORGE_QA_VIEWPORTS||'[[360,640],[393,873],[412,915],[1280,960]]');
  let firstViewport=true;
  async function captureReforge(state,width,height){
-  if(state==='pending-old-new'||state==='locked'){
-   await c.eval(`document.querySelector('.v17358-reforge-lock-panel').scrollIntoView({block:'start',behavior:'instant'})`);await pause();
-  }
   const reading=await c.eval(`(()=>{const root=document.querySelector('#homeFeatureModal'),body=root.querySelector('.v141-synthesis-body'),footer=root.querySelector('.v141-smelting-footer');const scale=e=>e.getBoundingClientRect().width/e.offsetWidth;const texts=[];const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);while(walker.nextNode()){const n=walker.currentNode,e=n.parentElement,r=e.getBoundingClientRect(),s=getComputedStyle(e);if(!n.textContent.trim()||!r.width||!r.height||s.visibility==='hidden'||e.closest('[aria-hidden="true"]'))continue;let box=e;while(box&&!box.offsetWidth)box=box.parentElement;texts.push({text:n.textContent.trim(),font:parseFloat(s.fontSize)*(box?scale(box):1)});}const controls=[...root.querySelectorAll('button,summary')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.height}).map(e=>{const r=e.getBoundingClientRect(),visible=r.top>=0&&r.bottom<=innerHeight;const hit=visible?document.elementFromPoint(r.left+r.width/2,r.top+r.height/2):null;return {text:e.textContent.trim(),disabled:e.disabled===true,visible,hit:!!hit&&(e===hit||e.contains(hit)),height:r.height};});const f=footer.getBoundingClientRect();return {texts,controls,scrollOwners:root.querySelectorAll('.v141-synthesis-body[data-scroll-owner="y"]').length,overflow:body.scrollWidth-body.clientWidth,footer:{top:f.top,bottom:f.bottom},bodyScrollTop:body.scrollTop};})()`);
   assert.ok(reading.texts.length&&reading.texts.every(x=>x.font>=12.9),state+' text below minimum '+JSON.stringify(reading.texts.filter(x=>x.font<12.9)));
   reading.scrollOwners=await c.eval(`Array.from(document.querySelectorAll('#homeFeatureModal .v141-synthesis-body')).filter(e=>getComputedStyle(e).overflowY==='auto').length`);
   assert.equal(reading.scrollOwners,1,state+' must retain one content scroll owner');
   assert.ok(reading.overflow<=1&&reading.footer.top>=0&&reading.footer.bottom<=height+1,state+' content/footer escapes viewport');
-  reading.controls=await c.eval(`Array.from(document.querySelectorAll('#homeFeatureModal button,#homeFeatureModal summary')).filter(e=>e.checkVisibility()&&!(e.closest('details:not([open])')&&e.tagName!=='SUMMARY')).map(e=>{const r=e.getBoundingClientRect(),b=e.closest('.v141-synthesis-body')?.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,visible=r.width>0&&r.height>0&&r.top>=0&&r.bottom<=innerHeight&&(!b||(y>=b.top&&y<=b.bottom)),hit=visible?document.elementFromPoint(x,y):null;return {text:e.textContent.trim(),disabled:e.disabled===true,visible,hit:!!hit&&(e===hit||e.contains(hit)),height:r.height};})`);
+  reading.controls=await c.eval(`Array.from(document.querySelectorAll('#homeFeatureModal button,#homeFeatureModal summary')).filter(e=>e.checkVisibility()&&!(e.closest('details:not([open])')&&e.tagName!=='SUMMARY')).map(e=>{const r=e.getBoundingClientRect(),b=e.closest('.v141-synthesis-body')?.getBoundingClientRect(),strip=e.closest('[data-scroll-owner="x"]')?.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,visible=r.width>0&&r.height>0&&r.top>=0&&r.bottom<=innerHeight&&(!b||(y>=b.top&&y<=b.bottom))&&(!strip||(r.left>=strip.left&&r.right<=strip.right)),hit=visible?document.elementFromPoint(x,y):null;return {text:e.textContent.trim(),disabled:e.disabled===true,visible,hit:!!hit&&(e===hit||e.contains(hit)),height:r.height};})`);
   assert.ok(reading.controls.filter(x=>x.visible&&!x.disabled).every(x=>x.hit),state+' visible controls covered '+JSON.stringify(reading.controls));
   const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`reforge-${state}-${width}x${height}.png`),Buffer.from(shot.data,'base64'));
   evidence.push({scene:state,width,height,reading});
+ }
+ async function assertCompactReforge(state){
+  const layout=await c.eval(`(()=>{const b=document.querySelector('.v141-synthesis-body'),f=document.querySelector('.v141-smelting-footer');return {scroll:b.scrollHeight-b.clientHeight,top:b.scrollTop,clientHeight:b.clientHeight,scrollHeight:b.scrollHeight,bodyHeight:b.getBoundingClientRect().height,footerHeight:f.getBoundingClientRect().height};})()`);
+  assert.ok(layout.scroll<=1,state+' ordinary two-slot reforge must fit without vertical scrolling '+JSON.stringify(layout));
+  evidence.push({scene:'compact-'+state,...await c.eval(`({width:innerWidth,height:innerHeight})`),...layout});
+  return layout;
  }
  for(const [width,height] of viewports){
   await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height});
@@ -101,25 +104,42 @@ try{
   await c.eval(`(()=>{const original=window.alert;try{window.alert=()=>{};v141SelectReforgeItem('');}finally{window.alert=original;}return true;})()`);
   assert.equal(await c.eval(`!!document.querySelector('.v141-reforge-current')`),false,'empty picker must have no selected equipment');
   await captureReforge('empty-selection',width,height);
-  await openEquipmentPicker();await captureReforge('picker-expanded',width,height);
-  await tap('.v141-forge-picker summary');
+  assert.equal(await c.eval(`document.querySelector('.v141-smelting-picker').tagName`),'DIV','reforge uses an always-visible equipment strip');
+  assert.equal(await c.eval(`document.querySelectorAll('.v141-smelting-picker .v141-forge-options[data-scroll-owner="x"]').length`),1,'equipment strip owns horizontal scrolling');
+  await captureReforge('equipment-strip',width,height);
   assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-forge-tabs button'),n=>n.textContent)`),['冶煉','鑲嵌']);
   assert.equal(await c.eval(`Array.from(document.querySelectorAll('#homeFeatureModalBody select')).filter(n=>{const r=n.getBoundingClientRect();return r.width&&r.height}).length`),0,'visible native selector in forge');
   // Reforge V2 exercises the final bundled owner with disposable local assets.
   await c.eval(`(()=>{const item=inventoryItems.find(i=>i.v141Uid==='forge-qa-orange');item.reforgeAffixes=[{stat:'attack',value:40},{stat:'attack',value:35}];item.reforgeVersion=1;item.reforgeSlots=2;const ore=v132GetContentDefinitions().ores.find(i=>i.tierKey==='white');inventoryItems.push({...ore,count:1000});gold=100000;saveGame();v141SelectReforgeItem(item.v141Uid);return true;})()`);
   assert.equal(await c.eval(`document.querySelectorAll('.v17358-affix-lock').length`),2);
   await captureReforge('selected',width,height);
+  const stripDrag=await c.eval(`(()=>{const e=document.querySelector('.v141-smelting-picker .v141-forge-options');e.scrollLeft=0;const r=e.getBoundingClientRect();return {x:r.right-18,to:r.left+18,y:r.top+r.height/2,selected:e.querySelector('[aria-pressed="true"]').dataset.forgeValue};})()`);
+  await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:stripDrag.x,y:stripDrag.y}]});
+  for(let i=1;i<=8;i++){await c.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:stripDrag.x+(stripDrag.to-stripDrag.x)*i/8,y:stripDrag.y}]});await new Promise(r=>setTimeout(r,20));}
+  await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await pause();
+  assert.equal(await c.eval(`(async()=>{const e=document.querySelector('.v141-smelting-picker .v141-forge-options'),end=Date.now()+5000;let previous=e.scrollLeft,stable=Date.now();while(Date.now()<end){await new Promise(r=>setTimeout(r,50));if(Math.abs(e.scrollLeft-previous)>.5)stable=Date.now();previous=e.scrollLeft;if(Date.now()-stable>=300)return true;}return false;})()`),true,'equipment horizontal fling did not settle');
+  const stripState=await c.eval(`(()=>{const e=document.querySelector('.v141-smelting-picker .v141-forge-options');return {scrollLeft:e.scrollLeft,selected:e.querySelector('[aria-pressed="true"]').dataset.forgeValue};})()`);
+  assert.ok(stripState.scrollLeft>0,'equipment strip cannot touch scroll');assert.equal(stripState.selected,stripDrag.selected,'horizontal drag selected another equipment');
+  await tap('.v141-smelting-picker [data-forge-value="forge-qa-19"]');
+  assert.equal(await c.eval(`document.querySelector('.v141-smelting-picker [aria-pressed="true"]').dataset.forgeValue`),'forge-qa-19','last horizontal candidate is unreachable');
+  const selectedVisible=await c.eval(`(()=>{const e=document.querySelector('.v141-smelting-picker [aria-pressed="true"]'),r=e.getBoundingClientRect(),rail=e.closest('.v141-forge-options').getBoundingClientRect();return {visible:r.left>=rail.left-1&&r.right<=rail.right+1,scrollLeft:e.parentElement.scrollLeft,left:r.left,right:r.right,railLeft:rail.left,railRight:rail.right};})()`);
+  assert.ok(selectedVisible.visible,'selected last equipment disappeared after render '+JSON.stringify(selectedVisible));
+  await tap('.v141-smelting-picker [data-forge-value="forge-qa-orange"]');
+  evidence.push({scene:'equipment-strip-touch',width,height,...stripState,lastCandidateReachable:true,selectedVisible});
+  await assertCompactReforge('selected');
   await tap('.v17358-reforge-tier:nth-child(2) .v141-smelting-tier-choice');
   assert.equal(await c.eval(`document.querySelector('.v141-smelting-footer .v141-synthesis-primary').disabled`),true,'missing material must disable reforge');
   await captureReforge('material-insufficient',width,height);
   await tap('.v17358-reforge-tier:first-child .v141-smelting-tier-choice');
-  assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v17358-reforge-tier'),tile=>({tier:tile.querySelector('[data-tier]').dataset.tier,text:tile.querySelector('.v141-smelting-tier-choice').textContent,icon:!!tile.querySelector('.v169-item-art')}))`),[
-   {tier:'white',text:'白階1000 / 50',icon:true},{tier:'blue',text:'藍階0 / 50',icon:true},
-   {tier:'purple',text:'紫階0 / 50',icon:true},{tier:'orange',text:'橙階0 / 50',icon:true}]);
-  assert.equal(await c.eval(`document.querySelector('.v17358-reforge-material').textContent.includes('金幣需求 1,000')`),true);
+  assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v17358-reforge-tier'),tile=>({tier:tile.querySelector('[data-tier]').dataset.tier,text:tile.querySelector('.v141-smelting-tier-choice').textContent}))`),[
+   {tier:'white',text:'白階1000 / 50'},{tier:'blue',text:'藍階0 / 50'},
+   {tier:'purple',text:'紫階0 / 50'},{tier:'orange',text:'橙階0 / 50'}]);
+  assert.equal(await c.eval(`(()=>{const source=document.querySelector('.v141-reforge-material-source');return source.dataset.tier==='white'&&!!source.querySelector('.v169-item-art')&&source.getAttribute('aria-label').includes('獲取途徑');})()`),true,'selected material retains formal art and labeled source action');
+  assert.equal(await c.eval(`document.querySelector('.v141-reforge-cost').textContent.includes('金幣 1,000')`),true);
   await tap('.v141-smelting-affix:first-child .v17358-affix-lock');
   assert.equal(await c.eval(`document.querySelector('.v17358-affix-lock').getAttribute('aria-pressed')`),'true');
   await captureReforge('locked',width,height);
+  await assertCompactReforge('locked');
   await c.eval(`window.__forgeQaRandom=Math.random;Math.random=()=>0;true`);
   await tap('.v141-smelting-footer .v141-synthesis-primary');
   await c.eval(`Math.random=window.__forgeQaRandom;delete window.__forgeQaRandom;true`);
@@ -128,6 +148,8 @@ try{
   assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-reforge-old-value'),e=>e.textContent)`),['原：攻擊 +40','原：攻擊 +35'],'pending keeps original values visible');
   assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-smelting-affix>b'),e=>e.textContent)`),['新：攻擊 +40','新：攻擊 +10'],'pending shows exact new values');
   await captureReforge('pending-old-new',width,height);
+  await assertCompactReforge('pending');
+  assert.equal(await c.eval(`(()=>{const before=JSON.stringify({inventoryItems,gold}),value=document.querySelector('.v141-reforge-current').textContent;v141SelectReforgeItem('forge-qa-19');v141SelectReforgeMaterialTier('blue');v141ToggleReforgeLock(1);const blocked=v141StartReforge()===false;return blocked&&before===JSON.stringify({inventoryItems,gold})&&document.querySelector('.v141-reforge-current').textContent===value&&Array.from(document.querySelectorAll('.v141-smelting-picker [data-forge-value],.v141-smelting-tier-choice,.v17358-affix-lock')).every(e=>e.disabled);})()`),true,'pending guards and disabled controls preserve the paid transaction');
   const reforgeShot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`reforge-v2-${width}.png`),Buffer.from(reforgeShot.data,'base64'));
   await tap('[onclick="v141ResolveReforge(false)"]');
   await c.eval(`(async()=>{const end=Date.now()+2000;while(Date.now()<end&&!document.getElementById('v132RewardModal')?.classList.contains('show'))await new Promise(r=>setTimeout(r,50));return true;})()`);
@@ -153,6 +175,10 @@ try{
   await tap('.v141-smelting-affix:first-child .v17358-affix-lock');await tap('.v141-smelting-affix:nth-child(2) .v17358-affix-lock');
   await tap('.v141-smelting-footer .v141-synthesis-primary');
   assert.equal(await c.eval(`document.querySelectorAll('.v141-smelting-affix').length`),5,'the roll fills the fifth formal slot');
+  const excessScroll=await c.eval(`(()=>{const b=document.querySelector('.v141-synthesis-body'),last=document.querySelector('.v141-smelting-affix:last-child');last.scrollIntoView({block:'end',behavior:'instant'});const r=last.getBoundingClientRect(),box=b.getBoundingClientRect();return {overflow:b.scrollHeight-b.clientHeight,scrollTop:b.scrollTop,lastVisible:r.top>=box.top-1&&r.bottom<=box.bottom+1};})()`);
+  assert.ok(excessScroll.lastVisible,'last of five historical slots is unreachable');
+  if(excessScroll.overflow>1)assert.ok(excessScroll.scrollTop>0,'historical excess slots require a usable vertical escape');
+  evidence.push({scene:'historical-five-slot-scroll',width,height,...excessScroll});
   assert.equal(await c.eval(`(()=>{const area=document.querySelector('.v141-synthesis-body'),action=document.querySelector('.v141-smelting-footer'),r=action.getBoundingClientRect();return area.scrollWidth<=area.clientWidth+1&&getComputedStyle(area).overflowY==='auto'&&r.top>=0&&r.bottom<=innerHeight+1;})()`),true,'single result scrolls and its actions remain visible');
   const excessShot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`reforge-v2-excess-${width}.png`),Buffer.from(excessShot.data,'base64'));
   await tap('[onclick="v141ResolveReforge(true)"]');
