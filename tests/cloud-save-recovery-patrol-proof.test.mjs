@@ -9,6 +9,7 @@ const {createSessionAuthority}=require('../functions/src/session-authority');
 const {createCanonicalSourceWriter}=require('../functions/src/canonical-source-writer');
 const {createCanonicalCurrentRecovery}=require('../functions/src/canonical-current-recovery');
 const {createCanonicalRecoveryApproval}=require('../functions/src/canonical-recovery-approval');
+const {createCanonicalAccountModeTime}=require('../functions/src/canonical-account-mode-time');
 const {createCanonicalPatrolSettlement}=require('../functions/src/canonical-patrol-settlement');
 const {createCanonicalExpAllocation}=require('../functions/src/canonical-exp-allocation');
 const {decodePatrolProofPayload,encodePatrolProofPayload,decodeInventoryPayload,encodeInventoryPayload,PATROL_PROOF_LIMITS}=require('../functions/src/recovery-audit-artifact');
@@ -16,7 +17,7 @@ const {createRecoveryArchive}=require('../functions/src/canonical-recovery-archi
 const {assembleCanonicalSnapshot}=require('../functions/src/canonical-snapshot');
 const {snapshotDigest}=require('../functions/src/canonical-snapshot');
 const auditId='proof-component-audit-0001',approvalId='proof-component-approval-01';
-async function fixture({battles=20,three=true,largeBytes=0}={}){
+async function fixture({battles=20,three=true,largeBytes=0,rested=false}={}){
     const h=storeHarness({optimisticTransactions:true}),sessions=createSessionAuthority(h.dependencies),authTime=Math.floor(h.clock/1000);let session;
     const request=()=>({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid,...(session?{session}:{})}});
     session=await sessions.create(request());
@@ -41,6 +42,11 @@ async function fixture({battles=20,three=true,largeBytes=0}={}){
     const forest=createCanonicalPatrolSettlement({...deps,randomBytes:size=>Buffer.alloc(size,255)}),tickets=[];let serial=0;
     const id=name=>`proof-${name}-${String(++serial).padStart(8,'0')}`;
     await forest.observePresence(request(),{operationId:id('reopen'),expectedRevision:h.revision,expectedSequence:0,intent:'reopen',elementBox:'keep'});
+    if(rested){
+        await forest.observePresence(request(),{operationId:id('rest'),expectedRevision:h.revision,expectedSequence:1,intent:'rest',elementBox:'keep'});
+        h.advance(120000);
+        await forest.observePresence(request(),{operationId:id('resume'),expectedRevision:h.revision,expectedSequence:2,intent:'resume',elementBox:'keep'});
+    }
     for(let index=0;index<battles+(three?1:0);index++){
         const ticketId=id('ticket'),triple=index===battles;
         await forest.issueTicket(request(),{operationId:ticketId,expectedRevision:h.revision,triggerEntryId:'forest:0',availableEntryIds:triple?['forest:0','forest:1','forest:2']:['forest:0']});
@@ -197,4 +203,62 @@ for(const keepReceipt of [true,false])test('missing proof state cannot reset seq
         const f=await fixture({battles:1,three:false}),first=f.intent();await f.recovery.capturePatrolProof(f.request(),first);
         f.h.data.delete(f.root+'/proofState/current');if(!keepReceipt)f.h.data.delete(f.root+'/patrolProofPages/'+first.operationId);
         await unchanged(f,()=>f.recovery.capturePatrolProof(f.request(),{...first,operationId:'proof-reopened-missing-state'}),/orphan|missing proof state/);
+});
+
+test('rested-winning original Forest proof remains valid after sole codec capture and original-chunk replay',async()=>{
+    const f=await fixture({battles:1,three:false,rested:true}),root=f.h.dependencies.db.collection('serverUsers').doc(f.h.uid),
+        account=f.h.data.get(f.h.root+'/recoveryArchives/'+f.h.revision).sourceRecords.account;
+    await f.deps.runProtected(f.request(),async tx=>{
+        const forest=createCanonicalPatrolSettlement(f.deps);forest.beginEvidenceAttempt(tx);
+        await forest.verifyRetainedTicket(tx,root,f.h.uid,account,await tx.get(root.collection('patrolTickets').doc(f.tickets[0])),f.h.revision);
+    });
+    const terminal=[...f.h.data].find(([path,row])=>path.startsWith(f.h.root+'/patrolSettlements/')&&row.intent?.kind==='win')[1];
+    assert.equal(terminal.mode.rested,true);
+    const originalKeys=Object.keys(f.h.data.get(f.h.root+'/modeTimeEvents/'+terminal.operationId).beforeModes.rested);
+    const original=copy([...f.h.data]),result=await f.recovery.capturePatrolProof(f.request(),f.intent());
+    const decoded=capsule(f,f.intent()).payload.documents.find(row=>row.path===f.h.root+'/modeTimeEvents/'+terminal.operationId);
+    assert.notDeepEqual(Object.keys(decoded.data.beforeModes.rested),originalKeys,
+        'the original sorted codec remains unchanged; original raw sidecars determine reconstruction');
+    assert.equal((await f.recovery.capturePatrolProof(f.request(),f.intent())).unchanged,true);
+    for(const [path,row] of original)assert.deepEqual(f.h.data.get(path),row,'original source and raw strings are unchanged');
+    for(const flag of ['authoritativeStateReady','candidateProofValid','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
+});
+
+function permuteModeMaps(tx,mutate){return {get:async reference=>{
+    const snap=await tx.get(reference);if(!snap.exists)return snap;
+    const raw=snap.data();if(reference.path.includes('/modeTimeEvents/'))for(const name of ['beforeModes','afterModes'])if(raw[name]?.rested){
+        const original=raw[name].rested;raw[name].rested=Object.fromEntries(Object.keys(original).sort().map(key=>[key,original[key]]));
+    }
+    if(mutate)mutate(raw,reference.path);
+    return {id:snap.id,ref:snap.ref,exists:true,updateTime:snap.updateTime,data:()=>raw,
+        get:key=>key.split('.').reduce((value,part)=>value?.[part],raw)};
+}};}
+for(const kind of ['v1-mode','v2-forest'])test('original '+kind+' proof derives exact sidecar bytes from canonical archive despite unordered evidence maps',async()=>{
+    const f=await fixture({battles:1,three:false,rested:true}),before=copy([...f.h.data]),root=f.h.dependencies.db.collection('serverUsers').doc(f.h.uid),
+        records=f.h.data.get(f.h.root+'/recoveryArchives/'+f.h.revision).sourceRecords;
+    const check=async tx=>{
+        if(kind==='v1-mode'){
+            const mode=createCanonicalAccountModeTime(f.deps),event=[...f.h.data].find(([path,row])=>path.startsWith(f.h.root+'/modeTimeEvents/')&&row.intent?.action==='resume')[0];
+            await mode.verifyRetainedEvent(tx,root,f.h.uid,records.account,await tx.get(f.h.dependencies.db.doc(event)),f.h.revision);
+        }else{
+            const forest=createCanonicalPatrolSettlement(f.deps);forest.beginEvidenceAttempt(tx);
+            await forest.verifyRetainedTicket(tx,root,f.h.uid,records.account,await tx.get(root.collection('patrolTickets').doc(f.tickets[0])),f.h.revision);
+        }
+    };
+    await f.deps.runProtected(f.request(),check); // Same original Owner first passes untouched SDK data.
+    await f.deps.runProtected(f.request(),tx=>check(permuteModeMaps(tx)));
+    assert.deepEqual([...f.h.data],before,'neither proof can rewrite original source or raw JSON');
+    for(const fault of ['value','delta','hash','raw']){
+        await unchanged(f,()=>f.deps.runProtected(f.request(),tx=>check(permuteModeMaps(tx,(raw,path)=>{
+            const target=raw.intent?.action===(kind==='v1-mode'?'resume':'forest-settlement')&&
+                (kind==='v1-mode'||raw.intent.settlementKind==='win');
+            if(target){
+                if(fault==='hash')raw.sha256='f'.repeat(64);
+                if(fault==='value')raw.beforeModes.rested.battles++;
+                if(fault==='delta')raw.delta.restedBattles++;
+                if(fault==='value'||fault==='delta'){const {sha256,createdAt,...payload}=raw;raw.sha256=snapshotDigest(payload);}
+            }
+            if(fault==='raw'&&path.includes('/recoveryArchives/'))raw.sourceRecords.progress.sidecars['rested-exp-state'].raw+=' ';
+        }))),/inconsistent|differs|missing|invalid/);
+    }
 });
