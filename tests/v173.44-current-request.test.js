@@ -65,7 +65,7 @@ assert.doesNotMatch(economy,/grantFastStartToAdditionalCharacter/);
 assert.match(main,/function buildAdditionalCharacter[\s\S]*?level:1,[\s\S]*?exp:0,/);
 assert.match(v132,/v132HasTwoCharactersAtLevel20=hasLevel10CharacterForDailyDungeon/);
 assert.match(main,/!prereqMet&&eligibility\.prerequisiteRequired/);
-assert.match(main,/🔒 \$\{eligibility\.reason\}/);
+assert.match(main,/class="skill-row-prerequisite">\s*\$\{eligibility\.reason\}\s*<\/span>/,"locked skills retain the authoritative prerequisite reason in their presentation slot");
 assert.doesNotMatch(water,/LEGACY_WATER_SKILL_SNAPSHOT|applyFinalSkillData/);
 assert.match(water,/FROSTBITE_REMAINING_RATE=\.70/);
 assert.match(skillOwner,/floodBeast:\{baseDamage:105,damagePerLevel:21,spCost:35,targetType:"single",requires:\["waterBall"\]/);
