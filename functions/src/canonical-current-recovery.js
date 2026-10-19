@@ -426,7 +426,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
            pages.at(-1)?.row.operationId!==state.lastPageOperationId)fail("data-loss","Forest inventory terminal or membership differs.");
         return index;
     }
-    const proofComponent=value=>value==="forest-ticket"||value==="exp-allocation";
+    const proofComponent=value=>value==="forest-ticket"||value==="exp-allocation"||value==="additional-character-sources";
     const proofKind=(version,suffix)=>"canonical-recovery-"+(version===1?"patrol-":"")+"proof-"+suffix;
     const proofTarget=(version,component,sourceId)=>version===1?{ticketId:sourceId}:{component,sourceId};
     const proofIntent=(version,args)=>version===1?{action:"capture-patrol-proof",auditId:args.auditId,
@@ -496,6 +496,11 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             const grant=await kernel.get(root.collection("grantOperations").doc(sourceId));
             if(grant.exists)fail("data-loss","EXP proof overlaps a grant.");
             await verifyDebitRecoveryEvidence(kernel,root,uid,revision,records,operation,ledger.data(),undefined);
+        }else if(component==="additional-character-sources"){
+            const operation=await kernel.get(root.collection("operations").doc(sourceId));
+            if(!operation.exists||operation.id!==sourceId||operation.get("operationId")!==sourceId||operation.get("kind")!=="additional-character-sources")
+                fail("data-loss","Additional-character proof source kind or identity differs.");
+            await sourceEvidence.verifyRetainedOperation(kernel,root,uid,records.account,operation);
         }else fail("invalid-argument","Unsupported proof component.");
     }
     async function captureProof(request,args){
@@ -530,7 +535,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             }
             const index=await completeInventory(tx,run,inventory,namespaces,runRef);
             const state=stateSnap.exists?inspectProofState(stateSnap.data(),run,inventory):null,version=state?.schemaVersion??2;
-            if(version===1&&args.component!=="forest-ticket")fail("failed-precondition","Legacy Forest audit requires a new audit for EXP proof.");
+            if(version===1&&args.component!=="forest-ticket")fail("failed-precondition","Legacy Forest audit requires a new audit for non-Forest proof.");
             const intentSha256=snapshotDigest(proofIntent(version,args));
             if(state){
                 const headSnap=state.lastOperationId===args.operationId?receiptSnap:

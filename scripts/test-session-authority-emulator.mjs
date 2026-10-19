@@ -4049,6 +4049,14 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     const expReplayStart=attempts.length,expReplay=await measure(()=>recovery.captureProof(h.request(),expInput),{retry:true});assert.equal(expReplay.unchanged,true);
     assert.ok(attempts.slice(expReplayStart).every(attempt=>!["operations","ledgerEntries","grantOperations"].some(name=>
         attempt.paths.includes(h.root.collection(name).doc(allocation.id).path))),"EXP receipt retry must not rerun its live debit kernel");
+    const additional=(await h.root.collection("operations").where("kind","==","additional-character-sources").limit(1).get()).docs[0];
+    assert.ok(additional,"The genuine second-character operation must remain available");
+    const additionalInput={...input,operationId:"proof-sdk-additional-capture1",expectedSequence:5,component:"additional-character-sources",sourceId:additional.id};
+    const additionalResult=await measure(()=>recovery.captureProof(h.request(),additionalInput));assert.equal(additionalResult.component,"additional-character-sources");
+    const additionalReplayStart=attempts.length;
+    assert.equal((await measure(()=>recovery.captureProof(h.request(),additionalInput),{retry:true})).unchanged,true);
+    assert.ok(attempts.slice(additionalReplayStart).every(attempt=>!["operations","ledgerEntries","grantOperations"].some(name=>
+        attempt.paths.includes(h.root.collection(name).doc(additional.id).path))),"Additional-character retry must use original chunks without live source reads");
     assert.deepEqual(await Promise.all([run.get(),fence.get()]).then(rows=>rows.map(row)),controls);
     // Asset/current/history versions cannot be changed by a proof-only capture.
     assert.deepEqual(await h.capture(),assets);
@@ -4069,7 +4077,7 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.equal(restoredMetadata.typedDataSha256,originalMetadata.typedDataSha256);
     assert.equal(restoredMetadata.typedDataByteLength,originalMetadata.typedDataByteLength);
     assert.notDeepEqual(stamp(restoredTicket.updateTime),stamp(changedTicket.updateTime));
-    const changedInput={...input,operationId:"proof-sdk-version-changed-01",expectedSequence:5,sourceId:changedTicket.id};
+    const changedInput={...input,operationId:"proof-sdk-version-changed-01",expectedSequence:6,sourceId:changedTicket.id};
     let changedStart=attempts.length;
     await assert.rejects(()=>recovery.captureProof(h.request(),changedInput));
     assert.ok(attempts.slice(changedStart).every(attempt=>attempt.writes===0));

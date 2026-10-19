@@ -53,10 +53,11 @@ async function fixture({battles=20,three=true,largeBytes=0,rested=false}={}){
         for(const memberIndex of triple?[2,0,1]:[0])await forest.settleMember(request(),{operationId:id('member'),expectedRevision:h.revision,ticketId,memberIndex});
         await forest.settleTerminal(request(),{operationId:id('win'),expectedRevision:h.revision,ticketId,kind:'win'});tickets.push(ticketId);
     }
-    const allocations=[];
+    const allocations=[];let additional;
     if(battles>=20){
         const allocator=createCanonicalExpAllocation(deps);for(let level=1;level<10;level++){const operationId=id('allocate');await allocator.allocateSharedExp(request(),{operationId,expectedRevision:h.revision});allocations.push(operationId);}
-        await createCanonicalSourceWriter(deps).commitAdditionalCharacter(request(),{operationId:id('additional'),expectedRevision:h.revision,slotIndex:1,
+        additional=id('additional');
+        await createCanonicalSourceWriter(deps).commitAdditionalCharacter(request(),{operationId:additional,expectedRevision:h.revision,slotIndex:1,
             selection:{...selection,displayName:'Second',attributes:{attack:3,vitality:0,energy:0,intelligence:0,defensePoints:0,agility:0}}});
         assert.equal(h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords.characters[0].state.level,10);
         for(const path of [...h.data.keys()])if(['account','characters','economy','inventory','equipment','relics','relicLoadout','progress','claimRecords','claimCheckpoints']
@@ -70,7 +71,7 @@ async function fixture({battles=20,three=true,largeBytes=0,rested=false}={}){
     h.dependencies.db.runTransaction=callback=>base(async tx=>{const trace={reads:0,queries:0,writes:0,paths:[]};traces.push(trace);
         const wrapper={get:async ref=>{trace.paths.push(ref.path);const snap=await tx.get(ref);trace.reads+=snap.docs?Math.max(1,snap.size):1;trace.queries+=snap.docs?1:0;return snap;}};
         for(const method of ['set','create','update','delete'])wrapper[method]=(...args)=>{trace.writes++;return tx[method](...args);};return callback(wrapper);});
-    return {h,recovery,request,tickets,allocations,root,traces,deps,sessions,intent:(sequence=1,ticketId=tickets[0])=>({auditId,expectedEpoch:1,operationId:`proof-capsule-${String(sequence).padStart(8,'0')}`,expectedSequence:sequence,component:'forest-ticket',sourceId:ticketId})};
+    return {h,recovery,request,tickets,allocations,additional,root,traces,deps,sessions,intent:(sequence=1,ticketId=tickets[0])=>({auditId,expectedEpoch:1,operationId:`proof-capsule-${String(sequence).padStart(8,'0')}`,expectedSequence:sequence,component:'forest-ticket',sourceId:ticketId})};
 }
 const unchanged=async(f,operation,pattern)=>{const before=copy([...f.h.data]),writes=f.h.writes;await assert.rejects(operation,pattern);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);};
 function capsule(f,input){const receipt=f.h.data.get(f.root+'/patrolProofPages/'+input.operationId);
@@ -104,6 +105,26 @@ test('true twenty Forest battles, Lv10 and slot2 current loss capture original b
     assert.equal(extra.size,36,'nine original EXP units add exactly36 previously uncovered present dependencies');
     for(const [path,row] of originalSources)assert.deepEqual(f.h.data.get(path),row,'all original sources and raw history remain byte-identical');
     assert.equal(f.h.data.get(f.root+'/proofState/current').nextSequence,31);
+    const additionalInput={...f.intent(31),component:'additional-character-sources',sourceId:f.additional};
+    const result=await f.recovery.captureProof(f.request(),additionalInput),saved=capsule(f,additionalInput),trace=f.traces.at(-1);
+    assert.equal(result.component,'additional-character-sources');
+    for(const flag of ['authoritativeStateReady','candidateProofValid','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
+    const union=new Set([...forestPaths,...extra]),added=saved.payload.documents.filter(row=>row.exists&&!union.has(row.path));
+    assert.deepEqual(added.map(row=>row.path),[f.h.root+'/operations/'+f.additional]);
+    assert.deepEqual(saved.payload.documents.filter(row=>!row.exists).map(row=>row.path).sort(),
+        [f.h.root+'/grantOperations/'+f.additional,f.h.root+'/ledgerEntries/'+f.additional].sort());
+    const operation=f.h.data.get(f.h.root+'/operations/'+f.additional),start=trace.paths.indexOf(f.h.root+'/operations/'+f.additional);
+    assert.deepEqual(trace.paths.slice(start),[f.h.root+'/operations/'+f.additional,
+        f.h.root+'/playableSnapshots/'+operation.sourceRevision,f.h.root+'/recoveryArchives/'+operation.sourceRevision,
+        f.h.root+'/playableSnapshots/'+operation.resultRevision,f.h.root+'/recoveryArchives/'+operation.resultRevision,
+        f.h.root+'/grantOperations/'+f.additional,f.h.root+'/ledgerEntries/'+f.additional]);
+    const pageCount=[...f.h.data.keys()].filter(path=>path.startsWith(f.root+'/inventoryPages/')).length;
+    assert.equal(trace.reads,pageCount+23);assert(trace.reads<=400);assert(trace.writes<=10);
+    for(const [path,row] of originalSources)assert.deepEqual(f.h.data.get(path),row);
+    const original=copy([...f.h.data]);assert.equal((await f.recovery.captureProof(f.request(),additionalInput)).unchanged,true);
+    assert.deepEqual([...f.h.data],original);assert(!f.traces.at(-1).paths.includes(f.h.root+'/operations/'+f.additional));
+    assert.equal(f.h.data.get(f.root+'/proofState/current').nextSequence,32);
+
 
     assert.equal((await f.recovery.captureProof(f.request(),f.intent())).unchanged,true,'historical original receipt remains replayable');
 });
@@ -311,7 +332,7 @@ test('legacy schema1 Forest retains original hashes and bytes through unified AP
     assert.equal(typeof f.recovery.capturePatrolProof,'undefined','old test-only API is removed instead of wrapped');
     assert.equal((await f.recovery.captureProof(f.request(),input)).unchanged,true);assert.deepEqual([...f.h.data],before);
     assert.deepEqual(capsule(f,input).bytes,legacy.bytes);assert.deepEqual(capsule(f,input).receipt,legacy.receipt);
-    await unchanged(f,()=>f.recovery.captureProof(f.request(),{...f.intent(2),component:'exp-allocation',sourceId:'legacy-exp-source-000001'}),/new audit/);
+    for(const component of ['exp-allocation','additional-character-sources'])await unchanged(f,()=>f.recovery.captureProof(f.request(),{...f.intent(2),component,sourceId:'legacy-source-operation-01'}),/new audit/);
     const next=f.intent(2,f.tickets[1]);await f.recovery.captureProof(f.request(),next);
     assert.equal(capsule(f,next).receipt.schemaVersion,1);assert.equal(capsule(f,next).payload.ticketId,next.sourceId);
     assert.equal(f.h.data.get(f.root+'/proofState/current').schemaVersion,1);
@@ -370,4 +391,49 @@ test('EXP source kind is hard-listed and v2 component/source tuple, original deb
     }
     assert.deepEqual(capsule(f,input).bytes,saved.bytes);
     f.h.advance(61000);await unchanged(f,()=>f.recovery.captureProof(f.request(),input),/approval/);
+});
+
+
+test('additional-character component uses only its original seven-read proof and rejects wrong sources, corruption and economic overlap',async()=>{
+    const f=await fixture(),sourceId=f.additional,input={...f.intent(),component:'additional-character-sources',sourceId};
+    for(const wrong of ['proof-initial-operation-001',f.allocations[0],f.tickets[0],'additional-unknown-source-01'])
+        await unchanged(f,()=>f.recovery.captureProof(f.request(),{...input,sourceId:wrong}),/kind or identity/);
+    const original=f.h.data.get(f.h.root+'/operations/'+sourceId);
+    const originalPaths=['playableSnapshots/'+original.sourceRevision,'recoveryArchives/'+original.sourceRevision,
+        'playableSnapshots/'+original.resultRevision,'recoveryArchives/'+original.resultRevision];
+    for(const fault of ['uid','slot','character','hash','identity','kind','grant','ledger',...originalPaths.flatMap(path=>['missing:'+path,'corrupt:'+path])]){
+        const bad=createCanonicalCurrentRecovery({...f.deps,runRecoveryAuditMaintenance:(req,id,operation)=>
+            f.deps.runRecoveryAuditMaintenance(req,id,(tx,session)=>operation({...tx,get:async reference=>{
+                const snap=await tx.get(reference);if(snap.docs)return snap;let exists=snap.exists;const raw=snap.data();
+                if(reference.path===f.h.root+'/operations/'+sourceId){
+                    if(fault==='uid')raw.ownerUid='foreign-owner';
+                    if(fault==='kind')raw.kind='unknown-operation';
+                    if(fault==='slot')raw.slotIndex=2;
+                    if(fault==='character')raw.characterId='character-foreign-operation';
+                    if(fault==='hash')raw.snapshotSha256='f'.repeat(64);
+                    if(fault==='identity')raw.operationId='foreign-operation-000001';
+                }
+                if(reference.path===f.h.root+'/grantOperations/'+sourceId&&fault==='grant')exists=true;
+                if(reference.path===f.h.root+'/ledgerEntries/'+sourceId&&fault==='ledger')exists=true;
+                if(fault==='missing:'+reference.path.slice(f.h.root.length+1))exists=false;
+                if(fault==='corrupt:'+reference.path.slice(f.h.root.length+1)){
+                    if(reference.path.includes('/playableSnapshots/'))raw.sha256='f'.repeat(64);else raw.sourceSha256='f'.repeat(64);
+                }
+                return {...snap,exists,data:()=>raw,get:key=>key.split('.').reduce((value,part)=>value?.[part],raw)};
+            }},session))});
+        const expected=fault.startsWith('missing:')&&fault.endsWith('/'+f.h.revision)?'failed-precondition':'data-loss';
+        await unchanged(f,()=>bad.captureProof(f.request(),input),error=>error.code===expected);
+    }
+    f.h.abortNext();await unchanged(f,()=>f.recovery.captureProof(f.request(),input),/rollback/);
+    const start=f.traces.length,race=await Promise.all([f.recovery.captureProof(f.request(),input),f.recovery.captureProof(f.request(),input)]);
+    assert.deepEqual(race.map(row=>row.unchanged).sort(),[false,true]);
+    const pages=[...f.h.data.keys()].filter(path=>path.startsWith(f.root+'/inventoryPages/')).length;
+    assert(f.traces.slice(start).some(trace=>trace.reads===pages+24&&trace.writes>0),'fresh original unit includes exactly seven point reads');
+    assert(f.traces.slice(start).every(trace=>trace.reads<=400&&trace.writes<=10));
+    const saved=capsule(f,input);assert.equal(saved.payload.component,'additional-character-sources');
+    const before=copy([...f.h.data]);assert.equal((await f.recovery.captureProof(f.request(),input)).unchanged,true);assert.deepEqual([...f.h.data],before);
+    assert(!f.traces.at(-1).paths.some(path=>path===f.h.root+'/operations/'+sourceId));
+    f.h.advance(61000);await unchanged(f,()=>f.recovery.captureProof(f.request(),input),/approval/);
+    await f.recovery.cancelAudit(f.request(),{auditId,expectedEpoch:1,operationId:'additional-proof-cancel-01'});
+    await unchanged(f,()=>f.recovery.captureProof(f.request(),input));
 });
