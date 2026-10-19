@@ -633,6 +633,16 @@ const rawArgs=(sequence=1,startOrdinal=0,count=16)=>({auditId,expectedEpoch:1,op
 function inventoryOrder(f){return [...f.h.data].filter(([path])=>path.startsWith(f.root+'/inventoryPages/')).map(([,row])=>decodeInventoryPayload(row.payloadBytes))
     .sort((a,b)=>a.sequence-b.sequence).flatMap(page=>page.entries.map(entry=>({path:page.namespacePath+'/'+entry.id,...entry})));}
 function stableRawReceipt(row){const {createdAt,...manifest}=row;return snapshotDigest(manifest);}
+function candidateQueryDb(db){
+    // The fixture exposes query metadata; add the SDK's public equality API
+    // only here. Production candidate never inspects query implementation data.
+    const reference=row=>({path:row.path,id:row.id,collection:name=>query(row.collection(name))});
+    const query=row=>({path:row.path,doc:id=>reference(row.doc(id)),limit:n=>query(row.limit(n)),
+        where:(...args)=>query(row.where(...args)),orderBy:(...args)=>query(row.orderBy(...args)),
+        key:JSON.stringify([row.path,row.filters,row.maximum,row.order]),
+        isEqual:other=>other?.isEqual instanceof Function&&other.key===JSON.stringify([row.path,row.filters,row.maximum,row.order])});
+    return {collection:name=>query(db.collection(name)),doc:path=>reference(db.doc(path))};
+}
 
 function privateRawInspector(f){
     const filename=require.resolve('../functions/src/canonical-current-recovery'),compiled=new Module(filename);
@@ -657,6 +667,13 @@ async function completeRawMaterial(f){
     return {binding:{ownerUid:f.h.uid,auditId,epoch:1,sourceRevision:f.h.revision,inventoryStateSha256:inventoryState.stateSha256},
         run:copy(f.h.data.get(f.root)),inventoryState,inventoryPages:rows('inventoryPages'),
         rawState:copy(f.h.data.get(f.root+'/proofState/current')),rawReceipts:rows('patrolProofPages'),rawChunks:rows('proofPayloadChunks')};
+}
+const assembledRawBaselines=new Map();
+async function longRawAssemblyFixture(currentLoss){
+    if(!assembledRawBaselines.has(currentLoss))assembledRawBaselines.set(currentLoss,(async()=>{
+        const f=await fixture({three:false,adStatus:'abandoned',currentLoss});return {f,material:await completeRawMaterial(f)};
+    })());
+    return assembledRawBaselines.get(currentLoss);
 }
 function resealRawState(state){const {stateSha256,createdAt,updatedAt,...value}=state;state.stateSha256=snapshotDigest(value);}
 function replaceLastRawPayload(material,mutate){
@@ -692,6 +709,63 @@ test('private full raw chain closes actual twenty-battle Lv10 slot2 active and c
             'collection enumeration order is not a receipt sequence or chunk-order proof');
         assert.deepEqual(material,input);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);assert.equal(f.traces.length,traces);
     }
+});
+
+test('actual twenty-battle active and current-loss raw captures assemble through original strict candidate without prefilled absences or SDK access',async t=>{
+    for(const currentLoss of [false,true]){
+        const {f,material}=await longRawAssemblyFixture(currentLoss);
+        const before=copy([...f.h.data]),input=copy(material),writes=f.h.writes,traces=f.traces.length;
+        const recovery=createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)});
+        const result=await recovery.verifyRawRecoveryAuditCandidate(material);
+        assert.equal(result.candidateProofValid,true);assert.equal(result.ownerUid,f.h.uid);assert.equal(result.sourceRevision,f.h.revision);
+        for(const flag of ['authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
+        assert.equal(result.documentCount,inventoryOrder(f).length);assert.equal(result.absenceCount,currentLoss?56:51);
+        assert(result.assemblyUsage.passes>1&&result.assemblyUsage.passes<=64);assert.equal(result.assemblyUsage.reservedBytes,0);
+        assert(result.assemblyUsage.bytes<256*1024*1024);assert(result.assemblyUsage.nodes<=16000000);
+        assert(result.assemblyUsage.operations<=16384);assert(result.assemblyUsage.elapsedMs<=30000);
+        assert(!Object.values(result).some(value=>Buffer.isBuffer(value)));assert(Object.isFrozen(result));
+        assert.deepEqual(material,input);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);assert.equal(f.traces.length,traces);
+        t.diagnostic(JSON.stringify({currentLoss,...result.assemblyUsage}));
+    }
+});
+
+test('assembly B1 admits actual aggregate chunk bytes before any concat/parse and rejects retained semantic corruption without dropping raw records',async()=>{
+    const {f,material}=await longRawAssemblyFixture(false),inspect=privateRawInspector(f);
+    const {createRecoveryAuditAssemblyBudget}=require('../functions/src/recovery-audit-artifact');
+    const damaged=copy(material),shared=Buffer.alloc(2*1024*1024);
+    assert(damaged.rawReceipts.length*8>=128);
+    damaged.rawChunks=Array.from({length:128},(_,index)=>({id:'aggregate-pressure-'+index,row:{payloadBytes:shared}}));
+    let concats=0,parses=0;const concat=Buffer.concat,parse=JSON.parse;
+    Buffer.concat=(...args)=>{concats++;return concat(...args);};JSON.parse=(...args)=>{parses++;return parse(...args);};
+    try{assert.throws(()=>inspect(damaged,createRecoveryAuditAssemblyBudget()),/assembly bytes budget exceeded/);}
+    finally{Buffer.concat=concat;JSON.parse=parse;}
+    assert.equal(concats,0);assert.equal(parses,0);
+    const orphan=copy(material);orphan.rawChunks.push({id:'orphan-operation-extra_00',row:copy(orphan.rawChunks[0].row)});
+    assert.throws(()=>inspect(orphan,createRecoveryAuditAssemblyBudget()),/retained inventory differs/);
+    const unknown=await fixture({battles:1,three:false,beforeAudit:h=>{
+        h.data.set(h.root+'/recoveryAudits/unreferenced-old-audit',{schemaVersion:1,kind:'retained-unclassified'});
+    }}),unknownMaterial=await completeRawMaterial(unknown);
+    const recovery=createCanonicalCurrentRecovery({...unknown.deps,db:candidateQueryDb(unknown.h.dependencies.db)});
+    await unchanged(unknown,()=>recovery.verifyRawRecoveryAuditCandidate(unknownMaterial),/unused dependency/);
+    const priorApproval=await fixture({battles:1,three:false,beforeAudit:async h=>{
+        await createCanonicalRecoveryApproval(h.dependencies).issue({auth:{uid:'proof-operator',token:{cloudSaveOperator:true}},
+            data:{ownerUid:h.uid,operationId:'retained-prior-approval-001',sourceRevision:h.revision,ttlSeconds:60}});
+    }}),priorMaterial=await completeRawMaterial(priorApproval);
+    await unchanged(priorApproval,()=>createCanonicalCurrentRecovery({...priorApproval.deps,db:candidateQueryDb(priorApproval.h.dependencies.db)})
+        .verifyRawRecoveryAuditCandidate(priorMaterial),/unused dependency .*recoveryApprovals\/retained-prior-approval-001/);
+    const corrupt=await fixture({battles:1,three:false,beforeAudit:h=>{
+        const entry=[...h.data].find(([path])=>path.startsWith(h.root+'/ledgerEntries/'));entry[1].forensicCorruption=true;
+    }}),corruptMaterial=await completeRawMaterial(corrupt);
+    assert(privateRawInspector(corrupt)(corruptMaterial).documents.some(row=>row.data.forensicCorruption),
+        'structural raw checks preserve even original semantic corruption');
+    await unchanged(corrupt,()=>createCanonicalCurrentRecovery({...corrupt.deps,db:candidateQueryDb(corrupt.h.dependencies.db)})
+        .verifyRawRecoveryAuditCandidate(corruptMaterial),/differs/);
+    const absent=copy(material),last=absent.rawReceipts.find(entry=>entry.id===absent.rawState.lastOperationId);
+    absent.rawChunks=absent.rawChunks.filter(entry=>entry.row.operationId!==last.id);
+    const before=copy([...f.h.data]),writes=f.h.writes;
+    await assert.rejects(()=>createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)})
+        .verifyRawRecoveryAuditCandidate(absent));
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
 });
 
 test('private full raw chain rejects every missing, orphan, duplicate, binding, range and self-consistent byte/version substitution without writes',async()=>{

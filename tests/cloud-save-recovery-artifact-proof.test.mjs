@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createRequire} from 'node:module';
+import {createRequire,Module} from 'node:module';
+import {readFileSync} from 'node:fs';
+import {dirname} from 'node:path';
 import {storeHarness,selection,copy} from '../scripts/test-helpers/canonical-store-harness.mjs';
 const require=createRequire(import.meta.url);
 const {createCanonicalCurrentRecovery}=require('../functions/src/canonical-current-recovery');
@@ -148,6 +150,67 @@ async function controlledFixture(){
 }
 function cloneMaterial(m){return {...m,docs:new Map([...m.docs].map(([path,data])=>[path,copy(data)])),
     absent:new Set(m.absent),paths:m.paths.slice(),auditControl:m.auditControl?copy(m.auditControl):undefined};}
+
+function assemblyHelperFaults({operations,nodes,clock}={}){
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);
+    compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+    const native=compiled.require.bind(compiled);compiled.require=name=>name==='node:perf_hooks'&&clock?{performance:{now:clock}}:native(name);
+    let source=readFileSync(filename,'utf8');
+    assert(source.includes('bytes:256*1024*1024,nodes:16000000,operations:16384,passes:64,milliseconds:30000'));
+    // Resource fault injection only. No production/request quota option exists.
+    if(nodes!==undefined)source=source.replace('nodes:16000000','nodes:'+nodes);
+    if(operations!==undefined)source=source.replace('operations:16384','operations:'+operations);
+    compiled._compile(source,filename);return compiled.exports;
+}
+
+test('fixed assembly token protects reserved raw bytes, terminal reservations, node/pass/deadline limits and charges closed-view late reads',async()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),m=await closedFixture(),db=queryDb(m.h.dependencies.db);
+    const empty={uid:m.h.uid,expectedRevision:m.h.revision,auditControl:{auditId:'assembly-test-audit-0001',epoch:1,
+        sessionId:'a'.repeat(32),sessionRevision:1,recordedAt:['timestamp',1700000000,0]},documents:[],absences:[],
+        namespaces:helper.recoveryAuditNamespaces(m.h.uid,2).map(path=>({path,ids:[],terminalEmpty:true}))};
+    const reserved=helper.createRecoveryAuditAssemblyBudget(),buffer=Buffer.alloc(2*1024*1024);
+    helper.reserveRecoveryAuditRawInputs(reserved,Array(128).fill(buffer));
+    let allocations=0,parses=0;const from=Buffer.from,parse=JSON.parse;
+    Buffer.from=(...args)=>{allocations++;return from(...args);};JSON.parse=(...args)=>{parses++;return parse(...args);};
+    try{
+        assert.throws(()=>helper.encodeProofPayload({x:1},reserved),/assembly bytes budget exceeded/);
+        assert.throws(()=>helper.decodeProofPayload(buffer,reserved),/assembly bytes budget exceeded/);
+    }finally{Buffer.from=from;JSON.parse=parse;}
+    assert.equal(allocations,0);assert.equal(parses,0);
+    const orphan=helper.createRecoveryAuditAssemblyBudget();helper.reserveRecoveryAuditRawInputs(orphan,[Buffer.from('unconsumed')]);
+    assert.throws(()=>helper.finishRecoveryAuditRawInputs(orphan),/reservation is incomplete/);
+    assert.throws(()=>helper.encodeRecoveryAuditCandidate(empty,orphan),/reservation is incomplete/);
+    const unknown=Object.freeze({});assert.throws(()=>helper.recoveryAuditAssemblyUsage(unknown),/unknown assembly budget/);
+
+    const tiny=assemblyHelperFaults({nodes:8}),nodeToken=tiny.createRecoveryAuditAssemblyBudget();
+    assert.throws(()=>tiny.encodeProofPayload(Array(9).fill(null),nodeToken),/assembly nodes budget exceeded/);
+    assert.throws(()=>tiny.recoveryAuditAssemblyUsage(nodeToken),/assembly nodes budget exceeded/,'exhaustion is sticky');
+    const passes=helper.createRecoveryAuditAssemblyBudget();helper.reserveRecoveryAuditRawInputs(passes,[]);
+    for(let index=0;index<64;index++)helper.encodeRecoveryAuditCandidate(empty,passes);
+    assert.throws(()=>helper.encodeRecoveryAuditCandidate(empty,passes),/assembly passes budget exceeded/);
+
+    let now=0;const timed=assemblyHelperFaults({clock:()=>now}),timeToken=timed.createRecoveryAuditAssemblyBudget();
+    timed.reserveRecoveryAuditRawInputs(timeToken,[]);const encoded=timed.encodeRecoveryAuditCandidate(empty,timeToken);
+    const timedView=timed.decodeRecoveryAuditArtifact(encoded,{uid:m.h.uid,expectedRevision:m.h.revision,db},timeToken);
+    now=30001;assert.throws(()=>timedView.finish(),/assembly deadline exceeded/,'terminal finish must check the deadline');
+    await timed.drainAndCloseRecoveryAuditLookups(timedView);
+    assert.throws(()=>timed.decodeRecoveryAuditArtifact(encoded,{uid:m.h.uid,expectedRevision:m.h.revision,db},timeToken),/assembly deadline exceeded/);
+
+    const limited=assemblyHelperFaults({operations:3}),opToken=limited.createRecoveryAuditAssemblyBudget();
+    limited.reserveRecoveryAuditRawInputs(opToken,[]);const opBytes=limited.encodeRecoveryAuditCandidate(empty,opToken);
+    const view=limited.decodeRecoveryAuditArtifact(opBytes,{uid:m.h.uid,expectedRevision:m.h.revision,db},opToken),path=m.h.root+'/operations/not-recorded-test-01';
+    await assert.rejects(()=>view.tx.get(db.doc(path)),/unrecorded dependency/);
+    assert.deepEqual(await limited.drainAndCloseRecoveryAuditLookups(view),[path]);
+    assert.equal(view.rows('operations').size,0);
+    await assert.rejects(()=>view.tx.get(db.doc(path)),/unrecorded dependency/);
+    await assert.rejects(()=>view.tx.get(db.doc(path)),/assembly operations budget exceeded/);
+    assert.deepEqual(await limited.drainAndCloseRecoveryAuditLookups(view),[path],'closed diagnostics do not disable accounting');
+    assert.throws(()=>limited.recoveryAuditAssemblyUsage(opToken),/assembly operations budget exceeded/);
+    const claimed=helper.createRecoveryAuditAssemblyBudget();helper.reserveRecoveryAuditRawInputs(claimed,[]);
+    const declared={...empty,namespaces:empty.namespaces.map(row=>row.path===m.h.root+'/operations'?{...row,ids:['missing-claimed-document']}:row)};
+    const claimedBytes=helper.encodeRecoveryAuditCandidate(declared,claimed);
+    assert.throws(()=>helper.decodeRecoveryAuditArtifact(claimedBytes,{uid:m.h.uid,expectedRevision:m.h.revision,db},claimed),/inventory missing document/);
+});
 
 test('exact-view lookup diagnostics collect only missing members, close once and never relax strict reads',async()=>{
     const m=await closedFixture(),db=queryDb(m.h.dependencies.db),input={uid:m.h.uid,expectedRevision:m.h.revision,db};

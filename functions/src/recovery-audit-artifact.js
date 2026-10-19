@@ -1,6 +1,7 @@
 "use strict";
 
 const {createHash}=require("node:crypto");
+const {performance}=require("node:perf_hooks");
 
 // A candidate data format, not a trusted capture certificate or restore source.
 const MAGIC=Buffer.from("CSRA1\n");
@@ -11,6 +12,62 @@ const NAMES=Object.freeze(["account","characters","economy","inventory","equipme
     "simulatedAdSources","modeTimeEvents","modeTime","patrol","patrolTickets","patrolTicketStates",
     "patrolSettlements","patrolClosures","recoveryApprovals","recoveryAudits"]);
 const bad=message=>{throw Error(`Invalid recovery audit artifact: ${message}`);};
+const ASSEMBLY_LIMITS=Object.freeze({bytes:256*1024*1024,nodes:16000000,operations:16384,passes:64,milliseconds:30000});
+const assemblyBudgets=new WeakMap();
+function createRecoveryAuditAssemblyBudget(){
+    const token=Object.freeze({});
+    assemblyBudgets.set(token,{bytes:0,reserved:0,nodes:0,operations:0,passes:0,startedAt:performance.now(),rawReserved:false});
+    return token;
+}
+function assemblyCharge(token,field,amount=0){
+    if(token===undefined)return;
+    const state=assemblyBudgets.get(token);
+    if(!state)bad("unknown assembly budget");
+    if(state.failure)throw state.failure;
+    const exhausted=message=>{state.failure=Error(`Invalid recovery audit artifact: ${message}`);throw state.failure;};
+    if(performance.now()-state.startedAt>ASSEMBLY_LIMITS.milliseconds)exhausted("assembly deadline exceeded");
+    if(field){
+        if(!Number.isSafeInteger(amount)||amount<0||state[field]+amount+(field==="bytes"?state.reserved:0)>ASSEMBLY_LIMITS[field])
+            exhausted(`assembly ${field} budget exceeded`);
+        state[field]+=amount;
+    }
+    return state;
+}
+function reserveRecoveryAuditRawInputs(token,buffers){
+    const state=assemblyCharge(token);
+    if(state.rawReserved)bad("assembly raw input already reserved");
+    let total=0;
+    for(const buffer of buffers){
+        assemblyCharge(token);
+        if(!Buffer.isBuffer(buffer)||!buffer.length||buffer.length>LIMITS.frameBytes)bad("assembly raw input bytes");
+        total+=buffer.length;
+        if(total>ASSEMBLY_LIMITS.bytes-state.bytes-state.reserved)bad("assembly bytes budget exceeded");
+    }
+    state.reserved=total;state.rawReserved=true;
+}
+function assemblyDecodeBytes(token,length,reserved){
+    const state=assemblyCharge(token);if(!state)return;
+    if(reserved){
+        if(!state.rawReserved||length>state.reserved)bad("assembly raw reservation differs");
+        state.reserved-=length;
+    }
+    assemblyCharge(token,"bytes",length);
+}
+function finishRecoveryAuditRawInputs(token){
+    const state=assemblyCharge(token);
+    if(state&&(!state.rawReserved||state.reserved!==0))bad("assembly raw reservation is incomplete");
+}
+function recoveryAuditAssemblyUsage(token){
+    const state=assemblyCharge(token);
+    return Object.freeze({bytes:state.bytes,reservedBytes:state.reserved,nodes:state.nodes,operations:state.operations,
+        passes:state.passes,elapsedMs:performance.now()-state.startedAt});
+}
+function assemblyParsedNodes(row,token,depth=0){
+    if(depth>LIMITS.depth*3+8)bad("parsed node or depth limit");
+    assemblyCharge(token,"nodes",1);
+    if(Array.isArray(row)){for(const child of row)assemblyParsedNodes(child,token,depth+1);}
+    else if(row&&typeof row==="object")for(const child of Object.values(row))assemblyParsedNodes(child,token,depth+1);
+}
 const lookupAttempts=new WeakMap();
 async function drainAndCloseRecoveryAuditLookups(view){
     const attempt=lookupAttempts.get(view);
@@ -73,7 +130,8 @@ function value(node,depth=0){
 }
 // The inverse of the same bounded typed codec used by candidate documents.
 // Map order is canonical; Firestore map enumeration order is not evidence.
-function encodedValue(row,depth=0,budget={nodes:0}){
+function encodedValue(row,depth=0,budget={nodes:0},assemblyBudget){
+    assemblyCharge(assemblyBudget,"nodes",1);
     if(depth>LIMITS.depth||++budget.nodes>LIMITS.nodes)bad("typed value or resource limit");
     if(row===null)return ["null"];
     if(typeof row==="string"||typeof row==="boolean")return [typeof row,row];
@@ -84,12 +142,12 @@ function encodedValue(row,depth=0,budget={nodes:0}){
     }
     if(Array.isArray(row)){
         for(let index=0;index<row.length;index++)if(!Object.hasOwn(row,index))bad("sparse typed array");
-        return ["array",row.map(child=>encodedValue(child,depth+1,budget))];
+        return ["array",row.map(child=>encodedValue(child,depth+1,budget,assemblyBudget))];
     }
     if(row&&typeof row==="object"&&[Object.prototype,null].includes(Object.getPrototypeOf(row))){
         return ["object",Object.keys(row).sort().map(key=>{
             if(["__proto__","constructor","prototype"].includes(key)||!Object.hasOwn(Object.getOwnPropertyDescriptor(row,key),"value"))bad("object key");
-            return [key,encodedValue(row[key],depth+1,budget)];
+            return [key,encodedValue(row[key],depth+1,budget,assemblyBudget)];
         })];
     }
     bad("unsupported typed value");
@@ -99,33 +157,41 @@ function encodeInventoryPayload(payload){
     if(bytes.length>INVENTORY_LIMITS.payloadBytes)bad("inventory payload size");
     return bytes;
 }
-function decodeInventoryPayload(bytes){
+function decodeInventoryPayload(bytes,assemblyBudget,reserved=false){
     if(!Buffer.isBuffer(bytes)||!bytes.length||bytes.length>INVENTORY_LIMITS.payloadBytes)bad("inventory payload size");
+    assemblyDecodeBytes(assemblyBudget,bytes.length,reserved);
     const text=bytes.toString("utf8");let parsed;
     try{parsed=JSON.parse(text);}catch(_){bad("inventory payload JSON");}
+    if(assemblyBudget)assemblyParsedNodes(parsed,assemblyBudget);
     if(JSON.stringify(parsed)!==text||!Buffer.from(text).equals(bytes))bad("inventory payload encoding");
     return value(parsed);
 }
 const PATROL_PROOF_LIMITS=Object.freeze({bytes:2*1024*1024,chunkBytes:256*1024,chunks:8,reads:400,kernelReads:60,inventoryDocuments:4096,inventoryPages:317});
-function encodeProofPayload(payload){
-    const bytes=Buffer.from(JSON.stringify(encodedValue(payload)),"utf8");
+function encodeProofPayload(payload,assemblyBudget){
+    const text=JSON.stringify(encodedValue(payload,0,{nodes:0},assemblyBudget));
+    assemblyCharge(assemblyBudget,"bytes",Buffer.byteLength(text,"utf8"));
+    const bytes=Buffer.from(text,"utf8");
     if(!bytes.length||bytes.length>PATROL_PROOF_LIMITS.bytes)bad("Patrol proof payload size");
     return bytes;
 }
-function decodeProofPayload(bytes){
+function decodeProofPayload(bytes,assemblyBudget,reserved=false){
     if(!Buffer.isBuffer(bytes)||!bytes.length||bytes.length>PATROL_PROOF_LIMITS.bytes)bad("Patrol proof payload size");
+    assemblyDecodeBytes(assemblyBudget,bytes.length,reserved);
     let parsed;try{parsed=JSON.parse(bytes.toString("utf8"));}catch(_){bad("Patrol proof JSON");}
+    if(assemblyBudget)assemblyParsedNodes(parsed,assemblyBudget);
     const result=value(parsed);
-    if(!encodeProofPayload(result).equals(bytes))bad("Patrol proof encoding");
+    if(!encodeProofPayload(result,assemblyBudget).equals(bytes))bad("Patrol proof encoding");
     return result;
 }
-function inventoryDocumentMetadata(snapshot,namespace){
+function inventoryDocumentMetadata(snapshot,namespace,assemblyBudget){
     if(!snapshot?.exists||typeof snapshot.id!=="string"||!snapshot.id||snapshot.id.includes("/")||
        Buffer.from(snapshot.id,"utf8").toString("utf8")!==snapshot.id||snapshot.ref?.path!==`${namespace}/${snapshot.id}`)
         bad("inventory document identity");
     // Exact SDK versions are mandatory. No data timestamp/millisecond fallback.
     const stamp=new ArtifactTimestamp(snapshot.updateTime?.seconds,snapshot.updateTime?.nanoseconds);
-    const bytes=Buffer.from(JSON.stringify(encodedValue(snapshot.data())),"utf8");
+    const text=JSON.stringify(encodedValue(snapshot.data(),0,{nodes:0},assemblyBudget));
+    assemblyCharge(assemblyBudget,"bytes",Buffer.byteLength(text,"utf8"));
+    const bytes=Buffer.from(text,"utf8");
     if(bytes.length>LIMITS.frameBytes)bad("typed document size");
     return Object.freeze({id:snapshot.id,updateTime:Object.freeze({seconds:stamp.seconds,nanoseconds:stamp.nanoseconds}),
         typedDataSha256:createHash("sha256").update(bytes).digest("hex"),typedDataByteLength:bytes.length});
@@ -136,8 +202,39 @@ function clone(row){
     if(row&&typeof row==="object")return Object.freeze(Object.fromEntries(Object.entries(row).map(([key,v])=>[key,clone(v)])));
     return row;
 }
-function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
+function encodeRecoveryAuditCandidate({uid,expectedRevision,auditControl,documents,namespaces,absences},token){
+    finishRecoveryAuditRawInputs(token);
+    assemblyCharge(token,"passes",1);
+    if(!Array.isArray(documents)||!Array.isArray(namespaces)||!Array.isArray(absences)||
+       documents.length+absences.length>LIMITS.documents)bad("document limit");
+    const texts=[];let size=MAGIC.length;
+    const add=frame=>{
+        assemblyCharge(token,"nodes",1);
+        const text=JSON.stringify(frame),length=Buffer.byteLength(text,"utf8");
+        if(!length||length>LIMITS.frameBytes)bad("frame size");
+        size+=length+4;
+        if(size>LIMITS.bytes||texts.length>=LIMITS.frames)bad("bytes or frame limit");
+        texts.push({text,length});
+    };
+    add({type:"header",schemaVersion:2,ownerUid:uid,expectedRevision,auditControl});
+    for(const row of documents)add({type:"document",path:row.path,data:encodedValue(row.data,0,{nodes:0},token)});
+    for(const path of absences)add({type:"absence",path});
+    for(const row of namespaces)add({type:"namespace",path:row.path,ids:row.ids,terminalEmpty:row.terminalEmpty});
+    add({type:"footer",frameCount:texts.length+1,documentCount:documents.length,absenceCount:absences.length});
+    // Charge the entire exact output before allocating either frame Buffers or
+    // their concatenation. Raw input reservations cannot fund this encoding.
+    assemblyCharge(token,"bytes",size);
+    const parts=[MAGIC];
+    for(const {text,length} of texts){
+        assemblyCharge(token);
+        const prefix=Buffer.alloc(4);prefix.writeUInt32BE(length);parts.push(prefix,Buffer.from(text,"utf8"));
+    }
+    assemblyCharge(token);
+    return Buffer.concat(parts,size);
+}
+function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},assemblyBudget){
     if(!Buffer.isBuffer(bytes)||bytes.length>LIMITS.bytes||!bytes.subarray(0,MAGIC.length).equals(MAGIC))bad("bytes or magic");
+    assemblyDecodeBytes(assemblyBudget,bytes.length,false);
     // Copy before parsing: a caller cannot mutate the verified byte array later.
     bytes=Buffer.from(bytes);
     const frames=[];let offset=MAGIC.length,nodeCount=0;
@@ -157,6 +254,7 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
         // frame is bounded before JSON.parse; reject its shape immediately and
         // charge every parsed node before retaining any further frame.
         function charge(row,depth){
+            assemblyCharge(assemblyBudget,"nodes",1);
             if(++nodeCount>LIMITS.nodes||depth>LIMITS.depth*3+8)bad("parsed node or depth limit");
             if(Array.isArray(row)){for(const child of row)charge(child,depth+1);}
             else if(row&&typeof row==="object")for(const child of Object.values(row))charge(child,depth+1);
@@ -226,7 +324,7 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
         return Object.freeze({id:path.slice(path.lastIndexOf("/")+1),ref:db.doc(path),exists:documents.has(path),
             data:()=>clone(data),get:key=>clone(field(data,key))});
     }
-    function rows(name){return Object.freeze(inventories.get(`${root.path}/${name}`).map(id=>document(`${root.path}/${name}/${id}`)));}
+    function rows(name){assemblyCharge(assemblyBudget,"operations",1);return Object.freeze(inventories.get(`${root.path}/${name}`).map(id=>document(`${root.path}/${name}/${id}`)));}
     const result=docs=>Object.freeze({docs:Object.freeze(docs),size:docs.length,empty:docs.length===0});
     const add=(query,name,filter=()=>true,maximum=Infinity,order=null)=>queries.push({query,name,filter,maximum,order});
     for(const name of ["characters","inventory","equipment","relics","claimRecords"])add(root.collection(name),name);
@@ -242,6 +340,7 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
         add(root.collection(name).where("kind","==","account-mode-time").limit(1),name,row=>row.kind==="account-mode-time",1);
     add(root.collection("modeTimeEvents").orderBy("sequence","desc").limit(2),"modeTimeEvents",row=>Object.hasOwn(row,"sequence"),2,"sequence");
     const lookup=async reference=>{
+        assemblyCharge(assemblyBudget,"operations",1);
         if(reference&&typeof reference.collection==="function"&&typeof reference.path==="string")return document(reference.path);
         if(typeof reference?.isEqual!=="function")bad("unsupported query API");
         const matches=queries.filter(entry=>reference.isEqual(entry.query));
@@ -266,6 +365,7 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
     }});
     const view=Object.freeze({root,save,tx,auditControl,rows:name=>result(rows(name)),
         finish:()=>{
+            assemblyCharge(assemblyBudget);
             const unused=[...documents.keys(),...absences].filter(path=>!used.has(path));
             if(unused.length)bad(`unused dependency ${unused[0]}`);
             return Object.freeze({artifactSha256:createHash("sha256").update(bytes).digest("hex"),documentCount:documents.size,
@@ -275,5 +375,6 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
     return view;
 }
 
-module.exports={decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
+module.exports={createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,
+    encodeRecoveryAuditCandidate,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
     inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS};

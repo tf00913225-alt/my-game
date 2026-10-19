@@ -11,7 +11,8 @@ const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
-const {decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
+const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,
+    encodeRecoveryAuditCandidate,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
     inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
 const {createHash}=require("node:crypto");
 
@@ -311,13 +312,13 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             return {...inventoryFlags,auditId:run.auditId,epoch:run.epoch,prepareSha256:intentSha256,nextSequence:1,phase:"preparing",unchanged:false};
         });
     }
-    function inspectInventoryPage(row,args,run,state,namespaces,pendingCreate=false){
+    function inspectInventoryPage(row,args,run,state,namespaces,pendingCreate=false,assemblyBudget){
         inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","intentSha256","payloadSha256","payloadBytes","createdAt"],"page");
         if(row.schemaVersion!==1||row.kind!=="canonical-recovery-inventory-page"||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||
            row.epoch!==run.epoch||row.operationId!==args.operationId||row.intentSha256!==snapshotDigest({action:"capture-inventory-page",...args})||
            !HEX.test(row.payloadSha256||"")||!Buffer.isBuffer(row.payloadBytes)||inventoryHash(row.payloadBytes)!==row.payloadSha256||
            (!pendingCreate&&typeof row.createdAt?.toMillis!=="function"))fail("data-loss","Inventory page seal is inconsistent.");
-        let payload;try{payload=decodeInventoryPayload(row.payloadBytes);}catch(error){fail("data-loss",error.message);}
+        let payload;try{payload=decodeInventoryPayload(row.payloadBytes,assemblyBudget);}catch(error){fail("data-loss",error.message);}
         inventoryExact(payload,["schemaVersion","sequence","namespaceIndex","namespacePath","cursorBefore","cursorAfter","entries",
             "terminalEmpty","inventoryExhausted","previousPageSha256","auditBindingSha256"],"payload");
         if(payload.schemaVersion!==1||payload.sequence!==args.expectedSequence||!Number.isSafeInteger(payload.sequence)||payload.sequence<1||
@@ -409,12 +410,12 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         if(rows.size>=318||rows.size!==state.nextSequence-1)fail("data-loss","Forest inventory page inventory differs.");
         return inspectInventoryPages(rows.docs.map(doc=>({id:doc.id,row:doc.data()})),run,state,namespaces);
     }
-    function inspectInventoryPages(rows,run,state,namespaces){
+    function inspectInventoryPages(rows,run,state,namespaces,assemblyBudget){
         if(rows.length>=318||rows.length!==state.nextSequence-1)fail("data-loss","Forest inventory page inventory differs.");
         const pages=rows.map(({id,row})=>{
             if(id!==row?.operationId)fail("data-loss","Forest inventory page ID differs.");
-            const payload=decodeInventoryPayload(row.payloadBytes);
-            inspectInventoryPage(row,{auditId:run.auditId,expectedEpoch:run.epoch,operationId:id,expectedSequence:payload.sequence},run,state,namespaces);
+            const payload=decodeInventoryPayload(row.payloadBytes,assemblyBudget,assemblyBudget!==undefined);
+            inspectInventoryPage(row,{auditId:run.auditId,expectedEpoch:run.epoch,operationId:id,expectedSequence:payload.sequence},run,state,namespaces,false,assemblyBudget);
             return {row,payload};
         }).sort((a,b)=>a.payload.sequence-b.payload.sequence);
         const index=new Map();let namespaceIndex=0,cursor=null,previous=null,sequence=1;
@@ -454,13 +455,13 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         return Object.freeze({id:path.slice(path.lastIndexOf("/")+1),ref:db.doc(path),exists:entry.exists,
             updateTime:entry.updateTime,data:()=>data,get:key=>key.split(".").reduce((row,name)=>row?.[name],data)});
     }
-    function proofMembership(path,row,index,namespaces){
+    function proofMembership(path,row,index,namespaces,assemblyBudget){
         const namespace=path.slice(0,path.lastIndexOf("/"));
         if(!namespaces.includes(namespace))fail("data-loss","Forest proof dependency namespace is unsupported.");
         const metadata=index.get(path);
         if(row.exists){
             if(!metadata)fail("data-loss","Forest proof dependency is outside inventory.");
-            let actual;try{actual=inventoryDocumentMetadata(proofSnapshot(path,row),namespace);}catch(error){fail("data-loss",error.message);}
+            let actual;try{actual=inventoryDocumentMetadata(proofSnapshot(path,row),namespace,assemblyBudget);}catch(error){fail("data-loss",error.message);}
             if(snapshotDigest(actual)!==snapshotDigest(metadata))fail("data-loss","Forest proof dependency version or bytes changed.");
         }else if(metadata||row.data!==null||row.updateTime!==null)fail("data-loss","Forest proof absence contradicts inventory.");
     }
@@ -560,7 +561,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     }
     function rawRange(args,run,inventory,previousReceiptSha256){return {sourceRevision:run.sourceRevision,inventoryStateSha256:inventory.stateSha256,
         startOrdinal:args.startOrdinal,count:args.count,endOrdinal:args.startOrdinal+args.count,previousReceiptSha256};}
-    function checkRawCapsule(payload,run,inventory,index,namespaces,version,_component,_sourceId,binding){
+    function checkRawCapsule(payload,run,inventory,index,namespaces,version,_component,_sourceId,binding,assemblyBudget){
         inventoryExact(payload,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","sequence","intentSha256","sourceRevision",
             "inventoryStateSha256","startOrdinal","count","endOrdinal","previousReceiptSha256","documents"],"raw payload");
         if(version!==3||payload.schemaVersion!==3||payload.kind!==proofKind(3,"payload")||payload.ownerUid!==run.ownerUid||
@@ -572,7 +573,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         for(let offset=0;offset<paths.length;offset++){
             const row=payload.documents[offset];inventoryExact(row,["path","exists","updateTime","data"],"raw document");
             if(row.path!==paths[offset]||row.exists!==true)fail("data-loss","Raw inventory document order or existence differs.");
-            proofMembership(row.path,row,index,namespaces);
+            proofMembership(row.path,row,index,namespaces,assemblyBudget);
         }
     }
     async function buildRawPayload({tx,run,namespaces,inventory,index,args,binding}){
@@ -604,7 +605,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     // Structural review of already-materialized schema3 bytes only. No SDK
     // reads, semantic Owner dispatch, candidate approval or restore capability.
     // Decode one bounded capsule at a time; do not concatenate the full capture.
-    function inspectCompleteRawCapture(input){
+    function inspectCompleteRawCapture(input,assemblyBudget){
         inventoryExact(input,["binding","run","inventoryState","inventoryPages","rawState","rawReceipts","rawChunks"],"complete raw capture");
         const {binding}=input;
         inventoryExact(binding,["ownerUid","auditId","epoch","sourceRevision","inventoryStateSha256"],"raw capture binding");
@@ -623,7 +624,9 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
            rawChunks.length>rawReceipts.length*PATROL_PROOF_LIMITS.chunks)
             fail("data-loss","Complete raw capture collection bounds differ.");
         for(const entry of inventoryPages)inventoryExact(entry,["id","row"],"raw inventory page entry");
-        const index=inspectInventoryPages(inventoryPages,run,inventory,namespaces);
+        if(assemblyBudget)reserveRecoveryAuditRawInputs(assemblyBudget,[...inventoryPages.map(entry=>entry.row?.payloadBytes),
+            ...rawChunks.map(entry=>entry?.row?.payloadBytes)]);
+        const index=inspectInventoryPages(inventoryPages,run,inventory,namespaces,assemblyBudget);
         const state=inspectProofState(input.rawState,run,inventory);
         if(state.schemaVersion!==3||rawReceipts.length!==state.nextSequence-1)fail("data-loss","Complete raw capture state differs.");
         const chunks=new Map(),receipts=new Map();
@@ -648,13 +651,15 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 const id=receipt.operationId+"_"+String(number).padStart(2,"0"),row=chunks.get(id);
                 parts.push(inspectCapsuleChunk(row,number,receipt,run,3));chunks.delete(id);
             }
+            if(assemblyBudget)recoveryAuditAssemblyUsage(assemblyBudget);
             const bytes=Buffer.concat(parts);
             if(bytes.length!==receipt.payloadByteLength||inventoryHash(bytes)!==receipt.payloadSha256)
                 fail("data-loss","Forest proof complete payload differs.");
-            const payload=decodeProofPayload(bytes);
-            checkRawCapsule(payload,run,inventory,index,namespaces,3,undefined,undefined,receipt);
+            const payload=decodeProofPayload(bytes,assemblyBudget,assemblyBudget!==undefined);
+            checkRawCapsule(payload,run,inventory,index,namespaces,3,undefined,undefined,receipt,assemblyBudget);
             for(const row of payload.documents){
                 if(paths.has(row.path))fail("data-loss","Complete raw capture has duplicate documents.");
+                if(assemblyBudget)recoveryAuditAssemblyUsage(assemblyBudget);
                 paths.add(row.path);documents.push(row);
             }
             offset=receipt.endOrdinal;previous=rawReceiptHash(receipt);last=receipt;
@@ -663,6 +668,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
            state.rawNextOffset!==offset||state.lastOperationId!==last.operationId||state.lastPayloadSha256!==last.payloadSha256||
            state.lastReceiptSha256!==previous||state.lastStartOrdinal!==last.startOrdinal||state.lastCount!==last.count)
             fail("data-loss","Complete raw capture terminal or retained inventory differs.");
+        if(assemblyBudget)finishRecoveryAuditRawInputs(assemblyBudget);
         return Object.freeze({...inventoryFlags,documents:Object.freeze(documents),
             namespaces:Object.freeze(namespaces.map(path=>Object.freeze({path,terminalEmpty:true,
                 ids:Object.freeze([...index.keys()].filter(key=>key.slice(0,key.lastIndexOf("/"))===path)
@@ -1371,6 +1377,44 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             sourceSha256:archiveSnap.get("sourceSha256"),snapshotSha256:snapshotSnap.get("sha256"),
             trustedCaptureVerified:false,restoreAuthorized:false,authoritativeStateReady:false,...view.finish()});
     }
+    // Candidate bytes remain local to this readonly assembly. No mutable Buffer,
+    // captured records or capability escapes to a restore/publication caller.
+    async function verifyRawRecoveryAuditCandidate(input){
+        const budget=createRecoveryAuditAssemblyBudget();
+        try{
+            const union=inspectCompleteRawCapture(input,budget),{ownerUid:uid,sourceRevision:expectedRevision,auditId}=input.binding;
+            const selected=union.documents.find(row=>row.path===`serverUsers/${uid}/${RECOVERY_AUDIT_RUN_COLLECTION}/${auditId}`);
+            if(!selected||!encodeProofPayload(selected.data,budget).equals(encodeProofPayload(input.run,budget)))
+                fail("data-loss","Raw selected audit run differs from its capture binding.");
+            const run=selected.data,recorded=timestampPair(run.createdAt),auditControl={auditId,epoch:run.epoch,
+                sessionId:run.sessionId,sessionRevision:run.sessionRevision,recordedAt:["timestamp",recorded.seconds,recorded.nanoseconds]};
+            const namespaceIds=new Map(union.namespaces.map(row=>[row.path,new Set(row.ids)])),absent=new Set();
+            for(;;){
+                const bytes=encodeRecoveryAuditCandidate({uid,expectedRevision,auditControl,documents:union.documents,
+                    namespaces:union.namespaces,absences:[...absent]},budget);
+                const view=decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},budget);
+                let result,error,missing;
+                try{result=await verifyCandidateStrict(view,uid,expectedRevision);}
+                catch(cause){error=cause;}
+                finally{missing=await drainAndCloseRecoveryAuditLookups(view);}
+                // Sticky resource exhaustion cannot be hidden by an original
+                // Owner replacing a lookup error with its own strict rejection.
+                const usage=recoveryAuditAssemblyUsage(budget);
+                if(result)return Object.freeze({...result,assemblyUsage:usage});
+                if(!missing.length)throw error;
+                let added=false;
+                for(const path of missing){
+                    const slash=path.lastIndexOf("/"),ids=namespaceIds.get(path.slice(0,slash));
+                    if(!ids||ids.has(path.slice(slash+1)))throw error;
+                    if(!absent.has(path)){absent.add(path);added=true;}
+                }
+                if(!added)throw error;
+            }
+        }catch(error){
+            if(error instanceof HttpsError)throw error;
+            fail("data-loss",error.message);
+        }
+    }
     // Candidate-only internal consistency review. This does not establish that
     // a trusted capture included all live documents, grant approval, or return
     // records/a capability usable by the private restore write kernel.
@@ -1390,7 +1434,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             await drainAndCloseRecoveryAuditLookups(view);
         }
     }
-    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,captureProof,captureRawInventory});
+    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,verifyRawRecoveryAuditCandidate,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,captureProof,captureRawInventory});
 }
 
 module.exports={createCanonicalCurrentRecovery,inspectRecoveryAuditFence,
