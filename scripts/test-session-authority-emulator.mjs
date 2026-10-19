@@ -3231,6 +3231,7 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
     console.log("PASS isolated account mode time actual Firestore: protected identity, private zero heartbeats, rested/ElementBox clock transitions, serial simulated grant, replay/concurrency, corrupt-proof rejection, rules and current-source-loss recovery; all readiness remains closed.");
 }
 
+let patrolProofSdkFixture; // Script-private handle to the already-earned multi-character actor.
 // Isolated ordinary online Forest settlement: the real HTTP identity/session
 // and first-character path feed internal Owners and actual Firestore commits.
 // Deterministic entropy is an injected server test dependency, never Client
@@ -3480,6 +3481,7 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
     console.log("PASS actual HTTP second character: Forest-funded Lv10 admission, unspent attribute and shared EXP target, complete two-character revisions and same-operation retries, strict minting/UID/session/foreign-target refusals.");
     console.log(`Forest repeat checkpoint: Lv10 verified after ${completedBattles} test battles; starting isolated recovery.`);
 
+    patrolProofSdkFixture=h;
     // Recovery uses a different fresh UID and a deliberately small legitimate
     // history. Large histories retain the existing 400-read refusal budget.
     const r=await freshPatrol("recovery"),ticket=await r.issue();
@@ -3900,6 +3902,170 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
     assert.deepEqual(row(await stateRef.get()),frozenState);assert.deepEqual(await assets(),assetBefore);
     assert.equal((await save.get()).get("authoritativeStateReady"),false);
     console.log("PASS recovery inventory capture actual SDK: fixed namespaces,16-document pages and true-empty tails, metadata/cursor receipts, bounded reads/writes, rollback/retry/concurrent once-only, no-query lost-response replay, live expiry/takeover/cancel refusal and unchanged assets/readiness.");
+}
+
+
+// Reuse the genuine repeated-Forest/Lv10/second-character actor above. This
+// segment captures proof only; it cannot publish, restore or credit assets.
+{
+    const {recoveryAuditNamespaces,decodePatrolProofPayload,PATROL_PROOF_LIMITS}=require("../functions/src/recovery-audit-artifact.js");
+    const {createCanonicalPatrolSettlement}=require("../functions/src/canonical-patrol-settlement.js");
+    const h=patrolProofSdkFixture;assert.ok(h);
+    let clock=h.clock;
+    let originalTickets=await h.root.collection("patrolTickets").get();
+    // Earlier rested/elite earnings can reach Lv10 in fewer than20 battles.
+    // Top up only the missing genuine battles, rather than replaying a fixture.
+    for(let guard=0;originalTickets.size<20&&guard<20;guard++){
+        const next=await h.issue();await h.member(next.ticketId);await h.terminal(next.ticketId);
+        originalTickets=await h.root.collection("patrolTickets").get();
+    }
+    assert.ok(originalTickets.size>=20);
+    const revision=await h.revision(),original=await checkRecoveryArchive(h.uid,revision);
+    assert.equal(original.get("sourceRecords.characters").length,2);
+    assert.equal(original.get("sourceRecords.characters")[0].state.level,10);
+    const full=createCanonicalPatrolSettlement({...h.deps,randomBytes:size=>Buffer.alloc(size,255)});
+    const ticketId="proof-sdk-three-member-ticket1";
+    const issued=await full.issueTicket(h.request(),{operationId:ticketId,expectedRevision:revision,
+        triggerEntryId:"forest:0",availableEntryIds:["forest:0","forest:1","forest:2"]});
+    assert.equal(issued.members.length,3);
+    for(const memberIndex of [2,0,1])await full.settleMember(h.request(),{
+        operationId:"proof-sdk-member-operation-"+memberIndex,expectedRevision:await h.revision(),ticketId,memberIndex});
+    await full.settleTerminal(h.request(),{operationId:"proof-sdk-terminal-operation1",expectedRevision:await h.revision(),ticketId,kind:"win"});
+    const sourceRevision=await h.revision();await checkRecoveryArchive(h.uid,sourceRevision);
+    const attempts=[],observedDb={doc:path=>db.doc(path),runTransaction:callback=>db.runTransaction(async raw=>{
+        const attempt={reads:0,queries:0,writes:0,paths:[],queryRefs:[]};attempts.push(attempt);
+        const tx={get:async reference=>{const result=await raw.get(reference),query=typeof reference.collection!=="function";
+            attempt.reads+=query?Math.max(1,result.size):1;
+            if(query){attempt.queries++;attempt.queryRefs.push(reference);}else attempt.paths.push(reference.path);
+            return result;}};
+        for(const method of ["create","set","update","delete"])tx[method]=(...args)=>{attempt.writes++;return raw[method](...args);};
+        return callback(tx);
+    })};
+    const authority=createSessionAuthority({db:observedDb,FieldValue,HttpsError,now:()=>clock});
+    const deps={...h.deps,Timestamp,now:()=>clock,runProtected:authority.runProtected,
+        runRecoveryAuditMaintenance:authority.runRecoveryAuditMaintenance};
+    const recovery=createCanonicalCurrentRecovery(deps),auditId="proof-sdk-audit-operation1",approvalOperationId="proof-sdk-approval-operation1";
+    await createCanonicalRecoveryApproval(deps).issue({auth:{uid:"proof-sdk-operator",token:{cloudSaveOperator:true}},
+        data:{ownerUid:h.uid,operationId:approvalOperationId,sourceRevision,ttlSeconds:900}});
+    await recovery.beginAudit(h.request(),{operationId:auditId,expectedRevision:sourceRevision,approvalOperationId});
+    const run=h.root.collection("recoveryAuditRuns").doc(auditId),fence=h.root.collection("recoveryAuditFence").doc("current");
+    const state=run.collection("proofState").doc("current"),receipt=id=>run.collection("patrolProofPages").doc(id),
+        chunk=(id,index)=>run.collection("proofPayloadChunks").doc(id+"_"+String(index).padStart(2,"0"));
+    const row=snap=>({exists:snap.exists,data:snap.data()??null,updateTime:snap.updateTime});
+    const controls=await Promise.all([run.get(),fence.get()]).then(rows=>rows.map(row));
+    const assets=await h.capture();
+    const closed=result=>{for(const key of ["authoritativeStateReady","candidateProofValid","trustedCaptureVerified","restoreAuthorized"])assert.equal(result[key],false);};
+    await recovery.prepareInventory(h.request(),{auditId,expectedEpoch:1,operationId:"proof-sdk-inventory-prepare1"});
+    let exhausted=false;
+    for(let sequence=1;!exhausted&&sequence<=318;sequence++){
+        const result=await recovery.captureInventoryPage(h.request(),{auditId,expectedEpoch:1,
+            operationId:"proof-sdk-inventory-page-"+String(sequence).padStart(8,"0"),expectedSequence:sequence});
+        closed(result);exhausted=result.inventoryExhausted;
+    }
+    assert.equal(exhausted,true,"Actual long-history inventory must complete before proof capture");
+    assert.equal(recoveryAuditNamespaces(h.uid,2).length,31);
+    assert.ok((await run.collection("captureState").doc("current").get()).get("capturedCount")<=4096);
+    async function measure(operation,{retry=false,fresh=false}={}){
+        const start=attempts.length,result=await operation();closed(result);
+        for(const attempt of attempts.slice(start)){
+            assert.ok(attempt.reads<=400,"Full SDK attempt read budget");assert.ok(attempt.writes<=10);
+            const expectedQueries=[run.collection("inventoryPages").limit(318),...(fresh?
+                [run.collection("patrolProofPages").limit(1),run.collection("proofPayloadChunks").limit(1)]:[])];
+            assert.equal(attempt.queries,expectedQueries.length,"Only exact audit metadata admission queries are allowed");
+            for(const expected of expectedQueries)assert.equal(attempt.queryRefs.filter(reference=>reference.isEqual(expected)).length,1);
+            if(retry){
+                assert.ok(!attempt.paths.some(path=>/\/(patrolTickets|patrolTicketStates|patrolSettlements|patrolClosures)\//.test(path)),"Receipt retry must use original chunks without live Forest kernel source reads");
+                for(const name of ["playableSnapshots","recoveryArchives"])assert.deepEqual(
+                    attempt.paths.filter(path=>path.includes("/"+name+"/")),[h.root.collection(name).doc(String(sourceRevision)).path],
+                    "Only the required current approval live gate may reread snapshot/archive");
+            }
+            const kernel=attempt.paths.filter(path=>!path.startsWith(run.path+"/")&&
+                ![h.save.path,h.root.collection("sessionAuthority").doc("current").path,
+                  h.root.collection("recoveryAuditFence").doc("current").path].includes(path));
+            assert.ok(kernel.length<=60,"Original Forest point proof stays within declared60");
+        }
+        return result;
+    }
+    const input={auditId,expectedEpoch:1,operationId:"proof-sdk-capture-operation1",expectedSequence:1,ticketId};
+    const rollback=createCanonicalCurrentRecovery({...deps,runRecoveryAuditMaintenance:(req,id,operation)=>
+        authority.runRecoveryAuditMaintenance(req,id,async(tx,session)=>{await operation(tx,session);throw Error("proof SDK staged rollback");})});
+    await assert.rejects(()=>rollback.capturePatrolProof(h.request(),input),/proof SDK staged rollback/);
+    assert.equal((await state.get()).exists,false);assert.equal((await receipt(input.operationId).get()).exists,false);
+    assert.equal((await run.collection("proofPayloadChunks").get()).empty,true);
+    const result=await measure(()=>recovery.capturePatrolProof(h.request(),input),{fresh:true});
+    assert.equal(result.component,"forest-ticket");assert.ok(result.payloadByteLength<=2*1024*1024);
+    assert.ok(result.chunkCount>=1&&result.chunkCount<=8);assert.equal(PATROL_PROOF_LIMITS.chunks,8);
+    const chunks=await Promise.all(Array.from({length:result.chunkCount},(_,index)=>chunk(input.operationId,index).get()));
+    for(const snap of chunks){assert.equal(snap.exists,true);assert.ok(Buffer.isBuffer(snap.get("payloadBytes")));
+        assert.ok(snap.get("payloadBytes").length<=256*1024);assert.ok(snap.updateTime);}
+    const payload=Buffer.concat(chunks.map(snap=>snap.get("payloadBytes")));
+    assert.equal(payload.length,result.payloadByteLength);assert.equal(createHash("sha256").update(payload).digest("hex"),result.payloadSha256);
+    assert.ok(decodePatrolProofPayload(payload));
+    const proofState=row(await state.get()),proofReceipt=row(await receipt(input.operationId).get());
+    const replay=await measure(()=>recovery.capturePatrolProof(h.request(),input),{retry:true});assert.equal(replay.unchanged,true);
+    assert.deepEqual(row(await state.get()),proofState);assert.deepEqual(row(await receipt(input.operationId).get()),proofReceipt);
+    for(const removeReceipt of [false,true]){
+        await state.delete();if(removeReceipt)await receipt(input.operationId).delete();
+        const orphan={...input,operationId:removeReceipt?"proof-sdk-missing-both-001":"proof-sdk-missing-state-01"};
+        const start=attempts.length;
+        await assert.rejects(()=>recovery.capturePatrolProof(h.request(),orphan));
+        assert.ok(attempts.slice(start).every(attempt=>attempt.writes===0));
+        assert.equal((await state.get()).exists,false);assert.equal((await receipt(orphan.operationId).get()).exists,false);
+        for(const old of chunks)assert.deepEqual((await old.ref.get()).data(),old.data(),"Orphan rejection cannot repair or mutate original chunks");
+        // Restore the exact intentionally removed emulator metadata, not a new seal.
+        await state.set(proofState.data);if(removeReceipt)await receipt(input.operationId).set(proofReceipt.data);
+    }
+    for(const damage of ["missing","corrupt"]){
+        const ref=chunks[0].ref,bytes=chunks[0].data();
+        if(damage==="missing")await ref.delete();else await ref.update({payloadBytes:Buffer.from("damaged proof chunk")});
+        const start=attempts.length;
+        await assert.rejects(()=>recovery.capturePatrolProof(h.request(),input));
+        assert.ok(attempts.slice(start).every(attempt=>attempt.writes===0));
+        assert.deepEqual((await state.get()).data(),proofState.data);
+        if(damage==="missing")assert.equal((await ref.get()).exists,false);
+        await ref.set(bytes); // Restore only explicitly damaged emulator proof.
+    }
+    const second={...input,operationId:"proof-sdk-capture-operation2",expectedSequence:2,ticketId:originalTickets.docs[0].id};
+    let callbacks=0;
+    const retrying=createCanonicalCurrentRecovery({...deps,runRecoveryAuditMaintenance:(req,id,operation)=>
+        authority.runRecoveryAuditMaintenance(req,id,async(tx,session)=>{callbacks++;const value=await operation(tx,session);
+            if(callbacks===1)throw Object.assign(Error("proof actual SDK callback retry"),{code:10});return value;})});
+    const retryStart=attempts.length;
+    await measure(()=>retrying.capturePatrolProof(h.request(),second));assert.ok(callbacks>=2);
+    assert.ok(attempts.slice(retryStart).every(attempt=>attempt.paths.includes(h.root.collection("patrolTickets").doc(second.ticketId).path)),
+        "Every SDK attempt must record the live ticket with a fresh source cache");
+    const stale={...second,operationId:"proof-sdk-stale-sequence-01"},staleStart=attempts.length;
+    await assert.rejects(()=>recovery.capturePatrolProof(h.request(),stale));
+    assert.ok(attempts.slice(staleStart).every(attempt=>attempt.writes===0));
+    assert.equal((await receipt(stale.operationId).get()).exists,false);
+    const third={...second,operationId:"proof-sdk-capture-operation3",expectedSequence:3,ticketId:originalTickets.docs[1].id};
+    const start=attempts.length,race=await Promise.all([recovery.capturePatrolProof(h.request(),third),recovery.capturePatrolProof(h.request(),third)]);
+    assert.ok(race.some(value=>value.unchanged));assert.equal(race[0].payloadSha256,race[1].payloadSha256);race.forEach(closed);
+    assert.ok(attempts.slice(start).every(attempt=>attempt.reads<=400&&attempt.writes<=10));
+    assert.deepEqual(await Promise.all([run.get(),fence.get()]).then(rows=>rows.map(row)),controls);
+    // Asset/current/history versions cannot be changed by a proof-only capture.
+    assert.deepEqual(await h.capture(),assets);
+    // Rewrite identical test-only raw bytes after inventory: updateTime alone
+    // must invalidate the source seal even though the semantic ticket hash agrees.
+    const changedTicket=originalTickets.docs[2];
+    await changedTicket.ref.update({ownerUid:h.uid});
+    const changedInput={...input,operationId:"proof-sdk-version-changed-01",expectedSequence:4,ticketId:changedTicket.id};
+    let changedStart=attempts.length;
+    await assert.rejects(()=>recovery.capturePatrolProof(h.request(),changedInput));
+    assert.ok(attempts.slice(changedStart).every(attempt=>attempt.writes===0));
+    assert.equal((await receipt(changedInput.operationId).get()).exists,false);
+    clock+=901000;
+    const finalState=row(await state.get());let before=attempts.length;
+    await assert.rejects(()=>recovery.capturePatrolProof(h.request(),input));assert.ok(attempts.slice(before).every(a=>a.writes===0));
+    const oldRequest=h.request();
+    while(Math.floor(Date.now()/1000)<=claims(h.token).auth_time)await new Promise(resolve=>setTimeout(resolve,100));
+    const next=await login("accounts:signInWithPassword",{email:h.email,password});
+    h.setIdentity(next.idToken,await invoke("createGameSession",next.idToken,{uid:h.uid}));
+    await assert.rejects(()=>recovery.capturePatrolProof(oldRequest,input),/SESSION_REVOKED/);
+    await recovery.cancelAudit(h.request(),{operationId:"proof-sdk-cancel-operation1",auditId,expectedEpoch:1});
+    await assert.rejects(()=>recovery.capturePatrolProof(h.request(),input));assert.deepEqual(row(await state.get()),finalState);
+    assert.equal((await h.save.get()).get("authoritativeStateReady"),false);
+    console.log("PASS Forest proof component actual SDK: genuine multi-battle/Lv10/slot2 plus three-member unit, complete inventory admission, typed bounded chunks committed by real SDK, rollback/retry/CAS concurrency, original-chunk receipt replay, missing/corrupt chunk zero repair, live gates and all readiness closed. Payload bytes are not SDK wire-size measurements.");
 }
 
 await db.terminate();

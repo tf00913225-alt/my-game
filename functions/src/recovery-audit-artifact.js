@@ -93,6 +93,19 @@ function decodeInventoryPayload(bytes){
     if(JSON.stringify(parsed)!==text||!Buffer.from(text).equals(bytes))bad("inventory payload encoding");
     return value(parsed);
 }
+const PATROL_PROOF_LIMITS=Object.freeze({bytes:2*1024*1024,chunkBytes:256*1024,chunks:8,reads:400,kernelReads:60,inventoryDocuments:4096,inventoryPages:317});
+function encodePatrolProofPayload(payload){
+    const bytes=Buffer.from(JSON.stringify(encodedValue(payload)),"utf8");
+    if(!bytes.length||bytes.length>PATROL_PROOF_LIMITS.bytes)bad("Patrol proof payload size");
+    return bytes;
+}
+function decodePatrolProofPayload(bytes){
+    if(!Buffer.isBuffer(bytes)||!bytes.length||bytes.length>PATROL_PROOF_LIMITS.bytes)bad("Patrol proof payload size");
+    let parsed;try{parsed=JSON.parse(bytes.toString("utf8"));}catch(_){bad("Patrol proof JSON");}
+    const result=value(parsed);
+    if(!encodePatrolProofPayload(result).equals(bytes))bad("Patrol proof encoding");
+    return result;
+}
 function inventoryDocumentMetadata(snapshot,namespace){
     if(!snapshot?.exists||typeof snapshot.id!=="string"||!snapshot.id||snapshot.id.includes("/")||
        Buffer.from(snapshot.id,"utf8").toString("utf8")!==snapshot.id||snapshot.ref?.path!==`${namespace}/${snapshot.id}`)
@@ -236,4 +249,4 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
 }
 
 module.exports={decodeRecoveryAuditArtifact,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
-    inventoryDocumentMetadata,INVENTORY_LIMITS};
+    inventoryDocumentMetadata,INVENTORY_LIMITS,encodePatrolProofPayload,decodePatrolProofPayload,PATROL_PROOF_LIMITS};

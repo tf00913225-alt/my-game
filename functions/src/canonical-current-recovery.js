@@ -12,7 +12,7 @@ const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocat
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
 const {decodeRecoveryAuditArtifact,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
-    inventoryDocumentMetadata,INVENTORY_LIMITS}=require("./recovery-audit-artifact");
+    inventoryDocumentMetadata,INVENTORY_LIMITS,encodePatrolProofPayload,decodePatrolProofPayload,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
 const {createHash}=require("node:crypto");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
@@ -396,6 +396,189 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             inspectInventoryPage(page,args,run,next,namespaces,true);
             tx.create(pageRef,page);tx.set(stateRef,next);
             return inventoryPageResult(args,run,payload,sha256,false);
+        });
+    }
+    // Forest-only component. These seals never certify the complete recovery closure.
+    function admitProofInventory(state,namespaces){
+        if(namespaces.length!==31||state.phase!=="inventory"||!state.inventoryExhausted||state.capturedCount>PATROL_PROOF_LIMITS.inventoryDocuments)
+            fail("failed-precondition","Forest proof inventory admission failed.");
+    }
+    async function completeInventory(tx,run,state,namespaces,runRef){
+        admitProofInventory(state,namespaces);
+        const rows=await tx.get(runRef.collection(RECOVERY_INVENTORY_PAGE_COLLECTION).limit(318));
+        if(rows.size>=318||rows.size!==state.nextSequence-1)fail("data-loss","Forest inventory page inventory differs.");
+        const pages=rows.docs.map(doc=>{
+            if(doc.id!==doc.get("operationId"))fail("data-loss","Forest inventory page ID differs.");
+            const row=doc.data(),payload=decodeInventoryPayload(row.payloadBytes);
+            inspectInventoryPage(row,{auditId:run.auditId,expectedEpoch:run.epoch,operationId:doc.id,expectedSequence:payload.sequence},run,state,namespaces);
+            return {row,payload};
+        }).sort((a,b)=>a.payload.sequence-b.payload.sequence);
+        const index=new Map();let namespaceIndex=0,cursor=null,previous=null,sequence=1;
+        for(const {row,payload} of pages){
+            if(payload.sequence!==sequence++||payload.namespaceIndex!==namespaceIndex||payload.cursorBefore!==cursor||payload.previousPageSha256!==previous)
+                fail("data-loss","Forest inventory page chain differs.");
+            for(const entry of payload.entries){const path=namespaces[namespaceIndex]+"/"+entry.id;
+                if(index.has(path))fail("data-loss","Forest inventory has duplicate membership.");index.set(path,entry);}
+            previous=row.payloadSha256;cursor=payload.cursorAfter;
+            if(payload.terminalEmpty){namespaceIndex++;cursor=null;}
+        }
+        if(namespaceIndex!==namespaces.length||cursor!==null||index.size!==state.capturedCount||previous!==state.lastPageSha256||
+           pages.at(-1)?.row.operationId!==state.lastPageOperationId)fail("data-loss","Forest inventory terminal or membership differs.");
+        return index;
+    }
+    function proofStateHash(row){const {stateSha256,createdAt,updatedAt,...value}=row;return snapshotDigest(value);}
+    function inspectProofState(row,run,inventory){
+        inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","inventoryStateSha256","nextSequence","lastOperationId","lastPayloadSha256","stateSha256","createdAt","updatedAt"],"Forest proof state");
+        if(row.schemaVersion!==1||row.kind!=="canonical-recovery-patrol-proof-state"||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||row.epoch!==run.epoch||
+           row.inventoryStateSha256!==inventory.stateSha256||!Number.isSafeInteger(row.nextSequence)||row.nextSequence<2||
+           !OPERATION_ID.test(row.lastOperationId||"")||!HEX.test(row.lastPayloadSha256||"")||row.stateSha256!==proofStateHash(row)||
+           typeof row.createdAt?.toMillis!=="function"||typeof row.updatedAt?.toMillis!=="function")fail("data-loss","Forest proof state differs.");
+        return row;
+    }
+    function proofSnapshot(path,entry){
+        const data=entry.exists?entry.data:undefined;
+        return Object.freeze({id:path.slice(path.lastIndexOf("/")+1),ref:db.doc(path),exists:entry.exists,
+            updateTime:entry.updateTime,data:()=>data,get:key=>key.split(".").reduce((row,name)=>row?.[name],data)});
+    }
+    function proofMembership(path,row,index,namespaces){
+        const namespace=path.slice(0,path.lastIndexOf("/"));
+        if(!namespaces.includes(namespace))fail("data-loss","Forest proof dependency namespace is unsupported.");
+        const metadata=index.get(path);
+        if(row.exists){
+            if(!metadata)fail("data-loss","Forest proof dependency is outside inventory.");
+            let actual;try{actual=inventoryDocumentMetadata(proofSnapshot(path,row),namespace);}catch(error){fail("data-loss",error.message);}
+            if(snapshotDigest(actual)!==snapshotDigest(metadata))fail("data-loss","Forest proof dependency version or bytes changed.");
+        }else if(metadata||row.data!==null||row.updateTime!==null)fail("data-loss","Forest proof absence contradicts inventory.");
+    }
+    async function checkPatrolCapsule(payload,run,inventory,index,namespaces){
+        inventoryExact(payload,["schemaVersion","kind","ownerUid","sourceRevision","ticketId","inventoryStateSha256","documents"],"Forest proof payload");
+        if(payload.schemaVersion!==1||payload.kind!=="canonical-recovery-patrol-proof-payload"||payload.ownerUid!==run.ownerUid||
+           payload.sourceRevision!==run.sourceRevision||payload.inventoryStateSha256!==inventory.stateSha256||!OPERATION_ID.test(payload.ticketId||"")||
+           !Array.isArray(payload.documents)||payload.documents.length>79)fail("data-loss","Forest proof payload differs.");
+        const records=new Map();let previous=null;
+        for(const row of payload.documents){
+            inventoryExact(row,["path","exists","updateTime","data"],"Forest dependency");
+            if(typeof row.path!=="string"||typeof row.exists!=="boolean"||(previous!==null&&inventoryCompare(previous,row.path)>=0))
+                fail("data-loss","Forest proof dependency order differs.");
+            proofMembership(row.path,row,index,namespaces);records.set(row.path,row);previous=row.path;
+        }
+        const used=new Set(),read=path=>{const row=records.get(path);if(!row)fail("data-loss","Forest proof dependency is missing.");used.add(path);return proofSnapshot(path,row);};
+        const root=db.collection("serverUsers").doc(run.ownerUid),source=inspectCurrentRecoverySource(run.ownerUid,run.sourceRevision,{
+            envelopeSnap:read("users/"+run.ownerUid+"/saves/current"),
+            archiveSnap:read(root.path+"/recoveryArchives/"+run.sourceRevision),snapshotSnap:read(root.path+"/playableSnapshots/"+run.sourceRevision)});
+        const fixed={get:async reference=>{if(typeof reference?.path!=="string"||typeof reference.collection!=="function")
+                fail("data-loss","Forest proof requires point reads only.");return read(reference.path);}};
+        await verifyCandidateAuditControl(fixed,root,run.ownerUid,run.sourceRevision,{auditId:run.auditId,epoch:run.epoch,
+            sessionId:run.sessionId,sessionRevision:run.sessionRevision,recordedAt:read(root.path+"/recoveryApprovals/"+run.approvalOperationId).get("issuedAt")});
+        let reads=0;const kernel={get:reference=>{if(++reads>PATROL_PROOF_LIMITS.kernelReads)fail("resource-exhausted","Forest proof kernel read budget exceeded.");return fixed.get(reference);}};
+        patrolEvidence.beginEvidenceAttempt(kernel);
+        const ticket=read(root.path+"/patrolTickets/"+payload.ticketId);
+        await patrolEvidence.verifyRetainedTicket(kernel,root,run.ownerUid,source.records.account,ticket,run.sourceRevision);
+        if(used.size!==records.size)fail("data-loss","Forest proof contains unused raw dependencies.");
+    }
+    async function capturePatrolProof(request,args){
+        auditIntent("capture Forest proof",args,["auditId","expectedEpoch","operationId","expectedSequence","ticketId"]);
+        if(!OPERATION_ID.test(args.ticketId||"")||!Number.isSafeInteger(args.expectedSequence)||args.expectedSequence<1)
+            fail("invalid-argument","A Forest ticket and sequence are required.");
+        return runRecoveryAuditMaintenance(request,args.auditId,async(rawTx,session)=>{
+            // Session Authority has already read its two Session records and fence.
+            // Reserve query limits BEFORE sending a read, then release unused slots.
+            let reads=3;const dependencies=new Map(),orphanQueries=new Set(),reserve=amount=>{if(reads+amount>400)fail("resource-exhausted","Forest proof transaction read budget exceeded.");reads+=amount;};
+            const tx={get:async reference=>{const point=typeof reference?.collection==="function",amount=point?1:orphanQueries.has(reference)?1:318;
+                reserve(amount);const row=await rawTx.get(reference);if(!point){
+                    if(!Number.isSafeInteger(row.size)||row.size<0||row.size>amount||!Array.isArray(row.docs)||row.docs.length!==row.size)
+                        fail("data-loss","Forest proof bounded query result differs.");
+                    reads-=amount-Math.max(1,row.size);
+                }
+                if(point){const path=reference.path;dependencies.set(path,{path,exists:row.exists,
+                    updateTime:row.exists?{seconds:row.updateTime?.seconds,nanoseconds:row.updateTime?.nanoseconds}:null,data:row.exists?row.data():null});}
+                return row;}};
+            const {run,namespaces,stateRef,runRef}=await inventoryContext(tx,session,args.auditId,args.expectedEpoch);
+            const proofStateRef=runRef.collection("proofState").doc("current"),receiptRef=runRef.collection("patrolProofPages").doc(args.operationId);
+            const [inventorySnap,stateSnap,receiptSnap]=await Promise.all([tx.get(stateRef),tx.get(proofStateRef),tx.get(receiptRef)]);
+            const inventory=inspectInventoryState(inventorySnap.data(),run,namespaces);
+            admitProofInventory(inventory,namespaces);
+            if(!stateSnap.exists&&!receiptSnap.exists){
+                // Only these two Owner-created exact query objects receive a
+                // one-read reservation; no caller can supply a smaller cost.
+                const pages=runRef.collection("patrolProofPages").limit(1),chunks=runRef.collection("proofPayloadChunks").limit(1);
+                orphanQueries.add(pages);orphanQueries.add(chunks);
+                const retained=[await tx.get(pages),await tx.get(chunks)];
+                if(retained.some(rows=>rows.size>0))fail("data-loss","Forest orphan history survives missing proof state.");
+            }
+            const index=await completeInventory(tx,run,inventory,namespaces,runRef);
+            const state=stateSnap.exists?inspectProofState(stateSnap.data(),run,inventory):null,
+                intentSha256=snapshotDigest({action:"capture-patrol-proof",...args});
+            if(state){
+                const headSnap=state.lastOperationId===args.operationId?receiptSnap:
+                    await tx.get(runRef.collection("patrolProofPages").doc(state.lastOperationId)),head=headSnap.data();
+                if(!headSnap.exists||head?.schemaVersion!==1||head.kind!=="canonical-recovery-patrol-proof-page"||head.ownerUid!==run.ownerUid||
+                   head.auditId!==run.auditId||head.epoch!==run.epoch||head.operationId!==state.lastOperationId||head.sequence!==state.nextSequence-1||
+                   head.inventoryStateSha256!==inventory.stateSha256||head.payloadSha256!==state.lastPayloadSha256||!OPERATION_ID.test(head.ticketId||"")||
+                   head.intentSha256!==snapshotDigest({action:"capture-patrol-proof",auditId:run.auditId,expectedEpoch:run.epoch,
+                       operationId:head.operationId,expectedSequence:head.sequence,ticketId:head.ticketId}))fail("data-loss","Forest proof state head differs.");
+            }
+            const result=(receipt,unchanged)=>({...inventoryFlags,component:"forest-ticket",auditId:run.auditId,epoch:run.epoch,
+                operationId:args.operationId,ticketId:args.ticketId,sequence:receipt.sequence,payloadSha256:receipt.payloadSha256,
+                payloadByteLength:receipt.payloadByteLength,chunkCount:receipt.chunkSha256s.length,unchanged});
+            if(receiptSnap.exists){
+                const receipt=receiptSnap.data();
+                inventoryExact(receipt,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","intentSha256","sequence","ticketId",
+                    "inventoryStateSha256","payloadSha256","payloadByteLength","chunkSha256s","createdAt"],"Forest proof receipt");
+                if(receipt.schemaVersion!==1||receipt.kind!=="canonical-recovery-patrol-proof-page"||receipt.ownerUid!==run.ownerUid||receipt.auditId!==run.auditId||
+                   receipt.epoch!==run.epoch||receipt.operationId!==args.operationId||receipt.intentSha256!==intentSha256||receipt.sequence!==args.expectedSequence||
+                   receipt.ticketId!==args.ticketId||receipt.inventoryStateSha256!==inventory.stateSha256||!state||state.nextSequence<=receipt.sequence||
+                   !Number.isSafeInteger(receipt.payloadByteLength)||receipt.payloadByteLength<1||receipt.payloadByteLength>PATROL_PROOF_LIMITS.bytes||
+                   !Array.isArray(receipt.chunkSha256s)||receipt.chunkSha256s.length!==Math.ceil(receipt.payloadByteLength/PATROL_PROOF_LIMITS.chunkBytes)||
+                   receipt.chunkSha256s.some(hash=>!HEX.test(hash||""))||!HEX.test(receipt.payloadSha256||"")||typeof receipt.createdAt?.toMillis!=="function"||
+                   (state.nextSequence===receipt.sequence+1&&(state.lastOperationId!==args.operationId||state.lastPayloadSha256!==receipt.payloadSha256)))
+                    fail("data-loss","Forest proof receipt differs.");
+                const chunks=[];
+                for(let number=0;number<receipt.chunkSha256s.length;number++){
+                    const snap=await tx.get(runRef.collection("proofPayloadChunks").doc(args.operationId+"_"+String(number).padStart(2,"0"))),row=snap.data();
+                    inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","chunkIndex","payloadBytes","sha256"],"Forest proof chunk");
+                    if(row.schemaVersion!==1||row.kind!=="canonical-recovery-patrol-proof-chunk"||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||
+                       row.epoch!==run.epoch||row.operationId!==args.operationId||row.chunkIndex!==number||!Buffer.isBuffer(row.payloadBytes)||
+                       row.payloadBytes.length!==(number===receipt.chunkSha256s.length-1?receipt.payloadByteLength-number*PATROL_PROOF_LIMITS.chunkBytes:PATROL_PROOF_LIMITS.chunkBytes)||
+                       row.sha256!==receipt.chunkSha256s[number]||inventoryHash(row.payloadBytes)!==row.sha256)fail("data-loss","Forest proof chunk differs.");
+                    chunks.push(row.payloadBytes);
+                }
+                const bytes=Buffer.concat(chunks);if(inventoryHash(bytes)!==receipt.payloadSha256)fail("data-loss","Forest proof complete payload differs.");
+                const payload=decodePatrolProofPayload(bytes);if(payload.ticketId!==args.ticketId)fail("data-loss","Forest proof ticket differs.");
+                await checkPatrolCapsule(payload,run,inventory,index,namespaces);return result(receipt,true);
+            }
+            if((state?.nextSequence??1)!==args.expectedSequence)fail("failed-precondition","Forest proof sequence is not current.");
+            const root=db.collection("serverUsers").doc(session.uid),base=await Promise.all([
+                tx.get(db.doc("users/"+session.uid+"/saves/current")),tx.get(root.collection("recoveryArchives").doc(String(run.sourceRevision))),
+                tx.get(root.collection("playableSnapshots").doc(String(run.sourceRevision)))]);
+            const source=inspectCurrentRecoverySource(session.uid,run.sourceRevision,{envelopeSnap:base[0],archiveSnap:base[1],snapshotSnap:base[2]});
+            const ticket=await tx.get(root.collection("patrolTickets").doc(args.ticketId));let kernelReads=0;
+            const kernel={get:reference=>{if(typeof reference?.collection!=="function")fail("data-loss","Forest proof requires point reads only.");
+                if(++kernelReads>60)fail("resource-exhausted","Forest proof kernel read budget exceeded.");return tx.get(reference);}};
+            patrolEvidence.beginEvidenceAttempt(kernel);
+            await patrolEvidence.verifyRetainedTicket(kernel,root,session.uid,source.records.account,ticket,run.sourceRevision);
+            const documents=[...dependencies.values()].filter(row=>namespaces.includes(row.path.slice(0,row.path.lastIndexOf("/"))))
+                .sort((a,b)=>inventoryCompare(a.path,b.path));
+            for(const row of documents)proofMembership(row.path,row,index,namespaces);
+            let bytes,payload={schemaVersion:1,kind:"canonical-recovery-patrol-proof-payload",ownerUid:session.uid,sourceRevision:run.sourceRevision,
+                ticketId:args.ticketId,inventoryStateSha256:inventory.stateSha256,documents};
+            try{bytes=encodePatrolProofPayload(payload);await checkPatrolCapsule(decodePatrolProofPayload(bytes),run,inventory,index,namespaces);}
+            catch(error){if(error instanceof HttpsError)throw error;fail("data-loss",error.message);}
+            const chunks=[];for(let offset=0;offset<bytes.length;offset+=PATROL_PROOF_LIMITS.chunkBytes)chunks.push(bytes.subarray(offset,offset+PATROL_PROOF_LIMITS.chunkBytes));
+            const stamp=FieldValue.serverTimestamp(),receipt={schemaVersion:1,kind:"canonical-recovery-patrol-proof-page",ownerUid:session.uid,auditId:run.auditId,
+                epoch:run.epoch,operationId:args.operationId,intentSha256,sequence:args.expectedSequence,ticketId:args.ticketId,inventoryStateSha256:inventory.stateSha256,
+                payloadSha256:inventoryHash(bytes),payloadByteLength:bytes.length,chunkSha256s:chunks.map(inventoryHash),createdAt:stamp};
+            const next={schemaVersion:1,kind:"canonical-recovery-patrol-proof-state",ownerUid:session.uid,auditId:run.auditId,epoch:run.epoch,
+                inventoryStateSha256:inventory.stateSha256,nextSequence:args.expectedSequence+1,lastOperationId:args.operationId,lastPayloadSha256:receipt.payloadSha256,
+                createdAt:state?.createdAt??stamp,updatedAt:stamp};
+            if(!Number.isSafeInteger(next.nextSequence))fail("resource-exhausted","Forest proof sequence exhausted.");next.stateSha256=proofStateHash(next);
+            // Fixed <=8 binary chunks plus receipt/state: <=10 writes. Oversize
+            // and every proof check have already failed before any mutation.
+            chunks.forEach((payloadBytes,chunkIndex)=>rawTx.create(runRef.collection("proofPayloadChunks").doc(args.operationId+"_"+String(chunkIndex).padStart(2,"0")),{
+                schemaVersion:1,kind:"canonical-recovery-patrol-proof-chunk",ownerUid:session.uid,auditId:run.auditId,epoch:run.epoch,
+                operationId:args.operationId,chunkIndex,payloadBytes,sha256:receipt.chunkSha256s[chunkIndex]}));
+            rawTx.create(receiptRef,receipt);if(state)rawTx.set(proofStateRef,next);else rawTx.create(proofStateRef,next);
+            return result(receipt,false);
         });
     }
     async function verifyDebitRecoveryEvidence(tx,root,uid,expectedRevision,records,doc,ledger,receipt){
@@ -986,7 +1169,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             fail("data-loss",error.message);
         }
     }
-    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage});
+    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,capturePatrolProof});
 }
 
 module.exports={createCanonicalCurrentRecovery,inspectRecoveryAuditFence,

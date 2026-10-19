@@ -146,9 +146,14 @@ function createSessionAuthority({db,FieldValue,HttpsError,now=Date.now}){
                         const auditPath=`serverUsers/${session.uid}/${RECOVERY_AUDIT_RUN_COLLECTION}/${auditId}`;
                         const pagePrefix=`${auditPath}/${RECOVERY_INVENTORY_PAGE_COLLECTION}/`;
                         const pageId=reference?.path?.startsWith(pagePrefix)?reference.path.slice(pagePrefix.length):null;
+                        const proofState=reference?.path===auditPath+"/proofState/current";
+                        const proofPagePrefix=auditPath+"/patrolProofPages/",chunkPrefix=auditPath+"/proofPayloadChunks/";
+                        const proofPageId=reference?.path?.startsWith(proofPagePrefix)?reference.path.slice(proofPagePrefix.length):null;
+                        const chunkId=reference?.path?.startsWith(chunkPrefix)?reference.path.slice(chunkPrefix.length):null;
                         const inventoryState=reference?.path===`${auditPath}/${RECOVERY_INVENTORY_STATE_COLLECTION}/current`;
                         if(![fencePath,auditPath].includes(reference?.path)&&
-                           !(inventoryState&&["create","set"].includes(method))&&
+                           !((inventoryState||proofState)&&["create","set"].includes(method))&&
+                           !(method==="create"&&(/^[A-Za-z0-9_-]{16,64}$/.test(proofPageId||"")||/^[A-Za-z0-9_-]{16,64}_0[0-7]$/.test(chunkId||"")))&&
                            !(method==="create"&&/^[A-Za-z0-9_-]{16,64}$/.test(pageId||"")))fail("RECOVERY_AUDIT_WRITE_SCOPE");
                     }
                     if(mode==="maintenance"&&method==="delete")fail("RECOVERY_AUDIT_WRITE_SCOPE");
