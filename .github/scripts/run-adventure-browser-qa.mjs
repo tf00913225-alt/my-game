@@ -3,8 +3,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import net from "node:net";
-import {spawn,spawnSync} from "node:child_process";
-import {startServer,waitJson,Cdp,findChrome as productionChrome} from './runtime-browser-qa-support.mjs';
+import {spawn} from "node:child_process";
+import {startServer,waitJson,Cdp,findChrome} from './runtime-browser-qa-support.mjs';
 
 // Same Adventure QA entry; production mode extends the historical layout fixtures.
 if(process.env.ADVENTURE_MONSTER_BALANCE_QA==='1'){
@@ -16,13 +16,6 @@ const ROOT=process.cwd();
 const ARTIFACT_DIR=path.join(ROOT,"artifacts/browser-qa");
 const VIEWPORTS=[[360,800],[393,873],[412,915]];
 
-function findChrome(){
-    for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
-        const probe=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
-        if(probe.status===0&&probe.stdout.trim()){ return probe.stdout.trim(); }
-    }
-    throw new Error("Headless Chrome/Chromium is required for Adventure browser QA.");
-}
 function read(file){ return fs.readFileSync(path.join(ROOT,file),"utf8"); }
 function sleep(ms){ return new Promise(resolve=>setTimeout(resolve,ms)); }
 async function reservePort(){
@@ -168,12 +161,9 @@ async function runChromeViewport(chrome,width,height,reduced){
     proc.stderr.setEncoding("utf8");proc.stderr.on("data",chunk=>{ stderr+=chunk; });
     let cdp=null;
     try{
-        let pages=[];
-        for(let attempt=0;attempt<200;attempt++){
-            if(proc.exitCode!==null){ break; }
-            try{pages=await fetch(`http://127.0.0.1:${devtoolsPort}/json/list`).then(response=>response.json());if(pages.some(page=>page.type==="page")){ break; }}catch(_){ }
-            await sleep(50);
-        }
+        const pages=await waitJson(`http://127.0.0.1:${devtoolsPort}/json/list`).catch(error=>{
+            throw new Error('Adventure Chrome startup failed: '+JSON.stringify({executable:chrome,pid:proc.pid,port:devtoolsPort,exit:proc.exitCode,stderr}),{cause:error});
+        });
         const page=pages.find(candidate=>candidate.type==="page");
         assert.ok(page?.webSocketDebuggerUrl,`Chrome DevTools page target unavailable at ${width}x${height}: ${stderr}`);
         cdp=openCdp(page.webSocketDebuggerUrl);await cdp.ready;await cdp.send("Page.enable");await cdp.send("Runtime.enable");
@@ -344,7 +334,7 @@ async function runProductionAdventureBalanceQa(){
     try{
         for(const [width,height] of [[390,844],[412,915]]){
             profile=fs.mkdtempSync(path.join(os.tmpdir(),'adventure-balance-'));const port=9750+Math.floor(Math.random()*100);
-            const chrome=productionChrome();let launchError='';
+            const chrome=findChrome();let launchError='';
             proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:['ignore','ignore','pipe']});
             proc.stderr.on('data',chunk=>{launchError=(launchError+chunk).slice(-4000);});
             proc.on('error',error=>{launchError=String(error);});
