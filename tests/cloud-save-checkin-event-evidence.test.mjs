@@ -113,7 +113,7 @@ test("original eligibility survives later account revision and balance changes w
     assert.deepEqual(h.event,before);assert.equal(h.writes,0);
 });
 
-test("structurally valid historical and multi-character source revisions are not eligible",async()=>{
+test("historical sources stay blocked while complete server-created multi-character sources share one daily grant",async()=>{
     for(const kind of ["historical","multi-character"]){
         const h=fixture();const records=structuredClone(h.data.get(`serverUsers/${uid}/recoveryArchives/2`).sourceRecords);
         if(kind==="historical"){
@@ -133,6 +133,16 @@ test("structurally valid historical and multi-character source revisions are not
         h.data.set(`serverUsers/${uid}/playableSnapshots/2`,bundle);
         h.data.set(`serverUsers/${uid}/recoveryArchives/2`,createRecoveryArchive(uid,2,records,bundle));
         h.data.get(`serverUsers/${uid}/account/current`).snapshotSha256=bundle.sha256;
+        if(kind==="multi-character"){
+            assert.equal((await h.read()).sha256,h.event.sha256);
+            h.data.delete(`serverUsers/${uid}/rewardEvents/${grantId}`);
+            h.data.delete(`serverUsers/${uid}/pendingGrants/${grantId}`);
+            assert.equal((await h.issuer.issue({})).unchanged,false);
+            assert.equal(h.writes,2);
+            assert.equal((await h.issuer.issue({})).unchanged,true);
+            assert.equal(h.writes,2,"Additional characters cannot issue another UID daily grant");
+            continue;
+        }
         await assert.rejects(h.read(),e=>e.code==="data-loss");
         h.data.delete(`serverUsers/${uid}/rewardEvents/${grantId}`);
         h.data.delete(`serverUsers/${uid}/pendingGrants/${grantId}`);

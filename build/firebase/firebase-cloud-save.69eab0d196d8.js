@@ -125,8 +125,18 @@ export async function completeHeroChapterNode({ticketId,nodeId,choiceId=null,exp
     return callTrustedFunction("completeHeroChapterNode",{ticketId,nodeId,choiceId,expectedRevision});
 }
 
-/* Only first-character choices cross this boundary. The backend checks Auth
- * account age, active session, empty canonical sources and expected revision. */
+/* Explicit account intents retain the caller's operation ID for receipt retry. */
+export async function createAdditionalCanonicalCharacter({operationId,expectedRevision,slotIndex,selection}={}){
+    return callTrustedFunction("createAdditionalCanonicalCharacter",{operationId,expectedRevision,slotIndex,selection});
+}
+export async function allocateCanonicalSharedExp({operationId,expectedRevision,characterId}={}){
+    return callTrustedFunction("allocateCanonicalSharedExp",{operationId,expectedRevision,...(characterId===undefined?{}:{characterId})});
+}
+export async function allocateCanonicalAttributePoint({operationId,expectedRevision,stat,characterId}={}){
+    return callTrustedFunction("allocateCanonicalAttributePoint",{operationId,expectedRevision,stat,...(characterId===undefined?{}:{characterId})});
+}
+/* First-character choices require Auth, active session, empty canonical sources
+ * and an expected revision; the backend generates all initial progression. */
 export async function createInitialCanonicalCharacter(selection,expectedRevision){
     return callTrustedFunction("createInitialCanonicalCharacter",{selection,expectedRevision});
 }

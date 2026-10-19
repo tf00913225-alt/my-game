@@ -4598,11 +4598,7 @@
     window.v173GetDailyTotalTarget=getDailyTotalTarget;
 
     function getExpPoolCatchUpMultiplierForLevel(level){
-        const gap=Math.max(0,getHighestCreatedCharacterLevel()-Math.max(1,Number(level)||1));
-        if(gap>=30){ return 1.50; }
-        if(gap>=20){ return 1.30; }
-        if(gap>=10){ return 1.15; }
-        return 1.00;
+        return window.FourSymbolsExpPoolCatchUpPolicy.multiplierForLevel(level,getHighestCreatedCharacterLevel());
     }
     function getCharacterPartyIndex(character){
         if(!character){ return -1; }
@@ -4617,11 +4613,7 @@
     }
     function getAdditionalCharacterPoolMultiplier(character,level){
         const safeLevel=Math.max(1,Number(level)||Number(character&&character.level)||1);
-        if(safeLevel>=20){ return 1; }
-        const index=getCharacterPartyIndex(character);
-        if(index===2){ return 2.00; }
-        if(index===1){ return 1.50; }
-        return 1;
+        return window.FourSymbolsExpPoolCatchUpPolicy.multiplierForSlot(getCharacterPartyIndex(character),safeLevel);
     }
     function getExpPoolCatchUpMultiplierAtLevel(character,level){
         const slotMultiplier=getAdditionalCharacterPoolMultiplier(character,level);

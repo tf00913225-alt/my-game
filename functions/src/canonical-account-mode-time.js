@@ -3,7 +3,7 @@
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,
     claimRecordsDigest,snapshotDigest}=require("./canonical-snapshot");
 const {inspectRecoveryArchive,createRecoveryArchive}=require("./canonical-recovery-archive");
-const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=require("./canonical-owned-sources");
+const {source,readOwnedSources,readCharacterSources,advanceOwnedRecords,advanceOwnedSources}=require("./canonical-owned-sources");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const timePolicy=require("./account-mode-time-policy");
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
@@ -420,19 +420,18 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
         if(envelope.kind!=="current"||envelope.data.authoritativeStateReady!==false||
            account.ownerUid!==uid||account.provenance!=="server-created"||
            account.slots?.length!==3||typeof account.slots[0]!=="string"||
-           account.slots[1]!==null||account.slots[2]!==null||
            !Number.isSafeInteger(account.serverRevision)||account.serverRevision>envelope.serverRevision){
-            fail("failed-precondition","Unpublished first-character mode sources are required.");
+            fail("failed-precondition","Unpublished canonical mode sources are required.");
         }
         if(expectedRevision!==null&&envelope.serverRevision!==expectedRevision)fail("aborted","CLOUD_REVISION_CONFLICT");
-        const [characterSnap,snapshot,currentArchive,owned]=await Promise.all([
-            tx.get(ref(root,"characters",account.slots[0])),
+        const [characters,snapshot,currentArchive,owned]=await Promise.all([
+            readCharacterSources(tx,root,account,fail),
             tx.get(ref(root,"playableSnapshots",String(account.serverRevision))),
             tx.get(ref(root,"recoveryArchives",String(account.serverRevision))),readOwnedSources(tx,root,fail)]);
-        if(!characterSnap.exists||!snapshot.exists||!currentArchive.exists||snapshot.get("sha256")!==account.snapshotSha256){
+        if(!snapshot.exists||!currentArchive.exists||snapshot.get("sha256")!==account.snapshotSha256){
             fail("data-loss","Canonical mode snapshot is missing.");
         }
-        const records={...owned.records,characters:[source(characterSnap.data())],
+        const records={...owned.records,characters:characters.records,
             ...Object.fromEntries(Object.keys(SINGLE).map((key,i)=>[key,source(singles[i].data())]))};
         try{
             verifyCanonicalSnapshotAgainstSources(snapshot.data(),uid,account.serverRevision,records);
@@ -549,8 +548,10 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
                     tx.update(ref(root,collection,"current"),{...records[name],updatedAt:stamp,
                         ...(name==="account"?{snapshotSha256:bundle.sha256}:{})});
                 }
-                tx.update(ref(root,"characters",current.account.slots[0]),
-                    {serverRevision:revision,updatedAt:stamp});
+                for(const character of records.characters){
+                    tx.update(ref(root,"characters",character.characterId),
+                        {serverRevision:revision,updatedAt:stamp});
+                }
                 advanceOwnedSources(tx,current.owned.refs,revision,stamp);
                 tx.create(ref(root,"playableSnapshots",String(revision)),{...bundle,createdAt:stamp});
                 tx.create(ref(root,"recoveryArchives",String(revision)),{...archive,createdAt:stamp});
@@ -693,7 +694,7 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
            envelope.serverRevision!==expectedRevision){fail("aborted","CLOUD_REVISION_CONFLICT");}
         if(account?.ownerUid!==uid||account.provenance!=="server-created"||
            !Number.isSafeInteger(account.serverRevision)||account.serverRevision>expectedRevision||
-           typeof account.slots?.[0]!=="string"||account.slots[1]!==null||account.slots[2]!==null){
+           !Array.isArray(account.slots)||account.slots.length!==3||typeof account.slots[0]!=="string"){
             fail("failed-precondition","Canonical Forest mode source is not eligible.");
         }
         if(!accountSnap.exists||accountSnap.get("snapshotSha256")!==sourceSnapshotSha256||

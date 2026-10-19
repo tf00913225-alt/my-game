@@ -78,9 +78,12 @@ assert.match(tuning,/rollBeginnerForestNormalAttackDamage=function\(\)\{[\s\S]*r
 /* Second / third character starts at Lv1; catch-up is EXP-only and ends at Lv20. */
 assert.match(economy,/function getCharacterPartyIndex\(character\)/);
 assert.match(economy,/function getAdditionalCharacterPoolMultiplier\(character,level\)/);
-assert.match(economy,/if\(safeLevel>=20\)\{ return 1; \}/);
-assert.match(economy,/if\(index===2\)\{ return 2\.00; \}/);
-assert.match(economy,/if\(index===1\)\{ return 1\.50; \}/);
+assert.match(economy,/FourSymbolsExpPoolCatchUpPolicy\.multiplierForSlot\(getCharacterPartyIndex\(character\),safeLevel\)/);
+const poolPolicy=require("../functions/src/exp-pool-catch-up-policy");
+for(const [slot,multiplier] of [[1,1.5],[2,2]]){
+    assert.equal(poolPolicy.multiplierForSlot(slot,19),multiplier);
+    assert.equal(poolPolicy.multiplierForSlot(slot,20),1);
+}
 assert.match(economy,/function getDirectCatchUpExpMultiplier\(character\)/);
 assert.match(economy,/if\(index===2\)\{ return 3; \}/);
 assert.match(economy,/if\(index===1\)\{ return 2; \}/);
