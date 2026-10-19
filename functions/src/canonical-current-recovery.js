@@ -143,6 +143,11 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             fail("data-loss","Recovery approval timestamp is invalid.");
         return {seconds,nanoseconds};
     }
+    function auditApprovalBinding(approval,sourceRevision){
+        return {schemaVersion:approval.schemaVersion,kind:approval.kind,ownerUid:approval.ownerUid,operationId:approval.operationId,
+            sourceRevision,sourceSha256:approval.sourceSha256,snapshotSha256:approval.snapshotSha256,
+            approvedBy:approval.approvedBy,status:approval.status,issuedAt:timestampPair(approval.issuedAt),expiresAt:timestampPair(approval.expiresAt)};
+    }
     async function verifyAuditApproval(tx,root,uid,sourceRevision,approvalOperationId,recordedAt){
         const [envelopeSnap,archiveSnap,snapshotSnap,approvalSnap]=await Promise.all([
             db.collection("users").doc(uid).collection("saves").doc("current"),
@@ -159,9 +164,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
            typeof approval.expiresAt?.toMillis!=="function"||(recordedAt===undefined&&approval.expiresAt.toMillis()<=now())){
             fail("permission-denied","A current server operator approval is required for recovery audit.");
         }
-        const binding={schemaVersion:approval.schemaVersion,kind:approval.kind,ownerUid:uid,operationId:approvalOperationId,
-            sourceRevision,sourceSha256:approval.sourceSha256,snapshotSha256:approval.snapshotSha256,
-            approvedBy:approval.approvedBy,status:approval.status,issuedAt:timestampPair(approval.issuedAt),expiresAt:timestampPair(approval.expiresAt)};
+        const binding=auditApprovalBinding(approval,sourceRevision);
         if(recordedAt!==undefined){
             const observed=timestampPair(recordedAt),compare=(a,b)=>a.seconds-b.seconds||a.nanoseconds-b.nanoseconds;
             if(compare(binding.issuedAt,binding.expiresAt)>=0||compare(binding.issuedAt,observed)>0||compare(observed,binding.expiresAt)>=0)
@@ -181,6 +184,66 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         const binding=await verifyAuditApproval(tx,root,uid,sourceRevision,run.approvalOperationId,control.recordedAt);
         if(binding.sourceSha256!==run.sourceSha256||binding.snapshotSha256!==run.snapshotSha256||
            binding.approvalBindingSha256!==run.approvalBindingSha256)fail("data-loss","Candidate audit approval binding differs.");
+    }
+    async function verifyRetainedAuditControls(view,uid,expectedRevision,operations,verifiedRecoveryIDs){
+        const {tx,root,auditControl:control}=view,verified=new Set(verifiedRecoveryIDs),receipts=new Map(operations.docs.map(doc=>[doc.id,doc.data()]));
+        const approvals=new Map(),compare=(a,b)=>a.seconds-b.seconds||a.nanoseconds-b.nanoseconds;
+        for(const doc of view.rows("recoveryApprovals").docs){
+            const approval=doc.data(),used=approval?.status==="used";
+            inventoryExact(approval,["schemaVersion","kind","ownerUid","operationId","sourceRevision","sourceSha256","snapshotSha256",
+                "approvedBy","status","issuedAt","expiresAt",...(used?["usedRevision","usedAt"]:[])],"retained approval");
+            if(approval.schemaVersion!==1||approval.kind!=="canonical-current-recovery-approval"||approval.ownerUid!==uid||
+               approval.operationId!==doc.id||!OPERATION_ID.test(doc.id)||!["approved","used"].includes(approval.status)||
+               !Number.isSafeInteger(approval.sourceRevision)||approval.sourceRevision<2||approval.sourceRevision>expectedRevision||
+               !HEX.test(approval.sourceSha256||"")||!HEX.test(approval.snapshotSha256||"")||
+               typeof approval.approvedBy!=="string"||!approval.approvedBy.trim())fail("data-loss","Retained audit approval identity differs.");
+            const binding=auditApprovalBinding(approval,approval.sourceRevision);
+            if(compare(binding.issuedAt,binding.expiresAt)>=0)fail("data-loss","Retained audit approval interval differs.");
+            const [snapshot,archive]=await Promise.all([
+                tx.get(root.collection("playableSnapshots").doc(String(approval.sourceRevision))),
+                tx.get(root.collection("recoveryArchives").doc(String(approval.sourceRevision)))]);
+            try{
+                if(!snapshot.exists||!archive.exists||snapshot.get("sha256")!==approval.snapshotSha256||
+                   archive.get("sourceSha256")!==approval.sourceSha256)throw Error("Missing original approval source");
+                const original=inspectRecoveryArchive(archive.data(),uid,approval.sourceRevision,snapshot.data());
+                if(original.account.provenance!=="server-created")throw Error("Approval provenance differs");
+            }catch(_){fail("data-loss","Retained audit approval source differs.");}
+            if(used){
+                const receipt=receipts.get(doc.id);
+                if(!verified.has(doc.id)||!receipt||receipt.kind!=="canonical-current-recovery"||receipt.ownerUid!==uid||
+                   receipt.operationId!==doc.id||receipt.sourceRevision!==approval.sourceRevision||receipt.sourceSha256!==approval.sourceSha256||
+                   receipt.approvedBy!==approval.approvedBy||receipt.restoredRevision!==approval.usedRevision||
+                   snapshotDigest(timestampPair(approval.usedAt))!==snapshotDigest(timestampPair(receipt.createdAt)))
+                    fail("data-loss","Retained used approval lacks its verified recovery result.");
+            }
+            // This original approved-binding view verifies a historical seal;
+            // it cannot authorize reuse of a used or expired approval.
+            approvals.set(doc.id,{approval,binding:{...binding,status:"approved"}});
+        }
+        const runs=view.rows(RECOVERY_AUDIT_RUN_COLLECTION).docs.map(doc=>{
+            const run=inspectAuditRun(doc.data(),uid,doc.id);
+            if(doc.id!==run.auditId)fail("data-loss","Retained audit run ID differs.");
+            return run;
+        }).sort((a,b)=>a.epoch-b.epoch);
+        if(runs.length!==control.epoch)fail("data-loss","Retained audit epoch inventory differs.");
+        let previous;
+        for(let index=0;index<runs.length;index++){
+            const run=runs[index],last=index===runs.length-1,source=approvals.get(run.approvalOperationId);
+            if(run.epoch!==index+1||(last?(run.auditId!==control.auditId||run.status!=="active"):run.status!=="cancelled")||
+               run.sourceRevision>expectedRevision||!source||run.sourceRevision!==source.approval.sourceRevision||
+               run.sourceSha256!==source.approval.sourceSha256||run.snapshotSha256!==source.approval.snapshotSha256||
+               run.approvalBindingSha256!==snapshotDigest(source.binding))fail("data-loss","Retained audit run source or epoch differs.");
+            const created=timestampPair(run.createdAt),updated=timestampPair(run.updatedAt);
+            if(compare(created,source.binding.issuedAt)<0||compare(created,updated)>0||
+               (previous&&(run.sourceRevision<previous.sourceRevision||compare(timestampPair(previous.updatedAt),created)>0)))
+                fail("data-loss","Retained audit chronology differs.");
+            // Begin authorization precedes commit; cancellation may be later
+            // than expiry. Neither commit timestamp is a new expiry gate.
+            previous=run;
+        }
+        const fences=view.rows(RECOVERY_AUDIT_FENCE_COLLECTION).docs;
+        if(fences.length!==1||fences[0].id!=="current")fail("data-loss","Retained audit fence inventory differs.");
+        matchingAuditFence(inspectRecoveryAuditFence(fences[0].data(),uid,fail),runs.at(-1));
     }
     async function beginAudit(request,args){
         auditIntent("begin",args,["operationId","expectedRevision","approvalOperationId"]);
@@ -947,6 +1010,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         claims,receipts,ledgers,grants,events,operations,modeSources,modeEvents,
         patrolTickets,patrolStates,patrolSettlements,patrolClosures,patrolModeEvents,
         patrolOwnedModeEvents,patrolOperationIds}){
+        const verifiedRecoveryIDs=new Set();
         const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
         if(claims.docs.length!==archivedClaims.size){
             fail("data-loss","Independent claims differ from the recovery archive.");
@@ -1058,6 +1122,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                     }catch(_){fail("data-loss","Retained recovery source is inconsistent.");}
                     await verifyRecoveredResult(tx,root,uid,doc.id,value.sourceRevision,expectedRevision,
                         {archiveSnap,snapshotSnap,approvalSnap,operationSnap:doc,auditSnap,grantSnap,ledgerSnap},original);
+                    verifiedRecoveryIDs.add(doc.id);
                 }else{
                     await sourceEvidence.verifyRetainedOperation(tx,root,uid,records.account,doc);
                 }
@@ -1175,6 +1240,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 currentRevision:expectedRevision,grant:grant.data(),receipt:receipt.data(),
                 ledger:ledger.data(),claim,claimRecord:record,otherOperationExists:other.exists,fail});
         }
+        return Object.freeze([...verifiedRecoveryIDs]);
     }
 
     async function restoreCurrent(request,{operationId,expectedRevision}){
@@ -1362,7 +1428,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 fail("failed-precondition","Candidate mode evidence exceeds an original query limit.");
         }
         const patrolOperationIds=new Set(patrolSettlements.docs.map(doc=>doc.id));
-        await verifyRecoveryRights(tx,root,uid,expectedRevision,records,{claims,receipts,ledgers,grants,events,operations,
+        const verifiedRecoveryIDs=await verifyRecoveryRights(tx,root,uid,expectedRevision,records,{claims,receipts,ledgers,grants,events,operations,
             modeSources,modeEvents,patrolTickets,patrolStates,patrolSettlements,patrolClosures,
             patrolModeEvents,patrolOwnedModeEvents,patrolOperationIds});
         for(const doc of allMode.docs){
@@ -1373,6 +1439,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 fail("data-loss","An unclassified private mode event blocks candidate verification.");
             }
         }
+        if(view.auditControl)await verifyRetainedAuditControls(view,uid,expectedRevision,operations,verifiedRecoveryIDs);
         return Object.freeze({candidateProofValid:true,ownerUid:uid,sourceRevision:expectedRevision,
             sourceSha256:archiveSnap.get("sourceSha256"),snapshotSha256:snapshotSnap.get("sha256"),
             trustedCaptureVerified:false,restoreAuthorized:false,authoritativeStateReady:false,...view.finish()});

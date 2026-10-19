@@ -141,6 +141,7 @@ async function controlledFixture(){
     const runRecoveryAuditMaintenance=(request,_auditId,operation)=>h.dependencies.runProtected(request,
         (tx,session)=>operation(tx,{...session,revision:1}));
     const recovery=createCanonicalCurrentRecovery({...h.dependencies,runRecoveryAuditMaintenance});
+    h.advance(1); // The deliberately sub-ms issuedAt must precede the real begin commit.
     await recovery.beginAudit(h.request(),{operationId:auditId,expectedRevision:h.revision,approvalOperationId:approvalId});
     const fencePath=h.root+'/recoveryAuditFence/current',runPath=h.root+'/recoveryAuditRuns/'+auditId;
     for(const path of [approvalPath,fencePath,runPath])m.docs.set(path,copy(h.data.get(path)));

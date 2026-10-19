@@ -644,27 +644,27 @@ function candidateQueryDb(db){
     return {collection:name=>query(db.collection(name)),doc:path=>reference(db.doc(path))};
 }
 
-function privateRawInspector(f){
+function privateRawInspector(f,which='inspectCompleteRawCapture'){
     const filename=require.resolve('../functions/src/canonical-current-recovery'),compiled=new Module(filename);
     compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
     const original=readFileSync(filename,'utf8'),needle='return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact';
     assert.equal(original.split(needle).length,2);
     // Test-only lexical access to the private pure kernel. Production exports,
     // factory methods and SDK entry points remain unchanged.
-    compiled._compile(original.replace(needle,'return Object.freeze({inspectCompleteRawCapture,restoreCurrent,verifyRecoveryAuditArtifact'),filename);
+    compiled._compile(original.replace(needle,'return Object.freeze({inspectCompleteRawCapture,verifyCandidateStrict,restoreCurrent,verifyRecoveryAuditArtifact'),filename);
     assert.equal(Object.hasOwn(f.recovery,'inspectCompleteRawCapture'),false);
-    return compiled.exports.createCanonicalCurrentRecovery(f.deps).inspectCompleteRawCapture;
+    return compiled.exports.createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)})[which];
 }
-async function completeRawMaterial(f){
+async function completeRawMaterial(f,{id=auditId,epoch=1}={}){
     const total=inventoryOrder(f).length;let ordinal=0,sequence=1;
     while(ordinal<total){
-        const result=await f.recovery.captureRawInventory(f.request(),rawArgs(sequence++,ordinal,Math.min(16,total-ordinal)));
+        const result=await f.recovery.captureRawInventory(f.request(),{...rawArgs(sequence++,ordinal,Math.min(16,total-ordinal)),auditId:id,expectedEpoch:epoch});
         ordinal=result.nextOrdinal;
     }
     const rows=name=>[...f.h.data].filter(([path])=>path.startsWith(f.root+'/'+name+'/'))
         .map(([path,row])=>({id:path.split('/').at(-1),row:copy(row)}));
     const inventoryState=copy(f.h.data.get(f.root+'/captureState/current'));
-    return {binding:{ownerUid:f.h.uid,auditId,epoch:1,sourceRevision:f.h.revision,inventoryStateSha256:inventoryState.stateSha256},
+    return {binding:{ownerUid:f.h.uid,auditId:id,epoch,sourceRevision:f.h.revision,inventoryStateSha256:inventoryState.stateSha256},
         run:copy(f.h.data.get(f.root)),inventoryState,inventoryPages:rows('inventoryPages'),
         rawState:copy(f.h.data.get(f.root+'/proofState/current')),rawReceipts:rows('patrolProofPages'),rawChunks:rows('proofPayloadChunks')};
 }
@@ -675,6 +675,114 @@ async function longRawAssemblyFixture(currentLoss){
     })());
     return assembledRawBaselines.get(currentLoss);
 }
+let retainedControlBaseline;
+async function retainedControlFixture(){
+    if(!retainedControlBaseline)retainedControlBaseline=(async()=>{
+        const f=await fixture({battles:1,three:false}),oldRevision=f.h.revision;
+        await f.takeover();
+        await f.recovery.cancelAudit(f.request(),{operationId:'history-cancel-audit-first',auditId,expectedEpoch:1});
+        const unused='history-unused-approval-01',second='history-second-audit-0001',selected='history-selected-audit-001',selectedApproval='history-selected-approval-01';
+        await createCanonicalRecoveryApproval(f.deps).issue({auth:{uid:'proof-operator',token:{cloudSaveOperator:true}},
+            data:{ownerUid:f.h.uid,operationId:unused,sourceRevision:oldRevision,ttlSeconds:60}});
+        await f.recovery.beginAudit(f.request(),{operationId:second,expectedRevision:oldRevision,approvalOperationId:approvalId});
+        f.h.advance(1);
+        await f.recovery.cancelAudit(f.request(),{operationId:'history-cancel-audit-second',auditId:second,expectedEpoch:2});
+        const restored=await f.recovery.restoreCurrent(f.request(),{operationId:approvalId,expectedRevision:oldRevision});
+        assert.equal(restored.restoredRevision,oldRevision+1);
+        const forest=createCanonicalPatrolSettlement({...f.deps,randomBytes:size=>Buffer.alloc(size,255)}),ticketId='history-formal-next-ticket';
+        await forest.observePresence(f.request(),{operationId:'history-foreground-reopen',expectedRevision:f.h.revision,
+            expectedSequence:f.h.data.get(f.h.root+'/modeTime/current').sequence,intent:'reopen',elementBox:'keep'});
+        await forest.issueTicket(f.request(),{operationId:ticketId,expectedRevision:f.h.revision,triggerEntryId:'forest:0',availableEntryIds:['forest:0']});
+        await forest.settleMember(f.request(),{operationId:'history-formal-next-member',expectedRevision:f.h.revision,ticketId,memberIndex:0});
+        await forest.settleTerminal(f.request(),{operationId:'history-formal-next-win',expectedRevision:f.h.revision,ticketId,kind:'win'});
+        f.h.advance(61000);
+        assert(f.h.data.get(f.h.root+'/recoveryApprovals/'+unused).expiresAt.toMillis()<=f.h.clock);
+        await createCanonicalRecoveryApproval(f.deps).issue({auth:{uid:'proof-operator',token:{cloudSaveOperator:true}},
+            data:{ownerUid:f.h.uid,operationId:selectedApproval,sourceRevision:f.h.revision,ttlSeconds:60}});
+        await f.recovery.beginAudit(f.request(),{operationId:selected,expectedRevision:f.h.revision,approvalOperationId:selectedApproval});
+        await f.recovery.prepareInventory(f.request(),{auditId:selected,expectedEpoch:3,operationId:'history-prepare-inventory'});
+        let page,sequence=0;
+        do{page=await f.recovery.captureInventoryPage(f.request(),{auditId:selected,expectedEpoch:3,
+            operationId:'history-inventory-'+String(++sequence).padStart(8,'0'),expectedSequence:sequence});}while(!page.inventoryExhausted);
+        const current={...f,root:f.h.root+'/recoveryAuditRuns/'+selected},material=await completeRawMaterial(current,{id:selected,epoch:3});
+        return {f:current,material,oldRevision,unused,second,selected,selectedApproval};
+    })();
+    return retainedControlBaseline;
+}
+
+test('original cancel/rebegin/restore writers retain epochs, unused expired approvals and used proofs through full raw candidate without renewed rights',async()=>{
+    const {f,material,oldRevision,unused,second,selected}=await retainedControlFixture();
+    const before=copy([...f.h.data]),writes=f.h.writes,traces=f.traces.length;
+    const recovery=createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)});
+    const result=await recovery.verifyRawRecoveryAuditCandidate(material);
+    assert.equal(result.candidateProofValid,true);assert.equal(result.documentCount,inventoryOrder(f).length);
+    for(const flag of ['authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
+    assert.equal(f.h.data.get(f.h.root+'/recoveryApprovals/'+approvalId).status,'used');
+    assert.equal(f.h.data.get(f.h.root+'/recoveryApprovals/'+unused).status,'approved');
+    const first=f.h.data.get(f.h.root+'/recoveryAuditRuns/'+auditId),again=f.h.data.get(f.h.root+'/recoveryAuditRuns/'+second);
+    assert.notEqual(first.sessionId,first.cancelledBySessionId);assert.equal(first.status,'cancelled');assert.equal(again.status,'cancelled');
+    assert.equal(f.h.data.get(f.h.root+'/recoveryAuditRuns/'+selected).epoch,3);
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);assert.equal(f.traces.length,traces);
+    assert.equal((await f.recovery.restoreCurrent(f.request(),{operationId:approvalId,expectedRevision:oldRevision})).unchanged,true);
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+});
+
+test('retained controls reject forged used markers, missing original evidence and epoch/shape/chronology corruption under original strict proof',async()=>{
+    const {f,material,unused,second,selected}=await retainedControlFixture(),helper=require('../functions/src/recovery-audit-artifact');
+    const union=privateRawInspector(f)(material),strict=privateRawInspector(f,'verifyCandidateStrict'),db=candidateQueryDb(f.h.dependencies.db);
+    const root=f.h.root,oldApproval=root+'/recoveryApprovals/'+approvalId,unusedApproval=root+'/recoveryApprovals/'+unused,
+        oldRun=root+'/recoveryAuditRuns/'+auditId,nextRun=root+'/recoveryAuditRuns/'+second,currentRun=root+'/recoveryAuditRuns/'+selected;
+    const base={documents:new Map(union.documents.map(row=>[row.path,copy(f.h.data.get(row.path))])),absent:new Set()};
+    const encoded=state=>{const budget=helper.createRecoveryAuditAssemblyBudget();helper.reserveRecoveryAuditRawInputs(budget,[]);
+        const run=state.documents.get(currentRun),stamp=run.createdAt,millis=stamp.toMillis(),seconds=stamp.seconds??Math.floor(millis/1000);
+        const namespaces=union.namespaces.map(row=>({...row,ids:[...state.documents.keys()]
+            .filter(path=>path.slice(0,path.lastIndexOf('/'))===row.path).map(path=>path.slice(path.lastIndexOf('/')+1))
+            .sort((a,b)=>Buffer.compare(Buffer.from(a),Buffer.from(b)))}));
+        return helper.encodeRecoveryAuditCandidate({uid:f.h.uid,expectedRevision:f.h.revision,
+            auditControl:{auditId:selected,epoch:run.epoch,sessionId:run.sessionId,sessionRevision:run.sessionRevision,
+                recordedAt:['timestamp',seconds,stamp.nanoseconds??(millis-seconds*1000)*1000000]},
+            documents:[...state.documents].map(([path,data])=>({path,data})),absences:[...state.absent],namespaces},budget);};
+    // Test construction follows actual strict lookups; only negative frames
+    // are completed. Every original positive raw document is retained.
+    for(let pass=0;pass<64;pass++){
+        const view=helper.decodeRecoveryAuditArtifact(encoded(base),{uid:f.h.uid,expectedRevision:f.h.revision,db});let success=false,missing,error;
+        try{await strict(view,f.h.uid,f.h.revision);success=true;}catch(cause){error=cause;}finally{missing=await helper.drainAndCloseRecoveryAuditLookups(view);}
+        if(success)break;
+        if(!missing.length)throw error;
+        for(const path of missing)base.absent.add(path);
+    }
+    const remove=(state,path)=>{state.documents.delete(path);state.absent.add(path);};
+    const nanos=(stamp,delta)=>{
+        let seconds=stamp.seconds,nanoseconds=stamp.nanoseconds+delta;
+        if(nanoseconds<0){seconds--;nanoseconds+=1000000000;}
+        if(nanoseconds>=1000000000){seconds++;nanoseconds-=1000000000;}
+        return {seconds,nanoseconds,toMillis:()=>seconds*1000+Math.floor(nanoseconds/1000000)};
+    };
+    const cases=[
+        n=>remove(n,oldRun),n=>remove(n,oldApproval),n=>remove(n,root+'/operations/'+approvalId),
+        n=>remove(n,root+'/recoveryArchives/'+material.run.sourceRevision),
+        n=>{n.documents.get(oldApproval).usedRevision++;},n=>{n.documents.get(oldApproval).usedAt=copy(n.documents.get(currentRun).createdAt);},
+        n=>{const a=n.documents.get(unusedApproval);a.status='used';a.usedRevision=a.sourceRevision+1;a.usedAt=copy(n.documents.get(oldApproval).usedAt);},
+        n=>{n.documents.get(unusedApproval).extra=true;},n=>{delete n.documents.get(unusedApproval).issuedAt;},
+        n=>{n.documents.get(unusedApproval).status='unknown';},n=>{n.documents.get(unusedApproval).ownerUid='foreign';},
+        n=>{n.documents.get(unusedApproval).sourceRevision=f.h.revision+1;},n=>{n.documents.get(unusedApproval).sourceSha256='f'.repeat(64);},
+        n=>{n.documents.get(unusedApproval).issuedAt=copy(n.documents.get(unusedApproval).expiresAt);},
+        n=>{n.documents.get(nextRun).epoch=1;},n=>{n.documents.get(nextRun).epoch=4;},
+        n=>{n.documents.get(nextRun).status='active';},n=>{n.documents.get(nextRun).beginIntentSha256='f'.repeat(64);},
+        n=>{n.documents.get(nextRun).cancelIntentSha256='f'.repeat(64);},n=>{n.documents.get(nextRun).approvalBindingSha256='f'.repeat(64);},
+        n=>{n.documents.get(nextRun).createdAt=copy(n.documents.get(unusedApproval).expiresAt);},
+        n=>{n.documents.get(nextRun).updatedAt=copy(n.documents.get(oldRun).createdAt);},
+        n=>{n.documents.get(oldRun).updatedAt=copy(n.documents.get(currentRun).createdAt);},
+        n=>{n.documents.get(oldRun).createdAt=nanos(n.documents.get(oldApproval).issuedAt,-1);},
+        n=>{n.documents.get(oldRun).updatedAt=nanos(n.documents.get(nextRun).createdAt,1);},
+        n=>{n.documents.set(root+'/recoveryAuditFence/extra',copy(n.documents.get(root+'/recoveryAuditFence/current')));}
+    ];
+    const before=copy([...f.h.data]),writes=f.h.writes;
+    for(const [index,mutate] of cases.entries()){const n={documents:new Map([...base.documents].map(([path,row])=>[path,copy(row)])),absent:new Set(base.absent)};mutate(n);
+        await assert.rejects(()=>recoveryCandidate(n),undefined,'retained control corruption case '+index);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);}
+    async function recoveryCandidate(state){return createCanonicalCurrentRecovery({...f.deps,db})
+        .verifyRecoveryAuditArtifact({uid:f.h.uid,expectedRevision:f.h.revision,artifactBytes:encoded(state)});}
+});
 function resealRawState(state){const {stateSha256,createdAt,updatedAt,...value}=state;state.stateSha256=snapshotDigest(value);}
 function replaceLastRawPayload(material,mutate){
     const receipt=material.rawReceipts.find(entry=>entry.id===material.rawState.lastOperationId).row;
@@ -751,8 +859,10 @@ test('assembly B1 admits actual aggregate chunk bytes before any concat/parse an
         await createCanonicalRecoveryApproval(h.dependencies).issue({auth:{uid:'proof-operator',token:{cloudSaveOperator:true}},
             data:{ownerUid:h.uid,operationId:'retained-prior-approval-001',sourceRevision:h.revision,ttlSeconds:60}});
     }}),priorMaterial=await completeRawMaterial(priorApproval);
-    await unchanged(priorApproval,()=>createCanonicalCurrentRecovery({...priorApproval.deps,db:candidateQueryDb(priorApproval.h.dependencies.db)})
-        .verifyRawRecoveryAuditCandidate(priorMaterial),/unused dependency .*recoveryApprovals\/retained-prior-approval-001/);
+    const priorBefore=copy([...priorApproval.h.data]),priorWrites=priorApproval.h.writes;
+    assert.equal((await createCanonicalCurrentRecovery({...priorApproval.deps,db:candidateQueryDb(priorApproval.h.dependencies.db)})
+        .verifyRawRecoveryAuditCandidate(priorMaterial)).candidateProofValid,true);
+    assert.deepEqual([...priorApproval.h.data],priorBefore);assert.equal(priorApproval.h.writes,priorWrites);
     const corrupt=await fixture({battles:1,three:false,beforeAudit:h=>{
         const entry=[...h.data].find(([path])=>path.startsWith(h.root+'/ledgerEntries/'));entry[1].forensicCorruption=true;
     }}),corruptMaterial=await completeRawMaterial(corrupt);
