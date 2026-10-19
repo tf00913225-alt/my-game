@@ -31839,53 +31839,14 @@ function showSkillDetail(skillId){
         .innerHTML=
 
         `
-        <div style="margin-bottom:6px;">
-            <span style="
-                display:inline-block;
-                background:#2e2822;
-                color:#f0b429;
-                font-size:11px;
-                font-weight:bold;
-                padding:2px 7px;
-                border-radius:10px;
-            ">
-                ${getSkillCategoryLabel(skill.category)}
-            </span>
-        </div>
-
-        <div style="line-height:1.7;">
-            ${skill.description}
-        </div>
-
-        <div style="margin-top:8px;color:#b3a58c;">
-            ${
-                skill.category==="passive"
-                ?
-                "被動技能，不用裝備，學了就永久生效"
-                :
-                spCost+"SP"
-            }
-            ${
-                skill.learnCost
-                ?
-                "｜首次學習需要"+getSkillLearnCostForUi(getSkillCharacterObject(currentSkillCharacter),skill)+"點"
-                :
-                ""
-            }
-        </div>
-
-        <div style="margin-top:10px;font-size:11px;color:#f0b429;font-weight:bold;">
-             各等級數值
-        </div>
-
-        <div style="margin-top:4px;font-size:12px;">
-            ${
-                buildSkillLevelBreakdownHTML(
-                    skill
-                )
-            }
-        </div>
-
+        <div class="skill-detail-category">${getSkillCategoryLabel(skill.category)}</div>
+        <p class="skill-detail-description">${skill.description}</p>
+        <p class="skill-detail-cost">
+            ${skill.category==="passive"?"被動技能，不用裝備，學了就永久生效":spCost+"SP"}
+            ${skill.learnCost?"｜首次學習需要"+getSkillLearnCostForUi(getSkillCharacterObject(currentSkillCharacter),skill)+"點":""}
+        </p>
+        <h3 class="skill-detail-section-title">各等級數值</h3>
+        <div class="skill-detail-levels">${buildSkillLevelBreakdownHTML(skill)}</div>
         `;
 
 

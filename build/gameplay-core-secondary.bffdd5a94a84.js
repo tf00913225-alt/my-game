@@ -9857,9 +9857,9 @@ ensureFunctionalStyles();runRepairs();
             const level=index+1;
             const breakthrough=PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)&&(level===5||level===10)
                 ?"（突破×1.5）":"";
-            return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);">'+
-                '<span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.'+level+'</span>'+
-                '<span style="flex:1;">'+escapeText(effectText(skill,level)+breakthrough)+'</span></div>';
+            return '<div class="skill-detail-level-row">'+
+                '<span class="skill-detail-level-label">Lv.'+level+'</span>'+
+                '<span class="skill-detail-level-effect">'+escapeText(effectText(skill,level)+breakthrough)+'</span></div>';
         }).join("");
     }
 
@@ -10511,10 +10511,7 @@ ensureFunctionalStyles();runRepairs();
         style.id="v17364-skill-progression-style";
         style.textContent=
             ".v17364-progression-hint{display:block;margin-top:4px;white-space:normal;overflow-wrap:anywhere;line-height:1.35;opacity:.86;font-size:.82em;}"+
-            ".v17364-progression-detail{display:grid;gap:6px;margin-top:10px;}"+
-            ".v17364-progression-detail>div{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}"+
-            ".v17364-progression-detail strong{flex:0 0 auto;}"+
-            ".v17364-progression-detail span{text-align:right;overflow-wrap:anywhere;}";
+            "";
         document.head.appendChild(style);
     }
 

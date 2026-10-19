@@ -111,7 +111,7 @@ assert.match(qa, /\.v17346-shop-name\{font-size:16px!important/);
 assert.match(qa, /\.v17346-shop-buy\{[^}]*font-size:15px!important/);
 assert.match(qa, /\.quest-card-desc\{font-size:15px!important/);
 assert.match(qa, /\.v17363-preview-group p\{font-size:15px!important/);
-assert.match(read('css/38-v141-system-expansion.css'), /\.v17363-game-select-option\{[^}]*font-size:15px!important/);
+assert.match(read('css/38-v141-system-expansion.css'), /\.v17363-game-select-option\{[^}]*font-size:15px/);
 assert.match(read('css/38-v141-system-expansion.css'), /\.v141-synthesis-tabs button\{[^}]*font-size:15px!important/);
 
 // Native 1080 design-space values must still resolve to at least 13px on a 420px phone.

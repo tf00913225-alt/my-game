@@ -1504,7 +1504,7 @@ body > .v169-rpg-dialog-layer{
 }
 #game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-title{background:transparent;box-shadow:none;border:0;}
 #game-ui #homeFeatureModal[data-character-tab="skill"] #homeFeatureModalTitle{
-    flex:0 0 45%;min-width:0;box-sizing:border-box;height:var(--skill-header-height);
+    flex:0 0 70%;min-width:0;box-sizing:border-box;height:var(--skill-header-height);
     display:flex;align-items:center;justify-content:center;
     padding:0 calc(12 * var(--ui-length-unit,1px)) 0 calc(34 * var(--ui-length-unit,1px));
     background:transparent url('../assets/ui/skill-iron-bronze/title-short.bb578519c9f4.webp') center/100% auto no-repeat;

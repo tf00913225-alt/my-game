@@ -39,6 +39,51 @@
 }
 
 /* 詳細資訊 modal 必須高於角色 modal */
+/* Shared native detail typography; the retired css/38 legacy wildcard must
+   never force stage-pixel fonts onto these native modal descendants. */
+#game-ui .item-modal:not(#itemModal) .item-modal-box{
+    padding:calc(14 * var(--ui-length-unit,1px));
+    color:var(--rpg-window-text,#eee7d8);
+    font-size:calc(15 * var(--ui-length-unit,1px));
+    line-height:1.6;
+}
+#game-ui .item-modal:not(#itemModal) .item-modal-name{
+    margin:0;
+    padding:calc(6 * var(--ui-length-unit,1px)) 0;
+    font-size:calc(20 * var(--ui-length-unit,1px));
+    line-height:1.4;
+    overflow-wrap:anywhere;
+}
+#game-ui .item-modal:not(#itemModal) .item-stat-list{
+    padding:calc(12 * var(--ui-length-unit,1px));
+    font-size:calc(15 * var(--ui-length-unit,1px));
+    line-height:1.6;
+}
+#game-ui .item-modal:not(#itemModal) .close-item-button{
+    height:auto;
+    min-height:calc(44 * var(--ui-length-unit,1px));
+    padding:calc(8 * var(--ui-length-unit,1px));
+    font-size:calc(16 * var(--ui-length-unit,1px));
+    line-height:1.4;
+}
+#game-ui #skillDetailStats .skill-detail-category{
+    display:inline-block;
+    padding:calc(2 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid #73582d;
+    border-radius:calc(3 * var(--ui-length-unit,1px));
+    color:#f0d38a;
+    font-size:calc(14 * var(--ui-length-unit,1px));
+}
+#game-ui #skillDetailStats .skill-detail-description{margin:calc(10 * var(--ui-length-unit,1px)) 0;}
+#game-ui #skillDetailStats .skill-detail-cost{margin:0;color:#b9ad98;font-size:calc(14 * var(--ui-length-unit,1px));}
+#game-ui #skillDetailStats .skill-detail-section-title{margin:calc(16 * var(--ui-length-unit,1px)) 0 calc(8 * var(--ui-length-unit,1px));font-size:calc(18 * var(--ui-length-unit,1px));line-height:1.5;color:#f0d38a;}
+#game-ui #skillDetailStats .skill-detail-level-row{display:grid;grid-template-columns:calc(48 * var(--ui-length-unit,1px)) minmax(0,1fr);gap:calc(8 * var(--ui-length-unit,1px));padding:calc(8 * var(--ui-length-unit,1px)) 0;border-bottom:calc(1 * var(--ui-length-unit,1px)) solid #73582d66;}
+#game-ui #skillDetailStats .skill-detail-level-label{color:#f0d38a;font-weight:700;}
+#game-ui #skillDetailStats .skill-detail-level-effect{min-width:0;overflow-wrap:anywhere;}
+#game-ui #skillDetailStats .v17364-progression-detail{display:grid;gap:calc(8 * var(--ui-length-unit,1px));margin-top:calc(16 * var(--ui-length-unit,1px));}
+#game-ui #skillDetailStats .v17364-progression-detail>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:calc(10 * var(--ui-length-unit,1px));padding:calc(6 * var(--ui-length-unit,1px)) 0;}
+#game-ui #skillDetailStats .v17364-progression-detail strong{color:#b9ad98;font-weight:500;}
+#game-ui #skillDetailStats .v17364-progression-detail span{text-align:right;overflow-wrap:anywhere;}
 .inventory-character-detail-modal{
     z-index:9000 !important;
 }
