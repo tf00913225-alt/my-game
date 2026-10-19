@@ -12,7 +12,7 @@ const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocat
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
 const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,
-    encodeRecoveryAuditCandidate,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
+    prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
     inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
 const {createHash}=require("node:crypto");
 
@@ -1463,9 +1463,10 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             const run=selected.data,recorded=timestampPair(run.createdAt),auditControl={auditId,epoch:run.epoch,
                 sessionId:run.sessionId,sessionRevision:run.sessionRevision,recordedAt:["timestamp",recorded.seconds,recorded.nanoseconds]};
             const namespaceIds=new Map(union.namespaces.map(row=>[row.path,new Set(row.ids)])),absent=new Set();
+            const encode=prepareRecoveryAuditCandidateEncoding({uid,expectedRevision,auditControl,
+                documents:union.documents,namespaces:union.namespaces},budget);
             for(;;){
-                const bytes=encodeRecoveryAuditCandidate({uid,expectedRevision,auditControl,documents:union.documents,
-                    namespaces:union.namespaces,absences:[...absent]},budget);
+                const bytes=encode([...absent]);
                 const view=decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},budget);
                 let result,error,missing;
                 try{result=await verifyCandidateStrict(view,uid,expectedRevision);}

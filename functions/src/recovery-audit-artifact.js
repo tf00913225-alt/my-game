@@ -202,6 +202,12 @@ function clone(row){
     if(row&&typeof row==="object")return Object.freeze(Object.fromEntries(Object.entries(row).map(([key,v])=>[key,clone(v)])));
     return row;
 }
+function candidateFrameText(frame,token){
+    assemblyCharge(token,"nodes",1);
+    const text=JSON.stringify(frame),length=Buffer.byteLength(text,"utf8");
+    if(!length||length>LIMITS.frameBytes)bad("frame size");
+    return {text,length};
+}
 function encodeRecoveryAuditCandidate({uid,expectedRevision,auditControl,documents,namespaces,absences},token){
     finishRecoveryAuditRawInputs(token);
     assemblyCharge(token,"passes",1);
@@ -209,9 +215,7 @@ function encodeRecoveryAuditCandidate({uid,expectedRevision,auditControl,documen
        documents.length+absences.length>LIMITS.documents)bad("document limit");
     const texts=[];let size=MAGIC.length;
     const add=frame=>{
-        assemblyCharge(token,"nodes",1);
-        const text=JSON.stringify(frame),length=Buffer.byteLength(text,"utf8");
-        if(!length||length>LIMITS.frameBytes)bad("frame size");
+        const {text,length}=candidateFrameText(frame,token);
         size+=length+4;
         if(size>LIMITS.bytes||texts.length>=LIMITS.frames)bad("bytes or frame limit");
         texts.push({text,length});
@@ -231,6 +235,63 @@ function encodeRecoveryAuditCandidate({uid,expectedRevision,auditControl,documen
     }
     assemblyCharge(token);
     return Buffer.concat(parts,size);
+}
+function writeCandidateFrames(buffer,offset,frames,token){
+    for(const {text,length} of frames){
+        assemblyCharge(token);
+        buffer.writeUInt32BE(length,offset);offset+=4;
+        offset+=buffer.write(text,offset,length,"utf8");
+    }
+    return offset;
+}
+function fixedCandidateEncoder(prefix,suffix,documentCount,fixedFrameCount,token){
+    // Only fixed bytes/counts and this one budget survive. There is no input
+    // identity memo, mutable source reference, authority or lookup reader.
+    return Object.freeze(function encode(absences){
+        if(arguments.length!==1)bad("prepared encoding accepts only absences");
+        finishRecoveryAuditRawInputs(token);assemblyCharge(token,"passes",1);
+        if(!Array.isArray(absences)||documentCount+absences.length>LIMITS.documents)bad("document limit");
+        let size=prefix.length+suffix.length;
+        const frames=[];
+        const add=frame=>{
+            const encoded=candidateFrameText(frame,token);size+=encoded.length+4;
+            if(size>LIMITS.bytes||fixedFrameCount+frames.length>=LIMITS.frames)bad("bytes or frame limit");
+            frames.push(encoded);
+        };
+        for(const path of absences)add({type:"absence",path});
+        add({type:"footer",frameCount:fixedFrameCount+frames.length+1,documentCount,absenceCount:absences.length});
+        // Every round pays its complete output, including copies of all fixed
+        // bytes, before allocation. Cache construction is a separate charge.
+        assemblyCharge(token,"bytes",size);
+        const bytes=Buffer.alloc(size);prefix.copy(bytes);
+        let offset=writeCandidateFrames(bytes,prefix.length,frames.slice(0,-1),token);
+        suffix.copy(bytes,offset);offset+=suffix.length;
+        offset=writeCandidateFrames(bytes,offset,frames.slice(-1),token);
+        if(offset!==size)bad("prepared encoding length");
+        assemblyCharge(token);return bytes;
+    });
+}
+function prepareRecoveryAuditCandidateEncoding({uid,expectedRevision,auditControl,documents,namespaces},token){
+    if(arguments.length!==2||!assemblyBudgets.has(token))bad("unknown assembly budget");
+    finishRecoveryAuditRawInputs(token);
+    if(!Array.isArray(documents)||!Array.isArray(namespaces)||documents.length>LIMITS.documents)bad("document limit");
+    const prefix=[],suffix=[];let size=MAGIC.length;
+    const add=(frames,frame)=>{
+        const encoded=candidateFrameText(frame,token);size+=encoded.length+4;
+        if(size>LIMITS.bytes||prefix.length+suffix.length>=LIMITS.frames)bad("bytes or frame limit");
+        frames.push(encoded);
+    };
+    add(prefix,{type:"header",schemaVersion:2,ownerUid:uid,expectedRevision,auditControl});
+    for(const row of documents)add(prefix,{type:"document",path:row.path,data:encodedValue(row.data,0,{nodes:0},token)});
+    for(const row of namespaces)add(suffix,{type:"namespace",path:row.path,ids:row.ids,terminalEmpty:row.terminalEmpty});
+    // As in the fresh formatter, JSON strings are bounded by typed nodes/depth
+    // and frame limits. Exact cache bytes are charged before any cache Buffer.
+    assemblyCharge(token,"bytes",size);
+    const prefixLength=MAGIC.length+prefix.reduce((sum,row)=>sum+row.length+4,0);
+    const prefixBytes=Buffer.alloc(prefixLength),suffixBytes=Buffer.alloc(size-prefixLength);
+    MAGIC.copy(prefixBytes);writeCandidateFrames(prefixBytes,MAGIC.length,prefix,token);
+    writeCandidateFrames(suffixBytes,0,suffix,token);assemblyCharge(token);
+    return fixedCandidateEncoder(prefixBytes,suffixBytes,documents.length,prefix.length+suffix.length,token);
 }
 function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},assemblyBudget){
     if(!Buffer.isBuffer(bytes)||bytes.length>LIMITS.bytes||!bytes.subarray(0,MAGIC.length).equals(MAGIC))bad("bytes or magic");
@@ -376,5 +437,5 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},assemblyBud
 }
 
 module.exports={createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,
-    encodeRecoveryAuditCandidate,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
+    encodeRecoveryAuditCandidate,prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
     inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS};
