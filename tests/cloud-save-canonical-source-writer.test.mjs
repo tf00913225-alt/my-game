@@ -455,6 +455,83 @@ function harness(candidate="none"){
         get committed(){return committed;}};
 }
 
+async function retainedProof(h,id,account=h.data.get(`${root}/account/current`)){
+    let reads=0;
+    const ref=path=>({path,collection:name=>({doc:key=>ref(`${path}/${name}/${key}`)})});
+    const tx={get:async reference=>{
+        reads++;
+        const value=h.data.get(reference.path);
+        return {exists:value!==undefined,data:()=>value,get:key=>value?.[key]};
+    }};
+    const value=h.data.get(`${root}/operations/${id}`);
+    const before=JSON.stringify([...h.data]),writes=h.committed;
+    try{
+        await h.writer.verifyRetainedOperation(tx,ref(root),uid,account,{id,data:()=>value});
+    }finally{
+        assert.equal(JSON.stringify([...h.data]),before);assert.equal(h.committed,writes);
+        assert.ok(reads<=h.writer.retainedOperationReadBudget(value?.kind));
+    }
+}
+
+test("recovery source proof reuses original initial and daily owners within a fixed read budget",async()=>{
+    const h=await applicationHarness();
+    await retainedProof(h,operationId);
+    await retainedProof(h,observationId);
+    await retainedProof(h,"daily-period-20261016");
+    await h.writer.applyDailyPeriod({},application);
+    await retainedProof(h,application.operationId);
+    await retainedProof(h,"daily-period-applied-20261016");
+    h.setClock(Date.parse("2026-10-16T16:00:00.000Z"));
+    await h.writer.observeDailyPeriod({}, {operationId:"observe-period-0002",expectedRevision:6});
+    await h.writer.applyDailyPeriod({}, {operationId:"apply-period-0002",
+        periodId:"daily-period-20261017",expectedRevision:6});
+    await retainedProof(h,"apply-period-0002");
+    await retainedProof(h,operationId);
+});
+
+test("recovery initial proof rejects corrupt identity and original evidence without writes",async()=>{
+    for(const change of [
+        h=>h.data.get(`${root}/operations/${operationId}`).ownerUid="foreign",
+        h=>h.data.get(`${root}/operations/${operationId}`).sourceRevision=8,
+        h=>h.data.get(`${root}/operations/${operationId}`).selectionSha256="a".repeat(64),
+        h=>h.data.get(`${root}/operations/${operationId}`).snapshotSha256="a".repeat(64),
+        h=>h.data.delete(`${root}/playableSnapshots/5`),
+        h=>h.data.delete(`${root}/recoveryArchives/5`),
+        h=>h.data.get(`${root}/recoveryArchives/5`).sourceSha256="a".repeat(64)
+    ]){
+        const h=await periodHarness();change(h);
+        await assert.rejects(retainedProof(h,operationId),e=>e.code==="data-loss");
+    }
+});
+
+test("recovery daily proofs reject missing pairs and corrupt original history without writes",async()=>{
+    for(const change of [
+        h=>h.data.delete(`${root}/operations/${observationId}`),
+        h=>h.data.get(`${root}/operations/daily-period-20261016`).sourceRevision=8,
+        h=>h.data.get(`${root}/operations/daily-period-20261016`).sha256="a".repeat(64),
+        h=>h.data.delete(`${root}/recoveryArchives/5`)
+    ]){
+        const h=await applicationHarness();change(h);
+        await assert.rejects(retainedProof(h,"daily-period-20261016"),e=>e.code==="data-loss");
+    }
+    for(const change of [
+        h=>h.data.delete(`${root}/operations/${application.operationId}`),
+        h=>h.data.get(`${root}/operations/daily-period-applied-20261016`).sha256="a".repeat(64),
+        h=>h.data.delete(`${root}/recoveryArchives/6`)
+    ]){
+        const h=await applicationHarness();await h.writer.applyDailyPeriod({},application);change(h);
+        await assert.rejects(retainedProof(h,"daily-period-applied-20261016"),e=>e.code==="data-loss");
+    }
+});
+
+test("recovery source owner rejects unsupported operation kinds without reads or writes",async()=>{
+    for(const kind of [undefined,"unknown","battle-source-preparation","restricted-battle-terminal"]){
+        const h=await periodHarness();h.data.set(`${root}/operations/unknown-operation-0001`,{
+            schemaVersion:1,ownerUid:uid,kind});
+        await assert.rejects(retainedProof(h,"unknown-operation-0001"),e=>e.code==="failed-precondition");
+    }
+});
+
 test("public first creation replay requires the original session and current revision",async()=>{
     const h=harness(),args={operationId,expectedRevision:4,selection};
     await h.writer.commitInitialSources({},args,{requireCurrentReplay:true});
