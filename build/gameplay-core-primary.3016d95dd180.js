@@ -11823,7 +11823,7 @@
         freeze:{anchor:"feet",width:1.18,height:1.06,min:.68,max:.68},
         petrify:{anchor:"feet",width:1.16,height:1.04,min:.72,max:.72},
         dodgeSkill:{anchor:"feet",width:1.14,height:.55,min:.38,max:.58},
-        dinghaishenzhen:{anchor:"feet",width:1.12,height:.40,min:.40,max:.58},
+        dinghaishenzhen:{anchor:"feet",width:1.12,height:.74,min:.40,max:.58},
         shield:{anchor:"feet",width:1.12,height:.94,min:.52,max:.52},
         earthShield:{anchor:"feet",width:1.16,height:.96,min:.56,max:.56},
         rockWall:{anchor:"feet",width:1.18,height:.64,min:.58,max:.58},

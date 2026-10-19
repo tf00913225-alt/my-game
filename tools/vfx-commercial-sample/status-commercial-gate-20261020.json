@@ -1,0 +1,334 @@
+{
+  "schemaVersion": 1,
+  "reviewDate": "2026-10-20",
+  "reviewer": "independent timing_review commercial-quality Gate Owner",
+  "head": "4b2cb54869fa8ee7b703bd62fdc1f68f477931c5",
+  "device": "SM-N960F Android 10 physical USB Chrome",
+  "scope": "Independent static visual review of all 42 phone status screenshots, plus read-only lifecycle snapshot interpretation",
+  "overallCommercialGate": "FAIL",
+  "overallReason": "Rage body state presence fails static identity. Two subtle foot auras need semantic evidence. Motion quality and sustained performance are not established.",
+  "evidence": {
+    "player": "artifacts/vfx-status-anchors-player/evidence.json",
+    "enemy": "artifacts/vfx-status-anchors-enemy/evidence.json",
+    "playerHead": "4b2cb54869fa8ee7b703bd62fdc1f68f477931c5",
+    "enemyHead": "4b2cb54869fa8ee7b703bd62fdc1f68f477931c5",
+    "playerErrors": [],
+    "enemyErrors": [],
+    "playerTechnicalComplete": true,
+    "enemyTechnicalComplete": true
+  },
+  "bodyStaticSummary": {
+    "PASS": 11,
+    "FAIL": 1,
+    "NEEDS_EVIDENCE": 2
+  },
+  "otherStaticSummary": {
+    "PASS": 7,
+    "FAIL": 0,
+    "NEEDS_EVIDENCE": 0
+  },
+  "statuses": [
+    {
+      "id": "burn",
+      "presentationMode": "pulse",
+      "category": "body",
+      "staticGate": "PASS",
+      "reason": "Foot flames remain contained; orange ring is clearer on blue enemy and still visible against player native fire.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-burn.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-burn.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "rage",
+      "presentationMode": "pulse",
+      "category": "body",
+      "staticGate": "FAIL",
+      "reason": "Player aura nearly merges into native portrait flames; enemy has only faint red torso traces. Observed opacity about 0.47 on both sides, so this is not a zero-opacity instant. Body state presence is insufficient; a normal-combat icon may mitigate overall semantics but is not demonstrated here.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-rage.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-rage.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "freeze",
+      "presentationMode": "static",
+      "category": "body",
+      "staticGate": "PASS",
+      "reason": "Ice cocoon fits portrait and clearly conveys hard control. Expected body covering does not invade adjacent actors or HUD.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-freeze.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-freeze.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "stun",
+      "presentationMode": "pulse",
+      "category": "body",
+      "staticGate": "PASS",
+      "reason": "Readable yellow stars above head on both sides; clear of HUD.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-stun.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-stun.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "dodgeSkill",
+      "presentationMode": "pulse",
+      "category": "body",
+      "staticGate": "NEEDS_EVIDENCE",
+      "reason": "Pale green foot ring is weak against player native fire and similar to dinghaishenzhen; normal-combat motion/icon evidence is needed before requiring redesign.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-dodgeSkill.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-dodgeSkill.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "dinghaishenzhen",
+      "presentationMode": "pulse",
+      "category": "body",
+      "staticGate": "NEEDS_EVIDENCE",
+      "reason": "Low pale cyan-white ring is faint and similar to dodgeSkill. No demonstrated placement defect; identity requires normal-combat motion/icon evidence.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-dinghaishenzhen.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-dinghaishenzhen.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "shield",
+      "presentationMode": "static",
+      "category": "body",
+      "staticGate": "PASS",
+      "reason": "Thin round bubble remains readable and preserves actor/HUD on both sides.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-shield.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-shield.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "petrify",
+      "presentationMode": "static",
+      "category": "body",
+      "staticGate": "PASS",
+      "reason": "Fitted earth cocoon is distinct from ice freeze. Expected hard-control covering stays contained.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-petrify.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-petrify.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "earthShield",
+      "presentationMode": "static",
+      "category": "body",
+      "staticGate": "PASS",
+      "reason": "Sphere and elemental details remain visible while face and weapon stay readable.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-earthShield.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-earthShield.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "rockWall",
+      "presentationMode": "static",
+      "category": "body",
+      "staticGate": "PASS",
+      "reason": "Low rocks occupy feet/lower legs; upper actor and HUD remain clear.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-rockWall.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-rockWall.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "barrier",
+      "presentationMode": "static",
+      "category": "body",
+      "staticGate": "PASS",
+      "reason": "Etched cylindrical enclosure and floor ring differ visibly from spherical shields; actor remains visible.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-barrier.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-barrier.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "yuanZuBlessing",
+      "presentationMode": "pulse",
+      "category": "body",
+      "staticGate": "PASS",
+      "reason": "Gold-white lower-body blessing is visible and contained without nearby actor/HUD intrusion.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-yuanZuBlessing.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-yuanZuBlessing.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "fireSoulResonance",
+      "presentationMode": "pulse",
+      "category": "body",
+      "staticGate": "PASS",
+      "reason": "Additional orange-gold lower-body loop remains perceptible and preserves upper body; especially clear on enemy blue portrait.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-fireSoulResonance.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-fireSoulResonance.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "bloodBurn",
+      "presentationMode": "pulse",
+      "category": "body",
+      "staticGate": "PASS",
+      "reason": "Dark crimson foot flames differ visibly from ordinary burn; actor remains readable.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-bloodBurn.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-bloodBurn.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "frostbite",
+      "presentationMode": "icon",
+      "category": "icon_or_intentional_none",
+      "staticGate": "PASS",
+      "reason": "Snowflake icon is statically readable on both sides.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-frostbite.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-frostbite.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "agilityDown",
+      "presentationMode": "icon",
+      "category": "icon_or_intentional_none",
+      "staticGate": "PASS",
+      "reason": "Boot/down-arrow icon is statically readable on both sides.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-agilityDown.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-agilityDown.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "damageDown",
+      "presentationMode": "icon",
+      "category": "icon_or_intentional_none",
+      "staticGate": "PASS",
+      "reason": "Damage-down icon is statically readable on both sides.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-damageDown.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-damageDown.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "defenseDown",
+      "presentationMode": "icon",
+      "category": "icon_or_intentional_none",
+      "staticGate": "PASS",
+      "reason": "Shield/down-arrow icon is statically readable on both sides.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-defenseDown.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-defenseDown.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "phoenixMight",
+      "presentationMode": "icon",
+      "category": "icon_or_intentional_none",
+      "staticGate": "PASS",
+      "reason": "Red-gold phoenix icon is statically readable on both sides.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-phoenixMight.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-phoenixMight.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "stealthSkill",
+      "presentationMode": "none",
+      "category": "icon_or_intentional_none",
+      "staticGate": "PASS",
+      "reason": "Expected portrait fading is visible on both sides while HUD remains readable; no body/icon is intentional.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-stealthSkill.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-stealthSkill.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "fireMomentum",
+      "presentationMode": "none",
+      "category": "icon_or_intentional_none",
+      "staticGate": "PASS",
+      "reason": "No body/icon is intentional under existing presentation Owner; absence is not a missing-art failure.",
+      "playerImage": "artifacts/vfx-status-anchors-player/status-fireMomentum.png",
+      "enemyImage": "artifacts/vfx-status-anchors-enemy/status-fireMomentum.png",
+      "bothSidesVisuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE"
+    }
+  ],
+  "sideConsistency": "Both-side effect geometry follows portrait aspect ratio; no demonstrated side-specific anchoring or HUD regression. Hard-control covering is intentional and is not rejected for covering the face.",
+  "lifecycle": {
+    "source": "artifacts/vfx-status-anchors-enemy/status-lifecycle.json",
+    "rawObservation": {
+      "first": [
+        {
+          "type": "rage",
+          "opacity": "0.38245"
+        },
+        {
+          "type": "freeze",
+          "opacity": "0.68"
+        }
+      ],
+      "rotated": [
+        {
+          "type": "freeze",
+          "opacity": "0.68"
+        },
+        {
+          "type": "shield",
+          "opacity": "0.52"
+        }
+      ],
+      "enemy": 1,
+      "icons": [
+        {
+          "width": "24px",
+          "height": "24px",
+          "z": "34"
+        }
+      ],
+      "cleansed": [
+        {
+          "type": "rage",
+          "opacity": "0.485793"
+        }
+      ],
+      "expired": [],
+      "dead": [],
+      "revived": [
+        {
+          "type": "shield",
+          "opacity": "0.52"
+        }
+      ],
+      "remaining": 0
+    },
+    "technicalGate": "PASS",
+    "scope": "Observed DOM/state snapshots only",
+    "findings": [
+      "First visible body layers rage/freeze change to freeze/shield, supporting layer rotation selection; opacity values are present.",
+      "Enemy count is 1 and sampled icon is 24x24 with z-index 34.",
+      "After cleanse only rage remains, supporting selective removal rather than clearing every status.",
+      "Expiry and death snapshots contain no body layers.",
+      "Revival shows shield again; final remaining count is 0."
+    ],
+    "limits": [
+      "Lifecycle file itself contains no head/device/time fields; it is associated by artifact directory, not independently SHA-attested.",
+      "Snapshots do not show transition continuity, flicker, pulse cadence, rotation smoothness or duration.",
+      "This technical PASS is not animation-smoothness or sustained-performance acceptance."
+    ]
+  },
+  "limits": [
+    "Static PASS accepts visible composition/footprint/readability in these captured portraits only; it does not certify all roster art, simultaneous casts or arbitrary overlapping statuses.",
+    "Pulse/rotation continuity, interruption, frame pacing and long-session smoothness remain NEEDS_EVIDENCE.",
+    "Lifecycle snapshots support observed cleanup/death/revival states but cannot prove absence of transient residual pixels.",
+    "Rage screenshot does not demonstrate a normal-combat dedicated status icon adequately compensating for weak body identity.",
+    "No regeneration, runtime changes, phone operation or commit performed for this report."
+  ],
+  "stopRule": "Retain statically passing presentations unless new player-visible defects appear. Do not iterate for minor hue preference, invisible pixels or arbitrary prompt padding."
+}

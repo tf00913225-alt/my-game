@@ -20,14 +20,28 @@ const rows=[
  ['rage','怒火常駐','status','火臉改為中空火環，保留人物與既有狀態辨識。'],
  ['stun','暈眩','status','全身星旋移到頭部附近，避免遮住臉胸。'],
  ['agilityDown','重力圖示','status','檢查 24px 暗色圖示輪廓對比。'],
- ['defenseDown','破防圖示','status','檢查 24px 暗色圖示輪廓對比。']
+ ['defenseDown','破防圖示','status','檢查 24px 暗色圖示輪廓對比。'],
+ ['burn','燃燒常駐','status','下半身火苗與角色腳底對齊，避免搶走人物視覺。'],
+ ['freeze','冰封常駐','status','保留完整冰牢辨識，讓角色及自身血條仍可讀。'],
+ ['petrify','石化常駐','status','保留石殼形態，檢查完整包覆與材質透明度。'],
+ ['shield','護盾常駐','status','檢查身側護框與腳底位置，不延伸到 HUD。'],
+ ['earthShield','萬象土盾常駐','status','保留岩質與元素徽記，檢查人物可讀性。'],
+ ['rockWall','岩石壁壘常駐','status','低位岩柱保持辨識，避免全身大型罩。'],
+ ['barrier','結界常駐','status','保留符文板與中央開口，不遮人物臉。'],
+ ['dodgeSkill','風行常駐','status','風流位於下半身與腳邊，檢查縮小後是否仍可辨識。'],
+ ['dinghaishenzhen','氣定神閒常駐','status','低位印記，與風行分別辨識。'],
+ ['yuanZuBlessing','元祖賜福常駐','status','低位金色符帶，檢查不再繞住臉部。'],
+ ['fireSoulResonance','炎魂共鳴常駐','status','保留火魂辨識，降低持續霧光。'],
+ ['bloodBurn','焚血常駐','status','深紅尖焰保持危險感，與橘色燃燒區分。']
 ];
 const picker=document.getElementById('case');rows.forEach((r,i)=>picker.add(new Option(r[1],i)));
 function show(){const [id,label,kind,note]=rows[Number(picker.value)];const baseline=id==='flameSlash'||id==='iceArrowRain';
 const originalRage=kind==='status'&&id==='rage';
-const before=originalRage?'../../artifacts/vfx-final/status-rage-original.png':baseline&&kind==='skill'?`../../artifacts/vfx-usb-runtime/before-${id}.png`:`../../artifacts/vfx-checkpoint18/${kind}-${id}.png`;
-document.getElementById('before').src=before;document.getElementById('after').src=`../../artifacts/vfx-final/${kind}-${id}.png`;
+const before=originalRage?'../../artifacts/vfx-status-anchors-player/status-rage-original.png':baseline&&kind==='skill'?`../../artifacts/vfx-usb-runtime/before-${id}.png`:`../../artifacts/vfx-checkpoint18/${kind}-${id}.png`;
+const revisedGroup=['rage','windSpell'];
+const folder=kind==='status'?'vfx-status-anchors-player':revisedGroup.includes(id)?'vfx-status-polish':'vfx-final';
+document.getElementById('before').src=before;document.getElementById('after').src=`../../artifacts/${folder}/${kind}-${id}.png`;
 document.getElementById('beforeSource').textContent=originalRage?'同一候選環境：原素材重播':baseline&&kind==='skill'?'原始基線 b767d31e':'上一輪 checkpoint 18f92b26';
-document.getElementById('afterSource').textContent='新候選：實際 Head 以 vfx-final/evidence.json 為準';document.getElementById('note').textContent=note;}
+document.getElementById('afterSource').textContent=kind==='status'?'狀態候選 4b2cb548':revisedGroup.includes(id)?'取消過度放大候選 b145e2d7':'素材候選 067fa105';document.getElementById('note').textContent=note;}
 picker.onchange=show;show();
 </script></html>
