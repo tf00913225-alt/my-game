@@ -81,6 +81,7 @@
 - `00-main.js` 是 `finishPlayerAction()` 與 `processNextCombatant()` 唯一 owner。功能模組不得替換這兩個函式，也不得以 Promise（非同步承諾）阻塞回合佇列。
 - 功能模組需要觀察或暫時攔截完成通知時，只能使用 `FourSymbolsBattleFlow` 的訂閱／攔截 API（應用程式介面），並確保攔截器可解除。
 - single 的中心是實際目標格；tri 即使只剩一個單位也保留三人格視覺尺寸；all 永遠保留完整目標側範圍；projectile（飛行技能）從施放者中心飛向正式主要目標中心。
+- 上述範圍是目標集合與基準幾何，不依存活數縮減。點陣素材保持原比例，在既有 Geometry Owner 的目標側與畫面交集內等比安全 fit；只限制藝術框，不改命中錨點或目標範圍。群體範圍由正式素材構圖與各實際目標的命中回饋共同表達，不以拉伸、裁切主體或新增範圍 Owner 填滿。
 - DOM 例外、MISS（未命中）、Buff（增益）、Heal、Shield、Debuff（減益）與 VFX 清理都不得讓同一 initiative（行動序）永久等待。
 
 ## 持續效果回合生命週期契約

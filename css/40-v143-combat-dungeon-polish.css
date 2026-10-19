@@ -136,16 +136,16 @@
 }
 
 .v143-skill-stage[data-element="fire"] .v143-vfx-sprite{
-    filter:drop-shadow(0 0 11px rgba(255,87,25,.9));
+    filter:drop-shadow(0 0 4px rgba(255,87,25,.55));
 }
 .v143-skill-stage[data-element="water"] .v143-vfx-sprite{
-    filter:drop-shadow(0 0 11px rgba(76,205,255,.9));
+    filter:drop-shadow(0 0 4px rgba(76,205,255,.5));
 }
 .v143-skill-stage[data-element="wind"] .v143-vfx-sprite{
-    filter:drop-shadow(0 0 12px rgba(83,241,184,.92));
+    filter:drop-shadow(0 0 4px rgba(83,241,184,.5));
 }
 .v143-skill-stage[data-element="earth"] .v143-vfx-sprite{
-    filter:drop-shadow(0 0 11px rgba(214,166,77,.9));
+    filter:drop-shadow(0 0 4px rgba(214,166,77,.5));
 }
 .v143-skill-stage[data-element="light"] .v143-vfx-sprite{
     filter:drop-shadow(0 0 12px rgba(255,230,116,.94));
@@ -239,7 +239,7 @@
     z-index:var(--v143-status-layer-rotating);
 }
 
-#game-stage #battlePage .v143-status-icon{
+:is(#game-stage #battlePage,.v174-battle-hud-layer) .v143-status-icon{
     display:inline-block;
     width:24px;
     height:24px;
@@ -257,12 +257,12 @@
     pointer-events:none;
     transform:none;
 }
-#game-stage #battlePage .v143-status-icon--layer-hud{
+:is(#game-stage #battlePage,.v174-battle-hud-layer) .v143-status-icon--layer-hud{
     position:relative;
-    z-index:var(--v143-status-layer-hud);
+    z-index:var(--v143-status-layer-hud,34);
 }
 
-#game-stage #battlePage .v143-status-icon--pulse{
+:is(#game-stage #battlePage,.v174-battle-hud-layer) .v143-status-icon--pulse{
     animation:none !important;
     opacity:1 !important;
     transform:none !important;
@@ -311,7 +311,7 @@
 }
 
 @keyframes v143StatusImageBreath{
-    0%,100%{opacity:0}
+    0%,100%{opacity:.58}
     50%{opacity:1}
 }
 

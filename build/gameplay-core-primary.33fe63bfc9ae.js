@@ -11680,7 +11680,7 @@
     const SPRITE_SCALE_MULTIPLIER=1;
     /* Size the raster box before centering/travel. CSS independent scale also
        scales translate(-50%) and the travel vector, moving the visible hit. */
-    const PLACEMENT_SIZE_SCALE=Object.freeze({single:.88,targetTrajectory:.80,trajectory:1,group:1,battlefield:1});
+    const PLACEMENT_SIZE_SCALE=Object.freeze({single:.70,targetTrajectory:.72,trajectory:1,group:1,battlefield:1});
     const spriteFrameAspectCache=new Map();
     const spriteFrameAspectLoading=new Set();
 
@@ -12498,8 +12498,8 @@
         const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
         const regularEnemy=side==="monster"&&!isBossIndexForVfx(index);
         const shellStatus=type==="shield"||type==="barrier"||type==="earthShield"||type==="rockWall";
-        const widthScale=(regularEnemy?1.45:1.40)*(shellStatus?1.08:1);
-        const heightScale=(regularEnemy?1.36:1.34)*(shellStatus?1.08:1);
+        const widthScale=(regularEnemy?1.24:1.20)*(shellStatus?1.04:1);
+        const heightScale=(regularEnemy?1.20:1.18)*(shellStatus?1.04:1);
         const width=regularEnemy
             ?Math.max(72,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale))
             :Math.max(62,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale));
@@ -12896,6 +12896,29 @@
         image.src=key;
     }
 
+    function fitRangeArt(node,current,bounds,center){
+        const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.()?.rect;
+        const side=geometryOwner()?.getSideRect?.(current.targetSide);
+        if(!overlay||!side){ return; }
+        const left=Math.max(overlay.left,side.left),right=Math.min(overlay.right,side.right);
+        const top=Math.max(overlay.top,side.top),bottom=Math.min(overlay.bottom,side.bottom);
+        const width=parseFloat(node.style.width),height=parseFloat(node.style.height);
+        const availableWidth=2*Math.min(center.x-left,right-center.x);
+        const availableHeight=2*Math.min(center.y-top,bottom-center.y);
+        if(!(width>0&&height>0&&availableWidth>0&&availableHeight>0)){
+            node.dataset.artFit="unavailable";
+            node.style.visibility="hidden";
+            return;
+        }
+        const fit=Math.min(1,availableWidth/width,availableHeight/height);
+        node.style.width=(width*fit)+"px";
+        node.style.height=(height*fit)+"px";
+        node.dataset.artFit="safe";
+        node.dataset.artFitScale=String(fit);
+        node.dataset.semanticWidth=String(bounds.width);
+        node.dataset.semanticHeight=String(bounds.height);
+    }
+
     function emittedSpriteTargets(current){
         return current.targetIndexes.filter(index=>
             current.emitted.has(index)&&current.validTargets.has(index)&&
@@ -12998,6 +13021,7 @@
                extend into the independent operation track. The whole source
                frame remains visible; no card or Zone is a paint clip owner. */
             applySpriteBox(node,width,height,sprite,"cover");
+            fitRangeArt(node,current,bounds,{x:bounds.centerX,y:bounds.centerY});
             return;
         }
 
@@ -13015,6 +13039,7 @@
             :primaryAnchor
             ?{x:primaryAnchor.x,y:primaryAnchor.y}
             :{x:bounds.centerX,y:bounds.centerY};
+        fitRangeArt(node,current,bounds,destination);
         if(primaryAnchor){ node.dataset.geometrySlot=primaryAnchor.slot; }
         const actor=placement==="trajectory"?slotAnchor(current.side,current.actorIndex,current.actorCard):null;
         if(placement==="trajectory"&&sprite.travelToTargets&&actor){
@@ -13039,7 +13064,6 @@
         let node=current.spriteNodes.get(key);
         if(!node){
             const initialSprite=!current.firstVisibleFrameAt;
-            if(initialSprite&&!sprite.impactOnly){ beginVisualTimeline(current); }
             node=appendSpriteNode(current);
             node.dataset.columns=String(sprite.columns);
             node.dataset.rows=String(sprite.rows);
@@ -13072,7 +13096,7 @@
            Outcome confirmation still marks the node and controls hit feedback, but
            MISS/status/custom Boss paths must not make the cast animation disappear. */
         if(node.style.left&&node.style.top){
-            node.style.visibility=sprite.impactOnly?"hidden":"visible";
+            node.style.visibility=sprite.impactOnly||node.dataset.artFit==="unavailable"?"hidden":"visible";
             node.dataset.emittedVisual="true";
         }
         if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }
@@ -13082,8 +13106,9 @@
     }
 
     function queueTargetHit(current,index,callback,phase,side){
-        if(!current||!current.model||!current.model.sprite||!current.model.sprite.impactOnly){ return false; }
+        if(!current||!current.model||!current.model.sprite){ return false; }
         if(side&&current.targetSide!==side){ return false; }
+        if(!current.model.sprite.impactOnly&&!current.emitted?.has(index)){ return false; }
         if(current.done){ return true; }
         if(current.hitReached){ callback(); return true; }
         if(!current.hitCallbacks){ current.hitCallbacks=new Map(); }
@@ -13091,6 +13116,40 @@
         callbacks.push({callback:callback,phase:phase||"feedback"});
         current.hitCallbacks.set(index,callbacks);
         return true;
+    }
+
+    function requestCastTimeline(current){
+        if(current.castTimelineRequested){ return; }
+        current.castTimelineRequested=true;
+        if(current.gate){ current.gate.visualTimelinePending=true; }
+        const start=function(frameTime){
+            if(state.current!==current||current.done){ return; }
+            // Force CSS animation creation after the complete settlement/DOM
+            // task, then align every raster and travel track to one paint clock.
+            const tracks=[];
+            current.spriteNodes.forEach(node=>{
+                try{
+                    const animations=typeof node.getAnimations==="function"?node.getAnimations():[];
+                    animations.forEach(animation=>{ if(String(animation.animationName||"").startsWith("v143Raster")){ tracks.push(animation); } });
+                    if(node.v143MotionAnimation){ tracks.push(node.v143MotionAnimation); }
+                }catch(_){ state.metrics.clockAlignmentFailures=(state.metrics.clockAlignmentFailures||0)+1; }
+            });
+            // performance.now and the default DocumentTimeline share a time
+            // origin. Read after style creation, not the stale RAF frame stamp.
+            const clockTime=Number.isFinite(frameTime)&&typeof performance!=="undefined"&&typeof performance.now==="function"
+                ?performance.now():frameTime;
+            tracks.forEach(animation=>{
+                try{ if(Number.isFinite(clockTime)){ animation.startTime=clockTime; } }
+                catch(_){ state.metrics.clockAlignmentFailures=(state.metrics.clockAlignmentFailures||0)+1; }
+            });
+            current.animationStartTimeline=Number.isFinite(clockTime)?clockTime:null;
+            beginVisualTimeline(current);
+            current.targetIndexes.forEach(index=>setTimer(
+                ()=>settleTargetVisual(current,index),Math.max(0,targetHitTime(current,index)-Date.now())
+            ));
+        };
+        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(start); }
+        else{ start(); }
     }
 
     function requestImpactTimeline(current){
@@ -13177,7 +13236,7 @@
         if(current.targetIndexes.indexOf(index)<0){ current.targetIndexes.push(index); }
         if(targetCard&&targetCard.classList){ targetCard.classList.add("v143-effects-pending"); }
         if(current.model.sprite){ addSprite(current,index,target); }
-        if(!current.model.sprite||!current.model.sprite.impactOnly||current.firstVisibleFrameAt){
+        if(!current.model.sprite||current.firstVisibleFrameAt){
             setTimer(()=>settleTargetVisual(current,index),Math.max(0,targetHitTime(current,index)-Date.now()));
         }
     }
@@ -13204,6 +13263,8 @@
             }
         }
         current.done=true;
+        current.pendingUpdateKeys?.forEach(key=>state.pendingUpdates?.delete(key));
+        if(current.hitCallbacks){ current.hitCallbacks.clear(); }
         window.FourSymbolsBattlePresentation?.endCast?.(current.actorCard,current.characterMotion);
         current.spriteNodes.forEach(node=>{ if(node.v143MotionAnimation){ node.v143MotionAnimation.cancel(); } });
         current.targetIndexes.forEach(index=>{
@@ -13308,6 +13369,7 @@
             if(!model.passive){ state.metrics.missingVisuals++; }
         }else{
             current.targetIndexes.slice().forEach(index=>emitSprite(current,index));
+            if(!model.sprite.impactOnly&&current.spriteNodes.size){ requestCastTimeline(current); }
         }
 
         if(model.noVisual||!model.sprite){
@@ -13448,7 +13510,8 @@
             if(wait>8||current&&!current.done&&!current.hitReached){ setTimer(present,wait); }else{ present(); }
         }
         if(wait>8){ state.metrics.delayedNumbers++; }
-        const scheduleImpact=current&&current.model&&current.model.sprite&&current.model.sprite.impactOnly
+        const scheduleImpact=current&&!current.done&&current.targetSide===side&&current.model&&current.model.sprite&&
+            (current.model.sprite.impactOnly||current.emitted?.has(unitIndex))
             ?callback=>queueTargetHit(current,unitIndex,callback,"feedback",side):null;
         return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical,scheduleImpact:scheduleImpact});
     };
@@ -13510,9 +13573,13 @@
                 state.pendingUpdates.set(key,true);
                 const project=()=>{
                     state.pendingUpdates.delete(key);
+                    current?.pendingUpdateKeys?.delete(key);
                     callback();
                 };
-                if(!queueTargetHit(current,index,project,"projection",side)){ setTimer(project,wait); }
+                if(queueTargetHit(current,index,project,"projection",side)){
+                    if(!current.pendingUpdateKeys){ current.pendingUpdateKeys=new Set(); }
+                    current.pendingUpdateKeys.add(key);
+                }else{ setTimer(project,wait); }
             }
             return;
         }
