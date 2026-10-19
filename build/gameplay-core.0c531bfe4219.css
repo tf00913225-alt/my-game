@@ -2658,6 +2658,7 @@
 
 #game-ui #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row{
     position:relative;
+    grid-template-columns:minmax(0,1fr) minmax(0,calc(126 * var(--ui-length-unit,1px)));
     min-height:calc(72 * var(--ui-length-unit,1px)) !important;
     padding:calc(10 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px)) !important;
     border:calc(1 * var(--ui-length-unit,1px)) solid rgba(200,154,72,.20) !important;
@@ -2696,6 +2697,9 @@
 #game-ui #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel select,
 #game-ui #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel input{
     min-height:calc(44 * var(--ui-length-unit,1px)) !important;
+    max-width:100%;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 #game-ui #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row:not(.danger) .home-feature-buy-btn{

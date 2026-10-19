@@ -7012,7 +7012,7 @@
         let slots;
         try{ slots=owner.slots(item); }
         catch(_){ stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot">冶煉資料異常，請保留原資料。</div>');return; }
-        slots.forEach((affix,index)=>stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot" data-reforge-slot="'+index+'">'+escapeHtml(owner.slotText(affix))+'</div>'));
+        slots.forEach((affix,index)=>stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot" data-reforge-slot="'+index+'">'+(affix?'':'詞條 '+(index+1)+'：')+escapeHtml(owner.slotText(affix))+'</div>'));
         const reason=owner.reason(item);
         if(reason){ stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot v17346-reforge-reason">'+escapeHtml(reason)+'</div>'); }
     }
@@ -11965,7 +11965,7 @@ ensureFunctionalStyles();runRepairs();
         const equipped=effectiveLoadoutRelicId()===def.id;
         const unavailable=def.runtimeReady!==true;
         return '<div class="team-relic-detail"><button class="team-relic-detail-back" onclick="v174OpenRelicPage()">‹ 返回秘寶列表</button><div class="team-relic-detail-hero '+rarityClass(def)+'">'+
-            '<div class="team-relic-detail-art">'+relicIconMarkup(def,true)+'</div><h2>'+esc(def.name)+'</h2><p>'+esc(RARITY_LABELS[def.rarity]||def.rarity)+(unavailable?'・效果尚未覺醒':'・Lv.'+level+' / 20')+'</p><strong>'+esc(CATEGORY_LABELS[def.category]||def.category)+(def.tags&&def.tags.length?' / '+esc(def.tags.join('・')):'')+'</strong></div>'+
+            '<div class="team-relic-detail-art">'+relicIconMarkup(def,true)+'</div><h2>'+esc(def.name)+'</h2><p>'+esc(RARITY_LABELS[def.rarity]||def.rarity)+(unavailable?'・效果尚未覺醒':'・Lv.'+level+' / 20')+'</p><strong>'+esc(CATEGORY_LABELS[def.category]||def.category)+'</strong></div>'+
             (unavailable
                 ?'<section><h3>秘寶能力</h3><p>秘寶能力尚未開放。正式 Trigger、Effect 與成長數值尚未定案，因此目前不可裝備或強化。</p></section>'
                 :'<section><h3>觸發條件</h3><p>'+esc(def.triggerText||"尚未定義")+'</p></section><section><h3>秘寶效果</h3><p>'+esc(currentEffectText(def,level))+'</p></section><section><h3>觸發限制</h3><p>'+esc(def.limitText||"依秘寶設定。")+'</p></section>'+
