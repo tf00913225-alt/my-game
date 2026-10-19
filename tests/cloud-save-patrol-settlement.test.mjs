@@ -294,3 +294,53 @@ test('initial and replayed public issuance expose member identity without future
     assert.ok(settled.result.reward.gold>0);assert.ok(settled.result.reward.drops.length>0);
     assert.deepEqual(h.data.get(h.root+'/patrolTickets/'+issued.ticketId),privateCore);
 });
+
+test('a retried callback reusing one SDK transaction object refreshes proof reads after another member commit',async()=>{
+    const h=await seeded({sample:0}),ticket=await issue(h);
+    const expectedGold=h.data.get(h.root+'/patrolTickets/'+ticket.ticketId).members[0].gold;
+    const input={operationId:id('retry-object-member'),expectedRevision:h.revision,ticketId:ticket.ticketId,memberIndex:0};
+    const base=h.dependencies.runProtected,rollback=Error('discard first SDK attempt');
+    let currentTransaction,attempts=0;
+    const reusedTransaction=Object.fromEntries(['get','create','update','set','delete'].map(method=>
+        [method,(...args)=>currentTransaction[method](...args)]));
+    const retryProtected=async(request,operation)=>{
+        try{
+            await base(request,async(tx,session)=>{
+                attempts++;currentTransaction=tx;await operation(reusedTransaction,session);throw rollback;
+            });
+        }catch(error){if(error!==rollback)throw error;}
+        // Another legitimate transaction wins the optimistic conflict while the
+        // SDK retains its public Transaction object's identity for the retry.
+        await h.forest.settleMember(h.request(),input);
+        return base(request,(tx,session)=>{
+            attempts++;currentTransaction=tx;return operation(reusedTransaction,session);
+        });
+    };
+    const retrying=createCanonicalPatrolSettlement({...h.dependencies,runProtected:retryProtected});
+    const before=h.revision,result=await retrying.settleMember(h.request(),input);
+    assert.equal(attempts,2);assert.equal(result.unchanged,true);assert.equal(h.revision,before+1);
+    assert.equal(economy(h).gold,expectedGold);assert.equal(state(h,ticket.ticketId).settledMembers.length,1);
+    assert.equal([...h.data.keys()].filter(key=>key===h.root+'/patrolSettlements/'+input.operationId).length,1);
+});
+
+test('Forest-configured presence retries refresh callback proofs while retaining sharing within each attempt',async()=>{
+    const h=await seeded(),ticket=await issue(h);await member(h,ticket.ticketId);
+    const base=h.dependencies.runProtected,rollback=Error('discard mode SDK attempt');
+    let currentTransaction,attempt=0;
+    const ticketReads=[0,0],reusedTransaction=Object.fromEntries(['get','create','update','set','delete'].map(method=>
+        [method,(...args)=>{
+            if(method==='get'&&args[0].path===h.root+'/patrolTickets/'+ticket.ticketId)ticketReads[attempt]++;
+            return currentTransaction[method](...args);
+        }]));
+    const retryProtected=async(request,operation)=>{
+        try{await base(request,async(tx,session)=>{
+            currentTransaction=tx;await operation(reusedTransaction,session);throw rollback;
+        });}catch(error){if(error!==rollback)throw error;}
+        attempt=1;
+        return base(request,(tx,session)=>{currentTransaction=tx;return operation(reusedTransaction,session);});
+    };
+    const forest=createCanonicalPatrolSettlement({...h.dependencies,runProtected:retryProtected});
+    await forest.modeOwner.observePresence(h.request(),{operationId:id('retry-mode-cache'),expectedRevision:h.revision,
+        expectedSequence:h.data.get(h.root+'/modeTime/current').sequence,intent:'heartbeat',elementBox:'keep'});
+    assert.deepEqual(ticketReads,[1,1]);
+});

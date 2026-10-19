@@ -107,6 +107,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             fail("invalid-argument","A recovery operation and current revision are required.");
         }
         return runProtected(request,async(tx,session)=>{
+            patrolEvidence.beginEvidenceAttempt(tx);
             const uid=session.uid,root=db.collection("serverUsers").doc(uid);
             const envelopeRef=db.collection("users").doc(uid).collection("saves").doc("current");
             const archiveRef=root.collection("recoveryArchives").doc(String(expectedRevision));

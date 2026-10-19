@@ -50,9 +50,23 @@ function createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
     const fail=(code,message)=>{throw new HttpsError(code,message);};
     const ref=(root,name,id)=>root.collection(name).doc(id);
     const sourceOwner=createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,inspectExistingEnvelope,nextRevision,now});
-    const modeOwner=createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,inspectExistingEnvelope,nextRevision,now,
+    const modeOwner=createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected:runEvidenceAttempt,inspectExistingEnvelope,nextRevision,now,
         verifyPatrolSettlementEvidence,patrolSettlementEvidenceReadBudget:60});
     const caches=new WeakMap();
+    // The SDK can reuse one Transaction object for multiple optimistic attempts.
+    // Its identity is not a snapshot identity. Reset once at callback entry,
+    // retaining shared immutable proof reads only within that one attempt.
+    function beginEvidenceAttempt(tx){
+        const previous=caches.get(tx);
+        if(previous)caches.delete(previous.proxy);
+        caches.delete(tx);
+    }
+    function runEvidenceAttempt(request,operation){
+        return runProtected(request,(tx,session)=>{
+            beginEvidenceAttempt(tx);
+            return operation(tx,session);
+        });
+    }
     function cache(tx){
         let value=caches.get(tx);
         if(!value){
@@ -468,7 +482,7 @@ function createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
         if(!Buffer.isBuffer(bytes)||bytes.length!==150)fail("internal","Server Patrol entropy is unavailable.");
         try{members=preparePatrolMembers(parsed,()=>{const value=bytes.readUIntBE(cursor++*6,6)/281474976710656;samples.push(value);return value;});}
         catch(_){fail("invalid-argument","Unsupported Forest source selection.");}
-        return runProtected(request,async(tx,session)=>{
+        return runEvidenceAttempt(request,async(tx,session)=>{
             const uid=session.uid,root=db.collection("serverUsers").doc(uid),ticketId=parsed.operationId;
             const issued=await read(tx,ref(root,"patrolTickets",ticketId));
             const issueIntent={...parsed,ownerUid:uid};
@@ -503,7 +517,7 @@ function createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
     }
     async function settle(request,action,input){
         const parsed=intent(action,input),time=boundedTime();
-        return runProtected(request,async(tx,session)=>{
+        return runEvidenceAttempt(request,async(tx,session)=>{
             const uid=session.uid,root=db.collection("serverUsers").doc(uid),requestIntent={...parsed,ownerUid:uid};
             const original=await read(tx,ref(root,"patrolSettlements",parsed.operationId));
             if(original.exists){
@@ -589,7 +603,7 @@ function createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
     }
     async function abandonTicket(request,input){
         const parsed=intent("abandon",input),time=boundedTime();
-        return runProtected(request,async(tx,session)=>{
+        return runEvidenceAttempt(request,async(tx,session)=>{
             const uid=session.uid,root=db.collection("serverUsers").doc(uid),requestIntent={...parsed,ownerUid:uid};
             const original=await read(tx,ref(root,"patrolClosures",parsed.operationId));
             if(original.exists){
@@ -639,7 +653,7 @@ function createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
         settleTerminal:(request,input)=>settle(request,"terminal",input),abandonTicket,
         verifyPatrolSettlementEvidence,verifyRetainedTicket,verifyRetainedSettlement,verifyRetainedClosure,
         verifyCurrentEvidence,retainedTicketReadBudget,retainedSettlementReadBudget,retainedClosureReadBudget,
-        currentEvidenceReadBudget,patrolSettlementEvidenceReadBudget:60,modeOwner,
+        currentEvidenceReadBudget,patrolSettlementEvidenceReadBudget:60,beginEvidenceAttempt,modeOwner,
         observePresence:modeOwner.observePresence,beginSimulatedAd:modeOwner.beginSimulatedAd,
         completeSimulatedAd:modeOwner.completeSimulatedAd,abandonSimulatedAd:modeOwner.abandonSimulatedAd});
 }
