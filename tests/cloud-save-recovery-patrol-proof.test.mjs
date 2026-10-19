@@ -17,7 +17,7 @@ const {createRecoveryArchive}=require('../functions/src/canonical-recovery-archi
 const {assembleCanonicalSnapshot}=require('../functions/src/canonical-snapshot');
 const {snapshotDigest}=require('../functions/src/canonical-snapshot');
 const auditId='proof-component-audit-0001',approvalId='proof-component-approval-01';
-async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus=null,historicalSession=false,zeroHeartbeat=false,beforeAudit=null}={}){
+async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus=null,historicalSession=false,zeroHeartbeat=false,beforeAudit=null,currentLoss=true}={}){
     const h=storeHarness({optimisticTransactions:true}),sessions=createSessionAuthority(h.dependencies);let authTime=Math.floor(h.clock/1000),session;
     const request=()=>({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid,...(session?{session}:{})}});
     session=await sessions.create(request());
@@ -78,7 +78,7 @@ async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus
         expectedSequence:h.data.get(h.root+'/modeTime/current').sequence,intent:'heartbeat',elementBox:'keep'});}
     if(historicalSession){h.advance(1000);authTime=Math.floor(h.clock/1000);
         session=await sessions.create({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid}});}
-    if(battles>=20)for(const path of [...h.data.keys()])if(['account','characters','economy','inventory','equipment','relics','relicLoadout','progress','claimRecords','claimCheckpoints']
+    if(battles>=20&&currentLoss)for(const path of [...h.data.keys()])if(['account','characters','economy','inventory','equipment','relics','relicLoadout','progress','claimRecords','claimCheckpoints']
         .some(name=>path.startsWith(h.root+'/'+name+'/')))h.data.delete(path);
     if(beforeAudit)await beforeAudit(h);
     await createCanonicalRecoveryApproval(deps).issue({auth:{uid:'proof-operator',token:{cloudSaveOperator:true}},data:{ownerUid:h.uid,operationId:approvalId,sourceRevision:h.revision,ttlSeconds:60}});
@@ -633,6 +633,111 @@ const rawArgs=(sequence=1,startOrdinal=0,count=16)=>({auditId,expectedEpoch:1,op
 function inventoryOrder(f){return [...f.h.data].filter(([path])=>path.startsWith(f.root+'/inventoryPages/')).map(([,row])=>decodeInventoryPayload(row.payloadBytes))
     .sort((a,b)=>a.sequence-b.sequence).flatMap(page=>page.entries.map(entry=>({path:page.namespacePath+'/'+entry.id,...entry})));}
 function stableRawReceipt(row){const {createdAt,...manifest}=row;return snapshotDigest(manifest);}
+
+function privateRawInspector(f){
+    const filename=require.resolve('../functions/src/canonical-current-recovery'),compiled=new Module(filename);
+    compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+    const original=readFileSync(filename,'utf8'),needle='return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact';
+    assert.equal(original.split(needle).length,2);
+    // Test-only lexical access to the private pure kernel. Production exports,
+    // factory methods and SDK entry points remain unchanged.
+    compiled._compile(original.replace(needle,'return Object.freeze({inspectCompleteRawCapture,restoreCurrent,verifyRecoveryAuditArtifact'),filename);
+    assert.equal(Object.hasOwn(f.recovery,'inspectCompleteRawCapture'),false);
+    return compiled.exports.createCanonicalCurrentRecovery(f.deps).inspectCompleteRawCapture;
+}
+async function completeRawMaterial(f){
+    const total=inventoryOrder(f).length;let ordinal=0,sequence=1;
+    while(ordinal<total){
+        const result=await f.recovery.captureRawInventory(f.request(),rawArgs(sequence++,ordinal,Math.min(16,total-ordinal)));
+        ordinal=result.nextOrdinal;
+    }
+    const rows=name=>[...f.h.data].filter(([path])=>path.startsWith(f.root+'/'+name+'/'))
+        .map(([path,row])=>({id:path.split('/').at(-1),row:copy(row)}));
+    const inventoryState=copy(f.h.data.get(f.root+'/captureState/current'));
+    return {binding:{ownerUid:f.h.uid,auditId,epoch:1,sourceRevision:f.h.revision,inventoryStateSha256:inventoryState.stateSha256},
+        run:copy(f.h.data.get(f.root)),inventoryState,inventoryPages:rows('inventoryPages'),
+        rawState:copy(f.h.data.get(f.root+'/proofState/current')),rawReceipts:rows('patrolProofPages'),rawChunks:rows('proofPayloadChunks')};
+}
+function resealRawState(state){const {stateSha256,createdAt,updatedAt,...value}=state;state.stateSha256=snapshotDigest(value);}
+function replaceLastRawPayload(material,mutate){
+    const receipt=material.rawReceipts.find(entry=>entry.id===material.rawState.lastOperationId).row;
+    const rows=material.rawChunks.filter(entry=>entry.row.operationId===receipt.operationId).sort((a,b)=>a.row.chunkIndex-b.row.chunkIndex);
+    const payload=copy(decodeProofPayload(Buffer.concat(rows.map(entry=>entry.row.payloadBytes))));mutate(payload);
+    const bytes=encodeProofPayload(payload),chunks=[];
+    for(let offset=0;offset<bytes.length;offset+=PATROL_PROOF_LIMITS.chunkBytes)chunks.push(bytes.subarray(offset,offset+PATROL_PROOF_LIMITS.chunkBytes));
+    const hash=bytes=>require('node:crypto').createHash('sha256').update(bytes).digest('hex');
+    material.rawChunks=material.rawChunks.filter(entry=>entry.row.operationId!==receipt.operationId);
+    chunks.forEach((payloadBytes,chunkIndex)=>material.rawChunks.push({id:receipt.operationId+'_'+String(chunkIndex).padStart(2,'0'),
+        row:{...rows[0].row,chunkIndex,payloadBytes,sha256:hash(payloadBytes)}}));
+    receipt.payloadByteLength=bytes.length;receipt.payloadSha256=hash(bytes);receipt.chunkSha256s=chunks.map(hash);
+    material.rawState.lastPayloadSha256=receipt.payloadSha256;material.rawState.lastReceiptSha256=stableRawReceipt(receipt);resealRawState(material.rawState);
+}
+
+test('private full raw chain closes actual twenty-battle Lv10 slot2 active and current-loss bytes without semantic authority or SDK access',async()=>{
+    for(const currentLoss of [false,true]){
+        const f=await fixture({three:false,adStatus:'abandoned',currentLoss}),material=await completeRawMaterial(f),inspect=privateRawInspector(f);
+        const before=copy([...f.h.data]),writes=f.h.writes,traces=f.traces.length,input=copy(material);
+        const result=inspect(material),order=inventoryOrder(f);
+        assert.deepEqual(result.documents.map(row=>row.path),order.map(row=>row.path));
+        for(const row of result.documents){
+            assert.deepEqual(row.updateTime,order.find(entry=>entry.path===row.path).updateTime);
+            assert.deepEqual(encodeProofPayload(row.data),encodeProofPayload(f.h.data.get(row.path)));
+        }
+        for(const flag of ['authoritativeStateReady','candidateProofValid','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
+        assert(Object.isFrozen(result));assert(Object.isFrozen(result.documents));assert(Object.isFrozen(result.documents[0].data));
+        assert.equal(result.namespaces.length,31);assert(result.namespaces.every(row=>row.terminalEmpty&&Object.isFrozen(row.ids)));
+        assert.equal(result.documents.some(row=>row.path===f.h.root+'/account/current'),!currentLoss);
+        assert.deepEqual(inspect({...material,inventoryPages:material.inventoryPages.slice().reverse(),
+            rawReceipts:material.rawReceipts.slice().reverse(),rawChunks:material.rawChunks.slice().reverse()}),result,
+            'collection enumeration order is not a receipt sequence or chunk-order proof');
+        assert.deepEqual(material,input);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);assert.equal(f.traces.length,traces);
+    }
+});
+
+test('private full raw chain rejects every missing, orphan, duplicate, binding, range and self-consistent byte/version substitution without writes',async()=>{
+    const f=await fixture({battles:1,three:false,beforeAudit:h=>h.data.set(h.root+'/recoveryAudits/unknown-retained-raw',
+        {kind:'not-a-supported-right',ownerUid:h.uid})}),base=await completeRawMaterial(f),inspect=privateRawInspector(f);
+    assert(inspect(base).documents.some(row=>row.path.endsWith('/unknown-retained-raw')),
+        'structural capture deliberately preserves unknown raw records; no semantic candidate success is claimed');
+    const mutations=[
+        m=>{m.binding.ownerUid='foreign-uid';},m=>{m.binding.auditId='foreign-audit-operation';},
+        m=>{m.binding.epoch++;},m=>{m.binding.sourceRevision++;},m=>{m.binding.inventoryStateSha256='f'.repeat(64);},
+        m=>{m.inventoryPages.pop();},m=>{m.inventoryPages.push(copy(m.inventoryPages[0]));},
+        m=>{m.inventoryPages[0].id='wrong-inventory-page-id';},
+        m=>{m.inventoryPages[0].row.payloadBytes[0]^=1;},
+        m=>{m.rawState.schemaVersion=2;},m=>{m.rawState.rawNextOffset--;resealRawState(m.rawState);},
+        m=>{m.rawState.nextSequence++;resealRawState(m.rawState);},
+        m=>{m.rawState.lastReceiptSha256='f'.repeat(64);resealRawState(m.rawState);},
+        m=>{m.rawState.lastOperationId='wrong-last-operation-0001';resealRawState(m.rawState);},
+        m=>{m.rawState.lastPayloadSha256='f'.repeat(64);resealRawState(m.rawState);},
+        m=>{m.rawState.lastStartOrdinal--;resealRawState(m.rawState);},
+        m=>{m.rawState.lastCount=1;resealRawState(m.rawState);},
+        m=>{m.rawReceipts.shift();},m=>{m.rawReceipts.push(copy(m.rawReceipts[0]));},
+        m=>{m.rawReceipts[0].id='wrong-raw-receipt-id';},
+        m=>{m.rawReceipts[1].row.sequence=1;},m=>{m.rawReceipts[1].row.previousReceiptSha256='f'.repeat(64);},
+        m=>{m.rawReceipts[1].row.startOrdinal--;},m=>{m.rawReceipts[0].row.epoch++;},
+        m=>{m.rawReceipts[0].row.inventoryStateSha256='f'.repeat(64);},
+        m=>{m.rawChunks.shift();},m=>{m.rawChunks.push(copy(m.rawChunks[0]));},
+        m=>{m.rawChunks[0].id+='extra';},
+        m=>{const extra=copy(m.rawChunks[0]);extra.id='orphan-chunk-operation-01_00';m.rawChunks.push(extra);},
+        m=>{m.rawChunks[0].row.ownerUid='foreign';},m=>{m.rawChunks[0].row.epoch++;},
+        m=>{m.rawChunks[0].row.operationId='foreign-chunk-operation-01';},
+        m=>{m.rawChunks[0].row.sequence++;},m=>{m.rawChunks[0].row.chunkIndex++;},
+        m=>{m.rawChunks[0].row.payloadBytes[0]^=1;},
+        m=>replaceLastRawPayload(m,p=>{p.documents[0].updateTime.nanoseconds++;}),
+        m=>replaceLastRawPayload(m,p=>{p.documents[0].data.forensicByteChange=true;}),
+        m=>replaceLastRawPayload(m,p=>{p.documents[0].path=p.documents.at(-1).path;}),
+        m=>replaceLastRawPayload(m,p=>{p.documents[0].exists=false;}),
+        m=>replaceLastRawPayload(m,p=>{p.documents.pop();})
+    ];
+    const before=copy([...f.h.data]),writes=f.h.writes,traces=f.traces.length;
+    for(const mutate of mutations){const damaged=copy(base);mutate(damaged);assert.throws(()=>inspect(damaged));
+        assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);assert.equal(f.traces.length,traces);}
+    // A current head and exhausted cursor cannot certify an older missing
+    // payload, even though the normal last-op retry remains locally valid.
+    const damaged=copy(base);damaged.rawChunks=damaged.rawChunks.filter(entry=>entry.row.operationId!==base.rawReceipts[0].id);
+    assert.throws(()=>inspect(damaged));assert.deepEqual(inspect(base),inspect(copy(base)));
+});
 
 test('schema3 raw uses the same lifecycle and captures every fixed-order present byte, including active and unsupported raw data, without proof authority',async()=>{
     const f=await fixture({battles:1,three:false,beforeAudit:h=>{

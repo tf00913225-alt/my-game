@@ -407,10 +407,14 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         admitProofInventory(state,namespaces);
         const rows=await tx.get(runRef.collection(RECOVERY_INVENTORY_PAGE_COLLECTION).limit(318));
         if(rows.size>=318||rows.size!==state.nextSequence-1)fail("data-loss","Forest inventory page inventory differs.");
-        const pages=rows.docs.map(doc=>{
-            if(doc.id!==doc.get("operationId"))fail("data-loss","Forest inventory page ID differs.");
-            const row=doc.data(),payload=decodeInventoryPayload(row.payloadBytes);
-            inspectInventoryPage(row,{auditId:run.auditId,expectedEpoch:run.epoch,operationId:doc.id,expectedSequence:payload.sequence},run,state,namespaces);
+        return inspectInventoryPages(rows.docs.map(doc=>({id:doc.id,row:doc.data()})),run,state,namespaces);
+    }
+    function inspectInventoryPages(rows,run,state,namespaces){
+        if(rows.length>=318||rows.length!==state.nextSequence-1)fail("data-loss","Forest inventory page inventory differs.");
+        const pages=rows.map(({id,row})=>{
+            if(id!==row?.operationId)fail("data-loss","Forest inventory page ID differs.");
+            const payload=decodeInventoryPayload(row.payloadBytes);
+            inspectInventoryPage(row,{auditId:run.auditId,expectedEpoch:run.epoch,operationId:id,expectedSequence:payload.sequence},run,state,namespaces);
             return {row,payload};
         }).sort((a,b)=>a.payload.sequence-b.payload.sequence);
         const index=new Map();let namespaceIndex=0,cursor=null,previous=null,sequence=1;
@@ -586,6 +590,84 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         return {schemaVersion:3,kind:proofKind(3,"payload"),ownerUid:run.ownerUid,auditId:run.auditId,epoch:run.epoch,
             operationId:args.operationId,sequence:args.expectedSequence,intentSha256:binding.intentSha256,...rawRange(args,run,inventory,binding.previousReceiptSha256),documents};
     }
+    function inspectCapsuleChunk(row,number,receipt,run,version,component,sourceId){
+        const raw=version===3;
+        inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","chunkIndex","payloadBytes","sha256",...(raw?["sourceRevision","inventoryStateSha256","sequence","intentSha256","startOrdinal","count","endOrdinal","previousReceiptSha256"]:version===1?[]:["component","sourceId"])],"Forest proof chunk");
+        if(row.schemaVersion!==version||row.kind!==proofKind(version,"chunk")||
+           (version===2&&(row.component!==component||row.sourceId!==sourceId))||
+           (raw&&["sourceRevision","inventoryStateSha256","sequence","intentSha256","startOrdinal","count","endOrdinal","previousReceiptSha256"].some(key=>row[key]!==receipt[key]))||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||
+           row.epoch!==run.epoch||row.operationId!==receipt.operationId||row.chunkIndex!==number||!Buffer.isBuffer(row.payloadBytes)||
+           row.payloadBytes.length!==(number===receipt.chunkSha256s.length-1?receipt.payloadByteLength-number*PATROL_PROOF_LIMITS.chunkBytes:PATROL_PROOF_LIMITS.chunkBytes)||
+           row.sha256!==receipt.chunkSha256s[number]||inventoryHash(row.payloadBytes)!==row.sha256)fail("data-loss","Forest proof chunk differs.");
+        return row.payloadBytes;
+    }
+    // Structural review of already-materialized schema3 bytes only. No SDK
+    // reads, semantic Owner dispatch, candidate approval or restore capability.
+    // Decode one bounded capsule at a time; do not concatenate the full capture.
+    function inspectCompleteRawCapture(input){
+        inventoryExact(input,["binding","run","inventoryState","inventoryPages","rawState","rawReceipts","rawChunks"],"complete raw capture");
+        const {binding}=input;
+        inventoryExact(binding,["ownerUid","auditId","epoch","sourceRevision","inventoryStateSha256"],"raw capture binding");
+        if(typeof binding.ownerUid!=="string"||!binding.ownerUid||binding.ownerUid.includes("/")||
+           !OPERATION_ID.test(binding.auditId||"")||!Number.isSafeInteger(binding.epoch)||binding.epoch<1||
+           !Number.isSafeInteger(binding.sourceRevision)||binding.sourceRevision<2||!HEX.test(binding.inventoryStateSha256||""))
+            fail("data-loss","Complete raw capture binding differs.");
+        const run=inspectAuditRun(input.run,binding.ownerUid,binding.auditId),namespaces=recoveryAuditNamespaces(binding.ownerUid,2);
+        if(run.epoch!==binding.epoch||run.sourceRevision!==binding.sourceRevision)fail("data-loss","Complete raw capture run differs.");
+        const inventory=inspectInventoryState(input.inventoryState,run,namespaces);
+        admitProofInventory(inventory,namespaces);
+        if(inventory.stateSha256!==binding.inventoryStateSha256)fail("data-loss","Complete raw capture inventory binding differs.");
+        const {inventoryPages,rawReceipts,rawChunks}=input;
+        if(!Array.isArray(inventoryPages)||inventoryPages.length>317||!Array.isArray(rawReceipts)||
+           rawReceipts.length<1||rawReceipts.length>inventory.capturedCount||!Array.isArray(rawChunks)||
+           rawChunks.length>rawReceipts.length*PATROL_PROOF_LIMITS.chunks)
+            fail("data-loss","Complete raw capture collection bounds differ.");
+        for(const entry of inventoryPages)inventoryExact(entry,["id","row"],"raw inventory page entry");
+        const index=inspectInventoryPages(inventoryPages,run,inventory,namespaces);
+        const state=inspectProofState(input.rawState,run,inventory);
+        if(state.schemaVersion!==3||rawReceipts.length!==state.nextSequence-1)fail("data-loss","Complete raw capture state differs.");
+        const chunks=new Map(),receipts=new Map();
+        for(const entry of rawChunks){
+            inventoryExact(entry,["id","row"],"raw chunk entry");
+            if(typeof entry.id!=="string"||chunks.has(entry.id))fail("data-loss","Complete raw capture has duplicate chunk IDs.");
+            chunks.set(entry.id,entry.row);
+        }
+        for(const entry of rawReceipts){
+            inventoryExact(entry,["id","row"],"raw receipt entry");
+            const row=inspectRawReceipt(entry.row,run,inventory);
+            if(entry.id!==row.operationId||receipts.has(entry.id))fail("data-loss","Complete raw capture receipt IDs differ.");
+            receipts.set(entry.id,row);
+        }
+        const ordered=[...receipts.values()].sort((a,b)=>a.sequence-b.sequence),documents=[],paths=new Set();
+        let sequence=1,offset=0,previous=null,last;
+        for(const receipt of ordered){
+            if(receipt.sequence!==sequence++||receipt.startOrdinal!==offset||receipt.previousReceiptSha256!==previous)
+                fail("data-loss","Complete raw capture receipt chain differs.");
+            const parts=[];
+            for(let number=0;number<receipt.chunkSha256s.length;number++){
+                const id=receipt.operationId+"_"+String(number).padStart(2,"0"),row=chunks.get(id);
+                parts.push(inspectCapsuleChunk(row,number,receipt,run,3));chunks.delete(id);
+            }
+            const bytes=Buffer.concat(parts);
+            if(bytes.length!==receipt.payloadByteLength||inventoryHash(bytes)!==receipt.payloadSha256)
+                fail("data-loss","Forest proof complete payload differs.");
+            const payload=decodeProofPayload(bytes);
+            checkRawCapsule(payload,run,inventory,index,namespaces,3,undefined,undefined,receipt);
+            for(const row of payload.documents){
+                if(paths.has(row.path))fail("data-loss","Complete raw capture has duplicate documents.");
+                paths.add(row.path);documents.push(row);
+            }
+            offset=receipt.endOrdinal;previous=rawReceiptHash(receipt);last=receipt;
+        }
+        if(chunks.size||offset!==inventory.capturedCount||paths.size!==index.size||
+           state.rawNextOffset!==offset||state.lastOperationId!==last.operationId||state.lastPayloadSha256!==last.payloadSha256||
+           state.lastReceiptSha256!==previous||state.lastStartOrdinal!==last.startOrdinal||state.lastCount!==last.count)
+            fail("data-loss","Complete raw capture terminal or retained inventory differs.");
+        return Object.freeze({...inventoryFlags,documents:Object.freeze(documents),
+            namespaces:Object.freeze(namespaces.map(path=>Object.freeze({path,terminalEmpty:true,
+                ids:Object.freeze([...index.keys()].filter(key=>key.slice(0,key.lastIndexOf("/"))===path)
+                    .map(key=>key.slice(key.lastIndexOf("/")+1)))})))});
+    }
     async function captureRawInventory(request,args){
         auditIntent("capture raw inventory",args,["auditId","expectedEpoch","operationId","expectedSequence","startOrdinal","count"]);
         if(!Number.isSafeInteger(args.expectedSequence)||args.expectedSequence<1||!Number.isSafeInteger(args.startOrdinal)||args.startOrdinal<0||
@@ -682,13 +764,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 const chunks=[];
                 for(let number=0;number<receipt.chunkSha256s.length;number++){
                     const snap=await tx.get(runRef.collection("proofPayloadChunks").doc(args.operationId+"_"+String(number).padStart(2,"0"))),row=snap.data();
-                    inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","chunkIndex","payloadBytes","sha256",...(raw?["sourceRevision","inventoryStateSha256","sequence","intentSha256","startOrdinal","count","endOrdinal","previousReceiptSha256"]:version===1?[]:["component","sourceId"])],"Forest proof chunk");
-                    if(row.schemaVersion!==version||row.kind!==proofKind(version,"chunk")||
-                       (version===2&&(row.component!==args.component||row.sourceId!==args.sourceId))||
-                       (raw&&["sourceRevision","inventoryStateSha256","sequence","intentSha256","startOrdinal","count","endOrdinal","previousReceiptSha256"].some(key=>row[key]!==receipt[key]))||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||
-                       row.epoch!==run.epoch||row.operationId!==args.operationId||row.chunkIndex!==number||!Buffer.isBuffer(row.payloadBytes)||
-                       row.payloadBytes.length!==(number===receipt.chunkSha256s.length-1?receipt.payloadByteLength-number*PATROL_PROOF_LIMITS.chunkBytes:PATROL_PROOF_LIMITS.chunkBytes)||
-                       row.sha256!==receipt.chunkSha256s[number]||inventoryHash(row.payloadBytes)!==row.sha256)fail("data-loss","Forest proof chunk differs.");
+                    inspectCapsuleChunk(row,number,receipt,run,version,args.component,args.sourceId);
                     chunks.push(row.payloadBytes);
                 }
                 const bytes=Buffer.concat(chunks);if(inventoryHash(bytes)!==receipt.payloadSha256)fail("data-loss","Forest proof complete payload differs.");
