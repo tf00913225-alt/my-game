@@ -4,7 +4,7 @@ const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,claimReco
     require("./canonical-snapshot");
 const {createRecoveryArchive,inspectRecoveryArchive}=require("./canonical-recovery-archive");
 const {verifyCreditedGrant}=require("./credited-grant-evidence");
-const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
+const {source,readOwnedSources,readCharacterSources,advanceOwnedRecords,advanceOwnedSources}=
     require("./canonical-owned-sources");
 const {taipeiDay,REWARD_GOLD}=require("./daily-checkin-policy");
 const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
@@ -120,21 +120,19 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
             if(!Number.isSafeInteger(previous)||previous<1||previous>expectedRevision||
                !Array.isArray(account.slots)||account.slots.length!==3||
                typeof account.slots[0]!=="string"||
-               account.slots[1]!==null||account.slots[2]!==null||
                !/^[a-f0-9]{64}$/.test(account.snapshotSha256||"")){
-                fail("failed-precondition","First-character source is not eligible.");
+                fail("failed-precondition","Canonical character source is not eligible.");
             }
-            const characterRef=root.collection("characters").doc(account.slots[0]);
             const previousSnapshotRef=root.collection("playableSnapshots").doc(String(previous));
-            const [characterSnap,previousSnapshotSnap,previousArchiveSnap]=await Promise.all([
-                tx.get(characterRef),tx.get(previousSnapshotRef),
+            const [characters,previousSnapshotSnap,previousArchiveSnap]=await Promise.all([
+                readCharacterSources(tx,root,account,fail),tx.get(previousSnapshotRef),
                 tx.get(root.collection("recoveryArchives").doc(String(previous)))]);
-            if(!characterSnap.exists||!previousSnapshotSnap.exists||
+            if(!previousSnapshotSnap.exists||
                previousSnapshotSnap.get("sha256")!==account.snapshotSha256){
                 fail("data-loss","Previous canonical source snapshot is missing.");
             }
             const owned=await readOwnedSources(tx,root,fail);
-            const records={account:source(account),characters:[source(characterSnap.data())],
+            const records={account:source(account),characters:characters.records,
                 economy:source(economy),...owned.records,
                 relicLoadout:source(loadoutSnap.data()),progress:source(progressSnap.data()),
                 claimCheckpoint:source(checkpointSnap.data())};
@@ -173,7 +171,9 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                 tx.create(eventProof.ref,{...eventProof.event,sha256:eventProof.sha256,createdAt:stamp});
             }
             tx.update(accountRef,{serverRevision:revision,snapshotSha256:bundle.sha256,updatedAt:stamp});
-            tx.update(characterRef,{serverRevision:revision,updatedAt:stamp});
+            for(const characterRef of characters.refs){
+                tx.update(characterRef,{serverRevision:revision,updatedAt:stamp});
+            }
             tx.update(economyRef,{serverRevision:revision,
                 [balanceKey]:nextRecords.economy[balanceKey],updatedAt:stamp});
             for(const ref of [loadoutRef,progressRef]){

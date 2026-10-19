@@ -14,6 +14,31 @@ const source=data=>{
     return record;
 };
 
+// Read only the existing account's bounded references, in slot order. The
+// canonical snapshot Owner remains responsible for complete account/character
+// schema, revision and playable-state validation; this helper admits no slots.
+async function readCharacterSources(tx,root,account,fail){
+    const uid=root.id||root.path?.split("/").at(-1),slots=account?.slots;
+    if(typeof uid!=="string"||!uid||account?.ownerUid!==uid||
+       !Array.isArray(slots)||slots.length!==3||typeof slots[0]!=="string"||
+       slots.some(id=>id!==null&&(typeof id!=="string"||!id||id.includes("/")))||
+       new Set(slots.filter(id=>id!==null)).size!==slots.filter(id=>id!==null).length){
+        fail("data-loss","Canonical character references are inconsistent.");
+    }
+    const positions=slots.flatMap((id,index)=>id===null?[]:[{id,index}]);
+    const refs=positions.map(({id})=>root.collection("characters").doc(id));
+    const snapshots=await Promise.all(refs.map(ref=>tx.get(ref)));
+    const records=snapshots.map((snapshot,index)=>{
+        const data=snapshot.data(),position=positions[index];
+        if(!snapshot.exists||snapshot.id!==position.id||data?.characterId!==position.id||
+           data.ownerUid!==uid||data.slotIndex!==position.index){
+            fail("data-loss","Canonical character source identity is inconsistent.");
+        }
+        return source(data);
+    });
+    return {records,refs};
+}
+
 async function readOwnedSources(tx,root,fail){
     const snapshots=await Promise.all([
         ...SOURCE_COLLECTIONS.map(([name])=>tx.get(root.collection(name))),
@@ -92,4 +117,4 @@ function advanceOwnedSources(tx,refs,revision,stamp){
     }
 }
 
-module.exports={source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources};
+module.exports={source,readCharacterSources,readOwnedSources,advanceOwnedRecords,advanceOwnedSources};
