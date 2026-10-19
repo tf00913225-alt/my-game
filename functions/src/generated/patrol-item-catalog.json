@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "policyId": "patrol-item-definitions-v1",
+  "scope": "patrol-item-definition-data-only",
+  "sourceDigests": {
+    "js/27-v132-content-expansion.js": "01540a29fb989ff073ab27c428c3532f77e4aa02502e036b9682efe829f5a4ab",
+    "functions/src/patrol-drop-policy.js": "89740fedd35053ade07ae2ed2c5c5860c6b1a605ba323dc03bacfcfd64eebfd6"
+  },
+  "items": {
+    "freezeTalismanLow": {
+      "id": "freezeTalismanLow",
+      "name": "白階冰封符",
+      "icon": "<span class=\"v169-item-art v169-talisman-art v169-rarity-white\"><img src=\"assets/items/talismans/freeze-icon.png\" alt=\"\" aria-hidden=\"true\" draggable=\"false\" decoding=\"async\" onerror=\"this.hidden=true\"></span>",
+      "type": "talisman",
+      "talismanEffect": "freeze",
+      "talismanDuration": 4,
+      "tierChance": 35,
+      "tierKey": "white",
+      "legacyTierKey": "low",
+      "price": 0,
+      "stats": {}
+    },
+    "stealthTalismanLow": {
+      "id": "stealthTalismanLow",
+      "name": "白階隱身符",
+      "icon": "<span class=\"v169-item-art v169-talisman-art v169-rarity-white\"><img src=\"assets/items/talismans/stealth-icon.png\" alt=\"\" aria-hidden=\"true\" draggable=\"false\" decoding=\"async\" onerror=\"this.hidden=true\"></span>",
+      "type": "talisman",
+      "talismanEffect": "stealth",
+      "talismanDuration": 2,
+      "tierChance": 35,
+      "tierKey": "white",
+      "legacyTierKey": "low",
+      "price": 0,
+      "stats": {}
+    },
+    "barrierTalismanLow": {
+      "id": "barrierTalismanLow",
+      "name": "白階結界符",
+      "icon": "<span class=\"v169-item-art v169-talisman-art v169-rarity-white\"><img src=\"assets/items/talismans/barrier-icon.png\" alt=\"\" aria-hidden=\"true\" draggable=\"false\" decoding=\"async\" onerror=\"this.hidden=true\"></span>",
+      "type": "talisman",
+      "talismanEffect": "barrier",
+      "talismanDuration": 4,
+      "tierChance": 35,
+      "tierKey": "white",
+      "legacyTierKey": "low",
+      "price": 0,
+      "stats": {}
+    },
+    "oreLow": {
+      "id": "oreLow",
+      "name": "白階礦石",
+      "icon": "<span class=\"v169-item-art v169-material-art v169-rarity-white\"><img src=\"assets/items/materials/ore.png\" alt=\"\" aria-hidden=\"true\" draggable=\"false\" decoding=\"async\" onerror=\"this.hidden=true\"></span>",
+      "type": "material",
+      "tierKey": "white",
+      "legacyTierKey": "low",
+      "available": true,
+      "planned": false,
+      "price": 0,
+      "stats": {}
+    },
+    "ticketSetFire": {
+      "type": "ticket",
+      "price": 0,
+      "stats": {},
+      "id": "ticketSetFire",
+      "name": "赤炎裝備抽獎券",
+      "setId": "setFire",
+      "icon": "<span class=\"v169-item-art v169-ticket-art\"><img src=\"assets/items/tickets/fire-icon.png\" alt=\"\" aria-hidden=\"true\" draggable=\"false\" decoding=\"async\" onerror=\"this.hidden=true\"></span>"
+    },
+    "ticketSetWater": {
+      "type": "ticket",
+      "price": 0,
+      "stats": {},
+      "id": "ticketSetWater",
+      "name": "寒泉裝備抽獎券",
+      "setId": "setWater",
+      "icon": "<span class=\"v169-item-art v169-ticket-art\"><img src=\"assets/items/tickets/water-icon.png\" alt=\"\" aria-hidden=\"true\" draggable=\"false\" decoding=\"async\" onerror=\"this.hidden=true\"></span>"
+    },
+    "ticketSetEarth": {
+      "type": "ticket",
+      "price": 0,
+      "stats": {},
+      "id": "ticketSetEarth",
+      "name": "岩岳裝備抽獎券",
+      "setId": "setEarth",
+      "icon": "<span class=\"v169-item-art v169-ticket-art\"><img src=\"assets/items/tickets/earth-icon.png\" alt=\"\" aria-hidden=\"true\" draggable=\"false\" decoding=\"async\" onerror=\"this.hidden=true\"></span>"
+    },
+    "ticketSetWind": {
+      "type": "ticket",
+      "price": 0,
+      "stats": {},
+      "id": "ticketSetWind",
+      "name": "青嵐裝備抽獎券",
+      "setId": "setWind",
+      "icon": "<span class=\"v169-item-art v169-ticket-art\"><img src=\"assets/items/tickets/wind-icon.png\" alt=\"\" aria-hidden=\"true\" draggable=\"false\" decoding=\"async\" onerror=\"this.hidden=true\"></span>"
+    },
+    "freezeTalismanMid": {
+      "id": "freezeTalismanMid",
+      "name": "藍階冰封符",
+      "icon": "<span class=\"v169-item-art v169-talisman-art v169-rarity-blue\"><img src=\"assets/items/talismans/freeze-icon.png\" alt=\"\" aria-hidden=\"true\" draggable=\"false\" decoding=\"async\" onerror=\"this.hidden=true\"></span>",
+      "type": "talisman",
+      "talismanEffect": "freeze",
+      "talismanDuration": 4,
+      "tierChance": 55,
+      "tierKey": "blue",
+      "legacyTierKey": "mid",
+      "price": 0,
+      "stats": {}
+    },
+    "stealthTalismanMid": {
+      "id": "stealthTalismanMid",
+      "name": "藍階隱身符",
+      "icon": "<span class=\"v169-item-art v169-talisman-art v169-rarity-blue\"><img src=\"assets/items/talismans/stealth-icon.png\" alt=\"\" aria-hidden=\"true\" draggable=\"false\" decoding=\"async\" onerror=\"this.hidden=true\"></span>",
+      "type": "talisman",
+      "talismanEffect": "stealth",
+      "talismanDuration": 2,
+      "tierChance": 55,
+      "tierKey": "blue",
+      "legacyTierKey": "mid",
+      "price": 0,
+      "stats": {}
+    },
+    "barrierTalismanMid": {
+      "id": "barrierTalismanMid",
+      "name": "藍階結界符",
+      "icon": "<span class=\"v169-item-art v169-talisman-art v169-rarity-blue\"><img src=\"assets/items/talismans/barrier-icon.png\" alt=\"\" aria-hidden=\"true\" draggable=\"false\" decoding=\"async\" onerror=\"this.hidden=true\"></span>",
+      "type": "talisman",
+      "talismanEffect": "barrier",
+      "talismanDuration": 4,
+      "tierChance": 55,
+      "tierKey": "blue",
+      "legacyTierKey": "mid",
+      "price": 0,
+      "stats": {}
+    }
+  },
+  "outcomeVerified": false,
+  "rewardEligible": false,
+  "sha256": "4b22f5cdb76271e0b7bd8cca04d9f148a250ad1dc41b2ad24475d33173cb740a"
+}
