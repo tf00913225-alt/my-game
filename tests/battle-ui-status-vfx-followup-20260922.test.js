@@ -22,7 +22,7 @@ test("persistent body status owner keeps hard-control base fixed under the two-s
   assert.match(js,/type===activeRotatingBodyType/);
   assert.match(js,/syncStatusVisualEffects\(true\)/);
   assert.doesNotMatch(js,/Math\.floor\(Date\.now\(\)\/STATUS_ROTATION_MS\)/);
-  assert.match(js,/stun:statusVisual\("assets\/vfx\/status\/stun\.webp","pulse"/);
+  assert.match(js,/stun:statusVisual\("assets\/vfx\/status\/stun-stars-v2\.webp","pulse"/);
   assert.match(css,/--v143-status-layer-hard-control-base:4/);
   assert.match(css,/--v143-status-layer-rotating:5/);
   assert.match(css,/--v143-status-layer-hud:34/);
@@ -98,7 +98,7 @@ test("new skill icons and 4x3 cast sheets use dedicated WebP runtime assets",()=
     "assets/vfx/fire/fire-soul-resonance-cast-v2.webp",
     "assets/vfx/fire/blood-burn-art-cast.webp",
     "assets/vfx/water/purify-mind-cast.webp",
-    "assets/vfx/status/stun.webp"
+    "assets/vfx/status/stun-stars-v2.webp"
   ];
   assert.match(main,/fireSoulResonance:"assets\/skills\/fire-soul-resonance\.webp"/);
   assert.match(main,/bloodBurnArt:"assets\/skills\/fire-blood-burn\.webp"/);

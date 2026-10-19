@@ -51,14 +51,14 @@ test("an edge tri anchor retains its center and footprint while fitting proporti
     fit(small,{targetSide:"player"},bounds,center);
     assert.equal(small.style.width,"40px");assert.equal(small.style.height,"20px");
 });
-test("low group art uses the visible side with minimal translation instead of shrinking to one slot",()=>{
+test("low group art cannot expand and relocate below its canonical target center",()=>{
     const safe=rect(0,0,360,300),center={x:180,y:240},bounds=rect(0,180,360,120);
     const node={style:{width:"360px",height:"360px"},dataset:{targetIndexes:"0,1,2"}};
     const semantic=JSON.stringify(bounds);
-    fitRuntime(safe,safe)(node,{targetSide:"monster"},bounds,center,true);
-    assert.equal(parseFloat(node.style.width),300);
-    assert.equal(parseFloat(node.style.height),300);
-    assert.equal(center.x,180);assert.equal(center.y,150);
+    fitRuntime(safe,safe)(node,{targetSide:"monster"},bounds,center);
+    assert.equal(parseFloat(node.style.width),120);
+    assert.equal(parseFloat(node.style.height),120);
+    assert.equal(center.x,180);assert.equal(center.y,240);
     assertInside(node,center,safe);
     assert.equal(node.dataset.targetIndexes,"0,1,2");assert.equal(JSON.stringify(bounds),semantic);
 });

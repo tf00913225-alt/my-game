@@ -32,7 +32,7 @@ const CASTS={
 const STATUSES={
     agilityDown:{file:"agility-down-loop.png",runtimeFile:"gravity-icon.webp",mode:"icon",collection:"statusEffects",hash:"fb1b42d3c0c87ab4e93b4fd495657852268cb15e9234bfefdeb2edf0546e7d7a"},
     damageDown:{file:"damage-down-loop.png",runtimeFile:"damage-down-icon.webp",mode:"icon",collection:"statusEffects",hash:"25e984ef5973616bc6f37cfc5842d445ff484f981a98902894febca59a92ae34"},
-    stun:{file:"stun-loop.png",runtimeFile:"stun.webp",mode:"pulse",collection:"statusEffects",hash:"45903df26e32ddc265d45217639211bb9966fb69b3a02389f07afa0500d53071"},
+    stun:{file:"stun-loop.png",runtimeFile:"stun-stars-v2.webp",mode:"pulse",collection:"statusEffects",hash:"45903df26e32ddc265d45217639211bb9966fb69b3a02389f07afa0500d53071"},
     dodgeSkill:{file:"dodge-skill-loop.png",runtimeFile:"windwalk.webp",mode:"pulse",collection:"activeBuffs",hash:"397338dc6fc01967de860e285c1f65febe5248f0a111c01f789dfb676c141c5b"},
     stealthSkill:{file:"stealth-skill-loop.png",runtimeFile:"stealth.webp",mode:"none",collection:"activeBuffs",hash:"58523f3066068e2d7a784c309fe072c3cbb92361a0d703ed8b4d9b1da4a0a02b"},
     dinghaishenzhen:{file:"dinghaishenzhen-loop.png",runtimeFile:"calm-mind.webp",mode:"pulse",collection:"activeBuffs",hash:"3607d280f4ff4092d80b8ead216e410425815a4996b22437af556bf28673f31b"}
@@ -302,6 +302,13 @@ test("the supplied wind PNG files remain byte-identical and keep their actual so
     });
 });
 
+test("stun head presentation uses the independently reviewed lossless stars candidate",()=>{
+    const file=fs.readFileSync("assets/vfx/status/"+STATUSES.stun.runtimeFile);
+    assert.equal(file.subarray(0,4).toString("ascii"),"RIFF");
+    assert.equal(file.subarray(8,12).toString("ascii"),"WEBP");
+    assert.equal(crypto.createHash("sha256").update(file).digest("hex"),"047e37bef6c86ad891662ffe2c93f33c7a30741779c159e9554476f4e23ea57b");
+});
+
 test("all eleven casts keep Sprite timing while six persistent states use low-motion visual modes",()=>{
     const runtime=loadRuntime();
     const manifest=runtime.context.v143SkillAnimationManifest;
@@ -405,7 +412,7 @@ test("single, three-lane and battlefield casts each own one correctly positioned
     assert.equal(allSprites[0].style.top,"170px");
 });
 
-test("three-target wind sheets keep a fixed three-slot footprint centered on the selected target",()=>{
+test("three-target wind sheets keep their canonical three-slot artwork center after casualties",()=>{
     const placements=[];
     [
         [
@@ -428,7 +435,7 @@ test("three-target wind sheets keep a fixed three-slot footprint centered on the
         const sprite=stageSprites(runtime).sprites[0];
         assert.ok(sprite);
         assert.equal(sprite.dataset.placement,"group");
-        assert.equal(sprite.style.left,"458px","selected middle target remains the visual centre");
+        assert.equal(sprite.style.left,"458px","artwork remains centered on the canonical three-slot footprint");
         assert.equal(sprite.style.top,"140px");
         placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
     });

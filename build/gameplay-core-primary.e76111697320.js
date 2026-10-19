@@ -11816,6 +11816,23 @@
         yuanZuBlessing:{hit:.5,deferredStatusTypes:["yuanZuBlessing"],sprite:castSheet("assets/vfx/light/yuan-zu-blessing-cast.png?v=173.39","battlefield",{scale:1.08,minSize:280})}
     };
 
+    const STATUS_BODY_PRESENTATION=Object.freeze({
+        burn:{anchor:"feet",width:1.12,height:.66,min:.42,max:.64},
+        rage:{anchor:"body",width:1.08,height:.94,min:.38,max:.56},
+        stun:{anchor:"head",width:.9,height:.22,min:.70,max:.86},
+        freeze:{anchor:"feet",width:1.18,height:1.06,min:.68,max:.68},
+        petrify:{anchor:"feet",width:1.16,height:1.04,min:.72,max:.72},
+        dodgeSkill:{anchor:"feet",width:1.14,height:.55,min:.38,max:.58},
+        dinghaishenzhen:{anchor:"feet",width:1.12,height:.40,min:.40,max:.58},
+        shield:{anchor:"feet",width:1.12,height:.94,min:.52,max:.52},
+        earthShield:{anchor:"feet",width:1.16,height:.96,min:.56,max:.56},
+        rockWall:{anchor:"feet",width:1.18,height:.64,min:.58,max:.58},
+        barrier:{anchor:"feet",width:1.14,height:.92,min:.48,max:.48},
+        yuanZuBlessing:{anchor:"feet",width:1.10,height:.66,min:.42,max:.62},
+        fireSoulResonance:{anchor:"feet",width:1.10,height:.78,min:.40,max:.60},
+        bloodBurn:{anchor:"feet",width:1.10,height:.70,min:.42,max:.64}
+    });
+
     const RAW_STATUS_VISUALS={
         burn:statusVisual("assets/vfx/status/burn.webp","pulse","statusEffects",{label:"燃燒",statusName:"燃燒",iconSrc:"assets/vfx/status/burn.webp"}),
         rage:statusVisual("assets/vfx/status/rage-aura-v2.webp","pulse","activeBuffs",{label:"怒火",statusName:"怒火",iconSrc:"assets/vfx/status/rage-icon.webp"}),
@@ -11823,7 +11840,7 @@
         freeze:statusVisual("assets/vfx/status/freeze.webp","static","statusEffects",{label:"冰封",statusName:"冰封",iconSrc:"assets/vfx/status/freeze.webp",visualLayer:STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE}),
         agilityDown:statusVisual("","icon","statusEffects",{label:"重力",statusName:"重力",iconSrc:"assets/vfx/status/gravity-icon.webp"}),
         damageDown:statusVisual("","icon","statusEffects",{label:"殤風",statusName:"殤風",iconSrc:"assets/vfx/status/damage-down-icon.webp"}),
-        stun:statusVisual("assets/vfx/status/stun.webp","pulse","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
+        stun:statusVisual("assets/vfx/status/stun-stars-v2.webp","pulse","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
         dodgeSkill:statusVisual("assets/vfx/status/windwalk.webp","pulse","activeBuffs",{label:"風行",statusName:"風行",iconSrc:"assets/vfx/status/windwalk.webp"}),
         stealthSkill:statusVisual("","none","activeBuffs",{label:"隱身",statusName:"隱身",noBodyVisual:true,noHudIcon:true}),
         dinghaishenzhen:statusVisual("assets/vfx/status/calm-mind.webp","pulse","activeBuffs",{label:"氣定神閒",statusName:"氣定神閒",iconSrc:"assets/vfx/status/calm-mind.webp"}),
@@ -12457,7 +12474,7 @@
     const statusRotationByUnit=new Map();
     const hardControlContractViolationByUnit=new Map();
 
-    function syncStatusVisual(side,index,type,showBody){
+    function syncStatusVisual(side,index,type,showBody,presentationGeometry){
         const spec=STATUS_VISUALS[type];
         const card=cardFor(side,index);
         const entity=entityFor(side,index);
@@ -12495,20 +12512,39 @@
 
         const anchor=slotAnchor(side,index,card);
         if(!anchor){ return; }
+        placeStatusBodyVisual(node,side,index,type,card,anchor,presentationGeometry);
+    }
+
+    function placeStatusBodyVisual(node,side,index,type,card,anchor,geometry){
+        const profile=STATUS_BODY_PRESENTATION[type];
+        if(!profile){ return; }
         const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
-        const regularEnemy=side==="monster"&&!isBossIndexForVfx(index);
-        const shellStatus=type==="shield"||type==="barrier"||type==="earthShield"||type==="rockWall";
-        const widthScale=(regularEnemy?1.24:1.20)*(shellStatus?1.04:1);
-        const heightScale=(regularEnemy?1.20:1.18)*(shellStatus?1.04:1);
-        const width=regularEnemy
-            ?Math.max(72,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale))
-            :Math.max(62,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale));
-        const height=regularEnemy
-            ?Math.max(68,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale))
-            :Math.max(64,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale));
+        const paint=geometry?.artworkProjection?.rect;
+        const projected=geometry?.portraitRect;
+        const portrait=paint&&paint.width>0&&paint.height>0?paint:
+            projected&&projected.width>0&&projected.height>0?projected:anchor.rect;
+        const scaleX=geometry?.hudSurface?.scaleX||1,scaleY=geometry?.hudSurface?.scaleY||1;
+        // Character art uses a wide transparent carrier; its height limits the
+        // body frame. Normalized monster paint already has a tight source box.
+        const bodyWidth=side==="player"?Math.min(portrait.width,portrait.height):portrait.width;
+        const width=Math.min(bodyWidth*profile.width,cardRect.width*.94);
+        const height=portrait.height*profile.height;
+        const x=portrait.left+portrait.width/2;
+        const bottom=portrait.bottom===undefined?portrait.top+portrait.height:portrait.bottom;
+        let y=profile.anchor==="feet"?bottom-height/2:portrait.top+portrait.height/2;
+        if(profile.anchor==="head"){
+            y=portrait.top-height*.35;
+            const hud=geometry?.hudSafeRect;
+            if(hud&&hud.bottom<=portrait.top){ y=Math.max(y,hud.bottom+height/2+2); }
+        }
         node.dataset.slot=anchor.slot;
-        node.style.width=Math.round(width)+"px";
-        node.style.height=Math.round(height)+"px";
+        node.dataset.presentation=profile.anchor;
+        node.style.left=((x-cardRect.left)/scaleX)+"px";
+        node.style.top=((y-cardRect.top)/scaleY)+"px";
+        node.style.width=(width/scaleX)+"px";
+        node.style.height=(height/scaleY)+"px";
+        node.style.setProperty("--v143-status-opacity-min",String(profile.min));
+        node.style.setProperty("--v143-status-opacity-max",String(profile.max));
     }
 
     function activeBodyStatusTypesForLayer(entity,side,index,visualLayer){
@@ -12575,13 +12611,15 @@
         const activeRotatingBodyType=rotation&&rotatingBodyTypes.length
             ?rotatingBodyTypes[rotation.index%rotatingBodyTypes.length]
             :null;
+        const presentationGeometry=baseBodyTypes.length||rotatingBodyTypes.length
+            ?window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry?.(side,index):null;
 
         Object.keys(RAW_STATUS_VISUALS).forEach(type=>{
             const spec=RAW_STATUS_VISUALS[type];
             const showBody=spec&&spec.visualLayer===STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
                 ?baseBodyTypes.includes(type)
                 :type===activeRotatingBodyType;
-            syncStatusVisual(side,index,type,showBody);
+            syncStatusVisual(side,index,type,showBody,presentationGeometry);
         });
     }
 
@@ -12896,30 +12934,21 @@
         image.src=key;
     }
 
-    function fitRangeArt(node,current,bounds,center,allowArtRecenter){
+    function fitRangeArt(node,current,bounds,center){
         const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.()?.rect;
         const side=geometryOwner()?.getSideRect?.(current.targetSide);
         if(!overlay||!side){ return; }
         const left=Math.max(overlay.left,side.left),right=Math.min(overlay.right,side.right);
         const top=Math.max(overlay.top,side.top),bottom=Math.min(overlay.bottom,side.bottom);
         const width=parseFloat(node.style.width),height=parseFloat(node.style.height);
-        const availableWidth=allowArtRecenter?right-left:2*Math.min(center.x-left,right-center.x);
-        const availableHeight=allowArtRecenter?bottom-top:2*Math.min(center.y-top,bottom-center.y);
+        const availableWidth=2*Math.min(center.x-left,right-center.x);
+        const availableHeight=2*Math.min(center.y-top,bottom-center.y);
         if(!(width>0&&height>0&&availableWidth>0&&availableHeight>0)){
             node.dataset.artFit="unavailable";
             node.style.visibility="hidden";
             return;
         }
         const fit=Math.min(1,availableWidth/width,availableHeight/height);
-        if(allowArtRecenter){
-            // A wide authored group must use the whole visible side, not the
-            // small symmetric space below a low portrait anchor. Move only its
-            // artwork box by the minimum distance; target geometry stays fixed.
-            center.x=clamp(center.x,left+width*fit/2,right-width*fit/2);
-            center.y=clamp(center.y,top+height*fit/2,bottom-height*fit/2);
-            node.dataset.artCenterX=String(center.x);
-            node.dataset.artCenterY=String(center.y);
-        }
         node.style.width=(width*fit)+"px";
         node.style.height=(height*fit)+"px";
         node.dataset.artFit="safe";
@@ -13049,7 +13078,7 @@
             :primaryAnchor
             ?{x:primaryAnchor.x,y:primaryAnchor.y}
             :{x:bounds.centerX,y:bounds.centerY};
-        fitRangeArt(node,current,bounds,destination,placement==="group");
+        fitRangeArt(node,current,bounds,destination);
         if(primaryAnchor){ node.dataset.geometrySlot=primaryAnchor.slot; }
         const actor=placement==="trajectory"?slotAnchor(current.side,current.actorIndex,current.actorCard):null;
         if(placement==="trajectory"&&sprite.travelToTargets&&actor){

@@ -3806,7 +3806,7 @@
     background-position:0 0;
     background-repeat:no-repeat;
     image-rendering:auto;
-    opacity:.9;
+    opacity:var(--v143-status-opacity-max,.64);
     pointer-events:none;
     transform:translate(-50%,-50%);
     transform-origin:center;
@@ -3818,7 +3818,7 @@
 
 #game-stage #battlePage .v143-status-visual--static{
     animation:none;
-    opacity:.9;
+    opacity:var(--v143-status-opacity-max,.64);
 }
 
 #game-stage #battlePage .v143-status-visual--layer-hard-control-base{
@@ -3861,40 +3861,35 @@
     filter:drop-shadow(0 0 1px rgba(229,246,255,.95));
 }
 
-#game-stage #battlePage .v143-status-visual-stun{
-    top:20%;
-    transform:translate(-50%,-50%) scale(.52);
-}
-
 #game-stage #battlePage .v143-status-visual-burn{
-    filter:drop-shadow(0 0 7px rgba(255,79,23,.82));
+    filter:drop-shadow(0 0 2px rgba(255,79,23,.5));
 }
 #game-stage #battlePage .v143-status-visual-rage{
-    filter:drop-shadow(0 0 8px rgba(255,35,20,.9));
+    filter:drop-shadow(0 0 2px rgba(255,35,20,.5));
 }
 #game-stage #battlePage .v143-status-visual-freeze{
     animation:none;
-    opacity:.94;
-    filter:drop-shadow(0 0 10px rgba(178,238,255,.96));
+    opacity:var(--v143-status-opacity-max,.68);
+    filter:drop-shadow(0 0 2px rgba(178,238,255,.5));
 }
 #game-stage #battlePage .v143-status-visual-dodgeSkill,
 #game-stage #battlePage .v143-status-visual-stealthSkill,
 #game-stage #battlePage .v143-status-visual-dinghaishenzhen{
-    filter:drop-shadow(0 0 9px rgba(127,255,205,.92));
+    filter:drop-shadow(0 0 2px rgba(127,255,205,.5));
 }
 #game-stage #battlePage .v143-status-visual-shield,
 #game-stage #battlePage .v143-status-visual-earthShield,
 #game-stage #battlePage .v143-status-visual-rockWall,
 #game-stage #battlePage .v143-status-visual-barrier{
-    filter:drop-shadow(0 0 9px rgba(222,178,90,.92));
+    filter:drop-shadow(0 0 2px rgba(222,178,90,.5));
 }
 #game-stage #battlePage .v143-status-visual-petrify{
     animation:none;
-    opacity:.94;
-    filter:drop-shadow(0 0 9px rgba(222,178,90,.92));
+    opacity:var(--v143-status-opacity-max,.72);
+    filter:drop-shadow(0 0 2px rgba(222,178,90,.5));
 }
 #game-stage #battlePage .v143-status-visual-yuanZuBlessing{
-    filter:drop-shadow(0 0 10px rgba(255,232,135,.94));
+    filter:drop-shadow(0 0 2px rgba(255,232,135,.5));
 }
 
 #game-stage #battlePage .battle-monster.v152-abyss-portrait > .v143-status-visual{
@@ -3909,8 +3904,8 @@
 }
 
 @keyframes v143StatusImageBreath{
-    0%,100%{opacity:.58}
-    50%{opacity:1}
+    0%,100%{opacity:var(--v143-status-opacity-min,.42)}
+    50%{opacity:var(--v143-status-opacity-max,.64)}
 }
 
 @keyframes v143StatusIconBreath{

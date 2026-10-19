@@ -3,7 +3,7 @@
   "pullRequest": 941,
   "sourceHead": "05ada0906a6b7ade6789108bffa2901ebc9643c7",
   "scope": "44 four-element active skills, four intentional passive casts, and 21 formal status visual entries",
-  "qualityClaim": "Coverage inventory and limited source-image review only; no commercial-readiness or runtime pass is implied.",
+  "qualityClaim": "69-entry coverage inventory with separate historical technical-runtime completion and visual-art status. This is NOT commercial completion; current candidates and subsequent head remain pending new phone verification.",
   "owners": {
     "manifest": "js/39-v143-skill-animation.js",
     "finalSkillData": "js/60-v173.64-skill-progression-rebalance.js",
@@ -48,11 +48,59 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "needs-art-followup",
-      "runtimeQaState": "not-reviewed",
+      "artReviewState": "device-candidate-pending-visual-acceptance",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
       "notes": [
         "Original sheet viewed: frames 6 to 7 change from horizontal slash to a broad curved mass. Peak frames approach cell boundaries; wide flame haze obscures the sharp slash identity. Runtime downscaling alone cannot establish animation continuity or improved detail. Compare candidate in motion before accepting."
-      ]
+      ],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "6bc39b67823c3b478b7760666ee1214eb85cdb0b7b59e17c84fb7d844ef144c4"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "f9e1754b322dbcc965b7d1f6f5d3ae6e467c00be71dbef6327a89b2064334e68"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "needs-followup",
+          "notes": [
+            "Bright crescent identity is clear, but the visible slash crosses the left stage edge and the target artwork disappears completely. HUD remains legible above it; constrain source/placement without erasing the crescent."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Slash is sharp but hides target and extends left of the stage. Retest new single-fit; preserve crisp crescent.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "currentDeviceCandidate": {
+        "runtime": "assets/vfx/fire/flame-slash-cast-v2.webp",
+        "candidate": "tools/vfx-commercial-sample/assets/full/flame-slash-v3.webp",
+        "sha256": "c20fd88c563d13796b155d0fb5da920b4ca96a141e3f1347ae3ba64efd6d11f8",
+        "importEvidence": "tools/vfx-commercial-sample/runtime-import-review.json",
+        "importState": "isolated-phone-candidate-pending-device-review",
+        "independentEvidence": []
+      },
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "fireCritical",
@@ -66,9 +114,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "13c340c7db249c147aaebf8b4ac654565c8efb28324d1fa6078952754b0f84e4"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "867762dc8fa21a23e1914bd489435b16b3600c91a8cf7cf3bdeed1548f0b1095"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "sample-reviewed",
+          "notes": [
+            "Narrow red sword column stays centered on target and leaves neighboring units clear; HUD remains readable. Target is partly visible at sides. No scale blocker in this sampled frame."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "screenshot-reviewed",
+          "notes": "Narrow fiery blade clearly identifies one target, HUD remains readable and adjacent units remain clear; sequence/performance not accepted by still image.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "explosiveFlurry",
@@ -82,9 +170,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "89a4801100a11d496db00766201e4d7b59cf34da6cf063530aa3be77e50b15f7"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "a7fddb0cd9661bbe938399c384116cc0ba61c01900b77616865925e8ee75c9d4"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "sample-reviewed",
+          "notes": [
+            "Crossed slashes are readable and compact around the selected target; feet remain visible and neighbors are clear. Screenshot shows one targeted entity, so it cannot establish three-target coverage."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Slashes remain near left target and HUD readable but target largely concealed. Confirm whether tri target metadata requires group spread after correction.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "dragonSlash",
@@ -98,9 +226,59 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "device-candidate-pending-visual-acceptance",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "e44fb080dfaefd7e9390cc668fe2c30626f9f525f5d63dd895d8bdaa381d60ab"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "da963186d031ce952e05d85a0321c8618dc58a2f6fc6f306d78735677282268f"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "needs-followup",
+          "notes": [
+            "Large fire pillar hides entire target; a straight horizontal cutoff appears at the pillar top near enemy label. Dragon identity is absent in this sample; inspect authored clip and sampled phase before deciding source or placement fix."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-art",
+          "notes": "Large burst covers target with clear upper/left clipped-looking border. Source padding and single-fit need verification.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "currentDeviceCandidate": {
+        "runtime": "assets/vfx/fire/dragon-slash-cast-v2.webp",
+        "candidate": "tools/vfx-commercial-sample/assets/full/dragon-slash-v2.webp",
+        "sha256": "b8deae02abb44d17e7e2ed099d98e5576a2b993cb2ff63179af138bb42ecb87f",
+        "importEvidence": "tools/vfx-commercial-sample/runtime-import-review.json",
+        "importState": "isolated-phone-candidate-pending-device-review",
+        "independentEvidence": [
+          "tools/vfx-commercial-sample/dragon-slash-independent-review.json"
+        ]
+      },
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "fireRocket",
@@ -114,9 +292,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "858f3a185dfa6890a71c1738973ea5fd29ac3283cabf2adfbb64bd46d10e825f"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "792a2ae9ebd4ee82930daadd0e54b12024741f30d68ea409322a2795fe35e14f"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "insufficient-hit-frame",
+          "notes": [
+            "Three arrows remain crisp and neighbors/HUD clear, but sprite is midway between teams. This image cannot verify target arrival or impact placement."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Three arrows are in flight through center operation space; this still cannot establish endpoint/impact synchronization. Verify destination and size in motion.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "blazeSpell",
@@ -130,9 +348,57 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "device-candidate-pending-visual-acceptance",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "dae4d9d690c516b46ba3829b7b075f726dbbf86d4dc2237c7898213d8567a370"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "05ce637d9d88a1ac739f279c433dd7d9c727f4ff863d1854db20bcd1d861bd46"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "needs-followup",
+          "notes": [
+            "Tall fire pillar fully hides target and has a conspicuous flat top near the name row; footprint reaches left stage edge. Distinguish from dragonSlash/flameTornado using magic-circle identity."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-art",
+          "notes": "Dense fire column has a flat top cutoff and covers left target. Source boundary repair required.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "currentDeviceCandidate": {
+        "runtime": "assets/vfx/fire/blaze-spell-cast-v2.webp",
+        "candidate": "tools/vfx-commercial-sample/assets/full/blaze-spell-v2.webp",
+        "sha256": "5fd74e77bfa2b9544bc41478f5df01c9ef9ecb6a134338855bcc275fe57e5511",
+        "importEvidence": "tools/vfx-commercial-sample/runtime-import-review.json",
+        "importState": "isolated-phone-candidate-pending-device-review",
+        "independentEvidence": []
+      },
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "flameTornado",
@@ -146,9 +412,59 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "device-candidate-pending-visual-acceptance",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "2cfe08a6cd59e4c56a7a849deb9e18327f764c18aa0051afbcc72ff02670dbc1"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "c90aaf7fe9465c2de2a9f8e29e3cc85d1a76044d4b75833313fd90da9112d6fd"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "needs-followup",
+          "notes": [
+            "Fire rings establish tornado identity but the bright column fully hides target and the bottom is visibly rectangular/flat. Needs clip-shape and concentrated-contact review rather than blanket scale reduction."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-art",
+          "notes": "Large bright pillar hides the target and has a rectangular ground edge. Reduce solid core and repair alpha/source boundary.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "currentDeviceCandidate": {
+        "runtime": "assets/vfx/fire/flame-tornado-cast-v2.webp",
+        "candidate": "tools/vfx-commercial-sample/assets/full/flame-tornado-v2.webp",
+        "sha256": "8598d97f62e6b0ec4db22a660d15063d60715e912cfc540ea1e176765bf79b0e",
+        "importEvidence": "tools/vfx-commercial-sample/runtime-import-review.json",
+        "importState": "isolated-phone-candidate-pending-device-review",
+        "independentEvidence": [
+          "tools/vfx-commercial-sample/flame-tornado-independent-review.json"
+        ]
+      },
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "phoenixCry",
@@ -162,9 +478,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "798afb966f4cd23d06c970f00d8aad1493f4bfb903e4e090946e36b717882760"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "38699759a059fe86628d92c6bd66cea774a94cd3741b29e44ab07d11ec7361b9"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "sample-reviewed-with-caveat",
+          "notes": [
+            "Phoenix silhouette is clearly readable, centered within enemy side and entirely inside viewport. Large blast hides central target, appropriate to a climax only if brief; duration/overlap cannot be certified from one image."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Phoenix silhouette recognizable, HUD readable, middle target hidden by luminous core. Retain wings but reduce broad core fill and verify brief peak.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "rage",
@@ -178,9 +534,57 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "device-candidate-pending-visual-acceptance",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "236f4f7788810b39f38c4affa8ef51550c09661af6da3b48f708edf50ee3fb8c"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "a6c0ab250fe219ab98e1e4f2baa58ce3afa3c14cb95b7f7931b041d1135132ce"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "sample-reviewed",
+          "notes": [
+            "Three upward arrows communicate buff, centered on caster, neighbors clear and bars remain readable. Aura overlaps own name region behind HUD but does not cover its text."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Buff arrows clearly visible around center ally with clear HUD; fire hides torso. Compare rage-v2 in actual runtime before adoption.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "currentDeviceCandidate": {
+        "runtime": "assets/vfx/fire/rage-cast-v2.webp",
+        "candidate": "tools/vfx-commercial-sample/assets/full/rage-v2.webp",
+        "sha256": "094b9b53f8263f2520f83ac839ddb545af5b8e259f1a2ff1c0f80cae4e647d18",
+        "importEvidence": "tools/vfx-commercial-sample/runtime-import-review.json",
+        "importState": "isolated-phone-candidate-pending-device-review",
+        "independentEvidence": []
+      },
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "fireEX",
@@ -194,9 +598,11 @@
       "frames": 0,
       "reusedFrom": null,
       "visualIntent": "intentional-passive-no-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "intentional-passive-noVisual",
+      "runtimeQaState": "intentional-passive-no-cast",
+      "notes": [],
+      "technicalRuntimeState": "intentional-noVisual-not-a-cast-pass",
+      "technicalRuntimeEvidence": []
     },
     {
       "id": "waterKnife",
@@ -210,9 +616,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "dba91bfc337fa9b4910c9ce5d4688380d89f7954017211be89b8f83536628793"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "12a54f9013cd0fbbffa2d36dc8345dae61f2d0e370cdb3533dde664fe84d328d"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "sample-reviewed",
+          "notes": [
+            "Thin blue cut/star concentrated on target upper body; feet and neighboring units remain visible, no stage clipping observed."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "screenshot-reviewed",
+          "notes": "Sharp horizontal water hit, HUD and adjacent units readable; still cannot prove endpoint timing.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "frostPunch",
@@ -226,9 +672,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "a54046d275fb7d6236f9341b1a21ef5a3aa8b57138647a595aaf64566ef9c78d"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "6d92d84cb97d69ce36e2468e36b4ef545ecef3292236b159067d6c8b6f918828"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "sample-reviewed-with-caveat",
+          "notes": [
+            "Fist silhouette is unmistakable and isolated to one target. It hides target head/torso at this phase but neighbors and HUD stay clear; assess occlusion duration in motion."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Fist identity strong, target fully concealed, HUD readable. Verify single-fit edges and hold duration.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "iceSpin",
@@ -242,9 +728,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "866544fc2432c2f0ab3d709ea8131a28a2544fd1cf8349fac3141206b3f5fed0"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "7de4e43afd1a55da98315c6ad095339658dc4bb9f9a4980ca93ad95157298060"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "sample-reviewed",
+          "notes": [
+            "Three narrow swords leave much of target artwork visible and have good negative space. No stage or HUD clipping observed."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-fix",
+          "notes": "Three blades cluster on left monster; canonical group-center retest required if formal target is tri.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "frostCrush",
@@ -258,9 +784,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-art",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "973b5c67406db9a63d07847c098b8829daf5156c40ebe1b5bb9cfbb5ef595b2c"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "a37a2a519b77e1ce71d9099b3be573bf241bc412e45353ad891bd651ef43e16b"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "needs-followup",
+          "notes": [
+            "Broad white/blue burst hides target entirely with a conspicuous straight bottom/right rectangular boundary. Keep crystal identity and soften/bound secondary glow rather than reducing everything uniformly."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-art",
+          "notes": "Large blue burst hides target with visible straight bottom/side raster box edges. Source alpha and padding repair required.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "waterBall",
@@ -274,9 +840,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "9c2da396c1fbbfcf9e2c09bd55d8557d460635a982961b89d8230d96f6ff85ad"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "3a6058f3522c2096c3a3cc0918a4d9112a8a8e3406a58ff367477869c281e071"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "sample-reviewed",
+          "notes": [
+            "Three blue orbs remain separated around target and allow target silhouette to remain visible. No crowding of adjacent units or labels observed."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-fix",
+          "notes": "Three small water orbs compressed at left monster rather than three recipients. Retest group-center.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "floodBeast",
@@ -290,9 +896,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "8639da2f427f951ff81f7dace442c75ff5541da27c09cf4800972b774a378e56"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "eedf2c44964d8a9c81630a6d66ba1dc3b5ccbd5cbb8f14dc1b130e2c7c9fc1ed"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "insufficient-hit-frame",
+          "notes": [
+            "Beast head is readable but placed low between teams and partially crosses round label at this sample. Need actual contact-frame image/video before concluding landing misalignment."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Water beast is in transit through operation space, not at recipient in this still. Need travel/landing playback verification and source bottom-edge inspection.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "iceArrowRain",
@@ -306,9 +952,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-art",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "b0747cf6147b3113908a7e3c1aa2d5aba18bd808628a8a9b8204c8cc962ec93c"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "4c1c5f6e6feae3fd420efdc0bfbbba61ab18d889e97c0c82130c5d982efc5f84"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "sample-reviewed-with-caveat",
+          "notes": [
+            "Plural ice contacts remain readable across enemy center; HUD stays above effects and left/right targets remain visible. Center target is hidden by broad burst, requiring temporal/overlap review."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-art",
+          "notes": "All-range peak spans enemy zone but broad blue-white ground wash hides central target. Reduce filled mist while retaining arrows/landing bursts.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "freeze",
@@ -331,9 +1017,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "2fc6e03cfd5f6c6f6f33ae1ea6978af93268b1a4d19cd28395e6e28a722e68a4"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "3d50dc14175fa16417fa67697d60fe7ced300beaf45824cd81f0e8d3bb12da23"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "sample-reviewed",
+          "notes": [
+            "Ice shard enclosure is readable and target silhouette remains faintly visible between shards; narrow enough for one slot, HUD and neighbors clear. This sample alone cannot inspect later prison hold."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Ice enclosure on one target is recognizable; HUD clear but target almost invisible. Validate transition into persistent freeze without duplicate cover.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "healSpell",
@@ -347,9 +1073,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "14471c04d36ee9ec2eb2064f63795d391dd8159407d1e41801c19d6eafa34b5e"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "74f90aeb65a0f2e82b23890f0e46d7adcaac13f9de0ddd1d8ab3819257fc3955"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "sample-reviewed",
+          "notes": [
+            "Lotus and green-tinted core provide clear healing identity, sized to caster and clear of neighbors; upper actor remains visible and bars readable."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "screenshot-reviewed",
+          "notes": "Focused blue healing column around center ally leaves head visible; HUD readable. Verify heal timing separately.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "revive",
@@ -363,9 +1129,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "da6a05770c59897430916744bba4df0e0ddb8b02dffd7845304c3b4c7ac106d6"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "bfdbfd15cb42ee348f7cea1cf06a72cdd755d16c7fd247359aefd92bd46d6cf0"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "sample-reviewed-with-caveat",
+          "notes": [
+            "Lotus and gold/blue upward wisps are distinct and moderately sized. Both actor and own HUD are translucent in this frame; verify this is intended revival state, not a VFX-layer HUD fade."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Revive lotus visible but center ally/HUD deliberately faint; still cannot distinguish downed state from presentation defect. Verify recovery transition with real state.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "waterEX",
@@ -379,9 +1185,11 @@
       "frames": 0,
       "reusedFrom": null,
       "visualIntent": "intentional-passive-no-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "intentional-passive-noVisual",
+      "runtimeQaState": "intentional-passive-no-cast",
+      "notes": [],
+      "technicalRuntimeState": "intentional-noVisual-not-a-cast-pass",
+      "technicalRuntimeEvidence": []
     },
     {
       "id": "stormFist",
@@ -395,9 +1203,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "3b06d5fc001a0e93eaa0ea7e46f9d1df1fe5768fa02c6f10fd6d8c81dbc932d1"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "08d01528109dd360c3d4e03521a88dad1e24970ca99076ecad696206ae8a30a0"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Fist readable and HUD clear; the wide leftward trail reaches the left screen edge. Retest the new single-fit change before accepting.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "stormFlurry",
@@ -411,9 +1251,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "7a931584728fe20c2fa91ff252bcb5eb2c2ef0bf52240a8c0958d579fce71d52"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "f3ca7dc9a15d31614c5e3ad309082f9895e680ed59c863605613818376d34bb3"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-fix",
+          "notes": "All three fist groups occupy only the left monster; middle/right recipients have no visible strike. Retest canonical group-center correction.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "windCrossSlash",
@@ -427,9 +1299,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "12d206f90482dd6ea1ae18fe91f18dcb29a43de0aeacdee8cc9f0a9f2fb494a6"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "f6c9d5943bb941c92cb366750656eb0a2326934f94627acfa2db7c96428431e1"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Bright curved blades obscure the left target and reach the left edge; screenshot is before a clear X peak. Retest single-fit and motion sequence.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "dizzyFist",
@@ -443,9 +1347,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "b07b01421d86fc8f1382e7b0eaecb4fb8f9835c2344ebfe21af5f2283a9a99b0"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "cfebb5e53640a3cdd3e2367b388f4cc47d0005ba2e495e5f20cc9c7eb8198521"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Tall tornado is recognizable, HUD stays readable; monster is almost entirely covered. Reduce prolonged pillar fill rather than all-frame brightness.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "windSpell",
@@ -459,11 +1395,43 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "source-reviewed-runtime-pending",
-      "runtimeQaState": "not-reviewed",
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
       "notes": [
         "Original sheet viewed: three wind columns clearly express a three-target cast. Peak white impact area is broad and cell-edge proximity needs playback inspection. Preserve all three columns; first calibrate shared group geometry and HUD layering, then decide whether cloud redraw is necessary."
-      ]
+      ],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "216fd813a97a14bc14dc20861d55dd787f8d51f3d383c6bb9be3aaa3fdbb3e1e"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "8a46a443773a53b58c5a114c9056bc2f12e1cdb77e1f00354e038fdbeafa7eba"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-fix",
+          "notes": "Three tornadoes are compressed around the left monster instead of spanning the three targets. Retest group-center fix.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "stormCircle",
@@ -477,9 +1445,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "d23154d1c3176d2f9b0fba65031b24f6a02a3c147f30d45da3ccccf415826baf"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "8fe17956aaebdb2d9693b505c3abd1aa5946f5fdd3f24813f500af4493870270"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-fix",
+          "notes": "Three small falling streaks surround only the left monster; other recipients remain unmarked. Group footprint placement needs correction.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "windHowlLightning",
@@ -493,9 +1493,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "23959399eb56859fe109f916281d569963376feab249d3801dfda3ec3fbc0410"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "318ad7394ba978de728c72537534cfab0d6a01b7c9b10da55453eff2cf10cdd7"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Lightning burst is sharp and HUD readable but target disappears behind full circular blast and left rays reach edge. Validate single-fit and peak duration.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "stormRain",
@@ -509,11 +1541,51 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "needs-art-followup",
-      "runtimeQaState": "not-reviewed",
+      "artReviewState": "device-candidate-pending-visual-acceptance",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
       "notes": [
         "Original sheet viewed: recognisable green wind funnels, but dense white cloud fills nearly every peak-frame cell; first frame and some cloud edges meet cell borders. Reduce authored peripheral cloud density while preserving funnel silhouettes; verify no source-edge or viewport clipping in motion. Not a runtime QA pass."
-      ]
+      ],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "030552bbd21af2b8930d6687e15c2f9345680f0dd3a355385af5b5cf4c03375a"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "0aca2ef3cb07238179c2670f288fb0c2e0bbb82f19414d2f48b8b561331315ad"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-art",
+          "notes": "Large opaque-looking cloud/tornado mass fills upper target zone and hides central target; HUD remains readable. Rework negative space/cloud alpha while retaining all-range identity.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "currentDeviceCandidate": {
+        "runtime": "assets/vfx/wind/storm-rain-cast-v2.webp",
+        "candidate": "tools/vfx-commercial-sample/assets/full/storm-rain-v2.webp",
+        "sha256": "518147f7f9afca6a63b825e2caf0250698e8d9d4702207c3293e2318148aa792",
+        "importEvidence": "tools/vfx-commercial-sample/runtime-import-review.json",
+        "importState": "isolated-phone-candidate-pending-device-review",
+        "independentEvidence": []
+      },
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "dodgeSkill",
@@ -527,9 +1599,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "b05b78d52c7c67900fc527575f8c02742812923a5a48b068479aabe557ed3bc6"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "654ed547002908a9f6d731289078604f378800a13dd3c73c5be4874991a1fd57"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Three wisps sit around the center ally only; screenshot cannot establish allyAll coverage. Confirm targets and phase, then span canonical all bounds or use recipient-local authored support feedback.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "stealthSkill",
@@ -543,9 +1647,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-art",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "42bb6d5706d75cc82dd0703b62bc779402e9b56e96794dfaed0efb2b02193b31"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "35516884efbba8d954196fa5592587d9df2401bf9f702ecdfc5c6127085aa9e0"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-art",
+          "notes": "Three distinct translucent bubbles surround the allies and obscure their forms. Reads as shielding rather than stealth; replace bubble silhouette with brief veil activation.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "dinghaishenzhen",
@@ -559,9 +1695,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-art",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "58e79135bf4b57f26352e8da71b70d8655669b95a370ade137b27287aa134fe5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "81b1e64541b19ec1b04a9766f6460f9004f0ecd7dbf50bb2fb067bdc692dd641"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-art",
+          "notes": "One large ritual dome extends from ally bodies to near bottom stage edge, substantially below their feet. Move visual body toward unit artwork region and reduce dome fill; keep HUD on top.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "windEX",
@@ -575,9 +1743,11 @@
       "frames": 0,
       "reusedFrom": null,
       "visualIntent": "intentional-passive-no-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "intentional-passive-noVisual",
+      "runtimeQaState": "intentional-passive-no-cast",
+      "notes": [],
+      "technicalRuntimeState": "intentional-noVisual-not-a-cast-pass",
+      "technicalRuntimeEvidence": []
     },
     {
       "id": "stoneSlash",
@@ -591,9 +1761,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "554d33ff6c76fc774af7d203f0aea027826bf61194d443ab16163622167744e8"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "a736d81c197d6edc13ca7cb3320349d446a7a2588998295b0030cff3a0e15020"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Large dense slash hides left target and strikes through left screen edge. Single-fit retest plus source-tail continuity follow-up required.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "petrifyFist",
@@ -607,9 +1809,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "2be3aa8495a14bedcd7b8f2633ee2fd67ebda33c1f27cda5cf91e4de303a9234"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "1e8c0c915209c9c5b17ae8761ab70836bbeb99339e1eaf5106032538a3d40116"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-fix",
+          "notes": "Three small impacts are compressed around one left target. Retest group-center before judging source resolution.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "stoneBreakSky",
@@ -623,9 +1857,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "95baa3b0cf4408234afe577fffe48b8b3e130d4c09f025cfc2248371b97fa5bf"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "3a936ca9811be779c1cc0b0fc6cfa3ad5b1f8ad570c44b8127e6b4569bbd6ffe"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Rock and downward trail readable, HUD clear; main object hides target and upper trail has abrupt rectangular cutoff. Review source padding and landing frame.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "earthquakeCrush",
@@ -639,11 +1905,43 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "source-reviewed-runtime-pending",
-      "runtimeQaState": "not-reviewed",
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
       "notes": [
         "Original sheet viewed: three stone fists and separate impact bases are recognisable. Frames 4 to 6 have strong descending fist silhouettes; preserve these. Check footprint and dust/HUD overlap in runtime before commissioning redraw; source review alone does not prove continuity or commercial readiness."
-      ]
+      ],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "ac76d018bbd028912e59653ca3afd028dd9fbbef07a6d1b6fb4361a3ba2bda81"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "7d5ae59f8b5108d197f7cf46fdb53d0be9108d8e1b84cd44a2b48f4d6968cd5e"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-fix",
+          "notes": "Three stone fist impacts sit within the left target's footprint instead of across the three recipients. Retest group-center correction.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "stoneThrow",
@@ -657,9 +1955,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "4aae07ec37cd716ef183655f5de02776495b0fe1644947581d54cc9588d96553"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "a335fa77dc26d0df6cbcd749ee3266d53e41efde0359668a9a32d9f3ad779878"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-fix",
+          "notes": "Three rocks fall on the left monster only; a faint straight vertical sheet edge appears near x365. Fix group-center and verify alpha/export boundary in motion.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "sandWind",
@@ -673,9 +2003,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "a4e168c7bac491ac5756fd8e130ea9c64296e8d7065c5d1dded965de1984a17c"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "c6c450699de5e29934ed4f00fc9f332572bf6355a2473110175370c79a98d354"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-fix",
+          "notes": "Three rock streams compressed over the left target. Source detail is readable, but group coverage presentation is incorrect.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "flyingSandStrike",
@@ -689,11 +2051,43 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "needs-art-followup",
-      "runtimeQaState": "not-reviewed",
+      "artReviewState": "needs-art",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
       "notes": [
         "Original sheet viewed: earth whirlwind and rocks identifiable, but near-solid tan dust occupies most peak-frame cells and early sweep approaches the sheet-cell boundary. Needs art follow-up to separate rock silhouettes from peripheral dust rather than only shrinking the whole battlefield cast."
-      ]
+      ],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "17c5fd63c77662b30c65fbfd2bec2eb29b09c909fdc643a9ffcdff2b06979877"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "1d3227515ec3c3434e221822313bb7b70a37678ef4729225817f3d92cf4c3b1b"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-art",
+          "notes": "All-range burst spans enemy zone and HUD remains clear, but huge airborne stones/near-opaque dust hide the central target. Concentrate three landing flashes near targets and reduce air/dust coverage.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "dustStorm",
@@ -707,9 +2101,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "d76c5bb019ac1f79a0f601fb09c33be8896bf1cb22014d26dd7b074bb3708d9b"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "1cc8526bc7eff08b5b4599b749d0eed6c3de99c694ff96d028de1452ba01dee1"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-followup",
+          "notes": "Bull silhouette is clear and bounded to the left target, but dense body fully hides recipient. Keep identity and reduce surrounding debris/hold duration.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "earthShield",
@@ -723,9 +2149,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "device-candidate-pending-visual-acceptance",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "d334b6e251e2ef192fd65e6bae19741b33ab327edefbaa876f1f70cc55770046"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "a8e6a3bf650b7f1925b55848021fec0f7ebde23d2bab880eba19734ef7f77321"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-art",
+          "notes": "Three shields visibly cluster on one self target; the original source is still used here. Replace with independently reviewed single-shield candidate only after candidate USB verification.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "currentDeviceCandidate": {
+        "runtime": "assets/vfx/earth/earth-shield-cast-v2.webp",
+        "candidate": "tools/vfx-commercial-sample/assets/full/earth-shield-v3.webp",
+        "sha256": "4500d96865663ab45314796d68f8117db3cb8a5cae3d4ab3db5a45efd068576e",
+        "importEvidence": "tools/vfx-commercial-sample/runtime-import-review.json",
+        "importState": "isolated-phone-candidate-pending-device-review",
+        "independentEvidence": []
+      },
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "rockWall",
@@ -739,9 +2205,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-device-visual-followup",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "a859b844ffc32fdd84d08130840d420560bf07500a8f82aa657526a25aafc574"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "9c16e0cbf719a8fe21cdd0613f0b4845d404709307bbebb417070e971174a469"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-fix",
+          "notes": "Three stones all gather around the center ally rather than covering three ally positions. Retest canonical group-center correction; preserve character head visibility.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "barrier",
@@ -755,9 +2253,41 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-art",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "f9e1b19c817435900fdbd4920ed379eca96d358b065f42cf14baf511036660c3"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "8370ca4bcbf12c3715f35a92e6e2348acbd428de335ced2055034e7714131945"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-art",
+          "notes": "Three large spheres span the allies but hide almost all bodies. Lower central fill/brightness and retain thin rim; HUD remains readable.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "earthEX",
@@ -771,9 +2301,11 @@
       "frames": 0,
       "reusedFrom": null,
       "visualIntent": "intentional-passive-no-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "intentional-passive-noVisual",
+      "runtimeQaState": "intentional-passive-no-cast",
+      "notes": [],
+      "technicalRuntimeState": "intentional-noVisual-not-a-cast-pass",
+      "technicalRuntimeEvidence": []
     },
     {
       "id": "fireSoulResonance",
@@ -787,9 +2319,59 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "device-candidate-pending-visual-acceptance",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "d4312fc98339e3f68f9f2454eaf7f998e649a6d5b06e6185169b2c49de1186c6"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "41eb505ff4bf185c1df3492a3a7160e14eac686a2703fbd56bb73b25dd560f5c"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "sample-reviewed",
+          "notes": [
+            "Sharp core and surrounding thin arcs remain recognizable, actor head/hair still visible and neighbors clear. Runtime compositing is much cleaner than raw-sheet viewer; no broad opaque orange disk is visible here."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "screenshot-reviewed",
+          "notes": "Focused orange ring/orb leaves head and adjacent units visible; HUD clear. Still image alone does not prove loop or impact timing.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "currentDeviceCandidate": {
+        "runtime": "assets/vfx/fire/fire-soul-resonance-cast-v2.webp",
+        "candidate": "tools/vfx-commercial-sample/assets/full/fire-soul-resonance-v3.webp",
+        "sha256": "5f0017df5b96a7d70e0c2a77ee98ac3ae96128a5389b6f1c5ca65f826c3fc964",
+        "importEvidence": "tools/vfx-commercial-sample/runtime-import-review.json",
+        "importState": "isolated-phone-candidate-pending-device-review",
+        "independentEvidence": [
+          "tools/vfx-commercial-sample/fire-soul-v3-independent-review.json"
+        ]
+      },
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "bloodBurnArt",
@@ -803,9 +2385,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-art",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "c17a9a2451abaef2509ccbf825497e7a5c07100595c7394d1f1397495eff65cb"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "dfed03786dbed10a838745789771a6403e968ecdc7126f31031c9feb91dd48ec"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "needs-followup",
+          "notes": [
+            "Distinct dark red tendrils but the tall central flame hides nearly all actor artwork and has a flat cutoff at its top. Neighbors and HUD remain clear. Check that whole clip retains blood-burn rather than generic pillar identity."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-art",
+          "notes": "Tall red plume obscures center ally; a flat top cutoff is visible above head. Repair source padding and lower central fill.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "purifyMind",
@@ -830,9 +2452,49 @@
       "frames": 12,
       "reusedFrom": null,
       "visualIntent": "authored-raster-cast",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-art",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "2a735bb10c3192de460fc237a983a52ce9a8ac6faca419c1216e015e60dfe04a"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": 0,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "6a242fca19e0a007a6071f60c83e8adffb1908894fe4446f4b3c35d05cdda695"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+          "state": "needs-followup",
+          "notes": [
+            "Three bright washes join almost continuously across full team width, obscuring all three actors and creating a horizontal white band. HUD stays readable. Retain three cleansing spirals while reducing secondary glow overlap."
+          ],
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+          "state": "needs-art",
+          "notes": "Three bright columns fully wash out ally bodies though HUD clear. Lower central white fill and keep thin cleansing ribbons.",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "burn",
@@ -846,11 +2508,45 @@
       "collection": "statusEffects",
       "frames": 1,
       "visualIntent": "one-body-at-a-time-2000ms-carousel",
-      "artReviewState": "source-reviewed-runtime-pending",
-      "runtimeQaState": "not-reviewed",
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
       "notes": [
         "Status source viewed: detailed U-shaped flame frame with a large open centre. A full redraw is not justified by source detail alone. Calibrate body footprint and glow so the target remains visible; evaluate thin outer flame fringe against the actual battlefield."
-      ]
+      ],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "c5aa86f12bd5244abd1955b342d762a34c356f6b1885eeb3bf24e5d9f61bb326",
+          "mode": "pulse"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "1798e48375e6e2785fede931c42704533ca12accf8c2432413d7e1cf0b690dc5",
+          "mode": "pulse"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-current-art",
+          "notes": "Open flame U-frame leaves face/torso visible; name and HP/SP remain above lower flame.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "rage",
@@ -864,9 +2560,53 @@
       "collection": "activeBuffs",
       "frames": 1,
       "visualIntent": "one-body-at-a-time-2000ms-carousel",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "device-candidate-pending-visual-acceptance",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "9f04384c57b86673b0b57c7dd0d8ac43f915c6b2cc26e7a306b341fbae2e0211",
+          "mode": "pulse"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "86125b7f32f945fa725808dbee359bf0168b560f9ad534f7cbda3f3cba177842",
+          "mode": "pulse"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "needs-visual-fix",
+          "notes": "Old solid angry-fire face almost completely replaces central actor artwork, though name/HP/SP are readable.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "currentDeviceCandidate": {
+        "runtime": "assets/vfx/status/rage-aura-v2.webp",
+        "candidate": "tools/vfx-commercial-sample/assets/full/rage-status-v2.webp",
+        "sha256": "64886f9c879c23ee96b8f6acd9aac036d6dab890bf8d2c65bf8143f810167ba1",
+        "importEvidence": "tools/vfx-commercial-sample/runtime-import-review.json",
+        "importState": "isolated-phone-candidate-pending-device-review",
+        "independentEvidence": [
+          "tools/vfx-commercial-sample/rage-status-independent-review.json"
+        ]
+      },
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "frostbite",
@@ -880,9 +2620,43 @@
       "collection": "statusEffects",
       "frames": 1,
       "visualIntent": "hud-icon-only",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "397bcfa63b35b8bdfb5a59a601376a79bc218c75d0250a174256dc884042ede3",
+          "mode": "icon"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "2aefa169b228da9c252f218bcbc7dd7fa5fba990daae8176dc3bbcd4d84fd0f2",
+          "mode": "icon"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-current-art",
+          "notes": "Broken blue snowflake clearly visible near feet; actor and HUD remain clear.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "freeze",
@@ -896,11 +2670,45 @@
       "collection": "statusEffects",
       "frames": 1,
       "visualIntent": "fixed-hard-control-base",
-      "artReviewState": "source-reviewed-runtime-pending",
-      "runtimeQaState": "not-reviewed",
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
       "notes": [
         "Status source viewed: ice prism silhouette is immediately identifiable and detailed. Tall central spike reaches the source top edge; distinguish authored edge contact from runtime cropping. Hard-control base must stay fixed beneath rotating statuses, and HUD remains readable. Do not lower opacity merely to conceal intentional hard control."
-      ]
+      ],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "6b7544e0cfb6b12fde07d94a28f744882df67f3903e4d020acf271f2d2afef42",
+          "mode": "static"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "37da1c9b3717490cf7fdad50afc213c309aebaa54ebeb0ad0aa001e847e66a02",
+          "mode": "static"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-intended-hard-control",
+          "notes": "Opaque blue prism intentionally encases actor; distinct hard-control identity; name/level,HP/SP and adjacent actors readable.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "agilityDown",
@@ -914,9 +2722,43 @@
       "collection": "statusEffects",
       "frames": 1,
       "visualIntent": "hud-icon-only",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-visual-tuning",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "386911cfb26aa7f5fb4ee037eb2bfbcc1e7bbcd897908fdc6095ca55a053aad5",
+          "mode": "icon"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "6e3c1b615e19c538c1b17292b9ebe891bcffcb55ba7cae82b13192df7e1eb069",
+          "mode": "icon"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "needs-hud-contrast-tuning",
+          "notes": "Small black boot at feet has low silhouette contrast against dark artwork/floor; red downward arrow reads better.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "damageDown",
@@ -930,9 +2772,43 @@
       "collection": "statusEffects",
       "frames": 1,
       "visualIntent": "hud-icon-only",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "ac1da46fddd287cfdfe4f65c59050f1617d0d3beedf98f83e60a3893045ad10d",
+          "mode": "icon"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "a18aa3ac5d0787ed6605487f8a35ab085e851cefa72d1b6ed1ee50404156202a",
+          "mode": "icon"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-current-art",
+          "notes": "Teal cracked wind blade and red arrow recognisable near feet; actor/HUD clear.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "stun",
@@ -946,9 +2822,43 @@
       "collection": "statusEffects",
       "frames": 1,
       "visualIntent": "one-body-at-a-time-2000ms-carousel",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-visual-tuning",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "c8e410067753d290367bb876cc1f5d8e7f3e9a62d4a6000d9ae5497a81501dfb",
+          "mode": "pulse"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "5604c20bf487e020eef0981c58b6d73691beef4a4841d8ad9e7811b99c0382c8",
+          "mode": "pulse"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "needs-visual-fix",
+          "notes": "Large gold stars and full-height spiral cross head/chest and cover substantial actor detail. HP/SP remain clear.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "dodgeSkill",
@@ -962,9 +2872,43 @@
       "collection": "activeBuffs",
       "frames": 1,
       "visualIntent": "one-body-at-a-time-2000ms-carousel",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "cb66a0cf7781b044fb38841a14d3134c1191eb9a725c6f19c9560a4afb9f5d38",
+          "mode": "pulse"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "834f319301ec2ae0ee69fffd08568c305df90e48590853d3eafbaea7fbbb8c00",
+          "mode": "pulse"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-current-art",
+          "notes": "Green wisps frame actor with open centre; face/torso and neighbours visible.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "stealthSkill",
@@ -978,11 +2922,45 @@
       "collection": "activeBuffs",
       "frames": 1,
       "visualIntent": "intentional-no-body-no-hud",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
+      "artReviewState": "intentional-noVisual-reviewed",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
       "notes": [
         "No added body/HUD intended; existing artwork-only opacity 0.35 conveys stealth."
-      ]
+      ],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "e866200419cc1bcf6d3862d46dbc47dadddd696d0c7b2cd81df5cc981726a94b",
+          "mode": "none"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "a746a20ae5a985957bf6d86485a70254c96aba8a8a3303d4f971e6e8f6dbfaac",
+          "mode": "none"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-intentional-none",
+          "notes": "Central artwork translucent while name/HP/SP stay opaque; no extra aura.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "dinghaishenzhen",
@@ -996,9 +2974,43 @@
       "collection": "activeBuffs",
       "frames": 1,
       "visualIntent": "one-body-at-a-time-2000ms-carousel",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "8dbc430dc0c273a9fff7fcda423e1a7bb3e686af51c28ef421b623a80e2d3597",
+          "mode": "pulse"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "dc6e6971e4919d090f588c5fdc6a660c038e50859b226a0024533b376a6f4a53",
+          "mode": "pulse"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-current-art",
+          "notes": "Pale blue cloud wisps leave actor centre open; face/torso and resources clear.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "defenseDown",
@@ -1012,9 +3024,43 @@
       "collection": "statusEffects",
       "frames": 1,
       "visualIntent": "hud-icon-only",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "needs-visual-tuning",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "b56b5b5144ac4cbc37f4e71a53892c380319892749e5bd5778592e3f08aa25a4",
+          "mode": "icon"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "34db9040eb4fea571c01a2f8b2d7877c20328d278861eaf20e41c0383e087917",
+          "mode": "icon"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "needs-hud-contrast-tuning",
+          "notes": "Small dark cracked shield at feet is harder to distinguish than its red down arrow.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "shield",
@@ -1028,11 +3074,45 @@
       "collection": "activeBuffs",
       "frames": 1,
       "visualIntent": "one-body-at-a-time-2000ms-carousel",
-      "artReviewState": "source-reviewed-runtime-pending",
-      "runtimeQaState": "not-reviewed",
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
       "notes": [
         "Status source viewed: clear U-shaped protective shell with open centre; detailed pale/gold facets are already resolved. Bright side bands and thin fringe need real-background review. First tune body bounds/intensity in existing owner; no evidence yet that a full redraw is required."
-      ]
+      ],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "608282705888df01d191514902e2d4e90a92faee38d7b4ad6e726aa481343040",
+          "mode": "static"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "e661458cac6e0112e6e0b6d7361a98d828fa6cf819d2dc8e7caa9e87a1b77c6d",
+          "mode": "static"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-current-art",
+          "notes": "Pale gold shell has open middle and retains actor/HUD readability.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "petrify",
@@ -1046,9 +3126,43 @@
       "collection": "statusEffects",
       "frames": 1,
       "visualIntent": "fixed-hard-control-base",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "ba0afbdc0a495fcd58e36a2b04699709fd5b659d6f017827088fc6d7af0fe1bf",
+          "mode": "static"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "7fcb72b0939d8cebbda57ae7c5f6784b9fe13d5e5757bb0096b31ab0626e73c1",
+          "mode": "static"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-intended-hard-control",
+          "notes": "Solid tan prism intentionally covers actor; distinct from freeze; name/HP/SP readable.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "earthShield",
@@ -1062,9 +3176,43 @@
       "collection": "activeBuffs",
       "frames": 1,
       "visualIntent": "one-body-at-a-time-2000ms-carousel",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "5a476d7abed9885eaeec3d46d4224b63360ca3ce65eb7be7f831e621439a7b61",
+          "mode": "static"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "380f090a6ced23def361b28a3be8a3a3c8a6e81abce5832abab81ef6c2f8bd4c",
+          "mode": "static"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-with-density-watch",
+          "notes": "Broad multielement stone ring leaves centre open; upper seal near head; actor,neighbours,name/resources readable.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "rockWall",
@@ -1078,9 +3226,43 @@
       "collection": "activeBuffs",
       "frames": 1,
       "visualIntent": "one-body-at-a-time-2000ms-carousel",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "e4c9481b72b52b475eeb730d3bbc7664d58de14682b210bcd18d156333c3b7c7",
+          "mode": "static"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "e0fc904417abb5bd6493ea82f28f24e34c179ac8b52102e8a9faa69fc5bcb8fe",
+          "mode": "static"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-with-density-watch",
+          "notes": "Thick runed rock pillars frame actor; centre and neighbouring actors remain clear; side mass substantial.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "barrier",
@@ -1094,9 +3276,43 @@
       "collection": "activeBuffs",
       "frames": 1,
       "visualIntent": "one-body-at-a-time-2000ms-carousel",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "c182593bae372a2de48c3a6befc85a7e35c0005d510f366f3047005727441297",
+          "mode": "static"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "2f1e60f71824a78957bfbbb9593034ca9b707eff4ffd913d445444addd3bff6d",
+          "mode": "static"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-current-art",
+          "notes": "Golden rune panels frame actor; centre open; base ring behind name/resources without covering text.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "yuanZuBlessing",
@@ -1110,9 +3326,43 @@
       "collection": "activeBuffs",
       "frames": 1,
       "visualIntent": "one-body-at-a-time-2000ms-carousel",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "b9b97adfc745653d0ba297533f40be14406633da3e4995d9916f27cfea109625",
+          "mode": "pulse"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "98accfeb3a59eebc5ded4b8f7c6ab1f5db9baad85237fd9065727c98fe5a9a13",
+          "mode": "pulse"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-current-art",
+          "notes": "Soft gold white support frame leaves centre open and actor/HUD clear; distinct from rigid barrier panels.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "fireMomentum",
@@ -1126,11 +3376,45 @@
       "collection": "activeBuffs",
       "frames": 1,
       "visualIntent": "intentional-no-body-no-hud",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
+      "artReviewState": "intentional-noVisual-reviewed",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
       "notes": [
         "Fire momentum intentionally has no body/HUD sprite; do not count as missing art."
-      ]
+      ],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "4b6f2a841a0d07bca47b82d6c6f48aaf26ef03b292d4c5f4eda698d981a0bb83",
+          "mode": "none"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "734b6a6b2b2f87885c7c50fd238bae63fdc48efcaa19fc06d7b3a2d787eb0e97",
+          "mode": "none"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-intentional-none",
+          "notes": "Actor unchanged with no extra aura/icon, consistent with explicit no-visual intent.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "phoenixMight",
@@ -1144,9 +3428,43 @@
       "collection": "activeBuffs",
       "frames": 1,
       "visualIntent": "hud-icon-only",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "98c0c769c04ce5b03fd7956ddfb156b4d485db3574fb962d826f5ab177e3870b",
+          "mode": "icon"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "c2a9cb3a3812990b28f1c74c2ecc4819685b5fd4285a00439a1f4db3f92343df",
+          "mode": "icon"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-current-art",
+          "notes": "Small phoenix emblem visible at feet; actor/HUD clear, though similar red colour to actor art.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "fireSoulResonance",
@@ -1160,9 +3478,43 @@
       "collection": "activeBuffs",
       "frames": 1,
       "visualIntent": "one-body-at-a-time-2000ms-carousel",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "8a95e75cfe4f5f4828787f1c774ced250e0d4f805630bab84ea3581502faa6e8",
+          "mode": "pulse"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "545dc08d93bf84f4253a6b0bfb0d8d998d498f6c8f153e0b5ab18a450ca4cc68",
+          "mode": "pulse"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-with-density-watch",
+          "notes": "Fire wreath frames actor; central small sigil overlaps lower torso but face remains clear. Wreath/crests distinguish it from burn.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     },
     {
       "id": "bloodBurn",
@@ -1176,9 +3528,80 @@
       "collection": "activeBuffs",
       "frames": 1,
       "visualIntent": "one-body-at-a-time-2000ms-carousel",
-      "artReviewState": "not-reviewed",
-      "runtimeQaState": "not-reviewed",
-      "notes": []
+      "artReviewState": "source-and-still-reviewed-not-commercial-pass",
+      "runtimeQaState": "pending-new-phone-verification-for-next-head",
+      "notes": [],
+      "technicalRuntimeState": "completed-no-exceptions-cleanup-confirmed-at-evidence-heads",
+      "technicalRuntimeEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+          "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "23a883d4099fbbcaea20bea0980cb8bf472461f811cf7e633d4ccc09a7ca86ad",
+          "mode": "pulse"
+        },
+        {
+          "path": "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+          "device": "SM-N960F Android 10 physical USB Chrome",
+          "technicalComplete": true,
+          "exceptions": 0,
+          "castRemaining": null,
+          "lifecycleRemaining": 0,
+          "screenshotSha256": "eb4e59c3bf8ee3eff5469cee480daf2a93dd0cc852c70c8324ba1da0e0779590",
+          "mode": "pulse"
+        }
+      ],
+      "visualReviewEvidence": [
+        {
+          "path": "tools/vfx-commercial-sample/usb-visual-review-status.json",
+          "state": "retain-current-art",
+          "notes": "Dark red angular frame distinct from orange burn; face/torso,name and HP/SP clear.",
+          "head": "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+        }
+      ],
+      "runtimeQaScope": "Historical technical completion remains valid only at cited heads; later candidate/source/CSS changes require new phone evidence. No art, gameplay duration, sustained performance or Required CI pass implied."
     }
+  ],
+  "updatedAtHead": "067fa105ad14964ed265de5f871fef341e990570",
+  "pendingDeviceHead": "next-committed-head-containing-current-candidate-and-CSS-changes",
+  "technicalRuntimeSummary": {
+    "activeSkills": 44,
+    "statuses": 21,
+    "passivesIntentionalNoVisual": 4,
+    "exceptions": 0,
+    "cleanupConfirmed": true,
+    "evidenceHeads": [
+      "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+      "18f92b2638194b2eef7777bbcd50a6fd31209ca9"
+    ],
+    "evidenceFiles": [
+      "tools/vfx-commercial-sample/usb-full-matrix-20261019.json",
+      "tools/vfx-commercial-sample/usb-full-matrix-checkpoint18.json"
+    ],
+    "limits": [
+      "Visual-only cast matrix does not prove actual gameplay damage or eligibility.",
+      "RAF intervals include CDP screenshot overhead and cannot establish performance acceptance.",
+      "Individual screenshots do not prove animation sequence or commercial visual quality.",
+      "Status expiry check sets visual input turnsLeft=0; it does not retest the formal round-end duration owner.",
+      "After this head, group artwork center is being corrected and requires affected-skill replay."
+    ],
+    "lifecycleNote": "Visual-input rotation/cleanse/expiry/death/revival evidence only. Expiry sets turnsLeft0 and does not retest formal duration owner."
+  },
+  "visualEvidenceSources": [
+    "tools/vfx-commercial-sample/usb-visual-review-fire-water.json",
+    "tools/vfx-commercial-sample/usb-visual-review-wind-earth.json",
+    "tools/vfx-commercial-sample/usb-visual-review-status.json"
+  ],
+  "candidateIndependentEvidence": [
+    "tools/vfx-commercial-sample/independent-art-review.json",
+    "tools/vfx-commercial-sample/fire-soul-v3-independent-review.json",
+    "tools/vfx-commercial-sample/dragon-slash-independent-review.json",
+    "tools/vfx-commercial-sample/rage-status-independent-review.json",
+    "tools/vfx-commercial-sample/flame-tornado-independent-review.json"
   ]
 }
