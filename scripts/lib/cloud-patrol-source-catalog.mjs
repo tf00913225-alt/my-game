@@ -18,6 +18,12 @@ function one(source,pattern,label){
 // A changed sampling/append algorithm requires explicit interpretation here.
 const GROUP_SHAPE='ecc1f5d4203bdf56643cd11285a872ee515fc78e1da9f0fb40f35e1b8c531f7d';
 const APPEND_SHAPE='a61d0f1f7110166fd947c9f79f5970e63777673783db45c14720e043b14e18d7';
+export function assertWildRosterAppendSource(extra){
+  const append=one(extra,/function addWindAndEarthWildMonsters\(\)\{([\s\S]*?)\n    \}/,'Wild append');
+  if(hash(compact(append[0]))!==APPEND_SHAPE)fail('unsupported Wild append algorithm');
+  if(!/\baddWindAndEarthWildMonsters\(\);/.test(extra))fail('Wild append is not activated');
+  return append;
+}
 
 // Pure deployment metadata: no combat projection, runtime evaluation or random
 // sampling. This is neither the frozen encounter catalog nor a trusted ticket.
@@ -46,9 +52,7 @@ export async function buildPatrolSourceCatalog(root){
   const forestSpec=one(specs[1],/\[typeof forestMonsters!=="undefined"\?forestMonsters:null,(\d+),"([^"\\]*)","([^"\\]*)"\]/,'Forest append row');
   if(!/^return\[\[typeofforestMonsters/.test(compact(specs[1]))||
      !/\]\.filter\(entry=>Array\.isArray\(entry\[0\]\)\);$/.test(compact(specs[1])))fail('unsupported zone-spec inventory');
-  const append=one(extra,/function addWindAndEarthWildMonsters\(\)\{([\s\S]*?)\n    \}/,'Wild append');
-  if(hash(compact(append[0]))!==APPEND_SHAPE)fail('unsupported Wild append algorithm');
-  if(!/\baddWindAndEarthWildMonsters\(\);/.test(extra))fail('Wild append is not activated');
+  const append=assertWildRosterAppendSource(extra);
   const appended=[['wind',forestSpec[2]],['earth',forestSpec[3]]].map(([element,name])=>({
     name,level:Number(forestSpec[1]),element,monsterKey:`wild.zone-01.${element}-01`}));
   if(appended.some(row=>initial.some(entry=>entry.name===row.name))||appended[0].name===appended[1].name)

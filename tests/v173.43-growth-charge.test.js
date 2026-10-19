@@ -47,6 +47,7 @@ function harness(options={}){
         setTimeout:()=>1,setInterval:()=>1
     });
     context.window=context;
+    context.FourSymbolsExpPoolCatchUpPolicy=require("../functions/src/exp-pool-catch-up-policy");
     context.window.addEventListener=()=>{};
     vm.runInContext(growth,context);
     return {context,alerts,setNow:value=>{now=Number(value);},getNow:()=>now,state:()=>JSON.parse(store.get(KEY)||"{}")};

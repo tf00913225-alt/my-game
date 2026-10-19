@@ -132,9 +132,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             try{records=inspectRecoveryArchive(archiveSnap.data(),uid,
                 expectedRevision,snapshotSnap.data());}
             catch(_){fail("data-loss","Recovery archive or original snapshot is corrupt.");}
-            if(records.account.provenance!=="server-created"||
-               records.account.slots[1]!==null||records.account.slots[2]!==null){
-                fail("failed-precondition","Only the first server-created character is eligible.");
+            if(records.account.provenance!=="server-created"){
+                fail("failed-precondition","Only a server-created canonical account is eligible.");
             }
             if(operationSnap.exists){
                 return verifyRecoveredResult(tx,root,uid,operationId,expectedRevision,envelope.serverRevision,
@@ -350,8 +349,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                             original=inspectRecoveryArchive(archiveSnap.data(),uid,
                                 value.sourceRevision,snapshotSnap.data());
                             if(original.account.provenance!=="server-created"||
-                               original.account.slots[0]!==records.account.slots[0]||
-                               original.account.slots[1]!==null||original.account.slots[2]!==null){
+                               original.account.slots.some((id,index)=>id!==null&&id!==records.account.slots[index])){
                                 throw Error("Recovery character differs");
                             }
                         }catch(_){fail("data-loss","Retained recovery source is inconsistent.");}
@@ -444,7 +442,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                     if(!debitSnapshot.exists||!debitArchive.exists||
                        debitSnapshot.get("sha256")!==debit.snapshotSha256)throw new Error("Missing debit proof");
                     const original=inspectRecoveryArchive(debitArchive.data(),uid,debitRevision,debitSnapshot.data());
-                    if(original.account.slots[0]!==records.account.slots[0]||
+                    if(original.account.slots.some((id,index)=>id!==null&&id!==records.account.slots[index])||
+                       (debit.kind!=="shop-purchase"&&!records.account.slots.includes(debit.characterId))||
                        (debit.kind==="exp-allocation"&&!original.characters.some(row=>
                            row.characterId===debit.characterId&&row.state.level===debit.levelAfter))||
                        (debit.kind==="attribute-allocation"&&!original.characters.some(row=>
@@ -458,9 +457,9 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 if(debit.kind==="shop-purchase"){
                     await verifyShopPurchaseEvidence({...proof,itemId:debit.itemId,quantity:debit.quantity});
                 }else if(debit.kind==="exp-allocation"){
-                    verifyExpAllocationEvidence({...proof,characterId:records.account.slots[0]});
+                    verifyExpAllocationEvidence({...proof,characterId:debit.characterId});
                 }else{
-                    verifyAttributeAllocationEvidence({...proof,characterId:records.account.slots[0],stat:debit.stat});
+                    verifyAttributeAllocationEvidence({...proof,characterId:debit.characterId,stat:debit.stat});
                 }
             }
             if(creditLedgerCount!==archivedClaims.size){

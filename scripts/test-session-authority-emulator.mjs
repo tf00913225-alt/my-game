@@ -3424,6 +3424,61 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
     assert.equal(level,10,"Actual earned shared EXP and the existing allocator must reach Lv10");
     assert.ok(completedBattles>=2);assert.equal((await h.save.get()).get("authoritativeStateReady"),false);
     await checkRecoveryArchive(h.uid,await h.revision());
+    // Public multi-character intents consume only the genuine Forest-funded
+    // Lv10 authority above. Third-slot Lv50 admission stays separately scoped.
+    const multiIdentity=()=>({uid:h.uid,session:h.session});
+    const multiCall=(name,input)=>invoke(name,h.token,{...multiIdentity(),...input});
+    const originalPrimary=(await h.root.collection("characters").doc(charId).get()).get("state");
+    const additional=await h.intent({slotIndex:1,selection:{...choices,displayName:"HTTP Second",
+        attributes:{attack:0,vitality:0,energy:0,intelligence:0,defensePoints:0,agility:0}}});
+    const created=await multiCall("createAdditionalCanonicalCharacter",additional),secondaryId=created.characterId;
+    assert.equal(typeof secondaryId,"string");assert.equal(created.authoritativeStateReady,false);
+    async function checkMulti(){
+        const revision=await h.revision(),archive=await checkRecoveryArchive(h.uid,revision);
+        const rows=archive.get("sourceRecords.characters"),account=archive.get("sourceRecords.account");
+        assert.deepEqual(account.slots,[charId,secondaryId,null]);assert.equal(rows.length,2);
+        for(const row of rows){
+            assert.equal(row.serverRevision,revision);
+            const live=(await h.root.collection("characters").doc(row.characterId).get()).data();
+            const {createdAt,updatedAt,snapshotSha256,...source}=live;
+            assert.deepEqual(source,row);
+        }
+        assert.deepEqual(rows[0].state,originalPrimary,"Secondary intents preserve primary state");
+        assert.equal((await h.save.get()).get("authoritativeStateReady"),false);
+        return rows[1].state;
+    }
+    const secondaryBefore=await checkMulti();assert.equal(secondaryBefore.attributePoints,10);
+    const attributeInput=await h.intent({characterId:secondaryId,stat:"attack"});
+    await multiCall("allocateCanonicalAttributePoint",attributeInput);
+    const attributed=await checkMulti();assert.equal(attributed.attack,secondaryBefore.attack+1);
+    assert.equal(attributed.attributePoints,secondaryBefore.attributePoints-1);
+    // One additional real battle supplies the secondary allocation; no grant
+    // fixture or client amount is introduced at the callable boundary.
+    const secondaryBattle=await h.issue();await h.member(secondaryBattle.ticketId);await h.terminal(secondaryBattle.ticketId);
+    const secondaryPreExp=await checkMulti(),poolBefore=(await economy()).get("sharedExp");
+    const expInput=await h.intent({characterId:secondaryId});
+    const secondaryAllocation=await multiCall("allocateCanonicalSharedExp",expInput);
+    const secondaryAfter=await checkMulti();assert.equal(secondaryAfter.level,secondaryPreExp.level+1);
+    assert.equal((await economy()).get("sharedExp"),poolBefore-secondaryAllocation.cost);
+    const beforeMultiRetry=await h.capture();
+    for(const [name,input] of [["createAdditionalCanonicalCharacter",additional],
+        ["allocateCanonicalAttributePoint",attributeInput],["allocateCanonicalSharedExp",expInput]]){
+        assert.equal((await multiCall(name,input)).unchanged,true);
+        assert.deepEqual(await h.capture(),beforeMultiRetry,"Original HTTP retries cannot reauthorize rights");
+    }
+    for(const [name,extra] of [["createAdditionalCanonicalCharacter",{slotIndex:1,selection:additional.selection}],
+        ["allocateCanonicalAttributePoint",{characterId:secondaryId,stat:"attack"}],
+        ["allocateCanonicalSharedExp",{characterId:secondaryId}]]){
+        const input=await h.intent(extra);
+        for(const field of ["amount","level","state"])
+            await h.refuses(()=>multiCall(name,{...input,[field]:999}));
+        await h.refuses(()=>invoke(name,h.token,{...multiIdentity(),...input,uid:y}));
+        await h.refuses(()=>invoke(name,h.token,{...multiIdentity(),...input,session:null}));
+        if(name!=="createAdditionalCanonicalCharacter")
+            await h.refuses(()=>multiCall(name,{...input,characterId:"foreign-character"}));
+    }
+    await checkMulti();
+    console.log("PASS actual HTTP second character: Forest-funded Lv10 admission, unspent attribute and shared EXP target, complete two-character revisions and same-operation retries, strict minting/UID/session/foreign-target refusals.");
     console.log(`Forest repeat checkpoint: Lv10 verified after ${completedBattles} test battles; starting isolated recovery.`);
 
     // Recovery uses a different fresh UID and a deliberately small legitimate

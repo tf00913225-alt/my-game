@@ -4,7 +4,7 @@ const {randomBytes}=require("node:crypto");
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,snapshotDigest,
     claimRecordsDigest}=require("./canonical-snapshot");
 const {inspectRecoveryArchive,createRecoveryArchive}=require("./canonical-recovery-archive");
-const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=require("./canonical-owned-sources");
+const {source,readOwnedSources,readCharacterSources,advanceOwnedRecords,advanceOwnedSources}=require("./canonical-owned-sources");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalAccountModeTime}=require("./canonical-account-mode-time");
 const {preparePatrolMembers,patrolVictoryExp}=require("./patrol-ticket-policy");
@@ -117,9 +117,9 @@ function createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
         const envelope=inspectExistingEnvelope(envelopeSnap.data(),uid),account=singleSnaps[0].data();
         if(envelope.kind!=="current"||envelope.data.authoritativeStateReady!==false||account.ownerUid!==uid||
            account.provenance!=="server-created"||account.slots?.length!==3||typeof account.slots[0]!=="string"||
-           account.slots[1]!==null||account.slots[2]!==null||!Number.isSafeInteger(account.serverRevision)||
+           !Number.isSafeInteger(account.serverRevision)||
            account.serverRevision<2||account.serverRevision>envelope.serverRevision){
-            fail("failed-precondition","Unpublished first-character Patrol sources are required.");
+            fail("failed-precondition","Unpublished canonical Patrol sources are required.");
         }
         if(expectedRevision!==null&&expectedRevision!==envelope.serverRevision)fail("aborted","CLOUD_REVISION_CONFLICT");
         // A sibling may reject while readOwnedSources still has sequential
@@ -127,16 +127,15 @@ function createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
         // to roll back; keep Promise.all's first rejection object unchanged.
         let readFailed=false,firstReadError;
         const completed=await Promise.allSettled([
-            read(tx,ref(root,"characters",account.slots[0])),readOwnedSources(tx,root,fail),
+            readCharacterSources(cache(tx).proxy,root,account,fail),readOwnedSources(tx,root,fail),
             archived(tx,root,uid,account.serverRevision,account.snapshotSha256)].map(promise=>
                 promise.catch(error=>{
                     if(!readFailed){readFailed=true;firstReadError=error;}
                     throw error;
                 })));
         if(readFailed)throw firstReadError;
-        const [character,owned,original]=completed.map(result=>result.value);
-        if(!character.exists)fail("data-loss","Canonical Patrol character is missing.");
-        const records={...owned.records,characters:[source(character.data())],
+        const [characters,owned,original]=completed.map(result=>result.value);
+        const records={...owned.records,characters:characters.records,
             ...Object.fromEntries(Object.keys(SINGLE).map((key,index)=>[key,source(singleSnaps[index].data())]))};
         const snapshot=await read(tx,ref(root,"playableSnapshots",String(account.serverRevision)));
         try{verifyCanonicalSnapshotAgainstSources(snapshot.data(),uid,account.serverRevision,records);}

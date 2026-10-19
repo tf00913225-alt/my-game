@@ -74,8 +74,7 @@ async function readDailyCheckinEvidence({tx,root,uid,grantId,grant,fail,
         }
         const slots=records.account.slots;
         if(records.account.provenance!=="server-created"||
-           slots[0]!==event.characterId||slots[1]!==null||slots[2]!==null||
-           records.characters.length!==1||
+           slots[0]!==event.characterId||
            (allowCreate&&snapshot.data().sha256!==expectedSha256)){
             fail("data-loss","Daily check-in source character is not eligible.");
         }
