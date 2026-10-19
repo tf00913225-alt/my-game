@@ -12,7 +12,7 @@ const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocat
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
 const {decodeRecoveryAuditArtifact,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
-    inventoryDocumentMetadata,INVENTORY_LIMITS,encodePatrolProofPayload,decodePatrolProofPayload,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
+    inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
 const {createHash}=require("node:crypto");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
@@ -398,7 +398,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             return inventoryPageResult(args,run,payload,sha256,false);
         });
     }
-    // Forest-only component. These seals never certify the complete recovery closure.
+    // Bounded proof components. These seals never certify the complete recovery closure.
     function admitProofInventory(state,namespaces){
         if(namespaces.length!==31||state.phase!=="inventory"||!state.inventoryExhausted||state.capturedCount>PATROL_PROOF_LIMITS.inventoryDocuments)
             fail("failed-precondition","Forest proof inventory admission failed.");
@@ -426,10 +426,17 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
            pages.at(-1)?.row.operationId!==state.lastPageOperationId)fail("data-loss","Forest inventory terminal or membership differs.");
         return index;
     }
+    const proofComponent=value=>value==="forest-ticket"||value==="exp-allocation";
+    const proofKind=(version,suffix)=>"canonical-recovery-"+(version===1?"patrol-":"")+"proof-"+suffix;
+    const proofTarget=(version,component,sourceId)=>version===1?{ticketId:sourceId}:{component,sourceId};
+    const proofIntent=(version,args)=>version===1?{action:"capture-patrol-proof",auditId:args.auditId,
+        expectedEpoch:args.expectedEpoch,operationId:args.operationId,expectedSequence:args.expectedSequence,ticketId:args.sourceId}:
+        {schemaVersion:2,action:"capture-proof",...args};
     function proofStateHash(row){const {stateSha256,createdAt,updatedAt,...value}=row;return snapshotDigest(value);}
     function inspectProofState(row,run,inventory){
-        inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","inventoryStateSha256","nextSequence","lastOperationId","lastPayloadSha256","stateSha256","createdAt","updatedAt"],"Forest proof state");
-        if(row.schemaVersion!==1||row.kind!=="canonical-recovery-patrol-proof-state"||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||row.epoch!==run.epoch||
+        inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","inventoryStateSha256","nextSequence","lastOperationId","lastPayloadSha256","stateSha256","createdAt","updatedAt",...(row?.schemaVersion===2?["lastComponent","lastSourceId"]:[])],"Forest proof state");
+        if(![1,2].includes(row.schemaVersion)||row.kind!==proofKind(row.schemaVersion,"state")||
+           (row.schemaVersion===2&&(!proofComponent(row.lastComponent)||!OPERATION_ID.test(row.lastSourceId||"")))||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||row.epoch!==run.epoch||
            row.inventoryStateSha256!==inventory.stateSha256||!Number.isSafeInteger(row.nextSequence)||row.nextSequence<2||
            !OPERATION_ID.test(row.lastOperationId||"")||!HEX.test(row.lastPayloadSha256||"")||row.stateSha256!==proofStateHash(row)||
            typeof row.createdAt?.toMillis!=="function"||typeof row.updatedAt?.toMillis!=="function")fail("data-loss","Forest proof state differs.");
@@ -450,10 +457,11 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             if(snapshotDigest(actual)!==snapshotDigest(metadata))fail("data-loss","Forest proof dependency version or bytes changed.");
         }else if(metadata||row.data!==null||row.updateTime!==null)fail("data-loss","Forest proof absence contradicts inventory.");
     }
-    async function checkPatrolCapsule(payload,run,inventory,index,namespaces){
-        inventoryExact(payload,["schemaVersion","kind","ownerUid","sourceRevision","ticketId","inventoryStateSha256","documents"],"Forest proof payload");
-        if(payload.schemaVersion!==1||payload.kind!=="canonical-recovery-patrol-proof-payload"||payload.ownerUid!==run.ownerUid||
-           payload.sourceRevision!==run.sourceRevision||payload.inventoryStateSha256!==inventory.stateSha256||!OPERATION_ID.test(payload.ticketId||"")||
+    async function checkProofCapsule(payload,run,inventory,index,namespaces,version,component,sourceId){
+        inventoryExact(payload,["schemaVersion","kind","ownerUid","sourceRevision",...(version===1?["ticketId"]:["component","sourceId"]),"inventoryStateSha256","documents"],"Forest proof payload");
+        if(payload.schemaVersion!==version||payload.kind!==proofKind(version,"payload")||
+           (version===1?payload.ticketId!==sourceId:payload.component!==component||payload.sourceId!==sourceId)||payload.ownerUid!==run.ownerUid||
+           payload.sourceRevision!==run.sourceRevision||payload.inventoryStateSha256!==inventory.stateSha256||!OPERATION_ID.test(sourceId||"")||
            !Array.isArray(payload.documents)||payload.documents.length>79)fail("data-loss","Forest proof payload differs.");
         const records=new Map();let previous=null;
         for(const row of payload.documents){
@@ -471,15 +479,29 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         await verifyCandidateAuditControl(fixed,root,run.ownerUid,run.sourceRevision,{auditId:run.auditId,epoch:run.epoch,
             sessionId:run.sessionId,sessionRevision:run.sessionRevision,recordedAt:read(root.path+"/recoveryApprovals/"+run.approvalOperationId).get("issuedAt")});
         let reads=0;const kernel={get:reference=>{if(++reads>PATROL_PROOF_LIMITS.kernelReads)fail("resource-exhausted","Forest proof kernel read budget exceeded.");return fixed.get(reference);}};
-        patrolEvidence.beginEvidenceAttempt(kernel);
-        const ticket=read(root.path+"/patrolTickets/"+payload.ticketId);
-        await patrolEvidence.verifyRetainedTicket(kernel,root,run.ownerUid,source.records.account,ticket,run.sourceRevision);
+        await verifyProofUnit(fixed,kernel,root,run.ownerUid,source.records,run.sourceRevision,component,sourceId);
         if(used.size!==records.size)fail("data-loss","Forest proof contains unused raw dependencies.");
     }
-    async function capturePatrolProof(request,args){
-        auditIntent("capture Forest proof",args,["auditId","expectedEpoch","operationId","expectedSequence","ticketId"]);
-        if(!OPERATION_ID.test(args.ticketId||"")||!Number.isSafeInteger(args.expectedSequence)||args.expectedSequence<1)
-            fail("invalid-argument","A Forest ticket and sequence are required.");
+    // Both capture and immutable replay invoke the same original evidence Owner.
+    async function verifyProofUnit(seed,kernel,root,uid,records,revision,component,sourceId){
+        if(component==="forest-ticket"){
+            patrolEvidence.beginEvidenceAttempt(kernel);
+            const ticket=await seed.get(root.collection("patrolTickets").doc(sourceId));
+            await patrolEvidence.verifyRetainedTicket(kernel,root,uid,records.account,ticket,revision);
+        }else if(component==="exp-allocation"){
+            const operation=await kernel.get(root.collection("operations").doc(sourceId));
+            if(!operation.exists||operation.id!==sourceId||operation.get("operationId")!==sourceId||operation.get("kind")!=="exp-allocation")
+                fail("data-loss","EXP proof source kind or identity differs.");
+            const ledger=await kernel.get(root.collection("ledgerEntries").doc(sourceId));
+            const grant=await kernel.get(root.collection("grantOperations").doc(sourceId));
+            if(grant.exists)fail("data-loss","EXP proof overlaps a grant.");
+            await verifyDebitRecoveryEvidence(kernel,root,uid,revision,records,operation,ledger.data(),undefined);
+        }else fail("invalid-argument","Unsupported proof component.");
+    }
+    async function captureProof(request,args){
+        auditIntent("capture proof",args,["auditId","expectedEpoch","operationId","expectedSequence","component","sourceId"]);
+        if(!proofComponent(args.component)||!OPERATION_ID.test(args.sourceId||"")||!Number.isSafeInteger(args.expectedSequence)||args.expectedSequence<1)
+            fail("invalid-argument","A supported proof component, source and sequence are required.");
         return runRecoveryAuditMaintenance(request,args.auditId,async(rawTx,session)=>{
             // Session Authority has already read its two Session records and fence.
             // Reserve query limits BEFORE sending a read, then release unused slots.
@@ -507,27 +529,32 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 if(retained.some(rows=>rows.size>0))fail("data-loss","Forest orphan history survives missing proof state.");
             }
             const index=await completeInventory(tx,run,inventory,namespaces,runRef);
-            const state=stateSnap.exists?inspectProofState(stateSnap.data(),run,inventory):null,
-                intentSha256=snapshotDigest({action:"capture-patrol-proof",...args});
+            const state=stateSnap.exists?inspectProofState(stateSnap.data(),run,inventory):null,version=state?.schemaVersion??2;
+            if(version===1&&args.component!=="forest-ticket")fail("failed-precondition","Legacy Forest audit requires a new audit for EXP proof.");
+            const intentSha256=snapshotDigest(proofIntent(version,args));
             if(state){
                 const headSnap=state.lastOperationId===args.operationId?receiptSnap:
                     await tx.get(runRef.collection("patrolProofPages").doc(state.lastOperationId)),head=headSnap.data();
-                if(!headSnap.exists||head?.schemaVersion!==1||head.kind!=="canonical-recovery-patrol-proof-page"||head.ownerUid!==run.ownerUid||
+                inventoryExact(head,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","intentSha256","sequence",...(version===1?["ticketId"]:["component","sourceId"]),
+                    "inventoryStateSha256","payloadSha256","payloadByteLength","chunkSha256s","createdAt"],"proof state head receipt");
+                const headComponent=version===1?"forest-ticket":head.component,headSource=version===1?head.ticketId:head.sourceId;
+                if(!headSnap.exists||head.schemaVersion!==version||head.kind!==proofKind(version,"page")||head.ownerUid!==run.ownerUid||
                    head.auditId!==run.auditId||head.epoch!==run.epoch||head.operationId!==state.lastOperationId||head.sequence!==state.nextSequence-1||
-                   head.inventoryStateSha256!==inventory.stateSha256||head.payloadSha256!==state.lastPayloadSha256||!OPERATION_ID.test(head.ticketId||"")||
-                   head.intentSha256!==snapshotDigest({action:"capture-patrol-proof",auditId:run.auditId,expectedEpoch:run.epoch,
-                       operationId:head.operationId,expectedSequence:head.sequence,ticketId:head.ticketId}))fail("data-loss","Forest proof state head differs.");
+                   head.inventoryStateSha256!==inventory.stateSha256||head.payloadSha256!==state.lastPayloadSha256||!proofComponent(headComponent)||!OPERATION_ID.test(headSource||"")||
+                   (version===2&&(state.lastComponent!==headComponent||state.lastSourceId!==headSource))||
+                   head.intentSha256!==snapshotDigest(proofIntent(version,{auditId:run.auditId,expectedEpoch:run.epoch,
+                       operationId:head.operationId,expectedSequence:head.sequence,component:headComponent,sourceId:headSource})))fail("data-loss","Forest proof state head differs.");
             }
-            const result=(receipt,unchanged)=>({...inventoryFlags,component:"forest-ticket",auditId:run.auditId,epoch:run.epoch,
-                operationId:args.operationId,ticketId:args.ticketId,sequence:receipt.sequence,payloadSha256:receipt.payloadSha256,
+            const result=(receipt,unchanged)=>({...inventoryFlags,component:args.component,auditId:run.auditId,epoch:run.epoch,
+                operationId:args.operationId,sourceId:args.sourceId,sequence:receipt.sequence,payloadSha256:receipt.payloadSha256,
                 payloadByteLength:receipt.payloadByteLength,chunkCount:receipt.chunkSha256s.length,unchanged});
             if(receiptSnap.exists){
                 const receipt=receiptSnap.data();
-                inventoryExact(receipt,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","intentSha256","sequence","ticketId",
+                inventoryExact(receipt,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","intentSha256","sequence",...(version===1?["ticketId"]:["component","sourceId"]),
                     "inventoryStateSha256","payloadSha256","payloadByteLength","chunkSha256s","createdAt"],"Forest proof receipt");
-                if(receipt.schemaVersion!==1||receipt.kind!=="canonical-recovery-patrol-proof-page"||receipt.ownerUid!==run.ownerUid||receipt.auditId!==run.auditId||
+                if(receipt.schemaVersion!==version||receipt.kind!==proofKind(version,"page")||receipt.ownerUid!==run.ownerUid||receipt.auditId!==run.auditId||
                    receipt.epoch!==run.epoch||receipt.operationId!==args.operationId||receipt.intentSha256!==intentSha256||receipt.sequence!==args.expectedSequence||
-                   receipt.ticketId!==args.ticketId||receipt.inventoryStateSha256!==inventory.stateSha256||!state||state.nextSequence<=receipt.sequence||
+                   (version===1?receipt.ticketId!==args.sourceId:receipt.component!==args.component||receipt.sourceId!==args.sourceId)||receipt.inventoryStateSha256!==inventory.stateSha256||!state||state.nextSequence<=receipt.sequence||
                    !Number.isSafeInteger(receipt.payloadByteLength)||receipt.payloadByteLength<1||receipt.payloadByteLength>PATROL_PROOF_LIMITS.bytes||
                    !Array.isArray(receipt.chunkSha256s)||receipt.chunkSha256s.length!==Math.ceil(receipt.payloadByteLength/PATROL_PROOF_LIMITS.chunkBytes)||
                    receipt.chunkSha256s.some(hash=>!HEX.test(hash||""))||!HEX.test(receipt.payloadSha256||"")||typeof receipt.createdAt?.toMillis!=="function"||
@@ -536,46 +563,46 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 const chunks=[];
                 for(let number=0;number<receipt.chunkSha256s.length;number++){
                     const snap=await tx.get(runRef.collection("proofPayloadChunks").doc(args.operationId+"_"+String(number).padStart(2,"0"))),row=snap.data();
-                    inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","chunkIndex","payloadBytes","sha256"],"Forest proof chunk");
-                    if(row.schemaVersion!==1||row.kind!=="canonical-recovery-patrol-proof-chunk"||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||
+                    inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","chunkIndex","payloadBytes","sha256",...(version===1?[]:["component","sourceId"])],"Forest proof chunk");
+                    if(row.schemaVersion!==version||row.kind!==proofKind(version,"chunk")||
+                       (version===2&&(row.component!==args.component||row.sourceId!==args.sourceId))||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||
                        row.epoch!==run.epoch||row.operationId!==args.operationId||row.chunkIndex!==number||!Buffer.isBuffer(row.payloadBytes)||
                        row.payloadBytes.length!==(number===receipt.chunkSha256s.length-1?receipt.payloadByteLength-number*PATROL_PROOF_LIMITS.chunkBytes:PATROL_PROOF_LIMITS.chunkBytes)||
                        row.sha256!==receipt.chunkSha256s[number]||inventoryHash(row.payloadBytes)!==row.sha256)fail("data-loss","Forest proof chunk differs.");
                     chunks.push(row.payloadBytes);
                 }
                 const bytes=Buffer.concat(chunks);if(inventoryHash(bytes)!==receipt.payloadSha256)fail("data-loss","Forest proof complete payload differs.");
-                const payload=decodePatrolProofPayload(bytes);if(payload.ticketId!==args.ticketId)fail("data-loss","Forest proof ticket differs.");
-                await checkPatrolCapsule(payload,run,inventory,index,namespaces);return result(receipt,true);
+                const payload=decodeProofPayload(bytes);
+                await checkProofCapsule(payload,run,inventory,index,namespaces,version,args.component,args.sourceId);return result(receipt,true);
             }
             if((state?.nextSequence??1)!==args.expectedSequence)fail("failed-precondition","Forest proof sequence is not current.");
             const root=db.collection("serverUsers").doc(session.uid),base=await Promise.all([
                 tx.get(db.doc("users/"+session.uid+"/saves/current")),tx.get(root.collection("recoveryArchives").doc(String(run.sourceRevision))),
                 tx.get(root.collection("playableSnapshots").doc(String(run.sourceRevision)))]);
             const source=inspectCurrentRecoverySource(session.uid,run.sourceRevision,{envelopeSnap:base[0],archiveSnap:base[1],snapshotSnap:base[2]});
-            const ticket=await tx.get(root.collection("patrolTickets").doc(args.ticketId));let kernelReads=0;
+            let kernelReads=0;
             const kernel={get:reference=>{if(typeof reference?.collection!=="function")fail("data-loss","Forest proof requires point reads only.");
                 if(++kernelReads>60)fail("resource-exhausted","Forest proof kernel read budget exceeded.");return tx.get(reference);}};
-            patrolEvidence.beginEvidenceAttempt(kernel);
-            await patrolEvidence.verifyRetainedTicket(kernel,root,session.uid,source.records.account,ticket,run.sourceRevision);
+            await verifyProofUnit(tx,kernel,root,session.uid,source.records,run.sourceRevision,args.component,args.sourceId);
             const documents=[...dependencies.values()].filter(row=>namespaces.includes(row.path.slice(0,row.path.lastIndexOf("/"))))
                 .sort((a,b)=>inventoryCompare(a.path,b.path));
             for(const row of documents)proofMembership(row.path,row,index,namespaces);
-            let bytes,payload={schemaVersion:1,kind:"canonical-recovery-patrol-proof-payload",ownerUid:session.uid,sourceRevision:run.sourceRevision,
-                ticketId:args.ticketId,inventoryStateSha256:inventory.stateSha256,documents};
-            try{bytes=encodePatrolProofPayload(payload);await checkPatrolCapsule(decodePatrolProofPayload(bytes),run,inventory,index,namespaces);}
+            let bytes,payload={schemaVersion:version,kind:proofKind(version,"payload"),ownerUid:session.uid,sourceRevision:run.sourceRevision,
+                ...proofTarget(version,args.component,args.sourceId),inventoryStateSha256:inventory.stateSha256,documents};
+            try{bytes=encodeProofPayload(payload);await checkProofCapsule(decodeProofPayload(bytes),run,inventory,index,namespaces,version,args.component,args.sourceId);}
             catch(error){if(error instanceof HttpsError)throw error;fail("data-loss",error.message);}
             const chunks=[];for(let offset=0;offset<bytes.length;offset+=PATROL_PROOF_LIMITS.chunkBytes)chunks.push(bytes.subarray(offset,offset+PATROL_PROOF_LIMITS.chunkBytes));
-            const stamp=FieldValue.serverTimestamp(),receipt={schemaVersion:1,kind:"canonical-recovery-patrol-proof-page",ownerUid:session.uid,auditId:run.auditId,
-                epoch:run.epoch,operationId:args.operationId,intentSha256,sequence:args.expectedSequence,ticketId:args.ticketId,inventoryStateSha256:inventory.stateSha256,
+            const stamp=FieldValue.serverTimestamp(),receipt={schemaVersion:version,kind:proofKind(version,"page"),ownerUid:session.uid,auditId:run.auditId,
+                epoch:run.epoch,operationId:args.operationId,intentSha256,sequence:args.expectedSequence,...proofTarget(version,args.component,args.sourceId),inventoryStateSha256:inventory.stateSha256,
                 payloadSha256:inventoryHash(bytes),payloadByteLength:bytes.length,chunkSha256s:chunks.map(inventoryHash),createdAt:stamp};
-            const next={schemaVersion:1,kind:"canonical-recovery-patrol-proof-state",ownerUid:session.uid,auditId:run.auditId,epoch:run.epoch,
-                inventoryStateSha256:inventory.stateSha256,nextSequence:args.expectedSequence+1,lastOperationId:args.operationId,lastPayloadSha256:receipt.payloadSha256,
+            const next={schemaVersion:version,kind:proofKind(version,"state"),ownerUid:session.uid,auditId:run.auditId,epoch:run.epoch,
+                inventoryStateSha256:inventory.stateSha256,nextSequence:args.expectedSequence+1,lastOperationId:args.operationId,lastPayloadSha256:receipt.payloadSha256,...(version===1?{}:{lastComponent:args.component,lastSourceId:args.sourceId}),
                 createdAt:state?.createdAt??stamp,updatedAt:stamp};
             if(!Number.isSafeInteger(next.nextSequence))fail("resource-exhausted","Forest proof sequence exhausted.");next.stateSha256=proofStateHash(next);
             // Fixed <=8 binary chunks plus receipt/state: <=10 writes. Oversize
             // and every proof check have already failed before any mutation.
             chunks.forEach((payloadBytes,chunkIndex)=>rawTx.create(runRef.collection("proofPayloadChunks").doc(args.operationId+"_"+String(chunkIndex).padStart(2,"0")),{
-                schemaVersion:1,kind:"canonical-recovery-patrol-proof-chunk",ownerUid:session.uid,auditId:run.auditId,epoch:run.epoch,
+                schemaVersion:version,kind:proofKind(version,"chunk"),... (version===1?{}:{component:args.component,sourceId:args.sourceId}),ownerUid:session.uid,auditId:run.auditId,epoch:run.epoch,
                 operationId:args.operationId,chunkIndex,payloadBytes,sha256:receipt.chunkSha256s[chunkIndex]}));
             rawTx.create(receiptRef,receipt);if(state)rawTx.set(proofStateRef,next);else rawTx.create(proofStateRef,next);
             return result(receipt,false);
@@ -1169,7 +1196,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             fail("data-loss",error.message);
         }
     }
-    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,capturePatrolProof});
+    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,captureProof});
 }
 
 module.exports={createCanonicalCurrentRecovery,inspectRecoveryAuditFence,
