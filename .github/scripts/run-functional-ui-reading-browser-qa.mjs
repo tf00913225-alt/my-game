@@ -2,13 +2,15 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import {spawn} from 'node:child_process';
+import {spawn,execFileSync} from 'node:child_process';
 import {ROOT,startServer,waitJson,Cdp,findChrome} from './runtime-browser-qa-support.mjs';
 
 // Use the same isolated account and the real production loader as skill QA.
 const skillQa=fs.readFileSync(path.join(ROOT,'.github/scripts/run-skill-progression-browser-qa.mjs'),'utf8');
 const prepare=skillQa.match(/const PREPARE_RUNTIME=`([\s\S]*?)`;/)[1];
 const viewport=JSON.parse(process.env.UI_READING_VIEWPORT||'[393,873]');
+const sourceHead=process.env.GITHUB_SHA||execFileSync('git',['rev-parse','HEAD'],{cwd:ROOT,encoding:'utf8'}).trim();
+const sourceDirty=!!execFileSync('git',['status','--porcelain'],{cwd:ROOT,encoding:'utf8'}).trim();
 const out=path.join(ROOT,'artifacts/browser-qa/functional-reading',viewport.join('x'));
 fs.mkdirSync(out,{recursive:true});
 const server=await startServer();
@@ -65,6 +67,77 @@ try{
   console.log(name+': '+data.rows.length+' text nodes, '+data.rows.filter(x=>x.font<12.9).length+' below minimum');
  };
  if(process.env.UI_READING_CREATION_ONLY!=='1'){
+  await c.eval("(()=>{closeHomeFeature();showPage('home');window.__readingInventoryBackup=inventoryItems.slice();window.__readingEquipmentBackup=structuredClone(characterEquipment);inventoryItems.splice(0);rebuildInventorySlots();openMapInventoryOverlay('home');setInventoryFilter('equipment');})()");
+  await capture('inventory-empty','#inventoryPage');
+  assert.equal(await c.eval("document.querySelectorAll('#inventoryGrid .has-item').length"),0,'empty inventory still displays items');
+  for(const filter of ['item','material','function']){
+   await c.eval(`setInventoryFilter(${JSON.stringify(filter)})`);
+   assert.equal(await c.eval("document.querySelectorAll('#inventoryGrid .has-item').length"),0,'empty category contains stale item');
+  }
+  await c.eval("(()=>{inventoryItems.splice(0,...Array.from({length:120},(_,i)=>({...v17346GenerateEquipment(()=>.2,{slot:'armor',classType:'warrior',rarity:'orange',uid:'reading-full-'+i}),count:1})));rebuildInventorySlots();setInventoryFilter('equipment');})()");
+  // The formal first render may equip one fixture item. Fill the remaining
+  // bag slot afterwards; do not change equipment normalization to stage QA.
+  await c.eval("(()=>{if(inventoryItems.length===119){inventoryItems.push({...v17346GenerateEquipment(()=>.2,{slot:'armor',classType:'warrior',rarity:'orange',uid:'reading-full-extra'}),count:1});rebuildInventorySlots();renderInventoryItems();}})()");
+  const fullState=await c.eval('({items:inventoryItems.length,slots:inventorySlots.filter(Boolean).length,first:inventoryItems[0],last:inventoryItems.at(-1)})');
+  assert.equal(fullState.slots,120,'full inventory fixture did not fill formal capacity: '+JSON.stringify(fullState));
+  await capture('inventory-full','#inventoryPage');
+  await c.eval('openItemModal(0)');await capture('inventory-full-detail','#itemModal');await c.eval('closeItemModal()');
+  assert.ok(await c.eval("document.getElementById('inventoryPage').getBoundingClientRect().width>0&&document.querySelectorAll('#inventoryGrid .has-item').length>0"),'full inventory not restored after item detail');
+  await capture('inventory-full-return','#inventoryPage');
+  await c.eval("inventoryItems.splice(0,inventoryItems.length,...window.__readingInventoryBackup);Object.assign(characterEquipment,structuredClone(window.__readingEquipmentBackup));rebuildInventorySlots();renderInventory();closeMapInventoryOverlay()");
+  await c.eval(`(()=>{
+   const ticket=v132GetContentDefinitions().tickets[0];
+   if(!ticket)throw Error('real ticket definition missing');
+   window.__readingPreviewTicket={...ticket,count:3};
+   inventoryItems.push({id:'materialChest',name:'材料寶箱',type:'chest',count:3,stats:{}},{...ticket,count:3});
+   rebuildInventorySlots();
+   window.__readingPreviewAssets=()=>JSON.stringify({gold,inventoryItems,characterEquipment});
+   window.__readingPreviewBefore=window.__readingPreviewAssets();
+   closeHomeFeature();showPage('home');
+  })()`);
+  for(const type of ['material','ticket']){
+   const info=await c.eval(`(()=>{
+    const id=${type==='material'?"'materialChest'":"window.__readingPreviewTicket.id"};
+    openItemModal(inventorySlots.findIndex(i=>i?.id===id));
+    const button=document.getElementById('v132ItemPreviewButton');
+    if(!button||getComputedStyle(button).display==='none')throw Error('formal preview action unavailable');
+    button.click();
+    const modal=document.getElementById('v132RewardModal');
+    const rows=Array.from(modal.querySelectorAll('${type==='material'?'.v132-preview-row':'.v132-preview-item'}'));
+    const defs=${type==='material'?"v132MaterialChestDropTable.map(e=>({entry:e,def:v132GetOreDefinition(e.itemId)||getPotionDefinition(e.itemId)}))":"v132GetEquipmentSetItemDefinitions(window.__readingPreviewTicket.setId).map(def=>({def}))"};
+    return {title:modal.querySelector('h3')?.textContent,rule:modal.querySelector('p')?.textContent,
+     rows:rows.map(e=>({text:e.textContent,icon:!!e.querySelector('.v132-preview-icon'),id:e.dataset.itemId})),
+     expected:defs.map(({entry,def})=>({name:def.name,amount:entry?.amount,probability:entry?.weight??100/defs.length,id:def.id}))};
+   })()`);
+   assert.ok(info.title?.includes('開啟預覽'),type+': preview title missing');
+   assert.match(info.rule,/每箱抽取一項|隨機獲得1件/,type+': draw-count rule missing');
+   if(type==='material')assert.match(info.rule,/暫定.*尚未定案/,'provisional chest policy must remain visible');
+   assert.equal(info.rows.length,info.expected.length,type+': preview rows do not match formal definitions');
+   info.expected.forEach((e,i)=>{assert.ok(info.rows[i].icon&&info.rows[i].text.includes(e.name),type+': missing item icon/name '+e.name);assert.ok(info.rows[i].text.includes((Math.round(e.probability*10)/10)+'%'),type+': wrong displayed probability');if(e.amount)assert.ok(info.rows[i].text.includes('×'+e.amount),'material preview quantity missing');});
+   await capture('preview-'+type,'#v132RewardModal');
+   const scroll=await c.eval(`(()=>{const root=document.getElementById('v132RewardModal'),list=root.querySelector('.v132-preview-list-scroll,.v132-preview-grid');let e=list;while(e&&!(e.scrollHeight>e.clientHeight+1&&/auto|scroll/.test(getComputedStyle(e).overflowY)))e=e.parentElement;if(!e)return {needed:false};e.scrollTop=e.scrollHeight;const last=list.lastElementChild.getBoundingClientRect(),r=e.getBoundingClientRect();return {needed:true,top:e.scrollTop,reachable:last.bottom<=r.bottom+1};})()`);
+   if(scroll.needed)assert.ok(scroll.top>0&&scroll.reachable,type+': final preview entry unreachable');
+   await capture('preview-'+type+'-end','#v132RewardModal');
+   if(type==='ticket'){
+    await c.eval("document.querySelector('#v132RewardModal .v132-preview-item').click()");
+    assert.ok(await c.eval("document.getElementById('itemModal').classList.contains('v132-ticket-preview-detail')&&document.getElementById('v132RewardModal').classList.contains('v132-detail-paused')"),'ticket result detail did not preserve preview');
+    await capture('preview-ticket-equipment','#itemModal');
+    await c.eval('closeItemModal()');
+    const returnState=await c.eval("(()=>{const e=document.getElementById('v132RewardModal'),r=e.getBoundingClientRect(),s=getComputedStyle(e);return {classes:e.className,style:e.getAttribute('style'),display:s.display,visibility:s.visibility,width:r.width,height:r.height,items:e.querySelectorAll('.v132-preview-item').length};})()");
+    fs.writeFileSync(path.join(out,'preview-ticket-return-state.json'),JSON.stringify(returnState,null,2));
+    const returnImage=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,'preview-ticket-return.png'),Buffer.from(returnImage.data,'base64'));
+    assert.ok(returnState.width&&returnState.height&&returnState.display!=='none'&&returnState.visibility!=='hidden','ticket preview became invisible after returning from item detail: '+JSON.stringify(returnState));
+    assert.ok(await c.eval("!document.getElementById('v132RewardModal').classList.contains('v132-detail-paused')&&document.querySelectorAll('#v132RewardModal .v132-preview-item').length===10"),'ticket detail did not return to preview');
+    await capture('preview-ticket-return','#v132RewardModal');
+   }
+   await c.eval("document.querySelector('#v132RewardModal .v132-reward-actions button').click();closeItemModal()");
+   await c.eval(`v132ShowItemPreview(${type==='material'?"inventoryItems.find(i=>i.id==='materialChest')":"window.__readingPreviewTicket"})`);
+   await capture('preview-'+type+'-reopen','#v132RewardModal');
+   await c.eval('v132CloseRewardModal()');
+   assert.ok(await c.eval('window.__readingPreviewBefore===window.__readingPreviewAssets()'),type+': read-only preview changed player assets');
+  }
+ }
+ if(process.env.UI_READING_CREATION_ONLY!=='1'&&process.env.UI_READING_PREVIEW_ONLY!=='1'){
  await c.eval("selectedSkillElementTab='fire';renderSkillLoadout();showSkillDetail('flameSlash')");
  await capture('skill-detail','#skillDetailModal');await c.eval('closeSkillDetail()');
  for(const feature of ['character','shop','forge','synthesis','autoBattleSettings','quest','announcement','system','rest','expPool','offlineExp','hero','relic','achievement']){
@@ -129,12 +202,14 @@ try{
  const questScroll=await c.eval("(()=>{const e=document.querySelector('.quest-completion-milestones');e.scrollLeft=e.scrollWidth;return {left:e.scrollLeft,last:e.lastElementChild.getBoundingClientRect().right,edge:e.getBoundingClientRect().right,count:e.children.length};})()");
  assert.ok(questScroll.count===5&&questScroll.left>0&&questScroll.last<=questScroll.edge+1,'all quest milestones must be reachable');
  }
+ if(process.env.UI_READING_PREVIEW_ONLY!=='1'){
  await c.eval("closeHomeFeature();showPage('home');openCharacterCreation(3)");await capture('creation-step-1','#creationPage');
  for(const element of ['water','wind','earth']){await c.eval(`selectElement(${JSON.stringify(element)})`);await capture('creation-'+element,'#creationPage');}
  const creationFit=await c.eval("(()=>{const role=document.querySelector('.creation-role-card').getBoundingClientRect(),box=document.querySelector('.creation-showcase').getBoundingClientRect();return role.bottom<=box.bottom+1;})()");assert.ok(creationFit,'creation role description clipped');
  await c.eval("showCreationSkillDetail('flameSlash')");await capture('creation-skill-detail','#creationSkillDetailModal');await c.eval('closeCreationSkillDetail()');
  await c.eval('setCreationStep(2)');await capture('creation-step-2','#creationPage');await c.eval('cancelAdditionalCharacterCreation()');
- const report={viewport,scenes:scenes.map(s=>({name:s.name,textCount:s.rows.length,small:s.rows.filter(x=>x.font<12.9),smallControls:s.rows.filter(x=>x.button&&x.font<14.9),smallPrimaryControls:s.rows.filter(x=>x.primary&&x.font<14.9),overflow:s.overflow,clippedControls:s.controls.filter(x=>x.overflow)}))};
+ }
+ const report={head:sourceHead,dirty:sourceDirty,viewport,previewOnly:process.env.UI_READING_PREVIEW_ONLY==='1',scenes:scenes.map(s=>({name:s.name,textCount:s.rows.length,small:s.rows.filter(x=>x.font<12.9),smallControls:s.rows.filter(x=>x.button&&x.font<14.9),smallPrimaryControls:s.rows.filter(x=>x.primary&&x.font<14.9),overflow:s.overflow,clippedControls:s.controls.filter(x=>x.overflow)}))};
  fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2));
  fs.writeFileSync(path.join(out,'all-text.json'),JSON.stringify(scenes,null,2));
  if(process.env.UI_READING_AUDIT_ONLY!=='1'){
