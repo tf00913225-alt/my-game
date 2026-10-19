@@ -1,0 +1,134 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "sourceHead": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+  "assetId": "rage-status",
+  "mode": "builtin-imagegen-edit",
+  "attemptCount": 2,
+  "editTarget": "assets/vfx/status/rage.webp",
+  "mother": "C:/Users/User/.codex/generated_images/01a1547a-7158-78a2-ae5f-0bf74afde211/exec-70f0dc98-de0b-4c35-883a-47118d88736a.png",
+  "output": "tools/vfx-commercial-sample/assets/full/rage-status-v2.webp",
+  "prompts": [
+    "Use case: precise-object-edit. Edit target: the attached rage status image. Replace the solid angry fire face ENTIRELY with one restrained persistent rage aura for a mobile RPG character. SINGLE IMAGE, not sprite sheet, no panels. Transparent RGBA canvas, square aspect. Thin elegant red/orange flame ribbons flow UP along the left and right outer sides of a tall oval, lightly joined by a narrow curved base wisp. Large completely EMPTY transparent central opening: central rectangle spanning x=32%-68%, y=24%-76% MUST have no glow, no mist, no painted pixels. Aura sides around x=22% and78%, base near76%. Outer silhouette including faint glow must remain within central76% of canvas leaving at least12% FULLY transparent margins on ALL FOUR edges; do not fill canvas. Sparse curling crimson and orange tips, small sharp gold highlights, rich but controlled fine fantasy flame detail. This effect sits around a visible person but DO NOT DRAW ANY PERSON or placeholder. Keep centre fully open to show face/body of the character underneath. No face, no monster, no eyes, no demonic mouth, no solid flame pillar, no cloud, no fog, no fire disk, no huge bloom, no background rectangle, no text, no letters, no glyphs, no numbers, no border. Avoid a complete thick ring; use delicate separated flowing strands with breathing space. Actual alpha transparency, not fake black or checkerboard background.",
+    "Use case: precise-object-edit. Edit target: the attached rage status image. Replace the solid angry fire face ENTIRELY with one restrained persistent rage aura for a mobile RPG character. SINGLE IMAGE, not sprite sheet, no panels. Transparent RGBA canvas, square aspect. Thin elegant red/orange flame ribbons flow UP along the left and right outer sides of a tall oval, lightly joined by a narrow curved base wisp. Large completely EMPTY transparent central opening: central rectangle spanning x=32%-68%, y=24%-76% MUST have no glow, no mist, no painted pixels. Aura sides around x=22% and78%, base near76%. Outer silhouette including faint glow must remain within central76% of canvas leaving at least12% FULLY transparent margins on ALL FOUR edges; do not fill canvas. Sparse curling crimson and orange tips, small sharp gold highlights, rich but controlled fine fantasy flame detail. This effect sits around a visible person but DO NOT DRAW ANY PERSON or placeholder. Keep centre fully open to show face/body of the character underneath. No face, no monster, no eyes, no demonic mouth, no solid flame pillar, no cloud, no fog, no fire disk, no huge bloom, no background rectangle, no text, no letters, no glyphs, no numbers, no border. Avoid a complete thick ring; use delicate separated flowing strands with breathing space. Actual alpha transparency, not fake black or checkerboard background.\nCRITICAL EDIT OF PREVIOUS GENERATED AURA: Shrink the ENTIRE aura composition in the image itself to occupy only central60% width and60% height. The bounding box MUST be within x20%-80%,y20%-80%. The outermost20% on all sides is FULLY EMPTY transparent. Leave much more empty outer canvas. Make flame strips half their current thickness, with delicate narrow separated strands instead of massive bands. Preserve red-orange rage identity and large open centre. Keep the centre rectangle x35%-65%,y35%-65% absolutely alpha0. This extra empty outer space is mandatory; do not extend any wisps or glow into that margin. No solid face."
+  ],
+  "grid": {
+    "columns": 1,
+    "rows": 1,
+    "frames": 1
+  },
+  "conversion": {
+    "lossless": true,
+    "exact": true,
+    "rgbaPixelEquality": true,
+    "alphaEquality": true,
+    "motherSize": [
+      1254,
+      1254
+    ],
+    "outputSize": [
+      1254,
+      1254
+    ],
+    "resized": false,
+    "cropped": false,
+    "rearranged": false
+  },
+  "alpha": {
+    "bounds": [
+      {
+        "threshold": 1,
+        "bbox": [
+          0,
+          35,
+          1234,
+          1254
+        ],
+        "paddingFraction": [
+          0.0,
+          0.0279,
+          0.0159,
+          0.0
+        ]
+      },
+      {
+        "threshold": 16,
+        "bbox": [
+          288,
+          226,
+          981,
+          1066
+        ],
+        "paddingFraction": [
+          0.2297,
+          0.1802,
+          0.2177,
+          0.1499
+        ]
+      },
+      {
+        "threshold": 64,
+        "bbox": [
+          291,
+          233,
+          978,
+          1059
+        ],
+        "paddingFraction": [
+          0.2321,
+          0.1858,
+          0.2201,
+          0.1555
+        ]
+      },
+      {
+        "threshold": 128,
+        "bbox": [
+          294,
+          235,
+          976,
+          1056
+        ],
+        "paddingFraction": [
+          0.2344,
+          0.1874,
+          0.2217,
+          0.1579
+        ]
+      },
+      {
+        "threshold": 240,
+        "bbox": [
+          305,
+          251,
+          956,
+          1047
+        ],
+        "paddingFraction": [
+          0.2432,
+          0.2002,
+          0.2376,
+          0.1651
+        ]
+      }
+    ],
+    "central30Percent": {
+      "alphaMaximum": 253,
+      "fullyTransparentFraction": 0.825518
+    },
+    "outer12Percent": {
+      "alphaMaximum": 1,
+      "nonzeroPixels": 698
+    }
+  },
+  "selfReview": [
+    "Single U-shaped red-orange flame aura replaces solid fire face. No character, text, solid central pillar or background.",
+    "Second generation reduces overall occupied area and flame-band thickness; substantial transparent central opening remains.",
+    "No deterministic resizing/cropping/alpha cleaning used.",
+    "Source pixels require independent acceptance; no runtime or state lifecycle claim.",
+    "Strict alpha0 outer12-percent padding is NOT achieved: 698 pixels carry alpha1; visible alpha>=16 has at least14.99-percent padding. No cleanup was performed to conceal this.",
+    "Central30-percent rectangle is82.55-percent fully transparent, with flame intrusion at side positions. The stricter prompt of entirely empty central rectangle was NOT fully achieved."
+  ],
+  "artReviewState": "needs-independent-review-with-deviations",
+  "runtimeQaState": "not-reviewed",
+  "sha256": "64886f9c879c23ee96b8f6acd9aac036d6dab890bf8d2c65bf8143f810167ba1"
+}

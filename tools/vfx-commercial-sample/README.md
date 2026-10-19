@@ -72,3 +72,33 @@ the first sampled logical hit precedes frame-eight paint in both versions.
 RAF medians near 16.7ms coexist with long action-start frames. This short
 test does not certify sustained performance, endurance or gameplay safety.
 The raw traces and six phone screenshots are in artifacts/vfx-usb-runtime.
+
+## Full four-element/status follow-up
+
+The work now covers 44 active skills, four intentionally passive entries and
+21 formal statuses. `coverage-matrix.json` records their formal owners.
+`usb-full-matrix-20261019.json` records the first full Note9 presentation run
+at d6f181c4: all 44 casts cleaned up, 21 status entries were exercised, and
+there were no runtime exceptions. It includes screenshot hashes and explicit
+limits: these were presentation casts, not full skill eligibility/damage tests.
+Screenshot capture affects RAF intervals, so they do not certify performance.
+
+Independent screenshot review found that edge-primary group art had shrunk
+around one target, single-target artwork could still reach the viewport edge,
+and a timer could present feedback while CSS still showed the preceding frame.
+The subsequent checkpoint centers group art on canonical shape bounds, fits
+single art safely without changing hit anchors, and uses a one-shot paint-frame
+handoff for ordinary hit feedback. A new open-center rage status aura replaces
+the opaque fire face; its HUD icon and gameplay state remain unchanged.
+These subsequent changes require a fresh USB run.
+
+Status lifecycle checks on the isolated phone fixture exercised two-second
+rotation with fixed hard control, cleansed input, zero-duration input, death,
+revival, enemy status rendering and 24px detached HUD icons. All visual nodes
+were removed after cleanup. This is not a retest of the round-end duration owner.
+
+`assets/full` contains artwork candidates and generation evidence. Candidates
+are not runtime imports merely because they decode or have lossless conversion.
+The earth-shield and fire-soul sheets still require independent art review.
+Commercial visual acceptance remains pending; review findings are retained in
+the adjacent independent/USB visual review JSON files.

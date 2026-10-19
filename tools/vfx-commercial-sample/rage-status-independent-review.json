@@ -1,0 +1,20 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewer": "timing_review",
+  "asset": "tools/vfx-commercial-sample/assets/full/rage-status-v2.webp",
+  "runtimeAsset": "assets/vfx/status/rage-aura-v2.webp",
+  "decision": "ACCEPT_FOR_DEVICE_CANDIDATE_ONLY",
+  "method": "Viewed full source with view_image; read generation evidence; independently sampled alpha and compared runtime copy RGBA.",
+  "observations": [
+    "Recognizable warm red/orange flame aura, no face or opaque central fire pillar. Large open center should allow artwork head and torso to remain readable.",
+    "Effective alpha silhouette has substantial outer padding; low-alpha colored pixels shown by viewer are not evidence of an opaque background.",
+    "Lower U-shaped base and two side strips remain comparatively thick. Device placement must keep the base clear of own HP/SP and preserve portrait visibility.",
+    "This is a single persistent status body, not a cast sheet. Existing dedicated rage icon remains the semantic status indicator."
+  ],
+  "acceptanceLimits": [
+    "Candidate acceptance does not certify commercially finished appearance or device performance.",
+    "Verify body pulse, rotation with other active buffs, layer ordering, own HUD readability and cleanup on state expiry/death in real combat.",
+    "Reject if the flames paint a thick foreground band across the lower character or resource bars."
+  ],
+  "runtimeQaState": "pending-root-device-verification"
+}

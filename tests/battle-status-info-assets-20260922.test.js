@@ -7,7 +7,7 @@ const ROOT=path.resolve(__dirname,"..");
 const read=relative=>fs.readFileSync(path.join(ROOT,relative),"utf8");
 
 const STATUS_ASSETS=[
-  "burn.webp","rage.webp","rage-icon.webp","frostbite-icon.webp","freeze.webp",
+  "burn.webp","rage-aura-v2.webp","rage-icon.webp","frostbite-icon.webp","freeze.webp",
   "gravity-icon.webp","damage-down-icon.webp","stun-icon.webp","windwalk.webp",
   "stealth.webp","calm-mind.webp","defense-down-icon.webp","shield.webp",
   "petrify.webp","earth-shield.webp","rock-wall.webp","barrier.webp",

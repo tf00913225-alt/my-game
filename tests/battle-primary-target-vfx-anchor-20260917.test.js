@@ -162,8 +162,8 @@ function currentSprite(runtime){
     assert.equal(current.targetId,2);
     assert.deepEqual(Array.from(current.targetIds),[0,1,2]);
     assert.equal(sprite.dataset.geometrySlot,"PLAYER_2","tri VFX must retain the selected primary slot");
-    assert.equal(sprite.style.left,"320px","tri VFX must center on the actually selected card");
-    assert.notEqual(sprite.style.left,"200px","tri VFX must not fall back to the row center");
+    assert.equal(sprite.style.left,"200px","tri artwork centers on its canonical footprint while the selected primary slot remains authoritative");
+    assert.notEqual(sprite.style.left,"320px","an edge primary must not collapse all three painted strikes onto one card");
 }
 
 {

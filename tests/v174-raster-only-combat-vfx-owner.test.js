@@ -119,6 +119,9 @@ test("V143 production VFX contains no procedural/Canvas/SVG fallback",()=>{
         /canvas-crop/
     ].forEach(pattern=>assert.doesNotMatch(v143,pattern));
     assert.equal((v143.match(/requestAnimationFrame\(start\)/g)||[]).length,1,"one paint-clock handoff only; frame selection remains CSS raster");
+    assert.equal((v143.match(/requestAnimationFrame\(presentHit\)/g)||[]).length,1,"one hit paint-clock handoff callsite");
+    assert.equal((v143.match(/requestAnimationFrame\s*\(/g)||[]).length,2,"no procedural RAF renderer");
+    assert.match(v143,/const presentHit=\(\)=>settleTargetVisual\(current,index\);/);
     assert.match(v143,/renderer:"dom-sprite"/);
     assert.match(v143,/No Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback/);
 });

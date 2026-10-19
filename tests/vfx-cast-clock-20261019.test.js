@@ -30,6 +30,12 @@ function fixture(withRaf=true){
     assert.equal(f.tracks[0].startTime,350);assert.equal(f.tracks[1].startTime,350);assert.equal(f.tracks[2].startTime,7);
     assert.equal(f.frames.length,0,"handoff does not recursively schedule frames");
     assert.deepEqual(f.jobs.map(job=>job.delay),[1200,700,700],"all targets use the same authored hit offset");
+    f.jobs[1].fn();f.jobs[2].fn();
+    assert.equal(f.frames.length,2,"each target timer hands off exactly once to the paint clock");
+    assert.deepEqual(f.events,[["restart",1200]],"timer task must not present against an old CSS timeline sample");
+    f.frames.shift()(1050);f.frames.shift()(1050);
+    assert.deepEqual(f.events,[["restart",1200],0,2]);
+    assert.equal(f.frames.length,0,"hit callbacks cannot create a procedural frame loop");
 }
 {
     const f=fixture();f.setNow(450);
@@ -58,5 +64,6 @@ for(const reason of ["dispose","superseded"]){
 {
     const f=fixture(false);f.context.requestCastTimeline(f.current);
     assert.equal(f.current.firstVisibleFrameAt,100);assert.equal(f.current.animationStartTimeline,null);assert.equal(f.current.gate.visualTimelinePending,false);assert.equal(f.jobs.length,3);
+    f.jobs[1].fn();assert.deepEqual(f.events,[["restart",1200],0],"no-RAF fallback presents synchronously");
 }
 console.log("Ordinary cast RAF handoff, raster track alignment, shared targets, non-target rejection, disposal and synchronous fallback PASS");

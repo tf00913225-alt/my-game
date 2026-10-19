@@ -67,6 +67,49 @@ test("tri geometry is the canonical three-slot footprint regardless of surviving
     assert.deepEqual(Array.from(last.slots),["F1","F2","F3"]);
     assert.deepEqual(calls,[{side:"monster",slot:"F2",shape:"tri"},{side:"monster",slot:"F2",shape:"tri"}]);
 });
+test("an edge primary keeps its hit identity while three-slot artwork centers across the canonical footprint",()=>{
+    const safe=rect(0,0,600,600),bounds=rect(0,100,600,400);
+    bounds.slots=["F1","F2","F3"];
+    const primary={slot:"F1",x:100,y:300,rect:rect(0,200,200,200)};
+    const context={window:{FourSymbolsBattlefieldRenderGeometry:{getBattlefieldOverlayGeometry:()=>({rect:safe})}},
+        geometryOwner:()=>({getSideRect:()=>safe}),placementFor:()=>"group",emittedSpriteTargets:current=>current.targetIndexes,
+        geometryBounds:()=>bounds,geometryPrimaryAnchor:()=>primary,frameAspectFor:()=>1,
+        SPRITE_SCALE_MULTIPLIER:1,PLACEMENT_SIZE_SCALE:{group:1},Math,Number,String,Array,parseFloat};
+    vm.createContext(context);
+    vm.runInContext(functionSource(animation,"applySpriteBox","requestSpriteAspect")+
+        functionSource(animation,"fitRangeArt","emittedSpriteTargets")+
+        functionSource(animation,"placeSprite","addSprite"),context);
+    const current={model:{sprite:{}},config:{},targetSide:"monster",targetId:0,targetIds:[0,1,2],targetIndexes:[0,1,2]};
+    const node={style:{},dataset:{}};
+    context.placeSprite(current,node,0,primary);
+    assert.equal(node.style.left,"300px");assert.equal(node.style.top,"300px");
+    assert.equal(parseFloat(node.style.width),600,"three strikes must not be reduced to one-slot width by an edge primary");
+    assert.equal(node.dataset.geometrySlot,"F1");assert.equal(current.targetId,0);
+    assert.deepEqual(current.targetIds,[0,1,2]);assert.equal(node.dataset.geometrySlots,"F1,F2,F3");
+    assertInside(node,{x:300,y:300},safe);
+    current.targetIndexes=[0];
+    context.placeSprite(current,node,0,primary);
+    assert.equal(node.style.left,"300px");assert.equal(parseFloat(node.style.width),600,"one survivor preserves the same three-slot art frame");
+});
+test("a single target near the visible edge keeps its hit center and source ratio without clipping",()=>{
+    const safe=rect(0,0,600,600),target={slot:"F1",x:20,y:300,rect:rect(0,250,100,100)};
+    const context={window:{FourSymbolsBattlefieldRenderGeometry:{getBattlefieldOverlayGeometry:()=>({rect:safe})}},
+        geometryOwner:()=>({getSideRect:()=>safe}),placementFor:()=>"single",frameAspectFor:()=>2,
+        SPRITE_SCALE_MULTIPLIER:1,PLACEMENT_SIZE_SCALE:{single:.70},Math,Number,String,parseFloat,
+        clamp:(value,min,max)=>Math.max(min,Math.min(max,value))};
+    vm.createContext(context);
+    vm.runInContext(functionSource(animation,"applySpriteBox","requestSpriteAspect")+
+        functionSource(animation,"fitRangeArt","emittedSpriteTargets")+
+        functionSource(animation,"authoredSquareSize","placePhasedMotion")+
+        functionSource(animation,"placeSprite","addSprite"),context);
+    const current={model:{sprite:{}},config:{},targetSide:"monster",targetId:0,targetIds:[0]};
+    const node={style:{},dataset:{}};
+    context.placeSprite(current,node,0,target);
+    assert.equal(node.style.left,"20px");assert.equal(node.style.top,"300px");
+    assert.equal(node.dataset.geometrySlot,"F1");assert.equal(current.targetId,0);
+    assert.equal(parseFloat(node.style.width)/parseFloat(node.style.height),2);
+    assertInside(node,target,safe);
+});
 test("HUD detaches for the whole cast, returns during reading, and restores the original node on cleanup",()=>{
     function host(){return {children:[],appendChild(node){if(node.parentNode)node.parentNode.children=node.parentNode.children.filter(x=>x!==node);this.children.push(node);node.parentNode=this;},remove(){if(this.parentNode)this.parentNode.children=this.parentNode.children.filter(x=>x!==this);}};}
     const body=host();let reading=false,stage=true,hit=false;

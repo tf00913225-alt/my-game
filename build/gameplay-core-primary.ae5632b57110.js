@@ -11818,7 +11818,7 @@
 
     const RAW_STATUS_VISUALS={
         burn:statusVisual("assets/vfx/status/burn.webp","pulse","statusEffects",{label:"燃燒",statusName:"燃燒",iconSrc:"assets/vfx/status/burn.webp"}),
-        rage:statusVisual("assets/vfx/status/rage.webp","pulse","activeBuffs",{label:"怒火",statusName:"怒火",iconSrc:"assets/vfx/status/rage-icon.webp"}),
+        rage:statusVisual("assets/vfx/status/rage-aura-v2.webp","pulse","activeBuffs",{label:"怒火",statusName:"怒火",iconSrc:"assets/vfx/status/rage-icon.webp"}),
         frostbite:statusVisual("","icon","statusEffects",{label:"凍傷",statusName:"凍傷",iconSrc:"assets/vfx/status/frostbite-icon.webp"}),
         freeze:statusVisual("assets/vfx/status/freeze.webp","static","statusEffects",{label:"冰封",statusName:"冰封",iconSrc:"assets/vfx/status/freeze.webp",visualLayer:STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE}),
         agilityDown:statusVisual("","icon","statusEffects",{label:"重力",statusName:"重力",iconSrc:"assets/vfx/status/gravity-icon.webp"}),
@@ -12975,6 +12975,7 @@
             node.style.left=target.x+"px";
             node.style.top=target.y+"px";
             applySpriteBox(node,size,size,sprite);
+            fitRangeArt(node,current,target.rect,{x:target.x,y:target.y});
             return;
         }
 
@@ -13031,10 +13032,10 @@
         const height=Math.max(1,Math.round(bounds.height));
         node.dataset.targetIndexes=indexes.join(",");
         applySpriteBox(node,width,height,sprite,"cover");
-        /* A group/row/tri Sprite keeps the fixed-shape bounds for sizing, but
-           its visual center belongs to the explicitly selected primary card.
-           Only full-battlefield effects remain centered on the whole side. */
-        const destination=bounds.centerOnBounds&&placement!=="trajectory"
+        /* Authored multi-target art spans the canonical shape, including when
+           the selected primary is its edge slot. Hit callbacks retain the
+           primary/individual target anchors; projectiles still fly to primary. */
+        const destination=(placement==="group"||bounds.centerOnBounds)&&placement!=="trajectory"
             ?{x:bounds.centerX,y:bounds.centerY}
             :primaryAnchor
             ?{x:primaryAnchor.x,y:primaryAnchor.y}
@@ -13145,7 +13146,13 @@
             current.animationStartTimeline=Number.isFinite(clockTime)?clockTime:null;
             beginVisualTimeline(current);
             current.targetIndexes.forEach(index=>setTimer(
-                ()=>settleTargetVisual(current,index),Math.max(0,targetHitTime(current,index)-Date.now())
+                ()=>{
+                    // A timer can run before the document timeline advances.
+                    // Present this hit on the next paint frame, once per target.
+                    const presentHit=()=>settleTargetVisual(current,index);
+                    if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(presentHit); }
+                    else{ presentHit(); }
+                },Math.max(0,targetHitTime(current,index)-Date.now())
             ));
         };
         if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(start); }
