@@ -23,6 +23,7 @@ on:
       - 'tests/cloud-save-*.test.mjs'
       - 'tests/firebase-trusted-cloud-save-backend.test.mjs'
       - 'scripts/firestore-backup-readiness.mjs'
+      - 'scripts/storage-recovery-readiness.mjs'
       - 'tests/firestore-backup-readiness.test.mjs'
       - '.github/workflows/session-authority.yml'
       - '.github/scripts/wait-session-repository-checks.mjs'
@@ -39,6 +40,7 @@ on:
       - 'tests/cloud-save-*.test.mjs'
       - 'tests/firebase-trusted-cloud-save-backend.test.mjs'
       - 'scripts/firestore-backup-readiness.mjs'
+      - 'scripts/storage-recovery-readiness.mjs'
       - 'tests/firestore-backup-readiness.test.mjs'
       - '.github/workflows/session-authority.yml'
       - '.github/scripts/wait-session-repository-checks.mjs'
@@ -125,6 +127,16 @@ jobs:
           project_id: four-symbols-jianghu
       - uses: google-github-actions/setup-gcloud@v2
         continue-on-error: true
+      - name: Inspect Storage recovery readiness (read only)
+        id: storage_readiness
+        run: node scripts/storage-recovery-readiness.mjs
+      - name: Upload sanitized Storage readiness metadata
+        if: ${{ always() && steps.storage_readiness.outcome == 'success' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: storage-recovery-readiness-${{ github.sha }}-${{ github.run_attempt }}
+          path: artifacts/recovery/storage-readiness.json
+          if-no-files-found: error
       - name: Inspect Firestore recovery readiness (read only)
         shell: bash
         run: |
