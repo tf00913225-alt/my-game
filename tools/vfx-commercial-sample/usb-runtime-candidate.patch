@@ -1,0 +1,80 @@
+diff --git a/css/40-v143-combat-dungeon-polish.css b/css/40-v143-combat-dungeon-polish.css
+index 298d00d1..04bfd3d9 100644
+--- a/css/40-v143-combat-dungeon-polish.css
++++ b/css/40-v143-combat-dungeon-polish.css
+@@ -475,3 +475,18 @@
+ :root{--battle-hp-loss-color:#e9b86b;}
+ .v174-unit-hud .monster-hp-inner,.v174-unit-hud .hp-bar-inner{transition:none;}
+ .v143-hp-damage-trail{position:absolute;top:0;height:100%;background:var(--battle-hp-loss-color);pointer-events:none;}
++
++.v143-vfx-sprite.v143-vfx-sprite-active[data-qa-vfx-sample="relic_nine_dragon_fire"]{animation:vfxQaRelicFrames var(--v143-sprite-duration) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,vfxQaRelicEnvelope var(--v143-sprite-duration) linear var(--v143-sprite-delay,0ms) 1 both;}
++@keyframes vfxQaRelicFrames{0%{background-image:url('/tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp');background-size:400% 300%;background-position:0% 0%}
++8.333333333333334%{background-image:url('/tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp');background-size:400% 300%;background-position:33.333333333333336% 0%}
++16.666666666666668%{background-image:url('/tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp');background-size:400% 300%;background-position:66.66666666666667% 0%}
++25%{background-image:url('/tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp');background-size:400% 300%;background-position:100% 0%}
++33.333333333333336%{background-image:url('/tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp');background-size:400% 300%;background-position:0% 50%}
++41.666666666666664%{background-image:url('/tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp');background-size:400% 300%;background-position:33.333333333333336% 50%}
++50%{background-image:url('/tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp');background-size:400% 300%;background-position:66.66666666666667% 50%}
++58.333333333333336%{background-image:url('/tools/vfx-commercial-sample/assets/nine-dragon-fire-impact-v3.webp');background-size:100% 100%;background-position:center}
++66.66666666666667%{background-image:url('/tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp');background-size:400% 300%;background-position:0% 100%}
++75%{background-image:url('/tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp');background-size:400% 300%;background-position:33.333333333333336% 100%}
++83.33333333333333%{background-image:url('/tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp');background-size:400% 300%;background-position:66.66666666666667% 100%}
++91.66666666666667%{background-image:url('/tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp');background-size:400% 300%;background-position:100% 100%}100%{background-image:url('/tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp');background-size:400% 300%;background-position:100% 100%;}}
++@keyframes vfxQaRelicEnvelope{0%{opacity:.58}50%,66.666667%{opacity:1}100%{opacity:0}}
+\ No newline at end of file
+diff --git a/js/39-v143-skill-animation.js b/js/39-v143-skill-animation.js
+index b954278c..59765e71 100644
+--- a/js/39-v143-skill-animation.js
++++ b/js/39-v143-skill-animation.js
+@@ -25,6 +25,7 @@
+     const spriteFrameAspectLoading=new Set();
+ 
+     function castSheet(src,placement,options){
++ options=Object.assign({},options);if(src.includes('vfx-commercial-sample'))options.qaSizeScale=src.includes('flame-slash')?.75:src.includes('ice-arrow-rain')?690/880:500/520;
+         return Object.assign({
+             src:src,columns:4,rows:3,frames:12,hitFrame:7,
+             placement:placement||"single",renderer:"dom-sprite"
+@@ -66,7 +67,7 @@
+     const RAW_MANIFEST={
+         normal:{hit:.57,sprite:castSheet("assets/vfx/normal/normal-impact.webp","single",{hitFrame:6,scale:.85,maxSize:100,impactOnly:true})},
+ 
+-        flameSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-slash-cast.png","single",{scale:1.85,maxSize:220})},
++        flameSlash:{hit:DEFAULT_HIT,sprite:castSheet("tools/vfx-commercial-sample/assets/flame-slash.webp","single",{scale:1.85,maxSize:220})},
+         fireCritical:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260})},
+         fireBurstStrike:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260,reusedFrom:"fireCritical"})},
+         explosiveFlurry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/explosive-flurry-cast.png?v=165","group",{scale:1.08,minSize:190,alignToSlots:true})},
+@@ -88,7 +89,7 @@
+         // Keep every authored frame at its original source angle while the
+         // complete sheet moves between actor and target. Hit timing is unchanged.
+         floodBeast:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/tidal-beast-vfx.png?v=166","targetTrajectory",{travelToTargets:true,preserveSourceOrientation:true,scale:1.85,minSize:175,maxSize:250,motionPhases:{flightStart:2,turnFrame:5,impactStart:6,flightSourceAngle:0,turnSourceAngle:90}})},
+-        iceArrowRain:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/frost-arrow-rain-vfx.png?v=173.19","battlefield",{fixedFormation:true,coverageScale:1.22,minWidth:140,minHeight:140})},
++        iceArrowRain:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("tools/vfx-commercial-sample/assets/ice-arrow-rain.webp","battlefield",{fixedFormation:true,coverageScale:1.22,minWidth:140,minHeight:140})},
+         freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270})},
+         healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
+         revive:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-revive-vfx.png?v=166","single",{scale:2.3,maxSize:285})},
+@@ -132,7 +133,7 @@
+         relic_xuanwu_seal:relicSheet("assets/vfx/relic/relic_xuanwu_seal.webp",8),
+         relic_soul_bell:relicSheet("assets/vfx/relic/relic_soul_bell.webp",8),
+         relic_tiangang_banner:relicSheet("assets/vfx/relic/relic_tiangang_banner.webp",9),
+-        relic_nine_dragon_fire:relicSheet("assets/vfx/relic/relic_nine_dragon_fire.webp",8),
++        relic_nine_dragon_fire:relicSheet("tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp",8),
+         relic_cold_spring_jade:relicSheet("assets/vfx/relic/relic_cold_spring_jade.webp",7),
+         relic_qinglan_feather:relicSheet("assets/vfx/relic/relic_qinglan_feather.webp",6),
+         relic_rock_mountain_seal:relicSheet("assets/vfx/relic/relic_rock_mountain_seal.webp",7),
+@@ -1200,7 +1201,7 @@
+     }
+ 
+     function applySpriteBox(node,width,height,sprite,fit){
+-        const placementScale=PLACEMENT_SIZE_SCALE[node.dataset.placement]||1;
++        const placementScale=(PLACEMENT_SIZE_SCALE[node.dataset.placement]||1)*(sprite.qaSizeScale||1);
+         const boxWidth=Math.max(1,Number(width)||1)*SPRITE_SCALE_MULTIPLIER*placementScale;
+         const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER*placementScale;
+         const aspect=frameAspectFor(sprite);
+@@ -1381,6 +1382,7 @@
+             const initialSprite=!current.firstVisibleFrameAt;
+             if(initialSprite&&!sprite.impactOnly){ beginVisualTimeline(current); }
+             node=appendSpriteNode(current);
++            node.dataset.qaVfxSample=String(current.config.id);
+             node.dataset.columns=String(sprite.columns);
+             node.dataset.rows=String(sprite.rows);
+             node.dataset.frames=String(sprite.frames);

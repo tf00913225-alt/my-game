@@ -54,3 +54,21 @@ This remains an asset-review renderer, not a V143 runtime change. The strong
 contact frame may require further continuity tuning after user review.
 Generation prompts and selected/rejected sources are recorded in
 relic-v3-generation.json. Flame Slash and Ice Arrow Rain remain unchanged.
+
+## Physical USB battle validation
+
+See usb-runtime-verification.json and usb-runtime-candidate.patch. The patch
+is the exact local candidate adaptation used for this test, not an imported
+runtime change. A detached snapshot was built through build-production.mjs
+and passed build:check; resource integrity checks remained enabled. The
+existing read-only QA account ran the real 3-vs-3 battle on Note9 Android 10.
+Flame Slash and Ice Arrow Rain exercised actual isolated damage; the relic
+used its existing DEV presentation preview, without testing settlement.
+
+Six baseline/candidate casts completed with no asset failure, runtime
+exception or leftover VFX node. Visual acceptance is NOT PASSED: actual
+all-target relic geometry still clips the top and obscures enemy HUD, and
+the first sampled logical hit precedes frame-eight paint in both versions.
+RAF medians near 16.7ms coexist with long action-start frames. This short
+test does not certify sustained performance, endurance or gameplay safety.
+The raw traces and six phone screenshots are in artifacts/vfx-usb-runtime.
