@@ -44,6 +44,7 @@ const appScripts=[
     "js/equipment-factory.js",
     "functions/src/hero-core.js",
     "functions/src/patrol-reward-policy.js",
+    "functions/src/patrol-drop-policy.js",
     "js/00-main.js",
     "functions/src/team-formation-policy.js",
     "js/hero-acquisition-client.js",
