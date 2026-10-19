@@ -23,6 +23,36 @@ const SETS={
 };
 const SINGLES={account:"current",economy:"current",relicLoadout:"current",
     progress:"current",claimCheckpoint:"current"};
+const RECOVERY_AUDIT_FENCE_COLLECTION="recoveryAuditFence";
+const RECOVERY_AUDIT_RUN_COLLECTION="recoveryAuditRuns";
+const HEX=/^[a-f0-9]{64}$/;
+const SESSION_ID=/^[A-Za-z0-9_-]{32}$/;
+function inspectRecoveryAuditFence(value,uid,fail){
+    if(value===undefined)return null;
+    const keys=["schemaVersion","kind","ownerUid","auditId","epoch","status","sessionId","sessionRevision",
+        "sourceRevision","sourceSha256","snapshotSha256","approvalOperationId","approvalBindingSha256",
+        "cancelOperationId","cancelIntentSha256","cancelledBySessionId","cancelledBySessionRevision","createdAt","updatedAt"];
+    if(!value||Object.keys(value).sort().join("|")!==keys.sort().join("|")||value.schemaVersion!==1||
+       value.kind!=="canonical-recovery-audit-fence"||value.ownerUid!==uid||!OPERATION_ID.test(value.auditId||"")||
+       !Number.isSafeInteger(value.epoch)||value.epoch<1||!SESSION_ID.test(value.sessionId||"")||
+       !Number.isSafeInteger(value.sessionRevision)||value.sessionRevision<1||
+       !Number.isSafeInteger(value.sourceRevision)||value.sourceRevision<2||
+       !HEX.test(value.sourceSha256||"")||!HEX.test(value.snapshotSha256||"")||
+       !OPERATION_ID.test(value.approvalOperationId||"")||!HEX.test(value.approvalBindingSha256||"")||
+       !["active","cancelled"].includes(value.status)||
+       typeof value.createdAt?.toMillis!=="function"||typeof value.updatedAt?.toMillis!=="function"||
+       !Number.isSafeInteger(value.createdAt.toMillis())||!Number.isSafeInteger(value.updatedAt.toMillis())||
+       (value.status==="active"?[value.cancelOperationId,value.cancelIntentSha256,value.cancelledBySessionId,value.cancelledBySessionRevision].some(v=>v!==null):
+           (!OPERATION_ID.test(value.cancelOperationId||"")||!HEX.test(value.cancelIntentSha256||"")||
+            !SESSION_ID.test(value.cancelledBySessionId||"")||!Number.isSafeInteger(value.cancelledBySessionRevision)||value.cancelledBySessionRevision<1))){
+        fail("data-loss","Recovery audit fence is inconsistent.");
+    }
+    if(value.status==="cancelled"&&value.cancelIntentSha256!==snapshotDigest({action:"cancel-audit",ownerUid:uid,
+        operationId:value.cancelOperationId,auditId:value.auditId,expectedEpoch:value.epoch})){
+        fail("data-loss","Recovery audit cancellation intent is inconsistent.");
+    }
+    return value;
+}
 
 function restoredRecords(records,revision){
     const next={...records};
@@ -42,7 +72,7 @@ function restoredRecords(records,revision){
 // be written through a separately authorized server operator path, never by a
 // browser. There is deliberately no callable or player recovery UI.
 function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
-    inspectExistingEnvelope,nextRevision,now=Date.now}){
+    runRecoveryAuditMaintenance,inspectExistingEnvelope,nextRevision,now=Date.now}){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
     const sourceEvidence=createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
         inspectExistingEnvelope,nextRevision,now});
@@ -65,6 +95,134 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             fail("failed-precondition","Only a server-created canonical account is eligible.");
         }
         return {envelope,records};
+    }
+    function auditIntent(action,args,keys){
+        if(!args||Object.keys(args).sort().join("|")!==keys.slice().sort().join("|")||
+           (args.operationId!==undefined&&!OPERATION_ID.test(args.operationId))||
+           (args.auditId!==undefined&&!OPERATION_ID.test(args.auditId))||
+           (args.expectedRevision!==undefined&&(!Number.isSafeInteger(args.expectedRevision)||args.expectedRevision<2))||
+           (args.expectedEpoch!==undefined&&(!Number.isSafeInteger(args.expectedEpoch)||args.expectedEpoch<1))||
+           (args.approvalOperationId!==undefined&&!OPERATION_ID.test(args.approvalOperationId))){
+            fail("invalid-argument",`An exact recovery audit ${action} intent is required.`);
+        }
+        if(typeof runRecoveryAuditMaintenance!=="function")fail("failed-precondition","Recovery audit maintenance runner is unavailable.");
+    }
+    function inspectAuditRun(raw,uid,auditId){
+        if(!raw||raw.kind!=="canonical-recovery-audit-run"||raw.auditId!==auditId||!HEX.test(raw.beginIntentSha256||""))
+            fail("data-loss","Recovery audit run is inconsistent.");
+        const {beginIntentSha256,...value}=raw;
+        inspectRecoveryAuditFence({...value,kind:"canonical-recovery-audit-fence"},uid,fail);
+        if(beginIntentSha256!==snapshotDigest({action:"begin-audit",ownerUid:uid,operationId:auditId,
+            expectedRevision:raw.sourceRevision,approvalOperationId:raw.approvalOperationId})){
+            fail("data-loss","Recovery audit begin intent is inconsistent.");
+        }
+        return raw;
+    }
+    function matchingAuditFence(fence,run){
+        const {beginIntentSha256,kind,...value}=run;
+        if(!fence||snapshotDigest(fence)!==snapshotDigest({...value,kind:"canonical-recovery-audit-fence"}))
+            fail("data-loss","Recovery audit run and fence differ.");
+    }
+    function timestampPair(value){
+        if(typeof value?.toMillis!=="function")fail("data-loss","Recovery approval timestamp is invalid.");
+        let seconds=value.seconds,nanoseconds=value.nanoseconds;
+        // The repository transaction fixture represents exact millisecond
+        // timestamps; production Node Timestamp exposes seconds/nanoseconds.
+        if(seconds===undefined&&nanoseconds===undefined){
+            const millis=value.toMillis();
+            if(!Number.isSafeInteger(millis))fail("data-loss","Recovery approval timestamp lacks exact precision.");
+            seconds=Math.floor(millis/1000);nanoseconds=(millis-seconds*1000)*1000000;
+        }
+        if(!Number.isSafeInteger(seconds)||seconds<-62135596800||seconds>253402300799||
+           !Number.isInteger(nanoseconds)||nanoseconds<0||nanoseconds>999999999)
+            fail("data-loss","Recovery approval timestamp is invalid.");
+        return {seconds,nanoseconds};
+    }
+    async function verifyAuditApproval(tx,root,uid,sourceRevision,approvalOperationId){
+        const [envelopeSnap,archiveSnap,snapshotSnap,approvalSnap]=await Promise.all([
+            db.collection("users").doc(uid).collection("saves").doc("current"),
+            root.collection("recoveryArchives").doc(String(sourceRevision)),
+            root.collection("playableSnapshots").doc(String(sourceRevision)),
+            root.collection("recoveryApprovals").doc(approvalOperationId)].map(ref=>tx.get(ref)));
+        const {envelope}=inspectCurrentRecoverySource(uid,sourceRevision,{envelopeSnap,archiveSnap,snapshotSnap});
+        if(envelope.serverRevision!==sourceRevision)fail("aborted","CLOUD_REVISION_CONFLICT");
+        const approval=approvalSnap.data();
+        if(!approvalSnap.exists||approval.schemaVersion!==1||approval.kind!=="canonical-current-recovery-approval"||
+           approval.ownerUid!==uid||approval.operationId!==approvalOperationId||approval.status!=="approved"||
+           approval.sourceRevision!==sourceRevision||approval.sourceSha256!==archiveSnap.get("sourceSha256")||
+           approval.snapshotSha256!==snapshotSnap.get("sha256")||typeof approval.approvedBy!=="string"||!approval.approvedBy.trim()||
+           typeof approval.expiresAt?.toMillis!=="function"||approval.expiresAt.toMillis()<=now()){
+            fail("permission-denied","A current server operator approval is required for recovery audit.");
+        }
+        const binding={schemaVersion:approval.schemaVersion,kind:approval.kind,ownerUid:uid,operationId:approvalOperationId,
+            sourceRevision,sourceSha256:approval.sourceSha256,snapshotSha256:approval.snapshotSha256,
+            approvedBy:approval.approvedBy,status:approval.status,issuedAt:timestampPair(approval.issuedAt),expiresAt:timestampPair(approval.expiresAt)};
+        return {sourceSha256:binding.sourceSha256,snapshotSha256:binding.snapshotSha256,approvalBindingSha256:snapshotDigest(binding)};
+    }
+    async function beginAudit(request,args){
+        auditIntent("begin",args,["operationId","expectedRevision","approvalOperationId"]);
+        return runRecoveryAuditMaintenance(request,args.operationId,async(tx,session)=>{
+            const root=db.collection("serverUsers").doc(session.uid),fenceRef=root.collection(RECOVERY_AUDIT_FENCE_COLLECTION).doc("current"),
+                runRef=root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(args.operationId);
+            const [fenceSnap,runSnap]=await Promise.all([tx.get(fenceRef),tx.get(runRef)]);
+            const fence=inspectRecoveryAuditFence(fenceSnap.exists?fenceSnap.data():undefined,session.uid,fail);
+            const beginIntentSha256=snapshotDigest({action:"begin-audit",ownerUid:session.uid,...args});
+            if(runSnap.exists){
+                const run=inspectAuditRun(runSnap.data(),session.uid,args.operationId);
+                if(run.beginIntentSha256!==beginIntentSha256)fail("already-exists","Recovery audit ID has another intent.");
+                return {auditId:run.auditId,epoch:run.epoch,sourceRevision:run.sourceRevision,beginAccepted:true,unchanged:true};
+            }
+            if(fence?.status==="active")fail("failed-precondition","A recovery audit is already active.");
+            if(fence){
+                const previous=await tx.get(root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(fence.auditId));
+                matchingAuditFence(fence,inspectAuditRun(previous.data(),session.uid,fence.auditId));
+            }
+            const binding=await verifyAuditApproval(tx,root,session.uid,args.expectedRevision,args.approvalOperationId);
+            const epoch=(fence?.epoch??0)+1;
+            if(!Number.isSafeInteger(epoch))fail("failed-precondition","Recovery audit epoch is exhausted.");
+            const stamp=FieldValue.serverTimestamp(),next={schemaVersion:1,kind:"canonical-recovery-audit-fence",ownerUid:session.uid,
+                auditId:args.operationId,epoch,status:"active",sessionId:session.sessionId,sessionRevision:session.revision,
+                sourceRevision:args.expectedRevision,...binding,approvalOperationId:args.approvalOperationId,
+                cancelOperationId:null,cancelIntentSha256:null,cancelledBySessionId:null,cancelledBySessionRevision:null,createdAt:stamp,updatedAt:stamp};
+            tx.create(runRef,{...next,kind:"canonical-recovery-audit-run",beginIntentSha256});tx.set(fenceRef,next);
+            return {auditId:next.auditId,epoch,sourceRevision:next.sourceRevision,beginAccepted:true,unchanged:false};
+        });
+    }
+    async function resumeAudit(request,args){
+        auditIntent("resume",args,["auditId","expectedEpoch","expectedRevision"]);
+        return runRecoveryAuditMaintenance(request,args.auditId,async(tx,session)=>{
+            const root=db.collection("serverUsers").doc(session.uid);
+            const [fenceSnap,runSnap]=await Promise.all([
+                tx.get(root.collection(RECOVERY_AUDIT_FENCE_COLLECTION).doc("current")),tx.get(root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(args.auditId))]);
+            const fence=inspectRecoveryAuditFence(fenceSnap.exists?fenceSnap.data():undefined,session.uid,fail),run=inspectAuditRun(runSnap.data(),session.uid,args.auditId);
+            matchingAuditFence(fence,run);
+            if(run.status!=="active"||run.epoch!==args.expectedEpoch||run.sourceRevision!==args.expectedRevision||
+               run.sessionId!==session.sessionId||run.sessionRevision!==session.revision)fail("failed-precondition","Recovery audit epoch or session is no longer current.");
+            const binding=await verifyAuditApproval(tx,root,session.uid,run.sourceRevision,run.approvalOperationId);
+            if(binding.approvalBindingSha256!==run.approvalBindingSha256||binding.sourceSha256!==run.sourceSha256||
+               binding.snapshotSha256!==run.snapshotSha256)fail("data-loss","Recovery audit approval binding changed.");
+            return {auditId:run.auditId,epoch:run.epoch,sourceRevision:run.sourceRevision,status:run.status};
+        });
+    }
+    async function cancelAudit(request,args){
+        auditIntent("cancel",args,["operationId","auditId","expectedEpoch"]);
+        return runRecoveryAuditMaintenance(request,args.auditId,async(tx,session)=>{
+            const root=db.collection("serverUsers").doc(session.uid),fenceRef=root.collection(RECOVERY_AUDIT_FENCE_COLLECTION).doc("current"),
+                runRef=root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(args.auditId);
+            const [fenceSnap,runSnap]=await Promise.all([tx.get(fenceRef),tx.get(runRef)]);
+            const fence=inspectRecoveryAuditFence(fenceSnap.exists?fenceSnap.data():undefined,session.uid,fail),run=inspectAuditRun(runSnap.data(),session.uid,args.auditId);
+            const cancelIntentSha256=snapshotDigest({action:"cancel-audit",ownerUid:session.uid,...args});
+            if(run.epoch!==args.expectedEpoch)fail("failed-precondition","Recovery audit epoch differs.");
+            if(run.status==="cancelled"){
+                if(run.cancelOperationId!==args.operationId||run.cancelIntentSha256!==cancelIntentSha256)fail("already-exists","Recovery audit was cancelled by another intent.");
+                return {auditId:run.auditId,epoch:run.epoch,status:"cancelled",unchanged:true};
+            }
+            matchingAuditFence(fence,run);
+            const next={...fence,status:"cancelled",cancelOperationId:args.operationId,cancelIntentSha256,
+                cancelledBySessionId:session.sessionId,cancelledBySessionRevision:session.revision,updatedAt:FieldValue.serverTimestamp()};
+            tx.set(fenceRef,next);tx.set(runRef,{...next,kind:"canonical-recovery-audit-run",beginIntentSha256:run.beginIntentSha256});
+            return {auditId:run.auditId,epoch:run.epoch,status:"cancelled",unchanged:false};
+        });
     }
     async function verifyDebitRecoveryEvidence(tx,root,uid,expectedRevision,records,doc,ledger,receipt){
         const operation=await tx.get(root.collection("operations").doc(doc.id));
@@ -653,7 +811,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             fail("data-loss",error.message);
         }
     }
-    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact});
+    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,beginAudit,resumeAudit,cancelAudit});
 }
 
-module.exports={createCanonicalCurrentRecovery};
+module.exports={createCanonicalCurrentRecovery,inspectRecoveryAuditFence,
+    RECOVERY_AUDIT_FENCE_COLLECTION,RECOVERY_AUDIT_RUN_COLLECTION};

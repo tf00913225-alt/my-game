@@ -3586,5 +3586,125 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
     console.log("PASS Forest callable HTTP boundary: real reopen/issue/member/loss/retry, no Client amount/raw-state/win proof, unauthenticated/cross-UID/invalid-session refusal; readiness remains false.");
 }
 
+// Actual SDK retries and real Auth/session state exercise the temporary audit
+// fence. These internal methods are deliberately not new callable endpoints.
+{
+    const account=await login("accounts:signUp",{email:"recovery-audit-fence@example.test",password});
+    const uid=account.localId,root=db.collection("serverUsers").doc(uid),save=db.doc(`users/${uid}/saves/current`);
+    let token=account.idToken,clock=Date.now(),session=await invoke("createGameSession",token,{uid});
+    await invoke("bootstrapCloudSave",token,{uid,session});
+    const authority=createSessionAuthority({db,FieldValue,HttpsError,now:()=>clock});
+    const request=()=>({auth:{uid,token:claims(token)},data:{uid,session}});
+    const dependencies={db,FieldValue,Timestamp,HttpsError,now:()=>clock,inspectExistingEnvelope,nextRevision,
+        runProtected:authority.runProtected,runRecoveryAuditMaintenance:authority.runRecoveryAuditMaintenance};
+    const source=createCanonicalSourceWriter(dependencies),initial={operationId:"audit-fence-initial-00001",expectedRevision:1,
+        selection:{displayName:"審核維護",element:"fire",gender:"female",
+            attributes:{attack:3,vitality:2,energy:1,intelligence:2,defensePoints:1,agility:1}}};
+    await source.commitInitialSources(request(),initial);
+    const {createCanonicalPatrolSettlement}=require("../functions/src/canonical-patrol-settlement.js");
+    const patrol=createCanonicalPatrolSettlement({...dependencies,randomBytes:n=>Buffer.alloc(n,255)});
+    const reopen={operationId:"audit-fence-reopen-000001",expectedRevision:2,expectedSequence:0,intent:"reopen",elementBox:"keep"};
+    await patrol.observePresence(request(),reopen);
+    const approval=createCanonicalRecoveryApproval(dependencies),approvalId="audit-fence-approval-0001",auditId="audit-fence-run-00000001";
+    const operator=operationId=>({auth:{uid:"audit-fence-operator",token:{cloudSaveOperator:true}},
+        data:{ownerUid:uid,operationId,sourceRevision:2,ttlSeconds:60}});
+    await approval.issue(operator(approvalId));
+    const recovery=createCanonicalCurrentRecovery(dependencies),begin={operationId:auditId,expectedRevision:2,approvalOperationId:approvalId};
+    // First attempt really reads an absent fence. An injected ABORTED releases
+    // its read locks; the normal begin transaction commits before the SDK's
+    // next attempt enters requireActiveSession/fence reading. This tests real
+    // SDK retry handling without relying on timing or an emulator lock mode.
+    let sdkAttempts=0,callbackAttempts=0,beginPromise,firstFacade;
+    const retryDb={doc:path=>db.doc(path),runTransaction:callback=>db.runTransaction(async tx=>{
+        if(++sdkAttempts>1)await beginPromise;
+        return callback(tx);
+    })};
+    const retryAuthority=createSessionAuthority({db:retryDb,FieldValue,HttpsError,now:()=>clock});
+    await assert.rejects(()=>retryAuthority.runProtected(request(),async tx=>{
+        if(++callbackAttempts===1){
+            firstFacade=tx;assert.equal(tx.firestore,undefined);assert.equal(tx.batch,undefined);
+            beginPromise=recovery.beginAudit(request(),begin);
+            throw Object.assign(new Error("emulator retry after absent fence read"),{code:10});
+        }
+        assert.notEqual(tx,firstFacade);
+        tx.create(root.collection("fenceRegression").doc("must-not-commit"),{value:1});
+    }),/RECOVERY_AUDIT_MAINTENANCE/);
+    await beginPromise;assert.ok(sdkAttempts>=2);assert.equal(callbackAttempts,2);
+    assert.equal((await root.collection("fenceRegression").doc("must-not-commit").get()).exists,false);
+    assert.equal((await root.collection("recoveryAuditFence").doc("current").get()).get("status"),"active");
+    assert.equal((await source.commitInitialSources(request(),initial)).unchanged,true);
+    assert.equal((await patrol.observePresence(request(),reopen)).unchanged,true);
+    assert.equal((await authority.protectedTest(request())).result,"SUCCESS");
+    const heartbeat={operationId:"audit-fence-heartbeat-001",expectedRevision:2,expectedSequence:1,intent:"heartbeat",elementBox:"keep"};
+    await assert.rejects(()=>patrol.observePresence(request(),heartbeat),/RECOVERY_AUDIT_MAINTENANCE/);
+    await assert.rejects(()=>patrol.beginSimulatedAd(request(),{operationId:"audit-fence-adbegin-00001",expectedRevision:2,expectedSequence:1}),/RECOVERY_AUDIT_MAINTENANCE/);
+    await assert.rejects(()=>createDailyCheckinGrant(dependencies).issue(request()),/RECOVERY_AUDIT_MAINTENANCE/);
+    await assert.rejects(()=>approval.issue(operator("audit-fence-newapproval-01")),/blocks new approvals/);
+    const priorApproval=await approval.issue(operator(approvalId));assert.equal(priorApproval.unchanged,true);
+    await assert.rejects(()=>authority.runRecoveryAuditMaintenance(request(),auditId,tx=>
+        tx.set(root.collection("economy").doc("current"),{gold:999})),/RECOVERY_AUDIT_WRITE_SCOPE/);
+    const oldRequest=request();
+    while(Math.floor(Date.now()/1000)<=claims(token).auth_time)await new Promise(resolve=>setTimeout(resolve,100));
+    const nextLogin=await login("accounts:signInWithPassword",{email:"recovery-audit-fence@example.test",password});
+    token=nextLogin.idToken;clock=Date.now();session=await invoke("createGameSession",token,{uid});
+    await assert.rejects(()=>recovery.resumeAudit(request(),{auditId,expectedEpoch:1,expectedRevision:2}),/epoch or session/);
+    await assert.rejects(()=>recovery.cancelAudit(oldRequest,{operationId:"audit-fence-oldcancel-001",auditId,expectedEpoch:1}),/SESSION_REVOKED/);
+    await authority.revoke(request());assert.equal((await root.collection("recoveryAuditFence").doc("current").get()).get("status"),"active");
+    while(Math.floor(Date.now()/1000)<=claims(token).auth_time)await new Promise(resolve=>setTimeout(resolve,100));
+    const finalLogin=await login("accounts:signInWithPassword",{email:"recovery-audit-fence@example.test",password});
+    token=finalLogin.idToken;clock=Date.now();session=await invoke("createGameSession",token,{uid});clock+=61000;
+    assert.equal((await approval.issue(operator(approvalId))).expiresAtMs,priorApproval.expiresAtMs);
+    assert.ok(priorApproval.expiresAtMs<clock);
+    const accountRef=root.collection("account").doc("current"),accountBytes=(await accountRef.get()).data();
+    await accountRef.delete(); // Emulator-only source damage; cancel needs no asset source.
+    const cancel={operationId:"audit-fence-cancel-000001",auditId,expectedEpoch:1};
+    await assert.rejects(()=>recovery.cancelAudit(request(),{...cancel,expectedEpoch:2}),/epoch differs/);
+    await recovery.cancelAudit(request(),cancel);assert.equal((await recovery.cancelAudit(request(),cancel)).unchanged,true);
+    await accountRef.create(accountBytes); // Undo only this test's source damage.
+    await patrol.observePresence(request(),{...heartbeat,operationId:"audit-fence-aftercancel-01",intent:"reopen"});
+    assert.equal((await root.collection("modeTime").doc("current").get()).get("sessionId"),session.sessionId);
+    assert.equal((await save.get()).get("authoritativeStateReady"),false);
+    // A second fresh UID tests real contention on an initially absent fence,
+    // without injected errors, sleeps or assumptions about lock scheduling.
+    const raceAccount=await login("accounts:signUp",{email:"recovery-fence-race@example.test",password});
+    const raceUid=raceAccount.localId,raceRoot=db.collection("serverUsers").doc(raceUid);
+    const raceSession=await invoke("createGameSession",raceAccount.idToken,{uid:raceUid});
+    await invoke("bootstrapCloudSave",raceAccount.idToken,{uid:raceUid,session:raceSession});
+    const raceRequest=()=>({auth:{uid:raceUid,token:claims(raceAccount.idToken)},data:{uid:raceUid,session:raceSession}});
+    await createCanonicalSourceWriter(dependencies).commitInitialSources(raceRequest(),{
+        ...initial,operationId:"audit-fence-race-initial-01"});
+    const raceApprovalId="audit-fence-race-approval1",raceAuditId="audit-fence-race-audit-001";
+    await approval.issue({auth:{uid:"audit-fence-operator",token:{cloudSaveOperator:true}},
+        data:{ownerUid:raceUid,operationId:raceApprovalId,sourceRevision:2,ttlSeconds:60}});
+    const raceFence=raceRoot.collection("recoveryAuditFence").doc("current"),probe=raceRoot.collection("fenceRaceProbe").doc("current");
+    assert.equal((await raceFence.get()).exists,false);
+    const [writerResult,beginResult]=await Promise.allSettled([
+        authority.runProtected(raceRequest(),async tx=>{
+            await tx.get(raceFence); // Same absent/live fence ref as begin.
+            tx.create(probe,{committedAt:FieldValue.serverTimestamp()});
+            return {written:true};
+        }),
+        recovery.beginAudit(raceRequest(),{operationId:raceAuditId,expectedRevision:2,approvalOperationId:raceApprovalId})
+    ]);
+    assert.equal(beginResult.status,"fulfilled",beginResult.reason?.message);
+    const [committedFence,committedProbe]=await Promise.all([raceFence.get(),probe.get()]);
+    assert.equal(committedFence.get("status"),"active");
+    if(writerResult.status==="fulfilled"){
+        assert.equal(committedProbe.exists,true);
+        const writerAt=committedProbe.get("committedAt"),fenceAt=committedFence.get("createdAt");
+        assert(writerAt.seconds<fenceAt.seconds||(writerAt.seconds===fenceAt.seconds&&writerAt.nanoseconds<=fenceAt.nanoseconds),
+            "An ordinary writer may commit only before audit begin, never after the active fence");
+    }else{
+        assert.match(writerResult.reason.message,/RECOVERY_AUDIT_MAINTENANCE/);
+        assert.equal(committedProbe.exists,false,"Fence-first serialization commits no ordinary write");
+    }
+    await assert.rejects(()=>authority.runProtected(raceRequest(),tx=>tx.set(probe,{late:true})),/RECOVERY_AUDIT_MAINTENANCE/);
+    await recovery.cancelAudit(raceRequest(),{operationId:"audit-fence-race-cancel-01",auditId:raceAuditId,expectedEpoch:1});
+    await authority.runProtected(raceRequest(),tx=>{tx.set(probe,{afterCancel:true});});
+    assert.equal((await probe.get()).get("afterCancel"),true);
+    console.log("PASS recovery audit fence: actual absent-read SDK retry blocks later writes; zero/private writers, approval and maintenance scope; reads/original retries survive; real takeover/revoke and expired-approval source-loss cancel; canonical readiness stays false.");
+    console.log("PASS actual ordinary-writer versus begin race on missing fence: server commit timestamps or zero-write maintenance rejection prove serialization; cancel restores normal writes.");
+}
+
 await db.terminate();
 if(direct){await getFirestore().terminate();}
