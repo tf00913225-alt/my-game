@@ -43,6 +43,7 @@ const appScripts=[
     "functions/src/equipment-reforge.js",
     "js/equipment-factory.js",
     "functions/src/hero-core.js",
+    "functions/src/patrol-drop-policy.js",
     "js/00-main.js",
     "functions/src/team-formation-policy.js",
     "js/hero-acquisition-client.js",

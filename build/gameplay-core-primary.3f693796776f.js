@@ -2830,10 +2830,7 @@
           獨立判定）
     ===================================================== */
 
-    const NORMAL_DROP_TABLE=Object.freeze([
-        {itemId:"freezeTalismanLow",chance:.05,quantity:1},{itemId:"stealthTalismanLow",chance:.05,quantity:1},
-        {itemId:"barrierTalismanLow",chance:.05,quantity:1},{itemId:"oreLow",chance:.05,quantity:1}
-    ].map(Object.freeze));
+    const patrolDropPolicy=window.FourSymbolsPatrolDropPolicy;
 
     function awardMonsterMaterialDrop(monster){
         /*
@@ -2844,11 +2841,12 @@
         if(window.v132ActiveDungeonRun){ return; }
 
         const gained=[];
-        NORMAL_DROP_TABLE.forEach(row=>{
-            if(Math.random()>=row.chance){ return; }
+        patrolDropPolicy.normalRows.forEach((entry,index)=>{
+            const row=patrolDropPolicy.normalDrop(index,Math.random());
+            if(!row){ return; }
             const definition=getTalismanDefinition(row.itemId)||getOreDefinition(row.itemId);
             if(!definition){ return; }
-            if(addItemToInventory(definition,1)){
+            if(addItemToInventory(definition,row.quantity)){
                 gained.push(definition.name);
             }
         });
@@ -7822,19 +7820,13 @@
        Elite single-roll drops + quest progress    /* =====================================================
        Elite single-roll drops + quest progress
     ===================================================== */
-    const ELITE_DROP_TABLE=Object.freeze([
-        {itemId:"ticketSetFire",chance:.01,quantity:1},{itemId:"ticketSetWater",chance:.01,quantity:1},
-        {itemId:"ticketSetEarth",chance:.01,quantity:1},{itemId:"ticketSetWind",chance:.01,quantity:1},
-        {itemId:"freezeTalismanMid",chance:.05,quantity:1},{itemId:"stealthTalismanMid",chance:.05,quantity:1},
-        {itemId:"barrierTalismanMid",chance:.05,quantity:1}
-    ].map(Object.freeze));
+    const patrolDropPolicy=window.FourSymbolsPatrolDropPolicy;
     function addEliteSpecialDrop(monster){
         if(typeof window.v132AddItemToInventory!=="function"){ return null; }
-        let roll=Math.random();
-        const row=ELITE_DROP_TABLE.find(entry=>(roll-=entry.chance)<0);
+        const row=patrolDropPolicy.eliteDrop(Math.random());
         const definition=row&&((window.v132GetTicketDefinition&&window.v132GetTicketDefinition(row.itemId))||(window.v132GetTalismanDefinition&&window.v132GetTalismanDefinition(row.itemId)));
         if(!definition){ return null; }
-        if(!window.v132AddItemToInventory(definition,1)){
+        if(!window.v132AddItemToInventory(definition,row.quantity)){
             addBattleLog(monster.name+"出現特殊掉落，但背包已滿，未能放入。");
             return null;
         }

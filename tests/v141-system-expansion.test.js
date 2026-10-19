@@ -5,6 +5,7 @@ const fs=require("node:fs");
 const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
+const dropPolicy=require("../functions/src/patrol-drop-policy.js");
 
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
 const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
@@ -127,9 +128,9 @@ test("wild ranks are explicit, independent 10% rolls and never random BOSS",()=>
 test("elite special loot uses one 19% cumulative table and isolates the normal low-tier pool",()=>{
     const dropBody=extractFunction(coreSource,"addEliteSpecialDrop");
     assert.equal((dropBody.match(/Math\.random\(\)/g)||[]).length,1);
-    assert.match(dropBody,/ELITE_DROP_TABLE.find/);
-    assert.match(coreSource,/itemId:"ticketSetFire",chance:\.01,quantity:1/);
-    assert.match(coreSource,/itemId:"barrierTalismanMid",chance:\.05,quantity:1/);
+    assert.match(dropBody,/patrolDropPolicy\.eliteDrop\(Math\.random\(\)\)/);
+    assert.deepEqual(dropPolicy.eliteRows[0],{itemId:"ticketSetFire",chance:.01,quantity:1});
+    assert.deepEqual(dropPolicy.eliteRows[6],{itemId:"barrierTalismanMid",chance:.05,quantity:1});
     assert.match(coreSource,/v141EliteDropIsolation:true/);
     assert.match(v132Source,/if\(window\.v132ActiveDungeonRun\)\{ return; \}/);
     assert.match(v131Source,/rank==="elite"\)\{ return 1\.5; \}/);
