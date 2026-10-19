@@ -200,6 +200,7 @@ test("rested multiplier is only called outside the element-box branch",()=>{
 });
 
 test("gold, highest-level shop tiers, and exact six potion prices remain enforced",()=>{
+    assert.doesNotMatch(v133Source,/getMonsterGoldDrop\s*=/,"retired late gold getter must not regain arithmetic ownership");
     const context=makeEconomyContext();
     assert.equal(vm.runInContext("getMonsterGoldDrop({level:20,rank:'regular'})",context),43);
     assert.equal(vm.runInContext("getMonsterGoldDrop({level:20,rank:'elite'})",context),86);
