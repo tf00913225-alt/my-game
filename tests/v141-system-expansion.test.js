@@ -133,8 +133,11 @@ test("elite special loot uses one 19% cumulative table and isolates the normal l
     assert.deepEqual(dropPolicy.eliteRows[6],{itemId:"barrierTalismanMid",chance:.05,quantity:1});
     assert.match(coreSource,/v141EliteDropIsolation:true/);
     assert.match(v132Source,/if\(window\.v132ActiveDungeonRun\)\{ return; \}/);
-    assert.match(v131Source,/rank==="elite"\)\{ return 1\.5; \}/);
-    assert.match(v133Source,/rank==="elite"\s*\?\s*2/);
+    const rewards=require("../functions/src/patrol-reward-policy.js");
+    assert.match(v131Source,/rewardPolicy\.expRankMultiplier/);
+    assert.match(mainSource,/FourSymbolsPatrolRewardPolicy\.baseGold/);
+    assert.equal(rewards.expRankMultiplier("elite"),1.5);
+    assert.equal(rewards.baseGold(20,"elite",.5),2*rewards.baseGold(20,"regular",.5));
 });
 
 test("final EXP curve follows the eight-monster zones and deterministic 10% elite expectation",()=>{
