@@ -54,16 +54,16 @@ const fixture=[
 
 fs.mkdirSync(ARTIFACT_DIR,{recursive:true});
 fs.writeFileSync(FIXTURE,fixture);
-let browser,client,profile,deadlineTimer;
+let browser,client,profile,deadlineTimer,launchError="",chromeExecutable="";
 try{
     const chrome=findChrome();
+    chromeExecutable=chrome;
     const base=String(process.env.DEV_BASE_URL||"").trim();
     if(!base){ throw new Error("DEV_BASE_URL is required."); }
     // Image preparation is asynchronous. Wait for the formal owner and the
     // actual fixture result rather than advancing Chrome's virtual clock.
     const started=Date.now(),port=9800+Math.floor(Math.random()*200);
     profile=fs.mkdtempSync(path.join(os.tmpdir(),"tower-first-frame-"));
-    let launchError="";
     browser=spawn(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--window-size=412,915","--remote-debugging-port="+port,"--user-data-dir="+profile,"about:blank"],{stdio:["ignore","ignore","pipe"]});
     browser.stderr.on("data",chunk=>{launchError=(launchError+chunk).slice(-4000);});
     browser.on("error",error=>{launchError=String(error);});
@@ -107,6 +107,11 @@ try{
     const finalExpected={fire:"焰冠獅魁",wind:"風極真君",earth:"磐山帝君"}[element];
     assert.equal(expectedNames[element==="earth"?90:100],finalExpected);
     console.log("Fire Tower identity / first-frame browser QA passed:",JSON.stringify(expectedNames));
+}catch(error){
+    const chromeProcess={executable:chromeExecutable,pid:browser?.pid??null,exit:browser?.exitCode??null,stderr:launchError};
+    console.error('Tower first-frame Chrome failure: '+JSON.stringify({chromeProcess,devTools:error.devToolsDiagnostics||null}));
+    fs.writeFileSync(path.join(ARTIFACT_DIR,element+'-tower-identity-first-frame-browser-qa.json'),JSON.stringify({passed:false,error:String(error.stack||error),chromeProcess,devTools:error.devToolsDiagnostics||null},null,2)+'\n');
+    throw error;
 }finally{
     clearTimeout(deadlineTimer);
     client?.close();

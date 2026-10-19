@@ -256,7 +256,8 @@ test("patrol movement, left task tracker, global tap feedback and red dots are w
 });
 
 test("compact UI and daily cover scaffolding meet the mobile layout requirements",()=>{
-    assert.match(cssSource,/\.item-stat-list \*\{\s*font-size:15px !important/);
+    assert.doesNotMatch(cssSource,/\.item-stat-list \*\{\s*font-size:15px !important/);
+    assert.match(authoredUiCss(fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8")),/\.item-stat-list\{[^}]*font-size:15px/);
     assert.match(cssSource,/\.shop-potion-list\{grid-template-columns:repeat\(2/);
     assert.match(cssSource,/\.v141-offline-panel\{display:grid/);
     assert.match(cssSource,/\.v141-dungeon-cover-art\{[\s\S]*?aspect-ratio:16 \/ 9/);

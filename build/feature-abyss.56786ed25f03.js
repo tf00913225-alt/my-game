@@ -455,7 +455,7 @@
             '<button type="button" '+(locked?'disabled aria-disabled="true"':'onclick="v174AbyssSelectDifficulty('+level+')"')+'>'+escapeHtml(status.action)+'</button></article>';
     }
     function renderSelection(){
-        return '<div class="v141-abyss-intro v174-abyss-selection"><header class="v174-abyss-selection-head"><span>永久高難首通攻略</span><b>虛空五帝</b><small>固定境界・每個寶箱與最終特殊獎勵每份存檔僅可領取一次</small><button type="button" class="v174-abyss-leave" onclick="v174AbyssLeaveToGameplay()">返回玩法</button></header><div class="v174-abyss-card-list">'+renderDifficultyCard(20)+renderDifficultyCard(40)+'</div></div>';
+        return '<div class="v141-abyss-intro v174-abyss-selection"><header class="v174-abyss-selection-head"><span>永久高難首通攻略</span><b>虛空五帝</b><small>固定境界・每個寶箱與最終特殊獎勵每份存檔僅可領取一次</small><button type="button" class="v174-abyss-leave" onclick="v174AbyssLeaveToGameplay()">返回玩法</button></header><div class="v174-abyss-card-list" data-scroll-owner="y">'+renderDifficultyCard(20)+renderDifficultyCard(40)+'</div></div>';
     }
     function nodeClass(run,index){
         const key="d"+run.difficulty+"-r"+run.regionIndex+"-s"+index;

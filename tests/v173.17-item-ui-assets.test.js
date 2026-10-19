@@ -105,8 +105,8 @@ test("ticket choices keep image and label in separate layout boxes",()=>{
 });
 
 test("item preview stays inside the stage with a reachable return button",()=>{
-    assert.match(itemCss,/max-height:calc\(100% - 24px\) !important/);
     const frameCss=authoredUiCss(fs.readFileSync("css/49-v169-rpg-ui.css","utf8"));
+    assert.match(frameCss,/#itemModal \.item-modal-box\{[^}]*max-height:min\(var\(--ui-medium-modal-height\),calc\(100% - var\(--ui-medium-modal-safe-space\)\)\) !important/);
     assert.match(frameCss,/#itemModal #itemModalIcon\{[^}]*aspect-ratio:1 !important/);
     assert.doesNotMatch(itemCss,/#itemModal \.item-modal-icon/);
     assert.match(frameCss,/#itemModal #itemModalStats\{[^}]*overflow-y:auto !important/);

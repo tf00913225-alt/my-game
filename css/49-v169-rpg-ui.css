@@ -1473,7 +1473,7 @@ body > .v169-rpg-dialog-layer{
 #game-ui #skillPage .skill-category-badge{display:inline-block;margin:0;padding:0 calc(5 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid var(--skill-edge);border-radius:calc(2 * var(--ui-length-unit,1px));color:var(--skill-muted);font-size:calc(13 * var(--ui-length-unit,1px));font-weight:400;line-height:1.5;}
 #game-ui #skillPage .skill-row-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:calc(6 * var(--ui-length-unit,1px));color:var(--skill-paper);font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.6;}
 #game-ui #skillPage .skill-row-prerequisite{display:block;margin-top:calc(6 * var(--ui-length-unit,1px));color:var(--skill-highlight);font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.5;}
-#game-ui #skillPage .skill-row-detail-link{grid-column:1;grid-row:2;display:inline-flex;align-items:center;gap:calc(3 * var(--ui-length-unit,1px));min-height:calc(44 * var(--ui-length-unit,1px));margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--skill-highlight);font:inherit;font-size:calc(14 * var(--ui-length-unit,1px));font-weight:500;line-height:1.5;cursor:pointer;text-align:left;}
+#game-ui #skillPage .skill-row-detail-link{grid-column:1;grid-row:2;display:inline-flex;align-items:center;gap:calc(3 * var(--ui-length-unit,1px));min-height:calc(44 * var(--ui-length-unit,1px));margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--skill-highlight);font:inherit;font-size:calc(15 * var(--ui-length-unit,1px));font-weight:500;line-height:1.5;cursor:pointer;text-align:left;}
 #game-ui #skillPage .skill-action-card{grid-column:3;min-width:0;width:100%;min-height:calc(44 * var(--ui-length-unit,1px));height:auto;margin:0;padding:calc(7 * var(--ui-length-unit,1px)) calc(6 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid var(--skill-bronze);border-radius:calc(3 * var(--ui-length-unit,1px));background:linear-gradient(#77552c,#4d351e);box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 #f0d38a44,0 calc(2 * var(--ui-length-unit,1px)) calc(3 * var(--ui-length-unit,1px)) #0005;color:var(--skill-paper);font:inherit;cursor:pointer;appearance:none;transition:background .12s,border-color .12s;}
 #game-ui #skillPage .skill-action-card[data-skill-action="growth"]{grid-row:2;}
 #game-ui #skillPage .skill-action-card[data-skill-action="equip"]{grid-column:2;grid-row:2;border-color:var(--skill-edge);background:linear-gradient(#30291f,#1b1812);color:var(--skill-highlight);box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 #f0d38a15;}
@@ -1504,7 +1504,7 @@ body > .v169-rpg-dialog-layer{
 }
 #game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-title{background:transparent;box-shadow:none;border:0;}
 #game-ui #homeFeatureModal[data-character-tab="skill"] #homeFeatureModalTitle{
-    flex:0 0 45%;min-width:0;box-sizing:border-box;height:var(--skill-header-height);
+    flex:0 0 70%;min-width:0;box-sizing:border-box;height:var(--skill-header-height);
     display:flex;align-items:center;justify-content:center;
     padding:0 calc(12 * var(--ui-length-unit,1px)) 0 calc(34 * var(--ui-length-unit,1px));
     background:transparent url('../assets/ui/skill-iron-bronze/title-short.bb578519c9f4.webp') center/100% auto no-repeat;
@@ -1691,8 +1691,10 @@ body > .v169-rpg-dialog-layer{
 #game-stage .modal-box button:disabled,
 .v132-reward-modal-inner button:disabled,
 .v169-rpg-dialog-button:disabled{
-    border-color:#4C4232;
-    color:#807563;
+    border-color:#5D5342;
+    color:var(--rpg-window-muted,#B9AD98);
+    opacity:1;
+    filter:none;
     background:linear-gradient(180deg,#1B1915,#100F0C);
     box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(255,255,255,.025);
 }

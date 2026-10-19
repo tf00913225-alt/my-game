@@ -164,26 +164,26 @@
     line-height:calc(17 * var(--ui-length-unit,1px)) !important;
 }
 #game-stage .v141-dungeon-cover-art small{
-    font-size:13px;
-    line-height:17px;
+    font-size:16px;
+    line-height:1.45;
 }
 #game-stage .v141-dungeon-cover-info b{
     font-size:16px;
     line-height:20px;
 }
 #game-stage .v141-dungeon-cover-info span{
-    font-size:14px;
-    line-height:18px;
+    font-size:16px;
+    line-height:1.45;
 }
 #game-stage #dungeonPage .v141-dungeon-cover-actions button{
     min-height:38px;
-    font-size:15px;
+    font-size:18px;
     line-height:1.2;
 }
 #game-stage .v141-dungeon-remaining{
     padding-top:3px;
-    font-size:14px;
-    line-height:18px;
+    font-size:16px;
+    line-height:1.45;
 }
 
 /* Other formal non-battle mobile owners discovered by the full typography scan. */

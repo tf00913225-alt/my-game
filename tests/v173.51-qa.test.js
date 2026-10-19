@@ -57,7 +57,7 @@ assert.match(quest,/v17351ClaimAllAchievements/);
 assert.match(quest,/每日任務獎勵/);
 assert.match(quest,/委託任務獎勵/);
 assert.match(quest,/v17351PreviewQuestMilestone/);
-assert.match(css,/quest-card-name\{font-size:17px/);
+assert.match(authoredUiCss(fs.readFileSync("css/25-stage-v90-quest-interface-core.css","utf8")),/quest-card-name\{[^}]*font-size:17px/);
 
 assert.match(build,/"css\/53-v173\.51-qa\.css"/);
 assert.match(build,/"js\/53-v173\.50-inventory-qol\.js"[\s\S]*?"js\/54-v173\.51-battle-qa\.js"[\s\S]*?"js\/55-v173\.51-inventory-qa\.js"[\s\S]*?"js\/57-v173\.51-quest-qa\.js"/);

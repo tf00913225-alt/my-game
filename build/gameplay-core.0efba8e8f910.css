@@ -415,6 +415,51 @@
 }
 
 /* 詳細資訊 modal 必須高於角色 modal */
+/* Shared native detail typography; the retired css/38 legacy wildcard must
+   never force stage-pixel fonts onto these native modal descendants. */
+#game-ui .item-modal:not(#itemModal) .item-modal-box{
+    padding:calc(14 * var(--ui-length-unit,1px));
+    color:var(--rpg-window-text,#eee7d8);
+    font-size:calc(15 * var(--ui-length-unit,1px));
+    line-height:1.6;
+}
+#game-ui .item-modal:not(#itemModal) .item-modal-name{
+    margin:0;
+    padding:calc(6 * var(--ui-length-unit,1px)) 0;
+    font-size:calc(20 * var(--ui-length-unit,1px));
+    line-height:1.4;
+    overflow-wrap:anywhere;
+}
+#game-ui .item-modal:not(#itemModal) .item-stat-list{
+    padding:calc(12 * var(--ui-length-unit,1px));
+    font-size:calc(15 * var(--ui-length-unit,1px));
+    line-height:1.6;
+}
+#game-ui .item-modal:not(#itemModal) .close-item-button{
+    height:auto;
+    min-height:calc(44 * var(--ui-length-unit,1px));
+    padding:calc(8 * var(--ui-length-unit,1px));
+    font-size:calc(16 * var(--ui-length-unit,1px));
+    line-height:1.4;
+}
+#game-ui #skillDetailStats .skill-detail-category{
+    display:inline-block;
+    padding:calc(2 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px));
+    border:calc(1 * var(--ui-length-unit,1px)) solid var(--rpg-window-gold-dark,#73582D);
+    border-radius:calc(3 * var(--ui-length-unit,1px));
+    color:var(--rpg-window-gold-hi,#F0D38A);
+    font-size:calc(14 * var(--ui-length-unit,1px));
+}
+#game-ui #skillDetailStats .skill-detail-description{margin:calc(10 * var(--ui-length-unit,1px)) 0;}
+#game-ui #skillDetailStats .skill-detail-cost{margin:0;color:var(--rpg-window-muted,#B9AD98);font-size:calc(14 * var(--ui-length-unit,1px));}
+#game-ui #skillDetailStats .skill-detail-section-title{margin:calc(16 * var(--ui-length-unit,1px)) 0 calc(8 * var(--ui-length-unit,1px));font-size:calc(18 * var(--ui-length-unit,1px));line-height:1.5;color:var(--rpg-window-gold-hi,#F0D38A);}
+#game-ui #skillDetailStats .skill-detail-level-row{display:grid;grid-template-columns:calc(48 * var(--ui-length-unit,1px)) minmax(0,1fr);gap:calc(8 * var(--ui-length-unit,1px));padding:calc(8 * var(--ui-length-unit,1px)) 0;border-bottom:calc(1 * var(--ui-length-unit,1px)) solid #73582d66;}
+#game-ui #skillDetailStats .skill-detail-level-label{color:var(--rpg-window-gold-hi,#F0D38A);font-weight:700;}
+#game-ui #skillDetailStats .skill-detail-level-effect{min-width:0;overflow-wrap:anywhere;}
+#game-ui #skillDetailStats .v17364-progression-detail{display:grid;gap:calc(8 * var(--ui-length-unit,1px));margin-top:calc(16 * var(--ui-length-unit,1px));}
+#game-ui #skillDetailStats .v17364-progression-detail>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:calc(10 * var(--ui-length-unit,1px));padding:calc(6 * var(--ui-length-unit,1px)) 0;}
+#game-ui #skillDetailStats .v17364-progression-detail strong{color:var(--rpg-window-muted,#B9AD98);font-weight:500;}
+#game-ui #skillDetailStats .v17364-progression-detail span{text-align:right;overflow-wrap:anywhere;}
 .inventory-character-detail-modal{
     z-index:9000 !important;
 }
@@ -516,15 +561,6 @@
     scrollbar-gutter:stable !important;
     font-size:calc(15 * var(--ui-length-unit,1px)) !important;
     line-height:1.55 !important;
-}
-#game-ui #skillDetailModal #skillDetailStats span[style*="font-size:11px"]{
-    font-size:calc(13 * var(--ui-length-unit,1px)) !important;
-    line-height:1.35 !important;
-}
-#game-ui #skillDetailModal #skillDetailStats div[style*="font-size:11px"],
-#game-ui #skillDetailModal #skillDetailStats div[style*="font-size:12px"]{
-    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
-    line-height:1.5 !important;
 }
 #game-ui #skillDetailModal #skillDetailStats .v17364-progression-hint{
     font-size:calc(14 * var(--ui-length-unit,1px)) !important;
@@ -718,14 +754,14 @@
 #game-ui #homeFeatureModal.quest-mode .quest-tab{
     position:relative !important;
     min-height:132px !important;
-    padding:21px 12px 27px !important;
+    padding:18px 12px !important;
     border:0 !important;
     border-radius:0 !important;
     background:transparent !important;
     color:#b9aa91 !important;
-    font-size:42px !important;
+    font-size:45px !important;
     font-weight:700 !important;
-    line-height:1 !important;
+    line-height:1.4 !important;
     box-shadow:none !important;
 }
 
@@ -787,7 +823,7 @@
 #game-ui #homeFeatureModal.quest-mode .quest-card-name{
     min-width:0 !important;
     color:#f3e7cc !important;
-    font-size:42px !important;
+    font-size:51px !important;
     font-weight:800 !important;
     line-height:1.15 !important;
 }
@@ -815,19 +851,19 @@
 #game-ui #homeFeatureModal.quest-mode .quest-card-desc{
     margin-top:6px !important;
     color:#b9aa91 !important;
-    font-size:39px !important;
-    line-height:1.32 !important;
+    font-size:45px !important;
+    line-height:1.5 !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-progress-line{
     margin-top:18px !important;
     color:#aa9b83 !important;
-    font-size:39px !important;
+    font-size:42px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-progress-line strong{
     color:#e7d6b7 !important;
-    font-size:39px !important;
+    font-size:45px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-progress-track{
@@ -857,7 +893,7 @@
     align-items:center !important;
     gap:12px 18px !important;
     color:#e0cda8 !important;
-    font-size:39px !important;
+    font-size:42px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-reward-label{
@@ -874,7 +910,7 @@
     border-radius:18px !important;
     background:linear-gradient(180deg,#5d2417,#2c100a) !important;
     color:#ffe27a !important;
-    font-size:39px !important;
+    font-size:45px !important;
     font-weight:800 !important;
 }
 
@@ -925,14 +961,24 @@
 
 #game-ui #homeFeatureModal.quest-mode .quest-completion-milestones{
     display:grid !important;
-    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    grid-template-columns:none !important;
     gap:18px !important;
+
+    grid-auto-flow:column;
+    grid-auto-columns:calc(120 * var(--ui-length-unit,1px));
+    overflow-x:auto;
+    overflow-y:hidden;
+    touch-action:pan-x;
+    overscroll-behavior-x:contain;
+    padding-bottom:calc(6 * var(--ui-length-unit,1px));
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-milestone{
     min-width:0 !important;
     text-align:center !important;
     opacity:1 !important;
+    display:flex;
+    flex-direction:column;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-milestone.reached{
@@ -952,17 +998,24 @@
 
 #game-ui #homeFeatureModal.quest-mode .quest-milestone-slot{
     position:relative !important;
-    min-height:234px !important;
+    min-height:calc(112 * var(--ui-length-unit,1px)) !important;
     display:flex !important;
     flex-direction:column !important;
     align-items:center !important;
-    justify-content:center !important;
-    padding:12px !important;
+    justify-content:flex-start !important;
+    padding:calc(8 * var(--ui-length-unit,1px)) !important;
     border:3px solid rgba(138,106,58,.55) !important;
     border-radius:18px !important;
     background:rgba(0,0,0,.25) !important;
     color:#8f8371 !important;
-    font-size:27px !important;
+    font-size:45px !important;
+
+    height:auto;
+    flex:1 1 auto;
+    gap:calc(4 * var(--ui-length-unit,1px));
+    line-height:1.4 !important;
+    overflow-wrap:anywhere;
+    white-space:normal;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-milestone-chest{
@@ -1002,6 +1055,10 @@
     background:#ff2d2d !important;
     box-shadow:0 0 21px rgba(255,45,45,.9) !important;
 }
+
+#game-ui #homeFeatureModal.quest-mode .quest-milestone-slot small{font-size:42px;line-height:1.5;overflow-wrap:anywhere;max-width:100%;}
+
+#game-ui #homeFeatureModal.quest-mode .quest-scroll-hint{margin:0 0 calc(6 * var(--ui-length-unit,1px));font-size:39px;line-height:1.4;color:#b9aa91;}
 
 
 /* bundled source: css/26-v110-auto-settings-premium.css */
@@ -1851,41 +1908,41 @@
 }
 
 /* V173 typography: the native creation canvas is 1080px wide and renders at
-   roughly 0.388889 on a 420px phone. Values here are design-space sizes chosen
-   from actual visible targets; the 13px floor therefore maps to about 34px. */
-#creationPage .creation-step-progress{font-size:34px !important;line-height:1.25 !important;}
-#creationPage .creation-portrait-caption{font-size:36px !important;line-height:1.35 !important;}
+   1/3 on a 360px phone. Design-space text needs at least 39px
+   to preserve the 13px visible minimum. */
+#creationPage .creation-step-progress{font-size:39px !important;line-height:1.25 !important;}
+#creationPage .creation-portrait-caption{font-size:39px !important;line-height:1.35 !important;}
 #creationPage .creation-portrait-caption b{font-size:41px !important;line-height:1.25 !important;}
 #creationPage .creation-section-kicker{font-size:39px !important;line-height:1.3 !important;}
-#creationPage .creation-gender-option{font-size:39px !important;}
-#creationPage .element-option .element-name{font-size:41px !important;line-height:1.25 !important;}
+#creationPage .creation-gender-option{font-size:45px !important;}
+#creationPage .element-option .element-name{font-size:45px !important;line-height:1.25 !important;}
 #creationPage .creation-role-subtitle{font-size:39px !important;line-height:1.35 !important;}
 #creationPage .creation-role-description{font-size:39px !important;line-height:1.5 !important;}
-#creationPage .creation-role-tag{font-size:34px !important;line-height:1.3 !important;}
-#creationPage .creation-card-index{font-size:34px !important;}
-#creationPage .creation-card-caption{font-size:36px !important;line-height:1.4 !important;}
-#creationPage .creation-next small,#creationPage .creation-back small{font-size:34px !important;line-height:1.25 !important;}
-#creationPage .creation-skill-lane-label{font-size:36px !important;line-height:1.3 !important;}
+#creationPage .creation-role-tag{font-size:39px !important;line-height:1.3 !important;}
+#creationPage .creation-card-index{font-size:39px !important;}
+#creationPage .creation-card-caption{font-size:39px !important;line-height:1.4 !important;}
+#creationPage .creation-next small,#creationPage .creation-back small{font-size:39px !important;line-height:1.25 !important;}
+#creationPage .creation-skill-lane-label{font-size:39px !important;line-height:1.3 !important;}
 #creationPage .creation-skill-chip{font-size:39px !important;line-height:1.3 !important;}
-#creationPage .creation-points-badge{font-size:36px !important;line-height:1.3 !important;}
+#creationPage .creation-points-badge{font-size:39px !important;line-height:1.3 !important;}
 #creationPage .creation-points-badge b{font-size:41px !important;}
 #creationPage .creation-stats-card .creation-label{font-size:41px !important;line-height:1.3 !important;}
-#creationPage .creation-stats-card .creation-card-caption{font-size:36px !important;line-height:1.4 !important;}
+#creationPage .creation-stats-card .creation-card-caption{font-size:39px !important;line-height:1.4 !important;}
 #creationPage .creation-stat-copy b{font-size:41px !important;line-height:1.25 !important;}
-#creationPage .creation-stat-copy small{font-size:36px !important;line-height:1.35 !important;}
+#creationPage .creation-stat-copy small{font-size:39px !important;line-height:1.35 !important;}
 #creationPage .creation-stat-right > b{font-size:41px !important;}
 #creationPage .creation-stat-details summary{font-size:39px !important;line-height:1.4 !important;}
 #creationPage .creation-stat-details[open] .creation-stat-details-body,
 #creationPage .creation-stat-details-body{font-size:39px !important;line-height:1.6 !important;}
-#creationPage .creation-start small{font-size:34px !important;line-height:1.25 !important;}
-#creationSkillDetailModal .creation-skill-detail-path{font-size:calc(36 * var(--ui-length-unit,1px)) !important;line-height:1.35 !important;}
-#creationSkillDetailModal .creation-skill-detail-tag{font-size:calc(34 * var(--ui-length-unit,1px)) !important;line-height:1.3 !important;}
-#creationSkillDetailModal .creation-skill-detail-description{font-size:calc(39 * var(--ui-length-unit,1px)) !important;line-height:1.6 !important;}
-#creationSkillDetailModal .creation-skill-detail-meta{font-size:calc(36 * var(--ui-length-unit,1px)) !important;line-height:1.55 !important;}
-#creationSkillDetailModal .creation-skill-detail-section-title{font-size:calc(46 * var(--ui-length-unit,1px)) !important;line-height:1.3 !important;}
+#creationPage .creation-start small{font-size:39px !important;line-height:1.25 !important;}
+#creationSkillDetailModal .creation-skill-detail-path{font-size:calc(39 * var(--ui-length-unit,1px)) !important;line-height:1.35 !important;}
+#creationSkillDetailModal .creation-skill-detail-tag{font-size:calc(39 * var(--ui-length-unit,1px)) !important;line-height:1.3 !important;}
+#creationSkillDetailModal .creation-skill-detail-description{font-size:calc(45 * var(--ui-length-unit,1px)) !important;line-height:1.6 !important;}
+#creationSkillDetailModal .creation-skill-detail-meta{font-size:calc(39 * var(--ui-length-unit,1px)) !important;line-height:1.55 !important;}
+#creationSkillDetailModal .creation-skill-detail-section-title{font-size:calc(54 * var(--ui-length-unit,1px)) !important;line-height:1.3 !important;}
 #creationSkillDetailModal .creation-skill-detail-level-row,
-#creationSkillDetailModal .creation-skill-detail-level-row b{font-size:calc(39 * var(--ui-length-unit,1px)) !important;line-height:1.55 !important;}
-#creationSkillDetailModal .creation-skill-detail-close{font-size:calc(39 * var(--ui-length-unit,1px)) !important;}
+#creationSkillDetailModal .creation-skill-detail-level-row b{font-size:calc(45 * var(--ui-length-unit,1px)) !important;line-height:1.55 !important;}
+#creationSkillDetailModal .creation-skill-detail-close{font-size:calc(48 * var(--ui-length-unit,1px)) !important;}
 
 /* Fixed battlefield ally slots: structural owner, not a positional workaround. */
 #game-stage #battlePlayerRow.v-fixed-ally-formation{
@@ -1918,7 +1975,7 @@
     font-size:calc(15 * var(--ui-length-unit,1px));
     margin-left:0;
     min-width:calc(54 * var(--ui-length-unit,1px));
-    min-height:calc(30 * var(--ui-length-unit,1px));
+    min-height:calc(44 * var(--ui-length-unit,1px));
     border:calc(1 * var(--ui-length-unit,1px)) solid rgba(223,187,95,.7);
     border-radius:calc(8 * var(--ui-length-unit,1px));
     background:rgba(31,24,14,.92);
@@ -2601,6 +2658,7 @@
 
 #game-ui #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row{
     position:relative;
+    grid-template-columns:minmax(0,1fr) minmax(0,calc(126 * var(--ui-length-unit,1px)));
     min-height:calc(72 * var(--ui-length-unit,1px)) !important;
     padding:calc(10 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px)) !important;
     border:calc(1 * var(--ui-length-unit,1px)) solid rgba(200,154,72,.20) !important;
@@ -2639,6 +2697,9 @@
 #game-ui #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel select,
 #game-ui #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel input{
     min-height:calc(44 * var(--ui-length-unit,1px)) !important;
+    max-width:100%;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 #game-ui #homeFeatureModal:has(#homeFeatureModalBody > .system-panel) .system-panel-row:not(.danger) .home-feature-buy-btn{
@@ -2716,71 +2777,17 @@
 }
 
 #game-ui #homeFeatureModalBody .home-feature-buy-btn,
-#game-ui #homeFeatureModalBody button,
-#game-stage #dungeonPage button{
+#game-ui #homeFeatureModalBody button{
     min-height:114px;
-    font-size:42px;
+    font-size:45px;
 }
 
 :is(#game-stage,#game-ui) .system-panel-row strong{font-size:calc(16 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .system-panel-row small{font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.55;}
 
-/* Legacy modal compatibility for other surfaces only.
-   #itemModal frame, art, typography, actions and scroll migrated to css/49. */
-.item-modal:not(#itemModal) .item-modal-box{
-    width:min(calc(var(--layout-inline-size,420px) * .92),calc(470 * var(--ui-length-unit,1px))) !important;
-    max-width:calc(470 * var(--ui-length-unit,1px)) !important;
-    max-height:calc(100% - 24px) !important;
-    overflow:hidden !important;
-    padding:15px !important;
-    box-sizing:border-box;
-    border:1px solid rgba(200,154,72,.72) !important;
-    background:linear-gradient(165deg,rgba(35,26,16,.98),rgba(8,7,5,.99) 72%) !important;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.04),0 12px 28px rgba(0,0,0,.48) !important;
-}
+#game-stage #dungeonTabBtnDaily{min-height:48px;padding:8px 12px;font-size:18px;line-height:1.4;}
 
-.item-modal:not(#itemModal) .item-modal-icon{
-    min-height:44px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:38px !important;
-    line-height:1 !important;
-}
-
-.item-modal:not(#itemModal) .item-modal-icon svg{
-    width:46px;
-    height:46px;
-}
-
-.item-modal:not(#itemModal) .item-modal-name{
-    margin:5px 0 9px !important;
-    color:var(--v141-gold-soft);
-    font-size:20px !important;
-    line-height:1.25;
-}
-
-.item-modal:not(#itemModal) .item-stat-list,
-.item-modal:not(#itemModal) .item-stat-list *{
-    font-size:15px !important;
-    line-height:1.55 !important;
-}
-
-.item-modal:not(#itemModal) .item-stat-list{
-    max-height:none !important;
-    overflow:visible !important;
-    padding:11px !important;
-}
-
-.item-modal:not(#itemModal) .item-modal-buttons{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-}
-
-.item-modal:not(#itemModal) .item-modal-button,
-.item-modal:not(#itemModal) .close-item-button{
-    min-height:40px;
-    font-size:15px;
-}
+/* Native skill/status/character detail presentation is owned by css/23. */
 
 .v141-item-reforge{
     display:flex;
@@ -3107,12 +3114,6 @@
     width:min(98%,1440px) !important;
     max-width:1440px !important;
 }
-#game-ui #homeFeatureModal.quest-mode .home-feature-modal-title{font-size:69px !important;}
-#game-ui #homeFeatureModal.quest-mode .quest-tab{font-size:48px !important;}
-#game-ui #homeFeatureModal.quest-mode .quest-card-name{font-size:48px !important;}
-#game-ui #homeFeatureModal.quest-mode .quest-card-desc{font-size:39px !important;line-height:1.48 !important;}
-#game-ui #homeFeatureModal.quest-mode .quest-progress-line{font-size:36px !important;}
-#game-ui #homeFeatureModal.quest-mode .quest-progress-line strong{font-size:39px !important;}
 
 :is(#game-stage,#game-ui) .quest-completion-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:calc(4 * var(--ui-length-unit,1px));color:#dec89d;font-size:calc(13 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .quest-completion-track{height:calc(7 * var(--ui-length-unit,1px));overflow:hidden;border-radius:calc(99 * var(--ui-length-unit,1px));background:#1b1510;box-shadow:inset 0 0 0 calc(1 * var(--ui-length-unit,1px)) #5c462b;}
@@ -3276,15 +3277,6 @@
 @keyframes v141NoticePulse{50%{transform:scale(.9);opacity:.72}}
 
 /* ----- Synthesis system ----- */
-#game-stage .v17363-material-card>p{font-size:14px!important;line-height:1.45!important}
-#game-stage .v17363-material-field,#game-stage .v17363-material-field-label{font-size:14px!important;line-height:1.4!important}
-#game-stage .v17363-game-select-trigger{min-height:44px!important;font-size:15px!important;line-height:1.3!important}
-#game-stage .v17363-game-select-trigger>b{font-size:15px!important}
-#game-stage .v17363-game-select-option{min-height:44px!important;font-size:15px!important;line-height:1.35!important}
-#game-stage .v17363-material-flow section{font-size:14px!important;line-height:1.4!important}
-#game-stage .v17363-material-flow section b{font-size:16px!important;line-height:1.35!important}
-#game-stage .v17363-material-flow section span{font-size:13px!important;line-height:1.35!important}
-#game-stage .v17363-material-card .v17363-craft-button{min-height:calc(44 * var(--ui-length-unit,1px))!important;font-size:calc(15 * var(--ui-length-unit,1px))!important}
 
 #game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-wallet span{font-size:42px!important;line-height:57px!important}
 #game-ui #homeFeatureModal.v141-synthesis-modal .v141-synthesis-wallet b{font-size:48px!important;line-height:63px!important}
@@ -3340,36 +3332,35 @@
 
 
 #game-stage .v17363-material-synthesis{display:grid;gap:calc(8 * var(--ui-length-unit,1px));padding-bottom:calc(8 * var(--ui-length-unit,1px));}
-#game-stage .v17363-material-card{position:relative;padding:10px;border:1px solid rgba(154,112,58,.7);border-radius:11px;background:linear-gradient(180deg,#20170f,#0e0b08);overflow:visible;}
-#game-stage .v17363-material-card h4{margin:0 0 3px;color:#f0ce85;font:900 16px/1.35 "Noto Serif TC",serif;}
-#game-stage .v17363-material-card>p{margin:0 0 7px;color:#9f927f;font-size:13px;line-height:1.45;}
-#game-stage .v17363-material-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;position:relative;z-index:12;}
+#game-stage .v17363-material-card{position:relative;padding:calc(10 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid rgba(154,112,58,.7);border-radius:calc(11 * var(--ui-length-unit,1px));background:linear-gradient(180deg,#20170f,#0e0b08);overflow:visible;}
+#game-stage .v17363-material-card h4{margin:0 0 calc(3 * var(--ui-length-unit,1px));color:#f0ce85;font:900 calc(18 * var(--ui-length-unit,1px))/1.35 "Noto Serif TC",serif;}
+#game-stage .v17363-material-card>p{margin:0 0 calc(7 * var(--ui-length-unit,1px));color:#9f927f;font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.45;}
+#game-stage .v17363-material-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(6 * var(--ui-length-unit,1px));position:relative;z-index:12;}
 #game-stage .v17363-material-controls.single{grid-template-columns:1fr;}
 #game-stage .v17363-material-controls:not(.single)>.v17363-material-field:last-child:nth-child(odd){grid-column:1/-1;}
-#game-stage .v17363-material-field{display:grid;gap:4px;min-width:0;color:#bbaa8c;font-size:13px;}
-#game-stage .v17363-material-field-label{color:#bbaa8c;font-size:13px;line-height:1.3;}
+#game-stage .v17363-material-field{display:grid;gap:calc(4 * var(--ui-length-unit,1px));min-width:0;color:#bbaa8c;font-size:calc(13 * var(--ui-length-unit,1px));}
+#game-stage .v17363-material-field-label{color:#bbaa8c;font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.3;}
 #game-stage .v17363-game-select{position:relative;min-width:0;z-index:1;}
 #game-stage .v17363-game-select.open{z-index:80;}
-#game-stage .v17363-game-select-trigger{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:6px;width:100%;min-height:44px;padding:5px 8px;border:1px solid #805e31;border-radius:7px;color:#ead9b5;background:linear-gradient(180deg,#21170e,#0b0907);font-size:15px;font-weight:800;text-align:left;box-shadow:inset 0 0 0 1px rgba(255,222,151,.03);}
+#game-stage .v17363-game-select-trigger{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:calc(6 * var(--ui-length-unit,1px));width:100%;min-height:calc(44 * var(--ui-length-unit,1px));padding:calc(5 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #805e31;border-radius:calc(7 * var(--ui-length-unit,1px));color:#ead9b5;background:linear-gradient(180deg,#21170e,#0b0907);font-size:calc(15 * var(--ui-length-unit,1px));font-weight:800;text-align:left;box-shadow:inset 0 0 0 calc(1 * var(--ui-length-unit,1px)) rgba(255,222,151,.03);}
 #game-stage .v17363-game-select-trigger>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-stage .v17363-game-select-trigger>b{color:#d7ab59;font-size:13px;}
-#game-stage .v17363-game-select.open .v17363-game-select-trigger{border-color:#d6a448;box-shadow:0 0 9px rgba(211,157,65,.2),inset 0 0 0 1px rgba(255,225,158,.14);}
-#game-stage .v17363-game-select-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);display:none;max-height:205px;padding:5px;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;border:1px solid #a0783a;border-radius:8px;background:linear-gradient(170deg,#281b0f,#090705);box-shadow:0 12px 30px rgba(0,0,0,.82),inset 0 0 0 1px rgba(255,222,151,.05);}
-#game-stage .v17363-game-select.open .v17363-game-select-menu{display:grid;gap:3px;}
-#game-stage .v17363-game-select-option{display:grid;grid-template-columns:auto minmax(0,1fr) 16px;align-items:center;gap:7px;width:100%;min-height:44px;padding:6px 8px;border:1px solid transparent;border-radius:6px;color:#d7c6a4;background:transparent;font-size:13px;font-weight:800;text-align:left;}
+#game-stage .v17363-game-select-trigger>b{color:#d7ab59;font-size:calc(13 * var(--ui-length-unit,1px));}
+#game-stage .v17363-game-select.open .v17363-game-select-trigger{border-color:#d6a448;box-shadow:0 0 calc(9 * var(--ui-length-unit,1px)) rgba(211,157,65,.2),inset 0 0 0 calc(1 * var(--ui-length-unit,1px)) rgba(255,225,158,.14);}
+#game-stage .v17363-game-select-menu{position:absolute;left:0;right:0;top:calc(100% + calc(4 * var(--ui-length-unit,1px)));display:none;max-height:calc(205 * var(--ui-length-unit,1px));padding:calc(5 * var(--ui-length-unit,1px));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;border:calc(1 * var(--ui-length-unit,1px)) solid #a0783a;border-radius:calc(8 * var(--ui-length-unit,1px));background:linear-gradient(170deg,#281b0f,#090705);box-shadow:0 calc(12 * var(--ui-length-unit,1px)) calc(30 * var(--ui-length-unit,1px)) rgba(0,0,0,.82),inset 0 0 0 calc(1 * var(--ui-length-unit,1px)) rgba(255,222,151,.05);}
+#game-stage .v17363-game-select.open .v17363-game-select-menu{display:grid;gap:calc(3 * var(--ui-length-unit,1px));}
+#game-stage .v17363-game-select-option{display:grid;grid-template-columns:auto minmax(0,1fr) calc(16 * var(--ui-length-unit,1px));align-items:center;gap:calc(7 * var(--ui-length-unit,1px));width:100%;min-height:calc(44 * var(--ui-length-unit,1px));padding:calc(6 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid transparent;border-radius:calc(6 * var(--ui-length-unit,1px));color:#d7c6a4;background:transparent;font-size:calc(15 * var(--ui-length-unit,1px));font-weight:800;text-align:left;}
 #game-stage .v17363-game-select-option.selected{border-color:#9d7336;background:linear-gradient(90deg,rgba(180,126,39,.2),rgba(72,46,16,.15));color:#ffe09a;}
 #game-stage .v17363-game-select-option>b{color:#efbd55;text-align:center;}
-#game-stage .v17363-menu-rarity-dot{display:block;width:10px;height:10px;border:1px solid rgba(255,255,255,.35);border-radius:50%;background:#9d7136;box-shadow:0 0 5px rgba(255,255,255,.08);}
+#game-stage .v17363-menu-rarity-dot{display:block;width:calc(10 * var(--ui-length-unit,1px));height:calc(10 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid rgba(255,255,255,.35);border-radius:50%;background:#9d7136;box-shadow:0 0 calc(5 * var(--ui-length-unit,1px)) rgba(255,255,255,.08);}
 #game-stage .v17363-menu-rarity-dot.white{background:#d8d8d8;}#game-stage .v17363-menu-rarity-dot.blue{background:#42a5ff;}#game-stage .v17363-menu-rarity-dot.purple{background:#b05cff;}#game-stage .v17363-menu-rarity-dot.orange{background:#ff9f38;}#game-stage .v17363-menu-rarity-dot.pink{background:#ff4fa7;}#game-stage .v17363-menu-rarity-dot.neutral{background:#b68a48;}
-#game-stage .v17363-material-flow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;margin:7px 0;padding:7px;border:1px solid rgba(116,87,49,.55);border-radius:9px;background:#090806;}
-#game-stage .v17363-material-flow section{display:grid;gap:2px;justify-items:center;min-width:0;text-align:center;color:#cab996;font-size:13px;}
+#game-stage .v17363-material-flow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:calc(6 * var(--ui-length-unit,1px));margin:calc(7 * var(--ui-length-unit,1px)) 0;padding:calc(7 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid rgba(116,87,49,.55);border-radius:calc(9 * var(--ui-length-unit,1px));background:#090806;}
+#game-stage .v17363-material-flow section{display:grid;gap:calc(2 * var(--ui-length-unit,1px));justify-items:center;min-width:0;text-align:center;color:#cab996;font-size:calc(13 * var(--ui-length-unit,1px));}
 #game-stage .v17363-material-flow section>.v169-item-art,#game-stage .v17363-material-flow section>svg{width:calc(70 * var(--ui-length-unit,1px))!important;height:calc(70 * var(--ui-length-unit,1px))!important;max-width:calc(70 * var(--ui-length-unit,1px))!important;max-height:calc(70 * var(--ui-length-unit,1px))!important;margin:0 auto!important;}
 #game-stage .v17363-material-flow section>.v169-item-art img{width:100%!important;height:100%!important;object-fit:contain!important;}
-#game-stage .v17363-material-flow section b{max-width:100%;color:#f1d698;font-size:13px;line-height:1.25;overflow-wrap:anywhere;}
-#game-stage .v17363-material-flow section span{font-size:13px;line-height:1.25;}
-#game-stage .v17363-material-flow>i{color:#d3a34f;font-size:18px;font-style:normal;}
+#game-stage .v17363-material-flow section b{max-width:100%;color:#f1d698;font-size:calc(16 * var(--ui-length-unit,1px));line-height:1.25;overflow-wrap:anywhere;}
+#game-stage .v17363-material-flow section span{font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.25;}
+#game-stage .v17363-material-flow>i{color:#d3a34f;font-size:calc(18 * var(--ui-length-unit,1px));font-style:normal;}
 #game-stage .v17363-material-card .v17363-craft-button{width:100%;min-height:calc(44 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #b88740;border-radius:calc(8 * var(--ui-length-unit,1px));color:#1c1207;background:linear-gradient(180deg,#efd17f,#bd7d2c);font-weight:900;}
-#game-stage .v17363-material-card .v17363-craft-button:disabled{filter:grayscale(.7);opacity:.45;}
 :is(#game-stage,#game-ui) .v141-picker-field{margin-bottom:calc(7 * var(--ui-length-unit,1px));color:#d8c6a5;font-size:calc(14 * var(--ui-length-unit,1px));}
 
 /* Crafting outer spacing is owned by css/49-v169-rpg-ui.css. */
@@ -3426,7 +3417,6 @@
 :is(#game-stage,#game-ui) .v141-material-lines .ok{color:#8ee6a2;}
 :is(#game-stage,#game-ui) .v141-material-lines .lack{color:#ee8e79;}
 :is(#game-stage,#game-ui) .v141-synthesis-primary{width:100%;min-height:calc(44 * var(--ui-length-unit,1px)) !important;border:calc(1 * var(--ui-length-unit,1px)) solid #e0ad55;border-radius:calc(8 * var(--ui-length-unit,1px));color:#241607;background:linear-gradient(180deg,#f3d083,#b9792a);font-size:calc(15 * var(--ui-length-unit,1px)) !important;font-weight:900;}
-:is(#game-stage,#game-ui) .v141-synthesis-primary:disabled{opacity:.36;filter:grayscale(.55);}
 #game-stage .v141-affix-info{display:block;margin:6px auto 0;border:0;color:#cdb37d;background:transparent;text-decoration:underline;font-size:12px !important;}
 :is(#game-stage,#game-ui) .v141-reforge-current{padding:calc(7 * var(--ui-length-unit,1px));border:0;border-radius:0;background:rgba(18,13,8,.56);
     border-left:calc(2 * var(--ui-length-unit,1px)) solid rgba(200,154,72,.58);
@@ -3540,38 +3530,56 @@
     }
 }
 
-/* V173.58 — FREE-MATERIAL REFORGE UI: browser-domain single page */
-#game-ui .v17358-reforge-card{display:flex;flex-direction:column;gap:36px;min-width:0;}
-#game-ui .v17358-reforge-card h3{margin:0 0 24px;font-size:54px;line-height:1.4;color:var(--ui-gold,#c89a48);}
-#game-ui .v17358-reforge-card p{margin:24px 0;font-size:45px;line-height:1.5;overflow-wrap:anywhere;}
-#game-ui .v17358-reforge-card small{display:block;font-size:42px;line-height:1.45;}
-#game-ui .v141-smelting-picker summary{display:grid;grid-template-columns:calc(64 * var(--ui-length-unit,1px)) minmax(0,1fr) auto;gap:calc(12 * var(--ui-length-unit,1px));align-items:center;min-height:calc(88 * var(--ui-length-unit,1px));}
-#game-ui .v141-smelting-picker summary>span{grid-column:auto;}
-#game-ui .v141-smelting-picker summary>span:nth-child(2){font-size:calc(18 * var(--ui-length-unit,1px));line-height:1.4;overflow-wrap:anywhere;}
-#game-ui .v141-smelting-picker .v141-forge-option{display:grid;grid-template-columns:168px minmax(0,1fr);gap:36px;align-items:center;text-align:left;}
-#game-ui .v141-smelting-picker .v141-forge-option .v141-smelting-art{width:168px;height:168px;}
-#game-ui .v141-smelting-picker .v141-forge-options{position:static;max-height:960px;overflow-y:auto;}
-#game-ui .v141-smelting-art{display:block;width:calc(64 * var(--ui-length-unit,1px));height:calc(64 * var(--ui-length-unit,1px));min-width:0;}
+/* Reforge presentation: equipment rail, selected identity, affixes and fixed cost/actions. */
+#game-ui .v17358-reforge-card{display:flex;flex-direction:column;gap:12px;min-width:0;padding:18px;}
+#game-ui .v17358-reforge-card h3{margin:0;font-size:54px;line-height:1.3;color:var(--rpg-window-gold-hi,#F0D38A);overflow-wrap:anywhere;}
+#game-ui .v17358-reforge-card p{margin:12px 0;font-size:45px;line-height:1.4;overflow-wrap:anywhere;}
+#game-ui .v17358-reforge-card small{font-size:42px;line-height:1.4;}
+#game-ui .v141-smelting-picker{margin:0;border:0;background:transparent;min-width:0;}
+#game-ui .v141-smelting-picker .v141-forge-options{display:flex;gap:18px;padding:6px;overflow-x:auto;overflow-y:hidden;touch-action:pan-x;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;}
+#game-ui .v141-smelting-picker .v141-forge-option{flex:0 0 144px;width:144px;min-height:144px;padding:6px;justify-content:center;}
+#game-ui .v141-smelting-picker .v141-forge-option.selected{border-color:var(--rpg-window-gold-hi,#F0D38A);box-shadow:inset 0 0 0 3px var(--rpg-window-gold,#C69A45);}
+#game-ui .v141-smelting-art{display:block;width:132px;height:132px;min-width:0;}
 #game-ui .v141-smelting-art .v169-item-art{width:100%;height:100%;}
 #game-ui .v141-smelting-art img{width:100%;height:100%;object-fit:contain;}
-#game-ui .v141-smelting-plus{display:grid;place-items:center;width:100%;height:100%;border:calc(1 * var(--ui-length-unit,1px)) dashed var(--ui-gold,#c89a48);border-radius:var(--radius-md,10px);font-size:calc(36 * var(--ui-length-unit,1px));}
-#game-ui .v17358-reforge-material,#game-ui .v17358-reforge-lock-panel{padding:36px;border:3px solid #72552d;border-radius:var(--radius-md,30px);background:var(--ui-bg,#17130f);}
-#game-ui .v17358-reforge-tiers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;}
-#game-ui .v17358-reforge-tier{display:flex;flex-direction:column;align-items:center;gap:18px;min-width:0;padding:24px 9px;border:3px solid #72552d;border-radius:21px;background:#15100a;color:var(--ui-text,#f4ead4);font-size:45px;line-height:1.4;}
-#game-ui .v17358-reforge-tier.active{border-color:var(--ui-gold,#c89a48);background:#39250d;}
-#game-ui .v17358-reforge-tier .v141-smelting-art{width:min(100%,156px);height:auto;aspect-ratio:1;min-height:0;padding:0;border:0;background:transparent;}
-#game-ui .v141-smelting-tier-choice{display:flex;flex-direction:column;gap:calc(4 * var(--ui-length-unit,1px));width:100%;padding:calc(4 * var(--ui-length-unit,1px)) 0;border:0;background:transparent;color:inherit;font-size:calc(15 * var(--ui-length-unit,1px));}
-#game-ui .v141-smelting-tier-choice span{font-size:calc(13 * var(--ui-length-unit,1px));overflow-wrap:anywhere;}
-#game-ui .v141-smelting-footer{flex:0 0 auto;padding:calc(8 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));border-top:calc(1 * var(--ui-length-unit,1px)) solid #72552d;background:var(--ui-bg,#17130f);}
-#game-ui .v141-smelting-footer p{margin:0 0 calc(8 * var(--ui-length-unit,1px));font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.45;}
-#game-ui .v17358-reforge-lock-list{display:flex;flex-direction:column;gap:24px;}
-#game-ui .v141-smelting-affix{display:flex;align-items:center;justify-content:space-between;gap:calc(12 * var(--ui-length-unit,1px));font-size:calc(16 * var(--ui-length-unit,1px));line-height:1.4;}
-#game-ui .v17358-affix-lock{flex:0 0 auto;min-height:calc(44 * var(--ui-length-unit,1px));padding:calc(8 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #72552d;border-radius:calc(7 * var(--ui-length-unit,1px));background:#15100a;color:var(--ui-text,#f4ead4);font-size:calc(15 * var(--ui-length-unit,1px));}
-#game-ui .v17358-affix-lock.locked{border-color:var(--ui-gold,#c89a48);background:#39250d;color:#ffe1a0;}
-#game-ui .v17358-reforge-card .lack{color:#e8a092;}
-#game-ui .v17358-reforge-card .ok{color:#b8d7a0;}
-#game-ui .v141-reforge-actions{display:flex;flex-wrap:wrap;gap:24px;}
-#game-ui .v141-reforge-actions>button{flex:1;min-height:132px;font-size:48px;}
+#game-ui .v141-reforge-current{padding:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:6px;}
+#game-ui .v141-reforge-current .v141-reforge-portrait{width:216px;height:216px;}
+#game-ui .v141-reforge-current .v141-reforge-identity{display:flex;align-items:center;justify-content:center;gap:18px;margin:0;width:100%;min-width:0;}
+#game-ui .v141-reforge-identity h3{min-width:0;font-size:54px;}
+#game-ui .v141-reforge-identity>.v141-affix-info{min-height:132px;padding:0 12px;border:0;background:transparent;color:var(--rpg-window-text-muted,#B9AD98);font-size:45px;}
+#game-ui .v141-reforge-stats{flex:0 0 auto;color:var(--rpg-window-text-muted,#B9AD98);font-size:42px;}
+#game-ui .v141-reforge-stats summary{display:flex;align-items:center;justify-content:center;min-height:132px;padding:0 12px;cursor:pointer;}
+#game-ui .v141-reforge-stats>div{display:flex;flex-wrap:wrap;gap:12px;padding:12px;border:3px solid var(--rpg-window-gold-dark,#73582D);background:var(--rpg-window-inset,#12110E);}
+#game-ui .v17358-reforge-lock-panel{padding:0;border:0;background:transparent;}
+#game-ui .v17358-reforge-lock-panel>h3{font-size:48px;margin-bottom:6px;}
+#game-ui .v17358-reforge-lock-list{display:flex;flex-direction:column;gap:0;}
+#game-ui .v141-smelting-affix{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;column-gap:12px;min-height:132px;padding:0;border-bottom:3px solid var(--rpg-window-gold-dark,#73582D);font-size:48px;line-height:1.35;}
+#game-ui .v141-smelting-affix>b{grid-column:2;overflow-wrap:anywhere;}
+#game-ui .v141-smelting-affix>.v17358-affix-lock{grid-column:3;grid-row:1 / span 2;}
+#game-ui .v141-reforge-slot-label{grid-column:1;grid-row:1 / span 2;font-size:39px;color:var(--rpg-window-text-muted,#B9AD98);}
+#game-ui .v141-reforge-old-value{grid-column:2;font-size:42px;color:var(--rpg-window-text-muted,#B9AD98);overflow-wrap:anywhere;}
+#game-ui .v17358-affix-lock{min-height:132px;padding:12px 18px;border:3px solid var(--rpg-window-gold-dark,#73582D);border-radius:18px;background:var(--rpg-window-inset,#12110E);color:var(--rpg-window-text,#EEE7D8);font-size:45px;}
+#game-ui .v17358-affix-lock.locked{border-color:var(--rpg-window-gold,#C69A45);background:#39250d;color:var(--rpg-window-gold-hi,#F0D38A);}
+#game-ui .v141-smelting-footer{flex:0 0 auto;padding:18px 24px;border-top:3px solid var(--rpg-window-gold-dark,#73582D);background:var(--rpg-window-panel,#201D17);}
+#game-ui .v141-smelting-footer p{margin:6px 0;font-size:42px;line-height:1.35;}
+#game-ui .v17358-reforge-material{padding:0;border:0;background:transparent;}
+#game-ui .v17358-reforge-tiers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+#game-ui .v17358-reforge-tier{display:flex;flex-direction:column;align-items:center;min-width:0;padding:0 3px;border:3px solid var(--rpg-window-gold-dark,#73582D);border-radius:18px;background:var(--rpg-window-inset,#12110E);color:var(--rpg-window-text,#EEE7D8);}
+#game-ui .v17358-reforge-tier.active{border-color:var(--rpg-window-gold,#C69A45);background:#39250d;}
+#game-ui .v141-smelting-tier-choice{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:100%;min-height:132px;padding:0;border:0;background:transparent;color:inherit;font-size:45px;}
+#game-ui .v141-smelting-tier-choice span{font-size:39px;line-height:1.25;overflow-wrap:anywhere;}
+#game-ui .v141-reforge-purchase{display:grid;grid-template-columns:132px minmax(0,1fr) minmax(0,1.45fr);gap:18px;align-items:center;margin-top:12px;}
+#game-ui .v141-reforge-material-source{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:132px;padding:0;border:0;background:transparent;color:var(--rpg-window-text-muted,#B9AD98);font-size:39px;line-height:1;}
+#game-ui .v141-reforge-material-source .v141-smelting-art{width:78px;height:78px;}
+#game-ui .v141-reforge-material-source>span:last-child{font-size:39px;}
+#game-ui .v141-reforge-cost{min-width:0;font-size:42px;line-height:1.35;overflow-wrap:anywhere;}
+#game-ui .v141-reforge-cost small{display:block;font-size:39px;color:var(--rpg-window-text-muted,#B9AD98);}
+#game-ui .v141-reforge-view .lack{color:#e8a092;}
+#game-ui .v141-reforge-view .ok{color:#b8d7a0;}
+#game-ui .v141-reforge-actions{display:flex;gap:18px;}
+#game-ui .v141-reforge-actions>button{flex:1;min-height:132px;font-size:45px;}
+#game-ui .v141-reforge-empty{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;}
+#game-ui .v141-smelting-plus{display:grid;place-items:center;width:168px;height:168px;border:3px dashed var(--rpg-window-gold,#C69A45);border-radius:18px;font-size:108px;}
 
 
 /* bundled source: css/39-v142-skill-animation.css */
@@ -4257,26 +4265,26 @@
     line-height:calc(17 * var(--ui-length-unit,1px)) !important;
 }
 #game-stage .v141-dungeon-cover-art small{
-    font-size:13px;
-    line-height:17px;
+    font-size:16px;
+    line-height:1.45;
 }
 #game-stage .v141-dungeon-cover-info b{
     font-size:16px;
     line-height:20px;
 }
 #game-stage .v141-dungeon-cover-info span{
-    font-size:14px;
-    line-height:18px;
+    font-size:16px;
+    line-height:1.45;
 }
 #game-stage #dungeonPage .v141-dungeon-cover-actions button{
     min-height:38px;
-    font-size:15px;
+    font-size:18px;
     line-height:1.2;
 }
 #game-stage .v141-dungeon-remaining{
     padding-top:3px;
-    font-size:14px;
-    line-height:18px;
+    font-size:16px;
+    line-height:1.45;
 }
 
 /* Other formal non-battle mobile owners discovered by the full typography scan. */
@@ -6832,7 +6840,7 @@ body > .v169-rpg-dialog-layer{
 #game-ui #skillPage .skill-category-badge{display:inline-block;margin:0;padding:0 calc(5 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid var(--skill-edge);border-radius:calc(2 * var(--ui-length-unit,1px));color:var(--skill-muted);font-size:calc(13 * var(--ui-length-unit,1px));font-weight:400;line-height:1.5;}
 #game-ui #skillPage .skill-row-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:calc(6 * var(--ui-length-unit,1px));color:var(--skill-paper);font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.6;}
 #game-ui #skillPage .skill-row-prerequisite{display:block;margin-top:calc(6 * var(--ui-length-unit,1px));color:var(--skill-highlight);font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.5;}
-#game-ui #skillPage .skill-row-detail-link{grid-column:1;grid-row:2;display:inline-flex;align-items:center;gap:calc(3 * var(--ui-length-unit,1px));min-height:calc(44 * var(--ui-length-unit,1px));margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--skill-highlight);font:inherit;font-size:calc(14 * var(--ui-length-unit,1px));font-weight:500;line-height:1.5;cursor:pointer;text-align:left;}
+#game-ui #skillPage .skill-row-detail-link{grid-column:1;grid-row:2;display:inline-flex;align-items:center;gap:calc(3 * var(--ui-length-unit,1px));min-height:calc(44 * var(--ui-length-unit,1px));margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--skill-highlight);font:inherit;font-size:calc(15 * var(--ui-length-unit,1px));font-weight:500;line-height:1.5;cursor:pointer;text-align:left;}
 #game-ui #skillPage .skill-action-card{grid-column:3;min-width:0;width:100%;min-height:calc(44 * var(--ui-length-unit,1px));height:auto;margin:0;padding:calc(7 * var(--ui-length-unit,1px)) calc(6 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid var(--skill-bronze);border-radius:calc(3 * var(--ui-length-unit,1px));background:linear-gradient(#77552c,#4d351e);box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 #f0d38a44,0 calc(2 * var(--ui-length-unit,1px)) calc(3 * var(--ui-length-unit,1px)) #0005;color:var(--skill-paper);font:inherit;cursor:pointer;appearance:none;transition:background .12s,border-color .12s;}
 #game-ui #skillPage .skill-action-card[data-skill-action="growth"]{grid-row:2;}
 #game-ui #skillPage .skill-action-card[data-skill-action="equip"]{grid-column:2;grid-row:2;border-color:var(--skill-edge);background:linear-gradient(#30291f,#1b1812);color:var(--skill-highlight);box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 #f0d38a15;}
@@ -6863,7 +6871,7 @@ body > .v169-rpg-dialog-layer{
 }
 #game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-title{background:transparent;box-shadow:none;border:0;}
 #game-ui #homeFeatureModal[data-character-tab="skill"] #homeFeatureModalTitle{
-    flex:0 0 45%;min-width:0;box-sizing:border-box;height:var(--skill-header-height);
+    flex:0 0 70%;min-width:0;box-sizing:border-box;height:var(--skill-header-height);
     display:flex;align-items:center;justify-content:center;
     padding:0 calc(12 * var(--ui-length-unit,1px)) 0 calc(34 * var(--ui-length-unit,1px));
     background:transparent url('../assets/ui/skill-iron-bronze/title-short.bb578519c9f4.webp') center/100% auto no-repeat;
@@ -7050,8 +7058,10 @@ body > .v169-rpg-dialog-layer{
 #game-stage .modal-box button:disabled,
 .v132-reward-modal-inner button:disabled,
 .v169-rpg-dialog-button:disabled{
-    border-color:#4C4232;
-    color:#807563;
+    border-color:#5D5342;
+    color:var(--rpg-window-muted,#B9AD98);
+    opacity:1;
+    filter:none;
     background:linear-gradient(180deg,#1B1915,#100F0C);
     box-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(255,255,255,.025);
 }
@@ -7276,10 +7286,6 @@ body > .v169-rpg-dialog-layer{
     min-height:calc(44 * var(--ui-length-unit,1px))!important;
 }
 
-#game-ui #homeFeatureModal.quest-mode .quest-tab{font-size:48px!important;min-height:132px!important;}#game-ui #homeFeatureModal.quest-mode .quest-list{gap:30px!important}#game-ui #homeFeatureModal.quest-mode .quest-card{padding:33px 36px!important}#game-ui #homeFeatureModal.quest-mode .quest-card-name{font-size:51px!important;line-height:1.2!important}#game-ui #homeFeatureModal.quest-mode .quest-card-desc{font-size:45px!important;line-height:1.45!important;margin-top:12px!important}#game-ui #homeFeatureModal.quest-mode .quest-progress-line{font-size:42px!important}#game-ui #homeFeatureModal.quest-mode .quest-progress-line strong{font-size:45px!important}#game-ui #homeFeatureModal.quest-mode .quest-reward{font-size:42px!important;line-height:1.4!important}#game-ui #homeFeatureModal.quest-mode .quest-claim-btn{font-size:45px!important;min-width:234px!important;min-height:132px!important;}
-#game-ui #homeFeatureModal.quest-mode .quest-milestone-percent{font-size:39px!important;line-height:51px!important}
-#game-ui #homeFeatureModal.quest-mode .quest-milestone-slot{min-height:138px!important;padding:15px 6px!important;font-size:45px!important;line-height:1.25!important}
-#game-ui #homeFeatureModal.quest-mode .quest-milestone-slot small{font-size:39px!important;line-height:51px!important}
 #game-ui #homeFeatureModal.quest-mode .quest-milestone:not(.reached) .quest-milestone-slot.v17351-previewable{pointer-events:auto!important;cursor:pointer!important;opacity:.62!important}
 
 /* DEV-only ad simulator is intentionally excluded from player-facing typography enforcement. */
@@ -8126,7 +8132,6 @@ body > .v169-rpg-dialog-layer{
 :is(#game-stage,#game-ui) .team-relic-card .team-relic-card-name,
 :is(#game-stage,#game-ui) .team-relic-card .team-relic-card-meta{position:relative;z-index:2;pointer-events:none;}
 :is(#game-stage,#game-ui) .team-relic-card .team-relic-equip{grid-column:1/-1;grid-row:3;z-index:3;align-self:end;min-height:calc(34 * var(--ui-length-unit,1px));margin-top:calc(5 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid rgba(218,170,77,.78);border-radius:calc(7 * var(--ui-length-unit,1px));background:linear-gradient(180deg,#533719,#24160b);color:#ffe09a;font-size:calc(15 * var(--ui-length-unit,1px));line-height:calc(20 * var(--ui-length-unit,1px));font-weight:900;}
-:is(#game-stage,#game-ui) .team-relic-card .team-relic-equip:disabled{opacity:.5;filter:grayscale(.45);}
 :is(#game-stage,#game-ui) .team-relic-placeholder{width:calc(54 * var(--ui-length-unit,1px));height:calc(54 * var(--ui-length-unit,1px));border-radius:50%;display:grid;place-items:center;position:relative;border:calc(2 * var(--ui-length-unit,1px)) solid #8b6a34;background:radial-gradient(circle at 50% 45%,#49331a,#0a0908 72%);box-shadow:inset 0 0 calc(11 * var(--ui-length-unit,1px)) rgba(246,205,119,.09),0 0 calc(8 * var(--ui-length-unit,1px)) rgba(0,0,0,.5);}
 :is(#game-stage,#game-ui) .team-relic-placeholder.large{width:calc(66 * var(--ui-length-unit,1px));height:calc(66 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .team-relic-placeholder i{font-style:normal;font:900 calc(24 * var(--ui-length-unit,1px)) "Noto Serif TC",serif;color:#d8bd7b;text-shadow:0 calc(1 * var(--ui-length-unit,1px)) calc(1 * var(--ui-length-unit,1px)) #000;}
@@ -8165,7 +8170,6 @@ body > .v169-rpg-dialog-layer{
 :is(#game-stage,#game-ui) .team-relic-upgrade b{display:block;margin-top:calc(5 * var(--ui-length-unit,1px));color:#f0d18a;font-size:calc(16 * var(--ui-length-unit,1px));line-height:calc(21 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .team-relic-detail-actions{position:sticky;bottom:calc(-9 * var(--ui-length-unit,1px));display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(8 * var(--ui-length-unit,1px));padding:calc(9 * var(--ui-length-unit,1px)) 0;background:linear-gradient(180deg,rgba(7,7,6,0),#070706 30%);}
 :is(#game-stage,#game-ui) .team-relic-detail-actions button{min-height:calc(44 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #bc8a3e;border-radius:calc(8 * var(--ui-length-unit,1px));background:linear-gradient(180deg,#543719,#24150a);color:#ffe09a;font-size:calc(15 * var(--ui-length-unit,1px));font-weight:900;}
-:is(#game-stage,#game-ui) .team-relic-detail-actions button:disabled{opacity:.42;filter:grayscale(.5);}
 /* Relic battle cinematic owner: viewport dim -> target apertures -> identity -> VFX -> restore.
    The presentation is a document-level fixed surface so Dungeon/Tower/Boss DOM
    stacking contexts cannot change the result. */

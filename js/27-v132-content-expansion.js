@@ -1480,7 +1480,14 @@
         if(!item||typeof openEquippedItem!=="function"){ return; }
 
         const rewardModal=document.getElementById("v132RewardModal");
-        if(rewardModal){ rewardModal.classList.add("v132-detail-paused"); }
+        if(rewardModal){
+            // The equipment detail reuses itemModal. Keep its parent preview
+            // on the existing native host so closing that detail cannot close
+            // or hide the preview as an itemModal child dialog.
+            const host=document.getElementById("game-ui");
+            if(rewardModal.parentElement===document.getElementById("itemModal")&&host){host.appendChild(rewardModal);}
+            rewardModal.classList.add("v132-detail-paused");
+        }
 
         openEquippedItem(item,"");
 
