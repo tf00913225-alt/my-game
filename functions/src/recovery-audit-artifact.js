@@ -11,6 +11,19 @@ const NAMES=Object.freeze(["account","characters","economy","inventory","equipme
     "simulatedAdSources","modeTimeEvents","modeTime","patrol","patrolTickets","patrolTicketStates",
     "patrolSettlements","patrolClosures","recoveryApprovals","recoveryAudits"]);
 const bad=message=>{throw Error(`Invalid recovery audit artifact: ${message}`);};
+const lookupAttempts=new WeakMap();
+async function drainAndCloseRecoveryAuditLookups(view){
+    const attempt=lookupAttempts.get(view);
+    if(!attempt)bad("unknown lookup view");
+    if(!attempt.closed){
+        attempt.open=false;
+        // Only settle lookups already emitted by this exact immutable view.
+        // This is not a drain of an Owner's entire asynchronous call graph;
+        // later lookups remain strict but cannot change this attempt's trace.
+        attempt.closed=Promise.allSettled([...attempt.pending]).then(()=>Object.freeze([...attempt.missing]));
+    }
+    return attempt.closed;
+}
 const compareNames=(a,b)=>Buffer.compare(Buffer.from(a,"utf8"),Buffer.from(b,"utf8"));
 const INVENTORY_LIMITS=Object.freeze({rows:16,payloadBytes:128*1024});
 function recoveryAuditNamespaces(uid,version=2){
@@ -200,10 +213,14 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
     }
     for(const path of documents.keys())if(!inventories.get(parent(path)).includes(path.slice(path.lastIndexOf("/")+1)))bad("unindexed document");
     for(const path of absences)if(inventories.get(parent(path)).includes(path.slice(path.lastIndexOf("/")+1)))bad("contradictory absence");
-    const used=new Set(),queries=[];
+    const used=new Set(),queries=[],attempt={open:true,pending:new Set(),missing:new Set(),closed:null};
     const field=(row,key)=>key.split(".").reduce((v,k)=>v?.[k],row);
     function document(path){
-        if(!documents.has(path)&&!absences.has(path))bad(`unrecorded dependency ${path}`);
+        if(!documents.has(path)&&!absences.has(path)){
+            if(attempt.open&&validPath(path)&&!inventories.get(parent(path)).includes(path.slice(path.lastIndexOf("/")+1)))
+                attempt.missing.add(path);
+            bad(`unrecorded dependency ${path}`);
+        }
         used.add(path);
         const data=documents.get(path);
         return Object.freeze({id:path.slice(path.lastIndexOf("/")+1),ref:db.doc(path),exists:documents.has(path),
@@ -224,7 +241,7 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
     for(const name of ["operations","ledgerEntries"])
         add(root.collection(name).where("kind","==","account-mode-time").limit(1),name,row=>row.kind==="account-mode-time",1);
     add(root.collection("modeTimeEvents").orderBy("sequence","desc").limit(2),"modeTimeEvents",row=>Object.hasOwn(row,"sequence"),2,"sequence");
-    const tx=Object.freeze({get:async reference=>{
+    const lookup=async reference=>{
         if(reference&&typeof reference.collection==="function"&&typeof reference.path==="string")return document(reference.path);
         if(typeof reference?.isEqual!=="function")bad("unsupported query API");
         const matches=queries.filter(entry=>reference.isEqual(entry.query));
@@ -238,15 +255,25 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
             });
         }
         return result(ids.slice(0,entry.maximum).map(id=>document(`${root.path}/${entry.name}/${id}`)));
+    };
+    const tx=Object.freeze({get:reference=>{
+        const pending=lookup(reference);
+        if(attempt.open)attempt.pending.add(pending);
+        // Observe both outcomes even when an original Owner catches/replaces
+        // the rejection or a sibling in Promise.all rejects first.
+        void pending.then(()=>attempt.pending.delete(pending),()=>attempt.pending.delete(pending));
+        return pending;
     }});
-    return Object.freeze({root,save,tx,auditControl,rows:name=>result(rows(name)),
+    const view=Object.freeze({root,save,tx,auditControl,rows:name=>result(rows(name)),
         finish:()=>{
             const unused=[...documents.keys(),...absences].filter(path=>!used.has(path));
             if(unused.length)bad(`unused dependency ${unused[0]}`);
             return Object.freeze({artifactSha256:createHash("sha256").update(bytes).digest("hex"),documentCount:documents.size,
                 absenceCount:absences.size,dependencyCount:used.size});
         }});
+    lookupAttempts.set(view,attempt);
+    return view;
 }
 
-module.exports={decodeRecoveryAuditArtifact,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
+module.exports={decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
     inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS};

@@ -7,7 +7,7 @@ const {createCanonicalCurrentRecovery}=require('../functions/src/canonical-curre
 const {createCanonicalPatrolSettlement}=require('../functions/src/canonical-patrol-settlement');
 const {createCanonicalExpAllocation}=require('../functions/src/canonical-exp-allocation');
 const {createCanonicalRecoveryApproval}=require('../functions/src/canonical-recovery-approval');
-const {decodeRecoveryAuditArtifact}=require('../functions/src/recovery-audit-artifact');
+const {decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups}=require('../functions/src/recovery-audit-artifact');
 const {snapshotDigest}=require('../functions/src/canonical-snapshot');
 const {createCanonicalAccountModeTime}=require('../functions/src/canonical-account-mode-time');
 const functionsRequire=createRequire(new URL('../functions/package.json',import.meta.url));
@@ -148,6 +148,72 @@ async function controlledFixture(){
 }
 function cloneMaterial(m){return {...m,docs:new Map([...m.docs].map(([path,data])=>[path,copy(data)])),
     absent:new Set(m.absent),paths:m.paths.slice(),auditControl:m.auditControl?copy(m.auditControl):undefined};}
+
+test('exact-view lookup diagnostics collect only missing members, close once and never relax strict reads',async()=>{
+    const m=await closedFixture(),db=queryDb(m.h.dependencies.db),input={uid:m.h.uid,expectedRevision:m.h.revision,db};
+    const view=decodeRecoveryAuditArtifact(bytes(m),input),other=decodeRecoveryAuditArtifact(bytes(m),input);
+    const missing=['diagnostic-missing-0001','diagnostic-missing-0002'].map(id=>m.h.root+'/operations/'+id);
+    const emitted=missing.map(path=>view.tx.get(db.doc(path)));
+    await assert.rejects(()=>Promise.all(emitted),/unrecorded dependency/);
+    const trace=await drainAndCloseRecoveryAuditLookups(view);
+    assert.deepEqual(trace,missing);assert(Object.isFrozen(trace));
+    assert.equal(await drainAndCloseRecoveryAuditLookups(view),trace,'close is idempotent');
+    // Closing drains only already-emitted lookup promises, not an Owner's
+    // asynchronous call graph. A later lookup still rejects without appending.
+    const late=m.h.root+'/operations/diagnostic-late-0001';
+    await assert.rejects(()=>Promise.resolve().then(()=>view.tx.get(db.doc(late))),/unrecorded dependency/);
+    assert.equal(await drainAndCloseRecoveryAuditLookups(view),trace);
+    await assert.rejects(()=>other.tx.get(db.doc(late)),/unrecorded dependency/);
+    assert.deepEqual(await drainAndCloseRecoveryAuditLookups(other),[late]);
+    await assert.rejects(()=>drainAndCloseRecoveryAuditLookups({...view}),/unknown lookup view/);
+
+    const clean=decodeRecoveryAuditArtifact(bytes(m),input);
+    await clean.tx.get(db.doc([...m.docs.keys()][0]));
+    assert.equal((await clean.tx.get(db.doc([...m.absent][0]))).exists,false);
+    for(const path of ['foreign/uid/operations/missing',m.h.root+'/operations//missing',m.h.root+'/unknown/missing']){
+        await assert.rejects(()=>clean.tx.get({path,collection(){}}),/unrecorded dependency/);
+    }
+    await assert.rejects(()=>clean.tx.get(db.collection('unsupported').limit(1)),/unknown or ambiguous query/);
+    await assert.rejects(()=>clean.tx.get({isEqual:()=>true}),/unknown or ambiguous query/);
+    await assert.rejects(()=>clean.tx.get({}),/unsupported query API/);
+    assert.deepEqual(await drainAndCloseRecoveryAuditLookups(clean),[]);
+    const corrupt=cloneMaterial(m),event=[...corrupt.docs.keys()].find(path=>path.includes('/modeTimeEvents/'));
+    corrupt.docs.set(event,{...corrupt.docs.get(event),sequence:'invalid'});
+    const invalid=decodeRecoveryAuditArtifact(bytes(corrupt),input);
+    await assert.rejects(()=>invalid.tx.get(db.collection('serverUsers').doc(m.h.uid).collection('modeTimeEvents')
+        .orderBy('sequence','desc').limit(2)),/unsupported mode sequence ordering/);
+    assert.deepEqual(await drainAndCloseRecoveryAuditLookups(invalid),[]);
+});
+
+test('public candidate preserves complete v1/v2 results, strict errors and original Owner error wrapping',async()=>{
+    const m=await closedFixture(),controlled=await controlledFixture();
+    for(const source of [m,controlled.m]){
+        const original=bytes(source),before=copy([...source.h.data]),writes=source.h.writes;
+        const expected={candidateProofValid:true,ownerUid:source.h.uid,sourceRevision:source.h.revision,
+            sourceSha256:source.docs.get(source.h.root+'/recoveryArchives/'+source.h.revision).sourceSha256,
+            snapshotSha256:source.docs.get(source.h.root+'/playableSnapshots/'+source.h.revision).sha256,
+            trustedCaptureVerified:false,restoreAuthorized:false,authoritativeStateReady:false,
+            artifactSha256:require('node:crypto').createHash('sha256').update(original).digest('hex'),
+            documentCount:source.docs.size,absenceCount:source.absent.size,dependencyCount:source.docs.size+source.absent.size};
+        assert.deepEqual(await verify(source),expected);assert.deepEqual(bytes(source),original);
+        assert.deepEqual([...source.h.data],before);assert.equal(source.h.writes,writes);
+    }
+    const owner=candidate(m.h);
+    await assert.rejects(()=>owner.verifyRecoveryAuditArtifact({uid:m.h.uid,expectedRevision:1,artifactBytes:bytes(m)}),
+        {code:'invalid-argument',message:'A candidate owner and current revision are required.'});
+    await assert.rejects(()=>owner.verifyRecoveryAuditArtifact({uid:m.h.uid,expectedRevision:m.h.revision,artifactBytes:Buffer.from('bad')}),
+        {code:'data-loss',message:'Invalid recovery audit artifact: bytes or magic'});
+    const damaged=cloneMaterial(m),additional=[...m.docs].find(([path,row])=>path.includes('/operations/')&&row.kind==='additional-character-sources')[1];
+    const negative=['grantOperations','ledgerEntries'].map(name=>m.h.root+'/'+name+'/'+additional.operationId);
+    for(const path of negative)damaged.absent.delete(path);
+    await assert.rejects(()=>verify(damaged),{code:'data-loss',message:'Original additional-character evidence is inconsistent.'});
+    const db=queryDb(m.h.dependencies.db),view=decodeRecoveryAuditArtifact(bytes(damaged),{uid:m.h.uid,expectedRevision:m.h.revision,db});
+    const row={id:additional.operationId,data:()=>additional},account=m.docs.get(m.h.root+'/recoveryArchives/'+m.h.revision).sourceRecords.account;
+    await assert.rejects(()=>m.h.initial.verifyRetainedOperation(view.tx,db.collection('serverUsers').doc(m.h.uid),m.h.uid,account,row),
+        {code:'data-loss',message:'Original additional-character evidence is inconsistent.'});
+    assert.deepEqual(await drainAndCloseRecoveryAuditLookups(view),negative,
+        'original Owner may replace the error; the exact reader retains only the actual missing lookup group');
+});
 
 test('real twenty-battle Lv10 plus slot2 current-loss artifact is candidate-only, while original restore keeps its400 gate',async()=>{
     const m=await closedFixture(),h=m.h,before=copy([...h.data]),writes=h.writes;

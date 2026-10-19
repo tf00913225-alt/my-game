@@ -11,7 +11,7 @@ const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
-const {decodeRecoveryAuditArtifact,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
+const {decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
     inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
 const {createHash}=require("node:crypto");
 
@@ -1235,6 +1235,66 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                     envelopeRef,approvalRef,operationRef,auditRef});
         });
     }
+    async function verifyCandidateStrict(view,uid,expectedRevision){
+        const {tx,root}=view;
+        patrolEvidence.beginEvidenceAttempt(tx);
+        const [envelopeSnap,archiveSnap,snapshotSnap]=await Promise.all([
+            view.save,root.collection("recoveryArchives").doc(String(expectedRevision)),
+            root.collection("playableSnapshots").doc(String(expectedRevision))].map(ref=>tx.get(ref)));
+        const {envelope,records}=inspectCurrentRecoverySource(uid,expectedRevision,{envelopeSnap,archiveSnap,snapshotSnap});
+        if(envelope.serverRevision!==expectedRevision)fail("aborted","CLOUD_REVISION_CONFLICT");
+        if(view.auditControl)await verifyCandidateAuditControl(tx,root,uid,expectedRevision,view.auditControl);
+        const setNames=Object.keys(SETS),singleNames=Object.keys(SINGLES);
+        const [queries,singles]=await Promise.all([
+            Promise.all(setNames.map(name=>tx.get(root.collection(name)))),
+            Promise.all(singleNames.map(name=>tx.get(root.collection(
+                name==="claimCheckpoint"?"claimCheckpoints":name).doc(SINGLES[name]))))]);
+        for(const doc of [...singles,...queries.flatMap(query=>query.docs)]){
+            if(doc.exists){
+                const revision=doc.get("serverRevision");
+                if(!Number.isSafeInteger(revision)||revision<1||revision>expectedRevision)
+                    fail("data-loss","Surviving source revision blocks current recovery.");
+            }
+        }
+        for(let i=0;i<setNames.length;i++){
+            const name=setNames[i],keys=new Set(records[name].map(SETS[name]));
+            if(queries[i].docs.some(doc=>!keys.has(doc.id)))fail("data-loss","Unexpected current source blocks recovery.");
+        }
+        // Full byte-bounded inventories, not truncated query results. The
+        // original Owner proof queries keep their existing intrinsic limits.
+        const claims=view.rows("uniqueClaims"),receipts=view.rows("grantOperations"),ledgers=view.rows("ledgerEntries"),
+            grants=view.rows("pendingGrants"),events=view.rows("rewardEvents"),operations=view.rows("operations"),
+            modeSources=view.rows("simulatedAdSources"),patrolTickets=view.rows("patrolTickets"),
+            patrolStates=view.rows("patrolTicketStates"),patrolSettlements=view.rows("patrolSettlements"),
+            patrolClosures=view.rows("patrolClosures");
+        const [modeEvents,patrolModeEvents,patrolOwnedModeEvents]=await Promise.all([
+            tx.get(root.collection("modeTimeEvents").where("modeChanged","==",true).limit(401)),
+            tx.get(root.collection("modeTimeEvents").where("schemaVersion","==",2).limit(401)),
+            tx.get(root.collection("modeTimeEvents").where("resultOwner","==","forest-patrol-settlement").limit(401))]);
+        // An inventory exceeding an original filtered query limit must not
+        // hide additional mode evidence behind its first 401 documents.
+        const allMode=view.rows("modeTimeEvents");
+        for(const [key,value,query] of [["modeChanged",true,modeEvents],["schemaVersion",2,patrolModeEvents],
+            ["resultOwner","forest-patrol-settlement",patrolOwnedModeEvents]]){
+            if(allMode.docs.filter(doc=>doc.get(key)===value).length!==query.size)
+                fail("failed-precondition","Candidate mode evidence exceeds an original query limit.");
+        }
+        const patrolOperationIds=new Set(patrolSettlements.docs.map(doc=>doc.id));
+        await verifyRecoveryRights(tx,root,uid,expectedRevision,records,{claims,receipts,ledgers,grants,events,operations,
+            modeSources,modeEvents,patrolTickets,patrolStates,patrolSettlements,patrolClosures,
+            patrolModeEvents,patrolOwnedModeEvents,patrolOperationIds});
+        for(const doc of allMode.docs){
+            if(doc.get("schemaVersion")===1&&doc.get("modeChanged")===false){
+                await modeEvidence.verifyRetainedNonValueEvent(tx,root,uid,records.account,doc,expectedRevision);
+            }else if(!(doc.get("schemaVersion")===1&&doc.get("modeChanged")===true)&&
+                !(doc.get("schemaVersion")===2&&doc.get("resultOwner")==="forest-patrol-settlement")){
+                fail("data-loss","An unclassified private mode event blocks candidate verification.");
+            }
+        }
+        return Object.freeze({candidateProofValid:true,ownerUid:uid,sourceRevision:expectedRevision,
+            sourceSha256:archiveSnap.get("sourceSha256"),snapshotSha256:snapshotSnap.get("sha256"),
+            trustedCaptureVerified:false,restoreAuthorized:false,authoritativeStateReady:false,...view.finish()});
+    }
     // Candidate-only internal consistency review. This does not establish that
     // a trusted capture included all live documents, grant approval, or return
     // records/a capability usable by the private restore write kernel.
@@ -1246,68 +1306,12 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         let view;
         try{view=decodeRecoveryAuditArtifact(artifactBytes,{uid,expectedRevision,db});}
         catch(error){fail("data-loss",error.message);}
-        const {tx,root}=view;
-        patrolEvidence.beginEvidenceAttempt(tx);
-        try{
-            const [envelopeSnap,archiveSnap,snapshotSnap]=await Promise.all([
-                view.save,root.collection("recoveryArchives").doc(String(expectedRevision)),
-                root.collection("playableSnapshots").doc(String(expectedRevision))].map(ref=>tx.get(ref)));
-            const {envelope,records}=inspectCurrentRecoverySource(uid,expectedRevision,{envelopeSnap,archiveSnap,snapshotSnap});
-            if(envelope.serverRevision!==expectedRevision)fail("aborted","CLOUD_REVISION_CONFLICT");
-            if(view.auditControl)await verifyCandidateAuditControl(tx,root,uid,expectedRevision,view.auditControl);
-            const setNames=Object.keys(SETS),singleNames=Object.keys(SINGLES);
-            const [queries,singles]=await Promise.all([
-                Promise.all(setNames.map(name=>tx.get(root.collection(name)))),
-                Promise.all(singleNames.map(name=>tx.get(root.collection(
-                    name==="claimCheckpoint"?"claimCheckpoints":name).doc(SINGLES[name]))))]);
-            for(const doc of [...singles,...queries.flatMap(query=>query.docs)]){
-                if(doc.exists){
-                    const revision=doc.get("serverRevision");
-                    if(!Number.isSafeInteger(revision)||revision<1||revision>expectedRevision)
-                        fail("data-loss","Surviving source revision blocks current recovery.");
-                }
-            }
-            for(let i=0;i<setNames.length;i++){
-                const name=setNames[i],keys=new Set(records[name].map(SETS[name]));
-                if(queries[i].docs.some(doc=>!keys.has(doc.id)))fail("data-loss","Unexpected current source blocks recovery.");
-            }
-            // Full byte-bounded inventories, not truncated query results. The
-            // original Owner proof queries keep their existing intrinsic limits.
-            const claims=view.rows("uniqueClaims"),receipts=view.rows("grantOperations"),ledgers=view.rows("ledgerEntries"),
-                grants=view.rows("pendingGrants"),events=view.rows("rewardEvents"),operations=view.rows("operations"),
-                modeSources=view.rows("simulatedAdSources"),patrolTickets=view.rows("patrolTickets"),
-                patrolStates=view.rows("patrolTicketStates"),patrolSettlements=view.rows("patrolSettlements"),
-                patrolClosures=view.rows("patrolClosures");
-            const [modeEvents,patrolModeEvents,patrolOwnedModeEvents]=await Promise.all([
-                tx.get(root.collection("modeTimeEvents").where("modeChanged","==",true).limit(401)),
-                tx.get(root.collection("modeTimeEvents").where("schemaVersion","==",2).limit(401)),
-                tx.get(root.collection("modeTimeEvents").where("resultOwner","==","forest-patrol-settlement").limit(401))]);
-            // An inventory exceeding an original filtered query limit must not
-            // hide additional mode evidence behind its first 401 documents.
-            const allMode=view.rows("modeTimeEvents");
-            for(const [key,value,query] of [["modeChanged",true,modeEvents],["schemaVersion",2,patrolModeEvents],
-                ["resultOwner","forest-patrol-settlement",patrolOwnedModeEvents]]){
-                if(allMode.docs.filter(doc=>doc.get(key)===value).length!==query.size)
-                    fail("failed-precondition","Candidate mode evidence exceeds an original query limit.");
-            }
-            const patrolOperationIds=new Set(patrolSettlements.docs.map(doc=>doc.id));
-            await verifyRecoveryRights(tx,root,uid,expectedRevision,records,{claims,receipts,ledgers,grants,events,operations,
-                modeSources,modeEvents,patrolTickets,patrolStates,patrolSettlements,patrolClosures,
-                patrolModeEvents,patrolOwnedModeEvents,patrolOperationIds});
-            for(const doc of allMode.docs){
-                if(doc.get("schemaVersion")===1&&doc.get("modeChanged")===false){
-                    await modeEvidence.verifyRetainedNonValueEvent(tx,root,uid,records.account,doc,expectedRevision);
-                }else if(!(doc.get("schemaVersion")===1&&doc.get("modeChanged")===true)&&
-                    !(doc.get("schemaVersion")===2&&doc.get("resultOwner")==="forest-patrol-settlement")){
-                    fail("data-loss","An unclassified private mode event blocks candidate verification.");
-                }
-            }
-            return Object.freeze({candidateProofValid:true,ownerUid:uid,sourceRevision:expectedRevision,
-                sourceSha256:archiveSnap.get("sourceSha256"),snapshotSha256:snapshotSnap.get("sha256"),
-                trustedCaptureVerified:false,restoreAuthorized:false,authoritativeStateReady:false,...view.finish()});
-        }catch(error){
+        try{return await verifyCandidateStrict(view,uid,expectedRevision);}
+        catch(error){
             if(error instanceof HttpsError)throw error;
             fail("data-loss",error.message);
+        }finally{
+            await drainAndCloseRecoveryAuditLookups(view);
         }
     }
     return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,captureProof,captureRawInventory});
