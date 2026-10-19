@@ -284,6 +284,8 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
             }
             ad={...ad,status:"pending",consumedBy:null,closedAtMs:null};
         }
+        // Evidence maps have no authoritative enumeration order. Rebuild raw
+        // sidecar JSON from the already verified original archive, as runtime does.
         const derived=transition(event.beforeHead,sourceModes,event.intent,event.observedAtMs,event.sessionId,ad);
         if(!same(derived.after,event.afterModes)||!same(event.delta,delta(event.beforeModes,event.afterModes))||
            event.modeChanged===same(event.beforeModes,event.afterModes)){
@@ -339,6 +341,22 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
         await verifyEvent(tx,root,uid,account,event,operation.data(),ledger.data(),maxEnvelopeRevision);
     }
     function retainedEventReadBudget(event){return 20+(event?.schemaVersion===1?0:forestReadBudget);}
+    // Candidate audit of the full private namespace also includes v1 events
+    // without a canonical delta (presence and simulated-ad lifecycle intents).
+    // Keep their transition/ad/source proof in this original Owner.
+    async function verifyRetainedNonValueEvent(tx,root,uid,account,row,maxEnvelopeRevision=account.serverRevision){
+        const event=row.data();
+        if(event?.schemaVersion!==1||event.modeChanged!==false||event.kind!==KIND||event.operationId!==row.id){
+            fail("data-loss","Retained non-value mode event identity differs.");
+        }
+        const [operation,ledger,grant]=await Promise.all([
+            tx.get(ref(root,"operations",row.id)),tx.get(ref(root,"ledgerEntries",row.id)),
+            tx.get(ref(root,"grantOperations",row.id))]);
+        if(operation.exists||ledger.exists||grant.exists){
+            fail("data-loss","Retained non-value mode event overlaps economic evidence.");
+        }
+        await verifyEvent(tx,root,uid,account,event,undefined,undefined,maxEnvelopeRevision);
+    }
     function retainedOperationReadBudget(kind){return kind===KIND?20:0;}
     function retainedSourceReadBudget(){return 32;}
     function currentEvidenceReadBudget(event){return 40+(event?.schemaVersion===1?0:forestReadBudget);}
@@ -773,7 +791,7 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
         abandonSimulatedAd:(request,args)=>perform(request,"abandon-ad",args),
         readSettlementMode,verifyRetainedOperation,retainedOperationReadBudget,verifyCurrentEvidence,
         currentEvidenceReadBudget,verifyRetainedSource,retainedSourceReadBudget,
-        verifyRetainedEvent,retainedEventReadBudget,preparePatrolSettlement,
+        verifyRetainedEvent,verifyRetainedNonValueEvent,retainedEventReadBudget,preparePatrolSettlement,
         writePatrolModeEvidence,verifyPatrolModeComponent});
 }
 

@@ -64,6 +64,7 @@ const recoveryApprovalIssuer=createCanonicalRecoveryApproval({
 });
 const currentRecovery=createCanonicalCurrentRecovery({
     db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    runRecoveryAuditMaintenance:sessions.runRecoveryAuditMaintenance,
     inspectExistingEnvelope,nextRevision
 });
 const initialCharacterWriter=createCanonicalSourceWriter({
