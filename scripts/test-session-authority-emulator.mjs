@@ -3238,6 +3238,17 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
 {
     const {createCanonicalPatrolSettlement}=require("../functions/src/canonical-patrol-settlement.js");
     const {patrolVictoryExp}=require("../functions/src/patrol-ticket-policy.js");
+    // Failure context only: preserve the SDK error (including its original
+    // stack) as cause and retain its code/details. Never retry or mask it.
+    async function forestStage(label,operation){
+        try{return await operation();}
+        catch(cause){
+            const error=new Error(`Forest emulator stage ${label}: ${cause.message}`,{cause});
+            if(cause.code!==undefined)error.code=cause.code;
+            if(cause.details!==undefined)error.details=cause.details;
+            throw error;
+        }
+    }
     async function freshPatrol(suffix){
         const email=`forest-patrol-${suffix}-emulator@example.test`;
         const user=await login("accounts:signUp",{email,password}),uid=user.localId;
@@ -3342,25 +3353,32 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
     assert.ok(Math.floor(Date.now()/1000)>claims(h.token).auth_time);
     const other=await login("accounts:signInWithPassword",{email:h.email,password});
     const otherSession=await invoke("createGameSession",other.idToken,{uid:h.uid});h.setIdentity(other.idToken,otherSession);
-    await h.refuses(()=>h.forest.settleTerminal(oldRequest,winInput));await h.presence("reopen");
+    console.log("Forest repeat checkpoint: takeover completed; checking revoked session and reopening mode.");
+    await forestStage("repeat/takeover/old-session-refusal",()=>h.refuses(()=>h.forest.settleTerminal(oldRequest,winInput)));
+    await forestStage("repeat/takeover/mode-reopen",()=>h.presence("reopen"));
     const allocator=createCanonicalExpAllocation(h.deps);
     async function allocateAvailable(){
         for(let guard=0;guard<9;guard++){
             const current=(await h.root.collection("characters").doc(charId).get()).get("state");
             if(current.level>=10||(await economy()).get("sharedExp")<current.expNext-current.exp)return current.level;
-            await allocator.allocateSharedExp(h.request(),await h.intent());
+            await forestStage(`repeat/allocate/level-${current.level}/guard-${guard}`,
+                async()=>allocator.allocateSharedExp(h.request(),await h.intent()));
         }
         return (await h.root.collection("characters").doc(charId).get()).get("state.level");
     }
-    let level=await allocateAvailable(),completedBattles=2;
+    let level=await forestStage("repeat/allocate/after-takeover",allocateAvailable),completedBattles=2;
     // Finite test guard only: this adds no production challenge/earning limit.
     for(let guard=0;level<10&&guard<48;guard++){
-        const next=await h.issue();await h.member(next.ticketId);await h.terminal(next.ticketId);
-        completedBattles++;level=await allocateAvailable();
+        const stage=`repeat/battle-${completedBattles+1}/guard-${guard}`;
+        const next=await forestStage(stage+"/issue",()=>h.issue());
+        await forestStage(stage+"/member",()=>h.member(next.ticketId));
+        await forestStage(stage+"/terminal",()=>h.terminal(next.ticketId));
+        completedBattles++;level=await forestStage(stage+"/allocate-available",allocateAvailable);
     }
     assert.equal(level,10,"Actual earned shared EXP and the existing allocator must reach Lv10");
     assert.ok(completedBattles>=2);assert.equal((await h.save.get()).get("authoritativeStateReady"),false);
     await checkRecoveryArchive(h.uid,await h.revision());
+    console.log(`Forest repeat checkpoint: Lv10 verified after ${completedBattles} test battles; starting isolated recovery.`);
 
     // Recovery uses a different fresh UID and a deliberately small legitimate
     // history. Large histories retain the existing 400-read refusal budget.
