@@ -77,7 +77,7 @@ function makeInitialSidecars(recordedAt){
 
 // Only the player's choices cross this boundary. All progression is generated
 // here by the server. The callable accepts choices only, never progression.
-function makeInitialCharacterSources(uid,revision,operationId,selection,{recordedAt}={}){
+function makeInitialCharacterSources(uid,revision,operationId,selection,{recordedAt,allowUnspent=false}={}){
     if(!plain(selection)||Object.keys(selection).sort().join("|")!==
         "attributes|displayName|element|gender"||
        typeof selection.displayName!=="string"||
@@ -90,7 +90,8 @@ function makeInitialCharacterSources(uid,revision,operationId,selection,{recorde
        Object.keys(selection.attributes).sort().join("|")!==[...STAT_KEYS].sort().join("|")||
        STAT_KEYS.some(key=>!Number.isSafeInteger(selection.attributes[key])||
            selection.attributes[key]<0||selection.attributes[key]>10)||
-       STAT_KEYS.reduce((sum,key)=>sum+selection.attributes[key],0)!==10){
+       (allowUnspent===true?STAT_KEYS.reduce((sum,key)=>sum+selection.attributes[key],0)>10:
+           STAT_KEYS.reduce((sum,key)=>sum+selection.attributes[key],0)!==10)){
         throw new Error("Invalid initial character choices.");
     }
     const characterId=`character-${operationId}`;
@@ -103,7 +104,7 @@ function makeInitialCharacterSources(uid,revision,operationId,selection,{recorde
     const state={id:selection.displayName,element:selection.element,
         gender:selection.gender,level:1,exp:0,expNext:newcomerExpNext(1),
         ...Object.fromEntries(STAT_KEYS.map(key=>[key,attributes[key]])),
-        bonusHP:0,bonusSP:0,attributePoints:0,skillPoints:2,
+        bonusHP:0,bonusSP:0,attributePoints:10-STAT_KEYS.reduce((sum,key)=>sum+attributes[key],0),skillPoints:2,
         hp:100+attributes.vitality*50,sp:50+attributes.energy*15,
         activeBuffs:[],statusEffects:[],isDefending:false};
     return {

@@ -5,7 +5,8 @@ const {assembleCanonicalSnapshot,inspectCanonicalSnapshot,
     snapshotDigest,claimRecordsDigest}=require("./canonical-snapshot");
 const {makeInitialCharacterSources,makeInitialSidecars}=require("./initial-character-sources");
 const {createRecoveryArchive,inspectRecoveryArchive}=require("./canonical-recovery-archive");
-const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=require("./canonical-owned-sources");
+const {source,readCharacterSources,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=require("./canonical-owned-sources");
+const FormationPolicy=require("./team-formation-policy");
 const {taipeiDay}=require("./daily-checkin-policy");
 const {createHash}=require("node:crypto");
 
@@ -16,6 +17,140 @@ const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
     inspectExistingEnvelope,nextRevision,now=Date.now}){
     const fail=(code,message)=>{ throw new HttpsError(code,message); };
+    const equal=(a,b)=>snapshotDigest(a)===snapshotDigest(b);
+    const additionalKind="additional-character-sources";
+    const singleCollections={account:"account",economy:"economy",progress:"progress",
+        relicLoadout:"relicLoadout",claimCheckpoint:"claimCheckpoints"};
+    function additionalIntent(input){
+        if(!input||Object.keys(input).sort().join("|")!=="expectedRevision|operationId|selection|slotIndex"||
+           !OPERATION_ID.test(input.operationId||"")||input.slotIndex!==1||
+           !Number.isSafeInteger(input.expectedRevision)||input.expectedRevision<2){
+            fail("invalid-argument","Only second-character choices and an expected revision are accepted.");
+        }
+        try{makeInitialCharacterSources("validation",input.expectedRevision+1,input.operationId,input.selection,{allowUnspent:true});}
+        catch(_){fail("invalid-argument","Invalid additional character choices.");}
+        return JSON.parse(JSON.stringify(input));
+    }
+    function additionalFormation(formation){
+        if(formation===null)return null;
+        const next=JSON.parse(JSON.stringify(formation));
+        const occupied=new Set([...Object.values(next.characterIndexToSlot),...Object.values(next.heroIdToSlot||{})]);
+        // Preserve Client normalizeAllyFormation's two-player preferred position;
+        // canonical Policy owns the complete front/back fallback order.
+        const position=!occupied.has("ALLY_F3")?"ALLY_F3":FormationPolicy.slots.find(slot=>!occupied.has(slot));
+        if(!position)fail("failed-precondition","No additional-character formation position is available.");
+        next.characterIndexToSlot[1]=position;
+        return next;
+    }
+    function additionalRecords(uid,before,intent,revision){
+        if(before.account.provenance!=="server-created"||before.account.slots[1]!==null||
+           before.account.slots[2]!==null||before.characters.length!==1||before.characters[0].state.level<10){
+            fail("failed-precondition","An empty second slot and primary level10 are required.");
+        }
+        const normalized=name=>name.trim().normalize("NFKC").toLocaleLowerCase();
+        if(before.characters.some(row=>normalized(row.displayName)===normalized(intent.selection.displayName))){
+            fail("already-exists","Character display names must be distinct.");
+        }
+        const generated=makeInitialCharacterSources(uid,revision,intent.operationId,intent.selection,{allowUnspent:true});
+        const character={...generated.characters[0],slotIndex:1};
+        const owned=advanceOwnedRecords(before,revision);
+        return {...before,...owned,
+            account:{...before.account,serverRevision:revision,
+                slots:[before.account.slots[0],character.characterId,null],formation:additionalFormation(before.account.formation)},
+            characters:[...before.characters.map(row=>({...row,serverRevision:revision})),character],
+            economy:{...before.economy,serverRevision:revision},progress:{...before.progress,serverRevision:revision},
+            relicLoadout:{...before.relicLoadout,serverRevision:revision},
+            claimCheckpoint:{...before.claimCheckpoint,serverRevision:revision,claimDigest:claimRecordsDigest(owned.claimRecords)}};
+    }
+    async function additionalProof(tx,root,uid,account,receipt){
+        try{
+            const intent=additionalIntent(receipt.intent),revision=receipt.resultRevision;
+            if(receipt.schemaVersion!==1||receipt.kind!==additionalKind||receipt.ownerUid!==uid||
+               receipt.operationId!==intent.operationId||receipt.authoritativeStateReady!==false||
+               !Number.isSafeInteger(receipt.sourceRevision)||receipt.sourceRevision<2||
+               receipt.sourceRevision>intent.expectedRevision||revision!==intent.expectedRevision+1||
+               revision>account.serverRevision||account.slots[1]!==`character-${intent.operationId}`||
+               receipt.characterId!==account.slots[1]||receipt.slotIndex!==1){throw Error("Receipt identity");}
+            const [beforeSnapshot,beforeArchive,afterSnapshot,afterArchive,grant,ledger]=await Promise.all([
+                tx.get(root.collection("playableSnapshots").doc(String(receipt.sourceRevision))),
+                tx.get(root.collection("recoveryArchives").doc(String(receipt.sourceRevision))),
+                tx.get(root.collection("playableSnapshots").doc(String(revision))),
+                tx.get(root.collection("recoveryArchives").doc(String(revision))),
+                tx.get(root.collection("grantOperations").doc(intent.operationId)),
+                tx.get(root.collection("ledgerEntries").doc(intent.operationId))]);
+            if(grant.exists||ledger.exists||!beforeSnapshot.exists||!beforeArchive.exists||!afterSnapshot.exists||!afterArchive.exists||
+               beforeSnapshot.get("sha256")!==receipt.sourceSnapshotSha256||afterSnapshot.get("sha256")!==receipt.snapshotSha256){
+                throw Error("Missing original evidence");
+            }
+            const before=inspectRecoveryArchive(beforeArchive.data(),uid,receipt.sourceRevision,beforeSnapshot.data());
+            const after=inspectRecoveryArchive(afterArchive.data(),uid,revision,afterSnapshot.data());
+            if(!equal(additionalRecords(uid,before,intent,revision),after))throw Error("Original transition differs");
+            return {sourceRevision:receipt.sourceRevision,resultRevision:revision,characterId:receipt.characterId,
+                slotIndex:1,snapshotSha256:receipt.snapshotSha256,authoritativeStateReady:false};
+        }catch(error){
+            fail("data-loss","Original additional-character evidence is inconsistent.");
+        }
+    }
+    async function commitAdditionalCharacter(request,input){
+        const intent=additionalIntent(input);
+        return runProtected(request,async(tx,session)=>{
+            const uid=session.uid,root=db.collection("serverUsers").doc(uid);
+            const envelopeRef=db.collection("users").doc(uid).collection("saves").doc("current");
+            const [envelopeSnapshot,operation,...singles]=await Promise.all([
+                tx.get(envelopeRef),tx.get(root.collection("operations").doc(intent.operationId)),
+                ...Object.values(singleCollections).map(name=>tx.get(root.collection(name).doc("current")))]);
+            if(!envelopeSnapshot.exists||singles.some(row=>!row.exists))fail("failed-precondition","Complete canonical character sources are required.");
+            const envelope=inspectExistingEnvelope(envelopeSnapshot.data(),uid),account=singles[0].data();
+            if(envelope.kind!=="current"||envelope.data.authoritativeStateReady!==false||account.ownerUid!==uid||
+               account.provenance!=="server-created"||!Number.isSafeInteger(account.serverRevision)||
+               account.serverRevision<2||account.serverRevision>envelope.serverRevision){
+                fail("failed-precondition","An unpublished canonical account is required.");
+            }
+            if(operation.exists){
+                const receipt=operation.data();
+                if(!receipt.intent||!equal(receipt.intent,intent)||receipt.operationId!==intent.operationId){
+                    fail("data-loss","Additional-character operation overlaps a different intent.");
+                }
+                return {...await additionalProof(tx,root,uid,account,receipt),unchanged:true};
+            }
+            if(envelope.serverRevision!==intent.expectedRevision)fail("aborted","CLOUD_REVISION_CONFLICT");
+            const [characters,owned,snapshot,archive,...collisions]=await Promise.all([
+                readCharacterSources(tx,root,account,fail),readOwnedSources(tx,root,fail),
+                tx.get(root.collection("playableSnapshots").doc(String(account.serverRevision))),
+                tx.get(root.collection("recoveryArchives").doc(String(account.serverRevision))),
+                ...["grantOperations","ledgerEntries","modeTimeEvents","simulatedAdSources","patrolTickets",
+                    "patrolTicketStates","patrolSettlements","patrolClosures","recoveryAudits","recoveryApprovals"]
+                    .map(name=>tx.get(root.collection(name).doc(intent.operationId))),
+                tx.get(root.collection("characters").doc(`character-${intent.operationId}`))]);
+            if(collisions.some(row=>row.exists))fail("failed-precondition","Additional-character operation ID is already used.");
+            const records={...owned.records,characters:characters.records,...Object.fromEntries(
+                Object.keys(singleCollections).map((key,index)=>[key,source(singles[index].data())]))};
+            try{
+                if(!snapshot.exists||!archive.exists||snapshot.get("sha256")!==account.snapshotSha256)throw Error("Missing current archive");
+                inspectRecoveryArchive(archive.data(),uid,account.serverRevision,snapshot.data());
+                verifyCanonicalSnapshotAgainstSources(snapshot.data(),uid,account.serverRevision,records);
+            }catch(_){fail("data-loss","Current character sources differ from their snapshot/archive.");}
+            const revision=nextRevision(envelope),next=additionalRecords(uid,records,intent,revision);
+            let bundle,backup;
+            try{bundle=assembleCanonicalSnapshot(uid,revision,next);backup=createRecoveryArchive(uid,revision,next,bundle);}
+            catch(_){fail("data-loss","Additional character cannot form a complete canonical revision.");}
+            const receipt={schemaVersion:1,kind:additionalKind,ownerUid:uid,operationId:intent.operationId,intent,
+                sourceRevision:account.serverRevision,resultRevision:revision,sourceSnapshotSha256:snapshot.get("sha256"),
+                snapshotSha256:bundle.sha256,characterId:`character-${intent.operationId}`,slotIndex:1,authoritativeStateReady:false};
+            const stamp=FieldValue.serverTimestamp();
+            for(const [index,key] of Object.keys(singleCollections).entries())tx.update(singles[index].ref,
+                {...next[key],...(key==="account"?{snapshotSha256:bundle.sha256}:{}),updatedAt:stamp});
+            characters.refs.forEach((ref,index)=>tx.update(ref,{...next.characters[index],updatedAt:stamp}));
+            tx.create(root.collection("characters").doc(receipt.characterId),{...next.characters[1],createdAt:stamp,updatedAt:stamp});
+            advanceOwnedSources(tx,owned.refs,revision,stamp);
+            tx.create(root.collection("playableSnapshots").doc(String(revision)),{...bundle,createdAt:stamp});
+            tx.create(root.collection("recoveryArchives").doc(String(revision)),{...backup,createdAt:stamp});
+            tx.create(root.collection("operations").doc(intent.operationId),{...receipt,createdAt:stamp});
+            tx.update(envelopeRef,{serverRevision:revision,updatedAt:stamp});
+            return {sourceRevision:receipt.sourceRevision,resultRevision:revision,characterId:receipt.characterId,
+                slotIndex:1,snapshotSha256:bundle.sha256,unchanged:false,authoritativeStateReady:false};
+        });
+    }
 
     function dailyPeriods(records,uid,date){
         // The complete projection rejects absent, historical-only or
@@ -775,6 +910,10 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
            account.provenance!=="server-created"||!Number.isSafeInteger(account.serverRevision)||
            account.serverRevision<2){fail("data-loss","Retained operation identity is inconsistent.");}
         switch(value.kind){
+        case "additional-character-sources":
+            if(value.operationId!==row.id)fail("data-loss","Additional character receipt identity differs.");
+            await additionalProof(tx,root,uid,account,value);
+            return;
         case "initial-character-sources": {
             const revision=value.sourceRevision;
             if(!OPERATION_ID.test(row.id||"")||value.operationId!==row.id||
@@ -820,12 +959,13 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
         }
     }
     function retainedOperationReadBudget(kind){
+        if(kind==="additional-character-sources")return 6;
         if(kind==="initial-character-sources")return 2;
         if(["daily-period-source","daily-period-observation"].includes(kind))return 8;
         if(["daily-period-application","daily-period-apply"].includes(kind))return 35;
         return 0; // Unsupported kinds are rejected without reads.
     }
-    return Object.freeze({commitInitialSources,observeDailyPeriod,applyDailyPeriod,
+    return Object.freeze({commitInitialSources,commitAdditionalCharacter,observeDailyPeriod,applyDailyPeriod,
         verifyRetainedOperation,retainedOperationReadBudget});
 }
 
