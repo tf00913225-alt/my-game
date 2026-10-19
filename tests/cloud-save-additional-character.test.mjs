@@ -42,13 +42,19 @@ async function refuses(h,operation,code){
 }
 // A later trusted-source fixture records only an explicit formation choice.
 // It retains every previous snapshot/archive; it does not forge the Lv10 gate.
-function formationFixture(h,formation,heroAccount){
+function formationFixture(h,formation,heroAccount,structuralLevels){
     const before=current(h),revision=h.revision+1;
     const records=copy(before);
     for(const name of ['account','economy','progress','relicLoadout','claimCheckpoint'])records[name].serverRevision=revision;
     for(const name of ['characters','inventory','equipment','relics','claimRecords'])for(const row of records[name])row.serverRevision=revision;
     records.account.formation=formation;
     if(heroAccount)records.progress.playableState.heroAccount=heroAccount;
+    // Explicit server-structural qualification fixture, not earning evidence.
+    // Only the earlier Lv10 baseline was earned through actual Forest writes.
+    if(structuralLevels)records.characters.forEach((row,index)=>{
+        row.state.level=structuralLevels[index];row.state.exp=0;
+        row.state.expNext=require('../functions/src/canonical-newcomer-exp').newcomerExpNext(structuralLevels[index]);
+    });
     records.claimCheckpoint.claimDigest=claimRecordsDigest(records.claimRecords);
     const snapshot=assembleCanonicalSnapshot(h.uid,revision,records),archive=createRecoveryArchive(h.uid,revision,records,snapshot);
     for(const [name,collection] of Object.entries({account:'account',economy:'economy',progress:'progress',relicLoadout:'relicLoadout',claimCheckpoint:'claimCheckpoints'}))
@@ -167,4 +173,86 @@ test('additional retained proof reuses the original Owner within its six-read bo
         await h.writer.verifyRetainedOperation({get:ref=>{reads++;return tx.get(ref);}},root,h.uid,current(h).account,row);
     });
     assert.equal(reads,6);assert.equal(h.writer.retainedOperationReadBudget('additional-character-sources'),6);
+});
+
+async function structuralTwo(levels=[50,50],formation=null,heroAccount){
+    const h=await unlocked(),second=intent(h);
+    await h.writer.commitAdditionalCharacter(h.request(),second);
+    formationFixture(h,formation,heroAccount,levels);
+    h.secondIntent=second;return h;
+}
+const thirdIntent=(h,points=3)=>({...intent(h,points),slotIndex:2,selection:{...choices(points),displayName:'Third'}});
+
+test('third slot requires both canonical primary and secondary50, with structural49/50 boundaries and no client eligibility override',async()=>{
+    for(const levels of [[49,50],[50,49],[49,49]]){
+        const h=await structuralTwo(levels);
+        await refuses(h,()=>h.writer.commitAdditionalCharacter(h.request(),thirdIntent(h)),'failed-precondition');
+    }
+    const missing=await unlocked();
+    await refuses(missing,()=>missing.writer.commitAdditionalCharacter(missing.request(),thirdIntent(missing)),'failed-precondition');
+    for(const points of [0,10]){
+        const h=await structuralTwo(),before=copy(current(h)),input=thirdIntent(h,points);
+        await refuses(h,()=>h.writer.commitAdditionalCharacter(h.request(),{...input,primaryLevel:50}),'invalid-argument');
+        const created=await h.writer.commitAdditionalCharacter(h.request(),input),after=current(h);
+        assert.equal(created.slotIndex,2);assert.equal(after.characters.length,3);
+        assert.equal(after.account.slots[2],created.characterId);assert.equal(after.account.formation,null);
+        assert.equal(after.characters[2].state.level,1);assert.equal(after.characters[2].state.attributePoints,10-points);
+        for(const index of [0,1])assert.deepEqual({...after.characters[index],serverRevision:before.account.serverRevision},before.characters[index]);
+        assert.deepEqual({...after.economy,serverRevision:before.account.serverRevision},before.economy);
+        assert.deepEqual({...after.progress,serverRevision:before.account.serverRevision},before.progress);
+        assert.equal(after.characters.every(row=>row.serverRevision===created.resultRevision),true);
+    }
+});
+
+test('third creation is once-only across occupied slots, mixed-target intents, lost responses and later revisions',async()=>{
+    const h=await structuralTwo(),input=thirdIntent(h);h.abortNext();
+    await refuses(h,()=>h.writer.commitAdditionalCharacter(h.request(),input));
+    const created=await h.writer.commitAdditionalCharacter(h.request(),input);
+    await refuses(h,()=>h.writer.commitAdditionalCharacter(h.request(),thirdIntent(h)),'failed-precondition');
+    await refuses(h,()=>h.writer.commitAdditionalCharacter(h.request(),{...input,slotIndex:1}),'data-loss');
+    await refuses(h,()=>h.writer.commitAdditionalCharacter(h.request(),{...input,selection:{...input.selection,attributes:choices(11).attributes}}),'invalid-argument');
+    formationFixture(h,null);
+    const before=copy([...h.data]),retry=await h.writer.commitAdditionalCharacter(h.request(),input);
+    assert.equal(retry.unchanged,true);assert.equal(retry.resultRevision,created.resultRevision);assert.equal(retry.slotIndex,2);
+    assert.equal((await h.writer.commitAdditionalCharacter(h.request(),h.secondIntent)).unchanged,true);
+    assert.deepEqual([...h.data],before);
+    let reads=0;
+    await h.dependencies.db.runTransaction(async tx=>{
+        const root=h.dependencies.db.doc(h.root),row=await tx.get(root.collection('operations').doc(input.operationId));
+        await h.writer.verifyRetainedOperation({get:ref=>{reads++;return tx.get(ref);}},root,h.uid,current(h).account,row);
+    });assert.equal(reads,6);
+});
+
+test('third-player formation follows actual three-player normalization without moving previous units or Heroes',async()=>{
+    const browser=vm.createContext({window:{}});
+    vm.runInContext(fs.readFileSync(new URL('../js/battlefield-slot-owner.js',import.meta.url),'utf8'),browser);
+    for(const map of [{0:'ALLY_F2',1:'ALLY_F3'},{0:'ALLY_F1',1:'ALLY_B2'}]){
+        const formation={version:1,characterIndexToSlot:map},h=await structuralTwo([50,50],formation);
+        const expected=JSON.parse(JSON.stringify(browser.window.FourSymbolsBattlefieldSlots.normalizeAllyFormation(formation,[0,1,2])));
+        await h.writer.commitAdditionalCharacter(h.request(),thirdIntent(h));
+        assert.deepEqual(current(h).account.formation,{version:1,characterIndexToSlot:expected.characterIndexToSlot});
+    }
+    const Core=require('../functions/src/hero-core'),heroId=Core.listHeroDefinitions()[0].heroId;
+    const base=await unlocked(),heroes=Core.createDomain(current(base).progress.playableState.heroAccount,()=>[],()=>null,()=>null).unlockHeroDirect(heroId,123);
+    const formation={version:2,characterIndexToSlot:{0:'ALLY_F1',1:'ALLY_F2'},heroIdToSlot:{[heroId]:'ALLY_F3'}};
+    const h=await structuralTwo([50,50],formation,heroes);
+    await h.writer.commitAdditionalCharacter(h.request(),thirdIntent(h));
+    const result=current(h).account.formation;
+    assert.deepEqual(result,{version:2,characterIndexToSlot:{0:'ALLY_F1',1:'ALLY_F2',2:'ALLY_B1'},heroIdToSlot:formation.heroIdToSlot});
+    assert.deepEqual(current(h).progress.playableState.heroAccount,heroes);
+});
+
+test('third source, receipt target, original archives and canonical pointers reject corruption with no writes',async()=>{
+    for(const damage of ['current-archive','target','before-archive','after-archive']){
+        const h=await structuralTwo(),input=thirdIntent(h);
+        if(damage==='current-archive'){
+            h.data.delete(h.root+'/recoveryArchives/'+h.revision);
+            await refuses(h,()=>h.writer.commitAdditionalCharacter(h.request(),input),'data-loss');continue;
+        }
+        const result=await h.writer.commitAdditionalCharacter(h.request(),input);
+        if(damage==='target')h.data.get(h.root+'/operations/'+input.operationId).slotIndex=1;
+        if(damage==='before-archive')h.data.delete(h.root+'/recoveryArchives/'+result.sourceRevision);
+        if(damage==='after-archive')h.data.delete(h.root+'/recoveryArchives/'+result.resultRevision);
+        await refuses(h,()=>h.writer.commitAdditionalCharacter(h.request(),input),'data-loss');
+    }
 });

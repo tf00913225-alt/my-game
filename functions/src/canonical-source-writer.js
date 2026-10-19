@@ -23,40 +23,45 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
         relicLoadout:"relicLoadout",claimCheckpoint:"claimCheckpoints"};
     function additionalIntent(input){
         if(!input||Object.keys(input).sort().join("|")!=="expectedRevision|operationId|selection|slotIndex"||
-           !OPERATION_ID.test(input.operationId||"")||input.slotIndex!==1||
+           !OPERATION_ID.test(input.operationId||"")||![1,2].includes(input.slotIndex)||
            !Number.isSafeInteger(input.expectedRevision)||input.expectedRevision<2){
-            fail("invalid-argument","Only second-character choices and an expected revision are accepted.");
+            fail("invalid-argument","Only additional-character choices and an expected revision are accepted.");
         }
         try{makeInitialCharacterSources("validation",input.expectedRevision+1,input.operationId,input.selection,{allowUnspent:true});}
         catch(_){fail("invalid-argument","Invalid additional character choices.");}
         return JSON.parse(JSON.stringify(input));
     }
-    function additionalFormation(formation){
+    function additionalFormation(formation,slotIndex){
         if(formation===null)return null;
         const next=JSON.parse(JSON.stringify(formation));
         const occupied=new Set([...Object.values(next.characterIndexToSlot),...Object.values(next.heroIdToSlot||{})]);
-        // Preserve Client normalizeAllyFormation's two-player preferred position;
+        // Client normalization prefers F3 for the second and third player;
         // canonical Policy owns the complete front/back fallback order.
         const position=!occupied.has("ALLY_F3")?"ALLY_F3":FormationPolicy.slots.find(slot=>!occupied.has(slot));
         if(!position)fail("failed-precondition","No additional-character formation position is available.");
-        next.characterIndexToSlot[1]=position;
+        next.characterIndexToSlot[slotIndex]=position;
         return next;
     }
     function additionalRecords(uid,before,intent,revision){
-        if(before.account.provenance!=="server-created"||before.account.slots[1]!==null||
-           before.account.slots[2]!==null||before.characters.length!==1||before.characters[0].state.level<10){
-            fail("failed-precondition","An empty second slot and primary level10 are required.");
+        const slotIndex=intent.slotIndex;
+        if(before.account.provenance!=="server-created"||before.account.slots[slotIndex]!==null||
+           before.characters.length!==slotIndex||
+           (slotIndex===1&&(before.account.slots[2]!==null||before.characters[0].state.level<10))||
+           (slotIndex===2&&(before.account.slots[1]===null||before.characters.some(row=>row.state.level<50)))){
+            fail("failed-precondition",slotIndex===1?"An empty second slot and primary level10 are required.":
+                "An empty third slot and primary/secondary level50 are required.");
         }
         const normalized=name=>name.trim().normalize("NFKC").toLocaleLowerCase();
         if(before.characters.some(row=>normalized(row.displayName)===normalized(intent.selection.displayName))){
             fail("already-exists","Character display names must be distinct.");
         }
         const generated=makeInitialCharacterSources(uid,revision,intent.operationId,intent.selection,{allowUnspent:true});
-        const character={...generated.characters[0],slotIndex:1};
+        const character={...generated.characters[0],slotIndex};
+        const slots=[...before.account.slots];slots[slotIndex]=character.characterId;
         const owned=advanceOwnedRecords(before,revision);
         return {...before,...owned,
             account:{...before.account,serverRevision:revision,
-                slots:[before.account.slots[0],character.characterId,null],formation:additionalFormation(before.account.formation)},
+                slots,formation:additionalFormation(before.account.formation,slotIndex)},
             characters:[...before.characters.map(row=>({...row,serverRevision:revision})),character],
             economy:{...before.economy,serverRevision:revision},progress:{...before.progress,serverRevision:revision},
             relicLoadout:{...before.relicLoadout,serverRevision:revision},
@@ -69,8 +74,8 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
                receipt.operationId!==intent.operationId||receipt.authoritativeStateReady!==false||
                !Number.isSafeInteger(receipt.sourceRevision)||receipt.sourceRevision<2||
                receipt.sourceRevision>intent.expectedRevision||revision!==intent.expectedRevision+1||
-               revision>account.serverRevision||account.slots[1]!==`character-${intent.operationId}`||
-               receipt.characterId!==account.slots[1]||receipt.slotIndex!==1){throw Error("Receipt identity");}
+               revision>account.serverRevision||account.slots[intent.slotIndex]!==`character-${intent.operationId}`||
+               receipt.characterId!==account.slots[intent.slotIndex]||receipt.slotIndex!==intent.slotIndex){throw Error("Receipt identity");}
             const [beforeSnapshot,beforeArchive,afterSnapshot,afterArchive,grant,ledger]=await Promise.all([
                 tx.get(root.collection("playableSnapshots").doc(String(receipt.sourceRevision))),
                 tx.get(root.collection("recoveryArchives").doc(String(receipt.sourceRevision))),
@@ -86,7 +91,7 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
             const after=inspectRecoveryArchive(afterArchive.data(),uid,revision,afterSnapshot.data());
             if(!equal(additionalRecords(uid,before,intent,revision),after))throw Error("Original transition differs");
             return {sourceRevision:receipt.sourceRevision,resultRevision:revision,characterId:receipt.characterId,
-                slotIndex:1,snapshotSha256:receipt.snapshotSha256,authoritativeStateReady:false};
+                slotIndex:intent.slotIndex,snapshotSha256:receipt.snapshotSha256,authoritativeStateReady:false};
         }catch(error){
             fail("data-loss","Original additional-character evidence is inconsistent.");
         }
@@ -136,19 +141,19 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
             catch(_){fail("data-loss","Additional character cannot form a complete canonical revision.");}
             const receipt={schemaVersion:1,kind:additionalKind,ownerUid:uid,operationId:intent.operationId,intent,
                 sourceRevision:account.serverRevision,resultRevision:revision,sourceSnapshotSha256:snapshot.get("sha256"),
-                snapshotSha256:bundle.sha256,characterId:`character-${intent.operationId}`,slotIndex:1,authoritativeStateReady:false};
+                snapshotSha256:bundle.sha256,characterId:`character-${intent.operationId}`,slotIndex:intent.slotIndex,authoritativeStateReady:false};
             const stamp=FieldValue.serverTimestamp();
             for(const [index,key] of Object.keys(singleCollections).entries())tx.update(singles[index].ref,
                 {...next[key],...(key==="account"?{snapshotSha256:bundle.sha256}:{}),updatedAt:stamp});
             characters.refs.forEach((ref,index)=>tx.update(ref,{...next.characters[index],updatedAt:stamp}));
-            tx.create(root.collection("characters").doc(receipt.characterId),{...next.characters[1],createdAt:stamp,updatedAt:stamp});
+            tx.create(root.collection("characters").doc(receipt.characterId),{...next.characters[intent.slotIndex],createdAt:stamp,updatedAt:stamp});
             advanceOwnedSources(tx,owned.refs,revision,stamp);
             tx.create(root.collection("playableSnapshots").doc(String(revision)),{...bundle,createdAt:stamp});
             tx.create(root.collection("recoveryArchives").doc(String(revision)),{...backup,createdAt:stamp});
             tx.create(root.collection("operations").doc(intent.operationId),{...receipt,createdAt:stamp});
             tx.update(envelopeRef,{serverRevision:revision,updatedAt:stamp});
             return {sourceRevision:receipt.sourceRevision,resultRevision:revision,characterId:receipt.characterId,
-                slotIndex:1,snapshotSha256:bundle.sha256,unchanged:false,authoritativeStateReady:false};
+                slotIndex:intent.slotIndex,snapshotSha256:bundle.sha256,unchanged:false,authoritativeStateReady:false};
         });
     }
 
