@@ -17,7 +17,7 @@ const {createRecoveryArchive}=require('../functions/src/canonical-recovery-archi
 const {assembleCanonicalSnapshot}=require('../functions/src/canonical-snapshot');
 const {snapshotDigest}=require('../functions/src/canonical-snapshot');
 const auditId='proof-component-audit-0001',approvalId='proof-component-approval-01';
-async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus=null,historicalSession=false}={}){
+async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus=null,historicalSession=false,zeroHeartbeat=false}={}){
     const h=storeHarness({optimisticTransactions:true}),sessions=createSessionAuthority(h.dependencies);let authTime=Math.floor(h.clock/1000),session;
     const request=()=>({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid,...(session?{session}:{})}});
     session=await sessions.create(request());
@@ -41,7 +41,8 @@ async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus
     }
     const forest=createCanonicalPatrolSettlement({...deps,randomBytes:size=>Buffer.alloc(size,255)}),tickets=[];let serial=0;
     const id=name=>`proof-${name}-${String(++serial).padStart(8,'0')}`;
-    await forest.observePresence(request(),{operationId:id('reopen'),expectedRevision:h.revision,expectedSequence:0,intent:'reopen',elementBox:'keep'});
+    const reopenId=id('reopen');
+    await forest.observePresence(request(),{operationId:reopenId,expectedRevision:h.revision,expectedSequence:0,intent:'reopen',elementBox:'keep'});
     if(rested){
         await forest.observePresence(request(),{operationId:id('rest'),expectedRevision:h.revision,expectedSequence:1,intent:'rest',elementBox:'keep'});
         h.advance(120000);
@@ -72,6 +73,9 @@ async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus
                 operationId:adCloseId,expectedRevision:h.revision,expectedSequence:sequence(),sourceId:adSourceId});
         }
     }
+    let heartbeatId;
+    if(zeroHeartbeat){heartbeatId=id('heartbeat');await forest.observePresence(request(),{operationId:heartbeatId,expectedRevision:h.revision,
+        expectedSequence:h.data.get(h.root+'/modeTime/current').sequence,intent:'heartbeat',elementBox:'keep'});}
     if(historicalSession){h.advance(1000);authTime=Math.floor(h.clock/1000);
         session=await sessions.create({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid}});}
     if(battles>=20)for(const path of [...h.data.keys()])if(['account','characters','economy','inventory','equipment','relics','relicLoadout','progress','claimRecords','claimCheckpoints']
@@ -84,7 +88,7 @@ async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus
     h.dependencies.db.runTransaction=callback=>base(async tx=>{const trace={reads:0,queries:0,writes:0,paths:[]};traces.push(trace);
         const wrapper={get:async ref=>{trace.paths.push(ref.path);const snap=await tx.get(ref);trace.reads+=snap.docs?Math.max(1,snap.size):1;trace.queries+=snap.docs?1:0;return snap;}};
         for(const method of ['set','create','update','delete'])wrapper[method]=(...args)=>{trace.writes++;return tx[method](...args);};return callback(wrapper);});
-    return {h,recovery,request,tickets,allocations,additional,adSourceId,adCloseId,root,traces,deps,sessions,intent:(sequence=1,ticketId=tickets[0])=>({auditId,expectedEpoch:1,operationId:`proof-capsule-${String(sequence).padStart(8,'0')}`,expectedSequence:sequence,component:'forest-ticket',sourceId:ticketId})};
+    return {h,recovery,request,tickets,allocations,additional,adSourceId,adCloseId,reopenId,heartbeatId,root,traces,deps,sessions,intent:(sequence=1,ticketId=tickets[0])=>({auditId,expectedEpoch:1,operationId:`proof-capsule-${String(sequence).padStart(8,'0')}`,expectedSequence:sequence,component:'forest-ticket',sourceId:ticketId})};
 }
 const unchanged=async(f,operation,pattern)=>{const before=copy([...f.h.data]),writes=f.h.writes;await assert.rejects(operation,pattern);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);};
 function capsule(f,input){const receipt=f.h.data.get(f.root+'/patrolProofPages/'+input.operationId);
@@ -151,6 +155,26 @@ test('true twenty Forest battles, Lv10 and slot2 current loss capture original b
     assert(!f.traces.at(-1).paths.some(path=>path===f.h.root+'/simulatedAdSources/'+f.adSourceId||path===f.h.root+'/modeTimeEvents/'+f.adSourceId));
     for(const [path,row] of originalSources)assert.deepEqual(f.h.data.get(path),row);
     assert.equal(f.h.data.get(f.root+'/proofState/current').nextSequence,33);
+    const present=new Set([...union,...adSaved.payload.documents.filter(row=>row.exists).map(row=>row.path)]);
+    const priorAbsences=new Set();
+    for(const row of f.h.data.values())if(row.kind==='canonical-recovery-proof-page'){
+        const chunks=row.chunkSha256s.map((_,index)=>f.h.data.get(f.root+'/proofPayloadChunks/'+row.operationId+'_'+String(index).padStart(2,'0')).payloadBytes);
+        for(const dependency of decodeProofPayload(Buffer.concat(chunks)).documents)if(!dependency.exists)priorAbsences.add(dependency.path);
+    }
+    const modeInput={...f.intent(33),component:'mode-nonvalue-event',sourceId:f.reopenId};
+    const modeResult=await f.recovery.captureProof(f.request(),modeInput),modeSaved=capsule(f,modeInput),modeTrace=f.traces.at(-1);
+    assert.equal(modeResult.component,'mode-nonvalue-event');
+    assert.deepEqual(modeSaved.payload.documents.filter(row=>row.exists&&!present.has(row.path)),[],'original reopen is already present in Forest lineage');
+    assert.deepEqual(modeSaved.payload.documents.filter(row=>!row.exists&&!priorAbsences.has(row.path)).map(row=>row.path).sort(),
+        ['operations','ledgerEntries','grantOperations'].map(name=>f.h.root+'/'+name+'/'+f.reopenId).sort());
+    assert(modeTrace.paths.slice(modeTrace.paths.indexOf(f.h.root+'/modeTimeEvents/'+f.reopenId)).length<=21);
+    assert(modeTrace.reads<=pageCount+37);assert.equal(modeTrace.queries,1);assert(modeTrace.writes<=10);
+    const beforeModeRetry=copy([...f.h.data]);assert.equal((await f.recovery.captureProof(f.request(),modeInput)).unchanged,true);assert.deepEqual([...f.h.data],beforeModeRetry);
+    assert(!f.traces.at(-1).paths.some(path=>['modeTimeEvents','operations','ledgerEntries','grantOperations'].some(name=>path===f.h.root+'/'+name+'/'+f.reopenId)));
+    for(const [path,row] of originalSources)assert.deepEqual(f.h.data.get(path),row);
+    for(const flag of ['authoritativeStateReady','candidateProofValid','trustedCaptureVerified','restoreAuthorized'])assert.equal(modeResult[flag],false);
+    assert.equal(f.h.data.get(f.root+'/proofState/current').nextSequence,34);
+
 
 
 
@@ -360,7 +384,7 @@ test('legacy schema1 Forest retains original hashes and bytes through unified AP
     assert.equal(typeof f.recovery.capturePatrolProof,'undefined','old test-only API is removed instead of wrapped');
     assert.equal((await f.recovery.captureProof(f.request(),input)).unchanged,true);assert.deepEqual([...f.h.data],before);
     assert.deepEqual(capsule(f,input).bytes,legacy.bytes);assert.deepEqual(capsule(f,input).receipt,legacy.receipt);
-    for(const component of ['exp-allocation','additional-character-sources','simulated-ad-source'])await unchanged(f,()=>f.recovery.captureProof(f.request(),{...f.intent(2),component,sourceId:'legacy-source-operation-01'}),/new audit/);
+    for(const component of ['exp-allocation','additional-character-sources','simulated-ad-source','mode-nonvalue-event'])await unchanged(f,()=>f.recovery.captureProof(f.request(),{...f.intent(2),component,sourceId:'legacy-source-operation-01'}),/new audit/);
     const next=f.intent(2,f.tickets[1]);await f.recovery.captureProof(f.request(),next);
     assert.equal(capsule(f,next).receipt.schemaVersion,1);assert.equal(capsule(f,next).payload.ticketId,next.sourceId);
     assert.equal(f.h.data.get(f.root+'/proofState/current').schemaVersion,1);
@@ -539,4 +563,64 @@ test('simulated-ad source identity, original event chains and economic collision
         await unchanged(f,()=>f.recovery.captureProof(f.request(),input),/chunk differs/);f.h.data.set(path,chunk);
         f.h.advance(61000);await unchanged(f,()=>f.recovery.captureProof(f.request(),input),/approval/);
     }
+});
+
+
+test('non-value mode component accepts original v1 reopen, heartbeat and ad lifecycle with no new entitlement',async()=>{
+    const f=await fixture({battles:1,three:false,adStatus:'abandoned',zeroHeartbeat:true,historicalSession:true});
+    const original=copy([...f.h.data]),sources=[f.reopenId,f.heartbeatId,f.adSourceId,f.adCloseId];
+    const pages=[...f.h.data.keys()].filter(path=>path.startsWith(f.root+'/inventoryPages/')).length;
+    for(const [index,sourceId] of sources.entries()){
+        const input={...f.intent(index+1),component:'mode-nonvalue-event',sourceId},result=await f.recovery.captureProof(f.request(),input),trace=f.traces.at(-1);
+        const unitReads=trace.paths.slice(trace.paths.indexOf(f.h.root+'/modeTimeEvents/'+sourceId)).length;
+        assert(unitReads<=21);assert.equal(trace.reads,pages+(index===0?17:16)+unitReads);assert(trace.reads<=pages+(index===0?38:37));
+        assert.equal(trace.queries,index===0?3:1);assert(trace.writes<=10);
+        const saved=capsule(f,input);assert.equal(saved.payload.component,'mode-nonvalue-event');
+        const event=f.h.data.get(f.h.root+'/modeTimeEvents/'+sourceId);assert.equal(event.schemaVersion,1);assert.equal(event.modeChanged,false);
+        assert.deepEqual(saved.payload.documents.filter(row=>!row.exists&&['operations','ledgerEntries','grantOperations'].some(name=>row.path===f.h.root+'/'+name+'/'+sourceId)).map(row=>row.path).sort(),
+            ['operations','ledgerEntries','grantOperations'].map(name=>f.h.root+'/'+name+'/'+sourceId).sort());
+        const before=copy([...f.h.data]);assert.equal((await f.recovery.captureProof(f.request(),input)).unchanged,true);assert.deepEqual([...f.h.data],before);
+        assert(!f.traces.at(-1).paths.some(path=>['modeTimeEvents','operations','ledgerEntries','grantOperations'].some(name=>path===f.h.root+'/'+name+'/'+sourceId)));
+        for(const flag of ['authoritativeStateReady','candidateProofValid','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
+    }
+    for(const [path,row] of original)assert.deepEqual(f.h.data.get(path),row);
+});
+
+
+test('non-value mode source guard and original predecessor/ad/economic proof fail closed, with atomic capture and chunk retry',async()=>{
+    const f=await fixture({battles:1,three:false,adStatus:'abandoned',zeroHeartbeat:true,rested:true});
+    const sourceId=f.adCloseId,input={...f.intent(),component:'mode-nonvalue-event',sourceId},eventPath=f.h.root+'/modeTimeEvents/'+sourceId;
+    const event=f.h.data.get(eventPath),predecessor=f.h.root+'/modeTimeEvents/'+event.beforeHead.lastOperationId;
+    const excluded=[...f.h.data].filter(([path,row])=>path.startsWith(f.h.root+'/modeTimeEvents/')&&(row.schemaVersion===2||row.modeChanged===true));
+    assert(excluded.some(([,row])=>row.schemaVersion===1&&row.modeChanged===true));assert(excluded.some(([,row])=>row.schemaVersion===2));
+    for(const [path] of excluded)await unchanged(f,()=>f.recovery.captureProof(f.request(),{...input,sourceId:path.split('/').at(-1)}),/kind or identity/);
+    for(const fault of ['missing','identity','uid','schema','kind','value','hash','source','predecessor','ad','operation','ledger','grant']){
+        const bad=createCanonicalCurrentRecovery({...f.deps,runRecoveryAuditMaintenance:(req,id,operation)=>
+            f.deps.runRecoveryAuditMaintenance(req,id,(tx,session)=>operation({...tx,get:async reference=>{
+                const snap=await tx.get(reference);if(snap.docs)return snap;let raw=snap.data(),exists=snap.exists;
+                if(reference.path===eventPath){
+                    if(fault==='missing')exists=false;
+                    if(fault==='identity')raw.operationId='foreign-mode-operation-0001';
+                    if(fault==='uid')raw.ownerUid='foreign-owner';
+                    if(fault==='schema')raw.schemaVersion=2;
+                    if(fault==='kind')raw.kind='unknown-mode-kind';
+                    if(fault==='value')raw.modeChanged=true;
+                    if(fault==='hash')raw.sha256='f'.repeat(64);
+                    if(fault==='source')raw.sourceSnapshotSha256='f'.repeat(64);
+                }
+                if(reference.path===predecessor&&fault==='predecessor')exists=false;
+                if(reference.path===f.h.root+'/simulatedAdSources/'+f.adSourceId&&fault==='ad')raw.ownerUid='foreign-ad-owner';
+                const economic={operation:'operations',ledger:'ledgerEntries',grant:'grantOperations'}[fault];
+                if(economic&&reference.path===f.h.root+'/'+economic+'/'+sourceId){exists=true;raw={ownerUid:f.h.uid};}
+                return {...snap,exists,data:()=>raw,get:key=>key.split('.').reduce((value,part)=>value?.[part],raw)};
+            }},session))});
+        await unchanged(f,()=>bad.captureProof(f.request(),input),error=>error.code==='data-loss');
+    }
+    f.h.abortNext();await unchanged(f,()=>f.recovery.captureProof(f.request(),input),/rollback/);
+    const result=await Promise.all([f.recovery.captureProof(f.request(),input),f.recovery.captureProof(f.request(),input)]);
+    assert.deepEqual(result.map(row=>row.unchanged).sort(),[false,true]);
+    await unchanged(f,()=>f.recovery.captureProof(f.request(),{...input,component:'forest-ticket',sourceId:f.tickets[0]}),/receipt differs/);
+    const path=f.root+'/proofPayloadChunks/'+input.operationId+'_00',original=copy(f.h.data.get(path));f.h.data.delete(path);
+    await unchanged(f,()=>f.recovery.captureProof(f.request(),input),/shape/);assert.equal(f.h.data.has(path),false);f.h.data.set(path,original);
+    const before=copy([...f.h.data]);assert.equal((await f.recovery.captureProof(f.request(),input)).unchanged,true);assert.deepEqual([...f.h.data],before);
 });

@@ -4068,6 +4068,13 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.ok(attempts.slice(adReplayStart).every(attempt=>!attempt.paths.some(path=>path===h.root.collection("simulatedAdSources").doc(adSourceId).path||
         path===h.root.collection("modeTimeEvents").doc(adSourceId).path||path===h.root.collection("modeTimeEvents").doc(adCloseId).path)),
         "Simulated-ad retry must replay original chunks without live source/event reads");
+    const originalReopen=(await h.root.collection("modeTimeEvents").where("intent.action","==","reopen").limit(1).get()).docs[0];
+    assert.ok(originalReopen);assert.equal(originalReopen.get("schemaVersion"),1);assert.equal(originalReopen.get("modeChanged"),false);
+    const modeInput={...input,operationId:"proof-sdk-mode-capture-operation1",expectedSequence:7,component:"mode-nonvalue-event",sourceId:originalReopen.id};
+    assert.equal((await measure(()=>recovery.captureProof(h.request(),modeInput))).component,"mode-nonvalue-event");
+    const modeReplayStart=attempts.length;assert.equal((await measure(()=>recovery.captureProof(h.request(),modeInput),{retry:true})).unchanged,true);
+    assert.ok(attempts.slice(modeReplayStart).every(attempt=>!attempt.paths.some(path=>["modeTimeEvents","operations","ledgerEntries","grantOperations"].some(name=>
+        path===h.root.collection(name).doc(originalReopen.id).path))),"Non-value mode retry must use original chunks without live source/economic reads");
     assert.deepEqual(await Promise.all([run.get(),fence.get()]).then(rows=>rows.map(row)),controls);
     // Asset/current/history versions cannot be changed by a proof-only capture.
     assert.deepEqual(await h.capture(),assets);
@@ -4088,7 +4095,7 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.equal(restoredMetadata.typedDataSha256,originalMetadata.typedDataSha256);
     assert.equal(restoredMetadata.typedDataByteLength,originalMetadata.typedDataByteLength);
     assert.notDeepEqual(stamp(restoredTicket.updateTime),stamp(changedTicket.updateTime));
-    const changedInput={...input,operationId:"proof-sdk-version-changed-01",expectedSequence:7,sourceId:changedTicket.id};
+    const changedInput={...input,operationId:"proof-sdk-version-changed-01",expectedSequence:8,sourceId:changedTicket.id};
     let changedStart=attempts.length;
     await assert.rejects(()=>recovery.captureProof(h.request(),changedInput));
     assert.ok(attempts.slice(changedStart).every(attempt=>attempt.writes===0));

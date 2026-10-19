@@ -426,7 +426,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
            pages.at(-1)?.row.operationId!==state.lastPageOperationId)fail("data-loss","Forest inventory terminal or membership differs.");
         return index;
     }
-    const proofComponent=value=>value==="forest-ticket"||value==="exp-allocation"||value==="additional-character-sources"||value==="simulated-ad-source";
+    const proofComponent=value=>value==="forest-ticket"||value==="exp-allocation"||value==="additional-character-sources"||value==="simulated-ad-source"||value==="mode-nonvalue-event";
     const proofKind=(version,suffix)=>"canonical-recovery-"+(version===1?"patrol-":"")+"proof-"+suffix;
     const proofTarget=(version,component,sourceId)=>version===1?{ticketId:sourceId}:{component,sourceId};
     const proofIntent=(version,args)=>version===1?{action:"capture-patrol-proof",auditId:args.auditId,
@@ -507,6 +507,12 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                source.get("kind")!=="simulated-element-box-ad"||source.get("ownerUid")!==uid)
                 fail("data-loss","Simulated-ad proof source kind or identity differs.");
             await modeEvidence.verifyRetainedSource(kernel,root,uid,records.account,source,revision);
+        }else if(component==="mode-nonvalue-event"){
+            const event=await kernel.get(root.collection("modeTimeEvents").doc(sourceId));
+            if(!event.exists||event.id!==sourceId||event.get("operationId")!==sourceId||event.get("schemaVersion")!==1||
+               event.get("kind")!=="account-mode-time"||event.get("ownerUid")!==uid||event.get("modeChanged")!==false)
+                fail("data-loss","Non-value mode proof source kind or identity differs.");
+            await modeEvidence.verifyRetainedNonValueEvent(kernel,root,uid,records.account,event,revision);
         }else fail("invalid-argument","Unsupported proof component.");
     }
     async function captureProof(request,args){
