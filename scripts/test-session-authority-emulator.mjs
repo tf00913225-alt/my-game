@@ -3908,7 +3908,7 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
 // Reuse the genuine repeated-Forest/Lv10/second-character actor above. This
 // segment captures proof only; it cannot publish, restore or credit assets.
 {
-    const {recoveryAuditNamespaces,decodePatrolProofPayload,PATROL_PROOF_LIMITS}=require("../functions/src/recovery-audit-artifact.js");
+    const {recoveryAuditNamespaces,decodePatrolProofPayload,inventoryDocumentMetadata,PATROL_PROOF_LIMITS}=require("../functions/src/recovery-audit-artifact.js");
     const {createCanonicalPatrolSettlement}=require("../functions/src/canonical-patrol-settlement.js");
     const h=patrolProofSdkFixture;assert.ok(h);
     let clock=h.clock;
@@ -4045,10 +4045,23 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.deepEqual(await Promise.all([run.get(),fence.get()]).then(rows=>rows.map(row)),controls);
     // Asset/current/history versions cannot be changed by a proof-only capture.
     assert.deepEqual(await h.capture(),assets);
-    // Rewrite identical test-only raw bytes after inventory: updateTime alone
-    // must invalidate the source seal even though the semantic ticket hash agrees.
-    const changedTicket=originalTickets.docs[2];
-    await changedTicket.ref.update({ownerUid:h.uid});
+    // A same-value update may be a no-op. Force a real isolated metadata
+    // change, then restore exact original data before testing the version seal.
+    const changedTicket=originalTickets.docs[2],namespace=h.root.collection("patrolTickets").path;
+    const originalData=changedTicket.data(),originalMetadata=inventoryDocumentMetadata(changedTicket,namespace);
+    const stamp=value=>({seconds:value.seconds,nanoseconds:value.nanoseconds});
+    assert.ok(originalData.createdAt instanceof Timestamp);
+    await changedTicket.ref.update({createdAt:Timestamp.fromMillis(originalData.createdAt.toMillis()+1)});
+    const intermediate=await changedTicket.ref.get(),intermediateMetadata=inventoryDocumentMetadata(intermediate,namespace);
+    assert.notDeepEqual(intermediate.data(),originalData);
+    assert.notEqual(intermediateMetadata.typedDataSha256,originalMetadata.typedDataSha256);
+    assert.notDeepEqual(stamp(intermediate.updateTime),stamp(changedTicket.updateTime));
+    await changedTicket.ref.set(originalData);
+    const restoredTicket=await changedTicket.ref.get(),restoredMetadata=inventoryDocumentMetadata(restoredTicket,namespace);
+    assert.deepEqual(restoredTicket.data(),originalData);
+    assert.equal(restoredMetadata.typedDataSha256,originalMetadata.typedDataSha256);
+    assert.equal(restoredMetadata.typedDataByteLength,originalMetadata.typedDataByteLength);
+    assert.notDeepEqual(stamp(restoredTicket.updateTime),stamp(changedTicket.updateTime));
     const changedInput={...input,operationId:"proof-sdk-version-changed-01",expectedSequence:4,ticketId:changedTicket.id};
     let changedStart=attempts.length;
     await assert.rejects(()=>recovery.capturePatrolProof(h.request(),changedInput));
