@@ -4,6 +4,30 @@ import os from 'node:os';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import test from 'node:test';
+import http from 'node:http';
+import {waitJson} from '../.github/scripts/runtime-browser-qa-support.mjs';
+
+test('failed DevTools fetch retains direct HTTP evidence without turning failure into success',async()=>{
+    const server=http.createServer((request,response)=>{response.setHeader('Content-Type','application/json');response.end(JSON.stringify([{type:'page'}]));});
+    await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+    const originalFetch=globalThis.fetch;
+    try{
+        globalThis.fetch=async()=>{throw Object.assign(new Error('injected fetch refusal'),{code:'ECONNREFUSED'});};
+        await assert.rejects(waitJson('http://127.0.0.1:'+server.address().port+'/json/list',{timeoutMs:1}),error=>{
+            assert.equal(error.message,'injected fetch refusal');
+            assert.deepEqual(error.devToolsDiagnostics.directHttp,{status:200,pageTargets:1});
+            return true;
+        });
+    }finally{globalThis.fetch=originalFetch;await new Promise(resolve=>server.close(resolve));}
+});
+
+test('unavailable DevTools listener remains a failure with direct connection evidence',async()=>{
+    const server=http.createServer();await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+    const port=server.address().port;await new Promise(resolve=>server.close(resolve));
+    await assert.rejects(waitJson('http://127.0.0.1:'+port+'/json/list',{timeoutMs:1}),error=>{
+        assert.equal(error.devToolsDiagnostics.directHttp.error,'ECONNREFUSED');return true;
+    });
+});
 
 test('terminal visual QA retains failed Chrome process evidence before CDP exists',()=>{
     const root=fs.mkdtempSync(path.join(os.tmpdir(),'ci-terminal-chrome-evidence-'));

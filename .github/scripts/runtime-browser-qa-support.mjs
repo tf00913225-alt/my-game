@@ -104,13 +104,60 @@ async function collectStartupFailure(cdp,context){
     return evidence;
 }
 
-function waitJson(url){
+async function collectDevToolsFailure(url){
+    const endpoint=new URL(url);
+    const result={endpoint:endpoint.origin+endpoint.pathname,platform:process.platform,node:process.version};
+    if(!['127.0.0.1','localhost','[::1]'].includes(endpoint.hostname)||endpoint.username||endpoint.password){return result;}
+    result.directHttp=await new Promise(resolve=>{
+        const request=http.get(endpoint,response=>{
+            let body='';response.setEncoding('utf8');
+            response.on('data',chunk=>{body=(body+chunk).slice(0,8192);});
+            response.on('end',()=>{let data;try{data=JSON.parse(body);}catch{}
+                resolve({status:response.statusCode,pageTargets:Array.isArray(data)?data.filter(p=>p.type==='page').length:null});});
+        });
+        request.setTimeout(1000,()=>request.destroy(new Error('direct HTTP diagnostic timeout')));
+        request.on('error',error=>resolve({error:error.code||error.message}));
+    });
+    result.proxyEnvironment=Object.fromEntries(['HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','NODE_USE_ENV_PROXY'].map(key=>[key,!!process.env[key]]));
+    if(process.platform==='linux'){
+        const ps=spawnSync('ps',['-eo','pid,ppid,stat,etime,comm'],{encoding:'utf8',timeout:2000});
+        const processes=(ps.stdout||'').split('\n').filter(line=>/chrome|chromium|crashpad/i.test(line));
+        result.processCount=processes.length;
+        result.processes=processes.slice(0,40);
+        result.chrome=result.processes.map(line=>{
+            const pid=line.trim().split(/\s+/)[0],entry={pid};
+            if(!/^\d+$/.test(pid))return entry;
+            try{entry.executable=fs.readlinkSync('/proc/'+pid+'/exe');}catch{}
+            try{entry.waitChannel=fs.readFileSync('/proc/'+pid+'/wchan','utf8').trim();}catch{}
+            try{entry.launch=fs.readFileSync('/proc/'+pid+'/cmdline','utf8').split('\0').filter(arg=>/^--(remote-debugging|user-data-dir|headless)/.test(arg));}catch{}
+            return entry;
+        });
+        const sockets=spawnSync('ss',['-ltnp'],{encoding:'utf8',timeout:2000});
+        result.listeners=(sockets.stdout||'').split('\n').filter(line=>line.includes(':'+endpoint.port+' ')||/chrome|chromium/i.test(line)).slice(0,20);
+        try{result.memory=fs.readFileSync('/proc/meminfo','utf8').split('\n').filter(line=>/^(MemAvailable|SwapFree):/.test(line));}catch{}
+        result.cgroup={};
+        for(const key of ['pids.current','pids.max','memory.current','memory.max']){try{result.cgroup[key]=fs.readFileSync('/sys/fs/cgroup/'+key,'utf8').trim();}catch{}}
+    }
+    return result;
+}
+
+function waitJson(url,{timeoutMs=15000}={}){
     return new Promise((resolve,reject)=>{
         const started=Date.now();
-        const poll=()=>fetch(url).then(r=>r.json()).then(resolve).catch(error=>{
-            if(Date.now()-started>15000){ reject(error); }
+        let attempts=0;
+        const poll=()=>{attempts++;return fetch(url).then(r=>r.json()).then(data=>{
+            if(attempts>1){const endpoint=new URL(url);console.log('DevTools ready: '+JSON.stringify({endpoint:endpoint.origin+endpoint.pathname,elapsedMs:Date.now()-started,attempts}));}
+            resolve(data);
+        }).catch(error=>{
+            if(Date.now()-started>timeoutMs){
+                collectDevToolsFailure(url).then(diagnostics=>{
+                    error.devToolsDiagnostics=diagnostics;
+                    console.error('DevTools connection failure diagnostics: '+JSON.stringify(diagnostics));
+                    reject(error);
+                },()=>reject(error));
+            }
             else{ setTimeout(poll,80); }
-        });
+        });};
         poll();
     });
 }
