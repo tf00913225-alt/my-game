@@ -7,6 +7,63 @@ import test from 'node:test';
 import http from 'node:http';
 import {waitJson} from '../.github/scripts/runtime-browser-qa-support.mjs';
 
+for(const phase of ['headers','JSON body']){
+    test('DevTools deadline aborts stalled '+phase,async()=>{
+        let requests=0;
+        const sockets=new Set();
+        const server=http.createServer((request,response)=>{
+            requests++;
+            if(phase==='JSON body'){
+                response.writeHead(200,{'Content-Type':'application/json'});
+                response.flushHeaders();response.write('[{');
+            }
+        });
+        server.on('connection',socket=>{sockets.add(socket);socket.on('close',()=>sockets.delete(socket));});
+        await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+        let watchdog;
+        try{
+            const probe=waitJson('http://127.0.0.1:'+server.address().port+'/json/list',{timeoutMs:100});
+            await assert.rejects(Promise.race([probe,new Promise((_,reject)=>{
+                watchdog=setTimeout(()=>reject(new Error('test watchdog: probe remained unbounded')),2500);
+            })]),error=>{
+                assert.equal(error.code,'ETIMEDOUT');
+                assert.match(error.devToolsDiagnostics.directHttp.error,/diagnostic timeout/);
+                return true;
+            });
+            assert.ok(requests>=2,'primary and failure diagnostic must reach the isolated server');
+        }finally{
+            clearTimeout(watchdog);for(const socket of sockets)socket.destroy();
+            await new Promise(resolve=>server.close(resolve));
+        }
+    });
+}
+
+test('DevTools deadline retains normal JSON success',async()=>{
+    const server=http.createServer((request,response)=>response.end(JSON.stringify([{type:'page',id:'real-response'}])));
+    await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+    try{
+        assert.deepEqual(await waitJson('http://127.0.0.1:'+server.address().port+'/json/list'),[{type:'page',id:'real-response'}]);
+    }finally{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
+});
+
+test('interrupted diagnostic response cannot leave startup failure pending',async()=>{
+    const server=http.createServer((request,response)=>{
+        response.writeHead(200,{'Content-Type':'application/json'});response.flushHeaders();response.write('[{');
+        setTimeout(()=>response.destroy(),15);
+    });
+    await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+    let watchdog;
+    try{
+        await assert.rejects(Promise.race([
+            waitJson('http://127.0.0.1:'+server.address().port+'/json/list',{timeoutMs:50}),
+            new Promise((_,reject)=>{watchdog=setTimeout(()=>reject(new Error('test watchdog: interrupted diagnostic remained pending')),2500);})
+        ]),error=>{
+            assert.ok(error.devToolsDiagnostics,'startup failure retains diagnostics');
+            assert.match(error.devToolsDiagnostics.directHttp.error,/aborted|ECONNRESET/);return true;
+        });
+    }finally{clearTimeout(watchdog);server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
+});
+
 test('failed DevTools fetch retains direct HTTP evidence without turning failure into success',async()=>{
     const server=http.createServer((request,response)=>{response.setHeader('Content-Type','application/json');response.end(JSON.stringify([{type:'page'}]));});
     await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));

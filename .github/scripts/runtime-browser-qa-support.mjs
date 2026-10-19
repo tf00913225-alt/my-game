@@ -109,14 +109,21 @@ async function collectDevToolsFailure(url){
     const result={endpoint:endpoint.origin+endpoint.pathname,platform:process.platform,node:process.version};
     if(!['127.0.0.1','localhost','[::1]'].includes(endpoint.hostname)||endpoint.username||endpoint.password){return result;}
     result.directHttp=await new Promise(resolve=>{
+        let settled=false;
+        const finish=value=>{if(settled)return;settled=true;clearTimeout(deadline);resolve(value);};
+        const deadline=setTimeout(()=>{
+            finish({error:'direct HTTP diagnostic timeout'});
+            request.destroy();
+        },1000);
         const request=http.get(endpoint,response=>{
             let body='';response.setEncoding('utf8');
             response.on('data',chunk=>{body=(body+chunk).slice(0,8192);});
             response.on('end',()=>{let data;try{data=JSON.parse(body);}catch{}
-                resolve({status:response.statusCode,pageTargets:Array.isArray(data)?data.filter(p=>p.type==='page').length:null});});
+                finish({status:response.statusCode,pageTargets:Array.isArray(data)?data.filter(p=>p.type==='page').length:null});});
+            response.once('aborted',()=>finish({error:'direct HTTP diagnostic response aborted'}));
+            response.once('error',error=>finish({error:error.code||error.message}));
         });
-        request.setTimeout(1000,()=>request.destroy(new Error('direct HTTP diagnostic timeout')));
-        request.on('error',error=>resolve({error:error.code||error.message}));
+        request.on('error',error=>finish({error:error.code||error.message}));
     });
     result.proxyEnvironment=Object.fromEntries(['HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','NODE_USE_ENV_PROXY'].map(key=>[key,!!process.env[key]]));
     if(process.platform==='linux'){
@@ -141,25 +148,37 @@ async function collectDevToolsFailure(url){
     return result;
 }
 
-function waitJson(url,{timeoutMs=15000}={}){
-    return new Promise((resolve,reject)=>{
-        const started=Date.now();
-        let attempts=0;
-        const poll=()=>{attempts++;return fetch(url).then(r=>r.json()).then(data=>{
-            if(attempts>1){const endpoint=new URL(url);console.log('DevTools ready: '+JSON.stringify({endpoint:endpoint.origin+endpoint.pathname,elapsedMs:Date.now()-started,attempts}));}
-            resolve(data);
-        }).catch(error=>{
-            if(Date.now()-started>timeoutMs){
-                collectDevToolsFailure(url).then(diagnostics=>{
-                    error.devToolsDiagnostics=diagnostics;
-                    console.error('DevTools connection failure diagnostics: '+JSON.stringify(diagnostics));
-                    reject(error);
-                },()=>reject(error));
+async function waitJson(url,{timeoutMs=15000}={}){
+    const started=Date.now(),controller=new AbortController();
+    const timeout=Object.assign(new Error('DevTools startup probe exceeded its '+timeoutMs+'ms deadline'),{code:'ETIMEDOUT'});
+    const deadline=setTimeout(()=>controller.abort(timeout),timeoutMs);
+    let attempts=0,lastError;
+    try{
+        while(!controller.signal.aborted){
+            attempts++;
+            try{
+                // The same deadline covers response headers AND JSON body.
+                const response=await fetch(url,{signal:controller.signal});
+                const data=await response.json();
+                if(controller.signal.aborted){throw timeout;}
+                if(attempts>1){const endpoint=new URL(url);console.log('DevTools ready: '+JSON.stringify({endpoint:endpoint.origin+endpoint.pathname,elapsedMs:Date.now()-started,attempts}));}
+                return data;
+            }catch(error){
+                if(controller.signal.aborted){
+                    if(lastError&&lastError!==timeout){timeout.cause=lastError;}
+                    else if(error!==timeout){timeout.cause=error;}
+                    lastError=timeout;
+                }else{lastError=error;}
             }
-            else{ setTimeout(poll,80); }
-        });};
-        poll();
-    });
+            if(!controller.signal.aborted){await new Promise(resolve=>setTimeout(resolve,Math.min(80,Math.max(0,timeoutMs-(Date.now()-started)))));}
+        }
+    }finally{clearTimeout(deadline);}
+    const error=lastError||timeout;
+    try{
+        error.devToolsDiagnostics=await collectDevToolsFailure(url);
+        console.error('DevTools connection failure diagnostics: '+JSON.stringify(error.devToolsDiagnostics));
+    }catch{}
+    throw error;
 }
 
 class Cdp{
