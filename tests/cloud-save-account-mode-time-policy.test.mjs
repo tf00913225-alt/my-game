@@ -99,6 +99,20 @@ test('storage boundary alone floors remaining milliseconds and exported constant
         elementBoxRewardMs:28800000,elementBoxMaxMs:115200000});
 });
 
+test('single-win rested consumption preserves the actual Client subtraction and zero-state result',()=>{
+    function previous(battles){
+        if(battles<=0)return {applied:false,remainingBattles:0};
+        battles--;
+        return {applied:true,remainingBattles:battles};
+    }
+    for(const battles of [0,1,2,299,300,-1,undefined,null,NaN,'1','2',false,true]){
+        assert.deepEqual(policy.consumeRestedBattle(battles),previous(battles));
+    }
+    assert.deepEqual(policy.consumeRestedBattle(2),{applied:true,remainingBattles:1});
+    assert.deepEqual(policy.consumeRestedBattle(1),{applied:true,remainingBattles:0});
+    assert.deepEqual(policy.consumeRestedBattle(0),{applied:false,remainingBattles:0});
+});
+
 test('frozen browser and CommonJS exports evaluate and calculate without clock, RNG or persistent state',()=>{
     for(const commonjs of [false,true]){
         const math=Object.create(Math);
@@ -110,11 +124,12 @@ test('frozen browser and CommonJS exports evaluate and calculate without clock, 
         vm.createContext(context);vm.runInContext(source,context);
         const api=commonjs?context.module.exports:context.window.FourSymbolsAccountModeTimePolicy;
         assert.ok(Object.isFrozen(api));assert.ok(Object.isFrozen(api.constants));
-        assert.deepEqual(Object.keys(api).sort(),['constants','accrueRested','grantElementBox','debitElementBox','elementBoxStoredMs'].sort());
+        assert.deepEqual(Object.keys(api).sort(),['constants','accrueRested','grantElementBox','debitElementBox','elementBoxStoredMs','consumeRestedBattle'].sort());
         assert.equal(api.accrueRested(0,0,120000).accepted,1);
         assert.equal(api.grantElementBox(0,8,32),28800000);
         assert.equal(api.debitElementBox(100,.5,true).remainingMs,99.5);
         assert.equal(api.elementBoxStoredMs(99.5),99);
+        assert.equal(api.consumeRestedBattle(2).remainingBattles,1);
         assert.throws(()=>{api.constants.restedMaxBattles=1;},TypeError);
     }
 });

@@ -187,17 +187,13 @@
     };
 
     window.v139TryConsumeRestedBattle=function(){
-        if(restedState.battles<=0){
-            return {applied:false,remainingBattles:0};
-        }
-        restedState.battles--;
+        const consumed=window.FourSymbolsAccountModeTimePolicy.consumeRestedBattle(restedState.battles);
+        if(!consumed.applied){ return consumed; }
+        restedState.battles=consumed.remainingBattles;
         restedState.lastSeenAt=Date.now();
         persistRestedState();
         updateRestedExperienceDisplay();
-        return {
-            applied:true,
-            remainingBattles:restedState.battles
-        };
+        return consumed;
     };
 
     document.addEventListener("visibilitychange",function(){

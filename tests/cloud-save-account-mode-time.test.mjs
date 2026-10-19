@@ -1,93 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
+import {storeHarness,selection,Timestamp,copy} from '../scripts/test-helpers/canonical-store-harness.mjs';
 
 const require=createRequire(import.meta.url);
-const {createCanonicalSourceWriter}=require('../functions/src/canonical-source-writer.js');
 const {createCanonicalAccountModeTime}=require('../functions/src/canonical-account-mode-time.js');
 const {createHeroAcquisition}=require('../functions/src/hero-acquisition.js');
 const {assembleCanonicalSnapshot,claimRecordsDigest,snapshotDigest}=require('../functions/src/canonical-snapshot.js');
 const {createRecoveryArchive}=require('../functions/src/canonical-recovery-archive.js');
 const {createCanonicalRecoveryApproval}=require('../functions/src/canonical-recovery-approval.js');
 const {createCanonicalCurrentRecovery}=require('../functions/src/canonical-current-recovery.js');
-const {createEmptyEnvelope,inspectExistingEnvelope,nextRevision}=require('../functions/src/cloud-save-envelope.js');
-const selection={displayName:'時間測試',element:'fire',gender:'female',
-    attributes:{attack:3,vitality:2,energy:1,intelligence:2,defensePoints:1,agility:1}};
-class Timestamp{
-    constructor(millis){this.millis=millis;Object.freeze(this);}
-    toMillis(){return this.millis;}
-    static fromMillis(millis){return new Timestamp(millis);}
-}
-class HttpsError extends Error{
-    constructor(code,message){super(message);this.code=code;}
-}
-function copy(value){
-    if(value instanceof Timestamp)return value;
-    if(Array.isArray(value))return value.map(copy);
-    if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([key,row])=>[key,copy(row)]));
-    return value;
-}
-function storeHarness(){
-    const uid='account-mode-time-uid';let clock=Date.parse('2026-10-19T00:00:00Z');
-    const save=`users/${uid}/saves/current`,root=`serverUsers/${uid}`;
-    const data=new Map([[save,copy(createEmptyEnvelope(uid,Timestamp.fromMillis(clock)))]]);
-    const field=(row,key)=>key.split('.').reduce((value,part)=>value?.[part],row);
-    const ref=path=>({path,id:path.split('/').at(-1),collection:name=>collection(`${path}/${name}`)});
-    const collection=(path,filters=[],maximum=Infinity,order=null)=>({path,query:true,
-        doc:id=>ref(`${path}/${id}`),limit:max=>collection(path,filters,max,order),
-        where:(key,operator,value)=>{assert.equal(operator,'==');return collection(path,[...filters,[key,value]],maximum,order);},
-        orderBy:(key,direction)=>collection(path,filters,maximum,[key,direction]),filters,maximum,order});
-    const db={collection,doc:ref};let writes=0,commits=0,abort=false;
-    let activeSession='a'.repeat(32);
-    const request=()=>({auth:{uid},data:{uid,session:{sessionId:activeSession}}});
-    async function runProtected(input,operation){
-        if(input?.auth?.uid!==uid||input?.data?.uid!==uid||input?.data?.session?.sessionId!==activeSession){
-            throw new HttpsError('permission-denied','SESSION_REVOKED_OR_UID_MISMATCH');
-        }
-        const pending=[];let startedWrites=false;
-        const snapshot=(path,value)=>({ref:ref(path),id:path.split('/').at(-1),exists:value!==undefined,
-            data:()=>copy(value),get:key=>copy(field(value,key))});
-        const tx={
-            async get(reference){
-                assert.equal(startedWrites,false,'Firestore transactions must finish every read before the first write');
-                if(reference.query){
-                    const entries=[...data].filter(([key,value])=>key.startsWith(reference.path+'/')&&
-                        !key.slice(reference.path.length+1).includes('/')&&
-                        reference.filters.every(([name,expected])=>field(value,name)===expected));
-                    if(reference.order){const [key,direction]=reference.order;
-                        entries.sort((a,b)=>(field(a[1],key)-field(b[1],key))*(direction==='desc'?-1:1));}
-                    const docs=entries.slice(0,reference.maximum).map(([key,value])=>snapshot(key,value));
-                    return {docs,size:docs.length,empty:docs.length===0};
-                }
-                return snapshot(reference.path,data.get(reference.path));
-            },
-            create(reference,value){startedWrites=true;pending.push(['create',reference.path,copy(value)]);},
-            update(reference,value){startedWrites=true;pending.push(['update',reference.path,copy(value)]);},
-            set(reference,value,options){startedWrites=true;pending.push([options?.merge?'update':'set',reference.path,copy(value)]);},
-            delete(reference){startedWrites=true;pending.push(['delete',reference.path]);}
-        };
-        const result=await operation(tx,{uid,sessionId:activeSession});
-        if(abort){abort=false;throw Error('simulated rollback after staged writes');}
-        const next=new Map(data);
-        for(const [kind,path,value] of pending){
-            if(kind==='create'){assert.equal(next.has(path),false,`duplicate document ${path}`);next.set(path,value);}
-            else if(kind==='update'){assert.equal(next.has(path),true,`missing document ${path}`);next.set(path,{...next.get(path),...value});}
-            else if(kind==='set')next.set(path,value);
-            else next.delete(path);
-        }
-        if(pending.length){data.clear();for(const entry of next)data.set(...entry);writes+=pending.length;commits++;}
-        return result;
-    }
-    db.runTransaction=operation=>runProtected(request(),operation);
-    const dependencies={db,Timestamp,FieldValue:{serverTimestamp:()=>Timestamp.fromMillis(clock)},
-        HttpsError,inspectExistingEnvelope,nextRevision,runProtected,now:()=>clock};
-    const initial=createCanonicalSourceWriter(dependencies);
-    return {uid,save,root,data,dependencies,initial,request,
-        setClock:value=>{clock=value;},advance:delta=>{clock+=delta;},
-        setSession:value=>{activeSession=value;},abortNext:()=>{abort=true;},
-        get clock(){return clock;},get writes(){return writes;},get commits(){return commits;},
-        get revision(){return data.get(save).serverRevision;}};
-}
 async function seeded(){
     const h=storeHarness();
     await h.initial.commitInitialSources(h.request(),{operationId:'mode-time-initial-0001',expectedRevision:1,selection});
@@ -412,6 +334,160 @@ test('actual operator approval and current recovery retain mode value evidence t
     assert.deepEqual(snapshot(h),before);assert.equal(h.writes,writes);
 });
 
+// A deliberately small stand-in for the independent Forest evidence Owner.
+// It checks its own test reward and invokes only the mode component reader;
+// it never re-enters mode-current or its source-specific dispatch.
+function withPatrolEvidence(h){
+    let fullProofCalls=0;
+    h.owner=createCanonicalAccountModeTime({...h.dependencies,patrolSettlementEvidenceReadBudget:12,
+        verifyPatrolSettlementEvidence:async context=>{
+            fullProofCalls++;
+            const {tx,root,uid,account,event,receipt,ledger,maxEnvelopeRevision,verifyPatrolModeComponent}=context;
+            await verifyPatrolModeComponent(tx,root,uid,account,event,receipt,ledger,maxEnvelopeRevision);
+            const read=revision=>tx.get(root.collection('recoveryArchives').doc(String(revision)));
+            const [before,after]=await Promise.all([read(event.sourceRevision),read(event.resultRevision)]);
+            assert.equal(after.get('sourceRecords.economy.gold'),before.get('sourceRecords.economy.gold')+11);
+        }});
+    return ()=>fullProofCalls;
+}
+async function settlePatrolModeFixture(h,settlementKind,{memberIndex=settlementKind==='member'?0:null,
+    rollback=false}={}){
+    const operationId=`forest-mode-fixture-${String(++serial).padStart(6,'0')}`;
+    const expectedRevision=h.revision,resultRevision=expectedRevision+1;
+    const before=copy(h.data.get(h.root+'/recoveryArchives/'+h.data.get(h.root+'/account/current').serverRevision).sourceRecords);
+    const sourceRevision=before.account.serverRevision;
+    const sourceSnapshotSha256=h.data.get(h.root+'/playableSnapshots/'+sourceRevision).sha256;
+    if(rollback)h.abortNext();
+    return h.dependencies.runProtected(h.request(),async(tx,session)=>{
+        const root=h.dependencies.db.doc(h.root);
+        const plan=await h.owner.preparePatrolSettlement(tx,{root,uid:h.uid,session,operationId,
+            expectedRevision,expectedSequence:h.data.get(h.root+'/modeTime/current').sequence,
+            sourceRecords:before,sourceSnapshotSha256,serverNow:h.clock,resultRevision,
+            settlementKind,memberIndex,sourceId:`forest-source-fixture-${serial}`});
+        const after=copy(before);
+        for(const rows of Object.values(after))for(const row of Array.isArray(rows)?rows:[rows])row.serverRevision=resultRevision;
+        after.economy.gold+=11;
+        if(settlementKind==='win')after.economy.sharedExp+=plan.mode.rested?588:plan.mode.elementBox?206:294;
+        after.progress.sidecars['element-box-state'].raw=JSON.stringify(plan.modeState.elementBox);
+        after.progress.sidecars['rested-exp-state'].raw=JSON.stringify(plan.modeState.rested);
+        after.claimCheckpoint.claimDigest=claimRecordsDigest(after.claimRecords);
+        const bundle=assembleCanonicalSnapshot(h.uid,resultRevision,after);
+        const settlementCoreSha256=snapshotDigest({operationId,sourceSnapshotSha256,resultSnapshotSha256:bundle.sha256});
+        const {event}=h.owner.writePatrolModeEvidence(tx,plan,{resultRecords:after,
+            resultSnapshotSha256:bundle.sha256,settlementCoreSha256});
+        const pair={schemaVersion:1,kind:'forest-patrol-settlement',ownerUid:h.uid,operationId,
+            sourceRevision,envelopeRevision:expectedRevision,resultRevision,resultEnvelopeRevision:resultRevision,
+            snapshotSha256:bundle.sha256,modeEventSha256:event.sha256,modeHeadSha256:event.headSha256,
+            settlementCoreSha256,createdAt:Timestamp.fromMillis(h.clock)};
+        tx.create(root.collection('operations').doc(operationId),pair);
+        tx.create(root.collection('ledgerEntries').doc(operationId),{...pair,modeDelta:event.delta});
+        for(const [key,collection] of Object.entries({account:'account',economy:'economy',progress:'progress',
+            relicLoadout:'relicLoadout',claimCheckpoint:'claimCheckpoints'})){
+            tx.update(root.collection(collection).doc('current'),{...after[key],
+                ...(key==='account'?{snapshotSha256:bundle.sha256}:{})});
+        }
+        for(const row of after.characters)tx.update(root.collection('characters').doc(row.characterId),{serverRevision:resultRevision});
+        tx.create(root.collection('playableSnapshots').doc(String(resultRevision)),bundle);
+        tx.create(root.collection('recoveryArchives').doc(String(resultRevision)),createRecoveryArchive(h.uid,resultRevision,after,bundle));
+        tx.update(h.dependencies.db.doc(h.save),{serverRevision:resultRevision});
+        return {event,mode:copy(plan.mode),after};
+    });
+}
+
+test('Forest member/win/loss/escape share one canonical transaction and consume rested only on wins',async()=>{
+    const h=await seeded();await presence(h);await presence(h,'rest');h.advance(240000);await presence(h,'resume');
+    const fullProofCalls=withPatrolEvidence(h);
+    const member=await settlePatrolModeFixture(h,'member');
+    assert.equal(member.after.economy.gold,11);assert.equal(member.after.economy.sharedExp,0);
+    assert.equal(member.after.progress.sidecars['rested-exp-state'].raw.includes('"battles":2'),true);
+    assert.equal(member.mode.rested,false);assert.equal(member.event.schemaVersion,2);assert.equal(member.event.modeChanged,false);
+    const win1=await settlePatrolModeFixture(h,'win');
+    assert.equal(win1.mode.rested,true);assert.equal(JSON.parse(win1.after.progress.sidecars['rested-exp-state'].raw).battles,1);
+    const loss=await settlePatrolModeFixture(h,'loss');
+    assert.equal(loss.mode.rested,false);assert.equal(JSON.parse(loss.after.progress.sidecars['rested-exp-state'].raw).battles,1);
+    const escaped=await settlePatrolModeFixture(h,'escape');
+    assert.equal(escaped.mode.rested,false);assert.equal(JSON.parse(escaped.after.progress.sidecars['rested-exp-state'].raw).battles,1);
+    const win2=await settlePatrolModeFixture(h,'win');
+    assert.equal(win2.mode.rested,true);assert.equal(JSON.parse(win2.after.progress.sidecars['rested-exp-state'].raw).battles,0);
+    assert.equal(win2.after.economy.sharedExp,1176);assert.equal(win2.after.economy.gold,55);
+    await presence(h,'heartbeat');
+    assert.ok(fullProofCalls()>=5,'v2 dispatch invokes the independent proof Owner without recursive mode-current');
+});
+
+test('Forest member time debit and winning ElementBox mode exclude rested consumption and roll back atomically',async()=>{
+    const h=await seeded();await presence(h);await presence(h,'rest');h.advance(120000);await presence(h,'resume');
+    await grant(h);await presence(h,'heartbeat','start');withPatrolEvidence(h);h.advance(1000);
+    await refuses(h,()=>settlePatrolModeFixture(h,'member',{rollback:true}),/simulated rollback/);
+    const member=await settlePatrolModeFixture(h,'member');
+    assert.equal(member.mode.elementBox,true);assert.equal(member.event.delta.elementBoxMs,-1000);
+    assert.equal(JSON.parse(member.after.progress.sidecars['rested-exp-state'].raw).battles,1);
+    h.advance(1000);const won=await settlePatrolModeFixture(h,'win');
+    assert.equal(won.mode.elementBox,true);assert.equal(won.mode.rested,false);
+    assert.equal(won.after.economy.sharedExp,206);
+    assert.equal(JSON.parse(won.after.progress.sidecars['rested-exp-state'].raw).battles,1);
+});
+
+test('prepared Forest mode plans cannot be forged, moved across transactions or created while resting',async()=>{
+    const h=await seeded();await presence(h);withPatrolEvidence(h);
+    const before=copy(h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords);
+    const setup=(tx,session)=>h.owner.preparePatrolSettlement(tx,{root:h.dependencies.db.doc(h.root),uid:h.uid,session,
+        operationId:'forest-plan-binding-0001',expectedRevision:h.revision,expectedSequence:h.data.get(h.root+'/modeTime/current').sequence,
+        sourceRecords:before,sourceSnapshotSha256:h.data.get(h.root+'/playableSnapshots/'+h.revision).sha256,
+        serverNow:h.clock,resultRevision:h.revision+1,settlementKind:'win',memberIndex:null,sourceId:'forest-bound-source-0001'});
+    const plan=await h.dependencies.runProtected(h.request(),setup);
+    for(const candidate of [{...plan},plan]){
+        await refuses(h,()=>h.dependencies.runProtected(h.request(),async tx=>{
+            h.owner.writePatrolModeEvidence(tx,candidate,{resultRecords:before,
+                resultSnapshotSha256:'a'.repeat(64),settlementCoreSha256:'b'.repeat(64)});
+        }),error=>error.code==='failed-precondition');
+    }
+    await presence(h,'rest');
+    await refuses(h,()=>settlePatrolModeFixture(h,'win'),error=>error.code==='failed-precondition');
+});
+
+test('v2 current evidence fails closed without its specific Forest verifier and binds original outcome/sequence',async()=>{
+    const h=await seeded();await presence(h);withPatrolEvidence(h);
+    const result=await settlePatrolModeFixture(h,'member');
+    const path=h.root+'/modeTimeEvents/'+result.event.operationId;
+    const valid=copy(h.data.get(path));
+    h.owner=createCanonicalAccountModeTime(h.dependencies);
+    await refuses(h,()=>presence(h,'heartbeat'),error=>error.code==='failed-precondition');
+    withPatrolEvidence(h);
+    for(const field of ['settlementKind','memberIndex','expectedSequence']){
+        const damaged=copy(valid);damaged.intent[field]=field==='settlementKind'?'win':field==='memberIndex'?3:999;
+        h.data.set(path,damaged);
+        await refuses(h,()=>presence(h,'heartbeat'),error=>error.code==='data-loss');
+        h.data.set(path,copy(valid));
+    }
+    await presence(h,'heartbeat');
+});
+
+test('Forest plans bind the live canonical pointer and reject mutation of their public mode projection',async()=>{
+    const h=await seeded();await presence(h);withPatrolEvidence(h);
+    const stale=copy(h.data.get(h.root+'/recoveryArchives/2').sourceRecords);
+    const staleSha=h.data.get(h.root+'/playableSnapshots/2').sha256;
+    advanceUnrelatedCanonicalRevision(h);
+    const prepare=(tx,session,records,hash)=>h.owner.preparePatrolSettlement(tx,{
+        root:h.dependencies.db.doc(h.root),uid:h.uid,session,operationId:'forest-plan-live-source-0001',
+        expectedRevision:h.revision,expectedSequence:h.data.get(h.root+'/modeTime/current').sequence,
+        sourceRecords:records,sourceSnapshotSha256:hash,serverNow:h.clock,resultRevision:h.revision+1,
+        settlementKind:'win',memberIndex:null,sourceId:'forest-live-source-0001'});
+    await refuses(h,()=>h.dependencies.runProtected(h.request(),(tx,session)=>prepare(tx,session,stale,staleSha)),
+        error=>error.code==='data-loss');
+    await refuses(h,()=>h.dependencies.runProtected(h.request(),async(tx,session)=>{
+        const before=copy(h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords);
+        const hash=h.data.get(h.root+'/playableSnapshots/'+h.revision).sha256;
+        const plan=await prepare(tx,session,before,hash);
+        plan.modeState.rested.battles=99;
+        const after=copy(before),next=h.revision+1;
+        for(const rows of Object.values(after))for(const row of Array.isArray(rows)?rows:[rows])row.serverRevision=next;
+        after.progress.sidecars['rested-exp-state'].raw=JSON.stringify(plan.modeState.rested);
+        after.claimCheckpoint.claimDigest=claimRecordsDigest(after.claimRecords);
+        const bundle=assembleCanonicalSnapshot(h.uid,next,after);
+        h.owner.writePatrolModeEvidence(tx,plan,{resultRecords:after,resultSnapshotSha256:bundle.sha256,
+            settlementCoreSha256:'a'.repeat(64)});
+    }),error=>error.code==='data-loss');
+});
 
 test('v1 retained proof derives exact sidecar bytes from canonical archive despite unordered event maps',async()=>{
     const h=await seeded();await presence(h);await presence(h,'rest');h.advance(120000);

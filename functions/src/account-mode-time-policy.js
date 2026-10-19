@@ -38,7 +38,14 @@
     function elementBoxStoredMs(remainingMs){
         return Math.max(0,Math.floor(remainingMs));
     }
-    const api=Object.freeze({constants,accrueRested,grantElementBox,debitElementBox,elementBoxStoredMs});
+    // Exact single-win rule formerly owned by v139TryConsumeRestedBattle.
+    // Eligibility (ordinary win, no ElementBox/dungeon) belongs to the caller.
+    function consumeRestedBattle(battles){
+        if(battles<=0)return {applied:false,remainingBattles:0};
+        return {applied:true,remainingBattles:battles-1};
+    }
+    const api=Object.freeze({constants,accrueRested,grantElementBox,debitElementBox,
+        elementBoxStoredMs,consumeRestedBattle});
     global.FourSymbolsAccountModeTimePolicy=api;
     if(typeof module!=="undefined"&&module.exports){module.exports=api;}
 })(typeof window!=="undefined"?window:globalThis);

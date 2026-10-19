@@ -61,7 +61,9 @@ test("old saved equipment-ticket stacks hydrate to the four supplied raster icon
 });
 
 test("merging a ticket stack refreshes presentation before increasing only its count",()=>{
-    const context=vm.createContext({Math,Number});
+    const context=vm.createContext({Math,Number,window:{
+        FourSymbolsInventoryStackPolicy:require("../functions/src/inventory-stack-policy")
+    }});
     vm.runInContext(`
         const INVENTORY_MAX_STACK_DEFAULT=100;
         const ticketDefinitions=[
