@@ -195,9 +195,9 @@ test('private full-read publication and ACK bind canonical string generation; AC
 test('lost create/ACK responses preserve the original object and exact bytes without overwrite or source replacement',async()=>{
     const f=await preparedFixture(),create=f.io.createOnly;let lost=true;
     f.io.createOnly=async input=>{const result=await create(input);if(lost){lost=false;throw Object.assign(Error('lost response'),{code:'UNKNOWN_COMMIT'});}return result;};
-    const proof=await f.private.publishPreparedCandidate(f.request(),f.prepared),native=f.h.dependencies.db.runTransaction;let loseCommit=true;
-    f.h.dependencies.db.runTransaction=async callback=>{const result=await native(callback);if(loseCommit){loseCommit=false;throw Error('lost ACK response');}return result;};
-    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),/lost ACK/);
+    const proof=await f.private.publishPreparedCandidate(f.request(),f.prepared),native=f.h.dependencies.db.runTransaction,lostError=Error('lost ACK response');let loseCommit=true;
+    f.h.dependencies.db.runTransaction=async callback=>{const result=await native(callback);if(loseCommit){loseCommit=false;throw lostError;}return result;};
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),error=>error===lostError);
     f.h.dependencies.db.runTransaction=native;
     const attempts=f.traces.length;
     await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),/unconsumed/);
@@ -222,14 +222,28 @@ test('metadata, generation, bytes and provider errors cannot ACK, overwrite coll
         assert.equal(f.io.calls.filter(([kind])=>kind==='create').length,1);
     }
     for(const code of ['PERMISSION_DENIED','DEADLINE_EXCEEDED']){
-        const f=await preparedFixture();f.io.createOnly=async()=>{throw Object.assign(Error(code),{code});};
-        await assert.rejects(f.private.publishPreparedCandidate(f.request(),f.prepared),new RegExp(code));
+        const f=await preparedFixture(),failure=Object.assign(Error(code),{code});f.io.createOnly=async()=>{throw failure;};
+        await assert.rejects(f.private.publishPreparedCandidate(f.request(),f.prepared),error=>error===failure);
         assert.equal(f.h.data.get(f.root+'/candidatePublications/'+operationId).status,'prepared');
     }
     const f=await preparedFixture(),proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
     await f.private.ackCandidatePublication(f.request(),f.prepared,proof);
     const row=[...f.io.objects.values()][0];row.metadata.generation='9007199254740994';const writes=f.h.writes;
     await assert.rejects(f.private.publishPreparedCandidate(f.request(),f.prepared),/missing exact generation/);assert.equal(f.h.writes,writes);
+});
+test('create precondition races reuse one original object; unknown commit without an object cannot ACK and retries never rename',async()=>{
+    const f=await preparedFixture();await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    const original=copy([...f.io.objects]),lookup=f.io.lookupMetadata;let first=true;
+    f.io.lookupMetadata=async input=>{if(first){first=false;return null;}return lookup(input);};
+    const proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    assert.deepEqual([...f.io.objects],original);await f.private.ackCandidatePublication(f.request(),f.prepared,proof);
+    const absent=await preparedFixture(),create=absent.io.createOnly;
+    absent.io.createOnly=async()=>{throw Object.assign(Error('unknown commit'),{code:'UNKNOWN_COMMIT'});};
+    await assert.rejects(absent.private.publishPreparedCandidate(absent.request(),absent.prepared),/not available/);
+    assert.equal(absent.io.objects.size,0);assert.equal(absent.h.data.get(absent.root+'/candidatePublications/'+operationId).status,'prepared');
+    absent.io.createOnly=create;
+    await absent.private.ackCandidatePublication(absent.request(),absent.prepared,await absent.private.publishPreparedCandidate(absent.request(),absent.prepared));
+    assert.equal(absent.io.objects.size,1);
 });
 test('ACK rollback and concurrent proofs preserve exact tuple; takeover, expiry and cancel recheck live gates after IO',async()=>{
     const f=await preparedFixture();let a=await f.private.publishPreparedCandidate(f.request(),f.prepared);const b=await f.private.publishPreparedCandidate(f.request(),f.prepared);
