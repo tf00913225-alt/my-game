@@ -3356,7 +3356,37 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
     console.log("Forest repeat checkpoint: takeover completed; checking revoked session and reopening mode.");
     await forestStage("repeat/takeover/old-session-refusal",()=>h.refuses(()=>h.forest.settleTerminal(oldRequest,winInput)));
     await forestStage("repeat/takeover/mode-reopen",()=>h.presence("reopen"));
-    const allocator=createCanonicalExpAllocation(h.deps);
+    const allocator=createCanonicalExpAllocation({...h.deps,
+        runProtected:(request,operation)=>{
+            let attempt=0;
+            return writerSessions.runProtected(request,async(tx,active)=>{
+                const currentAttempt=++attempt;
+                let readSequence=0;
+                // Bind every SDK method to its original transaction. Only get
+                // failures gain context; reads retain their original ordering.
+                const traced=new Proxy(tx,{get(target,key){
+                    if(key!=="get"){
+                        const value=Reflect.get(target,key,target);
+                        return typeof value==="function"?value.bind(target):value;
+                    }
+                    return async(reference,...args)=>{
+                        const sequence=++readSequence;
+                        const kind=typeof reference?.collection==="function"?"document":"query";
+                        const path=typeof reference?.path==="string"?reference.path:
+                            `[${reference?.constructor?.name||"unknown query"}]`;
+                        try{return await target.get(reference,...args);}
+                        catch(cause){
+                            const error=new Error(`Forest allocator transaction attempt ${currentAttempt} read ${sequence} ${kind} ${path}: ${cause.message}`,{cause});
+                            for(const field of ["code","details","detail"]){
+                                if(cause[field]!==undefined)error[field]=cause[field];
+                            }
+                            throw error;
+                        }
+                    };
+                }});
+                return operation(traced,active);
+            });
+        }});
     async function allocateAvailable(){
         for(let guard=0;guard<9;guard++){
             const current=(await h.root.collection("characters").doc(charId).get()).get("state");
