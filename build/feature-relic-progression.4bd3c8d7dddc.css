@@ -151,8 +151,8 @@
     background:linear-gradient(180deg,rgba(50,37,21,.86),rgba(18,15,11,.94));
 }
 #game-stage .tower-relic-reward-guide h3{ margin:0 0 calc(5 * var(--ui-length-unit,1px));color:#f0cc79;font-size:calc(18 * var(--ui-length-unit,1px));line-height:1.3; }
-#game-stage .tower-relic-reward-guide p{ margin:0;color:#d2c2a5;font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.48; }
-#game-stage .tower-relic-reward-guide small{ display:block;margin-top:calc(5 * var(--ui-length-unit,1px));color:#ab9c83;font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.45; }
+#game-stage .tower-relic-reward-guide p{ margin:0;color:#d2c2a5;font-size:calc(16 * var(--ui-length-unit,1px));line-height:1.48; }
+#game-stage .tower-relic-reward-guide small{ display:block;margin-top:calc(5 * var(--ui-length-unit,1px));color:#ab9c83;font-size:calc(16 * var(--ui-length-unit,1px));line-height:1.45; }
 
 
 #game-ui #homeFeatureModal.team-relic-modal .relic-progression-detail-panel [data-relic-source]{font-size:48px;min-height:156px;}

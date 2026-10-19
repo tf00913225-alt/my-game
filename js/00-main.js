@@ -27073,7 +27073,7 @@ function renderQuestCompletionPanelContent(
             '<div class="quest-completion-fill" style="width:'+percent+'%;"></div>'+
         '</div>'+
 
-        '<div class="quest-completion-milestones">'+
+        '<p class="quest-scroll-hint">左右滑動查看全部獎勵</p><div class="quest-completion-milestones" data-scroll-owner="x">'+
             milestones+
         '</div>'
     );

@@ -79,6 +79,14 @@
         if(from==="current"||to==="current"){ return "current"; }
         return to==="planned"?"planned":"locked";
     }
+    function mapDisplayY(view,value){
+        const rows=Array.from(new Set(view.chapter.nodes.map(node=>Number(node.y)))).sort((a,b)=>a-b);
+        const y=Number(value),upper=rows.findIndex(row=>row>=y);
+        if(upper<0){ return 96; }
+        if(upper===0){ return 4; }
+        const fraction=(y-rows[upper-1])/(rows[upper]-rows[upper-1]);
+        return 4+(upper-1+fraction)*92/Math.max(1,rows.length-1);
+    }
     function mapRoadSvg(view){
         const routes=Array.isArray(view.chapter.routes)?view.chapter.routes:[];
         const nodes=new Map(view.chapter.nodes.map(node=>[node.id,node]));
@@ -86,15 +94,15 @@
             const from=nodes.get(route.from),to=nodes.get(route.to);
             if(!from||!to){ return ""; }
             const state=routeState(view,route),midX=Number(route.bendX||((Number(from.x)+Number(to.x))/2)),midY=Number(route.bendY||((Number(from.y)+Number(to.y))/2));
-            return '<path class="adventure-route adventure-route-'+state+'" d="M '+Number(from.x*10.8)+' '+Number(from.y*19.2)+' Q '+(midX*10.8)+' '+(midY*19.2)+' '+Number(to.x*10.8)+' '+Number(to.y*19.2)+'"/>';
+            return '<path class="adventure-route adventure-route-'+state+'" d="M '+Number(from.x*10.8)+' '+Number(mapDisplayY(view,from.y)*19.2)+' Q '+(midX*10.8)+' '+(mapDisplayY(view,midY)*19.2)+' '+Number(to.x*10.8)+' '+Number(mapDisplayY(view,to.y)*19.2)+'"/>';
         }).join("");
         return '<svg class="adventure-road-layer" viewBox="0 0 1080 1920" preserveAspectRatio="none" aria-hidden="true">'+paths+'</svg>';
     }
 
-    function mapNodeButton(node,status,hidden){
+    function mapNodeButton(view,node,status,hidden){
         const locked=status==="locked"||status==="hidden";
         if(status==="hidden"){ return ""; }
-        const style='style="--node-x:'+Number(node.x||50)+'%;--node-y:'+Number(node.y||50)+'%;"';
+        const style='style="--node-x:'+Number(node.x||50)+'%;--node-y:'+mapDisplayY(view,node.y||50)+'%;"';
         const type=hidden&&status==="hidden-available"?"hidden":node.type;
         const badge=status==="reward-unclaimed"?'<span class="adventure-node-reward-badge">獎</span>':
             status==="objective-ready"?'<span class="adventure-node-ready-badge">✓</span>':"";
@@ -123,8 +131,8 @@
 
     function renderMap(view){
         const chapter=view.chapter,state=view.state;
-        const mainNodes=chapter.nodes.map(node=>mapNodeButton(node,API().getNodeStatus(node.id),false)).join("");
-        const hiddenNodes=(chapter.hiddenNodes||[]).map(node=>mapNodeButton(node,API().getNodeStatus(node.id),true)).join("");
+        const mainNodes=chapter.nodes.map(node=>mapNodeButton(view,node,API().getNodeStatus(node.id),false)).join("");
+        const hiddenNodes=(chapter.hiddenNodes||[]).map(node=>mapNodeButton(view,node,API().getNodeStatus(node.id),true)).join("");
         const branch=chapter.nodes.find(node=>node.type==="branch");
         const selected=branch&&state.branchSelections[branch.branchId];
         const backtrack=state.chapterCompleted?'<span class="adventure-backtrack-mark" aria-label="回溯探索已開放">↩ 回溯可走</span>':"";
@@ -337,7 +345,13 @@
         const title=root.querySelector("#adventureHeaderTitle"),meta=root.querySelector("#adventureHeaderMeta");
         if(title){ title.textContent=view.chapter.title; }
         if(meta){ meta.innerHTML='<span>建議 Lv.'+esc(view.chapter.suggestedLevel)+'</span><span>主線章節</span>'; }
-        if(ui.body){ ui.body.innerHTML=renderPanel(view); }
+        if(ui.body){
+            ui.body.innerHTML=renderPanel(view);
+            const map=ui.body.querySelector('.adventure-map-canvas');
+            const focusId=ui.lastFocusNodeId||view.state.currentNodeId;
+            const node=map&&Array.from(map.querySelectorAll('[data-node-id]')).find(entry=>entry.dataset.nodeId===focusId);
+            if(node){ ui.body.scrollTop=map.offsetTop+node.offsetTop-ui.body.clientHeight/2; }
+        }
         syncTracker(view);
     }
 

@@ -56,14 +56,14 @@
 #game-ui #homeFeatureModal.quest-mode .quest-tab{
     position:relative !important;
     min-height:132px !important;
-    padding:21px 12px 27px !important;
+    padding:18px 12px !important;
     border:0 !important;
     border-radius:0 !important;
     background:transparent !important;
     color:#b9aa91 !important;
-    font-size:42px !important;
+    font-size:45px !important;
     font-weight:700 !important;
-    line-height:1 !important;
+    line-height:1.4 !important;
     box-shadow:none !important;
 }
 
@@ -125,7 +125,7 @@
 #game-ui #homeFeatureModal.quest-mode .quest-card-name{
     min-width:0 !important;
     color:#f3e7cc !important;
-    font-size:42px !important;
+    font-size:51px !important;
     font-weight:800 !important;
     line-height:1.15 !important;
 }
@@ -153,19 +153,19 @@
 #game-ui #homeFeatureModal.quest-mode .quest-card-desc{
     margin-top:6px !important;
     color:#b9aa91 !important;
-    font-size:39px !important;
-    line-height:1.32 !important;
+    font-size:45px !important;
+    line-height:1.5 !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-progress-line{
     margin-top:18px !important;
     color:#aa9b83 !important;
-    font-size:39px !important;
+    font-size:42px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-progress-line strong{
     color:#e7d6b7 !important;
-    font-size:39px !important;
+    font-size:45px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-progress-track{
@@ -195,7 +195,7 @@
     align-items:center !important;
     gap:12px 18px !important;
     color:#e0cda8 !important;
-    font-size:39px !important;
+    font-size:42px !important;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-reward-label{
@@ -212,7 +212,7 @@
     border-radius:18px !important;
     background:linear-gradient(180deg,#5d2417,#2c100a) !important;
     color:#ffe27a !important;
-    font-size:39px !important;
+    font-size:45px !important;
     font-weight:800 !important;
 }
 
@@ -263,14 +263,24 @@
 
 #game-ui #homeFeatureModal.quest-mode .quest-completion-milestones{
     display:grid !important;
-    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    grid-template-columns:none !important;
     gap:18px !important;
+
+    grid-auto-flow:column;
+    grid-auto-columns:calc(120 * var(--ui-length-unit,1px));
+    overflow-x:auto;
+    overflow-y:hidden;
+    touch-action:pan-x;
+    overscroll-behavior-x:contain;
+    padding-bottom:calc(6 * var(--ui-length-unit,1px));
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-milestone{
     min-width:0 !important;
     text-align:center !important;
     opacity:1 !important;
+    display:flex;
+    flex-direction:column;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-milestone.reached{
@@ -290,17 +300,24 @@
 
 #game-ui #homeFeatureModal.quest-mode .quest-milestone-slot{
     position:relative !important;
-    min-height:234px !important;
+    min-height:calc(112 * var(--ui-length-unit,1px)) !important;
     display:flex !important;
     flex-direction:column !important;
     align-items:center !important;
-    justify-content:center !important;
-    padding:12px !important;
+    justify-content:flex-start !important;
+    padding:calc(8 * var(--ui-length-unit,1px)) !important;
     border:3px solid rgba(138,106,58,.55) !important;
     border-radius:18px !important;
     background:rgba(0,0,0,.25) !important;
     color:#8f8371 !important;
-    font-size:27px !important;
+    font-size:45px !important;
+
+    height:auto;
+    flex:1 1 auto;
+    gap:calc(4 * var(--ui-length-unit,1px));
+    line-height:1.4 !important;
+    overflow-wrap:anywhere;
+    white-space:normal;
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-milestone-chest{
@@ -340,3 +357,7 @@
     background:#ff2d2d !important;
     box-shadow:0 0 21px rgba(255,45,45,.9) !important;
 }
+
+#game-ui #homeFeatureModal.quest-mode .quest-milestone-slot small{font-size:42px;line-height:1.5;overflow-wrap:anywhere;max-width:100%;}
+
+#game-ui #homeFeatureModal.quest-mode .quest-scroll-hint{margin:0 0 calc(6 * var(--ui-length-unit,1px));font-size:39px;line-height:1.4;color:#b9aa91;}

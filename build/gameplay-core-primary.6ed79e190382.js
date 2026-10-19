@@ -9049,7 +9049,7 @@
             }).join("");
             return '<div class="quest-completion-head"><span>完成度寶箱</span><strong>'+display+'%</strong></div>'+
                 '<div class="quest-completion-track" aria-hidden="true"><div class="quest-completion-fill" style="width:'+percent+'%;"></div></div>'+
-                '<div class="quest-completion-milestones">'+milestones+'</div>';
+                '<p class="quest-scroll-hint">左右滑動查看全部獎勵</p><div class="quest-completion-milestones" data-scroll-owner="x">'+milestones+'</div>';
         };
     }
 

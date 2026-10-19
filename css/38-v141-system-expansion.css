@@ -43,14 +43,15 @@
 }
 
 #game-ui #homeFeatureModalBody .home-feature-buy-btn,
-#game-ui #homeFeatureModalBody button,
-#game-stage #dungeonPage button{
+#game-ui #homeFeatureModalBody button{
     min-height:114px;
     font-size:42px;
 }
 
 :is(#game-stage,#game-ui) .system-panel-row strong{font-size:calc(16 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .system-panel-row small{font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.55;}
+
+#game-stage #dungeonTabBtnDaily{min-height:48px;padding:8px 12px;font-size:18px;line-height:1.4;}
 
 /* Native skill/status/character detail presentation is owned by css/23. */
 
@@ -379,12 +380,6 @@
     width:min(98%,1440px) !important;
     max-width:1440px !important;
 }
-#game-ui #homeFeatureModal.quest-mode .home-feature-modal-title{font-size:69px !important;}
-#game-ui #homeFeatureModal.quest-mode .quest-tab{font-size:48px !important;}
-#game-ui #homeFeatureModal.quest-mode .quest-card-name{font-size:48px !important;}
-#game-ui #homeFeatureModal.quest-mode .quest-card-desc{font-size:39px !important;line-height:1.48 !important;}
-#game-ui #homeFeatureModal.quest-mode .quest-progress-line{font-size:36px !important;}
-#game-ui #homeFeatureModal.quest-mode .quest-progress-line strong{font-size:39px !important;}
 
 :is(#game-stage,#game-ui) .quest-completion-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:calc(4 * var(--ui-length-unit,1px));color:#dec89d;font-size:calc(13 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .quest-completion-track{height:calc(7 * var(--ui-length-unit,1px));overflow:hidden;border-radius:calc(99 * var(--ui-length-unit,1px));background:#1b1510;box-shadow:inset 0 0 0 calc(1 * var(--ui-length-unit,1px)) #5c462b;}

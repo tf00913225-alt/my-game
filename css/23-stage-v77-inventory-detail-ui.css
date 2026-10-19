@@ -186,15 +186,6 @@
     font-size:calc(15 * var(--ui-length-unit,1px)) !important;
     line-height:1.55 !important;
 }
-#game-ui #skillDetailModal #skillDetailStats span[style*="font-size:11px"]{
-    font-size:calc(13 * var(--ui-length-unit,1px)) !important;
-    line-height:1.35 !important;
-}
-#game-ui #skillDetailModal #skillDetailStats div[style*="font-size:11px"],
-#game-ui #skillDetailModal #skillDetailStats div[style*="font-size:12px"]{
-    font-size:calc(15 * var(--ui-length-unit,1px)) !important;
-    line-height:1.5 !important;
-}
 #game-ui #skillDetailModal #skillDetailStats .v17364-progression-hint{
     font-size:calc(14 * var(--ui-length-unit,1px)) !important;
     line-height:1.45 !important;
