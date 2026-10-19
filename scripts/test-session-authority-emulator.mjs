@@ -3877,6 +3877,46 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.equal((await runRef.collection("inventoryPages").get()).size,pages.length);
     assert.deepEqual(await Promise.all([runRef.get(),fenceRef.get()]).then(rows=>rows.map(row)),controls);
     assert.deepEqual(await assets(),assetBefore);
+    // This already exhausted inventory has no proofState: select raw schema3
+    // without another actor or inventory scan. Raw cursor exhaustion is NOT a
+    // certificate that every earlier chunk/chain remains intact.
+    const {decodeProofPayload}=require("../functions/src/recovery-audit-artifact.js");
+    const {snapshotDigest}=require("../functions/src/canonical-snapshot.js");
+    const rawState=runRef.collection("proofState").doc("current"),rawPage=id=>runRef.collection("patrolProofPages").doc(id);
+    assert.equal((await rawState.get()).exists,false);
+    const rawOrder=namespacePaths.flatMap(path=>expected.get(path)),rawFirst={auditId,expectedEpoch:1,operationId:"inventory-raw-page-operation1",expectedSequence:1,startOrdinal:0,count:16};
+    assert.ok(rawOrder.length>16&&rawOrder.length<=32,"Reuse the existing bounded two-page inventory actor");
+    const rawRollback=createCanonicalCurrentRecovery({...deps,runRecoveryAuditMaintenance:(req,id,operation)=>
+        authority.runRecoveryAuditMaintenance(req,id,async(tx,active)=>{await operation(tx,active);throw Error("raw SDK staged rollback");})});
+    await assert.rejects(()=>rawRollback.captureRawInventory(request(),rawFirst),/raw SDK staged rollback/);
+    assert.equal((await rawState.get()).exists,false);assert.equal((await rawPage(rawFirst.operationId).get()).exists,false);
+    async function checkRaw(input,result){
+        closed(result);assert.equal(result.proofKernelExecuted,false);assert.equal(Object.hasOwn(result,"rawComplete"),false);
+        const receipt=(await rawPage(input.operationId).get()).data(),chunks=[];
+        for(let index=0;index<result.chunkCount;index++){
+            const doc=await runRef.collection("proofPayloadChunks").doc(input.operationId+"_"+String(index).padStart(2,"0")).get();
+            assert.equal(doc.exists,true);assert.ok(Buffer.isBuffer(doc.get("payloadBytes")));assert.ok(doc.get("payloadBytes").length<=256*1024);chunks.push(doc.get("payloadBytes"));
+        }
+        const bytes=Buffer.concat(chunks);assert.equal(bytes.length,result.payloadByteLength);assert.equal(createHash("sha256").update(bytes).digest("hex"),result.payloadSha256);
+        const payload=decodeProofPayload(bytes);assert.equal(payload.schemaVersion,3);assert.equal(payload.documents.length,input.count);
+        assert.deepEqual(payload.documents.map(doc=>({path:doc.path,updateTime:doc.updateTime})),rawOrder.slice(input.startOrdinal,input.startOrdinal+input.count));
+        const {createdAt,...manifest}=receipt;assert.equal(snapshotDigest(manifest),result.receiptSha256);
+        assert.equal(payload.previousReceiptSha256,result.previousReceiptSha256);
+    }
+    const rawStart=attempts.length,rawResult=await recovery.captureRawInventory(request(),rawFirst);await checkRaw(rawFirst,rawResult);
+    assert.equal(rawResult.rawCursorExhausted,false);assert.equal(rawResult.previousReceiptSha256,null);
+    for(const attempt of attempts.slice(rawStart)){assert.ok(attempt.reads<=400);assert.ok(attempt.reads<=14+pages.length+16);assert.ok(attempt.writes<=10);assert.equal(attempt.queries,3);}
+    const rawRetryStart=attempts.length;assert.equal((await recovery.captureRawInventory(request(),rawFirst)).unchanged,true);
+    for(const attempt of attempts.slice(rawRetryStart)){assert.ok(attempt.reads<=13+pages.length+rawResult.chunkCount);assert.equal(attempt.queries,1);assert.equal(attempt.writes,0);}
+    const rawNext={...rawFirst,operationId:"inventory-raw-page-operation2",expectedSequence:2,startOrdinal:16,count:rawOrder.length-16};let rawCallbacks=0;
+    const rawRetry=createCanonicalCurrentRecovery({...deps,runRecoveryAuditMaintenance:(req,id,operation)=>
+        authority.runRecoveryAuditMaintenance(req,id,async(tx,active)=>{rawCallbacks++;const value=await operation(tx,active);
+            if(rawCallbacks===1)throw Object.assign(Error("raw SDK callback retry"),{code:10});return value;})});
+    const rawRaceStart=attempts.length,rawRace=await Promise.all([rawRetry.captureRawInventory(request(),rawNext),recovery.captureRawInventory(request(),rawNext)]);
+    assert.ok(rawCallbacks>=2);assert.ok(rawRace.some(result=>result.unchanged));assert.equal(rawRace[0].payloadSha256,rawRace[1].payloadSha256);
+    for(const result of rawRace){await checkRaw(rawNext,result);assert.equal(result.rawCursorExhausted,true);assert.equal(result.previousReceiptSha256,rawResult.receiptSha256);}
+    for(const attempt of attempts.slice(rawRaceStart)){assert.ok(attempt.reads<=400);assert.ok(attempt.reads<=13+pages.length+16);assert.ok(attempt.writes<=10);assert.equal(attempt.queries,1);}
+    assert.deepEqual(await assets(),assetBefore);assert.deepEqual(await Promise.all([runRef.get(),fenceRef.get()]).then(rows=>rows.map(row)),controls);
     await assert.rejects(()=>patrol.observePresence(request(),{operationId:"inventory-fenced-heartbeat1",expectedRevision:2,
         expectedSequence:18,intent:"heartbeat",elementBox:"keep"}),/RECOVERY_AUDIT_MAINTENANCE/);
     // Expire the approval between real SDK attempts of an original page retry.
@@ -3891,14 +3931,17 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     const frozenState=row(await stateRef.get());
     await assert.rejects(()=>expiry.captureInventoryPage(request(),first),/approval/i);
     assert.ok(expiryCallbacks>=2);assert.deepEqual(row(await stateRef.get()),frozenState);
+    await assert.rejects(()=>recovery.captureRawInventory(request(),rawFirst));
     const oldRequest=request();
     while(Math.floor(Date.now()/1000)<=claims(token).auth_time)await new Promise(resolve=>setTimeout(resolve,100));
     const nextLogin=await login("accounts:signInWithPassword",{email,password});
     token=nextLogin.idToken;session=await invoke("createGameSession",token,{uid});
     await assert.rejects(()=>recovery.captureInventoryPage(oldRequest,first),/SESSION_REVOKED/);
+    await assert.rejects(()=>recovery.captureRawInventory(oldRequest,rawFirst),/SESSION_REVOKED/);
     await assert.rejects(()=>recovery.captureInventoryPage(request(),first));
     await recovery.cancelAudit(request(),{operationId:"inventory-cancel-operation1",auditId,expectedEpoch:1});
     await assert.rejects(()=>recovery.captureInventoryPage(request(),first));
+    await assert.rejects(()=>recovery.captureRawInventory(request(),rawFirst));
     assert.deepEqual(row(await stateRef.get()),frozenState);assert.deepEqual(await assets(),assetBefore);
     assert.equal((await save.get()).get("authoritativeStateReady"),false);
     console.log("PASS recovery inventory capture actual SDK: fixed namespaces,16-document pages and true-empty tails, metadata/cursor receipts, bounded reads/writes, rollback/retry/concurrent once-only, no-query lost-response replay, live expiry/takeover/cancel refusal and unchanged assets/readiness.");

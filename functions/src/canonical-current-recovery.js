@@ -427,16 +427,19 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         return index;
     }
     const proofComponent=value=>value==="forest-ticket"||value==="exp-allocation"||value==="additional-character-sources"||value==="simulated-ad-source"||value==="mode-nonvalue-event";
-    const proofKind=(version,suffix)=>"canonical-recovery-"+(version===1?"patrol-":"")+"proof-"+suffix;
+    const proofKind=(version,suffix)=>version===3?"canonical-recovery-raw-inventory-"+suffix:"canonical-recovery-"+(version===1?"patrol-":"")+"proof-"+suffix;
     const proofTarget=(version,component,sourceId)=>version===1?{ticketId:sourceId}:{component,sourceId};
     const proofIntent=(version,args)=>version===1?{action:"capture-patrol-proof",auditId:args.auditId,
         expectedEpoch:args.expectedEpoch,operationId:args.operationId,expectedSequence:args.expectedSequence,ticketId:args.sourceId}:
         {schemaVersion:2,action:"capture-proof",...args};
     function proofStateHash(row){const {stateSha256,createdAt,updatedAt,...value}=row;return snapshotDigest(value);}
     function inspectProofState(row,run,inventory){
-        inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","inventoryStateSha256","nextSequence","lastOperationId","lastPayloadSha256","stateSha256","createdAt","updatedAt",...(row?.schemaVersion===2?["lastComponent","lastSourceId"]:[])],"Forest proof state");
-        if(![1,2].includes(row.schemaVersion)||row.kind!==proofKind(row.schemaVersion,"state")||
-           (row.schemaVersion===2&&(!proofComponent(row.lastComponent)||!OPERATION_ID.test(row.lastSourceId||"")))||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||row.epoch!==run.epoch||
+        inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","inventoryStateSha256","nextSequence","lastOperationId","lastPayloadSha256","stateSha256","createdAt","updatedAt",...(row?.schemaVersion===2?["lastComponent","lastSourceId"]:row?.schemaVersion===3?["rawNextOffset","lastStartOrdinal","lastCount","lastReceiptSha256"]:[])],"Forest proof state");
+        if(![1,2,3].includes(row.schemaVersion)||row.kind!==proofKind(row.schemaVersion,"state")||
+           (row.schemaVersion===2&&(!proofComponent(row.lastComponent)||!OPERATION_ID.test(row.lastSourceId||"")))||
+           (row.schemaVersion===3&&(!Number.isSafeInteger(row.rawNextOffset)||row.rawNextOffset<1||row.rawNextOffset>inventory.capturedCount||
+               !Number.isSafeInteger(row.lastStartOrdinal)||row.lastStartOrdinal<0||!Number.isSafeInteger(row.lastCount)||row.lastCount<1||row.lastCount>16||
+               row.lastStartOrdinal+row.lastCount!==row.rawNextOffset||!HEX.test(row.lastReceiptSha256||"")))||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||row.epoch!==run.epoch||
            row.inventoryStateSha256!==inventory.stateSha256||!Number.isSafeInteger(row.nextSequence)||row.nextSequence<2||
            !OPERATION_ID.test(row.lastOperationId||"")||!HEX.test(row.lastPayloadSha256||"")||row.stateSha256!==proofStateHash(row)||
            typeof row.createdAt?.toMillis!=="function"||typeof row.updatedAt?.toMillis!=="function")fail("data-loss","Forest proof state differs.");
@@ -533,15 +536,73 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             ...proofTarget(version,args.component,args.sourceId),inventoryStateSha256:inventory.stateSha256,documents};
         return payload;
     }
+    const rawIntent=args=>({schemaVersion:3,action:"capture-raw-inventory",...args});
+    function rawReceiptHash(row){const {createdAt,...manifest}=row;return snapshotDigest(manifest);}
+    function inspectRawReceipt(row,run,inventory){
+        inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","intentSha256","sequence","sourceRevision",
+            "inventoryStateSha256","startOrdinal","count","endOrdinal","previousReceiptSha256","payloadSha256","payloadByteLength","chunkSha256s","createdAt"],"raw receipt");
+        if(row.schemaVersion!==3||row.kind!==proofKind(3,"page")||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||row.epoch!==run.epoch||
+           row.sourceRevision!==run.sourceRevision||row.inventoryStateSha256!==inventory.stateSha256||!OPERATION_ID.test(row.operationId||"")||
+           !Number.isSafeInteger(row.sequence)||row.sequence<1||!Number.isSafeInteger(row.startOrdinal)||row.startOrdinal<0||
+           !Number.isSafeInteger(row.count)||row.count<1||row.count>16||row.endOrdinal!==row.startOrdinal+row.count||row.endOrdinal>inventory.capturedCount||
+           (row.sequence===1?(row.startOrdinal!==0||row.previousReceiptSha256!==null):(row.startOrdinal<1||!HEX.test(row.previousReceiptSha256||"")))||
+           row.intentSha256!==snapshotDigest(rawIntent({auditId:row.auditId,expectedEpoch:row.epoch,operationId:row.operationId,
+               expectedSequence:row.sequence,startOrdinal:row.startOrdinal,count:row.count}))||
+           !Number.isSafeInteger(row.payloadByteLength)||row.payloadByteLength<1||row.payloadByteLength>PATROL_PROOF_LIMITS.bytes||
+           !Array.isArray(row.chunkSha256s)||row.chunkSha256s.length!==Math.ceil(row.payloadByteLength/PATROL_PROOF_LIMITS.chunkBytes)||
+           row.chunkSha256s.some(hash=>!HEX.test(hash||""))||!HEX.test(row.payloadSha256||"")||typeof row.createdAt?.toMillis!=="function")
+            fail("data-loss","Raw inventory receipt differs.");
+        return row;
+    }
+    function rawRange(args,run,inventory,previousReceiptSha256){return {sourceRevision:run.sourceRevision,inventoryStateSha256:inventory.stateSha256,
+        startOrdinal:args.startOrdinal,count:args.count,endOrdinal:args.startOrdinal+args.count,previousReceiptSha256};}
+    function checkRawCapsule(payload,run,inventory,index,namespaces,version,_component,_sourceId,binding){
+        inventoryExact(payload,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","sequence","intentSha256","sourceRevision",
+            "inventoryStateSha256","startOrdinal","count","endOrdinal","previousReceiptSha256","documents"],"raw payload");
+        if(version!==3||payload.schemaVersion!==3||payload.kind!==proofKind(3,"payload")||payload.ownerUid!==run.ownerUid||
+           payload.auditId!==run.auditId||payload.epoch!==run.epoch||!Array.isArray(payload.documents)||payload.documents.length!==binding.count||
+           ["operationId","sequence","intentSha256","sourceRevision","inventoryStateSha256","startOrdinal","count","endOrdinal","previousReceiptSha256"]
+               .some(key=>payload[key]!==binding[key]))fail("data-loss","Raw inventory payload binding differs.");
+        const paths=[...index.keys()].slice(binding.startOrdinal,binding.endOrdinal);
+        if(paths.length!==binding.count)fail("data-loss","Raw inventory range differs.");
+        for(let offset=0;offset<paths.length;offset++){
+            const row=payload.documents[offset];inventoryExact(row,["path","exists","updateTime","data"],"raw document");
+            if(row.path!==paths[offset]||row.exists!==true)fail("data-loss","Raw inventory document order or existence differs.");
+            proofMembership(row.path,row,index,namespaces);
+        }
+    }
+    async function buildRawPayload({tx,run,namespaces,inventory,index,args,binding}){
+        const selected=[...index.keys()].slice(args.startOrdinal,args.startOrdinal+args.count);
+        if(selected.length!==args.count)fail("failed-precondition","Raw inventory range is outside the fixed inventory.");
+        const estimate=selected.reduce((sum,path)=>sum+index.get(path).typedDataByteLength,0);
+        if(estimate>PATROL_PROOF_LIMITS.bytes)fail("resource-exhausted","Raw page exceeds2MiB; use a smaller new operation or pending Storage fallback.");
+        const documents=[];
+        for(const path of selected){
+            const snap=await tx.get(db.doc(path));
+            const row={path,exists:snap.exists,updateTime:snap.exists?{seconds:snap.updateTime?.seconds,nanoseconds:snap.updateTime?.nanoseconds}:null,data:snap.exists?snap.data():null};
+            if(!row.exists)fail("data-loss","Raw inventory source is missing.");
+            proofMembership(path,row,index,namespaces);documents.push(row);
+        }
+        return {schemaVersion:3,kind:proofKind(3,"payload"),ownerUid:run.ownerUid,auditId:run.auditId,epoch:run.epoch,
+            operationId:args.operationId,sequence:args.expectedSequence,intentSha256:binding.intentSha256,...rawRange(args,run,inventory,binding.previousReceiptSha256),documents};
+    }
+    async function captureRawInventory(request,args){
+        auditIntent("capture raw inventory",args,["auditId","expectedEpoch","operationId","expectedSequence","startOrdinal","count"]);
+        if(!Number.isSafeInteger(args.expectedSequence)||args.expectedSequence<1||!Number.isSafeInteger(args.startOrdinal)||args.startOrdinal<0||
+           !Number.isSafeInteger(args.count)||args.count<1||args.count>16||!Number.isSafeInteger(args.startOrdinal+args.count))
+            fail("invalid-argument","A bounded raw inventory range and sequence are required.");
+        return captureEvidence(request,args,buildRawPayload,checkRawCapsule,3);
+    }
     async function captureProof(request,args){
         auditIntent("capture proof",args,["auditId","expectedEpoch","operationId","expectedSequence","component","sourceId"]);
         if(!proofComponent(args.component)||!OPERATION_ID.test(args.sourceId||"")||!Number.isSafeInteger(args.expectedSequence)||args.expectedSequence<1)
             fail("invalid-argument","A supported proof component, source and sequence are required.");
-        return captureEvidence(request,args,buildProofPayload,checkProofCapsule);
+        return captureEvidence(request,args,buildProofPayload,checkProofCapsule,2);
     }
     // One private capture transaction lifecycle. Semantic fronts are fixed by
     // this Owner, never supplied by request data or a public callback registry.
-    async function captureEvidence(request,args,buildPayload,checkPayload){
+    async function captureEvidence(request,args,buildPayload,checkPayload,freshVersion){
+        const raw=freshVersion===3;
         return runRecoveryAuditMaintenance(request,args.auditId,async(rawTx,session)=>{
             // Session Authority has already read its two Session records and fence.
             // Reserve query limits BEFORE sending a read, then release unused slots.
@@ -569,12 +630,19 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 if(retained.some(rows=>rows.size>0))fail("data-loss","Forest orphan history survives missing proof state.");
             }
             const index=await completeInventory(tx,run,inventory,namespaces,runRef);
-            const state=stateSnap.exists?inspectProofState(stateSnap.data(),run,inventory):null,version=state?.schemaVersion??2;
+            const state=stateSnap.exists?inspectProofState(stateSnap.data(),run,inventory):null,version=state?.schemaVersion??freshVersion;
+            if((version===3)!==raw)fail("failed-precondition","Capture mode requires a new audit.");
             if(version===1&&args.component!=="forest-ticket")fail("failed-precondition","Legacy Forest audit requires a new audit for non-Forest proof.");
-            const intentSha256=snapshotDigest(proofIntent(version,args));
+            const intentSha256=snapshotDigest(raw?rawIntent(args):proofIntent(version,args));
             if(state){
                 const headSnap=state.lastOperationId===args.operationId?receiptSnap:
                     await tx.get(runRef.collection("patrolProofPages").doc(state.lastOperationId)),head=headSnap.data();
+                if(raw){
+                    inspectRawReceipt(head,run,inventory);
+                    if(!headSnap.exists||head.operationId!==state.lastOperationId||head.sequence!==state.nextSequence-1||
+                       head.payloadSha256!==state.lastPayloadSha256||head.startOrdinal!==state.lastStartOrdinal||head.count!==state.lastCount||
+                       head.endOrdinal!==state.rawNextOffset||rawReceiptHash(head)!==state.lastReceiptSha256)fail("data-loss","Raw inventory state head differs.");
+                }else{
                 inventoryExact(head,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","intentSha256","sequence",...(version===1?["ticketId"]:["component","sourceId"]),
                     "inventoryStateSha256","payloadSha256","payloadByteLength","chunkSha256s","createdAt"],"proof state head receipt");
                 const headComponent=version===1?"forest-ticket":head.component,headSource=version===1?head.ticketId:head.sourceId;
@@ -584,12 +652,22 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                    (version===2&&(state.lastComponent!==headComponent||state.lastSourceId!==headSource))||
                    head.intentSha256!==snapshotDigest(proofIntent(version,{auditId:run.auditId,expectedEpoch:run.epoch,
                        operationId:head.operationId,expectedSequence:head.sequence,component:headComponent,sourceId:headSource})))fail("data-loss","Forest proof state head differs.");
+                }
             }
-            const result=(receipt,unchanged)=>({...inventoryFlags,component:args.component,auditId:run.auditId,epoch:run.epoch,
+            const result=(receipt,unchanged)=>raw?({...inventoryFlags,captureKind:"raw-inventory",proofKernelExecuted:false,auditId:run.auditId,epoch:run.epoch,
+                operationId:args.operationId,sequence:receipt.sequence,startOrdinal:receipt.startOrdinal,count:receipt.count,nextOrdinal:receipt.endOrdinal,
+                rawCursorExhausted:receipt.endOrdinal===inventory.capturedCount,previousReceiptSha256:receipt.previousReceiptSha256,receiptSha256:rawReceiptHash(receipt),
+                payloadSha256:receipt.payloadSha256,payloadByteLength:receipt.payloadByteLength,chunkCount:receipt.chunkSha256s.length,unchanged}):({...inventoryFlags,component:args.component,auditId:run.auditId,epoch:run.epoch,
                 operationId:args.operationId,sourceId:args.sourceId,sequence:receipt.sequence,payloadSha256:receipt.payloadSha256,
                 payloadByteLength:receipt.payloadByteLength,chunkCount:receipt.chunkSha256s.length,unchanged});
             if(receiptSnap.exists){
                 const receipt=receiptSnap.data();
+                if(raw){
+                    inspectRawReceipt(receipt,run,inventory);
+                    if(!state||receipt.operationId!==args.operationId||receipt.sequence!==args.expectedSequence||receipt.intentSha256!==intentSha256||
+                       receipt.startOrdinal!==args.startOrdinal||receipt.count!==args.count||state.nextSequence<=receipt.sequence||receipt.endOrdinal>state.rawNextOffset)
+                        fail("data-loss","Raw inventory receipt intent or progress differs.");
+                }else{
                 inventoryExact(receipt,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","intentSha256","sequence",...(version===1?["ticketId"]:["component","sourceId"]),
                     "inventoryStateSha256","payloadSha256","payloadByteLength","chunkSha256s","createdAt"],"Forest proof receipt");
                 if(receipt.schemaVersion!==version||receipt.kind!==proofKind(version,"page")||receipt.ownerUid!==run.ownerUid||receipt.auditId!==run.auditId||
@@ -600,12 +678,14 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                    receipt.chunkSha256s.some(hash=>!HEX.test(hash||""))||!HEX.test(receipt.payloadSha256||"")||typeof receipt.createdAt?.toMillis!=="function"||
                    (state.nextSequence===receipt.sequence+1&&(state.lastOperationId!==args.operationId||state.lastPayloadSha256!==receipt.payloadSha256)))
                     fail("data-loss","Forest proof receipt differs.");
+                }
                 const chunks=[];
                 for(let number=0;number<receipt.chunkSha256s.length;number++){
                     const snap=await tx.get(runRef.collection("proofPayloadChunks").doc(args.operationId+"_"+String(number).padStart(2,"0"))),row=snap.data();
-                    inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","chunkIndex","payloadBytes","sha256",...(version===1?[]:["component","sourceId"])],"Forest proof chunk");
+                    inventoryExact(row,["schemaVersion","kind","ownerUid","auditId","epoch","operationId","chunkIndex","payloadBytes","sha256",...(raw?["sourceRevision","inventoryStateSha256","sequence","intentSha256","startOrdinal","count","endOrdinal","previousReceiptSha256"]:version===1?[]:["component","sourceId"])],"Forest proof chunk");
                     if(row.schemaVersion!==version||row.kind!==proofKind(version,"chunk")||
-                       (version===2&&(row.component!==args.component||row.sourceId!==args.sourceId))||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||
+                       (version===2&&(row.component!==args.component||row.sourceId!==args.sourceId))||
+                       (raw&&["sourceRevision","inventoryStateSha256","sequence","intentSha256","startOrdinal","count","endOrdinal","previousReceiptSha256"].some(key=>row[key]!==receipt[key]))||row.ownerUid!==run.ownerUid||row.auditId!==run.auditId||
                        row.epoch!==run.epoch||row.operationId!==args.operationId||row.chunkIndex!==number||!Buffer.isBuffer(row.payloadBytes)||
                        row.payloadBytes.length!==(number===receipt.chunkSha256s.length-1?receipt.payloadByteLength-number*PATROL_PROOF_LIMITS.chunkBytes:PATROL_PROOF_LIMITS.chunkBytes)||
                        row.sha256!==receipt.chunkSha256s[number]||inventoryHash(row.payloadBytes)!==row.sha256)fail("data-loss","Forest proof chunk differs.");
@@ -613,25 +693,30 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 }
                 const bytes=Buffer.concat(chunks);if(inventoryHash(bytes)!==receipt.payloadSha256)fail("data-loss","Forest proof complete payload differs.");
                 const payload=decodeProofPayload(bytes);
-                await checkPayload(payload,run,inventory,index,namespaces,version,args.component,args.sourceId);return result(receipt,true);
+                await checkPayload(payload,run,inventory,index,namespaces,version,args.component,args.sourceId,receipt);return result(receipt,true);
             }
             if((state?.nextSequence??1)!==args.expectedSequence)fail("failed-precondition","Forest proof sequence is not current.");
-            const payload=await buildPayload({tx,session,run,namespaces,dependencies,inventory,index,version,args});
+            if(raw&&(args.startOrdinal!==(state?.rawNextOffset??0)||args.startOrdinal+args.count>inventory.capturedCount))
+                fail("failed-precondition","Raw inventory range must continue exactly within the fixed inventory.");
+            const binding=raw?{...rawRange(args,run,inventory,state?.lastReceiptSha256??null),operationId:args.operationId,sequence:args.expectedSequence,intentSha256}:null;
+            const payload=await buildPayload({tx,session,run,namespaces,dependencies,inventory,index,version,args,binding});
             let bytes;
-            try{bytes=encodeProofPayload(payload);await checkPayload(decodeProofPayload(bytes),run,inventory,index,namespaces,version,args.component,args.sourceId);}
-            catch(error){if(error instanceof HttpsError)throw error;fail("data-loss",error.message);}
+            try{bytes=encodeProofPayload(payload);await checkPayload(decodeProofPayload(bytes),run,inventory,index,namespaces,version,args.component,args.sourceId,binding);}
+            catch(error){if(error instanceof HttpsError)throw error;
+                if(raw&&error.message==="Invalid recovery audit artifact: Patrol proof payload size")fail("resource-exhausted","Raw encoded page exceeds2MiB; use a smaller new operation or pending Storage fallback.");
+                fail("data-loss",error.message);}
             const chunks=[];for(let offset=0;offset<bytes.length;offset+=PATROL_PROOF_LIMITS.chunkBytes)chunks.push(bytes.subarray(offset,offset+PATROL_PROOF_LIMITS.chunkBytes));
             const stamp=FieldValue.serverTimestamp(),receipt={schemaVersion:version,kind:proofKind(version,"page"),ownerUid:session.uid,auditId:run.auditId,
-                epoch:run.epoch,operationId:args.operationId,intentSha256,sequence:args.expectedSequence,...proofTarget(version,args.component,args.sourceId),inventoryStateSha256:inventory.stateSha256,
+                epoch:run.epoch,operationId:args.operationId,intentSha256,sequence:args.expectedSequence,...(raw?rawRange(args,run,inventory,binding.previousReceiptSha256):proofTarget(version,args.component,args.sourceId)),inventoryStateSha256:inventory.stateSha256,
                 payloadSha256:inventoryHash(bytes),payloadByteLength:bytes.length,chunkSha256s:chunks.map(inventoryHash),createdAt:stamp};
             const next={schemaVersion:version,kind:proofKind(version,"state"),ownerUid:session.uid,auditId:run.auditId,epoch:run.epoch,
-                inventoryStateSha256:inventory.stateSha256,nextSequence:args.expectedSequence+1,lastOperationId:args.operationId,lastPayloadSha256:receipt.payloadSha256,...(version===1?{}:{lastComponent:args.component,lastSourceId:args.sourceId}),
+                inventoryStateSha256:inventory.stateSha256,nextSequence:args.expectedSequence+1,lastOperationId:args.operationId,lastPayloadSha256:receipt.payloadSha256,...(raw?{rawNextOffset:receipt.endOrdinal,lastStartOrdinal:receipt.startOrdinal,lastCount:receipt.count,lastReceiptSha256:rawReceiptHash(receipt)}:version===1?{}:{lastComponent:args.component,lastSourceId:args.sourceId}),
                 createdAt:state?.createdAt??stamp,updatedAt:stamp};
             if(!Number.isSafeInteger(next.nextSequence))fail("resource-exhausted","Forest proof sequence exhausted.");next.stateSha256=proofStateHash(next);
             // Fixed <=8 binary chunks plus receipt/state: <=10 writes. Oversize
             // and every proof check have already failed before any mutation.
             chunks.forEach((payloadBytes,chunkIndex)=>rawTx.create(runRef.collection("proofPayloadChunks").doc(args.operationId+"_"+String(chunkIndex).padStart(2,"0")),{
-                schemaVersion:version,kind:proofKind(version,"chunk"),... (version===1?{}:{component:args.component,sourceId:args.sourceId}),ownerUid:session.uid,auditId:run.auditId,epoch:run.epoch,
+                schemaVersion:version,kind:proofKind(version,"chunk"),...(raw?{...rawRange(args,run,inventory,binding.previousReceiptSha256),sequence:args.expectedSequence,intentSha256}:version===1?{}:{component:args.component,sourceId:args.sourceId}),ownerUid:session.uid,auditId:run.auditId,epoch:run.epoch,
                 operationId:args.operationId,chunkIndex,payloadBytes,sha256:receipt.chunkSha256s[chunkIndex]}));
             rawTx.create(receiptRef,receipt);if(state)rawTx.set(proofStateRef,next);else rawTx.create(proofStateRef,next);
             return result(receipt,false);
@@ -1225,7 +1310,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             fail("data-loss",error.message);
         }
     }
-    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,captureProof});
+    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,captureProof,captureRawInventory});
 }
 
 module.exports={createCanonicalCurrentRecovery,inspectRecoveryAuditFence,

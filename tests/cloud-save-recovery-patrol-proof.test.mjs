@@ -17,7 +17,7 @@ const {createRecoveryArchive}=require('../functions/src/canonical-recovery-archi
 const {assembleCanonicalSnapshot}=require('../functions/src/canonical-snapshot');
 const {snapshotDigest}=require('../functions/src/canonical-snapshot');
 const auditId='proof-component-audit-0001',approvalId='proof-component-approval-01';
-async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus=null,historicalSession=false,zeroHeartbeat=false}={}){
+async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus=null,historicalSession=false,zeroHeartbeat=false,beforeAudit=null}={}){
     const h=storeHarness({optimisticTransactions:true}),sessions=createSessionAuthority(h.dependencies);let authTime=Math.floor(h.clock/1000),session;
     const request=()=>({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid,...(session?{session}:{})}});
     session=await sessions.create(request());
@@ -80,6 +80,7 @@ async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus
         session=await sessions.create({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid}});}
     if(battles>=20)for(const path of [...h.data.keys()])if(['account','characters','economy','inventory','equipment','relics','relicLoadout','progress','claimRecords','claimCheckpoints']
         .some(name=>path.startsWith(h.root+'/'+name+'/')))h.data.delete(path);
+    if(beforeAudit)await beforeAudit(h);
     await createCanonicalRecoveryApproval(deps).issue({auth:{uid:'proof-operator',token:{cloudSaveOperator:true}},data:{ownerUid:h.uid,operationId:approvalId,sourceRevision:h.revision,ttlSeconds:60}});
     const recovery=createCanonicalCurrentRecovery(deps);await recovery.beginAudit(request(),{operationId:auditId,expectedRevision:h.revision,approvalOperationId:approvalId});
     await recovery.prepareInventory(request(),{auditId,expectedEpoch:1,operationId:'proof-prepare-operation-01'});
@@ -88,7 +89,8 @@ async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus
     h.dependencies.db.runTransaction=callback=>base(async tx=>{const trace={reads:0,queries:0,writes:0,paths:[]};traces.push(trace);
         const wrapper={get:async ref=>{trace.paths.push(ref.path);const snap=await tx.get(ref);trace.reads+=snap.docs?Math.max(1,snap.size):1;trace.queries+=snap.docs?1:0;return snap;}};
         for(const method of ['set','create','update','delete'])wrapper[method]=(...args)=>{trace.writes++;return tx[method](...args);};return callback(wrapper);});
-    return {h,recovery,request,tickets,allocations,additional,adSourceId,adCloseId,reopenId,heartbeatId,root,traces,deps,sessions,intent:(sequence=1,ticketId=tickets[0])=>({auditId,expectedEpoch:1,operationId:`proof-capsule-${String(sequence).padStart(8,'0')}`,expectedSequence:sequence,component:'forest-ticket',sourceId:ticketId})};
+    return {h,recovery,request,tickets,allocations,additional,adSourceId,adCloseId,reopenId,heartbeatId,root,traces,deps,sessions,takeover:async()=>{h.advance(1000);authTime=Math.floor(h.clock/1000);
+        session=await sessions.create({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid}});},intent:(sequence=1,ticketId=tickets[0])=>({auditId,expectedEpoch:1,operationId:`proof-capsule-${String(sequence).padStart(8,'0')}`,expectedSequence:sequence,component:'forest-ticket',sourceId:ticketId})};
 }
 const unchanged=async(f,operation,pattern)=>{const before=copy([...f.h.data]),writes=f.h.writes;await assert.rejects(operation,pattern);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);};
 function capsule(f,input){const receipt=f.h.data.get(f.root+'/patrolProofPages/'+input.operationId);
@@ -385,6 +387,7 @@ test('legacy schema1 Forest retains original hashes and bytes through unified AP
     assert.equal((await f.recovery.captureProof(f.request(),input)).unchanged,true);assert.deepEqual([...f.h.data],before);
     assert.deepEqual(capsule(f,input).bytes,legacy.bytes);assert.deepEqual(capsule(f,input).receipt,legacy.receipt);
     for(const component of ['exp-allocation','additional-character-sources','simulated-ad-source','mode-nonvalue-event'])await unchanged(f,()=>f.recovery.captureProof(f.request(),{...f.intent(2),component,sourceId:'legacy-source-operation-01'}),/new audit/);
+    await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),{auditId,expectedEpoch:1,operationId:'legacy-raw-operation-0001',expectedSequence:2,startOrdinal:0,count:1}),/new audit/);
     const next=f.intent(2,f.tickets[1]);await f.recovery.captureProof(f.request(),next);
     assert.equal(capsule(f,next).receipt.schemaVersion,1);assert.equal(capsule(f,next).payload.ticketId,next.sourceId);
     assert.equal(f.h.data.get(f.root+'/proofState/current').schemaVersion,1);
@@ -623,4 +626,185 @@ test('non-value mode source guard and original predecessor/ad/economic proof fai
     const path=f.root+'/proofPayloadChunks/'+input.operationId+'_00',original=copy(f.h.data.get(path));f.h.data.delete(path);
     await unchanged(f,()=>f.recovery.captureProof(f.request(),input),/shape/);assert.equal(f.h.data.has(path),false);f.h.data.set(path,original);
     const before=copy([...f.h.data]);assert.equal((await f.recovery.captureProof(f.request(),input)).unchanged,true);assert.deepEqual([...f.h.data],before);
+});
+
+
+const rawArgs=(sequence=1,startOrdinal=0,count=16)=>({auditId,expectedEpoch:1,operationId:'raw-capsule-'+String(sequence).padStart(8,'0'),expectedSequence:sequence,startOrdinal,count});
+function inventoryOrder(f){return [...f.h.data].filter(([path])=>path.startsWith(f.root+'/inventoryPages/')).map(([,row])=>decodeInventoryPayload(row.payloadBytes))
+    .sort((a,b)=>a.sequence-b.sequence).flatMap(page=>page.entries.map(entry=>({path:page.namespacePath+'/'+entry.id,...entry})));}
+function stableRawReceipt(row){const {createdAt,...manifest}=row;return snapshotDigest(manifest);}
+
+test('schema3 raw uses the same lifecycle and captures every fixed-order present byte, including active and unsupported raw data, without proof authority',async()=>{
+    const f=await fixture({battles:1,three:false,beforeAudit:h=>{
+        h.data.get(h.root+'/account/current').forensicUnknown={enabled:true,opaque:['leave',7]};
+        h.data.set(h.root+'/recoveryAudits/Ω-unknown',{schemaVersion:987,kind:'unsupported-by-proof',ownerUid:h.uid,opaque:{z:1,a:'原始資料'}});
+    }}),order=inventoryOrder(f),original=copy([...f.h.data]),seen=[],pageCount=[...f.h.data.keys()].filter(path=>path.startsWith(f.root+'/inventoryPages/')).length;
+    let ordinal=0,sequence=1,previous=null;
+    while(ordinal<order.length){
+        const input=rawArgs(sequence,ordinal,Math.min(16,order.length-ordinal));
+        const result=await f.recovery.captureRawInventory(f.request(),input),trace=f.traces.at(-1),saved=capsule(f,input);
+        assert.equal(saved.receipt.schemaVersion,3);assert.equal(saved.payload.schemaVersion,3);
+        assert.equal(saved.receipt.previousReceiptSha256,previous);assert.equal(saved.payload.previousReceiptSha256,previous);
+        assert.equal(result.receiptSha256,stableRawReceipt(saved.receipt));
+        assert.equal(trace.reads,pageCount+(sequence===1?14:13)+input.count);assert(trace.reads<=400);assert(trace.writes<=10);assert.equal(trace.queries,sequence===1?3:1);
+        assert.deepEqual(saved.payload.documents.map(row=>row.path),order.slice(ordinal,ordinal+input.count).map(row=>row.path));
+        for(const row of saved.payload.documents){
+            assert.equal(row.exists,true);assert.deepEqual(encodeProofPayload(row.data),encodeProofPayload(f.h.data.get(row.path)));
+            assert.deepEqual(row.updateTime,order.find(entry=>entry.path===row.path).updateTime);seen.push(row.path);
+        }
+        assert.equal(result.proofKernelExecuted,false);for(const flag of ['authoritativeStateReady','candidateProofValid','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
+        assert.equal(result.rawCursorExhausted,ordinal+input.count===order.length);assert.equal(Object.hasOwn(result,'rawComplete'),false);
+        const before=copy([...f.h.data]);assert.equal((await f.recovery.captureRawInventory(f.request(),input)).unchanged,true);assert.deepEqual([...f.h.data],before);
+        assert(f.traces.at(-1).reads<=pageCount+13+saved.receipt.chunkSha256s.length);
+        const gateOnly=f.traces.at(-1).paths.filter(path=>!path?.startsWith(f.root+'/')&&path!==f.h.root+'/sessionAuthority/current'&&!path?.includes('/gameSessions/'));
+        assert(!gateOnly.some(path=>path===f.h.root+'/account/current'),'raw retry cannot replace captured live source bytes');
+        previous=result.receiptSha256;ordinal=result.nextOrdinal;sequence++;
+    }
+    assert.deepEqual(seen,order.map(entry=>entry.path));assert(seen.includes(f.h.root+'/recoveryAudits/Ω-unknown'));
+    for(const [path,row] of original)assert.deepEqual(f.h.data.get(path),row);
+    const state=f.h.data.get(f.root+'/proofState/current');assert.equal(state.schemaVersion,3);assert.equal(state.rawNextOffset,order.length);
+    assert.equal(state.lastReceiptSha256,previous);
+    await unchanged(f,()=>f.recovery.captureProof(f.request(),f.intent(sequence)),/new audit/);
+});
+
+
+test('raw mode selection, immutable committed range, strict sequence and head CAS reject skips, overlap and metadata loss',async()=>{
+    const proof=await fixture({battles:1,three:false});await proof.recovery.captureProof(proof.request(),proof.intent());
+    await unchanged(proof,()=>proof.recovery.captureRawInventory(proof.request(),rawArgs(2)),/new audit/);
+    const f=await fixture({battles:1,three:false}),total=inventoryOrder(f).length;
+    for(const input of [rawArgs(2,0,1),rawArgs(1,1,1),rawArgs(1,0,17),rawArgs(1,0,0),rawArgs(1,total,1),rawArgs(1,-1,1)])
+        await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),input));
+    const first=rawArgs(1,0,2);f.h.abortNext();await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),first),/rollback/);
+    const race=await Promise.all([f.recovery.captureRawInventory(f.request(),first),f.recovery.captureRawInventory(f.request(),first)]);
+    assert.deepEqual(race.map(row=>row.unchanged).sort(),[false,true]);
+    for(const input of [{...first,count:1},{...first,startOrdinal:1}])await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),input),/intent or progress/);
+    for(const input of [rawArgs(2,0,1),rawArgs(2,3,1),rawArgs(3,2,1),rawArgs(2,total,1)])await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),input));
+    const statePath=f.root+'/proofState/current',pagePath=f.root+'/patrolProofPages/'+first.operationId,state=copy(f.h.data.get(statePath)),page=copy(f.h.data.get(pagePath));
+    for(const removePage of [false,true]){
+        f.h.data.delete(statePath);if(removePage)f.h.data.delete(pagePath);
+        await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),{...first,operationId:'raw-orphan-'+(removePage?'both':'state')+'-operation1'}),/orphan/);
+        f.h.data.set(statePath,copy(state));if(removePage)f.h.data.set(pagePath,copy(page));
+    }
+    f.h.data.delete(pagePath);await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),rawArgs(2,2,1)),/shape/);f.h.data.set(pagePath,copy(page));
+    for(const field of ['rawNextOffset','lastStartOrdinal','lastCount','lastReceiptSha256']){
+        const changed={...state,[field]:field==='lastReceiptSha256'?'f'.repeat(64):state[field]+1};
+        const {stateSha256,createdAt,updatedAt,...body}=changed;changed.stateSha256=snapshotDigest(body);f.h.data.set(statePath,changed);
+        await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),rawArgs(2,2,1)),/state/);f.h.data.set(statePath,copy(state));
+    }
+    const second=rawArgs(2,2,1);await f.recovery.captureRawInventory(f.request(),second);
+    const secondPath=f.root+'/patrolProofPages/'+second.operationId,secondPage=copy(f.h.data.get(secondPath));
+    f.h.data.set(secondPath,{...secondPage,previousReceiptSha256:'e'.repeat(64)});
+    await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),rawArgs(3,3,1)),/head/);f.h.data.set(secondPath,secondPage);
+    const before=copy([...f.h.data]);assert.equal((await f.recovery.captureRawInventory(f.request(),first)).unchanged,true);assert.deepEqual([...f.h.data],before);
+});
+
+test('raw chunk replay validates complete bytes and self-consistent payload metadata without reading live replacement sources',async()=>{
+    const f=await fixture({battles:1,three:false}),input=rawArgs(1,0,2);await f.recovery.captureRawInventory(f.request(),input);
+    const saved=capsule(f,input),pagePath=f.root+'/patrolProofPages/'+input.operationId,chunkPath=f.root+'/proofPayloadChunks/'+input.operationId+'_00',statePath=f.root+'/proofState/current';
+    const page=copy(f.h.data.get(pagePath)),chunk=copy(f.h.data.get(chunkPath)),state=copy(f.h.data.get(statePath));
+    const hash=value=>require('node:crypto').createHash('sha256').update(value).digest('hex');
+    for(const fault of ['missing','bytes','binding']){
+        if(fault==='missing')f.h.data.delete(chunkPath);
+        if(fault==='bytes')f.h.data.set(chunkPath,{...chunk,payloadBytes:Buffer.from('corrupt')});
+        if(fault==='binding')f.h.data.set(chunkPath,{...chunk,count:1});
+        await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),input));
+        if(fault==='missing')assert.equal(f.h.data.has(chunkPath),false);f.h.data.set(chunkPath,copy(chunk));
+    }
+    for(const fault of ['order','absence','version','data','range']){
+        const payload=copy(saved.payload);
+        if(fault==='order')payload.documents.reverse();
+        if(fault==='absence')payload.documents[0].exists=false;
+        if(fault==='version')payload.documents[0].updateTime.nanoseconds++;
+        if(fault==='data')payload.documents[0].data.forensicChange=true;
+        if(fault==='range')payload.startOrdinal++;
+        const bytes=encodeProofPayload(payload);assert(bytes.length<=256*1024);
+        const newPage={...page,payloadSha256:hash(bytes),payloadByteLength:bytes.length,chunkSha256s:[hash(bytes)]};
+        const newState={...state,lastPayloadSha256:newPage.payloadSha256,lastReceiptSha256:stableRawReceipt(newPage)};
+        const {stateSha256,createdAt,updatedAt,...body}=newState;newState.stateSha256=snapshotDigest(body);
+        f.h.data.set(pagePath,newPage);f.h.data.set(statePath,newState);f.h.data.set(chunkPath,{...chunk,payloadBytes:bytes,sha256:hash(bytes)});
+        await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),input));
+        f.h.data.set(pagePath,copy(page));f.h.data.set(statePath,copy(state));f.h.data.set(chunkPath,copy(chunk));
+    }
+    const sourcePath=saved.payload.documents[0].path;f.h.data.set(sourcePath,{...f.h.data.get(sourcePath),laterRawValue:true});
+    const before=copy([...f.h.data]);assert.equal((await f.recovery.captureRawInventory(f.request(),input)).unchanged,true);assert.deepEqual([...f.h.data],before);
+    assert.deepEqual(capsule(f,input).bytes,saved.bytes,'receipt replay never replaces old raw bytes with a changed source');
+    const nextPath=inventoryOrder(f)[2].path;f.h.data.set(nextPath,copy(f.h.data.get(nextPath)));
+    await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),rawArgs(2,2,1)),/version or bytes changed/);
+});
+
+
+async function advanceRawPrefix(f,target){let ordinal=0,sequence=1;
+    while(ordinal<target){const result=await f.recovery.captureRawInventory(f.request(),rawArgs(sequence,ordinal,Math.min(16,target-ordinal)));ordinal=result.nextOrdinal;sequence++;}
+    return {ordinal,sequence};
+}
+test('raw page oversize rejects before source reads, while a smaller new operation commits without changing game capacity',async()=>{
+    const f=await fixture({battles:1,three:false,beforeAudit:h=>{
+        for(let index=0;index<5;index++)h.data.set(h.root+'/recoveryAudits/pressure-'+index,{opaque:'x'.repeat(500000)});
+    }}),order=inventoryOrder(f),offset=order.findIndex(row=>row.path.endsWith('/pressure-0')),{sequence}=await advanceRawPrefix(f,offset);
+    const input={...rawArgs(sequence,offset,5),operationId:'raw-pressure-oversize-op001'};
+    const start=f.traces.length;await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),input),error=>error.code==='resource-exhausted');
+    assert(!f.traces.slice(start).some(trace=>trace.paths.some(path=>path?.includes('/pressure-'))),'metadata total bounds temporary data before issuing pressure source reads');
+    assert.equal(f.h.data.has(f.root+'/patrolProofPages/'+input.operationId),false);
+    // Zero-write failures have no durable operation-ID memory. Using a NEW ID
+    // to shrink count is an operational convention, not a reservation feature.
+    const smaller={...input,operationId:'raw-pressure-smaller-op001',count:4},result=await f.recovery.captureRawInventory(f.request(),smaller);
+    assert.equal(result.count,4);assert.equal(result.chunkCount,8);assert.equal(f.traces.at(-1).writes,10);assert(result.payloadByteLength<=2*1024*1024);
+});
+
+test('single raw document may fit metadata framing yet exceed the encoded page, which stays zero-write pending Storage fallback',async()=>{
+    const data={many:Array(Math.floor((2*1024*1024-33)/18)).fill(false)};
+    assert(Buffer.byteLength(JSON.stringify(data))<1024*1024,'structural pressure data is below1MiB as JSON, not a claim about SDK wire size');
+    assert(encodeProofPayload(data).length<=2*1024*1024);
+    const f=await fixture({battles:1,three:false,beforeAudit:h=>h.data.set(h.root+'/recoveryAudits/single-pressure',data)}),
+        offset=inventoryOrder(f).findIndex(row=>row.path.endsWith('/single-pressure')),{sequence}=await advanceRawPrefix(f,offset),
+        input={...rawArgs(sequence,offset,1),operationId:'raw-single-pressure-op001'};
+    const start=f.traces.length;await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),input),error=>error.code==='resource-exhausted');
+    assert(f.traces.slice(start).some(trace=>trace.paths.includes(f.h.root+'/recoveryAudits/single-pressure')),'the final encoded limit is checked after the one bounded raw read');
+    assert.equal(f.h.data.has(f.root+'/patrolProofPages/'+input.operationId),false);
+    assert(![...f.h.data.keys()].some(path=>path.startsWith(f.root+'/proofPayloadChunks/'+input.operationId)));
+});
+
+
+test('raw SDK attempts reread sources and all live gates; expiry, takeover and cancel never mint or refresh a permit',async()=>{
+    const f=await fixture({battles:1,three:false}),input=rawArgs(1,0,1),source=inventoryOrder(f)[0].path;let callbacks=0;
+    const retrying=createCanonicalCurrentRecovery({...f.deps,runRecoveryAuditMaintenance:(req,id,operation)=>f.deps.runRecoveryAuditMaintenance(req,id,async(tx,session)=>{
+        callbacks++;const result=await operation(tx,session);if(callbacks===1)throw Object.assign(Error('raw SDK retry'),{code:10});return result;})});
+    const start=f.traces.length;await retrying.captureRawInventory(f.request(),input);assert.equal(callbacks,2);
+    assert(f.traces.slice(start).every(trace=>trace.paths.includes(source)),'source readsets are rebuilt for every SDK attempt');
+    const old=f.request();await f.takeover();await unchanged(f,()=>f.recovery.captureRawInventory(old,input),/SESSION_REVOKED/);
+    await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),input));
+    await f.recovery.cancelAudit(f.request(),{auditId,expectedEpoch:1,operationId:'raw-cancel-operation-001'});
+    await unchanged(f,()=>f.recovery.captureRawInventory(f.request(),input));
+    const expired=await fixture({battles:1,three:false});let attempts=0;
+    const expires=createCanonicalCurrentRecovery({...expired.deps,runRecoveryAuditMaintenance:(req,id,operation)=>expired.deps.runRecoveryAuditMaintenance(req,id,async(tx,session)=>{
+        attempts++;const result=await operation(tx,session);if(attempts===1){expired.h.advance(61000);throw Object.assign(Error('raw approval expires before retry'),{code:10});}return result;})});
+    await unchanged(expired,()=>expires.captureRawInventory(expired.request(),input),/approval/);assert.equal(attempts,2);
+    const changed=await fixture({battles:1,three:false}),path=inventoryOrder(changed)[0].path;let tries=0;
+    const changes=createCanonicalCurrentRecovery({...changed.deps,runRecoveryAuditMaintenance:(req,id,operation)=>changed.deps.runRecoveryAuditMaintenance(req,id,async(tx,session)=>{
+        tries++;const result=await operation(tx,session);if(tries===1){changed.h.data.set(path,copy(changed.h.data.get(path)));throw Object.assign(Error('raw source version changes before retry'),{code:10});}return result;})});
+    await unchanged(changed,()=>changes.captureRawInventory(changed.request(),input),/version or bytes changed/);assert.equal(tries,2);
+});
+
+test('rawCursorExhausted reports progress only and never certifies that older chunks or the full chain remain complete',async()=>{
+    const f=await fixture({battles:1,three:false}),total=inventoryOrder(f).length;let ordinal=0,sequence=1,last;
+    while(ordinal<total){last=rawArgs(sequence,ordinal,Math.min(16,total-ordinal));const result=await f.recovery.captureRawInventory(f.request(),last);ordinal=result.nextOrdinal;sequence++;}
+    const firstChunk=f.root+'/proofPayloadChunks/'+rawArgs().operationId+'_00';assert(last.operationId!==rawArgs().operationId);f.h.data.delete(firstChunk);
+    const result=await f.recovery.captureRawInventory(f.request(),last);assert.equal(result.rawCursorExhausted,true);assert.equal(result.proofKernelExecuted,false);
+    for(const flag of ['authoritativeStateReady','candidateProofValid','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
+    assert.equal(f.h.data.has(firstChunk),false,'only a future full-chain assembler can certify every historical chunk');
+});
+
+
+test('raw capture requires exact SDK source versions and typed bytes, never a millisecond fallback or invented absence',async()=>{
+    const f=await fixture({battles:1,three:false}),source=inventoryOrder(f)[0].path,input=rawArgs(1,0,1);
+    for(const fault of ['missing-version','milliseconds-only','changed-bytes','missing-source']){
+        const bad=createCanonicalCurrentRecovery({...f.deps,runRecoveryAuditMaintenance:(req,id,operation)=>f.deps.runRecoveryAuditMaintenance(req,id,(tx,session)=>
+            operation({...tx,get:async reference=>{const snap=await tx.get(reference);if(reference.path!==source)return snap;
+                if(fault==='missing-version')return {...snap,updateTime:undefined};
+                if(fault==='milliseconds-only')return {...snap,updateTime:{toMillis:()=>f.h.clock}};
+                if(fault==='missing-source')return {...snap,exists:false,data:()=>undefined};
+                return {...snap,data:()=>({...snap.data(),forensicChange:true})};
+            }},session))});
+        await unchanged(f,()=>bad.captureRawInventory(f.request(),input),error=>error.code==='data-loss');
+    }
 });
