@@ -18,6 +18,7 @@ const {createCanonicalCurrentRecovery}=require("./src/canonical-current-recovery
 const {createCanonicalSourceWriter}=require("./src/canonical-source-writer");
 const {createCanonicalShopPurchase}=require("./src/canonical-shop-purchase");
 const {createCanonicalExpAllocation}=require("./src/canonical-exp-allocation");
+const {createCanonicalAttributeAllocation}=require("./src/canonical-attribute-allocation");
 const {createCanonicalPatrolSettlement}=require("./src/canonical-patrol-settlement");
 const {CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./src/cloud-preferences");
 const {
@@ -77,6 +78,8 @@ const canonicalExpAllocation=createCanonicalExpAllocation({
     db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
     inspectExistingEnvelope,nextRevision
 });
+const canonicalAttributeAllocation=createCanonicalAttributeAllocation({db:getFirestore(),FieldValue,HttpsError,
+    runProtected:sessions.runProtected,inspectExistingEnvelope,nextRevision});
 const canonicalPatrol=createCanonicalPatrolSettlement({db:getFirestore(),FieldValue,HttpsError,
     runProtected:sessions.runProtected,inspectExistingEnvelope,nextRevision});
 // Existing UIDs may hold an original-phone save that was never submitted.
@@ -232,6 +235,16 @@ function canonicalPatrolIntent(request,required,optional=[]){
     return Object.fromEntries([...required,...optional].filter(key=>
         Object.prototype.hasOwnProperty.call(data,key)).map(key=>[key,data[key]]));
 }
+exports.createAdditionalCanonicalCharacter=onCall(CALLABLE_OPTIONS,async request=>{
+    try{request=await verifyGameIdentity(request);return await initialCharacterWriter.commitAdditionalCharacter(request,
+        canonicalPatrolIntent(request,["operationId","expectedRevision","slotIndex","selection"]));}
+    catch(error){throw asHttpsError(error);}
+});
+exports.allocateCanonicalAttributePoint=onCall(CALLABLE_OPTIONS,async request=>{
+    try{request=await verifyGameIdentity(request);return await canonicalAttributeAllocation.allocateAttributePoint(request,
+        canonicalPatrolIntent(request,["operationId","expectedRevision","stat"],["characterId"]));}
+    catch(error){throw asHttpsError(error);}
+});
 exports.observeCanonicalAccountMode=onCall(CALLABLE_OPTIONS,async request=>{
     try{request=await verifyGameIdentity(request);return await canonicalPatrol.modeOwner.observePresence(request,
         canonicalPatrolIntent(request,["operationId","expectedRevision","expectedSequence","intent","elementBox"]));}
@@ -341,22 +354,11 @@ exports.purchaseCanonicalPotion=onCall(CALLABLE_OPTIONS,async request=>{
         });
     }catch(error){ throw asHttpsError(error); }
 });
-// Spend only the server-owned EXP pool on the unpublished first character.
-// The client supplies no EXP amount, target level or resulting attributes.
+// Spend only the server-owned EXP pool on an admitted stable character.
 exports.allocateCanonicalSharedExp=onCall(CALLABLE_OPTIONS,async request=>{
-    request=await verifyGameIdentity(request);
-    try{
-        const data=request.data;
-        if(!data||typeof data!=="object"||Array.isArray(data)||
-           Object.keys(data).some(key=>![
-               "uid","session","operationId","expectedRevision"
-           ].includes(key))){
-            throw new HttpsError("invalid-argument","Only an EXP allocation operation is accepted.");
-        }
-        return await canonicalExpAllocation.allocateSharedExp(request,{
-            operationId:data.operationId,expectedRevision:data.expectedRevision
-        });
-    }catch(error){ throw asHttpsError(error); }
+    try{request=await verifyGameIdentity(request);return await canonicalExpAllocation.allocateSharedExp(request,
+        canonicalPatrolIntent(request,["operationId","expectedRevision"],["characterId"]));}
+    catch(error){throw asHttpsError(error);}
 });
 // Reads a private candidate and returns blockers; never approves or copies it
 // into the public cloud-save envelope.

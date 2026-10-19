@@ -3,7 +3,7 @@
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,claimRecordsDigest}=
     require("./canonical-snapshot");
 const {createRecoveryArchive}=require("./canonical-recovery-archive");
-const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
+const {source,readCharacterSources,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
     require("./canonical-owned-sources");
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
 const STATS=new Set(["attack","intelligence","vitality","energy","defensePoints","agility"]);
@@ -52,8 +52,8 @@ function migrateLegacyCanonicalCharacterState(state){
 function createCanonicalAttributeAllocation({db,FieldValue,HttpsError,runProtected,
     inspectExistingEnvelope,nextRevision}){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
-    async function allocateAttributePoint(request,{operationId,expectedRevision,stat}){
-        if(!ID.test(operationId||"")||!STATS.has(stat)||
+    async function allocateAttributePoint(request,{operationId,expectedRevision,stat,characterId}){
+        if(!ID.test(operationId||"")||(characterId!==undefined&&(typeof characterId!=="string"||!characterId))||!STATS.has(stat)||
            !Number.isSafeInteger(expectedRevision)||expectedRevision<1){
             fail("invalid-argument","A stat, operation and expected revision are required.");
         }
@@ -83,13 +83,15 @@ function createCanonicalAttributeAllocation({db,FieldValue,HttpsError,runProtect
                account.ownerUid!==uid||account.provenance!=="server-created"||
                economy.ownerUid!==uid||!Array.isArray(account.slots)||
                account.slots.length!==3||typeof account.slots[0]!=="string"||
-               account.slots[1]!==null||account.slots[2]!==null){
+               !account.slots[0]){
                 fail("failed-precondition","First-character source is not eligible.");
             }
+            const targetId=characterId===undefined?account.slots[0]:characterId;
+            if(!account.slots.includes(targetId))fail("invalid-argument","Character target is not owned.");
             if(operationSnap.exists){
                 const receipt=operationSnap.data(),ledger=ledgerSnap.data();
                 verifyAttributeAllocationEvidence({uid,operationId,currentRevision:envelope.serverRevision,
-                    characterId:account.slots[0],stat,receipt,ledger,grantExists:grantOperationSnap.exists,fail});
+                    characterId:targetId,stat,receipt,ledger,grantExists:grantOperationSnap.exists,fail});
                 return {allocatedRevision:receipt.allocatedRevision,stat,
                     statAfter:receipt.statAfter,pointsAfter:receipt.pointsAfter,
                     unchanged:true,authoritativeStateReady:false};
@@ -106,28 +108,27 @@ function createCanonicalAttributeAllocation({db,FieldValue,HttpsError,runProtect
                !/^[a-f0-9]{64}$/.test(account.snapshotSha256||"")){
                 fail("failed-precondition","Source revision or claim state is invalid.");
             }
-            const characterRef=root.collection("characters").doc(account.slots[0]);
             const priorRef=root.collection("playableSnapshots").doc(String(previous));
-            const [characterSnap,priorSnap]=await Promise.all([
-                tx.get(characterRef),tx.get(priorRef)]);
-            if(!characterSnap.exists||!priorSnap.exists||
+            const [characters,priorSnap]=await Promise.all([
+                readCharacterSources(tx,root,account,fail),tx.get(priorRef)]);
+            if(!priorSnap.exists||
                priorSnap.get("sha256")!==account.snapshotSha256){
                 fail("data-loss","Previous canonical snapshot is missing.");
             }
             const owned=await readOwnedSources(tx,root,fail);
-            const records={account:source(account),characters:[source(characterSnap.data())],
+            const records={account:source(account),characters:characters.records,
                 economy:source(economy),...owned.records,
                 relicLoadout:source(loadoutSnap.data()),progress:source(progressSnap.data()),
                 claimCheckpoint:source(checkpointSnap.data())};
             try{verifyCanonicalSnapshotAgainstSources(priorSnap.data(),uid,previous,records);}
             catch(_){fail("data-loss","Previous sources differ from snapshot.");}
-            const sourceCharacter=records.characters[0];
+            const sourceCharacter=records.characters.find(row=>row.characterId===targetId);
             let migratedState;
             try{ migratedState=migrateLegacyCanonicalCharacterState(sourceCharacter.state); }
             catch(_){ fail("data-loss","Character ability migration is invalid."); }
             const character={...sourceCharacter,state:migratedState},state=character.state;
             const keys=[...STATS,"attributePoints","bonusHP","bonusSP","hp","sp"];
-            if(character.characterId!==account.slots[0]||
+            if(character.characterId!==targetId||
                keys.some(key=>!Number.isSafeInteger(state[key])||state[key]<0)||
                state.hp>100+state.vitality*50+state.bonusHP||
                state.sp>50+state.energy*15+state.bonusSP){
@@ -146,7 +147,8 @@ function createCanonicalAttributeAllocation({db,FieldValue,HttpsError,runProtect
                 ({...record,serverRevision:revision}));
             const nextRecords={...records,...advanceOwnedRecords(records,revision),
                 account:{...records.account,serverRevision:revision},
-                characters:[{...character,serverRevision:revision,state:nextState}],
+                characters:records.characters.map(row=>({...row,serverRevision:revision,
+                    ...(row.characterId===targetId?{state:nextState}:{})})),
                 economy:{...records.economy,serverRevision:revision},
                 relicLoadout:{...records.relicLoadout,serverRevision:revision},
                 progress:{...records.progress,serverRevision:revision},
@@ -157,7 +159,8 @@ function createCanonicalAttributeAllocation({db,FieldValue,HttpsError,runProtect
             catch(_){fail("data-loss","Next character projection is invalid.");}
             const stamp=FieldValue.serverTimestamp();
             tx.update(accountRef,{serverRevision:revision,snapshotSha256:bundle.sha256,updatedAt:stamp});
-            tx.update(characterRef,{serverRevision:revision,state:nextState,updatedAt:stamp});
+            characters.refs.forEach((ref,index)=>tx.update(ref,{serverRevision:revision,
+                ...(records.characters[index].characterId===targetId?{state:nextState}:{}),updatedAt:stamp}));
             tx.update(economyRef,{serverRevision:revision,updatedAt:stamp});
             for(const ref of [loadoutRef,progressRef]){
                 tx.update(ref,{serverRevision:revision,updatedAt:stamp});

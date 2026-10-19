@@ -51,6 +51,7 @@ const appScripts=[
     "functions/src/patrol-reward-policy.js",
     "functions/src/patrol-drop-policy.js",
     "functions/src/account-mode-time-policy.js",
+    "functions/src/exp-pool-catch-up-policy.js",
     "functions/src/inventory-stack-policy.js",
     "js/00-main.js",
     "functions/src/team-formation-policy.js",
