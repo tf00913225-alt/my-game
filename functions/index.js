@@ -18,6 +18,7 @@ const {createCanonicalCurrentRecovery}=require("./src/canonical-current-recovery
 const {createCanonicalSourceWriter}=require("./src/canonical-source-writer");
 const {createCanonicalShopPurchase}=require("./src/canonical-shop-purchase");
 const {createCanonicalExpAllocation}=require("./src/canonical-exp-allocation");
+const {createCanonicalPatrolSettlement}=require("./src/canonical-patrol-settlement");
 const {CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./src/cloud-preferences");
 const {
     CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
@@ -76,6 +77,8 @@ const canonicalExpAllocation=createCanonicalExpAllocation({
     db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
     inspectExistingEnvelope,nextRevision
 });
+const canonicalPatrol=createCanonicalPatrolSettlement({db:getFirestore(),FieldValue,HttpsError,
+    runProtected:sessions.runProtected,inspectExistingEnvelope,nextRevision});
 // Existing UIDs may hold an original-phone save that was never submitted.
 // Only Auth accounts minted after this rollout may use the fresh-start path.
 const FRESH_CHARACTER_UID_CUTOFF_MS=Date.parse("2026-09-29T14:15:00Z");
@@ -216,6 +219,58 @@ exports.createInitialCanonicalCharacter=onCall(CALLABLE_OPTIONS,async request=>{
             operationId,expectedRevision:data.expectedRevision,selection:data.selection
         },{requireCurrentReplay:true});
     }catch(error){ throw asHttpsError(error); }
+});
+// Explicit bounded intents only. These endpoints do not activate local battle
+// hooks, adopt a local save or publish a complete playable Cloud Save.
+function canonicalPatrolIntent(request,required,optional=[]){
+    const data=request.data,keys=["uid","session",...required];
+    if(!data||typeof data!=="object"||Array.isArray(data)||
+       keys.some(key=>!Object.prototype.hasOwnProperty.call(data,key))||
+       Object.keys(data).some(key=>!keys.includes(key)&&!optional.includes(key))){
+        throw new HttpsError("invalid-argument","Only a protected canonical intent is accepted.");
+    }
+    return Object.fromEntries([...required,...optional].filter(key=>
+        Object.prototype.hasOwnProperty.call(data,key)).map(key=>[key,data[key]]));
+}
+exports.observeCanonicalAccountMode=onCall(CALLABLE_OPTIONS,async request=>{
+    try{request=await verifyGameIdentity(request);return await canonicalPatrol.modeOwner.observePresence(request,
+        canonicalPatrolIntent(request,["operationId","expectedRevision","expectedSequence","intent","elementBox"]));}
+    catch(error){throw asHttpsError(error);}
+});
+exports.beginCanonicalElementBoxAd=onCall(CALLABLE_OPTIONS,async request=>{
+    try{request=await verifyGameIdentity(request);return await canonicalPatrol.modeOwner.beginSimulatedAd(request,
+        canonicalPatrolIntent(request,["operationId","expectedRevision","expectedSequence"]));}
+    catch(error){throw asHttpsError(error);}
+});
+exports.completeCanonicalElementBoxAd=onCall(CALLABLE_OPTIONS,async request=>{
+    try{request=await verifyGameIdentity(request);return await canonicalPatrol.modeOwner.completeSimulatedAd(request,
+        canonicalPatrolIntent(request,["operationId","expectedRevision","expectedSequence","sourceId"]));}
+    catch(error){throw asHttpsError(error);}
+});
+exports.abandonCanonicalElementBoxAd=onCall(CALLABLE_OPTIONS,async request=>{
+    try{request=await verifyGameIdentity(request);return await canonicalPatrol.modeOwner.abandonSimulatedAd(request,
+        canonicalPatrolIntent(request,["operationId","expectedRevision","expectedSequence","sourceId"]));}
+    catch(error){throw asHttpsError(error);}
+});
+exports.issueCanonicalPatrolTicket=onCall(CALLABLE_OPTIONS,async request=>{
+    try{request=await verifyGameIdentity(request);return await canonicalPatrol.issueTicket(request,
+        canonicalPatrolIntent(request,["operationId","expectedRevision","triggerEntryId"],["availableEntryIds"]));}
+    catch(error){throw asHttpsError(error);}
+});
+exports.settleCanonicalPatrolMember=onCall(CALLABLE_OPTIONS,async request=>{
+    try{request=await verifyGameIdentity(request);return await canonicalPatrol.settleMember(request,
+        canonicalPatrolIntent(request,["operationId","expectedRevision","ticketId","memberIndex"]));}
+    catch(error){throw asHttpsError(error);}
+});
+exports.settleCanonicalPatrolTerminal=onCall(CALLABLE_OPTIONS,async request=>{
+    try{request=await verifyGameIdentity(request);return await canonicalPatrol.settleTerminal(request,
+        canonicalPatrolIntent(request,["operationId","expectedRevision","ticketId","kind"]));}
+    catch(error){throw asHttpsError(error);}
+});
+exports.abandonCanonicalPatrolTicket=onCall(CALLABLE_OPTIONS,async request=>{
+    try{request=await verifyGameIdentity(request);return await canonicalPatrol.abandonTicket(request,
+        canonicalPatrolIntent(request,["operationId","expectedRevision","ticketId"]));}
+    catch(error){throw asHttpsError(error);}
 });
 // No browser grant issuer exists. This reserves a server-issued entitlement
 // for a future authoritative character transaction without changing gameplay.

@@ -83,32 +83,11 @@
     }
 
     function accrueRestedMilliseconds(elapsedMs){
-        const safeElapsed=Math.max(0,Math.floor(Number(elapsedMs)||0));
-        if(safeElapsed<=0 || restedState.battles>=RESTED_EXP_MAX_BATTLES){
-            if(restedState.battles>=RESTED_EXP_MAX_BATTLES){
-                restedState.progressMs=0;
-            }
-            return 0;
-        }
-
-        /* 超過累積上限所需的時間沒有差別，先封頂避免異常時鐘
-           產生不必要的大數字。 */
-        const cappedElapsed=Math.min(
-            safeElapsed,
-            RESTED_EXP_MAX_BATTLES*RESTED_EXP_MS_PER_BATTLE
-        );
-        const totalMs=restedState.progressMs+cappedElapsed;
-        const earned=Math.floor(totalMs/RESTED_EXP_MS_PER_BATTLE);
-        const accepted=Math.min(
-            earned,
-            RESTED_EXP_MAX_BATTLES-restedState.battles
-        );
-
-        restedState.battles+=accepted;
-        restedState.progressMs=restedState.battles>=RESTED_EXP_MAX_BATTLES
-            ? 0
-            : totalMs-earned*RESTED_EXP_MS_PER_BATTLE;
-        return accepted;
+        const result=window.FourSymbolsAccountModeTimePolicy.accrueRested(
+            restedState.battles,restedState.progressMs,elapsedMs);
+        restedState.battles=result.battles;
+        restedState.progressMs=result.progressMs;
+        return result.accepted;
     }
 
     function getNextRestedBattleText(){
@@ -208,17 +187,13 @@
     };
 
     window.v139TryConsumeRestedBattle=function(){
-        if(restedState.battles<=0){
-            return {applied:false,remainingBattles:0};
-        }
-        restedState.battles--;
+        const consumed=window.FourSymbolsAccountModeTimePolicy.consumeRestedBattle(restedState.battles);
+        if(!consumed.applied){ return consumed; }
+        restedState.battles=consumed.remainingBattles;
         restedState.lastSeenAt=Date.now();
         persistRestedState();
         updateRestedExperienceDisplay();
-        return {
-            applied:true,
-            remainingBattles:restedState.battles
-        };
+        return consumed;
     };
 
     document.addEventListener("visibilitychange",function(){

@@ -1682,12 +1682,8 @@
         };
     };
     window.v131GrantElementBoxHours=function(hours,maxHours){
-        const safeHours=Math.max(0,Number(hours)||0);
-        const capMs=Math.max(0,Number(maxHours)||32)*60*60*1000;
-        elementBoxState.remainingMs=Math.min(
-            capMs,
-            Math.max(0,elementBoxState.remainingMs)+safeHours*60*60*1000
-        );
+        elementBoxState.remainingMs=window.FourSymbolsAccountModeTimePolicy.grantElementBox(
+            elementBoxState.remainingMs,hours,maxHours);
         persistElementBoxState();
         updateElementBoxStatsUI();
         return Math.max(0,Math.floor(elementBoxState.remainingMs));
@@ -1698,11 +1694,11 @@
         const delta=Math.max(0,now-elementBoxLastTick);
         elementBoxLastTick=now;
         if(elementBoxActive && elementBoxState.remainingMs>0){
-            const used=Math.min(delta,elementBoxState.remainingMs);
-            elementBoxState.remainingMs-=used;
-            elementBoxSession.activeMs+=used;
-            if(elementBoxState.remainingMs<=0){
-                elementBoxState.remainingMs=0;
+            const debit=window.FourSymbolsAccountModeTimePolicy.debitElementBox(
+                elementBoxState.remainingMs,delta,elementBoxActive);
+            elementBoxState.remainingMs=debit.remainingMs;
+            elementBoxSession.activeMs+=debit.used;
+            if(debit.exhausted){
                 stopElementBoxWhenTimeEnds();
             }
         }
@@ -2641,28 +2637,18 @@
         const maxStack=isEquipmentInventoryType(definition.type)
             ? 1
             : INVENTORY_MAX_STACK_DEFAULT;
-        const matchingStacks=inventoryItems.filter(
-            item=>item && item.id===definition.id
-        );
-        const stackFreeSpace=maxStack<=1
-            ? 0
-            : matchingStacks.reduce(
-                (sum,item)=>sum+Math.max(0,maxStack-(Number(item.count)||0)),
-                0
-            );
-        const freeSlots=Math.max(0,120-inventoryItems.length);
-        return stackFreeSpace+freeSlots*maxStack;
+        return window.FourSymbolsInventoryStackPolicy.capacity(inventoryItems,definition.id,maxStack);
     }
 
     function canAddItemToInventory(definition,amount){
-        const quantity=Math.max(1,Math.floor(Number(amount)||1));
+        const quantity=window.FourSymbolsInventoryStackPolicy.quantity(amount);
         return quantity<=getItemInventoryCapacity(definition);
     }
     window.v132CanAddItemToInventory=canAddItemToInventory;
 
     function addItemToInventory(definition,amount){
         if(!definition||definition.retired||definition.compatibilityOnly||definition.blueprintSlot||/^blueprint/.test(definition.id)||/^(hp|sp)Potion(?:20|100)$/.test(definition.id)){ return false; }
-        const quantity=Math.max(1,Math.floor(Number(amount)||1));
+        const quantity=window.FourSymbolsInventoryStackPolicy.quantity(amount);
         const maxStack=isEquipmentInventoryType(definition.type)
             ? 1
             : INVENTORY_MAX_STACK_DEFAULT;
@@ -2673,9 +2659,8 @@
            先算完整容量，確定整批都放得下才開始改背包，讓加入操作
            具備all-or-nothing語意。
         */
-        if(!canAddItemToInventory(definition,quantity)){ return false; }
-
         if(maxStack<=1){
+            if(!canAddItemToInventory(definition,quantity)){ return false; }
             let remaining=quantity;
             while(remaining>0){
                 if(inventoryItems.length>=120){
@@ -2691,29 +2676,19 @@
             return true;
         }
 
-        let remaining=quantity;
-        const stacks=inventoryItems.filter(item=>item && item.id===definition.id);
+        const plan=window.FourSymbolsInventoryStackPolicy.plan(
+            inventoryItems,definition.id,quantity,maxStack);
+        if(!plan.canAdd){ return false; }
         const ticketDefinition=getTicketDefinition(definition.id);
-        stacks.forEach(stack=>{
-            if(remaining<=0){ return; }
+        plan.updates.forEach(update=>{
+            const stack=inventoryItems[update.index];
             if(ticketDefinition){ syncTicketPresentation(stack,ticketDefinition); }
-            const current=Math.max(0,Math.floor(Number(stack.count)||0));
-            const space=Math.max(0,maxStack-current);
-            const add=Math.min(space,remaining);
-            stack.count=current+add;
-            remaining-=add;
+            stack.count=update.count;
         });
-
-        while(remaining>0){
-            if(inventoryItems.length>=120){
-                return false;
-            }
-            const stackCount=Math.min(maxStack,remaining);
+        plan.appendCounts.forEach(stackCount=>{
             inventoryItems.push(cloneInventoryStackItem(definition,stackCount));
-            remaining-=stackCount;
-        }
-
-        return true;
+        });
+        return plan.success;
     }
 
     window.v132AddItemToInventory=addItemToInventory;
@@ -2809,10 +2784,7 @@
           獨立判定）
     ===================================================== */
 
-    const NORMAL_DROP_TABLE=Object.freeze([
-        {itemId:"freezeTalismanLow",chance:.05,quantity:1},{itemId:"stealthTalismanLow",chance:.05,quantity:1},
-        {itemId:"barrierTalismanLow",chance:.05,quantity:1},{itemId:"oreLow",chance:.05,quantity:1}
-    ].map(Object.freeze));
+    const patrolDropPolicy=window.FourSymbolsPatrolDropPolicy;
 
     function awardMonsterMaterialDrop(monster){
         /*
@@ -2823,11 +2795,12 @@
         if(window.v132ActiveDungeonRun){ return; }
 
         const gained=[];
-        NORMAL_DROP_TABLE.forEach(row=>{
-            if(Math.random()>=row.chance){ return; }
+        patrolDropPolicy.normalRows.forEach((entry,index)=>{
+            const row=patrolDropPolicy.normalDrop(index,Math.random());
+            if(!row){ return; }
             const definition=getTalismanDefinition(row.itemId)||getOreDefinition(row.itemId);
             if(!definition){ return; }
-            if(addItemToInventory(definition,1)){
+            if(addItemToInventory(definition,row.quantity)){
                 gained.push(definition.name);
             }
         });
@@ -6255,32 +6228,11 @@
     }
 
     function accrueRestedMilliseconds(elapsedMs){
-        const safeElapsed=Math.max(0,Math.floor(Number(elapsedMs)||0));
-        if(safeElapsed<=0 || restedState.battles>=RESTED_EXP_MAX_BATTLES){
-            if(restedState.battles>=RESTED_EXP_MAX_BATTLES){
-                restedState.progressMs=0;
-            }
-            return 0;
-        }
-
-        /* 超過累積上限所需的時間沒有差別，先封頂避免異常時鐘
-           產生不必要的大數字。 */
-        const cappedElapsed=Math.min(
-            safeElapsed,
-            RESTED_EXP_MAX_BATTLES*RESTED_EXP_MS_PER_BATTLE
-        );
-        const totalMs=restedState.progressMs+cappedElapsed;
-        const earned=Math.floor(totalMs/RESTED_EXP_MS_PER_BATTLE);
-        const accepted=Math.min(
-            earned,
-            RESTED_EXP_MAX_BATTLES-restedState.battles
-        );
-
-        restedState.battles+=accepted;
-        restedState.progressMs=restedState.battles>=RESTED_EXP_MAX_BATTLES
-            ? 0
-            : totalMs-earned*RESTED_EXP_MS_PER_BATTLE;
-        return accepted;
+        const result=window.FourSymbolsAccountModeTimePolicy.accrueRested(
+            restedState.battles,restedState.progressMs,elapsedMs);
+        restedState.battles=result.battles;
+        restedState.progressMs=result.progressMs;
+        return result.accepted;
     }
 
     function getNextRestedBattleText(){
@@ -6380,17 +6332,13 @@
     };
 
     window.v139TryConsumeRestedBattle=function(){
-        if(restedState.battles<=0){
-            return {applied:false,remainingBattles:0};
-        }
-        restedState.battles--;
+        const consumed=window.FourSymbolsAccountModeTimePolicy.consumeRestedBattle(restedState.battles);
+        if(!consumed.applied){ return consumed; }
+        restedState.battles=consumed.remainingBattles;
         restedState.lastSeenAt=Date.now();
         persistRestedState();
         updateRestedExperienceDisplay();
-        return {
-            applied:true,
-            remainingBattles:restedState.battles
-        };
+        return consumed;
     };
 
     document.addEventListener("visibilitychange",function(){
@@ -7788,19 +7736,13 @@
        Elite single-roll drops + quest progress    /* =====================================================
        Elite single-roll drops + quest progress
     ===================================================== */
-    const ELITE_DROP_TABLE=Object.freeze([
-        {itemId:"ticketSetFire",chance:.01,quantity:1},{itemId:"ticketSetWater",chance:.01,quantity:1},
-        {itemId:"ticketSetEarth",chance:.01,quantity:1},{itemId:"ticketSetWind",chance:.01,quantity:1},
-        {itemId:"freezeTalismanMid",chance:.05,quantity:1},{itemId:"stealthTalismanMid",chance:.05,quantity:1},
-        {itemId:"barrierTalismanMid",chance:.05,quantity:1}
-    ].map(Object.freeze));
+    const patrolDropPolicy=window.FourSymbolsPatrolDropPolicy;
     function addEliteSpecialDrop(monster){
         if(typeof window.v132AddItemToInventory!=="function"){ return null; }
-        let roll=Math.random();
-        const row=ELITE_DROP_TABLE.find(entry=>(roll-=entry.chance)<0);
+        const row=patrolDropPolicy.eliteDrop(Math.random());
         const definition=row&&((window.v132GetTicketDefinition&&window.v132GetTicketDefinition(row.itemId))||(window.v132GetTalismanDefinition&&window.v132GetTalismanDefinition(row.itemId)));
         if(!definition){ return null; }
-        if(!window.v132AddItemToInventory(definition,1)){
+        if(!window.v132AddItemToInventory(definition,row.quantity)){
             addBattleLog(monster.name+"出現特殊掉落，但背包已滿，未能放入。");
             return null;
         }

@@ -469,6 +469,140 @@
 })(typeof window!=="undefined"?window:globalThis);
 
 
+/* bundled source: functions/src/patrol-drop-policy.js */
+/* Shared Wild drop data and reward sampling only. Samples are supplied by the
+   caller; this Owner creates no RNG, combat result, eligibility or entitlement. */
+(function installPatrolDropPolicy(global){
+    "use strict";
+    const normalRows=Object.freeze([
+        {itemId:"freezeTalismanLow",chance:.05,quantity:1},
+        {itemId:"stealthTalismanLow",chance:.05,quantity:1},
+        {itemId:"barrierTalismanLow",chance:.05,quantity:1},
+        {itemId:"oreLow",chance:.05,quantity:1}
+    ].map(Object.freeze));
+    const eliteRows=Object.freeze([
+        {itemId:"ticketSetFire",chance:.01,quantity:1},
+        {itemId:"ticketSetWater",chance:.01,quantity:1},
+        {itemId:"ticketSetEarth",chance:.01,quantity:1},
+        {itemId:"ticketSetWind",chance:.01,quantity:1},
+        {itemId:"freezeTalismanMid",chance:.05,quantity:1},
+        {itemId:"stealthTalismanMid",chance:.05,quantity:1},
+        {itemId:"barrierTalismanMid",chance:.05,quantity:1}
+    ].map(Object.freeze));
+    // One row per call preserves the Client's interleaving of random draws,
+    // definition lookup and inventory insertion, including capacity failures.
+    function normalDrop(rowIndex,sample){
+        const row=normalRows[rowIndex];
+        if(sample>=row.chance){return null;}
+        return row;
+    }
+    function eliteDrop(sample){
+        let remaining=sample;
+        return eliteRows.find(row=>(remaining-=row.chance)<0)||null;
+    }
+    const api=Object.freeze({normalRows,eliteRows,normalDrop,eliteDrop});
+    global.FourSymbolsPatrolDropPolicy=api;
+    if(typeof module!=="undefined"&&module.exports){module.exports=api;}
+})(typeof window!=="undefined"?window:globalThis);
+
+
+/* bundled source: functions/src/account-mode-time-policy.js */
+/* Shared account-mode time arithmetic only. Callers own validated state,
+   clocks, presence, eligibility, grants, persistence and lifecycle decisions. */
+(function installAccountModeTimePolicy(global){
+    "use strict";
+    const constants=Object.freeze({restedMsPerBattle:120000,restedMaxBattles:300,
+        elementBoxRewardMs:8*60*60*1000,elementBoxMaxMs:32*60*60*1000});
+    function accrueRested(battles,progressMs,elapsedMs){
+        const safeElapsed=Math.max(0,Math.floor(Number(elapsedMs)||0));
+        if(safeElapsed<=0||battles>=constants.restedMaxBattles){
+            if(battles>=constants.restedMaxBattles){progressMs=0;}
+            return {battles,progressMs,accepted:0};
+        }
+        const cappedElapsed=Math.min(safeElapsed,
+            constants.restedMaxBattles*constants.restedMsPerBattle);
+        const totalMs=progressMs+cappedElapsed;
+        const earned=Math.floor(totalMs/constants.restedMsPerBattle);
+        const accepted=Math.min(earned,constants.restedMaxBattles-battles);
+        battles+=accepted;
+        progressMs=battles>=constants.restedMaxBattles?0:
+            totalMs-earned*constants.restedMsPerBattle;
+        return {battles,progressMs,accepted};
+    }
+    function grantElementBox(remainingMs,hours,maxHours){
+        const safeHours=Math.max(0,Number(hours)||0);
+        const capMs=Math.max(0,Number(maxHours)||32)*60*60*1000;
+        return Math.min(capMs,Math.max(0,remainingMs)+safeHours*60*60*1000);
+    }
+    function debitElementBox(remainingMs,elapsedMs,active){
+        let used=0,exhausted=false;
+        if(active&&remainingMs>0){
+            const delta=Math.max(0,elapsedMs);
+            used=Math.min(delta,remainingMs);
+            remainingMs-=used;
+            if(remainingMs<=0){remainingMs=0;exhausted=true;}
+        }
+        return {remainingMs,used,exhausted};
+    }
+    function elementBoxStoredMs(remainingMs){
+        return Math.max(0,Math.floor(remainingMs));
+    }
+    // Exact single-win rule formerly owned by v139TryConsumeRestedBattle.
+    // Eligibility (ordinary win, no ElementBox/dungeon) belongs to the caller.
+    function consumeRestedBattle(battles){
+        if(battles<=0)return {applied:false,remainingBattles:0};
+        return {applied:true,remainingBattles:battles-1};
+    }
+    const api=Object.freeze({constants,accrueRested,grantElementBox,debitElementBox,
+        elementBoxStoredMs,consumeRestedBattle});
+    global.FourSymbolsAccountModeTimePolicy=api;
+    if(typeof module!=="undefined"&&module.exports){module.exports=api;}
+})(typeof window!=="undefined"?window:globalThis);
+
+
+/* bundled source: functions/src/inventory-stack-policy.js */
+/* Shared stack planning only. Callers retain definition admission, canonical
+   input validation, presentation, item cloning and equipment instance owners. */
+(function installInventoryStackPolicy(global){
+    "use strict";
+    const constants=Object.freeze({maxEntries:120,maxStack:999});
+    function quantity(amount){return Math.max(1,Math.floor(Number(amount)||1));}
+    function capacity(items,itemId,maxStack=constants.maxStack){
+        const matching=items.filter(item=>item&&item.id===itemId);
+        const stackFreeSpace=maxStack<=1?0:matching.reduce((sum,item)=>
+            sum+Math.max(0,maxStack-(Number(item.count)||0)),0);
+        return stackFreeSpace+Math.max(0,constants.maxEntries-items.length)*maxStack;
+    }
+    function plan(items,itemId,amount,maxStack=constants.maxStack){
+        const requested=quantity(amount),available=capacity(items,itemId,maxStack);
+        const result={quantity:requested,capacity:available,canAdd:requested<=available,
+            success:false,updates:[],appendCounts:[]};
+        if(!result.canAdd)return result;
+        let remaining=requested;
+        // Retain both the original iteration order and touched zero-space rows:
+        // the Client synchronizes ticket presentation for every visited stack.
+        if(maxStack>1){
+            items.forEach((item,index)=>{
+                if(!item||item.id!==itemId||remaining<=0)return;
+                const current=Math.max(0,Math.floor(Number(item.count)||0));
+                const add=Math.min(Math.max(0,maxStack-current),remaining);
+                result.updates.push({index,count:current+add});remaining-=add;
+            });
+        }
+        while(remaining>0){
+            if(items.length+result.appendCounts.length>=constants.maxEntries)return result;
+            const count=Math.min(maxStack,remaining);
+            result.appendCounts.push(count);remaining-=count;
+        }
+        result.success=true;
+        return result;
+    }
+    const api=Object.freeze({constants,quantity,capacity,plan});
+    global.FourSymbolsInventoryStackPolicy=api;
+    if(typeof module!=="undefined"&&module.exports){module.exports=api;}
+})(typeof window!=="undefined"?window:globalThis);
+
+
 /* bundled source: js/00-main.js */
 /* BEGIN GENERATED MONSTER BALANCE OWNER */
 (function installMonsterBalanceAuthority(){
