@@ -12,14 +12,18 @@ const {createCanonicalCurrentRecovery}=require('../functions/src/canonical-curre
 const {createCanonicalPatrolSettlement}=require('../functions/src/canonical-patrol-settlement');
 const auditId='immutable-candidate-audit-001',operationId='immutable-publication-0001';
 const args={auditId,expectedEpoch:1,operationId};
-function lexicalFactory(enabled){
+function lexicalFactory(enabled,io={bucketName:'private-fake-test-bucket'}){
     const filename=require.resolve('../functions/src/canonical-current-recovery'),compiled=new Module(filename);
     compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
     let source=readFileSync(filename,'utf8');
     const needle='return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact';
     assert.equal(source.split(needle).length,2);
     source=source.replace(needle,'return Object.freeze({pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact');
-    if(enabled)source=source.replace('const immutableCandidateIO=null;','const immutableCandidateIO=Object.freeze({bucketName:"private-fake-test-bucket"});');
+    if(enabled){
+        source=source.replace('const immutableCandidateIO=null;','const immutableCandidateIO=require("test-only-immutable-candidate-io");');
+        const native=compiled.require.bind(compiled);compiled.require=name=>name==='test-only-immutable-candidate-io'?io:native(name);
+    }
+    source=source.replace('return Object.freeze({pinCandidatePublication,','return Object.freeze({publishPreparedCandidate,ackCandidatePublication,pinCandidatePublication,');
     compiled._compile(source,filename);return compiled.exports.createCanonicalCurrentRecovery;
 }
 // Only the fixture adapts its in-memory references to SDK public query APIs.
@@ -33,7 +37,7 @@ function sdkDb(db){
         get:()=>db.runTransaction(tx=>tx.get(row))});
     return {collection:name=>query(db.collection(name)),doc:path=>reference(db.doc(path)),runTransaction:operation=>db.runTransaction(operation)};
 }
-async function fixture(){
+async function fixture(io){
     const h=storeHarness({optimisticTransactions:true}),sessions=createSessionAuthority(h.dependencies);
     let authTime=Math.floor(h.clock/1000),session=await sessions.create({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid}});
     const request=()=>({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid,session}});
@@ -56,22 +60,22 @@ async function fixture(){
     const count=h.data.get(root+'/captureState/current').capturedCount;let offset=0;sequence=0;
     while(offset<count){const value=await original.captureRawInventory(request(),{...args,operationId:`immutable-raw-${String(++sequence).padStart(6,'0')}`,
         expectedSequence:sequence,startOrdinal:offset,count:Math.min(16,count-offset)});offset=value.nextOrdinal;}
-    const traces=[],native=h.dependencies.db.runTransaction;
+    const traces=[],native=h.dependencies.db.runTransaction;let transactionDepth=0;
     h.dependencies.db.runTransaction=callback=>native(async tx=>{
         const trace={points:0,queries:0,writes:0};traces.push(trace);
         const facade={get:ref=>{trace[ref.query?'queries':'points']++;return tx.get(ref);}};
         for(const name of ['create','set','update','delete'])facade[name]=(...a)=>{trace.writes++;return tx[name](...a);};
-        return callback(facade);
+        transactionDepth++;try{return await callback(facade);}finally{transactionDepth--;}
     });
     return {h,deps,request,root,sessions,original,traces,
-        private:lexicalFactory(true)(deps),disabled:lexicalFactory(false)(deps),
+        private:lexicalFactory(true,io)(deps),disabled:lexicalFactory(false)(deps),get transactionDepth(){return transactionDepth;},
         takeover:async()=>{h.advance(1000);authTime=Math.floor(h.clock/1000);session=await sessions.create({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid}});}};
 }
 async function artifact(f){const pin=await f.private.pinCandidatePublication(f.request(),args);
     const material=await f.private.loadPinnedRawCapture(pin);return {pin,artifact:await f.private.assemblePinnedCandidate(pin,material)};}
 test('publication preparation stays private and production-unavailable before reads; forged identities cannot mint origin',async()=>{
     const f=await fixture(),before=copy([...f.h.data]),writes=f.h.writes;f.traces.length=0;
-    for(const name of ['pinCandidatePublication','loadPinnedRawCapture','assemblePinnedCandidate','prepareCandidatePublication'])assert.equal(Object.hasOwn(f.original,name),false);
+    for(const name of ['pinCandidatePublication','loadPinnedRawCapture','assemblePinnedCandidate','prepareCandidatePublication','publishPreparedCandidate','ackCandidatePublication'])assert.equal(Object.hasOwn(f.original,name),false);
     await assert.rejects(f.disabled.pinCandidatePublication(f.request(),args),/unavailable/);
     await assert.rejects(f.private.loadPinnedRawCapture(Object.freeze({})),/original private/);
     await assert.rejects(f.private.prepareCandidatePublication(f.request(),{},{}),/original private/);
@@ -151,4 +155,99 @@ test('same-op concurrent prepares commit one manifest and every SDK attempt reva
     loaded.h.data.get(loaded.h.save).serverRevision++;
     await assert.rejects(loaded.private.prepareCandidatePublication(loaded.request(),value.pin,value.artifact),/REVISION/);
     assert.equal(loaded.h.writes,writes);
+});
+function fakeStorage(){
+    const objects=new Map(),calls=[];let serial=9007199254740993n;
+    const io={bucketName:'private-fake-test-bucket',outside:()=>{},calls,objects,
+        async lookupMetadata(name){io.outside();calls.push(['lookup',copy(name)]);return copy(objects.get(name.objectName)?.metadata??null);},
+        async createOnly(input){
+            io.outside();calls.push(['create',input.ifGenerationMatch]);assert.equal(input.ifGenerationMatch,'0');
+            if(objects.has(input.objectName))throw Object.assign(Error('exists'),{code:'ALREADY_EXISTS'});
+            const metadata={bucketName:input.bucketName,objectName:input.objectName,generation:String(serial++),size:input.bytes.length};
+            objects.set(input.objectName,{metadata,bytes:Buffer.from(input.bytes)});return copy(metadata);
+        },
+        async readExact(input){
+            io.outside();calls.push(['read',input.generation]);const row=objects.get(input.objectName);
+            if(!row||row.metadata.generation!==input.generation)throw Object.assign(Error('missing exact generation'),{code:'NOT_FOUND'});
+            return copy(row);
+        }};
+    return io;
+}
+async function preparedFixture(){const io=fakeStorage(),f=await fixture(io);io.outside=()=>assert.equal(f.transactionDepth,0,'Storage IO cannot run in a Firestore callback');
+    const ready=await artifact(f);return {...f,io,ready,prepared:await f.private.prepareCandidatePublication(f.request(),ready.pin,ready.artifact)};}
+test('private full-read publication and ACK bind canonical string generation; ACK changes only four fields and retry is read-only',async()=>{
+    const f=await preparedFixture(),path=f.root+'/candidatePublications/'+operationId,before=copy(f.h.data.get(path));f.traces.length=0;
+    const proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    assert.deepEqual(proof,{});assert.deepEqual(f.traces,[{points:13,queries:0,writes:0}]);
+    f.traces.length=0;const result=await f.private.ackCandidatePublication(f.request(),f.prepared,proof);
+    assert.equal(result.generation,'9007199254740993');assert.equal(result.unchanged,false);
+    assert.deepEqual(f.traces,[{points:13,queries:0,writes:1}]);
+    const {generation,objectSize,ackAt,...after}=f.h.data.get(path);assert(ackAt.toMillis());
+    assert.deepEqual(after,{...before,status:'acknowledged'});assert.equal(objectSize,before.artifactByteLength);
+    for(const name of ['candidateProofValid','trustedCaptureVerified','restoreAuthorized','authoritativeStateReady'])assert.equal(result[name],false);
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),/unconsumed/);
+    const newProof=await f.private.publishPreparedCandidate(f.request(),f.prepared);f.traces.length=0;
+    assert.equal((await f.private.ackCandidatePublication(f.request(),f.prepared,newProof)).unchanged,true);
+    assert.deepEqual(f.traces,[{points:13,queries:0,writes:0}]);
+    const repeat=await f.private.prepareCandidatePublication(f.request(),f.ready.pin,f.ready.artifact);assert.deepEqual(repeat,{});
+    assert.equal(f.io.calls.filter(([kind])=>kind==='create').length,1);
+});
+test('lost create/ACK responses preserve the original object and exact bytes without overwrite or source replacement',async()=>{
+    const f=await preparedFixture(),create=f.io.createOnly;let lost=true;
+    f.io.createOnly=async input=>{const result=await create(input);if(lost){lost=false;throw Object.assign(Error('lost response'),{code:'UNKNOWN_COMMIT'});}return result;};
+    const proof=await f.private.publishPreparedCandidate(f.request(),f.prepared),native=f.h.dependencies.db.runTransaction;let loseCommit=true;
+    f.h.dependencies.db.runTransaction=async callback=>{const result=await native(callback);if(loseCommit){loseCommit=false;throw Error('lost ACK response');}return result;};
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),/lost ACK/);
+    f.h.dependencies.db.runTransaction=native;
+    const attempts=f.traces.length;
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),/unconsumed/);
+    assert.equal(f.traces.length,attempts,'a failed outer response invalidates proof before another transaction');
+    const refreshed=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    assert.equal((await f.private.ackCandidatePublication(f.request(),f.prepared,refreshed)).unchanged,true);
+    assert.equal(f.io.objects.size,1);assert.equal(f.io.calls.filter(([kind])=>kind==='create').length,1);
+    // A process restart may rematerialize only the original immutable capture.
+    const restarted=lexicalFactory(true,f.io)(f.deps),pin=await restarted.pinCandidatePublication(f.request(),args);
+    const material=await restarted.loadPinnedRawCapture(pin),identity=await restarted.assemblePinnedCandidate(pin,material);
+    const prepared=await restarted.prepareCandidatePublication(f.request(),pin,identity);
+    await restarted.ackCandidatePublication(f.request(),prepared,await restarted.publishPreparedCandidate(f.request(),prepared));
+    assert.equal(f.io.calls.filter(([kind])=>kind==='create').length,1);
+});
+test('metadata, generation, bytes and provider errors cannot ACK, overwrite collisions, or fall back from a lost acknowledged generation',async()=>{
+    for(const mutate of [row=>{row.metadata.generation=9007199254740993;},row=>{row.metadata.generation='01';},
+        row=>{row.metadata.bucketName='foreign';},row=>{row.metadata.objectName+='-foreign';},row=>{row.metadata.size++;},
+        row=>{row.bytes[0]^=1;}]){
+        const f=await preparedFixture();await f.private.publishPreparedCandidate(f.request(),f.prepared);
+        mutate([...f.io.objects.values()][0]);const writes=f.h.writes;
+        await assert.rejects(f.private.publishPreparedCandidate(f.request(),f.prepared));assert.equal(f.h.writes,writes);
+        assert.equal(f.io.calls.filter(([kind])=>kind==='create').length,1);
+    }
+    for(const code of ['PERMISSION_DENIED','DEADLINE_EXCEEDED']){
+        const f=await preparedFixture();f.io.createOnly=async()=>{throw Object.assign(Error(code),{code});};
+        await assert.rejects(f.private.publishPreparedCandidate(f.request(),f.prepared),new RegExp(code));
+        assert.equal(f.h.data.get(f.root+'/candidatePublications/'+operationId).status,'prepared');
+    }
+    const f=await preparedFixture(),proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    await f.private.ackCandidatePublication(f.request(),f.prepared,proof);
+    const row=[...f.io.objects.values()][0];row.metadata.generation='9007199254740994';const writes=f.h.writes;
+    await assert.rejects(f.private.publishPreparedCandidate(f.request(),f.prepared),/missing exact generation/);assert.equal(f.h.writes,writes);
+});
+test('ACK rollback and concurrent proofs preserve exact tuple; takeover, expiry and cancel recheck live gates after IO',async()=>{
+    const f=await preparedFixture();let a=await f.private.publishPreparedCandidate(f.request(),f.prepared);const b=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    f.h.abortNext();await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,a),/rollback/);
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,a),/unconsumed/);
+    a=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    const before=f.h.writes;
+    const results=await Promise.all([f.private.ackCandidatePublication(f.request(),f.prepared,a),f.private.ackCandidatePublication(f.request(),f.prepared,b)]);
+    assert.equal(f.h.writes-before,1);assert.deepEqual(results.map(row=>row.unchanged).sort(),[false,true]);
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,{}),/original private/);
+    for(const action of ['expiry','takeover','cancel']){
+        const f=await preparedFixture(),proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+        if(action==='expiry')f.h.advance(60000);
+        else if(action==='takeover')await f.takeover();
+        else await f.original.cancelAudit(f.request(),{auditId,expectedEpoch:1,operationId:'immutable-cancel-after-io'});
+        const writes=f.h.writes,creates=f.io.calls.filter(([kind])=>kind==='create').length;
+        await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof));
+        await assert.rejects(f.private.publishPreparedCandidate(f.request(),f.prepared));
+        assert.equal(f.h.writes,writes);assert.equal(f.io.calls.filter(([kind])=>kind==='create').length,creates);
+    }
 });

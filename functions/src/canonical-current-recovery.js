@@ -84,10 +84,11 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     const patrolEvidence=createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
         inspectExistingEnvelope,nextRevision,now});
     const modeEvidence=patrolEvidence.modeOwner;
-    // Checkpoint A is deliberately unreachable from the factory and has no
+    // Publication preparation is deliberately unreachable from the factory and has no
     // production IO adapter. Tests may inspect these lexical functions only.
     const immutableCandidateIO=null;
     const publicationPins=new WeakMap(),publicationMaterials=new WeakMap(),publicationArtifacts=new WeakMap(),publicationPreparations=new WeakMap();
+    const publicationReadProofs=new WeakMap();
     function requirePublicationPreparation(){
         if(immutableCandidateIO===null)fail("failed-precondition","Immutable candidate publication is unavailable.");
     }
@@ -1607,13 +1608,115 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 artifactSha256:inventoryHash(artifact.bytes),artifactByteLength:artifact.bytes.length,status:"prepared",...inventoryFlags};
             if(typeof tuple.bucketName!=="string"||!tuple.bucketName)fail("failed-precondition","A private publication destination is unavailable.");
             if(current.existing.exists){
-                const {createdAt,...existing}=current.existing.data();
-                if(typeof createdAt?.toMillis!=="function"||!Number.isSafeInteger(createdAt.toMillis())||snapshotDigest(existing)!==snapshotDigest(tuple))
-                    fail("data-loss","Original candidate publication manifest differs.");
+                inspectPublicationManifest(current.existing.data(),tuple);
             }else tx.create(current.reference,{...tuple,createdAt:FieldValue.serverTimestamp()});
             return tuple;
         },args.operationId);
         return publicationIdentity(publicationPreparations,{pin,artifactIdentity,tuple:value});
+    }
+    const publicationGeneration=value=>typeof value==="string"&&/^[1-9][0-9]{0,19}$/.test(value);
+    function inspectPublicationManifest(row,tuple){
+        if(!row)fail("data-loss","Original candidate publication manifest is missing.");
+        const {createdAt,...value}=row;
+        if(typeof createdAt?.toMillis!=="function"||!Number.isSafeInteger(createdAt.toMillis()))
+            fail("data-loss","Original candidate publication timestamp differs.");
+        timestampPair(createdAt);
+        if(row.status==="acknowledged"){
+            const {generation,objectSize,ackAt,...original}=value;
+            if(!publicationGeneration(generation)||objectSize!==tuple.artifactByteLength||
+               typeof ackAt?.toMillis!=="function"||!Number.isSafeInteger(ackAt.toMillis()))
+                fail("data-loss","Original candidate acknowledgement differs.");
+            timestampPair(ackAt);
+            if(snapshotDigest({...original,status:"prepared"})!==snapshotDigest(tuple))
+                fail("data-loss","Original candidate publication manifest differs.");
+        }else if(snapshotDigest(value)!==snapshotDigest(tuple))fail("data-loss","Original candidate publication manifest differs.");
+        return row;
+    }
+    async function livePreparedPublication(request,identity){
+        const prepared=publicationValue(publicationPreparations,identity),pinned=publicationValue(publicationPins,prepared.pin);
+        const artifact=publicationValue(publicationArtifacts,prepared.artifactIdentity);
+        const manifest=await runRecoveryAuditMaintenance(request,pinned.args.auditId,async(tx,session)=>{
+            const current=await publicationContext(tx,session,pinned.args);
+            if(snapshotDigest(current.tuple)!==snapshotDigest(pinned.tuple))fail("aborted","Publication capture binding changed.");
+            return inspectPublicationManifest(current.existing.data(),prepared.tuple);
+        },pinned.args.operationId);
+        return {prepared,pinned,artifact,manifest};
+    }
+    function publicationMetadata(value,tuple){
+        inventoryExact(value,["bucketName","objectName","generation","size"],"publication object metadata");
+        if(value.bucketName!==tuple.bucketName||value.objectName!==tuple.objectName||
+           !publicationGeneration(value.generation)||value.size!==tuple.artifactByteLength)
+            fail("data-loss","Candidate object metadata differs from its manifest.");
+        return value;
+    }
+    async function publishPreparedCandidate(request,identity){
+        requirePublicationPreparation();
+        if(["createOnly","lookupMetadata","readExact"].some(name=>typeof immutableCandidateIO[name]!=="function"))
+            fail("failed-precondition","Immutable candidate IO is unavailable.");
+        // This protected read finishes before any external side effect. There
+        // is no Firestore/Storage distributed transaction: ACK rechecks again.
+        const {prepared,artifact,manifest}=await livePreparedPublication(request,identity),tuple=prepared.tuple;
+        const name={bucketName:tuple.bucketName,objectName:tuple.objectName};
+        let metadata;
+        if(manifest.status==="acknowledged")metadata={...name,generation:manifest.generation,size:manifest.objectSize};
+        else{
+            metadata=await immutableCandidateIO.lookupMetadata({...name});
+            if(metadata===null){
+                let created;
+                try{
+                    created=publicationMetadata(await immutableCandidateIO.createOnly({...name,
+                        bytes:Buffer.from(artifact.bytes),ifGenerationMatch:"0"}),tuple);
+                }catch(error){
+                    if(!["ALREADY_EXISTS","UNKNOWN_COMMIT"].includes(error.code))throw error;
+                }
+                metadata=await immutableCandidateIO.lookupMetadata({...name});
+                if(metadata===null)fail("unavailable","Original immutable candidate object is not available.");
+                if(created&&metadata.generation!==created.generation)fail("data-loss","Created candidate generation changed.");
+            }
+        }
+        publicationMetadata(metadata,tuple);
+        const response=await immutableCandidateIO.readExact({...name,generation:metadata.generation});
+        inventoryExact(response,["metadata","bytes"],"publication exact read");
+        const observed=publicationMetadata(response.metadata,tuple);
+        if(observed.generation!==metadata.generation||!Buffer.isBuffer(response.bytes)||response.bytes.length!==tuple.artifactByteLength)
+            fail("data-loss","Exact candidate generation or bytes differ.");
+        const generation=observed.generation,bytes=Buffer.from(response.bytes);
+        if(inventoryHash(bytes)!==tuple.artifactSha256)fail("data-loss","Immutable candidate bytes differ from the original manifest.");
+        const result=await verifyRecoveryAuditArtifact({uid:tuple.ownerUid,expectedRevision:tuple.sourceRevision,artifactBytes:bytes});
+        if(result.candidateProofValid!==true||result.trustedCaptureVerified!==false||result.restoreAuthorized!==false||
+           result.authoritativeStateReady!==false||result.ownerUid!==tuple.ownerUid||result.sourceRevision!==tuple.sourceRevision||
+           result.sourceSha256!==tuple.sourceSha256||result.snapshotSha256!==tuple.snapshotSha256)
+            fail("data-loss","Immutable candidate original proof differs.");
+        return publicationIdentity(publicationReadProofs,{identity,tupleSha256:snapshotDigest(tuple),
+            generation,size:bytes.length,sha256:inventoryHash(bytes),consumed:false,unusable:false});
+    }
+    async function ackCandidatePublication(request,identity,readIdentity){
+        requirePublicationPreparation();
+        const prepared=publicationValue(publicationPreparations,identity),proof=publicationValue(publicationReadProofs,readIdentity);
+        const pinned=publicationValue(publicationPins,prepared.pin),tuple=prepared.tuple;
+        if(proof.identity!==identity||proof.consumed||proof.unusable||proof.tupleSha256!==snapshotDigest(tuple)||
+           proof.size!==tuple.artifactByteLength||proof.sha256!==tuple.artifactSha256)
+            fail("permission-denied","An original unconsumed exact candidate read is required.");
+        let result;
+        try{result=await runRecoveryAuditMaintenance(request,pinned.args.auditId,async(tx,session)=>{
+            const current=await publicationContext(tx,session,pinned.args);
+            if(snapshotDigest(current.tuple)!==snapshotDigest(pinned.tuple))fail("aborted","Publication capture binding changed.");
+            const manifest=inspectPublicationManifest(current.existing.data(),tuple),unchanged=manifest.status==="acknowledged";
+            if(unchanged){
+                if(manifest.generation!==proof.generation||manifest.objectSize!==proof.size)
+                    fail("data-loss","Original acknowledged candidate generation differs.");
+            }else tx.update(current.reference,{status:"acknowledged",generation:proof.generation,objectSize:proof.size,ackAt:FieldValue.serverTimestamp()});
+            return Object.freeze({...inventoryFlags,status:"acknowledged",auditId:tuple.auditId,operationId:tuple.operationId,
+                artifactSha256:tuple.artifactSha256,generation:proof.generation,unchanged});
+        },pinned.args.operationId);}
+        catch(error){
+            // SDK callback retries stay within the awaited runner. Any outer
+            // failure (including a committed-but-lost response) requires a
+            // fresh exact-generation full read, without hiding its error.
+            proof.unusable=true;throw error;
+        }
+        // Only successful transaction resolution consumes a usable proof.
+        proof.consumed=true;return result;
     }
     // Candidate-only internal consistency review. This does not establish that
     // a trusted capture included all live documents, grant approval, or return
