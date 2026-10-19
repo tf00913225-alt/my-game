@@ -3890,12 +3890,15 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
         authority.runRecoveryAuditMaintenance(req,id,async(tx,active)=>{await operation(tx,active);throw Error("raw SDK staged rollback");})});
     await assert.rejects(()=>rawRollback.captureRawInventory(request(),rawFirst),/raw SDK staged rollback/);
     assert.equal((await rawState.get()).exists,false);assert.equal((await rawPage(rawFirst.operationId).get()).exists,false);
+    const rawReceiptRows=new Map(),rawChunkRows=new Map();
     async function checkRaw(input,result){
         closed(result);assert.equal(result.proofKernelExecuted,false);assert.equal(Object.hasOwn(result,"rawComplete"),false);
         const receipt=(await rawPage(input.operationId).get()).data(),chunks=[];
+        rawReceiptRows.set(input.operationId,{id:input.operationId,row:receipt});
         for(let index=0;index<result.chunkCount;index++){
             const doc=await runRef.collection("proofPayloadChunks").doc(input.operationId+"_"+String(index).padStart(2,"0")).get();
             assert.equal(doc.exists,true);assert.ok(Buffer.isBuffer(doc.get("payloadBytes")));assert.ok(doc.get("payloadBytes").length<=256*1024);chunks.push(doc.get("payloadBytes"));
+            rawChunkRows.set(doc.id,{id:doc.id,row:doc.data()});
         }
         const bytes=Buffer.concat(chunks);assert.equal(bytes.length,result.payloadByteLength);assert.equal(createHash("sha256").update(bytes).digest("hex"),result.payloadSha256);
         const payload=decodeProofPayload(bytes);assert.equal(payload.schemaVersion,3);assert.equal(payload.documents.length,input.count);
@@ -3916,6 +3919,35 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.ok(rawCallbacks>=2);assert.ok(rawRace.some(result=>result.unchanged));assert.equal(rawRace[0].payloadSha256,rawRace[1].payloadSha256);
     for(const result of rawRace){await checkRaw(rawNext,result);assert.equal(result.rawCursorExhausted,true);assert.equal(result.previousReceiptSha256,rawResult.receiptSha256);}
     for(const attempt of attempts.slice(rawRaceStart)){assert.ok(attempt.reads<=400);assert.ok(attempt.reads<=13+pages.length+16);assert.ok(attempt.writes<=10);assert.equal(attempt.queries,1);}
+    // Reuse the real two-page capture, including native SDK Timestamp values.
+    // Only these two cursor documents require additional live point reads;
+    // inventory pages, run and raw receipts/chunks were already read above.
+    const inventoryState=(await stateRef.get()).data(),finalRawState=(await rawState.get()).data();
+    const rawMaterial={binding:{ownerUid:uid,auditId,epoch:1,sourceRevision:2,
+        inventoryStateSha256:inventoryState.stateSha256},run:controls[0].data,inventoryState,
+        inventoryPages:pages.map(page=>({id:page.args.operationId,row:page.data})),rawState:finalRawState,
+        rawReceipts:[...rawReceiptRows.values()],rawChunks:[...rawChunkRows.values()]};
+    // Snapshot only for mutation detection: Buffer.toJSON retains bytes and
+    // native Timestamp.toJSON retains exact seconds/nanoseconds. The gameplay
+    // typed codec deliberately does not accept this outer transport bundle.
+    const materialBefore=JSON.stringify(rawMaterial),candidateAttemptStart=attempts.length;
+    const candidate=await recovery.verifyRawRecoveryAuditCandidate(rawMaterial);
+    assert.equal(candidate.candidateProofValid,true);assert.equal(candidate.ownerUid,uid);assert.equal(candidate.sourceRevision,2);
+    for(const flag of ["authoritativeStateReady","trustedCaptureVerified","restoreAuthorized"])assert.equal(candidate[flag],false);
+    assert.equal(candidate.documentCount,rawOrder.length);
+    assert.equal(candidate.dependencyCount,candidate.documentCount+candidate.absenceCount);
+    assert.ok(Object.isFrozen(candidate));assert.ok(!Object.values(candidate).some(value=>Buffer.isBuffer(value)));
+    for(const key of ["records","documents","artifactBytes","restorePermit"])assert.equal(Object.hasOwn(candidate,key),false);
+    const usage=candidate.assemblyUsage;assert.equal(usage.reservedBytes,0);
+    assert.ok(usage.bytes<=256*1024*1024);assert.ok(usage.nodes<=16000000);
+    assert.ok(usage.operations<=16384);assert.ok(usage.passes>1&&usage.passes<=64);assert.ok(usage.elapsedMs<=30000);
+    assert.equal(JSON.stringify(rawMaterial),materialBefore);
+    // Exhausted cursor alone cannot conceal a missing historical chunk. This
+    // damaged in-memory bundle never changes or repairs the committed capture.
+    const missingChunk={...rawMaterial,rawChunks:rawMaterial.rawChunks.slice(1)};
+    await assert.rejects(()=>recovery.verifyRawRecoveryAuditCandidate(missingChunk));
+    assert.equal(JSON.stringify(rawMaterial),materialBefore);assert.equal(attempts.length,candidateAttemptStart);
+    console.log("PASS raw capture candidate actual SDK: original two-page bytes and native timestamps, complete chain through sole candidate encoder/original proofs, missing historical chunk refusal; candidate validity only, no trusted capture, restore or playable authority.");
     assert.deepEqual(await assets(),assetBefore);assert.deepEqual(await Promise.all([runRef.get(),fenceRef.get()]).then(rows=>rows.map(row)),controls);
     await assert.rejects(()=>patrol.observePresence(request(),{operationId:"inventory-fenced-heartbeat1",expectedRevision:2,
         expectedSequence:18,intent:"heartbeat",elementBox:"keep"}),/RECOVERY_AUDIT_MAINTENANCE/);
