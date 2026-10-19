@@ -3931,6 +3931,11 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     for(const memberIndex of [2,0,1])await full.settleMember(h.request(),{
         operationId:"proof-sdk-member-operation-"+memberIndex,expectedRevision:await h.revision(),ticketId,memberIndex});
     await full.settleTerminal(h.request(),{operationId:"proof-sdk-terminal-operation1",expectedRevision:await h.revision(),ticketId,kind:"win"});
+    const adSourceId="proof-sdk-ad-begin-operation1",adCloseId="proof-sdk-ad-abandon-op0001";
+    await full.beginSimulatedAd(h.request(),{operationId:adSourceId,expectedRevision:await h.revision(),
+        expectedSequence:(await h.root.collection("modeTime").doc("current").get()).get("sequence")});
+    await full.abandonSimulatedAd(h.request(),{operationId:adCloseId,expectedRevision:await h.revision(),sourceId:adSourceId,
+        expectedSequence:(await h.root.collection("modeTime").doc("current").get()).get("sequence")});
     const sourceRevision=await h.revision();await checkRecoveryArchive(h.uid,sourceRevision);
     const attempts=[],observedDb={doc:path=>db.doc(path),runTransaction:callback=>db.runTransaction(async raw=>{
         const attempt={reads:0,queries:0,writes:0,paths:[],queryRefs:[]};attempts.push(attempt);
@@ -4057,6 +4062,12 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.equal((await measure(()=>recovery.captureProof(h.request(),additionalInput),{retry:true})).unchanged,true);
     assert.ok(attempts.slice(additionalReplayStart).every(attempt=>!["operations","ledgerEntries","grantOperations"].some(name=>
         attempt.paths.includes(h.root.collection(name).doc(additional.id).path))),"Additional-character retry must use original chunks without live source reads");
+    const adInput={...input,operationId:"proof-sdk-ad-capture-operation1",expectedSequence:6,component:"simulated-ad-source",sourceId:adSourceId};
+    assert.equal((await measure(()=>recovery.captureProof(h.request(),adInput))).component,"simulated-ad-source");
+    const adReplayStart=attempts.length;assert.equal((await measure(()=>recovery.captureProof(h.request(),adInput),{retry:true})).unchanged,true);
+    assert.ok(attempts.slice(adReplayStart).every(attempt=>!attempt.paths.some(path=>path===h.root.collection("simulatedAdSources").doc(adSourceId).path||
+        path===h.root.collection("modeTimeEvents").doc(adSourceId).path||path===h.root.collection("modeTimeEvents").doc(adCloseId).path)),
+        "Simulated-ad retry must replay original chunks without live source/event reads");
     assert.deepEqual(await Promise.all([run.get(),fence.get()]).then(rows=>rows.map(row)),controls);
     // Asset/current/history versions cannot be changed by a proof-only capture.
     assert.deepEqual(await h.capture(),assets);
@@ -4077,7 +4088,7 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.equal(restoredMetadata.typedDataSha256,originalMetadata.typedDataSha256);
     assert.equal(restoredMetadata.typedDataByteLength,originalMetadata.typedDataByteLength);
     assert.notDeepEqual(stamp(restoredTicket.updateTime),stamp(changedTicket.updateTime));
-    const changedInput={...input,operationId:"proof-sdk-version-changed-01",expectedSequence:6,sourceId:changedTicket.id};
+    const changedInput={...input,operationId:"proof-sdk-version-changed-01",expectedSequence:7,sourceId:changedTicket.id};
     let changedStart=attempts.length;
     await assert.rejects(()=>recovery.captureProof(h.request(),changedInput));
     assert.ok(attempts.slice(changedStart).every(attempt=>attempt.writes===0));

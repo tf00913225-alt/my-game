@@ -426,7 +426,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
            pages.at(-1)?.row.operationId!==state.lastPageOperationId)fail("data-loss","Forest inventory terminal or membership differs.");
         return index;
     }
-    const proofComponent=value=>value==="forest-ticket"||value==="exp-allocation"||value==="additional-character-sources";
+    const proofComponent=value=>value==="forest-ticket"||value==="exp-allocation"||value==="additional-character-sources"||value==="simulated-ad-source";
     const proofKind=(version,suffix)=>"canonical-recovery-"+(version===1?"patrol-":"")+"proof-"+suffix;
     const proofTarget=(version,component,sourceId)=>version===1?{ticketId:sourceId}:{component,sourceId};
     const proofIntent=(version,args)=>version===1?{action:"capture-patrol-proof",auditId:args.auditId,
@@ -501,6 +501,12 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             if(!operation.exists||operation.id!==sourceId||operation.get("operationId")!==sourceId||operation.get("kind")!=="additional-character-sources")
                 fail("data-loss","Additional-character proof source kind or identity differs.");
             await sourceEvidence.verifyRetainedOperation(kernel,root,uid,records.account,operation);
+        }else if(component==="simulated-ad-source"){
+            const source=await kernel.get(root.collection("simulatedAdSources").doc(sourceId));
+            if(!source.exists||source.id!==sourceId||source.get("sourceId")!==sourceId||source.get("schemaVersion")!==1||
+               source.get("kind")!=="simulated-element-box-ad"||source.get("ownerUid")!==uid)
+                fail("data-loss","Simulated-ad proof source kind or identity differs.");
+            await modeEvidence.verifyRetainedSource(kernel,root,uid,records.account,source,revision);
         }else fail("invalid-argument","Unsupported proof component.");
     }
     async function captureProof(request,args){

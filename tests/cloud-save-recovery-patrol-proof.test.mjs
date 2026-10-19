@@ -17,8 +17,8 @@ const {createRecoveryArchive}=require('../functions/src/canonical-recovery-archi
 const {assembleCanonicalSnapshot}=require('../functions/src/canonical-snapshot');
 const {snapshotDigest}=require('../functions/src/canonical-snapshot');
 const auditId='proof-component-audit-0001',approvalId='proof-component-approval-01';
-async function fixture({battles=20,three=true,largeBytes=0,rested=false}={}){
-    const h=storeHarness({optimisticTransactions:true}),sessions=createSessionAuthority(h.dependencies),authTime=Math.floor(h.clock/1000);let session;
+async function fixture({battles=20,three=true,largeBytes=0,rested=false,adStatus=null,historicalSession=false}={}){
+    const h=storeHarness({optimisticTransactions:true}),sessions=createSessionAuthority(h.dependencies);let authTime=Math.floor(h.clock/1000),session;
     const request=()=>({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid,...(session?{session}:{})}});
     session=await sessions.create(request());
     const deps={...h.dependencies,runProtected:sessions.runProtected,runRecoveryAuditMaintenance:sessions.runRecoveryAuditMaintenance};
@@ -60,9 +60,22 @@ async function fixture({battles=20,three=true,largeBytes=0,rested=false}={}){
         await createCanonicalSourceWriter(deps).commitAdditionalCharacter(request(),{operationId:additional,expectedRevision:h.revision,slotIndex:1,
             selection:{...selection,displayName:'Second',attributes:{attack:3,vitality:0,energy:0,intelligence:0,defensePoints:0,agility:0}}});
         assert.equal(h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords.characters[0].state.level,10);
-        for(const path of [...h.data.keys()])if(['account','characters','economy','inventory','equipment','relics','relicLoadout','progress','claimRecords','claimCheckpoints']
-            .some(name=>path.startsWith(h.root+'/'+name+'/')))h.data.delete(path);
+
     }
+    let adSourceId,adCloseId;
+    if(adStatus){
+        const sequence=()=>h.data.get(h.root+'/modeTime/current').sequence;
+        adSourceId=id('ad-begin');await forest.beginSimulatedAd(request(),{operationId:adSourceId,expectedRevision:h.revision,expectedSequence:sequence()});
+        if(adStatus!=='pending'){
+            adCloseId=id('ad-close');if(adStatus==='consumed')h.advance(3000);
+            await forest[adStatus==='consumed'?'completeSimulatedAd':'abandonSimulatedAd'](request(),{
+                operationId:adCloseId,expectedRevision:h.revision,expectedSequence:sequence(),sourceId:adSourceId});
+        }
+    }
+    if(historicalSession){h.advance(1000);authTime=Math.floor(h.clock/1000);
+        session=await sessions.create({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid}});}
+    if(battles>=20)for(const path of [...h.data.keys()])if(['account','characters','economy','inventory','equipment','relics','relicLoadout','progress','claimRecords','claimCheckpoints']
+        .some(name=>path.startsWith(h.root+'/'+name+'/')))h.data.delete(path);
     await createCanonicalRecoveryApproval(deps).issue({auth:{uid:'proof-operator',token:{cloudSaveOperator:true}},data:{ownerUid:h.uid,operationId:approvalId,sourceRevision:h.revision,ttlSeconds:60}});
     const recovery=createCanonicalCurrentRecovery(deps);await recovery.beginAudit(request(),{operationId:auditId,expectedRevision:h.revision,approvalOperationId:approvalId});
     await recovery.prepareInventory(request(),{auditId,expectedEpoch:1,operationId:'proof-prepare-operation-01'});
@@ -71,14 +84,14 @@ async function fixture({battles=20,three=true,largeBytes=0,rested=false}={}){
     h.dependencies.db.runTransaction=callback=>base(async tx=>{const trace={reads:0,queries:0,writes:0,paths:[]};traces.push(trace);
         const wrapper={get:async ref=>{trace.paths.push(ref.path);const snap=await tx.get(ref);trace.reads+=snap.docs?Math.max(1,snap.size):1;trace.queries+=snap.docs?1:0;return snap;}};
         for(const method of ['set','create','update','delete'])wrapper[method]=(...args)=>{trace.writes++;return tx[method](...args);};return callback(wrapper);});
-    return {h,recovery,request,tickets,allocations,additional,root,traces,deps,sessions,intent:(sequence=1,ticketId=tickets[0])=>({auditId,expectedEpoch:1,operationId:`proof-capsule-${String(sequence).padStart(8,'0')}`,expectedSequence:sequence,component:'forest-ticket',sourceId:ticketId})};
+    return {h,recovery,request,tickets,allocations,additional,adSourceId,adCloseId,root,traces,deps,sessions,intent:(sequence=1,ticketId=tickets[0])=>({auditId,expectedEpoch:1,operationId:`proof-capsule-${String(sequence).padStart(8,'0')}`,expectedSequence:sequence,component:'forest-ticket',sourceId:ticketId})};
 }
 const unchanged=async(f,operation,pattern)=>{const before=copy([...f.h.data]),writes=f.h.writes;await assert.rejects(operation,pattern);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);};
 function capsule(f,input){const receipt=f.h.data.get(f.root+'/patrolProofPages/'+input.operationId);
     const chunks=receipt.chunkSha256s.map((_,index)=>f.h.data.get(f.root+'/proofPayloadChunks/'+input.operationId+'_'+String(index).padStart(2,'0')).payloadBytes);
     return {receipt,bytes:Buffer.concat(chunks),payload:decodeProofPayload(Buffer.concat(chunks))};}
 test('true twenty Forest battles, Lv10 and slot2 current loss capture original bounded Forest components and replay complete old bytes',async()=>{
-    const f=await fixture();assert.equal(f.tickets.length,21);let maximum=0;const forestPaths=new Set();
+    const f=await fixture({adStatus:'abandoned'});assert.equal(f.tickets.length,21);let maximum=0;const forestPaths=new Set();
     const originalSources=copy([...f.h.data]);
     for(let index=0;index<f.tickets.length;index++){
         const input=f.intent(index+1,f.tickets[index]),result=await f.recovery.captureProof(f.request(),input),trace=f.traces.at(-1);
@@ -124,6 +137,21 @@ test('true twenty Forest battles, Lv10 and slot2 current loss capture original b
     const original=copy([...f.h.data]);assert.equal((await f.recovery.captureProof(f.request(),additionalInput)).unchanged,true);
     assert.deepEqual([...f.h.data],original);assert(!f.traces.at(-1).paths.includes(f.h.root+'/operations/'+f.additional));
     assert.equal(f.h.data.get(f.root+'/proofState/current').nextSequence,32);
+    for(const row of saved.payload.documents)if(row.exists)union.add(row.path);
+    const adInput={...f.intent(32),component:'simulated-ad-source',sourceId:f.adSourceId};
+    const adResult=await f.recovery.captureProof(f.request(),adInput),adSaved=capsule(f,adInput),adTrace=f.traces.at(-1);
+    assert.equal(adResult.component,'simulated-ad-source');
+    assert.deepEqual(adSaved.payload.documents.filter(row=>row.exists&&!union.has(row.path)).map(row=>row.path).sort(),
+        [f.h.root+'/simulatedAdSources/'+f.adSourceId,f.h.root+'/modeTimeEvents/'+f.adSourceId,f.h.root+'/modeTimeEvents/'+f.adCloseId].sort());
+    const absences=adSaved.payload.documents.filter(row=>!row.exists).map(row=>row.path).sort();
+    assert.deepEqual(absences,[f.adSourceId,f.adCloseId].flatMap(id=>['operations','ledgerEntries','grantOperations'].map(name=>f.h.root+'/'+name+'/'+id)).sort());
+    assert.equal(adTrace.paths.slice(adTrace.paths.indexOf(f.h.root+'/simulatedAdSources/'+f.adSourceId)).length,18);
+    assert(adTrace.reads<=pageCount+49);assert.equal(adTrace.queries,1);assert(adTrace.writes<=10);
+    const beforeAdRetry=copy([...f.h.data]);assert.equal((await f.recovery.captureProof(f.request(),adInput)).unchanged,true);assert.deepEqual([...f.h.data],beforeAdRetry);
+    assert(!f.traces.at(-1).paths.some(path=>path===f.h.root+'/simulatedAdSources/'+f.adSourceId||path===f.h.root+'/modeTimeEvents/'+f.adSourceId));
+    for(const [path,row] of originalSources)assert.deepEqual(f.h.data.get(path),row);
+    assert.equal(f.h.data.get(f.root+'/proofState/current').nextSequence,33);
+
 
 
     assert.equal((await f.recovery.captureProof(f.request(),f.intent())).unchanged,true,'historical original receipt remains replayable');
@@ -332,7 +360,7 @@ test('legacy schema1 Forest retains original hashes and bytes through unified AP
     assert.equal(typeof f.recovery.capturePatrolProof,'undefined','old test-only API is removed instead of wrapped');
     assert.equal((await f.recovery.captureProof(f.request(),input)).unchanged,true);assert.deepEqual([...f.h.data],before);
     assert.deepEqual(capsule(f,input).bytes,legacy.bytes);assert.deepEqual(capsule(f,input).receipt,legacy.receipt);
-    for(const component of ['exp-allocation','additional-character-sources'])await unchanged(f,()=>f.recovery.captureProof(f.request(),{...f.intent(2),component,sourceId:'legacy-source-operation-01'}),/new audit/);
+    for(const component of ['exp-allocation','additional-character-sources','simulated-ad-source'])await unchanged(f,()=>f.recovery.captureProof(f.request(),{...f.intent(2),component,sourceId:'legacy-source-operation-01'}),/new audit/);
     const next=f.intent(2,f.tickets[1]);await f.recovery.captureProof(f.request(),next);
     assert.equal(capsule(f,next).receipt.schemaVersion,1);assert.equal(capsule(f,next).payload.ticketId,next.sourceId);
     assert.equal(f.h.data.get(f.root+'/proofState/current').schemaVersion,1);
@@ -436,4 +464,79 @@ test('additional-character component uses only its original seven-read proof and
     f.h.advance(61000);await unchanged(f,()=>f.recovery.captureProof(f.request(),input),/approval/);
     await f.recovery.cancelAudit(f.request(),{auditId,expectedEpoch:1,operationId:'additional-proof-cancel-01'});
     await unchanged(f,()=>f.recovery.captureProof(f.request(),input));
+});
+
+
+for(const [status,unitReads] of [['pending',10],['consumed',20],['abandoned',18]])test('simulated-ad '+status+' capture reuses original source proof and exact reads across a later audit session',async()=>{
+    const f=await fixture({battles:1,three:false,adStatus:status,historicalSession:true}),input={...f.intent(),component:'simulated-ad-source',sourceId:f.adSourceId};
+    const source=f.h.data.get(f.h.root+'/simulatedAdSources/'+f.adSourceId),before=copy([...f.h.data]);
+    assert.equal(source.status,status);assert.equal(source.verifiedProvider,false);assert.equal(source.rewardMs,28800000);assert.equal(source.maximumMs,115200000);
+    assert.notEqual(source.sessionId,f.h.data.get(f.root).sessionId,'historical source session is not the current audit session');
+    if(status==='consumed'){
+        assert.equal(source.closedAtMs-source.startedAtMs,3000);
+        const records=f.h.data.get(f.h.root+'/recoveryArchives/'+f.h.revision).sourceRecords;
+        assert.equal(JSON.parse(records.progress.sidecars['element-box-state'].raw).remainingMs,28800000);
+    }
+    const result=await f.recovery.captureProof(f.request(),input),trace=f.traces.at(-1),saved=capsule(f,input);
+    const start=trace.paths.indexOf(f.h.root+'/simulatedAdSources/'+f.adSourceId);assert.equal(trace.paths.slice(start).length,unitReads);
+    const pages=[...f.h.data.keys()].filter(path=>path.startsWith(f.root+'/inventoryPages/')).length;
+    assert.equal(trace.reads,pages+17+unitReads);assert(trace.reads<=pages+50);assert.equal(trace.queries,3);assert(trace.writes<=10);
+    assert.equal(saved.payload.component,'simulated-ad-source');
+    if(status==='pending')assert(saved.payload.documents.some(row=>row.path===f.h.root+'/modeTime/current'&&row.exists));
+    for(const [path,row] of before)assert.deepEqual(f.h.data.get(path),row);
+    for(const flag of ['authoritativeStateReady','candidateProofValid','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
+    const original=copy([...f.h.data]);assert.equal((await f.recovery.captureProof(f.request(),input)).unchanged,true);assert.deepEqual([...f.h.data],original);
+    assert(!f.traces.at(-1).paths.some(path=>path.startsWith(f.h.root+'/simulatedAdSources/')||path.startsWith(f.h.root+'/modeTimeEvents/')));
+});
+
+
+test('simulated-ad source identity, original event chains and economic collisions refuse without writes in all three states',async()=>{
+    for(const status of ['pending','consumed','abandoned']){
+        const f=await fixture({battles:1,three:false,adStatus:status}),input={...f.intent(),component:'simulated-ad-source',sourceId:f.adSourceId};
+        const sourcePath=f.h.root+'/simulatedAdSources/'+f.adSourceId,beginPath=f.h.root+'/modeTimeEvents/'+f.adSourceId,
+            closePath=f.adCloseId?f.h.root+'/modeTimeEvents/'+f.adCloseId:null;
+        const begin=f.h.data.get(beginPath),predecessor=f.h.root+'/modeTimeEvents/'+begin.beforeHead.lastOperationId;
+        for(const wrong of [f.tickets[0],'simulated-ad-unknown-source'])await unchanged(f,()=>f.recovery.captureProof(f.request(),{...input,sourceId:wrong}),/kind or identity/);
+        const faults=['missing-source','identity','schema','kind','uid','session','hash','status','provider','missing-begin','begin-hash','predecessor','archive',
+            ...(status==='pending'?['pending-head']:['missing-close','closure']),...(status==='consumed'?['receipt','ledger','grant']:['economic-overlap'])];
+        for(const fault of faults){
+            const bad=createCanonicalCurrentRecovery({...f.deps,runRecoveryAuditMaintenance:(req,id,operation)=>
+                f.deps.runRecoveryAuditMaintenance(req,id,(tx,session)=>operation({...tx,get:async reference=>{
+                    const snap=await tx.get(reference);if(snap.docs)return snap;let raw=snap.data(),exists=snap.exists;
+                    if(reference.path===sourcePath){
+                        if(fault==='missing-source')exists=false;
+                        if(fault==='identity')raw.sourceId='simulated-ad-foreign-source';
+                        if(fault==='schema')raw.schemaVersion=2;
+                        if(fault==='kind')raw.kind='unknown-ad-source';
+                        if(fault==='uid')raw.ownerUid='foreign-owner';
+                        if(fault==='session'){
+                            raw.sessionId='historical-session-that-does-not-match-begin';
+                            const {sha256,status,consumedBy,closedAtMs,createdAt,updatedAt,...body}=raw;raw.sha256=snapshotDigest(body);
+                        }
+                        if(fault==='hash')raw.sha256='f'.repeat(64);
+                        if(fault==='status')raw.status='unknown';
+                        if(fault==='provider')raw.verifiedProvider=true;
+                        if(fault==='closure')raw.closedAtMs++;
+                    }
+                    if(reference.path===beginPath){if(fault==='missing-begin')exists=false;if(fault==='begin-hash')raw.sha256='f'.repeat(64);}
+                    if(reference.path===predecessor&&fault==='predecessor')exists=false;
+                    if(reference.path===closePath&&fault==='missing-close')exists=false;
+                    if(reference.path===f.h.root+'/recoveryArchives/'+begin.sourceRevision&&fault==='archive')raw.sourceSha256='f'.repeat(64);
+                    if(reference.path===f.h.root+'/modeTime/current'&&fault==='pending-head')exists=false;
+                    if(reference.path===f.h.root+'/operations/'+f.adCloseId&&fault==='receipt')exists=false;
+                    if(reference.path===f.h.root+'/ledgerEntries/'+f.adCloseId&&fault==='ledger')exists=false;
+                    if(reference.path===f.h.root+'/grantOperations/'+f.adCloseId&&fault==='grant'){exists=true;raw={ownerUid:f.h.uid};}
+                    if(reference.path===f.h.root+'/operations/'+f.adSourceId&&fault==='economic-overlap'){exists=true;raw={ownerUid:f.h.uid};}
+                    return {...snap,exists,data:()=>raw,get:key=>key.split('.').reduce((value,part)=>value?.[part],raw)};
+                }},session))});
+            await unchanged(f,()=>bad.captureProof(f.request(),input),error=>error.code==='data-loss');
+        }
+        f.h.abortNext();await unchanged(f,()=>f.recovery.captureProof(f.request(),input),/rollback/);
+        const results=await Promise.all([f.recovery.captureProof(f.request(),input),f.recovery.captureProof(f.request(),input)]);
+        assert.deepEqual(results.map(row=>row.unchanged).sort(),[false,true]);
+        await unchanged(f,()=>f.recovery.captureProof(f.request(),{...input,component:'forest-ticket',sourceId:f.tickets[0]}),/receipt differs/);
+        const path=f.root+'/proofPayloadChunks/'+input.operationId+'_00',chunk=copy(f.h.data.get(path));f.h.data.set(path,{...chunk,sourceId:f.tickets[0]});
+        await unchanged(f,()=>f.recovery.captureProof(f.request(),input),/chunk differs/);f.h.data.set(path,chunk);
+        f.h.advance(61000);await unchanged(f,()=>f.recovery.captureProof(f.request(),input),/approval/);
+    }
 });
