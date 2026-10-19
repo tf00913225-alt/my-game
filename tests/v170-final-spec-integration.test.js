@@ -22,6 +22,7 @@ const v158Source=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 
 const EXPECTED_DIRECT_SCRIPT_PATHS=[
     "functions/src/hero-core.js",
+    "functions/src/patrol-drop-policy.js",
     "functions/src/patrol-reward-policy.js",
     "js/00-main.js",
     "js/01-stage-v8-touch-lock.js",
