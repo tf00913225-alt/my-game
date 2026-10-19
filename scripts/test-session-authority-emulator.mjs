@@ -3986,7 +3986,10 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     const {recoveryAuditNamespaces,decodeProofPayload,inventoryDocumentMetadata,PATROL_PROOF_LIMITS}=require("../functions/src/recovery-audit-artifact.js");
     const {createCanonicalPatrolSettlement}=require("../functions/src/canonical-patrol-settlement.js");
     const h=patrolProofSdkFixture;assert.ok(h);
-    let clock=h.clock;
+    // This audit has its own control clock. The earning actor deliberately
+    // advanced two minutes for rested EXP; that is not the SDK commit clock.
+    const auditReadTime=(await h.save.get()).readTime;assert.ok(auditReadTime instanceof Timestamp);
+    let clock=auditReadTime.toMillis();
     let originalTickets=await h.root.collection("patrolTickets").get();
     // Earlier rested/elite earnings can reach Lv10 in fewer than20 battles.
     // Top up only the missing genuine battles, rather than replaying a fixture.
@@ -4033,6 +4036,10 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
         chunk=(id,index)=>run.collection("proofPayloadChunks").doc(id+"_"+String(index).padStart(2,"0"));
     const row=snap=>({exists:snap.exists,data:snap.data()??null,updateTime:snap.updateTime});
     const controls=await Promise.all([run.get(),fence.get()]).then(rows=>rows.map(row));
+    const auditApproval=(await h.root.collection("recoveryApprovals").doc(approvalOperationId).get()).data();
+    const compareAuditTime=(a,b)=>a.seconds-b.seconds||a.nanoseconds-b.nanoseconds;
+    assert.ok(compareAuditTime(auditApproval.issuedAt,controls[0].data.createdAt)<=0&&
+        compareAuditTime(controls[0].data.createdAt,auditApproval.expiresAt)<0,"Original audit commit must lie within its exact approval interval");
     const assets=await h.capture();
     const closed=result=>{for(const key of ["authoritativeStateReady","candidateProofValid","trustedCaptureVerified","restoreAuthorized"])assert.equal(result[key],false);};
     await recovery.prepareInventory(h.request(),{auditId,expectedEpoch:1,operationId:"proof-sdk-inventory-prepare1"});
@@ -4193,7 +4200,8 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
 // object storage is explicitly fake and cannot contact GCS or change IAM.
 {
     const h=patrolProofSdkFixture;assert.ok(h);
-    let clock=Math.max(Date.now(),h.clock),depth=0,abortOnce=false,rollbackOnce=false,loseResponse=false;
+    const publicationReadTime=(await h.save.get()).readTime;assert.ok(publicationReadTime instanceof Timestamp);
+    let clock=publicationReadTime.toMillis(),depth=0,abortOnce=false,rollbackOnce=false,loseResponse=false;
     const traces=[],observedDb={doc:path=>db.doc(path),runTransaction:callback=>db.runTransaction(async raw=>{
         const trace={reads:0,queries:0,writes:0};traces.push(trace);
         const tx={get:async ref=>{const snap=await raw.get(ref),query=typeof ref.collection!=="function";
@@ -4224,6 +4232,10 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.equal(begun.epoch,2);
     const assets=await h.capture();
     const args={auditId,expectedEpoch:2,operationId:"publication-sdk-manifest-01"},run=h.root.collection("recoveryAuditRuns").doc(auditId);
+    const publicationApproval=(await h.root.collection("recoveryApprovals").doc(approvalId).get()).data(),publicationRun=(await run.get()).data();
+    const comparePublicationTime=(a,b)=>a.seconds-b.seconds||a.nanoseconds-b.nanoseconds;
+    assert.ok(comparePublicationTime(publicationApproval.issuedAt,publicationRun.createdAt)<=0&&
+        comparePublicationTime(publicationRun.createdAt,publicationApproval.expiresAt)<0,"Publication audit commit must lie within its exact approval interval");
     await recovery.prepareInventory(h.request(),{...args,operationId:"publication-sdk-prepare-inventory"});
     let complete=false;
     for(let sequence=1;!complete&&sequence<=318;sequence++)complete=(await recovery.captureInventoryPage(h.request(),{
