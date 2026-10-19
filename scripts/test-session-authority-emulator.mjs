@@ -3380,17 +3380,16 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
                 let readSequence=0;
                 // Bind every SDK method to its original transaction. Only get
                 // failures gain context; reads retain their original ordering.
-                const traced=new Proxy(tx,{get(target,key){
-                    if(key!=="get"){
-                        const value=Reflect.get(target,key,target);
-                        return typeof value==="function"?value.bind(target):value;
-                    }
-                    return async(reference,...args)=>{
+                // A protected facade is frozen. Use a separate diagnostic
+                // object rather than overriding a nonconfigurable Proxy value.
+                const traced={
+                    ...Object.fromEntries(["create","set","update","delete"].map(method=>[method,tx[method].bind(tx)])),
+                    get:async(reference,...args)=>{
                         const sequence=++readSequence;
                         const kind=typeof reference?.collection==="function"?"document":"query";
                         const path=typeof reference?.path==="string"?reference.path:
                             `[${reference?.constructor?.name||"unknown query"}]`;
-                        try{return await target.get(reference,...args);}
+                        try{return await tx.get(reference,...args);}
                         catch(cause){
                             const error=new Error(`Forest allocator transaction attempt ${currentAttempt} read ${sequence} ${kind} ${path}: ${cause.message}`,{cause});
                             for(const field of ["code","details","detail"]){
@@ -3398,8 +3397,8 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
                             }
                             throw error;
                         }
-                    };
-                }});
+                    }
+                };
                 return operation(traced,active);
             });
         }});
