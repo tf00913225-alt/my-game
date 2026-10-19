@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
-import {storeHarness,selection,copy} from './helpers/canonical-store-harness.mjs';
+import {storeHarness,selection,copy} from '../scripts/test-helpers/canonical-store-harness.mjs';
 const require=createRequire(import.meta.url);
 const {makeInitialCharacterSources}=require('../functions/src/initial-character-sources');
 const {assembleCanonicalSnapshot}=require('../functions/src/canonical-snapshot');
