@@ -54,7 +54,8 @@ function material(h){
     return {h,paths,docs,absent:new Set()};
 }
 function frames(m){
-    return [{type:'header',schemaVersion:1,ownerUid:m.h.uid,expectedRevision:m.h.revision},
+    return [{type:'header',schemaVersion:m.auditControl?2:1,ownerUid:m.h.uid,expectedRevision:m.h.revision,
+        ...(m.auditControl?{auditControl:m.auditControl}:{})},
         ...[...m.docs].map(([path,data])=>({type:'document',path,data:typed(data)})),
         ...[...m.absent].map(path=>({type:'absence',path})),
         ...m.paths.map(path=>({type:'namespace',path,ids:[...m.docs.keys()].filter(key=>key.slice(0,key.lastIndexOf('/'))===path)
@@ -125,6 +126,28 @@ async function closedFixture(){
     const saved=await closedBaseline,h=await forestFixture();
     return {...saved,h,docs:new Map(saved.docs),absent:new Set(saved.absent)};
 }
+const nanoStamp=(seconds,nanoseconds)=>({seconds,nanoseconds,toMillis:()=>seconds*1000+Math.floor(nanoseconds/1000000)});
+async function controlledFixture(){
+    const m=await closedFixture(),h=m.h,approvalId='artifact-audit-approval-001',auditId='artifact-audit-run-0000001';
+    const approval=createCanonicalRecoveryApproval(h.dependencies);
+    await approval.issue({auth:{uid:'artifact-operator',token:{cloudSaveOperator:true}},
+        data:{ownerUid:h.uid,operationId:approvalId,sourceRevision:h.revision,ttlSeconds:60}});
+    const approvalPath=h.root+'/recoveryApprovals/'+approvalId,raw=copy(h.data.get(approvalPath)),seconds=Math.floor(h.clock/1000);
+    // Preserve the exact sub-millisecond stored timestamps while the live
+    // Owner continues to apply its original expiresAt.toMillis() semantics.
+    raw.issuedAt=nanoStamp(seconds,123);raw.expiresAt=nanoStamp(seconds+60,123);h.data.set(approvalPath,raw);
+    const runRecoveryAuditMaintenance=(request,_auditId,operation)=>h.dependencies.runProtected(request,
+        (tx,session)=>operation(tx,{...session,revision:1}));
+    const recovery=createCanonicalCurrentRecovery({...h.dependencies,runRecoveryAuditMaintenance});
+    await recovery.beginAudit(h.request(),{operationId:auditId,expectedRevision:h.revision,approvalOperationId:approvalId});
+    const fencePath=h.root+'/recoveryAuditFence/current',runPath=h.root+'/recoveryAuditRuns/'+auditId;
+    for(const path of [approvalPath,fencePath,runPath])m.docs.set(path,copy(h.data.get(path)));
+    m.paths=[...m.paths,h.root+'/recoveryAuditFence',h.root+'/recoveryAuditRuns'];
+    m.auditControl={auditId,epoch:1,sessionId:'a'.repeat(32),sessionRevision:1,recordedAt:['timestamp',seconds,123]};
+    return {m,recovery,approvalPath,fencePath,runPath,seconds};
+}
+function cloneMaterial(m){return {...m,docs:new Map([...m.docs].map(([path,data])=>[path,copy(data)])),
+    absent:new Set(m.absent),paths:m.paths.slice(),auditControl:m.auditControl?copy(m.auditControl):undefined};}
 
 test('real twenty-battle Lv10 plus slot2 current-loss artifact is candidate-only, while original restore keeps its400 gate',async()=>{
     const m=await closedFixture(),h=m.h,before=copy([...h.data]),writes=h.writes;
@@ -251,4 +274,71 @@ test('artifact timestamps preserve the installed pinned Admin SDK semantics and 
         assert.equal(decoded.seconds,timestamp.seconds);assert.equal(decoded.nanoseconds,timestamp.nanoseconds);
         assert.equal(snapshotDigest({stamp:decoded}),snapshotDigest({stamp:timestamp}));
     }
+});
+
+test('v2 selected audit control closes the real20-battle artifact without granting trust, while v1 remains byte-compatible',async()=>{
+    const legacy=await closedFixture(),legacyBytes=bytes(legacy),legacyResult=await verify(legacy);
+    assert.deepEqual(frames(legacy)[0],{type:'header',schemaVersion:1,ownerUid:legacy.h.uid,expectedRevision:legacy.h.revision});
+    const {m,recovery}=await controlledFixture(),before=copy([...m.h.data]),writes=m.h.writes;
+    const result=await verify(m);assert.equal(result.candidateProofValid,true);assert.equal(result.trustedCaptureVerified,false);assert.equal(result.restoreAuthorized,false);
+    assert.deepEqual(Object.keys(result).sort(),Object.keys(legacyResult).sort());
+    assert.equal(result.documentCount,legacyResult.documentCount+3);assert.equal(result.absenceCount,legacyResult.absenceCount);
+    assert.equal(result.sourceSha256,legacyResult.sourceSha256);assert.equal(result.snapshotSha256,legacyResult.snapshotSha256);
+    // recordedAt is a named consistency observation, never trusted current time.
+    m.h.advance(61000);assert.equal((await verify(m)).candidateProofValid,true);
+    await assert.rejects(()=>recovery.resumeAudit(m.h.request(),{auditId:m.auditControl.auditId,expectedEpoch:1,expectedRevision:m.h.revision}),/operator approval/);
+    assert.deepEqual([...m.h.data],before);assert.equal(m.h.writes,writes);
+    assert.deepEqual(bytes(legacy),legacyBytes);assert.deepEqual(await verify(legacy),legacyResult);
+    const v1WithApproval=cloneMaterial(legacy),approval=[...m.docs].find(([path])=>path.includes('/recoveryApprovals/'));
+    v1WithApproval.docs.set(...approval);await assert.rejects(()=>verify(v1WithApproval),/unused dependency/);
+});
+
+test('v2 control rejects missing, foreign, used, extra or inconsistently bound raw evidence without writes',async()=>{
+    const {m,approvalPath,fencePath,runPath}=await controlledFixture(),before=copy([...m.h.data]),writes=m.h.writes;
+    const cases=[
+        n=>{n.docs.delete(approvalPath);n.absent.add(approvalPath);},
+        n=>{n.docs.delete(fencePath);n.absent.add(fencePath);},
+        n=>{n.docs.delete(runPath);n.absent.add(runPath);},
+        n=>{n.auditControl.epoch++;},n=>{n.auditControl.sessionId='b'.repeat(32);},n=>{n.auditControl.sessionRevision++;},
+        n=>{delete n.auditControl.sessionRevision;},n=>{n.auditControl.ownerUid=n.h.uid;},
+        n=>{delete n.auditControl.sessionId;},
+        n=>{n.auditControl.auditId='artifact-wrong-audit-0001';n.absent.add(n.h.root+'/recoveryAuditRuns/'+n.auditControl.auditId);},
+        n=>{n.docs.get(fencePath).ownerUid='foreign';},n=>{n.docs.get(runPath).ownerUid='foreign';},
+        n=>{n.docs.get(approvalPath).ownerUid='foreign';},n=>{n.docs.get(approvalPath).status='used';},
+        n=>{n.docs.get(approvalPath).operationId='artifact-wrong-approval-01';},
+        n=>{delete n.docs.get(approvalPath).issuedAt;},n=>{delete n.docs.get(approvalPath).expiresAt;},
+        n=>{n.docs.get(approvalPath).sourceRevision--;},n=>{n.docs.get(approvalPath).sourceSha256='f'.repeat(64);},
+        n=>{n.docs.get(approvalPath).snapshotSha256='f'.repeat(64);},
+        n=>{n.docs.get(approvalPath).approvedBy='another-operator';},
+        n=>{n.docs.get(runPath).beginIntentSha256='f'.repeat(64);},
+        n=>{n.docs.get(fencePath).approvalBindingSha256='f'.repeat(64);n.docs.get(runPath).approvalBindingSha256='f'.repeat(64);},
+        n=>{n.docs.get(fencePath).sourceSha256='f'.repeat(64);n.docs.get(runPath).sourceSha256='f'.repeat(64);},
+        n=>{n.docs.get(fencePath).snapshotSha256='f'.repeat(64);n.docs.get(runPath).snapshotSha256='f'.repeat(64);},
+        n=>{n.docs.get(fencePath).sourceRevision--;n.docs.get(runPath).sourceRevision--;},
+        n=>{n.docs.get(fencePath).epoch++;n.docs.get(runPath).epoch++;},
+        n=>{n.docs.set(n.h.root+'/recoveryApprovals/artifact-unreferenced-0001',copy(n.docs.get(approvalPath)));},
+        n=>{n.docs.set(n.h.root+'/recoveryAuditRuns/artifact-unreferenced-0001',copy(n.docs.get(runPath)));},
+        n=>{n.paths=n.paths.filter(path=>!path.endsWith('/recoveryAuditRuns'));}
+    ];
+    for(const mutate of cases){const n=cloneMaterial(m);mutate(n);await assert.rejects(()=>verify(n));}
+    const foreign=frames(m);foreign[0].ownerUid='foreign';await assert.rejects(()=>candidate(m.h).verifyRecoveryAuditArtifact({
+        uid:m.h.uid,expectedRevision:m.h.revision,artifactBytes:frameBytes(foreign)}),/header identity/);
+    assert.deepEqual([...m.h.data],before);assert.equal(m.h.writes,writes);
+});
+
+test('v2 approval interval comparisons preserve exact nanosecond boundaries rather than millisecond rounding',async()=>{
+    const {m,recovery,approvalPath,seconds}=await controlledFixture();
+    for(const [sec,nanos,valid] of [[seconds,122,false],[seconds,123,true],[seconds+60,122,true],[seconds+60,123,false]]){
+        const n=cloneMaterial(m);n.auditControl.recordedAt=['timestamp',sec,nanos];
+        if(valid)assert.equal((await verify(n)).candidateProofValid,true);
+        else await assert.rejects(()=>verify(n),/approval interval/);
+    }
+    for(const stamp of [nanoStamp(seconds+60,123),nanoStamp(seconds+61,123)]){
+        const n=cloneMaterial(m);n.docs.get(approvalPath).issuedAt=stamp;
+        await assert.rejects(()=>verify(n),/approval interval/);
+    }
+    const n=cloneMaterial(m);n.auditControl.recordedAt=['timestamp',seconds,1000000000];await assert.rejects(()=>verify(n),/timestamp/);
+    m.h.setClock((seconds+60)*1000);
+    await assert.rejects(()=>recovery.resumeAudit(m.h.request(),{auditId:m.auditControl.auditId,expectedEpoch:1,expectedRevision:m.h.revision}),
+        /operator approval/,'Live expiry retains expiresAt.toMillis() <= now semantics at the exact millisecond');
 });

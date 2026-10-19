@@ -69,7 +69,8 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
         if(!size||size>LIMITS.frameBytes||offset+size>bytes.length)bad("frame size");
         const raw=bytes.subarray(offset,offset+size),text=raw.toString("utf8");offset+=size;
         let frame;try{frame=JSON.parse(text);}catch(_){bad("frame JSON");}
-        const shapes={header:["type","schemaVersion","ownerUid","expectedRevision"],
+        const shapes={header:frame?.schemaVersion===2?["type","schemaVersion","ownerUid","expectedRevision","auditControl"]:
+            ["type","schemaVersion","ownerUid","expectedRevision"],
             footer:["type","frameCount","documentCount","absenceCount"],document:["type","path","data"],
             absence:["type","path"],namespace:["type","path","ids","terminalEmpty"]};
         if(!frame||!Object.hasOwn(shapes,frame.type))bad("unknown frame");
@@ -89,14 +90,25 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
     }
     if(frames.length<2)bad("missing header/footer");
     const header=frames.shift(),footer=frames.pop();
-    exact(header,["type","schemaVersion","ownerUid","expectedRevision"]);
-    if(header.type!=="header"||header.schemaVersion!==1||header.ownerUid!==uid||
+    exact(header,header.schemaVersion===2?["type","schemaVersion","ownerUid","expectedRevision","auditControl"]:
+        ["type","schemaVersion","ownerUid","expectedRevision"]);
+    if(header.type!=="header"||![1,2].includes(header.schemaVersion)||header.ownerUid!==uid||
        header.expectedRevision!==expectedRevision||typeof uid!=="string"||!uid||uid.includes("/")||
        !Number.isSafeInteger(expectedRevision)||expectedRevision<2)bad("header identity");
     exact(footer,["type","frameCount","documentCount","absenceCount"]);
     if(footer.type!=="footer"||footer.frameCount!==frames.length+2)bad("footer");
     const root=db.collection("serverUsers").doc(uid),save=db.collection("users").doc(uid).collection("saves").doc("current");
-    const namespacePaths=[...NAMES.map(name=>`${root.path}/${name}`),save.path.slice(0,save.path.lastIndexOf("/"))];
+    let auditControl=null;
+    if(header.schemaVersion===2){
+        const control=header.auditControl;
+        exact(control,["auditId","epoch","sessionId","sessionRevision","recordedAt"]);
+        if(!/^[A-Za-z0-9_-]{16,64}$/.test(control.auditId||"")||!Number.isSafeInteger(control.epoch)||control.epoch<1||
+           !/^[A-Za-z0-9_-]{32}$/.test(control.sessionId||"")||!Number.isSafeInteger(control.sessionRevision)||control.sessionRevision<1||
+           !Array.isArray(control.recordedAt)||control.recordedAt[0]!=="timestamp")bad("audit control identity");
+        auditControl=Object.freeze({...control,recordedAt:value(control.recordedAt)});
+    }
+    const names=header.schemaVersion===2?[...NAMES,"recoveryAuditFence","recoveryAuditRuns"]:NAMES;
+    const namespacePaths=[...names.map(name=>`${root.path}/${name}`),save.path.slice(0,save.path.lastIndexOf("/"))];
     const allowed=new Set(namespacePaths),documents=new Map(),absences=new Set(),inventories=new Map();
     const parent=path=>typeof path==="string"?path.slice(0,path.lastIndexOf("/")):"";
     const validPath=path=>typeof path==="string"&&allowed.has(parent(path))&&path.split("/").every(part=>part.length>0);
@@ -163,7 +175,7 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db}){
         }
         return result(ids.slice(0,entry.maximum).map(id=>document(`${root.path}/${entry.name}/${id}`)));
     }});
-    return Object.freeze({root,save,tx,rows:name=>result(rows(name)),
+    return Object.freeze({root,save,tx,auditControl,rows:name=>result(rows(name)),
         finish:()=>{
             const unused=[...documents.keys(),...absences].filter(path=>!used.has(path));
             if(unused.length)bad(`unused dependency ${unused[0]}`);

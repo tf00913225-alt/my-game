@@ -138,7 +138,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             fail("data-loss","Recovery approval timestamp is invalid.");
         return {seconds,nanoseconds};
     }
-    async function verifyAuditApproval(tx,root,uid,sourceRevision,approvalOperationId){
+    async function verifyAuditApproval(tx,root,uid,sourceRevision,approvalOperationId,recordedAt){
         const [envelopeSnap,archiveSnap,snapshotSnap,approvalSnap]=await Promise.all([
             db.collection("users").doc(uid).collection("saves").doc("current"),
             root.collection("recoveryArchives").doc(String(sourceRevision)),
@@ -151,13 +151,31 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
            approval.ownerUid!==uid||approval.operationId!==approvalOperationId||approval.status!=="approved"||
            approval.sourceRevision!==sourceRevision||approval.sourceSha256!==archiveSnap.get("sourceSha256")||
            approval.snapshotSha256!==snapshotSnap.get("sha256")||typeof approval.approvedBy!=="string"||!approval.approvedBy.trim()||
-           typeof approval.expiresAt?.toMillis!=="function"||approval.expiresAt.toMillis()<=now()){
+           typeof approval.expiresAt?.toMillis!=="function"||(recordedAt===undefined&&approval.expiresAt.toMillis()<=now())){
             fail("permission-denied","A current server operator approval is required for recovery audit.");
         }
         const binding={schemaVersion:approval.schemaVersion,kind:approval.kind,ownerUid:uid,operationId:approvalOperationId,
             sourceRevision,sourceSha256:approval.sourceSha256,snapshotSha256:approval.snapshotSha256,
             approvedBy:approval.approvedBy,status:approval.status,issuedAt:timestampPair(approval.issuedAt),expiresAt:timestampPair(approval.expiresAt)};
+        if(recordedAt!==undefined){
+            const observed=timestampPair(recordedAt),compare=(a,b)=>a.seconds-b.seconds||a.nanoseconds-b.nanoseconds;
+            if(compare(binding.issuedAt,binding.expiresAt)>=0||compare(binding.issuedAt,observed)>0||compare(observed,binding.expiresAt)>=0)
+                fail("data-loss","Candidate recorded time lies outside its approval interval.");
+        }
         return {sourceSha256:binding.sourceSha256,snapshotSha256:binding.snapshotSha256,approvalBindingSha256:snapshotDigest(binding)};
+    }
+    async function verifyCandidateAuditControl(tx,root,uid,sourceRevision,control){
+        const [fenceSnap,runSnap]=await Promise.all([
+            tx.get(root.collection(RECOVERY_AUDIT_FENCE_COLLECTION).doc("current")),
+            tx.get(root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(control.auditId))]);
+        const fence=inspectRecoveryAuditFence(fenceSnap.exists?fenceSnap.data():undefined,uid,fail),run=inspectAuditRun(runSnap.data(),uid,control.auditId);
+        matchingAuditFence(fence,run);
+        if(run.status!=="active"||run.sourceRevision!==sourceRevision||run.epoch!==control.epoch||
+           run.sessionId!==control.sessionId||run.sessionRevision!==control.sessionRevision)
+            fail("data-loss","Candidate audit control binding differs.");
+        const binding=await verifyAuditApproval(tx,root,uid,sourceRevision,run.approvalOperationId,control.recordedAt);
+        if(binding.sourceSha256!==run.sourceSha256||binding.snapshotSha256!==run.snapshotSha256||
+           binding.approvalBindingSha256!==run.approvalBindingSha256)fail("data-loss","Candidate audit approval binding differs.");
     }
     async function beginAudit(request,args){
         auditIntent("begin",args,["operationId","expectedRevision","approvalOperationId"]);
@@ -756,6 +774,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 root.collection("playableSnapshots").doc(String(expectedRevision))].map(ref=>tx.get(ref)));
             const {envelope,records}=inspectCurrentRecoverySource(uid,expectedRevision,{envelopeSnap,archiveSnap,snapshotSnap});
             if(envelope.serverRevision!==expectedRevision)fail("aborted","CLOUD_REVISION_CONFLICT");
+            if(view.auditControl)await verifyCandidateAuditControl(tx,root,uid,expectedRevision,view.auditControl);
             const setNames=Object.keys(SETS),singleNames=Object.keys(SINGLES);
             const [queries,singles]=await Promise.all([
                 Promise.all(setNames.map(name=>tx.get(root.collection(name)))),
