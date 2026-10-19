@@ -7,20 +7,21 @@ Base dev: 07402d4cc56cff6e43bade758ef81c87ce2af072
 
 Serve the repository root and open `tools/vfx-commercial-sample/index.html`.
 The page compares the actual existing flameSlash, iceArrowRain and
-relic_nine_dragon_fire sprite sheets with three newly authored candidates.
+relic_nine_dragon_fire sprite sheets with three visual candidates.
 It never loads gameplay, saves, auth, rewards or a second combat renderer.
 
-The two panels share 12 uniform frames, frame-eight contact and original
-760/1600/2550ms durations. Reference character positions and sprite sizes
+The two panels share 12 uniform timeline frames, frame-eight contact and
+original 760/1600/2550ms durations. Reference character positions and sprite sizes
 are explicitly controlled review geometry, not a capture or reproduction
 of production Fixed Slot geometry. Desktop shows both; mobile toggles the
 same scene at the same size. Pause, slow playback and scrubbing are provided.
 
-New sheets were generated with imagegen. Lossless WebP conversion preserves
-the complete 1448×1086 canvas, 4×3 frame grid and original RGBA pixels.
-See asset-verification.json. Each new frame is 362×362; existing flame/ice
-frames are 384×384. These candidates aim for cleaner shapes and less coverage,
-and do not claim increased native resolution or temporal interpolation.
+New artwork was generated with built-in imagegen. Lossless WebP conversion
+preserves each complete canvas, frame layout and original RGBA pixels.
+See asset-verification.json. New sheet cells are 362×362; existing flame/ice
+frames are 384×384. The V3 relic impact is a separate 1254×1254 image.
+Only that keyframe has increased native resolution. The animation has not
+gained time frames or temporal interpolation.
 
 Pending: user visual selection, final asset continuity/anchor review,
 integration through V143's existing manifest/geometry owner, latest-head
@@ -36,3 +37,20 @@ size change (approximately −4%). Duration remains 2550ms. This revision
 restores identity; it does not claim an artwork quality upgrade. The first
 generated relic candidate is retained as review history but is not selected.
 Flame Slash and Ice Arrow Rain are unchanged.
+
+## Nine Dragon Fire revision 3 (current)
+
+The accepted identity baseline remains the original intertwined dragon
+composition, with a 500 logical-pixel review box (original: 520), 2550ms
+duration and frame-eight contact. The current candidate uses a new detailed
+4×3 sheet for gathering/dissipation and a separate 1254px square contact
+keyframe with the full uncut ring. A rejected sheet padding edit did not
+meet the intended margin; it was not imported. The independent contact image
+avoids that sheet's clipped contact ring. The candidate has a gradual
+brightness buildup and a continuous post-contact alpha fade, with zero
+opacity during the loop's 700ms gap. The baseline panel remains unchanged.
+
+This remains an asset-review renderer, not a V143 runtime change. The strong
+contact frame may require further continuity tuning after user review.
+Generation prompts and selected/rejected sources are recorded in
+relic-v3-generation.json. Flame Slash and Ice Arrow Rain remain unchanged.
