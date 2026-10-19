@@ -229,6 +229,31 @@ test("operation receipt inventory is bounded before reverse debit reconciliation
     await assert.rejects(h.recovery.restoreCurrent({},intent),e=>e.code==="failed-precondition");
     assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
 });
+
+test("unknown, malformed and frozen operation history blocks fresh recovery without writes",async()=>{
+    const operationId="unreconciled-operation-0001";
+    for(const patch of [
+        {kind:"unknown-operation"},{kind:null},{kind:"battle-source-preparation"},
+        {kind:"restricted-battle-round"},{kind:"restricted-battle-terminal"},
+        {kind:"canonical-current-recovery"},{kind:"daily-period-apply"},
+        {kind:"shop-purchase",schemaVersion:2},
+        {kind:"shop-purchase",ownerUid:"foreign-owner"},
+        {kind:"shop-purchase",operationId:"different-operation-0001"}
+    ]){
+        for(const missingSources of [false,true]){
+            const h=fixture();
+            h.data.set(`${root}/operations/${operationId}`,{
+                schemaVersion:1,ownerUid:uid,operationId,...patch});
+            if(missingSources)for(const path of h.current.keys())h.data.delete(path);
+            const before=JSON.stringify([...h.data]);
+            const unsupported=["unknown-operation",null,"battle-source-preparation",
+                "restricted-battle-round","restricted-battle-terminal"].includes(patch.kind);
+            await assert.rejects(h.recovery.restoreCurrent({},intent),
+                e=>e.code===(unsupported?"failed-precondition":"data-loss"));
+            assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
+        }
+    }
+});
 test("supported purchase, EXP and attribute debit history survives full source loss without replaying costs",async()=>{
     for(const kind of ["shop-purchase","exp-allocation","attribute-allocation"]){
         const h=fixture();addDebit(h,kind);
@@ -240,6 +265,43 @@ test("supported purchase, EXP and attribute debit history survives full source l
         assert.equal(h.data.get(`${root}/economy/current`).gold,25);
         assert.equal(h.data.get(`${root}/economy/current`).sharedExp,0);
     }
+});
+
+test("retained recovery history reuses original read-only proof before a later fresh repair",async()=>{
+    for(const corrupt of [null,"recoveryAudits","recoveryApprovals","playableSnapshots","recoveryArchives"]){
+        const h=fixture();await h.recovery.restoreCurrent({},intent);
+        const nextIntent={operationId:"recover-next-current-revision-0001",expectedRevision:7};
+        const archive=h.data.get(`${root}/recoveryArchives/7`),snapshot=h.data.get(`${root}/playableSnapshots/7`);
+        h.data.set(`${root}/recoveryApprovals/${nextIntent.operationId}`,{
+            schemaVersion:1,kind:"canonical-current-recovery-approval",ownerUid:uid,
+            operationId:nextIntent.operationId,sourceRevision:7,sourceSha256:archive.sourceSha256,
+            snapshotSha256:snapshot.sha256,approvedBy:"operator",status:"approved",
+            expiresAt:{toMillis:()=>Date.parse("2026-12-01T00:00:00Z")}});
+        if(corrupt){
+            h.data.delete(`${root}/${corrupt}/${["recoveryAudits","recoveryApprovals"].includes(corrupt)?intent.operationId:"6"}`);
+        }
+        for(const path of h.current.keys())h.data.delete(path);
+        const before=JSON.stringify([...h.data]),count=h.writes();
+        if(corrupt){
+            await assert.rejects(h.recovery.restoreCurrent({},nextIntent),e=>e.code==="data-loss");
+            assert.equal(h.writes(),count);assert.equal(JSON.stringify([...h.data]),before);
+        }else{
+            const oldReceipt=h.data.get(`${root}/operations/${intent.operationId}`);
+            assert.equal((await h.recovery.restoreCurrent({},nextIntent)).restoredRevision,8);
+            assert.deepEqual(h.data.get(`${root}/operations/${intent.operationId}`),oldReceipt);
+            assert.equal(h.data.get(`${root}/economy/current`).gold,25);
+        }
+    }
+});
+
+test("operation source proof budget is reserved before reading daily history",async()=>{
+    const h=fixture();
+    for(let i=0;i<12;i++)h.data.set(`${root}/operations/retained-daily-history-${i}`,{
+        schemaVersion:1,ownerUid:uid,kind:"daily-period-apply"});
+    const before=JSON.stringify([...h.data]);
+    await assert.rejects(h.recovery.restoreCurrent({},intent),e=>e.code==="failed-precondition"&&
+        /transaction budget/.test(e.message));
+    assert.equal(h.writes(),0);assert.equal(JSON.stringify([...h.data]),before);
 });
 test("debit ledgers require their original receipt, revision and intact snapshot/archive",async()=>{
     for(const kind of ["shop-purchase","exp-allocation","attribute-allocation"]){

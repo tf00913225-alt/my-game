@@ -378,7 +378,7 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
         }
         const proof=await readDailyPeriodProof(tx,root,uid,account,sourceSnap.data(),receipt.data());
         if(proof.result.periodId!==periodId){fail("data-loss","Daily source ID differs.");}
-        return proof;
+        return {...proof,operationId:id};
     }
 
     // Compare the complete canonical state with its explicit creation evidence.
@@ -478,6 +478,29 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
         if(record.markerId!==markerId){fail("data-loss","Daily application marker ID differs.");}
         return record;
     }
+    function inspectInitialOrigin(uid,revision,initialId,receipt,snapshot,archive){
+        if(!snapshot.exists||!archive.exists||snapshot.get("sha256")!==receipt.snapshotSha256){
+            throw Error("Initial proof differs.");
+        }
+        const origin=inspectRecoveryArchive(archive.data(),uid,revision,snapshot.data());
+        const character=origin.characters[0],state=character?.state;
+        if(origin.account.provenance!=="server-created"||
+           origin.account.slots[0]!==`character-${initialId}`||
+           origin.account.slots[1]!==null||origin.account.slots[2]!==null||
+           origin.characters.length!==1){throw Error("Initial character differs.");}
+        const selection={displayName:character.displayName,element:character.element,
+            gender:state.gender,attributes:Object.fromEntries([
+                "attack","vitality","energy","intelligence","defensePoints","agility"]
+                .map(key=>[key,state[key]]))};
+        const generated=makeInitialCharacterSources(uid,revision,initialId,selection,
+            {recordedAt:origin.progress.playableState.lastSaveTimestamp});
+        if(snapshotDigest(origin)!==snapshotDigest(generated)||
+           receipt.selectionSha256!==createHash("sha256")
+               .update(JSON.stringify(generated.characters[0].state)).digest("hex")){
+            throw Error("Not the explicit initial state.");
+        }
+        return origin;
+    }
     async function verifyZeroBasis(tx,root,uid,account,proof){
         const {records,result}=proof;
         const initialId=account.slots[0].slice("character-".length);
@@ -501,21 +524,10 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
             root.collection("ledgerEntries").doc(initialId)].map(ref=>tx.get(ref)));
         let origin;
         try{
-            if(!snapshot.exists||!archive.exists||snapshot.get("sha256")!==hash||
-               overlap.some(snap=>snap.exists)){throw Error("Initial proof differs.");}
-            origin=inspectRecoveryArchive(archive.data(),uid,revision,snapshot.data());
+            if(overlap.some(snap=>snap.exists)){throw Error("Initial proof differs.");}
+            origin=inspectInitialOrigin(uid,revision,initialId,initial.data(),snapshot,archive);
             assembleCanonicalPlayableProjection(uid,revision,origin);
-            const character=origin.characters[0],state=character.state;
-            const selection={displayName:character.displayName,element:character.element,
-                gender:state.gender,attributes:Object.fromEntries([
-                    "attack","vitality","energy","intelligence","defensePoints","agility"]
-                    .map(key=>[key,state[key]]))};
-            const generated=makeInitialCharacterSources(uid,revision,initialId,selection,
-                {recordedAt:origin.progress.playableState.lastSaveTimestamp});
-            if(snapshotDigest(origin)!==snapshotDigest(generated)||
-               initial.get("selectionSha256")!==createHash("sha256")
-                   .update(JSON.stringify(generated.characters[0].state)).digest("hex")||
-               zeroBaseline(records)!==zeroBaseline(origin)){
+            if(zeroBaseline(records)!==zeroBaseline(origin)){
                 throw Error("Not the explicit untouched initial state.");
             }
         }catch(_){fail("failed-precondition","Canonical consumption cannot be reconciled to its initial source.");}
@@ -753,7 +765,68 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
                 authoritativeStateReady:false,rewardEligible:false};
         });
     }
-    return Object.freeze({commitInitialSources,observeDailyPeriod,applyDailyPeriod});
+    // Read-only proof entry point for approved recovery. The caller inventories
+    // all operations and economic collisions before writing. Additional reads:
+    // initial <=2, observation <=8, application <=35. Application proof has one
+    // parent lookup, never an unbounded recursive traversal.
+    async function verifyRetainedOperation(tx,root,uid,account,row){
+        const value=row.data();
+        if(value?.schemaVersion!==1||value.ownerUid!==uid||
+           account.provenance!=="server-created"||!Number.isSafeInteger(account.serverRevision)||
+           account.serverRevision<2){fail("data-loss","Retained operation identity is inconsistent.");}
+        switch(value.kind){
+        case "initial-character-sources": {
+            const revision=value.sourceRevision;
+            if(!OPERATION_ID.test(row.id||"")||value.operationId!==row.id||
+               account.slots?.[0]!==`character-${row.id}`||value.authoritativeStateReady!==false||
+               !Number.isSafeInteger(revision)||revision<2||revision>account.serverRevision||
+               !/^[a-f0-9]{64}$/.test(value.snapshotSha256||"")||
+               !/^[a-f0-9]{64}$/.test(value.selectionSha256||"")){
+                fail("data-loss","Retained initial operation is inconsistent.");
+            }
+            const [snapshot,archive]=await Promise.all([
+                tx.get(root.collection("playableSnapshots").doc(String(revision))),
+                tx.get(root.collection("recoveryArchives").doc(String(revision)))]);
+            try{inspectInitialOrigin(uid,revision,row.id,value,snapshot,archive);}
+            catch(_){fail("data-loss","Retained initial proof is inconsistent.");}
+            return;
+        }
+        case "daily-period-source":
+        case "daily-period-observation": {
+            if(!/^daily-period-\d{8}$/.test(value.periodId||"")){
+                fail("data-loss","Retained daily period identity is inconsistent.");
+            }
+            const proof=await loadDailySource(tx,root,uid,account,value.periodId);
+            if((value.kind==="daily-period-source"&&row.id!==value.periodId)||
+               (value.kind==="daily-period-observation"&&row.id!==proof.operationId)){
+                fail("data-loss","Retained daily period inventory differs.");
+            }
+            return;
+        }
+        case "daily-period-application":
+        case "daily-period-apply": {
+            if(!/^daily-period-applied-\d{8}$/.test(value.markerId||"")){
+                fail("data-loss","Retained daily application identity is inconsistent.");
+            }
+            const record=await loadAppliedPair(tx,root,uid,account,value.markerId);
+            if((value.kind==="daily-period-application"&&row.id!==value.markerId)||
+               (value.kind==="daily-period-apply"&&row.id!==record.operationId)){
+                fail("data-loss","Retained daily application inventory differs.");
+            }
+            await verifyAppliedResult(tx,root,uid,account,record);
+            return;
+        }
+        default:fail("failed-precondition","Unsupported retained operation blocks recovery.");
+        }
+    }
+    function retainedOperationReadBudget(kind){
+        if(kind==="initial-character-sources")return 2;
+        if(["daily-period-source","daily-period-observation"].includes(kind))return 8;
+        if(["daily-period-application","daily-period-apply"].includes(kind))return 35;
+        return 0; // Unsupported kinds are rejected without reads.
+    }
+    return Object.freeze({commitInitialSources,observeDailyPeriod,applyDailyPeriod,
+        verifyRetainedOperation,retainedOperationReadBudget});
 }
 
 module.exports={createCanonicalSourceWriter};

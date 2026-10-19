@@ -232,6 +232,32 @@ async function runViewport(chrome,url,width,height,capture){
         assert.ok(evidence.guidance.length>0,"learnable action has no Guidance Dot");
         for(const item of evidence.guidance){ assertVisibleAction("Guidance Dot parent",item.parent);assert.ok(item.dot.visibleRectWidth>0&&item.dot.visibleRectHeight>0,"Guidance Dot is not visible"); }
         for(const card of evidence.allCards){ assert.equal(card.tagName,"BUTTON","div.skill-action-card is forbidden in formal Runtime"); }
+        const layout=await client.eval(`(()=>{
+            const failures=[];
+            const rect=node=>node.getBoundingClientRect();
+            for(const element of ['fire','water','wind','earth']){
+                selectedSkillElementTab=element;renderSkillLoadout();
+                for(const row of document.querySelectorAll('#allSkillsList .skill-row')){
+                    const bounds=rect(row),text=row.querySelector('.skill-row-text'),icon=row.querySelector('.skill-row-icon');
+                    if(row.scrollWidth>row.clientWidth+1)failures.push(element+': row overflow');
+                    if(rect(icon).right>rect(text).left+1)failures.push(element+': icon overlaps text');
+                    const actions=[...row.querySelectorAll('button')];
+                    for(const action of actions){
+                        const r=rect(action);
+                        if(r.left<bounds.left||r.right>bounds.right+1)failures.push(element+': action escapes row');
+                        if(r.top<rect(text).bottom-1)failures.push(element+': action overlaps description');
+                        if(action.scrollWidth>action.clientWidth+1||action.scrollHeight>action.clientHeight+1)failures.push(element+': clipped action');
+                    }
+                    const scale=bounds.width/row.offsetWidth;
+                    for(const node of row.querySelectorAll('b,.skill-row-meta,.skill-row-desc,.skill-action-card-label,.skill-row-detail-link')){
+                        if(parseFloat(getComputedStyle(node).fontSize)*scale<12.9)failures.push(element+': projected text below minimum');
+                    }
+                }
+            }
+            return {failures};
+        })()`);
+        assert.deepEqual(layout.failures,[],"skill presentation must remain readable without overlapping controls");
+        evidence.layout=layout;
         const retirement=await client.eval(`(async()=>{
             const absent=!document.querySelector('#allElementSkillPreviewModal,#skillPreviewHeaderButton,.skill-preview-modal');
             const detail=document.querySelector('#allSkillsList [onclick^="showSkillDetail"]');
@@ -249,8 +275,20 @@ async function runViewport(chrome,url,width,height,capture){
         assert.deepEqual(retirement,{absent:true,shown:true,closed:true,skillList:true});
         evidence.retirement=retirement;
         if(capture){
+            await client.eval(`(()=>{
+                player.id='赤炎行者';player2.id='寒泉行者';
+                renderCharacterShowcaseContent();
+                characterSkillLoadouts.fire={skillLevels:{fireRocket:1},equippedSkills:['fireRocket']};
+                selectedSkillElementTab='fire';renderSkillLoadout();
+                document.getElementById('characterTabContent').scrollTop=0;
+            })()`);
+            await client.eval(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))`);
             const screenshot=await client.send("Page.captureScreenshot",{format:"png"});
             fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-393x873.png"),Buffer.from(screenshot.data,"base64"));
+            await client.eval(`document.querySelector('#allSkillsList .skill-row').scrollIntoView({block:'start'})`);
+            await client.eval(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))`);
+            const listScreenshot=await client.send("Page.captureScreenshot",{format:"png"});
+            fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-list-393x873.png"),Buffer.from(listScreenshot.data,"base64"));
         }
         return {viewport:{width,height},evidence};
     }catch(error){
