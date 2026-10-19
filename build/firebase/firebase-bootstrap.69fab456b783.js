@@ -7,8 +7,10 @@ import {
 import {
     bootstrapTrustedCloudSave,createInitialCanonicalCharacter,CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,saveLocalAutoBattlePreferences,createLocalMigrationBackup,
     submitLegacyMigrationCandidate,screenLegacyMigrationCandidate,readHeroAcquisition,observeHeroLogin,
-    ensureHeroChapterTicket,completeHeroChapterNode,readHeroGrowth,mutateHeroGrowth,claimHeroLoginReward,claimHeroDailySupply,readTeamFormation,saveTeamFormation
-} from "./firebase-cloud-save.51aec2128714.js";
+    ensureHeroChapterTicket,completeHeroChapterNode,readHeroGrowth,mutateHeroGrowth,claimHeroLoginReward,claimHeroDailySupply,readTeamFormation,saveTeamFormation,
+    observeCanonicalAccountMode,beginCanonicalElementBoxAd,completeCanonicalElementBoxAd,abandonCanonicalElementBoxAd,
+    issueCanonicalPatrolTicket,settleCanonicalPatrolMember,settleCanonicalPatrolTerminal,abandonCanonicalPatrolTicket
+} from "./firebase-cloud-save.bca9048d8a32.js";
 import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.2698bfba1bdc.js";
 import {synchronizeGameSession,revokeGameSession,protectedTest,getGameSessionState} from "./firebase-session.877a7842d6bd.js";
 
@@ -86,6 +88,8 @@ const api=Object.freeze({
     signInWithGoogle,signInWithFacebook,signInWithEmail,createAccountWithEmail,signInAsAnonymous,signOut:signOutFirebase,
     bootstrapCloudSave:bootstrapTrustedCloudSave,createInitialCanonicalCharacter,submitLegacyMigrationCandidate,screenLegacyMigrationCandidate,saveLocalAutoBattlePreferences,createLocalMigrationBackup,protectedTest,getGameSessionState,
     readHeroAcquisition,observeHeroLogin,ensureHeroChapterTicket,completeHeroChapterNode,readHeroGrowth,mutateHeroGrowth,claimHeroLoginReward,claimHeroDailySupply,readTeamFormation,saveTeamFormation,
+    observeCanonicalAccountMode,beginCanonicalElementBoxAd,completeCanonicalElementBoxAd,abandonCanonicalElementBoxAd,
+    issueCanonicalPatrolTicket,settleCanonicalPatrolMember,settleCanonicalPatrolTerminal,abandonCanonicalPatrolTicket,
     openAuth:openFirebaseAuthUi,closeAuth:closeFirebaseAuthUi,
     setUiState:setFirebaseAuthUiState,cloudSaveWritePolicy:CLOUD_SAVE_WRITE_POLICY,
     cloudFunctionsRegion:CLOUD_FUNCTIONS_REGION,dispose:()=>{ if(unsubscribe){ unsubscribe(); unsubscribe=null; } }

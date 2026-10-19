@@ -3231,5 +3231,241 @@ console.log("PASS Hero daily supply real Firestore/HTTP: both fragments, one pil
     console.log("PASS isolated account mode time actual Firestore: protected identity, private zero heartbeats, rested/ElementBox clock transitions, serial simulated grant, replay/concurrency, corrupt-proof rejection, rules and current-source-loss recovery; all readiness remains closed.");
 }
 
+// Isolated ordinary online Forest settlement: the real HTTP identity/session
+// and first-character path feed internal Owners and actual Firestore commits.
+// Deterministic entropy is an injected server test dependency, never Client
+// reward data. This is bounded intent settlement, not combat verification.
+{
+    const {createCanonicalPatrolSettlement}=require("../functions/src/canonical-patrol-settlement.js");
+    const {patrolVictoryExp}=require("../functions/src/patrol-ticket-policy.js");
+    async function freshPatrol(suffix){
+        const email=`forest-patrol-${suffix}-emulator@example.test`;
+        const user=await login("accounts:signUp",{email,password}),uid=user.localId;
+        let token=user.idToken,session=await invoke("createGameSession",token,{uid});
+        const root=db.collection("serverUsers").doc(uid),save=db.doc(`users/${uid}/saves/current`);
+        const envelope=await invoke("bootstrapCloudSave",token,{uid,session});
+        await invoke("createInitialCanonicalCharacter",token,{uid,session,selection:choices,
+            expectedRevision:envelope.serverRevision});
+        const original=await checkRecoveryArchive(uid,2);
+        let clock=original.get("sourceRecords.progress.playableState.lastSaveTimestamp"),serial=0;
+        const deps={db,FieldValue,HttpsError,inspectExistingEnvelope,nextRevision,
+            runProtected:writerSessions.runProtected,now:()=>clock,randomBytes:size=>Buffer.alloc(size)};
+        const forest=createCanonicalPatrolSettlement(deps);
+        const mode=forest.modeOwner;
+        const request=()=>({auth:{uid,token:claims(token)},data:{uid,session}});
+        const revision=async()=>(await save.get()).get("serverRevision");
+        const intent=async extra=>({operationId:`forest-${suffix}-${String(++serial).padStart(8,"0")}`,
+            expectedRevision:await revision(),...extra});
+        const presence=async(action="heartbeat",elementBox="keep")=>mode.observePresence(request(),
+            await intent({intent:action,elementBox,
+                expectedSequence:(await root.collection("modeTime").doc("current").get()).get("sequence")??0}));
+        const capture=async()=>{
+            const rows=[[save.path,await save.get()]];
+            for(const collection of await root.listCollections())for(const doc of (await collection.get()).docs)rows.push([doc.ref.path,doc]);
+            return rows.map(([path,doc])=>[path,{data:doc.data(),version:doc.updateTime?.toMillis()}])
+                .sort(([a],[b])=>a.localeCompare(b));
+        };
+        const refuses=async(operation,pattern)=>{
+            const before=await capture();await assert.rejects(operation,pattern);
+            assert.deepEqual(await capture(),before,"Rejected Forest intents must commit zero writes");
+        };
+        const issue=async()=>{
+            const input=await intent({triggerEntryId:"forest:0",availableEntryIds:["forest:0"]});
+            const result=await forest.issueTicket(request(),input);
+            const ticketId=result.ticketId;
+            const ticket=(await root.collection("patrolTickets").doc(ticketId).get()).data();
+            assert.equal(ticketId,input.operationId);assert.equal(ticket.members.length,1);
+            return {ticketId,ticket,input};
+        };
+        const member=async(ticketId,extra={})=>forest.settleMember(request(),await intent({ticketId,memberIndex:0,...extra}));
+        const terminal=async(ticketId,kind="win")=>forest.settleTerminal(request(),await intent({ticketId,kind}));
+        await presence("reopen");
+        return {uid,email,root,save,deps,forest,mode,request,revision,intent,presence,capture,refuses,issue,member,terminal,
+            advance:delta=>{clock+=delta;},get clock(){return clock;},get token(){return token;},get session(){return session;},
+            setIdentity:(nextToken,nextSession)=>{token=nextToken;session=nextSession;}};
+    }
+    const h=await freshPatrol("repeat"),economy=()=>h.root.collection("economy").doc("current").get();
+    await h.presence("rest");h.advance(120000);await h.presence("resume");
+    const lost=await h.issue(),memberInput=await h.intent({ticketId:lost.ticketId,memberIndex:0});
+    const goldBefore=(await economy()).get("gold");
+    const memberRace=await Promise.all([h.forest.settleMember(h.request(),memberInput),h.forest.settleMember(h.request(),memberInput)]);
+    assert.deepEqual(memberRace[0].reward,memberRace[1].reward);
+    assert.equal((await economy()).get("gold"),goldBefore+lost.ticket.members[0].gold);
+    assert.ok(memberRace[0].reward.drops.some(row=>row.accepted),"The server-sealed deterministic drop must enter the actual inventory");
+    const retainedMember=(await checkRecoveryArchive(h.uid,await h.revision())).get("sourceRecords");
+    // Discarded member response resolves the same immutable intent without a
+    // second drop, gold credit, mode debit or private event.
+    const afterMember=await h.capture();assert.equal((await h.forest.settleMember(h.request(),memberInput)).unchanged,true);
+    assert.deepEqual(await h.capture(),afterMember);
+    await h.terminal(lost.ticketId,"loss");
+    assert.equal((await economy()).get("gold"),goldBefore+lost.ticket.members[0].gold);
+    assert.equal((await economy()).get("sharedExp"),0,"Loss retains member gold/drop but grants no victory EXP");
+    const afterLoss=(await checkRecoveryArchive(h.uid,await h.revision())).get("sourceRecords");
+    assert.deepEqual(afterLoss.inventory.map(row=>row.state),retainedMember.inventory.map(row=>row.state));
+    assert.equal(JSON.parse(afterLoss.progress.sidecars["rested-exp-state"].raw).battles,1);
+    const won=await h.issue();await h.member(won.ticketId);
+    const charId=(await h.root.collection("account").doc("current").get()).get("slots")[0];
+    const state=(await h.root.collection("characters").doc(charId).get()).get("state");
+    const expectedExp=patrolVictoryExp(won.ticket.members,[state],{rested:true,elementBox:false});
+    const winInput=await h.intent({ticketId:won.ticketId,kind:"win"});
+    const rollback=createCanonicalPatrolSettlement({...h.deps,
+        runProtected:(request,operation)=>writerSessions.runProtected(request,async(tx,active)=>{
+            await operation(tx,active);throw new Error("Forest rollback after all staged writes");
+        })});
+    await h.refuses(()=>rollback.settleTerminal(h.request(),winInput),/Forest rollback/);
+    await h.forest.settleTerminal(h.request(),winInput);
+    const winRetry=await h.forest.settleTerminal(h.request(),winInput);
+    assert.equal(winRetry.unchanged,true);assert.equal(winRetry.reward.exp,expectedExp);
+    assert.equal((await economy()).get("sharedExp"),expectedExp);
+    assert.equal((await h.root.collection("modeTime").doc("current").get()).get("modeState.rested.battles"),0);
+    const modeEvent=await h.root.collection("modeTimeEvents").doc(winInput.operationId).get();
+    assert.equal(modeEvent.exists,true,"Mode consumption shares the actual winning settlement transaction");
+    for(const [collection,id] of [["patrolTickets",won.ticketId],["patrolSettlements",winInput.operationId],
+        ["ledgerEntries",winInput.operationId]]){
+        const proof=h.root.collection(collection).doc(id),bytes=(await proof.get()).data();assert.ok(bytes);
+        await proof.delete();await h.refuses(()=>h.forest.settleTerminal(h.request(),winInput));await proof.set(bytes);
+        await proof.update({ownerUid:"foreign-patrol-owner"});await h.refuses(()=>h.forest.settleTerminal(h.request(),winInput));await proof.set(bytes);
+    }
+    const archiveRef=h.root.collection("recoveryArchives").doc(String(await h.revision()));
+    const archiveBytes=(await archiveRef.get()).data();await archiveRef.delete();await h.refuses(()=>h.issue());await archiveRef.set(archiveBytes);
+    await archiveRef.update({sourceSha256:"0".repeat(64)});await h.refuses(()=>h.issue());await archiveRef.set(archiveBytes);
+    for(const path of [`patrolTickets/${won.ticketId}`,`patrolSettlements/${winInput.operationId}`,`patrolTicketStates/${won.ticketId}`,"patrol/current"]){
+        for(const browserToken of [h.token,yUser.idToken])for(const method of ["GET","PATCH"]){
+            assert.equal(await rulesRequest(`${h.root.path}/${path}`,browserToken,method),403);
+        }
+    }
+    const stale=await h.intent({triggerEntryId:"forest:0",availableEntryIds:["forest:0"]});
+    await h.refuses(()=>h.forest.issueTicket(h.request(),{...stale,expectedRevision:stale.expectedRevision-1}));
+    await h.refuses(()=>h.forest.issueTicket({auth:{uid:h.uid,token:claims(h.token)},data:{uid:y,session:h.session}},stale));
+    const oldRequest=h.request(),deadline=Date.now()+2500;
+    while(Math.floor(Date.now()/1000)<=claims(h.token).auth_time&&Date.now()<deadline)await new Promise(resolve=>setTimeout(resolve,100));
+    assert.ok(Math.floor(Date.now()/1000)>claims(h.token).auth_time);
+    const other=await login("accounts:signInWithPassword",{email:h.email,password});
+    const otherSession=await invoke("createGameSession",other.idToken,{uid:h.uid});h.setIdentity(other.idToken,otherSession);
+    await h.refuses(()=>h.forest.settleTerminal(oldRequest,winInput));await h.presence("reopen");
+    const allocator=createCanonicalExpAllocation(h.deps);
+    async function allocateAvailable(){
+        for(let guard=0;guard<9;guard++){
+            const current=(await h.root.collection("characters").doc(charId).get()).get("state");
+            if(current.level>=10||(await economy()).get("sharedExp")<current.expNext-current.exp)return current.level;
+            await allocator.allocateSharedExp(h.request(),await h.intent());
+        }
+        return (await h.root.collection("characters").doc(charId).get()).get("state.level");
+    }
+    let level=await allocateAvailable(),completedBattles=2;
+    // Finite test guard only: this adds no production challenge/earning limit.
+    for(let guard=0;level<10&&guard<48;guard++){
+        const next=await h.issue();await h.member(next.ticketId);await h.terminal(next.ticketId);
+        completedBattles++;level=await allocateAvailable();
+    }
+    assert.equal(level,10,"Actual earned shared EXP and the existing allocator must reach Lv10");
+    assert.ok(completedBattles>=2);assert.equal((await h.save.get()).get("authoritativeStateReady"),false);
+    await checkRecoveryArchive(h.uid,await h.revision());
+
+    // Recovery uses a different fresh UID and a deliberately small legitimate
+    // history. Large histories retain the existing 400-read refusal budget.
+    const r=await freshPatrol("recovery"),ticket=await r.issue();
+    const paid=await r.member(ticket.ticketId),closed=await r.terminal(ticket.ticketId,"loss");
+    const laterHeartbeat=await r.presence();
+    assert.equal((await r.root.collection("modeTimeEvents").doc(laterHeartbeat.operationId).get()).get("schemaVersion"),1);
+    for(const id of [paid.operationId,closed.operationId]){
+        const event=await r.root.collection("modeTimeEvents").doc(id).get();
+        assert.equal(event.get("schemaVersion"),2);assert.equal(event.get("modeChanged"),false);
+    }
+    assert.equal(typeof paid.operationId,"string");
+    const revision=await r.revision(),beforeLoss=(await checkRecoveryArchive(r.uid,revision)).get("sourceRecords");
+    const restoreId="forest-recovery-current-0001",restoreIntent={operationId:restoreId,expectedRevision:revision};
+    const approval=createCanonicalRecoveryApproval({...r.deps,Timestamp});
+    await approval.issue({auth:{uid:"emulator-forest-operator",token:{cloudSaveOperator:true}},
+        data:{ownerUid:r.uid,operationId:restoreId,sourceRevision:revision}});
+    const recovery=createCanonicalCurrentRecovery(r.deps);
+    // A retained settlement is independent proof even after both economic
+    // indexes are lost. The actual restore must inventory that source.
+    const refs=[r.root.collection("operations").doc(paid.operationId),r.root.collection("ledgerEntries").doc(paid.operationId)];
+    const bytes=await Promise.all(refs.map(async ref=>(await ref.get()).data()));
+    for(const ref of refs)await ref.delete();await r.refuses(()=>recovery.restoreCurrent(r.request(),restoreIntent));
+    for(let index=0;index<refs.length;index++)await refs[index].set(bytes[index]);
+    const source=r.root.collection("patrolTickets").doc(ticket.ticketId),sourceBytes=(await source.get()).data();
+    await source.update({ownerUid:"foreign-patrol-owner"});await r.refuses(()=>recovery.restoreCurrent(r.request(),restoreIntent));await source.set(sourceBytes);
+    // A later v1 heartbeat cannot hide v2 Forest events whose time delta was
+    // zero. Remove ALL Forest indexes plus current sources; only independent
+    // retained mode events/snapshots survive to expose the missing originals.
+    const allBeforeDamage=await r.capture(),eraseCollections=new Set(["account","economy","inventory","equipment","characters",
+        "relics","relicLoadout","progress","claimCheckpoints","claimRecords","patrolTickets","patrolTicketStates",
+        "patrolSettlements","patrolClosures","patrol"]);
+    const erased=allBeforeDamage.filter(([path])=>{
+        if(!path.startsWith(r.root.path+"/"))return false;
+        const relative=path.slice(r.root.path.length+1);
+        return eraseCollections.has(relative.split("/")[0])||[paid.operationId,closed.operationId].some(id=>
+            relative===`operations/${id}`||relative===`ledgerEntries/${id}`);
+    });
+    const erase=db.batch();for(const [path] of erased)erase.delete(db.doc(path));await erase.commit();
+    await r.refuses(()=>recovery.restoreCurrent(r.request(),restoreIntent));
+    const replace=db.batch();for(const [path,row] of erased)replace.set(db.doc(path),row.data);await replace.commit();
+    const retained=await r.capture(),remove=db.batch();
+    for(const name of ["account","economy","inventory","equipment","characters","relics","relicLoadout","progress","claimCheckpoints","claimRecords"]){
+        for(const doc of (await r.root.collection(name).get()).docs)remove.delete(doc.ref);
+    }
+    await remove.commit();const restored=await recovery.restoreCurrent(r.request(),restoreIntent);
+    assert.equal(restored.restoredRevision,revision+1);
+    const after=(await checkRecoveryArchive(r.uid,restored.restoredRevision)).get("sourceRecords");
+    assert.equal(after.economy.gold,beforeLoss.economy.gold);assert.equal(after.economy.sharedExp,0);
+    assert.deepEqual(after.inventory.map(row=>row.state),beforeLoss.inventory.map(row=>row.state));
+    for(const [path,row] of retained.filter(([path])=>/\/(patrolTickets|patrolTicketStates|patrolSettlements|patrolClosures|modeTime|modeTimeEvents|ledgerEntries)\//.test(path))){
+        assert.deepEqual((await db.doc(path).get()).data(),row.data,"Recovery retains independent Forest/mode history");
+    }
+    const committed=await r.capture();assert.equal((await recovery.restoreCurrent(r.request(),restoreIntent)).unchanged,true);
+    assert.deepEqual(await r.capture(),committed);
+    console.log("PASS isolated Forest online settlement actual Firestore: repeatable member/win/loss, concurrent/lost-response once-only credit, retained loss loot, rested/mode atomic win, actual EXP allocation through Lv10, corruption/session/rules fences and fresh-small-history source-loss recovery. Intent outcomes remain unverified; no readiness or gameplay limit is published.");
+}
+
+// Minimal public-boundary smoke uses the actual callable clock and entropy.
+// No internal mode/Forest factory is used for this separate fresh actor.
+{
+    const user=await login("accounts:signUp",{email:"forest-patrol-callable-emulator@example.test",password});
+    const uid=user.localId,token=user.idToken,session=await invoke("createGameSession",token,{uid});
+    const root=db.collection("serverUsers").doc(uid),save=db.doc(`users/${uid}/saves/current`),identity={uid,session};
+    const envelope=await invoke("bootstrapCloudSave",token,identity);
+    await invoke("createInitialCanonicalCharacter",token,{...identity,selection:choices,expectedRevision:envelope.serverRevision});
+    const revision=async()=>(await save.get()).get("serverRevision");
+    const capture=async()=>{
+        const rows=[[save.path,(await save.get()).data()]];
+        for(const collection of await root.listCollections())for(const doc of (await collection.get()).docs)rows.push([doc.ref.path,doc.data()]);
+        return rows.sort(([a],[b])=>a.localeCompare(b));
+    };
+    const refuses=async(name,authToken,input,code)=>{
+        const before=await capture();await assert.rejects(()=>invoke(name,authToken,input),error=>
+            [code,code.toLowerCase().replaceAll("_","-")].includes(error.code));
+        assert.deepEqual(await capture(),before,"Callable boundary rejection cannot change canonical/private records");
+    };
+    const reopen={...identity,operationId:"forest-http-reopen-0001",expectedRevision:await revision(),
+        expectedSequence:0,intent:"reopen",elementBox:"keep"};
+    await refuses("observeCanonicalAccountMode",null,reopen,"UNAUTHENTICATED");
+    await refuses("observeCanonicalAccountMode",token,{...reopen,uid:y},"SESSION_INVALID");
+    await refuses("observeCanonicalAccountMode",token,{...reopen,session:null},"SESSION_INVALID");
+    await refuses("observeCanonicalAccountMode",token,{...reopen,rawState:{}},"INVALID_ARGUMENT");
+    await invoke("observeCanonicalAccountMode",token,reopen);
+    const issue={...identity,operationId:"forest-http-ticket-0001",expectedRevision:await revision(),
+        triggerEntryId:"forest:0",availableEntryIds:["forest:0"]};
+    await refuses("issueCanonicalPatrolTicket",token,{...issue,amount:999999},"INVALID_ARGUMENT");
+    const ticket=await invoke("issueCanonicalPatrolTicket",token,issue);
+    assert.equal(ticket.members.length,1);assert.equal(ticket.outcomeVerified,false);
+    const member={...identity,operationId:"forest-http-member-0001",expectedRevision:await revision(),ticketId:ticket.ticketId,memberIndex:0};
+    await refuses("settleCanonicalPatrolMember",token,{...member,won:true},"INVALID_ARGUMENT");
+    await refuses("settleCanonicalPatrolTerminal",token,{...identity,operationId:"forest-http-forged-win-0001",
+        expectedRevision:await revision(),ticketId:ticket.ticketId,kind:"win"},"FAILED_PRECONDITION");
+    const credited=await invoke("settleCanonicalPatrolMember",token,member);
+    assert.equal(credited.outcomeVerified,false);assert.ok(credited.reward.gold>0);
+    const loss={...identity,operationId:"forest-http-loss-0001",expectedRevision:await revision(),ticketId:ticket.ticketId,kind:"loss"};
+    await refuses("settleCanonicalPatrolTerminal",token,{...loss,rawState:{gold:999999}},"INVALID_ARGUMENT");
+    const closed=await invoke("settleCanonicalPatrolTerminal",token,loss);
+    assert.equal(closed.reward.exp,0);assert.equal((await root.collection("economy").doc("current").get()).get("sharedExp"),0);
+    const beforeRetry=await capture();
+    assert.equal((await invoke("settleCanonicalPatrolMember",token,member)).unchanged,true);
+    assert.equal((await invoke("settleCanonicalPatrolTerminal",token,loss)).unchanged,true);
+    assert.deepEqual(await capture(),beforeRetry);assert.equal((await save.get()).get("authoritativeStateReady"),false);
+    console.log("PASS Forest callable HTTP boundary: real reopen/issue/member/loss/retry, no Client amount/raw-state/win proof, unauthenticated/cross-UID/invalid-session refusal; readiness remains false.");
+}
+
 await db.terminate();
 if(direct){await getFirestore().terminate();}

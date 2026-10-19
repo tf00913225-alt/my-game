@@ -1,6 +1,6 @@
 "use strict";
 
-const {assembleCanonicalSnapshot,claimRecordsDigest}=
+const {assembleCanonicalSnapshot,claimRecordsDigest,snapshotDigest}=
     require("./canonical-snapshot");
 const {inspectRecoveryArchive,createRecoveryArchive}=
     require("./canonical-recovery-archive");
@@ -10,7 +10,7 @@ const {verifyShopPurchaseEvidence}=require("./canonical-shop-purchase");
 const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
-const {createCanonicalAccountModeTime}=require("./canonical-account-mode-time");
+const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 const SETS={
@@ -45,8 +45,9 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     const fail=(code,message)=>{throw new HttpsError(code,message);};
     const sourceEvidence=createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
         inspectExistingEnvelope,nextRevision,now});
-    const modeEvidence=createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
+    const patrolEvidence=createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
         inspectExistingEnvelope,nextRevision,now});
+    const modeEvidence=patrolEvidence.modeOwner;
     async function verifyRecoveredResult(tx,root,uid,operationId,expectedRevision,maxRevision,
         {archiveSnap,snapshotSnap,approvalSnap,operationSnap,auditSnap,grantSnap,ledgerSnap},records){
         const receipt=operationSnap.data(),audit=auditSnap.data(),
@@ -186,7 +187,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             }
             // Canonical claim sources may all be lost. Independent retained
             // rights must agree with the archive, not be hidden by its rollback.
-            const [claims,receipts,ledgers,grants,events,operations,modeSources,modeEvents]=await Promise.all([
+            const [claims,receipts,ledgers,grants,events,operations,modeSources,modeEvents,
+                patrolTickets,patrolStates,patrolSettlements,patrolClosures,patrolModeEvents,patrolOwnedModeEvents,modeHead]=await Promise.all([
                 tx.get(root.collection("uniqueClaims").limit(401)),
                 tx.get(root.collection("grantOperations").limit(401)),
                 tx.get(root.collection("ledgerEntries").limit(401)),
@@ -194,8 +196,22 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 tx.get(root.collection("rewardEvents").limit(401)),
                 tx.get(root.collection("operations").limit(401)),
                 tx.get(root.collection("simulatedAdSources").limit(401)),
-                tx.get(root.collection("modeTimeEvents").where("modeChanged","==",true).limit(401))
+                tx.get(root.collection("modeTimeEvents").where("modeChanged","==",true).limit(401)),
+                tx.get(root.collection("patrolTickets").limit(401)),
+                tx.get(root.collection("patrolTicketStates").limit(401)),
+                tx.get(root.collection("patrolSettlements").limit(401)),
+                tx.get(root.collection("patrolClosures").limit(401)),
+                // Schema 2 carries a Forest asset delta even when no mode value
+                // changed. Such evidence must survive loss of all asset indexes.
+                tx.get(root.collection("modeTimeEvents").where("schemaVersion","==",2).limit(401)),
+                // Independent Owner identity catches an unsupported/corrupt
+                // version even if it no longer appears in the schema-2 index.
+                tx.get(root.collection("modeTimeEvents").where("resultOwner","==","forest-patrol-settlement").limit(401)),
+                tx.get(root.collection("modeTime").doc("current"))
             ]);
+            const modeHeadEvent=modeHead.exists?await tx.get(root.collection("modeTimeEvents")
+                .doc(modeHead.get("lastOperationId")||"missing-mode-head")):null;
+            const patrolOperationIds=new Set(patrolSettlements.docs.map(doc=>doc.id));
             // Each credit proof reads at most 12 documents, including its claim,
             // grant/receipt/ledger/collision and original event/snapshot/archive.
             // Inventory reads are additional; a reservation reserves six proof
@@ -210,6 +226,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             const pendingCount=grants.docs.filter(doc=>doc.get("status")==="pending").length;
             const operationProofReads=operations.docs.reduce((sum,doc)=>sum+
                 (doc.get("kind")==="canonical-current-recovery"?8:
+                    doc.get("kind")==="forest-patrol-settlement"?0:
                     doc.get("kind")==="account-mode-time"?
                         modeEvidence.retainedOperationReadBudget(doc.get("kind")):
                         sourceEvidence.retainedOperationReadBudget(doc.get("kind"))),0);
@@ -218,8 +235,13 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                grants.docs.length+pendingCount*3+events.docs.length*4+
                operations.docs.length+operationProofReads+
                modeSources.docs.length*(1+modeEvidence.retainedSourceReadBudget())+
-               modeEvents.docs.length*(1+modeEvidence.retainedEventReadBudget())+
-               modeEvidence.currentEvidenceReadBudget()>400){
+               modeEvents.docs.reduce((sum,doc)=>sum+1+(doc.get("schemaVersion")===2?0:
+                   modeEvidence.retainedEventReadBudget(doc.data())),0)+
+               patrolTickets.docs.length*(1+patrolEvidence.retainedTicketReadBudget())+
+               patrolStates.docs.length+patrolSettlements.docs.length+patrolClosures.docs.length+
+               patrolModeEvents.docs.length+patrolOwnedModeEvents.docs.length+2+
+               (patrolTickets.docs.length?patrolEvidence.currentEvidenceReadBudget():5)+
+               modeEvidence.currentEvidenceReadBudget(modeHeadEvent?.data()??{schemaVersion:1})>400){
                 fail("failed-precondition","Recovery claim evidence exceeds the transaction budget.");
             }
             const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
@@ -230,12 +252,49 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             // Reuse the original credit/debit Owners; never infer a missing
             // receipt from a balance or regenerate an operation during repair.
             const receiptById=new Map(receipts.docs.map(doc=>[doc.id,doc.data()]));
+            const verifiedPatrolOperations=new Set(),ticketProofs=new Map();
+            for(const doc of patrolTickets.docs){
+                const proof=await patrolEvidence.verifyRetainedTicket(tx,root,uid,records.account,doc,expectedRevision);
+                ticketProofs.set(doc.id,proof);
+                for(const operationId of proof.verifiedOperationIds)verifiedPatrolOperations.add(operationId);
+            }
+            if(patrolStates.docs.length!==ticketProofs.size){
+                fail("data-loss","Patrol ticket checkpoint inventory differs from retained sources.");
+            }
+            for(const doc of patrolStates.docs){
+                const {createdAt,updatedAt,...state}=doc.data();
+                if(!ticketProofs.has(doc.id)||snapshotDigest(state)!==snapshotDigest(ticketProofs.get(doc.id).state)){
+                    fail("data-loss","An orphaned Patrol checkpoint blocks recovery.");
+                }
+            }
+            for(const doc of patrolSettlements.docs){
+                if(!verifiedPatrolOperations.has(doc.id))fail("data-loss","An unindexed Patrol earning blocks recovery.");
+                await patrolEvidence.verifyRetainedSettlement(tx,root,uid,records.account,doc,expectedRevision);
+            }
+            for(const doc of patrolClosures.docs){
+                const proof=ticketProofs.get(doc.get("ticketId"));
+                if(!proof||proof.state.status!=="abandoned"||proof.state.terminalOperationId!==doc.id){
+                    fail("data-loss","An orphaned Patrol closure blocks recovery.");
+                }
+                await patrolEvidence.verifyRetainedClosure(tx,root,uid,records.account,doc,expectedRevision);
+            }
+            for(const doc of [...patrolModeEvents.docs,...patrolOwnedModeEvents.docs]){
+                if(doc.get("schemaVersion")!==2||doc.get("resultOwner")!=="forest-patrol-settlement"||
+                   !verifiedPatrolOperations.has(doc.id)||!patrolOperationIds.has(doc.id)){
+                    fail("data-loss","A Forest mode component lacks its original earning source.");
+                }
+            }
+            await patrolEvidence.verifyCurrentEvidence(tx,root,uid,records.account,expectedRevision);
             await modeEvidence.verifyCurrentEvidence(tx,root,uid,records.account,records,expectedRevision);
             for(const doc of modeSources.docs){
                 await modeEvidence.verifyRetainedSource(tx,root,uid,records.account,doc,expectedRevision);
             }
             const verifiedModeOperations=new Set();
             for(const doc of modeEvents.docs){
+                if(doc.get("schemaVersion")===2){
+                    if(!verifiedPatrolOperations.has(doc.id))fail("data-loss","An orphaned Forest value event blocks recovery.");
+                    continue; // Full source-specific proof already checked this exact component.
+                }
                 await modeEvidence.verifyRetainedEvent(tx,root,uid,records.account,doc,expectedRevision);
                 verifiedModeOperations.add(doc.id);
             }
@@ -248,7 +307,11 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 if(value.schemaVersion!==1||value.ownerUid!==uid){
                     fail("data-loss","Operation inventory identity blocks recovery.");
                 }
-                if(value.kind==="account-mode-time"){
+                if(value.kind==="forest-patrol-settlement"){
+                    if(receiptById.has(doc.id)||!ledgerIds.has(doc.id)||!verifiedPatrolOperations.has(doc.id)){
+                        fail("data-loss","A Patrol operation lacks its original source and signed ledger.");
+                    }
+                }else if(value.kind==="account-mode-time"){
                     if(receiptById.has(doc.id)||!ledgerIds.has(doc.id)){
                         fail("data-loss","A mode operation lacks its original signed ledger or overlaps a grant.");
                     }
@@ -344,6 +407,12 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 if(ledger.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
                    ledger.schemaVersion!==1||ledger.ownerUid!==uid){
                     fail("data-loss","An unmatched ledger entry blocks recovery.");
+                }
+                if(ledger.kind==="forest-patrol-settlement"){
+                    if(receipt||!verifiedPatrolOperations.has(doc.id)){
+                        fail("data-loss","An unmatched signed Patrol ledger blocks recovery.");
+                    }
+                    continue; // Complete Forest proof checked the original asset and mode delta.
                 }
                 if(ledger.kind==="account-mode-time"){
                     if(receipt||!verifiedModeOperations.has(doc.id)){

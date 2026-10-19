@@ -338,10 +338,10 @@ function createCanonicalAccountModeTime({db,FieldValue,HttpsError,runProtected,
         }
         await verifyEvent(tx,root,uid,account,event,operation.data(),ledger.data(),maxEnvelopeRevision);
     }
-    function retainedEventReadBudget(){return 20+forestReadBudget;}
+    function retainedEventReadBudget(event){return 20+(event?.schemaVersion===1?0:forestReadBudget);}
     function retainedOperationReadBudget(kind){return kind===KIND?20:0;}
     function retainedSourceReadBudget(){return 32;}
-    function currentEvidenceReadBudget(){return 40+forestReadBudget;}
+    function currentEvidenceReadBudget(event){return 40+(event?.schemaVersion===1?0:forestReadBudget);}
     async function verifyRetainedSource(tx,root,uid,account,row,maxEnvelopeRevision=account.serverRevision){
         const ad=row.data();validateAd(ad,uid,row.id);
         const readEvent=async operationId=>{
