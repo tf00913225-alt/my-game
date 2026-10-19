@@ -8,6 +8,7 @@ const {assembleCanonicalSnapshot}=require('../functions/src/canonical-snapshot')
 const {createRecoveryArchive,inspectRecoveryArchive}=require('../functions/src/canonical-recovery-archive');
 const {createCanonicalExpAllocation}=require('../functions/src/canonical-exp-allocation');
 const {createCanonicalAttributeAllocation}=require('../functions/src/canonical-attribute-allocation');
+const {newcomerExpNext}=require('../functions/src/canonical-newcomer-exp');
 let serial=0;
 const id=()=>`allocation-target-${String(++serial).padStart(8,'0')}`;
 const records=h=>h.data.get(h.root+'/recoveryArchives/'+h.data.get(h.root+'/account/current').serverRevision).sourceRecords;
@@ -111,16 +112,35 @@ test('target mutations retain rollback, stale and session protection, while malf
  }
 });
 
-test('pool rounding follows remaining EXP and primary gap rules; unavailable curve and level cap remain closed',async()=>{
+test('pool rounding follows remaining EXP and primary gap rules; malformed thresholds and level cap remain closed',async()=>{
  const h=await fixture(),next=copy(records(h));next.characters[1].state.exp=1;next.characters[2].state.level=40;
- // This valid source fixture exercises the pool gap without claiming an
- // available authoritative threshold for the high-level character itself.
+ // The high-level character supplies the existing party-gap rule; this
+ // operation still validates the chosen target's exact threshold.
  install(h,next);
  const secondary=await h.exp.allocateSharedExp(h.request(),{operationId:id(),expectedRevision:h.revision,characterId:next.account.slots[1]});
  assert.equal(secondary.cost,200);
  const primary=await h.exp.allocateSharedExp(h.request(),{operationId:id(),expectedRevision:h.revision});assert.equal(primary.cost,200);
  for(const level of [19,100]){
   const state=copy(records(h));state.characters[2].state.level=level;install(h,state);
-  await refuses(h,()=>h.exp.allocateSharedExp(h.request(),{operationId:id(),expectedRevision:h.revision,characterId:state.account.slots[2]}),'failed-precondition');
+  await refuses(h,()=>h.exp.allocateSharedExp(h.request(),{operationId:id(),expectedRevision:h.revision,characterId:state.account.slots[2]}),level===100?'failed-precondition':'data-loss');
+ }
+});
+
+test('complete formal thresholds permit atomic levels19,20,49 and99 while preserving the level100 cap',async()=>{
+ for(const level of [19,20,49,99]){
+  const h=await fixture(),next=copy(records(h));
+  next.characters[2].state={...next.characters[2].state,level,exp:0,expNext:newcomerExpNext(level)};
+  next.economy.sharedExp=100000000;install(h,next);
+  const before=copy(records(h)),input={operationId:id(),expectedRevision:h.revision,characterId:next.account.slots[2]};
+  const result=await h.exp.allocateSharedExp(h.request(),input),after=complete(h);
+  assert.equal(result.levelAfter,level+1);
+  assert.equal(result.cost,Math.ceil(newcomerExpNext(level)/(level<20?2:1)));
+  assert.equal(after.characters[2].state.expNext,newcomerExpNext(level+1));
+  assert.equal(after.economy.sharedExp,before.economy.sharedExp-result.cost);
+  for(const index of [0,1])assert.deepEqual(after.characters[index].state,before.characters[index].state);
+  const stable=copy([...h.data]);
+  assert.equal((await h.exp.allocateSharedExp(h.request(),input)).unchanged,true);
+  assert.deepEqual([...h.data],stable);
+  if(level===99)await refuses(h,()=>h.exp.allocateSharedExp(h.request(),{...input,operationId:id(),expectedRevision:h.revision}),'failed-precondition');
  }
 });

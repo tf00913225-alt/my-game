@@ -117,11 +117,8 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
             if(state.level===MAX_CHARACTER_LEVEL){
                 fail("failed-precondition","Character has reached the level cap.");
             }
-            // Beyond the static newcomer curve the runtime uses a live zone roster.
-            // No client-computed threshold can become an authoritative debit.
-            if(state.level>=19){
-                fail("failed-precondition","Trusted EXP curve is unavailable at this level.");
-            }
+            // The build projects the final formal roster/curve into the sealed
+            // complete level table. No client-computed threshold is accepted.
             if(state.expNext!==newcomerExpNext(state.level)){
                 fail("data-loss","Character EXP threshold differs from the trusted curve.");
             }

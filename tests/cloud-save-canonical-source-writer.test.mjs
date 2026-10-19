@@ -633,7 +633,8 @@ test("new creation persists server-generated playable fields in the existing rev
 test("static newcomer EXP curve follows current game anchors",()=>{
     assert.deepEqual([1,2,5,10,15,19].map(newcomerExpNext),
         [300,375,600,1200,2500,6900]);
-    assert.throws(()=>newcomerExpNext(20),/unavailable/);
+    assert.equal(newcomerExpNext(20),52515);
+    assert.throws(()=>newcomerExpNext(101),/unavailable/);
 });
 
 test("initial server-owned character commits complete sources and receipt at one revision",async()=>{

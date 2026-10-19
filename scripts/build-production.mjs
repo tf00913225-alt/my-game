@@ -5,6 +5,7 @@ import {syncMonsterBalanceRuntime} from "./lib/monster-balance-runtime-source.mj
 import {syncBattleEncounterCatalog} from "./lib/cloud-battle-encounter-catalog.mjs";
 import {syncPatrolSourceCatalog} from "./lib/cloud-patrol-source-catalog.mjs";
 import {syncPatrolProgressPolicy} from "./lib/cloud-patrol-progress-policy.mjs";
+import {syncCharacterExpThresholds} from "./lib/character-exp-thresholds.mjs";
 import {syncPlainPlayerNormalAttackRules} from "./lib/cloud-battle-normal-attack-rules.mjs";
 import {syncForestOpeningRoundRules} from "./lib/cloud-battle-opening-round-rules.mjs";
 import {syncHeroChapterQualification} from "./lib/hero-chapter-qualification.mjs";
@@ -21,6 +22,7 @@ await syncBattleEncounterCatalog(ROOT,checkOnly);
 await syncPatrolSourceCatalog(ROOT,checkOnly);
 syncPatrolItemCatalog(ROOT,checkOnly);
 syncPatrolProgressPolicy(ROOT,checkOnly);
+await syncCharacterExpThresholds(ROOT,checkOnly);
 syncPlainPlayerNormalAttackRules(ROOT,checkOnly);
 syncForestOpeningRoundRules(ROOT,checkOnly);
 syncHeroChapterQualification(ROOT,checkOnly);
