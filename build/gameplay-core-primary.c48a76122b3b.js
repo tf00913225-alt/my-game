@@ -11818,7 +11818,7 @@
 
     const STATUS_BODY_PRESENTATION=Object.freeze({
         burn:{anchor:"feet",width:1.12,height:.66,min:.42,max:.64},
-        rage:{anchor:"body",width:1.08,height:.94,min:.38,max:.56},
+        rage:{anchor:"body",width:1.08,height:.94,min:.60,max:.80},
         stun:{anchor:"head",width:.9,height:.22,min:.70,max:.86},
         freeze:{anchor:"feet",width:1.18,height:1.06,min:.68,max:.68},
         petrify:{anchor:"feet",width:1.16,height:1.04,min:.72,max:.72},
