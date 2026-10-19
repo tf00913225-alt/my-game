@@ -78,7 +78,7 @@ test("floors one through four require their chest reward before portal travel",(
 test("supplied chest and ordinary portal art stays compact while labels meet the readable floor",()=>{
     assert.match(css,/\.v141-abyss-portal,\s*#game-stage[^\n]*\.v141-abyss-chest\{[^}]*width:104px !important;[^}]*height:66px !important;/);
     assert.match(css,/\.v141-abyss-portal i,\s*#game-stage[^\n]*\.v141-abyss-chest i\{[^}]*height:44px !important;/);
-    assert.match(css,/\.v141-abyss-portal span,\s*#game-stage[^\n]*\.v141-abyss-chest span\{[^}]*font-size:13px !important;[^}]*line-height:17px !important;/);
+    assert.match(css,/\.v141-abyss-portal span,\s*#game-stage[^\n]*\.v141-abyss-chest span\{[^}]*font-size:16px !important;[^}]*line-height:17px !important;/);
     assert.match(css,/\.v174-abyss-portal\.boss-gate/);
 });
 

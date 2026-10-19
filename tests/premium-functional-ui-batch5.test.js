@@ -37,6 +37,6 @@ assert.match(quest,/quest-claim-btn\{[\s\S]*?min-height:44px !important/);
 assert.match(qa,/v17351-achievement-claim-all\{[^{}]*min-height:44px!important/);
 assert.match(qa,/v17351-achievement-card>button\{[^{}]*min-height:44px!important/);
 assert.match(qa,/v17351-achievement-pager button\{[^{}]*min-height:44px!important/);
-assert.match(qa,/quest-mode \.quest-tab\{[^{}]*min-height:44px!important/);
-assert.match(qa,/quest-mode \.quest-claim-btn\{[^{}]*min-height:44px!important/);
+assert.match(quest,/quest-mode \.quest-tab\{[^{}]*min-height:44px\s*!important/);
+assert.match(quest,/quest-mode \.quest-claim-btn\{[^{}]*min-height:44px\s*!important/);
 console.log("✓ premium functional UI batch 5 preserves achievement, announcement, quest and modal runtimes");
