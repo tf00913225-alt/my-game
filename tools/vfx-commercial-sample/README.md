@@ -26,3 +26,13 @@ Pending: user visual selection, final asset continuity/anchor review,
 integration through V143's existing manifest/geometry owner, latest-head
 required CI and real battle symptom verification. No runtime replacement
 or claim of commercial release readiness is part of this preview.
+
+## Nine Dragon Fire revision 2
+
+User feedback: the first candidate removed too much and the relic was no
+longer recognizable. The active relic comparison now restores the original
+sheet and its complete dragon silhouettes, with only a 520→500 reference
+size change (approximately −4%). Duration remains 2550ms. This revision
+restores identity; it does not claim an artwork quality upgrade. The first
+generated relic candidate is retained as review history but is not selected.
+Flame Slash and Ice Arrow Rain are unchanged.
