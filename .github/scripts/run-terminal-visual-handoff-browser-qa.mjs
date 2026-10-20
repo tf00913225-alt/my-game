@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
-import {ROOT,findChrome,startServer,waitJson,Cdp,collectStartupFailure} from './runtime-browser-qa-support.mjs';
+import {ROOT,findChrome,startServer,waitJson,Cdp,collectStartupFailure,observeChromeStartup} from './runtime-browser-qa-support.mjs';
 const baseUrl=process.env.QA_BASE_URL||'';
 const expected=process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local';
 const endFixture=fs.readFileSync('.github/scripts/battle-layer-audio-live-qa.mjs','utf8').match(/^function finishBattleLayerQaEndFixture\([\s\S]*?^\}/m)?.[0];
@@ -92,6 +92,7 @@ const server=await startServer({baseUrl}),profile=fs.mkdtempSync(path.join(os.tm
 const port=9900+Math.floor(Math.random()*90);
 const chrome=findChrome();
 const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-gpu','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:['ignore','ignore','pipe'],windowsHide:true});
+const startup=observeChromeStartup(proc,{port,output:path.join(ROOT,'artifacts/browser-qa/terminal-visual-chrome-startup.json')});
 let chromeStderr='',chromeExit=null,chromeSpawnError=null;
 proc.stderr.on('data',chunk=>{chromeStderr=(chromeStderr+chunk).slice(-4000);});
 proc.on('exit',(code,signal)=>{chromeExit={code,signal};});
@@ -99,6 +100,7 @@ proc.on('error',error=>{chromeSpawnError=String(error.message);});
 const out=path.join(ROOT,'artifacts/browser-qa');fs.mkdirSync(out,{recursive:true});let cdp;
 try{
     const page=(await waitJson('http://127.0.0.1:'+port+'/json/list')).find(p=>p.type==='page');
+    await startup.finish('DevTools ready');
     cdp=new Cdp(page.webSocketDebuggerUrl);await cdp.send('Page.enable');await cdp.send('Runtime.enable');
     await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
     await cdp.send('Page.navigate',{url:server.url});
@@ -113,6 +115,7 @@ try{
     fs.writeFileSync(path.join(out,'terminal-visual-handoff.json'),JSON.stringify({passed:true,expected,baseUrl,rows},null,2));
     console.log('Terminal visual handoff: single/tri/all, queued declaration and two-wave terminal phases PASS');
 }catch(error){
+    await startup.finish('startup or QA failure');
     const detail=cdp?await collectStartupFailure(cdp,{error:String(error.stack||error)}):{};
     detail.chromeProcess={executable:chrome,pid:proc.pid??null,port,
         exit:chromeExit,spawnError:chromeSpawnError,stderr:chromeStderr};
