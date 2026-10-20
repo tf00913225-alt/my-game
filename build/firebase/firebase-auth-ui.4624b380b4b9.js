@@ -173,7 +173,7 @@ function render(){
         byId("firebaseAccountName").textContent=state.user.displayName||state.user.email||(state.user.isAnonymous?"訪客帳號":"遊戲帳號");
         byId("firebaseAccountMeta").textContent=state.user.isAnonymous?"訪客帳號":"已驗證帳號";
         byId("firebaseAccountUid").textContent="UID："+state.user.uid;
-        byId("firebaseCloudState").textContent=state.mode==="SAVE_LOADING"?"正在讀取 UID 對應的雲端與本機資料…":"角色資料以此 UID 為 owner。";
+        byId("firebaseCloudState").textContent=state.mode==="SAVE_LOADING"?"正在讀取 UID 對應的雲端與本機資料…":"角色資料歸屬此 UID 帳號。";
     }
     const reauth=byId("firebaseGoogleReauthButton");
     if(reauth){ reauth.hidden=!state.sessionError||!state.user?.providerIds?.includes("google.com"); }

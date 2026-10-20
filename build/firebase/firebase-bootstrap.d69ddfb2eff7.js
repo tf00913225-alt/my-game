@@ -11,7 +11,7 @@ import {
     observeCanonicalAccountMode,beginCanonicalElementBoxAd,completeCanonicalElementBoxAd,abandonCanonicalElementBoxAd,
     issueCanonicalPatrolTicket,settleCanonicalPatrolMember,settleCanonicalPatrolTerminal,abandonCanonicalPatrolTicket
 } from "./firebase-cloud-save.dbb8d71d026f.js";
-import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.e5124ef5fef1.js";
+import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.4624b380b4b9.js";
 import {synchronizeGameSession,revokeGameSession,protectedTest,getGameSessionState} from "./firebase-session.877a7842d6bd.js";
 
 const AUTH_EVENT="four-symbols:firebase-auth-state";

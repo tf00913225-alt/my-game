@@ -370,7 +370,10 @@
         lastError=error; saveResolved=false;
         if(state!==STATES.ERROR){ transition(STATES.ERROR,{error}); }
         showLoader(); status("啟動失敗",message);
-        if(firebase){ accountUi("ERROR",message+" "+String(error&&error.message||""),true); }
+        if(firebase){
+            accountUi("ERROR",message+" "+String(error&&error.message||""),true);
+            void hideLoader();
+        }
         emit("four-symbols:startup-error",{error,message});
     }
     function reloadForAccountTransition(reason){
