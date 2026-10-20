@@ -3595,7 +3595,8 @@
 /* bundled source: css/40-v143-combat-dungeon-polish.css */
 /* =====================================================
    V143 — combat readability, raster-only battle VFX and dungeon polish
-   V174 cleanup: formal PNG Sprite Sheets/status loops are the only VFX.
+   V174 cleanup: cast VFX uses formal raster sheets; persistent status paint
+   includes the three explicitly named CSS foot-aura samples below.
 ===================================================== */
 
 /* 1. Enemy identity and resource numbers use the existing card width. */
@@ -3799,6 +3800,7 @@
    Hard-control body covers are fixed below the rotating body-status plane.
    HUD status icons remain above both body planes with the resource HUD. */
 #game-stage #battlePage{
+    --v143-status-layer-outer-shell:0;
     --v143-status-layer-hard-control-base:4;
     --v143-status-layer-rotating:5;
     --v143-status-layer-hud:34;
@@ -3834,6 +3836,11 @@
 }
 #game-stage #battlePage .v143-status-visual--layer-rotating{
     z-index:var(--v143-status-layer-rotating);
+}
+/* The existing square shell surrounds the portrait from behind. Its authored
+   front ribbons must not paint across the character; portrait art owns plane 1. */
+#game-stage #battlePage .v143-status-visual[data-presentation-role="outer-shell"]{
+    z-index:var(--v143-status-layer-outer-shell);
 }
 
 :is(#game-stage #battlePage,.v174-battle-hud-layer) .v143-status-icon{
@@ -3914,6 +3921,41 @@
 @keyframes v143StatusImageBreath{
     0%,100%{opacity:var(--v143-status-opacity-min,.42)}
     50%{opacity:var(--v143-status-opacity-max,.64)}
+}
+
+/* Named persistent buff sample, owned by the same rotating status node.
+   Cast sheets and static HUD icons retain their existing raster paths. */
+#game-stage #battlePage .v143-status-visual[data-presentation-role="foot-aura"]{
+    filter:none;
+    overflow:visible;
+    color:var(--v143-aura-color);
+}
+#game-stage #battlePage .v143-status-visual[data-aura-color="red"]{--v143-aura-color:rgba(255,92,65,.85);}
+#game-stage #battlePage .v143-status-visual[data-aura-color="green"]{--v143-aura-color:rgba(105,236,159,.85);}
+#game-stage #battlePage .v143-status-visual[data-aura-color="blue"]{--v143-aura-color:rgba(102,185,255,.85);}
+#game-stage #battlePage .v143-status-visual[data-presentation-role="foot-aura"]::before{
+    content:"";position:absolute;inset:0;border:1px solid currentColor;border-radius:50%;
+    background:radial-gradient(ellipse,transparent 38%,currentColor 72%,transparent 76%);
+    box-shadow:0 0 4px currentColor;opacity:.65;pointer-events:none;
+}
+#game-stage #battlePage .v143-status-aura-rise{position:absolute;left:0;bottom:45%;width:100%;height:300%;pointer-events:none;}
+#game-stage #battlePage .v143-status-aura-rise::before,
+#game-stage #battlePage .v143-status-aura-rise::after{
+    content:"";position:absolute;bottom:0;left:10%;width:3px;height:60%;
+    background:radial-gradient(circle at 50% 2px,currentColor 1px,transparent 1.7px),linear-gradient(transparent,currentColor);
+    background-size:3px 100%,1px 100%;background-position:center;background-repeat:no-repeat;
+    opacity:0;pointer-events:none;
+    animation:v143StatusAuraRise 2s ease-out infinite;
+}
+#game-stage #battlePage .v143-status-aura-rise::after{left:90%;height:45%;animation-delay:-.7s;}
+@keyframes v143StatusAuraRise{
+    0%,52%,100%{opacity:0;transform:translateY(0)}
+    12%{opacity:.85;transform:translateY(-15%)}
+    45%{opacity:0;transform:translateY(-100%)}
+}
+@media(prefers-reduced-motion:reduce){
+    #game-stage #battlePage .v143-status-aura-rise::before,
+    #game-stage #battlePage .v143-status-aura-rise::after{animation:none !important;opacity:0;}
 }
 
 @keyframes v143StatusIconBreath{
