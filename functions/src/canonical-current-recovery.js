@@ -1647,8 +1647,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         return {root,save:db.doc("users/"+uid+"/saves/current"),tx,rows,finish,
             close:async()=>{await Promise.allSettled([...pending]);capture.release();recoveryAuditAssemblyUsage(budget);}};
     }
-    async function verifySegmentedRawRecoveryProof(input){
-        const budget=createRecoveryAuditAssemblyBudget();let view;
+    async function verifySegmentedRawRecoveryProof(input,budget=createRecoveryAuditAssemblyBudget()){
+        let view;
         try{
             chargeRecoveryAuditAssembly(budget,"passes",1);
             const capture=inspectCompleteRawCapture(input,budget,true),{ownerUid:uid,sourceRevision:revision,auditId}=input.binding;
@@ -1732,6 +1732,9 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     }
     async function pinCandidatePublication(request,args){
         requirePublicationPreparation();
+        return pinRawCapture(request,args);
+    }
+    async function pinRawCapture(request,args){
         auditIntent("pin publication",args,["auditId","expectedEpoch","operationId"]);
         // A failed/retried callback never mints an identity. Only its committed
         // result is retained in the private map after run resolves.
@@ -1743,6 +1746,9 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     }
     async function loadPinnedRawCapture(pin){
         requirePublicationPreparation();
+        return loadPinnedRawMaterial(pin);
+    }
+    async function loadPinnedRawMaterial(pin){
         const pinned=publicationValue(publicationPins,pin),budget=createRecoveryAuditAssemblyBudget();
         const input={binding:{ownerUid:pinned.tuple.ownerUid,auditId:pinned.tuple.auditId,epoch:pinned.tuple.epoch,
             sourceRevision:pinned.tuple.sourceRevision,inventoryStateSha256:pinned.tuple.inventoryStateSha256},
@@ -1790,6 +1796,22 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         }
         recoveryAuditAssemblyUsage(budget);
         return publicationIdentity(publicationMaterials,{pin,input,budget,scanReads,wireBytes});
+    }
+    // Private process-local proof only. No artifact, durable point or authority is issued.
+    async function verifyPinnedSegmentedProof(request,pin,material){
+        const pinned=publicationValue(publicationPins,pin),value=publicationValue(publicationMaterials,material);
+        if(value.pin!==pin)fail("permission-denied","Candidate material belongs to another pin.");
+        publicationMaterials.delete(material);
+        recoveryAuditAssemblyUsage(value.budget);
+        const summary=await verifySegmentedRawRecoveryProof(value.input,value.budget);
+        recoveryAuditAssemblyUsage(value.budget);
+        await runRecoveryAuditMaintenance(request,pinned.args.auditId,async(tx,session)=>{
+            recoveryAuditAssemblyUsage(value.budget);
+            const current=await publicationContext(tx,session,pinned.args);
+            recoveryAuditAssemblyUsage(value.budget);
+            if(snapshotDigest(current.tuple)!==snapshotDigest(pinned.tuple))fail("aborted","Pinned proof capture binding changed.");
+        },pinned.args.operationId);
+        return Object.freeze({...summary,assemblyUsage:recoveryAuditAssemblyUsage(value.budget)});
     }
     async function assemblePinnedCandidate(pin,material){
         requirePublicationPreparation();
