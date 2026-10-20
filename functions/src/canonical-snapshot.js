@@ -332,6 +332,12 @@ function inspectPlayableState(records){
         "selectedCreationElement","lastSaveTimestamp"];
     const stored=records.progress?.playableState;
     let extra=records.playableState;
+    const preferenceSource=stored===undefined?extra:stored;
+    const versioned=object(preferenceSource)&&Object.hasOwn(preferenceSource,"preferencesVersion");
+    if(versioned){
+        if(preferenceSource.preferencesVersion!==2){fail("unsupported canonical preferences version");}
+        fields.push("preferencesVersion");
+    }
     if(stored!==undefined){
         if(extra!==undefined||!object(stored)||Object.keys(stored).length!==fields.length||
            fields.some(key=>!Object.hasOwn(stored,key))){
@@ -364,7 +370,8 @@ function inspectPlayableState(records){
         }
     }
     const configKeys=["autoConfig","autoConfig2","autoConfig3"];
-    const preferences=require("./cloud-preferences").normalizePreferences({
+    const preferenceOwner=require("./cloud-preferences");
+    const preferences=(versioned?preferenceOwner.normalizeCanonicalPreferencesV2:preferenceOwner.normalizePreferences)({
         characterIds:records.account.slots.map((id,index)=>id===null?null:`slot-${index}`),
         ...Object.fromEntries(configKeys.map(key=>[key,extra[key]]))});
     return {extra,hero,preferences};
