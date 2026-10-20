@@ -22,6 +22,7 @@
     ]);
     const PLAYER_DAMAGE_SKILL_ID_SET=new Set(PLAYER_DAMAGE_SKILL_IDS);
     const progression=window.FourSymbolsSkillProgressionCore.createRules(skillDatabase,PLAYER_DAMAGE_SKILL_IDS);
+    const loadoutRules=window.FourSymbolsSkillProgressionCore.getLoadoutRulesForVersion("v1",skillDatabase);
     const FIRE_MOMENTUM_BY_LEVEL=Object.freeze([12,15,18,21,25]);
     const BLOOD_BURN_HP_COST_BY_LEVEL=Object.freeze([20,25,30,35,40]);
     const BLOOD_BURN_BY_LEVEL=Object.freeze([20,25,30,35,50]);
@@ -643,14 +644,9 @@
     const initialLearnCost=progression.initialLearnCost;
     function normalizeCrossElementEquip(loadout,character){
         if(!loadout||!character||!Array.isArray(loadout.equippedSkills)){ return false; }
-        let seen=false,changed=false;
-        loadout.equippedSkills=loadout.equippedSkills.filter(skillId=>{
-            const skill=skillById(skillId);
-            if(!skill||!isCrossElementSkill(character,skill)){ return true; }
-            if(!seen){ seen=true; return true; }
-            changed=true; return false;
-        }).slice(0,4);
-        return changed;
+        const result=loadoutRules.normalizeCrossElementEquip(loadout.equippedSkills,character);
+        loadout.equippedSkills=result.equippedSkills;
+        return result.changed;
     }
     function normalizeAllCrossElementEquips(){
         if(typeof characterSkillLoadouts==="undefined"||!characterSkillLoadouts){ return false; }
@@ -741,16 +737,12 @@
 
     if(typeof equipSkill==="function"){
         equipSkill=function(skillId){
-            const skill=skillById(skillId),context=getSkillContext();
-            if(!skill||!context.character||!context.loadout||learnedLevel(context,skillId)<=0){ return false; }
-            normalizeCrossElementEquip(context.loadout,context.character);
-            const equipped=context.loadout.equippedSkills=context.loadout.equippedSkills||[];
-            if(equipped.includes(skillId)){ return true; }
-            if(isCrossElementSkill(context.character,skill)&&equipped.some(id=>{
-                const equippedSkill=skillById(id); return equippedSkill&&isCrossElementSkill(context.character,equippedSkill);
-            })){ return notify("每名角色最多攜帶 1 招跨元素技能。"); }
-            if(equipped.length>=4){ return notify("每個角色最多只能攜帶4個技能。"); }
-            equipped.push(skillId);
+            const context=getSkillContext(),result=loadoutRules.equipSkill(context.character,context.loadout,skillId);
+            if(result.status==="invalid"){ return false; }
+            context.loadout.equippedSkills=result.equippedSkills;
+            if(result.status==="already-equipped"){ return true; }
+            if(result.status==="cross-limit"){ return notify("每名角色最多攜帶 1 招跨元素技能。"); }
+            if(result.status==="full"){ return notify("每個角色最多只能攜帶4個技能。"); }
             if(typeof populateAutoSkillOptions==="function"){ populateAutoSkillOptions(); }
             if(typeof populateAutoSkillOptions2==="function"){ populateAutoSkillOptions2(); }
             finalizeSkillMutation();

@@ -8,7 +8,7 @@ import {syncPatrolSourceCatalog} from "./lib/cloud-patrol-source-catalog.mjs";
 import {syncPatrolProgressPolicy} from "./lib/cloud-patrol-progress-policy.mjs";
 import {syncCharacterExpThresholds} from "./lib/character-exp-thresholds.mjs";
 import {syncPlayerSkillConfigCatalog} from "./lib/player-skill-config-catalog.mjs";
-import {verifySkillLearningPolicy} from "./lib/skill-learning-policy.mjs";
+import {verifySkillLearningPolicy,verifySkillLoadoutPolicy} from "./lib/skill-learning-policy.mjs";
 import {syncPlainPlayerNormalAttackRules} from "./lib/cloud-battle-normal-attack-rules.mjs";
 import {syncForestOpeningRoundRules} from "./lib/cloud-battle-opening-round-rules.mjs";
 import {syncHeroChapterQualification} from "./lib/hero-chapter-qualification.mjs";
@@ -28,6 +28,7 @@ syncPatrolProgressPolicy(ROOT,checkOnly);
 await syncCharacterExpThresholds(ROOT,checkOnly);
 await syncPlayerSkillConfigCatalog(ROOT,checkOnly);
 verifySkillLearningPolicy(ROOT);
+verifySkillLoadoutPolicy(ROOT);
 syncPlainPlayerNormalAttackRules(ROOT,checkOnly);
 syncForestOpeningRoundRules(ROOT,checkOnly);
 syncHeroChapterQualification(ROOT,checkOnly);
@@ -60,6 +61,7 @@ const appScripts=[
     "functions/src/account-mode-time-policy.js",
     "functions/src/exp-pool-catch-up-policy.js",
     "functions/src/inventory-stack-policy.js",
+    "functions/src/skill-progression-core.js",
     "js/00-main.js",
     "functions/src/team-formation-policy.js",
     "js/hero-acquisition-client.js",
@@ -128,7 +130,6 @@ const gameplayScripts=[
     "js/58-v173.63-functional-fixes.js",
     "js/battlefield-render-geometry-adapter.js",
     "js/battle-floating-feedback-owner.js",
-    "functions/src/skill-progression-core.js",
     "js/60-v173.64-skill-progression-rebalance.js",
     "js/60-team-relic-system.js"
 ];
@@ -217,6 +218,9 @@ function combineStyles(files){
     return files.map(file=>`\n/* bundled source: ${file} */\n${read(file).trim()}\n`).join("\n");
 }
 function target(name,extension,content){
+    // Git stores generated text with LF. Hash the same bytes that every checkout
+    // publishes, even when a Windows source file was read with CRLF.
+    content=content.replace(/\r\n/g,"\n");
     const digest=hash(content); return {content,digest,path:`build/${name}.${digest}.${extension}`};
 }
 function writeTarget(output){

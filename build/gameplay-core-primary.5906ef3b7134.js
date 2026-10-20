@@ -5779,13 +5779,12 @@
 
     if(window.v136AutoBattleFixInstalled){ return; }
     window.v136AutoBattleFixInstalled=true;
+    const loadoutRules=window.FourSymbolsSkillProgressionCore.getLoadoutRulesForVersion("v1",skillDatabase);
 
     const lastNoticeByCharacter={};
 
     function normalizeAction(action){
-        return typeof action==="string" && action
-            ? action
-            : "normal";
+        return loadoutRules.normalizeAction(action);
     }
 
     function getSkillCost(skill){
@@ -5796,25 +5795,7 @@
     }
 
     function isUnsupportedAutoCategory(skill){
-        return !!(
-            skill &&
-            ["buff","passive","heal","revive"].includes(skill.category)
-        );
-    }
-
-    function isEquippedAndLearnedAutoSkill(characterIndex,skillId){
-        const skill=skillDatabase[skillId];
-        const skillKey=getPartyCharacterKey(characterIndex);
-        const loadout=characterSkillLoadouts[skillKey];
-
-        return !!(
-            skill &&
-            !isUnsupportedAutoCategory(skill) &&
-            loadout &&
-            Array.isArray(loadout.equippedSkills) &&
-            loadout.equippedSkills.includes(skillId) &&
-            getSkillLevel(skillKey,skillId)>0
-        );
+        return loadoutRules.isUnsupportedAutoCategory(skill);
     }
 
     function rememberExplicitAction(characterIndex,action){
@@ -5822,20 +5803,7 @@
         if(!character){ return; }
 
         const config=getPartyAutoConfig(characterIndex);
-        const selected=normalizeAction(action);
-
-        config.skill=selected;
-
-        if(selected==="normal"){
-            config.v136ActionIntent="normal";
-        }
-        else if(selected==="defend"){
-            config.v136ActionIntent="defend";
-        }
-        else{
-            config.v136ActionIntent="skill";
-            config.v136LastSkill=selected;
-        }
+        Object.assign(config,loadoutRules.rememberExplicitAction(config,action));
     }
 
     function migrateCurrentIntent(characterIndex){
@@ -5843,35 +5811,14 @@
         if(!character){ return; }
 
         const config=getPartyAutoConfig(characterIndex);
-        const selected=normalizeAction(config.skill);
-
-        if(config.v136ActionIntent){ return; }
-
-        if(selected==="normal"){
-            config.v136ActionIntent="normal";
-        }
-        else if(selected==="defend"){
-            config.v136ActionIntent="defend";
-        }
-        else{
-            config.v136ActionIntent="skill";
-            config.v136LastSkill=selected;
-        }
+        Object.assign(config,loadoutRules.migrateCurrentIntent(config));
     }
 
     function restoreSkillAfterLegacySync(characterIndex){
         const config=getPartyAutoConfig(characterIndex);
-
-        if(
-            config.v136ActionIntent==="skill" &&
-            config.skill==="normal" &&
-            isEquippedAndLearnedAutoSkill(characterIndex,config.v136LastSkill)
-        ){
-            config.skill=config.v136LastSkill;
-            return true;
-        }
-
-        return false;
+        const key=getPartyCharacterKey(characterIndex),result=loadoutRules.restoreSkillAfterLegacySync(config,characterSkillLoadouts[key]);
+        Object.assign(config,result.config);
+        return result.restored;
     }
 
     function saveCurrentActionFromPanel(){

@@ -130,6 +130,14 @@ export async function completeHeroChapterNode({ticketId,nodeId,choiceId=null,exp
 }
 
 /* Explicit account intents retain the caller's operation ID for receipt retry. */
+export async function mutateCanonicalSkillLoadout({operationId,expectedRevision,characterId,action,skillId}={}){
+    return callTrustedFunction("mutateCanonicalSkillLoadout",{operationId,expectedRevision,characterId,action,skillId});
+}
+// Configuration only. The caller decides what to display; this never hydrates
+// a save, caches a result or promotes a partial response to playable authority.
+export async function readCanonicalSkillLoadout({expectedRevision}={}){
+    return callTrustedFunction("readCanonicalSkillLoadout",{expectedRevision});
+}
 export async function createAdditionalCanonicalCharacter({operationId,expectedRevision,slotIndex,selection}={}){
     return callTrustedFunction("createAdditionalCanonicalCharacter",{operationId,expectedRevision,slotIndex,selection});
 }
