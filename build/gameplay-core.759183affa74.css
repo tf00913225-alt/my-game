@@ -7345,12 +7345,16 @@ body > .v169-rpg-dialog-layer{
 /* Preserve the previous preferred heights, bounded by the paint box below
    the new top HUD so alpha bounds cannot enter the name/HP strip. */
 #game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"] .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{
-    --battle-portrait-visible-height:min(101.55px, 92cqh);
+    --battle-portrait-safe-height:96cqh;
+    --battle-portrait-visible-height:min(101.55px, calc(var(--battle-portrait-safe-height) / var(--battle-art-depth, 1)));
     --battle-portrait-baseline:100%;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"] .battle-monster[data-portrait-size-class="ELITE"] > .v174-normalized-portrait{
-    --battle-portrait-visible-height:min(105.27px, 96cqh);
+    --battle-portrait-visible-height:min(105.27px, calc(var(--battle-portrait-safe-height) / var(--battle-art-depth, 1)));
 }
+/* Keep a real upper HUD gap and retain a smaller far-row silhouette even
+   when the available paint height, rather than preferred pixels, is limiting. */
+#game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"] .v-fixed-enemy-row[data-slot-row="back"] .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{--battle-portrait-safe-height:90cqh;}
 
 #game-stage #battlePage.v-fixed-slot-render-v2 > .battle-wrap{
     position:relative !important;
@@ -7660,8 +7664,8 @@ body > .v169-rpg-dialog-layer{
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-battle-slot > .battle-monster > .v174-battle-art,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot > .battle-player > .v174-battle-art{
     position:absolute !important;
-    left:calc(-1 * var(--battle-art-overhang-x)) !important;
-    right:calc(-1 * var(--battle-art-overhang-x)) !important;
+    left:calc(50% - (50% + var(--battle-art-overhang-x)) / var(--battle-art-depth, 1)) !important;
+    right:calc(50% - (50% + var(--battle-art-overhang-x)) / var(--battle-art-depth, 1)) !important;
     top:calc(-1 * var(--battle-art-overhang-top)) !important;
     bottom:var(--battle-art-hud-reserve) !important;
     width:auto !important;
@@ -7685,10 +7689,17 @@ body > .v169-rpg-dialog-layer{
     --battle-art-hud-reserve:44px;
     --battle-art-overhang-top:7px;
 }
-/* Depth is paint-only: the near rows retain full size. Slot/target/VFX
-   geometry remains owned by the existing adapter. */
+/* Depth is paint-only; the camera is behind the party. Width compensation
+   preserves the existing painted horizontal envelope for wide silhouettes.
+   Normalized enemy height is bounded below the top HUD before scaling. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-battle-art{scale:var(--battle-art-depth, 1);}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player > .v174-battle-art,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{--battle-art-depth:1.10;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-row[data-slot-row="back"] .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait,
+#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot-row[data-slot-row="front"] .battle-player > .v174-battle-art{--battle-art-depth:1.02;}
+/* Boss and generic fallback artwork keep the previous depth policy. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-row[data-slot-row="back"] .v174-battle-art,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot-row[data-slot-row="front"] .v174-battle-art{scale:.94;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot-row[data-slot-row="front"] .v174-battle-art{scale:var(--battle-art-depth, .94);}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster > .v174-battle-art{
     --battle-art-overhang-top:-36px;
     --battle-art-hud-reserve:6px;

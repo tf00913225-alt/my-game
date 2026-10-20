@@ -216,8 +216,14 @@ console.log("Fixed Slot Battlefield Rendering V2 regression contract passed.");
 
 assert.match(css, /\[data-enemy-battlefield-profile="standard-six"\]\{[\s\S]*?--battle-enemy-region-track:40fr;[\s\S]*?--battle-center-region-track:21fr;[\s\S]*?--battle-ally-region-track:39fr;/,"only standard six-slot profile reallocates portrait height");
 
-assert.match(css,/--battle-portrait-visible-height:min\(101\.55px, 92cqh\);/,"normal art retains its preferred height within the paint box below the top HUD");
-assert.match(css,/--battle-portrait-visible-height:min\(105\.27px, 96cqh\);/,"elite art remains larger while respecting the top HUD");
+assert.match(css,/--battle-portrait-visible-height:min\(101\.55px, calc\(var\(--battle-portrait-safe-height\) \/ var\(--battle-art-depth, 1\)\)\);/,"normal art compensates depth before the below-HUD height limit");
+assert.match(css,/--battle-portrait-visible-height:min\(105\.27px, calc\(var\(--battle-portrait-safe-height\) \/ var\(--battle-art-depth, 1\)\)\);/,"elite art retains its preferred height while compensating depth at the top HUD");
+assert.match(css,/--battle-portrait-safe-height:96cqh;/,"near-row enemy paint leaves upper HUD headroom");
+assert.match(css,/\[data-enemy-battlefield-profile="standard-six"\] \.v-fixed-enemy-row\[data-slot-row="back"\][^{}]*\{--battle-portrait-safe-height:90cqh;\}/,"height-limited far enemies stay smaller instead of both rows saturating the same height");
+assert.match(css,/left:calc\(50% - \(50% \+ var\(--battle-art-overhang-x\)\) \/ var\(--battle-art-depth, 1\)\)/,"depth must not expand the horizontal silhouette envelope into adjacent slots");
+assert.match(css,/right:calc\(50% - \(50% \+ var\(--battle-art-overhang-x\)\) \/ var\(--battle-art-depth, 1\)\)/,"width compensation stays symmetric around the canonical slot");
+assert.match(css,/\.battle-player > \.v174-battle-art,\s*[^{}]*\.battle-monster:is\(\[data-portrait-size-class="STANDARD"\],\[data-portrait-size-class="ELITE"\]\) > \.v174-normalized-portrait\{--battle-art-depth:1\.10;\}/,"only players and normalized ordinary/elite monsters receive the near-row enlargement");
+assert.match(css,/\.v-fixed-enemy-row\[data-slot-row="back"\][^{}]*,\s*[^{}]*\.v-fixed-ally-slot-row\[data-slot-row="front"\][^{}]*\{--battle-art-depth:1\.02;\}/,"far rows preserve the camera perspective rather than reversing the party");
 
 assert.match(fs.readFileSync("index.html","utf8"), /id="battleActionRegion"[\s\S]*?id="battleElementBoxButton"[\s\S]*?id="turnTargetRow"/,"element box shares the formal operation reserve");
 
