@@ -3709,7 +3709,7 @@
         "sourceSha256": "9c199bacf75418b579b663a6e0fb19ea84b8e68df8f43e76499d718ea3cae5cf",
         "assetClass": "shared-npc",
         "sizeClass": "standard",
-        "status": "reserved",
+        "status": "adopted",
         "reusePolicy": "reusable",
         "exclusive": false,
         "allowedContexts": [
@@ -3728,7 +3728,8 @@
           "transparentPixels": true,
           "decodeVerified": true
         },
-        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+        "notes": "外觀描述僅供素材辨識；正式採用保留原始母圖。 Chapter 1 selected adoption; original Master dimensions/alpha preserved by lossless WebP; reused via explicit Content portraitKey.",
+        "runtimePath": "assets/monsters/shared/npc-shared-021.webp"
       },
       {
         "assetId": "NPC_SHARED_022",
@@ -3949,7 +3950,7 @@
         "sourceSha256": "0cc801cc393da168189aebd3e863b874ddc74a7ba308949555c6e477db945bd3",
         "assetClass": "shared-npc",
         "sizeClass": "standard",
-        "status": "reserved",
+        "status": "adopted",
         "reusePolicy": "reusable",
         "exclusive": false,
         "allowedContexts": [
@@ -3968,7 +3969,8 @@
           "transparentPixels": true,
           "decodeVerified": true
         },
-        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+        "notes": "外觀描述僅供素材辨識；正式採用保留原始母圖。 Chapter 1 selected adoption; original Master dimensions/alpha preserved by lossless WebP; reused via explicit Content portraitKey.",
+        "runtimePath": "assets/monsters/shared/npc-shared-029.webp"
       },
       {
         "assetId": "NPC_SHARED_030",
@@ -4099,7 +4101,7 @@
         "sourceSha256": "87e8adab1569448970f5ec216a5ef13d13394fd4bacad1447d7b00dc779ca78e",
         "assetClass": "shared-npc",
         "sizeClass": "standard",
-        "status": "reserved",
+        "status": "adopted",
         "reusePolicy": "reusable",
         "exclusive": false,
         "allowedContexts": [
@@ -4118,7 +4120,8 @@
           "transparentPixels": true,
           "decodeVerified": true
         },
-        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+        "notes": "外觀描述僅供素材辨識；正式採用保留原始母圖。 Chapter 1 selected adoption; original Master dimensions/alpha preserved by lossless WebP; reused via explicit Content portraitKey.",
+        "runtimePath": "assets/monsters/shared/npc-shared-034.webp"
       },
       {
         "assetId": "NPC_SHARED_035",
@@ -4279,7 +4282,7 @@
         "sourceSha256": "bb57ca7d3ebfbed629dc367e7194b4542d4a9997b493b44ee2db72107a06724d",
         "assetClass": "shared-npc",
         "sizeClass": "standard",
-        "status": "reserved",
+        "status": "adopted",
         "reusePolicy": "reusable",
         "exclusive": false,
         "allowedContexts": [
@@ -4298,7 +4301,8 @@
           "transparentPixels": true,
           "decodeVerified": true
         },
-        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+        "notes": "外觀描述僅供素材辨識；正式採用保留原始母圖。 Chapter 1 selected adoption; original Master dimensions/alpha preserved by lossless WebP; reused via explicit Content portraitKey.",
+        "runtimePath": "assets/monsters/shared/npc-shared-040.webp"
       },
       {
         "assetId": "NPC_SHARED_041",
@@ -4399,7 +4403,7 @@
         "sourceSha256": "ef0fae0f2bfb59b918538ad446da77a3fe0abbaef79abb79a9370968f8c7d4e7",
         "assetClass": "shared-npc",
         "sizeClass": "standard",
-        "status": "reserved",
+        "status": "adopted",
         "reusePolicy": "reusable",
         "exclusive": false,
         "allowedContexts": [
@@ -4418,7 +4422,8 @@
           "transparentPixels": true,
           "decodeVerified": true
         },
-        "notes": "外觀描述僅供素材辨識；未指派 Content、未產生 Runtime derivative。"
+        "notes": "外觀描述僅供素材辨識；正式採用保留原始母圖。 Chapter 1 selected adoption; original Master dimensions/alpha preserved by lossless WebP; reused via explicit Content portraitKey.",
+        "runtimePath": "assets/monsters/shared/npc-shared-044.webp"
       },
       {
         "assetId": "NPC_SHARED_045",
@@ -6900,6 +6905,61 @@
           1536
         ],
         "sha256": "4b028b3ba7a1f8e16762577432f56fed91082952c707751f6c716836d7b869fe"
+      },
+      "assets/monsters/shared/npc-shared-021.webp": {
+        "width": 1086,
+        "height": 1448,
+        "alphaBounds": [
+          0,
+          0,
+          1082,
+          1448
+        ],
+        "sha256": "459466d43834bfa583600552e98597a5337dd63ef62a4c94053acd33a89d34da"
+      },
+      "assets/monsters/shared/npc-shared-029.webp": {
+        "width": 1086,
+        "height": 1448,
+        "alphaBounds": [
+          0,
+          0,
+          1086,
+          1448
+        ],
+        "sha256": "366d07ed98d041d7f94c5faca29433dba5ab0cb3873dbc2b54e079daf52f4488"
+      },
+      "assets/monsters/shared/npc-shared-034.webp": {
+        "width": 1086,
+        "height": 1448,
+        "alphaBounds": [
+          15,
+          0,
+          1086,
+          1448
+        ],
+        "sha256": "ce3f37fbf25ce84c0074a8f519d0364b10de916edf8bae94a561c06097ebc144"
+      },
+      "assets/monsters/shared/npc-shared-040.webp": {
+        "width": 1086,
+        "height": 1448,
+        "alphaBounds": [
+          0,
+          0,
+          1086,
+          1448
+        ],
+        "sha256": "9df2ae502a394258a3097705f95b3efce5fd18470337fca2391a4f65d480ad76"
+      },
+      "assets/monsters/shared/npc-shared-044.webp": {
+        "width": 1086,
+        "height": 1448,
+        "alphaBounds": [
+          0,
+          0,
+          1070,
+          1448
+        ],
+        "sha256": "892b70f5aff20f9e1dc33c653bcc15eaa0388e124ca8f3597c1ef6fd320c5af3"
       },
       "assets/dungeons/abyss/soldier.webp": {
         "width": 1152,

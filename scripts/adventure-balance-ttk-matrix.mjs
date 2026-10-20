@@ -19,9 +19,10 @@ export function buildAdventureTtkMatrix({randomPolicy='neutral'}={}){
   vm.runInContext(fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','utf8'),c);
   vm.runInContext('updateUI=()=>{};saveGame=()=>{};finishPlayerAction=()=>{};',c);
   const rows=[];
-  for(const [encounterIndex,encounter] of Object.values(c.FourSymbolsAdventureContent.encounters).entries())for(const offset of [0,5,10])for(const partySize of [1,2]){
-    const node=c.FourSymbolsAdventureContent.chapters.chapter_v1.nodes.find(n=>n.encounterId===encounter.id);
-    c.__adventureInput={encounterId:encounter.id,partyLevel:node.suggestedLevel+offset,partySize,encounterIndex,randomPolicy};
+  const formalNodes=c.FourSymbolsAdventureContent.chapters.chapter_v1.nodes.filter(node=>node.encounterId);
+  for(const [encounterIndex,node] of formalNodes.entries())for(const offset of [0,5,10])for(const partySize of [1,2]){
+    const encounter=c.FourSymbolsAdventureContent.encounters[node.encounterId];
+    c.__adventureInput={encounterId:encounter.id,partyLevel:(node.suggestedLevel||Math.max(...encounter.enemies.map(m=>m.level)))+offset,partySize,encounterIndex,randomPolicy};
     rows.push(JSON.parse(vm.runInContext(`JSON.stringify((()=>{
       const {encounterId,partyLevel,partySize,encounterIndex,randomPolicy}=__adventureInput;
       const randomSeed=10000+encounterIndex*1000+partyLevel*10+partySize;let randomState=randomSeed;
@@ -53,7 +54,7 @@ export function buildAdventureTtkMatrix({randomPolicy='neutral'}={}){
     })())`,c)));
   }
   const failures=rows.filter(r=>!r.clear||!r.survivors),instantWipes=rows.filter(r=>r.firstRoundParty.every(hp=>hp<=0));
-  return {workId:'MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004',randomPolicy,cases:rows.length,method:'All three formal encounters; suggested/+5/+10 level, legal solo/two-member unequipped reference, final stat/skill/initiative/AI/damage/status/round-end owners. No asynchronous animation claims.',gate:{passed:failures.length===0&&instantWipes.length===0,failures,instantWipes},rows};
+  return {workId:'MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004',randomPolicy,cases:rows.length,method:'All seven formal encounters; declared encounter level/+5/+10, legal solo/two-member unequipped reference, final stat/skill/initiative/AI/damage/status/round-end owners. No asynchronous animation claims.',gate:{passed:failures.length===0&&instantWipes.length===0,failures,instantWipes},rows};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
   const report=buildAdventureTtkMatrix({randomPolicy:process.argv.includes('--seeded')?'seeded':'neutral'});
