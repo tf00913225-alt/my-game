@@ -8372,7 +8372,7 @@ const selectedArt=itemArt(item);
 const selectedName=sourceName&&sourceName.textContent?sourceName.textContent:String(item.name||"背包装備");
 const selectedStats=sourceStats&&sourceStats.innerHTML?sourceStats.innerHTML:compareStats(item);
 box.id="v17351EquipmentCompare";box.className="v17351-equipment-compare";
-box.innerHTML='<header class="v17351-compare-header"><div><small>裝備對照</small><b>裝備比較</b><span>同部位對照・'+esc(SLOT_LABEL[targetSlot]||targetSlot)+'</span></div><button class="v17351-compare-back" type="button" onclick="closeItemModal()">返回</button></header>'+
+box.innerHTML='<header class="v17351-compare-header"><div><b>裝備對照</b><span>部位・'+esc(SLOT_LABEL[targetSlot]||targetSlot)+'</span></div><button class="v17351-compare-back" type="button" onclick="closeItemModal()">返回</button></header>'+
 '<div class="v17351-compare-grid" data-scroll-owner="y">'+
 '<article class="v17351-compare-pane selected"><em>背包装備</em><div class="v17351-compare-art">'+selectedArt+'</div><strong>'+window.FourSymbolsItemSlot.name(selectedName,item)+'</strong><div class="v17351-compare-stats selected-stats">'+selectedStats+'</div></article>'+
 '<article class="v17351-compare-pane current"><em>目前裝備</em>'+(worn?'<div class="v17351-compare-art">'+itemArt(worn)+'</div><strong>'+window.FourSymbolsItemSlot.name(worn.name||"目前裝備",worn)+'</strong><div class="v17351-compare-stats">'+compareStats(worn)+'</div>':'<div class="v17351-compare-art empty">—</div><strong>此部位尚未裝備</strong><div class="v17351-compare-stats">'+compareStats(null)+'</div>')+'</article></div>';
