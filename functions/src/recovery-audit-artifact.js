@@ -235,8 +235,8 @@ function decodeIndexedRawProofRow(bytes,qualification,assemblyBudget){
     const row=indexedRawRows.get(qualification);
     if(!row||row.budget!==assemblyBudget||row.version!==3||!Buffer.isBuffer(bytes)||bytes.length!==row.length)
         bad("raw row qualification differs");
-    if(createHash("sha256").update(bytes).digest("hex")!==row.sha256)bad("raw row bytes differ");
     assemblyDecodeBytes(assemblyBudget,bytes.length,false);
+    if(createHash("sha256").update(bytes).digest("hex")!==row.sha256)bad("raw row bytes differ");
     let parsed;try{parsed=JSON.parse(bytes.toString("utf8"));}catch(_){bad("raw row JSON");}
     assemblyParsedNodes(parsed,assemblyBudget);
     const result=value(parsed);

@@ -1181,6 +1181,7 @@ test('segmented strict proof streams sealed raw capsules through original comple
         for(const flag of ['candidateProofValid','authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
         assert(result.residentUsage.maxResidentCapsuleBytes<=2*1024*1024);assert(result.residentUsage.maxUnitReads<=60);
         assert(result.residentUsage.maxUnitTypedBytes<=2*1024*1024);assert.equal(result.assemblyUsage.reservedBytes,0);
+        assert.equal(result.residentUsage.units,options.battles===20?77:15,'canonical syntax reuse never skips original complete source proof units');
         assert.equal(f.h.writes,writes);assert.deepEqual([...f.h.data],before);assert.equal(JSON.stringify(material),input);
         t.diagnostic(JSON.stringify({battles:options.battles,...result.residentUsage,...result.assemblyUsage}));
     }
@@ -1294,7 +1295,9 @@ test('indexed raw row qualifications bind one canonical span and original sticky
     assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0],first.qualification,helper.createRecoveryAuditAssemblyBudget()),/qualification/);
     assert.throws(()=>helper.decodeIndexedRawProofRow(raw[1],first.qualification,budget),/bytes differ/);
     const changed=Buffer.from(raw[0]);changed[changed.length-2]^=1;
+    const beforeBad=helper.recoveryAuditAssemblyUsage(budget).bytes;
     assert.throws(()=>helper.decodeIndexedRawProofRow(changed,first.qualification,budget),/bytes differ/);
+    assert.equal(helper.recoveryAuditAssemblyUsage(budget).bytes-beforeBad,changed.length,'a failed hash still charges the real attempted row read');
     assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0].subarray(1),first.qualification,budget),/qualification/);
     assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0],first.qualification,{}),/unknown assembly budget/);
     helper.reserveRecoveryAuditRawInputs(budget,[]);
@@ -1307,4 +1310,21 @@ test('indexed raw row qualifications bind one canonical span and original sticky
     clock=30001;assert.throws(()=>timed.decodeIndexedRawProofRow(raw[0],timedIndex.spans[0].qualification,timedBudget),/deadline exceeded/);
     clock=0;assert.throws(()=>timed.decodeIndexedRawProofRow(raw[0],timedIndex.spans[0].qualification,timedBudget),/deadline exceeded/);
     assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0],timedIndex.spans[0].qualification,helper.createRecoveryAuditAssemblyBudget()),/qualification/);
+});
+
+
+test('indexed row byte exhaustion refuses before hashing or parsing the qualified bytes',()=>{
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);compiled.filename=filename;
+    compiled.paths=Module._nodeModulePaths(dirname(filename));const native=compiled.require.bind(compiled);let hashes=0,parses=0;
+    const crypto=native('node:crypto');compiled.require=name=>name==='node:crypto'?{...crypto,createHash:(...args)=>{hashes++;return crypto.createHash(...args);}}:
+        name==='test-only-indexed-row-json'?{stringify:JSON.stringify,parse:(...args)=>{parses++;return JSON.parse(...args);}}:native(name);
+    const source=readFileSync(filename,'utf8');compiled._compile(source.replace('"use strict";','"use strict";const JSON=require("test-only-indexed-row-json");'),filename);
+    const helper=compiled.exports,budget=helper.createRecoveryAuditAssemblyBudget(),bytes=helper.encodeProofPayload({schemaVersion:3,documents:[{path:'serverUsers/row-budget/operations/a',exists:true,data:{value:1}}]}),
+        indexed=helper.indexRawProofPayload(bytes,budget),span=indexed.spans[0],raw=bytes.subarray(span.start,span.start+span.length);
+    const usage=helper.recoveryAuditAssemblyUsage(budget);helper.chargeRecoveryAuditAssembly(budget,'bytes',256*1024*1024-usage.bytes);
+    hashes=0;parses=0;
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw,span.qualification,budget),/bytes budget exceeded/);
+    assert.equal(hashes,0);assert.equal(parses,0);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw,span.qualification,budget),/bytes budget exceeded/);
+    assert.equal(hashes,0);assert.equal(parses,0);
 });
