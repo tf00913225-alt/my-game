@@ -223,7 +223,7 @@
       "label": "角色",
       "entry": "openHomeFeature('character')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -304,6 +304,66 @@
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
         }
+      },
+      "segment24Evidence": {
+        "segment": 24,
+        "status": "部分已實際驗證",
+        "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+        "scope": "僅列明呈現/真入口返回；limits未驗狀態不得外推",
+        "deviceEvidence": {
+          "360x640": {
+            "status": "部分已實際驗證",
+            "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-character-entry.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-character-home-return.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-report.json",
+            "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-candidates/1cf6761c-home-1-top.png",
+            "beforeStatus": "僅主城原長名狀態before"
+          },
+          "393x873": {
+            "status": "部分已實際驗證",
+            "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-character-entry.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-character-home-return.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-report.json",
+            "before": null,
+            "beforeStatus": "未拍before，不冒充四尺寸前後"
+          },
+          "412x915": {
+            "status": "部分已實際驗證",
+            "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-character-entry.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-character-home-return.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-report.json",
+            "before": null,
+            "beforeStatus": "未拍before，不冒充四尺寸前後"
+          },
+          "1280x800": {
+            "status": "部分已實際驗證",
+            "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-character-entry.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-character-home-return.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-report.json",
+            "before": null,
+            "beforeStatus": "未拍before，不冒充四尺寸前後"
+          }
+        },
+        "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/independent-reviews.json",
+        "remaining": [
+          "摘要fixture在relic owner init之後寫canonical local save；主城summary讀新值，秘寶頁私有hydrate仍舊runtime。只批准空/loaded摘要呈現與真導航返回，不批准跨頁loaded資料一致性，不判產品存檔故障。",
+          "角色0/1/2跨能力/技能/經驗TAB選角、未創建可建/鎖定、完整英雄編隊、真拖曳/移出/同步成功、pending第三按鈕仍未驗。",
+          "DEV控制28px、主城footer工具42px未列44px通過，仍待修。",
+          "本機canonical fixture與原UI可能有mark-seen/save副作用，僅原save/meta bytes已精確還原，不能稱零副作用、裝備/交易或雲端驗收。",
+          "無實體手機/鍵盤/載入拒絕重試/戰鬥/創角/獎勵/交易驗收。"
+        ]
       }
     },
     {
@@ -3430,6 +3490,62 @@
           "interaction": "真四情境entry/return/分類/pager/唯一grid末端，3bb四尺寸name/Lv/頁碼/最後120格delta與索引119配對",
           "scope": "CSS22 canonical原Owner/HTML裝飾文字/測試/生成；無JS/容量/rarity/handler變更；formal測試按真安全區與字型就緒"
         }
+      },
+      "segment24Evidence": {
+        "segment": 24,
+        "status": "部分已實際驗證",
+        "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+        "scope": "僅列明呈現/真入口返回；limits未驗狀態不得外推",
+        "deviceEvidence": {
+          "360x640": {
+            "status": "部分已實際驗證",
+            "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-bottom-nav-home-return.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-report.json",
+            "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-candidates/1cf6761c-home-1-top.png",
+            "beforeStatus": "僅主城原長名狀態before"
+          },
+          "393x873": {
+            "status": "部分已實際驗證",
+            "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-bottom-nav-home-return.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-report.json",
+            "before": null,
+            "beforeStatus": "未拍before，不冒充四尺寸前後"
+          },
+          "412x915": {
+            "status": "部分已實際驗證",
+            "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-bottom-nav-home-return.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-report.json",
+            "before": null,
+            "beforeStatus": "未拍before，不冒充四尺寸前後"
+          },
+          "1280x800": {
+            "status": "部分已實際驗證",
+            "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-bottom-nav-home-return.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-report.json",
+            "before": null,
+            "beforeStatus": "未拍before，不冒充四尺寸前後"
+          }
+        },
+        "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/independent-reviews.json",
+        "remaining": [
+          "摘要fixture在relic owner init之後寫canonical local save；主城summary讀新值，秘寶頁私有hydrate仍舊runtime。只批准空/loaded摘要呈現與真導航返回，不批准跨頁loaded資料一致性，不判產品存檔故障。",
+          "角色0/1/2跨能力/技能/經驗TAB選角、未創建可建/鎖定、完整英雄編隊、真拖曳/移出/同步成功、pending第三按鈕仍未驗。",
+          "DEV控制28px、主城footer工具42px未列44px通過，仍待修。",
+          "本機canonical fixture與原UI可能有mark-seen/save副作用，僅原save/meta bytes已精確還原，不能稱零副作用、裝備/交易或雲端驗收。",
+          "無實體手機/鍵盤/載入拒絕重試/戰鬥/創角/獎勵/交易驗收。"
+        ]
       }
     },
     {
@@ -6103,6 +6219,70 @@
           "交易／合成執行",
           "獎勵領取／結算",
           "未列出的其他業務狀態"
+        ]
+      },
+      "segment24Evidence": {
+        "segment": 24,
+        "status": "部分已實際驗證",
+        "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+        "scope": "僅列明呈現/真入口返回；limits未驗狀態不得外推",
+        "deviceEvidence": {
+          "360x640": {
+            "status": "部分已實際驗證",
+            "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-formation-entry-no-edit.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-formation-content-end.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-formation-home-return.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-report.json",
+            "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-candidates/1cf6761c-home-1-top.png",
+            "beforeStatus": "僅主城原長名狀態before"
+          },
+          "393x873": {
+            "status": "部分已實際驗證",
+            "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-formation-entry-no-edit.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-formation-content-end.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-formation-home-return.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-report.json",
+            "before": null,
+            "beforeStatus": "未拍before，不冒充四尺寸前後"
+          },
+          "412x915": {
+            "status": "部分已實際驗證",
+            "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-formation-entry-no-edit.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-formation-content-end.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-formation-home-return.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-report.json",
+            "before": null,
+            "beforeStatus": "未拍before，不冒充四尺寸前後"
+          },
+          "1280x800": {
+            "status": "部分已實際驗證",
+            "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-formation-entry-no-edit.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-formation-content-end.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-formation-home-return.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-report.json",
+            "before": null,
+            "beforeStatus": "未拍before，不冒充四尺寸前後"
+          }
+        },
+        "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/independent-reviews.json",
+        "remaining": [
+          "摘要fixture在relic owner init之後寫canonical local save；主城summary讀新值，秘寶頁私有hydrate仍舊runtime。只批准空/loaded摘要呈現與真導航返回，不批准跨頁loaded資料一致性，不判產品存檔故障。",
+          "角色0/1/2跨能力/技能/經驗TAB選角、未創建可建/鎖定、完整英雄編隊、真拖曳/移出/同步成功、pending第三按鈕仍未驗。",
+          "DEV控制28px、主城footer工具42px未列44px通過，仍待修。",
+          "本機canonical fixture與原UI可能有mark-seen/save副作用，僅原save/meta bytes已精確還原，不能稱零副作用、裝備/交易或雲端驗收。",
+          "無實體手機/鍵盤/載入拒絕重試/戰鬥/創角/獎勵/交易驗收。"
         ]
       }
     },
@@ -19999,6 +20179,268 @@
           "未驗真帳號/雲端權威/硬體裝置/軟鍵盤"
         ]
       }
+    },
+    {
+      "id": "home.resources",
+      "label": "主城身份題牌與資源",
+      "entry": "home-city-hud",
+      "owner": "js/16-stage-v54-main-city-runtime.js;css/00-main.css;css/19-stage-v54-main-city-moderate-native-scale.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "普通名",
+        "16字名",
+        "萬億資源",
+        "title/aria完整值",
+        "自然充能當次取樣"
+      ],
+      "operations": [
+        "閱讀",
+        "真捲動",
+        "正式入口返回"
+      ],
+      "segment": 24,
+      "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+      "scope": "僅列明呈現/真入口返回；limits未驗狀態不得外推",
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-home-short-1-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-home-3-top.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-report.json",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-candidates/1cf6761c-home-1-top.png",
+          "beforeStatus": "僅主城原長名狀態before"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-home-short-1-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-home-3-top.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-report.json",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸前後"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-home-short-1-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-home-3-top.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-report.json",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸前後"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-home-short-1-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-home-3-top.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-report.json",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸前後"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/independent-reviews.json",
+      "remaining": [
+        "摘要fixture在relic owner init之後寫canonical local save；主城summary讀新值，秘寶頁私有hydrate仍舊runtime。只批准空/loaded摘要呈現與真導航返回，不批准跨頁loaded資料一致性，不判產品存檔故障。",
+        "角色0/1/2跨能力/技能/經驗TAB選角、未創建可建/鎖定、完整英雄編隊、真拖曳/移出/同步成功、pending第三按鈕仍未驗。",
+        "DEV控制28px、主城footer工具42px未列44px通過，仍待修。",
+        "本機canonical fixture與原UI可能有mark-seen/save副作用，僅原save/meta bytes已精確還原，不能稱零副作用、裝備/交易或雲端驗收。",
+        "無實體手機/鍵盤/載入拒絕重試/戰鬥/創角/獎勵/交易驗收。"
+      ]
+    },
+    {
+      "id": "home.roster",
+      "label": "主城角色列與場景入口",
+      "entry": "#v146HomeRoster",
+      "owner": "js/16-stage-v54-main-city-runtime.js;css/00-main.css;css/19-stage-v54-main-city-moderate-native-scale.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "一人",
+        "三人",
+        "短名",
+        "16字名",
+        "HP/SP",
+        "真捲動首末",
+        "通知空/有"
+      ],
+      "operations": [
+        "閱讀",
+        "真捲動",
+        "正式入口返回"
+      ],
+      "segment": 24,
+      "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+      "scope": "僅列明呈現/真入口返回；limits未驗狀態不得外推",
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-home-short-3-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-home-3-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-home-3-end.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-notification-absent.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-notification-present.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-report.json",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-candidates/1cf6761c-home-1-top.png",
+          "beforeStatus": "僅主城原長名狀態before"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-home-short-3-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-home-3-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-home-3-end.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-notification-absent.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-notification-present.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-report.json",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸前後"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-home-short-3-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-home-3-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-home-3-end.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-notification-absent.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-notification-present.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-report.json",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸前後"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-home-short-3-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-home-3-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-home-3-end.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-notification-absent.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-notification-present.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-report.json",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸前後"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/independent-reviews.json",
+      "remaining": [
+        "摘要fixture在relic owner init之後寫canonical local save；主城summary讀新值，秘寶頁私有hydrate仍舊runtime。只批准空/loaded摘要呈現與真導航返回，不批准跨頁loaded資料一致性，不判產品存檔故障。",
+        "角色0/1/2跨能力/技能/經驗TAB選角、未創建可建/鎖定、完整英雄編隊、真拖曳/移出/同步成功、pending第三按鈕仍未驗。",
+        "DEV控制28px、主城footer工具42px未列44px通過，仍待修。",
+        "本機canonical fixture與原UI可能有mark-seen/save副作用，僅原save/meta bytes已精確還原，不能稱零副作用、裝備/交易或雲端驗收。",
+        "無實體手機/鍵盤/載入拒絕重試/戰鬥/創角/獎勵/交易驗收。"
+      ]
+    },
+    {
+      "id": "home.relic-summary",
+      "label": "主城隊伍秘寶摘要",
+      "entry": "#homePage > .team-relic-loadout-slot",
+      "owner": "js/16-stage-v54-main-city-runtime.js;css/00-main.css;css/19-stage-v54-main-city-moderate-native-scale.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "空",
+        "已裝備呈現",
+        "入口",
+        "返回",
+        "loaded跨頁一致性未驗"
+      ],
+      "operations": [
+        "閱讀",
+        "真捲動",
+        "正式入口返回"
+      ],
+      "segment": 24,
+      "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+      "scope": "僅列明呈現/真入口返回；limits未驗狀態不得外推",
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-summary-empty.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-summary-loaded.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-summary-loaded-home-return.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-report.json",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-candidates/1cf6761c-home-1-top.png",
+          "beforeStatus": "僅主城原長名狀態before"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-summary-empty.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-summary-loaded.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-summary-loaded-home-return.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-report.json",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸前後"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-summary-empty.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-summary-loaded.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-summary-loaded-home-return.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-report.json",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸前後"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-summary-empty.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-summary-loaded.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-summary-loaded-home-return.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-report.json",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸前後"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/independent-reviews.json",
+      "remaining": [
+        "摘要fixture在relic owner init之後寫canonical local save；主城summary讀新值，秘寶頁私有hydrate仍舊runtime。只批准空/loaded摘要呈現與真導航返回，不批准跨頁loaded資料一致性，不判產品存檔故障。",
+        "角色0/1/2跨能力/技能/經驗TAB選角、未創建可建/鎖定、完整英雄編隊、真拖曳/移出/同步成功、pending第三按鈕仍未驗。",
+        "DEV控制28px、主城footer工具42px未列44px通過，仍待修。",
+        "本機canonical fixture與原UI可能有mark-seen/save副作用，僅原save/meta bytes已精確還原，不能稱零副作用、裝備/交易或雲端驗收。",
+        "無實體手機/鍵盤/載入拒絕重試/戰鬥/創角/獎勵/交易驗收。"
+      ]
+    },
+    {
+      "id": "home.footer-touch-gaps",
+      "label": "主城工具列與DEV觸控缺口",
+      "entry": ".home-test-tools;主城下方工具列",
+      "owner": "css/00-main.css",
+      "status": "有問題",
+      "states": [
+        "DEV28px",
+        "玩家工具42px"
+      ],
+      "operations": [
+        "仍待原Owner修正與實測"
+      ],
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-report.json",
+      "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b"
     }
   ],
   "segmentReviews": [

@@ -1,0 +1,5457 @@
+{
+  "complete": true,
+  "sourcesBefore": {
+    "index.html": "093d31ad61acc55b12d6a55ab3e5bc6b49bd5bd8f13dc0c34e2f5397779262ac",
+    "asset-manifest.json": "caf2e8ac41ac1b62b1c36c24e925a24ca064c57a09ef14257e0ba83c25a857d8",
+    "js/16-stage-v54-main-city-runtime.js": "5f737500d811d70fb3fc1380d57e1ba578cf1c1726d249383dcbc703523ebbb7",
+    "js/relic-summary-catalog.js": "07c5f86837d229c2c1a4dbdbc067934a442f3a1f90d473053ec825293358df17",
+    "js/49-v169-element-box-settings.js": "bc3f067e6e51ca46dacf72404702f95a190d7b53ac86df0919e3629a79d817b6",
+    "js/25-v131-fix-batch.js": "962d3f3a289a97540b7aaa1f8b91805190cbf8a32f3b5d40540cc304dbaee9ce",
+    "js/00-main.js": "7d153f2015596ccfd783e097a22b7ebc70b9f132498b2d8b6f13b0e91779cead",
+    "css/48-v169-element-box-settings.css": "1af0440eb987708e4fb8c4b8c59d3a518fda7cf9b6d5197570310c243c04f21f",
+    "build/app-shell.21c79e4fa190.css": "21c79e4fa1909bcbbb333b254428ff03fbf0e60003d34fec0850b02af2bf325b",
+    "build/app-shell.5fb16d5569d1.js": "5fb16d5569d16410deae3ba6b000731a8e513016054bbb81cd2541ebfd0a235a",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/boot-core.e7a5c8849782.css": "e7a5c8849782b12ec2358f1a1cbe3af19e182d6b45c0c3ed489ab69bee287886",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.08c8faad4670.js": "08c8faad467089da80571ff62de823e4fe26b7c3f7d8fdd31869f934379d6097",
+    "build/gameplay-core.41c2d3198f68.css": "41c2d3198f68a120034ce6e569f8220648982811d0a31b1c3101252ce8b18ac5"
+  },
+  "sourcesAfter": {
+    "index.html": "093d31ad61acc55b12d6a55ab3e5bc6b49bd5bd8f13dc0c34e2f5397779262ac",
+    "asset-manifest.json": "caf2e8ac41ac1b62b1c36c24e925a24ca064c57a09ef14257e0ba83c25a857d8",
+    "js/16-stage-v54-main-city-runtime.js": "5f737500d811d70fb3fc1380d57e1ba578cf1c1726d249383dcbc703523ebbb7",
+    "js/relic-summary-catalog.js": "07c5f86837d229c2c1a4dbdbc067934a442f3a1f90d473053ec825293358df17",
+    "js/49-v169-element-box-settings.js": "bc3f067e6e51ca46dacf72404702f95a190d7b53ac86df0919e3629a79d817b6",
+    "js/25-v131-fix-batch.js": "962d3f3a289a97540b7aaa1f8b91805190cbf8a32f3b5d40540cc304dbaee9ce",
+    "js/00-main.js": "7d153f2015596ccfd783e097a22b7ebc70b9f132498b2d8b6f13b0e91779cead",
+    "css/48-v169-element-box-settings.css": "1af0440eb987708e4fb8c4b8c59d3a518fda7cf9b6d5197570310c243c04f21f",
+    "build/app-shell.21c79e4fa190.css": "21c79e4fa1909bcbbb333b254428ff03fbf0e60003d34fec0850b02af2bf325b",
+    "build/app-shell.5fb16d5569d1.js": "5fb16d5569d16410deae3ba6b000731a8e513016054bbb81cd2541ebfd0a235a",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/boot-core.e7a5c8849782.css": "e7a5c8849782b12ec2358f1a1cbe3af19e182d6b45c0c3ed489ab69bee287886",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.08c8faad4670.js": "08c8faad467089da80571ff62de823e4fe26b7c3f7d8fdd31869f934379d6097",
+    "build/gameplay-core.41c2d3198f68.css": "41c2d3198f68a120034ce6e569f8220648982811d0a31b1c3101252ce8b18ac5"
+  },
+  "sourceUnchanged": true,
+  "loaded": [
+    "/build/boot-core.9cdbe69aad4a.js",
+    "/build/boot-core.e7a5c8849782.css",
+    "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/boot-core.9cdbe69aad4a.js",
+    "/build/boot-core.e7a5c8849782.css",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/boot-core.9cdbe69aad4a.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/boot-core.e7a5c8849782.css",
+    "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/app-shell.21c79e4fa190.css",
+    "/build/app-shell.5fb16d5569d1.js",
+    "/build/app-shell.21c79e4fa190.css",
+    "/build/app-shell.5fb16d5569d1.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.a90218b9da1c.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/gameplay-core-secondary.08c8faad4670.js",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core.41c2d3198f68.css",
+    "/build/gameplay-core-primary.a90218b9da1c.js",
+    "/build/gameplay-core-secondary.08c8faad4670.js",
+    "/build/gameplay-core.41c2d3198f68.css",
+    "/build/feature-adventure-entry.f68f5350eccc.css",
+    "/build/feature-adventure-entry.8215d893d208.js",
+    "/build/feature-adventure-items.cf197e72837f.js",
+    "/build/feature-boss-relic.25e704feb9dd.css",
+    "/build/feature-relic-progression.9eb4fff74856.css",
+    "/build/feature-boss-relic.a8ff5e27d0a5.js",
+    "/build/feature-relic-progression.371e66b3317f.js"
+  ],
+  "touches": [
+    {
+      "kind": "home-scroll-end",
+      "owner": "#homePage",
+      "direction": "top",
+      "steps": 0,
+      "active": true,
+      "top": 0,
+      "client": 1704,
+      "height": 1816,
+      "overflow": "auto",
+      "rect": {
+        "x": 415,
+        "y": 0,
+        "width": 450,
+        "height": 710,
+        "top": 0,
+        "right": 865,
+        "bottom": 710,
+        "left": 415
+      },
+      "ancestors": [
+        {
+          "id": "game-ui",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-overlay-layer",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-stage",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-viewport",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "kind": "home-true-scroll",
+      "owner": "#homePage",
+      "direction": "end",
+      "step": 0
+    },
+    {
+      "kind": "home-scroll-end",
+      "owner": "#homePage",
+      "direction": "end",
+      "steps": 1,
+      "active": true,
+      "top": 112,
+      "client": 1704,
+      "height": 1816,
+      "overflow": "auto",
+      "rect": {
+        "x": 415,
+        "y": 0,
+        "width": 450,
+        "height": 710,
+        "top": 0,
+        "right": 865,
+        "bottom": 710,
+        "left": 415
+      },
+      "ancestors": [
+        {
+          "id": "game-ui",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-overlay-layer",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-stage",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-viewport",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "kind": "home-true-scroll",
+      "owner": "#homePage",
+      "direction": "top",
+      "step": 0
+    },
+    {
+      "kind": "home-scroll-end",
+      "owner": "#homePage",
+      "direction": "top",
+      "steps": 1,
+      "active": true,
+      "top": 0,
+      "client": 1704,
+      "height": 1816,
+      "overflow": "auto",
+      "rect": {
+        "x": 415,
+        "y": 0,
+        "width": 450,
+        "height": 710,
+        "top": 0,
+        "right": 865,
+        "bottom": 710,
+        "left": 415
+      },
+      "ancestors": [
+        {
+          "id": "game-ui",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-overlay-layer",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-stage",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-viewport",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "kind": "home-true-scroll",
+      "owner": "#homePage",
+      "direction": "end",
+      "step": 0
+    },
+    {
+      "kind": "home-scroll-end",
+      "owner": "#homePage",
+      "direction": "end",
+      "steps": 1,
+      "active": true,
+      "top": 112,
+      "client": 1704,
+      "height": 1816,
+      "overflow": "auto",
+      "rect": {
+        "x": 415,
+        "y": 0,
+        "width": 450,
+        "height": 710,
+        "top": 0,
+        "right": 865,
+        "bottom": 710,
+        "left": 415
+      },
+      "ancestors": [
+        {
+          "id": "game-ui",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-overlay-layer",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-stage",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-viewport",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "kind": "home-true-scroll",
+      "owner": "#homePage",
+      "direction": "top",
+      "step": 0
+    },
+    {
+      "kind": "home-scroll-end",
+      "owner": "#homePage",
+      "direction": "top",
+      "steps": 1,
+      "active": true,
+      "top": 0,
+      "client": 1704,
+      "height": 2075,
+      "overflow": "auto",
+      "rect": {
+        "x": 415,
+        "y": 0,
+        "width": 450,
+        "height": 710,
+        "top": 0,
+        "right": 865,
+        "bottom": 710,
+        "left": 415
+      },
+      "ancestors": [
+        {
+          "id": "game-ui",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-overlay-layer",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-stage",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-viewport",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "kind": "home-true-scroll",
+      "owner": "#homePage",
+      "direction": "end",
+      "step": 0
+    },
+    {
+      "kind": "home-scroll-end",
+      "owner": "#homePage",
+      "direction": "end",
+      "steps": 1,
+      "active": true,
+      "top": 371,
+      "client": 1704,
+      "height": 2075,
+      "overflow": "auto",
+      "rect": {
+        "x": 415,
+        "y": 0,
+        "width": 450,
+        "height": 710,
+        "top": 0,
+        "right": 865,
+        "bottom": 710,
+        "left": 415
+      },
+      "ancestors": [
+        {
+          "id": "game-ui",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-overlay-layer",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-stage",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-viewport",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "kind": "home-true-scroll",
+      "owner": "#homePage",
+      "direction": "top",
+      "step": 0
+    },
+    {
+      "kind": "home-scroll-end",
+      "owner": "#homePage",
+      "direction": "top",
+      "steps": 1,
+      "active": true,
+      "top": 0,
+      "client": 1704,
+      "height": 2075,
+      "overflow": "auto",
+      "rect": {
+        "x": 415,
+        "y": 0,
+        "width": 450,
+        "height": 710,
+        "top": 0,
+        "right": 865,
+        "bottom": 710,
+        "left": 415
+      },
+      "ancestors": [
+        {
+          "id": "game-ui",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-overlay-layer",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-stage",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-viewport",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "kind": "home-true-scroll",
+      "owner": "#homePage",
+      "direction": "end",
+      "step": 0
+    },
+    {
+      "kind": "home-scroll-end",
+      "owner": "#homePage",
+      "direction": "end",
+      "steps": 1,
+      "active": true,
+      "top": 371,
+      "client": 1704,
+      "height": 2075,
+      "overflow": "auto",
+      "rect": {
+        "x": 415,
+        "y": 0,
+        "width": 450,
+        "height": 710,
+        "top": 0,
+        "right": 865,
+        "bottom": 710,
+        "left": 415
+      },
+      "ancestors": [
+        {
+          "id": "game-ui",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-overlay-layer",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-stage",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-viewport",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "kind": "home-true-scroll",
+      "owner": "#homePage",
+      "direction": "top",
+      "step": 0
+    },
+    {
+      "kind": "home-scroll-end",
+      "owner": "#homePage",
+      "direction": "top",
+      "steps": 1,
+      "active": true,
+      "top": 0,
+      "client": 1704,
+      "height": 2075,
+      "overflow": "auto",
+      "rect": {
+        "x": 415,
+        "y": 0,
+        "width": 450,
+        "height": 710,
+        "top": 0,
+        "right": 865,
+        "bottom": 710,
+        "left": 415
+      },
+      "ancestors": [
+        {
+          "id": "game-ui",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-overlay-layer",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-stage",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-viewport",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "kind": "home-scroll-end",
+      "owner": "#homePage",
+      "direction": "top",
+      "steps": 0,
+      "active": true,
+      "top": 0,
+      "client": 1704,
+      "height": 2075,
+      "overflow": "auto",
+      "rect": {
+        "x": 415,
+        "y": 0,
+        "width": 450,
+        "height": 710,
+        "top": 0,
+        "right": 865,
+        "bottom": 710,
+        "left": 415
+      },
+      "ancestors": [
+        {
+          "id": "game-ui",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-overlay-layer",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-stage",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-viewport",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "selector": "[data-city-entry=\"0\"]",
+      "x": 452.5,
+      "y": 355.07159423828125,
+      "width": 60,
+      "height": 60,
+      "hit": true,
+      "label": "角色"
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 793.59375,
+      "y": 56.25,
+      "width": 85.3125,
+      "height": 55,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#v146HomeRoster .v-fixed-formation-entry",
+      "x": 818.75,
+      "y": 212.36328125,
+      "width": 67.5,
+      "height": 55,
+      "hit": true,
+      "label": "佈陣"
+    },
+    {
+      "root": "#formationContent",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 729.375,
+      "y": 599.7330474853516,
+      "to": 229.5833282470703,
+      "top": 4,
+      "client": 1008,
+      "height": 1012
+    },
+    {
+      "selector": ".v-fixed-formation-panel [onclick=\"returnFromFormation()\"]",
+      "x": 640,
+      "y": 164.5833282470703,
+      "width": 357.5,
+      "height": 55,
+      "hit": true,
+      "label": "‹ 返回"
+    },
+    {
+      "kind": "home-true-scroll",
+      "owner": "#homePage",
+      "direction": "end",
+      "step": 0
+    },
+    {
+      "kind": "home-scroll-end",
+      "owner": "#homePage",
+      "direction": "end",
+      "steps": 1,
+      "active": true,
+      "top": 371,
+      "client": 1704,
+      "height": 2075,
+      "overflow": "auto",
+      "rect": {
+        "x": 415,
+        "y": 0,
+        "width": 450,
+        "height": 710,
+        "top": 0,
+        "right": 865,
+        "bottom": 710,
+        "left": 415
+      },
+      "ancestors": [
+        {
+          "id": "game-ui",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-overlay-layer",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-stage",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-viewport",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "selector": "#inventoryNav",
+      "x": 460,
+      "y": 755.4166564941406,
+      "width": 90,
+      "height": 89.16668701171875,
+      "hit": true,
+      "label": "背包\n背包"
+    },
+    {
+      "selector": "#mapInventoryOverlayClose",
+      "x": 806.25,
+      "y": 53.75,
+      "width": 70,
+      "height": 55,
+      "hit": true,
+      "label": "關閉"
+    },
+    {
+      "selector": "#homePage > .team-relic-loadout-slot button",
+      "x": 817.9166259765625,
+      "y": 674.23828125,
+      "width": 62.5,
+      "height": 55,
+      "hit": true,
+      "label": "選擇"
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 802.1354064941406,
+      "y": 50,
+      "width": 85.72918701171875,
+      "height": 55,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#homePage > .team-relic-loadout-slot button",
+      "x": 817.9166259765625,
+      "y": 674.23828125,
+      "width": 62.5,
+      "height": 55,
+      "hit": true,
+      "label": "更換"
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 802.1354064941406,
+      "y": 50,
+      "width": 85.72918701171875,
+      "height": 55,
+      "hit": true,
+      "label": "返回"
+    }
+  ],
+  "checks": [
+    {
+      "homePlan": {
+        "segment": 24,
+        "mode": "preparation-only; no browser started",
+        "owners": [
+          "index.html:home-city-hud/homeHudGoldValue/homeHudExpValue",
+          "js/16-stage-v54-main-city-runtime.js:177-345 resource formatting, roster, summary, asset readiness",
+          "js/relic-summary-catalog.js",
+          "js/35-v141-ui-battle.js:notification calculation",
+          "js/41-v146-system-polish.js:notification projection"
+        ],
+        "entries": {
+          "character": "[data-city-entry=\"0\"]",
+          "formation": "#v146HomeRoster .v-fixed-formation-entry",
+          "relicSummary": "#homePage > .team-relic-loadout-slot button",
+          "relicCity": "[data-city-entry=\"4\"]",
+          "return": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)"
+        },
+        "limits": [
+          "Do not tap DEV grants, claim, create, equip, upgrade or submit formation.",
+          "Home roster article/name/HP/SP meters and resource spans are display-only, not invented buttons.",
+          "AccountSave.readForUid is frozen API; no claim that mutating its returned copy changes canonical save.",
+          "Summary loading is an initial ensureShell placeholder; sync() with unavailable save only flips ready=false, does not reset old loaded markup. Do not fake DOM reset and call it production loading.",
+          "prepareFirstScreenVisuals rejects and clears its cached promise; no standalone summary failure/retry button exists in this Owner. API readiness retry is not a player-visible retry control."
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "count": 1,
+        "localOnly": true,
+        "notCharacterCreation": true
+      }
+    },
+    {
+      "ordinaryShortNameComparison": 1,
+      "home": {
+        "roster": [
+          {
+            "slot": "0",
+            "text": "QA 火\nLv.70\nHP\nSP",
+            "rect": {
+              "x": 427.5,
+              "y": 191.953125,
+              "width": 135,
+              "height": 105.625,
+              "top": 191.953125,
+              "right": 562.5,
+              "bottom": 297.578125,
+              "left": 427.5
+            },
+            "nameBox": {
+              "x": 427.5,
+              "y": 195.703125,
+              "width": 135,
+              "height": 28.125,
+              "top": 195.703125,
+              "right": 562.5,
+              "bottom": 223.828125,
+              "left": 427.5
+            },
+            "nameInk": {
+              "x": 427.5,
+              "y": 196.11978149414062,
+              "width": 49.140625,
+              "height": 27.083343505859375,
+              "top": 196.11978149414062,
+              "right": 476.640625,
+              "bottom": 223.203125,
+              "left": 427.5
+            },
+            "meters": [
+              {
+                "label": "QA 火 HP",
+                "text": "HP 300 / 2000"
+              },
+              {
+                "label": "QA 火 SP",
+                "text": "SP 120 / 200"
+              }
+            ]
+          }
+        ],
+        "partySize": "1",
+        "resources": [
+          {
+            "id": "homeHudGoldValue",
+            "text": "10000億",
+            "title": "999,999,999,999",
+            "aria": "999,999,999,999",
+            "rect": {
+              "x": 472.5,
+              "y": 49.869789123535156,
+              "width": 69.12762451171875,
+              "height": 27.5,
+              "top": 49.869789123535156,
+              "right": 541.6276245117188,
+              "bottom": 77.36978912353516,
+              "left": 472.5
+            },
+            "ink": {
+              "x": 472.5,
+              "y": 50.703125,
+              "width": 69.12762451171875,
+              "height": 25.416664123535156,
+              "top": 50.703125,
+              "right": 541.6276245117188,
+              "bottom": 76.11978912353516,
+              "left": 472.5
+            }
+          },
+          {
+            "id": "homeHudExpValue",
+            "text": "10000億",
+            "title": "1,000,000,000,042",
+            "aria": "1,000,000,000,042",
+            "rect": {
+              "x": 775.8723754882812,
+              "y": 49.869789123535156,
+              "width": 69.12762451171875,
+              "height": 27.5,
+              "top": 49.869789123535156,
+              "right": 845,
+              "bottom": 77.36978912353516,
+              "left": 775.8723754882812
+            },
+            "ink": {
+              "x": 775.8723754882812,
+              "y": 50.703125,
+              "width": 69.12762451171875,
+              "height": 25.416664123535156,
+              "top": 50.703125,
+              "right": 845,
+              "bottom": 76.11978912353516,
+              "left": 775.8723754882812
+            }
+          }
+        ],
+        "summary": {
+          "ready": "true",
+          "text": "隊伍秘寶\n尚未裝備\n選擇",
+          "button": "<button type=\"button\" data-feature=\"relic\" onclick=\"openHomeFeature('relic')\">選擇</button>",
+          "rect": {
+            "x": 422.5,
+            "y": 690.078125,
+            "width": 435,
+            "height": 61.6666259765625,
+            "top": 690.078125,
+            "right": 857.5,
+            "bottom": 751.7447509765625,
+            "left": 422.5
+          }
+        },
+        "resourceSample": {
+          "gold": 999999999999,
+          "exp": 1000000000042,
+          "expRead": {
+            "at": 1792506202394,
+            "value": 1000000000042
+          }
+        },
+        "notification": {
+          "exists": true,
+          "rect": {
+            "x": 467.5,
+            "y": 348.41143798828125,
+            "width": 11.25,
+            "height": 11.25,
+            "top": 348.41143798828125,
+            "right": 478.75,
+            "bottom": 359.66143798828125,
+            "left": 467.5
+          },
+          "display": "block",
+          "opacity": "1",
+          "attention": {
+            "show": true,
+            "label": "角色：可升級、能力點未分配、技能可學習／升級／裝備",
+            "canLevel": true,
+            "hasAttributePoints": true,
+            "hasSkillAttention": true,
+            "byIndex": {
+              "0": {
+                "canLevel": true,
+                "hasAttributePoints": true,
+                "skill": {
+                  "show": true,
+                  "canSpend": true,
+                  "canEquip": true
+                }
+              }
+            }
+          },
+          "legacyExpDot": false
+        },
+        "resourceApiExactRestored": true
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "home-short-1-top",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 59.999969482421875,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 59.999969482421875,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "home-short-1-end",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 59.999969482421875,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 59.999969482421875,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.66403198242188,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "fixture": {
+        "count": 3,
+        "localOnly": true,
+        "notCharacterCreation": true
+      }
+    },
+    {
+      "ordinaryShortNameComparison": 3,
+      "home": {
+        "roster": [
+          {
+            "slot": "0",
+            "text": "QA 火\nLv.70\nHP\nSP",
+            "rect": {
+              "x": 427.5,
+              "y": 191.953125,
+              "width": 135,
+              "height": 105.625,
+              "top": 191.953125,
+              "right": 562.5,
+              "bottom": 297.578125,
+              "left": 427.5
+            },
+            "nameBox": {
+              "x": 427.5,
+              "y": 195.703125,
+              "width": 135,
+              "height": 28.125,
+              "top": 195.703125,
+              "right": 562.5,
+              "bottom": 223.828125,
+              "left": 427.5
+            },
+            "nameInk": {
+              "x": 427.5,
+              "y": 196.11978149414062,
+              "width": 49.140625,
+              "height": 27.083343505859375,
+              "top": 196.11978149414062,
+              "right": 476.640625,
+              "bottom": 223.203125,
+              "left": 427.5
+            },
+            "meters": [
+              {
+                "label": "QA 火 HP",
+                "text": "HP 300 / 2000"
+              },
+              {
+                "label": "QA 火 SP",
+                "text": "SP 120 / 200"
+              }
+            ]
+          },
+          {
+            "slot": "1",
+            "text": "QA 水\nLv.70\nHP\nSP",
+            "rect": {
+              "x": 572.5,
+              "y": 191.953125,
+              "width": 135,
+              "height": 105.625,
+              "top": 191.953125,
+              "right": 707.5,
+              "bottom": 297.578125,
+              "left": 572.5
+            },
+            "nameBox": {
+              "x": 572.5,
+              "y": 195.703125,
+              "width": 135,
+              "height": 28.125,
+              "top": 195.703125,
+              "right": 707.5,
+              "bottom": 223.828125,
+              "left": 572.5
+            },
+            "nameInk": {
+              "x": 572.5,
+              "y": 196.11978149414062,
+              "width": 49.140625,
+              "height": 27.083343505859375,
+              "top": 196.11978149414062,
+              "right": 621.640625,
+              "bottom": 223.203125,
+              "left": 572.5
+            },
+            "meters": [
+              {
+                "label": "QA 水 HP",
+                "text": "HP 300 / 600"
+              },
+              {
+                "label": "QA 水 SP",
+                "text": "SP 120 / 200"
+              }
+            ]
+          },
+          {
+            "slot": "2",
+            "text": "QA 風\nLv.70\nHP\nSP",
+            "rect": {
+              "x": 717.5,
+              "y": 191.953125,
+              "width": 135,
+              "height": 105.625,
+              "top": 191.953125,
+              "right": 852.5,
+              "bottom": 297.578125,
+              "left": 717.5
+            },
+            "nameBox": {
+              "x": 717.5,
+              "y": 195.703125,
+              "width": 135,
+              "height": 28.125,
+              "top": 195.703125,
+              "right": 852.5,
+              "bottom": 223.828125,
+              "left": 717.5
+            },
+            "nameInk": {
+              "x": 717.5,
+              "y": 196.11978149414062,
+              "width": 49.140625,
+              "height": 27.083343505859375,
+              "top": 196.11978149414062,
+              "right": 766.640625,
+              "bottom": 223.203125,
+              "left": 717.5
+            },
+            "meters": [
+              {
+                "label": "QA 風 HP",
+                "text": "HP 300 / 600"
+              },
+              {
+                "label": "QA 風 SP",
+                "text": "SP 120 / 200"
+              }
+            ]
+          }
+        ],
+        "partySize": "3",
+        "resources": [
+          {
+            "id": "homeHudGoldValue",
+            "text": "10000億",
+            "title": "999,999,999,999",
+            "aria": "999,999,999,999",
+            "rect": {
+              "x": 472.5,
+              "y": 49.869789123535156,
+              "width": 69.12762451171875,
+              "height": 27.5,
+              "top": 49.869789123535156,
+              "right": 541.6276245117188,
+              "bottom": 77.36978912353516,
+              "left": 472.5
+            },
+            "ink": {
+              "x": 472.5,
+              "y": 50.703125,
+              "width": 69.12762451171875,
+              "height": 25.416664123535156,
+              "top": 50.703125,
+              "right": 541.6276245117188,
+              "bottom": 76.11978912353516,
+              "left": 472.5
+            }
+          },
+          {
+            "id": "homeHudExpValue",
+            "text": "10000億",
+            "title": "1,000,000,000,207",
+            "aria": "1,000,000,000,207",
+            "rect": {
+              "x": 775.8723754882812,
+              "y": 49.869789123535156,
+              "width": 69.12762451171875,
+              "height": 27.5,
+              "top": 49.869789123535156,
+              "right": 845,
+              "bottom": 77.36978912353516,
+              "left": 775.8723754882812
+            },
+            "ink": {
+              "x": 775.8723754882812,
+              "y": 50.703125,
+              "width": 69.12762451171875,
+              "height": 25.416664123535156,
+              "top": 50.703125,
+              "right": 845,
+              "bottom": 76.11978912353516,
+              "left": 775.8723754882812
+            }
+          }
+        ],
+        "summary": {
+          "ready": "true",
+          "text": "隊伍秘寶\n尚未裝備\n選擇",
+          "button": "<button type=\"button\" data-feature=\"relic\" onclick=\"openHomeFeature('relic')\">選擇</button>",
+          "rect": {
+            "x": 422.5,
+            "y": 690.078125,
+            "width": 435,
+            "height": 61.6666259765625,
+            "top": 690.078125,
+            "right": 857.5,
+            "bottom": 751.7447509765625,
+            "left": 422.5
+          }
+        },
+        "resourceSample": {
+          "gold": 999999999999,
+          "exp": 1000000000207,
+          "expRead": {
+            "at": 1792506204271,
+            "value": 1000000000207
+          }
+        },
+        "notification": {
+          "exists": true,
+          "rect": {
+            "x": 468.06231689453125,
+            "y": 348.9737548828125,
+            "width": 10.1253662109375,
+            "height": 10.125396728515625,
+            "top": 348.9737548828125,
+            "right": 478.18768310546875,
+            "bottom": 359.0991516113281,
+            "left": 468.06231689453125
+          },
+          "display": "block",
+          "opacity": "0.720095",
+          "attention": {
+            "show": true,
+            "label": "角色：可升級、能力點未分配、技能可學習／升級／裝備",
+            "canLevel": true,
+            "hasAttributePoints": true,
+            "hasSkillAttention": true,
+            "byIndex": {
+              "0": {
+                "canLevel": true,
+                "hasAttributePoints": true,
+                "skill": {
+                  "show": true,
+                  "canSpend": true,
+                  "canEquip": true
+                }
+              },
+              "1": {
+                "canLevel": true,
+                "hasAttributePoints": true,
+                "skill": {
+                  "show": false,
+                  "canSpend": false,
+                  "canEquip": false
+                }
+              },
+              "2": {
+                "canLevel": true,
+                "hasAttributePoints": true,
+                "skill": {
+                  "show": false,
+                  "canSpend": false,
+                  "canEquip": false
+                }
+              }
+            }
+          },
+          "legacyExpDot": false
+        },
+        "resourceApiExactRestored": true
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "home-short-3-top",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 59.999969482421875,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 59.999969482421875,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "home-short-3-end",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 59.999969482421875,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 59.999969482421875,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.66403198242188,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "fixture": {
+        "count": 1,
+        "localOnly": true,
+        "notCharacterCreation": true
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "home-1-top",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "home": {
+        "roster": [
+          {
+            "slot": "0",
+            "text": "角色名稱長文測試甲乙丙丁戊己庚辛\nLv.70\nHP\nSP",
+            "rect": {
+              "x": 427.5,
+              "y": 243.61328125,
+              "width": 135,
+              "height": 161.875,
+              "top": 243.61328125,
+              "right": 562.5,
+              "bottom": 405.48828125,
+              "left": 427.5
+            },
+            "nameBox": {
+              "x": 427.5,
+              "y": 247.36328125,
+              "width": 135,
+              "height": 84.375,
+              "top": 247.36328125,
+              "right": 562.5,
+              "bottom": 331.73828125,
+              "left": 427.5
+            },
+            "nameInk": {
+              "x": 427.5,
+              "y": 247.77993774414062,
+              "width": 131.25,
+              "height": 83.33334350585938,
+              "top": 247.77993774414062,
+              "right": 558.75,
+              "bottom": 331.11328125,
+              "left": 427.5
+            },
+            "meters": [
+              {
+                "label": "角色名稱長文測試甲乙丙丁戊己庚辛 HP",
+                "text": "HP 300 / 2000"
+              },
+              {
+                "label": "角色名稱長文測試甲乙丙丁戊己庚辛 SP",
+                "text": "SP 120 / 200"
+              }
+            ]
+          }
+        ],
+        "partySize": "1",
+        "resources": [
+          {
+            "id": "homeHudGoldValue",
+            "text": "10000億",
+            "title": "999,999,999,999",
+            "aria": "999,999,999,999",
+            "rect": {
+              "x": 472.5,
+              "y": 101.52994537353516,
+              "width": 69.12762451171875,
+              "height": 27.49999237060547,
+              "top": 101.52994537353516,
+              "right": 541.6276245117188,
+              "bottom": 129.02993774414062,
+              "left": 472.5
+            },
+            "ink": {
+              "x": 472.5,
+              "y": 102.36328125,
+              "width": 69.12762451171875,
+              "height": 25.416664123535156,
+              "top": 102.36328125,
+              "right": 541.6276245117188,
+              "bottom": 127.77994537353516,
+              "left": 472.5
+            }
+          },
+          {
+            "id": "homeHudExpValue",
+            "text": "10000億",
+            "title": "1,000,000,000,367",
+            "aria": "1,000,000,000,367",
+            "rect": {
+              "x": 775.8723754882812,
+              "y": 101.52994537353516,
+              "width": 69.12762451171875,
+              "height": 27.49999237060547,
+              "top": 101.52994537353516,
+              "right": 845,
+              "bottom": 129.02993774414062,
+              "left": 775.8723754882812
+            },
+            "ink": {
+              "x": 775.8723754882812,
+              "y": 102.36328125,
+              "width": 69.12762451171875,
+              "height": 25.416664123535156,
+              "top": 102.36328125,
+              "right": 845,
+              "bottom": 127.77994537353516,
+              "left": 775.8723754882812
+            }
+          }
+        ],
+        "summary": {
+          "ready": "true",
+          "text": "隊伍秘寶\n尚未裝備\n選擇",
+          "button": "<button type=\"button\" data-feature=\"relic\" onclick=\"openHomeFeature('relic')\">選擇</button>",
+          "rect": {
+            "x": 422.5,
+            "y": 797.98828125,
+            "width": 435,
+            "height": 61.6666259765625,
+            "top": 797.98828125,
+            "right": 857.5,
+            "bottom": 859.6549072265625,
+            "left": 422.5
+          }
+        },
+        "resourceSample": {
+          "gold": 999999999999,
+          "exp": 1000000000367,
+          "expRead": {
+            "at": 1792506206094,
+            "value": 1000000000367
+          }
+        },
+        "notification": {
+          "exists": true,
+          "rect": {
+            "x": 467.507080078125,
+            "y": 456.32867431640625,
+            "width": 11.23583984375,
+            "height": 11.235870361328125,
+            "top": 456.32867431640625,
+            "right": 478.742919921875,
+            "bottom": 467.5645446777344,
+            "left": 467.507080078125
+          },
+          "display": "block",
+          "opacity": "0.99647",
+          "attention": {
+            "show": true,
+            "label": "角色：可升級、能力點未分配、技能可學習／升級／裝備",
+            "canLevel": true,
+            "hasAttributePoints": true,
+            "hasSkillAttention": true,
+            "byIndex": {
+              "0": {
+                "canLevel": true,
+                "hasAttributePoints": true,
+                "skill": {
+                  "show": true,
+                  "canSpend": true,
+                  "canEquip": true
+                }
+              }
+            }
+          },
+          "legacyExpDot": false
+        },
+        "resourceApiExactRestored": true
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "home-1-end",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "fixture": {
+        "count": 3,
+        "localOnly": true,
+        "notCharacterCreation": true
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "home-3-top",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "home": {
+        "roster": [
+          {
+            "slot": "0",
+            "text": "角色名稱長文測試甲乙丙丁戊己庚辛\nLv.70\nHP\nSP",
+            "rect": {
+              "x": 427.5,
+              "y": 243.61328125,
+              "width": 135,
+              "height": 161.875,
+              "top": 243.61328125,
+              "right": 562.5,
+              "bottom": 405.48828125,
+              "left": 427.5
+            },
+            "nameBox": {
+              "x": 427.5,
+              "y": 247.36328125,
+              "width": 135,
+              "height": 84.375,
+              "top": 247.36328125,
+              "right": 562.5,
+              "bottom": 331.73828125,
+              "left": 427.5
+            },
+            "nameInk": {
+              "x": 427.5,
+              "y": 247.77993774414062,
+              "width": 131.25,
+              "height": 83.33334350585938,
+              "top": 247.77993774414062,
+              "right": 558.75,
+              "bottom": 331.11328125,
+              "left": 427.5
+            },
+            "meters": [
+              {
+                "label": "角色名稱長文測試甲乙丙丁戊己庚辛 HP",
+                "text": "HP 300 / 2000"
+              },
+              {
+                "label": "角色名稱長文測試甲乙丙丁戊己庚辛 SP",
+                "text": "SP 120 / 200"
+              }
+            ]
+          },
+          {
+            "slot": "1",
+            "text": "第二角色長名稱甲乙丙丁\nLv.70\nHP\nSP",
+            "rect": {
+              "x": 572.5,
+              "y": 243.61328125,
+              "width": 135,
+              "height": 161.875,
+              "top": 243.61328125,
+              "right": 707.5,
+              "bottom": 405.48828125,
+              "left": 572.5
+            },
+            "nameBox": {
+              "x": 572.5,
+              "y": 250.87890625,
+              "width": 135,
+              "height": 56.25,
+              "top": 250.87890625,
+              "right": 707.5,
+              "bottom": 307.12890625,
+              "left": 572.5
+            },
+            "nameInk": {
+              "x": 572.5,
+              "y": 251.29556274414062,
+              "width": 131.25,
+              "height": 55.208343505859375,
+              "top": 251.29556274414062,
+              "right": 703.75,
+              "bottom": 306.50390625,
+              "left": 572.5
+            },
+            "meters": [
+              {
+                "label": "第二角色長名稱甲乙丙丁 HP",
+                "text": "HP 300 / 600"
+              },
+              {
+                "label": "第二角色長名稱甲乙丙丁 SP",
+                "text": "SP 120 / 200"
+              }
+            ]
+          },
+          {
+            "slot": "2",
+            "text": "第三角色長名稱甲乙丙丁\nLv.70\nHP\nSP",
+            "rect": {
+              "x": 717.5,
+              "y": 243.61328125,
+              "width": 135,
+              "height": 161.875,
+              "top": 243.61328125,
+              "right": 852.5,
+              "bottom": 405.48828125,
+              "left": 717.5
+            },
+            "nameBox": {
+              "x": 717.5,
+              "y": 250.87890625,
+              "width": 135,
+              "height": 56.25,
+              "top": 250.87890625,
+              "right": 852.5,
+              "bottom": 307.12890625,
+              "left": 717.5
+            },
+            "nameInk": {
+              "x": 717.5,
+              "y": 251.29556274414062,
+              "width": 131.25,
+              "height": 55.208343505859375,
+              "top": 251.29556274414062,
+              "right": 848.75,
+              "bottom": 306.50390625,
+              "left": 717.5
+            },
+            "meters": [
+              {
+                "label": "第三角色長名稱甲乙丙丁 HP",
+                "text": "HP 300 / 600"
+              },
+              {
+                "label": "第三角色長名稱甲乙丙丁 SP",
+                "text": "SP 120 / 200"
+              }
+            ]
+          }
+        ],
+        "partySize": "3",
+        "resources": [
+          {
+            "id": "homeHudGoldValue",
+            "text": "10000億",
+            "title": "999,999,999,999",
+            "aria": "999,999,999,999",
+            "rect": {
+              "x": 472.5,
+              "y": 101.52994537353516,
+              "width": 69.12762451171875,
+              "height": 27.49999237060547,
+              "top": 101.52994537353516,
+              "right": 541.6276245117188,
+              "bottom": 129.02993774414062,
+              "left": 472.5
+            },
+            "ink": {
+              "x": 472.5,
+              "y": 102.36328125,
+              "width": 69.12762451171875,
+              "height": 25.416664123535156,
+              "top": 102.36328125,
+              "right": 541.6276245117188,
+              "bottom": 127.77994537353516,
+              "left": 472.5
+            }
+          },
+          {
+            "id": "homeHudExpValue",
+            "text": "10000億",
+            "title": "1,000,000,000,525",
+            "aria": "1,000,000,000,525",
+            "rect": {
+              "x": 775.8723754882812,
+              "y": 101.52994537353516,
+              "width": 69.12762451171875,
+              "height": 27.49999237060547,
+              "top": 101.52994537353516,
+              "right": 845,
+              "bottom": 129.02993774414062,
+              "left": 775.8723754882812
+            },
+            "ink": {
+              "x": 775.8723754882812,
+              "y": 102.36328125,
+              "width": 69.12762451171875,
+              "height": 25.416664123535156,
+              "top": 102.36328125,
+              "right": 845,
+              "bottom": 127.77994537353516,
+              "left": 775.8723754882812
+            }
+          }
+        ],
+        "summary": {
+          "ready": "true",
+          "text": "隊伍秘寶\n尚未裝備\n選擇",
+          "button": "<button type=\"button\" data-feature=\"relic\" onclick=\"openHomeFeature('relic')\">選擇</button>",
+          "rect": {
+            "x": 422.5,
+            "y": 797.98828125,
+            "width": 435,
+            "height": 61.6666259765625,
+            "top": 797.98828125,
+            "right": 857.5,
+            "bottom": 859.6549072265625,
+            "left": 422.5
+          }
+        },
+        "resourceSample": {
+          "gold": 999999999999,
+          "exp": 1000000000525,
+          "expRead": {
+            "at": 1792506207893,
+            "value": 1000000000525
+          }
+        },
+        "notification": {
+          "exists": true,
+          "rect": {
+            "x": 468.0164489746094,
+            "y": 456.83807373046875,
+            "width": 10.217132568359375,
+            "height": 10.217071533203125,
+            "top": 456.83807373046875,
+            "right": 478.23358154296875,
+            "bottom": 467.0551452636719,
+            "left": 468.0164489746094
+          },
+          "display": "block",
+          "opacity": "0.742928",
+          "attention": {
+            "show": true,
+            "label": "角色：可升級、能力點未分配、技能可學習／升級／裝備",
+            "canLevel": true,
+            "hasAttributePoints": true,
+            "hasSkillAttention": true,
+            "byIndex": {
+              "0": {
+                "canLevel": true,
+                "hasAttributePoints": true,
+                "skill": {
+                  "show": true,
+                  "canSpend": true,
+                  "canEquip": true
+                }
+              },
+              "1": {
+                "canLevel": true,
+                "hasAttributePoints": true,
+                "skill": {
+                  "show": false,
+                  "canSpend": false,
+                  "canEquip": false
+                }
+              },
+              "2": {
+                "canLevel": true,
+                "hasAttributePoints": true,
+                "skill": {
+                  "show": false,
+                  "canSpend": false,
+                  "canEquip": false
+                }
+              }
+            }
+          },
+          "legacyExpDot": false
+        },
+        "resourceApiExactRestored": true
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "home-3-end",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "notificationFixture": {
+        "localCanonicalFixture": true,
+        "attention": {
+          "show": false,
+          "label": "",
+          "canLevel": false,
+          "hasAttributePoints": false,
+          "hasSkillAttention": false,
+          "byIndex": {
+            "0": {
+              "canLevel": false,
+              "hasAttributePoints": false,
+              "skill": {
+                "show": false,
+                "canSpend": false,
+                "canEquip": false
+              }
+            },
+            "1": {
+              "canLevel": false,
+              "hasAttributePoints": false,
+              "skill": {
+                "show": false,
+                "canSpend": false,
+                "canEquip": false
+              }
+            },
+            "2": {
+              "canLevel": false,
+              "hasAttributePoints": false,
+              "skill": {
+                "show": false,
+                "canSpend": false,
+                "canEquip": false
+              }
+            }
+          }
+        }
+      },
+      "actualNotification": {
+        "exists": false,
+        "rect": null,
+        "display": null,
+        "opacity": null,
+        "attention": {
+          "show": false,
+          "label": "",
+          "canLevel": false,
+          "hasAttributePoints": false,
+          "hasSkillAttention": false,
+          "byIndex": {
+            "0": {
+              "canLevel": false,
+              "hasAttributePoints": false,
+              "skill": {
+                "show": false,
+                "canSpend": false,
+                "canEquip": false
+              }
+            },
+            "1": {
+              "canLevel": false,
+              "hasAttributePoints": false,
+              "skill": {
+                "show": false,
+                "canSpend": false,
+                "canEquip": false
+              }
+            },
+            "2": {
+              "canLevel": false,
+              "hasAttributePoints": false,
+              "skill": {
+                "show": false,
+                "canSpend": false,
+                "canEquip": false
+              }
+            }
+          }
+        },
+        "legacyExpDot": false
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "notification-absent",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "notificationFixture": {
+        "localCanonicalFixture": true,
+        "attention": {
+          "show": true,
+          "label": "角色：可升級",
+          "canLevel": true,
+          "hasAttributePoints": false,
+          "hasSkillAttention": false,
+          "byIndex": {
+            "0": {
+              "canLevel": true,
+              "hasAttributePoints": false,
+              "skill": {
+                "show": false,
+                "canSpend": false,
+                "canEquip": false
+              }
+            },
+            "1": {
+              "canLevel": true,
+              "hasAttributePoints": false,
+              "skill": {
+                "show": false,
+                "canSpend": false,
+                "canEquip": false
+              }
+            },
+            "2": {
+              "canLevel": true,
+              "hasAttributePoints": false,
+              "skill": {
+                "show": false,
+                "canSpend": false,
+                "canEquip": false
+              }
+            }
+          }
+        }
+      },
+      "actualNotification": {
+        "exists": true,
+        "rect": {
+          "x": 467.5,
+          "y": 456.32159423828125,
+          "width": 11.25,
+          "height": 11.25,
+          "top": 456.32159423828125,
+          "right": 478.75,
+          "bottom": 467.57159423828125,
+          "left": 467.5
+        },
+        "display": "block",
+        "opacity": "1",
+        "attention": {
+          "show": true,
+          "label": "角色：可升級",
+          "canLevel": true,
+          "hasAttributePoints": false,
+          "hasSkillAttention": false,
+          "byIndex": {
+            "0": {
+              "canLevel": true,
+              "hasAttributePoints": false,
+              "skill": {
+                "show": false,
+                "canSpend": false,
+                "canEquip": false
+              }
+            },
+            "1": {
+              "canLevel": true,
+              "hasAttributePoints": false,
+              "skill": {
+                "show": false,
+                "canSpend": false,
+                "canEquip": false
+              }
+            },
+            "2": {
+              "canLevel": true,
+              "hasAttributePoints": false,
+              "skill": {
+                "show": false,
+                "canSpend": false,
+                "canEquip": false
+              }
+            }
+          }
+        },
+        "legacyExpDot": false
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "notification-present",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "character-entry",
+        "controls": [
+          {
+            "label": "？",
+            "width": 55,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "返回",
+            "width": 85.3125,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "經驗池分配",
+            "width": 167.7734375,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "能力值",
+            "width": 104.86328125,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "技能",
+            "width": 104.86328125,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 64.99996948242188,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 65,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 64.99996948242188,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 65,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 64.99996948242188,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 65,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 64.99996948242188,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 65,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 64.99996948242188,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 65,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 64.99996948242188,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 65,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "確認加點",
+            "width": 381.6666564941406,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "returnPreserved": "character",
+      "before": {
+        "position": {
+          "active": true,
+          "top": 297,
+          "client": 1704,
+          "height": 2075,
+          "overflow": "auto",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 710,
+            "top": 0,
+            "right": 865,
+            "bottom": 710,
+            "left": 415
+          },
+          "ancestors": [
+            {
+              "id": "game-ui",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-overlay-layer",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-stage",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-viewport",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            }
+          ]
+        },
+        "anchor": {
+          "selector": "[data-city-entry=\"0\"]",
+          "rect": {
+            "x": 422.5,
+            "y": 325.07159423828125,
+            "width": 60,
+            "height": 60,
+            "top": 325.07159423828125,
+            "right": 482.5,
+            "bottom": 385.07159423828125,
+            "left": 422.5
+          }
+        }
+      },
+      "after": {
+        "position": {
+          "active": true,
+          "top": 297,
+          "client": 1704,
+          "height": 2075,
+          "overflow": "auto",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 710,
+            "top": 0,
+            "right": 865,
+            "bottom": 710,
+            "left": 415
+          },
+          "ancestors": [
+            {
+              "id": "game-ui",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-overlay-layer",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-stage",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-viewport",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            }
+          ]
+        },
+        "anchor": {
+          "selector": "[data-city-entry=\"0\"]",
+          "rect": {
+            "x": 422.5,
+            "y": 325.07159423828125,
+            "width": 60,
+            "height": 60,
+            "top": 325.07159423828125,
+            "right": 482.5,
+            "bottom": 385.07159423828125,
+            "left": 422.5
+          }
+        }
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "character-home-return",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 59.999969482421875,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 59.999969482421875,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "formation-entry-no-edit",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 85.3125,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "‹ 返回",
+            "width": 357.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "第二角色長名稱甲乙丙丁",
+            "width": 108.33331298828125,
+            "height": 163.48956298828125,
+            "overflow": false
+          },
+          {
+            "label": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "width": 108.33331298828125,
+            "height": 163.48956298828125,
+            "overflow": false
+          },
+          {
+            "label": "第三角色長名稱甲乙丙丁",
+            "width": 108.3333740234375,
+            "height": 163.48956298828125,
+            "overflow": false
+          },
+          {
+            "label": "空位",
+            "width": 108.33331298828125,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "空位",
+            "width": 108.33331298828125,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "空位",
+            "width": 108.3333740234375,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "移出英雄",
+            "width": 170,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "同步佈陣",
+            "width": 180,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "formation-content-end",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 85.3125,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "‹ 返回",
+            "width": 357.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "第二角色長名稱甲乙丙丁",
+            "width": 108.33331298828125,
+            "height": 163.48959350585938,
+            "overflow": false
+          },
+          {
+            "label": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "width": 108.33331298828125,
+            "height": 163.48959350585938,
+            "overflow": false
+          },
+          {
+            "label": "第三角色長名稱甲乙丙丁",
+            "width": 108.3333740234375,
+            "height": 163.48959350585938,
+            "overflow": false
+          },
+          {
+            "label": "空位",
+            "width": 108.33331298828125,
+            "height": 54.999969482421875,
+            "overflow": false
+          },
+          {
+            "label": "空位",
+            "width": 108.33331298828125,
+            "height": 54.999969482421875,
+            "overflow": false
+          },
+          {
+            "label": "空位",
+            "width": 108.3333740234375,
+            "height": 54.999969482421875,
+            "overflow": false
+          },
+          {
+            "label": "移出英雄",
+            "width": 170,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "同步佈陣",
+            "width": 180,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "formationLastContent": {
+        "top": 4,
+        "height": 1012,
+        "client": 1008,
+        "last": "目前沒有未上陣的已擁有英雄。"
+      }
+    },
+    {
+      "returnPreserved": "formation",
+      "before": {
+        "position": {
+          "active": true,
+          "top": 0,
+          "client": 1704,
+          "height": 2075,
+          "overflow": "auto",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 710,
+            "top": 0,
+            "right": 865,
+            "bottom": 710,
+            "left": 415
+          },
+          "ancestors": [
+            {
+              "id": "game-ui",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-overlay-layer",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-stage",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-viewport",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            }
+          ]
+        },
+        "anchor": {
+          "selector": "#v146HomeRoster .v-fixed-formation-entry",
+          "rect": {
+            "x": 785,
+            "y": 184.86328125,
+            "width": 67.5,
+            "height": 55,
+            "top": 184.86328125,
+            "right": 852.5,
+            "bottom": 239.86328125,
+            "left": 785
+          }
+        }
+      },
+      "after": {
+        "position": {
+          "active": true,
+          "top": 0,
+          "client": 1704,
+          "height": 2075,
+          "overflow": "auto",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 710,
+            "top": 0,
+            "right": 865,
+            "bottom": 710,
+            "left": 415
+          },
+          "ancestors": [
+            {
+              "id": "game-ui",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-overlay-layer",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-stage",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-viewport",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            }
+          ]
+        },
+        "anchor": {
+          "selector": "#v146HomeRoster .v-fixed-formation-entry",
+          "rect": {
+            "x": 785,
+            "y": 184.86328125,
+            "width": 67.5,
+            "height": 55,
+            "top": 184.86328125,
+            "right": 852.5,
+            "bottom": 239.86328125,
+            "left": 785
+          }
+        }
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "formation-home-return",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "returnPreserved": "bottom-nav",
+      "before": {
+        "position": {
+          "active": true,
+          "top": 371,
+          "client": 1704,
+          "height": 2075,
+          "overflow": "auto",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 710,
+            "top": 0,
+            "right": 865,
+            "bottom": 710,
+            "left": 415
+          },
+          "ancestors": [
+            {
+              "id": "game-ui",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-overlay-layer",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-stage",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-viewport",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            }
+          ]
+        },
+        "anchor": {
+          "selector": "#homePage > .team-relic-loadout-slot",
+          "rect": {
+            "x": 422.5,
+            "y": 643.4049072265625,
+            "width": 435,
+            "height": 61.66668701171875,
+            "top": 643.4049072265625,
+            "right": 857.5,
+            "bottom": 705.0715942382812,
+            "left": 422.5
+          }
+        }
+      },
+      "after": {
+        "position": {
+          "active": true,
+          "top": 371,
+          "client": 1704,
+          "height": 2075,
+          "overflow": "auto",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 710,
+            "top": 0,
+            "right": 865,
+            "bottom": 710,
+            "left": 415
+          },
+          "ancestors": [
+            {
+              "id": "game-ui",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-overlay-layer",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-stage",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-viewport",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            }
+          ]
+        },
+        "anchor": {
+          "selector": "#homePage > .team-relic-loadout-slot",
+          "rect": {
+            "x": 422.5,
+            "y": 643.4049072265625,
+            "width": 435,
+            "height": 61.66668701171875,
+            "top": 643.4049072265625,
+            "right": 857.5,
+            "bottom": 705.0715942382812,
+            "left": 422.5
+          }
+        }
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "bottom-nav-home-return",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "localSaveOriginal": {
+        "uid": "skill-runtime-browser-qa",
+        "key": "four_symbols_save:skill-runtime-browser-qa",
+        "raw": "{\"version\":6,\"heroAccount\":{\"schemaVersion\":1,\"heroes\":{\"divineDogHongbao\":{\"heroId\":\"divineDogHongbao\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1},\"vajraHeavenlyKing\":{\"heroId\":\"vajraHeavenlyKing\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1}}},\"player\":{\"id\":\"QA 火角色\",\"element\":\"fire\",\"level\":70,\"exp\":0,\"expNext\":9637200,\"attack\":10,\"vitality\":10,\"energy\":10,\"intelligence\":10,\"defensePoints\":0,\"agility\":10,\"bonusHP\":0,\"bonusSP\":0,\"hp\":300,\"sp\":120,\"attributePoints\":10,\"skillPoints\":999,\"activeBuffs\":[],\"statusEffects\":[],\"isDefending\":false,\"gender\":\"male\",\"relicProgression\":{\"version\":1,\"initialized\":true,\"ownershipMigration\":\"preserved-existing\",\"firstCharacterLevel20Grant\":true,\"legacyTowerChoiceHandled\":true,\"majorMilestoneClaims\":{},\"pending\":null}},\"player2\":{\"id\":\"QA 水角色\",\"element\":\"water\",\"level\":70,\"skillPoints\":999},\"player3\":null,\"sharedExp\":0,\"gold\":0,\"dailyQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"checkin\":0,\"killMonsters\":0,\"winBattle\":0,\"kill10\":0,\"win3\":0,\"skills5\":0},\"claimed\":{\"checkin\":false,\"killMonsters\":false,\"winBattle\":false,\"kill10\":false,\"win3\":false,\"skills5\":false}},\"commissionQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"killMonsters\":0,\"winBattle\":0,\"kill30\":0,\"win5\":0,\"elite2\":0,\"skills15\":0},\"claimed\":{\"killMonsters\":false,\"winBattle\":false,\"kill30\":false,\"win5\":false,\"elite2\":false,\"skills15\":false}},\"bestiaryData\":{},\"achievementState\":{},\"lastSaveTimestamp\":1792506202224,\"selectedCreationElement\":\"fire\",\"characterEquipment\":{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}},\"characterSkillLoadouts\":{\"fire\":{\"skillLevels\":{\"fireRocket\":1},\"equippedSkills\":[]},\"water\":{\"name\":\"水戰士\",\"skillLevels\":{},\"equippedSkills\":[]},\"wind\":{\"name\":\"風弓手\",\"skillLevels\":{},\"equippedSkills\":[]},\"earth\":{\"name\":\"土騎士\",\"skillLevels\":{},\"equippedSkills\":[]}},\"autoConfig\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false,\"v136ActionIntent\":\"normal\"},\"autoConfig2\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false},\"autoConfig3\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false},\"allyFormation\":{\"version\":1,\"characterIndexToSlot\":{\"0\":\"ALLY_F2\"}},\"playerRelics\":{\"relic_qiankun_flask\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_sun_orb\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_xuanwu_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_soul_bell\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_tiangang_banner\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_nine_dragon_fire\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_cold_spring_jade\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_qinglan_feather\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_rock_mountain_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_returning_wheel\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_origin_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_broken_army_scroll\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_red_sky_war_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_ice_mirror_heart\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_wind_chasing_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_mountain_river_cauldron\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_burning_star_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_spirit_spring_bottle\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_demon_suppressing_seal\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_all_returning_array\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false}},\"teamLoadout\":{\"relicId\":null,\"subRelicId\":null},\"gameplayProgress\":{\"version\":1,\"personal\":{\"personal-20\":{\"firstClear\":false,\"clears\":0},\"personal-30\":{\"firstClear\":false,\"clears\":0},\"personal-40\":{\"firstClear\":false,\"clears\":0},\"personal-50\":{\"firstClear\":false,\"clears\":0},\"personal-60\":{\"firstClear\":false,\"clears\":0},\"personal-70\":{\"firstClear\":false,\"clears\":0},\"personal-80\":{\"firstClear\":false,\"clears\":0},\"personal-90\":{\"firstClear\":false,\"clears\":0},\"personal-100\":{\"firstClear\":false,\"clears\":0}},\"world\":{\"world-40\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-60\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-80\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-100\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0}},\"tower\":{\"weekKey\":\"2026-10-19\",\"element\":\"wind\",\"completedFloor\":0,\"highestThisWeek\":0,\"claimedFloors\":{},\"historicalHighest\":0,\"pendingRelicChoice\":false}},\"inventoryItems\":[]}",
+        "metadata": "{\"schemaVersion\":2,\"ownerUid\":\"skill-runtime-browser-qa\",\"source\":\"team-relic\",\"cloudBaseFingerprint\":\"v1:249:72181a45e5c7319c21b8951dc0d4abac\",\"localDirty\":true,\"updatedAt\":1792506202224}"
+      }
+    },
+    {
+      "summaryFixture": {
+        "mode": "empty",
+        "readStatus": "ready",
+        "teamLoadout": {
+          "relicId": null,
+          "subRelicId": null
+        },
+        "notEquipTransaction": true
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "summary-empty",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "summary": {
+        "ready": "true",
+        "text": "隊伍秘寶\n尚未裝備\n選擇",
+        "button": "<button type=\"button\" data-feature=\"relic\" onclick=\"openHomeFeature('relic')\">選擇</button>",
+        "rect": {
+          "x": 422.5,
+          "y": 643.4049072265625,
+          "width": 435,
+          "height": 61.66668701171875,
+          "top": 643.4049072265625,
+          "right": 857.5,
+          "bottom": 705.0715942382812,
+          "left": 422.5
+        }
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "summary-empty-relic-entry",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 85.72918701171875,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "選擇秘寶",
+            "width": 102.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "全部",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "攻擊",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "回復",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "防禦",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "增益",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "控制",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "元素聯動",
+            "width": 105,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "特殊",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 362.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "returnPreserved": "summary-empty",
+      "before": {
+        "position": {
+          "active": true,
+          "top": 371,
+          "client": 1704,
+          "height": 2075,
+          "overflow": "auto",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 710,
+            "top": 0,
+            "right": 865,
+            "bottom": 710,
+            "left": 415
+          },
+          "ancestors": [
+            {
+              "id": "game-ui",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-overlay-layer",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-stage",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-viewport",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            }
+          ]
+        },
+        "anchor": {
+          "selector": "#homePage > .team-relic-loadout-slot button",
+          "rect": {
+            "x": 786.6666259765625,
+            "y": 646.73828125,
+            "width": 62.5,
+            "height": 55,
+            "top": 646.73828125,
+            "right": 849.1666259765625,
+            "bottom": 701.73828125,
+            "left": 786.6666259765625
+          }
+        }
+      },
+      "after": {
+        "position": {
+          "active": true,
+          "top": 371,
+          "client": 1704,
+          "height": 2075,
+          "overflow": "auto",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 710,
+            "top": 0,
+            "right": 865,
+            "bottom": 710,
+            "left": 415
+          },
+          "ancestors": [
+            {
+              "id": "game-ui",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-overlay-layer",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-stage",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-viewport",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            }
+          ]
+        },
+        "anchor": {
+          "selector": "#homePage > .team-relic-loadout-slot button",
+          "rect": {
+            "x": 786.6666259765625,
+            "y": 646.73828125,
+            "width": 62.5,
+            "height": 55,
+            "top": 646.73828125,
+            "right": 849.1666259765625,
+            "bottom": 701.73828125,
+            "left": 786.6666259765625
+          }
+        }
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "summary-empty-home-return",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "summaryFixture": {
+        "mode": "loaded",
+        "readStatus": "ready",
+        "teamLoadout": {
+          "relicId": "relic_all_returning_array",
+          "subRelicId": null
+        },
+        "notEquipTransaction": true
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "summary-loaded",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "更換",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "summary": {
+        "ready": "true",
+        "text": "隊伍秘寶\n萬象歸元盤 Lv.20\n更換",
+        "button": "<button type=\"button\" data-feature=\"relic\" onclick=\"openHomeFeature('relic')\">更換</button>",
+        "rect": {
+          "x": 422.5,
+          "y": 643.4049072265625,
+          "width": 435,
+          "height": 61.66668701171875,
+          "top": 643.4049072265625,
+          "right": 857.5,
+          "bottom": 705.0715942382812,
+          "left": 422.5
+        }
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "summary-loaded-relic-entry",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 85.72918701171875,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "選擇秘寶",
+            "width": 102.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "全部",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "攻擊",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "回復",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "防禦",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "增益",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "控制",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "元素聯動",
+            "width": 105,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "特殊",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 362.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "裝備",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "returnPreserved": "summary-loaded",
+      "before": {
+        "position": {
+          "active": true,
+          "top": 371,
+          "client": 1704,
+          "height": 2075,
+          "overflow": "auto",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 710,
+            "top": 0,
+            "right": 865,
+            "bottom": 710,
+            "left": 415
+          },
+          "ancestors": [
+            {
+              "id": "game-ui",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-overlay-layer",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-stage",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-viewport",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            }
+          ]
+        },
+        "anchor": {
+          "selector": "#homePage > .team-relic-loadout-slot button",
+          "rect": {
+            "x": 786.6666259765625,
+            "y": 646.73828125,
+            "width": 62.5,
+            "height": 55,
+            "top": 646.73828125,
+            "right": 849.1666259765625,
+            "bottom": 701.73828125,
+            "left": 786.6666259765625
+          }
+        }
+      },
+      "after": {
+        "position": {
+          "active": true,
+          "top": 371,
+          "client": 1704,
+          "height": 2075,
+          "overflow": "auto",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 710,
+            "top": 0,
+            "right": 865,
+            "bottom": 710,
+            "left": 415
+          },
+          "ancestors": [
+            {
+              "id": "game-ui",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-overlay-layer",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-stage",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "game-viewport",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            },
+            {
+              "id": "",
+              "cls": "",
+              "top": 0,
+              "left": 0
+            }
+          ]
+        },
+        "anchor": {
+          "selector": "#homePage > .team-relic-loadout-slot button",
+          "rect": {
+            "x": 786.6666259765625,
+            "y": 646.73828125,
+            "width": 62.5,
+            "height": 55,
+            "top": 646.73828125,
+            "right": 849.1666259765625,
+            "bottom": 701.73828125,
+            "left": 786.6666259765625
+          }
+        }
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "summary-loaded-home-return",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 99.08203125,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 105.7421875,
+            "height": 35,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 67.5,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 60,
+            "height": 60,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 106.875,
+            "height": 52.5,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 250,
+            "height": 65.6640625,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 62.5,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "localBytesRestored": {
+        "raw": true,
+        "metadata": true
+      },
+      "notice": "Only fixture save+metadata restored, other original UI sideeffects not claimed zero."
+    }
+  ],
+  "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+  "dirty": false,
+  "viewport": [
+    1280,
+    800
+  ],
+  "contexts": [
+    "home resources/1 and 3 roster/summary empty and loaded; no backpack contexts"
+  ],
+  "scenes": [
+    {
+      "name": "home-short-1-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "home-short-1-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "home-short-3-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "home-short-3-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "home-1-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "home-1-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "home-3-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "home-3-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "notification-absent",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "notification-present",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "character-entry",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "character-home-return",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "formation-entry-no-edit",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "formation-content-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "formation-home-return",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "bottom-nav-home-return",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "summary-empty",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "summary-empty-relic-entry",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "summary-empty-home-return",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "summary-loaded",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "summary-loaded-relic-entry",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "summary-loaded-home-return",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    }
+  ],
+  "scope": "Segment24 main city presentation: 1/3 canonical local character fixtures, ordinary short-name controls and legal16-name, large resources exact renderer-sampled full/compact values and actual notification DOM; fixed home scroller top/end and returned anchor preservation including bottom nav bag / original inventory close / home; true character and formation open/return without editing/submitting; summary empty/loaded via formal QA local write/read, original bytes+metadata restored, not equip transaction. No loading/reject/retry UI fabricated, no claims/create/cloud transactions, no backpack repeat; original UI sideeffects retained."
+}
