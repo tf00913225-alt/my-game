@@ -28567,7 +28567,7 @@ function renderSystemContent(){
                 '<button class="home-feature-buy-btn" onclick="saveGame();alert(\'已完成手動存檔。\')">立即存檔</button>'+
             '</div>'+
             '<div class="system-panel-row">'+
-                '<div><strong>帳號管理</strong><small>查看目前 Firebase UID、登出或切換帳號。</small></div>'+
+                '<div><strong>帳號管理</strong><small>查看帳號資料、登出或切換帳號。</small></div>'+
                 '<button class="home-feature-buy-btn" onclick="window.FourSymbolsStartupPolicy&&window.FourSymbolsStartupPolicy.openAccountManager()">切換帳號／綁定帳號</button>'+
             '</div>'+
             '<div class="system-panel-row">'+
