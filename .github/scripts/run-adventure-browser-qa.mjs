@@ -179,6 +179,7 @@ function measure(name,html){
  for(let i=0;i<rects.length;i++)for(let j=i+1;j<rects.length;j++){const area=overlap(rects[i].r,rects[j].r);if(area>16)overlaps.push([i,j,Math.round(area)]);}
  const readable=[...content.querySelectorAll(".adventure-panel-title h2,.adventure-panel-card p,.adventure-dialogue,.adventure-route-choice p,.adventure-node-sheet p,.adventure-node-sheet h2,.adventure-node-copy strong")];
  const clipped=readable.filter(node=>overflowClips(node,textRects(node)).length>0).map(node=>node.textContent.trim().slice(0,40));
+ const readableDiagnostics=readable.map(node=>{const style=getComputedStyle(node),ranges=textRects(node);return {tag:node.tagName,className:node.className,text:node.textContent.trim(),rect:node.getBoundingClientRect().toJSON(),ranges,fontSize:style.fontSize,lineHeight:style.lineHeight,flexShrink:style.flexShrink,overflowX:style.overflowX,overflowY:style.overflowY,parent:node.parentElement?{tag:node.parentElement.tagName,className:node.parentElement.className,rect:node.parentElement.getBoundingClientRect().toJSON()}:null,clips:overflowClips(node,ranges)};});
  const decorations=[...content.querySelectorAll(".adventure-scene-decor,.adventure-panel-scene,.adventure-road-layer,.adventure-landmark,.adventure-map-depth,.adventure-boss-landscape,.adventure-map-fog,.adventure-home-gate")];
  const badPointer=decorations.filter(node=>getComputedStyle(node).pointerEvents!=="none").map(node=>String(node.className&&node.className.baseVal||node.className||node.tagName));
  const rr=root&&root.getBoundingClientRect();const result={name,rootOutside:rr?outside(rr):true,badButtons:rects.filter(x=>outside(x.r)).map(x=>x.node.textContent.trim().slice(0,24)),buttonDiagnostics:rects.map(x=>({text:x.node.textContent.trim(),id:x.node.dataset.stageId||x.node.dataset.nodeId||x.node.id,rect:x.r.toJSON(),clips:overflowClips(x.node,[x.r])})),overlaps,clipped,badPointer,docOverflow:document.documentElement.scrollWidth>innerWidth+1||document.documentElement.scrollHeight>innerHeight+1};
@@ -196,7 +197,7 @@ function measure(name,html){
   if(picker&&list){picker.open=true;for(const button of list.querySelectorAll('[data-stage-id]')){list.scrollTop=button.offsetTop-list.clientHeight/2+button.offsetHeight/2;const r=button.getBoundingClientRect(),lr=list.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;const hit=document.elementFromPoint(x,y);result.pickerReachability.push({id:button.dataset.stageId,disabled:button.disabled,painted:painted(button),centerVisible:x>=lr.left&&x<=lr.right&&y>=lr.top&&y<=lr.bottom&&x>=0&&x<=innerWidth&&y>=0&&y<=innerHeight,hit:!!hit&&(hit===button||button.contains(hit)),rect:r.toJSON(),owner:lr.toJSON()});}picker.open=false;}
  }
  if(name==="tracker"){const t=content.querySelector("#adventureObjectiveTracker")?.getBoundingClientRect(),p=content.querySelector("#mockPlayer")?.getBoundingClientRect(),c=content.querySelector("#mockControl")?.getBoundingClientRect();result.trackerOverlapPlayer=t&&p?overlap(t,p):999;result.trackerOverlapControl=t&&c?overlap(t,c):999;}
- return result;
+ result.readableDiagnostics=readableDiagnostics;return result;
 }
 function run(){
  try{
