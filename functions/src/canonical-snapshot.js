@@ -332,6 +332,22 @@ function inspectPlayableState(records){
         "selectedCreationElement","lastSaveTimestamp"];
     const stored=records.progress?.playableState;
     let extra=records.playableState;
+    const preferenceSource=stored===undefined?extra:stored;
+    const versioned=object(preferenceSource)&&Object.hasOwn(preferenceSource,"preferencesVersion");
+    if(versioned){
+        if(preferenceSource.preferencesVersion!==2){fail("unsupported canonical preferences version");}
+        fields.push("preferencesVersion");
+        if(Object.hasOwn(preferenceSource,"loadoutSource")){
+            const head=preferenceSource.loadoutSource;
+            if(!object(head)||Object.keys(head).sort().join(",")!=="operationId,policySha256,resultRevision"||
+               typeof head.operationId!=="string"||!/^[A-Za-z0-9_-]{16,64}(?![\s\S])/.test(head.operationId)||
+               !Number.isSafeInteger(head.resultRevision)||head.resultRevision<1||head.resultRevision>records.account.serverRevision||
+               typeof head.policySha256!=="string"||!/^[a-f0-9]{64}(?![\s\S])/.test(head.policySha256)){
+                fail("canonical loadout source binding");
+            }
+            fields.push("loadoutSource");
+        }
+    }
     if(stored!==undefined){
         if(extra!==undefined||!object(stored)||Object.keys(stored).length!==fields.length||
            fields.some(key=>!Object.hasOwn(stored,key))){
@@ -364,7 +380,8 @@ function inspectPlayableState(records){
         }
     }
     const configKeys=["autoConfig","autoConfig2","autoConfig3"];
-    const preferences=require("./cloud-preferences").normalizePreferences({
+    const preferenceOwner=require("./cloud-preferences");
+    const preferences=(versioned?preferenceOwner.normalizeCanonicalPreferencesV2:preferenceOwner.normalizePreferences)({
         characterIds:records.account.slots.map((id,index)=>id===null?null:`slot-${index}`),
         ...Object.fromEntries(configKeys.map(key=>[key,extra[key]]))});
     return {extra,hero,preferences};
