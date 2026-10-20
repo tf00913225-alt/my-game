@@ -1,0 +1,8348 @@
+{
+  "workId": "UI-SKILL-STANDARD-20261020",
+  "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
+  "createdDate": "2026-10-20",
+  "status": "施工中，未全介面驗收",
+  "devices": [
+    {
+      "id": "360x640",
+      "purpose": "短螢幕手機"
+    },
+    {
+      "id": "393x873",
+      "purpose": "常見手機"
+    },
+    {
+      "id": "412x915",
+      "purpose": "長螢幕手機"
+    },
+    {
+      "id": "1280x800",
+      "purpose": "桌面"
+    }
+  ],
+  "statusDefinitions": {
+    "未檢查": "入口已掃描或候選，無本輪實際畫面/操作證據",
+    "有問題": "有具體實畫缺陷，未表示已修",
+    "已修改": "已落實修改，尚未批准修後操作",
+    "已實際驗證": "必須逐裝置逐狀態連結提交與實畫操作證據",
+    "基準保留": "技能品質基準，仍需回歸證據"
+  },
+  "sources": [
+    "index.html",
+    "js/00-main.js",
+    "js/36-v141-content-systems.js",
+    ".github/scripts/run-functional-ui-reading-browser-qa.mjs",
+    "tests/premium-functional-ui-responsive-browser.test.js"
+  ],
+  "evidencePolicy": [
+    "掃描、CSS數值、fixture或CI綠燈均不等於實際視覺/操作驗收。",
+    "每項states須逐項補stateEvidence；deviceEvidence不得用單裝置結果批量批准。",
+    "未適用狀態需記具體理由，不能以空值表示已驗。",
+    "四張問題原圖裝置/Head未知，不能充當本輪前後比較。",
+    "可隨實際入口發現補列；本清單不是宣稱已完整枚舉所有動態生成項。",
+    "長文字/空/滿/鎖定/未解鎖/可操作/禁用/載入/失敗/待確認依實際相關性逐項檢查。",
+    "每段修改保留before/after、操作紀錄、checkpoint Head與三類獨立review結果。"
+  ],
+  "entries": [
+    {
+      "id": "baseline.skill",
+      "label": "技能視覺基準",
+      "entry": "openHomeFeature('character'); switchCharacterTab('skill')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css; assets/ui/skill-iron-bronze",
+      "status": "基準保留",
+      "states": [
+        "已裝備",
+        "未學習",
+        "未解鎖",
+        "長說明",
+        "詳情返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "baselineEvidence": "C:/Users/User/AppData/Local/Temp/codex-clipboard-69b377c7-7d48-4f46-a4e8-4e192fa3c226.png",
+      "notes": "已讀使用者原圖；保留品質。未對任何裝置或操作批准。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.character",
+      "label": "角色",
+      "entry": "openHomeFeature('character')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.hero",
+      "label": "英雄",
+      "entry": "openHomeFeature('hero')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.shop",
+      "label": "商店",
+      "entry": "openHomeFeature('shop')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.quest",
+      "label": "任務",
+      "entry": "openHomeFeature('quest')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.relic",
+      "label": "秘寶",
+      "entry": "openHomeFeature('relic')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.autoBattleSettings",
+      "label": "元素匣／自動戰鬥設定",
+      "entry": "openHomeFeature('autoBattleSettings')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "有問題",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "beforeEvidence": "C:/Users/User/AppData/Local/Temp/codex-clipboard-d6a57f84-f459-41b4-bbd7-fe646b8e435f.png",
+      "notes": "普通金框與技能頁不一致；AUTO COMBAT術語待統一。",
+      "verification": "已實看使用者原圖；原圖裝置尺寸與提交未提供，不能當本輪操作或修後證據。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.forge",
+      "label": "鍛造",
+      "entry": "openHomeFeature('forge')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.synthesis",
+      "label": "合成",
+      "entry": "openHomeFeature('synthesis')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.achievement",
+      "label": "成就",
+      "entry": "openHomeFeature('achievement')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.announcement",
+      "label": "公告",
+      "entry": "openHomeFeature('announcement')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.offlineExp",
+      "label": "離線經驗",
+      "entry": "openHomeFeature('offlineExp')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.system",
+      "label": "系統",
+      "entry": "openHomeFeature('system')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.rest",
+      "label": "主城休息",
+      "entry": "openHomeFeature('rest')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.expPool",
+      "label": "主城經驗池",
+      "entry": "openHomeFeature('expPool')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次開啟",
+        "切頁返回",
+        "重開",
+        "長內容"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "home.main",
+      "label": "主城入口與資源/角色列",
+      "entry": "showPage('home')",
+      "owner": "index.html; js/00-main.js; css/04-stage-v11-main-city.css",
+      "status": "未檢查",
+      "states": [
+        "1名角色",
+        "3名角色",
+        "角色未解鎖",
+        "通知點",
+        "長名稱",
+        "資源大數值"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "character.tab.expPool",
+      "label": "經驗池分配",
+      "entry": "openHomeFeature('character'); switchCharacterTab('expPool')",
+      "owner": "index.html; js/00-main.js; css/00-main.css; css/49-v169-rpg-ui.css",
+      "status": "有問題",
+      "states": [
+        "0經驗",
+        "不足升級",
+        "可升級",
+        "1名角色",
+        "3名角色",
+        "Lv20前",
+        "Lv20後",
+        "預覽升級",
+        "待確認",
+        "確認禁用",
+        "返回撤回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "beforeEvidence": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b6c10a0e-030b-433d-b87a-e4d59687a90a.png",
+      "notes": "共用經驗池主標題被TAB下緣遮裁；資訊與操作層級不足。",
+      "verification": "已實看使用者原圖；原圖裝置尺寸與提交未提供，不能當本輪操作或修後證據。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "character.tab.status",
+      "label": "能力值",
+      "entry": "openHomeFeature('character'); switchCharacterTab('status')",
+      "owner": "index.html; js/00-main.js; css/00-main.css; css/49-v169-rpg-ui.css",
+      "status": "有問題",
+      "states": [
+        "0點",
+        "有點可加",
+        "暫配可減",
+        "確認禁用",
+        "待確認",
+        "六屬性長數值",
+        "戰鬥鎖定",
+        "說明返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "beforeEvidence": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b3acaf9c-4a1f-4891-a9df-49b98b18e42d.png",
+      "notes": "±過窄，文字與操作區比例失衡；頂部只見SP，須查捲動狀態。",
+      "verification": "已實看使用者原圖；原圖裝置尺寸與提交未提供，不能當本輪操作或修後證據。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "character.tab.skill",
+      "label": "技能",
+      "entry": "openHomeFeature('character'); switchCharacterTab('skill')",
+      "owner": "index.html; js/00-main.js; css/00-main.css; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "四元素",
+        "未學習",
+        "可學習",
+        "可升級",
+        "已滿級",
+        "已裝備",
+        "未解鎖",
+        "長名稱",
+        "長說明",
+        "戰鬥鎖定"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "character.transition",
+      "label": "角色TAB捲動與切換",
+      "entry": "技能捲到底→經驗池→能力值→技能→關閉重開",
+      "owner": "index.html; js/00-main.js; js/18-stage-v64-character-touch-action-runtime.js",
+      "status": "未檢查",
+      "states": [
+        "頂部開啟",
+        "中段切頁",
+        "底部切頁",
+        "切換角色",
+        "help關閉",
+        "重開"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "detail.help",
+      "label": "能力值說明",
+      "entry": "showStatusHelp()",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "短內容",
+        "長內容",
+        "全部數值",
+        "捲動末項",
+        "返回重開"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "detail.skill-detail",
+      "label": "技能詳情",
+      "entry": "showSkillDetail(skillId)",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "短內容",
+        "長內容",
+        "全部數值",
+        "捲動末項",
+        "返回重開"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "detail.character-detail",
+      "label": "背包角色詳細",
+      "entry": "openInventoryCharacterDetail()",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "短內容",
+        "長內容",
+        "全部數值",
+        "捲動末項",
+        "返回重開"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "inventory.tab.equipment",
+      "label": "背包分類 equipment",
+      "entry": "openMapInventoryOverlay('home'); setInventoryFilter('equipment')",
+      "owner": "index.html; js/00-main.js; css/22-stage-v78-character-inventory-core.css; css/24-stage-v85-inventory-inner-grid-scroll-root.css",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "少資料",
+        "120格滿資料",
+        "末頁",
+        "切Tab",
+        "刷新",
+        "詳情返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "inventory.tab.item",
+      "label": "背包分類 item",
+      "entry": "openMapInventoryOverlay('home'); setInventoryFilter('item')",
+      "owner": "index.html; js/00-main.js; css/22-stage-v78-character-inventory-core.css; css/24-stage-v85-inventory-inner-grid-scroll-root.css",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "少資料",
+        "120格滿資料",
+        "末頁",
+        "切Tab",
+        "刷新",
+        "詳情返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "inventory.tab.material",
+      "label": "背包分類 material",
+      "entry": "openMapInventoryOverlay('home'); setInventoryFilter('material')",
+      "owner": "index.html; js/00-main.js; css/22-stage-v78-character-inventory-core.css; css/24-stage-v85-inventory-inner-grid-scroll-root.css",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "少資料",
+        "120格滿資料",
+        "末頁",
+        "切Tab",
+        "刷新",
+        "詳情返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "inventory.tab.function",
+      "label": "背包分類 function",
+      "entry": "openMapInventoryOverlay('home'); setInventoryFilter('function')",
+      "owner": "index.html; js/00-main.js; css/22-stage-v78-character-inventory-core.css; css/24-stage-v85-inventory-inner-grid-scroll-root.css",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "少資料",
+        "120格滿資料",
+        "末頁",
+        "切Tab",
+        "刷新",
+        "詳情返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "inventory.entry.home",
+      "label": "背包情境入口 home",
+      "entry": "openMapInventoryOverlay('home')",
+      "owner": "index.html; js/00-main.js; js/04-stage-v11-native-bottom-nav-runtime.js",
+      "status": "未檢查",
+      "states": [
+        "開啟",
+        "詳情覆蓋導覽",
+        "關閉還原",
+        "單指捲動"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "inventory.entry.training",
+      "label": "背包情境入口 training",
+      "entry": "openMapInventoryOverlay('training')",
+      "owner": "index.html; js/00-main.js; js/04-stage-v11-native-bottom-nav-runtime.js",
+      "status": "未檢查",
+      "states": [
+        "開啟",
+        "詳情覆蓋導覽",
+        "關閉還原",
+        "單指捲動"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "inventory.entry.dungeon",
+      "label": "背包情境入口 dungeon",
+      "entry": "openMapInventoryOverlay('dungeon')",
+      "owner": "index.html; js/00-main.js; js/04-stage-v11-native-bottom-nav-runtime.js",
+      "status": "未檢查",
+      "states": [
+        "開啟",
+        "詳情覆蓋導覽",
+        "關閉還原",
+        "單指捲動"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "inventory.entry.gameplay",
+      "label": "背包情境入口 gameplay",
+      "entry": "openMapInventoryOverlay('gameplay')",
+      "owner": "index.html; js/00-main.js; js/04-stage-v11-native-bottom-nav-runtime.js",
+      "status": "未檢查",
+      "states": [
+        "開啟",
+        "詳情覆蓋導覽",
+        "關閉還原",
+        "單指捲動"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "item.equipment",
+      "label": "裝備詳情",
+      "entry": "透過正式背包格 openItemModal / openEquippedItem",
+      "owner": "index.html; js/00-main.js; js/equipment-progression.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "長名稱",
+        "長詞條",
+        "缺少獲取來源",
+        "可用",
+        "禁用",
+        "批量",
+        "操作確認",
+        "返回原格"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "item.comparison",
+      "label": "裝備比較",
+      "entry": "透過正式背包格 openItemModal / openEquippedItem",
+      "owner": "index.html; js/00-main.js; js/equipment-progression.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "長名稱",
+        "長詞條",
+        "缺少獲取來源",
+        "可用",
+        "禁用",
+        "批量",
+        "操作確認",
+        "返回原格"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "item.potion",
+      "label": "補品詳情",
+      "entry": "透過正式背包格 openItemModal / openEquippedItem",
+      "owner": "index.html; js/00-main.js; js/equipment-progression.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "長名稱",
+        "長詞條",
+        "缺少獲取來源",
+        "可用",
+        "禁用",
+        "批量",
+        "操作確認",
+        "返回原格"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "item.material",
+      "label": "材料詳情",
+      "entry": "透過正式背包格 openItemModal / openEquippedItem",
+      "owner": "index.html; js/00-main.js; js/equipment-progression.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "長名稱",
+        "長詞條",
+        "缺少獲取來源",
+        "可用",
+        "禁用",
+        "批量",
+        "操作確認",
+        "返回原格"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "item.chest",
+      "label": "寶箱詳情",
+      "entry": "透過正式背包格 openItemModal / openEquippedItem",
+      "owner": "index.html; js/00-main.js; js/equipment-progression.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "長名稱",
+        "長詞條",
+        "缺少獲取來源",
+        "可用",
+        "禁用",
+        "批量",
+        "操作確認",
+        "返回原格"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "item.ticket",
+      "label": "票券詳情",
+      "entry": "透過正式背包格 openItemModal / openEquippedItem",
+      "owner": "index.html; js/00-main.js; js/equipment-progression.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "長名稱",
+        "長詞條",
+        "缺少獲取來源",
+        "可用",
+        "禁用",
+        "批量",
+        "操作確認",
+        "返回原格"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "preview.material",
+      "label": "material開啟／獎勵預覽",
+      "entry": "物品詳情→正式開啟預覽；v132ShowItemPreview",
+      "owner": "js/27-v132-content-expansion.js; js/equipment-progression.js; css/33-v132-content-expansion.css",
+      "status": "未檢查",
+      "states": [
+        "所有獎項",
+        "長說明",
+        "末項",
+        "子詳情",
+        "返回預覽",
+        "關閉重開",
+        "唯讀資產不變"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "preview.ticket",
+      "label": "ticket開啟／獎勵預覽",
+      "entry": "物品詳情→正式開啟預覽；v132ShowItemPreview",
+      "owner": "js/27-v132-content-expansion.js; js/equipment-progression.js; css/33-v132-content-expansion.css",
+      "status": "未檢查",
+      "states": [
+        "所有獎項",
+        "長說明",
+        "末項",
+        "子詳情",
+        "返回預覽",
+        "關閉重開",
+        "唯讀資產不變"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "preview.equipment",
+      "label": "equipment開啟／獎勵預覽",
+      "entry": "物品詳情→正式開啟預覽；v132ShowItemPreview",
+      "owner": "js/27-v132-content-expansion.js; js/equipment-progression.js; css/33-v132-content-expansion.css",
+      "status": "未檢查",
+      "states": [
+        "所有獎項",
+        "長說明",
+        "末項",
+        "子詳情",
+        "返回預覽",
+        "關閉重開",
+        "唯讀資產不變"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "shop.potion",
+      "label": "商店補品",
+      "entry": "openHomeFeature('shop'); 點擊正式分類TAB",
+      "owner": "index.html; js/00-main.js; js/equipment-progression.js",
+      "status": "未檢查",
+      "states": [
+        "可購買",
+        "金幣不足",
+        "數量最小/最大",
+        "輸入長數字",
+        "已售完",
+        "背包滿",
+        "詳情",
+        "購買確認",
+        "取消返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "shop.equipment",
+      "label": "商店裝備",
+      "entry": "openHomeFeature('shop'); 點擊正式分類TAB",
+      "owner": "index.html; js/00-main.js; js/equipment-progression.js",
+      "status": "未檢查",
+      "states": [
+        "可購買",
+        "金幣不足",
+        "數量最小/最大",
+        "輸入長數字",
+        "已售完",
+        "背包滿",
+        "詳情",
+        "購買確認",
+        "取消返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "shop.refresh",
+      "label": "商店刷新確認",
+      "entry": "商店裝備TAB→刷新",
+      "owner": "js/equipment-progression.js",
+      "status": "未檢查",
+      "states": [
+        "可刷新",
+        "不足",
+        "待確認",
+        "取消",
+        "失敗訊息"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "forge.reforge",
+      "label": "鍛造 reforge",
+      "entry": "openHomeFeature('forge'); v141SwitchForgeTab('reforge')",
+      "owner": "js/36-v141-content-systems.js; css/38-v141-system-expansion.css",
+      "status": "未檢查",
+      "states": [
+        "無裝備",
+        "多裝備",
+        "裝備選擇",
+        "材料不足",
+        "可操作",
+        "鎖定",
+        "待確認",
+        "禁用",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "forge.socket",
+      "label": "鍛造 socket",
+      "entry": "openHomeFeature('forge'); v141SwitchForgeTab('socket')",
+      "owner": "js/36-v141-content-systems.js; css/38-v141-system-expansion.css",
+      "status": "未檢查",
+      "states": [
+        "無裝備",
+        "多裝備",
+        "裝備選擇",
+        "材料不足",
+        "可操作",
+        "鎖定",
+        "待確認",
+        "禁用",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "forge.rules",
+      "label": "冶煉規則",
+      "entry": "v141ShowAffixInfo()",
+      "owner": "js/36-v141-content-systems.js; css/33-v132-content-expansion.css",
+      "status": "有問題",
+      "states": [
+        "六階材料",
+        "長規則",
+        "頂部",
+        "中段",
+        "末段",
+        "返回原冶煉"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "beforeEvidence": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b8cf058f-d363-4b76-bdc2-9466c58b3608.png",
+      "notes": "已實看原圖：返回蓋住桃紅材料及下方規則。尚無本輪裝置/修後證據。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "synthesis.talisman",
+      "label": "合成 talisman",
+      "entry": "v141SwitchSynthesisTab('talisman')",
+      "owner": "js/36-v141-content-systems.js; css/38-v141-system-expansion.css",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "滿資料",
+        "不足",
+        "可合成",
+        "數量最小/最大",
+        "待確認",
+        "結果",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "synthesis.fragment",
+      "label": "合成 fragment",
+      "entry": "v141SwitchSynthesisTab('fragment')",
+      "owner": "js/36-v141-content-systems.js; css/38-v141-system-expansion.css",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "滿資料",
+        "不足",
+        "可合成",
+        "數量最小/最大",
+        "待確認",
+        "結果",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "synthesis.material",
+      "label": "合成 material",
+      "entry": "v141SwitchSynthesisTab('material')",
+      "owner": "js/36-v141-content-systems.js; css/38-v141-system-expansion.css",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "滿資料",
+        "不足",
+        "可合成",
+        "數量最小/最大",
+        "待確認",
+        "結果",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "quest.daily",
+      "label": "任務 daily",
+      "entry": "openHomeFeature('quest'); 正式任務TAB",
+      "owner": "index.html; js/00-main.js; css/25-stage-v90-quest-interface-core.css",
+      "status": "未檢查",
+      "states": [
+        "未完成",
+        "可領取",
+        "已領取",
+        "長描述",
+        "列表末項",
+        "完成度五階獎勵",
+        "切頁返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "quest.commission",
+      "label": "任務 commission",
+      "entry": "openHomeFeature('quest'); 正式任務TAB",
+      "owner": "index.html; js/00-main.js; css/25-stage-v90-quest-interface-core.css",
+      "status": "未檢查",
+      "states": [
+        "未完成",
+        "可領取",
+        "已領取",
+        "長描述",
+        "列表末項",
+        "完成度五階獎勵",
+        "切頁返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "hero.overview",
+      "label": "英雄 overview",
+      "entry": "主城英雄→正式 overview 控制",
+      "owner": "index.html; js/00-main.js; js/hero-acquisition-client.js; js/hero-growth-client.js",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "已擁有",
+        "未擁有",
+        "鎖定",
+        "不足",
+        "可操作",
+        "待確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "hero.detail",
+      "label": "英雄 detail",
+      "entry": "主城英雄→正式 detail 控制",
+      "owner": "index.html; js/00-main.js; js/hero-acquisition-client.js; js/hero-growth-client.js",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "已擁有",
+        "未擁有",
+        "鎖定",
+        "不足",
+        "可操作",
+        "待確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "hero.formation",
+      "label": "英雄 formation",
+      "entry": "主城英雄→正式 formation 控制",
+      "owner": "index.html; js/00-main.js; js/hero-acquisition-client.js; js/hero-growth-client.js",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "已擁有",
+        "未擁有",
+        "鎖定",
+        "不足",
+        "可操作",
+        "待確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "hero.acquisition",
+      "label": "英雄 acquisition",
+      "entry": "主城英雄→正式 acquisition 控制",
+      "owner": "index.html; js/00-main.js; js/hero-acquisition-client.js; js/hero-growth-client.js",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "已擁有",
+        "未擁有",
+        "鎖定",
+        "不足",
+        "可操作",
+        "待確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "hero.growth",
+      "label": "英雄 growth",
+      "entry": "主城英雄→正式 growth 控制",
+      "owner": "index.html; js/00-main.js; js/hero-acquisition-client.js; js/hero-growth-client.js",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "已擁有",
+        "未擁有",
+        "鎖定",
+        "不足",
+        "可操作",
+        "待確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "relic.overview",
+      "label": "秘寶 overview",
+      "entry": "openHomeFeature('relic'); 正式 overview 控制",
+      "owner": "js/60-team-relic-system.js; css/55-team-relic-system.css",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "未取得",
+        "已取得",
+        "可操作",
+        "不足",
+        "選取",
+        "長說明",
+        "列表末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "relic.tabs",
+      "label": "秘寶 tabs",
+      "entry": "openHomeFeature('relic'); 正式 tabs 控制",
+      "owner": "js/60-team-relic-system.js; css/55-team-relic-system.css",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "未取得",
+        "已取得",
+        "可操作",
+        "不足",
+        "選取",
+        "長說明",
+        "列表末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "relic.detail",
+      "label": "秘寶 detail",
+      "entry": "openHomeFeature('relic'); 正式 detail 控制",
+      "owner": "js/60-team-relic-system.js; css/55-team-relic-system.css",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "未取得",
+        "已取得",
+        "可操作",
+        "不足",
+        "選取",
+        "長說明",
+        "列表末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "relic.growth",
+      "label": "秘寶 growth",
+      "entry": "openHomeFeature('relic'); 正式 growth 控制",
+      "owner": "js/60-team-relic-system.js; css/55-team-relic-system.css",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "未取得",
+        "已取得",
+        "可操作",
+        "不足",
+        "選取",
+        "長說明",
+        "列表末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "relic.equip",
+      "label": "秘寶 equip",
+      "entry": "openHomeFeature('relic'); 正式 equip 控制",
+      "owner": "js/60-team-relic-system.js; css/55-team-relic-system.css",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "未取得",
+        "已取得",
+        "可操作",
+        "不足",
+        "選取",
+        "長說明",
+        "列表末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "auto.character",
+      "label": "自動戰鬥 character",
+      "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "選單展開",
+        "已選取",
+        "禁用",
+        "鎖定",
+        "長選項",
+        "單指捲動",
+        "套用待確認",
+        "取消返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "auto.strategy",
+      "label": "自動戰鬥 strategy",
+      "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "選單展開",
+        "已選取",
+        "禁用",
+        "鎖定",
+        "長選項",
+        "單指捲動",
+        "套用待確認",
+        "取消返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "auto.hp",
+      "label": "自動戰鬥 hp",
+      "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "選單展開",
+        "已選取",
+        "禁用",
+        "鎖定",
+        "長選項",
+        "單指捲動",
+        "套用待確認",
+        "取消返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "auto.sp",
+      "label": "自動戰鬥 sp",
+      "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "選單展開",
+        "已選取",
+        "禁用",
+        "鎖定",
+        "長選項",
+        "單指捲動",
+        "套用待確認",
+        "取消返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "auto.return",
+      "label": "自動戰鬥 return",
+      "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "選單展開",
+        "已選取",
+        "禁用",
+        "鎖定",
+        "長選項",
+        "單指捲動",
+        "套用待確認",
+        "取消返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "auto.element-box",
+      "label": "自動戰鬥 element-box",
+      "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "選單展開",
+        "已選取",
+        "禁用",
+        "鎖定",
+        "長選項",
+        "單指捲動",
+        "套用待確認",
+        "取消返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "auto.apply",
+      "label": "自動戰鬥 apply",
+      "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "選單展開",
+        "已選取",
+        "禁用",
+        "鎖定",
+        "長選項",
+        "單指捲動",
+        "套用待確認",
+        "取消返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "utility.achievement",
+      "label": "achievement內頁及動作",
+      "entry": "openHomeFeature('achievement')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "長資料",
+        "可操作",
+        "禁用",
+        "載入",
+        "失敗",
+        "待確認",
+        "結果",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "utility.announcement",
+      "label": "announcement內頁及動作",
+      "entry": "openHomeFeature('announcement')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "長資料",
+        "可操作",
+        "禁用",
+        "載入",
+        "失敗",
+        "待確認",
+        "結果",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "utility.system",
+      "label": "system內頁及動作",
+      "entry": "openHomeFeature('system')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "長資料",
+        "可操作",
+        "禁用",
+        "載入",
+        "失敗",
+        "待確認",
+        "結果",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "utility.offlineExp",
+      "label": "offlineExp內頁及動作",
+      "entry": "openHomeFeature('offlineExp')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "長資料",
+        "可操作",
+        "禁用",
+        "載入",
+        "失敗",
+        "待確認",
+        "結果",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "utility.rest",
+      "label": "rest內頁及動作",
+      "entry": "openHomeFeature('rest')",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "空資料",
+        "長資料",
+        "可操作",
+        "禁用",
+        "載入",
+        "失敗",
+        "待確認",
+        "結果",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "page.training",
+      "label": "玩法主頁 training",
+      "entry": "showPage('training') 或正式玩法入口",
+      "owner": "index.html; js/00-main.js; js/gameplay-boss-tower-system.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "資料長",
+        "入口通知",
+        "列表末項",
+        "返回主城"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "page.dungeon",
+      "label": "玩法主頁 dungeon",
+      "entry": "showPage('dungeon') 或正式玩法入口",
+      "owner": "index.html; js/00-main.js; js/gameplay-boss-tower-system.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "資料長",
+        "入口通知",
+        "列表末項",
+        "返回主城"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "page.boss",
+      "label": "玩法主頁 boss",
+      "entry": "showPage('boss') 或正式玩法入口",
+      "owner": "index.html; js/00-main.js; js/gameplay-boss-tower-system.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "資料長",
+        "入口通知",
+        "列表末項",
+        "返回主城"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "page.gameplay",
+      "label": "玩法主頁 gameplay",
+      "entry": "showPage('gameplay') 或正式玩法入口",
+      "owner": "index.html; js/00-main.js; js/gameplay-boss-tower-system.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "資料長",
+        "入口通知",
+        "列表末項",
+        "返回主城"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "page.tower",
+      "label": "玩法主頁 tower",
+      "entry": "showPage('tower') 或正式玩法入口",
+      "owner": "index.html; js/00-main.js; js/gameplay-boss-tower-system.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "資料長",
+        "入口通知",
+        "列表末項",
+        "返回主城"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "page.adventure",
+      "label": "玩法主頁 adventure",
+      "entry": "showPage('adventure') 或正式玩法入口",
+      "owner": "index.html; js/00-main.js; js/gameplay-boss-tower-system.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "資料長",
+        "入口通知",
+        "列表末項",
+        "返回主城"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "training.forest",
+      "label": "練功區詳情 forest",
+      "entry": "openTrainingZoneInfo('forest')",
+      "owner": "index.html; js/00-main.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "怪物列表",
+        "獎勵預覽",
+        "長說明",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "training.desert",
+      "label": "練功區詳情 desert",
+      "entry": "openTrainingZoneInfo('desert')",
+      "owner": "index.html; js/00-main.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "怪物列表",
+        "獎勵預覽",
+        "長說明",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "training.ice",
+      "label": "練功區詳情 ice",
+      "entry": "openTrainingZoneInfo('ice')",
+      "owner": "index.html; js/00-main.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "怪物列表",
+        "獎勵預覽",
+        "長說明",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "training.zone4",
+      "label": "練功區詳情 zone4",
+      "entry": "openTrainingZoneInfo('zone4')",
+      "owner": "index.html; js/00-main.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "怪物列表",
+        "獎勵預覽",
+        "長說明",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "training.zone5",
+      "label": "練功區詳情 zone5",
+      "entry": "openTrainingZoneInfo('zone5')",
+      "owner": "index.html; js/00-main.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "怪物列表",
+        "獎勵預覽",
+        "長說明",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "training.zone6",
+      "label": "練功區詳情 zone6",
+      "entry": "openTrainingZoneInfo('zone6')",
+      "owner": "index.html; js/00-main.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "怪物列表",
+        "獎勵預覽",
+        "長說明",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "training.zone7",
+      "label": "練功區詳情 zone7",
+      "entry": "openTrainingZoneInfo('zone7')",
+      "owner": "index.html; js/00-main.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "怪物列表",
+        "獎勵預覽",
+        "長說明",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "training.zone8",
+      "label": "練功區詳情 zone8",
+      "entry": "openTrainingZoneInfo('zone8')",
+      "owner": "index.html; js/00-main.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "怪物列表",
+        "獎勵預覽",
+        "長說明",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "training.zone9",
+      "label": "練功區詳情 zone9",
+      "entry": "openTrainingZoneInfo('zone9')",
+      "owner": "index.html; js/00-main.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "怪物列表",
+        "獎勵預覽",
+        "長說明",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "training.zone10",
+      "label": "練功區詳情 zone10",
+      "entry": "openTrainingZoneInfo('zone10')",
+      "owner": "index.html; js/00-main.js",
+      "status": "未檢查",
+      "states": [
+        "未解鎖",
+        "可進入",
+        "怪物列表",
+        "獎勵預覽",
+        "長說明",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "dungeon.exp",
+      "label": "exp日常副本與獎勵",
+      "entry": "v141ShowDungeonRewardPreview('exp')",
+      "owner": "js/36-v141-content-systems.js; js/equipment-progression.js",
+      "status": "未檢查",
+      "states": [
+        "剩餘次數",
+        "已耗盡",
+        "難度鎖定",
+        "可進入",
+        "全部獎勵",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "dungeon.material",
+      "label": "material日常副本與獎勵",
+      "entry": "v141ShowDungeonRewardPreview('material')",
+      "owner": "js/36-v141-content-systems.js; js/equipment-progression.js",
+      "status": "未檢查",
+      "states": [
+        "剩餘次數",
+        "已耗盡",
+        "難度鎖定",
+        "可進入",
+        "全部獎勵",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "dungeon.equipment",
+      "label": "equipment日常副本與獎勵",
+      "entry": "v141ShowDungeonRewardPreview('equipment')",
+      "owner": "js/36-v141-content-systems.js; js/equipment-progression.js",
+      "status": "未檢查",
+      "states": [
+        "剩餘次數",
+        "已耗盡",
+        "難度鎖定",
+        "可進入",
+        "全部獎勵",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "boss.personal",
+      "label": "personal首領TAB與詳情",
+      "entry": "vGameplaySwitchBossTab('personal'); vGameplayOpenBossDetail(...)",
+      "owner": "js/gameplay-boss-tower-system.js",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "可挑戰",
+        "冷卻",
+        "已完成",
+        "長機制",
+        "獎勵",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "boss.world",
+      "label": "world首領TAB與詳情",
+      "entry": "vGameplaySwitchBossTab('world'); vGameplayOpenBossDetail(...)",
+      "owner": "js/gameplay-boss-tower-system.js",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "可挑戰",
+        "冷卻",
+        "已完成",
+        "長機制",
+        "獎勵",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "gameplay.tower-overview",
+      "label": "tower-overview內頁",
+      "entry": "玩法頁正式入口→tower-overview",
+      "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "解鎖",
+        "可操作",
+        "禁用",
+        "長資料",
+        "詳情",
+        "末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "gameplay.tower-floor",
+      "label": "tower-floor內頁",
+      "entry": "玩法頁正式入口→tower-floor",
+      "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "解鎖",
+        "可操作",
+        "禁用",
+        "長資料",
+        "詳情",
+        "末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "gameplay.abyss-regions",
+      "label": "abyss-regions內頁",
+      "entry": "玩法頁正式入口→abyss-regions",
+      "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "解鎖",
+        "可操作",
+        "禁用",
+        "長資料",
+        "詳情",
+        "末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "gameplay.abyss-detail",
+      "label": "abyss-detail內頁",
+      "entry": "玩法頁正式入口→abyss-detail",
+      "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "解鎖",
+        "可操作",
+        "禁用",
+        "長資料",
+        "詳情",
+        "末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "gameplay.adventure-chapter",
+      "label": "adventure-chapter內頁",
+      "entry": "玩法頁正式入口→adventure-chapter",
+      "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "解鎖",
+        "可操作",
+        "禁用",
+        "長資料",
+        "詳情",
+        "末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "gameplay.adventure-node",
+      "label": "adventure-node內頁",
+      "entry": "玩法頁正式入口→adventure-node",
+      "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "解鎖",
+        "可操作",
+        "禁用",
+        "長資料",
+        "詳情",
+        "末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "gameplay.adventure-event",
+      "label": "adventure-event內頁",
+      "entry": "玩法頁正式入口→adventure-event",
+      "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "解鎖",
+        "可操作",
+        "禁用",
+        "長資料",
+        "詳情",
+        "末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "gameplay.patrol",
+      "label": "patrol內頁",
+      "entry": "玩法頁正式入口→patrol",
+      "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "解鎖",
+        "可操作",
+        "禁用",
+        "長資料",
+        "詳情",
+        "末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "gameplay.monster-catalog",
+      "label": "monster-catalog內頁",
+      "entry": "玩法頁正式入口→monster-catalog",
+      "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
+      "status": "未檢查",
+      "states": [
+        "鎖定",
+        "解鎖",
+        "可操作",
+        "禁用",
+        "長資料",
+        "詳情",
+        "末項",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "battle.hud",
+      "label": "戰鬥 hud",
+      "entry": "隔離QA帳號→正式戰鬥控制 hud",
+      "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
+      "status": "未檢查",
+      "states": [
+        "可操作",
+        "禁用",
+        "等待",
+        "長名稱",
+        "長說明",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "battle.skills",
+      "label": "戰鬥 skills",
+      "entry": "隔離QA帳號→正式戰鬥控制 skills",
+      "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
+      "status": "未檢查",
+      "states": [
+        "可操作",
+        "禁用",
+        "等待",
+        "長名稱",
+        "長說明",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "battle.items-potion",
+      "label": "戰鬥 items-potion",
+      "entry": "隔離QA帳號→正式戰鬥控制 items-potion",
+      "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
+      "status": "未檢查",
+      "states": [
+        "可操作",
+        "禁用",
+        "等待",
+        "長名稱",
+        "長說明",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "battle.items-talisman",
+      "label": "戰鬥 items-talisman",
+      "entry": "隔離QA帳號→正式戰鬥控制 items-talisman",
+      "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
+      "status": "未檢查",
+      "states": [
+        "可操作",
+        "禁用",
+        "等待",
+        "長名稱",
+        "長說明",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "battle.target",
+      "label": "戰鬥 target",
+      "entry": "隔離QA帳號→正式戰鬥控制 target",
+      "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
+      "status": "未檢查",
+      "states": [
+        "可操作",
+        "禁用",
+        "等待",
+        "長名稱",
+        "長說明",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "battle.status-detail",
+      "label": "戰鬥 status-detail",
+      "entry": "隔離QA帳號→正式戰鬥控制 status-detail",
+      "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
+      "status": "未檢查",
+      "states": [
+        "可操作",
+        "禁用",
+        "等待",
+        "長名稱",
+        "長說明",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "battle.statistics",
+      "label": "戰鬥 statistics",
+      "entry": "隔離QA帳號→正式戰鬥控制 statistics",
+      "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
+      "status": "未檢查",
+      "states": [
+        "可操作",
+        "禁用",
+        "等待",
+        "長名稱",
+        "長說明",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "battle.boss-mechanism",
+      "label": "戰鬥 boss-mechanism",
+      "entry": "隔離QA帳號→正式戰鬥控制 boss-mechanism",
+      "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
+      "status": "未檢查",
+      "states": [
+        "可操作",
+        "禁用",
+        "等待",
+        "長名稱",
+        "長說明",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "battle.auto",
+      "label": "戰鬥 auto",
+      "entry": "隔離QA帳號→正式戰鬥控制 auto",
+      "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
+      "status": "未檢查",
+      "states": [
+        "可操作",
+        "禁用",
+        "等待",
+        "長名稱",
+        "長說明",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "battle.escape",
+      "label": "戰鬥 escape",
+      "entry": "隔離QA帳號→正式戰鬥控制 escape",
+      "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
+      "status": "未檢查",
+      "states": [
+        "可操作",
+        "禁用",
+        "等待",
+        "長名稱",
+        "長說明",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "battle.victory",
+      "label": "戰鬥 victory",
+      "entry": "隔離QA帳號→正式戰鬥控制 victory",
+      "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
+      "status": "未檢查",
+      "states": [
+        "可操作",
+        "禁用",
+        "等待",
+        "長名稱",
+        "長說明",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "battle.defeat",
+      "label": "戰鬥 defeat",
+      "entry": "隔離QA帳號→正式戰鬥控制 defeat",
+      "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
+      "status": "未檢查",
+      "states": [
+        "可操作",
+        "禁用",
+        "等待",
+        "長名稱",
+        "長說明",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "battle.reward",
+      "label": "戰鬥 reward",
+      "entry": "隔離QA帳號→正式戰鬥控制 reward",
+      "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
+      "status": "未檢查",
+      "states": [
+        "可操作",
+        "禁用",
+        "等待",
+        "長名稱",
+        "長說明",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "creation.step1",
+      "label": "創角 step1",
+      "entry": "openCharacterCreation(slot); 正式創角操作",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次角色",
+        "新增角色",
+        "長名稱",
+        "未輸入",
+        "有輸入",
+        "點數耗盡",
+        "待確認",
+        "禁用",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "creation.element-fire",
+      "label": "創角 element-fire",
+      "entry": "openCharacterCreation(slot); 正式創角操作",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次角色",
+        "新增角色",
+        "長名稱",
+        "未輸入",
+        "有輸入",
+        "點數耗盡",
+        "待確認",
+        "禁用",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "creation.element-water",
+      "label": "創角 element-water",
+      "entry": "openCharacterCreation(slot); 正式創角操作",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次角色",
+        "新增角色",
+        "長名稱",
+        "未輸入",
+        "有輸入",
+        "點數耗盡",
+        "待確認",
+        "禁用",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "creation.element-wind",
+      "label": "創角 element-wind",
+      "entry": "openCharacterCreation(slot); 正式創角操作",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次角色",
+        "新增角色",
+        "長名稱",
+        "未輸入",
+        "有輸入",
+        "點數耗盡",
+        "待確認",
+        "禁用",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "creation.element-earth",
+      "label": "創角 element-earth",
+      "entry": "openCharacterCreation(slot); 正式創角操作",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次角色",
+        "新增角色",
+        "長名稱",
+        "未輸入",
+        "有輸入",
+        "點數耗盡",
+        "待確認",
+        "禁用",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "creation.gender",
+      "label": "創角 gender",
+      "entry": "openCharacterCreation(slot); 正式創角操作",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次角色",
+        "新增角色",
+        "長名稱",
+        "未輸入",
+        "有輸入",
+        "點數耗盡",
+        "待確認",
+        "禁用",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "creation.skill-detail",
+      "label": "創角 skill-detail",
+      "entry": "openCharacterCreation(slot); 正式創角操作",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次角色",
+        "新增角色",
+        "長名稱",
+        "未輸入",
+        "有輸入",
+        "點數耗盡",
+        "待確認",
+        "禁用",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "creation.step2",
+      "label": "創角 step2",
+      "entry": "openCharacterCreation(slot); 正式創角操作",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次角色",
+        "新增角色",
+        "長名稱",
+        "未輸入",
+        "有輸入",
+        "點數耗盡",
+        "待確認",
+        "禁用",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "creation.stats",
+      "label": "創角 stats",
+      "entry": "openCharacterCreation(slot); 正式創角操作",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次角色",
+        "新增角色",
+        "長名稱",
+        "未輸入",
+        "有輸入",
+        "點數耗盡",
+        "待確認",
+        "禁用",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "creation.submit",
+      "label": "創角 submit",
+      "entry": "openCharacterCreation(slot); 正式創角操作",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次角色",
+        "新增角色",
+        "長名稱",
+        "未輸入",
+        "有輸入",
+        "點數耗盡",
+        "待確認",
+        "禁用",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "creation.cancel",
+      "label": "創角 cancel",
+      "entry": "openCharacterCreation(slot); 正式創角操作",
+      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "首次角色",
+        "新增角色",
+        "長名稱",
+        "未輸入",
+        "有輸入",
+        "點數耗盡",
+        "待確認",
+        "禁用",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "startup.auth",
+      "label": "啟動/帳號提示 auth",
+      "entry": "隔離測試正式入口；不得操作玩家資料",
+      "owner": "js/firebase/firebase-auth-ui.js; js/startup; 精確owner待核對",
+      "status": "未檢查",
+      "states": [
+        "載入",
+        "失敗",
+        "重試",
+        "待確認",
+        "長訊息",
+        "禁用"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "本工作限呈現檢查；不放寬或修改Auth/Save/Security契約。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "startup.privacy",
+      "label": "啟動/帳號提示 privacy",
+      "entry": "隔離測試正式入口；不得操作玩家資料",
+      "owner": "js/firebase/firebase-auth-ui.js; js/startup; 精確owner待核對",
+      "status": "未檢查",
+      "states": [
+        "載入",
+        "失敗",
+        "重試",
+        "待確認",
+        "長訊息",
+        "禁用"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "本工作限呈現檢查；不放寬或修改Auth/Save/Security契約。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "startup.first-load",
+      "label": "啟動/帳號提示 first-load",
+      "entry": "隔離測試正式入口；不得操作玩家資料",
+      "owner": "js/firebase/firebase-auth-ui.js; js/startup; 精確owner待核對",
+      "status": "未檢查",
+      "states": [
+        "載入",
+        "失敗",
+        "重試",
+        "待確認",
+        "長訊息",
+        "禁用"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "本工作限呈現檢查；不放寬或修改Auth/Save/Security契約。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "startup.loading-failure",
+      "label": "啟動/帳號提示 loading-failure",
+      "entry": "隔離測試正式入口；不得操作玩家資料",
+      "owner": "js/firebase/firebase-auth-ui.js; js/startup; 精確owner待核對",
+      "status": "未檢查",
+      "states": [
+        "載入",
+        "失敗",
+        "重試",
+        "待確認",
+        "長訊息",
+        "禁用"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "本工作限呈現檢查；不放寬或修改Auth/Save/Security契約。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "startup.session-notice",
+      "label": "啟動/帳號提示 session-notice",
+      "entry": "隔離測試正式入口；不得操作玩家資料",
+      "owner": "js/firebase/firebase-auth-ui.js; js/startup; 精確owner待核對",
+      "status": "未檢查",
+      "states": [
+        "載入",
+        "失敗",
+        "重試",
+        "待確認",
+        "長訊息",
+        "禁用"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "本工作限呈現檢查；不放寬或修改Auth/Save/Security契約。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "startup.save-error",
+      "label": "啟動/帳號提示 save-error",
+      "entry": "隔離測試正式入口；不得操作玩家資料",
+      "owner": "js/firebase/firebase-auth-ui.js; js/startup; 精確owner待核對",
+      "status": "未檢查",
+      "states": [
+        "載入",
+        "失敗",
+        "重試",
+        "待確認",
+        "長訊息",
+        "禁用"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "notes": "本工作限呈現檢查；不放寬或修改Auth/Save/Security契約。",
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "shared.alert",
+      "label": "共用 alert",
+      "entry": "由實際功能開啟既有共用對話框",
+      "owner": "index.html; js/00-main.js; js/27-v132-content-expansion.js; css/33-v132-content-expansion.css; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "短文",
+        "長文",
+        "主要/次要操作",
+        "取消",
+        "禁用",
+        "載入",
+        "失敗",
+        "待確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "shared.confirm",
+      "label": "共用 confirm",
+      "entry": "由實際功能開啟既有共用對話框",
+      "owner": "index.html; js/00-main.js; js/27-v132-content-expansion.js; css/33-v132-content-expansion.css; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "短文",
+        "長文",
+        "主要/次要操作",
+        "取消",
+        "禁用",
+        "載入",
+        "失敗",
+        "待確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "shared.prompt",
+      "label": "共用 prompt",
+      "entry": "由實際功能開啟既有共用對話框",
+      "owner": "index.html; js/00-main.js; js/27-v132-content-expansion.js; css/33-v132-content-expansion.css; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "短文",
+        "長文",
+        "主要/次要操作",
+        "取消",
+        "禁用",
+        "載入",
+        "失敗",
+        "待確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "shared.toast",
+      "label": "共用 toast",
+      "entry": "由實際功能開啟既有共用對話框",
+      "owner": "index.html; js/00-main.js; js/27-v132-content-expansion.js; css/33-v132-content-expansion.css; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "短文",
+        "長文",
+        "主要/次要操作",
+        "取消",
+        "禁用",
+        "載入",
+        "失敗",
+        "待確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "shared.reward-result",
+      "label": "共用 reward-result",
+      "entry": "由實際功能開啟既有共用對話框",
+      "owner": "index.html; js/00-main.js; js/27-v132-content-expansion.js; css/33-v132-content-expansion.css; css/49-v169-rpg-ui.css",
+      "status": "未檢查",
+      "states": [
+        "短文",
+        "長文",
+        "主要/次要操作",
+        "取消",
+        "禁用",
+        "載入",
+        "失敗",
+        "待確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "shared.navigation",
+      "label": "底部導覽與覆蓋還原",
+      "entry": "主城/練功/背包/玩法→詳情→返回",
+      "owner": "js/04-stage-v11-native-bottom-nav-runtime.js; css/06-stage-v11-native-bottom-nav.css",
+      "status": "未檢查",
+      "states": [
+        "選取",
+        "通知",
+        "modal覆蓋",
+        "還原",
+        "連續切頁"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    },
+    {
+      "id": "shared.gestures",
+      "label": "觸控、長按及圖片保護",
+      "entry": "各實際捲動區與圖片執行單指/雙指/長按",
+      "owner": "js/01-stage-v8-touch-lock.js; css/00-main.css",
+      "status": "未檢查",
+      "states": [
+        "單指垂直",
+        "單指水平",
+        "雙指不可縮放",
+        "圖片長按",
+        "控制拖曳",
+        "文字輸入"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      }
+    }
+  ]
+}
+
