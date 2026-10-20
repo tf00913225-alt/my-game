@@ -6393,7 +6393,7 @@
       "label": "玩法主頁 training",
       "entry": "showPage('training') 或正式玩法入口",
       "owner": "index.html; js/00-main.js; js/gameplay-boss-tower-system.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -6444,6 +6444,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-10",
+        "head": "803c309de1185e6d331a8d4967f7a717939c2fef",
+        "baseHeaderEvidenceHead": "e2a532203fdbce21dbb7b724b3c718a82cabd177",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment10-accepted",
+        "verified": [
+          "十卡真入口／頂返回（e2基準）",
+          "對稱獨立題牌／文字置中",
+          "首區可用／末區鎖定與可用隔離情境（803delta）",
+          "所有modal按鍵最小44.57screenpx",
+          "原怪物名單克隆5次壓力情境真touch／wheel末端及body返回"
+        ],
+        "notVerified": [
+          "進入地區／戰鬥與掉落",
+          "真實升級與解鎖過程",
+          "實體裝置",
+          "未列出其他載入／失敗狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸14張基準＋8張最終delta限定通過",
+          "interaction": "e2十卡基準＋803四尺寸9圖真操作delta限定通過",
+          "scope": "原CSS20／49與生成物／實圖限定通過，無JS修改"
+        }
       }
     },
     {
@@ -7021,7 +7051,7 @@
       "label": "練功區詳情 forest",
       "entry": "openTrainingZoneInfo('forest')",
       "owner": "index.html; js/00-main.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -7072,6 +7102,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-10",
+        "head": "803c309de1185e6d331a8d4967f7a717939c2fef",
+        "baseHeaderEvidenceHead": "e2a532203fdbce21dbb7b724b3c718a82cabd177",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment10-accepted",
+        "verified": [
+          "十卡真入口／頂返回（e2基準）",
+          "對稱獨立題牌／文字置中",
+          "首區可用／末區鎖定與可用隔離情境（803delta）",
+          "所有modal按鍵最小44.57screenpx",
+          "原怪物名單克隆5次壓力情境真touch／wheel末端及body返回"
+        ],
+        "notVerified": [
+          "進入地區／戰鬥與掉落",
+          "真實升級與解鎖過程",
+          "實體裝置",
+          "未列出其他載入／失敗狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸14張基準＋8張最終delta限定通過",
+          "interaction": "e2十卡基準＋803四尺寸9圖真操作delta限定通過",
+          "scope": "原CSS20／49與生成物／實圖限定通過，無JS修改"
+        }
       }
     },
     {
@@ -7079,7 +7139,7 @@
       "label": "練功區詳情 desert",
       "entry": "openTrainingZoneInfo('desert')",
       "owner": "index.html; js/00-main.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -7130,6 +7190,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-10",
+        "head": "803c309de1185e6d331a8d4967f7a717939c2fef",
+        "baseHeaderEvidenceHead": "e2a532203fdbce21dbb7b724b3c718a82cabd177",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment10-accepted",
+        "verified": [
+          "十卡真入口／頂返回（e2基準）",
+          "對稱獨立題牌／文字置中",
+          "首區可用／末區鎖定與可用隔離情境（803delta）",
+          "所有modal按鍵最小44.57screenpx",
+          "原怪物名單克隆5次壓力情境真touch／wheel末端及body返回"
+        ],
+        "notVerified": [
+          "進入地區／戰鬥與掉落",
+          "真實升級與解鎖過程",
+          "實體裝置",
+          "未列出其他載入／失敗狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸14張基準＋8張最終delta限定通過",
+          "interaction": "e2十卡基準＋803四尺寸9圖真操作delta限定通過",
+          "scope": "原CSS20／49與生成物／實圖限定通過，無JS修改"
+        }
       }
     },
     {
@@ -7137,7 +7227,7 @@
       "label": "練功區詳情 ice",
       "entry": "openTrainingZoneInfo('ice')",
       "owner": "index.html; js/00-main.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -7188,6 +7278,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-10",
+        "head": "803c309de1185e6d331a8d4967f7a717939c2fef",
+        "baseHeaderEvidenceHead": "e2a532203fdbce21dbb7b724b3c718a82cabd177",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment10-accepted",
+        "verified": [
+          "十卡真入口／頂返回（e2基準）",
+          "對稱獨立題牌／文字置中",
+          "首區可用／末區鎖定與可用隔離情境（803delta）",
+          "所有modal按鍵最小44.57screenpx",
+          "原怪物名單克隆5次壓力情境真touch／wheel末端及body返回"
+        ],
+        "notVerified": [
+          "進入地區／戰鬥與掉落",
+          "真實升級與解鎖過程",
+          "實體裝置",
+          "未列出其他載入／失敗狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸14張基準＋8張最終delta限定通過",
+          "interaction": "e2十卡基準＋803四尺寸9圖真操作delta限定通過",
+          "scope": "原CSS20／49與生成物／實圖限定通過，無JS修改"
+        }
       }
     },
     {
@@ -7195,7 +7315,7 @@
       "label": "練功區詳情 zone4",
       "entry": "openTrainingZoneInfo('zone4')",
       "owner": "index.html; js/00-main.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -7246,6 +7366,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-10",
+        "head": "803c309de1185e6d331a8d4967f7a717939c2fef",
+        "baseHeaderEvidenceHead": "e2a532203fdbce21dbb7b724b3c718a82cabd177",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment10-accepted",
+        "verified": [
+          "十卡真入口／頂返回（e2基準）",
+          "對稱獨立題牌／文字置中",
+          "首區可用／末區鎖定與可用隔離情境（803delta）",
+          "所有modal按鍵最小44.57screenpx",
+          "原怪物名單克隆5次壓力情境真touch／wheel末端及body返回"
+        ],
+        "notVerified": [
+          "進入地區／戰鬥與掉落",
+          "真實升級與解鎖過程",
+          "實體裝置",
+          "未列出其他載入／失敗狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸14張基準＋8張最終delta限定通過",
+          "interaction": "e2十卡基準＋803四尺寸9圖真操作delta限定通過",
+          "scope": "原CSS20／49與生成物／實圖限定通過，無JS修改"
+        }
       }
     },
     {
@@ -7253,7 +7403,7 @@
       "label": "練功區詳情 zone5",
       "entry": "openTrainingZoneInfo('zone5')",
       "owner": "index.html; js/00-main.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -7304,6 +7454,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-10",
+        "head": "803c309de1185e6d331a8d4967f7a717939c2fef",
+        "baseHeaderEvidenceHead": "e2a532203fdbce21dbb7b724b3c718a82cabd177",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment10-accepted",
+        "verified": [
+          "十卡真入口／頂返回（e2基準）",
+          "對稱獨立題牌／文字置中",
+          "首區可用／末區鎖定與可用隔離情境（803delta）",
+          "所有modal按鍵最小44.57screenpx",
+          "原怪物名單克隆5次壓力情境真touch／wheel末端及body返回"
+        ],
+        "notVerified": [
+          "進入地區／戰鬥與掉落",
+          "真實升級與解鎖過程",
+          "實體裝置",
+          "未列出其他載入／失敗狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸14張基準＋8張最終delta限定通過",
+          "interaction": "e2十卡基準＋803四尺寸9圖真操作delta限定通過",
+          "scope": "原CSS20／49與生成物／實圖限定通過，無JS修改"
+        }
       }
     },
     {
@@ -7311,7 +7491,7 @@
       "label": "練功區詳情 zone6",
       "entry": "openTrainingZoneInfo('zone6')",
       "owner": "index.html; js/00-main.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -7362,6 +7542,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-10",
+        "head": "803c309de1185e6d331a8d4967f7a717939c2fef",
+        "baseHeaderEvidenceHead": "e2a532203fdbce21dbb7b724b3c718a82cabd177",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment10-accepted",
+        "verified": [
+          "十卡真入口／頂返回（e2基準）",
+          "對稱獨立題牌／文字置中",
+          "首區可用／末區鎖定與可用隔離情境（803delta）",
+          "所有modal按鍵最小44.57screenpx",
+          "原怪物名單克隆5次壓力情境真touch／wheel末端及body返回"
+        ],
+        "notVerified": [
+          "進入地區／戰鬥與掉落",
+          "真實升級與解鎖過程",
+          "實體裝置",
+          "未列出其他載入／失敗狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸14張基準＋8張最終delta限定通過",
+          "interaction": "e2十卡基準＋803四尺寸9圖真操作delta限定通過",
+          "scope": "原CSS20／49與生成物／實圖限定通過，無JS修改"
+        }
       }
     },
     {
@@ -7369,7 +7579,7 @@
       "label": "練功區詳情 zone7",
       "entry": "openTrainingZoneInfo('zone7')",
       "owner": "index.html; js/00-main.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -7420,6 +7630,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-10",
+        "head": "803c309de1185e6d331a8d4967f7a717939c2fef",
+        "baseHeaderEvidenceHead": "e2a532203fdbce21dbb7b724b3c718a82cabd177",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment10-accepted",
+        "verified": [
+          "十卡真入口／頂返回（e2基準）",
+          "對稱獨立題牌／文字置中",
+          "首區可用／末區鎖定與可用隔離情境（803delta）",
+          "所有modal按鍵最小44.57screenpx",
+          "原怪物名單克隆5次壓力情境真touch／wheel末端及body返回"
+        ],
+        "notVerified": [
+          "進入地區／戰鬥與掉落",
+          "真實升級與解鎖過程",
+          "實體裝置",
+          "未列出其他載入／失敗狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸14張基準＋8張最終delta限定通過",
+          "interaction": "e2十卡基準＋803四尺寸9圖真操作delta限定通過",
+          "scope": "原CSS20／49與生成物／實圖限定通過，無JS修改"
+        }
       }
     },
     {
@@ -7427,7 +7667,7 @@
       "label": "練功區詳情 zone8",
       "entry": "openTrainingZoneInfo('zone8')",
       "owner": "index.html; js/00-main.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -7478,6 +7718,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-10",
+        "head": "803c309de1185e6d331a8d4967f7a717939c2fef",
+        "baseHeaderEvidenceHead": "e2a532203fdbce21dbb7b724b3c718a82cabd177",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment10-accepted",
+        "verified": [
+          "十卡真入口／頂返回（e2基準）",
+          "對稱獨立題牌／文字置中",
+          "首區可用／末區鎖定與可用隔離情境（803delta）",
+          "所有modal按鍵最小44.57screenpx",
+          "原怪物名單克隆5次壓力情境真touch／wheel末端及body返回"
+        ],
+        "notVerified": [
+          "進入地區／戰鬥與掉落",
+          "真實升級與解鎖過程",
+          "實體裝置",
+          "未列出其他載入／失敗狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸14張基準＋8張最終delta限定通過",
+          "interaction": "e2十卡基準＋803四尺寸9圖真操作delta限定通過",
+          "scope": "原CSS20／49與生成物／實圖限定通過，無JS修改"
+        }
       }
     },
     {
@@ -7485,7 +7755,7 @@
       "label": "練功區詳情 zone9",
       "entry": "openTrainingZoneInfo('zone9')",
       "owner": "index.html; js/00-main.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -7536,6 +7806,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-10",
+        "head": "803c309de1185e6d331a8d4967f7a717939c2fef",
+        "baseHeaderEvidenceHead": "e2a532203fdbce21dbb7b724b3c718a82cabd177",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment10-accepted",
+        "verified": [
+          "十卡真入口／頂返回（e2基準）",
+          "對稱獨立題牌／文字置中",
+          "首區可用／末區鎖定與可用隔離情境（803delta）",
+          "所有modal按鍵最小44.57screenpx",
+          "原怪物名單克隆5次壓力情境真touch／wheel末端及body返回"
+        ],
+        "notVerified": [
+          "進入地區／戰鬥與掉落",
+          "真實升級與解鎖過程",
+          "實體裝置",
+          "未列出其他載入／失敗狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸14張基準＋8張最終delta限定通過",
+          "interaction": "e2十卡基準＋803四尺寸9圖真操作delta限定通過",
+          "scope": "原CSS20／49與生成物／實圖限定通過，無JS修改"
+        }
       }
     },
     {
@@ -7543,7 +7843,7 @@
       "label": "練功區詳情 zone10",
       "entry": "openTrainingZoneInfo('zone10')",
       "owner": "index.html; js/00-main.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -7594,6 +7894,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-10",
+        "head": "803c309de1185e6d331a8d4967f7a717939c2fef",
+        "baseHeaderEvidenceHead": "e2a532203fdbce21dbb7b724b3c718a82cabd177",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment10-accepted",
+        "verified": [
+          "十卡真入口／頂返回（e2基準）",
+          "對稱獨立題牌／文字置中",
+          "首區可用／末區鎖定與可用隔離情境（803delta）",
+          "所有modal按鍵最小44.57screenpx",
+          "原怪物名單克隆5次壓力情境真touch／wheel末端及body返回"
+        ],
+        "notVerified": [
+          "進入地區／戰鬥與掉落",
+          "真實升級與解鎖過程",
+          "實體裝置",
+          "未列出其他載入／失敗狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸14張基準＋8張最終delta限定通過",
+          "interaction": "e2十卡基準＋803四尺寸9圖真操作delta限定通過",
+          "scope": "原CSS20／49與生成物／實圖限定通過，無JS修改"
+        }
       }
     },
     {
@@ -11889,6 +12219,17 @@
         "練功地區獨立標題／小返回",
         "清單其餘未驗入口與狀態",
         "最新Head CI／Linux Chrome根因阻塞／部署"
+      ]
+    },
+    {
+      "segment": "segment-10",
+      "head": "803c309de1185e6d331a8d4967f7a717939c2fef",
+      "baseHeaderEvidenceHead": "e2a532203fdbce21dbb7b724b3c718a82cabd177",
+      "result": "練功地區獨立標題／所有modal控制／單body長文捲動限定通過",
+      "pending": [
+        "冒險內頁正式畫面取證與打磨",
+        "其餘台帳未驗入口／狀態",
+        "最新Head必要CI／部署"
       ]
     }
   ],
