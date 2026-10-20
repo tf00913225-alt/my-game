@@ -1986,17 +1986,17 @@
     font-weight:800;
 }
 #game-ui #homeFeatureModal .v-fixed-formation-panel{gap:calc(6 * var(--ui-length-unit,1px));font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.35;overflow:hidden;}
-#formationContent{display:flex;flex:1;flex-direction:column;min-height:0;gap:calc(6 * var(--ui-length-unit,1px));overflow:hidden;}
+#formationContent{display:flex;flex:1;flex-direction:column;min-height:0;gap:calc(6 * var(--ui-length-unit,1px));overflow-x:hidden;overflow-y:auto;}
 #formationContent>.hero-page-note{margin:0;font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.4;}
-.v-fixed-formation-row{display:flex;flex:1;flex-direction:column;min-height:0;}
+.v-fixed-formation-row{display:flex;flex:0 0 auto;flex-direction:column;min-height:0;}
 .v-fixed-formation-row>header{margin:calc(3 * var(--ui-length-unit,1px)) 0;font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.2;font-weight:700;color:#efcb83;}
-.v-fixed-formation-slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:1;min-height:0;gap:calc(6 * var(--ui-length-unit,1px));}
+.v-fixed-formation-slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:1;min-height:calc(110 * var(--ui-length-unit,1px));gap:calc(6 * var(--ui-length-unit,1px));}
 .v-fixed-formation-slot{min-width:0;min-height:0;padding:calc(3 * var(--ui-length-unit,1px));margin:0;border:calc(1 * var(--ui-length-unit,1px)) solid #a08043;border-radius:calc(8 * var(--ui-length-unit,1px));background:#16120da8;color:#f4ead4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(2 * var(--ui-length-unit,1px));touch-action:none;}
-.v-fixed-formation-slot b{font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.3;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.v-fixed-formation-slot img{display:block;width:100%;height:0;min-height:0;flex:1;object-fit:contain;}
+.v-fixed-formation-slot b{font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.3;max-width:100%;white-space:normal;overflow-wrap:anywhere;}
+.v-fixed-formation-slot img{display:block;width:100%;height:0;min-height:calc(32 * var(--ui-length-unit,1px));flex:1;object-fit:contain;}
 .v-fixed-formation-slot span{font-size:calc(14 * var(--ui-length-unit,1px));}
 .v-fixed-formation-slot.selected,.formation-candidate.selected{outline:calc(2 * var(--ui-length-unit,1px)) solid #e6bb69;outline-offset:-calc(2 * var(--ui-length-unit,1px));}
-.formation-battlefield{display:flex;flex:1;flex-direction:column;min-height:0;padding:calc(6 * var(--ui-length-unit,1px));gap:calc(6 * var(--ui-length-unit,1px));background-color:#181610;background-size:cover;background-position:center;border:calc(1 * var(--ui-length-unit,1px)) solid #80603c;border-radius:calc(8 * var(--ui-length-unit,1px));}
+.formation-battlefield{display:flex;flex:0 0 auto;flex-direction:column;min-height:0;padding:calc(6 * var(--ui-length-unit,1px));gap:calc(6 * var(--ui-length-unit,1px));background-color:#181610;background-size:cover;background-position:center;border:calc(1 * var(--ui-length-unit,1px)) solid #80603c;border-radius:calc(8 * var(--ui-length-unit,1px));}
 .formation-candidates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));flex:0 0 auto;gap:calc(6 * var(--ui-length-unit,1px));}
 .formation-candidate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(2 * var(--ui-length-unit,1px));min-width:0;margin:0;padding:calc(3 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #80603c;border-radius:calc(8 * var(--ui-length-unit,1px));background:#17130f;color:#f4ead4;touch-action:none;}
 .formation-candidate img{width:100%;height:calc(48 * var(--ui-length-unit,1px));object-fit:contain;}
@@ -2808,7 +2808,7 @@
 }
 
 #game-ui #homeFeatureModalBody .home-feature-buy-btn,
-#game-ui #homeFeatureModalBody button:where(:not(.team-relic-modal button,.quest-claim-all-btn,.v17363-material-synthesis button,.status-confirm)){
+#game-ui #homeFeatureModalBody button:where(:not(.team-relic-modal button,.quest-claim-all-btn,.v17363-material-synthesis button,.status-confirm,.formation-remove)){
     min-height:114px;
     font-size:45px;
 }
