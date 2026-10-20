@@ -1,0 +1,91 @@
+{
+  "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+  "reports": [
+    {
+      "file": "artifacts\\ui-skill-standard\\segment24c-summary-preinit3-ccca1b2c\\empty\\360x640\\report.json",
+      "type": "c",
+      "size": "360x640",
+      "mode": "empty",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "sha256": "4db67354d9e8d213cbcb48807f65dbbfbd8d88be61c908be2c83ffcbe7174552",
+      "complete": true,
+      "restoration": "raw+metadata exact"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment24c-summary-preinit3-ccca1b2c\\loaded\\360x640\\report.json",
+      "type": "c",
+      "size": "360x640",
+      "mode": "loaded",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "sha256": "fcec2efe25c48c441388b2885c54bd353d41bc7b0b955777c423acbf81580fed",
+      "complete": true,
+      "restoration": "raw+metadata exact"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment24c-summary-preinit3-ccca1b2c\\empty\\393x873\\report.json",
+      "type": "c",
+      "size": "393x873",
+      "mode": "empty",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "sha256": "89d1c82f32140e7d4d489d2df75b320eaad17c85b340a227fdfa005330e16761",
+      "complete": true,
+      "restoration": "raw+metadata exact"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment24c-summary-preinit3-ccca1b2c\\loaded\\393x873\\report.json",
+      "type": "c",
+      "size": "393x873",
+      "mode": "loaded",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "sha256": "6ad663dafc62722fb50f6b37fd3e5393f33b606c8272490109264a5b5dd80b2c",
+      "complete": true,
+      "restoration": "raw+metadata exact"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment24c-summary-preinit3-ccca1b2c\\empty\\412x915\\report.json",
+      "type": "c",
+      "size": "412x915",
+      "mode": "empty",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "sha256": "69e6ccc55c50b591e8dbb9e7957eeac6d078a83e5c323e064d9c78202cf8ed62",
+      "complete": true,
+      "restoration": "raw+metadata exact"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment24c-summary-preinit3-ccca1b2c\\loaded\\412x915\\report.json",
+      "type": "c",
+      "size": "412x915",
+      "mode": "loaded",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "sha256": "ab782ed205c30ecd6b8ae2239d7dd735a83213311f6125089d18a57d8955e5e2",
+      "complete": true,
+      "restoration": "raw+metadata exact"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment24c-summary-preinit3-ccca1b2c\\empty\\1280x800\\report.json",
+      "type": "c",
+      "size": "1280x800",
+      "mode": "empty",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "sha256": "c581024148208cc1c6da8db2e0993379e040e78a839cbe99cf90bccb083792f6",
+      "complete": true,
+      "restoration": "raw+metadata exact"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment24c-summary-preinit3-ccca1b2c\\loaded\\1280x800\\report.json",
+      "type": "c",
+      "size": "1280x800",
+      "mode": "loaded",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "sha256": "9697e1c723c4120ad98fd52992c34e18933658eeff5a8ed419ab88b9ccf05ac9",
+      "complete": true,
+      "restoration": "raw+metadata exact"
+    }
+  ],
+  "files": [],
+  "limits": [
+    "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+    "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+    "No equip/upgrade/choose/use/sell/cloud authority/real device"
+  ]
+}

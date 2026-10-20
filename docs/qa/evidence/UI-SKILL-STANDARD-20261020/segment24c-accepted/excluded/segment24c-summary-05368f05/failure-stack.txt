@@ -1,0 +1,6 @@
+Error: Error: Relic already initialized: fresh profile required
+    at <anonymous>:1:74
+    at <anonymous>:1:1086
+    at Cdp.eval (file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/.github/scripts/runtime-browser-qa-support.mjs:204:44)
+    at async runFresh360Case (file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/artifacts/segment24c-summary-case.mjs:8:17)
+    at async file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/artifacts/segment24c-summary-360.mjs:12:2

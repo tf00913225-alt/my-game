@@ -1,0 +1,39 @@
+{
+  "head": "05368f057a2ad2f9b2442dfbdbde77bf51dfc305",
+  "mode": "empty",
+  "complete": false,
+  "sourcesBefore": {
+    "index.html": "093d31ad61acc55b12d6a55ab3e5bc6b49bd5bd8f13dc0c34e2f5397779262ac",
+    "asset-manifest.json": "6d24edb0ed3abcad341475e643ddbafa3163354f989a248989360e6fa8e794e0",
+    "build/app-shell.21c79e4fa190.css": "21c79e4fa1909bcbbb333b254428ff03fbf0e60003d34fec0850b02af2bf325b",
+    "build/app-shell.9d4cba99e9f4.js": "9d4cba99e9f4b76c613a1c2a82f779cfa17fc54a587a2dc3f2f1734d4aeb0c9d",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/boot-core.e7a5c8849782.css": "e7a5c8849782b12ec2358f1a1cbe3af19e182d6b45c0c3ed489ab69bee287886",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.41c2d3198f68.css": "41c2d3198f68a120034ce6e569f8220648982811d0a31b1c3101252ce8b18ac5"
+  },
+  "checks": [],
+  "touches": [],
+  "scenes": [],
+  "scope": "Fresh local canonical summary/relic hydrate consistency only; no equip/use/upgrade/cloud transaction. Original UI side effects retained.",
+  "restore": {
+    "notSeeded": true
+  },
+  "error": "Error: Relic already initialized: fresh profile required"
+}

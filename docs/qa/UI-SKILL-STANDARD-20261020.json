@@ -665,7 +665,21 @@
           "beforeStatus": "有實畫",
           "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-relic-list.png",
           "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
-          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": [
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/empty/360x640/report.json",
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/loaded/360x640/report.json"
+              ],
+              "limits": [
+                "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+                "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+                "No equip/upgrade/choose/use/sell/cloud authority/real device"
+              ]
+            }
+          ]
         },
         "393x873": {
           "status": "部分已實際驗證",
@@ -674,7 +688,21 @@
           "beforeStatus": "未拍before，不冒充四尺寸before",
           "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-relic-list.png",
           "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
-          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": [
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/empty/393x873/report.json",
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/loaded/393x873/report.json"
+              ],
+              "limits": [
+                "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+                "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+                "No equip/upgrade/choose/use/sell/cloud authority/real device"
+              ]
+            }
+          ]
         },
         "412x915": {
           "status": "部分已實際驗證",
@@ -683,7 +711,21 @@
           "beforeStatus": "未拍before，不冒充四尺寸before",
           "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-relic-list.png",
           "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
-          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": [
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/empty/412x915/report.json",
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/loaded/412x915/report.json"
+              ],
+              "limits": [
+                "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+                "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+                "No equip/upgrade/choose/use/sell/cloud authority/real device"
+              ]
+            }
+          ]
         },
         "1280x800": {
           "status": "部分已實際驗證",
@@ -692,7 +734,21 @@
           "beforeStatus": "未拍before，不冒充四尺寸before",
           "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-relic-list.png",
           "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
-          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": [
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/empty/1280x800/report.json",
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/loaded/1280x800/report.json"
+              ],
+              "limits": [
+                "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+                "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+                "No equip/upgrade/choose/use/sell/cloud authority/real device"
+              ]
+            }
+          ]
         }
       },
       "stateEvidence": [
@@ -735,6 +791,17 @@
           "head": "3b4963f8a1fdb5ea699432220a853f8ec5c0cf4b",
           "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment18-accepted",
           "scope": "呈現與導航限定；詳見逐ID條目與報告；不批准交易/正式鎖卡/所有業務狀態"
+        },
+        {
+          "state": "Fresh-profile original preinit canonical empty/loaded summary/list same ID/Lv20/equipped, true navigation return",
+          "status": "已實際驗證",
+          "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted",
+          "limits": [
+            "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+            "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+            "No equip/upgrade/choose/use/sell/cloud authority/real device"
+          ]
         }
       ],
       "reviews": {
@@ -793,7 +860,19 @@
           "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
           "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
           "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
-        }
+        },
+        "followups": [
+          {
+            "segment": "segment-24C",
+            "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+            "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted",
+            "notVerified": [
+              "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+              "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+              "No equip/upgrade/choose/use/sell/cloud authority/real device"
+            ]
+          }
+        ]
       }
     },
     {
@@ -20414,7 +20493,21 @@
           ],
           "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-report.json",
           "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-candidates/1cf6761c-home-1-top.png",
-          "beforeStatus": "僅主城原長名狀態before"
+          "beforeStatus": "僅主城原長名狀態before",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": [
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/empty/360x640/report.json",
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/loaded/360x640/report.json"
+              ],
+              "limits": [
+                "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+                "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+                "No equip/upgrade/choose/use/sell/cloud authority/real device"
+              ]
+            }
+          ]
         },
         "393x873": {
           "status": "部分已實際驗證",
@@ -20426,7 +20519,21 @@
           ],
           "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-report.json",
           "before": null,
-          "beforeStatus": "未拍before，不冒充四尺寸前後"
+          "beforeStatus": "未拍before，不冒充四尺寸前後",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": [
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/empty/393x873/report.json",
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/loaded/393x873/report.json"
+              ],
+              "limits": [
+                "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+                "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+                "No equip/upgrade/choose/use/sell/cloud authority/real device"
+              ]
+            }
+          ]
         },
         "412x915": {
           "status": "部分已實際驗證",
@@ -20438,7 +20545,21 @@
           ],
           "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-report.json",
           "before": null,
-          "beforeStatus": "未拍before，不冒充四尺寸前後"
+          "beforeStatus": "未拍before，不冒充四尺寸前後",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": [
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/empty/412x915/report.json",
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/loaded/412x915/report.json"
+              ],
+              "limits": [
+                "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+                "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+                "No equip/upgrade/choose/use/sell/cloud authority/real device"
+              ]
+            }
+          ]
         },
         "1280x800": {
           "status": "部分已實際驗證",
@@ -20450,7 +20571,21 @@
           ],
           "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-report.json",
           "before": null,
-          "beforeStatus": "未拍before，不冒充四尺寸前後"
+          "beforeStatus": "未拍before，不冒充四尺寸前後",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": [
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/empty/1280x800/report.json",
+                "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted/loaded/1280x800/report.json"
+              ],
+              "limits": [
+                "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+                "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+                "No equip/upgrade/choose/use/sell/cloud authority/real device"
+              ]
+            }
+          ]
         }
       },
       "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/independent-reviews.json",
@@ -20460,7 +20595,34 @@
         "DEV控制28px、主城footer工具42px未列44px通過，仍待修。",
         "本機canonical fixture與原UI可能有mark-seen/save副作用，僅原save/meta bytes已精確還原，不能稱零副作用、裝備/交易或雲端驗收。",
         "無實體手機/鍵盤/載入拒絕重試/戰鬥/創角/獎勵/交易驗收。"
-      ]
+      ],
+      "stateEvidence": [
+        {
+          "state": "Fresh-profile original preinit canonical empty/loaded summary/list same ID/Lv20/equipped, true navigation return",
+          "status": "已實際驗證",
+          "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted",
+          "limits": [
+            "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+            "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+            "No equip/upgrade/choose/use/sell/cloud authority/real device"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "followups": [
+          {
+            "segment": "segment-24C",
+            "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+            "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted",
+            "notVerified": [
+              "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+              "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+              "No equip/upgrade/choose/use/sell/cloud authority/real device"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "home.footer-touch-gaps",
@@ -24595,6 +24757,17 @@
         "未使用/出售/合成/選箱/升級/領獎/驗機率或經濟交易",
         "choice-box bag detail不是relic-strip自選池驗收",
         "未驗真帳號/雲端權威/硬體裝置/軟鍵盤"
+      ]
+    },
+    {
+      "segment": "segment-24C",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24c-accepted",
+      "result": "限定呈現/操作證據；非全狀態或業務驗收",
+      "pending": [
+        "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
+        "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
+        "No equip/upgrade/choose/use/sell/cloud authority/real device"
       ]
     }
   ],
