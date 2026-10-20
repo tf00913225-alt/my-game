@@ -1,7 +1,7 @@
-# Segment25 技能詳情：修復候選，尚未全項驗收
+# Segment25 技能詳情：48項四尺寸 base＋3項文案 delta 限定驗收
 
 Work ID UI-SKILL-STANDARD-20261020；PR #955；Branch fix/ui-skill-standard-polish-20261020。
-候選Head a17d2357107f3dd41a5268c64cbb173ce03dda14，原症狀Head 8ba3488a60fbbfd3e4e3767c5d4c244f829e6bbd。
+最新delta 067395727302ef1b2c76d7c1357ac095ba0487ea，base be598b486010157f3a707718458ecd2aa255adcf；以下a17候選與失敗均為施工歷史。原症狀Head 8ba3488a60fbbfd3e4e3767c5d4c244f829e6bbd。
 
 ## 實際症狀／修法
 
@@ -31,3 +31,18 @@ Authority be598b486010157f3a707718458ecd2aa255adcf，source與a17候選相同；
 - 原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。
 
 此為布局/閱讀/輸入base限定通過，非全25語言通過。下一步只修4個生效display字串、對3個ID四尺寸delta，不重跑48矩陣。
+
+## 最新限定驗收
+
+Delta 067395727302ef1b2c76d7c1357ac095ba0487ea：只原supportEffectText4個生效display literal，總述/各級共用；淨心訣正式中文增益/減益/護盾/結界/首領，焚血訣/結界持續傷害。所有清除/排除條件、數字、HP/SP/Lv/EX及internal token保留。3ID四尺寸各6圖/15真tap/12同步handler，全文及級別字串無上述工程英詞，重開回頂/原API精確還原。21focused/build/check通過。
+
+原48項四尺寸base沿用，另24原圖與四份完整無損report/可讀summary/三方審核已保存。Art逐24圖，input/scope四尺寸代表圖及完整報告；scope另獨立byte還原source+整bundle exact。
+
+自動審核曾因只見舊hash bundle刪除而暫拒提交；後核R099新完整bundle、23來源及12110換行分段保留、4字串還原old整檔byte-exact、manifest正確指向新檔，同一提交重試批准，沒有繞過。正式policy僅compatibilitydigest，其他declarations/值exact。
+
+- 本段只48技能詳情閱讀/開關/重開，四個Lv1已學隔離fixture；未驗其他mid/max級別視覺或學習/升級/裝備/施放/消耗/交易/真硬體。
+- 24張delta圖不是逐級中間列圖審；完整正文/各級由同原supportEffectText4literal生成，原數值/排除條件/其餘bytes可逆exact，並保留真全文捲末與原文字快照。
+- 同步handler同task exact純讀；跨await有原背景資料變化，不稱零save，也不依keys精確判每筆timer來源。
+- 其他角色TAB/未創slot、摘要跨頁一致性、主城28/42觸控缺口、完整編隊等仍依全介面清單未驗，不稱全遊戲完成。
+
+未合dev/部署；Latest Head必要CI仍待核定。Next：24B三選角三TAB與未創slot／24C先canonical fixture再原lazy hydrate的摘要一致性／主城觸控缺口與其餘清單。

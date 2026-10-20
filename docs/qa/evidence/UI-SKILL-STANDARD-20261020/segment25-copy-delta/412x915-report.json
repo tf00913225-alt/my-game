@@ -1,0 +1,3008 @@
+{
+  "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+  "viewport": [
+    412,
+    915
+  ],
+  "complete": true,
+  "dirty": false,
+  "sourcesBefore": {
+    "index.html": "093d31ad61acc55b12d6a55ab3e5bc6b49bd5bd8f13dc0c34e2f5397779262ac",
+    "asset-manifest.json": "6d24edb0ed3abcad341475e643ddbafa3163354f989a248989360e6fa8e794e0",
+    "js/00-main.js": "44c8c321e74c4399c166806148fca08f6a40c78ed29e54c826a0e81a8402d4c8",
+    "js/60-v173.64-skill-progression-rebalance.js": "c67f8bd6cadc91315afb7d4aa43f19ab93363f60a3891904fbad79b61c9779b7",
+    "build/app-shell.21c79e4fa190.css": "21c79e4fa1909bcbbb333b254428ff03fbf0e60003d34fec0850b02af2bf325b",
+    "build/app-shell.9d4cba99e9f4.js": "9d4cba99e9f4b76c613a1c2a82f779cfa17fc54a587a2dc3f2f1734d4aeb0c9d",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/boot-core.e7a5c8849782.css": "e7a5c8849782b12ec2358f1a1cbe3af19e182d6b45c0c3ed489ab69bee287886",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.41c2d3198f68.css": "41c2d3198f68a120034ce6e569f8220648982811d0a31b1c3101252ce8b18ac5"
+  },
+  "scenes": [
+    {
+      "name": "bloodBurnArt-top",
+      "state": {
+        "elementLabel": "火元素",
+        "name": "焚血訣（未學習）",
+        "text": "\n        增益\n        範圍：自己。消耗最大HP 20%；接下來4次成功施放的直接攻擊技能傷害+20%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數。最高 Lv5。SP 35。\n        \n            35SP\n            ｜首次學習需要18點\n        \n        各等級數值\n        Lv.1消耗最大HP 20%；接下來4次成功施放的直接攻擊技能傷害+20%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數Lv.2消耗最大HP 25%；接下來4次成功施放的直接攻擊技能傷害+25%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數Lv.3消耗最大HP 30%；接下來4次成功施放的直接攻擊技能傷害+30%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數Lv.4消耗最大HP 35%；接下來4次成功施放的直接攻擊技能傷害+35%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數Lv.5消耗最大HP 40%；接下來4次成功施放的直接攻擊技能傷害+50%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數\n        最低學習等級Lv35目前技能等級尚未學習下一級角色需求—技能元素火元素學習成本18 技能點升級成本每次升級固定 1 技能點前置技能炎魂共鳴",
+        "open": true,
+        "scrollTop": 0,
+        "scrollHeight": 3747,
+        "clientHeight": 904,
+        "levelRows": 5,
+        "progressionRows": 7
+      },
+      "safe": {
+        "title": {
+          "x": 46.15925598144531,
+          "y": 286.21484375,
+          "width": 319.68145751953125,
+          "height": 45.777801513671875,
+          "top": 286.21484375,
+          "right": 365.84071350097656,
+          "bottom": 331.9926452636719,
+          "left": 46.15925598144531
+        },
+        "ink": {
+          "x": 114.44444274902344,
+          "y": 292.3185729980469,
+          "width": 183.11109924316406,
+          "height": 33.188873291015625,
+          "top": 292.3185729980469,
+          "right": 297.5555419921875,
+          "bottom": 325.5074462890625,
+          "left": 114.44444274902344
+        },
+        "close": {
+          "x": 46.15925598144531,
+          "y": 699.7407836914062,
+          "width": 319.68145751953125,
+          "height": 50.35552978515625,
+          "top": 699.7407836914062,
+          "right": 365.84071350097656,
+          "bottom": 750.0963134765625,
+          "left": 46.15925598144531
+        },
+        "hit": "closeSkillDetail()"
+      }
+    },
+    {
+      "name": "bloodBurnArt-end",
+      "state": {
+        "elementLabel": "火元素",
+        "name": "焚血訣（未學習）",
+        "text": "\n        增益\n        範圍：自己。消耗最大HP 20%；接下來4次成功施放的直接攻擊技能傷害+20%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數。最高 Lv5。SP 35。\n        \n            35SP\n            ｜首次學習需要18點\n        \n        各等級數值\n        Lv.1消耗最大HP 20%；接下來4次成功施放的直接攻擊技能傷害+20%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數Lv.2消耗最大HP 25%；接下來4次成功施放的直接攻擊技能傷害+25%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數Lv.3消耗最大HP 30%；接下來4次成功施放的直接攻擊技能傷害+30%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數Lv.4消耗最大HP 35%；接下來4次成功施放的直接攻擊技能傷害+35%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數Lv.5消耗最大HP 40%；接下來4次成功施放的直接攻擊技能傷害+50%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數\n        最低學習等級Lv35目前技能等級尚未學習下一級角色需求—技能元素火元素學習成本18 技能點升級成本每次升級固定 1 技能點前置技能炎魂共鳴",
+        "open": true,
+        "scrollTop": 2843,
+        "scrollHeight": 3747,
+        "clientHeight": 904,
+        "levelRows": 5,
+        "progressionRows": 7
+      },
+      "safe": {
+        "title": {
+          "x": 46.15925598144531,
+          "y": 286.21484375,
+          "width": 319.68145751953125,
+          "height": 45.777801513671875,
+          "top": 286.21484375,
+          "right": 365.84071350097656,
+          "bottom": 331.9926452636719,
+          "left": 46.15925598144531
+        },
+        "ink": {
+          "x": 114.44444274902344,
+          "y": 292.3185729980469,
+          "width": 183.11109924316406,
+          "height": 33.188873291015625,
+          "top": 292.3185729980469,
+          "right": 297.5555419921875,
+          "bottom": 325.5074462890625,
+          "left": 114.44444274902344
+        },
+        "close": {
+          "x": 46.15925598144531,
+          "y": 699.7407836914062,
+          "width": 319.68145751953125,
+          "height": 50.35552978515625,
+          "top": 699.7407836914062,
+          "right": 365.84071350097656,
+          "bottom": 750.0963134765625,
+          "left": 46.15925598144531
+        },
+        "hit": "closeSkillDetail()"
+      }
+    },
+    {
+      "name": "purifyMind-top",
+      "state": {
+        "elementLabel": "水元素",
+        "name": "淨心訣（未學習）",
+        "text": "\n        增益\n        範圍：我方或敵方1名。滿級範圍：我方或敵方中、左、右最多3名。立即清除所有可解除的臨時增益、減益、護盾、結界與異常狀態；不清除永久被動、EX、裝備效果、首領固有機制、HP／SP或死亡狀態。最高 Lv3。SP 22。\n        \n            22SP\n            ｜首次學習需要36點\n        \n        各等級數值\n        Lv.1立即清除所有可解除的臨時增益、減益、護盾、結界與異常狀態；不清除永久被動、EX、裝備效果、首領固有機制、HP／SP或死亡狀態Lv.2立即清除所有可解除的臨時增益、減益、護盾、結界與異常狀態；不清除永久被動、EX、裝備效果、首領固有機制、HP／SP或死亡狀態Lv.3立即清除所有可解除的臨時增益、減益、護盾、結界與異常狀態；不清除永久被動、EX、裝備效果、首領固有機制、HP／SP或死亡狀態\n        最低學習等級Lv35目前技能等級尚未學習下一級角色需求—技能元素水元素學習成本36 技能點（跨修）升級成本每次升級固定 1 技能點前置技能跨修免前置",
+        "open": true,
+        "scrollTop": 0,
+        "scrollHeight": 3087,
+        "clientHeight": 904,
+        "levelRows": 3,
+        "progressionRows": 7
+      },
+      "safe": {
+        "title": {
+          "x": 46.15925598144531,
+          "y": 286.21484375,
+          "width": 319.68145751953125,
+          "height": 45.777801513671875,
+          "top": 286.21484375,
+          "right": 365.84071350097656,
+          "bottom": 331.9926452636719,
+          "left": 46.15925598144531
+        },
+        "ink": {
+          "x": 114.44444274902344,
+          "y": 292.3185729980469,
+          "width": 183.11109924316406,
+          "height": 33.188873291015625,
+          "top": 292.3185729980469,
+          "right": 297.5555419921875,
+          "bottom": 325.5074462890625,
+          "left": 114.44444274902344
+        },
+        "close": {
+          "x": 46.15925598144531,
+          "y": 699.7407836914062,
+          "width": 319.68145751953125,
+          "height": 50.35552978515625,
+          "top": 699.7407836914062,
+          "right": 365.84071350097656,
+          "bottom": 750.0963134765625,
+          "left": 46.15925598144531
+        },
+        "hit": "closeSkillDetail()"
+      }
+    },
+    {
+      "name": "purifyMind-end",
+      "state": {
+        "elementLabel": "水元素",
+        "name": "淨心訣（未學習）",
+        "text": "\n        增益\n        範圍：我方或敵方1名。滿級範圍：我方或敵方中、左、右最多3名。立即清除所有可解除的臨時增益、減益、護盾、結界與異常狀態；不清除永久被動、EX、裝備效果、首領固有機制、HP／SP或死亡狀態。最高 Lv3。SP 22。\n        \n            22SP\n            ｜首次學習需要36點\n        \n        各等級數值\n        Lv.1立即清除所有可解除的臨時增益、減益、護盾、結界與異常狀態；不清除永久被動、EX、裝備效果、首領固有機制、HP／SP或死亡狀態Lv.2立即清除所有可解除的臨時增益、減益、護盾、結界與異常狀態；不清除永久被動、EX、裝備效果、首領固有機制、HP／SP或死亡狀態Lv.3立即清除所有可解除的臨時增益、減益、護盾、結界與異常狀態；不清除永久被動、EX、裝備效果、首領固有機制、HP／SP或死亡狀態\n        最低學習等級Lv35目前技能等級尚未學習下一級角色需求—技能元素水元素學習成本36 技能點（跨修）升級成本每次升級固定 1 技能點前置技能跨修免前置",
+        "open": true,
+        "scrollTop": 2183,
+        "scrollHeight": 3087,
+        "clientHeight": 904,
+        "levelRows": 3,
+        "progressionRows": 7
+      },
+      "safe": {
+        "title": {
+          "x": 46.15925598144531,
+          "y": 286.21484375,
+          "width": 319.68145751953125,
+          "height": 45.777801513671875,
+          "top": 286.21484375,
+          "right": 365.84071350097656,
+          "bottom": 331.9926452636719,
+          "left": 46.15925598144531
+        },
+        "ink": {
+          "x": 114.44444274902344,
+          "y": 292.3185729980469,
+          "width": 183.11109924316406,
+          "height": 33.188873291015625,
+          "top": 292.3185729980469,
+          "right": 297.5555419921875,
+          "bottom": 325.5074462890625,
+          "left": 114.44444274902344
+        },
+        "close": {
+          "x": 46.15925598144531,
+          "y": 699.7407836914062,
+          "width": 319.68145751953125,
+          "height": 50.35552978515625,
+          "top": 699.7407836914062,
+          "right": 365.84071350097656,
+          "bottom": 750.0963134765625,
+          "left": 46.15925598144531
+        },
+        "hit": "closeSkillDetail()"
+      }
+    },
+    {
+      "name": "barrier-top",
+      "state": {
+        "elementLabel": "土元素",
+        "name": "結界（未學習）",
+        "text": "\n        增益\n        範圍：我方1名。持續3回合；免疫一般直接傷害、持續傷害與反傷，但不免疫狀態、硬控或淨心訣。最高 Lv5。SP 40。\n        \n            40SP\n            ｜首次學習需要36點\n        \n        各等級數值\n        Lv.1持續3回合；免疫一般直接傷害、持續傷害與反傷，但不免疫狀態、硬控或淨心訣Lv.2持續3回合；免疫一般直接傷害、持續傷害與反傷，但不免疫狀態、硬控或淨心訣Lv.3持續3回合；免疫一般直接傷害、持續傷害與反傷，但不免疫狀態、硬控或淨心訣Lv.4持續4回合；免疫一般直接傷害、持續傷害與反傷，但不免疫狀態、硬控或淨心訣Lv.5持續5回合；免疫一般直接傷害、持續傷害與反傷，但不免疫狀態、硬控或淨心訣\n        最低學習等級Lv35目前技能等級尚未學習下一級角色需求—技能元素土元素學習成本36 技能點（跨修）升級成本每次升級固定 1 技能點前置技能跨修免前置",
+        "open": true,
+        "scrollTop": 0,
+        "scrollHeight": 2979,
+        "clientHeight": 904,
+        "levelRows": 5,
+        "progressionRows": 7
+      },
+      "safe": {
+        "title": {
+          "x": 46.15925598144531,
+          "y": 286.21484375,
+          "width": 319.68145751953125,
+          "height": 45.777801513671875,
+          "top": 286.21484375,
+          "right": 365.84071350097656,
+          "bottom": 331.9926452636719,
+          "left": 46.15925598144531
+        },
+        "ink": {
+          "x": 125.88888549804688,
+          "y": 292.3185729980469,
+          "width": 160.22222900390625,
+          "height": 33.188873291015625,
+          "top": 292.3185729980469,
+          "right": 286.1111145019531,
+          "bottom": 325.5074462890625,
+          "left": 125.88888549804688
+        },
+        "close": {
+          "x": 46.15925598144531,
+          "y": 699.7407836914062,
+          "width": 319.68145751953125,
+          "height": 50.35552978515625,
+          "top": 699.7407836914062,
+          "right": 365.84071350097656,
+          "bottom": 750.0963134765625,
+          "left": 46.15925598144531
+        },
+        "hit": "closeSkillDetail()"
+      }
+    },
+    {
+      "name": "barrier-end",
+      "state": {
+        "elementLabel": "土元素",
+        "name": "結界（未學習）",
+        "text": "\n        增益\n        範圍：我方1名。持續3回合；免疫一般直接傷害、持續傷害與反傷，但不免疫狀態、硬控或淨心訣。最高 Lv5。SP 40。\n        \n            40SP\n            ｜首次學習需要36點\n        \n        各等級數值\n        Lv.1持續3回合；免疫一般直接傷害、持續傷害與反傷，但不免疫狀態、硬控或淨心訣Lv.2持續3回合；免疫一般直接傷害、持續傷害與反傷，但不免疫狀態、硬控或淨心訣Lv.3持續3回合；免疫一般直接傷害、持續傷害與反傷，但不免疫狀態、硬控或淨心訣Lv.4持續4回合；免疫一般直接傷害、持續傷害與反傷，但不免疫狀態、硬控或淨心訣Lv.5持續5回合；免疫一般直接傷害、持續傷害與反傷，但不免疫狀態、硬控或淨心訣\n        最低學習等級Lv35目前技能等級尚未學習下一級角色需求—技能元素土元素學習成本36 技能點（跨修）升級成本每次升級固定 1 技能點前置技能跨修免前置",
+        "open": true,
+        "scrollTop": 2075,
+        "scrollHeight": 2979,
+        "clientHeight": 904,
+        "levelRows": 5,
+        "progressionRows": 7
+      },
+      "safe": {
+        "title": {
+          "x": 46.15925598144531,
+          "y": 286.21484375,
+          "width": 319.68145751953125,
+          "height": 45.777801513671875,
+          "top": 286.21484375,
+          "right": 365.84071350097656,
+          "bottom": 331.9926452636719,
+          "left": 46.15925598144531
+        },
+        "ink": {
+          "x": 125.88888549804688,
+          "y": 292.3185729980469,
+          "width": 160.22222900390625,
+          "height": 33.188873291015625,
+          "top": 292.3185729980469,
+          "right": 286.1111145019531,
+          "bottom": 325.5074462890625,
+          "left": 125.88888549804688
+        },
+        "close": {
+          "x": 46.15925598144531,
+          "y": 699.7407836914062,
+          "width": 319.68145751953125,
+          "height": 50.35552978515625,
+          "top": 699.7407836914062,
+          "right": 365.84071350097656,
+          "bottom": 750.0963134765625,
+          "left": 46.15925598144531
+        },
+        "hit": "closeSkillDetail()"
+      }
+    }
+  ],
+  "touches": [
+    {
+      "kind": "tap",
+      "selector": "#skillElementTabs button[onclick=\"selectSkillElementTab('fire')\"]",
+      "x": 69.52499961853027,
+      "y": 406.0000457763672,
+      "hit": true,
+      "label": "火元素",
+      "width": 86.40555572509766,
+      "height": 50.355560302734375
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('bloodBurnArt')\"]",
+      "step": 0,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 3366.33203125,
+        "right": 96.13333129882812,
+        "bottom": 3416.6875,
+        "width": 54.93333435058594,
+        "height": 50.35546875,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 0,
+        "scrollHeight": 8651,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('bloodBurnArt')\"]",
+      "step": 1,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 3037.494873046875,
+        "right": 96.13333129882812,
+        "bottom": 3087.8505859375,
+        "width": 54.93333435058594,
+        "height": 50.355712890625,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 862,
+        "scrollHeight": 8651,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('bloodBurnArt')\"]",
+      "step": 2,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 2709.802490234375,
+        "right": 96.13333129882812,
+        "bottom": 2760.157958984375,
+        "width": 54.93333435058594,
+        "height": 50.35546875,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 1721,
+        "scrollHeight": 8651,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('bloodBurnArt')\"]",
+      "step": 3,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 2453.828369140625,
+        "right": 96.13333129882812,
+        "bottom": 2504.183837890625,
+        "width": 54.93333435058594,
+        "height": 50.35546875,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 2392,
+        "scrollHeight": 8651,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('bloodBurnArt')\"]",
+      "step": 4,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 2129.569091796875,
+        "right": 96.13333129882812,
+        "bottom": 2179.924560546875,
+        "width": 54.93333435058594,
+        "height": 50.35546875,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 3242,
+        "scrollHeight": 8651,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('bloodBurnArt')\"]",
+      "step": 5,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 1802.2579345703125,
+        "right": 96.13333129882812,
+        "bottom": 1852.613525390625,
+        "width": 54.93333435058594,
+        "height": 50.3555908203125,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 4100,
+        "scrollHeight": 8651,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('bloodBurnArt')\"]",
+      "step": 6,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 1478.76171875,
+        "right": 96.13333129882812,
+        "bottom": 1529.1173095703125,
+        "width": 54.93333435058594,
+        "height": 50.3555908203125,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 4948,
+        "scrollHeight": 8651,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('bloodBurnArt')\"]",
+      "step": 7,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 1150.6876220703125,
+        "right": 96.13333129882812,
+        "bottom": 1201.043212890625,
+        "width": 54.93333435058594,
+        "height": 50.3555908203125,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 5808,
+        "scrollHeight": 8651,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('bloodBurnArt')\"]",
+      "step": 8,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 895.0950317382812,
+        "right": 96.13333129882812,
+        "bottom": 945.4506225585938,
+        "width": 54.93333435058594,
+        "height": 50.3555908203125,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 6478,
+        "scrollHeight": 8651,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('bloodBurnArt')\"]",
+      "step": 9,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 639.1209716796875,
+        "right": 96.13333129882812,
+        "bottom": 689.4765625,
+        "width": 54.93333435058594,
+        "height": 50.3555908203125,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 7149,
+        "scrollHeight": 8651,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "tap",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('bloodBurnArt')\"]",
+      "x": 68.66666412353516,
+      "y": 664.2987670898438,
+      "hit": true,
+      "label": "詳情 ›",
+      "width": 54.93333435058594,
+      "height": 50.3555908203125
+    },
+    {
+      "kind": "scroll",
+      "selector": "#skillDetailStats",
+      "direction": "toward-end"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#skillDetailStats",
+      "direction": "toward-end"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#skillDetailStats",
+      "direction": "toward-end"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#skillDetailStats",
+      "direction": "toward-end"
+    },
+    {
+      "kind": "tap",
+      "selector": "#skillDetailModal .close-item-button",
+      "x": 205.99998474121094,
+      "y": 724.9185485839844,
+      "hit": true,
+      "label": "關閉",
+      "width": 319.68145751953125,
+      "height": 50.35552978515625
+    },
+    {
+      "kind": "tap",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('bloodBurnArt')\"]",
+      "x": 68.66666412353516,
+      "y": 664.2987670898438,
+      "hit": true,
+      "label": "詳情 ›",
+      "width": 54.93333435058594,
+      "height": 50.3555908203125
+    },
+    {
+      "kind": "tap",
+      "selector": "#skillDetailModal .close-item-button",
+      "x": 205.99998474121094,
+      "y": 724.9185485839844,
+      "hit": true,
+      "label": "關閉",
+      "width": 319.68145751953125,
+      "height": 50.35552978515625
+    },
+    {
+      "kind": "scroll",
+      "selector": "#characterTabContent",
+      "direction": "toward-top"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#characterTabContent",
+      "direction": "toward-top"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#characterTabContent",
+      "direction": "toward-top"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#characterTabContent",
+      "direction": "toward-top"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#characterTabContent",
+      "direction": "toward-top"
+    },
+    {
+      "kind": "tap",
+      "selector": "#skillElementTabs button[onclick=\"selectSkillElementTab('water')\"]",
+      "x": 160.50832748413086,
+      "y": 406.0000457763672,
+      "hit": true,
+      "label": "水元素",
+      "width": 86.40555572509766,
+      "height": 50.355560302734375
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('purifyMind')\"]",
+      "step": 0,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 3168.343017578125,
+        "right": 96.13333129882812,
+        "bottom": 3218.69873046875,
+        "width": 54.93333435058594,
+        "height": 50.355712890625,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 0,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('purifyMind')\"]",
+      "step": 1,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 2844.846923828125,
+        "right": 96.13333129882812,
+        "bottom": 2895.202392578125,
+        "width": 54.93333435058594,
+        "height": 50.35546875,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 848,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('purifyMind')\"]",
+      "step": 2,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 2515.246826171875,
+        "right": 96.13333129882812,
+        "bottom": 2565.602294921875,
+        "width": 54.93333435058594,
+        "height": 50.35546875,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 1712,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('purifyMind')\"]",
+      "step": 3,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 2259.272705078125,
+        "right": 96.13333129882812,
+        "bottom": 2309.62841796875,
+        "width": 54.93333435058594,
+        "height": 50.355712890625,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 2383,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('purifyMind')\"]",
+      "step": 4,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 1929.291259765625,
+        "right": 96.13333129882812,
+        "bottom": 1979.6468505859375,
+        "width": 54.93333435058594,
+        "height": 50.3555908203125,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 3248,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('purifyMind')\"]",
+      "step": 5,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 1673.3172607421875,
+        "right": 96.13333129882812,
+        "bottom": 1723.6728515625,
+        "width": 54.93333435058594,
+        "height": 50.3555908203125,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 3919,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('purifyMind')\"]",
+      "step": 6,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 1346.7691650390625,
+        "right": 96.13333129882812,
+        "bottom": 1397.1246337890625,
+        "width": 54.93333435058594,
+        "height": 50.35546875,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 4775,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('purifyMind')\"]",
+      "step": 7,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 1016.024658203125,
+        "right": 96.13333129882812,
+        "bottom": 1066.3802490234375,
+        "width": 54.93333435058594,
+        "height": 50.3555908203125,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 5642,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('purifyMind')\"]",
+      "step": 8,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 687.9506225585938,
+        "right": 96.13333129882812,
+        "bottom": 738.30615234375,
+        "width": 54.93333435058594,
+        "height": 50.35552978515625,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 6502,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "tap",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('purifyMind')\"]",
+      "x": 68.66666412353516,
+      "y": 713.1283874511719,
+      "hit": true,
+      "label": "詳情 ›",
+      "width": 54.93333435058594,
+      "height": 50.35552978515625
+    },
+    {
+      "kind": "scroll",
+      "selector": "#skillDetailStats",
+      "direction": "toward-end"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#skillDetailStats",
+      "direction": "toward-end"
+    },
+    {
+      "kind": "tap",
+      "selector": "#skillDetailModal .close-item-button",
+      "x": 205.99998474121094,
+      "y": 724.9185485839844,
+      "hit": true,
+      "label": "關閉",
+      "width": 319.68145751953125,
+      "height": 50.35552978515625
+    },
+    {
+      "kind": "tap",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('purifyMind')\"]",
+      "x": 68.66666412353516,
+      "y": 713.1283874511719,
+      "hit": true,
+      "label": "詳情 ›",
+      "width": 54.93333435058594,
+      "height": 50.35552978515625
+    },
+    {
+      "kind": "tap",
+      "selector": "#skillDetailModal .close-item-button",
+      "x": 205.99998474121094,
+      "y": 724.9185485839844,
+      "hit": true,
+      "label": "關閉",
+      "width": 319.68145751953125,
+      "height": 50.35552978515625
+    },
+    {
+      "kind": "scroll",
+      "selector": "#characterTabContent",
+      "direction": "toward-top"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#characterTabContent",
+      "direction": "toward-top"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#characterTabContent",
+      "direction": "toward-top"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#characterTabContent",
+      "direction": "toward-top"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#characterTabContent",
+      "direction": "toward-top"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#characterTabContent",
+      "direction": "toward-top"
+    },
+    {
+      "kind": "tap",
+      "selector": "#skillElementTabs button[onclick=\"selectSkillElementTab('earth')\"]",
+      "x": 342.47499084472656,
+      "y": 406.0000457763672,
+      "hit": true,
+      "label": "土元素",
+      "width": 86.40554809570312,
+      "height": 50.355560302734375
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('barrier')\"]",
+      "step": 0,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 3168.343017578125,
+        "right": 96.13333129882812,
+        "bottom": 3218.69873046875,
+        "width": 54.93333435058594,
+        "height": 50.355712890625,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 0,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('barrier')\"]",
+      "step": 1,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 2841.031982421875,
+        "right": 96.13333129882812,
+        "bottom": 2891.3876953125,
+        "width": 54.93333435058594,
+        "height": 50.355712890625,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 858,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('barrier')\"]",
+      "step": 2,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 2521.73193359375,
+        "right": 96.13333129882812,
+        "bottom": 2572.087646484375,
+        "width": 54.93333435058594,
+        "height": 50.355712890625,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 1695,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('barrier')\"]",
+      "step": 3,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 2193.657958984375,
+        "right": 96.13333129882812,
+        "bottom": 2244.013427734375,
+        "width": 54.93333435058594,
+        "height": 50.35546875,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 2555,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('barrier')\"]",
+      "step": 4,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 1937.6839599609375,
+        "right": 96.13333129882812,
+        "bottom": 1988.0394287109375,
+        "width": 54.93333435058594,
+        "height": 50.35546875,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 3226,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('barrier')\"]",
+      "step": 5,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 1682.09130859375,
+        "right": 96.13333129882812,
+        "bottom": 1732.4468994140625,
+        "width": 54.93333435058594,
+        "height": 50.3555908203125,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 3896,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('barrier')\"]",
+      "step": 6,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 1352.4913330078125,
+        "right": 96.13333129882812,
+        "bottom": 1402.846923828125,
+        "width": 54.93333435058594,
+        "height": 50.3555908203125,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 4760,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('barrier')\"]",
+      "step": 7,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 1096.517333984375,
+        "right": 96.13333129882812,
+        "bottom": 1146.872802734375,
+        "width": 54.93333435058594,
+        "height": 50.35546875,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 5431,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('barrier')\"]",
+      "step": 8,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 840.9246826171875,
+        "right": 96.13333129882812,
+        "bottom": 891.2802124023438,
+        "width": 54.93333435058594,
+        "height": 50.35552978515625,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 6101,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "reach-sample",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('barrier')\"]",
+      "step": 9,
+      "target": {
+        "left": 41.19999694824219,
+        "top": 513.9950561523438,
+        "right": 96.13333129882812,
+        "bottom": 564.3505859375,
+        "width": 54.93333435058594,
+        "height": 50.35552978515625,
+        "scrollTop": 0,
+        "scrollHeight": 132,
+        "clientHeight": 132
+      },
+      "host": {
+        "left": 26.322221755981445,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 797.4000244140625,
+        "width": 359.35552978515625,
+        "height": 416.5777587890625,
+        "scrollTop": 6958,
+        "scrollHeight": 8132,
+        "clientHeight": 1092
+      }
+    },
+    {
+      "kind": "tap",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('barrier')\"]",
+      "x": 68.66666412353516,
+      "y": 539.1728210449219,
+      "hit": true,
+      "label": "詳情 ›",
+      "width": 54.93333435058594,
+      "height": 50.35552978515625
+    },
+    {
+      "kind": "scroll",
+      "selector": "#skillDetailStats",
+      "direction": "toward-end"
+    },
+    {
+      "kind": "scroll",
+      "selector": "#skillDetailStats",
+      "direction": "toward-end"
+    },
+    {
+      "kind": "tap",
+      "selector": "#skillDetailModal .close-item-button",
+      "x": 205.99998474121094,
+      "y": 724.9185485839844,
+      "hit": true,
+      "label": "關閉",
+      "width": 319.68145751953125,
+      "height": 50.35552978515625
+    },
+    {
+      "kind": "tap",
+      "selector": ".skill-row-detail-link[onclick=\"showSkillDetail('barrier')\"]",
+      "x": 68.66666412353516,
+      "y": 539.1728210449219,
+      "hit": true,
+      "label": "詳情 ›",
+      "width": 54.93333435058594,
+      "height": 50.35552978515625
+    },
+    {
+      "kind": "tap",
+      "selector": "#skillDetailModal .close-item-button",
+      "x": 205.99998474121094,
+      "y": 724.9185485839844,
+      "hit": true,
+      "label": "關閉",
+      "width": 319.68145751953125,
+      "height": 50.35552978515625
+    }
+  ],
+  "checks": [
+    {
+      "phase": "after-original-PREPARE",
+      "identity": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "315c7bb852a65f846ce7b5c006917691f70d54790d1d1e1a845a614dd694d925",
+        "bytes": 9653
+      }
+    },
+    {
+      "phase": "after-local-unlearned-seed-and-render",
+      "identity": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "d5900410eb6980843039a9f9a9c4c2db9ddf5a449c9ef6f6c15b72f9d42d853e",
+        "bytes": 9636
+      }
+    },
+    {
+      "phase": "actual-scroll-owner",
+      "id": "characterTabContent",
+      "overflowY": "auto",
+      "scrollHeight": 8132,
+      "clientHeight": 1092
+    },
+    {
+      "phase": "handler-observer-installed",
+      "transparentDelegate": true
+    },
+    {
+      "phase": "true-return-to-list-top",
+      "owner": "#characterTabContent",
+      "scrollTop": 0
+    },
+    {
+      "phase": "tab",
+      "element": "fire",
+      "cards": [
+        {
+          "id": "flameSlash",
+          "name": "火焰斬",
+          "element": "fire",
+          "description": "範圍：敵方1名。Lv1傷害 30。Lv5突破 72。Lv10突破 144。追擊：爆擊或擊敗目標時免費再施放，最多額外1次；免費追擊不消耗SP。SP 10。",
+          "maxLevel": 10,
+          "learnLevel": 1,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": false,
+            "isNativeElement": true,
+            "allowed": false,
+            "levelOk": true,
+            "prerequisiteRequired": true,
+            "prerequisiteOk": true,
+            "learnCost": 2,
+            "pointsOk": false,
+            "crossGateOk": true,
+            "reason": "需要2點"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 868.0098876953125,
+            "width": 54.93333435058594,
+            "height": 50.35552978515625,
+            "top": 868.0098876953125,
+            "right": 96.13333129882812,
+            "bottom": 918.3654174804688,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "fireCritical",
+          "name": "會心一擊",
+          "element": "fire",
+          "description": "範圍：敵方1名。Lv1傷害 45。Lv5突破 108。Lv10突破 216。追擊：爆擊或擊敗目標時免費再施放，最多額外1次；免費追擊不消耗SP。SP 28。",
+          "maxLevel": 10,
+          "learnLevel": 7,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": false,
+            "isNativeElement": true,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": true,
+            "prerequisiteOk": false,
+            "learnCost": 6,
+            "pointsOk": false,
+            "crossGateOk": true,
+            "reason": "Lv7 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 1120.93212890625,
+            "width": 54.93333435058594,
+            "height": 50.35546875,
+            "top": 1120.93212890625,
+            "right": 96.13333129882812,
+            "bottom": 1171.28759765625,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "explosiveFlurry",
+          "name": "火爆亂擊",
+          "element": "fire",
+          "description": "範圍：同排中、左、右最多3名。Lv1傷害 50。Lv5突破 120。Lv10突破 240。追擊：爆擊或擊敗目標時免費再施放，最多額外1次；免費追擊不消耗SP。SP 47。",
+          "maxLevel": 10,
+          "learnLevel": 14,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": false,
+            "isNativeElement": true,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": true,
+            "prerequisiteOk": false,
+            "learnCost": 10,
+            "pointsOk": false,
+            "crossGateOk": true,
+            "reason": "Lv14 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 1373.854248046875,
+            "width": 54.93333435058594,
+            "height": 50.3555908203125,
+            "top": 1373.854248046875,
+            "right": 96.13333129882812,
+            "bottom": 1424.2098388671875,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "dragonSlash",
+          "name": "霸龍裂天斬",
+          "element": "fire",
+          "description": "範圍：敵方1名。Lv1傷害 165。Lv5突破 396。Lv10突破 792。追擊：爆擊或擊敗目標時免費再施放，最多額外2次；免費追擊不消耗SP。SP 65。",
+          "maxLevel": 10,
+          "learnLevel": 30,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": false,
+            "isNativeElement": true,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": true,
+            "prerequisiteOk": false,
+            "learnCost": 16,
+            "pointsOk": false,
+            "crossGateOk": true,
+            "reason": "Lv30 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 1626.7764892578125,
+            "width": 54.93333435058594,
+            "height": 50.3555908203125,
+            "top": 1626.7764892578125,
+            "right": 96.13333129882812,
+            "bottom": 1677.132080078125,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "fireRocket",
+          "name": "火箭",
+          "element": "fire",
+          "description": "範圍：同排中、左、右最多3名。Lv1傷害 13。Lv5突破 38。Lv10突破 81。燃燒：40%基礎機率，4%最大HP／回合，2回合。SP 10。",
+          "maxLevel": 10,
+          "learnLevel": 1,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": false,
+            "isNativeElement": true,
+            "allowed": false,
+            "levelOk": true,
+            "prerequisiteRequired": true,
+            "prerequisiteOk": true,
+            "learnCost": 2,
+            "pointsOk": false,
+            "crossGateOk": true,
+            "reason": "需要2點"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 1848.7987060546875,
+            "width": 54.93333435058594,
+            "height": 50.3555908203125,
+            "top": 1848.7987060546875,
+            "right": 96.13333129882812,
+            "bottom": 1899.154296875,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "blazeSpell",
+          "name": "烈火術",
+          "element": "fire",
+          "description": "範圍：敵方1名。Lv1傷害 45。Lv5突破 108。Lv10突破 216。燃燒：45%基礎機率，6%最大HP／回合，2回合。SP 28。",
+          "maxLevel": 10,
+          "learnLevel": 7,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": false,
+            "isNativeElement": true,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": true,
+            "prerequisiteOk": false,
+            "learnCost": 6,
+            "pointsOk": false,
+            "crossGateOk": true,
+            "reason": "Lv7 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2101.720947265625,
+            "width": 54.93333435058594,
+            "height": 50.35546875,
+            "top": 2101.720947265625,
+            "right": 96.13333129882812,
+            "bottom": 2152.076416015625,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "flameTornado",
+          "name": "烈焰龍捲",
+          "element": "fire",
+          "description": "範圍：敵方1名。Lv1傷害 150。Lv5突破 360。Lv10突破 720。燃燒：60%基礎機率，7%最大HP／回合，2回合。SP 47。",
+          "maxLevel": 10,
+          "learnLevel": 14,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": false,
+            "isNativeElement": true,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": true,
+            "prerequisiteOk": false,
+            "learnCost": 10,
+            "pointsOk": false,
+            "crossGateOk": true,
+            "reason": "Lv14 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2354.64306640625,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 2354.64306640625,
+            "right": 96.13333129882812,
+            "bottom": 2404.998779296875,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "phoenixCry",
+          "name": "火鳳天鳴",
+          "element": "fire",
+          "description": "範圍：敵方全體。Lv1傷害 28。Lv5突破 69。Lv10突破 140。燃燒：50%基礎機率，9%最大HP／回合，2回合；鳳威：本次實際新增燃燒少於3名時，施法者獲得1回合鳳威，所有傷害+30%。SP 60。",
+          "maxLevel": 10,
+          "learnLevel": 30,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": false,
+            "isNativeElement": true,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": true,
+            "prerequisiteOk": false,
+            "learnCost": 16,
+            "pointsOk": false,
+            "crossGateOk": true,
+            "reason": "Lv30 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2607.5654296875,
+            "width": 54.93333435058594,
+            "height": 50.35546875,
+            "top": 2607.5654296875,
+            "right": 96.13333129882812,
+            "bottom": 2657.9208984375,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "rage",
+          "name": "怒火",
+          "element": "fire",
+          "description": "範圍：我方中、左、右最多3名。爆擊率+10%、爆擊傷害+15%，持續3回合。最高 Lv5。SP 50。",
+          "maxLevel": 5,
+          "learnLevel": 18,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": false,
+            "isNativeElement": true,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": true,
+            "prerequisiteOk": false,
+            "learnCost": 10,
+            "pointsOk": false,
+            "crossGateOk": true,
+            "reason": "Lv18 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2860.487548828125,
+            "width": 54.93333435058594,
+            "height": 50.35546875,
+            "top": 2860.487548828125,
+            "right": 96.13333129882812,
+            "bottom": 2910.843017578125,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "fireSoulResonance",
+          "name": "炎魂共鳴",
+          "element": "fire",
+          "description": "範圍：自己。炎魂共鳴使直接攻擊技能傷害+12%，基礎3回合。最高 Lv5。SP 45。",
+          "maxLevel": 5,
+          "learnLevel": 25,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": false,
+            "isNativeElement": true,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": true,
+            "prerequisiteOk": false,
+            "learnCost": 14,
+            "pointsOk": false,
+            "crossGateOk": true,
+            "reason": "Lv25 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 3113.409912109375,
+            "width": 54.93333435058594,
+            "height": 50.35546875,
+            "top": 3113.409912109375,
+            "right": 96.13333129882812,
+            "bottom": 3163.765380859375,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "bloodBurnArt",
+          "name": "焚血訣",
+          "element": "fire",
+          "description": "範圍：自己。消耗最大HP 20%；接下來4次成功施放的直接攻擊技能傷害+20%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數。最高 Lv5。SP 35。",
+          "maxLevel": 5,
+          "learnLevel": 35,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": false,
+            "isNativeElement": true,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": true,
+            "prerequisiteOk": false,
+            "learnCost": 18,
+            "pointsOk": false,
+            "crossGateOk": true,
+            "reason": "Lv35 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 3366.33203125,
+            "width": 54.93333435058594,
+            "height": 50.35546875,
+            "top": 3366.33203125,
+            "right": 96.13333129882812,
+            "bottom": 3416.6875,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "fireEX",
+          "name": "火元素EX",
+          "element": "fire",
+          "description": "範圍：被動。火元素角色傷害 +10%、爆擊率5%、爆擊傷害25%；對有異常狀態的目標傷害再+5%。",
+          "maxLevel": 1,
+          "learnLevel": 50,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": false,
+            "isNativeElement": true,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": true,
+            "prerequisiteOk": true,
+            "learnCost": 20,
+            "pointsOk": false,
+            "crossGateOk": true,
+            "reason": "Lv50 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 3588.354248046875,
+            "width": 54.93333435058594,
+            "height": 50.35546875,
+            "top": 3588.354248046875,
+            "right": 96.13333129882812,
+            "bottom": 3638.709716796875,
+            "left": 41.19999694824219
+          }
+        }
+      ]
+    },
+    {
+      "phase": "synchronous-handler",
+      "handler": "showSkillDetail",
+      "args": [
+        "bloodBurnArt"
+      ],
+      "startedAt": 12457.30000000447,
+      "finishedAt": 12464.89999999851,
+      "sameTaskUnchanged": true,
+      "identityKeys": [],
+      "storageKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "d5900410eb6980843039a9f9a9c4c2db9ddf5a449c9ef6f6c15b72f9d42d853e",
+        "bytes": 9636
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "d5900410eb6980843039a9f9a9c4c2db9ddf5a449c9ef6f6c15b72f9d42d853e",
+        "bytes": 9636
+      },
+      "threw": false,
+      "error": null
+    },
+    {
+      "id": "bloodBurnArt",
+      "level": 0,
+      "eligibility": {
+        "isCrossElement": false,
+        "isNativeElement": true,
+        "allowed": false,
+        "levelOk": false,
+        "prerequisiteRequired": true,
+        "prerequisiteOk": false,
+        "learnCost": 18,
+        "pointsOk": false,
+        "crossGateOk": true,
+        "reason": "Lv35 解鎖"
+      },
+      "end": "true gesture end"
+    },
+    {
+      "phase": "synchronous-handler",
+      "handler": "closeSkillDetail",
+      "args": [],
+      "startedAt": 17089,
+      "finishedAt": 17089.10000000149,
+      "sameTaskUnchanged": true,
+      "identityKeys": [],
+      "storageKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "d5900410eb6980843039a9f9a9c4c2db9ddf5a449c9ef6f6c15b72f9d42d853e",
+        "bytes": 9636
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "d5900410eb6980843039a9f9a9c4c2db9ddf5a449c9ef6f6c15b72f9d42d853e",
+        "bytes": 9636
+      },
+      "threw": false,
+      "error": null
+    },
+    {
+      "id": "bloodBurnArt-first",
+      "phase": "cross-await-background-observation",
+      "unchanged": true,
+      "storageKeys": [],
+      "identityKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "d5900410eb6980843039a9f9a9c4c2db9ddf5a449c9ef6f6c15b72f9d42d853e",
+        "bytes": 9636
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "d5900410eb6980843039a9f9a9c4c2db9ddf5a449c9ef6f6c15b72f9d42d853e",
+        "bytes": 9636
+      },
+      "note": "Includes original background timers; not proof of zero saves or handler mutation"
+    },
+    {
+      "phase": "synchronous-handler",
+      "handler": "showSkillDetail",
+      "args": [
+        "bloodBurnArt"
+      ],
+      "startedAt": 17520.10000000149,
+      "finishedAt": 17521.30000000447,
+      "sameTaskUnchanged": true,
+      "identityKeys": [],
+      "storageKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "d5900410eb6980843039a9f9a9c4c2db9ddf5a449c9ef6f6c15b72f9d42d853e",
+        "bytes": 9636
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "d5900410eb6980843039a9f9a9c4c2db9ddf5a449c9ef6f6c15b72f9d42d853e",
+        "bytes": 9636
+      },
+      "threw": false,
+      "error": null
+    },
+    {
+      "phase": "synchronous-handler",
+      "handler": "closeSkillDetail",
+      "args": [],
+      "startedAt": 17937.80000000447,
+      "finishedAt": 17938,
+      "sameTaskUnchanged": true,
+      "identityKeys": [],
+      "storageKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "d5900410eb6980843039a9f9a9c4c2db9ddf5a449c9ef6f6c15b72f9d42d853e",
+        "bytes": 9636
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "d5900410eb6980843039a9f9a9c4c2db9ddf5a449c9ef6f6c15b72f9d42d853e",
+        "bytes": 9636
+      },
+      "threw": false,
+      "error": null
+    },
+    {
+      "id": "bloodBurnArt-reopen",
+      "phase": "cross-await-background-observation",
+      "unchanged": true,
+      "storageKeys": [],
+      "identityKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "d5900410eb6980843039a9f9a9c4c2db9ddf5a449c9ef6f6c15b72f9d42d853e",
+        "bytes": 9636
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "d5900410eb6980843039a9f9a9c4c2db9ddf5a449c9ef6f6c15b72f9d42d853e",
+        "bytes": 9636
+      },
+      "note": "Includes original background timers; not proof of zero saves or handler mutation"
+    },
+    {
+      "phase": "true-return-to-list-top",
+      "owner": "#characterTabContent",
+      "scrollTop": 0
+    },
+    {
+      "phase": "tab",
+      "element": "water",
+      "cards": [
+        {
+          "id": "waterKnife",
+          "name": "水刀斬",
+          "element": "water",
+          "description": "範圍：敵方1名。Lv1傷害 21。Lv5突破 54。Lv10突破 111。凍傷：50%基礎機率，3回合；期間傷害-30%、最終閃躲-25%、最終異常狀態抗性-25%；吸血：10%實際傷害回復自身HP。SP 6。",
+          "maxLevel": 10,
+          "learnLevel": 1,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": true,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 4,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "需先學會至少 1 招本命元素技能"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 868.0098876953125,
+            "width": 54.93333435058594,
+            "height": 50.35552978515625,
+            "top": 868.0098876953125,
+            "right": 96.13333129882812,
+            "bottom": 918.3654174804688,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "frostPunch",
+          "name": "冰霜拳",
+          "element": "water",
+          "description": "範圍：敵方1名。Lv1傷害 32。Lv5突破 80。Lv10突破 162。凍傷：40%基礎機率，2回合；期間傷害-30%、最終閃躲-25%、最終異常狀態抗性-25%；吸血：7%實際傷害回復自身HP。SP 17。",
+          "maxLevel": 10,
+          "learnLevel": 7,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 12,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv7 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 1130.087646484375,
+            "width": 54.93333435058594,
+            "height": 50.3555908203125,
+            "top": 1130.087646484375,
+            "right": 96.13333129882812,
+            "bottom": 1180.4432373046875,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "iceSpin",
+          "name": "冰旋一閃",
+          "element": "water",
+          "description": "範圍：同排中、左、右最多3名。Lv1傷害 35。Lv5突破 84。Lv10突破 168。凍傷：35%基礎機率，2回合；期間傷害-30%、最終閃躲-25%、最終異常狀態抗性-25%；吸血：8%實際傷害回復自身HP。SP 45。",
+          "maxLevel": 10,
+          "learnLevel": 14,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 20,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv14 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 1352.10986328125,
+            "width": 54.93333435058594,
+            "height": 50.3555908203125,
+            "top": 1352.10986328125,
+            "right": 96.13333129882812,
+            "bottom": 1402.4654541015625,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "frostCrush",
+          "name": "冰封重擊",
+          "element": "water",
+          "description": "範圍：敵方1名。Lv1傷害 116。Lv5突破 282。Lv10突破 567。凍傷：45%基礎機率，2回合；期間傷害-30%、最終閃躲-25%、最終異常狀態抗性-25%；吸血：9%實際傷害回復自身HP。SP 60。",
+          "maxLevel": 10,
+          "learnLevel": 30,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 32,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv30 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 1574.132080078125,
+            "width": 54.93333435058594,
+            "height": 50.3555908203125,
+            "top": 1574.132080078125,
+            "right": 96.13333129882812,
+            "bottom": 1624.4876708984375,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "waterBall",
+          "name": "水球術",
+          "element": "water",
+          "description": "範圍：同排中、左、右最多3名。Lv1傷害 10。Lv5突破 24。Lv10突破 48。凍傷：50%基礎機率，2回合；期間傷害-30%、最終閃躲-25%、最終異常狀態抗性-25%；吸血：6%實際傷害回復自身HP。SP 8。",
+          "maxLevel": 10,
+          "learnLevel": 1,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": true,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 4,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "需先學會至少 1 招本命元素技能"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 1796.154296875,
+            "width": 54.93333435058594,
+            "height": 50.3555908203125,
+            "top": 1796.154296875,
+            "right": 96.13333129882812,
+            "bottom": 1846.5098876953125,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "floodBeast",
+          "name": "洪水猛獸",
+          "element": "water",
+          "description": "範圍：敵方1名。Lv1傷害 105。Lv5突破 252。Lv10突破 504。凍傷：40%基礎機率，2回合；期間傷害-30%、最終閃躲-25%、最終異常狀態抗性-25%；吸血：9%實際傷害回復自身HP。SP 35。",
+          "maxLevel": 10,
+          "learnLevel": 7,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 12,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv7 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2058.23193359375,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 2058.23193359375,
+            "right": 96.13333129882812,
+            "bottom": 2108.587646484375,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "iceArrowRain",
+          "name": "冰霜箭雨",
+          "element": "water",
+          "description": "範圍：敵方全體。Lv1傷害 30。Lv5突破 72。Lv10突破 144。凍傷：35%基礎機率，2回合；期間傷害-30%、最終閃躲-25%、最終異常狀態抗性-25%；吸血：6%實際傷害回復自身HP。SP 75。",
+          "maxLevel": 10,
+          "learnLevel": 14,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 20,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv14 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2280.254150390625,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 2280.254150390625,
+            "right": 96.13333129882812,
+            "bottom": 2330.60986328125,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "healSpell",
+          "name": "治療術",
+          "element": "water",
+          "description": "範圍：我方中、左、右最多3名。恢復550 HP，並恢復目標最大SP的0%；解除所有可解除負面狀態；施放者不恢復自身SP。最高 Lv5。SP 45。",
+          "maxLevel": 5,
+          "learnLevel": 15,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 16,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv15 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2502.2763671875,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 2502.2763671875,
+            "right": 96.13333129882812,
+            "bottom": 2552.632080078125,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "revive",
+          "name": "復活術",
+          "element": "water",
+          "description": "範圍：死亡友方1名。復活1名死亡友方並恢復最大HP的20%；不恢復SP。最高 Lv5。SP 45。",
+          "maxLevel": 5,
+          "learnLevel": 20,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 20,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv20 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2724.298583984375,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 2724.298583984375,
+            "right": 96.13333129882812,
+            "bottom": 2774.654296875,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "freeze",
+          "name": "冰封",
+          "element": "water",
+          "description": "範圍：同一直列前、後最多2名敵人。滿級範圍：敵方中、左、右最多3名。55%基礎機率冰封，持續3回合；完全無法行動，受硬控命中上限與冰封／石化互斥限制。最高 Lv5。SP 32。",
+          "maxLevel": 5,
+          "learnLevel": 25,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 28,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv25 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2946.32080078125,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 2946.32080078125,
+            "right": 96.13333129882812,
+            "bottom": 2996.676513671875,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "purifyMind",
+          "name": "淨心訣",
+          "element": "water",
+          "description": "範圍：我方或敵方1名。滿級範圍：我方或敵方中、左、右最多3名。立即清除所有可解除的臨時增益、減益、護盾、結界與異常狀態；不清除永久被動、EX、裝備效果、首領固有機制、HP／SP或死亡狀態。最高 Lv3。SP 22。",
+          "maxLevel": 3,
+          "learnLevel": 35,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 36,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv35 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 3168.343017578125,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 3168.343017578125,
+            "right": 96.13333129882812,
+            "bottom": 3218.69873046875,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "waterEX",
+          "name": "水元素EX",
+          "element": "water",
+          "description": "範圍：被動。吸血效果 +20%、吸 SP 效果 +20%、回復類技能HP恢復量 +15%；每回合開始前有35%機率解除自身所有可解除負面狀態。",
+          "maxLevel": 1,
+          "learnLevel": 50,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 40,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv50 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 3390.365234375,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 3390.365234375,
+            "right": 96.13333129882812,
+            "bottom": 3440.720947265625,
+            "left": 41.19999694824219
+          }
+        }
+      ]
+    },
+    {
+      "phase": "synchronous-handler",
+      "handler": "showSkillDetail",
+      "args": [
+        "purifyMind"
+      ],
+      "startedAt": 30635,
+      "finishedAt": 30636.20000000298,
+      "sameTaskUnchanged": true,
+      "identityKeys": [],
+      "storageKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "85c256b37a1fd750be70948741303eb873053599417c245485617e6cf50db344",
+        "bytes": 11434
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "85c256b37a1fd750be70948741303eb873053599417c245485617e6cf50db344",
+        "bytes": 11434
+      },
+      "threw": false,
+      "error": null
+    },
+    {
+      "id": "purifyMind",
+      "level": 0,
+      "eligibility": {
+        "isCrossElement": true,
+        "isNativeElement": false,
+        "allowed": false,
+        "levelOk": false,
+        "prerequisiteRequired": false,
+        "prerequisiteOk": true,
+        "learnCost": 36,
+        "pointsOk": false,
+        "crossGateOk": false,
+        "reason": "Lv35 解鎖"
+      },
+      "end": "true gesture end"
+    },
+    {
+      "phase": "synchronous-handler",
+      "handler": "closeSkillDetail",
+      "args": [],
+      "startedAt": 33602.80000000447,
+      "finishedAt": 33603,
+      "sameTaskUnchanged": true,
+      "identityKeys": [],
+      "storageKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "6c88c75da3852353eee7949337db02999286169dbcb4562cb1a97d2e5d94b5b0",
+        "bytes": 11434
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "6c88c75da3852353eee7949337db02999286169dbcb4562cb1a97d2e5d94b5b0",
+        "bytes": 11434
+      },
+      "threw": false,
+      "error": null
+    },
+    {
+      "id": "purifyMind-first",
+      "phase": "cross-await-background-observation",
+      "unchanged": false,
+      "storageKeys": [
+        "four_symbols_account:skill-runtime-browser-qa:rested-exp-state"
+      ],
+      "identityKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "85c256b37a1fd750be70948741303eb873053599417c245485617e6cf50db344",
+        "bytes": 11434
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "6c88c75da3852353eee7949337db02999286169dbcb4562cb1a97d2e5d94b5b0",
+        "bytes": 11434
+      },
+      "note": "Includes original background timers; not proof of zero saves or handler mutation"
+    },
+    {
+      "phase": "synchronous-handler",
+      "handler": "showSkillDetail",
+      "args": [
+        "purifyMind"
+      ],
+      "startedAt": 34035.5,
+      "finishedAt": 34036.39999999851,
+      "sameTaskUnchanged": true,
+      "identityKeys": [],
+      "storageKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "6c88c75da3852353eee7949337db02999286169dbcb4562cb1a97d2e5d94b5b0",
+        "bytes": 11434
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "6c88c75da3852353eee7949337db02999286169dbcb4562cb1a97d2e5d94b5b0",
+        "bytes": 11434
+      },
+      "threw": false,
+      "error": null
+    },
+    {
+      "phase": "synchronous-handler",
+      "handler": "closeSkillDetail",
+      "args": [],
+      "startedAt": 34454,
+      "finishedAt": 34454.10000000149,
+      "sameTaskUnchanged": true,
+      "identityKeys": [],
+      "storageKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "6c88c75da3852353eee7949337db02999286169dbcb4562cb1a97d2e5d94b5b0",
+        "bytes": 11434
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "6c88c75da3852353eee7949337db02999286169dbcb4562cb1a97d2e5d94b5b0",
+        "bytes": 11434
+      },
+      "threw": false,
+      "error": null
+    },
+    {
+      "id": "purifyMind-reopen",
+      "phase": "cross-await-background-observation",
+      "unchanged": false,
+      "storageKeys": [
+        "four_symbols_account:skill-runtime-browser-qa:rested-exp-state"
+      ],
+      "identityKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "85c256b37a1fd750be70948741303eb873053599417c245485617e6cf50db344",
+        "bytes": 11434
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "6c88c75da3852353eee7949337db02999286169dbcb4562cb1a97d2e5d94b5b0",
+        "bytes": 11434
+      },
+      "note": "Includes original background timers; not proof of zero saves or handler mutation"
+    },
+    {
+      "phase": "true-return-to-list-top",
+      "owner": "#characterTabContent",
+      "scrollTop": 0
+    },
+    {
+      "phase": "tab",
+      "element": "earth",
+      "cards": [
+        {
+          "id": "stoneSlash",
+          "name": "土石斬",
+          "element": "earth",
+          "description": "範圍：敵方1名。Lv1傷害 26。Lv5突破 66。Lv10突破 135。破防：75%基礎機率，防禦-70%，1回合。SP 7。",
+          "maxLevel": 10,
+          "learnLevel": 1,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": true,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 4,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "需先學會至少 1 招本命元素技能"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 868.0098876953125,
+            "width": 54.93333435058594,
+            "height": 50.35552978515625,
+            "top": 868.0098876953125,
+            "right": 96.13333129882812,
+            "bottom": 918.3654174804688,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "petrifyFist",
+          "name": "石盾拳",
+          "element": "earth",
+          "description": "範圍：同排中、左、右最多3名。Lv1傷害 13。Lv5突破 33。Lv10突破 68。自身護盾：750，2回合；我方護盾：200，2回合。SP 26。",
+          "maxLevel": 10,
+          "learnLevel": 7,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 12,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv7 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 1130.087646484375,
+            "width": 54.93333435058594,
+            "height": 50.3555908203125,
+            "top": 1130.087646484375,
+            "right": 96.13333129882812,
+            "bottom": 1180.4432373046875,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "stoneBreakSky",
+          "name": "石破天驚",
+          "element": "earth",
+          "description": "範圍：敵方1名。Lv1傷害 128。Lv5突破 309。Lv10突破 620。自身護盾：500，2回合；我方護盾：200，2回合。SP 42。",
+          "maxLevel": 10,
+          "learnLevel": 14,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 20,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv14 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 1352.10986328125,
+            "width": 54.93333435058594,
+            "height": 50.3555908203125,
+            "top": 1352.10986328125,
+            "right": 96.13333129882812,
+            "bottom": 1402.4654541015625,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "earthquakeCrush",
+          "name": "地裂重拳",
+          "element": "earth",
+          "description": "範圍：同排中、左、右最多3名。Lv1傷害 47。Lv5突破 111。Lv10突破 221。石化：65%基礎機率，2回合。SP 55。",
+          "maxLevel": 10,
+          "learnLevel": 30,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 32,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv30 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 1574.132080078125,
+            "width": 54.93333435058594,
+            "height": 50.3555908203125,
+            "top": 1574.132080078125,
+            "right": 96.13333129882812,
+            "bottom": 1624.4876708984375,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "stoneThrow",
+          "name": "落石術",
+          "element": "earth",
+          "description": "範圍：同排中、左、右最多3名。Lv1傷害 12。Lv5突破 32。Lv10突破 66。破防：75%基礎機率，防禦-70%，1回合。SP 7。",
+          "maxLevel": 10,
+          "learnLevel": 1,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": true,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 4,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "需先學會至少 1 招本命元素技能"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 1796.154296875,
+            "width": 54.93333435058594,
+            "height": 50.3555908203125,
+            "top": 1796.154296875,
+            "right": 96.13333129882812,
+            "bottom": 1846.5098876953125,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "sandWind",
+          "name": "滾石術",
+          "element": "earth",
+          "description": "範圍：同排中、左、右最多3名。Lv1傷害 14。Lv5突破 39。Lv10突破 83。破防：65%基礎機率，防禦-60%，1回合。SP 19。",
+          "maxLevel": 10,
+          "learnLevel": 7,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 12,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv7 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2058.23193359375,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 2058.23193359375,
+            "right": 96.13333129882812,
+            "bottom": 2108.587646484375,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "flyingSandStrike",
+          "name": "飛沙瞬擊",
+          "element": "earth",
+          "description": "範圍：敵方全體。Lv1傷害 24。Lv5突破 59。Lv10突破 119。破防：60%基礎機率，防禦-35%，2回合。SP 55。",
+          "maxLevel": 10,
+          "learnLevel": 14,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 20,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv14 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2280.254150390625,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 2280.254150390625,
+            "right": 96.13333129882812,
+            "bottom": 2330.60986328125,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "dustStorm",
+          "name": "地牛猛襲",
+          "element": "earth",
+          "description": "範圍：敵方1名。Lv1傷害 140。Lv5突破 336。Lv10突破 672。石化：60%基礎機率，2回合。SP 65。",
+          "maxLevel": 10,
+          "learnLevel": 30,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 32,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv30 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2502.2763671875,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 2502.2763671875,
+            "right": 96.13333129882812,
+            "bottom": 2552.632080078125,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "rockWall",
+          "name": "岩石壁壘",
+          "element": "earth",
+          "description": "範圍：我方中、左、右最多3名。防禦+15%，持續4回合。最高 Lv5。SP 45。",
+          "maxLevel": 5,
+          "learnLevel": 18,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 20,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv18 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2724.298583984375,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 2724.298583984375,
+            "right": 96.13333129882812,
+            "bottom": 2774.654296875,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "earthShield",
+          "name": "萬象土盾",
+          "element": "earth",
+          "description": "範圍：自己。直接傷害減少並反射20%，可觸發2次，持續3回合；同名不可疊加或刷新。最高 Lv5。SP 45。",
+          "maxLevel": 5,
+          "learnLevel": 25,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 28,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv25 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 2946.32080078125,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 2946.32080078125,
+            "right": 96.13333129882812,
+            "bottom": 2996.676513671875,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "barrier",
+          "name": "結界",
+          "element": "earth",
+          "description": "範圍：我方1名。持續3回合；免疫一般直接傷害、持續傷害與反傷，但不免疫狀態、硬控或淨心訣。最高 Lv5。SP 40。",
+          "maxLevel": 5,
+          "learnLevel": 35,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 36,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv35 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 3168.343017578125,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 3168.343017578125,
+            "right": 96.13333129882812,
+            "bottom": 3218.69873046875,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "id": "earthEX",
+          "name": "土元素EX",
+          "element": "earth",
+          "description": "範圍：被動。永久提升防禦力35%、最大HP +20%。",
+          "maxLevel": 1,
+          "learnLevel": 50,
+          "level": 0,
+          "eligibility": {
+            "isCrossElement": true,
+            "isNativeElement": false,
+            "allowed": false,
+            "levelOk": false,
+            "prerequisiteRequired": false,
+            "prerequisiteOk": true,
+            "learnCost": 40,
+            "pointsOk": false,
+            "crossGateOk": false,
+            "reason": "Lv50 解鎖"
+          },
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 3390.365234375,
+            "width": 54.93333435058594,
+            "height": 50.355712890625,
+            "top": 3390.365234375,
+            "right": 96.13333129882812,
+            "bottom": 3440.720947265625,
+            "left": 41.19999694824219
+          }
+        }
+      ]
+    },
+    {
+      "phase": "synchronous-handler",
+      "handler": "showSkillDetail",
+      "args": [
+        "barrier"
+      ],
+      "startedAt": 48950.89999999851,
+      "finishedAt": 48952,
+      "sameTaskUnchanged": true,
+      "identityKeys": [],
+      "storageKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "03590fcaa659426092ffba3f15b2b6565b10d1bb3a0ad69347b54fb4e936e703",
+        "bytes": 11434
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "03590fcaa659426092ffba3f15b2b6565b10d1bb3a0ad69347b54fb4e936e703",
+        "bytes": 11434
+      },
+      "threw": false,
+      "error": null
+    },
+    {
+      "id": "barrier",
+      "level": 0,
+      "eligibility": {
+        "isCrossElement": true,
+        "isNativeElement": false,
+        "allowed": false,
+        "levelOk": false,
+        "prerequisiteRequired": false,
+        "prerequisiteOk": true,
+        "learnCost": 36,
+        "pointsOk": false,
+        "crossGateOk": false,
+        "reason": "Lv35 解鎖"
+      },
+      "end": "true gesture end"
+    },
+    {
+      "phase": "synchronous-handler",
+      "handler": "closeSkillDetail",
+      "args": [],
+      "startedAt": 51936.10000000149,
+      "finishedAt": 51936.20000000298,
+      "sameTaskUnchanged": true,
+      "identityKeys": [],
+      "storageKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "03590fcaa659426092ffba3f15b2b6565b10d1bb3a0ad69347b54fb4e936e703",
+        "bytes": 11434
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "03590fcaa659426092ffba3f15b2b6565b10d1bb3a0ad69347b54fb4e936e703",
+        "bytes": 11434
+      },
+      "threw": false,
+      "error": null
+    },
+    {
+      "id": "barrier-first",
+      "phase": "cross-await-background-observation",
+      "unchanged": true,
+      "storageKeys": [],
+      "identityKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "03590fcaa659426092ffba3f15b2b6565b10d1bb3a0ad69347b54fb4e936e703",
+        "bytes": 11434
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "03590fcaa659426092ffba3f15b2b6565b10d1bb3a0ad69347b54fb4e936e703",
+        "bytes": 11434
+      },
+      "note": "Includes original background timers; not proof of zero saves or handler mutation"
+    },
+    {
+      "phase": "synchronous-handler",
+      "handler": "showSkillDetail",
+      "args": [
+        "barrier"
+      ],
+      "startedAt": 52368.10000000149,
+      "finishedAt": 52369.10000000149,
+      "sameTaskUnchanged": true,
+      "identityKeys": [],
+      "storageKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "03590fcaa659426092ffba3f15b2b6565b10d1bb3a0ad69347b54fb4e936e703",
+        "bytes": 11434
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "03590fcaa659426092ffba3f15b2b6565b10d1bb3a0ad69347b54fb4e936e703",
+        "bytes": 11434
+      },
+      "threw": false,
+      "error": null
+    },
+    {
+      "phase": "synchronous-handler",
+      "handler": "closeSkillDetail",
+      "args": [],
+      "startedAt": 52785.30000000447,
+      "finishedAt": 52785.39999999851,
+      "sameTaskUnchanged": true,
+      "identityKeys": [],
+      "storageKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "03590fcaa659426092ffba3f15b2b6565b10d1bb3a0ad69347b54fb4e936e703",
+        "bytes": 11434
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "03590fcaa659426092ffba3f15b2b6565b10d1bb3a0ad69347b54fb4e936e703",
+        "bytes": 11434
+      },
+      "threw": false,
+      "error": null
+    },
+    {
+      "id": "barrier-reopen",
+      "phase": "cross-await-background-observation",
+      "unchanged": true,
+      "storageKeys": [],
+      "identityKeys": [],
+      "before": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "03590fcaa659426092ffba3f15b2b6565b10d1bb3a0ad69347b54fb4e936e703",
+        "bytes": 11434
+      },
+      "after": {
+        "rawSnapshotIn": "412x915-report.full.json.gz",
+        "sha256": "03590fcaa659426092ffba3f15b2b6565b10d1bb3a0ad69347b54fb4e936e703",
+        "bytes": 11434
+      },
+      "note": "Includes original background timers; not proof of zero saves or handler mutation"
+    }
+  ],
+  "scope": "3-ID language delta; original48 base retained. Real detail links, read/end/close/reopen; isolated level/loadout presentation fixtures. No learning/upgrading/equipping/casting/consume/settlement. No true device or cloud authority acceptance.",
+  "sourcesAfter": {
+    "index.html": "093d31ad61acc55b12d6a55ab3e5bc6b49bd5bd8f13dc0c34e2f5397779262ac",
+    "asset-manifest.json": "6d24edb0ed3abcad341475e643ddbafa3163354f989a248989360e6fa8e794e0",
+    "js/00-main.js": "44c8c321e74c4399c166806148fca08f6a40c78ed29e54c826a0e81a8402d4c8",
+    "js/60-v173.64-skill-progression-rebalance.js": "c67f8bd6cadc91315afb7d4aa43f19ab93363f60a3891904fbad79b61c9779b7",
+    "build/app-shell.21c79e4fa190.css": "21c79e4fa1909bcbbb333b254428ff03fbf0e60003d34fec0850b02af2bf325b",
+    "build/app-shell.9d4cba99e9f4.js": "9d4cba99e9f4b76c613a1c2a82f779cfa17fc54a587a2dc3f2f1734d4aeb0c9d",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/boot-core.e7a5c8849782.css": "e7a5c8849782b12ec2358f1a1cbe3af19e182d6b45c0c3ed489ab69bee287886",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.41c2d3198f68.css": "41c2d3198f68a120034ce6e569f8220648982811d0a31b1c3101252ce8b18ac5"
+  },
+  "sourceUnchanged": true,
+  "handlerRestoration": {
+    "exactBeforeRestore": true,
+    "restored": true
+  },
+  "rawReport": {
+    "file": "412x915-report.full.json.gz",
+    "sha256": "72846972087448544bb32a755523c30135dd8e6332dfc26fcc2e8153baa3d434",
+    "uncompressedBytes": 580270,
+    "compressedBytes": 21594
+  }
+}

@@ -2679,7 +2679,7 @@
       "label": "技能詳情",
       "entry": "showSkillDetail(skillId)",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "有問題",
+      "status": "部分已實際驗證",
       "states": [
         "短內容",
         "長內容",
@@ -2783,6 +2783,19 @@
           "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
           "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
           "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+        ]
+      },
+      "segment25Accepted": {
+        "baseHead": "be598b486010157f3a707718458ecd2aa255adcf",
+        "deltaHead": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+        "status": "四尺寸48base+3ID語言delta限定通過",
+        "baseEvidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base",
+        "deltaEvidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta",
+        "limits": [
+          "本段只48技能詳情閱讀/開關/重開，四個Lv1已學隔離fixture；未驗其他mid/max級別視覺或學習/升級/裝備/施放/消耗/交易/真硬體。",
+          "24張delta圖不是逐級中間列圖審；完整正文/各級由同原supportEffectText4literal生成，原數值/排除條件/其餘bytes可逆exact，並保留真全文捲末與原文字快照。",
+          "同步handler同task exact純讀；跨await有原背景資料變化，不稱零save，也不依keys精確判每筆timer來源。",
+          "其他角色TAB/未創slot、摘要跨頁一致性、主城28/42觸控缺口、完整編隊等仍依全介面清單未驗，不稱全遊戲完成。"
         ]
       }
     },
@@ -21160,7 +21173,7 @@
       "label": "焚血訣",
       "entry": ".skill-row-detail-link showSkillDetail(bloodBurnArt)",
       "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
-      "status": "有問題",
+      "status": "部分已實際驗證",
       "states": [
         "未學習/等級前置鎖定時詳情可讀",
         "首開",
@@ -21219,11 +21232,51 @@
       },
       "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
       "remaining": [
-        "語言3ID淨心訣/焚血訣/結界仍有Buff/Debuff/Shield/Barrier/Boss/DoT，未通過，待原supportEffectText4個display字串修復及3ID四尺寸delta。",
-        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
-        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
-        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
-      ]
+        "本段只48技能詳情閱讀/開關/重開，四個Lv1已學隔離fixture；未驗其他mid/max級別視覺或學習/升級/裝備/施放/消耗/交易/真硬體。",
+        "24張delta圖不是逐級中間列圖審；完整正文/各級由同原supportEffectText4literal生成，原數值/排除條件/其餘bytes可逆exact，並保留真全文捲末與原文字快照。",
+        "同步handler同task exact純讀；跨await有原背景資料變化，不稱零save，也不依keys精確判每筆timer來源。",
+        "其他角色TAB/未創slot、摘要跨頁一致性、主城28/42觸控缺口、完整編隊等仍依全介面清單未驗，不稱全遊戲完成。"
+      ],
+      "languageDelta": {
+        "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+        "status": "已實際驗證",
+        "deviceEvidence": {
+          "360x640": {
+            "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/360x640-bloodBurnArt-top.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/360x640-bloodBurnArt-end.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/360x640-report.json"
+          },
+          "393x873": {
+            "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/393x873-bloodBurnArt-top.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/393x873-bloodBurnArt-end.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/393x873-report.json"
+          },
+          "412x915": {
+            "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/412x915-bloodBurnArt-top.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/412x915-bloodBurnArt-end.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/412x915-report.json"
+          },
+          "1280x800": {
+            "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/1280x800-bloodBurnArt-top.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/1280x800-bloodBurnArt-end.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/1280x800-report.json"
+          }
+        },
+        "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/independent-reviews.json",
+        "scope": "只4display字串；原base布局/48項證據保留"
+      }
     },
     {
       "id": "detail.skill.fireEX",
@@ -21989,7 +22042,7 @@
       "label": "淨心訣",
       "entry": ".skill-row-detail-link showSkillDetail(purifyMind)",
       "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
-      "status": "有問題",
+      "status": "部分已實際驗證",
       "states": [
         "未學習/等級前置鎖定時詳情可讀",
         "首開",
@@ -22048,11 +22101,51 @@
       },
       "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
       "remaining": [
-        "語言3ID淨心訣/焚血訣/結界仍有Buff/Debuff/Shield/Barrier/Boss/DoT，未通過，待原supportEffectText4個display字串修復及3ID四尺寸delta。",
-        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
-        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
-        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
-      ]
+        "本段只48技能詳情閱讀/開關/重開，四個Lv1已學隔離fixture；未驗其他mid/max級別視覺或學習/升級/裝備/施放/消耗/交易/真硬體。",
+        "24張delta圖不是逐級中間列圖審；完整正文/各級由同原supportEffectText4literal生成，原數值/排除條件/其餘bytes可逆exact，並保留真全文捲末與原文字快照。",
+        "同步handler同task exact純讀；跨await有原背景資料變化，不稱零save，也不依keys精確判每筆timer來源。",
+        "其他角色TAB/未創slot、摘要跨頁一致性、主城28/42觸控缺口、完整編隊等仍依全介面清單未驗，不稱全遊戲完成。"
+      ],
+      "languageDelta": {
+        "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+        "status": "已實際驗證",
+        "deviceEvidence": {
+          "360x640": {
+            "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/360x640-purifyMind-top.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/360x640-purifyMind-end.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/360x640-report.json"
+          },
+          "393x873": {
+            "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/393x873-purifyMind-top.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/393x873-purifyMind-end.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/393x873-report.json"
+          },
+          "412x915": {
+            "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/412x915-purifyMind-top.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/412x915-purifyMind-end.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/412x915-report.json"
+          },
+          "1280x800": {
+            "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/1280x800-purifyMind-top.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/1280x800-purifyMind-end.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/1280x800-report.json"
+          }
+        },
+        "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/independent-reviews.json",
+        "scope": "只4display字串；原base布局/48項證據保留"
+      }
     },
     {
       "id": "detail.skill.waterEX",
@@ -23646,7 +23739,7 @@
       "label": "結界",
       "entry": ".skill-row-detail-link showSkillDetail(barrier)",
       "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
-      "status": "有問題",
+      "status": "部分已實際驗證",
       "states": [
         "未學習/等級前置鎖定時詳情可讀",
         "首開",
@@ -23705,11 +23798,51 @@
       },
       "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
       "remaining": [
-        "語言3ID淨心訣/焚血訣/結界仍有Buff/Debuff/Shield/Barrier/Boss/DoT，未通過，待原supportEffectText4個display字串修復及3ID四尺寸delta。",
-        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
-        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
-        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
-      ]
+        "本段只48技能詳情閱讀/開關/重開，四個Lv1已學隔離fixture；未驗其他mid/max級別視覺或學習/升級/裝備/施放/消耗/交易/真硬體。",
+        "24張delta圖不是逐級中間列圖審；完整正文/各級由同原supportEffectText4literal生成，原數值/排除條件/其餘bytes可逆exact，並保留真全文捲末與原文字快照。",
+        "同步handler同task exact純讀；跨await有原背景資料變化，不稱零save，也不依keys精確判每筆timer來源。",
+        "其他角色TAB/未創slot、摘要跨頁一致性、主城28/42觸控缺口、完整編隊等仍依全介面清單未驗，不稱全遊戲完成。"
+      ],
+      "languageDelta": {
+        "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+        "status": "已實際驗證",
+        "deviceEvidence": {
+          "360x640": {
+            "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/360x640-barrier-top.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/360x640-barrier-end.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/360x640-report.json"
+          },
+          "393x873": {
+            "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/393x873-barrier-top.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/393x873-barrier-end.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/393x873-report.json"
+          },
+          "412x915": {
+            "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/412x915-barrier-top.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/412x915-barrier-end.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/412x915-report.json"
+          },
+          "1280x800": {
+            "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+            "after": [
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/1280x800-barrier-top.png",
+              "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/1280x800-barrier-end.png"
+            ],
+            "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/1280x800-report.json"
+          }
+        },
+        "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/independent-reviews.json",
+        "scope": "只4display字串；原base布局/48項證據保留"
+      }
     },
     {
       "id": "detail.skill.earthEX",

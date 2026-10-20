@@ -1,0 +1,24 @@
+{
+  "head": "067395727302ef1b2c76d7c1357ac095ba0487ea",
+  "status": "25 base+3ID delta限定通過",
+  "baseHead": "be598b486010157f3a707718458ecd2aa255adcf",
+  "art": {
+    "agent": "/root/art_review",
+    "actualPictures": 24,
+    "scope": "四尺寸3ID首末逐圖；所有清除/排除、持續傷害/免費追擊、結界例外完整，正式HP/SP/Lv/EX保留，置中/雕框/末端按鈕未退化。"
+  },
+  "interaction": {
+    "agent": "/root/interaction_review",
+    "scope": "四尺寸代表首末與全部report，真全文/返回重開0、12同步handler/exactrestoreclean。"
+  },
+  "scope": {
+    "agent": "/root/scope_review",
+    "scope": "四尺寸代表圖；獨立用4pairs反向還原source與整bundle對git7be Buffer exact；plain policy僅digest、所有條件數值不變。"
+  },
+  "limits": [
+    "本段只48技能詳情閱讀/開關/重開，四個Lv1已學隔離fixture；未驗其他mid/max級別視覺或學習/升級/裝備/施放/消耗/交易/真硬體。",
+    "24張delta圖不是逐級中間列圖審；完整正文/各級由同原supportEffectText4literal生成，原數值/排除條件/其餘bytes可逆exact，並保留真全文捲末與原文字快照。",
+    "同步handler同task exact純讀；跨await有原背景資料變化，不稱零save，也不依keys精確判每筆timer來源。",
+    "其他角色TAB/未創slot、摘要跨頁一致性、主城28/42觸控缺口、完整編隊等仍依全介面清單未驗，不稱全遊戲完成。"
+  ]
+}
