@@ -36,12 +36,6 @@
         return loadoutRules.isUnsupportedAutoCategory(skill);
     }
 
-    function isEquippedAndLearnedAutoSkill(characterIndex,skillId){
-        const skillKey=getPartyCharacterKey(characterIndex);
-        const loadout=characterSkillLoadouts[skillKey];
-        return loadoutRules.isEquippedAndLearnedAutoSkill(loadout,skillId);
-    }
-
     function rememberExplicitAction(characterIndex,action){
         const character=getPartyCharacterByIndex(characterIndex);
         if(!character){ return; }

@@ -58,6 +58,13 @@ export function skillLoadoutRuleSemanticDigest(source){
  const wrapper=program.body[0]?.expression;
  if(program.body.length!==1||wrapper?.type!=='CallExpression'||wrapper.callee?.id?.name!=='installSkillProgressionCore')
   throw Error('Skill loadout UMD Owner is unsupported.');
+ const top=wrapper.callee.body.body,bindings=['SKILL_UPGRADE_COST_BY_TARGET_LEVEL','createRulesV1','createRules',
+  'getRulesForVersion','createLoadoutRulesV1','getLoadoutRulesForVersion'];
+ const commonJS=parse('if(typeof module!=="undefined"&&module.exports){module.exports=global.FourSymbolsSkillProgressionCore;}',{ecmaVersion:2022}).body[0];
+ if(top.length!==9||top[0].directive!=='use strict'||bindings.some((name,index)=>{
+  const node=top[index+1];return node?.type!=='VariableDeclaration'||node.kind!=='const'||node.declarations.length!==1||node.declarations[0].id.name!==name;
+ })||top[7].type!=='ExpressionStatement'||JSON.stringify(semantic(top[8]))!==JSON.stringify(semantic(commonJS)))
+  throw Error('Retained loadout export lifecycle is unsupported.');
  const names=['createLoadoutRulesV1','getLoadoutRulesForVersion'];
  const declarations=names.map(name=>wrapper.callee.body.body.filter(node=>node.type==='VariableDeclaration'&&node.kind==='const'&&
   node.declarations.length===1&&node.declarations[0].id.name===name));
@@ -66,6 +73,25 @@ export function skillLoadoutRuleSemanticDigest(source){
  const selector=declarations[1][0].declarations[0].init;
  const expected=parse('(function(version,catalog){if(version==="v1")return createLoadoutRulesV1(catalog);throw new RangeError("Unsupported skill loadout rules version");})',{ecmaVersion:2022}).body[0].expression;
  if(JSON.stringify(semantic(selector))!==JSON.stringify(semantic(expected)))throw Error('Retained loadout selector must directly forward its original arguments.');
+ const exports=[];
+ function findExports(node){
+  if(!node||typeof node!=='object')return;
+  if(node.type==='AssignmentExpression'&&node.left.type==='MemberExpression'&&!node.left.computed&&
+   node.left.object?.name==='global'&&node.left.property?.name==='FourSymbolsSkillProgressionCore')exports.push(node);
+  for(const child of Object.values(node))if(Array.isArray(child))child.forEach(findExports);else findExports(child);
+ }
+ findExports(wrapper);
+ const output=exports[0]?.right;
+ if(exports.length!==1||exports[0]!==top[7].expression||exports[0].operator!=='='||output?.type!=='CallExpression'||output.optional||
+  output.callee?.type!=='MemberExpression'||output.callee.computed||output.callee.optional||
+  output.callee.object?.name!=='Object'||output.callee.property?.name!=='freeze'||output.arguments.length!==1||
+  output.arguments[0]?.type!=='ObjectExpression')throw Error('Retained loadout export must be one frozen object.');
+ const properties=output.arguments[0].properties;
+ if(properties.some(prop=>prop.type!=='Property'||prop.computed||prop.method||prop.kind!=='init')||
+  new Set(properties.map(prop=>prop.key.name)).size!==properties.length)throw Error('Retained loadout export fields are unsupported.');
+ const exported=properties.filter(prop=>prop.key.name==='getLoadoutRulesForVersion');
+ if(exported.length!==1||exported[0].value.type!=='Identifier'||exported[0].value.name!=='getLoadoutRulesForVersion')
+  throw Error('Retained loadout export must directly bind its original selector.');
  function rejectRebinding(node){
   if(!node||typeof node!=='object')return;
   if((node.type==='AssignmentExpression'&&node.left.type==='Identifier'&&names.includes(node.left.name))||

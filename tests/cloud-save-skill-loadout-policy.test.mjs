@@ -79,6 +79,9 @@ test('separate retained loadout version fails closed while original learning pol
     assert.notEqual(skillLoadoutRuleSemanticDigest(source.replace('equipped.length>=4','equipped.length>=3')),skillLoadoutRuleSemanticDigest(source));
     for(const replacement of ['return createLoadoutRulesV1();','return createRulesV1(catalog,[]);'])
         assert.throws(()=>skillLoadoutRuleSemanticDigest(source.replace('return createLoadoutRulesV1(catalog);',replacement)),/selector/);
+    for(const replacement of ['getLoadoutRulesForVersion:createRules,','getLoadoutRulesForVersion,getLoadoutRulesForVersion,'])
+        assert.throws(()=>skillLoadoutRuleSemanticDigest(source.replace('getRulesForVersion,getLoadoutRulesForVersion,','getRulesForVersion,'+replacement)),/export/);
+    assert.throws(()=>skillLoadoutRuleSemanticDigest(source.replace('if(typeof module!=="undefined"','global.FourSymbolsSkillProgressionCore={getLoadoutRulesForVersion:createRules};\nif(typeof module!=="undefined"')),/export/);
 });
 test('loadout decisions preserve frozen inputs and use no clock, randomness, storage or DOM',()=>{
     const source=fs.readFileSync(new URL('../functions/src/skill-progression-core.js',import.meta.url),'utf8');
