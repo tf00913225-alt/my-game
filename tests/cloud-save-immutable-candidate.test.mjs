@@ -18,12 +18,12 @@ function lexicalFactory(enabled,io={bucketName:'private-fake-test-bucket'},artif
     let source=readFileSync(filename,'utf8');
     const needle='return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact';
     assert.equal(source.split(needle).length,2);
-    source=source.replace(needle,'return Object.freeze({pinRawCapture,loadPinnedRawMaterial,verifyPinnedSegmentedProof,pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact');
+    source=source.replace(needle,'return Object.freeze({assemblePinnedRawArchive,publicationMaterialTestValue:identity=>publicationValue(publicationMaterials,identity),publicationArtifactTestValue:identity=>publicationValue(publicationArtifacts,identity),publicationPreparationTestValue:identity=>publicationValue(publicationPreparations,identity),pinRawCapture,loadPinnedRawMaterial,verifyPinnedSegmentedProof,pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact');
     if(enabled){
         source=source.replace('return buildRecoveryOwner(deps,null,false);','return buildRecoveryOwner(deps,require("test-only-immutable-candidate-io"),false);');
         const native=compiled.require.bind(compiled);compiled.require=name=>name==='test-only-immutable-candidate-io'?io:native(name);
     }
-    source=source.replace('return Object.freeze({pinRawCapture,','return Object.freeze({publishCapturedCandidate,publishPreparedCandidate,ackCandidatePublication,pinRawCapture,');
+    source=source.replace('return Object.freeze({assemblePinnedRawArchive,','return Object.freeze({publishCapturedCandidate,publishPreparedCandidate,ackCandidatePublication,assemblePinnedRawArchive,');
     if(artifactHelper){const native=compiled.require.bind(compiled);compiled.require=name=>name==='./recovery-audit-artifact'?artifactHelper:native(name);}
     compiled._compile(source,filename);return compiled.exports.createCanonicalCurrentRecovery;
 }
@@ -38,7 +38,7 @@ function sdkDb(db){
         get:()=>db.runTransaction(tx=>tx.get(row))});
     return {collection:name=>query(db.collection(name)),doc:path=>reference(db.doc(path)),runTransaction:operation=>db.runTransaction(operation)};
 }
-async function fixture(io,artifactHelper){
+async function fixture(io,artifactHelper,beforeAudit){
     const h=storeHarness({optimisticTransactions:true}),sessions=createSessionAuthority(h.dependencies);
     let authTime=Math.floor(h.clock/1000),session=await sessions.create({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid}});
     const request=()=>({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid,session}});
@@ -50,6 +50,7 @@ async function fixture(io,artifactHelper){
     await forest.issueTicket(request(),{operationId:ticketId,expectedRevision:2,triggerEntryId:'forest:0',availableEntryIds:['forest:0']});
     await forest.settleMember(request(),{operationId:'immutable-forest-member-001',expectedRevision:h.revision,ticketId,memberIndex:0});
     await forest.settleTerminal(request(),{operationId:'immutable-forest-win-00001',expectedRevision:h.revision,ticketId,kind:'win'});
+    if(beforeAudit)await beforeAudit(h);
     const approvalOperationId='immutable-operator-approval';
     await createCanonicalRecoveryApproval(deps).issue({auth:{uid:'operator',token:{cloudSaveOperator:true}},data:{ownerUid:h.uid,operationId:approvalOperationId,sourceRevision:h.revision,ttlSeconds:60}});
     const original=createCanonicalCurrentRecovery(deps);
@@ -378,4 +379,112 @@ test('private pinned proof final SDK retry rechecks binding and rollback cannot 
     f.h.abortNext();await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),ready.pin,ready.material),/rollback/);
     assert.equal(f.h.writes,writes);assert.deepEqual([...f.h.data],before);
     await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),ready.pin,ready.material),/original private/);
+});
+async function rawPreparedFixture(artifactHelper){
+    const io=fakeStorage(),f=await fixture(io,artifactHelper);
+    io.outside=()=>assert.equal(f.transactionDepth,0);
+    const owner=artifactHelper?lexicalFactory(true,io,artifactHelper)(f.deps):f.private;
+    const pin=await owner.pinCandidatePublication(f.request(),args),material=await owner.loadPinnedRawCapture(pin);
+    const identity=await owner.assemblePinnedRawArchive(pin,material);
+    const prepared=await owner.prepareCandidatePublication(f.request(),pin,identity);
+    return {...f,private:owner,io,pin,material,identity,prepared};
+}
+test('raw publication uses one loader/proof/encoding/cut token and a separate original fullread token; v2 stays exact',async()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),tokens=[];
+    const wrapped={...helper,createRecoveryAuditAssemblyBudget:()=>{const token=helper.createRecoveryAuditAssemblyBudget();tokens.push(token);return token;}};
+    const f=await rawPreparedFixture(wrapped),manifest=f.h.data.get(f.root+'/candidatePublications/'+operationId);
+    assert.equal(tokens.length,1);assert.equal(manifest.schemaVersion,2);assert.equal(manifest.candidateEncodingVersion,3);
+    assert.equal(manifest.artifactKind,'canonical-recovery-raw-archive');assert.equal(manifest.proofKind,'segmented-original-rights-v1');
+    assert.equal(helper.recoveryAuditAssemblyUsage(tokens[0]).passes,2);
+    assert.equal(f.private.publicationArtifactTestValue(f.identity).summary.candidateProofValid,false);
+    assert.equal(f.private.publicationArtifactTestValue(f.identity).summary.segmentedProofValid,true);
+    const original=copy([...f.h.data]),proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    assert.equal(tokens.length,2);assert.notEqual(tokens[0],tokens[1]);assert.equal(helper.recoveryAuditAssemblyUsage(tokens[1]).passes,2);
+    for(const trace of f.traces.filter(row=>row.points))assert.deepEqual(trace,{points:13,queries:0,writes:trace.writes});
+    const result=await f.private.ackCandidatePublication(f.request(),f.prepared,proof);
+    for(const key of ['candidateProofValid','trustedCaptureVerified','restoreAuthorized','authoritativeStateReady'])assert.equal(result[key],false);
+    assert.equal(result.generation,'9007199254740993');assert.equal(f.io.objects.size,1);
+    assert.equal((await f.private.publishCapturedCandidate(f.request(),args)).unchanged,true);
+    const v2=await preparedFixture(),row=copy(v2.h.data.get(v2.root+'/candidatePublications/'+operationId));
+    assert.equal(row.schemaVersion,1);assert.equal(row.candidateEncodingVersion,2);assert.equal(Object.hasOwn(row,'proofKind'),false);
+    const bytes=copy(v2.private.publicationArtifactTestValue(v2.ready.artifact).bytes);
+    await v2.private.publishCapturedCandidate(v2.request(),args);
+    assert.deepEqual(v2.private.publicationArtifactTestValue(v2.ready.artifact).bytes,bytes);
+    const after=v2.h.data.get(v2.root+'/candidatePublications/'+operationId),{generation,objectSize,ackAt,...unchanged}=after;
+    assert.deepEqual(unchanged,{...row,status:'acknowledged'});assert.equal(objectSize,bytes.length);assert(generation);assert(ackAt);
+    assert.deepEqual(original.filter(([path])=>!path.includes('/candidatePublications/')),copy([...f.h.data]).filter(([path])=>!path.includes('/candidatePublications/')));
+});
+test('raw publication refuses cross-version manifests and never reinterprets old candidate bytes as raw proof',async()=>{
+    for(const mutate of [row=>row.candidateEncodingVersion=2,row=>row.proofKind='candidate-proof',row=>row.artifactKind='candidate',row=>row.schemaVersion=1]){
+        const f=await rawPreparedFixture(),path=f.root+'/candidatePublications/'+operationId;mutate(f.h.data.get(path));
+        const before=copy([...f.h.data]),calls=f.io.calls.length,writes=f.h.writes;
+        await assert.rejects(f.private.publishPreparedCandidate(f.request(),f.prepared),/version|encoding|proof|manifest/i);
+        await assert.rejects(f.private.publishCapturedCandidate(f.request(),args));
+        assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);assert.equal(f.io.calls.length,calls);
+    }
+});
+test('raw fullread refuses canonically resealed missing chunks; preparation rejects self-consistent captured economic corruption',async()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),hash=bytes=>require('node:crypto').createHash('sha256').update(bytes).digest('hex');
+    const f=await rawPreparedFixture(),artifact=f.private.publicationArtifactTestValue(f.identity);
+    const material=helper.decodeRawRecoveryArchive(artifact.bytes,helper.createRecoveryAuditAssemblyBudget());material.rawChunks.pop();
+    // Stronger test-only adversary reseals container/manifest/private tuple;
+    // original complete capture/source proof must still refuse.
+    const bytes=helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget()),prepared=f.private.publicationPreparationTestValue(f.prepared);
+    artifact.bytes=bytes;prepared.tuple.artifactSha256=hash(bytes);prepared.tuple.artifactByteLength=bytes.length;
+    Object.assign(f.h.data.get(f.root+'/candidatePublications/'+operationId),{artifactSha256:hash(bytes),artifactByteLength:bytes.length});
+    const before=copy([...f.h.data]),writes=f.h.writes;
+    await assert.rejects(f.private.publishPreparedCandidate(f.request(),f.prepared));
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    // The real capture writers seal all inventory/version/hash relationships
+    // around a corrupt retained ledger. Integrity alone grants no authority.
+    const bad=await fixture(fakeStorage(),undefined,h=>{
+        const path=[...h.data.keys()].find(path=>path.startsWith(h.root+'/ledgerEntries/'));h.data.get(path).kind='shop-purchase';
+    });
+    const pin=await bad.private.pinCandidatePublication(bad.request(),args),loaded=await bad.private.loadPinnedRawCapture(pin);
+    const badBefore=copy([...bad.h.data]),badWrites=bad.h.writes;
+    await assert.rejects(bad.private.assemblePinnedRawArchive(pin,loaded),/Embedded Forest mode receipt or ledger binding differs/);
+    assert.deepEqual([...bad.h.data],badBefore);assert.equal(bad.h.writes,badWrites);
+});
+test('raw preparation sticky resource/cut drift refuses without manifest; old material never refreshes its token',async()=>{
+    const helper=require('../functions/src/recovery-audit-artifact');let token;
+    const io=fakeStorage(),f=await fixture(io),owner=lexicalFactory(true,io,{...helper,createRecoveryAuditAssemblyBudget:()=>token=helper.createRecoveryAuditAssemblyBudget()})(f.deps);
+    const pin=await owner.pinCandidatePublication(f.request(),args),material=await owner.loadPinnedRawCapture(pin);
+    helper.chargeRecoveryAuditAssembly(token,'bytes',256*1024*1024);
+    await assert.rejects(owner.assemblePinnedRawArchive(pin,material),/bytes budget exceeded/);
+    await assert.rejects(owner.assemblePinnedRawArchive(pin,material),/original private/);
+    assert.equal(f.h.data.has(f.root+'/candidatePublications/'+operationId),false);assert.equal(io.calls.length,0);
+    const g=await fixture(fakeStorage()),p=await g.private.pinCandidatePublication(g.request(),args),m=await g.private.loadPinnedRawCapture(p);
+    const a=await g.private.assemblePinnedRawArchive(p,m);g.h.data.get(g.root+'/proofState/current').stateSha256='e'.repeat(64);
+    const writes=g.h.writes;await assert.rejects(g.private.prepareCandidatePublication(g.request(),p,a));assert.equal(g.h.writes,writes);
+});
+test('raw ACK lost response requires fresh original fullread; expiry takeover and cancel retain final live gates',async()=>{
+    const f=await rawPreparedFixture(),proof=await f.private.publishPreparedCandidate(f.request(),f.prepared),native=f.h.dependencies.db.runTransaction;
+    f.h.dependencies.db.runTransaction=async operation=>{await native(operation);throw Error('raw lost ACK response');};
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),/raw lost ACK response/);
+    f.h.dependencies.db.runTransaction=native;const before=f.traces.length;
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),/unconsumed/);assert.equal(f.traces.length,before);
+    const refreshed=await f.private.publishPreparedCandidate(f.request(),f.prepared);assert.equal((await f.private.ackCandidatePublication(f.request(),f.prepared,refreshed)).unchanged,true);
+    for(const mutate of [g=>g.h.advance(60000),g=>g.takeover(),g=>g.original.cancelAudit(g.request(),{auditId,expectedEpoch:1,operationId:'raw-publication-cancel-audit'})]){
+        const g=await rawPreparedFixture(),ready=await g.private.publishPreparedCandidate(g.request(),g.prepared);await mutate(g);
+        const writes=g.h.writes,calls=g.io.calls.length;
+        await assert.rejects(g.private.ackCandidatePublication(g.request(),g.prepared,ready));
+        await assert.rejects(g.private.publishPreparedCandidate(g.request(),g.prepared));
+        assert.equal(g.h.writes,writes);assert.equal(g.io.calls.length,calls);
+    }
+});
+test('raw publication deadlines include preparation resolution and awaited fullread without minting reusable proof',async()=>{
+    for(const phase of ['prepare-resolve','fullread-await']){
+        const clock={now:0},helper=clockedArtifact(clock),io=fakeStorage(),f=await fixture(io),owner=lexicalFactory(true,io,helper)(f.deps);
+        const pin=await owner.pinCandidatePublication(f.request(),args),material=await owner.loadPinnedRawCapture(pin),artifact=await owner.assemblePinnedRawArchive(pin,material);
+        if(phase==='prepare-resolve'){
+            const native=f.h.dependencies.db.runTransaction;f.h.dependencies.db.runTransaction=async callback=>{const result=await native(callback);clock.now=30001;return result;};
+            await assert.rejects(owner.prepareCandidatePublication(f.request(),pin,artifact),/deadline exceeded/);
+            assert.equal(io.calls.length,0,'No private prepared identity escaped the late transaction resolution');
+        }else{
+            const prepared=await owner.prepareCandidatePublication(f.request(),pin,artifact),read=io.readExact;
+            io.readExact=async input=>{const result=await read(input);clock.now=30001;return result;};
+            const writes=f.h.writes;await assert.rejects(owner.publishPreparedCandidate(f.request(),prepared),/deadline exceeded/);
+            assert.equal(f.h.data.get(f.root+'/candidatePublications/'+operationId).status,'prepared');assert.equal(f.h.writes,writes);
+        }
+    }
 });
