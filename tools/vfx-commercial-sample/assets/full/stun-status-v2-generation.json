@@ -1,0 +1,47 @@
+{
+  "asset": "stun-status-v2",
+  "tool": "built-in image_gen",
+  "attempts": 1,
+  "editTarget": "assets/vfx/status/stun.webp",
+  "generationMother": "C:\\Users\\User\\.codex\\generated_images\\01a1547a-204f-7812-b59e-d8c10e15a5d6\\exec-e3026702-58b1-4b76-a486-ba2a998d417d.png",
+  "prompt": "Use case: precise-object-edit. Edit target: provided stun status image, replace the entire tall swirling body-covering effect with one compact overhead dizziness status symbol. Single transparent raster asset, NOT sprite sheet. Exactly three sharp five-point golden stars, slightly different sizes, arranged around ONE short thin shallow horizontal elliptical orbit. Gold beveled edges and restrained warm glow matching original fantasy VFX polish. The orbit is delicate and broken behind the stars, not a thick luminous cloud; open transparent center. Compact wide composition centered in canvas with generous transparent outer padding. Intended to render as a tiny symbol above a character's head, so crisp simple readable silhouettes. No character, no head, no body, no lettering, no extra stars or sparkles, no long spiral, no vertical column, no fog, no opaque backdrop. True alpha transparency.",
+  "transparentBackground": true,
+  "grid": null,
+  "size": [
+    1774,
+    887
+  ],
+  "mode": "RGBA",
+  "lossless": true,
+  "exactRGBAEqual": true,
+  "alphaExtrema": [
+    0,
+    254
+  ],
+  "alpha64Bounds": [
+    217,
+    209,
+    1572,
+    682
+  ],
+  "alpha64EdgePixels": 0,
+  "alpha64MarginsPx": [
+    217,
+    209,
+    202,
+    205
+  ],
+  "sha256": "047e37bef6c86ad891662ffe2c93f33c7a30741779c159e9554476f4e23ea57b",
+  "bytes": 614238,
+  "selfReview": {
+    "result": "independent-review-required",
+    "observed": "Exactly three gold stars and a short shallow elliptical orbit; no tall spiral, character, column or fog. Wide compact composition with open transparent holes and outer padding. Orbit retains broad warm glow relative to its sharp core; independent reviewer should assess tiny-size readability.",
+    "notVerified": [
+      "in-game positioning",
+      "small rendered readability",
+      "USB gameplay",
+      "rotation lifecycle",
+      "performance"
+    ]
+  }
+}

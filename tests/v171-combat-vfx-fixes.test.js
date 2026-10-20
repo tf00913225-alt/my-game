@@ -35,8 +35,8 @@ test("Tidal Beast is single-target Frostbite and has no legacy team Freeze path"
     );
     assert.match(
         animation,
-        /floodBeast:\{[^\n]*preserveSourceOrientation:true/,
-        "Flood Beast keeps the supplied artwork upright for both player and enemy travel"
+        /floodBeast:\{[^\n]*motionPhases:\{flightStart:2,turnFrame:5,impactStart:6,flightSourceAngle:0,turnSourceAngle:90\}/,
+        "Flood Beast retains authored phase headings for target-directed travel on both sides"
     );
 });
 
@@ -72,7 +72,7 @@ test("Ice Arrow Rain uses one centered full-field raster sheet without tiles",()
 test("Rage cast and loop remain visible and card-anchored on both sides",()=>{
     assert.match(
         animation,
-        /rage:\{[\s\S]*?rage-cast\.png\?v=165[\s\S]*?scale:1\.08,minSize:96,maxSize:148/
+        /rage:\{[\s\S]*?rage-recipient-v1\.webp[\s\S]*?scale:1\.08,minSize:96,maxSize:148/
     );
     assert.match(
         animation,

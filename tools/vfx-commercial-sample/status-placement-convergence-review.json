@@ -1,0 +1,25 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "classification": "Scoped convergence of persistent-status position authority",
+  "symptom": "At b145e2d7, head-class stun still appeared at the waist and feet-class art did not follow the intended portrait baseline.",
+  "evidence": "USB vfx-status-polish/evidence.json: stun portrait top439.07 but rendered node top487.08. Fixed-slot CSS left50/top42 important defeated V143 inline placement.",
+  "causeStatus": "Confirmed and resolved on USB device at 4b2cb548; independent geometry review inspected both sides",
+  "canonicalOwner": "V143 placeStatusBodyVisual owns local status coordinates; FourSymbolsBattlefieldRenderGeometry supplies projected portrait/card/HUD rectangles.",
+  "responsibilities": {
+    "stateAndDuration": "Existing gameplay status collections and duration lifecycle unchanged",
+    "createRotateRemove": "Existing V143 status owner unchanged",
+    "inputHitbox": "Noninteractive artwork; pointer-events none retained",
+    "position": "V143 inline coordinates, replacing fixed-slot CSS important overrides",
+    "paint": "Existing CSS transform, layer, opacity and filter rules",
+    "persistence": "No persistent key, save, auth or cloud changes"
+  },
+  "retired": ["fixed-slot-battlefield-rendering-v2.css status left50 important", "fixed-slot-battlefield-rendering-v2.css status top42 important"],
+  "compatibility": "Existing css40 non-important left50/top44 defaults remain preparation-only defaults. They cannot override valid V143 inline placement and are not an asynchronous position writer.",
+  "scopeScan": "Direct v143-status-visual JS/CSS writers inspected. No other important left/top override found; unrelated target reticle coordinates retained.",
+  "lifecycle": "Creation, two-second rotation, fixed hard-control base, state expiry/death removal and dispose remain existing paths. No timer/observer/wrapper added for position repair.",
+  "regression": "Fixed-slot suite now rejects status left/top declarations in the competing rule; existing scaled portrait/head/feet/hard-control behavior tests pass.",
+  "build": "Normal production CSS bundle and manifests rebuilt; build:check required before checkpoint",
+  "finalDeviceVerification": "4b2cb548: vfx-status-anchors-player and vfx-status-anchors-enemy, 21 statuses each. Head stars avoid HUD; feet align to portrait baseline; freeze/petrify retain complete hard-control forms. Lifecycle rotation, cleanse, expiry inputs, death/revive and final zero remaining nodes verified separately. This does not imply commercial dynamic acceptance.",
+  "integration": "Draft PR941, not merged or deployed",
+  "commercialQuality": "NOT PASSED; separate visual and overcorrection review required"
+}

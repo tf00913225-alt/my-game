@@ -1,0 +1,66 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewDate": "2026-10-20",
+  "scope": "Independent source-only review of three water native-wide sheets against originals. No runtime or phone changes.",
+  "qualityClaim": "Source gate only; neither USB nor commercial pass.",
+  "technical": {
+    "dimensions": [
+      2172,
+      724
+    ],
+    "grid": [
+      4,
+      3
+    ],
+    "cellAspect": 2.25,
+    "measurement": "Independently decoded WebP and selectedMother PNG using Pillow/NumPy; full RGBA arrays exactly equal for all three. All twelve frame boundaries checked with rounded fractional row coordinates, alpha8 edge counts all zero, therefore alpha64 counts also zero.",
+    "heightNote": "724/3 is fractional; existing fractional row stepping must remain intact.",
+    "maxFrameEdgeAlpha": {
+      "waterBall": 6,
+      "iceSpin": 1,
+      "healSpell": 1
+    },
+    "gridFinding": "waterBall contains low-alpha seam residue up to6, not alpha8+ hard grid. Do not infer opaque seam from black preview."
+  },
+  "reviews": [
+    {
+      "id": "waterBall",
+      "candidate": "tools/vfx-commercial-sample/assets/full/waterBall-wide-v1.webp",
+      "original": "assets/vfx/water/water-orb-vfx.png",
+      "classification": "SOURCE_CANDIDATE_USB_ALLOWED",
+      "identity": "Three deep-blue swirled orbs remain distinct and erupt into three azure water jets at frame8, preserving original orb-to-water-impact progression.",
+      "sequence": "Frame8 largest jet impact; frames9-12 diminish into splash/ripple traces. Mass peaks35478 at8 and ends5915. Smaller pale water envelopes persist at12, so verify bounded fade rather than treating end as empty.",
+      "phoneChecks": [
+        "Check frame4-to5 and8-to9 baseline shift for perceived hopping at actual fitted size.",
+        "Check peak cyan envelopes do not merge into an opaque row blanket or cover enemy HUD.",
+        "Keep existing geometry/fit/target semantics; do not enlarge to compensate."
+      ],
+      "next": "Use focused USB candidate gate; stop discretionary source polish unless concrete playback defect appears."
+    },
+    {
+      "id": "iceSpin",
+      "candidate": "tools/vfx-commercial-sample/assets/full/iceSpin-wide-v1.webp",
+      "original": "assets/vfx/water/frost-spinning-slash-vfx.png",
+      "classification": "REJECT_SOURCE_IDENTITY",
+      "identity": "Independent visual comparison: original frames2-6 contain conspicuous long crystalline ice blades with straight facets, pointed tips and snowflake guards; candidate has rounded blue-white C-shaped water curls throughout. Small white streaks do not form clear crystal blades or ice shards. It reads as three water waves, so the ice spinning slash identity is lost.",
+      "sequence": "Frame8 is largest curl, but does not introduce a comparably distinct crystalline hit. Fade mass declines28212 at8 to2502 at12; technical fade does not cure identity loss.",
+      "next": "Restore recognizable faceted crystalline cutting blades/shards and rotational slash at three sites. Keep bounded native-wide composition; do not fix by runtime scale or whole-row enlargement."
+    },
+    {
+      "id": "healSpell",
+      "candidate": "tools/vfx-commercial-sample/assets/full/healSpell-wide-v1.webp",
+      "original": "assets/vfx/water/water-heal-vfx.png",
+      "classification": "SOURCE_CANDIDATE_USB_ALLOWED",
+      "identity": "Water rune bases, bubbles, mint-green lotus healing cores and upward light activation are retained at three separate sites. This remains healing rather than generic damaging splash.",
+      "sequence": "Frame8 strong white/mint activation;9-12 fade in place. Mass56637 at8 to7219 at12. Three glow envelopes nearly connect at peak, requiring actual character/HUD evidence.",
+      "phoneChecks": [
+        "Verify allied faces, portrait silhouette and HP/name during brightest frames7-8.",
+        "Ensure three bases sit on intended beneficiaries rather than empty floor.",
+        "Check tail shrink does not look like upward jump and final fade clears cleanly."
+      ],
+      "next": "Use focused USB candidate gate; no further discretionary source redesign before concrete phone evidence."
+    }
+  ],
+  "reviewInputs": "All three candidate sheets and original source sheets actually viewed; generation metadata and per-frame metrics inspected. Author iceSpin flag was not used as the decision by itself.",
+  "runtimeOrPhoneChangesMade": false
+}

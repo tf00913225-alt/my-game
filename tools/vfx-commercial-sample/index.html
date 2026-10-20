@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VFX 三件打磨樣本 · 前後比較</title>
+<link rel="stylesheet" href="/tools/vfx-commercial-sample/sample.css">
+<main>
+  <p class="eyebrow">四象江湖傳 / VFX STUDY 01</p>
+  <h1>光效收斂，命中更清楚。</h1>
+  <p class="intro">三個候選素材與尺寸方向。沿用正式素材及原播放秒數作比較；此頁是獨立視覺樣本，並非實戰驗收。</p>
+  <nav aria-label="特效樣本"><button data-sample="slash" aria-pressed="true">火焰斬</button><button data-sample="ice" aria-pressed="false">冰箭雨</button><button data-sample="relic" aria-pressed="false">九龍火秘寶</button></nav>
+  <div class="mode" role="group" aria-label="手機比較模式"><button data-mode="before" aria-pressed="false">原素材</button><button data-mode="after" aria-pressed="true">打磨候選</button></div>
+  <section class="comparison" data-mode="after">
+    <article data-variant="before"><header><span>BEFORE / 原素材</span><small>比較用參考尺寸</small></header><div class="viewport"><div class="scene"><div class="zone"></div><div class="targets"></div><div class="effect"></div><div class="damage">128</div><div class="scene-label">敵方戰區 · 同位置比較</div></div></div></article>
+    <article data-variant="after"><header><span>AFTER / 打磨候選</span><small>較小尺寸 · 集中亮部</small></header><div class="viewport"><div class="scene"><div class="zone"></div><div class="targets"></div><div class="effect"></div><div class="damage">128</div><div class="scene-label">敵方戰區 · 同位置比較</div></div></div></article>
+  </section>
+  <section class="controls"><button id="play">暫停</button><button id="replay">重播</button><button id="impact">看命中幀</button><label>慢速 <select id="speed"><option value="1">1×</option><option value="0.5">0.5×</option><option value="0.25">0.25×</option></select></label><label class="scrub">逐幀 <input id="frame" type="range" min="0" max="11" value="0"><output id="frameLabel">1 / 12</output></label></section>
+  <p id="note" class="note"></p>
+  <p class="foot">固定 1080 邏輯場景等比例顯示。沒有連接玩家資料、結算、技能傷害或存檔。候選仍為 12 幀；輪廓改善不代表增加原生解析度。</p>
+</main><script src="/tools/vfx-commercial-sample/sample.js"></script></html>

@@ -1,0 +1,380 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+  "scope": "Independent review of two other agents generated cast sheets and three supplied USB stills. No runtime/manifest adoption.",
+  "method": "view_image inspection, generation JSON review, independent Pillow alpha64 bounds/border/centre scan; pixel alpha is distinguished from raw RGB exposed by the image viewer.",
+  "assetReviews": [
+    {
+      "asset": "earth-shield",
+      "source": "tools/vfx-commercial-sample/assets/full/earth-shield-v2.webp",
+      "sha256": "4053da4eff540a1fd1e75012c0a2f9e2b4fdfdd92b28c81dc7bea4ee2282affa",
+      "generationRecordReviewed": "tools/vfx-commercial-sample/assets/full/earth-shield-v2-generation.json",
+      "authorState": "needs-art",
+      "reviewDecision": "needs-art-do-not-integrate",
+      "runtimeQaState": "not-reviewed",
+      "size": [
+        1448,
+        1086
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "findings": [
+        "One earth shield per frame is recognisable; gathers from fragments, reaches stable oval, and releases to fragments.",
+        "Source review confirms insufficient safe space between row1 and row2 effects; independent alpha64 border contacts must block integration.",
+        "Wide tan haze around the rim and centre may obscure actor silhouette; needs actual composite before acceptance."
+      ],
+      "independentFrameMeasurements": [
+        {
+          "frame": 1,
+          "alpha64Bounds": [
+            92,
+            126,
+            280,
+            303
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.163,
+          "centreAlpha64Fraction": 0.025
+        },
+        {
+          "frame": 2,
+          "alpha64Bounds": [
+            71,
+            180,
+            309,
+            341
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.058,
+          "centreAlpha64Fraction": 0.0
+        },
+        {
+          "frame": 3,
+          "alpha64Bounds": [
+            42,
+            111,
+            320,
+            362
+          ],
+          "alpha64BorderPixels": 16,
+          "alpha64MinimumPaddingFraction": 0.0,
+          "centreAlpha64Fraction": 0.0
+        },
+        {
+          "frame": 4,
+          "alpha64Bounds": [
+            53,
+            44,
+            317,
+            350
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.0331,
+          "centreAlpha64Fraction": 0.0
+        },
+        {
+          "frame": 5,
+          "alpha64Bounds": [
+            55,
+            29,
+            325,
+            338
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.0663,
+          "centreAlpha64Fraction": 0.0385
+        },
+        {
+          "frame": 6,
+          "alpha64Bounds": [
+            52,
+            17,
+            323,
+            338
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.047,
+          "centreAlpha64Fraction": 0.0328
+        },
+        {
+          "frame": 7,
+          "alpha64Bounds": [
+            39,
+            0,
+            325,
+            354
+          ],
+          "alpha64BorderPixels": 17,
+          "alpha64MinimumPaddingFraction": 0.0,
+          "centreAlpha64Fraction": 0.0146
+        },
+        {
+          "frame": 8,
+          "alpha64Bounds": [
+            51,
+            25,
+            314,
+            335
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.0691,
+          "centreAlpha64Fraction": 0.0226
+        },
+        {
+          "frame": 9,
+          "alpha64Bounds": [
+            71,
+            23,
+            299,
+            306
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.0635,
+          "centreAlpha64Fraction": 0.2398
+        },
+        {
+          "frame": 10,
+          "alpha64Bounds": [
+            76,
+            40,
+            312,
+            304
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.1105,
+          "centreAlpha64Fraction": 0.0001
+        },
+        {
+          "frame": 11,
+          "alpha64Bounds": [
+            97,
+            79,
+            256,
+            257
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.2182,
+          "centreAlpha64Fraction": 0.0138
+        },
+        {
+          "frame": 12,
+          "alpha64Bounds": [
+            98,
+            138,
+            252,
+            223
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.2707,
+          "centreAlpha64Fraction": 0.0
+        }
+      ]
+    },
+    {
+      "asset": "fire-soul-resonance",
+      "source": "tools/vfx-commercial-sample/assets/full/fire-soul-resonance-v2.webp",
+      "sha256": "2f1a0fcd31ac4d02a8efe7251d542ca3972d34ea13dbe213258944c6459a48f2",
+      "generationRecordReviewed": "tools/vfx-commercial-sample/assets/full/fire-soul-resonance-v2-generation.json",
+      "authorState": "NEEDS_ART_FOLLOWUP",
+      "reviewDecision": "needs-art-do-not-integrate",
+      "runtimeQaState": "not-reviewed",
+      "size": [
+        1448,
+        1086
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "findings": [
+        "Orange concentric ring/core identity survives, but centre reads as a broad cloud disc rather than sparse filaments.",
+        "Perspective changes from shallow ellipse in frames2-4 to near-front-facing rings around frames7-8; playback continuity is not established.",
+        "Peak frame8 occupies most cell width; independent alpha64 padding below requested12 percent blocks acceptance.",
+        "Final frames retain cloudy glow rather than sparse isolated embers; do not treat lossless conversion as art acceptance."
+      ],
+      "independentFrameMeasurements": [
+        {
+          "frame": 1,
+          "alpha64Bounds": [
+            159,
+            166,
+            225,
+            234
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.3536,
+          "centreAlpha64Fraction": 0.3177
+        },
+        {
+          "frame": 2,
+          "alpha64Bounds": [
+            95,
+            139,
+            268,
+            260
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.2597,
+          "centreAlpha64Fraction": 0.4556
+        },
+        {
+          "frame": 3,
+          "alpha64Bounds": [
+            58,
+            106,
+            305,
+            292
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.1575,
+          "centreAlpha64Fraction": 0.4187
+        },
+        {
+          "frame": 4,
+          "alpha64Bounds": [
+            44,
+            72,
+            313,
+            318
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.1215,
+          "centreAlpha64Fraction": 0.7188
+        },
+        {
+          "frame": 5,
+          "alpha64Bounds": [
+            60,
+            70,
+            331,
+            307
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.0856,
+          "centreAlpha64Fraction": 0.9226
+        },
+        {
+          "frame": 6,
+          "alpha64Bounds": [
+            62,
+            76,
+            313,
+            295
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.1354,
+          "centreAlpha64Fraction": 0.9804
+        },
+        {
+          "frame": 7,
+          "alpha64Bounds": [
+            43,
+            49,
+            323,
+            319
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.1077,
+          "centreAlpha64Fraction": 0.9473
+        },
+        {
+          "frame": 8,
+          "alpha64Bounds": [
+            12,
+            34,
+            346,
+            344
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.0331,
+          "centreAlpha64Fraction": 1.0
+        },
+        {
+          "frame": 9,
+          "alpha64Bounds": [
+            56,
+            36,
+            337,
+            285
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.0691,
+          "centreAlpha64Fraction": 0.8652
+        },
+        {
+          "frame": 10,
+          "alpha64Bounds": [
+            76,
+            65,
+            304,
+            268
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.1602,
+          "centreAlpha64Fraction": 0.8116
+        },
+        {
+          "frame": 11,
+          "alpha64Bounds": [
+            77,
+            99,
+            302,
+            252
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.1657,
+          "centreAlpha64Fraction": 0.389
+        },
+        {
+          "frame": 12,
+          "alpha64Bounds": [
+            115,
+            109,
+            223,
+            235
+          ],
+          "alpha64BorderPixels": 0,
+          "alpha64MinimumPaddingFraction": 0.3011,
+          "centreAlpha64Fraction": 0.3879
+        }
+      ]
+    }
+  ],
+  "screenshotReviews": [
+    {
+      "path": "artifacts/vfx-full/status-rage.png",
+      "reviewDecision": "needs-runtime-presentation-fix",
+      "characterVisibility": "Central player artwork is almost completely replaced by the large solid angry-fire face. This is a buff rather than hard control; current body projection fails character readability.",
+      "hudVisibility": "Central name/level panel and both green HP/blue SP bars remain legible above the effect in this still. Adjacent two players remain identifiable.",
+      "recommendation": "Reduce only rage body footprint or choose an open aura design through its existing owner; do not lower all hard-control visibility. Recheck minimum/maximum pulse and combined statuses.",
+      "sha256": "9f04384c57b86673b0b57c7dd0d8ac43f915c6b2cc26e7a306b341fbae2e0211",
+      "runtimeStateLifecycle": "not-reviewed"
+    },
+    {
+      "path": "artifacts/vfx-full/status-freeze.png",
+      "reviewDecision": "hard-control-recognisable-hud-readable-still-only",
+      "characterVisibility": "Central actor is intentionally encased by an opaque ice prism, while the other two actors remain visible; clear ice identity matches hard-control intent.",
+      "hudVisibility": "Central name/level and full HP/SP bars remain readable above the ice. Ice perimeter extends behind/around HUD and is visibly larger than ordinary actor, so combined-status overlap needs runtime follow-up.",
+      "recommendation": "Keep intentional fixed hard-control base. Check bounds at all slots and simultaneous rotating body/HUD; this screenshot is insufficient for lifecycle or animation approval.",
+      "sha256": "6b7544e0cfb6b12fde07d94a28f744882df67f3903e4d020acf271f2d2afef42",
+      "runtimeStateLifecycle": "not-reviewed"
+    },
+    {
+      "path": "artifacts/vfx-full/status-petrify.png",
+      "reviewDecision": "hard-control-recognisable-hud-readable-still-only",
+      "characterVisibility": "Central actor is intentionally hidden by a tan stone prism; stone silhouette is distinct from freeze. Adjacent actors remain clear.",
+      "hudVisibility": "Name/level and both resource bars remain readable above the effect. No opaque effect covers adjacent HUD in this still.",
+      "recommendation": "Preserve hard-control meaning; check overlap with rotating status and prompt state removal before pass.",
+      "sha256": "ba0afbdc0a495fcd58e36a2b04699709fd5b659d6f017827088fc6d7af0fe1bf",
+      "runtimeStateLifecycle": "not-reviewed"
+    }
+  ],
+  "overall": "Do not integrate either generated cast sheet at this stage. Rage persistent-body readability needs adjustment; freeze/petrify retain intended opaque hard-control semantics and readable HUD in these particular stills.",
+  "limitations": [
+    "No phone actions performed by this reviewer.",
+    "Single screenshots cannot establish activation, 2000ms rotation, expiry, cleanse, death, dispose, hit timing, or frame performance.",
+    "No asset or runtime modified."
+  ]
+}

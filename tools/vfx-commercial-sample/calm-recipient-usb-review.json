@@ -1,0 +1,66 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "20ecbf97248aa2f264db72e2abea4613932af3a1",
+  "classification": "RECIPIENT_GEOMETRY_USB_PASS_CONTROLLED_REUSE_ALLOWED",
+  "scope": "Only calm explicit per-recipient presentation prototype. Enemy replay certifies presentation geometry only, not buff eligibility or effect settlement.",
+  "evidence": "artifacts/vfx-recipient-prototype/recipient-video.json",
+  "frameDirectory": "artifacts/vfx-recipient-prototype/recipient-frames",
+  "reviewedFrames": [
+    10,
+    12,
+    14,
+    16,
+    18,
+    24,
+    80,
+    82,
+    84,
+    86,
+    88,
+    94,
+    150,
+    152,
+    154,
+    156,
+    160,
+    168
+  ],
+  "observations": [
+    {
+      "case": "three-allies",
+      "classification": "PASS_STOP_REFINEMENT",
+      "representativeFrame": 14,
+      "notes": "Separate cyan cloud flows surround each allied lower torso/legs, centered on actual actors rather than inner floor gaps. Face, name, level and HP/MP clear. Effect retains calm cloud outline and activation detail; no evidence of identity-destroying shrink."
+    },
+    {
+      "case": "six-enemies-presentation-only",
+      "classification": "PASS_GEOMETRY",
+      "representativeFrame": 84,
+      "notes": "Small cloud flow appears on each of six fox lower bodies, no connecting whole-row/whole-field blanket. Positions remain in correct row and card with clear upper HUD. Cyan-on-blue reduces fine leaf/sigil detail but visible flowing accent remains, insufficient basis for an over-shrink veto."
+    },
+    {
+      "case": "partial-enemies",
+      "classification": "PASS_GEOMETRY",
+      "representativeFrame": 156,
+      "notes": "Cloud accents remain on the three surviving actors across two rows. No new cast motif is seen on the three faded defeated actors. No obvious retargeting toward central empty space."
+    }
+  ],
+  "technicalInputs": {
+    "nodes": [
+      3,
+      6,
+      3
+    ],
+    "sharedCssStartWithinEachCast": true,
+    "remainingAfterEach": 0,
+    "formalTargetType": "allyAll retained; six-enemy presentation replay does not claim eligible target authority",
+    "portraitRect": "JSON portrait {} is helper serialization limitation, not proof of zero rect. Actual unaltered full-phone frames are visual evidence."
+  },
+  "limits": [
+    "Sampled decoded sequence inspection, not every-frame temporal/performance certification.",
+    "Current geometry/source clearance does not automatically certify rage/dodge/rockWall/stormRain/water/heal peak opacity, size or HUD clearance.",
+    "Fine cloud leaf/sigil details on blue enemy are less readable; no additional redraw/size refinement required without concrete new failure."
+  ],
+  "decision": "Allow same formal owner controlled reuse only for confirmed local failures, then run focused independent phone presentation gate for each source. Preserve formal target semantics and one shared clock/cleanup. Do not touch seven previously passed casts or approved persistent states.",
+  "runtimeOrPhoneChangesMade": false
+}

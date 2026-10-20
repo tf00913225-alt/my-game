@@ -1,0 +1,65 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "b7676b5f5a782fd28193521954665dc0877fdc3a",
+  "evidenceHead": "1d02be839ebc99b098fe592699fec51c5eca2aa4",
+  "gate": "BOUNDED_ROOT_CAUSE_IMPROVEMENT_PASS_NOT_ENDURANCE",
+  "evidence": "artifacts/vfx-status-batched-profile/evidence.json",
+  "trace": "artifacts/vfx-status-batched-profile/status-trace.json",
+  "oldAnalysis": "artifacts/vfx-status-profile/analysis.json",
+  "setup": {
+    "units": 6,
+    "body": 12,
+    "icons": 30,
+    "loadedSource": "assets/vfx/water/water-orb-recipient-v1.webp"
+  },
+  "windowMs": 8002.600000023842,
+  "new": {
+    "intervalCount": 428,
+    "p50": 16.70000000001164,
+    "p95": 33.40000000002328,
+    "max": 83.69999999998254,
+    "longTasks": [
+      {
+        "at": 3.9000000059604645,
+        "duration": 70
+      }
+    ],
+    "layoutCount": 5,
+    "layoutTotalMs": 3.363,
+    "statusForcedLayoutStackCount": 0,
+    "mutations": {
+      "added": 24,
+      "removed": 24
+    },
+    "before": {
+      "body": 12,
+      "icons": 30
+    },
+    "after": {
+      "body": 12,
+      "icons": 30
+    }
+  },
+  "oldMixed": {
+    "layout": {
+      "count": 54,
+      "totalMs": 32.485,
+      "maxMs": 1.783
+    },
+    "longTasks": 9,
+    "longTaskTotalMs": 1601,
+    "rAF": {
+      "p50": 16.699999999953434,
+      "p95": 33.5,
+      "p99": 183.9000000001397,
+      "max": 267.39999999990687
+    }
+  },
+  "conclusion": "Previous repeated status geometry read/write forced-layout long-task mechanism is absent in this bounded trace: no status forced Layout stack, five small layouts total3.363ms versus old mixed-window54/32.485ms, same12body30icons and24/24 rotation churn. Recurring137-282ms rotation stalls do not recur here. One70ms entry occurs3.9ms after measurement start, not at successive2s rotation boundaries; do not claim all long tasks eliminated.",
+  "limits": [
+    "Trace/profile overhead and different snapshot/source exist; same node density supports focused comparison, not perfectly controlled broad benchmark.",
+    "Old analysis is its mixed window; old full trace includes setup/fixed phase and has84 layouts49.426ms, so do not mislabel full-trace count54.",
+    "One8s observation cannot prove endurance, thermal behavior, all devices or constant60fps; p95~33.4ms and max~83.7ms still show occasional missed frames.",
+    "No phone actions or runtime/tests edits."
+  ]
+}

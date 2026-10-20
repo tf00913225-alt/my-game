@@ -1,0 +1,195 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "previousHead": "ade43a48ce618330055f9add290abb175ef9470d",
+  "scope": "11 independently source-approved candidates; no geometry, target, damage, duration or status changes",
+  "quality": "USB candidate only; commercial quality gate pending",
+  "rows": [
+    {
+      "id": "explosiveFlurry",
+      "runtime": "assets/vfx/fire/explosive-flurry-wide-v2.webp",
+      "source": "tools/vfx-commercial-sample/assets/full/explosive-flurry-wide-v2.webp",
+      "exactCandidateBytes": true,
+      "sha256": "65de2193edc2789153b1c7f77f054919686c515b9cd0b2a8c6be7a9320170cd9",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "nativeFrameAspect": 2.25,
+      "phoneGate": "PENDING"
+    },
+    {
+      "id": "stormCircle",
+      "runtime": "assets/vfx/wind/storm-circle-wide-v2.webp",
+      "source": "tools/vfx-commercial-sample/assets/full/storm-circle-wide-v1.webp",
+      "exactCandidateBytes": true,
+      "sha256": "3886439d276022db61ad22afb6656fab827fe45f946767c6f172ede253fa5c0e",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "nativeFrameAspect": 2.25,
+      "phoneGate": "PENDING"
+    },
+    {
+      "id": "waterBall",
+      "runtime": "assets/vfx/water/water-ball-wide-v2.webp",
+      "source": "tools/vfx-commercial-sample/assets/full/waterBall-wide-v1.webp",
+      "exactCandidateBytes": true,
+      "sha256": "188ff5373337bdf91a6c1054c8b06aa7d6919458e03f664dbe36844263ed66f1",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "nativeFrameAspect": 2.25,
+      "phoneGate": "PENDING"
+    },
+    {
+      "id": "healSpell",
+      "runtime": "assets/vfx/water/heal-spell-wide-v2.webp",
+      "source": "tools/vfx-commercial-sample/assets/full/healSpell-wide-v1.webp",
+      "exactCandidateBytes": true,
+      "sha256": "b47b8dd089cc093a15506a50645562cab5afb4e0d7329d084038c6e1dc6b34d3",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "nativeFrameAspect": 2.25,
+      "phoneGate": "PENDING"
+    },
+    {
+      "id": "petrifyFist",
+      "runtime": "assets/vfx/earth/petrify-fist-wide-v2.webp",
+      "source": "tools/vfx-commercial-sample/assets/full/petrify-fist-wide-v1.webp",
+      "exactCandidateBytes": true,
+      "sha256": "1d76cf65922b6329189ce7540a5161442943a5f3f2380261524abcdf89799045",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "nativeFrameAspect": 2.25,
+      "phoneGate": "PENDING"
+    },
+    {
+      "id": "earthquakeCrush",
+      "runtime": "assets/vfx/earth/earthquake-crush-wide-v2.webp",
+      "source": "tools/vfx-commercial-sample/assets/full/earthquake-crush-wide-v1.webp",
+      "exactCandidateBytes": true,
+      "sha256": "2f8325f12475965ae3b96f008231ceca6394c9f9827fa51b856d21d25b47bd4a",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "nativeFrameAspect": 2.25,
+      "phoneGate": "PENDING"
+    },
+    {
+      "id": "stoneThrow",
+      "runtime": "assets/vfx/earth/stone-throw-wide-v2.webp",
+      "source": "tools/vfx-commercial-sample/assets/full/stone-throw-wide-v1.webp",
+      "exactCandidateBytes": true,
+      "sha256": "3aab7fc59305527a2d1603ae94882dfc6aefabca8798489c4b155ea095a755bc",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "nativeFrameAspect": 2.25,
+      "phoneGate": "PENDING"
+    },
+    {
+      "id": "sandWind",
+      "runtime": "assets/vfx/earth/rolling-stone-wide-v2.webp",
+      "source": "tools/vfx-commercial-sample/assets/full/rolling-stone-wide-v1.webp",
+      "exactCandidateBytes": true,
+      "sha256": "b9fca4658b97fd690db1a877040a7ae66bc92a0fe51e232fb2d2f949a63ae1a3",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "nativeFrameAspect": 2.25,
+      "phoneGate": "PENDING"
+    },
+    {
+      "id": "rage",
+      "runtime": "assets/vfx/fire/rage-wide-v2.webp",
+      "source": "tools/vfx-commercial-sample/assets/full/rage-wide-v1.webp",
+      "exactCandidateBytes": true,
+      "sha256": "df6403daa4c3b6bd8e3eede4cdb97c7e26acd2e8de6f1ffec9468bac9a4aad28",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "nativeFrameAspect": 2.25,
+      "phoneGate": "PENDING"
+    },
+    {
+      "id": "dodgeSkill",
+      "runtime": "assets/vfx/wind/dodge-skill-wide-v2.webp",
+      "source": "tools/vfx-commercial-sample/assets/full/dodgeSkill-wide-v1.webp",
+      "exactCandidateBytes": true,
+      "sha256": "8a4aa1a86af263d47b613c6df6a3ffa875c02a476591c675bed1917defacca72",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "nativeFrameAspect": 2.25,
+      "phoneGate": "PENDING"
+    },
+    {
+      "id": "rockWall",
+      "runtime": "assets/vfx/earth/rock-wall-wide-v2.webp",
+      "source": "tools/vfx-commercial-sample/assets/full/rockWall-wide-v1.webp",
+      "exactCandidateBytes": true,
+      "sha256": "45989080b9506d5804d07daf79c308b41f16810c90ed50c713b58318e98cf683",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "nativeFrameAspect": 2.25,
+      "phoneGate": "PENDING"
+    }
+  ]
+}

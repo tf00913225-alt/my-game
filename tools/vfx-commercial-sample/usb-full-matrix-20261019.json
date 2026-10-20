@@ -1,0 +1,1535 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+  "device": "SM-N960F Android 10 physical USB Chrome",
+  "scope": "Full-runtime presentation matrix; existing read-only QA fixture. Visual review and performance acceptance are separate from technical completion.",
+  "fixture": {
+    "startup": "READY",
+    "uid": "skill-runtime-browser-qa",
+    "viewport": [
+      411,
+      717
+    ],
+    "roster": [
+      3,
+      3
+    ],
+    "relicPreview": "function"
+  },
+  "technicalComplete": true,
+  "exceptions": 0,
+  "skills": [
+    {
+      "id": "flameSlash",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 533.8999999910593,
+        "clock": 7710.300000011921,
+        "cssTime": 438.199999988079,
+        "cssStart": 7710.300000011921,
+        "expectedTime": 443.333333308,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -5.133333319921007,
+      "rafMs": {
+        "count": 33,
+        "max": 66.90000000000146,
+        "median": 16.700000000000728
+      },
+      "remaining": 0,
+      "screenshotSha256": "6bc39b67823c3b478b7760666ee1214eb85cdb0b7b59e17c84fb7d844ef144c4"
+    },
+    {
+      "id": "fireCritical",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 768.2000000029802,
+        "clock": 10563.800000011921,
+        "cssTime": 591.5999999880786,
+        "cssStart": 10563.800000011921,
+        "expectedTime": 612.499999965,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -20.899999976921436,
+      "rafMs": {
+        "count": 44,
+        "max": 100.20000000000073,
+        "median": 16.700000000000728
+      },
+      "remaining": 0,
+      "screenshotSha256": "13c340c7db249c147aaebf8b4ac654565c8efb28324d1fa6078952754b0f84e4"
+    },
+    {
+      "id": "explosiveFlurry",
+      "targetType": "tri",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 1055.199999988079,
+        "clock": 13602.10000000894,
+        "cssTime": 828.5999999910593,
+        "cssStart": 13602.10000000894,
+        "expectedTime": 845.8333332850001,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -17.233333293940746,
+      "rafMs": {
+        "count": 69,
+        "max": 133.60000000000036,
+        "median": 16.700000000000728
+      },
+      "remaining": 0,
+      "screenshotSha256": "89a4801100a11d496db00766201e4d7b59cf34da6cf063530aa3be77e50b15f7"
+    },
+    {
+      "id": "dragonSlash",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 1803.6000000089407,
+        "clock": 16865.30000001192,
+        "cssTime": 1625.1999999880802,
+        "cssStart": 16865.30000001192,
+        "expectedTime": 1633.33333324,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -8.133333251919794,
+      "rafMs": {
+        "count": 142,
+        "max": 133.70000000000073,
+        "median": 16.700000000000728
+      },
+      "remaining": 0,
+      "screenshotSha256": "e44fb080dfaefd7e9390cc668fe2c30626f9f525f5d63dd895d8bdaa381d60ab"
+    },
+    {
+      "id": "fireRocket",
+      "targetType": "tri",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 708.5,
+        "clock": 20896.5,
+        "cssTime": 484.7999999999999,
+        "cssStart": 20896.5,
+        "expectedTime": 524.99999997,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -40.19999997000008,
+      "rafMs": {
+        "count": 32,
+        "max": 167.10000000000218,
+        "median": 16.700000000000728
+      },
+      "remaining": 0,
+      "screenshotSha256": "858f3a185dfa6890a71c1738973ea5fd29ac3283cabf2adfbb64bd46d10e825f"
+    },
+    {
+      "id": "blazeSpell",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 813.2000000029802,
+        "clock": 23801.70000000298,
+        "cssTime": 637.7999999970178,
+        "cssStart": 23801.70000000298,
+        "expectedTime": 670.833333295,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -33.03333329798215,
+      "rafMs": {
+        "count": 56,
+        "max": 117,
+        "median": 16.700000000000728
+      },
+      "remaining": 0,
+      "screenshotSha256": "dae4d9d690c516b46ba3829b7b075f726dbbf86d4dc2237c7898213d8567a370"
+    },
+    {
+      "id": "flameTornado",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 1381.300000011921,
+        "clock": 26770.40000000596,
+        "cssTime": 1211.699999994039,
+        "cssStart": 26770.40000000596,
+        "expectedTime": 1224.99999993,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -13.299999935961068,
+      "rafMs": {
+        "count": 99,
+        "max": 133.70000000000073,
+        "median": 16.700000000000728
+      },
+      "remaining": 0,
+      "screenshotSha256": "2cfe08a6cd59e4c56a7a849deb9e18327f764c18aa0051afbcc72ff02670dbc1"
+    },
+    {
+      "id": "phoenixCry",
+      "targetType": "all",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 1946.7999999970198,
+        "clock": 30245.10000000894,
+        "cssTime": 1848.3999999910593,
+        "cssStart": 30245.10000000894,
+        "expectedTime": 1866.66666656,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -18.266666568940764,
+      "rafMs": {
+        "count": 168,
+        "max": 117,
+        "median": 16.700000000000728
+      },
+      "remaining": 0,
+      "screenshotSha256": "798afb966f4cd23d06c970f00d8aad1493f4bfb903e4e090946e36b717882760"
+    },
+    {
+      "id": "rage",
+      "targetType": "allyTri",
+      "side": "player",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 1038.800000011921,
+        "clock": 34582.70000000298,
+        "cssTime": 869.5999999970212,
+        "cssStart": 34582.70000000298,
+        "expectedTime": 874.9999999500001,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -5.399999952978874,
+      "rafMs": {
+        "count": 73,
+        "max": 133.70000000000437,
+        "median": 16.700000000004366
+      },
+      "remaining": 0,
+      "screenshotSha256": "236f4f7788810b39f38c4affa8ef51550c09661af6da3b48f708edf50ee3fb8c"
+    },
+    {
+      "id": "waterKnife",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 610,
+        "clock": 37712,
+        "cssTime": 447.499999999998,
+        "cssStart": 37712,
+        "expectedTime": 466.66666664,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -19.166666640002006,
+      "rafMs": {
+        "count": 35,
+        "max": 183.90000000000146,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "dba91bfc337fa9b4910c9ce5d4688380d89f7954017211be89b8f83536628793"
+    },
+    {
+      "id": "frostPunch",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 675.4000000059605,
+        "clock": 40720.30000001192,
+        "cssTime": 513.2999999880851,
+        "cssStart": 40720.30000001192,
+        "expectedTime": 524.99999997,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -11.699999981914857,
+      "rafMs": {
+        "count": 44,
+        "max": 116.90000000000146,
+        "median": 16.700000000004366
+      },
+      "remaining": 0,
+      "screenshotSha256": "a54046d275fb7d6236f9341b1a21ef5a3aa8b57138647a595aaf64566ef9c78d"
+    },
+    {
+      "id": "iceSpin",
+      "targetType": "tri",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 752.7999999970198,
+        "clock": 43540.10000000894,
+        "cssTime": 584.199999991057,
+        "cssStart": 43540.10000000894,
+        "expectedTime": 583.3333333,
+        "bg": "100% 50%"
+      },
+      "cssHitErrorMs": 0.8666666910569347,
+      "rafMs": {
+        "count": 39,
+        "max": 150.5,
+        "median": 16.700000000004366
+      },
+      "remaining": 0,
+      "screenshotSha256": "866544fc2432c2f0ab3d709ea8131a28a2544fd1cf8349fac3141206b3f5fed0"
+    },
+    {
+      "id": "frostCrush",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 822.9000000059605,
+        "clock": 46424,
+        "cssTime": 624.0999999999985,
+        "cssStart": 46424,
+        "expectedTime": 670.833333295,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -46.733333295001444,
+      "rafMs": {
+        "count": 54,
+        "max": 100.59999999999854,
+        "median": 16.700000000004366
+      },
+      "remaining": 0,
+      "screenshotSha256": "973b5c67406db9a63d07847c098b8829daf5156c40ebe1b5bb9cfbb5ef595b2c"
+    },
+    {
+      "id": "waterBall",
+      "targetType": "tri",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 979.7000000029802,
+        "clock": 49539.30000001192,
+        "cssTime": 800.6999999880833,
+        "cssStart": 49539.30000001192,
+        "expectedTime": 816.66666662,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -15.966666631916723,
+      "rafMs": {
+        "count": 64,
+        "max": 134.09999999999854,
+        "median": 16.700000000004366
+      },
+      "remaining": 0,
+      "screenshotSha256": "9c2da396c1fbbfcf9e2c09bd55d8557d460635a982961b89d8230d96f6ff85ad"
+    },
+    {
+      "id": "floodBeast",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 909,
+        "clock": 52717.60000000894,
+        "cssTime": 780.6999999910573,
+        "cssStart": 52717.60000000894,
+        "expectedTime": 787.499999955,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -6.799999963942696,
+      "rafMs": {
+        "count": 66,
+        "max": 133.70000000000437,
+        "median": 16.700000000004366
+      },
+      "remaining": 0,
+      "screenshotSha256": "8639da2f427f951ff81f7dace442c75ff5541da27c09cf4800972b774a378e56"
+    },
+    {
+      "id": "iceArrowRain",
+      "targetType": "all",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 1091.199999988079,
+        "clock": 55716.70000000298,
+        "cssTime": 922.9999999970175,
+        "cssStart": 55716.70000000298,
+        "expectedTime": 933.33333328,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -10.333333282982494,
+      "rafMs": {
+        "count": 62,
+        "max": 100.26800000000367,
+        "median": 16.799999999995634
+      },
+      "remaining": 0,
+      "screenshotSha256": "b0747cf6147b3113908a7e3c1aa2d5aba18bd808628a8a9b8204c8cc962ec93c"
+    },
+    {
+      "id": "freeze",
+      "targetType": "column",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 713.9000000059605,
+        "clock": 58932.60000000894,
+        "cssTime": 531.299999991063,
+        "cssStart": 58932.60000000894,
+        "expectedTime": 554.1666666350001,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -22.866666643937037,
+      "rafMs": {
+        "count": 39,
+        "max": 117,
+        "median": 16.700000000004366
+      },
+      "remaining": 0,
+      "screenshotSha256": "2fc6e03cfd5f6c6f6f33ae1ea6978af93268b1a4d19cd28395e6e28a722e68a4"
+    },
+    {
+      "id": "healSpell",
+      "targetType": "allyTri",
+      "side": "player",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 888.1999999880791,
+        "clock": 61815.70000000298,
+        "cssTime": 706.5999999970245,
+        "cssStart": 61815.70000000298,
+        "expectedTime": 729.1666666250001,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -22.566666627975565,
+      "rafMs": {
+        "count": 62,
+        "max": 117,
+        "median": 16.700000000004366
+      },
+      "remaining": 0,
+      "screenshotSha256": "14471c04d36ee9ec2eb2064f63795d391dd8159407d1e41801c19d6eafa34b5e"
+    },
+    {
+      "id": "revive",
+      "targetType": "deadAlly",
+      "side": "player",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 1116.7000000029802,
+        "clock": 65061.70000000298,
+        "cssTime": 1036.8999999970185,
+        "cssStart": 65061.70000000299,
+        "expectedTime": 1049.99999994,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -13.099999942981412,
+      "rafMs": {
+        "count": 106,
+        "max": 50.099999999998545,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "da6a05770c59897430916744bba4df0e0ddb8b02dffd7845304c3b4c7ac106d6"
+    },
+    {
+      "id": "stormFist",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 672.8999999910593,
+        "clock": 68459.5,
+        "cssTime": 580.5999999999898,
+        "cssStart": 68459.5,
+        "expectedTime": 600,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -19.40000000001021,
+      "rafMs": {
+        "count": 65,
+        "max": 66.80000000000291,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "3b06d5fc001a0e93eaa0ea7e46f9d1df1fe5768fa02c6f10fd6d8c81dbc932d1"
+    },
+    {
+      "id": "stormFlurry",
+      "targetType": "tri",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 874.2000000029802,
+        "clock": 71360.60000000894,
+        "cssTime": 720.3999999910593,
+        "cssStart": 71360.60000000894,
+        "expectedTime": 750,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -29.600000008940697,
+      "rafMs": {
+        "count": 69,
+        "max": 83.70000000001164,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "7a931584728fe20c2fa91ff252bcb5eb2c2ef0bf52240a8c0958d579fce71d52"
+    },
+    {
+      "id": "windCrossSlash",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 1039,
+        "clock": 74689.40000000596,
+        "cssTime": 834.1999999940413,
+        "cssStart": 74689.40000000596,
+        "expectedTime": 850,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -15.800000005958736,
+      "rafMs": {
+        "count": 83,
+        "max": 133.8000000000029,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "12d206f90482dd6ea1ae18fe91f18dcb29a43de0aeacdee8cc9f0a9f2fb494a6"
+    },
+    {
+      "id": "dizzyFist",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 1076.5999999940395,
+        "clock": 77849.80000001192,
+        "cssTime": 864.999999988072,
+        "cssStart": 77849.80000001192,
+        "expectedTime": 900,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -35.00000001192802,
+      "rafMs": {
+        "count": 89,
+        "max": 133.8000000000029,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "b07b01421d86fc8f1382e7b0eaecb4fb8f9835c2344ebfe21af5f2283a9a99b0"
+    },
+    {
+      "id": "windSpell",
+      "targetType": "tri",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 889.0999999940395,
+        "clock": 81113.20000000298,
+        "cssTime": 676.3999999970167,
+        "cssStart": 81113.20000000298,
+        "expectedTime": 700,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -23.60000000298328,
+      "rafMs": {
+        "count": 60,
+        "max": 150.29999999998836,
+        "median": 16.79999999998836
+      },
+      "remaining": 0,
+      "screenshotSha256": "216fd813a97a14bc14dc20861d55dd787f8d51f3d383c6bb9be3aaa3fdbb3e1e"
+    },
+    {
+      "id": "stormCircle",
+      "targetType": "tri",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 899.5999999940395,
+        "clock": 84156.90000000596,
+        "cssTime": 791.1999999940349,
+        "cssStart": 84156.90000000596,
+        "expectedTime": 800,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -8.800000005965103,
+      "rafMs": {
+        "count": 73,
+        "max": 66.89999999999418,
+        "median": 16.70000000001164
+      },
+      "remaining": 0,
+      "screenshotSha256": "d23154d1c3176d2f9b0fba65031b24f6a02a3c147f30d45da3ccccf415826baf"
+    },
+    {
+      "id": "windHowlLightning",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 1018.7000000029802,
+        "clock": 87187,
+        "cssTime": 936.000000000007,
+        "cssStart": 87187,
+        "expectedTime": 950,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -13.999999999992951,
+      "rafMs": {
+        "count": 92,
+        "max": 83.5,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "23959399eb56859fe109f916281d569963376feab249d3801dfda3ec3fbc0410"
+    },
+    {
+      "id": "stormRain",
+      "targetType": "all",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 1477,
+        "clock": 90600.30000001192,
+        "cssTime": 1282.899999988075,
+        "cssStart": 90600.30000001192,
+        "expectedTime": 1300,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -17.100000011924976,
+      "rafMs": {
+        "count": 130,
+        "max": 117,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "030552bbd21af2b8930d6687e15c2f9345680f0dd3a355385af5b5cf4c03375a"
+    },
+    {
+      "id": "dodgeSkill",
+      "targetType": "allyTri",
+      "side": "player",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 957.0999999940395,
+        "clock": 94151.5,
+        "cssTime": 790.7000000000011,
+        "cssStart": 94151.5,
+        "expectedTime": 800,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -9.299999999998931,
+      "rafMs": {
+        "count": 82,
+        "max": 117,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "b05b78d52c7c67900fc527575f8c02742812923a5a48b068479aabe557ed3bc6"
+    },
+    {
+      "id": "stealthSkill",
+      "targetType": "ally",
+      "side": "player",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 984,
+        "clock": 97156.10000000894,
+        "cssTime": 827.1999999910662,
+        "cssStart": 97156.10000000894,
+        "expectedTime": 850,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -22.800000008933807,
+      "rafMs": {
+        "count": 73,
+        "max": 133.6999999999971,
+        "median": 16.70000000001164
+      },
+      "remaining": 0,
+      "screenshotSha256": "42bb6d5706d75cc82dd0703b62bc779402e9b56e96794dfaed0efb2b02193b31"
+    },
+    {
+      "id": "dinghaishenzhen",
+      "targetType": "allyAll",
+      "side": "player",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 1276.8999999910593,
+        "clock": 100563.30000001192,
+        "cssTime": 1096.6999999880754,
+        "cssStart": 100563.30000001192,
+        "expectedTime": 1100,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -3.300000011924567,
+      "rafMs": {
+        "count": 113,
+        "max": 133.6999999999971,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "58e79135bf4b57f26352e8da71b70d8655669b95a370ade137b27287aa134fe5"
+    },
+    {
+      "id": "stoneSlash",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 652.8999999910593,
+        "clock": 103832.40000000596,
+        "cssTime": 518.0999999940354,
+        "cssStart": 103832.40000000596,
+        "expectedTime": 550,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -31.900000005964557,
+      "rafMs": {
+        "count": 48,
+        "max": 66.90000000000873,
+        "median": 16.70000000001164
+      },
+      "remaining": 0,
+      "screenshotSha256": "554d33ff6c76fc774af7d203f0aea027826bf61194d443ab16163622167744e8"
+    },
+    {
+      "id": "petrifyFist",
+      "targetType": "tri",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 882.6000000089407,
+        "clock": 106967.10000000894,
+        "cssTime": 691.099999991053,
+        "cssStart": 106967.10000000894,
+        "expectedTime": 700,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -8.900000008947018,
+      "rafMs": {
+        "count": 60,
+        "max": 116.90000000000873,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "2be3aa8495a14bedcd7b8f2633ee2fd67ebda33c1f27cda5cf91e4de303a9234"
+    },
+    {
+      "id": "stoneBreakSky",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 1060,
+        "clock": 110088,
+        "cssTime": 845.4000000000121,
+        "cssStart": 110088,
+        "expectedTime": 850,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -4.599999999987858,
+      "rafMs": {
+        "count": 87,
+        "max": 133.70000000001164,
+        "median": 16.70000000001164
+      },
+      "remaining": 0,
+      "screenshotSha256": "95baa3b0cf4408234afe577fffe48b8b3e130d4c09f025cfc2248371b97fa5bf"
+    },
+    {
+      "id": "earthquakeCrush",
+      "targetType": "tri",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 1009.7000000029802,
+        "clock": 113212.80000001192,
+        "cssTime": 844.4999999880736,
+        "cssStart": 113212.80000001192,
+        "expectedTime": 900,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -55.50000001192643,
+      "rafMs": {
+        "count": 82,
+        "max": 100.19999999999709,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "ac76d018bbd028912e59653ca3afd028dd9fbbef07a6d1b6fb4361a3ba2bda81"
+    },
+    {
+      "id": "stoneThrow",
+      "targetType": "tri",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 804.5,
+        "clock": 116599.80000001192,
+        "cssTime": 648.8999999880747,
+        "cssStart": 116599.80000001192,
+        "expectedTime": 650,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -1.1000000119253173,
+      "rafMs": {
+        "count": 61,
+        "max": 134.10000000000582,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "4aae07ec37cd716ef183655f5de02776495b0fe1644947581d54cc9588d96553"
+    },
+    {
+      "id": "sandWind",
+      "targetType": "tri",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 820.7999999970198,
+        "clock": 119418.30000001192,
+        "cssTime": 737.9999999880766,
+        "cssStart": 119418.30000001192,
+        "expectedTime": 750,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -12.000000011923362,
+      "rafMs": {
+        "count": 73,
+        "max": 133.6999999999971,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "a4e168c7bac491ac5756fd8e130ea9c64296e8d7065c5d1dded965de1984a17c"
+    },
+    {
+      "id": "flyingSandStrike",
+      "targetType": "all",
+      "side": "monster",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 1172.4000000059605,
+        "clock": 122629.5,
+        "cssTime": 986.2000000000108,
+        "cssStart": 122629.5,
+        "expectedTime": 1000,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -13.799999999989154,
+      "rafMs": {
+        "count": 101,
+        "max": 133.5,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "17c5fd63c77662b30c65fbfd2bec2eb29b09c909fdc643a9ffcdff2b06979877"
+    },
+    {
+      "id": "dustStorm",
+      "targetType": "single",
+      "side": "monster",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 1164.6000000089407,
+        "clock": 125859,
+        "cssTime": 981.8000000000069,
+        "cssStart": 125859,
+        "expectedTime": 1000,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -18.19999999999311,
+      "rafMs": {
+        "count": 95,
+        "max": 100.30000000000291,
+        "median": 16.70000000001164
+      },
+      "remaining": 0,
+      "screenshotSha256": "d76c5bb019ac1f79a0f601fb09c33be8896bf1cb22014d26dd7b074bb3708d9b"
+    },
+    {
+      "id": "earthShield",
+      "targetType": "self",
+      "side": "player",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 1066.7999999970198,
+        "clock": 129149.20000000298,
+        "cssTime": 883.3999999970104,
+        "cssStart": 129149.200000003,
+        "expectedTime": 900,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -16.600000002989646,
+      "rafMs": {
+        "count": 90,
+        "max": 117,
+        "median": 16.69999999999709
+      },
+      "remaining": 0,
+      "screenshotSha256": "d334b6e251e2ef192fd65e6bae19741b33ab327edefbaa876f1f70cc55770046"
+    },
+    {
+      "id": "rockWall",
+      "targetType": "allyTri",
+      "side": "player",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 918.5,
+        "clock": 132269.20000000298,
+        "cssTime": 837.8999999970347,
+        "cssStart": 132269.20000000298,
+        "expectedTime": 850,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -12.100000002965317,
+      "rafMs": {
+        "count": 79,
+        "max": 117.10000000000582,
+        "median": 16.70000000001164
+      },
+      "remaining": 0,
+      "screenshotSha256": "a859b844ffc32fdd84d08130840d420560bf07500a8f82aa657526a25aafc574"
+    },
+    {
+      "id": "barrier",
+      "targetType": "ally",
+      "side": "player",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 1108.2999999970198,
+        "clock": 135579.5,
+        "cssTime": 936.5999999999985,
+        "cssStart": 135579.5,
+        "expectedTime": 950,
+        "bg": "33.3333% 50%"
+      },
+      "cssHitErrorMs": -13.400000000001455,
+      "rafMs": {
+        "count": 77,
+        "max": 133.70000000001164,
+        "median": 16.70000000001164
+      },
+      "remaining": 0,
+      "screenshotSha256": "f9e1b19c817435900fdbd4920ed379eca96d358b065f42cf14baf511036660c3"
+    },
+    {
+      "id": "fireSoulResonance",
+      "targetType": "self",
+      "side": "player",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 988.2999999970198,
+        "clock": 138898,
+        "cssTime": 793.3000000000163,
+        "cssStart": 138898,
+        "expectedTime": 816.66666662,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -23.366666619983675,
+      "rafMs": {
+        "count": 65,
+        "max": 167,
+        "median": 16.70000000001164
+      },
+      "remaining": 0,
+      "screenshotSha256": "d4312fc98339e3f68f9f2454eaf7f998e649a6d5b06e6185169b2c49de1186c6"
+    },
+    {
+      "id": "bloodBurnArt",
+      "targetType": "self",
+      "side": "player",
+      "targets": [
+        0
+      ],
+      "hit": {
+        "at": 952.2999999970198,
+        "clock": 141995,
+        "cssTime": 804.3999999999869,
+        "cssStart": 141995,
+        "expectedTime": 816.66666662,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -12.266666620013098,
+      "rafMs": {
+        "count": 68,
+        "max": 133.79999999998836,
+        "median": 16.70000000001164
+      },
+      "remaining": 0,
+      "screenshotSha256": "c17a9a2451abaef2509ccbf825497e7a5c07100595c7394d1f1397495eff65cb"
+    },
+    {
+      "id": "purifyMind",
+      "targetType": "ally",
+      "side": "player",
+      "targets": [
+        0,
+        1,
+        2
+      ],
+      "hit": {
+        "at": 1023.7000000029802,
+        "clock": 145186.40000000596,
+        "cssTime": 805.2999999940482,
+        "cssStart": 145186.40000000596,
+        "expectedTime": 816.66666662,
+        "bg": "66.6667% 50%"
+      },
+      "cssHitErrorMs": -11.36666662595178,
+      "rafMs": {
+        "count": 53,
+        "max": 133.70000000001164,
+        "median": 16.79999999998836
+      },
+      "remaining": 0,
+      "screenshotSha256": "2a735bb10c3192de460fc237a983a52ce9a8ac6faca419c1216e015e60dfe04a"
+    }
+  ],
+  "statuses": [
+    {
+      "id": "burn",
+      "mode": "pulse",
+      "nodes": [
+        {
+          "type": "burn",
+          "classes": "v143-status-visual v143-status-visual-burn v143-status-visual--pulse v143-status-visual--layer-rotating",
+          "opacity": "0.838671",
+          "width": "151px",
+          "height": "158px",
+          "rect": {
+            "width": 145.20266723632812,
+            "height": 151.93392944335938
+          }
+        }
+      ],
+      "screenshotSha256": "c5aa86f12bd5244abd1955b342d762a34c356f6b1885eeb3bf24e5d9f61bb326"
+    },
+    {
+      "id": "rage",
+      "mode": "pulse",
+      "nodes": [
+        {
+          "type": "rage",
+          "classes": "v143-status-visual v143-status-visual-rage v143-status-visual--pulse v143-status-visual--layer-rotating",
+          "opacity": "0.850368",
+          "width": "151px",
+          "height": "158px",
+          "rect": {
+            "width": 145.20266723632812,
+            "height": 151.93392944335938
+          }
+        }
+      ],
+      "screenshotSha256": "9f04384c57b86673b0b57c7dd0d8ac43f915c6b2cc26e7a306b341fbae2e0211"
+    },
+    {
+      "id": "frostbite",
+      "mode": "icon",
+      "nodes": [
+        {
+          "type": "frostbite",
+          "classes": "v143-status-icon v143-status-icon-frostbite v143-status-icon--layer-hud",
+          "opacity": "1",
+          "width": "24px",
+          "height": "24px",
+          "rect": {
+            "width": 23.078567504882812,
+            "height": 23.07854461669922
+          }
+        }
+      ],
+      "screenshotSha256": "397bcfa63b35b8bdfb5a59a601376a79bc218c75d0250a174256dc884042ede3"
+    },
+    {
+      "id": "freeze",
+      "mode": "static",
+      "nodes": [
+        {
+          "type": "freeze",
+          "classes": "v143-status-visual v143-status-visual-freeze v143-status-visual--static v143-status-visual--layer-hard-control-base",
+          "opacity": "0.94",
+          "width": "151px",
+          "height": "158px",
+          "rect": {
+            "width": 145.20266723632812,
+            "height": 151.93392944335938
+          }
+        }
+      ],
+      "screenshotSha256": "6b7544e0cfb6b12fde07d94a28f744882df67f3903e4d020acf271f2d2afef42"
+    },
+    {
+      "id": "agilityDown",
+      "mode": "icon",
+      "nodes": [
+        {
+          "type": "agilityDown",
+          "classes": "v143-status-icon v143-status-icon-agilityDown v143-status-icon--layer-hud",
+          "opacity": "1",
+          "width": "24px",
+          "height": "24px",
+          "rect": {
+            "width": 23.078567504882812,
+            "height": 23.07854461669922
+          }
+        }
+      ],
+      "screenshotSha256": "386911cfb26aa7f5fb4ee037eb2bfbcc1e7bbcd897908fdc6095ca55a053aad5"
+    },
+    {
+      "id": "damageDown",
+      "mode": "icon",
+      "nodes": [
+        {
+          "type": "damageDown",
+          "classes": "v143-status-icon v143-status-icon-damageDown v143-status-icon--layer-hud",
+          "opacity": "1",
+          "width": "24px",
+          "height": "24px",
+          "rect": {
+            "width": 23.078567504882812,
+            "height": 23.07854461669922
+          }
+        }
+      ],
+      "screenshotSha256": "ac1da46fddd287cfdfe4f65c59050f1617d0d3beedf98f83e60a3893045ad10d"
+    },
+    {
+      "id": "stun",
+      "mode": "pulse",
+      "nodes": [
+        {
+          "type": "stun",
+          "classes": "v143-status-visual v143-status-visual-stun v143-status-visual--pulse v143-status-visual--layer-rotating",
+          "opacity": "0.838679",
+          "width": "151px",
+          "height": "158px",
+          "rect": {
+            "width": 145.20266723632812,
+            "height": 151.93392944335938
+          }
+        }
+      ],
+      "screenshotSha256": "c8e410067753d290367bb876cc1f5d8e7f3e9a62d4a6000d9ae5497a81501dfb"
+    },
+    {
+      "id": "dodgeSkill",
+      "mode": "pulse",
+      "nodes": [
+        {
+          "type": "dodgeSkill",
+          "classes": "v143-status-visual v143-status-visual-dodgeSkill v143-status-visual--pulse v143-status-visual--layer-rotating",
+          "opacity": "0.850174",
+          "width": "151px",
+          "height": "158px",
+          "rect": {
+            "width": 145.20266723632812,
+            "height": 151.93392944335938
+          }
+        }
+      ],
+      "screenshotSha256": "cb66a0cf7781b044fb38841a14d3134c1191eb9a725c6f19c9560a4afb9f5d38"
+    },
+    {
+      "id": "stealthSkill",
+      "mode": "none",
+      "nodes": [],
+      "screenshotSha256": "e866200419cc1bcf6d3862d46dbc47dadddd696d0c7b2cd81df5cc981726a94b"
+    },
+    {
+      "id": "dinghaishenzhen",
+      "mode": "pulse",
+      "nodes": [
+        {
+          "type": "dinghaishenzhen",
+          "classes": "v143-status-visual v143-status-visual-dinghaishenzhen v143-status-visual--pulse v143-status-visual--layer-rotating",
+          "opacity": "0.824692",
+          "width": "151px",
+          "height": "158px",
+          "rect": {
+            "width": 145.20266723632812,
+            "height": 151.93392944335938
+          }
+        }
+      ],
+      "screenshotSha256": "8dbc430dc0c273a9fff7fcda423e1a7bb3e686af51c28ef421b623a80e2d3597"
+    },
+    {
+      "id": "defenseDown",
+      "mode": "icon",
+      "nodes": [
+        {
+          "type": "defenseDown",
+          "classes": "v143-status-icon v143-status-icon-defenseDown v143-status-icon--layer-hud",
+          "opacity": "1",
+          "width": "24px",
+          "height": "24px",
+          "rect": {
+            "width": 23.078567504882812,
+            "height": 23.07854461669922
+          }
+        }
+      ],
+      "screenshotSha256": "b56b5b5144ac4cbc37f4e71a53892c380319892749e5bd5778592e3f08aa25a4"
+    },
+    {
+      "id": "shield",
+      "mode": "static",
+      "nodes": [
+        {
+          "type": "shield",
+          "classes": "v143-status-visual v143-status-visual-shield v143-status-visual--static v143-status-visual--layer-rotating",
+          "opacity": "0.9",
+          "width": "157px",
+          "height": "164px",
+          "rect": {
+            "width": 150.97230529785156,
+            "height": 157.70355224609375
+          }
+        }
+      ],
+      "screenshotSha256": "608282705888df01d191514902e2d4e90a92faee38d7b4ad6e726aa481343040"
+    },
+    {
+      "id": "petrify",
+      "mode": "static",
+      "nodes": [
+        {
+          "type": "petrify",
+          "classes": "v143-status-visual v143-status-visual-petrify v143-status-visual--static v143-status-visual--layer-hard-control-base",
+          "opacity": "0.94",
+          "width": "151px",
+          "height": "158px",
+          "rect": {
+            "width": 145.20266723632812,
+            "height": 151.93392944335938
+          }
+        }
+      ],
+      "screenshotSha256": "ba0afbdc0a495fcd58e36a2b04699709fd5b659d6f017827088fc6d7af0fe1bf"
+    },
+    {
+      "id": "earthShield",
+      "mode": "static",
+      "nodes": [
+        {
+          "type": "earthShield",
+          "classes": "v143-status-visual v143-status-visual-earthShield v143-status-visual--static v143-status-visual--layer-rotating",
+          "opacity": "0.9",
+          "width": "157px",
+          "height": "164px",
+          "rect": {
+            "width": 150.97230529785156,
+            "height": 157.70355224609375
+          }
+        }
+      ],
+      "screenshotSha256": "5a476d7abed9885eaeec3d46d4224b63360ca3ce65eb7be7f831e621439a7b61"
+    },
+    {
+      "id": "rockWall",
+      "mode": "static",
+      "nodes": [
+        {
+          "type": "rockWall",
+          "classes": "v143-status-visual v143-status-visual-rockWall v143-status-visual--static v143-status-visual--layer-rotating",
+          "opacity": "0.9",
+          "width": "157px",
+          "height": "164px",
+          "rect": {
+            "width": 150.97230529785156,
+            "height": 157.70355224609375
+          }
+        }
+      ],
+      "screenshotSha256": "e4c9481b72b52b475eeb730d3bbc7664d58de14682b210bcd18d156333c3b7c7"
+    },
+    {
+      "id": "barrier",
+      "mode": "static",
+      "nodes": [
+        {
+          "type": "barrier",
+          "classes": "v143-status-visual v143-status-visual-barrier v143-status-visual--static v143-status-visual--layer-rotating",
+          "opacity": "0.9",
+          "width": "157px",
+          "height": "164px",
+          "rect": {
+            "width": 150.97230529785156,
+            "height": 157.70355224609375
+          }
+        }
+      ],
+      "screenshotSha256": "c182593bae372a2de48c3a6befc85a7e35c0005d510f366f3047005727441297"
+    },
+    {
+      "id": "yuanZuBlessing",
+      "mode": "pulse",
+      "nodes": [
+        {
+          "type": "yuanZuBlessing",
+          "classes": "v143-status-visual v143-status-visual-yuanZuBlessing v143-status-visual--pulse v143-status-visual--layer-rotating",
+          "opacity": "0.740565",
+          "width": "151px",
+          "height": "158px",
+          "rect": {
+            "width": 145.20266723632812,
+            "height": 151.93392944335938
+          }
+        }
+      ],
+      "screenshotSha256": "b9b97adfc745653d0ba297533f40be14406633da3e4995d9916f27cfea109625"
+    },
+    {
+      "id": "fireMomentum",
+      "mode": "none",
+      "nodes": [],
+      "screenshotSha256": "4b6f2a841a0d07bca47b82d6c6f48aaf26ef03b292d4c5f4eda698d981a0bb83"
+    },
+    {
+      "id": "phoenixMight",
+      "mode": "icon",
+      "nodes": [
+        {
+          "type": "phoenixMight",
+          "classes": "v143-status-icon v143-status-icon-phoenixMight v143-status-icon--layer-hud",
+          "opacity": "1",
+          "width": "24px",
+          "height": "24px",
+          "rect": {
+            "width": 23.078567504882812,
+            "height": 23.07854461669922
+          }
+        }
+      ],
+      "screenshotSha256": "98c0c769c04ce5b03fd7956ddfb156b4d485db3574fb962d826f5ab177e3870b"
+    },
+    {
+      "id": "fireSoulResonance",
+      "mode": "pulse",
+      "nodes": [
+        {
+          "type": "fireSoulResonance",
+          "classes": "v143-status-visual v143-status-visual-fireSoulResonance v143-status-visual--pulse v143-status-visual--layer-rotating",
+          "opacity": "0.850291",
+          "width": "151px",
+          "height": "158px",
+          "rect": {
+            "width": 145.20266723632812,
+            "height": 151.93392944335938
+          }
+        }
+      ],
+      "screenshotSha256": "8a95e75cfe4f5f4828787f1c774ced250e0d4f805630bab84ea3581502faa6e8"
+    },
+    {
+      "id": "bloodBurn",
+      "mode": "pulse",
+      "nodes": [
+        {
+          "type": "bloodBurn",
+          "classes": "v143-status-visual v143-status-visual-bloodBurn v143-status-visual--pulse v143-status-visual--layer-rotating",
+          "opacity": "0.838624",
+          "width": "151px",
+          "height": "158px",
+          "rect": {
+            "width": 145.20266723632812,
+            "height": 151.93392944335938
+          }
+        }
+      ],
+      "screenshotSha256": "23a883d4099fbbcaea20bea0980cb8bf472461f811cf7e633d4ccc09a7ca86ad"
+    }
+  ],
+  "lifecycle": {
+    "first": [
+      {
+        "type": "rage",
+        "opacity": "0.627269"
+      },
+      {
+        "type": "freeze",
+        "opacity": "0.94"
+      }
+    ],
+    "rotated": [
+      {
+        "type": "freeze",
+        "opacity": "0.94"
+      },
+      {
+        "type": "shield",
+        "opacity": "0.9"
+      }
+    ],
+    "enemy": 1,
+    "icons": [
+      {
+        "width": "24px",
+        "height": "24px",
+        "z": "34"
+      }
+    ],
+    "cleansed": [
+      {
+        "type": "rage",
+        "opacity": "0.63457"
+      }
+    ],
+    "expired": [],
+    "dead": [],
+    "revived": [
+      {
+        "type": "shield",
+        "opacity": "0.9"
+      }
+    ],
+    "remaining": 0
+  },
+  "limits": [
+    "Visual-only cast matrix does not prove actual gameplay damage or eligibility.",
+    "RAF intervals include CDP screenshot overhead and cannot establish performance acceptance.",
+    "Individual screenshots do not prove animation sequence or commercial visual quality.",
+    "Status expiry check sets visual input turnsLeft=0; it does not retest the formal round-end duration owner.",
+    "After this head, group artwork center is being corrected and requires affected-skill replay."
+  ]
+}

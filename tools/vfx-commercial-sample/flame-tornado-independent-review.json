@@ -1,0 +1,140 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewer": "geometry_review",
+  "asset": "tools/vfx-commercial-sample/assets/full/flame-tornado-v2.webp",
+  "generationEvidence": "tools/vfx-commercial-sample/assets/full/flame-tornado-v2-generation.json",
+  "state": "source-reviewed-for-runtime-candidate",
+  "runtimeQaState": "not-reviewed",
+  "method": "Opened complete12-frame sheet using view_image; reviewed row-major sequence and independently scanned all cell border alpha at threshold64.",
+  "findings": [
+    "Flame ribbons become an articulated dragon spiral, retaining a readable curled flame/tornado identity without the previous flat-topped pillar.",
+    "Frames1-2 provide gathering ribbon shapes;3-6 grow the dragon body; frame8 includes a mouth flare;9 retains full dragon;10-12 contract toward a smaller residual ribbon.",
+    "All12 frames have zero strong-alpha cell-border contacts. Very tight top margin on some frames is a runtime filtering risk to inspect, not itself proof of clipping.",
+    "Head position moves significantly between neighboring frames and disappears in frame7 before reappearing with an open mouth in frame8. Playback must determine whether this reads as rotation or an abrupt pop.",
+    "Frame9 remains a fairly complete dragon after the attack flare; test whether this prolongs occupancy or produces a second apparent peak. Do not claim sequence polish passed from the atlas alone.",
+    "Low-alpha orange RGB visible in the image viewer is not treated as an opaque matte; confirm actual compositing and target visibility on phone."
+  ],
+  "decision": "Allow candidate-only phone test; no source edge/contact blocker proven. Require mouth/head continuity and character readability review before commercial-quality approval.",
+  "frames": [
+    {
+      "frame": 1,
+      "alpha64Bounds": [
+        54,
+        58,
+        318,
+        341
+      ],
+      "edgeAlpha64": 0
+    },
+    {
+      "frame": 2,
+      "alpha64Bounds": [
+        69,
+        46,
+        330,
+        341
+      ],
+      "edgeAlpha64": 0
+    },
+    {
+      "frame": 3,
+      "alpha64Bounds": [
+        51,
+        8,
+        328,
+        341
+      ],
+      "edgeAlpha64": 0
+    },
+    {
+      "frame": 4,
+      "alpha64Bounds": [
+        59,
+        8,
+        338,
+        343
+      ],
+      "edgeAlpha64": 0
+    },
+    {
+      "frame": 5,
+      "alpha64Bounds": [
+        23,
+        5,
+        351,
+        346
+      ],
+      "edgeAlpha64": 0
+    },
+    {
+      "frame": 6,
+      "alpha64Bounds": [
+        55,
+        21,
+        352,
+        348
+      ],
+      "edgeAlpha64": 0
+    },
+    {
+      "frame": 7,
+      "alpha64Bounds": [
+        65,
+        33,
+        327,
+        343
+      ],
+      "edgeAlpha64": 0
+    },
+    {
+      "frame": 8,
+      "alpha64Bounds": [
+        39,
+        17,
+        354,
+        341
+      ],
+      "edgeAlpha64": 0
+    },
+    {
+      "frame": 9,
+      "alpha64Bounds": [
+        60,
+        18,
+        319,
+        342
+      ],
+      "edgeAlpha64": 0
+    },
+    {
+      "frame": 10,
+      "alpha64Bounds": [
+        64,
+        35,
+        325,
+        320
+      ],
+      "edgeAlpha64": 0
+    },
+    {
+      "frame": 11,
+      "alpha64Bounds": [
+        95,
+        67,
+        304,
+        306
+      ],
+      "edgeAlpha64": 0
+    },
+    {
+      "frame": 12,
+      "alpha64Bounds": [
+        127,
+        121,
+        267,
+        273
+      ],
+      "edgeAlpha64": 0
+    }
+  ]
+}
