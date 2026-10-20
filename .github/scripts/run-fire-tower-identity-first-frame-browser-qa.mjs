@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import {spawn,spawnSync} from "node:child_process";
-import {Cdp,waitJson} from "./runtime-browser-qa-support.mjs";
+import {Cdp,waitJson,observeChromeStartup} from "./runtime-browser-qa-support.mjs";
 
 const ROOT=process.cwd();
 const FIXTURE=path.join(ROOT,".fire-tower-identity-first-frame-qa.html");
@@ -54,7 +54,7 @@ const fixture=[
 
 fs.mkdirSync(ARTIFACT_DIR,{recursive:true});
 fs.writeFileSync(FIXTURE,fixture);
-let browser,client,profile,deadlineTimer,launchError="",chromeExecutable="";
+let browser,client,profile,deadlineTimer,startup,launchError="",chromeExecutable="";
 try{
     const chrome=findChrome();
     chromeExecutable=chrome;
@@ -65,10 +65,12 @@ try{
     const started=Date.now(),port=9800+Math.floor(Math.random()*200);
     profile=fs.mkdtempSync(path.join(os.tmpdir(),"tower-first-frame-"));
     browser=spawn(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--window-size=412,915","--remote-debugging-port="+port,"--user-data-dir="+profile,"about:blank"],{stdio:["ignore","ignore","pipe"]});
+    startup=observeChromeStartup(browser,{port,output:path.join(ARTIFACT_DIR,element+'-tower-chrome-startup.json')});
     browser.stderr.on("data",chunk=>{launchError=(launchError+chunk).slice(-4000);});
     browser.on("error",error=>{launchError=String(error);});
     const collectResult=async()=>{
         const pages=await waitJson("http://127.0.0.1:"+port+"/json/list");
+        await startup.finish('DevTools ready');
         client=new Cdp(pages.find(page=>page.type==="page").webSocketDebuggerUrl);
         await client.send("Page.enable");await client.send("Runtime.enable");
         await client.send("Page.navigate",{url:base+"/.fire-tower-identity-first-frame-qa.html"});
@@ -108,6 +110,7 @@ try{
     assert.equal(expectedNames[element==="earth"?90:100],finalExpected);
     console.log("Fire Tower identity / first-frame browser QA passed:",JSON.stringify(expectedNames));
 }catch(error){
+    await startup?.finish('startup or QA failure');
     const chromeProcess={executable:chromeExecutable,pid:browser?.pid??null,exit:browser?.exitCode??null,stderr:launchError};
     console.error('Tower first-frame Chrome failure: '+JSON.stringify({chromeProcess,devTools:error.devToolsDiagnostics||null}));
     fs.writeFileSync(path.join(ARTIFACT_DIR,element+'-tower-identity-first-frame-browser-qa.json'),JSON.stringify({passed:false,error:String(error.stack||error),chromeProcess,devTools:error.devToolsDiagnostics||null},null,2)+'\n');

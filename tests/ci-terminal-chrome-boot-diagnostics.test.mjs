@@ -2,10 +2,43 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {spawnSync} from 'node:child_process';
+import {spawn,spawnSync} from 'node:child_process';
 import test from 'node:test';
 import http from 'node:http';
-import {waitJson} from '../.github/scripts/runtime-browser-qa-support.mjs';
+import {waitJson,observeChromeStartup} from '../.github/scripts/runtime-browser-qa-support.mjs';
+
+test('startup observation cannot mask a child failure when its artifact cannot be written',async()=>{
+    const directory=fs.mkdtempSync(path.join(os.tmpdir(),'chrome-observer-'));
+    const child=spawn(process.execPath,['-e',"process.stderr.write('isolated startup failure');process.exit(7)"],{stdio:['ignore','ignore','pipe']});
+    const observer=observeChromeStartup(child,{port:65530,output:directory});
+    try{
+        await new Promise(resolve=>child.once('close',resolve));
+        const evidence=await observer.finish('failed');
+        assert.equal(child.exitCode,7);assert.equal(evidence.exit.code,7);
+        assert.match(evidence.artifactError,/directory|EISDIR|EPERM/i);
+        assert.match(evidence.stderrHead,/isolated startup failure/);
+        assert.notEqual(evidence.firstStderrMs,null);
+    }finally{fs.rmSync(directory,{recursive:true,force:true});}
+});
+
+test('Linux slow-start observation is limited to the target tree and stops its tracer', {skip:process.platform!=='linux'},async()=>{
+    const directory=fs.mkdtempSync(path.join(os.tmpdir(),'chrome-observer-'));
+    const child=spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{stdio:['ignore','ignore','pipe']});
+    const observer=observeChromeStartup(child,{port:65530,output:path.join(directory,'startup.json')});
+    try{
+        await new Promise(resolve=>setTimeout(resolve,5200));
+        const start=Date.now(),evidence=await observer.finish('diagnostic fixture complete');
+        assert.ok(Date.now()-start<1500,'observer cleanup is bounded');
+        assert.equal(child.exitCode,null,'observation must not stop the target');
+        assert.ok(evidence.samples.some(s=>s.processes.some(p=>p.pid===child.pid)));
+        assert.ok(evidence.samples.every(s=>s.processes.every(p=>p.pid!==process.pid)),'no parent/system-wide process scan');
+        assert.ok(evidence.trace?.unavailable||evidence.trace?.exit||evidence.trace?.error||evidence.trace?.drainedAfterKill);
+        assert.equal(JSON.parse(fs.readFileSync(path.join(directory,'startup.json'),'utf8')).outcome,'diagnostic fixture complete');
+    }finally{
+        const closed=new Promise(resolve=>child.once('close',resolve));child.kill();await closed;
+        fs.rmSync(directory,{recursive:true,force:true});
+    }
+});
 
 for(const phase of ['headers','JSON body']){
     test('DevTools deadline aborts stalled '+phase,async()=>{
@@ -103,9 +136,10 @@ test('terminal visual QA retains failed Chrome process evidence before CDP exist
                 });}
                 throw Error('injected CDP unavailable');
             };
+            const observeChromeStartup=()=>({finish(){}});
             class Cdp{};
             const collectStartupFailure=async()=>{throw Error('CDP must not exist');};`;
-        const source=original.replace(/^import \{ROOT,findChrome,startServer,waitJson,Cdp,collectStartupFailure\} from .*;$/m,dependencies)
+        const source=original.replace(/^import \{ROOT,findChrome,startServer,waitJson,Cdp,collectStartupFailure,observeChromeStartup\} from .*;$/m,dependencies)
             .replace("const baseUrl=process.env.QA_BASE_URL||'';","const baseUrl='';");
         assert.notEqual(source,original,'fixture must isolate the imported transport');
         const script=`try{await import(${JSON.stringify('data:text/javascript;base64,'+Buffer.from(source).toString('base64'))});throw Error('expected failure');}

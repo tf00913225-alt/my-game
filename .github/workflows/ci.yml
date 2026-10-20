@@ -821,6 +821,7 @@ jobs:
             artifacts/browser-qa/fire-tower-identity-first-frame-browser-qa.json
             artifacts/browser-qa/wind-tower-identity-first-frame-browser-qa.json
             artifacts/browser-qa/earth-tower-identity-first-frame-browser-qa.json
+            artifacts/browser-qa/*-tower-chrome-startup.json
           if-no-files-found: error
           retention-days: 90
 
