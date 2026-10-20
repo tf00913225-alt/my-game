@@ -1,0 +1,19 @@
+{
+  "workId": "BATTLE-PORTRAIT-DEPTH-20261020",
+  "pr": 958,
+  "status": "IMPLEMENTED_BROWSER_VERIFIED_USB_PENDING",
+  "symptom": "The current manual actor's rapidly flashing yellow frame was tied to the smaller logical card and painted in front of enlarged portrait artwork.",
+  "owner": "css/fixed-slot-battlefield-rendering-v2.css",
+  "change": "Move the existing indicator to active actor artwork ::before behind portrait paint (z-1). Artwork frame already owns depth and occupied-row height caps. Explicitly retire old card ::after frame. Keep original .3s flash, action/lunge/dodge owner, actual portrait sizes and ::after foot shadow.",
+  "focusedValidation": [
+    "Fixed-slot actual browser QA four viewports PASS: artwork-relative insets/size and behind-paint order, old frame absent, foot shadow retained, unique manual actor, auto cleanup and target-selection coexistence",
+    "battle-ui-status-vfx-followup seven tests PASS",
+    "remaining-ui-regressions PASS",
+    "v174-cardless-battle-browser production bundle PASS including lunge/dodge frame survival",
+    "Production build PASS"
+  ],
+  "usb": "Pending matched physical before/after on three- and six-actor scenes",
+  "ci": "New Head required checks remain separate. Previously reported CI failures are not claimed repaired by this frame fix.",
+  "latestDevObserved": "1ec7362be54a7e2f27525196294735ec2c9db39b",
+  "devImpact": "New Cloud recovery and skill-progression changes since prior observation do not change the fixed-slot frame Owner. Build Owner advanced separately; recheck merge scope and latest checks before integration."
+}

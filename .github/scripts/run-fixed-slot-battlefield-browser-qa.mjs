@@ -151,7 +151,15 @@ ${portraitSource}
  /* Restore the formal three-enemy DOM after the death-stability probe. Floating
     feedback must never target a Unit that no longer exists in the battlefield. */
  addCards(3,3,true);
- function activeFrame(index){var card=document.getElementById('battlePlayerCard'+index),style=getComputedStyle(card,'::after');return {index:index,content:style.content,border:style.borderTopWidth,borderColor:style.borderTopColor,shadow:style.boxShadow,animationName:style.animationName,animationDuration:style.animationDuration};}
+ function activeFrame(index){
+  const card=document.getElementById('battlePlayerCard'+index),art=card.querySelector('.v174-battle-art'),paint=art.querySelector('.v174-portrait-paint'),style=getComputedStyle(art,'::before'),a=art.getBoundingClientRect();
+  const evidence={index:index,content:style.content,border:style.borderTopWidth,borderColor:style.borderTopColor,shadow:style.boxShadow,animationName:style.animationName,animationDuration:style.animationDuration,zIndex:style.zIndex,insets:[style.top,style.right,style.bottom,style.left],width:parseFloat(style.width),height:parseFloat(style.height),artWidth:art.clientWidth,artHeight:art.clientHeight,transform:style.transform,rootAnimation:getComputedStyle(card,'::after').animationName,rootContent:getComputedStyle(card,'::after').content,footShadow:{content:getComputedStyle(art,'::after').content,background:getComputedStyle(art,'::after').backgroundImage,opacity:getComputedStyle(art,'::after').opacity}};
+  if(card.classList.contains('active-turn')){
+   const probe=document.createElement('style');probe.textContent='#battlePlayerCard'+index+' > .v174-battle-art::before{pointer-events:auto !important}';document.head.appendChild(probe);
+   const old=paint.style.pointerEvents;paint.style.pointerEvents='auto';const hit=document.elementFromPoint(a.left+a.width/2,a.top+a.height/2);evidence.behindPaint=hit===paint||paint.contains(hit);paint.style.pointerEvents=old;probe.remove();
+  }
+  return evidence;
+ }
  function setManualActive(index){document.querySelectorAll('#battlePlayerRow .battle-player').forEach(function(card){card.classList.toggle('active-turn',card.id==='battlePlayerCard'+index);});return {active:Array.from(document.querySelectorAll('#battlePlayerRow .battle-player.active-turn')).map(function(card){return card.id;}),frame:activeFrame(index)};}
  var manualControl={character0:setManualActive(0),character1:setManualActive(1),character2:setManualActive(2)};
  var targetSelectingPlayer=document.getElementById('battlePlayerCard1');setManualActive(1);targetSelectingPlayer.classList.add('ally-targetable');manualControl.targetSelection={active:Array.from(document.querySelectorAll('#battlePlayerRow .battle-player.active-turn')).map(function(card){return card.id;}),frame:activeFrame(1),reticleAnimation:getComputedStyle(targetSelectingPlayer,'::before').animationName};targetSelectingPlayer.classList.remove('ally-targetable');
@@ -328,12 +336,24 @@ function runViewport(chrome,width,height){
         assert.notEqual(state.frame.shadow,"none");
         assert.equal(state.frame.animationName,"v174ManualActiveTurnFrameFlash");
         assert.equal(state.frame.animationDuration,"0.3s");
+        assert.equal(state.frame.zIndex,"-1","manual frame stays behind the portrait paint");
+        assert.deepEqual(state.frame.insets,["-4px","-4px","-4px","-4px"],"frame follows artwork, not the smaller Unit/HUD rectangle");
+        close(state.frame.width,state.frame.artWidth+8,"manual frame artwork width",1);
+        close(state.frame.height,state.frame.artHeight+8,"manual frame artwork height",1);
+        assert.equal(state.frame.transform,"none","ground-shadow translation must not leak into the frame");
+        assert.equal(state.frame.behindPaint,true,"actual frame pseudo-element must paint behind portrait, even when made hit-testable");
+        assert.notEqual(state.frame.rootAnimation,"v174ManualActiveTurnFrameFlash","old Unit pseudo must not retain a second frame");
+        assert.equal(state.frame.rootContent,"none");
+        assert.equal(state.frame.footShadow.content,'""');
+        assert.match(state.frame.footShadow.background,/radial-gradient/);
+        assert.equal(state.frame.footShadow.opacity,"0.72");
     }
     assert.deepEqual(data.manualControl.auto.active,[],"auto control must expose no manual active character");
-    data.manualControl.auto.frames.forEach(frame=>assert.equal(frame.animationName,"none","inactive/auto cards must not run the manual flash"));
+    data.manualControl.auto.frames.forEach(frame=>{assert.equal(frame.animationName,"none","inactive/auto cards must not run the manual flash");assert.ok(frame.content==="none"||frame.content==="normal","inactive artwork has no frame");assert.equal(frame.footShadow.content,'""');assert.match(frame.footShadow.background,/radial-gradient/);});
     assert.deepEqual(data.manualControl.targetSelection.active,["battlePlayerCard1"]);
     assert.equal(data.manualControl.targetSelection.frame.animationName,"v174ManualActiveTurnFrameFlash","ally target selection must not suppress the manual active frame");
     assert.equal(data.manualControl.targetSelection.reticleAnimation,"none","multi-target reticles remain static");
+    assert.equal(data.manualControl.targetSelection.frame.behindPaint,true,"target selection retains the behind-art frame plane");
     close(data.turnUi.normal.rect.top,baseline.action.top,"turn timer occupies the shared information band",.8);
     assert.ok(baseline.command.height/canvasScale>=66-.1,"command touch row retains 66 logical pixels");
     assert.ok(baseline.elementBox.height/canvasScale>=66-.1,"Element Box retains 66 logical pixels");

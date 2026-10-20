@@ -573,10 +573,10 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-side="monster"] .monster-status-badges{top:36px !important;bottom:auto !important;}
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud .monster-status-badges:empty{display:none !important;}
 
-/* Fixed Slot is the production owner of the manual-control indicator. The
-   frame lives on its own pseudo-element so continuous feedback never claims
-   the Unit root or portrait animation property used by lunge/hit/dodge. */
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after{
+/* The manual indicator follows the stationary artwork frame, including depth
+   and occupied-row height caps. Paint it behind the portrait so no frame edge
+   cuts through the character; the existing ::after foot shadow stays intact. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art::before{
     content:"" !important;
     position:absolute !important;
     inset:-4px !important;
@@ -587,8 +587,13 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     box-shadow:0 0 7px 2px rgba(255,210,31,1),0 0 18px 5px rgba(255,196,0,.72) !important;
     opacity:1;
     pointer-events:none !important;
-    z-index:36 !important;
+    z-index:-1 !important;
     animation:v174ManualActiveTurnFrameFlash .3s linear infinite !important;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after{
+    content:none !important;
+    display:none !important;
+    animation:none !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn{
     outline:0 !important;

@@ -117,29 +117,29 @@ window.__qaBefore=qaRects();
   var activePlayer=document.getElementById('battlePlayerCard1');
   var elementFrames=['fire','water','wind','earth'].map(function(element){
     activePlayer.dataset.element=element;
-    return {element:element,animation:getComputedStyle(activePlayer,'::after').animationName,
-      border:getComputedStyle(activePlayer,'::after').borderTopColor};
+    return {element:element,animation:getComputedStyle(activePlayer.querySelector('.v174-battle-art'),'::before').animationName,
+      border:getComputedStyle(activePlayer.querySelector('.v174-battle-art'),'::before').borderTopColor};
   });
   var manualCount=document.querySelectorAll('.battle-player.active-turn').length;
   // The formal declaration path clears before deciding auto/manual. Exercise
   // those same projection functions; automatic characters receive no update.
   clearActiveCharacterHighlight();
   var autoCount=document.querySelectorAll('.battle-player.active-turn').length;
-  var autoFrameAnimation=getComputedStyle(activePlayer,'::after').animationName;
+  var autoFrameAnimation=getComputedStyle(activePlayer.querySelector('.v174-battle-art'),'::before').animationName;
   activeBattleCharacterIndex=2;updateActiveCharacterHighlight();
   var nextManualIds=Array.from(document.querySelectorAll('.battle-player.active-turn')).map(function(card){return card.id});
   activeBattleCharacterIndex=1;updateActiveCharacterHighlight();
-  var activeFrame=getComputedStyle(activePlayer,'::after');
+  var activeFrame=getComputedStyle(activePlayer.querySelector('.v174-battle-art'),'::before');
   var art=player.querySelector(':scope > .v174-battle-art');
   var activeArt=activePlayer.querySelector(':scope > .v174-battle-art');
   activePlayer.classList.add('attacker-lunge-up');
   var activeLungeAnimation=getComputedStyle(activeArt.querySelector('.v174-action-motion')).animationName;
-  var activeFrameDuringLunge=getComputedStyle(activePlayer,'::after').animationName;
+  var activeFrameDuringLunge=getComputedStyle(activePlayer.querySelector('.v174-battle-art'),'::before').animationName;
   activePlayer.classList.remove('attacker-lunge-up');
   activePlayer.classList.add('dodge-back');
   var activeDodgeAnimation=getComputedStyle(activeArt.querySelector('.v174-action-motion')).animationName;
   var dodgeRootAnimation=getComputedStyle(activePlayer).animationName;
-  var activeFrameDuringDodge=getComputedStyle(activePlayer,'::after').animationName;
+  var activeFrameDuringDodge=getComputedStyle(activePlayer.querySelector('.v174-battle-art'),'::before').animationName;
   activePlayer.classList.remove('dodge-back');
   player.classList.add('attacker-lunge-up');
   var lungeAnimation=getComputedStyle(art.querySelector('.v174-action-motion')).animationName;
