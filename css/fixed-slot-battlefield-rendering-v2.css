@@ -31,7 +31,7 @@
     --battle-name-row-height:26px;
     --battle-resource-bar-height:6px;
     --battle-enemy-safe-top:12px;
-    --battle-skill-menu-top-offset:144px;
+    --battle-skill-menu-top-offset:188px;
     --battle-item-menu-bottom:78px;
     --battle-item-menu-height:300px;
     --battle-item-menu-gap:8px;
@@ -183,12 +183,17 @@
     height:100%;
     box-sizing:border-box;
     padding:4px 3px;
+    display:grid;
+    grid-template-rows:56px minmax(40px,auto) 20px minmax(60px,auto);
+    align-content:center;
+    justify-items:center;
+    gap:2px;
     overflow:visible !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-icon-wrap{
-    width:34px;
-    height:34px;
-    flex-basis:34px;
+    width:56px;
+    height:56px;
+    flex-basis:56px;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-name{
     display:block !important;

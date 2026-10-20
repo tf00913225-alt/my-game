@@ -1939,8 +1939,8 @@ button:active{
 .skill-quick-button:disabled,
 .skill-quick-button.sp-insufficient{
     background:#151412;
-    color:#77716a;
-    border-color:#4a3f2e;
+    color:#bcb19e;
+    border-color:#756341;
     opacity:1;
 }
 
@@ -1988,8 +1988,9 @@ button:active{
     justify-content:center;
     background:rgba(0,0,0,.62);
     color:#ffcf59;
-    font-size:11px;
-    line-height:13px;
+    font-size:16px;
+    line-height:20px;
+    white-space:nowrap;
     font-weight:900;
     text-shadow:0 1px 2px #000;
     z-index:3;
@@ -2034,7 +2035,7 @@ button:active{
 }
 
 .skill-quick-button.sp-insufficient .sq-cost{
-    color:#8a8177;
+    color:#bcb19e;
 }
 
 .sub-menu{
@@ -2359,7 +2360,7 @@ button:active{
 
 .skill-sp-warning{
     color:#b3a58c;
-    font-size:16px;
+    font-size:11px;
     font-weight:bold;
 }
 
