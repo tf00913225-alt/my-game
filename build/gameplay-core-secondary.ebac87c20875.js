@@ -7981,6 +7981,12 @@ function syncUnitArtwork(card,kind,selectedRecord){
     art.style.backgroundImage=source||"none";
     let action=art.querySelector(":scope > .v174-action-motion");
     if(!action){action=document.createElement("div");action.className="v174-action-motion";art.appendChild(action);}
+    // One stationary manual-turn marker shares the formal art frame. CSS uses
+    // the existing active-turn state; no second selection or coordinate owner.
+    if(kind==="player"&&!art.querySelector(":scope > .v174-manual-turn-arrow")){
+        const arrow=document.createElement("span");arrow.className="v174-manual-turn-arrow";
+        arrow.setAttribute("aria-hidden","true");art.appendChild(arrow);
+    }
     let paint=action.querySelector(":scope > .v174-portrait-paint");
     if(record?.generic){if(paint)paint.remove();paint=null;}
     else if(!paint){paint=document.createElement("div");paint.className="v174-portrait-paint";action.appendChild(paint);}

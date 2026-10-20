@@ -7916,23 +7916,37 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-side="monster"] .monster-status-badges{top:36px !important;bottom:auto !important;}
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud .monster-status-badges:empty{display:none !important;}
 
-/* The manual indicator follows the stationary artwork frame, including depth
-   and occupied-row height caps. Paint it behind the portrait so no frame edge
-   cuts through the character; the existing ::after foot shadow stays intact. */
+/* Manual-turn feedback shares the stationary art frame and its depth/row cap.
+   The foot ellipse sits behind paint; ::after keeps the existing foot shadow. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art::before{
     content:"" !important;
     position:absolute !important;
-    inset:-4px !important;
+    left:50% !important;
+    right:auto !important;
+    top:auto !important;
+    bottom:-2px !important;
+    width:66% !important;
+    height:10px !important;
+    transform:translateX(-50%) !important;
     box-sizing:border-box !important;
-    border:3px solid #ffd21f !important;
-    border-radius:10px !important;
-    background:transparent !important;
-    box-shadow:0 0 7px 2px rgba(255,210,31,1),0 0 18px 5px rgba(255,196,0,.72) !important;
-    opacity:1;
+    border:1px solid rgba(241,210,137,.72) !important;
+    border-radius:50% !important;
+    background:radial-gradient(ellipse,rgba(241,210,137,.12),rgba(241,210,137,.25) 65%,transparent 74%) !important;
+    box-shadow:0 0 5px 1px rgba(241,210,137,.3) !important;
+    opacity:.65;
     pointer-events:none !important;
     z-index:-1 !important;
-    animation:v174ManualActiveTurnFrameFlash .3s linear infinite !important;
+    animation:v174ManualTurnFootBreath 2s ease-in-out infinite !important;
 }
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-arrow{
+    display:none;position:absolute;left:50%;top:-5px;width:0;height:0;
+    border-left:4px solid transparent;border-right:4px solid transparent;
+    border-top:4px solid #ecd190;transform:translateX(-50%);
+    pointer-events:none;z-index:2;
+}
+/* Five unscaled pixels fit the existing six-pixel paired-HUD clearance even
+   at 1.18 depth. No glow extends the arrow into the information band. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art > .v174-manual-turn-arrow{display:block;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after{
     content:none !important;
     display:none !important;
@@ -7942,15 +7956,9 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     outline:0 !important;
     box-shadow:none !important;
 }
-@keyframes v174ManualActiveTurnFrameFlash{
-    0%,100%{
-        opacity:1;
-        box-shadow:0 0 7px 2px rgba(255,210,31,1),0 0 18px 5px rgba(255,196,0,.72);
-    }
-    50%{
-        opacity:.24;
-        box-shadow:0 0 14px 4px rgba(255,240,130,1),0 0 28px 8px rgba(255,210,31,.95);
-    }
+@keyframes v174ManualTurnFootBreath{
+    0%,100%{opacity:.55;}
+    50%{opacity:.75;}
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target{
@@ -8086,6 +8094,7 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     to{opacity:1;filter:brightness(1.3)}
 }
 @media (prefers-reduced-motion:reduce){
+    #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art::before{animation:none !important;opacity:.65;}
     #game-stage #battlePage .v174-action-motion,
     #game-stage #battlePage .v174-portrait-paint,
     #game-stage #battlePage .v174-generic-portrait > .v174-action-motion::before{animation:none !important;}

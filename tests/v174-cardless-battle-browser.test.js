@@ -118,14 +118,14 @@ window.__qaBefore=qaRects();
   var elementFrames=['fire','water','wind','earth'].map(function(element){
     activePlayer.dataset.element=element;
     return {element:element,animation:getComputedStyle(activePlayer.querySelector('.v174-battle-art'),'::before').animationName,
-      border:getComputedStyle(activePlayer.querySelector('.v174-battle-art'),'::before').borderTopColor};
+      border:getComputedStyle(activePlayer.querySelector('.v174-battle-art'),'::before').borderTopColor,arrow:getComputedStyle(activePlayer.querySelector('.v174-manual-turn-arrow')).display,arrowCount:activePlayer.querySelectorAll('.v174-manual-turn-arrow').length};
   });
   var manualCount=document.querySelectorAll('.battle-player.active-turn').length;
   // The formal declaration path clears before deciding auto/manual. Exercise
   // those same projection functions; automatic characters receive no update.
   clearActiveCharacterHighlight();
   var autoCount=document.querySelectorAll('.battle-player.active-turn').length;
-  var autoFrameAnimation=getComputedStyle(activePlayer.querySelector('.v174-battle-art'),'::before').animationName;
+  var autoFrameAnimation=getComputedStyle(activePlayer.querySelector('.v174-battle-art'),'::before').animationName;var autoArrowDisplay=getComputedStyle(activePlayer.querySelector('.v174-manual-turn-arrow')).display;
   activeBattleCharacterIndex=2;updateActiveCharacterHighlight();
   var nextManualIds=Array.from(document.querySelectorAll('.battle-player.active-turn')).map(function(card){return card.id});
   activeBattleCharacterIndex=1;updateActiveCharacterHighlight();
@@ -150,7 +150,7 @@ window.__qaBefore=qaRects();
     var enemy=document.getElementById('battleMonster0');
     var enemyArt=enemy.querySelector(':scope > .v174-battle-art');
     var result={
-      elementFrames:elementFrames,manualCount:manualCount,autoCount:autoCount,autoFrameAnimation:autoFrameAnimation,nextManualIds:nextManualIds,
+      elementFrames:elementFrames,manualCount:manualCount,autoCount:autoCount,autoFrameAnimation:autoFrameAnimation,autoArrowDisplay:autoArrowDisplay,nextManualIds:nextManualIds,
       rows:document.querySelectorAll('#battleMonsterArea > .v-fixed-enemy-row').length,
       enemies:document.querySelectorAll('#battleMonsterArea .battle-monster').length,
       players:document.querySelectorAll('#battlePlayerRow .battle-player').length,
@@ -225,9 +225,11 @@ function runViewport(chrome,width,height){
     assert.equal(data.autoCount,0,"automatic declaration clears the preceding manual frame");
     assert.equal(data.autoFrameAnimation,"none");
     assert.deepEqual(data.nextManualIds,["battlePlayerCard2"],"manual handoff retires preceding indicator");
+    assert.equal(data.autoArrowDisplay,"none");
     for(const frame of data.elementFrames){
-        assert.equal(frame.animation,"v174ManualActiveTurnFrameFlash",frame.element);
-        assert.equal(frame.border,"rgb(255, 210, 31)",frame.element+" uses the manual frame color owner");
+        assert.equal(frame.arrow,"block");assert.equal(frame.arrowCount,1);
+        assert.equal(frame.animation,"v174ManualTurnFootBreath",frame.element);
+        assert.equal(frame.border,"rgba(241, 210, 137, 0.72)",frame.element+" uses the manual frame color owner");
     }
     assert.equal(data.rows,2);
     assert.equal(data.enemies,10);
@@ -251,14 +253,14 @@ function runViewport(chrome,width,height){
     assert.equal(data.activeShadow,"none");
     assert.notEqual(data.activeArtFilter,"none","active cardless feedback must remain on artwork instead of a card frame");
     assert.equal(data.activeFrameContent,'""');
-    assert.equal(data.activeFrameBorder,"3px");
+    assert.equal(data.activeFrameBorder,"1px");
     assert.notEqual(data.activeFrameShadow,"none");
-    assert.equal(data.activeFrameAnimation,"v174ManualActiveTurnFrameFlash");
+    assert.equal(data.activeFrameAnimation,"v174ManualTurnFootBreath");
     assert.equal(data.activeLungeAnimation,"v174BattleLungeUp");
-    assert.equal(data.activeFrameDuringLunge,"v174ManualActiveTurnFrameFlash","manual frame must survive attacker lunge");
+    assert.equal(data.activeFrameDuringLunge,"v174ManualTurnFootBreath","manual frame must survive attacker lunge");
     assert.equal(data.activeDodgeAnimation,"dodgeBack");
     assert.equal(data.dodgeRootAnimation,"none","dodge must leave the Unit and its HUD fixed");
-    assert.equal(data.activeFrameDuringDodge,"v174ManualActiveTurnFrameFlash","manual frame must survive dodge/MISS");
+    assert.equal(data.activeFrameDuringDodge,"v174ManualTurnFootBreath","manual frame must survive dodge/MISS");
     assert.equal(data.playerIdle,"v174BattleIdle","only inner image paint breathes");
     assert.equal(data.lungeAnimation,"v174BattleLungeUp");
     assert.equal(data.hitAnimation,"none","damage popups must not start a persistent portrait animation");

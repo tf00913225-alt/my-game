@@ -1,0 +1,30 @@
+{
+  "workId": "BATTLE-PORTRAIT-DEPTH-20261020",
+  "pr": 958,
+  "status": "USB_BROWSER_AND_INDEPENDENT_REVIEW_PASS_STOP",
+  "userDesign": "Replace rapidly flashing yellow rectangle with restrained pale-gold foot ellipse and small static overhead arrow. Switch with the active manual actor; hide for auto.",
+  "owners": [
+    "css/fixed-slot-battlefield-rendering-v2.css",
+    "js/54-v173.51-battle-qa.js"
+  ],
+  "implementation": "Existing active-turn state controls the same artwork ::before ellipse (2s opacity .55-.75) and one aria-hidden stationary arrow span per player artwork (8x4px, top-5px). Keep foot shadow; retire fast-frame keyframes and old card frame. No new timer, coordinate projection or gameplay owner.",
+  "normalizedSourceSha256": {
+    "css/fixed-slot-battlefield-rendering-v2.css": "382a5077aa54367e1fd5f0aeafbbd8fd4e46d34e6faac535fad277438c1cb445",
+    "js/54-v173.51-battle-qa.js": "ab8906581b0116df1d95aef1b3a626047dcbea082516090374c06ed3daa35c9d"
+  },
+  "baseline": "artifacts/active-frame-after/evidence.json (previous physical recording, runtime74e1bb4d; same four visual Owners in22495a1e)",
+  "candidate": "artifacts/active-turn-cue-after/evidence.json",
+  "candidateBasis": "USB recorded dirty22495a1e with new source/build; loaded bundle fingerprints and normalized source hashes identify candidate, not its older Git HEAD alone.",
+  "device": "Authorized Samsung SM-N960F USB",
+  "focusedChecks": [
+    "Source suites8 tests PASS",
+    "Production-bundle cardless browser PASS: four elements, manual/auto/target and lunge/dodge",
+    "Fixed-slot browser4 viewports PASS:84 arrow/HUD placements across party1..6, unique aria-hidden arrow, foot ellipse and shadow, old frame absent",
+    "Existing8 command-paint pairs retain exact pixels",
+    "Production build/build-check/diff-check PASS"
+  ],
+  "independentVisual": "geometry_review PASS STOP: all3v3/6v6 actors, auto and buff coexistence actual PNGs inspected; visible yet restrained, arrow avoids hair/wings/crowns/HUD, no yellow rectangle or strong SP glow spill, status art retained.",
+  "usbFunctional": "timing_review independent PASS: all9 actors have unique active/static arrow,2s ring opacity .55→.713-.731, stable arrow rect, old card frame absent, preserved shadow; auto hides both cues on all cards. Coexistence manualActive[0]→auto0 retains ragebody1/frostbiteicon1. errors[].",
+  "limits": "Finite physical presentation samples. Auto fixture sets auto then calls formal clear; not a separate auto-button entry acceptance. Reduced-motion static ring implemented and source-checked; no separate reduced-motion USB recording in this round. Native60s video and acknowledged PNG timing have separate coverage.",
+  "ci": "Latest new Head required checks and dev integration remain separate. Previously reported CI failures are not declared repaired by this user-requested UI change. No main release."
+}
