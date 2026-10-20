@@ -8134,9 +8134,21 @@ function prepareUnitHud(card,side){
         hud.v174Card=card;
         card.v174UnitHud=hud;
         card.appendChild(hud);
+        if(side==="monster")hud.addEventListener("click",event=>{
+            const band=event.target?.closest?.('.monster-status-badges');
+            if(event.defaultPrevented||!band||!hud.contains(band)||card.contains(hud)||!card.isConnected)return;
+            // Detached HUDs preserve the original Core card target/detail click.
+            // In-card badges bubble normally; the gesture Owner suppresses drags.
+            event.stopPropagation();card.click();
+        });
     }
     card.querySelectorAll(HUD_SELECTOR).forEach(node=>hud.appendChild(node));
     hud.dataset.boss=String(card.classList.contains("gameplay-boss-card"));
+    if(side==="monster")hud.dataset.enemyProfile=card.closest('#battlePage')?.dataset.enemyBattlefieldProfile||"";
+    if(side==="monster"){
+        const badges=hud.querySelector('.monster-status-badges');
+        if(badges)badges.dataset.scrollOwner="x";
+    }
     hud.dataset.anchor=side==="monster"?"top":"bottom";
     syncIdentity(card,side);
     return hud;
@@ -8151,7 +8163,10 @@ function clearUnitHud(side){
             for(const property of ["left","top","width","height","transform","opacity","visibility"]){ hud.style.removeProperty(property); }
         }else{ if(card){ card.v174UnitHud=null; } hud.remove(); }
     });
-    if(!hudLayer.children.length){ hudLayer.remove(); hudLayer=null; }
+    if(!hudLayer.children.length){
+        window.FourSymbolsGestureArbiter?.unregisterSurface?.(hudLayer);
+        hudLayer.remove();hudLayer=null;
+    }
 }
 function syncHud(){
     const page=document.getElementById("battlePage");
@@ -8173,6 +8188,7 @@ function syncHud(){
             hudLayer=document.createElement("div");
             hudLayer.className="v174-battle-hud-layer";
             document.body.appendChild(hudLayer);
+            window.FourSymbolsGestureArbiter?.registerSurface?.(hudLayer);
         }
         hudLayer.appendChild(hud);
         hud.style.visibility="visible";
@@ -8693,6 +8709,11 @@ ensureFunctionalStyles();runRepairs();
         const indexes=activeEnemyIndexes();
         const snapshot=activeEnemySnapshot(indexes);
         if(!snapshot){ return; }
+        // Presentation consumes this canonical profile while preparing the HUD.
+        // Publish before the first card, including initial entry/profile changes.
+        area.dataset.battlefieldProfile=snapshot.battlefieldProfile;
+        const page=document.getElementById("battlePage");
+        if(page){ page.dataset.enemyBattlefieldProfile=snapshot.battlefieldProfile; }
 
         const cards=new Map();
         indexes.forEach(index=>{
@@ -8742,9 +8763,6 @@ ensureFunctionalStyles();runRepairs();
         area.dataset.geometryOwner="fixed-slot";
         area.dataset.monsterCount=String(indexes.length);
         area.dataset.formationType=String(snapshot.originalFormationType||indexes.length);
-        area.dataset.battlefieldProfile=snapshot.battlefieldProfile;
-        const page=document.getElementById("battlePage");
-        if(page){ page.dataset.enemyBattlefieldProfile=snapshot.battlefieldProfile; }
         area.dataset.migrationStatus=snapshot.migrationStatus;
         area.classList.toggle("gameplay-boss-active",!!bossCard);
     }
@@ -8945,7 +8963,10 @@ ensureFunctionalStyles();runRepairs();
                 "--portrait-baseline":style.getPropertyValue("--portrait-baseline")
             };
         }
-        const hudRects=hudNodes
+        const statusBadge=targetSide==="monster"?hud.querySelector('.monster-status-badges'):null;
+        const badgeRect=statusBadge?plainRect(statusBadge.getBoundingClientRect()):null;
+        const statusBadgeRect=badgeRect&&badgeRect.width>0&&badgeRect.height>0?badgeRect:null;
+        const hudRects=hudNodes.filter(node=>node!==statusBadge)
             .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
             .filter(rect=>rect&&rect.width>0&&rect.height>0);
         const hudTop=hudRects.length?Math.min(...hudRects.map(rect=>rect.top)):unitRect.bottom;
@@ -8970,7 +8991,9 @@ ensureFunctionalStyles();runRepairs();
         // projection and reserve feedback below it; allies retain bottom HUDs.
         if(hud.dataset?.anchor==="top"){
             feedbackTop=Math.max(unitRect.top+6,Math.min(unitRect.bottom-24,hudBottom+8));
-            feedbackBottom=unitRect.bottom-6;
+            feedbackBottom=Math.min(unitRect.bottom-6,statusBadgeRect?statusBadgeRect.top-4:unitRect.bottom-6);
+            feedbackBottom=Math.max(unitRect.top+6,feedbackBottom);
+            feedbackTop=Math.min(feedbackTop,feedbackBottom);
         }
         const feedbackSafeRect={
             left:unitRect.left+4,top:feedbackTop,right:unitRect.right-4,bottom:feedbackBottom,
@@ -8989,7 +9012,7 @@ ensureFunctionalStyles();runRepairs();
         return {
             hudSurface:hudSurface,
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
-            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,spRect:spRect,artworkProjection:artworkProjection,hpProjection:hpProjection,spProjection:spProjection,hudSafeRect:hudSafeRect,
+            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,spRect:spRect,artworkProjection:artworkProjection,hpProjection:hpProjection,spProjection:spProjection,hudSafeRect:hudSafeRect,statusBadgeRect:statusBadgeRect,
             feedbackSafeRect:feedbackSafeRect,
             center:{x:unitRect.left+unitRect.width/2,y:unitRect.top+unitRect.height/2},
             feedbackAnchor:{

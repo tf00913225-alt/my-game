@@ -67,7 +67,7 @@
 - Direct Damage Impact Presentation 由 V143 Hit Frame 同步投影 artwork-only Impact Recoil（僅 `.v174-battle-art`，140ms），同一V143 Owner於命中時在唯一 Hit Feedback Overlay（16010）投影正式 Render Geometry 的 artworkProjection，位於技能 VFX（16000）之上、同一 Presentation Owner 暫時移出的原節點 Unit HUD（16015）、技能名稱（16020）及 Floating Feedback 之下；以非互動角色剪影反白兩次（每次80ms，中間40ms恢復原色，總長200ms，不延長Gameplay gate）、Floating Feedback、Impact SFX 與已結算 HP／Shield。HP紅條立即投影正式值；V143依正式HP減少量與最終HUD分母畫260ms暖色傷害殘留段，Boss護盾改變分母不視為失血，回血／重建身份／dispose清理舊殘留。`.red-hit`、root card shake、`v174-hit-shake` 永久 RETIRED；Heal／SP／Shield Gain／Status-only／DOT 不使用直接傷害recoil／反白，MISS 使用既有 dodge。Gameplay settlement 維持同步。致死直接命中僅由 V143 保存該次 committed hp_damage、角色物件身分、cast／battle generation 與正式 artworkProjection 快照，完成同一 80/40/80 Overlay；死亡後的新回饋及已消耗／失效回呼不得取得此資格。Core 傷害與死亡同步結算，V143 不延後 killMonster；最後行動由 00-main.js 的同一受管理推進計時器等待 V142 演出生命週期及既有 650ms 行動後等待，再啟動勝利退場，既有勝負離場動畫秒數不變；battle_end 後僅在原戰鬥頁仍可見時保留該次致死呈現，自然動畫結束即清理。相同戰鬥死亡重建 DOM 使用同一正式快照；dispose／supersede／換頁／hidden／pagehide／新戰鬥仍立即取消，不新增命中或延後清理 timer。
 - 玩家與普通敵方共用資源條高度與 HUD 錨點；Boss 可使用自己的大型 HP／Shield HUD。
 - Target Reticle（目標準星）由 Fixed Slot V2 唯一投影；敵方、我方、Boss、援軍與可破壞 Boss object 共用同一金色準星。歷史 `::after` 準星不得與正式 `::before` 準星並存。
-- Status Icon（狀態圖示）HUD 必須位於 HP／SP 資源條之上，正式 24px Icon 不得被塞入低於自身高度的容器或被資源條 z-index 蓋住。
+- 我方 Status Icon（狀態圖示）HUD 位於 HP／SP 資源條之上；敵方狀態圖示位於立繪腳下的獨立資訊帶。正式 24px Icon 不得裁切、縮進低於自身高度的容器或遮住相鄰單位資訊。Render Geometry Owner 分別輸出敵方上方資源資訊的 hudSafeRect 與下方 statusBadgeRect，瞬時回饋避開兩帶。
 - Stealth（隱身）有效期間只將 combatant artwork（戰鬥立繪本體）投影為 `opacity: 0.35`；HP／SP、名稱、Status Icon、Target/VFX 錨點不得一起變透明。狀態解除或死亡後必須在正式狀態同步時移除半透明呈現。
 - 戰鬥資訊抽屜、巡怪與深淵戰鬥紀錄 UI 已退場；不得重建入口、視窗或鏡像 DOM。回合標籤由正式戰場獨立顯示，內部戰鬥事件及其 observer（觀察者）仍保留。
 - 巡怪頁底部導覽與副本／Gameplay 共用 `js/04-stage-v11-native-bottom-nav-runtime.js::FourSymbolsBottomNav.syncContext()` 的 app-shell context navigation owner；順序固定為「角色／背包／秘寶／元素匣／返回」，冷進野怪區不得等待或預載 gameplay-core 才取得正確情境。`js/42-v148-combat-dungeon-fixes.js::syncContextNavigation()` 只保留深淵頂部返回控制與相容轉呼叫，不得重新持有底部情境選擇。巡怪頁不得再建立右上角第二顆返回鈕或自行硬寫另一套底部按鈕 markup。
@@ -209,7 +209,7 @@
 - 普通攻擊名稱顯示 700ms，動畫仍為 520ms，名稱不取得流程鎖；其他技能名稱維持 duration × 2/3。唯一 Core Queue resolve delay 為 visualRemaining + 650ms；技能秒數與 Hit Frame 不變。普通 Impact 的視覺時鐘於同步 settlement／DOM task 完成後由 V143 啟動，Hit task 先投影正式資源／狀態，再揭示 Impact 與同批浮字／recoil／SFX。初始化待完成時 V142 remaining 保留 authored duration；cold hit 的既有 140ms recoil 不得被到期清理截斷，dispose／supersede 仍立即取消。
 - 深淵／四象塔換波沿用同一 Core Queue 的 visualRemaining + 650ms，不另疊等待、不建立新 Session、不發布第二次 battle_start。第一波全滅進入 WAVE_TRANSITION，正式 Action／追擊／秘寶及呈現鎖釋放後才換敵人；第二波全滅才 BATTLE_COMPLETE 並走原有單次結算。玩家 HP、SP、怒氣、狀態、秘寶計數及統計保留；換波不額外遞減持續時間或新增回合。舊敵人及目標引用釋放，第二波用不重用的實體索引與既有 Fixed Slot 快照。
 - 深淵前置關為六普通→三精英三普通；帝王關為六精英→一帝王五精英；Lv.40 最終戰第一波沿用水、土、火、風四種精英配置循環為水／土／火／風／水／土（保留舊前五名，不因循環五人格位名單而追加第三補師），第二波為東、天、極、北、南五位天尊（第六格空位）。天尊沿用正式固定技能；等級、MonsterBalance 數值 Owner、獎勵及地圖通關流程不變。
-- 戰場怪物 identity 僅名稱，等級讀正式 entity.level 於 Battle Status Detail 顯示；玩家 ID／SP／HP HUD 共用名稱列與資源條 tokens 連續相接，不改 Slot／artwork geometry。
+- 戰場怪物 identity 使用單行名稱／等級，等級讀正式 entity.level；完整名稱與等級保留於 Battle Status Detail。玩家 ID／SP／HP HUD 共用名稱列與資源條 tokens 連續相接；敵方腳下狀態圖示列由同一戰場幾何 Owner 預留空間。
 - Skill-name presentation derives color from `skill.element` through `data-skill-element`; character element must not participate. It is a document-level fixed viewport surface and shares the ordinary floating-feedback visual font size.
 
 ## Battle Reading Layer Contract (2026-10-01)

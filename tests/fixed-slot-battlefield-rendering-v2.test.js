@@ -216,7 +216,7 @@ assert.deepEqual(JSON.parse(JSON.stringify(owner.bossFootprintSlots)),["ENEMY_B2
 assert.match(qaSource,/V174 battle presentation owner/);
 console.log("Fixed Slot Battlefield Rendering V2 regression contract passed.");
 
-assert.match(css,/--battle-enemy-region-track:46fr;[\s\S]*?--battle-center-region-track:12fr;[\s\S]*?--battle-ally-region-track:42fr;/,"compact controls reallocate empty middle space to the two formations");
+assert.match(css,/--battle-enemy-region-track:54\.785fr;[\s\S]*?--battle-center-region-track:12fr;[\s\S]*?--battle-ally-region-track:45\.215fr;/,"single-line enemy identity and compact turn information fund foot badges while retaining portraits");
 assert.doesNotMatch(css.match(/\[data-enemy-battlefield-profile="standard-six"\]\{([^}]+)\}/)[1],/--battle-(enemy|center|ally)-region-track/,"six-slot profile shares the structural layout instead of silently restoring the old middle gap");
 assert.match(css,/height:calc\(100% - var\(--battle-bottom-safe-gap\)\) !important;/,"bottom HUD safety is real layout space, not an art translation");
 assert.match(css,/--battle-bottom-safe-gap:24px;/);
@@ -228,7 +228,7 @@ const enemyWeight=layoutNumber('battle-enemy-region-track','fr'),centerWeight=la
 const bottomReserve=layoutNumber('battle-bottom-safe-gap','px'),regionGap=layoutNumber('battle-region-gap','px');
 const commandCss=read('css/00-main.css');
 const commandHeight=Number(commandCss.match(/--battle-command-row-height:(\d+)px;/)[1]);
-const turnHeight=Number(commandCss.match(/--battle-turn-row-height:(\d+)px;/)[1]);
+const turnHeight=layoutNumber('battle-turn-row-height','px')||Number(commandCss.match(/--battle-turn-row-height:(\d+)px;/)[1]);
 const centerMinimum=turnHeight+Math.max(commandHeight,layoutNumber('battle-target-prompt-height','px')+layoutNumber('battle-target-select-gap','px'))+6;
 for(const contentHeight of [600,717,840]){
     const usable=contentHeight-bottomReserve-regionGap*2;
@@ -260,3 +260,23 @@ assert.match(css,/--battle-name-row-height:26px;/);
 assert.match(css,/--battle-art-hud-reserve:44px;/);
 
 assert.match(css,/\.v174-portrait-paint\{[^}]*background-size:contain/,"The single inner image paint preserves source aspect ratio");
+
+// Initial render and profile transitions must publish the canonical semantic
+// profile before any HUD is prepared; an extra later sync may not repair it.
+{
+    const node=()=>({dataset:{},style:{setProperty(){}},classList:{add(){},remove(){},toggle(){}},appendChild(){},replaceChildren(){}});
+    const area=node(),page=node(),cards=[node(),node()],observed=[];
+    let profile='standard-six',boss=false;
+    const context={document:{getElementById:id=>id==='battleMonsterArea'?area:id==='battlePage'?page:cards[Number(id.replace('battleMonster',''))],createDocumentFragment:node,createElement:node},
+        activeEnemyIndexes:()=>[0,1],activeEnemySnapshot:()=>({battlefieldProfile:profile,originalFormationType:6,migrationStatus:'canonical'}),
+        bossBattleOwner:()=>boss?{getBossIndex:()=>0}:null,
+        slots:{getEnemyRenderSlotRows:()=>[['ENEMY_B1'],['ENEMY_F1']],getAssignedMonsterAtEnemySlot:(_,slot)=>slot==='ENEMY_B1'?0:1,bossFootprintSlots:['ENEMY_B2','ENEMY_F2']},makeSlot:node,
+        applyPresentation(){assert.equal(page.dataset.enemyBattlefieldProfile,profile);assert.equal(area.dataset.battlefieldProfile,profile);observed.push(profile);}};
+    vm.createContext(context);
+    vm.runInContext(adapterSource.slice(adapterSource.indexOf('function canonicalizeEnemyZone('),adapterSource.indexOf('function partyIndexes(')),context);
+    for(const next of ['standard-six','legacy-ten','standard-six']){profile=next;boss=next==='legacy-ten';context.canonicalizeEnemyZone();}
+    assert.deepEqual(observed,['standard-six','standard-six','legacy-ten','legacy-ten','standard-six','standard-six']);
+}
+assert.match(adapterSource,/hudNodes\.filter\(node=>node!==statusBadge\)/,'foot badges cannot enlarge the upper resource HUD into a body-covering rectangle');
+assert.match(adapterSource,/statusBadgeRect\?statusBadgeRect\.top-4/,'floating feedback must stop above the separate foot badge band');
+assert.match(css,/flex-wrap:nowrap;[\s\S]*?overflow-x:auto !important;overflow-y:hidden !important;/,'narrow Boss columns keep all original-size icons on a horizontally reachable single row');

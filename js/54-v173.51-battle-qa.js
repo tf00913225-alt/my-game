@@ -212,9 +212,21 @@ function prepareUnitHud(card,side){
         hud.v174Card=card;
         card.v174UnitHud=hud;
         card.appendChild(hud);
+        if(side==="monster")hud.addEventListener("click",event=>{
+            const band=event.target?.closest?.('.monster-status-badges');
+            if(event.defaultPrevented||!band||!hud.contains(band)||card.contains(hud)||!card.isConnected)return;
+            // Detached HUDs preserve the original Core card target/detail click.
+            // In-card badges bubble normally; the gesture Owner suppresses drags.
+            event.stopPropagation();card.click();
+        });
     }
     card.querySelectorAll(HUD_SELECTOR).forEach(node=>hud.appendChild(node));
     hud.dataset.boss=String(card.classList.contains("gameplay-boss-card"));
+    if(side==="monster")hud.dataset.enemyProfile=card.closest('#battlePage')?.dataset.enemyBattlefieldProfile||"";
+    if(side==="monster"){
+        const badges=hud.querySelector('.monster-status-badges');
+        if(badges)badges.dataset.scrollOwner="x";
+    }
     hud.dataset.anchor=side==="monster"?"top":"bottom";
     syncIdentity(card,side);
     return hud;
@@ -229,7 +241,10 @@ function clearUnitHud(side){
             for(const property of ["left","top","width","height","transform","opacity","visibility"]){ hud.style.removeProperty(property); }
         }else{ if(card){ card.v174UnitHud=null; } hud.remove(); }
     });
-    if(!hudLayer.children.length){ hudLayer.remove(); hudLayer=null; }
+    if(!hudLayer.children.length){
+        window.FourSymbolsGestureArbiter?.unregisterSurface?.(hudLayer);
+        hudLayer.remove();hudLayer=null;
+    }
 }
 function syncHud(){
     const page=document.getElementById("battlePage");
@@ -251,6 +266,7 @@ function syncHud(){
             hudLayer=document.createElement("div");
             hudLayer.className="v174-battle-hud-layer";
             document.body.appendChild(hudLayer);
+            window.FourSymbolsGestureArbiter?.registerSurface?.(hudLayer);
         }
         hudLayer.appendChild(hud);
         hud.style.visibility="visible";

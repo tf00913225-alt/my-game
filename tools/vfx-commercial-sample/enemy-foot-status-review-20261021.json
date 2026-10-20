@@ -1,0 +1,161 @@
+{
+  "workId": "BATTLE-PORTRAIT-DEPTH-20261020",
+  "pr": 958,
+  "status": "focused-geometry-pass-usb-interaction-pending",
+  "baseline": "ce1e603c",
+  "head": "f77dd6401922a79f4d3d0df87995c0d832227158",
+  "sourceState": "uncommitted candidate; root performs official build",
+  "sources": {
+    "css/fixed-slot-battlefield-rendering-v2.css": "c77cc536aeb69a542d2ca881e0e1538504d2f3a17a4b74fb82830a7cea85ff7a",
+    "js/54-v173.51-battle-qa.js": "753953401a6f14e72451e2761bd824e6b1174d501b1997b65e655e454417d8b5",
+    "js/battlefield-render-geometry-adapter.js": "c11b030af9630967e276d4ba8279d5414f876fcbb02f1fb5f223137aed52a3e1"
+  },
+  "evidence": "artifacts/status-badge-probe/single-line-candidate.json",
+  "commands": [
+    "node C:/Projects/my-game/.vfx-tools-local/badge-single-line-probe.cjs",
+    "node tests/fixed-slot-battlefield-rendering-v2.test.js"
+  ],
+  "measurement": {
+    "viewport": [
+      412,
+      915
+    ],
+    "owner": "existing fixed-slot browser fixture with V174 source-alpha projection; cached unchanged authored patrol alpha metadata",
+    "enemy": [
+      {
+        "source": "assets/monsters/wild/zone-01/fire-01.webp",
+        "before": 87.25645703574021,
+        "after": 87.2564494907856,
+        "changePercent": 0
+      },
+      {
+        "source": "assets/monsters/wild/zone-01/water-01.webp",
+        "before": 94.9361822605133,
+        "after": 94.93617467582226,
+        "changePercent": 0
+      },
+      {
+        "source": "assets/monsters/wild/zone-01/wind-01.webp",
+        "before": 94.93934631347656,
+        "after": 94.9393310546875,
+        "changePercent": 0
+      },
+      {
+        "source": "assets/monsters/wild/zone-01/earth-01.webp",
+        "before": 101.2652587890625,
+        "after": 101.2652587890625,
+        "changePercent": 0
+      }
+    ],
+    "party": [
+      {
+        "id": "battlePlayerCard0",
+        "before": 111.96807861328125,
+        "after": 107.65182495117188,
+        "changePercent": -3.8549
+      },
+      {
+        "id": "battlePlayerCard1",
+        "before": 111.96807861328125,
+        "after": 107.65182495117188,
+        "changePercent": -3.8549
+      },
+      {
+        "id": "battlePlayerCard2",
+        "before": 111.96807861328125,
+        "after": 107.65182495117188,
+        "changePercent": -3.8549
+      },
+      {
+        "id": "battlePlayerCard3",
+        "before": 96.88836669921875,
+        "after": 92.963623046875,
+        "changePercent": -4.0508
+      },
+      {
+        "id": "battlePlayerCard4",
+        "before": 96.88836669921875,
+        "after": 92.963623046875,
+        "changePercent": -4.0508
+      },
+      {
+        "id": "battlePlayerCard5",
+        "before": 96.88836669921875,
+        "after": 92.963623046875,
+        "changePercent": -4.0508
+      }
+    ],
+    "boss": [
+      {
+        "id": "battleMonster0",
+        "before": 209.83184814453125,
+        "after": 230.56979370117188,
+        "changePercent": 9.8831
+      },
+      {
+        "id": "battleMonster1",
+        "before": 89.45521904528141,
+        "after": 89.45522662997246,
+        "changePercent": 0
+      },
+      {
+        "id": "battleMonster2",
+        "before": 89.44293212890625,
+        "after": 89.44292449951172,
+        "changePercent": 0
+      },
+      {
+        "id": "battleMonster3",
+        "before": 92.56573486328125,
+        "after": 92.56573486328125,
+        "changePercent": 0
+      },
+      {
+        "id": "battleMonster4",
+        "before": 92.57864538828532,
+        "after": 92.57864538828532,
+        "changePercent": 0
+      }
+    ]
+  },
+  "fiveIcons": {
+    "types": [
+      "frostbite",
+      "agilityDown",
+      "damageDown",
+      "defenseDown",
+      "phoenixMight"
+    ],
+    "logicalSize": [
+      24,
+      24
+    ],
+    "ordinary": "five complete icons fit one row",
+    "narrowBoss": {
+      "clientWidth": 79,
+      "scrollWidth": 120,
+      "scrollLeftAtEnd": 41,
+      "lastIconFullyReachable": true
+    },
+    "allChildrenMeasured": true
+  },
+  "profileLifecycle": {
+    "status": "PASS",
+    "test": "fixed-slot-battlefield-rendering-v2.test.js extracts actual canonicalizeEnemyZone; checks initial standard-six, switch legacy-ten Boss, return standard-six before each applyPresentation; no later sync repairs"
+  },
+  "safeBands": {
+    "upperHud": "identity/HP only",
+    "lowerHud": "statusBadgeRect",
+    "feedback": "bottom limited above lower status band; no inverted rectangle"
+  },
+  "pending": [
+    "USB 6v6 and Boss actual screenshot review",
+    "native horizontal drag, no accidental modal, exact one tap modal and target selection priority",
+    "detached HUD registered surface drag/click/cleanup integrated proof"
+  ],
+  "limitations": [
+    "Party alpha height decreases 3.855% front and 4.051% rear; do not claim all portraits unchanged",
+    "Programmatic horizontal reach proves layout reachability, not physical touch gesture delivery",
+    "No CI rerun, commit or push performed by geometry agent"
+  ]
+}
