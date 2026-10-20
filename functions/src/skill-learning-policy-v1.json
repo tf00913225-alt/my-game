@@ -1,7 +1,6 @@
 {
   "schemaVersion": 1,
   "policyVersion": "player-skill-learning-v1",
-  "ruleSourceSha256": "7da3dd23728eec232cfd1bf501cddb7c61b89b9fe59cd1681baeee2a33395bbf",
   "catalogSha256": "615eff6f7602e0ee681a30acb710e52e5721ccbce120152fe44594bb8f633770",
   "skills": [
     {
@@ -607,5 +606,7 @@
       ],
       "damageClassification": "non-direct"
     }
-  ]
+  ],
+  "ruleVersion": "v1",
+  "ruleSemanticSha256": "65fd2490a3566157243f2ae81432ea0e2e49f712f9f7409f193c8b45ef50dc10"
 }

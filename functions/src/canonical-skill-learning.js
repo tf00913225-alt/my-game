@@ -1,9 +1,8 @@
 "use strict";
 
 const {createHash}=require("node:crypto");
-const {readFileSync}=require("node:fs");
 const {isDeepStrictEqual:same}=require("node:util");
-const {createRules}=require("./skill-progression-core");
+const {getRulesForVersion}=require("./skill-progression-core");
 const policy=require("./skill-learning-policy-v1.json");
 function freeze(value){if(value&&typeof value==="object"){Object.values(value).forEach(freeze);Object.freeze(value);}return value;}
 freeze(policy);
@@ -13,9 +12,8 @@ const {source,readCharacterSources,readOwnedSources,advanceOwnedRecords,advanceO
 const ID=/^[A-Za-z0-9_-]{16,64}(?![\s\S])/;
 const KIND="skill-learning";
 const POLICY_SHA=createHash("sha256").update(JSON.stringify(policy)).digest("hex");
-const RULE_SHA=createHash("sha256").update(readFileSync(require.resolve("./skill-progression-core"))).digest("hex");
 const catalog=Object.fromEntries(policy.skills.map(row=>[row.id,row]));
-const rules=createRules(catalog,policy.skills.filter(row=>row.damageClassification==="direct").map(row=>row.id));
+const rules=getRulesForVersion(policy.ruleVersion,catalog,policy.skills.filter(row=>row.damageClassification==="direct").map(row=>row.id));
 const actions=new Set(["learn","upgrade"]);
 function validIntent(value){
     return value&&Object.keys(value).sort().join(",")==="action,characterId,expectedRevision,operationId,skillId"&&
@@ -24,13 +22,14 @@ function validIntent(value){
         actions.has(value.action)&&typeof value.skillId==="string"&&Object.hasOwn(catalog,value.skillId);
 }
 function checkPolicy(receipt,fail){
-    if(RULE_SHA!==policy.ruleSourceSha256||policy.schemaVersion!==1||
+    if(policy.ruleVersion!=="v1"||policy.schemaVersion!==1||
        (receipt&&(receipt.policyVersion!==policy.policyVersion||receipt.policySha256!==POLICY_SHA))){
         fail("data-loss","Retained skill learning policy is unavailable.");
     }
 }
 function transition(records,revision,characterId,action,skillId,fail){
     checkPolicy(null,fail);
+    if(records.account.provenance!=="server-created")fail("data-loss","Skill learning requires original server-created ownership.");
     const character=records.characters.find(row=>row.characterId===characterId);
     if(!character||!records.account.slots.includes(characterId))fail("invalid-argument","Character target is not owned.");
     const state=character.state,loadout=character.skillLoadout,levels=loadout?.skillLevels;
@@ -70,6 +69,7 @@ async function verifySkillLearningEvidence({tx,root,uid,operationId,currentRevis
     const fields="action,allocatedRevision,characterId,cost,createdAt,expectedRevision,kind,levelAfter,operationId,ownerUid,pointsAfter,policySha256,policyVersion,schemaVersion,skillId,snapshotSha256,sourceRevision";
     if(!validIntent(intent)||!receipt||Object.keys(receipt).sort().join(",")!==fields||
        receipt.schemaVersion!==1||receipt.kind!==KIND||receipt.ownerUid!==uid||receipt.operationId!==operationId||
+       typeof receipt.createdAt?.toMillis!=="function"||!Number.isFinite(receipt.createdAt.toMillis())||
        !Number.isSafeInteger(receipt.sourceRevision)||receipt.sourceRevision<1||receipt.sourceRevision>receipt.expectedRevision||
        receipt.allocatedRevision!==receipt.expectedRevision+1||receipt.allocatedRevision>currentRevision||
        grantExists||!ledger||!same(ledger,{...receipt,amount:-receipt.cost})){

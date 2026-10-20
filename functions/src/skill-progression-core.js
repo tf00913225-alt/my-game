@@ -4,7 +4,7 @@
 const SKILL_UPGRADE_COST_BY_TARGET_LEVEL=Object.freeze({
         2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1
     });
-function createRules(catalog,damageSkillIds){
+function createRulesV1(catalog,damageSkillIds){
 if(!catalog||typeof catalog!=="object"||Array.isArray(catalog)||!Array.isArray(damageSkillIds)){throw new TypeError("skill catalogue and damage classifications required");}
 const PLAYER_DAMAGE_SKILL_ID_SET=new Set(damageSkillIds);
 function numeric(value,fallback){
@@ -124,6 +124,11 @@ function getSkillLearnEligibility(character,skill,levels){
     }
 return Object.freeze({getInitialLearnCost,initialLearnCost,getRequiredCharacterLevelForSkillLevel,getUpgradeCostForTargetLevel,getSkillUpgradeEligibility,isCrossElementSkill,prerequisiteLabel,getSkillLearnEligibility,upgradeCosts:SKILL_UPGRADE_COST_BY_TARGET_LEVEL});
 }
-global.FourSymbolsSkillProgressionCore=Object.freeze({createRules,upgradeCosts:SKILL_UPGRADE_COST_BY_TARGET_LEVEL});
+const createRules=createRulesV1;
+function getRulesForVersion(version,catalog,damageSkillIds){
+if(version!=="v1"){throw new RangeError("Unsupported skill progression rules version");}
+return createRulesV1(catalog,damageSkillIds);
+}
+global.FourSymbolsSkillProgressionCore=Object.freeze({createRules,getRulesForVersion,upgradeCosts:SKILL_UPGRADE_COST_BY_TARGET_LEVEL});
 if(typeof module!=="undefined"&&module.exports){module.exports=global.FourSymbolsSkillProgressionCore;}
 })(typeof window!=="undefined"?window:globalThis);
