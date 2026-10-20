@@ -23551,12 +23551,14 @@ function ensureBattleStatusDetailModal(){
         '<div class="battle-status-detail-panel" role="dialog" aria-modal="true" aria-labelledby="battleStatusDetailTitle">'+
             '<button type="button" class="battle-status-detail-close" aria-label="關閉">×</button>'+
             '<h3 id="battleStatusDetailTitle">戰鬥狀態</h3>'+
+            '<div class="battle-status-detail-portrait" role="img"></div>'+
             '<div class="battle-status-detail-core">'+
                 '<span data-field="element"></span>'+
                 '<span data-field="name"></span>'+
                 '<span data-field="level"></span>'+
                 '<span data-field="hp"></span>'+
                 '<span data-field="sp"></span>'+
+                '<span data-field="agility"></span>'+
             '</div>'+
             '<section><h4>增益狀態：</h4><div data-list="buffs" class="battle-status-detail-list"></div></section>'+
             '<section><h4>負面狀態：</h4><div data-list="debuffs" class="battle-status-detail-list"></div></section>'+
@@ -23622,6 +23624,14 @@ function openBattleStatusDetailModal(side,index){
 
     const modal=ensureBattleStatusDetailModal();
     const stats=!isMonster&&typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
+    const portrait=modal.querySelector('.battle-status-detail-portrait');
+    const card=document.getElementById((isMonster?'battleMonster':'battlePlayerCard')+index);
+    const artwork=card&&card.querySelector('.v174-battle-art');
+    const source=artwork&&artwork.style.backgroundImage;
+    portrait.style.backgroundImage=source&&source!=='none'?source:'none';
+    portrait.textContent=source&&source!=='none'?'':'◇';
+    portrait.setAttribute('aria-label',String(entity.name||entity.id||'角色')+'立繪');
+    const agility=isMonster?getMonsterAgility(entity):stats?Number(stats.agility):NaN;
     const maxHP=isMonster?entity.maxHP:
         Number(stats&&stats.maxHP)||Number(entity.maxHP)||Math.max(1,Number(entity.hp)||1);
     const maxSP=isMonster?entity.maxSP:
@@ -23634,7 +23644,8 @@ function openBattleStatusDetailModal(side,index){
         name:"名稱："+String(entity.name||entity.id||"角色"),
         level:"等級：Lv."+String(entity.level),
         hp:"HP："+(isMonster?projectEnemyResource(entity.hp,maxHP).text:Math.max(0,Number(entity.hp)||0)+" / "+maxHP),
-        sp:"SP："+(isMonster?projectEnemyResource(entity.sp,maxSP).text:Math.max(0,Number(entity.sp)||0)+" / "+maxSP)
+        sp:"SP："+(isMonster?projectEnemyResource(entity.sp,maxSP).text:Math.max(0,Number(entity.sp)||0)+" / "+maxSP),
+        agility:"敏捷："+(Number.isFinite(agility)?Math.round(agility*100)/100:'—')
     };
     Object.keys(fields).forEach(key=>{
         const node=modal.querySelector('[data-field="'+key+'"]');
@@ -23644,6 +23655,7 @@ function openBattleStatusDetailModal(side,index){
     renderBattleStatusDetailList(modal.querySelector('[data-list="debuffs"]'),summary.debuffs);
     modal.hidden=false;
     modal.setAttribute("aria-hidden","false");
+    modal.querySelector('.battle-status-detail-panel').scrollTop=0;
     syncBattleUiPriorityLayer();
     return true;
 }
@@ -36373,7 +36385,13 @@ window.FourSymbolsItemAcquisitionData={
     const CLICK_LIFETIME_MS=1000;
     const completedPointers=new Map();
     let legacyClickGesture=null;
-    function isGameSurfaceTarget(target){ return !!(target&&target.closest&&target.closest("#game-stage, #game-ui")); }
+    const managedSurfaces=new WeakMap();
+    function managedSurfaceFor(target){
+        for(let node=target;node;node=node.parentElement){ if(managedSurfaces.has(node)){ return node; } }
+        const root=target&&target.closest&&target.closest("#game-stage, #game-ui");
+        return root&&managedSurfaces.has(root)?root:null;
+    }
+    function isGameSurfaceTarget(target){ return !!(managedSurfaceFor(target)||target&&target.closest&&target.closest("#game-stage, #game-ui")); }
     function isEditableGameControl(target){ return !!(target&&target.closest&&target.closest('input, textarea, [contenteditable="true"]')); }
     function scrollAxes(node){
         const style=window.getComputedStyle(node);
@@ -36435,7 +36453,7 @@ window.FourSymbolsItemAcquisitionData={
         legacyClickGesture=null;
         completedPointers.delete(event.pointerId);
         const initial=interactiveTarget(event.target)||event.target;
-        activePointers.set(event.pointerId,{pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,currentX:event.clientX,currentY:event.clientY,distance:0,initialTarget:event.target,interactiveTarget:initial,scrollOwner:findScrollOwner(event.target),dragOwner:event.target.closest&&event.target.closest("[data-drag-owner]"),state:"TAP"});
+        activePointers.set(event.pointerId,{pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,currentX:event.clientX,currentY:event.clientY,distance:0,initialTarget:event.target,surface:managedSurfaceFor(event.target),interactiveTarget:initial,scrollOwner:findScrollOwner(event.target),dragOwner:event.target.closest&&event.target.closest("[data-drag-owner]"),state:"TAP"});
         if(activePointers.size>1){ for(const pointer of activePointers.values()){ pointer.state="CANCEL"; } }
     },{capture:true,passive:true});
     document.addEventListener("pointermove",function(event){ const pointer=activePointers.get(event.pointerId); if(pointer) classify(pointer,event); },{capture:true,passive:true});
@@ -36444,9 +36462,29 @@ window.FourSymbolsItemAcquisitionData={
     function cancelPointer(event){ const pointer=activePointers.get(event.pointerId); if(pointer){ pointer.state="CANCEL"; activePointers.delete(event.pointerId); rememberCompletion(pointer); } }
     document.addEventListener("pointercancel",cancelPointer,{capture:true,passive:true});
     function handleSuppressedGestureClick(event){ if(consumeSuppression(event)){ event.preventDefault(); event.stopImmediatePropagation(); } }
-    const stage=document.getElementById("game-stage");
-    for(const surface of [stage,document.getElementById("game-ui")]){
-        if(surface){ surface.addEventListener("click",handleSuppressedGestureClick,true); surface.addEventListener("pointerleave",function(event){ if(event.target===surface){ cancelPointer(event); } },true); }
+    function registerSurface(surface){
+        if(!surface||typeof surface.addEventListener!=="function"){ return false; }
+        if(managedSurfaces.has(surface)){ return true; }
+        const leave=event=>{ if(event.target===surface){ cancelPointer(event); } };
+        surface.addEventListener("click",handleSuppressedGestureClick,true);
+        surface.addEventListener("pointerleave",leave,true);
+        managedSurfaces.set(surface,{leave});
+        return true;
+    }
+    function unregisterSurface(surface){
+        const entry=surface&&managedSurfaces.get(surface);
+        if(!entry){ return false; }
+        surface.removeEventListener?.("click",handleSuppressedGestureClick,true);
+        surface.removeEventListener?.("pointerleave",entry.leave,true);
+        managedSurfaces.delete(surface);
+        const belongs=pointer=>pointer.surface===surface||surface.contains?.(pointer.initialTarget);
+        for(const [id,pointer] of activePointers){ if(belongs(pointer)){ activePointers.delete(id); } }
+        for(const [id,pointer] of completedPointers){ if(belongs(pointer)){ completedPointers.delete(id); } }
+        if(legacyClickGesture&&belongs(legacyClickGesture)){ legacyClickGesture=null; }
+        return true;
+    }
+    for(const surface of [document.getElementById("game-stage"),document.getElementById("game-ui")]){
+        registerSurface(surface);
     }
     function resetGestures(){ activePointers.clear(); completedPointers.clear(); legacyClickGesture=null; }
     window.addEventListener("blur",resetGestures);
@@ -36461,7 +36499,7 @@ window.FourSymbolsItemAcquisitionData={
     document.addEventListener("selectstart",function(event){ if(isGameSurfaceTarget(event.target)&&!isEditableGameControl(event.target)) event.preventDefault(); },{capture:true});
     document.addEventListener("wheel",function(event){ if(event.ctrlKey&&isGameSurfaceTarget(event.target)) event.preventDefault(); },{capture:true,passive:false});
     ["gesturestart","gesturechange"].forEach(name=>window.addEventListener(name,function(event){ if(isGameSurfaceTarget(event.target)) event.preventDefault(); },{passive:false}));
-    window.FourSymbolsGestureArbiter=Object.freeze({TAP_SLOP_CSS_PX,findScrollOwner,getState:pointerId=>activePointers.get(pointerId)||null});
+    window.FourSymbolsGestureArbiter=Object.freeze({TAP_SLOP_CSS_PX,findScrollOwner,registerSurface,unregisterSurface,getState:pointerId=>activePointers.get(pointerId)||null});
 })();
 
 

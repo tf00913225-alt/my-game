@@ -37,16 +37,23 @@ const expression=String.raw`(async()=>{
   const [l,t,r,b]=meta.alphaBounds,top=p.top+p.height*t/meta.height,bottom=p.top+p.height*b/meta.height,left=p.left+p.width*l/meta.width,right=p.left+p.width*r/meta.width;
   const cls=card.dataset.portraitSizeClass;
   const fixedSix=document.getElementById('battlePage').dataset.enemyBattlefieldProfile==='standard-six'&&['STANDARD','ELITE'].includes(cls)&&!card.classList.contains('gameplay-boss-card');
-  const projection=a.height/parseFloat(getComputedStyle(art).height);
   const baseline=a.top+a.height*(fixedSix?1:.96),clipped=top<a.top-1||bottom>a.bottom+1||left<a.left-1||right>a.right+1;
   check(a.height>0&&p.height>0,'zero presentation geometry '+record.portraitKey);
   check(!clipped,'clipped alpha silhouette '+record.portraitKey+' '+JSON.stringify({a:a.toJSON(),p:p.toJSON(),top,bottom,left,right}));
   check(Math.abs(bottom-baseline)<1,'bottom baseline drift '+record.portraitKey);
   const target=registry.presentation.classes[cls].bodyHeight;
-  const targetHeight=fixedSix?Math.min((cls==='ELITE'?105.27:101.55)*projection,a.height*(cls==='ELITE'?.96:.92)):target*a.height;
+  // Resolve the formal CSS height expression inside the same size container.
+  // This independent neutral probe does not read the actual paint height or
+  // duplicate preferred-pixel, safe-height and depth constants in the gate.
+  const artStyle=getComputedStyle(art),heightProbe=document.createElement('span');
+  heightProbe.style.cssText='position:absolute;left:0;top:0;width:0;height:var(--battle-portrait-visible-height, '+target*100+'cqh);visibility:hidden;pointer-events:none;';
+  art.appendChild(heightProbe);
+  let targetHeight;
+  try{targetHeight=heightProbe.getBoundingClientRect().height;}finally{heightProbe.remove();}
+  check(Number.isFinite(targetHeight)&&targetHeight>0&&targetHeight<=a.height+1,'invalid formal CSS body-height budget '+record.portraitKey);
   const expected=Math.min(targetHeight,a.width/(r-l)*(b-t));
   check(Math.abs((bottom-top)-expected)<1.1,'body-height contract drift '+record.portraitKey);
-  evidence.geometry.push({label,portraitKey:record.portraitKey,sizeClass:cls,slotHeight:a.height,visualBodyTop:top,visualBodyBottom:bottom,visualBodyHeight:bottom-top,baseline,clipped,overflow:false,widthLimited:expected<targetHeight-1});
+  evidence.geometry.push({label,portraitKey:record.portraitKey,sizeClass:cls,slotHeight:a.height,visualBodyTop:top,visualBodyBottom:bottom,visualBodyHeight:bottom-top,baseline,clipped,overflow:false,widthLimited:expected<targetHeight-1,targetHeight,visibleHeight:artStyle.getPropertyValue('--battle-portrait-visible-height'),safeHeight:artStyle.getPropertyValue('--battle-portrait-safe-height'),depth:artStyle.getPropertyValue('--battle-art-depth')});
  };
  async function scene(roster,label,encounterMode="legacy-dungeon"){
   monsters=roster;currentBattleMonsters=roster.map((m,i)=>i);battleActive=false;
