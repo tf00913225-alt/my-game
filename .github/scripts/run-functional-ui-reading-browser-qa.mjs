@@ -58,13 +58,19 @@ try{
  await c.send('Emulation.setDeviceMetricsOverride',{width:viewport[0],height:viewport[1],deviceScaleFactor:1,mobile:true});
  await c.send('Page.navigate',{url:server.url});await c.eval(prepare);
  await c.eval("(async()=>{await FourSymbolsFeatures.ensure('relic','functional-reading');await FourSymbolsFeatures.ensure('gameplay-core','functional-reading');})()");
- await c.eval("(()=>{const armor=v17346GenerateEquipment(()=>.2,{slot:'armor',classType:'warrior',rarity:'orange'});inventoryItems.push(armor,{...getPotionDefinition('hpPotion10'),count:30});characterEquipment.fire.armor=armor;rebuildInventorySlots();renderInventory();})()");
+ await c.eval("(()=>{const armor=v17346GenerateEquipment(()=>.2,{slot:'armor',classType:'warrior',rarity:'orange',uid:'reading-equipped-armor'});const bagArmor=v17346GenerateEquipment(()=>.2,{slot:'armor',classType:'warrior',rarity:'orange',uid:'reading-bag-armor'});inventoryItems.push(bagArmor,{...getPotionDefinition('hpPotion10'),count:30});characterEquipment.fire.armor=armor;rebuildInventorySlots();renderInventory();})()");
  const capture=async(name,selector='#homeFeatureModal')=>{
   await settle();const data=await c.eval(`(${measure})(${JSON.stringify(selector)})`);
   assert.ok(data.rows.length||data.controls.length,name+': empty UI coverage');
   scenes.push({name,...data});fs.writeFileSync(path.join(out,'all-text.json'),JSON.stringify(scenes,null,2));
   const image=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(image.data,'base64'));
   console.log(name+': '+data.rows.length+' text nodes, '+data.rows.filter(x=>x.font<12.9).length+' below minimum');
+ };
+ const tap=async selector=>{
+  const point=await c.eval(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)return null;const r=e.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,hit=document.elementFromPoint(x,y);return {x,y,hit:hit===e||e.contains(hit),label:e.textContent.trim()};})()`);
+  assert.ok(point?.hit,'real touch is blocked: '+selector+' '+JSON.stringify(point));
+  await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:point.x,y:point.y}]});
+  await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await settle();
  };
  if(process.env.UI_READING_CREATION_ONLY!=='1'){
   await c.eval("(()=>{closeHomeFeature();showPage('home');window.__readingInventoryBackup=inventoryItems.slice();window.__readingEquipmentBackup=structuredClone(characterEquipment);inventoryItems.splice(0);rebuildInventorySlots();openMapInventoryOverlay('home');setInventoryFilter('equipment');})()");
@@ -119,18 +125,24 @@ try{
    if(scroll.needed)assert.ok(scroll.top>0&&scroll.reachable,type+': final preview entry unreachable');
    await capture('preview-'+type+'-end','#v132RewardModal');
    if(type==='ticket'){
-    await c.eval("document.querySelector('#v132RewardModal .v132-preview-item').click()");
+    await tap('#v132RewardModal .v132-preview-item');
     assert.ok(await c.eval("document.getElementById('itemModal').classList.contains('v132-ticket-preview-detail')&&document.getElementById('v132RewardModal').classList.contains('v132-detail-paused')"),'ticket result detail did not preserve preview');
     await capture('preview-ticket-equipment','#itemModal');
-    await c.eval('closeItemModal()');
+    await tap('#itemModal .close-item-button');
     const returnState=await c.eval("(()=>{const e=document.getElementById('v132RewardModal'),r=e.getBoundingClientRect(),s=getComputedStyle(e);return {classes:e.className,style:e.getAttribute('style'),display:s.display,visibility:s.visibility,width:r.width,height:r.height,items:e.querySelectorAll('.v132-preview-item').length};})()");
     fs.writeFileSync(path.join(out,'preview-ticket-return-state.json'),JSON.stringify(returnState,null,2));
     const returnImage=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,'preview-ticket-return.png'),Buffer.from(returnImage.data,'base64'));
     assert.ok(returnState.width&&returnState.height&&returnState.display!=='none'&&returnState.visibility!=='hidden','ticket preview became invisible after returning from item detail: '+JSON.stringify(returnState));
     assert.ok(await c.eval("!document.getElementById('v132RewardModal').classList.contains('v132-detail-paused')&&document.querySelectorAll('#v132RewardModal .v132-preview-item').length===10"),'ticket detail did not return to preview');
     await capture('preview-ticket-return','#v132RewardModal');
+    // Rehosting from itemModal to game-ui must preserve real hit testing.
+    await tap('#v132RewardModal .v132-preview-item:last-child');
+    await capture('preview-ticket-last-equipment','#itemModal');
+    await tap('#itemModal .close-item-button');
+    assert.equal(await c.eval("document.querySelectorAll('#v132RewardModal .v132-preview-item').length"),10);
    }
-   await c.eval("document.querySelector('#v132RewardModal .v132-reward-actions button').click();closeItemModal()");
+   await tap('#v132RewardModal .v132-reward-actions button');
+   await c.eval('closeItemModal()');
    await c.eval(`v132ShowItemPreview(${type==='material'?"inventoryItems.find(i=>i.id==='materialChest')":"window.__readingPreviewTicket"})`);
    await capture('preview-'+type+'-reopen','#v132RewardModal');
    await c.eval('v132CloseRewardModal()');
