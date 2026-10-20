@@ -1719,6 +1719,17 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         // Only successful transaction resolution consumes a usable proof.
         proof.consumed=true;return result;
     }
+    // Keep every private identity inside one server invocation. The production
+    // binding remains unavailable and this function is not a factory/API exit.
+    async function publishCapturedCandidate(request,args){
+        requirePublicationPreparation();
+        const pin=await pinCandidatePublication(request,args);
+        const material=await loadPinnedRawCapture(pin);
+        const artifact=await assemblePinnedCandidate(pin,material);
+        const prepared=await prepareCandidatePublication(request,pin,artifact);
+        const readProof=await publishPreparedCandidate(request,prepared);
+        return ackCandidatePublication(request,prepared,readProof);
+    }
     // Candidate-only internal consistency review. This does not establish that
     // a trusted capture included all live documents, grant approval, or return
     // records/a capability usable by the private restore write kernel.
