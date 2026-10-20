@@ -92,6 +92,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
         linear-gradient(110deg,rgba(100,58,18,.26),rgba(18,13,9,.96) 52%),
         linear-gradient(180deg,#21170d,#120e0a) !important;
     box-shadow:
+        inset 0 calc(1 * var(--ui-length-unit,1px)) 0 #8f6934,
         inset 0 0 calc(18 * var(--ui-length-unit,1px)) rgba(240,180,41,.045),
         0 calc(8 * var(--ui-length-unit,1px)) calc(14 * var(--ui-length-unit,1px)) rgba(0,0,0,.34) !important;
 }

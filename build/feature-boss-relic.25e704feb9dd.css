@@ -609,7 +609,9 @@
 #game-stage .tower-floor-band small{ color:#8f836e;font-size:16px;line-height:1.4; }
 #game-stage .tower-floor-band.done{ border-color:#8c6934;background:#24180d; }
 #game-stage .tower-floor-band.current{ border-color:#d0a151;box-shadow:0 0 8px rgba(214,154,51,.22); }
-#game-stage .tower-floor-band:disabled{ opacity:.4; }
+#game-stage .tower-floor-band:disabled{ opacity:1;border-color:#433c30;cursor:not-allowed; }
+#game-stage .tower-floor-band:disabled b,
+#game-stage .tower-floor-band:disabled small{ color:#b9ad98; }
 
 #game-stage .tower-milestone-choice{
     padding:11px;
