@@ -4382,13 +4382,33 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     const needle="return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact",source=readFileSync(filename,"utf8");
     assert.equal(source.split(needle).length,2);
     compiled._compile(source.replace("return buildRecoveryOwner(deps,null,false);","return buildRecoveryOwner(deps,require('test-only-publication-fake-io'),false);")
-        .replace(needle,"return Object.freeze({pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,publishPreparedCandidate,ackCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact"),filename);
+        .replace(needle,"return Object.freeze({verifySegmentedRawRecoveryProof,loadedRawMaterial:identity=>publicationValue(publicationMaterials,identity).input,pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,publishPreparedCandidate,ackCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact"),filename);
     const publication=compiled.exports.createCanonicalCurrentRecovery(deps);
     assert.equal(Object.hasOwn(recovery,"pinCandidatePublication"),false);
     async function gate(operation,writes){const start=traces.length,result=await operation();
         assert.ok(traces.length>start);for(const trace of traces.slice(start)){assert.equal(trace.reads,13);assert.equal(trace.queries,0);assert.ok(trace.writes<=writes);}return result;}
     const pin=await gate(()=>publication.pinCandidatePublication(h.request(),args),0),scanStart=traces.length;
-    const material=await publication.loadPinnedRawCapture(pin),artifact=await publication.assemblePinnedCandidate(pin,material);
+    const material=await publication.loadPinnedRawCapture(pin);
+    // Independent memory-proof acceptance on the existing native20-battle
+    // capture, not a shared publication preparation/readback budget claim.
+    const reuseInput=publication.loadedRawMaterial(material),reuseBytes=JSON.stringify(reuseInput),reuseTrace=JSON.stringify(traces);
+    const {decodeInventoryPayload}=require("../functions/src/recovery-audit-artifact.js");
+    const settlementCount=reuseInput.inventoryPages.reduce((count,page)=>{
+        const payload=decodeInventoryPayload(page.row.payloadBytes);
+        return count+(payload.namespacePath===h.root.path+"/patrolSettlements"?payload.entries.length:0);
+    },0);
+    const nativeReuse=await publication.verifySegmentedRawRecoveryProof(reuseInput),usage=nativeReuse.residentUsage;
+    assert.equal(nativeReuse.segmentedProofValid,true);assert.ok(usage.settlementReuseHits>0);
+    assert.equal(usage.enumeratedSettlementRows,settlementCount);assert.equal(usage.settlementReuseHits,settlementCount);
+    assert.equal(usage.units,usage.executedProofUnits);
+    for(const flag of ["candidateProofValid","trustedCaptureVerified","restoreAuthorized","authoritativeStateReady"])assert.equal(nativeReuse[flag],false);
+    for(const key of ["records","documents","artifact","artifactBytes","identity","restorePermit"])assert.equal(Object.hasOwn(nativeReuse,key),false);
+    assert.equal(JSON.stringify(reuseInput),reuseBytes);assert.equal(JSON.stringify(traces),reuseTrace);
+    assert.ok(nativeReuse.assemblyUsage.bytes<=256*1024*1024);assert.ok(nativeReuse.assemblyUsage.nodes<=16000000);
+    assert.ok(nativeReuse.assemblyUsage.operations<=16384);assert.ok(nativeReuse.assemblyUsage.elapsedMs<=30000);
+    assert.equal(nativeReuse.assemblyUsage.passes,1);assert.equal(nativeReuse.assemblyUsage.reservedBytes,0);
+    console.log("PASS native segmented settlement reuse: existing20-battle Lv10/slot2 capture; all "+settlementCount+" settlement rows enumerated and exact-metadata reused after complete original ticket proofs; executed="+usage.executedProofUnits+"; independent original budget, no extra SDK attempts/reads, unchanged material, four flags false; no publication-capacity or201 claim.");
+    const artifact=await publication.assemblePinnedCandidate(pin,material);
     assert.equal(traces.length,scanStart,"Outside SDK snapshot scans and memory proof do not run a protected transaction");
     const manifestRef=run.collection("candidatePublications").doc(args.operationId);
     rollbackOnce=true;await assert.rejects(()=>publication.prepareCandidatePublication(h.request(),pin,artifact),/staged rollback/);
