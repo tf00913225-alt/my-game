@@ -43,6 +43,22 @@ if(process.env.GCLOUD_PROJECT!==project||process.env.FIRESTORE_EMULATOR_HOST!=="
 }
 const testApp=initializeApp({projectId:project},"session-authority-test");
 const db=getFirestore(testApp);
+function assertRecoveryFenceCommitOrder(probe,fence){
+    const valid=value=>value&&Number.isSafeInteger(value.seconds)&&
+        value.seconds>=-62135596800&&value.seconds<=253402300799&&
+        Number.isInteger(value.nanoseconds)&&value.nanoseconds>=0&&value.nanoseconds<1000000000;
+    const describe=value=>value?{seconds:value.seconds,nanoseconds:value.nanoseconds}:null;
+    const diagnostic=JSON.stringify({
+        probe:{createTime:describe(probe.createTime),updateTime:describe(probe.updateTime),
+            readTime:describe(probe.readTime),committedAt:describe(probe.get("committedAt"))},
+        fence:{createTime:describe(fence.createTime),updateTime:describe(fence.updateTime),
+            readTime:describe(fence.readTime),createdAt:describe(fence.get("createdAt"))}
+    });
+    const writerAt=probe.updateTime,fenceAt=fence.updateTime;
+    assert(valid(writerAt)&&valid(fenceAt),"Valid document commit metadata is required: "+diagnostic);
+    assert(writerAt.seconds<fenceAt.seconds||(writerAt.seconds===fenceAt.seconds&&writerAt.nanoseconds<=fenceAt.nanoseconds),
+        "An ordinary writer may commit only before audit begin, never after the active fence: "+diagnostic);
+}
 async function checkRecoveryArchive(uid,revision){
     const root=db.collection("serverUsers").doc(uid);
     const [archive,bundle]=await Promise.all([
@@ -3693,9 +3709,7 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.equal(committedFence.get("status"),"active");
     if(writerResult.status==="fulfilled"){
         assert.equal(committedProbe.exists,true);
-        const writerAt=committedProbe.get("committedAt"),fenceAt=committedFence.get("createdAt");
-        assert(writerAt.seconds<fenceAt.seconds||(writerAt.seconds===fenceAt.seconds&&writerAt.nanoseconds<=fenceAt.nanoseconds),
-            "An ordinary writer may commit only before audit begin, never after the active fence");
+        assertRecoveryFenceCommitOrder(committedProbe,committedFence);
     }else{
         assert.match(writerResult.reason.message,/RECOVERY_AUDIT_MAINTENANCE/);
         assert.equal(committedProbe.exists,false,"Fence-first serialization commits no ordinary write");
@@ -3705,7 +3719,7 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     await authority.runProtected(raceRequest(),tx=>{tx.set(probe,{afterCancel:true});});
     assert.equal((await probe.get()).get("afterCancel"),true);
     console.log("PASS recovery audit fence: actual absent-read SDK retry blocks later writes; zero/private writers, approval and maintenance scope; reads/original retries survive; real takeover/revoke and expired-approval source-loss cancel; canonical readiness stays false.");
-    console.log("PASS actual ordinary-writer versus begin race on missing fence: server commit timestamps or zero-write maintenance rejection prove serialization; cancel restores normal writes.");
+    console.log("PASS actual ordinary-writer versus begin race on missing fence: document updateTime commit metadata or zero-write maintenance rejection prove serialization; cancel restores normal writes.");
 }
 
 // Real SDK inventory capture remains an internal, metadata-only audit segment.
