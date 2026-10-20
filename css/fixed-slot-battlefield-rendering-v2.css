@@ -6,11 +6,14 @@
    namespace so legacy card dimensions cannot override the Slot contract. */
 
 #game-stage #battlePage.v-fixed-slot-render-v2{
-    --battle-enemy-region-track:42fr;
+    --battle-enemy-region-track:54.785fr;
     /* A shared 66px information band and 66px command row replace the
        decorative 100px raster command stack. Reclaimed space belongs to allies. */
-    --battle-center-region-track:21fr;
-    --battle-ally-region-track:37fr;
+    --battle-center-region-track:12fr;
+    --battle-ally-region-track:45.215fr;
+    --battle-turn-row-height:20px;
+    --battle-bottom-safe-gap:24px;
+    --battle-center-min-height:calc(var(--battle-turn-row-height) + max(var(--battle-command-visual-height), calc(var(--battle-target-prompt-height) + var(--battle-target-select-gap))) + 6px);
     --battle-target-prompt-height:60px;
     --battle-target-select-gap:6px;
     --battle-region-gap:4px;
@@ -35,34 +38,36 @@
     --battle-item-menu-gap:8px;
 }
 
-/* Enemy tracks and normalized portraits stay unchanged; three former center
-   fractions enlarge the ally rows without borrowing enemy HUD space. */
+/* Both formations share compact middle controls and a real bottom reserve.
+   The ordinary six-slot profile retains its own title/portrait HUD policy. */
 #game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"]{
-    --battle-enemy-region-track:40fr;
     --battle-title-height:0px;
     --battle-enemy-safe-top:12px;
     --battle-art-overhang-top:12px;
-    --battle-center-region-track:21fr;
-    --battle-ally-region-track:39fr;
 }
 
 
 /* Preserve the previous preferred heights, bounded by the paint box below
    the new top HUD so alpha bounds cannot enter the name/HP strip. */
 #game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"] .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{
-    --battle-portrait-visible-height:min(101.55px, 92cqh);
+    --battle-portrait-safe-height:96cqh;
+    --battle-portrait-visible-height:min(101.55px, calc(var(--battle-portrait-safe-height) / var(--battle-art-depth, 1)));
     --battle-portrait-baseline:100%;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"] .battle-monster[data-portrait-size-class="ELITE"] > .v174-normalized-portrait{
-    --battle-portrait-visible-height:min(105.27px, 96cqh);
+    --battle-portrait-visible-height:min(105.27px, calc(var(--battle-portrait-safe-height) / var(--battle-art-depth, 1)));
 }
+/* Keep a real upper HUD gap and retain a smaller far-row silhouette even
+   when the available paint height, rather than preferred pixels, is limiting. */
+#game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"] .v-fixed-enemy-row[data-slot-row="back"] .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{--battle-portrait-safe-height:90cqh;}
 
 #game-stage #battlePage.v-fixed-slot-render-v2 > .battle-wrap{
     position:relative !important;
+    height:calc(100% - var(--battle-bottom-safe-gap)) !important;
     display:grid !important;
     grid-template-rows:
         minmax(0,var(--battle-enemy-region-track))
-        minmax(0,var(--battle-center-region-track))
+        minmax(var(--battle-center-min-height),var(--battle-center-region-track))
         minmax(0,var(--battle-ally-region-track)) !important;
     gap:var(--battle-region-gap) !important;
     min-height:0 !important;
@@ -365,8 +370,8 @@
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-battle-slot > .battle-monster > .v174-battle-art,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot > .battle-player > .v174-battle-art{
     position:absolute !important;
-    left:calc(-1 * var(--battle-art-overhang-x)) !important;
-    right:calc(-1 * var(--battle-art-overhang-x)) !important;
+    left:calc(50% - (50% + var(--battle-art-overhang-x)) / var(--battle-art-depth, 1)) !important;
+    right:calc(50% - (50% + var(--battle-art-overhang-x)) / var(--battle-art-depth, 1)) !important;
     top:calc(-1 * var(--battle-art-overhang-top)) !important;
     bottom:var(--battle-art-hud-reserve) !important;
     width:auto !important;
@@ -390,13 +395,28 @@
     --battle-art-hud-reserve:44px;
     --battle-art-overhang-top:7px;
 }
-/* Depth is paint-only: the near rows retain full size. Slot/target/VFX
-   geometry remains owned by the existing adapter. */
+/* Depth is paint-only; the camera is behind the party. Width compensation
+   preserves the existing painted horizontal envelope for wide silhouettes.
+   Normalized enemy height is bounded below the top HUD before scaling. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-battle-art{scale:var(--battle-art-depth, 1);}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player > .v174-battle-art,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{--battle-art-depth:1.18;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-row[data-slot-row="back"] .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait,
+#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot-row[data-slot-row="front"] .battle-player > .v174-battle-art{--battle-art-depth:1.10;}
+/* Boss and generic fallback artwork keep the previous depth policy. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-row[data-slot-row="back"] .v174-battle-art,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot-row[data-slot-row="front"] .v174-battle-art{scale:.94;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot-row[data-slot-row="front"] .v174-battle-art{scale:var(--battle-art-depth, .94);}
+/* A filled front slot owns the information band directly above its paired
+   back slot. Bound only that back portrait's height, keeping its feet and
+   source aspect. Empty front slots keep the approved larger silhouette. */
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow:has(> [data-slot-row="front"] > [data-slot="ALLY_F1"] > .battle-player) > [data-slot-row="back"] > [data-slot="ALLY_B1"] > .battle-player > .v174-battle-art,
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow:has(> [data-slot-row="front"] > [data-slot="ALLY_F2"] > .battle-player) > [data-slot-row="back"] > [data-slot="ALLY_B2"] > .battle-player > .v174-battle-art,
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow:has(> [data-slot-row="front"] > [data-slot="ALLY_F3"] > .battle-player) > [data-slot-row="back"] > [data-slot="ALLY_B3"] > .battle-player > .v174-battle-art{
+    --battle-art-overhang-top:calc((100% + var(--battle-ally-row-gap) - 6px - var(--battle-art-hud-reserve)) / var(--battle-art-depth) - 100% + var(--battle-art-hud-reserve));
+}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster > .v174-battle-art{
-    --battle-art-overhang-top:-36px;
-    --battle-art-hud-reserve:6px;
+    --battle-art-overhang-top:-24px;
+    --battle-art-hud-reserve:30px;
 }
 /* Offline alpha bounds are consumed by V174. The full canvas is painted once,
    preserving aspect and every nontransparent pixel; no runtime pixel scan. */
@@ -495,7 +515,7 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     --battle-hp-fill:linear-gradient(180deg,#b5e877 0%,#77cc3b 44%,#4c9b25 100%);
     color:#f4ead4;font-family:"Noto Sans TC",sans-serif;
 }
-.v174-unit-hud[data-side="monster"]{--battle-hp-fill:linear-gradient(180deg,#ff907a 0%,#df4c3b 44%,#a72c26 100%);}
+.v174-unit-hud[data-side="monster"]{--battle-name-row-height:14px;--battle-enemy-status-band-height:24px;--battle-hp-fill:linear-gradient(180deg,#ff907a 0%,#df4c3b 44%,#a72c26 100%);}
 .v174-battle-hud-layer > .v174-unit-hud{position:fixed;inset:auto;}
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud :is(.battle-monster-name,.battle-player-id){
     position:absolute !important;top:auto !important;bottom:16px !important;
@@ -513,6 +533,10 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
 .v174-unit-hud .battle-identity-copy{display:flex;flex-direction:column;min-width:0;overflow:hidden;}
 .v174-unit-hud .battle-identity-name{overflow:hidden;text-overflow:ellipsis;font-size:11px;line-height:13px;font-weight:700;}
 .v174-unit-hud .battle-identity-level{font-size:10px;line-height:12px;color:#eadfc7;}
+.v174-unit-hud[data-side="monster"] .battle-identity-copy{flex-direction:row;align-items:center;gap:3px;}
+.v174-unit-hud[data-side="monster"] .battle-identity-name{min-width:0;flex:1 1 auto;}
+.v174-unit-hud[data-side="monster"] .battle-identity-level{flex:0 0 auto;}
+.v174-unit-hud[data-side="monster"] .battle-identity-element{flex-basis:14px;width:14px;height:14px;}
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud .battle-identity-copy > span{color:#f4ead4 !important;}
 .v174-unit-hud .battle-identity-element .elem-icon{width:12px;height:12px;animation:none;}
 .v174-unit-hud .battle-identity-element{
@@ -546,44 +570,64 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     padding:0 !important;margin:-1px !important;overflow:hidden !important;clip-path:inset(50%);white-space:nowrap;
 }
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-side="monster"] .battle-monster-name{top:0 !important;bottom:auto !important;}
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-side="monster"] .monster-hp{top:28px !important;bottom:auto !important;}
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-side="monster"] .monster-hp{top:16px !important;bottom:auto !important;}
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud .monster-status-badges{
     position:absolute !important;left:0 !important;right:0 !important;bottom:46px !important;
     width:auto !important;min-height:14px !important;max-height:24px !important;overflow:visible !important;z-index:32 !important;
 }
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-side="monster"] .monster-status-badges{top:36px !important;bottom:auto !important;}
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-side="monster"] .monster-status-badges{
+    top:auto !important;bottom:0 !important;height:var(--battle-enemy-status-band-height) !important;
+    min-height:var(--battle-enemy-status-band-height) !important;max-height:none !important;
+    display:flex;flex-wrap:nowrap;align-items:center;justify-content:safe center;gap:0 !important;
+    overflow-x:auto !important;overflow-y:hidden !important;scrollbar-width:none;
+    pointer-events:auto;touch-action:pan-x;overscroll-behavior-x:contain;
+}
+:is(#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-side="monster"] .monster-status-badges::-webkit-scrollbar{display:none;}
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud .monster-status-badges:empty{display:none !important;}
 
-/* Fixed Slot is the production owner of the manual-control indicator. The
-   frame lives on its own pseudo-element so continuous feedback never claims
-   the Unit root or portrait animation property used by lunge/hit/dodge. */
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after{
+/* Manual-turn feedback shares the stationary art frame and its depth/row cap.
+   The foot ellipse sits behind paint; ::after keeps the existing foot shadow. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art::before{
     content:"" !important;
     position:absolute !important;
-    inset:-4px !important;
+    left:50% !important;
+    right:auto !important;
+    top:auto !important;
+    bottom:-2px !important;
+    width:66% !important;
+    height:10px !important;
+    transform:translateX(-50%) !important;
     box-sizing:border-box !important;
-    border:3px solid #ffd21f !important;
-    border-radius:10px !important;
-    background:transparent !important;
-    box-shadow:0 0 7px 2px rgba(255,210,31,1),0 0 18px 5px rgba(255,196,0,.72) !important;
-    opacity:1;
+    border:1px solid rgba(241,210,137,.72) !important;
+    border-radius:50% !important;
+    background:radial-gradient(ellipse,rgba(241,210,137,.12),rgba(241,210,137,.25) 65%,transparent 74%) !important;
+    box-shadow:0 0 5px 1px rgba(241,210,137,.3) !important;
+    opacity:.65;
     pointer-events:none !important;
-    z-index:36 !important;
-    animation:v174ManualActiveTurnFrameFlash .3s linear infinite !important;
+    z-index:-1 !important;
+    animation:v174ManualTurnFootBreath 2s ease-in-out infinite !important;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-arrow{
+    display:none;position:absolute;left:50%;top:-5px;width:0;height:0;
+    border-left:4px solid transparent;border-right:4px solid transparent;
+    border-top:4px solid #ecd190;transform:translateX(-50%);
+    pointer-events:none;z-index:2;
+}
+/* Five unscaled pixels fit the existing six-pixel paired-HUD clearance even
+   at 1.18 depth. No glow extends the arrow into the information band. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art > .v174-manual-turn-arrow{display:block;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after{
+    content:none !important;
+    display:none !important;
+    animation:none !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn{
     outline:0 !important;
     box-shadow:none !important;
 }
-@keyframes v174ManualActiveTurnFrameFlash{
-    0%,100%{
-        opacity:1;
-        box-shadow:0 0 7px 2px rgba(255,210,31,1),0 0 18px 5px rgba(255,196,0,.72);
-    }
-    50%{
-        opacity:.24;
-        box-shadow:0 0 14px 4px rgba(255,240,130,1),0 0 28px 8px rgba(255,210,31,.95);
-    }
+@keyframes v174ManualTurnFootBreath{
+    0%,100%{opacity:.55;}
+    50%{opacity:.75;}
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target{
@@ -719,6 +763,7 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     to{opacity:1;filter:brightness(1.3)}
 }
 @media (prefers-reduced-motion:reduce){
+    #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art::before{animation:none !important;opacity:.65;}
     #game-stage #battlePage .v174-action-motion,
     #game-stage #battlePage .v174-portrait-paint,
     #game-stage #battlePage .v174-generic-portrait > .v174-action-motion::before{animation:none !important;}

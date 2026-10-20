@@ -22726,12 +22726,14 @@ function ensureBattleStatusDetailModal(){
         '<div class="battle-status-detail-panel" role="dialog" aria-modal="true" aria-labelledby="battleStatusDetailTitle">'+
             '<button type="button" class="battle-status-detail-close" aria-label="關閉">×</button>'+
             '<h3 id="battleStatusDetailTitle">戰鬥狀態</h3>'+
+            '<div class="battle-status-detail-portrait" role="img"></div>'+
             '<div class="battle-status-detail-core">'+
                 '<span data-field="element"></span>'+
                 '<span data-field="name"></span>'+
                 '<span data-field="level"></span>'+
                 '<span data-field="hp"></span>'+
                 '<span data-field="sp"></span>'+
+                '<span data-field="agility"></span>'+
             '</div>'+
             '<section><h4>增益狀態：</h4><div data-list="buffs" class="battle-status-detail-list"></div></section>'+
             '<section><h4>負面狀態：</h4><div data-list="debuffs" class="battle-status-detail-list"></div></section>'+
@@ -22797,6 +22799,14 @@ function openBattleStatusDetailModal(side,index){
 
     const modal=ensureBattleStatusDetailModal();
     const stats=!isMonster&&typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
+    const portrait=modal.querySelector('.battle-status-detail-portrait');
+    const card=document.getElementById((isMonster?'battleMonster':'battlePlayerCard')+index);
+    const artwork=card&&card.querySelector('.v174-battle-art');
+    const source=artwork&&artwork.style.backgroundImage;
+    portrait.style.backgroundImage=source&&source!=='none'?source:'none';
+    portrait.textContent=source&&source!=='none'?'':'◇';
+    portrait.setAttribute('aria-label',String(entity.name||entity.id||'角色')+'立繪');
+    const agility=isMonster?getMonsterAgility(entity):stats?Number(stats.agility):NaN;
     const maxHP=isMonster?entity.maxHP:
         Number(stats&&stats.maxHP)||Number(entity.maxHP)||Math.max(1,Number(entity.hp)||1);
     const maxSP=isMonster?entity.maxSP:
@@ -22809,7 +22819,8 @@ function openBattleStatusDetailModal(side,index){
         name:"名稱："+String(entity.name||entity.id||"角色"),
         level:"等級：Lv."+String(entity.level),
         hp:"HP："+(isMonster?projectEnemyResource(entity.hp,maxHP).text:Math.max(0,Number(entity.hp)||0)+" / "+maxHP),
-        sp:"SP："+(isMonster?projectEnemyResource(entity.sp,maxSP).text:Math.max(0,Number(entity.sp)||0)+" / "+maxSP)
+        sp:"SP："+(isMonster?projectEnemyResource(entity.sp,maxSP).text:Math.max(0,Number(entity.sp)||0)+" / "+maxSP),
+        agility:"敏捷："+(Number.isFinite(agility)?Math.round(agility*100)/100:'—')
     };
     Object.keys(fields).forEach(key=>{
         const node=modal.querySelector('[data-field="'+key+'"]');
@@ -22819,6 +22830,7 @@ function openBattleStatusDetailModal(side,index){
     renderBattleStatusDetailList(modal.querySelector('[data-list="debuffs"]'),summary.debuffs);
     modal.hidden=false;
     modal.setAttribute("aria-hidden","false");
+    modal.querySelector('.battle-status-detail-panel').scrollTop=0;
     syncBattleUiPriorityLayer();
     return true;
 }
