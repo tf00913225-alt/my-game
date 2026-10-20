@@ -12768,7 +12768,7 @@
       "label": "戰鬥 boss-mechanism",
       "entry": "隔離QA帳號→正式戰鬥控制 boss-mechanism",
       "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "可操作",
         "禁用",
@@ -12787,40 +12787,86 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "3d14c8b27b7347f3929d02f50d8e965a7f0e3c4d",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-boss-observer-accepted/after/360x640/drawer-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-boss-observer-accepted/after/360x640/report.json",
+          "remaining": [
+            "Observer-only empty/inactive/cleared guards and six formal mechanism presentation cards; true alert/open/end/close/reopen",
+            "No actual active-battle priority/layer acceptance or actual Boss encounter",
+            "No damage/targeting/turn/settlement/reward/save/escape/transactions/real device acceptance"
+          ]
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "3d14c8b27b7347f3929d02f50d8e965a7f0e3c4d",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-boss-observer-accepted/after/393x873/drawer-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-boss-observer-accepted/after/393x873/report.json",
+          "remaining": [
+            "Observer-only empty/inactive/cleared guards and six formal mechanism presentation cards; true alert/open/end/close/reopen",
+            "No actual active-battle priority/layer acceptance or actual Boss encounter",
+            "No damage/targeting/turn/settlement/reward/save/escape/transactions/real device acceptance"
+          ]
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "3d14c8b27b7347f3929d02f50d8e965a7f0e3c4d",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-boss-observer-accepted/after/412x915/drawer-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-boss-observer-accepted/after/412x915/report.json",
+          "remaining": [
+            "Observer-only empty/inactive/cleared guards and six formal mechanism presentation cards; true alert/open/end/close/reopen",
+            "No actual active-battle priority/layer acceptance or actual Boss encounter",
+            "No damage/targeting/turn/settlement/reward/save/escape/transactions/real device acceptance"
+          ]
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "3d14c8b27b7347f3929d02f50d8e965a7f0e3c4d",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-boss-observer-accepted/after/1280x800/drawer-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-boss-observer-accepted/after/1280x800/report.json",
+          "remaining": [
+            "Observer-only empty/inactive/cleared guards and six formal mechanism presentation cards; true alert/open/end/close/reopen",
+            "No actual active-battle priority/layer acceptance or actual Boss encounter",
+            "No damage/targeting/turn/settlement/reward/save/escape/transactions/real device acceptance"
+          ]
         }
       },
       "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "純observer session guards/六正式卡/標題與44px入口關閉/真末/重開0",
+          "status": "已實際驗證",
+          "head": "3d14c8b27b7347f3929d02f50d8e965a7f0e3c4d",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-boss-observer-accepted",
+          "limits": [
+            "Observer-only empty/inactive/cleared guards and six formal mechanism presentation cards; true alert/open/end/close/reopen",
+            "No actual active-battle priority/layer acceptance or actual Boss encounter",
+            "No damage/targeting/turn/settlement/reward/save/escape/transactions/real device acceptance"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "followups": [
+          {
+            "segment": "segment-27-boss-observer",
+            "head": "3d14c8b27b7347f3929d02f50d8e965a7f0e3c4d",
+            "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-boss-observer-accepted",
+            "notVerified": [
+              "Observer-only empty/inactive/cleared guards and six formal mechanism presentation cards; true alert/open/end/close/reopen",
+              "No actual active-battle priority/layer acceptance or actual Boss encounter",
+              "No damage/targeting/turn/settlement/reward/save/escape/transactions/real device acceptance"
+            ]
+          }
+        ]
       }
     },
     {
@@ -25439,6 +25485,18 @@
       "pending": [
         "Latest Head required CI / deploy",
         "Other unverified UI states preserved"
+      ]
+    },
+    {
+      "segment": "segment-27-boss-observer",
+      "head": "3d14c8b27b7347f3929d02f50d8e965a7f0e3c4d",
+      "beforeHead": "d6e52c235760791cae581dc0b86f037b11f5e7ba",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-boss-observer-accepted",
+      "result": "Observer呈現限定通過；非真戰鬥驗收",
+      "pending": [
+        "Observer-only empty/inactive/cleared guards and six formal mechanism presentation cards; true alert/open/end/close/reopen",
+        "No actual active-battle priority/layer acceptance or actual Boss encounter",
+        "No damage/targeting/turn/settlement/reward/save/escape/transactions/real device acceptance"
       ]
     }
   ],
