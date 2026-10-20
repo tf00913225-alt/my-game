@@ -123,6 +123,7 @@ const gameplayScripts=[
     "js/58-v173.63-functional-fixes.js",
     "js/battlefield-render-geometry-adapter.js",
     "js/battle-floating-feedback-owner.js",
+    "functions/src/skill-progression-core.js",
     "js/60-v173.64-skill-progression-rebalance.js",
     "js/60-team-relic-system.js"
 ];
