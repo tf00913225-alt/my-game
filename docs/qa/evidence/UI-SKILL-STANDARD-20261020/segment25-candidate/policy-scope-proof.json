@@ -1,0 +1,16 @@
+{
+  "base": "8ba3488a60fbbfd3e4e3767c5d4c244f829e6bbd",
+  "head": "a17d2357107f3dd41a5268c64cbb173ce03dda14",
+  "policies": [
+    {
+      "file": "functions/src/generated/restricted-forest-instance-policy.json",
+      "onlySourceDigest": "js/00-main.js",
+      "allRemainingPolicyBytesEquivalent": true
+    },
+    {
+      "file": "functions/src/generated/plain-player-normal-attack-policy.json",
+      "onlySourceDigest": "js/60-v173.64-skill-progression-rebalance.js",
+      "allRemainingPolicyBytesEquivalent": true
+    }
+  ]
+}

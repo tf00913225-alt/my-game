@@ -2679,7 +2679,7 @@
       "label": "技能詳情",
       "entry": "showSkillDetail(skillId)",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "短內容",
         "長內容",
@@ -2761,6 +2761,18 @@
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
         }
+      },
+      "segment25Candidate": {
+        "head": "a17d2357107f3dd41a5268c64cbb173ce03dda14",
+        "status": "修復候選，48項四尺寸尚未驗完成",
+        "report": "docs/qa/UI-SKILL-STANDARD-20261020-segment-25.md",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-candidate",
+        "pending": [
+          "同步handler純委派副作用歸屬",
+          "48formalID",
+          "四尺寸",
+          "三方實畫審核"
+        ]
       }
     },
     {
