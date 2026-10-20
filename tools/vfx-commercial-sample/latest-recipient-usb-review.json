@@ -1,0 +1,111 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "b7676b5f5a782fd28193521954665dc0877fdc3a",
+  "evidenceHead": "1d02be839ebc99b098fe592699fec51c5eca2aa4",
+  "evidence": "artifacts/vfx-final-recipient-usb/skill-video.json",
+  "method": "view_image full original 720x1280 decoded frames, no crop",
+  "gate": "PASS_SCOPED_VISUAL_STOP_REFINEMENT",
+  "reviews": [
+    {
+      "id": "floodBeast",
+      "gate": "PASS",
+      "frames": [
+        165,
+        168,
+        170,
+        172,
+        174,
+        176,
+        178,
+        180,
+        182
+      ],
+      "reason": "Head now faces upper-left along trajectory toward left enemy, contacts there and becomes upright splash. Old backward flight and hard boundaries resolved; water-dragon identity and HUD preserved."
+    },
+    {
+      "id": "waterBall",
+      "gate": "PASS",
+      "frames": [
+        8,
+        13,
+        18,
+        20,
+        22
+      ],
+      "reason": "Distinct recipient motif, visible activation/contact and fade at actual actors, readable portrait/HUD. No demonstrated excessive shrink or skill identity erasure."
+    },
+    {
+      "id": "healSpell",
+      "gate": "PASS",
+      "frames": [
+        31,
+        35,
+        39,
+        42,
+        44
+      ],
+      "reason": "Distinct recipient motif, visible activation/contact and fade at actual actors, readable portrait/HUD. No demonstrated excessive shrink or skill identity erasure."
+    },
+    {
+      "id": "rage",
+      "gate": "PASS",
+      "frames": [
+        52,
+        57,
+        62,
+        65,
+        68
+      ],
+      "reason": "Distinct recipient motif, visible activation/contact and fade at actual actors, readable portrait/HUD. No demonstrated excessive shrink or skill identity erasure."
+    },
+    {
+      "id": "dodgeSkill",
+      "gate": "PASS",
+      "frames": [
+        76,
+        81,
+        86,
+        90,
+        93
+      ],
+      "reason": "Distinct recipient motif, visible activation/contact and fade at actual actors, readable portrait/HUD. No demonstrated excessive shrink or skill identity erasure."
+    },
+    {
+      "id": "rockWall",
+      "gate": "PASS",
+      "frames": [
+        101,
+        106,
+        111,
+        114,
+        117
+      ],
+      "reason": "Distinct recipient motif, visible activation/contact and fade at actual actors, readable portrait/HUD. No demonstrated excessive shrink or skill identity erasure."
+    },
+    {
+      "id": "stormRain",
+      "gate": "PASS",
+      "frames": [
+        127,
+        133,
+        139,
+        143,
+        145,
+        147,
+        150,
+        153
+      ],
+      "reason": "Distinct recipient motif, visible activation/contact and fade at actual actors, readable portrait/HUD. No demonstrated excessive shrink or skill identity erasure."
+    }
+  ],
+  "limits": [
+    "Sampled12fps sequence acceptance is not60fps or endurance/performance certification.",
+    "Reviewed phone snapshot is1d02; current repository head is separate.",
+    "No damage/settlement authority acceptance implied."
+  ],
+  "engineeringFollowup": {
+    "head": "b7676b5f5a782fd28193521954665dc0877fdc3a",
+    "scope": "Reviewed commit7cdeb freeze presentation flag and relic-only HUDz18135 above existing stage18130",
+    "decision": "Scoped presentation-only change; target IDs/type, shared clock, settlement and cleanup owners unchanged; formal resources retained rather than art redrawn/shrunk. Focused tests retain recipient/clock/geometry assertions. Phone evidence for this followup is separate from1d02 seven-cast review."
+  }
+}

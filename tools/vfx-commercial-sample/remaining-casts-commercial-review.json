@@ -1,0 +1,656 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewDate": "2026-10-20",
+  "head": "ade43a48ce618330055f9add290abb175ef9470d",
+  "device": "SM-N960F Android 10 physical USB Chrome",
+  "scope": "All 30 remaining-batch casts inventoried; sixteen fire/water original stills plus corrected direct-video contact followup for four, and fourteen wind/earth/support direct contact frames reviewed. Revive rejected video fixture remains unverified.",
+  "evidence": "artifacts/vfx-remaining-hit/evidence.json",
+  "staticSummary": {
+    "PASS": 27,
+    "FAIL": 3,
+    "NEEDS_EVIDENCE": 0
+  },
+  "overallCommercialGate": "NEEDS_EVIDENCE",
+  "skills": [
+    {
+      "id": "flameSlash",
+      "staticGate": "PASS",
+      "reason": "Corrected direct-video contact frame shows sharp orange curved slash and contact star at intended target; actor identity and HUD preserved, no edge crop.",
+      "image": "artifacts/vfx-remaining-hit/skill-flameSlash.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 601.5,
+        "clock": 7260.800000011921,
+        "cssTime": 474.59999998807945,
+        "cssStart": 7260.800000011921,
+        "expectedTime": 443.333333308,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE",
+      "historicalStillFinding": "No visible cast in new phone still. Evidence hit CSS time is after authored hit, but screenshot may occur after short cast cleanup. Need original-video adjacent hit frames; do not reject art from empty capture.",
+      "additionalImagesViewed": [
+        "artifacts/vfx-remaining-hit/contact-frames/flameSlash-1.png",
+        "artifacts/vfx-remaining-hit/contact-frames/flameSlash-3.png"
+      ]
+    },
+    {
+      "id": "fireCritical",
+      "staticGate": "PASS",
+      "reason": "Distinct orange-red impact ring and shards centered on intended left target. Names/HP bars remain clear, no stage crop observed; peak torso overlap is acceptable transient contact.",
+      "image": "artifacts/vfx-remaining-hit/skill-fireCritical.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 784.5,
+        "clock": 10877.40000000596,
+        "cssTime": 632.099999994038,
+        "cssStart": 10877.40000000596,
+        "expectedTime": 612.499999965,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "dragonSlash",
+      "staticGate": "PASS",
+      "reason": "Dragon head and diagonal fire slashes remain distinct. Upper sparks approach behind HP bar but text/resources stay readable; no visible viewport clipping.",
+      "image": "artifacts/vfx-remaining-hit/skill-dragonSlash.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 1875.3999999761581,
+        "clock": 14538.5,
+        "cssTime": 1663.9999999999998,
+        "cssStart": 14538.5,
+        "expectedTime": 1633.33333324,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "fireRocket",
+      "staticGate": "PASS",
+      "reason": "Three fiery rocket/explosion trails cluster on intended target with visible face and contained footprint; HUD readable.",
+      "image": "artifacts/vfx-remaining-hit/skill-fireRocket.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 740.9000000059605,
+        "clock": 19342.70000001788,
+        "cssTime": 551.2999999821169,
+        "cssStart": 19342.70000001788,
+        "expectedTime": 524.99999997,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "blazeSpell",
+      "staticGate": "PASS",
+      "reason": "Compact flame vortex at target head/upper torso is visible and identifiable, leaves HUD/neighbors clear; no evidence justifies discretionary enlargement.",
+      "image": "artifacts/vfx-remaining-hit/skill-blazeSpell.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 835.5,
+        "clock": 22887.30000001192,
+        "cssTime": 715.4999999880758,
+        "cssStart": 22887.30000001192,
+        "expectedTime": 670.833333295,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "flameTornado",
+      "staticGate": "PASS",
+      "reason": "Strong coiled fire-dragon/tornado silhouette remains recognizable, bounded to intended target; HUD remains legible and no visible edge crop.",
+      "image": "artifacts/vfx-remaining-hit/skill-flameTornado.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 1446.300000011921,
+        "clock": 26709.70000001788,
+        "cssTime": 1252.899999982116,
+        "cssStart": 26709.70000001788,
+        "expectedTime": 1224.99999993,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "phoenixCry",
+      "staticGate": "PASS",
+      "reason": "Large ultimate phoenix/ring peak clearly preserves skill identity. It hides middle actor transiently but names/levels/HP remain readable; no viewport crop. One peak alone does not justify shrinking ultimate.",
+      "image": "artifacts/vfx-remaining-hit/skill-phoenixCry.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 2000.2999999821186,
+        "clock": 30888.5,
+        "cssTime": 1885.3000000000009,
+        "cssStart": 30888.5,
+        "expectedTime": 1866.66666656,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "waterKnife",
+      "staticGate": "PASS",
+      "reason": "Corrected contact frame shows crisp blue spiral slash/starburst at target with readable HUD and no crop; later sample has faded tail as expected.",
+      "image": "artifacts/vfx-remaining-hit/skill-waterKnife.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 607,
+        "clock": 35628.5,
+        "cssTime": 486.4999999999995,
+        "cssStart": 35628.5,
+        "expectedTime": 466.66666664,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE",
+      "historicalStillFinding": "No visible cast in new still; possible short-cast capture latency. Need original-video contact samples, not old pre-hit screenshot or art rollback.",
+      "additionalImagesViewed": [
+        "artifacts/vfx-remaining-hit/contact-frames/waterKnife-1.png",
+        "artifacts/vfx-remaining-hit/contact-frames/waterKnife-3.png"
+      ]
+    },
+    {
+      "id": "frostPunch",
+      "staticGate": "PASS",
+      "reason": "Corrected contact frame shows bright ice spikes/ground ring centered on target; HUD readable and no crop. Earlier still only showed tail.",
+      "image": "artifacts/vfx-remaining-hit/skill-frostPunch.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 720.7999999821186,
+        "clock": 39218.40000000596,
+        "cssTime": 536.9999999940446,
+        "cssStart": 39218.40000000596,
+        "expectedTime": 524.99999997,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE",
+      "historicalStillFinding": "Only very faint residual blue flecks/mist visible; this still cannot assess authored contact identity/strength. Need original-video hit-adjacent frames.",
+      "additionalImagesViewed": [
+        "artifacts/vfx-remaining-hit/contact-frames/frostPunch-1.png",
+        "artifacts/vfx-remaining-hit/contact-frames/frostPunch-3.png"
+      ]
+    },
+    {
+      "id": "frostCrush",
+      "staticGate": "PASS",
+      "reason": "Blue ice shards and contact burst visible around intended target; portrait identifiable and HUD clear. No obvious viewport clipping.",
+      "image": "artifacts/vfx-remaining-hit/skill-frostCrush.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 819.5,
+        "clock": 42804.20000001788,
+        "cssTime": 693.1999999821201,
+        "cssStart": 42804.20000001788,
+        "expectedTime": 670.833333295,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "floodBeast",
+      "staticGate": "FAIL",
+      "reason": "Valid active frames 0/1/3 retain obvious stage-left water cut and long horizontal bottom termination. Formal name/level/HP are clear; HUD allegation resolved. Water identity/contact strength retained.",
+      "image": "artifacts/vfx-remaining-hit/skill-floodBeast.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 913.5,
+        "clock": 46569.70000001788,
+        "cssTime": 819.2999999821211,
+        "cssStart": 46569.70000001788,
+        "expectedTime": 787.499999955,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE",
+      "additionalImagesViewed": [
+        "artifacts/vfx-remaining-hit/contact-frames/floodBeast-1.png",
+        "artifacts/vfx-remaining-hit/contact-frames/floodBeast-3.png"
+      ],
+      "fixtureInvalidHudPortion": "Previous HUD contrast finding is invalid for actual combat because formal HUD layering was absent.",
+      "preActiveRecheckFinding": {
+        "gate": "FAIL",
+        "reason": "Source/boundary FAIL remains: left wave lobe is cut at stage edge and bottom foam has conspicuous horizontal termination in original still and corrected contact frames. Actual-battle source/boundary recheck pending. HUD claim withdrawn due invalid battleActive=false replay; do not infer current gameplay HUD defect."
+      },
+      "activeRecheckEvidence": {
+        "video": "artifacts/vfx-active-battle-recheck/skill-video.json",
+        "imagesViewed": [
+          "artifacts/vfx-active-battle-recheck/contact-frames/floodBeast-1.png",
+          "artifacts/vfx-active-battle-recheck/contact-frames/floodBeast-0.png",
+          "artifacts/vfx-active-battle-recheck/contact-frames/floodBeast-3.png"
+        ],
+        "battleActive": true,
+        "hud": 6
+      }
+    },
+    {
+      "id": "iceArrowRain",
+      "staticGate": "PASS",
+      "reason": "Broad blue ice/water impact remains identifiable with clear target row HUD. Center actor is transiently covered at peak; no hard viewport clipping shown.",
+      "image": "artifacts/vfx-remaining-hit/skill-iceArrowRain.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 1045.199999988079,
+        "clock": 50366.80000001192,
+        "cssTime": 948.0999999880808,
+        "cssStart": 50366.80000001192,
+        "expectedTime": 933.33333328,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "revive",
+      "staticGate": "PASS",
+      "reason": "Valid dead-target presentation shows recognizable blue-white resurrection lotus/light, contained to intended slot without neighboring/HUD obstruction. Own dead actor and HUD are consistently faded; no separate opaque VFX HUD-cover defect established. Static visual PASS only, not actual revive settlement/lifecycle or continuous motion acceptance.",
+      "image": "artifacts/vfx-remaining-hit/skill-revive.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 1166.199999988079,
+        "clock": 54527.40000000596,
+        "cssTime": 1081.0999999940377,
+        "cssStart": 54527.40000000596,
+        "expectedTime": 1049.99999994,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE",
+      "preActiveRecheckFinding": {
+        "gate": "NEEDS_EVIDENCE",
+        "reason": "Current cycle video fixture did not establish dead target and cast rejected immediately, per capture Owner. Do not use it as revive visual PASS. Await valid dead-target evidence; old still remains insufficient to separate intended dead fade from HUD overlay."
+      },
+      "activeRecheckEvidence": {
+        "video": "artifacts/vfx-active-battle-recheck/skill-video.json",
+        "imagesViewed": [
+          "artifacts/vfx-active-battle-recheck/contact-frames/revive-1.png",
+          "artifacts/vfx-active-battle-recheck/contact-frames/revive-0.png",
+          "artifacts/vfx-active-battle-recheck/contact-frames/revive-3.png"
+        ],
+        "battleActive": true,
+        "hud": 6
+      }
+    },
+    {
+      "id": "fireSoulResonance",
+      "staticGate": "PASS",
+      "reason": "Open orange-red body/foot aura visible around self with readable face/HUD and clear neighbors; no cut edge observed.",
+      "image": "artifacts/vfx-remaining-hit/skill-fireSoulResonance.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 979.5,
+        "clock": 113785.09999999404,
+        "cssTime": 840.7000000059526,
+        "cssStart": 113785.09999999404,
+        "expectedTime": 816.66666662,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "bloodBurnArt",
+      "staticGate": "PASS",
+      "reason": "Crimson body aura and vertical energy retain blood-fire identity; own text/HP/SP remain readable despite tail behind own panel.",
+      "image": "artifacts/vfx-remaining-hit/skill-bloodBurnArt.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 946,
+        "clock": 117512.30000001192,
+        "cssTime": 838.5999999880767,
+        "cssStart": 117512.30000001192,
+        "expectedTime": 816.66666662,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "purifyMind",
+      "staticGate": "PASS",
+      "reason": "Three pale blue cleansing foot circles clearly cover intended ally row, preserve all portraits and HUD, no visible stage clipping.",
+      "image": "artifacts/vfx-remaining-hit/skill-purifyMind.png",
+      "visuallyInspected": true,
+      "recordedHit": {
+        "at": 986.5,
+        "clock": 121376.70000001788,
+        "cssTime": 833.5999999821269,
+        "cssStart": 121376.70000001788,
+        "expectedTime": 816.66666662,
+        "bg": "100% 50%"
+      },
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "barrier",
+      "staticGate": "PASS",
+      "reason": "Valid active battle keeps all ally names/levels/HP/SP legible above three golden shields. Protection identity and bounded footprint remain. Prior HUD-only rejection resolved without art change.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/barrier-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE",
+      "fixtureInvalidHistoricalFinding": {
+        "gate": "FAIL",
+        "reason": "Three gold shield peaks have clear protection identity but cover each ally name/level with bright opaque center/lower rays. HP/SP remain visible; fix HUD protection rather than erase shield identity."
+      },
+      "fixtureValidity": "ACTIVE_BATTLE_RECHECK_VALID",
+      "preActiveRecheckFinding": {
+        "gate": "NEEDS_EVIDENCE",
+        "reason": "FIXTURE-INVALID for combat HUD acceptance: replay battleActive=false removed formal detached HUD layer. Prior foreground/HUD conflict cannot establish actual battle defect. Await active+paused battle recheck with hudLayers=1 and detachedHud=6 at hit; preserve art pending valid evidence."
+      },
+      "activeRecheckEvidence": {
+        "video": "artifacts/vfx-active-battle-recheck/skill-video.json",
+        "imagesViewed": [
+          "artifacts/vfx-active-battle-recheck/contact-frames/barrier-1.png"
+        ],
+        "battleActive": true,
+        "hud": 6
+      }
+    },
+    {
+      "id": "dinghaishenzhen",
+      "staticGate": "FAIL",
+      "reason": "Formal HUD is now clearly readable, but cast sphere remains vertically misplaced: most floor rings and roughly lower half of sphere sit below portrait feet and HUD in empty bottom stage, rather than surrounding intended recipients. Obvious location/footprint defect independent of HUD layering; persistent status aura PASS is unaffected.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/dinghaishenzhen-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE",
+      "fixtureInvalidHistoricalFinding": {
+        "gate": "FAIL",
+        "reason": "Large cyan sphere extends below ally portraits, hiding own name/level and HP/SP and reaching near bottom stage. This is cast geometry/HUD conflict, distinct from accepted persistent calm status aura."
+      },
+      "fixtureValidity": "ACTIVE_BATTLE_RECHECK_VALID",
+      "preActiveRecheckFinding": {
+        "gate": "NEEDS_EVIDENCE",
+        "reason": "FIXTURE-INVALID for combat HUD acceptance: replay battleActive=false removed formal detached HUD layer. Prior foreground/HUD conflict cannot establish actual battle defect. Await active+paused battle recheck with hudLayers=1 and detachedHud=6 at hit; preserve art pending valid evidence."
+      },
+      "activeRecheckEvidence": {
+        "video": "artifacts/vfx-active-battle-recheck/skill-video.json",
+        "imagesViewed": [
+          "artifacts/vfx-active-battle-recheck/contact-frames/dinghaishenzhen-1.png",
+          "artifacts/vfx-active-battle-recheck/contact-frames/dinghaishenzhen-0.png",
+          "artifacts/vfx-active-battle-recheck/contact-frames/dinghaishenzhen-3.png"
+        ],
+        "battleActive": true,
+        "hud": 6
+      }
+    },
+    {
+      "id": "dizzyFist",
+      "staticGate": "PASS",
+      "reason": "Compact teal upward impact ring clearly centered on target; enemy HUD stays readable and footprint contained.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/dizzyFist-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "dodgeSkill",
+      "staticGate": "PASS",
+      "reason": "Formal HUD text is clearly foreground; green foot stars preserve identity and face/neighbor readability. Prior HUD finding resolved.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/dodgeSkill-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE",
+      "fixtureInvalidHistoricalFinding": {
+        "gate": "FAIL",
+        "reason": "Green triple foot-star/circles are visible but foreground flare crosses own name/level and washes text. Preserve identity while protecting HUD."
+      },
+      "fixtureValidity": "ACTIVE_BATTLE_RECHECK_VALID",
+      "preActiveRecheckFinding": {
+        "gate": "NEEDS_EVIDENCE",
+        "reason": "FIXTURE-INVALID for combat HUD acceptance: replay battleActive=false removed formal detached HUD layer. Prior foreground/HUD conflict cannot establish actual battle defect. Await active+paused battle recheck with hudLayers=1 and detachedHud=6 at hit; preserve art pending valid evidence."
+      },
+      "activeRecheckEvidence": {
+        "video": "artifacts/vfx-active-battle-recheck/skill-video.json",
+        "imagesViewed": [
+          "artifacts/vfx-active-battle-recheck/contact-frames/dodgeSkill-1.png"
+        ],
+        "battleActive": true,
+        "hud": 6
+      }
+    },
+    {
+      "id": "dustStorm",
+      "staticGate": "PASS",
+      "reason": "Earth spire/shards clearly centered on intended target, contained laterally; enemy name/HP remain readable at sampled peak.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/dustStorm-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "earthShield",
+      "staticGate": "PASS",
+      "reason": "Single self shield retains clear name/level/HP/SP under formal layering; outline is contained and identity intact. No need to restore old multi-shield source.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/earthShield-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE",
+      "fixtureInvalidHistoricalFinding": {
+        "gate": "FAIL",
+        "reason": "Single orange shield fits self identity but lower bright ring/star passes through own name/level, making text difficult to read. HP/SP remain visible; do not restore three-shield source."
+      },
+      "fixtureValidity": "ACTIVE_BATTLE_RECHECK_VALID",
+      "preActiveRecheckFinding": {
+        "gate": "NEEDS_EVIDENCE",
+        "reason": "FIXTURE-INVALID for combat HUD acceptance: replay battleActive=false removed formal detached HUD layer. Prior foreground/HUD conflict cannot establish actual battle defect. Await active+paused battle recheck with hudLayers=1 and detachedHud=6 at hit; preserve art pending valid evidence."
+      },
+      "activeRecheckEvidence": {
+        "video": "artifacts/vfx-active-battle-recheck/skill-video.json",
+        "imagesViewed": [
+          "artifacts/vfx-active-battle-recheck/contact-frames/earthShield-1.png"
+        ],
+        "battleActive": true,
+        "hud": 6
+      }
+    },
+    {
+      "id": "flyingSandStrike",
+      "staticGate": "PASS",
+      "reason": "Group rock bursts retain earth identity; all three formal names/levels/HP bars are legible above rocks. Peak actor overlap alone is not rejection.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/flyingSandStrike-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE",
+      "fixtureInvalidHistoricalFinding": {
+        "gate": "FAIL",
+        "reason": "Multi-column rock bursts convey group earth attack, but opaque rocks cover enemy names/levels and central HP bar. This is HUD occlusion rather than transient actor-cover rejection."
+      },
+      "fixtureValidity": "ACTIVE_BATTLE_RECHECK_VALID",
+      "preActiveRecheckFinding": {
+        "gate": "NEEDS_EVIDENCE",
+        "reason": "FIXTURE-INVALID for combat HUD acceptance: replay battleActive=false removed formal detached HUD layer. Prior foreground/HUD conflict cannot establish actual battle defect. Await active+paused battle recheck with hudLayers=1 and detachedHud=6 at hit; preserve art pending valid evidence."
+      },
+      "activeRecheckEvidence": {
+        "video": "artifacts/vfx-active-battle-recheck/skill-video.json",
+        "imagesViewed": [
+          "artifacts/vfx-active-battle-recheck/contact-frames/flyingSandStrike-1.png"
+        ],
+        "battleActive": true,
+        "hud": 6
+      }
+    },
+    {
+      "id": "stealthSkill",
+      "staticGate": "PASS",
+      "reason": "Three translucent teal rings preserve silhouettes and readable resource bars; name/level remain discernible through light. No hard crop visible.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/stealthSkill-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "stoneBreakSky",
+      "staticGate": "PASS",
+      "reason": "Formal left-target name/level and HP are clear above earth beam. Impact identity, lateral footprint and viewport boundaries acceptable.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/stoneBreakSky-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE",
+      "fixtureInvalidHistoricalFinding": {
+        "gate": "FAIL",
+        "reason": "Earth beam/shards convey impact but bright vertical pillar crosses and obscures left enemy name/level. Lateral footprint is contained."
+      },
+      "fixtureValidity": "ACTIVE_BATTLE_RECHECK_VALID",
+      "preActiveRecheckFinding": {
+        "gate": "NEEDS_EVIDENCE",
+        "reason": "FIXTURE-INVALID for combat HUD acceptance: replay battleActive=false removed formal detached HUD layer. Prior foreground/HUD conflict cannot establish actual battle defect. Await active+paused battle recheck with hudLayers=1 and detachedHud=6 at hit; preserve art pending valid evidence."
+      },
+      "activeRecheckEvidence": {
+        "video": "artifacts/vfx-active-battle-recheck/skill-video.json",
+        "imagesViewed": [
+          "artifacts/vfx-active-battle-recheck/contact-frames/stoneBreakSky-1.png"
+        ],
+        "battleActive": true,
+        "hud": 6
+      }
+    },
+    {
+      "id": "stoneSlash",
+      "staticGate": "PASS",
+      "reason": "Sharp diagonal orange slash across rock fragments is recognizable and centered; target HUD readable, no stage crop.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/stoneSlash-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "stormFist",
+      "staticGate": "PASS",
+      "reason": "Compact green-teal burst/star and shards visibly contact target; HUD readable and no hard crop.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/stormFist-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "stormRain",
+      "staticGate": "FAIL",
+      "reason": "Valid active frames 0/1/3 show three narrow lightning columns and contact stars at left-middle gap, center actor, middle-right gap; side actors do not receive visible contact. Names/HP are clear, but group contact alignment is visibly compressed toward center. Preserve three-column identity when correcting.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/stormRain-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE",
+      "preActiveRecheckFinding": {
+        "gate": "NEEDS_EVIDENCE",
+        "reason": "Three lightning contact stars lie at left/middle gap, center target and middle/right gap. Identity/HUD clear but side-target contact coverage is not established by this frame; verify source/target mapping or neighboring sequence before PASS or geometry change."
+      },
+      "activeRecheckEvidence": {
+        "video": "artifacts/vfx-active-battle-recheck/skill-video.json",
+        "imagesViewed": [
+          "artifacts/vfx-active-battle-recheck/contact-frames/stormRain-1.png",
+          "artifacts/vfx-active-battle-recheck/contact-frames/stormRain-0.png",
+          "artifacts/vfx-active-battle-recheck/contact-frames/stormRain-3.png"
+        ],
+        "battleActive": true,
+        "hud": 6
+      }
+    },
+    {
+      "id": "windCrossSlash",
+      "staticGate": "PASS",
+      "reason": "Two crisp green/cyan crossing blades preserve cross-slash identity at target; names/HP remain readable and no viewport cut.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/windCrossSlash-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "windHowlLightning",
+      "staticGate": "PASS",
+      "reason": "Green spiral and blue lightning star are recognizable and centered on target; HUD readable and no viewport crop.",
+      "image": "artifacts/vfx-remaining-hit/contact-frames/windHowlLightning-1.png",
+      "visuallyInspected": true,
+      "dynamicGate": "NEEDS_EVIDENCE",
+      "sustainedPerformanceGate": "NEEDS_EVIDENCE"
+    }
+  ],
+  "limits": [
+    "Recorded logical hit CSS times do not prove screenshot pixels correspond to the same instant. Short cast blank/tail stills need original-video validation.",
+    "Transient ultimate contact covering a target is not by itself a failure when HUD, identity and boundaries remain acceptable.",
+    "FloodBeast boundary finding needs original-frame/source comparison to determine minimum correction; no runtime change is requested from inference alone.",
+    "No continuous motion or sustained performance acceptance is claimed.",
+    "No phone operation/runtime edit/commit performed."
+  ],
+  "initialStaticSummary": {
+    "PASS": 11,
+    "FAIL": 1,
+    "NEEDS_EVIDENCE": 4
+  },
+  "correctedVideoFollowup": {
+    "reviewHead": "ade43a48ce618330055f9add290abb175ef9470d",
+    "evidenceHead": "ade43a48ce618330055f9add290abb175ef9470d",
+    "sourceVideo": "artifacts/vfx-remaining-hit/skill-cycle.mp4",
+    "timing": "artifacts/vfx-remaining-hit/skill-video.json",
+    "frameDirectory": "artifacts/vfx-remaining-hit/contact-frames",
+    "timingCorrection": "Capture Owner corrected recording startup lead approximately .55s; earlier too-early decoded samples are not rejection evidence.",
+    "method": "view_image inspection of original full video contact frames; no continuous playback claim",
+    "limits": [
+      "Most new wind/earth findings inspected phase1 only; sampled static Gate, not full sequence acceptance.",
+      "Revive needs valid dead-target capture.",
+      "HUD failures concern player-visible text/resource obstruction; peak target portrait coverage alone is not a rejection.",
+      "No runtime changes or phone operation."
+    ],
+    "continuous": "NEEDS_EVIDENCE",
+    "sustainedPerformance": "NEEDS_EVIDENCE"
+  },
+  "preFixtureAuditSummary": {
+    "PASS": 21,
+    "FAIL": 7,
+    "NEEDS_EVIDENCE": 2
+  },
+  "hudFixtureAudit": {
+    "reviewHead": "ade43a48ce618330055f9add290abb175ef9470d",
+    "evidence": "artifacts/vfx-remaining-hit/hud-fixture-check.json",
+    "observedFalse": {
+      "stage": 1,
+      "hudLayers": 0,
+      "detachedHud": 0
+    },
+    "observedTrue": {
+      "stage": 1,
+      "hudLayers": 1,
+      "detachedHud": 6
+    },
+    "impact": "Six HUD-only FAIL findings become fixture-invalid NEEDS_EVIDENCE. FloodBeast source boundary FAIL retained, HUD portion withdrawn. Prior PASS composition observations are not promoted into active-battle HUD certification.",
+    "allBatchActualBattleHudGate": "NEEDS_EVIDENCE",
+    "next": "Nine-item active+paused fixture recheck, six detached HUD elements at hit, and revive with valid dead target.",
+    "artChangeAuthorizedByThisReview": false
+  },
+  "preActiveRecheckSummary": {
+    "PASS": 21,
+    "FAIL": 1,
+    "NEEDS_EVIDENCE": 8
+  },
+  "activeBattleFollowup": {
+    "reviewHead": "ade43a48ce618330055f9add290abb175ef9470d",
+    "evidenceHead": "ade43a48ce618330055f9add290abb175ef9470d",
+    "evidence": "artifacts/vfx-active-battle-recheck/skill-video.json",
+    "scope": "Nine affected casts; hit events explicitly battleActive true and HUD6; revive capture has dead target",
+    "hudRecheck": "PASS for readable formal HUD on living targets; revive uses expected dead presentation fade",
+    "remainingVisibleDefects": [
+      "dinghaishenzhen cast location too low",
+      "floodBeast left/bottom hard boundaries",
+      "stormRain outer contacts miss side actors"
+    ],
+    "continuous": "NEEDS_EVIDENCE",
+    "sustainedPerformance": "NEEDS_EVIDENCE",
+    "limits": [
+      "Original full frames visually inspected; sparse samples cannot certify motion smoothness or frame pacing.",
+      "No revive gameplay settlement acceptance claimed.",
+      "No art/runtime/phone mutation; passing cast art should not receive discretionary refinement."
+    ]
+  }
+}

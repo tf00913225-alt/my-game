@@ -1,0 +1,112 @@
+[
+  {
+    "asset": "tools\\vfx-commercial-sample\\assets\\flame-slash.webp",
+    "source": "exec-3fd23b41-e374-4beb-9564-8674575d4c78.png",
+    "size": [
+      1448,
+      1086
+    ],
+    "grid": [
+      4,
+      3
+    ],
+    "cell": [
+      362,
+      362
+    ],
+    "losslessPixelMatch": true,
+    "alphaExtrema": [
+      0,
+      253
+    ],
+    "sha256": "5207c5e3486fbe9fb84f00e82d40465f8de0f26d9579b60a62c0f9f39225fcfe"
+  },
+  {
+    "asset": "tools\\vfx-commercial-sample\\assets\\ice-arrow-rain.webp",
+    "source": "exec-ebfa32e3-1df5-4311-859e-83efc3c05145.png",
+    "size": [
+      1448,
+      1086
+    ],
+    "grid": [
+      4,
+      3
+    ],
+    "cell": [
+      362,
+      362
+    ],
+    "losslessPixelMatch": true,
+    "alphaExtrema": [
+      0,
+      252
+    ],
+    "sha256": "7651389c1a72545adccb004ca48ed276c08a91d1a47ceb80d6dbdc688e835b4e"
+  },
+  {
+    "asset": "tools\\vfx-commercial-sample\\assets\\nine-dragon-fire.webp",
+    "source": "exec-cf8150ae-e5c7-43fe-b27d-6061db12c890.png",
+    "size": [
+      1448,
+      1086
+    ],
+    "grid": [
+      4,
+      3
+    ],
+    "cell": [
+      362,
+      362
+    ],
+    "losslessPixelMatch": true,
+    "alphaExtrema": [
+      0,
+      253
+    ],
+    "sha256": "0ced505fcf7c38d4f8856975481352df985dbe169f35198d5213f43b2111ae6f"
+  },
+  {
+    "asset": "tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp",
+    "source": "exec-46bdda37-9723-4f9f-a10e-a76e89ca99bb.png",
+    "size": [
+      1448,
+      1086
+    ],
+    "grid": [
+      4,
+      3
+    ],
+    "cell": [
+      362,
+      362
+    ],
+    "losslessPixelMatch": true,
+    "alphaExtrema": [
+      0,
+      253
+    ],
+    "sha256": "370de356c8799b55b32120d225aa4ff5dfadad86ec254328125637a23aff57ec"
+  },
+  {
+    "asset": "tools/vfx-commercial-sample/assets/nine-dragon-fire-impact-v3.webp",
+    "source": "exec-3413f9a3-2f09-4510-b2bc-792616c93940.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "grid": [
+      1,
+      1
+    ],
+    "cell": [
+      1254,
+      1254
+    ],
+    "losslessPixelMatch": true,
+    "alphaExtrema": [
+      0,
+      255
+    ],
+    "sha256": "8ef73976fdce19961c3d2e90ddfaa551fbab1a56d61496367bc867db150b2d8f"
+  }
+]

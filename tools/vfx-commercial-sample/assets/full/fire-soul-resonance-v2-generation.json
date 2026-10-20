@@ -1,0 +1,1337 @@
+{
+  "source": "assets/vfx/fire/fire-soul-resonance-cast.webp",
+  "mode": "built-in image_gen edit",
+  "attempts": [
+    {
+      "prompt": "Edit target: the attached fire-soul-resonance-cast.webp sprite sheet. Create a genuinely newly painted high-quality replacement, not a resized copy. Preserve its recognizable FIRE SOUL RESONANCE identity: warm orange-gold concentric energy rings, a tiny incandescent soul core, curving flame tendrils and radiant resonance, no creature or text. Exact layout: 4 columns by 3 rows, TWELVE equal square cells, row-major animation. Canvas aspect 4:3, ideally 1536x1152, every cell 384x384. Transparent RGBA background; no visible grid, no labels, no shadow/backplate, no fog disk. Each cell's entire painted effect must stay inside the central 76% of that cell leaving at least 12% completely transparent padding on all four sides, including the strongest flares. Keep identical center registration in every frame. Smooth progression: frames1-2 tiny glowing core and first thin ring; 3-4 second ring builds with curling flame; 5-6 rings converge around soul core; 7 anticipation compressed luminous ring; FRAME8 is the UNIQUE strongest bright ignition of concentric rings and sharp central gold star, still fully bounded; 9 rings expand slightly with breakup into curved embers; 10 fewer dimmer arcs; 11 sparse small sparks; 12 only a few tiny dying embers. Preserve clear large negative-space holes between rings and between tendrils. Paint crisp detailed warm gold-white filaments with controlled thin orange glow, no broad semi-opaque orange pancake, no huge cloud. Maintain same camera and ring perspective throughout, no abrupt ellipse-to-front-view changes, no cell-to-cell camera zoom. Polished fantasy mobile game raster VFX.",
+      "mother": "C:/Users/User/.codex/generated_images/01a15479-dacf-7941-bc65-e785a5c615f3/exec-42371b04-7462-4e48-be0c-ffd80221ad5a.png"
+    },
+    {
+      "prompt": "Edit target: the attached fire-soul-resonance-cast.webp sprite sheet. Create a genuinely newly painted high-quality replacement, not a resized copy. Preserve its recognizable FIRE SOUL RESONANCE identity: warm orange-gold concentric energy rings, a tiny incandescent soul core, curving flame tendrils and radiant resonance, no creature or text. Exact layout: 4 columns by 3 rows, TWELVE equal square cells, row-major animation. Canvas aspect 4:3, ideally 1536x1152, every cell 384x384. Transparent RGBA background; no visible grid, no labels, no shadow/backplate, no fog disk. Each cell's entire painted effect must stay inside the central 76% of that cell leaving at least 12% completely transparent padding on all four sides, including the strongest flares. Keep identical center registration in every frame. Smooth progression: frames1-2 tiny glowing core and first thin ring; 3-4 second ring builds with curling flame; 5-6 rings converge around soul core; 7 anticipation compressed luminous ring; FRAME8 is the UNIQUE strongest bright ignition of concentric rings and sharp central gold star, still fully bounded; 9 rings expand slightly with breakup into curved embers; 10 fewer dimmer arcs; 11 sparse small sparks; 12 only a few tiny dying embers. Preserve clear large negative-space holes between rings and between tendrils. Paint crisp detailed warm gold-white filaments with controlled thin orange glow, no broad semi-opaque orange pancake, no huge cloud. Maintain same camera and ring perspective throughout, no abrupt ellipse-to-front-view changes, no cell-to-cell camera zoom. Polished fantasy mobile game raster VFX.\nCRITICAL REVISION: The previous result was too similar to the reference and failed padding. Treat reference only as identity guidance, repaint geometry. Every frame must be small enough within its cell; 12% empty transparent margin on each side is mandatory. DELETE the broad orange smoke/cloud disk entirely, so the thin rings enclose visibly empty transparent holes. Show only luminous filament rings and a few small sparks on actual alpha. All 12 centered subjects must have the same safe bounding box maximum 70% cell width and height. Frames9-12 progressively evaporate into sparse arcs and 3-5 tiny sparks, not full clouds. A sparse, sharp circular fire-aura sprite sequence with realistic filament detail. No text or borders.",
+      "mother": "C:/Users/User/.codex/generated_images/01a15479-dacf-7941-bc65-e785a5c615f3/exec-788fd01d-d076-4694-a139-4db89190e70a.png"
+    }
+  ],
+  "selectedAttempt": 2,
+  "grid": {
+    "columns": 4,
+    "rows": 3,
+    "frames": 12,
+    "hitFrame": 8
+  },
+  "status": "NEEDS_ART_FOLLOWUP",
+  "losslessRgbaEqual": true,
+  "output": "tools/vfx-commercial-sample/assets/full/fire-soul-resonance-v2.webp",
+  "size": [
+    1448,
+    1086
+  ],
+  "motherSha256": "24b573f2a3587a24c10f60f9679d81847f3e9f90a4a9f86d03aceb33561c15cd",
+  "outputSha256": "2f1a0fcd31ac4d02a8efe7251d542ca3972d34ea13dbe213258944c6459a48f2",
+  "measurements": [
+    {
+      "mother": "C:/Users/User/.codex/generated_images/01a15479-dacf-7941-bc65-e785a5c615f3/exec-42371b04-7462-4e48-be0c-ffd80221ad5a.png",
+      "size": [
+        1448,
+        1086
+      ],
+      "gridDivisible": true,
+      "cell": [
+        362,
+        362
+      ],
+      "frames": [
+        {
+          "frame": 1,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                123,
+                132,
+                247,
+                257
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.34,
+                0.365,
+                0.318,
+                0.29
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                128,
+                141,
+                230,
+                237
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.354,
+                0.39,
+                0.365,
+                0.345
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                158,
+                166,
+                213,
+                226
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.436,
+                0.459,
+                0.412,
+                0.376
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 2,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                83,
+                109,
+                290,
+                284
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.229,
+                0.301,
+                0.199,
+                0.215
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                89,
+                113,
+                272,
+                277
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.246,
+                0.312,
+                0.249,
+                0.235
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                91,
+                114,
+                269,
+                275
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.251,
+                0.315,
+                0.257,
+                0.24
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 3,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                45,
+                77,
+                327,
+                300
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.124,
+                0.213,
+                0.097,
+                0.171
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                50,
+                82,
+                321,
+                293
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.138,
+                0.227,
+                0.113,
+                0.191
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                52,
+                84,
+                318,
+                291
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.144,
+                0.232,
+                0.122,
+                0.196
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 4,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                22,
+                64,
+                344,
+                312
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.061,
+                0.177,
+                0.05,
+                0.138
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                25,
+                68,
+                337,
+                307
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.069,
+                0.188,
+                0.069,
+                0.152
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                29,
+                71,
+                334,
+                306
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.08,
+                0.196,
+                0.077,
+                0.155
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 5,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                20,
+                27,
+                349,
+                323
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.055,
+                0.075,
+                0.036,
+                0.108
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                25,
+                32,
+                343,
+                318
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.069,
+                0.088,
+                0.052,
+                0.122
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                26,
+                35,
+                339,
+                316
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.072,
+                0.097,
+                0.064,
+                0.127
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 6,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                22,
+                31,
+                345,
+                328
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.061,
+                0.086,
+                0.047,
+                0.094
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                27,
+                41,
+                340,
+                310
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.075,
+                0.113,
+                0.061,
+                0.144
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                29,
+                43,
+                336,
+                307
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.08,
+                0.119,
+                0.072,
+                0.152
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 7,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                9,
+                23,
+                362,
+                338
+              ],
+              "edgeFraction": 0.03522,
+              "paddingFraction": [
+                0.025,
+                0.064,
+                0.0,
+                0.066
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                19,
+                43,
+                362,
+                317
+              ],
+              "edgeFraction": 0.01105,
+              "paddingFraction": [
+                0.052,
+                0.119,
+                0.0,
+                0.124
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                28,
+                57,
+                362,
+                305
+              ],
+              "edgeFraction": 0.00207,
+              "paddingFraction": [
+                0.077,
+                0.157,
+                0.0,
+                0.157
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 8,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                0,
+                7,
+                362,
+                354
+              ],
+              "edgeFraction": 0.05318,
+              "paddingFraction": [
+                0.0,
+                0.019,
+                0.0,
+                0.022
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                0,
+                25,
+                362,
+                344
+              ],
+              "edgeFraction": 0.01381,
+              "paddingFraction": [
+                0.0,
+                0.069,
+                0.0,
+                0.05
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                0,
+                30,
+                352,
+                330
+              ],
+              "edgeFraction": 0.00414,
+              "paddingFraction": [
+                0.0,
+                0.083,
+                0.028,
+                0.088
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 9,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                17,
+                22,
+                356,
+                306
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.047,
+                0.061,
+                0.017,
+                0.155
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                24,
+                27,
+                350,
+                299
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.066,
+                0.075,
+                0.033,
+                0.174
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                27,
+                31,
+                347,
+                297
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.075,
+                0.086,
+                0.041,
+                0.18
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 10,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                40,
+                33,
+                328,
+                292
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.11,
+                0.091,
+                0.094,
+                0.193
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                47,
+                38,
+                323,
+                283
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.13,
+                0.105,
+                0.108,
+                0.218
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                51,
+                39,
+                320,
+                280
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.141,
+                0.108,
+                0.116,
+                0.227
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 11,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                75,
+                55,
+                315,
+                296
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.207,
+                0.152,
+                0.13,
+                0.182
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                81,
+                60,
+                308,
+                289
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.224,
+                0.166,
+                0.149,
+                0.202
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                84,
+                63,
+                305,
+                286
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.232,
+                0.174,
+                0.157,
+                0.21
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 12,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                72,
+                68,
+                288,
+                281
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.199,
+                0.188,
+                0.204,
+                0.224
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                77,
+                72,
+                282,
+                277
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.213,
+                0.199,
+                0.221,
+                0.235
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                79,
+                75,
+                281,
+                274
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.218,
+                0.207,
+                0.224,
+                0.243
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mother": "C:/Users/User/.codex/generated_images/01a15479-dacf-7941-bc65-e785a5c615f3/exec-788fd01d-d076-4694-a139-4db89190e70a.png",
+      "size": [
+        1448,
+        1086
+      ],
+      "gridDivisible": true,
+      "cell": [
+        362,
+        362
+      ],
+      "frames": [
+        {
+          "frame": 1,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                146,
+                155,
+                237,
+                245
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.403,
+                0.428,
+                0.345,
+                0.323
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                159,
+                166,
+                225,
+                234
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.439,
+                0.459,
+                0.378,
+                0.354
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                165,
+                174,
+                215,
+                227
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.456,
+                0.481,
+                0.406,
+                0.373
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 2,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                92,
+                131,
+                276,
+                264
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.254,
+                0.362,
+                0.238,
+                0.271
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                95,
+                139,
+                268,
+                260
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.262,
+                0.384,
+                0.26,
+                0.282
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                104,
+                152,
+                266,
+                256
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.287,
+                0.42,
+                0.265,
+                0.293
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 3,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                52,
+                102,
+                309,
+                298
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.144,
+                0.282,
+                0.146,
+                0.177
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                58,
+                106,
+                305,
+                292
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.16,
+                0.293,
+                0.157,
+                0.193
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                60,
+                108,
+                303,
+                290
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.166,
+                0.298,
+                0.163,
+                0.199
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 4,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                39,
+                66,
+                316,
+                323
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.108,
+                0.182,
+                0.127,
+                0.108
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                44,
+                72,
+                313,
+                318
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.122,
+                0.199,
+                0.135,
+                0.122
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                47,
+                75,
+                311,
+                315
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.13,
+                0.207,
+                0.141,
+                0.13
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 5,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                57,
+                65,
+                337,
+                315
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.157,
+                0.18,
+                0.069,
+                0.13
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                60,
+                70,
+                331,
+                307
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.166,
+                0.193,
+                0.086,
+                0.152
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                61,
+                72,
+                328,
+                304
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.169,
+                0.199,
+                0.094,
+                0.16
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 6,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                58,
+                71,
+                317,
+                302
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.16,
+                0.196,
+                0.124,
+                0.166
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                62,
+                76,
+                313,
+                295
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.171,
+                0.21,
+                0.135,
+                0.185
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                65,
+                77,
+                311,
+                292
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.18,
+                0.213,
+                0.141,
+                0.193
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 7,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                32,
+                34,
+                334,
+                332
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.088,
+                0.094,
+                0.077,
+                0.083
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                43,
+                49,
+                323,
+                319
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.119,
+                0.135,
+                0.108,
+                0.119
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                51,
+                57,
+                316,
+                309
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.141,
+                0.157,
+                0.127,
+                0.146
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 8,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                4,
+                26,
+                351,
+                355
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.011,
+                0.072,
+                0.03,
+                0.019
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                12,
+                34,
+                346,
+                344
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.033,
+                0.094,
+                0.044,
+                0.05
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                20,
+                42,
+                342,
+                336
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.055,
+                0.116,
+                0.055,
+                0.072
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 9,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                50,
+                29,
+                340,
+                293
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.138,
+                0.08,
+                0.061,
+                0.191
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                56,
+                36,
+                337,
+                285
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.155,
+                0.099,
+                0.069,
+                0.213
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                58,
+                38,
+                335,
+                283
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.16,
+                0.105,
+                0.075,
+                0.218
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 10,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                72,
+                59,
+                312,
+                277
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.199,
+                0.163,
+                0.138,
+                0.235
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                76,
+                65,
+                304,
+                268
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.21,
+                0.18,
+                0.16,
+                0.26
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                80,
+                68,
+                301,
+                266
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.221,
+                0.188,
+                0.169,
+                0.265
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 11,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                71,
+                94,
+                306,
+                260
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.196,
+                0.26,
+                0.155,
+                0.282
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                77,
+                99,
+                302,
+                252
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.213,
+                0.273,
+                0.166,
+                0.304
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                79,
+                104,
+                297,
+                250
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.218,
+                0.287,
+                0.18,
+                0.309
+              ]
+            }
+          ]
+        },
+        {
+          "frame": 12,
+          "alpha": [
+            {
+              "threshold": 16,
+              "bbox": [
+                109,
+                104,
+                230,
+                244
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.301,
+                0.287,
+                0.365,
+                0.326
+              ]
+            },
+            {
+              "threshold": 64,
+              "bbox": [
+                115,
+                109,
+                223,
+                235
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.318,
+                0.301,
+                0.384,
+                0.351
+              ]
+            },
+            {
+              "threshold": 128,
+              "bbox": [
+                117,
+                112,
+                220,
+                234
+              ],
+              "edgeFraction": 0.0,
+              "paddingFraction": [
+                0.323,
+                0.309,
+                0.392,
+                0.354
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "selfReview": [
+    "Both generated edits preserve ring/core identity but fail requested fully bounded padding, particularly hit frame 8 and later rings.",
+    "Generated edits retain broad orange cloud discs and abrupt elliptical-to-front-facing ring changes rather than the requested newly painted sparse filaments.",
+    "No runtime/manifest change made. Two-attempt limit reached; candidate is evidence only and must not be marked accepted."
+  ]
+}

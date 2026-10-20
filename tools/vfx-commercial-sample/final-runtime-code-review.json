@@ -1,0 +1,64 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewRange": {
+    "base": "05ada0906a6b7ade6789108bffa2901ebc9643c7",
+    "head": "067fa105ad14964ed265de5f871fef341e990570"
+  },
+  "scope": [
+    "js/39-v143-skill-animation.js",
+    "css/40-v143-combat-dungeon-polish.css",
+    "js/54-v173.51-battle-qa.js"
+  ],
+  "mode": "read-only-static-code-review",
+  "findings": [],
+  "conclusion": "No concrete blocking code defect identified within this diff and the inspected surrounding owner functions. This does not certify commercial art, device timing or performance.",
+  "checks": [
+    {
+      "area": "Bounded RAF and dispose",
+      "evidence": "requestCastTimeline.start guards state.current identity/current.done before manipulating animations or arming timers. Nested RAF eventually calls settleTargetVisual, which repeats both guards. director.dispose clears managed timers, marks/cleans current, and removes stage/statuses; late RAF cannot invoke stale hit callbacks.",
+      "limitation": "RAF IDs are not cancelled, so a bounded queued callback can still execute and return; this is not a continuous loop or stale DOM mutation."
+    },
+    {
+      "area": "Callback queue and cleanup",
+      "evidence": "queueTargetHit requires matching side and emitted target for non-impact casts; callbacks are separated into projection then feedback. settleTargetVisual deletes queued callbacks before invoking and syncs statuses/HUD in between. cleanupCurrent clears hitCallbacks and associated pendingUpdateKeys, preventing cancelled cast projection keys from blocking subsequent updates.",
+      "limitation": "Natural cleanup under severely delayed/throttled rendering drops unpresented callbacks; foreground timing/fallback behaviour still needs device observation. No gameplay writes were introduced in this diff."
+    },
+    {
+      "area": "Target authority and art fitting",
+      "evidence": "render continues to resolve contracted targetSide/targetType and canonical initialTargetIndexes. fitRangeArt only changes raster node dimensions/art centre and diagnostic datasets; it does not write formal targets, damage, status chance or target data. Group placement uses canonical bounds while projectiles retain primary-anchor destination.",
+      "limitation": "Bounds fitting and optional artwork recentering can change visual recipient coverage; edge-primary, column/tri, all and one-survivor phone cases remain required."
+    },
+    {
+      "area": "Status lifecycle",
+      "evidence": "Changed status data is rage source only; dimensions and pulse envelope are presentation changes. Existing hasTimedEffect/deferredStatusDuringCast, two-second rotating layer, fixed hard-control base, alive checks, cleanup and intentional noVisual remain in original owner. No new turnsLeft mutation or duration consumer was added.",
+      "limitation": "Visual-input expiry/cleanse samples are not a formal round-end duration-owner retest."
+    },
+    {
+      "area": "HUD detach and restoration",
+      "evidence": "js54 syncHud now detaches existing HUD during any raster skill stage as well as hit overlay. Existing clearUnitHud restores original HUD node to connected card, clears projection styles and removes empty detached layer. V143 cleanup removes skill stage then syncHud; dispose invokes clearHud before cleanup.",
+      "limitation": "Rebuild/death/battle-end and simultaneous terminal-hit HUD restoration require the existing phone/targeted regression evidence; static inspection cannot prove rendered z-order."
+    },
+    {
+      "area": "CSS",
+      "evidence": "Raster opacity tail now fades after66.666667percent. Status pulse minimum.58 avoids disappearing auras. Detached HUD selector includes native HUD layer with34 fallback. Stun transform only changes its body; agilityDown/defenseDown contrast targets icons only.",
+      "limitation": "Fade cannot fix source-frame registration jumps or clipped art. Stun head alignment and24px contrast remain visual acceptance items."
+    }
+  ],
+  "verificationPerformed": [
+    "Read exact base-to-head diff for only three requested files.",
+    "Inspected setTimer/clearTimers,requestCastTimeline,requestImpactTimeline,beginVisualTimeline,settleTargetVisual,cleanupCurrent,director.dispose,queueTargetHit,scheduleStatusOwnedUiUpdate.",
+    "Inspected placeSprite/fitRangeArt, render target-contract selection,status sync/rotation/removal, js54 prepareUnitHud/clearUnitHud/syncHud and changed CSS."
+  ],
+  "notPerformed": [
+    "No new test suite run by this reviewer.",
+    "No USB control or new screenshot capture.",
+    "No save/auth/economy or unrelated-module audit."
+  ],
+  "requiredRemainingDeviceConditions": [
+    "Latest-head candidate playback verifies hit frame and floating feedback before stage cleanup.",
+    "Dispose/supersede/page-hidden during pending first RAF and nested hit RAF must leave no old impact/status/HUD.",
+    "All44 active skills and21 statuses need current-source visual judgement rather than reusing older screenshot acceptance.",
+    "Long frames in screenshot-driven traces do not alone establish real sustained gameplay performance."
+  ],
+  "commercialAcceptance": "not-claimed"
+}

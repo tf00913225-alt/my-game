@@ -1,0 +1,158 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "20ecbf97248aa2f264db72e2abea4613932af3a1",
+  "reviewScope": "Status batching code review and completed untraced physical-device soak; no runtime, test or source modifications in this review.",
+  "device": "SM-N960F Android 10 physical USB Chrome",
+  "origin": "http://127.0.0.1:50058/index.html",
+  "loadedRuntime": {
+    "inMemoryBatchedStatusOwner": true,
+    "bundles": [
+      {
+        "url": "http://127.0.0.1:50058/build/gameplay-core-primary.84e0e97e1d75.js",
+        "sha256": "84e0e97e1d752468b0e05b1e2dd932bff55260de00c9f410d05f54130313b313",
+        "workspaceSHA256": "84e0e97e1d752468b0e05b1e2dd932bff55260de00c9f410d05f54130313b313",
+        "match": true
+      },
+      {
+        "url": "http://127.0.0.1:50058/build/gameplay-core-secondary.02d4748d671c.js",
+        "sha256": "02d4748d671c4ba60755fecc904846e61035feafbfe3f4da62062d0689a22002",
+        "workspaceSHA256": "02d4748d671c4ba60755fecc904846e61035feafbfe3f4da62062d0689a22002",
+        "match": true
+      }
+    ],
+    "fingerprintMethod": "In-memory exported sync function contains readStatusPresentation; actual resource URLs and fetched bundle SHA256 equal the current committed workspace bundle bytes."
+  },
+  "untracedSoak": {
+    "evidence": "artifacts/vfx-status-batched-soak/evidence.json",
+    "warmupMs": 23000,
+    "durationMs": 30052.600000023842,
+    "units": 6,
+    "types": [
+      "rage",
+      "shield",
+      "earthShield",
+      "rockWall",
+      "barrier",
+      "yuanZuBlessing",
+      "fireSoulResonance",
+      "bloodBurn",
+      "dodgeSkill",
+      "dinghaishenzhen",
+      "burn",
+      "freeze",
+      "agilityDown",
+      "damageDown",
+      "defenseDown",
+      "frostbite",
+      "phoenixMight"
+    ],
+    "before": {
+      "body": 12,
+      "icons": 30
+    },
+    "all12SnapshotsMaintain12Body30Icons": true,
+    "summaryMs": {
+      "p50": 16.70000000001164,
+      "p95": 33.40000000002328,
+      "p99": 50.20000000001164,
+      "max": 150.5,
+      "longTaskCount": 6,
+      "longTaskTotalMs": 391
+    },
+    "longTasks": [
+      {
+        "at": 6113.5,
+        "duration": 51
+      },
+      {
+        "at": 8100.100000023842,
+        "duration": 50
+      },
+      {
+        "at": 12102.700000017881,
+        "duration": 50
+      },
+      {
+        "at": 13105.800000011921,
+        "duration": 50
+      },
+      {
+        "at": 28106.20000001788,
+        "duration": 51
+      },
+      {
+        "at": 29358.600000023842,
+        "duration": 139
+      }
+    ],
+    "cleanup": {
+      "battleActive": false,
+      "body": 0,
+      "icons": 0
+    },
+    "measurementControls": "No tracing, CPU profiler, recording or screenshots during measured interval; images decoded and full mixed rotation warmed for 23 seconds."
+  },
+  "historicalComparison": {
+    "evidence": "artifacts/vfx-status-soak/evidence.json",
+    "head": "ade43a48ce618330055f9add290abb175ef9470d",
+    "durationMs": 30692.59999999404,
+    "longTaskCount": 35,
+    "longTaskTotalMs": 5955,
+    "p99Ms": 200.5,
+    "maxMs": 601.2000000001863,
+    "firstRafIntervalMs": 601.2000000001863,
+    "maxExcludingFirstMs": 467.6000000005588,
+    "limitations": "Historical old soak and new warm soak are separate bounded runs, not a randomized matched trial. Old max601.2ms is the first RAF interval and may include startup contamination; do not claim its entire reduction as a batching-only effect. Status owner unchanged between historical ade43a48 and b1ede88d; batched fix is in20ec."
+  },
+  "priorCpuEvidence": {
+    "evidence": "artifacts/vfx-status-profile/analysis.json",
+    "trace": "artifacts/vfx-status-profile/status-trace.json",
+    "finding": "Warm mixed rotation forced style/layout in geometryRectForSlot -> unitGeometry -> syncStatusVisualsForUnit and targetGeometry -> slotAnchor -> syncStatusVisual after body DOM mutations. Same12body30icon fixed-state control had no longtasks/forced stacks.",
+    "newTraceStatus": "pending-not-obtained",
+    "newForcedStacksAbsentClaim": false
+  },
+  "remaining139ms": {
+    "task": {
+      "at": 29358.600000023842,
+      "duration": 139
+    },
+    "attribution": "Unattributed: longtask observer has timestamps and durations but no stack. A later trace cannot retrospectively identify this earlier task.",
+    "requiredFollowup": "When USB authority is restored, collect a separate bounded trace on the identified new runtime; keep tracing separate from acceptance soak."
+  },
+  "additionalQaLimits": {
+    "trace": "Not obtained: first launch hit automatic permission-review deadline; subsequent USB reconnection was reported unauthorized by root. This is not an unsafe-action rejection. No further phone actions or soak retries performed.",
+    "mixedDensityScreenshot": "Pending; no screenshot obtained after completed soak cleanup. Do not rerun soak just for a screenshot.",
+    "deviceRelease": "Completed soak finally cleared statuses, disposed director, released pause lock and set battleActive=false, body0/icons0. No active profiling session or pause lock remains from this agent."
+  },
+  "statusBatchingDiffReview": {
+    "base": "b1ede88d7c61e290f4f09933f1043d0bee981800",
+    "head": "20ecbf97248aa2f264db72e2abea4613932af3a1",
+    "readBeforeWrite": "syncStatusVisualEffects collects every unit readStatusPresentation snapshot before purgeLegacyCardVfx and before syncStatusVisualsForUnit DOM mutations. Single-unit notifications also prepare snapshot before writing.",
+    "snapshotContents": [
+      "entity/card",
+      "active base and rotating body types",
+      "formal getUnitGeometry projection",
+      "formal slotAnchor",
+      "card bounding rectangle"
+    ],
+    "writePath": "syncStatusVisual and placeStatusBodyVisual consume the same unit snapshot; neither performs slotAnchor/getBoundingClientRect after append. No persistent geometry cache or second geometry authority added.",
+    "statusProfileAndSourceAndOpacityBlockByteEqual": true,
+    "twoSecondTimerBlockByteEqual": true,
+    "cleanupBlockByteEqual": true,
+    "nodePoolIntroduced": false,
+    "shapeDensityReduction": false,
+    "risk": "Legacy purge now follows geometry pre-read; normal governed path has no legacy nodes. If obsolete legacy effects unexpectedly change layout when purged, that abnormal path may need a subsequent snapshot. No observed blocker in completed soak.",
+    "focusedTests": "Root reports12focused suites passed; this review did not rerun them."
+  },
+  "decision": {
+    "status": "Marked improvement with required workload preserved; batching code review accepted.",
+    "noStutterClaim": false,
+    "allPerformancePass": false,
+    "commercialCompletion": false,
+    "pending": [
+      "Separate post-fix CPUtrace to verify prior forced stacks are gone",
+      "Attribution if139ms-class residual longtask reproduces",
+      "Mixed-density HUD screenshot after USB reauthorization"
+    ]
+  }
+}

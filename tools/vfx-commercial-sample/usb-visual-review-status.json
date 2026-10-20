@@ -1,0 +1,286 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+  "scope": "All21 formal status USB screenshots; no runtime/source edits.",
+  "counts": {
+    "reviewedStatusScreenshots": 21,
+    "needsVisualFix": 2,
+    "needsHudContrastTuning": 2,
+    "intentionalHardControlRetained": 2,
+    "intentionalNoneRetained": 2
+  },
+  "visualInputs": {
+    "lifecyclePath": "artifacts/vfx-full/status-lifecycle.json",
+    "sha256": "b3d1b27155478a3ac9da8844b42f6e257ffcb8deab0dc50c1aaeb258983e021b",
+    "observedRecords": {
+      "first": [
+        {
+          "type": "rage",
+          "opacity": "0.627269"
+        },
+        {
+          "type": "freeze",
+          "opacity": "0.94"
+        }
+      ],
+      "rotated": [
+        {
+          "type": "freeze",
+          "opacity": "0.94"
+        },
+        {
+          "type": "shield",
+          "opacity": "0.9"
+        }
+      ],
+      "enemy": 1,
+      "icons": [
+        {
+          "width": "24px",
+          "height": "24px",
+          "z": "34"
+        }
+      ],
+      "cleansed": [
+        {
+          "type": "rage",
+          "opacity": "0.63457"
+        }
+      ],
+      "expired": [],
+      "dead": [],
+      "revived": [
+        {
+          "type": "shield",
+          "opacity": "0.9"
+        }
+      ],
+      "remaining": 0
+    },
+    "interpretation": "Provided visual records show freeze retained while rotating rage changes to shield; enemy visual exists; icon reports24px/24px,z34; cleanse/expired/dead/revived/remaining samples exist. This is visual input, not independent formal duration-owner retest or proof of every status-specific gameplay duration."
+  },
+  "priorities": [
+    "Replace old rage body only after independent candidate acceptance and device comparison.",
+    "Calibrate stun body to preserve actor identity.",
+    "Improve agilityDown/defenseDown HUD silhouette contrast.",
+    "Retain other art unless concrete runtime evidence justifies tuning."
+  ],
+  "rows": [
+    {
+      "id": "burn",
+      "screenshot": "artifacts/vfx-full/status-burn.png",
+      "sha256": "1798e48375e6e2785fede931c42704533ca12accf8c2432413d7e1cf0b690dc5",
+      "visualReview": "view_image-observed",
+      "decision": "retain-current-art",
+      "observation": "Open flame U-frame leaves face/torso visible; name and HP/SP remain above lower flame.",
+      "next": "No redraw justified.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "rage",
+      "screenshot": "artifacts/vfx-full/status-rage.png",
+      "sha256": "86125b7f32f945fa725808dbee359bf0168b560f9ad534f7cbda3f3cba177842",
+      "visualReview": "view_image-observed",
+      "decision": "needs-visual-fix",
+      "observation": "Old solid angry-fire face almost completely replaces central actor artwork, though name/HP/SP are readable.",
+      "next": "Review open-centre rage-status candidate independently and repeat device comparison; no automatic adoption.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "frostbite",
+      "screenshot": "artifacts/vfx-full/status-frostbite.png",
+      "sha256": "2aefa169b228da9c252f218bcbc7dd7fa5fba990daae8176dc3bbcd4d84fd0f2",
+      "visualReview": "view_image-observed",
+      "decision": "retain-current-art",
+      "observation": "Broken blue snowflake clearly visible near feet; actor and HUD remain clear.",
+      "next": "Keep HUD-only; no body aura needed.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "freeze",
+      "screenshot": "artifacts/vfx-full/status-freeze.png",
+      "sha256": "37da1c9b3717490cf7fdad50afc213c309aebaa54ebeb0ad0aa001e847e66a02",
+      "visualReview": "view_image-observed",
+      "decision": "retain-intended-hard-control",
+      "observation": "Opaque blue prism intentionally encases actor; distinct hard-control identity; name/level,HP/SP and adjacent actors readable.",
+      "next": "Preserve fixed base; encasement itself is not a failure.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "agilityDown",
+      "screenshot": "artifacts/vfx-full/status-agilityDown.png",
+      "sha256": "6e3c1b615e19c538c1b17292b9ebe891bcffcb55ba7cae82b13192df7e1eb069",
+      "visualReview": "view_image-observed",
+      "decision": "needs-hud-contrast-tuning",
+      "observation": "Small black boot at feet has low silhouette contrast against dark artwork/floor; red downward arrow reads better.",
+      "next": "Tune original HUD outline/backing contrast at actual24px before regenerating art.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "damageDown",
+      "screenshot": "artifacts/vfx-full/status-damageDown.png",
+      "sha256": "a18aa3ac5d0787ed6605487f8a35ab085e851cefa72d1b6ed1ee50404156202a",
+      "visualReview": "view_image-observed",
+      "decision": "retain-current-art",
+      "observation": "Teal cracked wind blade and red arrow recognisable near feet; actor/HUD clear.",
+      "next": "Retain and verify differences within combined HUD row.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "stun",
+      "screenshot": "artifacts/vfx-full/status-stun.png",
+      "sha256": "5604c20bf487e020eef0981c58b6d73691beef4a4841d8ad9e7811b99c0382c8",
+      "visualReview": "view_image-observed",
+      "decision": "needs-visual-fix",
+      "observation": "Large gold stars and full-height spiral cross head/chest and cover substantial actor detail. HP/SP remain clear.",
+      "next": "Tune stun-specific footprint/placement through original owner toward compact head-area emphasis; no blanket all-status shrink.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "dodgeSkill",
+      "screenshot": "artifacts/vfx-full/status-dodgeSkill.png",
+      "sha256": "834f319301ec2ae0ee69fffd08568c305df90e48590853d3eafbaea7fbbb8c00",
+      "visualReview": "view_image-observed",
+      "decision": "retain-current-art",
+      "observation": "Green wisps frame actor with open centre; face/torso and neighbours visible.",
+      "next": "Retain; check minimum pulse on brighter battlefield if needed.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "stealthSkill",
+      "screenshot": "artifacts/vfx-full/status-stealthSkill.png",
+      "sha256": "a746a20ae5a985957bf6d86485a70254c96aba8a8a3303d4f971e6e8f6dbfaac",
+      "visualReview": "view_image-observed",
+      "decision": "retain-intentional-none",
+      "observation": "Central artwork translucent while name/HP/SP stay opaque; no extra aura.",
+      "next": "Preserve explicit no-body/no-HUD convention.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "dinghaishenzhen",
+      "screenshot": "artifacts/vfx-full/status-dinghaishenzhen.png",
+      "sha256": "dc6e6971e4919d090f588c5fdc6a660c038e50859b226a0024533b376a6f4a53",
+      "visualReview": "view_image-observed",
+      "decision": "retain-current-art",
+      "observation": "Pale blue cloud wisps leave actor centre open; face/torso and resources clear.",
+      "next": "Retain; context contrast follow-up only.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "defenseDown",
+      "screenshot": "artifacts/vfx-full/status-defenseDown.png",
+      "sha256": "b56b5b5144ac4cbc37f4e71a53892c380319892749e5bd5778592e3f08aa25a4",
+      "visualReview": "view_image-observed",
+      "decision": "needs-hud-contrast-tuning",
+      "observation": "Small dark cracked shield at feet is harder to distinguish than its red down arrow.",
+      "next": "Tune same original HUD contrast treatment as agilityDown; no body effect needed.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "shield",
+      "screenshot": "artifacts/vfx-full/status-shield.png",
+      "sha256": "608282705888df01d191514902e2d4e90a92faee38d7b4ad6e726aa481343040",
+      "visualReview": "view_image-observed",
+      "decision": "retain-current-art",
+      "observation": "Pale gold shell has open middle and retains actor/HUD readability.",
+      "next": "Retain; perimeter behind HUD does not cover foreground text in this still.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "petrify",
+      "screenshot": "artifacts/vfx-full/status-petrify.png",
+      "sha256": "ba0afbdc0a495fcd58e36a2b04699709fd5b659d6f017827088fc6d7af0fe1bf",
+      "visualReview": "view_image-observed",
+      "decision": "retain-intended-hard-control",
+      "observation": "Solid tan prism intentionally covers actor; distinct from freeze; name/HP/SP readable.",
+      "next": "Keep encasement semantics; do not reduce opacity simply to reveal actor.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "earthShield",
+      "screenshot": "artifacts/vfx-full/status-earthShield.png",
+      "sha256": "5a476d7abed9885eaeec3d46d4224b63360ca3ce65eb7be7f831e621439a7b61",
+      "visualReview": "view_image-observed",
+      "decision": "retain-with-density-watch",
+      "observation": "Broad multielement stone ring leaves centre open; upper seal near head; actor,neighbours,name/resources readable.",
+      "next": "Retain source; tune footprint only if crowded battle evidence shows conflict.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "rockWall",
+      "screenshot": "artifacts/vfx-full/status-rockWall.png",
+      "sha256": "e4c9481b72b52b475eeb730d3bbc7664d58de14682b210bcd18d156333c3b7c7",
+      "visualReview": "view_image-observed",
+      "decision": "retain-with-density-watch",
+      "observation": "Thick runed rock pillars frame actor; centre and neighbouring actors remain clear; side mass substantial.",
+      "next": "Retain source; crowded-slot pulse maximum may justify bounds calibration.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "barrier",
+      "screenshot": "artifacts/vfx-full/status-barrier.png",
+      "sha256": "c182593bae372a2de48c3a6befc85a7e35c0005d510f366f3047005727441297",
+      "visualReview": "view_image-observed",
+      "decision": "retain-current-art",
+      "observation": "Golden rune panels frame actor; centre open; base ring behind name/resources without covering text.",
+      "next": "Retain; decorative runes need not be text-readable.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "yuanZuBlessing",
+      "screenshot": "artifacts/vfx-full/status-yuanZuBlessing.png",
+      "sha256": "b9b97adfc745653d0ba297533f40be14406633da3e4995d9916f27cfea109625",
+      "visualReview": "view_image-observed",
+      "decision": "retain-current-art",
+      "observation": "Soft gold white support frame leaves centre open and actor/HUD clear; distinct from rigid barrier panels.",
+      "next": "No replacement justified by this view.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "fireMomentum",
+      "screenshot": "artifacts/vfx-full/status-fireMomentum.png",
+      "sha256": "4b6f2a841a0d07bca47b82d6c6f48aaf26ef03b292d4c5f4eda698d981a0bb83",
+      "visualReview": "view_image-observed",
+      "decision": "retain-intentional-none",
+      "observation": "Actor unchanged with no extra aura/icon, consistent with explicit no-visual intent.",
+      "next": "Do not invent body effect.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "phoenixMight",
+      "screenshot": "artifacts/vfx-full/status-phoenixMight.png",
+      "sha256": "98c0c769c04ce5b03fd7956ddfb156b4d485db3574fb962d826f5ab177e3870b",
+      "visualReview": "view_image-observed",
+      "decision": "retain-current-art",
+      "observation": "Small phoenix emblem visible at feet; actor/HUD clear, though similar red colour to actor art.",
+      "next": "Retain; mixed HUD contrast watch only.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "fireSoulResonance",
+      "screenshot": "artifacts/vfx-full/status-fireSoulResonance.png",
+      "sha256": "8a95e75cfe4f5f4828787f1c774ced250e0d4f805630bab84ea3581502faa6e8",
+      "visualReview": "view_image-observed",
+      "decision": "retain-with-density-watch",
+      "observation": "Fire wreath frames actor; central small sigil overlaps lower torso but face remains clear. Wreath/crests distinguish it from burn.",
+      "next": "Retain body source; rejected cast-sheet candidate is separate. Recheck stacked status density.",
+      "scope": "One supplied USB still only"
+    },
+    {
+      "id": "bloodBurn",
+      "screenshot": "artifacts/vfx-full/status-bloodBurn.png",
+      "sha256": "23a883d4099fbbcaea20bea0980cb8bf472461f811cf7e633d4ccc09a7ca86ad",
+      "visualReview": "view_image-observed",
+      "decision": "retain-current-art",
+      "observation": "Dark red angular frame distinct from orange burn; face/torso,name and HP/SP clear.",
+      "next": "Retain; minimum-pulse contrast on darker background may need context check.",
+      "scope": "One supplied USB still only"
+    }
+  ],
+  "limits": [
+    "No blanket commercial-readiness pass.",
+    "Freeze/petrify encasement is intended, not failure.",
+    "No automatic adoption of any new candidate.",
+    "No USB commands or duration-owner retesting performed by reviewer."
+  ]
+}

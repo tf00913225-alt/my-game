@@ -1,0 +1,141 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewDate": "2026-10-20",
+  "scope": "Source-only independent art/alpha gate. Runtime unchanged; no phone operations. All three candidate WebPs and original cast sheets viewed; generation metadata read and conversion equality independently reproduced.",
+  "qualityClaim": "Source candidate gate only; no commercial or phone acceptance.",
+  "measurement": {
+    "dimensions": [
+      2172,
+      724
+    ],
+    "grid": [
+      4,
+      3
+    ],
+    "nominalCell": [
+      543,
+      241.33333333333334
+    ],
+    "integerInspectionCell": [
+      543,
+      241
+    ],
+    "rowRemainder": 1,
+    "method": "Pillow RGBA + NumPy. Compared full decoded candidate array to generation PNG array. Inspected all four edges of each 543x241 partition, plus outer row723 and adjacent internal boundary rows/columns. Alpha mass is sum(alpha)/255.",
+    "alpha8EdgeCountsAll36Frames": 0,
+    "losslessRgbaEqualAll": true,
+    "nonDivisibleHeightNote": "724 is not divisible by 3; fractional source-row stepping requires existing renderer behavior. This is recorded, not independently treated as a visual failure, because boundary-adjacent pixels remain below alpha8."
+  },
+  "statuses": [
+    {
+      "id": "stormFlurry",
+      "candidate": "tools/vfx-commercial-sample/assets/full/storm-flurry-wide-v1.webp",
+      "original": "assets/vfx/wind/storm-flurry-cast.png",
+      "classification": "REJECT_SOURCE_IDENTITY",
+      "usbAllowed": false,
+      "alpha": {
+        "allFrameEdgeAlpha8Count": 0,
+        "maxEdgeAlpha": 1
+      },
+      "sequence": {
+        "alphaMassFrames": [
+          3080,
+          4650,
+          10874,
+          17143,
+          24915,
+          28477,
+          33259,
+          33133,
+          20680,
+          12459,
+          8232,
+          4004
+        ],
+        "peakFrame": 7,
+        "lastToPeakRatio": 0.1204,
+        "assessment": "Frame7 crisp stars align with intended hit; strong growth and declining tail exist, though frame12 still has three visible shapes."
+      },
+      "identity": "Original includes recognizably clenched wind fists and rapid directional multi-hit strikes. Candidate replaces them with three broad leafy spirals; fist silhouettes and directional fist barrage are absent. Shape family becomes close to stormCircle. This is a concrete loss of skill identity, not a padding or style preference.",
+      "minimumNext": "Preserve three separate wide sites but restore readable wind fist silhouettes / repeated strike motion. Do not compensate with group scale or geometry."
+    },
+    {
+      "id": "stormCircle",
+      "candidate": "tools/vfx-commercial-sample/assets/full/storm-circle-wide-v1.webp",
+      "original": "assets/vfx/wind/storm-circle-cast.png",
+      "classification": "SOURCE_CANDIDATE_USB_ALLOWED",
+      "usbAllowed": true,
+      "alpha": {
+        "allFrameEdgeAlpha8Count": 0,
+        "maxEdgeAlpha": 1
+      },
+      "sequence": {
+        "alphaMassFrames": [
+          3393,
+          6237,
+          13443,
+          19198,
+          26653,
+          29011,
+          30690,
+          27897,
+          20816,
+          11454,
+          6438,
+          2824
+        ],
+        "peakFrame": 7,
+        "lastToPeakRatio": 0.092,
+        "assessment": "Three tilted circular wind sites grow, show sharp frame7 contact stars and taper to small rings by frame12. Circular/open-core wind motif remains."
+      },
+      "identity": "Circular jade/white slicing rings and swirling wind remain recognizable as circular wind formation. More horizontal composition is compatible with wide target row.",
+      "usbChecks": [
+        "At actual fitted size, verify three target sites remain distinguishable and ring details do not become generic green pads.",
+        "Inspect peak frames5-8 for actor/HUD obstruction and final tail for hard pop.",
+        "Do not enlarge group geometry to force source width."
+      ]
+    },
+    {
+      "id": "explosiveFlurry",
+      "candidate": "tools/vfx-commercial-sample/assets/full/explosive-flurry-wide-v1.webp",
+      "original": "assets/vfx/fire/explosive-flurry-cast.png",
+      "classification": "REJECT_SOURCE_IDENTITY",
+      "usbAllowed": false,
+      "alpha": {
+        "allFrameEdgeAlpha8Count": 0,
+        "maxEdgeAlpha": 5,
+        "gridFinding": "Faint red grid has real low-alpha residue, not alpha>=8 line. Internal column1086 max alpha5 median2; neighbouring grid rows/columns max1-3. Do not call it an opaque/background grid or reject solely from the black-preview appearance."
+      },
+      "sequence": {
+        "alphaMassFrames": [
+          3590,
+          4800,
+          10136,
+          12635,
+          14771,
+          17404,
+          23822,
+          24466,
+          11800,
+          8036,
+          5311,
+          3603
+        ],
+        "peakFrame": 8,
+        "lastToPeakRatio": 0.1473,
+        "assessment": "Growth and tail fade exist; bright contact star is already present at all three points in frame1 and persists throughout, weakening frame7/8 hit contrast. End remains three similar flame silhouettes, smaller/dimmer rather than ember breakup."
+      },
+      "identity": "Original has multiple sharp fire blades, crossed slashes and a later explosive release. Candidate reduces the action to three generic upright flame tongues with bottom stars. Repeated/crossed slash identity is lost; fire element alone is insufficient to preserve this skill.",
+      "minimumNext": "Keep separated three attack sites but recover sharp fire-blade / crossed-strike buildup and a concentrated hit burst, then ember breakup. Do not restore an opaque all-row explosion or alter geometry."
+    }
+  ],
+  "doNotRejectFor": [
+    "Failure to meet an arbitrary prompt 6% margin",
+    "RGB coloration hidden beneath alpha0",
+    "Black-background preview showing alpha1-5 red residue as if opaque"
+  ],
+  "stopRefinement": [
+    "stormCircle source static polish: retain candidate pending focused USB; reopen only on concrete phone failure"
+  ],
+  "runtimeOrPhoneChangesMade": false
+}

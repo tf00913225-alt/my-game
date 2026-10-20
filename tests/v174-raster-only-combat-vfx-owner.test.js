@@ -105,12 +105,11 @@ test("V142 is timing-only and contains no legacy visual renderer",()=>{
     assert.doesNotMatch(css142,/@keyframes|animation\s*:|#v142-skill-stage/);
 });
 
-test("V143 production VFX contains no procedural/Canvas/SVG fallback",()=>{
+test("V143 casts retain raster-only choreography; named persistent foot auras stay within the same DOM status owner",()=>{
     [
         /createElement\(["']canvas["']\)/,
         /getContext\s*\(/,
         /drawImage\s*\(/,
-        /requestAnimationFrame\s*\(/,
         /<svg\b/i,
         /v149-word-/,
         /v143-cast-charge/,
@@ -119,8 +118,18 @@ test("V143 production VFX contains no procedural/Canvas/SVG fallback",()=>{
         /v143-hit-particle/,
         /canvas-crop/
     ].forEach(pattern=>assert.doesNotMatch(v143,pattern));
+    assert.equal((v143.match(/requestAnimationFrame\(start\)/g)||[]).length,1,"one paint-clock handoff only; frame selection remains CSS raster");
+    assert.equal((v143.match(/requestAnimationFrame\(presentHit\)/g)||[]).length,1,"one hit paint-clock handoff callsite");
+    assert.equal((v143.match(/requestAnimationFrame\s*\(/g)||[]).length,3,"one start and a bounded two-frame hit fence, no procedural RAF renderer");
+    assert.match(v143,/requestAnimationFrame\(\(\)=>requestAnimationFrame\(presentHit\)\)/);
+    assert.match(v143,/const presentHit=\(\)=>settleTargetVisual\(current,index\);/);
     assert.match(v143,/renderer:"dom-sprite"/);
-    assert.match(v143,/No Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback/);
+    assert.match(v143,/Casts have no Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback/);
+    assert.match(v143,/node\.dataset\.presentationRole="foot-aura"/);
+    assert.match(v143,/rise\.className="v143-status-aura-rise"/);
+    assert.doesNotMatch(v143.slice(v143.indexOf('function createBodyStatusVisual('),v143.indexOf('function createStatusIcon(')),/setInterval|setTimeout|requestAnimationFrame|canvas|createElementNS/,'status aura uses one existing-node child, never an emitter clock/engine');
+    assert.match(css143,/\.v143-status-aura-rise::after\{[\s\S]*?animation:v143StatusAuraRise 2s ease-out infinite/);
+    assert.match(css143,/@media\(prefers-reduced-motion:reduce\)\{[\s\S]*?\.v143-status-aura-rise::after\{animation:none !important;opacity:0;/);
 });
 
 test("live Abyss QA follows the current V143 DOM raster Sprite contract",()=>{

@@ -1,0 +1,51 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "067fa105ad14964ed265de5f871fef341e990570",
+  "asset": "tools/vfx-commercial-sample/assets/full/stun-status-v2.webp",
+  "generationEvidence": "tools/vfx-commercial-sample/assets/full/stun-status-v2-generation.json",
+  "sha256": "047e37bef6c86ad891662ffe2c93f33c7a30741779c159e9554476f4e23ea57b",
+  "decision": "ACCEPT_FOR_PHONE_CANDIDATE_ONLY",
+  "formalRuntimeAdoption": "not-approved-until-device-review",
+  "method": "view_image full source and generation JSON; independent Pillow alpha64 border/bounds and motherRGBA comparison.",
+  "measurements": {
+    "size": [
+      1774,
+      887
+    ],
+    "aspectRatio": 2.0,
+    "rgbaMotherEquality": true,
+    "alphaExtrema": [
+      0,
+      254
+    ],
+    "alpha64Bounds": [
+      217,
+      209,
+      1572,
+      682
+    ],
+    "alpha64BorderPixels": 0
+  },
+  "observations": [
+    "Exactly three recognisable beveled gold stars and a single shallow oval orbit retain dizziness/stun meaning.",
+    "No long body-height spiral, face, character or solid column. The wide short silhouette is materially better suited to overhead status placement than the original full-body spiral that obscured torso.",
+    "Actual alpha background exists, and no strong-alpha content contacts canvas border. No arbitrary prompt margin percentage is imposed as a formal source gate.",
+    "Warm glow around the orbit remains broad relative to the sharp line. At tiny display size it could merge stars into one gold blob; must be judged on device before adoption."
+  ],
+  "candidateConditions": [
+    "Preserve native2:1 aspect; do not stretch the image to the previous roughly square body box.",
+    "Place compactly above head through existing status presentation owner; no changes to target geometry, HUD position, gameplay stun duration or other states.",
+    "Compare against original at same actor/slot and confirm face/chest,own HP/SP and nearby portraits stay readable.",
+    "Three-star identity must remain apparent at actual displayed size and pulse minimum; reject if glow becomes a solid blurred plaque.",
+    "Verify overhead symbol does not collide with enemy top HUD or status icons at all relevant unit slots."
+  ],
+  "overrepairVeto": [
+    "Candidate source acceptance does not authorize global status scaling, further style rewrites or automatic runtime import.",
+    "Reject presentation if it expands to a body-height ornament or uses aspect distortion to fill old bounds."
+  ],
+  "runtimeQaState": "pending-phone-candidate-review",
+  "lifecycleState": "not-retested; no duration-owner modification",
+  "filesChangedByReviewer": [
+    "tools/vfx-commercial-sample/stun-status-independent-review.json"
+  ]
+}

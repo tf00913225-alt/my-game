@@ -1,0 +1,653 @@
+{
+  "id": "iceSpin",
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "tool": "built-in imagegen",
+  "reviewHead": "ade43a48ce618330055f9add290abb175ef9470d",
+  "formalShape": "tri",
+  "originalSource": "assets/vfx/water/frost-spinning-slash-vfx.png",
+  "selectedMother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-f9c4b01c-4adc-4561-a0a0-cdad83ba30a4.png",
+  "attempts": [
+    {
+      "number": 1,
+      "prompt": "Edit source reference into one transparent fantasy game VFX sprite sheet, not a scene. Exact sheet layout FOUR columns by THREE rows, twelve frames in row-major order. Overall image aspect 3:1, each individual cell native wide 2.25:1 (for example overall2160x720, cells540x240). Each cell contains EXACTLY THREE separate small effects horizontally centered at x18%,50%,82%, one per target, with transparent gaps. Keep the three centers and shared floor baseline y80% fixed throughout all twelve frames, no baseline hopping on row transitions. Leave transparent safe margins on every cell, no intercell lines or labels. Frames1-3 gather,4-7 build,FRAME8 strongest impact/activation,9-12 progressively dissipate in place to nearly invisible. Original pixel proportions, crisp small-screen silhouettes, no broad fog blanket, no full-height opaque wall, no character, no text, no background. Genuine alpha transparency. Preserve ice spinning slash identity: exactly three separate slender icy crescent blades, one spinning curved sweep around each of the three centers; sharp frosted blue-white crystal edges, tiny controlled ice shards, clear transparent hollow arc centers. Maintain arc shape while rotating coherently, frame8 three crisp icy slash flashes, then arcs fade in place. Not water pillars, not giant ice fog, not one enormous full-width circular slash.",
+      "mother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-3b158f2b-be4d-49dd-bdb4-4032762878f2.png"
+    },
+    {
+      "number": 2,
+      "prompt": "Edit source reference into one transparent fantasy game VFX sprite sheet, not a scene. Exact sheet layout FOUR columns by THREE rows, twelve frames in row-major order. Overall image aspect 3:1, each individual cell native wide 2.25:1 (for example overall2160x720, cells540x240). Each cell contains EXACTLY THREE separate small effects horizontally centered at x18%,50%,82%, one per target, with transparent gaps. Keep the three centers and shared floor baseline y80% fixed throughout all twelve frames, no baseline hopping on row transitions. Leave transparent safe margins on every cell, no intercell lines or labels. Frames1-3 gather,4-7 build,FRAME8 strongest impact/activation,9-12 progressively dissipate in place to nearly invisible. Original pixel proportions, crisp small-screen silhouettes, no broad fog blanket, no full-height opaque wall, no character, no text, no background. Genuine alpha transparency. Preserve ice spinning slash identity: exactly three separate slender icy crescent blades, one spinning curved sweep around each of the three centers; sharp frosted blue-white crystal edges, tiny controlled ice shards, clear transparent hollow arc centers. Maintain arc shape while rotating coherently, frame8 three crisp icy slash flashes, then arcs fade in place. Not water pillars, not giant ice fog, not one enormous full-width circular slash.\nCORRECTION: Recreate fresh clean art, not the previous source's dense fog. Exactly12 CELLS on a 4x3 grid. KEEP EVERY EFFECT WELL INSIDE ITS CELL: all strong visible pixels restricted to local x8%-92%, y18%-78%, baseline y78%. At least20% blank transparent vertical gap BETWEEN ROWS, no glows or particles crossing row seams. Three small disconnected clean symbols, each no wider than22% cellwidth, visibly transparent gaps between them. Strong opacity only on narrow edges; interior mostly transparent. Water/ice forms must not connect into a horizontal wall. Same baseline in all rows; fading last frames shrink toward the baseline, not upward. Frame8 is strongest. Do not add solid pale blue hazy blobs.",
+      "mother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-f9c4b01c-4adc-4561-a0a0-cdad83ba30a4.png",
+      "firstAttemptRejected": "Strong alpha crosses row boundaries; first result is not an eligible runtime candidate."
+    }
+  ],
+  "candidateOnly": true,
+  "independentReview": "pending",
+  "phonePass": false,
+  "commercialPass": false,
+  "selfReview": {
+    "status": "needs-identity-review-before-USB",
+    "identity": "Three curved blue-white crescent sweeps remain separate and frame8 is largest.",
+    "risks": [
+      "Fresh retry removed strong row crossing but resembles curved water waves more than crystalline ice blades. Independent reviewer must reject if ice slash identity is insufficient.",
+      "Frame8 to9 bottom contracts upward about29 source pixels.",
+      "Frame8 is largest arc but not a very distinct white impact flash."
+    ]
+  },
+  "runtimeCandidate": "tools/vfx-commercial-sample/assets/full/iceSpin-wide-v1.webp",
+  "size": [
+    2172,
+    724
+  ],
+  "grid": [
+    4,
+    3
+  ],
+  "cellSize": [
+    543.0,
+    241.33333333333334
+  ],
+  "cellAspect": 2.25,
+  "lossless": true,
+  "exactRGBAEqualToMother": true,
+  "sha256": "ad55628111fd60acb8e706bd6caa64241858bd93f08271e01dfacd0ca0c75c23",
+  "bytes": 1016030,
+  "frameMetrics": [
+    {
+      "frame": 1,
+      "alpha": {
+        "8": {
+          "bounds": [
+            46,
+            116,
+            491,
+            197
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            49,
+            128,
+            486,
+            195
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 81.94,
+          "alphaWeight": 327701
+        },
+        {
+          "centerX": 262.33,
+          "alphaWeight": 361654
+        },
+        {
+          "centerX": 458.2,
+          "alphaWeight": 284842
+        }
+      ]
+    },
+    {
+      "frame": 2,
+      "alpha": {
+        "8": {
+          "bounds": [
+            43,
+            100,
+            498,
+            204
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            47,
+            109,
+            492,
+            201
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 86.53,
+          "alphaWeight": 528662
+        },
+        {
+          "centerX": 263.04,
+          "alphaWeight": 597551
+        },
+        {
+          "centerX": 456.81,
+          "alphaWeight": 596127
+        }
+      ]
+    },
+    {
+      "frame": 3,
+      "alpha": {
+        "8": {
+          "bounds": [
+            29,
+            77,
+            503,
+            204
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            33,
+            84,
+            497,
+            200
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 88.98,
+          "alphaWeight": 978017
+        },
+        {
+          "centerX": 265.42,
+          "alphaWeight": 813152
+        },
+        {
+          "centerX": 455.23,
+          "alphaWeight": 814579
+        }
+      ]
+    },
+    {
+      "frame": 4,
+      "alpha": {
+        "8": {
+          "bounds": [
+            30,
+            76,
+            508,
+            205
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            34,
+            84,
+            504,
+            201
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 85.53,
+          "alphaWeight": 1141186
+        },
+        {
+          "centerX": 261.94,
+          "alphaWeight": 947502
+        },
+        {
+          "centerX": 456.79,
+          "alphaWeight": 1059937
+        }
+      ]
+    },
+    {
+      "frame": 5,
+      "alpha": {
+        "8": {
+          "bounds": [
+            24,
+            59,
+            524,
+            208
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            29,
+            66,
+            519,
+            205
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 85.51,
+          "alphaWeight": 1460347
+        },
+        {
+          "centerX": 262.57,
+          "alphaWeight": 1307251
+        },
+        {
+          "centerX": 463.4,
+          "alphaWeight": 1298137
+        }
+      ]
+    },
+    {
+      "frame": 6,
+      "alpha": {
+        "8": {
+          "bounds": [
+            21,
+            50,
+            521,
+            211
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            25,
+            59,
+            518,
+            209
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 90.39,
+          "alphaWeight": 1953350
+        },
+        {
+          "centerX": 262.58,
+          "alphaWeight": 1554477
+        },
+        {
+          "centerX": 457.24,
+          "alphaWeight": 1679271
+        }
+      ]
+    },
+    {
+      "frame": 7,
+      "alpha": {
+        "8": {
+          "bounds": [
+            19,
+            44,
+            521,
+            213
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            24,
+            52,
+            517,
+            211
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 93.75,
+          "alphaWeight": 2318747
+        },
+        {
+          "centerX": 263.78,
+          "alphaWeight": 1832994
+        },
+        {
+          "centerX": 456.3,
+          "alphaWeight": 1897157
+        }
+      ]
+    },
+    {
+      "frame": 8,
+      "alpha": {
+        "8": {
+          "bounds": [
+            16,
+            42,
+            523,
+            219
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            21,
+            49,
+            518,
+            215
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 94.89,
+          "alphaWeight": 2828705
+        },
+        {
+          "centerX": 263.56,
+          "alphaWeight": 2071316
+        },
+        {
+          "centerX": 454.01,
+          "alphaWeight": 2294102
+        }
+      ]
+    },
+    {
+      "frame": 9,
+      "alpha": {
+        "8": {
+          "bounds": [
+            32,
+            65,
+            510,
+            189
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            36,
+            77,
+            504,
+            186
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 88.66,
+          "alphaWeight": 1163463
+        },
+        {
+          "centerX": 267.57,
+          "alphaWeight": 889591
+        },
+        {
+          "centerX": 456.53,
+          "alphaWeight": 914811
+        }
+      ]
+    },
+    {
+      "frame": 10,
+      "alpha": {
+        "8": {
+          "bounds": [
+            35,
+            77,
+            499,
+            189
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            37,
+            84,
+            493,
+            185
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 90.16,
+          "alphaWeight": 841791
+        },
+        {
+          "centerX": 269.14,
+          "alphaWeight": 616545
+        },
+        {
+          "centerX": 453.32,
+          "alphaWeight": 525413
+        }
+      ]
+    },
+    {
+      "frame": 11,
+      "alpha": {
+        "8": {
+          "bounds": [
+            45,
+            90,
+            497,
+            185
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            50,
+            111,
+            493,
+            181
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 93.12,
+          "alphaWeight": 477999
+        },
+        {
+          "centerX": 271.14,
+          "alphaWeight": 367162
+        },
+        {
+          "centerX": 453.79,
+          "alphaWeight": 307683
+        }
+      ]
+    },
+    {
+      "frame": 12,
+      "alpha": {
+        "8": {
+          "bounds": [
+            56,
+            121,
+            494,
+            185
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            60,
+            129,
+            491,
+            182
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 96.25,
+          "alphaWeight": 235627
+        },
+        {
+          "centerX": 270.47,
+          "alphaWeight": 227207
+        },
+        {
+          "centerX": 450.74,
+          "alphaWeight": 175197
+        }
+      ]
+    }
+  ],
+  "seamRows": [
+    {
+      "y": 240,
+      "maxAlpha": 1,
+      "alpha64Count": 0
+    },
+    {
+      "y": 241,
+      "maxAlpha": 1,
+      "alpha64Count": 0
+    },
+    {
+      "y": 242,
+      "maxAlpha": 1,
+      "alpha64Count": 0
+    },
+    {
+      "y": 481,
+      "maxAlpha": 1,
+      "alpha64Count": 0
+    },
+    {
+      "y": 482,
+      "maxAlpha": 1,
+      "alpha64Count": 0
+    },
+    {
+      "y": 483,
+      "maxAlpha": 1,
+      "alpha64Count": 0
+    }
+  ],
+  "strongEdgeTouchFrames": [],
+  "alpha8EdgeTouchFrames": []
+}
