@@ -391,6 +391,16 @@ test('pointer acknowledgement excludes the original hidden cancel without accept
     assert.match(block,/v169GetRpgDialogState\(\)\.active/);assert.match(block,/'alert','only original alert acknowledgements/);assert.match(block,/await tap\(selector\)/,'original strict visible hit-test tap remains required');
 });
 
+test('pointer scroll readiness requires stable owner and target samples before a single original tap',()=>{
+    const source=fs.readFileSync('tests/fixtures/run-chapter1-guided-pointer-qa.mjs','utf8'),fn=source.match(/function stableScrollSample\(previous,sample,now\)\{[\s\S]*?\n\}/);assert.ok(fn);
+    const context={};vm.createContext(context);vm.runInContext(fn[0],context);
+    const sample={valid:true,scrollTop:400,scrollLeft:0,left:10,top:100,width:100,height:52};let state;
+    for(const now of [0,80,160]){state=context.stableScrollSample(state,sample,now);assert.equal(state.ready,false);}
+    state=context.stableScrollSample(state,sample,240);assert.equal(state.ready,true);
+    for(const change of [{scrollTop:405},{top:105},{valid:false,disabled:true},{valid:false,hit:{id:'occluding-overlay'}}])assert.equal(context.stableScrollSample(state,{...sample,...change},320).ready,false);
+    assert.match(source,/!e\.disabled&&e\.checkVisibility/);assert.match(source,/hit===e\|\|e\.contains\(hit\)/);assert.match(source,/original scroll target never became stable and pointer ready/);
+});
+
 test("story reading guide keeps the real Next target and toggles reading presentation without an acknowledgement step",()=>{
     const h=guideHarness(),story=h.element(),next=h.element(),other=h.element();let advances=0;
     h.c.battleActive=false;next.action=()=>{advances++;};

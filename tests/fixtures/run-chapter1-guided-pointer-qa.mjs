@@ -9,6 +9,12 @@ import {startServer,waitJson,Cdp,QA_CLOUD_MODULE,findChrome} from '../../.github
 
 // Only external transport is isolated. Every player action uses trusted CDP
 // pointer/touch input. Runtime/state reads below are observations, never commands.
+function stableScrollSample(previous,sample,now){
+    if(!sample?.valid)return {sample,since:now,count:0,ready:false};
+    const same=previous?.count>0&&['scrollTop','scrollLeft','left','top','width','height'].every(key=>Math.abs(sample[key]-previous.sample[key])<.5);
+    const since=same?previous.since:now,count=same?previous.count+1:1;
+    return {sample,since,count,ready:count>=4&&now-since>=240};
+}
 let cloud=QA_CLOUD_MODULE.replace(/export async function readCurrentCloudSave\(\)\{.*?\}\);\}/,
     'export async function readCurrentCloudSave(){return {exists:false,uid,path:"users/"+uid+"/saves/current",data:null};}');
 cloud=cloud.replace('export async function bootstrapTrustedCloudSave(){throw new Error("QA cloud writes are forbidden");}',
@@ -102,7 +108,14 @@ try{
             const reveal=async selector=>{
                 for(let i=0;i<16;i++){
                     const r=await client.eval(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)return null;const r=e.getBoundingClientRect(),p=e.closest('[data-scroll-owner="y"],.home-feature-modal-body,.skill-scroll')?.getBoundingClientRect();return {top:r.top,bottom:r.bottom,y:r.y+r.height/2,x:r.x+r.width/2,p:p?{left:p.left,right:p.right,top:p.top,bottom:p.bottom}:null};})()`);
-                    assert.ok(r,'visible UI target exists: '+selector);const area=r.p||{left:width*.2,right:width*.8,top:height*.2,bottom:height*.8},top=Math.max(30,area.top+8),bottom=Math.min(height-30,area.bottom-8);if(r.y>top&&r.y<bottom)return;
+                    assert.ok(r,'visible UI target exists: '+selector);const area=r.p||{left:width*.2,right:width*.8,top:height*.2,bottom:height*.8},top=Math.max(30,area.top+8),bottom=Math.min(height-30,area.bottom-8);if(r.y>top&&r.y<bottom){
+                        const deadline=Date.now()+45000;let stable;
+                        while(Date.now()<deadline){
+                            const sample=await client.eval(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)return {valid:false};const r=e.getBoundingClientRect(),owner=e.closest('[data-scroll-owner="y"],.home-feature-modal-body,.skill-scroll'),p=owner?.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);return {valid:!e.disabled&&e.checkVisibility({checkOpacity:true,checkVisibilityCSS:true})&&r.width>0&&r.height>0&&x>=0&&x<innerWidth&&y>=0&&y<innerHeight&&(!p||x>p.left&&x<p.right&&y>p.top+8&&y<p.bottom-8)&&(hit===e||e.contains(hit)),scrollTop:owner?.scrollTop||0,scrollLeft:owner?.scrollLeft||0,left:r.left,top:r.top,width:r.width,height:r.height,owner:p?.toJSON(),hit:{id:hit?.id,tag:hit?.tagName},disabled:e.disabled};})()`);
+                            stable=stableScrollSample(stable,sample,Date.now());if(stable.ready){trace.push({selector,observation:'original scroll owner and target stable',sample});return;}await new Promise(resolve=>setTimeout(resolve,80));
+                        }
+                        throw Error('original scroll target never became stable and pointer ready: '+selector+' '+JSON.stringify(stable));
+                    }
                     const x=Math.max(20,Math.min(width-20,(area.left+area.right)/2)),y=Math.max(80,Math.min(height-80,(area.top+area.bottom)/2)),direction=r.y<top?-1:1;
                     if(mobile){await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y:y+direction*60}]});for(let n=1;n<=5;n++)await client.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y+direction*(60-n*24)}]});await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
                     else await client.send('Input.dispatchMouseEvent',{type:'mouseWheel',x,y,deltaX:0,deltaY:direction*220});
