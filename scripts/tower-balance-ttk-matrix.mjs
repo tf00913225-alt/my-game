@@ -40,7 +40,7 @@ export function buildTowerTtkMatrix(){
       const initialMonsters=roster.map(m=>({spec:m.balanceProjection.identity,rank:m.rank,level:m.level,hp:m.maxHP,sp:m.maxSP,attack:m.attack,magicAttack:m.magicAttack,defense:m.defense,speed:m.agility,owner:m.balanceOwner,pressure:m.balanceProjection.finalDamagePressure}));
       let rounds=0;
       for(let round=1;round<=60;round++){
-        turn=round;rounds++;
+        turn=round;rounds++;notifyBattleRoundBoundary("round_start",battleToken);
         for(const action of buildInitiativeQueue()){
           if(monsters.every(m=>!m.alive||m.hp<=0)||getExistingPartyIndexes().every(i=>getPartyCharacterByIndex(i).hp<=0))break;
           if(action.type==='monster'){processSingleMonsterAttack(action.monsterIndex,battleToken);continue;}
@@ -49,7 +49,7 @@ export function buildTowerTtkMatrix(){
           autoActionForCharacter(i,battleToken);
           resolveQueuedPlayerAction(i,battleToken);
         }
-        consumeRoundEndDurations();
+        notifyBattleRoundBoundary("round_end",battleToken);
         if(monsters.every(m=>!m.alive||m.hp<=0)||getExistingPartyIndexes().every(i=>getPartyCharacterByIndex(i).hp<=0))break;
       }
       return {
@@ -65,7 +65,7 @@ export function buildTowerTtkMatrix(){
   const failures=rows.filter(row=>!row.clear||row.survivors===0);
   return {
     workId:'MONSTER-BALANCE-OWNER-P2C-TOWER-20261004',
-    method:'Formal current player stats/skills, initiative, enemy AI, damage and status owners; neutral 0.5 rolls; Tower unlock Lv30 minimum; 2 members below floor50 and 3 members from floor50. Animation lifecycle is verified separately in Chrome.',
+    method:'Formal current player stats/skills, initiative, enemy AI, damage and status owners; neutral 0.5 rolls; legacy single-wave 10-unit pressure fixture (not current two-wave acceptance); formal round boundaries; Tower unlock Lv30 minimum; 2 members below floor50 and 3 members from floor50. Animation lifecycle is verified separately in Chrome.',
     gate:evaluateChallengeDiagnostic(rows,'tower'),cases:rows.length,failures,rows
   };
 }

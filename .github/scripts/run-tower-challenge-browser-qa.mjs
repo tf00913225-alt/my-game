@@ -30,7 +30,7 @@ const expression=`(async()=>{
    for(const m of active){
      const p=MonsterBalance.debug(m);check(m.maxHP===p.final.maxHP&&m.maxSP===p.final.maxSP&&m.attack===p.final.physicalAttack&&m.magicAttack===p.final.magicAttack&&m.defense===p.final.defense&&m.agility===p.final.speed,'render stats equal owner projection');
      if(element==='fire')check(m.vTowerCriticalBonusPercent===15&&getMonsterCriticalChance(m)===25&&getTowerDirectDamageMultiplier(m,{damageKind:'direct'})===1.15,'fire critical/direct damage +15');
-     if(element==='water')check(m.vTowerHealingMultiplier===1.15&&getTowerStatusAccuracyBonus(m)===15&&m.v141AbyssAi==='support'&&m.skillIds.includes('freeze'),'water heal/status/support/freeze');
+     if(element==='water')check(m.vTowerHealingMultiplier===1.15&&getTowerStatusAccuracyBonus(m)===15&&m.skillIds.includes('freeze')===['support','commander'].includes(m.vTowerCombatRole)&&m.v141SupportSkillIds.includes('healSpell')===['support','commander'].includes(m.vTowerCombatRole),'water heal/status/support/freeze');
      if(element==='wind')check(p.profiles.element.speed===1.15&&m.agility===p.derived.speed*1.15&&getMonsterEvasion(m)>=15,'wind owner speed/evasion +15');
      if(element==='earth')check(p.profiles.element.hp===1.15&&p.profiles.element.defense===1.15,'earth owner HP/defense +15');
    }
@@ -56,14 +56,14 @@ const expression=`(async()=>{
    await exit();
  }
  await enter('water',100);
- const caster=monsters[currentBattleMonsters[0]],ally=monsters[currentBattleMonsters[1]];
+ const casterIndex=currentBattleMonsters.find(i=>monsters[i].v141SupportSkillIds.includes("healSpell")),caster=monsters[casterIndex],ally=monsters[currentBattleMonsters[1]];
  const beforeHp=ally.hp;ally.hp=1;const healed=v141HealMonsterPreservingShield(ally,1000,caster);check(healed===1150,'water HP heal +15');evidence.healing.push({healed,sp:ally.sp});ally.hp=beforeHp;
  const bonus=getTowerStatusAccuracyBonus(caster);
  for(const base of [30,52,999]){const hard=calculateStatusEffectChance(base,100,100,0,0,true,'player',0,bonus);evidence.status.push({base,hard});check(hard===(base===30?45:60),'water hard cap');}
  check(calculateStatusEffectChance(40,1,1,0,0,false,'player',0,bonus)===55,'water soft +15');
  // The real enemy turn must choose healing inside, and only inside, the probability gate.
  caster.sp=100000;ally.hp=1;const spBefore=caster.sp;const oldRandom=Math.random;
- try{Math.random=()=>0;processSingleMonsterAttack(currentBattleMonsters[0],battleToken);}finally{Math.random=oldRandom;}
+ try{caster.v175ForcedSupportSkillId="healSpell";Math.random=()=>0;processSingleMonsterAttack(casterIndex,battleToken);}finally{Math.random=oldRandom;}
  await new Promise(r=>setTimeout(r,4500));check(caster.sp<spBefore&&ally.hp>1,'real water heal action');
  await exit();
  await enter('water',100);
@@ -74,7 +74,7 @@ const expression=`(async()=>{
  queuedPlayerActions={};for(const i of getExistingPartyIndexes())queuedPlayerActions[i]={action:'defend'};
  for(const i of currentBattleMonsters){monsters[i].sp=100000;monsters[i].hp=monsters[i].maxHP;}
  try{startResolutionPhase(battleToken);await wait(()=>ended,100000);}finally{off();endOff();Math.random=queueRandom;showMonsterSkillNameBadge=badgeOwner;}
- check(actions.length===6&&new Set(actions).size===6,'6 x 80 queue completes exactly once');evidence.actions=actions;evidence.freezeSkills=skillNames;check(skillNames.includes(skillDatabase.freeze.name),'real water Freeze decision');
+ check(actions.length===6&&new Set(actions).size===6,'6 x 80 queue completes exactly once');evidence.actions=actions;evidence.freezeSkills=skillNames;check(skillNames.filter(name=>name===skillDatabase.freeze.name).length<=2,'water team Freeze declaration quota');check(skillNames.some(name=>['waterKnife','waterBall','frostPunch','iceSpin','frostCrush','floodBeast','iceArrowRain'].some(id=>skillDatabase[id].name===name)),'other water attacks remain usable');
  await exit();
  await enter('fire',1);
  // Actual all-target skill, six independent settlements and feedback events.
@@ -96,6 +96,6 @@ const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','
 const artifact=path.join(ROOT,'artifacts/browser-qa/tower-challenge.json');fs.mkdirSync(path.dirname(artifact),{recursive:true});let client,evidence;
 try{
  const targets=await waitJson('http://127.0.0.1:'+port+'/json/list');client=new Cdp(targets.find(x=>x.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width:412,height:915,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});evidence=await client.eval(expression);assert.equal(evidence.matrix.length,27);assert.deepEqual(evidence.matrix.map(({element,floor})=>[element,floor]),[...['fire','water','wind','earth'].flatMap(element=>[1,5,10,45,75,100].map(floor=>[element,floor])),['water',100],['water',100],['fire',1]]);
- const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-battle.png'),Buffer.from(shot.data,'base64'));await client.eval('loseBattle()');await new Promise(r=>setTimeout(r,3000));await client.eval('vGameplayOpenTower()');const ruleShot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-rules.png'),Buffer.from(ruleShot.data,'base64'));fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',evidence},null,2)+'\n');console.log('Tower challenge production Runtime 27 scenes / Phase2C owner / 10-unit queue / AOE QA passed');
+ const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-battle.png'),Buffer.from(shot.data,'base64'));await client.eval('loseBattle()');await new Promise(r=>setTimeout(r,3000));await client.eval('vGameplayOpenTower()');const ruleShot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-rules.png'),Buffer.from(ruleShot.data,'base64'));fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',evidence},null,2)+'\n');console.log('Tower challenge production Runtime 27 scenes / Phase2C owner / six-unit queue / AOE QA passed');
 }catch(error){fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),evidence,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-12)},null,2)+'\n');throw error;}
 finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}await new Promise(r=>server.server.close(r));}

@@ -320,7 +320,7 @@ for(const element of ["fire","water","earth","wind"]){
         for(const m of roster){
             assert.equal(m.skillChance,floor<=30?.65:floor<=60?.70:floor<=90?.75:.8);
             if(element==="fire"){assert.equal(m.vTowerCriticalBonusPercent,15);assert.equal(m.vTowerDirectDamageMultiplier,1.15);}
-            if(element==="water"){assert.equal(m.vTowerHealingMultiplier,1.15);assert.equal(m.vTowerStatusAccuracyPercent,15);assert.ok(m.skillIds.includes("freeze"));assert.ok(m.v141SupportSkillIds.includes("healSpell"));}
+            if(element==="water"){assert.equal(m.vTowerHealingMultiplier,1.15);assert.equal(m.vTowerStatusAccuracyPercent,15);assert.equal(m.skillIds.includes("freeze"),["support","commander"].includes(m.vTowerCombatRole));assert.equal(m.v141SupportSkillIds.includes("healSpell"),["support","commander"].includes(m.vTowerCombatRole));}
             const projection=context.MonsterBalance.debug(m);
             assert.equal(m.level,floor<=20?40:floor<=40?60:floor<=60?80:100);
             assert.equal(m.balanceOwner,"MonsterBalance");

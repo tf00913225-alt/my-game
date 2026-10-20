@@ -253,10 +253,11 @@
 - Common Skill Frequency 與 Element Profile 分離，唯一塔 Owner 是 `gameplay-boss-tower-system.js`。1～30 層 65%、31～60 層 70%、61～90 層 75%、91～100 層 80%；Regular／Elite／Tower Boss 相同，canAct=false 機制物件排除。火塔舊額外 +8 Skill Chance 退休。
 - Skill Chance 是輪到可行動且有合法可負擔技能時進入技能決策的機率，不是技能命中率。Tower attack/heal/support/control 只能共用一次 roll；正式 `FourSymbolsEnemySkillAI` 與 V144 合法技能 Guard 選招，不增加第二套 AI。
 - Fire：最終爆擊 +15 個百分點，遵守 Crit Cap；自身普通攻擊與直接物理／法術技能傷害 ×1.15。DoT／Burn／Reflect／Relic／Boss Object／HP Cost／Self Damage／Environment 排除。Damage Owner 只套用一次塔 direct modifier。
-- Water：合法 Heal／Support／Freeze 技能決策偏輔助；友軍 HP <70% 優先治療。HP Healing ×1.15，SP 回復不加成。最新正式水系無獨立 Buff，沿用 Heal Support 及 Freeze，不引入跨元素 Buff 或新控制狀態。
+- Water：合法 Heal／Support／Freeze 技能決策偏輔助；實際 allyTri 目標中有友軍本體 HP <40% 才能進入治療候選，按 HP 缺口選目標。冰封與治療各全隊每大回合最多宣告 2 次；同一怪物於 N 回合宣告後，N+1、N+2 禁用、N+3 才可再用，MISS／抵抗亦計次。配額與冷卻由塔 Owner 訂閱正式 Round Start 管理，同回合換波不刷新；戰鬥結束釋放。移除額外 50% 冰封偏好。HP Healing ×1.15，SP 回復不加成。最新正式水系無獨立 Buff，沿用 Heal Support 及 Freeze，不引入跨元素 Buff 或新控制狀態。
 - Water Status Accuracy +15 個百分點適用 Soft／DoT／Hard Control。先加入 `calculateStatusEffectChance` 正式公式，最後 Clamp：一般 Status 5～95%；Player→Regular 5～90%、Elite 5～75%、Boss 5～60%；Enemy→Player Hard Control 5～60%，與施放怪物 rank 無關。30+15=45；52+15=67→60。
 - Wind：最終 Evasion +15 個百分點（不另設上限）；Agility／Speed ×1.15，只影響速度，不增加 Evasion 或 Accuracy。
 - Earth：Defense ×1.15、Max HP ×1.15、建立時 hp=maxHP，Profile 同場冪等，不在 render/reload/round 疊加。
+- 塔技能配置由同一塔 Owner 依元素、樓層與 physical／magic／support／commander 定位分配，精英增加互補技能、Boss 擁有完整同元素攻擊池；保留低 SP 招式。僅納入已支援的主動技能，未實作的敵方 rockWall 不再配置；土系沿用正式攻擊附帶護盾／石化／降防。正式 EnemySkillAI 負責合法候選加權抽選，有其他可用技能時排除上次宣告技能；不增加第二套選招引擎或施法率 roll。
 - Profile 僅套 Tower metadata；其他玩法的敵人数量、技能頻率與戰鬥數值保持既有規則。入口顯示當週元素特性、樓層施放率與每層兩波、每波六名敵人。普通層兩波各六名普通怪；精英層第一波六名普通怪、第二波二精英四普通；Boss 層第一波六精英、第二波一 Boss 五精英。
 
 本批已核准暫定獎勵：四象塔每週每10層首次通關體質寶石×1，沿用既有每週樓層領取記錄；裝備副本每次通關等機率抽取赤炎／寒泉／岩岳／青嵐碎片一種×10（各25%），與寶箱一起領取及廣告雙倍。數量與分布集中於各玩法正式 Reward Owner。
