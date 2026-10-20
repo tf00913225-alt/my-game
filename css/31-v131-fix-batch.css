@@ -283,7 +283,7 @@
     color:#cfbd98;
     font-size:calc(14 * var(--ui-length-unit,1px));
     line-height:1.4;
-    padding:calc(3 * var(--ui-length-unit,1px)) calc(2 * var(--ui-length-unit,1px));
+    padding:calc(3 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px));
 }
 
 .v131-exp-actions{
