@@ -4316,12 +4316,26 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     };
     const deps={...h.deps,Timestamp,now:()=>clock,runProtected:authority.runProtected,runRecoveryAuditMaintenance:maintenance};
     const recovery=createCanonicalCurrentRecovery(deps),auditId="publication-sdk-audit-0001",approvalId="publication-sdk-approval-01";
+    const canonicalRevision=(await h.root.collection("account").doc("current").get()).get("serverRevision");
+    const beforeHeroRevision=await h.revision(),hero=createHeroAcquisition(deps);
+    const heroRequest=expectedRevision=>({...h.request(),data:{...h.request().data,expectedRevision}});
+    await hero.observeLogin(heroRequest(beforeHeroRevision));
+    const heroTicket=await hero.ensureChapterTicket(heroRequest(await h.revision()));
+    assert.equal(heroTicket.chapter.phase,"active");
+    assert.equal(heroTicket.chapter.completedIntents.length,0,"The original issued ticket is deliberately unused");
     const sourceRevision=await h.revision();
+    assert.equal(sourceRevision,beforeHeroRevision+2);
+    assert.equal((await h.root.collection("account").doc("current").get()).get("serverRevision"),canonicalRevision);
+    assert.ok(canonicalRevision<sourceRevision,"Hero observations advance only the envelope cut");
+    assert.equal((await h.root.collection("heroAcquisitionHistory").get()).size,1);
+    assert.equal((await h.root.collection("heroChapterTickets").get()).size,1);
+    assert.equal((await h.root.collection("heroChapterSteps").get()).size,0);
+    assert.equal((await h.root.collection("recoveryArchives").doc(String(sourceRevision)).get()).exists,false,"No archive is fabricated at the Hero envelope revision");
     assert.ok((await h.root.collection("patrolTickets").get()).size>=20);
-    const before=await checkRecoveryArchive(h.uid,sourceRevision);
+    const before=await checkRecoveryArchive(h.uid,canonicalRevision);
     assert.equal(before.get("sourceRecords.characters").length,2);assert.equal(before.get("sourceRecords.characters")[0].state.level,10);
     await createCanonicalRecoveryApproval(deps).issue({auth:{uid:"publication-operator",token:{cloudSaveOperator:true}},
-        data:{ownerUid:h.uid,operationId:approvalId,sourceRevision,ttlSeconds:900}});
+        data:{ownerUid:h.uid,operationId:approvalId,sourceRevision,canonicalRevision,ttlSeconds:900}});
     // Exercise the actual staged callable over the existing emulator HTTP
     // boundary. Publication below deliberately fails its epoch gate before IO;
     // successful provider publication remains SDK + lexical fake-Storage only.
@@ -4337,6 +4351,11 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     const assets=await h.capture();
     const args={auditId,expectedEpoch:2,operationId:"publication-sdk-manifest-01"},run=h.root.collection("recoveryAuditRuns").doc(auditId);
     const publicationApproval=(await h.root.collection("recoveryApprovals").doc(approvalId).get()).data(),publicationRun=(await run.get()).data();
+    assert.equal(publicationApproval.namespaceVersion,3);assert.equal(publicationApproval.canonicalRevision,canonicalRevision);
+    assert.equal(publicationRun.schemaVersion,2);assert.equal(publicationRun.namespaceVersion,3);
+    assert.equal(publicationRun.canonicalRevision,canonicalRevision);assert.equal(publicationRun.sourceRevision,sourceRevision);
+    // h.capture enumerates every top-level server collection, including all
+    // five Hero namespaces; it is not a fixed pre-Hero collection allowlist.
     const comparePublicationTime=(a,b)=>a.seconds-b.seconds||a.nanoseconds-b.nanoseconds;
     assert.ok(comparePublicationTime(publicationApproval.issuedAt,publicationRun.createdAt)<=0&&
         comparePublicationTime(publicationRun.createdAt,publicationApproval.expiresAt)<0,"Publication audit commit must lie within its exact approval interval");
@@ -4388,18 +4407,24 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     const publication=compiled.exports.createCanonicalCurrentRecovery(deps);
     assert.equal(Object.hasOwn(recovery,"pinCandidatePublication"),false);
     async function gate(operation,writes){const start=traces.length,result=await operation();
-        assert.ok(traces.length>start);for(const trace of traces.slice(start)){assert.equal(trace.reads,13);assert.equal(trace.queries,0);assert.ok(trace.writes<=writes);}return result;}
+        assert.ok(traces.length>start);for(const trace of traces.slice(start)){assert.equal(trace.reads,14);assert.equal(trace.queries,0);assert.ok(trace.writes<=writes);}return result;}
     const pin=await gate(()=>publication.pinCandidatePublication(h.request(),args),0),scanStart=traces.length;
     const material=await publication.loadPinnedRawCapture(pin);
     // Independent memory-proof acceptance on the existing native20-battle
     // capture, not a shared publication preparation/readback budget claim.
     const reuseInput=publication.loadedRawMaterial(material),reuseBytes=JSON.stringify(reuseInput),reuseTrace=JSON.stringify(traces);
     const {decodeInventoryPayload}=require("../functions/src/recovery-audit-artifact.js");
+    const capturedNamespaces=new Set(reuseInput.inventoryPages.map(page=>decodeInventoryPayload(page.row.payloadBytes).namespacePath));
+    for(const name of ["heroAcquisition","heroAcquisitionHistory","heroChapter","heroChapterTickets","heroChapterSteps"])
+        assert.ok(capturedNamespaces.has(h.root.path+"/"+name),"Namespace3 captures the complete Hero namespace, including empty steps");
     const settlementCount=reuseInput.inventoryPages.reduce((count,page)=>{
         const payload=decodeInventoryPayload(page.row.payloadBytes);
         return count+(payload.namespacePath===h.root.path+"/patrolSettlements"?payload.entries.length:0);
     },0);
     const nativeReuse=await publication.verifySegmentedRawRecoveryProof(reuseInput),usage=nativeReuse.residentUsage;
+    assert.equal(reuseInput.binding.namespaceVersion,3);assert.equal(reuseInput.binding.canonicalRevision,canonicalRevision);
+    assert.equal(nativeReuse.namespaceVersion,3);assert.equal(nativeReuse.canonicalRevision,canonicalRevision);
+    assert.equal(nativeReuse.sourceRevision,sourceRevision);
     assert.equal(nativeReuse.segmentedProofValid,true);assert.ok(usage.settlementReuseHits>0);
     assert.equal(usage.enumeratedSettlementRows,settlementCount);assert.equal(usage.settlementReuseHits,settlementCount);
     assert.equal(usage.units,usage.executedProofUnits);
@@ -4418,8 +4443,9 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     abortOnce=true;const prepared=await gate(()=>publication.prepareCandidatePublication(h.request(),pin,artifact),1);
     await gate(()=>publication.prepareCandidatePublication(h.request(),pin,artifact),0);
     const manifest=(await manifestRef.get()).data();
-    assert.equal(manifest.schemaVersion,2);assert.equal(manifest.candidateEncodingVersion,3);
-    assert.equal(manifest.artifactKind,"canonical-recovery-raw-archive");assert.equal(manifest.proofKind,"segmented-original-rights-v1");
+    assert.equal(manifest.schemaVersion,3);assert.equal(manifest.candidateEncodingVersion,4);
+    assert.equal(manifest.namespaceVersion,3);assert.equal(manifest.canonicalRevision,canonicalRevision);
+    assert.equal(manifest.artifactKind,"canonical-recovery-raw-archive");assert.equal(manifest.proofKind,"segmented-original-rights-v2");
     const preparationUsage=artifactHelper.recoveryAuditAssemblyUsage(publicationAssemblyTokens[0]),readPhaseStart=publicationAssemblyTokens.length;
     assert.equal(preparationUsage.passes,2);assert.equal(preparationUsage.reservedBytes,0);
     const proof=await gate(()=>publication.publishPreparedCandidate(h.request(),prepared),0);
@@ -4429,7 +4455,7 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     for(const value of [preparationUsage,readbackUsage]){
         assert.ok(value.bytes<=256*1024*1024);assert.ok(value.nodes<=16000000);assert.ok(value.operations<=16384);assert.ok(value.elapsedMs<=30000);
     }
-    console.log("PASS raw-v3 publication actual SDK phases on existing20-battle actor (fake Storage only): "+JSON.stringify({wireBytes:manifest.artifactByteLength,preparation:preparationUsage,readback:readbackUsage})+"; no real provider or201 capacity claim.");
+    console.log("PASS raw-v4 Hero publication actual SDK phases on existing20-battle actor (fake Storage only): "+JSON.stringify({sourceRevision,canonicalRevision,wireBytes:manifest.artifactByteLength,preparation:preparationUsage,readback:readbackUsage})+"; genuine login and unused chapter ticket, namespace3 complete original rights; no real provider or201 capacity claim.");
     assert.equal(ioCalls.filter(name=>name==="create").length,1);assert.equal(objects.size,1);
     loseResponse=true;await assert.rejects(()=>publication.ackCandidatePublication(h.request(),prepared,proof),/lost ACK response/);
     assert.equal((await manifestRef.get()).get("status"),"acknowledged");
@@ -4465,10 +4491,10 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     await assert.rejects(()=>publication.publishPreparedCandidate(h.request(),prepared),/epoch or session/);
     await callMaintenance("cancel",{auditId,expectedEpoch:2,operationId:"publication-sdk-cancel-audit"});
     await assert.rejects(()=>publication.publishPreparedCandidate(h.request(),prepared));
-    assert.deepEqual((await checkRecoveryArchive(h.uid,sourceRevision)).data(),before.data());
+    assert.deepEqual((await checkRecoveryArchive(h.uid,canonicalRevision)).data(),before.data());
     assert.equal((await h.save.get()).get("authoritativeStateReady"),false);
     console.log("PASS staged Recovery maintenance: actual Auth/HTTP six successful actions, unknown/excess/foreign/replaced-session rejection, publish stale epoch before provider IO; SDK + lexical fake Storage positive publish/replay keeps four flags false. Representative RSS below 1GiB, not maximum payload capacity or real GCS proof.");
-    console.log("PASS private immutable candidate publication: actual Firestore Session/SDK cursors/Timestamps on existing20-battle Lv10/slot2 actor; original raw full-chain/strict proofs;13-point gates, rollback/SDK retry, exact immutable tuple, fakeStorage-only64-bit generation/fullread/lost responses/read-only ACK races, expiry/takeover/cancel refusal. No actual GCS, production adapter, trusted backup or restore authority.");
+    console.log("PASS private immutable candidate publication: actual Firestore Session/SDK cursors/Timestamps on existing20-battle Lv10/slot2 plus genuine Hero login/unused-ticket actor; namespace3/raw4 original full-chain/strict proofs with separate canonical/envelope cuts;14-point gates, rollback/SDK retry, exact immutable tuple, fakeStorage-only64-bit generation/fullread/lost responses/read-only ACK races, expiry/takeover/cancel refusal. No actual GCS, production adapter, trusted backup or restore authority.");
 }
 
 // Internal skill configuration only. A fresh isolated account keeps all prior

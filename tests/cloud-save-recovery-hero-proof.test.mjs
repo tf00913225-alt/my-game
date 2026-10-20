@@ -1,11 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createRequire} from 'node:module';
+import {createRequire,Module} from 'node:module';
+import {readFileSync} from 'node:fs';
+import {dirname} from 'node:path';
 import {storeHarness,selection,copy} from '../scripts/test-helpers/canonical-store-harness.mjs';
 const require=createRequire(import.meta.url);
 const {createSessionAuthority}=require('../functions/src/session-authority');
 const {createCanonicalSourceWriter}=require('../functions/src/canonical-source-writer');
 const {createHeroAcquisition}=require('../functions/src/hero-acquisition');
+const {createHeroGrowth}=require('../functions/src/hero-growth');
 const {createCanonicalRecoveryApproval}=require('../functions/src/canonical-recovery-approval');
 const {createCanonicalCurrentRecovery}=require('../functions/src/canonical-current-recovery');
 const {snapshotDigest}=require('../functions/src/canonical-snapshot');
@@ -51,7 +54,7 @@ test('raw archive v4 syntax binds the Hero namespace and both revision cuts with
     assert.equal(Object.hasOwn(decode(wire),'candidateProofValid'),false);
 });
 
-async function heroFixture(){
+async function heroFixture(beforeHero){
     const h=storeHarness(),sessions=createSessionAuthority(h.dependencies);
     let session;
     const request=()=>({auth:{uid:h.uid,token:{auth_time:Math.floor(h.clock/1000)}},
@@ -60,9 +63,11 @@ async function heroFixture(){
     const deps={...h.dependencies,runProtected:sessions.runProtected,runRecoveryAuditMaintenance:sessions.runRecoveryAuditMaintenance};
     await createCanonicalSourceWriter(deps).commitInitialSources(request(),{
         operationId:'hero-proof-initial-operation-01',expectedRevision:1,selection});
+    if(beforeHero)await beforeHero({h,deps,request});
     await createHeroAcquisition({...deps,now:()=>h.clock,seed:()=>1}).observeLogin({
         ...request(),data:{...request().data,expectedRevision:h.revision}});
-    return {h,deps,request};
+    return {h,deps,request,refreshSession:async()=>{session=await sessions.create({
+        auth:{uid:h.uid,token:{auth_time:Math.floor(h.clock/1000)}},data:{uid:h.uid}});}};
 }
 
 test('a genuine Hero login is retained recovery evidence while canonical and envelope revisions differ',async()=>{
@@ -135,4 +140,184 @@ test('Hero audit and inventory preserve both approved cuts and explicitly seal n
     assert.equal(inventory.namespaceVersion,3);
     assert.equal(inventory.namespaceListSha256,snapshotDigest(recoveryAuditNamespaces(h.uid,3)));
     assert.equal(h.data.has(h.root+'/recoveryArchives/3'),false);
+});
+
+test('original retained-control proof closes mixed old and Hero audit history against each original canonical archive',async()=>{
+    const oldApproval='hero-proof-old-approval-0001',oldAudit='hero-proof-old-audit-00001';
+    const {h,deps,request}=await heroFixture(async({h,deps,request})=>{
+        const approvals=createCanonicalRecoveryApproval({...deps,now:()=>h.clock});
+        await approvals.issue({auth:{uid:'hero-proof-operator',token:{cloudSaveOperator:true}},data:{
+            ownerUid:h.uid,operationId:oldApproval,sourceRevision:2,ttlSeconds:60}});
+        const recovery=createCanonicalCurrentRecovery({...deps,now:()=>h.clock});
+        await recovery.beginAudit(request(),{operationId:oldAudit,expectedRevision:2,approvalOperationId:oldApproval});
+        await recovery.cancelAudit(request(),{auditId:oldAudit,expectedEpoch:1,operationId:'hero-proof-old-cancel-00001'});
+    });
+    const approvalId='hero-proof-new-approval-0001',auditId='hero-proof-new-audit-00001';
+    await createCanonicalRecoveryApproval({...deps,now:()=>h.clock}).issue({
+        auth:{uid:'hero-proof-operator',token:{cloudSaveOperator:true}},data:{
+            ownerUid:h.uid,operationId:approvalId,sourceRevision:3,canonicalRevision:2,ttlSeconds:60}});
+    await createCanonicalCurrentRecovery({...deps,now:()=>h.clock}).beginAudit(request(),{
+        operationId:auditId,expectedRevision:3,approvalOperationId:approvalId});
+    const owner=proofOwnerForTest({...deps,now:()=>h.clock});
+    const verify=async()=>h.dependencies.db.runTransaction(async tx=>{
+        const root=h.dependencies.db.collection('serverUsers').doc(h.uid),names=['recoveryApprovals','recoveryAuditRuns','recoveryAuditFence','operations'];
+        const snapshots=await Promise.all(names.map(name=>tx.get(root.collection(name))));
+        const rows=new Map(names.map((name,i)=>[name,snapshots[i]]));
+        return owner.verifyRetainedAuditControls({tx,root,rows:name=>rows.get(name),auditControl:{auditId,epoch:2}},
+            h.uid,3,rows.get('operations'),[]);
+    });
+    const before=copy([...h.data]),writes=h.writes;
+    await verify();
+    assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);
+    const path=h.root+'/recoveryAuditRuns/'+oldAudit,run=h.data.get(path);
+    h.data.set(path,{...run,schemaVersion:2,canonicalRevision:2,namespaceVersion:3});
+    await assert.rejects(verify(),/source or epoch differs/);
+    assert.equal(h.writes,writes);
+});
+
+function proofOwnerForTest(deps){
+    const filename=require.resolve('../functions/src/canonical-current-recovery'),compiled=new Module(filename);
+    compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+    const original=readFileSync(filename,'utf8'),marker='return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,';
+    assert.equal(original.split(marker).length,2);
+    compiled._compile(original.replace(marker,'return Object.freeze({verifyRetainedAuditControls,verifySegmentedRawRecoveryProof,restoreCurrent,verifyRecoveryAuditArtifact,'),filename);
+    return compiled.exports.createCanonicalCurrentRecovery(deps);
+}
+
+// The fake SDK exposes query metadata. Only this test reference facade adds
+// the public native isEqual method; production never inspects fake internals.
+function queryDb(db){
+    const reference=row=>({path:row.path,id:row.id,collection:name=>query(row.collection(name))});
+    const query=row=>({path:row.path,doc:id=>reference(row.doc(id)),limit:n=>query(row.limit(n)),
+        where:(...args)=>query(row.where(...args)),orderBy:(...args)=>query(row.orderBy(...args)),
+        key:JSON.stringify([row.path,row.filters,row.maximum,row.order]),
+        isEqual:other=>other?.isEqual instanceof Function&&other.key===JSON.stringify([row.path,row.filters,row.maximum,row.order])});
+    return {collection:name=>query(db.collection(name)),doc:path=>reference(db.doc(path))};
+}
+
+async function completeHeroRawCapture(afterHero,beforeHero){
+    const f=await heroFixture(beforeHero),{h,deps,request}=f,approvalId='hero-full-raw-approval-0001',auditId='hero-full-raw-audit-00001';
+    if(afterHero)await afterHero(f);
+    const envelopeRevision=h.revision,canonicalRevision=h.data.get(h.root+'/account/current').serverRevision;
+    await createCanonicalRecoveryApproval({...deps,now:()=>h.clock}).issue({auth:{uid:'hero-proof-operator',token:{cloudSaveOperator:true}},
+        data:{ownerUid:h.uid,operationId:approvalId,sourceRevision:envelopeRevision,canonicalRevision,ttlSeconds:60}});
+    const recovery=createCanonicalCurrentRecovery({...deps,now:()=>h.clock});
+    await recovery.beginAudit(request(),{operationId:auditId,expectedRevision:envelopeRevision,approvalOperationId:approvalId});
+    const epoch=h.data.get(h.root+'/recoveryAuditRuns/'+auditId).epoch;
+    await recovery.prepareInventory(request(),{auditId,expectedEpoch:epoch,operationId:'hero-full-inventory-prepare'});
+    const root=h.root+'/recoveryAuditRuns/'+auditId;
+    for(let sequence=1;!h.data.get(root+'/captureState/current').inventoryExhausted;sequence++){
+        assert.ok(sequence<150,'bounded original empty-terminal inventory');
+        await recovery.captureInventoryPage(request(),{auditId,expectedEpoch:epoch,operationId:'hero-full-inventory-'+String(sequence).padStart(4,'0'),expectedSequence:sequence});
+    }
+    const state=copy(h.data.get(root+'/captureState/current'));
+    let ordinal=0;
+    for(let sequence=1;ordinal<state.capturedCount;sequence++){
+        const result=await recovery.captureRawInventory(request(),{auditId,expectedEpoch:epoch,operationId:'hero-full-raw-capsule-'+String(sequence).padStart(4,'0'),
+            expectedSequence:sequence,startOrdinal:ordinal,count:Math.min(16,state.capturedCount-ordinal)});
+        ordinal=result.nextOrdinal;
+    }
+    const rows=name=>[...h.data].filter(([path])=>path.startsWith(root+'/'+name+'/')).map(([path,row])=>({id:path.split('/').at(-1),row:copy(row)}));
+    const material={binding:{ownerUid:h.uid,auditId,epoch,sourceRevision:envelopeRevision,canonicalRevision,namespaceVersion:3,inventoryStateSha256:state.stateSha256},
+        run:copy(h.data.get(root)),inventoryState:state,inventoryPages:rows('inventoryPages'),rawState:copy(h.data.get(root+'/proofState/current')),
+        rawReceipts:rows('patrolProofPages'),rawChunks:rows('proofPayloadChunks')};
+    return {...f,material};
+}
+
+test('genuine Hero histories traverse original inventory and raw capture into complete original rights proof',async t=>{
+    for(const comprehensive of [false,true]){
+        const f=await completeHeroRawCapture(comprehensive?async({h,deps,request,refreshSession})=>{
+            const acquisition=createHeroAcquisition({...deps,now:()=>h.clock,seed:()=>1});
+            const growth=createHeroGrowth({...deps,acquisition,now:()=>h.clock,seed:()=>2});
+            const intent=extra=>({...request(),data:{...request().data,expectedRevision:h.revision,...extra}});
+            const daily=()=>{const periodDate=require('../functions/src/daily-checkin-policy').taipeiDay(h.clock);
+                return growth.claimDailySupply(intent({periodDate,operationId:'hero-daily-supply-v1-'+periodDate}));};
+            await daily();
+            for(let day=2;day<=7;day++){
+                h.advance(86400000);await refreshSession();await acquisition.observeLogin(intent());
+            }
+            const policy=require('../functions/src/generated/hero-chapter-qualification.json');
+            await acquisition.ensureChapterTicket(intent());
+            for(let count=0;count<33;count++){
+                const state=await acquisition.read(request());
+                if(state.chapter.phase==='completed')break;
+                assert.ok(count<32);
+                const node=policy.nodes.find(row=>row.id===state.chapter.nextNodeId);
+                await acquisition.completeChapterNode(intent({ticketId:state.chapter.ticketId,nodeId:node.id,
+                    choiceId:node.type==='branch'?node.branches[0].id:null}));
+            }
+            await daily();
+            await growth.mutate(intent({operationId:'hero-full-growth-reroll-0001',action:'reroll',heroId:'divineDogHongbao'}));
+        }:null);
+        const {h,deps,material}=f,before=copy([...h.data]),writes=h.writes;
+        const result=await proofOwnerForTest({...deps,db:queryDb(h.dependencies.db),now:()=>h.clock}).verifySegmentedRawRecoveryProof(material);
+        assert.equal(result.segmentedProofValid,true);
+        assert.equal(result.canonicalRevision,material.binding.canonicalRevision);
+        for(const key of ['authoritativeStateReady','candidateProofValid','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[key],false);
+        assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);
+        assert.equal(h.data.has(h.root+'/recoveryArchives/3'),false);
+        assert.ok(result.residentUsage.maxUnitReads<=60);
+        t.diagnostic(JSON.stringify({comprehensive,canonicalRevision:result.canonicalRevision,envelopeRevision:result.sourceRevision,
+            usage:result.assemblyUsage,maxUnitReads:result.residentUsage.maxUnitReads}));
+    }
+});
+
+test('complete Hero capture cannot hide a lost ledger or an unused renewal source behind a new valid seal',async()=>{
+    for(const fault of ['ledger','unused-renewal']){
+        const f=await completeHeroRawCapture(async({h,deps,request,refreshSession})=>{
+            if(fault==='ledger'){
+                const path=[...h.data].find(([path,row])=>path.startsWith(h.root+'/ledgerEntries/')&&row.kind==='hero-login-observation')[0];
+                h.data.delete(path); // Deliberate source-loss negative, never a repair operation.
+            }else{
+                const acquisition=createHeroAcquisition({...deps,now:()=>h.clock,seed:()=>1});
+                const intent=()=>({...request(),data:{...request().data,expectedRevision:h.revision}});
+                const original=await acquisition.ensureChapterTicket(intent());
+                h.advance(8*86400000);await refreshSession();
+                await acquisition.ensureChapterTicket(intent());
+                h.data.delete(h.root+'/heroChapterTickets/'+original.chapter.ticketId);
+            }
+        });
+        const {h,deps,material}=f,before=copy([...h.data]),writes=h.writes;
+        await assert.rejects(proofOwnerForTest({...deps,db:queryDb(h.dependencies.db),now:()=>h.clock}).verifySegmentedRawRecoveryProof(material),
+            fault==='ledger'?/Hero acquisition history or revision is incomplete/:/complete versioned retained proof/);
+        assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);
+    }
+});
+
+test('Hero capture cannot be downgraded to a retained raw format by removing the namespace and canonical cut',async()=>{
+    const {h,deps,material}=await completeHeroRawCapture();
+    delete material.binding.namespaceVersion;delete material.binding.canonicalRevision;
+    const before=copy([...h.data]),writes=h.writes;
+    await assert.rejects(proofOwnerForTest({...deps,db:queryDb(h.dependencies.db),now:()=>h.clock}).verifySegmentedRawRecoveryProof(material),/raw capture run differs/);
+    assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);
+});
+
+
+test('full Hero raw proof closes cancelled legacy audit and current versioned audit together',async()=>{
+    const f=await completeHeroRawCapture(null,async({h,deps,request})=>{
+        const operationId='hero-full-legacy-approval-001',auditId='hero-full-legacy-audit-00001';
+        await createCanonicalRecoveryApproval({...deps,now:()=>h.clock}).issue({
+            auth:{uid:'hero-proof-operator',token:{cloudSaveOperator:true}},
+            data:{ownerUid:h.uid,operationId,sourceRevision:2,ttlSeconds:60}});
+        const recovery=createCanonicalCurrentRecovery({...deps,now:()=>h.clock});
+        await recovery.beginAudit(request(),{operationId:auditId,expectedRevision:2,approvalOperationId:operationId});
+        await recovery.cancelAudit(request(),{auditId,expectedEpoch:1,operationId:'hero-full-legacy-cancel-001'});
+    });
+    const {h,deps,material}=f,before=copy([...h.data]),writes=h.writes;
+    assert.equal(material.binding.epoch,2);
+    const result=await proofOwnerForTest({...deps,db:queryDb(h.dependencies.db),now:()=>h.clock}).verifySegmentedRawRecoveryProof(material);
+    assert.equal(result.segmentedProofValid,true);
+    assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);
+});
+
+test('extra orphan Hero ledger or claim cannot acquire rights through a valid raw seal',async()=>{
+    for(const collection of ['ledgerEntries','uniqueClaims']){
+        const {h,deps,material}=await completeHeroRawCapture(async({h})=>{
+            const original=[...h.data].find(([path,row])=>path.startsWith(h.root+'/ledgerEntries/')&&row.kind==='hero-login-observation')[1];
+            h.data.set(h.root+'/'+collection+'/hero-orphan-evidence-0001',copy(original));
+        });
+        const before=copy([...h.data]),writes=h.writes;
+        await assert.rejects(proofOwnerForTest({...deps,db:queryDb(h.dependencies.db),now:()=>h.clock}).verifySegmentedRawRecoveryProof(material));
+        assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);
+    }
 });

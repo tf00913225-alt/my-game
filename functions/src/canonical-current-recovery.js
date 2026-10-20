@@ -14,6 +14,8 @@ const {verifySkillLoadoutEvidence,skillLoadoutEvidenceReadBudget}=require("./can
 const {classifyRetainedCanonicalOperation}=require("./canonical-operation-classifier");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
+const {createHeroAcquisition}=require("./hero-acquisition");
+const {createHeroGrowth}=require("./hero-growth");
 const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,chargeRecoveryAuditAssembly,admitRecoveryAuditAssemblyBytes,recoveryAuditQueryShapes,
     encodeRawRecoveryArchive,decodeRawRecoveryArchive,prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
     inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,indexRawProofPayload,decodeIndexedRawProofRow,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
@@ -216,8 +218,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
            run.sessionId!==control.sessionId||run.sessionRevision!==control.sessionRevision)
             fail("data-loss","Candidate audit control binding differs.");
         const binding=await verifyAuditApproval(tx,root,uid,sourceRevision,run.approvalOperationId,control.recordedAt);
-        if(binding.sourceSha256!==run.sourceSha256||binding.snapshotSha256!==run.snapshotSha256||
-           binding.approvalBindingSha256!==run.approvalBindingSha256)fail("data-loss","Candidate audit approval binding differs.");
+        if(Object.keys(binding).some(key=>binding[key]!==run[key]))fail("data-loss","Candidate audit approval binding differs.");
     }
     async function verifyRetainedAuditControls(view,uid,expectedRevision,operations,verifiedRecoveryIDs){
         const {tx,root,auditControl:control}=view,verified=new Set(verifiedRecoveryIDs),receipts=await recoveryIndex(operations,doc=>{const row=doc.data();return segmentedScopes.has(tx)?{kind:row.kind,ownerUid:row.ownerUid,operationId:row.operationId,sourceRevision:row.sourceRevision,sourceSha256:row.sourceSha256,approvedBy:row.approvedBy,restoredRevision:row.restoredRevision,createdAt:row.createdAt}:row;});
@@ -225,21 +226,26 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         for await(const doc of recoveryRows(view.rows("recoveryApprovals"))){
             const approval=doc.data(),used=approval?.status==="used";
             inventoryExact(approval,["schemaVersion","kind","ownerUid","operationId","sourceRevision","sourceSha256","snapshotSha256",
-                "approvedBy","status","issuedAt","expiresAt",...(used?["usedRevision","usedAt"]:[])],"retained approval");
-            if(approval.schemaVersion!==1||approval.kind!=="canonical-current-recovery-approval"||approval.ownerUid!==uid||
+                "approvedBy","status","issuedAt","expiresAt",...(used?["usedRevision","usedAt"]:[]),
+                ...(approval.schemaVersion===2?["canonicalRevision","namespaceVersion"]:[])],"retained approval");
+            if(![1,2].includes(approval.schemaVersion)||
+               (approval.schemaVersion===2&&(approval.namespaceVersion!==3||used||!Number.isSafeInteger(approval.canonicalRevision)||
+                   approval.canonicalRevision<2||approval.canonicalRevision>approval.sourceRevision))||
+               approval.kind!=="canonical-current-recovery-approval"||approval.ownerUid!==uid||
                approval.operationId!==doc.id||!OPERATION_ID.test(doc.id)||!["approved","used"].includes(approval.status)||
                !Number.isSafeInteger(approval.sourceRevision)||approval.sourceRevision<2||approval.sourceRevision>expectedRevision||
                !HEX.test(approval.sourceSha256||"")||!HEX.test(approval.snapshotSha256||"")||
                typeof approval.approvedBy!=="string"||!approval.approvedBy.trim())fail("data-loss","Retained audit approval identity differs.");
             const binding=auditApprovalBinding(approval,approval.sourceRevision);
             if(compare(binding.issuedAt,binding.expiresAt)>=0)fail("data-loss","Retained audit approval interval differs.");
+            const canonicalRevision=approval.schemaVersion===2?approval.canonicalRevision:approval.sourceRevision;
             const [snapshot,archive]=await Promise.all([
-                tx.get(root.collection("playableSnapshots").doc(String(approval.sourceRevision))),
-                tx.get(root.collection("recoveryArchives").doc(String(approval.sourceRevision)))]);
+                tx.get(root.collection("playableSnapshots").doc(String(canonicalRevision))),
+                tx.get(root.collection("recoveryArchives").doc(String(canonicalRevision)))]);
             try{
                 if(!snapshot.exists||!archive.exists||snapshot.get("sha256")!==approval.snapshotSha256||
                    archive.get("sourceSha256")!==approval.sourceSha256)throw Error("Missing original approval source");
-                const original=inspectRecoveryArchive(archive.data(),uid,approval.sourceRevision,snapshot.data());
+                const original=inspectRecoveryArchive(archive.data(),uid,canonicalRevision,snapshot.data());
                 if(original.account.provenance!=="server-created")throw Error("Approval provenance differs");
             }catch(_){fail("data-loss","Retained audit approval source differs.");}
             if(used){
@@ -266,6 +272,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             const run=runs[index],last=index===runs.length-1,source=approvals.get(run.approvalOperationId);
             if(run.epoch!==index+1||(last?(run.auditId!==control.auditId||run.status!=="active"):run.status!=="cancelled")||
                run.sourceRevision>expectedRevision||!source||run.sourceRevision!==source.approval.sourceRevision||
+               run.schemaVersion!==source.approval.schemaVersion||
+               (run.schemaVersion===2&&(run.canonicalRevision!==source.approval.canonicalRevision||run.namespaceVersion!==source.approval.namespaceVersion))||
                run.sourceSha256!==source.approval.sourceSha256||run.snapshotSha256!==source.approval.snapshotSha256||
                run.approvalBindingSha256!==snapshotDigest(source.binding))fail("data-loss","Retained audit run source or epoch differs.");
             const created=timestampPair(run.createdAt),updated=timestampPair(run.updatedAt);
@@ -500,7 +508,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     }
     // Bounded proof components. These seals never certify the complete recovery closure.
     function admitProofInventory(state,namespaces){
-        if(namespaces.length!==31||state.phase!=="inventory"||!state.inventoryExhausted||state.capturedCount>PATROL_PROOF_LIMITS.inventoryDocuments)
+        if(namespaces.length!==(state.schemaVersion===2&&state.namespaceVersion===3?36:31)||
+           state.phase!=="inventory"||!state.inventoryExhausted||state.capturedCount>PATROL_PROOF_LIMITS.inventoryDocuments)
             fail("failed-precondition","Forest proof inventory admission failed.");
     }
     async function completeInventory(tx,run,state,namespaces,runRef){
@@ -709,13 +718,16 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             fail("data-loss","Private raw readback ownership differs.");
         inventoryExact(input,["binding","run","inventoryState","inventoryPages","rawState","rawReceipts","rawChunks"],"complete raw capture");
         const {binding}=input;
-        inventoryExact(binding,["ownerUid","auditId","epoch","sourceRevision","inventoryStateSha256"],"raw capture binding");
+        inventoryExact(binding,["ownerUid","auditId","epoch","sourceRevision","inventoryStateSha256",
+            ...(binding.namespaceVersion===3?["canonicalRevision","namespaceVersion"]:[])],"raw capture binding");
         if(typeof binding.ownerUid!=="string"||!binding.ownerUid||binding.ownerUid.includes("/")||
            !OPERATION_ID.test(binding.auditId||"")||!Number.isSafeInteger(binding.epoch)||binding.epoch<1||
            !Number.isSafeInteger(binding.sourceRevision)||binding.sourceRevision<2||!HEX.test(binding.inventoryStateSha256||""))
             fail("data-loss","Complete raw capture binding differs.");
-        const run=inspectAuditRun(input.run,binding.ownerUid,binding.auditId),namespaces=recoveryAuditNamespaces(binding.ownerUid,2);
-        if(run.epoch!==binding.epoch||run.sourceRevision!==binding.sourceRevision)fail("data-loss","Complete raw capture run differs.");
+        const run=inspectAuditRun(input.run,binding.ownerUid,binding.auditId),namespaces=recoveryAuditNamespaces(binding.ownerUid,binding.namespaceVersion??2);
+        if(run.epoch!==binding.epoch||run.sourceRevision!==binding.sourceRevision||
+           run.namespaceVersion!==binding.namespaceVersion||run.canonicalRevision!==binding.canonicalRevision)
+            fail("data-loss","Complete raw capture run differs.");
         const inventory=inspectInventoryState(input.inventoryState,run,namespaces);
         admitProofInventory(inventory,namespaces);
         if(inventory.stateSha256!==binding.inventoryStateSha256)fail("data-loss","Complete raw capture inventory binding differs.");
@@ -1109,13 +1121,54 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     async function recoveryIndex(query,project){
         const result=new Map();for await(const doc of recoveryRows(query))result.set(doc.id,project(doc));return result;
     }
+    async function verifyHeroRecoveryEvidence(view,uid,envelopeRevision,canonicalRevision,binding,budget){
+        const {tx,root}=view,acquisition=createHeroAcquisition({db,FieldValue,HttpsError,runProtected,inspectExistingEnvelope,nextRevision,now});
+        const growth=createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExistingEnvelope,nextRevision,acquisition,now});
+        encodeProofPayload(binding,budget);
+        const scope={root,uid,envelopeRevision,canonicalRevision,captureSha256:snapshotDigest(binding)};
+        const retained=value=>{encodeProofPayload(value,budget);return value;};
+        const inventory={};
+        for(const name of ["heroAcquisition","heroAcquisitionHistory","heroChapter","heroChapterTickets","heroChapterSteps"]){
+            const ids=[];for await(const doc of recoveryRows(view.rows(name)))ids.push(doc.id);
+            inventory[name]=retained(ids);
+        }
+        const login=retained(await acquisition.verifyRetainedLogin(recoveryUnit(tx),scope));
+        const head=retained(await acquisition.verifyRetainedChapterHead(recoveryUnit(tx),scope)),tickets=[],steps=[];
+        for(const id of inventory.heroChapterTickets)tickets.push(retained(await acquisition.verifyRetainedChapterTicket(recoveryUnit(tx),scope,id)));
+        for(const id of inventory.heroChapterSteps)steps.push(retained(await acquisition.verifyRetainedChapterStep(recoveryUnit(tx),scope,id)));
+        const closed=retained(acquisition.closeRetainedEvidence({login,head,tickets,steps,inventory}));
+        const operationIds=new Set(),ledgerIds=new Set(),claimIds=new Set();
+        const add=(set,ids)=>{for(const id of ids){chargeRecoveryAuditAssembly(budget,"operations",2);
+            chargeRecoveryAuditAssembly(budget,"nodes",1);if(set.has(id))fail("data-loss","Overlapping Hero evidence blocks recovery.");set.add(id);}};
+        add(operationIds,closed.operationIds);add(ledgerIds,closed.ledgerIds);add(claimIds,closed.claimIds);
+        for await(const doc of recoveryRows(view.rows("operations"))){
+            if(!["hero-growth","hero-login-reward","hero-daily-supply"].includes(doc.get("kind")))continue;
+            const proof=retained(await growth.verifyRetainedOperation(recoveryUnit(tx),{...scope,entitlements:closed.entitlements},doc.id));
+            const expected=closed.entitlements.filter(row=>row.grantedRevision<=proof.beforeEnvelopeRevision)
+                .sort((a,b)=>a.heroId.localeCompare(b.heroId,"en"))
+                .map(row=>({...row,beforeEnvelopeRevision:proof.beforeEnvelopeRevision}));
+            retained(expected);
+            if(proof.ownerUid!==uid||proof.operationId!==doc.id||proof.captureSha256!==scope.captureSha256||
+               snapshotDigest(proof.entitlementObligations)!==snapshotDigest(expected))
+                fail("data-loss","Hero historical entitlement obligations differ.");
+            if(proof.loginEvidence){
+                const original=closed.loginHistory.find(row=>row.operationId===proof.loginEvidence.sourceId);
+                if(!original||original.serverRevision!==proof.loginEvidence.serverRevision||original.sha256!==proof.loginEvidence.sha256||
+                   original.loginCount!==proof.loginEvidence.loginCount||original.serverRevision>proof.beforeEnvelopeRevision)
+                    fail("data-loss","Hero login reward lacks its original complete history.");
+            }
+            add(operationIds,proof.operationIds);add(ledgerIds,proof.ledgerIds);add(claimIds,proof.claimIds);
+        }
+        return {operationIds,ledgerIds,claimIds};
+    }
     async function verifyRecoveryRights(tx,root,uid,expectedRevision,records,{
         claims,receipts,ledgers,grants,events,operations,modeSources,modeEvents,
         patrolTickets,patrolStates,patrolSettlements,patrolClosures,patrolModeEvents,
-        patrolOwnedModeEvents,patrolOperationIds}){
+        patrolOwnedModeEvents,patrolOperationIds,heroProof=null}){
         const verifiedRecoveryIDs=new Set();
         const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
-        if(recoveryCount(claims)!==archivedClaims.size){
+        if([...heroProof?.claimIds??[]].some(id=>archivedClaims.has(id))||
+           recoveryCount(claims)!==archivedClaims.size+(heroProof?.claimIds.size??0)){
             fail("data-loss","Independent claims differ from the recovery archive.");
         }
         // A lost claim/receipt index cannot hide a retained economic delta.
@@ -1180,7 +1233,10 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         for await(const doc of recoveryRows(operations)){
             const value=doc.data();
             const category=classifyRetainedCanonicalOperation(value,doc.id,uid,expectedRevision,fail);
-            if(category==="patrol"){
+            if(category==="hero"){
+                if(!heroProof?.operationIds.has(doc.id)||!heroProof.ledgerIds.has(doc.id)||receiptById.has(doc.id))
+                    fail("data-loss","Hero operation lacks complete versioned retained proof.");
+            }else if(category==="patrol"){
                 if(receiptById.has(doc.id)||!ledgerIds.has(doc.id)||!verifiedPatrolOperations.has(doc.id)){
                     fail("data-loss","A Patrol operation lacks its original source and signed ledger.");
                 }
@@ -1311,6 +1367,10 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         let creditLedgerCount=0;
         for await(const doc of recoveryRows(ledgers)){
             const ledger=doc.data(),receipt=receiptById.get(doc.id);
+            if(heroProof?.ledgerIds.has(doc.id)){
+                if(receipt||!heroProof.operationIds.has(doc.id))fail("data-loss","Hero ledger overlaps other economic evidence.");
+                continue; // The original complete Hero source/transition proof checked this exact immutable row.
+            }
             if(ledger.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
                ledger.schemaVersion!==1||ledger.ownerUid!==uid){
                 fail("data-loss","An unmatched ledger entry blocks recovery.");
@@ -1367,6 +1427,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             fail("data-loss","Credited receipt inventory differs from the recovery archive.");
         }
         for await(const doc of recoveryRows(claims)){
+            if(heroProof?.claimIds.has(doc.id))continue; // Disjoint original Hero closure, never an archived credit claim.
             const record=archivedClaims.get(doc.id),claim=doc.data();
             if(!record||record.grantId!==doc.id||!OPERATION_ID.test(record.operationId||"")){
                 fail("data-loss","Unsupported or unmatched recovery claim.");
@@ -1628,9 +1689,9 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     // Private verification view over this Owner's already sealed raw capture.
     // It is not a provider, live SDK transaction, publication candidate or
     // caller-configurable loader. Only original exact query shapes are valid.
-    function segmentedRawView(capture,budget,uid){
+    function segmentedRawView(capture,budget,uid,namespaceVersion=2){
         const root=db.collection("serverUsers").doc(uid),namespaces=new Map(capture.namespaces.map(row=>[row.path,row.ids]));
-        const used=new Set(),absences=new Set(),shapes=recoveryAuditQueryShapes(root),pending=new Set();
+        const used=new Set(),absences=new Set(),shapes=recoveryAuditQueryShapes(root,namespaceVersion),pending=new Set();
         const field=(row,key)=>key.split(".").reduce((v,k)=>v?.[k],row);
         const metrics={units:0,executedProofUnits:0,settlementReuseHits:0,enumeratedSettlementRows:0,
             witnessLookupOperations:0,witnessMetadataNodes:0,maxUnitReads:0,maxUnitTypedBytes:0};
@@ -1769,16 +1830,17 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             if(!ownership)chargeRecoveryAuditAssembly(budget,"operations",1);
             chargeRecoveryAuditAssembly(budget,"passes",1);
             const capture=inspectCompleteRawCapture(input,budget,true,ownership),{ownerUid:uid,sourceRevision:revision,auditId}=input.binding;
-            view=segmentedRawView(capture,budget,uid);const {tx,root}=view;
+            const namespaceVersion=input.binding.namespaceVersion??2,canonicalRevision=input.binding.canonicalRevision??revision;
+            view=segmentedRawView(capture,budget,uid,namespaceVersion);const {tx,root}=view;
             const selected=await tx.get(root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(auditId));
             if(!selected.exists||!encodeProofPayload(selected.data(),budget).equals(encodeProofPayload(input.run,budget)))
                 fail("data-loss","Segmented selected run differs.");
             const run=selected.data();
             view.auditControl={auditId,epoch:run.epoch,sessionId:run.sessionId,sessionRevision:run.sessionRevision,
                 recordedAt:run.createdAt};
-            const envelopeSnap=await tx.get(view.save),archiveSnap=await tx.get(root.collection("recoveryArchives").doc(String(revision))),
-                snapshotSnap=await tx.get(root.collection("playableSnapshots").doc(String(revision)));
-            const {envelope,records}=inspectCurrentRecoverySource(uid,revision,{envelopeSnap,archiveSnap,snapshotSnap});
+            const envelopeSnap=await tx.get(view.save),archiveSnap=await tx.get(root.collection("recoveryArchives").doc(String(canonicalRevision))),
+                snapshotSnap=await tx.get(root.collection("playableSnapshots").doc(String(canonicalRevision)));
+            const {envelope,records}=inspectCurrentRecoverySource(uid,canonicalRevision,{envelopeSnap,archiveSnap,snapshotSnap});
             if(envelope.serverRevision!==revision)fail("aborted","CLOUD_REVISION_CONFLICT");
             await verifyCandidateAuditControl(tx,root,uid,revision,view.auditControl);
             for(const name of Object.keys(SINGLES)){
@@ -1798,7 +1860,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                 patrolModeEvents=view.rows("modeTimeEvents",doc=>doc.get("schemaVersion")===2),
                 patrolOwnedModeEvents=view.rows("modeTimeEvents",doc=>doc.get("resultOwner")==="forest-patrol-settlement"),
                 patrolOperationIds=new Set((await recoveryIndex(collections.patrolSettlements,()=>true)).keys());
-            const verified=await verifyRecoveryRights(tx,root,uid,revision,records,{...collections,modeEvents,patrolModeEvents,patrolOwnedModeEvents,patrolOperationIds});
+            const heroProof=namespaceVersion===3?await verifyHeroRecoveryEvidence(view,uid,revision,canonicalRevision,input.binding,budget):null;
+            const verified=await verifyRecoveryRights(tx,root,uid,revision,records,{...collections,modeEvents,patrolModeEvents,patrolOwnedModeEvents,patrolOperationIds,heroProof});
             for await(const doc of recoveryRows(view.rows("modeTimeEvents"))){
                 if(doc.get("schemaVersion")===1&&doc.get("modeChanged")===false)
                     await verifyProofUnit(tx,recoveryUnit(tx),root,uid,records,revision,"mode-nonvalue-event",doc.id);
@@ -1808,7 +1871,9 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             }
             await verifyRetainedAuditControls(view,uid,revision,collections.operations,verified);
             const summary=view.finish();
+            if(namespaceVersion===3)chargeRecoveryAuditAssembly(budget,"nodes",2);
             return Object.freeze({...inventoryFlags,segmentedProofValid:true,ownerUid:uid,sourceRevision:revision,...summary,
+                ...(namespaceVersion===3?{canonicalRevision,namespaceVersion}:{}),
                 assemblyUsage:recoveryAuditAssemblyUsage(budget)});
         }catch(error){if(error instanceof HttpsError)throw error;fail("data-loss",error.message);}
         finally{if(view)await view.close();}
@@ -1824,7 +1889,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         if(!value)fail("permission-denied","An original private candidate identity is required.");
         return value;
     }
-    // Thirteen point reads including the original Session runner's three.
+    // Legacy thirteen point reads including the original Session runner's three;
+    // Hero captures additionally recheck the current canonical pointer.
     // This does not include the separately bounded outside-transaction scan.
     async function publicationContext(tx,session,args){
         const context=await inventoryContext(tx,session,args.auditId,args.expectedEpoch);
@@ -1842,6 +1908,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         const reference=runRef.collection("candidatePublications").doc(args.operationId),existing=await tx.get(reference);
         const tuple={ownerUid:session.uid,auditId:run.auditId,epoch:run.epoch,operationId:args.operationId,
             sessionId:session.sessionId,sessionRevision:session.revision,sourceRevision:run.sourceRevision,
+            ...(run.namespaceVersion===3?{canonicalRevision:run.canonicalRevision,namespaceVersion:3}:{}),
             sourceSha256:run.sourceSha256,snapshotSha256:run.snapshotSha256,approvalOperationId:run.approvalOperationId,
             approvalBindingSha256:run.approvalBindingSha256,inventoryStateSha256:inventory.stateSha256,
             rawStateSha256:rawState.stateSha256,rawLastReceiptSha256:rawState.lastReceiptSha256};
@@ -1858,7 +1925,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         const pinned=await runRecoveryAuditMaintenance(request,args.auditId,async(tx,session)=>{
             const value=await publicationContext(tx,session,args);
             return {args:{...args},tuple:value.tuple,run:value.run,inventory:value.inventory,rawState:value.rawState,runRef:value.runRef,
-                encodingVersion:value.existing.exists?publicationEncoding(value.existing.data()):3};
+                encodingVersion:value.existing.exists?publicationEncoding(value.existing.data()):(value.run.namespaceVersion===3?4:3)};
         },args.operationId);
         return publicationIdentity(publicationPins,pinned);
     }
@@ -1869,7 +1936,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     async function loadPinnedRawMaterial(pin){
         const pinned=publicationValue(publicationPins,pin),budget=createRecoveryAuditAssemblyBudget();
         const input={binding:{ownerUid:pinned.tuple.ownerUid,auditId:pinned.tuple.auditId,epoch:pinned.tuple.epoch,
-            sourceRevision:pinned.tuple.sourceRevision,inventoryStateSha256:pinned.tuple.inventoryStateSha256},
+            sourceRevision:pinned.tuple.sourceRevision,inventoryStateSha256:pinned.tuple.inventoryStateSha256,
+            ...(pinned.tuple.namespaceVersion===3?{canonicalRevision:pinned.tuple.canonicalRevision,namespaceVersion:3}:{})},
             run:pinned.run,inventoryState:pinned.inventory,rawState:pinned.rawState};
         let wireBytes=0,scanReads=0;
         // Immutable capture paths only. SDK materialization is separately
@@ -1941,9 +2009,14 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         return publicationIdentity(publicationArtifacts,{pin,bytes:artifact.bytes,summary:artifact.summary,encodingVersion:2});
     }
     function publicationEncoding(row){
-        if(row?.schemaVersion===1&&row.kind==="canonical-recovery-candidate-publication"&&row.candidateEncodingVersion===2)return 2;
+        if(row?.schemaVersion===1&&row.kind==="canonical-recovery-candidate-publication"&&row.candidateEncodingVersion===2&&
+           !Object.hasOwn(row,"canonicalRevision")&&!Object.hasOwn(row,"namespaceVersion"))return 2;
         if(row?.schemaVersion===2&&row.kind==="canonical-recovery-raw-publication"&&row.candidateEncodingVersion===3&&
-           row.artifactKind==="canonical-recovery-raw-archive"&&row.proofKind==="segmented-original-rights-v1")return 3;
+           row.artifactKind==="canonical-recovery-raw-archive"&&row.proofKind==="segmented-original-rights-v1"&&
+           !Object.hasOwn(row,"canonicalRevision")&&!Object.hasOwn(row,"namespaceVersion"))return 3;
+        if(row?.schemaVersion===3&&row.kind==="canonical-recovery-raw-publication"&&row.candidateEncodingVersion===4&&
+           row.artifactKind==="canonical-recovery-raw-archive"&&row.proofKind==="segmented-original-rights-v2"&&row.namespaceVersion===3&&
+           Number.isSafeInteger(row.canonicalRevision)&&row.canonicalRevision>=2&&row.canonicalRevision<=row.sourceRevision)return 4;
         fail("data-loss","Unsupported original publication encoding or proof kind.");
     }
     async function assemblePinnedRawArchive(pin,material){
@@ -1954,7 +2027,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         const summary=await verifySegmentedRawRecoveryProof(value.input,value.budget);
         const bytes=encodeRawRecoveryArchive(value.input,value.budget);
         recoveryAuditAssemblyUsage(value.budget);
-        return publicationIdentity(publicationArtifacts,{pin,bytes,summary,encodingVersion:3,budget:value.budget});
+        return publicationIdentity(publicationArtifacts,{pin,bytes,summary,encodingVersion:value.input.binding.namespaceVersion===3?4:3,budget:value.budget});
     }
     async function prepareCandidatePublication(request,pin,artifactIdentity){
         requirePublicationPreparation();
@@ -1967,7 +2040,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             if(artifact.budget)recoveryAuditAssemblyUsage(artifact.budget);
             if(snapshotDigest(current.tuple)!==snapshotDigest(pinned.tuple))fail("aborted","Publication capture binding changed.");
             if(artifact.budget){
-                chargeRecoveryAuditAssembly(artifact.budget,"nodes",26);
+                chargeRecoveryAuditAssembly(artifact.budget,"nodes",artifact.encodingVersion===4?28:26);
                 chargeRecoveryAuditAssembly(artifact.budget,"bytes",artifact.bytes.length);
             }
             const tuple={schemaVersion:1,kind:"canonical-recovery-candidate-publication",...pinned.tuple,
@@ -1975,9 +2048,10 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                 candidateEncodingVersion:artifact.encodingVersion,bucketName:immutableCandidateIO.bucketName,
                 objectName:`private/recovery-candidates/v1/${session.uid}/${args.auditId}/${args.expectedEpoch}/${args.operationId}.csra`,
                 artifactSha256:inventoryHash(artifact.bytes),artifactByteLength:artifact.bytes.length,status:"prepared",...inventoryFlags};
-            if(artifact.encodingVersion===3){
-                tuple.schemaVersion=2;tuple.kind="canonical-recovery-raw-publication";
-                tuple.artifactKind="canonical-recovery-raw-archive";tuple.proofKind="segmented-original-rights-v1";
+            if([3,4].includes(artifact.encodingVersion)){
+                tuple.schemaVersion=artifact.encodingVersion===4?3:2;tuple.kind="canonical-recovery-raw-publication";
+                tuple.artifactKind="canonical-recovery-raw-archive";
+                tuple.proofKind=artifact.encodingVersion===4?"segmented-original-rights-v2":"segmented-original-rights-v1";
             }
             publicationEncoding(tuple);
             if(typeof tuple.bucketName!=="string"||!tuple.bucketName)fail("failed-precondition","A private publication destination is unavailable.");
@@ -2033,7 +2107,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         // is no Firestore/Storage distributed transaction: ACK rechecks again.
         const {prepared,artifact,manifest}=await livePreparedPublication(request,identity),tuple=prepared.tuple;
         const name={bucketName:tuple.bucketName,objectName:tuple.objectName},encodingVersion=publicationEncoding(tuple);
-        const readBudget=encodingVersion===3?createRecoveryAuditAssemblyBudget():null;
+        const readBudget=encodingVersion!==2?createRecoveryAuditAssemblyBudget():null;
         let metadata;
         if(manifest.status==="acknowledged")metadata={...name,generation:manifest.generation,size:manifest.objectSize};
         else{
@@ -2045,7 +2119,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                     // The fixed transport snapshots raw bytes synchronously before
                     // its first await; the original private artifact has no caller.
                     created=publicationMetadata(await immutableCandidateIO.createOnly({...name,
-                        bytes:encodingVersion===3?artifact.bytes:Buffer.from(artifact.bytes),ifGenerationMatch:"0"}),tuple);
+                        bytes:encodingVersion!==2?artifact.bytes:Buffer.from(artifact.bytes),ifGenerationMatch:"0"}),tuple);
                 }catch(error){
                     if(!["ALREADY_EXISTS","UNKNOWN_COMMIT"].includes(error.code))throw error;
                 }
@@ -2081,6 +2155,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             const input=decodeRawRecoveryArchive(response.bytes,readBudget,tuple.artifactSha256);
             if(input.binding.ownerUid!==tuple.ownerUid||input.binding.auditId!==tuple.auditId||input.binding.epoch!==tuple.epoch||
                input.binding.sourceRevision!==tuple.sourceRevision||input.binding.inventoryStateSha256!==tuple.inventoryStateSha256||
+               input.binding.namespaceVersion!==tuple.namespaceVersion||input.binding.canonicalRevision!==tuple.canonicalRevision||
                input.run.sourceSha256!==tuple.sourceSha256||input.run.snapshotSha256!==tuple.snapshotSha256||
                input.run.approvalOperationId!==tuple.approvalOperationId||input.run.sessionId!==tuple.sessionId||
                input.run.sessionRevision!==tuple.sessionRevision||input.run.approvalBindingSha256!==tuple.approvalBindingSha256||
@@ -2090,7 +2165,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             registerPrivateReadbackOwnership(input,readBudget);
             const result=await verifySegmentedRawRecoveryProof(input,readBudget);
             if(result.segmentedProofValid!==true||Object.keys(inventoryFlags).some(key=>result[key]!==false)||
-               result.ownerUid!==tuple.ownerUid||result.sourceRevision!==tuple.sourceRevision)
+               result.ownerUid!==tuple.ownerUid||result.sourceRevision!==tuple.sourceRevision||
+               result.namespaceVersion!==tuple.namespaceVersion||result.canonicalRevision!==tuple.canonicalRevision)
                 fail("data-loss","Immutable raw archive original proof differs.");
             recoveryAuditAssemblyUsage(readBudget);
         }
