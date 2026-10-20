@@ -16,6 +16,64 @@ async function fixture(options){
     const intent={operationId:'loadout_equip_000001',expectedRevision:h.revision,characterId,action:'equip',skillId:'flameSlash'};
     return {h,writer,intent,characterId};
 }
+
+test('protected configuration read preserves v1/v2 presence without first-write admission or authority',async()=>{
+    const {h,writer,intent,characterId}=await fixture(),reads=[];
+    const reader=createCanonicalSkillLoadout({...h.dependencies,runProtected:(request,fn)=>h.dependencies.runProtected(request,(tx,session)=>
+        fn({...tx,get:ref=>{reads.push(ref.path);return tx.get(ref);}},session))});
+    const original=[...h.data],writes=h.writes;
+    // Unrelated operation history is not an absence admission for a read.
+    h.data.set(`${h.root}/operations/unknown-read-only-history`,{kind:'unknown'});
+    const v1=await reader.readLoadout(h.request(),{expectedRevision:h.revision});
+    assert.equal(v1.preferencesVersion,1);assert.equal(v1.ownerUid,h.uid);
+    assert.equal(v1.serverRevision,h.revision);assert.equal(v1.canonicalRevision,h.revision);
+    assert.deepEqual(v1.characters,[{characterId,slotIndex:0,skillLoadout:h.data.get(`${h.root}/characters/${characterId}`).skillLoadout}]);
+    for(const name of ['autoConfig','autoConfig2','autoConfig3']){
+        assert.deepEqual(v1[name],h.data.get(`${h.root}/progress/current`).playableState[name]);
+        assert.equal(Object.hasOwn(v1[name],'v136ActionIntent'),false);assert.equal(Object.hasOwn(v1[name],'v136LastSkill'),false);
+    }
+    assert.equal(reads.some(path=>path.includes('/operations')),false);assert.equal(h.writes,writes);
+    h.data.delete(`${h.root}/operations/unknown-read-only-history`);assert.deepEqual([...h.data],original);
+    await writer.mutateLoadout(h.request(),intent);
+    await writer.mutateLoadout(h.request(),{...intent,operationId:'loadout_read_selected01',expectedRevision:h.revision,action:'select-auto-action'});
+    reads.length=0;const before=[...h.data],afterWrites=h.writes,v2=await reader.readLoadout(h.request(),{expectedRevision:h.revision});
+    assert.equal(v2.preferencesVersion,2);assert.equal(v2.autoConfig.v136ActionIntent,'skill');assert.equal(v2.autoConfig.v136LastSkill,'flameSlash');
+    assert.equal(Object.hasOwn(v2.autoConfig2,'v136ActionIntent'),false);assert.equal(Object.hasOwn(v2.autoConfig3,'v136LastSkill'),false);
+    assert.ok(reads.includes(`${h.root}/operations/loadout_read_selected01`));
+    for(const namespace of ['ledgerEntries','grantOperations'])assert.ok(reads.includes(`${h.root}/${namespace}/loadout_read_selected01`));
+    for(const flag of ['authoritativeStateReady','readyForRestore','rewardEligible','outcomeVerified'])assert.equal(v2[flag],false);
+    assert.deepEqual(Object.keys(v2).sort(),['schemaVersion','ownerUid','serverRevision','canonicalRevision','preferencesVersion','characters',
+        'autoConfig','autoConfig2','autoConfig3','outcomeVerified','rewardEligible','readyForRestore','authoritativeStateReady'].sort());
+    assert.equal(h.writes,afterWrites);assert.deepEqual([...h.data],before);
+});
+
+test('configuration reads reject stale revision, replaced identity and corrupt original sources/head without writes',async()=>{
+    const {h,writer,intent}=await fixture();await writer.mutateLoadout(h.request(),intent);
+    const before=[...h.data],writes=h.writes,read=value=>writer.readLoadout(h.request(),value);
+    for(const value of [{},{expectedRevision:0},{expectedRevision:'4'},{expectedRevision:h.revision,rawState:{}},
+        {expectedRevision:h.revision-1}])await assert.rejects(read(value));
+    const head=`${h.root}/operations/${intent.operationId}`,archived=`${h.root}/recoveryArchives/${h.revision}`;
+    for(const path of [head,archived]){const value=h.data.get(path);h.data.delete(path);
+        await assert.rejects(read({expectedRevision:h.revision}),{code:'data-loss'});h.data.set(path,value);}
+    await assert.rejects(writer.readLoadout({auth:{uid:'foreign'},data:h.request().data},{expectedRevision:h.revision}),{code:'permission-denied'});
+    const request=h.request();h.setSession('b'.repeat(32));
+    await assert.rejects(writer.readLoadout(request,{expectedRevision:h.revision}),{code:'permission-denied'});
+    assert.equal(h.writes,writes);assert.deepEqual([...h.data].sort(),before.sort());
+});
+
+test('configuration read distinguishes a real Hero-only envelope revision from the canonical source revision',async()=>{
+    const h=storeHarness();
+    await h.initial.commitInitialSources(h.request(),{operationId:'loadout_read_initial01',expectedRevision:h.revision,selection});
+    const {createHeroAcquisition}=require('../functions/src/hero-acquisition');
+    const request=h.request();request.data.expectedRevision=h.revision;
+    await createHeroAcquisition({...h.dependencies,seed:()=>1}).observeLogin(request);
+    assert.equal(h.revision,3);assert.equal(h.data.get(`${h.root}/account/current`).serverRevision,2);
+    const writes=h.writes,before=[...h.data];
+    const result=await createCanonicalSkillLoadout(h.dependencies).readLoadout(h.request(),{expectedRevision:3});
+    assert.equal(result.serverRevision,3);assert.equal(result.canonicalRevision,2);assert.equal(result.preferencesVersion,1);
+    assert.equal(h.data.has(`${h.root}/playableSnapshots/3`),false);assert.equal(h.data.has(`${h.root}/recoveryArchives/3`),false);
+    assert.equal(h.writes,writes);assert.deepEqual([...h.data],before);
+});
 test('actual learned ownership equips, explicitly remembers normal/defend/skill and removes with original primary sync',async()=>{
     const {h,writer,intent,characterId}=await fixture(),character=()=>h.data.get(`${h.root}/characters/${characterId}`);
     const points=character().state.skillPoints,eco={...h.data.get(`${h.root}/economy/current`)};

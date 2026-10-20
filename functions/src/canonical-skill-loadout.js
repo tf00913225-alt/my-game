@@ -112,6 +112,57 @@ async function verifySkillLoadoutEvidence({tx,root,uid,operationId,currentRevisi
 
 function createCanonicalSkillLoadout({db,FieldValue,HttpsError,runProtected,inspectExistingEnvelope,nextRevision}){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
+    // Shared current-source validation only. First-write history admission stays
+    // in the mutation, and a configuration read creates no history/absence right.
+    async function readCurrentContext(tx,root,uid,envelope,expectedRevision,characterId){
+        if(envelope.serverRevision!==expectedRevision)fail("aborted","CLOUD_REVISION_CONFLICT");
+        const names=["account","economy","relicLoadout","progress","claimCheckpoints"],refs=names.map(name=>root.collection(name).doc("current")),singles=[];
+        for(const ref of refs){const snapshot=await tx.get(ref);if(!snapshot.exists)fail("data-loss","Complete canonical sources are required.");singles.push(snapshot);}
+        const account=singles[0].data(),previous=account.serverRevision;
+        if(account.ownerUid!==uid||account.provenance!=="server-created"||!Number.isSafeInteger(previous)||previous<1||previous>expectedRevision)
+            fail("data-loss","Canonical skill loadout revision is invalid.");
+        const characters=await readCharacterSources(tx,root,account,fail);
+        if(characterId!==undefined&&!account.slots.includes(characterId))fail("invalid-argument","Character target is not owned.");
+        const prior=await tx.get(root.collection("playableSnapshots").doc(String(previous)));
+        const archived=await tx.get(root.collection("recoveryArchives").doc(String(previous)));
+        const owned=await readOwnedSources(tx,root,fail,{accountSnapshot:singles[0],currentSnapshot:prior});
+        const records={account:source(account),characters:characters.records,...owned.records,economy:source(singles[1].data()),
+            relicLoadout:source(singles[2].data()),progress:source(singles[3].data()),claimCheckpoint:source(singles[4].data())};
+        try{
+            if(!prior.exists||!archived.exists||prior.get("sha256")!==account.snapshotSha256)throw Error("missing");
+            verifyCanonicalSnapshotAgainstSources(prior.data(),uid,previous,records);
+            if(!same(inspectRecoveryArchive(archived.data(),uid,previous,prior.data()),records))throw Error("different");
+        }catch(_){fail("data-loss","Current skill loadout sources differ from their archive.");}
+        if(!records.progress.playableState)fail("data-loss","Complete playable skill sources are required.");
+        return {records,refs,characters,owned,previous};
+    }
+    async function readLoadout(request,intent){
+        if(!intent||Object.keys(intent).join(",")!=="expectedRevision"||!Number.isSafeInteger(intent.expectedRevision)||intent.expectedRevision<1)
+            fail("invalid-argument","An expected revision is required for the configuration read.");
+        const expectedRevision=intent.expectedRevision;
+        return runProtected(request,async(tx,session)=>{
+            const uid=session.uid,root=db.collection("serverUsers").doc(uid),snapshot=await tx.get(db.doc(`users/${uid}/saves/current`));
+            if(!snapshot.exists)fail("failed-precondition","Canonical envelope is required.");
+            const envelope=inspectExistingEnvelope(snapshot.data(),uid);
+            if(envelope.kind!=="current"||envelope.data.authoritativeStateReady!==false)fail("failed-precondition","Canonical envelope is not eligible.");
+            const {records,previous}=await readCurrentContext(tx,root,uid,envelope,expectedRevision);
+            const head=records.progress.playableState.loadoutSource;
+            if(head){
+                const operation=await tx.get(root.collection("operations").doc(head.operationId));
+                if(!operation.exists)fail("data-loss","Current skill loadout source receipt is missing.");
+                const edge=await verifySkillLoadoutEvidence({tx,root,uid,operationId:head.operationId,currentRevision:expectedRevision,receipt:operation.data(),fail});
+                if(edge.resultRevision!==head.resultRevision||edge.policySha256!==head.policySha256)
+                    fail("data-loss","Current skill loadout source binding differs.");
+            }
+            const projection=assembleCanonicalPlayableProjection(uid,previous,records).projection.gameSave,state=records.progress.playableState;
+            return {schemaVersion:1,ownerUid:uid,serverRevision:envelope.serverRevision,canonicalRevision:previous,
+                preferencesVersion:Object.hasOwn(state,"preferencesVersion")?state.preferencesVersion:1,
+                characters:records.characters.map(character=>({characterId:character.characterId,slotIndex:character.slotIndex,
+                    skillLoadout:projection.characterSkillLoadouts[["fire","player2","player3"][character.slotIndex]]})),
+                autoConfig:projection.autoConfig,autoConfig2:projection.autoConfig2,autoConfig3:projection.autoConfig3,
+                outcomeVerified:false,rewardEligible:false,readyForRestore:false,authoritativeStateReady:false};
+        });
+    }
     async function mutateLoadout(request,intent){
         if(!validIntent(intent))fail("invalid-argument","A bounded skill loadout intent is required.");
         const {operationId,expectedRevision,characterId,action,skillId}=intent;
@@ -132,25 +183,7 @@ function createCanonicalSkillLoadout({db,FieldValue,HttpsError,runProtected,insp
             for(const namespace of ["ledgerEntries","grantOperations"]){
                 if((await tx.get(root.collection(namespace).doc(operationId))).exists)fail("failed-precondition","Operation ID is already used.");
             }
-            if(envelope.serverRevision!==expectedRevision)fail("aborted","CLOUD_REVISION_CONFLICT");
-            const names=["account","economy","relicLoadout","progress","claimCheckpoints"],refs=names.map(name=>root.collection(name).doc("current")),singles=[];
-            for(const ref of refs){const snapshot=await tx.get(ref);if(!snapshot.exists)fail("data-loss","Complete canonical sources are required.");singles.push(snapshot);}
-            const account=singles[0].data(),previous=account.serverRevision;
-            if(account.ownerUid!==uid||account.provenance!=="server-created"||!Number.isSafeInteger(previous)||previous<1||previous>expectedRevision)
-                fail("data-loss","Canonical skill loadout revision is invalid.");
-            const characters=await readCharacterSources(tx,root,account,fail);
-            if(!account.slots.includes(characterId))fail("invalid-argument","Character target is not owned.");
-            const prior=await tx.get(root.collection("playableSnapshots").doc(String(previous)));
-            const archived=await tx.get(root.collection("recoveryArchives").doc(String(previous)));
-            const owned=await readOwnedSources(tx,root,fail,{accountSnapshot:singles[0],currentSnapshot:prior});
-            const records={account:source(account),characters:characters.records,...owned.records,economy:source(singles[1].data()),
-                relicLoadout:source(singles[2].data()),progress:source(singles[3].data()),claimCheckpoint:source(singles[4].data())};
-            try{
-                if(!prior.exists||!archived.exists||prior.get("sha256")!==account.snapshotSha256)throw Error("missing");
-                verifyCanonicalSnapshotAgainstSources(prior.data(),uid,previous,records);
-                if(!same(inspectRecoveryArchive(archived.data(),uid,previous,prior.data()),records))throw Error("different");
-            }catch(_){fail("data-loss","Current skill loadout sources differ from their archive.");}
-            if(!records.progress.playableState)fail("data-loss","Complete playable skill sources are required.");
+            const {records,refs,characters,owned,previous}=await readCurrentContext(tx,root,uid,envelope,expectedRevision,characterId);
             if(!Object.hasOwn(records.progress.playableState,"loadoutSource")){
                 // First admission is explicitly finite. This proves only that
                 // complete known operation headers contain no previous loadout;
@@ -184,7 +217,7 @@ function createCanonicalSkillLoadout({db,FieldValue,HttpsError,runProtected,insp
             return result(receipt,false);
         });
     }
-    return Object.freeze({mutateLoadout});
+    return Object.freeze({mutateLoadout,readLoadout});
 }
 function result(receipt,unchanged){return {operationId:receipt.operationId,resultRevision:receipt.resultRevision,characterId:receipt.characterId,
     action:receipt.action,skillId:receipt.skillId,unchanged,outcomeVerified:false,rewardEligible:false,readyForRestore:false,authoritativeStateReady:false};}
