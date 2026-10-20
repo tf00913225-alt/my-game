@@ -39,7 +39,7 @@ async function verifyCreationStates(){
     // after its real styles/fonts/layout settle, within the original 2s budget.
     const readyBy=Date.now()+2000;let ready=false;
     while(Date.now()<readyBy){
-     const loaded=await c.eval(`({current:location.href===${JSON.stringify(pageUrl)},complete:document.readyState==='complete',input:!!document.querySelector('.creation-input'),styles:[...document.querySelectorAll('link[rel="stylesheet"]')].map(link=>({href:link.href,ready:!!link.sheet}))})`);
+     const loaded=await c.eval(`({current:location.href===${JSON.stringify(pageUrl)},complete:document.readyState==='complete',input:!!document.querySelector('.creation-input'),styles:[...document.querySelectorAll('link[rel="stylesheet"]')].map(link=>({href:link.href,ready:!!link.sheet&&link.sheet.cssRules.length>0}))})`);
      if(loaded.current&&loaded.complete){
       assert.ok(loaded.styles.length>=3&&loaded.styles.every(link=>link.ready),'creation stylesheet failed to load: '+JSON.stringify(loaded.styles));
       if(loaded.input){ready=true;break;}
