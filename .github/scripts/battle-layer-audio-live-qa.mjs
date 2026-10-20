@@ -6,6 +6,44 @@ import {battleSkillTouchFloodQa} from './battle-skill-touch-flood-qa.mjs';
 import os from 'node:os';
 import {startServer,waitJson,Cdp,findChrome} from './runtime-browser-qa-support.mjs';
 
+// Match the formal portrait QA's authored alpha projection, not the larger
+// depth-scaled carrier. getBoundingClientRect includes the current motion.
+function measureEnemyVisiblePortrait(card){
+    const art=card?.querySelector('.v174-battle-art');
+    if(!art)throw new Error('Enemy HUD QA requires the formal artwork node');
+    const index=Number(String(card.id).replace('battleMonster',''));
+    const record=window.v154ResolveMonsterPortraitRecord?.(monsters[index]);
+    if(art.classList.contains('v174-generic-portrait')&&record?.generic){
+        // The generic glyph lives inside this carrier. Using its complete box
+        // is conservative and never excuses an actual glyph/HUD intersection.
+        const r=art.getBoundingClientRect();
+        return {basis:'generic-carrier-conservative',top:r.top,bottom:r.bottom,height:r.height,source:null};
+    }
+    const meta=record?.path&&window.v154GetPortraitPresentation?.(record.path);
+    const paint=art.querySelector('.v174-portrait-paint');
+    if(!art.classList.contains('v174-normalized-portrait')||!paint||!meta||
+        !Number.isFinite(meta.width)||!Number.isFinite(meta.height)||!(meta.width>0&&meta.height>0)||!Array.isArray(meta.alphaBounds)||meta.alphaBounds.length!==4||
+        !meta.alphaBounds.every(Number.isFinite))throw new Error('Enemy HUD QA missing normalized source/alpha metadata: '+JSON.stringify({index,record,classes:art.className}));
+    const [l,t,r,b]=meta.alphaBounds;
+    if(!(l>=0&&t>=0&&r>l&&b>t&&r<=meta.width&&b<=meta.height))throw new Error('Enemy HUD QA invalid source alpha bounds');
+    for(let node=paint;node;node=node.parentElement){
+        const transform=getComputedStyle(node).transform;
+        if(transform&&transform!=='none'){
+            const m=new DOMMatrixReadOnly(transform);
+            if(!m.is2D||![m.a,m.b,m.c,m.d,m.e,m.f].every(Number.isFinite)||m.a<=0||m.d<=0||Math.abs(m.b)>1e-6||Math.abs(m.c)>1e-6)
+                throw new Error('Enemy idle HUD QA requires positive axis-aligned portrait transforms: '+transform);
+        }
+        if(node===card)break;
+    }
+    const box=paint.getBoundingClientRect();
+    if(!(box.width>0&&box.height>0))throw new Error('Enemy HUD QA empty portrait paint');
+    const top=box.top+box.height*t/meta.height,bottom=box.top+box.height*b/meta.height;
+    return {basis:'source-alpha',source:record.path,sizeClass:card.dataset.portraitSizeClass,
+        top,bottom,height:bottom-top,left:box.left+box.width*l/meta.width,right:box.left+box.width*r/meta.width,
+        alphaBounds:meta.alphaBounds,paint:{top:box.top,bottom:box.bottom,width:box.width,height:box.height},
+        motion:art.dataset.motion,actionTransform:getComputedStyle(art.querySelector('.v174-action-motion')).transform};
+}
+
 async function runBossBalanceProductionQa(){
     const mode=process.env.BOSS_GATE_MODE||'full',startedAt=Date.now();
     assert.ok(['fast','full'].includes(mode),'Unknown Boss mode must fail closed');
@@ -1187,6 +1225,7 @@ try{
     assert.equal(logRetirement.turnVisible,true,"Current battle round must remain visible");
 
     const resourceLayers=await client.eval(`(()=>{
+        const measureEnemyVisiblePortrait=${measureEnemyVisiblePortrait.toString()};
         const playerCard=document.getElementById('battlePlayerCard0');
         const monsterCard=document.getElementById('battleMonster0');
         const playerHp=FourSymbolsBattlePresentation.getUnitHud(playerCard)?.querySelector('.hp-bar');
@@ -1214,7 +1253,7 @@ try{
             playerHpVisible:getComputedStyle(playerHp).visibility,
             monsterHpVisible:getComputedStyle(monsterHp).visibility,
             player:{art:rect(playerArt),hp:rect(playerHp),sp:rect(playerSp),name:rect(playerName)},
-            monster:{art:rect(monsterArt),hp:rect(monsterHp),sp:rect(monsterSp),name:rect(monsterName)},
+            monster:{art:rect(monsterArt),visiblePortrait:measureEnemyVisiblePortrait(monsterCard),hp:rect(monsterHp),sp:rect(monsterSp),name:rect(monsterName)},
             logicalHeights:{playerHp:playerHp?.offsetHeight||0,monsterHp:monsterHp?.offsetHeight||0,monsterSpWidth:monsterSp?.offsetWidth||0}
         };
         playerStatus.remove();
@@ -1233,7 +1272,7 @@ try{
     assert.ok(allyHud.name.bottom<=allyHud.hp.top+1,"ally identity sits above HP");
     assert.ok(allyHud.hp.bottom<=allyHud.sp.top+1,"ally HP sits above SP");
     assert.ok(enemyHud.name.bottom<=enemyHud.hp.top+1,"enemy identity sits above HP");
-    assert.ok(enemyHud.hp.bottom<=enemyHud.art.top+1,"enemy top HUD stays above portrait");
+    assert.ok(enemyHud.hp.bottom<=enemyHud.visiblePortrait.top+1,"enemy top HUD stays above visible portrait: "+JSON.stringify(enemyHud));
     assert.equal(resourceLayers.logicalHeights.monsterHp,resourceLayers.logicalHeights.playerHp,"Enemy and player resource bars must use the same formal owner height");
     assert.equal(resourceLayers.logicalHeights.monsterHp,6,"Battle resource bars use the shared thin logical height");
 
