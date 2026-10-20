@@ -1550,9 +1550,16 @@
             }
 
             const isChestOrTicket=item && (item.type==="chest" || item.type==="ticket");
+            const materialDescription=item&&item.type==="material"
+                ?item.relicFragment?"秘寶專屬合成碎片。請至主城「秘寶」，選擇對應秘寶查看合成需求。"
+                :item.relicUniversalFragment?"可替代部分專屬碎片的秘寶合成材料。請至主城「秘寶」查看可替代數量。"
+                :item.relicEssence?"秘寶升級材料。請至主城「秘寶」查看升級需求。"
+                :item.relicBreakthroughStone?"秘寶升級的突破材料。請至主城「秘寶」查看各級需求。"
+                :item.relicChoiceBox?"可自選秘寶專屬碎片。請至主城「秘寶」的「碎片自選箱」查看可選秘寶與數量。"
+                :null:null;
             const description=item&&(item.id==="materialChest"
                 ?"鍛造材料與實戰消耗品。每箱抽取一項；可先查看預覽。"
-                :getOreDefinition(item.id)?"鍛造與材料合成用礦石。":null);
+                :getOreDefinition(item.id)?"鍛造與材料合成用礦石。":materialDescription);
             const detailStats=document.getElementById("itemModalStats");
             if(description&&detailStats){
                 Array.from(detailStats.childNodes||[]).filter(node=>node.nodeType===3).forEach(node=>{
