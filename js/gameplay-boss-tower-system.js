@@ -420,6 +420,91 @@
         if(monster.v141SupportSkillIds.length){ monster.v141AbyssAi="support"; }
         else if(monster.v141AbyssAi==="support"){ delete monster.v141AbyssAi; }
     }
+    // Tower owns loadout/profile policy; selection stays in FourSymbolsEnemySkillAI.
+    const TOWER_SKILLS=Object.freeze({
+        fire:{physical:["flameSlash","fireCritical","explosiveFlurry","dragonSlash"],magic:["fireRocket","blazeSpell","flameTornado","phoenixCry"],support:"rage"},
+        earth:{physical:["stoneSlash","petrifyFist","stoneBreakSky","earthquakeCrush"],magic:["stoneThrow","sandWind","flyingSandStrike","dustStorm"]},
+        water:{physical:["waterKnife","frostPunch","iceSpin","frostCrush"],magic:["waterBall","floodBeast","iceArrowRain"],support:"healSpell"},
+        wind:{physical:["stormFist","stormFlurry","windCrossSlash","dizzyFist"],magic:["windSpell","stormCircle","windHowlLightning","stormRain"],support:"dodgeSkill"}
+    });
+    function configureTowerSkills(monster,element,floor,slot){
+        const profile=TOWER_SKILLS[element];
+        const boss=monster.vGameplayTowerRole==="boss",elite=monster.vGameplayTowerRole==="elite";
+        const position=Math.max(0,Math.floor(Number(slot)||0));
+        const role=boss?"commander":["physical","magic","support"][position%3];
+        const depth=floor<=30?2:floor<=60?3:4;
+        const primary=role==="physical"?profile.physical:profile.magic;
+        const secondary=role==="physical"?profile.magic:profile.physical;
+        let attacks=primary.slice(0,Math.min(primary.length,depth+(elite?1:0)));
+        if(elite)attacks=attacks.concat(secondary.slice(0,Math.min(2,depth)));
+        if(boss)attacks=profile.physical.concat(profile.magic);
+        if(element==="water"&&(role==="support"||boss))attacks.push("freeze");
+        monster.vTowerCombatRole=role;
+        monster.skillIds=compatibleSkillIds(element,attacks).filter(id=>{
+            const skill=skillDatabase[id];
+            return ["physical","magic"].includes(skill.category)&&!skill.passive;
+        });
+        monster.v141SupportSkillIds=profile.support&&(role==="support"||boss)
+            ?compatibleSkillIds(element,[profile.support]):[];
+        monster.v132FixedSkillLoadout=true;
+        monster.v144LegalSkillPool=monster.skillIds.slice();
+        monster.v141ForceSkillLevel=clamp(Math.ceil(numeric(monster.level,1)/25),1,5);
+        monster.v141SkillLevel=monster.v141ForceSkillLevel;
+        monster.v144SkillLevel=monster.v141ForceSkillLevel;
+        if(monster.v141SupportSkillIds.length)monster.v141AbyssAi="support";
+        else delete monster.v141AbyssAi;
+    }
+    let towerDecisionState=null;
+    const towerWaterLimits=Object.freeze({freeze:2,healSpell:2});
+    function towerRoundStart(event){
+        if(event.token!==battleToken)return;
+        if(!towerDecisionState||towerDecisionState.token!==event.token){
+            towerDecisionState={token:event.token,round:event.turn,counts:{freeze:0,healSpell:0},casters:new WeakMap()};
+        }else if(event.turn>towerDecisionState.round){
+            towerDecisionState.round=event.turn;
+            towerDecisionState.counts={freeze:0,healSpell:0};
+        }
+    }
+    function towerCastState(monster){
+        if(!towerDecisionState||towerDecisionState.token!==battleToken||towerDecisionState.round!==turn)return null;
+        return towerDecisionState.casters.get(monster)||{last:null,next:{}};
+    }
+    function towerSkillAllowed(monster,id){
+        if(!monster||monster.vGameplayTower!==true)return true;
+        const state=towerCastState(monster);
+        if(!state)return false;
+        if(monster.element==="water"&&towerWaterLimits[id]){
+            if(towerDecisionState.counts[id]>=towerWaterLimits[id]||turn<(state.next[id]||0))return false;
+        }
+        return true;
+    }
+    function recordTowerSkill(monster,id){
+        if(!monster||monster.vGameplayTower!==true)return;
+        const state=towerCastState(monster);
+        if(!state)return;
+        state.last=id;
+        if(monster.element==="water"&&towerWaterLimits[id]){
+            towerDecisionState.counts[id]++;
+            state.next[id]=turn+3; // N+1 and N+2 are complete intervening rounds.
+        }
+        towerDecisionState.casters.set(monster,state);
+    }
+    window.FourSymbolsTowerSkillPolicy=Object.freeze({
+        allows:towerSkillAllowed,
+        recordDeclaration:recordTowerSkill,
+        lastDeclaration:monster=>{const state=towerCastState(monster);return state&&state.last;},
+        weight:function(monster,id){
+            const skill=skillDatabase[id];
+            if(!skill)return 0;
+            if(id==="freeze")return .65;
+            if(monster.vTowerCombatRole==="physical")return skill.category==="physical"?2:1;
+            if(monster.vTowerCombatRole==="magic")return skill.category==="magic"?2:1;
+            return 1;
+        }
+    });
+    if(window.FourSymbolsBattleFlow)window.FourSymbolsBattleFlow.subscribeRoundStart(towerRoundStart);
+    if(window.FourSymbolsCombatEvents)window.FourSymbolsCombatEvents.subscribe("battle_end",()=>{towerDecisionState=null;});
+
     function buildBossMonster(definition,options){
         const profile=options||{};
         const mode=profile.mode||(String(definition.id||"").indexOf("world-")===0?"world":"personal");
@@ -498,10 +583,6 @@
         if(element==="water"){
             monster.vTowerHealingMultiplier=1.15;
             monster.vTowerStatusAccuracyPercent=15;
-            monster.skillIds=Array.from(new Set(monster.skillIds.concat(compatibleSkillIds(element,["freeze"]))));
-            monster.v144LegalSkillPool=monster.skillIds.slice();
-            monster.v141SupportSkillIds=compatibleSkillIds(element,ELEMENTS.water.supports);
-            if(monster.v141SupportSkillIds.length){ monster.v141AbyssAi="support"; }
         }
         if(element==="wind"){
             monster.evasion=numeric(monster.evasion,0)+15;
@@ -543,7 +624,7 @@
         monster.vGameplayTowerRole=role;
         monster.portraitKey=portraitKey;
         bindTowerMonsterIdentity(monster);
-        configureBossSkills(monster,element,Math.ceil(floor/30));
+        configureTowerSkills(monster,element,floor,portraitSlot);
         applyTowerElementProfile(monster,element);
         applyTowerChallengeProfile(monster);
         return monster;
@@ -561,7 +642,7 @@
         monster.portraitKey=portraitKey;
         bindTowerMonsterIdentity(monster);
         monster.vGameplayPortraitSizeClass="standard";
-        configureBossSkills(monster,definition.element,stage);
+        configureTowerSkills(monster,definition.element,floor,0);
         applyTowerElementProfile(monster,definition.element);
         applyTowerChallengeProfile(monster);
         return monster;
