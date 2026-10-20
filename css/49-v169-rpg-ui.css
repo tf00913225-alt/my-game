@@ -1535,16 +1535,20 @@ body > .v169-rpg-dialog-layer{
 #game-ui #homeFeatureModal:has(#autoBattleSettingsPanel) .home-feature-modal-title{flex-wrap:wrap;}
 #game-ui #homeFeatureModal:has(#autoBattleSettingsPanel) #homeFeatureModalTitle{flex-basis:100%;letter-spacing:.02em;}
 #game-ui #homeFeatureModal:has(#autoBattleSettingsPanel) .character-header-actions{display:flex;justify-content:flex-end;flex:1 0 100%;}
-/* Release notices have full editorial titles, not short feature names. */
+/* Long feature titles share a symmetric carved plate and a separate return row. */
+#game-ui #homeFeatureModal.team-relic-modal:has(.relic-choice-page) .home-feature-modal-title,
 #game-ui #homeFeatureModal.release-update-modal .home-feature-modal-title{flex-wrap:wrap;gap:calc(8 * var(--ui-length-unit,1px));}
+#game-ui #homeFeatureModal.team-relic-modal:has(.relic-choice-page) #homeFeatureModalTitle,
 #game-ui #homeFeatureModal.release-update-modal #homeFeatureModalTitle{
     display:block;flex:1 0 100%;height:auto;min-height:var(--skill-header-height);max-width:100%;
     padding:calc(8 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px));
     border:calc(6 * var(--ui-length-unit,1px)) solid transparent;
     border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / calc(6 * var(--ui-length-unit,1px)) / 0 stretch;
-    background:#171717;text-align:center;line-height:1.35;letter-spacing:.02em;white-space:normal;overflow-wrap:anywhere;
+    background:#171717;text-align:center;font-size:calc(24 * var(--ui-length-unit,1px));line-height:1.35;letter-spacing:.02em;white-space:normal;overflow-wrap:anywhere;
 }
+#game-ui #homeFeatureModal.team-relic-modal:has(.relic-choice-page) #homeFeatureModalTitle::before,
 #game-ui #homeFeatureModal.release-update-modal #homeFeatureModalTitle::before{content:none;}
+#game-ui #homeFeatureModal.team-relic-modal:has(.relic-choice-page) .character-header-actions,
 #game-ui #homeFeatureModal.release-update-modal .character-header-actions{display:flex;justify-content:flex-end;flex:1 0 100%;}
 :is(#game-ui #homeFeatureModal,#game-stage #trainingZoneModal) .home-feature-close-btn{
     position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;

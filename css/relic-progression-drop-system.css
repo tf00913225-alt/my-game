@@ -20,7 +20,7 @@
     letter-spacing:.04em;
 }
 #game-stage .relic-progression-box-strip button{
-    min-height:calc(40 * var(--ui-length-unit,1px));
+    min-height:calc(44 * var(--ui-length-unit,1px));
     padding:calc(7 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));
     border:calc(1 * var(--ui-length-unit,1px)) solid rgba(230,187,96,.5);
     border-radius:calc(8 * var(--ui-length-unit,1px));
@@ -86,7 +86,7 @@
 }
 #game-stage .relic-choice-back{
     align-self:flex-start;
-    min-height:calc(42 * var(--ui-length-unit,1px));
+    min-height:calc(44 * var(--ui-length-unit,1px));
     padding:calc(7 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px));
     border:calc(1 * var(--ui-length-unit,1px)) solid rgba(202,161,82,.4);
     border-radius:calc(8 * var(--ui-length-unit,1px));
@@ -117,10 +117,13 @@
     border-radius:calc(10 * var(--ui-length-unit,1px));
     background:linear-gradient(180deg,rgba(39,32,23,.96),rgba(17,14,11,.96));
     color:#f1e4ca;
+    height:auto;
+    white-space:normal;
+    overflow:visible;
     text-align:left;
 }
 #game-stage .relic-choice-grid button b{ display:block;font-size:calc(16 * var(--ui-length-unit,1px));line-height:1.3; }
-#game-stage .relic-choice-grid button span{ display:block;margin-top:calc(5 * var(--ui-length-unit,1px));color:#bdae94;font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.3; }
+#game-stage .relic-choice-grid button span{ display:block;margin-top:calc(5 * var(--ui-length-unit,1px));color:#bdae94;font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.3; }
 #game-stage .relic-choice-grid button.rarity-blue{ border-color:#42A5FF; }
 #game-stage .relic-choice-grid button.rarity-purple{ border-color:#B05CFF; }
 #game-stage .relic-choice-grid button.rarity-orange{ border-color:#FF9F38; }
