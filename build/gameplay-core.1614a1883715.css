@@ -915,7 +915,10 @@
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-claim-btn:disabled{
-    opacity:.42 !important;
+    opacity:1 !important;
+    color:#b9ad98 !important;
+    border-color:#73582d !important;
+    background:#211b14 !important;
 }
 
 /* ----- V90 enlarged fixed completion reward area ----- */
@@ -6913,7 +6916,8 @@ body > .v169-rpg-dialog-layer{
     --skill-header-inset:calc(4 * var(--ui-length-unit,1px));
     --skill-header-text:#ffe0a1;
 }
-#game-ui #homeFeatureModal.v131-shop-open{--skill-header-height:calc(44 * var(--ui-length-unit,1px));}
+#game-ui #homeFeatureModal.v131-shop-open,
+#game-ui #homeFeatureModal.quest-mode{--skill-header-height:calc(44 * var(--ui-length-unit,1px));}
 #game-ui #homeFeatureModal:has(#homeFeatureModalBody > :is(.v17351-achievement-shell,.release-update-announcement,.v141-offline-panel,.system-panel)),
 #game-ui #homeFeatureModal.release-update-modal{--skill-header-height:calc(44 * var(--ui-length-unit,1px));}
 :is(#game-ui #homeFeatureModal,#game-stage #trainingZoneModal) .home-feature-modal-title{background:transparent;box-shadow:none;border:0;}

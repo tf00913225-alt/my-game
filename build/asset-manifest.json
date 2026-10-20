@@ -7,7 +7,7 @@
       "build/boot-core.92c7957bd528.js"
     ],
     "styles": [
-      "build/boot-core.7c85620e671b.css"
+      "build/boot-core.1775eab1cc99.css"
     ],
     "images": [
       "assets/ui/startup-logo.4631c0bc3f2b.jpg",
@@ -53,7 +53,7 @@
           "build/gameplay-core-secondary.ec568394fd00.js"
         ],
         "styles": [
-          "build/gameplay-core.d8c87227a829.css"
+          "build/gameplay-core.1614a1883715.css"
         ],
         "dependencies": [
           "app-shell",
@@ -210,9 +210,9 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.7c85620e671b.css",
-        "sha256": "7c85620e671b",
-        "bytes": 205570,
+        "path": "build/boot-core.1775eab1cc99.css",
+        "sha256": "1775eab1cc99",
+        "bytes": 205582,
         "priority": "P0",
         "type": "style",
         "decode": false
@@ -818,16 +818,16 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core.d8c87227a829.css",
-        "sha256": "d8c87227a829",
-        "bytes": 434766,
+        "path": "build/gameplay-core.1614a1883715.css",
+        "sha256": "1614a1883715",
+        "bytes": 434905,
         "priority": "P2",
         "type": "style",
         "decode": false
       }
     ],
-    "manifestHash": "5cfdafcab29b",
-    "totalBytes": 24035776,
+    "manifestHash": "48e2f541924a",
+    "totalBytes": 24035927,
     "totalResources": 79
   },
   "assets": {
@@ -883,17 +883,17 @@
       "sha256": "9bcdf1d2545b",
       "bytes": 29293
     },
-    "build/boot-core.7c85620e671b.css": {
-      "sha256": "7c85620e671b",
-      "bytes": 205570
+    "build/boot-core.1775eab1cc99.css": {
+      "sha256": "1775eab1cc99",
+      "bytes": 205582
     },
     "build/app-shell.058b860fa3fc.css": {
       "sha256": "058b860fa3fc",
       "bytes": 90942
     },
-    "build/gameplay-core.d8c87227a829.css": {
-      "sha256": "d8c87227a829",
-      "bytes": 434766
+    "build/gameplay-core.1614a1883715.css": {
+      "sha256": "1614a1883715",
+      "bytes": 434905
     },
     "build/feature-patrol.1cef20d37f82.css": {
       "sha256": "1cef20d37f82",

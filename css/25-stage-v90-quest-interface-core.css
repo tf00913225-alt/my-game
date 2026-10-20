@@ -217,7 +217,10 @@
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-claim-btn:disabled{
-    opacity:.42 !important;
+    opacity:1 !important;
+    color:#b9ad98 !important;
+    border-color:#73582d !important;
+    background:#211b14 !important;
 }
 
 /* ----- V90 enlarged fixed completion reward area ----- */
