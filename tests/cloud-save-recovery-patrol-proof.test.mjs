@@ -875,7 +875,7 @@ test('actual twenty-battle active and current-loss raw captures assemble through
 test('genuine twenty-battle skill learn/upgrade and secondary learn survive full raw current-loss candidate without source replacement',async()=>{
     const {createCanonicalSkillLearning}=require('../functions/src/canonical-skill-learning');
     let primaryId,secondaryId,learnIntent,learnResult;
-    const f=await fixture({three:false,currentLoss:false,beforeAudit:async(h,{deps,request})=>{
+    const make=async fault=>fixture({three:false,currentLoss:false,beforeAudit:async(h,{deps,request})=>{
         const writer=createCanonicalSkillLearning(deps),slots=h.data.get(h.root+'/account/current').slots;
         [primaryId,secondaryId]=slots;
         assert.equal(h.data.get(h.root+'/characters/'+primaryId).state.level,10);
@@ -897,10 +897,11 @@ test('genuine twenty-battle skill learn/upgrade and secondary learn survive full
         assert.equal(complete.characters[1].state.skillPoints,0);
         const writes=h.writes;
         assert.deepEqual(await writer.learnOrUpgrade(request(),learnIntent),{...learnResult,unchanged:true});assert.equal(h.writes,writes);
+        if(fault)fault(h,learnIntent.operationId);
         for(const path of [...h.data.keys()])if(['account','characters','economy','inventory','equipment','relics','relicLoadout','progress','claimRecords','claimCheckpoints']
             .some(name=>path.startsWith(h.root+'/'+name+'/')))h.data.delete(path);
     }});
-    const material=await completeRawMaterial(f),before=copy([...f.h.data]),writes=f.h.writes;
+    const f=await make(),material=await completeRawMaterial(f),before=copy([...f.h.data]),writes=f.h.writes;
     const owner=createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)});
     const result=await owner.verifyRawRecoveryAuditCandidate(material);
     assert.equal(result.candidateProofValid,true);
@@ -908,6 +909,18 @@ test('genuine twenty-battle skill learn/upgrade and secondary learn survive full
     assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
     assert.equal(f.h.data.has(f.h.root+'/characters/'+primaryId),false);
     assert.equal(f.h.data.has(f.h.root+'/characters/'+secondaryId),false);
+    const input=JSON.stringify(material),segmented=await privateRawInspector(f,'verifySegmentedRawRecoveryProof')(material);
+    assert.equal(segmented.segmentedProofValid,true);
+    for(const flag of ['candidateProofValid','authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(segmented[flag],false);
+    assert.equal(Object.hasOwn(f.recovery,'verifySegmentedRawRecoveryProof'),false);
+    assert.equal(JSON.stringify(material),input);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    for(const fault of [
+        (h,id)=>{h.data.get(h.root+'/ledgerEntries/'+id).amount--;},
+        (h,id)=>{for(const collection of ['operations','ledgerEntries'])h.data.get(h.root+'/'+collection+'/'+id).policySha256='f'.repeat(64);}
+    ]){
+        const corrupt=await make(fault),sealed=await completeRawMaterial(corrupt);
+        await unchanged(corrupt,()=>privateRawInspector(corrupt,'verifySegmentedRawRecoveryProof')(sealed),error=>error.code==='data-loss');
+    }
 });
 
 test('rich twenty-normal-battle multi-character and rested history closes every original byte through a second audit within unchanged assembly limits',async t=>{
