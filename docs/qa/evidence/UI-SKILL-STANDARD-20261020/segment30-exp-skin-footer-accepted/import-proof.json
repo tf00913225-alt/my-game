@@ -1,0 +1,527 @@
+{
+  "records": [
+    {
+      "state": "original hero/charge artwork, natural float peak/end and EXP end/reopen",
+      "head": "31a30660fe8d54c77381f6d1ec7b781bd7931c14",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\360x640"
+    },
+    {
+      "state": "original hero/charge artwork, natural float peak/end and EXP end/reopen",
+      "head": "31a30660fe8d54c77381f6d1ec7b781bd7931c14",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\393x873"
+    },
+    {
+      "state": "original hero/charge artwork, natural float peak/end and EXP end/reopen",
+      "head": "31a30660fe8d54c77381f6d1ec7b781bd7931c14",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\412x915"
+    },
+    {
+      "state": "original hero/charge artwork, natural float peak/end and EXP end/reopen",
+      "head": "31a30660fe8d54c77381f6d1ec7b781bd7931c14",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\1280x800"
+    },
+    {
+      "state": "EXP footer presentation only; root must confirm geometry and actual evidence",
+      "head": "5cdb3c8634649f2b286f66fe48e14158c8117763",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\360x640"
+    },
+    {
+      "state": "EXP footer presentation only; root must confirm geometry and actual evidence",
+      "head": "5cdb3c8634649f2b286f66fe48e14158c8117763",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\393x873"
+    },
+    {
+      "state": "EXP footer presentation only; root must confirm geometry and actual evidence",
+      "head": "5cdb3c8634649f2b286f66fe48e14158c8117763",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\412x915"
+    },
+    {
+      "state": "EXP footer presentation only; root must confirm geometry and actual evidence",
+      "head": "5cdb3c8634649f2b286f66fe48e14158c8117763",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\1280x800"
+    }
+  ],
+  "files": [
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\360x640\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\360x640\\all-text.json",
+      "sha256": "88e07025ad5c87eafee63379aaf76cb8bc17e3bfe9c1b430725e396fb94eaaa9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\360x640\\charge-partial.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\360x640\\charge-partial.json",
+      "sha256": "7144840a322b03c3524bd5e5050b6438ad8727348d5ca7b995e07b201a34343a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\360x640\\exp-charge-region.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\360x640\\exp-charge-region.png",
+      "sha256": "487537006df312a5cf4234354c273cd02657f79ce0ff5f7231ec9108ed7e69ad"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\360x640\\exp-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\360x640\\exp-end.png",
+      "sha256": "8689ee81035c5d7fa0bd6ae3cde5c64ce19cb2a574266cda391c3c14324b00a4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\360x640\\exp-natural-float-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\360x640\\exp-natural-float-end.png",
+      "sha256": "9932f0ebb55c1a084a38cf3234931ee9e2a03f4c497d2ee59db4d29d57f5cb3a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\360x640\\exp-natural-float-peak.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\360x640\\exp-natural-float-peak.png",
+      "sha256": "f7f272064a4d1ea2723939000aac7297112f1520340bc9b57193a7d5132a55be"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\360x640\\exp-reopen-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\360x640\\exp-reopen-top.png",
+      "sha256": "56ff333d963a3641b20472e121a48e60c2779e43ecb762e83295e94e45c80391"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\360x640\\exp-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\360x640\\exp-top.png",
+      "sha256": "dd141c04963e1ae1b6bc41b68966769be3f119d34daa3db1e74d16f3372d56b6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\360x640\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\360x640\\partial-report.json",
+      "sha256": "d20445c7dd27e707757ccfa4c9899e1867e4f5d49f6ec061f32d2a9b9c69a580"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\360x640\\report.json",
+      "sha256": "bbf38de303b9d526576f1da7e0c520cc6376d969c8dd3718d5b9a822a35fe981"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\393x873\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\393x873\\all-text.json",
+      "sha256": "873d015022bd3868843e3111b1b3ade1a60f21f03daafe5697054c2a5a2e8f01"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\393x873\\charge-partial.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\393x873\\charge-partial.json",
+      "sha256": "30d43c461f9ea2341d5ed4c6167b29180b86fbef94d31429abd94dca3cb2a0d7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\393x873\\exp-charge-region.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\393x873\\exp-charge-region.png",
+      "sha256": "bdfc6451e6459b20a7bbbd0648b109b1ae1a980db7477bd95010e02081c4a2ac"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\393x873\\exp-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\393x873\\exp-end.png",
+      "sha256": "c496a5b1157f7db919096006ddb28a3292da7eb536eda6542d0463394f81e7d0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\393x873\\exp-natural-float-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\393x873\\exp-natural-float-end.png",
+      "sha256": "643af3c3022a5a484be152e3518ecb0ff24245e049e95d8eb3eb41ec3e48f2ac"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\393x873\\exp-natural-float-peak.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\393x873\\exp-natural-float-peak.png",
+      "sha256": "2c0170aff28c10720bbdb584e40de31df10bc1187651728225059dd5a2002712"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\393x873\\exp-reopen-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\393x873\\exp-reopen-top.png",
+      "sha256": "4ec92d87a060e42008faa7b231e3ad1218d6ca9c5cf544805a3637c77de63733"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\393x873\\exp-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\393x873\\exp-top.png",
+      "sha256": "9f28a8ed2ae171a96e32b16838764969d4426abc7390ea51b5d2256307ae2659"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\393x873\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\393x873\\partial-report.json",
+      "sha256": "afbf0253d5a9863ff259d875cdb272c3d031fde2a2614a5e3c01132f4f058910"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\393x873\\report.json",
+      "sha256": "ea2fdf06609a405f6f03424d38424c82a4f07f9466f9e47985accb99717cf710"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\412x915\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\412x915\\all-text.json",
+      "sha256": "2dd3c740fc72982f0321ddaafd692ba76f49330cc413ca8bf2544d3b9cc60bc2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\412x915\\charge-partial.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\412x915\\charge-partial.json",
+      "sha256": "83c9f1594d7511dec7dfee27a0adc772db3d48928b16e0fe02266bfc47bfb28e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\412x915\\exp-charge-region.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\412x915\\exp-charge-region.png",
+      "sha256": "1d6d7066e1da8fd3d15788a9eb39ae7f4dc57d55467b67765b17cd95b06cc24b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\412x915\\exp-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\412x915\\exp-end.png",
+      "sha256": "a0c6badd07391f73263721a349f79d2a8fb3c6ad99d17fa507d650941727c48b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\412x915\\exp-natural-float-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\412x915\\exp-natural-float-end.png",
+      "sha256": "c35af860ceca5abcf38a421893554bb7d9f687d8c74d87549f27395ee1dcc58d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\412x915\\exp-natural-float-peak.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\412x915\\exp-natural-float-peak.png",
+      "sha256": "a5eb5e171a18ed1e426ad8997b69b02bb327b86a9c309006167a7d0c7d57e91e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\412x915\\exp-reopen-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\412x915\\exp-reopen-top.png",
+      "sha256": "e7a43164dc3b242f309a58217b4c2c3b6cb32e46f6bdd86f0e0a9732c2af6aa1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\412x915\\exp-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\412x915\\exp-top.png",
+      "sha256": "ebf874513efdbb5c428417d7783573c2e30c3c841b42cdcfc306c075cf2e355e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\412x915\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\412x915\\partial-report.json",
+      "sha256": "46dc66b98173f73cc28cfe0e11a32935eee8a90222733a6d1e66ae2b408c49bb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\412x915\\report.json",
+      "sha256": "7806ac71e933d2a4b7ce508cfa4d20a2b08cf1dc0f86a47cc919314f360e5066"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\1280x800\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\1280x800\\all-text.json",
+      "sha256": "b6a2f2f632a0ce42d51db0647e365dcc44ee4fefa26dc1efb8a9088e4e5d2206"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\1280x800\\charge-partial.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\1280x800\\charge-partial.json",
+      "sha256": "f9e73f4db49f206fed8d374f63799360d8616dc1a95160466a23bab73acca53f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\1280x800\\exp-charge-region.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\1280x800\\exp-charge-region.png",
+      "sha256": "a3be09746284194eb938c68f69a615c580b771a5719e4f6a8708135d6b096993"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\1280x800\\exp-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\1280x800\\exp-end.png",
+      "sha256": "89b8ba9b00c976c457fa546ea3a96a5df3266b8fbb6f82cacbb0d10b0b0c242a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\1280x800\\exp-natural-float-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\1280x800\\exp-natural-float-end.png",
+      "sha256": "3df53efa844c7c1adc32b0b8eb3427a670fddf4379963b99ece30284dc434f2b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\1280x800\\exp-natural-float-peak.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\1280x800\\exp-natural-float-peak.png",
+      "sha256": "a55192e1bb686759187efa164b1494b952d7e4eccd5523239db68b3e92318c58"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\1280x800\\exp-reopen-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\1280x800\\exp-reopen-top.png",
+      "sha256": "8be42d5c94c89246b54af85317bd7c5870c01a063890ad1910ca3605c7e3d06d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\1280x800\\exp-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\1280x800\\exp-top.png",
+      "sha256": "1528536a84669d4dca33808bcaec2d77bc37d29a8fb621684fb5bc62f96cb874"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\1280x800\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\1280x800\\partial-report.json",
+      "sha256": "cd1ba19aff67d5ebd678113f54540c8571b4f00e85a37ff93597b0bffbdf7b02"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-31a30660\\prepared\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\1280x800\\report.json",
+      "sha256": "05bbdee51d5ddbb34df829ab9f9520ebae83390e7c66d745f07ca16ac5854aa9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-4f741c13\\prepared\\360x640\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-skin-4f741c13\\all-text.json",
+      "sha256": "5973184d0eba266fa28fa739dac21ce86d3cf7c3fac0b18a8e51bd8bd2206e9a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-4f741c13\\prepared\\360x640\\charge-partial.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-skin-4f741c13\\charge-partial.json",
+      "sha256": "154be81ca25462b549b3e0a2b7cf67698fe6d05d69352b08eaefea642dd1dd14"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-4f741c13\\prepared\\360x640\\exp-charge-region.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-skin-4f741c13\\exp-charge-region.png",
+      "sha256": "d3ba1c2aa9f523951e03e16eff3bd62fe0b9afef906074f4fe2cfc21727916df"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-4f741c13\\prepared\\360x640\\exp-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-skin-4f741c13\\exp-end.png",
+      "sha256": "ca56f79b4a7147ebfb236c843a9bd1244f4ebe4bf60fe3102510efbd168a3e75"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-4f741c13\\prepared\\360x640\\exp-natural-float-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-skin-4f741c13\\exp-natural-float-end.png",
+      "sha256": "10800f16c72ee78fe3cf00fd059ac43e2b957bfbdc7c17e67ecd0cb45ba11d6f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-4f741c13\\prepared\\360x640\\exp-natural-float-peak.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-skin-4f741c13\\exp-natural-float-peak.png",
+      "sha256": "0793e1c9377fe5cb22833aa5295027626e886bce57d08513ec2915d1ed089f3b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-4f741c13\\prepared\\360x640\\exp-reopen-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-skin-4f741c13\\exp-reopen-top.png",
+      "sha256": "c99e4a23136918555e1c63dc03d632267cd2fb1ab11cb7f06388ba4db1ad5c14"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-4f741c13\\prepared\\360x640\\exp-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-skin-4f741c13\\exp-top.png",
+      "sha256": "56c1a441fb528b2269b5e22fa93a3dfae4f8b9be900b7cc13c60fc7dd2602b26"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-4f741c13\\prepared\\360x640\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-skin-4f741c13\\partial-report.json",
+      "sha256": "e1c29b720e693a916f8bf6d4a8e30a2719546d5de5c1c104ea221909d68b8fc3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-4f741c13\\prepared\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-skin-4f741c13\\report.json",
+      "sha256": "c3f5271df4645035fc4d3c1be8e7ea5cd5dc0e8a4d61e2ce2c5c70b94e760f83"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-3abc38b3\\footer-probe\\360x640\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-footer-3abc38b3\\all-text.json",
+      "sha256": "be19578323d041e9b15367070fdd05964f7328700d19eebf852ef77f07176629"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-3abc38b3\\footer-probe\\360x640\\exp-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-footer-3abc38b3\\exp-end.png",
+      "sha256": "28a542b06e51983ed4a439812133f27c78fc06fccf6a732b9d005f85d2159d03"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-3abc38b3\\footer-probe\\360x640\\exp-reopen-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-footer-3abc38b3\\exp-reopen-top.png",
+      "sha256": "bedac6c4932c3fb351b7bbcc09b644062c99e976d2d1150f6b78da20255be75c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-3abc38b3\\footer-probe\\360x640\\exp-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-footer-3abc38b3\\exp-top.png",
+      "sha256": "aeb567e099eb53e1760309aeeb9215ef17e97e79d695f61978f1a5343841a0b2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-3abc38b3\\footer-probe\\360x640\\footer-probe.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-footer-3abc38b3\\footer-probe.json",
+      "sha256": "677ff070fdc859923e7964fe9c7407fd98fdede84c2f8e338605d3416fc48664"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-3abc38b3\\footer-probe\\360x640\\footer-summary-probe.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-footer-3abc38b3\\footer-summary-probe.png",
+      "sha256": "30593ea1886da8220b12763fae2a4d40f3e687b0b7fd5e243dede444d7a7982c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-3abc38b3\\footer-probe\\360x640\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-footer-3abc38b3\\partial-report.json",
+      "sha256": "422c85352175df5e13fe3e7924abf9858340888334873b008ce6f523adf6924a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-3abc38b3\\footer-probe\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\before-footer-3abc38b3\\report.json",
+      "sha256": "4655c32938ddf686668a8af6bb2fa451ca5d52aa54ed693a5ca33d1e1925f9c3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\360x640\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\360x640\\all-text.json",
+      "sha256": "49e20bc72d9097736c01751a38efd601210b07130d7730bc31b16fec27910792"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\360x640\\exp-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\360x640\\exp-end.png",
+      "sha256": "533cf101f24dbe55baaa01e48086efde0b297becb3a12ae6003a306f898ced18"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\360x640\\exp-reopen-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\360x640\\exp-reopen-top.png",
+      "sha256": "0487e1d159c485f98f87e22d0d9a986fc6f2d2bb49caf99f2d9b87afb73857b2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\360x640\\exp-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\360x640\\exp-top.png",
+      "sha256": "67333b37c9b8a6766ba71ad391d9bee251b9e53ce4c08b49b71412f583ddb641"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\360x640\\footer-probe.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\360x640\\footer-probe.json",
+      "sha256": "44ed9d3e3d5b43369d1cafc87292e9c44abf9768911e03a392ade813f05c03a3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\360x640\\footer-summary-probe.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\360x640\\footer-summary-probe.png",
+      "sha256": "c279ce6b9e4d768f85d4a2b282e72748367a903c56bfdbffacafc33b0b5c4f95"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\360x640\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\360x640\\partial-report.json",
+      "sha256": "cdf268b59efecb5d446bc1aedcbb94ab37f9aac9e9ef5d3e239da21e21c659e1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\360x640\\report.json",
+      "sha256": "7bd910dd17b24d73a601b33df8addcfdb23db876f8d000cf5a181348bdcc9d1f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\393x873\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\393x873\\all-text.json",
+      "sha256": "f292ce9674b02392d97436750e787cceb152e1dfe82ebae3bc0f586842a3ca0a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\393x873\\exp-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\393x873\\exp-end.png",
+      "sha256": "e363f66a9a058dffe6462028e79392ac6dc4944ea77078b35d03da281223fb69"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\393x873\\exp-reopen-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\393x873\\exp-reopen-top.png",
+      "sha256": "ab7d795a336365df596fdf96f3c99adfdbe60116b317bec67cabbb3cc1913023"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\393x873\\exp-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\393x873\\exp-top.png",
+      "sha256": "37e467524866832f5271aac8ee09597ef37467b1e82109cf101eccd55221262f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\393x873\\footer-probe.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\393x873\\footer-probe.json",
+      "sha256": "b14d88b33732dfe1f71c521e4adad37db32187bbd39565749eb93b00fca5ddd0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\393x873\\footer-summary-probe.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\393x873\\footer-summary-probe.png",
+      "sha256": "bbe6eb89baf608e858952fe259d4b73d71ba14be88531bfff551195b67350649"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\393x873\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\393x873\\partial-report.json",
+      "sha256": "676703ccca507acd570a8625894a1fd08e4d02b634efe539587c11c9fe39a0cb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\393x873\\report.json",
+      "sha256": "160fee87924a59e63b74f54077ff86bb66a3931b97c167033fa73098370c2ea3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\412x915\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\412x915\\all-text.json",
+      "sha256": "aec8e907041285af5beadfd7e2dbbe821202e0889a2a8bea1fd9f9da7bdb2733"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\412x915\\exp-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\412x915\\exp-end.png",
+      "sha256": "82e9b275a5ffadda67f863870bcc6d2cb282ee57ac2d4377d85b03bda9c4cc37"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\412x915\\exp-reopen-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\412x915\\exp-reopen-top.png",
+      "sha256": "8d0fd59390c21edfb5ff1b20d857ae4adfaba91e0d9b951954f236c933a22af3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\412x915\\exp-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\412x915\\exp-top.png",
+      "sha256": "1145a6a7e62146178ec208c5d2582a24e8e48734ce25437c18d30e26d8816db9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\412x915\\footer-probe.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\412x915\\footer-probe.json",
+      "sha256": "3143673fd0af01014ed252d697fb9356f91315bc1226d623777dfb4c34222105"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\412x915\\footer-summary-probe.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\412x915\\footer-summary-probe.png",
+      "sha256": "c932362fb778aee16362404708607319ea7975765be553fdc64bc7f0001b9a5a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\412x915\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\412x915\\partial-report.json",
+      "sha256": "0c11f1473ac656b493f3b8a05370aed7e838c422d68465b612794f0033757d69"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\412x915\\report.json",
+      "sha256": "fbbe4dcd65d739da4581bd23908e2d4dd93b81409289143f02100dba603a165c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\1280x800\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\1280x800\\all-text.json",
+      "sha256": "d55f280f3dbadfd1cd361a25d308ab20e5482652af2b2d587421424aff408818"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\1280x800\\exp-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\1280x800\\exp-end.png",
+      "sha256": "fa278dcab7991a1f66a2ede4e2137b40b2ba687b84bedf39f43483baefbedbb4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\1280x800\\exp-reopen-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\1280x800\\exp-reopen-top.png",
+      "sha256": "4ee3ab15652c23b640994ca44ee3d4be93157e899edcbe02bac182d571c39bc5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\1280x800\\exp-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\1280x800\\exp-top.png",
+      "sha256": "d6e70fa0f4c57f26799b1f747384ca05734e44050042e942fea07bb660c67fb3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\1280x800\\footer-probe.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\1280x800\\footer-probe.json",
+      "sha256": "b3166b9c7bc8d28e180024602c819ab9295e8513c34ffb660e76ad0ddd03d011"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\1280x800\\footer-summary-probe.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\1280x800\\footer-summary-probe.png",
+      "sha256": "7cfef0f4269eea003046c3fea97f5394ba8bf6c2e6ec12f6d8a49cc980d5664b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\1280x800\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\1280x800\\partial-report.json",
+      "sha256": "14971a81e0b9b8e80207fc4a6bcb4c1dbf066bf339511941767890e9be05b910"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment30-exp-art-5cdb3c86\\footer-probe\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\1280x800\\report.json",
+      "sha256": "2451bc9d07553b393b2e214bbc347ccf724509053a0be78438b3add68c1361a0"
+    }
+  ],
+  "helpers": [
+    {
+      "path": "artifacts/segment30-exp-art-controls.mjs",
+      "sha256": "59f1dfd4896746c6093c5996a443d55f5c5caf5e13e9c2a737affb2ef22d5b04",
+      "gzip": "segment30-exp-art-controls.mjs.current-source.gz",
+      "provenance": "current file bytes at import, not reconstructed earlier failing version"
+    },
+    {
+      "path": "artifacts/segment30-exp-footer-probe.mjs",
+      "sha256": "237065f0c38993e9deb45d1a16480d4dd3d0643f9267c7c0c9d631d010043f1c",
+      "gzip": "segment30-exp-footer-probe.mjs.current-source.gz",
+      "provenance": "current file bytes at import, not reconstructed earlier failing version"
+    },
+    {
+      "path": "artifacts/run30-exp-art.cjs",
+      "sha256": "43fad0de10eea3f5baabe8376e035f68652769d28ccbda27fa2117c29a689337",
+      "gzip": "run30-exp-art.cjs.current-source.gz",
+      "provenance": "current file bytes at import, not reconstructed earlier failing version"
+    },
+    {
+      "path": "artifacts/run30-exp-footer-probe.cjs",
+      "sha256": "320622dd0ad0e25bae44b9ac4d4207474ecd4e657bad5e722d018536b2589a11",
+      "gzip": "run30-exp-footer-probe.cjs.current-source.gz",
+      "provenance": "current file bytes at import, not reconstructed earlier failing version"
+    }
+  ],
+  "limits": [
+    "Only skin and footer presentation, original natural timer observed; no allocation confirmation/charge consumption/transaction",
+    "Canonical fixture normalization and delegated original saves remain; not zero-save or hardware acceptance",
+    "Three independent actual-picture reviews confirmed; limits remain per-state and do not constitute all-game acceptance"
+  ]
+}

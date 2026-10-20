@@ -1,0 +1,1351 @@
+{
+  "complete": false,
+  "head": "5cdb3c8634649f2b286f66fe48e14158c8117763",
+  "dirty": false,
+  "viewport": [
+    1280,
+    800
+  ],
+  "sourcesBefore": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "asset-manifest.json": "cace521d6bf83c38e47f1bb2a4ea51a3f0e9251edde71f7af3ec5b18b63f4479",
+    "js/41-v146-system-polish.js": "51e3c5bb6d9592300b094c118ecaeb6e8e4aaf25435ef974841b6184d5bbd881",
+    "css/49-v169-rpg-ui.css": "f14ee0922d32e9c7be123485b723c7e94b3e5f4c78e9628027eff6aa295823ee",
+    "js/49-v169-element-box-settings.js": "bc3f067e6e51ca46dacf72404702f95a190d7b53ac86df0919e3629a79d817b6",
+    "js/25-v131-fix-batch.js": "962d3f3a289a97540b7aaa1f8b91805190cbf8a32f3b5d40540cc304dbaee9ce",
+    "js/00-main.js": "b2272bd5168a5b57db9c3830ab712b771d4864e574e5706b8ca51ad86c2b3ea9",
+    "css/48-v169-element-box-settings.css": "1af0440eb987708e4fb8c4b8c59d3a518fda7cf9b6d5197570310c243c04f21f",
+    "css/42-v146-system-polish.css": "66944c27353d2e3add6fd2b4f776a65eb720d22451c80cb4f76845572ba85a50",
+    "js/28-v133-economy-rebalance.js": "7b55806546110b29cb11a8cd61b0456d377fd29a9065acc0199c11abb8cdc451",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.febd46a25a09.js": "febd46a25a09f4095a88932cf15c1c0dbff82fb597a4d83b963767de9f16db0b",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.dd3870f6010a.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "build/feature-adventure-ui.e3d2d8ecf966.js": "e3d2d8ecf966b3c2a6963492d7f9a42ffc69d4f1ce28041b225735163a3b0935",
+    "build/feature-adventure.653b97a18985.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.d1e7d90cba12.js": "d1e7d90cba12d0b99ef595e3c217049d672dcaa3557b196f34ad64415fdf15d4",
+    "build/gameplay-core-secondary.553eac9d8410.js": "553eac9d84104e607e3898d32ab79f05c5608050b4b4b13e3b865e1a19584cd6",
+    "build/gameplay-core.c323fe775bdd.css": "c323fe775bddd39347d2e9e99304b09a657f5d17ab05a5d2786d1971c745f402"
+  },
+  "sourcesAfter": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "asset-manifest.json": "cace521d6bf83c38e47f1bb2a4ea51a3f0e9251edde71f7af3ec5b18b63f4479",
+    "js/41-v146-system-polish.js": "51e3c5bb6d9592300b094c118ecaeb6e8e4aaf25435ef974841b6184d5bbd881",
+    "css/49-v169-rpg-ui.css": "f14ee0922d32e9c7be123485b723c7e94b3e5f4c78e9628027eff6aa295823ee",
+    "js/49-v169-element-box-settings.js": "bc3f067e6e51ca46dacf72404702f95a190d7b53ac86df0919e3629a79d817b6",
+    "js/25-v131-fix-batch.js": "962d3f3a289a97540b7aaa1f8b91805190cbf8a32f3b5d40540cc304dbaee9ce",
+    "js/00-main.js": "b2272bd5168a5b57db9c3830ab712b771d4864e574e5706b8ca51ad86c2b3ea9",
+    "css/48-v169-element-box-settings.css": "1af0440eb987708e4fb8c4b8c59d3a518fda7cf9b6d5197570310c243c04f21f",
+    "css/42-v146-system-polish.css": "66944c27353d2e3add6fd2b4f776a65eb720d22451c80cb4f76845572ba85a50",
+    "js/28-v133-economy-rebalance.js": "7b55806546110b29cb11a8cd61b0456d377fd29a9065acc0199c11abb8cdc451",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.febd46a25a09.js": "febd46a25a09f4095a88932cf15c1c0dbff82fb597a4d83b963767de9f16db0b",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.dd3870f6010a.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "build/feature-adventure-ui.e3d2d8ecf966.js": "e3d2d8ecf966b3c2a6963492d7f9a42ffc69d4f1ce28041b225735163a3b0935",
+    "build/feature-adventure.653b97a18985.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.d1e7d90cba12.js": "d1e7d90cba12d0b99ef595e3c217049d672dcaa3557b196f34ad64415fdf15d4",
+    "build/gameplay-core-secondary.553eac9d8410.js": "553eac9d84104e607e3898d32ab79f05c5608050b4b4b13e3b865e1a19584cd6",
+    "build/gameplay-core.c323fe775bdd.css": "c323fe775bddd39347d2e9e99304b09a657f5d17ab05a5d2786d1971c745f402"
+  },
+  "sourceUnchanged": true,
+  "touches": [
+    {
+      "selector": "[data-city-entry=\"0\"]",
+      "x": 452.5,
+      "y": 498.82159423828125,
+      "width": 60,
+      "height": 60,
+      "hit": true,
+      "label": "角色"
+    },
+    {
+      "selector": "#characterTabBtnExpPool",
+      "x": 527.63671875,
+      "y": 355,
+      "width": 167.7734375,
+      "height": 65,
+      "hit": true,
+      "label": "經驗池分配"
+    },
+    {
+      "kind": "pane-real-top",
+      "owner": "#characterTabContent",
+      "top": 0,
+      "x": 806.25,
+      "y": 425,
+      "to": 741.25
+    },
+    {
+      "root": "#characterTabContent",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 738.125,
+      "y": 746.25,
+      "to": 420,
+      "top": 1451,
+      "client": 903,
+      "height": 2354
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 793.59375,
+      "y": 56.25,
+      "width": 85.3125,
+      "height": 55,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "[data-city-entry=\"0\"]",
+      "x": 452.5,
+      "y": 498.82159423828125,
+      "width": 60,
+      "height": 60,
+      "hit": true,
+      "label": "角色"
+    },
+    {
+      "selector": "#characterTabBtnExpPool",
+      "x": 527.63671875,
+      "y": 355,
+      "width": 167.7734375,
+      "height": 65,
+      "hit": true,
+      "label": "經驗池分配"
+    },
+    {
+      "kind": "pane-real-top",
+      "owner": "#characterTabContent",
+      "top": 0,
+      "x": 806.25,
+      "y": 425,
+      "to": 741.25
+    }
+  ],
+  "checks": [
+    {
+      "phase": "canonical-fixture-before-entry",
+      "state": {
+        "stage": "canonical-fixture-before-entry",
+        "characters": [
+          {
+            "i": 0,
+            "id": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "level": 70,
+            "expNext": 9637200,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 1,
+            "id": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+            "level": 60,
+            "expNext": 5885100,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 2,
+            "id": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+            "level": 50,
+            "expNext": 2960400,
+            "hp": 300,
+            "sp": 120
+          }
+        ],
+        "saveCalls": 0
+      }
+    },
+    {
+      "fixture": {
+        "names": [
+          "角色名稱長文測試甲乙丙丁戊己庚辛",
+          "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+          "子丑寅卯辰巳午未申酉戌亥甲乙丙丁"
+        ],
+        "levels": [
+          70,
+          60,
+          50
+        ],
+        "timing": "after formal startup and gameplay-core formula owner, before explicit skill feature ensure; charge timers may already be running; not cold pre-boot fixture"
+      }
+    },
+    {
+      "phase": "after-formal-entry-normalization",
+      "state": {
+        "stage": "after-formal-entry-normalization",
+        "characters": [
+          {
+            "i": 0,
+            "id": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "level": 70,
+            "expNext": 9637200,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 1,
+            "id": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+            "level": 60,
+            "expNext": 5885100,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 2,
+            "id": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+            "level": 50,
+            "expNext": 2960400,
+            "hp": 300,
+            "sp": 120
+          }
+        ],
+        "saveCalls": 0
+      }
+    },
+    {
+      "phase": "canonical-exp-rows",
+      "stage": "top",
+      "index": 0,
+      "rows": [
+        {
+          "i": 0,
+          "name": "角色名稱長文測試甲乙丙丁戊己庚辛",
+          "level": "Lv.70",
+          "rect": {
+            "x": 443.75,
+            "y": 809.1015625,
+            "width": 392.5,
+            "height": 145.37109375,
+            "top": 809.1015625,
+            "right": 836.25,
+            "bottom": 954.47265625,
+            "left": 443.75
+          },
+          "nameBox": {
+            "x": 457.5,
+            "y": 823.2877197265625,
+            "width": 313.53515625,
+            "height": 26.25,
+            "top": 823.2877197265625,
+            "right": 771.03515625,
+            "bottom": 849.5377197265625,
+            "left": 457.5
+          },
+          "nameInk": {
+            "x": 457.5,
+            "y": 822.87109375,
+            "width": 300,
+            "height": 27.08331298828125,
+            "top": 822.87109375,
+            "right": 757.5,
+            "bottom": 849.9544067382812,
+            "left": 457.5
+          },
+          "meta": {
+            "text": "目前 0 / 9,637,200 EXP",
+            "rect": {
+              "x": 457.5,
+              "y": 856.2239379882812,
+              "width": 365,
+              "height": 24.49871826171875,
+              "top": 856.2239379882812,
+              "right": 822.5,
+              "bottom": 880.72265625,
+              "left": 457.5
+            },
+            "ink": {
+              "x": 457.5,
+              "y": 855.390625,
+              "width": 176.38671875,
+              "height": 25.4166259765625,
+              "top": 855.390625,
+              "right": 633.88671875,
+              "bottom": 880.8072509765625,
+              "left": 457.5
+            }
+          },
+          "badge": {
+            "rect": null,
+            "ink": null
+          }
+        },
+        {
+          "i": 1,
+          "name": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+          "level": "Lv.60",
+          "rect": {
+            "x": 443.75,
+            "y": 963.22265625,
+            "width": 392.5,
+            "height": 149.622314453125,
+            "top": 963.22265625,
+            "right": 836.25,
+            "bottom": 1112.844970703125,
+            "left": 443.75
+          },
+          "nameBox": {
+            "x": 457.5,
+            "y": 977.4088134765625,
+            "width": 313.53515625,
+            "height": 26.25,
+            "top": 977.4088134765625,
+            "right": 771.03515625,
+            "bottom": 1003.6588134765625,
+            "left": 457.5
+          },
+          "nameInk": {
+            "x": 457.5,
+            "y": 976.9921875,
+            "width": 300,
+            "height": 27.08331298828125,
+            "top": 976.9921875,
+            "right": 757.5,
+            "bottom": 1004.0755004882812,
+            "left": 457.5
+          },
+          "meta": {
+            "text": "目前 0 / 5,885,100 EXP\n追趕加成 ×1.15",
+            "rect": {
+              "x": 457.5,
+              "y": 1010.3450317382812,
+              "width": 365,
+              "height": 28.74993896484375,
+              "top": 1010.3450317382812,
+              "right": 822.5,
+              "bottom": 1039.094970703125,
+              "left": 457.5
+            },
+            "ink": {
+              "x": 457.5,
+              "y": 1010.3450317382812,
+              "width": 365,
+              "height": 28.74993896484375,
+              "top": 1010.3450317382812,
+              "right": 822.5,
+              "bottom": 1039.094970703125,
+              "left": 457.5
+            }
+          },
+          "badge": {
+            "text": "追趕加成 ×1.15",
+            "rect": {
+              "x": 686.015625,
+              "y": 1010.3450317382812,
+              "width": 136.484375,
+              "height": 28.74993896484375,
+              "top": 1010.3450317382812,
+              "right": 822.5,
+              "bottom": 1039.094970703125,
+              "left": 686.015625
+            },
+            "ink": {
+              "x": 694.765625,
+              "y": 1012.8450317382812,
+              "width": 118.984375,
+              "height": 23.33331298828125,
+              "top": 1012.8450317382812,
+              "right": 813.75,
+              "bottom": 1036.1783447265625,
+              "left": 694.765625
+            }
+          }
+        },
+        {
+          "i": 2,
+          "name": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+          "level": "Lv.50",
+          "rect": {
+            "x": 443.75,
+            "y": 1121.594970703125,
+            "width": 392.5,
+            "height": 149.6224365234375,
+            "top": 1121.594970703125,
+            "right": 836.25,
+            "bottom": 1271.2174072265625,
+            "left": 443.75
+          },
+          "nameBox": {
+            "x": 457.5,
+            "y": 1135.78125,
+            "width": 313.53515625,
+            "height": 26.25,
+            "top": 1135.78125,
+            "right": 771.03515625,
+            "bottom": 1162.03125,
+            "left": 457.5
+          },
+          "nameInk": {
+            "x": 457.5,
+            "y": 1135.364501953125,
+            "width": 300,
+            "height": 27.0833740234375,
+            "top": 1135.364501953125,
+            "right": 757.5,
+            "bottom": 1162.4478759765625,
+            "left": 457.5
+          },
+          "meta": {
+            "text": "目前 0 / 2,960,400 EXP\n追趕加成 ×1.30",
+            "rect": {
+              "x": 457.5,
+              "y": 1168.7174072265625,
+              "width": 365,
+              "height": 28.75,
+              "top": 1168.7174072265625,
+              "right": 822.5,
+              "bottom": 1197.4674072265625,
+              "left": 457.5
+            },
+            "ink": {
+              "x": 457.5,
+              "y": 1168.7174072265625,
+              "width": 365,
+              "height": 28.75,
+              "top": 1168.7174072265625,
+              "right": 822.5,
+              "bottom": 1197.4674072265625,
+              "left": 457.5
+            }
+          },
+          "badge": {
+            "text": "追趕加成 ×1.30",
+            "rect": {
+              "x": 686.015625,
+              "y": 1168.7174072265625,
+              "width": 136.484375,
+              "height": 28.75,
+              "top": 1168.7174072265625,
+              "right": 822.5,
+              "bottom": 1197.4674072265625,
+              "left": 686.015625
+            },
+            "ink": {
+              "x": 694.765625,
+              "y": 1171.2174072265625,
+              "width": 118.984375,
+              "height": 23.3333740234375,
+              "top": 1171.2174072265625,
+              "right": 813.75,
+              "bottom": 1194.55078125,
+              "left": 694.765625
+            }
+          }
+        }
+      ],
+      "footer": {
+        "x": 443.75,
+        "y": 1320.716064453125,
+        "width": 392.5,
+        "height": 55,
+        "top": 1320.716064453125,
+        "right": 836.25,
+        "bottom": 1375.716064453125,
+        "left": 443.75
+      },
+      "owner": {
+        "x": 443.75,
+        "y": 395,
+        "width": 392.5,
+        "height": 376.25,
+        "top": 395,
+        "right": 836.25,
+        "bottom": 771.25,
+        "left": 443.75
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "exp-top",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 85.3125,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "經驗池分配",
+            "width": 167.7734375,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "能力值",
+            "width": 104.86328125,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "技能",
+            "width": 104.86328125,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "確定",
+            "width": 191.25,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "返回",
+            "width": 191.25,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "phase": "canonical-exp-rows",
+      "stage": "end",
+      "index": 0,
+      "rows": [
+        {
+          "i": 0,
+          "name": "角色名稱長文測試甲乙丙丁戊己庚辛",
+          "level": "Lv.70",
+          "rect": {
+            "x": 443.75,
+            "y": 204.51821899414062,
+            "width": 392.5,
+            "height": 145.37109375,
+            "top": 204.51821899414062,
+            "right": 836.25,
+            "bottom": 349.8893127441406,
+            "left": 443.75
+          },
+          "nameBox": {
+            "x": 457.5,
+            "y": 218.7044219970703,
+            "width": 313.53515625,
+            "height": 26.25,
+            "top": 218.7044219970703,
+            "right": 771.03515625,
+            "bottom": 244.9544219970703,
+            "left": 457.5
+          },
+          "nameInk": {
+            "x": 457.5,
+            "y": 218.28775024414062,
+            "width": 300,
+            "height": 27.083343505859375,
+            "top": 218.28775024414062,
+            "right": 757.5,
+            "bottom": 245.37109375,
+            "left": 457.5
+          },
+          "meta": {
+            "text": "目前 0 / 9,637,200 EXP",
+            "rect": {
+              "x": 457.5,
+              "y": 251.640625,
+              "width": 365,
+              "height": 24.498687744140625,
+              "top": 251.640625,
+              "right": 822.5,
+              "bottom": 276.1393127441406,
+              "left": 457.5
+            },
+            "ink": {
+              "x": 457.5,
+              "y": 250.80728149414062,
+              "width": 176.38671875,
+              "height": 25.416656494140625,
+              "top": 250.80728149414062,
+              "right": 633.88671875,
+              "bottom": 276.22393798828125,
+              "left": 457.5
+            }
+          },
+          "badge": {
+            "rect": null,
+            "ink": null
+          }
+        },
+        {
+          "i": 1,
+          "name": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+          "level": "Lv.60",
+          "rect": {
+            "x": 443.75,
+            "y": 358.6393127441406,
+            "width": 392.5,
+            "height": 149.62240600585938,
+            "top": 358.6393127441406,
+            "right": 836.25,
+            "bottom": 508.26171875,
+            "left": 443.75
+          },
+          "nameBox": {
+            "x": 457.5,
+            "y": 372.82550048828125,
+            "width": 313.53515625,
+            "height": 26.25,
+            "top": 372.82550048828125,
+            "right": 771.03515625,
+            "bottom": 399.07550048828125,
+            "left": 457.5
+          },
+          "nameInk": {
+            "x": 457.5,
+            "y": 372.4088439941406,
+            "width": 300,
+            "height": 27.083343505859375,
+            "top": 372.4088439941406,
+            "right": 757.5,
+            "bottom": 399.4921875,
+            "left": 457.5
+          },
+          "meta": {
+            "text": "目前 0 / 5,885,100 EXP\n追趕加成 ×1.15",
+            "rect": {
+              "x": 457.5,
+              "y": 405.76171875,
+              "width": 365,
+              "height": 28.75,
+              "top": 405.76171875,
+              "right": 822.5,
+              "bottom": 434.51171875,
+              "left": 457.5
+            },
+            "ink": {
+              "x": 457.5,
+              "y": 405.76171875,
+              "width": 365,
+              "height": 28.75,
+              "top": 405.76171875,
+              "right": 822.5,
+              "bottom": 434.51171875,
+              "left": 457.5
+            }
+          },
+          "badge": {
+            "text": "追趕加成 ×1.15",
+            "rect": {
+              "x": 686.015625,
+              "y": 405.76171875,
+              "width": 136.484375,
+              "height": 28.75,
+              "top": 405.76171875,
+              "right": 822.5,
+              "bottom": 434.51171875,
+              "left": 686.015625
+            },
+            "ink": {
+              "x": 694.765625,
+              "y": 408.26171875,
+              "width": 118.984375,
+              "height": 23.33331298828125,
+              "top": 408.26171875,
+              "right": 813.75,
+              "bottom": 431.59503173828125,
+              "left": 694.765625
+            }
+          }
+        },
+        {
+          "i": 2,
+          "name": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+          "level": "Lv.50",
+          "rect": {
+            "x": 443.75,
+            "y": 517.01171875,
+            "width": 392.5,
+            "height": 149.62237548828125,
+            "top": 517.01171875,
+            "right": 836.25,
+            "bottom": 666.6340942382812,
+            "left": 443.75
+          },
+          "nameBox": {
+            "x": 457.5,
+            "y": 531.1978759765625,
+            "width": 313.53515625,
+            "height": 26.25,
+            "top": 531.1978759765625,
+            "right": 771.03515625,
+            "bottom": 557.4478759765625,
+            "left": 457.5
+          },
+          "nameInk": {
+            "x": 457.5,
+            "y": 530.78125,
+            "width": 300,
+            "height": 27.08331298828125,
+            "top": 530.78125,
+            "right": 757.5,
+            "bottom": 557.8645629882812,
+            "left": 457.5
+          },
+          "meta": {
+            "text": "目前 0 / 2,960,400 EXP\n追趕加成 ×1.30",
+            "rect": {
+              "x": 457.5,
+              "y": 564.1340942382812,
+              "width": 365,
+              "height": 28.75,
+              "top": 564.1340942382812,
+              "right": 822.5,
+              "bottom": 592.8840942382812,
+              "left": 457.5
+            },
+            "ink": {
+              "x": 457.5,
+              "y": 564.1340942382812,
+              "width": 365,
+              "height": 28.75,
+              "top": 564.1340942382812,
+              "right": 822.5,
+              "bottom": 592.8840942382812,
+              "left": 457.5
+            }
+          },
+          "badge": {
+            "text": "追趕加成 ×1.30",
+            "rect": {
+              "x": 686.015625,
+              "y": 564.1340942382812,
+              "width": 136.484375,
+              "height": 28.75,
+              "top": 564.1340942382812,
+              "right": 822.5,
+              "bottom": 592.8840942382812,
+              "left": 686.015625
+            },
+            "ink": {
+              "x": 694.765625,
+              "y": 566.6340942382812,
+              "width": 118.984375,
+              "height": 23.33331298828125,
+              "top": 566.6340942382812,
+              "right": 813.75,
+              "bottom": 589.9674072265625,
+              "left": 694.765625
+            }
+          }
+        }
+      ],
+      "footer": {
+        "x": 443.75,
+        "y": 716.1328125,
+        "width": 392.5,
+        "height": 55,
+        "top": 716.1328125,
+        "right": 836.25,
+        "bottom": 771.1328125,
+        "left": 443.75
+      },
+      "owner": {
+        "x": 443.75,
+        "y": 395,
+        "width": 392.5,
+        "height": 376.25,
+        "top": 395,
+        "right": 836.25,
+        "bottom": 771.25,
+        "left": 443.75
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "exp-end",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 85.3125,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "經驗池分配",
+            "width": 167.7734375,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "能力值",
+            "width": 104.86328125,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "技能",
+            "width": 104.86328125,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "確定",
+            "width": 191.25,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "返回",
+            "width": 191.25,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "phase": "actual-footer-summary-range",
+      "scale": 1.25,
+      "owner": {
+        "x": 443.75,
+        "y": 395,
+        "width": 392.5,
+        "height": 376.25,
+        "top": 395,
+        "right": 836.25,
+        "bottom": 771.25,
+        "left": 443.75
+      },
+      "selector": "#expDistributeList .v131-exp-preview-summary",
+      "text": "本次分配：0 EXP",
+      "ink": {
+        "x": 688.7044067382812,
+        "y": 678.30078125,
+        "width": 132.54559326171875,
+        "height": 25.4166259765625,
+        "top": 678.30078125,
+        "right": 821.25,
+        "bottom": 703.7174072265625,
+        "left": 688.7044067382812
+      },
+      "box": {
+        "x": 443.75,
+        "y": 675.3840942382812,
+        "width": 392.5,
+        "height": 31.99871826171875,
+        "top": 675.3840942382812,
+        "right": 836.25,
+        "bottom": 707.3828125,
+        "left": 443.75
+      },
+      "style": {
+        "overflowX": "visible",
+        "overflowY": "visible",
+        "paddingLeft": "36px",
+        "paddingRight": "36px",
+        "borderLeft": "0px",
+        "borderRight": "0px",
+        "font": "42px",
+        "transform": "none"
+      },
+      "rangeRects": [
+        {
+          "x": 688.7044067382812,
+          "y": 678.30078125,
+          "width": 132.54559326171875,
+          "height": 25.4166259765625,
+          "top": 678.30078125,
+          "right": 821.25,
+          "bottom": 703.7174072265625,
+          "left": 688.7044067382812
+        }
+      ],
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "v131-exp-preview-summary",
+          "rect": {
+            "x": 443.75,
+            "y": 675.3840942382812,
+            "width": 392.5,
+            "height": 31.99871826171875,
+            "top": 675.3840942382812,
+            "right": 836.25,
+            "bottom": 707.3828125,
+            "left": 443.75
+          },
+          "overflowX": "visible",
+          "overflowY": "visible",
+          "paddingLeft": "36px",
+          "paddingRight": "36px",
+          "borderLeft": "0px",
+          "borderRight": "0px",
+          "font": "42px",
+          "transform": "none"
+        },
+        {
+          "tag": "DIV",
+          "id": "expDistributeList",
+          "className": "exp-pool-character-list",
+          "rect": {
+            "x": 443.75,
+            "y": 204.51821899414062,
+            "width": 392.5,
+            "height": 566.6146240234375,
+            "top": 204.51821899414062,
+            "right": 836.25,
+            "bottom": 771.1328430175781,
+            "left": 443.75
+          },
+          "overflowX": "visible",
+          "overflowY": "visible",
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "borderLeft": "0px",
+          "borderRight": "0px",
+          "font": "45px",
+          "transform": "none"
+        },
+        {
+          "tag": "DIV",
+          "id": "homeExpPoolCard",
+          "className": "exp-pool-panel",
+          "rect": {
+            "x": 443.75,
+            "y": -209.5833282470703,
+            "width": 392.5,
+            "height": 980.7161254882812,
+            "top": -209.5833282470703,
+            "right": 836.25,
+            "bottom": 771.1327972412109,
+            "left": 443.75
+          },
+          "overflowX": "visible",
+          "overflowY": "visible",
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "borderLeft": "0px",
+          "borderRight": "0px",
+          "font": "45px",
+          "transform": "none"
+        },
+        {
+          "tag": "DIV",
+          "id": "characterTabContent",
+          "className": "",
+          "rect": {
+            "x": 443.75,
+            "y": 395,
+            "width": 392.5,
+            "height": 376.25,
+            "top": 395,
+            "right": 836.25,
+            "bottom": 771.25,
+            "left": 443.75
+          },
+          "overflowX": "hidden",
+          "overflowY": "auto",
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "borderLeft": "0px",
+          "borderRight": "0px",
+          "font": "45px",
+          "transform": "none"
+        },
+        {
+          "tag": "DIV",
+          "id": "homeFeatureModalBody",
+          "className": "",
+          "rect": {
+            "x": 443.75,
+            "y": 96.25,
+            "width": 392.5,
+            "height": 675,
+            "top": 96.25,
+            "right": 836.25,
+            "bottom": 771.25,
+            "left": 443.75
+          },
+          "overflowX": "hidden",
+          "overflowY": "hidden",
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "borderLeft": "0px",
+          "borderRight": "0px",
+          "font": "45px",
+          "transform": "none"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "home-feature-modal-box wide",
+          "rect": {
+            "x": 435,
+            "y": 20,
+            "width": 410,
+            "height": 760,
+            "top": 20,
+            "right": 845,
+            "bottom": 780,
+            "left": 435
+          },
+          "overflowX": "hidden",
+          "overflowY": "hidden",
+          "paddingLeft": "18px",
+          "paddingRight": "18px",
+          "borderLeft": "3px",
+          "borderRight": "3px",
+          "font": "45px",
+          "transform": "none"
+        },
+        {
+          "tag": "DIV",
+          "id": "homeFeatureModal",
+          "className": "home-feature-modal no-padding show",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 800,
+            "top": 0,
+            "right": 865,
+            "bottom": 800,
+            "left": 415
+          },
+          "overflowX": "visible",
+          "overflowY": "visible",
+          "paddingLeft": "12px",
+          "paddingRight": "12px",
+          "borderLeft": "0px",
+          "borderRight": "0px",
+          "font": "45px",
+          "transform": "none"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-ui",
+          "className": "",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 800,
+            "top": 0,
+            "right": 865,
+            "bottom": 800,
+            "left": 415
+          },
+          "overflowX": "hidden",
+          "overflowY": "hidden",
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "borderLeft": "0px",
+          "borderRight": "0px",
+          "font": "45px",
+          "transform": "none"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-overlay-layer",
+          "className": "",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 800,
+            "top": 0,
+            "right": 865,
+            "bottom": 800,
+            "left": 415
+          },
+          "overflowX": "hidden",
+          "overflowY": "hidden",
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "borderLeft": "0px",
+          "borderRight": "0px",
+          "font": "16px",
+          "transform": "none"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "",
+          "rect": {
+            "x": 415,
+            "y": 0,
+            "width": 450,
+            "height": 800,
+            "top": 0,
+            "right": 865,
+            "bottom": 800,
+            "left": 415
+          },
+          "overflowX": "hidden",
+          "overflowY": "hidden",
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "borderLeft": "0px",
+          "borderRight": "0px",
+          "font": "16px",
+          "transform": "matrix(0.416667, 0, 0, 0.416667, 0, 0)"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 800,
+            "top": 0,
+            "right": 1280,
+            "bottom": 800,
+            "left": 0
+          },
+          "overflowX": "clip",
+          "overflowY": "clip",
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "borderLeft": "0px",
+          "borderRight": "0px",
+          "font": "16px",
+          "transform": "none"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 800,
+            "top": 0,
+            "right": 1280,
+            "bottom": 800,
+            "left": 0
+          },
+          "overflowX": "hidden",
+          "overflowY": "hidden",
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "borderLeft": "0px",
+          "borderRight": "0px",
+          "font": "16px",
+          "transform": "none"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 800,
+            "top": 0,
+            "right": 1280,
+            "bottom": 800,
+            "left": 0
+          },
+          "overflowX": "hidden",
+          "overflowY": "hidden",
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
+          "borderLeft": "0px",
+          "borderRight": "0px",
+          "font": "16px",
+          "transform": "none"
+        }
+      ],
+      "actions": {
+        "x": 443.75,
+        "y": 716.1328125,
+        "width": 392.5,
+        "height": 55,
+        "top": 716.1328125,
+        "right": 836.25,
+        "bottom": 771.1328125,
+        "left": 443.75
+      }
+    },
+    {
+      "phase": "footer-horizontal-clipping-assessment",
+      "ancestor": "characterTabContent",
+      "leftGap": 244.95440673828125,
+      "rightGap": 15
+    },
+    {
+      "phase": "footer-horizontal-clipping-assessment",
+      "ancestor": "homeFeatureModalBody",
+      "leftGap": 244.95440673828125,
+      "rightGap": 15
+    },
+    {
+      "phase": "footer-horizontal-clipping-assessment",
+      "ancestor": "home-feature-modal-box wide",
+      "leftGap": 253.70440673828125,
+      "rightGap": 23.75
+    },
+    {
+      "phase": "footer-horizontal-clipping-assessment",
+      "ancestor": "game-ui",
+      "leftGap": 273.70440673828125,
+      "rightGap": 43.75
+    },
+    {
+      "phase": "footer-horizontal-clipping-assessment",
+      "ancestor": "game-overlay-layer",
+      "leftGap": 273.70440673828125,
+      "rightGap": 43.75
+    },
+    {
+      "phase": "footer-horizontal-clipping-assessment",
+      "ancestor": "game-stage",
+      "leftGap": 273.70440673828125,
+      "rightGap": 43.75
+    },
+    {
+      "phase": "footer-horizontal-clipping-assessment",
+      "ancestor": "game-viewport",
+      "leftGap": 688.7044067382812,
+      "rightGap": 458.75
+    },
+    {
+      "phase": "footer-horizontal-clipping-assessment",
+      "ancestor": "",
+      "leftGap": 688.7044067382812,
+      "rightGap": 458.75
+    },
+    {
+      "phase": "footer-horizontal-clipping-assessment",
+      "ancestor": "",
+      "leftGap": 688.7044067382812,
+      "rightGap": 458.75
+    },
+    {
+      "captureAttempt": {
+        "name": "exp-reopen-top",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 85.3125,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "經驗池分配",
+            "width": 167.7734375,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "能力值",
+            "width": 104.86328125,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "技能",
+            "width": 104.86328125,
+            "height": 65,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 365,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "確定",
+            "width": 191.25,
+            "height": 55,
+            "overflow": false
+          },
+          {
+            "label": "返回",
+            "width": 191.25,
+            "height": 55,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    }
+  ],
+  "scenes": [
+    "exp-top",
+    "exp-end",
+    "exp-reopen-top"
+  ],
+  "scope": "Segment30 EXP charge-only partial evidence; no completion claim"
+}

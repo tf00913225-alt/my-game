@@ -1866,7 +1866,7 @@
       "label": "主城經驗池",
       "entry": "openHomeFeature('expPool')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -1910,7 +1910,60 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "segment30-exp-skin-footer",
+          "status": "已實際驗證",
+          "records": [
+            {
+              "state": "original hero/charge artwork, natural float peak/end and EXP end/reopen",
+              "head": "31a30660fe8d54c77381f6d1ec7b781bd7931c14",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\360x640"
+            },
+            {
+              "state": "original hero/charge artwork, natural float peak/end and EXP end/reopen",
+              "head": "31a30660fe8d54c77381f6d1ec7b781bd7931c14",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\393x873"
+            },
+            {
+              "state": "original hero/charge artwork, natural float peak/end and EXP end/reopen",
+              "head": "31a30660fe8d54c77381f6d1ec7b781bd7931c14",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\412x915"
+            },
+            {
+              "state": "original hero/charge artwork, natural float peak/end and EXP end/reopen",
+              "head": "31a30660fe8d54c77381f6d1ec7b781bd7931c14",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\1280x800"
+            },
+            {
+              "state": "EXP footer presentation only; root must confirm geometry and actual evidence",
+              "head": "5cdb3c8634649f2b286f66fe48e14158c8117763",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\360x640"
+            },
+            {
+              "state": "EXP footer presentation only; root must confirm geometry and actual evidence",
+              "head": "5cdb3c8634649f2b286f66fe48e14158c8117763",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\393x873"
+            },
+            {
+              "state": "EXP footer presentation only; root must confirm geometry and actual evidence",
+              "head": "5cdb3c8634649f2b286f66fe48e14158c8117763",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\412x915"
+            },
+            {
+              "state": "EXP footer presentation only; root must confirm geometry and actual evidence",
+              "head": "5cdb3c8634649f2b286f66fe48e14158c8117763",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\1280x800"
+            }
+          ],
+          "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted",
+          "limits": [
+            "Only skin and footer presentation, original natural timer observed; no allocation confirmation/charge consumption/transaction",
+            "Canonical fixture normalization and delegated original saves remain; not zero-save or hardware acceptance",
+            "Three independent actual-picture reviews confirmed; limits remain per-state and do not constitute all-game acceptance"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -2020,6 +2073,39 @@
             "所有主城業務操作",
             "24B charge浮字仍待delta",
             "真實裝置/鍵盤"
+          ]
+        },
+        {
+          "state": "segment31-home-scroll-qa",
+          "status": "已實際驗證",
+          "records": [
+            {
+              "state": "Focused exact formal home Gate: real touch scroll/end/footer/native navigation boundaries",
+              "head": "3abc38b3173cb2f42066fcbe7887315f473fb4ae",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\360x640"
+            },
+            {
+              "state": "Focused exact formal home Gate: real touch scroll/end/footer/native navigation boundaries",
+              "head": "3abc38b3173cb2f42066fcbe7887315f473fb4ae",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\393x873"
+            },
+            {
+              "state": "Focused exact formal home Gate: real touch scroll/end/footer/native navigation boundaries",
+              "head": "3abc38b3173cb2f42066fcbe7887315f473fb4ae",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\412x915"
+            },
+            {
+              "state": "Focused exact formal home Gate: real touch scroll/end/footer/native navigation boundaries",
+              "head": "3abc38b3173cb2f42066fcbe7887315f473fb4ae",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\1280x800"
+            }
+          ],
+          "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted",
+          "limits": [
+            "Exact formal home block only; not cold-training/inventory/lifecycle/reload/full navigation matrix",
+            "Original touch swipe also touch-emulated at desktop viewport; not desktop native wheel",
+            "Failure reports unchanged: wrong identity API / PREPARE modal left open / borrowed home not ancestor of outer content are QA failures",
+            "Helper gzip captures current reviewed v3 bytes only; original earlier failing helper bytes were not captured and are not claimed"
           ]
         }
       ],
@@ -2282,6 +2368,58 @@
             "Original normalization/delegated saves retained; no zero-save claim",
             "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
             "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+          ]
+        },
+        {
+          "state": "segment30-exp-skin-footer",
+          "status": "已實際驗證",
+          "records": [
+            {
+              "state": "original hero/charge artwork, natural float peak/end and EXP end/reopen",
+              "head": "31a30660fe8d54c77381f6d1ec7b781bd7931c14",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\360x640"
+            },
+            {
+              "state": "original hero/charge artwork, natural float peak/end and EXP end/reopen",
+              "head": "31a30660fe8d54c77381f6d1ec7b781bd7931c14",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\393x873"
+            },
+            {
+              "state": "original hero/charge artwork, natural float peak/end and EXP end/reopen",
+              "head": "31a30660fe8d54c77381f6d1ec7b781bd7931c14",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\412x915"
+            },
+            {
+              "state": "original hero/charge artwork, natural float peak/end and EXP end/reopen",
+              "head": "31a30660fe8d54c77381f6d1ec7b781bd7931c14",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\skin\\1280x800"
+            },
+            {
+              "state": "EXP footer presentation only; root must confirm geometry and actual evidence",
+              "head": "5cdb3c8634649f2b286f66fe48e14158c8117763",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\360x640"
+            },
+            {
+              "state": "EXP footer presentation only; root must confirm geometry and actual evidence",
+              "head": "5cdb3c8634649f2b286f66fe48e14158c8117763",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\393x873"
+            },
+            {
+              "state": "EXP footer presentation only; root must confirm geometry and actual evidence",
+              "head": "5cdb3c8634649f2b286f66fe48e14158c8117763",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\412x915"
+            },
+            {
+              "state": "EXP footer presentation only; root must confirm geometry and actual evidence",
+              "head": "5cdb3c8634649f2b286f66fe48e14158c8117763",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted\\footer\\1280x800"
+            }
+          ],
+          "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted",
+          "limits": [
+            "Only skin and footer presentation, original natural timer observed; no allocation confirmation/charge consumption/transaction",
+            "Canonical fixture normalization and delegated original saves remain; not zero-save or hardware acceptance",
+            "Three independent actual-picture reviews confirmed; limits remain per-state and do not constitute all-game acceptance"
           ]
         }
       ],
@@ -15338,6 +15476,39 @@
             "連續切頁壓力",
             "其他modal/目的地與嵌套"
           ]
+        },
+        {
+          "state": "segment31-home-scroll-qa",
+          "status": "已實際驗證",
+          "records": [
+            {
+              "state": "Focused exact formal home Gate: real touch scroll/end/footer/native navigation boundaries",
+              "head": "3abc38b3173cb2f42066fcbe7887315f473fb4ae",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\360x640"
+            },
+            {
+              "state": "Focused exact formal home Gate: real touch scroll/end/footer/native navigation boundaries",
+              "head": "3abc38b3173cb2f42066fcbe7887315f473fb4ae",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\393x873"
+            },
+            {
+              "state": "Focused exact formal home Gate: real touch scroll/end/footer/native navigation boundaries",
+              "head": "3abc38b3173cb2f42066fcbe7887315f473fb4ae",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\412x915"
+            },
+            {
+              "state": "Focused exact formal home Gate: real touch scroll/end/footer/native navigation boundaries",
+              "head": "3abc38b3173cb2f42066fcbe7887315f473fb4ae",
+              "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\1280x800"
+            }
+          ],
+          "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted",
+          "limits": [
+            "Exact formal home block only; not cold-training/inventory/lifecycle/reload/full navigation matrix",
+            "Original touch swipe also touch-emulated at desktop viewport; not desktop native wheel",
+            "Failure reports unchanged: wrong identity API / PREPARE modal left open / borrowed home not ancestor of outer content are QA failures",
+            "Helper gzip captures current reviewed v3 bytes only; original earlier failing helper bytes were not captured and are not claimed"
+          ]
         }
       ],
       "reviews": {
@@ -26025,6 +26196,27 @@
         "Three original tutorial handlers have selected-domain same-task observations; pager/detail clicks do not inherit that claim",
         "No wear/sell/lock/acquisition/equipment/use/claim/combat actions clicked; background original save effects retained",
         "Empty-current-equipment comparison state only; other equipment transaction states unverified"
+      ]
+    },
+    {
+      "segment": "segment30-exp-skin-footer",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment30-exp-skin-footer-accepted",
+      "result": "限定呈現/操作證據；非整entry完成",
+      "pending": [
+        "Only skin and footer presentation, original natural timer observed; no allocation confirmation/charge consumption/transaction",
+        "Canonical fixture normalization and delegated original saves remain; not zero-save or hardware acceptance",
+        "Three independent actual-picture reviews confirmed; limits remain per-state and do not constitute all-game acceptance"
+      ]
+    },
+    {
+      "segment": "segment31-home-scroll-qa",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted",
+      "result": "限定呈現/操作證據；非整entry完成",
+      "pending": [
+        "Exact formal home block only; not cold-training/inventory/lifecycle/reload/full navigation matrix",
+        "Original touch swipe also touch-emulated at desktop viewport; not desktop native wheel",
+        "Failure reports unchanged: wrong identity API / PREPARE modal left open / borrowed home not ancestor of outer content are QA failures",
+        "Helper gzip captures current reviewed v3 bytes only; original earlier failing helper bytes were not captured and are not claimed"
       ]
     }
   ],
