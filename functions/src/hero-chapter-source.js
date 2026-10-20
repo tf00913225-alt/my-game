@@ -2,6 +2,12 @@
 const {randomBytes}=require("node:crypto");
 const {snapshotDigest:digest}=require("./canonical-snapshot");
 const catalog=require("./generated/hero-chapter-qualification.json");
+const retainedV1=require("./generated/hero-chapter-qualification-v1.json");
+// Issued tickets retain their immutable route and receipts across story edits.
+// Only these policies may advance or renew. Historical evidence reads keep
+// their original receipt/digest validation. Never rewrite an existing ticket.
+const acceptedPolicies=new Set([digest(catalog),digest(retainedV1)]);
+const acceptsPolicy=policy=>!!policy&&acceptedPolicies.has(digest(policy));
 const Core=require("./hero-core");
 const HERO="divineDogHongbao",CLAIM="hero-v1-"+HERO,TTL=7*86400000;
 const strip=data=>{const {createdAt,updatedAt,...value}=data;return value;};
@@ -147,7 +153,7 @@ function createHeroChapterSource({fail,nextRevision,FieldValue,makeClaim,
         const source=context.chapter;
         if(source.marker?.completed||source.ticket&&time<source.ticket.expiresAtMs){return context;}
         if(expectedRevision!==context.envelope.serverRevision){fail("aborted","CLOUD_REVISION_CONFLICT");}
-        if(source.ticket&&source.ticket.policySha256!==digest(catalog)){
+        if(source.ticket&&!acceptsPolicy(source.ticket.policy)){
             fail("failed-precondition","Chapter policy changed; the retained route requires review.");
         }
         const id=nonce();if(!validId(id)){fail("internal","Invalid server chapter nonce.");}
@@ -182,7 +188,7 @@ function createHeroChapterSource({fail,nextRevision,FieldValue,makeClaim,
            time<source.ticket.issuedAtMs||time>=source.ticket.expiresAtMs){
             fail("failed-precondition","A current unexpired chapter ticket is required.");
         }
-        if(source.ticket.policySha256!==digest(catalog)){fail("failed-precondition","Chapter policy changed; qualification is blocked.");}
+        if(!acceptsPolicy(source.ticket.policy)){fail("failed-precondition","Chapter policy changed; qualification is blocked.");}
         if(expectedRevision!==context.envelope.serverRevision){fail("aborted","CLOUD_REVISION_CONFLICT");}
         if(nodeId!==source.marker.nextNodeId){fail("failed-precondition","Chapter node is not the issued next position.");}
         const policy=source.ticket.policy,cursor=nextNode(policy,nodeId,choiceId);

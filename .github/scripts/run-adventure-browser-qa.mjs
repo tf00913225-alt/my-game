@@ -236,6 +236,7 @@ for(const entry of compositionByViewport.slice(1)){
 }
 fs.writeFileSync(path.join(ARTIFACT_DIR,"adventure-node-system-v1.json"),JSON.stringify({generatedAt:new Date().toISOString(),screenshots:VIEWPORTS.map(([w,h])=>`adventure-map-${w}x${h}.png`),evidence},null,2)+"\n");
 console.log("✓ Adventure browser QA passed at exact 360x800, 393x873 and 412x915 viewports with scroll-reachable chapter nodes and stable portrait composition screenshots");
+await import('../../tests/fixtures/run-chapter1-story-browser-qa.mjs');
 
 async function runProductionAdventureBalanceQa(){
     const baseUrl=process.env.ADVENTURE_BALANCE_BASE_URL;
@@ -260,22 +261,24 @@ async function runProductionAdventureBalanceQa(){
       const verify=m=>{const p=MonsterBalance.debug(m);check(m.balanceOwner==='MonsterBalance'&&m.mode==='adventure','owner');check(!m.v132Dungeon&&!m.v141ExtraHP,'no legacy marker');check(JSON.stringify(stats(m).slice(0,6))===JSON.stringify([p.final.maxHP,p.final.maxSP,p.final.physicalAttack,p.final.magicAttack,p.final.defense,p.final.speed]),'all final stats match projection');check(getEnemyPressureMultiplier(m,player)===p.finalDamagePressure,'pressure once');check(p.base.abilityPointBudget===(m.level-1)*5,'budget');};
       try{
         const nodes=content.chapters.chapter_v1.nodes.filter(n=>n.encounterId);
-        check(nodes.length===3,'all formal encounters');
-        for(const [sceneIndex,node] of [...nodes,nodes[0]].entries()){
-          const replay=sceneIndex===3,level=replay?8:node.suggestedLevel;
+        check(nodes.length===7,'all seven formal Chapter 1 encounters');
+        for(const [sceneIndex,node] of [...nodes,nodes.at(-1)].entries()){
+          const replay=sceneIndex===nodes.length,level=replay?8:Math.max(...content.encounters[node.encounterId].enemies.map(m=>m.level));
           const ref=prepareWildBalanceReferenceParty(level,replay?2:1);v131GrantElementBoxHours(8,32);
           let seed=9000+sceneIndex;Math.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
           autoBattle=false;autoPatrolEnabled=false;for(const cfg of [autoConfig,autoConfig2,autoConfig3]){cfg.enabled=false;cfg.skill=ref.skill;cfg.hp=0;cfg.sp=0;}
-          const state=player.adventureProgress.chapters.chapter_v1;state.currentNodeId=node.id;state.branchSelections.fork_1='bold';
+          const state=player.adventureProgress.chapters.chapter_v1;state.currentNodeId=node.id;state.chapterCompleted=false;state.onboarding.active=false;
           if(!replay){delete state.completedNodes[node.id];delete state.rewardClaims[node.id];}
           api.open();api.selectNode(node.id);const activate=document.querySelector('.adventure-node-sheet .adventure-button.primary');check(activate,'formal encounter action');activate.click();
+          for(let lines=0;api.getView().dialogue&&lines<30;lines++){check(api.advanceDialogue(),'formal prebattle dialogue');}
+          if(replay){check(api.beginBattle(node.id),'formal battle replay API');}
           await wait(()=>battleActive&&window.v132ActiveDungeonRun?.mode==='adventure');
           await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
           check(!document.getElementById('homeFeatureModal')?.classList.contains('show'),'no blocking modal');
           const roster=monsters.slice(),ids=currentBattleMonsters.slice(),initial=roster.map(stats),beforeParty=getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp);
-          check(roster.length===3,'formal count');roster.forEach(verify);renderBattle();roster.forEach(verify);
+          check(roster.length===content.encounters[node.encounterId].enemies.length,'formal data roster count');roster.forEach(verify);renderBattle();roster.forEach(verify);
           const snapshot=FourSymbolsBattlefieldSlots.getActiveEnemySnapshot(),slots=ids.map(i=>FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,i));
-          check(new Set(slots).size===3,'fixed unique slots');
+          check(new Set(slots).size===roster.length,'fixed unique slots');
           const shapes={};for(const shape of ['single','row','tri','all']){shapes[shape]=FourSymbolsBattlefieldSlots.resolveEnemyTargets(snapshot,ids[0],shape,i=>monsters[i]?.alive);check(shapes[shape].length>0&&shapes[shape].every(i=>ids.includes(i)),'targeting '+shape);}
           for(const i of ids){
             const m=roster[i],spec=content.encounters[node.encounterId].enemies[i];
@@ -319,29 +322,39 @@ async function runProductionAdventureBalanceQa(){
           const survivors=getExistingPartyIndexes().filter(i=>getPartyCharacterByIndex(i).hp>0).length;check(survivors>0,'natural survivors');
           const actualState=player.adventureProgress.chapters.chapter_v1;check(actualState.completedNodes[node.id],'completed node');
           const beforeGold=gold,beforeExp=sharedExp,reward=content.rewards[node.rewardId];
-          if(!replay){check(actualState.rewardClaims[node.id]==='ready','reward ready');check(api.claimNodeReward(node.id),'formal claim');check(gold-beforeGold===(reward.gold||0)&&sharedExp-beforeExp===(reward.sharedExp||0),'reward values unchanged');check(!api.claimNodeReward(node.id),'single claim ledger');}
-          else{check(actualState.rewardClaims[node.id]==='claimed'&&!api.claimNodeReward(node.id),'replay never double grants');}
-          const uid=FourSymbolsAccountSave.getActiveUid(),saved=FourSymbolsAccountSave.readForUid(uid);check(saved.status==='ready'&&saved.save.player.adventureProgress.chapters.chapter_v1.rewardClaims[node.id]==='claimed','persisted progression');
-          api.closeToCity();check(!battleActive&&!window.v132ActiveDungeonRun,'return cleanup');document.getElementById('adventureHomeEntry').click();await wait(()=>api.getView().visible);check(api.getChapterState().rewardClaims[node.id]==='claimed','re-entry progression');
+          if(!replay&&node.rewardId){check(actualState.rewardClaims[node.id]==='ready','reward ready');check(api.claimNodeReward(node.id),'formal claim');check(gold-beforeGold===(reward.gold||0)&&sharedExp-beforeExp===(reward.sharedExp||0),'reward values unchanged');check(!api.claimNodeReward(node.id),'single claim ledger');}
+          else if(replay){check(actualState.rewardClaims[node.id]==='claimed'&&!api.claimNodeReward(node.id),'replay never double grants');}
+          else{check(!api.claimNodeReward(node.id)&&gold===beforeGold&&sharedExp===beforeExp,'unrewarded formal nodes cannot mint assets');}
+          const uid=FourSymbolsAccountSave.getActiveUid(),saved=FourSymbolsAccountSave.readForUid(uid);check(saved.status==='ready'&&saved.save.player.adventureProgress.chapters.chapter_v1.completedNodes[node.id],'persisted progression');
+          if(node.rewardId){check(saved.save.player.adventureProgress.chapters.chapter_v1.rewardClaims[node.id]==='claimed','persisted reward receipt');}
+          api.closeToCity();check(!battleActive&&!window.v132ActiveDungeonRun,'return cleanup');document.getElementById('adventureHomeEntry').click();await wait(()=>api.getView().visible);check(api.getChapterState().completedNodes[node.id],'re-entry progression');
+          if(node.rewardId){check(api.getChapterState().rewardClaims[node.id]==='claimed','re-entry reward receipt');}
           evidence.scenes.push({encounterId:node.encounterId,level,replay,initial,slots,shapes,beforeParty,afterParty:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),rounds:maxTurn,survivors,castSkills,events,rewardGold:gold-beforeGold,rewardExp:sharedExp-beforeExp,saveProgression:true});
         }
         for(const rank of ['regular','elite','boss','smallBoss','player']){const cap=rank==='regular'?90:rank==='elite'?75:60;check(calculateStatusEffectChance(999,100,100,0,0,true,rank==='smallBoss'?getMonsterRank({rank}):rank,0)===cap,'hard cap '+rank);}
-        check(evidence.skills.some(skill=>skill.name!=='普通攻擊'),'actual Enemy AI carried skill execution');return evidence;
+        const expectsSkills=nodes.some(node=>content.encounters[node.encounterId].enemies.some(m=>getMonsterSkillTierAndChance(m.level).chance>0));
+        if(expectsSkills){check(evidence.skills.some(skill=>skill.name!=='普通攻擊'),'actual Enemy AI carried skill execution');}
+        else{
+          check(nodes.every(node=>content.encounters[node.encounterId].enemies.every(m=>getMonsterSkillTierAndChance(m.level).chance===0)),'low-level formal AI has zero skill chance');
+          check(evidence.skills.every(skill=>skill.name==='普通攻擊'),'low-level formal AI only used normal attacks');
+          check(evidence.scenes.some(scene=>scene.events.some(event=>event.type==='monster')),'natural enemy AI acted');
+        }
+        return evidence;
       }finally{Math.random=oldRandom;showMonsterSkillNameBadge=badge;rollStatusEffectHit=statusRoll;autoBattle=false;autoConfig.enabled=false;}
     })()`;
     const server=await startServer({baseUrl});const file=path.join(process.cwd(),'artifacts/browser-qa/adventure-balance.json');fs.mkdirSync(path.dirname(file),{recursive:true});const results=[];let client,proc,profile;
     const close=()=>{client?.close();client=null;proc?.kill('SIGTERM');proc=null;if(profile){try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{}profile=null;}};
     try{
         for(const [width,height] of [[390,844],[412,915]]){
-            profile=fs.mkdtempSync(path.join(os.tmpdir(),'adventure-balance-'));const port=9750+Math.floor(Math.random()*100);
+            profile=fs.mkdtempSync(path.join(os.tmpdir(),'adventure-balance-'));const port=await reservePort();
             const chrome=findChrome();let launchError='';
-            proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:['ignore','ignore','pipe']});
+            proc=spawn(chrome,['--headless=new','--no-sandbox','--remote-allow-origins=*','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:['ignore','ignore','pipe'],windowsHide:true});
             proc.stderr.on('data',chunk=>{launchError=(launchError+chunk).slice(-4000);});
             proc.on('error',error=>{launchError=String(error);});
             const tabs=await waitJson('http://127.0.0.1:'+port+'/json/list').catch(error=>{throw new Error('Adventure Chrome startup failed: '+chrome+' exit='+proc.exitCode+' '+launchError,{cause:error});});client=new Cdp(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});await new Promise(r=>setTimeout(r,1000));
             const active=client.eval(reference+'\n'+expression);let done=false;active.finally(()=>{done=true;}).catch(()=>{});const captured=new Set();
             while(!done){await new Promise(r=>setTimeout(r,250));const marker=await client.eval('window.adventureBalanceQaCapture||null').catch(()=>null);if(marker&&!captured.has(marker)){captured.add(marker);const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(file.replace('.json','-'+width+'x'+height+'-'+marker+'.png'),Buffer.from(shot.data,'base64'));}}
-            const evidence=await active;assert.equal(evidence.scenes.length,4);assert.equal(client.events.some(e=>e.method==='Runtime.consoleAPICalled'&&e.params.type==='error'&&JSON.stringify(e.params.args).includes('戰鬥行動超過安全期限')),false,'no watchdog recovery');results.push({width,height,...evidence});close();
+            const evidence=await active;assert.equal(evidence.scenes.length,8);assert.equal(client.events.some(e=>e.method==='Runtime.consoleAPICalled'&&e.params.type==='error'&&JSON.stringify(e.params.args).includes('戰鬥行動超過安全期限')),false,'no watchdog recovery');results.push({width,height,...evidence});close();
         }
         fs.writeFileSync(file,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',results},null,2)+'\n');console.log('Adventure production Chrome: eight natural scenes, both mobile viewports, owner/reward/progression PASS');
     }catch(error){const partial=await client?.eval('({evidence:window.adventureBalanceQaEvidence,phase:battlePhase,turn,battleActive,run:window.v132ActiveDungeonRun,modals:[...document.querySelectorAll(".show")].map(x=>x.id)})').catch(()=>null);fs.writeFileSync(file,JSON.stringify({passed:false,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-12)},null,2)+'\n');throw error;}
