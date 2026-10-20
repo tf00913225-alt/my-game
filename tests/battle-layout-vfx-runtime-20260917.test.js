@@ -172,8 +172,11 @@ assert.doesNotMatch(feedbackCss,/0 0 (?:7|8|10|14|16)px|rgba\([^)]*(?:255,32,32|
     "canonical battle feedback must not use coloured neon glow");
 assert.match(relicCss,/body\.team-relic-cinematic-active > \.v143-skill-stage\{z-index:18130!important;\}/,
     "formal relic VFX remains above the viewport cinematic presentation");
-assert.match(fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8"),/body\.team-relic-cinematic-active > \.v174-battle-hud-layer\{z-index:18135;\}/,
-    "formal resource HUD stays above the relic VFX without shrinking relic artwork");
+const relicHudCss=fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8");
+assert.match(relicHudCss,/body\.team-relic-cinematic-active > \.v174-battle-hud-layer > \.v174-unit-hud\[data-relic-target-focus="true"\]\{z-index:18135;\}/,
+    "only actual recipient HUDs stay above relic VFX without shrinking artwork");
+assert.doesNotMatch(relicHudCss,/body\.team-relic-cinematic-active > \.v174-battle-hud-layer\{z-index:18135;\}/,
+    "non-recipient HUDs must remain below the cinematic dim");
 
 const relicPresentation=relicRuntime.slice(
     relicRuntime.indexOf("const RELIC_VFX_PRESENTATION=Object.freeze({"),

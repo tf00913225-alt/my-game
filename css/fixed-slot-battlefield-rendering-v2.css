@@ -482,8 +482,11 @@
 /* One compact HUD for allies, enemies, Bosses and reinforcements. Resource
    nodes/IDs remain the settlement writers' real nodes, including detached HUDs. */
 .v174-battle-hud-layer{position:fixed;inset:0;z-index:16015;pointer-events:none;}
-/* Relic VFX rises above its cinematic dim; resource HUDs remain readable. */
-body.team-relic-cinematic-active > .v174-battle-hud-layer{z-index:18135;}
+/* During a relic the existing fixed HUDs own individual stacking positions.
+   Only formal recipients rise above VFX; all others remain under the dim. */
+body.team-relic-cinematic-active > .v174-battle-hud-layer{display:contents;}
+body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud{z-index:16015;}
+body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-relic-target-focus="true"]{z-index:18135;}
 .v174-unit-hud{
     position:absolute;inset:0;transform-origin:0 0;pointer-events:none;
     --battle-name-row-height:26px;

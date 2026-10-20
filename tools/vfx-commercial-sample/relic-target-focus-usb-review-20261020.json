@@ -1,0 +1,36 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "issue": "Only actual relic recipients should remain highlighted during the cinematic",
+  "status": "SCOPED_USB_AND_INDEPENDENT_REVIEW_PASS_STOP_REFINEMENT_REQUIRED_CI_SEPARATE",
+  "sourceBase": "9db05ae745d9f006c223a66fc9550146ca1d8a44",
+  "scope": [
+    "js/60-team-relic-system.js formal side/targetIds target marker and cleanup",
+    "css/fixed-slot-battlefield-rendering-v2.css individual existing HUD stacking"
+  ],
+  "device": "SM-N960F Android10 USB Chrome",
+  "before": "artifacts/relic-target-focus/before-loaded-rules",
+  "after": "artifacts/relic-target-focus/after",
+  "viewer": "http://127.0.0.1:8879/relic-target-focus/index.html",
+  "loadedSourceEvidence": "Each USB evidence.json records parsed CSSStyleSheet rules from the actual foreground document, rather than assuming disk tree equals a cached tab.",
+  "visual": "Enemy-all Nine Dragon preview: targeted enemy name/HP remain clear above dim and VFX; ally name/HP/SP now dim with the background. Original source art and size unchanged.",
+  "tests": [
+    "real Chrome formal JS54 applyUnit/getUnitHud:3/6 roster,enemy-all/single/ally-subset,late detach,scroll,actual stacking,rect invariance,cleanup PASS",
+    "relic-target-highlight-stacking-20260919 PASS",
+    "relic-battle-cutin-icon-readability-20260919 PASS",
+    "v174-team-relic-system PASS",
+    "battle-layout-vfx-runtime-20260917 PASS",
+    "production build and build --check PASS"
+  ],
+  "otherFindings": "Temporary portrait composite had reintroduced old status left/top overrides; those new status samples were rejected, not used to redesign source art. Corrected composition requires status recapture.",
+  "ci": "Latest Head required CI remains a separate gate; earlier Cloud audit-fence ordering failure is not waived.",
+  "previousCheckpointCI": {
+    "head": "9db05ae745d9f006c223a66fc9550146ca1d8a44",
+    "run": "https://github.com/tf00913225-alt/my-game/actions/runs/39366196982",
+    "attempt": 1,
+    "battle_browser": "success",
+    "session_authority_emulator": "success",
+    "aggregate": "pending",
+    "historicalFailure": "Prior c72 audit fence timestamp ordering failure remains unclassified. No Cloud code or assertion changed. Latest run success is evidence for9db only."
+  },
+  "independentReview": "coverage_review PASS: formal public HUD API/side/index, late detach, fixed geometry and cleanup; physical before-loaded-rules01 vs after01 only targets stay bright, after02/03 restore. This does not accept separate status positioning samples."
+}

@@ -10,7 +10,7 @@
     "relic": 1,
     "total": 70
   },
-  "gate": "SCOPED_PRESENTATION_ACCEPTANCE_COMPLETE_STOP_ART_REFINEMENT",
+  "gate": "REOPENED_LOCAL_FINDINGS_PENDING_USB_REVIEW",
   "scope": "Commercial presentation acceptance within recorded source, target, HUD, timing and cleanup samples. This is a finite engineering/art gate, not a guarantee of every device, every frame or error-free gameplay.",
   "policy": "Passed items stop refinement. Only specific failed presentation portions were corrected. No additional CSS particle system or renderer.",
   "recordedHeads": [
@@ -564,7 +564,7 @@
       "mode": null,
       "frames": 12,
       "sourceSha256": "91bd7ebcd3a059b85c4f370aeba48307b60c233fca8d76df3c3a34fa7e78e7c2",
-      "decision": "PASS_SCOPED_PRESENTATION_STOP_REFINEMENT",
+      "decision": "FAIL_LOCAL_SOURCE_DUST_EDGE_PENDING_ALPHA_ONLY_CORRECTION",
       "review": "tools/vfx-commercial-sample/dynamic-wind-earth-usb-review.json",
       "additionalReview": []
     },
@@ -1099,8 +1099,9 @@
       "name": "九龍火",
       "source": "assets/vfx/relic/relic_nine_dragon_fire.webp?v=6a58936606a0",
       "sourceSha256": "6a58936606a09df7165221988ce0785f337996c992bce417b364dcf12d9e6659",
-      "decision": "PASS_SCOPED_PRESENTATION_STOP_REFINEMENT",
-      "review": "tools/vfx-commercial-sample/recipient-and-nine-dragon-usb-review.json"
+      "decision": "PASS_TARGET_HUD_FOCUS_USB_STOP_REFINEMENT",
+      "review": "tools/vfx-commercial-sample/relic-target-focus-usb-review-20261020.json"
     }
-  ]
+  ],
+  "integrationReviewStatus": "Relic target-only HUD fix passed independent review and USB replay; stop refinement. StoneBreakSky alpha candidate passed source invariants and independent review, pending USB. Rejected temporary-composite status samples require fresh valid capture; other passed items remain frozen."
 }
