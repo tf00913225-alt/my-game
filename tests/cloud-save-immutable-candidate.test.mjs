@@ -23,7 +23,7 @@ function lexicalFactory(enabled,io={bucketName:'private-fake-test-bucket'}){
         source=source.replace('const immutableCandidateIO=null;','const immutableCandidateIO=require("test-only-immutable-candidate-io");');
         const native=compiled.require.bind(compiled);compiled.require=name=>name==='test-only-immutable-candidate-io'?io:native(name);
     }
-    source=source.replace('return Object.freeze({pinCandidatePublication,','return Object.freeze({publishPreparedCandidate,ackCandidatePublication,pinCandidatePublication,');
+    source=source.replace('return Object.freeze({pinCandidatePublication,','return Object.freeze({publishCapturedCandidate,publishPreparedCandidate,ackCandidatePublication,pinCandidatePublication,');
     compiled._compile(source,filename);return compiled.exports.createCanonicalCurrentRecovery;
 }
 // Only the fixture adapts its in-memory references to SDK public query APIs.
@@ -75,7 +75,8 @@ async function artifact(f){const pin=await f.private.pinCandidatePublication(f.r
     const material=await f.private.loadPinnedRawCapture(pin);return {pin,artifact:await f.private.assemblePinnedCandidate(pin,material)};}
 test('publication preparation stays private and production-unavailable before reads; forged identities cannot mint origin',async()=>{
     const f=await fixture(),before=copy([...f.h.data]),writes=f.h.writes;f.traces.length=0;
-    for(const name of ['pinCandidatePublication','loadPinnedRawCapture','assemblePinnedCandidate','prepareCandidatePublication','publishPreparedCandidate','ackCandidatePublication'])assert.equal(Object.hasOwn(f.original,name),false);
+    for(const name of ['publishCapturedCandidate','pinCandidatePublication','loadPinnedRawCapture','assemblePinnedCandidate','prepareCandidatePublication','publishPreparedCandidate','ackCandidatePublication'])assert.equal(Object.hasOwn(f.original,name),false);
+    await assert.rejects(f.disabled.publishCapturedCandidate(f.request(),args),/unavailable/);
     await assert.rejects(f.disabled.pinCandidatePublication(f.request(),args),/unavailable/);
     await assert.rejects(f.private.loadPinnedRawCapture(Object.freeze({})),/original private/);
     await assert.rejects(f.private.prepareCandidatePublication(f.request(),{},{}),/original private/);
@@ -175,6 +176,24 @@ function fakeStorage(){
 }
 async function preparedFixture(){const io=fakeStorage(),f=await fixture(io);io.outside=()=>assert.equal(f.transactionDepth,0,'Storage IO cannot run in a Firestore callback');
     const ready=await artifact(f);return {...f,io,ready,prepared:await f.private.prepareCandidatePublication(f.request(),ready.pin,ready.artifact)};}
+
+test('single-invocation publication retains all private identities and rechecks the original gates on replay',async()=>{
+    const io=fakeStorage(),f=await fixture(io);
+    io.outside=()=>assert.equal(f.transactionDepth,0);
+    const result=await f.private.publishCapturedCandidate(f.request(),args);
+    assert.equal(result.status,'acknowledged');assert.equal(result.generation,'9007199254740993');
+    assert.equal(result.unchanged,false);
+    for(const name of ['candidateProofValid','trustedCaptureVerified','restoreAuthorized','authoritativeStateReady'])assert.equal(result[name],false);
+    assert.deepEqual(Object.keys(result).sort(),['candidateProofValid','trustedCaptureVerified','restoreAuthorized','authoritativeStateReady','status','auditId','operationId','artifactSha256','generation','unchanged'].sort());
+    assert(!Object.values(result).some(Buffer.isBuffer));
+    const writes=f.h.writes;
+    assert.equal((await f.private.publishCapturedCandidate(f.request(),args)).unchanged,true);
+    assert.equal(f.h.writes,writes);assert.equal(io.calls.filter(([kind])=>kind==='create').length,1);
+    await f.takeover();const ioCount=io.calls.length,takeoverWrites=f.h.writes;
+    await assert.rejects(f.private.publishCapturedCandidate(f.request(),args));
+    assert.equal(io.calls.length,ioCount,'replaced audit session stops before provider IO');
+    assert.equal(f.h.writes,takeoverWrites,'rejected publication wrote nothing');
+});
 test('private full-read publication and ACK bind canonical string generation; ACK changes only four fields and retry is read-only',async()=>{
     const f=await preparedFixture(),path=f.root+'/candidatePublications/'+operationId,before=copy(f.h.data.get(path));f.traces.length=0;
     const proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);

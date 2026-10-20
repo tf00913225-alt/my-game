@@ -14842,14 +14842,33 @@ function chooseEnemySkillCategory(attackSkillIds,buffSkillIds,randomValue,monste
     const attackWeight=monster&&monster.vGameplayTower===true&&monster.element==="water"?.30:.70;
     return Number(randomValue)<attackWeight?"attack":"buff";
 }
+function filterEnemySkillCandidates(monster,ids){
+    const policy=monster&&monster.vGameplayTower===true?window.FourSymbolsTowerSkillPolicy:null;
+    const legal=(ids||[]).filter(id=>skillDatabase[id]&&Number(monster.sp)>=(Number(skillDatabase[id].spCost)||0)&&(!policy||policy.allows(monster,id)));
+    if(!policy)return legal;
+    const last=policy.lastDeclaration(monster);
+    const fresh=legal.filter(id=>id!==last);
+    return fresh.length?fresh:legal;
+}
+function selectEnemySkill(monster,ids,randomValue){
+    const candidates=filterEnemySkillCandidates(monster,ids);
+    if(!candidates.length)return null;
+    const policy=monster&&monster.vGameplayTower===true?window.FourSymbolsTowerSkillPolicy:null;
+    const weights=candidates.map(id=>policy?policy.weight(monster,id):1);
+    let remaining=(randomValue===undefined?Math.random():Number(randomValue))*weights.reduce((sum,value)=>sum+value,0);
+    for(let i=0;i<candidates.length;i++){remaining-=weights[i];if(remaining<0)return candidates[i];}
+    return candidates[candidates.length-1];
+}
 window.FourSymbolsEnemySkillAI=Object.freeze({
     chooseCategory:chooseEnemySkillCategory,
+    filterCandidates:filterEnemySkillCandidates,
+    selectSkill:selectEnemySkill,
     enterSkillDecision:function(monster,randomValue){
         if(!monster||monster.alive===false||monster.canAct===false||isMonsterFrozen(monster)||isMonsterPetrified(monster)){ return false; }
         const pool=typeof window.v144GetLegalMonsterSkillIds==="function"
             ?[...window.v144GetLegalMonsterSkillIds(monster,"attack"),...window.v144GetLegalMonsterSkillIds(monster,"support")]
             :[...(monster.skillIds||[]),...(monster.v141SupportSkillIds||[])];
-        const legal=pool.some(id=>skillDatabase[id]&&Number(monster.sp)>=(Number(skillDatabase[id].spCost)||0));
+        const legal=filterEnemySkillCandidates(monster,pool).length>0;
         return legal&&(randomValue===undefined?Math.random():Number(randomValue))<Number(monster.skillChance||0);
     },
     healingThresholdPercent:70,
@@ -18757,7 +18776,7 @@ function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
 
     const hasVisibleHostilePrimary=resolveEnemyActionTargets(actionTargets,"single").targets.length>0;
 
-    const affordableSkillIds=
+    let affordableSkillIds=
 
         Array.isArray(monster.skillIds)
         ?
@@ -18787,6 +18806,7 @@ function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
         [];
 
 
+    if(monster.vGameplayTower===true){ affordableSkillIds=filterEnemySkillCandidates(monster,affordableSkillIds); }
     const forcedAttackSkillId=monster.v175ForcedAttackSkillId;
     const forcedAttackIsLegal=affordableSkillIds.includes(forcedAttackSkillId);
     delete monster.v175ForcedAttackSkillId;
@@ -18813,7 +18833,7 @@ function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
 
         castSkillId=forcedAttackIsLegal
             ?forcedAttackSkillId
-            :affordableSkillIds[Math.floor(Math.random()*affordableSkillIds.length)];
+            :monster.vGameplayTower===true?selectEnemySkill(monster,affordableSkillIds):affordableSkillIds[Math.floor(Math.random()*affordableSkillIds.length)];
 
 
         castSkillData=
@@ -18929,6 +18949,9 @@ function processSingleMonsterAttack(monsterIndex,token,targetSnapshot){
     }
 
     const attackTargetIndexes=attackTargets.map(target=>target.index);
+    if(usesSkill&&monster.vGameplayTower===true&&window.FourSymbolsTowerSkillPolicy){
+        window.FourSymbolsTowerSkillPolicy.recordDeclaration(monster,castSkillId);
+    }
     if(usesSkill){
         showMonsterSkillNameBadge(
             castSkillName,

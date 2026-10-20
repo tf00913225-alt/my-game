@@ -10047,7 +10047,7 @@
         return Math.max(1,Number(shield&&shield.baseMaxHP)||Number(monster&&monster.maxHP)||1);
     }
 
-    function getMonsterAllyTriTargeting(casterIndex,entries){
+    function getMonsterAllyTriTargeting(casterIndex,entries,hpThreshold){
         const living=(entries||currentBattleMonsters.map(index=>({index:index,monster:monsters[index]})))
             .filter(entry=>entry&&entry.monster&&entry.monster.alive!==false&&Number(entry.monster.hp)>0);
         const livingByIndex=new Map(living.map(entry=>[entry.index,entry]));
@@ -10065,12 +10065,13 @@
                     ?owner.resolveEnemyTargets(snapshot,center,"tri",index=>livingByIndex.has(index))
                     :[center]);
             const trio=indexes.map(index=>livingByIndex.get(index)).filter(Boolean);
+            if(hpThreshold!==undefined&&!trio.some(entry=>monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)*hpThreshold))return;
             const score=trio.reduce((sum,entry)=>{
                 const ally=entry.monster;
                 const hpNeed=(monsterBaseMaxHp(ally)-monsterBaseHp(ally))/monsterBaseMaxHp(ally);
                 const maxSP=Math.max(1,Number(ally.maxSP)||1);
                 const spNeed=(maxSP-Math.max(0,Number(ally.sp)||0))/maxSP;
-                return sum+Math.max(0,hpNeed)+Math.max(0,spNeed);
+                return sum+Math.max(0,hpNeed)+(hpThreshold===undefined?Math.max(0,spNeed):0);
             },0)+(trio.some(entry=>entry.index===casterIndex)?0.0001:0);
             if(score>bestScore){ best=trio; bestPrimary=center; bestScore=score; }
         });
@@ -10109,9 +10110,9 @@
             const buff={type,turnsLeft:turns,amount};
             if(type==="rage"){
                 buff.originalAttack=monster.attack; buff.originalMagicAttack=monster.magicAttack;
-                buff.bonusPercent=25;
-                buff.critChanceBonusPercent=25;
-                buff.critDamageBonusPercent=50;
+                buff.critChanceBonusPercent=Number.isFinite(Number(opts.critChanceBonusPercent))?Number(opts.critChanceBonusPercent):25;
+                buff.bonusPercent=buff.critChanceBonusPercent;
+                buff.critDamageBonusPercent=Number.isFinite(Number(opts.critDamageBonusPercent))?Number(opts.critDamageBonusPercent):50;
             }else if(type==="resistance"){
                 buff.accuracyBonusPercent=Math.max(0,Number(opts.accuracyBonusPercent)||0);
                 monster.resistance=(Number(monster.resistance)||0)+amount;
@@ -10168,7 +10169,9 @@
             monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)*.70
         );
         const healSkill=skillDatabase.healSpell;
-        if(!skillId&&supportIds.includes("healSpell")&&allAlliesNeedHealing&&healSkill&&monster.sp>=(healSkill.spCost||0)){
+        const tower=monster.vGameplayTower===true;
+        const towerHealTargeting=tower?getMonsterAllyTriTargeting(monsterIndex,allyEntries,.40):null;
+        if(!tower&&!skillId&&supportIds.includes("healSpell")&&allAlliesNeedHealing&&healSkill&&monster.sp>=(healSkill.spCost||0)){
             supportTargeting=getMonsterAllyTriTargeting(monsterIndex,allyEntries);
             healTargets=supportTargeting.entries;
             if(healTargets.length){ skillId="healSpell"; }
@@ -10179,45 +10182,58 @@
                 const skill=skillDatabase[id];
                 return !!(skill&&skill.element&&skill.element===monster.element);
             });
-        const affordableAttacks=carriedAttacks.filter(id=>{
+        let affordableAttacks=carriedAttacks.filter(id=>{
             const skill=skillDatabase[id];
             return !!(skill&&monster.sp>=(skill.spCost||0));
         });
-        const affordableBuffs=supportIds.filter(id=>{
+        let affordableBuffs=supportIds.filter(id=>{
             const skill=skillDatabase[id];
             return id!=="healSpell"&&!!(skill&&monster.sp>=(skill.spCost||0));
         });
+        if(tower){
+            const ai=window.FourSymbolsEnemySkillAI;
+            affordableAttacks=ai.filterCandidates(monster,affordableAttacks);
+            affordableBuffs=ai.filterCandidates(monster,supportIds.filter(id=>{
+                const skill=skillDatabase[id];
+                if(!skill||monster.sp<(skill.spCost||0))return false;
+                if(id==="healSpell")return towerHealTargeting.entries.length>0;
+                const type={rage:"rage",dodgeSkill:"dodge",dinghaishenzhen:"resistance"}[id];
+                return !!type&&!allies.some(ally=>ally.v141TeamBuffs?.some(buff=>buff.type===type&&buff.turnsLeft>0));
+            }));
+            skillId=affordableBuffs.includes(skillId)?skillId:null;
+        }
         if(!skillId){
             const category=window.FourSymbolsEnemySkillAI
                 ?window.FourSymbolsEnemySkillAI.chooseCategory(affordableAttacks,affordableBuffs,Math.random(),monster)
                 :(Math.random()<.70?"attack":"buff");
             if(category==="attack"&&affordableAttacks.length){
-                const preferredAttacks=monster.vGameplayTower===true&&monster.element==="water"&&affordableAttacks.includes("freeze")&&Math.random()<.5
-                    ?["freeze"]:affordableAttacks;
-                monster.v175ForcedAttackSkillId=preferredAttacks[Math.floor(Math.random()*preferredAttacks.length)];
+                monster.v175ForcedAttackSkillId=tower?window.FourSymbolsEnemySkillAI.selectSkill(monster,affordableAttacks):affordableAttacks[Math.floor(Math.random()*affordableAttacks.length)];
                 return false;
             }
+            if(tower&&category==="buff"){ skillId=window.FourSymbolsEnemySkillAI.selectSkill(monster,affordableBuffs); }
             if(category!=="buff"&&affordableBuffs.length){
                 /* An unaffordable/missing attack pool falls back once to buffs. */
             }else if(category==="normal"){ return false; }
         }
-        if(!skillId&&supportIds.includes("barrier")){
+        if(!tower&&!skillId&&supportIds.includes("barrier")){
             target=allies.find(item=>!(item.v141Shield&&item.v141Shield.isBarrier));
             if(target){ skillId="barrier"; }
         }
-        if(!skillId&&supportIds.includes("rage")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="rage"&&buff.turnsLeft>0))){ skillId="rage"; }
-        if(!skillId&&supportIds.includes("dinghaishenzhen")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="resistance"&&buff.turnsLeft>0))){ skillId="dinghaishenzhen"; }
-        if(!skillId&&supportIds.includes("dodgeSkill")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="dodge"&&buff.turnsLeft>0))){ skillId="dodgeSkill"; }
+        if(!tower&&!skillId&&supportIds.includes("rage")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="rage"&&buff.turnsLeft>0))){ skillId="rage"; }
+        if(!tower&&!skillId&&supportIds.includes("dinghaishenzhen")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="resistance"&&buff.turnsLeft>0))){ skillId="dinghaishenzhen"; }
+        if(!tower&&!skillId&&supportIds.includes("dodgeSkill")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="dodge"&&buff.turnsLeft>0))){ skillId="dodgeSkill"; }
         if(!skillId){
             if(affordableAttacks.length){
-                const preferredAttacks=monster.vGameplayTower===true&&monster.element==="water"&&affordableAttacks.includes("freeze")&&Math.random()<.5
-                    ?["freeze"]:affordableAttacks;
-                monster.v175ForcedAttackSkillId=preferredAttacks[Math.floor(Math.random()*preferredAttacks.length)];
+                monster.v175ForcedAttackSkillId=tower?window.FourSymbolsEnemySkillAI.selectSkill(monster,affordableAttacks):affordableAttacks[Math.floor(Math.random()*affordableAttacks.length)];
             }
             return false;
         }
         const skill=skillDatabase[skillId];
         if(monster.sp<(skill.spCost||0)){ return false; }
+        if(tower&&skillId==="healSpell"){
+            supportTargeting=towerHealTargeting;healTargets=supportTargeting.entries;
+            if(!healTargets.length)return false;
+        }
         if(!supportTargeting){
             if(skillId==="barrier"&&target){
                 const entry=allyEntries.find(item=>item.monster===target)||null;
@@ -10228,6 +10244,7 @@
         }
         const supportTargetIds=(supportTargeting.entries||[]).map(entry=>entry.index);
         monster.sp-=skill.spCost||0;
+        if(tower&&window.FourSymbolsTowerSkillPolicy)window.FourSymbolsTowerSkillPolicy.recordDeclaration(monster,skillId);
         showMonsterSkillNameBadge(skill.name,skill.element||monster.element,monsterIndex,supportTargeting.primaryIndex,supportTargetIds,"monster",skill.targetType);
         const level=Math.max(1,Math.min(
             Number(skill.maxLevel)||1,
@@ -10267,7 +10284,10 @@
             target.v141Shield.isBarrier=true;
             addBattleLog(monster.name+"為"+target.name+"施放結界，可抵擋"+blocks+"次直接傷害，最多持續"+duration+"回合。");
         }else if(skillId==="rage"){
-            applyTimedMonsterBuff((supportTargeting.entries||[]).map(entry=>entry.monster),"rage",3,0);
+            applyTimedMonsterBuff((supportTargeting.entries||[]).map(entry=>entry.monster),"rage",3,0,tower?{
+                critChanceBonusPercent:levelValue(skill.critChanceBonusByLevel||skill.critBonusByLevel,0),
+                critDamageBonusPercent:levelValue(skill.critDamageBonusByLevel||skill.critBonusByLevel,0)
+            }:undefined);
             addBattleLog(monster.name+"施放怒火，敵方全體爆擊率與爆擊傷害提升3回合。");
         }else if(skillId==="dinghaishenzhen"){
             const resist=levelValue(skill.statusResistBonusByLevel,skill.statusResistBonus||0);
