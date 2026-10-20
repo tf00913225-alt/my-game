@@ -487,7 +487,7 @@
       "label": "任務",
       "entry": "openHomeFeature('quest')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -531,7 +531,15 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "第19對應真主城入口與局部分頁返回重開",
+          "status": "已實際驗證",
+          "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted",
+          "limits": "不代表此入口全部TAB或交易全驗；其他既有段證據保留"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -1023,7 +1031,7 @@
       "label": "合成",
       "entry": "openHomeFeature('synthesis')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -1067,7 +1075,15 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "第19對應真主城入口與局部分頁返回重開",
+          "status": "已實際驗證",
+          "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted",
+          "limits": "不代表此入口全部TAB或交易全驗；其他既有段證據保留"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -5320,7 +5336,7 @@
       "label": "合成 material",
       "entry": "v141SwitchSynthesisTab('material')",
       "owner": "js/36-v141-content-systems.js; css/38-v141-system-expansion.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "滿資料",
@@ -5340,39 +5356,87 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/360x640-material-only-report.json"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/393x873-report.json"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/412x915-report.json"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/1280x800-report.json"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真city7→材料TAB，不足/真menu捲末與最後路線/1234持有可合成呈現/返回重開",
+          "status": "已實際驗證",
+          "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+          "scope": "僅呈現/真導航；不點領取/合成，原UI副作用保留",
+          "devices": [
+            {
+              "device": "360x640",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/360x640-material-only-report.json",
+              "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted"
+            },
+            {
+              "device": "393x873",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/393x873-report.json",
+              "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted"
+            },
+            {
+              "device": "412x915",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/412x915-report.json",
+              "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted"
+            },
+            {
+              "device": "1280x800",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/1280x800-report.json",
+              "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted"
+            }
+          ],
+          "limits": [
+            "未領取/合成/開箱/交易或驗獎勵與雲端",
+            "僅canonical local fixtures，不代表真帳號業務結果",
+            "未驗實體裝置/鍵盤/所有資料組合",
+            "自然委託實際六項長列表已捲末（含js34追加），材料一張卡無溢出明記不需捲，未造synthetic長內容",
+            "本段未逐格委託完成獎勵橫向rail；既有共用rail證據保留，不冒充此情境五箱全驗"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸實圖代表核對題牌/原雕框/內卡/中文/disabled對比，不擴整頁重排",
+        "interaction": "interaction_review：四尺寸正式city/TAB/首末/可領與claimed呈現/礦石menu末階與多位數/返回重開，未領取/合成，clean與hash綁定",
+        "scope": "scope_review：原00/25/38/49局部呈現Owner；舊generic僅零specificity排除對應控制，沒有JS/公式/成本/claim/craft/Save/Auth變更"
+      },
+      "presentationEvidence": {
+        "segment": "segment-19",
+        "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted",
+        "verified": [
+          "真city7→材料TAB，不足/真menu捲末與最後路線/1234持有可合成呈現/返回重開"
+        ],
+        "notVerified": [
+          "未領取/合成/開箱/交易或驗獎勵與雲端",
+          "僅canonical local fixtures，不代表真帳號業務結果",
+          "未驗實體裝置/鍵盤/所有資料組合",
+          "自然委託實際六項長列表已捲末（含js34追加），材料一張卡無溢出明記不需捲，未造synthetic長內容",
+          "本段未逐格委託完成獎勵橫向rail；既有共用rail證據保留，不冒充此情境五箱全驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸實圖代表核對題牌/原雕框/內卡/中文/disabled對比，不擴整頁重排",
+          "interaction": "interaction_review：四尺寸正式city/TAB/首末/可領與claimed呈現/礦石menu末階與多位數/返回重開，未領取/合成，clean與hash綁定",
+          "scope": "scope_review：原00/25/38/49局部呈現Owner；舊generic僅零specificity排除對應控制，沒有JS/公式/成本/claim/craft/Save/Auth變更"
+        }
       }
     },
     {
@@ -5480,7 +5544,7 @@
       "label": "任務 commission",
       "entry": "openHomeFeature('quest'); 正式任務TAB",
       "owner": "index.html; js/00-main.js; css/25-stage-v90-quest-interface-core.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未完成",
         "可領取",
@@ -5499,39 +5563,87 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/360x640-commission-only-report.json"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/393x873-report.json"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/412x915-report.json"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/1280x800-report.json"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真city3→委託TAB，自然首末/可領與已領呈現/返回重開",
+          "status": "已實際驗證",
+          "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+          "scope": "僅呈現/真導航；不點領取/合成，原UI副作用保留",
+          "devices": [
+            {
+              "device": "360x640",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/360x640-commission-only-report.json",
+              "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted"
+            },
+            {
+              "device": "393x873",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/393x873-report.json",
+              "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted"
+            },
+            {
+              "device": "412x915",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/412x915-report.json",
+              "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted"
+            },
+            {
+              "device": "1280x800",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/1280x800-report.json",
+              "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted"
+            }
+          ],
+          "limits": [
+            "未領取/合成/開箱/交易或驗獎勵與雲端",
+            "僅canonical local fixtures，不代表真帳號業務結果",
+            "未驗實體裝置/鍵盤/所有資料組合",
+            "自然委託實際六項長列表已捲末（含js34追加），材料一張卡無溢出明記不需捲，未造synthetic長內容",
+            "本段未逐格委託完成獎勵橫向rail；既有共用rail證據保留，不冒充此情境五箱全驗"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸實圖代表核對題牌/原雕框/內卡/中文/disabled對比，不擴整頁重排",
+        "interaction": "interaction_review：四尺寸正式city/TAB/首末/可領與claimed呈現/礦石menu末階與多位數/返回重開，未領取/合成，clean與hash綁定",
+        "scope": "scope_review：原00/25/38/49局部呈現Owner；舊generic僅零specificity排除對應控制，沒有JS/公式/成本/claim/craft/Save/Auth變更"
+      },
+      "presentationEvidence": {
+        "segment": "segment-19",
+        "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted",
+        "verified": [
+          "真city3→委託TAB，自然首末/可領與已領呈現/返回重開"
+        ],
+        "notVerified": [
+          "未領取/合成/開箱/交易或驗獎勵與雲端",
+          "僅canonical local fixtures，不代表真帳號業務結果",
+          "未驗實體裝置/鍵盤/所有資料組合",
+          "自然委託實際六項長列表已捲末（含js34追加），材料一張卡無溢出明記不需捲，未造synthetic長內容",
+          "本段未逐格委託完成獎勵橫向rail；既有共用rail證據保留，不冒充此情境五箱全驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸實圖代表核對題牌/原雕框/內卡/中文/disabled對比，不擴整頁重排",
+          "interaction": "interaction_review：四尺寸正式city/TAB/首末/可領與claimed呈現/礦石menu末階與多位數/返回重開，未領取/合成，clean與hash綁定",
+          "scope": "scope_review：原00/25/38/49局部呈現Owner；舊generic僅零specificity排除對應控制，沒有JS/公式/成本/claim/craft/Save/Auth變更"
+        }
       }
     },
     {
@@ -16874,6 +16986,62 @@
         "實體裝置/真帳號/真網路事故未驗",
         "localhost DEV卡片unlocked不代表正式production locked卡驗收",
         "其他未列level/state組合未驗；catalog均runtimeReady，未造未覺醒狀態"
+      ]
+    },
+    {
+      "segment": "segment-19",
+      "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+      "result": "委託/材料原Owner38px覆蓋與禁用對比修復；四尺寸真入口/狀態/選單/返回限定通過",
+      "reviews": {
+        "art": "art_review：四尺寸實圖代表核對題牌/原雕框/內卡/中文/disabled對比，不擴整頁重排",
+        "interaction": "interaction_review：四尺寸正式city/TAB/首末/可領與claimed呈現/礦石menu末階與多位數/返回重開，未領取/合成，clean與hash綁定",
+        "scope": "scope_review：原00/25/38/49局部呈現Owner；舊generic僅零specificity排除對應控制，沒有JS/公式/成本/claim/craft/Save/Auth變更"
+      },
+      "bindings": [
+        {
+          "device": "360x640",
+          "part": "commission-only",
+          "scenes": 5,
+          "records": 7,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/360x640-commission-only-report.json"
+        },
+        {
+          "device": "360x640",
+          "part": "material-only",
+          "scenes": 7,
+          "records": 11,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/360x640-material-only-report.json"
+        },
+        {
+          "device": "393x873",
+          "part": "",
+          "scenes": 12,
+          "records": 18,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/393x873-report.json"
+        },
+        {
+          "device": "412x915",
+          "part": "",
+          "scenes": 12,
+          "records": 18,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/412x915-report.json"
+        },
+        {
+          "device": "1280x800",
+          "part": "",
+          "scenes": 12,
+          "records": 18,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment19-accepted/1280x800-report.json"
+        }
+      ],
+      "pending": [
+        "Latest Head必要CI/部署",
+        "背包材料/寶箱個別詳情、auto門檻/確認及其餘台帳",
+        "未領取/合成/開箱/交易或驗獎勵與雲端",
+        "僅canonical local fixtures，不代表真帳號業務結果",
+        "未驗實體裝置/鍵盤/所有資料組合",
+        "自然委託實際六項長列表已捲末（含js34追加），材料一張卡無溢出明記不需捲，未造synthetic長內容",
+        "本段未逐格委託完成獎勵橫向rail；既有共用rail證據保留，不冒充此情境五箱全驗"
       ]
     }
   ],

@@ -1,0 +1,174 @@
+[
+  {
+    "name": "material-insufficient-top",
+    "rows": [
+      {
+        "text": "合成",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 15.980487804878049,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "合成",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "金幣 0",
+        "font": 16.025922309027777,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "符咒合成",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "碎片合成",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "材料合成",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "礦石升階",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h4.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "升階路線",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17363-material-field-label",
+        "parent": "v17363-material-field"
+      },
+      {
+        "text": "白階 → 藍階",
+        "font": 14.992088607594935,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17363-game-select-trigger"
+      },
+      {
+        "text": "白階礦石",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "0 / 50",
+        "font": 14.029165649414061,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "藍階礦石",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "×10",
+        "font": 13.94101363621401,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "合成下一階礦石 ×10",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.v17363-craft-button",
+        "parent": "v17363-material-card"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.25,
+        "height": 38,
+        "overflow": false
+      },
+      {
+        "label": "符咒合成",
+        "width": 98,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "碎片合成",
+        "width": 98,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "材料合成",
+        "width": 98,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "白階 → 藍階▾",
+        "width": 288,
+        "height": 38,
+        "overflow": false
+      },
+      {
+        "label": "合成下一階礦石 ×10",
+        "width": 288,
+        "height": 38,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  }
+]
