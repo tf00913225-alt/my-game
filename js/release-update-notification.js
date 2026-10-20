@@ -504,8 +504,8 @@
         parts.modal.classList.toggle("release-update-forced",forced);
         parts.title.textContent=manifest.title;
         parts.body.innerHTML=renderReleaseContent(manifest,kind);
-        parts.body.scrollTop=0;
         parts.modal.classList.add("show");
+        parts.body.scrollTop=0;
         global.FourSymbolsBottomNav?.syncContext();
         state.modalOpen=true;
         state.modalKind=kind;
