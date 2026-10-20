@@ -1,0 +1,611 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "player-skill-learning-v1",
+  "ruleSourceSha256": "7da3dd23728eec232cfd1bf501cddb7c61b89b9fe59cd1681baeee2a33395bbf",
+  "catalogSha256": "615eff6f7602e0ee681a30acb710e52e5721ccbce120152fe44594bb8f633770",
+  "skills": [
+    {
+      "id": "flameSlash",
+      "name": "火焰斬",
+      "element": "fire",
+      "category": "physical",
+      "learnCost": 2,
+      "maxLevel": 10,
+      "learnLevel": 1,
+      "requires": [],
+      "damageClassification": "direct"
+    },
+    {
+      "id": "fireCritical",
+      "name": "會心一擊",
+      "element": "fire",
+      "category": "physical",
+      "learnCost": 6,
+      "maxLevel": 10,
+      "requires": [
+        "flameSlash"
+      ],
+      "learnLevel": 7,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "explosiveFlurry",
+      "name": "火爆亂擊",
+      "element": "fire",
+      "category": "physical",
+      "learnCost": 10,
+      "maxLevel": 10,
+      "requires": [
+        "fireCritical"
+      ],
+      "learnLevel": 14,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "dragonSlash",
+      "name": "霸龍裂天斬",
+      "element": "fire",
+      "category": "physical",
+      "learnCost": 16,
+      "maxLevel": 10,
+      "requires": [
+        "explosiveFlurry"
+      ],
+      "learnLevel": 30,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "fireRocket",
+      "name": "火箭",
+      "element": "fire",
+      "category": "magic",
+      "learnCost": 2,
+      "maxLevel": 10,
+      "learnLevel": 1,
+      "requires": [],
+      "damageClassification": "direct"
+    },
+    {
+      "id": "blazeSpell",
+      "name": "烈火術",
+      "element": "fire",
+      "category": "magic",
+      "learnCost": 6,
+      "maxLevel": 10,
+      "requires": [
+        "fireRocket"
+      ],
+      "learnLevel": 7,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "flameTornado",
+      "name": "烈焰龍捲",
+      "element": "fire",
+      "category": "magic",
+      "learnCost": 10,
+      "maxLevel": 10,
+      "requires": [
+        "blazeSpell"
+      ],
+      "learnLevel": 14,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "phoenixCry",
+      "name": "火鳳天鳴",
+      "element": "fire",
+      "category": "magic",
+      "learnCost": 16,
+      "maxLevel": 10,
+      "requires": [
+        "flameTornado"
+      ],
+      "learnLevel": 30,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "rage",
+      "name": "怒火",
+      "element": "fire",
+      "category": "buff",
+      "learnCost": 10,
+      "maxLevel": 5,
+      "requires": [
+        "explosiveFlurry",
+        "flameTornado"
+      ],
+      "learnLevel": 18,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "fireEX",
+      "name": "火元素EX",
+      "element": "fire",
+      "category": "passive",
+      "learnCost": 20,
+      "maxLevel": 1,
+      "learnLevel": 50,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "waterKnife",
+      "name": "水刀斬",
+      "element": "water",
+      "category": "physical",
+      "learnCost": 2,
+      "maxLevel": 10,
+      "learnLevel": 1,
+      "requires": [],
+      "damageClassification": "direct"
+    },
+    {
+      "id": "frostPunch",
+      "name": "冰霜拳",
+      "element": "water",
+      "category": "physical",
+      "learnCost": 6,
+      "maxLevel": 10,
+      "requires": [
+        "waterKnife"
+      ],
+      "learnLevel": 7,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "iceSpin",
+      "name": "冰旋一閃",
+      "element": "water",
+      "category": "physical",
+      "learnCost": 10,
+      "maxLevel": 10,
+      "requires": [
+        "frostPunch"
+      ],
+      "learnLevel": 14,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "frostCrush",
+      "name": "冰封重擊",
+      "element": "water",
+      "category": "physical",
+      "learnCost": 16,
+      "maxLevel": 10,
+      "requires": [
+        "iceSpin"
+      ],
+      "learnLevel": 30,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "waterBall",
+      "name": "水球術",
+      "element": "water",
+      "category": "magic",
+      "learnCost": 2,
+      "maxLevel": 10,
+      "learnLevel": 1,
+      "requires": [],
+      "damageClassification": "direct"
+    },
+    {
+      "id": "floodBeast",
+      "name": "洪水猛獸",
+      "element": "water",
+      "category": "magic",
+      "learnCost": 6,
+      "maxLevel": 10,
+      "requires": [
+        "waterBall"
+      ],
+      "learnLevel": 7,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "iceArrowRain",
+      "name": "冰霜箭雨",
+      "element": "water",
+      "category": "magic",
+      "learnCost": 10,
+      "maxLevel": 10,
+      "requires": [
+        "floodBeast"
+      ],
+      "learnLevel": 14,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "freeze",
+      "name": "冰封",
+      "element": "water",
+      "category": "magic",
+      "learnCost": 14,
+      "maxLevel": 5,
+      "requires": [
+        "iceSpin",
+        "iceArrowRain"
+      ],
+      "learnLevel": 25,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "healSpell",
+      "name": "治療術",
+      "element": "water",
+      "category": "heal",
+      "learnCost": 8,
+      "maxLevel": 5,
+      "requires": [
+        "frostPunch",
+        "floodBeast"
+      ],
+      "learnLevel": 15,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "revive",
+      "name": "復活術",
+      "element": "water",
+      "category": "revive",
+      "learnCost": 10,
+      "maxLevel": 5,
+      "requires": [
+        "healSpell",
+        "frostCrush"
+      ],
+      "learnLevel": 20,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "waterEX",
+      "name": "水元素EX",
+      "element": "water",
+      "category": "passive",
+      "learnCost": 20,
+      "maxLevel": 1,
+      "learnLevel": 50,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "stormFist",
+      "name": "暴風拳",
+      "element": "wind",
+      "category": "physical",
+      "learnCost": 2,
+      "maxLevel": 10,
+      "learnLevel": 1,
+      "requires": [],
+      "damageClassification": "direct"
+    },
+    {
+      "id": "stormFlurry",
+      "name": "暴風亂擊",
+      "element": "wind",
+      "category": "physical",
+      "learnCost": 6,
+      "maxLevel": 10,
+      "requires": [
+        "stormFist"
+      ],
+      "learnLevel": 7,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "windCrossSlash",
+      "name": "風旋十字斬",
+      "element": "wind",
+      "category": "physical",
+      "learnCost": 10,
+      "maxLevel": 10,
+      "requires": [
+        "stormFlurry"
+      ],
+      "learnLevel": 14,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "dizzyFist",
+      "name": "暈眩猛擊",
+      "element": "wind",
+      "category": "physical",
+      "learnCost": 16,
+      "maxLevel": 10,
+      "requires": [
+        "stormFlurry"
+      ],
+      "learnLevel": 30,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "windSpell",
+      "name": "狂風術",
+      "element": "wind",
+      "category": "magic",
+      "learnCost": 2,
+      "maxLevel": 10,
+      "learnLevel": 1,
+      "requires": [],
+      "damageClassification": "direct"
+    },
+    {
+      "id": "stormCircle",
+      "name": "風焰術",
+      "element": "wind",
+      "category": "magic",
+      "learnCost": 6,
+      "maxLevel": 10,
+      "requires": [
+        "windSpell"
+      ],
+      "learnLevel": 7,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "windHowlLightning",
+      "name": "風哮電擊",
+      "element": "wind",
+      "category": "magic",
+      "learnCost": 10,
+      "maxLevel": 10,
+      "requires": [
+        "stormCircle"
+      ],
+      "learnLevel": 14,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "stormRain",
+      "name": "風起雲湧",
+      "element": "wind",
+      "category": "magic",
+      "learnCost": 16,
+      "maxLevel": 10,
+      "requires": [
+        "windHowlLightning"
+      ],
+      "learnLevel": 30,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "dodgeSkill",
+      "name": "閃躲術",
+      "element": "wind",
+      "category": "buff",
+      "learnCost": 10,
+      "maxLevel": 5,
+      "requires": [
+        "windCrossSlash",
+        "windHowlLightning"
+      ],
+      "learnLevel": 18,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "stealthSkill",
+      "name": "隱身術",
+      "element": "wind",
+      "category": "buff",
+      "learnCost": 14,
+      "maxLevel": 3,
+      "requires": [
+        "dodgeSkill"
+      ],
+      "learnLevel": 25,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "dinghaishenzhen",
+      "name": "氣定神閒",
+      "element": "wind",
+      "category": "buff",
+      "learnCost": 18,
+      "maxLevel": 5,
+      "requires": [
+        "stealthSkill"
+      ],
+      "learnLevel": 35,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "windEX",
+      "name": "風元素EX",
+      "element": "wind",
+      "category": "passive",
+      "learnCost": 20,
+      "maxLevel": 1,
+      "learnLevel": 50,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "stoneSlash",
+      "name": "土石斬",
+      "element": "earth",
+      "category": "physical",
+      "learnCost": 2,
+      "maxLevel": 10,
+      "learnLevel": 1,
+      "requires": [],
+      "damageClassification": "direct"
+    },
+    {
+      "id": "petrifyFist",
+      "name": "石盾拳",
+      "element": "earth",
+      "category": "physical",
+      "learnCost": 6,
+      "maxLevel": 10,
+      "requires": [
+        "stoneSlash"
+      ],
+      "learnLevel": 7,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "stoneBreakSky",
+      "name": "石破天驚",
+      "element": "earth",
+      "category": "physical",
+      "learnCost": 10,
+      "maxLevel": 10,
+      "requires": [
+        "petrifyFist"
+      ],
+      "learnLevel": 14,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "earthquakeCrush",
+      "name": "地裂重拳",
+      "element": "earth",
+      "category": "physical",
+      "learnCost": 16,
+      "maxLevel": 10,
+      "requires": [
+        "stoneBreakSky"
+      ],
+      "learnLevel": 30,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "stoneThrow",
+      "name": "落石術",
+      "element": "earth",
+      "category": "magic",
+      "learnCost": 2,
+      "maxLevel": 10,
+      "learnLevel": 1,
+      "requires": [],
+      "damageClassification": "direct"
+    },
+    {
+      "id": "sandWind",
+      "name": "滾石術",
+      "element": "earth",
+      "category": "magic",
+      "learnCost": 6,
+      "maxLevel": 10,
+      "requires": [
+        "stoneThrow"
+      ],
+      "learnLevel": 7,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "flyingSandStrike",
+      "name": "飛沙瞬擊",
+      "element": "earth",
+      "category": "magic",
+      "learnCost": 10,
+      "maxLevel": 10,
+      "requires": [
+        "sandWind"
+      ],
+      "learnLevel": 14,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "dustStorm",
+      "name": "地牛猛襲",
+      "element": "earth",
+      "category": "magic",
+      "learnCost": 16,
+      "maxLevel": 10,
+      "requires": [
+        "flyingSandStrike"
+      ],
+      "learnLevel": 30,
+      "damageClassification": "direct"
+    },
+    {
+      "id": "earthShield",
+      "name": "萬象土盾",
+      "element": "earth",
+      "category": "buff",
+      "learnCost": 14,
+      "maxLevel": 5,
+      "requires": [
+        "rockWall"
+      ],
+      "learnLevel": 25,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "rockWall",
+      "name": "岩石壁壘",
+      "element": "earth",
+      "category": "buff",
+      "learnCost": 10,
+      "maxLevel": 5,
+      "requires": [
+        "petrifyFist",
+        "sandWind"
+      ],
+      "learnLevel": 18,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "barrier",
+      "name": "結界",
+      "element": "earth",
+      "category": "buff",
+      "learnCost": 18,
+      "maxLevel": 5,
+      "requires": [
+        "earthShield"
+      ],
+      "learnLevel": 35,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "earthEX",
+      "name": "土元素EX",
+      "element": "earth",
+      "category": "passive",
+      "learnCost": 20,
+      "maxLevel": 1,
+      "learnLevel": 50,
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "purifyMind",
+      "name": "淨心訣",
+      "element": "water",
+      "category": "buff",
+      "learnLevel": 35,
+      "learnCost": 18,
+      "maxLevel": 3,
+      "requires": [
+        "healSpell",
+        "frostCrush"
+      ],
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "fireSoulResonance",
+      "name": "炎魂共鳴",
+      "element": "fire",
+      "category": "buff",
+      "learnLevel": 25,
+      "learnCost": 14,
+      "maxLevel": 5,
+      "requires": [
+        "rage"
+      ],
+      "damageClassification": "non-direct"
+    },
+    {
+      "id": "bloodBurnArt",
+      "name": "焚血訣",
+      "element": "fire",
+      "category": "buff",
+      "learnLevel": 35,
+      "learnCost": 18,
+      "maxLevel": 5,
+      "requires": [
+        "fireSoulResonance"
+      ],
+      "damageClassification": "non-direct"
+    }
+  ]
+}

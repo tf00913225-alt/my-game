@@ -9,6 +9,7 @@ const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
 const {verifyShopPurchaseEvidence}=require("./canonical-shop-purchase");
 const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
+const {verifySkillLearningEvidence,skillLearningEvidenceReadBudget}=require("./canonical-skill-learning");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
 const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,
@@ -879,8 +880,14 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         const operation=await tx.get(root.collection("operations").doc(doc.id));
         const debit=operation.data();
         if(receipt||!operation.exists||debit.schemaVersion!==1||debit.ownerUid!==uid||
-           debit.operationId!==doc.id||!["shop-purchase","exp-allocation","attribute-allocation"].includes(debit.kind)){
+           debit.operationId!==doc.id||!["shop-purchase","exp-allocation","attribute-allocation","skill-learning"].includes(debit.kind)){
             fail("data-loss","An unmatched ledger entry blocks recovery.");
+        }
+        if(debit.kind==="skill-learning"){
+            if(!records.account.slots.includes(debit.characterId))fail("data-loss","Skill learning character is no longer owned.");
+            await verifySkillLearningEvidence({tx,root,uid,operationId:doc.id,currentRevision:expectedRevision,
+                receipt:debit,ledger,grantExists:false,fail});
+            return;
         }
         const debitRevision=debit.kind==="shop-purchase"?debit.purchasedRevision:debit.allocatedRevision;
         if(!Number.isSafeInteger(debitRevision)||debitRevision<2||debitRevision>expectedRevision){
@@ -1094,7 +1101,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                     await modeEvidence.verifyRetainedOperation(tx,root,uid,records.account,doc,expectedRevision);
                 }
                 verifiedModeOperations.add(doc.id);
-            }else if(["shop-purchase","exp-allocation","attribute-allocation"].includes(value.kind)){
+            }else if(["shop-purchase","exp-allocation","attribute-allocation","skill-learning"].includes(value.kind)){
                 if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||!ledgerIds.has(doc.id)){
                     fail("data-loss","A debit receipt without its original ledger blocks recovery.");
                 }
@@ -1369,7 +1376,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                         modeEvidence.retainedOperationReadBudget(doc.get("kind")):
                         sourceEvidence.retainedOperationReadBudget(doc.get("kind"))),0);
             if(queries.reduce((sum,query)=>sum+query.size,0)+claims.docs.length*12+
-               receipts.docs.length+ledgers.docs.length*5+reservedCount*6+
+               receipts.docs.length+ledgers.docs.length*5+
+               ledgers.docs.filter(doc=>doc.get("kind")==="skill-learning").length*(1+skillLearningEvidenceReadBudget()-5)+reservedCount*6+
                grants.docs.length+pendingCount*3+events.docs.length*4+
                operations.docs.length+operationProofReads+
                modeSources.docs.length*(1+modeEvidence.retainedSourceReadBudget())+
