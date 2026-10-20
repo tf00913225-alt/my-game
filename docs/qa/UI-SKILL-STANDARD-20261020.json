@@ -24968,6 +24968,19 @@
             "Original open lastViewedAt/beginChapter/local save effects retained; raw/meta/playerid exact restore does not mean zero saves",
             "No active tutorial system/continue/claim/terminal story/battle/transaction/hardware acceptance"
           ]
+        },
+        {
+          "state": "20 before-dialogue nodes/76 lines actual input/read/return/reopen; all4sizes",
+          "status": "已實際驗證",
+          "head": "331f01f0c77525589ac86ce2a0cc4c6286f72299",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment28-all20-before-accepted",
+          "limits": [
+            "Only20 before-dialogue nodes/76 formal lines across4 sizes; no guidance/ending or terminal click/outcome",
+            "Next true input/cursor/text/reopen evidence valid; original same-task click capture misses Next because render detaches target. No claim that76 Next have same-task domain observation; separate node02 four-size v2 delta establishes exactly1 safe Next observation each",
+            "Resolved360node02 ordinary announcement already naturally settled at first sample; no actual announcement-header close interaction proven",
+            "Original open lastViewedAt/beginChapter/local saves retained, not zero-save; restore exact local raw/meta/name only",
+            "No tutorial continuation/claim/learn/equip/actualbattle/transaction/physical device acceptance"
+          ]
         }
       ]
     },
@@ -25143,6 +25156,19 @@
             "No guidance/ending terminal click/continueTutorial/reward/creation/equip/learning/battle/transaction acceptance",
             "Original open lastViewedAt/beginChapter/local saves retained; same-task domain snapshot does not prove zero save",
             "No hardware device/keyboard acceptance"
+          ]
+        },
+        {
+          "state": "20 before-dialogue nodes/76 lines actual input/read/return/reopen; all4sizes",
+          "status": "已實際驗證",
+          "head": "331f01f0c77525589ac86ce2a0cc4c6286f72299",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment28-all20-before-accepted",
+          "limits": [
+            "Only20 before-dialogue nodes/76 formal lines across4 sizes; no guidance/ending or terminal click/outcome",
+            "Next true input/cursor/text/reopen evidence valid; original same-task click capture misses Next because render detaches target. No claim that76 Next have same-task domain observation; separate node02 four-size v2 delta establishes exactly1 safe Next observation each",
+            "Resolved360node02 ordinary announcement already naturally settled at first sample; no actual announcement-header close interaction proven",
+            "Original open lastViewedAt/beginChapter/local saves retained, not zero-save; restore exact local raw/meta/name only",
+            "No tutorial continuation/claim/learn/equip/actualbattle/transaction/physical device acceptance"
           ]
         }
       ]
@@ -25908,6 +25934,19 @@
         "Active onboarding c1_01 before0 presentation only; hidden back0x0, no next/back click or runtime guard bypass",
         "Original open lastViewedAt/beginChapter/local save effects retained; raw/meta/playerid exact restore does not mean zero saves",
         "No active tutorial system/continue/claim/terminal story/battle/transaction/hardware acceptance"
+      ]
+    },
+    {
+      "segment": "segment-28-all20-before",
+      "head": "331f01f0c77525589ac86ce2a0cc4c6286f72299",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment28-all20-before-accepted",
+      "result": "before呈現與真輸入有限通過，原Next同task觀察缺口另列",
+      "pending": [
+        "Only20 before-dialogue nodes/76 formal lines across4 sizes; no guidance/ending or terminal click/outcome",
+        "Next true input/cursor/text/reopen evidence valid; original same-task click capture misses Next because render detaches target. No claim that76 Next have same-task domain observation; separate node02 four-size v2 delta establishes exactly1 safe Next observation each",
+        "Resolved360node02 ordinary announcement already naturally settled at first sample; no actual announcement-header close interaction proven",
+        "Original open lastViewedAt/beginChapter/local saves retained, not zero-save; restore exact local raw/meta/name only",
+        "No tutorial continuation/claim/learn/equip/actualbattle/transaction/physical device acceptance"
       ]
     }
   ],

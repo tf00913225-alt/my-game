@@ -11,3 +11,13 @@ Production c349a41065a7f1a2796b604a3022641bd8ea7c39。手寫只原UI render按�
 仍未驗：guidance/ending分支、末句transition、tutorial系統往返／準備確認／護具領獎／戰鬥、其他故事cursor與長文／場景／人物組合、硬體鍵盤。第11段舊map/event/returns僅保原有限歷史證據，不能替代新版故事狀態。
 
 前候選9ea26af7實圖證實header display:none使返回0×0；診斷保留，不作通過。證據位於segment28-short-long-accepted及segment28-active-accepted；helper原始位元組gzip與SHA保留。18項故事finalization原guard測試、adventure scroll/render targeted及build check通過；CI仍須最新Head，非部署驗收。
+
+## before全20節點補驗（331f01f0）
+
+四尺寸各20節點、76句正式before對話逐句真操作完成，共80份成功報告；最後一句只展示，真返回再開核對最後cursor。360沿用原node01，02公告遮擋失敗保留排除，resolved僅補02至20；其他三尺寸不重做。原公告自然settled，不宣稱每case曾真點公告返回。
+
+三方獨立限定通過。art_review實看146張取樣，01至06三尺寸全部78、07三尺寸15加360一張、08至20各四尺寸代表52；不是全部圖片人工審。已見守驛人、旅人、藥師、旅商、黑松寨主；未把未抽中的獨立橋景稱已人工看過。interaction_review與scope_review逐node核文字、句序、素材decoded、真輸入、末句重開及raw/meta/name還原，並實看四尺寸代表。
+
+原監測在Next重繪後漏記same-task資料域，舊報告不改寫；Next本身真輸入與cursor/text證據仍有效。另node02四尺寸next-observation-v2精確獨立斷言各1次Next同task域不變、總5events、clean/complete/sourceequal/restore通過。此delta不是76句全部same-task觀測。首次delta未設WindowsChrome的啟動失敗亦保留排除。
+
+證據：segment28-all20-before-accepted，含正式plan、原失敗、80成功報告、四尺寸最小delta及三個時期原helper gzip。仍未批准guidance/ending、末句轉移、真戰鬥/獎勵/領取/教學完成/載圖失敗/實體裝置。下一段已發現教學返回可見但無法命中的實際缺陷，另存第29段診斷，不混入本before呈現驗收。
