@@ -389,7 +389,7 @@ async function rawPreparedFixture(artifactHelper){
     const prepared=await owner.prepareCandidatePublication(f.request(),pin,identity);
     return {...f,private:owner,io,pin,material,identity,prepared};
 }
-test('raw publication uses one loader/proof/encoding/cut token and a separate original fullread token; v2 stays exact',async()=>{
+test('raw publication uses one loader/proof/encoding/cut token and a separate original fullread token; v2 stays exact',async t=>{
     const helper=require('../functions/src/recovery-audit-artifact'),tokens=[];
     const wrapped={...helper,createRecoveryAuditAssemblyBudget:()=>{const token=helper.createRecoveryAuditAssemblyBudget();tokens.push(token);return token;}};
     const f=await rawPreparedFixture(wrapped),manifest=f.h.data.get(f.root+'/candidatePublications/'+operationId);
@@ -398,7 +398,9 @@ test('raw publication uses one loader/proof/encoding/cut token and a separate or
     assert.equal(helper.recoveryAuditAssemblyUsage(tokens[0]).passes,2);
     assert.equal(f.private.publicationArtifactTestValue(f.identity).summary.candidateProofValid,false);
     assert.equal(f.private.publicationArtifactTestValue(f.identity).summary.segmentedProofValid,true);
+    const prepareUsage=helper.recoveryAuditAssemblyUsage(tokens[0]);
     const original=copy([...f.h.data]),proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    t.diagnostic(JSON.stringify({wireBytes:manifest.artifactByteLength,preparation:prepareUsage,fullread:helper.recoveryAuditAssemblyUsage(tokens[1]),scope:"Node fakeStorage; excludes total provider heap and end-to-end real SDK/GCS timing"}));
     assert.equal(tokens.length,2);assert.notEqual(tokens[0],tokens[1]);assert.equal(helper.recoveryAuditAssemblyUsage(tokens[1]).passes,2);
     for(const trace of f.traces.filter(row=>row.points))assert.deepEqual(trace,{points:13,queries:0,writes:trace.writes});
     const result=await f.private.ackCandidatePublication(f.request(),f.prepared,proof);
