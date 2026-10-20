@@ -21262,7 +21262,7 @@
       "label": "主城工具列與DEV觸控缺口",
       "entry": ".home-test-tools;主城下方工具列",
       "owner": "css/00-main.css",
-      "status": "有問題",
+      "status": "部分已實際驗證",
       "states": [
         "DEV28px",
         "玩家工具42px"
@@ -21271,7 +21271,22 @@
         "仍待原Owner修正與實測"
       ],
       "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-report.json",
-      "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b"
+      "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+      "stateEvidence": [
+        {
+          "state": "DEV2按鈕僅44px/font15量測；四footer44px/真入口返回/anchor/nav安全區；1/3長名與通知有無",
+          "status": "已實際驗證",
+          "head": "f7a837cdba2d7ce7e5421d24083ef7ffa35712a2",
+          "testedSnapshot": "bf51672f7672382462ceeb23ed26081c4f291564 plus original uncommitted index critical href",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment26-home-touch-accepted",
+          "limits": [
+            "No DEV resource click",
+            "No formation/summary/equip/claim/update/transactions/full destination content acceptance",
+            "No hardware device/keyboard acceptance",
+            "Historical dirty report not relabeled clean"
+          ]
+        }
+      ]
     },
     {
       "id": "detail.skill.flameSlash",
@@ -25414,6 +25429,16 @@
         "Original normalization/delegated saves retained; no zero-save claim",
         "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
         "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+      ]
+    },
+    {
+      "segment": "segment-26-home-touch",
+      "head": "f7a837cdba2d7ce7e5421d24083ef7ffa35712a2",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment26-home-touch-accepted",
+      "result": "限定呈現/觸控與返回；以逐檔source equivalence沿用原測試快照",
+      "pending": [
+        "Latest Head required CI / deploy",
+        "Other unverified UI states preserved"
       ]
     }
   ],

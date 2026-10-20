@@ -1,0 +1,595 @@
+{
+  "proofs": [
+    {
+      "viewport": "360x640",
+      "reportHead": "bf51672f7672382462ceeb23ed26081c4f291564",
+      "historicalDirty": true,
+      "savedEquivalentHead": "f7a837cdba2d7ce7e5421d24083ef7ffa35712a2",
+      "allSnapshotFilesExact": true,
+      "onlyDifferenceFromReportedHead": [
+        "index.html"
+      ],
+      "sourceUnchanged": true,
+      "note": "Original dirty report preserved. No resource-load log was recorded; CSS effect is evidenced by computed geometry and actual screenshots."
+    },
+    {
+      "viewport": "393x873",
+      "reportHead": "bf51672f7672382462ceeb23ed26081c4f291564",
+      "historicalDirty": true,
+      "savedEquivalentHead": "f7a837cdba2d7ce7e5421d24083ef7ffa35712a2",
+      "allSnapshotFilesExact": true,
+      "onlyDifferenceFromReportedHead": [
+        "index.html"
+      ],
+      "sourceUnchanged": true,
+      "note": "Original dirty report preserved. No resource-load log was recorded; CSS effect is evidenced by computed geometry and actual screenshots."
+    },
+    {
+      "viewport": "412x915",
+      "reportHead": "bf51672f7672382462ceeb23ed26081c4f291564",
+      "historicalDirty": true,
+      "savedEquivalentHead": "f7a837cdba2d7ce7e5421d24083ef7ffa35712a2",
+      "allSnapshotFilesExact": true,
+      "onlyDifferenceFromReportedHead": [
+        "index.html"
+      ],
+      "sourceUnchanged": true,
+      "note": "Original dirty report preserved. No resource-load log was recorded; CSS effect is evidenced by computed geometry and actual screenshots."
+    },
+    {
+      "viewport": "1280x800",
+      "reportHead": "bf51672f7672382462ceeb23ed26081c4f291564",
+      "historicalDirty": true,
+      "savedEquivalentHead": "f7a837cdba2d7ce7e5421d24083ef7ffa35712a2",
+      "allSnapshotFilesExact": true,
+      "onlyDifferenceFromReportedHead": [
+        "index.html"
+      ],
+      "sourceUnchanged": true,
+      "note": "Original dirty report preserved. No resource-load log was recorded; CSS effect is evidenced by computed geometry and actual screenshots."
+    },
+    {
+      "viewport": "360x640",
+      "role": "clean-loader-smoke",
+      "head": "f7a837cdba2d7ce7e5421d24083ef7ffa35712a2",
+      "complete": true,
+      "criticalCss": "build/boot-core.1a331d452911.css",
+      "resource200": true,
+      "sheetReady": true,
+      "oldCssRequested": false
+    },
+    {
+      "viewport": "393x873",
+      "role": "clean-loader-smoke",
+      "head": "f7a837cdba2d7ce7e5421d24083ef7ffa35712a2",
+      "complete": true,
+      "criticalCss": "build/boot-core.1a331d452911.css",
+      "resource200": true,
+      "sheetReady": true,
+      "oldCssRequested": false
+    },
+    {
+      "viewport": "412x915",
+      "role": "clean-loader-smoke",
+      "head": "f7a837cdba2d7ce7e5421d24083ef7ffa35712a2",
+      "complete": true,
+      "criticalCss": "build/boot-core.1a331d452911.css",
+      "resource200": true,
+      "sheetReady": true,
+      "oldCssRequested": false
+    },
+    {
+      "viewport": "1280x800",
+      "role": "clean-loader-smoke",
+      "head": "f7a837cdba2d7ce7e5421d24083ef7ffa35712a2",
+      "complete": true,
+      "criticalCss": "build/boot-core.1a331d452911.css",
+      "resource200": true,
+      "sheetReady": true,
+      "oldCssRequested": false
+    }
+  ],
+  "helperSha256": "297cd1f6f5ade981492e1cbad5ef5e0f26a700604a502af60da5f352b1a649dc",
+  "files": [
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\achievement-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\achievement-entry.png",
+      "sha256": "a62cb1d23bbc2b95645371df5f010e24ecd41bf09cf96278f768aa83b1a76dc6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\achievement-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\achievement-home-return.png",
+      "sha256": "c6e51f397b161defd0f5deaa7b72674c685a09b9426609260142c3f522fd5d64"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\all-text.json",
+      "sha256": "37d7f6539e4e4e951955f0d31f1e5d1e68866d6c4f3fa4de0a2fe361a6f5fdb0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\announcement-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\announcement-entry.png",
+      "sha256": "317a4e9ec9515c49472e0201c5a5815833ce77c6077445d784c3b39361e7ef1d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\announcement-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\announcement-home-return.png",
+      "sha256": "1fe808d45a7931964719b1209976b28095a765f168aed0d9e33ba6625aa7b99d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\final-home-footer-nav.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\final-home-footer-nav.png",
+      "sha256": "dca0c6f9423a234112a5f3ed3543a640649c448bcf0966a98e4bf629d068e738"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\home-1-footer-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\home-1-footer-end.png",
+      "sha256": "3a1513964e934c46f44d66914098235820f6470f1a86b46ac96380dd68698a0f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\home-1-longname-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\home-1-longname-top.png",
+      "sha256": "61cb97a9b94bf71931a368bb2a5a2fc06e506efe14a39c40e44cf2125a737f07"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\home-3-footer-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\home-3-footer-end.png",
+      "sha256": "1c32f38a1d0112055ce66ece013ac2c886ac9ebe6891ff1129b304fc6ec7982e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\home-3-longname-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\home-3-longname-top.png",
+      "sha256": "bd3a0a753530d523fde295b9a2910e1ab2bdc4772c2ebf72e119942aaba9579c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\notice-false-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\notice-false-end.png",
+      "sha256": "de4829765eda328a1e7d10436bdec8654f617c440c968f0daaa6cd56e5f42872"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\notice-false-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\notice-false-top.png",
+      "sha256": "bb6fe812568b6246c151912c513d4b1c183feb58e75d4268ff082349165aab84"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\notice-true-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\notice-true-end.png",
+      "sha256": "af633d5243cd01c96ce1024d538dc89c7d1d4cd3858fce867cc79e5a162e72a6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\notice-true-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\notice-true-top.png",
+      "sha256": "df760c3c8e5202d2ba0df81c6ec740e8343d9696a78b2dade1b10d16c3f8fc03"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\offlineExp-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\offlineExp-entry.png",
+      "sha256": "a7ad90aaca9aa737300906610a25f1dcbd316c62bb4bd70745a498b05896769c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\offlineExp-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\offlineExp-home-return.png",
+      "sha256": "15dcdce713d94a4ec0cff55abdc2bb292eff4db67fa55305eaa5e798a79e22d0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\partial-report.json",
+      "sha256": "d1d78cd9a9c21836b5cf6dc8ab604f578f9ec8543c909747fe3a8da6d1b79be9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\report.json",
+      "sha256": "6c3462e7b197494b5b46dba5ac7d0a9e363f0d017467cf5d8f946e72d3bd1ecb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\system-entry.png",
+      "sha256": "5fe300f825ea98308cb3697b2fd03d29b8bae727eebbf2b8fba36a20b8b68894"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\360x640\\system-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\360x640\\system-home-return.png",
+      "sha256": "845a5d953e6eddaf16979417228b88993fa637652d1759c1953fe587831a89e4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\achievement-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\achievement-entry.png",
+      "sha256": "41b5fed090b5d21f26009455ac3567bf5b9f8414c5175bf8ef7e65e2ac6ca6bd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\achievement-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\achievement-home-return.png",
+      "sha256": "d50866d937e98a3212fa8978c6fbc5b6e9e883af5f3120ef415b53c63553b584"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\all-text.json",
+      "sha256": "c8963ebef08eb23109cfc852050dffa5e1079fb4ecc1e3d044fe185658a170aa"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\announcement-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\announcement-entry.png",
+      "sha256": "7758b76964557ea5d2ac73c66db7c78f8e7ffb4d3ae685cf4cb04c14ff3001ad"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\announcement-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\announcement-home-return.png",
+      "sha256": "1ef0620e6b6160264062d7499ccdae85326381dd1bfe485acbacc0834712d1d8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\final-home-footer-nav.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\final-home-footer-nav.png",
+      "sha256": "269691f9b61207c6c4618d4d9ede7ab153984bb38a7d93dbf39a1079209463c7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\home-1-footer-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\home-1-footer-end.png",
+      "sha256": "fb72c5ddb0dac19b81ea301a79971bdc78ca51bad7bb04cf34d6db176d6d327c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\home-1-longname-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\home-1-longname-top.png",
+      "sha256": "69bf2975d2df450b1aebcec57f6f20ab63e9970c0cc7b591d25f5aa2d531a6c1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\home-3-footer-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\home-3-footer-end.png",
+      "sha256": "2cd7a3c5d75fa7f666b81e37617a3721a75fc69297fc9c0bf4c0c3d3f302e1de"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\home-3-longname-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\home-3-longname-top.png",
+      "sha256": "4d2845688274def636a1f6774941a8b24c18520117277eca91c6c6750c2ccb7d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\notice-false-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\notice-false-end.png",
+      "sha256": "339667024e1e84d9b0af89a4b3f455986ac641a77e8de5541ff0c4037b6ff1b2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\notice-false-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\notice-false-top.png",
+      "sha256": "1f4d85348296b33878c285d453fc736630cd72858e63e9a9ff6821cf5664782f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\notice-true-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\notice-true-end.png",
+      "sha256": "a4f134d2001de5eb66997eacb33c1f65e338c54d359a4155c437b1a9fe451340"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\notice-true-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\notice-true-top.png",
+      "sha256": "37e9b7972d9266005a86a127413e2aab4a25b4b93ba0b0d01ea57ce51f647035"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\offlineExp-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\offlineExp-entry.png",
+      "sha256": "82c9b28ee13e873d721e206bd7a697360d8d3c11e6f648233d35d5e011820ff0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\offlineExp-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\offlineExp-home-return.png",
+      "sha256": "2c8dca6697df752bdbd64bc89771bf61d70f9c12151a20cd34f03ae4074f1401"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\partial-report.json",
+      "sha256": "df36e7dd7b4aef531610f88ea36f6a2201f6a2632a926f3155ab977646df5293"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\report.json",
+      "sha256": "1bebd01e39b8814c7fcf39e5b2e7177c10a75b1e6ac49539dd224abf732fa97e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\system-entry.png",
+      "sha256": "a54681566b5eb389865c02f263916704e10a27a299c66ea7bb09efea5409e221"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\393x873\\system-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\393x873\\system-home-return.png",
+      "sha256": "e699386b9888ba802dbeb41bf772dd3327f1b241e2c91543ae9c96fe235ec7e5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\achievement-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\achievement-entry.png",
+      "sha256": "c454233e6b7ee2fd9f63003b3025e7fa39066f4aa805345fe26d6d8cd905ca5b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\achievement-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\achievement-home-return.png",
+      "sha256": "0b1adafb24fb033f9fc98c809ea88f0b883a6bbc52fdefcbdc2820b8decce827"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\all-text.json",
+      "sha256": "2f47b488fecf966b937d4e77cd0aab12b4737e58958ae432a9ff2c664250aacb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\announcement-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\announcement-entry.png",
+      "sha256": "b7ced24f6aaf04c045a16de8f17e7b96e436b34f554c1be8c7ed24b95c7c1bbc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\announcement-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\announcement-home-return.png",
+      "sha256": "ac02e5ab3a5a67d9d00e00179cec61cd6e7b2c207c612cb9f0dcc04dec6ebff4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\final-home-footer-nav.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\final-home-footer-nav.png",
+      "sha256": "91be0001825691bc80e8bf2e67615cb3e320951e1bddffb4bbc110414091a171"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\home-1-footer-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\home-1-footer-end.png",
+      "sha256": "8cc212b73ec86732e0c5b6598c7aa4939ad75c88960c50d0c203313bc38f8259"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\home-1-longname-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\home-1-longname-top.png",
+      "sha256": "8780fe4e08faadb6cd8eaf2c019fad7fcd7a97170b1bb1b2b04296cbc77027f9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\home-3-footer-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\home-3-footer-end.png",
+      "sha256": "5954629300a63fb12b9677c9867d6ccb0cbfd7d59339d0482ec6bdc3dd4af2df"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\home-3-longname-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\home-3-longname-top.png",
+      "sha256": "08e0051ebf71670caeade92dd3c959aa3347e0ffa4fe3cfe23006459cd04bd86"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\notice-false-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\notice-false-end.png",
+      "sha256": "08a817310a358c5cb3c86ac92bfcd8191b81f77a23599931354cfd471ee367fe"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\notice-false-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\notice-false-top.png",
+      "sha256": "4f4c7535cdc7ccdf58f1c49a7af1c4e3c0f4b48ca4e4aecc00b7386b35ec8771"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\notice-true-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\notice-true-end.png",
+      "sha256": "845c808a22a8823444e9b0af344c106a06d579aa01384cde42d8e81b0956c2c1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\notice-true-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\notice-true-top.png",
+      "sha256": "98c910eae37e4c92cc0d8a6bf795a09d46176f128bd381a55093fb83b1accd2a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\offlineExp-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\offlineExp-entry.png",
+      "sha256": "584898856a28f786a6e99861457ffe2b4a5ec2104f921521df01a46e63da054b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\offlineExp-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\offlineExp-home-return.png",
+      "sha256": "e3ee55e078cf90c3f4dbb2b791a12168f791bf0a7eea0ab0950914ee51c0b37f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\partial-report.json",
+      "sha256": "b96a4ea50cc8879c9454c0017f20629398643785ef733fe664013ab7d7b89f6a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\report.json",
+      "sha256": "013a1c0308cc5d6542ce7395c488aa8a8fc12121ecf8ceb6cf0fb1d943dc31a5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\system-entry.png",
+      "sha256": "4bb6209cba672bdfb0e66b1de5c3ebddd91d53e2495a266a715add264092d507"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\412x915\\system-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\412x915\\system-home-return.png",
+      "sha256": "946901f7b90def250292c7f569edffce1b135aa2e8a9975bed9ab980dcc1bb1f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\achievement-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\achievement-entry.png",
+      "sha256": "2963ff44f1b81d1497d05f01faf4066abf80f9b7a6c1a0ccd6ac51d5b9cbb9fc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\achievement-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\achievement-home-return.png",
+      "sha256": "0cb9243272450e8cbd0da74f4455b8cbcff70b56e39b701380e131ceecdde93f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\all-text.json",
+      "sha256": "eb63412fead89fc7641f1f3431b843bf15aed83ca8c166ef8e7b38694b72106b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\announcement-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\announcement-entry.png",
+      "sha256": "9bae37cb0280c9522435f722333e6a964e4e655d14036585c8e49bde69928328"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\announcement-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\announcement-home-return.png",
+      "sha256": "79f4ee9e898d77e7836b3a2a97aa768cc53ca33ae5cc751171f44dedd4357364"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\final-home-footer-nav.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\final-home-footer-nav.png",
+      "sha256": "ec3637bbb8f7caf900c7e714de7de6f3fc9733afef732f21a9e4794f3fc4a499"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\home-1-footer-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\home-1-footer-end.png",
+      "sha256": "0862e2b5910ff27a304c179b95f0578fead372f6c920642ccc455d6a47c3be5d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\home-1-longname-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\home-1-longname-top.png",
+      "sha256": "9fd2de5ffc88e5a96e711623f3e01bd31d9a76dc47a846546b3e2844ec28a96f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\home-3-footer-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\home-3-footer-end.png",
+      "sha256": "424e0c441b086abdcdda5e7c7ba83f0de9a02226b879b6b64e5476d0b94e59d4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\home-3-longname-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\home-3-longname-top.png",
+      "sha256": "185f8bd0ec9783653977f85251f0c83b5d7da23754bf8c29867aeb6b2070d32e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\notice-false-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\notice-false-end.png",
+      "sha256": "c90f220bcf3bd6905711aaf627beef8887b5fadbfa8a0f0749cc5ae2dcca1160"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\notice-false-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\notice-false-top.png",
+      "sha256": "92c65f84a845efccd5949da8f9fb6672f62b11aa52f37fc0caa613462c84bca6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\notice-true-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\notice-true-end.png",
+      "sha256": "871356075e2048446f1f22ebd6ce89c22c127525956558522370ce7f57053b83"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\notice-true-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\notice-true-top.png",
+      "sha256": "a2b3ceb86880ce3edbf1615515b89d1791509399070c3be718e1f0a0999a5f80"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\offlineExp-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\offlineExp-entry.png",
+      "sha256": "62d09b851f9679e2cfe40510a639a0fef5ae35db1957cf67ab8c4b4626e9924d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\offlineExp-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\offlineExp-home-return.png",
+      "sha256": "29d3738d08cd314cfc5839d3324735d29994993ef529d26cbb25d38639198b8d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\partial-report.json",
+      "sha256": "6a38023fb20973f37b4deba84c425a7956fcd3842d3a15a60e86d99edd8699e0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\report.json",
+      "sha256": "110f971fe0bba2d25b7ba2c4d6aa4f05ff53e3d8879d9ec685c21f7072181432"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\system-entry.png",
+      "sha256": "9223cb3ba2d8c0ba1e70a2453dcb759b27fdb79de48c15cc7dd57e7fd0dd1613"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-touch-bf51672f\\prepared4\\1280x800\\system-home-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\1280x800\\system-home-return.png",
+      "sha256": "63c7cedd9a19b21ad48d965e711ace65c03d54ea30397bdce9ff0ba03b503df5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\360x640\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\360x640\\all-text.json",
+      "sha256": "7a080daee85134d705da0cbcb8999dedf588980668c0765957e580a16d3b8943"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\360x640\\home-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\360x640\\home-end.png",
+      "sha256": "270a1d8691ad44343994203ca5955381c6a31e6fbb726961209a21425a119363"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\360x640\\home-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\360x640\\home-top.png",
+      "sha256": "fb3973c7114133534c74a7ea6ef1c371bccab2ae76e6d754915e93abff99cacd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\360x640\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\360x640\\partial-report.json",
+      "sha256": "ae4f74770712a618c5fea82dc6e3f2100188e7c8f9b1247017e0c0b18e08269f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\360x640\\report.json",
+      "sha256": "687e4c2e6a6cec1901257d4beb398d288c59f0b2704e609dbdb20a4d3fa6fa3c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\393x873\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\393x873\\all-text.json",
+      "sha256": "b08d378aecca54dd9ada4a6a0185c5ebc3466dc2986bdd66d568bd59acd4b398"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\393x873\\home-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\393x873\\home-end.png",
+      "sha256": "d1829d683571c15c3244987ff54955c676dfe1fa170f682f1355568ee5519314"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\393x873\\home-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\393x873\\home-top.png",
+      "sha256": "1dfa1b8793ef43d76711574f386d4a7d8f1e165e476418bc19e821ecd269d8a5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\393x873\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\393x873\\partial-report.json",
+      "sha256": "573b025cb972c785e83ee59d86067a581fdda93486227bc2a5ce44ba337ede63"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\393x873\\report.json",
+      "sha256": "8023bb03f9e7676a13526aa68be4edfa48e4888322c5aa7aa6fe6ca4683209a7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\412x915\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\412x915\\all-text.json",
+      "sha256": "6318cdc5efa323445bab59e661f0f29c4d2862982e07deb3a67aeda5dc454a80"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\412x915\\home-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\412x915\\home-end.png",
+      "sha256": "26e7855d0b6e9ed58377fdea9f8545c090ac92ce76c221367c22e55767b45148"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\412x915\\home-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\412x915\\home-top.png",
+      "sha256": "236be0ed5607a95f926c6eac7d061b98af48e33eb272599bf413bbffc26eee5d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\412x915\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\412x915\\partial-report.json",
+      "sha256": "31841095545edb4b1c8a90bc31b72b860acd35005434ae4fed6ae1a5e929d398"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\412x915\\report.json",
+      "sha256": "9049c1d4473e886f4b97caeaf7fbe4ddfaa0480e3588d4d776bf512aafebc17c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\1280x800\\all-text.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\1280x800\\all-text.json",
+      "sha256": "1f192864e51500ef248f345d29dbe094af83f691855900cf7f8d2305363f28a7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\1280x800\\home-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\1280x800\\home-end.png",
+      "sha256": "7fc6e402ef8f29e12bbdb4d1f66eef1dcaddc5ec2c4da532ad8680d03b626e63"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\1280x800\\home-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\1280x800\\home-top.png",
+      "sha256": "d3e9a944800ca892f75df4ef15cb613d4c9f920350513ca8dfd257f35db41d46"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\1280x800\\partial-report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\1280x800\\partial-report.json",
+      "sha256": "6cc7b0138a54314764ee59ab122ca679204f063db4a806b47e32ccc2b2f4fb6c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment26-home-loader-clean-f7a837cd\\smoke\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment26-home-touch-accepted\\clean-loader-smoke\\1280x800\\report.json",
+      "sha256": "ee62535ead992f7483ebfe9a9c013538f47881da56609f7a7541fc59b19918cc"
+    }
+  ]
+}
