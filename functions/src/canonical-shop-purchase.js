@@ -3,7 +3,7 @@
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,
     claimRecordsDigest}=require("./canonical-snapshot");
 const {createRecoveryArchive}=require("./canonical-recovery-archive");
-const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
+const {source,readOwnedSources,readCharacterSources,advanceOwnedRecords,advanceOwnedSources}=
     require("./canonical-owned-sources");
 
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
@@ -73,9 +73,8 @@ function createCanonicalShopPurchase({db,FieldValue,HttpsError,runProtected,
             if(envelope.kind!=="current"||envelope.data.authoritativeStateReady!==false||
                account.ownerUid!==uid||account.provenance!=="server-created"||
                economy.ownerUid!==uid||!Array.isArray(account.slots)||
-               account.slots.length!==3||typeof account.slots[0]!=="string"||
-               account.slots[1]!==null||account.slots[2]!==null){
-                fail("failed-precondition","First-character source is not eligible.");
+               account.slots.length!==3||typeof account.slots[0]!=="string"){
+                fail("failed-precondition","Canonical character source is not eligible.");
             }
             if(operationSnap.exists){
                 const receipt=operationSnap.data(),ledger=ledgerSnap.data();
@@ -97,16 +96,15 @@ function createCanonicalShopPurchase({db,FieldValue,HttpsError,runProtected,
                !/^[a-f0-9]{64}$/.test(account.snapshotSha256||"")){
                 fail("failed-precondition","Canonical source revision is invalid.");
             }
-            const characterRef=root.collection("characters").doc(account.slots[0]);
             const priorRef=root.collection("playableSnapshots").doc(String(previous));
-            const [characterSnap,priorSnap]=await Promise.all([
-                tx.get(characterRef),tx.get(priorRef)]);
-            if(!characterSnap.exists||!priorSnap.exists||
+            const [characters,priorSnap]=await Promise.all([
+                readCharacterSources(tx,root,account,fail),tx.get(priorRef)]);
+            if(!priorSnap.exists||
                priorSnap.get("sha256")!==account.snapshotSha256){
                 fail("data-loss","Previous canonical snapshot is missing.");
             }
             const owned=await readOwnedSources(tx,root,fail);
-            const records={account:source(account),characters:[source(characterSnap.data())],
+            const records={account:source(account),characters:characters.records,
                 economy:source(economy),...owned.records,
                 relicLoadout:source(loadoutSnap.data()),progress:source(progressSnap.data()),
                 claimCheckpoint:source(checkpointSnap.data())};
@@ -126,7 +124,7 @@ function createCanonicalShopPurchase({db,FieldValue,HttpsError,runProtected,
             nextOwned.inventory.push(item);
             const nextRecords={...records,...nextOwned,
                 account:{...records.account,serverRevision:revision},
-                characters:[{...records.characters[0],serverRevision:revision}],
+                characters:records.characters.map(character=>({...character,serverRevision:revision})),
                 economy:{...records.economy,serverRevision:revision,gold:economy.gold-cost},
                 relicLoadout:{...records.relicLoadout,serverRevision:revision},
                 progress:{...records.progress,serverRevision:revision},
@@ -137,7 +135,9 @@ function createCanonicalShopPurchase({db,FieldValue,HttpsError,runProtected,
             catch(_){fail("data-loss","Purchased item cannot form a complete snapshot.");}
             const stamp=FieldValue.serverTimestamp();
             tx.update(accountRef,{serverRevision:revision,snapshotSha256:bundle.sha256,updatedAt:stamp});
-            tx.update(characterRef,{serverRevision:revision,updatedAt:stamp});
+            for(const characterRef of characters.refs){
+                tx.update(characterRef,{serverRevision:revision,updatedAt:stamp});
+            }
             tx.update(economyRef,{serverRevision:revision,gold:economy.gold-cost,updatedAt:stamp});
             for(const ref of [loadoutRef,progressRef]){
                 tx.update(ref,{serverRevision:revision,updatedAt:stamp});

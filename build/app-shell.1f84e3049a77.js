@@ -397,6 +397,240 @@
 })(typeof window!=="undefined"?window:globalThis);
 
 
+/* bundled source: functions/src/patrol-reward-policy.js */
+/* Shared patrol settlement arithmetic only. This does not simulate combat,
+   verify outcomes, establish eligibility or authorize a reward. Callers own
+   canonical-input validation and supply any reward random sample explicitly. */
+(function installPatrolRewardPolicy(global){
+    "use strict";
+
+    const constants=Object.freeze({elementBoxExpRatio:0.70,expMultiplier:3,
+        goldMultiplier:5,beginnerTargetBattles:20,beginnerFallbackExp:690});
+
+    function beginnerForestBattleExp(thresholds){
+        if(thresholds===null||thresholds===undefined){return constants.beginnerFallbackExp;}
+        let totalRequired=0;
+        for(let index=0;index<9;index++){
+            totalRequired+=Math.max(1,Math.round(Number(thresholds[index])||0));
+        }
+        return Math.max(1,Math.ceil(totalRequired/constants.beginnerTargetBattles));
+    }
+    function beginnerForestMonsterExpUnit(battleExp){
+        return Math.max(1,Math.ceil(battleExp/3));
+    }
+    function expRankMultiplier(rank){
+        if(rank==="boss"){return 3;}
+        if(rank==="elite"){return 1.5;}
+        return 1;
+    }
+    function formalMonsterBaseExp(level){
+        return Math.max(0,Math.floor((Number(level)||0)*35));
+    }
+    function progressionExpMultiplier(level){
+        const safeLevel=Math.max(1,Math.floor(Number(level)||1));
+        return safeLevel<20?constants.expMultiplier:1;
+    }
+    function standardPatrolExp(rows,progressionLevel){
+        const rankAdjustedExp=(Array.isArray(rows)?rows:[]).reduce((total,row)=>{
+            if(!row){return total;}
+            return total+formalMonsterBaseExp(row.level)*expRankMultiplier(row.rank);
+        },0);
+        return Math.max(0,Math.floor(rankAdjustedExp*progressionExpMultiplier(progressionLevel)));
+    }
+    function beginnerForestExp(battleExp,rankWeight){
+        return Math.max(1,Math.round(beginnerForestMonsterExpUnit(battleExp)*
+            Math.max(1,rankWeight)*constants.expMultiplier));
+    }
+    function applyExpMode(standardExp,options){
+        const safeExp=Math.max(0,Math.floor(Number(standardExp)||0));
+        const mode=options&&typeof options==="object"?options:{};
+        if(mode.elementBox){return Math.round(safeExp*constants.elementBoxExpRatio);}
+        if(mode.rested){return Math.round(safeExp*2);}
+        return safeExp;
+    }
+    function baseGold(level,rank,randomUnit){
+        const safeLevel=Math.max(1,Math.floor(Number(level)||1));
+        const rankMultiplier=rank==="boss"?5:rank==="elite"?2:1;
+        const base=safeLevel*2+3;
+        const variance=0.85+randomUnit*0.30;
+        return Math.max(1,Math.floor(base*rankMultiplier*variance));
+    }
+    function awardedGoldFromBase(baseAmount){
+        const base=Math.max(0,Number(baseAmount)||0);
+        const bonus=Math.max(0,Math.floor(base*(constants.goldMultiplier-1)));
+        return base+bonus;
+    }
+
+    const api=Object.freeze({constants,beginnerForestBattleExp,beginnerForestMonsterExpUnit,
+        expRankMultiplier,formalMonsterBaseExp,progressionExpMultiplier,standardPatrolExp,
+        beginnerForestExp,applyExpMode,baseGold,awardedGoldFromBase});
+    global.FourSymbolsPatrolRewardPolicy=api;
+    if(typeof module!=="undefined"&&module.exports){module.exports=api;}
+})(typeof window!=="undefined"?window:globalThis);
+
+
+/* bundled source: functions/src/patrol-drop-policy.js */
+/* Shared Wild drop data and reward sampling only. Samples are supplied by the
+   caller; this Owner creates no RNG, combat result, eligibility or entitlement. */
+(function installPatrolDropPolicy(global){
+    "use strict";
+    const normalRows=Object.freeze([
+        {itemId:"freezeTalismanLow",chance:.05,quantity:1},
+        {itemId:"stealthTalismanLow",chance:.05,quantity:1},
+        {itemId:"barrierTalismanLow",chance:.05,quantity:1},
+        {itemId:"oreLow",chance:.05,quantity:1}
+    ].map(Object.freeze));
+    const eliteRows=Object.freeze([
+        {itemId:"ticketSetFire",chance:.01,quantity:1},
+        {itemId:"ticketSetWater",chance:.01,quantity:1},
+        {itemId:"ticketSetEarth",chance:.01,quantity:1},
+        {itemId:"ticketSetWind",chance:.01,quantity:1},
+        {itemId:"freezeTalismanMid",chance:.05,quantity:1},
+        {itemId:"stealthTalismanMid",chance:.05,quantity:1},
+        {itemId:"barrierTalismanMid",chance:.05,quantity:1}
+    ].map(Object.freeze));
+    // One row per call preserves the Client's interleaving of random draws,
+    // definition lookup and inventory insertion, including capacity failures.
+    function normalDrop(rowIndex,sample){
+        const row=normalRows[rowIndex];
+        if(sample>=row.chance){return null;}
+        return row;
+    }
+    function eliteDrop(sample){
+        let remaining=sample;
+        return eliteRows.find(row=>(remaining-=row.chance)<0)||null;
+    }
+    const api=Object.freeze({normalRows,eliteRows,normalDrop,eliteDrop});
+    global.FourSymbolsPatrolDropPolicy=api;
+    if(typeof module!=="undefined"&&module.exports){module.exports=api;}
+})(typeof window!=="undefined"?window:globalThis);
+
+
+/* bundled source: functions/src/account-mode-time-policy.js */
+/* Shared account-mode time arithmetic only. Callers own validated state,
+   clocks, presence, eligibility, grants, persistence and lifecycle decisions. */
+(function installAccountModeTimePolicy(global){
+    "use strict";
+    const constants=Object.freeze({restedMsPerBattle:120000,restedMaxBattles:300,
+        elementBoxRewardMs:8*60*60*1000,elementBoxMaxMs:32*60*60*1000});
+    function accrueRested(battles,progressMs,elapsedMs){
+        const safeElapsed=Math.max(0,Math.floor(Number(elapsedMs)||0));
+        if(safeElapsed<=0||battles>=constants.restedMaxBattles){
+            if(battles>=constants.restedMaxBattles){progressMs=0;}
+            return {battles,progressMs,accepted:0};
+        }
+        const cappedElapsed=Math.min(safeElapsed,
+            constants.restedMaxBattles*constants.restedMsPerBattle);
+        const totalMs=progressMs+cappedElapsed;
+        const earned=Math.floor(totalMs/constants.restedMsPerBattle);
+        const accepted=Math.min(earned,constants.restedMaxBattles-battles);
+        battles+=accepted;
+        progressMs=battles>=constants.restedMaxBattles?0:
+            totalMs-earned*constants.restedMsPerBattle;
+        return {battles,progressMs,accepted};
+    }
+    function grantElementBox(remainingMs,hours,maxHours){
+        const safeHours=Math.max(0,Number(hours)||0);
+        const capMs=Math.max(0,Number(maxHours)||32)*60*60*1000;
+        return Math.min(capMs,Math.max(0,remainingMs)+safeHours*60*60*1000);
+    }
+    function debitElementBox(remainingMs,elapsedMs,active){
+        let used=0,exhausted=false;
+        if(active&&remainingMs>0){
+            const delta=Math.max(0,elapsedMs);
+            used=Math.min(delta,remainingMs);
+            remainingMs-=used;
+            if(remainingMs<=0){remainingMs=0;exhausted=true;}
+        }
+        return {remainingMs,used,exhausted};
+    }
+    function elementBoxStoredMs(remainingMs){
+        return Math.max(0,Math.floor(remainingMs));
+    }
+    // Exact single-win rule formerly owned by v139TryConsumeRestedBattle.
+    // Eligibility (ordinary win, no ElementBox/dungeon) belongs to the caller.
+    function consumeRestedBattle(battles){
+        if(battles<=0)return {applied:false,remainingBattles:0};
+        return {applied:true,remainingBattles:battles-1};
+    }
+    const api=Object.freeze({constants,accrueRested,grantElementBox,debitElementBox,
+        elementBoxStoredMs,consumeRestedBattle});
+    global.FourSymbolsAccountModeTimePolicy=api;
+    if(typeof module!=="undefined"&&module.exports){module.exports=api;}
+})(typeof window!=="undefined"?window:globalThis);
+
+
+/* bundled source: functions/src/exp-pool-catch-up-policy.js */
+/* Shared EXP pool arithmetic. Callers supply the actual party identity and
+   levels; this policy grants no EXP and does not decide eligibility. */
+(function installExpPoolCatchUpPolicy(global){
+    "use strict";
+    function multiplierForLevel(level,highestCreatedLevel){
+        const gap=Math.max(0,highestCreatedLevel-Math.max(1,Number(level)||1));
+        if(gap>=30)return 1.50;
+        if(gap>=20)return 1.30;
+        if(gap>=10)return 1.15;
+        return 1;
+    }
+    function multiplierForSlot(slotIndex,level){
+        if(Math.max(1,Number(level)||1)>=20)return 1;
+        if(slotIndex===2)return 2;
+        if(slotIndex===1)return 1.50;
+        return 1;
+    }
+    function multiplierForCharacter(slotIndex,level,highestCreatedLevel){
+        const slot=multiplierForSlot(slotIndex,level);
+        return slot>1?slot:multiplierForLevel(level,highestCreatedLevel);
+    }
+    const policy=Object.freeze({multiplierForLevel,multiplierForSlot,multiplierForCharacter});
+    if(typeof module!=="undefined"&&module.exports)module.exports=policy;
+    global.FourSymbolsExpPoolCatchUpPolicy=policy;
+})(typeof window!=="undefined"?window:globalThis);
+
+
+/* bundled source: functions/src/inventory-stack-policy.js */
+/* Shared stack planning only. Callers retain definition admission, canonical
+   input validation, presentation, item cloning and equipment instance owners. */
+(function installInventoryStackPolicy(global){
+    "use strict";
+    const constants=Object.freeze({maxEntries:120,maxStack:999});
+    function quantity(amount){return Math.max(1,Math.floor(Number(amount)||1));}
+    function capacity(items,itemId,maxStack=constants.maxStack){
+        const matching=items.filter(item=>item&&item.id===itemId);
+        const stackFreeSpace=maxStack<=1?0:matching.reduce((sum,item)=>
+            sum+Math.max(0,maxStack-(Number(item.count)||0)),0);
+        return stackFreeSpace+Math.max(0,constants.maxEntries-items.length)*maxStack;
+    }
+    function plan(items,itemId,amount,maxStack=constants.maxStack){
+        const requested=quantity(amount),available=capacity(items,itemId,maxStack);
+        const result={quantity:requested,capacity:available,canAdd:requested<=available,
+            success:false,updates:[],appendCounts:[]};
+        if(!result.canAdd)return result;
+        let remaining=requested;
+        // Retain both the original iteration order and touched zero-space rows:
+        // the Client synchronizes ticket presentation for every visited stack.
+        if(maxStack>1){
+            items.forEach((item,index)=>{
+                if(!item||item.id!==itemId||remaining<=0)return;
+                const current=Math.max(0,Math.floor(Number(item.count)||0));
+                const add=Math.min(Math.max(0,maxStack-current),remaining);
+                result.updates.push({index,count:current+add});remaining-=add;
+            });
+        }
+        while(remaining>0){
+            if(items.length+result.appendCounts.length>=constants.maxEntries)return result;
+            const count=Math.min(maxStack,remaining);
+            result.appendCounts.push(count);remaining-=count;
+        }
+        result.success=true;
+        return result;
+    }
+    const api=Object.freeze({constants,quantity,capacity,plan});
+    global.FourSymbolsInventoryStackPolicy=api;
+    if(typeof module!=="undefined"&&module.exports){module.exports=api;}
+})(typeof window!=="undefined"?window:globalThis);
+
+
 /* bundled source: js/00-main.js */
 /* BEGIN GENERATED MONSTER BALANCE OWNER */
 (function installMonsterBalanceAuthority(){
@@ -22861,22 +23095,8 @@ function getMonsterGoldDrop(monster){
         return 0;
     }
 
-    const level=Math.max(1,Math.floor(Number(monster.level)||1));
-    const rank=getMonsterRank(monster);
-    const rankMultiplier=
-        rank==="boss"
-        ? 8
-        : rank==="elite"
-        ? 3
-        : 1;
-
-    const base=level*2+3;
-    const variance=0.85+Math.random()*0.30;
-
-    return Math.max(
-        1,
-        Math.floor(base*rankMultiplier*variance)
-    );
+    return window.FourSymbolsPatrolRewardPolicy.baseGold(
+        monster.level,getMonsterRank(monster),Math.random());
 }
 
 function awardMonsterGoldDrop(monster){
@@ -27473,7 +27693,7 @@ function renderQuestCompletionPanelContent(
             '<div class="quest-completion-fill" style="width:'+percent+'%;"></div>'+
         '</div>'+
 
-        '<div class="quest-completion-milestones">'+
+        '<p class="quest-scroll-hint">左右滑動查看全部獎勵</p><div class="quest-completion-milestones" data-scroll-owner="x">'+
             milestones+
         '</div>'
     );
@@ -31839,53 +32059,14 @@ function showSkillDetail(skillId){
         .innerHTML=
 
         `
-        <div style="margin-bottom:6px;">
-            <span style="
-                display:inline-block;
-                background:#2e2822;
-                color:#f0b429;
-                font-size:11px;
-                font-weight:bold;
-                padding:2px 7px;
-                border-radius:10px;
-            ">
-                ${getSkillCategoryLabel(skill.category)}
-            </span>
-        </div>
-
-        <div style="line-height:1.7;">
-            ${skill.description}
-        </div>
-
-        <div style="margin-top:8px;color:#b3a58c;">
-            ${
-                skill.category==="passive"
-                ?
-                "被動技能，不用裝備，學了就永久生效"
-                :
-                spCost+"SP"
-            }
-            ${
-                skill.learnCost
-                ?
-                "｜首次學習需要"+getSkillLearnCostForUi(getSkillCharacterObject(currentSkillCharacter),skill)+"點"
-                :
-                ""
-            }
-        </div>
-
-        <div style="margin-top:10px;font-size:11px;color:#f0b429;font-weight:bold;">
-             各等級數值
-        </div>
-
-        <div style="margin-top:4px;font-size:12px;">
-            ${
-                buildSkillLevelBreakdownHTML(
-                    skill
-                )
-            }
-        </div>
-
+        <div class="skill-detail-category">${getSkillCategoryLabel(skill.category)}</div>
+        <p class="skill-detail-description">${skill.description}</p>
+        <p class="skill-detail-cost">
+            ${skill.category==="passive"?"被動技能，不用裝備，學了就永久生效":spCost+"SP"}
+            ${skill.learnCost?"｜首次學習需要"+getSkillLearnCostForUi(getSkillCharacterObject(currentSkillCharacter),skill)+"點":""}
+        </p>
+        <h3 class="skill-detail-section-title">各等級數值</h3>
+        <div class="skill-detail-levels">${buildSkillLevelBreakdownHTML(skill)}</div>
         `;
 
 
@@ -37899,6 +38080,7 @@ window.syncCharacterTouchMode=syncCharacterTouchMode;
             try{
                 return originalShowCreation.apply(this,arguments);
             }finally{
+                window.closeCreationSkillDetail();
                 setCreationTouchMode(true);
                 installCreationGestureLock();
                 applyCreationStep(1);

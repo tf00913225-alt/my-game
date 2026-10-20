@@ -33,8 +33,7 @@ function createDailyCheckinGrant({db,FieldValue,HttpsError,runProtected,
             if(envelope.kind!=="current"||envelope.data.authoritativeStateReady!==false||
                account.ownerUid!==uid||account.provenance!=="server-created"||
                !Array.isArray(account.slots)||account.slots.length!==3||
-               typeof account.slots[0]!=="string"||account.slots[1]!==null||
-               account.slots[2]!==null||
+               typeof account.slots[0]!=="string"||
                !Number.isSafeInteger(account.serverRevision)||
                account.serverRevision<1||account.serverRevision>envelope.serverRevision){
                 fail("failed-precondition","Canonical first character is not eligible.");

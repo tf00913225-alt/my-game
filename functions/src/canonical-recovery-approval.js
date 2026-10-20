@@ -2,6 +2,7 @@
 
 const {inspectCanonicalSnapshot}=require("./canonical-snapshot");
 const {inspectRecoveryArchive}=require("./canonical-recovery-archive");
+const {inspectRecoveryAuditFence,RECOVERY_AUDIT_FENCE_COLLECTION}=require("./canonical-current-recovery");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 const UID=/^[A-Za-z0-9:_-]{1,128}$/;
@@ -51,9 +52,10 @@ function createCanonicalRecoveryApproval({db,Timestamp,HttpsError,inspectExistin
         const expiresAtMs=issuedAt+ttlSeconds*1000;
 
         return db.runTransaction(async transaction=>{
-            const [saveSnapshot,archiveSnapshot,snapshot,approval]=await Promise.all([
+            const [saveSnapshot,archiveSnapshot,snapshot,approval,fenceSnapshot]=await Promise.all([
                 transaction.get(saveRef),transaction.get(archiveRef),
-                transaction.get(snapshotRef),transaction.get(approvalRef)
+                transaction.get(snapshotRef),transaction.get(approvalRef),
+                transaction.get(root.collection(RECOVERY_AUDIT_FENCE_COLLECTION).doc("current"))
             ]);
             if(!saveSnapshot.exists||!archiveSnapshot.exists||!snapshot.exists){
                 fail("failed-precondition","Recovery sources are missing.");
@@ -101,6 +103,9 @@ function createCanonicalRecoveryApproval({db,Timestamp,HttpsError,inspectExistin
                     expiresAtMs:existing.expiresAt.toMillis()
                 };
             }
+
+            const fence=inspectRecoveryAuditFence(fenceSnapshot.exists?fenceSnapshot.data():undefined,ownerUid,fail);
+            if(fence?.status==="active")fail("failed-precondition","Recovery audit maintenance blocks new approvals.");
 
             const stamp=Timestamp.fromMillis(issuedAt);
             transaction.create(approvalRef,{

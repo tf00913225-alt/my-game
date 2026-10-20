@@ -78,6 +78,8 @@ function makeContext(values={}){
         Infinity,
         ...values
     });
+    context.window=context.window||context;
+    context.window.FourSymbolsInventoryStackPolicy=require("../functions/src/inventory-stack-policy");
     return context;
 }
 

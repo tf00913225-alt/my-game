@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 import crypto from "node:crypto";
-import {syncItemAcquisitionProjection} from "./lib/item-acquisition-projection.mjs";
+import {syncItemAcquisitionProjection,syncPatrolItemCatalog} from "./lib/item-acquisition-projection.mjs";
 import {syncMonsterBalanceRuntime} from "./lib/monster-balance-runtime-source.mjs";
 import {syncBattleEncounterCatalog} from "./lib/cloud-battle-encounter-catalog.mjs";
+import {syncPatrolSourceCatalog} from "./lib/cloud-patrol-source-catalog.mjs";
+import {syncPatrolProgressPolicy} from "./lib/cloud-patrol-progress-policy.mjs";
+import {syncCharacterExpThresholds} from "./lib/character-exp-thresholds.mjs";
 import {syncPlainPlayerNormalAttackRules} from "./lib/cloud-battle-normal-attack-rules.mjs";
 import {syncForestOpeningRoundRules} from "./lib/cloud-battle-opening-round-rules.mjs";
 import {syncHeroChapterQualification} from "./lib/hero-chapter-qualification.mjs";
@@ -16,6 +19,10 @@ const checkOnly=process.argv.includes("--check");
 syncItemAcquisitionProjection(ROOT,checkOnly);
 syncMonsterBalanceRuntime(ROOT,checkOnly);
 await syncBattleEncounterCatalog(ROOT,checkOnly);
+await syncPatrolSourceCatalog(ROOT,checkOnly);
+syncPatrolItemCatalog(ROOT,checkOnly);
+syncPatrolProgressPolicy(ROOT,checkOnly);
+await syncCharacterExpThresholds(ROOT,checkOnly);
 syncPlainPlayerNormalAttackRules(ROOT,checkOnly);
 syncForestOpeningRoundRules(ROOT,checkOnly);
 syncHeroChapterQualification(ROOT,checkOnly);
@@ -43,6 +50,11 @@ const appScripts=[
     "functions/src/equipment-reforge.js",
     "js/equipment-factory.js",
     "functions/src/hero-core.js",
+    "functions/src/patrol-reward-policy.js",
+    "functions/src/patrol-drop-policy.js",
+    "functions/src/account-mode-time-policy.js",
+    "functions/src/exp-pool-catch-up-policy.js",
+    "functions/src/inventory-stack-policy.js",
     "js/00-main.js",
     "functions/src/team-formation-policy.js",
     "js/hero-acquisition-client.js",

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "policyId": "wild-patrol-progress-v1",
+  "scope": "quest-progress-data-only",
+  "period": {
+    "timeZone": "UTC",
+    "dateFormat": "YYYY-MM-DD",
+    "boundary": "00:00:00Z"
+  },
+  "quests": {
+    "daily": {
+      "checkin": 1,
+      "killMonsters": 5,
+      "winBattle": 1,
+      "kill10": 10,
+      "win3": 3,
+      "skills5": 5
+    },
+    "commission": {
+      "killMonsters": 15,
+      "winBattle": 3,
+      "kill30": 30,
+      "win5": 5,
+      "elite2": 2,
+      "skills15": 15
+    }
+  },
+  "sourceDigests": {
+    "js/00-main.js": "8e23856eac54fa953c9a59c99453b53e4b66f0304218c2fd11d27cd85f91547e",
+    "js/34-v141-core-systems.js": "d376b002baedc9cc8ba33a94d3404cb6e4980a1124d0a5fb71b8e0dd61fe64c0"
+  },
+  "outcomeVerified": false,
+  "rewardEligible": false,
+  "sha256": "c7fe9f4c5fec9aef20d0425430d39d8198cf3492e864609e74474c3091232377"
+}

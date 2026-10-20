@@ -5,6 +5,7 @@ const fs=require("node:fs");
 const authoredUiCss=require("../.github/scripts/fixtures/native-ui-css-contract.cjs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
+const dropPolicy=require("../functions/src/patrol-drop-policy.js");
 
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
 const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
@@ -127,13 +128,16 @@ test("wild ranks are explicit, independent 10% rolls and never random BOSS",()=>
 test("elite special loot uses one 19% cumulative table and isolates the normal low-tier pool",()=>{
     const dropBody=extractFunction(coreSource,"addEliteSpecialDrop");
     assert.equal((dropBody.match(/Math\.random\(\)/g)||[]).length,1);
-    assert.match(dropBody,/ELITE_DROP_TABLE.find/);
-    assert.match(coreSource,/itemId:"ticketSetFire",chance:\.01,quantity:1/);
-    assert.match(coreSource,/itemId:"barrierTalismanMid",chance:\.05,quantity:1/);
+    assert.match(dropBody,/patrolDropPolicy\.eliteDrop\(Math\.random\(\)\)/);
+    assert.deepEqual(dropPolicy.eliteRows[0],{itemId:"ticketSetFire",chance:.01,quantity:1});
+    assert.deepEqual(dropPolicy.eliteRows[6],{itemId:"barrierTalismanMid",chance:.05,quantity:1});
     assert.match(coreSource,/v141EliteDropIsolation:true/);
     assert.match(v132Source,/if\(window\.v132ActiveDungeonRun\)\{ return; \}/);
-    assert.match(v131Source,/rank==="elite"\)\{ return 1\.5; \}/);
-    assert.match(v133Source,/rank==="elite"\s*\?\s*2/);
+    const rewards=require("../functions/src/patrol-reward-policy.js");
+    assert.match(v131Source,/rewardPolicy\.expRankMultiplier/);
+    assert.match(mainSource,/FourSymbolsPatrolRewardPolicy\.baseGold/);
+    assert.equal(rewards.expRankMultiplier("elite"),1.5);
+    assert.equal(rewards.baseGold(20,"elite",.5),2*rewards.baseGold(20,"regular",.5));
 });
 
 test("final EXP curve follows the eight-monster zones and deterministic 10% elite expectation",()=>{
@@ -252,7 +256,8 @@ test("patrol movement, left task tracker, global tap feedback and red dots are w
 });
 
 test("compact UI and daily cover scaffolding meet the mobile layout requirements",()=>{
-    assert.match(cssSource,/\.item-stat-list \*\{\s*font-size:15px !important/);
+    assert.doesNotMatch(cssSource,/\.item-stat-list \*\{\s*font-size:15px !important/);
+    assert.match(authoredUiCss(fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8")),/\.item-stat-list\{[^}]*font-size:15px/);
     assert.match(cssSource,/\.shop-potion-list\{grid-template-columns:repeat\(2/);
     assert.match(cssSource,/\.v141-offline-panel\{display:grid/);
     assert.match(cssSource,/\.v141-dungeon-cover-art\{[\s\S]*?aspect-ratio:16 \/ 9/);

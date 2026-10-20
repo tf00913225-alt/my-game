@@ -7012,7 +7012,7 @@
         let slots;
         try{ slots=owner.slots(item); }
         catch(_){ stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot">冶煉資料異常，請保留原資料。</div>');return; }
-        slots.forEach((affix,index)=>stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot" data-reforge-slot="'+index+'">'+escapeHtml(owner.slotText(affix))+'</div>'));
+        slots.forEach((affix,index)=>stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot" data-reforge-slot="'+index+'">'+(affix?'':'詞條 '+(index+1)+'：')+escapeHtml(owner.slotText(affix))+'</div>'));
         const reason=owner.reason(item);
         if(reason){ stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot v17346-reforge-reason">'+escapeHtml(reason)+'</div>'); }
     }
@@ -9857,9 +9857,9 @@ ensureFunctionalStyles();runRepairs();
             const level=index+1;
             const breakthrough=PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)&&(level===5||level===10)
                 ?"（突破×1.5）":"";
-            return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);">'+
-                '<span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.'+level+'</span>'+
-                '<span style="flex:1;">'+escapeText(effectText(skill,level)+breakthrough)+'</span></div>';
+            return '<div class="skill-detail-level-row">'+
+                '<span class="skill-detail-level-label">Lv.'+level+'</span>'+
+                '<span class="skill-detail-level-effect">'+escapeText(effectText(skill,level)+breakthrough)+'</span></div>';
         }).join("");
     }
 
@@ -10511,10 +10511,7 @@ ensureFunctionalStyles();runRepairs();
         style.id="v17364-skill-progression-style";
         style.textContent=
             ".v17364-progression-hint{display:block;margin-top:4px;white-space:normal;overflow-wrap:anywhere;line-height:1.35;opacity:.86;font-size:.82em;}"+
-            ".v17364-progression-detail{display:grid;gap:6px;margin-top:10px;}"+
-            ".v17364-progression-detail>div{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}"+
-            ".v17364-progression-detail strong{flex:0 0 auto;}"+
-            ".v17364-progression-detail span{text-align:right;overflow-wrap:anywhere;}";
+            "";
         document.head.appendChild(style);
     }
 
@@ -11968,7 +11965,7 @@ ensureFunctionalStyles();runRepairs();
         const equipped=effectiveLoadoutRelicId()===def.id;
         const unavailable=def.runtimeReady!==true;
         return '<div class="team-relic-detail"><button class="team-relic-detail-back" onclick="v174OpenRelicPage()">‹ 返回秘寶列表</button><div class="team-relic-detail-hero '+rarityClass(def)+'">'+
-            '<div class="team-relic-detail-art">'+relicIconMarkup(def,true)+'</div><h2>'+esc(def.name)+'</h2><p>'+esc(RARITY_LABELS[def.rarity]||def.rarity)+(unavailable?'・效果尚未覺醒':'・Lv.'+level+' / 20')+'</p><strong>'+esc(CATEGORY_LABELS[def.category]||def.category)+(def.tags&&def.tags.length?' / '+esc(def.tags.join('・')):'')+'</strong></div>'+
+            '<div class="team-relic-detail-art">'+relicIconMarkup(def,true)+'</div><h2>'+esc(def.name)+'</h2><p>'+esc(RARITY_LABELS[def.rarity]||def.rarity)+(unavailable?'・效果尚未覺醒':'・Lv.'+level+' / 20')+'</p><strong>'+esc(CATEGORY_LABELS[def.category]||def.category)+'</strong></div>'+
             (unavailable
                 ?'<section><h3>秘寶能力</h3><p>秘寶能力尚未開放。正式 Trigger、Effect 與成長數值尚未定案，因此目前不可裝備或強化。</p></section>'
                 :'<section><h3>觸發條件</h3><p>'+esc(def.triggerText||"尚未定義")+'</p></section><section><h3>秘寶效果</h3><p>'+esc(currentEffectText(def,level))+'</p></section><section><h3>觸發限制</h3><p>'+esc(def.limitText||"依秘寶設定。")+'</p></section>'+

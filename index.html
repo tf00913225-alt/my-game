@@ -7,30 +7,6 @@
 
 <link rel="preconnect"href="https://fonts.googleapis.com">
 <link rel="preconnect"href="https://fonts.gstatic.com"crossorigin>
-<style id="v173.69-home-version-badge-style">
-#game-ui #homePage .home-version-badge{
-    position:static;
-    display:inline-flex;
-    align-items:center;
-    box-sizing:border-box;
-    padding:3px 6px 2px;
-    border:1px solid rgba(224,181,92,.46);
-    border-radius:999px;
-    background:rgba(8,7,5,.58);
-    color:#bda46d;
-    font-family:"Cinzel","Noto Serif TC",serif;
-    font-size:11px;
-    font-weight:700;
-    line-height:1;
-    letter-spacing:.04em;
-    text-shadow:0 1px 2px #000;
-    box-shadow:none;
-    white-space:nowrap;
-    pointer-events:none;
-    user-select:none;
-}
-</style>
-
 <!-- V12: Automatic browser Fullscreen API is intentionally disabled.
      Game viewport/scaling remains unchanged. -->
 
@@ -38,7 +14,7 @@
 <link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/ui/startup-main-city.d43e67af1c1c.jpg" fetchpriority="high">
 <!-- build:critical-style -->
-<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.4968a4b6d54a.css">
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.3c6f6f5d87d2.css">
 <!-- /build:critical-style -->
 </head>
 
@@ -278,7 +254,6 @@
             onclick="setCreationStep(2)"
         >
             <span>下一步：能力配點</span>
-            <small>STEP 2 OF 2</small>
         </button>
 
         <div
@@ -288,11 +263,9 @@
         >
             <button class="creation-back" type="button" onclick="cancelAdditionalCharacterCreation()">
                 <span>返回角色頁</span>
-                <small>RETURN</small>
             </button>
             <button class="creation-next" type="button" onclick="setCreationStep(2)">
                 <span>下一步：能力配點</span>
-                <small>STEP 2 OF 2</small>
             </button>
         </div>
 
@@ -400,11 +373,9 @@
         <div class="creation-action-row">
             <button class="creation-back" type="button" onclick="setCreationStep(1)">
                 <span>上一步</span>
-                <small>BACK</small>
             </button>
             <button id="creationSubmitButton" class="creation-start" type="button" onclick="createCharacter()">
                 <span id="creationSubmitLabel" role="status" aria-live="polite">開始冒險</span>
-                <small>ENTER THE WORLD</small>
             </button>
             <button
                 id="creationCancelButton"
@@ -414,7 +385,6 @@
                 hidden
             >
                 <span>取消創建</span>
-                <small>RETURN</small>
             </button>
         </div>
 
@@ -1095,7 +1065,7 @@
     <button
         id="dungeonTabBtnDaily"
         class="home-feature-buy-btn"
-        style="flex:1;padding:8px 4px;font-size:13px;"
+        style="flex:1;"
         onclick="switchDungeonTab('daily')"
     >
         日常副本
@@ -2603,7 +2573,7 @@
 
 <!-- V136: version the loader itself; otherwise a cached old loader never sees new patch versions. -->
 <!-- build:critical-script -->
-<script id="boot-core-runtime" src="build/boot-core.94b3eb642b7a.js"></script>
+<script id="boot-core-runtime" src="build/boot-core.46a2b5f0aa1f.js"></script>
 <!-- /build:critical-script -->
 </body>
 </html>

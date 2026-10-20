@@ -19,6 +19,7 @@ function loadRuntime(options={}){
     let now=0;
     let tick=null;
     const context={
+        FourSymbolsAccountModeTimePolicy:require("../functions/src/account-mode-time-policy.js"),
         window:null,console,Math,Number,Object,Array,Set,Map,JSON,Infinity,
         Date:{now:()=>now},
         gold:Number(options.gold)||0,
@@ -31,6 +32,7 @@ function loadRuntime(options={}){
             setItem:(key,value)=>{ values.set(key,String(value)); }
         },
         FourSymbolsAccountSave:{accountKey:name=>"four_symbols_account:test-uid:"+name},
+        FourSymbolsPatrolRewardPolicy:require("../functions/src/patrol-reward-policy.js"),
         document:{
             getElementById:id=>id==="v131EbGold"?goldNode:null,
             addEventListener(){},createElement(){ return {}; }

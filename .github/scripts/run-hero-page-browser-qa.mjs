@@ -20,7 +20,13 @@ async function handleRequest(req,res){
    if(data.fail)throw Error('fixture save refusal');
    const prior=receipts.get(data.operationId);
    if(prior){assert.deepEqual(data,prior);}
-   else{assert.equal(data.expectedRevision,revision);formation=Policy.validate(data.formation,[0],ids);receipts.set(data.operationId,data);revision++;}
+   else{
+    assert.equal(data.expectedRevision,revision);const next=Policy.validate(data.formation,[0],ids);
+    const removesHero=ids.some(id=>Object.hasOwn(formation?.heroIdToSlot||{},id)&&!Object.hasOwn(next.heroIdToSlot,id));
+    formation=next;receipts.set(data.operationId,data);revision++;
+    // Keep the committed removal response slower than the former 400ms gesture wait.
+    if(removesHero)await pause(650);
+   }
   }
   if(req.url.endsWith('/loginReward')){
    assert.ok([3,7].includes(data.milestoneDay));assert.equal(data.operationId,'hero-login-reward-v1-day'+data.milestoneDay);
@@ -67,15 +73,20 @@ try{
  await c.send('Page.enable');await c.send('Runtime.enable');await c.send('Page.setLifecycleEventsEnabled',{enabled:true});
  const loads=new Set();c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Page.lifecycleEvent'&&m.params.name==='load')loads.add(m.params.loaderId);});
  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')+`;window.__heroQaOwned=${JSON.stringify(ids)};window.__heroQaErrors=[];addEventListener('error',e=>{if(e.message)window.__heroQaErrors.push(e.message)});`});
- async function waitReady(){await c.eval(`(async()=>{const end=Date.now()+45000;while(Date.now()<end&&!(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')))await new Promise(r=>setTimeout(r,50));if(FourSymbolsStartupPolicy.getState()!=='READY')throw Error('startup not READY');await FourSymbolsHeroAcquisition.sync();await FourSymbolsHeroGrowth.read();await FourSymbolsTeamFormation.read();showPage('home');return true;})()`);}
+ async function waitReady(){await c.eval(`(async()=>{const end=Date.now()+45000;while(Date.now()<end&&!(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')))await new Promise(r=>setTimeout(r,50));if(FourSymbolsStartupPolicy.getState()!=='READY')throw Error('startup not READY');await FourSymbolsHeroAcquisition.sync();await FourSymbolsHeroGrowth.read();await FourSymbolsTeamFormation.read();showPage('home');return true;})()`);await waitFormationIdle();}
+ async function waitFormationIdle(){return c.eval(`(async()=>{const end=Date.now()+15000;while(FourSymbolsTeamFormation.getStatus().busy&&Date.now()<end)await new Promise(r=>setTimeout(r,50));const status=FourSymbolsTeamFormation.getStatus();if(status.busy)throw Error('formation synchronization did not finish '+JSON.stringify(status));return status;})()`);}
  async function point(selector){return c.eval(`(async()=>{const query=${JSON.stringify(selector)},root=query.startsWith('[data-')?document.querySelector('.v-fixed-formation-panel'):document;let n=root?.querySelector(query);if(!n||n.disabled)throw Error('unavailable '+query);if(!n.closest('.v-fixed-formation-panel'))n.scrollIntoView({block:'center',behavior:'instant'});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));n=(query.startsWith('[data-')?document.querySelector('.v-fixed-formation-panel'):document)?.querySelector(query);if(!n?.isConnected)throw Error('formation/control detached during synchronization');const b=n.getBoundingClientRect(),x=b.left+b.width/2,y=b.top+b.height/2,h=document.elementFromPoint(x,y);if(!(h===n||n.contains(h)))throw Error('occluded '+query+' '+JSON.stringify({box:b.toJSON(),hit:h?.outerHTML.slice(0,250)}));return {x,y};})()`);}
  let mobile=true;
  async function press(p){if(mobile)await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[p]});else await c.send('Input.dispatchMouseEvent',{type:'mousePressed',...p,button:'left',clickCount:1});}
  async function release(p){if(mobile)await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});else await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',...p,button:'left',clickCount:1});}
  async function tap(selector){
-  if(selector.startsWith('[data-'))await c.eval(`(async()=>{const end=Date.now()+15000;while(FourSymbolsTeamFormation.getStatus().busy&&Date.now()<end)await new Promise(r=>setTimeout(r,50));if(FourSymbolsTeamFormation.getStatus().busy)throw Error('formation synchronization did not finish');return true;})()`);
-  const p=await point(selector);await press(p);await release(p);await pause();}
- async function drag(from,to){const a=await point(from),b=await point(to);await press(a);for(let i=1;i<=8;i++){const p={x:a.x+(b.x-a.x)*i/8,y:a.y+(b.y-a.y)*i/8};if(mobile)await c.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[p]});else await c.send('Input.dispatchMouseEvent',{type:'mouseMoved',...p,button:'left',buttons:1});await pause(20);}await release(b);await pause(400);}
+  const formationControl=selector.startsWith('[data-')||selector.includes('FourSymbolsTeamFormation.');
+  if(formationControl)await waitFormationIdle();
+  const p=await point(selector);await press(p);await release(p);await pause();if(formationControl)await waitFormationIdle();}
+ async function drag(from,to){
+  const before=await waitFormationIdle();assert.ok(before.ready&&!before.pending&&!before.error,JSON.stringify(before));
+  const a=await point(from),b=await point(to);await press(a);for(let i=1;i<=8;i++){const p={x:a.x+(b.x-a.x)*i/8,y:a.y+(b.y-a.y)*i/8};if(mobile)await c.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[p]});else await c.send('Input.dispatchMouseEvent',{type:'mouseMoved',...p,button:'left',buttons:1});await pause(20);}await release(b);
+  const after=await waitFormationIdle();assert.ok(after.ready&&!after.pending&&!after.error,JSON.stringify(after));}
  async function screenshot(name){fs.writeFileSync(path.join(OUT,name+'.png'),Buffer.from((await c.send('Page.captureScreenshot',{format:'png'})).data,'base64'));}
  for(const [width,height] of [[360,640],[412,915],[1280,800]]){
   mobile=width<600;

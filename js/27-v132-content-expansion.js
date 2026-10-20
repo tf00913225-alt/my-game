@@ -605,28 +605,18 @@
         const maxStack=isEquipmentInventoryType(definition.type)
             ? 1
             : INVENTORY_MAX_STACK_DEFAULT;
-        const matchingStacks=inventoryItems.filter(
-            item=>item && item.id===definition.id
-        );
-        const stackFreeSpace=maxStack<=1
-            ? 0
-            : matchingStacks.reduce(
-                (sum,item)=>sum+Math.max(0,maxStack-(Number(item.count)||0)),
-                0
-            );
-        const freeSlots=Math.max(0,120-inventoryItems.length);
-        return stackFreeSpace+freeSlots*maxStack;
+        return window.FourSymbolsInventoryStackPolicy.capacity(inventoryItems,definition.id,maxStack);
     }
 
     function canAddItemToInventory(definition,amount){
-        const quantity=Math.max(1,Math.floor(Number(amount)||1));
+        const quantity=window.FourSymbolsInventoryStackPolicy.quantity(amount);
         return quantity<=getItemInventoryCapacity(definition);
     }
     window.v132CanAddItemToInventory=canAddItemToInventory;
 
     function addItemToInventory(definition,amount){
         if(!definition||definition.retired||definition.compatibilityOnly||definition.blueprintSlot||/^blueprint/.test(definition.id)||/^(hp|sp)Potion(?:20|100)$/.test(definition.id)){ return false; }
-        const quantity=Math.max(1,Math.floor(Number(amount)||1));
+        const quantity=window.FourSymbolsInventoryStackPolicy.quantity(amount);
         const maxStack=isEquipmentInventoryType(definition.type)
             ? 1
             : INVENTORY_MAX_STACK_DEFAULT;
@@ -637,9 +627,8 @@
            先算完整容量，確定整批都放得下才開始改背包，讓加入操作
            具備all-or-nothing語意。
         */
-        if(!canAddItemToInventory(definition,quantity)){ return false; }
-
         if(maxStack<=1){
+            if(!canAddItemToInventory(definition,quantity)){ return false; }
             let remaining=quantity;
             while(remaining>0){
                 if(inventoryItems.length>=120){
@@ -655,29 +644,19 @@
             return true;
         }
 
-        let remaining=quantity;
-        const stacks=inventoryItems.filter(item=>item && item.id===definition.id);
+        const plan=window.FourSymbolsInventoryStackPolicy.plan(
+            inventoryItems,definition.id,quantity,maxStack);
+        if(!plan.canAdd){ return false; }
         const ticketDefinition=getTicketDefinition(definition.id);
-        stacks.forEach(stack=>{
-            if(remaining<=0){ return; }
+        plan.updates.forEach(update=>{
+            const stack=inventoryItems[update.index];
             if(ticketDefinition){ syncTicketPresentation(stack,ticketDefinition); }
-            const current=Math.max(0,Math.floor(Number(stack.count)||0));
-            const space=Math.max(0,maxStack-current);
-            const add=Math.min(space,remaining);
-            stack.count=current+add;
-            remaining-=add;
+            stack.count=update.count;
         });
-
-        while(remaining>0){
-            if(inventoryItems.length>=120){
-                return false;
-            }
-            const stackCount=Math.min(maxStack,remaining);
+        plan.appendCounts.forEach(stackCount=>{
             inventoryItems.push(cloneInventoryStackItem(definition,stackCount));
-            remaining-=stackCount;
-        }
-
-        return true;
+        });
+        return plan.success;
     }
 
     window.v132AddItemToInventory=addItemToInventory;
@@ -773,10 +752,7 @@
           獨立判定）
     ===================================================== */
 
-    const NORMAL_DROP_TABLE=Object.freeze([
-        {itemId:"freezeTalismanLow",chance:.05,quantity:1},{itemId:"stealthTalismanLow",chance:.05,quantity:1},
-        {itemId:"barrierTalismanLow",chance:.05,quantity:1},{itemId:"oreLow",chance:.05,quantity:1}
-    ].map(Object.freeze));
+    const patrolDropPolicy=window.FourSymbolsPatrolDropPolicy;
 
     function awardMonsterMaterialDrop(monster){
         /*
@@ -787,11 +763,12 @@
         if(window.v132ActiveDungeonRun){ return; }
 
         const gained=[];
-        NORMAL_DROP_TABLE.forEach(row=>{
-            if(Math.random()>=row.chance){ return; }
+        patrolDropPolicy.normalRows.forEach((entry,index)=>{
+            const row=patrolDropPolicy.normalDrop(index,Math.random());
+            if(!row){ return; }
             const definition=getTalismanDefinition(row.itemId)||getOreDefinition(row.itemId);
             if(!definition){ return; }
-            if(addItemToInventory(definition,1)){
+            if(addItemToInventory(definition,row.quantity)){
                 gained.push(definition.name);
             }
         });
@@ -1503,7 +1480,14 @@
         if(!item||typeof openEquippedItem!=="function"){ return; }
 
         const rewardModal=document.getElementById("v132RewardModal");
-        if(rewardModal){ rewardModal.classList.add("v132-detail-paused"); }
+        if(rewardModal){
+            // The equipment detail reuses itemModal. Keep its parent preview
+            // on the existing native host so closing that detail cannot close
+            // or hide the preview as an itemModal child dialog.
+            const host=document.getElementById("game-ui");
+            if(rewardModal.parentElement===document.getElementById("itemModal")&&host){host.appendChild(rewardModal);}
+            rewardModal.classList.add("v132-detail-paused");
+        }
 
         openEquippedItem(item,"");
 

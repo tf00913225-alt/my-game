@@ -1,6 +1,8 @@
 "use strict";
 
 const {createHash,randomBytes,timingSafeEqual}=require("node:crypto");
+const {inspectRecoveryAuditFence,RECOVERY_AUDIT_FENCE_COLLECTION,RECOVERY_AUDIT_RUN_COLLECTION,
+    RECOVERY_INVENTORY_STATE_COLLECTION,RECOVERY_INVENTORY_PAGE_COLLECTION}=require("./canonical-current-recovery");
 const SCHEMA_VERSION=1;
 const ID_PATTERN=/^[A-Za-z0-9_-]{32}$/;
 const SECRET_PATTERN=/^[A-Za-z0-9_-]{43}$/;
@@ -124,21 +126,63 @@ function createSessionAuthority({db,FieldValue,HttpsError,now=Date.now}){
         }
     }
 
-    async function runProtected(request,operation){
+    async function run(request,operation,mode="ordinary",auditId=null,publicationOperationId=null){
         return db.runTransaction(async transaction=>{
             const session=await requireActiveSession(transaction,request);
-            return operation(transaction,session);
+            const fencePath=`serverUsers/${session.uid}/${RECOVERY_AUDIT_FENCE_COLLECTION}/current`;
+            let fence=null;
+            if(mode!=="session"){
+                const snapshot=await transaction.get(db.doc(fencePath));
+                fence=inspectRecoveryAuditFence(snapshot.exists?snapshot.data():undefined,session.uid,
+                    (code,message)=>{throw new HttpsError(code,message);});
+            }
+            // A fresh facade belongs to this SDK attempt, not the possibly
+            // reused Transaction object. No raw transaction/batch escapes it.
+            const facade={get:reference=>transaction.get(reference)};
+            for(const method of ["create","set","update","delete"]){
+                facade[method]=(reference,...args)=>{
+                    if(mode==="ordinary"&&fence?.status==="active")fail("RECOVERY_AUDIT_MAINTENANCE","failed-precondition");
+                    if(mode==="maintenance"){
+                        const auditPath=`serverUsers/${session.uid}/${RECOVERY_AUDIT_RUN_COLLECTION}/${auditId}`;
+                        const pagePrefix=`${auditPath}/${RECOVERY_INVENTORY_PAGE_COLLECTION}/`;
+                        const pageId=reference?.path?.startsWith(pagePrefix)?reference.path.slice(pagePrefix.length):null;
+                        const proofState=reference?.path===auditPath+"/proofState/current";
+                        const proofPagePrefix=auditPath+"/patrolProofPages/",chunkPrefix=auditPath+"/proofPayloadChunks/";
+                        const proofPageId=reference?.path?.startsWith(proofPagePrefix)?reference.path.slice(proofPagePrefix.length):null;
+                        const chunkId=reference?.path?.startsWith(chunkPrefix)?reference.path.slice(chunkPrefix.length):null;
+                        const inventoryState=reference?.path===`${auditPath}/${RECOVERY_INVENTORY_STATE_COLLECTION}/current`;
+                        const publication=publicationOperationId!==null&&reference?.path===
+                            `${auditPath}/candidatePublications/${publicationOperationId}`&&["create","update"].includes(method);
+                        if(![fencePath,auditPath].includes(reference?.path)&&
+                           !publication&&
+                           !((inventoryState||proofState)&&["create","set"].includes(method))&&
+                           !(method==="create"&&(/^[A-Za-z0-9_-]{16,64}$/.test(proofPageId||"")||/^[A-Za-z0-9_-]{16,64}_0[0-7]$/.test(chunkId||"")))&&
+                           !(method==="create"&&/^[A-Za-z0-9_-]{16,64}$/.test(pageId||"")))fail("RECOVERY_AUDIT_WRITE_SCOPE");
+                    }
+                    if(mode==="maintenance"&&method==="delete")fail("RECOVERY_AUDIT_WRITE_SCOPE");
+                    if(mode==="session"&&![session.reference.path,session.recordRef.path].includes(reference?.path))fail("SESSION_WRITE_SCOPE");
+                    transaction[method](reference,...args);return facade;
+                };
+            }
+            Object.freeze(facade);
+            return operation(facade,session);
         });
+    }
+    function runProtected(request,operation){return run(request,operation);}
+    function runRecoveryAuditMaintenance(request,auditId,operation,publicationOperationId=null){
+        if(!/^[A-Za-z0-9_-]{16,64}$/.test(auditId||"")||typeof operation!=="function"||
+           (publicationOperationId!==null&&!/^[A-Za-z0-9_-]{16,64}$/.test(publicationOperationId)))fail("RECOVERY_AUDIT_INVALID");
+        return run(request,operation,"maintenance",auditId,publicationOperationId);
     }
 
     async function revoke(request){
-        return runProtected(request,async(transaction,session)=>{
+        return run(request,async(transaction,session)=>{
             const timestamp=FieldValue.serverTimestamp();
             transaction.update(session.recordRef,{status:"revoked",revokedAt:timestamp});
             /* Keep the auth_time tombstone: a refresh/reload is not a new login. */
             transaction.update(session.reference,{status:"revoked",activeSessionId:null,updatedAt:timestamp});
             return {uid:session.uid,status:"revoked"};
-        });
+        },"session");
     }
 
     async function protectedTest(request){
@@ -146,7 +190,7 @@ function createSessionAuthority({db,FieldValue,HttpsError,now=Date.now}){
             result:"SUCCESS",uid:session.uid,sessionId:session.sessionId,revision:session.revision
         }));
     }
-    return Object.freeze({create,revoke,protectedTest,runProtected,requireActiveSession,requireCurrentLoginEpoch});
+    return Object.freeze({create,revoke,protectedTest,runProtected,runRecoveryAuditMaintenance,requireActiveSession,requireCurrentLoginEpoch});
 }
 
 module.exports={createSessionAuthority};

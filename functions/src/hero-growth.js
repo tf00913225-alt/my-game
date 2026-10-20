@@ -5,7 +5,7 @@ const {taipeiDay}=require("./daily-checkin-policy");
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,snapshotDigest:digest,
     claimRecordsDigest}=require("./canonical-snapshot");
 const {createRecoveryArchive,inspectRecoveryArchive}=require("./canonical-recovery-archive");
-const {source,readOwnedSources,advanceOwnedRecords}=require("./canonical-owned-sources");
+const {source,readCharacterSources,readOwnedSources,advanceOwnedRecords}=require("./canonical-owned-sources");
 
 // Existing progress/current playableState.heroAccount and inventory remain the
 // only growth/resource sources. Approved milestones and daily supply share this writer.
@@ -129,13 +129,12 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
         const snaps=await Promise.all(Object.values(refs).map(ref=>tx.get(ref)));
         if(snaps.some(s=>!s.exists)){fail("failed-precondition","Canonical character sources required; local resources cannot be admitted.");}
         const rows=Object.fromEntries(Object.keys(refs).map((key,i)=>[key,source(snaps[i].data())]));
-        const characterRefs=rows.account.slots.filter(Boolean).map(id=>root.collection("characters").doc(id));
-        const characterSnaps=await Promise.all(characterRefs.map(ref=>tx.get(ref)));
-        if(characterSnaps.some(s=>!s.exists)){fail("data-loss","Character source missing.");}
+        const characters=await readCharacterSources(tx,root,rows.account,fail);
+        const characterRefs=characters.refs;
         const owned=await readOwnedSources(tx,root,fail);
         const records={account:rows.account,economy:rows.economy,progress:rows.progress,
             relicLoadout:rows.relicLoadout,claimCheckpoint:rows.claimCheckpoints,
-            characters:characterSnaps.map(s=>source(s.data())),...owned.records};
+            characters:characters.records,...owned.records};
         const revision=records.account.serverRevision;
         const [snapshot,archive,envelopeSnap]=await Promise.all([
             tx.get(root.collection("playableSnapshots").doc(String(revision))),

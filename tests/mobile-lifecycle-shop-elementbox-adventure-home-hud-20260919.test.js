@@ -194,7 +194,7 @@ test("main-city roster and relic summary are first-screen stable without executi
     assert.match(cityCss,/team-relic-loadout-slot/);
     assert.match(cityCss,/team-relic-loadout-slot\{[\s\S]{0,180}min-height:40px/);
     assert.match(cityCss,/team-relic-loadout-slot>small\{display:none;\}/);
-    assert.match(cityCss,/team-relic-loadout-slot>button\{[^}]*height:30px;min-height:30px;/);
+    assert.match(cityCss,/team-relic-loadout-slot>button\{[^}]*height:44px;min-height:44px;/);
     assert.doesNotMatch(relic,/createElement\("div"\)[\s\S]{0,180}team-relic-loadout-slot/);
     assert.doesNotMatch(relicCss,/team-relic-loadout-slot/);
     assert.doesNotMatch(featureIntent,/ensure\("relic","home-utilities"\)/);

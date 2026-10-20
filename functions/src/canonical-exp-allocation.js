@@ -4,8 +4,9 @@ const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,claimReco
     require("./canonical-snapshot");
 const {createRecoveryArchive}=require("./canonical-recovery-archive");
 const {newcomerExpNext}=require("./canonical-newcomer-exp");
-const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
+const {source,readCharacterSources,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
     require("./canonical-owned-sources");
+const ExpPoolPolicy=require("./exp-pool-catch-up-policy");
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
 // js/28-v133-economy-rebalance.js owns the current game level ceiling.
 const MAX_CHARACTER_LEVEL=100;
@@ -31,8 +32,8 @@ function verifyExpAllocationEvidence({uid,operationId,currentRevision,characterI
 function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
     inspectExistingEnvelope,nextRevision}){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
-    async function allocateSharedExp(request,{operationId,expectedRevision}){
-        if(!ID.test(operationId||"")||
+    async function allocateSharedExp(request,{operationId,expectedRevision,characterId}){
+        if(!ID.test(operationId||"")||(characterId!==undefined&&(typeof characterId!=="string"||!characterId))||
            !Number.isSafeInteger(expectedRevision)||expectedRevision<1){
             fail("invalid-argument","An operation and expected revision are required.");
         }
@@ -62,14 +63,15 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
                account.ownerUid!==uid||account.provenance!=="server-created"||
                economy.ownerUid!==uid||!Array.isArray(account.slots)||
                account.slots.length!==3||typeof account.slots[0]!=="string"||
-               account.slots[1]!==null||account.slots[2]!==null||
                !Number.isSafeInteger(economy.sharedExp)||economy.sharedExp<0){
                 fail("failed-precondition","First-character EXP source is not eligible.");
             }
+            const targetId=characterId===undefined?account.slots[0]:characterId;
+            if(!account.slots.includes(targetId))fail("invalid-argument","Character target is not owned.");
             if(operationSnap.exists){
                 const receipt=operationSnap.data(),ledger=ledgerSnap.data();
                 verifyExpAllocationEvidence({uid,operationId,currentRevision:envelope.serverRevision,
-                    characterId:account.slots[0],receipt,ledger,grantExists:grantOperationSnap.exists,fail});
+                    characterId:targetId,receipt,ledger,grantExists:grantOperationSnap.exists,fail});
                 return {allocatedRevision:receipt.allocatedRevision,
                     cost:receipt.cost,levelAfter:receipt.levelAfter,unchanged:true,
                     authoritativeStateReady:false};
@@ -86,25 +88,25 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
                !/^[a-f0-9]{64}$/.test(account.snapshotSha256||"")){
                 fail("failed-precondition","Source revision or claim state is invalid.");
             }
-            const characterRef=root.collection("characters").doc(account.slots[0]);
             const priorRef=root.collection("playableSnapshots").doc(String(previous));
-            const [characterSnap,priorSnap]=await Promise.all([
-                tx.get(characterRef),tx.get(priorRef)]);
-            if(!characterSnap.exists||!priorSnap.exists||
+            const [characters,priorSnap]=await Promise.all([
+                readCharacterSources(tx,root,account,fail),tx.get(priorRef)]);
+            if(!priorSnap.exists||
                priorSnap.get("sha256")!==account.snapshotSha256){
                 fail("data-loss","Previous canonical snapshot is missing.");
             }
-            const owned=await readOwnedSources(tx,root,fail);
-            const records={account:source(account),characters:[source(characterSnap.data())],
+            const owned=await readOwnedSources(tx,root,fail,
+                {accountSnapshot:accountSnap,currentSnapshot:priorSnap});
+            const records={account:source(account),characters:characters.records,
                 economy:source(economy),...owned.records,
                 relicLoadout:source(loadoutSnap.data()),progress:source(progressSnap.data()),
                 claimCheckpoint:source(checkpointSnap.data())};
             try{verifyCanonicalSnapshotAgainstSources(priorSnap.data(),uid,previous,records);}
             catch(_){fail("data-loss","Previous sources differ from snapshot.");}
-            const character=records.characters[0],state=character.state;
+            const character=records.characters.find(row=>row.characterId===targetId),state=character.state;
             const keys=["level","exp","expNext","attributePoints","skillPoints",
                 "bonusHP","bonusSP","hp","sp","vitality","energy"];
-            if(character.characterId!==account.slots[0]||
+            if(character.characterId!==targetId||
                keys.some(key=>!Number.isSafeInteger(state[key])||state[key]<0)||
                state.level<1||state.level>MAX_CHARACTER_LEVEL||
                state.expNext<1||state.exp>=state.expNext||
@@ -115,15 +117,14 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
             if(state.level===MAX_CHARACTER_LEVEL){
                 fail("failed-precondition","Character has reached the level cap.");
             }
-            // Beyond the static newcomer curve the runtime uses a live zone roster.
-            // No client-computed threshold can become an authoritative debit.
-            if(state.level>=19){
-                fail("failed-precondition","Trusted EXP curve is unavailable at this level.");
-            }
+            // The build projects the final formal roster/curve into the sealed
+            // complete level table. No client-computed threshold is accepted.
             if(state.expNext!==newcomerExpNext(state.level)){
                 fail("data-loss","Character EXP threshold differs from the trusted curve.");
             }
-            const cost=state.expNext-state.exp;
+            const highest=Math.max(...records.characters.map(row=>row.state.level));
+            const multiplier=ExpPoolPolicy.multiplierForCharacter(character.slotIndex,state.level,highest);
+            const cost=Math.ceil((state.expNext-state.exp)/multiplier);
             const nextExpNext=newcomerExpNext(state.level+1);
             if(economy.sharedExp<cost){
                 fail("failed-precondition","Shared EXP is insufficient.");
@@ -145,7 +146,8 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
                 ({...record,serverRevision:revision}));
             const nextRecords={...records,...advanceOwnedRecords(records,revision),
                 account:{...records.account,serverRevision:revision},
-                characters:[{...character,serverRevision:revision,state:nextState}],
+                characters:records.characters.map(row=>({...row,serverRevision:revision,
+                    ...(row.characterId===targetId?{state:nextState}:{})})),
                 economy:{...records.economy,serverRevision:revision,
                     sharedExp:economy.sharedExp-cost},
                 relicLoadout:{...records.relicLoadout,serverRevision:revision},
@@ -157,7 +159,8 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
             catch(_){fail("data-loss","Next character projection is invalid.");}
             const stamp=FieldValue.serverTimestamp();
             tx.update(accountRef,{serverRevision:revision,snapshotSha256:bundle.sha256,updatedAt:stamp});
-            tx.update(characterRef,{serverRevision:revision,state:nextState,updatedAt:stamp});
+            characters.refs.forEach((ref,index)=>tx.update(ref,{serverRevision:revision,
+                ...(records.characters[index].characterId===targetId?{state:nextState}:{}),updatedAt:stamp}));
             tx.update(economyRef,{serverRevision:revision,
                 sharedExp:nextRecords.economy.sharedExp,updatedAt:stamp});
             for(const ref of [loadoutRef,progressRef]){

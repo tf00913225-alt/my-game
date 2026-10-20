@@ -52,10 +52,12 @@ assert.match(index,/home-utility-actions team-relic-home-tools/);
 assert.match(index,/team-relic-home-entry[^>]*data-feature="relic"/);
 assert.match(index,/team-element-box-home-entry[^>]*data-feature="gameplay-core"/);
 assert.match(baseCss,/\.home-city-entrances\{[^}]*pointer-events:none/);
-assert.match(v131,/V17342_GLOBAL_EXP_REWARD_MULTIPLIER=3/);
+const patrolRewards=require("../functions/src/patrol-reward-policy.js");
+assert.equal(patrolRewards.constants.expMultiplier,3);
 assert.match(v131,/function getFormalMonsterBaseExp/);
 assert.doesNotMatch(v131,/V131_EXP_MULTIPLIER/);
-assert.match(v131,/V17342_GLOBAL_GOLD_REWARD_MULTIPLIER=5/);
+assert.equal(patrolRewards.constants.goldMultiplier,5);
+assert.match(v131,/rewardPolicy\.awardedGoldFromBase\(baseAmount\)/);
 assert.match(v131,/getBeginnerForestMonsterExpUnit/);
 assert.match(v131,/beginnerMonsterUnits/);
 
@@ -76,9 +78,12 @@ assert.match(tuning,/rollBeginnerForestNormalAttackDamage=function\(\)\{[\s\S]*r
 /* Second / third character starts at Lv1; catch-up is EXP-only and ends at Lv20. */
 assert.match(economy,/function getCharacterPartyIndex\(character\)/);
 assert.match(economy,/function getAdditionalCharacterPoolMultiplier\(character,level\)/);
-assert.match(economy,/if\(safeLevel>=20\)\{ return 1; \}/);
-assert.match(economy,/if\(index===2\)\{ return 2\.00; \}/);
-assert.match(economy,/if\(index===1\)\{ return 1\.50; \}/);
+assert.match(economy,/FourSymbolsExpPoolCatchUpPolicy\.multiplierForSlot\(getCharacterPartyIndex\(character\),safeLevel\)/);
+const poolPolicy=require("../functions/src/exp-pool-catch-up-policy");
+for(const [slot,multiplier] of [[1,1.5],[2,2]]){
+    assert.equal(poolPolicy.multiplierForSlot(slot,19),multiplier);
+    assert.equal(poolPolicy.multiplierForSlot(slot,20),1);
+}
 assert.match(economy,/function getDirectCatchUpExpMultiplier\(character\)/);
 assert.match(economy,/if\(index===2\)\{ return 3; \}/);
 assert.match(economy,/if\(index===1\)\{ return 2; \}/);
@@ -179,7 +184,7 @@ assert.match(dungeonPolish,/topReturn\.setAttribute\("aria-label","返回上一�
 assert.match(navShell,/grid-template-columns|renderGameplayContext/);
 
 assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
-assert.match(creationCss,/creation-stat-details\[open\] \.creation-stat-details-body\{[\s\S]*font-size:32px/);
+assert.match(creationCss,/creation-stat-details\[open\] \.creation-stat-details-body\{[\s\S]*font-size:39px/);
 assert.match(questCss,/quest-milestone\.reached:not\(\.claimed\) \.quest-milestone-slot::after/);
 assert.match(questCss,/quest-milestone:not\(\.reached\)[\s\S]*opacity:\.5 !important/);
 assert.match(questCss,/quest-milestone\.claimed[\s\S]*opacity:\.5 !important/);

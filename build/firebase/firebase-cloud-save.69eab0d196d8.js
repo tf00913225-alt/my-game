@@ -125,10 +125,48 @@ export async function completeHeroChapterNode({ticketId,nodeId,choiceId=null,exp
     return callTrustedFunction("completeHeroChapterNode",{ticketId,nodeId,choiceId,expectedRevision});
 }
 
-/* Only first-character choices cross this boundary. The backend checks Auth
- * account age, active session, empty canonical sources and expected revision. */
+/* Explicit account intents retain the caller's operation ID for receipt retry. */
+export async function createAdditionalCanonicalCharacter({operationId,expectedRevision,slotIndex,selection}={}){
+    return callTrustedFunction("createAdditionalCanonicalCharacter",{operationId,expectedRevision,slotIndex,selection});
+}
+export async function allocateCanonicalSharedExp({operationId,expectedRevision,characterId}={}){
+    return callTrustedFunction("allocateCanonicalSharedExp",{operationId,expectedRevision,...(characterId===undefined?{}:{characterId})});
+}
+export async function allocateCanonicalAttributePoint({operationId,expectedRevision,stat,characterId}={}){
+    return callTrustedFunction("allocateCanonicalAttributePoint",{operationId,expectedRevision,stat,...(characterId===undefined?{}:{characterId})});
+}
+/* First-character choices require Auth, active session, empty canonical sources
+ * and an expected revision; the backend generates all initial progression. */
 export async function createInitialCanonicalCharacter(selection,expectedRevision){
     return callTrustedFunction("createInitialCanonicalCharacter",{selection,expectedRevision});
+}
+
+// Explicit intent services only. Stable operation IDs belong to the caller;
+// transport failure never creates a replacement operation or replays a save.
+export async function observeCanonicalAccountMode({operationId,expectedRevision,expectedSequence,intent,elementBox}){
+    return callTrustedFunction("observeCanonicalAccountMode",{operationId,expectedRevision,expectedSequence,intent,elementBox});
+}
+export async function beginCanonicalElementBoxAd({operationId,expectedRevision,expectedSequence}){
+    return callTrustedFunction("beginCanonicalElementBoxAd",{operationId,expectedRevision,expectedSequence});
+}
+export async function completeCanonicalElementBoxAd({operationId,expectedRevision,expectedSequence,sourceId}){
+    return callTrustedFunction("completeCanonicalElementBoxAd",{operationId,expectedRevision,expectedSequence,sourceId});
+}
+export async function abandonCanonicalElementBoxAd({operationId,expectedRevision,expectedSequence,sourceId}){
+    return callTrustedFunction("abandonCanonicalElementBoxAd",{operationId,expectedRevision,expectedSequence,sourceId});
+}
+export async function issueCanonicalPatrolTicket({operationId,expectedRevision,triggerEntryId,availableEntryIds}){
+    return callTrustedFunction("issueCanonicalPatrolTicket",{operationId,expectedRevision,triggerEntryId,
+        ...(availableEntryIds===undefined?{}:{availableEntryIds})});
+}
+export async function settleCanonicalPatrolMember({operationId,expectedRevision,ticketId,memberIndex}){
+    return callTrustedFunction("settleCanonicalPatrolMember",{operationId,expectedRevision,ticketId,memberIndex});
+}
+export async function settleCanonicalPatrolTerminal({operationId,expectedRevision,ticketId,kind}){
+    return callTrustedFunction("settleCanonicalPatrolTerminal",{operationId,expectedRevision,ticketId,kind});
+}
+export async function abandonCanonicalPatrolTicket({operationId,expectedRevision,ticketId}){
+    return callTrustedFunction("abandonCanonicalPatrolTicket",{operationId,expectedRevision,ticketId});
 }
 
 /* Explicit, same-UID preference upload. Never sends the character save,

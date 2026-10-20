@@ -23,6 +23,7 @@ on:
       - 'tests/cloud-save-*.test.mjs'
       - 'tests/firebase-trusted-cloud-save-backend.test.mjs'
       - 'scripts/firestore-backup-readiness.mjs'
+      - 'scripts/storage-recovery-readiness.mjs'
       - 'tests/firestore-backup-readiness.test.mjs'
       - '.github/workflows/session-authority.yml'
       - '.github/scripts/wait-session-repository-checks.mjs'
@@ -39,6 +40,7 @@ on:
       - 'tests/cloud-save-*.test.mjs'
       - 'tests/firebase-trusted-cloud-save-backend.test.mjs'
       - 'scripts/firestore-backup-readiness.mjs'
+      - 'scripts/storage-recovery-readiness.mjs'
       - 'tests/firestore-backup-readiness.test.mjs'
       - '.github/workflows/session-authority.yml'
       - '.github/scripts/wait-session-repository-checks.mjs'
@@ -70,6 +72,8 @@ jobs:
           distribution: temurin
           java-version: '21'
       - run: npm --prefix functions ci --no-audit --no-fund
+      - name: Install pinned repository build dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - run: node --test tests/session-client.test.mjs tests/session-repository-checks-wait.test.mjs
       - run: node --test tests/cloud-save-*.test.mjs tests/firebase-trusted-cloud-save-backend.test.mjs
       - name: Verify account boot with session backend unavailable
@@ -123,6 +127,16 @@ jobs:
           project_id: four-symbols-jianghu
       - uses: google-github-actions/setup-gcloud@v2
         continue-on-error: true
+      - name: Inspect Storage recovery readiness (read only)
+        id: storage_readiness
+        run: node scripts/storage-recovery-readiness.mjs
+      - name: Upload sanitized Storage readiness metadata
+        if: ${{ always() && steps.storage_readiness.outcome == 'success' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: storage-recovery-readiness-${{ github.sha }}-${{ github.run_attempt }}
+          path: artifacts/recovery/storage-readiness.json
+          if-no-files-found: error
       - name: Inspect Firestore recovery readiness (read only)
         shell: bash
         run: |
@@ -165,4 +179,4 @@ jobs:
         shell: bash
         run: |
           test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
-          npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --force --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:issueCanonicalRecoveryApproval,functions:restoreCanonicalCurrent,functions:createInitialCanonicalCharacter,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,functions:screenLegacyMigrationCandidate,functions:saveCloudPreferences,functions:reserveTrustedGrant,functions:claimDailyCheckin,functions:readTeamFormation,functions:saveTeamFormation,functions:readHeroGrowth,functions:mutateHeroGrowth,functions:claimHeroLoginReward,functions:claimHeroDailySupply,functions:readHeroAcquisition,functions:observeHeroLogin,functions:ensureHeroChapterTicket,functions:completeHeroChapterNode,functions:purchaseCanonicalPotion,functions:allocateCanonicalSharedExp,functions:createNativeAuthHandoff,functions:redeemNativeAuthHandoff,firestore:rules'
+          npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --force --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:issueCanonicalRecoveryApproval,functions:restoreCanonicalCurrent,functions:createInitialCanonicalCharacter,functions:createAdditionalCanonicalCharacter,functions:allocateCanonicalAttributePoint,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,functions:screenLegacyMigrationCandidate,functions:saveCloudPreferences,functions:reserveTrustedGrant,functions:claimDailyCheckin,functions:readTeamFormation,functions:saveTeamFormation,functions:readHeroGrowth,functions:mutateHeroGrowth,functions:claimHeroLoginReward,functions:claimHeroDailySupply,functions:readHeroAcquisition,functions:observeHeroLogin,functions:ensureHeroChapterTicket,functions:completeHeroChapterNode,functions:purchaseCanonicalPotion,functions:allocateCanonicalSharedExp,functions:observeCanonicalAccountMode,functions:beginCanonicalElementBoxAd,functions:completeCanonicalElementBoxAd,functions:abandonCanonicalElementBoxAd,functions:issueCanonicalPatrolTicket,functions:settleCanonicalPatrolMember,functions:settleCanonicalPatrolTerminal,functions:abandonCanonicalPatrolTicket,functions:createNativeAuthHandoff,functions:redeemNativeAuthHandoff,firestore:rules'

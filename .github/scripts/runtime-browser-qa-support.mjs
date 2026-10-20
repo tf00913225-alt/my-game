@@ -15,7 +15,7 @@ const QA_FIRST_PLAY={gameVersion:String(ASSET_MANIFEST.release||""),manifestVers
    Firebase transport is replaced by a read-only local account so Startup can
    formally reach READY without a player account or cloud write. */
 const QA_AUTH_MODULE=String.raw`const user=Object.freeze({uid:"skill-runtime-browser-qa",email:"skill-runtime-browser-qa@qa.invalid",displayName:"Skill Runtime QA",photoURL:null,isAnonymous:true,providerIds:Object.freeze([])});export function getFirebaseAuthConfigStatus(){return Object.freeze({ready:true,missingFields:[],projectId:"skill-runtime-qa",sdkVersion:"qa"});}export async function initializeFirebaseAuth(){return Object.freeze({app:{name:"skill-runtime-qa"},auth:{currentUser:user}});}export function getFirebaseApp(){return {name:"skill-runtime-qa"};}export function getFirebaseAuth(){return {currentUser:user};}export function getSignedInUser(){return user;}export function installFirebaseSessionHooks(){}export async function observeFirebaseAuthState(listener){queueMicrotask(()=>listener(user,null));return ()=>{};}export async function signInAsAnonymous(){return user;}export async function signInWithGoogle(){return user;}export async function reauthenticateWithGoogle(){return user;}export async function signInWithFacebook(){return user;}export async function signInWithEmail(){return user;}export async function createAccountWithEmail(){return user;}export async function signOutFirebase(){}`;
-const QA_CLOUD_MODULE=String.raw`export const CLOUD_SAVE_WRITE_POLICY="trusted-backend-only";export const CLOUD_FUNCTIONS_REGION="qa-local";export const CURRENT_SAVE_SUBCOLLECTION="saves";export const CURRENT_SAVE_DOCUMENT="current";export const LEGACY_LOCAL_SAVE_KEY="battle_full_version_save_v5";const uid="skill-runtime-browser-qa";const save={player:{id:"Skill Runtime QA",element:"fire",gender:"male",level:70,exp:0,expNext:100,attack:10,vitality:10,energy:10,intelligence:10,spirit:10,agility:10,bonusHP:0,bonusSP:0,hp:300,sp:120,attributePoints:0,skillPoints:999,activeBuffs:[],statusEffects:[],isDefending:false},sharedExp:0,gold:0,inventoryItems:[],characterEquipment:{fire:{head:null,hand:null,shoulder:null,armor:null,shoes:null,ring:null}},characterSkillLoadouts:{fire:{name:"Skill Runtime QA",skillLevels:{fireRocket:1},equippedSkills:[]}}};export async function readCurrentCloudSave(){return Object.freeze({exists:true,uid,path:"users/"+uid+"/saves/current",data:{ownerUid:uid,authoritativeStateReady:true,status:"ready",gameSave:save}});}export async function bootstrapTrustedCloudSave(){throw new Error("QA cloud writes are forbidden");}export async function createInitialCanonicalCharacter(){throw new Error("QA cloud writes are forbidden");}export async function saveLocalAutoBattlePreferences(){throw new Error("QA cloud writes are forbidden");}export async function submitLegacyMigrationCandidate(){throw new Error("QA cloud writes are forbidden");}export async function screenLegacyMigrationCandidate(){throw new Error("QA cloud writes are forbidden");}export async function readTeamFormation(){throw new Error("QA cloud reads are isolated");}export async function saveTeamFormation(){throw new Error("QA cloud writes are forbidden");}export async function readHeroGrowth(){throw new Error("QA cloud writes are forbidden");}export async function claimHeroLoginReward(){throw new Error("QA cloud writes are forbidden");}export async function claimHeroDailySupply(){throw new Error("QA cloud writes are forbidden");}export async function mutateHeroGrowth(){throw new Error("QA cloud writes are forbidden");}export async function readHeroAcquisition(){return __qaHeroRights();}export async function observeHeroLogin(){return __qaHeroRights();}export async function ensureHeroChapterTicket(){throw new Error("QA cloud writes are forbidden");}export async function completeHeroChapterNode(){throw new Error("QA cloud writes are forbidden");}function __qaHeroRights(){const ids=Array.isArray(window.__heroQaOwned)?window.__heroQaOwned:[];const entitlements=Object.fromEntries(ids.filter(id=>["divineDogHongbao","vajraHeavenlyKing"].includes(id)).map(id=>[id,{heroId:id,claimKey:"hero-v1-"+id,allocationSeed:20261012,sourceId:"qa-hero-source-"+id,grantedRevision:1}]));return {schemaVersion:1,ownerUid:uid,serverRevision:1,loginCount:ids.includes("vajraHeavenlyKing")?7:0,entitlements,unchanged:true,authoritativeStateReady:false,chapter:{chapterId:"chapter_v1",ticketId:null,nextNodeId:ids.includes("divineDogHongbao")?null:"n01_arrival",phase:ids.includes("divineDogHongbao")?"completed":"not-started",expiresAtMs:null,outcomeVerified:false,completedIntents:[]}};}export function createLocalMigrationBackup(){throw new Error("QA cloud writes are forbidden");}`;
+const QA_CLOUD_MODULE=String.raw`export const CLOUD_SAVE_WRITE_POLICY="trusted-backend-only";export const CLOUD_FUNCTIONS_REGION="qa-local";export const CURRENT_SAVE_SUBCOLLECTION="saves";export const CURRENT_SAVE_DOCUMENT="current";export const LEGACY_LOCAL_SAVE_KEY="battle_full_version_save_v5";const uid="skill-runtime-browser-qa";const save={player:{id:"Skill Runtime QA",element:"fire",gender:"male",level:70,exp:0,expNext:100,attack:10,vitality:10,energy:10,intelligence:10,spirit:10,agility:10,bonusHP:0,bonusSP:0,hp:300,sp:120,attributePoints:0,skillPoints:999,activeBuffs:[],statusEffects:[],isDefending:false},sharedExp:0,gold:0,inventoryItems:[],characterEquipment:{fire:{head:null,hand:null,shoulder:null,armor:null,shoes:null,ring:null}},characterSkillLoadouts:{fire:{name:"Skill Runtime QA",skillLevels:{fireRocket:1},equippedSkills:[]}}};export async function readCurrentCloudSave(){return Object.freeze({exists:true,uid,path:"users/"+uid+"/saves/current",data:{ownerUid:uid,authoritativeStateReady:true,status:"ready",gameSave:save}});}export async function bootstrapTrustedCloudSave(){throw new Error("QA cloud writes are forbidden");}export async function observeCanonicalAccountMode(){throw new Error("QA canonical earning intents are isolated");}export async function beginCanonicalElementBoxAd(){throw new Error("QA canonical earning intents are isolated");}export async function completeCanonicalElementBoxAd(){throw new Error("QA canonical earning intents are isolated");}export async function abandonCanonicalElementBoxAd(){throw new Error("QA canonical earning intents are isolated");}export async function issueCanonicalPatrolTicket(){throw new Error("QA canonical earning intents are isolated");}export async function settleCanonicalPatrolMember(){throw new Error("QA canonical earning intents are isolated");}export async function settleCanonicalPatrolTerminal(){throw new Error("QA canonical earning intents are isolated");}export async function abandonCanonicalPatrolTicket(){throw new Error("QA canonical earning intents are isolated");}export async function createAdditionalCanonicalCharacter(){throw new Error("QA canonical intents are isolated");}export async function allocateCanonicalSharedExp(){throw new Error("QA canonical intents are isolated");}export async function allocateCanonicalAttributePoint(){throw new Error("QA canonical intents are isolated");}export async function createInitialCanonicalCharacter(){throw new Error("QA cloud writes are forbidden");}export async function saveLocalAutoBattlePreferences(){throw new Error("QA cloud writes are forbidden");}export async function submitLegacyMigrationCandidate(){throw new Error("QA cloud writes are forbidden");}export async function screenLegacyMigrationCandidate(){throw new Error("QA cloud writes are forbidden");}export async function readTeamFormation(){throw new Error("QA cloud reads are isolated");}export async function saveTeamFormation(){throw new Error("QA cloud writes are forbidden");}export async function readHeroGrowth(){throw new Error("QA cloud writes are forbidden");}export async function claimHeroLoginReward(){throw new Error("QA cloud writes are forbidden");}export async function claimHeroDailySupply(){throw new Error("QA cloud writes are forbidden");}export async function mutateHeroGrowth(){throw new Error("QA cloud writes are forbidden");}export async function readHeroAcquisition(){return __qaHeroRights();}export async function observeHeroLogin(){return __qaHeroRights();}export async function ensureHeroChapterTicket(){throw new Error("QA cloud writes are forbidden");}export async function completeHeroChapterNode(){throw new Error("QA cloud writes are forbidden");}function __qaHeroRights(){const ids=Array.isArray(window.__heroQaOwned)?window.__heroQaOwned:[];const entitlements=Object.fromEntries(ids.filter(id=>["divineDogHongbao","vajraHeavenlyKing"].includes(id)).map(id=>[id,{heroId:id,claimKey:"hero-v1-"+id,allocationSeed:20261012,sourceId:"qa-hero-source-"+id,grantedRevision:1}]));return {schemaVersion:1,ownerUid:uid,serverRevision:1,loginCount:ids.includes("vajraHeavenlyKing")?7:0,entitlements,unchanged:true,authoritativeStateReady:false,chapter:{chapterId:"chapter_v1",ticketId:null,nextNodeId:ids.includes("divineDogHongbao")?null:"n01_arrival",phase:ids.includes("divineDogHongbao")?"completed":"not-started",expiresAtMs:null,outcomeVerified:false,completedIntents:[]}};}export function createLocalMigrationBackup(){throw new Error("QA cloud writes are forbidden");}`;
 const QA_SESSION_MODULE=String.raw`export const CLOUD_FUNCTIONS_REGION="qa-local";export async function synchronizeGameSession(user){window.dispatchEvent(new CustomEvent("four-symbols:game-session-state",{detail:{uid:user?.uid||null,status:user?"ready":"signed-out",code:null}}));return {status:"ready"};}export async function callProtectedFunction(){throw new Error("QA cloud writes are forbidden");}export async function revokeGameSession(){}export const protectedTest=()=>callProtectedFunction("protectedTest");export function getGameSessionState(){return {status:"ready"};}`;
 function qaPrelude(){return `<script>localStorage.setItem("four_symbols_active_uid","skill-runtime-browser-qa");localStorage.setItem("four_symbols_privacy_consent",JSON.stringify({privacyPolicyVersion:"2026-09-11-v2",acceptedAt:"2026-09-30T00:00:00.000Z"}));localStorage.setItem("four_symbols_first_play_ready",${JSON.stringify(JSON.stringify(QA_FIRST_PLAY))});</script>`;}
 
@@ -104,15 +104,81 @@ async function collectStartupFailure(cdp,context){
     return evidence;
 }
 
-function waitJson(url){
-    return new Promise((resolve,reject)=>{
-        const started=Date.now();
-        const poll=()=>fetch(url).then(r=>r.json()).then(resolve).catch(error=>{
-            if(Date.now()-started>15000){ reject(error); }
-            else{ setTimeout(poll,80); }
+async function collectDevToolsFailure(url){
+    const endpoint=new URL(url);
+    const result={endpoint:endpoint.origin+endpoint.pathname,platform:process.platform,node:process.version};
+    if(!['127.0.0.1','localhost','[::1]'].includes(endpoint.hostname)||endpoint.username||endpoint.password){return result;}
+    result.directHttp=await new Promise(resolve=>{
+        let settled=false;
+        const finish=value=>{if(settled)return;settled=true;clearTimeout(deadline);resolve(value);};
+        const deadline=setTimeout(()=>{
+            finish({error:'direct HTTP diagnostic timeout'});
+            request.destroy();
+        },1000);
+        const request=http.get(endpoint,response=>{
+            let body='';response.setEncoding('utf8');
+            response.on('data',chunk=>{body=(body+chunk).slice(0,8192);});
+            response.on('end',()=>{let data;try{data=JSON.parse(body);}catch{}
+                finish({status:response.statusCode,pageTargets:Array.isArray(data)?data.filter(p=>p.type==='page').length:null});});
+            response.once('aborted',()=>finish({error:'direct HTTP diagnostic response aborted'}));
+            response.once('error',error=>finish({error:error.code||error.message}));
         });
-        poll();
+        request.on('error',error=>finish({error:error.code||error.message}));
     });
+    result.proxyEnvironment=Object.fromEntries(['HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','NODE_USE_ENV_PROXY'].map(key=>[key,!!process.env[key]]));
+    if(process.platform==='linux'){
+        const ps=spawnSync('ps',['-eo','pid,ppid,stat,etime,comm'],{encoding:'utf8',timeout:2000});
+        const processes=(ps.stdout||'').split('\n').filter(line=>/chrome|chromium|crashpad/i.test(line));
+        result.processCount=processes.length;
+        result.processes=processes.slice(0,40);
+        result.chrome=result.processes.map(line=>{
+            const pid=line.trim().split(/\s+/)[0],entry={pid};
+            if(!/^\d+$/.test(pid))return entry;
+            try{entry.executable=fs.readlinkSync('/proc/'+pid+'/exe');}catch{}
+            try{entry.waitChannel=fs.readFileSync('/proc/'+pid+'/wchan','utf8').trim();}catch{}
+            try{entry.launch=fs.readFileSync('/proc/'+pid+'/cmdline','utf8').split('\0').filter(arg=>/^--(remote-debugging|user-data-dir|headless)/.test(arg));}catch{}
+            return entry;
+        });
+        const sockets=spawnSync('ss',['-ltnp'],{encoding:'utf8',timeout:2000});
+        result.listeners=(sockets.stdout||'').split('\n').filter(line=>line.includes(':'+endpoint.port+' ')||/chrome|chromium/i.test(line)).slice(0,20);
+        try{result.memory=fs.readFileSync('/proc/meminfo','utf8').split('\n').filter(line=>/^(MemAvailable|SwapFree):/.test(line));}catch{}
+        result.cgroup={};
+        for(const key of ['pids.current','pids.max','memory.current','memory.max']){try{result.cgroup[key]=fs.readFileSync('/sys/fs/cgroup/'+key,'utf8').trim();}catch{}}
+    }
+    return result;
+}
+
+async function waitJson(url,{timeoutMs=15000}={}){
+    const started=Date.now(),controller=new AbortController();
+    const timeout=Object.assign(new Error('DevTools startup probe exceeded its '+timeoutMs+'ms deadline'),{code:'ETIMEDOUT'});
+    const deadline=setTimeout(()=>controller.abort(timeout),timeoutMs);
+    let attempts=0,lastError;
+    try{
+        while(!controller.signal.aborted){
+            attempts++;
+            try{
+                // The same deadline covers response headers AND JSON body.
+                const response=await fetch(url,{signal:controller.signal});
+                const data=await response.json();
+                if(controller.signal.aborted){throw timeout;}
+                if(attempts>1){const endpoint=new URL(url);console.log('DevTools ready: '+JSON.stringify({endpoint:endpoint.origin+endpoint.pathname,elapsedMs:Date.now()-started,attempts}));}
+                return data;
+            }catch(error){
+                if(controller.signal.aborted){
+                    if(lastError&&lastError!==timeout){timeout.cause=lastError;}
+                    else if(error!==timeout){timeout.cause=error;}
+                    lastError=timeout;
+                }else{lastError=error;}
+            }
+            if(!controller.signal.aborted){await new Promise(resolve=>setTimeout(resolve,Math.min(80,Math.max(0,timeoutMs-(Date.now()-started)))));}
+        }
+    }finally{clearTimeout(deadline);}
+    const error=lastError||timeout;
+    try{
+        error.devToolsDiagnostics=await collectDevToolsFailure(url);
+        console.error('DevTools connection failure diagnostics: '+JSON.stringify(error.devToolsDiagnostics));
+    }catch{}
+    throw error;
 }
 
 class Cdp{

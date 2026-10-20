@@ -946,21 +946,17 @@
           目的是讓「掛機」明顯比「手動玩」慢，避免無腦掛機
           就能在短時間衝到滿等。
     */
-    const ELEMENT_BOX_EXP_RATIO=0.70;
-    const V17342_GLOBAL_EXP_REWARD_MULTIPLIER=3;
-    const V17342_GLOBAL_GOLD_REWARD_MULTIPLIER=5;
-    const V173_BEGINNER_FOREST_TARGET_BATTLES=20;
-    const V173_BEGINNER_FOREST_FALLBACK_EXP=690;
+    const rewardPolicy=window.FourSymbolsPatrolRewardPolicy;
 
     function getBeginnerForestBattleExp(){
         if(typeof window.v133GetExpNextForLevel!=="function"){
-            return V173_BEGINNER_FOREST_FALLBACK_EXP;
+            return rewardPolicy.beginnerForestBattleExp(null);
         }
-        let totalRequired=0;
+        const thresholds=[];
         for(let level=1;level<=9;level++){
-            totalRequired+=Math.max(1,Math.round(Number(window.v133GetExpNextForLevel(level))||0));
+            thresholds.push(window.v133GetExpNextForLevel(level));
         }
-        return Math.max(1,Math.ceil(totalRequired/V173_BEGINNER_FOREST_TARGET_BATTLES));
+        return rewardPolicy.beginnerForestBattleExp(thresholds);
     }
 
     window.v173GetBeginnerForestBattleExp=getBeginnerForestBattleExp;
@@ -969,27 +965,23 @@
         /* V173.40 targeted ~20 battles using one flat battle reward.
            V173.42 keeps that old 3-monster reference value, but pays per
            defeated monster so 1 / 2 / 3 monsters are no longer identical. */
-        return Math.max(1,Math.ceil(getBeginnerForestBattleExp()/3));
+        return rewardPolicy.beginnerForestMonsterExpUnit(getBeginnerForestBattleExp());
     }
     window.v17342GetBeginnerForestMonsterExpUnit=getBeginnerForestMonsterExpUnit;
 
     function getMonsterExpRankMultiplier(monster){
-        const rank=getMonsterRank(monster);
-        if(rank==="boss"){ return 3; }
-        if(rank==="elite"){ return 1.5; }
-        return 1;
+        return rewardPolicy.expRankMultiplier(getMonsterRank(monster));
     }
 
     /* Formal base EXP: a normal monster's own reward before rank/mode rules.
        35 is the established Lv×10 × historical 3.5 result, now encoded at
        this data owner so every player-facing reward remains unchanged. */
     function getFormalMonsterBaseExp(monster){
-        return Math.max(0,Math.floor((Number(monster&&monster.level)||0)*35));
+        return rewardPolicy.formalMonsterBaseExp(monster&&monster.level);
     }
 
     function getPatrolProgressionExpMultiplier(level){
-        const safeLevel=Math.max(1,Math.floor(Number(level)||1));
-        return safeLevel<20 ? V17342_GLOBAL_EXP_REWARD_MULTIPLIER : 1;
+        return rewardPolicy.progressionExpMultiplier(level);
     }
 
     function getPatrolProgressionReferenceLevel(){
@@ -1009,21 +1001,12 @@
     }
 
     function calculateStandardPatrolExp(monsterList,progressionLevel){
-        const rankAdjustedExp=(Array.isArray(monsterList)?monsterList:[]).reduce((total,monster)=>{
-            if(!monster){ return total; }
-            return total+getFormalMonsterBaseExp(monster)*getMonsterExpRankMultiplier(monster);
-        },0);
-        return Math.max(0,Math.floor(
-            rankAdjustedExp*getPatrolProgressionExpMultiplier(progressionLevel)
-        ));
+        return rewardPolicy.standardPatrolExp((Array.isArray(monsterList)?monsterList:[])
+            .map(monster=>monster?{level:monster.level,rank:getMonsterRank(monster)}:null),progressionLevel);
     }
 
     function applyPatrolExpMode(standardExp,options){
-        const safeExp=Math.max(0,Math.floor(Number(standardExp)||0));
-        const mode=options&&typeof options==="object"?options:{};
-        if(mode.elementBox){ return Math.round(safeExp*ELEMENT_BOX_EXP_RATIO); }
-        if(mode.rested){ return Math.round(safeExp*2); }
-        return safeExp;
+        return rewardPolicy.applyExpMode(standardExp,options);
     }
 
     window.v173GetPatrolProgressionExpMultiplier=getPatrolProgressionExpMultiplier;
@@ -1699,12 +1682,8 @@
         };
     };
     window.v131GrantElementBoxHours=function(hours,maxHours){
-        const safeHours=Math.max(0,Number(hours)||0);
-        const capMs=Math.max(0,Number(maxHours)||32)*60*60*1000;
-        elementBoxState.remainingMs=Math.min(
-            capMs,
-            Math.max(0,elementBoxState.remainingMs)+safeHours*60*60*1000
-        );
+        elementBoxState.remainingMs=window.FourSymbolsAccountModeTimePolicy.grantElementBox(
+            elementBoxState.remainingMs,hours,maxHours);
         persistElementBoxState();
         updateElementBoxStatsUI();
         return Math.max(0,Math.floor(elementBoxState.remainingMs));
@@ -1715,11 +1694,11 @@
         const delta=Math.max(0,now-elementBoxLastTick);
         elementBoxLastTick=now;
         if(elementBoxActive && elementBoxState.remainingMs>0){
-            const used=Math.min(delta,elementBoxState.remainingMs);
-            elementBoxState.remainingMs-=used;
-            elementBoxSession.activeMs+=used;
-            if(elementBoxState.remainingMs<=0){
-                elementBoxState.remainingMs=0;
+            const debit=window.FourSymbolsAccountModeTimePolicy.debitElementBox(
+                elementBoxState.remainingMs,delta,elementBoxActive);
+            elementBoxState.remainingMs=debit.remainingMs;
+            elementBoxSession.activeMs+=debit.used;
+            if(debit.exhausted){
                 stopElementBoxWhenTimeEnds();
             }
         }
@@ -1797,12 +1776,12 @@
         const originalAwardMonsterGoldDrop=awardMonsterGoldDrop;
         awardMonsterGoldDrop=function(){
             const baseAmount=Math.max(0,Number(originalAwardMonsterGoldDrop.apply(this,arguments))||0);
-            const bonusAmount=Math.max(0,Math.floor(baseAmount*(V17342_GLOBAL_GOLD_REWARD_MULTIPLIER-1)));
+            const amount=rewardPolicy.awardedGoldFromBase(baseAmount);
+            const bonusAmount=amount-baseAmount;
             if(bonusAmount>0){
                 gold+=bonusAmount;
                 if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
             }
-            const amount=baseAmount+bonusAmount;
             recordElementBoxMonsterGold(amount);
             return amount;
         };
@@ -1980,11 +1959,7 @@
                     const monster=monsters[index];
                     return monster ? total+getMonsterExpRankMultiplier(monster) : total;
                 },0);
-                finalExp=Math.max(1,Math.round(
-                    getBeginnerForestMonsterExpUnit()*
-                    Math.max(1,beginnerMonsterUnits)*
-                    V17342_GLOBAL_EXP_REWARD_MULTIPLIER
-                ));
+                finalExp=rewardPolicy.beginnerForestExp(getBeginnerForestBattleExp(),beginnerMonsterUnits);
             }
 
             /* 元素匣（自動掛機）只給70%EXP，金幣/掉落/材料不受影響
@@ -2662,28 +2637,18 @@
         const maxStack=isEquipmentInventoryType(definition.type)
             ? 1
             : INVENTORY_MAX_STACK_DEFAULT;
-        const matchingStacks=inventoryItems.filter(
-            item=>item && item.id===definition.id
-        );
-        const stackFreeSpace=maxStack<=1
-            ? 0
-            : matchingStacks.reduce(
-                (sum,item)=>sum+Math.max(0,maxStack-(Number(item.count)||0)),
-                0
-            );
-        const freeSlots=Math.max(0,120-inventoryItems.length);
-        return stackFreeSpace+freeSlots*maxStack;
+        return window.FourSymbolsInventoryStackPolicy.capacity(inventoryItems,definition.id,maxStack);
     }
 
     function canAddItemToInventory(definition,amount){
-        const quantity=Math.max(1,Math.floor(Number(amount)||1));
+        const quantity=window.FourSymbolsInventoryStackPolicy.quantity(amount);
         return quantity<=getItemInventoryCapacity(definition);
     }
     window.v132CanAddItemToInventory=canAddItemToInventory;
 
     function addItemToInventory(definition,amount){
         if(!definition||definition.retired||definition.compatibilityOnly||definition.blueprintSlot||/^blueprint/.test(definition.id)||/^(hp|sp)Potion(?:20|100)$/.test(definition.id)){ return false; }
-        const quantity=Math.max(1,Math.floor(Number(amount)||1));
+        const quantity=window.FourSymbolsInventoryStackPolicy.quantity(amount);
         const maxStack=isEquipmentInventoryType(definition.type)
             ? 1
             : INVENTORY_MAX_STACK_DEFAULT;
@@ -2694,9 +2659,8 @@
            先算完整容量，確定整批都放得下才開始改背包，讓加入操作
            具備all-or-nothing語意。
         */
-        if(!canAddItemToInventory(definition,quantity)){ return false; }
-
         if(maxStack<=1){
+            if(!canAddItemToInventory(definition,quantity)){ return false; }
             let remaining=quantity;
             while(remaining>0){
                 if(inventoryItems.length>=120){
@@ -2712,29 +2676,19 @@
             return true;
         }
 
-        let remaining=quantity;
-        const stacks=inventoryItems.filter(item=>item && item.id===definition.id);
+        const plan=window.FourSymbolsInventoryStackPolicy.plan(
+            inventoryItems,definition.id,quantity,maxStack);
+        if(!plan.canAdd){ return false; }
         const ticketDefinition=getTicketDefinition(definition.id);
-        stacks.forEach(stack=>{
-            if(remaining<=0){ return; }
+        plan.updates.forEach(update=>{
+            const stack=inventoryItems[update.index];
             if(ticketDefinition){ syncTicketPresentation(stack,ticketDefinition); }
-            const current=Math.max(0,Math.floor(Number(stack.count)||0));
-            const space=Math.max(0,maxStack-current);
-            const add=Math.min(space,remaining);
-            stack.count=current+add;
-            remaining-=add;
+            stack.count=update.count;
         });
-
-        while(remaining>0){
-            if(inventoryItems.length>=120){
-                return false;
-            }
-            const stackCount=Math.min(maxStack,remaining);
+        plan.appendCounts.forEach(stackCount=>{
             inventoryItems.push(cloneInventoryStackItem(definition,stackCount));
-            remaining-=stackCount;
-        }
-
-        return true;
+        });
+        return plan.success;
     }
 
     window.v132AddItemToInventory=addItemToInventory;
@@ -2830,10 +2784,7 @@
           獨立判定）
     ===================================================== */
 
-    const NORMAL_DROP_TABLE=Object.freeze([
-        {itemId:"freezeTalismanLow",chance:.05,quantity:1},{itemId:"stealthTalismanLow",chance:.05,quantity:1},
-        {itemId:"barrierTalismanLow",chance:.05,quantity:1},{itemId:"oreLow",chance:.05,quantity:1}
-    ].map(Object.freeze));
+    const patrolDropPolicy=window.FourSymbolsPatrolDropPolicy;
 
     function awardMonsterMaterialDrop(monster){
         /*
@@ -2844,11 +2795,12 @@
         if(window.v132ActiveDungeonRun){ return; }
 
         const gained=[];
-        NORMAL_DROP_TABLE.forEach(row=>{
-            if(Math.random()>=row.chance){ return; }
+        patrolDropPolicy.normalRows.forEach((entry,index)=>{
+            const row=patrolDropPolicy.normalDrop(index,Math.random());
+            if(!row){ return; }
             const definition=getTalismanDefinition(row.itemId)||getOreDefinition(row.itemId);
             if(!definition){ return; }
-            if(addItemToInventory(definition,1)){
+            if(addItemToInventory(definition,row.quantity)){
                 gained.push(definition.name);
             }
         });
@@ -3560,7 +3512,14 @@
         if(!item||typeof openEquippedItem!=="function"){ return; }
 
         const rewardModal=document.getElementById("v132RewardModal");
-        if(rewardModal){ rewardModal.classList.add("v132-detail-paused"); }
+        if(rewardModal){
+            // The equipment detail reuses itemModal. Keep its parent preview
+            // on the existing native host so closing that detail cannot close
+            // or hide the preview as an itemModal child dialog.
+            const host=document.getElementById("game-ui");
+            if(rewardModal.parentElement===document.getElementById("itemModal")&&host){host.appendChild(rewardModal);}
+            rewardModal.classList.add("v132-detail-paused");
+        }
 
         openEquippedItem(item,"");
 
@@ -4639,11 +4598,7 @@
     window.v173GetDailyTotalTarget=getDailyTotalTarget;
 
     function getExpPoolCatchUpMultiplierForLevel(level){
-        const gap=Math.max(0,getHighestCreatedCharacterLevel()-Math.max(1,Number(level)||1));
-        if(gap>=30){ return 1.50; }
-        if(gap>=20){ return 1.30; }
-        if(gap>=10){ return 1.15; }
-        return 1.00;
+        return window.FourSymbolsExpPoolCatchUpPolicy.multiplierForLevel(level,getHighestCreatedCharacterLevel());
     }
     function getCharacterPartyIndex(character){
         if(!character){ return -1; }
@@ -4658,11 +4613,7 @@
     }
     function getAdditionalCharacterPoolMultiplier(character,level){
         const safeLevel=Math.max(1,Number(level)||Number(character&&character.level)||1);
-        if(safeLevel>=20){ return 1; }
-        const index=getCharacterPartyIndex(character);
-        if(index===2){ return 2.00; }
-        if(index===1){ return 1.50; }
-        return 1;
+        return window.FourSymbolsExpPoolCatchUpPolicy.multiplierForSlot(getCharacterPartyIndex(character),safeLevel);
     }
     function getExpPoolCatchUpMultiplierAtLevel(character,level){
         const slotMultiplier=getAdditionalCharacterPoolMultiplier(character,level);
@@ -5342,19 +5293,6 @@
     }
     if(typeof renderExpDistributeList==="function"){ renderExpDistributeList(); }
     if(typeof setTimeout==="function"){ setTimeout(installLateGrowthEnhancements,0); }
-
-    /* 2. 怪物金幣掉落rank倍率 */
-    if(typeof getMonsterGoldDrop==="function"){
-        getMonsterGoldDrop=function(monster){
-            if(!monster){ return 0; }
-            const level=Math.max(1,Math.floor(Number(monster.level)||1));
-            const rank=getMonsterRank(monster);
-            const rankMultiplier=rank==="boss"?5:rank==="elite"?2:1;
-            const base=level*2+3;
-            const variance=0.85+Math.random()*0.30;
-            return Math.max(1,Math.floor(base*rankMultiplier*variance));
-        };
-    }
 
     /* 3. 商店價格 */
     const SHOP_PRICE_TIERS=[
@@ -6289,32 +6227,11 @@
     }
 
     function accrueRestedMilliseconds(elapsedMs){
-        const safeElapsed=Math.max(0,Math.floor(Number(elapsedMs)||0));
-        if(safeElapsed<=0 || restedState.battles>=RESTED_EXP_MAX_BATTLES){
-            if(restedState.battles>=RESTED_EXP_MAX_BATTLES){
-                restedState.progressMs=0;
-            }
-            return 0;
-        }
-
-        /* 超過累積上限所需的時間沒有差別，先封頂避免異常時鐘
-           產生不必要的大數字。 */
-        const cappedElapsed=Math.min(
-            safeElapsed,
-            RESTED_EXP_MAX_BATTLES*RESTED_EXP_MS_PER_BATTLE
-        );
-        const totalMs=restedState.progressMs+cappedElapsed;
-        const earned=Math.floor(totalMs/RESTED_EXP_MS_PER_BATTLE);
-        const accepted=Math.min(
-            earned,
-            RESTED_EXP_MAX_BATTLES-restedState.battles
-        );
-
-        restedState.battles+=accepted;
-        restedState.progressMs=restedState.battles>=RESTED_EXP_MAX_BATTLES
-            ? 0
-            : totalMs-earned*RESTED_EXP_MS_PER_BATTLE;
-        return accepted;
+        const result=window.FourSymbolsAccountModeTimePolicy.accrueRested(
+            restedState.battles,restedState.progressMs,elapsedMs);
+        restedState.battles=result.battles;
+        restedState.progressMs=result.progressMs;
+        return result.accepted;
     }
 
     function getNextRestedBattleText(){
@@ -6414,17 +6331,13 @@
     };
 
     window.v139TryConsumeRestedBattle=function(){
-        if(restedState.battles<=0){
-            return {applied:false,remainingBattles:0};
-        }
-        restedState.battles--;
+        const consumed=window.FourSymbolsAccountModeTimePolicy.consumeRestedBattle(restedState.battles);
+        if(!consumed.applied){ return consumed; }
+        restedState.battles=consumed.remainingBattles;
         restedState.lastSeenAt=Date.now();
         persistRestedState();
         updateRestedExperienceDisplay();
-        return {
-            applied:true,
-            remainingBattles:restedState.battles
-        };
+        return consumed;
     };
 
     document.addEventListener("visibilitychange",function(){
@@ -7822,19 +7735,13 @@
        Elite single-roll drops + quest progress    /* =====================================================
        Elite single-roll drops + quest progress
     ===================================================== */
-    const ELITE_DROP_TABLE=Object.freeze([
-        {itemId:"ticketSetFire",chance:.01,quantity:1},{itemId:"ticketSetWater",chance:.01,quantity:1},
-        {itemId:"ticketSetEarth",chance:.01,quantity:1},{itemId:"ticketSetWind",chance:.01,quantity:1},
-        {itemId:"freezeTalismanMid",chance:.05,quantity:1},{itemId:"stealthTalismanMid",chance:.05,quantity:1},
-        {itemId:"barrierTalismanMid",chance:.05,quantity:1}
-    ].map(Object.freeze));
+    const patrolDropPolicy=window.FourSymbolsPatrolDropPolicy;
     function addEliteSpecialDrop(monster){
         if(typeof window.v132AddItemToInventory!=="function"){ return null; }
-        let roll=Math.random();
-        const row=ELITE_DROP_TABLE.find(entry=>(roll-=entry.chance)<0);
+        const row=patrolDropPolicy.eliteDrop(Math.random());
         const definition=row&&((window.v132GetTicketDefinition&&window.v132GetTicketDefinition(row.itemId))||(window.v132GetTalismanDefinition&&window.v132GetTalismanDefinition(row.itemId)));
         if(!definition){ return null; }
-        if(!window.v132AddItemToInventory(definition,1)){
+        if(!window.v132AddItemToInventory(definition,row.quantity)){
             addBattleLog(monster.name+"出現特殊掉落，但背包已滿，未能放入。");
             return null;
         }
@@ -9049,7 +8956,7 @@
             }).join("");
             return '<div class="quest-completion-head"><span>完成度寶箱</span><strong>'+display+'%</strong></div>'+
                 '<div class="quest-completion-track" aria-hidden="true"><div class="quest-completion-fill" style="width:'+percent+'%;"></div></div>'+
-                '<div class="quest-completion-milestones">'+milestones+'</div>';
+                '<p class="quest-scroll-hint">左右滑動查看全部獎勵</p><div class="quest-completion-milestones" data-scroll-owner="x">'+milestones+'</div>';
         };
     }
 
@@ -9610,7 +9517,8 @@
     }
 
     function renderReforgeEquipmentPicker(entries,item){
-        return '<details class="v141-forge-picker v141-smelting-picker"><summary><span class="v141-smelting-art">'+(item?window.FourSymbolsItemSlot.art(item.icon,item):'<span class="v141-smelting-plus" aria-hidden="true">＋</span>')+'</span><span>'+(item?window.FourSymbolsItemSlot.name(item.name,item)+'<small>'+escapeHtml(TIER_META[reforgeModel.rarity(item)].label)+'</small>':'選擇裝備')+'</span><b>'+(item?'更換':'選擇')+'</b></summary><div class="v141-forge-options" role="group" aria-label="選擇可冶煉裝備">'+entries.map(entry=>'<button type="button" class="v141-forge-option" data-forge-value="'+escapeHtml(entry.item.v141Uid)+'" onclick="v141SelectReforgeItem(this.dataset.forgeValue)"><span class="v141-smelting-art">'+window.FourSymbolsItemSlot.art(entry.item.icon,entry.item)+'</span><span>'+window.FourSymbolsItemSlot.name(entry.item.name,entry.item)+'<small>'+escapeHtml(TIER_META[reforgeModel.rarity(entry.item)].label)+'・'+entry.source+'</small><small>'+statsHtml(entry.item.stats)+'</small></span></button>').join('')+(entries.length?'':'<p>目前沒有可冶煉裝備。</p>')+'<button type="button" onclick="this.parentElement.parentElement.open=false">取消選擇</button></div></details>';
+        const pending=!!synthesisState.pendingReforge;
+        return '<div class="v141-forge-picker v141-smelting-picker"><div class="v141-forge-options" role="group" aria-label="選擇冶煉裝備" data-scroll-owner="x">'+entries.map(entry=>'<button type="button" class="v141-forge-option '+(item?.v141Uid===entry.item.v141Uid?'selected':'')+'" aria-label="'+escapeHtml(entry.item.name+'・'+entry.source)+'" aria-pressed="'+(item?.v141Uid===entry.item.v141Uid)+'" '+(pending?'disabled':'')+' data-forge-value="'+escapeHtml(entry.item.v141Uid)+'" onclick="v141SelectReforgeItem(this.dataset.forgeValue)"><span class="v141-smelting-art">'+window.FourSymbolsItemSlot.art(entry.item.icon,entry.item)+'</span></button>').join('')+(entries.length?'':'<p>目前沒有可冶煉裝備</p>')+'</div></div>';
     }
     function renderReforgeTab(){
         const entries=allRefinableEquipment();
@@ -9619,7 +9527,7 @@
         const picker=renderReforgeEquipmentPicker(entries,item);
         if(!item){
             const reason=selected?canActuallyReforge(selected,true):synthesisState.reforgeUid?'裝備已失效，請重新選擇裝備。':'請先選擇裝備。';
-            return {content:'<div class="v141-synthesis-card v17358-reforge-card">'+picker+'</div>',footer:'<footer class="v141-smelting-footer"><p role="status">'+escapeHtml(reason)+'</p>'+(synthesisState.pendingReforge?'<button type="button" class="v141-synthesis-primary" onclick="v141ResolveReforge(false)">保留原效果</button>':'<button type="button" class="v141-synthesis-primary" disabled>開始冶煉</button>')+'</footer>'};
+            return {content:'<div class="v141-synthesis-card v17358-reforge-card">'+picker+'<div class="v141-reforge-empty"><span class="v141-smelting-plus" aria-hidden="true">＋</span><p>'+(entries.length?'選擇上方裝備':'取得可冶煉裝備後再試')+'</p></div></div>',footer:'<footer class="v141-smelting-footer"><p role="status">'+escapeHtml(reason)+'</p>'+(synthesisState.pendingReforge?'<button type="button" class="v141-synthesis-primary" onclick="v141ResolveReforge(false)">保留原效果</button>':'<button type="button" class="v141-synthesis-primary" disabled>開始冶煉</button>')+'</footer>'};
         }
         const slotCount=reforgeSlotCount(item),locks=normalizeReforgeLocks(item),lockSet=new Set(locks);
         const requestedTier=normalizeTierKey(synthesisState.reforgeMaterialTier);
@@ -9636,14 +9544,13 @@
         if(!Number.isFinite(gold)||gold<material.meta.reforgeGold){ missing.push('金幣不足，需求 '+material.meta.reforgeGold.toLocaleString('zh-TW')); }
         const tiers=TIER_ORDER.filter(key=>TIER_META[key].available!==false).map(key=>{
             const info=reforgeMaterialInfo(key);
-            return '<div class="v17358-reforge-tier '+(tier===key?'active':'')+'"><button type="button" class="v141-smelting-art" aria-label="'+escapeHtml(info.ore?.name||info.meta.label)+'獲取途徑" data-tier="'+key+'" onclick="v141ShowReforgeMaterialSource(this.dataset.tier)">'+(info.ore?window.FourSymbolsItemSlot.art(info.ore.icon,info.ore):'')+'</button><button type="button" class="v141-smelting-tier-choice" aria-pressed="'+(tier===key)+'" '+(pending?'disabled':'data-tier="'+key+'" onclick="v141SelectReforgeMaterialTier(this.dataset.tier)"')+'><b>'+info.meta.label+'</b><span class="'+(info.oreCount>=materialCost?'ok':'lack')+'">'+info.oreCount+' / '+materialCost+'</span></button></div>';
+            return '<div class="v17358-reforge-tier '+(tier===key?'active':'')+'"><button type="button" class="v141-smelting-tier-choice" aria-pressed="'+(tier===key)+'" '+(pending?'disabled':'data-tier="'+key+'" onclick="v141SelectReforgeMaterialTier(this.dataset.tier)"')+'><b>'+info.meta.label+'</b><span class="'+(info.oreCount>=materialCost?'ok':'lack')+'">'+info.oreCount+' / '+materialCost+'</span></button></div>';
         }).join('');
-        const affixes=currentEntries.map((affix,index)=>'<div class="v141-smelting-affix" data-reforge-slot="'+index+'"><b>'+escapeHtml(reforgeSlotText(affix))+'</b>'+(affix?'<button type="button" class="v17358-affix-lock '+(lockSet.has(index)?'locked':'')+'" aria-pressed="'+lockSet.has(index)+'" '+(pending?'disabled':'onclick="v141ToggleReforgeLock('+index+')"')+'>'+(lockSet.has(index)?'已鎖定':'鎖定')+'</button>':'')+'</div>').join('');
+        const affixes=currentEntries.map((affix,index)=>'<div class="v141-smelting-affix" data-reforge-slot="'+index+'"><span class="v141-reforge-slot-label">'+(index+1)+'</span>'+(pending?'<span class="v141-reforge-old-value">原：'+escapeHtml(reforgeSlotText(reforgeModel.slots(item)[index]))+'</span>':'')+'<b>'+(pending?'新：':'')+escapeHtml(reforgeSlotText(affix))+'</b>'+(affix?'<button type="button" class="v17358-affix-lock '+(lockSet.has(index)?'locked':'')+'" aria-label="'+(lockSet.has(index)?'解鎖':'鎖定')+'詞條 '+(index+1)+'" aria-pressed="'+lockSet.has(index)+'" '+(pending?'disabled':'onclick="v141ToggleReforgeLock('+index+')"')+'>'+(lockSet.has(index)?'已鎖定':'鎖定')+'</button>':'')+'</div>').join('');
         const actions=pending?'<div class="v141-reforge-actions"><button type="button" onclick="v141ResolveReforge(false)">保留原效果</button><button type="button" class="v141-synthesis-primary" onclick="v141ResolveReforge(true)">套用新效果</button></div>':'<button type="button" class="v141-synthesis-primary" '+(can?'':'disabled')+' onclick="v141StartReforge()">開始冶煉</button>';
         return {content:'<div class="v141-synthesis-card v17358-reforge-card">'+picker+
-            '<section class="v141-reforge-current"><h3>基本屬性</h3><div>'+statsHtml(item.stats)+'</div></section>'+
-            '<section class="v17358-reforge-lock-panel" aria-live="polite"><h3>'+(pending?'本次新效果':'可冶煉詞條')+'</h3><div class="v17358-reforge-lock-list">'+affixes+'</div><small>目前鎖定 '+locks.length+' / '+reforgeModel.maxLocks(item)+' 條；至少保留一槽重洗。</small></section>'+
-            '<section class="v17358-reforge-material"><h3>冶煉材料</h3><small>持有 / 本次需求・點圖示查看來源</small><div class="v17358-reforge-tiers">'+tiers+'</div><p>'+reforgeRangeText(tier,slotCount)+'・金幣需求 '+material.meta.reforgeGold.toLocaleString('zh-TW')+'</p><button type="button" class="v141-affix-info" onclick="v141ShowAffixInfo()">冶煉規則</button></section></div>',footer:'<footer class="v141-smelting-footer"><p class="v141-smelting-status" role="status">'+(pending?'材料與金幣已消耗，請選擇套用或保留。':escapeHtml(missing.join('；')||'材料足夠，可以開始冶煉。'))+'</p>'+actions+'</footer>'};
+            '<section class="v141-reforge-current"><span class="v141-reforge-portrait v141-smelting-art">'+window.FourSymbolsItemSlot.art(item.icon,item)+'</span><div class="v141-reforge-identity"><h3>'+window.FourSymbolsItemSlot.name(item.name,item)+'</h3><details class="v141-reforge-stats"><summary>屬性</summary><div>'+statsHtml(item.stats)+'</div></details><button type="button" class="v141-affix-info" onclick="v141ShowAffixInfo()">規則</button></div></section>'+
+            '<section class="v17358-reforge-lock-panel" aria-live="polite">'+(pending?'<h3>本次新效果</h3>':'')+'<div class="v17358-reforge-lock-list">'+affixes+'</div></section></div>',footer:'<footer class="v141-smelting-footer"><section class="v17358-reforge-material" '+(pending?'hidden':'')+' aria-label="選擇材料・持有與需求"><div class="v17358-reforge-tiers">'+tiers+'</div></section>'+(pending?'<p class="v141-smelting-status" role="status">已消耗材料與金幣，請選擇效果。</p>'+actions:(missing.length?'<p class="v141-smelting-status lack" role="status">'+escapeHtml(missing.join('；'))+'</p>':'')+'<div class="v141-reforge-purchase"><button type="button" class="v141-reforge-material-source" aria-label="'+escapeHtml(material.ore?.name||material.meta.label)+'獲取途徑" data-tier="'+tier+'" onclick="v141ShowReforgeMaterialSource(this.dataset.tier)"><span class="v141-smelting-art">'+(material.ore?window.FourSymbolsItemSlot.art(material.ore.icon,material.ore):'')+'</span><span>來源</span></button><span class="v141-reforge-cost">金幣 '+material.meta.reforgeGold.toLocaleString('zh-TW')+'<small>持有 '+Math.floor(gold).toLocaleString('zh-TW')+'</small></span>'+actions+'</div>')+'</footer>'};
     }
     window.v141ShowReforgeMaterialSource=function(tier){
         const info=reforgeMaterialInfo(tier||synthesisState.reforgeMaterialTier);
@@ -9795,15 +9702,19 @@
         if(!body){ return; }
         if(typeof window.v17346SyncFourElementSets==="function"){ window.v17346SyncFourElementSets(); }
         const forge=activeFeature==="forge";
+        const previousRail=forge&&synthesisState.forgeTab==="reforge"?body.querySelector(".v141-smelting-picker .v141-forge-options"):null;
+        const railScrollLeft=previousRail?.scrollLeft||0;
         const renderers=forge?{reforge:renderReforgeTab,socket:renderSocketTab}:{talisman:renderTalismanTab,fragment:renderFragmentTab,material:renderMaterialSynthesis};
         const tab=forge?synthesisState.forgeTab:synthesisState.tab;
         const rendered=renderers[tab]();
         const content=typeof rendered==="string"?rendered:rendered.content;
         const footer=typeof rendered==="string"?"":rendered.footer;
         const title=document.getElementById("homeFeatureModalTitle");
-        if(title&&forge){ title.textContent=tab==="reforge"?"冶煉":"鑲嵌"; }
-        const tabs=forge?'<div class="v141-synthesis-tabs v141-forge-tabs"><button type="button" class="'+(tab==="reforge"?'active':'')+'" onclick="v141SwitchForgeTab(\'reforge\')">冶煉</button><button type="button" class="'+(tab==="socket"?'active':'')+'" onclick="v141SwitchForgeTab(\'socket\')">鑲嵌</button></div>':renderSynthesisTabs();
-        body.innerHTML='<div class="v141-synthesis"><div class="v141-synthesis-wallet"><span>'+(forge?'鍛造':'合成')+'</span><b>金幣 '+Math.floor(gold).toLocaleString('zh-TW')+'</b></div>'+tabs+'<div class="v141-synthesis-body">'+content+'</div>'+footer+'</div>';
+        if(title&&forge){ title.textContent="鍛造"; }
+        const tabs=forge?'<div class="v141-synthesis-tabs v141-forge-tabs"><button type="button" class="'+(tab==="reforge"?'active':'')+'" '+(synthesisState.pendingReforge?'disabled':'')+' onclick="v141SwitchForgeTab(\'reforge\')">冶煉</button><button type="button" class="'+(tab==="socket"?'active':'')+'" '+(synthesisState.pendingReforge?'disabled':'')+' onclick="v141SwitchForgeTab(\'socket\')">鑲嵌</button></div>':renderSynthesisTabs();
+        body.innerHTML='<div class="v141-synthesis '+(forge&&tab==="reforge"?'v141-reforge-view':'')+'">'+(forge&&tab==="reforge"?'':'<div class="v141-synthesis-wallet"><span>'+(forge?'鍛造':'合成')+'</span><b>金幣 '+Math.floor(gold).toLocaleString('zh-TW')+'</b></div>')+tabs+'<div class="v141-synthesis-body">'+content+'</div>'+footer+'</div>';
+        const rail=forge&&tab==="reforge"?body.querySelector(".v141-smelting-picker .v141-forge-options"):null;
+        if(rail){rail.scrollLeft=railScrollLeft;}
     }
     window.v141RenderSynthesis=renderSynthesis;
     window.v141SwitchForgeTab=function(tab){
@@ -10062,7 +9973,7 @@
             activeFeature=type;
             const modal=document.getElementById("homeFeatureModal");
             const title=document.getElementById("homeFeatureModalTitle");
-            if(title){ title.textContent=type==="forge"?"冶煉":"合成"; }
+            if(title){ title.textContent=type==="forge"?"鍛造":"合成"; }
             if(modal){ modal.dataset.craftingFeature=type; modal.classList.add("show","v141-synthesis-modal"); window.FourSymbolsBottomNav?.syncContext(); }
             ensureEquipmentUids();
             renderSynthesis();

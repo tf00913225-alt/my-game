@@ -21,7 +21,7 @@ const root=process.cwd();
 const fixture=path.join(root,".ui-typography-mobile-smoke.html");
 const fileUrl="file://"+fixture.replace(/\\/g,"/");
 const css=[
-    "css/00-main.css","css/19-stage-v54-main-city-moderate-native-scale.css","css/22-stage-v78-character-inventory-core.css","css/23-stage-v77-inventory-detail-ui.css",
+    "css/00-main.css","css/19-stage-v54-main-city-moderate-native-scale.css","css/22-stage-v78-character-inventory-core.css","css/23-stage-v77-inventory-detail-ui.css","css/25-stage-v90-quest-interface-core.css",
     "css/31-v131-fix-batch.css","css/32-v131-patrol-appearance.css","css/33-v132-content-expansion.css",
     "css/35-v134-fixes.css","css/37-v139-rested-experience.css","css/38-v141-system-expansion.css",
     "css/42-v146-system-polish.css","css/48-v169-element-box-settings.css","css/49-v169-rpg-ui.css",
