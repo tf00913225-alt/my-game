@@ -64,6 +64,7 @@ try{
                 await captureStory();
                 if(ready.view.panel==='node-reward'&&ready.view.selectedNodeId==='c1_01'){assert.equal(ready.view.state.currentNodeId,'c1_02');assert.equal(ready.view.state.rewardClaims.c1_01,'ready');await capture('first-victory');}
                 const target=await guidePoint();
+                if(target.handler==="v169SwitchShopPage('equipment')")assert.equal(await client.eval('!!document.querySelector("#homeFeatureModal .v17345-equipment-shop")'),false,'fresh shop starts with the real potion category');
                 const offer=target.id==='chapter1TutorialArmorBuy'?await client.eval(`(()=>{const b=document.getElementById('chapter1TutorialArmorBuy');return {name:b.closest('[data-tutorial-offer]').querySelector('.v17346-shop-name').textContent.trim(),cost:Number(b.textContent.match(/([\d,]+)\s*金幣/)[1].replaceAll(',',''))};})()`):null;
                 await point(target);
                 if(offer){const bought=await observe(),receipt=bought.view.state.equipmentLessonPurchase,item=bought.inventory.find(i=>i.uid===receipt?.equipmentUid);assert.ok(receipt&&item,'fresh tutorial must make a real shop purchase');assert.equal(bought.gold,ready.gold-offer.cost);assert.equal(receipt.paidGold,offer.cost);assert.equal(item.name,offer.name);assert.equal(bought.view.state.grantedEquipmentUid,item.uid);purchases.push({kind:'lesson-armor',name:item.name,uid:item.uid,price:offer.cost,beforeGold:ready.gold,afterGold:bought.gold});}
@@ -148,6 +149,7 @@ try{
             let current=await observe();assert.equal(current.view.tutorial.active,false,'bounded five-lesson player guide');
             assert.ok(firstClaimed);assert.ok(lessonDefeats.c1_02&&lessonDefeats.c1_04,'both authored defeat lessons actually occurred');
             assert.equal(purchases.filter(p=>p.kind==='lesson-armor').length,1);assert.equal(current.view.state.rewardClaims.c1_05,'claimed','supplies were really claimed before practice, not granted after victory');
+            assert.ok(trace.some(action=>action.handler==="v169SwitchShopPage('equipment')"),'the player really selected the equipment shop category');
             assert.ok(current.potions.hpPotion10<current.view.state.onboarding.preparation.hpCount||current.potions.spPotion10<current.view.state.onboarding.preparation.spCount,'stage5 requires an original inventory or battle potion consumed after its claimed baseline');
             for(let n=1;n<=5;n++)assert.ok(current.view.state.completedNodes['c1_'+String(n).padStart(2,'0')]);
             if(current.view.panel==='node-reward')await tap('#adventurePage [onclick*="claimNodeReward"]');
@@ -162,7 +164,7 @@ try{
                         const status=await observe(),max=resource==='hp'?status.maxHP:status.maxSP;if(status[resource]>=max)break;
                         let item=await client.eval(`Array.from(document.querySelectorAll('#inventoryGrid [data-item-id]')).map(e=>e.dataset.itemId).find(id=>id.startsWith(${JSON.stringify(resource+'Potion')}))||null`);
                         if(!item){
-                            await tap('#mapInventoryOverlayClose');await tap('[aria-label="商店"]');
+                            await tap('#mapInventoryOverlayClose');await tap('[aria-label="商店"]');await tap('#homeFeatureModal [onclick="v169SwitchShopPage(\'potion\')"]');
                             const id=resource+'Potion30',button='button[onclick*="buyShopItem(\''+id+'\'"]';await reveal(button);
                             const transaction=await observe(),price=await client.eval(`Number(document.getElementById(${JSON.stringify('shopQuantity-'+id)}).dataset.unitPrice)`);
                             await tap(button);await wait(`document.querySelector('.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button:last-child')?.textContent==='確定購買'`,'normal shop confirmation');await tap('.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button:last-child');await dismiss();

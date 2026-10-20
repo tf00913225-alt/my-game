@@ -176,6 +176,16 @@ test('recovery guide chooses stocked SP when HP has a deficit but no HP potion',
     assert.equal(h.children.get('.adventure-guide-recovery').hidden,true);
 });
 
+test('the default potion shop requires the original equipment tab click before the lesson purchase',()=>{
+    const h=guideHarness(),modal=h.element(),tab=h.element(),offer=h.element();let tabs=0,bought=0;
+    h.c.battleActive=false;h.view.tutorial.requiredAction='equipment';h.view.tutorialProgress.equipmentNeedsPurchase=true;
+    h.targets.set('#homeFeatureModal.show',[modal]);h.targets.set('#homeFeatureModal [onclick="v169SwitchShopPage(\'equipment\')"]',[tab]);
+    tab.action=()=>{tabs++;h.targets.set('#homeFeatureModal.show .v17345-equipment-shop',[h.element()]);};offer.action=()=>{bought++;};
+    h.targets.set('#chapter1TutorialArmorBuy',[offer]);h.frame();assert.equal(tabs,0);assert.equal(bought,0,'guide does not switch tabs or purchase automatically');
+    assert.equal(h.dispatch('click',offer).stopped,true);assert.equal(h.dispatch('click',tab).stopped,false);assert.equal(tabs,1);
+    h.frame();assert.equal(h.dispatch('click',tab).stopped,true);assert.equal(h.dispatch('click',offer).stopped,false);assert.equal(bought,1);
+});
+
 test('pending battle potion permits the original ally target and blocks an enemy target',()=>{
     const h=guideHarness(),ally=h.element(),enemy=h.element();let used=0;
     h.c.pendingAction='__v143PotionTarget';h.c.actionReady=true;ally.action=()=>{used++;h.c.pendingAction=null;};

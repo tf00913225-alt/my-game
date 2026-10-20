@@ -101,6 +101,8 @@
 .adventure-node,.adventure-route-pip{position:absolute;left:var(--node-x);top:var(--node-y);transform:translate(-50%,-50%);}
 .adventure-node{z-index:3;width:54px;height:54px;min-height:44px;padding:0;border:0;color:#f8e3b7;background:transparent;cursor:pointer;}
 .adventure-node-icon{display:grid;place-items:center;width:29.56px;height:29.56px;margin:auto;border:1.17px solid #dfc58b;border-radius:50%;color:#f7d694;background:radial-gradient(circle at 35% 25%,#685438,#241d12);box-shadow:0 1.17px 3.89px #0009,0 0 4.67px #e6bd6b55;font:14.78px/1 "DFKai-SB","KaiTi",serif;}
+.adventure-node-icon svg{width:68%;height:68%;pointer-events:none;}
+.adventure-sheet-icon svg{display:block;width:22px;height:22px;}
 .adventure-node-copy{position:absolute;top:38.11px;left:50%;transform:translateX(-50%);display:block;width:max-content;max-width:105px;padding:1.17px 5.83px;background:linear-gradient(90deg,transparent,#111b16dd 18% 82%,transparent);text-shadow:0 0.78px 1.17px #000;}
 .adventure-node-copy strong{display:block;font:700 16px/1.2 "DFKai-SB","KaiTi",serif;white-space:nowrap;}
 .adventure-node:disabled{cursor:default;}

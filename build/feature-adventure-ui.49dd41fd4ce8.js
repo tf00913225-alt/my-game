@@ -87,6 +87,16 @@
         return '<svg class="adventure-road-layer" viewBox="0 0 1080 1920" preserveAspectRatio="none" aria-hidden="true">'+paths+'</svg>';
     }
 
+    function mapNodeIcon(type,done){
+        const paths=done?'<path d="m5 12 5 5L20 6"/>':
+            type==='boss'?'<path d="m5 3 3 5-2 3 2 7 4 3 4-3 2-7-2-3 3-5-1 9-6 5-6-5Z"/><path d="m8 11 2 2m6-2-2 2m-4 4h4"/>':
+            type==='rest'?'<path d="M13 3c2 5-1 5 2 8 2-2 2-3 2-4 6 8 1 13-5 13S3 14 7 9c0 4 3 4 3 1 0-3 3-4 3-7Z"/><path d="m4 21 16-2M4 19l16 2"/>':
+            type==='chest'?'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M3 12h18M7 7V4h10v3M10 11v5h4v-5"/>':
+            type==='event'||type==='objective'?'<path d="M8 8a4 4 0 1 1 6 3c-2 1-2 2-2 4m0 3v1"/>':
+            '<path d="m4 3 13 12-2 2L3 4Zm16 0L7 15l2 2L21 4ZM13 16l5 5m-2-2 4-4M11 16l-5 5m2-2-4-4"/>';
+        return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+paths+'</svg>';
+    }
+
     function mapNodeButton(node,status,major,selected){
         if(status==="hidden"){return "";}
         const style='style="--node-x:'+Number(node.x||50)+'%;--node-y:'+Number(node.y||50)+'%;"';
@@ -97,7 +107,7 @@
         return '<button type="button" data-node-id="'+attr(node.id)+'" class="'+classes+'" '+style+
             (locked?' disabled':' onclick="FourSymbolsAdventure.openNode(\''+attr(node.id)+'\')"')+
             ' aria-label="第'+attr(node.stage)+'關 '+attr(node.title)+'，'+attr(statusLabel(status))+'">'+
-            '<span class="adventure-node-icon" aria-hidden="true">'+(done?'✓':node.type==='battle'||node.type==='elite'?'⚔':esc(nodeGlyph(node.type,status)))+'</span>'+
+            '<span class="adventure-node-icon" aria-hidden="true">'+mapNodeIcon(node.type,done)+'</span>'+
             (selected?'<span class="adventure-current-position" aria-hidden="true"></span>':'')+
             '<span class="adventure-node-copy"><strong>'+esc(node.stage+'. '+node.title)+'</strong></span></button>';
     }
@@ -130,7 +140,7 @@
         const scene=CONTENT().storyPresentation.scenes[node.scene]||CONTENT().storyPresentation.scenes.road;
         return '<aside class="adventure-node-sheet is-'+esc(status)+'" aria-live="polite">'+
             '<img class="adventure-sheet-preview" src="'+attr(scene)+'" alt="'+attr(node.title)+'場景">'+
-            '<div class="adventure-sheet-content"><div class="adventure-sheet-title"><span class="adventure-sheet-icon" aria-hidden="true">'+esc(nodeGlyph(node.type,status))+'</span><h2>'+esc(node.title)+'</h2><small>'+esc(labels[node.type]||'章節節點')+'</small></div>'+
+            '<div class="adventure-sheet-content"><div class="adventure-sheet-title"><span class="adventure-sheet-icon" aria-hidden="true">'+mapNodeIcon(node.type,false)+'</span><h2>'+esc(node.title)+'</h2><small>'+esc(labels[node.type]||'章節節點')+'</small></div>'+
             '<p>'+esc(node.detail||node.subtitle||'沿山路前行，探訪江湖。')+'</p>'+
             '<div class="adventure-sheet-actions"><div class="adventure-reward-preview" aria-label="關卡獎勵">'+mapRewardPreview(node)+'</div><details class="adventure-stage-picker" id="adventureStagePicker"><summary aria-label="選擇已解鎖關卡">關卡一覽 ▴</summary><div class="adventure-stage-list" data-scroll-owner="y">'+replay+options+'</div></details>'+
             '<button type="button" class="adventure-button primary" aria-label="'+attr(action+'第 '+node.stage+' 關 · '+node.title)+'" '+(disabled?'disabled':'onclick="FourSymbolsAdventure.activateSelectedNode()"')+'>'+action+' <span aria-hidden="true">›</span></button></div></div></aside>';
