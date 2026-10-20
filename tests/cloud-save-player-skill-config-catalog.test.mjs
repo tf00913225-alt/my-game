@@ -68,6 +68,8 @@ test('only sealed original loadout delegate readers preserve normalized v1 data 
             ['index.html',s=>s.replace('id="autoSettingsActionSelect"','id="autoSkillPlayer2"')],
             ['index.html',s=>s+'\n<div id="player2AutoSettingsCard"></div>\n'],
             [main,s=>s+'\ndocument.createElement("div").id="player2AutoSettingsCard";\n'],
+            [main,s=>s+'\ndocument.body.insertAdjacentHTML("beforeend",\'<div id="player2AutoSettingsCard"></div><select id="autoSkillPlayer2"></select>\');\n'],
+            [main,s=>s+'\ndocument.body.innerHTML+=`<div id="player2AutoSettingsCard"></div><select id="autoSkillPlayer2"></select>`;\n'],
             ['js/51-v169-rpg-ui.js',s=>s+'\ndocument.createElement("select").id="autoSkillPlayer2";\n'],
             [main,s=>s.replace(/(function populateAutoSkillOptions2\(\)\{[\s\S]*?)if\(!card\)\{/, '$1if(false){')],
             [main,s=>s.replace(/(function populateAutoSkillOptions2\(\)\{[\s\S]*?)if\(!select\)\{/, '$1if(false){')],

@@ -115,7 +115,10 @@ export function skillLoadoutRuntimeSemanticDigest(root){
  const legacyReads={player2AutoSettingsCard:0,player2AutoSettingsTitle:0,autoSkillPlayer2:0};
  function checkLegacyReads(node,parent){
   if(!node||typeof node!=='object')return;
-  if(node.type==='Literal'&&Object.hasOwn(legacyReads,node.value)){
+  const text=node.type==='Literal'&&typeof node.value==='string'?node.value:
+   node.type==='TemplateElement'?node.value.cooked??node.value.raw:null;
+  if(text!==null&&Object.keys(legacyReads).some(id=>text.includes(id))){
+   if(node.type!=='Literal'||!Object.hasOwn(legacyReads,node.value))throw Error('Retained loadout secondary DOM producer changed.');
    if(parent?.type!=='CallExpression'||parent.callee?.type!=='Identifier'||parent.callee.name!=='$'||
     parent.arguments.length!==1||parent.arguments[0]!==node)throw Error('Retained loadout secondary DOM source changed.');
    legacyReads[node.value]++;
