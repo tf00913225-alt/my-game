@@ -11,9 +11,9 @@ const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
-const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,chargeRecoveryAuditAssembly,recoveryAuditQueryShapes,
+const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,chargeRecoveryAuditAssembly,admitRecoveryAuditAssemblyBytes,recoveryAuditQueryShapes,
     prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
-    inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
+    inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,indexRawProofPayload,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
 const {createHash}=require("node:crypto");
 const {createRecoveryCandidateStorage}=require("./recovery-candidate-storage");
 
@@ -573,7 +573,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         if(component==="forest-ticket"){
             patrolEvidence.beginEvidenceAttempt(kernel);
             const ticket=await seed.get(root.collection("patrolTickets").doc(sourceId));
-            await patrolEvidence.verifyRetainedTicket(kernel,root,uid,records.account,ticket,revision);
+            return patrolEvidence.verifyRetainedTicket(kernel,root,uid,records.account,ticket,revision);
         }else if(component==="exp-allocation"){
             const operation=await kernel.get(root.collection("operations").doc(sourceId));
             if(!operation.exists||operation.id!==sourceId||operation.get("operationId")!==sourceId||operation.get("kind")!=="exp-allocation")
@@ -696,7 +696,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         const inventory=inspectInventoryState(input.inventoryState,run,namespaces);
         admitProofInventory(inventory,namespaces);
         if(inventory.stateSha256!==binding.inventoryStateSha256)fail("data-loss","Complete raw capture inventory binding differs.");
-        const {inventoryPages,rawReceipts,rawChunks}=input;
+        const {inventoryPages,rawReceipts}=input;let rawChunks=input.rawChunks;
         if(!Array.isArray(inventoryPages)||inventoryPages.length>317||!Array.isArray(rawReceipts)||
            rawReceipts.length<1||rawReceipts.length>inventory.capturedCount||!Array.isArray(rawChunks)||
            rawChunks.length>rawReceipts.length*PATROL_PROOF_LIMITS.chunks)
@@ -704,6 +704,20 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         for(const entry of inventoryPages)inventoryExact(entry,["id","row"],"raw inventory page entry");
         if(assemblyBudget)reserveRecoveryAuditRawInputs(assemblyBudget,[...inventoryPages.map(entry=>entry.row?.payloadBytes),
             ...rawChunks.map(entry=>entry?.row?.payloadBytes)]);
+        let privateChunkBytes=0;
+        if(segmented){
+            for(const entry of rawChunks){
+                const bytes=entry?.row?.payloadBytes;
+                if(!Buffer.isBuffer(bytes)||!bytes.length||bytes.length>PATROL_PROOF_LIMITS.chunkBytes)
+                    fail("data-loss","Segmented raw chunk bounds differ.");
+                privateChunkBytes+=bytes.length;
+            }
+            admitRecoveryAuditAssemblyBytes(assemblyBudget,privateChunkBytes);
+            rawChunks=rawChunks.map(entry=>{
+                chargeRecoveryAuditAssembly(assemblyBudget,"bytes",entry.row.payloadBytes.length);
+                return {id:entry.id,row:{...entry.row,payloadBytes:Buffer.from(entry.row.payloadBytes)}};
+            });
+        }
         const index=inspectInventoryPages(inventoryPages,run,inventory,namespaces,assemblyBudget);
         const state=inspectProofState(input.rawState,run,inventory);
         if(state.schemaVersion!==3||rawReceipts.length!==state.nextSequence-1)fail("data-loss","Complete raw capture state differs.");
@@ -733,13 +747,14 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             const bytes=Buffer.concat(parts);
             if(bytes.length!==receipt.payloadByteLength||inventoryHash(bytes)!==receipt.payloadSha256)
                 fail("data-loss","Forest proof complete payload differs.");
-            const payload=decodeProofPayload(bytes,assemblyBudget,assemblyBudget!==undefined);
+            const indexed=segmented?indexRawProofPayload(bytes,assemblyBudget,assemblyBudget!==undefined):null;
+            const payload=indexed?indexed.payload:decodeProofPayload(bytes,assemblyBudget,assemblyBudget!==undefined);
             checkRawCapsule(payload,run,inventory,index,namespaces,3,undefined,undefined,receipt,assemblyBudget);
             for(const row of payload.documents){
                 if(paths.has(row.path))fail("data-loss","Complete raw capture has duplicate documents.");
                 if(assemblyBudget)recoveryAuditAssemblyUsage(assemblyBudget);
                 paths.add(row.path);
-                if(segmented)locators.set(row.path,{operationId:receipt.operationId,offset:locators.size-receipt.startOrdinal});
+                if(segmented)locators.set(row.path,{operationId:receipt.operationId,...indexed.spans[locators.size-receipt.startOrdinal]});
                 else documents.push(row);
             }
             if(segmented)capsules.set(receipt.operationId,Object.freeze({...receipt,chunkSha256s:Object.freeze(receipt.chunkSha256s.slice())}));
@@ -757,25 +772,26 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         // One private sealed-capture reader. Keep only metadata locations after
         // validating the entire original chain; never expose this capability.
         const chunkRows=new Map(rawChunks.map(entry=>[entry.id,entry.row]));
-        let resident=null,residentId=null;
-        const metrics={capsuleDecodes:ordered.length,maxResidentCapsuleBytes:Math.max(...ordered.map(row=>row.payloadByteLength))};
-        const release=()=>{resident=null;residentId=null;};
+        const metrics={capsuleDecodes:ordered.length,rowDecodes:0,privateChunkBytes,copyChargedBytes:privateChunkBytes,
+            initialHashCheckedBytes:2*privateChunkBytes,rowSpanHashBytes:0,
+            maxResidentCapsuleBytes:Math.max(...ordered.map(row=>row.payloadByteLength))};
+        const release=()=>{}; // No decoded row/capsule is retained by this locator.
         const read=path=>{
             const location=locators.get(path);if(!location)return null;
-            if(residentId!==location.operationId){
-                release();const receipt=capsules.get(location.operationId),parts=[];
-                for(let number=0;number<receipt.chunkSha256s.length;number++)parts.push(inspectCapsuleChunk(
-                    chunkRows.get(receipt.operationId+"_"+String(number).padStart(2,"0")),number,receipt,run,3));
-                const bytes=Buffer.concat(parts);
-                if(bytes.length!==receipt.payloadByteLength||inventoryHash(bytes)!==receipt.payloadSha256)
-                    fail("data-loss","Segmented raw payload changed.");
-                resident=decodeProofPayload(bytes,assemblyBudget);
-                checkRawCapsule(resident,run,inventory,index,namespaces,3,undefined,undefined,receipt,assemblyBudget);
-                residentId=location.operationId;metrics.capsuleDecodes++;
+            const receipt=capsules.get(location.operationId),parts=[];
+            for(let number=0;number<receipt.chunkSha256s.length;number++){
+                const bytes=chunkRows.get(receipt.operationId+"_"+String(number).padStart(2,"0")).payloadBytes;
+                const start=Math.max(0,location.start-number*PATROL_PROOF_LIMITS.chunkBytes),
+                    end=Math.min(bytes.length,location.start+location.length-number*PATROL_PROOF_LIMITS.chunkBytes);
+                if(end>start)parts.push(bytes.subarray(start,end));
             }
-            const row=resident.documents[location.offset];
+            chargeRecoveryAuditAssembly(assemblyBudget,"bytes",location.length);
+            const bytes=Buffer.concat(parts);
+            if(bytes.length!==location.length||inventoryHash(bytes)!==location.sha256)fail("data-loss","Segmented raw row span differs.");
+            metrics.rowSpanHashBytes+=bytes.length;
+            const row=decodeProofPayload(bytes,assemblyBudget);metrics.rowDecodes++;
             if(row?.path!==path)fail("data-loss","Segmented raw locator differs.");
-            return row;
+            proofMembership(path,row,index,namespaces,assemblyBudget);return row;
         };
         return {index,namespaces:sealedNamespaces,read,release,metrics};
     }
@@ -1070,7 +1086,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         const receiptById=await recoveryIndex(receipts,doc=>{const row=doc.data();return segmentedScopes.has(tx)?{grantId:row.grantId,operationId:row.operationId,creditedToCharacter:row.creditedToCharacter}:row;});
         const verifiedPatrolOperations=new Set(),ticketProofs=new Map();
         for await(const doc of recoveryRows(patrolTickets)){
-            const proof=await patrolEvidence.verifyRetainedTicket(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
+            const proof=segmentedScopes.has(tx)?await verifyProofUnit(tx,recoveryUnit(tx),root,uid,records,expectedRevision,"forest-ticket",doc.id):
+                await patrolEvidence.verifyRetainedTicket(tx,root,uid,records.account,doc,expectedRevision);
             ticketProofs.set(doc.id,{stateSha256:snapshotDigest(proof.state),status:proof.state.status,terminalOperationId:proof.state.terminalOperationId});
             for(const operationId of proof.verifiedOperationIds)verifiedPatrolOperations.add(operationId);
         }
@@ -1103,7 +1120,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         await patrolEvidence.verifyCurrentEvidence(recoveryUnit(tx),root,uid,records.account,expectedRevision);
         await modeEvidence.verifyCurrentEvidence(recoveryUnit(tx),root,uid,records.account,records,expectedRevision);
         for await(const doc of recoveryRows(modeSources)){
-            await modeEvidence.verifyRetainedSource(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
+            if(segmentedScopes.has(tx))await verifyProofUnit(tx,recoveryUnit(tx),root,uid,records,expectedRevision,"simulated-ad-source",doc.id);
+            else await modeEvidence.verifyRetainedSource(tx,root,uid,records.account,doc,expectedRevision);
         }
         const verifiedModeOperations=new Set();
         for await(const doc of recoveryRows(modeEvents)){
@@ -1173,7 +1191,9 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                         {archiveSnap,snapshotSnap,approvalSnap,operationSnap:doc,auditSnap,grantSnap,ledgerSnap},original);
                     verifiedRecoveryIDs.add(doc.id);
                 }else{
-                    await sourceEvidence.verifyRetainedOperation(recoveryUnit(tx),root,uid,records.account,doc);
+                    if(segmentedScopes.has(tx)&&value.kind==="additional-character-sources")
+                        await verifyProofUnit(tx,recoveryUnit(tx),root,uid,records,expectedRevision,"additional-character-sources",doc.id);
+                    else await sourceEvidence.verifyRetainedOperation(recoveryUnit(tx),root,uid,records.account,doc);
                 }
             }
         }
@@ -1241,7 +1261,9 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                 creditLedgerCount++;
                 continue; // Full credit proof is checked below.
             }
-            await verifyDebitRecoveryEvidence(recoveryUnit(tx),root,uid,expectedRevision,records,doc,ledger,receipt);
+            if(segmentedScopes.has(tx)&&ledger.kind==="exp-allocation")
+                await verifyProofUnit(tx,recoveryUnit(tx),root,uid,records,expectedRevision,"exp-allocation",doc.id);
+            else await verifyDebitRecoveryEvidence(recoveryUnit(tx),root,uid,expectedRevision,records,doc,ledger,receipt);
         }
         if(creditLedgerCount!==archivedClaims.size){
             fail("data-loss","Credit ledger inventory differs from the recovery archive.");
@@ -1564,7 +1586,12 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             const shape=matches[0],selected=[];
             for(const id of namespaces.get(root.path+"/"+shape.name)){
                 const path=root.path+"/"+shape.name+"/"+id,doc=snapshot(path);
-                if(shape.filter(doc.data()))selected.push(doc);
+                if(shape.filter(doc.data())){
+                    if(shape.order&&!Number.isSafeInteger(doc.get(shape.order)))fail("data-loss","Segmented query sequence is invalid.");
+                    selected.push(doc);
+                    if(shape.order){selected.sort((a,b)=>b.get(shape.order)-a.get(shape.order)||Buffer.compare(Buffer.from(b.id),Buffer.from(a.id)));
+                        if(selected.length>shape.maximum)selected.pop();}
+                }
                 if(!shape.order&&selected.length===shape.maximum)break;
             }
             if(shape.order){
@@ -1585,6 +1612,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             return Object.freeze({get:async reference=>{
                 if(++reads>PATROL_PROOF_LIMITS.kernelReads)fail("resource-exhausted","Segmented original proof read budget exceeded.");
                 const row=await tracked(reference),docs=row.docs??[row];
+                if(row.docs)reads+=Math.max(1,row.size)-1;
+                if(reads>PATROL_PROOF_LIMITS.kernelReads)fail("resource-exhausted","Segmented original proof read budget exceeded.");
                 for(const doc of docs)if(doc.exists&&!paths.has(doc.ref.path)){
                     paths.add(doc.ref.path);typedBytes+=capture.index.get(doc.ref.path).typedDataByteLength;
                     if(typedBytes>PATROL_PROOF_LIMITS.bytes)fail("resource-exhausted","Segmented proof resident data exceeds2MiB.");
@@ -1618,7 +1647,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             const selected=await tx.get(root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(auditId));
             if(!selected.exists||!encodeProofPayload(selected.data(),budget).equals(encodeProofPayload(input.run,budget)))
                 fail("data-loss","Segmented selected run differs.");
-            const run=selected.data(),recorded=timestampPair(run.createdAt);
+            const run=selected.data();
             view.auditControl={auditId,epoch:run.epoch,sessionId:run.sessionId,sessionRevision:run.sessionRevision,
                 recordedAt:run.createdAt};
             const envelopeSnap=await tx.get(view.save),archiveSnap=await tx.get(root.collection("recoveryArchives").doc(String(revision))),
@@ -1646,7 +1675,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             const verified=await verifyRecoveryRights(tx,root,uid,revision,records,{...collections,modeEvents,patrolModeEvents,patrolOwnedModeEvents,patrolOperationIds});
             for await(const doc of recoveryRows(view.rows("modeTimeEvents"))){
                 if(doc.get("schemaVersion")===1&&doc.get("modeChanged")===false)
-                    await modeEvidence.verifyRetainedNonValueEvent(recoveryUnit(tx),root,uid,records.account,doc,revision);
+                    await verifyProofUnit(tx,recoveryUnit(tx),root,uid,records,revision,"mode-nonvalue-event",doc.id);
                 else if(!(doc.get("schemaVersion")===1&&doc.get("modeChanged")===true)&&
                     !(doc.get("schemaVersion")===2&&doc.get("resultOwner")==="forest-patrol-settlement"))
                     fail("data-loss","An unclassified private mode event blocks segmented proof.");
@@ -1941,7 +1970,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         }
     }
     if(maintenanceMode)return Object.freeze({maintain});
-    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,verifyRawRecoveryAuditCandidate,verifySegmentedRawRecoveryProof,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,captureProof,captureRawInventory});
+    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,verifyRawRecoveryAuditCandidate,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,captureProof,captureRawInventory});
 }
 
 module.exports={createCanonicalCurrentRecovery,createCanonicalRecoveryMaintenance,inspectRecoveryAuditFence,

@@ -644,14 +644,15 @@ function candidateQueryDb(db){
     return {collection:name=>query(db.collection(name)),doc:path=>reference(db.doc(path))};
 }
 
-function privateRawInspector(f,which='inspectCompleteRawCapture'){
+function privateRawInspector(f,which='inspectCompleteRawCapture',artifactHelper){
     const filename=require.resolve('../functions/src/canonical-current-recovery'),compiled=new Module(filename);
     compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+    const native=compiled.require.bind(compiled);if(artifactHelper)compiled.require=name=>name==='./recovery-audit-artifact'?artifactHelper:native(name);
     const original=readFileSync(filename,'utf8'),needle='return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact';
     assert.equal(original.split(needle).length,2);
     // Test-only lexical access to the private pure kernel. Production exports,
     // factory methods and SDK entry points remain unchanged.
-    compiled._compile(original.replace(needle,'return Object.freeze({inspectCompleteRawCapture,verifyCandidateStrict,restoreCurrent,verifyRecoveryAuditArtifact'),filename);
+    compiled._compile(original.replace(needle,'return Object.freeze({inspectCompleteRawCapture,verifyCandidateStrict,verifySegmentedRawRecoveryProof,restoreCurrent,verifyRecoveryAuditArtifact'),filename);
     assert.equal(Object.hasOwn(f.recovery,'inspectCompleteRawCapture'),false);
     return compiled.exports.createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)})[which];
 }
@@ -1174,8 +1175,8 @@ test('raw capture requires exact SDK source versions and typed bytes, never a mi
 test('segmented strict proof streams sealed raw capsules through original complete ticket units without candidate authority',async t=>{
     for(const options of [{battles:2,three:true},{battles:20,three:false,adStatus:'abandoned'}]){
         const f=await fixture(options),material=await completeRawMaterial(f),before=copy([...f.h.data]),input=JSON.stringify(material),writes=f.h.writes;
-        const owner=createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db),runProtected:()=>{throw Error('segmented proof cannot enter SDK');}});
-        const result=await owner.verifySegmentedRawRecoveryProof(material);
+        assert.equal(Object.hasOwn(f.recovery,'verifySegmentedRawRecoveryProof'),false);
+        const result=await privateRawInspector(f,'verifySegmentedRawRecoveryProof')(material);
         assert.equal(result.segmentedProofValid,true);assert.equal(result.documentCount,inventoryOrder(f).length);
         for(const flag of ['candidateProofValid','authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
         assert(result.residentUsage.maxResidentCapsuleBytes<=2*1024*1024);assert(result.residentUsage.maxUnitReads<=60);
@@ -1183,4 +1184,60 @@ test('segmented strict proof streams sealed raw capsules through original comple
         assert.equal(f.h.writes,writes);assert.deepEqual([...f.h.data],before);assert.equal(JSON.stringify(material),input);
         t.diagnostic(JSON.stringify({battles:options.battles,...result.residentUsage,...result.assemblyUsage}));
     }
+});
+
+
+test('sole raw typed codec derives exact row spans through Unicode, escaped framing and nested same-name values',()=>{
+    const helper=require('../functions/src/recovery-audit-artifact');
+    const documents=[{path:'serverUsers/中文😀/operations/a',exists:true,updateTime:{seconds:1700000000,nanoseconds:999999999},
+        data:{documents:[{documents:'["documents",["array",['}],unicode:'中é😀𐐷',escape:'quote" slash\\ tab\t newline\n',same:'["object",['}},
+        {path:'serverUsers/中文😀/operations/b',exists:true,updateTime:{seconds:0,nanoseconds:1},data:{value:-0,nested:[null,false,'文']}}];
+    const payload={before:'["documents",["array",[',documents,schemaVersion:3,zzz:{documents:documents[0]}};
+    const bytes=helper.encodeProofPayload(payload),saved=Buffer.from(bytes),budget=helper.createRecoveryAuditAssemblyBudget();
+    const indexed=helper.indexRawProofPayload(bytes,budget);assert.deepEqual(helper.encodeProofPayload(indexed.payload),bytes);
+    assert.equal(indexed.spans.length,documents.length);let previous=0;
+    for(const [i,span] of indexed.spans.entries()){
+        assert(span.start>=previous);previous=span.start+span.length;
+        const raw=bytes.subarray(span.start,previous);assert.deepEqual(raw,helper.encodeProofPayload(documents[i]));
+        assert.deepEqual(helper.encodeProofPayload(helper.decodeProofPayload(raw)),raw);
+        assert.equal(require('node:crypto').createHash('sha256').update(raw).digest('hex'),span.sha256);
+    }
+    assert.deepEqual(bytes,saved);assert(helper.recoveryAuditAssemblyUsage(budget).bytes>bytes.length);
+    for(const invalid of [Buffer.concat([bytes,Buffer.from(' ')]),Buffer.from(bytes.toString().replace('中文','\\u4e2d文')),
+        helper.encodeProofPayload({...payload,schemaVersion:2})])assert.throws(()=>helper.indexRawProofPayload(invalid),/encoding|span shape/);
+});
+
+test('segmented private proof rejects semantic orphans, lost economic pairs and contradictory absences across sealed capsules',async()=>{
+    const faults=[
+        h=>h.data.set(h.root+'/operations/unknown-segmented-op001',{schemaVersion:1,ownerUid:h.uid,operationId:'unknown-segmented-op001',kind:'future-unknown-kind'}),
+        h=>h.data.set(h.root+'/recoveryAudits/unknown-segmented-row',{kind:'unclassified-retained-data',ownerUid:h.uid}),
+        h=>{const path=[...h.data.keys()].find(path=>path.startsWith(h.root+'/patrolSettlements/'));const id=path.split('/').at(-1);
+            h.data.delete(h.root+'/operations/'+id);h.data.delete(h.root+'/ledgerEntries/'+id);},
+        h=>{const id=[...h.data.keys()].find(path=>path.startsWith(h.root+'/patrolSettlements/')).split('/').at(-1);
+            h.data.set(h.root+'/grantOperations/'+id,{schemaVersion:1,ownerUid:h.uid});}
+    ];
+    for(const beforeAudit of faults){const f=await fixture({battles:2,three:false,beforeAudit}),material=await completeRawMaterial(f);
+        await unchanged(f,()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof')(material));}
+    const f=await fixture({battles:2,three:true}),base=await completeRawMaterial(f);
+    for(const mutate of [m=>{m.rawChunks.shift();},m=>{m.rawReceipts[1].row.previousReceiptSha256='f'.repeat(64);},
+        m=>replaceLastRawPayload(m,p=>{p.documents[0].path=p.documents.at(-1).path;}),
+        m=>replaceLastRawPayload(m,p=>{p.documents[0].updateTime.nanoseconds++;})]){
+        const m=copy(base);mutate(m);await unchanged(f,()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof')(m));
+    }
+});
+
+test('segmented row reads recheck original chunk seals and charge one sticky whole-lifecycle budget',async()=>{
+    const f=await fixture({battles:2,three:true}),base=await completeRawMaterial(f),helper=require('../functions/src/recovery-audit-artifact');
+    let builds=0,token;const tokens=new Set(),wrapped={...helper,createRecoveryAuditAssemblyBudget:()=>{builds++;return token=helper.createRecoveryAuditAssemblyBudget();},
+        chargeRecoveryAuditAssembly:(budget,...args)=>{tokens.add(budget);return helper.chargeRecoveryAuditAssembly(budget,...args);}};
+    await privateRawInspector(f,'verifySegmentedRawRecoveryProof',wrapped)(copy(base));assert.equal(builds,1);assert.deepEqual([...tokens],[token]);
+    const material=copy(base);let scheduled=false;
+    const mutation={...helper,indexRawProofPayload:(...args)=>{const result=helper.indexRawProofPayload(...args);
+        if(!scheduled){scheduled=true;queueMicrotask(()=>{material.rawChunks[0].row.payloadBytes[100]^=1;});}return result;}};
+    await unchanged(f,()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof',mutation)(material),/chunk differs|payload changed/);
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);
+    compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+    const original=readFileSync(filename,'utf8');assert(original.includes('nodes:16000000'));
+    compiled._compile(original.replace('nodes:16000000','nodes:200000'),filename);
+    await unchanged(f,()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof',compiled.exports)(copy(base)),/nodes budget exceeded/);
 });
