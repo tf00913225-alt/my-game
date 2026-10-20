@@ -3,22 +3,30 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {spawn,spawnSync} from 'node:child_process';
+import {once} from 'node:events';
 import test from 'node:test';
 import http from 'node:http';
 import {waitJson,observeChromeStartup,readProcWindow,observeProcPageWait} from '../.github/scripts/runtime-browser-qa-support.mjs';
 
 test('blocked proc metadata cannot block the foreground DevTools deadline',async()=>{
+    const workerCreated=once(process,'worker');
     const collector=observeProcPageWait('/unused',{timeoutMs:30,workerSource:'Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,3000);'});
+    const [worker]=await workerCreated;
+    const workerExited=once(worker,'exit');
     const server=http.createServer((req,res)=>setTimeout(()=>res.end('[]'),40));
     await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
-    const start=Date.now();
+    const start=Date.now();let watchdog;
     try{
         await assert.rejects(waitJson('http://127.0.0.1:'+server.address().port+'/json/list',{timeoutMs:10}),error=>error.code==='ETIMEDOUT');
         assert.ok(Date.now()-start<1000,'metadata must not hold the launch deadline');
         await new Promise(resolve=>setTimeout(resolve,40));
         assert.equal(collector.evidence.status,'timeout');
         assert.ok(Number.isFinite(collector.evidence.settledAfterMs));
-    }finally{collector.stop('test-finished');server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
+        await Promise.race([workerExited,new Promise((_,reject)=>{
+            watchdog=setTimeout(()=>reject(new Error('timed-out metadata worker did not exit')),1000);
+        })]);
+        assert.equal(worker.threadId,-1,'timeout must terminate the worker, not only change evidence status');
+    }finally{clearTimeout(watchdog);collector.stop('test-finished');server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
 });
 
 test('proc metadata capture bounds bytes and preserves denial/missing evidence',()=>{
