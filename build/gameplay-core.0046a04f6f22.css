@@ -4062,9 +4062,21 @@
     font-size:20px;
     line-height:28px;
 }
+#game-stage #battlePage .battle-status-detail-portrait{
+    height:160px;
+    margin:0 auto 10px;
+    background-size:contain;
+    background-position:center bottom;
+    background-repeat:no-repeat;
+    display:grid;
+    place-items:center;
+    color:var(--ui-gold,#c89a48);
+    font-size:64px;
+    pointer-events:none;
+}
 #game-stage #battlePage .battle-status-detail-core{
     display:grid;
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap:6px 10px;
     padding:9px 10px;
     border:1px solid rgba(188,145,75,.45);
@@ -4073,6 +4085,7 @@
     font-size:13px;
     line-height:1.35;
 }
+#game-stage #battlePage .battle-status-detail-core > span{min-width:0;overflow-wrap:anywhere;}
 #game-stage #battlePage .battle-status-detail-panel section{margin-top:12px;}
 #game-stage #battlePage .battle-status-detail-panel h4{
     margin:0 0 6px;
