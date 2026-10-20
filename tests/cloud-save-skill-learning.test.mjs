@@ -113,6 +113,12 @@ test('retained v1 factory is explicit and semantic seal ignores presentation but
  assert.equal(digest,skillLearningRuleSemanticDigest('/* changed packaging only */\n'+source.replace('"use strict";','"use strict";\n\n')));
  assert.notEqual(digest,skillLearningRuleSemanticDigest(source.replace('base*(cross?2:1)','base*(cross?3:1)')));
  assert.notEqual(digest,skillLearningRuleSemanticDigest(source.replace('2:1,3:1','2:2,3:1')));
+ for(const changed of [source.replace('const createRules=createRulesV1;','createRulesV1=function(){return {}};\nconst createRules=createRulesV1;'),
+  source.replace('return createRulesV1(catalog,damageSkillIds);','return createRules(catalog,damageSkillIds);'),
+  source.replace('return createRulesV1(catalog,damageSkillIds);','return createRulesV1(catalog,[]);'),
+  source.replace('const getRulesForVersion=function','let getRulesForVersion=function')]){
+  assert.throws(()=>skillLearningRuleSemanticDigest(changed),/binding|selector|missing/);
+ }
  assert.throws(()=>core.getRulesForVersion('v2',{},[]),RangeError);
  assert.throws(()=>core.getRulesForVersion('v1\n',{},[]),RangeError);
  assert.equal(verifySkillLearningPolicy(fileURLToPath(new URL('../',import.meta.url))),digest);

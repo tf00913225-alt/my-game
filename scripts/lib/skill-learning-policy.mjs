@@ -16,11 +16,30 @@ export function skillLearningRuleSemanticDigest(source){
   node.expression.callee.type==='FunctionExpression'&&node.expression.callee.id?.name==='installSkillProgressionCore');
  if(program.body.length!==1||!wrapper)throw Error('Skill progression original UMD Owner is unsupported.');
  const body=wrapper.expression.callee.body.body;
- const factories=body.filter(node=>node.type==='FunctionDeclaration'&&node.id.name==='createRulesV1');
+ const declaration=name=>body.filter(node=>node.type==='VariableDeclaration'&&node.kind==='const'&&
+  node.declarations.length===1&&node.declarations[0].id.type==='Identifier'&&node.declarations[0].id.name===name);
+ const factories=declaration('createRulesV1');
  const costs=body.filter(node=>node.type==='VariableDeclaration'&&node.declarations.length===1&&
   node.declarations[0].id.name==='SKILL_UPGRADE_COST_BY_TARGET_LEVEL');
- const selectors=body.filter(node=>node.type==='FunctionDeclaration'&&node.id.name==='getRulesForVersion');
+ const selectors=declaration('getRulesForVersion');
  if(factories.length!==1||costs.length!==1||selectors.length!==1)throw Error('Retained v1 skill rules are missing or ambiguous.');
+ const factory=factories[0].declarations[0].init,selector=selectors[0].declarations[0].init;
+ if(factory?.type!=='FunctionExpression'||selector?.type!=='FunctionExpression'||
+  JSON.stringify(semantic(selector.params))!==JSON.stringify(semantic(parse('(function(version,catalog,damageSkillIds){})',{ecmaVersion:2022}).body[0].expression.params)))
+  throw Error('Retained v1 skill bindings are unsupported.');
+ const expected=parse('(function(){if(version==="v1"){return createRulesV1(catalog,damageSkillIds);} throw new RangeError("Unsupported skill progression rules version");})',{ecmaVersion:2022}).body[0].expression.body.body;
+ if(JSON.stringify(semantic(selector.body.body[0]))!==JSON.stringify(semantic(expected[0]))||
+  JSON.stringify(semantic(selector.body.body.at(-1)))!==JSON.stringify(semantic(expected[1])))
+  throw Error('Retained v1 selector must directly forward its original arguments.');
+ const guarded=new Set(['createRulesV1','getRulesForVersion']);
+ function rejectRebinding(node){
+  if(!node||typeof node!=='object')return;
+  if((node.type==='AssignmentExpression'&&node.left.type==='Identifier'&&guarded.has(node.left.name))||
+   (node.type==='UpdateExpression'&&node.argument.type==='Identifier'&&guarded.has(node.argument.name)))
+   throw Error('Retained v1 binding cannot be reassigned.');
+  for(const child of Object.values(node))if(Array.isArray(child))child.forEach(rejectRebinding);else rejectRebinding(child);
+ }
+ rejectRebinding(wrapper);
  return createHash('sha256').update(JSON.stringify(semantic([costs[0],factories[0]]))).digest('hex');
 }
 export function verifySkillLearningPolicy(root){
