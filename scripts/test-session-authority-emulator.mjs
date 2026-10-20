@@ -3963,6 +3963,31 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     await assert.rejects(()=>recovery.verifyRawRecoveryAuditCandidate(missingChunk));
     assert.equal(JSON.stringify(rawMaterial),materialBefore);assert.equal(attempts.length,candidateAttemptStart);
     console.log("PASS raw capture candidate actual SDK: original two-page bytes and native timestamps, complete chain through sole candidate encoder/original proofs, missing historical chunk refusal; candidate validity only, no trusted capture, restore or playable authority.");
+    // Exercise the private segmented verifier against these same committed
+    // SDK bytes. No new actor, scan, live transaction or public factory API.
+    const segmentedFilename=require.resolve("../functions/src/canonical-current-recovery.js"),segmentedModule=new Module(segmentedFilename);
+    segmentedModule.filename=segmentedFilename;segmentedModule.paths=Module._nodeModulePaths(
+        segmentedFilename.slice(0,Math.max(segmentedFilename.lastIndexOf("/"),segmentedFilename.lastIndexOf("\\"))));
+    const segmentedNeedle="return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact",segmentedSource=readFileSync(segmentedFilename,"utf8");
+    assert.equal(segmentedSource.split(segmentedNeedle).length,2);
+    segmentedModule._compile(segmentedSource.replace(segmentedNeedle,
+        "return Object.freeze({verifySegmentedRawRecoveryProof,restoreCurrent,verifyRecoveryAuditArtifact"),segmentedFilename);
+    assert.equal(Object.hasOwn(recovery,"verifySegmentedRawRecoveryProof"),false);
+    const segmentedOwner=segmentedModule.exports.createCanonicalCurrentRecovery(deps),segmented=await segmentedOwner.verifySegmentedRawRecoveryProof(rawMaterial);
+    assert.equal(segmented.segmentedProofValid,true);assert.equal(segmented.documentCount,candidate.documentCount);
+    assert.equal(segmented.absenceCount,candidate.absenceCount);
+    for(const flag of ["candidateProofValid","authoritativeStateReady","trustedCaptureVerified","restoreAuthorized"])assert.equal(segmented[flag],false);
+    for(const key of ["records","documents","artifactBytes","restorePermit"])assert.equal(Object.hasOwn(segmented,key),false);
+    assert.ok(Object.isFrozen(segmented));assert.ok(!Object.values(segmented).some(value=>Buffer.isBuffer(value)));
+    assert.equal(segmented.assemblyUsage.reservedBytes,0);assert.ok(segmented.assemblyUsage.bytes<=256*1024*1024);
+    assert.ok(segmented.assemblyUsage.nodes<=16000000);assert.ok(segmented.assemblyUsage.operations<=16384);
+    assert.equal(segmented.assemblyUsage.passes,1);assert.ok(segmented.assemblyUsage.elapsedMs<=30000);
+    assert.ok(segmented.residentUsage.maxResidentCapsuleBytes<=2*1024*1024);
+    assert.ok(segmented.residentUsage.maxUnitReads<=60);assert.ok(segmented.residentUsage.maxUnitTypedBytes<=2*1024*1024);
+    assert.equal(segmented.residentUsage.copyChargedBytes,rawMaterial.rawChunks.reduce((sum,entry)=>sum+entry.row.payloadBytes.length,0));
+    await assert.rejects(()=>segmentedOwner.verifySegmentedRawRecoveryProof(missingChunk));
+    assert.equal(JSON.stringify(rawMaterial),materialBefore);assert.equal(attempts.length,candidateAttemptStart);
+    console.log("PASS private segmented recovery proof actual SDK: same two-page native Timestamp bytes, original source coverage, missing historical chunk refusal, one shared budget and four authority flags false; no publication or restore.");
     assert.deepEqual(await assets(),assetBefore);assert.deepEqual(await Promise.all([runRef.get(),fenceRef.get()]).then(rows=>rows.map(row)),controls);
     await assert.rejects(()=>patrol.observePresence(request(),{operationId:"inventory-fenced-heartbeat1",expectedRevision:2,
         expectedSequence:18,intent:"heartbeat",elementBox:"keep"}),/RECOVERY_AUDIT_MAINTENANCE/);
@@ -4359,6 +4384,68 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.equal((await h.save.get()).get("authoritativeStateReady"),false);
     console.log("PASS staged Recovery maintenance: actual Auth/HTTP six successful actions, unknown/excess/foreign/replaced-session rejection, publish stale epoch before provider IO; SDK + lexical fake Storage positive publish/replay keeps four flags false. Representative RSS below 1GiB, not maximum payload capacity or real GCS proof.");
     console.log("PASS private immutable candidate publication: actual Firestore Session/SDK cursors/Timestamps on existing20-battle Lv10/slot2 actor; original raw full-chain/strict proofs;13-point gates, rollback/SDK retry, exact immutable tuple, fakeStorage-only64-bit generation/fullread/lost responses/read-only ACK races, expiry/takeover/cancel refusal. No actual GCS, production adapter, trusted backup or restore authority.");
+}
+
+// Internal skill configuration only. A fresh isolated account keeps all prior
+// actors, retained histories and their exact assertions unchanged.
+{
+    const {createCanonicalSkillLearning}=require("../functions/src/canonical-skill-learning.js");
+    const account=await login("accounts:signUp",{email:"canonical-skill-learning-sdk@example.test",password});
+    const uid=account.localId,token=account.idToken,session=await invoke("createGameSession",token,{uid});
+    const identity={uid,session},empty=await invoke("bootstrapCloudSave",token,identity);
+    await invoke("createInitialCanonicalCharacter",token,{...identity,selection:choices,expectedRevision:empty.serverRevision});
+    const root=db.collection("serverUsers").doc(uid),save=db.doc(`users/${uid}/saves/current`);
+    const decoded=await getAuth(testApp).verifyIdToken(token,true);
+    const request={auth:{uid,token:decoded},data:identity},accountSource=await root.collection("account").doc("current").get();
+    const characterId=accountSource.get("slots")[0],characterRef=root.collection("characters").doc(characterId);
+    const originalCharacter=(await characterRef.get()).data(),before=await checkRecoveryArchive(uid,2);
+    const traces=[];
+    const protectedRun=(req,fn)=>writerSessions.runProtected(req,async(tx,active)=>{
+        const trace={reads:0,writes:0};traces.push(trace);
+        const observed={get:async reference=>{
+            assert.equal(trace.writes,0,"skill transactions finish all reads before any write");
+            const snapshot=await tx.get(reference);trace.reads+=snapshot.docs?Math.max(1,snapshot.size):1;return snapshot;
+        }};
+        for(const method of ["create","update","set","delete"])observed[method]=(...args)=>{trace.writes++;return tx[method](...args);};
+        return fn(observed,active);
+    });
+    const deps={db,FieldValue,HttpsError,inspectExistingEnvelope,nextRevision,runProtected:protectedRun};
+    const writer=createCanonicalSkillLearning(deps),intent={operationId:"skill-sdk-original-learn-001",expectedRevision:2,
+        characterId,action:"learn",skillId:"waterKnife"};
+    const lost=createCanonicalSkillLearning({...deps,runProtected:async(req,fn)=>{
+        await protectedRun(req,fn);throw Error("skill SDK committed response lost");
+    }});
+    await assert.rejects(()=>lost.learnOrUpgrade(request,intent),/committed response lost/);
+    assert.equal((await save.get()).get("serverRevision"),3);
+    const learned=(await characterRef.get()).data(),archive=await checkRecoveryArchive(uid,3);
+    assert.equal(learned.state.skillPoints,originalCharacter.state.skillPoints-2);
+    assert.deepEqual(learned.skillLoadout.skillLevels,{waterKnife:1});
+    assert.deepEqual(learned.skillLoadout.equippedSkills,originalCharacter.skillLoadout.equippedSkills);
+    assert.equal(archive.get("sourceRecords.characters")[0].skillLoadout.skillLevels.waterKnife,1);
+    const operation=await root.collection("operations").doc(intent.operationId).get();
+    const ledger=await root.collection("ledgerEntries").doc(intent.operationId).get();
+    assert.equal(operation.get("kind"),"skill-learning");assert.equal(ledger.get("amount"),-2);
+    const replayStart=traces.length,replay=await writer.learnOrUpgrade(request,intent);
+    assert.equal(replay.unchanged,true);assert.ok(traces.slice(replayStart).every(trace=>trace.writes===0));
+    for(const flag of ["authoritativeStateReady","readyForRestore","rewardEligible","outcomeVerified"])assert.equal(replay[flag],false);
+    const unchanged=async(operation,pattern)=>{
+        const start=traces.length;await assert.rejects(operation,pattern);
+        assert.ok(traces.slice(start).every(trace=>trace.writes===0));
+        assert.equal((await save.get()).get("serverRevision"),3);
+        assert.deepEqual((await characterRef.get()).data(),learned);
+    };
+    await unchanged(()=>writer.learnOrUpgrade(request,{...intent,operationId:"skill-sdk-stale-intent-001"}),/CLOUD_REVISION_CONFLICT/);
+    await unchanged(()=>writer.learnOrUpgrade(request,{...intent,expectedRevision:3,operationId:"skill-sdk-foreign-intent-01",characterId:"foreign-character"}),/not owned/);
+    await unchanged(()=>writer.learnOrUpgrade(request,{...intent,amount:1}),/bounded skill/);
+    await unchanged(()=>writer.learnOrUpgrade({...request,auth:{uid:"foreign-uid",token:decoded}},intent),/UID|SESSION/);
+    const originalArchiveRef=root.collection("recoveryArchives").doc("2");
+    await originalArchiveRef.delete();
+    await unchanged(()=>writer.learnOrUpgrade(request,intent),/sources are missing or corrupt/);
+    await originalArchiveRef.set(before.data());
+    assert.equal((await writer.learnOrUpgrade(request,intent)).unchanged,true);
+    assert.deepEqual((await root.collection("operations").doc(intent.operationId).get()).data(),operation.data());
+    assert.deepEqual((await root.collection("ledgerEntries").doc(intent.operationId).get()).data(),ledger.data());
+    console.log("PASS internal skill learning: real Auth/Session and Firestore atomic initial-point debit, immutable snapshot/archive transition, committed lost response, zero-write original-policy replay and stale/foreign/missing-source refusal. No callable, equip, combat or readiness activation.");
 }
 
 await db.terminate();

@@ -113,6 +113,7 @@ function makeRuntime(options={}){
         assert.ok(start>=0,name);
         vm.runInContext(main.slice(start,main.indexOf("\n}",start)+2),context);
     }
+    vm.runInContext(fs.readFileSync("functions/src/skill-progression-core.js","utf8"),context,{filename:"functions/src/skill-progression-core.js"});
     vm.runInContext(source,context,{filename:"js/60-v173.64-skill-progression-rebalance.js"});
     const rawCastDamageSkill=context.castDamageSkill;
     context.castDamageSkill=function(skillId){

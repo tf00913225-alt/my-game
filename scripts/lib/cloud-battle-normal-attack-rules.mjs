@@ -54,7 +54,7 @@ export function buildPlainPlayerNormalAttackRules(root){
     scope:'single-plain-player-normal-attack-arithmetic-only',
     sourceOwner:'js/00-main.js',
     compatibilityDigests:Object.fromEntries(['js/33-v140-four-element-balance.js','js/43-v149-skill-ui-rules.js',
-      'js/44-v152-dev-fixes.js','js/60-v173.64-skill-progression-rebalance.js'].map(file=>
+      'js/44-v152-dev-fixes.js','functions/src/skill-progression-core.js','js/60-v173.64-skill-progression-rebalance.js'].map(file=>
         [file,hash(fs.readFileSync(path.join(root,file),'utf8'))])),
     declarationDigests:Object.fromEntries(Object.entries(declarations).map(([name,value])=>[name,hash(value)])),
     rulesSha256:hash(code),combatRulesReady:false,outcomeVerified:false,rewardEligible:false};
