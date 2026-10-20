@@ -6,10 +6,20 @@
 <label for="case">選擇技能或狀態　</label><select id="case"></select><p id="note"></p>
 <div class="pair"><figure><figcaption>修改前／上一輪</figcaption><div class="source" id="beforeSource"></div><img id="before" alt="修改前手機截圖"></figure><figure><figcaption>目前候選</figcaption><div class="source" id="afterSource"></div><img id="after" alt="目前候選手機截圖"></figure></div>
 <p>使用獨立唯讀 QA 帳號。較早基線與本輪的瀏覽器可視高度略有差異；圖片完整呈現，沒有裁切或重繪截圖。</p>
-<h2>最新群體候選：USB 實機完整錄影</h2><p>候選 b1ede88d：11 招原生寬幅素材與單體結界檢查。這是審核中的原始手機錄影，尚未全部通過商業品質；逐項檢查目標對齊、遮擋、命中與消退。</p><video controls preload="metadata" style="width:min(100%,460px)" src="../../artifacts/vfx-wide-batch-usb/skill-cycle.mp4"></video>
+<h2>九龍火：最新 USB 實機完整錄影</h2><p>7cdebfb2：保留多龍首、盤身與火環，只修正血條圖層。獨立審核確認身份、尺寸、HUD 與退場通過；停止額外精修。</p><video controls preload="metadata" style="width:min(100%,460px)" src="../../artifacts/vfx-freeze-relic-final-usb/relic-cycle.mp4"></video>
+<h2>六項對位修正與洪流獸：USB 實機完整錄影</h2><p>1d02be83：水球、治療、怒火、風行、岩壁、風起雲湧各對準實際角色；洪流獸修正飛行朝向。逐項實機視覺審核通過。</p><video controls preload="metadata" style="width:min(100%,460px)" src="../../artifacts/vfx-final-recipient-usb/skill-cycle.mp4"></video>
+<h2>群體寬幅素材：前一批 USB 實機錄影</h2><p>b1ede88d 歷史錄影：其中七項通過並保留；水球、治療、怒火、風行與岩壁的舊對位失敗已由上方新版取代。</p><video controls preload="metadata" style="width:min(100%,460px)" src="../../artifacts/vfx-wide-batch-usb/skill-cycle.mp4"></video>
 <h2>持續狀態：USB 實機完整錄影</h2><p>候選 590b1390，14 種身體狀態逐項開／關，玩家與敵方同步展示。21 種狀態靜態畫面通過，8 種脈動狀態已完成抽樣動態檢查；六人混合狀態效能仍在驗證。</p><video controls preload="metadata" style="width:min(100%,460px)" src="../../artifacts/vfx-status-contrast-v2/status-cycle.mp4"></video></main>
 <script>
 const rows=[
+ ['relic_nine_dragon_fire','九龍火秘寶','relic','恢復清楚多龍首、盤身與火環；保留尺寸，只提升正式 HUD 圖層。USB 身份、尺寸、血條與退場通過，停止精修。'],
+ ['waterBall','水球術','skill','每名實際目標各有水球，修正原本打在角色之間的問題；USB 審核通過。'],
+ ['healSpell','治療術','skill','水蓮分別對準各名實際受益角色，保留人物與血條；USB 審核通過。'],
+ ['dodgeSkill','風行施放','skill','各名實際受益角色各有清楚綠風環，沒有再壓住姓名與血條。'],
+ ['rockWall','岩石壁壘施放','skill','岩片護壁對準各名角色軀幹，保留臉部與血條；USB 審核通過。'],
+ ['floodBeast','洪流獸','skill','保留水獸形態，修正飛行方向；USB 連續影格確認朝目標前進、接觸並濺水退場。'],
+ ['dinghaishenzhen','氣定神閒施放','skill','每名實際受益角色各有低位印記，三人、六敵與部分目標均已驗證。'],
+ ['freeze','冰封施放：六敵直列','skill','同一六敵陣形的修正前後：原本列間一座冰牢，改為兩名正式目標各自受凍；不更動技能範圍。'],
  ['flameSlash','火焰斬','skill','斬柱改為纖細斜弧，保留火焰辨識，檢查命中星芒與角色可讀性。'],
  ['dragonSlash','龍斬','skill','保留龍首與盤身，檢查裁切、開場與尾段消散。'],
  ['blazeSpell','火法','skill','完整火焰尖弧取代平切大柱，檢查法陣與收尾。'],
@@ -45,15 +55,20 @@ const rows=[
 ];
 const picker=document.getElementById('case');rows.forEach((r,i)=>picker.add(new Option(r[1],i)));
 function show(){const [id,label,kind,note]=rows[Number(picker.value)];const baseline=id==='flameSlash'||id==='iceArrowRain';
+const recentPeaks={waterBall:19,healSpell:38,rage:60,dodgeSkill:85,rockWall:108,stormRain:140,floodBeast:170};
+const recentPeak=kind==='skill'&&recentPeaks[id];
 const originalRage=kind==='status'&&id==='rage';
-const before=originalRage?'../../artifacts/vfx-status-anchors-player/status-rage-original.png':baseline&&kind==='skill'?`../../artifacts/vfx-usb-runtime/before-${id}.png`:`../../artifacts/vfx-checkpoint18/${kind}-${id}.png`;
+const before=kind==='relic'?'../../artifacts/vfx-usb-runtime/before-relic_nine_dragon_fire.png':kind==='skill'&&id==='freeze'?'../../artifacts/vfx-final-recipient-usb/range-frames/frame-0047.png':originalRage?'../../artifacts/vfx-status-anchors-player/status-rage-original.png':baseline&&kind==='skill'?`../../artifacts/vfx-usb-runtime/before-${id}.png`:`../../artifacts/vfx-checkpoint18/${kind}-${id}.png`;
 const revisedGroup=['rage','windSpell'];
 const revisedStatus=kind==='status'&&['rage','dodgeSkill','dinghaishenzhen'].includes(id);
 const passedPeakFrames={explosiveFlurry:16,stormCircle:36,petrifyFist:104,earthquakeCrush:132,stoneThrow:154,sandWind:176,barrier:272};
 const currentPeak=kind==='skill'&&passedPeakFrames[id];
 const folder=kind==='status'?(revisedStatus?'vfx-status-contrast-v2':'vfx-status-anchors-player'):revisedGroup.includes(id)?'vfx-status-polish':'vfx-final';
-document.getElementById('before').src=before;document.getElementById('after').src=currentPeak?`../../artifacts/vfx-wide-batch-usb/sequence-frames/frame-${String(currentPeak).padStart(4,'0')}.png`:kind==='skill'&&id==='flameSlash'?'../../artifacts/vfx-remaining-hit/flame-contact.png':kind==='skill'&&id==='windSpell'?'../../artifacts/vfx-wind-wide/skill-windSpell.png':`../../artifacts/${folder}/${kind}-${id}.png`;
+document.getElementById('before').src=before;document.getElementById('after').src=kind==='relic'?'../../artifacts/vfx-freeze-relic-final-usb/relic-frames/frame-0055.png':kind==='skill'&&id==='freeze'?'../../artifacts/vfx-freeze-relic-final-usb/range-frames/frame-0045.png':kind==='skill'&&id==='dinghaishenzhen'?'../../artifacts/vfx-recipient-prototype/recipient-frames/frame-0016.png':recentPeak?`../../artifacts/vfx-final-recipient-usb/sequence-frames/frame-${String(recentPeak).padStart(4,'0')}.png`:currentPeak?`../../artifacts/vfx-wide-batch-usb/sequence-frames/frame-${String(currentPeak).padStart(4,'0')}.png`:kind==='skill'&&id==='flameSlash'?'../../artifacts/vfx-remaining-hit/flame-contact.png':kind==='skill'&&id==='windSpell'?'../../artifacts/vfx-wind-wide/skill-windSpell.png':`../../artifacts/${folder}/${kind}-${id}.png`;
 document.getElementById('beforeSource').textContent=originalRage?'同一候選環境：原素材重播':baseline&&kind==='skill'?'原始基線 b767d31e':'上一輪 checkpoint 18f92b26';
-document.getElementById('afterSource').textContent=currentPeak?'USB 原片審核影格 b1ede88d（含手機瀏覽器介面）':kind==='status'?(revisedStatus?'局部修正候選 590b1390':'狀態候選 4b2cb548'):id==='flameSlash'?'USB 原片命中影格 ade43a48（含手機瀏覽器介面）':id==='windSpell'?'原生寬扁風卷 ade43a48':revisedGroup.includes(id)?'取消過度放大候選 b145e2d7':'素材候選 067fa105';document.getElementById('note').textContent=note;}
+document.getElementById('afterSource').textContent=kind==='relic'||kind==='skill'&&id==='freeze'?'USB 原片審核影格 7cdebfb2（含手機瀏覽器介面）':recentPeak?'USB 原片審核影格 1d02be83（含手機瀏覽器介面）':kind==='skill'&&id==='dinghaishenzhen'?'USB 原片審核影格 20ecbf97':currentPeak?'USB 原片審核影格 b1ede88d（含手機瀏覽器介面）':kind==='status'?(revisedStatus?'局部修正候選 590b1390':'狀態候選 4b2cb548'):id==='flameSlash'?'USB 原片命中影格 ade43a48（含手機瀏覽器介面）':id==='windSpell'?'原生寬扁風卷 ade43a48':revisedGroup.includes(id)?'取消過度放大候選 b145e2d7':'素材候選 067fa105';
+if(kind==='relic')document.getElementById('beforeSource').textContent='原始基線 b767d31e';
+if(kind==='skill'&&id==='freeze')document.getElementById('beforeSource').textContent='六敵直列：修正前 1d02be83';
+document.getElementById('note').textContent=note;}
 picker.onchange=show;show();
 </script></html>
