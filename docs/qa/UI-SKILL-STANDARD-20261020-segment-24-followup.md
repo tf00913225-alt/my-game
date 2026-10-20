@@ -17,3 +17,7 @@ c5ea05020f8d2126e3e86ad4fbd2efdcfd75266a 的360×640實際操作已走過三角�
 原始暫存證據：artifacts/ui-skill-standard/segment24b-character-tabs-c5ea0502/prepared/360x640，以及segment24c-summary-preinit2-c5ea0502與segment24c-summary-preinit3-c5ea0502。通過證據須在四尺寸及獨立審核後轉存正式evidence；失敗候選不可代替通過。
 
 Next：正確三角色EXP fixture後補驗24B四尺寸／創角取消；24C其餘三尺寸及三方實圖審核。其餘全介面待驗項目仍以逐項清單與PR即時狀態為準。
+
+## 正確fixture的後續候選
+
+806599b7已保存上述禁用字色與創角Owner修正。正式EXP renderer重繪三角色後，360實測全名墨跡超出原name box，未通過；未把舊QA兩卡視為產品綁定錯誤。原CSS38雙欄覆蓋CSS31直列，使姓名與資訊過窄；退休該覆蓋，原CSS31姓名允許全文換行，CSS42 metadata／追趕徽牌允許換列與換行。僅修改呈現，仍須後續實際驗證，不提前批准。

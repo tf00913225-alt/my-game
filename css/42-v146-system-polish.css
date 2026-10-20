@@ -85,6 +85,7 @@
 :is(#game-stage,#game-ui) #expDistributeList .v173-exp-row-meta{
     grid-column:1/-1;
     display:flex;
+    flex-wrap:wrap;
     align-items:center;
     justify-content:space-between;
     gap:calc(6 * var(--ui-length-unit,1px));
@@ -101,7 +102,8 @@
     background:rgba(86,54,18,.42);
     font-size:calc(13 * var(--ui-length-unit,1px));
     line-height:calc(17 * var(--ui-length-unit,1px));
-    white-space:nowrap;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 /* Remaining non-battle mobile owners. These rules are intentionally scoped to

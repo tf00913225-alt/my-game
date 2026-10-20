@@ -1741,9 +1741,9 @@
 
 .v131-exp-name{
     min-width:0;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+    overflow-wrap:anywhere;
+    white-space:normal;
+    line-height:1.4;
     font-size:calc(15 * var(--ui-length-unit,1px));
     font-weight:800;
     color:#f3dfb2;
@@ -3182,7 +3182,6 @@
 }
 :is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-section-head span{font-size:calc(14 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-section-head small{font-size:calc(11 * var(--ui-length-unit,1px));}
-:is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-character-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(6 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) #homeExpPoolCard .exp-distribute-button{min-height:calc(52 * var(--ui-length-unit,1px));padding:calc(6 * var(--ui-length-unit,1px)) calc(7 * var(--ui-length-unit,1px));grid-template-columns:calc(29 * var(--ui-length-unit,1px)) minmax(0,1fr);gap:calc(6 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-icon{width:calc(29 * var(--ui-length-unit,1px));height:calc(29 * var(--ui-length-unit,1px));font-size:calc(15 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) #homeExpPoolCard .exp-character-copy strong{font-size:calc(13 * var(--ui-length-unit,1px));}
@@ -4223,6 +4222,7 @@
 :is(#game-stage,#game-ui) #expDistributeList .v173-exp-row-meta{
     grid-column:1/-1;
     display:flex;
+    flex-wrap:wrap;
     align-items:center;
     justify-content:space-between;
     gap:calc(6 * var(--ui-length-unit,1px));
@@ -4239,7 +4239,8 @@
     background:rgba(86,54,18,.42);
     font-size:calc(13 * var(--ui-length-unit,1px));
     line-height:calc(17 * var(--ui-length-unit,1px));
-    white-space:nowrap;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 /* Remaining non-battle mobile owners. These rules are intentionally scoped to

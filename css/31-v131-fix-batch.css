@@ -244,9 +244,9 @@
 
 .v131-exp-name{
     min-width:0;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+    overflow-wrap:anywhere;
+    white-space:normal;
+    line-height:1.4;
     font-size:calc(15 * var(--ui-length-unit,1px));
     font-weight:800;
     color:#f3dfb2;
