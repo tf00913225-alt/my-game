@@ -398,6 +398,14 @@ test('pointer scroll readiness requires stable owner and target samples before a
     for(const now of [0,80,160]){state=context.stableScrollSample(state,sample,now);assert.equal(state.ready,false);}
     state=context.stableScrollSample(state,sample,240);assert.equal(state.ready,true);
     for(const change of [{scrollTop:405},{top:105},{valid:false,disabled:true},{valid:false,hit:{id:'occluding-overlay'}}])assert.equal(context.stableScrollSample(state,{...sample,...change},320).ready,false);
+    let overshoot;for(const now of [0,80,160,240])overshoot=context.stableScrollSample(overshoot,{...sample,valid:false,top:-100},now);
+    assert.equal(overshoot.settled,true,'an idle overshoot is settled even though it cannot be clicked');assert.equal(overshoot.ready,false,'settled outside target must resume physical adjustments');
+    let recovered=context.stableScrollSample(overshoot,sample,320);assert.equal(recovered.ready,false,'new visible geometry must settle again');
+    for(const now of [400,480,560])recovered=context.stableScrollSample(recovered,sample,now);assert.equal(recovered.ready,true);
+    assert.match(source,/if\(stable\?\.settled\)continue;/,'settled invalid target resumes bounded outer scroll loop with fresh geometry');
+    const reveal=source.slice(source.indexOf('const reveal=async selector=>'),source.indexOf("await wait('window.FourSymbolsStartupPolicy"));
+    assert.match(reveal,/type:'touchMove'/);assert.match(reveal,/setTimeout\(resolve,40\)/);assert.match(reveal,/i<16/);assert.match(reveal,/Date\.now\(\)\+45000/);
+    assert.doesNotMatch(reveal,/\.scrollTop\s*=(?!=)|\.click\s*\(|FourSymbolsAdventure\./,'scroll reachability uses original physical input and observations only');
     assert.match(source,/!e\.disabled&&e\.checkVisibility/);assert.match(source,/hit===e\|\|e\.contains\(hit\)/);assert.match(source,/original scroll target never became stable and pointer ready/);
 });
 
