@@ -1468,3 +1468,22 @@ test('indexed row byte exhaustion refuses before hashing or parsing the qualifie
     assert.throws(()=>helper.decodeIndexedRawProofRow(raw,span.qualification,budget),/bytes budget exceeded/);
     assert.equal(hashes,0);assert.equal(parses,0);
 });
+
+test('versioned raw archive syntax roundtrips genuine two-battle capture bytes without source authority or old-reader acceptance',async t=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),f=await fixture({battles:2,three:true}),material=await completeRawMaterial(f);
+    const before=copy([...f.h.data]),original=JSON.stringify(material),writes=f.h.writes,budget=helper.createRecoveryAuditAssemblyBudget();
+    const bytes=helper.encodeRawRecoveryArchive(material,budget),decoded=helper.decodeRawRecoveryArchive(bytes,budget);
+    for(const name of ['binding','run','inventoryState','rawState'])assert.deepEqual(helper.encodeProofPayload(decoded[name]),helper.encodeProofPayload(material[name]));
+    for(const name of ['inventoryPages','rawReceipts','rawChunks']){
+        assert.deepEqual(decoded[name].map(row=>row.id),material[name].map(row=>row.id));
+        for(let i=0;i<decoded[name].length;i++){
+            const {payloadBytes:a,...left}=decoded[name][i].row,{payloadBytes:b,...right}=material[name][i].row;
+            assert.deepEqual(helper.encodeProofPayload(left),helper.encodeProofPayload(right));if(a)assert.deepEqual(a,b);
+        }
+    }
+    assert.deepEqual(helper.encodeRawRecoveryArchive(decoded,budget),bytes);
+    assert.throws(()=>helper.decodeRecoveryAuditArtifact(bytes,{uid:f.h.uid,expectedRevision:f.h.revision,db:candidateQueryDb(f.h.dependencies.db)}));
+    assert.equal(JSON.stringify(material),original);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    assert.deepEqual(Object.keys(decoded).sort(),Object.keys(material).sort());
+    t.diagnostic(JSON.stringify({archiveBytes:bytes.length,...helper.recoveryAuditAssemblyUsage(budget)}));
+});

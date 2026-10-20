@@ -3987,6 +3987,35 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     await assert.rejects(()=>segmentedOwner.verifySegmentedRawRecoveryProof(missingChunk));
     assert.equal(JSON.stringify(rawMaterial),materialBefore);assert.equal(attempts.length,candidateAttemptStart);
     console.log("PASS private segmented recovery proof actual SDK: same two-page native Timestamp bytes, original source coverage, missing historical chunk refusal, one shared budget and four authority flags false; no publication or restore.");
+    // Format roundtrip is one caller-owned syntax budget. The original private
+    // Recovery proof below is a separate consumer verification phase/token;
+    // this does not claim a combined prepare pipeline or201-history capacity.
+    const rawArchiveCodec=require("../functions/src/recovery-audit-artifact.js"),rawArchiveBudget=rawArchiveCodec.createRecoveryAuditAssemblyBudget();
+    const rawArchiveBytes=rawArchiveCodec.encodeRawRecoveryArchive(rawMaterial,rawArchiveBudget);
+    const decodedRawArchive=rawArchiveCodec.decodeRawRecoveryArchive(rawArchiveBytes,rawArchiveBudget);
+    const rawArchiveUsage=rawArchiveCodec.recoveryAuditAssemblyUsage(rawArchiveBudget);
+    assert.ok(rawArchiveBytes.length<=32*1024*1024);assert.equal(rawArchiveUsage.passes,2);assert.equal(rawArchiveUsage.reservedBytes,0);
+    assert.ok(rawArchiveUsage.bytes<=256*1024*1024);assert.ok(rawArchiveUsage.nodes<=16000000);
+    assert.ok(rawArchiveUsage.operations<=16384);assert.ok(rawArchiveUsage.elapsedMs<=30000);
+    for(const name of ["binding","run","inventoryState","rawState"])assert.deepEqual(
+        rawArchiveCodec.encodeProofPayload(decodedRawArchive[name]),rawArchiveCodec.encodeProofPayload(rawMaterial[name]));
+    for(const name of ["inventoryPages","rawReceipts","rawChunks"]){
+        assert.deepEqual(decodedRawArchive[name].map(row=>row.id),rawMaterial[name].map(row=>row.id));
+        for(let i=0;i<rawMaterial[name].length;i++){
+            const {payloadBytes:actual,...decoded}=decodedRawArchive[name][i].row,{payloadBytes:expected,...original}=rawMaterial[name][i].row;
+            assert.deepEqual(rawArchiveCodec.encodeProofPayload(decoded),rawArchiveCodec.encodeProofPayload(original));
+            if(expected)assert.deepEqual(actual,expected);
+        }
+    }
+    const archiveConsumer=await segmentedOwner.verifySegmentedRawRecoveryProof(decodedRawArchive);
+    assert.equal(archiveConsumer.segmentedProofValid,true);assert.equal(archiveConsumer.documentCount,segmented.documentCount);
+    assert.equal(archiveConsumer.absenceCount,segmented.absenceCount);
+    for(const flag of ["candidateProofValid","authoritativeStateReady","trustedCaptureVerified","restoreAuthorized"])assert.equal(archiveConsumer[flag],false);
+    for(const key of ["records","documents","artifactBytes","restorePermit","identity"])assert.equal(Object.hasOwn(archiveConsumer,key),false);
+    assert.ok(Object.isFrozen(archiveConsumer));assert.ok(!Object.values(archiveConsumer).some(value=>Buffer.isBuffer(value)));
+    assert.equal(JSON.stringify(rawMaterial),materialBefore);assert.equal(attempts.length,candidateAttemptStart);
+    console.log("PASS versioned raw archive codec actual SDK: original two-page native Timestamp capture bytes, shared syntax encode/decode token, separate original complete-proof consumer with four flags false, no new SDK attempts/publication/Storage/restore; format bytes="+rawArchiveBytes.length);
+
     // The same actor now follows the actual private server pin and literal SDK
     // loader; null IO stays disabled and no candidate/publication is issued.
     for(const name of ["pinRawCapture","loadPinnedRawMaterial","verifyPinnedSegmentedProof"])
