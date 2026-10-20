@@ -25374,7 +25374,7 @@ function renderHeroGrowthControls(hero,data){
         <p>解鎖需 100 碎片；升星依序需 25／50／75／100／150 碎片；洗髓消耗 1 顆洗髓丹，重新分配全部成長點數。</p>
         <p class="hero-page-note">正式資源可由英雄首頁的累計登入獎勵與每日補給取得。${g.testMode?"測試資源與成長不保存，重新載入即消失。":"正式操作需連線確認資源。"}</p>
         ${g.error?`<p role="status">${heroPageHtml(g.error)}</p>`:""}
-        <button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.read()" ${g.busy?"disabled":""}>同步成長紀錄</button>
+        <button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.read()" ${g.busy?"disabled":""}>${g.busy?"同步中…":"同步成長紀錄"}</button>
         ${g.devAvailable&&!g.testMode?'<button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.testResources()">啟用 DEV 隔離測試資源</button>':""}
         ${button("unlock","碎片解鎖（100）",d.canUnlockHero(state.heroId))}
         ${button("starUp",state.stars===5?"已達五星":`升星（${d.getHeroStarCost(state.stars)} 碎片）`,d.canStarUpHero(state.heroId))}
