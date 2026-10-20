@@ -11,6 +11,35 @@ const FIXTURE=path.join(ROOT,".fixed-slot-battlefield-rendering-v2-qa.html");
 const VIEWPORTS=[[412,915],[393,873],[390,844],[360,800]];
 const read=file=>fs.readFileSync(path.join(ROOT,file),"utf8");
 
+function assertFloatingCommandReachability(evidence){
+    assert.equal(evidence.before.length,5,'all five default command centers must be observed');
+    for(const button of evidence.before)assert.ok(button.hit||button.blockedByElementBox,'only the approved floating Element Box may intercept a default command center: '+JSON.stringify(button));
+    if(evidence.before.some(button=>!button.hit)){
+        assert.equal(evidence.dragReady,true,'the production Element Box drag Owner must be bound');
+        assert.equal(evidence.moved,true,'the original pointer drag must actually move the Element Box');
+    }
+    assert.equal(evidence.after.length,5);
+    evidence.after.forEach(button=>assert.equal(button.hit,true,'dragging the floating Element Box must restore every complete command center: '+JSON.stringify(button)));
+}
+
+function exerciseFloatingCommandReachability(){
+    const box=document.getElementById('battleElementBoxButton');
+    const buttons=[...document.querySelectorAll('#mainBattleMenu > .menu-button')];
+    const capture=()=>buttons.map(button=>{const r=button.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,hit=document.elementFromPoint(x,y);return {text:button.textContent,point:[x,y],hit:hit===button,blockedByElementBox:hit===box||!!hit&&box.contains(hit),interceptor:hit?{id:hit.id,className:hit.className}:null};});
+    const before=capture(),start=box.getBoundingClientRect();
+    if(before.some(button=>!button.hit&&button.blockedByElementBox)){
+        // Move the actual floating button between neighboring command centers.
+        // The source drag Owner retains bounds, scaling and click suppression.
+        const centers=before.map(button=>button.point[0]).sort((a,b)=>a-b);
+        const gap=centers.slice(1).map((right,i)=>({left:centers[i],right})).find(pair=>pair.right-pair.left>start.width+4);
+        if(!gap)throw new Error('No draggable Element Box location clears all command centers');
+        const x=start.left+start.width/2,y=start.top+start.height/2,targetX=(gap.left+gap.right)/2;
+        for(const [type,clientX,buttons] of [['pointerdown',x,1],['pointermove',targetX,1],['pointerup',targetX,0]])box.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,pointerId:174,pointerType:'touch',isPrimary:true,button:0,buttons,clientX,clientY:y}));
+    }
+    const end=box.getBoundingClientRect();
+    return {before,after:capture(),dragReady:box.dataset.dragReady==='1',moved:Math.abs(end.left-start.left)>.5||Math.abs(end.top-start.top)>.5,from:start.toJSON(),to:end.toJSON()};
+}
+
 function findChrome(){
     const configured=String(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||"").trim();
     if(configured&&fs.existsSync(configured)){ return configured; }
@@ -63,6 +92,9 @@ const bossCss=read("css/gameplay-boss-tower.css").replace(/<\/style/gi,"<\\/styl
 const presentationSource=read("js/54-v173.51-battle-qa.js");
 const portraitSource=presentationSource.slice(presentationSource.indexOf("function numericValue("),presentationSource.indexOf("function syncUnitArtwork("))+presentationSource.slice(presentationSource.indexOf("function syncUnitArtwork("),presentationSource.indexOf("function clearUnitHud("));
 const portraitRegistry=JSON.parse(read("config/monster-portrait-registry.json")).presentation;
+const elementBoxSource=read('js/20-anonymous-20.js');
+const elementBoxDragSource=elementBoxSource.slice(elementBoxSource.indexOf('(function initBattleElementBoxDrag(){')).replace(/<\/script/gi,'<\\/script');
+assert.ok(elementBoxDragSource.startsWith('(function initBattleElementBoxDrag(){'),'fixture must load the original Element Box drag Owner');
 const portraitSamples=Object.keys(portraitRegistry.assets).filter(p=>p.startsWith("assets/monsters/wild/zone-01/")).slice(0,6);
 const allyPortraitSamples=[...read("js/26-v131-patrol-appearance.js").matchAll(/front:"(assets\/characters\/patrol\/[^" ]+)"/g)].map(match=>({path:match[1],data:"data:image/webp;base64,"+fs.readFileSync(path.join(ROOT,match[1])).toString("base64")}));
 assert.equal(allyPortraitSamples.length,8,"formal patrol front portrait coverage");
@@ -103,8 +135,11 @@ window.FourSymbolsBattlePresentation={getUnitHud:function(card){return card.v174
 window.showDamagePopup=function(element,text,type,isCrit){var p=document.createElement('div');p.className='damage-popup hp-popup'+(isCrit?' crit':'');p.textContent=text||'-100';element.appendChild(p);return p;};
 window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getElementById((isPlayerTarget?'battlePlayerCard':'battleMonster')+index);if(!el)return;var p=document.createElement('div');p.className='damage-popup miss-popup';p.textContent=label||'MISS';el.appendChild(p);};
 </script><script>${ownerSource}</script><script>${v131FormationSource}</script><script>${v131EnemyApplySource}</script><script>${adapterSource}</script><script>${feedbackSource}</script><script>${mainRenderHookSource}</script><script>${mainRenderSource}</script>
-<script>
+<script>${elementBoxDragSource}</script><script>
 (async function(){
+ if(document.readyState==='loading')await new Promise(resolve=>document.addEventListener('DOMContentLoaded',resolve,{once:true}));
+ const exerciseFloatingCommandReachability=${exerciseFloatingCommandReachability.toString()};
+ let commandDrag=null;
 ${portraitSource}
  const portraitMetadata=${JSON.stringify(portraitRegistry)},portraitPaths=${JSON.stringify(portraitSamples)};
  window.v154GetPortraitPresentation=function(path){return portraitMetadata.assets[path];};
@@ -136,7 +171,7 @@ ${portraitSource}
  }
  function rect(sel){var node=document.querySelector(sel),r=node.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height,centerX:r.left+r.width/2,centerY:r.top+r.height/2};}
  function commandVisualTop(){var menu=document.getElementById('mainBattleMenu'),r=menu.getBoundingClientRect(),style=getComputedStyle(menu,'::before'),scaleY=menu.offsetHeight?r.height/menu.offsetHeight:1,top=parseFloat(style.top)||0;return r.top+top*scaleY;}
- function lower(){return {enemy:rect('.battle-enemy-region'),center:rect('.battle-center-region'),allyRegion:rect('.battle-ally-region'),ally:rect('#battlePlayerRow'),middle:rect('.battle-middle'),action:rect('#battleActionRegion'),turn:rect('#turnTargetRow'),command:rect('#mainBattleMenu'),commandVisualTop:commandVisualTop(),elementBox:rect('.battle-element-box-button'),elementBoxHit:(function(){var n=document.querySelector('.battle-element-box-button'),r=n.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return n===hit||n.contains(hit);})(),commandButtons:Array.from(document.querySelectorAll('#mainBattleMenu > .menu-button')).map(n=>({rect:n.getBoundingClientRect().toJSON(),radii:(function(){const r=n.getBoundingClientRect(),style=getComputedStyle(n),sx=r.width/n.offsetWidth,sy=r.height/n.offsetHeight;return ['borderTopLeftRadius','borderTopRightRadius','borderBottomRightRadius','borderBottomLeftRadius'].map(key=>{const parts=style[key].split(/\s+/),x=parts[0],y=parts[1]||x;return {x:x.endsWith('%')?parseFloat(x)*r.width/100:parseFloat(x)*sx,y:y.endsWith('%')?parseFloat(y)*r.height/100:parseFloat(y)*sy};});})(),font:getComputedStyle(n).fontSize,hit:document.elementFromPoint(n.getBoundingClientRect().x+n.getBoundingClientRect().width/2,n.getBoundingClientRect().y+n.getBoundingClientRect().height/2)===n})),centerBackground:getComputedStyle(document.querySelector('.battle-center-region')).backgroundImage};}
+ function lower(){if(!commandDrag)commandDrag=exerciseFloatingCommandReachability();return {enemy:rect('.battle-enemy-region'),center:rect('.battle-center-region'),allyRegion:rect('.battle-ally-region'),ally:rect('#battlePlayerRow'),middle:rect('.battle-middle'),action:rect('#battleActionRegion'),turn:rect('#turnTargetRow'),command:rect('#mainBattleMenu'),commandVisualTop:commandVisualTop(),elementBox:rect('.battle-element-box-button'),elementBoxHit:(function(){var n=document.querySelector('.battle-element-box-button'),r=n.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return n===hit||n.contains(hit);})(),commandButtons:Array.from(document.querySelectorAll('#mainBattleMenu > .menu-button')).map(n=>({rect:n.getBoundingClientRect().toJSON(),radii:(function(){const r=n.getBoundingClientRect(),style=getComputedStyle(n),sx=r.width/n.offsetWidth,sy=r.height/n.offsetHeight;return ['borderTopLeftRadius','borderTopRightRadius','borderBottomRightRadius','borderBottomLeftRadius'].map(key=>{const parts=style[key].split(/\s+/),x=parts[0],y=parts[1]||x;return {x:x.endsWith('%')?parseFloat(x)*r.width/100:parseFloat(x)*sx,y:y.endsWith('%')?parseFloat(y)*r.height/100:parseFloat(y)*sy};});})(),font:getComputedStyle(n).fontSize,hit:document.elementFromPoint(n.getBoundingClientRect().x+n.getBoundingClientRect().width/2,n.getBoundingClientRect().y+n.getBoundingClientRect().height/2)===n})),centerBackground:getComputedStyle(document.querySelector('.battle-center-region')).backgroundImage};}
  function unitRects(selector){return Array.from(document.querySelectorAll(selector)).filter(function(node){return node.children.length;}).map(function(node){return rect('#'+node.children[0].id);});}
  function hudRects(selector){return Array.from(document.querySelectorAll(selector)).filter(function(node){return node.children.length;}).map(function(slot){var card=slot.children[0],art=card.querySelector('.v174-battle-art'),hp=card.querySelector('.monster-hp,.hp-bar'),sp=card.querySelector('.monster-sp,.sp-bar'),name=card.querySelector('.battle-monster-name,.battle-player-id');return {id:card.id,art:rect('#'+card.id+' .v174-battle-art'),hp:rect('#'+card.id+' .monster-hp,#'+card.id+' .hp-bar'),sp:rect('#'+card.id+' .monster-sp,#'+card.id+' .sp-bar'),name:rect('#'+card.id+' .battle-monster-name,#'+card.id+' .battle-player-id'),logicalHp:hp.offsetHeight,logicalSp:sp.offsetHeight};});}
  function clipChain(node){var result=[];for(var p=node.parentElement;p&&p.id!=='game-stage';p=p.parentElement){var cs=getComputedStyle(p);result.push({tag:p.id||p.className,overflow:cs.overflow,overflowX:cs.overflowX,overflowY:cs.overflowY,contain:cs.contain});}return result;}
@@ -252,7 +287,7 @@ ${portraitSource}
    return {path:path,visible:visible,art:{left:a.left,top:a.top,right:a.right,bottom:a.bottom},slot:card.dataset.slot,hudTop:card.v174UnitHud.querySelector('.monster-hp').getBoundingClientRect().top};
   });
  }
- result.portraits={legacy:portraitProbe('adventure'),six:portraitProbe('wild')};
+ result.commandDrag=commandDrag;result.portraits={legacy:portraitProbe('adventure'),six:portraitProbe('wild')};
  result.sixProfile=document.getElementById('battleMonsterArea').dataset.battlefieldProfile;
  result.sixRows=Array.from(document.querySelectorAll('.v-fixed-enemy-row')).map(row=>Array.from(row.children).map(slot=>slot.dataset.slot));
 const proofParty=Number(new URLSearchParams(location.search).get('proofParty'));if(proofParty){addCards(5,proofParty,false);allyVisiblePortraits();if(new URLSearchParams(location.search).has('hidePortrait'))document.querySelectorAll('#battlePlayerRow .v174-battle-art').forEach(n=>n.style.visibility='hidden');}document.getElementById('result').textContent=JSON.stringify(result);},40);
@@ -362,6 +397,7 @@ function runViewport(chrome,width,height){
     // Product decision: Element Box is a floating button and may overlap the
     // command region; its hit target and the existing command targets remain usable.
     assert.equal(baseline.elementBoxHit,true,"floating Element Box must retain its own hit target");
+    assertFloatingCommandReachability(data.commandDrag);
     assert.equal(baseline.commandButtons.length,5);
     baseline.commandButtons.forEach(button=>{assert.ok(button.rect.height/canvasScale>=66-.1);assert.ok(button.rect.width/canvasScale>=70);assert.equal(button.font,"16px");assert.equal(button.hit,true,"visible command center must hit its own control");});
     assert.ok(data.allyScenarios[6].hudRects[0].art.height/canvasScale/.94>99,"far-row depth preserves the original artwork box before its 6% paint projection");

@@ -83,12 +83,12 @@ test('canonical artwork updates reuse one child and preserve the selected portra
     const children=[];
     const makeStyle=()=>({setProperty(name,value){this[name]=value;},removeProperty(name){delete this[name];}});
     const context=vm.createContext({
-        document:{body:{classList:{remove(){}}},getElementById(){return null;},querySelectorAll(){return [];},createElement(){return {style:makeStyle(),dataset:{},classList:{toggle(){}},querySelector(){return null;},appendChild(){}};}},
+        document:{body:{classList:{remove(){}}},getElementById(){return null;},querySelectorAll(){return [];},createElement(){return {style:makeStyle(),dataset:{},classList:{toggle(){}},querySelector(){return null;},appendChild(){},addEventListener(){}};}},
         addEventListener(){},getComputedStyle:()=>({getPropertyValue:()=> 'url("abyss-selected.webp")',backgroundImage:"none"}),console
     });
     context.window=context;
     vm.runInContext(source,context);
-    const card={id:"battleMonster0",dataset:{},style:makeStyle(),classList:{add(){},contains(){return false;}},querySelectorAll(){return [];},appendChild(node){children.push(node);},
+    const card={id:"battleMonster0",dataset:{},style:makeStyle(),classList:{add(){},contains(){return false;}},closest(){return null;},querySelectorAll(){return [];},appendChild(node){children.push(node);},
         querySelector(){return children.find(node=>node.className==="v174-battle-art")||null;},
         insertBefore(node){children.unshift(node);},get firstChild(){return children[0]||null;}
     };
