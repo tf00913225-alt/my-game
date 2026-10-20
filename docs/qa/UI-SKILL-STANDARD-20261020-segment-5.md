@@ -13,3 +13,5 @@ before權威：`battle-before-8b6857ae/393x873`12圖與`battle-before-a83339b0/3
 1904e4c2固定Head四尺寸被退回：全4技能、最長範圍三行會越過底雕框，SP不足在34px圖框內斷行。dirty r2增加高度/56圖示解決文字卻碰到敵HP，未批准。r3由原fixed-slot Owner把卡片改對齊的圖示/名稱/消耗/範圍四列，offset188保留所需字級及三行範圍；360實圖scope末端在卡內、敵HP底約165px而面板起點約166px無實際覆蓋，返回成功。另原禁用文字改可讀古銅色，原disabled與SP不足標記保留。待新固定Head四尺寸複審，r2/r3不作最終批准。
 
 後續實圖待辦（不稱已修）：秘寶後段分類選中不可見、任務鎖定寶箱獎勵文字過暗、合成數量區擁擠；舊hero五tab圖只露補給長文，英雄名單/詳情尚缺有效fixture與操作證據。Boss/塔/玩法及創角仍有普通外框須依當前實畫判斷，保留既有配置。
+
+最終限定通過：80974cac6fc8c5a938e20e655e52b0b97b7e7d39，`battle-final-80974cac`四尺寸52圖、來源/載入bundle hash綁定且clean/unchanged。interaction與scope逐張52圖，美術看360全13圖與其他三尺寸15代表圖；四格滿/SP不足、空滿/補品真捲末、狀態/目標返回正常。完整三行範圍在框內，敵名/HP在框外。legacy兩ID原icon為空，非新增素材缺漏；✦原glyph已正常顯示。真攻擊、使用補品、勝敗/獎勵結算、非空buff、Boss、硬體與reward dismiss均未驗，沒有擴大批准。代表性前後圖與source binding已加入evidence目錄；整個UI工程仍施工中。

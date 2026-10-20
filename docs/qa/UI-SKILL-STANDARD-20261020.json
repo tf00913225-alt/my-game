@@ -8018,7 +8018,7 @@
       "label": "戰鬥 skills",
       "entry": "隔離QA帳號→正式戰鬥控制 skills",
       "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "可操作",
         "禁用",
@@ -8071,6 +8071,75 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": 5,
+        "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+        "status": "已實際驗證（限定列出呈現路徑）",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "artifacts/ui-skill-standard/battle-final-80974cac",
+        "deviceResults": [
+          {
+            "device": "360x640",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "393x873",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "412x915",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "1280x800",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          }
+        ],
+        "reviewers": [
+          "art_review",
+          "interaction_review",
+          "scope_review"
+        ],
+        "states": [
+          "技能空格/四格滿/不足SP",
+          "補品空/滿/真捲末項",
+          "符咒空",
+          "狀態雙方（空buff）",
+          "目標返回",
+          "reward正式API穩定展示"
+        ],
+        "limits": [
+          "未執行真攻擊/補品使用/勝敗結算/交易",
+          "未驗Boss/非空狀態/正式符咒/實體裝置",
+          "未驗reward dismiss",
+          "舊8b before360被trial誤覆，已INVALID；before393與a833360有效"
+        ]
       }
     },
     {
@@ -8078,7 +8147,7 @@
       "label": "戰鬥 items-potion",
       "entry": "隔離QA帳號→正式戰鬥控制 items-potion",
       "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "可操作",
         "禁用",
@@ -8131,6 +8200,75 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": 5,
+        "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+        "status": "已實際驗證（限定列出呈現路徑）",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "artifacts/ui-skill-standard/battle-final-80974cac",
+        "deviceResults": [
+          {
+            "device": "360x640",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "393x873",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "412x915",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "1280x800",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          }
+        ],
+        "reviewers": [
+          "art_review",
+          "interaction_review",
+          "scope_review"
+        ],
+        "states": [
+          "技能空格/四格滿/不足SP",
+          "補品空/滿/真捲末項",
+          "符咒空",
+          "狀態雙方（空buff）",
+          "目標返回",
+          "reward正式API穩定展示"
+        ],
+        "limits": [
+          "未執行真攻擊/補品使用/勝敗結算/交易",
+          "未驗Boss/非空狀態/正式符咒/實體裝置",
+          "未驗reward dismiss",
+          "舊8b before360被trial誤覆，已INVALID；before393與a833360有效"
+        ]
       }
     },
     {
@@ -8138,7 +8276,7 @@
       "label": "戰鬥 items-talisman",
       "entry": "隔離QA帳號→正式戰鬥控制 items-talisman",
       "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "可操作",
         "禁用",
@@ -8191,6 +8329,75 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": 5,
+        "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+        "status": "已實際驗證（限定列出呈現路徑）",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "artifacts/ui-skill-standard/battle-final-80974cac",
+        "deviceResults": [
+          {
+            "device": "360x640",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "393x873",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "412x915",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "1280x800",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          }
+        ],
+        "reviewers": [
+          "art_review",
+          "interaction_review",
+          "scope_review"
+        ],
+        "states": [
+          "技能空格/四格滿/不足SP",
+          "補品空/滿/真捲末項",
+          "符咒空",
+          "狀態雙方（空buff）",
+          "目標返回",
+          "reward正式API穩定展示"
+        ],
+        "limits": [
+          "未執行真攻擊/補品使用/勝敗結算/交易",
+          "未驗Boss/非空狀態/正式符咒/實體裝置",
+          "未驗reward dismiss",
+          "舊8b before360被trial誤覆，已INVALID；before393與a833360有效"
+        ]
       }
     },
     {
@@ -8198,7 +8405,7 @@
       "label": "戰鬥 target",
       "entry": "隔離QA帳號→正式戰鬥控制 target",
       "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "可操作",
         "禁用",
@@ -8251,6 +8458,75 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": 5,
+        "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+        "status": "已實際驗證（限定列出呈現路徑）",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "artifacts/ui-skill-standard/battle-final-80974cac",
+        "deviceResults": [
+          {
+            "device": "360x640",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "393x873",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "412x915",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "1280x800",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          }
+        ],
+        "reviewers": [
+          "art_review",
+          "interaction_review",
+          "scope_review"
+        ],
+        "states": [
+          "技能空格/四格滿/不足SP",
+          "補品空/滿/真捲末項",
+          "符咒空",
+          "狀態雙方（空buff）",
+          "目標返回",
+          "reward正式API穩定展示"
+        ],
+        "limits": [
+          "未執行真攻擊/補品使用/勝敗結算/交易",
+          "未驗Boss/非空狀態/正式符咒/實體裝置",
+          "未驗reward dismiss",
+          "舊8b before360被trial誤覆，已INVALID；before393與a833360有效"
+        ]
       }
     },
     {
@@ -8258,7 +8534,7 @@
       "label": "戰鬥 status-detail",
       "entry": "隔離QA帳號→正式戰鬥控制 status-detail",
       "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "可操作",
         "禁用",
@@ -8311,6 +8587,75 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": 5,
+        "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+        "status": "已實際驗證（限定列出呈現路徑）",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "artifacts/ui-skill-standard/battle-final-80974cac",
+        "deviceResults": [
+          {
+            "device": "360x640",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "393x873",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "412x915",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "1280x800",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          }
+        ],
+        "reviewers": [
+          "art_review",
+          "interaction_review",
+          "scope_review"
+        ],
+        "states": [
+          "技能空格/四格滿/不足SP",
+          "補品空/滿/真捲末項",
+          "符咒空",
+          "狀態雙方（空buff）",
+          "目標返回",
+          "reward正式API穩定展示"
+        ],
+        "limits": [
+          "未執行真攻擊/補品使用/勝敗結算/交易",
+          "未驗Boss/非空狀態/正式符咒/實體裝置",
+          "未驗reward dismiss",
+          "舊8b before360被trial誤覆，已INVALID；before393與a833360有效"
+        ]
       }
     },
     {
@@ -8371,7 +8716,8 @@
         "art": null,
         "interaction": null,
         "scope": null
-      }
+      },
+      "formalEntryFinding": "直接Owner及既有battle-ui-status-vfx-followup regression證明統計主頁已退休；不自造入口。現存Boss功能檢視另外待驗。"
     },
     {
       "id": "battle.boss-mechanism",
@@ -8678,7 +9024,7 @@
       "label": "戰鬥 reward",
       "entry": "隔離QA帳號→正式戰鬥控制 reward",
       "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "可操作",
         "禁用",
@@ -8731,6 +9077,75 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": 5,
+        "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+        "status": "已實際驗證（限定列出呈現路徑）",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "artifacts/ui-skill-standard/battle-final-80974cac",
+        "deviceResults": [
+          {
+            "device": "360x640",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "393x873",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "412x915",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "1280x800",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          }
+        ],
+        "reviewers": [
+          "art_review",
+          "interaction_review",
+          "scope_review"
+        ],
+        "states": [
+          "技能空格/四格滿/不足SP",
+          "補品空/滿/真捲末項",
+          "符咒空",
+          "狀態雙方（空buff）",
+          "目標返回",
+          "reward正式API穩定展示"
+        ],
+        "limits": [
+          "未執行真攻擊/補品使用/勝敗結算/交易",
+          "未驗Boss/非空狀態/正式符咒/實體裝置",
+          "未驗reward dismiss",
+          "舊8b before360被trial誤覆，已INVALID；before393與a833360有效"
+        ]
       }
     },
     {
@@ -10297,6 +10712,75 @@
         "interaction_review",
         "scope_review"
       ]
+    },
+    {
+      "segment": 5,
+      "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+      "status": "已實際驗證（限定列出呈現路徑）",
+      "devices": [
+        "360x640",
+        "393x873",
+        "412x915",
+        "1280x800"
+      ],
+      "evidence": "artifacts/ui-skill-standard/battle-final-80974cac",
+      "deviceResults": [
+        {
+          "device": "360x640",
+          "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+          "dirty": false,
+          "unchanged": true,
+          "screens": 13,
+          "actionRecords": 21,
+          "taps": 15
+        },
+        {
+          "device": "393x873",
+          "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+          "dirty": false,
+          "unchanged": true,
+          "screens": 13,
+          "actionRecords": 21,
+          "taps": 15
+        },
+        {
+          "device": "412x915",
+          "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+          "dirty": false,
+          "unchanged": true,
+          "screens": 13,
+          "actionRecords": 21,
+          "taps": 15
+        },
+        {
+          "device": "1280x800",
+          "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+          "dirty": false,
+          "unchanged": true,
+          "screens": 13,
+          "actionRecords": 21,
+          "taps": 15
+        }
+      ],
+      "reviewers": [
+        "art_review",
+        "interaction_review",
+        "scope_review"
+      ],
+      "states": [
+        "技能空格/四格滿/不足SP",
+        "補品空/滿/真捲末項",
+        "符咒空",
+        "狀態雙方（空buff）",
+        "目標返回",
+        "reward正式API穩定展示"
+      ],
+      "limits": [
+        "未執行真攻擊/補品使用/勝敗結算/交易",
+        "未驗Boss/非空狀態/正式符咒/實體裝置",
+        "未驗reward dismiss",
+        "舊8b before360被trial誤覆，已INVALID；before393與a833360有效"
+      ]
     }
   ],
   "titleAudit": {
@@ -10328,9 +10812,11 @@
       "長名稱與其他尚未列證之動態狀態"
     ],
     "nextSegmentIssues": [
-      "戰鬥HUD/技能/道具/統計/結算實圖尚待審",
-      "自動設定sticky策略卡邊緣捲動露字待實際定位",
-      "其他台帳未列狀態保留未檢查"
+      "秘寶分類切換選中不可見",
+      "任務鎖定寶箱內容對比",
+      "合成數量區擁擠",
+      "英雄現有圖片只空名單/未就緒，需要既有正式隔離transport",
+      "其他未列狀態與玩法/創角材質仍待目前實圖"
     ],
     "limits": "桌面Chrome viewport/touch模擬；非真實手機硬體。dialog補驗在dirty期間未綁bundlehash，只作before線索。",
     "followupSegments": [
@@ -10392,6 +10878,75 @@
           "art_review",
           "interaction_review",
           "scope_review"
+        ]
+      },
+      {
+        "segment": 5,
+        "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+        "status": "已實際驗證（限定列出呈現路徑）",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "artifacts/ui-skill-standard/battle-final-80974cac",
+        "deviceResults": [
+          {
+            "device": "360x640",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "393x873",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "412x915",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          },
+          {
+            "device": "1280x800",
+            "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+            "dirty": false,
+            "unchanged": true,
+            "screens": 13,
+            "actionRecords": 21,
+            "taps": 15
+          }
+        ],
+        "reviewers": [
+          "art_review",
+          "interaction_review",
+          "scope_review"
+        ],
+        "states": [
+          "技能空格/四格滿/不足SP",
+          "補品空/滿/真捲末項",
+          "符咒空",
+          "狀態雙方（空buff）",
+          "目標返回",
+          "reward正式API穩定展示"
+        ],
+        "limits": [
+          "未執行真攻擊/補品使用/勝敗結算/交易",
+          "未驗Boss/非空狀態/正式符咒/實體裝置",
+          "未驗reward dismiss",
+          "舊8b before360被trial誤覆，已INVALID；before393與a833360有效"
         ]
       }
     ]
