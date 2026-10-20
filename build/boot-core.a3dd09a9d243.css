@@ -5898,6 +5898,7 @@ body.creation-fixed-active{
     padding:28px 36px 32px;
     box-sizing:border-box;
     overflow:clip;
+    border-image:var(--rpg-window-frame,url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp')) 115 fill / 30px / 0 stretch;
 }
 
 #creationPage .creation-premium-shell::before{
@@ -5921,6 +5922,7 @@ body.creation-fixed-active{
 }
 
 #creationPage .creation-header-ornament{
+    display:none;
     width:87.429px;
     height:46.286px;
     margin:0 auto 7.714px;
@@ -5932,6 +5934,9 @@ body.creation-fixed-active{
 
 #creationPage .creation-title{
     margin:0;
+    padding:18px 30px;
+    border-image:var(--rpg-window-frame,url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp')) 115 fill / 18px / 0 stretch;
+    background:#151515;
     font-family:"Noto Serif TC",serif;
     font-size:66.857px;
     line-height:1.18;
@@ -6001,37 +6006,13 @@ body.creation-fixed-active{
     margin-bottom:24px;
     overflow:hidden;
     border:2.571px solid rgba(198,146,68,.58);
-    border-radius:41.143px;
+    border-image:var(--rpg-window-frame,url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp')) 115 fill / 18px / 0 stretch;
+    border-radius:0;
     background:
         linear-gradient(135deg,rgba(32,29,23,.98),rgba(13,12,9,.99));
     box-shadow:
         inset 0 0 0 2.571px rgba(255,232,178,.035),
         0 25.714px 77.143px rgba(0,0,0,.35);
-}
-
-#creationPage .creation-showcase::before,
-#creationPage .creation-showcase::after{
-    content:"";
-    position:absolute;
-    z-index:3;
-    pointer-events:none;
-    width:141.429px;
-    height:141.429px;
-    border-color:rgba(244,188,83,.65);
-}
-
-#creationPage .creation-showcase::before{
-    left:20.571px;
-    top:20.571px;
-    border-left:2.571px solid;
-    border-top:2.571px solid;
-}
-
-#creationPage .creation-showcase::after{
-    right:20.571px;
-    bottom:20.571px;
-    border-right:2.571px solid;
-    border-bottom:2.571px solid;
 }
 
 #creationPage .creation-portrait-panel{
