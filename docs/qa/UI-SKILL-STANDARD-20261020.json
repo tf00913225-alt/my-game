@@ -24908,7 +24908,7 @@
       ],
       "note": "一個story面板的真實狀態，不是新增三個頁面。advanceDialogue使用commitChange且末句可進教學/戰鬥/完成與recordHeroChapterNode，不作無副作用點擊。",
       "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "operations": [
         "正式入口",
         "閱讀",
@@ -24943,7 +24943,33 @@
           "after": null,
           "interaction": null
         }
-      }
+      },
+      "stateEvidence": [
+        {
+          "state": "two before-dialogue short/long canonical cursor presentation and true safe-next/non-onboarding return/reopen",
+          "status": "已實際驗證",
+          "head": "c349a41065a7f1a2796b604a3022641bd8ea7c39",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment28-short-long-accepted",
+          "limits": [
+            "Only two canonical before-dialogue cursor cases, player/NPC speaker, short/long text and legal16-name, safe nonterminal next, true non-onboarding return/reopen",
+            "Active onboarding UI/guard actual case still pending; parent28 NOT fully accepted",
+            "No guidance/ending terminal click/continueTutorial/reward/creation/equip/learning/battle/transaction acceptance",
+            "Original open lastViewedAt/beginChapter/local saves retained; same-task domain snapshot does not prove zero save",
+            "No hardware device/keyboard acceptance"
+          ]
+        },
+        {
+          "state": "Active onboarding first story c1_01 before0, hidden-back presentation only",
+          "status": "已實際驗證",
+          "head": "c349a41065a7f1a2796b604a3022641bd8ea7c39",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment28-active-accepted",
+          "limits": [
+            "Active onboarding c1_01 before0 presentation only; hidden back0x0, no next/back click or runtime guard bypass",
+            "Original open lastViewedAt/beginChapter/local save effects retained; raw/meta/playerid exact restore does not mean zero saves",
+            "No active tutorial system/continue/claim/terminal story/battle/transaction/hardware acceptance"
+          ]
+        }
+      ]
     },
     {
       "id": "gameplay.adventure-onboarding",
@@ -24958,7 +24984,7 @@
       ],
       "note": "claimNodeReward/confirmPreparation/continueTutorial皆可能改持久化/資源/啟戰，不點業務按鈕造呈現。",
       "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "operations": [
         "正式入口",
         "閱讀",
@@ -24993,7 +25019,20 @@
           "after": null,
           "interaction": null
         }
-      }
+      },
+      "stateEvidence": [
+        {
+          "state": "Active onboarding first story c1_01 before0, hidden-back presentation only",
+          "status": "已實際驗證",
+          "head": "c349a41065a7f1a2796b604a3022641bd8ea7c39",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment28-active-accepted",
+          "limits": [
+            "Active onboarding c1_01 before0 presentation only; hidden back0x0, no next/back click or runtime guard bypass",
+            "Original open lastViewedAt/beginChapter/local save effects retained; raw/meta/playerid exact restore does not mean zero saves",
+            "No active tutorial system/continue/claim/terminal story/battle/transaction/hardware acceptance"
+          ]
+        }
+      ]
     },
     {
       "id": "gameplay.adventure-onboarding-return",
@@ -25056,7 +25095,7 @@
       ],
       "note": "cursor是同story面板資料狀態，不是獨立catalog或choice頁。invalid cursor/security/migration不能靠手改closure或fail-open造畫面。",
       "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "operations": [
         "正式入口",
         "閱讀",
@@ -25091,7 +25130,22 @@
           "after": null,
           "interaction": null
         }
-      }
+      },
+      "stateEvidence": [
+        {
+          "state": "two before-dialogue short/long canonical cursor presentation and true safe-next/non-onboarding return/reopen",
+          "status": "已實際驗證",
+          "head": "c349a41065a7f1a2796b604a3022641bd8ea7c39",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment28-short-long-accepted",
+          "limits": [
+            "Only two canonical before-dialogue cursor cases, player/NPC speaker, short/long text and legal16-name, safe nonterminal next, true non-onboarding return/reopen",
+            "Active onboarding UI/guard actual case still pending; parent28 NOT fully accepted",
+            "No guidance/ending terminal click/continueTutorial/reward/creation/equip/learning/battle/transaction acceptance",
+            "Original open lastViewedAt/beginChapter/local saves retained; same-task domain snapshot does not prove zero save",
+            "No hardware device/keyboard acceptance"
+          ]
+        }
+      ]
     }
   ],
   "segmentReviews": [
@@ -25830,6 +25884,30 @@
       "result": "標題字型有限通過；保留先前字型批准撤回之歷史",
       "pending": [
         "Actual battle states remain unverified"
+      ]
+    },
+    {
+      "segment": "segment-28-short-long",
+      "head": "c349a41065a7f1a2796b604a3022641bd8ea7c39",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment28-short-long-accepted",
+      "result": "before短長文有限通過，父段仍待active onboarding等未驗狀態",
+      "pending": [
+        "Only two canonical before-dialogue cursor cases, player/NPC speaker, short/long text and legal16-name, safe nonterminal next, true non-onboarding return/reopen",
+        "Active onboarding UI/guard actual case still pending; parent28 NOT fully accepted",
+        "No guidance/ending terminal click/continueTutorial/reward/creation/equip/learning/battle/transaction acceptance",
+        "Original open lastViewedAt/beginChapter/local saves retained; same-task domain snapshot does not prove zero save",
+        "No hardware device/keyboard acceptance"
+      ]
+    },
+    {
+      "segment": "segment-28-active",
+      "head": "c349a41065a7f1a2796b604a3022641bd8ea7c39",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment28-active-accepted",
+      "result": "Active首故事呈現有限通過，不等全故事/教學流程",
+      "pending": [
+        "Active onboarding c1_01 before0 presentation only; hidden back0x0, no next/back click or runtime guard bypass",
+        "Original open lastViewedAt/beginChapter/local save effects retained; raw/meta/playerid exact restore does not mean zero saves",
+        "No active tutorial system/continue/claim/terminal story/battle/transaction/hardware acceptance"
       ]
     }
   ],
