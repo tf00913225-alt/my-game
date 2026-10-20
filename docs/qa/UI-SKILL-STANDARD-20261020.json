@@ -4821,7 +4821,7 @@
       "label": "裝備比較",
       "entry": "透過正式背包格 openItemModal / openEquippedItem",
       "owner": "index.html; js/00-main.js; js/equipment-progression.js; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "長名稱",
         "長詞條",
@@ -4869,7 +4869,42 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "Five formal slots current-occupied comparison true entry/end/return",
+          "status": "已實際驗證",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment33-occupied-five-slots",
+          "reports": [
+            {
+              "head": "eaac1b0d33937919b91c03baa9c9867adcd72f88",
+              "viewport": "360x640",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33-occupied-five-slots\\360x640\\report.json"
+            },
+            {
+              "head": "eaac1b0d33937919b91c03baa9c9867adcd72f88",
+              "viewport": "393x873",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33-occupied-five-slots\\393x873\\report.json"
+            },
+            {
+              "head": "ba993e5de98b8712b595f1736e7a875bdb7613a4",
+              "viewport": "412x915",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33-occupied-five-slots\\412x915\\report.json"
+            },
+            {
+              "head": "ba993e5de98b8712b595f1736e7a875bdb7613a4",
+              "viewport": "1280x800",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33-occupied-five-slots\\1280x800\\report.json"
+            }
+          ],
+          "limits": [
+            "Five formally defined slots only: weapon/head/shoulder/armor/shoes, original current-occupied read-only comparison",
+            "Ring formal definition not found; legally populated long affixes unverified; empty reforge slots are not long-affix evidence",
+            "No wear/sell/lock/source or live transaction/physical-device acceptance",
+            "Six restore fields only; baseline after startup/module initialization before actor seed, not all private caches/selection/save API restoration",
+            "Known tall duplicate header and white-background weapon artwork remain polishing candidates, not new logic regressions"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -26492,6 +26527,40 @@
         "Six exact restore fields; privateHeroCachesExact=false, fresh isolated profile discarded",
         "No growth/reward/equipment transactions, live provider availability or physical-device acceptance",
         "Initial strict same-pixel anchor failure excluded; original saved anchor retained and returned top precisely browser-clamped to new list maximum"
+      ]
+    },
+    {
+      "segment": "segment-33-occupied-five-slots",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment33-occupied-five-slots",
+      "reports": [
+        {
+          "head": "eaac1b0d33937919b91c03baa9c9867adcd72f88",
+          "viewport": "360x640",
+          "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33-occupied-five-slots\\360x640\\report.json"
+        },
+        {
+          "head": "eaac1b0d33937919b91c03baa9c9867adcd72f88",
+          "viewport": "393x873",
+          "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33-occupied-five-slots\\393x873\\report.json"
+        },
+        {
+          "head": "ba993e5de98b8712b595f1736e7a875bdb7613a4",
+          "viewport": "412x915",
+          "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33-occupied-five-slots\\412x915\\report.json"
+        },
+        {
+          "head": "ba993e5de98b8712b595f1736e7a875bdb7613a4",
+          "viewport": "1280x800",
+          "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33-occupied-five-slots\\1280x800\\report.json"
+        }
+      ],
+      "result": "五部位目前裝備對照操作限定通過；美術待精修項明列",
+      "pending": [
+        "Five formally defined slots only: weapon/head/shoulder/armor/shoes, original current-occupied read-only comparison",
+        "Ring formal definition not found; legally populated long affixes unverified; empty reforge slots are not long-affix evidence",
+        "No wear/sell/lock/source or live transaction/physical-device acceptance",
+        "Six restore fields only; baseline after startup/module initialization before actor seed, not all private caches/selection/save API restoration",
+        "Known tall duplicate header and white-background weapon artwork remain polishing candidates, not new logic regressions"
       ]
     }
   ],
