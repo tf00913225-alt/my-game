@@ -338,11 +338,16 @@
         if(title){ title.textContent=view.chapter.title; }
         if(meta){ meta.innerHTML='<span>建議 Lv.'+esc(view.chapter.suggestedLevel)+'</span><span>主線章節</span>'; }
         if(ui.body){
+            const samePanel=ui.renderedPanel===view.panel;
+            const panelScrollTop=ui.body.scrollTop;
             if(ui.body.querySelector('.adventure-map-canvas')){ ui.mapScrollTop=ui.body.scrollTop; }
             ui.body.innerHTML=renderPanel(view);
             if(ui.body.querySelector('.adventure-map-canvas')&&Number.isFinite(ui.mapScrollTop)){
                 ui.body.scrollTop=ui.mapScrollTop;
+            }else{
+                ui.body.scrollTop=samePanel?panelScrollTop:0;
             }
+            ui.renderedPanel=view.panel;
         }
         syncTracker(view);
     }
