@@ -43,7 +43,7 @@
 }
 
 #game-ui #homeFeatureModalBody .home-feature-buy-btn,
-#game-ui #homeFeatureModalBody button:where(:not(.team-relic-modal button,.quest-claim-all-btn,.v17363-material-synthesis button,.status-confirm,.formation-remove)){
+#game-ui #homeFeatureModalBody button:where(:not(.team-relic-modal button,.quest-claim-all-btn,.v17363-material-synthesis button,.status-confirm,.formation-remove,.formation-footer .main-button)){
     min-height:114px;
     font-size:45px;
 }
