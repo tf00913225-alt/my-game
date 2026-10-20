@@ -6794,7 +6794,42 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "Two real hero details/normal reads and empty filters; no business mutations",
+          "status": "已實際驗證",
+          "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+          "reports": [
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "360x640",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\report.json"
+            },
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "393x873",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\report.json"
+            },
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "412x915",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\report.json"
+            },
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "1280x800",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\report.json"
+            }
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment32-hero-normal-accepted",
+          "limits": [
+            "Two real hero IDs detail/acquisition/growth/equipment readonly presentation, water/earth empty filter and true ends/return/reopen only",
+            "Six restore exacts and no QA transport mutations; privateHeroCachesExact false intentionally recorded, not full runtime cache restoration",
+            "No unlock/star/reset/equip/claim/formation mutation/combat/cloud authority acceptance",
+            "32B read-failure states are separate and not imported or approved here"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -6894,7 +6929,42 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "Two real hero details/normal reads and empty filters; no business mutations",
+          "status": "已實際驗證",
+          "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+          "reports": [
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "360x640",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\report.json"
+            },
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "393x873",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\report.json"
+            },
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "412x915",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\report.json"
+            },
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "1280x800",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\report.json"
+            }
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment32-hero-normal-accepted",
+          "limits": [
+            "Two real hero IDs detail/acquisition/growth/equipment readonly presentation, water/earth empty filter and true ends/return/reopen only",
+            "Six restore exacts and no QA transport mutations; privateHeroCachesExact false intentionally recorded, not full runtime cache restoration",
+            "No unlock/star/reset/equip/claim/formation mutation/combat/cloud authority acceptance",
+            "32B read-failure states are separate and not imported or approved here"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -7187,6 +7257,40 @@
             }
           ],
           "limits": "只呈現fixture；末端/解鎖/取得/成長交易及權威未驗"
+        },
+        {
+          "state": "Two real hero details/normal reads and empty filters; no business mutations",
+          "status": "已實際驗證",
+          "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+          "reports": [
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "360x640",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\report.json"
+            },
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "393x873",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\report.json"
+            },
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "412x915",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\report.json"
+            },
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "1280x800",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\report.json"
+            }
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment32-hero-normal-accepted",
+          "limits": [
+            "Two real hero IDs detail/acquisition/growth/equipment readonly presentation, water/earth empty filter and true ends/return/reopen only",
+            "Six restore exacts and no QA transport mutations; privateHeroCachesExact false intentionally recorded, not full runtime cache restoration",
+            "No unlock/star/reset/equip/claim/formation mutation/combat/cloud authority acceptance",
+            "32B read-failure states are separate and not imported or approved here"
+          ]
         }
       ],
       "reviews": {
@@ -7279,6 +7383,40 @@
             }
           ],
           "limits": "只呈現fixture；末端/解鎖/取得/成長交易及權威未驗"
+        },
+        {
+          "state": "Two real hero details/normal reads and empty filters; no business mutations",
+          "status": "已實際驗證",
+          "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+          "reports": [
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "360x640",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\report.json"
+            },
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "393x873",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\report.json"
+            },
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "412x915",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\report.json"
+            },
+            {
+              "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+              "viewport": "1280x800",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\report.json"
+            }
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment32-hero-normal-accepted",
+          "limits": [
+            "Two real hero IDs detail/acquisition/growth/equipment readonly presentation, water/earth empty filter and true ends/return/reopen only",
+            "Six restore exacts and no QA transport mutations; privateHeroCachesExact false intentionally recorded, not full runtime cache restoration",
+            "No unlock/star/reset/equip/claim/formation mutation/combat/cloud authority acceptance",
+            "32B read-failure states are separate and not imported or approved here"
+          ]
         }
       ],
       "reviews": {
@@ -26217,6 +26355,18 @@
         "Original touch swipe also touch-emulated at desktop viewport; not desktop native wheel",
         "Failure reports unchanged: wrong identity API / PREPARE modal left open / borrowed home not ancestor of outer content are QA failures",
         "Helper gzip captures current reviewed v3 bytes only; original earlier failing helper bytes were not captured and are not claimed"
+      ]
+    },
+    {
+      "segment": "segment-32-normal",
+      "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment32-hero-normal-accepted",
+      "result": "英雄兩個正式個體正常呈現限定通過",
+      "pending": [
+        "Two real hero IDs detail/acquisition/growth/equipment readonly presentation, water/earth empty filter and true ends/return/reopen only",
+        "Six restore exacts and no QA transport mutations; privateHeroCachesExact false intentionally recorded, not full runtime cache restoration",
+        "No unlock/star/reset/equip/claim/formation mutation/combat/cloud authority acceptance",
+        "32B read-failure states are separate and not imported or approved here"
       ]
     }
   ],
