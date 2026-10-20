@@ -1,0 +1,195 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "sourceHead": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+  "assetId": "blazeSpell",
+  "mode": "builtin-imagegen-edit",
+  "attemptCount": 2,
+  "original": "assets/vfx/fire/blaze-spell-cast.png",
+  "selectedMother": "C:/Users/User/.codex/generated_images/01a1547a-7158-78a2-ae5f-0bf74afde211/exec-947964d3-92a1-423d-a040-c5afa2c406d1.png",
+  "output": "tools/vfx-commercial-sample/assets/full/blaze-spell-v2.webp",
+  "prompts": [
+    "Use case: precise-object-edit. Edit target: original blaze-spell-cast sprite sheet attached. Repaint this fire magic cast animation as a refined premium mobile fantasy RPG VFX atlas, retaining small magic circle charging -> concentrated flame jet -> impact fire whirl -> fading sparks. EXACT4 columns x3 rows,12 equal square cells, row-major,4:3 canvas. Actual RGBA TRANSPARENT background, NO grid lines, dividers, captions, backgrounds or checkerboard. Draw every complete effect INCLUDING glow only within central60% of each square cell,20% empty transparent gutter on all sides; deliberately small art with lots of negative space. Same source centre and ground baseline across all12 cells. Frames1-2 tiny red-gold magic circle gathers. Frames3-4 thin curving flame ribbon coils above circle. Frames5-6 concentrated narrow flame jet rises, ENTIRE jet visible with tapering pointed curved flame top well away from cell edge, NEVER a flat-cut horizontal top. Frame7 compresses fire into a tight target whirl. FRAME8 is strongest crisp hit: concentrated bright gold core and sharp curved red-orange fire-spiral edges, controlled footprint not giant disc. Frames9-10 continuously shrink and dissipate the whirl into a few curved flame threads. Frame11 only a few tiny embers. Frame12 almost empty one dying ember. Smooth adjacent-frame evolution with stable viewpoint and centre; do not move camera between rows. Crisp filament detail, deep crimson edges, thin amber highlights, minimal peripheral smoke, no large opaque haze cloud or full white explosion. No face, creature, person, text, symbols or letters beyond fine abstract magic-circle linework. No flame tip cropping, no shape touches any grid boundary. Preserve exactly12 phases and frame8 hit intent.",
+    "Use case: precise-object-edit. Edit target: original blaze-spell-cast sprite sheet attached. Repaint this fire magic cast animation as a refined premium mobile fantasy RPG VFX atlas, retaining small magic circle charging -> concentrated flame jet -> impact fire whirl -> fading sparks. EXACT4 columns x3 rows,12 equal square cells, row-major,4:3 canvas. Actual RGBA TRANSPARENT background, NO grid lines, dividers, captions, backgrounds or checkerboard. Draw every complete effect INCLUDING glow only within central60% of each square cell,20% empty transparent gutter on all sides; deliberately small art with lots of negative space. Same source centre and ground baseline across all12 cells. Frames1-2 tiny red-gold magic circle gathers. Frames3-4 thin curving flame ribbon coils above circle. Frames5-6 concentrated narrow flame jet rises, ENTIRE jet visible with tapering pointed curved flame top well away from cell edge, NEVER a flat-cut horizontal top. Frame7 compresses fire into a tight target whirl. FRAME8 is strongest crisp hit: concentrated bright gold core and sharp curved red-orange fire-spiral edges, controlled footprint not giant disc. Frames9-10 continuously shrink and dissipate the whirl into a few curved flame threads. Frame11 only a few tiny embers. Frame12 almost empty one dying ember. Smooth adjacent-frame evolution with stable viewpoint and centre; do not move camera between rows. Crisp filament detail, deep crimson edges, thin amber highlights, minimal peripheral smoke, no large opaque haze cloud or full white explosion. No face, creature, person, text, symbols or letters beyond fine abstract magic-circle linework. No flame tip cropping, no shape touches any grid boundary. Preserve exactly12 phases and frame8 hit intent.\nTARGETED CORRECTION: Repaint the VFX at HALF the current size inside each cell; preserve exactly4x3/12 frames and animation order. EVERY flame and magic circle must be small, surrounded by huge fully empty transparent canvas gutters. Central50% width and60% height of each cell only. Current shapes occupy too much cell area. Thin strand-like fire, not broad orange pancake. Frame1-2 just a tiny magic ring, frame5-6 thin pointed jet, frame8 clearly brightest compact whirl, frame9 half-size whirl,frame10 three slim arcs,frame11 three tiny sparks,frame12 single tiny ember. Crucial: use SAME local centre coordinates in every cell, centred x50%, y50%, rather than bottom-aligning first row and top-aligning last row. Entire flame jets need intact tapering top. No stray smoke between cells or near boundary. No solid fog. Keep crisp tiny-scale details."
+  ],
+  "grid": {
+    "columns": 4,
+    "rows": 3,
+    "frames": 12,
+    "order": "row-major",
+    "hitFrame": 8
+  },
+  "conversion": {
+    "lossless": true,
+    "exact": true,
+    "rgbaPixelEquality": true,
+    "alphaEquality": true,
+    "sourceSize": [
+      1448,
+      1086
+    ],
+    "outputSize": [
+      1448,
+      1086
+    ],
+    "resized": false,
+    "cropped": false,
+    "rearranged": false
+  },
+  "frames": [
+    {
+      "frame": 1,
+      "alpha64Bounds": [
+        127,
+        228,
+        262,
+        329
+      ],
+      "alpha64PixelCount": 5608,
+      "alpha16BorderPixels": 0,
+      "alpha64MinimumPaddingFraction": 0.0912
+    },
+    {
+      "frame": 2,
+      "alpha64Bounds": [
+        125,
+        211,
+        258,
+        327
+      ],
+      "alpha64PixelCount": 6999,
+      "alpha16BorderPixels": 0,
+      "alpha64MinimumPaddingFraction": 0.0967
+    },
+    {
+      "frame": 3,
+      "alpha64Bounds": [
+        114,
+        159,
+        248,
+        328
+      ],
+      "alpha64PixelCount": 10979,
+      "alpha16BorderPixels": 0,
+      "alpha64MinimumPaddingFraction": 0.0939
+    },
+    {
+      "frame": 4,
+      "alpha64Bounds": [
+        112,
+        131,
+        245,
+        327
+      ],
+      "alpha64PixelCount": 13237,
+      "alpha16BorderPixels": 0,
+      "alpha64MinimumPaddingFraction": 0.0967
+    },
+    {
+      "frame": 5,
+      "alpha64Bounds": [
+        127,
+        80,
+        261,
+        305
+      ],
+      "alpha64PixelCount": 13838,
+      "alpha16BorderPixels": 0,
+      "alpha64MinimumPaddingFraction": 0.1575
+    },
+    {
+      "frame": 6,
+      "alpha64Bounds": [
+        124,
+        58,
+        259,
+        305
+      ],
+      "alpha64PixelCount": 16337,
+      "alpha16BorderPixels": 0,
+      "alpha64MinimumPaddingFraction": 0.1575
+    },
+    {
+      "frame": 7,
+      "alpha64Bounds": [
+        104,
+        133,
+        272,
+        304
+      ],
+      "alpha64PixelCount": 14395,
+      "alpha16BorderPixels": 0,
+      "alpha64MinimumPaddingFraction": 0.1602
+    },
+    {
+      "frame": 8,
+      "alpha64Bounds": [
+        98,
+        131,
+        266,
+        304
+      ],
+      "alpha64PixelCount": 18138,
+      "alpha16BorderPixels": 0,
+      "alpha64MinimumPaddingFraction": 0.1602
+    },
+    {
+      "frame": 9,
+      "alpha64Bounds": [
+        135,
+        110,
+        270,
+        248
+      ],
+      "alpha64PixelCount": 9410,
+      "alpha16BorderPixels": 0,
+      "alpha64MinimumPaddingFraction": 0.2541
+    },
+    {
+      "frame": 10,
+      "alpha64Bounds": [
+        138,
+        135,
+        256,
+        242
+      ],
+      "alpha64PixelCount": 5326,
+      "alpha16BorderPixels": 0,
+      "alpha64MinimumPaddingFraction": 0.2928
+    },
+    {
+      "frame": 11,
+      "alpha64Bounds": [
+        137,
+        146,
+        216,
+        234
+      ],
+      "alpha64PixelCount": 1478,
+      "alpha16BorderPixels": 0,
+      "alpha64MinimumPaddingFraction": 0.3536
+    },
+    {
+      "frame": 12,
+      "alpha64Bounds": [
+        168,
+        189,
+        187,
+        215
+      ],
+      "alpha64PixelCount": 327,
+      "alpha16BorderPixels": 0,
+      "alpha64MinimumPaddingFraction": 0.4061
+    }
+  ],
+  "selfReview": [
+    "Original horizontal flat crop on middle fire columns removed: new jets have complete curved tapering tops within cells.",
+    "Charging circle to coiled jet to compact impact whirl to embers retains fire-magic identity.",
+    "Second attempt produces smaller effects and broad transparent gutters; no source alpha>=16 contacts cell border.",
+    "No camera tilt change introduced; first two rows preserve ground-circle registration approximately. Last-row fading whirl no longer has ground circle, so slow-play8to9 transition still needs independent review.",
+    "Frame11 retains a small curled flame rather than only tiny sparks; record this deviation instead of claiming perfect prompt compliance.",
+    "Thinness/remaining orange body and actual actor occlusion require phone comparison; no runtime claim."
+  ],
+  "artReviewState": "awaiting-independent-review",
+  "runtimeQaState": "not-reviewed",
+  "sha256": "5fd74e77bfa2b9544bc41478f5df01c9ef9ecb6a134338855bcc275fe57e5511"
+}

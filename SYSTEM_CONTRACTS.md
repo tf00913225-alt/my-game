@@ -80,7 +80,11 @@
 - V142 只擁有視覺生命週期與剩餘時間；V143 只擁有 raster VFX（點陣視覺特效）渲染與幾何。
 - `00-main.js` 是 `finishPlayerAction()` 與 `processNextCombatant()` 唯一 owner。功能模組不得替換這兩個函式，也不得以 Promise（非同步承諾）阻塞回合佇列。
 - 功能模組需要觀察或暫時攔截完成通知時，只能使用 `FourSymbolsBattleFlow` 的訂閱／攔截 API（應用程式介面），並確保攔截器可解除。
-- single 的中心是實際目標格；tri 即使只剩一個單位也保留三人格視覺尺寸；all 永遠保留完整目標側範圍；projectile（飛行技能）從施放者中心飛向正式主要目標中心。
+- single 的中心是實際目標格；tri 的整張群體圖即使只剩一個單位也保留三人格基準尺寸；all 永遠保留完整目標側基準範圍；projectile（飛行技能）從施放者中心飛向正式主要目標中心。
+- 上述範圍是目標集合與基準幾何，不依存活數縮減。點陣素材保持原比例，在既有 Geometry Owner 的目標側與畫面交集內等比安全 fit；只限制藝術框，不改命中錨點或目標範圍。群體範圍由正式素材構圖與各實際目標的命中回饋共同表達，不以拉伸、裁切主體或新增範圍 Owner 填滿。
+- group／tri／row 的整張群體圖對齊正式形狀 bounds 中心，在原中心內等比安全 fit，不為填滿範圍而放大或搬移到角色腳下。primary 與各目標命中回饋仍對齊實際目標，飛行技能終點仍使用正式主要目標。
+- 明確標記 `presentation:"per-recipient"` 的單人構圖依正式 `targetIds` 快照逐人呈現，沿用立繪 Geometry、同一施放時鐘與清理；不改技能 targetType、命中或結算，也不得因非目標的遲到回饋增加節點。未標記的整張群體圖仍依前述固定形狀規則。
+- 持續狀態 body 由 V143 依既有 Render Geometry 的人物立繪範圍定位，區分頭頂、身側與腳邊呈現，不以含 HUD 的整張卡片放大。冰封／石化保留硬控包覆身份；點陣來源維持 contain 比例，HUD、兩秒輪播與狀態生命週期仍沿原 Owner。岩壁／土盾依使用者指定呈現外包覆、中央留透的護體感；怒火（爆擊）、風行（閃避）、氣定神閒（異常抗性）的小樣使用同一 V143 狀態節點的紅／綠／藍腳下光圈與約兩秒一次稀疏上升細線，不新增發射計時器、Canvas 或第二狀態 Owner；減少動態時停用上升，狀態 Icon 維持靜態。
 - DOM 例外、MISS（未命中）、Buff（增益）、Heal、Shield、Debuff（減益）與 VFX 清理都不得讓同一 initiative（行動序）永久等待。
 
 ## 持續效果回合生命週期契約
@@ -115,7 +119,8 @@
 - 玩家四元素「主要效果包含直接傷害」技能的正式傷害曲線唯一 owner 為 `js/00-main.js::getSkillDamageAtLevel()`。Lv1 使用 `baseDamage`；Lv2～4 依 `damagePerLevel` 線性增加；Lv5 = Lv4 × 1.5；Lv6～9 再依固定成長增加；Lv10 = Lv9 × 1.5。突破與最終傷害取整統一使用正式戰鬥 `Math.round` 語意。
 - 玩家直接傷害技能正式上限為 Lv10；純 Buff／Heal／Revive／Control／Support／EX 不得因本規則被誤升 Lv10。既有玩家已學等級必須原值保留，Max Lv 提升不得重置、退點、自動補滿或重複扣點。
 - 所有可升級技能 Lv2～Max 每次固定消耗 1 技能點。初次學習成本仍由正式技能階級／資料 owner 決定，不得拿升級成本覆蓋學習成本。
-- `js/60-v173.64-skill-progression-rebalance.js` 是正式玩家技能 Final Data／玩家說明與技能變更 lifecycle owner，並隨 `gameplay-core` 固定載入；學習／升級資格、門檻與成本委派同 bundle 前載的純規則 `functions/src/skill-progression-core.js`，不複製公式。共用規則不建立技能所有權、伺服器 writer 或戰鬥執行。V144／V169 等舊層不得再各自覆寫技能詳細文字或另算下一級傷害。
+- `js/60-v173.64-skill-progression-rebalance.js` 是正式玩家技能 Final Data／玩家說明與技能變更 lifecycle owner，並隨 `gameplay-core` 固定載入；學習／升級資格、門檻與成本委派app-shell 在原 main 前唯一載入的純規則 `functions/src/skill-progression-core.js`，不複製公式。共用規則不建立技能所有權、伺服器 writer 或戰鬥執行。V144／V169 等舊層不得再各自覆寫技能詳細文字或另算下一級傷害。
+- 原技能裝備／移除、保留第一招跨修及 v136 明選／恢復決策委派同一純 core 的獨立 retained loadout v1；原 Client entry 保留 render／save lifecycle，原 learning v1 seal 不變。共用決策不授予技能所有權或 Cloud loadout authority；canonical v2 與 protected writer／Recovery 仍依原高風險 Gate。
 - `scripts/lib/player-skill-config-catalog.mjs` 在既有 production build／check 中，僅從原始技能資料、四元素 renderer predicate 與 Final Data 機械投影 `functions/src/generated/player-skill-config-catalog.json`。目錄只含玩家設定欄位與原傷害 ID 集合的分類標記，缺省 `requires` 保留缺省；不包含 SP／傷害／戰鬥 runtime，不授予學習、升級、技能點或雲端權利。來源不明、動態 selected field、歧義或未審核覆寫必須拒絕產物；既有全部 runtime 技能與純資格規則不因目錄投影被縮減。
 - 技能列表、詳細頁、Lv1～Max 明細與下一級傷害必須由正式 Skill Data 與 `getSkillDamageAtLevel()` 投影。禁止在 UI 寫第二份 10 級傷害表、舊「最高5級」或用「每級+X」假裝完整描述 Lv5/Lv10 突破。
 - Battle Quick Bar（戰鬥技能快捷列）必須驗證每格的 canonical structure（正式結構），並由正式 Skill Data／`FourSymbolsSkillSpec` 投影技能名稱、SP、目標範圍與效果說明；只檢查「有四顆按鈕」不得視為結構有效，缺少內部節點時必須重建正式結構。

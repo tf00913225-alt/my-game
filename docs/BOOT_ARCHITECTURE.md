@@ -4,6 +4,8 @@
 
 ## 唯一 owner
 
+成功受保護創角與 UID 本機保存後，第一角色以既有 Adventure entry／lazy feature 開啟第一章故事；等待模組後重驗 UID 與原創角 context。`pendingStoryOpening`／onboarding 狀態隨既有 UID main-save 恢復，載入失敗可重試，舊角色不以缺少狀態啟動新手教學。這不增加 Critical bundle，也不變更 Auth／Save 判定。一般登入公告待新手引導結束再呈現；強制更新仍遵守原安全 Gate。
+
 | 責任 | 正式 owner |
 | --- | --- |
 | 狀態與合法轉移 | `js/startup/startup-contract.js` |

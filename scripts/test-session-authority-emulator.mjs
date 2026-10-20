@@ -2865,34 +2865,33 @@ const storyData={uid:storyUid,session:storySession};
 let storyProof=await invoke("ensureHeroChapterTicket",storyUser.idToken,{...storyData,expectedRevision:1});
 const storyTicket=storyProof.chapter.ticketId;
 await rejected("completeHeroChapterNode",storyUser.idToken,{...storyData,
-    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"n10_finish",choiceId:null},"FAILED_PRECONDITION");
+    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"c1_20",choiceId:null},"FAILED_PRECONDITION");
 await rejected("completeHeroChapterNode",storyUser.idToken,{...storyData,
-    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"n01_arrival",choiceId:null,won:true},"INVALID_ARGUMENT");
+    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"c1_01",choiceId:null,won:true},"INVALID_ARGUMENT");
 await rejected("completeHeroChapterNode",heroOtherDevice.idToken,{uid:heroUid,session:heroOtherSession,
-    expectedRevision:8,ticketId:storyTicket,nodeId:"n01_arrival",choiceId:null},"DATA_LOSS"); // corrupt own rights; no other-UID source is read.
+    expectedRevision:8,ticketId:storyTicket,nodeId:"c1_01",choiceId:null},"DATA_LOSS"); // corrupt own rights; no other-UID source is read.
 const firstStep={...storyData,expectedRevision:storyProof.serverRevision,
-    ticketId:storyTicket,nodeId:"n01_arrival",choiceId:null};
+    ticketId:storyTicket,nodeId:"c1_01",choiceId:null};
 const concurrentStep=await Promise.all([
     invoke("completeHeroChapterNode",storyUser.idToken,firstStep),
     invoke("completeHeroChapterNode",storyUser.idToken,firstStep)]);
 assert.deepEqual(concurrentStep.map(r=>r.unchanged).sort(),[false,true]);
 storyProof=concurrentStep.find(r=>!r.unchanged);
-for(const nodeId of ["n02_roadfight","n03_fork","n04a_path","n05_commission","n06_rest",
-    "n07_chest","n08_truth","n09_boss","n10_finish"]){
+for(const nodeId of Array.from({length:19},(_,index)=>`c1_${String(index+2).padStart(2,"0")}`)){
     storyProof=await invoke("completeHeroChapterNode",storyUser.idToken,{...storyData,
         expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId,
-        choiceId:nodeId==="n03_fork"?"safe":null});
+        choiceId:null});
 }
 assert.equal(storyProof.chapter.phase,"completed");assert.equal(storyProof.chapter.outcomeVerified,false);
 assert.equal(storyProof.authoritativeStateReady,false);
 const storyRoot=db.collection("serverUsers").doc(storyUid);
 assert.equal((await storyRoot.collection("uniqueClaims").get()).size,1);
-assert.equal((await storyRoot.collection("heroChapterSteps").get()).size,10);
+assert.equal((await storyRoot.collection("heroChapterSteps").get()).size,20);
 const storyClaim=await storyRoot.collection("uniqueClaims").doc("hero-v1-divineDogHongbao").get();
 const storyGrant=storyProof.entitlements.divineDogHongbao;
 assert.equal(storyClaim.get("allocationSeed"),storyGrant.allocationSeed);
 assert.equal((await invoke("completeHeroChapterNode",storyUser.idToken,{...storyData,
-    expectedRevision:1,ticketId:storyTicket,nodeId:"n10_finish",choiceId:null})).unchanged,true);
+    expectedRevision:1,ticketId:storyTicket,nodeId:"c1_20",choiceId:null})).unchanged,true);
 while(Math.floor(Date.now()/1000)<=claims(storyUser.idToken).auth_time){await new Promise(resolve=>setTimeout(resolve,100));}
 const storyOther=await login("accounts:signInWithPassword",{email:storyEmail,password});
 const storyOtherSession=await invoke("createGameSession",storyOther.idToken,{uid:storyUid});
@@ -2900,7 +2899,7 @@ await rejected("readHeroAcquisition",storyUser.idToken,storyData,"SESSION_REVOKE
 assert.deepEqual((await invoke("readHeroAcquisition",storyOther.idToken,
     {uid:storyUid,session:storyOtherSession})).entitlements.divineDogHongbao,storyGrant);
 await rejected("completeHeroChapterNode",storyOther.idToken,{uid:storyUid,session:storyOtherSession,
-    expectedRevision:1,ticketId:storyTicket,nodeId:"n10_finish",choiceId:null,save:{chapterCompleted:true}},"INVALID_ARGUMENT");
+    expectedRevision:1,ticketId:storyTicket,nodeId:"c1_20",choiceId:null,save:{chapterCompleted:true}},"INVALID_ARGUMENT");
 assert.equal((await storyRoot.collection("uniqueClaims").get()).size,1);
 assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapter/current`,storyOther.idToken),403);
 assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapterTickets/${storyTicket}`,storyOther.idToken,"PATCH"),403);
@@ -4485,12 +4484,14 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     const request={auth:{uid,token:decoded},data:identity},accountSource=await root.collection("account").doc("current").get();
     const characterId=accountSource.get("slots")[0],characterRef=root.collection("characters").doc(characterId);
     const originalCharacter=(await characterRef.get()).data(),before=await checkRecoveryArchive(uid,2);
-    const traces=[];
-    const protectedRun=(req,fn)=>writerSessions.runProtected(req,async(tx,active)=>{
-        const trace={reads:0,writes:0};traces.push(trace);
+    const traces=[],firstLoadoutQuery=root.collection("operations").orderBy("__name__").limit(401);
+    const protectedRun=(req,fn,label="learning")=>writerSessions.runProtected(req,async(tx,active)=>{
+        const trace={label,reads:0,writes:0,firstRows:[]};traces.push(trace);
         const observed={get:async reference=>{
             assert.equal(trace.writes,0,"skill transactions finish all reads before any write");
-            const snapshot=await tx.get(reference);trace.reads+=snapshot.docs?Math.max(1,snapshot.size):1;return snapshot;
+            const snapshot=await tx.get(reference);trace.reads+=snapshot.docs?Math.max(1,snapshot.size):1;
+            if(snapshot.docs&&reference.isEqual(firstLoadoutQuery))trace.firstRows.push(snapshot.docs.map(row=>row.id));
+            return snapshot;
         }};
         for(const method of ["create","update","set","delete"])observed[method]=(...args)=>{trace.writes++;return tx[method](...args);};
         return fn(observed,active);
@@ -4532,6 +4533,173 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.deepEqual((await root.collection("operations").doc(intent.operationId).get()).data(),operation.data());
     assert.deepEqual((await root.collection("ledgerEntries").doc(intent.operationId).get()).data(),ledger.data());
     console.log("PASS internal skill learning: real Auth/Session and Firestore atomic initial-point debit, immutable snapshot/archive transition, committed lost response, zero-write original-policy replay and stale/foreign/missing-source refusal. No callable, equip, combat or readiness activation.");
+
+    // Extend this same earned learning actor; these are additional protected
+    // calls and native SDK optimistic retries, not additional actors or grants.
+    const {createCanonicalSkillLoadout}=require("../functions/src/canonical-skill-loadout.js");
+    const loadoutDeps={...deps,runProtected:(req,fn)=>protectedRun(req,fn,"loadout")};
+    const loadout=createCanonicalSkillLoadout(loadoutDeps);
+    const economic=(await root.collection("economy").doc("current").get()).data();
+    const resourceFields=value=>Object.fromEntries(Object.entries(value).filter(([key])=>!["serverRevision","createdAt","updatedAt"].includes(key)));
+    const fourFalse=value=>{for(const key of ["authoritativeStateReady","readyForRestore","rewardEligible","outcomeVerified"])assert.equal(value[key],false);};
+    const args=(id,revision,action,skillId="waterKnife")=>({operationId:id,expectedRevision:revision,characterId,action,skillId});
+    const assertTraces=(start,first=false)=>{
+        const attempts=traces.slice(start);assert.ok(attempts.length>0);
+        for(const trace of attempts){
+            assert.equal(trace.label,"loadout");
+            if(trace.writes){assert.equal(trace.writes,10);assert.equal(trace.reads,first?18:23);}
+            else assert.ok(trace.reads<=23);
+            assert.equal(trace.firstRows.length,first?1:0);
+            if(first)assert.deepEqual([...trace.firstRows[0]].sort(),[intent.operationId,initialOperationId].sort());
+        }
+    };
+    const initialRows=await firstLoadoutQuery.get();assert.equal(initialRows.size,2);
+    const initialOperationId=initialRows.docs.find(row=>row.id!==intent.operationId).id;
+    assert.equal(initialRows.docs.find(row=>row.id===initialOperationId).get("kind"),"initial-character-sources");
+    const rollbackIntent=args("skill-sdk-loadout-rollback-01",3,"equip"),rollbackStart=traces.length;
+    const rollback=createCanonicalSkillLoadout({...loadoutDeps,runProtected:(req,fn)=>protectedRun(req,async(tx,active)=>{
+        await fn(tx,active);throw Error("loadout SDK staged rollback");
+    },"loadout")});
+    await assert.rejects(()=>rollback.mutateLoadout(request,rollbackIntent),/staged rollback/);
+    assertTraces(rollbackStart,true);
+    assert.equal((await save.get()).get("serverRevision"),3);
+    assert.deepEqual((await characterRef.get()).data(),learned);
+    for(const [namespace,id] of [["operations",rollbackIntent.operationId],["playableSnapshots","4"],["recoveryArchives","4"]])
+        assert.equal((await root.collection(namespace).doc(id).get()).exists,false);
+    const equipIntent=args("skill-sdk-loadout-equip-001",3,"equip"),equipStart=traces.length;
+    const lostLoadout=createCanonicalSkillLoadout({...loadoutDeps,runProtected:async(req,fn)=>{
+        await protectedRun(req,fn,"loadout");throw Error("loadout SDK committed response lost");
+    }});
+    await assert.rejects(()=>lostLoadout.mutateLoadout(request,equipIntent),/committed response lost/);
+    assertTraces(equipStart,true);await checkRecoveryArchive(uid,4);
+    const firstReceipt=(await root.collection("operations").doc(equipIntent.operationId).get()).data();
+    assert.equal(firstReceipt.previousLoadoutSource,null);
+    const firstProgress=(await root.collection("progress").doc("current").get()).get("playableState");
+    assert.equal(firstProgress.preferencesVersion,2);
+    for(const key of ["autoConfig","autoConfig2","autoConfig3"])
+        for(const optional of ["v136ActionIntent","v136LastSkill"])assert.equal(Object.hasOwn(firstProgress[key],optional),false);
+    const retryStart=traces.length,retry=await loadout.mutateLoadout(request,equipIntent);
+    fourFalse(retry);assert.equal(retry.unchanged,true);
+    for(const trace of traces.slice(retryStart)){assert.equal(trace.reads,8);assert.equal(trace.writes,0);assert.deepEqual(trace.firstRows,[]);}
+    async function mutate(value){const start=traces.length,result=await loadout.mutateLoadout(request,value);
+        fourFalse(result);assertTraces(start);await checkRecoveryArchive(uid,result.resultRevision);return result;}
+    await mutate(args("skill-sdk-loadout-select-01",4,"select-auto-action"));
+    await mutate(args("skill-sdk-loadout-remove-01",5,"remove"));
+    const removed=(await root.collection("progress").doc("current").get()).get("playableState.autoConfig");
+    assert.equal(removed.skill,"normal");assert.equal(removed.v136ActionIntent,"skill");assert.equal(removed.v136LastSkill,"waterKnife");
+    assert.deepEqual((await characterRef.get()).get("skillLoadout.equippedSkills"),[]);
+    const sameIntent=args("skill-sdk-loadout-same-race-01",6,"equip"),sameStart=traces.length;
+    const sameRace=await Promise.all([loadout.mutateLoadout(request,sameIntent),loadout.mutateLoadout(request,sameIntent)]);
+    assert.deepEqual(sameRace.map(row=>row.unchanged).sort(),[false,true]);sameRace.forEach(fourFalse);assertTraces(sameStart);
+    const noOpStart=traces.length;
+    await assert.rejects(()=>loadout.mutateLoadout(request,args("skill-sdk-loadout-noop-001",7,"equip")),/does not change/);
+    assert.ok(traces.slice(noOpStart).every(trace=>trace.writes===0));
+    assert.equal((await root.collection("operations").doc("skill-sdk-loadout-noop-001").get()).exists,false);
+    const contenders=[args("skill-sdk-loadout-race-normal",7,"select-auto-action","normal"),args("skill-sdk-loadout-race-defend",7,"select-auto-action","defend")];
+    const race=await Promise.allSettled(contenders.map(value=>loadout.mutateLoadout(request,value)));
+    assert.equal(race.filter(row=>row.status==="fulfilled").length,1);
+    const winner=race.find(row=>row.status==="fulfilled").value;fourFalse(winner);
+    assert.match(race.find(row=>row.status==="rejected").reason.message,/CLOUD_REVISION_CONFLICT/);
+    assert.equal((await save.get()).get("serverRevision"),8);await checkRecoveryArchive(uid,8);
+    // Original private rights function, compiled lexically only in this test.
+    // Production still has no such factory method, callable or authority hook.
+    const recoveryFilename=require.resolve("../functions/src/canonical-current-recovery.js"),readerModule=new Module(recoveryFilename);
+    readerModule.filename=recoveryFilename;readerModule.paths=Module._nodeModulePaths(recoveryFilename.slice(0,Math.max(recoveryFilename.lastIndexOf("/"),recoveryFilename.lastIndexOf("\\"))));
+    const recoverySource=readFileSync(recoveryFilename,"utf8"),rightsNeedle="return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact";
+    assert.equal(recoverySource.split(rightsNeedle).length,2);
+    readerModule._compile(recoverySource.replace(rightsNeedle,"return Object.freeze({verifyRecoveryRights,restoreCurrent,verifyRecoveryAuditArtifact"),recoveryFilename);
+    const rights=readerModule.exports.createCanonicalCurrentRecovery(deps);
+    assert.equal(Object.hasOwn(require(recoveryFilename).createCanonicalCurrentRecovery(deps),"verifyRecoveryRights"),false);
+    const closure=()=>protectedRun(request,async tx=>{
+        const account=(await tx.get(root.collection("account").doc("current"))).data();
+        const snapshot=await tx.get(root.collection("playableSnapshots").doc(String(account.serverRevision)));
+        const archive=await tx.get(root.collection("recoveryArchives").doc(String(account.serverRevision)));
+        assert.equal(snapshot.get("sha256"),account.snapshotSha256);
+        const records=inspectRecoveryArchive(archive.data(),uid,account.serverRevision,snapshot.data()),collections={};
+        for(const [key,namespace] of Object.entries({claims:"uniqueClaims",receipts:"grantOperations",ledgers:"ledgerEntries",grants:"pendingGrants",events:"rewardEvents",operations:"operations",modeSources:"simulatedAdSources",patrolTickets:"patrolTickets",patrolStates:"patrolTicketStates",patrolSettlements:"patrolSettlements",patrolClosures:"patrolClosures"})){
+            collections[key]=await tx.get(root.collection(namespace).limit(401));assert.ok(collections[key].size<401);
+        }
+        assert.equal((await tx.get(root.collection("modeTimeEvents").limit(1))).empty,true);
+        for(const [key,field,value] of [["modeEvents","modeChanged",true],["patrolModeEvents","schemaVersion",2],["patrolOwnedModeEvents","resultOwner","forest-patrol-settlement"]])
+            collections[key]=await tx.get(root.collection("modeTimeEvents").where(field,"==",value).limit(401));
+        collections.patrolOperationIds=new Set(collections.patrolSettlements.docs.map(row=>row.id));
+        return rights.verifyRecoveryRights(tx,root,uid,8,records,collections);
+    },"loadout-closure");
+    const closureStart=traces.length;await closure();
+    assert.ok(traces.slice(closureStart).every(trace=>trace.writes===0&&trace.reads<=400));
+    const earlyRef=root.collection("operations").doc(equipIntent.operationId);
+    await earlyRef.delete();const gapStart=traces.length;
+    try{await assert.rejects(closure,/loadout|Loadout/);assert.ok(traces.slice(gapStart).every(trace=>trace.writes===0));}
+    finally{await earlyRef.set(firstReceipt);}
+    const headRef=root.collection("operations").doc(winner.operationId),head=(await headRef.get()).data();
+    await headRef.delete();const missingHeadStart=traces.length;
+    try{await assert.rejects(()=>loadout.mutateLoadout(request,args("skill-sdk-loadout-missing-head",8,"remove")),/source receipt is missing/);
+        assert.ok(traces.slice(missingHeadStart).every(trace=>trace.writes===0));}
+    finally{await headRef.set(head);}
+    assert.deepEqual((await headRef.get()).data(),head);
+    assert.deepEqual((await earlyRef.get()).data(),firstReceipt);
+    assert.equal((await root.collection("operations").doc("skill-sdk-loadout-missing-head").get()).exists,false);
+    for(const namespace of ["playableSnapshots","recoveryArchives"])assert.equal((await root.collection(namespace).doc("9").get()).exists,false);
+    await closure();
+    assert.deepEqual((await characterRef.get()).get("state"),learned.state);
+    assert.deepEqual((await characterRef.get()).get("skillLoadout.skillLevels"),learned.skillLoadout.skillLevels);
+    assert.deepEqual(resourceFields((await root.collection("economy").doc("current").get()).data()),resourceFields(economic));
+    assert.deepEqual((await root.collection("operations").doc(intent.operationId).get()).data(),operation.data());
+    assert.deepEqual((await root.collection("ledgerEntries").doc(intent.operationId).get()).data(),ledger.data());
+    for(const id of [equipIntent.operationId,"skill-sdk-loadout-select-01","skill-sdk-loadout-remove-01",sameIntent.operationId,winner.operationId])
+        for(const namespace of ["ledgerEntries","grantOperations"])assert.equal((await root.collection(namespace).doc(id).get()).exists,false);
+    assert.equal((await save.get()).get("serverRevision"),8);
+    console.log("PASS internal skill loadout: original learning actor, native rollback/lost-response/once-only races, exact first limit401 two-row inventory; fixture kernel first18/later23/replay8 reads and10 writes (Session3 reads separate), v2 presence/intent retention, non-economic six-point receipts, readonly full closure and missing earlier/current receipt refusal. Four authority flags remain false; no gameplay UI/Boot integration.");
+    // Same actor, now through the actual two exported HTTP callable boundaries.
+    // Neither service is a gameplay hook or a complete-save hydrate operation.
+    const captureLoadoutActor=async()=>{
+        const rows=[[save.path,(await save.get()).data()]];
+        for(const collection of await root.listCollections())for(const doc of (await collection.get()).docs)rows.push([doc.ref.path,doc.data()]);
+        return rows.sort(([a],[b])=>a.localeCompare(b));
+    };
+    const httpRead={...identity,expectedRevision:8},preRead=await captureLoadoutActor();
+    const configuration=await invoke("readCanonicalSkillLoadout",token,httpRead);fourFalse(configuration);
+    assert.equal(configuration.ownerUid,uid);assert.equal(configuration.serverRevision,8);assert.equal(configuration.canonicalRevision,8);
+    assert.equal(configuration.preferencesVersion,2);
+    assert.deepEqual(configuration.characters,[{characterId,slotIndex:0,skillLoadout:(await characterRef.get()).get("skillLoadout")}]);
+    assert.equal(Object.hasOwn(configuration.autoConfig2,"v136ActionIntent"),false);
+    assert.equal(Object.hasOwn(configuration.autoConfig3,"v136LastSkill"),false);
+    assert.deepEqual(Object.keys(configuration).sort(),["schemaVersion","ownerUid","serverRevision","canonicalRevision","preferencesVersion","characters",
+        "autoConfig","autoConfig2","autoConfig3","outcomeVerified","rewardEligible","readyForRestore","authoritativeStateReady"].sort());
+    assert.deepEqual(await captureLoadoutActor(),preRead,"HTTP configuration read writes no sources, Session or receipts");
+    const httpRemove={...identity,...args("skill-sdk-http-loadout-remove",8,"remove")};
+    const removedHttp=await invoke("mutateCanonicalSkillLoadout",token,httpRemove);fourFalse(removedHttp);
+    assert.equal(removedHttp.resultRevision,9);assert.equal(removedHttp.unchanged,false);await checkRecoveryArchive(uid,9);
+    const postMutation=await captureLoadoutActor(),retryHttp=await invoke("mutateCanonicalSkillLoadout",token,httpRemove);
+    fourFalse(retryHttp);assert.equal(retryHttp.unchanged,true);assert.deepEqual(await captureLoadoutActor(),postMutation);
+    const currentHttp=await invoke("readCanonicalSkillLoadout",token,{...identity,expectedRevision:9});fourFalse(currentHttp);
+    assert.deepEqual(currentHttp.characters[0].skillLoadout.equippedSkills,[]);
+    assert.equal(currentHttp.autoConfig.v136LastSkill,"waterKnife");
+    const httpRefuses=async(name,authToken,input,code)=>{
+        const before=await captureLoadoutActor();
+        await assert.rejects(()=>invoke(name,authToken,input),error=>[code,code.toLowerCase().replaceAll("_","-")].includes(error.code));
+        assert.deepEqual(await captureLoadoutActor(),before);
+    };
+    for(const name of ["mutateCanonicalSkillLoadout","readCanonicalSkillLoadout"]){
+        const input=name.startsWith("mutate")?{...httpRemove,operationId:"skill-sdk-http-forged-loadout",expectedRevision:9}:{...identity,expectedRevision:9};
+        for(const key of ["amount","rawState","autoConfig","authoritativeStateReady"])
+            await httpRefuses(name,token,{...input,[key]:true},"INVALID_ARGUMENT");
+        await httpRefuses(name,null,input,"UNAUTHENTICATED");
+        await httpRefuses(name,token,{...input,uid:y},"SESSION_INVALID");
+        await httpRefuses(name,token,{...input,session:null},"SESSION_INVALID");
+    }
+    await httpRefuses("readCanonicalSkillLoadout",token,httpRead,"ABORTED");
+    await httpRefuses("mutateCanonicalSkillLoadout",token,{...httpRemove,operationId:"skill-sdk-http-null-skill",expectedRevision:9,skillId:null},"INVALID_ARGUMENT");
+    const httpHeadRef=root.collection("operations").doc(httpRemove.operationId),httpHead=(await httpHeadRef.get()).data();
+    await httpHeadRef.delete();
+    try{await httpRefuses("readCanonicalSkillLoadout",token,{...identity,expectedRevision:9},"DATA_LOSS");}
+    finally{await httpHeadRef.set(httpHead);}
+    assert.deepEqual((await characterRef.get()).get("state"),learned.state);
+    assert.deepEqual(resourceFields((await root.collection("economy").doc("current").get()).data()),resourceFields(economic));
+    assert.deepEqual((await root.collection("operations").doc(intent.operationId).get()).data(),operation.data());
+    assert.deepEqual((await root.collection("ledgerEntries").doc(intent.operationId).get()).data(),ledger.data());
+    assert.deepEqual(await captureLoadoutActor(),postMutation);
+    console.log("PASS skill loadout HTTP boundary: exact protected intent and same-Session configuration read, v2 presence/stable IDs/revisions, non-economic remove/original retry, zero-write extra-field/unauthenticated/cross-UID/session/stale/null-skill/missing-head refusal. Four authority flags remain false; no UI/Boot hydrate or server combat activation.");
 }
 
 await db.terminate();

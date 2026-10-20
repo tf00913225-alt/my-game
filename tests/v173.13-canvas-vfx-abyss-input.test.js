@@ -177,18 +177,18 @@ test("Water Ball and Ice Arrow Rain own DOM-raster manifests",()=>{
     });
 });
 
-test("the raster renderer creates one shared Water Ball Sprite Sheet node without Canvas",()=>{
+test("the raster renderer creates one Water Ball Sprite Sheet per formal recipient without Canvas",()=>{
     const water=loadRasterRuntime("waterBall","tri",[0,1,2],1400);
     const sprites=water.stage.children.filter(node=>node.dataset.renderer==="dom-sprite");
-    assert.equal(sprites.length,1);
+    assert.equal(sprites.length,3);
     const sprite=sprites[0];
     assert.equal(sprite.dataset.columns,"4");
     assert.equal(sprite.dataset.rows,"3");
     assert.equal(sprite.dataset.frames,"12");
-    assert.match(sprite.style.backgroundImage,/water-orb-vfx\.png\?v=173\.19/);
-    assert.equal(sprite.style.left,"318px","three-target VFX is centered on the explicit primary target");
-    assert.equal(sprite.style.top,"130px");
-    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(|requestAnimationFrame\(/);
+    assert.match(sprite.style.backgroundImage,/water-orb-recipient-v1\.webp/);
+    assert.deepEqual(sprites.map(n=>n.dataset.targetIndex),["0","1","2"]);
+    assert.ok(sprites.every(n=>n.dataset.placement==="single"));
+    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(/);
 });
 
 test("Ice Arrow Rain stays centered on the full monster battlefield",()=>{

@@ -22,7 +22,7 @@ test("persistent body status owner keeps hard-control base fixed under the two-s
   assert.match(js,/type===activeRotatingBodyType/);
   assert.match(js,/syncStatusVisualEffects\(true\)/);
   assert.doesNotMatch(js,/Math\.floor\(Date\.now\(\)\/STATUS_ROTATION_MS\)/);
-  assert.match(js,/stun:statusVisual\("assets\/vfx\/status\/stun\.webp","pulse"/);
+  assert.match(js,/stun:statusVisual\("assets\/vfx\/status\/stun-stars-v2\.webp","pulse"/);
   assert.match(css,/--v143-status-layer-hard-control-base:4/);
   assert.match(css,/--v143-status-layer-rotating:5/);
   assert.match(css,/--v143-status-layer-hud:34/);
@@ -95,15 +95,19 @@ test("new skill icons and 4x3 cast sheets use dedicated WebP runtime assets",()=
     "assets/skills/fire-soul-resonance.webp",
     "assets/skills/fire-blood-burn.webp",
     "assets/skills/water-purify-mind.webp",
-    "assets/vfx/fire/fire-soul-resonance-cast.webp",
+    "assets/vfx/fire/fire-soul-resonance-cast-v2.webp",
     "assets/vfx/fire/blood-burn-art-cast.webp",
     "assets/vfx/water/purify-mind-cast.webp",
-    "assets/vfx/status/stun.webp"
+    "assets/vfx/status/stun-stars-v2.webp"
   ];
   assert.match(main,/fireSoulResonance:"assets\/skills\/fire-soul-resonance\.webp"/);
   assert.match(main,/bloodBurnArt:"assets\/skills\/fire-blood-burn\.webp"/);
   assert.match(main,/purifyMind:"assets\/skills\/water-purify-mind\.webp"/);
-  assert.match(vfx,/fireSoulResonance:\{[\s\S]*?fire-soul-resonance-cast\.webp/);
+  assert.match(vfx,/fireSoulResonance:\{[\s\S]*?fire-soul-resonance-cast-v2\.webp/);
+  const soulSheet=losslessWebpInfo("assets/vfx/fire/fire-soul-resonance-cast-v2.webp");
+  assert.deepEqual([soulSheet.width,soulSheet.height,soulSheet.alpha],[1448,1086,1]);
+  assert.equal(soulSheet.width/4,soulSheet.height/3);
+  assert.deepEqual(fs.readFileSync("assets/vfx/fire/fire-soul-resonance-cast-v2.webp"),fs.readFileSync("tools/vfx-commercial-sample/assets/full/fire-soul-resonance-v3.webp"),"runtime soul sheet preserves the reviewed candidate bytes");
   assert.match(vfx,/bloodBurnArt:\{[\s\S]*?blood-burn-art-cast\.webp/);
   assert.match(vfx,/purifyMind:\{[\s\S]*?purify-mind-cast\.webp/);
   for(const relative of assets){
@@ -171,3 +175,11 @@ test("manual active character highlight is unique and cleared for per-character 
   for(const index of [3,4,5]){activeBattleCharacterIndex=index;clear();update();assert.deepEqual(active(),[index]);}
   clear();assert.deepEqual(active(),[],"auto-controlled character must not retain a manual-control flash");
 });
+
+
+function losslessWebpInfo(file){
+ const b=Buffer.isBuffer(file)?file:fs.readFileSync(file);
+ assert.equal(b.toString("ascii",0,4),"RIFF");assert.equal(b.toString("ascii",8,12),"WEBP");
+ for(let o=12;o+8<=b.length;){const type=b.toString("ascii",o,o+4),size=b.readUInt32LE(o+4),p=o+8;assert.ok(p+size<=b.length,"complete WebP chunk");if(type==="VP8L"){assert.equal(b[p],0x2f);const bits=b.readUInt32LE(p+1);return {width:1+(bits&16383),height:1+((bits>>>14)&16383),alpha:(bits>>>28)&1};}o=p+size+(size%2);}
+ throw new Error("Expected lossless VP8L image");
+}

@@ -1,0 +1,45 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "portraitWorkId": "BATTLE-PORTRAIT-DEPTH-20261020",
+  "status": "SCOPED_VISUAL_INTEGRATION_PASS_STOP_REFINEMENT_REQUIRED_CI_SEPARATE",
+  "portraitHead": "cbba78ff31e05d07f095956ed4de9173603b67f4",
+  "sourceHashes": {
+    "js/39-v143-skill-animation.js": "e018a0e3b82f71e5bf66003339587e7b47efc8be88b17393ca34ed555a4b3fa0",
+    "css/40-v143-combat-dungeon-polish.css": "0aad2d46e850bb0f9ffd71d3f49c636522e44a63ee62113fbced0a843174585b",
+    "css/fixed-slot-battlefield-rendering-v2.css": "1e813fbf1833a2b9aa5af2f8693a5b2770d97e0c5c2e5f1dcb4fa36bbbe42053",
+    "js/60-team-relic-system.js": "7f041d4281c8b6682d7269095fe7decd156a8e1b324465c1fd1401dc7d3fe31d"
+  },
+  "device": "SM-N960F Android10 USB Chrome",
+  "scope": "44 active skills,4 intentionally non-cast passive skills,21 statuses and Nine Dragon relic. Finite presentation acceptance; no all-device/constant60fps/endurance guarantee.",
+  "captures": [
+    {
+      "tree": "6eea53195266808545c477d2cbce6670e208a0c1",
+      "path": "artifacts/vfx-portrait-integration",
+      "decision": "44 casts technically complete; fire/water22 and wind/earth21 visual PASS; stone edge locally reopened and later corrected",
+      "loadedCss": "gameplay-core.2f5fe8c2660c.css"
+    },
+    {
+      "tree": "18435b8e237c559a48498fe7893bc74706c502b2",
+      "path": "artifacts/usb-motion",
+      "decision": "8 statuses each12 bodies/12 owners,stable refs; motion PASS. freeze/petrify/rage/shield/rockWall/barrier visualPASS; rearstun localFAIL; earthShield missing image not accepted"
+    },
+    {
+      "tree": "bdcd2cf24f8d1eb15e19982daa52444b771bc924",
+      "path": "artifacts/usb-head-clearance",
+      "decision": "stun and earthShield12-body focused USB and independent visual PASS; rear head effect2px below paired front HUD,other positions and size retained"
+    }
+  ],
+  "formalEntries": "artifacts/usb-formal-casts/evidence.json: actual waterBall/iceArrowRain/flameSlash declared targets and damage/feedback3/6/1,unique callbacks,cleanup0; loaded original6ee document. Static icons opacity1/animationnone/transformnone.",
+  "input": "artifacts/usb-controls/evidence.json: formal skill declaration/drag/cancel/confirmonce/support/alltarget controls and30 flood trajectory phases PASS",
+  "motion": "Normal HP816→660,critical660→437,miss437→437,formal900mscast,death/revive/dispose and HUD geometry stable",
+  "relicReview": "tools/vfx-commercial-sample/relic-target-focus-usb-review-20261020.json",
+  "stoneReview": "tools/vfx-commercial-sample/stone-break-alpha-usb-review-20261020.json",
+  "independentReview": "coverage: headclearance code+12-body stun/earthShield visualPASS; geometry: sourcecomposition and focused21checksPASS; timing: stonealpha source and actual-source USB three castsPASS",
+  "rejected": [
+    "Temporary f474 composite restored old status left/top!important and lost relic layer adjustment; its status positioning samples rejected, not a formal sample regression",
+    "Old candidate-labelled stone runs still used original src; excluded from after evidence",
+    "AI stone candidate rejected due persistent hard edges/new cross-cell alpha; not imported"
+  ],
+  "policy": "Passed items stop refinement. Only demonstrated local errors repaired. Static icons retained. No extra global particles.",
+  "ci": "Latest final Head Required CI and normal dev integration remain separate pending gates."
+}

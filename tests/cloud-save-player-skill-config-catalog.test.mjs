@@ -29,7 +29,8 @@ test('mechanical catalogue exactly matches the actual full-loaded renderer selec
 });
 function temporary(){
     const dir=fs.mkdtempSync(path.join(os.tmpdir(),'player-skill-catalog-'));
-    const build=fs.readFileSync('scripts/build-production.mjs','utf8'),files=new Set([main,final,'scripts/build-production.mjs']);
+    const build=fs.readFileSync('scripts/build-production.mjs','utf8'),files=new Set([main,final,'scripts/build-production.mjs','index.html',
+        'functions/src/skill-learning-policy-v1.json','functions/src/skill-loadout-policy-v1.json']);
     for(const list of ['appScripts','gameplayScripts'])for(const match of build.match(new RegExp('const '+list+'=\\[([\\s\\S]*?)\\];'))[1].matchAll(/"([^"]+\.js)"/g))files.add(match[1]);
     for(const file of files){fs.mkdirSync(path.dirname(path.join(dir,file)),{recursive:true});fs.copyFileSync(file,path.join(dir,file));}
     return dir;
@@ -41,6 +42,48 @@ test('generated catalogue is stale until rebuilt and selected literal drift is m
         const file=path.join(dir,final),source=fs.readFileSync(file,'utf8');fs.writeFileSync(file,source.replace('flameSlash:{learnLevel:1,learnCost:2','flameSlash:{learnLevel:1,learnCost:3'));
         await assert.rejects(syncPlayerSkillConfigCatalog(dir,true),/stale/);
         assert.equal((await buildPlayerSkillConfigCatalog(dir)).skills.find(s=>s.id==='flameSlash').learnCost,3);
+    }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
+
+test('only sealed original loadout delegate readers preserve normalized v1 data provenance',async()=>{
+    const dir=temporary();
+    try{
+        const before=fs.readFileSync(CATALOG_PATH,'utf8');
+        assert.equal(JSON.stringify(await buildPlayerSkillConfigCatalog(dir),null,2)+'\n',before);
+        const core='functions/src/skill-progression-core.js';
+        for(const [file,edit] of [
+            [core,s=>s.replace('getRulesForVersion,getLoadoutRulesForVersion,','getRulesForVersion,getLoadoutRulesForVersion:createRules,')],
+            [core,s=>s.replace('getRulesForVersion,getLoadoutRulesForVersion,','getRulesForVersion,getLoadoutRulesForVersion,getLoadoutRulesForVersion,')],
+            [core,s=>s.replace('return createLoadoutRulesV1(catalog);','return createRulesV1(catalog,[]);')],
+            [core,s=>s.replace('equipped.length>=4','equipped.length>=3')],
+            [main,s=>s.replace('.getLoadoutRulesForVersion("v1",skillDatabase)','.getLoadoutRulesForVersion("v2",skillDatabase)')],
+            [main,s=>s.replace('.getLoadoutRulesForVersion("v1",skillDatabase)','.getLoadoutRulesForVersion("v1",skillDatabase,null)')],
+            [main,s=>s.replace('.getLoadoutRulesForVersion("v1",skillDatabase)','["getLoadoutRulesForVersion"]("v1",skillDatabase)')],
+            [main,s=>s.replace('.getLoadoutRulesForVersion("v1",skillDatabase)','.getLoadoutRulesForVersion?.("v1",skillDatabase)')],
+            [main,s=>s.replace('window.FourSymbolsSkillProgressionCore\n        .getLoadoutRulesForVersion("v1",skillDatabase)','selectLoadout("v1",skillDatabase)')],
+            [main,s=>s.replace('.getLoadoutRulesForVersion("v1",skillDatabase)','.getRulesForVersion("v1",skillDatabase)')],
+            [main,s=>s+'\nwindow.FourSymbolsSkillProgressionCore.getLoadoutRulesForVersion("v1",skillDatabase);\n'],
+            [final,s=>s.replace('finalizeSkillMutation();\n            return true;\n        };\n    }\n\n    if(typeof getSkillEffectPreviewText','return true;\n        };\n    }\n\n    if(typeof getSkillEffectPreviewText')],
+            ['js/31-v136-auto-battle-fix.js',s=>s+'\nrememberExplicitAction=function(){};\n'],
+            ['index.html',s=>s.replace('id="autoSettingsActionSelect"','id="autoSkillPlayer2"')],
+            ['index.html',s=>s+'\n<div id="player2AutoSettingsCard"></div>\n'],
+            [main,s=>s+'\ndocument.createElement("div").id="player2AutoSettingsCard";\n'],
+            [main,s=>s+'\ndocument.body.insertAdjacentHTML("beforeend",\'<div id="player2AutoSettingsCard"></div><select id="autoSkillPlayer2"></select>\');\n'],
+            [main,s=>s+'\ndocument.body.innerHTML+=`<div id="player2AutoSettingsCard"></div><select id="autoSkillPlayer2"></select>`;\n'],
+            ['js/51-v169-rpg-ui.js',s=>s+'\ndocument.createElement("select").id="autoSkillPlayer2";\n'],
+            [main,s=>s.replace(/(function populateAutoSkillOptions2\(\)\{[\s\S]*?)if\(!card\)\{/, '$1if(false){')],
+            [main,s=>s.replace(/(function populateAutoSkillOptions2\(\)\{[\s\S]*?)if\(!select\)\{/, '$1if(false){')],
+            ['js/31-v136-auto-battle-fix.js',s=>s.replace('restoreSkillAfterLegacySync(1)','restoreSkillAfterLegacySync(0)')],
+            ['scripts/build-production.mjs',s=>s.replace('    "functions/src/skill-progression-core.js",\n','')],
+            [final,s=>s+'\nskillDatabase.flameSlash.learnCost=999;\n'],
+            [final,s=>s+'\nconst escapedLoadoutData=skillDatabase.flameSlash;unknownMutation(escapedLoadoutData);\n'],
+            [final,s=>s+'\nObject.values(skillDatabase).forEach(skill=>{skill.learnCost=999;});\n']
+        ]){
+            const pathName=path.join(dir,file),original=fs.readFileSync(pathName,'utf8'),changed=edit(original);
+            assert.notEqual(changed,original,file+' mutation anchor');fs.writeFileSync(pathName,changed);
+            try{await assert.rejects(buildPlayerSkillConfigCatalog(dir));}finally{fs.writeFileSync(pathName,original);}
+        }
+        assert.equal(fs.readFileSync(CATALOG_PATH,'utf8'),before);
     }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
 test('unknown selected expressions, duplicate definitions, predicate changes and hidden overrides fail closed',async()=>{

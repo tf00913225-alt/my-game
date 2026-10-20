@@ -17,18 +17,17 @@ const deployWorkflow=read(".github/workflows/deploy-dev-cloudflare.yml");
 const deploymentPackaging=read(".github/scripts/prepare-static-deployment.mjs");
 const authorityWorkflow=read(".github/workflows/session-authority.yml");
 
-test("Firebase deployment includes active callables and keeps staged recovery maintenance excluded",()=>{
+test("Firebase deployment includes every exported callable and Firestore rules",()=>{
     const deploySelection=authorityWorkflow.match(/firebase-tools@15\.30\.0 deploy[^\n]*--only '([^']+)'/);
     assert.ok(deploySelection,"Session Authority workflow must select Firebase deployment targets");
     const selected=new Set(deploySelection[1].split(","));
     const callables=[...functionsIndex.matchAll(/exports\.([A-Za-z0-9_]+)\s*=\s*onCall\(/g)].map(match=>match[1]);
     assert.ok(callables.includes("createInitialCanonicalCharacter"));
+    assert.ok(callables.includes("mutateCanonicalSkillLoadout"));
+    assert.ok(callables.includes("readCanonicalSkillLoadout"));
     assert.ok(callables.includes("restoreCanonicalCurrent"));
     assert.ok(callables.includes("maintainCanonicalRecoveryAudit"));
-    assert.equal(selected.has("functions:maintainCanonicalRecoveryAudit"),false,
-        "Dedicated identity/provider authorization must precede maintenance deployment");
     for(const name of callables){
-        if(name==="maintainCanonicalRecoveryAudit")continue;
         assert.ok(selected.has(`functions:${name}`),`${name} is absent from Firebase deployment`);
     }
     assert.ok(selected.has("firestore:rules"));

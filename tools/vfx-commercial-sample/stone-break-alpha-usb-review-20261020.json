@@ -1,0 +1,84 @@
+{
+  "source": "C:\\Projects\\my-game\\.vfx-work\\sample\\assets\\vfx\\earth\\stone-break-sky-cast.png",
+  "sourceSha256": "91bd7ebcd3a059b85c4f370aeba48307b60c233fca8d76df3c3a34fa7e78e7c2",
+  "script": "C:\\Projects\\my-game\\.vfx-work\\sample\\artifacts\\stone-break-edge\\soften-alpha.py",
+  "scriptSha256": "0920d9e669d8ab38b792b8ac15ea729e07cb93e7e5138526f7bd7a9eadbcd6f5",
+  "candidatePng": "C:\\Projects\\my-game\\.vfx-work\\sample\\artifacts\\stone-break-edge\\alpha-edge-candidate.png",
+  "candidatePngSha256": "3e3985b18d8b5f571c6a78ef7003dd5219623ed7f98dc1ae6806548bb41157b3",
+  "candidateWebp": "C:\\Projects\\my-game\\.vfx-work\\sample\\artifacts\\stone-break-edge\\alpha-edge-candidate.webp",
+  "candidateWebpSha256": "27dda41d11c88dee51cdb66916f814618bc333d5bb39283bd863d09ebb3c05a0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "grid": [
+    4,
+    3
+  ],
+  "frames": 12,
+  "cell": [
+    362,
+    362
+  ],
+  "method": "Only frames7/8 left/right24px: original alpha multiplied by smoothstep(distance/24), with solid alpha160..224 progressively protected; alpha>=224 untouched. RGB is never edited. No scale/crop/trim/regrid.",
+  "framesChanged": [
+    {
+      "frame": 7,
+      "changedAlphaPixels": 8684,
+      "localChangeBboxInclusive": [
+        0,
+        2,
+        361,
+        361
+      ],
+      "maxAlphaReduction": 144,
+      "opaqueAlphaAtLeast224Exact": true,
+      "coreX24Through337Exact": true
+    },
+    {
+      "frame": 8,
+      "changedAlphaPixels": 7764,
+      "localChangeBboxInclusive": [
+        0,
+        11,
+        361,
+        361
+      ],
+      "maxAlphaReduction": 155,
+      "opaqueAlphaAtLeast224Exact": true,
+      "coreX24Through337Exact": true
+    }
+  ],
+  "assertions": {
+    "allRGBExact": true,
+    "otherTenFramesAllRGBAExact": true,
+    "centerCoreAtLeast24pxFromSidesAllRGBAExact": true,
+    "opaqueRockAlphaAtLeast224Exact": true,
+    "originalTransparentPaddingRetained": true,
+    "alphaNeverIncreased": true,
+    "webpDecodedRGBAEqualsPngAndCandidate": true
+  },
+  "status": "SCOPED_SOURCE_AND_USB_PASS_STOP_REFINEMENT",
+  "limitations": [
+    "Local source edit only; phone replay and independent review required.",
+    "No promise that24px feather removes every internal rectangular haze boundary."
+  ],
+  "formalSource": "assets/vfx/earth/stone-break-sky-soft-edge-v2.webp",
+  "reproducibleScript": "tools/vfx-commercial-sample/soften-stone-break-alpha.py",
+  "independentReviews": [
+    "coverage_review: exact RGB/other10frames/core/opaque-rock/no-cross-grid/lossless WebP PASS",
+    "timing_review: original and valid bound-candidate three casts each, matching F7/F8 softer dust edges with rocks/core/column/ring retained; PASS STOP"
+  ],
+  "usb": {
+    "before": "artifacts/stone-break-edge/usb-comparison",
+    "after": "artifacts/stone-break-edge/usb-bound-candidate",
+    "actualCandidateUrl": "assets/vfx/earth/stone-break-sky-soft-edge-v2.webp",
+    "castCountBefore": 3,
+    "castCountAfter": 3,
+    "actualSrcVerified": true,
+    "preflightHashAndDimensionsVerified": true,
+    "cleanup": 0,
+    "exceptions": 0,
+    "rejected": "Old candidate-labelled casts used original source; excluded. Only actual-original1–3 used for before."
+  }
+}

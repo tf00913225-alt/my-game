@@ -6993,6 +6993,7 @@ async function createCharacter(){
     }
 
 
+    player.adventureProgress={schemaVersion:3,activeChapterId:"chapter_v1",chapters:{},pendingStoryOpening:true};
     if(saveGame()!==true){
         Object.keys(player).forEach(key=>delete player[key]);
         Object.assign(player,previousPlayer);
@@ -7005,12 +7006,19 @@ async function createCharacter(){
 
     initialCharacterCreationPending=false;
     updateInitialCharacterCreationFeedback();
+    // Only a committed fresh character enters onboarding. Feature loading
+    // remains lazy; failed loading retains the persisted resumable intent.
+    try{await window.FourSymbolsFeatures.ensure("adventure","character-story-opening");}
+    catch(error){console.error("[adventure] story load pending retry",error);}
+    if(accountSave.getActiveUid()!==uid||window.FourSymbolsStartupPolicy.getUid()!==uid||
+       player.id!==id||!window.FourSymbolsStartupPolicy.canCreateCharacter()){return false;}
     window.FourSymbolsStartupPolicy.notifyCharacterCreated();
     $("creationPage").style.display="none";
     $("gameInterface").style.display="block";
     if(typeof window.syncCreationTouchMode==="function"){
         window.syncCreationTouchMode();
     }
+    window.FourSymbolsAdventure?.startFreshStory();
     return true;
 
 }
@@ -8379,6 +8387,7 @@ function showPage(page,options={}){
     target.classList.add(
         "active"
     );
+    window.FourSymbolsAdventureUI?.syncTutorialReturn(page);
     if(page!=="battle"){
         window.v143ClearImpactOverlays?.();
         window.FourSymbolsBattlePresentation?.clearHud?.();
@@ -13019,6 +13028,7 @@ function getTowerStatusAccuracyBonus(caster){
         ?Number(caster.vTowerStatusAccuracyPercent)||0:0;
 }
 function getMonsterCriticalChance(monster,targetAntiCrit=0){
+    if(monster?.tutorialEncounter===true){return Math.max(0,Number(monster.criticalChance)||0);}
     const rage=getActiveRageCriticalBonuses(monster);
     const towerBonus=monster&&monster.vGameplayTower===true?Number(monster.vTowerCriticalBonusPercent)||0:0;
     const baseChance=10+rage.chance+towerBonus;
@@ -30253,11 +30263,10 @@ function removeEquippedSkill(index){
     }
 
 
-    character.equippedSkills
-        .splice(
-            index,
-            1
-        );
+    const nextEquippedSkills=window.FourSymbolsSkillProgressionCore
+        .getLoadoutRulesForVersion("v1",skillDatabase)
+        .removeEquippedSkill(character.equippedSkills,index);
+    character.equippedSkills.splice(0,character.equippedSkills.length,...nextEquippedSkills);
 
 
     renderSkillLoadout();
@@ -31799,20 +31808,9 @@ function populateAutoSkillOptions(){
        修正：把"defend"也視為合法值。
     */
 
-    const stillValid =
-        previousValue==="normal"||
-        previousValue==="defend"||
-        character.equippedSkills.includes(
-            previousValue
-        );
-
-
-    if(!stillValid){
-
-        autoConfig.skill=
-            "normal";
-
-    }
+    autoConfig.skill=window.FourSymbolsSkillProgressionCore
+        .getLoadoutRulesForVersion("v1",skillDatabase)
+        .syncPrimaryAction(autoConfig,character).skill;
 
 
     if(homeSelect){
