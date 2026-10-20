@@ -19,6 +19,7 @@ assert.ok(!css.includes(".v17351-shop-card{display:grid!important;grid-template-
 assert.ok(css.includes(".v17346-shop-card.purchased .v17346-shop-buy.v17351-purchased-buy"));
 assert.doesNotMatch(css,/\.v17345-equipment-shop\{grid-template-rows:minmax\(0,1fr\) 64px!important/);
 assert.doesNotMatch(css,/\.v17345-equipment-refresh\{height:64px!important/);
+assert.doesNotMatch(css,/\.v17346-shop-card(?:\s|\{|\.)[^}]*\b(?:grid-template-rows|height|font-size):/,'Equipment card geometry and type have one css49 owner');
 assert.match(canonicalCss,/v17345-equipment-shop[\s\S]*grid-template-rows:32px minmax\(0,1fr\) 58px\s*!important/);
 assert.match(canonicalCss,/v17346-shop-card \.v17346-gear-art\{[\s\S]*overflow:hidden !important[\s\S]*box-sizing:border-box !important/);
 assert.match(canonicalCss,/v17346-gear-art\s*>\s*\.v169-item-art\{[\s\S]*max-width:100% !important[\s\S]*max-height:100% !important[\s\S]*overflow:hidden !important/);

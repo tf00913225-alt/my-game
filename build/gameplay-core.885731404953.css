@@ -6421,7 +6421,7 @@ body > .v169-rpg-dialog-layer{
 #game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card{
     display:grid !important;
     grid-template-columns:162px minmax(0,1fr) !important;
-    grid-template-rows:54px 45px 54px 36px 90px !important;
+    grid-template-rows:60px 54px 60px 54px 132px !important;
     column-gap:21px !important;
     row-gap:3px !important;
     align-content:center !important;
@@ -6483,8 +6483,8 @@ body > .v169-rpg-dialog-layer{
     margin:0 !important;
     overflow:hidden !important;
     color:#f6e7c2 !important;
-    font-size:42px !important;
-    line-height:54px !important;
+    font-size:48px !important;
+    line-height:60px !important;
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
@@ -6494,8 +6494,8 @@ body > .v169-rpg-dialog-layer{
     min-width:0 !important;
     margin:0 !important;
     overflow:hidden !important;
-    font-size:33px !important;
-    line-height:45px !important;
+    font-size:39px !important;
+    line-height:54px !important;
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
@@ -6505,8 +6505,8 @@ body > .v169-rpg-dialog-layer{
     min-width:0 !important;
     margin:0 !important;
     overflow:hidden !important;
-    font-size:39px !important;
-    line-height:54px !important;
+    font-size:42px !important;
+    line-height:60px !important;
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
@@ -6514,11 +6514,11 @@ body > .v169-rpg-dialog-layer{
     grid-column:2 !important;
     grid-row:4 !important;
     min-width:0 !important;
-    min-height:36px !important;
+    min-height:54px !important;
     margin:0 !important;
     overflow:hidden !important;
-    font-size:30px !important;
-    line-height:36px !important;
+    font-size:39px !important;
+    line-height:54px !important;
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
 }
@@ -6526,12 +6526,12 @@ body > .v169-rpg-dialog-layer{
     grid-column:1 / -1 !important;
     grid-row:5 !important;
     width:100% !important;
-    height:126px !important;
-    min-height:126px !important;
+    height:132px !important;
+    min-height:132px !important;
     margin:0 !important;
     padding:calc(6 * var(--ui-length-unit,1px)) 18px !important;
     border-radius:18px !important;
-    font-size:36px !important;
+    font-size:45px !important;
     line-height:1 !important;
     border:3px solid #c2964d !important;
     color:#2b1908 !important;
@@ -6613,7 +6613,7 @@ body > .v169-rpg-dialog-layer{
 }
 #game-ui #homeFeatureModal.v131-shop-open .shop-potion-card{
     display:grid !important;
-    grid-template-rows:54px 114px 126px !important;
+    grid-template-rows:54px 114px 132px !important;
     row-gap:9px !important;
     align-content:space-between !important;
     width:100% !important;
@@ -6726,13 +6726,13 @@ body > .v169-rpg-dialog-layer{
 #game-ui #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
     display:grid;
     grid-template-columns:144px minmax(168px,1fr) 162px;
-    grid-template-rows:126px;
+    grid-template-rows:132px;
     align-items:center;
     gap:9px;
     width:100%;
     min-width:0;
     min-height:0;
-    height:126px;
+    height:132px;
     margin:0;
     overflow:hidden;
 }
@@ -6748,8 +6748,8 @@ body > .v169-rpg-dialog-layer{
     inline-size:144px;
     min-inline-size:144px;
     max-inline-size:144px;
-    height:114px;
-    min-height:114px;
+    height:132px;
+    min-height:132px;
     margin:0;
     padding:0 12px;
     box-sizing:border-box;
@@ -6757,7 +6757,7 @@ body > .v169-rpg-dialog-layer{
     appearance:textfield;
     font-family:Arial,sans-serif;
     font-size:39px;
-    line-height:114px;
+    line-height:132px;
     text-align:center;
 }
 #game-ui #homeFeatureModal.v131-shop-open .shop-potion-quantity::-webkit-outer-spin-button,
@@ -6782,8 +6782,8 @@ body > .v169-rpg-dialog-layer{
     grid-row:1;
     width:162px;
     min-width:162px;
-    height:126px;
-    min-height:126px;
+    height:132px;
+    min-height:132px;
     margin:0;
     padding:0 12px;
     font-size:45px;
@@ -6907,6 +6907,7 @@ body > .v169-rpg-dialog-layer{
     --skill-header-inset:calc(4 * var(--ui-length-unit,1px));
     --skill-header-text:#ffe0a1;
 }
+#game-ui #homeFeatureModal.v131-shop-open{--skill-header-height:calc(44 * var(--ui-length-unit,1px));}
 :is(#game-ui #homeFeatureModal,#game-stage #trainingZoneModal) .home-feature-modal-title{background:transparent;box-shadow:none;border:0;}
 #game-ui #homeFeatureModal #homeFeatureModalTitle{
     flex:0 1 70%;min-width:0;box-sizing:border-box;height:var(--skill-header-height);
@@ -7301,14 +7302,7 @@ body > .v169-rpg-dialog-layer{
 #game-ui #homeFeatureModal .v17346-shop-card.purchased .v17346-shop-buy.v17351-purchased-buy{color:#b8ccb0!important;border-color:#586a4f!important;background:linear-gradient(180deg,#242d20,#11160f)!important;box-shadow:none!important;opacity:1!important}
 #game-ui #homeFeatureModal .v17351-free-refresh button{color:#261704!important;border-color:#d4a44b!important;background:linear-gradient(180deg,#f2cd73,#c78930)!important;text-shadow:none!important}
 
-/* Final shop QA owner: typography and row geometry move together so readable
-   text never gets forced back below the global 13px floor to fit one screen. */
-#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card{grid-template-rows:60px 54px 60px 54px 108px!important}
-#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-name{font-size:48px!important;line-height:60px!important}
-#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-slot{font-size:39px!important;line-height:54px!important}
-#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-stat{font-size:42px!important;line-height:60px!important}
-#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-reforge-mini{min-height:54px!important;font-size:39px!important;line-height:54px!important}
-#game-ui #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-buy{height:126px!important;min-height:126px!important;font-size:45px!important}
+/* Equipment card typography and row geometry are owned by css49. */
 #game-ui #homeFeatureModal.v131-shop-open .v17345-equipment-refresh b{font-size:45px!important;line-height:60px!important}
 #game-ui #homeFeatureModal.v131-shop-open .v17345-equipment-refresh span{font-size:39px!important;line-height:54px!important}
 #game-ui #homeFeatureModal.v131-shop-open .v17345-equipment-refresh>button{height:132px!important;min-height:132px!important;font-size:45px!important}
