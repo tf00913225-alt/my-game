@@ -4095,6 +4095,19 @@
             "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
             "真帳號/存檔權威/雲端/實體裝置未驗"
           ]
+        },
+        {
+          "state": "27種正式秘寶材料用途/真來源末端/原格返回重開；素材6件仍有問題",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
         }
       ],
       "reviews": {
@@ -15196,6 +15209,19 @@
             "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
             "真帳號/存檔權威/雲端/實體裝置未驗"
           ]
+        },
+        {
+          "state": "27種正式秘寶材料用途/真來源末端/原格返回重開；素材6件仍有問題",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
         }
       ],
       "presentationEvidence": {
@@ -17402,6 +17428,2247 @@
         "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
         "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
       }
+    },
+    {
+      "id": "item.material.relicFragment_all_returning_array",
+      "label": "萬象歸元盤碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_all_returning_array",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_all_returning_array-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_all_returning_array-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_all_returning_array-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_all_returning_array-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_returning_wheel",
+      "label": "回天寶輪碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_returning_wheel",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_returning_wheel-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_returning_wheel-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_returning_wheel-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_returning_wheel-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicChoiceBoxPink",
+      "label": "桃紅階以下秘寶碎片自選箱個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicChoiceBoxPink",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "有問題",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": "現runtime純色幾何占位；新正式六圖尚未導入/實驗",
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicChoiceBoxPink-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicChoiceBoxPink-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicChoiceBoxPink-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicChoiceBoxPink-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_tiangang_banner",
+      "label": "天罡戰旗碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_tiangang_banner",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_tiangang_banner-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_tiangang_banner-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_tiangang_banner-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_tiangang_banner-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_red_sky_war_mark",
+      "label": "赤霄戰紋碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_red_sky_war_mark",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_red_sky_war_mark-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_red_sky_war_mark-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_red_sky_war_mark-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_red_sky_war_mark-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_mountain_river_cauldron",
+      "label": "山河寶鼎碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_mountain_river_cauldron",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_mountain_river_cauldron-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_mountain_river_cauldron-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_mountain_river_cauldron-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_mountain_river_cauldron-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_demon_suppressing_seal",
+      "label": "伏魔金印碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_demon_suppressing_seal",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_demon_suppressing_seal-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_demon_suppressing_seal-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_demon_suppressing_seal-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_demon_suppressing_seal-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicBreakthroughStone",
+      "label": "秘寶突破石個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicBreakthroughStone",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "有問題",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": "現runtime純色幾何占位；新正式六圖尚未導入/實驗",
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicBreakthroughStone-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicBreakthroughStone-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicBreakthroughStone-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicBreakthroughStone-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicChoiceBoxOrange",
+      "label": "橙階以下秘寶碎片自選箱個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicChoiceBoxOrange",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "有問題",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": "現runtime純色幾何占位；新正式六圖尚未導入/實驗",
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicChoiceBoxOrange-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicChoiceBoxOrange-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicChoiceBoxOrange-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicChoiceBoxOrange-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_sun_orb",
+      "label": "烈陽神珠碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_sun_orb",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_sun_orb-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_sun_orb-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_sun_orb-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_sun_orb-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_soul_bell",
+      "label": "鎮魂古鐘碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_soul_bell",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_soul_bell-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_soul_bell-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_soul_bell-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_soul_bell-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_nine_dragon_fire",
+      "label": "九龍神火罩碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_nine_dragon_fire",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_nine_dragon_fire-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_nine_dragon_fire-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_nine_dragon_fire-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_nine_dragon_fire-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_cold_spring_jade",
+      "label": "寒泉玉珮碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_cold_spring_jade",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_cold_spring_jade-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_cold_spring_jade-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_cold_spring_jade-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_cold_spring_jade-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_rock_mountain_seal",
+      "label": "岩岳鎮印碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_rock_mountain_seal",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_rock_mountain_seal-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_rock_mountain_seal-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_rock_mountain_seal-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_rock_mountain_seal-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_origin_talisman",
+      "label": "太初聖符碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_origin_talisman",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_origin_talisman-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_origin_talisman-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_origin_talisman-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_origin_talisman-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_broken_army_scroll",
+      "label": "破軍殘卷碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_broken_army_scroll",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_broken_army_scroll-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_broken_army_scroll-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_broken_army_scroll-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_broken_army_scroll-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_ice_mirror_heart",
+      "label": "玄冰鏡心碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_ice_mirror_heart",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_ice_mirror_heart-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_ice_mirror_heart-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_ice_mirror_heart-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_ice_mirror_heart-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_burning_star_mark",
+      "label": "焚星殘印碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_burning_star_mark",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_burning_star_mark-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_burning_star_mark-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_burning_star_mark-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_burning_star_mark-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicUniversalFragment",
+      "label": "秘寶通用碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicUniversalFragment",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicUniversalFragment-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicUniversalFragment-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicUniversalFragment-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicUniversalFragment-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicChoiceBoxPurple",
+      "label": "紫階以下秘寶碎片自選箱個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicChoiceBoxPurple",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "有問題",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": "現runtime純色幾何占位；新正式六圖尚未導入/實驗",
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicChoiceBoxPurple-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicChoiceBoxPurple-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicChoiceBoxPurple-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicChoiceBoxPurple-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_qiankun_flask",
+      "label": "乾坤玉壺碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_qiankun_flask",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_qiankun_flask-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_qiankun_flask-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_qiankun_flask-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_qiankun_flask-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_xuanwu_seal",
+      "label": "玄武靈印碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_xuanwu_seal",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_xuanwu_seal-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_xuanwu_seal-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_xuanwu_seal-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_xuanwu_seal-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_qinglan_feather",
+      "label": "青嵐羽符碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_qinglan_feather",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_qinglan_feather-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_qinglan_feather-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_qinglan_feather-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_qinglan_feather-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_wind_chasing_talisman",
+      "label": "追風行符碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_wind_chasing_talisman",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_wind_chasing_talisman-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_wind_chasing_talisman-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_wind_chasing_talisman-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_wind_chasing_talisman-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicFragment_spirit_spring_bottle",
+      "label": "靈泉法瓶碎片個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicFragment_spirit_spring_bottle",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": null,
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicFragment_spirit_spring_bottle-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicFragment_spirit_spring_bottle-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicFragment_spirit_spring_bottle-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicFragment_spirit_spring_bottle-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicEssence",
+      "label": "秘寶精華個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicEssence",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "有問題",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": "現runtime純色幾何占位；新正式六圖尚未導入/實驗",
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicEssence-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicEssence-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicEssence-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicEssence-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
+    },
+    {
+      "id": "item.material.relicChoiceBoxBlue",
+      "label": "藍階以下秘寶碎片自選箱個別材料詳情",
+      "entry": "真inventoryNav→material分類→原頁碼/格位→relicChoiceBoxBlue",
+      "owner": "js/27-v132-content-expansion.js::openItemModal description; js/relic-progression-drop-system.js::itemDefinitions/materialSvg; js/35-v141-ui-battle.js::canonical pager; js/item-acquisition-registry.js; css/49-v169-rpg-ui.css",
+      "status": "有問題",
+      "states": [
+        "持有3件隔離fixture",
+        "真詳情首/自然短內容末N/A",
+        "獲取途徑首/真末/返回原詳情",
+        "回原分類頁碼與格位/重開"
+      ],
+      "operations": [
+        "原格位點入並核ID/name/UID/sourceIndex",
+        "完整用途/售價",
+        "真來源與末端",
+        "關閉返回/重開"
+      ],
+      "artIssue": "現runtime純色幾何占位；新正式六圖尚未導入/實驗",
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-relicChoiceBoxBlue-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-relicChoiceBoxBlue-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-relicChoiceBoxBlue-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-relicChoiceBoxBlue-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "用途/詳情/來源/返回重開限定",
+          "status": "已實際驗證",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+          "limits": [
+            "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+            "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+            "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+            "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-22-copy-flow",
+        "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow",
+        "notVerified": [
+          "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+          "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+          "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+          "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
+        ],
+        "reviews": {
+          "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+          "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+          "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+        }
+      },
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      }
     }
   ],
   "segmentReviews": [
@@ -17980,6 +20247,59 @@
         "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
         "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
         "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+      ]
+    },
+    {
+      "segment": "segment-22-copy-flow",
+      "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+      "result": "27正式材料四尺寸copy/entry/source/end/return限定通過；六圖素材問題未解除，非完整美術結案",
+      "bindings": [
+        {
+          "device": "360x640",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "scenes": 77,
+          "records": 192,
+          "taps": 165,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/360x640-report.json"
+        },
+        {
+          "device": "393x873",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "scenes": 77,
+          "records": 192,
+          "taps": 165,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/393x873-report.json"
+        },
+        {
+          "device": "412x915",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "scenes": 77,
+          "records": 192,
+          "taps": 165,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/412x915-report.json"
+        },
+        {
+          "device": "1280x800",
+          "head": "42f3ca5c847a658477fe081a634b97613adad4ff",
+          "scenes": 77,
+          "records": 194,
+          "taps": 165,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow/1280x800-report.json"
+        }
+      ],
+      "reviews": {
+        "art": "art_review：實看四尺寸12代表detail/source-end，長箱名置中完整、用途/100樓/每週首通條件與底返回完整；只copy/frame限定通過，6個素材仍problem",
+        "interaction": "interaction_review：實看四尺寸代表與77圖report，27identity/UID/sourceIndex、page2 selected26、真source100樓末、same detail/原格返回重開；相關控制>=44無墨跡overflow；交易selectors taps0",
+        "scope": "scope_review：2ff..42f3手寫只js27既有description五formal flag用途/主城指引與正式primary/manifest生成，原raw node替換/售價/handlers保留，無數值/交易/存檔變更"
+      },
+      "pending": [
+        "六icon母圖/無損導入/真bag與detail小尺寸三方審核",
+        "其餘物品/主城/技能詳情/戰鬥/ledger/Latest Head CI/deploy",
+        "未使用/售出/合成/選箱/升級或驗證掉落/成本/機率",
+        "choice box僅正式type material背包詳情，不代表原relic-strip自選池",
+        "體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收",
+        "四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成",
+        "真帳號/雲端權威/實體裝置/軟鍵盤未驗"
       ]
     }
   ],
