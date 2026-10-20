@@ -4034,7 +4034,7 @@
       "label": "材料詳情",
       "entry": "透過正式背包格 openItemModal / openEquippedItem",
       "owner": "index.html; js/00-main.js; js/equipment-progression.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "長名稱",
         "長詞條",
@@ -4082,11 +4082,42 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "第20三個logical IDs真背包入口/詳情/來源/兩箱preview/返回重開；礦石禁用delta",
+          "status": "已實際驗證",
+          "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted",
+          "limits": [
+            "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+            "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+            "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+            "真帳號/存檔權威/雲端/實體裝置未驗"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+        "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+        "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+      },
+      "presentationEvidence": {
+        "segment": "segment-20",
+        "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+        "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted",
+        "notVerified": [
+          "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+          "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+          "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+          "真帳號/存檔權威/雲端/實體裝置未驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+          "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+          "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+        }
       }
     },
     {
@@ -4094,7 +4125,7 @@
       "label": "寶箱詳情",
       "entry": "透過正式背包格 openItemModal / openEquippedItem",
       "owner": "index.html; js/00-main.js; js/equipment-progression.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "長名稱",
         "長詞條",
@@ -4142,11 +4173,42 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "第20三個logical IDs真背包入口/詳情/來源/兩箱preview/返回重開；礦石禁用delta",
+          "status": "已實際驗證",
+          "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted",
+          "limits": [
+            "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+            "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+            "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+            "真帳號/存檔權威/雲端/實體裝置未驗"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+        "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+        "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+      },
+      "presentationEvidence": {
+        "segment": "segment-20",
+        "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+        "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted",
+        "notVerified": [
+          "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+          "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+          "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+          "真帳號/存檔權威/雲端/實體裝置未驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+          "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+          "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+        }
       }
     },
     {
@@ -4246,7 +4308,7 @@
       "label": "material開啟／獎勵預覽",
       "entry": "物品詳情→正式開啟預覽；v132ShowItemPreview",
       "owner": "js/27-v132-content-expansion.js; js/equipment-progression.js; css/33-v132-content-expansion.css",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "所有獎項",
         "長說明",
@@ -4293,11 +4355,25 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "第20三個logical IDs真背包入口/詳情/來源/兩箱preview/返回重開；礦石禁用delta",
+          "status": "已實際驗證",
+          "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted",
+          "limits": [
+            "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+            "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+            "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+            "真帳號/存檔權威/雲端/實體裝置未驗"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+        "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+        "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
       },
       "detailEvidence": {
         "segment": 3,
@@ -4323,6 +4399,23 @@
           "未驗真手機硬體、真交易、所有遊戲狀態",
           "此項其他未列商業狀態仍未檢查"
         ]
+      },
+      "presentationEvidence": {
+        "segment": "segment-20",
+        "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+        "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted",
+        "notVerified": [
+          "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+          "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+          "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+          "真帳號/存檔權威/雲端/實體裝置未驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+          "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+          "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+        }
       }
     },
     {
@@ -4414,7 +4507,7 @@
       "label": "equipment開啟／獎勵預覽",
       "entry": "物品詳情→正式開啟預覽；v132ShowItemPreview",
       "owner": "js/27-v132-content-expansion.js; js/equipment-progression.js; css/33-v132-content-expansion.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "所有獎項",
         "長說明",
@@ -4461,11 +4554,42 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "第20三個logical IDs真背包入口/詳情/來源/兩箱preview/返回重開；礦石禁用delta",
+          "status": "已實際驗證",
+          "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted",
+          "limits": [
+            "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+            "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+            "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+            "真帳號/存檔權威/雲端/實體裝置未驗"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+        "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+        "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+      },
+      "presentationEvidence": {
+        "segment": "segment-20",
+        "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+        "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted",
+        "notVerified": [
+          "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+          "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+          "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+          "真帳號/存檔權威/雲端/實體裝置未驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+          "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+          "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+        }
       }
     },
     {
@@ -14921,29 +15045,42 @@
               "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-controls-639.json"
             }
           ]
+        },
+        {
+          "state": "第20三個logical IDs真背包入口/詳情/來源/兩箱preview/返回重開；礦石禁用delta",
+          "status": "已實際驗證",
+          "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted",
+          "limits": [
+            "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+            "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+            "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+            "真帳號/存檔權威/雲端/實體裝置未驗"
+          ]
         }
       ],
       "presentationEvidence": {
-        "segment": "segment-13",
-        "head": "639391f4245b0535c7d4aef35cca746bb244bc8a",
-        "presentationHead": "0b408c143114b5407634e6e8071fd0dbe909b4f8",
-        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted",
-        "reviews": {
-          "art": "四尺寸裝備及長文/規則末端、代表補品與彈窗實圖限定通過",
-          "interaction": "四尺寸原Owner真touch/wheel末端／hit／返回，44screen下限及逐卡零重疊",
-          "scope": "CSS原Owner修正／覆蓋退役；無JS／價格／交易變更，實圖限定通過"
-        },
-        "verified": [
-          "正式入口/TAB/確認取消及金幣變動拒絕（補品）",
-          "隔離sold/unavailable與特定QA storage failure",
-          "真touch/wheel清單/長文末端與返回",
-          "題牌保留／逐卡reforge零重疊／控件至少44screen"
-        ],
+        "segment": "segment-20",
+        "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+        "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted",
         "notVerified": [
-          "成功購買／成功刷新／存檔交易",
-          "真帳號／實體手機",
-          "其他未列狀態"
-        ]
+          "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+          "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+          "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+          "真帳號/存檔權威/雲端/實體裝置未驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+          "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+          "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+        }
+      },
+      "reviews": {
+        "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+        "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+        "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
       }
     },
     {
@@ -16908,6 +17045,225 @@
         "interaction": "interaction_review：基準每尺寸47圖70操作捲動紀錄，修後9件每尺寸18圖28紀錄；真overlay/name/scroll0/末/返回，hash不變且clean",
         "scope": "scope_review：白名單逆向逐位元重建一致，僅11行顯示字串，原公式/事件/數值/交易不變；四尺寸修後代表實圖限定通過"
       }
+    },
+    {
+      "id": "item.material.oreLow",
+      "label": "白階礦石個別詳情",
+      "entry": "真inventoryNav→正式分類/格位→oreLow",
+      "owner": "js/00-main.js::openItemModal; js/27-v132-content-expansion.js; js/equipment-progression.js; js/53-v173.50-inventory-qol.js; css/52-v173.50-inventory-qol.css; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有/正式堆疊",
+        "詳情首末",
+        "來源首末/返回",
+        "箱子預覽首末/返回（礦石無該入口）",
+        "關閉回原分類/格位與重開"
+      ],
+      "operations": [
+        "真格位點入/ID-name-UID-sourceIndex核對",
+        "閱讀用途/售價/數量",
+        "原來源與可用預覽入口",
+        "內容真末或無需捲動明記",
+        "真返回重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/360x640-delta-oreLow-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/360x640-base-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/360x640-delta-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/393x873-delta-oreLow-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/393x873-base-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/393x873-delta-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/412x915-delta-oreLow-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/412x915-base-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/412x915-delta-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/1280x800-delta-oreLow-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/1280x800-base-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/1280x800-delta-report.json"
+        }
+      },
+      "presentationEvidence": {
+        "segment": "segment-20",
+        "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+        "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted",
+        "notVerified": [
+          "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+          "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+          "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+          "真帳號/存檔權威/雲端/實體裝置未驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+          "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+          "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+        }
+      },
+      "reviews": {
+        "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+        "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+        "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+      }
+    },
+    {
+      "id": "item.chest.materialChest",
+      "label": "材料寶箱個別詳情",
+      "entry": "真inventoryNav→正式分類/格位→materialChest",
+      "owner": "js/00-main.js::openItemModal; js/27-v132-content-expansion.js; js/equipment-progression.js; js/53-v173.50-inventory-qol.js; css/52-v173.50-inventory-qol.css; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有/正式堆疊",
+        "詳情首末",
+        "來源首末/返回",
+        "箱子預覽首末/返回（礦石無該入口）",
+        "關閉回原分類/格位與重開"
+      ],
+      "operations": [
+        "真格位點入/ID-name-UID-sourceIndex核對",
+        "閱讀用途/售價/數量",
+        "原來源與可用預覽入口",
+        "內容真末或無需捲動明記",
+        "真返回重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/360x640-base-materialChest-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/360x640-base-report.json",
+          "delta": null
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/393x873-base-materialChest-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/393x873-base-report.json",
+          "delta": null
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/412x915-base-materialChest-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/412x915-base-report.json",
+          "delta": null
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/1280x800-base-materialChest-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/1280x800-base-report.json",
+          "delta": null
+        }
+      },
+      "presentationEvidence": {
+        "segment": "segment-20",
+        "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+        "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted",
+        "notVerified": [
+          "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+          "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+          "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+          "真帳號/存檔權威/雲端/實體裝置未驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+          "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+          "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+        }
+      },
+      "reviews": {
+        "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+        "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+        "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+      }
+    },
+    {
+      "id": "item.chest.equipmentChest",
+      "label": "裝備寶箱個別詳情",
+      "entry": "真inventoryNav→正式分類/格位→equipmentChest",
+      "owner": "js/00-main.js::openItemModal; js/27-v132-content-expansion.js; js/equipment-progression.js; js/53-v173.50-inventory-qol.js; css/52-v173.50-inventory-qol.css; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "持有/正式堆疊",
+        "詳情首末",
+        "來源首末/返回",
+        "箱子預覽首末/返回（礦石無該入口）",
+        "關閉回原分類/格位與重開"
+      ],
+      "operations": [
+        "真格位點入/ID-name-UID-sourceIndex核對",
+        "閱讀用途/售價/數量",
+        "原來源與可用預覽入口",
+        "內容真末或無需捲動明記",
+        "真返回重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/360x640-base-equipmentChest-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/360x640-base-report.json",
+          "delta": null
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/393x873-base-equipmentChest-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/393x873-base-report.json",
+          "delta": null
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/412x915-base-equipmentChest-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/412x915-base-report.json",
+          "delta": null
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/1280x800-base-equipmentChest-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/1280x800-base-report.json",
+          "delta": null
+        }
+      },
+      "presentationEvidence": {
+        "segment": "segment-20",
+        "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+        "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted",
+        "notVerified": [
+          "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+          "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+          "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+          "真帳號/存檔權威/雲端/實體裝置未驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+          "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+          "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+        }
+      },
+      "reviews": {
+        "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+        "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+        "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+      }
     }
   ],
   "segmentReviews": [
@@ -17297,6 +17653,99 @@
         "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
       ],
       "excluded": "舊activegetter fixture被原js45每秒補品engine消費，原8calls與整批resolved2快照不批准；單獨EXCLUDED證據只追溯QA污染"
+    },
+    {
+      "segment": "segment-20",
+      "baseHead": "d66dec130ff15d6515f3f29d256725cc713427b4",
+      "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+      "result": "三種物品真入口與用途/批量target/來源/預覽/返回四尺寸限定通過；只有礦石禁用字delta，不重兩箱",
+      "bindings": [
+        {
+          "kind": "base",
+          "device": "360x640",
+          "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "scenes": 27,
+          "records": 34,
+          "taps": 26,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/360x640-base-report.json"
+        },
+        {
+          "kind": "base",
+          "device": "393x873",
+          "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "scenes": 27,
+          "records": 34,
+          "taps": 26,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/393x873-base-report.json"
+        },
+        {
+          "kind": "base",
+          "device": "412x915",
+          "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "scenes": 27,
+          "records": 34,
+          "taps": 26,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/412x915-base-report.json"
+        },
+        {
+          "kind": "base",
+          "device": "1280x800",
+          "head": "d66dec130ff15d6515f3f29d256725cc713427b4",
+          "scenes": 27,
+          "records": 34,
+          "taps": 26,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/1280x800-base-report.json"
+        },
+        {
+          "kind": "delta",
+          "device": "360x640",
+          "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+          "scenes": 7,
+          "records": 10,
+          "taps": 8,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/360x640-delta-report.json"
+        },
+        {
+          "kind": "delta",
+          "device": "393x873",
+          "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+          "scenes": 7,
+          "records": 10,
+          "taps": 8,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/393x873-delta-report.json"
+        },
+        {
+          "kind": "delta",
+          "device": "412x915",
+          "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+          "scenes": 7,
+          "records": 10,
+          "taps": 8,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/412x915-delta-report.json"
+        },
+        {
+          "kind": "delta",
+          "device": "1280x800",
+          "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+          "scenes": 7,
+          "records": 10,
+          "taps": 8,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment20-accepted/1280x800-delta-report.json"
+        }
+      ],
+      "reviews": {
+        "art": "art_review：四尺寸base箱detail/preview與delta礦石代表實圖，disabled中性色清楚、原雕框/題牌/品階保留",
+        "interaction": "interaction_review：四尺寸base27圖34records、delta7圖10records，真bag分類/slot/sourceIndex binder/source/preview/返回；未編輯quantity",
+        "scope": "scope_review：原CSS52批量44、原箱configure與js27 emptyraw用途、js00材料opacity1；無handler/機率/cost/堆疊變更，生成policy只sourceDigest"
+      },
+      "pending": [
+        "Latest Head必要CI/部署",
+        "其餘物品類別/主城/戰鬥/帳號提示與activeguard",
+        "未開箱/批量執行/出售/使用/領取/交易或驗機率計算",
+        "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
+        "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
+        "真帳號/存檔權威/雲端/實體裝置未驗"
+      ]
     }
   ],
   "titleAudit": {
