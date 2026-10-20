@@ -7417,6 +7417,40 @@
             "No unlock/star/reset/equip/claim/formation mutation/combat/cloud authority acceptance",
             "32B read-failure states are separate and not imported or approved here"
           ]
+        },
+        {
+          "state": "Original growth read busy/failure/retry display only, not full page end",
+          "status": "已實際驗證",
+          "head": "00c5e015bbaa8dd8f0affbddb51c16ef5582c2bd",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment32b-read-states-accepted",
+          "reports": [
+            {
+              "head": "00c5e015bbaa8dd8f0affbddb51c16ef5582c2bd",
+              "viewport": "360x640",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\360x640\\report.json"
+            },
+            {
+              "head": "00c5e015bbaa8dd8f0affbddb51c16ef5582c2bd",
+              "viewport": "393x873",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\393x873\\report.json"
+            },
+            {
+              "head": "00c5e015bbaa8dd8f0affbddb51c16ef5582c2bd",
+              "viewport": "412x915",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\412x915\\report.json"
+            },
+            {
+              "head": "00c5e015bbaa8dd8f0affbddb51c16ef5582c2bd",
+              "viewport": "1280x800",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\1280x800\\report.json"
+            }
+          ],
+          "limits": [
+            "Actual held read busy/disabled display, original 503 failure and true original sync retry recovery, four viewport sizes",
+            "These are middle-of-detail read states; no 32B true page-end acceptance, particularly desktop failure lower content is outside capture",
+            "Six restore exact fields; privateHeroCachesExact false remains explicit; no full runtime cache restoration claim",
+            "No unlock/star/reset/equip/claim/purchase/combat/transaction; zero transport mutations in isolated QA"
+          ]
         }
       ],
       "reviews": {
@@ -26367,6 +26401,18 @@
         "Six restore exacts and no QA transport mutations; privateHeroCachesExact false intentionally recorded, not full runtime cache restoration",
         "No unlock/star/reset/equip/claim/formation mutation/combat/cloud authority acceptance",
         "32B read-failure states are separate and not imported or approved here"
+      ]
+    },
+    {
+      "segment": "segment-32b-read-states",
+      "head": "00c5e015bbaa8dd8f0affbddb51c16ef5582c2bd",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment32b-read-states-accepted",
+      "result": "成長讀取狀態與重試呈現限定通過",
+      "pending": [
+        "Actual held read busy/disabled display, original 503 failure and true original sync retry recovery, four viewport sizes",
+        "These are middle-of-detail read states; no 32B true page-end acceptance, particularly desktop failure lower content is outside capture",
+        "Six restore exact fields; privateHeroCachesExact false remains explicit; no full runtime cache restoration claim",
+        "No unlock/star/reset/equip/claim/purchase/combat/transaction; zero transport mutations in isolated QA"
       ]
     }
   ],
