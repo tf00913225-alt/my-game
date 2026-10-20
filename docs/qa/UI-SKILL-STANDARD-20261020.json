@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：34 ready深淵四尺寸限定驗收；全UI與所有標題未全部完成",
+  "status": "施工中：35靜態巡邏四尺寸限定驗收；快捷圖字與全UI/所有標題剩餘狀態未完成",
   "devices": [
     {
       "id": "360x640",
@@ -12415,7 +12415,7 @@
       "label": "patrol內頁",
       "entry": "玩法頁正式入口→patrol",
       "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
-      "status": "有問題",
+      "status": "已修改",
       "states": [
         "鎖定",
         "解鎖",
@@ -12484,7 +12484,42 @@
           "8 restore flags true，private caches/runtime瞬態不主張完整還原",
           "原party auto configs off precondition；不改玩法或補給邏輯"
         ]
-      }
+      },
+      "presentationEvidence": {
+        "segment": "segment35-static-patrol-accepted",
+        "head": "4325f3df9ea36cf496723a21edef5cd575eaf8b0",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment35-static-patrol-accepted",
+        "status": "已實際驗證（限定列出路徑）",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "screens": 32,
+        "inputs": 32,
+        "reviewers": [
+          "art_review",
+          "interaction_review",
+          "scope_review"
+        ],
+        "limits": [
+          "僅首forest靜態map、兩短名既有actor形象面板開關、不選取；無map移動/怪物/auto切換/戰鬥/回復/獎勵/交易",
+          "quick off按鈕僅尺寸/命中/原圖載入；圖內主字/OFF微字可讀性仍待改善，不因44px通過批准所有按鈕美術",
+          "3actor/長名/形象選取寫入/其他地區/enabled補給或auto/battle/真手機硬體未驗",
+          "8項raw/meta/actors/inventory/loadouts/equipment/patrol-key/saveAPI精確還原；currentZone/monsters/grid/path/animation與私有selected/decode/generation/cache不主張完全還原，隔離profile丟棄",
+          "原route重建怪物與reset位置屬既有進場effects；僅比對靜態期間HP/SP/gold/inventory/equipment/hours/auto/battle/token/timer同baseline",
+          "本機targeted2靜態contract與build/check通過；內建modal Browser因未配置exe跳過，不代此四尺寸圖證；最新Head必要Actions未確認，未merge/deploy"
+        ]
+      },
+      "remainingStates": [
+        "僅首forest靜態map、兩短名既有actor形象面板開關、不選取；無map移動/怪物/auto切換/戰鬥/回復/獎勵/交易",
+        "quick off按鈕僅尺寸/命中/原圖載入；圖內主字/OFF微字可讀性仍待改善，不因44px通過批准所有按鈕美術",
+        "3actor/長名/形象選取寫入/其他地區/enabled補給或auto/battle/真手機硬體未驗",
+        "8項raw/meta/actors/inventory/loadouts/equipment/patrol-key/saveAPI精確還原；currentZone/monsters/grid/path/animation與私有selected/decode/generation/cache不主張完全還原，隔離profile丟棄",
+        "原route重建怪物與reset位置屬既有進場effects；僅比對靜態期間HP/SP/gold/inventory/equipment/hours/auto/battle/token/timer同baseline",
+        "本機targeted2靜態contract與build/check通過；內建modal Browser因未配置exe跳過，不代此四尺寸圖證；最新Head必要Actions未確認，未merge/deploy"
+      ]
     },
     {
       "id": "gameplay.monster-catalog",
@@ -26799,6 +26834,33 @@
         "只首360，不代表四尺寸或已驗收map",
         "不點形象選取/自動切換/map移動；quick圖內小字仍待打磨",
         "8還原true；private caches/進場瞬態不主張完全還原"
+      ]
+    },
+    {
+      "segment": "segment35-static-patrol-accepted",
+      "head": "4325f3df9ea36cf496723a21edef5cd575eaf8b0",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment35-static-patrol-accepted",
+      "status": "已實際驗證（限定列出路徑）",
+      "devices": [
+        "360x640",
+        "393x873",
+        "412x915",
+        "1280x800"
+      ],
+      "screens": 32,
+      "inputs": 32,
+      "reviewers": [
+        "art_review",
+        "interaction_review",
+        "scope_review"
+      ],
+      "limits": [
+        "僅首forest靜態map、兩短名既有actor形象面板開關、不選取；無map移動/怪物/auto切換/戰鬥/回復/獎勵/交易",
+        "quick off按鈕僅尺寸/命中/原圖載入；圖內主字/OFF微字可讀性仍待改善，不因44px通過批准所有按鈕美術",
+        "3actor/長名/形象選取寫入/其他地區/enabled補給或auto/battle/真手機硬體未驗",
+        "8項raw/meta/actors/inventory/loadouts/equipment/patrol-key/saveAPI精確還原；currentZone/monsters/grid/path/animation與私有selected/decode/generation/cache不主張完全還原，隔離profile丟棄",
+        "原route重建怪物與reset位置屬既有進場effects；僅比對靜態期間HP/SP/gold/inventory/equipment/hours/auto/battle/token/timer同baseline",
+        "本機targeted2靜態contract與build/check通過；內建modal Browser因未配置exe跳過，不代此四尺寸圖證；最新Head必要Actions未確認，未merge/deploy"
       ]
     }
   ],

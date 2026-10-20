@@ -21,3 +21,14 @@ eb5首360仍36px，末列不足44；inline/CSSOM診斷證明JS17啟動函式以4
 60ce首360已真末列/回森林/原資訊進入巡邏，但首採集誤讀不存在mapPageTitle失敗，保原圖排除；正式null-safe再跑顯示原地圖無獨立題牌，不能憑空新增。靜態map、人物與quick off目標44.705px/EFP正常，形象原選項32.57px不足44。兩組未通過證據保留segment35-panel-before，不冒稱巡邏已驗收。
 
 原CSS32選項min52/font18/line1.4/可換行，面板適當寬度/內距沿原技能黑鐵雕框，選項保左齊名稱/原active；不改JS26選取或localkey。build/check過，四尺寸/三方修後圖證待完成。快捷圖內微字另待改善，off目標大小不代表語言/切換狀態已驗。
+
+## 四尺寸限定驗收
+
+Source 4325f3df9ea36cf496723a21edef5cd575eaf8b0，四尺寸32張圖/32項真輸入，三方獨立圖證見segment35-static-patrol-accepted。原列表真末第10項/反向回森林、資訊原進入、靜態地圖原人物/素材、形象開關與原native leaveMap→training；原44/EFP保留，no auto/choice/map操作。原失敗與QA錯誤逐組保留，不拿舊驗收蓋過新問題。
+
+- 僅首forest靜態map、兩短名既有actor形象面板開關、不選取；無map移動/怪物/auto切換/戰鬥/回復/獎勵/交易
+- quick off按鈕僅尺寸/命中/原圖載入；圖內主字/OFF微字可讀性仍待改善，不因44px通過批准所有按鈕美術
+- 3actor/長名/形象選取寫入/其他地區/enabled補給或auto/battle/真手機硬體未驗
+- 8項raw/meta/actors/inventory/loadouts/equipment/patrol-key/saveAPI精確還原；currentZone/monsters/grid/path/animation與私有selected/decode/generation/cache不主張完全還原，隔離profile丟棄
+- 原route重建怪物與reset位置屬既有進場effects；僅比對靜態期間HP/SP/gold/inventory/equipment/hours/auto/battle/token/timer同baseline
+- 本機targeted2靜態contract與build/check通過；內建modal Browser因未配置exe跳過，不代此四尺寸圖證；最新Head必要Actions未確認，未merge/deploy
