@@ -812,4 +812,19 @@ test("recipient casts preserve formal target sets across both sides, six-slot fo
  }}}
 });
 
+test("Freeze column and tri artwork follows only formal portrait recipients on both sides",()=>{
+ for(const side of ["player","monster"]){for(const [type,indexes] of [["column",[0,3]],["tri",[0,1,2]]]){
+  const rects=Array.from({length:6},(_,i)=>({left:40+(i%3)*100,top:120+Math.floor(i/3)*150,right:120+(i%3)*100,bottom:240+Math.floor(i/3)*150,width:80,height:120}));
+  const portraits=rects.map(r=>({left:r.left+10,top:r.top+20,width:60,height:90}));
+  const runtime=loadRuntime({playerRects:rects,monsterRects:rects,renderGeometry:{getUnitGeometry(s,i){return s===side?{artworkProjection:{rect:portraits[i]}}:null;}}});runtime.setClock(100);
+  runtime.context.v142SkillAnimationDirector.play({id:"freeze",element:"water",category:"magic",targetType:type,duration:950},{side:side==="player"?"monster":"player",actorIndex:0,targetSide:side,targetId:indexes[0],targetIds:indexes});
+  const current=runtime.context.v143SkillAnimationState.current,nodes=stageSprites(runtime).sprites;
+  assert.equal(current.targetType,type);assert.deepEqual(Array.from(current.targetIds),indexes);
+  assert.deepEqual(nodes.map(n=>Number(n.dataset.targetIndex)),indexes,"each formal target receives its own ice prison");
+  indexes.forEach((i,j)=>{const p=portraits[i];assert.equal(nodes[j].style.left,(p.left+p.width/2)+"px");assert.equal(nodes[j].style.top,(p.top+p.height/2)+"px");});
+  runtime.context.v143ResolveBattleFeedbackTiming(side,5,"hp",false);assert.equal(current.spriteNodes.has("5"),false,"nonrecipient feedback must not create another ice prison");
+  assert.equal(runtime.raf.length,1);runtime.context.v142SkillAnimationDirector.dispose();assert.equal(runtime.body.querySelectorAll("#v143-skill-stage").length,0);
+ }}
+});
+
 console.log("\n"+passed+" V173.39 wind Sprite VFX tests passed.");

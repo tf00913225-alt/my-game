@@ -590,19 +590,18 @@ test("late callbacks cannot expand a single-target Tidal Beast cast",()=>{
     assert.deepEqual(stageSprites(runtime).sprites.map(node=>node.dataset.targetIndex),["1"]);
 });
 
-test("tri-target Freeze and ally-all Heal use their fixed semantic footprints",()=>{
+test("tri-target Freeze and ally-all Heal retain formal recipients with separate artwork",()=>{
     const freeze=loadRuntime({targetIndexes:[0,2]});
     freeze.context.v142SkillAnimationDirector.play(
         castConfig("freeze","tri"),
         {side:"player",actorIndex:0,targetSide:"monster",targetId:0,targetIds:[0,2]}
     );
     const freezeSprites=stageSprites(freeze).sprites;
-    assert.equal(freezeSprites.length,1);
-    assert.equal(freezeSprites[0].dataset.targetIndexes,"0,2");
-    assert.equal(freezeSprites[0].style.left,"458px");
+    assert.equal(freezeSprites.length,2);
+    assert.deepEqual(freezeSprites.map(s=>s.dataset.targetIndexes),["0","2"]);
+    assert.ok(freezeSprites.every(s=>s.dataset.placement==="single"&&s.style.width===s.style.height));
     assert.equal(freeze.context.v143SkillAnimationState.current.targetId,0);
-    assert.equal(freezeSprites[0].style.width,"316px");
-    assert.equal(freezeSprites[0].style.height,"316px","Freeze preserves its authored square frame across the fixed tri-target footprint");
+    assert.equal(freeze.context.v143SkillAnimationState.current.targetType,"tri","recipient artwork does not change formal skill range");
 
     const heal=loadRuntime();
     heal.context.v142SkillAnimationDirector.play(
@@ -705,8 +704,8 @@ test("enemy Freeze uses its explicit successful player target",()=>{
     assert.equal(sprites[0].dataset.targetIndexes,"1");
     assert.equal(sprites[0].style.left,"239px");
     assert.equal(sprites[0].style.top,"418px");
-    assert.equal(sprites[0].style.width,"398px");
-    assert.equal(sprites[0].style.height,"398px","enemy Freeze preserves its authored square frame across the fixed tri-target footprint");
+    assert.equal(sprites[0].style.width,"139px");
+    assert.equal(sprites[0].style.height,"139px","enemy Freeze remains a compact square at its actual recipient");
     assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v143-status-visual-freeze"),null);
 });
 
