@@ -1442,7 +1442,8 @@ body > .v169-rpg-dialog-layer{
     touch-action:pan-y !important;
 }
 :is(#game-stage,#game-ui) .home-feature-modal-box .home-feature-close-btn{
-    min-height:calc(38 * var(--ui-length-unit,1px));
+    min-width:calc(44 * var(--ui-length-unit,1px));
+    min-height:calc(44 * var(--ui-length-unit,1px));
 }
 
 /* Skill iron/bronze presentation: replaces the old css/00,31,42 writers.

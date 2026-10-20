@@ -586,7 +586,7 @@ button:disabled{
 }
 #homePage.active{
     display:grid;grid-template-columns:minmax(0,1fr);
-    grid-template-rows:auto auto minmax(900px,1fr) auto;gap:10px;
+    grid-template-rows:max-content max-content minmax(900px,1fr) max-content;gap:10px;
 }
 #homePage .home-city-hud{grid-row:1;}
 #homePage .v146-home-roster{grid-column:1;grid-row:2;}
