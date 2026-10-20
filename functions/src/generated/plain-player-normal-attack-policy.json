@@ -7,8 +7,8 @@
     "js/33-v140-four-element-balance.js": "ec0e90959f8d50862deb808c3cd66554ac426d9bc80de1fe07464e8683162a45",
     "js/43-v149-skill-ui-rules.js": "dc765992753af59a8f1d85f6e1252f492cec949fcbc15699e6dd34d61b73a22b",
     "js/44-v152-dev-fixes.js": "7b9dbd4221c27225b4c177fca61da430f3964d3ae7702199c302234ddb334409",
-    "functions/src/skill-progression-core.js": "2a3aab49f7ee84456f8438c6b0fe5fc81c3d8cb759826830d721cf7228907931",
-    "js/60-v173.64-skill-progression-rebalance.js": "c67f8bd6cadc91315afb7d4aa43f19ab93363f60a3891904fbad79b61c9779b7"
+    "functions/src/skill-progression-core.js": "70973ea5b9cbd3083f2723758038af4fab64a8c19fffcb3998fadd84ea5a3df9",
+    "js/60-v173.64-skill-progression-rebalance.js": "fa08c27b513b742f5a0539f148df7802c836fe6002e1f9fbbd2b30ab94fc502d"
   },
   "declarationDigests": {
     "BASE_PHYSICAL_ATTACK": "8c512bffb37a77a9df4d5ffe8e5d92d8a6304d41fd610fefb102d03b5b3850dd",
