@@ -6,6 +6,44 @@ import {battleSkillTouchFloodQa} from './battle-skill-touch-flood-qa.mjs';
 import os from 'node:os';
 import {startServer,waitJson,Cdp,findChrome} from './runtime-browser-qa-support.mjs';
 
+// Match the formal portrait QA's authored alpha projection, not the larger
+// depth-scaled carrier. getBoundingClientRect includes the current motion.
+function measureEnemyVisiblePortrait(card){
+    const art=card?.querySelector('.v174-battle-art');
+    if(!art)throw new Error('Enemy HUD QA requires the formal artwork node');
+    const index=Number(String(card.id).replace('battleMonster',''));
+    const record=window.v154ResolveMonsterPortraitRecord?.(monsters[index]);
+    if(art.classList.contains('v174-generic-portrait')&&record?.generic){
+        // The generic glyph lives inside this carrier. Using its complete box
+        // is conservative and never excuses an actual glyph/HUD intersection.
+        const r=art.getBoundingClientRect();
+        return {basis:'generic-carrier-conservative',top:r.top,bottom:r.bottom,height:r.height,source:null};
+    }
+    const meta=record?.path&&window.v154GetPortraitPresentation?.(record.path);
+    const paint=art.querySelector('.v174-portrait-paint');
+    if(!art.classList.contains('v174-normalized-portrait')||!paint||!meta||
+        !Number.isFinite(meta.width)||!Number.isFinite(meta.height)||!(meta.width>0&&meta.height>0)||!Array.isArray(meta.alphaBounds)||meta.alphaBounds.length!==4||
+        !meta.alphaBounds.every(Number.isFinite))throw new Error('Enemy HUD QA missing normalized source/alpha metadata: '+JSON.stringify({index,record,classes:art.className}));
+    const [l,t,r,b]=meta.alphaBounds;
+    if(!(l>=0&&t>=0&&r>l&&b>t&&r<=meta.width&&b<=meta.height))throw new Error('Enemy HUD QA invalid source alpha bounds');
+    for(let node=paint;node;node=node.parentElement){
+        const transform=getComputedStyle(node).transform;
+        if(transform&&transform!=='none'){
+            const m=new DOMMatrixReadOnly(transform);
+            if(!m.is2D||![m.a,m.b,m.c,m.d,m.e,m.f].every(Number.isFinite)||m.a<=0||m.d<=0||Math.abs(m.b)>1e-6||Math.abs(m.c)>1e-6)
+                throw new Error('Enemy idle HUD QA requires positive axis-aligned portrait transforms: '+transform);
+        }
+        if(node===card)break;
+    }
+    const box=paint.getBoundingClientRect();
+    if(!(box.width>0&&box.height>0))throw new Error('Enemy HUD QA empty portrait paint');
+    const top=box.top+box.height*t/meta.height,bottom=box.top+box.height*b/meta.height;
+    return {basis:'source-alpha',source:record.path,sizeClass:card.dataset.portraitSizeClass,
+        top,bottom,height:bottom-top,left:box.left+box.width*l/meta.width,right:box.left+box.width*r/meta.width,
+        alphaBounds:meta.alphaBounds,paint:{top:box.top,bottom:box.bottom,width:box.width,height:box.height},
+        motion:art.dataset.motion,actionTransform:getComputedStyle(art.querySelector('.v174-action-motion')).transform};
+}
+
 async function runBossBalanceProductionQa(){
     const mode=process.env.BOSS_GATE_MODE||'full',startedAt=Date.now();
     assert.ok(['fast','full'].includes(mode),'Unknown Boss mode must fail closed');
@@ -1187,6 +1225,7 @@ try{
     assert.equal(logRetirement.turnVisible,true,"Current battle round must remain visible");
 
     const resourceLayers=await client.eval(`(()=>{
+        const measureEnemyVisiblePortrait=${measureEnemyVisiblePortrait.toString()};
         const playerCard=document.getElementById('battlePlayerCard0');
         const monsterCard=document.getElementById('battleMonster0');
         const playerHp=FourSymbolsBattlePresentation.getUnitHud(playerCard)?.querySelector('.hp-bar');
@@ -1214,7 +1253,7 @@ try{
             playerHpVisible:getComputedStyle(playerHp).visibility,
             monsterHpVisible:getComputedStyle(monsterHp).visibility,
             player:{art:rect(playerArt),hp:rect(playerHp),sp:rect(playerSp),name:rect(playerName)},
-            monster:{art:rect(monsterArt),hp:rect(monsterHp),sp:rect(monsterSp),name:rect(monsterName)},
+            monster:{art:rect(monsterArt),visiblePortrait:measureEnemyVisiblePortrait(monsterCard),hp:rect(monsterHp),sp:rect(monsterSp),name:rect(monsterName)},
             logicalHeights:{playerHp:playerHp?.offsetHeight||0,monsterHp:monsterHp?.offsetHeight||0,monsterSpWidth:monsterSp?.offsetWidth||0}
         };
         playerStatus.remove();
@@ -1233,7 +1272,7 @@ try{
     assert.ok(allyHud.name.bottom<=allyHud.hp.top+1,"ally identity sits above HP");
     assert.ok(allyHud.hp.bottom<=allyHud.sp.top+1,"ally HP sits above SP");
     assert.ok(enemyHud.name.bottom<=enemyHud.hp.top+1,"enemy identity sits above HP");
-    assert.ok(enemyHud.hp.bottom<=enemyHud.art.top+1,"enemy top HUD stays above portrait");
+    assert.ok(enemyHud.hp.bottom<=enemyHud.visiblePortrait.top+1,"enemy top HUD stays above visible portrait: "+JSON.stringify(enemyHud));
     assert.equal(resourceLayers.logicalHeights.monsterHp,resourceLayers.logicalHeights.playerHp,"Enemy and player resource bars must use the same formal owner height");
     assert.equal(resourceLayers.logicalHeights.monsterHp,6,"Battle resource bars use the shared thin logical height");
 
@@ -1256,6 +1295,11 @@ try{
         const sprites=stage?Array.from(stage.querySelectorAll('.v143-vfx-sprite')):[];
         const sprite=sprites[0]||null;
         const bounds=owner.getSideRect('monster');
+        const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.()?.rect;
+        const safeBounds=bounds&&overlay?{
+            left:Math.max(bounds.left,overlay.left),right:Math.min(bounds.right,overlay.right),
+            top:Math.max(bounds.top,overlay.top),bottom:Math.min(bounds.bottom,overlay.bottom)
+        }:null;
         const css=stage?getComputedStyle(stage):null;
         return {
             config:{id:config.id,targetType:config.targetType,duration:config.duration},
@@ -1273,6 +1317,8 @@ try{
                 width:Number.parseFloat(sprite.style.width),height:Number.parseFloat(sprite.style.height)
             }:null,
             bounds,
+            safeBounds,
+            clipPath:sprite?.style.clipPath||null,
             stageOverflow:css?.overflow||null,
             emitted:sprite?.dataset.emittedVisual||null,
             gateId:gate?.id||null
@@ -1288,8 +1334,18 @@ try{
     assert.equal(iceArrowRain?.areaId,"fixed-enemy-zone","Ice Arrow Rain must bind to the complete enemy fixed zone");
     assert.equal(iceArrowRain?.geometrySlots.length,6,"Full-range VFX geometry must retain all six current-wave slots regardless of occupancy");
     assert.equal(iceArrowRain?.targetIndexes.length,6,"The real six-enemy wave must expose all living targets to Ice Arrow Rain");
-    assert.ok(iceArrowRain.spriteBox.width>=iceArrowRain.bounds.width-1,"Ice Arrow Rain must cover the complete enemy width");
-    assert.ok(iceArrowRain.spriteBox.height>=iceArrowRain.bounds.height-1,"Ice Arrow Rain must cover the complete enemy height");
+    // Full range is the formal target set and fixed geometry, not a requirement
+    // to enlarge square artwork beyond the side. Retain the complete source.
+    assert.ok(iceArrowRain.safeBounds,"Ice Arrow Rain requires the formal overlay/side intersection");
+    const iceSafe=iceArrowRain.safeBounds,iceBox=iceArrowRain.spriteBox;
+    const availableWidth=2*Math.min(iceBox.left-iceSafe.left,iceSafe.right-iceBox.left);
+    const availableHeight=2*Math.min(iceBox.top-iceSafe.top,iceSafe.bottom-iceBox.top);
+    const expectedHeight=Math.min(availableHeight,availableWidth/iceArrowRain.frameAspect);
+    assert.ok(iceBox.width>0&&iceBox.height>0,"Ice Arrow Rain must retain visible artwork");
+    assert.ok(Math.abs(iceBox.height-expectedHeight)<=1,"Ice Arrow Rain must use the full aspect-preserving safe fit, not arbitrary shrinking");
+    assert.ok(iceBox.left-iceBox.width/2>=iceSafe.left-1&&iceBox.left+iceBox.width/2<=iceSafe.right+1,"Ice Arrow Rain art must remain inside the enemy-side safe width");
+    assert.ok(iceBox.top-iceBox.height/2>=iceSafe.top-1&&iceBox.top+iceBox.height/2<=iceSafe.bottom+1,"Ice Arrow Rain art must remain inside the enemy-side safe height");
+    assert.equal(iceArrowRain.clipPath,"none","Ice Arrow Rain must retain the complete source without clipping");
     assert.ok(Math.abs(iceArrowRain.spriteBox.width/iceArrowRain.spriteBox.height-iceArrowRain.frameAspect)<=.02,"Ice Arrow Rain must not flatten its source frame");
     assert.ok(Math.abs(iceArrowRain.spriteBox.left-iceArrowRain.bounds.centerX)<=1,"Ice Arrow Rain must stay centered on the complete enemy region");
     assert.ok(Math.abs(iceArrowRain.spriteBox.top-iceArrowRain.bounds.centerY)<=1,"Ice Arrow Rain must stay centered on the complete enemy region");
@@ -1348,9 +1404,13 @@ try{
         const sprites=stage?Array.from(stage.querySelectorAll('.v143-vfx-sprite')):[];
         const sprite=sprites[0]||null;
         const bounds=owner.getGeometryRectFromShape('monster',primarySlot,'tri');
+        const side=owner.getSideRect('monster');
+        const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.()?.rect;
+        const safeBounds=side&&overlay?{left:Math.max(side.left,overlay.left),right:Math.min(side.right,overlay.right),top:Math.max(side.top,overlay.top),bottom:Math.min(side.bottom,overlay.bottom)}:null;
         return {
             config:{id:config.id,targetType:config.targetType,duration:config.duration},
             targetId,primarySlot,
+            safeBounds,clipPath:sprite?.style.clipPath||null,
             stageCount:document.querySelectorAll('#v143-skill-stage').length,
             stageSkill:stage?.dataset.skill||null,
             spriteCount:sprites.length,
@@ -1379,8 +1439,17 @@ try{
     assert.equal(windFlame?.frameFit,"cover","Three-target VFX must preserve its source-frame aspect");
     assert.equal(windFlame?.targetIndexes.length,1,"This live check deliberately supplies only one surviving target");
     assert.equal(windFlame?.geometrySlots.length,3,"Wind Flame must retain a three-slot footprint for a single surviving target");
-    assert.ok(windFlame.spriteBox.width>=windFlame.bounds.width-1,"Wind Flame must cover the fixed three-slot width");
-    assert.ok(windFlame.spriteBox.height>=windFlame.bounds.height-1,"Wind Flame must cover the fixed three-slot height");
+    assert.ok(windFlame.safeBounds,"Wind Flame requires formal side safety geometry");
+    const windSafe=windFlame.safeBounds,windBox=windFlame.spriteBox;
+    const windWidth=2*Math.min(windFlame.bounds.centerX-windSafe.left,windSafe.right-windFlame.bounds.centerX);
+    const windHeight=2*Math.min(windFlame.bounds.centerY-windSafe.top,windSafe.bottom-windFlame.bounds.centerY);
+    const authoredHeight=Math.max(Math.round(windFlame.bounds.height),Math.round(windFlame.bounds.width)/windFlame.frameAspect);
+    const expectedWindHeight=Math.min(authoredHeight,windHeight,windWidth/windFlame.frameAspect);
+    assert.ok(windBox.width>0&&windBox.height>0,"Wind Flame must retain visible artwork");
+    assert.ok(Math.abs(windBox.height-expectedWindHeight)<=2,"Wind Flame must preserve its authored group size with only proportional safe fit");
+    assert.ok(Math.abs(windBox.left-windFlame.bounds.centerX)<=1&&Math.abs(windBox.top-windFlame.bounds.centerY)<=1,"Wind Flame must stay centered on its canonical tri shape");
+    assert.ok(windBox.left-windBox.width/2>=windSafe.left-1&&windBox.left+windBox.width/2<=windSafe.right+1&&windBox.top-windBox.height/2>=windSafe.top-1&&windBox.top+windBox.height/2<=windSafe.bottom+1,"Wind Flame must stay inside target-side safe bounds");
+    assert.equal(windFlame.clipPath||"none","none","Wind Flame must not crop its source");
     assert.ok(Math.abs(windFlame.spriteBox.width/windFlame.spriteBox.height-windFlame.frameAspect)<=.02,"Wind Flame must not flatten its source frame");
     assert.equal(windFlame.emitted,"true","Wind Flame must emit a visible production sprite");
 
@@ -1416,21 +1485,39 @@ try{
         const stage=document.getElementById('v143-skill-stage');
         const sprite=stage?.querySelector('.v143-vfx-sprite')||null;
         const bounds=owner.getGeometryRectFromShape('monster',primarySlot,'tri');
+        const side=owner.getSideRect('monster');
+        const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.()?.rect;
+        const safeBounds=side&&overlay?{left:Math.max(side.left,overlay.left),right:Math.min(side.right,overlay.right),top:Math.max(side.top,overlay.top),bottom:Math.min(side.bottom,overlay.bottom)}:null;
         return {
-            targetId,primarySlot,bounds,
+            targetId,primarySlot,bounds,safeBounds,
+            targetType:config.targetType,placement:sprite?.dataset.placement||null,
+            spriteCount:stage?.querySelectorAll('.v143-vfx-sprite').length||0,
+            portrait:(()=>{
+                const rect=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry('monster',targetId)?.artworkProjection?.rect;
+                return rect?{left:rect.left,top:rect.top,width:rect.width,height:rect.height}:null;
+            })(),
+            clipPath:sprite?.style.clipPath||null,
             frameFit:sprite?.dataset.frameFit||null,
             frameAspect:Number(sprite?.dataset.frameAspect||0),
             geometrySlots:String(sprite?.dataset.geometrySlots||'').split(',').filter(Boolean),
             targetIndexes:String(sprite?.dataset.targetIndexes||'').split(',').filter(Boolean),
-            spriteBox:sprite?{width:Number.parseFloat(sprite.style.width),height:Number.parseFloat(sprite.style.height)}:null,
+            spriteBox:sprite?{left:Number.parseFloat(sprite.style.left),top:Number.parseFloat(sprite.style.top),width:Number.parseFloat(sprite.style.width),height:Number.parseFloat(sprite.style.height)}:null,
             emitted:sprite?.dataset.emittedVisual||null
         };
     })()`);
     evidence.checks.waterOrbTriRange=waterOrb;
-    assert.equal(waterOrb?.frameFit,"cover","Water Orb must preserve its source-frame aspect");
-    assert.equal(waterOrb?.geometrySlots.length,3,"Water Orb must keep a fixed three-slot footprint");
-    assert.equal(waterOrb?.targetIndexes.length,1,"Water Orb geometry must not depend on surviving target count");
-    assert.ok(waterOrb.spriteBox.width>=waterOrb.bounds.width-1&&waterOrb.spriteBox.height>=waterOrb.bounds.height-1,"Water Orb must cover its fixed three-slot geometry");
+    assert.equal(waterOrb.targetType,"tri","Water Orb keeps its formal three-target rule");
+    assert.equal(waterOrb.bounds.slots.length,3,"Water Orb keeps canonical tri targeting geometry");
+    assert.equal(waterOrb.placement,"single","Explicit recipient artwork uses the existing single-node emitter");
+    assert.equal(waterOrb.spriteCount,1,"The supplied single recipient must emit exactly one node");
+    assert.equal(waterOrb.frameFit,"contain","Recipient Water Orb must preserve its complete source");
+    assert.deepEqual(waterOrb.targetIndexes,[String(waterOrb.targetId)],"Late feedback must not expand the supplied recipient snapshot");
+    assert.ok(waterOrb.portrait&&waterOrb.safeBounds,"Recipient Water Orb requires formal portrait and safety geometry");
+    const waterBox=waterOrb.spriteBox,waterSafe=waterOrb.safeBounds;
+    assert.ok(waterBox.width>0&&waterBox.height>0,"Water Orb must retain visible recipient art");
+    assert.ok(Math.abs(waterBox.left-(waterOrb.portrait.left+waterOrb.portrait.width/2))<=1&&Math.abs(waterBox.top-(waterOrb.portrait.top+waterOrb.portrait.height/2))<=1,"Water Orb must center on the actual recipient portrait");
+    assert.ok(waterBox.left-waterBox.width/2>=waterSafe.left-1&&waterBox.left+waterBox.width/2<=waterSafe.right+1&&waterBox.top-waterBox.height/2>=waterSafe.top-1&&waterBox.top+waterBox.height/2<=waterSafe.bottom+1,"Water Orb must stay inside target-side safety bounds");
+    assert.equal(waterOrb.clipPath||"none","none","Water Orb must not crop its source");
     assert.ok(Math.abs(waterOrb.spriteBox.width/waterOrb.spriteBox.height-waterOrb.frameAspect)<=.02,"Water Orb must not flatten its square source frame");
     assert.equal(waterOrb.emitted,"true","Water Orb must emit a visible production sprite");
     const waterScreenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});

@@ -1,0 +1,61 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "b1ede88d7c61e290f4f09933f1043d0bee981800",
+  "scope": "Independent source gate only; no runtime/phone modifications.",
+  "rejectedHistory": [
+    {
+      "candidate": "tidal-beast-safe-v2.webp",
+      "reason": "True strong cross-cell clipping: frame3 bottom304 pixels alpha8+, frame4 bottom308, opposing frame5-8 top138/286/303/308; max edgealpha252. Dragon identity retained but unsafe source rejected."
+    },
+    {
+      "candidate": "calm-mind-cast-person-v1.webp",
+      "reason": "True strong cross-cell clipping: frame3 bottom165 alpha8+, frame7 top159 and bottom90; maxedge241. Cloud identity retained but unsafe source rejected."
+    }
+  ],
+  "acceptedCandidates": [
+    {
+      "candidate": "tidal-beast-safe-v3.webp",
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "classification": "SOURCE_PASS_USB_CANDIDATE_STOP_STATIC_REFINEMENT",
+      "alpha8EdgesAll12Frames": 0,
+      "maxEdgeAlpha": 1,
+      "fullMotherRgbaEqual": true,
+      "identity": "Deep-blue fanged dragon and coiling neck remain distinct. Right-facing head frames2-4 turns down5-6 and lands7-8; release becomes splashes then small ripples/drops11-12. No identity overcorrection demonstrated.",
+      "remaining": "Verify actual phone placement/fit, peak actor-HUD clearance and orientation; sourcePASS is not USBPASS. Do not replace with unsolicited v4 refinement."
+    },
+    {
+      "candidate": "calm-mind-cast-person-v2.webp",
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "classification": "SOURCE_PASS_USB_CANDIDATE_STOP_STATIC_REFINEMENT",
+      "alpha8EdgesAll12Frames": 0,
+      "maxEdgeAlpha": 2,
+      "fullMotherRgbaEqual": true,
+      "identity": "Single-recipient cyan-mint cloud U, leaves and central calm sigil retained. Hollow center gives room for character; activation7 relaxes into loose leaves and tiny final traces. White-cyan preview haze does not touch alpha8 grid edges.",
+      "remaining": "Per-recipient runtime prototype still needs formal target and phone placement/clearance evidence. Approved persistent calm state must remain unchanged."
+    }
+  ],
+  "nextBatchRetained": [
+    {
+      "candidate": "storm-flurry-wide-v3.webp",
+      "alpha8EdgesAll12Frames": 0,
+      "maxEdgeAlpha": 1,
+      "classification": "SOURCE_PASS_STILL_ELIGIBLE",
+      "condition": "Existing mandatory phone tail/fist readability check from wide-batch3-source-review.json remains."
+    },
+    {
+      "candidate": "iceSpin-wide-v2.webp",
+      "alpha8EdgesAll12Frames": 0,
+      "maxEdgeAlpha": 2,
+      "classification": "SOURCE_PASS_STILL_ELIGIBLE",
+      "condition": "Actual source aspect2.2448275862068967 and peak haze/readability phone check remain."
+    }
+  ],
+  "measurement": "Pillow/NumPy independently decoded WebPs and conversion.source mothers, compared exact RGBA and measured four frame edges with rounded fractional atlas boundaries. No arbitrary prompt margin gate.",
+  "qualityClaim": "Only source eligibility. No commercial completion or USB acceptance."
+}

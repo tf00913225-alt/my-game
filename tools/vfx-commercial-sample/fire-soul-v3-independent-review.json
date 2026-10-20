@@ -1,0 +1,246 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "18f92b2638194b2eef7777bbcd50a6fd31209ca9",
+  "source": "tools/vfx-commercial-sample/assets/full/fire-soul-resonance-v3.webp",
+  "sha256": "5f0017df5b96a7d70e0c2a77ee98ac3ae96128a5389b6f1c5ca65f826c3fc964",
+  "generationRecord": "tools/vfx-commercial-sample/assets/full/fire-soul-resonance-v3-generation.json",
+  "promptRead": "tools/vfx-commercial-sample/assets/full/fire-soul-resonance-v3-prompt.txt",
+  "decision": "approved-for-isolated-phone-candidate-only",
+  "formalIntegrationDecision": "pending-phone-playback-and-hit-alignment",
+  "sourceReview": "view_image observed full12-frame atlas; independent alpha scan and source-mother equality.",
+  "rgbaEquality": true,
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "grid": [
+    4,
+    3
+  ],
+  "findings": [
+    "Front-facing red-orange ring remains in one perspective; previous shallow-ellipse to frontal jump is substantially improved.",
+    "All12 cells independently show zero alpha>=16/64 border pixels.7.18-percent minimum alpha64 gutter alone is not treated as a formal failure: no source-cell contact was observed and actual renderer has bounded geometry.",
+    "Frames2-7,9-10 have clearly open visual centres; frame8 intentionally adds central glint and its central alpha occupancy must be checked over actor face/torso during the brief activation.",
+    "Gathering arcs become ring then break back into arcs/embers; last frame is appropriately tiny, unlike the earlier candidate.",
+    "Main remaining risk is source registration drift: early arc bounds sit lower in cells than row2/3 rings. Bounds-centre is not optical centre, but row-boundary transitions4to5 and8to9 warrant slow playback; candidate is not automatically a commercial animation pass.",
+    "Ring strands remain thicker/more smoky than prompt requested; do not enforce arbitrary20-percent prompt padding as a repository gate. Judge actual occlusion and continuity in the same phone scene."
+  ],
+  "phoneAcceptanceChecks": [
+    "Compare original/candidate at identical actor,slot,castDuration and scale.",
+    "Watch transitions4to5 and8to9 for a visible vertical jump; reject if movement looks like snapping.",
+    "Confirm frame8 glint aligns with existing formal hit marker and no extension of gameplay timing.",
+    "Confirm actor identity remains readable through ring and HUD/HP/SP stay clear.",
+    "Check all slots and no new loading/decoding stutter or residual nodes."
+  ],
+  "frames": [
+    {
+      "frame": 1,
+      "alpha64Bounds": [
+        187,
+        222,
+        212,
+        249
+      ],
+      "boundsCentre": [
+        199.5,
+        235.5
+      ],
+      "alpha64BorderCount": 0,
+      "alpha16BorderCount": 0,
+      "inner72pxAlphaBelow16Fraction": 0.7677,
+      "inner72pxAlphaMean": 20.88
+    },
+    {
+      "frame": 2,
+      "alpha64Bounds": [
+        79,
+        132,
+        284,
+        327
+      ],
+      "boundsCentre": [
+        181.5,
+        229.5
+      ],
+      "alpha64BorderCount": 0,
+      "alpha16BorderCount": 0,
+      "inner72pxAlphaBelow16Fraction": 1.0,
+      "inner72pxAlphaMean": 0.29
+    },
+    {
+      "frame": 3,
+      "alpha64Bounds": [
+        63,
+        129,
+        282,
+        333
+      ],
+      "boundsCentre": [
+        172.5,
+        231.0
+      ],
+      "alpha64BorderCount": 0,
+      "alpha16BorderCount": 0,
+      "inner72pxAlphaBelow16Fraction": 1.0,
+      "inner72pxAlphaMean": 0.37
+    },
+    {
+      "frame": 4,
+      "alpha64Bounds": [
+        46,
+        123,
+        270,
+        336
+      ],
+      "boundsCentre": [
+        158.0,
+        229.5
+      ],
+      "alpha64BorderCount": 0,
+      "alpha16BorderCount": 0,
+      "inner72pxAlphaBelow16Fraction": 1.0,
+      "inner72pxAlphaMean": 0.72
+    },
+    {
+      "frame": 5,
+      "alpha64Bounds": [
+        82,
+        91,
+        307,
+        290
+      ],
+      "boundsCentre": [
+        194.5,
+        190.5
+      ],
+      "alpha64BorderCount": 0,
+      "alpha16BorderCount": 0,
+      "inner72pxAlphaBelow16Fraction": 1.0,
+      "inner72pxAlphaMean": 0.73
+    },
+    {
+      "frame": 6,
+      "alpha64Bounds": [
+        72,
+        84,
+        292,
+        296
+      ],
+      "boundsCentre": [
+        182.0,
+        190.0
+      ],
+      "alpha64BorderCount": 0,
+      "alpha16BorderCount": 0,
+      "inner72pxAlphaBelow16Fraction": 1.0,
+      "inner72pxAlphaMean": 1.23
+    },
+    {
+      "frame": 7,
+      "alpha64Bounds": [
+        57,
+        80,
+        309,
+        300
+      ],
+      "boundsCentre": [
+        183.0,
+        190.0
+      ],
+      "alpha64BorderCount": 0,
+      "alpha16BorderCount": 0,
+      "inner72pxAlphaBelow16Fraction": 0.9765,
+      "inner72pxAlphaMean": 2.97
+    },
+    {
+      "frame": 8,
+      "alpha64Bounds": [
+        61,
+        82,
+        295,
+        297
+      ],
+      "boundsCentre": [
+        178.0,
+        189.5
+      ],
+      "alpha64BorderCount": 0,
+      "alpha16BorderCount": 0,
+      "inner72pxAlphaBelow16Fraction": 0.5783,
+      "inner72pxAlphaMean": 38.8
+    },
+    {
+      "frame": 9,
+      "alpha64Bounds": [
+        89,
+        58,
+        307,
+        250
+      ],
+      "boundsCentre": [
+        198.0,
+        154.0
+      ],
+      "alpha64BorderCount": 0,
+      "alpha16BorderCount": 0,
+      "inner72pxAlphaBelow16Fraction": 1.0,
+      "inner72pxAlphaMean": 0.24
+    },
+    {
+      "frame": 10,
+      "alpha64Bounds": [
+        95,
+        57,
+        269,
+        258
+      ],
+      "boundsCentre": [
+        182.0,
+        157.5
+      ],
+      "alpha64BorderCount": 0,
+      "alpha16BorderCount": 0,
+      "inner72pxAlphaBelow16Fraction": 0.9931,
+      "inner72pxAlphaMean": 0.71
+    },
+    {
+      "frame": 11,
+      "alpha64Bounds": [
+        109,
+        93,
+        246,
+        229
+      ],
+      "boundsCentre": [
+        177.5,
+        161.0
+      ],
+      "alpha64BorderCount": 0,
+      "alpha16BorderCount": 0,
+      "inner72pxAlphaBelow16Fraction": 0.9128,
+      "inner72pxAlphaMean": 6.67
+    },
+    {
+      "frame": 12,
+      "alpha64Bounds": [
+        156,
+        148,
+        177,
+        169
+      ],
+      "boundsCentre": [
+        166.5,
+        158.5
+      ],
+      "alpha64BorderCount": 0,
+      "alpha16BorderCount": 0,
+      "inner72pxAlphaBelow16Fraction": 0.8654,
+      "inner72pxAlphaMean": 11.57
+    }
+  ],
+  "limitations": [
+    "Review author did not run USB.",
+    "Only candidate eligibility approved; no runtime/manifest changes made.",
+    "This is cast activation art, not persistent fireSoulResonance status-body approval."
+  ]
+}

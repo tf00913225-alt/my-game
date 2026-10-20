@@ -1,0 +1,123 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewDate": "2026-10-20",
+  "reviewer": "independent timing_review",
+  "evidenceHead": "20ecbf97248aa2f264db72e2abea4613932af3a1",
+  "headAtWrite": "20ecbf97248aa2f264db72e2abea4613932af3a1",
+  "evidence": "artifacts/vfx-recipient-prototype/skill-video.json",
+  "frames": "artifacts/vfx-recipient-prototype/sequence-frames",
+  "method": "view_image inspection of original uncropped full phone frames sampled from 12fps decode, including consecutive peak/tail and flight frames",
+  "technical": "Recorded hit events battleActive=true HUD=6 and remaining=0; technical metadata does not substitute visual review",
+  "reviews": [
+    {
+      "id": "iceSpin",
+      "gate": "PASS_SCOPED_VISUAL",
+      "framesViewed": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        25,
+        26,
+        27
+      ],
+      "identity": "Long faceted ice blades, crossing spin and crystalline impact remain clear; no watery-curl identity loss.",
+      "readability": "Peak white haze is local to contacts, leaves HUD and neighboring silhouettes readable; no stage cut.",
+      "contact": "Outer blades visibly overlap lateral target portions; accept contact rather than demand star-center coincidence. Cross-review of outer contact assigned to coverage.",
+      "release": "F18 is sparse shard tail; F19/25 clear.",
+      "stopStaticRefinement": true
+    },
+    {
+      "id": "stormFlurry",
+      "gate": "PASS_SCOPED_VISUAL",
+      "framesViewed": [
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67
+      ],
+      "identity": "Paired clenched jade fists and white contact stars clearly convey wind-fist barrage.",
+      "contact": "Fist/wind envelopes reach lateral actors; do not reject solely for nonconcentric stars. Coverage cross-review assigned.",
+      "release": "Frames62-66 visibly step from full wind to partial transparency to faint trail to clear background, resolving broad residual source-tail concern at sampled cadence.",
+      "hud": "All names/HP stay clear, no hard stage boundary.",
+      "stopStaticRefinement": true
+    },
+    {
+      "id": "floodBeast",
+      "gate": "FAIL",
+      "framesViewed": [
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        43,
+        47,
+        48,
+        50,
+        51,
+        52
+      ],
+      "sourceBoundaryGate": "PASS",
+      "identity": "Blue water-dragon identity and strong target splash are preserved; old left/bottom hard cut is absent in new source/central target run.",
+      "defect": "F32 head points lower-right; F33-34 head points down toward caster while node travels upward to enemy; F35 transitions to upright splash. This is visible backward-flight direction mismatch, not a request for artistic recoloring or enlargement.",
+      "minimumFixReview": "Read existing placePhasedMotion: removing flood-only preserveSourceOrientation=true reactivates existing trajectoryAngle-sourceHeading rotation. FlightSourceAngle0 and turnSourceAngle90 align right/down authored headings with target vector; impact splash upright0 remains valid. Engineering approach accepted, phone retest required."
+    },
+    {
+      "id": "stealthSkill",
+      "gate": "PASS_SCOPED_VISUAL",
+      "framesViewed": [
+        73,
+        79,
+        85,
+        91,
+        97
+      ],
+      "reason": "Only self middle ally has teal ring; side allies unaffected. Formal HUD clear, actor remains recognizable, ring fades to baseline without persistent node.",
+      "stopStaticRefinement": true
+    },
+    {
+      "id": "dinghaishenzhen",
+      "gate": "DELEGATED_TO_COVERAGE",
+      "reason": "3/6/partial recipient geometry/commercial visual review is coverage Owner scope; do not duplicate or override its gate."
+    }
+  ],
+  "limits": [
+    "12fps full decoded frames support sampled visible sequence/identity/position/release acceptance; do not certify 60fps, inter-frame smoothness or sustained performance.",
+    "Ice/Storm outer-contact cross-review remains coverage Owner responsibility; no source refinement requested from this review.",
+    "Flood boundary clearance covers shown central endpoint; general six-direction heading and edge targets require focused regression/phone verification.",
+    "No runtime/tests/phone edits or commit in this review."
+  ],
+  "overall": "FLOOD_DIRECTION_FAIL; retain other scoped passing art and await minimal orientation retest"
+}

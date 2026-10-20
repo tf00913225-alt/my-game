@@ -1,0 +1,598 @@
+{
+  "asset": "windSpell wide v2",
+  "reviewType": "independent-source-only",
+  "decision": "allowed-for-USB-candidate",
+  "phonePass": false,
+  "reviewHead": "590b1390631aaf550a5803e718325ae211baa818",
+  "mother": "C:\\Users\\User\\.codex\\generated_images\\01a15425-277b-7140-b0e5-d3891f17519d\\exec-1aa37571-aa2a-4b89-8518-dc15442639b1.png",
+  "runtime": "assets\\vfx\\wind\\wind-spell-wide-v2.webp",
+  "size": [
+    2172,
+    724
+  ],
+  "grid": [
+    4,
+    3
+  ],
+  "nativeCellSize": [
+    543.0,
+    241.33333333333334
+  ],
+  "actualCellAspect": 2.25,
+  "runtimeSHA256": "73b005cb0199578af99938aa083b10cd6a465f6151b973ce6a57f5c6922df42c",
+  "runtimeExactRGBAEqualToMother": true,
+  "frames": [
+    {
+      "frame": 1,
+      "roundedAnalysisCell": [
+        0,
+        0,
+        543,
+        241
+      ],
+      "alpha": {
+        "8": {
+          "bounds": [
+            63,
+            144,
+            483,
+            221
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            67,
+            146,
+            479,
+            219
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "frame": 2,
+      "roundedAnalysisCell": [
+        543,
+        0,
+        1086,
+        241
+      ],
+      "alpha": {
+        "8": {
+          "bounds": [
+            63,
+            104,
+            483,
+            221
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            68,
+            114,
+            478,
+            219
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "frame": 3,
+      "roundedAnalysisCell": [
+        1086,
+        0,
+        1629,
+        241
+      ],
+      "alpha": {
+        "8": {
+          "bounds": [
+            58,
+            64,
+            490,
+            222
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            63,
+            66,
+            488,
+            219
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "frame": 4,
+      "roundedAnalysisCell": [
+        1629,
+        0,
+        2172,
+        241
+      ],
+      "alpha": {
+        "8": {
+          "bounds": [
+            45,
+            45,
+            489,
+            221
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            49,
+            49,
+            486,
+            219
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "frame": 5,
+      "roundedAnalysisCell": [
+        0,
+        241,
+        543,
+        483
+      ],
+      "alpha": {
+        "8": {
+          "bounds": [
+            43,
+            38,
+            513,
+            229
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            47,
+            44,
+            510,
+            227
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "frame": 6,
+      "roundedAnalysisCell": [
+        543,
+        241,
+        1086,
+        483
+      ],
+      "alpha": {
+        "8": {
+          "bounds": [
+            28,
+            39,
+            513,
+            230
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            31,
+            47,
+            510,
+            228
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "frame": 7,
+      "roundedAnalysisCell": [
+        1086,
+        241,
+        1629,
+        483
+      ],
+      "alpha": {
+        "8": {
+          "bounds": [
+            21,
+            40,
+            521,
+            230
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            26,
+            44,
+            511,
+            228
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "frame": 8,
+      "roundedAnalysisCell": [
+        1629,
+        241,
+        2172,
+        483
+      ],
+      "alpha": {
+        "8": {
+          "bounds": [
+            24,
+            38,
+            509,
+            230
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            29,
+            42,
+            507,
+            228
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "frame": 9,
+      "roundedAnalysisCell": [
+        0,
+        483,
+        543,
+        724
+      ],
+      "alpha": {
+        "8": {
+          "bounds": [
+            56,
+            55,
+            500,
+            204
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            60,
+            58,
+            499,
+            201
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "frame": 10,
+      "roundedAnalysisCell": [
+        543,
+        483,
+        1086,
+        724
+      ],
+      "alpha": {
+        "8": {
+          "bounds": [
+            55,
+            69,
+            483,
+            204
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            59,
+            72,
+            479,
+            201
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "frame": 11,
+      "roundedAnalysisCell": [
+        1086,
+        483,
+        1629,
+        724
+      ],
+      "alpha": {
+        "8": {
+          "bounds": [
+            63,
+            93,
+            487,
+            205
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            66,
+            95,
+            484,
+            200
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "frame": 12,
+      "roundedAnalysisCell": [
+        1629,
+        483,
+        2172,
+        724
+      ],
+      "alpha": {
+        "8": {
+          "bounds": [
+            60,
+            110,
+            483,
+            204
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            67,
+            112,
+            478,
+            200
+          ],
+          "edgeCountsTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    }
+  ],
+  "fractionalRowBoundaryCheck": [
+    {
+      "y": 240,
+      "maxAlpha": 1
+    },
+    {
+      "y": 241,
+      "maxAlpha": 1
+    },
+    {
+      "y": 242,
+      "maxAlpha": 1
+    },
+    {
+      "y": 481,
+      "maxAlpha": 1
+    },
+    {
+      "y": 482,
+      "maxAlpha": 1
+    },
+    {
+      "y": 483,
+      "maxAlpha": 1
+    }
+  ],
+  "visualReview": {
+    "all12FramesViewed": true,
+    "threeCenters": "Three independent wind curls persist in left/middle/right order, no merging or lane swapping. Alpha weighted centers vary approximately x92-107,263-276,433-447 within 543px cells; shape variation is visible.",
+    "identity": "Three upright cyan-green wind curls with sharp pale ribbons remain identifiable, not flattened into generic rings.",
+    "peak": "Frame 7 has three clear white impact peaks; frames 8-12 diminish.",
+    "actualCrossframeClippingObserved": false,
+    "risksForUSB": [
+      "Frame 8 to 9 content bottom rises approximately 27 source pixels, potentially appearing to hop while dissipating.",
+      "Middle sequence still has substantial translucent green mass; verify target faces remain readable.",
+      "Source review does not establish canonical three-slot contact, animation continuity, gameplay timing or sustained performance."
+    ]
+  },
+  "validation": {
+    "test": "tests/v173.23-wind-vfx.test.js",
+    "result": "14 checks passed",
+    "originalPNGDimensionsAndHashesRetained": true,
+    "cellAspectColdAndWarmCacheMatchesNative": true
+  },
+  "phoneStaticReview": {
+    "head": "ade43a48ce618330055f9add290abb175ef9470d",
+    "device": "SM-N960F Android 10 physical USB Chrome",
+    "evidence": "artifacts/vfx-wind-wide/evidence.json",
+    "screenshot": "artifacts/vfx-wind-wide/skill-windSpell.png",
+    "skill": "windSpell",
+    "targetType": "tri",
+    "targets": [
+      0,
+      1,
+      2
+    ],
+    "result": "static-range-readability-accepted-stop-asset-refinement",
+    "threeTargetContact": "Three separate wind curls extend across the enemy row and visibly overlap left, middle and right targets. Outer curls overlap targets laterally rather than precisely sharing their centers; range is nevertheless clearly three-target, no longer compressed into the middle slot.",
+    "characterReadability": "All three creature silhouettes remain identifiable. The middle target receives the largest translucent overlay; it is not replaced by an opaque green mass.",
+    "hud": "All three names, levels and red HP bars remain legible. No effect crosses into the ally HUD or command area.",
+    "boundary": "No visible frame edge cut, rectangular seam or viewport clipping in the sampled still.",
+    "decision": "Stop static source/size refinement for this candidate; retain current geometry and source.",
+    "limitations": [
+      "Single still cannot establish animation continuity or sustained performance.",
+      "Frame 8 to 9 upward contraction risk still requires video review.",
+      "This observation does not validate every other primary slot, target formation or survivor combination."
+    ]
+  },
+  "phoneSequenceReview": {
+    "head": "ade43a48ce618330055f9add290abb175ef9470d",
+    "evidence": "artifacts/vfx-wind-wide/skill-video.json",
+    "recording": "artifacts/vfx-wind-wide/skill-cycle.mp4",
+    "reviewedDecodedFrames": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "sampling": "Original-size uncropped decoded first-cast frames, 12 fps, viewed as adjacent still sequence; not full-rate video playback.",
+    "decision": "No material visual blocker observed; stop asset refinement.",
+    "middle": "Frames 6-9 preserve three independent wind curls; frames 10-11 show three clear white impact cores without opaque whole-target replacement. HUD and target silhouettes remain readable.",
+    "tail": "Frames 12 to 13 visibly reduce height and brightness together; this reads as dissipation rather than an isolated upward jump. Frames 15-16 fade to clear field. Earlier source frame 8-to-9 jump concern is not a blocking defect in the observed phone sequence.",
+    "identity": "Wind ribbons and three-target separation remain consistent through sampled middle and tail.",
+    "lifecycleReportedByEvidence": {
+      "casts": 3,
+      "remainingPerCast": [
+        0,
+        0,
+        0
+      ],
+      "stageNodes": 0
+    },
+    "limits": [
+      "Lifecycle values are read from supplied evidence, not independently replayed on device.",
+      "12 fps samples cannot prove absence of every sub-frame hitch or sustained performance."
+    ]
+  }
+}

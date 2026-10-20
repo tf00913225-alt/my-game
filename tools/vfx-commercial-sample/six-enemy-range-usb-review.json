@@ -1,0 +1,237 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "scope": "Independent visual review of original-size decoded USB frames; no phone operation or runtime edits",
+  "limits": [
+    "12 fps sampled decoded recording; not performance certification",
+    "Fixed three-slot tri artwork is the formal contract even when edge primary yields two recipients; no new perfect-center contact gate",
+    "QA overlay partly covers upper-left name HUD; this is fixture overlay, not VFX occlusion"
+  ],
+  "original": {
+    "head": "1d02be839ebc99b098fe592699fec51c5eca2aa4",
+    "evidence": "artifacts/vfx-final-recipient-usb/range-video.json",
+    "rows": [
+      {
+        "id": "freeze",
+        "level": 1,
+        "targets": [
+          0,
+          3
+        ],
+        "result": "FAIL",
+        "frames": [
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51
+        ],
+        "reason": "One ice cage lies between rows behind RANGE3 HUD. Upper recipient feet touch and lower recipient hair briefly touches shard tips, but column identity is not clearly communicated."
+      },
+      {
+        "id": "freeze",
+        "level": 5,
+        "targets": [
+          0,
+          1,
+          2
+        ],
+        "result": "FAIL",
+        "frames": [
+          64,
+          65,
+          66,
+          67
+        ],
+        "reason": "Only central upper recipient receives recognizable ice cage; outer two lack recognizable ice contact."
+      },
+      {
+        "id": "iceArrowRain",
+        "targets": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "result": "PASS_FORMAL_CAST_SAMPLE",
+        "frames": [
+          86,
+          88,
+          90,
+          92,
+          94
+        ],
+        "reason": "Original visual-only limitation resolved by formal six-enemy cast recording on 7cdebfb2. Central AoE remains the intended art; simultaneous readable damage feedback on all six recipients communicates full-party range without six centered explosions. Outer upper portraits need not sit at the central rain core.",
+        "originalResult": "EVIDENCE_LIMITED"
+      },
+      {
+        "id": "windSpell",
+        "targets": [
+          0,
+          1
+        ],
+        "result": "PASS_SCOPE_SAMPLE",
+        "frames": [
+          108,
+          110,
+          112
+        ],
+        "reason": "Formal recipients visibly contact wind, HUD readable, no six-enemy regression. Third authored slot also visible on RANGE2, consistent with fixed three-slot footprint; recorded limitation, not new failure."
+      },
+      {
+        "id": "stormFlurry",
+        "targets": [
+          0,
+          1,
+          2
+        ],
+        "result": "PASS_SCOPE_SAMPLE",
+        "frames": [
+          133,
+          135,
+          137
+        ],
+        "reason": "Three readable wind strikes contact upper row; lower row and HUD remain clear."
+      },
+      {
+        "id": "iceSpin",
+        "targets": [
+          0,
+          1
+        ],
+        "result": "PASS_SCOPE_SAMPLE",
+        "frames": [
+          158,
+          160,
+          162
+        ],
+        "reason": "Formal recipients visibly contact ice blades; HUD remains readable. Third authored strike retained under fixed three-slot footprint contract."
+      },
+      {
+        "id": "explosiveFlurry",
+        "targets": [
+          0,
+          1,
+          2
+        ],
+        "result": "PASS_SCOPE_SAMPLE",
+        "frames": [
+          183,
+          185,
+          187
+        ],
+        "reason": "Three readable impact peaks contact upper row without swallowing lower row or HP HUD; brief portrait coverage is the impact peak."
+      }
+    ]
+  },
+  "freezeRecheck": {
+    "head": "7cdebfb2d9bd2a2fcf98b22e4ab559be94e362a9",
+    "evidence": "artifacts/vfx-freeze-relic-final-usb/range-video.json",
+    "source": "Original freeze PNG retained; existing single emitter presented per formal recipient",
+    "rows": [
+      {
+        "level": 1,
+        "targets": [
+          0,
+          3
+        ],
+        "nodes": 2,
+        "cssSizes": [
+          63,
+          67
+        ],
+        "frames": [
+          40,
+          43,
+          45,
+          46,
+          48,
+          50
+        ],
+        "result": "PASS_SCOPE_SAMPLE",
+        "reason": "Both column recipients visibly receive distinct ice formation, crystalline burst and cage on their own bodies. Clear at phone size despite smaller raster; no longer trapped between rows. No adjacent recipient coverage or HP masking. Tail fades in place and is absent by frame50.",
+        "remaining": 0
+      },
+      {
+        "level": 5,
+        "targets": [
+          0,
+          1,
+          2
+        ],
+        "nodes": 3,
+        "cssSizes": [
+          63,
+          63,
+          63
+        ],
+        "frames": [
+          58,
+          60,
+          62,
+          65,
+          66,
+          68,
+          70
+        ],
+        "result": "PASS_SCOPE_SAMPLE",
+        "reason": "All three upper recipients receive recognizable crystalline cages and burst peaks. Lower row unaffected visually. Individual effects remain large enough to identify freeze, HUD bars readable, no obvious boundary clipping or tail jump. Fully absent by frame68.",
+        "remaining": 0
+      }
+    ],
+    "hudCount": 9,
+    "decision": "Original freeze range visual blockers resolved in this USB sample. Stop freeze source/size refinement; persistent status and performance are outside this review."
+  },
+  "iceRainFormalRecheck": {
+    "head": "7cdebfb2d9bd2a2fcf98b22e4ab559be94e362a9",
+    "evidence": "artifacts/vfx-freeze-relic-final-usb/ice-rain-formal.json",
+    "frames": [
+      12,
+      16,
+      20,
+      23,
+      26,
+      29,
+      30,
+      32,
+      35,
+      40
+    ],
+    "targets": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "before": [
+      1000000,
+      1000000,
+      1000000,
+      1000000,
+      1000000,
+      1000000
+    ],
+    "after": [
+      999800,
+      999796,
+      999785,
+      999796,
+      999802,
+      999803
+    ],
+    "result": "PASS_FORMAL_CAST_SAMPLE",
+    "observations": [
+      "Frames12-26 show central overhead vortex, falling ice arrows, spreading splash and smooth fade across two rows; HP HUD remains readable.",
+      "Frames29-35 clearly show six separate red damage texts on all six enemy portraits, including upper outer recipients. This makes the actual all-target outcome readable in context.",
+      "No need to enlarge central AoE, draw six explosions, change formal targeting or replace source.",
+      "Tail clears; remaining0 in evidence. This review does not certify frame rate or precise callback timing; JSON HP already changed in its first sampled row."
+    ],
+    "decision": "Stop iceArrowRain source and placement refinement for this scope."
+  }
+}

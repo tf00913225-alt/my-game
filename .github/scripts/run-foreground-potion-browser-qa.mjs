@@ -12,9 +12,34 @@ const server=await startServer({baseUrl});
 const bases=[['home',"showPage('home')"],['training',"showPage('training')"],['patrol',"enterMap()"],['daily',"leaveMap();openDungeonHub()"],['gameplay',"showPage('gameplay')"],['boss',"vGameplayOpenBoss()"],['tower',"vGameplayOpenTower()"],['abyss',"vGameplayOpenAbyss()"],['abyss-map20',"vGameplayOpenAbyss();v174AbyssSelectDifficulty(20)"],['abyss-map40',"vGameplayOpenAbyss();v174AbyssSelectDifficulty(40)"]];
 const measure=`(()=>{const shell=document.querySelector('.native-bottom-nav-layer'),nav=document.getElementById('bottomNav'),r=nav.getBoundingClientRect();return {visible:!shell.hidden&&getComputedStyle(shell).display!=='none',shellCount:document.querySelectorAll('.native-bottom-nav-layer').length,navCount:document.querySelectorAll('#bottomNav').length,legacy:document.querySelectorAll('#mapPageNav,#v141DungeonNav').length,context:nav.dataset.navContext,signature:nav.dataset.navSignature,buttons:[...nav.children].map(n=>n.getAttribute('onclick')),hitboxes:nav.getClientRects().length,reason:FourSymbolsBottomNav.foregroundSuppressionReason(),active:document.querySelector('#game-content .page.active')?.id};})()`;
 const rows=[];const returns=[];const results=[];
+// Only this QA's disposable profile may be removed, after Chrome exits.
+async function cleanupForegroundProfile(proc,profile,primaryError){
+ try{
+  const temp=fs.realpathSync(os.tmpdir()),requested=path.resolve(profile);
+  if(fs.lstatSync(requested).isSymbolicLink())throw Error('Unsafe foreground profile cleanup path: '+requested);
+  const target=fs.realpathSync(requested),identity=fs.lstatSync(target);
+  const checkPath=()=>{const current=fs.lstatSync(requested);if(current.dev!==identity.dev||current.ino!==identity.ino||path.dirname(target)!==temp||!path.basename(target).startsWith('foreground-potion-')||path.basename(target)==='foreground-potion-'||fs.lstatSync(requested).isSymbolicLink()||fs.realpathSync(requested)!==target)throw Error('Unsafe foreground profile cleanup path: '+requested);};
+  checkPath();
+  await new Promise((resolve,reject)=>{
+   let timer,done=false;
+   const finish=(error)=>{if(done)return;done=true;clearTimeout(timer);proc.removeListener('close',closed);proc.removeListener('exit',exited);error?reject(error):resolve();};
+   const closed=()=>finish(),exited=()=>finish();
+   proc.once('close',closed);proc.once('exit',exited);
+   if(proc.exitCode!==null||proc.signalCode!=null){finish();return;}
+   timer=setTimeout(()=>finish(Error('Chrome cleanup exit timeout; profile retained: '+target)),3000);
+   try{proc.kill('SIGKILL');}catch(error){finish(error);}
+  });
+  // Node retries only the documented transient removal errors, after exit.
+  checkPath();
+  fs.rmSync(target,{recursive:true,force:true,maxRetries:3,retryDelay:100});
+ }catch(error){
+  if(!primaryError)throw error;
+  console.error('Foreground profile cleanup failed; primary QA error preserved:',error);
+ }
+}
 async function run(width,height){
  const port=9850+Math.floor(Math.random()*100),profile=fs.mkdtempSync(path.join(os.tmpdir(),'foreground-potion-'));
- const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});let c;let phase='chrome-startup';
+ const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});let c;let phase='chrome-startup';let primaryError;
  try{
  const page=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(p=>p.type==='page');c=new Cdp(page.webSocketDebuggerUrl);
  await c.send('Page.enable');await c.send('Runtime.enable');await c.send('Network.enable');await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
@@ -93,8 +118,8 @@ async function run(width,height){
  results.push({width,height,cold,coldRelic,potions,reload:false});console.log('Actual potion settlement PASS',width,JSON.stringify(potions));
  phase='startup-reload';await c.eval("showPage('home');openHomeFeature('character')");await navigate('Page.reload',{ignoreCache:true});await c.send('Page.bringToFront');await c.eval(`(async()=>{for(let i=0;i<600;i++){if(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')){closeHomeFeature();showPage('home');return;}await new Promise(r=>setTimeout(r,50));}throw Error('Reload startup/auth not ready '+JSON.stringify({state:window.FourSymbolsStartupPolicy?.getState?.(),error:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||''),text:document.body.innerText.slice(0,1000)}));})()`);assert.equal((await c.eval(measure)).visible,true);
  results.at(-1).reload=true;
- }catch(error){error.diagnostics=await collectStartupFailure(c,{width,height,phase,proxyFailures:server.failures.slice()});throw error;}
- finally{c?.close();proc.kill('SIGKILL');fs.rmSync(profile,{recursive:true,force:true});}
+ }catch(error){primaryError=error;error.diagnostics=await collectStartupFailure(c,{width,height,phase,proxyFailures:server.failures.slice()});throw error;}
+ finally{let closeError;try{c?.close();}catch(error){closeError=error;}await cleanupForegroundProfile(proc,profile,primaryError||closeError);if(closeError&&!primaryError)throw closeError;}
 }
 try{for(const [w,h] of [[390,844],[412,915]])await run(w,h);const result={passed:true,expected,environment:baseUrl?'deployed-dev':'local-production',rows,returns,results};fs.writeFileSync(`${out}/foreground-potion-qa.json`,JSON.stringify(result,null,2)+'\n');console.log('Foreground/Potion QA PASS',rows.length,'panel transitions',results.map(x=>x.potions.rows.length));}
 catch(error){fs.writeFileSync(`${out}/foreground-potion-qa.json`,JSON.stringify({passed:false,error:String(error.stack),diagnostics:error.diagnostics,rows,returns,results},null,2));throw error;}

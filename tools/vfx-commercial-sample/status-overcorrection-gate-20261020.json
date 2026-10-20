@@ -1,0 +1,336 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "4b2cb54869fa8ee7b703bd62fdc1f68f477931c5",
+  "reviewDate": "2026-10-20",
+  "reviewRole": "Independent overcorrection veto reviewer",
+  "scope": "Read-only review of all 21 formal statuses on player and enemy physical USB screenshots. This file records conclusions only; no runtime, assets, phone or commit changes.",
+  "qualityClaim": "Static visual overcorrection review only. Not commercial completion, performance acceptance or formal gameplay duration-owner retest.",
+  "evidence": {
+    "current": [
+      "artifacts/vfx-status-anchors-player/evidence.json",
+      "artifacts/vfx-status-anchors-enemy/evidence.json"
+    ],
+    "comparisons": [
+      "artifacts/vfx-status-polish/status-dinghaishenzhen.png",
+      "assets/vfx/status/calm-mind.webp",
+      "artifacts/vfx-status-polish/status-rockWall.png",
+      "artifacts/vfx-status-anchors-player/status-rage-original.png"
+    ],
+    "limits": "One still per side/status cannot establish animation continuity or every pulse phase. Existing lifecycle evidence is visual input, not a new duration-authority test."
+  },
+  "counts": {
+    "statuses": 21,
+    "phoneScreenshotsReviewed": 42,
+    "localVeto": 1,
+    "needsEvidence": 1,
+    "retainStopRefinement": 19
+  },
+  "policy": {
+    "onOvercorrection": "Stop and revert only the demonstrated overcorrected portion; unrelated authorized work continues.",
+    "noGeneralRollback": [
+      "Do not restore global CSS top:42% or duplicate positioning owners.",
+      "Do not roll back all status presentation profiles.",
+      "Do not replace existing sources simply to satisfy an arbitrary margin/detail preference.",
+      "Do not use runtime/lifecycle technical success as commercial visual acceptance."
+    ]
+  },
+  "stopRefinement": [
+    "burn",
+    "freeze",
+    "stun",
+    "dodgeSkill",
+    "shield",
+    "petrify",
+    "earthShield",
+    "rockWall",
+    "barrier",
+    "yuanZuBlessing",
+    "fireSoulResonance",
+    "bloodBurn",
+    "frostbite",
+    "agilityDown",
+    "damageDown",
+    "defenseDown",
+    "phoenixMight",
+    "stealthSkill",
+    "fireMomentum"
+  ],
+  "localVeto": [
+    "dinghaishenzhen"
+  ],
+  "needsEvidence": [
+    "rage"
+  ],
+  "statuses": [
+    {
+      "id": "burn",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-burn.png",
+        "artifacts/vfx-status-anchors-enemy/status-burn.png"
+      ],
+      "conclusion": "Compact orange fire at feet remains visible, especially against blue enemy; no face or HUD obstruction.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "rage",
+      "classification": "NEEDS_EVIDENCE",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-rage.png",
+        "artifacts/vfx-status-anchors-enemy/status-rage.png"
+      ],
+      "conclusion": "Orange aura remains visible around blue enemy but blends into red player portrait. Single pulse sample cannot establish full-cycle readability.",
+      "next": "Capture same red player and blue enemy with status off, on at maximum pulse, and preferably a bounded pulse cycle. Compare actual outline/readability; do not redraw, further shrink, or declare commercial pass from present stills."
+    },
+    {
+      "id": "freeze",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-freeze.png",
+        "artifacts/vfx-status-anchors-enemy/status-freeze.png"
+      ],
+      "conclusion": "Tight ice enclosure remains clearly recognizable; complete hard-control wrapping is intentional and does not cover HP/name.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "stun",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-stun.png",
+        "artifacts/vfx-status-anchors-enemy/status-stun.png"
+      ],
+      "conclusion": "Three small gold stars above head clearly identify dizziness; previous full-body obstruction removed.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "dodgeSkill",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-dodgeSkill.png",
+        "artifacts/vfx-status-anchors-enemy/status-dodgeSkill.png"
+      ],
+      "conclusion": "Subtle green foot wind ring remains distinguishable; insufficient objective evidence to reject smaller presentation.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "dinghaishenzhen",
+      "classification": "LOCAL_VETO",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-dinghaishenzhen.png",
+        "artifacts/vfx-status-anchors-enemy/status-dinghaishenzhen.png"
+      ],
+      "conclusion": "Both sides show only very faint ankle wisps. Player opacity .514581 is already near configured max .58; this is not only a low-pulse snapshot. Height 38.5 CSS px with contain makes square calm-mind source approximately 38.5 px wide despite container width 107.798 px. Original cloud/leaf/U-shaped flow identity is lost relative to source and status-polish image.",
+      "next": "Stop and revert only this status presentation profile's excessive size/anchor categorization; retain new single position owner, geometry adapter and unrelated status changes. Recheck player/enemy cloud identity and HUD clearance. No blanket rollback or mandatory redraw."
+    },
+    {
+      "id": "shield",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-shield.png",
+        "artifacts/vfx-status-anchors-enemy/status-shield.png"
+      ],
+      "conclusion": "Translucent enclosing shield contour remains visible without obscuring portrait or HUD.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "petrify",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-petrify.png",
+        "artifacts/vfx-status-anchors-enemy/status-petrify.png"
+      ],
+      "conclusion": "Tight stone enclosure clearly preserves stone hard-control identity; full-body wrapping is intentional.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "earthShield",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-earthShield.png",
+        "artifacts/vfx-status-anchors-enemy/status-earthShield.png"
+      ],
+      "conclusion": "Colored rune/earth shield perimeter remains recognizable; open center preserves actor.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "rockWall",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-rockWall.png",
+        "artifacts/vfx-status-anchors-enemy/status-rockWall.png"
+      ],
+      "conclusion": "Rune and pillar details are reduced, but tan low defensive wall silhouette remains visible. Redesign is authorized; detail preference alone is not a rollback reason.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "barrier",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-barrier.png",
+        "artifacts/vfx-status-anchors-enemy/status-barrier.png"
+      ],
+      "conclusion": "Distinct gold enclosing barrier contour remains visible with clear central portrait.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "yuanZuBlessing",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-yuanZuBlessing.png",
+        "artifacts/vfx-status-anchors-enemy/status-yuanZuBlessing.png"
+      ],
+      "conclusion": "Compact pale gold foot blessing remains visible and contained.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "fireSoulResonance",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-fireSoulResonance.png",
+        "artifacts/vfx-status-anchors-enemy/status-fireSoulResonance.png"
+      ],
+      "conclusion": "Orange circulating flames remain visible and distinct from dark-red blood effect, particularly on blue enemy.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "bloodBurn",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-bloodBurn.png",
+        "artifacts/vfx-status-anchors-enemy/status-bloodBurn.png"
+      ],
+      "conclusion": "Dark-red foot aura remains visible without forming opaque face or column.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "frostbite",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-frostbite.png",
+        "artifacts/vfx-status-anchors-enemy/status-frostbite.png"
+      ],
+      "conclusion": "Snowflake icon remains recognizable on both sides.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "agilityDown",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-agilityDown.png",
+        "artifacts/vfx-status-anchors-enemy/status-agilityDown.png"
+      ],
+      "conclusion": "Boot with red down arrow remains identifiable; no new over-shrink evidence.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "damageDown",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-damageDown.png",
+        "artifacts/vfx-status-anchors-enemy/status-damageDown.png"
+      ],
+      "conclusion": "Green attack motif and red down arrow remain identifiable.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "defenseDown",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-defenseDown.png",
+        "artifacts/vfx-status-anchors-enemy/status-defenseDown.png"
+      ],
+      "conclusion": "Shield with red down arrow remains identifiable.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "phoenixMight",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-phoenixMight.png",
+        "artifacts/vfx-status-anchors-enemy/status-phoenixMight.png"
+      ],
+      "conclusion": "Orange phoenix icon remains recognizable.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "stealthSkill",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-stealthSkill.png",
+        "artifacts/vfx-status-anchors-enemy/status-stealthSkill.png"
+      ],
+      "conclusion": "Portrait transparency visibly conveys stealth; no new body artwork intended.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    },
+    {
+      "id": "fireMomentum",
+      "classification": "RETAIN_STOP_REFINEMENT",
+      "screenshots": [
+        "artifacts/vfx-status-anchors-player/status-fireMomentum.png",
+        "artifacts/vfx-status-anchors-enemy/status-fireMomentum.png"
+      ],
+      "conclusion": "Intentional lack of body/HUD visual retained; absence is not a failure.",
+      "next": "Stop discretionary visual refinement for this reviewed presentation. Reopen only for a concrete regression or newly demonstrated readability/overlap issue."
+    }
+  ],
+  "enemyDinghaishenzhenResolution": {
+    "reviewHead": "590b1390631aaf550a5803e718325ae211baa818",
+    "screenshot": "artifacts/vfx-status-contrast-v2-enemy/status-dinghaishenzhen.png",
+    "evidence": "artifacts/vfx-status-contrast-v2-enemy/evidence.json",
+    "classification": "LOCAL_VETO_RESOLVED_BOTH_SIDES_STOP_REFINEMENT",
+    "conclusion": "New enemy image visibly restores pale blue U-shaped cloud flow around lower body and feet at opacity .479929, with approximately 66.28 by 65.69 rendered CSS-pixel bounds. Cloud remains visible against blue fox, while face, upper silhouette and HP/name remain clear. Together with previous player follow-up, the local over-shrink veto is resolved on both sides.",
+    "next": "Retain .74 height and stop discretionary refinement of this status. Previous enemy NEEDS_EVIDENCE entry is historical and now resolved. No general rollback, source redraw or geometry change is warranted.",
+    "limits": "Focused static visual review only; not performance or commercial completion. No other already-retained statuses were reopened."
+  },
+  "followUpReviews": [
+    {
+      "reviewHead": "590b1390631aaf550a5803e718325ae211baa818",
+      "reviewDate": "2026-10-20",
+      "scope": "Focused follow-up; historical 4b2cb548 conclusions above remain unchanged.",
+      "evidenceDirectory": "artifacts/vfx-status-contrast-v2",
+      "imagesViewed": [
+        "status-dinghaishenzhen.png",
+        "status-rage.png",
+        "status-dodgeSkill.png",
+        "rage-player-off.png",
+        "rage-player-min.png",
+        "rage-player-max.png",
+        "rage-monster-off.png",
+        "rage-monster-min.png",
+        "rage-monster-max.png"
+      ],
+      "metadataViewed": [
+        "rage-contrast.json"
+      ],
+      "decisions": [
+        {
+          "id": "dinghaishenzhen",
+          "classification": "LOCAL_VETO_RESOLVED_FOR_PLAYER",
+          "conclusion": "Height .74 restores visible pale blue cloud U and bilateral flow around lower body; distinct from green dodgeSkill. Face, upper portrait and HUD remain clear. Previous player over-shrink is resolved without full rollback.",
+          "remainingEvidence": "No new enemy dinghaishenzhen still exists in this evidence directory. Enemy follow-up is NEEDS_EVIDENCE; do not claim both-side clearance from player image.",
+          "next": "Retain .74 candidate; no further discretionary player refinement. Only verify enemy at same profile."
+        },
+        {
+          "id": "rage",
+          "classification": "RETAIN_STOP_REFINEMENT",
+          "conclusion": "Off/min .60/max .80 pairs show improved orange aura along red player's torso and lower silhouette. Red-on-red blending remains natural but effect is no longer judged absent. Blue enemy shows a clear orange U at .60 and .80; eyes, face and central body remain readable, and HP/name are untouched. No new opaque fire face or column. This limited opacity change is not overcorrection.",
+          "next": "Retain .60-.80; stop discretionary contrast, size and source refinement unless a concrete new regression appears."
+        },
+        {
+          "id": "dodgeSkill",
+          "classification": "RETAIN_STOP_REFINEMENT",
+          "conclusion": "Unchanged green foot wind remains visible, with distinct hue and lower silhouette versus restored pale cloud. No new regression in control image."
+        }
+      ],
+      "qualityClaim": "Focused static visual veto review only; not commercial completion or performance/duration-owner acceptance.",
+      "currentStopRefinementAddition": [
+        "rage",
+        "dinghaishenzhen:player"
+      ],
+      "currentPending": [
+        "dinghaishenzhen:enemy new-profile still"
+      ],
+      "runtimeOrPhoneChangesMade": false
+    }
+  ]
+}

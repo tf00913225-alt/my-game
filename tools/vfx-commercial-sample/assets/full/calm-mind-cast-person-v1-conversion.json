@@ -1,0 +1,140 @@
+{
+  "source": "C:\\Users\\User\\.codex\\generated_images\\01a15425-277b-7140-b0e5-d3891f17519d\\exec-af624e50-6ef6-48ab-ab72-45381cf5aa19.png",
+  "output": "tools/vfx-commercial-sample/assets/full/calm-mind-cast-person-v1.webp",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "grid": [
+    4,
+    3
+  ],
+  "cell": [
+    362,
+    362
+  ],
+  "losslessRgbaEqual": true,
+  "sha256": "b70745a43e25bf27677ed48488efe8875546d9b325637c997739d5b74213f4b2",
+  "frames": [
+    {
+      "frame": 1,
+      "alpha64Bounds": [
+        26,
+        197,
+        342,
+        361
+      ],
+      "minPaddingFraction": 0.0027624309392265192
+    },
+    {
+      "frame": 2,
+      "alpha64Bounds": [
+        21,
+        195,
+        344,
+        362
+      ],
+      "minPaddingFraction": 0.0
+    },
+    {
+      "frame": 3,
+      "alpha64Bounds": [
+        20,
+        119,
+        347,
+        362
+      ],
+      "minPaddingFraction": 0.0
+    },
+    {
+      "frame": 4,
+      "alpha64Bounds": [
+        23,
+        82,
+        343,
+        362
+      ],
+      "minPaddingFraction": 0.0
+    },
+    {
+      "frame": 5,
+      "alpha64Bounds": [
+        25,
+        121,
+        352,
+        357
+      ],
+      "minPaddingFraction": 0.013812154696132596
+    },
+    {
+      "frame": 6,
+      "alpha64Bounds": [
+        23,
+        0,
+        346,
+        359
+      ],
+      "minPaddingFraction": 0.0
+    },
+    {
+      "frame": 7,
+      "alpha64Bounds": [
+        18,
+        0,
+        351,
+        362
+      ],
+      "minPaddingFraction": 0.0
+    },
+    {
+      "frame": 8,
+      "alpha64Bounds": [
+        21,
+        0,
+        342,
+        353
+      ],
+      "minPaddingFraction": 0.0
+    },
+    {
+      "frame": 9,
+      "alpha64Bounds": [
+        28,
+        134,
+        349,
+        322
+      ],
+      "minPaddingFraction": 0.03591160220994475
+    },
+    {
+      "frame": 10,
+      "alpha64Bounds": [
+        28,
+        181,
+        344,
+        318
+      ],
+      "minPaddingFraction": 0.049723756906077346
+    },
+    {
+      "frame": 11,
+      "alpha64Bounds": [
+        17,
+        0,
+        336,
+        316
+      ],
+      "minPaddingFraction": 0.0
+    },
+    {
+      "frame": 12,
+      "alpha64Bounds": [
+        51,
+        225,
+        318,
+        315
+      ],
+      "minPaddingFraction": 0.12154696132596685
+    }
+  ]
+}

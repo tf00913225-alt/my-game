@@ -1,0 +1,73 @@
+{
+  "head": "ecb4e90009820486ebaafb0315c4a029e66f34e8",
+  "dev": "102cfe2e3dc7b3bac5706444733e90a4c9ea18b7",
+  "base": "b153e3f0269cf61bd8b4814e17f32277aae9df42",
+  "rows": [
+    {
+      "path": "css/40-v143-combat-dungeon-polish.css",
+      "mergeExit": 0,
+      "expectedThreeWaySha256": "5acd4a0b5a63b3d4478cf952dcdeac682195248adfda87f6dd8e3e17590a37c6",
+      "stagedSha256": "5acd4a0b5a63b3d4478cf952dcdeac682195248adfda87f6dd8e3e17590a37c6",
+      "exactExpectedThreeWay": true
+    },
+    {
+      "path": "css/fixed-slot-battlefield-rendering-v2.css",
+      "mergeExit": 0,
+      "expectedThreeWaySha256": "82f76fda717078d930498eb184dbb503c407d11c83fdfb19ec49b36ce4711081",
+      "stagedSha256": "82f76fda717078d930498eb184dbb503c407d11c83fdfb19ec49b36ce4711081",
+      "exactExpectedThreeWay": true
+    },
+    {
+      "path": "js/60-team-relic-system.js",
+      "mergeExit": 0,
+      "expectedThreeWaySha256": "3ae6af6e17cfdf30ad7225a72c77001a2cb8afeacb17c34f876572178e89921f",
+      "stagedSha256": "3ae6af6e17cfdf30ad7225a72c77001a2cb8afeacb17c34f876572178e89921f",
+      "exactExpectedThreeWay": true
+    },
+    {
+      "path": "js/54-v173.51-battle-qa.js",
+      "mergeExit": 0,
+      "expectedThreeWaySha256": "72d62aea4bfc949ee064b2a593e4b67bf69b3224bbe750a757ac454b5a2e5245",
+      "stagedSha256": "72d62aea4bfc949ee064b2a593e4b67bf69b3224bbe750a757ac454b5a2e5245",
+      "exactExpectedThreeWay": true
+    }
+  ],
+  "unchanged": [
+    {
+      "path": "css/49-v169-rpg-ui.css",
+      "sameAsUiHead": true
+    },
+    {
+      "path": "css/53-v173.51-qa.css",
+      "sameAsUiHead": true
+    },
+    {
+      "path": "css/31-v131-fix-batch.css",
+      "sameAsUiHead": true
+    },
+    {
+      "path": "js/00-main.js",
+      "sameAsUiHead": true
+    },
+    {
+      "path": "js/adventure/adventure-content-v1-20260915.js",
+      "sameAsUiHead": true
+    },
+    {
+      "path": "js/adventure/adventure-entry-v1-20260915.js",
+      "sameAsUiHead": true
+    },
+    {
+      "path": "js/adventure/adventure-items-v1-20260915.js",
+      "sameAsUiHead": true
+    },
+    {
+      "path": "js/adventure/adventure-runtime-v1-20260915.js",
+      "sameAsUiHead": true
+    },
+    {
+      "path": "js/adventure/adventure-ui-v1-20260915.js",
+      "sameAsUiHead": true
+    }
+  ]
+}

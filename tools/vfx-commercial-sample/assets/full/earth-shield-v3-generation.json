@@ -1,0 +1,140 @@
+{
+  "source": "C:/Users/User/.codex/generated_images/01a15425-277b-7140-b0e5-d3891f17519d/exec-4c8c9c7d-df41-407f-b8fb-8c564c71d229.png",
+  "output": "C:/Projects/my-game/.vfx-work/sample/tools/vfx-commercial-sample/assets/full/earth-shield-v3.webp",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "grid": [
+    4,
+    3
+  ],
+  "cell": [
+    362,
+    362
+  ],
+  "losslessRgbaEqual": true,
+  "sha256": "4500d96865663ab45314796d68f8117db3cb8a5cae3d4ab3db5a45efd068576e",
+  "frames": [
+    {
+      "frame": 1,
+      "alpha64Bounds": [
+        114,
+        153,
+        266,
+        294
+      ],
+      "minPaddingFraction": 0.1878453038674033
+    },
+    {
+      "frame": 2,
+      "alpha64Bounds": [
+        89,
+        202,
+        281,
+        332
+      ],
+      "minPaddingFraction": 0.08287292817679558
+    },
+    {
+      "frame": 3,
+      "alpha64Bounds": [
+        68,
+        148,
+        281,
+        336
+      ],
+      "minPaddingFraction": 0.0718232044198895
+    },
+    {
+      "frame": 4,
+      "alpha64Bounds": [
+        71,
+        113,
+        273,
+        339
+      ],
+      "minPaddingFraction": 0.06353591160220995
+    },
+    {
+      "frame": 5,
+      "alpha64Bounds": [
+        79,
+        89,
+        295,
+        335
+      ],
+      "minPaddingFraction": 0.07458563535911603
+    },
+    {
+      "frame": 6,
+      "alpha64Bounds": [
+        75,
+        76,
+        295,
+        335
+      ],
+      "minPaddingFraction": 0.07458563535911603
+    },
+    {
+      "frame": 7,
+      "alpha64Bounds": [
+        66,
+        61,
+        290,
+        353
+      ],
+      "minPaddingFraction": 0.024861878453038673
+    },
+    {
+      "frame": 8,
+      "alpha64Bounds": [
+        70,
+        77,
+        287,
+        334
+      ],
+      "minPaddingFraction": 0.07734806629834254
+    },
+    {
+      "frame": 9,
+      "alpha64Bounds": [
+        93,
+        69,
+        282,
+        280
+      ],
+      "minPaddingFraction": 0.19060773480662985
+    },
+    {
+      "frame": 10,
+      "alpha64Bounds": [
+        92,
+        71,
+        286,
+        274
+      ],
+      "minPaddingFraction": 0.19613259668508287
+    },
+    {
+      "frame": 11,
+      "alpha64Bounds": [
+        101,
+        102,
+        248,
+        242
+      ],
+      "minPaddingFraction": 0.27900552486187846
+    },
+    {
+      "frame": 12,
+      "alpha64Bounds": [
+        112,
+        135,
+        252,
+        215
+      ],
+      "minPaddingFraction": 0.30386740331491713
+    }
+  ]
+}

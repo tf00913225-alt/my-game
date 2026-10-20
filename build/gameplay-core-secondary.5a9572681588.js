@@ -8152,7 +8152,7 @@ function clearUnitHud(side){
 function syncHud(){
     const page=document.getElementById("battlePage");
     if(!page||!page.classList.contains("active")||typeof battleActive!=="undefined"&&!battleActive&&!window.v143HasTerminalImpactPresentation?.()||document.body.classList.contains("v174-battle-reading-open")||
-       !document.querySelector(".v143-hit-feedback-overlay")){ clearUnitHud(); return; }
+       !document.querySelector(".v143-hit-feedback-overlay,.v143-skill-stage")){ clearUnitHud(); return; }
     const geometry=window.FourSymbolsBattlefieldRenderGeometry;
     if(!geometry){ return; }
     if(hudLayer){
@@ -10911,6 +10911,9 @@ if(typeof module!=="undefined"&&module.exports){module.exports=global.FourSymbol
         return typeof document!=="undefined"&&typeof document.getElementById==="function"&&!!document.getElementById("battlePage");
     }
     function clearRelicTargetFocus(){
+        if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
+            document.querySelectorAll('.v174-unit-hud[data-relic-target-focus="true"]').forEach(hud=>{delete hud.dataset.relicTargetFocus;});
+        }
         const presentation=typeof document!=="undefined"?document.getElementById("teamRelicBattlePresentation"):null;
         const layer=presentation&&presentation.querySelector(".team-relic-target-projection-layer");
         if(layer){ layer.replaceChildren(); }
@@ -10975,7 +10978,15 @@ if(typeof module!=="undefined"&&module.exports){module.exports=global.FourSymbol
         clearRelicTargetFocus();
         if(!relicCutinNode||!target||!Array.isArray(target.targetIds)){ return waitMs(RELIC_TARGET_REVEAL_MS); }
         const overlayRect=syncRelicPresentationGeometry(relicCutinNode)||relicCutinNode.__relicOverlayRect, layer=relicCutinNode.querySelector(".team-relic-target-projection-layer"), owner=relicGeometryOwner();
-        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{const geometry=owner.getUnitGeometry(target.targetSide,index);if(geometry&&(geometry.artworkProjection||geometry.hpProjection||geometry.spProjection)){appendRelicProjection(layer,geometry,overlayRect);}});}
+        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{
+            const geometry=owner.getUnitGeometry(target.targetSide,index);
+            if(geometry&&(geometry.artworkProjection||geometry.hpProjection||geometry.spProjection)){
+                appendRelicProjection(layer,geometry,overlayRect);
+                const card=document.getElementById((target.targetSide==="monster"?"battleMonster":"battlePlayerCard")+index);
+                const hud=card&&(window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card.querySelector?.(".v174-unit-hud"));
+                if(hud&&hud.dataset.side===target.targetSide&&Number(hud.dataset.index)===index){hud.dataset.relicTargetFocus="true";}
+            }
+        });}
         const show=()=>{if(relicCutinNode){relicCutinNode.classList.add("targets-visible");}};
         if(typeof requestAnimationFrame==="function"){requestAnimationFrame(show);}else{show();}
         return waitMs(RELIC_TARGET_REVEAL_MS);
