@@ -4263,8 +4263,8 @@
     line-height:calc(18 * var(--ui-length-unit,1px)) !important;
 }
 #game-stage .autosave-indicator{
-    font-size:13px !important;
-    line-height:17px !important;
+    font-size:var(--autosave-indicator-font-size,13px) !important;
+    line-height:var(--autosave-indicator-line-height,17px) !important;
 }
 :is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-kicker{
     font-size:calc(13 * var(--ui-length-unit,1px)) !important;

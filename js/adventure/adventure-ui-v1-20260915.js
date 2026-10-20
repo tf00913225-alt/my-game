@@ -180,7 +180,7 @@
             choices='<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.setPanel(\'map\')">返回章節地圖</button>';
         }
         const body='<div class="adventure-event-layout">'+portrait+'<div class="adventure-dialogue"><b>'+esc(event.speaker||"旅人")+'</b>'+paragraphs+'</div></div>';
-        return panelShell(event.title,"NPC／劇情事件",body,choices,"event-panel scene-"+esc(event.background||"road"));
+        return panelShell(event.title,"江湖事件",body,choices,"event-panel scene-"+esc(event.background||"road"));
     }
 
     function renderEventResult(view){
@@ -207,7 +207,7 @@
                 (isSelected?'<small>首次已選</small>':locked?'<small>章節通關後可回溯</small>':'<small>選擇此路線</small>')+'</button>';
         }).join("");
         const actions='<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.setPanel(\'map\')">先看看地圖</button>';
-        return panelShell("山路分岔","第一次有選擇，長期沒有遺憾",'<p class="adventure-lead">兩條路最後都會回到主線。首次推進選定後不能立刻回頭；章節通關後可直接回溯另一條。</p><div class="adventure-route-grid">'+cards+'</div>',actions,"branch-panel");
+        return panelShell("山路分岔","路線選擇",'<p class="adventure-lead">兩條路最後都會回到主線。首次推進選定後不能立刻回頭；章節通關後可直接回溯另一條。</p><div class="adventure-route-grid">'+cards+'</div>',actions,"branch-panel");
     }
 
     function progressDots(current,target){

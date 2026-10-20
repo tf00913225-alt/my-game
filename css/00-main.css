@@ -5563,7 +5563,7 @@ button:active{
 #game-stage > #app > #game-content .autosave-indicator{
     position:absolute !important;
     right:10px !important;
-    bottom:78px !important;
+    bottom:var(--autosave-indicator-bottom,78px) !important;
 }
 
 
