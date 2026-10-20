@@ -142,8 +142,9 @@ test("all casts use DOM Sprite Sheets, frame seven impact and the requested plac
     Object.entries(CASTS).forEach(([id,spec])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id);
-        const wideFile={rockWall:"rock-wall-recipient-v1.webp",petrifyFist:"petrify-fist-wide-v2.webp",earthquakeCrush:"earthquake-crush-wide-v2.webp",stoneThrow:"stone-throw-wide-v2.webp",sandWind:"rolling-stone-wide-v2.webp"}[id];
-        assert.equal(model.sprite.src,wideFile?"assets/vfx/earth/"+wideFile:spec.file+(spec.file.endsWith(".webp")?"":"?v=173.39"),id);
+        const activeFile={stoneBreakSky:"stone-break-sky-soft-edge-v2.webp",rockWall:"rock-wall-recipient-v1.webp",petrifyFist:"petrify-fist-wide-v2.webp",earthquakeCrush:"earthquake-crush-wide-v2.webp",stoneThrow:"stone-throw-wide-v2.webp",sandWind:"rolling-stone-wide-v2.webp"}[id];
+        assert.equal(model.sprite.src,activeFile?"assets/vfx/earth/"+activeFile:spec.file+(spec.file.endsWith(".webp")?"":"?v=173.39"),id);
+        if(id==="stoneBreakSky"){const info=losslessWebpInfo(model.sprite.src);assert.deepEqual([info.width,info.height,info.alpha],[1448,1086,1],"alpha-only source retains the original atlas dimensions and lossless alpha");}
         assert.deepEqual(Array.from([
             model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame
         ]),[4,3,12,7],id);
