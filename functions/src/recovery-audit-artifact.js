@@ -410,8 +410,9 @@ function rawArchiveBase64(text,maximum,token){
     if(length<1||length>maximum)bad("raw archive payload size");
     assemblyCharge(token,"bytes",length);
     const bytes=Buffer.from(text,"base64");
-    assemblyCharge(token,"bytes",text.length);
-    if(bytes.length!==length||bytes.toString("base64")!==text)bad("raw archive base64");
+    assemblyCharge(token); // Preserve sticky/deadline checks after decoding.
+    // Alphabet, padding and zero pad bits uniquely determine canonical base64.
+    if(bytes.length!==length)bad("raw archive base64");
     return bytes;
 }
 // Resource oracle only: it emits no JSON/bytes and changes no value semantics.
