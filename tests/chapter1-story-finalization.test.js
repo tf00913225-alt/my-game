@@ -409,6 +409,20 @@ test('pointer scroll readiness requires stable owner and target samples before a
     assert.match(source,/!e\.disabled&&e\.checkVisibility/);assert.match(source,/hit===e\|\|e\.contains\(hit\)/);assert.match(source,/original scroll target never became stable and pointer ready/);
 });
 
+test('pointer shop preparation observes the original inner potion list scroll owner',()=>{
+    const css=fs.readFileSync('css/49-v169-rpg-ui.css','utf8'),source=fs.readFileSync('tests/fixtures/run-chapter1-guided-pointer-qa.mjs','utf8');
+    const rules=[...css.matchAll(/#game-ui #homeFeatureModal\.v131-shop-open \.shop-potion-list\{([^}]+)\}/g)];assert.ok(rules.some(rule=>/overflow-y\s*:\s*auto/.test(rule[1])&&/touch-action\s*:\s*pan-y/.test(rule[1])));
+    const reveal=source.slice(source.indexOf('const reveal=async selector=>'),source.indexOf("await wait('window.FourSymbolsStartupPolicy"));
+    const selectors=[...reveal.matchAll(/\.closest\('([^']+)'\)/g)].map(match=>match[1]);assert.equal(selectors.length,2);
+    for(const selector of selectors)assert.ok(selector.split(',').includes('.shop-potion-list'),'initial bounds and stable samples use the same actual inner owner');
+    const literal=reveal.match(/const sample=await client\.eval\(`([^`]+)`\)/);assert.ok(literal);
+    const expression=vm.runInNewContext('`'+literal[1]+'`',{selector:'button.buy'}),ownerRect={left:30,right:370,top:345,bottom:742,toJSON(){return {...this,toJSON:undefined};}},owner={scrollTop:675,scrollLeft:0,getBoundingClientRect:()=>ownerRect};
+    const button={disabled:false,checkVisibility:()=>true,getBoundingClientRect:()=>({x:290,y:685,left:290,top:685,width:60,height:52}),closest:selector=>selector.split(',').includes('.shop-potion-list')?owner:null,contains:hit=>hit===button};
+    const sample=vm.runInNewContext(expression,{document:{querySelector:()=>button,elementFromPoint:()=>button},innerWidth:393,innerHeight:873});assert.equal(sample.valid,true,'actual generated observation admits y711 in the original shop owner');
+    const context={};vm.createContext(context);vm.runInContext(source.match(/function stableScrollSample\(previous,sample,now\)\{[\s\S]*?\n\}/)[0],context);let state;for(const now of [0,80,160,240])state=context.stableScrollSample(state,sample,now);assert.equal(state.ready,true);
+    assert.ok(711>Math.min(873-30,873*.8-8),'the former fallback bound690.4 rejects the same visible button');
+});
+
 test("story reading guide keeps the real Next target and toggles reading presentation without an acknowledgement step",()=>{
     const h=guideHarness(),story=h.element(),next=h.element(),other=h.element();let advances=0;
     h.c.battleActive=false;next.action=()=>{advances++;};
