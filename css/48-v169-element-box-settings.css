@@ -84,7 +84,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 }
 body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-panel .auto-premium-status{
     position:sticky !important;
-    top:0 !important;
+    top:calc(-1 * var(--ui-length-unit,1px)) !important;
     z-index:7 !important;
     flex:0 0 auto !important;
     margin-bottom:0 !important;
