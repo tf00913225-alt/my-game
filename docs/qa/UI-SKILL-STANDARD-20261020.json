@@ -182,14 +182,46 @@
         },
         "scope": null
       },
-      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。"
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。",
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/skills-fire.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/skills-fire.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/skills-fire.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/skills-fire.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
+      }
     },
     {
       "id": "home.character",
       "label": "角色",
       "entry": "openHomeFeature('character')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -238,6 +270,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/character.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/character.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/character.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/character.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -245,7 +309,7 @@
       "label": "英雄",
       "entry": "openHomeFeature('hero')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -294,6 +358,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/hero.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/hero.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/hero.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/hero.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -301,7 +397,7 @@
       "label": "商店",
       "entry": "openHomeFeature('shop')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -350,6 +446,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/shop.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/shop.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/shop.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/shop.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -357,7 +485,7 @@
       "label": "任務",
       "entry": "openHomeFeature('quest')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -406,6 +534,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/quest.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/quest.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/quest.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/quest.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -413,7 +573,7 @@
       "label": "秘寶",
       "entry": "openHomeFeature('relic')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -462,6 +622,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/relic.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/relic.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/relic.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/relic.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -632,6 +824,38 @@
           "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
         },
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/autoBattleSettings.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/autoBattleSettings.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/autoBattleSettings.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/autoBattleSettings.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -639,7 +863,7 @@
       "label": "鍛造",
       "entry": "openHomeFeature('forge')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -688,6 +912,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/forge.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/forge.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/forge.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/forge.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -695,7 +951,7 @@
       "label": "合成",
       "entry": "openHomeFeature('synthesis')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -744,6 +1000,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/synthesis.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/synthesis.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/synthesis.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/synthesis.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -751,7 +1039,7 @@
       "label": "成就",
       "entry": "openHomeFeature('achievement')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -800,6 +1088,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/achievement.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/achievement.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/achievement.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/achievement.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -807,7 +1127,7 @@
       "label": "公告",
       "entry": "openHomeFeature('announcement')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -856,6 +1176,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/announcement.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/announcement.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/announcement.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/announcement.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -863,7 +1215,7 @@
       "label": "離線經驗",
       "entry": "openHomeFeature('offlineExp')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -912,6 +1264,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/offlineExp.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/offlineExp.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/offlineExp.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/offlineExp.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -919,7 +1303,7 @@
       "label": "系統",
       "entry": "openHomeFeature('system')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -968,6 +1352,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/system.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/system.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/system.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/system.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -975,7 +1391,7 @@
       "label": "主城休息",
       "entry": "openHomeFeature('rest')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -1024,6 +1440,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/rest.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/rest.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/rest.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/rest.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -1031,7 +1479,7 @@
       "label": "主城經驗池",
       "entry": "openHomeFeature('expPool')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -1080,6 +1528,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/expPool.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/expPool.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/expPool.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/expPool.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -1891,7 +2371,39 @@
         "scope": null
       },
       "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。",
-      "notes": "r3四裝置實畫：六屬性及關閉完整可讀，但仍普通金框、內容下有大片空白，未達技能頁美術/內容密度標準；下一段待修。"
+      "notes": "r3四裝置實畫：六屬性及關閉完整可讀，但仍普通金框、內容下有大片空白，未達技能頁美術/內容密度標準；下一段待修。",
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/status-help.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/status-help.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/status-help.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/status-help.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
+      }
     },
     {
       "id": "detail.skill-detail",
@@ -1948,6 +2460,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/skill-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/skill-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/skill-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/skill-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -2005,6 +2549,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/character-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/character-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/character-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/character-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -4304,6 +4880,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/relic-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/relic-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/relic-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/relic-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -5411,6 +6019,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/dungeon.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/dungeon.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/dungeon.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/dungeon.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -5469,6 +6109,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/boss.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/boss.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/boss.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/boss.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -5527,6 +6199,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/gameplay-hub.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/gameplay-hub.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/gameplay-hub.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/gameplay-hub.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -5585,6 +6289,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/tower.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/tower.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/tower.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/tower.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -5643,6 +6379,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/adventure.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/adventure.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/adventure.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/adventure.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -8265,6 +9033,38 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "titleEvidence": {
+        "status": "已實際驗證（僅已覆蓋標題畫面）",
+        "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+        "scope": "牌面書寫區／獨立標題群置中及可見返回分區；不批准其餘互動、未覆蓋狀態或整頁美術",
+        "devices": [
+          {
+            "device": "360x640",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/creation-skill-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/360x640/source-binding.json"
+          },
+          {
+            "device": "393x873",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/creation-skill-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/393x873/source-binding.json"
+          },
+          {
+            "device": "412x915",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/creation-skill-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/412x915/source-binding.json"
+          },
+          {
+            "device": "1280x800",
+            "image": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/creation-skill-detail.png",
+            "sourceBinding": "artifacts/ui-skill-standard/title-final-4d5c2ac6/1280x800/source-binding.json"
+          }
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
+          "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
+          "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
       }
     },
     {
@@ -9313,5 +10113,40 @@
         "其它台帳項目仍未檢查"
       ]
     }
-  ]
+  ],
+  "titleAudit": {
+    "head": "4d5c2ac624cd161ff62abd4a11e8ab806cf1a33e",
+    "sourceUnchanged": true,
+    "devices": [
+      "360x640",
+      "393x873",
+      "412x915",
+      "1280x800"
+    ],
+    "readingScenesPerDevice": {
+      "360x640": 82,
+      "393x873": 82,
+      "412x915": 82,
+      "1280x800": 82
+    },
+    "controlsPerDevice": {
+      "screenshots": 17,
+      "actions": 25
+    },
+    "result": "已測標題族通過；全UI標題尚未全部覆蓋",
+    "unverified": [
+      "Auth帳號各表單/失敗",
+      "啟動建立/載入/進入/失敗",
+      "隱私政策長文/確認",
+      "戰鬥主標題/道具/統計/機制/結算/升級",
+      "正式prompt入口尚未找到，不能用自造DOM驗收",
+      "長名稱與其他尚未列證之動態狀態"
+    ],
+    "nextSegmentIssues": [
+      "詳情/比較/獎勵/預覽普通框美術未達技能標準",
+      "自動設定sticky策略卡邊緣捲動露字待實際定位",
+      "廣告模擬面板native寬度上限錯誤，後續修正需固定Head重驗"
+    ],
+    "limits": "桌面Chrome viewport/touch模擬；非真實手機硬體。dialog補驗在dirty期間未綁bundlehash，只作before線索。"
+  }
 }
