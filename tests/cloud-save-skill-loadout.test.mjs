@@ -6,8 +6,8 @@ const require=createRequire(import.meta.url);
 const {createCanonicalSkillLearning}=require('../functions/src/canonical-skill-learning');
 const {createCanonicalSkillLoadout,verifySkillLoadoutEvidence}=require('../functions/src/canonical-skill-loadout');
 const fail=(code,message)=>{throw Object.assign(Error(message),{code});};
-async function fixture(){
-    const h=storeHarness();
+async function fixture(options){
+    const h=storeHarness(options);
     await h.initial.commitInitialSources(h.request(),{operationId:'loadout_initial_0001',expectedRevision:h.revision,selection});
     const characterId=h.data.get(`${h.root}/account/current`).slots[0];
     await createCanonicalSkillLearning(h.dependencies).learnOrUpgrade(h.request(),{operationId:'loadout_learned_0001',
@@ -74,4 +74,103 @@ test('invalid/no-op/stale/foreign/session intents and rolled-back writes cannot 
     h.setSession('replacement-session');
     await assert.rejects(writer.mutateLoadout({auth:{uid:h.uid},data:{uid:h.uid,session:{sessionId:'a'.repeat(32)}}},intent),{code:'permission-denied'});
     assert.equal(h.writes,writes);assert.deepEqual([...h.data],state);
+});
+
+test('first admission scans the exact complete bounded operation namespace and refuses malformed or prior history',async()=>{
+    const {h,intent}=await fixture(),reads=[];
+    const writer=createCanonicalSkillLoadout({...h.dependencies,runProtected:(request,operation)=>h.dependencies.runProtected(request,(tx,session)=>
+        operation({...tx,get:async ref=>{const value=await tx.get(ref);reads.push({path:ref.path,query:!!ref.query,maximum:ref.maximum,order:ref.order,
+            count:value.docs?Math.max(1,value.size):1});return value;}},session))});
+    const original=[...h.data],initial=`${h.root}/operations/loadout_initial_0001`,row=h.data.get(initial);
+    for(const patch of [{kind:'unknown-kind'},{schemaVersion:2},{ownerUid:'foreign'},{sourceRevision:h.revision+1},
+        {sourceRevision:'2'},{operationId:'wrong-operation-id'}]){
+        h.data.set(initial,{...row,...patch});const before=[...h.data],writes=h.writes;
+        await assert.rejects(writer.mutateLoadout(h.request(),intent));assert.equal(h.writes,writes);assert.deepEqual([...h.data],before);
+        h.data.set(initial,row);
+    }
+    for(let index=0;index<399;index++)h.data.set(`${h.root}/operations/header-pressure-${String(index).padStart(4,'0')}`,{schemaVersion:1});
+    const before=[...h.data],writes=h.writes;
+    await assert.rejects(writer.mutateLoadout(h.request(),intent),/admission budget/);assert.equal(h.writes,writes);assert.deepEqual([...h.data],before);
+    h.data.clear();for(const [key,value] of original)h.data.set(key,value);
+    reads.length=0;await writer.mutateLoadout(h.request(),intent);
+    const query=reads.filter(row=>row.query&&row.path===h.root+'/operations');
+    assert.equal(query.length,1);assert.equal(query[0].maximum,401);assert.equal(query[0].order[0],'__name__');
+    assert.equal(query[0].count,2);assert(reads.reduce((sum,row)=>sum+row.count,0)<=818);
+});
+
+test('a retained current head requires its exact original receipt and predecessor, with zero repair writes',async()=>{
+    const {h,writer,intent}=await fixture();await writer.mutateLoadout(h.request(),intent);
+    const path=`${h.root}/operations/${intent.operationId}`,original=h.data.get(path),writes=h.writes;
+    const next={...intent,operationId:'loadout_select_00003',expectedRevision:h.revision,action:'select-auto-action'};
+    for(const value of [undefined,{...original,previousLoadoutSource:{operationId:'unknown-previous-op',resultRevision:2,policySha256:'a'.repeat(64)}}]){
+        if(value)h.data.set(path,value);else h.data.delete(path);
+        const before=[...h.data];await assert.rejects(writer.mutateLoadout(h.request(),next),{code:'data-loss'});
+        assert.equal(h.writes,writes);assert.deepEqual([...h.data],before);h.data.set(path,original);
+    }
+    await writer.mutateLoadout(h.request(),next);
+    assert.deepEqual(h.data.get(`${h.root}/operations/${next.operationId}`).previousLoadoutSource,
+        {operationId:intent.operationId,resultRevision:original.resultRevision,policySha256:original.policySha256});
+});
+
+test('optimistic same-operation and competing intents commit once and preserve the original receipt on retry',async()=>{
+    const {h,intent}=await fixture({optimisticTransactions:true});
+    // Reuse the shared fixture's SDK-style optimistic retry driver. The
+    // production writer itself never retries or weakens a stale intent.
+    const writer=createCanonicalSkillLoadout({...h.dependencies,runProtected:(_request,operation)=>h.dependencies.db.runTransaction(operation)});
+    const same=await Promise.all([writer.mutateLoadout(h.request(),intent),writer.mutateLoadout(h.request(),intent)]);
+    assert.equal(same.filter(row=>row.unchanged===false).length,1);assert.equal(same.filter(row=>row.unchanged).length,1);
+    const base={...intent,action:'select-auto-action',expectedRevision:h.revision};
+    const outcomes=await Promise.allSettled([writer.mutateLoadout(h.request(),{...base,operationId:'loadout_race_normal1',skillId:'normal'}),
+        writer.mutateLoadout(h.request(),{...base,operationId:'loadout_race_defend1',skillId:'defend'})]);
+    assert.equal(outcomes.filter(row=>row.status==='fulfilled').length,1);
+    assert.equal(outcomes.filter(row=>row.status==='rejected'&&row.reason.code==='aborted').length,1);
+});
+
+test('lost responses replay original non-economic proof, while a first-admission namespace phantom is rechecked on SDK retry',async()=>{
+    const {h,writer,intent}=await fixture();
+    const lost=createCanonicalSkillLoadout({...h.dependencies,runProtected:async(request,operation)=>{
+        await h.dependencies.runProtected(request,operation);throw Error('loadout response lost after commit');
+    }});
+    await assert.rejects(lost.mutateLoadout(h.request(),intent),/response lost/);
+    const before=[...h.data],writes=h.writes;
+    assert.equal((await writer.mutateLoadout(h.request(),intent)).unchanged,true);assert.equal(h.writes,writes);assert.deepEqual([...h.data],before);
+    const fresh=await fixture({optimisticTransactions:true});let inserted=false,attempts=0;
+    const racing=createCanonicalSkillLoadout({...fresh.h.dependencies,runProtected:(_request,operation)=>fresh.h.dependencies.db.runTransaction((tx,session)=>{
+        attempts++;return operation({...tx,get:async ref=>{
+            const row=await tx.get(ref);
+            if(ref.query&&ref.path===fresh.h.root+'/operations'&&!inserted){
+                inserted=true;fresh.h.data.set(fresh.h.root+'/operations/loadout_phantom_0001',
+                    {schemaVersion:1,ownerUid:fresh.h.uid,operationId:'loadout_phantom_0001',kind:'unknown-future-kind'});
+            }
+            return row;
+        }},session);
+    })});
+    const committed=fresh.h.writes,revision=fresh.h.revision;
+    await assert.rejects(racing.mutateLoadout(fresh.h.request(),fresh.intent),{code:'failed-precondition'});
+    assert.equal(attempts,2);assert.equal(fresh.h.writes,committed);assert.equal(fresh.h.revision,revision);
+    assert.equal(fresh.h.data.has(fresh.h.root+'/operations/'+fresh.intent.operationId),false);
+});
+
+test('original approved current-source recovery closes the full loadout chain and rejects missing head or earlier receipts',async()=>{
+    const {h,writer,intent,characterId}=await fixture();await writer.mutateLoadout(h.request(),intent);
+    const selected={...intent,operationId:'loadout_selected_0004',expectedRevision:h.revision,action:'select-auto-action'};
+    await writer.mutateLoadout(h.request(),selected);
+    const {createCanonicalCurrentRecovery}=require('../functions/src/canonical-current-recovery');
+    const {createCanonicalRecoveryApproval}=require('../functions/src/canonical-recovery-approval');
+    const operationId='loadout_recovery_0001',revision=h.revision;
+    const head={...h.data.get(`${h.root}/progress/current`).playableState.loadoutSource};
+    await createCanonicalRecoveryApproval(h.dependencies).issue({auth:{uid:'loadout-test-operator',token:{cloudSaveOperator:true}},
+        data:{ownerUid:h.uid,operationId,sourceRevision:revision,ttlSeconds:300}});
+    for(const name of ['account','economy','progress','relicLoadout','claimCheckpoints'])h.data.delete(`${h.root}/${name}/current`);
+    h.data.delete(`${h.root}/characters/${characterId}`);
+    const recovery=createCanonicalCurrentRecovery(h.dependencies),writes=h.writes;
+    for(const id of [intent.operationId,selected.operationId]){
+        const path=`${h.root}/operations/${id}`,row=h.data.get(path);h.data.delete(path);const before=[...h.data];
+        await assert.rejects(recovery.restoreCurrent(h.request(),{operationId,expectedRevision:revision}),{code:'data-loss'});
+        assert.equal(h.writes,writes);assert.deepEqual([...h.data],before);h.data.set(path,row);
+    }
+    await recovery.restoreCurrent(h.request(),{operationId,expectedRevision:revision});
+    assert.deepEqual(h.data.get(`${h.root}/progress/current`).playableState.loadoutSource,head);
+    assert.deepEqual(h.data.get(`${h.root}/characters/${characterId}`).skillLoadout.equippedSkills,['flameSlash']);
+    const after=h.writes;assert.equal((await writer.mutateLoadout(h.request(),intent)).unchanged,true);assert.equal(h.writes,after);
 });

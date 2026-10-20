@@ -109,6 +109,19 @@ test("canonical preferences reject unknown version, malformed presence and unkno
     }
 });
 
+test("canonical v2 source binding is exact and survives later canonical revisions without rewriting the original head",()=>{
+    const r=sources();r.playableState.preferencesVersion=2;
+    const head={operationId:'loadout_projection_0001',resultRevision:3,policySha256:'a'.repeat(64)};
+    r.playableState.loadoutSource=head;
+    assert.equal(assemble(r).readyForPublication,false);assert.deepEqual(r.playableState.loadoutSource,head);
+    for(const value of [null,{}, {...head,extra:1},{...head,resultRevision:8},{...head,resultRevision:'3'},
+        {...head,operationId:'loadout_projection_0001\n'},{...head,policySha256:'a'.repeat(64)+'\n'}]){
+        const changed=structuredClone(r);changed.playableState.loadoutSource=value;const before=JSON.stringify(changed);
+        assert.throws(()=>assemble(changed));assert.equal(JSON.stringify(changed),before);
+    }
+    delete r.playableState.preferencesVersion;assert.throws(()=>assemble(r));
+});
+
 // Actual server-created source evidence; no test-only period completion.
 function newAccountSources(){
     const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");

@@ -917,6 +917,11 @@ test('genuine twenty-battle skill learn/upgrade and secondary learn survive full
         assert.equal(final.progress.playableState.autoConfig2.skill,'flameSlash');
         assert.equal(final.progress.playableState.autoConfig2.v136LastSkill,'flameSlash');
         assert.equal(Object.hasOwn(final.progress.playableState.autoConfig3,'v136ActionIntent'),false);
+        const head=copy(final.progress.playableState.loadoutSource);
+        await writer.learnOrUpgrade(request(),{...learnIntent,operationId:'skill-earned-later-learn-001',
+            expectedRevision:h.revision,skillId:'fireCritical'});
+        assert.deepEqual(h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords.progress.playableState.loadoutSource,head);
+        assert(head.resultRevision<h.revision,'another actual writer preserves the older exact head revision');
         if(fault)fault(h,learnIntent.operationId);
         for(const path of [...h.data.keys()])if(['account','characters','economy','inventory','equipment','relics','relicLoadout','progress','claimRecords','claimCheckpoints']
             .some(name=>path.startsWith(h.root+'/'+name+'/')))h.data.delete(path);

@@ -7,6 +7,7 @@ const policy=require("./skill-loadout-policy-v1.json"),learning=require("./skill
 const {assembleCanonicalSnapshot,assembleCanonicalPlayableProjection,verifyCanonicalSnapshotAgainstSources,claimRecordsDigest}=require("./canonical-snapshot");
 const {createRecoveryArchive,inspectRecoveryArchive}=require("./canonical-recovery-archive");
 const {source,readCharacterSources,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=require("./canonical-owned-sources");
+const {classifyRetainedCanonicalOperation}=require("./canonical-operation-classifier");
 function freeze(value){if(value&&typeof value==="object"){Object.values(value).forEach(freeze);Object.freeze(value);}return value;}
 freeze(policy);freeze(learning);
 const KIND="skill-loadout",ID=/^[A-Za-z0-9_-]{16,64}(?![\s\S])/;
@@ -21,7 +22,7 @@ function validIntent(value){
         ["equip","remove","select-auto-action"].includes(value.action)&&typeof value.skillId==="string"&&
         (Object.hasOwn(catalog,value.skillId)||value.action==="select-auto-action"&&["normal","defend"].includes(value.skillId));
 }
-function transition(records,revision,characterId,action,skillId,fail){
+function transition(records,revision,characterId,action,skillId,operationId,fail){
     if(policy.schemaVersion!==1||policy.ruleVersion!=="v1"||policy.policyVersion!=="player-skill-loadout-v1"||
        records.account.provenance!=="server-created"||!records.progress.playableState)
         fail("data-loss","Original skill loadout policy or sources are unavailable.");
@@ -65,6 +66,7 @@ function transition(records,revision,characterId,action,skillId,fail){
     // Explicit version conversion preserves every absent v136 field. Never
     // execute the Client's boot migration to reconstruct missing history.
     preferences.preferencesVersion=2;
+    preferences.loadoutSource={operationId,resultRevision:revision,policySha256:POLICY_SHA};
     const nextClaims=records.claimRecords.map(row=>({...row,serverRevision:revision}));
     return {...records,...advanceOwnedRecords(records,revision),
         account:{...records.account,serverRevision:revision},characters:nextCharacters,
@@ -76,7 +78,7 @@ function transition(records,revision,characterId,action,skillId,fail){
 // Non-economic proof: the operation, both originals and both economic absences
 // must survive. No zero ledger/grant is manufactured to resemble learning.
 async function verifySkillLoadoutEvidence({tx,root,uid,operationId,currentRevision,receipt,fail}){
-    const fields="action,characterId,createdAt,expectedRevision,kind,operationId,ownerUid,policySha256,policyVersion,resultRevision,schemaVersion,skillId,snapshotSha256,sourceRevision";
+    const fields="action,characterId,createdAt,expectedRevision,kind,operationId,ownerUid,policySha256,policyVersion,previousLoadoutSource,resultRevision,schemaVersion,skillId,snapshotSha256,sourceRevision";
     if(!receipt||Object.keys(receipt).sort().join(",")!==fields||receipt.schemaVersion!==1||receipt.kind!==KIND||
        receipt.ownerUid!==uid||receipt.operationId!==operationId||!validIntent({operationId,expectedRevision:receipt.expectedRevision,
            characterId:receipt.characterId,action:receipt.action,skillId:receipt.skillId})||
@@ -99,8 +101,13 @@ async function verifySkillLoadoutEvidence({tx,root,uid,operationId,currentRevisi
         }catch(_){fail("data-loss","Original skill loadout evidence is missing or corrupt.");}
     }
     const reject=()=>fail("data-loss","Original skill loadout transition differs.");
-    const next=transition(originals[0].records,receipt.resultRevision,receipt.characterId,receipt.action,receipt.skillId,reject);
+    const previous=originals[0].records.progress.playableState.loadoutSource??null;
+    if(!same(previous,receipt.previousLoadoutSource))reject();
+    const next=transition(originals[0].records,receipt.resultRevision,receipt.characterId,receipt.action,receipt.skillId,operationId,reject);
     if(!same(next,originals[1].records)||originals[1].snapshot.sha256!==receipt.snapshotSha256)reject();
+    return Object.freeze({operationId,resultRevision:receipt.resultRevision,policySha256:receipt.policySha256,
+        previousOperationId:previous?.operationId??null,previousResultRevision:previous?.resultRevision??null,
+        previousPolicySha256:previous?.policySha256??null});
 }
 
 function createCanonicalSkillLoadout({db,FieldValue,HttpsError,runProtected,inspectExistingEnvelope,nextRevision}){
@@ -143,7 +150,26 @@ function createCanonicalSkillLoadout({db,FieldValue,HttpsError,runProtected,insp
                 verifyCanonicalSnapshotAgainstSources(prior.data(),uid,previous,records);
                 if(!same(inspectRecoveryArchive(archived.data(),uid,previous,prior.data()),records))throw Error("different");
             }catch(_){fail("data-loss","Current skill loadout sources differ from their archive.");}
-            const revision=nextRevision(envelope),next=transition(records,revision,characterId,action,skillId,fail);
+            if(!records.progress.playableState)fail("data-loss","Complete playable skill sources are required.");
+            if(!Object.hasOwn(records.progress.playableState,"loadoutSource")){
+                // First admission is explicitly finite. This proves only that
+                // complete known operation headers contain no previous loadout;
+                // it is not a full economic proof or total-read400 contract.
+                const history=await tx.get(root.collection("operations").orderBy("__name__").limit(401));
+                if(history.size>400)fail("failed-precondition","First loadout operation inventory exceeds its admission budget.");
+                for(const row of history.docs){
+                    if(classifyRetainedCanonicalOperation(row.data(),row.id,uid,expectedRevision,fail)==="loadout")
+                        fail("data-loss","A retained loadout operation is missing its current source binding.");
+                }
+            }else{
+                const head=records.progress.playableState.loadoutSource;
+                const retained=await tx.get(root.collection("operations").doc(head.operationId));
+                if(!retained.exists)fail("data-loss","Current skill loadout source receipt is missing.");
+                const edge=await verifySkillLoadoutEvidence({tx,root,uid,operationId:head.operationId,currentRevision:expectedRevision,receipt:retained.data(),fail});
+                if(edge.resultRevision!==head.resultRevision||edge.policySha256!==head.policySha256)
+                    fail("data-loss","Current skill loadout source binding differs.");
+            }
+            const revision=nextRevision(envelope),next=transition(records,revision,characterId,action,skillId,operationId,fail);
             const bundle=assembleCanonicalSnapshot(uid,revision,next),archive=createRecoveryArchive(uid,revision,next,bundle),stamp=FieldValue.serverTimestamp();
             refs.forEach((ref,index)=>tx.update(ref,{serverRevision:revision,updatedAt:stamp,...(index===0?{snapshotSha256:bundle.sha256}:{}),
                 ...(index===3?{playableState:next.progress.playableState}:{}),...(index===4?{claimDigest:next.claimCheckpoint.claimDigest}:{})}));
@@ -153,6 +179,7 @@ function createCanonicalSkillLoadout({db,FieldValue,HttpsError,runProtected,insp
             tx.create(root.collection("recoveryArchives").doc(String(revision)),{...archive,createdAt:stamp});
             const receipt={schemaVersion:1,kind:KIND,ownerUid:uid,operationId,expectedRevision,sourceRevision:previous,resultRevision:revision,
                 characterId,action,skillId,policyVersion:policy.policyVersion,policySha256:POLICY_SHA,snapshotSha256:bundle.sha256,createdAt:stamp};
+            receipt.previousLoadoutSource=records.progress.playableState.loadoutSource??null;
             tx.create(operationRef,receipt);tx.update(envelopeRef,{serverRevision:revision,updatedAt:stamp});
             return result(receipt,false);
         });
