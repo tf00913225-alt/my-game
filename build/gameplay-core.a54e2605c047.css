@@ -4338,7 +4338,7 @@
 .v132-ticket-preview-modal p,.v132-ticket-preview-modal .v132-preview-item{font-size:calc(14 * var(--ui-length-unit,1px))!important;line-height:1.45!important;}
 .v132-set-title{font-size:calc(16 * var(--ui-length-unit,1px))!important;line-height:1.35!important;}
 .v132-set-bonus{font-size:calc(14 * var(--ui-length-unit,1px))!important;line-height:1.5!important;}
-.v132-reward-modal .v132-reward-actions button{min-height:calc(40 * var(--ui-length-unit,1px))!important;font-size:calc(15 * var(--ui-length-unit,1px))!important;line-height:1.25!important;}
+.v132-reward-modal .v132-reward-actions button{font-size:calc(15 * var(--ui-length-unit,1px))!important;line-height:1.25!important;}
 
 
     #game-ui .v146-shop-total{font-size:39px;}
