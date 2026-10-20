@@ -50,10 +50,10 @@
       "gameplay-core": {
         "scripts": [
           "build/gameplay-core-primary.7b75ca5e1c88.js",
-          "build/gameplay-core-secondary.ec568394fd00.js"
+          "build/gameplay-core-secondary.08c8faad4670.js"
         ],
         "styles": [
-          "build/gameplay-core.e981e271013d.css"
+          "build/gameplay-core.0b1b33fe5e04.css"
         ],
         "dependencies": [
           "app-shell",
@@ -810,24 +810,24 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core-secondary.ec568394fd00.js",
-        "sha256": "ec568394fd00",
-        "bytes": 739892,
+        "path": "build/gameplay-core-secondary.08c8faad4670.js",
+        "sha256": "08c8faad4670",
+        "bytes": 740077,
         "priority": "P2",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/gameplay-core.e981e271013d.css",
-        "sha256": "e981e271013d",
+        "path": "build/gameplay-core.0b1b33fe5e04.css",
+        "sha256": "0b1b33fe5e04",
         "bytes": 435125,
         "priority": "P2",
         "type": "style",
         "decode": false
       }
     ],
-    "manifestHash": "1adc353bc400",
-    "totalBytes": 24036147,
+    "manifestHash": "7bb90a8d931b",
+    "totalBytes": 24036332,
     "totalResources": 79
   },
   "assets": {
@@ -843,9 +843,9 @@
       "sha256": "7b75ca5e1c88",
       "bytes": 664967
     },
-    "build/gameplay-core-secondary.ec568394fd00.js": {
-      "sha256": "ec568394fd00",
-      "bytes": 739892
+    "build/gameplay-core-secondary.08c8faad4670.js": {
+      "sha256": "08c8faad4670",
+      "bytes": 740077
     },
     "build/feature-patrol.ab5bd3ce5582.js": {
       "sha256": "ab5bd3ce5582",
@@ -891,8 +891,8 @@
       "sha256": "058b860fa3fc",
       "bytes": 90942
     },
-    "build/gameplay-core.e981e271013d.css": {
-      "sha256": "e981e271013d",
+    "build/gameplay-core.0b1b33fe5e04.css": {
+      "sha256": "0b1b33fe5e04",
       "bytes": 435125
     },
     "build/feature-patrol.1cef20d37f82.css": {

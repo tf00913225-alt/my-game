@@ -7019,6 +7019,8 @@
     window.v17346AppendReforgeMarkers=appendReforgeMarkers;
     function configureEquipmentChestModal(item){
         if(!item||item.id!==EQUIPMENT_CHEST_DEFINITION.id){ return; }
+        const stats=document.getElementById("itemModalStats");
+        if(stats){ stats.textContent="每個裝備寶箱開啟後固定隨機獲得3件裝備；可先查看預覽。"; }
         const modal=document.getElementById("itemModal");
         const equipButton=document.getElementById("itemEquipButton");
         const sellButton=document.querySelector("#itemModal .sell-button");
