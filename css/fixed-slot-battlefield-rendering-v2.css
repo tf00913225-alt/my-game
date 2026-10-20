@@ -405,6 +405,14 @@
 /* Boss and generic fallback artwork keep the previous depth policy. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-row[data-slot-row="back"] .v174-battle-art,
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot-row[data-slot-row="front"] .v174-battle-art{scale:var(--battle-art-depth, .94);}
+/* A filled front slot owns the information band directly above its paired
+   back slot. Bound only that back portrait's height, keeping its feet and
+   source aspect. Empty front slots keep the approved larger silhouette. */
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow:has(> [data-slot-row="front"] > [data-slot="ALLY_F1"] > .battle-player) > [data-slot-row="back"] > [data-slot="ALLY_B1"] > .battle-player > .v174-battle-art,
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow:has(> [data-slot-row="front"] > [data-slot="ALLY_F2"] > .battle-player) > [data-slot-row="back"] > [data-slot="ALLY_B2"] > .battle-player > .v174-battle-art,
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow:has(> [data-slot-row="front"] > [data-slot="ALLY_F3"] > .battle-player) > [data-slot-row="back"] > [data-slot="ALLY_B3"] > .battle-player > .v174-battle-art{
+    --battle-art-overhang-top:calc((100% + var(--battle-ally-row-gap) - 6px - var(--battle-art-hud-reserve)) / var(--battle-art-depth) - 100% + var(--battle-art-hud-reserve));
+}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster > .v174-battle-art{
     --battle-art-overhang-top:-36px;
     --battle-art-hud-reserve:6px;
