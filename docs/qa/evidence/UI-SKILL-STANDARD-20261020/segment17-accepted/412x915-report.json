@@ -1,0 +1,394 @@
+{
+  "sourcesBefore": {
+    "index.html": "40bcc204de4f7154573cde60c59a2582eaa077a4aadf0f4000ec330a09c0a145",
+    "asset-manifest.json": "05c8a81ffe2a6dfe93238cc6f8ffa2b0efce163c3045b91a0b312bfe2ab85d22",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.201a0fc6b9da.js": "201a0fc6b9da8ac1fbd68268439b148e1c8f63e92df7e7c5f258f5a1e5bc6d33",
+    "build/boot-core.7c85620e671b.css": "7c85620e671bbb3e4d17f9b3a922b7b205b911d4fb0717858cc65ba86558d639",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.9381903ea71f.js": "9381903ea71f71a12753c8059108fdc54ee0a9c246a89d10df2345e4fb82d2d5",
+    "build/gameplay-core.d8c87227a829.css": "d8c87227a8292ba1e22a33dc048a49758210736787174689e4eaa57add3ff873"
+  },
+  "sourcesAfter": {
+    "index.html": "40bcc204de4f7154573cde60c59a2582eaa077a4aadf0f4000ec330a09c0a145",
+    "asset-manifest.json": "05c8a81ffe2a6dfe93238cc6f8ffa2b0efce163c3045b91a0b312bfe2ab85d22",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.201a0fc6b9da.js": "201a0fc6b9da8ac1fbd68268439b148e1c8f63e92df7e7c5f258f5a1e5bc6d33",
+    "build/boot-core.7c85620e671b.css": "7c85620e671bbb3e4d17f9b3a922b7b205b911d4fb0717858cc65ba86558d639",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.9381903ea71f.js": "9381903ea71f71a12753c8059108fdc54ee0a9c246a89d10df2345e4fb82d2d5",
+    "build/gameplay-core.d8c87227a829.css": "d8c87227a8292ba1e22a33dc048a49758210736787174689e4eaa57add3ff873"
+  },
+  "sourceUnchanged": true,
+  "loaded": [
+    "/build/boot-core.7c85620e671b.css",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/boot-core.7c85620e671b.css",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/boot-core.7c85620e671b.css",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/app-shell.201a0fc6b9da.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/app-shell.201a0fc6b9da.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/gameplay-core-secondary.9381903ea71f.js",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core.d8c87227a829.css",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/gameplay-core-secondary.9381903ea71f.js",
+    "/build/gameplay-core.d8c87227a829.css",
+    "/build/feature-adventure-entry.f68f5350eccc.css",
+    "/build/feature-adventure-entry.8215d893d208.js",
+    "/build/feature-adventure-items.cf197e72837f.js"
+  ],
+  "touches": [
+    {
+      "selector": "[data-city-entry=\"4\"]",
+      "x": 377.6666564941406,
+      "y": 374.2119140625,
+      "hit": true,
+      "label": "秘寶"
+    },
+    {
+      "selector": ".relic-progression-box-strip button",
+      "x": 163.67044830322266,
+      "y": 311.58338928222656,
+      "hit": true,
+      "label": "桃紅階以下秘寶碎片自選箱 ×1"
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 299.84442138671875,
+      "y": 778.1222839355469,
+      "to": 278.0975036621094,
+      "top": 1670,
+      "client": 1442,
+      "height": 3112
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 354.4439697265625,
+      "y": 215.33084106445312,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": ".home-utility-actions button[aria-label=\"公告\"]",
+      "x": 157.0749969482422,
+      "y": 652.8185424804688,
+      "hit": true,
+      "label": "公告"
+    },
+    {
+      "selector": ".release-update-announcement .release-update-primary",
+      "x": 205.99701690673828,
+      "y": 578.80517578125,
+      "hit": true,
+      "label": "查看本次更新"
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 285.55823516845703,
+      "y": 735.31884765625,
+      "to": 356.8316955566406,
+      "top": 4275,
+      "client": 1123,
+      "height": 5399
+    },
+    {
+      "selector": ".release-update-suppress-today span",
+      "x": 302.175048828125,
+      "y": 657.4499816894531,
+      "hit": true,
+      "label": "今日不再跳出提醒"
+    },
+    {
+      "selector": ".release-update-suppress-today",
+      "x": 205.99701690673828,
+      "y": 657.4499816894531,
+      "hit": true,
+      "label": "今日不再跳出提醒"
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 326.06532287597656,
+      "y": 295.20948791503906,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": ".home-utility-actions button[aria-label=\"公告\"]",
+      "x": 157.0749969482422,
+      "y": 652.8185424804688,
+      "hit": true,
+      "label": "公告"
+    },
+    {
+      "selector": ".release-update-announcement .release-update-primary",
+      "x": 205.99701690673828,
+      "y": 578.80517578125,
+      "hit": true,
+      "label": "查看本次更新"
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 326.06532287597656,
+      "y": 295.20948791503906,
+      "hit": true,
+      "label": "返回"
+    }
+  ],
+  "checks": [
+    {
+      "entry": {
+        "scrollBehavior": "auto",
+        "scroll": 0,
+        "body": {
+          "x": 46.874534606933594,
+          "y": 331.8316955566406,
+          "width": 318.24493408203125,
+          "height": 428.4871520996094,
+          "top": 331.8316955566406,
+          "right": 365.11946868896484,
+          "bottom": 760.31884765625,
+          "left": 46.874534606933594
+        },
+        "summary": {
+          "x": 49.16342544555664,
+          "y": 345.5650329589844,
+          "width": 313.66717529296875,
+          "height": 135.95046997070312,
+          "top": 345.5650329589844,
+          "right": 362.8306007385254,
+          "bottom": 481.5155029296875,
+          "left": 49.16342544555664
+        },
+        "summaryText": "V173.73　四象塔每層十名敵人，新增鍛造入口，並改善命中閃避、技能操作、背包與戰鬥呈現。",
+        "titleInk": {
+          "x": 77.16059112548828,
+          "y": 169.17755126953125,
+          "width": 257.6669006347656,
+          "height": 77.13076782226562,
+          "top": 169.17755126953125,
+          "right": 334.8274917602539,
+          "bottom": 246.30831909179688,
+          "left": 77.16059112548828
+        },
+        "kind": "acknowledge"
+      }
+    },
+    {
+      "preference": {
+        "before": {
+          "label": {
+            "x": 50.30786895751953,
+            "y": 632.272216796875,
+            "width": 311.3782958984375,
+            "height": 50.35552978515625,
+            "top": 632.272216796875,
+            "right": 361.68616485595703,
+            "bottom": 682.6277465820312,
+            "left": 50.30786895751953
+          },
+          "ack": {
+            "x": 49.16342544555664,
+            "y": 698.6499633789062,
+            "width": 313.66717529296875,
+            "height": 59.5111083984375,
+            "top": 698.6499633789062,
+            "right": 362.8306007385254,
+            "bottom": 758.1610717773438,
+            "left": 49.16342544555664
+          },
+          "checked": false,
+          "stored": {}
+        },
+        "on": {
+          "label": {
+            "x": 50.30786895751953,
+            "y": 632.272216796875,
+            "width": 311.3782958984375,
+            "height": 50.35552978515625,
+            "top": 632.272216796875,
+            "right": 361.68616485595703,
+            "bottom": 682.6277465820312,
+            "left": 50.30786895751953
+          },
+          "ack": {
+            "x": 49.16342544555664,
+            "y": 698.6499633789062,
+            "width": 313.66717529296875,
+            "height": 59.5111083984375,
+            "top": 698.6499633789062,
+            "right": 362.8306007385254,
+            "bottom": 758.1610717773438,
+            "left": 49.16342544555664
+          },
+          "checked": true,
+          "stored": {}
+        },
+        "off": {
+          "label": {
+            "x": 50.30786895751953,
+            "y": 632.272216796875,
+            "width": 311.3782958984375,
+            "height": 50.35552978515625,
+            "top": 632.272216796875,
+            "right": 361.68616485595703,
+            "bottom": 682.6277465820312,
+            "left": 50.30786895751953
+          },
+          "ack": {
+            "x": 49.16342544555664,
+            "y": 698.6499633789062,
+            "width": 313.66717529296875,
+            "height": 59.5111083984375,
+            "top": 698.6499633789062,
+            "right": 362.8306007385254,
+            "bottom": 758.1610717773438,
+            "left": 49.16342544555664
+          },
+          "checked": false,
+          "stored": {}
+        }
+      }
+    },
+    {
+      "entry": {
+        "scrollBehavior": "auto",
+        "scroll": 0,
+        "body": {
+          "x": 46.874534606933594,
+          "y": 331.8316955566406,
+          "width": 318.24493408203125,
+          "height": 428.4871520996094,
+          "top": 331.8316955566406,
+          "right": 365.11946868896484,
+          "bottom": 760.31884765625,
+          "left": 46.874534606933594
+        },
+        "summary": {
+          "x": 49.16342544555664,
+          "y": 345.5650329589844,
+          "width": 313.66717529296875,
+          "height": 135.95046997070312,
+          "top": 345.5650329589844,
+          "right": 362.8306007385254,
+          "bottom": 481.5155029296875,
+          "left": 49.16342544555664
+        },
+        "summaryText": "V173.73　四象塔每層十名敵人，新增鍛造入口，並改善命中閃避、技能操作、背包與戰鬥呈現。",
+        "titleInk": {
+          "x": 77.16059112548828,
+          "y": 169.17755126953125,
+          "width": 257.6669006347656,
+          "height": 77.13076782226562,
+          "top": 169.17755126953125,
+          "right": 334.8274917602539,
+          "bottom": 246.30831909179688,
+          "left": 77.16059112548828
+        },
+        "kind": "acknowledge"
+      }
+    }
+  ],
+  "head": "b67289342afa3f6c779da41ce67471729b561b83",
+  "dirty": false,
+  "viewport": [
+    412,
+    915
+  ],
+  "contexts": [
+    "choice true end -> city -> announcement -> release detail"
+  ],
+  "scenes": [
+    {
+      "name": "choice-real-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "release-entry-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "release-full-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "release-preference-off",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "release-reopen-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    }
+  ],
+  "scope": "Segment17 only: actual owned choice-box entry and true end, header home, announcement -> release detail cross-entry. Assert first visible scrollTop zero, auto scroll behavior, summary and full title visible; true end, preference on/off without acknowledge and unchanged preference storage, header return/reopen. Isolated material fixture only; no choice selection, rewards, trades, acknowledge/update, or guard bypass. Original seen/saveRelics UI sideeffects retained."
+}

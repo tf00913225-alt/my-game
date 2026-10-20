@@ -7372,32 +7372,36 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "b67289342afa3f6c779da41ce67471729b561b83",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/before-f3ee-cross-release.png",
+          "beforeStatus": "真跨頁症狀",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/360x640-release-entry-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/360x640-report.json"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "b67289342afa3f6c779da41ce67471729b561b83",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/393x873-release-entry-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/393x873-report.json"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "b67289342afa3f6c779da41ce67471729b561b83",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/412x915-release-entry-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/412x915-report.json"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "b67289342afa3f6c779da41ce67471729b561b83",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/1280x800-release-entry-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/1280x800-report.json"
         }
       },
       "stateEvidence": [
@@ -7441,31 +7445,71 @@
           "device": "360x640",
           "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-release-title.png",
           "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json",
-          "finding": "長標題／右返完整，但release正文保留舊body scroll而從中段顯示；不是共用header delta造成，下一段修原release呈現Owner。"
+          "finding": "長標題／右返完整，但release正文保留舊body scroll而從中段顯示；不是共用header delta造成，下一段修原release呈現Owner。",
+          "resolvedBy": {
+            "segment": "segment-17",
+            "head": "b67289342afa3f6c779da41ce67471729b561b83",
+            "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted"
+          }
+        },
+        {
+          "state": "長自選真末→主城→公告詳情／回頂摘要／全文末／label toggle還原／返回重開",
+          "status": "已實際驗證",
+          "head": "b67289342afa3f6c779da41ce67471729b561b83",
+          "scope": "僅原呈現導航；無ack/update/選箱交易，原seen/saveRelics UI副作用保留",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/360x640-release-entry-top.png",
+              "end": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/360x640-release-full-end.png",
+              "reopen": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/360x640-release-reopen-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/360x640-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/393x873-release-entry-top.png",
+              "end": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/393x873-release-full-end.png",
+              "reopen": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/393x873-release-reopen-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/393x873-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/412x915-release-entry-top.png",
+              "end": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/412x915-release-full-end.png",
+              "reopen": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/412x915-release-reopen-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/412x915-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/1280x800-release-entry-top.png",
+              "end": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/1280x800-release-full-end.png",
+              "reopen": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/1280x800-release-reopen-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/1280x800-report.json"
+            }
+          ]
         }
       ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "四尺寸首屏／重開／長題與末端實圖限定通過，原雕框/字級/摘要保留",
+        "interaction": "四尺寸真自選末→home→公告→detail，entry/reopen0且auto，全文末/label on-off storage不變，5圖13records",
+        "scope": "原release Owner唯一同步reset在show後同task；實證hiddenbox模型red→green，無rAF/timeout/globalOwner/ack/update/forced/save改動"
       },
       "presentationEvidence": {
-        "segment": "segment-14",
-        "head": "c5904c3e92794e4976d657b04324a1963649fc96",
-        "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
-        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted",
+        "segment": "segment-17",
+        "head": "b67289342afa3f6c779da41ce67471729b561b83",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted",
         "verified": [
-          "真公告入口／查看本次更新／返回"
+          "長自選真末→主城→公告詳情／回頂摘要／全文末／label toggle還原／返回重開"
         ],
         "notVerified": [
-          "領獎/廣告/存檔/刪除/帳號切換/更新/同意隱私",
-          "真帳號/實體手機",
-          "其他未列狀態"
+          "forced真流程/有效update/reload/acknowledge業務狀態",
+          "真網路事故／真帳號／實體裝置",
+          "其他未列跨頁序列"
         ],
         "reviews": {
-          "art": "四尺寸長title/成就末端及其他代表圖限定通過；checkbox四尺寸delta另審",
-          "interaction": "c590四尺寸19scene+privacy PNG；523 checkbox-only四尺寸真toggle，source unchanged/clean",
-          "scope": "原Owner CSS與一句顯示文案；正式生成產物僅sourceDigest，不改控制流程或政策"
+          "art": "四尺寸首屏／重開／長題與末端實圖限定通過，原雕框/字級/摘要保留",
+          "interaction": "四尺寸真自選末→home→公告→detail，entry/reopen0且auto，全文末/label on-off storage不變，5圖13records",
+          "scope": "原release Owner唯一同步reset在show後同task；實證hiddenbox模型red→green，無rAF/timeout/globalOwner/ack/update/forced/save改動"
         }
       }
     },
@@ -14539,7 +14583,40 @@
         "捲動（實際相關時）",
         "返回"
       ],
-      "deviceEvidence": {},
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "b67289342afa3f6c779da41ce67471729b561b83",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/before-f3ee-cross-release.png",
+          "beforeStatus": "真跨頁症狀",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/360x640-release-entry-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/360x640-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "b67289342afa3f6c779da41ce67471729b561b83",
+          "before": null,
+          "beforeStatus": "未拍before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/393x873-release-entry-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/393x873-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "b67289342afa3f6c779da41ce67471729b561b83",
+          "before": null,
+          "beforeStatus": "未拍before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/412x915-release-entry-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/412x915-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "b67289342afa3f6c779da41ce67471729b561b83",
+          "before": null,
+          "beforeStatus": "未拍before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/1280x800-release-entry-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/1280x800-report.json"
+        }
+      },
       "stateEvidence": [
         {
           "state": "正式acknowledge入口／長標完整／真末端／header返回；checkbox delta on/off",
@@ -14573,26 +14650,66 @@
             }
           ],
           "scope": "固定Head呈現/導航；fixture、原政策viewer入口與checkbox無持久化範圍見第14段"
+        },
+        {
+          "state": "長自選真末→主城→公告詳情／回頂摘要／全文末／label toggle還原／返回重開",
+          "status": "已實際驗證",
+          "head": "b67289342afa3f6c779da41ce67471729b561b83",
+          "scope": "僅原呈現導航；無ack/update/選箱交易，原seen/saveRelics UI副作用保留",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/360x640-release-entry-top.png",
+              "end": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/360x640-release-full-end.png",
+              "reopen": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/360x640-release-reopen-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/360x640-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/393x873-release-entry-top.png",
+              "end": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/393x873-release-full-end.png",
+              "reopen": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/393x873-release-reopen-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/393x873-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/412x915-release-entry-top.png",
+              "end": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/412x915-release-full-end.png",
+              "reopen": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/412x915-release-reopen-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/412x915-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/1280x800-release-entry-top.png",
+              "end": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/1280x800-release-full-end.png",
+              "reopen": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/1280x800-release-reopen-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted/1280x800-report.json"
+            }
+          ]
         }
       ],
       "presentationEvidence": {
-        "segment": "segment-14",
-        "head": "c5904c3e92794e4976d657b04324a1963649fc96",
-        "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
-        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted",
+        "segment": "segment-17",
+        "head": "b67289342afa3f6c779da41ce67471729b561b83",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment17-accepted",
         "verified": [
-          "正式acknowledge入口／長標完整／真末端／header返回；checkbox delta on/off"
+          "長自選真末→主城→公告詳情／回頂摘要／全文末／label toggle還原／返回重開"
         ],
         "notVerified": [
-          "領獎/廣告/存檔/刪除/帳號切換/更新/同意隱私",
-          "真帳號/實體手機",
-          "其他未列狀態"
+          "forced真流程/有效update/reload/acknowledge業務狀態",
+          "真網路事故／真帳號／實體裝置",
+          "其他未列跨頁序列"
         ],
         "reviews": {
-          "art": "四尺寸長title/成就末端及其他代表圖限定通過；checkbox四尺寸delta另審",
-          "interaction": "c590四尺寸19scene+privacy PNG；523 checkbox-only四尺寸真toggle，source unchanged/clean",
-          "scope": "原Owner CSS與一句顯示文案；正式生成產物僅sourceDigest，不改控制流程或政策"
+          "art": "四尺寸首屏／重開／長題與末端實圖限定通過，原雕框/字級/摘要保留",
+          "interaction": "四尺寸真自選末→home→公告→detail，entry/reopen0且auto，全文末/label on-off storage不變，5圖13records",
+          "scope": "原release Owner唯一同步reset在show後同task；實證hiddenbox模型red→green，無rAF/timeout/globalOwner/ack/update/forced/save改動"
         }
+      },
+      "reviews": {
+        "art": "四尺寸首屏／重開／長題與末端實圖限定通過，原雕框/字級/摘要保留",
+        "interaction": "四尺寸真自選末→home→公告→detail，entry/reopen0且auto，全文末/label on-off storage不變，5圖13records",
+        "scope": "原release Owner唯一同步reset在show後同task；實證hiddenbox模型red→green，無rAF/timeout/globalOwner/ack/update/forced/save改動"
       }
     },
     {
@@ -15271,6 +15388,16 @@
         "其餘19件秘寶的個別效果長文／獲取來源／詳細狀態尚未逐件巡查",
         "Latest Head必要CI未完／尚未合併部署",
         "逐件秘寶效果內頁、委託／材料合成／背包物品及其餘台帳"
+      ]
+    },
+    {
+      "segment": "segment-17",
+      "head": "b67289342afa3f6c779da41ce67471729b561b83",
+      "result": "原公告共享body隱藏時回頂無效，顯示後同task回頂修復；四尺寸真crossflow/全文末/偏好toggle還原/重開限定通過",
+      "pending": [
+        "Latest Head必要CI與部署未完",
+        "其他19件秘寶詳情、委託／材料／物品／其餘台帳",
+        "實體裝置／未列業務狀態"
       ]
     }
   ],
