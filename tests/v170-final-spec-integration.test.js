@@ -27,6 +27,7 @@ const EXPECTED_DIRECT_SCRIPT_PATHS=[
     "functions/src/account-mode-time-policy.js",
     "functions/src/exp-pool-catch-up-policy.js",
     "functions/src/inventory-stack-policy.js",
+    "functions/src/skill-progression-core.js",
     "js/00-main.js",
     "js/01-stage-v8-touch-lock.js",
     "js/02-stage-v9-native-coordinate-api.js",
@@ -79,7 +80,7 @@ const EXPECTED_RUNTIME_PATHS=[
     "js/49-v169-element-box-settings.js",
     "js/50-v169-water-skill-rules.js",
     "js/51-v169-rpg-ui.js",
-    "functions/src/skill-progression-core.js","js/60-v173.64-skill-progression-rebalance.js",
+    "js/60-v173.64-skill-progression-rebalance.js",
     "js/59-abyss-two-tier-runtime.js",
 ];
 

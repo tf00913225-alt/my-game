@@ -7981,6 +7981,12 @@ function syncUnitArtwork(card,kind,selectedRecord){
     art.style.backgroundImage=source||"none";
     let action=art.querySelector(":scope > .v174-action-motion");
     if(!action){action=document.createElement("div");action.className="v174-action-motion";art.appendChild(action);}
+    // One stationary manual-turn marker shares the formal art frame. CSS uses
+    // the existing active-turn state; no second selection or coordinate owner.
+    if(kind==="player"&&!art.querySelector(":scope > .v174-manual-turn-arrow")){
+        const arrow=document.createElement("span");arrow.className="v174-manual-turn-arrow";
+        arrow.setAttribute("aria-hidden","true");art.appendChild(arrow);
+    }
     let paint=action.querySelector(":scope > .v174-portrait-paint");
     if(record?.generic){if(paint)paint.remove();paint=null;}
     else if(!paint){paint=document.createElement("div");paint.className="v174-portrait-paint";action.appendChild(paint);}
@@ -8128,9 +8134,21 @@ function prepareUnitHud(card,side){
         hud.v174Card=card;
         card.v174UnitHud=hud;
         card.appendChild(hud);
+        if(side==="monster")hud.addEventListener("click",event=>{
+            const band=event.target?.closest?.('.monster-status-badges');
+            if(event.defaultPrevented||!band||!hud.contains(band)||card.contains(hud)||!card.isConnected)return;
+            // Detached HUDs preserve the original Core card target/detail click.
+            // In-card badges bubble normally; the gesture Owner suppresses drags.
+            event.stopPropagation();card.click();
+        });
     }
     card.querySelectorAll(HUD_SELECTOR).forEach(node=>hud.appendChild(node));
     hud.dataset.boss=String(card.classList.contains("gameplay-boss-card"));
+    if(side==="monster")hud.dataset.enemyProfile=card.closest('#battlePage')?.dataset.enemyBattlefieldProfile||"";
+    if(side==="monster"){
+        const badges=hud.querySelector('.monster-status-badges');
+        if(badges)badges.dataset.scrollOwner="x";
+    }
     hud.dataset.anchor=side==="monster"?"top":"bottom";
     syncIdentity(card,side);
     return hud;
@@ -8145,7 +8163,10 @@ function clearUnitHud(side){
             for(const property of ["left","top","width","height","transform","opacity","visibility"]){ hud.style.removeProperty(property); }
         }else{ if(card){ card.v174UnitHud=null; } hud.remove(); }
     });
-    if(!hudLayer.children.length){ hudLayer.remove(); hudLayer=null; }
+    if(!hudLayer.children.length){
+        window.FourSymbolsGestureArbiter?.unregisterSurface?.(hudLayer);
+        hudLayer.remove();hudLayer=null;
+    }
 }
 function syncHud(){
     const page=document.getElementById("battlePage");
@@ -8167,6 +8188,7 @@ function syncHud(){
             hudLayer=document.createElement("div");
             hudLayer.className="v174-battle-hud-layer";
             document.body.appendChild(hudLayer);
+            window.FourSymbolsGestureArbiter?.registerSurface?.(hudLayer);
         }
         hudLayer.appendChild(hud);
         hud.style.visibility="visible";
@@ -8687,6 +8709,11 @@ ensureFunctionalStyles();runRepairs();
         const indexes=activeEnemyIndexes();
         const snapshot=activeEnemySnapshot(indexes);
         if(!snapshot){ return; }
+        // Presentation consumes this canonical profile while preparing the HUD.
+        // Publish before the first card, including initial entry/profile changes.
+        area.dataset.battlefieldProfile=snapshot.battlefieldProfile;
+        const page=document.getElementById("battlePage");
+        if(page){ page.dataset.enemyBattlefieldProfile=snapshot.battlefieldProfile; }
 
         const cards=new Map();
         indexes.forEach(index=>{
@@ -8736,9 +8763,6 @@ ensureFunctionalStyles();runRepairs();
         area.dataset.geometryOwner="fixed-slot";
         area.dataset.monsterCount=String(indexes.length);
         area.dataset.formationType=String(snapshot.originalFormationType||indexes.length);
-        area.dataset.battlefieldProfile=snapshot.battlefieldProfile;
-        const page=document.getElementById("battlePage");
-        if(page){ page.dataset.enemyBattlefieldProfile=snapshot.battlefieldProfile; }
         area.dataset.migrationStatus=snapshot.migrationStatus;
         area.classList.toggle("gameplay-boss-active",!!bossCard);
     }
@@ -8939,7 +8963,10 @@ ensureFunctionalStyles();runRepairs();
                 "--portrait-baseline":style.getPropertyValue("--portrait-baseline")
             };
         }
-        const hudRects=hudNodes
+        const statusBadge=targetSide==="monster"?hud.querySelector('.monster-status-badges'):null;
+        const badgeRect=statusBadge?plainRect(statusBadge.getBoundingClientRect()):null;
+        const statusBadgeRect=badgeRect&&badgeRect.width>0&&badgeRect.height>0?badgeRect:null;
+        const hudRects=hudNodes.filter(node=>node!==statusBadge)
             .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
             .filter(rect=>rect&&rect.width>0&&rect.height>0);
         const hudTop=hudRects.length?Math.min(...hudRects.map(rect=>rect.top)):unitRect.bottom;
@@ -8964,7 +8991,9 @@ ensureFunctionalStyles();runRepairs();
         // projection and reserve feedback below it; allies retain bottom HUDs.
         if(hud.dataset?.anchor==="top"){
             feedbackTop=Math.max(unitRect.top+6,Math.min(unitRect.bottom-24,hudBottom+8));
-            feedbackBottom=unitRect.bottom-6;
+            feedbackBottom=Math.min(unitRect.bottom-6,statusBadgeRect?statusBadgeRect.top-4:unitRect.bottom-6);
+            feedbackBottom=Math.max(unitRect.top+6,feedbackBottom);
+            feedbackTop=Math.min(feedbackTop,feedbackBottom);
         }
         const feedbackSafeRect={
             left:unitRect.left+4,top:feedbackTop,right:unitRect.right-4,bottom:feedbackBottom,
@@ -8983,7 +9012,7 @@ ensureFunctionalStyles();runRepairs();
         return {
             hudSurface:hudSurface,
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
-            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,spRect:spRect,artworkProjection:artworkProjection,hpProjection:hpProjection,spProjection:spProjection,hudSafeRect:hudSafeRect,
+            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,spRect:spRect,artworkProjection:artworkProjection,hpProjection:hpProjection,spProjection:spProjection,hudSafeRect:hudSafeRect,statusBadgeRect:statusBadgeRect,
             feedbackSafeRect:feedbackSafeRect,
             center:{x:unitRect.left+unitRect.width/2,y:unitRect.top+unitRect.height/2},
             feedbackAnchor:{
@@ -9376,143 +9405,6 @@ ensureFunctionalStyles();runRepairs();
 })();
 
 
-/* bundled source: functions/src/skill-progression-core.js */
-/* Shared player skill progression rules. No persistence, UI or combat execution. */
-(function installSkillProgressionCore(global){
-"use strict";
-const SKILL_UPGRADE_COST_BY_TARGET_LEVEL=Object.freeze({
-        2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1
-    });
-const createRulesV1=function(catalog,damageSkillIds){
-if(!catalog||typeof catalog!=="object"||Array.isArray(catalog)||!Array.isArray(damageSkillIds)){throw new TypeError("skill catalogue and damage classifications required");}
-const PLAYER_DAMAGE_SKILL_ID_SET=new Set(damageSkillIds);
-function numeric(value,fallback){
-        const number=Number(value);
-        return Number.isFinite(number)?number:(fallback===undefined?0:fallback);
-    }
-function skillById(id){ return catalog[id]||null; }
-function skillLabel(skillId){
-        const skill=skillById(skillId);
-        return skill&&skill.name?skill.name:String(skillId||"");
-    }
-function getInitialLearnCost(character,skill){
-        const base=Math.max(0,Math.floor(numeric(skill&&skill.learnCost)));
-        const cross=!!(character&&skill&&character.element&&skill.element&&character.element!==skill.element);
-        return base*(cross?2:1);
-    }
-function initialLearnCost(context,skill){ return Math.max(0,Math.floor(numeric(getInitialLearnCost(context&&context.character,skill)))); }
-function getRequiredCharacterLevelForSkillLevel(skill,targetSkillLevel){
-        const learnLevel=Math.max(1,Math.floor(numeric(skill&&skill.learnLevel,1)));
-        const target=Math.max(1,Math.floor(numeric(targetSkillLevel,1)));
-        if(target<=1){ return learnLevel; }
-        /* Absolute character-level gates; never offset by learnLevel. */
-        const maxLevel=Math.max(1,Math.floor(numeric(skill&&skill.maxLevel,1)));
-        if(maxLevel<=1){ return Infinity; }
-        if(PLAYER_DAMAGE_SKILL_ID_SET.has(skill&&skill.id)){
-            return Math.min(90,Math.max(10,(target-1)*10));
-        }
-        return Math.min(80,Math.max(20,(target-1)*20));
-    }
-function getUpgradeCostForTargetLevel(skill,targetSkillLevel){
-        if(!skill||numeric(skill.maxLevel,1)<=1){ return 0; }
-        return numeric(SKILL_UPGRADE_COST_BY_TARGET_LEVEL[Math.floor(numeric(targetSkillLevel))],0);
-    }
-function getSkillUpgradeEligibility(character,skill,currentSkillLevel){
-        const current=Math.max(0,Math.floor(numeric(currentSkillLevel)));
-        const maxLevel=Math.max(1,Math.floor(numeric(skill&&skill.maxLevel,1)));
-        const target=current+1;
-        const requiredLevel=target<=maxLevel
-            ?getRequiredCharacterLevelForSkillLevel(skill,target):Infinity;
-        const characterLevel=Math.max(1,Math.floor(numeric(character&&character.level,1)));
-        const cost=target<=maxLevel?getUpgradeCostForTargetLevel(skill,target):0;
-        const points=Math.max(0,Math.floor(numeric(character&&character.skillPoints)));
-        const learned=current>0;
-        const atMax=learned&&current>=maxLevel;
-        const levelOk=learned&&!atMax&&characterLevel>=requiredLevel;
-        const pointsOk=learned&&!atMax&&points>=cost;
-        let reason="";
-        if(!skill){ reason="技能資料不存在"; }
-        else if(!learned){ reason="請先學會此技能"; }
-        else if(atMax){ reason="已達最高技能等級"; }
-        else if(!levelOk){ reason="需要角色 Lv"+requiredLevel; }
-        else if(!pointsOk){ reason="技能點不足，需要"+cost+"點"; }
-        return Object.freeze({allowed:!!(skill&&levelOk&&pointsOk),currentLevel:current,
-            targetLevel:target,maxLevel,requiredLevel,levelOk,pointsOk,cost,reason});
-    }
-function isCrossElementSkill(character,skill){
-        return !!(character&&skill&&character.element&&skill.element&&character.element!==skill.element);
-    }
-function hasLearnedNativeSkill(context){
-        const levels=context&&context.loadout&&context.loadout.skillLevels||{};
-        return Object.keys(levels).some(id=>numeric(levels[id])>0&&skillById(id)&&skillById(id).element===context.character.element);
-    }
-function crossLearnGate(context,skill){
-        if(!isCrossElementSkill(context.character,skill)){ return {ok:true,cross:false}; }
-        if(/EX$/.test(String(skill.id||""))||skill.category==="passive"){
-            return {ok:false,cross:true,reason:"本命元素限定"};
-        }
-        if(!hasLearnedNativeSkill(context)){
-            return {ok:false,cross:true,reason:"需先學會至少 1 招本命元素技能"};
-        }
-        return {ok:true,cross:true};
-    }
-function prerequisiteMet(levels,skill){
-        const required=Array.isArray(skill&&skill.requires)?skill.requires.filter(Boolean):[];
-        if(!required.length){ return true; }
-        return required.some(skillId=>numeric(levels&&levels[skillId])>0);
-    }
-function prerequisiteLabel(skill){
-        const required=Array.isArray(skill&&skill.requires)?skill.requires.filter(Boolean):[];
-        if(!required.length){ return "無"; }
-        return required.map(skillLabel).join(" 或 ");
-    }
-function getSkillLearnEligibility(character,skill,levels){
-        const safeCharacter=character||null;
-        const safeSkill=skill||null;
-        const safeLevels=levels||{};
-        const cross=isCrossElementSkill(safeCharacter,safeSkill);
-        const native=!cross;
-        const crossGate=crossLearnGate({character:safeCharacter,loadout:{skillLevels:safeLevels}},safeSkill);
-        const levelOk=!!(safeCharacter&&safeSkill&&
-            Math.max(1,Math.floor(numeric(safeCharacter.level,1)))>=
-            getRequiredCharacterLevelForSkillLevel(safeSkill,1));
-        const prerequisiteRequired=!cross;
-        const prerequisiteOk=!prerequisiteRequired||prerequisiteMet(safeLevels,safeSkill);
-        const learnCost=initialLearnCost({character:safeCharacter},safeSkill);
-        const points=Math.max(0,Math.floor(numeric(safeCharacter&&safeCharacter.skillPoints)));
-        const pointsOk=points>=learnCost;
-        const allowed=!!(safeSkill&&levelOk&&crossGate.ok&&prerequisiteOk&&pointsOk);
-        let reason="";
-        if(!safeSkill){ reason="技能資料不存在"; }
-        else if(!levelOk){ reason="Lv"+safeSkill.learnLevel+" 解鎖"; }
-        else if(!crossGate.ok){ reason=crossGate.reason; }
-        else if(!prerequisiteOk){ reason="需先學習："+prerequisiteLabel(safeSkill); }
-        else if(!pointsOk){ reason="需要"+learnCost+"點"; }
-        return Object.freeze({
-            isCrossElement:cross,
-            isNativeElement:native,
-            allowed,
-            levelOk,
-            prerequisiteRequired,
-            prerequisiteOk,
-            learnCost,
-            pointsOk,
-            crossGateOk:!!crossGate.ok,
-            reason
-        });
-    }
-return Object.freeze({getInitialLearnCost,initialLearnCost,getRequiredCharacterLevelForSkillLevel,getUpgradeCostForTargetLevel,getSkillUpgradeEligibility,isCrossElementSkill,prerequisiteLabel,getSkillLearnEligibility,upgradeCosts:SKILL_UPGRADE_COST_BY_TARGET_LEVEL});
-};
-const createRules=createRulesV1;
-const getRulesForVersion=function(version,catalog,damageSkillIds){
-if(version==="v1"){return createRulesV1(catalog,damageSkillIds);}
-throw new RangeError("Unsupported skill progression rules version");
-};
-global.FourSymbolsSkillProgressionCore=Object.freeze({createRules,getRulesForVersion,upgradeCosts:SKILL_UPGRADE_COST_BY_TARGET_LEVEL});
-if(typeof module!=="undefined"&&module.exports){module.exports=global.FourSymbolsSkillProgressionCore;}
-})(typeof window!=="undefined"?window:globalThis);
-
-
 /* bundled source: js/60-v173.64-skill-progression-rebalance.js */
 /* =====================================================
    V173.64 — 四元素技能成長節奏正式 owner
@@ -9538,6 +9430,7 @@ if(typeof module!=="undefined"&&module.exports){module.exports=global.FourSymbol
     ]);
     const PLAYER_DAMAGE_SKILL_ID_SET=new Set(PLAYER_DAMAGE_SKILL_IDS);
     const progression=window.FourSymbolsSkillProgressionCore.createRules(skillDatabase,PLAYER_DAMAGE_SKILL_IDS);
+    const loadoutRules=window.FourSymbolsSkillProgressionCore.getLoadoutRulesForVersion("v1",skillDatabase);
     const FIRE_MOMENTUM_BY_LEVEL=Object.freeze([12,15,18,21,25]);
     const BLOOD_BURN_HP_COST_BY_LEVEL=Object.freeze([20,25,30,35,40]);
     const BLOOD_BURN_BY_LEVEL=Object.freeze([20,25,30,35,50]);
@@ -10159,14 +10052,9 @@ if(typeof module!=="undefined"&&module.exports){module.exports=global.FourSymbol
     const initialLearnCost=progression.initialLearnCost;
     function normalizeCrossElementEquip(loadout,character){
         if(!loadout||!character||!Array.isArray(loadout.equippedSkills)){ return false; }
-        let seen=false,changed=false;
-        loadout.equippedSkills=loadout.equippedSkills.filter(skillId=>{
-            const skill=skillById(skillId);
-            if(!skill||!isCrossElementSkill(character,skill)){ return true; }
-            if(!seen){ seen=true; return true; }
-            changed=true; return false;
-        }).slice(0,4);
-        return changed;
+        const result=loadoutRules.normalizeCrossElementEquip(loadout.equippedSkills,character);
+        loadout.equippedSkills=result.equippedSkills;
+        return result.changed;
     }
     function normalizeAllCrossElementEquips(){
         if(typeof characterSkillLoadouts==="undefined"||!characterSkillLoadouts){ return false; }
@@ -10257,16 +10145,12 @@ if(typeof module!=="undefined"&&module.exports){module.exports=global.FourSymbol
 
     if(typeof equipSkill==="function"){
         equipSkill=function(skillId){
-            const skill=skillById(skillId),context=getSkillContext();
-            if(!skill||!context.character||!context.loadout||learnedLevel(context,skillId)<=0){ return false; }
-            normalizeCrossElementEquip(context.loadout,context.character);
-            const equipped=context.loadout.equippedSkills=context.loadout.equippedSkills||[];
-            if(equipped.includes(skillId)){ return true; }
-            if(isCrossElementSkill(context.character,skill)&&equipped.some(id=>{
-                const equippedSkill=skillById(id); return equippedSkill&&isCrossElementSkill(context.character,equippedSkill);
-            })){ return notify("每名角色最多攜帶 1 招跨元素技能。"); }
-            if(equipped.length>=4){ return notify("每個角色最多只能攜帶4個技能。"); }
-            equipped.push(skillId);
+            const context=getSkillContext(),result=loadoutRules.equipSkill(context.character,context.loadout,skillId);
+            if(result.status==="invalid"){ return false; }
+            context.loadout.equippedSkills=result.equippedSkills;
+            if(result.status==="already-equipped"){ return true; }
+            if(result.status==="cross-limit"){ return notify("每名角色最多攜帶 1 招跨元素技能。"); }
+            if(result.status==="full"){ return notify("每個角色最多只能攜帶4個技能。"); }
             if(typeof populateAutoSkillOptions==="function"){ populateAutoSkillOptions(); }
             if(typeof populateAutoSkillOptions2==="function"){ populateAutoSkillOptions2(); }
             finalizeSkillMutation();

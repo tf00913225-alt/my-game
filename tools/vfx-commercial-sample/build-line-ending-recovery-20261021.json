@@ -1,0 +1,18 @@
+{
+  "workId": "BATTLE-PORTRAIT-DEPTH-20261020",
+  "failedHead": "140cfc344af6f0feac4289acb7135adb42318d12",
+  "ci": 39487208312,
+  "firstProvenFailure": "core_checks118851085918: served bundles and original atlas must match their hashes; UI118851086106 reports app-shell resource-error",
+  "oldBundle": "build/app-shell.f4db21e7e021.js",
+  "oldWorkingTreeSha256": "f4db21e7e021f6207b733475a46415be4d2714cd03652526a89bcf37f9334967",
+  "oldCommittedSha256": "04cfaeb6f34d056db57db309c25ba9b3a9d0c514493a7f4b3b22eb7e5a7af743",
+  "workingTreeCrlfCount": 127,
+  "committedCrlfCount": 0,
+  "cause": "Text bundle was hashed before Git normalized CRLF. Committed served bytes then disagreed with filename and manifest; local fresh boot could pass against the unnormalized working tree.",
+  "fix": "Existing production target Owner normalizes text line endings before hashing and writing; binary assets and accepted source owners unchanged. No integrity check relaxation.",
+  "newBundle": "build/app-shell.04cfaeb6f34d.js",
+  "focusedValidation": "Cross-line-ending filename/content/hash and JS runtime-equivalence regression3 PASS; original served-asset, corruption and wrong-SHA verification5 PASS; official build/build-check/diff-check PASS",
+  "stagedBlobVerification": "git show :build/app-shell.04cfaeb6f34d.js SHA256=04cfaeb6f34d056db57db309c25ba9b3a9d0c514493a7f4b3b22eb7e5a7af743, CRLF0, filename matches",
+  "independentReview": "coverage_review PASS; new04cfa fresh-origin boot reaches READY with runtimeExceptions0/serverFailures0; artifacts/boot-appshell-diagnosis/evidence.json",
+  "remaining": "Latest-Head required CI. Separate Chrome pre-navigation failures are not resolved by this evidence."
+}

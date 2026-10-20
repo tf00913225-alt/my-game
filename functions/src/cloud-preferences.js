@@ -48,4 +48,28 @@ function normalizePreferences(value){
     }
     return normalized;
 }
-module.exports={CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences};
+// Canonical-only v2. The public v1 envelope keeps its original exact reader.
+// Presence is evidence: neither remembered choice nor intent is inferred.
+function normalizeCanonicalPreferencesV2(value){
+    if(!exactKeys(value,[...CONFIG_KEYS,"characterIds"])){
+        throw new CloudPreferencesError("Only character-bound auto-battle configurations are permitted.");
+    }
+    const base={characterIds:value.characterIds},optional=["v136ActionIntent","v136LastSkill"];
+    for(const key of CONFIG_KEYS){
+        const config=value[key];
+        if(!plain(config)||CONFIG_FIELDS.some(field=>!Object.hasOwn(config,field))||
+           Object.keys(config).some(field=>!CONFIG_FIELDS.includes(field)&&!optional.includes(field))||
+           (Object.hasOwn(config,"v136ActionIntent")&&!["normal","defend","skill"].includes(config.v136ActionIntent))||
+           (Object.hasOwn(config,"v136LastSkill")&&(typeof config.v136LastSkill!=="string"||
+               !SKILL_ID.test(config.v136LastSkill)||config.v136LastSkill.match(SKILL_ID)[0]!==config.v136LastSkill))){
+            throw new CloudPreferencesError(`${key} has invalid canonical v2 preference fields.`);
+        }
+        base[key]=Object.fromEntries(CONFIG_FIELDS.map(field=>[field,config[field]]));
+    }
+    const normalized=normalizePreferences(base);
+    for(const key of CONFIG_KEYS)for(const field of optional){
+        if(Object.hasOwn(value[key],field))normalized[key][field]=value[key][field];
+    }
+    return normalized;
+}
+module.exports={CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences,normalizeCanonicalPreferencesV2};

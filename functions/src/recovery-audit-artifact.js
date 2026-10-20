@@ -1,6 +1,7 @@
 "use strict";
 
 const {createHash}=require("node:crypto");
+const {isUtf8}=require("node:buffer");
 const {performance}=require("node:perf_hooks");
 
 // A candidate data format, not a trusted capture certificate or restore source.
@@ -410,8 +411,9 @@ function rawArchiveBase64(text,maximum,token){
     if(length<1||length>maximum)bad("raw archive payload size");
     assemblyCharge(token,"bytes",length);
     const bytes=Buffer.from(text,"base64");
-    assemblyCharge(token,"bytes",text.length);
-    if(bytes.length!==length||bytes.toString("base64")!==text)bad("raw archive base64");
+    assemblyCharge(token); // Preserve sticky/deadline checks after decoding.
+    // Alphabet, padding and zero pad bits uniquely determine canonical base64.
+    if(bytes.length!==length)bad("raw archive base64");
     return bytes;
 }
 // Resource oracle only: it emits no JSON/bytes and changes no value semantics.
@@ -542,9 +544,11 @@ function encodeRawRecoveryArchive(material,token){
     }
     assemblyCharge(token,"bytes",size);const bytes=Buffer.alloc(size);MAGIC.copy(bytes);writeCandidateFrames(bytes,MAGIC.length,frames,token);return bytes;
 }
-function decodeRawRecoveryArchive(input,token){
+function decodeRawRecoveryArchive(input,token,expectedSha256){
     rawArchiveBudget(token);assemblyCharge(token,"passes",1);
-    const {frames,bytes}=readRecoveryFrames(input,token,true);
+    if(expectedSha256!==undefined&&(typeof expectedSha256!=="string"||expectedSha256.length!==64||!/^[a-f0-9]{64}$/.test(expectedSha256)))
+        bad("raw archive expected hash");
+    const {frames,bytes}=readRecoveryFrames(input,token,true,expectedSha256);
     if(frames.length<5)bad("raw archive header/footer");
     const header=frames[0],footer=frames.at(-1);
     if(header.type!=="header"||header.schemaVersion!==3||header.kind!=="canonical-recovery-raw-archive")bad("raw archive version");
@@ -576,12 +580,16 @@ function decodeRawRecoveryArchive(input,token){
        createHash("sha256").update(bytes.subarray(0,footerOffset)).digest("hex")!==footer.framesSha256)bad("raw archive frames hash");
     return material;
 }
-function readRecoveryFrames(bytes,assemblyBudget,rawArchive=false){
+function readRecoveryFrames(bytes,assemblyBudget,rawArchive=false,expectedSha256){
     if(!Buffer.isBuffer(bytes)||bytes.length>LIMITS.bytes||!bytes.subarray(0,MAGIC.length).equals(MAGIC))bad("bytes or magic");
     assemblyDecodeBytes(assemblyBudget,bytes.length,false);
     // Copy before parsing: a caller cannot mutate the verified byte array later.
     if(rawArchive)assemblyCharge(assemblyBudget,"bytes",bytes.length);
     bytes=Buffer.from(bytes);
+    if(expectedSha256!==undefined){
+        assemblyCharge(assemblyBudget,"bytes",bytes.length);
+        if(createHash("sha256").update(bytes).digest("hex")!==expectedSha256)bad("raw archive expected hash differs");
+    }
     const frames=[];let offset=MAGIC.length,nodeCount=0;
     while(offset<bytes.length){
         if(frames.length>=LIMITS.frames||offset+4>bytes.length)bad("frame boundary");
@@ -613,8 +621,13 @@ function readRecoveryFrames(bytes,assemblyBudget,rawArchive=false){
             assemblyCharge(assemblyBudget,"bytes",length);
             const canonical=JSON.stringify(frame);
             if(canonical!==text)bad("noncanonical JSON");
-            assemblyCharge(assemblyBudget,"bytes",length);
-            if(!Buffer.from(canonical).equals(raw))bad("noncanonical JSON");
+            // Valid UTF-8 has one byte encoding; canonical===text above already
+            // proves the decoded spelling without another encoded Buffer.
+            // Node22: https://github.com/nodejs/node/blob/v22.x/doc/api/buffer.md#bufferisutf8input
+            assemblyCharge(assemblyBudget);
+            const validUtf8=isUtf8(raw);
+            assemblyCharge(assemblyBudget);
+            if(!validUtf8)bad("noncanonical JSON");
         }else if(JSON.stringify(frame)!==text||!Buffer.from(text).equals(raw))bad("noncanonical JSON");
         frames.push(frame);
     }

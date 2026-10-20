@@ -32,3 +32,27 @@ pointer("pointerdown",14);listeners.get("stage:pointerleave")({target,pointerId:
 pointer("pointerdown",15);listeners.get("stage:pointerleave")({target:stage,pointerId:15});assert.equal(click(15),true,"leaving the stage cancels that gesture");assert.equal(tap(15),false);
 assert.doesNotMatch(fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8"),/suppressedTargets|touchend/);
 console.log("✓ gesture-scoped suppression, no-click recovery, cancel, expiry, delayed click, multitouch and re-entry");
+
+// Detached HUDs use this same arbiter, not a second drag detector or document click hook.
+{
+ const handlers=new Map(),surfaceHandlers=new Map();let adds=0,clock=0;
+ const surface={nodeType:1,parentElement:null,isConnected:true,addEventListener(name,fn){adds++;surfaceHandlers.set(name,fn);},removeEventListener(name,fn){assert.equal(surfaceHandlers.get(name),fn);surfaceHandlers.delete(name);},contains(node){for(let n=node;n;n=n.parentElement)if(n===this)return true;return false;}};
+ const band={nodeType:1,parentElement:surface,isConnected:true,clientWidth:72,scrollWidth:120,clientHeight:24,scrollHeight:24,getAttribute:name=>name==='data-scroll-owner'?'x':null,closest(){return null;},contains:n=>n===band};
+ const document={documentElement:{},hidden:false,getElementById(){return null;},addEventListener(name,fn){handlers.set(name,fn);}};
+ const window={addEventListener(){},getComputedStyle:n=>n===band?{overflowX:'auto',overflowY:'hidden'}:{overflowX:'visible',overflowY:'visible'}};
+ vm.runInNewContext(fs.readFileSync('js/01-stage-v8-touch-lock.js','utf8'),{window,document,Date:{now:()=>clock},Math,Number,Map});
+ const owner=window.FourSymbolsGestureArbiter;
+ const pointer=(name,id,x=0)=>handlers.get(name)({target:band,pointerId:id,pointerType:'touch',clientX:x,clientY:0});
+ const click=(id,detail=1)=>{let suppressed=false;surfaceHandlers.get('click')({target:band,pointerId:id,detail,preventDefault(){suppressed=true;},stopImmediatePropagation(){}});return suppressed;};
+ pointer('pointerdown',20);assert.equal(owner.getState(20),null,'unregistered body content is outside the game input contract');
+ assert.equal(owner.registerSurface(surface),true);assert.equal(owner.registerSurface(surface),true);assert.equal(adds,2,'register is idempotent: exactly one capture click and one leave handler');
+ pointer('pointerdown',21);assert.equal(owner.getState(21).scrollOwner.node,band);assert.equal(owner.getState(21).scrollOwner.axes,'x');pointer('pointermove',21,30);assert.equal(owner.getState(21).state,'SCROLL');pointer('pointerup',21,30);assert.equal(click(21),true,'horizontal drag cannot leak a compatibility click into card forwarding');assert.equal(click(21),false,'one completion is consumed once');
+ pointer('pointerdown',22);pointer('pointerup',22);assert.equal(click(22),false,'ordinary detached HUD tap reaches the original card handler');
+ pointer('pointerdown',23);pointer('pointermove',23,30);pointer('pointerup',23,30);assert.equal(click(23,0),false,'keyboard/programmatic activation stays available');
+ let pinchPrevented=false;handlers.get('touchmove')({target:band,touches:[{},{}],preventDefault(){pinchPrevented=true;}});assert.equal(pinchPrevented,true,'registered HUD inherits the original pinch guard');
+ pointer('pointerdown',24);assert.equal(owner.getState(24).state,'TAP');band.parentElement=null;owner.unregisterSurface(surface);assert.equal(owner.getState(24),null,'removing a HUD surface retires its in-flight gesture');assert.equal(surfaceHandlers.size,0);assert.equal(owner.unregisterSurface(surface),false);
+ band.parentElement=surface;owner.registerSurface(surface);pointer('pointerdown',25);pointer('pointermove',25,30);pointer('pointerup',25,30);band.parentElement=null;owner.unregisterSurface(surface);band.parentElement=surface;owner.registerSurface(surface);assert.equal(click(25),false,'removed HUD completion cannot suppress a future reattached surface');
+ pointer('pointerdown',26);pointer('pointerup',26);assert.equal(click(26),false,'new HUD surface still taps normally');
+ assert.equal(handlers.has('click'),false,'no document-wide click interception was added');
+}
+console.log('✓ managed detached HUD surface: horizontal scroll, tap forwarding boundary, pinch, lifecycle and single-owner suppression');

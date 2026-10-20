@@ -67,7 +67,7 @@ test("battle information is retired and turn timer remains visible",()=>{
   assert.match(mainCss,/#battlePage\{[\s\S]*?--battle-command-row-height:66px;[\s\S]*?--battle-command-art-overhang:0px;[\s\S]*?--battle-command-visual-height:calc\(var\(--battle-command-row-height\) \+ var\(--battle-command-art-overhang\)\);/);
   assert.doesNotMatch(mainCss,/--battle-center-min-height/);
   assert.doesNotMatch(css,/--battle-command-row-height:66px|--battle-command-art-overhang:0px/);
-  assert.match(css,/grid-template-rows:[\s\S]*?minmax\(0,var\(--battle-center-region-track\)\)/);
+  assert.match(css,/grid-template-rows:[\s\S]*?minmax\(var\(--battle-center-min-height\),var\(--battle-center-region-track\)\)/);
   assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?position:absolute;[\s\S]*?top:0;[\s\S]*?bottom:auto;/);
 });
 
@@ -138,12 +138,21 @@ test("battle target selection avoids the dense compositor and unrelated global U
   assert.doesNotMatch(selectBlock,/updateUI\(\)/);
   assert.match(fixed,/\.battle-monster\.v174-cardless-unit\.targetable::after,[\s\S]*?\.battle-player\.v174-cardless-unit\.ally-targetable:not\(\.active-turn\)::after\{[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
   assert.match(fixed,/\.battle-player\.v174-cardless-unit\.ally-targetable::before,[\s\S]*?\.battle-monster\.v174-cardless-unit\.targetable::before,[\s\S]*?\.battle-monster\.v174-cardless-unit\.target::before\{/);
-  const activeFrameRule=fixed.match(/#game-stage #battlePage\.v-fixed-slot-render-v2 \.battle-player\.v174-cardless-unit\.active-turn::after\{([^}]*)\}/);
+  const activeFrameRule=fixed.match(/#game-stage #battlePage\.v-fixed-slot-render-v2 \.battle-player\.v174-cardless-unit\.active-turn > \.v174-battle-art::before\{([^}]*)\}/);
   assert.ok(activeFrameRule,"Fixed Slot must own the manual active-character frame");
-  assert.match(activeFrameRule[1],/border:3px solid #ffd21f !important/);
+  assert.match(activeFrameRule[1],/border:1px solid rgba\(241,210,137,\.72\) !important/);
   assert.match(activeFrameRule[1],/box-shadow:[^;]+!important/);
-  assert.match(activeFrameRule[1],/animation:v174ManualActiveTurnFrameFlash \.3s linear infinite !important/);
-  assert.match(fixed,/@keyframes v174ManualActiveTurnFrameFlash\{[\s\S]*?50%\{[\s\S]*?opacity:\.24/);
+  assert.match(activeFrameRule[1],/animation:v174ManualTurnFootBreath 2s ease-in-out infinite !important/);
+  assert.match(activeFrameRule[1],/z-index:-1 !important/);
+  assert.match(activeFrameRule[1],/bottom:-2px !important/);
+  assert.match(activeFrameRule[1],/width:66% !important/);
+  assert.match(activeFrameRule[1],/height:10px !important/);
+  assert.match(fixed,/\.battle-player\.v174-cardless-unit\.active-turn::after\{\s*content:none !important;\s*display:none !important;\s*animation:none !important/,'the obsolete Unit-root frame must be explicitly disabled');
+  assert.match(fixed,/\.v174-cardless-unit > \.v174-battle-art::after\{[\s\S]*?background:radial-gradient[\s\S]*?opacity:\.72/,'ground shadow keeps its original pseudo-element');
+  assert.match(fixed,/@keyframes v174ManualTurnFootBreath\{[\s\S]*?50%\{[\s\S]*?opacity:\.75/);
+  assert.doesNotMatch(fixed,/v174ManualActiveTurnFrameFlash/);
+  assert.match(read("js/54-v173.51-battle-qa.js"),/kind==="player"&&!art\.querySelector\(":scope > \.v174-manual-turn-arrow"\)/);
+  assert.match(fixed,/active-turn > \.v174-battle-art > \.v174-manual-turn-arrow\{display:block/);
   assert.doesNotMatch(activeFrameRule[1],/animation:none/);
 });
 

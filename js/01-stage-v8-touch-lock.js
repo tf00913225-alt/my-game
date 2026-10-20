@@ -10,7 +10,13 @@
     const CLICK_LIFETIME_MS=1000;
     const completedPointers=new Map();
     let legacyClickGesture=null;
-    function isGameSurfaceTarget(target){ return !!(target&&target.closest&&target.closest("#game-stage, #game-ui")); }
+    const managedSurfaces=new WeakMap();
+    function managedSurfaceFor(target){
+        for(let node=target;node;node=node.parentElement){ if(managedSurfaces.has(node)){ return node; } }
+        const root=target&&target.closest&&target.closest("#game-stage, #game-ui");
+        return root&&managedSurfaces.has(root)?root:null;
+    }
+    function isGameSurfaceTarget(target){ return !!(managedSurfaceFor(target)||target&&target.closest&&target.closest("#game-stage, #game-ui")); }
     function isEditableGameControl(target){ return !!(target&&target.closest&&target.closest('input, textarea, [contenteditable="true"]')); }
     function scrollAxes(node){
         const style=window.getComputedStyle(node);
@@ -72,7 +78,7 @@
         legacyClickGesture=null;
         completedPointers.delete(event.pointerId);
         const initial=interactiveTarget(event.target)||event.target;
-        activePointers.set(event.pointerId,{pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,currentX:event.clientX,currentY:event.clientY,distance:0,initialTarget:event.target,interactiveTarget:initial,scrollOwner:findScrollOwner(event.target),dragOwner:event.target.closest&&event.target.closest("[data-drag-owner]"),state:"TAP"});
+        activePointers.set(event.pointerId,{pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,currentX:event.clientX,currentY:event.clientY,distance:0,initialTarget:event.target,surface:managedSurfaceFor(event.target),interactiveTarget:initial,scrollOwner:findScrollOwner(event.target),dragOwner:event.target.closest&&event.target.closest("[data-drag-owner]"),state:"TAP"});
         if(activePointers.size>1){ for(const pointer of activePointers.values()){ pointer.state="CANCEL"; } }
     },{capture:true,passive:true});
     document.addEventListener("pointermove",function(event){ const pointer=activePointers.get(event.pointerId); if(pointer) classify(pointer,event); },{capture:true,passive:true});
@@ -81,9 +87,29 @@
     function cancelPointer(event){ const pointer=activePointers.get(event.pointerId); if(pointer){ pointer.state="CANCEL"; activePointers.delete(event.pointerId); rememberCompletion(pointer); } }
     document.addEventListener("pointercancel",cancelPointer,{capture:true,passive:true});
     function handleSuppressedGestureClick(event){ if(consumeSuppression(event)){ event.preventDefault(); event.stopImmediatePropagation(); } }
-    const stage=document.getElementById("game-stage");
-    for(const surface of [stage,document.getElementById("game-ui")]){
-        if(surface){ surface.addEventListener("click",handleSuppressedGestureClick,true); surface.addEventListener("pointerleave",function(event){ if(event.target===surface){ cancelPointer(event); } },true); }
+    function registerSurface(surface){
+        if(!surface||typeof surface.addEventListener!=="function"){ return false; }
+        if(managedSurfaces.has(surface)){ return true; }
+        const leave=event=>{ if(event.target===surface){ cancelPointer(event); } };
+        surface.addEventListener("click",handleSuppressedGestureClick,true);
+        surface.addEventListener("pointerleave",leave,true);
+        managedSurfaces.set(surface,{leave});
+        return true;
+    }
+    function unregisterSurface(surface){
+        const entry=surface&&managedSurfaces.get(surface);
+        if(!entry){ return false; }
+        surface.removeEventListener?.("click",handleSuppressedGestureClick,true);
+        surface.removeEventListener?.("pointerleave",entry.leave,true);
+        managedSurfaces.delete(surface);
+        const belongs=pointer=>pointer.surface===surface||surface.contains?.(pointer.initialTarget);
+        for(const [id,pointer] of activePointers){ if(belongs(pointer)){ activePointers.delete(id); } }
+        for(const [id,pointer] of completedPointers){ if(belongs(pointer)){ completedPointers.delete(id); } }
+        if(legacyClickGesture&&belongs(legacyClickGesture)){ legacyClickGesture=null; }
+        return true;
+    }
+    for(const surface of [document.getElementById("game-stage"),document.getElementById("game-ui")]){
+        registerSurface(surface);
     }
     function resetGestures(){ activePointers.clear(); completedPointers.clear(); legacyClickGesture=null; }
     window.addEventListener("blur",resetGestures);
@@ -98,5 +124,5 @@
     document.addEventListener("selectstart",function(event){ if(isGameSurfaceTarget(event.target)&&!isEditableGameControl(event.target)) event.preventDefault(); },{capture:true});
     document.addEventListener("wheel",function(event){ if(event.ctrlKey&&isGameSurfaceTarget(event.target)) event.preventDefault(); },{capture:true,passive:false});
     ["gesturestart","gesturechange"].forEach(name=>window.addEventListener(name,function(event){ if(isGameSurfaceTarget(event.target)) event.preventDefault(); },{passive:false}));
-    window.FourSymbolsGestureArbiter=Object.freeze({TAP_SLOP_CSS_PX,findScrollOwner,getState:pointerId=>activePointers.get(pointerId)||null});
+    window.FourSymbolsGestureArbiter=Object.freeze({TAP_SLOP_CSS_PX,findScrollOwner,registerSurface,unregisterSurface,getState:pointerId=>activePointers.get(pointerId)||null});
 })();
