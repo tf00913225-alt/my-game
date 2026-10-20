@@ -43,7 +43,7 @@
 }
 
 #game-ui #homeFeatureModalBody .home-feature-buy-btn,
-#game-ui #homeFeatureModalBody button:where(:not(.team-relic-modal button)){
+#game-ui #homeFeatureModalBody button:where(:not(.team-relic-modal button,.quest-claim-all-btn)){
     min-height:114px;
     font-size:45px;
 }
