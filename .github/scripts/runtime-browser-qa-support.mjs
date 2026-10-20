@@ -260,7 +260,7 @@ function observeChromeStartup(child,{port,output}){
         try{
             samples.push(snapshot());evidence.outcome=outcome;evidence.finishedAtMs=elapsed();
             await cleanup;
-            try{fs.writeFileSync(output,JSON.stringify(evidence,null,2)+'\n');}catch(error){evidence.artifactError=String(error.message);}
+            if(output)try{fs.writeFileSync(output,JSON.stringify(evidence,null,2)+'\n');}catch(error){evidence.artifactError=String(error.message);}
             try{console.log('Chrome startup observation: '+JSON.stringify(evidence));}catch{}
         }catch(error){evidence.observerError=String(error.message);}
         return evidence;
