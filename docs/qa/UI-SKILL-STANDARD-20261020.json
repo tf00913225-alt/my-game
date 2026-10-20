@@ -171,6 +171,17 @@
               "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
             }
           ]
+        },
+        {
+          "state": "Post-merge dev190d formal skill entry and scroll dependency smoke",
+          "status": "已實際驗證",
+          "head": "5e306322e8bb77da2977f06d8e50cd04f62bf569",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/skill-entry-dependency-5e306322",
+          "limits": [
+            "Post-dev190d dependency smoke: true skill entry and real scroll in isolated local QA,360x640/1280x800 only",
+            "Not all48 details, skill learning/equipping, end-of-list, hardware devices or whole UI approval",
+            "Not Cloud skill-config authority or SDK/backend acceptance; fresh QA transport only"
+          ]
         }
       ],
       "reviews": {
@@ -2947,6 +2958,17 @@
             "Original normalization/delegated saves retained; no zero-save claim",
             "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
             "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+          ]
+        },
+        {
+          "state": "Post-merge dev190d formal skill entry and scroll dependency smoke",
+          "status": "已實際驗證",
+          "head": "5e306322e8bb77da2977f06d8e50cd04f62bf569",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/skill-entry-dependency-5e306322",
+          "limits": [
+            "Post-dev190d dependency smoke: true skill entry and real scroll in isolated local QA,360x640/1280x800 only",
+            "Not all48 details, skill learning/equipping, end-of-list, hardware devices or whole UI approval",
+            "Not Cloud skill-config authority or SDK/backend acceptance; fresh QA transport only"
           ]
         }
       ],
@@ -26413,6 +26435,17 @@
         "These are middle-of-detail read states; no 32B true page-end acceptance, particularly desktop failure lower content is outside capture",
         "Six restore exact fields; privateHeroCachesExact false remains explicit; no full runtime cache restoration claim",
         "No unlock/star/reset/equip/claim/purchase/combat/transaction; zero transport mutations in isolated QA"
+      ]
+    },
+    {
+      "segment": "skill-entry-dependency-5e306322",
+      "head": "5e306322e8bb77da2977f06d8e50cd04f62bf569",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/skill-entry-dependency-5e306322",
+      "result": "技能入口依賴最小實畫通過",
+      "pending": [
+        "Post-dev190d dependency smoke: true skill entry and real scroll in isolated local QA,360x640/1280x800 only",
+        "Not all48 details, skill learning/equipping, end-of-list, hardware devices or whole UI approval",
+        "Not Cloud skill-config authority or SDK/backend acceptance; fresh QA transport only"
       ]
     }
   ],
