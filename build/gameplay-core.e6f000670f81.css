@@ -3942,7 +3942,7 @@
     overflow:hidden !important;
 }
 #game-stage #dungeonPage.active{display:flex !important;flex-direction:column !important;}
-#game-stage #dungeonPage > h2{flex:0 0 auto;margin:2px 0 3px !important;font-size:22px !important;line-height:28px !important;}
+#game-stage #dungeonPage > h2{flex:0 0 auto;margin:2px 0 3px !important;font-size:22px !important;line-height:28px !important;text-align:center;}
 #game-stage #dungeonPage > h2 + div{flex:0 0 auto;margin:3px 4px 6px !important;}
 #game-stage #dungeonTabContent{
     flex:1 1 auto !important;
