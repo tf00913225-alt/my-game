@@ -1,0 +1,347 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewDate": "2026-10-20",
+  "reviewHead": "20ecbf97248aa2f264db72e2abea4613932af3a1",
+  "reviewer": "independent timing_review",
+  "scope": "Source-only water orb and heal recipient v1; both complete sheets visually viewed using view_image, generation/conversion read, RGBA equality and cell-edge alpha independently measured with Pillow/NumPy",
+  "decision": "BOTH_ALLOWED_FOR_FOCUSED_USB_ONLY",
+  "reviews": [
+    {
+      "id": "waterBall",
+      "candidate": "tools/vfx-commercial-sample/assets/full/water-orb-recipient-v1.webp",
+      "generation": "tools/vfx-commercial-sample/assets/full/water-orb-recipient-v1-generation.json",
+      "conversion": "tools/vfx-commercial-sample/assets/full/water-orb-recipient-v1-conversion.json",
+      "sourceGate": "PASS_FOCUSED_USB_CANDIDATE_ONLY",
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "cell": [
+        362,
+        362
+      ],
+      "exactDecodedRgbaEqualToMother": true,
+      "sha256": "93cbbb60b0d796da8aa745fefbc20c5eddad53a23d8603e0927b20e4de81db97",
+      "frames": [
+        {
+          "frame": 1,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 7251
+        },
+        {
+          "frame": 2,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 20385
+        },
+        {
+          "frame": 3,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 33543
+        },
+        {
+          "frame": 4,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 43720
+        },
+        {
+          "frame": 5,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 47046
+        },
+        {
+          "frame": 6,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 46070
+        },
+        {
+          "frame": 7,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 54927
+        },
+        {
+          "frame": 8,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 45486
+        },
+        {
+          "frame": 9,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 37392
+        },
+        {
+          "frame": 10,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 28201
+        },
+        {
+          "frame": 11,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 27332
+        },
+        {
+          "frame": 12,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 10976
+        }
+      ],
+      "identity": "Glossy deep-blue spiral sphere, foam crest and single shallow ripple clearly preserve water-orb identity. One site per cell is appropriate for explicit recipient repetition; no removal of the sphere or conversion to generic mist.",
+      "sequence": "Readable seed-to-sphere buildup; frame7 has two bright glints, frame8 compact contact/splash, frames9-11 shrink the orb and frame12 leaves drops/ripple. Frame11 retains substantial mass, so bounded runtime fade must be checked in motion.",
+      "boundary": "All four edges of each real equal cell measured; no alpha>=8 edge pixels. Viewer blue gutter haze is alpha1/2, not visible clipping or opaque atlas contamination. No arbitrary prompt-padding veto.",
+      "overcorrection": "No demonstrated erasure of existing water/heal identity; compact one-recipient form addresses multi-site source duplication without requiring unrelated PASS assets to change.",
+      "phoneChecks": [
+        "Confirm single orb remains readable at each actual target and contacts on the existing authored hit, without nine sites from prepainted repetition.",
+        "Verify tail10-12 releases without an abrupt orb-to-drop pop or residual disc; do not force an arbitrary near-zero source endpoint."
+      ],
+      "phoneGate": "NEEDS_EVIDENCE",
+      "continuousGate": "NEEDS_EVIDENCE",
+      "performanceGate": "NEEDS_EVIDENCE"
+    },
+    {
+      "id": "healSpell",
+      "candidate": "tools/vfx-commercial-sample/assets/full/heal-recipient-v1.webp",
+      "generation": "tools/vfx-commercial-sample/assets/full/heal-recipient-v1-generation.json",
+      "conversion": "tools/vfx-commercial-sample/assets/full/heal-recipient-v1-conversion.json",
+      "sourceGate": "PASS_FOCUSED_USB_CANDIDATE_ONLY",
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "cell": [
+        362,
+        362
+      ],
+      "exactDecodedRgbaEqualToMother": true,
+      "sha256": "2e29ad935f6206b9af7196799cf4fc72d89f17b9ede009fda43a1ad054cb3737",
+      "frames": [
+        {
+          "frame": 1,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 5241
+        },
+        {
+          "frame": 2,
+          "edgeMaxAlpha": 2,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 11149
+        },
+        {
+          "frame": 3,
+          "edgeMaxAlpha": 2,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 15633
+        },
+        {
+          "frame": 4,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 20891
+        },
+        {
+          "frame": 5,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 26466
+        },
+        {
+          "frame": 6,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 34787
+        },
+        {
+          "frame": 7,
+          "edgeMaxAlpha": 2,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 30202
+        },
+        {
+          "frame": 8,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 25971
+        },
+        {
+          "frame": 9,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 21541
+        },
+        {
+          "frame": 10,
+          "edgeMaxAlpha": 1,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 11401
+        },
+        {
+          "frame": 11,
+          "edgeMaxAlpha": 2,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 7903
+        },
+        {
+          "frame": 12,
+          "edgeMaxAlpha": 2,
+          "edgePixelCountAtAlpha": {
+            "8": 0,
+            "16": 0,
+            "64": 0,
+            "128": 0
+          },
+          "pixelMassAlpha64": 4191
+        }
+      ],
+      "identity": "One airy blue-white water lotus, central droplet, rising motes and narrow ripple convey gentle healing. It retains clear water/heal identity without a giant rune disc or attack-like explosion.",
+      "sequence": "Petals unfurl through frames2-6; frame7 adds a distinct white healing glint though frame6 has more alpha mass. Frames8-12 reduce petals/motes toward a small droplet/ripple; a pixel-mass peak before hit is not itself a timing failure.",
+      "boundary": "All four edges of each real equal cell measured; no alpha>=8 edge pixels. Viewer blue gutter haze is alpha1/2, not visible clipping or opaque atlas contamination. No arbitrary prompt-padding veto.",
+      "overcorrection": "No demonstrated erasure of existing water/heal identity; compact one-recipient form addresses multi-site source duplication without requiring unrelated PASS assets to change.",
+      "phoneChecks": [
+        "Check tiny lotus and white glint remain readable at real portrait fit across three/six/partial recipients.",
+        "Check persistent glow does not become an opaque character/HUD wash and tail releases continuously."
+      ],
+      "phoneGate": "NEEDS_EVIDENCE",
+      "continuousGate": "NEEDS_EVIDENCE",
+      "performanceGate": "NEEDS_EVIDENCE"
+    }
+  ],
+  "limits": [
+    "Source clearance does not replace prior phone FAIL gate; recipient geometry, skill identity at actual fit, contact readability and tail continuity need focused phone evidence.",
+    "No runtime edits, phone operation or commit.",
+    "Stop source refinement unless a concrete new player-visible defect appears; no lowering of commercial acceptance."
+  ]
+}

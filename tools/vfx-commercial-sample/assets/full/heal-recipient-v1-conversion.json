@@ -1,0 +1,140 @@
+{
+  "source": "C:/Users/User/.codex/generated_images/01a15425-277b-7140-b0e5-d3891f17519d/exec-d6059fa8-1aed-4913-aa23-a3ba9d7f0653.png",
+  "output": "tools/vfx-commercial-sample/assets/full/heal-recipient-v1.webp",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "grid": [
+    4,
+    3
+  ],
+  "cell": [
+    362,
+    362
+  ],
+  "losslessRgbaEqual": true,
+  "sha256": "2e29ad935f6206b9af7196799cf4fc72d89f17b9ede009fda43a1ad054cb3737",
+  "frames": [
+    {
+      "frame": 1,
+      "alpha64Bounds": [
+        116,
+        183,
+        250,
+        315
+      ],
+      "minPaddingFraction": 0.1298342541436464
+    },
+    {
+      "frame": 2,
+      "alpha64Bounds": [
+        100,
+        149,
+        280,
+        321
+      ],
+      "minPaddingFraction": 0.1132596685082873
+    },
+    {
+      "frame": 3,
+      "alpha64Bounds": [
+        75,
+        144,
+        285,
+        321
+      ],
+      "minPaddingFraction": 0.1132596685082873
+    },
+    {
+      "frame": 4,
+      "alpha64Bounds": [
+        60,
+        116,
+        295,
+        325
+      ],
+      "minPaddingFraction": 0.10220994475138122
+    },
+    {
+      "frame": 5,
+      "alpha64Bounds": [
+        62,
+        78,
+        302,
+        315
+      ],
+      "minPaddingFraction": 0.1298342541436464
+    },
+    {
+      "frame": 6,
+      "alpha64Bounds": [
+        53,
+        76,
+        313,
+        318
+      ],
+      "minPaddingFraction": 0.12154696132596685
+    },
+    {
+      "frame": 7,
+      "alpha64Bounds": [
+        53,
+        90,
+        309,
+        318
+      ],
+      "minPaddingFraction": 0.12154696132596685
+    },
+    {
+      "frame": 8,
+      "alpha64Bounds": [
+        56,
+        97,
+        305,
+        315
+      ],
+      "minPaddingFraction": 0.1298342541436464
+    },
+    {
+      "frame": 9,
+      "alpha64Bounds": [
+        66,
+        73,
+        312,
+        299
+      ],
+      "minPaddingFraction": 0.13812154696132597
+    },
+    {
+      "frame": 10,
+      "alpha64Bounds": [
+        79,
+        113,
+        284,
+        299
+      ],
+      "minPaddingFraction": 0.17403314917127072
+    },
+    {
+      "frame": 11,
+      "alpha64Bounds": [
+        86,
+        126,
+        272,
+        298
+      ],
+      "minPaddingFraction": 0.17679558011049723
+    },
+    {
+      "frame": 12,
+      "alpha64Bounds": [
+        93,
+        151,
+        269,
+        297
+      ],
+      "minPaddingFraction": 0.17955801104972377
+    }
+  ]
+}

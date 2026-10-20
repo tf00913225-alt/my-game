@@ -84,10 +84,10 @@ test("visual timing, dead-target filtering and raster-only choreography are enfo
     assert.doesNotMatch(timing,/finishPlayerAction\s*=(?!=)|processNextCombatant\s*=(?!=)/);
     assert.match(animation,/function canReceive\(config,side,index\)/);
     assert.match(animation,/entity\.hp\)>0/);
-    assert.match(animation,/dragonSlash:\{[\s\S]*dragon-slash-cast\.png/);
-    assert.match(animation,/phoenixCry:\{[\s\S]*phoenix-cry-cast\.png/);
-    assert.match(animation,/iceArrowRain:\{[\s\S]*frost-arrow-rain-vfx\.png/);
-    assert.match(animation,/fireRocket:\{[\s\S]*fire-rocket-cast\.png/);
+    assert.match(animation,/dragonSlash:\{[^\n]*sprite:castSheet\("assets\/vfx\/fire\/dragon-slash-cast-v2\.webp","single"/);
+    assert.match(animation,/phoenixCry:\{[^\n]*sprite:castSheet\("assets\/vfx\/fire\/phoenix-cry-cast\.png\?v=165","battlefield"/);
+    assert.match(animation,/iceArrowRain:\{[^\n]*sprite:castSheet\("assets\/vfx\/water\/frost-arrow-rain-vfx\.png\?v=173\.19","battlefield"/);
+    assert.match(animation,/fireRocket:\{[^\n]*sprite:castSheet\("assets\/vfx\/fire\/fire-rocket-cast\.png\?v=165","trajectory"/);
     assert.match(animation,/renderer:"dom-sprite"/);
     assert.doesNotMatch(animation,/<svg\b|v146-flight-art|v143-skill-flight|v143-skill-field|v143-hit-impact/);
     assert.doesNotMatch(css,/v146-flight-art|v143-skill-flight|v143-skill-field|v143-hit-impact/);

@@ -1,0 +1,140 @@
+{
+  "source": "C:\\Users\\User\\.codex\\generated_images\\01a15425-277b-7140-b0e5-d3891f17519d\\exec-e3f1d39e-7ce2-4487-82ad-ad1ba382e45b.png",
+  "output": "tools/vfx-commercial-sample/assets/full/iceSpin-wide-v2.webp",
+  "dimensions": [
+    2170,
+    725
+  ],
+  "grid": [
+    4,
+    3
+  ],
+  "cell": [
+    542,
+    241
+  ],
+  "losslessRgbaEqual": true,
+  "sha256": "86573490352909d0cb1840807302690abc5038ab1492c1518f7f3f3ce75b1683",
+  "frames": [
+    {
+      "frame": 1,
+      "alpha64Bounds": [
+        57,
+        95,
+        509,
+        196
+      ],
+      "minPaddingFraction": 0.06088560885608856
+    },
+    {
+      "frame": 2,
+      "alpha64Bounds": [
+        39,
+        57,
+        509,
+        204
+      ],
+      "minPaddingFraction": 0.06088560885608856
+    },
+    {
+      "frame": 3,
+      "alpha64Bounds": [
+        40,
+        42,
+        509,
+        217
+      ],
+      "minPaddingFraction": 0.06088560885608856
+    },
+    {
+      "frame": 4,
+      "alpha64Bounds": [
+        28,
+        35,
+        518,
+        228
+      ],
+      "minPaddingFraction": 0.04428044280442804
+    },
+    {
+      "frame": 5,
+      "alpha64Bounds": [
+        23,
+        42,
+        523,
+        210
+      ],
+      "minPaddingFraction": 0.03505535055350553
+    },
+    {
+      "frame": 6,
+      "alpha64Bounds": [
+        26,
+        46,
+        514,
+        212
+      ],
+      "minPaddingFraction": 0.04797047970479705
+    },
+    {
+      "frame": 7,
+      "alpha64Bounds": [
+        39,
+        52,
+        513,
+        212
+      ],
+      "minPaddingFraction": 0.05350553505535055
+    },
+    {
+      "frame": 8,
+      "alpha64Bounds": [
+        29,
+        37,
+        520,
+        217
+      ],
+      "minPaddingFraction": 0.04059040590405904
+    },
+    {
+      "frame": 9,
+      "alpha64Bounds": [
+        36,
+        36,
+        513,
+        197
+      ],
+      "minPaddingFraction": 0.05350553505535055
+    },
+    {
+      "frame": 10,
+      "alpha64Bounds": [
+        48,
+        53,
+        504,
+        191
+      ],
+      "minPaddingFraction": 0.07011070110701106
+    },
+    {
+      "frame": 11,
+      "alpha64Bounds": [
+        47,
+        70,
+        500,
+        183
+      ],
+      "minPaddingFraction": 0.07749077490774908
+    },
+    {
+      "frame": 12,
+      "alpha64Bounds": [
+        59,
+        79,
+        496,
+        183
+      ],
+      "minPaddingFraction": 0.08487084870848709
+    }
+  ]
+}

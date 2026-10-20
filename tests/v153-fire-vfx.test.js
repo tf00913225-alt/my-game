@@ -239,11 +239,12 @@ function castConfig(id,duration,targetType,category="physical"){
 
 test("all supplied cast and loop sheets are exact RGBA Sprite Sheet grids",()=>{
     const castAssets=[
-        "flame-slash-cast.png","fire-critical-cast.png","explosive-flurry-cast.png","dragon-slash-cast.png",
-        "fire-rocket-cast.png","blaze-spell-cast.png","flame-tornado-cast.png",
-        "phoenix-cry-cast.png","rage-cast.png"
+        "flame-slash-cast-v2.webp","fire-critical-cast.png","explosive-flurry-cast.png","dragon-slash-cast-v2.webp",
+        "fire-rocket-cast.png","blaze-spell-cast-v2.webp","flame-tornado-cast-v2.webp",
+        "phoenix-cry-cast.png","rage-cast-v2.webp"
     ];
     castAssets.forEach(name=>{
+        if(name.endsWith(".webp")){const info=losslessWebpInfo("assets/vfx/fire/"+name);assert.deepEqual([info.width,info.height,info.alpha],[1448,1086,1],name);assert.equal(info.width/4,info.height/3);return;}
         const info=pngInfo(fs.readFileSync("assets/vfx/fire/"+name));
         assert.deepEqual([info.width,info.height,info.colorType],[1536,1152,6],name);
         const alpha=alphaStats(info);
@@ -263,20 +264,20 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
     const runtime=loadRuntime().context;
     const manifest=runtime.v143SkillAnimationManifest;
     const expected={
-        flameSlash:["flame-slash-cast.png","single"],
+        flameSlash:["flame-slash-cast-v2.webp","single"],
         fireCritical:["fire-critical-cast.png","single"],
-        explosiveFlurry:["explosive-flurry-cast.png","group"],
-        dragonSlash:["dragon-slash-cast.png","single"],
+        explosiveFlurry:["explosive-flurry-wide-v2.webp","group"],
+        dragonSlash:["dragon-slash-cast-v2.webp","single"],
         fireRocket:["fire-rocket-cast.png","trajectory"],
-        blazeSpell:["blaze-spell-cast.png","single"],
-        flameTornado:["flame-tornado-cast.png","single"],
+        blazeSpell:["blaze-spell-cast-v2.webp","single"],
+        flameTornado:["flame-tornado-cast-v2.webp","single"],
         phoenixCry:["phoenix-cry-cast.png","battlefield"],
-        rage:["rage-cast.png","single"]
+        rage:["rage-recipient-v1.webp","single"]
     };
     Object.entries(expected).forEach(([id,[filename,placement]])=>{
         const sprite=manifest[id].sprite;
         assert.ok(sprite.src.split("?")[0].endsWith(filename),id);
-        if(id!=="flameSlash"){ assert.ok(sprite.src.endsWith("?v=165"),id); }
+        if(id!=="explosiveFlurry"&&id!=="flameSlash"&&id!=="rage"&&id!=="blazeSpell"&&id!=="dragonSlash"&&id!=="flameTornado"){ assert.ok(sprite.src.endsWith("?v=165"),id); }
         assert.deepEqual([sprite.columns,sprite.rows,sprite.frames,sprite.hitFrame],[4,3,12,7],id);
         assert.equal(sprite.placement,placement,id);
         assert.equal(manifest[id].hit,.5833333333,id);
@@ -310,7 +311,7 @@ test("tri skills follow valid targets while Phoenix Cry keeps one full-field she
     assert.equal(triSprites[0].style.left,"438px");
     assert.equal(triSprites[0].style.top,"140px");
     assert.equal(triSprites[0].style.width,"276px","three-target cast keeps the fixed three-slot width");
-    assert.equal(triSprites[0].style.height,"276px","three-target cast preserves its authored square frame while covering the fixed footprint");
+    assert.equal(triSprites[0].style.height,"123px","three-target cast keeps native 2.25 frame aspect within raster rounding");
     assert.equal(triStage.children.some(node=>node.className.includes("v143-skill-flight")),false);
     assert.equal(triStage.children.some(node=>node.className.includes("v143-skill-field")),false);
 
@@ -406,9 +407,10 @@ test("Fire Slash plays one sheet on the selected target and reaches damage at fr
     assert.ok(parseFloat(sprites[0].style.width)<=220,"single-target VFX keeps the original scale ceiling");
     assert.equal(stage.children.some(node=>node.className.includes("v143-skill-flight")),false);
     const before=runtime.scheduled.length;
-    runtime.context.v143RunAtTargetHit("monster",1,()=>runtime.context.showMonsterHit(1,17,"hp",false),true);
+    const wait=runtime.context.v143RunAtTargetHit("monster",1,()=>runtime.context.showMonsterHit(1,17,"hp",false),true);
     assert.equal(runtime.monsterHits.length,0);
-    assert.equal(runtime.scheduled.length,before+1);
+    assert.equal(runtime.scheduled.length,before,"feedback joins the existing target hit task instead of a second timer");
+    assert.ok(wait>=425&&wait<=450);
     const damageTimer=runtime.scheduled[runtime.scheduled.length-1];
     assert.ok(damageTimer.delay>=425&&damageTimer.delay<=450);
 });
@@ -427,14 +429,14 @@ test("MISS still plays the formal skill Sprite and keeps MISS feedback on hit ti
     runtime.context.v143RunAtTargetHit("monster",1,()=>runtime.context.showMissEffect(false,1,"MISS"),true);
     assert.equal(sprite.style.visibility,"visible","MISS must not suppress the attempted skill animation");
     assert.equal(sprite.dataset.confirmedHit,"true","MISS resolves the target through the formal V143 endpoint");
-    assert.equal(runtime.scheduled.length,before+1);
+    assert.equal(runtime.scheduled.length,before,"feedback shares the authored target hit task");
     runtime.scheduled[runtime.scheduled.length-1].callback();
     assert.equal(sprite.style.visibility,"visible","skill VFX remains visible while MISS feedback resolves");
     assert.equal(runtime.misses.length,1);
     assert.equal(runtime.misses[0][2],"MISS");
 });
 
-test("Rage creates one shared full-ally cast sheet",()=>{
+test("Rage creates one portrait-sized cast sheet per explicit ally",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("rage",1500,"allyAll","buff"),
@@ -442,11 +444,10 @@ test("Rage creates one shared full-ally cast sheet",()=>{
     );
     const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
     const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
-    assert.equal(sprites.length,1);
-    assert.equal(sprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(sprites[0].dataset.placement,"battlefield");
-    assert.equal(sprites[0].style.width,"600px");
-    assert.equal(sprites[0].style.height,"600px","full-ally Rage preserves its authored square frame while covering the ally side");
+    assert.equal(sprites.length,3);
+    assert.deepEqual(sprites.map(n=>n.dataset.targetIndex),["0","1","2"]);
+    assert.ok(sprites.every(n=>n.dataset.placement==="single"&&n.style.width===n.style.height));
+    assert.equal(runtime.context.v143SkillAnimationState.current.targetType,"allyAll");
 });
 
 test("enemy Rage allyTri animates only the three explicit targets",()=>{
@@ -457,12 +458,12 @@ test("enemy Rage allyTri animates only the three explicit targets",()=>{
         {side:"monster",actorIndex:0,targetSide:"monster",targetId:5,targetIds:[4,5,6]}
     );
     const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
-    assert.equal(stage.children.filter(node=>node.className.includes("v143-vfx-sprite")).length,1);
+    assert.equal(stage.children.filter(node=>node.className.includes("v143-vfx-sprite")).length,3);
     [4,5,6].forEach(index=>runtime.context.v141PlayCardEffect("monster",index,"buff"));
     const sprites=stage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
-    assert.equal(sprites.length,1);
-    assert.equal(sprites[0].dataset.targetIndexes,"4,5,6");
-    assert.equal(sprites[0].dataset.placement,"group");
+    assert.equal(sprites.length,3);
+    assert.deepEqual(sprites.map(n=>n.dataset.targetIndex),["4","5","6"]);
+    assert.ok(sprites.every(n=>n.dataset.placement==="single"));
 });
 
 test("enemy Rage loop begins on the hit frame and follows its canonical ledger",()=>{
@@ -494,10 +495,10 @@ test("frame eight delays hit numbers together and Fire Critical keeps its critic
     assert.match(feedbackOwner,/const resolver=window\.v143ResolveBattleFeedbackTiming/);
     const feedback=runtime.context.v143ResolveBattleFeedbackTiming("monster",1,"damage");
     assert.equal(feedback.critical,true);
-    runtime.context.setTimeout(()=>runtime.context.showMonsterHit(1,55,"hp",feedback.critical),feedback.delayMs);
+    assert.equal(typeof feedback.scheduleImpact,"function");
+    feedback.scheduleImpact(()=>runtime.context.showMonsterHit(1,55,"hp",feedback.critical));
     assert.equal(runtime.monsterHits.length,0);
-    assert.equal(runtime.scheduled.length,before+2,"impact audio/recoil and floating number share the target-hit timer");
-    assert.ok(Math.abs(runtime.scheduled[before].delay-feedback.delayMs)<10);
+    assert.equal(runtime.scheduled.length,before,"impact audio/recoil and floating number share the existing target-hit task");
     const numberTimer=runtime.scheduled[runtime.scheduled.length-1];
     assert.ok(numberTimer.delay>=590&&numberTimer.delay<=620);
     numberTimer.callback();
@@ -554,7 +555,7 @@ test("a newly applied Burn starts its breathing image on the exact target hit fr
     const beforeBurn=runtime.scheduled.length;
     runtime.context.applyBurnEffect(runtime.monsters[1],2,3);
     assert.equal(runtime.cards.battleMonster1.querySelector(".v143-status-visual-burn"),null);
-    assert.equal(runtime.scheduled.length,beforeBurn+1);
+    assert.equal(runtime.scheduled.length,beforeBurn,"status projection joins the target hit task");
     const statusTimer=runtime.scheduled[runtime.scheduled.length-1];
     assert.ok(statusTimer.delay>0);
     statusTimer.callback();
@@ -569,9 +570,33 @@ test("cast sheets stay one-shot while Burn and Rage use single-image breathing",
     assert.doesNotMatch(css,/v143StatusRasterFrames/);
     assert.match(css,/\.v143-status-visual--pulse\{[\s\S]*?v143StatusImageBreath 2s ease-in-out infinite/);
     assert.match(animation,/burn:statusVisual\("assets\/vfx\/status\/burn\.webp","pulse","statusEffects"/);
-    assert.match(animation,/rage:statusVisual\("assets\/vfx\/status\/rage\.webp","pulse","activeBuffs"/);
+    assert.match(animation,/rage:statusVisual\("assets\/vfx\/status\/rage-aura-v2\.webp","pulse","activeBuffs"/);
     assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
+
+test("wide baseline bytes remain exact and active wide sources retain their native ratio",()=>{
+    const manifest=loadRuntime().context.v143SkillAnimationManifest;
+    const entries=[["rage", "fire/rage-wide-v2.webp", "df6403daa4c3b6bd8e3eede4cdb97c7e26acd2e8de6f1ffec9468bac9a4aad28"], ["explosiveFlurry", "fire/explosive-flurry-wide-v2.webp", "65de2193edc2789153b1c7f77f054919686c515b9cd0b2a8c6be7a9320170cd9"]];
+    entries.forEach(([id,file,hash])=>{
+        const candidate="assets/vfx/"+file,bytes=fs.readFileSync(candidate),info=losslessWebpInfo(bytes);
+        assert.deepEqual([info.width,info.height,info.alpha],[2172,724,1],id);
+        assert.equal(require("node:crypto").createHash("sha256").update(bytes).digest("hex"),hash,id);
+        if(!["rage"].includes(id)){
+        assert.equal(manifest[id].sprite.src,candidate,id);
+        assert.equal((info.width/manifest[id].sprite.columns)/(info.height/manifest[id].sprite.rows),2.25,id);
+        assert.equal(manifest[id].sprite.cellAspect,2.25,id+" cold-cache source ratio");
+        }else{ assert.equal(manifest[id].sprite.presentation,"per-recipient",id); assert.notEqual(manifest[id].sprite.src,candidate,id+" rejected placement source is retired"); }
+    });
+});
+
 console.log(`\n${passed} V153 Fire VFX tests passed.`);
+
+
+function losslessWebpInfo(file){
+ const b=Buffer.isBuffer(file)?file:fs.readFileSync(file);
+ assert.equal(b.toString("ascii",0,4),"RIFF");assert.equal(b.toString("ascii",8,12),"WEBP");
+ for(let o=12;o+8<=b.length;){const type=b.toString("ascii",o,o+4),size=b.readUInt32LE(o+4),p=o+8;assert.ok(p+size<=b.length,"complete WebP chunk");if(type==="VP8L"){assert.equal(b[p],0x2f);const bits=b.readUInt32LE(p+1);return {width:1+(bits&16383),height:1+((bits>>>14)&16383),alpha:(bits>>>28)&1};}o=p+size+(size%2);}
+ throw new Error("Expected lossless VP8L image");
+}

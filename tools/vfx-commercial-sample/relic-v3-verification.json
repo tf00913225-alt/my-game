@@ -1,0 +1,20 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "revision": 3,
+  "device": "Samsung SM-N960F / Android 10 / Chrome via USB ADB",
+  "viewportCssPixels": [411, 717],
+  "devicePixelRatio": 2.625,
+  "horizontalOverflow": false,
+  "assetPreload": "all selected sheets and independent contact image decoded",
+  "contactFrameZeroBased": 7,
+  "sharedDurationMs": 2550,
+  "candidateBoxLogicalPixels": 500,
+  "stageChecks": [
+    {"frame": 0, "source": "assets/nine-dragon-fire-v3.webp", "opacity": 0.615},
+    {"frame": 7, "source": "assets/nine-dragon-fire-impact-v3.webp", "opacity": 1},
+    {"frame": 11, "source": "assets/nine-dragon-fire-v3.webp", "opacity": 0.060371}
+  ],
+  "phoneScreenshotReview": "contact dragon heads and complete ground ring visible; before/after switch verified",
+  "staticChecks": ["node --check sample.js", "git diff --check"],
+  "limits": "Isolated visual study. No V143 integration, production battle, performance certification or deployment verification claimed. User visual acceptance pending."
+}

@@ -1,0 +1,640 @@
+{
+  "id": "dodgeSkill",
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewHead": "ade43a48ce618330055f9add290abb175ef9470d",
+  "tool": "built-in imagegen",
+  "intent": "New wide cast candidate; original source inspected as identity reference, persistent status assets excluded.",
+  "formalName": "閃躲術（持續狀態風行）",
+  "formalShape": "allyAll",
+  "formalSourceOwner": "js/00-main.js + progression retains base allyAll",
+  "originalSource": "assets/vfx/wind/dodge-skill-cast.png",
+  "selectedMother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-702579b2-5c13-407a-ae61-01ca2719592e.png",
+  "prompt": "Create a clean fantasy RPG buff CAST sprite sheet on genuine transparent alpha. FOUR columns THREE rows = exactly12 frames row-major. Overall image aspect3:1 e.g2160x720. Each cell native aspect2.25:1, wide, NOT a stretched square. In EVERY cell exactly THREE DISCONNECTED small low-position effects, at fixed local x18%,50%,82%, each effect width at most20% of cell. Keep ample clear transparent gaps. Floor baseline fixed at local y78% in all12 frames; all visible alpha including glow and sparks inside local x7%-93%, y18%-84%, absolutely clean transparent cell borders, no grid lines. Effects are seen front-on/slightly topdown below character waist, no characters drawn, leave empty air above for faces. No broad smoke, no opaque cloud, no single giant three-person dome. Frame1 faint small gathering,2-5 build,peak as specified,then smoothly fade toward the fixed baseline,12 nearly gone. Crisp thin luminous edges, restrained glow, readable small-screen silhouettes, no text, no background. Wind movement/dodge buff: each of THREE sites is a slim mint-green low wind stream curving over one shallow elliptical floor ring; fine pale green leaf-like highlights, clear transparent interiors. Frame7 three brief small starless bright glints on rings. Preserve flowing wind ribbon identity rather than tornado attack or generic healing glyph. Frames8-12 streams smoothly unwind and fade at the same floor locations.",
+  "attempts": 1,
+  "requestedPeakFrame": 7,
+  "candidateOnly": true,
+  "independentReview": "pending",
+  "phonePass": false,
+  "commercialPass": false,
+  "selfReview": {
+    "all12FramesViewed": true,
+    "status": "candidate-for-independent-review",
+    "identity": "Wind movement/dodge buff: each of THREE sites is a slim mint-green low wind stream curving over one shallow elliptical floor ring; fine pale green leaf-like highlights, clear transparent interiors. Frame7 three brief small starless bright glints on rings. Preserve flowing wind ribbon identity rather than tornado attack or generic healing glyph. Frames8-12 streams smoothly unwind and fade at the same floor locations.",
+    "risks": [
+      "The third row visible baseline is higher than the middle row by approximately20-30 source pixels. Need independent sequence/phone check for dissipation hopping, do not claim fixed baseline fully achieved.",
+      "Peak low-alpha glows can visually bridge the three sites despite separate strong shapes; verify legibility on actual characters.",
+      "Generated final frame retains a small residual shape; runtime ending/cleanup remains to be verified after any future import."
+    ]
+  },
+  "runtimeCandidate": "tools/vfx-commercial-sample/assets/full/dodgeSkill-wide-v1.webp",
+  "size": [
+    2172,
+    724
+  ],
+  "grid": [
+    4,
+    3
+  ],
+  "cellSize": [
+    543.0,
+    241.33333333333334
+  ],
+  "cellAspect": 2.25,
+  "lossless": true,
+  "exactRGBAEqualToMother": true,
+  "sha256": "8a4aa1a86af263d47b613c6df6a3ffa875c02a476591c675bed1917defacca72",
+  "bytes": 846178,
+  "frameMetrics": [
+    {
+      "frame": 1,
+      "alpha": {
+        "8": {
+          "bounds": [
+            38,
+            145,
+            515,
+            210
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            50,
+            154,
+            500,
+            207
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 101.83,
+          "alphaWeight": 265036
+        },
+        {
+          "centerX": 279.22,
+          "alphaWeight": 332575
+        },
+        {
+          "centerX": 451.93,
+          "alphaWeight": 313453
+        }
+      ]
+    },
+    {
+      "frame": 2,
+      "alpha": {
+        "8": {
+          "bounds": [
+            35,
+            126,
+            518,
+            211
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            51,
+            131,
+            499,
+            208
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 104.3,
+          "alphaWeight": 549238
+        },
+        {
+          "centerX": 275.99,
+          "alphaWeight": 661127
+        },
+        {
+          "centerX": 445.03,
+          "alphaWeight": 580014
+        }
+      ]
+    },
+    {
+      "frame": 3,
+      "alpha": {
+        "8": {
+          "bounds": [
+            31,
+            107,
+            514,
+            211
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            47,
+            113,
+            501,
+            208
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 97.89,
+          "alphaWeight": 804161
+        },
+        {
+          "centerX": 271.08,
+          "alphaWeight": 837907
+        },
+        {
+          "centerX": 446.22,
+          "alphaWeight": 851132
+        }
+      ]
+    },
+    {
+      "frame": 4,
+      "alpha": {
+        "8": {
+          "bounds": [
+            27,
+            102,
+            515,
+            211
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            37,
+            107,
+            503,
+            208
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 98.5,
+          "alphaWeight": 1033220
+        },
+        {
+          "centerX": 268.28,
+          "alphaWeight": 1022736
+        },
+        {
+          "centerX": 443.13,
+          "alphaWeight": 829189
+        }
+      ]
+    },
+    {
+      "frame": 5,
+      "alpha": {
+        "8": {
+          "bounds": [
+            27,
+            79,
+            525,
+            217
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            39,
+            83,
+            512,
+            211
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 97.43,
+          "alphaWeight": 1483275
+        },
+        {
+          "centerX": 269.78,
+          "alphaWeight": 1563060
+        },
+        {
+          "centerX": 441.52,
+          "alphaWeight": 1492815
+        }
+      ]
+    },
+    {
+      "frame": 6,
+      "alpha": {
+        "8": {
+          "bounds": [
+            26,
+            70,
+            522,
+            218
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            37,
+            76,
+            509,
+            212
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 96.27,
+          "alphaWeight": 1708739
+        },
+        {
+          "centerX": 267.92,
+          "alphaWeight": 1704810
+        },
+        {
+          "centerX": 441.35,
+          "alphaWeight": 1459814
+        }
+      ]
+    },
+    {
+      "frame": 7,
+      "alpha": {
+        "8": {
+          "bounds": [
+            24,
+            79,
+            523,
+            224
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            38,
+            84,
+            509,
+            219
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 96.83,
+          "alphaWeight": 1777691
+        },
+        {
+          "centerX": 266.76,
+          "alphaWeight": 1758606
+        },
+        {
+          "centerX": 439.92,
+          "alphaWeight": 1617436
+        }
+      ]
+    },
+    {
+      "frame": 8,
+      "alpha": {
+        "8": {
+          "bounds": [
+            24,
+            81,
+            521,
+            218
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            34,
+            88,
+            507,
+            212
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 95.04,
+          "alphaWeight": 1546359
+        },
+        {
+          "centerX": 267.83,
+          "alphaWeight": 1413608
+        },
+        {
+          "centerX": 437.11,
+          "alphaWeight": 1187555
+        }
+      ]
+    },
+    {
+      "frame": 9,
+      "alpha": {
+        "8": {
+          "bounds": [
+            34,
+            102,
+            519,
+            194
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            49,
+            111,
+            502,
+            191
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 98.23,
+          "alphaWeight": 691512
+        },
+        {
+          "centerX": 275.66,
+          "alphaWeight": 721776
+        },
+        {
+          "centerX": 446.53,
+          "alphaWeight": 641137
+        }
+      ]
+    },
+    {
+      "frame": 10,
+      "alpha": {
+        "8": {
+          "bounds": [
+            36,
+            107,
+            518,
+            195
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            52,
+            115,
+            499,
+            191
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 107.97,
+          "alphaWeight": 572374
+        },
+        {
+          "centerX": 279.91,
+          "alphaWeight": 492567
+        },
+        {
+          "centerX": 444.11,
+          "alphaWeight": 552512
+        }
+      ]
+    },
+    {
+      "frame": 11,
+      "alpha": {
+        "8": {
+          "bounds": [
+            33,
+            129,
+            513,
+            194
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            50,
+            147,
+            498,
+            191
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 98.81,
+          "alphaWeight": 298660
+        },
+        {
+          "centerX": 273.4,
+          "alphaWeight": 301048
+        },
+        {
+          "centerX": 448.7,
+          "alphaWeight": 262873
+        }
+      ]
+    },
+    {
+      "frame": 12,
+      "alpha": {
+        "8": {
+          "bounds": [
+            33,
+            123,
+            511,
+            194
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            47,
+            129,
+            495,
+            191
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 96.49,
+          "alphaWeight": 275266
+        },
+        {
+          "centerX": 273.75,
+          "alphaWeight": 257956
+        },
+        {
+          "centerX": 447.08,
+          "alphaWeight": 233959
+        }
+      ]
+    }
+  ],
+  "seamRows": [
+    {
+      "y": 240,
+      "maxAlpha": 1
+    },
+    {
+      "y": 241,
+      "maxAlpha": 1
+    },
+    {
+      "y": 242,
+      "maxAlpha": 1
+    },
+    {
+      "y": 481,
+      "maxAlpha": 1
+    },
+    {
+      "y": 482,
+      "maxAlpha": 1
+    },
+    {
+      "y": 483,
+      "maxAlpha": 1
+    }
+  ],
+  "alpha8EdgeTouchFrames": []
+}

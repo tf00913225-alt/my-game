@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>USB 真機 VFX 前後對照</title>
+<style>body{margin:0;background:#101722;color:#e9edf3;font:16px/1.6 system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:24px}h1{font-size:24px;margin:0 0 8px}p{color:#aeb9ca;margin:8px 0 18px}select{padding:10px 14px;background:#202d40;color:inherit;border:1px solid #68778d;border-radius:6px;font:inherit;min-width:240px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:20px}figure{margin:18px 0}figcaption{margin:0 0 8px;font-weight:600}img{width:100%;height:auto;display:block;background:#172033;border-radius:8px}.source{font-size:13px;color:#aeb9ca;overflow-wrap:anywhere}#note{padding:12px;background:#1d2a3d;border-radius:6px}@media(max-width:600px){main{padding:12px}.pair{gap:8px}h1{font-size:20px}}</style>
+<main><h1>USB 真機 VFX 前後對照</h1><p>同一台 Samsung Note9 的實際遊戲測試畫面。這是施放瞬間的對照；動畫連續性、命中與清理另有測試紀錄。</p>
+<label for="case">選擇技能或狀態　</label><select id="case"></select><p id="note"></p>
+<div class="pair"><figure><figcaption>修改前／上一輪</figcaption><div class="source" id="beforeSource"></div><img id="before" alt="修改前手機截圖"></figure><figure><figcaption>目前候選</figcaption><div class="source" id="afterSource"></div><img id="after" alt="目前候選手機截圖"></figure></div>
+<p>使用獨立唯讀 QA 帳號。較早基線與本輪的瀏覽器可視高度略有差異；圖片完整呈現，沒有裁切或重繪截圖。</p>
+<h2>九龍火：最新 USB 實機完整錄影</h2><p>7cdebfb2：保留多龍首、盤身與火環，只修正血條圖層。獨立審核確認身份、尺寸、HUD 與退場通過；停止額外精修。</p><video controls preload="metadata" style="width:min(100%,460px)" data-recording="../../artifacts/vfx-freeze-relic-final-usb/relic-cycle.mp4"></video>
+<h2>六項對位修正與洪流獸：USB 實機完整錄影</h2><p>1d02be83：水球、治療、怒火、風行、岩壁、風起雲湧各對準實際角色；洪流獸修正飛行朝向。逐項實機視覺審核通過。</p><video controls preload="metadata" style="width:min(100%,460px)" data-recording="../../artifacts/vfx-final-recipient-usb/skill-cycle.mp4"></video>
+<h2>群體寬幅素材：前一批 USB 實機錄影</h2><p>b1ede88d 歷史錄影：其中七項通過並保留；水球、治療、怒火、風行與岩壁的舊對位失敗已由上方新版取代。</p><video controls preload="metadata" style="width:min(100%,460px)" data-recording="../../artifacts/vfx-wide-batch-usb/skill-cycle.mp4"></video>
+<h2>其餘技能：連續動畫審核原片</h2><p>7cdebfb2，27 項施放，分組獨立審核起手、命中相鄰影格與消退。畫質及辨識通過者停止精修；12fps 影格抽樣不代表固定60fps保證。</p><video controls preload="metadata" style="width:min(100%,460px)" data-recording="../../artifacts/vfx-freeze-relic-final-usb/skill-cycle.mp4"></video><h2>持續狀態：USB 實機完整錄影</h2><p>候選 590b1390，14 種身體狀態逐項開／關，玩家與敵方同步展示。21 種狀態靜態畫面通過，8 種脈動狀態已完成抽樣動態檢查；六人混合畫面審核通過；先前狀態輪替強制排版卡頓已修正並完成有界實機追蹤，保留偶發掉幀的測試限制。</p><video controls preload="metadata" style="width:min(100%,460px)" data-recording="../../artifacts/vfx-status-contrast-v2/status-cycle.mp4"></video></main>
+<script>
+// USB recordings are local QA evidence, supplied beside this viewer rather than
+// production resources. Resolve them at runtime; keep full recording controls.
+document.querySelectorAll('video[data-recording]').forEach(video=>{
+  video.setAttribute('src',video.dataset.recording);
+});
+const rows=[
+ ['relic_nine_dragon_fire','九龍火秘寶','relic','恢復清楚多龍首、盤身與火環；保留尺寸，只提升正式 HUD 圖層。USB 身份、尺寸、血條與退場通過，停止精修。'],
+ ['waterBall','水球術','skill','每名實際目標各有水球，修正原本打在角色之間的問題；USB 審核通過。'],
+ ['healSpell','治療術','skill','水蓮分別對準各名實際受益角色，保留人物與血條；USB 審核通過。'],
+ ['dodgeSkill','風行施放','skill','各名實際受益角色各有清楚綠風環，沒有再壓住姓名與血條。'],
+ ['rockWall','岩石壁壘施放','skill','岩片護壁對準各名角色軀幹，保留臉部與血條；USB 審核通過。'],
+ ['floodBeast','洪流獸','skill','保留水獸形態，修正飛行方向；USB 連續影格確認朝目標前進、接觸並濺水退場。'],
+ ['dinghaishenzhen','氣定神閒施放','skill','每名實際受益角色各有低位印記，三人、六敵與部分目標均已驗證。'],
+ ['freeze','冰封施放：六敵直列','skill','同一六敵陣形的修正前後：原本列間一座冰牢，改為兩名正式目標各自受凍；不更動技能範圍。'],
+ ['flameSlash','火焰斬','skill','斬柱改為纖細斜弧，保留火焰辨識，檢查命中星芒與角色可讀性。'],
+ ['dragonSlash','龍斬','skill','保留龍首與盤身，檢查裁切、開場與尾段消散。'],
+ ['blazeSpell','火法','skill','完整火焰尖弧取代平切大柱，檢查法陣與收尾。'],
+ ['rage','怒火施放','skill','移除矩形底，保留向上增益標誌。'],
+ ['earthShield','萬象土盾施放','skill','單人土盾改為單盾，檢查不再畫出三個盾。'],
+ ['fireSoulResonance','火魂共鳴施放','skill','環流中央保留透明空間，檢查相鄰幀位置。'],
+ ['windSpell','群體風法','skill','改為原生寬扁三道風卷，三個目標各有接觸；保留安全範圍與角色資訊。'],
+ ['explosiveFlurry','火爆亂擊','skill','三道交叉火刃保留斬擊特色；USB 畫面審核通過，停止額外精修。'],
+ ['stormCircle','風焰術','skill','三道風刃仍接觸目標，尺寸與辨識達標，保留目前版本。'],
+ ['petrifyFist','石盾拳','skill','保留岩拳接觸與碎石，USB 畫面審核通過。'],
+ ['earthquakeCrush','地裂重拳','skill','保留三點岩石衝擊，不為追求完全同心而繼續重畫。'],
+ ['stoneThrow','落石術','skill','岩塊與目標接觸範圍通過，保留角色與血條可讀性。'],
+ ['sandWind','滾石術','skill','保留滾石材質與三個作用點，停止額外精修。'],
+ ['barrier','結界施放','skill','依正式單體友方目標驗證；保留單一結界與角色資訊。'],
+ ['stormRain','風起雲湧','skill','三道分離旋風取代滿幅霧團，檢查各目標辨識。'],
+ ['iceArrowRain','冰箭雨','skill','保留全體範圍，檢查血條、裁切與命中。'],
+ ['rage','怒火常駐','status','火臉改為中空火環，保留人物與既有狀態辨識。'],
+ ['stun','暈眩','status','全身星旋移到頭部附近，避免遮住臉胸。'],
+ ['agilityDown','重力圖示','status','檢查 24px 暗色圖示輪廓對比。'],
+ ['defenseDown','破防圖示','status','檢查 24px 暗色圖示輪廓對比。'],
+ ['burn','燃燒常駐','status','下半身火苗與角色腳底對齊，避免搶走人物視覺。'],
+ ['freeze','冰封常駐','status','保留完整冰牢辨識，讓角色及自身血條仍可讀。'],
+ ['petrify','石化常駐','status','保留石殼形態，檢查完整包覆與材質透明度。'],
+ ['shield','護盾常駐','status','檢查身側護框與腳底位置，不延伸到 HUD。'],
+ ['earthShield','萬象土盾常駐','status','保留岩質與元素徽記，檢查人物可讀性。'],
+ ['rockWall','岩石壁壘常駐','status','低位岩柱保持辨識，避免全身大型罩。'],
+ ['barrier','結界常駐','status','保留符文板與中央開口，不遮人物臉。'],
+ ['dodgeSkill','風行常駐','status','風流位於下半身與腳邊，檢查縮小後是否仍可辨識。'],
+ ['dinghaishenzhen','氣定神閒常駐','status','低位印記，與風行分別辨識。'],
+ ['yuanZuBlessing','元祖賜福常駐','status','低位金色符帶，檢查不再繞住臉部。'],
+ ['fireSoulResonance','炎魂共鳴常駐','status','保留火魂辨識，降低持續霧光。'],
+ ['bloodBurn','焚血常駐','status','深紅尖焰保持危險感，與橘色燃燒區分。']
+];
+rows.push(...[["fireCritical","會心一擊","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["fireRocket","火箭","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["flameTornado","烈焰龍捲","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["phoenixCry","火鳳天鳴","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["waterKnife","水刀斬","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["frostPunch","冰霜拳","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["iceSpin","冰旋一閃","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["frostCrush","冰封重擊","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["revive","復活術","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["stormFist","暴風拳","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["stormFlurry","暴風亂擊","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["windCrossSlash","風旋十字斬","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["dizzyFist","暈眩猛擊","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["windHowlLightning","風哮電擊","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["stealthSkill","隱身術","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["stoneSlash","土石斬","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["stoneBreakSky","石破天驚","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["flyingSandStrike","飛沙瞬擊","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["dustStorm","地牛猛襲","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["bloodBurnArt","焚血訣","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["purifyMind","淨心訣","skill","逐項實機視覺審核通過，保留技能身份、命中與退場；停止額外精修。"],["frostbite","凍傷常駐","status","沿用已通過的狀態呈現，保留人物與血條；停止額外精修。"],["damageDown","殤風常駐","status","沿用已通過的狀態呈現，保留人物與血條；停止額外精修。"],["stealthSkill","隱身術常駐","status","沿用已通過的狀態呈現，保留人物與血條；停止額外精修。"],["fireMomentum","炎勢常駐","status","沿用已通過的狀態呈現，保留人物與血條；停止額外精修。"],["phoenixMight","鳳威常駐","status","沿用已通過的狀態呈現，保留人物與血條；停止額外精修。"]]);
+const finalPeaks={"flameSlash":15,"fireCritical":33,"dragonSlash":54,"fireRocket":87,"blazeSpell":104,"flameTornado":129,"phoenixCry":163,"waterKnife":198,"frostPunch":212,"frostCrush":232,"iceArrowRain":251,"revive":280,"fireSoulResonance":309,"bloodBurnArt":335,"purifyMind":353,"dizzyFist":409,"dustStorm":463,"earthShield":491,"flyingSandStrike":519,"stealthSkill":541,"stoneBreakSky":572,"stoneSlash":596,"stormFist":615,"windCrossSlash":639,"windHowlLightning":666};
+const picker=document.getElementById('case');rows.forEach((r,i)=>picker.add(new Option(r[1],i)));
+function show(){const [id,label,kind,note]=rows[Number(picker.value)];const baseline=id==='flameSlash'||id==='iceArrowRain';
+const recentPeaks={waterBall:19,healSpell:38,rage:60,dodgeSkill:85,rockWall:108,stormRain:140,floodBeast:170};
+const recentPeak=kind==='skill'&&recentPeaks[id];
+const originalRage=kind==='status'&&id==='rage';
+const before=kind==='relic'?'../../artifacts/vfx-usb-runtime/before-relic_nine_dragon_fire.png':kind==='skill'&&id==='freeze'?'../../artifacts/vfx-final-recipient-usb/range-frames/frame-0047.png':originalRage?'../../artifacts/vfx-status-anchors-player/status-rage-original.png':baseline&&kind==='skill'?`../../artifacts/vfx-usb-runtime/before-${id}.png`:`../../artifacts/vfx-checkpoint18/${kind}-${id}.png`;
+const revisedGroup=['rage','windSpell'];
+const revisedStatus=kind==='status'&&['rage','dodgeSkill','dinghaishenzhen'].includes(id);
+const passedPeakFrames={explosiveFlurry:16,stormCircle:36,petrifyFist:104,earthquakeCrush:132,stoneThrow:154,sandWind:176,barrier:272};
+const currentPeak=kind==='skill'&&passedPeakFrames[id];
+const folder=kind==='status'?(revisedStatus?'vfx-status-contrast-v2':'vfx-status-anchors-player'):revisedGroup.includes(id)?'vfx-status-polish':'vfx-final';
+document.getElementById('before')['src']=before;document.getElementById('after')['src']=kind==='relic'?'../../artifacts/vfx-freeze-relic-final-usb/relic-frames/frame-0055.png':kind==='skill'&&id==='freeze'?'../../artifacts/vfx-freeze-relic-final-usb/range-frames/frame-0045.png':kind==='skill'&&id==='dinghaishenzhen'?'../../artifacts/vfx-recipient-prototype/recipient-frames/frame-0016.png':recentPeak?`../../artifacts/vfx-final-recipient-usb/sequence-frames/frame-${String(recentPeak).padStart(4,'0')}.png`:currentPeak?`../../artifacts/vfx-wide-batch-usb/sequence-frames/frame-${String(currentPeak).padStart(4,'0')}.png`:kind==='skill'&&id==='flameSlash'?'../../artifacts/vfx-remaining-hit/flame-contact.png':kind==='skill'&&id==='windSpell'?'../../artifacts/vfx-wind-wide/skill-windSpell.png':`../../artifacts/${folder}/${kind}-${id}.png`;
+document.getElementById('beforeSource').textContent=originalRage?'同一候選環境：原素材重播':baseline&&kind==='skill'?'原始基線 b767d31e':'上一輪 checkpoint 18f92b26';
+document.getElementById('afterSource').textContent=kind==='relic'||kind==='skill'&&id==='freeze'?'USB 原片審核影格 7cdebfb2（含手機瀏覽器介面）':recentPeak?'USB 原片審核影格 1d02be83（含手機瀏覽器介面）':kind==='skill'&&id==='dinghaishenzhen'?'USB 原片審核影格 20ecbf97':currentPeak?'USB 原片審核影格 b1ede88d（含手機瀏覽器介面）':kind==='status'?(revisedStatus?'局部修正候選 590b1390':'狀態候選 4b2cb548'):id==='flameSlash'?'USB 原片命中影格 ade43a48（含手機瀏覽器介面）':id==='windSpell'?'原生寬扁風卷 ade43a48':revisedGroup.includes(id)?'取消過度放大候選 b145e2d7':'素材候選 067fa105';
+if(kind==='relic')document.getElementById('beforeSource').textContent='原始基線 b767d31e';
+if(kind==='skill'&&id==='freeze')document.getElementById('beforeSource').textContent='六敵直列：修正前 1d02be83';
+if(kind==='skill'&&finalPeaks[id]){document.getElementById('after')['src']='../../artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-'+String(finalPeaks[id]).padStart(4,'0')+'.png';document.getElementById('afterSource').textContent='USB 原片實看峰值 7cdebfb2';}
+if(kind==='skill'&&['iceSpin','stormFlurry'].includes(id)){const frame=id==='iceSpin'?14:58;document.getElementById('after')['src']='../../artifacts/vfx-recipient-prototype/sequence-frames/frame-'+String(frame).padStart(4,'0')+'.png';document.getElementById('afterSource').textContent='USB 原片審核影格 20ecbf97';}
+document.getElementById('note').textContent=note;}
+picker.onchange=show;show();
+</script></html>
