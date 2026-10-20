@@ -944,6 +944,10 @@ button:disabled{
 }
 
 .training-zone-item{
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    min-height:52px;
     font-size:17px;
     font-weight:bold;
 

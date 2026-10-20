@@ -12415,7 +12415,7 @@
       "label": "patrol內頁",
       "entry": "玩法頁正式入口→patrol",
       "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
-      "status": "未檢查",
+      "status": "有問題",
       "states": [
         "鎖定",
         "解鎖",
@@ -12468,6 +12468,19 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "issues": [
+        "35首360入口training-zone-item實際36px/EFPtrue，未達44門檻即停止；尚未進map，非巡邏畫面驗收。原CSS00補52px min-height及flex垂直置中，修後待驗。"
+      ],
+      "diagnosticEvidence": {
+        "head": "297d72abb474186b2c9c0130c4d2a6d55bde70ac",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment35-entry-before",
+        "status": "有問題/未驗收",
+        "limits": [
+          "僅入口before，未進巡邏地圖",
+          "8 restore flags true，private caches/runtime瞬態不主張完整還原",
+          "原party auto configs off precondition；不改玩法或補給邏輯"
+        ]
       }
     },
     {
@@ -26744,6 +26757,12 @@
         "v169 assets-flow本機identify ENOENT未算通過；最新Head必要Actions待核對",
         "未合併dev，未部署本工作；新dev cc2842技能來源無新增差異，戰鬥樣式/builder LF正規化合併需保留上游"
       ]
+    },
+    {
+      "segment": "segment35-entry-before",
+      "head": "297d72abb474186b2c9c0130c4d2a6d55bde70ac",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment35-entry-before",
+      "status": "36px入口問題，修後實畫待驗"
     }
   ],
   "titleAudit": {
