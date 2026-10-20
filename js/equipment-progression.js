@@ -949,7 +949,7 @@
         let slots;
         try{ slots=owner.slots(item); }
         catch(_){ stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot">冶煉資料異常，請保留原資料。</div>');return; }
-        slots.forEach((affix,index)=>stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot" data-reforge-slot="'+index+'">'+(affix?'':'詞條 '+(index+1)+'：')+escapeHtml(owner.slotText(affix))+'</div>'));
+        slots.forEach((affix,index)=>stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot" data-reforge-slot="'+index+'">'+'詞條 '+(index+1)+'：'+escapeHtml(owner.slotText(affix))+'</div>'));
         const reason=owner.reason(item);
         if(reason){ stats.insertAdjacentHTML("beforeend",'<div class="v17346-reforge-slot v17346-reforge-reason">'+escapeHtml(reason)+'</div>'); }
     }

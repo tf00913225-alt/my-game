@@ -55,17 +55,6 @@
 
 /* Native skill/status/character detail presentation is owned by css/23. */
 
-.v141-item-reforge{
-    display:flex;
-    flex-wrap:wrap;
-    gap:calc(5 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px));
-    margin-top:calc(7 * var(--ui-length-unit,1px));
-    padding-top:calc(7 * var(--ui-length-unit,1px));
-    border-top:calc(1 * var(--ui-length-unit,1px)) solid rgba(210,164,78,.42);
-    color:#cde7ff;
-}
-
-.v141-item-reforge b{width:100%;color:#80d7ff;}
 .v141-decompose-button{background:linear-gradient(180deg,#65431d,#35200d) !important;}
 
 /* ----- Battle card geometry, name placement and shield bar ----- */
