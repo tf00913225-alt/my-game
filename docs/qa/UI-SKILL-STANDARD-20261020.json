@@ -25108,6 +25108,18 @@
             "Same-task selected domain unchanged for entry/navigation/return, not zero local saves; original open lastViewedAt/beginChapter effects retained",
             "Prior black/overlap/pointer/wheel failures retained only as diagnostics; desktop native-wheel replaces inadequate old bounded wheel distance"
           ]
+        },
+        {
+          "state": "Skill header cancellation hides borrowed tutorial return in subsequent shop/announcement, four viewports",
+          "status": "已實際驗證",
+          "head": "a078c8bfc9a271666a72cf03fa2289db17146cec",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment29b-stale-return-accepted",
+          "limits": [
+            "Only skill tutorial header cancellation then true shop/announcement entry; stale tutorial button hidden0x0",
+            "Original two entrance handlers have selected-domain same-task observations; cancel/shop/announcement taps are not covered by that observer",
+            "No purchases/update acknowledgement/learning/equipment/claim/combat; original open save effects retained",
+            "Full120/pager and other cancellation routes remain unverified; no general tutorial completion acceptance"
+          ]
         }
       ]
     },
@@ -25975,6 +25987,18 @@
         "No learning/equipment/claim/preparation-confirm/potion/combat/settlement/cloud actions; recovery secondary confirmation is readable, not a verified disabled state",
         "Same-task selected domain unchanged for entry/navigation/return, not zero local saves; original open lastViewedAt/beginChapter effects retained",
         "Prior black/overlap/pointer/wheel failures retained only as diagnostics; desktop native-wheel replaces inadequate old bounded wheel distance"
+      ]
+    },
+    {
+      "segment": "segment-29b-stale-return",
+      "head": "a078c8bfc9a271666a72cf03fa2289db17146cec",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment29b-stale-return-accepted",
+      "result": "取消後共用彈窗殘留返回修復限定通過",
+      "pending": [
+        "Only skill tutorial header cancellation then true shop/announcement entry; stale tutorial button hidden0x0",
+        "Original two entrance handlers have selected-domain same-task observations; cancel/shop/announcement taps are not covered by that observer",
+        "No purchases/update acknowledgement/learning/equipment/claim/combat; original open save effects retained",
+        "Full120/pager and other cancellation routes remain unverified; no general tutorial completion acceptance"
       ]
     }
   ],
