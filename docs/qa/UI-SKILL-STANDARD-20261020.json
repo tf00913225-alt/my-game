@@ -2596,10 +2596,10 @@
     },
     {
       "id": "detail.character-detail",
-      "label": "背包角色詳細",
+      "label": "背包角色詳細資訊",
       "entry": "openInventoryCharacterDetail()",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "短內容",
         "長內容",
@@ -2644,7 +2644,44 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "原合格detail保留，真背包詳按鈕/關閉返回",
+          "status": "已實際驗證",
+          "scope": "固定Head具體呈現/導航；full及長名是隔離fixture，無交易",
+          "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-156-inventory-character-detail.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-populated-page5-3bb.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-156-inventory-character-detail.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-populated-page5-3bb.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-156-inventory-character-detail.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-populated-page5-3bb.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-156-inventory-character-detail.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-populated-page5-3bb.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -2681,14 +2718,35 @@
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
         }
+      },
+      "presentationEvidence": {
+        "segment": "segment-15",
+        "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+        "baseEvidenceHead": "15660a34",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted",
+        "verified": [
+          "原合格detail保留，真背包詳按鈕/關閉返回",
+          "原shell/title/44target；合法16字與等級完整",
+          "120格/5頁/5欄與原rarity semantics保留"
+        ],
+        "notVerified": [
+          "使用/裝備/出售/交易/真帳號/硬體",
+          "所有未拍物品變體",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸正常/合法16字滿資料/末端/第120格及代表分類/detail限定通過",
+          "interaction": "真四情境entry/return/分類/pager/唯一grid末端，3bb四尺寸name/Lv/頁碼/最後120格delta與索引119配對",
+          "scope": "CSS22 canonical原Owner/HTML裝飾文字/測試/生成；無JS/容量/rarity/handler變更；formal測試按真安全區與字型就緒"
+        }
       }
     },
     {
       "id": "inventory.tab.equipment",
-      "label": "背包分類 equipment",
+      "label": "背包分類：裝備",
       "entry": "openMapInventoryOverlay('home'); setInventoryFilter('equipment')",
       "owner": "index.html; js/00-main.js; css/22-stage-v78-character-inventory-core.css; css/24-stage-v85-inventory-inner-grid-scroll-root.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "少資料",
@@ -2735,19 +2793,77 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真分類/稀疏及120件full/真5頁/occupied末索引119",
+          "status": "已實際驗證",
+          "scope": "固定Head具體呈現/導航；full及長名是隔離fixture，無交易",
+          "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-occupied-slot120-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-populated-page5-3bb.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-occupied-slot120-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-populated-page5-3bb.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-occupied-slot120-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-populated-page5-3bb.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-occupied-slot120-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-populated-page5-3bb.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-15",
+        "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+        "baseEvidenceHead": "15660a34",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted",
+        "verified": [
+          "真分類/稀疏及120件full/真5頁/occupied末索引119",
+          "原shell/title/44target；合法16字與等級完整",
+          "120格/5頁/5欄與原rarity semantics保留"
+        ],
+        "notVerified": [
+          "使用/裝備/出售/交易/真帳號/硬體",
+          "所有未拍物品變體",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸正常/合法16字滿資料/末端/第120格及代表分類/detail限定通過",
+          "interaction": "真四情境entry/return/分類/pager/唯一grid末端，3bb四尺寸name/Lv/頁碼/最後120格delta與索引119配對",
+          "scope": "CSS22 canonical原Owner/HTML裝飾文字/測試/生成；無JS/容量/rarity/handler變更；formal測試按真安全區與字型就緒"
+        }
       }
     },
     {
       "id": "inventory.tab.item",
-      "label": "背包分類 item",
+      "label": "背包分類：物品",
       "entry": "openMapInventoryOverlay('home'); setInventoryFilter('item')",
       "owner": "index.html; js/00-main.js; css/22-stage-v78-character-inventory-core.css; css/24-stage-v85-inventory-inner-grid-scroll-root.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "少資料",
@@ -2794,19 +2910,77 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真物品TAB/隔離既有補品fixture",
+          "status": "已實際驗證",
+          "scope": "固定Head具體呈現/導航；full及長名是隔離fixture，無交易",
+          "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-156-category-item.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-populated-page5-3bb.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-156-category-item.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-populated-page5-3bb.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-156-category-item.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-populated-page5-3bb.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-156-category-item.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-populated-page5-3bb.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-15",
+        "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+        "baseEvidenceHead": "15660a34",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted",
+        "verified": [
+          "真物品TAB/隔離既有補品fixture",
+          "原shell/title/44target；合法16字與等級完整",
+          "120格/5頁/5欄與原rarity semantics保留"
+        ],
+        "notVerified": [
+          "使用/裝備/出售/交易/真帳號/硬體",
+          "所有未拍物品變體",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸正常/合法16字滿資料/末端/第120格及代表分類/detail限定通過",
+          "interaction": "真四情境entry/return/分類/pager/唯一grid末端，3bb四尺寸name/Lv/頁碼/最後120格delta與索引119配對",
+          "scope": "CSS22 canonical原Owner/HTML裝飾文字/測試/生成；無JS/容量/rarity/handler變更；formal測試按真安全區與字型就緒"
+        }
       }
     },
     {
       "id": "inventory.tab.material",
-      "label": "背包分類 material",
+      "label": "背包分類：材料",
       "entry": "openMapInventoryOverlay('home'); setInventoryFilter('material')",
       "owner": "index.html; js/00-main.js; css/22-stage-v78-character-inventory-core.css; css/24-stage-v85-inventory-inner-grid-scroll-root.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "少資料",
@@ -2853,19 +3027,77 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真材料TAB/本fixture無材料；非所有材料詳情",
+          "status": "已實際驗證",
+          "scope": "固定Head具體呈現/導航；full及長名是隔離fixture，無交易",
+          "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-156-category-material.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-populated-page5-3bb.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-156-category-material.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-populated-page5-3bb.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-156-category-material.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-populated-page5-3bb.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-156-category-material.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-populated-page5-3bb.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-15",
+        "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+        "baseEvidenceHead": "15660a34",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted",
+        "verified": [
+          "真材料TAB/本fixture無材料；非所有材料詳情",
+          "原shell/title/44target；合法16字與等級完整",
+          "120格/5頁/5欄與原rarity semantics保留"
+        ],
+        "notVerified": [
+          "使用/裝備/出售/交易/真帳號/硬體",
+          "所有未拍物品變體",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸正常/合法16字滿資料/末端/第120格及代表分類/detail限定通過",
+          "interaction": "真四情境entry/return/分類/pager/唯一grid末端，3bb四尺寸name/Lv/頁碼/最後120格delta與索引119配對",
+          "scope": "CSS22 canonical原Owner/HTML裝飾文字/測試/生成；無JS/容量/rarity/handler變更；formal測試按真安全區與字型就緒"
+        }
       }
     },
     {
       "id": "inventory.tab.function",
-      "label": "背包分類 function",
+      "label": "背包分類：功能",
       "entry": "openMapInventoryOverlay('home'); setInventoryFilter('function')",
       "owner": "index.html; js/00-main.js; css/22-stage-v78-character-inventory-core.css; css/24-stage-v85-inventory-inner-grid-scroll-root.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "少資料",
@@ -2912,19 +3144,77 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真功能TAB/本fixture無功能物品",
+          "status": "已實際驗證",
+          "scope": "固定Head具體呈現/導航；full及長名是隔離fixture，無交易",
+          "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-156-category-function.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-populated-page5-3bb.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-156-category-function.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-populated-page5-3bb.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-156-category-function.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-populated-page5-3bb.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-156-category-function.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-populated-page5-3bb.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-15",
+        "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+        "baseEvidenceHead": "15660a34",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted",
+        "verified": [
+          "真功能TAB/本fixture無功能物品",
+          "原shell/title/44target；合法16字與等級完整",
+          "120格/5頁/5欄與原rarity semantics保留"
+        ],
+        "notVerified": [
+          "使用/裝備/出售/交易/真帳號/硬體",
+          "所有未拍物品變體",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸正常/合法16字滿資料/末端/第120格及代表分類/detail限定通過",
+          "interaction": "真四情境entry/return/分類/pager/唯一grid末端，3bb四尺寸name/Lv/頁碼/最後120格delta與索引119配對",
+          "scope": "CSS22 canonical原Owner/HTML裝飾文字/測試/生成；無JS/容量/rarity/handler變更；formal測試按真安全區與字型就緒"
+        }
       }
     },
     {
       "id": "inventory.entry.home",
-      "label": "背包情境入口 home",
+      "label": "背包入口：主城",
       "entry": "openMapInventoryOverlay('home')",
       "owner": "index.html; js/00-main.js; js/04-stage-v11-native-bottom-nav-runtime.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "開啟",
         "詳情覆蓋導覽",
@@ -2968,19 +3258,77 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真主城背包入口/關閉還原",
+          "status": "已實際驗證",
+          "scope": "固定Head具體呈現/導航；full及長名是隔離fixture，無交易",
+          "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-inventory-home.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-populated-page5-3bb.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-inventory-home.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-populated-page5-3bb.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-inventory-home.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-populated-page5-3bb.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-inventory-home.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-populated-page5-3bb.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-15",
+        "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+        "baseEvidenceHead": "15660a34",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted",
+        "verified": [
+          "真主城背包入口/關閉還原",
+          "原shell/title/44target；合法16字與等級完整",
+          "120格/5頁/5欄與原rarity semantics保留"
+        ],
+        "notVerified": [
+          "使用/裝備/出售/交易/真帳號/硬體",
+          "所有未拍物品變體",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸正常/合法16字滿資料/末端/第120格及代表分類/detail限定通過",
+          "interaction": "真四情境entry/return/分類/pager/唯一grid末端，3bb四尺寸name/Lv/頁碼/最後120格delta與索引119配對",
+          "scope": "CSS22 canonical原Owner/HTML裝飾文字/測試/生成；無JS/容量/rarity/handler變更；formal測試按真安全區與字型就緒"
+        }
       }
     },
     {
       "id": "inventory.entry.training",
-      "label": "背包情境入口 training",
+      "label": "背包入口：野怪區",
       "entry": "openMapInventoryOverlay('training')",
       "owner": "index.html; js/00-main.js; js/04-stage-v11-native-bottom-nav-runtime.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "開啟",
         "詳情覆蓋導覽",
@@ -3024,19 +3372,77 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真野怪區nav背包/關閉還原",
+          "status": "已實際驗證",
+          "scope": "固定Head具體呈現/導航；full及長名是隔離fixture，無交易",
+          "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-156-inventory-training.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-populated-page5-3bb.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-156-inventory-training.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-populated-page5-3bb.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-156-inventory-training.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-populated-page5-3bb.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-156-inventory-training.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-populated-page5-3bb.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-15",
+        "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+        "baseEvidenceHead": "15660a34",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted",
+        "verified": [
+          "真野怪區nav背包/關閉還原",
+          "原shell/title/44target；合法16字與等級完整",
+          "120格/5頁/5欄與原rarity semantics保留"
+        ],
+        "notVerified": [
+          "使用/裝備/出售/交易/真帳號/硬體",
+          "所有未拍物品變體",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸正常/合法16字滿資料/末端/第120格及代表分類/detail限定通過",
+          "interaction": "真四情境entry/return/分類/pager/唯一grid末端，3bb四尺寸name/Lv/頁碼/最後120格delta與索引119配對",
+          "scope": "CSS22 canonical原Owner/HTML裝飾文字/測試/生成；無JS/容量/rarity/handler變更；formal測試按真安全區與字型就緒"
+        }
       }
     },
     {
       "id": "inventory.entry.dungeon",
-      "label": "背包情境入口 dungeon",
+      "label": "背包入口：副本",
       "entry": "openMapInventoryOverlay('dungeon')",
       "owner": "index.html; js/00-main.js; js/04-stage-v11-native-bottom-nav-runtime.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "開啟",
         "詳情覆蓋導覽",
@@ -3080,19 +3486,77 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真副本nav背包/關閉還原",
+          "status": "已實際驗證",
+          "scope": "固定Head具體呈現/導航；full及長名是隔離fixture，無交易",
+          "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-156-inventory-dungeon.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-populated-page5-3bb.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-156-inventory-dungeon.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-populated-page5-3bb.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-156-inventory-dungeon.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-populated-page5-3bb.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-156-inventory-dungeon.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-populated-page5-3bb.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-15",
+        "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+        "baseEvidenceHead": "15660a34",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted",
+        "verified": [
+          "真副本nav背包/關閉還原",
+          "原shell/title/44target；合法16字與等級完整",
+          "120格/5頁/5欄與原rarity semantics保留"
+        ],
+        "notVerified": [
+          "使用/裝備/出售/交易/真帳號/硬體",
+          "所有未拍物品變體",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸正常/合法16字滿資料/末端/第120格及代表分類/detail限定通過",
+          "interaction": "真四情境entry/return/分類/pager/唯一grid末端，3bb四尺寸name/Lv/頁碼/最後120格delta與索引119配對",
+          "scope": "CSS22 canonical原Owner/HTML裝飾文字/測試/生成；無JS/容量/rarity/handler變更；formal測試按真安全區與字型就緒"
+        }
       }
     },
     {
       "id": "inventory.entry.gameplay",
-      "label": "背包情境入口 gameplay",
+      "label": "背包入口：玩法",
       "entry": "openMapInventoryOverlay('gameplay')",
       "owner": "index.html; js/00-main.js; js/04-stage-v11-native-bottom-nav-runtime.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "開啟",
         "詳情覆蓋導覽",
@@ -3136,11 +3600,69 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真玩法nav背包/關閉還原",
+          "status": "已實際驗證",
+          "scope": "固定Head具體呈現/導航；full及長名是隔離fixture，無交易",
+          "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-156-inventory-gameplay.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-populated-page5-3bb.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-156-inventory-gameplay.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-populated-page5-3bb.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-156-inventory-gameplay.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-populated-page5-3bb.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-156-inventory-gameplay.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-delta-3bb.json",
+              "base": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-presentation-156.json",
+              "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-populated-page5-3bb.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-15",
+        "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+        "baseEvidenceHead": "15660a34",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted",
+        "verified": [
+          "真玩法nav背包/關閉還原",
+          "原shell/title/44target；合法16字與等級完整",
+          "120格/5頁/5欄與原rarity semantics保留"
+        ],
+        "notVerified": [
+          "使用/裝備/出售/交易/真帳號/硬體",
+          "所有未拍物品變體",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸正常/合法16字滿資料/末端/第120格及代表分類/detail限定通過",
+          "interaction": "真四情境entry/return/分類/pager/唯一grid末端，3bb四尺寸name/Lv/頁碼/最後120格delta與索引119配對",
+          "scope": "CSS22 canonical原Owner/HTML裝飾文字/測試/生成；無JS/容量/rarity/handler變更；formal測試按真安全區與字型就緒"
+        }
       }
     },
     {
@@ -14084,6 +14606,16 @@
         "背包四情境／分類／內頁其餘狀態",
         "其他台帳未驗入口/狀態",
         "Latest Head Required CI／部署"
+      ]
+    },
+    {
+      "segment": "segment-15",
+      "head": "3bb8dba51bc177a08a8de3b8965ec7c84847bcf1",
+      "result": "背包原Owner黑鐵外框/對稱中文title/44targets，合法16字/Lv與頁碼不疊、滿格120th末端四尺寸限定通過",
+      "pending": [
+        "正常merge吸收即時dev新增依賴/生成衝突，最新Head必要CI目前缺失且PR mergeable=false",
+        "秘寶overview/detail/growth/equip與其餘台帳實際狀態",
+        "部署/原症狀及硬體未驗"
       ]
     }
   ],
