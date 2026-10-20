@@ -5601,7 +5601,7 @@
       "label": "自動戰鬥 strategy",
       "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "選單展開",
         "已選取",
@@ -5654,6 +5654,37 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-7",
+        "head": "087f59ab2c8315d821098368d425d52820d27b84",
+        "baseEvidenceHead": "e80f20802fd0d5dcfb782bdf6315303b59c0c76b",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "basePresentation": "artifacts/ui-skill-standard/segment7-main-after-e80f2080",
+        "baseInteraction": "artifacts/ui-skill-standard/segment7-controls-e80f2080/resolved",
+        "deltaInteraction": "artifacts/ui-skill-standard/segment7-final-087f59ab/resolved",
+        "verified": [
+          "固定策略卡上緣無穿字",
+          "內側頂線與文字完整",
+          "原捲動末端／返回／重新開啟"
+        ],
+        "notVerified": [
+          "開戰／勝負／結算",
+          "真實廣告與獎勵領取",
+          "交易／存檔",
+          "實體裝置",
+          "未列出的其他狀態"
+        ],
+        "reviews": {
+          "art": "原主殼四尺寸＋final delta實圖限定通過",
+          "interaction": "四尺寸真觸控／捲動／返回限定通過",
+          "scope": "原Owner CSS-only與前後實圖，限定通過"
+        }
       }
     },
     {
@@ -6510,7 +6541,7 @@
       "label": "玩法主頁 boss",
       "entry": "showPage('boss') 或正式玩法入口",
       "owner": "index.html; js/00-main.js; js/gameplay-boss-tower-system.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -6593,6 +6624,37 @@
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
         }
+      },
+      "presentationEvidence": {
+        "segment": "segment-7",
+        "head": "087f59ab2c8315d821098368d425d52820d27b84",
+        "baseEvidenceHead": "e80f20802fd0d5dcfb782bdf6315303b59c0c76b",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "basePresentation": "artifacts/ui-skill-standard/segment7-main-after-e80f2080",
+        "baseInteraction": "artifacts/ui-skill-standard/segment7-controls-e80f2080/resolved",
+        "deltaInteraction": "artifacts/ui-skill-standard/segment7-final-087f59ab/resolved",
+        "verified": [
+          "主框／對稱標題材質",
+          "個人／世界TAB／詳情／返回",
+          "鎖定資訊可讀且禁用保留"
+        ],
+        "notVerified": [
+          "開戰／勝負／結算",
+          "真實廣告與獎勵領取",
+          "交易／存檔",
+          "實體裝置",
+          "未列出的其他狀態"
+        ],
+        "reviews": {
+          "art": "原主殼四尺寸＋final delta實圖限定通過",
+          "interaction": "四尺寸真觸控／捲動／返回限定通過",
+          "scope": "原Owner CSS-only與前後實圖，限定通過"
+        }
       }
     },
     {
@@ -6600,7 +6662,7 @@
       "label": "玩法主頁 gameplay",
       "entry": "showPage('gameplay') 或正式玩法入口",
       "owner": "index.html; js/00-main.js; js/gameplay-boss-tower-system.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -6683,6 +6745,36 @@
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
         }
+      },
+      "presentationEvidence": {
+        "segment": "segment-7",
+        "head": "087f59ab2c8315d821098368d425d52820d27b84",
+        "baseEvidenceHead": "e80f20802fd0d5dcfb782bdf6315303b59c0c76b",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "basePresentation": "artifacts/ui-skill-standard/segment7-main-after-e80f2080",
+        "baseInteraction": "artifacts/ui-skill-standard/segment7-controls-e80f2080/resolved",
+        "deltaInteraction": "artifacts/ui-skill-standard/segment7-final-087f59ab/resolved",
+        "verified": [
+          "主框／對稱標題材質",
+          "Hub真捲末端／回頂／進塔／返回"
+        ],
+        "notVerified": [
+          "開戰／勝負／結算",
+          "真實廣告與獎勵領取",
+          "交易／存檔",
+          "實體裝置",
+          "未列出的其他狀態"
+        ],
+        "reviews": {
+          "art": "原主殼四尺寸＋final delta實圖限定通過",
+          "interaction": "四尺寸真觸控／捲動／返回限定通過",
+          "scope": "原Owner CSS-only與前後實圖，限定通過"
+        }
       }
     },
     {
@@ -6690,7 +6782,7 @@
       "label": "玩法主頁 tower",
       "entry": "showPage('tower') 或正式玩法入口",
       "owner": "index.html; js/00-main.js; js/gameplay-boss-tower-system.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -6772,6 +6864,37 @@
           "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
+      },
+      "presentationEvidence": {
+        "segment": "segment-7",
+        "head": "087f59ab2c8315d821098368d425d52820d27b84",
+        "baseEvidenceHead": "e80f20802fd0d5dcfb782bdf6315303b59c0c76b",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "basePresentation": "artifacts/ui-skill-standard/segment7-main-after-e80f2080",
+        "baseInteraction": "artifacts/ui-skill-standard/segment7-controls-e80f2080/resolved",
+        "deltaInteraction": "artifacts/ui-skill-standard/segment7-final-087f59ab/resolved",
+        "verified": [
+          "主框／對稱標題材質",
+          "原封面與資訊格保留",
+          "真捲末端／展開overview／返回"
+        ],
+        "notVerified": [
+          "開戰／勝負／結算",
+          "真實廣告與獎勵領取",
+          "交易／存檔",
+          "實體裝置",
+          "未列出的其他狀態"
+        ],
+        "reviews": {
+          "art": "原主殼四尺寸＋final delta實圖限定通過",
+          "interaction": "四尺寸真觸控／捲動／返回限定通過",
+          "scope": "原Owner CSS-only與前後實圖，限定通過"
         }
       }
     },
@@ -7627,7 +7750,7 @@
       "label": "personal首領TAB與詳情",
       "entry": "vGameplaySwitchBossTab('personal'); vGameplayOpenBossDetail(...)",
       "owner": "js/gameplay-boss-tower-system.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "鎖定",
         "可挑戰",
@@ -7679,6 +7802,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-7",
+        "head": "087f59ab2c8315d821098368d425d52820d27b84",
+        "baseEvidenceHead": "e80f20802fd0d5dcfb782bdf6315303b59c0c76b",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "basePresentation": "artifacts/ui-skill-standard/segment7-main-after-e80f2080",
+        "baseInteraction": "artifacts/ui-skill-standard/segment7-controls-e80f2080/resolved",
+        "deltaInteraction": "artifacts/ui-skill-standard/segment7-final-087f59ab/resolved",
+        "verified": [
+          "TAB／列表／詳情／返回",
+          "鎖定／可用卡資訊與禁用語意"
+        ],
+        "notVerified": [
+          "開戰／勝負／結算",
+          "真實廣告與獎勵領取",
+          "交易／存檔",
+          "實體裝置",
+          "未列出的其他狀態"
+        ],
+        "reviews": {
+          "art": "原主殼四尺寸＋final delta實圖限定通過",
+          "interaction": "四尺寸真觸控／捲動／返回限定通過",
+          "scope": "原Owner CSS-only與前後實圖，限定通過"
+        }
       }
     },
     {
@@ -7686,7 +7839,7 @@
       "label": "world首領TAB與詳情",
       "entry": "vGameplaySwitchBossTab('world'); vGameplayOpenBossDetail(...)",
       "owner": "js/gameplay-boss-tower-system.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "鎖定",
         "可挑戰",
@@ -7738,6 +7891,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-7",
+        "head": "087f59ab2c8315d821098368d425d52820d27b84",
+        "baseEvidenceHead": "e80f20802fd0d5dcfb782bdf6315303b59c0c76b",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "basePresentation": "artifacts/ui-skill-standard/segment7-main-after-e80f2080",
+        "baseInteraction": "artifacts/ui-skill-standard/segment7-controls-e80f2080/resolved",
+        "deltaInteraction": "artifacts/ui-skill-standard/segment7-final-087f59ab/resolved",
+        "verified": [
+          "TAB／列表／詳情／返回",
+          "鎖定名稱／等級／解鎖條件可讀且禁用保留"
+        ],
+        "notVerified": [
+          "開戰／勝負／結算",
+          "真實廣告與獎勵領取",
+          "交易／存檔",
+          "實體裝置",
+          "未列出的其他狀態"
+        ],
+        "reviews": {
+          "art": "原主殼四尺寸＋final delta實圖限定通過",
+          "interaction": "四尺寸真觸控／捲動／返回限定通過",
+          "scope": "原Owner CSS-only與前後實圖，限定通過"
+        }
       }
     },
     {
@@ -7745,7 +7928,7 @@
       "label": "tower-overview內頁",
       "entry": "玩法頁正式入口→tower-overview",
       "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "鎖定",
         "解鎖",
@@ -7798,6 +7981,36 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-7",
+        "head": "087f59ab2c8315d821098368d425d52820d27b84",
+        "baseEvidenceHead": "e80f20802fd0d5dcfb782bdf6315303b59c0c76b",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "basePresentation": "artifacts/ui-skill-standard/segment7-main-after-e80f2080",
+        "baseInteraction": "artifacts/ui-skill-standard/segment7-controls-e80f2080/resolved",
+        "deltaInteraction": "artifacts/ui-skill-standard/segment7-final-087f59ab/resolved",
+        "verified": [
+          "展開／收起／末端可達",
+          "鎖定樓層與守關說明可讀且禁用保留"
+        ],
+        "notVerified": [
+          "開戰／勝負／結算",
+          "真實廣告與獎勵領取",
+          "交易／存檔",
+          "實體裝置",
+          "未列出的其他狀態"
+        ],
+        "reviews": {
+          "art": "原主殼四尺寸＋final delta實圖限定通過",
+          "interaction": "四尺寸真觸控／捲動／返回限定通過",
+          "scope": "原Owner CSS-only與前後實圖，限定通過"
+        }
       }
     },
     {
@@ -11124,6 +11337,18 @@
       "pending": [
         "Auto393/412 sticky上緣露背後字細線",
         "其餘清單狀態",
+        "最新Head CI與部署"
+      ]
+    },
+    {
+      "segment": "segment-7",
+      "head": "087f59ab2c8315d821098368d425d52820d27b84",
+      "baseEvidenceHead": "e80f20802fd0d5dcfb782bdf6315303b59c0c76b",
+      "result": "原主框／標題／鎖定文字／Auto上緣限定通過，非全介面完成",
+      "pending": [
+        "Creation主殼與標題",
+        "深淵／副本標題帶及完整獎勵資料",
+        "其他清單狀態",
         "最新Head CI與部署"
       ]
     }
