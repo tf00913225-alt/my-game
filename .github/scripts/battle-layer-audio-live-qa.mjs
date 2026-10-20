@@ -1256,6 +1256,11 @@ try{
         const sprites=stage?Array.from(stage.querySelectorAll('.v143-vfx-sprite')):[];
         const sprite=sprites[0]||null;
         const bounds=owner.getSideRect('monster');
+        const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.()?.rect;
+        const safeBounds=bounds&&overlay?{
+            left:Math.max(bounds.left,overlay.left),right:Math.min(bounds.right,overlay.right),
+            top:Math.max(bounds.top,overlay.top),bottom:Math.min(bounds.bottom,overlay.bottom)
+        }:null;
         const css=stage?getComputedStyle(stage):null;
         return {
             config:{id:config.id,targetType:config.targetType,duration:config.duration},
@@ -1273,6 +1278,8 @@ try{
                 width:Number.parseFloat(sprite.style.width),height:Number.parseFloat(sprite.style.height)
             }:null,
             bounds,
+            safeBounds,
+            clipPath:sprite?.style.clipPath||null,
             stageOverflow:css?.overflow||null,
             emitted:sprite?.dataset.emittedVisual||null,
             gateId:gate?.id||null
@@ -1288,8 +1295,18 @@ try{
     assert.equal(iceArrowRain?.areaId,"fixed-enemy-zone","Ice Arrow Rain must bind to the complete enemy fixed zone");
     assert.equal(iceArrowRain?.geometrySlots.length,6,"Full-range VFX geometry must retain all six current-wave slots regardless of occupancy");
     assert.equal(iceArrowRain?.targetIndexes.length,6,"The real six-enemy wave must expose all living targets to Ice Arrow Rain");
-    assert.ok(iceArrowRain.spriteBox.width>=iceArrowRain.bounds.width-1,"Ice Arrow Rain must cover the complete enemy width");
-    assert.ok(iceArrowRain.spriteBox.height>=iceArrowRain.bounds.height-1,"Ice Arrow Rain must cover the complete enemy height");
+    // Full range is the formal target set and fixed geometry, not a requirement
+    // to enlarge square artwork beyond the side. Retain the complete source.
+    assert.ok(iceArrowRain.safeBounds,"Ice Arrow Rain requires the formal overlay/side intersection");
+    const iceSafe=iceArrowRain.safeBounds,iceBox=iceArrowRain.spriteBox;
+    const availableWidth=2*Math.min(iceBox.left-iceSafe.left,iceSafe.right-iceBox.left);
+    const availableHeight=2*Math.min(iceBox.top-iceSafe.top,iceSafe.bottom-iceBox.top);
+    const expectedHeight=Math.min(availableHeight,availableWidth/iceArrowRain.frameAspect);
+    assert.ok(iceBox.width>0&&iceBox.height>0,"Ice Arrow Rain must retain visible artwork");
+    assert.ok(Math.abs(iceBox.height-expectedHeight)<=1,"Ice Arrow Rain must use the full aspect-preserving safe fit, not arbitrary shrinking");
+    assert.ok(iceBox.left-iceBox.width/2>=iceSafe.left-1&&iceBox.left+iceBox.width/2<=iceSafe.right+1,"Ice Arrow Rain art must remain inside the enemy-side safe width");
+    assert.ok(iceBox.top-iceBox.height/2>=iceSafe.top-1&&iceBox.top+iceBox.height/2<=iceSafe.bottom+1,"Ice Arrow Rain art must remain inside the enemy-side safe height");
+    assert.equal(iceArrowRain.clipPath,"none","Ice Arrow Rain must retain the complete source without clipping");
     assert.ok(Math.abs(iceArrowRain.spriteBox.width/iceArrowRain.spriteBox.height-iceArrowRain.frameAspect)<=.02,"Ice Arrow Rain must not flatten its source frame");
     assert.ok(Math.abs(iceArrowRain.spriteBox.left-iceArrowRain.bounds.centerX)<=1,"Ice Arrow Rain must stay centered on the complete enemy region");
     assert.ok(Math.abs(iceArrowRain.spriteBox.top-iceArrowRain.bounds.centerY)<=1,"Ice Arrow Rain must stay centered on the complete enemy region");
