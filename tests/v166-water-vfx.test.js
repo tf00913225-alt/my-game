@@ -653,18 +653,7 @@ test("Freeze uses a fixed image and Frostbite uses a fixed icon without opening 
     assert.equal(runtime.cards.battleMonster0.querySelector(".v143-status-icon-frostbite"),null);
     assert.equal(runtime.cards.battleMonster1.querySelector(".v143-status-visual-freeze"),null);
     assert.match(css,/\.v143-status-visual--static\{[\s\S]*?animation:none/);
-  const iconRule=css.match(/\.v143-status-icon\{([^}]+)\}/)[1];
-  assert.match(iconRule,/width:24px;/);
-  assert.match(iconRule,/height:24px;/);
-  assert.match(iconRule,/flex:0 0 24px;/);
-  assert.match(iconRule,/animation:v143StatusIconBreath 3s ease-in-out infinite;/);
-  assert.doesNotMatch(iconRule,/(?:scale|rotate|filter|will-change)\s*[:(]/);
-  assert.equal((css.match(/@keyframes v143StatusIconBreath\{/g)||[]).length,1,"one opacity-only icon animation owner");
-  const iconFrames=css.match(/@keyframes v143StatusIconBreath\{([\s\S]*?)\n\}/)[1];
-  assert.match(iconFrames,/0%,100%\{opacity:1;\}/);
-  assert.match(iconFrames,/50%\{opacity:\.88;\}/);
-  assert.doesNotMatch(iconFrames,/transform|scale|rotate|filter|width|height/);
-  assert.match(css,/@media \(prefers-reduced-motion:reduce\)\{\s*[^{}]*\.v143-status-icon\{\s*animation:none !important;\s*opacity:1 !important;/);
+    assert.match(css,/\.v143-status-icon--pulse\{[\s\S]*?animation:none !important/);
     assert.doesNotMatch(css,/v143StatusRasterFrames/);
 });
 

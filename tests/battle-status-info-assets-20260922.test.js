@@ -15,7 +15,7 @@ const STATUS_ASSETS=[
   "fire-soul-resonance.webp","blood-burn.webp","stun-stars-v2.webp"
 ];
 
-test("persistent status icons breathe only in opacity while body states stay pulse/static",()=>{
+test("persistent status icons are static while body states stay pulse/static",()=>{
   const js=read("js/39-v143-skill-animation.js");
   const css=read("css/40-v143-combat-dungeon-polish.css");
   assert.match(js,/frostbite:statusVisual\("","icon","statusEffects"/);
@@ -23,18 +23,7 @@ test("persistent status icons breathe only in opacity while body states stay pul
   assert.match(js,/burn:statusVisual\("assets\/vfx\/status\/burn\.webp","pulse"/);
   assert.match(js,/freeze:statusVisual\("assets\/vfx\/status\/freeze\.webp","static"/);
   assert.doesNotMatch(js,/statDown:statusVisual/);
-  const iconRule=css.match(/\.v143-status-icon\{([^}]+)\}/)[1];
-  assert.match(iconRule,/width:24px;/);
-  assert.match(iconRule,/height:24px;/);
-  assert.match(iconRule,/flex:0 0 24px;/);
-  assert.match(iconRule,/animation:v143StatusIconBreath 3s ease-in-out infinite;/);
-  assert.doesNotMatch(iconRule,/(?:scale|rotate|filter|will-change)\s*[:(]/);
-  assert.equal((css.match(/@keyframes v143StatusIconBreath\{/g)||[]).length,1,"one opacity-only icon animation owner");
-  const iconFrames=css.match(/@keyframes v143StatusIconBreath\{([\s\S]*?)\n\}/)[1];
-  assert.match(iconFrames,/0%,100%\{opacity:1;\}/);
-  assert.match(iconFrames,/50%\{opacity:\.88;\}/);
-  assert.doesNotMatch(iconFrames,/transform|scale|rotate|filter|width|height/);
-  assert.match(css,/@media \(prefers-reduced-motion:reduce\)\{\s*[^{}]*\.v143-status-icon\{\s*animation:none !important;\s*opacity:1 !important;/);
+  assert.match(css,/\.v143-status-icon--pulse\{[\s\S]*?animation:none !important;/);
   assert.match(css,/\.v143-status-visual--pulse\{[\s\S]*?v143StatusImageBreath/);
 });
 

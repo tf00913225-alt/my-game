@@ -3853,14 +3853,17 @@
     line-height:1;
     pointer-events:none;
     transform:none;
-    animation:v143StatusIconBreath 3s ease-in-out infinite;
 }
 :is(#game-stage #battlePage,.v174-battle-hud-layer) .v143-status-icon--layer-hud{
     position:relative;
     z-index:var(--v143-status-layer-hud,34);
 }
 
-
+:is(#game-stage #battlePage,.v174-battle-hud-layer) .v143-status-icon--pulse{
+    animation:none !important;
+    opacity:1 !important;
+    transform:none !important;
+}
 
 :is(#game-stage #battlePage,.v174-battle-hud-layer) :is(.v143-status-icon-agilityDown,.v143-status-icon-defenseDown){
     filter:drop-shadow(0 0 1px rgba(229,246,255,.95));
@@ -3914,8 +3917,8 @@
 }
 
 @keyframes v143StatusIconBreath{
-    0%,100%{opacity:1;}
-    50%{opacity:.88;}
+    0%,100%{opacity:.48;transform:scale(.92)}
+    50%{opacity:1;transform:scale(1.08)}
 }
 
 /* 4 / 5. Dungeon content uses the available screen and its nav is in-scale. */
@@ -3965,10 +3968,6 @@
 
 
 @media (prefers-reduced-motion:reduce){
-    :is(#game-stage #battlePage,.v174-battle-hud-layer) .v143-status-icon{
-        animation:none !important;
-        opacity:1 !important;
-    }
     .v143-vfx-sprite.v143-vfx-sprite-active{
         animation-timing-function:steps(1,end),linear !important;
     }
