@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import crypto from "node:crypto";
+import {compactBootJavaScript} from "./lib/boot-javascript-compact.mjs";
 import {syncItemAcquisitionProjection,syncPatrolItemCatalog} from "./lib/item-acquisition-projection.mjs";
 import {syncMonsterBalanceRuntime} from "./lib/monster-balance-runtime-source.mjs";
 import {syncBattleEncounterCatalog} from "./lib/cloud-battle-encounter-catalog.mjs";
@@ -206,18 +207,6 @@ const adventureStyles=["css/adventure-v1-20260915.css"];
 
 function combineScripts(files,prefix=""){
     return prefix+files.map(file=>`\n/* bundled source: ${file} */\n${read(file).trim()}\n`).join("\n");
-}
-function compactBootJavaScript(content){
-    // Critical Boot keeps the source owners readable in js/, while the shipped
-    // boot artifact removes comments/indentation so the signed-out byte budget
-    // cannot be consumed by formatting. This only removes lexical whitespace;
-    // line breaks and string contents remain intact.
-    return content
-        .replace(/\/\*[\s\S]*?\*\//g,"")
-        .replace(/^[ \t]+|[ \t]+$/gm,"")
-        .replace(/[ \t]{2,}/g," ")
-        .replace(/\n{2,}/g,"\n")
-        .trim()+"\n";
 }
 function combineStyles(files){
     return files.map(file=>`\n/* bundled source: ${file} */\n${read(file).trim()}\n`).join("\n");
