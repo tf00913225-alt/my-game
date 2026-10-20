@@ -1,0 +1,9 @@
+{
+  "baselineDev": "13274580b4d531fcb2e10af749a78e8834b77391",
+  "scope": "Actual fully loaded Client skill catalogue and learn/upgrade eligibility matrix before pure-rule extraction; no combat execution.",
+  "result": {
+    "catalogueSize": 52,
+    "cases": 112390,
+    "sha256": "23cbb26b88596c17618b13cab5fe4ffde2645f1e1d415f264e6a1d69e9be5baf"
+  }
+}

@@ -8,6 +8,7 @@ const vm=require("node:vm");
 const read=file=>fs.readFileSync(file,"utf8");
 const main=read("js/00-main.js");
 const progression=read("js/60-v173.64-skill-progression-rebalance.js");
+const progressionCore=read("functions/src/skill-progression-core.js");
 const support=read("js/42-v148-combat-dungeon-fixes.js");
 const abyss=read("js/46-v155-dev-fixes.js");
 const freezeOwner=read("js/47-v158-combat-tuning.js");
@@ -57,13 +58,14 @@ test("all 31 player direct-damage skills are Lv10 and every upgrade target costs
   assert.equal(ids.length,31);
   ids.forEach(id=>assert.match(progression,new RegExp('"'+id+'"'),id));
   assert.match(progression,/PLAYER_DAMAGE_SKILL_ID_SET\.has\(skillId\)[\s\S]*?skill\.maxLevel=10/);
-  assert.match(progression,/2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1/);
-  assert.match(progression,/function getUpgradeCostForTargetLevel[\s\S]*?SKILL_UPGRADE_COST_BY_TARGET_LEVEL/);
+  assert.match(progressionCore,/2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1/);
+  assert.match(progressionCore,/function getUpgradeCostForTargetLevel[\s\S]*?SKILL_UPGRADE_COST_BY_TARGET_LEVEL/);
+  assert.match(progression,/const getUpgradeCostForTargetLevel=progression.getUpgradeCostForTargetLevel/);
   assert.doesNotMatch(progression,/\{2:1,3:2,4:3,5:4\}/);
 });
 
 test("skill level requirement owner uses absolute Lv10/Lv5 gates for all four elements",()=>{
-  const required=extractFunction(progression,"getRequiredCharacterLevelForSkillLevel");
+  const required=extractFunction(progressionCore,"getRequiredCharacterLevelForSkillLevel");
   const context={Math,Number,numeric:(value,fallback)=>Number.isFinite(Number(value))?Number(value):(fallback===undefined?0:fallback),PLAYER_DAMAGE_SKILL_ID_SET:new Set([
     "flameSlash","fireRocket","waterKnife","waterBall","stormFist","windSpell","stoneSlash","stoneThrow"
   ])};
@@ -81,14 +83,15 @@ test("skill level requirement owner uses absolute Lv10/Lv5 gates for all four el
     assert.equal(context.result({id,maxLevel:5,learnLevel:45},1),45,element+" learn gate");
   }
   assert.equal(context.result({id:"rage",maxLevel:5,learnLevel:45},6),80);
-  assert.match(progression,/function getSkillUpgradeEligibility\(character,skill,currentSkillLevel\)/);
+  assert.match(progressionCore,/function getSkillUpgradeEligibility\(character,skill,currentSkillLevel\)/);
+  assert.match(progression,/const getSkillUpgradeEligibility=progression.getSkillUpgradeEligibility/);
   assert.match(progression,/v17364GetSkillUpgradeEligibility/);
 });
 
 test("upgrade eligibility covers boundary, max-level, and late-learn cases",()=>{
-  const required=extractFunction(progression,"getRequiredCharacterLevelForSkillLevel");
-  const cost=extractFunction(progression,"getUpgradeCostForTargetLevel");
-  const eligibility=extractFunction(progression,"getSkillUpgradeEligibility");
+  const required=extractFunction(progressionCore,"getRequiredCharacterLevelForSkillLevel");
+  const cost=extractFunction(progressionCore,"getUpgradeCostForTargetLevel");
+  const eligibility=extractFunction(progressionCore,"getSkillUpgradeEligibility");
   const context={Math,Number,numeric:(value,fallback)=>Number.isFinite(Number(value))?Number(value):(fallback===undefined?0:fallback),
     PLAYER_DAMAGE_SKILL_ID_SET:new Set(["flameSlash"]),SKILL_UPGRADE_COST_BY_TARGET_LEVEL:{2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1}};
   vm.createContext(context);
