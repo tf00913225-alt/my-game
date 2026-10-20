@@ -1992,8 +1992,8 @@ html, body{
     min-width:0;padding:9px 0;color:#eee3cf;
     font-size:39px;line-height:54px;font-variant-numeric:tabular-nums;
 }
-#game-ui #homePage .v146-home-character b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:45px;font-weight:600;}
-#game-ui #homePage .v146-home-character span{color:#e5c890;white-space:nowrap;}
+#game-ui #homePage .v146-home-character b{grid-column:1/-1;white-space:normal;overflow-wrap:anywhere;font-size:45px;line-height:1.5;font-weight:600;}
+#game-ui #homePage .v146-home-character>span{grid-column:1/-1;color:#e5c890;white-space:nowrap;}
 #game-ui #homePage .home-status-meter{grid-column:1/-1;display:flex;align-items:center;gap:12px;min-width:0;line-height:48px;}
 #game-ui #homePage .home-status-meter>span:first-child{flex:0 0 60px;color:#e4d8be;}
 #game-ui #homePage .home-status-track{display:block;flex:1;min-width:0;height:18px;overflow:hidden;border:1px solid #a5865277;border-radius:12px;background:#0b0b0bcc;}

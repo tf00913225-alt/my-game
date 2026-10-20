@@ -7,7 +7,7 @@
       "build/boot-core.9cdbe69aad4a.js"
     ],
     "styles": [
-      "build/boot-core.1775eab1cc99.css"
+      "build/boot-core.05919e6f72a1.css"
     ],
     "images": [
       "assets/ui/startup-logo.4631c0bc3f2b.jpg",
@@ -23,7 +23,7 @@
           "build/app-shell.8e6259c4baef.js"
         ],
         "styles": [
-          "build/app-shell.058b860fa3fc.css"
+          "build/app-shell.21c79e4fa190.css"
         ],
         "dependencies": [
           "feature-adventure-entry"
@@ -210,9 +210,9 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.1775eab1cc99.css",
-        "sha256": "1775eab1cc99",
-        "bytes": 205582,
+        "path": "build/boot-core.05919e6f72a1.css",
+        "sha256": "05919e6f72a1",
+        "bytes": 205665,
         "priority": "P0",
         "type": "style",
         "decode": false
@@ -562,9 +562,9 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.058b860fa3fc.css",
-        "sha256": "058b860fa3fc",
-        "bytes": 90942,
+        "path": "build/app-shell.21c79e4fa190.css",
+        "sha256": "21c79e4fa190",
+        "bytes": 90976,
         "priority": "P1",
         "type": "style",
         "decode": false
@@ -826,8 +826,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "f3ef8fbcca93",
-    "totalBytes": 24037706,
+    "manifestHash": "bb2701cf5b7d",
+    "totalBytes": 24037823,
     "totalResources": 79
   },
   "assets": {
@@ -883,13 +883,13 @@
       "sha256": "9bcdf1d2545b",
       "bytes": 29293
     },
-    "build/boot-core.1775eab1cc99.css": {
-      "sha256": "1775eab1cc99",
-      "bytes": 205582
+    "build/boot-core.05919e6f72a1.css": {
+      "sha256": "05919e6f72a1",
+      "bytes": 205665
     },
-    "build/app-shell.058b860fa3fc.css": {
-      "sha256": "058b860fa3fc",
-      "bytes": 90942
+    "build/app-shell.21c79e4fa190.css": {
+      "sha256": "21c79e4fa190",
+      "bytes": 90976
     },
     "build/gameplay-core.0b1b33fe5e04.css": {
       "sha256": "0b1b33fe5e04",
