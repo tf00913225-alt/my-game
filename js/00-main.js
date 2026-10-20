@@ -26561,8 +26561,7 @@ function renderCharacterShowcaseContent(){
                     '\');">'+
                     "</div>"+
 
-                    '<div style="font-size:calc(15 * var(--ui-length-unit,1px));font-weight:bold;margin-top:calc(2 * var(--ui-length-unit,1px));'+
-                    'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+
+                    '<div class="character-showcase-name">'+
                     character.id+
                     "</div>"+
 
