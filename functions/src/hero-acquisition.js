@@ -57,7 +57,7 @@ function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
         }else if(grant){fail("data-loss","Hero entitlement has no seventh-day source.");}
         return state;
     }
-    async function readSources(tx,uid){
+    async function readLoginSources(tx,uid){
         const root=db.collection("serverUsers").doc(uid);
         const envelopeRef=db.collection("users").doc(uid).collection("saves").doc("current");
         const stateRef=root.collection("heroAcquisition").doc("current");
@@ -72,7 +72,7 @@ function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
         if(envelope.kind!=="current"){fail("failed-precondition","Current account envelope required.");}
         if(!stateSnap.exists){
             if(historySnap.size||claimSnap.exists||operationsSnap.size||ledgerSet.size){fail("data-loss","Hero acquisition source is missing; rights cannot be reinitialized.");}
-            return withChapter(tx,{root,envelopeRef,stateRef,historyRef,claimRef,envelope,state:null});
+            return {root,envelopeRef,stateRef,historyRef,claimRef,envelope,state:null,history:[]};
         }
         const state=inspectState(strip(stateSnap.data()),uid);
         if(state.serverRevision>envelope.serverRevision||historySnap.size!==state.loginDays.length||
@@ -126,7 +126,44 @@ function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
                 fail("data-loss","Hero claim is missing or inconsistent; it cannot be reissued.");
             }
         }else if(claimSnap.exists){fail("data-loss","Orphan Hero claim cannot be reopened.");}
-        return withChapter(tx,{root,envelopeRef,stateRef,historyRef,claimRef,envelope,state});
+        return {root,envelopeRef,stateRef,historyRef,claimRef,envelope,state,history};
+    }
+    async function readSources(tx,uid){return withChapter(tx,await readLoginSources(tx,uid));}
+    function retainedScope(scope){
+        if(!scope||scope.root?.path!=="serverUsers/"+scope.uid||!Number.isSafeInteger(scope.envelopeRevision)||
+           !Number.isSafeInteger(scope.canonicalRevision)||scope.canonicalRevision<1||scope.envelopeRevision<scope.canonicalRevision)
+            fail("data-loss","Retained Hero source scope is invalid.");
+        return scope;
+    }
+    async function verifyRetainedLogin(tx,scope){
+        retainedScope(scope);
+        const c=await readLoginSources(tx,scope.uid);
+        if(c.envelope.serverRevision!==scope.envelopeRevision)fail("data-loss","Retained Hero envelope differs.");
+        return {ownerUid:scope.uid,envelopeRevision:scope.envelopeRevision,canonicalRevision:scope.canonicalRevision,...(scope.captureSha256===undefined?{}:{captureSha256:scope.captureSha256}),
+            present:!!c.state,stateRevision:c.state?.serverRevision??null,stateSha256:c.state?digest(c.state):null,
+            history:c.history.map(r=>({id:r.id,operationId:r.operationId,sourceRevision:r.sourceRevision,
+                serverRevision:r.serverRevision,sha256:r.sha256,day:r.day,loginCount:r.loginCount,
+                entitlement:r.entitlement,allocationSeed:r.allocationSeed})),
+            entitlements:c.state?Object.values(c.state.entitlements).map(r=>({...r})):[],
+            operationIds:c.history.map(r=>r.operationId),ledgerIds:c.history.map(r=>r.operationId),
+            claimIds:c.state?.entitlements[KING]?[CLAIM]:[]};
+    }
+    const verifyRetainedChapterTicket=(tx,scope,id)=>chapterSource.verifyRetainedTicket(tx,retainedScope(scope),id);
+    const verifyRetainedChapterStep=(tx,scope,id)=>chapterSource.verifyRetainedStep(tx,retainedScope(scope),id);
+    const verifyRetainedChapterHead=(tx,scope)=>chapterSource.verifyRetainedHead(tx,retainedScope(scope));
+    function closeRetainedEvidence({login,head,tickets,steps,inventory}){
+        if(!login||!head||login.ownerUid!==head.ownerUid||login.envelopeRevision!==head.envelopeRevision||
+           login.canonicalRevision!==head.canonicalRevision||login.captureSha256!==head.captureSha256)fail("data-loss","Retained Hero closure binding differs.");
+        const equalSet=(actual,expected)=>Array.isArray(actual)&&new Set(actual).size===actual.length&&
+            actual.length===expected.length&&actual.every(id=>expected.includes(id));
+        if(!inventory||!equalSet(inventory.heroAcquisition,login.present?["current"]:[])||
+           !equalSet(inventory.heroAcquisitionHistory,login.history.map(r=>r.id)))
+            fail("data-loss","Retained Hero login inventory differs.");
+        const chapter=chapterSource.closeRetainedEvidence({head,tickets,steps,inventory});
+        return {ownerUid:login.ownerUid,envelopeRevision:login.envelopeRevision,canonicalRevision:login.canonicalRevision,...(login.captureSha256===undefined?{}:{captureSha256:login.captureSha256}),
+            operationIds:[...login.operationIds,...chapter.operationIds],ledgerIds:[...login.ledgerIds,...chapter.ledgerIds],
+            claimIds:[...login.claimIds,...chapter.claimIds],entitlements:[...login.entitlements,...chapter.entitlements],
+            loginHistory:login.history,chapterTicketIds:chapter.ticketIds,chapterStepIds:chapter.stepIds};
     }
     function result(context,unchanged=true){
         return {schemaVersion:1,ownerUid:context.envelope.data.ownerUid,
@@ -215,6 +252,7 @@ function createHeroAcquisition({db,FieldValue,HttpsError,runProtected,
         });
     }
     return Object.freeze({read,observeLogin,ensureChapterTicket,completeChapterNode,
+        verifyRetainedLogin,verifyRetainedChapterTicket,verifyRetainedChapterStep,verifyRetainedChapterHead,closeRetainedEvidence,
         readInTransaction:async(tx,session)=>{
             const context=await readSources(tx,session.uid);
             return {...result(context),loginEvidence:context.state?{

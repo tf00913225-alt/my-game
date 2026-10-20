@@ -40,8 +40,11 @@ function inspectRecoveryAuditFence(value,uid,fail){
     if(value===undefined)return null;
     const keys=["schemaVersion","kind","ownerUid","auditId","epoch","status","sessionId","sessionRevision",
         "sourceRevision","sourceSha256","snapshotSha256","approvalOperationId","approvalBindingSha256",
-        "cancelOperationId","cancelIntentSha256","cancelledBySessionId","cancelledBySessionRevision","createdAt","updatedAt"];
-    if(!value||Object.keys(value).sort().join("|")!==keys.sort().join("|")||value.schemaVersion!==1||
+        "cancelOperationId","cancelIntentSha256","cancelledBySessionId","cancelledBySessionRevision","createdAt","updatedAt",
+        ...(value?.schemaVersion===2?["canonicalRevision","namespaceVersion"]:[])];
+    if(!value||Object.keys(value).sort().join("|")!==keys.sort().join("|")||![1,2].includes(value.schemaVersion)||
+       (value.schemaVersion===2&&(value.namespaceVersion!==3||!Number.isSafeInteger(value.canonicalRevision)||
+           value.canonicalRevision<2||value.canonicalRevision>value.sourceRevision))||
        value.kind!=="canonical-recovery-audit-fence"||value.ownerUid!==uid||!OPERATION_ID.test(value.auditId||"")||
        !Number.isSafeInteger(value.epoch)||value.epoch<1||!SESSION_ID.test(value.sessionId||"")||
        !Number.isSafeInteger(value.sessionRevision)||value.sessionRevision<1||
@@ -163,19 +166,31 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     }
     function auditApprovalBinding(approval,sourceRevision){
         return {schemaVersion:approval.schemaVersion,kind:approval.kind,ownerUid:approval.ownerUid,operationId:approval.operationId,
-            sourceRevision,sourceSha256:approval.sourceSha256,snapshotSha256:approval.snapshotSha256,
+            sourceRevision,...(approval.schemaVersion===2?{canonicalRevision:approval.canonicalRevision,namespaceVersion:approval.namespaceVersion}:{}),
+            sourceSha256:approval.sourceSha256,snapshotSha256:approval.snapshotSha256,
             approvedBy:approval.approvedBy,status:approval.status,issuedAt:timestampPair(approval.issuedAt),expiresAt:timestampPair(approval.expiresAt)};
     }
     async function verifyAuditApproval(tx,root,uid,sourceRevision,approvalOperationId,recordedAt){
-        const [envelopeSnap,archiveSnap,snapshotSnap,approvalSnap]=await Promise.all([
+        const approvalSnap=await tx.get(root.collection("recoveryApprovals").doc(approvalOperationId));
+        const approval=approvalSnap.data(),heroVersion=approval?.schemaVersion===2;
+        if(!approvalSnap.exists||![1,2].includes(approval.schemaVersion)||
+           (heroVersion&&(approval.namespaceVersion!==3||!Number.isSafeInteger(approval.canonicalRevision)||
+               approval.canonicalRevision<2||approval.canonicalRevision>sourceRevision))||
+           (!heroVersion&&(Object.hasOwn(approval,"canonicalRevision")||Object.hasOwn(approval,"namespaceVersion")))){
+            fail("permission-denied","A current server operator approval is required for recovery audit.");
+        }
+        const canonicalRevision=heroVersion?approval.canonicalRevision:sourceRevision;
+        const [envelopeSnap,archiveSnap,snapshotSnap,accountPointer]=await Promise.all([
             db.collection("users").doc(uid).collection("saves").doc("current"),
-            root.collection("recoveryArchives").doc(String(sourceRevision)),
-            root.collection("playableSnapshots").doc(String(sourceRevision)),
-            root.collection("recoveryApprovals").doc(approvalOperationId)].map(ref=>tx.get(ref)));
-        const {envelope}=inspectCurrentRecoverySource(uid,sourceRevision,{envelopeSnap,archiveSnap,snapshotSnap});
+            root.collection("recoveryArchives").doc(String(canonicalRevision)),
+            root.collection("playableSnapshots").doc(String(canonicalRevision)),
+            ...(heroVersion?[root.collection("account").doc("current")]:[])].map(ref=>tx.get(ref)));
+        const {envelope}=inspectCurrentRecoverySource(uid,canonicalRevision,{envelopeSnap,archiveSnap,snapshotSnap});
         if(envelope.serverRevision!==sourceRevision)fail("aborted","CLOUD_REVISION_CONFLICT");
-        const approval=approvalSnap.data();
-        if(!approvalSnap.exists||approval.schemaVersion!==1||approval.kind!=="canonical-current-recovery-approval"||
+        if(heroVersion&&(!accountPointer?.exists||accountPointer.get("ownerUid")!==uid||
+           accountPointer.get("serverRevision")!==canonicalRevision||accountPointer.get("snapshotSha256")!==snapshotSnap.get("sha256")))
+            fail("data-loss","Recovery canonical pointer changed.");
+        if(approval.kind!=="canonical-current-recovery-approval"||
            approval.ownerUid!==uid||approval.operationId!==approvalOperationId||approval.status!=="approved"||
            approval.sourceRevision!==sourceRevision||approval.sourceSha256!==archiveSnap.get("sourceSha256")||
            approval.snapshotSha256!==snapshotSnap.get("sha256")||typeof approval.approvedBy!=="string"||!approval.approvedBy.trim()||
@@ -188,7 +203,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             if(compare(binding.issuedAt,binding.expiresAt)>=0||compare(binding.issuedAt,observed)>0||compare(observed,binding.expiresAt)>=0)
                 fail("data-loss","Candidate recorded time lies outside its approval interval.");
         }
-        return {sourceSha256:binding.sourceSha256,snapshotSha256:binding.snapshotSha256,approvalBindingSha256:snapshotDigest(binding)};
+        return {sourceSha256:binding.sourceSha256,snapshotSha256:binding.snapshotSha256,approvalBindingSha256:snapshotDigest(binding),
+            ...(heroVersion?{canonicalRevision,namespaceVersion:3}:{})};
     }
     async function verifyCandidateAuditControl(tx,root,uid,sourceRevision,control){
         const [fenceSnap,runSnap]=await Promise.all([
@@ -285,7 +301,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             const binding=await verifyAuditApproval(tx,root,session.uid,args.expectedRevision,args.approvalOperationId);
             const epoch=(fence?.epoch??0)+1;
             if(!Number.isSafeInteger(epoch))fail("failed-precondition","Recovery audit epoch is exhausted.");
-            const stamp=FieldValue.serverTimestamp(),next={schemaVersion:1,kind:"canonical-recovery-audit-fence",ownerUid:session.uid,
+            const stamp=FieldValue.serverTimestamp(),next={schemaVersion:binding.namespaceVersion===3?2:1,kind:"canonical-recovery-audit-fence",ownerUid:session.uid,
                 auditId:args.operationId,epoch,status:"active",sessionId:session.sessionId,sessionRevision:session.revision,
                 sourceRevision:args.expectedRevision,...binding,approvalOperationId:args.approvalOperationId,
                 cancelOperationId:null,cancelIntentSha256:null,cancelledBySessionId:null,cancelledBySessionRevision:null,createdAt:stamp,updatedAt:stamp};
@@ -337,14 +353,15 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     const inventoryCompare=(a,b)=>Buffer.compare(Buffer.from(a,"utf8"),Buffer.from(b,"utf8"));
     const inventoryId=id=>typeof id==="string"&&id.length>0&&!id.includes("/")&&Buffer.from(id,"utf8").toString("utf8")===id;
     const inventoryBinding=run=>Object.fromEntries(["ownerUid","auditId","epoch","sessionId","sessionRevision","sourceRevision",
-        "sourceSha256","snapshotSha256","approvalOperationId","approvalBindingSha256"].map(key=>[key,run[key]]));
+        "sourceSha256","snapshotSha256","approvalOperationId","approvalBindingSha256",
+        ...(run.schemaVersion===2?["canonicalRevision","namespaceVersion"]:[])].map(key=>[key,run[key]]));
     function inventoryStateHash(row){const {stateSha256,createdAt,updatedAt,...payload}=row;return snapshotDigest(payload);}
     function inspectInventoryState(row,run,namespaces){
         const binding=inventoryBinding(run);
         inventoryExact(row,["schemaVersion","kind",...Object.keys(binding),"prepareOperationId","prepareIntentSha256","namespaceListSha256",
             "phase","namespaceIndex","afterDocumentId","nextSequence","capturedCount","lastPageOperationId","lastPageSha256",
             "inventoryExhausted","stateSha256","createdAt","updatedAt"],"state");
-        if(row.schemaVersion!==1||row.kind!=="canonical-recovery-inventory-state"||
+        if(row.schemaVersion!==(run.schemaVersion===2?2:1)||row.kind!=="canonical-recovery-inventory-state"||
            Object.keys(binding).some(key=>row[key]!==binding[key])||!OPERATION_ID.test(row.prepareOperationId||"")||
            row.prepareIntentSha256!==snapshotDigest({action:"prepare-inventory",auditId:run.auditId,expectedEpoch:run.epoch,operationId:row.prepareOperationId})||
            row.namespaceListSha256!==snapshotDigest(namespaces)||!["preparing","inventory","blocked"].includes(row.phase)||
@@ -374,7 +391,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         const binding=await verifyAuditApproval(tx,root,session.uid,run.sourceRevision,run.approvalOperationId);
         if(Object.keys(binding).some(key=>binding[key]!==run[key]))fail("data-loss","Inventory approval binding changed.");
         const runRef=root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(auditId);
-        return {run,namespaces:recoveryAuditNamespaces(session.uid,2),stateRef:runRef.collection(RECOVERY_INVENTORY_STATE_COLLECTION).doc("current"),runRef};
+        return {run,namespaces:recoveryAuditNamespaces(session.uid,run.namespaceVersion??2),stateRef:runRef.collection(RECOVERY_INVENTORY_STATE_COLLECTION).doc("current"),runRef};
     }
     async function prepareInventory(request,args){
         auditIntent("prepare inventory",args,["auditId","expectedEpoch","operationId"]);
@@ -386,7 +403,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                 if(state.prepareIntentSha256!==intentSha256)fail("already-exists","Inventory preparation has another intent.");
                 return {...inventoryFlags,auditId:run.auditId,epoch:run.epoch,prepareSha256:intentSha256,nextSequence:1,phase:"preparing",unchanged:true};
             }
-            const stamp=FieldValue.serverTimestamp(),state={schemaVersion:1,kind:"canonical-recovery-inventory-state",...inventoryBinding(run),
+            const stamp=FieldValue.serverTimestamp(),state={schemaVersion:run.schemaVersion===2?2:1,kind:"canonical-recovery-inventory-state",...inventoryBinding(run),
                 prepareOperationId:args.operationId,prepareIntentSha256:intentSha256,namespaceListSha256:snapshotDigest(namespaces),
                 phase:"preparing",namespaceIndex:0,afterDocumentId:null,nextSequence:1,capturedCount:0,lastPageOperationId:null,
                 lastPageSha256:null,inventoryExhausted:false,createdAt:stamp,updatedAt:stamp};
