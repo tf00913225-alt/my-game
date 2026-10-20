@@ -35,3 +35,17 @@ Source Head：ccca1b2c97935a586443ada77b2ed76c268bc3cf。360×640、393×873、4
 同ccca Head四尺寸各24張、三角色九分頁及鎖定／可建立入口取消的實際操作完成。完整角色名／等級、三EXP列及末端footer可達；沒有創角提交、加點確認、分配、學習或裝備。B報告沒有finally cleanup結果，不宣稱exact restore或零儲存。
 
 獨立art_review另在1280×800/character-2-expPool-top.png抓到自然充能+55 EXP浮字碰到下方說明，root亦實看確認。B整段不得接受，保留其餘有限操作證據，待原CSS42浮字空間修正與四尺寸動態delta。EXP內卡材質／分隔精緻度另待局部試圖，不以幾何通過冒稱全品質完成。
+
+## 24B 加純觀察動態delta：限定接受
+
+原操作Head ccca1b2c97935a586443ada77b2ed76c268bc3cf，動態delta Head7952d712cd8f864132ab693c07add24074de4bee（CSS42修正來源a8d9155c）。四尺寸各24張原操作與6張動態PNG，正式證據segment24b-accepted；每份complete／clean／sourcehash不變。保留原9分頁綁定及末端、完整三角色EXP、創角2／3入口與原取消，未提交建立或分配。
+
+CSS42只在原充能說明後保留28ui動畫列，header可換行，原浮字動程在列內；不改任何充能計算、金額、timer或原1.45秒時長。第一次delta runner額外每200ms呼叫原視覺API，造成多筆重影；該prepared全列excluded，不稱自然timer證據，也不據此改資料邏輯。scope_review最初漏核更新頻率的批准已撤回。
+
+新prepared-observe移除全部手動充能API呼叫，只等舊span自然清理並觀察原4000ms timer；同一原DOM span的peak／end與所有存活浮字均記錄邊界及實圖。各尺寸自然浮字+266／+261／+268／+267清楚，原說明不被壓，末列與footer完整可達，原返回及重開正常。這些只是本次隔離QA的自然顯示值，不是遊戲數值規格。
+
+- art_review：逐張實看四尺寸24張新delta，單筆清楚無重影、預留列合理、末端及重開保留，限定通過。
+- interaction_review：實看四尺寸peak／end及末端／重開，核原timer純觀察、真輸入與source，限定通過。
+- scope_review：撤回污染runner批准後，重新核純觀察helper／四reports與四尺寸代表圖，原CSS展示修正不動計算JS，限定通過。
+
+B finally沒有精確還原結果報告，仍不宣稱exact restore／零儲存。實體裝置、鍵盤、加點確認、真正分配、學習／升級／裝備、創角提交與其他業務狀態未驗。EXP內卡材質精緻度仍可局部銜接，非全頁品質或全遊戲完成結論。

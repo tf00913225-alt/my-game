@@ -239,35 +239,102 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
+          "status": "部分已實際驗證",
           "head": null,
           "before": null,
           "after": null,
-          "interaction": null
+          "interaction": null,
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/360x640/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "393x873": {
-          "status": "未檢查",
+          "status": "部分已實際驗證",
           "head": null,
           "before": null,
           "after": null,
-          "interaction": null
+          "interaction": null,
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/393x873/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "412x915": {
-          "status": "未檢查",
+          "status": "部分已實際驗證",
           "head": null,
           "before": null,
           "after": null,
-          "interaction": null
+          "interaction": null,
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/412x915/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "1280x800": {
-          "status": "未檢查",
+          "status": "部分已實際驗證",
           "head": null,
           "before": null,
           "after": null,
-          "interaction": null
+          "interaction": null,
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/1280x800/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "Three actual choices x status/skill/expPool, full legal16 names, true ends/return/reopen；Locked/eligible uncreated slot entry and cancel only",
+          "status": "已實際驗證",
+          "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+          "deltaHead": "7952d712cd8f864132ab693c07add24074de4bee",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted",
+          "limits": [
+            "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+            "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+            "Original normalization/delegated saves retained; no zero-save claim",
+            "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+            "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -363,6 +430,22 @@
           "DEV控制28px、主城footer工具42px未列44px通過，仍待修。",
           "本機canonical fixture與原UI可能有mark-seen/save副作用，僅原save/meta bytes已精確還原，不能稱零副作用、裝備/交易或雲端驗收。",
           "無實體手機/鍵盤/載入拒絕重試/戰鬥/創角/獎勵/交易驗收。"
+        ]
+      },
+      "presentationEvidence": {
+        "followups": [
+          {
+            "segment": "segment-24B",
+            "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+            "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted",
+            "notVerified": [
+              "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+              "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+              "Original normalization/delegated saves retained; no zero-save claim",
+              "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+              "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+            ]
+          }
         ]
       }
     },
@@ -1976,7 +2059,7 @@
       "label": "經驗池分配",
       "entry": "openHomeFeature('character'); switchCharacterTab('expPool')",
       "owner": "index.html; js/00-main.js; css/00-main.css; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "0經驗",
         "不足升級",
@@ -2008,7 +2091,20 @@
             "artifacts/ui-skill-standard/segment-1-r3/360x640/exp-charge-after-scrolled-skill.png"
           ],
           "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/360x640/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "393x873": {
           "status": "部分已實際驗證",
@@ -2020,7 +2116,20 @@
             "artifacts/ui-skill-standard/segment-1-r3/393x873/exp-charge-after-scrolled-skill.png"
           ],
           "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/393x873/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "412x915": {
           "status": "部分已實際驗證",
@@ -2032,7 +2141,20 @@
             "artifacts/ui-skill-standard/segment-1-r3/412x915/exp-charge-after-scrolled-skill.png"
           ],
           "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/412x915/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "1280x800": {
           "status": "部分已實際驗證",
@@ -2044,7 +2166,20 @@
             "artifacts/ui-skill-standard/segment-1-r3/1280x800/exp-charge-after-scrolled-skill.png"
           ],
           "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/1280x800/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         }
       },
       "beforeEvidence": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b6c10a0e-030b-433d-b87a-e4d59687a90a.png",
@@ -2134,6 +2269,20 @@
               "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
             }
           ]
+        },
+        {
+          "state": "Three actual choices x status/skill/expPool, full legal16 names, true ends/return/reopen；Locked/eligible uncreated slot entry and cancel only",
+          "status": "已實際驗證",
+          "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+          "deltaHead": "7952d712cd8f864132ab693c07add24074de4bee",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted",
+          "limits": [
+            "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+            "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+            "Original normalization/delegated saves retained; no zero-save claim",
+            "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+            "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+          ]
         }
       ],
       "reviews": {
@@ -2146,6 +2295,22 @@
           "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
         },
         "scope": null
+      },
+      "presentationEvidence": {
+        "followups": [
+          {
+            "segment": "segment-24B",
+            "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+            "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted",
+            "notVerified": [
+              "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+              "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+              "Original normalization/delegated saves retained; no zero-save claim",
+              "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+              "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+            ]
+          }
+        ]
       }
     },
     {
@@ -2153,7 +2318,7 @@
       "label": "能力值",
       "entry": "openHomeFeature('character'); switchCharacterTab('status')",
       "owner": "index.html; js/00-main.js; css/00-main.css; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "0點",
         "有點可加",
@@ -2184,7 +2349,20 @@
             "artifacts/ui-skill-standard/segment-1-r3/360x640/attributes-tab-return.png"
           ],
           "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/360x640/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "393x873": {
           "status": "部分已實際驗證",
@@ -2198,7 +2376,20 @@
             "artifacts/ui-skill-standard/segment-1-r3/393x873/attributes-tab-return.png"
           ],
           "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/393x873/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "412x915": {
           "status": "部分已實際驗證",
@@ -2212,7 +2403,20 @@
             "artifacts/ui-skill-standard/segment-1-r3/412x915/attributes-tab-return.png"
           ],
           "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/412x915/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "1280x800": {
           "status": "部分已實際驗證",
@@ -2226,7 +2430,20 @@
             "artifacts/ui-skill-standard/segment-1-r3/1280x800/attributes-tab-return.png"
           ],
           "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/1280x800/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         }
       },
       "beforeEvidence": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b3acaf9c-4a1f-4891-a9df-49b98b18e42d.png",
@@ -2372,6 +2589,20 @@
               "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
             }
           ]
+        },
+        {
+          "state": "Three actual choices x status/skill/expPool, full legal16 names, true ends/return/reopen；Locked/eligible uncreated slot entry and cancel only",
+          "status": "已實際驗證",
+          "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+          "deltaHead": "7952d712cd8f864132ab693c07add24074de4bee",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted",
+          "limits": [
+            "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+            "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+            "Original normalization/delegated saves retained; no zero-save claim",
+            "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+            "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+          ]
         }
       ],
       "reviews": {
@@ -2384,6 +2615,22 @@
           "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
         },
         "scope": null
+      },
+      "presentationEvidence": {
+        "followups": [
+          {
+            "segment": "segment-24B",
+            "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+            "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted",
+            "notVerified": [
+              "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+              "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+              "Original normalization/delegated saves retained; no zero-save claim",
+              "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+              "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+            ]
+          }
+        ]
       }
     },
     {
@@ -2413,32 +2660,84 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
+          "status": "部分已實際驗證",
           "head": null,
           "before": null,
           "after": null,
-          "interaction": null
+          "interaction": null,
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/360x640/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "393x873": {
-          "status": "未檢查",
+          "status": "部分已實際驗證",
           "head": null,
           "before": null,
           "after": null,
-          "interaction": null
+          "interaction": null,
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/393x873/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "412x915": {
-          "status": "未檢查",
+          "status": "部分已實際驗證",
           "head": null,
           "before": null,
           "after": null,
-          "interaction": null
+          "interaction": null,
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/412x915/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "1280x800": {
-          "status": "未檢查",
+          "status": "部分已實際驗證",
           "head": null,
           "before": null,
           "after": null,
-          "interaction": null
+          "interaction": null,
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/1280x800/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         }
       },
       "stateEvidence": [
@@ -2497,6 +2796,20 @@
               "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
             }
           ]
+        },
+        {
+          "state": "Three actual choices x status/skill/expPool, full legal16 names, true ends/return/reopen；Locked/eligible uncreated slot entry and cancel only",
+          "status": "已實際驗證",
+          "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+          "deltaHead": "7952d712cd8f864132ab693c07add24074de4bee",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted",
+          "limits": [
+            "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+            "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+            "Original normalization/delegated saves retained; no zero-save claim",
+            "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+            "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+          ]
         }
       ],
       "reviews": {
@@ -2504,14 +2817,30 @@
         "interaction": null,
         "scope": null
       },
-      "verification": "與baseline.skill為同一正式入口，沿用第一段空槽/未學習/單指列表捲動證據；不重跑。其他技能/解鎖/裝備/所有詳情未驗。"
+      "verification": "與baseline.skill為同一正式入口，沿用第一段空槽/未學習/單指列表捲動證據；不重跑。其他技能/解鎖/裝備/所有詳情未驗。",
+      "presentationEvidence": {
+        "followups": [
+          {
+            "segment": "segment-24B",
+            "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+            "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted",
+            "notVerified": [
+              "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+              "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+              "Original normalization/delegated saves retained; no zero-save claim",
+              "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+              "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "character.transition",
       "label": "角色TAB捲動與切換",
       "entry": "技能捲到底→經驗池→能力值→技能→關閉重開",
       "owner": "index.html; js/00-main.js; js/18-stage-v64-character-touch-action-runtime.js",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "頂部開啟",
         "中段切頁",
@@ -2538,7 +2867,20 @@
             "artifacts/ui-skill-standard/segment-1-r3/360x640/attribute-help.png"
           ],
           "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/360x640/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "393x873": {
           "status": "部分已實際驗證",
@@ -2550,7 +2892,20 @@
             "artifacts/ui-skill-standard/segment-1-r3/393x873/attribute-help.png"
           ],
           "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/393x873/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "412x915": {
           "status": "部分已實際驗證",
@@ -2562,7 +2917,20 @@
             "artifacts/ui-skill-standard/segment-1-r3/412x915/attribute-help.png"
           ],
           "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/412x915/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         },
         "1280x800": {
           "status": "部分已實際驗證",
@@ -2574,7 +2942,20 @@
             "artifacts/ui-skill-standard/segment-1-r3/1280x800/attribute-help.png"
           ],
           "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。",
+          "additionalEvidence": [
+            {
+              "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/1280x800/report.json",
+              "limits": [
+                "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+                "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+                "Original normalization/delegated saves retained; no zero-save claim",
+                "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+                "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+              ]
+            }
+          ]
         }
       },
       "stateEvidence": [
@@ -2661,6 +3042,20 @@
               "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
             }
           ]
+        },
+        {
+          "state": "Three actual choices x status/skill/expPool, full legal16 names, true ends/return/reopen；Locked/eligible uncreated slot entry and cancel only",
+          "status": "已實際驗證",
+          "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+          "deltaHead": "7952d712cd8f864132ab693c07add24074de4bee",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted",
+          "limits": [
+            "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+            "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+            "Original normalization/delegated saves retained; no zero-save claim",
+            "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+            "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+          ]
         }
       ],
       "reviews": {
@@ -2674,7 +3069,23 @@
         },
         "scope": null
       },
-      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。"
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。",
+      "presentationEvidence": {
+        "followups": [
+          {
+            "segment": "segment-24B",
+            "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+            "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted",
+            "notVerified": [
+              "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+              "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+              "Original normalization/delegated saves retained; no zero-save claim",
+              "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+              "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "detail.help",
@@ -24990,6 +25401,19 @@
         "Only empty/loaded canonical Lv20 summary/list same-ID equipped consistency and navigation return",
         "Original UI seen/save effects retained; raw save/meta exact restore verified in disposable profile",
         "No equip/upgrade/choose/use/sell/cloud authority/real device"
+      ]
+    },
+    {
+      "segment": "segment-24B",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted",
+      "result": "限定呈現/操作證據；非全狀態或業務驗收",
+      "pending": [
+        "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+        "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+        "Original normalization/delegated saves retained; no zero-save claim",
+        "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+        "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
       ]
     }
   ],

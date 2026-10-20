@@ -1,0 +1,1305 @@
+{
+  "complete": false,
+  "head": "7952d712cd8f864132ab693c07add24074de4bee",
+  "dirty": false,
+  "viewport": [
+    360,
+    640
+  ],
+  "sourcesBefore": {
+    "index.html": "093d31ad61acc55b12d6a55ab3e5bc6b49bd5bd8f13dc0c34e2f5397779262ac",
+    "asset-manifest.json": "0b1db5730d6159eada5416076efb2e30e43a8bd811c1c7ff491e1bcd410c952f",
+    "js/41-v146-system-polish.js": "51e3c5bb6d9592300b094c118ecaeb6e8e4aaf25435ef974841b6184d5bbd881",
+    "css/49-v169-rpg-ui.css": "8237207301908dc150243acd02b993599a9212caadce8d9346893bfe47e6c56c",
+    "js/49-v169-element-box-settings.js": "bc3f067e6e51ca46dacf72404702f95a190d7b53ac86df0919e3629a79d817b6",
+    "js/25-v131-fix-batch.js": "962d3f3a289a97540b7aaa1f8b91805190cbf8a32f3b5d40540cc304dbaee9ce",
+    "js/00-main.js": "7b772375de00f38e7fa9309af581b9cc8202f5922dccc26b9b5c32650f813875",
+    "css/48-v169-element-box-settings.css": "1af0440eb987708e4fb8c4b8c59d3a518fda7cf9b6d5197570310c243c04f21f",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.aa32fb8e818d.js": "aa32fb8e818d080ae0ed4a8662244dbe7d1962c1e200a88b12c2fa7f7a2490d9",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/boot-core.e7a5c8849782.css": "e7a5c8849782b12ec2358f1a1cbe3af19e182d6b45c0c3ed489ab69bee287886",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.f5e440f14167.css": "f5e440f1416771b03e1bcee96aed3868ab7b1d8c02a64f5f1856ea05b78286ba"
+  },
+  "sourcesAfter": {
+    "index.html": "093d31ad61acc55b12d6a55ab3e5bc6b49bd5bd8f13dc0c34e2f5397779262ac",
+    "asset-manifest.json": "0b1db5730d6159eada5416076efb2e30e43a8bd811c1c7ff491e1bcd410c952f",
+    "js/41-v146-system-polish.js": "51e3c5bb6d9592300b094c118ecaeb6e8e4aaf25435ef974841b6184d5bbd881",
+    "css/49-v169-rpg-ui.css": "8237207301908dc150243acd02b993599a9212caadce8d9346893bfe47e6c56c",
+    "js/49-v169-element-box-settings.js": "bc3f067e6e51ca46dacf72404702f95a190d7b53ac86df0919e3629a79d817b6",
+    "js/25-v131-fix-batch.js": "962d3f3a289a97540b7aaa1f8b91805190cbf8a32f3b5d40540cc304dbaee9ce",
+    "js/00-main.js": "7b772375de00f38e7fa9309af581b9cc8202f5922dccc26b9b5c32650f813875",
+    "css/48-v169-element-box-settings.css": "1af0440eb987708e4fb8c4b8c59d3a518fda7cf9b6d5197570310c243c04f21f",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.aa32fb8e818d.js": "aa32fb8e818d080ae0ed4a8662244dbe7d1962c1e200a88b12c2fa7f7a2490d9",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/boot-core.e7a5c8849782.css": "e7a5c8849782b12ec2358f1a1cbe3af19e182d6b45c0c3ed489ab69bee287886",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.f5e440f14167.css": "f5e440f1416771b03e1bcee96aed3868ab7b1d8c02a64f5f1856ea05b78286ba"
+  },
+  "sourceUnchanged": true,
+  "touches": [
+    {
+      "selector": "[data-city-entry=\"0\"]",
+      "x": 30,
+      "y": 296.72918701171875,
+      "width": 48,
+      "height": 48,
+      "hit": true,
+      "label": "角色"
+    },
+    {
+      "selector": "#characterTabBtnExpPool",
+      "x": 90.109375,
+      "y": 284,
+      "width": 134.21875,
+      "height": 52,
+      "hit": true,
+      "label": "經驗池分配"
+    },
+    {
+      "kind": "pane-real-top",
+      "owner": "#characterTabContent",
+      "top": 0,
+      "x": 307,
+      "y": 346,
+      "to": 587
+    },
+    {
+      "kind": "charge-reach-sample",
+      "step": 0,
+      "panel": {
+        "x": 23,
+        "y": 484.1875,
+        "width": 314,
+        "height": 118.3958740234375,
+        "top": 484.1875,
+        "right": 337,
+        "bottom": 602.5833740234375,
+        "left": 23
+      },
+      "owner": {
+        "x": 23,
+        "y": 316,
+        "width": 314,
+        "height": 301,
+        "top": 316,
+        "right": 337,
+        "bottom": 617,
+        "left": 23
+      },
+      "scrollTop": 0
+    },
+    {
+      "root": "#characterTabContent",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 258.5,
+      "y": 592,
+      "to": 341,
+      "top": 1451,
+      "client": 903,
+      "height": 2354
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 302.875,
+      "y": 45,
+      "width": 68.25,
+      "height": 44,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "[data-city-entry=\"0\"]",
+      "x": 30,
+      "y": 296.72918701171875,
+      "width": 48,
+      "height": 48,
+      "hit": true,
+      "label": "角色"
+    },
+    {
+      "selector": "#characterTabBtnExpPool",
+      "x": 90.109375,
+      "y": 284,
+      "width": 134.21875,
+      "height": 52,
+      "hit": true,
+      "label": "經驗池分配"
+    },
+    {
+      "kind": "pane-real-top",
+      "owner": "#characterTabContent",
+      "top": 0,
+      "x": 307,
+      "y": 346,
+      "to": 587
+    }
+  ],
+  "checks": [
+    {
+      "phase": "before-local-fixture",
+      "state": {
+        "stage": "before-local-fixture",
+        "characters": [
+          {
+            "i": 0,
+            "id": "QA 火角色",
+            "level": 70,
+            "expNext": 9637200,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 1,
+            "id": "QA 水角色",
+            "level": 70
+          }
+        ],
+        "saveCalls": 0
+      }
+    },
+    {
+      "fixture": {
+        "names": [
+          "角色名稱長文測試甲乙丙丁戊己庚辛",
+          "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+          "子丑寅卯辰巳午未申酉戌亥甲乙丙丁"
+        ],
+        "levels": [
+          70,
+          60,
+          50
+        ],
+        "isolatedOnly": true,
+        "notCharacterCreation": true
+      }
+    },
+    {
+      "phase": "after-fixture-formal-exp-render",
+      "state": {
+        "stage": "after-fixture-formal-exp-render",
+        "characters": [
+          {
+            "i": 0,
+            "id": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "level": 70,
+            "expNext": 9637200,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 1,
+            "id": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+            "level": 60,
+            "expNext": 5885100,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 2,
+            "id": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+            "level": 50,
+            "expNext": 2960400,
+            "hp": 300,
+            "sp": 120
+          }
+        ],
+        "saveCalls": 0
+      }
+    },
+    {
+      "phase": "after-fixture-before-entry",
+      "state": {
+        "stage": "after-fixture-before-entry",
+        "characters": [
+          {
+            "i": 0,
+            "id": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "level": 70,
+            "expNext": 9637200,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 1,
+            "id": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+            "level": 60,
+            "expNext": 5885100,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 2,
+            "id": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+            "level": 50,
+            "expNext": 2960400,
+            "hp": 300,
+            "sp": 120
+          }
+        ],
+        "saveCalls": 0
+      }
+    },
+    {
+      "phase": "after-formal-entry-normalization",
+      "state": {
+        "stage": "after-formal-entry-normalization",
+        "characters": [
+          {
+            "i": 0,
+            "id": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "level": 70,
+            "expNext": 9637200,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 1,
+            "id": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+            "level": 60,
+            "expNext": 5885100,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 2,
+            "id": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+            "level": 50,
+            "expNext": 2960400,
+            "hp": 300,
+            "sp": 120
+          }
+        ],
+        "saveCalls": 0
+      }
+    },
+    {
+      "phase": "canonical-exp-rows",
+      "stage": "top",
+      "index": 0,
+      "rows": [
+        {
+          "i": 0,
+          "name": "角色名稱長文測試甲乙丙丁戊己庚辛",
+          "level": "Lv.70",
+          "rect": {
+            "x": 23,
+            "y": 647.28125,
+            "width": 314,
+            "height": 116.296875,
+            "top": 647.28125,
+            "right": 337,
+            "bottom": 763.578125,
+            "left": 23
+          },
+          "nameBox": {
+            "x": 34,
+            "y": 658.6302490234375,
+            "width": 250.828125,
+            "height": 21,
+            "top": 658.6302490234375,
+            "right": 284.828125,
+            "bottom": 679.6302490234375,
+            "left": 34
+          },
+          "nameInk": {
+            "x": 34,
+            "y": 658.296875,
+            "width": 240,
+            "height": 21.66668701171875,
+            "top": 658.296875,
+            "right": 274,
+            "bottom": 679.9635620117188,
+            "left": 34
+          },
+          "meta": {
+            "text": "目前 0 / 9,637,200 EXP",
+            "rect": {
+              "x": 34,
+              "y": 684.9791870117188,
+              "width": 292,
+              "height": 19.59893798828125,
+              "top": 684.9791870117188,
+              "right": 326,
+              "bottom": 704.578125,
+              "left": 34
+            },
+            "ink": {
+              "x": 34,
+              "y": 684.3125,
+              "width": 141.109375,
+              "height": 20.3333740234375,
+              "top": 684.3125,
+              "right": 175.109375,
+              "bottom": 704.6458740234375,
+              "left": 34
+            }
+          },
+          "badge": {
+            "rect": null,
+            "ink": null
+          }
+        },
+        {
+          "i": 1,
+          "name": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+          "level": "Lv.60",
+          "rect": {
+            "x": 23,
+            "y": 770.578125,
+            "width": 314,
+            "height": 119.69793701171875,
+            "top": 770.578125,
+            "right": 337,
+            "bottom": 890.2760620117188,
+            "left": 23
+          },
+          "nameBox": {
+            "x": 34,
+            "y": 781.9271240234375,
+            "width": 250.828125,
+            "height": 21,
+            "top": 781.9271240234375,
+            "right": 284.828125,
+            "bottom": 802.9271240234375,
+            "left": 34
+          },
+          "nameInk": {
+            "x": 34,
+            "y": 781.59375,
+            "width": 240,
+            "height": 21.66668701171875,
+            "top": 781.59375,
+            "right": 274,
+            "bottom": 803.2604370117188,
+            "left": 34
+          },
+          "meta": {
+            "text": "目前 0 / 5,885,100 EXP\n追趕加成 ×1.15",
+            "rect": {
+              "x": 34,
+              "y": 808.2760620117188,
+              "width": 292,
+              "height": 23,
+              "top": 808.2760620117188,
+              "right": 326,
+              "bottom": 831.2760620117188,
+              "left": 34
+            },
+            "ink": {
+              "x": 34,
+              "y": 808.2760620117188,
+              "width": 292,
+              "height": 23,
+              "top": 808.2760620117188,
+              "right": 326,
+              "bottom": 831.2760620117188,
+              "left": 34
+            }
+          },
+          "badge": {
+            "text": "追趕加成 ×1.15",
+            "rect": {
+              "x": 216.8125,
+              "y": 808.2760620117188,
+              "width": 109.1875,
+              "height": 23,
+              "top": 808.2760620117188,
+              "right": 326,
+              "bottom": 831.2760620117188,
+              "left": 216.8125
+            },
+            "ink": {
+              "x": 223.8125,
+              "y": 810.2760620117188,
+              "width": 95.1875,
+              "height": 18.66668701171875,
+              "top": 810.2760620117188,
+              "right": 319,
+              "bottom": 828.9427490234375,
+              "left": 223.8125
+            }
+          }
+        },
+        {
+          "i": 2,
+          "name": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+          "level": "Lv.50",
+          "rect": {
+            "x": 23,
+            "y": 897.2760620117188,
+            "width": 314,
+            "height": 119.69793701171875,
+            "top": 897.2760620117188,
+            "right": 337,
+            "bottom": 1016.9739990234375,
+            "left": 23
+          },
+          "nameBox": {
+            "x": 34,
+            "y": 908.625,
+            "width": 250.828125,
+            "height": 21,
+            "top": 908.625,
+            "right": 284.828125,
+            "bottom": 929.625,
+            "left": 34
+          },
+          "nameInk": {
+            "x": 34,
+            "y": 908.2916870117188,
+            "width": 240,
+            "height": 21.66668701171875,
+            "top": 908.2916870117188,
+            "right": 274,
+            "bottom": 929.9583740234375,
+            "left": 34
+          },
+          "meta": {
+            "text": "目前 0 / 2,960,400 EXP\n追趕加成 ×1.30",
+            "rect": {
+              "x": 34,
+              "y": 934.9739990234375,
+              "width": 292,
+              "height": 23,
+              "top": 934.9739990234375,
+              "right": 326,
+              "bottom": 957.9739990234375,
+              "left": 34
+            },
+            "ink": {
+              "x": 34,
+              "y": 934.9739990234375,
+              "width": 292,
+              "height": 23,
+              "top": 934.9739990234375,
+              "right": 326,
+              "bottom": 957.9739990234375,
+              "left": 34
+            }
+          },
+          "badge": {
+            "text": "追趕加成 ×1.30",
+            "rect": {
+              "x": 216.8125,
+              "y": 934.9739990234375,
+              "width": 109.1875,
+              "height": 23,
+              "top": 934.9739990234375,
+              "right": 326,
+              "bottom": 957.9739990234375,
+              "left": 216.8125
+            },
+            "ink": {
+              "x": 223.8125,
+              "y": 936.9739990234375,
+              "width": 95.1875,
+              "height": 18.6666259765625,
+              "top": 936.9739990234375,
+              "right": 319,
+              "bottom": 955.640625,
+              "left": 223.8125
+            }
+          }
+        }
+      ],
+      "footer": {
+        "x": 23,
+        "y": 1056.572998046875,
+        "width": 314,
+        "height": 44,
+        "top": 1056.572998046875,
+        "right": 337,
+        "bottom": 1100.572998046875,
+        "left": 23
+      },
+      "owner": {
+        "x": 23,
+        "y": 316,
+        "width": 314,
+        "height": 301,
+        "top": 316,
+        "right": 337,
+        "bottom": 617,
+        "left": 23
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "exp-top",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 68.25,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "經驗池分配",
+            "width": 134.21875,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "能力值",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "技能",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 292,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 292,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 292,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "確定",
+            "width": 153,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "返回",
+            "width": 153,
+            "height": 44,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "exp-charge-region",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 68.25,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "經驗池分配",
+            "width": 134.21875,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "能力值",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "技能",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 292,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 292,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 292,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "確定",
+            "width": 153,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "返回",
+            "width": 153,
+            "height": 44,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "phase": "original-float-natural-drain",
+      "step": 0,
+      "count": 0
+    },
+    {
+      "phase": "original-natural-charge-float",
+      "animationPhase": "peak",
+      "text": "+266 EXP",
+      "float": {
+        "x": 262.0520935058594,
+        "y": 571.3006591796875,
+        "width": 64.94790649414062,
+        "height": 19,
+        "top": 571.3006591796875,
+        "right": 327,
+        "bottom": 590.3006591796875,
+        "left": 262.0520935058594
+      },
+      "ink": {
+        "x": 262.0520935058594,
+        "y": 570.634033203125,
+        "width": 64.94790649414062,
+        "height": 20.33331298828125,
+        "top": 570.634033203125,
+        "right": 327,
+        "bottom": 590.9673461914062,
+        "left": 262.0520935058594
+      },
+      "opacity": "0.93401",
+      "progress": 0.18390758621222184,
+      "currentTime": 266.66600000772166,
+      "duration": 1450,
+      "all": [
+        {
+          "text": "+266 EXP",
+          "opacity": "0.93401",
+          "rect": {
+            "x": 262.0520935058594,
+            "y": 571.3006591796875,
+            "width": 64.94790649414062,
+            "height": 19,
+            "top": 571.3006591796875,
+            "right": 327,
+            "bottom": 590.3006591796875,
+            "left": 262.0520935058594
+          },
+          "ink": {
+            "x": 262.0520935058594,
+            "y": 570.634033203125,
+            "width": 64.94790649414062,
+            "height": 20.33331298828125,
+            "top": 570.634033203125,
+            "right": 327,
+            "bottom": 590.9673461914062,
+            "left": 262.0520935058594
+          }
+        }
+      ],
+      "panel": {
+        "x": 23,
+        "y": 484.1875,
+        "width": 314,
+        "height": 118.3958740234375,
+        "top": 484.1875,
+        "right": 337,
+        "bottom": 602.5833740234375,
+        "left": 23
+      },
+      "layer": {
+        "x": 33,
+        "y": 565.5833740234375,
+        "width": 294,
+        "height": 28,
+        "top": 565.5833740234375,
+        "right": 327,
+        "bottom": 593.5833740234375,
+        "left": 33
+      },
+      "title": {
+        "x": 33,
+        "y": 493.1875,
+        "width": 80,
+        "height": 21,
+        "top": 493.1875,
+        "right": 113,
+        "bottom": 514.1875,
+        "left": 33
+      },
+      "rate": {
+        "x": 191.7291717529297,
+        "y": 494.1875,
+        "width": 135.2708282470703,
+        "height": 19,
+        "top": 494.1875,
+        "right": 327,
+        "bottom": 513.1875,
+        "left": 191.7291717529297
+      },
+      "description": {
+        "x": 33,
+        "y": 518.1875,
+        "width": 294,
+        "height": 43.3958740234375,
+        "top": 518.1875,
+        "right": 327,
+        "bottom": 561.5833740234375,
+        "left": 33
+      },
+      "owner": {
+        "x": 23,
+        "y": 316,
+        "width": 314,
+        "height": 301,
+        "top": 316,
+        "right": 337,
+        "bottom": 617,
+        "left": 23
+      }
+    },
+    {
+      "phase": "original-natural-charge-float",
+      "animationPhase": "end",
+      "text": "+266 EXP",
+      "float": {
+        "x": 262.0520935058594,
+        "y": 565.699462890625,
+        "width": 64.94790649414062,
+        "height": 19,
+        "top": 565.699462890625,
+        "right": 327,
+        "bottom": 584.699462890625,
+        "left": 262.0520935058594
+      },
+      "ink": {
+        "x": 262.0520935058594,
+        "y": 565.0327758789062,
+        "width": 64.94790649414062,
+        "height": 20.33331298828125,
+        "top": 565.0327758789062,
+        "right": 327,
+        "bottom": 585.3660888671875,
+        "left": 262.0520935058594
+      },
+      "opacity": "0.0197718",
+      "progress": 0.9080455172467045,
+      "currentTime": 1316.6660000077215,
+      "duration": 1450,
+      "all": [
+        {
+          "text": "+266 EXP",
+          "opacity": "0.0197718",
+          "rect": {
+            "x": 262.0520935058594,
+            "y": 565.699462890625,
+            "width": 64.94790649414062,
+            "height": 19,
+            "top": 565.699462890625,
+            "right": 327,
+            "bottom": 584.699462890625,
+            "left": 262.0520935058594
+          },
+          "ink": {
+            "x": 262.0520935058594,
+            "y": 565.0327758789062,
+            "width": 64.94790649414062,
+            "height": 20.33331298828125,
+            "top": 565.0327758789062,
+            "right": 327,
+            "bottom": 585.3660888671875,
+            "left": 262.0520935058594
+          }
+        }
+      ],
+      "panel": {
+        "x": 23,
+        "y": 484.1875,
+        "width": 314,
+        "height": 118.3958740234375,
+        "top": 484.1875,
+        "right": 337,
+        "bottom": 602.5833740234375,
+        "left": 23
+      },
+      "layer": {
+        "x": 33,
+        "y": 565.5833740234375,
+        "width": 294,
+        "height": 28,
+        "top": 565.5833740234375,
+        "right": 327,
+        "bottom": 593.5833740234375,
+        "left": 33
+      },
+      "title": {
+        "x": 33,
+        "y": 493.1875,
+        "width": 80,
+        "height": 21,
+        "top": 493.1875,
+        "right": 113,
+        "bottom": 514.1875,
+        "left": 33
+      },
+      "rate": {
+        "x": 191.7291717529297,
+        "y": 494.1875,
+        "width": 135.2708282470703,
+        "height": 19,
+        "top": 494.1875,
+        "right": 327,
+        "bottom": 513.1875,
+        "left": 191.7291717529297
+      },
+      "description": {
+        "x": 33,
+        "y": 518.1875,
+        "width": 294,
+        "height": 43.3958740234375,
+        "top": 518.1875,
+        "right": 327,
+        "bottom": 561.5833740234375,
+        "left": 33
+      },
+      "owner": {
+        "x": 23,
+        "y": 316,
+        "width": 314,
+        "height": 301,
+        "top": 316,
+        "right": 337,
+        "bottom": 617,
+        "left": 23
+      }
+    },
+    {
+      "phase": "canonical-exp-rows",
+      "stage": "end",
+      "index": 0,
+      "rows": [
+        {
+          "i": 0,
+          "name": "角色名稱長文測試甲乙丙丁戊己庚辛",
+          "level": "Lv.70",
+          "rect": {
+            "x": 23,
+            "y": 163.61459350585938,
+            "width": 314,
+            "height": 116.296875,
+            "top": 163.61459350585938,
+            "right": 337,
+            "bottom": 279.9114685058594,
+            "left": 23
+          },
+          "nameBox": {
+            "x": 34,
+            "y": 174.9635467529297,
+            "width": 250.828125,
+            "height": 21,
+            "top": 174.9635467529297,
+            "right": 284.828125,
+            "bottom": 195.9635467529297,
+            "left": 34
+          },
+          "nameInk": {
+            "x": 34,
+            "y": 174.63021850585938,
+            "width": 240,
+            "height": 21.666656494140625,
+            "top": 174.63021850585938,
+            "right": 274,
+            "bottom": 196.296875,
+            "left": 34
+          },
+          "meta": {
+            "text": "目前 0 / 9,637,200 EXP",
+            "rect": {
+              "x": 34,
+              "y": 201.3125,
+              "width": 292,
+              "height": 19.598968505859375,
+              "top": 201.3125,
+              "right": 326,
+              "bottom": 220.91146850585938,
+              "left": 34
+            },
+            "ink": {
+              "x": 34,
+              "y": 200.64584350585938,
+              "width": 141.109375,
+              "height": 20.333328247070312,
+              "top": 200.64584350585938,
+              "right": 175.109375,
+              "bottom": 220.9791717529297,
+              "left": 34
+            }
+          },
+          "badge": {
+            "rect": null,
+            "ink": null
+          }
+        },
+        {
+          "i": 1,
+          "name": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+          "level": "Lv.60",
+          "rect": {
+            "x": 23,
+            "y": 286.9114685058594,
+            "width": 314,
+            "height": 119.69790649414062,
+            "top": 286.9114685058594,
+            "right": 337,
+            "bottom": 406.609375,
+            "left": 23
+          },
+          "nameBox": {
+            "x": 34,
+            "y": 298.26043701171875,
+            "width": 250.828125,
+            "height": 21,
+            "top": 298.26043701171875,
+            "right": 284.828125,
+            "bottom": 319.26043701171875,
+            "left": 34
+          },
+          "nameInk": {
+            "x": 34,
+            "y": 297.9270935058594,
+            "width": 240,
+            "height": 21.666656494140625,
+            "top": 297.9270935058594,
+            "right": 274,
+            "bottom": 319.59375,
+            "left": 34
+          },
+          "meta": {
+            "text": "目前 0 / 5,885,100 EXP\n追趕加成 ×1.15",
+            "rect": {
+              "x": 34,
+              "y": 324.609375,
+              "width": 292,
+              "height": 23,
+              "top": 324.609375,
+              "right": 326,
+              "bottom": 347.609375,
+              "left": 34
+            },
+            "ink": {
+              "x": 34,
+              "y": 324.609375,
+              "width": 292,
+              "height": 23,
+              "top": 324.609375,
+              "right": 326,
+              "bottom": 347.609375,
+              "left": 34
+            }
+          },
+          "badge": {
+            "text": "追趕加成 ×1.15",
+            "rect": {
+              "x": 216.8125,
+              "y": 324.609375,
+              "width": 109.1875,
+              "height": 23,
+              "top": 324.609375,
+              "right": 326,
+              "bottom": 347.609375,
+              "left": 216.8125
+            },
+            "ink": {
+              "x": 223.8125,
+              "y": 326.609375,
+              "width": 95.1875,
+              "height": 18.66668701171875,
+              "top": 326.609375,
+              "right": 319,
+              "bottom": 345.27606201171875,
+              "left": 223.8125
+            }
+          }
+        },
+        {
+          "i": 2,
+          "name": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+          "level": "Lv.50",
+          "rect": {
+            "x": 23,
+            "y": 413.609375,
+            "width": 314,
+            "height": 119.69793701171875,
+            "top": 413.609375,
+            "right": 337,
+            "bottom": 533.3073120117188,
+            "left": 23
+          },
+          "nameBox": {
+            "x": 34,
+            "y": 424.9583435058594,
+            "width": 250.828125,
+            "height": 21,
+            "top": 424.9583435058594,
+            "right": 284.828125,
+            "bottom": 445.9583435058594,
+            "left": 34
+          },
+          "nameInk": {
+            "x": 34,
+            "y": 424.625,
+            "width": 240,
+            "height": 21.66668701171875,
+            "top": 424.625,
+            "right": 274,
+            "bottom": 446.29168701171875,
+            "left": 34
+          },
+          "meta": {
+            "text": "目前 0 / 2,960,400 EXP\n追趕加成 ×1.30",
+            "rect": {
+              "x": 34,
+              "y": 451.30731201171875,
+              "width": 292,
+              "height": 23,
+              "top": 451.30731201171875,
+              "right": 326,
+              "bottom": 474.30731201171875,
+              "left": 34
+            },
+            "ink": {
+              "x": 34,
+              "y": 451.30731201171875,
+              "width": 292,
+              "height": 23,
+              "top": 451.30731201171875,
+              "right": 326,
+              "bottom": 474.30731201171875,
+              "left": 34
+            }
+          },
+          "badge": {
+            "text": "追趕加成 ×1.30",
+            "rect": {
+              "x": 216.8125,
+              "y": 451.30731201171875,
+              "width": 109.1875,
+              "height": 23,
+              "top": 451.30731201171875,
+              "right": 326,
+              "bottom": 474.30731201171875,
+              "left": 216.8125
+            },
+            "ink": {
+              "x": 223.8125,
+              "y": 453.30731201171875,
+              "width": 95.1875,
+              "height": 18.666656494140625,
+              "top": 453.30731201171875,
+              "right": 319,
+              "bottom": 471.9739685058594,
+              "left": 223.8125
+            }
+          }
+        }
+      ],
+      "footer": {
+        "x": 23,
+        "y": 572.90625,
+        "width": 314,
+        "height": 44,
+        "top": 572.90625,
+        "right": 337,
+        "bottom": 616.90625,
+        "left": 23
+      },
+      "owner": {
+        "x": 23,
+        "y": 316,
+        "width": 314,
+        "height": 301,
+        "top": 316,
+        "right": 337,
+        "bottom": 617,
+        "left": 23
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "exp-end",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 68.25,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "經驗池分配",
+            "width": 134.21875,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "能力值",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "技能",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 292,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 292,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 292,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "確定",
+            "width": 153,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "返回",
+            "width": 153,
+            "height": 44,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "exp-reopen-top",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 68.25,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "經驗池分配",
+            "width": 134.21875,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "能力值",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "技能",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 292,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 292,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "點擊預覽升級",
+            "width": 292,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "確定",
+            "width": 153,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "返回",
+            "width": 153,
+            "height": 44,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    }
+  ],
+  "scenes": [
+    "exp-top",
+    "exp-charge-region",
+    "exp-natural-float-peak",
+    "exp-natural-float-end",
+    "exp-end",
+    "exp-reopen-top"
+  ],
+  "scope": "Segment26 EXP charge-only partial evidence; no completion claim"
+}
