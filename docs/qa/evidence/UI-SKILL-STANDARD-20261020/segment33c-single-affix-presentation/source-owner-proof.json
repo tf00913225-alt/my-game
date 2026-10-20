@@ -1,0 +1,21 @@
+{
+  "base": "cb60dca81e160d4b8aae83cf27da120194eaadc2",
+  "scope": "Retire duplicate display-only summary and its dead CSS; canonical per-slot read owner preserves slot indices for filled/empty rows. No model/data/callback/cost/probability changes.",
+  "rows": [
+    {
+      "file": "js/35-v141-ui-battle.js",
+      "before": "714fe514a083bfbc42b3dbb1b815681402fff2b06f6629ec0de6e7e4b4c28231",
+      "after": "da921fe8e69114fac39ea0f6e9c2babcbfe677f7a0dcec857cd90cbdaa99f062"
+    },
+    {
+      "file": "css/38-v141-system-expansion.css",
+      "before": "a2f3ebd18517442397ae3c4f368076ced5e9db707246ddcf03741dd9d8ed8c65",
+      "after": "11e34057f4dbef7bae6101f316b3c47a93690a5ccdddf27de484a618686a8f81"
+    },
+    {
+      "file": "js/equipment-progression.js",
+      "before": "3a101cc317c228e28d0cc399dda02f96ab64115175da6498b9b1855c1a04243c",
+      "after": "199681b6f02284fef4b6b55e425583fd619515dc81166fca7578bba98b39b673"
+    }
+  ]
+}

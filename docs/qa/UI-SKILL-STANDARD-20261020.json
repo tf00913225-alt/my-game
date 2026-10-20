@@ -4937,6 +4937,42 @@
             "Ring formal definition and legal filled long affixes remain unverified",
             "White-background weapon source art retained per existing EQUIPMENT_CATALOG Owner, visual quality limitation not fixed by CSS"
           ]
+        },
+        {
+          "state": "Canonical filled-slot single presentation, indices preserved, backpack comparison and equipped detail",
+          "status": "已實際驗證",
+          "head": "3e9df4fe7e8c7fe7b391290ad040e496cbf2b5ef",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment33c-single-affix-presentation",
+          "reports": [
+            {
+              "head": "3e9df4fe7e8c7fe7b391290ad040e496cbf2b5ef",
+              "viewport": "360x640",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33c-single-affix-presentation\\360x640\\report.json"
+            },
+            {
+              "head": "3e9df4fe7e8c7fe7b391290ad040e496cbf2b5ef",
+              "viewport": "393x873",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33c-single-affix-presentation\\393x873\\report.json"
+            },
+            {
+              "head": "3e9df4fe7e8c7fe7b391290ad040e496cbf2b5ef",
+              "viewport": "412x915",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33c-single-affix-presentation\\412x915\\report.json"
+            },
+            {
+              "head": "3e9df4fe7e8c7fe7b391290ad040e496cbf2b5ef",
+              "viewport": "1280x800",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33c-single-affix-presentation\\1280x800\\report.json"
+            }
+          ],
+          "limits": [
+            "One formal armor, two model-produced filled slots in backpack comparison and equipped detail only",
+            "Deterministic pure model fixture, not a reforge/equip/sell/lock/source transaction or changed balance",
+            "Ordinary factory names retained; ring/legal long names/historical long-affix ranges and physical devices unverified",
+            "Equipped body naturally non-overflowing313/313; no claim of equipped scroll gesture or long-overflow coverage",
+            "Six exact restore fields only; baseline after startup/module initialization, not all private caches",
+            "Before scope prose five comparisons is a copied metadata typo: actual fixture/phase/input evidence has one armor comparison; original reports retained untouched"
+          ]
         }
       ],
       "reviews": {
@@ -26607,6 +26643,20 @@
         "Six exact restore fields only, after-startup/module-init baseline; physical devices/private caches/transactions unverified",
         "Ring formal definition and legal filled long affixes remain unverified",
         "White-background weapon source art retained per existing EQUIPMENT_CATALOG Owner, visual quality limitation not fixed by CSS"
+      ]
+    },
+    {
+      "segment": "segment-33c-single-affix-presentation",
+      "head": "3e9df4fe7e8c7fe7b391290ad040e496cbf2b5ef",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment33c-single-affix-presentation",
+      "result": "雙呈現Owner退役、逐槽索引/數值保留；四尺寸雙路限定通過",
+      "pending": [
+        "One formal armor, two model-produced filled slots in backpack comparison and equipped detail only",
+        "Deterministic pure model fixture, not a reforge/equip/sell/lock/source transaction or changed balance",
+        "Ordinary factory names retained; ring/legal long names/historical long-affix ranges and physical devices unverified",
+        "Equipped body naturally non-overflowing313/313; no claim of equipped scroll gesture or long-overflow coverage",
+        "Six exact restore fields only; baseline after startup/module initialization, not all private caches",
+        "Before scope prose five comparisons is a copied metadata typo: actual fixture/phase/input evidence has one armor comparison; original reports retained untouched"
       ]
     }
   ],

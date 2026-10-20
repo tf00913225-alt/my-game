@@ -1,0 +1,11 @@
+#33C independent scope and actual-image review
+
+Reviewed source3e9df4fe and four-size owner-after reports/screenshots. Before360 real image showed duplicate blue旧冶煉summary and gold canonical per-slot text. After independently viewed both backpack-comparison and equipped-detail routes for EACH360/393/412/1280 size. Both routes now show one set of original filled values with詞條1/2labels; comparison current side remains aggregate and equipped detail has no inappropriate comparison section. Ends are readable above original actions. No picture/rarity asset was replaced; original artwork quality limitations remain.
+
+Independent exact transformation checks against parent:js35 equals old bytes minus complete obsolete appendReforgeStatsToModal function and its two calls only; progression equals original with the filled/empty conditional prefix replaced by unconditional original slot index; CSS38 equals original minus exactly two obsolete v141-item-reforge rules. Complete generated primary JS, secondary JS and combined gameplay CSS equal the same exact transformations. functions/src/equipment-reforge.js is unchanged. Decompose/potion/icon/open/close handlers are retained. No numeric/model/economic/lock/wear/sell or save logic changed.
+
+Existing test's three ordinary/legacy/five-slot fixtures and original no-mutation/remaining/format assertions remain; additions enforce old Owner retirement and every filled/empty row's exact indexed text. No weakening. Focused/build results are root validation, not independently rerun here.
+
+All four actual reports clean/complete/sourceBeforeAfter equal/sourceUnchangedtrue, six raw/meta/actors/inventory/loadouts/equipment restore fields true. Legacy DOM count0 in comparison and equipped; equipped comparison count0. Canonical roll/ownership fixture stays isolated; no original business buttons were clicked. Restoration baseline remains after startup/module init, before actor seed; no whole private cache or zero-save claim.
+
+Limited acceptance: canonical filled orange armor comparison and canonical current-equipped purple armor detail, four viewports, real top/end/returns. Does not approve ring, every item, historical long labels/five-slot browser states, real reforge/wear/sell/lock/transaction or hardware. No Chrome launched or tracked files modified by reviewer.
