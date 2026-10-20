@@ -9,6 +9,7 @@ const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
 const {verifyShopPurchaseEvidence}=require("./canonical-shop-purchase");
 const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
+const {verifySkillLearningEvidence,skillLearningEvidenceReadBudget}=require("./canonical-skill-learning");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
 const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,chargeRecoveryAuditAssembly,admitRecoveryAuditAssemblyBytes,recoveryAuditQueryShapes,
@@ -938,8 +939,14 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         const operation=await tx.get(root.collection("operations").doc(doc.id));
         const debit=operation.data();
         if(receipt||!operation.exists||debit.schemaVersion!==1||debit.ownerUid!==uid||
-           debit.operationId!==doc.id||!["shop-purchase","exp-allocation","attribute-allocation"].includes(debit.kind)){
+           debit.operationId!==doc.id||!["shop-purchase","exp-allocation","attribute-allocation","skill-learning"].includes(debit.kind)){
             fail("data-loss","An unmatched ledger entry blocks recovery.");
+        }
+        if(debit.kind==="skill-learning"){
+            if(!records.account.slots.includes(debit.characterId))fail("data-loss","Skill learning character is no longer owned.");
+            await verifySkillLearningEvidence({tx,root,uid,operationId:doc.id,currentRevision:expectedRevision,
+                receipt:debit,ledger,grantExists:false,fail});
+            return;
         }
         const debitRevision=debit.kind==="shop-purchase"?debit.purchasedRevision:debit.allocatedRevision;
         if(!Number.isSafeInteger(debitRevision)||debitRevision<2||debitRevision>expectedRevision){
@@ -1162,7 +1169,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                     await modeEvidence.verifyRetainedOperation(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
                 }
                 verifiedModeOperations.add(doc.id);
-            }else if(["shop-purchase","exp-allocation","attribute-allocation"].includes(value.kind)){
+            }else if(["shop-purchase","exp-allocation","attribute-allocation","skill-learning"].includes(value.kind)){
                 if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||!ledgerIds.has(doc.id)){
                     fail("data-loss","A debit receipt without its original ledger blocks recovery.");
                 }
@@ -1441,7 +1448,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                         modeEvidence.retainedOperationReadBudget(doc.get("kind")):
                         sourceEvidence.retainedOperationReadBudget(doc.get("kind"))),0);
             if(queries.reduce((sum,query)=>sum+query.size,0)+claims.docs.length*12+
-               receipts.docs.length+ledgers.docs.length*5+reservedCount*6+
+               receipts.docs.length+ledgers.docs.length*5+
+               ledgers.docs.filter(doc=>doc.get("kind")==="skill-learning").length*(1+skillLearningEvidenceReadBudget()-5)+reservedCount*6+
                grants.docs.length+pendingCount*3+events.docs.length*4+
                operations.docs.length+operationProofReads+
                modeSources.docs.length*(1+modeEvidence.retainedSourceReadBudget())+
@@ -1647,8 +1655,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         return {root,save:db.doc("users/"+uid+"/saves/current"),tx,rows,finish,
             close:async()=>{await Promise.allSettled([...pending]);capture.release();recoveryAuditAssemblyUsage(budget);}};
     }
-    async function verifySegmentedRawRecoveryProof(input){
-        const budget=createRecoveryAuditAssemblyBudget();let view;
+    async function verifySegmentedRawRecoveryProof(input,budget=createRecoveryAuditAssemblyBudget()){
+        let view;
         try{
             chargeRecoveryAuditAssembly(budget,"passes",1);
             const capture=inspectCompleteRawCapture(input,budget,true),{ownerUid:uid,sourceRevision:revision,auditId}=input.binding;
@@ -1732,6 +1740,9 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     }
     async function pinCandidatePublication(request,args){
         requirePublicationPreparation();
+        return pinRawCapture(request,args);
+    }
+    async function pinRawCapture(request,args){
         auditIntent("pin publication",args,["auditId","expectedEpoch","operationId"]);
         // A failed/retried callback never mints an identity. Only its committed
         // result is retained in the private map after run resolves.
@@ -1743,6 +1754,9 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     }
     async function loadPinnedRawCapture(pin){
         requirePublicationPreparation();
+        return loadPinnedRawMaterial(pin);
+    }
+    async function loadPinnedRawMaterial(pin){
         const pinned=publicationValue(publicationPins,pin),budget=createRecoveryAuditAssemblyBudget();
         const input={binding:{ownerUid:pinned.tuple.ownerUid,auditId:pinned.tuple.auditId,epoch:pinned.tuple.epoch,
             sourceRevision:pinned.tuple.sourceRevision,inventoryStateSha256:pinned.tuple.inventoryStateSha256},
@@ -1790,6 +1804,22 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         }
         recoveryAuditAssemblyUsage(budget);
         return publicationIdentity(publicationMaterials,{pin,input,budget,scanReads,wireBytes});
+    }
+    // Private process-local proof only. No artifact, durable point or authority is issued.
+    async function verifyPinnedSegmentedProof(request,pin,material){
+        const pinned=publicationValue(publicationPins,pin),value=publicationValue(publicationMaterials,material);
+        if(value.pin!==pin)fail("permission-denied","Candidate material belongs to another pin.");
+        publicationMaterials.delete(material);
+        recoveryAuditAssemblyUsage(value.budget);
+        const summary=await verifySegmentedRawRecoveryProof(value.input,value.budget);
+        recoveryAuditAssemblyUsage(value.budget);
+        await runRecoveryAuditMaintenance(request,pinned.args.auditId,async(tx,session)=>{
+            recoveryAuditAssemblyUsage(value.budget);
+            const current=await publicationContext(tx,session,pinned.args);
+            recoveryAuditAssemblyUsage(value.budget);
+            if(snapshotDigest(current.tuple)!==snapshotDigest(pinned.tuple))fail("aborted","Pinned proof capture binding changed.");
+        },pinned.args.operationId);
+        return Object.freeze({...summary,assemblyUsage:recoveryAuditAssemblyUsage(value.budget)});
     }
     async function assemblePinnedCandidate(pin,material){
         requirePublicationPreparation();

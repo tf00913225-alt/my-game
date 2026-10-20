@@ -31,7 +31,7 @@ const scriptText=source=>source.replace(/<\/script/gi,"<\\/script");
 const databaseSource=scriptText(main.slice(databaseStart,databaseEnd));
 // Stop directly after renderSkillLoadout; subsequent preview helpers are unrelated.
 const rendererSource=scriptText(main.slice(rendererStart,rendererEnd));
-const progressionSource=scriptText(fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8"));
+const progressionSource=scriptText(fs.readFileSync("functions/src/skill-progression-core.js","utf8")+"\n"+fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8"));
 const fixture=path.join(process.cwd(),".critical-regressions-browser.html");
 const rows=Array.from({length:60},(_,i)=>`<div style="height:34px">秘寶測試列 ${i+1}</div>`).join("");
 const html=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
