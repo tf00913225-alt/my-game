@@ -44,6 +44,7 @@ function loadTower({gate}={}){
         rebuildInventorySlots:()=>{},updateGoldDisplay:()=>{},
         v154PreparePortraitsForEncounter:null,
         FourSymbolsFeatures:{ensureAssets:()=>Promise.resolve(true)},
+        setTimeout,clearTimeout,
         fetch:()=>Promise.resolve({ok:true,json:()=>Promise.resolve(registry)})
     };
     context.window=context;

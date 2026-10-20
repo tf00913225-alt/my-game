@@ -44,7 +44,7 @@ console.log("Daily Dungeon portrait owner convergence contracts: PASS.");
     const registry=JSON.parse(fs.readFileSync('config/monster-portrait-registry.json','utf8'));
     let requests=0,failElite=true;
     const elitePath=registry.groups.daily.find(row=>row[0]==='daily.exp.elite')[5];
-    const context={console:{warn(){}},fetch:async()=>{
+    const context={setTimeout,clearTimeout,console:{warn(){}},fetch:async()=>{
         requests++;if(requests===1)throw Error('isolated registry failure');
         return {ok:true,json:async()=>registry};
     },FourSymbolsFeatures:{ensureAssets:async paths=>{if(failElite&&paths.includes(elitePath))throw Error('isolated elite decode failure');}}};

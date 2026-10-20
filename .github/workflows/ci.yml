@@ -917,6 +917,7 @@ jobs:
           path: |
             artifacts/browser-qa/adventure-node-system-v1.json
             artifacts/browser-qa/chapter1-story
+            artifacts/browser-qa/chapter1-guided-pointer
           if-no-files-found: error
           retention-days: 90
 

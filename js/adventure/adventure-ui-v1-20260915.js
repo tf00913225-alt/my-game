@@ -125,12 +125,14 @@
         const action=status==='reward-unclaimed'?'領獎':view.state.completedNodes[node.id]?'重訪':'進入';
         const options=view.chapter.nodes.map(n=>{const st=API().getNodeStatus(n.id);return '<button type="button" data-stage-id="'+attr(n.id)+'"'+(['locked','planned'].includes(st)?' disabled':' onclick="FourSymbolsAdventure.openNode(\''+attr(n.id)+'\')"')+'>'+esc(n.stage+'. '+n.title)+'</button>';}).join('');
 
+        const required=window.FourSymbolsHeroAcquisition?.getRequiredStoryNode?.();
+        const replay=required&&view.state.completedNodes[required]?'<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.startStory(\''+attr(required)+'\')">補看故事紀錄</button>':'';
         const scene=CONTENT().storyPresentation.scenes[node.scene]||CONTENT().storyPresentation.scenes.road;
         return '<aside class="adventure-node-sheet is-'+esc(status)+'" aria-live="polite">'+
             '<img class="adventure-sheet-preview" src="'+attr(scene)+'" alt="'+attr(node.title)+'場景">'+
             '<div class="adventure-sheet-content"><div class="adventure-sheet-title"><span class="adventure-sheet-icon" aria-hidden="true">'+esc(nodeGlyph(node.type,status))+'</span><h2>'+esc(node.title)+'</h2><small>'+esc(labels[node.type]||'章節節點')+'</small></div>'+
             '<p>'+esc(node.detail||node.subtitle||'沿山路前行，探訪江湖。')+'</p>'+
-            '<div class="adventure-sheet-actions"><div class="adventure-reward-preview" aria-label="關卡獎勵">'+mapRewardPreview(node)+'</div><details class="adventure-stage-picker" id="adventureStagePicker"><summary aria-label="選擇已解鎖關卡">關卡一覽 ▴</summary><div class="adventure-stage-list" data-scroll-owner="y">'+options+'</div></details>'+
+            '<div class="adventure-sheet-actions"><div class="adventure-reward-preview" aria-label="關卡獎勵">'+mapRewardPreview(node)+'</div><details class="adventure-stage-picker" id="adventureStagePicker"><summary aria-label="選擇已解鎖關卡">關卡一覽 ▴</summary><div class="adventure-stage-list" data-scroll-owner="y">'+replay+options+'</div></details>'+
             '<button type="button" class="adventure-button primary" aria-label="'+attr(action+'第 '+node.stage+' 關 · '+node.title)+'" '+(disabled?'disabled':'onclick="FourSymbolsAdventure.activateSelectedNode()"')+'>'+action+' <span aria-hidden="true">›</span></button></div></div></aside>';
     }
 
@@ -138,14 +140,12 @@
         const selected=view.chapter.nodes.find(n=>n.id===view.selectedNodeId)||view.chapter.nodes.find(n=>n.id===view.state.currentNodeId);
         const milestones=[1,3,5,10,12,14,16,18,20];
         const mainNodes=view.chapter.nodes.map(node=>{
-            const close=selected&&node.id!==selected.id&&Math.hypot((node.x-selected.x)*10.8,(node.y-selected.y)*19.2)<145;
+            const close=selected&&node.id!==selected.id&&Math.abs((node.x-selected.x)*10.8)<145&&Math.abs((node.y-selected.y)*19.2)<145;
             const major=node.id===selected?.id||(milestones.includes(node.stage)&&!close);
             return mapNodeButton(node,API().getNodeStatus(node.id),major,node.id===selected?.id);
         }).join('');
         const legacy=(CONTENT().legacyNodes||[]).filter(n=>view.state.rewardClaims[n.id]==='ready').map(n=>'<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.openLegacyReward(\''+attr(n.id)+'\')">舊旅程待領 · '+esc(n.title)+'</button>').join('');
-        const required=window.FourSymbolsHeroAcquisition?.getRequiredStoryNode?.();
-        const replay=required&&view.state.completedNodes[required]?'<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.startStory(\''+attr(required)+'\')">補看故事紀錄</button>':'';
-        return '<section class="adventure-map-screen"><div class="adventure-map-canvas" role="region" aria-label="第一章二十關路線">'+mapRoadSvg(view)+mainNodes+'</div>'+nodeDetailSheet(view)+(legacy||replay?'<div class="adventure-legacy-rewards">'+replay+legacy+'</div>':'')+'</section>';
+        return '<section class="adventure-map-screen"><div class="adventure-map-canvas" role="region" aria-label="第一章二十關路線">'+mapRoadSvg(view)+mainNodes+'</div>'+nodeDetailSheet(view)+(legacy?'<div class="adventure-legacy-rewards">'+legacy+'</div>':'')+'</section>';
     }
 
     function panelShell(title,kicker,body,actions,extraClass){
@@ -259,7 +259,10 @@
         const dialog=visibleGuideTarget('.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button');
         if(dialog){return {target:dialog,text:"讀完提示後，點這裡繼續。"};}
         const o=view.tutorial,p=view.tutorialProgress||{};
-        if(o.requiredAction==="equipment"&&visibleGuideTarget('#homeFeatureModal.show .v17345-equipment-shop')){
+        if(o.requiredAction==="equipment"&&visibleGuideTarget('#homeFeatureModal.show')){
+            if(!view.state.grantedEquipmentUid&&!visibleGuideTarget('#homeFeatureModal.show .v17345-equipment-shop')){
+                return step("#homeFeatureModal [onclick=\"v169SwitchShopPage('equipment')\"]",'先點「裝備」分類，找到護具。');
+            }
             return view.state.grantedEquipmentUid?step('#homeFeatureModal [onclick="closeHomeFeature()"]','護具已買好，先關閉商店，再到背包穿戴。'):
                 step('#chapter1TutorialArmorBuy','點「購買護具」，支付金幣取得這件護具。');
         }
@@ -267,6 +270,9 @@
         if(battle){
             const declaring=typeof battlePhase!=="undefined"&&battlePhase==="declare";
             if(declaring&&typeof pendingAction!=="undefined"&&pendingAction){
+                if(pendingAction==='__v143PotionTarget'){
+                    return Object.assign(step('#battlePlayerRow .ally-targetable','點擊我方角色，確認使用補品。'),{battle:true});
+                }
                 return Object.assign(step('#battleMonsterArea [id^="battleMonster"]','點擊敵人，確認這次出招。'),{battle:true});
             }
             if(!declaring||(typeof actionReady!=="undefined"&&actionReady)){return {target:null,text:"出招中，看看這一回合的結果。",battle:true,waiting:true};}
@@ -375,7 +381,10 @@
         const copy=guide.overlay.querySelector('.adventure-guide-copy');
         copy.hidden=!recovery.hidden;
         if(copy.textContent!==step.text){copy.textContent=step.text;}
-        copy.style.top=(y>height*.52?Math.max(25,y-180):Math.min(height-180,bottom+28))+'px';
+        const sheet=visibleGuideTarget('#adventurePage.active[data-panel="map"] .adventure-node-sheet');
+        const sheetTop=sheet?(sheet.getBoundingClientRect().top-base.top)/scale:null;
+        const copyHeight=copy.offsetHeight||180;
+        copy.style.top=(sheetTop!==null?Math.max(25,sheetTop-copyHeight-28):y>height*.52?Math.max(25,y-copyHeight-28):Math.min(height-copyHeight-28,bottom+28))+'px';
     }
     function installGuide(){
         const block=event=>{

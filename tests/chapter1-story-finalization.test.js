@@ -58,17 +58,18 @@ function runtime(saved,initialSave=true){
         MonsterBalance:{build:spec=>({...spec,hp:50,maxHP:50,sp:0,maxSP:0})},
         getMonsterSkillPoolForLevel:()=>[],getMonsterSkillTierAndChance:()=>({chance:0}),configureBuiltMonster:m=>m,
         FourSymbolsCombatEvents:{subscribe(_name,fn){skillEvent=fn;}},
-        FourSymbolsEquipmentFactory:{starter:id=>({definitionId:id,name:id,v141Uid:"qa-starter-armor"})},
+        FourSymbolsEquipmentFactory:require("../js/equipment-factory"),
+        FourSymbolsAccountSave:{getActiveUid:()=>"chapter-qa"},FourSymbolsStartupPolicy:{getUid:()=>"chapter-qa"},
         v132AddItemToInventory(item){c.inventoryItems.push(item);return true;},
-        v132RunInventoryTransaction(fn){const before=JSON.parse(JSON.stringify(c.inventoryItems));const ok=fn();if(!ok)c.inventoryItems=before;return ok;},
-        getPotionCount:id=>potionCounts[id]||0,addPotionToInventory:()=>true,
+        v132RunInventoryTransaction(fn){const before=JSON.parse(JSON.stringify(c.inventoryItems)),potions={...potionCounts};const restore=()=>{c.inventoryItems=before;Object.assign(potionCounts,potions);};try{const ok=fn();if(!ok)restore();return ok;}catch(error){restore();throw error;}},
+        getPotionCount:id=>potionCounts[id]||0,addPotionToInventory:(id,n)=>{potionCounts[id]=(potionCounts[id]||0)+n;return true;},
         v132LaunchDungeonBattle(enemies,fn,opts){roster=enemies;callback=fn;options=opts;launches++;c.battleActive=true;return true;}};
     c.window=c;vm.createContext(c);
     for(const path of ["js/adventure/adventure-content-v1-20260915.js","js/adventure/adventure-runtime-v1-20260915.js"])vm.runInContext(fs.readFileSync(path,"utf8"),c);
     return {c,api:c.FourSymbolsAdventure,state:()=>c.player.adventureProgress.chapters.chapter_v1,
         save:value=>{saveMode=value;},stored:()=>structuredClone(stored),roster:()=>roster,options:()=>options,launches:()=>launches,
         finish:result=>{c.battleActive=false;callback({result});},useSkill:()=>skillEvent({actor:player,actualSpent:1}),
-        consumePotion:id=>{assert.ok(potionCounts[id]>0);potionCounts[id]--;}};
+        potions:potionCounts,consumePotion:id=>{assert.ok(potionCounts[id]>0);potionCounts[id]--;}};
 }
 function finishDialogue(h){let guard=30;while(h.state().dialogue&&guard-->0)assert.equal(h.api.advanceDialogue(),true);assert.ok(guard>0);}
 function at(h,id){h.state().currentNodeId=id;h.state().onboarding={active:true,phase:"story",nodeId:"c1_01"};}
@@ -92,10 +93,11 @@ test("first victory exposes its reward then a successful claim selects the next 
     assert.equal(h.api.claimNodeReward("c1_01"),true);
     assert.equal(h.api.getView().panel,"map");assert.equal(h.api.getView().selectedNodeId,"c1_02");
     assert.equal(h.state().rewardClaims.c1_01,"claimed");
-    assert.equal((html().match(/class="adventure-node type-/g)||[]).length,20);
-    assert.match(html(),/class="adventure-map-viewport" data-scroll-owner="y"/);
-    assert.match(html(),/<\/div><\/div><aside class="adventure-node-sheet/,'fixed action sheet is outside the scroll viewport');
-    assert.match(html(),/onclick="FourSymbolsAdventure.activateSelectedNode\(\)"[^>]*>前往第 2 關 · 山道惡徒/);
+    assert.equal((html().match(/data-stage-id=/g)||[]).length,20);
+    assert.match(html(),/id="adventureStagePicker"/);assert.doesNotMatch(html(),/<select\b/);
+    assert.match(html(),/data-stage-id="c1_02" onclick="FourSymbolsAdventure.openNode\('c1_02'\)"/);assert.match(html(),/data-stage-id="c1_03" disabled/);
+    assert.doesNotMatch(html(),/adventure-map-viewport/);assert.match(html(),/class="adventure-stage-list" data-scroll-owner="y"/);
+    assert.match(html(),/onclick="FourSymbolsAdventure.activateSelectedNode\(\)"[^>]*>進入/);
     assert.doesNotMatch(html(),/class="adventure-node[^>]*onclick="FourSymbolsAdventure.beginBattle/);
     const gold=h.c.gold,exp=h.c.sharedExp;
     assert.equal(h.api.claimNodeReward("c1_01"),false);assert.equal(h.c.gold,gold);assert.equal(h.c.sharedExp,exp);
@@ -111,9 +113,41 @@ test("refused first reward save keeps the reward action and cannot select the ne
     assert.match(html(),/claimNodeReward\('c1_01'\)/);
 });
 
+test("pending story portrait requests once and rerenders the same cursor when the registry becomes ready",async()=>{
+    const h=runtime();let ready=false,calls=0,resolve;
+    h.c.getCharacterBattleArtworkPath=()=>"assets/player.webp";
+    h.c.v154ResolveMonsterPortraitRecord=()=>ready?{path:"assets/monsters/shared/npc-shared-029.webp"}:null;
+    h.c.v154RequestMonsterPortraitRegistry=()=>{calls++;return new Promise(done=>{resolve=done;});};
+    const html=installUi(h);assert.equal(h.api.startFreshStory(),true);
+    const cursor=JSON.stringify(h.api.getView().dialogue),stored=JSON.stringify(h.stored());
+    assert.equal(calls,1);assert.match(html(),/人物載入中/);
+    assert.doesNotMatch(html(),/class="adventure-story-npc/);assert.match(html(),/disabled onclick="FourSymbolsAdventure.advanceDialogue/);
+    h.c.FourSymbolsAdventureUI.render();assert.equal(calls,1,"rerender cannot duplicate a pending registry request");
+    ready=true;resolve({});await new Promise(setImmediate);
+    assert.match(html(),/class="adventure-story-npc[^>]*src="assets\/monsters\/shared\/npc-shared-029.webp"/);
+    assert.doesNotMatch(html(),/disabled onclick="FourSymbolsAdventure.advanceDialogue/);
+    assert.equal(JSON.stringify(h.api.getView().dialogue),cursor);assert.equal(JSON.stringify(h.stored()),stored,"portrait readiness does not save or advance gameplay");
+});
+
+test("failed story portrait exposes a presentation retry and its success never advances the dialogue",async()=>{
+    const h=runtime();let ready=false,calls=0,reject,resolve;
+    h.c.getCharacterBattleArtworkPath=()=>"assets/player.webp";
+    h.c.v154ResolveMonsterPortraitRecord=()=>ready?{path:"assets/retried-npc.webp"}:null;
+    h.c.v154RequestMonsterPortraitRegistry=()=>{calls++;return new Promise((done,fail)=>{resolve=done;reject=fail;});};
+    const html=installUi(h);h.api.startFreshStory();const cursor=JSON.stringify(h.api.getView().dialogue);
+    reject(Error("registry unavailable"));await new Promise(setImmediate);
+    assert.equal(calls,1);assert.match(html(),/data-story-portrait-retry/);assert.match(html(),/人物載入未完成/);
+    assert.doesNotMatch(html(),/class="adventure-story-npc/);assert.match(html(),/disabled onclick="FourSymbolsAdventure.advanceDialogue/);
+    h.c.FourSymbolsAdventureUI.retryStoryPortrait();assert.equal(calls,2);assert.match(html(),/人物載入中/);
+    ready=true;resolve({});await new Promise(setImmediate);
+    assert.match(html(),/src="assets\/retried-npc.webp"/);assert.doesNotMatch(html(),/data-story-portrait-retry/);
+    assert.equal(JSON.stringify(h.api.getView().dialogue),cursor);
+});
+
 function guideHarness(){
     const listeners=new Map(),frames=[],targets=new Map(),children=new Map();let acquired=0,released=0,overlay;
-    const element=()=>{const classes=new Set();return {disabled:false,style:{},classList:{contains:name=>classes.has(name),toggle(name,force){const enabled=force===undefined?!classes.has(name):!!force;if(enabled)classes.add(name);else classes.delete(name);return enabled;}},getBoundingClientRect:()=>({left:20,top:100,right:100,bottom:140,width:80,height:40}),scrollIntoView(){},contains(other){return other?.parent===this;}};};
+    const element=()=>{const classes=new Set();return {disabled:false,style:{},classList:{contains:name=>classes.has(name),toggle(name,force){const enabled=force===undefined?!classes.has(name):!!force;if(enabled)classes.add(name);else classes.delete(name);return enabled;}},getBoundingClientRect:()=>({left:20,top:100,right:100,bottom:140,width:80,height:40}),scrollIntoView(){},contains(other){return other===this||other?.parent===this;}};};
+    const child=selector=>{if(!children.has(selector)){const node=element();node.hidden=false;node.textContent='';node.querySelector=s=>child(selector+' '+s);children.set(selector,node);}return children.get(selector);};
     const host={...element(),clientWidth:1080,clientHeight:1920,appendChild(child){overlay=child;}};
     const view={tutorial:{active:true,battleNodeId:"c1_01"},tutorialProgress:{},chapter:{nodes:[{id:"c1_01",stage:1}]},state:{rewardClaims:{}},panel:"map"};
     const c={window:null,console,Math,Object,Array,Set,Map,String,Number,Boolean,
@@ -125,12 +159,75 @@ function guideHarness(){
         document:{readyState:"loading",addEventListener(type,fn,capture){if(capture)listeners.set(type,fn);},
             querySelectorAll:selector=>targets.get(selector)||[],
             getElementById:id=>id==="game-ui"?host:null,
-            createElement(){return {...element(),querySelector(selector){if(!children.has(selector))children.set(selector,{style:{},textContent:"",hidden:false});return children.get(selector);}};}}};
+            createElement(){return {...element(),querySelector:child};}}};
     c.window=c;vm.createContext(c);vm.runInContext(fs.readFileSync("js/adventure/adventure-ui-v1-20260915.js","utf8"),c);
     let timestamp=0;
     return {c,view,element,targets,children,overlay:()=>overlay,holds:()=>({acquired,released}),frame(){assert.ok(frames.length);timestamp+=100;frames.shift()(timestamp);},
-        dispatch(type,target,key){const event={type,target,key,prevented:false,stopped:false,preventDefault(){this.prevented=true;},stopImmediatePropagation(){this.stopped=true;}};listeners.get(type)(event);if(!event.stopped)target.action?.();return event;}};
+        dispatch(type,target,key){const event={type,target,key,prevented:false,stopped:false,preventDefault(){this.prevented=true;},stopImmediatePropagation(){this.stopped=true;}};listeners.get(type)(event);if(!event.stopped){target.action?.();target.onclick?.();}return event;}};
 }
+
+test('recovery guide chooses stocked SP when HP has a deficit but no HP potion',()=>{
+    const h=guideHarness(),page=h.element(),tab=h.element(),sp=h.element(),hp=h.element();
+    h.c.battleActive=false;h.c.player={hp:30,sp:10};h.c.getPotionCount=id=>id==='spPotion10'?2:0;
+    h.view.tutorial.requiredAction='recovery';h.view.tutorialProgress.resources={maxHP:100,maxSP:40};tab.getAttribute=()=> 'true';
+    h.targets.set('#inventoryPage.active',[page]);h.targets.set('#inventoryCategoryTabs [data-filter="function"]',[tab]);
+    h.targets.set('#inventoryGrid [data-item-id="spPotion10"]',[sp]);h.targets.set('#inventoryGrid [data-item-id="hpPotion10"]',[hp]);
+    h.frame();assert.equal(h.dispatch('click',sp).stopped,false);assert.equal(h.dispatch('click',hp).stopped,true);
+    assert.equal(h.children.get('.adventure-guide-recovery').hidden,true);
+});
+
+test('pending battle potion permits the original ally target and blocks an enemy target',()=>{
+    const h=guideHarness(),ally=h.element(),enemy=h.element();let used=0;
+    h.c.pendingAction='__v143PotionTarget';h.c.actionReady=true;ally.action=()=>{used++;h.c.pendingAction=null;};
+    h.targets.set('#battlePlayerRow .ally-targetable',[ally]);h.targets.set('#battleMonsterArea [id^="battleMonster"]',[enemy]);
+    h.frame();assert.equal(h.dispatch('click',enemy).stopped,true);assert.equal(h.dispatch('click',ally).stopped,false);assert.equal(used,1);
+});
+
+test('missing non-waiting target exposes a real recovery action while resolving combat cannot skip',()=>{
+    const h=guideHarness();let returned=0;h.c.battleActive=false;h.view.tutorial.requiredAction='skill';h.c.FourSymbolsAdventure.returnFromTutorial=()=>{returned++;};
+    h.frame();const fallback=h.children.get('.adventure-guide-recovery'),button=h.children.get('.adventure-guide-recovery button');
+    assert.equal(fallback.hidden,false);assert.equal(h.dispatch('click',button).stopped,false);assert.equal(returned,1);
+    h.c.battleActive=true;h.c.battlePhase='resolve';h.frame();assert.equal(fallback.hidden,true);
+    assert.equal(h.dispatch('click',button).stopped,true);assert.equal(returned,1);
+});
+
+test('zero-gold zero-potion recovery receives existing supplies once before practice and preserves its baseline on reload',()=>{
+    const h=runtime();h.c.gold=0;h.potions.hpPotion10=0;h.potions.spPotion10=0;at(h,'c1_05');h.api.startStory('c1_05');finishDialogue(h);
+    assert.equal(h.state().rewardClaims.c1_05,'ready');assert.equal(h.api.confirmPreparation(),false);
+    assert.equal(h.api.claimNodeReward('c1_05'),true);assert.deepEqual({...h.state().onboarding.preparation},{hpCount:2,spCount:2});
+    assert.equal(h.potions.hpPotion10,2);assert.equal(h.potions.spPotion10,2);assert.equal(h.api.claimNodeReward('c1_05'),false);
+    const saved=h.stored(),reloaded=runtime(saved);Object.assign(reloaded.potions,{hpPotion10:2,spPotion10:1});
+    reloaded.api.startStory('c1_05');finishDialogue(reloaded);assert.deepEqual({...reloaded.state().onboarding.preparation},{hpCount:2,spCount:2});
+    assert.equal(reloaded.api.confirmPreparation(),true);assert.equal(reloaded.api.continueTutorial(),true);reloaded.finish('win');
+    assert.equal(reloaded.state().rewardClaims.c1_05,'claimed');assert.equal(reloaded.potions.spPotion10,1);assert.equal(reloaded.api.claimNodeReward('c1_05'),false);
+});
+
+test('recovery supply save refusal or throw rolls back receipt baseline resources and inventory atomically',()=>{
+    for(const mode of [false,'throw']){
+        const h=runtime();h.c.gold=0;h.potions.hpPotion10=0;h.potions.spPotion10=0;at(h,'c1_05');h.api.startStory('c1_05');finishDialogue(h);
+        const before=JSON.stringify(h.state());h.save(mode);assert.equal(h.api.claimNodeReward('c1_05'),false);
+        assert.equal(JSON.stringify(h.state()),before);assert.equal(h.potions.hpPotion10,0);assert.equal(h.potions.spPotion10,0);assert.equal(h.c.gold,0);
+    }
+});
+
+test('the final loaded v141 renderer marks exact item identity and its read-only locator agrees with real paging',()=>{
+    let opened=null,children=[];const label={textContent:''};
+    const grid={set innerHTML(_value){children=[];},appendChild:node=>children.push(node)};
+    const element=()=>({dataset:{},style:{},classList:{add(){},remove(){},toggle(){}},addEventListener(){},setAttribute(){},querySelector:()=>null});
+    const c={window:null,console,Math,Number,String,Array,Object,Set,Map,Date,JSON,
+        FourSymbolsAccountSave:{accountKey:key=>'test:'+key},FourSymbolsItemSlot:{apply(){},neutralizeArt(){}},
+        inventoryItems:Array.from({length:30},(_,i)=>({id:'armor-'+i,v141Uid:'gear-'+i,type:'armor',name:'護具'+i,count:1})),inventoryFilter:'equipment',
+        renderInventoryItems(){throw Error('early renderer must be replaced');},rebuildInventorySlots(){},getInventoryRarityKey:()=> 'white',
+        openItemModal:index=>{opened=index;},setTimeout(){},clearTimeout(){},addEventListener(){},
+        document:{readyState:'loading',addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],getElementById:id=>id==='inventoryGrid'?grid:id==='v141InventoryPageLabel'?label:null,createElement:element}};
+    c.window=c;c.inventorySlots=c.inventoryItems;c.getFilteredInventoryItems=()=>c.inventoryItems;
+    vm.createContext(c);vm.runInContext(fs.readFileSync('js/35-v141-ui-battle.js','utf8'),c);
+    c.renderInventoryItems();assert.equal(children.length,24);assert.equal(children[0].dataset.itemId,'armor-0');assert.equal(children[0].dataset.itemUid,'gear-0');
+    assert.deepEqual({...c.v141LocateInventoryItem({uid:'gear-26'})},{page:1,currentPage:0,direction:1});assert.equal(label.textContent,'1 / 5');
+    c.v141LocateInventoryItem({uid:'gear-26'});assert.equal(label.textContent,'1 / 5','location does not change the page');
+    c.v141ChangeInventoryPage(1);assert.equal(label.textContent,'2 / 5');assert.equal(children[2].dataset.itemUid,'gear-26');
+    assert.deepEqual({...c.v141LocateInventoryItem({uid:'gear-26'})},{page:1,currentPage:1,direction:0});children[2].onclick();assert.equal(opened,26);
+});
 
 test("guide capture requires the real attack then target and releases locks when onboarding ends",()=>{
     const h=guideHarness(),attack=h.element(),enemy=h.element(),unrelated=h.element();let attacks=0,selected=0,other=0;
@@ -153,13 +250,39 @@ test("story reading guide keeps the real Next target and toggles reading present
     const h=guideHarness(),story=h.element(),next=h.element(),other=h.element();let advances=0;
     h.c.battleActive=false;next.action=()=>{advances++;};
     h.targets.set('#adventurePage.active[data-panel="story"]',[story]);
-    h.targets.set('#adventurePage [onclick*="advanceDialogue"]',[next]);
+    h.targets.set('#adventurePage [data-story-portrait-retry],#adventurePage [onclick*="advanceDialogue"]',[next]);
     h.frame();assert.equal(h.overlay().classList.contains('is-reading'),true);
     assert.equal(advances,0);assert.equal(h.dispatch('click',other).stopped,true);
     assert.equal(h.dispatch('click',next).stopped,false);assert.equal(advances,1,'the existing story Next advances directly');
     h.targets.delete('#adventurePage.active[data-panel="story"]');
     h.targets.set('#adventurePage .adventure-button.primary',[other]);
     h.frame();assert.equal(h.overlay().classList.contains('is-reading'),false,'leaving story restores the normal guide presentation');
+});
+
+test("visible account or startup owner suspends guide capture until the game is ready again",()=>{
+    const h=guideHarness(),auth=h.element(),attack=h.element(),login=h.element();let entered=0;
+    login.action=()=>{entered++;};h.targets.set('#mainBattleMenu button[onclick*="normal"]',[attack]);
+    h.targets.set('#firebaseAuthOverlay,#startupLoader,#homeFeatureModal.release-update-forced.show',[auth]);h.frame();
+    assert.equal(h.overlay(),undefined,'no gameplay overlay is created over login');
+    assert.equal(h.dispatch('click',login).stopped,false);assert.equal(entered,1);
+    assert.deepEqual(h.holds(),{acquired:0,released:0});
+    h.targets.delete('#firebaseAuthOverlay,#startupLoader,#homeFeatureModal.release-update-forced.show');h.frame();
+    assert.equal(h.overlay().hidden,false);assert.equal(h.dispatch('click',login).stopped,true,'normal guide resumes after login');
+    assert.equal(h.dispatch('click',attack).stopped,false);assert.deepEqual(h.holds(),{acquired:1,released:0});
+    h.targets.set('#firebaseAuthOverlay,#startupLoader,#homeFeatureModal.release-update-forced.show',[h.element()]);h.frame();
+    assert.equal(h.overlay().hidden,true,'startup owner can regain presentation without a stale guide');
+    assert.equal(h.dispatch('click',login).stopped,false);assert.equal(entered,2);
+    assert.deepEqual(h.holds(),{acquired:1,released:1});
+});
+
+test('forced release update keeps its own input and visibility while the tutorial guide is suspended',()=>{
+    const h=guideHarness(),forced=h.element(),update=h.element(),attack=h.element();let updates=0;forced.visible=true;update.action=()=>{updates++;};
+    h.targets.set('#mainBattleMenu button[onclick*="normal"]',[attack]);
+    h.targets.set('#firebaseAuthOverlay,#startupLoader,#homeFeatureModal.release-update-forced.show',[forced]);h.frame();
+    assert.equal(h.overlay(),undefined);assert.equal(updates,0);assert.equal(forced.visible,true,'guide never hides or acknowledges a forced release');
+    assert.equal(h.dispatch('click',update).stopped,false);assert.equal(updates,1);
+    h.targets.delete('#firebaseAuthOverlay,#startupLoader,#homeFeatureModal.release-update-forced.show');h.frame();
+    assert.equal(h.overlay().hidden,false);assert.equal(h.dispatch('click',update).stopped,true);assert.equal(h.dispatch('click',attack).stopped,false);
 });
 
 test("tutorial defeat requires learned equipped skill and equipped starter armor before same-node retry",()=>{
@@ -173,6 +296,10 @@ test("tutorial defeat requires learned equipped skill and equipped starter armor
             h.c.characterSkillLoadouts.fire.equippedSkills.push("flameSlash");
         }else{
             h.state().rewardClaims.c1_03="ready";assert.equal(h.api.claimNodeReward("c1_03"),true);
+            assert.equal(h.state().equipmentLessonFunding.amount,750);assert.equal(h.c.inventoryItems.length,0);
+            const item=h.c.FourSymbolsEquipmentFactory.starter("leatherArmor"),cost=h.c.FourSymbolsEquipmentFactory.prices(item).shop;
+            h.c.gold-=cost;h.c.inventoryItems.push(item);
+            assert.equal(h.api.recordEquipmentLessonPurchase(item,cost,h.api.getEquipmentLessonOfferIntent()),true);
             assert.equal(h.api.continueTutorial(),false,"carrying armor is insufficient");
             h.c.characterEquipment.fire.armor={definitionId:"leatherArmor",v141Uid:"unrelated-armor"};
             assert.equal(h.api.continueTutorial(),false,"an unrelated copy cannot satisfy the tutorial grant");
@@ -188,6 +315,7 @@ test("stage 3 skill-use gate and stage 5 recovery preparation close onboarding",
     assert.equal(h.state().completedNodes.c1_03,undefined,"callback victory without skill use cannot complete lesson");
     assert.equal(h.api.beginBattle("c1_03"),true);h.useSkill();h.finish("win");assert.ok(h.state().completedNodes.c1_03);
     at(h,"c1_05");assert.equal(h.api.startStory("c1_05"),true);finishDialogue(h);
+    h.c.player.sp=39;
     assert.equal(h.state().onboarding.requiredAction,"recovery");assert.equal(h.api.continueTutorial(),false);
     assert.equal(h.api.confirmPreparation(),false,"confirmation cannot replace actual recovery consumption");
     h.consumePotion("spPotion10");assert.equal(h.api.confirmPreparation(),true);assert.equal(h.api.continueTutorial(),true);h.finish("win");
@@ -241,8 +369,28 @@ test("preparation from prior equipment retry cannot bypass the stage 5 recovery 
     assert.equal(h.api.startStory("c1_05"),true);finishDialogue(h);
     assert.equal(h.c.battleActive,false,"stage 5 must show recovery before battle even after a prepared stage 4");
     assert.equal(h.state().onboarding.nodeId,"c1_05");assert.equal(h.state().onboarding.requiredAction,"recovery");
+    h.c.player.hp=99;
     assert.equal(h.api.continueTutorial(),false);assert.equal(h.api.confirmPreparation(),false);
     h.consumePotion("hpPotion10");assert.equal(h.api.confirmPreparation(),true);
+});
+
+test("full resources permit recovery practice but victory without consuming a potion cannot complete stage 5",()=>{
+    const h=runtime();at(h,"c1_05");assert.equal(h.api.startStory("c1_05"),true);finishDialogue(h);
+    assert.equal(h.api.getView().tutorialProgress.recoveryNeedsPractice,true);
+    assert.equal(h.api.continueTutorial(),true);assert.equal(h.c.battleActive,true);
+    assert.equal(h.c.player.hp,100);assert.equal(h.c.player.sp,40);
+    assert.notEqual(h.state().onboarding.recoveryPrepared,true);
+    const gold=h.c.gold,exp=h.c.sharedExp;
+    // This unit fixture models the ordinary battle's SP expenditure.
+    h.c.player.sp=30;h.finish("win");
+    assert.equal(h.state().currentNodeId,"c1_05");assert.equal(h.state().onboarding.active,true);
+    assert.equal(h.state().completedNodes.c1_05,undefined);assert.equal(h.state().rewardClaims.c1_05,"ready");
+    assert.equal(h.c.gold,gold);assert.equal(h.c.sharedExp,exp);assert.equal(h.c.player.sp,30);
+    assert.equal(h.api.getView().panel,"tutorial");assert.equal(h.api.getView().tutorialProgress.recoveryNeedsPractice,false);
+    assert.equal(h.api.continueTutorial(),false,"resource use in battle is not potion consumption");
+    h.consumePotion("spPotion10");
+    assert.equal(h.api.continueTutorial(),true);h.finish("win");
+    assert.ok(h.state().completedNodes.c1_05);assert.equal(h.state().onboarding.active,false);
 });
 test("retained boss ready or claimed receipt blocks the same new boss reward",()=>{
     for(const receipt of ["ready","claimed"]){
