@@ -2042,7 +2042,7 @@
       "label": "技能",
       "entry": "openHomeFeature('character'); switchCharacterTab('skill')",
       "owner": "index.html; js/00-main.js; css/00-main.css; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "四元素",
         "未學習",
@@ -2092,12 +2092,70 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "水元素未學習列表及空裝備槽",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/skill-baseline.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/skill-baseline.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/skill-baseline.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/skill-baseline.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "單指捲動技能列表",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/skill-scrolled.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/skill-scrolled.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/skill-scrolled.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/skill-scrolled.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
-      }
+      },
+      "verification": "與baseline.skill為同一正式入口，沿用第一段空槽/未學習/單指列表捲動證據；不重跑。其他技能/解鎖/裝備/所有詳情未驗。"
     },
     {
       "id": "character.transition",
@@ -3465,7 +3523,7 @@
       "label": "票券詳情",
       "entry": "透過正式背包格 openItemModal / openEquippedItem",
       "owner": "index.html; js/00-main.js; js/equipment-progression.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "長名稱",
         "長詞條",
@@ -3513,12 +3571,44 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "第三段十項票券預覽→詳情→返回及重開（依報告實際票種）",
+          "status": "已實際驗證",
+          "scope": "既有已批准固定Head證據重新對應同一入口；沒有重跑或宣稱當前所有狀態",
+          "head": "efb2cff919349d6250634f5faca8b12db4b363f9",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-item-ticket.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-item-ticket-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-item-ticket.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-item-ticket-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-item-ticket.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-item-ticket-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-item-ticket.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-item-ticket-report.json"
+            }
+          ],
+          "limits": "不批准使用票券/開箱/獎勵交易或泛equipment預覽"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
-      }
+      },
+      "priorEvidenceConsolidated": true,
+      "verification": "第三段十項票券預覽→詳情→返回及重開（依報告實際票種）；不批准使用票券/開箱/獎勵交易或泛equipment預覽"
     },
     {
       "id": "preview.material",
@@ -5157,7 +5247,7 @@
       "label": "英雄詳情：永久取得區",
       "entry": "英雄詳情內永久取得區塊；並非獨立頁",
       "owner": "index.html; js/00-main.js; js/hero-acquisition-client.js; js/hero-growth-client.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "已擁有",
@@ -5205,19 +5295,51 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "第六段英雄詳情內永久取得/成長首段呈現",
+          "status": "已實際驗證",
+          "scope": "既有已批准固定Head證據重新對應同一入口；沒有重跑或宣稱當前所有狀態",
+          "head": "2fa326580bdf09095e2e515d95e818d3fed7fe56",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-hero-acquisition.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-hero-acquisition-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-hero-acquisition.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-hero-acquisition-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-hero-acquisition.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-hero-acquisition-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-hero-acquisition.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-hero-acquisition-report.json"
+            }
+          ],
+          "limits": "只呈現fixture；末端/解鎖/取得/成長交易及權威未驗"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
-      }
+      },
+      "priorEvidenceConsolidated": true,
+      "verification": "第六段英雄詳情內永久取得/成長首段呈現；只呈現fixture；末端/解鎖/取得/成長交易及權威未驗"
     },
     {
       "id": "hero.growth",
       "label": "英雄詳情：成長區",
       "entry": "英雄詳情內 renderHeroGrowthControls；並非獨立頁",
       "owner": "index.html; js/00-main.js; js/hero-acquisition-client.js; js/hero-growth-client.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "已擁有",
@@ -5265,12 +5387,44 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "第六段英雄詳情內永久取得/成長首段呈現",
+          "status": "已實際驗證",
+          "scope": "既有已批准固定Head證據重新對應同一入口；沒有重跑或宣稱當前所有狀態",
+          "head": "2fa326580bdf09095e2e515d95e818d3fed7fe56",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-hero-growth.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-hero-growth-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-hero-growth.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-hero-growth-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-hero-growth.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-hero-growth-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-hero-growth.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-hero-growth-report.json"
+            }
+          ],
+          "limits": "只呈現fixture；末端/解鎖/取得/成長交易及權威未驗"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
-      }
+      },
+      "priorEvidenceConsolidated": true,
+      "verification": "第六段英雄詳情內永久取得/成長首段呈現；只呈現fixture；末端/解鎖/取得/成長交易及權威未驗"
     },
     {
       "id": "relic.overview",
@@ -6248,10 +6402,10 @@
     },
     {
       "id": "utility.achievement",
-      "label": "achievement內頁及動作",
+      "label": "成就：分頁與清單",
       "entry": "openHomeFeature('achievement')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "長資料",
@@ -6300,19 +6454,72 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真入口／list末端／四頁往返；claimed/locked/empty隔離呈現",
+          "status": "已實際驗證",
+          "head": "c5904c3e92794e4976d657b04324a1963649fc96",
+          "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-achievement-first-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-checkbox-523.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-achievement-first-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-checkbox-523.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-achievement-first-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-checkbox-523.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-achievement-first-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-checkbox-523.json"
+            }
+          ],
+          "scope": "固定Head呈現/導航；fixture、原政策viewer入口與checkbox無持久化範圍見第14段"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-14",
+        "head": "c5904c3e92794e4976d657b04324a1963649fc96",
+        "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted",
+        "verified": [
+          "真入口／list末端／四頁往返；claimed/locked/empty隔離呈現"
+        ],
+        "notVerified": [
+          "領獎/廣告/存檔/刪除/帳號切換/更新/同意隱私",
+          "真帳號/實體手機",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸長title/成就末端及其他代表圖限定通過；checkbox四尺寸delta另審",
+          "interaction": "c590四尺寸19scene+privacy PNG；523 checkbox-only四尺寸真toggle，source unchanged/clean",
+          "scope": "原Owner CSS與一句顯示文案；正式生成產物僅sourceDigest，不改控制流程或政策"
+        }
       }
     },
     {
       "id": "utility.announcement",
-      "label": "announcement內頁及動作",
+      "label": "公告：更新摘要",
       "entry": "openHomeFeature('announcement')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "長資料",
@@ -6361,19 +6568,72 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真公告入口／查看本次更新／返回",
+          "status": "已實際驗證",
+          "head": "c5904c3e92794e4976d657b04324a1963649fc96",
+          "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-release-detail-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-checkbox-523.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-release-detail-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-checkbox-523.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-release-detail-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-checkbox-523.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-release-detail-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-checkbox-523.json"
+            }
+          ],
+          "scope": "固定Head呈現/導航；fixture、原政策viewer入口與checkbox無持久化範圍見第14段"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-14",
+        "head": "c5904c3e92794e4976d657b04324a1963649fc96",
+        "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted",
+        "verified": [
+          "真公告入口／查看本次更新／返回"
+        ],
+        "notVerified": [
+          "領獎/廣告/存檔/刪除/帳號切換/更新/同意隱私",
+          "真帳號/實體手機",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸長title/成就末端及其他代表圖限定通過；checkbox四尺寸delta另審",
+          "interaction": "c590四尺寸19scene+privacy PNG；523 checkbox-only四尺寸真toggle，source unchanged/clean",
+          "scope": "原Owner CSS與一句顯示文案；正式生成產物僅sourceDigest，不改控制流程或政策"
+        }
       }
     },
     {
       "id": "utility.system",
-      "label": "system內頁及動作",
+      "label": "系統",
       "entry": "openHomeFeature('system')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "長資料",
@@ -6422,19 +6682,72 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真入口／body末端／客服與政策開啟關閉／返回",
+          "status": "已實際驗證",
+          "head": "c5904c3e92794e4976d657b04324a1963649fc96",
+          "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-system-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-checkbox-523.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-system-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-checkbox-523.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-system-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-checkbox-523.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-system-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-checkbox-523.json"
+            }
+          ],
+          "scope": "固定Head呈現/導航；fixture、原政策viewer入口與checkbox無持久化範圍見第14段"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-14",
+        "head": "c5904c3e92794e4976d657b04324a1963649fc96",
+        "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted",
+        "verified": [
+          "真入口／body末端／客服與政策開啟關閉／返回"
+        ],
+        "notVerified": [
+          "領獎/廣告/存檔/刪除/帳號切換/更新/同意隱私",
+          "真帳號/實體手機",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸長title/成就末端及其他代表圖限定通過；checkbox四尺寸delta另審",
+          "interaction": "c590四尺寸19scene+privacy PNG；523 checkbox-only四尺寸真toggle，source unchanged/clean",
+          "scope": "原Owner CSS與一句顯示文案；正式生成產物僅sourceDigest，不改控制流程或政策"
+        }
       }
     },
     {
       "id": "utility.offlineExp",
-      "label": "offlineExp內頁及動作",
+      "label": "離線經驗",
       "entry": "openHomeFeature('offlineExp')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "長資料",
@@ -6483,11 +6796,64 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真入口／返回；零與大額pending隔離呈現，不領取",
+          "status": "已實際驗證",
+          "head": "c5904c3e92794e4976d657b04324a1963649fc96",
+          "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-offline-large-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-checkbox-523.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-offline-large-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-checkbox-523.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-offline-large-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-checkbox-523.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-offline-large-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-checkbox-523.json"
+            }
+          ],
+          "scope": "固定Head呈現/導航；fixture、原政策viewer入口與checkbox無持久化範圍見第14段"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-14",
+        "head": "c5904c3e92794e4976d657b04324a1963649fc96",
+        "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted",
+        "verified": [
+          "真入口／返回；零與大額pending隔離呈現，不領取"
+        ],
+        "notVerified": [
+          "領獎/廣告/存檔/刪除/帳號切換/更新/同意隱私",
+          "真帳號/實體手機",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸長title/成就末端及其他代表圖限定通過；checkbox四尺寸delta另審",
+          "interaction": "c590四尺寸19scene+privacy PNG；523 checkbox-only四尺寸真toggle，source unchanged/clean",
+          "scope": "原Owner CSS與一句顯示文案；正式生成產物僅sourceDigest，不改控制流程或政策"
+        }
       }
     },
     {
@@ -6495,7 +6861,7 @@
       "label": "rest內頁及動作",
       "entry": "openHomeFeature('rest')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "不適用",
       "states": [
         "空資料",
         "長資料",
@@ -6549,7 +6915,8 @@
         "art": null,
         "interaction": null,
         "scope": null
-      }
+      },
+      "verification": "現況無可見入口：有JS00 rest分支與hidden homeRestCard legacy實作，production未找到外部openHomeFeature(rest) caller。保留legacy，不新增入口；與冒險驛站休息分開。"
     },
     {
       "id": "page.training",
@@ -11535,7 +11902,7 @@
       "label": "啟動/帳號提示 auth",
       "entry": "隔離測試正式入口；不得操作玩家資料",
       "owner": "js/firebase/firebase-auth-ui.js; js/startup; 精確owner待核對",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "載入",
         "失敗",
@@ -11582,19 +11949,51 @@
         }
       },
       "notes": "本工作限呈現檢查；不放寬或修改Auth/Save/Security契約。",
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "第四段帳號畫面、空輸入與短密碼本地錯誤、返回閱讀",
+          "status": "已實際驗證",
+          "scope": "既有已批准固定Head證據重新對應同一入口；沒有重跑或宣稱當前所有狀態",
+          "head": "a83339b03905758a01a7d7702f26d9444bfa6d3c",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-startup-auth.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-startup-auth-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-startup-auth.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-startup-auth-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-startup-auth.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-startup-auth-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-startup-auth.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-startup-auth-report.json"
+            }
+          ],
+          "limits": "真登入/註冊/session/軟鍵盤/真機未驗"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
-      }
+      },
+      "priorEvidenceConsolidated": true,
+      "verification": "第四段帳號畫面、空輸入與短密碼本地錯誤、返回閱讀；真登入/註冊/session/軟鍵盤/真機未驗"
     },
     {
       "id": "startup.privacy",
       "label": "啟動/帳號提示 privacy",
       "entry": "隔離測試正式入口；不得操作玩家資料",
       "owner": "js/firebase/firebase-auth-ui.js; js/startup; 精確owner待核對",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "載入",
         "失敗",
@@ -11641,19 +12040,51 @@
         }
       },
       "notes": "本工作限呈現檢查；不放寬或修改Auth/Save/Security契約。",
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "第四段required/viewer閱讀到底、關閉返回與重開",
+          "status": "已實際驗證",
+          "scope": "既有已批准固定Head證據重新對應同一入口；沒有重跑或宣稱當前所有狀態",
+          "head": "a83339b03905758a01a7d7702f26d9444bfa6d3c",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-startup-privacy.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-startup-privacy-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-startup-privacy.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-startup-privacy-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-startup-privacy.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-startup-privacy-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-startup-privacy.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-startup-privacy-report.json"
+            }
+          ],
+          "limits": "未接受隱私同意或真帳號"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
-      }
+      },
+      "priorEvidenceConsolidated": true,
+      "verification": "第四段required/viewer閱讀到底、關閉返回與重開；未接受隱私同意或真帳號"
     },
     {
       "id": "startup.first-load",
       "label": "啟動/帳號提示 first-load",
       "entry": "隔離測試正式入口；不得操作玩家資料",
       "owner": "js/firebase/firebase-auth-ui.js; js/startup; 精確owner待核對",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "載入",
         "失敗",
@@ -11700,19 +12131,51 @@
         }
       },
       "notes": "本工作限呈現檢查；不放寬或修改Auth/Save/Security契約。",
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "第四段startup-loading API呈現",
+          "status": "已實際驗證",
+          "scope": "既有已批准固定Head證據重新對應同一入口；沒有重跑或宣稱當前所有狀態",
+          "head": "a83339b03905758a01a7d7702f26d9444bfa6d3c",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-startup-first-load.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-startup-first-load-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-startup-first-load.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-startup-first-load-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-startup-first-load.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-startup-first-load-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-startup-first-load.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-startup-first-load-report.json"
+            }
+          ],
+          "limits": "不代表冷啟效能或真provider載入驗收"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
-      }
+      },
+      "priorEvidenceConsolidated": true,
+      "verification": "第四段startup-loading API呈現；不代表冷啟效能或真provider載入驗收"
     },
     {
       "id": "startup.loading-failure",
       "label": "啟動/帳號提示 loading-failure",
       "entry": "隔離測試正式入口；不得操作玩家資料",
       "owner": "js/firebase/firebase-auth-ui.js; js/startup; 精確owner待核對",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "載入",
         "失敗",
@@ -11759,12 +12222,44 @@
         }
       },
       "notes": "本工作限呈現檢查；不放寬或修改Auth/Save/Security契約。",
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "第四段startup-error API呈現",
+          "status": "已實際驗證",
+          "scope": "既有已批准固定Head證據重新對應同一入口；沒有重跑或宣稱當前所有狀態",
+          "head": "a83339b03905758a01a7d7702f26d9444bfa6d3c",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-startup-loading-failure.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/360x640-startup-loading-failure-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-startup-loading-failure.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/393x873-startup-loading-failure-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-startup-loading-failure.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/412x915-startup-loading-failure-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-startup-loading-failure.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/prior-state-links/1280x800-startup-loading-failure-report.json"
+            }
+          ],
+          "limits": "不代表真provider故障或重試流程已驗"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
-      }
+      },
+      "priorEvidenceConsolidated": true,
+      "verification": "第四段startup-error API呈現；不代表真provider故障或重試流程已驗"
     },
     {
       "id": "startup.session-notice",
@@ -11889,7 +12384,7 @@
       "label": "共用 alert",
       "entry": "由實際功能開啟既有共用對話框",
       "owner": "index.html; js/00-main.js; js/27-v132-content-expansion.js; css/33-v132-content-expansion.css; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "短文",
         "長文",
@@ -11938,7 +12433,36 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "補品金幣待確認變動後的正式拒絕alert",
+          "status": "已實際驗證",
+          "head": "0b408c143114b5407634e6e8071fd0dbe909b4f8",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-0b-shop-stale-balance-error.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-presentation-0b.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-0b-shop-stale-balance-error.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-presentation-0b.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-0b-shop-stale-balance-error.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-presentation-0b.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-0b-shop-stale-balance-error.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-presentation-0b.json"
+            }
+          ],
+          "limits": "只特定正式入口；不批准所有caller或交易"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -11950,7 +12474,7 @@
       "label": "共用 confirm",
       "entry": "由實際功能開啟既有共用對話框",
       "owner": "index.html; js/00-main.js; js/27-v132-content-expansion.js; css/33-v132-content-expansion.css; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "短文",
         "長文",
@@ -11999,7 +12523,36 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真補品購買入口確認與取消；未成交",
+          "status": "已實際驗證",
+          "head": "0b408c143114b5407634e6e8071fd0dbe909b4f8",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-0b-shop-purchase-confirm.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-presentation-0b.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-0b-shop-purchase-confirm.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-presentation-0b.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-0b-shop-purchase-confirm.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-presentation-0b.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-0b-shop-purchase-confirm.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-presentation-0b.json"
+            }
+          ],
+          "limits": "只特定正式入口；不批准所有caller或交易"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -13128,6 +13681,150 @@
           "其他未列狀態"
         ]
       }
+    },
+    {
+      "id": "utility.release-detail",
+      "label": "公告：正式更新詳情",
+      "entry": "正式utility頁按鈕子入口",
+      "owner": "js/release-update-notification.js; css/release-update-notification.css; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "閱讀",
+        "長文",
+        "返回"
+      ],
+      "operations": [
+        "真入口",
+        "捲動（實際相關時）",
+        "返回"
+      ],
+      "deviceEvidence": {},
+      "stateEvidence": [
+        {
+          "state": "正式acknowledge入口／長標完整／真末端／header返回；checkbox delta on/off",
+          "status": "已實際驗證",
+          "head": "c5904c3e92794e4976d657b04324a1963649fc96",
+          "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-release-detail-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-checkbox-523.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-release-detail-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-checkbox-523.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-release-detail-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-checkbox-523.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-release-detail-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-checkbox-523.json"
+            }
+          ],
+          "scope": "固定Head呈現/導航；fixture、原政策viewer入口與checkbox無持久化範圍見第14段"
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-14",
+        "head": "c5904c3e92794e4976d657b04324a1963649fc96",
+        "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted",
+        "verified": [
+          "正式acknowledge入口／長標完整／真末端／header返回；checkbox delta on/off"
+        ],
+        "notVerified": [
+          "領獎/廣告/存檔/刪除/帳號切換/更新/同意隱私",
+          "真帳號/實體手機",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸長title/成就末端及其他代表圖限定通過；checkbox四尺寸delta另審",
+          "interaction": "c590四尺寸19scene+privacy PNG；523 checkbox-only四尺寸真toggle，source unchanged/clean",
+          "scope": "原Owner CSS與一句顯示文案；正式生成產物僅sourceDigest，不改控制流程或政策"
+        }
+      }
+    },
+    {
+      "id": "utility.support",
+      "label": "系統：聯絡客服",
+      "entry": "正式utility頁按鈕子入口",
+      "owner": "js/startup/support-contact.js; css/firebase-auth.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "閱讀",
+        "長文",
+        "返回"
+      ],
+      "operations": [
+        "真入口",
+        "捲動（實際相關時）",
+        "返回"
+      ],
+      "deviceEvidence": {},
+      "stateEvidence": [
+        {
+          "state": "真查看信箱／關閉／返回；無寄信",
+          "status": "已實際驗證",
+          "head": "c5904c3e92794e4976d657b04324a1963649fc96",
+          "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-support.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/360x640-checkbox-523.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-support.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/393x873-checkbox-523.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-support.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/412x915-checkbox-523.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-support.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-controls-c590.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted/1280x800-checkbox-523.json"
+            }
+          ],
+          "scope": "固定Head呈現/導航；fixture、原政策viewer入口與checkbox無持久化範圍見第14段"
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-14",
+        "head": "c5904c3e92794e4976d657b04324a1963649fc96",
+        "deltaHead": "523f70738205c2019730de2a62d08686cef30d3c",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment14-accepted",
+        "verified": [
+          "真查看信箱／關閉／返回；無寄信"
+        ],
+        "notVerified": [
+          "領獎/廣告/存檔/刪除/帳號切換/更新/同意隱私",
+          "真帳號/實體手機",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸長title/成就末端及其他代表圖限定通過；checkbox四尺寸delta另審",
+          "interaction": "c590四尺寸19scene+privacy PNG；523 checkbox-only四尺寸真toggle，source unchanged/clean",
+          "scope": "原Owner CSS與一句顯示文案；正式生成產物僅sourceDigest，不改控制流程或政策"
+        }
+      }
     }
   ],
   "segmentReviews": [
@@ -13375,6 +14072,17 @@
       "pending": [
         "成就頁分頁捲動時標題與返回隨外框捲走，待原Owner處理",
         "其他台帳未驗狀態",
+        "Latest Head Required CI／部署"
+      ]
+    },
+    {
+      "segment": "segment-14",
+      "head": "523f70738205c2019730de2a62d08686cef30d3c",
+      "baseEvidenceHead": "c5904c3e92794e4976d657b04324a1963649fc96",
+      "result": "成就sole scroller與固定pager、正式長title自動雕框、utility44觸控及checkbox44行，四尺寸限定通過",
+      "pending": [
+        "背包四情境／分類／內頁其餘狀態",
+        "其他台帳未驗入口/狀態",
         "Latest Head Required CI／部署"
       ]
     }
