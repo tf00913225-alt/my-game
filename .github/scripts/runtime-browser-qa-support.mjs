@@ -187,7 +187,14 @@ function readProcWindow(file,limit){
     let fd;
     try{
         fd=fs.openSync(file,'r');
-        const buffer=Buffer.alloc(limit+1),bytes=fs.readSync(fd,buffer,0,buffer.length,null);
+        const buffer=Buffer.alloc(limit+1);let bytes=0;
+        // proc seq_file reads can return one page before EOF. Keep reading
+        // inside the time-bounded worker, while retaining the byte ceiling.
+        while(bytes<buffer.length){
+            const count=fs.readSync(fd,buffer,bytes,buffer.length-bytes,null);
+            if(count===0)break;
+            bytes+=count;
+        }
         return {text:buffer.subarray(0,Math.min(bytes,limit)).toString('utf8'),truncated:bytes>limit};
     }catch(error){return {error:error.code||String(error.message)};}
     finally{if(fd!==undefined)try{fs.closeSync(fd);}catch{}}

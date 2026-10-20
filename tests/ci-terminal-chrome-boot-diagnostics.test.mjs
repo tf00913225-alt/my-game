@@ -27,6 +27,12 @@ test('proc metadata capture bounds bytes and preserves denial/missing evidence',
         const file=path.join(directory,'metadata');fs.writeFileSync(file,'0123456789');
         assert.deepEqual(readProcWindow(file,4),{text:'0123',truncated:true});
         assert.deepEqual(readProcWindow(file,10),{text:'0123456789',truncated:false});
+        const read=fs.readSync;
+        try{
+            fs.readSync=(fd,buffer,offset,length,position)=>read(fd,buffer,offset,Math.min(length,2),position);
+            assert.deepEqual(readProcWindow(file,4),{text:'0123',truncated:true},'short proc-style reads are not EOF');
+            assert.deepEqual(readProcWindow(file,12),{text:'0123456789',truncated:false});
+        }finally{fs.readSync=read;}
         assert.equal(readProcWindow(path.join(directory,'missing'),4).error,'ENOENT');
     }finally{fs.rmSync(directory,{recursive:true,force:true});}
 });
