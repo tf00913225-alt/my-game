@@ -1,6 +1,7 @@
 "use strict";
 
 const {createHash}=require("node:crypto");
+const {isUtf8}=require("node:buffer");
 const {performance}=require("node:perf_hooks");
 
 // A candidate data format, not a trusted capture certificate or restore source.
@@ -620,8 +621,13 @@ function readRecoveryFrames(bytes,assemblyBudget,rawArchive=false,expectedSha256
             assemblyCharge(assemblyBudget,"bytes",length);
             const canonical=JSON.stringify(frame);
             if(canonical!==text)bad("noncanonical JSON");
-            assemblyCharge(assemblyBudget,"bytes",length);
-            if(!Buffer.from(canonical).equals(raw))bad("noncanonical JSON");
+            // Valid UTF-8 has one byte encoding; canonical===text above already
+            // proves the decoded spelling without another encoded Buffer.
+            // Node22: https://github.com/nodejs/node/blob/v22.x/doc/api/buffer.md#bufferisutf8input
+            assemblyCharge(assemblyBudget);
+            const validUtf8=isUtf8(raw);
+            assemblyCharge(assemblyBudget);
+            if(!validUtf8)bad("noncanonical JSON");
         }else if(JSON.stringify(frame)!==text||!Buffer.from(text).equals(raw))bad("noncanonical JSON");
         frames.push(frame);
     }
