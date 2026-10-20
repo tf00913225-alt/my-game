@@ -352,6 +352,13 @@ test("guide capture requires the real attack then target and releases locks when
     h.frame();assert.deepEqual(h.holds(),{acquired:1,released:1},'release executes once');
 });
 
+test('tutorial return button opts into pointer input under the original noninteractive UI host',()=>{
+    const main=fs.readFileSync('css/00-main.css','utf8'),css=fs.readFileSync('css/adventure-v1-20260915.css','utf8');
+    assert.match(main.match(/#game-ui\{[\s\S]*?\}/)[0],/pointer-events\s*:\s*none/);
+    const rule=css.match(/\.adventure-tutorial-return\{([^}]+)\}/);assert.ok(rule);
+    assert.match(rule[1],/pointer-events\s*:\s*auto\s*;/,'original floating return control must receive real pointer input');
+});
+
 test("story reading guide keeps the real Next target and toggles reading presentation without an acknowledgement step",()=>{
     const h=guideHarness(),story=h.element(),next=h.element(),other=h.element();let advances=0;
     h.c.battleActive=false;next.action=()=>{advances++;};

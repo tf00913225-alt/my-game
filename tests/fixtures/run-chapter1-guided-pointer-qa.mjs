@@ -64,6 +64,7 @@ try{
                 await captureStory();
                 if(ready.view.panel==='node-reward'&&ready.view.selectedNodeId==='c1_01'){assert.equal(ready.view.state.currentNodeId,'c1_02');assert.equal(ready.view.state.rewardClaims.c1_01,'ready');await capture('first-victory');}
                 const target=await guidePoint();
+                if(target?.copy==='技能已裝好，返回故事再挑戰。')assert.equal(target.id,'adventureTutorialReturn','visible guide center must hit the original tutorial return button');
                 if(target.handler==="v169SwitchShopPage('equipment')")assert.equal(await client.eval('!!document.querySelector("#homeFeatureModal .v17345-equipment-shop")'),false,'fresh shop starts with the real potion category');
                 const offer=target.id==='chapter1TutorialArmorBuy'?await client.eval(`(()=>{const b=document.getElementById('chapter1TutorialArmorBuy');return {name:b.closest('[data-tutorial-offer]').querySelector('.v17346-shop-name').textContent.trim(),cost:Number(b.textContent.match(/([\d,]+)\s*金幣/)[1].replaceAll(',',''))};})()`):null;
                 await point(target);
@@ -234,7 +235,7 @@ try{
             const scene=label=>scenes.find(s=>s.label===label);assert.equal(scene('stage2-cast-0').npcSrc,scene('stage2-cast-1').npcSrc);assert.equal(scene('ending-guard').dialogue.lineIndex,2);assert.equal(scene('ending-guard').speaker,'守驛人');assert.equal(scene('ending-guard').npcSrc,scene('ending-line-3').npcSrc);
             results.push({width,height,trace,rounds,portraits,portraitChecks,scenes,nextRect,purchases,attempts,state:current.view.state});
         }catch(error){
-            const diagnostic=await client?.eval('({body:document.body.innerText,view:window.FourSymbolsAdventure?.getView?.()})').catch(()=>null);
+            const diagnostic=await client?.eval(`(()=>{const button=document.getElementById('adventureTutorialReturn'),r=button?.getBoundingClientRect(),style=button?getComputedStyle(button):null,hit=r?document.elementFromPoint(r.x+r.width/2,r.y+r.height/2):null;return {body:document.body.innerText,view:window.FourSymbolsAdventure?.getView?.(),tutorialReturn:button?{hidden:button.hidden,pointerEvents:style.pointerEvents,display:style.display,visibility:style.visibility,rect:r.toJSON(),centerHit:{id:hit?.id,tag:hit?.tagName,text:hit?.textContent,ownsCenter:hit===button||button.contains(hit)}}:null};})()`).catch(()=>null);
             if(client){const shot=await client.send('Page.captureScreenshot',{format:'png'}).catch(()=>null);if(shot)fs.writeFileSync(path.join(artifact,'failure.png'),Buffer.from(shot.data,'base64'));}
             fs.writeFileSync(path.join(artifact,'failure.json'),JSON.stringify({error:String(error.stack),width,height,trace,rounds,scenes,portraitChecks,purchases,attempts,diagnostic},null,2));throw error;
         }finally{client?.close();proc.kill();}
