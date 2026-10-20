@@ -359,6 +359,15 @@ test('tutorial return button opts into pointer input under the original noninter
     assert.match(rule[1],/pointer-events\s*:\s*auto\s*;/,'original floating return control must receive real pointer input');
 });
 
+test('pointer fixture preserves the generated armor offer price expression and refuses missing prices',()=>{
+    const source=fs.readFileSync('tests/fixtures/run-chapter1-guided-pointer-qa.mjs','utf8');
+    const literal=source.match(/const offer=target\.id==='chapter1TutorialArmorBuy'\?await client\.eval\((String\.raw`[^`]+`)\)/);assert.ok(literal);
+    const expression=vm.runInNewContext(literal[1]);new vm.Script(expression);
+    const evaluate=text=>vm.runInNewContext(expression,{document:{getElementById:id=>{assert.equal(id,'chapter1TutorialArmorBuy');return {textContent:text,closest:selector=>{assert.equal(selector,'[data-tutorial-offer]');return {querySelector:selector=>{assert.equal(selector,'.v17346-shop-name');return {textContent:' 蒼雷戰甲 '};}};}};}}});
+    for(const [label,price] of [['購買護具 · 750 金幣',750],['購買護具 · 1,250 金幣',1250]]){const offer=evaluate(label);assert.equal(offer.cost,price);assert.equal(offer.name,'蒼雷戰甲');}
+    assert.throws(()=>evaluate('購買護具'),/formal armor offer price missing/);
+});
+
 test("story reading guide keeps the real Next target and toggles reading presentation without an acknowledgement step",()=>{
     const h=guideHarness(),story=h.element(),next=h.element(),other=h.element();let advances=0;
     h.c.battleActive=false;next.action=()=>{advances++;};
