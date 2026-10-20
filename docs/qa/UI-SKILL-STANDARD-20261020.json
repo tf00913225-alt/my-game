@@ -13653,8 +13653,8 @@
       "id": "startup.session-notice",
       "label": "啟動/帳號提示 session-notice",
       "entry": "隔離測試正式入口；不得操作玩家資料",
-      "owner": "js/firebase/firebase-auth-ui.js; js/startup; 精確owner待核對",
-      "status": "未檢查",
+      "owner": "js/52-v173.20-startup-loader.js::fail/accountUi; js/firebase/firebase-auth-ui.js; js/firebase/firebase-bootstrap.js; css/firebase-auth.css; css/51-v173.20-startup-loader.css",
+      "status": "部分已實際驗證",
       "states": [
         "載入",
         "失敗",
@@ -13672,48 +13672,117 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/360x640-base-session-google-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/360x640-base-report.json",
+          "remaining": [
+            "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+            "沒有角色創建/資料遷移/恢復/清除或商業交易",
+            "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+            "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+            "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+            "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+            "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+          ]
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/393x873-base-session-google-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/393x873-base-report.json",
+          "remaining": [
+            "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+            "沒有角色創建/資料遷移/恢復/清除或商業交易",
+            "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+            "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+            "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+            "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+            "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+          ]
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/412x915-base-session-google-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/412x915-base-report.json",
+          "remaining": [
+            "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+            "沒有角色創建/資料遷移/恢復/清除或商業交易",
+            "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+            "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+            "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+            "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+            "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+          ]
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/1280x800-base-session-google-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/1280x800-base-report.json",
+          "remaining": [
+            "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+            "沒有角色創建/資料遷移/恢復/清除或商業交易",
+            "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+            "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+            "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+            "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+            "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+          ]
         }
       },
       "notes": "本工作限呈現檢查；不放寬或修改Auth/Save/Security契約。",
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "Google/guest原事件錯誤呈現、reauth顯隱、真捲動末及原事件清除",
+          "status": "已實際驗證",
+          "baseHead": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+          "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted",
+          "limits": [
+            "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+            "沒有角色創建/資料遷移/恢復/清除或商業交易",
+            "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+            "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+            "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+            "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+            "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：實看adb1四尺寸cloud/corrupt首與retry末12張、5d其餘三尺寸Google首/guest末6張及先前360七張；中文完整、對稱題牌置中、框無回歸、末端無遮擋，debug區不批准玩家流程",
+        "interaction": "interaction_review：實看四尺寸session首末與read-error/重試末；guest fresh首scroll0；geometry可見控制>=44/font16；真retry hit且reads1→2仍ERROR/canCreatefalse/creationnone，corrupt原bytes不變；未實行reauth/signout等按鈕",
+        "scope": "scope_review：實看adb1四尺寸代表首末/重試，完整3074..adb1手寫與生成diff僅js52呈現交接/正式message、Auth一句中文與回歸/正式hash依賴；ERROR/禁止創角/raw診斷/corruptbytes保留，無業務邏輯漂移，identify ENOENT及standalone skip不當通過"
+      },
+      "presentationEvidence": {
+        "segment": "segment-23",
+        "baseHead": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+        "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted",
+        "notVerified": [
+          "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+          "沒有角色創建/資料遷移/恢復/清除或商業交易",
+          "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+          "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+          "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+          "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+          "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+        ],
+        "reviews": {
+          "art": "art_review：實看adb1四尺寸cloud/corrupt首與retry末12張、5d其餘三尺寸Google首/guest末6張及先前360七張；中文完整、對稱題牌置中、框無回歸、末端無遮擋，debug區不批准玩家流程",
+          "interaction": "interaction_review：實看四尺寸session首末與read-error/重試末；guest fresh首scroll0；geometry可見控制>=44/font16；真retry hit且reads1→2仍ERROR/canCreatefalse/creationnone，corrupt原bytes不變；未實行reauth/signout等按鈕",
+          "scope": "scope_review：實看adb1四尺寸代表首末/重試，完整3074..adb1手寫與生成diff僅js52呈現交接/正式message、Auth一句中文與回歸/正式hash依賴；ERROR/禁止創角/raw診斷/corruptbytes保留，無業務邏輯漂移，identify ENOENT及standalone skip不當通過"
+        }
       }
     },
     {
       "id": "startup.save-error",
       "label": "啟動/帳號提示 save-error",
       "entry": "隔離測試正式入口；不得操作玩家資料",
-      "owner": "js/firebase/firebase-auth-ui.js; js/startup; 精確owner待核對",
-      "status": "未檢查",
+      "owner": "js/52-v173.20-startup-loader.js::fail/accountUi; js/firebase/firebase-auth-ui.js; js/firebase/firebase-bootstrap.js; css/firebase-auth.css; css/51-v173.20-startup-loader.css",
+      "status": "部分已實際驗證",
       "states": [
         "載入",
         "失敗",
@@ -13731,40 +13800,109 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/360x640-delta-cloud-error-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/360x640-delta-report.json",
+          "remaining": [
+            "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+            "沒有角色創建/資料遷移/恢復/清除或商業交易",
+            "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+            "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+            "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+            "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+            "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+          ]
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/393x873-delta-cloud-error-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/393x873-delta-report.json",
+          "remaining": [
+            "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+            "沒有角色創建/資料遷移/恢復/清除或商業交易",
+            "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+            "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+            "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+            "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+            "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+          ]
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/412x915-delta-cloud-error-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/412x915-delta-report.json",
+          "remaining": [
+            "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+            "沒有角色創建/資料遷移/恢復/清除或商業交易",
+            "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+            "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+            "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+            "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+            "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+          ]
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/1280x800-delta-cloud-error-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/1280x800-delta-report.json",
+          "remaining": [
+            "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+            "沒有角色創建/資料遷移/恢復/清除或商業交易",
+            "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+            "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+            "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+            "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+            "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+          ]
         }
       },
       "notes": "本工作限呈現檢查；不放寬或修改Auth/Save/Security契約。",
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "cloud-read失敗/corrupt-local中文與診斷、原retry仍失敗、ERROR/禁止創角與原bytes保留",
+          "status": "已實際驗證",
+          "baseHead": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+          "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted",
+          "limits": [
+            "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+            "沒有角色創建/資料遷移/恢復/清除或商業交易",
+            "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+            "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+            "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+            "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+            "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：實看adb1四尺寸cloud/corrupt首與retry末12張、5d其餘三尺寸Google首/guest末6張及先前360七張；中文完整、對稱題牌置中、框無回歸、末端無遮擋，debug區不批准玩家流程",
+        "interaction": "interaction_review：實看四尺寸session首末與read-error/重試末；guest fresh首scroll0；geometry可見控制>=44/font16；真retry hit且reads1→2仍ERROR/canCreatefalse/creationnone，corrupt原bytes不變；未實行reauth/signout等按鈕",
+        "scope": "scope_review：實看adb1四尺寸代表首末/重試，完整3074..adb1手寫與生成diff僅js52呈現交接/正式message、Auth一句中文與回歸/正式hash依賴；ERROR/禁止創角/raw診斷/corruptbytes保留，無業務邏輯漂移，identify ENOENT及standalone skip不當通過"
+      },
+      "presentationEvidence": {
+        "segment": "segment-23",
+        "baseHead": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+        "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted",
+        "notVerified": [
+          "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+          "沒有角色創建/資料遷移/恢復/清除或商業交易",
+          "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+          "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+          "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+          "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+          "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+        ],
+        "reviews": {
+          "art": "art_review：實看adb1四尺寸cloud/corrupt首與retry末12張、5d其餘三尺寸Google首/guest末6張及先前360七張；中文完整、對稱題牌置中、框無回歸、末端無遮擋，debug區不批准玩家流程",
+          "interaction": "interaction_review：實看四尺寸session首末與read-error/重試末；guest fresh首scroll0；geometry可見控制>=44/font16；真retry hit且reads1→2仍ERROR/canCreatefalse/creationnone，corrupt原bytes不變；未實行reauth/signout等按鈕",
+          "scope": "scope_review：實看adb1四尺寸代表首末/重試，完整3074..adb1手寫與生成diff僅js52呈現交接/正式message、Auth一句中文與回歸/正式hash依賴；ERROR/禁止創角/raw診斷/corruptbytes保留，無業務邏輯漂移，identify ENOENT及standalone skip不當通過"
+        }
       }
     },
     {
@@ -17650,7 +17788,8 @@
         "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
         "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
         "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
-        "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+        "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗",
+        "3074 activeguard clock-only360測試已排除：真touch在pause未完成；完整baseline/stalled readback同且save0、exact API restore，LIMITATION在segment23-accepted/EXCLUDED-guard-LIMITATION.json。原normal-only驗收保留。"
       ],
       "excluded": "舊activegetter fixture被原js45每秒補品engine消費，原8calls與整批resolved2快照不批准；單獨EXCLUDED證據只追溯QA污染"
     },
@@ -17745,6 +17884,102 @@
         "quantity只量測target/字與clip，未編輯數值或驗真軟鍵盤",
         "精華/通用碎片/專屬碎片/其他材料及箱種未在這三個ID段驗證",
         "真帳號/存檔權威/雲端/實體裝置未驗"
+      ]
+    },
+    {
+      "segment": "segment-23",
+      "baseHead": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+      "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+      "result": "帳號Session錯誤與讀檔錯誤四尺寸呈現/捲動/真重試限定通過；原遮罩交接與英文raw修正，非帳號/存檔權威驗收",
+      "bindings": [
+        {
+          "kind": "base",
+          "device": "360x640",
+          "head": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+          "scenes": 10,
+          "records": 8,
+          "trueRetryTaps": 0,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/360x640-base-report.json"
+        },
+        {
+          "kind": "base",
+          "device": "393x873",
+          "head": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+          "scenes": 11,
+          "records": 9,
+          "trueRetryTaps": 1,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/393x873-base-report.json"
+        },
+        {
+          "kind": "base",
+          "device": "412x915",
+          "head": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+          "scenes": 11,
+          "records": 9,
+          "trueRetryTaps": 1,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/412x915-base-report.json"
+        },
+        {
+          "kind": "base",
+          "device": "1280x800",
+          "head": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+          "scenes": 11,
+          "records": 9,
+          "trueRetryTaps": 1,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/1280x800-base-report.json"
+        },
+        {
+          "kind": "delta",
+          "device": "360x640",
+          "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+          "scenes": 7,
+          "records": 5,
+          "trueRetryTaps": 1,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/360x640-delta-report.json"
+        },
+        {
+          "kind": "delta",
+          "device": "393x873",
+          "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+          "scenes": 7,
+          "records": 5,
+          "trueRetryTaps": 1,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/393x873-delta-report.json"
+        },
+        {
+          "kind": "delta",
+          "device": "412x915",
+          "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+          "scenes": 7,
+          "records": 5,
+          "trueRetryTaps": 1,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/412x915-delta-report.json"
+        },
+        {
+          "kind": "delta",
+          "device": "1280x800",
+          "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+          "scenes": 7,
+          "records": 5,
+          "trueRetryTaps": 1,
+          "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment23-accepted/1280x800-delta-report.json"
+        }
+      ],
+      "reviews": {
+        "art": "art_review：實看adb1四尺寸cloud/corrupt首與retry末12張、5d其餘三尺寸Google首/guest末6張及先前360七張；中文完整、對稱題牌置中、框無回歸、末端無遮擋，debug區不批准玩家流程",
+        "interaction": "interaction_review：實看四尺寸session首末與read-error/重試末；guest fresh首scroll0；geometry可見控制>=44/font16；真retry hit且reads1→2仍ERROR/canCreatefalse/creationnone，corrupt原bytes不變；未實行reauth/signout等按鈕",
+        "scope": "scope_review：實看adb1四尺寸代表首末/重試，完整3074..adb1手寫與生成diff僅js52呈現交接/正式message、Auth一句中文與回歸/正式hash依賴；ERROR/禁止創角/raw診斷/corruptbytes保留，無業務邏輯漂移，identify ENOENT及standalone skip不當通過"
+      },
+      "pending": [
+        "Latest Head required CI / dev部署",
+        "剩餘材料/主城/戰鬥與精確ledger",
+        "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+        "沒有角色創建/資料遷移/恢復/清除或商業交易",
+        "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+        "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+        "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+        "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+        "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
       ]
     }
   ],

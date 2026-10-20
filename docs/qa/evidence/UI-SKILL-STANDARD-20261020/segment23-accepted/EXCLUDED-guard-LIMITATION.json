@@ -1,0 +1,22 @@
+{
+  "accepted": false,
+  "status": "UNVERIFIED",
+  "reason": "Paused virtual clock prevented true touch dispatch completion; no formal guard dialog was opened. Source product unchanged.",
+  "pausedClock": {
+    "clockBefore": {
+      "date": 1792499648791,
+      "perf": 2447.5
+    },
+    "clockAfter": {
+      "date": 1792499648791,
+      "perf": 2447.5
+    }
+  },
+  "baselineEqualsStalledReadback": true,
+  "error": null,
+  "delegatedSaveCalls": 0,
+  "getterExactRestored": true,
+  "saveExactRestored": true,
+  "chromeExited": true,
+  "remainingSizes": "393/412/1280 not run"
+}

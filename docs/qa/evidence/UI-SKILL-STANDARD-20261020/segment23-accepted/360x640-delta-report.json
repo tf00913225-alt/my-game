@@ -1,0 +1,1147 @@
+{
+  "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+  "viewport": [
+    360,
+    640
+  ],
+  "dirty": false,
+  "complete": true,
+  "sourceBefore": {
+    "index.html": "821a25dde6255e3b0ddc6782eb4396a6d4e068e36f72c550a937e9326c3ed8bc",
+    "asset-manifest.json": "50bf1f36b0ac37a0a36a2cad3158a02ced70a889e43f45df63b28b77abae83ef",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/app-shell.8e6259c4baef.js": "8e6259c4baefa13470f8c4d6ff3e25672de5d30af419a0e96d9b51a4e6670cfe",
+    "build/gameplay-core-primary.9c828c5bf57c.js": "9c828c5bf57c181b554639c320f885848a1f76cbcf191ba37fa38b8a39966b3d",
+    "build/gameplay-core-secondary.08c8faad4670.js": "08c8faad467089da80571ff62de823e4fe26b7c3f7d8fdd31869f934379d6097",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/boot-core.1775eab1cc99.css": "1775eab1cc99d533cf875312088be14505e6ea92befa08f5ce36c91029fb0234",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/gameplay-core.0b1b33fe5e04.css": "0b1b33fe5e0479e5f5b9d5f58ef364da1671ae01aec67ae490a801d5d48138e0",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/firebase/firebase-config.4314d6321ba1.js": "4314d6321ba1f5447e7089f309972422e52fd64ad5f1d37cbc554e9742134940",
+    "build/firebase/firebase-auth.9f8c09942b79.js": "9f8c09942b79acc26665d2f3561d9824ce13725ad85c38303aff3dadb22c3489",
+    "build/firebase/session-client.235aa8b1f47e.js": "235aa8b1f47ea17463e627473559219f63204235fd62f7bad671666b432d9752",
+    "build/firebase/firebase-session.877a7842d6bd.js": "877a7842d6bd93881b043e61e58ba9002f347f8c00637a9ad95717a65015cb3d",
+    "build/firebase/firebase-cloud-save.dbb8d71d026f.js": "dbb8d71d026f24701d5e8a04c59d94fcccccc73c87a59a1e85037af9055a4b7a",
+    "build/firebase/firebase-auth-ui.4624b380b4b9.js": "4624b380b4b98e48dc68fe61b2ec1e1b8374e85d52dfbfec2697866f522c0fb3",
+    "build/firebase/firebase-bootstrap.d69ddfb2eff7.js": "d69ddfb2eff75aeca741f55cd3f7b3a5204c34f285b2c7e4e22bab3e3a30bbec"
+  },
+  "scenes": [
+    {
+      "name": "cloud-error-session-priority",
+      "state": "ERROR",
+      "canCreate": false,
+      "lastError": "simulated Firestore read failure",
+      "creation": "none",
+      "status": "雲端操作暫時無法使用。請重新驗證原帳號；訪客請先聯絡客服保留原 UID。",
+      "error": true,
+      "reauthHidden": true,
+      "corrupt": null,
+      "trace": null,
+      "storage": {
+        "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-11T00:00:00.000Z\"}",
+        "four_symbols_active_uid": "uid-cloud-error",
+        "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"33c31b6f9dba\",\"completedAt\":\"2026-10-20T12:47:36.610Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.9cdbe69aad4a.js\":\"9cdbe69aad4a\",\"build/firebase/firebase-auth-ui.4624b380b4b9.js\":\"4624b380b4b9\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.d69ddfb2eff7.js\":\"d69ddfb2eff7\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.8e6259c4baef.js\":\"8e6259c4baef\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.9c828c5bf57c.js\":\"9c828c5bf57c\",\"build/gameplay-core-secondary.08c8faad4670.js\":\"08c8faad4670\",\"build/gameplay-core.0b1b33fe5e04.css\":\"0b1b33fe5e04\"}}"
+      },
+      "geometry": {
+        "visible": true,
+        "scrollTop": 0,
+        "scrollHeight": 1133,
+        "clientHeight": 614,
+        "loaderHidden": true,
+        "controls": [
+          {
+            "id": "firebaseSessionTestButton",
+            "label": "測試目前裝置權限",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudEnvelopeTestButton",
+            "label": "驗證雲端存檔骨架",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesTestButton",
+            "label": "驗證自動戰鬥設定上雲",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesRestoreButton",
+            "label": "取回雲端自動戰鬥設定",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationBackupExportButton",
+            "label": "下載本機封存副本",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseMigrationArchiveRecoveryButton",
+            "label": "檢查舊封存並補存真實來源",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationCandidateButton",
+            "label": "封存並準備提交存檔候選",
+            "width": 254,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseCandidateScreeningButton",
+            "label": "審查目前私人候選",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseRetryButton",
+            "label": "重試讀取",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseSignOutButton",
+            "label": "登出帳號",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "cloud-error-top",
+      "state": "ERROR",
+      "canCreate": false,
+      "lastError": "simulated Firestore read failure",
+      "creation": "none",
+      "status": "雲端存檔尚未確認；為避免誤判新玩家，禁止創角。",
+      "error": true,
+      "reauthHidden": true,
+      "corrupt": null,
+      "trace": null,
+      "storage": {
+        "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-11T00:00:00.000Z\"}",
+        "four_symbols_active_uid": "uid-cloud-error",
+        "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"33c31b6f9dba\",\"completedAt\":\"2026-10-20T12:47:36.610Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.9cdbe69aad4a.js\":\"9cdbe69aad4a\",\"build/firebase/firebase-auth-ui.4624b380b4b9.js\":\"4624b380b4b9\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.d69ddfb2eff7.js\":\"d69ddfb2eff7\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.8e6259c4baef.js\":\"8e6259c4baef\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.9c828c5bf57c.js\":\"9c828c5bf57c\",\"build/gameplay-core-secondary.08c8faad4670.js\":\"08c8faad4670\",\"build/gameplay-core.0b1b33fe5e04.css\":\"0b1b33fe5e04\"}}"
+      },
+      "geometry": {
+        "visible": true,
+        "scrollTop": 0,
+        "scrollHeight": 1133,
+        "clientHeight": 614,
+        "loaderHidden": true,
+        "controls": [
+          {
+            "id": "firebaseSessionTestButton",
+            "label": "測試目前裝置權限",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudEnvelopeTestButton",
+            "label": "驗證雲端存檔骨架",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesTestButton",
+            "label": "驗證自動戰鬥設定上雲",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesRestoreButton",
+            "label": "取回雲端自動戰鬥設定",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationBackupExportButton",
+            "label": "下載本機封存副本",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseMigrationArchiveRecoveryButton",
+            "label": "檢查舊封存並補存真實來源",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationCandidateButton",
+            "label": "封存並準備提交存檔候選",
+            "width": 254,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseCandidateScreeningButton",
+            "label": "審查目前私人候選",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseRetryButton",
+            "label": "重試讀取",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseSignOutButton",
+            "label": "登出帳號",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "cloud-error-end",
+      "state": "ERROR",
+      "canCreate": false,
+      "lastError": "simulated Firestore read failure",
+      "creation": "none",
+      "status": "雲端存檔尚未確認；為避免誤判新玩家，禁止創角。",
+      "error": true,
+      "reauthHidden": true,
+      "corrupt": null,
+      "trace": null,
+      "storage": {
+        "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-11T00:00:00.000Z\"}",
+        "four_symbols_active_uid": "uid-cloud-error",
+        "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"33c31b6f9dba\",\"completedAt\":\"2026-10-20T12:47:36.610Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.9cdbe69aad4a.js\":\"9cdbe69aad4a\",\"build/firebase/firebase-auth-ui.4624b380b4b9.js\":\"4624b380b4b9\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.d69ddfb2eff7.js\":\"d69ddfb2eff7\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.8e6259c4baef.js\":\"8e6259c4baef\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.9c828c5bf57c.js\":\"9c828c5bf57c\",\"build/gameplay-core-secondary.08c8faad4670.js\":\"08c8faad4670\",\"build/gameplay-core.0b1b33fe5e04.css\":\"0b1b33fe5e04\"}}"
+      },
+      "geometry": {
+        "visible": true,
+        "scrollTop": 519,
+        "scrollHeight": 1133,
+        "clientHeight": 614,
+        "loaderHidden": true,
+        "controls": [
+          {
+            "id": "firebaseSessionTestButton",
+            "label": "測試目前裝置權限",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudEnvelopeTestButton",
+            "label": "驗證雲端存檔骨架",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesTestButton",
+            "label": "驗證自動戰鬥設定上雲",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesRestoreButton",
+            "label": "取回雲端自動戰鬥設定",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationBackupExportButton",
+            "label": "下載本機封存副本",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseMigrationArchiveRecoveryButton",
+            "label": "檢查舊封存並補存真實來源",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationCandidateButton",
+            "label": "封存並準備提交存檔候選",
+            "width": 254,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseCandidateScreeningButton",
+            "label": "審查目前私人候選",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseRetryButton",
+            "label": "重試讀取",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseSignOutButton",
+            "label": "登出帳號",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "cloud-error-retry-end",
+      "state": "ERROR",
+      "canCreate": false,
+      "lastError": "simulated Firestore read failure",
+      "creation": "none",
+      "status": "雲端存檔尚未確認；為避免誤判新玩家，禁止創角。",
+      "error": true,
+      "reauthHidden": true,
+      "corrupt": null,
+      "trace": null,
+      "storage": {
+        "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-11T00:00:00.000Z\"}",
+        "four_symbols_active_uid": "uid-cloud-error",
+        "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"33c31b6f9dba\",\"completedAt\":\"2026-10-20T12:47:36.610Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.9cdbe69aad4a.js\":\"9cdbe69aad4a\",\"build/firebase/firebase-auth-ui.4624b380b4b9.js\":\"4624b380b4b9\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.d69ddfb2eff7.js\":\"d69ddfb2eff7\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.8e6259c4baef.js\":\"8e6259c4baef\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.9c828c5bf57c.js\":\"9c828c5bf57c\",\"build/gameplay-core-secondary.08c8faad4670.js\":\"08c8faad4670\",\"build/gameplay-core.0b1b33fe5e04.css\":\"0b1b33fe5e04\"}}"
+      },
+      "geometry": {
+        "visible": true,
+        "scrollTop": 519,
+        "scrollHeight": 1133,
+        "clientHeight": 614,
+        "loaderHidden": true,
+        "controls": [
+          {
+            "id": "firebaseSessionTestButton",
+            "label": "測試目前裝置權限",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudEnvelopeTestButton",
+            "label": "驗證雲端存檔骨架",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesTestButton",
+            "label": "驗證自動戰鬥設定上雲",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesRestoreButton",
+            "label": "取回雲端自動戰鬥設定",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationBackupExportButton",
+            "label": "下載本機封存副本",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseMigrationArchiveRecoveryButton",
+            "label": "檢查舊封存並補存真實來源",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationCandidateButton",
+            "label": "封存並準備提交存檔候選",
+            "width": 254,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseCandidateScreeningButton",
+            "label": "審查目前私人候選",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseRetryButton",
+            "label": "重試讀取",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseSignOutButton",
+            "label": "登出帳號",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "corrupt-session-priority",
+      "state": "ERROR",
+      "canCreate": false,
+      "lastError": "Stored save is not valid JSON.",
+      "creation": "none",
+      "status": "雲端操作暫時無法使用。請重新驗證原帳號；訪客請先聯絡客服保留原 UID。",
+      "error": true,
+      "reauthHidden": true,
+      "corrupt": "{broken-json",
+      "trace": null,
+      "storage": {
+        "four_symbols_save:uid-corrupt": "{broken-json",
+        "four_symbols_active_uid": "uid-corrupt",
+        "four_symbols_save_meta:uid-corrupt": "{\"schemaVersion\":1,\"ownerUid\":\"uid-corrupt\"}",
+        "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-11T00:00:00.000Z\"}",
+        "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"33c31b6f9dba\",\"completedAt\":\"2026-10-20T12:47:40.135Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.9cdbe69aad4a.js\":\"9cdbe69aad4a\",\"build/firebase/firebase-auth-ui.4624b380b4b9.js\":\"4624b380b4b9\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.d69ddfb2eff7.js\":\"d69ddfb2eff7\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.8e6259c4baef.js\":\"8e6259c4baef\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.9c828c5bf57c.js\":\"9c828c5bf57c\",\"build/gameplay-core-secondary.08c8faad4670.js\":\"08c8faad4670\",\"build/gameplay-core.0b1b33fe5e04.css\":\"0b1b33fe5e04\"}}"
+      },
+      "geometry": {
+        "visible": true,
+        "scrollTop": 0,
+        "scrollHeight": 1133,
+        "clientHeight": 614,
+        "loaderHidden": true,
+        "controls": [
+          {
+            "id": "firebaseSessionTestButton",
+            "label": "測試目前裝置權限",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudEnvelopeTestButton",
+            "label": "驗證雲端存檔骨架",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesTestButton",
+            "label": "驗證自動戰鬥設定上雲",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesRestoreButton",
+            "label": "取回雲端自動戰鬥設定",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationBackupExportButton",
+            "label": "下載本機封存副本",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseMigrationArchiveRecoveryButton",
+            "label": "檢查舊封存並補存真實來源",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationCandidateButton",
+            "label": "封存並準備提交存檔候選",
+            "width": 254,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseCandidateScreeningButton",
+            "label": "審查目前私人候選",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseRetryButton",
+            "label": "重試讀取",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseSignOutButton",
+            "label": "登出帳號",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "corrupt-top",
+      "state": "ERROR",
+      "canCreate": false,
+      "lastError": "Stored save is not valid JSON.",
+      "creation": "none",
+      "status": "本機帳號存檔無法安全讀取。",
+      "error": true,
+      "reauthHidden": true,
+      "corrupt": "{broken-json",
+      "trace": null,
+      "storage": {
+        "four_symbols_save:uid-corrupt": "{broken-json",
+        "four_symbols_active_uid": "uid-corrupt",
+        "four_symbols_save_meta:uid-corrupt": "{\"schemaVersion\":1,\"ownerUid\":\"uid-corrupt\"}",
+        "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-11T00:00:00.000Z\"}",
+        "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"33c31b6f9dba\",\"completedAt\":\"2026-10-20T12:47:40.135Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.9cdbe69aad4a.js\":\"9cdbe69aad4a\",\"build/firebase/firebase-auth-ui.4624b380b4b9.js\":\"4624b380b4b9\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.d69ddfb2eff7.js\":\"d69ddfb2eff7\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.8e6259c4baef.js\":\"8e6259c4baef\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.9c828c5bf57c.js\":\"9c828c5bf57c\",\"build/gameplay-core-secondary.08c8faad4670.js\":\"08c8faad4670\",\"build/gameplay-core.0b1b33fe5e04.css\":\"0b1b33fe5e04\"}}"
+      },
+      "geometry": {
+        "visible": true,
+        "scrollTop": 0,
+        "scrollHeight": 1115,
+        "clientHeight": 614,
+        "loaderHidden": true,
+        "controls": [
+          {
+            "id": "firebaseSessionTestButton",
+            "label": "測試目前裝置權限",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudEnvelopeTestButton",
+            "label": "驗證雲端存檔骨架",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesTestButton",
+            "label": "驗證自動戰鬥設定上雲",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesRestoreButton",
+            "label": "取回雲端自動戰鬥設定",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationBackupExportButton",
+            "label": "下載本機封存副本",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseMigrationArchiveRecoveryButton",
+            "label": "檢查舊封存並補存真實來源",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationCandidateButton",
+            "label": "封存並準備提交存檔候選",
+            "width": 254,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseCandidateScreeningButton",
+            "label": "審查目前私人候選",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseRetryButton",
+            "label": "重試讀取",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseSignOutButton",
+            "label": "登出帳號",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "corrupt-end",
+      "state": "ERROR",
+      "canCreate": false,
+      "lastError": "Stored save is not valid JSON.",
+      "creation": "none",
+      "status": "本機帳號存檔無法安全讀取。",
+      "error": true,
+      "reauthHidden": true,
+      "corrupt": "{broken-json",
+      "trace": null,
+      "storage": {
+        "four_symbols_save:uid-corrupt": "{broken-json",
+        "four_symbols_active_uid": "uid-corrupt",
+        "four_symbols_save_meta:uid-corrupt": "{\"schemaVersion\":1,\"ownerUid\":\"uid-corrupt\"}",
+        "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-11T00:00:00.000Z\"}",
+        "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"33c31b6f9dba\",\"completedAt\":\"2026-10-20T12:47:40.135Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.9cdbe69aad4a.js\":\"9cdbe69aad4a\",\"build/firebase/firebase-auth-ui.4624b380b4b9.js\":\"4624b380b4b9\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.d69ddfb2eff7.js\":\"d69ddfb2eff7\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.8e6259c4baef.js\":\"8e6259c4baef\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.9c828c5bf57c.js\":\"9c828c5bf57c\",\"build/gameplay-core-secondary.08c8faad4670.js\":\"08c8faad4670\",\"build/gameplay-core.0b1b33fe5e04.css\":\"0b1b33fe5e04\"}}"
+      },
+      "geometry": {
+        "visible": true,
+        "scrollTop": 501,
+        "scrollHeight": 1115,
+        "clientHeight": 614,
+        "loaderHidden": true,
+        "controls": [
+          {
+            "id": "firebaseSessionTestButton",
+            "label": "測試目前裝置權限",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudEnvelopeTestButton",
+            "label": "驗證雲端存檔骨架",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesTestButton",
+            "label": "驗證自動戰鬥設定上雲",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseCloudPreferencesRestoreButton",
+            "label": "取回雲端自動戰鬥設定",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationBackupExportButton",
+            "label": "下載本機封存副本",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseMigrationArchiveRecoveryButton",
+            "label": "檢查舊封存並補存真實來源",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseMigrationCandidateButton",
+            "label": "封存並準備提交存檔候選",
+            "width": 254,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseCandidateScreeningButton",
+            "label": "審查目前私人候選",
+            "width": 123.5,
+            "height": 56.9375,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": true
+          },
+          {
+            "id": "firebaseRetryButton",
+            "label": "重試讀取",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          },
+          {
+            "id": "firebaseSignOutButton",
+            "label": "登出帳號",
+            "width": 137.5,
+            "height": 44,
+            "font": 16,
+            "display": "block",
+            "hidden": false,
+            "disabled": false
+          }
+        ]
+      }
+    }
+  ],
+  "touches": [
+    {
+      "kind": "real-scroll",
+      "x": 276,
+      "y": 593,
+      "to": 57,
+      "top": 0,
+      "height": 1133,
+      "client": 614,
+      "done": false
+    },
+    {
+      "kind": "scroll-end",
+      "x": 276,
+      "y": 593,
+      "to": 57,
+      "top": 519,
+      "height": 1133,
+      "client": 614,
+      "done": true
+    },
+    {
+      "kind": "retry-real-tap",
+      "x": 107.75,
+      "y": 582.046875,
+      "width": 137.5,
+      "height": 44,
+      "disabled": false,
+      "hit": true
+    },
+    {
+      "kind": "real-scroll",
+      "x": 276,
+      "y": 593,
+      "to": 57,
+      "top": 0,
+      "height": 1115,
+      "client": 614,
+      "done": false
+    },
+    {
+      "kind": "scroll-end",
+      "x": 276,
+      "y": 593,
+      "to": 57,
+      "top": 501,
+      "height": 1115,
+      "client": 614,
+      "done": true
+    }
+  ],
+  "checks": [
+    {
+      "scenario": "cloud-error",
+      "beforeCapture": {
+        "state": "ERROR",
+        "canCreate": false,
+        "lastError": "simulated Firestore read failure",
+        "creation": "none",
+        "status": "雲端操作暫時無法使用。請重新驗證原帳號；訪客請先聯絡客服保留原 UID。",
+        "error": true,
+        "reauthHidden": true,
+        "corrupt": null,
+        "trace": null,
+        "storage": {
+          "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-11T00:00:00.000Z\"}",
+          "four_symbols_active_uid": "uid-cloud-error",
+          "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"33c31b6f9dba\",\"completedAt\":\"2026-10-20T12:47:36.610Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.9cdbe69aad4a.js\":\"9cdbe69aad4a\",\"build/firebase/firebase-auth-ui.4624b380b4b9.js\":\"4624b380b4b9\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.d69ddfb2eff7.js\":\"d69ddfb2eff7\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.8e6259c4baef.js\":\"8e6259c4baef\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.9c828c5bf57c.js\":\"9c828c5bf57c\",\"build/gameplay-core-secondary.08c8faad4670.js\":\"08c8faad4670\",\"build/gameplay-core.0b1b33fe5e04.css\":\"0b1b33fe5e04\"}}"
+        }
+      }
+    },
+    {
+      "scenario": "cloud-error",
+      "sessionErrorClearedViaOriginalEvent": true,
+      "underlyingReadError": "雲端存檔尚未確認；為避免誤判新玩家，禁止創角。",
+      "state": "ERROR",
+      "creation": "none",
+      "lastError": "simulated Firestore read failure",
+      "canCreate": false
+    },
+    {
+      "actualRetry": true,
+      "beforeReads": 1,
+      "afterReads": 2,
+      "stillError": true
+    },
+    {
+      "scenario": "corrupt",
+      "beforeCapture": {
+        "state": "ERROR",
+        "canCreate": false,
+        "lastError": "Stored save is not valid JSON.",
+        "creation": "none",
+        "status": "雲端操作暫時無法使用。請重新驗證原帳號；訪客請先聯絡客服保留原 UID。",
+        "error": true,
+        "reauthHidden": true,
+        "corrupt": "{broken-json",
+        "trace": null,
+        "storage": {
+          "four_symbols_save:uid-corrupt": "{broken-json",
+          "four_symbols_active_uid": "uid-corrupt",
+          "four_symbols_save_meta:uid-corrupt": "{\"schemaVersion\":1,\"ownerUid\":\"uid-corrupt\"}",
+          "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-11T00:00:00.000Z\"}",
+          "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"33c31b6f9dba\",\"completedAt\":\"2026-10-20T12:47:40.135Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.9cdbe69aad4a.js\":\"9cdbe69aad4a\",\"build/firebase/firebase-auth-ui.4624b380b4b9.js\":\"4624b380b4b9\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.d69ddfb2eff7.js\":\"d69ddfb2eff7\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.8e6259c4baef.js\":\"8e6259c4baef\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.9c828c5bf57c.js\":\"9c828c5bf57c\",\"build/gameplay-core-secondary.08c8faad4670.js\":\"08c8faad4670\",\"build/gameplay-core.0b1b33fe5e04.css\":\"0b1b33fe5e04\"}}"
+        }
+      }
+    },
+    {
+      "scenario": "corrupt",
+      "sessionErrorClearedViaOriginalEvent": true,
+      "underlyingReadError": "本機帳號存檔無法安全讀取。",
+      "state": "ERROR",
+      "creation": "none",
+      "lastError": "Stored save is not valid JSON.",
+      "canCreate": false
+    }
+  ],
+  "scope": "Session Google/guest original event and boot cloud-error/corrupt only. Fresh localhost fake transport; session user is presentation-only API fixture. No sign-in/reauth/protected test/cloud write/migration/ack or guard bypass. Existing fourth-segment frames reused; not real Session Authority or write-failure acceptance.",
+  "loaded": [
+    "/build/boot-core.1775eab1cc99.css",
+    "/build/boot-core.9cdbe69aad4a.js",
+    "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/boot-core.1775eab1cc99.css",
+    "/build/boot-core.9cdbe69aad4a.js",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/boot-core.1775eab1cc99.css",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/boot-core.9cdbe69aad4a.js",
+    "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/app-shell.8e6259c4baef.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/app-shell.8e6259c4baef.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.9c828c5bf57c.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/gameplay-core-secondary.08c8faad4670.js",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core.0b1b33fe5e04.css",
+    "/build/gameplay-core-primary.9c828c5bf57c.js",
+    "/build/gameplay-core-secondary.08c8faad4670.js",
+    "/build/gameplay-core.0b1b33fe5e04.css",
+    "/build/feature-adventure-entry.f68f5350eccc.css",
+    "/build/feature-adventure-entry.8215d893d208.js"
+  ],
+  "loadedHashes": {
+    "build/boot-core.1775eab1cc99.css": "1775eab1cc99d533cf875312088be14505e6ea92befa08f5ce36c91029fb0234",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/firebase/firebase-bootstrap.d69ddfb2eff7.js": "d69ddfb2eff75aeca741f55cd3f7b3a5204c34f285b2c7e4e22bab3e3a30bbec",
+    "build/firebase/firebase-auth.9f8c09942b79.js": "9f8c09942b79acc26665d2f3561d9824ce13725ad85c38303aff3dadb22c3489",
+    "build/firebase/firebase-session.877a7842d6bd.js": "877a7842d6bd93881b043e61e58ba9002f347f8c00637a9ad95717a65015cb3d",
+    "build/firebase/firebase-cloud-save.dbb8d71d026f.js": "dbb8d71d026f24701d5e8a04c59d94fcccccc73c87a59a1e85037af9055a4b7a",
+    "build/firebase/firebase-auth-ui.4624b380b4b9.js": "4624b380b4b98e48dc68fe61b2ec1e1b8374e85d52dfbfec2697866f522c0fb3",
+    "build/firebase/firebase-config.4314d6321ba1.js": "4314d6321ba1f5447e7089f309972422e52fd64ad5f1d37cbc554e9742134940",
+    "build/firebase/session-client.235aa8b1f47e.js": "235aa8b1f47ea17463e627473559219f63204235fd62f7bad671666b432d9752",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.8e6259c4baef.js": "8e6259c4baefa13470f8c4d6ff3e25672de5d30af419a0e96d9b51a4e6670cfe",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/gameplay-core-primary.9c828c5bf57c.js": "9c828c5bf57c181b554639c320f885848a1f76cbcf191ba37fa38b8a39966b3d",
+    "build/gameplay-core-secondary.08c8faad4670.js": "08c8faad467089da80571ff62de823e4fe26b7c3f7d8fdd31869f934379d6097",
+    "build/gameplay-core.0b1b33fe5e04.css": "0b1b33fe5e0479e5f5b9d5f58ef364da1671ae01aec67ae490a801d5d48138e0",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af"
+  },
+  "sourceAfter": {
+    "index.html": "821a25dde6255e3b0ddc6782eb4396a6d4e068e36f72c550a937e9326c3ed8bc",
+    "asset-manifest.json": "50bf1f36b0ac37a0a36a2cad3158a02ced70a889e43f45df63b28b77abae83ef",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/app-shell.8e6259c4baef.js": "8e6259c4baefa13470f8c4d6ff3e25672de5d30af419a0e96d9b51a4e6670cfe",
+    "build/gameplay-core-primary.9c828c5bf57c.js": "9c828c5bf57c181b554639c320f885848a1f76cbcf191ba37fa38b8a39966b3d",
+    "build/gameplay-core-secondary.08c8faad4670.js": "08c8faad467089da80571ff62de823e4fe26b7c3f7d8fdd31869f934379d6097",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/boot-core.1775eab1cc99.css": "1775eab1cc99d533cf875312088be14505e6ea92befa08f5ce36c91029fb0234",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/gameplay-core.0b1b33fe5e04.css": "0b1b33fe5e0479e5f5b9d5f58ef364da1671ae01aec67ae490a801d5d48138e0",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/firebase/firebase-config.4314d6321ba1.js": "4314d6321ba1f5447e7089f309972422e52fd64ad5f1d37cbc554e9742134940",
+    "build/firebase/firebase-auth.9f8c09942b79.js": "9f8c09942b79acc26665d2f3561d9824ce13725ad85c38303aff3dadb22c3489",
+    "build/firebase/session-client.235aa8b1f47e.js": "235aa8b1f47ea17463e627473559219f63204235fd62f7bad671666b432d9752",
+    "build/firebase/firebase-session.877a7842d6bd.js": "877a7842d6bd93881b043e61e58ba9002f347f8c00637a9ad95717a65015cb3d",
+    "build/firebase/firebase-cloud-save.dbb8d71d026f.js": "dbb8d71d026f24701d5e8a04c59d94fcccccc73c87a59a1e85037af9055a4b7a",
+    "build/firebase/firebase-auth-ui.4624b380b4b9.js": "4624b380b4b98e48dc68fe61b2ec1e1b8374e85d52dfbfec2697866f522c0fb3",
+    "build/firebase/firebase-bootstrap.d69ddfb2eff7.js": "d69ddfb2eff75aeca741f55cd3f7b3a5204c34f285b2c7e4e22bab3e3a30bbec"
+  },
+  "sourceUnchanged": true
+}
