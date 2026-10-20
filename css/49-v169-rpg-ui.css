@@ -1522,6 +1522,7 @@ body > .v169-rpg-dialog-layer{
 }
 #game-ui #homeFeatureModal.v131-shop-open,
 #game-ui #homeFeatureModal:has(.v17363-material-synthesis),
+#game-ui #homeFeatureModal:has(#autoBattleSettingsPanel),
 #game-ui #homeFeatureModal.quest-mode{--skill-header-height:calc(44 * var(--ui-length-unit,1px));}
 #game-ui #homeFeatureModal:has(#homeFeatureModalBody > :is(.v17351-achievement-shell,.release-update-announcement,.v141-offline-panel,.system-panel)),
 #game-ui #homeFeatureModal.release-update-modal{--skill-header-height:calc(44 * var(--ui-length-unit,1px));}
