@@ -3582,6 +3582,15 @@
             }
 
             const isChestOrTicket=item && (item.type==="chest" || item.type==="ticket");
+            const description=item&&(item.id==="materialChest"
+                ?"鍛造材料與實戰消耗品。每箱抽取一項；可先查看預覽。"
+                :getOreDefinition(item.id)?"鍛造與材料合成用礦石。":null);
+            const detailStats=document.getElementById("itemModalStats");
+            if(description&&detailStats){
+                Array.from(detailStats.childNodes||[]).filter(node=>node.nodeType===3).forEach(node=>{
+                    node.textContent=node.textContent.replace("沒有額外能力加成。",description);
+                });
+            }
 
             /*
                ★ 修正（依照使用者回報）：符咒不是裝備，但原本的
