@@ -4037,10 +4037,10 @@
     },
     {
       "id": "forge.socket",
-      "label": "鍛造 socket",
+      "label": "鍛造：鑲嵌",
       "entry": "openHomeFeature('forge'); v141SwitchForgeTab('socket')",
       "owner": "js/36-v141-content-systems.js; css/38-v141-system-expansion.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "無裝備",
         "多裝備",
@@ -4089,11 +4089,61 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "隔離fixture呈現及真入口／選單／末端／返回；非實際鑲嵌",
+          "status": "已實際驗證",
+          "head": "ad5c3f9531ba91891bc2ce4ea1119b4c8edc3801",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment12-accepted/360x640-socket-body-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment12-accepted/360x640-controls.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment12-accepted/393x873-socket-body-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment12-accepted/393x873-controls.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment12-accepted/412x915-socket-body-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment12-accepted/412x915-controls.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment12-accepted/1280x800-socket-body-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment12-accepted/1280x800-controls.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-12",
+        "head": "ad5c3f9531ba91891bc2ce4ea1119b4c8edc3801",
+        "productionHead": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment12-accepted",
+        "verified": [
+          "真城門／鍛造TAB／空裝備／無寶石／多裝備／滿槽／禁用原因",
+          "裝備與寶石選單真touch/wheel末端、選擇折疊",
+          "本體真捲動末端、返回及重新開啟"
+        ],
+        "notVerified": [
+          "實際鑲嵌交易／角色解鎖／存檔",
+          "多寶石種類",
+          "實體裝置",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸末端與空滿代表實圖限定保留通過",
+          "interaction": "四尺寸真入口／選單末端／返回限定通過",
+          "scope": "無production修改，原authority／交易保留，限定通過"
+        }
       }
     },
     {
@@ -13057,6 +13107,16 @@
         "鑲嵌長選單與末端真操作（原樣式先保留）",
         "其他台帳未驗入口／狀態",
         "最新Head Required CI／部署"
+      ]
+    },
+    {
+      "segment": "segment-12",
+      "head": "ad5c3f9531ba91891bc2ce4ea1119b4c8edc3801",
+      "result": "原鑲嵌皮膚／標題保留，四尺寸實際相關呈現與操作限定通過；無production修改",
+      "pending": [
+        "商店裝備卡片文字與購買鈕重疊實證，待修",
+        "其他台帳未驗狀態",
+        "Latest Head Required CI／部署"
       ]
     }
   ],
