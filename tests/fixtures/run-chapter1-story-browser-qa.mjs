@@ -143,10 +143,15 @@ try{
                     const check=(v,m)=>{if(!v)throw Error(m);};
                     const wait=async(fn,label)=>{const deadline=Date.now()+45000;while(!fn()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,50));check(fn(),label);};
                     const api=FourSymbolsAdventure,stages=[];
+                    const snapshot=()=>({hp:player.hp,sp:player.sp,stats:getPartyBattleStats(0),gold,sharedExp,turn,battleActive,battlePhase,run:v132ActiveDungeonRun?{mode:v132ActiveDungeonRun.mode,nodeId:v132ActiveDungeonRun.nodeId}:null,potions:Object.fromEntries(potionDefinitions.map(p=>[p.id,getPotionCount(p.id)])),enemies:monsters.filter(m=>m.alive).map(m=>({hp:m.hp,name:m.name})),state:JSON.parse(JSON.stringify(api.getChapterState()))});
+                    window.storyQaFormalDiagnostic={stages,current:null,purchases:[],battleEnds:[]};
+                    const unsubscribeBattleEnd=FourSymbolsCombatEvents.subscribe('battle_end',event=>window.storyQaFormalDiagnostic.battleEnds.push({event,...snapshot()}));
                     const dismiss=window.dismissStoryQaAlerts;
+                    check(api.getChapterState().rewardClaims.c1_05==='ready'&&api.claimNodeReward('c1_05'),'claim earned stage5 reward');
                     const recover=async()=>{
-                        for(const [id,resource,max] of [['hpPotion10','hp',getPartyBattleStats(0).maxHP],['spPotion10','sp',getPartyBattleStats(0).maxSP]]){
-                            let limit=10;while(player[resource]<max*.75&&getPotionCount(id)>0&&limit-->0){rebuildInventorySlots();const slot=inventorySlots.findIndex(item=>item?.id===id);check(slot>=0&&v17342UseInventoryPotion(slot),'formal preparation consumes existing potion');await dismiss();}
+                        for(const [resource,max] of [['hp',getPartyBattleStats(0).maxHP],['sp',getPartyBattleStats(0).maxSP]]){
+                            let limit=30;while(player[resource]<max&&limit-->0){let potion=potionDefinitions.filter(p=>p.resource===resource&&getPotionCount(p.id)>0).sort((a,b)=>(a.recoveryPercent||0)-(b.recoveryPercent||0))[0];if(!potion){const id=resource+'Potion30',definition=getPotionDefinition(id),quantity=Math.ceil((max-player[resource])/(max*.3)),price=getShopItemPrice(definition),beforeGold=gold,beforeCount=getPotionCount(id);check(gold>=price*quantity,'earned gold funds normal shop preparation');buyShopItem(id,quantity);check(gold===beforeGold-price*quantity&&getPotionCount(id)===beforeCount+quantity,'original shop debits gold and supplies exact quantity');window.storyQaFormalDiagnostic.purchases.push({id,quantity,price,beforeGold,afterGold:gold});potion=definition;}rebuildInventorySlots();const slot=inventorySlots.findIndex(item=>item?.id===potion.id);check(slot>=0&&v17342UseInventoryPotion(slot),'formal preparation consumes existing potion');await dismiss();}
+                            check(player[resource]>=max,'formal preparation reaches full '+resource);
                         }
                     };
                     for(let stage=6;stage<=20;stage++){
@@ -154,37 +159,50 @@ try{
                         await recover();if(stage===6)await captureStoryQa('map-after-tutorial');check(api.startStory(id),'start formal story '+id);if(stage===11||stage===19)await captureStoryQa('scene-'+id);let lines=30;
                         while(api.getView().dialogue&&lines-->0){check(api.advanceDialogue(),'formal dialogue '+id);await new Promise(r=>setTimeout(r,40));}check(lines>0,'formal dialogue bounded');
                         const node=FourSymbolsAdventureContent.chapters.chapter_v1.nodes.find(n=>n.id===id),rounds=[];
+                        const diagnostic={id,type:node.type,rounds,initial:snapshot()};window.storyQaFormalDiagnostic.current=diagnostic;
                         if(node.type==='rest')check(api.restAtNode(id),'formal rest');
                         if(node.type==='chest')check(api.openChest(id),'formal chest');
                         if(['battle','elite','boss'].includes(node.type)){
+                          diagnostic.attempts=[];
+                          for(let attempt=0;attempt<3;attempt++){
+                            const beforeAttempt={gold,sharedExp,claim:api.getChapterState().rewardClaims[id]},firstRound=rounds.length,firstEnd=window.storyQaFormalDiagnostic.battleEnds.length;
                             await wait(()=>battleActive,'formal battle starts');let actions=0;
                             while(battleActive&&actions<40){
                                 await wait(()=>!battleActive||(battlePhase==='declare'&&!battleAdvanceScheduled&&battlePresentationLocks.size===0&&declaredCharacterIndexes.has(activeBattleCharacterIndex)),'formal action ready');if(!battleActive)break;
-                                const before=turn;rounds.push({turn,hp:player.hp,sp:player.sp,enemies:monsters.filter(m=>m.alive).map(m=>m.hp)});
+                                const before=turn,round=snapshot();rounds.push(round);
                                 toggleSkillQuickBar();const skill=document.querySelector('.skill-quick-button[data-skill-id="flameSlash"]');
                                 if(skill&&!skill.disabled)skill.click();else document.querySelector('button[aria-label="普通攻擊"]').click();
                                 const target=currentBattleMonsters.find(i=>monsters[i]?.alive);document.getElementById('battleMonster'+target).click();actions++;
                                 await wait(()=>!battleActive||turn>before,'formal natural AI round');
                             }
                             check(!battleActive,'bounded formal combat');
+                            const terminal=snapshot(),battleEnds=window.storyQaFormalDiagnostic.battleEnds.slice(firstEnd);diagnostic.attempts.push({attempt,firstRound,actions,battleEnds,terminal});
+                            if(api.getChapterState().completedNodes[id])break;
+                            check((terminal.hp<=0||battleEnds.some(end=>end.hp<=0))&&api.getChapterState().currentNodeId===id,'retry requires genuine natural defeat');
+                            check(api.getChapterState().rewardClaims[id]===beforeAttempt.claim&&gold<=beforeAttempt.gold&&sharedExp===beforeAttempt.sharedExp,'natural defeat cannot issue completion reward');
+                            if(attempt===2)break;
+                            await dismiss();await recover();check(api.startStory(id),'normal retry same defeated node');let retryLines=30;while(api.getView().dialogue&&retryLines-->0){check(api.advanceDialogue(),'normal retry dialogue');await new Promise(r=>setTimeout(r,40));}check(retryLines>0,'retry dialogue bounded');
+                          }
                         }
+                        diagnostic.terminal=snapshot();
                         check(api.getChapterState().completedNodes[id],'formal node completes '+id);
                         if(api.getChapterState().rewardClaims[id]==='ready')check(api.claimNodeReward(id),'formal node reward');
                         if(stage===11){const key=JSON.stringify(api.getChapterState().storyKeys);check(api.getChapterState().storyKeys.blackPineToken.sourceNodeId===id,'one story key');api.startStory(id);while(api.getView().dialogue)check(api.advanceDialogue(),'reopen key dialogue');check(JSON.stringify(api.getChapterState().storyKeys)===key,'story key repeat adds nothing');}
-                        stages.push({id,type:node.type,rounds,hp:player.hp,sp:player.sp});
+                        stages.push(diagnostic);
                         if(stage===20){let ending=30;while(api.getView().dialogue&&ending-->0){const cursor=api.getView().dialogue;await captureStoryQa(cursor.lineIndex===2?'ending-guard':'ending-line-'+cursor.lineIndex);check(api.advanceDialogue(),'ending dialogue');}check(ending>0,'ending bounded');}
                     }
                     check(api.getChapterState().chapterCompleted,'twenty-node chapter completed');
                     check(Object.keys(api.getChapterState().completedNodes).filter(id=>/^c1_/.test(id)).length===20,'20 of 20 completed');
+                    unsubscribeBattleEnd();
                     const uid=FourSymbolsAccountSave.getActiveUid(),saved=FourSymbolsAccountSave.readForUid(uid);check(saved.status==='ready'&&saved.save.player.adventureProgress.chapters.chapter_v1.chapterCompleted,'original Save Owner persisted ending');
-                    return {stages,state:api.getChapterState()};
+                    return {stages,purchases:window.storyQaFormalDiagnostic.purchases,battleEnds:window.storyQaFormalDiagnostic.battleEnds,state:api.getChapterState()};
                 })()`);
             }
             await captureQueue;result.sceneMetadata=await client.eval("window.storyQaSceneMetadata");
             if(width===393||width===1920){const scene=label=>result.sceneMetadata.find(row=>row.label===label);assert.equal(scene("stage2-cast-0").npcSrc,scene("stage2-cast-1").npcSrc,"stage2 cast persists during player reply");assert.equal(scene("ending-guard").dialogue.lineIndex,2);assert.equal(scene("ending-guard").speaker,"守驛人");assert.equal(scene("ending-line-3").dialogue.lineIndex,3);assert.equal(scene("ending-guard").npcSrc,scene("ending-line-3").npcSrc,"guard persists during final player reply");}
             results.push({width,height,result});
         }catch(error){
-            const diagnostic=await Promise.race([client?.eval('({startup:window.FourSymbolsStartupPolicy?.getState?.(),creation:window.FourSymbolsStartupPolicy?.canCreateCharacter?.(),body:document.body.innerText.slice(-3500)})').catch(()=>null),new Promise(r=>setTimeout(()=>r(null),2000))]);
+            const diagnostic=await Promise.race([client?.eval('({startup:window.FourSymbolsStartupPolicy?.getState?.(),creation:window.FourSymbolsStartupPolicy?.canCreateCharacter?.(),formal:window.storyQaFormalDiagnostic,body:document.body.innerText.slice(-8000)})').catch(()=>null),new Promise(r=>setTimeout(()=>r(null),2000))]);
             fs.writeFileSync(path.join(artifact,"failure.json"),JSON.stringify({error:String(error.stack),width,height,diagnostic,events:client?.events.slice(-20)},null,2));throw error;
         }finally{client?.close();proc.kill();}
     }
