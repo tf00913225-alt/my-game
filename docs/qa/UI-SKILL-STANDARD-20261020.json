@@ -740,8 +740,8 @@
       "id": "home.autoBattleSettings",
       "label": "元素匣／自動戰鬥設定",
       "entry": "openHomeFeature('autoBattleSettings')",
-      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "owner": "js/49-v169-element-box-settings.js; js/25-v131-fix-batch.js; js/00-main.js::initCustomDropdown; css/26-v110-auto-settings-premium.css; css/48-v169-element-box-settings.css; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -758,51 +758,27 @@
       "deviceEvidence": {
         "360x640": {
           "status": "部分已實際驗證",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-d6a57f84-f459-41b4-bbd7-fe646b8e435f.png",
-          "after": [
-            "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-settings.png",
-            "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-character-menu.png",
-            "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-settings-bottom.png"
-          ],
-          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-auto-entry.png"
         },
         "393x873": {
           "status": "部分已實際驗證",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-d6a57f84-f459-41b4-bbd7-fe646b8e435f.png",
-          "after": [
-            "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-settings.png",
-            "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-character-menu.png",
-            "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-settings-bottom.png"
-          ],
-          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-auto-entry.png"
         },
         "412x915": {
           "status": "部分已實際驗證",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-d6a57f84-f459-41b4-bbd7-fe646b8e435f.png",
-          "after": [
-            "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-settings.png",
-            "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-character-menu.png",
-            "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-settings-bottom.png"
-          ],
-          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-auto-entry.png"
         },
         "1280x800": {
           "status": "部分已實際驗證",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-d6a57f84-f459-41b4-bbd7-fe646b8e435f.png",
-          "after": [
-            "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-settings.png",
-            "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-character-menu.png",
-            "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-settings-bottom.png"
-          ],
-          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-auto-entry.png"
         }
       },
       "beforeEvidence": "C:/Users/User/AppData/Local/Temp/codex-clipboard-d6a57f84-f459-41b4-bbd7-fe646b8e435f.png",
@@ -892,18 +868,46 @@
               "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
             }
           ]
+        },
+        {
+          "state": "真city5/完整題牌與44返回/重開",
+          "status": "已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "scope": "fresh localhost QA transport/profile，原saveGame完整delegated，每尺寸7次；不是零存檔或純暫存；不啟戰/授時/廣告",
+          "devices": [
+            {
+              "device": "360x640",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-auto-entry.png"
+            },
+            {
+              "device": "393x873",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-auto-entry.png"
+            },
+            {
+              "device": "412x915",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-auto-entry.png"
+            },
+            {
+              "device": "1280x800",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-auto-entry.png"
+            }
+          ],
+          "limits": [
+            "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
+            "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
+            "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+          ]
         }
       ],
       "reviews": {
-        "art": null,
-        "interaction": {
-          "reviewer": "interaction_review",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "result": "第一段已覆蓋原症狀通過，整項仍部分未驗",
-          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
-          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
-        },
-        "scope": null
+        "art": "art_review：四尺寸normal-only代表實圖核長角色/五選項100%/題牌/返回/零時確認，原皮膚保留",
+        "interaction": "interaction_review：四尺寸各9圖12真tap，custom portal44、HP75/SP50/shared config/切角/重開/zero取消，7次原delegatedSave記錄，fresh noactivefixture",
+        "scope": "scope_review：原26Auto選項44/15與49Autoheader44，無JS/設定選項/時數/啟戰修改；污染getter整批排除，只normal-only限定接受"
       },
       "titleEvidence": {
         "status": "已實際驗證（僅已覆蓋標題畫面）",
@@ -935,6 +939,25 @@
           "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
+      },
+      "presentationEvidence": {
+        "segment": "segment-21",
+        "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted",
+        "verified": [
+          "真city5/完整題牌與44返回/重開"
+        ],
+        "notVerified": [
+          "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
+          "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
+          "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸normal-only代表實圖核長角色/五選項100%/題牌/返回/零時確認，原皮膚保留",
+          "interaction": "interaction_review：四尺寸各9圖12真tap，custom portal44、HP75/SP50/shared config/切角/重開/zero取消，7次原delegatedSave記錄，fresh noactivefixture",
+          "scope": "scope_review：原26Auto選項44/15與49Autoheader44，無JS/設定選項/時數/啟戰修改；污染getter整批排除，只normal-only限定接受"
         }
       }
     },
@@ -6785,8 +6808,8 @@
       "id": "auto.character",
       "label": "自動戰鬥 character",
       "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
-      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "owner": "js/49-v169-element-box-settings.js; js/25-v131-fix-batch.js; js/00-main.js::initCustomDropdown; css/26-v110-auto-settings-premium.css; css/48-v169-element-box-settings.css; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
       "states": [
         "選單展開",
         "已選取",
@@ -6807,43 +6830,27 @@
       "deviceEvidence": {
         "360x640": {
           "status": "部分已實際驗證",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "before": null,
-          "after": [
-            "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-character-menu.png"
-          ],
-          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-auto-entry.png"
         },
         "393x873": {
           "status": "部分已實際驗證",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "before": null,
-          "after": [
-            "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-character-menu.png"
-          ],
-          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-auto-entry.png"
         },
         "412x915": {
           "status": "部分已實際驗證",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "before": null,
-          "after": [
-            "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-character-menu.png"
-          ],
-          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-auto-entry.png"
         },
         "1280x800": {
           "status": "部分已實際驗證",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "before": null,
-          "after": [
-            "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-character-menu.png"
-          ],
-          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-auto-entry.png"
         }
       },
       "stateEvidence": [
@@ -6874,20 +6881,67 @@
               "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
             }
           ]
+        },
+        {
+          "state": "正式custom角色選單第三未建長項呈現/真0→1選角",
+          "status": "已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "scope": "fresh localhost QA transport/profile，原saveGame完整delegated，每尺寸7次；不是零存檔或純暫存；不啟戰/授時/廣告",
+          "devices": [
+            {
+              "device": "360x640",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-auto-entry.png"
+            },
+            {
+              "device": "393x873",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-auto-entry.png"
+            },
+            {
+              "device": "412x915",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-auto-entry.png"
+            },
+            {
+              "device": "1280x800",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-auto-entry.png"
+            }
+          ],
+          "limits": [
+            "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
+            "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
+            "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+          ]
         }
       ],
       "reviews": {
-        "art": null,
-        "interaction": {
-          "reviewer": "interaction_review",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "result": "第一段已覆蓋原症狀通過，整項仍部分未驗",
-          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
-          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
-        },
-        "scope": null
+        "art": "art_review：四尺寸normal-only代表實圖核長角色/五選項100%/題牌/返回/零時確認，原皮膚保留",
+        "interaction": "interaction_review：四尺寸各9圖12真tap，custom portal44、HP75/SP50/shared config/切角/重開/zero取消，7次原delegatedSave記錄，fresh noactivefixture",
+        "scope": "scope_review：原26Auto選項44/15與49Autoheader44，無JS/設定選項/時數/啟戰修改；污染getter整批排除，只normal-only限定接受"
       },
-      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。"
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。",
+      "presentationEvidence": {
+        "segment": "segment-21",
+        "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted",
+        "verified": [
+          "正式custom角色選單第三未建長項呈現/真0→1選角"
+        ],
+        "notVerified": [
+          "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
+          "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
+          "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸normal-only代表實圖核長角色/五選項100%/題牌/返回/零時確認，原皮膚保留",
+          "interaction": "interaction_review：四尺寸各9圖12真tap，custom portal44、HP75/SP50/shared config/切角/重開/zero取消，7次原delegatedSave記錄，fresh noactivefixture",
+          "scope": "scope_review：原26Auto選項44/15與49Autoheader44，無JS/設定選項/時數/啟戰修改；污染getter整批排除，只normal-only限定接受"
+        }
+      }
     },
     {
       "id": "auto.strategy",
@@ -6984,8 +7038,8 @@
       "id": "auto.hp",
       "label": "自動戰鬥 hp",
       "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
-      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "owner": "js/49-v169-element-box-settings.js; js/25-v131-fix-batch.js; js/00-main.js::initCustomDropdown; css/26-v110-auto-settings-premium.css; css/48-v169-element-box-settings.css; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
       "states": [
         "選單展開",
         "已選取",
@@ -7005,47 +7059,97 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-auto-entry.png"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-auto-entry.png"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-auto-entry.png"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-auto-entry.png"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "正式custom生命補給門檻五選項/真50→75/全隊共用/重開",
+          "status": "已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "scope": "fresh localhost QA transport/profile，原saveGame完整delegated，每尺寸7次；不是零存檔或純暫存；不啟戰/授時/廣告",
+          "devices": [
+            {
+              "device": "360x640",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-auto-entry.png"
+            },
+            {
+              "device": "393x873",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-auto-entry.png"
+            },
+            {
+              "device": "412x915",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-auto-entry.png"
+            },
+            {
+              "device": "1280x800",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-auto-entry.png"
+            }
+          ],
+          "limits": [
+            "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
+            "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
+            "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸normal-only代表實圖核長角色/五選項100%/題牌/返回/零時確認，原皮膚保留",
+        "interaction": "interaction_review：四尺寸各9圖12真tap，custom portal44、HP75/SP50/shared config/切角/重開/zero取消，7次原delegatedSave記錄，fresh noactivefixture",
+        "scope": "scope_review：原26Auto選項44/15與49Autoheader44，無JS/設定選項/時數/啟戰修改；污染getter整批排除，只normal-only限定接受"
+      },
+      "presentationEvidence": {
+        "segment": "segment-21",
+        "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted",
+        "verified": [
+          "正式custom生命補給門檻五選項/真50→75/全隊共用/重開"
+        ],
+        "notVerified": [
+          "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
+          "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
+          "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸normal-only代表實圖核長角色/五選項100%/題牌/返回/零時確認，原皮膚保留",
+          "interaction": "interaction_review：四尺寸各9圖12真tap，custom portal44、HP75/SP50/shared config/切角/重開/zero取消，7次原delegatedSave記錄，fresh noactivefixture",
+          "scope": "scope_review：原26Auto選項44/15與49Autoheader44，無JS/設定選項/時數/啟戰修改；污染getter整批排除，只normal-only限定接受"
+        }
       }
     },
     {
       "id": "auto.sp",
       "label": "自動戰鬥 sp",
       "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
-      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "owner": "js/49-v169-element-box-settings.js; js/25-v131-fix-batch.js; js/00-main.js::initCustomDropdown; css/26-v110-auto-settings-premium.css; css/48-v169-element-box-settings.css; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
       "states": [
         "選單展開",
         "已選取",
@@ -7065,39 +7169,89 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-auto-entry.png"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-auto-entry.png"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-auto-entry.png"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-auto-entry.png"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "正式custom能量補給門檻五選項/真25→50/全隊共用/重開",
+          "status": "已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "scope": "fresh localhost QA transport/profile，原saveGame完整delegated，每尺寸7次；不是零存檔或純暫存；不啟戰/授時/廣告",
+          "devices": [
+            {
+              "device": "360x640",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-auto-entry.png"
+            },
+            {
+              "device": "393x873",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-auto-entry.png"
+            },
+            {
+              "device": "412x915",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-auto-entry.png"
+            },
+            {
+              "device": "1280x800",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-auto-entry.png"
+            }
+          ],
+          "limits": [
+            "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
+            "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
+            "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸normal-only代表實圖核長角色/五選項100%/題牌/返回/零時確認，原皮膚保留",
+        "interaction": "interaction_review：四尺寸各9圖12真tap，custom portal44、HP75/SP50/shared config/切角/重開/zero取消，7次原delegatedSave記錄，fresh noactivefixture",
+        "scope": "scope_review：原26Auto選項44/15與49Autoheader44，無JS/設定選項/時數/啟戰修改；污染getter整批排除，只normal-only限定接受"
+      },
+      "presentationEvidence": {
+        "segment": "segment-21",
+        "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted",
+        "verified": [
+          "正式custom能量補給門檻五選項/真25→50/全隊共用/重開"
+        ],
+        "notVerified": [
+          "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
+          "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
+          "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸normal-only代表實圖核長角色/五選項100%/題牌/返回/零時確認，原皮膚保留",
+          "interaction": "interaction_review：四尺寸各9圖12真tap，custom portal44、HP75/SP50/shared config/切角/重開/zero取消，7次原delegatedSave記錄，fresh noactivefixture",
+          "scope": "scope_review：原26Auto選項44/15與49Autoheader44，無JS/設定選項/時數/啟戰修改；污染getter整批排除，只normal-only限定接受"
+        }
       }
     },
     {
@@ -7212,8 +7366,8 @@
       "id": "auto.element-box",
       "label": "自動戰鬥 element-box",
       "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
-      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "owner": "js/49-v169-element-box-settings.js; js/25-v131-fix-batch.js; js/00-main.js::initCustomDropdown; css/26-v110-auto-settings-premium.css; css/48-v169-element-box-settings.css; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
       "states": [
         "選單展開",
         "已選取",
@@ -7234,43 +7388,27 @@
       "deviceEvidence": {
         "360x640": {
           "status": "部分已實際驗證",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "before": null,
-          "after": [
-            "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-settings-bottom.png"
-          ],
-          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-auto-entry.png"
         },
         "393x873": {
           "status": "部分已實際驗證",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "before": null,
-          "after": [
-            "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-settings-bottom.png"
-          ],
-          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-auto-entry.png"
         },
         "412x915": {
           "status": "部分已實際驗證",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "before": null,
-          "after": [
-            "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-settings-bottom.png"
-          ],
-          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-auto-entry.png"
         },
         "1280x800": {
           "status": "部分已實際驗證",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "before": null,
-          "after": [
-            "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-settings-bottom.png"
-          ],
-          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
-          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-auto-entry.png"
         }
       },
       "stateEvidence": [
@@ -7301,27 +7439,74 @@
               "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
             }
           ]
+        },
+        {
+          "state": "時數0補充確認呈現與取消；不觀看廣告",
+          "status": "已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "scope": "fresh localhost QA transport/profile，原saveGame完整delegated，每尺寸7次；不是零存檔或純暫存；不啟戰/授時/廣告",
+          "devices": [
+            {
+              "device": "360x640",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-zero-hours-confirm.png"
+            },
+            {
+              "device": "393x873",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-zero-hours-confirm.png"
+            },
+            {
+              "device": "412x915",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-zero-hours-confirm.png"
+            },
+            {
+              "device": "1280x800",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-zero-hours-confirm.png"
+            }
+          ],
+          "limits": [
+            "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
+            "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
+            "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+          ]
         }
       ],
       "reviews": {
-        "art": null,
-        "interaction": {
-          "reviewer": "interaction_review",
-          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
-          "result": "第一段已覆蓋原症狀通過，整項仍部分未驗",
-          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
-          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
-        },
-        "scope": null
+        "art": "art_review：四尺寸normal-only代表實圖核長角色/五選項100%/題牌/返回/零時確認，原皮膚保留",
+        "interaction": "interaction_review：四尺寸各9圖12真tap，custom portal44、HP75/SP50/shared config/切角/重開/zero取消，7次原delegatedSave記錄，fresh noactivefixture",
+        "scope": "scope_review：原26Auto選項44/15與49Autoheader44，無JS/設定選項/時數/啟戰修改；污染getter整批排除，只normal-only限定接受"
       },
-      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。"
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。",
+      "presentationEvidence": {
+        "segment": "segment-21",
+        "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted",
+        "verified": [
+          "時數0補充確認呈現與取消；不觀看廣告"
+        ],
+        "notVerified": [
+          "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
+          "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
+          "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸normal-only代表實圖核長角色/五選項100%/題牌/返回/零時確認，原皮膚保留",
+          "interaction": "interaction_review：四尺寸各9圖12真tap，custom portal44、HP75/SP50/shared config/切角/重開/zero取消，7次原delegatedSave記錄，fresh noactivefixture",
+          "scope": "scope_review：原26Auto選項44/15與49Autoheader44，無JS/設定選項/時數/啟戰修改；污染getter整批排除，只normal-only限定接受"
+        }
+      }
     },
     {
       "id": "auto.apply",
       "label": "自動戰鬥 apply",
       "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
-      "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "owner": "js/49-v169-element-box-settings.js; js/25-v131-fix-batch.js; js/00-main.js::initCustomDropdown; css/26-v110-auto-settings-premium.css; css/48-v169-element-box-settings.css; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
       "states": [
         "選單展開",
         "已選取",
@@ -7341,39 +7526,89 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-auto-entry.png"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-auto-entry.png"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-auto-entry.png"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-report.json",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-auto-entry.png"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "時數0且未啟用→套用並啟動原補充確認→只取消/時數仍0且未啟戰",
+          "status": "已實際驗證",
+          "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+          "scope": "fresh localhost QA transport/profile，原saveGame完整delegated，每尺寸7次；不是零存檔或純暫存；不啟戰/授時/廣告",
+          "devices": [
+            {
+              "device": "360x640",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/360x640-zero-hours-confirm.png"
+            },
+            {
+              "device": "393x873",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/393x873-zero-hours-confirm.png"
+            },
+            {
+              "device": "412x915",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/412x915-zero-hours-confirm.png"
+            },
+            {
+              "device": "1280x800",
+              "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-report.json",
+              "image": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted/1280x800-zero-hours-confirm.png"
+            }
+          ],
+          "limits": [
+            "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
+            "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
+            "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
+            "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸normal-only代表實圖核長角色/五選項100%/題牌/返回/零時確認，原皮膚保留",
+        "interaction": "interaction_review：四尺寸各9圖12真tap，custom portal44、HP75/SP50/shared config/切角/重開/zero取消，7次原delegatedSave記錄，fresh noactivefixture",
+        "scope": "scope_review：原26Auto選項44/15與49Autoheader44，無JS/設定選項/時數/啟戰修改；污染getter整批排除，只normal-only限定接受"
+      },
+      "presentationEvidence": {
+        "segment": "segment-21",
+        "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment21-accepted",
+        "verified": [
+          "時數0且未啟用→套用並啟動原補充確認→只取消/時數仍0且未啟戰"
+        ],
+        "notVerified": [
+          "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
+          "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
+          "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
+          "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸normal-only代表實圖核長角色/五選項100%/題牌/返回/零時確認，原皮膚保留",
+          "interaction": "interaction_review：四尺寸各9圖12真tap，custom portal44、HP75/SP50/shared config/切角/重開/zero取消，7次原delegatedSave記錄，fresh noactivefixture",
+          "scope": "scope_review：原26Auto選項44/15與49Autoheader44，無JS/設定選項/時數/啟戰修改；污染getter整批排除，只normal-only限定接受"
+        }
       }
     },
     {
@@ -17043,6 +17278,25 @@
         "自然委託實際六項長列表已捲末（含js34追加），材料一張卡無溢出明記不需捲，未造synthetic長內容",
         "本段未逐格委託完成獎勵橫向rail；既有共用rail證據保留，不冒充此情境五箱全驗"
       ]
+    },
+    {
+      "segment": "segment-21",
+      "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+      "result": "Auto真custom選項/局部返回觸控修復；fresh normal-only四尺寸9圖12tap7原savecalls限定通過",
+      "reviews": {
+        "art": "art_review：四尺寸normal-only代表實圖核長角色/五選項100%/題牌/返回/零時確認，原皮膚保留",
+        "interaction": "interaction_review：四尺寸各9圖12真tap，custom portal44、HP75/SP50/shared config/切角/重開/zero取消，7次原delegatedSave記錄，fresh noactivefixture",
+        "scope": "scope_review：原26Auto選項44/15與49Autoheader44，無JS/設定選項/時數/啟戰修改；污染getter整批排除，只normal-only限定接受"
+      },
+      "pending": [
+        "Latest Head必要CI/部署",
+        "第20個別物品與其餘台帳",
+        "activeguard/真啟動/停止/剩餘時數>0套用/廣告/加時未驗",
+        "真帳號/雲端權威/實體裝置/軟鍵盤未驗",
+        "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
+        "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
+      ],
+      "excluded": "舊activegetter fixture被原js45每秒補品engine消費，原8calls與整批resolved2快照不批准；單獨EXCLUDED證據只追溯QA污染"
     }
   ],
   "titleAudit": {
