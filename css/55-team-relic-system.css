@@ -1,6 +1,7 @@
 /* Team Relic System — black/gold mobile UI. */
 #game-ui #homeFeatureModal.team-relic-modal .team-relic-loading{display:grid;place-items:center;min-height:780px;padding:72px;color:#f4ead4;font-size:48px;line-height:72px;font-weight:800;text-align:center;}
 #game-ui #homeFeatureModal.team-relic-modal .team-relic-loading-error{color:#ffb5a6;}
+#game-ui #homeFeatureModal.team-relic-modal .team-relic-loading-error button{min-width:264px;min-height:132px;padding:18px 36px;font-size:45px;line-height:1.4;}
 :is(#game-stage,#game-ui) .team-relic-notice-dot{position:absolute;right:calc(-2 * var(--ui-length-unit,1px));top:calc(-2 * var(--ui-length-unit,1px));z-index:5;}
 /* Main-city relic summary styling lives in the app-shell first-screen owner. */
 #game-ui #homeFeatureModal.team-relic-modal{--skill-header-height:132px;padding:max(12px,var(--safe-top)) max(12px,var(--safe-right)) max(12px,var(--safe-bottom)) max(12px,var(--safe-left)) !important;}

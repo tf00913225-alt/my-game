@@ -1537,7 +1537,7 @@ body > .v169-rpg-dialog-layer{
 #game-ui #homeFeatureModal:has(#autoBattleSettingsPanel) .character-header-actions{display:flex;justify-content:flex-end;flex:1 0 100%;}
 /* Long feature titles share a symmetric carved plate and a separate return row. */
 #game-ui #homeFeatureModal.team-relic-modal:has(.relic-choice-page) .home-feature-modal-title,
-#game-ui #homeFeatureModal.release-update-modal .home-feature-modal-title{flex-wrap:wrap;gap:calc(8 * var(--ui-length-unit,1px));}
+#game-ui #homeFeatureModal.release-update-modal .home-feature-modal-title{flex-wrap:wrap;justify-content:flex-end;gap:calc(8 * var(--ui-length-unit,1px));}
 #game-ui #homeFeatureModal.team-relic-modal:has(.relic-choice-page) #homeFeatureModalTitle,
 #game-ui #homeFeatureModal.release-update-modal #homeFeatureModalTitle{
     display:block;flex:1 0 100%;height:auto;min-height:var(--skill-header-height);max-width:100%;
