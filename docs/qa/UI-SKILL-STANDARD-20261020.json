@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：逐段限定驗收；全UI與所有標題未全部完成",
+  "status": "施工中：34 ready深淵四尺寸限定驗收；全UI與所有標題未全部完成",
   "devices": [
     {
       "id": "360x640",
@@ -11839,7 +11839,8 @@
         "art": null,
         "interaction": null,
         "scope": null
-      }
+      },
+      "routeClarification": "原vGameplaySelectTowerBand直接startTowerFloor進戰鬥，無獨立唯讀樓層詳情；segment7概覽不代戰場驗收。樓層戰場仍未驗。"
     },
     {
       "id": "gameplay.abyss-regions",
@@ -11934,7 +11935,7 @@
       "label": "abyss-detail內頁",
       "entry": "玩法中心→深淵→20/40難度選擇與地圖；非獨立詳情彈窗",
       "owner": "js/59-abyss-two-tier-runtime.js; css/50-v169-abyss-flow.css; css/54-v174-abyss-two-tier.css; js/41-v146-system-polish.js; js/42-v148-combat-dungeon-fixes.js; config/feature-manifest.json",
-      "status": "有問題",
+      "status": "已修改",
       "states": [
         "鎖定",
         "解鎖",
@@ -12003,7 +12004,42 @@
           "No battle/chest/portal/reward/reset/movement; private cache/hardware/locked tiers/all regions unverified",
           "DOM class correct throughout0/1/3s: no evidence for class-lifecycle migration"
         ]
-      }
+      },
+      "presentationEvidence": {
+        "segment": "segment34-ready-map-accepted",
+        "head": "7025fe9664709590451526f2b3f1b390cffb34a8",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment34-ready-map-accepted",
+        "status": "已實際驗證（限定列出路徑）",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "screens": 36,
+        "inputs": 44,
+        "reviewers": [
+          "art_review",
+          "interaction_review",
+          "scope_review"
+        ],
+        "limits": [
+          "僅隔離帳號兩個ready難度20/40首領域選擇/地圖靜態顯示、原頂部返回玩法及底部返回選擇；不驗整個深淵玩法",
+          "未驗locked/completed/replay、其他領域、map移動、戰鬥、寶箱、portal、reset、獎勵或交易",
+          "九項raw/meta/abyss/legacy/actors/inventory/loadouts/equipment/saveAPI精確還原；private mapEntered/runtime caches未主張還原，隔離profile丟棄",
+          "未驗實體手機硬體；桌面原生wheel，手機CDP觸控",
+          "v169 assets-flow本機identify ENOENT未算通過；最新Head必要Actions待核對",
+          "未合併dev，未部署本工作；新dev cc2842技能來源無新增差異，戰鬥樣式/builder LF正規化合併需保留上游"
+        ]
+      },
+      "remainingStates": [
+        "僅隔離帳號兩個ready難度20/40首領域選擇/地圖靜態顯示、原頂部返回玩法及底部返回選擇；不驗整個深淵玩法",
+        "未驗locked/completed/replay、其他領域、map移動、戰鬥、寶箱、portal、reset、獎勵或交易",
+        "九項raw/meta/abyss/legacy/actors/inventory/loadouts/equipment/saveAPI精確還原；private mapEntered/runtime caches未主張還原，隔離profile丟棄",
+        "未驗實體手機硬體；桌面原生wheel，手機CDP觸控",
+        "v169 assets-flow本機identify ENOENT未算通過；最新Head必要Actions待核對",
+        "未合併dev，未部署本工作；新dev cc2842技能來源無新增差異，戰鬥樣式/builder LF正規化合併需保留上游"
+      ]
     },
     {
       "id": "gameplay.adventure-chapter",
@@ -12503,7 +12539,8 @@
         ],
         "note": "原ledger推測名稱未找到production入口；保持未檢查，不標已驗、不建立功能。",
         "revision": "durable-subset-v2"
-      }
+      },
+      "routeClarification": "js/index正式monsterCatalog/Bestiary/怪物圖鑑入口未找到；bestiaryData仍是擊殺/任務/存檔活躍資料Owner，不可視為退休。此可見頁候選未找到，非已實際驗證；找到正式caller時重開。"
     },
     {
       "id": "battle.hud",
@@ -26680,6 +26717,33 @@
       "head": "54c1eb0addb81476e38961547e0f9acb12a59439",
       "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment34-before-observations",
       "result": "具體問題已取證；未修後驗收，不准標完成"
+    },
+    {
+      "segment": "segment34-ready-map-accepted",
+      "head": "7025fe9664709590451526f2b3f1b390cffb34a8",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment34-ready-map-accepted",
+      "status": "已實際驗證（限定列出路徑）",
+      "devices": [
+        "360x640",
+        "393x873",
+        "412x915",
+        "1280x800"
+      ],
+      "screens": 36,
+      "inputs": 44,
+      "reviewers": [
+        "art_review",
+        "interaction_review",
+        "scope_review"
+      ],
+      "limits": [
+        "僅隔離帳號兩個ready難度20/40首領域選擇/地圖靜態顯示、原頂部返回玩法及底部返回選擇；不驗整個深淵玩法",
+        "未驗locked/completed/replay、其他領域、map移動、戰鬥、寶箱、portal、reset、獎勵或交易",
+        "九項raw/meta/abyss/legacy/actors/inventory/loadouts/equipment/saveAPI精確還原；private mapEntered/runtime caches未主張還原，隔離profile丟棄",
+        "未驗實體手機硬體；桌面原生wheel，手機CDP觸控",
+        "v169 assets-flow本機identify ENOENT未算通過；最新Head必要Actions待核對",
+        "未合併dev，未部署本工作；新dev cc2842技能來源無新增差異，戰鬥樣式/builder LF正規化合併需保留上游"
+      ]
     }
   ],
   "titleAudit": {
